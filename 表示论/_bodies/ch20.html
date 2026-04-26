@@ -1,0 +1,392 @@
+<h1 id="ch20">第 20 章 应用：Schur-Weyl 对偶与组合</h1>
+
+<p>前面几章里，有限群表示和 Lie 代数表示看起来像两条分开的河。对称群 \(S_n\) 的不可约表示由 Young 图控制，\(GL(V)\) 或 \(\mathfrak{gl}(V)\) 的不可约表示由最高权控制；一边像组合学，一边像几何与 Lie 理论。Schur-Weyl 对偶之所以经典，不是因为它给出一个漂亮公式而已，而是因为它告诉你：这两条河本来就在同一张张量幂空间里并排流。</p>
+
+<p>具体舞台是 \(V^{\otimes n}\)。你一旦把一个向量空间 \(V\) 做 \(n\) 次张量积，至少会立刻看见两种对称性。一种是 \(GL(V)\) 同时作用在每一因子上；另一种是 \(S_n\) 重排这些因子。最关键的事实是：它们彼此对易。也就是说，一边不会破坏另一边。这类“两个可交换作用同时住在一个空间里”的局面，在<a href="../线性代数/ch22.html">《线性代数读本》第 22 章</a>的谱分解和<a href="../测度论/ch12.html">《测度论与高级实分析读本》第 12 章</a>的正交分解里都有影子；只是到了这里，交换的不再是两个矩阵，而是两整个代数。</p>
+
+<p>这一章会把三件事焊起来。第一，Schur-Weyl 对偶给出 \(V^{\otimes n}\) 的同时分解。第二，这个分解让 \(S_n\) 的 Specht 模和 \(GL(V)\) 的 Schur 模彼此反射，一边的重数就是另一边的维数。第三，Frobenius 公式与 RSK 对应说明：这套对偶并不是只会算维数的代数技巧，它一直深入组合世界内部。</p>
+
+<h2 id="sec20-1">20.1 \(V^{\otimes n}\) 上有两种天然作用，而且它们彼此对易</h2>
+
+<p>设 \(V\) 是一个 \(d\) 维复向量空间。第一种作用来自 \(GL(V)\)：</p>
+
+\[
+g\cdot (v_1\otimes \cdots \otimes v_n)
+=
+gv_1\otimes \cdots \otimes gv_n,
+\qquad g\in GL(V).
+\]
+
+<p>第二种作用来自对称群 \(S_n\) 的重排：</p>
+
+\[
+\sigma\cdot(v_1\otimes\cdots\otimes v_n)
+=
+v_{\sigma^{-1}(1)}\otimes \cdots \otimes v_{\sigma^{-1}(n)},
+\qquad \sigma\in S_n.
+\]
+
+<p>这里写 \(\sigma^{-1}\) 而不是 \(\sigma\)，是为了让 \((\sigma\tau)\) 的作用真等于先做 \(\tau\) 再做 \(\sigma\)。你把两个定义直接套进去就会发现</p>
+
+\[
+g\cdot\bigl(\sigma\cdot (v_1\otimes\cdots\otimes v_n)\bigr)
+=
+\sigma\cdot\bigl(g\cdot (v_1\otimes\cdots\otimes v_n)\bigr).
+\]
+
+<p>也就是</p>
+
+\[
+\boxed{\rho(GL(V))\subseteq \operatorname{End}_{S_n}(V^{\otimes n}),\qquad
+\mathbb C[S_n]\subseteq \operatorname{End}_{GL(V)}(V^{\otimes n}).}
+\]
+
+<p>这句话是整章发动机。左边说 \(GL(V)\) 的像落在 \(S_n\) 的交换子里，右边说 \(S_n\) 的群代数落在 \(GL(V)\) 的交换子里。所谓 Schur-Weyl 对偶，就是它们不只是落进去，而是把对方的交换子整个填满。</p>
+
+<p>这个局面也解释了为什么张量幂总会同时牵出对称幂、外幂和更多复杂 Schur 函子。因为一旦有了 \(S_n\) 的作用，你就可以对不同置换模式做投影：全部对称给 \(\operatorname{Sym}^nV\)，全部反对称给 \(\bigwedge^nV\)，而介于二者之间的各种混合对称性，正是其他 Young 图在编码。</p>
+
+<h2 id="sec20-2">20.2 Schur-Weyl 对偶定理：\(V^{\otimes n}\) 的同时分解</h2>
+
+<p>现在陈述主定理。设 \(\dim V=d\)。则作为 \(GL(V)\times S_n\) 的表示，有</p>
+
+\[
+\boxed{
+V^{\otimes n}
+\cong
+\bigoplus_{\lambda\vdash n,\ \ell(\lambda)\le d}
+V_\lambda^{GL}\otimes V_\lambda^{S_n}.
+}
+\]
+
+<p>这里 \(\lambda\vdash n\) 表示 \(\lambda\) 是 \(n\) 的一个分拆，\(\ell(\lambda)\) 是 Young 图的行数。\(V_\lambda^{GL}\) 是 \(GL(V)\) 的不可约多项式表示，也常记为 \(S_\lambda(V)\)；\(V_\lambda^{S_n}\) 是对称群的不可约 Specht 模，也常记为 \(S^\lambda\)。公式里最关键的不是符号，而是两个结构：</p>
+
+<p>第一，<strong>同一个分拆 \(\lambda\)</strong> 同时标记两边的不可约对象。第二，张量积右边没有多余重数；每个 \(\lambda\) 只出现一次。所谓“重数”已经被另一边的表示空间自己吸收了。</p>
+
+<p>对应的双中心化结论是</p>
+
+\[
+\boxed{\operatorname{End}_{GL(V)}(V^{\otimes n})=\mathbb C[S_n],}
+\]
+
+\[
+\boxed{\operatorname{End}_{S_n}(V^{\otimes n})=\rho(GL(V)).}
+\]
+
+<p>这就是“对偶”二字的精确含义：你如果只盯住 \(GL(V)\) 看，\(S_n\) 正好把全部交换对称性填满；你如果只盯住 \(S_n\) 看，\(GL(V)\) 也正好把它的全部交换对称性填满。两边像一对互为影子的对称性。</p>
+
+<p>从表示论角度看，这和<a href="ch8.html">第 8 章</a>里的正交关系有一股相似的味道：都是“把大空间按不可约块彻底拆开”。只是这里的拆法更加奢侈，因为它同时记住了两个作用。</p>
+
+<h2 id="sec20-3">20.3 先看最具体的两级台阶：\(n=2\) 与 \(n=3\)</h2>
+
+<p>抽象定理最好先拿最小例子去撞。对 \(n=2\)，对称群 \(S_2\) 只有两个不可约表示：平凡表示和符号表示。对应的 \(V^{\otimes2}\) 立刻分成</p>
+
+\[
+\boxed{V^{\otimes2}=\operatorname{Sym}^2V\oplus \bigwedge^2V.}
+\]
+
+<p>其中交换算子 \((12)\) 在 \(\operatorname{Sym}^2V\) 上作用为 \(+1\)，在 \(\bigwedge^2V\) 上作用为 \(-1\)。也就是说，分拆 \((2)\) 对应全部对称，分拆 \((1,1)\) 对应全部反对称。</p>
+
+<h3 id="sec20-3-1">把 \(n=2\) 的投影公式真的写出来</h3>
+
+<p>对任意 \(v,w\in V\)，定义</p>
+
+\[
+P_{\mathrm{sym}}(v\otimes w)=\frac12(v\otimes w+w\otimes v),
+\]
+
+\[
+P_{\mathrm{alt}}(v\otimes w)=\frac12(v\otimes w-w\otimes v).
+\]
+
+<p>于是</p>
+
+\[
+v\otimes w=P_{\mathrm{sym}}(v\otimes w)+P_{\mathrm{alt}}(v\otimes w),
+\]
+
+<p>而且</p>
+
+\[
+(12)\cdot P_{\mathrm{sym}}(v\otimes w)=P_{\mathrm{sym}}(v\otimes w),
+\]
+
+\[
+(12)\cdot P_{\mathrm{alt}}(v\otimes w)=-P_{\mathrm{alt}}(v\otimes w).
+\]
+
+<p>所以 \(S_2\) 的两个不可约表示，就这样在 \(V^{\otimes2}\) 里被显式抠出来了。Schur-Weyl 对偶在 \(n=2\) 时并不高深；它就是“一个张量可以拆成对称部分和反对称部分”。真正深的是，这个故事会以同样的精神无限推到所有 \(n\)。</p>
+
+<p>对 \(n=3\)，\(S_3\) 有三个不可约表示，对应分拆</p>
+
+\[
+(3),\qquad (2,1),\qquad (1,1,1).
+\]
+
+<p>于是当 \(d\ge 3\) 时，有</p>
+
+\[
+V^{\otimes3}
+\cong
+\operatorname{Sym}^3V\otimes \mathbf 1
+\oplus
+S_{(2,1)}(V)\otimes \mathrm{std}
+\oplus
+\bigwedge^3V\otimes \mathrm{sgn}.
+\]
+
+<p>这里 \(\mathrm{std}\) 是 \(S_3\) 的二维标准表示。你可以把中间那一块理解成“既不完全对称，也不完全反对称”的混合对称性。</p>
+
+<h3 id="sec20-3-2">当 \(\dim V=2\) 时，\(V^{\otimes3}\) 如何分解</h3>
+
+<p>此时 \(\bigwedge^3V=0\)，因为三重外幂在二维空间上消失。所以只剩</p>
+
+\[
+V^{\otimes3}
+\cong
+\operatorname{Sym}^3V\otimes \mathbf 1
+\oplus
+S_{(2,1)}(V)\otimes \mathrm{std}.
+\]
+
+<p>两边维数必须相等。左边是</p>
+
+\[
+\dim V^{\otimes3}=2^3=8.
+\]
+
+<p>右边第一项维数是</p>
+
+\[
+\dim \operatorname{Sym}^3V=\binom{2+3-1}{3}=\binom43=4.
+\]
+
+<p>\(S_3\) 的标准表示维数是 \(2\)，所以第二项必须满足</p>
+
+\[
+4+2\dim S_{(2,1)}(V)=8.
+\]
+
+<p>因此</p>
+
+\[
+\dim S_{(2,1)}(V)=2.
+\]
+
+<p>于是 \(8=4+2\cdot2\) 正好配平。这个小算例已经把“左边的重数由右边的维数给出”清清楚楚地演示了一遍。</p>
+
+<h2 id="sec20-4">20.4 Young 图、Specht 模与 Schur 函子为什么会同时出现</h2>
+
+<p>Schur-Weyl 公式里的分拆 \(\lambda\) 不是凭空冒出来的。它来自同一个 Young 图同时控制两种投影：一边在群代数 \(\mathbb C[S_n]\) 里做 Young 对称化，另一边在 \(V^{\otimes n}\) 里对张量做同样的对称化。</p>
+
+<p>给定一个标准 Young 表 \(T\)，记它的行稳定子为 \(R_T\)，列稳定子为 \(C_T\)。定义行对称化子与列反对称化子</p>
+
+\[
+a_T=\sum_{\sigma\in R_T}\sigma,
+\qquad
+b_T=\sum_{\tau\in C_T}\operatorname{sgn}(\tau)\tau.
+\]
+
+<p>再令</p>
+
+\[
+c_T=b_Ta_T.
+\]
+
+<p>那么 Specht 模可以写成</p>
+
+\[
+\boxed{S^\lambda=\mathbb C[S_n]\,c_T,}
+\]
+
+<p>而相应的 \(GL(V)\) 表示则是</p>
+
+\[
+\boxed{S_\lambda(V)=c_T(V^{\otimes n}).}
+\]
+
+<p>这两个定义看起来长得几乎一样。差别只在于：前者让 \(c_T\) 作用在群代数自己身上，后者让它作用在张量幂上。也正因为它们来自同一个 Young 对称化元，\(\lambda\) 才会同时标记 \(S_n\) 的不可约表示与 \(GL(V)\) 的不可约多项式表示。</p>
+
+<p>在<a href="ch10.html">第 10 章</a>我们已经把 hook length formula 用来算 \(S_n\) 不可约表示的维数。这里它继续有用。若 \(\lambda\vdash n\)，则</p>
+
+\[
+\dim S^\lambda=f^\lambda=\frac{n!}{\prod_{(i,j)\in\lambda}h_{ij}}.
+\]
+
+<h3 id="sec20-4-1">形状 \((2,1)\) 的 Specht 模为什么是二维</h3>
+
+<p>Young 图 \((2,1)\) 的 hook 长度分别是</p>
+
+\[
+3,\qquad 1,\qquad 1.
+\]
+
+<p>因此</p>
+
+\[
+f^{(2,1)}=\frac{3!}{3\cdot1\cdot1}=2.
+\]
+
+<p>这正是 \(S_3\) 的标准表示维数。你如果把上一节 \(\dim V=2\) 的算例和这里对照起来，会发现它们刚好吻合：那里的 multiplicity space 之所以维数是 2，就是因为它背后站着形状 \((2,1)\) 的 Specht 模。</p>
+
+<h2 id="sec20-5">20.5 Schur-Weyl 对偶为什么能让 \(S_n\) 表示与 \(GL(V)\) 表示互定</h2>
+
+<p>现在说这条对偶最值钱的应用。把主公式再抄一遍：</p>
+
+\[
+V^{\otimes n}
+\cong
+\bigoplus_{\lambda\vdash n,\ \ell(\lambda)\le d}
+S_\lambda(V)\otimes S^\lambda.
+\]
+
+<p>如果你暂时只把它看成 \(GL(V)\) 表示，那么每个 \(S_\lambda(V)\) 出现的重数正好等于</p>
+
+\[
+\dim S^\lambda.
+\]
+
+<p>反过来，如果只把它看成 \(S_n\) 表示，那么每个 \(S^\lambda\) 出现的重数正好等于</p>
+
+\[
+\dim S_\lambda(V).
+\]
+
+<p>这就是“互定”的精确含义：知道 \(GL(V)\) 那一边的分块，就能读出 \(S_n\) 那一边的 multiplicity；知道 \(S_n\) 那一边的不可约与维数，又能反推出 \(GL(V)\) 那一边对应 Schur 函子的大小。</p>
+
+<p>为什么这件事成立？证明的核心是双中心化。因为 \(GL(V)\) 与 \(S_n\) 的作用互相对易，所以每个 \(GL(V)\)-同型分量的 multiplicity space 都自动带一个 \(S_n\) 作用；再利用两边都半单，便可把 \(V^{\otimes n}\) 写成</p>
+
+\[
+V^{\otimes n}\cong \bigoplus_\lambda W_\lambda\otimes M_\lambda,
+\]
+
+<p>其中 \(W_\lambda\) 是 \(GL(V)\) 不可约，\(M_\lambda\) 是相应 multiplicity space。双中心化定理再告诉你：这些 \(M_\lambda\) 恰好就是 \(S_n\) 的全部不可约表示，而且不重不漏。也就是说，所谓 Schur-Weyl 对偶，本质上是“两个可交换半单代数共同分解一个模块”的最漂亮样板。</p>
+
+<p>从这个角度看，你也就理解为什么</p>
+
+\[
+\operatorname{Sym}^nV \leftrightarrow (n),
+\qquad
+\bigwedge^nV \leftrightarrow (1^n).
+\]
+
+<p>平凡表示和符号表示不是孤零零的巧合，而是 Schur-Weyl 字典里的两端极值：一端全部对称，一端全部反对称，其他分拆则是介于二者之间的各种混合对称。</p>
+
+<h2 id="sec20-6">20.6 Frobenius 公式：把 \(S_n\) 特征标翻译成对称函数</h2>
+
+<p>Schur-Weyl 对偶告诉你同一个 \(\lambda\) 同时控制 \(GL\) 与 \(S_n\)；Frobenius 公式则把这种联系进一步压到特征标层面。对 \(S_n\) 的一个类函数 \(\chi\)，定义它的 Frobenius 特征为</p>
+
+\[
+\operatorname{ch}(\chi)
+=
+\sum_{\mu\vdash n} z_\mu^{-1}\chi(\mu)\,p_\mu.
+\]
+
+<p>这里 \(p_\mu=p_{\mu_1}\cdots p_{\mu_r}\) 是幂和对称函数，而</p>
+
+\[
+z_\mu=\prod_i i^{m_i}m_i!
+\]
+
+<p>若 \(\mu\) 中有 \(m_i\) 个长度为 \(i\) 的部件。Frobenius 定理说：对不可约特征标 \(\chi^\lambda\)，有</p>
+
+\[
+\boxed{s_\lambda=\sum_{\mu\vdash n} z_\mu^{-1}\chi^\lambda(\mu)\,p_\mu.}
+\]
+
+<p>左边的 \(s_\lambda\) 是 Schur 函数，也就是 \(GL\) 表示那一边的角色。右边则是 \(S_n\) 不可约特征标在各共轭类上的数值。于是 Schur 函数不是“另一个组合对象”，而是 \(S_n\) 特征标通过 Frobenius map 翻到对称函数环里的身影。</p>
+
+<h3 id="sec20-6-1">用 \(\lambda=(2,1)\) 把 \(S_3\) 的标准特征标反推出来</h3>
+
+<p>\(S_3\) 的共轭类由分拆</p>
+
+\[
+(1,1,1),\qquad (2,1),\qquad (3)
+\]
+
+<p>标记。对应的 \(z_\mu\) 分别是</p>
+
+\[
+z_{(1,1,1)}=6,\qquad z_{(2,1)}=2,\qquad z_{(3)}=3.
+\]
+
+<p>而形状 \((2,1)\) 的 Schur 函数满足</p>
+
+\[
+s_{(2,1)}=\frac13\bigl(p_1^3-p_3\bigr).
+\]
+
+<p>把它和 Frobenius 公式比较：</p>
+
+\[
+s_{(2,1)}
+=
+\frac{\chi^{(2,1)}(1^3)}{6}p_1^3
+\frac{\chi^{(2,1)}(2,1)}{2}p_1p_2
+\frac{\chi^{(2,1)}(3)}{3}p_3.
+\]
+
+<p>由于 \(p_1p_2\) 项系数为 \(0\)，我们立刻读出</p>
+
+\[
+\chi^{(2,1)}(2,1)=0.
+\]
+
+<p>再比较 \(p_1^3\) 与 \(p_3\) 项，得到</p>
+
+\[
+\frac{\chi^{(2,1)}(1^3)}6=\frac13
+\quad\Longrightarrow\quad
+\chi^{(2,1)}(1^3)=2,
+\]
+
+\[
+\frac{\chi^{(2,1)}(3)}3=-\frac13
+\quad\Longrightarrow\quad
+\chi^{(2,1)}(3)=-1.
+\]
+
+<p>于是标准表示的特征标正好是</p>
+
+\[
+\chi^{(2,1)}=(2,0,-1).
+\]
+
+<p>这正是你在<a href="ch9.html">第 9 章</a>构造 \(S_3\) 特征标表时见过的那一行。Frobenius 公式的妙处就在这里：它把对称函数恒等式和群特征标一一对接。</p>
+
+<h2 id="sec20-7">20.7 RSK 对应：同一批 Young 图继续出现在更深的组合结构里</h2>
+
+<p>Schur-Weyl 对偶说明分拆控制张量幂分解；Robinson-Schensted-Knuth 对应则说明，同一批分拆还控制排列与词的组合结构。对排列 \(\sigma\in S_n\)，RSK 给出一个双射</p>
+
+\[
+\sigma \longleftrightarrow (P(\sigma),Q(\sigma)),
+\]
+
+<p>其中 \(P,Q\) 是同形状的标准 Young 表。于是每个分拆 \(\lambda\vdash n\) 对应的排列数是</p>
+
+\[
+(f^\lambda)^2,
+\]
+
+<p>从而</p>
+
+\[
+n!=\sum_{\lambda\vdash n}(f^\lambda)^2.
+\]
+
+<p>这条恒等式你也可以把它看成“对称群正则表示按不可约表示分解”的维数平方和公式在组合世界里的另一个影子。</p>
+
+<h3 id="sec20-7-1">拿排列 \(3142\) 感受一下 RSK 的味道</h3>
+
+<p>把 \(3,1,4,2\) 依次插入，RSK 会得到一对同形状表，其形状是</p>
+
+\[
+\lambda=(2,2).
+\]
+
+<p>这说明这个排列对应的主形状有两行两列。更深的定理还告诉你：\(\lambda_1\) 是最长递增子序列长度，\(\lambda_1'\) 是最长递减子序列长度。也就是说，Young 图不仅在表示论里分类不可约块，在组合学里还在读取排列内部的序结构。</p>
+
+<p>本书不打算把 RSK 算法完整铺开，但你应该先记住它在这章里的地位：它不是旁枝，而是又一条证据，说明“分拆 \(\lambda\)”这批对象在群表示、对称函数、张量幂分解和排列组合之间反复充当共同货币。</p>
+
+<h2 id="sec20-8">20.8 这一章的主线其实只有一句</h2>
+
+<p>\(V^{\otimes n}\) 上的 \(GL(V)\) 作用和 \(S_n\) 作用彼此对易，于是同一个张量幂空间同时记住了 Lie 型表示与有限群表示。Schur-Weyl 对偶说，这两边的交换子恰好互相填满，所以分拆 \(\lambda\) 会同时标记 Schur 模与 Specht 模，而一边的重数正是另一边的维数。Frobenius 公式和 RSK 对应进一步告诉你：这不是一个局部巧合，而是一整片代数、组合与对称函数共用的语法。</p>

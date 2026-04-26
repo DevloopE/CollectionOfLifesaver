@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 模、代数与 Maschke 定理：为什么 \(k[G]\) 会把表示论线性化 — 普林斯顿表示论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 群论速查：从群、子群到 \(S_n\)、\(A_n\) 与二面体群</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+<h1 id="appB">附录 B 模、代数与 Maschke 定理：为什么 \(k[G]\) 会把表示论线性化</h1>
+
+<p>正文里我们一直在说“\(G\) 的表示”，但从更高一点的角度看，表示论其实在做一件非常统一的事：把群装进一个代数，再把“表示”改写成“这个代数的模”。一旦你接受这个视角，许多前面看似分别证明过的结论会突然长成同一条骨架：子表示就是子模，完全可约就是模的半单性，Schur 引理是在说简单模之间的同态极其刚性，而 Maschke 定理则是在断言某个特定代数 \(k[G]\) 是半单的。</p>
+
+<p>这份附录把这套后端压缩出来。它不会替代一门完整的非交换代数课，但会把表示论最常用的代数翻译表摆清楚，尤其是把 Maschke 定理的证明完整写出来。因为这条定理不是一块技术砖，而是本书前半段几乎所有分解现象真正踩着的地板。</p>
+
+<h2 id="secB-1">B.1 群代数 \(k[G]\)：把群元做成一组基</h2>
+
+<p>设 \(G\) 是一个有限群，\(k\) 是一个域。群代数 \(k[G]\) 定义为：以 \(G\) 的元素为基的 \(k\)-向量空间，再把群乘法线性延拓成代数乘法。也就是说，元素长成</p>
+
+\[
+\sum_{g\in G} a_g g,\qquad a_g\in k,
+\]
+
+<p>而乘法规定为</p>
+
+\[
+\left(\sum_{g\in G}a_gg\right)\left(\sum_{h\in G}b_hh\right)
+=
+\sum_{g,h\in G}a_gb_h(gh).
+\]
+
+<p>这看起来像是在“把群元素拿来做形式线性组合”。正是如此。群里原本只有乘法，没有加法；群代数把加法和标量乘法也补进来了，于是我们就能用线性代数和环论的语言处理群。</p>
+
+<p>作为向量空间，</p>
+
+\[
+\dim_k k[G]=|G|.
+\]
+
+<p>单位元则是群单位元 \(e\) 自己。若 \(G=C_n=\langle r:r^n=e\rangle\) 是循环群，那么</p>
+
+\[
+k[C_n]\cong k[x]/(x^n-1),
+\]
+
+<p>同构把 \(x\) 送到生成元 \(r\)。这说明群代数并不是什么抽象怪物；它经常是你已经认识的商代数，只是多了一层群结构来源。</p>
+
+<p>还有一个很重要的元素是平均元</p>
+
+\[
+\frac{1}{|G|}\sum_{g\in G}g,
+\]
+
+<p>当然只有当 \(|G|\) 在域 \(k\) 中可逆时它才有意义。Maschke 定理背后的“平均化”动作，正是靠这类元素完成的。</p>
+
+<h2 id="secB-2">B.2 \(k[G]\)-模与 \(G\) 表示其实是一回事</h2>
+
+<p>给定一个群表示</p>
+
+\[
+\rho\colon G\to GL(V),
+\]
+
+<p>我们可以把它扩张成 \(k[G]\) 对 \(V\) 的作用：</p>
+
+\[
+\left(\sum_{g\in G}a_g g\right)\cdot v
+=
+\sum_{g\in G}a_g\,\rho(g)v.
+\]
+
+<p>这个定义是线性的，也和代数乘法兼容，所以 \(V\) 成了一个左 \(k[G]\)-模。</p>
+
+<p>反过来，如果 \(V\) 是一个左 \(k[G]\)-模，那么每个群元 \(g\in G\subset k[G]\) 都通过乘法给出一个线性自同构 \(v\mapsto gv\)，因为 \(g^{-1}\) 在群代数里也存在。于是我们立刻得到一个群表示</p>
+
+\[
+G\to GL(V),\qquad g\mapsto (v\mapsto gv).
+\]
+
+<p>所以有一个完全等价：</p>
+
+\[
+\boxed{\{\text{\(k[G]\)-模}\}\ \longleftrightarrow\ \{\text{\(G\) 的线性表示}\}.}
+\]
+
+<p>在这套翻译表下，许多术语变得一一对应：</p>
+
+<ul>
+  <li>子表示 = \(k[G]\)-子模；</li>
+  <li>商表示 = 商模；</li>
+  <li>不可约表示 = 简单模；</li>
+  <li>直和分解 = 模的直和分解；</li>
+  <li>\(\operatorname{Hom}_G(V,W)\) = \(k[G]\)-模同态。</li>
+</ul>
+
+<p>这正是为什么 Schur 引理可以被看成一个纯模论命题，也正是为什么 Maschke 定理最好表述成“\(k[G]\) 是半单代数”。如果你只在群表示的语境里看它，很多现象会显得像一连串独立技巧；一旦换成模论语言，它们会重新合成一件事。</p>
+
+<h2 id="secB-3">B.3 半单代数与完全可约：什么叫“所有模都能拆开”</h2>
+
+<p>有限维 \(k\)-代数 \(A\) 称为半单，如果它的每个有限维左模都完全可约，也就是都能写成简单模的直和。对表示论读者来说，你可以先把这句话翻成：</p>
+
+\[
+\boxed{\text{半单} \iff \text{每个表示都能分解成不可约表示的直和}.}
+\]
+
+<p>这就是正文第 5 章里“完全可约”的代数版本。</p>
+
+<p>为什么这种性质重要？因为一旦模块范畴是半单的，许多问题会立刻降维。比如两个模之间的同态会被块分解控制，特征标加法会严格反映直和结构，投影到不可约分量的算子可以被系统构造出来，而不是靠临时猜。</p>
+
+<p>最简单的半单代数例子就是全矩阵代数 \(M_n(k)\)。它的模论本质上只有一个简单对象，就是列向量空间 \(k^n\)。更一般地，有限个矩阵代数的直和</p>
+
+\[
+M_{n_1}(k)\oplus \cdots \oplus M_{n_r}(k)
+\]
+
+<p>也是半单的。这一点在本附录最后的 Wedderburn 分解里会回来：对“好域”上的有限群，群代数最终就会分裂成这么几块矩阵代数。</p>
+
+<p>相反，如果代数不是半单，就会出现不能拆开的短正合列、不可分裂扩张、Jordan 型的幂零影子。表示论里最典型的坏情形，就是 \(\operatorname{char}k\mid |G|\) 的模表示论：那时 \(k[G]\) 往往不再半单，许多熟悉的分解定理会一起失效。</p>
+
+<h2 id="secB-4">B.4 Maschke 定理的完整证明：平均投影为什么能把补空间修正成 \(G\)-不变</h2>
+
+<p>现在进入核心。Maschke 定理说：</p>
+
+\[
+\boxed{
+\text{若 }G\text{ 有限且 }\operatorname{char}k\nmid |G|,
+\text{ 则每个有限维 }k[G]\text{-模都完全可约。}
+}
+\]
+
+<p>换成群表示语言，就是：有限群在“好特征”上的每个表示，都能分解成不可约表示直和。证明的关键不是去猜分解，而是从任意线性补空间出发，用平均化把它修正成 \(G\)-不变补空间。</p>
+
+<p>设 \(V\) 是一个 \(k[G]\)-模，\(W\subseteq V\) 是一个子模。我们要证明存在另一个子模 \(U\)，使得</p>
+
+\[
+V=W\oplus U.
+\]
+
+<p>第一步只用线性代数。因为 \(V\) 有限维，总可以找一个普通的向量空间补</p>
+
+\[
+V=W\oplus U_0.
+\]
+
+<p>对应地，存在一个线性投影</p>
+
+\[
+p\colon V\to W
+\]
+
+<p>满足</p>
+
+\[
+p(w)=w\quad(\forall w\in W).
+\]
+
+<p>问题在于，\(p\) 未必与 \(G\) 的作用可交换，所以 \(\ker p=U_0\) 未必是子模。我们要做的，就是把 \(p\) 平均成一个 \(G\)-等变投影：</p>
+
+\[
+P(v)=\frac1{|G|}\sum_{g\in G} g^{-1}p(gv).
+\]
+
+<p>这里 \(|G|^{-1}\) 在域 \(k\) 中存在，这正是特征条件的全部用处。接下来分三步检查。</p>
+
+<p>第一，\(P\) 的像落在 \(W\) 里。因为对每个 \(g\)，\(gv\in V\)，所以 \(p(gv)\in W\)。又由于 \(W\) 是子模，\(g^{-1}p(gv)\) 仍在 \(W\)。求和后当然还在 \(W\)。</p>
+
+<p>第二，\(P\) 在 \(W\) 上等于恒等。若 \(w\in W\)，则因为 \(W\) 是子模，\(gw\in W\)。所以</p>
+
+\[
+p(gw)=gw.
+\]
+
+<p>代回定义：</p>
+
+\[
+P(w)
+=
+\frac1{|G|}\sum_{g\in G}g^{-1}gw
+=
+\frac1{|G|}\sum_{g\in G}w
+=
+w.
+\]
+
+<p>因此 \(P\) 确实是投影到 \(W\) 的某种版本。</p>
+
+<p>第三，也是最关键的一步：\(P\) 与 \(G\) 作用可交换。取任意 \(h\in G\)，有</p>
+
+\[
+P(hv)
+=
+\frac1{|G|}\sum_{g\in G}g^{-1}p(ghv).
+\]
+
+<p>令 \(u=gh\)，则当 \(g\) 遍历 \(G\) 时，\(u\) 也遍历 \(G\)。于是</p>
+
+\[
+P(hv)
+=
+\frac1{|G|}\sum_{u\in G}(uh^{-1})^{-1}p(uv)
+=
+\frac1{|G|}\sum_{u\in G}hu^{-1}p(uv)
+=
+hP(v).
+\]
+
+<p>所以</p>
+
+\[
+P(hv)=hP(v)\qquad(\forall h\in G,\ v\in V).
+\]
+
+<p>这说明 \(P\) 是 \(k[G]\)-模同态。</p>
+
+<p>既然 \(P\) 是投影到 \(W\) 的模同态，那么</p>
+
+\[
+V=\operatorname{im}P\oplus \ker P
+=
+W\oplus \ker P.
+\]
+
+<p>剩下只要说明 \(\ker P\) 是子模即可。若 \(v\in \ker P\)，则 \(P(v)=0\)。对任意 \(h\in G\)，由等变性得</p>
+
+\[
+P(hv)=hP(v)=0.
+\]
+
+<p>故 \(hv\in \ker P\)。因此 \(\ker P\) 是 \(k[G]\)-子模，证明完成。</p>
+
+<p>整个证明真正值得你记住的地方，不是某一行计算，而是那一下“先任取普通投影，再用群平均把它修正成等变投影”。这招在表示论里会反复重现：Haar 积分版会通向紧群表示的完全可约性，正交投影版会通向 Peter-Weyl 与单位ary trick。</p>
+
+<h2 id="secB-5">B.5 Maschke 为什么会失败，以及 Wedderburn 分解说了什么</h2>
+
+<p>若 \(\operatorname{char}k\mid |G|\)，上面的平均公式立刻失效，因为 \(|G|^{-1}\) 不存在。更糟的是，结论本身通常真的不成立。最简单的反例是 \(G=C_p=\langle g\rangle\)，域 \(k\) 的特征也取 \(p\)。此时</p>
+
+\[
+k[C_p]\cong k[x]/(x^p-1)=k[x]/(x-1)^p.
+\]
+
+<p>右边含有幂零元，所以绝不可能是半单代数。对应地，正则模里会出现不能再拆开的 Jordan 型块。也就是说，Maschke 定理的条件不是技术细节，而是恰好卡在“能不能平均”这道门槛上。</p>
+
+<p>当 \(k\) 是分裂域且 \(\operatorname{char}k\nmid |G|\) 时，Wedderburn 定理进一步告诉你，群代数不仅半单，而且实际上分解成矩阵代数直和：</p>
+
+\[
+\boxed{k[G]\cong \bigoplus_{i=1}^r M_{d_i}(k),}
+\]
+
+<p>其中 \(d_i\) 正是 \(G\) 的全部不可约表示维数。若 \(k=\mathbb C\)，这就是最常用的形式。于是取维数便得</p>
+
+\[
+|G|=\dim_{\mathbb C}\mathbb C[G]=\sum_{i=1}^r d_i^2.
+\]
+
+<p>这正是正文第 8 章里“维数平方和等于群阶”的根源。你平时把它当作特征标正交关系的一个漂亮推论；在代数后端，它其实是在说：\(\mathbb C[G]\) 自己裂成若干全矩阵代数，而每一块的维数是 \(d_i^2\)。</p>
+
+<p>更一般地，有限维半单代数 \(A\) 在适当意义下总可写成</p>
+
+\[
+A\cong \bigoplus_i M_{n_i}(D_i),
+\]
+
+<p>其中 \(D_i\) 是除代数。对复数域来说每个 \(D_i\) 都退化成 \(\mathbb C\)，所以公式最干净。表示论里之所以偏爱复数域，很大程度上正因为这时 Wedderburn 分解完全透明，所有不可约模的 endomorphism 环也由 Schur 引理缩成 \(\mathbb C\) 本身。</p>
+
+<p>把这一附录压成一句最该留下的话：群表示论之所以能像线性代数一样“拆块”，不是因为幸运，而是因为在好特征下，群代数 \(k[G]\) 本身就是半单的。Maschke 定理给出这块地板的构造性证明，Wedderburn 定理则说明这块地板其实是一块块矩阵代数拼起来的。前者解释为什么能分解，后者解释分解完以后世界究竟长什么样。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 群论速查：从群、子群到 \(S_n\)、\(A_n\) 与二面体群</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+
+</main>
+</body>
+</html>

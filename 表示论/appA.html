@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 群论速查：从群、子群到 \(S_n\)、\(A_n\) 与二面体群 — 普林斯顿表示论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 应用：Schur-Weyl 对偶与组合</a><a href="appB.html">下一章 · 附录 B 模、代数与 Maschke 定理：为什么 \(k[G]\) 会把表示论线性化 →</a></nav>
+<h1 id="appA">附录 A 群论速查：从群、子群到 \(S_n\)、\(A_n\) 与二面体群</h1>
+
+<p>这本书前半段一直在用群，却没有打算把群论本身重讲一遍。对大多数读者来说，这反而是最容易出现“名词我都认识，但一连起来就卡壳”的地方：正规子群和商群什么时候该出现？Lagrange 定理到底最常拿来干什么？Sylow 定理在表示论里为什么总像一个后台判别器？这一份附录的任务，就是把最常用的群论地板压缩成一张能随手回查的速写图。</p>
+
+<p>请把它当作语言补给站，而不是独立课程。正文里如果某个地方需要更强的群论，我们会当场说；附录这里只收那些最会被反复调用、但又不值得每次都重讲一遍的骨架。</p>
+
+<h2 id="secA-1">A.1 群、子群、陪集、正规子群与商群</h2>
+
+<p>一个群 \(G\) 是一个带乘法的集合，满足结合律、有单位元 \(e\)，且每个元素都有逆元。最常见的例子包括：</p>
+
+\[
+(\mathbb Z,+),\qquad (\mathbb C^\times,\cdot),\qquad S_n,\qquad GL_n(\mathbb C).
+\]
+
+<p>子集 \(H\subseteq G\) 若在群运算下自己闭合，并包含单位元与逆元，就称为子群，记作 \(H\le G\)。验证子群时最常用的一步判据是：若 \(H\neq\varnothing\)，且对任意 \(x,y\in H\) 都有 \(xy^{-1}\in H\)，那么 \(H\) 就是子群。</p>
+
+<p>给定子群 \(H\le G\)，左陪集与右陪集定义为</p>
+
+\[
+gH=\{gh:h\in H\},\qquad Hg=\{hg:h\in H\}.
+\]
+
+<p>左陪集把群分成若干块，每块大小都与 \(H\) 相同。你可以把它理解成：\(H\) 在 \(G\) 里被平移到不同位置后形成的一簇等大切片。这正是 Lagrange 定理的几何直觉。</p>
+
+<p>子群 \(N\le G\) 若满足</p>
+
+\[
+gNg^{-1}=N\qquad(\forall g\in G),
+\]
+
+<p>就叫正规子群，记作 \(N\trianglelefteq G\)。正规性的真正意义是：左陪集与右陪集一致，于是陪集乘法</p>
+
+\[
+(gN)(hN)=(gh)N
+\]
+
+<p>才是良定义的。此时陪集集合 \(G/N\) 本身成为一个群，叫商群。</p>
+
+<p>很多初学者会把“商群”误读成“把群随便压缩一下”。其实不是。它做的是：把正规子群 \(N\) 内部的差异全部忽略，只保留“模掉 \(N\) 之后剩下的结构”。在表示论里，若某个表示把 \(N\) 里的每个元素都送到恒等算子，那么这个表示事实上不是在看 \(G\)，而是在看商群 \(G/N\)。</p>
+
+<h2 id="secA-2">A.2 同态、核、像、Lagrange 与 Sylow 三定理</h2>
+
+<p>群同态是保持乘法的映射</p>
+
+\[
+\varphi\colon G\to H,\qquad \varphi(xy)=\varphi(x)\varphi(y).
+\]
+
+<p>它的核与像分别定义为</p>
+
+\[
+\ker\varphi=\{g\in G:\varphi(g)=e_H\},
+\qquad
+\operatorname{im}\varphi=\{\varphi(g):g\in G\}.
+\]
+
+<p>核总是 \(G\) 的正规子群，像总是 \(H\) 的子群。最基本的一条结构定理是第一同构定理：</p>
+
+\[
+\boxed{G/\ker\varphi \cong \operatorname{im}\varphi.}
+\]
+
+<p>这句话在表示论里会不断重现。比如一个表示 \(\rho\colon G\to GL(V)\) 的核，就是那些“对 \(V\) 完全看不见”的群元素；因此 \(\rho\) 真正刻画的是 \(G/\ker\rho\) 的一个忠实表示。</p>
+
+<p>若 \(G\) 有限，子群 \(H\le G\) 的指数记作</p>
+
+\[
+[G:H]=\#\{gH:g\in G\}.
+\]
+
+<p>Lagrange 定理说：</p>
+
+\[
+\boxed{|G|=|H|\,[G:H].}
+\]
+
+<p>直接推论是：有限群中任何子群的阶都整除群的阶，任何元素的阶也都整除群的阶。于是阶为素数 \(p\) 的群一定循环；阶为 \(pq\) 的群结构也会被严重约束。</p>
+
+<p>再往上一层，Sylow 定理告诉你有限群里最大的 \(p\)-幂子群如何存在、如何计数。若</p>
+
+\[
+|G|=p^a m,\qquad p\nmid m,
+\]
+
+<p>则阶为 \(p^a\) 的子群称为 Sylow \(p\)-子群。Sylow 三定理是：</p>
+
+<ol>
+  <li>存在性：\(G\) 至少有一个 Sylow \(p\)-子群。</li>
+  <li>共轭性：任意两个 Sylow \(p\)-子群彼此共轭。</li>
+  <li>计数性：Sylow \(p\)-子群个数 \(n_p\) 满足</li>
+</ol>
+
+\[
+\boxed{n_p\equiv 1\pmod p,\qquad n_p\mid m.}
+\]
+
+<p>这三条看似只是群论技术，实际非常有杀伤力。很多有限群的“有没有正规子群”“是否唯一”“能否分解”为直积或半直积，往往一开始就是靠 Sylow 计数把可能性大幅削掉。</p>
+
+<p>举个最经典的用法。若 \(|G|=21=3\cdot 7\)，则 Sylow 7-子群个数 \(n_7\) 满足</p>
+
+\[
+n_7\equiv 1\pmod 7,\qquad n_7\mid 3.
+\]
+
+<p>唯一可能是 \(n_7=1\)，所以 Sylow 7-子群正规。也就是说，任何 21 阶群都带着一个正规 7 阶循环子群。这样的问题如果不借 Sylow，几乎没法快速开局。</p>
+
+<h2 id="secA-3">A.3 有限阿贝尔群分类：所有东西最后都是循环块的直和</h2>
+
+<p>阿贝尔群之所以在表示论里特别舒服，是因为它们的不可约复表示全是一维的。这个现象背后的离散版本，就是有限阿贝尔群本身已经非常可分解。分类定理说：</p>
+
+\[
+\boxed{
+A\cong
+\mathbb Z^r\oplus
+\mathbb Z/n_1\mathbb Z\oplus \cdots \oplus \mathbb Z/n_k\mathbb Z,
+\qquad
+n_1\mid n_2\mid \cdots \mid n_k.
+}
+\]
+
+<p>若 \(A\) 有限，则没有自由部分 \(\mathbb Z^r\)，只剩后一串有限循环群直和。等价地，你也可以先按素数分解成 \(p\)-初部分，再把每个 \(p\)-初群写成若干 \(p\)-幂循环群的直和。</p>
+
+<p>比如</p>
+
+\[
+\mathbb Z/12\mathbb Z
+\cong
+\mathbb Z/4\mathbb Z\oplus \mathbb Z/3\mathbb Z,
+\]
+
+<p>因为 \(12=4\cdot 3\) 且 \(\gcd(4,3)=1\)。再比如阶为 \(8\) 的阿贝尔群只有三种：</p>
+
+\[
+\mathbb Z/8,\qquad
+\mathbb Z/4\oplus \mathbb Z/2,\qquad
+(\mathbb Z/2)^3.
+\]
+
+<p>这条分类定理对表示论最直接的启发是：阿贝尔结构本身已经完全由一维块拼出来，所以它的复表示自然也会退化成特征标的直和。你在正文第 4 章第一次算循环群不可约表示时，其实已经在体验这条定理的影子。</p>
+
+<h2 id="secA-4">A.4 群作用、轨道、稳定子、共轭与类方程</h2>
+
+<p>群作用是表示论最自然的前厅。一个群 \(G\) 在集合 \(X\) 上的作用，是映射</p>
+
+\[
+G\times X\to X,\qquad (g,x)\mapsto g\cdot x
+\]
+
+<p>满足</p>
+
+\[
+e\cdot x=x,\qquad (gh)\cdot x=g\cdot(h\cdot x).
+\]
+
+<p>对 \(x\in X\)，它的轨道与稳定子分别为</p>
+
+\[
+Gx=\{g\cdot x:g\in G\},
+\qquad
+G_x=\{g\in G:g\cdot x=x\}.
+\]
+
+<p>有限群作用的最常用公式是轨道-稳定子定理：</p>
+
+\[
+\boxed{|Gx|=[G:G_x],\qquad |G|=|Gx|\,|G_x|.}
+\]
+
+<p>它的本质就是：所有能把某个基点 \(x\) 送到同一个位置的群元素，正好构成同一个左陪集。于是轨道大小就是群按稳定子切出的陪集数。</p>
+
+<p>当 \(G\) 作用在自己身上，方式取为共轭作用</p>
+
+\[
+g\cdot x=gxg^{-1},
+\]
+
+<p>轨道就是共轭类，稳定子就是中心化子</p>
+
+\[
+C_G(x)=\{g\in G:gx=xg\}.
+\]
+
+<p>于是</p>
+
+\[
+|\operatorname{Cl}(x)|=[G:C_G(x)].
+\]
+
+<p>把群按共轭类分块，就得到类方程</p>
+
+\[
+|G|=|Z(G)|+\sum [G:C_G(x_i)],
+\]
+
+<p>其中 \(Z(G)\) 是中心，求和在非中心共轭类代表元上进行。表示论里“类函数”“特征标常值于共轭类”这些话，全部都踩在这层结构上。</p>
+
+<p>如果你希望更会数轨道，Burnside 引理是另一条好用工具：</p>
+
+\[
+\boxed{|X/G|=\frac{1}{|G|}\sum_{g\in G}|X^g|,}
+\]
+
+<p>其中 \(X^g=\{x\in X:g\cdot x=x\}\) 是 \(g\) 的不动点集。它告诉你：轨道数等于平均不动点数。这条公式在 Polya 计数、项链染色、化学异构体计数中尤其有名；在表示论背景下，它也经常是“先数轨道，再转特征标”的起点。</p>
+
+<h2 id="secA-5">A.5 三个必须熟到手感化的例子：\(S_n\)、\(A_n\)、二面体群 \(D_n\)</h2>
+
+<p>对称群 \(S_n\) 是所有 \(n\) 个元素置换组成的群，阶为</p>
+
+\[
+|S_n|=n!.
+\]
+
+<p>\(S_n\) 的共轭类由循环类型决定，而循环类型又恰好对应 \(n\) 的分拆。这一点之所以对本书特别重要，是因为对称群的不可约复表示也由分拆标记。也就是说，<strong>分拆同时控制共轭类和不可约表示</strong>，于是特征标表自然会长成一个“分拆对分拆”的方阵。</p>
+
+<p>置换的奇偶性由符号映射给出：</p>
+
+\[
+\operatorname{sgn}\colon S_n\to\{\pm1\}.
+\]
+
+<p>它的核就是交错群 \(A_n\)，因此</p>
+
+\[
+|A_n|=\frac{n!}{2}.
+\]
+
+<p>\(A_n\) 是所有偶置换组成的群。对 \(n\ge 5\)，\(A_n\) 是单群，这是有限群论最著名的基础结论之一。表示论里我们常常在 \(S_n\) 与 \(A_n\) 之间来回限制和诱导，许多“表示是否分裂”“特征标在 \(A_n\) 上如何变化”的问题，都从这个指数 2 正规子群结构出发。</p>
+
+<p>二面体群 \(D_n\) 是正 \(n\) 边形的全对称群，按本书约定它有 \(2n\) 个元素。一个标准表示是</p>
+
+\[
+\boxed{D_n=\langle r,s\mid r^n=e,\ s^2=e,\ srs=r^{-1}\rangle.}
+\]
+
+<p>这里 \(r\) 是旋转一个顶角，\(s\) 是某条轴的反射。所有元素都可唯一写成</p>
+
+\[
+e,r,r^2,\dots,r^{n-1},\qquad s,sr,sr^2,\dots,sr^{n-1}.
+\]
+
+<p>于是 \(D_n\) 立刻带着一个指数 2 循环子群 \(\langle r\rangle\cong C_n\)。这也是为什么 \(D_n\) 的表示很适合先从循环部分出发，再处理反射如何把表示扭过去。你在正文前几章碰到的二维“标准反射表示”，其实就是把 \(D_n\) 真正作用在平面上的那份最直观表示。</p>
+
+<p>最后压成一句最值得带走的话。群论里最常见的几种动作，无非是：找子群、找正规子群、模掉核、数陪集、看共轭类、算轨道。表示论把这些动作线性化以后，得到的就是子表示、商表示、忠实表示、类函数、特征标与分解定理。换句话说，这份附录不是和正文平行的预备知识，而是正文一直在用、只是换了语言说的话。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 应用：Schur-Weyl 对偶与组合</a><a href="appB.html">下一章 · 附录 B 模、代数与 Maschke 定理：为什么 \(k[G]\) 会把表示论线性化 →</a></nav>
+
+</main>
+</body>
+</html>

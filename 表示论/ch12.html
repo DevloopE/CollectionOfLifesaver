@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 Frobenius 互反 — 普林斯顿表示论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 张量积与诱导表示</a><a href="ch13.html">下一章 · 第 13 章 紧 Lie 群与 Peter-Weyl →</a></nav>
+<h1 id="ch12">第 12 章 Frobenius 互反</h1>
+
+<p>上一章我们把限制 \(\operatorname{Res}_H^G\) 和诱导 \(\operatorname{Ind}_H^G\) 都定义出来了。可如果你只把它们当成两个各自有用的操作，事情就还停在“会用工具”的阶段。Frobenius 互反告诉你：这两个操作其实是一对严格配对的伴随。你在大群里问“诱导上来的表示里含有多少份 \(V\)”，和你在子群里问“\(V\) 限制下去以后含有多少份 \(W\)”——这两件事根本是同一个数字。</p>
+
+<p>这一定理的价值，不只是“有一个漂亮等式”。它真正改变的是计算方式。很多时候，直接看 \(\operatorname{Ind}_H^G W\) 怎么分解并不容易；但 \(\operatorname{Res}_H^G V\) 往往更直观，尤其对对称群来说，限制常常能被 Young 图上的删盒子看清。于是 Frobenius 互反等于给你一条地下通道：从看不清的诱导问题，钻到更容易的限制问题里去算，再把答案搬回来。</p>
+
+<p>这一章我们会先给出定理的两种形式：Hom 空间形式与特征标内积形式。然后用群代数张量积模型给出完整证明。最后把这条定理用在几个真正有含金量的地方：从 \(A_3\) 的一维特征标诱导出 \(S_3\) 的二维不可约表示；计算 \(S_4\) 与 \(S_5\) 的若干诱导分解；把上一章若隐若现的“加盒子 / 删盒子”规则，变成一条可以依赖的逻辑链。</p>
+
+<h2 id="sec12-1">12.1 定理先写成两种语言：Hom 形式与特征标形式</h2>
+
+<p>设 \(H\le G\) 是有限群的子群，\(W\) 是 \(H\)-表示，\(V\) 是 \(G\)-表示。Frobenius 互反最概念化的说法是：</p>
+
+\[
+\boxed{\operatorname{Hom}_G(\operatorname{Ind}_H^G W,\,V)\cong \operatorname{Hom}_H(W,\,\operatorname{Res}_H^G V).}
+\]
+
+<p>这里左边是所有 \(G\)-等变线性映射组成的向量空间，右边是所有 \(H\)-等变线性映射组成的向量空间。这个同构不是“维数恰好一样”而已，而是一个自然同构。也就是说，给左边一张 \(G\)-等变图，你可以机械地、没有选择地变成右边一张 \(H\)-等变图；反过来也一样。</p>
+
+<p>如果你更习惯特征标语言，那么在复表示完全可约的前提下，上式立刻转化为熟悉的重数等式：</p>
+
+\[
+\boxed{\langle \operatorname{Ind}_H^G W,\ V\rangle_G=\langle W,\ \operatorname{Res}_H^G V\rangle_H.}
+\]
+
+<p>这里 \(\langle -,-\rangle_G\) 表示 \(G\) 上的特征标内积，\(\langle -,-\rangle_H\) 表示 \(H\) 上的特征标内积。你在<a href="ch8.html">第 8 章</a>已经学过：若表示是完全可约的，那么</p>
+
+\[
+\langle U,V\rangle_G=\dim \operatorname{Hom}_G(U,V)
+\]
+
+<p>对不可约对象给出重数，对一般对象给出同态空间维数。所以内积形式其实只是 Hom 形式在角色表上的影子。</p>
+
+<p>先读这条定理的内容，不急着证明。左边问的是：大群 \(G\) 里，\(\operatorname{Ind}_H^G W\) 向 \(V\) 能投出多少个独立的 \(G\)-等变映射？右边问的是：小群 \(H\) 里，\(W\) 向 \(V\) 的限制版能投出多少个独立的 \(H\)-等变映射？Frobenius 互反说，答案一模一样。你可以把它读成一句很形象的话：<strong>诱导和限制彼此互为伴随</strong>。</p>
+
+<p>这和你在<a href="../线性代数/ch10.html">《线性代数读本》第 10 章</a>里见过的“一个线性映射由它在基上的值决定”有相似味道。这里的本质也是一样：\(\operatorname{Ind}_H^G W\) 看上去大得多，但一个 \(G\)-等变映射其实完全由它在 \(1\otimes W\) 这一块上的行为决定；而那一块恰好就是一个 \(H\)-映射 \(W\to \operatorname{Res}_H^G V\)。这已经把证明的轮廓暗示出来了。</p>
+
+<h2 id="sec12-2">12.2 证明前先把诱导的模型固定下来</h2>
+
+<p>我们沿用上一章的定义：</p>
+
+\[
+\operatorname{Ind}_H^G W=\mathbb{C}[G]\otimes_{\mathbb{C}[H]} W.
+\]
+
+<p>群 \(G\) 通过左乘作用在第一因子上：</p>
+
+\[
+g_0\cdot (g\otimes w)=(g_0g)\otimes w.
+\]
+
+<p>而张量积是沿 \(\mathbb{C}[H]\) 取的，所以有基本关系</p>
+
+\[
+gh\otimes w=g\otimes hw,\qquad h\in H.
+\]
+
+<p>这条关系恰恰表达了“同一左陪集里的变化不需要新副本”。你也可以把 \(\operatorname{Ind}_H^G W\) 看成所有形如 \(g\otimes w\) 的线性组合，只是必须允许用上面这条关系把 \(h\) 从第一因子挪到第二因子。</p>
+
+<p>为什么这个模型适合证明 Frobenius 互反？因为它把诱导写成了一个张量积，而张量积的普遍性质天生就是为了把“双线性数据”和“线性映射”来回对应。我们这章的证明，实际上就是把这个普遍性质翻译成群表示语言。这一点和<a href="../线性代数/ch8.html">《线性代数读本》第 8 章</a>处理维数与基时那种“先找最能看见结构的模型，再从模型直接推出结论”的策略是同一条路数。</p>
+
+<h2 id="sec12-3">12.3 完整证明：\(\operatorname{Hom}_G(\operatorname{Ind}W,V)\cong \operatorname{Hom}_H(W,\operatorname{Res}V)\)</h2>
+
+<p>现在进入证明。我们要显式构造两边之间的映射，并证明它们互为逆。</p>
+
+<p>先定义</p>
+
+\[
+\Phi:\operatorname{Hom}_G(\operatorname{Ind}_H^G W,V)\longrightarrow \operatorname{Hom}_H(W,\operatorname{Res}_H^G V)
+\]
+
+<p>为</p>
+
+\[
+\Phi(F)(w)=F(1\otimes w).
+\]
+
+<p>也就是说，给定一个 \(G\)-等变映射 \(F:\operatorname{Ind}_H^G W\to V\)，我们只看它在 \(1\otimes W\) 这一块上的值。现在要检查 \(\Phi(F)\) 确实是 \(H\)-等变的。</p>
+
+<p>取任意 \(h\in H\)、\(w\in W\)，有</p>
+
+\[
+\Phi(F)(hw)=F(1\otimes hw).
+\]
+
+<p>利用诱导空间里的关系 \(1\otimes hw=h\otimes w\)，得到</p>
+
+\[
+F(1\otimes hw)=F(h\otimes w).
+\]
+
+<p>而 \(h\otimes w=h\cdot (1\otimes w)\)，再用 \(F\) 的 \(G\)-等变性，便有</p>
+
+\[
+F(h\otimes w)=h\cdot F(1\otimes w)=h\cdot \Phi(F)(w).
+\]
+
+<p>所以</p>
+
+\[
+\Phi(F)(hw)=h\cdot \Phi(F)(w),
+\]
+
+<p>这正说明 \(\Phi(F)\in \operatorname{Hom}_H(W,\operatorname{Res}_H^G V)\)。因此 \(\Phi\) 定义良好。</p>
+
+<p>接下来定义反向映射</p>
+
+\[
+\Psi:\operatorname{Hom}_H(W,\operatorname{Res}_H^G V)\longrightarrow \operatorname{Hom}_G(\operatorname{Ind}_H^G W,V)
+\]
+
+<p>为</p>
+
+\[
+\Psi(T)(g\otimes w)=g\cdot T(w).
+\]
+
+<p>也就是说，若 \(T:W\to V\) 是一个 \(H\)-等变映射，我们就在每个张量基元 \(g\otimes w\) 上，把 \(w\) 先送进 \(V\)，再由 \(g\) 在 \(V\) 上作用。这看起来几乎是被逼出来的定义：\(1\otimes w\) 必须送到 \(T(w)\)，而整个诱导空间又由 \(G\) 作用生成，所以别的 \(g\otimes w\) 只能送到 \(g\cdot T(w)\)。</p>
+
+<p>现在要检查 \(\Psi(T)\) 的第一个关键点：它对张量积里的关系是良定的。也就是说，若 \(h\in H\)，我们必须有</p>
+
+\[
+\Psi(T)(gh\otimes w)=\Psi(T)(g\otimes hw).
+\]
+
+<p>左边等于</p>
+
+\[
+\Psi(T)(gh\otimes w)=gh\cdot T(w)=g\cdot (h\cdot T(w)).
+\]
+
+<p>由于 \(T\) 是 \(H\)-等变映射，所以</p>
+
+\[
+h\cdot T(w)=T(hw).
+\]
+
+<p>代回去得到</p>
+
+\[
+gh\cdot T(w)=g\cdot T(hw)=\Psi(T)(g\otimes hw).
+\]
+
+<p>因此 \(\Psi(T)\) 确实定义良好。</p>
+
+<p>第二个关键点：\(\Psi(T)\) 是 \(G\)-等变的。取任意 \(g_0\in G\)，则</p>
+
+\[
+\Psi(T)\bigl(g_0\cdot (g\otimes w)\bigr)
+=
+\Psi(T)(g_0g\otimes w)
+=(g_0g)\cdot T(w).
+\]
+
+<p>另一方面，先作用再送映射，有</p>
+
+\[
+g_0\cdot \Psi(T)(g\otimes w)
+=
+g_0\cdot (g\cdot T(w))
+=(g_0g)\cdot T(w).
+\]
+
+<p>两者相同，所以</p>
+
+\[
+\Psi(T)\bigl(g_0\cdot x\bigr)=g_0\cdot \Psi(T)(x)
+\]
+
+<p>对所有 \(x\in \operatorname{Ind}_H^G W\) 成立。故 \(\Psi(T)\in \operatorname{Hom}_G(\operatorname{Ind}_H^G W,V)\)。</p>
+
+<p>现在检查 \(\Phi\) 与 \(\Psi\) 互为逆。先取 \(T\in \operatorname{Hom}_H(W,\operatorname{Res}V)\)。则</p>
+
+\[
+(\Phi\circ \Psi)(T)(w)=\Phi(\Psi(T))(w)=\Psi(T)(1\otimes w)=1\cdot T(w)=T(w).
+\]
+
+<p>因此</p>
+
+\[
+\Phi\circ \Psi=\mathrm{id}.
+\]
+
+<p>反过来，取 \(F\in \operatorname{Hom}_G(\operatorname{Ind}W,V)\)。对任意 \(g\otimes w\)，有</p>
+
+\[
+(\Psi\circ \Phi)(F)(g\otimes w)
+=
+g\cdot \Phi(F)(w)
+=
+g\cdot F(1\otimes w).
+\]
+
+<p>利用 \(F\) 的 \(G\)-等变性，这等于</p>
+
+\[
+F(g\cdot (1\otimes w))
+=
+F(g\otimes w).
+\]
+
+<p>因此</p>
+
+\[
+\Psi\circ \Phi=\mathrm{id}.
+\]
+
+<p>于是 \(\Phi,\Psi\) 互为逆同构，证明完成：</p>
+
+\[
+\boxed{\operatorname{Hom}_G(\operatorname{Ind}_H^G W,V)\cong \operatorname{Hom}_H(W,\operatorname{Res}_H^G V).}
+\]
+
+<p>整个证明没有任何神秘技巧，核心只有一句话：<strong>\(G\)-等变映射由它在 \(1\otimes W\) 上的值唯一决定，而这个值恰好必须是一个 \(H\)-等变映射。</strong> 这就是伴随性的本质。</p>
+
+<h2 id="sec12-4">12.4 从 Hom 形式推到特征标内积形式</h2>
+
+<p>在有限群的复表示论里，Maschke 定理保证完全可约，于是第 6-8 章建立的那套“同态空间维数 = 特征标内积”可以直接使用。对任意 \(G\)-表示 \(U,V\)，有</p>
+
+\[
+\dim \operatorname{Hom}_G(U,V)=\langle \chi_U,\chi_V\rangle_G.
+\]
+
+<p>同样，对 \(H\)-表示也有</p>
+
+\[
+\dim \operatorname{Hom}_H(X,Y)=\langle \chi_X,\chi_Y\rangle_H.
+\]
+
+<p>把上一节的 Hom 同构两边取维数，立刻得到</p>
+
+\[
+\dim \operatorname{Hom}_G(\operatorname{Ind}_H^G W,V)
+
+=
+
+\dim \operatorname{Hom}_H(W,\operatorname{Res}_H^G V).
+\]
+
+<p>于是</p>
+
+\[
+\boxed{\langle \operatorname{Ind}_H^G W,\ V\rangle_G=\langle W,\ \operatorname{Res}_H^G V\rangle_H.}
+\]
+
+<p>这就是通常最常用的 Frobenius 互反公式。若 \(V\) 取不可约，则左边正是 \(V\) 在 \(\operatorname{Ind}_H^G W\) 里的重数；右边正是 \(W\) 在 \(\operatorname{Res}_H^G V\) 里的重数。也就是说：</p>
+
+\[
+\boxed{\text{\(V\) 在诱导里出现几次}
+=
+\text{\(W\) 在限制里出现几次}.}
+\]
+
+<p>这是你以后算分解时最应该直接调用的版本。它把“往上诱导”的问题翻译成“往下限制”的问题，而后者通常更具体、更好看见。特别是对 \(S_n\) 而言，Young 图下的限制往往带有直观的删盒子意义，所以 reciprocity 直接把诱导问题组合化了。</p>
+
+<h2 id="sec12-5">12.5 第一个应用：从 \(A_3\) 的一维特征标诱导出 \(S_3\) 的二维不可约表示</h2>
+
+<p>这是一道应该认真做完的经典题，因为它完美展示了“先不直接看诱导，而是反过来看限制”。设</p>
+
+\[
+H=A_3=\{e,(123),(132)\}\le S_3.
+\]
+
+<p>因为 \(A_3\cong C_3\) 是循环群，它有三个一维特征标：平凡特征标 \(1\)，以及两个非平凡特征标 \(\omega,\omega^2\)，其中</p>
+
+\[
+\omega((123))=\zeta,\qquad \omega((132))=\zeta^2,
+\]
+
+<p>这里 \(\zeta=e^{2\pi i/3}\)。考虑诱导表示 \(\operatorname{Ind}_{A_3}^{S_3}\omega\)。它的维数先由指数公式给出：</p>
+
+\[
+\dim \operatorname{Ind}_{A_3}^{S_3}\omega=[S_3:A_3]\cdot 1=2.
+\]
+
+<p>所以它一定是 \(S_3\) 的一个二维表示。可二维表示不一定不可约，先别急着下结论。现在用 Frobenius 互反来测试它会落到哪一块。</p>
+
+<p>\(S_3\) 的不可约表示只有三种：\(\mathbf 1\)、\(\mathrm{sgn}\)、\(S^{(2,1)}\)。先看平凡表示。因为平凡表示限制到 \(A_3\) 上仍是平凡表示，所以</p>
+
+\[
+\langle \operatorname{Ind}_{A_3}^{S_3}\omega,\ \mathbf 1\rangle_{S_3}
+
+=
+
+\langle \omega,\ \operatorname{Res}_{A_3}^{S_3}\mathbf 1\rangle_{A_3}
+
+=
+
+\langle \omega,\ 1\rangle_{A_3}
+=0.
+\]
+
+<p>再看符号表示。由于 3-循环是偶置换，\(\mathrm{sgn}\) 限制到 \(A_3\) 上也还是平凡表示，所以</p>
+
+\[
+\langle \operatorname{Ind}_{A_3}^{S_3}\omega,\ \mathrm{sgn}\rangle_{S_3}
+
+=
+
+\langle \omega,\ \operatorname{Res}_{A_3}^{S_3}\mathrm{sgn}\rangle_{A_3}
+
+=
+
+\langle \omega,\ 1\rangle_{A_3}
+=0.
+\]
+
+<p>最后看标准二维表示 \(S^{(2,1)}\)。它在 \(S_3\) 的三类共轭类上特征标为</p>
+
+\[
+(2,0,-1).
+\]
+
+<p>限制到 \(A_3\) 后，只剩下 \(e,(123),(132)\) 三个元素，所以特征标变成</p>
+
+\[
+(2,-1,-1).
+\]
+
+<p>于是</p>
+
+\[
+\langle \omega,\ \operatorname{Res}_{A_3}^{S_3}S^{(2,1)}\rangle_{A_3}
+=
+\frac{1}{3}\Bigl(2\cdot \overline{1}+(-1)\overline{\zeta}+(-1)\overline{\zeta^2}\Bigr).
+\]
+
+<p>注意 \(\overline{\zeta}=\zeta^2\)、\(\overline{\zeta^2}=\zeta\)，且</p>
+
+\[
+\zeta+\zeta^2=-1.
+\]
+
+<p>所以</p>
+
+\[
+\frac{1}{3}\bigl(2-\zeta-\zeta^2\bigr)
+=
+\frac{1}{3}(2+1)
+=1.
+\]
+
+<p>因此</p>
+
+\[
+\langle \operatorname{Ind}_{A_3}^{S_3}\omega,\ S^{(2,1)}\rangle_{S_3}=1.
+\]
+
+<p>综合三项：诱导表示里不含平凡、不含符号、含一份标准表示。再加上总维数本来就是 2，所以只能是</p>
+
+\[
+\boxed{\operatorname{Ind}_{A_3}^{S_3}\omega\cong S^{(2,1)}.}
+\]
+
+<p>这道题的意义很大。它告诉你，新的不可约表示完全可以从小子群的一维表示诱导出来，而不用一开始就在大群里硬造矩阵。对称群的二维标准表示，看似是平面几何对象，实际上也能从 \(A_3\) 的一个非平凡线性特征标“长出来”。</p>
+
+<h2 id="sec12-6">12.6 第二个应用：用互反直接算 \(S_4\) 的诱导分解</h2>
+
+<p>现在算一个你在上一章已经隐约猜到、但还没有真正证明的分解：</p>
+
+\[
+\operatorname{Ind}_{S_3}^{S_4}\mathbf 1.
+\]
+
+<p>由于 \([S_4:S_3]=4\)，这个表示 4 维。而从上一章你已经知道，它其实就是 \(S_4\) 在四个点上的置换表示。但我们现在不用这个直观结论，完全用 Frobenius 互反把它算出来。</p>
+
+<p>\(S_4\) 的不可约表示是</p>
+
+\[
+S^{(4)},\ S^{(3,1)},\ S^{(2,2)},\ S^{(2,1,1)},\ S^{(1,1,1,1)}.
+\]
+
+<p>我们要分别问，它们在 \(\operatorname{Ind}_{S_3}^{S_4}\mathbf 1\) 里出现几次。按 Frobenius 互反，重数等于平凡表示在各自限制中的重数。</p>
+
+<p>对 \(S^{(4)}=\mathbf 1\) 来说显然有</p>
+
+\[
+\langle \operatorname{Ind}_{S_3}^{S_4}\mathbf 1,\ S^{(4)}\rangle_{S_4}
+=
+\langle \mathbf 1,\ \operatorname{Res}_{S_3}^{S_4}S^{(4)}\rangle_{S_3}
+=1.
+\]
+
+<p>对 \(S^{(3,1)}\) 来说，上一章已经算出</p>
+
+\[
+\operatorname{Res}_{S_3}^{S_4}S^{(3,1)}\cong \mathbf 1\oplus S^{(2,1)}.
+\]
+
+<p>因此</p>
+
+\[
+\langle \operatorname{Ind}_{S_3}^{S_4}\mathbf 1,\ S^{(3,1)}\rangle_{S_4}=1.
+\]
+
+<p>对 \(S^{(2,2)}\) 来说，上一章算出</p>
+
+\[
+\operatorname{Res}_{S_3}^{S_4}S^{(2,2)}\cong S^{(2,1)},
+\]
+
+<p>其中不含平凡表示，所以它的重数为 0。</p>
+
+<p>对 \(S^{(2,1,1)}\cong S^{(3,1)}\otimes \mathrm{sgn}\) 来说，把上一章的限制分解乘上 \(\mathrm{sgn}_{S_3}\) 得</p>
+
+\[
+\operatorname{Res}_{S_3}^{S_4}S^{(2,1,1)}
+\cong
+\mathrm{sgn}\oplus S^{(2,1)},
+\]
+
+<p>因为 \(S^{(2,1)}\) 在 \(S_3\) 下自共轭，所以乘符号后还是自己。这里仍然不含平凡表示，因此重数为 0。</p>
+
+<p>最后，符号表示 \(S^{(1,1,1,1)}\) 限制到 \(S_3\) 后就是 \(S_3\) 的符号表示，也不含平凡块，所以重数仍为 0。</p>
+
+<p>综上，只有两块出现，各一次：</p>
+
+\[
+\boxed{\operatorname{Ind}_{S_3}^{S_4}\mathbf 1\cong S^{(4)}\oplus S^{(3,1)}.}
+\]
+
+<p>维数检查：</p>
+
+\[
+1+3=4,
+\]
+
+<p>完全匹配。你看到没有？如果不用互反，你要直接分析 4 维诱导空间上 \(S_4\) 的作用；用了互反，只要看五个不可约表示限制到 \(S_3\) 后有没有平凡分量。计算难度立刻降了一个层级。</p>
+
+<p>再算一个更有代表性的例子：</p>
+
+\[
+\operatorname{Ind}_{S_3}^{S_4}S^{(2,1)}.
+\]
+
+<p>这个诱导表示的维数是</p>
+
+\[
+[S_4:S_3]\cdot \dim S^{(2,1)}=4\cdot 2=8.
+\]
+
+<p>仍然逐个测试 \(S_4\) 的不可约表示。</p>
+
+<p>对 \(S^{(4)}\) 和 \(S^{(1,1,1,1)}\)，其限制分别是 \(\mathbf 1\) 和 \(\mathrm{sgn}\)，都不含 \(S^{(2,1)}\)，所以重数为 0。</p>
+
+<p>对 \(S^{(3,1)}\)，因为</p>
+
+\[
+\operatorname{Res}_{S_3}^{S_4}S^{(3,1)}\cong \mathbf 1\oplus S^{(2,1)},
+\]
+
+<p>故重数为 1。</p>
+
+<p>对 \(S^{(2,2)}\)，因为</p>
+
+\[
+\operatorname{Res}_{S_3}^{S_4}S^{(2,2)}\cong S^{(2,1)},
+\]
+
+<p>故重数也为 1。</p>
+
+<p>对 \(S^{(2,1,1)}\)，因为</p>
+
+\[
+\operatorname{Res}_{S_3}^{S_4}S^{(2,1,1)}
+\cong
+\mathrm{sgn}\oplus S^{(2,1)},
+\]
+
+<p>故重数仍为 1。</p>
+
+<p>于是得到</p>
+
+\[
+\boxed{
+\operatorname{Ind}_{S_3}^{S_4}S^{(2,1)}
+\cong
+S^{(3,1)}\oplus S^{(2,2)}\oplus S^{(2,1,1)}.}
+\]
+
+<p>再验维数：</p>
+
+\[
+3+2+3=8.
+\]
+
+<p>这正是上一章从“加一个盒子”猜出的分解。现在它不再是经验，而是被 Frobenius 互反严格支持的结论。</p>
+
+<h2 id="sec12-7">12.7 第三个应用：对 \(S_n\) 来说，互反把“删盒子”变成了“加盒子”</h2>
+
+<p>现在终于可以把 Young 图语言和 Frobenius 互反精确接起来。对对称群，有著名的 branching rule：</p>
+
+\[
+\operatorname{Res}_{S_n}^{S_{n+1}} S^\mu
+\cong
+\bigoplus_{\lambda\nearrow \mu} S^\lambda,
+\]
+
+<p>其中 \(\lambda\nearrow \mu\) 表示从 \(\mu\) 的 Young 图里删去一个角格得到 \(\lambda\)。这里每个可删角格对应一份不可约表示，而且重数都是 1。</p>
+
+<p>一旦接受这条限制规则，Frobenius 互反立刻推出诱导规则。对任意 \(\lambda\vdash n\)、\(\mu\vdash n+1\)，有</p>
+
+\[
+\left\langle \operatorname{Ind}_{S_n}^{S_{n+1}} S^\lambda,\ S^\mu\right\rangle_{S_{n+1}}
+
+=
+
+\left\langle S^\lambda,\ \operatorname{Res}_{S_n}^{S_{n+1}}S^\mu\right\rangle_{S_n}.
+\]
+
+<p>右边在什么时候等于 1？恰好当 \(\lambda\) 是从 \(\mu\) 删去一个角格得到的某个形状。换句话说，左边在什么时候非零？恰好当 \(\mu\) 是往 \(\lambda\) 上加一个角格得到的形状。于是</p>
+
+\[
+\boxed{
+\operatorname{Ind}_{S_n}^{S_{n+1}} S^\lambda
+\cong
+\bigoplus_{\mu:\ \lambda\nearrow \mu} S^\mu.}
+\]
+
+<p>这就是对称群的加盒子规则。你现在应该很清楚它为什么成立了：不是因为某个神秘的图形游戏，而是因为限制的删盒子规则通过 Frobenius 互反自动转置成了诱导的加盒子规则。</p>
+
+<p>把 \(\lambda=(3,1)\vdash 4\) 的例子真算一遍。往 Young 图 \((3,1)\) 上加一个角格，有三种合法形状：</p>
+
+\[
+(4,1),\qquad (3,2),\qquad (3,1,1).
+\]
+
+<p>所以</p>
+
+\[
+\operatorname{Ind}_{S_4}^{S_5} S^{(3,1)}
+\cong
+S^{(4,1)}\oplus S^{(3,2)}\oplus S^{(3,1,1)}.
+\]
+
+<p>把维数也验一下。左边维数是</p>
+
+\[
+[S_5:S_4]\cdot \dim S^{(3,1)}=5\cdot 3=15.
+\]
+
+<p>右边三个表示的维数可由 hook length formula 算出分别是</p>
+
+\[
+\dim S^{(4,1)}=4,\qquad \dim S^{(3,2)}=5,\qquad \dim S^{(3,1,1)}=6.
+\]
+
+<p>相加得到</p>
+
+\[
+4+5+6=15,
+\]
+
+<p>完全吻合。</p>
+
+<p>再顺手看一眼反方向的限制。例如 \(\mu=(3,2)\vdash 5\) 的可删角格有两个，对应形状</p>
+
+\[
+(3,1),\qquad (2,2).
+\]
+
+<p>因此</p>
+
+\[
+\operatorname{Res}_{S_4}^{S_5}S^{(3,2)}
+\cong
+S^{(3,1)}\oplus S^{(2,2)}.
+\]
+
+<p>若你再对这条式子应用一次互反，就会得到</p>
+
+\[
+\left\langle \operatorname{Ind}_{S_4}^{S_5}S^{(2,2)},\ S^{(3,2)}\right\rangle_{S_5}=1,
+\]
+
+<p>说明 \((3,2)\) 必然也出现在 \(\operatorname{Ind}_{S_4}^{S_5}S^{(2,2)}\) 里。于是加盒子、删盒子、互反这三件事已经完全咬合成一套机制。</p>
+
+<p>到这里，Frobenius 互反的真正威力应该已经很清楚了。它不是单独的一条美丽公式，而是把“看限制”和“看诱导”变成了同一项工作。对对称群而言，这一步尤其关键，因为 Young 图让限制往往比诱导更容易读；互反于是把容易的那边自动转成了困难的那边。</p>
+
+<p>你现在可以把这一章压缩成一句最实用的话：想知道 \(V\) 是否出现在 \(\operatorname{Ind}_H^G W\) 里，就去看 \(W\) 是否出现在 \(\operatorname{Res}_H^G V\) 里。很多本来看上去像大群难题的分解，都会被这句话一刀切开。</p>
+
+<p>对称群的表示论从这一章开始真正进入“可计算”的成熟阶段。Young 图给对象命名，hook length formula 给维数，Frobenius 互反给运算之间的桥。</p>
+
+<p>下一部分我们会离开有限群，走向紧 Lie 群与 Lie 代数。但你会发现，今天在 \(S_n\) 身上学会的很多直觉——分类、不可约块、分支、伴随性——其实会一路陪你走到更大的表示论世界里去。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 张量积与诱导表示</a><a href="ch13.html">下一章 · 第 13 章 紧 Lie 群与 Peter-Weyl →</a></nav>
+
+</main>
+</body>
+</html>

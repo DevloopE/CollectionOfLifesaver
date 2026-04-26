@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 经典 Lie 代数：\(A_n,B_n,C_n,D_n\) — 普林斯顿表示论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 \(sl_2\) 表示与最高权</a><a href="ch19.html">下一章 · 第 19 章 应用：粒子物理与量子角动量 →</a></nav>
+<h1 id="ch18">第 18 章 经典 Lie 代数：\(A_n,B_n,C_n,D_n\)</h1>
+
+<p><a href="ch16.html">第 16 章</a>把半单 Lie 代数的骨架搭了起来：Cartan 子代数、根、简单根、Dynkin 图。<a href="ch17.html">第 17 章</a>又把最核心的表示论机制先在 \(\mathfrak{sl}_2\) 上走了一遍：只要你抓住最高权，整个有限维不可约表示就会像被一根线牵着一样自己长出来。现在我们终于来到那张分类表里最常见、也最会在数学和物理里反复出现的四大家族：\(A_n,B_n,C_n,D_n\)。</p>
+
+<p>如果你第一次看到这些字母，很容易把它们误读成四批互不相关的记号。但它们其实都来自一件非常线性的事情：在一个带双线性形式的向量空间上，问“哪些矩阵无穷小地保持这个形式不变”。这一问先长出 \(\mathfrak{sl}_{n+1}\)，再长出 \(\mathfrak{so}_{2n+1}\)、\(\mathfrak{sp}_{2n}\)、\(\mathfrak{so}_{2n}\)。所以这一章最重要的，不是把四张根表背下来，而是看清：<strong>经典 Lie 代数本质上是矩阵代数里的四种稳定对称性</strong>。</p>
+
+<p>这也正是它们和<a href="../线性代数/ch18.html">《线性代数读本》第 18 章</a>、<a href="../线性代数/ch22.html">第 22 章</a>之间最深的连接。你在那本书里把内积、正交、对称矩阵、谱分解当作有限维线性代数的高峰；到了这里，我们把“保持某种形式不变”的要求升级成一整套 Lie 理论。你在<a href="../黎曼几何/ch3.html">《黎曼几何读本》第 3 章</a>把 Lie 群当作流形上的连续对称群看待；到了这里，我们专门盯住单位元附近的无穷小版本。</p>
+
+<h2 id="sec18-1">18.1 矩阵模型、Cartan 子代数与根分解</h2>
+
+<p>经典 Lie 代数都可以具体地塞进某个矩阵代数 \(\mathfrak{gl}_N\) 里。因此最自然的 Cartan 子代数，就是那批“同时可对角化的无穷小变换”。对矩阵模型来说，这通常就是一批对角矩阵。于是根分解不再神秘：它只是问，在对角矩阵共轭作用下，哪些矩阵单位 \(E_{ij}\) 会一起带同一个权。</p>
+
+<p>一般地，若 \(\mathfrak g\) 是半单 Lie 代数，\(\mathfrak h\subset \mathfrak g\) 是 Cartan 子代数，那么</p>
+
+\[
+\boxed{\mathfrak g=\mathfrak h\oplus \bigoplus_{\alpha\in\Phi}\mathfrak g_\alpha, \qquad
+\mathfrak g_\alpha=\{x\in\mathfrak g:[h,x]=\alpha(h)x\ \forall h\in\mathfrak h\}.}
+\]
+
+<p>这里 \(\Phi\subset \mathfrak h^*\) 就是根系。对经典类型，\(\mathfrak h^*\) 往往可以用一组坐标函数 \(\varepsilon_1,\dots,\varepsilon_n\) 描述，于是根会直接写成 \(\pm\varepsilon_i\pm\varepsilon_j\)、\(\pm2\varepsilon_i\) 或 \(\varepsilon_i-\varepsilon_j\) 这样的样子。你真正该熟悉的是这种“坐标化的根语言”，因为后面最高权、Weyl 群、维数公式都会靠它运转。</p>
+
+<p>一个很实用的维数检查公式是：</p>
+
+\[
+\dim \mathfrak g=\operatorname{rank}\mathfrak g+\#\Phi.
+\]
+
+<p>原因很简单：对经典型，每个根空间都是一维，所以维数就是 Cartan 子代数的维数加上根的总数。这个公式以后会像体温计一样好用。你算完一批根之后，只要和矩阵条件直接算出来的维数一对，就知道自己有没有漏根。</p>
+
+<h2 id="sec18-2">18.2 \(A_n=\mathfrak{sl}_{n+1}\)：最干净的根系</h2>
+
+<p>\(A_n\) 是最“裸露”的一型，因为它几乎没有额外约束：</p>
+
+\[
+\mathfrak{sl}_{n+1}=\{X\in M_{n+1}(\mathbb C):\operatorname{tr}(X)=0\}.
+\]
+
+<p>取 Cartan 子代数为所有迹为零的对角矩阵</p>
+
+\[
+\mathfrak h=
+\left\{
+\operatorname{diag}(h_1,\dots,h_{n+1}) : \sum_{i=1}^{n+1}h_i=0
+\right\}.
+\]
+
+<p>在 \(\mathfrak h^*\) 上记 \(\varepsilon_i(\operatorname{diag}(h_1,\dots,h_{n+1}))=h_i\)。则矩阵单位 \(E_{ij}\) 满足</p>
+
+\[
+[H,E_{ij}]=(\varepsilon_i-\varepsilon_j)(H)\,E_{ij}.
+\]
+
+<p>于是全部根正好是</p>
+
+\[
+\Phi(A_n)=\{\varepsilon_i-\varepsilon_j: i\neq j\}.
+\]
+
+<p>取正根为 \(i&lt;j\) 的那些，就得到简单根</p>
+
+\[
+\boxed{\alpha_1=\varepsilon_1-\varepsilon_2,\ \alpha_2=\varepsilon_2-\varepsilon_3,\ \dots,\ \alpha_n=\varepsilon_n-\varepsilon_{n+1}.}
+\]
+
+<p>这串链式简单根正是 \(A_n\) 的 Dynkin 图为什么是一条长度为 \(n\) 的线。所有正根都是连续块之和：</p>
+
+\[
+\varepsilon_i-\varepsilon_j=\alpha_i+\alpha_{i+1}+\cdots+\alpha_{j-1}\qquad (i&lt;j).
+\]
+
+<p>因此正根个数是</p>
+
+\[
+\#\Phi^+=\binom{n+1}{2},
+\qquad
+\#\Phi=n(n+1).
+\]
+
+<p>再加上秩 \(n\)，便得</p>
+
+\[
+\dim \mathfrak{sl}_{n+1}=n+n(n+1)=n(n+2)=(n+1)^2-1.
+\]
+
+<p>这和“迹为零矩阵只有一个线性条件”完全一致。</p>
+
+<h3 id="sec18-2-1">先把一个具体例子算到底：\(\mathfrak{sl}_4\) 为什么是 15 维</h3>
+
+<p>这里 \(n=3\)。所有根是</p>
+
+\[
+\varepsilon_i-\varepsilon_j,\qquad 1\le i\neq j\le 4.
+\]
+
+<p>这样的有 \(4\cdot 3=12\) 个。Cartan 子代数是所有迹为零对角矩阵，所以维数是 \(3\)。因此</p>
+
+\[
+\dim \mathfrak{sl}_4=3+12=15.
+\]
+
+<p>如果你直接从矩阵空间算，也有</p>
+
+\[
+\dim M_4(\mathbb C)=16,\qquad \operatorname{tr}(X)=0 \text{ 切掉一维},
+\]
+
+<p>于是同样得到</p>
+
+\[
+16-1=15.
+\]
+
+<p>这类双重计数值得你养成习惯。经典 Lie 代数里，一边从矩阵条件数维数，一边从根数维数，二者总会在最后会师。</p>
+
+<p>\(A_n\) 的基本权也很容易写。若把 \(\sum \varepsilon_i=0\) 看成关系，则</p>
+
+\[
+\omega_k=\varepsilon_1+\cdots+\varepsilon_k-\frac{k}{n+1}\sum_{i=1}^{n+1}\varepsilon_i,
+\qquad 1\le k\le n.
+\]
+
+<p>它们满足 \(\langle \omega_i,\alpha_j^\vee\rangle=\delta_{ij}\)。在 \(\mathfrak{sl}_{n+1}\) 里，\(\omega_1\) 对应标准表示 \(\mathbb C^{n+1}\)，\(\omega_k\) 对应外幂表示 \(\bigwedge^k\mathbb C^{n+1}\)。这一点等到本章后半的最高权构造时会再回来。</p>
+
+<h2 id="sec18-3">18.3 \(B_n=\mathfrak{so}_{2n+1}\)：既有长根，也有短根</h2>
+
+<p>正交 Lie 代数的定义来自“保持二次型不变”。在复数域上，具体选哪一个非退化对称双线性形式无关紧要。为了写公式方便，我们取一个标准模型，使得</p>
+
+\[
+\mathfrak{so}_{2n+1}
+=
+\{X\in M_{2n+1}(\mathbb C):X^tS+SX=0\},
+\]
+
+<p>其中 \(S\) 是适当选定的对称矩阵。这个条件是“\(e^{tX}\)” 一阶地保持二次型的微分版：把 \(g^tSg=S\) 对 \(t\) 求导，就得到上式。</p>
+
+<p>这时 Cartan 子代数可取成</p>
+
+\[
+\mathfrak h=\left\{
+\operatorname{diag}(h_1,\dots,h_n,0,-h_n,\dots,-h_1)
+\right\}.
+\]
+
+<p>于是 \(\mathfrak h^*\) 上自然有坐标 \(\varepsilon_1,\dots,\varepsilon_n\)。\(B_n\) 的根系是</p>
+
+\[
+\Phi(B_n)=\{\pm\varepsilon_i\pm\varepsilon_j\ (i\neq j)\}\cup\{\pm\varepsilon_i\}.
+\]
+
+<p>前一批是长根，后一批是短根。正根通常取成</p>
+
+\[
+\varepsilon_i\pm\varepsilon_j\ (i&lt;j),\qquad \varepsilon_i.
+\]
+
+<p>对应的简单根可以写成</p>
+
+\[
+\boxed{\alpha_1=\varepsilon_1-\varepsilon_2,\ \dots,\ \alpha_{n-1}=\varepsilon_{n-1}-\varepsilon_n,\ \alpha_n=\varepsilon_n.}
+\]
+
+<p>你应当特别记住最后一根 \(\alpha_n=\varepsilon_n\)。它说明 \(B_n\) 的末端是短根，所以 Dynkin 图最后那条箭头会朝向末端。</p>
+
+<p>根的总数为</p>
+
+\[
+2n(n-1)+2n=2n^2.
+\]
+
+<p>再加上秩 \(n\)，得到</p>
+
+\[
+\boxed{\dim \mathfrak{so}_{2n+1}=n+2n^2=n(2n+1).}
+\]
+
+<h3 id="sec18-3-1">把 \(B_2\) 真算一遍：\(\mathfrak{so}_5\) 为什么是 10 维</h3>
+
+<p>当 \(n=2\) 时，根为</p>
+
+\[
+\pm(\varepsilon_1-\varepsilon_2),\ \pm(\varepsilon_1+\varepsilon_2),\ \pm\varepsilon_1,\ \pm\varepsilon_2.
+\]
+
+<p>总共 \(8\) 个。Cartan 子代数维数是 \(2\)，所以</p>
+
+\[
+\dim \mathfrak{so}_5=8+2=10.
+\]
+
+<p>若从矩阵条件直接数维数，\(5\times5\) 反对称矩阵的独立参数也正好是</p>
+
+\[
+\frac{5\cdot 4}{2}=10.
+\]
+
+<p>这里你第一次看见一个很有意思的现象：\(B_2\) 和后面会出现的 \(C_2\) 居然维数一样，根的总数也一样。它们不是同一个根系，但二者互为对偶，所以低秩时会显得非常像。</p>
+
+<h2 id="sec18-4">18.4 \(C_n=\mathfrak{sp}_{2n}\)：保持辛形式的无穷小对称</h2>
+
+<p>如果把对称形式换成反对称形式，就长出辛 Lie 代数。取标准辛矩阵</p>
+
+\[
+J=
+\begin{pmatrix}
+0&I_n\\
+-I_n&0
+\end{pmatrix},
+\]
+
+<p>定义</p>
+
+\[
+\mathfrak{sp}_{2n}
+=
+\{X\in M_{2n}(\mathbb C):X^tJ+JX=0\}.
+\]
+
+<p>把块矩阵写开，会得到</p>
+
+\[
+X=
+\begin{pmatrix}
+A&B\\
+C&-A^t
+\end{pmatrix},
+\qquad
+B^t=B,\ C^t=C.
+\]
+
+<p>于是维数可以立刻数出来：</p>
+
+\[
+\dim A=n^2,\qquad \dim B=\frac{n(n+1)}2,\qquad \dim C=\frac{n(n+1)}2.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\dim \mathfrak{sp}_{2n}=n^2+n(n+1)=n(2n+1).}
+\]
+
+<p>这和 \(B_n\) 的维数公式居然完全一样，但不要被这个表面相似骗了。它们的根长短恰好对调了。</p>
+
+<p>Cartan 子代数可取成</p>
+
+\[
+\mathfrak h=
+\left\{
+\operatorname{diag}(h_1,\dots,h_n,-h_1,\dots,-h_n)
+\right\}.
+\]
+
+<p>于是根系为</p>
+
+\[
+\Phi(C_n)=\{\pm\varepsilon_i\pm\varepsilon_j\ (i\neq j)\}\cup\{\pm2\varepsilon_i\}.
+\]
+
+<p>简单根通常取成</p>
+
+\[
+\boxed{\alpha_1=\varepsilon_1-\varepsilon_2,\ \dots,\ \alpha_{n-1}=\varepsilon_{n-1}-\varepsilon_n,\ \alpha_n=2\varepsilon_n.}
+\]
+
+<p>在这里，长根是 \(\pm2\varepsilon_i\)，最后一根比前面更长，因此 \(C_n\) Dynkin 图末端箭头方向和 \(B_n\) 相反。抽象分类里这只是一个箭头；但在矩阵模型里，它对应的是“对称二次型”和“反对称二次型”之间真实的差别。</p>
+
+<h3 id="sec18-4-1">再算一个低秩例子：\(\mathfrak{sp}_4\) 为什么也是 10 维</h3>
+
+<p>\(n=2\) 时，根系为</p>
+
+\[
+\pm(\varepsilon_1-\varepsilon_2),\ \pm(\varepsilon_1+\varepsilon_2),\ \pm2\varepsilon_1,\ \pm2\varepsilon_2.
+\]
+
+<p>总根数仍是 \(8\)。再加上秩 \(2\)，便得</p>
+
+\[
+\dim \mathfrak{sp}_4=10.
+\]
+
+<p>如果用块矩阵也可以直接检查：</p>
+
+\[
+\dim A=4,\qquad \dim B=3,\qquad \dim C=3,
+\]
+
+<p>所以</p>
+
+\[
+4+3+3=10.
+\]
+
+<p>这正是前面说的 \(B_2\) 与 \(C_2\) 互为对偶的低秩影子。它们维数相同，根图都像一个正八边形，但“哪一批根更长”恰好交换了角色。</p>
+
+<h2 id="sec18-5">18.5 \(D_n=\mathfrak{so}_{2n}\)：偶维正交型与分叉末端</h2>
+
+<p>最后看偶维正交 Lie 代数：</p>
+
+\[
+\mathfrak{so}_{2n}
+=
+\{X\in M_{2n}(\mathbb C):X^tS+SX=0\}.
+\]
+
+<p>和 \(B_n\) 一样，它来自保持对称形式不变；不同只在底空间维数从 \(2n+1\) 变成 \(2n\)。Cartan 子代数可取成</p>
+
+\[
+\mathfrak h=
+\left\{
+\operatorname{diag}(h_1,\dots,h_n,-h_n,\dots,-h_1)
+\right\}.
+\]
+
+<p>这时根系变成</p>
+
+\[
+\Phi(D_n)=\{\pm\varepsilon_i\pm\varepsilon_j: i\neq j\},
+\]
+
+<p>注意没有单根 \(\pm\varepsilon_i\)，也没有 \(\pm2\varepsilon_i\)。因此</p>
+
+\[
+\#\Phi(D_n)=2n(n-1).
+\]
+
+<p>加上秩 \(n\)，得到</p>
+
+\[
+\boxed{\dim \mathfrak{so}_{2n}=n+2n(n-1)=n(2n-1).}
+\]
+
+<p>简单根可以取为</p>
+
+\[
+\boxed{\alpha_1=\varepsilon_1-\varepsilon_2,\ \dots,\ \alpha_{n-1}=\varepsilon_{n-1}-\varepsilon_n,\ \alpha_n=\varepsilon_{n-1}+\varepsilon_n.}
+\]
+
+<p>最后那一根不是沿着一条链接下去，而是把图尾巴分成两叉。这就是 \(D_n\) Dynkin 图为何在末端分叉。几何上，这种分叉和偶维正交群里出现的“两个半自旋方向”有关；完整的自旋表示要等到更高阶课程才讲，但你现在至少应该把这张根图的形状记住。</p>
+
+<p>拿 \(n=4\) 来说，</p>
+
+\[
+\dim \mathfrak{so}_8=4+2\cdot 4\cdot 3=28.
+\]
+
+<p>这和 \(8\times 8\) 反对称矩阵的参数数目</p>
+
+\[
+\frac{8\cdot 7}{2}=28
+\]
+
+<p>再次吻合。\(D_4\) 还有著名的 triality 现象，但那已经超出这本书的主线；此处你只需知道，它是经典族里最不安分的一个低秩例外。</p>
+
+<h2 id="sec18-6">18.6 从最高权 \(\lambda\) 怎样真正长出 \(V_\lambda\)</h2>
+
+<p>现在回到表示论。分类表告诉你有哪些 Lie 代数，真正值钱的问题则是：它们的有限维不可约表示从哪里来？<a href="ch17.html">第 17 章</a>已经在 \(\mathfrak{sl}_2\) 上反复演示过，答案是：从一个最高权向量往下打。经典 Lie 代数里，这个机制没有改变，只是 lowering operators 从一个 \(f\) 变成了一串与简单根对应的 \(f_1,\dots,f_n\)。</p>
+
+<p>先固定一个正根系 \(\Phi^+\)，并取相应的 Borel 子代数</p>
+
+\[
+\mathfrak b=\mathfrak h\oplus \bigoplus_{\alpha\in\Phi^+}\mathfrak g_\alpha.
+\]
+
+<p>若 \(\lambda\in\mathfrak h^*\) 是<strong>支配整权</strong>，也就是</p>
+
+\[
+\langle \lambda,\alpha_i^\vee\rangle \in \mathbb Z_{\ge 0}\qquad (1\le i\le n),
+\]
+
+<p>那么存在唯一（同构意义下）的有限维不可约表示 \(V_\lambda\)，其中有一个向量 \(v_\lambda\) 满足</p>
+
+\[
+\mathfrak n^+ v_\lambda=0,\qquad hv_\lambda=\lambda(h)v_\lambda\quad(h\in\mathfrak h),
+\]
+
+\[
+f_i^{\,\langle \lambda,\alpha_i^\vee\rangle+1}v_\lambda=0\qquad(1\le i\le n).
+\]
+
+<p>这里 \(\mathfrak n^+=\bigoplus_{\alpha\in\Phi^+}\mathfrak g_\alpha\)。一句话概括就是：</p>
+
+\[
+\boxed{V_\lambda = U(\mathfrak n^-)\,v_\lambda,}
+\]
+
+<p>也就是让所有负根方向不停作用在最高权向量上，把整棵权图往下生成出来。抽象地说，\(V_\lambda\) 是 Verma 模 \(M(\lambda)\) 的唯一有限维不可约商；具体地说，你可以把它想成“从山顶出发，只允许沿简单根方向一步步往下走”。</p>
+
+<h3 id="sec18-6-1">把 \(\mathfrak{sl}_{n+1}\) 的两个基本表示认出来</h3>
+
+<p>先看 \(\lambda=\omega_1\)。这时 \(\langle \omega_1,\alpha_1^\vee\rangle=1\)，其余都是 \(0\)。于是最高权向量只会被第一个 lowering operator 真正往下推一次，最后长出的正是标准表示 \(\mathbb C^{n+1}\)。它的权正好是</p>
+
+\[
+\varepsilon_1,\varepsilon_2,\dots,\varepsilon_{n+1},
+\]
+
+<p>而最高权是 \(\varepsilon_1\)，也就是 \(\omega_1\)。</p>
+
+<p>再看 \(\lambda=\omega_2\)。这次长出的就是</p>
+
+\[
+\bigwedge^2\mathbb C^{n+1},
+\]
+
+<p>其最高权向量可取为 \(e_1\wedge e_2\)。对角矩阵的作用给出权</p>
+
+\[
+(\varepsilon_1+\varepsilon_2)(H)=h_1+h_2,
+\]
+
+<p>而在 \(\mathfrak{sl}_{n+1}\) 的权格里，这恰好对应 \(\omega_2\)。所以“基本权 \(\omega_k\) 对应外幂表示”这句话不是装饰，而是最高权构造最具体的一次落地。</p>
+
+<p>这个机制在 \(B_n,C_n,D_n\) 里同样成立。只是某些基本权对应向量表示，某些对应自旋表示，某些对应更高外幂或辛迹零张量。你不必在第一遍就把所有基本表示名字背熟；但你必须知道：<strong>有限维不可约表示不是天上掉下来的，它们是由一批整数 \(m_i\) 乘在基本权上，再由 lowering operators 系统生成出来的。</strong></p>
+
+<h2 id="sec18-7">18.7 Weyl 维数公式：从最高权直接读出维数</h2>
+
+<p>最高权给了你表示的标签，但如果每次都靠真的生成整棵权图来数维数，工作量会迅速失控。Weyl 维数公式的价值就在这里：它把“表示有多大”压缩成了一个只依赖根系和最高权的乘积公式。</p>
+
+<p>设 \(\rho\) 是半正根和：</p>
+
+\[
+\rho=\frac12\sum_{\alpha\in\Phi^+}\alpha.
+\]
+
+<p>则对任意支配整权 \(\lambda\)，有</p>
+
+\[
+\boxed{\dim V_\lambda=\prod_{\alpha\in\Phi^+}\frac{\langle \lambda+\rho,\alpha^\vee\rangle}{\langle \rho,\alpha^\vee\rangle}.}
+\]
+
+<p>请注意这里要用的是余根 \(\alpha^\vee\)。在 \(A,D,E\) 这些 simply-laced 类型里，根和余根差一个统一比例，看起来不显眼；但在 \(B,C\) 型里，长短根不同，不写余根就会把比例弄错。</p>
+
+<p>这条公式背后真正深的东西，是 Weyl 特征公式和交替化技巧。本书不打算在这里完整证明；你只要先把它看成“最高权理论的维数版总账”。它最值得佩服的地方是：一个表示里有多少权、每个权的重数怎样纠缠，最终都能被这一个乘积打包。</p>
+
+<h3 id="sec18-7-1">\(\mathfrak{sl}_3\) 的所有最高权表示维数都能一行算出</h3>
+
+<p>在 \(\mathfrak{sl}_3\) 里，正根是</p>
+
+\[
+\alpha_1,\qquad \alpha_2,\qquad \alpha_1+\alpha_2.
+\]
+
+<p>设最高权为</p>
+
+\[
+\lambda=a\omega_1+b\omega_2,\qquad a,b\in\mathbb Z_{\ge 0}.
+\]
+
+<p>又因为</p>
+
+\[
+\rho=\omega_1+\omega_2,
+\]
+
+<p>所以</p>
+
+\[
+\langle \lambda+\rho,\alpha_1^\vee\rangle=a+1,\qquad
+\langle \lambda+\rho,\alpha_2^\vee\rangle=b+1,
+\]
+
+\[
+\langle \lambda+\rho,(\alpha_1+\alpha_2)^\vee\rangle=a+b+2.
+\]
+
+<p>分母则是</p>
+
+\[
+\langle \rho,\alpha_1^\vee\rangle=1,\qquad
+\langle \rho,\alpha_2^\vee\rangle=1,\qquad
+\langle \rho,(\alpha_1+\alpha_2)^\vee\rangle=2.
+\]
+
+<p>代入 Weyl 维数公式，立刻得到</p>
+
+\[
+\boxed{\dim V_{a,b}=\frac{(a+1)(b+1)(a+b+2)}{2}.}
+\]
+
+<p>现在几乎所有常见表示都能秒算：</p>
+
+\[
+\dim V_{1,0}=\frac{2\cdot 1\cdot 3}{2}=3,
+\qquad
+\dim V_{0,1}=\frac{1\cdot 2\cdot 3}{2}=3,
+\]
+
+\[
+\dim V_{2,0}=\frac{3\cdot 1\cdot 4}{2}=6,
+\qquad
+\dim V_{1,1}=\frac{2\cdot 2\cdot 4}{2}=8.
+\]
+
+<p>第一、第二个是标准表示和对偶标准表示；第三个是 \(\operatorname{Sym}^2(\mathbb C^3)\)；第四个正是下一节要讲的伴随表示。Weyl 公式在这里的威力，和<a href="../线性代数/ch15.html">《线性代数读本》第 15 章</a>里对角化的威力很像：一旦找到了正确坐标，原本看起来需要大量计算的对象会一下子变得可读。</p>
+
+<h2 id="sec18-8">18.8 \(\mathfrak{sl}_3\) 的伴随表示：最高权是 \(\omega_1+\omega_2\)</h2>
+
+<p>伴随表示永远是理解一个 Lie 代数最诚实的窗口，因为它让 \(\mathfrak g\) 自己作用在自己身上：</p>
+
+\[
+\operatorname{ad}\colon \mathfrak g\to \mathfrak{gl}(\mathfrak g),
+\qquad
+\operatorname{ad}(x)(y)=[x,y].
+\]
+
+<p>对 \(\mathfrak{sl}_3\) 来说，我们把空间分解成 Cartan 部分加根空间：</p>
+
+\[
+\mathfrak{sl}_3=
+\mathfrak h
+\oplus \mathfrak g_{\alpha_1}\oplus \mathfrak g_{-\alpha_1}
+\oplus \mathfrak g_{\alpha_2}\oplus \mathfrak g_{-\alpha_2}
+\oplus \mathfrak g_{\alpha_1+\alpha_2}\oplus \mathfrak g_{-(\alpha_1+\alpha_2)}.
+\]
+
+<p>这里</p>
+
+\[
+\mathfrak h=\operatorname{span}\{H_1,H_2\},
+\quad
+H_1=E_{11}-E_{22},\quad
+H_2=E_{22}-E_{33},
+\]
+
+<p>六个一维根空间分别由</p>
+
+\[
+E_{12},E_{21},E_{23},E_{32},E_{13},E_{31}
+\]
+
+<p>张成。因此维数立刻就是</p>
+
+\[
+\dim \mathfrak{sl}_3=2+6=8.
+\]
+
+<p>哪个向量是最高权向量？取正根系 \(\alpha_1,\alpha_2\) 后，最高根是</p>
+
+\[
+\theta=\alpha_1+\alpha_2.
+\]
+
+<p>对应的根向量 \(E_{13}\) 会被所有正根向量杀掉，所以它正是伴随表示中的最高权向量。于是伴随表示的最高权就是 \(\theta\)。而在 \(A_2\) 里有</p>
+
+\[
+\theta=\alpha_1+\alpha_2=\omega_1+\omega_2.
+\]
+
+<p>所以伴随表示对应的最高权标签正是 \((1,1)\)。用上一节的公式立刻重算一次维数：</p>
+
+\[
+\dim V_{1,1}=\frac{(1+1)(1+1)(1+1+2)}2=8.
+\]
+
+<p>这和根空间分解数出来的 \(8\) 完全一致。于是伴随表示的权图也一眼可见：六个非零权就是六个根，零权则有重数 \(2\)，对应 Cartan 子代数本身。你可以把它想成：Lie 代数在伴随表示里把“自己的根系”直接写在了权图上。</p>
+
+<p>如果你愿意再看一步， lowering operators 的动作也很直观。比如</p>
+
+\[
+[E_{21},E_{13}]=E_{23},\qquad
+[E_{32},E_{13}]=-E_{12}.
+\]
+
+<p>这说明从最高根向量 \(E_{13}\) 出发，沿着 \(-\alpha_1\) 和 \(-\alpha_2\) 方向一压，就分别落到另外两条正根上。继续往下压，就会把整张六角形权图生成出来。也就是说，伴随表示不是“又一个 8 维表示”这么简单，它正是根系几何自己在说话。</p>
+
+<h2 id="sec18-9">18.9 这一章真正该留下什么</h2>
+
+<p>第一，\(A_n,B_n,C_n,D_n\) 不是四串干巴巴的字母，而是四类矩阵对称性的无穷小版本：迹零、正交、辛、偶维正交。第二，经典 Lie 代数的不可约表示由支配整最高权 \(\lambda\) 标号，而 \(V_\lambda\) 是从最高权向量沿负根方向系统生成出来的。第三，Weyl 维数公式把根系和最高权焊在了一起，使你不必真的画完整张权图，也能先把表示的大小读出来。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 \(sl_2\) 表示与最高权</a><a href="ch19.html">下一章 · 第 19 章 应用：粒子物理与量子角动量 →</a></nav>
+
+</main>
+</body>
+</html>

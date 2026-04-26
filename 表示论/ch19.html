@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 应用：粒子物理与量子角动量 — 普林斯顿表示论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 经典 Lie 代数：\(A_n,B_n,C_n,D_n\)</a><a href="ch20.html">下一章 · 第 20 章 应用：Schur-Weyl 对偶与组合 →</a></nav>
+<h1 id="ch19">第 19 章 应用：粒子物理与量子角动量</h1>
+
+<p>如果你学表示论只是为了把有限群特征标表做得更快，那前半本已经足够。但这门课之所以在 20 世纪爆炸性地扩张影响力，不是因为数学家突然都爱上了抽象，而是因为物理真的需要它。量子力学里的“态”不是一个普通向量，而是 Hilbert 空间里的射线；可观测量不是数字，而是算子；对称性不再只是“把图形转一转”，而是对整套算子代数做兼容变换。于是表示论一下子从辅助工具，变成了物理语言本身。</p>
+
+<p>这一章要做的事情并不神秘：我们把你在<a href="ch14.html">第 14 章</a>和<a href="ch17.html">第 17 章</a>看过的 \(SU(2)\) 与 \(\mathfrak{sl}_2\) 重新读成角动量，再把 \(\mathfrak{sl}_3\) 和 \(SU(3)\) 读成夸克模型，最后把“粒子属于什么表示”这件事推到标准模型的规范群上。你会看见一个非常统一的现象：<strong>量子数其实就是最高权的物理化名字，粒子多重态其实就是不可约表示。</strong></p>
+
+<p>这条线还会和别的书接上。量子态空间首先是 Hilbert 空间，因此它天然承接<a href="../测度论/ch12.html">《测度论与高级实分析读本》第 12 章</a>里那套 \(L^2\) 几何。连续对称群的一个参数子群会写成指数 \(e^{tX}\)，所以它又承接<a href="../线性代数/ch17.html">《线性代数读本》第 17 章</a>对矩阵指数与线性流的讨论。至于平移和动量之间的关系，你如果看过<a href="../调和分析/ch9.html">《调和分析读本》第 9 章</a>到<a href="../调和分析/ch11.html">第 11 章</a>，会知道 Fourier 变换正是在把“平移表示”对角化。</p>
+
+<h2 id="sec19-1">19.1 量子力学中的对称性为什么必然长成表示</h2>
+
+<p>经典力学里的对称性通常是相空间上的变换；量子力学里，它必须作用在态空间上。最简单的说法是：若 \(G\) 是系统的对称群，那么每个 \(g\in G\) 应该对应一个保概率幅的算子 \(U(g)\)。忽略反幺正情形后，我们可以把它看成一个酉表示</p>
+
+\[
+U\colon G\to U(\mathcal H),
+\qquad
+U(g_1g_2)=U(g_1)U(g_2).
+\]
+
+<p>真正值钱的是它如何和可观测量兼容。若 \(A\) 是某个观测算子，那么对称变换后应当变成</p>
+
+\[
+A\longmapsto U(g)AU(g)^{-1}.
+\]
+
+<p>也就是说，群不是只作用在向量上，还作用在整个算子代数上。对连通 Lie 群，这个群表示一微分，就得到 Lie 代数表示：</p>
+
+\[
+dU(X)=\left.\frac{d}{dt}\right|_{t=0}U(e^{tX}).
+\]
+
+<p>物理里通常更喜欢写成自伴生成元 \(A_X\)：</p>
+
+\[
+U(e^{tX})=e^{-itA_X/\hbar}.
+\]
+
+<p>于是 Lie 括号会变成算子的对易关系：</p>
+
+\[
+dU([X,Y])=[dU(X),dU(Y)].
+\]
+
+<p>如果你从纯数学角度看，这不过是“群表示微分成 Lie 代数表示”；但从物理角度看，这一步非常关键，因为实验上真正可测的是生成元的谱。你不可能直接测量整个群元 \(g\)，你测量的是哈密顿量、动量、角动量、同位旋第三分量这些自伴算子的本征值。</p>
+
+<p>所以量子理论里一个基本套路是：先找出系统的对称群 \(G\)，再找它的酉表示，最后把表示分解成不可约块。每一个不可约块就是一类“不能再拆的粒子多重态”。这一逻辑和前面几章分解有限群表示的逻辑完全同构，只不过现在表示空间往往是无限维 Hilbert 空间，而连续群替代了有限群。</p>
+
+<h2 id="sec19-2">19.2 角动量算子其实就是一份 \(\mathfrak{sl}_2\) 表示</h2>
+
+<p>量子角动量的三个分量 \(J_x,J_y,J_z\) 满足著名对易关系</p>
+
+\[
+\boxed{[J_i,J_j]=i\hbar\,\varepsilon_{ijk}J_k.}
+\]
+
+<p>这看上去像物理专用公式，其实和 \(\mathfrak{so}_3\) 或 \(\mathfrak{sl}_2\) 的 Lie 括号只差一个归一化。把升降算子定义为</p>
+
+\[
+J_+=J_x+iJ_y,\qquad J_-=J_x-iJ_y,
+\]
+
+<p>就能直接算出</p>
+
+\[
+[J_z,J_\pm]=\pm\hbar J_\pm,\qquad [J_+,J_-]=2\hbar J_z.
+\]
+
+<p>现在把它们重新缩放成</p>
+
+\[
+e=\frac{J_+}{\hbar},\qquad
+f=\frac{J_-}{\hbar},\qquad
+h=\frac{2J_z}{\hbar},
+\]
+
+<p>便得到</p>
+
+\[
+[h,e]=2e,\qquad [h,f]=-2f,\qquad [e,f]=h.
+\]
+
+<p>这就是 \(\mathfrak{sl}_2\) 的标准关系。换句话说，<strong>任何角动量多重态，本质上都是一份 \(\mathfrak{sl}_2\) 表示</strong>。你在<a href="ch17.html">第 17 章</a>学到的最高权分类，这里一个字都不用改，只是物理上把最高权写成 \(2j\)，把权写成磁量子数 \(m\)。</p>
+
+<p>角动量里另一个核心对象是 Casimir 算子</p>
+
+\[
+J^2=J_x^2+J_y^2+J_z^2.
+\]
+
+<p>它与每个 \(J_i\) 都对易，因此可以在不可约表示上用一个标量描述。物理里这就是总角动量平方的本征值；表示论里这就是中心元在不可约模上的标量作用。</p>
+
+<h2 id="sec19-3">19.3 从最高权到量子数 \(j,m\)：升降算子把整套谱拉出来</h2>
+
+<p>现在把<a href="ch17.html">第 17 章</a>的 \(\mathfrak{sl}_2\) 分类直接翻译成物理语句。设 \(|j,m\rangle\) 同时是 \(J^2\) 和 \(J_z\) 的本征态：</p>
+
+\[
+J^2|j,m\rangle=\hbar^2j(j+1)|j,m\rangle,
+\qquad
+J_z|j,m\rangle=\hbar m\,|j,m\rangle.
+\]
+
+<p>其中 \(j\) 是总角动量量子数，\(m\) 是磁量子数。由前面的对易关系，\(J_+\) 与 \(J_-\) 会把 \(m\) 分别升高和降低 \(1\)：</p>
+
+\[
+J_\pm |j,m\rangle \propto |j,m\pm1\rangle.
+\]
+
+<p>真正需要算的是比例系数。先写出两个恒等式：</p>
+
+\[
+J_-J_+=J^2-J_z^2-\hbar J_z,
+\]
+
+\[
+J_+J_-=J^2-J_z^2+\hbar J_z.
+\]
+
+<p>于是</p>
+
+\[
+\|J_+|j,m\rangle\|^2
+=
+\langle j,m|J_-J_+|j,m\rangle
+=
+\hbar^2\bigl(j(j+1)-m(m+1)\bigr),
+\]
+
+\[
+\|J_-|j,m\rangle\|^2
+=
+\langle j,m|J_+J_-|j,m\rangle
+=
+\hbar^2\bigl(j(j+1)-m(m-1)\bigr).
+\]
+
+<p>所以升降系数被完全钉死：</p>
+
+\[
+\boxed{
+J_\pm |j,m\rangle
+=
+\hbar\sqrt{j(j+1)-m(m\pm1)}\ |j,m\pm1\rangle.
+}
+\]
+
+<p>现在一个极其重要的物理结论自动冒出来：由于范数平方必须非负，\(m\) 不可能无限往上或往下跑。一定存在最高态与最低态，使得</p>
+
+\[
+J_+|j,j\rangle=0,\qquad J_-|j,-j\rangle=0.
+\]
+
+<p>因此</p>
+
+\[
+m=-j,-j+1,\dots,j-1,j,
+\]
+
+<p>总共有</p>
+
+\[
+\boxed{2j+1}
+\]
+
+<p>个态。这就是角动量多重态的维数公式，而它和<a href="ch17.html#sec17-2">第 17.2 节</a>里 \(\mathfrak{sl}_2\) 不可约表示 \(V_n\) 的维数 \(n+1\) 完全一致，只要令</p>
+
+\[
+n=2j.
+\]
+
+<h3 id="sec19-3-1">把升降公式真的用一遍：为什么 \(j=\frac12\) 只有两个态</h3>
+
+<p>取 \(j=\frac12\)。那么允许的 \(m\) 只能是 \(\frac12\) 和 \(-\frac12\)。从最高态开始，有</p>
+
+\[
+J_+\left|\frac12,\frac12\right\rangle=0,
+\]
+
+<p>而下降一次得到</p>
+
+\[
+J_-\left|\frac12,\frac12\right\rangle
+=
+\hbar\sqrt{\frac12\left(\frac32\right)-\frac12\left(-\frac12\right)}
+\left|\frac12,-\frac12\right\rangle
+=
+\hbar\left|\frac12,-\frac12\right\rangle.
+\]
+
+<p>再往下降一次，系数变成</p>
+
+\[
+\hbar\sqrt{\frac12\left(\frac32\right)-\left(-\frac12\right)\left(-\frac32\right)}=0,
+\]
+
+<p>所以链条到此停止。也就是说，这个表示真的只有两维。这就是自旋 \(1/2\) 的最基本双态系统，也是电子、夸克等费米子内部自由度最常见的模型。</p>
+
+<h2 id="sec19-4">19.4 自旋就是 \(SU(2)\) 表示：半整数为什么会出现</h2>
+
+<p>如果只看 Lie 代数，你会说角动量来自 \(\mathfrak{sl}_2\)；如果看群，你会说自旋来自 \(SU(2)\)。两种说法并不冲突，因为<a href="ch14.html">第 14 章</a>已经说明：\(SU(2)\) 的有限维不可约表示和 \(\mathfrak{sl}_2\) 的有限维不可约表示是一回事。</p>
+
+<p>最基础的是二维定义表示，也就是自旋 \(1/2\) 表示。它的生成元可以写成 Pauli 矩阵：</p>
+
+\[
+\sigma_x=
+\begin{pmatrix}
+0&1\\
+1&0
+\end{pmatrix},
+\quad
+\sigma_y=
+\begin{pmatrix}
+0&-i\\
+i&0
+\end{pmatrix},
+\quad
+\sigma_z=
+\begin{pmatrix}
+1&0\\
+0&-1
+\end{pmatrix}.
+\]
+
+<p>对应的自旋算子是</p>
+
+\[
+S_i=\frac{\hbar}{2}\sigma_i.
+\]
+
+<p>它们满足和角动量完全一样的对易关系：</p>
+
+\[
+[S_i,S_j]=i\hbar\,\varepsilon_{ijk}S_k.
+\]
+
+<p>绕单位向量 \(\hat n\) 旋转角 \(\theta\) 的算子写成</p>
+
+\[
+U_{\frac12}(\hat n,\theta)=\exp\!\left(-\frac{i\theta}{2}\,\hat n\cdot \sigma\right).
+\]
+
+<p>现在最著名的现象来了。若旋转一整圈 \(\theta=2\pi\)，则</p>
+
+\[
+U_{\frac12}(\hat n,2\pi)
+=
+\exp(-i\pi\,\hat n\cdot\sigma)
+=-I.
+\]
+
+<p>也就是说，旋转 \(360^\circ\) 后，自旋 \(1/2\) 态并不回到原向量，而是差一个负号。物理上这不改变射线，所以概率不变；但表示论上它说明：这个表示没有降到 \(SO(3)\)，而是只活在它的双覆盖 \(SU(2)\) 上。</p>
+
+\[
+\boxed{\text{\(SU(2)\) 的表示能降到 \(SO(3)\) 当且仅当最高权 \(n=2j\) 为偶数。}}
+\]
+
+<p>因此整数自旋对应 \(SO(3)\) 表示，半整数自旋只能对应 \(SU(2)\) 表示。这不是物理额外添加的一条怪规则，而是覆盖群与表示提升之间的直接结果。</p>
+
+<h3 id="sec19-4-1">把 \(2\pi\) 旋转算到底：为什么电子“转一圈变负号”</h3>
+
+<p>取 \(\hat n=(0,0,1)\)。这时</p>
+
+\[
+U_{\frac12}(\hat z,\theta)
+=
+\exp\!\left(-\frac{i\theta}{2}\sigma_z\right)
+=
+\begin{pmatrix}
+e^{-i\theta/2}&0\\
+0&e^{i\theta/2}
+\end{pmatrix}.
+\]
+
+<p>令 \(\theta=2\pi\)，便得</p>
+
+\[
+U_{\frac12}(\hat z,2\pi)
+=
+\begin{pmatrix}
+e^{-i\pi}&0\\
+0&e^{i\pi}
+\end{pmatrix}
+=
+\begin{pmatrix}
+-1&0\\
+0&-1
+\end{pmatrix}
+=-I.
+\]
+
+<p>这不是近似，不是修辞，而是矩阵指数一行算出来的结果。你在<a href="../线性代数/ch17.html">《线性代数读本》第 17 章</a>学过指数矩阵如何解线性流；在这里，它直接告诉你为什么自旋子的拓扑性质和普通空间向量不一样。</p>
+
+<h2 id="sec19-5">19.5 同位旋：\(SU(2)\) 作为近似内部对称性</h2>
+
+<p>角动量的 \(SU(2)\) 来自空间旋转。可表示论的威力在于：只要实验现象显示出“两态成双”“三态成三重态”这类多重性，你就会怀疑背后是否有另一份 \(SU(2)\) 在工作。核物理里最著名的例子就是同位旋。</p>
+
+<p>如果先忽略电磁相互作用，并把 \(u,d\) 两种轻夸克的质量看得近似相等，那么强相互作用对它们几乎不加区分。于是可以把它们排成一个双重态：</p>
+
+\[
+\begin{pmatrix}
+u\\ d
+\end{pmatrix},
+\qquad
+\text{或在强子层面写成 }
+\begin{pmatrix}
+p\\ n
+\end{pmatrix}.
+\]
+
+<p>这意味着强相互作用近似具有一个内部 \(SU(2)\) 对称性。它不转动真实空间，而是在“味”空间里旋转。与角动量完全平行，同位旋 \(I\) 的不可约表示维数也是 \(2I+1\)。因此 \(I=\frac12\) 给出核子双重态，\(I=1\) 给出三重态，比如 \(\pi^+,\pi^0,\pi^-\)。</p>
+
+<h3 id="sec19-5-1">两份 \(I=\frac12\) 怎样分解成三重态加单态</h3>
+
+<p>表示论上就是熟悉的 Clebsch-Gordan 分解：</p>
+
+\[
+\frac12\otimes \frac12 = 1\oplus 0.
+\]
+
+<p>若以 \(|u\rangle,|d\rangle\) 为基，则四个张量积态可以重组为</p>
+
+\[
+|1,1\rangle=|uu\rangle,
+\]
+
+\[
+|1,0\rangle=\frac{1}{\sqrt2}\bigl(|ud\rangle+|du\rangle\bigr),
+\]
+
+\[
+|1,-1\rangle=|dd\rangle,
+\]
+
+\[
+|0,0\rangle=\frac{1}{\sqrt2}\bigl(|ud\rangle-|du\rangle\bigr).
+\]
+
+<p>前三个是对称部分，构成三维不可约表示；最后一个是反对称部分，构成一维不可约表示。你在<a href="ch17.html#sec17-6">第 17 章</a>已经把这种分解当作 \(\mathfrak{sl}_2\) 张量积分解看过一次；现在它被重新解释成“两个同位旋 \(1/2\) 粒子组成总同位旋 \(1\) 或 \(0\)”。</p>
+
+<p>当然，同位旋并不是严格对称。\(u,d\) 夸克质量不完全相等，电荷也不同，所以这个 \(SU(2)\) 只是在强相互作用主导时近似成立。但正因为它是近似成立的，我们才更看清表示论在物理里的真正用法：它并不要求世界百分之百理想，而是先抓住主导对称性，再把破缺看成小修正。</p>
+
+<h2 id="sec19-6">19.6 八重道与 \(SU(3)\)：夸克模型把多重态组织起来</h2>
+
+<p>把 \(u,d\) 再加上较轻的 \(s\) 夸克，强相互作用会近似表现出一个 flavor \(SU(3)\) 对称性。于是三种夸克组成基本表示</p>
+
+\[
+\mathbf 3=\operatorname{span}\{u,d,s\}.
+\]
+
+<p>Gell-Mann 的八重道正是把强子按这个 \(SU(3)\) 的不可约表示分类。这里最经典的分解是</p>
+
+\[
+\boxed{\mathbf 3\otimes \bar{\mathbf 3}=\mathbf 8\oplus \mathbf 1.}
+\]
+
+<p>这其实和<a href="ch18.html#sec18-8">第 18 章</a>里的 \(\mathfrak{sl}_3\) 伴随表示是一回事，因为</p>
+
+\[
+\mathbf 3\otimes \bar{\mathbf 3}\cong \operatorname{End}(\mathbb C^3),
+\]
+
+\[
+\operatorname{End}(\mathbb C^3)=\mathfrak{sl}_3(\mathbb C)\oplus \mathbb C I.
+\]
+
+<p>右边第一项就是 8 维伴随表示，第二项是 1 维平凡表示。物理上，这说明一个夸克和一个反夸克组成的介子态可以分成一个八重态和一个单态。</p>
+
+<h3 id="sec19-6-1">把 \(3\times 3=8+1\) 算得一清二楚</h3>
+
+<p>\(\operatorname{End}(\mathbb C^3)\) 的维数是</p>
+
+\[
+3\cdot 3=9.
+\]
+
+<p>其中标量矩阵 \(\mathbb C I\) 显然构成一维不变子空间。它的补空间最自然就是迹零矩阵：</p>
+
+\[
+\mathfrak{sl}_3(\mathbb C)=\{X\in M_3(\mathbb C):\operatorname{tr}(X)=0\}.
+\]
+
+<p>维数为</p>
+
+\[
+3^2-1=8.
+\]
+
+<p>因此</p>
+
+\[
+\operatorname{End}(\mathbb C^3)=\mathfrak{sl}_3\oplus \mathbb C I
+\]
+
+<p>就正是</p>
+
+\[
+\mathbf 3\otimes \bar{\mathbf 3}=\mathbf 8\oplus \mathbf 1.
+\]
+
+<p>这一步没有任何玄学：八重态之所以是“八”，只是因为伴随表示的维数是 8。表示论把粒子物理里的一个大分类现象，压回成了一个最普通的维数分解。</p>
+
+<p>继续做张量积，还会得到</p>
+
+\[
+\mathbf 3\otimes \mathbf 3\otimes \mathbf 3
+=
+\mathbf{10}\oplus \mathbf 8\oplus \mathbf 8\oplus \mathbf 1.
+\]
+
+<p>这对应重子十重态、两个八重态和一个单态。历史上最著名的成功，是十重态顶端缺失的 \(\Omega^-\) 粒子后来真的被实验发现。这件事本身就像一条强有力的注释：<strong>表示论不只是整理已知数据，它还能预测还没被找到的多重态。</strong></p>
+
+<p>在 flavor \(SU(3)\) 的语境里，人们常把状态画在 \((I_3,Y)\) 平面上，其中 \(I_3\) 是同位旋第三分量，\(Y\) 是 flavor hypercharge。八重态图形之所以那么有名，正因为权图和粒子谱图几乎就是同一张图。要记得，这里的 \(Y\) 是 flavor 量子数，不是下一节标准模型里的弱超荷；字母相同，含义不同。</p>
+
+<h2 id="sec19-7">19.7 标准模型规范群：\(SU(3)\times SU(2)\times U(1)\)</h2>
+
+<p>八重道里的 \(SU(3)\) 是近似 flavor 对称；标准模型里的 \(SU(3)\) 则完全不同，它是精确得多的颜色规范对称。现代粒子物理把基本相互作用的内部对称性压缩成一个规范群</p>
+
+\[
+\boxed{G_{\mathrm{SM}}=SU(3)_c\times SU(2)_L\times U(1)_Y.}
+\]
+
+<p>其中 \(SU(3)_c\) 负责强相互作用，\(SU(2)_L\times U(1)_Y\) 负责电弱相互作用。表示论的任务，是告诉你各种费米子和玻色子属于哪些表示。采用</p>
+
+\[
+Q=T_3+Y
+\]
+
+<p>这一约定时，一代费米子的表示可以写成</p>
+
+\[
+Q_L=
+\begin{pmatrix}
+u_L\\ d_L
+\end{pmatrix}
+\sim (\mathbf 3,\mathbf 2)_{1/6},
+\qquad
+L_L=
+\begin{pmatrix}
+\nu_L\\ e_L
+\end{pmatrix}
+\sim (\mathbf 1,\mathbf 2)_{-1/2},
+\]
+
+\[
+u_R\sim (\mathbf 3,\mathbf 1)_{2/3},
+\qquad
+d_R\sim (\mathbf 3,\mathbf 1)_{-1/3},
+\qquad
+e_R\sim (\mathbf 1,\mathbf 1)_{-1},
+\]
+
+\[
+H\sim (\mathbf 1,\mathbf 2)_{1/2}.
+\]
+
+<p>这里下标表示 \(U(1)_Y\) 的权，前两个粗体数字表示在 \(SU(3)_c\) 和 \(SU(2)_L\) 下的表示维数。光是读这个列表，你就已经在做表示论：夸克左手态是颜色三重态、弱双重态；右手上夸克是颜色三重态、弱单态；电子右手态则在两个非阿贝尔因子下都是平凡表示。</p>
+
+<h3 id="sec19-7-1">只用表示标签就能把电荷算出来</h3>
+
+<p>以左手夸克双重态 \(Q_L\sim(\mathbf 3,\mathbf 2)_{1/6}\) 为例。它在 \(SU(2)_L\) 里是二维表示，所以有两个 \(T_3\) 本征值：</p>
+
+\[
+T_3=+\frac12,\qquad T_3=-\frac12.
+\]
+
+<p>再用公式 \(Q=T_3+Y\)，且这里 \(Y=\frac16\)，于是上分量的电荷是</p>
+
+\[
+Q_u=\frac12+\frac16=\frac23,
+\]
+
+<p>下分量的电荷是</p>
+
+\[
+Q_d=-\frac12+\frac16=-\frac13.
+\]
+
+<p>这正是上夸克与下夸克的电荷。也就是说，电荷不是单独硬塞给每个粒子的标签，而是表示论数据 \(T_3\) 与 \(Y\) 组合出来的结果。</p>
+
+<p>规范玻色子也照样由伴随表示决定。\(SU(3)_c\) 的伴随表示维数是</p>
+
+\[
+\dim \mathfrak{su}(3)=8,
+\]
+
+<p>所以有 8 个胶子；\(SU(2)_L\) 的伴随表示维数是</p>
+
+\[
+\dim \mathfrak{su}(2)=3,
+\]
+
+<p>所以有三种弱规范玻色子 \(W^1,W^2,W^3\)。再加上 \(U(1)\) 的一个玻色子 \(B\)，经 Higgs 机制混合后长成 \(W^\pm,Z,\gamma\)。这里每一步背后都站着“场属于哪个表示”这个问题。</p>
+
+<p>当然，标准模型的完整故事远比这一节复杂：手征性、异常抵消、Higgs 自发破缺、质量矩阵与混合角都还没真正展开。但从表示论角度看，最核心的第一眼已经出现了：<strong>粒子物理并不是先有一堆粒子名词，再勉强找点代数来装它们；恰好相反，很多“为什么正好这么多态、为什么电荷恰好这些值、为什么胶子是 8 个”本来就是表示论问题。</strong></p>
+
+<h2 id="sec19-8">19.8 这一章的物理翻译表</h2>
+
+<p>在量子力学里，对称性不是图形上的动作，而是 Hilbert 空间上的酉表示；其无穷小版本就是 Lie 代数表示。角动量和自旋之所以由 \(2j+1\) 个态组成，不是经验巧合，而是 \(\mathfrak{sl}_2\) 与 \(SU(2)\) 不可约表示维数公式的直接物理化。至于同位旋、八重道和标准模型，它们最深的共同点都一样：多重态的结构，本质上是在读群与 Lie 代数的不可约表示。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 经典 Lie 代数：\(A_n,B_n,C_n,D_n\)</a><a href="ch20.html">下一章 · 第 20 章 应用：Schur-Weyl 对偶与组合 →</a></nav>
+
+</main>
+</body>
+</html>
