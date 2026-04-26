@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 大数定律 — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 不等式</a><a href="ch13.html">下一章 · 第 13 章 中心极限定理 →</a></nav>
+<h1 id="ch12">第 12 章 大数定律</h1>
+
+<p>"抛一万次硬币，正面占的比例<em>必然</em>接近 1/2。" "保险公司服务上百万用户，能从总保费里赚到稳定的利润。" "民调访问 1500 人，就能估计全国选民的意见，误差只有几个百分点。"</p>
+
+<p>你早就听过这种说法。它们的共同骨架就是本章的主题：<strong>大数定律</strong>（Law of Large Numbers，LLN）——把许多独立同分布随机变量平均起来，结果<em>必然</em>逼近真实期望。这是 17 世纪由瑞士数学家伯努利首次严格证明的，叫做"伯努利定理"；今天它已经升级为概率论的基石之一。</p>
+
+<p>大数定律解释了一件几乎神秘的事情：<em>个体的随机性，能在大尺度上被驯服为一种确定性</em>。每一次抛硬币是不可预测的——下一次是正是反，谁也不知道。但抛十万次，正面比例落在 49.7% 到 50.3% 之间几乎是<em>板上钉钉</em>。这种"个体不可知，整体可预测"的现象，是统计学得以存在的根本原因。</p>
+
+<p>本章会讲：</p>
+
+<ul>
+<li>大数定律的<strong>直觉</strong>——为什么频率"必然"逼近概率？</li>
+<li><strong>弱大数定律</strong>（WLLN）：依概率收敛的陈述。</li>
+<li>用上一章的<strong>Chebyshev</strong>不等式给出的五行证明。</li>
+<li><strong>强大数定律</strong>（SLLN）：几乎处处收敛的更强陈述（不证）。</li>
+<li>三种<strong>收敛模式</strong>（依概率/几乎处处/依分布）的层次关系。</li>
+<li>应用：<em>蒙特卡洛积分</em>、<em>保险公司聚合</em>。</li>
+<li>反复要警告的<strong>赌徒谬误</strong>：大数定律并不意味着"系统会修正自己"。</li>
+</ul>
+
+<h2 id="sec12-1">12.1 直觉：抛一万次硬币</h2>
+
+<p>设公平硬币抛 \(n\) 次，正面数为 \(S_n \sim \mathrm{Bin}(n, 1/2)\)。正面的比例是 \(\bar X_n = S_n/n\)。我们已经在第 10 章算过：</p>
+
+\[
+\mathbb{E}[\bar X_n] = \frac{1}{2}, \qquad \mathrm{Var}(\bar X_n) = \frac{(1/2)(1/2)}{n} = \frac{1}{4n}.
+\]
+
+<p>方差随 \(n\) 缩小到 0。也就是说样本均值"自身"的波动越来越小，最终所有概率质量都集中在一点 \(\mu = 1/2\) 上。这就是大数定律的几何图像——分布<em>收紧</em>到均值。</p>
+
+<p>把它<em>具体化</em>。\(n = 10\)：标准差 \(= \sqrt{1/40} \approx 0.158\)，所以正面比例的"典型"波动范围是 \(0.5 \pm 0.158\)，即 0.34 到 0.66。\(n = 1000\)：标准差 \(\approx 0.0158\)，波动 \(0.5 \pm 0.016\)，即 0.484 到 0.516。\(n = 100000\)：标准差 \(\approx 0.00158\)，波动 \(0.5 \pm 0.0016\)，即 0.4984 到 0.5016。</p>
+
+<p>越抛越窄。当 \(n \to \infty\)，\(\bar X_n\) 的分布退化为一根"点钉"在 \(0.5\) 处。这就是大数定律。</p>
+
+<p>请你<em>注意</em>：大数定律说的是<strong>比例</strong>逼近 \(0.5\)，<em>不</em>是说"正面数减反面数"逼近 0。事实上"正面数减反面数 \(= 2 S_n - n\)"的标准差是 \(\sqrt{n}\)——它会<em>越来越大</em>！差额在膨胀，比例在收敛——两件事是兼容的，因为 \((2S_n - n)/n = 2\bar X_n - 1 \to 0\)，分子膨胀但被分母 \(n\) 稀释。这是初学者常常困惑的一点：差额和比例的趋势相反。</p>
+
+<h2 id="sec12-2">12.2 弱大数定律 (WLLN)</h2>
+
+<p>把 12.1 的直觉变成数学陈述。</p>
+
+<p style="text-align:center"><strong>弱大数定律（Weak Law of Large Numbers, WLLN）</strong>　设 \(X_1, X_2, \ldots\) 独立同分布，\(\mathbb{E}[X_i] = \mu\) 有限，\(\mathrm{Var}(X_i) = \sigma^2 < \infty\)。则对任意 \(\varepsilon > 0\)，</p>
+
+\[
+\boxed{\lim_{n \to \infty} P(|\bar X_n - \mu| \geq \varepsilon) = 0,}
+\]
+
+<p>等价地写作</p>
+
+\[
+\bar X_n \xrightarrow{P} \mu \quad (n \to \infty),
+\]
+
+<p>读作"\(\bar X_n\) 依概率收敛于 \(\mu\)"。</p>
+
+<p>"依概率收敛"的意思是：<em>无论你给一个多么小的正数 \(\varepsilon\)，"\(\bar X_n\) 偏离 \(\mu\) 超过 \(\varepsilon\)" 这件事的概率，最终都会趋近 0</em>。换句话说，<em>对足够大的 \(n\)</em>，几乎每次实验得到的 \(\bar X_n\) 都会落在 \(\mu\) 周围 \(\varepsilon\) 的小区间里。</p>
+
+<p>请<em>注意</em>这条陈述的<em>陈述结构</em>：极限放在 \(P(\cdot)\) 的外面，不是里面。我们没有说"\(\bar X_n \to \mu\)"——我们说的是"\(\bar X_n\) 落在 \(\mu\) 邻域之外"这件事的概率趋近于 0。这是关于<em>概率</em>的极限，不是关于<em>随机变量</em>本身的极限。两者之间的微妙差别我们 12.4-12.5 节再讲。</p>
+
+<h2 id="sec12-3">12.3 用 Chebyshev 推 WLLN：五行证明</h2>
+
+<p>现在你看上一章的 Chebyshev 不等式怎样花一杯茶时间就证明 WLLN。</p>
+
+<p><em>证明</em>：固定 \(\varepsilon > 0\)。\(\bar X_n\) 的均值是 \(\mu\)、方差是 \(\sigma^2/n\)（10.6 节）。直接套 Chebyshev：</p>
+
+\[
+P(|\bar X_n - \mu| \geq \varepsilon) \leq \frac{\mathrm{Var}(\bar X_n)}{\varepsilon^2} = \frac{\sigma^2/n}{\varepsilon^2} = \frac{\sigma^2}{n \varepsilon^2}.
+\]
+
+<p>当 \(n \to \infty\)，右边 \(\to 0\)。所以 \(P(|\bar X_n - \mu| \geq \varepsilon) \to 0\)。证毕。</p>
+
+<p>整个证明就这一行半。请你品味一下这种简洁——一条上世纪初的不等式（Chebyshev 1867）配上一个根号倒数的方差缩减（\(\sigma^2 \to \sigma^2/n\)），就给出了概率论里最重要的极限之一。</p>
+
+<p>请<em>注意</em>这条证明对方差的有限性有要求（\(\sigma^2 < \infty\)）。事实上 WLLN 即使在<em>没有</em>方差的情形也成立——只需 \(\mathbb{E}|X_i|\) 有限——但证明要用更复杂的"截断"方法。Chebyshev 路径只对二阶矩有限的情形适用，但对绝大多数应用够了。</p>
+
+<h2 id="sec12-4">12.4 强大数定律 (SLLN)</h2>
+
+<p>WLLN 还不算"最强"的大数定律——它说"偏离的<em>概率</em>趋于 0"。一种更强的说法叫<strong>强大数定律</strong>（Strong Law of Large Numbers, SLLN）：</p>
+
+<p style="text-align:center"><strong>强大数定律</strong>　在与 WLLN 相同假设（i.i.d.、\(\mathbb{E}|X_i| < \infty\)）下，</p>
+
+\[
+\boxed{P\!\left(\lim_{n \to \infty} \bar X_n = \mu\right) = 1.}
+\]
+
+<p>等价地写作</p>
+
+\[
+\bar X_n \xrightarrow{a.s.} \mu \quad (n \to \infty),
+\]
+
+<p>读作"\(\bar X_n\) <strong>几乎处处</strong>（almost surely, a.s.）收敛于 \(\mu\)"。</p>
+
+<p>这条陈述比 WLLN 强在哪？它把"极限"从 \(P(\cdot)\) 的外面挪到<em>里面</em>了。它说的是：考虑<em>每一条</em>抽样轨道 \(\omega \mapsto \bar X_1(\omega), \bar X_2(\omega), \ldots\)，<em>除了一组概率为零的"坏"轨道之外</em>，每一条轨道都<em>真的</em>作为实数列收敛到 \(\mu\)。</p>
+
+<p>差别有多大？想想这个比喻：</p>
+
+<ul>
+<li>WLLN："抽 \(n\) 次以后，<em>这一次</em>的 \(\bar X_n\) 大约率离 \(\mu\) 不远。"</li>
+<li>SLLN："如果你坚持<em>无限</em>抽下去，<em>个</em>抽样路径几乎必然</em>会真的收敛到 \(\mu\)。"</li>
+</ul>
+
+<p>WLLN 不排除"\(\bar X_n\) 时不时跳出去远偏一下、再回来"——只要这种偏离的概率随 \(n\) 趋于零就行；但 SLLN 排除了这种"偶尔跳一下"的可能（更准确地说，跳起来的次数<em>有限</em>，几乎处处）。</p>
+
+<p>SLLN 的证明<em>不平凡</em>——属于研究生级别的概率论内容，要用到<em>Borel-Cantelli 引理</em>、四阶矩估计或者鞅论。我们这本入门书<em>不证明</em> SLLN，只承认它。重要的是会用：在统计学几乎所有应用里，SLLN 是"幕后推手"，让"长期频率 = 概率"这件事在几乎处处的意义下成立。</p>
+
+<p>关于"几乎处处"这个名词：测度论里 \(P(A) = 1\) 不是"\(A\) 一定发生"——而是"\(A\) 不发生的概率为零"。这两者在连续概率空间下不同（"概率零"的事件可以发生但被忽略）。所以"几乎处处"是"概率为 1"的同义词，把那一片"概率零的反例集"刻意撇开。</p>
+
+<h2 id="sec12-5">12.5 收敛模式速通：依概率 / 几乎处处 / 依分布</h2>
+
+<p>本节列三种最常见的"随机变量的收敛"模式，给出层次关系。这些概念在概率论里非常基础，请<em>分清</em>。</p>
+
+<p><strong>(1) 几乎处处收敛（a.s.）</strong>　\(X_n \xrightarrow{a.s.} X\) 当 \(P(\lim X_n = X) = 1\)。最强——单条样本路径"绝大多数"真的收敛。</p>
+
+<p><strong>(2) 依概率收敛（P）</strong>　\(X_n \xrightarrow{P} X\) 当 \(\forall \varepsilon > 0,\, P(|X_n - X| \geq \varepsilon) \to 0\)。中等——偏离的概率趋于 0，但单条路径未必收敛。</p>
+
+<p><strong>(3) 依分布收敛（d）</strong>　\(X_n \xrightarrow{d} X\) 当对每个 \(X\) 的连续点 \(x\)，\(F_{X_n}(x) \to F_X(x)\)。最弱——只要分布函数收敛，不要求 \(X_n\) 与 \(X\) 在同一概率空间上接近。</p>
+
+<p>层次关系：</p>
+
+\[
+\boxed{X_n \xrightarrow{a.s.} X \implies X_n \xrightarrow{P} X \implies X_n \xrightarrow{d} X.}
+\]
+
+<p>(三个箭头都<em>不可逆</em>。即依概率收敛不一定几乎处处收敛；依分布收敛不一定依概率收敛。具体反例存在但偏离主线，从略。)</p>
+
+<p>WLLN 就是 \(\bar X_n \xrightarrow{P} \mu\)；SLLN 把它升级为 \(\bar X_n \xrightarrow{a.s.} \mu\)。第 13 章的<em>中心极限定理</em>是依分布收敛——\(\frac{\bar X_n - \mu}{\sigma/\sqrt n} \xrightarrow{d} \mathcal N(0, 1)\)，最弱形式但也最有用。</p>
+
+<p>请<em>注意</em>这三种收敛在统计学里有不同的作用：依概率/几乎处处给出"估计量的一致性"（即 \(\hat\theta_n \to \theta\)），依分布给出"估计量的渐近分布"（即 \(\sqrt n (\hat\theta_n - \theta) \to \mathcal N(0, V)\)）。前者保证"估计是对的"，后者保证"知道估计有多准"。两者一起构成统计学渐近理论的脊梁。</p>
+
+<h2 id="sec12-6">12.6 应用：蒙特卡洛积分</h2>
+
+<p>大数定律的最早实用应用之一是<em>计算积分</em>——特别是高维或解析公式难写的积分。这种方法叫<strong>蒙特卡洛积分</strong>（Monte Carlo integration），由二战时洛斯阿拉莫斯国家实验室的乌拉姆和冯·诺依曼正式提出。</p>
+
+<p>核心思想：要算 \(\int_a^b f(x)\, dx\)，先把它写成期望。设 \(U \sim \mathrm{Uniform}(a, b)\)，则 \(U\) 的密度是 \(\frac{1}{b-a}\)，</p>
+
+\[
+\mathbb{E}[f(U)] = \int_a^b f(x) \cdot \frac{1}{b-a}\, dx = \frac{1}{b-a} \int_a^b f(x)\, dx.
+\]
+
+<p>所以</p>
+
+\[
+\int_a^b f(x)\, dx = (b - a) \cdot \mathbb{E}[f(U)].
+\]
+
+<p>右边的期望，我们用大数定律来估：抽 \(n\) 个独立的 \(U_1, \ldots, U_n \sim \mathrm{Uniform}(a, b)\)，计算</p>
+
+\[
+\hat I_n = (b - a) \cdot \frac{1}{n}\sum_{i=1}^n f(U_i).
+\]
+
+<p>由 SLLN，\(\hat I_n \to (b - a) \cdot \mathbb{E}[f(U)] = \int_a^b f(x)\, dx\)（几乎处处）。这就是<em>蒙特卡洛积分</em>——用大数定律和随机抽样代替解析积分。</p>
+
+<p><strong>例 12.1（用蒙特卡洛算 \(\pi\)）</strong>　把单位圆 \(\{(x, y) : x^2 + y^2 \leq 1\}\) 内嵌入正方形 \([-1, 1]^2\)。圆面积 \(\pi\)，正方形面积 4，<em>内圆面积比</em> \(= \pi/4\)。</p>
+
+<p>实验：均匀地从正方形 \([-1, 1]^2\) 抽 \(n\) 个随机点 \((U_i, V_i)\)，计算落入单位圆内的比例 \(\hat p_n = \frac{1}{n}\sum \mathbf 1_{\{U_i^2 + V_i^2 \leq 1\}}\)。则 \(\hat p_n \to \pi/4\)，所以 \(4\hat p_n \to \pi\)。</p>
+
+<p>伪代码：</p>
+
+\[
+\begin{aligned}
+&\text{count} = 0 \\
+&\text{for } i = 1, \ldots, n: \\
+&\quad U \sim \mathrm{Uniform}(-1, 1),\ V \sim \mathrm{Uniform}(-1, 1) \\
+&\quad \text{if } U^2 + V^2 \leq 1: \text{count} += 1 \\
+&\hat\pi = 4 \cdot \text{count}/n
+\end{aligned}
+\]
+
+<p>取 \(n = 10^6\)，典型结果 \(\hat \pi \approx 3.1416\)（标准误差大约 \(\sqrt{(\pi/4)(1-\pi/4)/n} \cdot 4 \approx 0.0016\)）。</p>
+
+<p>请<em>注意</em>：蒙特卡洛积分的"收敛速率"是 \(O(1/\sqrt n)\)（来自 \(\sigma/\sqrt n\) 的标准差），<em>不依赖维数</em>。这就是为什么蒙特卡洛在高维积分（比如金融期权定价、统计物理、贝叶斯推断）里几乎是<em>唯一</em>选择——传统数值积分的复杂度按 \(N^d\) 增长，\(d\) 大时无法承受；蒙特卡洛的 \(O(1/\sqrt n)\) 与 \(d\) 无关。</p>
+
+<p><strong>例 12.2（蒙特卡洛算复杂积分）</strong>　估计 \(\int_0^1 e^{-x^2}\, dx\)。</p>
+
+<p>解：设 \(U \sim \mathrm{Uniform}(0, 1)\)，估计</p>
+
+\[
+\hat I_n = \frac{1}{n}\sum_{i=1}^n e^{-U_i^2}.
+\]
+
+<p>取 \(n = 10000\)，典型 \(\hat I_n \approx 0.7468\)（真值 \(\approx 0.7468\)）。这条积分本身没有解析表达——它是误差函数 \(\mathrm{erf}\) 的化身——但蒙特卡洛照算不误。</p>
+
+<h2 id="sec12-7">12.7 应用：保险公司为什么稳赚</h2>
+
+<p>大数定律的另一个标志性应用：<em>保险</em>。</p>
+
+<p>设一家保险公司有 \(n\) 个独立的客户。每个客户每年的理赔金额 \(L_i\) 是个随机变量，期望 \(\mathbb{E}[L_i] = \mu\)，标准差 \(\sigma\)。公司每年向每个客户收保费 \(\pi\)（先付）。一年下来，公司的<em>总盈利</em>是</p>
+
+\[
+P_n = n\pi - \sum_{i=1}^n L_i = n\pi - n \bar L_n,
+\]
+
+<p>其中 \(\bar L_n\) 是平均理赔。除以 \(n\)，<em>每客户平均盈利</em>是 \(\pi - \bar L_n\)。</p>
+
+<p>由大数定律，\(\bar L_n \to \mu\)。所以当 \(n\) 足够大时，每客户平均盈利近乎 \(\pi - \mu\)。</p>
+
+<p>这就给保险公司一个非常稳定的策略：<em>把保费 \(\pi\) 设为 \(\mu\) 加一点点</em>（比如 \(\pi = \mu + 0.05\mu = 1.05\mu\)），即"理赔成本预期 + 5% 利润率"。</p>
+
+<p>这样：</p>
+
+<ul>
+<li>对个别客户，盈利 \(= \pi - L_i\) 是高度随机的——可能很大盈利（客户没出险），也可能巨亏（客户大额理赔）。</li>
+<li>对总体的 \(n\) 个客户，平均盈利 \(\to 0.05\mu\)，<em>几乎确定性地</em>。</li>
+</ul>
+
+<p>保险公司就靠这个"个体随机、聚合稳定"的现象赚钱。客户多得越多（\(n\) 大），波动越小，"赚 5%" 越接近板上钉钉。这就是为什么保险公司倾向于<em>大规模运营</em>——大数定律奖励规模。</p>
+
+<p>具体看 Chebyshev 给的"破产概率"上界：</p>
+
+\[
+P(\text{亏损}) = P(\bar L_n > \pi) = P(\bar L_n - \mu > 0.05\mu) \leq \frac{\sigma^2/n}{(0.05\mu)^2} = \frac{400 \sigma^2}{n \mu^2}.
+\]
+
+<p>取 \(\sigma/\mu = 1\)（即标准差与均值同量级），\(n = 100\)：上界 \(\leq 4\)（无意义，太松）。\(n = 10000\)：\(\leq 0.04 = 4\%\)。\(n = 10^6\)：\(\leq 0.0004 = 0.04\%\)。所以百万级客户的保险公司，"亏损"概率小于千分之零点四——几乎确定盈利。</p>
+
+<p>请<em>注意</em>这条逻辑的两个前提：(1) 客户独立（一次大灾让所有客户同时出险时这条假设崩溃，比如自然灾害保险或经济危机下的违约保险——这是"系统性风险"，大数定律失效）；(2) 期望与方差有限。某些"重尾"风险（比如极端事件支付）方差无限，Chebyshev 失效，保险定价要更小心。</p>
+
+<h2 id="sec12-8">12.8 注意陷阱：大数定律不是"修正定律"——赌徒谬误</h2>
+
+<p>这是本章最重要的一节——之所以重要不是因为它的数学难，而是因为它指出一个<em>非常常见</em>的<strong>错误直觉</strong>。</p>
+
+<p>赌徒在轮盘赌的红黑色上下注。他刚连看到 5 次黑色。他想："黑色出了 5 次，下一次<em>该</em>红色了——大数定律告诉我们红黑要平衡！" 于是他重注红色。</p>
+
+<p>这<strong>错了</strong>。下一轮红色出现的概率仍然是 \(18/37\)（标准欧式轮盘），与之前 5 次的结果<em>完全无关</em>，因为每一轮独立。这种把"长期均衡"误解为"短期会修正"的错误叫做<strong>赌徒谬误</strong>（gambler's fallacy）。</p>
+
+<p>为什么是错觉？因为人脑天然认为大数定律意味着"系统记得过去并矫正未来"。但大数定律说的是：<em>未来抛足够多次后，前 5 次的偏差会被巨量未来抛次"稀释"到可忽略</em>，而不是说"未来会主动反向偏差来抵消前面的"。</p>
+
+<p>用数学表达：设 \(S_n\) 是前 \(n\) 次正面数。已知前 5 次都是反面（\(S_5 = 0\)）。则未来 \(n - 5\) 次的正面数 \(S_n - S_5\) 仍然 \(\sim \mathrm{Bin}(n - 5, 1/2)\)，与历史无关。所以</p>
+
+\[
+\bar X_n = \frac{S_n}{n} = \frac{0 + (S_n - S_5)}{n} = \frac{S_n - S_5}{n}.
+\]
+
+<p>当 \(n \to \infty\)，\((n - 5)/n \to 1\)、\((S_n - S_5)/(n - 5) \to 1/2\)（对未来部分应用大数定律）。所以 \(\bar X_n \to 1/2\)——但这是因为 5 次"分母" \(n\) 越来越不显眼，<em>不</em>是因为后续会偏向正面来"修正"。系统不记仇，骰子没记忆。</p>
+
+<p>这条认知的反面也常错——叫<em>赌徒谬误的反面</em>（hot hand fallacy 之类的）："连出 5 次黑色 → 下一次更可能黑色（因为'手风正顺'）"。也<em>错</em>，下一次仍然 18/37，跟历史无关。</p>
+
+<p>请<em>记住</em>：<strong>独立同分布的随机变量没有记忆。下一次的概率与历史无关。大数定律只是说"遥远未来"会稀释当下的偏差，<em>不是</em>"主动修正"。</strong></p>
+
+<p><strong>例 12.3（赌徒谬误的具体计算）</strong>　已知 \(X_1 = X_2 = X_3 = X_4 = X_5 = 0\)（5 次反面）。在公平硬币下，\(X_6 = 1\)（第 6 次正面）的条件概率是多少？</p>
+
+<p>解：由独立性，\(P(X_6 = 1 | X_1 = \cdots = X_5 = 0) = P(X_6 = 1) = 1/2\)。<em>不</em>是 \(> 1/2\)。</p>
+
+<p><strong>例 12.4（不为人知的"大数定律的陷阱"）</strong>　考虑 \(X_i\) 服从柯西分布（密度 \(\frac{1}{\pi(1 + x^2)}\)）。它的 \(\mathbb{E}[X_i]\) <em>不存在</em>（积分发散）。问 \(\bar X_n\) 是否依概率收敛到 0？</p>
+
+<p>解：<strong>不收敛</strong>！柯西分布有一条惊人性质：\(\bar X_n\) 的分布<em>仍然是柯西</em>（参数不变）！所以 \(\bar X_n\) <em>不</em>集中到任何一点；它的方差是 \(\infty\)，期望都不存在，大数定律的前提失败。所以"大数定律"<em>不</em>无条件成立——它需要 \(\mathbb{E}[X_i]\) 至少存在。柯西分布是检验这一点的标准反例。</p>
+
+<p><strong>例 12.5（蒙特卡洛求高维积分）</strong>　估计 \(I = \int_{[0,1]^{10}} (x_1 + x_2 + \cdots + x_{10})^2\, dx_1 \cdots dx_{10}\)。</p>
+
+<p>解：注意这是 10 维积分。设 \(U_1, \ldots, U_{10}\) i.i.d. Uniform(0, 1)，\(S = \sum U_j\)。则 \(I = \mathbb{E}[S^2]\)。</p>
+
+<p>\(\mathbb{E}[S] = 10 \cdot 1/2 = 5\)，\(\mathrm{Var}(S) = 10 \cdot 1/12 = 5/6\)。所以 \(\mathbb{E}[S^2] = \mathrm{Var}(S) + (\mathbb{E}S)^2 = 5/6 + 25 = 155/6 \approx 25.833\)。</p>
+
+<p>这个例子刚好有解析答案——实际应用里大多是没有解析表达的高维积分（比如金融衍生品估值），蒙特卡洛是<em>唯一</em>可行办法。要实现：抽一万个 10 维点，把 \((U_1 + \cdots + U_{10})^2\) 平均，就得到 \(\hat I_{10000}\)。</p>
+
+<p><strong>例 12.6（投票频率的收敛速率）</strong>　民调员问 \(n\) 个选民"你支持 A 还是 B？"。设真实支持率 \(p\)，样本支持率 \(\hat p_n\)。需要多大 \(n\) 才能保证 "\(|\hat p_n - p| \geq 0.01\)" 的概率不超过 5%？</p>
+
+<p>解：用 Chebyshev：\(\mathrm{Var}(\hat p_n) = p(1-p)/n \leq 1/(4n)\)（\(p(1-p) \leq 1/4\) 在 \(p = 1/2\) 取大）。</p>
+
+\[
+P(|\hat p_n - p| \geq 0.01) \leq \frac{1/(4n)}{(0.01)^2} = \frac{1}{4n \cdot 10^{-4}} = \frac{2500}{n}.
+\]
+
+<p>要 \(\leq 0.05\)：\(n \geq 50000\)。</p>
+
+<p>这<em>非常</em>高估了所需样本——实际民调用 1500 人就够，因为 Chebyshev 太松。第 13 章用 CLT 会得到更紧的界（\(n \approx 1067\) 即可），与实际民调样本量一致。Chebyshev 给的是稳保的"上界"——你<em>真的</em>知道 \(n = 50000\) 一定够，但实际用更小 \(n\) 也基本够。</p>
+
+<p><strong>例 12.7（独立和大数定律应用：大公司与小公司）</strong>　两家公司——A（10 个销售员）、B（1000 个销售员）。每个销售员的月销售额 \(L_i\)，独立同分布，期望 \(10\) 万元，标准差 \(5\) 万元。问每家公司"平均月销售额 \(\bar L_n\) 偏离 10 万元 1 万元以上"的概率上界。</p>
+
+<p>解：</p>
+
+<ul>
+<li>A 公司（\(n = 10\)）：\(P(|\bar L_{10} - 10| \geq 1) \leq \frac{25/10}{1} = 2.5\)（无意义）。</li>
+<li>B 公司（\(n = 1000\)）：\(P(|\bar L_{1000} - 10| \geq 1) \leq \frac{25/1000}{1} = 0.025\)。</li>
+</ul>
+
+<p>对 A 公司，10 个销售员太少，Chebyshev 给不出有意义的上界；任何月份的平均销售都可能大幅偏离均值。对 B 公司，平均销售额几乎稳在 10 万元 \(\pm 1\) 万的窄区间内。这就是<em>规模优势</em>——大公司的"营业额波动率"自然小（按 \(1/\sqrt n\)），CFO 更容易做预算。</p>
+
+<p>这一章我们看到了"大数"的力量——独立同分布的随机变量平均起来，<em>必然</em>逼近期望。这个<em>必然</em>有强弱之分（依概率/几乎处处），但都给出了"统计学的基础公理"：长期频率 = 概率。</p>
+
+<p>下一章我们要讲一条<strong>更深</strong>的极限定律——<strong>中心极限定理</strong>。它不仅说"平均收敛到期望"，还说<em>偏差按一个特定形状收缩</em>——具体说，"偏差除以 \(\sigma/\sqrt n\)" 的分布<em>必然</em>收敛到标准正态。这条定理解释了为什么正态分布在自然界里"宇宙地"出现——它是一切被加和的结果的极限分布。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 不等式</a><a href="ch13.html">下一章 · 第 13 章 中心极限定理 →</a></nav>
+
+</main>
+</body>
+</html>

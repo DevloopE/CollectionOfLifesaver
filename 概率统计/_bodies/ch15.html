@@ -1,0 +1,472 @@
+<h1 id="ch15">第 15 章 点估计与最大似然</h1>
+
+<p>上一章我们承认了一件大事：在统计里，参数不是给好的，是要从数据"猜"出来的。本章我们正式开始这件事——用最简单的方式："给一个数当作参数的代表"。这种"用一个数代表参数"的做法叫做<strong>点估计</strong>（point estimation），是统计推断的入门，也是后面区间估计、检验、贝叶斯等所有更复杂方法的基础。</p>
+
+<p>本章我们要做的事情有两层：</p>
+
+<ul>
+<li>第一层：手里如果有几个不同的"猜法"，凭什么说一个比另一个好？我们引入<em>无偏</em>、<em>一致</em>、<em>有效</em>三条评判标准。</li>
+<li>第二层：怎么<em>系统地</em>构造点估计？我们介绍两条经典套路——<em>矩估计法</em>和<em>最大似然法</em>。其中最大似然是统计推断的"核心算法"，本章要详细推演到位。</li>
+</ul>
+
+<p>本章末尾会顺便揭穿一个 21 世纪才被广为认识的事实：机器学习里的"训练模型 = 最小化损失函数"，跟统计里的"做最大似然估计"，绝大多数情况下是<em>同一回事</em>。看完这章，你不仅获得了估计参数的工具，也获得了打通统计与机器学习的密码。</p>
+
+<h2 id="sec15-1">15.1 点估计：用样本给一个数</h2>
+
+<p><strong>定义</strong>　设总体 \(X \sim F(\,\cdot\,;\theta)\)，样本 \(X_1, \ldots, X_n\) iid。一个<strong>点估计</strong>是一个统计量</p>
+
+\[
+\hat\theta = \hat\theta(X_1, \ldots, X_n),
+\]
+
+<p>用来"猜"参数 \(\theta\)。</p>
+
+<p>请你<em>注意</em>这条定义里几件细节：</p>
+
+<ul>
+<li>\(\hat\theta\) 是<em>样本的函数</em>——所以它是统计量，是随机变量；它在没看到具体数据之前是抽象的随机量，看到数据后退化成具体的数 \(\hat\theta(x_1, \ldots, x_n)\)。</li>
+<li>"hat" 这个帽子 \(\hat{}\) 在统计学里的标准含义就是"估计量"。\(\hat\mu\) 是 \(\mu\) 的估计，\(\hat\sigma\) 是 \(\sigma\) 的估计，\(\hat p\) 是 \(p\) 的估计。看到帽子，立刻反应"这是个用数据算出来的猜测"。</li>
+<li>同一个参数可以有<em>许多</em>不同的估计量。比如要估正态总体的 \(\mu\)，你可以用 \(\bar X\)、可以用样本中位数、可以用 \(X_1\)（只用第一个数）、可以用 \((X_1 + X_n)/2\) ……每一个都"算得出一个数"。所以问题立刻变成："哪一个更好？"</li>
+</ul>
+
+<p>这就把我们带到下一节。</p>
+
+<h2 id="sec15-2">15.2 估计量的好坏：无偏、一致、有效</h2>
+
+<p>评判一个估计量的好坏，统计里最常用的是三条标准。</p>
+
+<h3 id="sec15-2-1">15.2.1 无偏（unbiased）</h3>
+
+<p>\(\hat\theta\) 称为<strong>无偏</strong>的，如果</p>
+
+\[
+\boxed{\mathbb{E}[\hat\theta] = \theta \quad \text{对所有 } \theta.}
+\]
+
+<p>它的<em>偏差</em>定义为 \(\mathrm{Bias}(\hat\theta) = \mathbb{E}[\hat\theta] - \theta\)。无偏的意思就是偏差恒为零。</p>
+
+<p>形象地：如果你重复抽样无穷多次，每次都用 \(\hat\theta\) 算一个估计，那么这无穷多个估计的"平均值"恰好就是真值 \(\theta\)。这是个很自然的"长期正确"性质。</p>
+
+<p>但你可能立刻会问："长期正确"很重要吗？你只抽一次样啊。问得好。无偏并不万能——下面有反例的引子：用一个高方差的无偏估计，可能远不如用一个低方差的有偏估计。所以无偏要和方差合在一起看。这就把我们带到下一条。</p>
+
+<h3 id="sec15-2-2">15.2.2 一致（consistent）</h3>
+
+<p>\(\hat\theta_n\) 称为<strong>一致</strong>估计量（注意它依赖样本量 \(n\)），如果</p>
+
+\[
+\boxed{\hat\theta_n \xrightarrow{P} \theta \quad \text{当 } n \to \infty.}
+\]
+
+<p>这里 "\(\xrightarrow{P}\)" 是依概率收敛（第 12 章定义过）。用大白话翻译：<em>样本量越大，\(\hat\theta_n\) 越接近真值，最终"几乎肯定"等于真值</em>。</p>
+
+<p>一致是个非常基础的"门槛"性质。如果一个估计量连一致都不是，意味着哪怕给你无穷多数据，它也不会收敛到真值——这种估计量基本上是垃圾，没人用。所以一致是<em>最低标准</em>。</p>
+
+<p>判一致的常用工具是<strong>大数定律</strong>（第 13 章）。比如 \(\bar X = \dfrac{1}{n}\sum X_i \xrightarrow{P} \mu\) 就是大数定律的直接结论，所以 \(\bar X\) 是 \(\mu\) 的一致估计，永远成立（只要 \(\mu\) 存在）。</p>
+
+<p>另一种判一致的方法：如果 \(\hat\theta_n\) 无偏（或渐近无偏），且 \(\mathrm{Var}(\hat\theta_n) \to 0\)，那么 \(\hat\theta_n \xrightarrow{P} \theta\)。这是切比雪夫不等式直接给的：\(P(|\hat\theta_n - \theta| > \varepsilon) \leq \mathrm{Var}(\hat\theta_n)/\varepsilon^2 \to 0\)。所以"无偏 + 方差消失" \(\Rightarrow\) 一致，这是常用的快速判据。</p>
+
+<h3 id="sec15-2-3">15.2.3 有效（efficient）</h3>
+
+<p>"有效"指的是<em>方差小</em>。在所有无偏估计量里，方差最小的那个叫做<strong>最小方差无偏估计</strong>（MVUE，minimum variance unbiased estimator）；它就是"在无偏前提下最有效"。</p>
+
+<p>那"方差能有多小"？这有一个理论下界，叫 <strong>Cramér-Rao 下界</strong>：在合理条件下，任何无偏估计量的方差都不小于</p>
+
+\[
+\mathrm{Var}(\hat\theta) \geq \frac{1}{I_n(\theta)},
+\]
+
+<p>其中 \(I_n(\theta)\) 是<em>样本的 Fisher 信息量</em>（15.9 节展开）。一个估计量如果方差恰好达到这个下界，就叫做<strong>达到 Cramér-Rao 下界的有效估计</strong>，简称"完全有效"。</p>
+
+<p>本章后面会看到，最大似然估计（MLE）在大样本下渐近达到 Cramér-Rao 下界——这就是 MLE 的"渐近有效"性。这件事意味着：<em>在大样本极限下，没有任何其他无偏估计能比 MLE 更精准</em>。</p>
+
+<h3 id="sec15-2-4">15.2.4 偏差-方差权衡</h3>
+
+<p>除了"无偏 + 有效"，还可以把它们俩合并到一个数里——<strong>均方误差</strong>（MSE）：</p>
+
+\[
+\mathrm{MSE}(\hat\theta) = \mathbb{E}[(\hat\theta - \theta)^2] = \mathrm{Var}(\hat\theta) + [\mathrm{Bias}(\hat\theta)]^2.
+\]
+
+<p>这条分解叫"偏差-方差分解"，是统计学和机器学习共同的基本恒等式。它说：估计的总误差 = 它系统偏离真值的程度（偏差）<sup>2</sup> + 它围绕自身均值抖动的程度（方差）。两个都要小才能 MSE 小。</p>
+
+<p>有时候允许一点偏差能换来很大的方差减少，从而让 MSE 反而变小——这就是<em>有偏但有用</em>的估计存在的理由。机器学习里的"正则化"就是典型的"故意引入偏差换方差降低"。统计里最经典的例子是<strong>James-Stein 估计量</strong>（Stein 1956 的著名"悖论"），它在 \(p \geq 3\) 个参数同时估计时，<em>一致地</em>比"每个参数各用其样本均值"的无偏估计 MSE 更小。这件事相当深，我们这章不展开，但请记住"无偏不是终极目标，MSE 才是"。</p>
+
+<h2 id="sec15-3">15.3 \(\bar X\) 是 \(\mu\) 的"完美"估计</h2>
+
+<p>把 15.2 的三条标准应用到样本均值身上，你会发现 \(\bar X\) 在很多场景下几乎是<em>完美</em>的估计。</p>
+
+<p><strong>无偏</strong>：\(\mathbb{E}[\bar X] = \mu\)。✓（14.4 节算过）</p>
+
+<p><strong>一致</strong>：弱大数定律，\(\bar X \xrightarrow{P} \mu\)。✓（13 章）</p>
+
+<p><strong>有效</strong>：在<em>正态</em>总体下，\(\bar X\) 达到 Cramér-Rao 下界，是 MVUE。在很多其他常见分布（指数、泊松、伯努利……）下也达到下界。所以"\(\bar X\) 估 \(\mu\)" 在<em>无偏估计</em>的世界里是无可挑剔的。</p>
+
+<p>这就是为什么"算 \(\bar X\)"是统计的入门第一步——它在常见分布族里是默认的最佳选择，而且公式简单到只需要小学加法和除法。</p>
+
+<p>请你<em>注意</em>，这种"完美"<em>只</em>限制于"对均值的无偏估计"。如果你想估其他参数（比如方差、分位数、最大值），\(\bar X\) 跟它们没关系，要另外构造估计量。</p>
+
+<h2 id="sec15-4">15.4 \(S^2\) 与 \(S\)：方差的估计</h2>
+
+<p>样本方差 \(S^2 = \dfrac{1}{n-1}\sum (X_i - \bar X)^2\)（14.6 节）是 \(\sigma^2\) 的<em>无偏</em>估计——这是 14.6 节的主结果，所以这个分母才是 \(n - 1\)。\(S^2\) 也是<em>一致</em>的，因为 \(\bar X \to \mu\)，\(\dfrac{1}{n}\sum (X_i - \mu)^2 \to \sigma^2\)，把它俩组合就得到 \(S^2 \to \sigma^2\)。</p>
+
+<p>那 \(S = \sqrt{S^2}\) 呢？它是 \(\sigma\) 的<em>有偏</em>估计——但<em>一致</em>。</p>
+
+<p>"为什么会偏？" 这是 Jensen 不等式的小练习。\(\sqrt{\,\cdot\,}\) 是凹函数，所以</p>
+
+\[
+\mathbb{E}[\sqrt{S^2}] \leq \sqrt{\mathbb{E}[S^2]} = \sqrt{\sigma^2} = \sigma.
+\]
+
+<p>等号一般取不到，所以 \(\mathbb{E}[S] < \sigma\)——\(S\) 系统性地<em>低估</em> \(\sigma\)。这种偏差在 \(n\) 大时小得忽略不计，所以实际工作里几乎没人在意；但你应当知道这件事，免得有人考你"\(S\) 是 \(\sigma\) 的无偏估计吗？"时答错。正确答案：<em>不是</em>。</p>
+
+<p>这也是个很好的"无偏不传递"的例子：\(S^2\) 无偏，但它的平方根 \(S\) 有偏。函数变换会破坏无偏性。下面 15.8 我们会讲 MLE 的"不变性"——MLE 的好处之一就是 MLE 经过任何函数变换<em>仍是 MLE</em>。这是 MLE 比"无偏估计"更结实的地方。</p>
+
+<h2 id="sec15-5">15.5 矩估计法</h2>
+
+<p>第一种系统构造估计量的方法叫<strong>矩估计法</strong>（method of moments，简称 MoM）。它的思想朴素得几乎让人怀疑能不能管用：</p>
+
+<p style="text-align:center"><strong>用样本矩代替总体矩，解方程。</strong></p>
+
+<p>详细些：总体的 \(k\) 阶矩是 \(m_k(\theta) = \mathbb{E}[X^k]\)，是参数的函数；样本的 \(k\) 阶矩是 \(M_k = \dfrac{1}{n}\sum_{i=1}^n X_i^k\)。当总体有 \(p\) 个参数 \(\theta_1, \ldots, \theta_p\)，我们写下 \(p\) 个方程</p>
+
+\[
+m_1(\theta) = M_1, \quad m_2(\theta) = M_2, \quad \ldots, \quad m_p(\theta) = M_p,
+\]
+
+<p>解出 \(\theta_1, \ldots, \theta_p\)，得到的解就是<em>矩估计</em>。</p>
+
+<p>这做法的合理性来自大数定律：\(M_k \xrightarrow{P} m_k(\theta)\)，所以矩估计自动是<em>一致</em>的（在合适的连续条件下）。这是它最大的卖点——理论保证简单，计算往往也简单。</p>
+
+<p><strong>例 15.1（矩估计：泊松）</strong>　总体 \(X \sim \mathrm{Poisson}(\lambda)\)，求 \(\lambda\) 的矩估计。</p>
+
+<p>解：\(m_1(\lambda) = \mathbb{E}[X] = \lambda\)，\(M_1 = \bar X\)。一个参数对一个方程：\(\lambda = \bar X\)。所以 \(\hat\lambda_{\mathrm{MoM}} = \bar X\)。简洁。</p>
+
+<p><strong>例 15.2（矩估计：正态）</strong>　总体 \(\mathcal{N}(\mu, \sigma^2)\)，求矩估计。</p>
+
+<p>解：两个参数，要两个方程。\(m_1 = \mu\)、\(m_2 = \mu^2 + \sigma^2\)（因为 \(\mathrm{Var}(X) = m_2 - m_1^2\)）。代入</p>
+
+\[
+\mu = \bar X, \qquad \mu^2 + \sigma^2 = M_2 = \frac{1}{n}\sum X_i^2.
+\]
+
+<p>解：\(\hat\mu_{\mathrm{MoM}} = \bar X\)，</p>
+
+\[
+\hat\sigma^2_{\mathrm{MoM}} = M_2 - \bar X^2 = \frac{1}{n}\sum X_i^2 - \bar X^2 = \frac{1}{n}\sum (X_i - \bar X)^2.
+\]
+
+<p>注意——这就是<em>除以 \(n\)</em> 的样本方差，跟 14.6 节的 "\(\tilde S^2\)" 一致。它是有偏的，但矩估计本来就不保证无偏。</p>
+
+<p><strong>例 15.3（矩估计：均匀）</strong>　总体 \(X \sim \mathrm{Uniform}(0, \theta)\)，求 \(\theta\) 的矩估计。</p>
+
+<p>解：\(m_1 = \mathbb{E}[X] = \theta/2\)，所以 \(\theta/2 = \bar X\)，\(\hat\theta_{\mathrm{MoM}} = 2\bar X\)。</p>
+
+<p>这个估计在直觉上略奇怪——它<em>有可能</em>给出比某个 \(X_i\) 还小的 \(\theta\) 估计（如果数据偏在小一边）。这就违反 \(X_i \leq \theta\) 这条结构约束！矩估计完全不"看"这种约束，可能给出"不合理"的答案。下一节的 MLE 就不会犯这个错——它会自然地给出 \(\hat\theta_{\mathrm{MLE}} = X_{(n)}\)（样本最大值），永远 \(\geq\) 所有数据点。</p>
+
+<p>这是矩估计的一般缺陷：<em>它只看矩，不看分布的几何结构</em>。所以矩估计常常作为"快速首选"，给一个不那么坏的起点；但更精细的推断里，MLE 是更主流的选择。</p>
+
+<h2 id="sec15-6">15.6 最大似然估计：核心方法</h2>
+
+<p>登场的是这本书后半最重要的一招。最大似然估计（maximum likelihood estimation, MLE）的思想，归结为一句话：</p>
+
+<p style="text-align:center"><strong>选择使得"看到这些数据"最有可能的参数。</strong></p>
+
+<p>详细一些。给定数据 \(x_1, \ldots, x_n\) 和参数化的密度（或概率质量）\(f(x; \theta)\)，定义<strong>似然函数</strong></p>
+
+\[
+\boxed{L(\theta) = L(\theta; x_1, \ldots, x_n) = \prod_{i=1}^n f(x_i; \theta).}
+\]
+
+<p>请你<em>注意</em>这个 \(L\) 跟联合密度<em>形式上是同一个表达式</em>，但它的"读法"完全不同——联合密度把 \(x_i\) 视为变量、\(\theta\) 固定；似然函数把 \(x_i\) 视为<em>已知的常数</em>（你已经看到了数据），而把 \(\theta\) 视为<em>变量</em>。这种"角色互换"是 Fisher 在 1922 年提出 MLE 时最深刻的发明之一。同一行公式，因为视角不同，意义完全不同。</p>
+
+<p>定义<strong>对数似然</strong>（log-likelihood）：</p>
+
+\[
+\boxed{\ell(\theta) = \log L(\theta) = \sum_{i=1}^n \log f(x_i; \theta).}
+\]
+
+<p>取 \(\log\) 把乘积变成求和。在数学上，\(\log\) 是单调增的，所以<em>最大化 \(L\) 等价于最大化 \(\ell\)</em>，但 \(\ell\) 求导和数值优化都比 \(L\) 容易得多。所以实际操作里我们总是用 \(\ell\)。</p>
+
+<p><strong>定义</strong>　使 \(\ell(\theta)\) 最大的那个 \(\theta\) 值称为<strong>最大似然估计</strong>：</p>
+
+\[
+\hat\theta_{\mathrm{MLE}} = \arg\max_\theta \ell(\theta).
+\]
+
+<p>实际计算时，绝大多数情形我们求<em>临界点</em>：</p>
+
+\[
+\frac{d\ell}{d\theta}\bigg|_{\theta = \hat\theta_{\mathrm{MLE}}} = 0,
+\]
+
+<p>然后验证它是个极大点（二阶导小于零、或检查端点）。这条 \(d\ell/d\theta = 0\) 的方程叫<strong>似然方程</strong>。</p>
+
+<p>下一节我们手把手做 MLE 的几个最重要的例子。</p>
+
+<h2 id="sec15-7">15.7 MLE 详解：五个经典案例</h2>
+
+<h3 id="sec15-7-1">15.7.1 伯努利</h3>
+
+<p><strong>例 15.4（伯努利的 MLE）</strong>　设 \(X_1, \ldots, X_n \stackrel{\text{iid}}{\sim} \mathrm{Bernoulli}(p)\)（每个 \(X_i\) 取 0 或 1）。求 \(p\) 的 MLE。</p>
+
+<p>解：单个伯努利的概率质量函数是 \(P(X = x; p) = p^x (1-p)^{1-x}\)（\(x \in \{0, 1\}\)）。所以似然</p>
+
+\[
+L(p) = \prod_{i=1}^n p^{x_i}(1-p)^{1-x_i} = p^{\sum x_i}(1-p)^{n - \sum x_i}.
+\]
+
+<p>令 \(s = \sum x_i\) 是"成功次数"。对数似然</p>
+
+\[
+\ell(p) = s \log p + (n - s)\log(1 - p).
+\]
+
+<p>求导：</p>
+
+\[
+\ell'(p) = \frac{s}{p} - \frac{n - s}{1 - p} = 0 \;\Rightarrow\; s(1 - p) = (n - s) p \;\Rightarrow\; s = np \;\Rightarrow\; \hat p_{\mathrm{MLE}} = \frac{s}{n} = \bar X.
+\]
+
+<p>结果再朴素不过了：<strong>\(p\) 的 MLE 就是样本中"成功"的比例</strong>。这跟人手算一辈子的方式完全一致——也就是说 MLE 在这个例子里和最朴素的常识答案重合。</p>
+
+<p>验证它是极大：\(\ell''(p) = -s/p^2 - (n-s)/(1-p)^2 < 0\)，所以临界点是极大。</p>
+
+<p><strong>无偏</strong>：\(\mathbb{E}[\bar X] = p\) ✓。<strong>一致</strong>：\(\bar X \to p\) ✓。<strong>有效</strong>：可以验证它达到 Cramér-Rao 下界 \(p(1-p)/n\)（这个是它本身的方差）✓。所以这是个完美的估计。</p>
+
+<h3 id="sec15-7-2">15.7.2 二项</h3>
+
+<p><strong>例 15.5（二项的 MLE）</strong>　这看起来跟伯努利不同，但其实更简单：观察一个 \(Y \sim \mathrm{Binomial}(n, p)\)（已知 \(n\)），从单次观测 \(y\) 估 \(p\)。</p>
+
+<p>解：\(L(p) = \binom{n}{y} p^y (1-p)^{n-y}\)。对 \(p\) 求导（\(\binom{n}{y}\) 是常数，求导没用）：</p>
+
+\[
+\ell'(p) = \frac{y}{p} - \frac{n-y}{1-p} = 0 \;\Rightarrow\; \hat p_{\mathrm{MLE}} = y/n.
+\]
+
+<p>跟伯努利结果一致——其实"\(n\) 次伯努利的总和" = "一次 \(\mathrm{Binomial}(n, p)\)"，所以 MLE 同样。</p>
+
+<h3 id="sec15-7-3">15.7.3 正态：估 \(\mu\) 和 \(\sigma^2\)</h3>
+
+<p><strong>例 15.6（正态的 MLE）</strong>　设 \(X_1, \ldots, X_n \stackrel{\text{iid}}{\sim} \mathcal{N}(\mu, \sigma^2)\)，两个参数都未知，求 MLE。</p>
+
+<p>解：单个密度 \(f(x; \mu, \sigma^2) = \dfrac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\dfrac{(x - \mu)^2}{2\sigma^2}\right)\)。似然</p>
+
+\[
+L(\mu, \sigma^2) = \prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma^2}} e^{-(x_i - \mu)^2/(2\sigma^2)} = (2\pi\sigma^2)^{-n/2} \exp\!\left(-\frac{1}{2\sigma^2}\sum_{i=1}^n (x_i - \mu)^2\right).
+\]
+
+<p>对数似然</p>
+
+\[
+\ell(\mu, \sigma^2) = -\frac{n}{2}\log(2\pi) - \frac{n}{2}\log\sigma^2 - \frac{1}{2\sigma^2}\sum (x_i - \mu)^2.
+\]
+
+<p>对 \(\mu\) 求偏导：</p>
+
+\[
+\frac{\partial \ell}{\partial \mu} = \frac{1}{\sigma^2}\sum (x_i - \mu) = 0 \;\Rightarrow\; \sum x_i = n\mu \;\Rightarrow\; \hat\mu_{\mathrm{MLE}} = \bar X.
+\]
+
+<p>对 \(\sigma^2\) 求偏导（把 \(\sigma^2\) 当一个变量，记作 \(v\)）：</p>
+
+\[
+\frac{\partial \ell}{\partial v} = -\frac{n}{2v} + \frac{1}{2 v^2}\sum (x_i - \mu)^2 = 0 \;\Rightarrow\; v = \frac{1}{n}\sum (x_i - \mu)^2.
+\]
+
+<p>把 \(\mu\) 替换成 \(\hat\mu = \bar X\)，得到</p>
+
+\[
+\boxed{\hat\sigma^2_{\mathrm{MLE}} = \frac{1}{n}\sum_{i=1}^n (X_i - \bar X)^2.}
+\]
+
+<p>请你<em>注意</em>这件事：MLE 给的方差估计<em>分母是 \(n\)</em>，<em>不是</em> \(n - 1\)！所以</p>
+
+\[
+\hat\sigma^2_{\mathrm{MLE}} \neq S^2 = \frac{1}{n-1}\sum (X_i - \bar X)^2.
+\]
+
+<p>由 14.6 节我们已经知道，分母为 \(n\) 的版本是<em>有偏</em>的：\(\mathbb{E}[\hat\sigma^2_{\mathrm{MLE}}] = \dfrac{n-1}{n}\sigma^2 < \sigma^2\)。所以 <strong>MLE 在小样本下是有偏的</strong>——它系统性地低估方差。</p>
+
+<p>这是一个非常重要的"颠覆性"事实：MLE 不一定无偏。但它仍然是<em>一致</em>的（因为偏差消失：\((n-1)/n \to 1\)），并且在大样本下渐近达到 Cramér-Rao 下界。所以 MLE 牺牲了"无偏"换来了"渐近最有效"——这就是 15.2.4 节"偏差-方差权衡"在 MLE 这里的具体体现。</p>
+
+<p>实际工作里：</p>
+
+<ul>
+<li>报告"无偏方差估计"的场合（CI、教科书）：用 \(S^2\)（除以 \(n - 1\)）。</li>
+<li>纯做 MLE / 训练 ML 模型的场合：用 \(\hat\sigma^2_{\mathrm{MLE}}\)（除以 \(n\)）。</li>
+</ul>
+
+<p>两种做法都<em>正确</em>，根据语境选。</p>
+
+<h3 id="sec15-7-4">15.7.4 指数</h3>
+
+<p><strong>例 15.7（指数的 MLE）</strong>　\(X_1, \ldots, X_n \stackrel{\text{iid}}{\sim} \mathrm{Exp}(\lambda)\)，密度 \(f(x; \lambda) = \lambda e^{-\lambda x}\)，\(x > 0\)。求 \(\lambda\) 的 MLE。</p>
+
+<p>解：似然 \(L(\lambda) = \prod \lambda e^{-\lambda x_i} = \lambda^n e^{-\lambda \sum x_i}\)。对数似然</p>
+
+\[
+\ell(\lambda) = n \log\lambda - \lambda \sum x_i.
+\]
+
+<p>求导：\(\ell'(\lambda) = n/\lambda - \sum x_i = 0 \Rightarrow \hat\lambda_{\mathrm{MLE}} = n/\sum x_i = 1/\bar X\)。</p>
+
+<p>"等等！" 你应当立刻反应过来——这跟矩估计一致：由于 \(\mathbb{E}[X] = 1/\lambda\)，矩估计令 \(1/\hat\lambda = \bar X\)，得 \(\hat\lambda = 1/\bar X\)。一致！</p>
+
+<p><strong>这个估计是无偏的吗？</strong> 不是。Jensen 不等式告诉你 \(\mathbb{E}[1/\bar X] > 1/\mathbb{E}[\bar X] = \lambda\)，所以 \(\hat\lambda_{\mathrm{MLE}}\) <em>系统性地高估</em> \(\lambda\)（在小样本下）。但它仍然是一致的。</p>
+
+<h3 id="sec15-7-5">15.7.5 泊松</h3>
+
+<p><strong>例 15.8（泊松的 MLE）</strong>　\(X_1, \ldots, X_n \stackrel{\text{iid}}{\sim} \mathrm{Poisson}(\lambda)\)，质量函数 \(P(X = k) = e^{-\lambda}\lambda^k/k!\)。求 \(\lambda\) 的 MLE。</p>
+
+<p>解：似然 \(L(\lambda) = \prod e^{-\lambda}\lambda^{x_i}/x_i! = e^{-n\lambda}\lambda^{\sum x_i}/\prod x_i!\)。对数似然（去掉与 \(\lambda\) 无关的常数）</p>
+
+\[
+\ell(\lambda) = -n\lambda + \log\lambda \cdot \sum x_i + \text{常数}.
+\]
+
+<p>求导：\(\ell'(\lambda) = -n + \sum x_i/\lambda = 0 \Rightarrow \hat\lambda_{\mathrm{MLE}} = \sum x_i/n = \bar X\)。</p>
+
+<p>和矩估计一致，且 \(\bar X\) 无偏。所以这里 MLE 又是个"完美"估计：无偏、一致、有效。</p>
+
+<h3 id="sec15-7-6">15.7.6 均匀分布：边界处的 MLE</h3>
+
+<p><strong>例 15.9（均匀分布的 MLE）</strong>　\(X_1, \ldots, X_n \stackrel{\text{iid}}{\sim} \mathrm{Uniform}(0, \theta)\)，密度 \(f(x; \theta) = 1/\theta\) 当 \(0 < x < \theta\)，否则 0。求 \(\theta\) 的 MLE。</p>
+
+<p>解：似然</p>
+
+\[
+L(\theta) = \prod_{i=1}^n \frac{1}{\theta} \cdot \mathbb{1}\{0 < x_i < \theta\} = \frac{1}{\theta^n} \cdot \mathbb{1}\{\theta > \max_i x_i\}.
+\]
+
+<p>这次似然<em>不光是 \(\theta\) 的连续函数</em>——它在 \(\theta < x_{(n)}\)（样本最大值）时直接为零，在 \(\theta \geq x_{(n)}\) 时是 \(1/\theta^n\)。\(1/\theta^n\) 关于 \(\theta\) 单调递减，所以在 \(\theta \geq x_{(n)}\) 的允许范围内，<em>越小越好</em>，最大化在边界 \(\theta = x_{(n)}\) 处取得。所以</p>
+
+\[
+\boxed{\hat\theta_{\mathrm{MLE}} = X_{(n)} = \max_i X_i.}
+\]
+
+<p>请你<em>注意</em>，这里的 MLE 不是"求导 = 0"得到的，而是在<em>边界</em>上取得的。求导法对均匀分布失效——因为似然不是处处可导。这就是 MLE 实操中要记得的"边界情形"。</p>
+
+<p>这个 \(\hat\theta = X_{(n)}\) 比矩估计 \(2\bar X\) 高明在两点：(1) 它<em>永远 \(\geq\)</em> 所有数据，永不违反结构约束；(2) 它的方差小很多——\(\mathrm{Var}(X_{(n)}) = O(1/n^2)\)，比矩估计的 \(O(1/n)\) 收敛快一阶。这就是"看分布几何"的胜利。</p>
+
+<p>不过 \(X_{(n)}\) 是有偏的：\(\mathbb{E}[X_{(n)}] = \dfrac{n}{n+1}\theta < \theta\)（系统性低估）。这又一次说明 MLE 不一定无偏。</p>
+
+<p>如果你坚持要无偏，可以用 \(\dfrac{n+1}{n}X_{(n)}\)，是无偏的。这是"轻调整"无偏化——很多 MLE 都可以这样小修一下变无偏。</p>
+
+<h2 id="sec15-8">15.8 MLE 的"奇迹"性质</h2>
+
+<p>MLE 之所以是统计推断的<em>核心</em>方法，原因在于它有几条"几乎太好"的渐近性质。这些性质统称为"MLE 的奇迹"，由 Fisher、Cramér、Wald 等人在 1920-1940 年代陆续证明。</p>
+
+<h3 id="sec15-8-1">15.8.1 渐近一致</h3>
+
+<p>在合理的<em>正则条件</em>下（参数空间打开、似然函数可微、可换序求导积分等），</p>
+
+\[
+\hat\theta_{\mathrm{MLE}} \xrightarrow{P} \theta_0,
+\]
+
+<p>其中 \(\theta_0\) 是真实参数。也就是 MLE 一致。这条本身没什么稀奇，矩估计也满足。</p>
+
+<h3 id="sec15-8-2">15.8.2 渐近正态</h3>
+
+<p>在同样的正则条件下，</p>
+
+\[
+\boxed{\sqrt n \,(\hat\theta_{\mathrm{MLE}} - \theta_0) \xrightarrow{d} \mathcal{N}\!\left(0, \frac{1}{I(\theta_0)}\right),}
+\]
+
+<p>其中 \(I(\theta_0)\) 是单个观测的<em>Fisher 信息量</em>（15.9 节），相当于 \(I_n(\theta_0)/n\)。</p>
+
+<p>这条结论极强——它告诉你<em>大样本下 MLE 服从正态</em>，并且方差精确到 \(1/(n I(\theta_0))\)。所以你大样本下做 MLE 的 CI、检验，都可以套用"近似正态"的方法。这就是为什么 MLE 几乎是"通用接口"——只要数据样本大，套上 MLE，余下的都按正态推断走。</p>
+
+<h3 id="sec15-8-3">15.8.3 渐近有效</h3>
+
+<p>渐近正态结论里的方差 \(1/[n I(\theta_0)]\)，<em>恰好就是 Cramér-Rao 下界</em>。所以 MLE 在大样本下"无可能再精准"——任何其他无偏估计都不会有更小的（渐近）方差。这件事叫"MLE 渐近有效"。</p>
+
+<p>合在一起：MLE = "渐近无偏 + 渐近达到 CR 下界"。在大样本下，没有人比它更准。这是 MLE 的<em>统治地位</em>来源。</p>
+
+<h3 id="sec15-8-4">15.8.4 不变性</h3>
+
+<p>这是 MLE 一条非常实用的性质：<em>MLE 经过任何函数变换仍是 MLE</em>。形式：</p>
+
+\[
+\boxed{\widehat{g(\theta)} = g(\hat\theta_{\mathrm{MLE}}).}
+\]
+
+<p>例如：正态的 MLE 给 \(\hat\sigma^2_{\mathrm{MLE}}\)，那 \(\sigma\) 的 MLE 就是 \(\hat\sigma_{\mathrm{MLE}} = \sqrt{\hat\sigma^2_{\mathrm{MLE}}}\)，<em>不需要重新算</em>。又例如：伯努利的 MLE 给 \(\hat p\)，那"赔率比" \(p/(1-p)\) 的 MLE 就是 \(\hat p/(1 - \hat p)\)，直接代。</p>
+
+<p>请你<em>注意</em>这件事 <em>无偏性不传递</em>，但<em>MLE 传递</em>。也就是说："变换后还是 MLE"是 MLE 比"无偏估计"更稳健的一个具体好处。</p>
+
+<p>证明草图（一参数情形）：MLE 是使 \(L(\theta)\) 最大的 \(\theta\)。如果 \(g\) 是一对一的，那 \(\eta = g(\theta)\) 反过来 \(\theta = g^{-1}(\eta)\)，最大化 \(L(g^{-1}(\eta))\) 等价于最大化 \(L(\theta)\)，所以 \(\hat\eta = g(\hat\theta)\)。如果 \(g\) 不是一对一的，需要更精细处理（看 \(\eta\) 的"诱导似然"），但结论仍然成立。</p>
+
+<h2 id="sec15-9">15.9 Fisher 信息量与 Cramér-Rao 下界</h2>
+
+<p>15.8 节的"奇迹"反复出现 \(I(\theta)\) 这个量，这一节稍微解释它是什么。我们点到为止——更深入的内容在数理统计教材里。</p>
+
+<p><strong>定义</strong>　设单个观测的密度为 \(f(x; \theta)\)，则<strong>Fisher 信息量</strong>定义为</p>
+
+\[
+I(\theta) = \mathbb{E}\!\left[\left(\frac{\partial}{\partial\theta}\log f(X; \theta)\right)^2\right] = -\mathbb{E}\!\left[\frac{\partial^2}{\partial\theta^2}\log f(X; \theta)\right].
+\]
+
+<p>第二个等号在合理可微条件下成立。</p>
+
+<p>意义：\(I(\theta)\) 衡量"在 \(\theta\) 附近，单个观测能对参数提供多少信息"。\(I(\theta)\) 越大，意味着对数似然在 \(\theta\) 附近<em>越尖</em>（曲率大），数据越能"挑出" \(\theta\)。如果 \(I(\theta)\) 小，就是似然平坦——参数难以从数据里识别。</p>
+
+<p>对 \(n\) 个 iid 观测，<strong>样本 Fisher 信息量</strong>是 \(I_n(\theta) = n I(\theta)\)（独立观测的信息量直接相加）。</p>
+
+<p><strong>Cramér-Rao 不等式</strong>　对任意无偏估计 \(\hat\theta\)，</p>
+
+\[
+\boxed{\mathrm{Var}(\hat\theta) \geq \frac{1}{I_n(\theta)} = \frac{1}{n I(\theta)}.}
+\]
+
+<p>这条不等式给了"无偏估计的方差能小到什么程度"的<em>理论极限</em>。MLE 在大样本下渐近达到这个下界——这就是它的"渐近有效"。</p>
+
+<p><strong>例 15.10（伯努利的 Fisher 信息）</strong>　单个 \(X \sim \mathrm{Bernoulli}(p)\)，\(\log f(x; p) = x\log p + (1-x)\log(1-p)\)。求二阶导：</p>
+
+\[
+\frac{\partial^2}{\partial p^2}\log f = -\frac{x}{p^2} - \frac{1-x}{(1-p)^2}.
+\]
+
+<p>取负的期望：\(I(p) = \mathbb{E}[X]/p^2 + (1 - \mathbb{E}[X])/(1-p)^2 = p/p^2 + (1-p)/(1-p)^2 = 1/p + 1/(1-p) = 1/[p(1-p)]\)。</p>
+
+<p>所以 CR 下界 \(= p(1-p)/n\)，恰好是 \(\mathrm{Var}(\bar X) = \mathrm{Var}(X)/n = p(1-p)/n\)——完美匹配！这印证了 \(\bar X\) 是 \(p\) 的"完全有效"无偏估计。</p>
+
+<h2 id="sec15-10">15.10 MLE 与机器学习的"最小化损失"——同一回事</h2>
+
+<p>本章最后一节，揭穿一个 21 世纪才被广为认识的事情：<em>机器学习里几乎所有"训练模型"都在做 MLE</em>。</p>
+
+<p>详细些。机器学习里训练模型的标准范式是：选一个参数化的模型 \(f_\theta\)，定义一个<em>损失函数</em> \(\mathcal{L}(\theta; x, y)\)，然后</p>
+
+\[
+\hat\theta_{\mathrm{ML}} = \arg\min_\theta \frac{1}{n}\sum_{i=1}^n \mathcal{L}(\theta; x_i, y_i).
+\]
+
+<p>看起来这是个跟统计无关的"优化问题"。但请你<em>注意</em>：</p>
+
+<ul>
+<li>线性回归的"均方误差损失" \(\mathcal{L} = (y_i - f_\theta(x_i))^2\)，对应"\(y_i \mid x_i \sim \mathcal{N}(f_\theta(x_i), \sigma^2)\)"模型的负对数似然。所以"最小二乘 = 高斯噪声下的 MLE"。</li>
+<li>分类的"交叉熵损失" \(\mathcal{L} = -\sum_k y_{ik}\log p_k(x_i; \theta)\)，对应"\(y_i \mid x_i \sim \mathrm{Categorical}(p(x_i; \theta))\)"模型的负对数似然。所以"交叉熵 = 多项分布下的 MLE"。</li>
+<li>泊松回归的"泊松偏差损失"，对应"\(y_i \sim \mathrm{Poisson}(\lambda(x_i; \theta))\)"模型的负对数似然。</li>
+<li>更深的：神经网络末层接 softmax + 交叉熵，本质就是个"用神经网络参数化的多项分布"在做 MLE。</li>
+</ul>
+
+<p>所以 ML 里的"训练" = "最小化负对数似然" = "做 MLE"。三者表面上看起来不同（一个是优化、一个是统计），但内核是同一个。</p>
+
+<p>认清这件事的好处：</p>
+
+<ol>
+<li>MLE 的渐近正态、渐近有效等"奇迹"性质，<em>顺势</em>转给 ML——这是为什么神经网络在数据多的时候越来越准。</li>
+<li>MLE 的"不变性"——Softmax 输出一个概率向量，作 \(g\) 变换（比如取 logit、取最大值的类别）后仍是 MLE 的对应估计。</li>
+<li>"正则化" = "在 MLE 上加先验" = "做 MAP（最大后验）估计"。L2 正则等价于"加高斯先验"，L1 等价于"加拉普拉斯先验"——这建立了正则化与贝叶斯推断的桥梁。</li>
+</ol>
+
+<p>所以本章最后的话：MLE 不是"上一代统计的方法"，而是<em>当前所有数据驱动学习</em>的共同地基。从经典正态推断到深度神经网络，它们的最优化目标都长得一样：</p>
+
+\[
+\hat\theta = \arg\min_\theta \;-\sum_{i=1}^n \log f(x_i; \theta).
+\]
+
+<p>所以下次你听到"训练神经网络"四个字，请把它翻译为"做最大似然估计"——你脑海里那张"似然函数曲线" 与"loss 曲线"是<em>同一个</em>东西的两种说法。</p>
+
+<p>下一章我们离开"点估计"，进入"区间估计"——给参数一个带"把握度"的范围，而不是只给一个数。区间估计是统计推断走向"诚实"的开端。</p>

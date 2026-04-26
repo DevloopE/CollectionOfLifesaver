@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 经典检验 — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 假设检验的逻辑</a><a href="ch19.html">下一章 · 第 19 章 多重检验与现代议题 →</a></nav>
+<h1 id="ch18">第 18 章 经典检验</h1>
+
+<p>第 17 章我们把假设检验的<em>逻辑</em>讲透了——零假设、备择假设、检验统计量、拒绝域、两类错误、\(p\) 值。这些是骨架。本章要做的是把骨架填上肉——把统计学家最常用的几把"工具刀"一一摆出来：什么场景下用 \(z\)，什么场景下用 \(t\)，什么场景下用 \(\chi^2\)，什么场景下用 \(F\)。</p>
+
+<p>有件事我要先说明白：本章不是"检验大全"。统计学发明的检验有几百种——光是 SPSS 的菜单就能滑半屏。本章只讲<em>本科与研究生入门最常用的那几种</em>，加起来覆盖了你 80% 以上日常会遇到的统计场景。剩下的 20%——非参数检验、广义线性模型检验、时间序列检验等——属于专门课程的范围。但只要本章这几样你<em>真懂</em>了，再学新的检验都是举一反三。</p>
+
+<p>本章覆盖：</p>
+
+<ul>
+<li>\(z\) 检验（单样本，\(\sigma\) 已知）；</li>
+<li>\(t\) 检验（单样本，\(\sigma\) 未知）；</li>
+<li>双样本 \(t\) 检验（合并方差、Welch's）；</li>
+<li>配对 \(t\) 检验（前后测量）；</li>
+<li>\(\chi^2\) 拟合优度检验；</li>
+<li>\(\chi^2\) 独立性检验；</li>
+<li>\(\chi^2\) 方差检验；</li>
+<li>\(F\) 检验（比较方差）；</li>
+<li>比例检验（一样本、两样本）；</li>
+<li>各检验的"使用心法"——分布假设、样本量要求；</li>
+<li>检验选择速查表。</li>
+</ul>
+
+<p>每一节的写法是相同的：先说<em>什么场景</em>用、再写<em>检验统计量</em>的公式、再讲<em>检验统计量在 \(H_0\) 下的分布</em>、再演示<em>一个具体例子</em>。建议你边读边把公式抄一遍——动手抄写比看几遍都管用。</p>
+
+<h2 id="sec18-1">18.1 \(z\) 检验：单样本，\(\sigma\) 已知</h2>
+
+<p>这是<em>最基础</em>的检验，从 17.4 节就开始用了。场景：</p>
+
+<p style="text-align:center">总体 \(X \sim \mathcal{N}(\mu, \sigma^2)\)，<em>方差 \(\sigma^2\) 已知</em>。抽 \(n\) 个独立样本 \(X_1, \ldots, X_n\)，检验 \(H_0: \mu = \mu_0\)。</p>
+
+<p>检验统计量：</p>
+
+\[
+\boxed{Z = \frac{\bar X - \mu_0}{\sigma / \sqrt n}.}
+\]
+
+<p>在 \(H_0\) 下，\(Z \sim \mathcal{N}(0, 1)\)。所以拒绝域：</p>
+
+<ul>
+<li>双边：\(|Z| > z_{\alpha/2}\)（\(\alpha = 0.05\) 时为 1.96，\(\alpha = 0.01\) 时为 2.576）；</li>
+<li>右单边：\(Z > z_\alpha\)（\(\alpha = 0.05\) 时为 1.645）；</li>
+<li>左单边：\(Z < -z_\alpha\)。</li>
+</ul>
+
+<p>"\(\sigma\) 已知" 这个假设——你大概已经在嘀咕——<em>现实中几乎从不成立</em>。我们怎么会知道总体方差却不知道总体均值？所以严格说 \(z\) 检验是个"教学用"工具，实际中绝大多数场景方差也未知，要用下一节的 \(t\) 检验。但 \(z\) 检验仍然有几种合法用法：</p>
+
+<ol>
+<li>历史上做过大量类似实验，\(\sigma\) 早被高精度地估计过（比如某种工业仪表的测量误差，厂商已给出 \(\sigma\)）；</li>
+<li>样本量 \(n\) 非常大（比如 \(n > 1000\)），此时即便 \(\sigma\) 用样本估，估计误差很小，\(t\) 与 \(z\) 几乎无区别；</li>
+<li>检验比例（18.9 节），分布参数确定后方差自动确定。</li>
+</ol>
+
+<p>第三条是最常见的合法场景。</p>
+
+<p><strong>例 18.1（智商检验）</strong>　Stanford-Binet IQ 测试历史上设定为 \(\mu = 100\)、\(\sigma = 15\)。某地区抽 36 名小学生测 IQ，平均 \(\bar X = 105\)。问该地区小学生 IQ 是否显著高于全国均值？</p>
+
+<p>解：\(H_0: \mu = 100\) vs. \(H_1: \mu > 100\)（右单边——只关心"高于"）。\(\sigma = 15\) 历史已知，所以用 \(z\) 检验：</p>
+
+\[
+Z = \frac{105 - 100}{15 / \sqrt{36}} = \frac{5}{2.5} = 2.0.
+\]
+
+<p>右单边 \(p = 1 - \Phi(2.0) \approx 0.0228\)。在 \(\alpha = 0.05\) 下显著（拒绝 \(H_0\)），结论：该地区小学生 IQ 平均显著高于全国均值。</p>
+
+<p>注意我特意写"<em>平均</em>显著高于"——并不是说每个学生都比 100 高（个体差异巨大），而是这群人的均值显著高于 100。把统计结论翻译成日常语言时务必小心，下一段会再讲。</p>
+
+<h2 id="sec18-2">18.2 \(t\) 检验：单样本，\(\sigma\) 未知</h2>
+
+<p>把上一节的 "\(\sigma\) 已知" 换成 "\(\sigma\) 未知，用样本标准差 \(S\) 替代"，就得到 \(t\) 检验。问题是：\((\bar X - \mu_0)/(S/\sqrt n)\) 不再是 \(\mathcal{N}(0,1)\)。它服从一个稍胖一点的分布——<strong>学生 \(t\) 分布</strong>，自由度 \(n - 1\)，记作 \(t_{n-1}\)。</p>
+
+<p>为什么"胖一点"？因为 \(S\) 是估计量、有自身的随机性，把它放分母会让整个统计量更不稳定，分布两端比正态厚（即"重尾"）。\(n\) 越小，这种"胖"越明显；\(n \to \infty\) 时 \(t_{n-1} \to \mathcal{N}(0,1)\)。</p>
+
+<p>这个分布是 1908 年 William Sealy Gosset 在 Guinness 啤酒厂研究小批量啤酒原料质量时发现的。Guinness 不让员工以本名发表论文，他用笔名 "Student"，所以分布叫"Student's t"。</p>
+
+<p>检验统计量：</p>
+
+\[
+\boxed{T = \frac{\bar X - \mu_0}{S / \sqrt n}, \quad T \sim t_{n-1} \text{ under } H_0.}
+\]
+
+<p>其中 \(S^2 = \frac{1}{n-1} \sum (X_i - \bar X)^2\)。拒绝域：</p>
+
+<ul>
+<li>双边：\(|T| > t_{n-1, \alpha/2}\)；</li>
+<li>右单边：\(T > t_{n-1, \alpha}\)；左单边镜像。</li>
+</ul>
+
+<p>分位数 \(t_{n-1, \alpha}\) 要查 \(t\) 表（或用软件——R 的 qt(alpha, n-1)；Python 的 scipy.stats.t.ppf）。</p>
+
+<p><strong>例 18.2（小样本机器精度）</strong>　某机床加工零件长度 \(\sim \mathcal{N}(\mu, \sigma^2)\)，\(\sigma\) 未知。设计目标 \(\mu = 50\) mm。抽 10 个零件实测：</p>
+
+<p style="text-align:center">49.8, 50.1, 49.5, 50.3, 49.9, 50.2, 49.7, 50.4, 49.6, 50.5</p>
+
+<p>解：先算 \(\bar X = 49.99\) 之类——具体地：和 = 50.0，\(\bar X = 50.00\)。让我重新认真算：49.8+50.1+49.5+50.3+49.9+50.2+49.7+50.4+49.6+50.5 = 500.0，\(\bar X = 50.00\)。再算样本方差：</p>
+
+<p>偏差：\(-0.2, 0.1, -0.5, 0.3, -0.1, 0.2, -0.3, 0.4, -0.4, 0.5\)。平方：\(0.04, 0.01, 0.25, 0.09, 0.01, 0.04, 0.09, 0.16, 0.16, 0.25\)。和 = \(1.10\)。\(S^2 = 1.10/9 \approx 0.1222\)，\(S \approx 0.3496\)。</p>
+
+<p>检验 \(H_0: \mu = 50\) vs. \(H_1: \mu \neq 50\)（双边）。\(T = (50.00 - 50)/(0.3496/\sqrt{10}) = 0/(0.1106) = 0.00\)。\(p = 1\)。完全不拒绝——这正是设计上"刚好打在靶心" 的情形，没什么可说的。</p>
+
+<p>把数据稍微改一改：假定 \(\bar X\) 实际上是 50.10（其他不变，假定 \(S\) 仍约 0.35），则</p>
+
+\[
+T = \frac{50.10 - 50}{0.35/\sqrt{10}} = \frac{0.10}{0.1107} \approx 0.904.
+\]
+
+<p>查 \(t_9\) 表，双边 \(p \approx 2 \cdot P(T_9 > 0.904) \approx 2 \cdot 0.195 = 0.39\)。完全不显著，不拒绝。</p>
+
+<p>把它再改：\(\bar X = 50.30\)，\(S = 0.35\)：\(T = 0.30/0.1107 \approx 2.71\)。\(t_9\) 表上 \(t_{9, 0.025} = 2.262\)、\(t_{9, 0.01} = 2.821\)。\(|T| = 2.71\) 超过 2.262 但没超 2.821，所以双边 \(p\) 在 \(0.02\) 与 \(0.05\) 之间，约 \(p \approx 0.024\)。在 \(\alpha = 0.05\) 显著、\(\alpha = 0.01\) 不显著。结论：有中等强度证据说机器漂了。</p>
+
+<p>请你<em>注意</em>一件事：同样的"漂 0.30"，如果我们用 \(z\) 检验（假装 \(\sigma\) = 0.35 已知），\(Z = 2.71\)，双边 \(p \approx 0.0067\)——比 \(t\) 检验小得多。这就是 \(t\) 分布"重尾"的代价：在小样本下证据需要"更显眼"才能显著。等到 \(n\) 够大（一般 \(n > 30\) 就够），\(t\) 与 \(z\) 几乎无差。</p>
+
+<h2 id="sec18-3">18.3 双样本 \(t\) 检验：比较两组均值</h2>
+
+<p>大量场景里我们要比较<em>两组</em>样本：新药 vs 旧药、男 vs 女、对照 vs 实验。设两组样本：</p>
+
+<ul>
+<li>组 1：\(X_1, \ldots, X_{n_1} \sim \mathcal{N}(\mu_1, \sigma_1^2)\)；</li>
+<li>组 2：\(Y_1, \ldots, Y_{n_2} \sim \mathcal{N}(\mu_2, \sigma_2^2)\)；</li>
+<li>两组<em>互相独立</em>。</li>
+</ul>
+
+<p>检验 \(H_0: \mu_1 = \mu_2\) vs. \(H_1: \mu_1 \neq \mu_2\)（或单边变体）。</p>
+
+<p>这里有两种主流方法，差别在于"是否假设两组方差相等"。</p>
+
+<h3 id="sec18-3-1">18.3.1 等方差合并 \(t\)（Pooled \(t\)）</h3>
+
+<p>假设 \(\sigma_1 = \sigma_2 = \sigma\)（未知）。把两组的方差信息<em>合并</em>起来得到一个对 \(\sigma^2\) 更精确的估计：</p>
+
+\[
+S_p^2 = \frac{(n_1 - 1) S_1^2 + (n_2 - 1) S_2^2}{n_1 + n_2 - 2}.
+\]
+
+<p>其中 \(S_1^2\)、\(S_2^2\) 是两组各自的样本方差。然后</p>
+
+\[
+\boxed{T = \frac{\bar X - \bar Y}{S_p \sqrt{\dfrac{1}{n_1} + \dfrac{1}{n_2}}}, \quad T \sim t_{n_1 + n_2 - 2} \text{ under } H_0.}
+\]
+
+<p>自由度 \(n_1 + n_2 - 2\)（两组各扣 1 自由度估计自己的均值）。</p>
+
+<p><strong>例 18.3（教学法比较）</strong>　两班学生学同一门课，方法不同。班 A：\(n_1 = 20\)、平均成绩 \(\bar X = 78\)、\(S_1 = 10\)。班 B：\(n_2 = 25\)、\(\bar Y = 72\)、\(S_2 = 12\)。问哪种方法更优？</p>
+
+<p>设 \(H_0: \mu_1 = \mu_2\) vs. \(H_1: \mu_1 \neq \mu_2\)（双边）。先合并方差：</p>
+
+\[
+S_p^2 = \frac{19 \cdot 100 + 24 \cdot 144}{20 + 25 - 2} = \frac{1900 + 3456}{43} = \frac{5356}{43} \approx 124.56.
+\]
+
+<p>\(S_p \approx 11.16\)。检验统计量：</p>
+
+\[
+T = \frac{78 - 72}{11.16 \cdot \sqrt{1/20 + 1/25}} = \frac{6}{11.16 \cdot \sqrt{0.09}} = \frac{6}{11.16 \cdot 0.3} = \frac{6}{3.348} \approx 1.79.
+\]
+
+<p>自由度 43。查 \(t_{43}\)（约等于 \(z\)）：双边 \(p \approx 2 \cdot (1 - 0.963) \approx 0.074\)（更精确为 0.0807）。在 \(\alpha = 0.05\) 下不显著（接近）；在 \(\alpha = 0.10\) 下显著。结论：弱证据说班 A 优于班 B。</p>
+
+<h3 id="sec18-3-2">18.3.2 Welch's \(t\)（不假设等方差）</h3>
+
+<p>"等方差" 这个假设很多时候站不住脚——尤其是两组本身代表性质不同的总体（不同地区、不同年龄段、不同实验条件）。这时用 <strong>Welch's \(t\) 检验</strong>，它不要求两组方差相等。</p>
+
+\[
+\boxed{T = \frac{\bar X - \bar Y}{\sqrt{\dfrac{S_1^2}{n_1} + \dfrac{S_2^2}{n_2}}}, \quad T \overset{\text{近似}}{\sim} t_{\nu}.}
+\]
+
+<p>自由度 \(\nu\) 由 Welch-Satterthwaite 近似公式给出（一个很丑的公式，但软件会自动算）：</p>
+
+\[
+\nu = \frac{(S_1^2/n_1 + S_2^2/n_2)^2}{\dfrac{(S_1^2/n_1)^2}{n_1 - 1} + \dfrac{(S_2^2/n_2)^2}{n_2 - 1}}.
+\]
+
+<p>实务里你不必背这个公式——R 的 t.test() 默认就用 Welch's，会自动算 \(\nu\)。但你应该知道公式存在，并且知道 \(\nu\) 一般不是整数（因为 Welch 是个近似过程）。</p>
+
+<p>用例 18.3 的数据再算一次（不假设等方差）：</p>
+
+\[
+T = \frac{78 - 72}{\sqrt{100/20 + 144/25}} = \frac{6}{\sqrt{5 + 5.76}} = \frac{6}{\sqrt{10.76}} \approx \frac{6}{3.281} \approx 1.83.
+\]
+
+<p>分子分母都和合并 \(t\) 接近，结论也接近。这时合并和 Welch 给出的差别小——但当两组方差悬殊或样本量悬殊时差别会变大。</p>
+
+<p>实务忠告：<em>默认用 Welch's</em>。它的代价仅是自由度可能略小（损失一点功效），收益是不需要"等方差"假设——这个假设若不成立，合并 \(t\) 的 \(p\) 值会失真。许多统计学家干脆建议<em>永远不用合并 \(t\)</em>。</p>
+
+<h2 id="sec18-4">18.4 配对 \(t\) 检验：前后测量</h2>
+
+<p>双样本 \(t\) 检验假设两组<em>独立</em>。但很多场景两组其实是"<em>配对</em>"的——同一批人在两种条件下各测一次：</p>
+
+<ul>
+<li>同一批病人服药前 vs 服药后的血压；</li>
+<li>同一批学生培训前 vs 培训后的考分；</li>
+<li>同一批用户用旧 UI vs 新 UI 的操作时长（仍同一用户）；</li>
+<li>双胞胎研究——一对双胞胎之一接受干预、另一不接受。</li>
+</ul>
+
+<p>这种数据<em>不能</em>当独立样本处理，因为同一个人前后测量是相关的。处理它的招式很朴素：把每对测一次<em>差值</em> \(D_i = X_i - Y_i\)，然后对 \(D_i\) 做<em>单样本</em> \(t\) 检验，检验 \(H_0: \mu_D = 0\)。</p>
+
+\[
+\boxed{T = \frac{\bar D}{S_D / \sqrt n}, \quad T \sim t_{n-1} \text{ under } H_0.}
+\]
+
+<p>其中 \(\bar D\) 与 \(S_D\) 分别是 \(D_i\) 的样本均值与样本标准差。</p>
+
+<p><strong>例 18.4（培训效果）</strong>　10 名销售员参加一次培训，记录培训前后他们一周内成交的客户数：</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em">销售员</th><th style="border:1px solid #888; padding:0.3em 0.7em">前</th><th style="border:1px solid #888; padding:0.3em 0.7em">后</th><th style="border:1px solid #888; padding:0.3em 0.7em">\(D_i\) (后-前)</th></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">1</td><td style="border:1px solid #888; padding:0.3em 0.7em">8</td><td style="border:1px solid #888; padding:0.3em 0.7em">11</td><td style="border:1px solid #888; padding:0.3em 0.7em">3</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">2</td><td style="border:1px solid #888; padding:0.3em 0.7em">10</td><td style="border:1px solid #888; padding:0.3em 0.7em">12</td><td style="border:1px solid #888; padding:0.3em 0.7em">2</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">3</td><td style="border:1px solid #888; padding:0.3em 0.7em">7</td><td style="border:1px solid #888; padding:0.3em 0.7em">9</td><td style="border:1px solid #888; padding:0.3em 0.7em">2</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">4</td><td style="border:1px solid #888; padding:0.3em 0.7em">12</td><td style="border:1px solid #888; padding:0.3em 0.7em">14</td><td style="border:1px solid #888; padding:0.3em 0.7em">2</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">5</td><td style="border:1px solid #888; padding:0.3em 0.7em">9</td><td style="border:1px solid #888; padding:0.3em 0.7em">10</td><td style="border:1px solid #888; padding:0.3em 0.7em">1</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">6</td><td style="border:1px solid #888; padding:0.3em 0.7em">11</td><td style="border:1px solid #888; padding:0.3em 0.7em">15</td><td style="border:1px solid #888; padding:0.3em 0.7em">4</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">7</td><td style="border:1px solid #888; padding:0.3em 0.7em">6</td><td style="border:1px solid #888; padding:0.3em 0.7em">8</td><td style="border:1px solid #888; padding:0.3em 0.7em">2</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">8</td><td style="border:1px solid #888; padding:0.3em 0.7em">13</td><td style="border:1px solid #888; padding:0.3em 0.7em">14</td><td style="border:1px solid #888; padding:0.3em 0.7em">1</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">9</td><td style="border:1px solid #888; padding:0.3em 0.7em">5</td><td style="border:1px solid #888; padding:0.3em 0.7em">6</td><td style="border:1px solid #888; padding:0.3em 0.7em">1</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">10</td><td style="border:1px solid #888; padding:0.3em 0.7em">9</td><td style="border:1px solid #888; padding:0.3em 0.7em">12</td><td style="border:1px solid #888; padding:0.3em 0.7em">3</td></tr>
+</table>
+
+<p>差值序列：3, 2, 2, 2, 1, 4, 2, 1, 1, 3。\(\bar D = 21/10 = 2.1\)。</p>
+
+<p>差值的方差：偏差 0.9, -0.1, -0.1, -0.1, -1.1, 1.9, -0.1, -1.1, -1.1, 0.9。平方 0.81, 0.01, 0.01, 0.01, 1.21, 3.61, 0.01, 1.21, 1.21, 0.81。和 = 8.90。\(S_D^2 = 8.90/9 \approx 0.989\)，\(S_D \approx 0.994\)。</p>
+
+\[
+T = \frac{2.1}{0.994/\sqrt{10}} = \frac{2.1}{0.3144} \approx 6.68.
+\]
+
+<p>自由度 9。查 \(t_9\) 表：\(t_{9, 0.0005} \approx 4.78\)。\(T = 6.68\) 远超此值，双边 \(p < 0.001\)。结论：培训效果<em>极其显著</em>。</p>
+
+<p>请你<em>对比</em>：如果你<em>错</em> 把这两列数据当独立样本做双样本 \(t\) 检验，会得到什么？两组均值差仍然 2.1，但分母（独立两样本的方差合并）会大得多——因为它没用上"同一个人前后差异通常小"这一信息。Welch's \(t\) 算下来 \(T \approx 1.45\)，\(p \approx 0.16\)——完全不显著！</p>
+
+<p>这就是配对设计的<em>威力</em>——它把"个体间的巨大差异"作为常数消掉了，只检验"前后差"。结论：<em>能配对就配对</em>。统计能力会大幅提升。</p>
+
+<h2 id="sec18-5">18.5 \(\chi^2\) 拟合优度检验</h2>
+
+<p>到这里我们一直在检验<em>均值</em>。下一类检验关心<em>分布</em>本身。</p>
+
+<p>场景：某个分类变量取 \(k\) 个可能值，理论上应当遵循某个概率分布 \((p_1, p_2, \ldots, p_k)\)。我们抽 \(n\) 个观测，统计每个类的频数 \((O_1, O_2, \ldots, O_k)\)（"O" for Observed），其中 \(\sum O_i = n\)。问：观测频数与理论分布<em>吻合</em> 吗？</p>
+
+<p>理论上"应当出现"的频数（"E" for Expected）是 \(E_i = n p_i\)。<strong>卡方拟合优度统计量</strong>是：</p>
+
+\[
+\boxed{\chi^2 = \sum_{i=1}^k \frac{(O_i - E_i)^2}{E_i}, \quad \chi^2 \overset{\text{近似}}{\sim} \chi^2_{k-1} \text{ under } H_0.}
+\]
+
+<p>自由度是 \(k - 1\)（少 1 因为 \(\sum O_i = n\) 是个约束，独立的频数只有 \(k - 1\) 个）。</p>
+
+<p>这个统计量是 1900 年 Karl Pearson 引入的，是 20 世纪统计学的奠基之作之一。它的直观非常美：</p>
+
+<ul>
+<li>分子 \((O_i - E_i)^2\) 衡量"观测与期望差多少"；</li>
+<li>分母 \(E_i\) 起"归一化"作用——一个 \(E_i\) 大的格子，绝对偏差大也不奇怪；一个 \(E_i\) 小的格子，绝对偏差小也很惊人；</li>
+<li>所有格子的"偏差"加总，给出整体不吻合度。</li>
+</ul>
+
+<p>\(\chi^2\) 越大，越不吻合，越倾向拒绝 \(H_0\)（即"分布吻合"）。注意 \(\chi^2\) 检验<em>永远是右单边</em>——拒绝域 \(\chi^2 > \chi^2_{k-1, \alpha}\)。</p>
+
+<p><strong>例 18.5（孟德尔豌豆遗传）</strong>　这是 \(\chi^2\) 检验的"教科书例题"。孟德尔在 19 世纪做豌豆杂交，根据他的遗传定律，第二代应当出现"圆黄、圆绿、皱黄、皱绿"四种性状，比例 \(9:3:3:1\)（共 16 份）。他实际观测了 556 颗豌豆：</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em">性状</th><th style="border:1px solid #888; padding:0.3em 0.7em">观测 \(O_i\)</th><th style="border:1px solid #888; padding:0.3em 0.7em">期望 \(E_i\)</th><th style="border:1px solid #888; padding:0.3em 0.7em">\((O-E)^2/E\)</th></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">圆黄</td><td style="border:1px solid #888; padding:0.3em 0.7em">315</td><td style="border:1px solid #888; padding:0.3em 0.7em">312.75</td><td style="border:1px solid #888; padding:0.3em 0.7em">0.016</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">圆绿</td><td style="border:1px solid #888; padding:0.3em 0.7em">108</td><td style="border:1px solid #888; padding:0.3em 0.7em">104.25</td><td style="border:1px solid #888; padding:0.3em 0.7em">0.135</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">皱黄</td><td style="border:1px solid #888; padding:0.3em 0.7em">101</td><td style="border:1px solid #888; padding:0.3em 0.7em">104.25</td><td style="border:1px solid #888; padding:0.3em 0.7em">0.101</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">皱绿</td><td style="border:1px solid #888; padding:0.3em 0.7em">32</td><td style="border:1px solid #888; padding:0.3em 0.7em">34.75</td><td style="border:1px solid #888; padding:0.3em 0.7em">0.218</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">合计</td><td style="border:1px solid #888; padding:0.3em 0.7em">556</td><td style="border:1px solid #888; padding:0.3em 0.7em">556</td><td style="border:1px solid #888; padding:0.3em 0.7em">0.470</td></tr>
+</table>
+
+<p>期望值 \(E_i\) 的算法：圆黄 \(= 556 \cdot 9/16 = 312.75\)，等等。\(\chi^2 = 0.470\)。自由度 \(k - 1 = 3\)。</p>
+
+<p>查 \(\chi^2_3\) 表：\(\chi^2_{3, 0.05} = 7.815\)。我们的 0.470 远小于 7.815，<em>不</em>拒绝 \(H_0\)。\(p \approx P(\chi^2_3 > 0.47) \approx 0.925\)——观测与孟德尔预测<em>极其吻合</em>。</p>
+
+<p>这个 \(p = 0.925\) 反过来还引发了一段历史公案——R. A. Fisher 在 1936 年指出，孟德尔所有实验的拟合优度<em>"过于完美"</em>，统计上看像是有人帮忙凑过数据。这种"\(p\) 值过大也可疑"的视角是高级话题，本科阶段不细究。</p>
+
+<h3 id="sec18-5-1">18.5.1 期望频数太小怎么办？</h3>
+
+<p>\(\chi^2\) 近似分布需要每个 \(E_i\) 不要太小——经验法则是 \(E_i \geq 5\)。如果有格子 \(E_i < 5\)，要么把相邻格子合并，要么改用<em>精确检验</em>（如费舍尔精确检验，第 19 章会提）。</p>
+
+<h2 id="sec18-6">18.6 \(\chi^2\) 独立性检验：列联表</h2>
+
+<p>这是 \(\chi^2\) 的另一个用法，也是最常见的用法之一。场景：两个分类变量，各取若干个值，组成一张<em>列联表</em>（contingency table）。问两个变量是否<em>独立</em>。</p>
+
+<p><strong>例 18.6（吸烟与肺病）</strong>　一项调查记录 1000 人是否吸烟、是否得过慢性支气管炎：</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em"></th><th style="border:1px solid #888; padding:0.3em 0.7em">得病</th><th style="border:1px solid #888; padding:0.3em 0.7em">未得病</th><th style="border:1px solid #888; padding:0.3em 0.7em">合计</th></tr>
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em">吸烟</th><td style="border:1px solid #888; padding:0.3em 0.7em">120</td><td style="border:1px solid #888; padding:0.3em 0.7em">280</td><td style="border:1px solid #888; padding:0.3em 0.7em">400</td></tr>
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em">不吸烟</th><td style="border:1px solid #888; padding:0.3em 0.7em">80</td><td style="border:1px solid #888; padding:0.3em 0.7em">520</td><td style="border:1px solid #888; padding:0.3em 0.7em">600</td></tr>
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em">合计</th><td style="border:1px solid #888; padding:0.3em 0.7em">200</td><td style="border:1px solid #888; padding:0.3em 0.7em">800</td><td style="border:1px solid #888; padding:0.3em 0.7em">1000</td></tr>
+</table>
+
+<p>\(H_0\)：吸烟与得病<em>独立</em>。\(H_1\)：相关。</p>
+
+<p>独立性意味着 \(P(\text{得病} \cap \text{吸烟}) = P(\text{得病}) \cdot P(\text{吸烟})\)。从边缘频率估计：\(P(\text{得病}) = 200/1000 = 0.2\)、\(P(\text{吸烟}) = 400/1000 = 0.4\)。所以独立性下"吸烟且得病"格的<em>期望</em>频数是 \(1000 \cdot 0.2 \cdot 0.4 = 80\)。同理算其他三格的期望：</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em"></th><th style="border:1px solid #888; padding:0.3em 0.7em">得病 \(E\)</th><th style="border:1px solid #888; padding:0.3em 0.7em">未得病 \(E\)</th></tr>
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em">吸烟</th><td style="border:1px solid #888; padding:0.3em 0.7em">80</td><td style="border:1px solid #888; padding:0.3em 0.7em">320</td></tr>
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em">不吸烟</th><td style="border:1px solid #888; padding:0.3em 0.7em">120</td><td style="border:1px solid #888; padding:0.3em 0.7em">480</td></tr>
+</table>
+
+<p>更一般地，\(r \times c\) 列联表中，第 \((i, j)\) 格的期望是</p>
+
+\[
+E_{ij} = \frac{(\text{第 } i \text{ 行总数}) \cdot (\text{第 } j \text{ 列总数})}{n}.
+\]
+
+<p>检验统计量同 \(\chi^2\) 拟合优度，只是求和遍历所有格：</p>
+
+\[
+\boxed{\chi^2 = \sum_{i,j} \frac{(O_{ij} - E_{ij})^2}{E_{ij}}, \quad \chi^2 \overset{\text{近似}}{\sim} \chi^2_{(r-1)(c-1)}.}
+\]
+
+<p>自由度是 \((r - 1)(c - 1)\)——每行边缘和每列边缘各扣了 1 自由度。</p>
+
+<p>本例：</p>
+
+\[
+\chi^2 = \frac{(120-80)^2}{80} + \frac{(280-320)^2}{320} + \frac{(80-120)^2}{120} + \frac{(520-480)^2}{480}
+\]
+
+\[
+= \frac{1600}{80} + \frac{1600}{320} + \frac{1600}{120} + \frac{1600}{480} = 20 + 5 + 13.33 + 3.33 = 41.67.
+\]
+
+<p>自由度 \((2-1)(2-1) = 1\)。查 \(\chi^2_1\) 表：\(\chi^2_{1, 0.001} = 10.83\)。\(\chi^2 = 41.67 \gg 10.83\)，所以 \(p \ll 0.001\)。结论：吸烟与得病<em>极显著</em>相关。</p>
+
+<p>请你<em>注意</em>：\(\chi^2\) 独立性检验告诉你"<em>有</em>相关"，但<em>没</em>告诉你 "<em>是吸烟导致得病</em>" ——后者是因果关系，统计检验本身不证因果，要靠实验设计或因果推断方法。把"相关"误读为"因果"是科学传播里最常见的错误。下一章会继续讨论。</p>
+
+<h2 id="sec18-7">18.7 \(\chi^2\) 方差检验</h2>
+
+<p>除了用于分类数据，\(\chi^2\) 分布还有一个连续场景：检验<em>方差</em>。</p>
+
+<p>设 \(X_1, \ldots, X_n \sim \mathcal{N}(\mu, \sigma^2)\)，检验 \(H_0: \sigma^2 = \sigma_0^2\)。</p>
+
+<p>统计量：</p>
+
+\[
+\boxed{\chi^2 = \frac{(n-1) S^2}{\sigma_0^2}, \quad \chi^2 \sim \chi^2_{n-1} \text{ under } H_0.}
+\]
+
+<p>这是利用 \((n - 1) S^2 / \sigma^2 \sim \chi^2_{n-1}\) 的事实（第 16 章已证）。</p>
+
+<p>拒绝域<em>双边</em>：\(\chi^2 < \chi^2_{n-1, 1-\alpha/2}\) 或 \(\chi^2 > \chi^2_{n-1, \alpha/2}\)。注意 \(\chi^2\) 分布<em>不对称</em>，所以双边拒绝域的两个临界值不是简单镜像。</p>
+
+<p><strong>例 18.7（机器精度的方差）</strong>　某机床要求零件长度的标准差不超过 0.05 mm（即 \(\sigma^2 \leq 0.0025\)）。抽 20 个零件测得 \(S^2 = 0.0040\)。问机器精度是否变差了？</p>
+
+<p>\(H_0: \sigma^2 = 0.0025\) vs. \(H_1: \sigma^2 > 0.0025\)（右单边，因为只关心精度变差）。</p>
+
+\[
+\chi^2 = \frac{19 \cdot 0.0040}{0.0025} = \frac{0.076}{0.0025} = 30.4.
+\]
+
+<p>查 \(\chi^2_{19}\) 表：\(\chi^2_{19, 0.05} = 30.14\)，\(\chi^2_{19, 0.025} = 32.85\)。\(\chi^2 = 30.4\) 略超 30.14、不到 32.85，所以右单边 \(p\) 在 \(0.025 \sim 0.05\) 之间，约 \(p \approx 0.047\)。\(\alpha = 0.05\) 下边缘显著。结论：弱证据说精度变差，建议进一步监控或加抽样本。</p>
+
+<p>警告：\(\chi^2\) 方差检验<em>对正态性假设非常敏感</em>。如果数据明显非正态（偏态、重尾、有异常值），这个检验给出的 \(p\) 值不可信——比 \(t\) 检验对正态性敏感得多。实际上很多统计学家建议<em>能不用就不用</em> \(\chi^2\) 方差检验，改用稳健的方差检验（如 Brown-Forsythe）。</p>
+
+<h2 id="sec18-8">18.8 \(F\) 检验：比较两组方差</h2>
+
+<p>类似上一节，但比较<em>两组</em>方差。设两组独立正态样本：组 1 \(n_1\) 个、方差 \(S_1^2\)；组 2 \(n_2\) 个、方差 \(S_2^2\)。检验 \(H_0: \sigma_1^2 = \sigma_2^2\)。</p>
+
+<p>检验统计量：</p>
+
+\[
+\boxed{F = \frac{S_1^2}{S_2^2}, \quad F \sim F_{n_1-1, n_2-1} \text{ under } H_0.}
+\]
+
+<p>分布是 \(F\) 分布，由 R. A. Fisher 引入。它本质上是两个独立 \(\chi^2\) 比值除以各自自由度——即 \((U/d_1)/(V/d_2)\) 当 \(U \sim \chi^2_{d_1}\)、\(V \sim \chi^2_{d_2}\) 独立。\(F\) 分布也不对称（永远 \(\geq 0\)）。</p>
+
+<p>双边拒绝域：\(F < F_{n_1-1, n_2-1, 1-\alpha/2}\) 或 \(F > F_{n_1-1, n_2-1, \alpha/2}\)。实务里常按"分子总放大方差那组"、查上分位数表。</p>
+
+<p><strong>例 18.8（比较两机床精度）</strong>　两台机床各抽 \(n_1 = n_2 = 16\) 个零件。\(S_1^2 = 0.0036\)、\(S_2^2 = 0.0016\)。问两机床精度是否一致？</p>
+
+<p>\(H_0: \sigma_1^2 = \sigma_2^2\) vs. \(H_1: \sigma_1^2 \neq \sigma_2^2\)。</p>
+
+\[
+F = \frac{0.0036}{0.0016} = 2.25.
+\]
+
+<p>查 \(F_{15, 15}\) 表（双边 \(\alpha = 0.05\) → 上分位 0.025）：\(F_{15, 15, 0.025} = 2.86\)。\(F = 2.25 < 2.86\)，<em>不</em>拒绝。结论：没有充分证据说两机床方差不同。</p>
+
+<p>跟 \(\chi^2\) 方差检验一样，\(F\) 检验对正态性也<em>敏感</em>。Levene 检验和 Brown-Forsythe 检验是更稳健的替代品。\(F\) 检验的另一个重要场景是方差分析（ANOVA），那里它用于比较多组均值，逻辑稍不同——具体见后续课程。</p>
+
+<h2 id="sec18-9">18.9 比例检验：一样本与两样本</h2>
+
+<p>这是检验"<em>比率</em>" 而非"<em>均值</em>"。最常见场景：投票支持率、产品故障率、网站点击率。</p>
+
+<h3 id="sec18-9-1">18.9.1 单样本比例检验</h3>
+
+<p>设观测 \(n\) 次独立的"成功/失败"试验（伯努利），观察到 \(X\) 次成功。检验 \(H_0: p = p_0\)。当 \(n p_0\) 与 \(n(1-p_0)\) 都足够大（一般要求 \(\geq 10\)）时，由中心极限定理：</p>
+
+\[
+\boxed{Z = \frac{\hat p - p_0}{\sqrt{p_0 (1 - p_0)/n}}, \quad Z \overset{\text{近似}}{\sim} \mathcal{N}(0,1) \text{ under } H_0,}
+\]
+
+<p>其中 \(\hat p = X/n\)。注意分母用<em>原假设下的方差</em> \(p_0(1-p_0)\)，不是用 \(\hat p (1 - \hat p)\)（后者对应 Wald 检验，是另一种近似，常被批评在小样本下不准）。</p>
+
+<p><strong>例 18.9（投票支持率）</strong>　某候选人声称支持率是 50%。一项独立民调随机访问 600 名选民，260 人支持。问支持率是否显著低于 50%？</p>
+
+<p>\(\hat p = 260/600 \approx 0.4333\)。\(H_0: p = 0.5\) vs. \(H_1: p < 0.5\)（左单边）。</p>
+
+\[
+Z = \frac{0.4333 - 0.5}{\sqrt{0.5 \cdot 0.5 / 600}} = \frac{-0.0667}{\sqrt{0.000417}} = \frac{-0.0667}{0.0204} \approx -3.27.
+\]
+
+<p>左单边 \(p = \Phi(-3.27) \approx 0.00054\)。极显著拒绝 \(H_0\)。结论：候选人 50% 的支持率<em>站不住</em>，民调显示真实支持率显著低于 50%。</p>
+
+<h3 id="sec18-9-2">18.9.2 两样本比例检验</h3>
+
+<p>比较两个独立样本的成功率：组 1 共 \(n_1\) 次试验、\(X_1\) 次成功；组 2 共 \(n_2\) 次试验、\(X_2\) 次成功。\(\hat p_1 = X_1/n_1\)、\(\hat p_2 = X_2/n_2\)。</p>
+
+<p>\(H_0: p_1 = p_2\)（即两个比例相等，未必等于某个特定值）。在 \(H_0\) 下两组合并比例 \(\hat p = (X_1 + X_2)/(n_1 + n_2)\) 是对共同 \(p\) 的最佳估计。</p>
+
+\[
+\boxed{Z = \frac{\hat p_1 - \hat p_2}{\sqrt{\hat p (1 - \hat p) (1/n_1 + 1/n_2)}}, \quad Z \overset{\text{近似}}{\sim} \mathcal{N}(0,1).}
+\]
+
+<p><strong>例 18.10（A/B 测试）</strong>　电商按钮测试：橙色组 \(n_1 = 5000\) 用户、点击 \(X_1 = 265\)；蓝色组 \(n_2 = 5000\) 用户、点击 \(X_2 = 250\)。\(\hat p_1 = 5.30\%\)、\(\hat p_2 = 5.00\%\)。问橙色显著好吗？</p>
+
+<p>\(H_0: p_1 = p_2\) vs. \(H_1: p_1 \neq p_2\)（双边）。</p>
+
+<p>合并 \(\hat p = (265 + 250)/10000 = 0.0515\)。</p>
+
+\[
+Z = \frac{0.053 - 0.050}{\sqrt{0.0515 \cdot 0.9485 \cdot (1/5000 + 1/5000)}} = \frac{0.003}{\sqrt{0.04886 \cdot 0.0004}} = \frac{0.003}{\sqrt{0.0000195}} = \frac{0.003}{0.00442} \approx 0.679.
+\]
+
+<p>双边 \(p = 2(1 - \Phi(0.679)) \approx 2 \cdot 0.249 \approx 0.50\)。<em>完全不显著</em>。即使橙色看似比蓝色高 0.3 个百分点，但在这个样本量下根本不能区分这是真效应还是抽样波动。</p>
+
+<p>要让 0.3% 的差异在 \(\alpha = 0.05\) 下显著，每组样本量需要约 \(n \approx 8 \cdot 0.05 \cdot 0.95 / 0.003^2 \approx 42000\)。数量级提示：检验小效应需要大样本。下一章 19.8 节会详细讨论"效应量 vs 样本量"。</p>
+
+<h2 id="sec18-10">18.10 各检验的"使用心法"</h2>
+
+<p>每个检验都有几个<em>分布假设</em>和<em>样本量要求</em>。这些假设若严重违反，\(p\) 值就不可信。</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr><th style="border:1px solid #888; padding:0.3em 0.6em">检验</th><th style="border:1px solid #888; padding:0.3em 0.6em">分布假设</th><th style="border:1px solid #888; padding:0.3em 0.6em">样本量要求</th><th style="border:1px solid #888; padding:0.3em 0.6em">稳健性</th></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">\(z\) 检验（均值）</td><td style="border:1px solid #888; padding:0.3em 0.6em">正态、\(\sigma\) 已知</td><td style="border:1px solid #888; padding:0.3em 0.6em">无</td><td style="border:1px solid #888; padding:0.3em 0.6em">大 \(n\) 时对正态偏离稳健</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">\(t\) 检验（单/双样本）</td><td style="border:1px solid #888; padding:0.3em 0.6em">正态</td><td style="border:1px solid #888; padding:0.3em 0.6em">小 \(n\) 时严格要求正态</td><td style="border:1px solid #888; padding:0.3em 0.6em">中等稳健（CLT 帮忙）</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">配对 \(t\)</td><td style="border:1px solid #888; padding:0.3em 0.6em">差值正态</td><td style="border:1px solid #888; padding:0.3em 0.6em">同上</td><td style="border:1px solid #888; padding:0.3em 0.6em">同上</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">\(\chi^2\) 拟合优度/独立性</td><td style="border:1px solid #888; padding:0.3em 0.6em">大样本近似</td><td style="border:1px solid #888; padding:0.3em 0.6em">每格 \(E_i \geq 5\)</td><td style="border:1px solid #888; padding:0.3em 0.6em">小格用 Fisher 精确</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">\(\chi^2\) 方差 / \(F\) 方差</td><td style="border:1px solid #888; padding:0.3em 0.6em">严格正态</td><td style="border:1px solid #888; padding:0.3em 0.6em">无特殊</td><td style="border:1px solid #888; padding:0.3em 0.6em">非常不稳健</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">比例 \(z\)</td><td style="border:1px solid #888; padding:0.3em 0.6em">大样本近似</td><td style="border:1px solid #888; padding:0.3em 0.6em">\(np_0, n(1-p_0) \geq 10\)</td><td style="border:1px solid #888; padding:0.3em 0.6em">小样本用二项式精确</td></tr>
+</table>
+
+<p>"稳健性" 列指：当假设略偏离时，\(p\) 值是否仍然可信。</p>
+
+<p>几条<em>心法</em>：</p>
+
+<ol>
+<li><strong>先看数据</strong>。在做检验前，画直方图/箱形图，看分布形状、有无异常值、是否对称。许多假设（如正态性）肉眼可粗判。</li>
+<li><strong>能用 \(t\) 别用 \(z\)</strong>。除非特殊场景（如比例检验），\(t\) 检验的"\(\sigma\) 未知"几乎总是适合现实。\(n > 30\) 时两者差别可忽略。</li>
+<li><strong>能用 Welch 别用合并 \(t\)</strong>。Welch 不要求等方差，多数情况下结果与合并 \(t\) 几乎相同；偶尔差很多时，Welch 的结果更可信。</li>
+<li><strong>能配对就配对</strong>。配对设计大幅提升功效（例 18.4）。</li>
+<li><strong>方差检验慎用</strong>。\(\chi^2\) 与 \(F\) 方差检验对正态性<em>非常</em>敏感，结论常常因为数据轻微非正态就完全错。Levene、Brown-Forsythe 是稳健替代。</li>
+<li><strong>样本量小用精确检验</strong>。Fisher 精确（\(2 \times 2\) 列联表）、二项式精确（比例检验），都有专门软件实现。</li>
+<li><strong>大样本注意"统计显著 vs 实际重要"</strong>。\(n = 100000\) 时几乎所有 \(H_0\) 都会被拒绝——但效应可能小到没意义。第 19 章会展开。</li>
+</ol>
+
+<h2 id="sec18-11">18.11 检验选择速查表</h2>
+
+<p>把这一章的几把刀按"问题类型"归档。下次面对一份数据，你可以照表查工具：</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr><th style="border:1px solid #888; padding:0.3em 0.6em">问题</th><th style="border:1px solid #888; padding:0.3em 0.6em">数据特征</th><th style="border:1px solid #888; padding:0.3em 0.6em">用什么检验</th></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">单组均值是否等于某值</td><td style="border:1px solid #888; padding:0.3em 0.6em">连续；\(\sigma\) 已知</td><td style="border:1px solid #888; padding:0.3em 0.6em">单样本 \(z\) 检验</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">同上</td><td style="border:1px solid #888; padding:0.3em 0.6em">连续；\(\sigma\) 未知</td><td style="border:1px solid #888; padding:0.3em 0.6em">单样本 \(t\) 检验</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">两组均值是否相等</td><td style="border:1px solid #888; padding:0.3em 0.6em">独立、连续</td><td style="border:1px solid #888; padding:0.3em 0.6em">Welch's \(t\) 检验（默认）</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">同上</td><td style="border:1px solid #888; padding:0.3em 0.6em">配对（前后或同源）</td><td style="border:1px solid #888; padding:0.3em 0.6em">配对 \(t\) 检验</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">分类变量分布是否符合理论</td><td style="border:1px solid #888; padding:0.3em 0.6em">分类、单变量</td><td style="border:1px solid #888; padding:0.3em 0.6em">\(\chi^2\) 拟合优度</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">两个分类变量是否独立</td><td style="border:1px solid #888; padding:0.3em 0.6em">分类、二维</td><td style="border:1px solid #888; padding:0.3em 0.6em">\(\chi^2\) 独立性</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">单组方差是否等于某值</td><td style="border:1px solid #888; padding:0.3em 0.6em">正态</td><td style="border:1px solid #888; padding:0.3em 0.6em">\(\chi^2\) 方差检验</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">两组方差是否相等</td><td style="border:1px solid #888; padding:0.3em 0.6em">正态</td><td style="border:1px solid #888; padding:0.3em 0.6em">\(F\) 检验（或 Levene 更稳健）</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">单个比例是否等于某值</td><td style="border:1px solid #888; padding:0.3em 0.6em">大样本</td><td style="border:1px solid #888; padding:0.3em 0.6em">单样本比例 \(z\)</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">两个比例是否相等</td><td style="border:1px solid #888; padding:0.3em 0.6em">大样本</td><td style="border:1px solid #888; padding:0.3em 0.6em">两样本比例 \(z\)</td></tr>
+</table>
+
+<p>这张表请你记下来——它是本章的<em>骨架</em>。下一章我们离开"具体怎么算"，回到统计学的<em>当下议题</em>：当我们做大量检验时会出什么乱子，重现性危机是怎么回事，统计学界正在如何反思自己的"\(p < 0.05\)" 文化。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 假设检验的逻辑</a><a href="ch19.html">下一章 · 第 19 章 多重检验与现代议题 →</a></nav>
+
+</main>
+</body>
+</html>

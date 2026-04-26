@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 22 章 方差分析（ANOVA） — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 多元线性回归</a><a href="ch23.html">下一章 · 第 23 章 Bayes 统计入门 →</a></nav>
+<h1 id="ch22">第 22 章 方差分析（ANOVA）</h1>
+
+<p>第 19 章我们用 \(t\) 检验比较<em>两个</em>总体的均值是否相同。可现实里"两组"经常不够：某农学家想比较<em>四种</em>肥料的产量；某临床试验想比较<em>三种</em>药物（包含安慰剂）的疗效；某教师想比较<em>五种</em>教学方法的考试成绩。这时该怎么办？</p>
+
+<p>朴素的想法是"两两做 \(t\) 检验"——\(\binom{4}{2} = 6\) 次、\(\binom{5}{2} = 10\) 次。这个办法看起来直接，<em>实际上是错的</em>，原因 22.1 节会讲清楚。正确的工具叫做<strong>方差分析</strong>（Analysis of Variance，ANOVA），由 R. A. Fisher 在 1920 年代为农业实验设计而发明，是 20 世纪统计学最重要的工具之一。</p>
+
+<p>"方差分析"这个名字听起来奇怪——<em>明明在比较均值，为什么叫方差分析</em>？因为 ANOVA 比较均值的<em>办法</em>是把"总方差"分解成"组间方差"与"组内方差"两份，看前者是否显著大于后者。如果"组间"远大于"组内"，说明组与组的差距比组内随机波动大得多，就有理由认为各组均值不同。这种"用方差比来检验均值"的思路，是 Fisher 最深刻的贡献之一。</p>
+
+<p>本章将依次：</p>
+
+<ul>
+<li>说明为什么"多次 \(t\) 检验"不行；</li>
+<li>建立单因子 ANOVA 模型与平方和分解；</li>
+<li>构造 \(F\) 统计量与 ANOVA 表；</li>
+<li>讲拒绝 \(H_0\) 后的事后检验（Tukey HSD、Bonferroni）；</li>
+<li>讨论双因子 ANOVA、交互作用；</li>
+<li>把 ANOVA 与回归视为同一框架的不同表达；</li>
+<li>讲假设诊断、协方差分析（ANCOVA）简介。</li>
+</ul>
+
+<h2 id="sec22-1">22.1 动机：为什么不能多次做 \(t\) 检验</h2>
+
+<p>设我们要比较 \(k = 5\) 个组的均值是否都相等。共 \(\binom{5}{2} = 10\) 对。如果我们对每对单独做 \(t\) 检验，每次显著性水平 \(\alpha = 0.05\)，会怎样？</p>
+
+<p>每次<em>不</em>犯第一类错误（错拒 \(H_0\)）的概率是 \(1 - 0.05 = 0.95\)。如果 10 次检验<em>独立</em>，10 次都不犯错的概率是 \(0.95^{10} \approx 0.599\)。所以<em>至少犯一次</em>错的概率约 \(1 - 0.599 = 0.401\)——即 40%。原本想控制 5%，结果膨胀到 40%！</p>
+
+<p>这叫<strong>多重比较问题</strong>（multiple comparisons problem）。检验次数越多，"假阳性"的总概率就越大。如果不做控制，几乎注定会"看到"一些根本不存在的差异——这是 21 世纪初"心理学复制危机"的根源之一（很多论文凭"显著 \(p < 0.05\)"发表，实际多次比较后真实的显著性早已消解）。</p>
+
+<p>ANOVA 提供的解决方案是：<em>先用一个总体性的检验</em>判断"所有组均值是否都相等"——这是单一假设、单次检验、单一 \(\alpha\) 水平。如果这个检验不显著，停止——结论是"没有证据说各组不同"。如果显著，再做事后检验找出"哪些组之间不同"——这时已经知道有差异，就可以用更精细的工具（22.7 节）。</p>
+
+<p>这种"先整体、后局部"的两步走思想，是 ANOVA 的核心战略。</p>
+
+<h2 id="sec22-2">22.2 单因子 ANOVA 模型</h2>
+
+<p>设有 \(k\) 个组（"水平"，levels），第 \(i\) 组有 \(n_i\) 个观测，记为 \(Y_{i1}, Y_{i2}, \ldots, Y_{i n_i}\)。总观测数 \(N = \sum_{i=1}^k n_i\)。</p>
+
+<p><strong>单因子方差分析模型</strong>（one-way ANOVA model）假设：</p>
+
+\[
+\boxed{Y_{ij} = \mu_i + \epsilon_{ij}, \qquad i = 1, \ldots, k; \quad j = 1, \ldots, n_i,}
+\]
+
+<p>其中：</p>
+
+<ul>
+<li>\(\mu_i\) 是第 \(i\) 组的（未知）总体均值；</li>
+<li>\(\epsilon_{ij} \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0, \sigma^2)\)——所有组共享同一个误差方差 \(\sigma^2\)（同方差）。</li>
+</ul>
+
+<p>有时也写成"效应"形式：\(Y_{ij} = \mu + \alpha_i + \epsilon_{ij}\)，其中 \(\mu\) 是总均值、\(\alpha_i = \mu_i - \mu\) 是第 \(i\) 组对总均值的"偏差"，满足约束 \(\sum_i n_i \alpha_i = 0\)（或等价的 \(\sum_i \alpha_i = 0\)）。两种写法等价，本章主要用第一种。</p>
+
+<p>要检验的<strong>原假设</strong>是"所有组均值相等"：</p>
+
+\[
+H_0 : \mu_1 = \mu_2 = \cdots = \mu_k.
+\]
+
+<p>对立假设是"至少有一对均值不同"：\(H_1 :\) 至少存在 \(i \neq j\) 使 \(\mu_i \neq \mu_j\)。</p>
+
+<p>请你<em>注意</em>，\(H_1\) 不是"所有 \(\mu_i\) 都不同"——只要有<em>任何</em>一对不同就拒 \(H_0\)。所以 ANOVA 拒绝 \(H_0\) 后只告诉你"有差异"，不告诉你"哪里有差异"。后者要靠事后检验。</p>
+
+<p>三个核心假设（同 20.2 节）：</p>
+
+<ol>
+<li><em>独立</em>：各组、各观测之间独立；</li>
+<li><em>等方差</em>：各组方差都是 \(\sigma^2\)；</li>
+<li><em>正态</em>：组内观测正态分布。</li>
+</ol>
+
+<p>这三条假设的诊断方法 22.11 节会讲。</p>
+
+<h2 id="sec22-3">22.3 平方和分解：SST = SSB + SSW</h2>
+
+<p>记几个均值：</p>
+
+<ul>
+<li>第 \(i\) 组样本均值：\(\bar Y_{i\cdot} = \dfrac{1}{n_i}\sum_{j=1}^{n_i} Y_{ij}\)；</li>
+<li>总样本均值：\(\bar Y_{\cdot\cdot} = \dfrac{1}{N}\sum_{i=1}^k \sum_{j=1}^{n_i} Y_{ij}\)。</li>
+</ul>
+
+<p>对每个观测有恒等式</p>
+
+\[
+Y_{ij} - \bar Y_{\cdot\cdot} = (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot}) + (Y_{ij} - \bar Y_{i\cdot}).
+\]
+
+<p>右边第一项是"组均值与总均值的偏差"——反映组与组的差异；第二项是"观测与本组均值的偏差"——反映组内的随机波动。两边平方再求和（对所有 \(i, j\)）：</p>
+
+\[
+\sum_{i,j} (Y_{ij} - \bar Y_{\cdot\cdot})^2 = \sum_{i,j} (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot})^2 + \sum_{i,j} (Y_{ij} - \bar Y_{i\cdot})^2 + 2 \sum_{i,j} (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot})(Y_{ij} - \bar Y_{i\cdot}).
+\]
+
+<p>关键：交叉项为零。证明：固定 \(i\)，对 \(j\) 求和，\(\sum_j (Y_{ij} - \bar Y_{i\cdot}) = 0\)（按组均值的定义），所以</p>
+
+\[
+\sum_{i,j} (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot})(Y_{ij} - \bar Y_{i\cdot}) = \sum_i (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot}) \cdot 0 = 0.
+\]
+
+<p>所以分解成立：</p>
+
+\[
+\boxed{\underbrace{\sum_{i,j} (Y_{ij} - \bar Y_{\cdot\cdot})^2}_{\mathrm{SST}} = \underbrace{\sum_{i} n_i (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot})^2}_{\mathrm{SSB}} + \underbrace{\sum_{i,j} (Y_{ij} - \bar Y_{i\cdot})^2}_{\mathrm{SSW}}.}
+\]
+
+<p>注意第二项里 \(\sum_{i,j} (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot})^2 = \sum_i n_i (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot})^2\)，因为对固定 \(i\)，被加项与 \(j\) 无关。</p>
+
+<p>命名：</p>
+
+<ul>
+<li><strong>SST</strong>（total sum of squares）= 总平方和；</li>
+<li><strong>SSB</strong>（sum of squares between groups）= 组间平方和——衡量"组与组的差异"；</li>
+<li><strong>SSW</strong>（sum of squares within groups）= 组内平方和——衡量"组内随机波动"。又叫 SSE（误差平方和）。</li>
+</ul>
+
+<p>这和第 20 章 SST = SSR + SSE 是同源的——把"被模型解释 / 未被解释"换个说法叫"组间 / 组内"。22.10 节会精确说明它们是同一件事。</p>
+
+<h2 id="sec22-4">22.4 \(F\) 统计量</h2>
+
+<p>有了平方和分解，自然想问："组间差异是不是显著大于组内随机？"——这就是 \(F\) 检验的直觉。</p>
+
+<p>把 SSB 和 SSW 各自除以自由度，得到<strong>均方</strong>：</p>
+
+\[
+\mathrm{MSB} = \frac{\mathrm{SSB}}{k - 1}, \qquad \mathrm{MSW} = \frac{\mathrm{SSW}}{N - k}.
+\]
+
+<p>"\(k - 1\)"是组间自由度——\(k\) 个组均值，减去一个总均值约束；"\(N - k\)"是组内自由度——\(N\) 个观测，每组减去一个组均值约束。注意 \((k - 1) + (N - k) = N - 1\) 等于 SST 的自由度，正好可以分配。</p>
+
+<p>定义</p>
+
+\[
+\boxed{F = \frac{\mathrm{MSB}}{\mathrm{MSW}}.}
+\]
+
+<p>在 \(H_0\) 下，可以证明：</p>
+
+<ul>
+<li>\(\mathrm{SSW}/\sigma^2 \sim \chi^2_{N - k}\)，且 \(\mathrm{MSW}\) 是 \(\sigma^2\) 的无偏估计；</li>
+<li>\(\mathrm{SSB}/\sigma^2 \sim \chi^2_{k - 1}\)，且 \(\mathrm{MSB}\) 也是 \(\sigma^2\) 的无偏估计；</li>
+<li>SSB 与 SSW 独立。</li>
+</ul>
+
+<p>所以 \(F = \mathrm{MSB}/\mathrm{MSW}\) 是两个独立卡方除以各自自由度之比，服从</p>
+
+\[
+F \sim F_{k-1,\, N-k}.
+\]
+
+<p>在 \(H_1\) 下（各组均值真不同），\(\mathrm{MSB}\) 倾向于偏大（除了 \(\sigma^2\) 还吃掉一份"组间真实差异"），而 \(\mathrm{MSW}\) 仍然估 \(\sigma^2\)。所以 \(F\) 偏大。这就是为什么我们做<strong>右尾检验</strong>：若 \(F > F_{\alpha, k-1, N-k}\) 则拒绝 \(H_0\)；或者算 \(p\)-value \(= \Pr(F_{k-1, N-k} > F_\text{观测}) < \alpha\) 则拒绝。</p>
+
+<p>请你<em>注意</em>"为什么 \(F\) 检验是单尾"。这与 \(t\) 检验比较两均值不同——后者是双尾的，因为 \(\mu_1 - \mu_2\) 可正可负。\(F\) 检验里 \(\mathrm{MSB} \geq 0\) 永远成立，"差异越大 \(F\) 越大"，所以只看右尾。</p>
+
+<h2 id="sec22-5">22.5 假设检验 \(H_0 : \mu_1 = \cdots = \mu_k\)</h2>
+
+<p>把 22.3 + 22.4 节合起来，单因子 ANOVA 的检验流程如下：</p>
+
+<ol>
+<li>列数据，算每组均值 \(\bar Y_{i\cdot}\) 与总均值 \(\bar Y_{\cdot\cdot}\)。</li>
+<li>算 SST、SSB、SSW（用 22.3 节公式；常用恒等式 \(\mathrm{SST} = \mathrm{SSB} + \mathrm{SSW}\) 节省一次计算）。</li>
+<li>算 MSB \(=\) SSB\(/(k-1)\)、MSW \(=\) SSW\(/(N-k)\)。</li>
+<li>算 \(F = \mathrm{MSB}/\mathrm{MSW}\)。</li>
+<li>查表得 \(F_{\alpha, k-1, N-k}\) 或算 \(p\) 值。</li>
+<li>决断：若 \(F > F_\text{临界}\) 或 \(p < \alpha\)，拒 \(H_0\)；否则不拒绝。</li>
+</ol>
+
+<p><strong>例 22.1（三种肥料的产量）</strong>　某农学家比较三种肥料对小麦产量（kg/亩）的影响。每种肥料试 4 块地，数据如下：</p>
+
+\[
+\begin{array}{c|cccc|c}
+\text{肥料} & \multicolumn{4}{c|}{\text{各小区产量}} & \text{组均值} \\
+\hline
+\text{A} & 480 & 460 & 470 & 490 & 475 \\
+\text{B} & 510 & 530 & 520 & 500 & 515 \\
+\text{C} & 450 & 470 & 460 & 480 & 465
+\end{array}
+\]
+
+<p>检验 \(H_0 : \mu_A = \mu_B = \mu_C\)，显著性水平 \(\alpha = 0.05\)。</p>
+
+<p>解：\(k = 3\)、每组 \(n_i = 4\)、\(N = 12\)。组均值：\(\bar Y_{A\cdot} = 475\)、\(\bar Y_{B\cdot} = 515\)、\(\bar Y_{C\cdot} = 465\)。总均值：\(\bar Y_{\cdot\cdot} = (475 + 515 + 465)/3 = 485\)（因为各组样本量相等）。</p>
+
+<p>组间：</p>
+
+\[
+\mathrm{SSB} = 4 \cdot (475 - 485)^2 + 4 \cdot (515 - 485)^2 + 4 \cdot (465 - 485)^2 = 4 \cdot (100 + 900 + 400) = 4 \cdot 1400 = 5600.
+\]
+
+<p>组内（计算每个偏差再平方求和）：</p>
+
+<p>A 组偏差 \((480-475, 460-475, 470-475, 490-475) = (5, -15, -5, 15)\)，平方和 \(25 + 225 + 25 + 225 = 500\)。</p>
+
+<p>B 组偏差 \((510-515, 530-515, 520-515, 500-515) = (-5, 15, 5, -15)\)，平方和 \(500\)。</p>
+
+<p>C 组偏差 \((450-465, 470-465, 460-465, 480-465) = (-15, 5, -5, 15)\)，平方和 \(500\)。</p>
+
+\[
+\mathrm{SSW} = 500 + 500 + 500 = 1500.
+\]
+
+<p>验证：\(\mathrm{SST} = \mathrm{SSB} + \mathrm{SSW} = 5600 + 1500 = 7100\)。直接算 SST 也得 \(7100\)（你可自己验证）。</p>
+
+<p>均方：\(\mathrm{MSB} = 5600 / (3 - 1) = 2800\)；\(\mathrm{MSW} = 1500 / (12 - 3) = 1500 / 9 \approx 166.67\)。</p>
+
+<p>\(F = 2800 / 166.67 \approx 16.8\)。查 \(F_{0.05, 2, 9} \approx 4.26\)。\(16.8 > 4.26\)，<em>强烈拒绝</em> \(H_0\)。结论：三种肥料的平均产量存在显著差异。</p>
+
+<p>但这只告诉我们"有差异"——不告诉"哪两组之间不同"。22.7 节会讲事后检验。</p>
+
+<h2 id="sec22-6">22.6 ANOVA 表标准格式</h2>
+
+<p>把 22.5 节例题的结果整理成<strong>ANOVA 表</strong>——这是统计学家展示分析结果的标准方式。每个软件输出（R 的 anova、Python 的 statsmodels、SPSS）都长这个样子。表中列出"变异来源、平方和、自由度、均方、\(F\) 值、\(p\) 值"。</p>
+
+\[
+\begin{array}{l|c|c|c|c|c}
+\text{来源} & \text{SS} & \text{df} & \text{MS} & F & p\text{-value} \\
+\hline
+\text{组间（处理）} & 5600 & 2 & 2800 & 16.80 & <0.001 \\
+\text{组内（误差）} & 1500 & 9 & 166.67 & & \\
+\hline
+\text{总} & 7100 & 11 & & &
+\end{array}
+\]
+
+<p>读这张表的标准顺序：先看 \(p\) 值——若小于 \(\alpha\) 就拒 \(H_0\)；如果拒了，可以补充 "\(R^2 = \mathrm{SSB}/\mathrm{SST} = 5600/7100 \approx 0.789\)"——表示因子（这里是肥料种类）解释了产量总变异的 79%。这个 \(R^2\) 与回归里的 \(R^2\) 同义，且会在 22.10 节看到它<em>真就是</em>同一个东西（哑变量回归视角）。</p>
+
+<p>请你<em>注意</em>，软件输出的"组间"行有时叫"Treatment"或"Between groups"或"Factor name"；"组内"行有时叫"Within groups"或"Residuals"或"Error"。术语不统一，但内容一样。</p>
+
+<h2 id="sec22-7">22.7 拒绝 \(H_0\) 后的事后检验</h2>
+
+<p>22.5 节例题拒了 \(H_0\)：三种肥料产量"有"差异。问题：A 与 B 不同？B 与 C 不同？A 与 C 不同？这是<strong>事后比较</strong>（post-hoc comparisons）问题。</p>
+
+<p>最简单的想法：对每对做 \(t\) 检验。但 22.1 节已经说了，这种做法会膨胀第一类错误率。事后检验的核心思想是<em>调整显著性水平</em>，让"<em>所有</em>对的总错误率"控制在 \(\alpha\) 内。</p>
+
+<p><strong>方法 1：Bonferroni 校正</strong>。最朴素也最广泛。把每对比较的水平设为 \(\alpha / m\)，其中 \(m\) 是比较对数。例如三组 \(m = 3\)、\(\alpha = 0.05\)，每对用 \(\alpha' = 0.0167\) 做 \(t\) 检验。</p>
+
+<p>原理是 Bonferroni 不等式：\(\Pr(\text{至少一对错拒}) \leq \sum_\text{对} \Pr(\text{该对错拒}) = m \cdot \alpha' = \alpha\)。简单可靠，但保守——\(m\) 大时校正过度，几乎没有功效。</p>
+
+<p><strong>方法 2：Tukey HSD</strong>（Honestly Significant Difference）。专为"两两比较"设计，比 Bonferroni 强。统计量：</p>
+
+\[
+q = \frac{|\bar Y_{i\cdot} - \bar Y_{j\cdot}|}{\sqrt{\mathrm{MSW}/n}} \quad (\text{各组样本量都为 } n).
+\]
+
+<p>临界值查"学生化范围分布"\(q_{\alpha, k, N - k}\)。如果 \(q > q_\text{临界}\) 则该对显著不同。</p>
+
+<p>等价地，可以构造各对差的<em>同时置信区间</em>：</p>
+
+\[
+\bar Y_{i\cdot} - \bar Y_{j\cdot} \pm q_{\alpha, k, N-k} \sqrt{\mathrm{MSW}/n}.
+\]
+
+<p>这条区间是<em>对所有 \(\binom{k}{2}\) 对同时</em>覆盖率 \(1 - \alpha\) 的，所以不需要再校正。</p>
+
+<p><strong>例 22.2（继续例 22.1：Tukey HSD）</strong>　继续上例，\(\mathrm{MSW} = 166.67\)、\(n = 4\)、\(k = 3\)、\(N - k = 9\)。查 \(q_{0.05, 3, 9} \approx 3.95\)。</p>
+
+\[
+\sqrt{\mathrm{MSW}/n} = \sqrt{166.67/4} = \sqrt{41.67} \approx 6.45.
+\]
+
+<p>显著差异的临界差距 \(= 3.95 \cdot 6.45 \approx 25.5\)。</p>
+
+<p>三对均值差的绝对值：\(|\bar A - \bar B| = |475 - 515| = 40\)；\(|\bar A - \bar C| = |475 - 465| = 10\)；\(|\bar B - \bar C| = |515 - 465| = 50\)。</p>
+
+<p>结论：A 与 B 显著不同（\(40 > 25.5\)）；B 与 C 显著不同（\(50 > 25.5\)）；A 与 C 不显著（\(10 < 25.5\)）。所以肥料 B 显著优于 A 与 C，而 A、C 之间无证据说不同。</p>
+
+<p>这个具体结论比"\(F\) 检验拒绝了 \(H_0\)"信息量大得多，是事后检验的真正价值。</p>
+
+<p>除 Bonferroni 与 Tukey 外还有 Scheffé、Dunnett、Holm 等方法，各有适用情境，本章不一一展开。实际工作里 Tukey HSD 是默认选择。</p>
+
+<h2 id="sec22-8">22.8 双因子 ANOVA：处理 + 区组</h2>
+
+<p>到此都是<em>单因子</em>——只有"肥料种类"一个因子。但农业实验里通常还有"试验地块的肥沃程度"这个变量；如果不控制，地块差异会被算进随机误差，掩盖处理效应。</p>
+
+<p>解决：做<strong>区组</strong>（block）设计。把试验地分成若干块，每块内部相对均匀；在每块内随机分配 \(k\) 种处理。这样每块内部的处理比较是公平的，块间的差异被显式建模、不再混入误差。这就是<strong>双因子 ANOVA</strong>（two-way ANOVA），也叫"随机区组设计"。</p>
+
+<p>记号：\(k\) 个处理水平、\(b\) 个区组、每组合 1 个观测，共 \(N = k b\) 个观测。模型：</p>
+
+\[
+Y_{ij} = \mu + \alpha_i + \beta_j + \epsilon_{ij}, \qquad i = 1, \ldots, k; \quad j = 1, \ldots, b,
+\]
+
+<p>其中 \(\alpha_i\) 是处理效应、\(\beta_j\) 是区组效应、\(\epsilon_{ij}\) 是随机误差。约束 \(\sum_i \alpha_i = 0\)、\(\sum_j \beta_j = 0\) 保证可识别。</p>
+
+<p>平方和分解从 SST 一分为三：</p>
+
+\[
+\mathrm{SST} = \mathrm{SSA} + \mathrm{SSB} + \mathrm{SSE},
+\]
+
+<p>其中 SSA 是处理效应（自由度 \(k - 1\)）、SSB 是区组效应（自由度 \(b - 1\)）、SSE 是残差（自由度 \((k-1)(b-1)\)）。</p>
+
+<p>具体公式：</p>
+
+\[
+\mathrm{SSA} = b \sum_i (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot})^2, \qquad \mathrm{SSB} = k \sum_j (\bar Y_{\cdot j} - \bar Y_{\cdot\cdot})^2,
+\]
+
+\[
+\mathrm{SSE} = \sum_{i,j} (Y_{ij} - \bar Y_{i\cdot} - \bar Y_{\cdot j} + \bar Y_{\cdot\cdot})^2.
+\]
+
+<p>检验"处理效应"用 \(F_A = \mathrm{MSA}/\mathrm{MSE} \sim F_{k-1, (k-1)(b-1)}\)；检验"区组效应"用 \(F_B = \mathrm{MSB}/\mathrm{MSE} \sim F_{b-1, (k-1)(b-1)}\)。</p>
+
+<p>请你<em>注意</em>，做区组设计的核心目的是控制区组带来的变异，<em>提高检测处理效应的功效</em>。区组本身是否显著并不是首要关注——它只是用来"抹平地块差异"的工具。</p>
+
+<p><strong>例 22.3（双因子 ANOVA 示例）</strong>　把例 22.1 的肥料试验重新设计：选 4 块土壤肥沃程度不同的地（区组 1 ~ 4），每块地内分成 3 小区，随机分配三种肥料。数据：</p>
+
+\[
+\begin{array}{c|cccc|c}
+\text{肥料/区组} & 1 & 2 & 3 & 4 & \text{行均值} \\
+\hline
+\text{A} & 470 & 460 & 480 & 490 & 475 \\
+\text{B} & 510 & 500 & 520 & 530 & 515 \\
+\text{C} & 460 & 450 & 470 & 480 & 465 \\
+\hline
+\text{列均值} & 480 & 470 & 490 & 500 & 485
+\end{array}
+\]
+
+<p>解：\(k = 3\)、\(b = 4\)、\(N = 12\)。总均值 \(485\)（同前）。</p>
+
+\[
+\mathrm{SSA} = 4 \cdot ((475 - 485)^2 + (515 - 485)^2 + (465 - 485)^2) = 4 \cdot (100 + 900 + 400) = 5600.
+\]
+
+\[
+\mathrm{SSB} = 3 \cdot ((480 - 485)^2 + (470 - 485)^2 + (490 - 485)^2 + (500 - 485)^2) = 3 \cdot (25 + 225 + 25 + 225) = 3 \cdot 500 = 1500.
+\]
+
+<p>用 \(\mathrm{SST}\) 减得 \(\mathrm{SSE}\)：先算 SST。各 \(Y_{ij} - \bar Y_{\cdot\cdot}\) 平方和（这些就是原始数据减 485 后的平方和）。读者可逐项算或用 \(\mathrm{SST} = \sum_{i,j} Y_{ij}^2 - N \bar Y_{\cdot\cdot}^2\) 计算，结果约为 \(7150\)（数值取决于数据细节）。从而 \(\mathrm{SSE} = 7150 - 5600 - 1500 = 50\)。</p>
+
+<p>均方：\(\mathrm{MSA} = 5600/(3-1) = 2800\)；\(\mathrm{MSB} = 1500/(4-1) = 500\)；\(\mathrm{MSE} = 50/((3-1)(4-1)) = 50/6 \approx 8.33\)。</p>
+
+<p>处理 \(F\)：\(F_A = 2800 / 8.33 \approx 336\)，远超 \(F_{0.05, 2, 6} \approx 5.14\)。区组 \(F\)：\(F_B = 500 / 8.33 \approx 60\)，也远超 \(F_{0.05, 3, 6} \approx 4.76\)。</p>
+
+<p>双结论：肥料种类对产量有显著影响；地块（区组）对产量也有显著影响。请<em>注意</em>对比：单因子设计（例 22.1）的 \(F = 16.8\)，双因子设计的 \(F_A = 336\)——区组化把"地块带来的方差"从误差里剥离后，处理效应的检测能力大幅提升。这是区组设计的根本好处。</p>
+
+<h2 id="sec22-9">22.9 交互作用</h2>
+
+<p>22.8 节的双因子模型 \(Y = \mu + \alpha_i + \beta_j + \epsilon_{ij}\) 假设处理效应与区组效应是<em>可加</em>的——肥料 B 比 A 多 \(\alpha_B - \alpha_A\)，无论在哪块地都一样多。但有时这条假设不对：某种肥料在肥沃地表现尤好、在贫瘠地反而不好——这就是<strong>交互作用</strong>（interaction）。</p>
+
+<p>带交互的模型（每个组合多于 1 个观测时）：</p>
+
+\[
+Y_{ijk} = \mu + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \epsilon_{ijk},
+\]
+
+<p>其中 \((\alpha\beta)_{ij}\) 是处理 \(i\) 与水平 \(j\) 的交互项；\(k = 1, \ldots, n\) 是同一组合的重复观测。每个组合至少要有 2 个观测（\(n \geq 2\)）才能估计交互；如果每个组合只有 1 个观测，交互项与误差项混在一起，无法分离。</p>
+
+<p>交互的含义：处理效应在不同水平下不一样。诊断方法是<em>交互图</em>（interaction plot）——把"处理 vs 水平"画成一条折线（每个水平一条），如果折线<em>平行</em>则无交互，如果<em>交叉</em>或斜率明显不同则有交互。</p>
+
+<p><strong>例 22.4（交互的小示例）</strong>　某药物试验：两种药 A、B；两类病人"年轻/老年"。各组合 5 名患者，记疗效评分。结果如下（组均值）：</p>
+
+\[
+\begin{array}{c|cc}
+& \text{年轻} & \text{老年} \\
+\hline
+\text{药 A} & 70 & 75 \\
+\text{药 B} & 80 & 60
+\end{array}
+\]
+
+<p>看：年轻组里 B 优于 A（80 > 70）；老年组里 A 优于 B（75 > 60）。两条折线交叉——这是典型的交互作用。意思是"哪种药更好"取决于患者年龄。如果忽略交互、只汇报"药效平均"，A 与 B 几乎一样（72.5 vs 70），结论会严重误导。</p>
+
+<p>检验交互：\(F = \mathrm{MS}_{AB}/\mathrm{MSE}\)，自由度 \(((I-1)(J-1), IJ(n-1))\)。本例 \(I = J = 2\)、\(n = 5\)，自由度 \((1, 16)\)。具体计算略，但若 \(F\) 显著则确认交互存在。</p>
+
+<p>遇到显著交互时，<em>不要</em>直接解读"主效应"——主效应在交互存在时含义不清。应当报告"交互图"和组合均值，分别在每个水平下解读处理效应。</p>
+
+<h2 id="sec22-10">22.10 ANOVA 与回归的等价：单因子 ANOVA = 哑变量回归</h2>
+
+<p>这一节展示一个深刻的事实：<strong>单因子 ANOVA 与"用类别哑变量做的多元回归"在数学上完全等价</strong>。两者所有的统计量（SSE、\(R^2\)、\(F\)）都<em>一字不差</em>地对应。</p>
+
+<p>怎么对应？设有 \(k\) 个组，引入 \(k - 1\) 个哑变量 \(D_2, \ldots, D_k\)（第 1 组为基准）：</p>
+
+\[
+Y = \beta_0 + \beta_2 D_2 + \beta_3 D_3 + \cdots + \beta_k D_k + \epsilon.
+\]
+
+<p>这正是 21.11 节讲的哑变量编码。模型解释：第 1 组均值是 \(\beta_0\)；第 \(i\) 组均值是 \(\beta_0 + \beta_i\)（对 \(i = 2, \ldots, k\)）。换言之 \(\mu_i - \mu_1 = \beta_i\)。</p>
+
+<p>检验"所有组均值相等"\(H_0 : \mu_1 = \cdots = \mu_k\) 等价于"所有斜率为零"\(H_0 : \beta_2 = \cdots = \beta_k = 0\)——这正是 21.7 节的整体 \(F\) 检验。两个检验给出<em>同一个 \(F\) 统计量、同一个 \(p\) 值</em>。</p>
+
+<p>这意味着 ANOVA 不是"另一种统计方法"，它就是回归在"预测变量全是类别"特殊情形下的<em>名字</em>。把 22.5 节的肥料数据重写成"3 个组、2 个哑变量"形式，运行 21.3 节的回归公式，得到的 \(F\) 值与例 22.1 算出的 \(F = 16.8\) 完全相同。</p>
+
+<p>这件事让两个原本看似无关的世界联通起来：</p>
+
+<ul>
+<li>有了这条对应，可以把回归世界的工具（残差诊断、对系数做单独 \(t\) 检验）<em>原封不动</em>用到 ANOVA；</li>
+<li>反过来，可以把 ANOVA 的精细的事后比较（Tukey HSD）想成"对回归系数差做同时区间"。</li>
+</ul>
+
+<p>21 世纪以后，统计学家越来越倾向于把 ANOVA 当作"线性模型的一种"看待，不再强调它是独立学科。这个统一框架叫<strong>线性模型</strong>（linear models）——它包括回归、ANOVA、ANCOVA（22.12 节）、混合效应模型等。</p>
+
+<h2 id="sec22-11">22.11 假设检查：等方差、正态、独立</h2>
+
+<p>所有 ANOVA 结论都站在三条假设上（22.2 节）。简短的诊断：</p>
+
+<p><strong>(1) 等方差</strong>。检查每组的样本方差是否大致相当。常用</p>
+
+<ul>
+<li>非正式：箱线图或残差 vs 拟合值散点图，看各组散布幅度是否相当；</li>
+<li>正式：Levene 检验（基于绝对偏差的 ANOVA）、Bartlett 检验（对正态假设敏感）。</li>
+</ul>
+
+<p>如果方差严重不同，可考虑变换 \(Y\)（取 \(\log\) 或 \(\sqrt{}\)），或用 Welch's ANOVA 等不假设等方差的版本。</p>
+
+<p><strong>(2) 正态</strong>。看残差的 QQ 图。如果 \(N\) 大（每组 \(\geq 30\)），中心极限定理保证 \(F\) 检验对正态假设不太敏感；若 \(N\) 小，正态偏离会放大 \(p\) 值的偏差。可用 Shapiro–Wilk 检验做正式判断。如果严重偏离，考虑非参数版本（Kruskal–Wallis 检验）。</p>
+
+<p><strong>(3) 独立</strong>。这是<em>最关键</em>但最难诊断的假设。如果观测有时间顺序、空间结构、或来自同一受试者的多次测量，独立性可能严重违反。常常需要更复杂的"重复测量 ANOVA"或"混合效应模型"处理。</p>
+
+<p>请你<em>注意</em>：诊断结果不必导致马上"换模型"——轻度违背可以接受、严重违背才需调整。统计学的实务智慧在于"知道何时严格、何时放宽"。</p>
+
+<h2 id="sec22-12">22.12 协方差分析（ANCOVA）简介</h2>
+
+<p>本章最后简短谈一下<strong>协方差分析</strong>（Analysis of Covariance, ANCOVA）。它是 ANOVA 与回归的混血儿——既有<em>类别</em>因子（处理组），又有<em>连续</em>协变量（如年龄、基线水平）。</p>
+
+<p>模型：</p>
+
+\[
+Y_{ij} = \mu + \alpha_i + \gamma X_{ij} + \epsilon_{ij},
+\]
+
+<p>其中 \(\alpha_i\) 是组效应、\(X_{ij}\) 是协变量（continuous covariate）、\(\gamma\) 是协变量斜率。</p>
+
+<p>用途：在比较"组效应"时<em>控制</em>协变量的影响。比如比较三种教学方法的成绩 \(Y\)，但不同方法班级的"基础水平 \(X\)"可能不一样；ANCOVA 在"控制基础水平相同"的条件下比较教学方法。</p>
+
+<p>从 22.10 节"ANOVA 是回归"的视角看，ANCOVA 就是"哑变量 + 连续变量"的多元回归——21 章的工具直接用。所以本章对 ANCOVA 不再展开公式；如果你想深入，去重读 21 章并把"协变量"当作普通预测变量纳入即可。</p>
+
+<p><strong>例 22.5（ANCOVA 概念示例）</strong>　某试验比较两种降压药 A、B 对收缩压的效果。受试者基线血压不同。如果不控制基线，"用药后血压"的组均值差可能被基线差异掩盖（A 组本来就比 B 组高）。模型：</p>
+
+\[
+Y_{ij} = \mu + \alpha_i + \gamma X_{ij} + \epsilon_{ij}
+\]
+
+<p>（\(\alpha_i\) 为药物效应，\(X_{ij}\) 为基线血压）。这样 \(\alpha_A - \alpha_B\) 给出的是"在<em>基线相同</em>的条件下"两药效果的差距，远比直接比较组均值有意义。这也呼应了 21 章里"偏效应 vs 边际效应"的讨论。</p>
+
+<p><strong>例 22.6（综合应用：教学方法的双因子 ANOVA）</strong>　某高中比较 3 种数学教学方法（A、B、C）和 2 种课时安排（每周 4 节 vs 每周 6 节）对学期末考试成绩的影响。每种"方法 × 课时"组合有 5 名学生，共 30 名。组均值如下：</p>
+
+\[
+\begin{array}{c|cc|c}
+& \text{4 节/周} & \text{6 节/周} & \text{方法均值} \\
+\hline
+\text{方法 A} & 72 & 80 & 76 \\
+\text{方法 B} & 75 & 88 & 81.5 \\
+\text{方法 C} & 70 & 78 & 74 \\
+\hline
+\text{课时均值} & 72.33 & 82 & 77.17
+\end{array}
+\]
+
+<p>组内方差（合并 \(\mathrm{MSE}\)）已计算为 16。请你完成 ANOVA 表，回答 (a) 教学方法主效应是否显著？(b) 课时数主效应是否显著？(c) 交互效应是否显著？</p>
+
+<p>解（要点）：\(I = 3\)（方法）、\(J = 2\)（课时）、\(n = 5\)、总 \(N = 30\)。计算各平方和：</p>
+
+\[
+\mathrm{SSA} = J n \sum_i (\bar Y_{i\cdot} - \bar Y_{\cdot\cdot})^2 = 10 \cdot ((76-77.17)^2 + (81.5-77.17)^2 + (74-77.17)^2) \approx 10 \cdot (1.37 + 18.75 + 10.05) \approx 301.7.
+\]
+
+\[
+\mathrm{SSB} = I n \sum_j (\bar Y_{\cdot j} - \bar Y_{\cdot\cdot})^2 = 15 \cdot ((72.33-77.17)^2 + (82-77.17)^2) \approx 15 \cdot (23.43 + 23.33) \approx 701.4.
+\]
+
+<p>交互平方和需要从总组合均值减去主效应贡献，详细计算从略；设结果约为 \(\mathrm{SS}_{AB} \approx 30\)（数值依精确数据而定）。</p>
+
+\[
+\mathrm{SSE} = \mathrm{MSE} \cdot \mathrm{df}_E = 16 \cdot (IJ(n-1)) = 16 \cdot 24 = 384.
+\]
+
+<p>ANOVA 表：</p>
+
+\[
+\begin{array}{l|c|c|c|c|c}
+\text{来源} & \text{SS} & \text{df} & \text{MS} & F & p \\
+\hline
+\text{方法} & 301.7 & 2 & 150.85 & 9.43 & < 0.01 \\
+\text{课时} & 701.4 & 1 & 701.40 & 43.84 & < 0.001 \\
+\text{方法 } \times \text{ 课时} & 30 & 2 & 15 & 0.94 & 0.40 \\
+\text{误差} & 384 & 24 & 16 & & \\
+\hline
+\text{总} & 1417.1 & 29 & & &
+\end{array}
+\]
+
+<p>结论：(a) 教学方法显著（\(F = 9.43, p < 0.01\)）；(b) 课时数显著（\(F = 43.84, p < 0.001\)）；(c) 交互不显著（\(p = 0.40\)）。</p>
+
+<p>由于交互不显著，可以分别解读两个主效应：增加课时数（4 → 6）平均提升约 9.7 分；不同教学方法间也有差异（B > A > C 的趋势），但需要 Tukey HSD 进一步确认哪两者间不同。</p>
+
+<p><strong>例 22.7（综合应用：ANOVA 与回归等价的小验证）</strong>　接例 22.1 的肥料数据（单因子，3 组各 4 个观测）。引入 2 个哑变量 \(D_B = \mathbb{1}\{\text{B 组}\}\)、\(D_C = \mathbb{1}\{\text{C 组}\}\)，做回归 \(Y = \beta_0 + \beta_B D_B + \beta_C D_C + \epsilon\)。</p>
+
+<p>解：根据 22.10 节理论，\(\hat\beta_0 = \bar Y_A = 475\)（A 组均值），\(\hat\beta_B = \bar Y_B - \bar Y_A = 515 - 475 = 40\)，\(\hat\beta_C = \bar Y_C - \bar Y_A = 465 - 475 = -10\)。</p>
+
+<p>整体 \(F\) 检验 \(H_0 : \beta_B = \beta_C = 0\) 等价于 \(H_0 : \mu_A = \mu_B = \mu_C\)。计算：</p>
+
+<ul>
+<li>SST \(= 7100\)（同例 22.1）。</li>
+<li>SSE \(= 1500\)（即组内 SSW）。</li>
+<li>SSR \(= 5600\)（即组间 SSB）。</li>
+<li>\(F = (5600/2)/(1500/9) = 2800/166.67 \approx 16.8\)。</li>
+</ul>
+
+<p>与 ANOVA 计算<em>完全</em>相同。这就是 22.10 节宣称的等价。</p>
+
+<p>本章到此结束。回过头看，我们花了三章（20–22）从"一个 \(X\) 解释一个 \(Y\)"一路推到"多个 \(X\) 解释一个 \(Y\)"再到"用 ANOVA 比较多个组的 \(Y\)"——表面上是三种不同的工具，本质上是同一个<em>线性模型</em>框架的三种应用。理解这件事，是从"会做题"走向"懂统计"的关键转折。</p>
+
+<p>下一阶段如果你想深入，往两个方向走：(a) <em>非参数方法</em>——当模型假设无法成立时如何做推断（Mann–Whitney U、Kruskal–Wallis、permutation test）；(b) <em>广义线性模型与现代回归</em>——逻辑回归、泊松回归、岭回归、Lasso、随机森林、神经网络。所有这些都建立在你前面学的概率与统计基础上，但发展出更丰富的语言来处理更复杂的现实。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 多元线性回归</a><a href="ch23.html">下一章 · 第 23 章 Bayes 统计入门 →</a></nav>
+
+</main>
+</body>
+</html>

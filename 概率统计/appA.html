@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 严格性：测度论速通 — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch25.html">← 上一章 · 第 25 章 信息论入门</a><a href="appB.html">下一章 · 附录 B 常用分布速查 →</a></nav>
+<h1 id="appA">附录 A 严格性：测度论速通</h1>
+
+<p>本书正文的概率论是<em>非测度论</em>（non-measure-theoretic）的——我们一直在直觉的水平讨论概率：把样本空间当成一个集合，把事件当成它的"合理"子集，离散情形用求和、连续情形用积分。这种"工程式"的概率论已经够你做绝大部分应用——做统计、做机器学习、做物理、做金融——的工作。</p>
+
+<p>但<em>严格</em>的概率论需要更深一层的语言：<strong>测度论</strong>（measure theory）。它是 1933 年由苏联数学家柯尔莫哥洛夫（Andrey Kolmogorov）正式引入概率论的——他的小书《<em>Foundations of the Theory of Probability</em>》在百页内把概率公理化为测度论的特例，自此概率论才被数学界完全接纳为"严肃数学"的成员。</p>
+
+<p>本附录不是测度论的完整教程（那需要单独一学期的课），而是一个"导览"——让你认识它的几个核心概念（\(\sigma\)-代数、测度、可测函数、Lebesgue 积分），知道它们如何把"事件"和"概率"严格化、为什么离散和连续可以用同一个 \(\mathbb{E}[X] = \int X \, dP\) 公式统一处理、以及单调收敛和控制收敛这两个收敛定理的力量。读完之后，将来若你接触到正经的"高等概率论"或"随机过程"教材，门槛会低很多。</p>
+
+<h2 id="secA-1">A.1 \(\sigma\)-代数与可测空间</h2>
+
+<p>第 1 章里我们漫不经心地说"事件就是样本空间 \(\Omega\) 的子集"。可是<em>所有</em>的子集都能算事件吗？对有限或可数的 \(\Omega\) 没问题——任意子集都行。但对不可数的 \(\Omega\)（比如 \(\Omega = [0, 1]\)），允许"任意子集"会导致灾难——著名的<em>Banach-Tarski 悖论</em>表明，如果允许任意子集都有"体积"（测度），就能把一个球拆成几片再重组成两个同样大的球。要避免这种荒谬，必须限制"什么样的子集才允许有概率"。</p>
+
+<p>这就是 \(\sigma\)-代数的来历。</p>
+
+<p><strong>定义</strong>：设 \(\Omega\) 是个集合。\(\Omega\) 的子集族 \(\mathcal{F}\) 称为<strong>\(\sigma\)-代数</strong>（\(\sigma\)-algebra），若它满足三条：</p>
+
+<ul>
+<li>(1) \(\Omega \in \mathcal{F}\)。</li>
+<li>(2) 若 \(A \in \mathcal{F}\)，则 \(A^c = \Omega \setminus A \in \mathcal{F}\)（对补集封闭）。</li>
+<li>(3) 若 \(A_1, A_2, \ldots \in \mathcal{F}\) 是<em>可数</em>多个事件，则 \(\bigcup_{n=1}^\infty A_n \in \mathcal{F}\)（对可数并封闭）。</li>
+</ul>
+
+<p>由 (1)(2) 推出 \(\emptyset \in \mathcal{F}\)；由 (2)(3) 推出对可数交也封闭。"\(\sigma\)" 这个前缀就是表示"可数操作"——比"代数"（仅要求<em>有限</em>并的封闭性）多了无穷的灵活。</p>
+
+<p>满足上述条件的\((\Omega, \mathcal{F})\) 叫<strong>可测空间</strong>（measurable space），\(\mathcal{F}\) 中的成员叫<strong>可测集</strong>。在概率论的语言里，可测集就是"允许有概率"的事件——也就是真正的"事件"。</p>
+
+<p>请你<em>注意</em>"可数操作封闭"这条至关重要——它让我们能从"基本事件"出发用可数次并、交、补构造所有"复杂事件"，这正是分析（求极限、积分）所需要的。</p>
+
+<p><strong>例 A.1（最简单的 \(\sigma\)-代数）</strong>　对任意 \(\Omega\)，\(\{\emptyset, \Omega\}\) 是 \(\sigma\)-代数（"平凡 \(\sigma\)-代数"）；\(\Omega\) 的所有子集 \(2^\Omega\) 也是 \(\sigma\)-代数（"幂集 \(\sigma\)-代数"）。这两个是任意 \(\sigma\)-代数的两端。</p>
+
+<p><strong>例 A.2（Borel \(\sigma\)-代数）</strong>　对实直线 \(\mathbb{R}\)，最重要的 \(\sigma\)-代数是<strong>Borel \(\sigma\)-代数</strong> \(\mathcal{B}(\mathbb{R})\)：包含所有开区间 \((a, b)\) 的<em>最小</em> \(\sigma\)-代数。它包含所有开集、闭集、可数交、可数并构造出来的"任何你能写出来的"集合——但它<em>不</em>包含某些极其病态的"不可测集"（比如 Vitali 集）。在 \(\mathbb{R}\) 上做概率论，几乎都用 Borel \(\sigma\)-代数。</p>
+
+<h2 id="secA-2">A.2 测度的定义</h2>
+
+<p>有了可测空间 \((\Omega, \mathcal{F})\)，下一步是定义"如何测量"——给每个可测集赋一个非负实数（可以是 \(\infty\)）作为它的"大小"。这就是<strong>测度</strong>。</p>
+
+<p><strong>定义</strong>：可测空间 \((\Omega, \mathcal{F})\) 上的<strong>测度</strong>是个映射 \(\mu : \mathcal{F} \to [0, \infty]\)，满足两条：</p>
+
+<ul>
+<li>(1) \(\mu(\emptyset) = 0\)。</li>
+<li>(2) <strong>可数可加性</strong>：对 \(\mathcal{F}\) 中两两不相交的可数集列 \(A_1, A_2, \ldots\)，</li>
+</ul>
+
+\[
+\mu\left(\bigcup_{n=1}^\infty A_n\right) = \sum_{n=1}^\infty \mu(A_n).
+\]
+
+<p>条件 (2) 是测度论的灵魂——它保证"分散开来量"等于"加在一起量"，这是把"长度、面积、体积、概率"等朴素概念严格化的关键。</p>
+
+<p><strong>例 A.3（Lebesgue 测度）</strong>　\(\mathbb{R}\) 上的<strong>Lebesgue 测度</strong> \(\lambda\) 把每个区间 \((a, b)\) 映为它的"长度" \(b - a\)；它是唯一一个<em>平移不变</em>的、把 \([0, 1]\) 映为 1 的 Borel 测度。它是"长度"概念的严格化。在 \(\mathbb{R}^n\) 上的 Lebesgue 测度同样是"体积"的严格化。</p>
+
+<p><strong>例 A.4（计数测度）</strong>　对任意可数集 \(\Omega\)（如 \(\mathbb{N}\)），<strong>计数测度</strong> \(\mu(A) = |A|\)（集合的元素个数）是一个测度。它把每个单点集 \(\{n\}\) 都映为 1。</p>
+
+<p><strong>例 A.5（Dirac 测度）</strong>　给定 \(\omega_0 \in \Omega\)，<strong>Dirac 测度</strong> \(\delta_{\omega_0}\) 定义为 \(\delta_{\omega_0}(A) = 1\) 若 \(\omega_0 \in A\)，否则 0。它是把"全部质量集中在一点 \(\omega_0\)"的测度。</p>
+
+<h2 id="secA-3">A.3 概率测度作为测度的特例</h2>
+
+<p>如果一个测度 \(\mu\) 还满足 \(\mu(\Omega) = 1\)，就把它叫<strong>概率测度</strong>，常记为 \(P\)。三元组 \((\Omega, \mathcal{F}, P)\) 叫<strong>概率空间</strong>（probability space）。</p>
+
+<p>柯尔莫哥洛夫公理把"概率"完全用这套语言定义：</p>
+
+<ul>
+<li>样本空间 \(\Omega\)：所有可能结局。</li>
+<li>事件 \(\sigma\)-代数 \(\mathcal{F}\)：哪些子集允许有概率。</li>
+<li>概率测度 \(P\)：每个事件的概率。</li>
+</ul>
+
+<p>第 1 章我们写下的"概率公理"——\(0 \leq P(A) \leq 1\)、\(P(\Omega) = 1\)、可加性——其实就是"\(P\) 是 \(\Omega\) 上的概率测度"。所以本书前 24 章你做的所有事情，都是在某个隐性的概率空间上做的——只是我们没把 \(\sigma\)-代数和测度的语言摆出来。</p>
+
+<p>把概率论看作测度论的特例有几条立刻的好处：</p>
+
+<ul>
+<li>极限运算（如 \(P(\lim_n A_n) = \lim_n P(A_n)\)）可以严格证明（由可数可加性导出）。</li>
+<li>"无穷次抛硬币" 这种无限维概率空间的存在性可以用 Kolmogorov 的延拓定理建立——这是研究"随机过程"（Brownian 运动等）的根基。</li>
+<li>条件期望可以用 Radon-Nikodym 定理给出严格定义——这在金融数学、滤波理论里至关重要。</li>
+</ul>
+
+<h2 id="secA-4">A.4 Lebesgue 积分简介</h2>
+
+<p>第 7 章我们用 Riemann 积分定义连续随机变量的期望：\(\mathbb{E}[X] = \int_{-\infty}^\infty x f(x) \, dx\)。Riemann 积分是把"\(x\) 轴" 切成小段、纵向画矩形求和——它对绝大部分"长得规矩"的函数都好用，但对极不规则的函数（如 Dirichlet 函数 \(\mathbf{1}_{\mathbb{Q}}\)）就失败了。</p>
+
+<p>测度论提供了一个更强的积分——<strong>Lebesgue 积分</strong>。基本思路反过来：把"\(y\) 轴"（值域）切成小段，对每个小段算"哪些 \(x\) 处函数值落在这小段中"、用测度量这片 \(x\) 的"大小"，再加总。</p>
+
+<p>具体步骤（粗略）：</p>
+
+<ol>
+<li>对<em>简单函数</em>（取有限个值的可测函数）\(\varphi = \sum_i a_i \mathbf{1}_{A_i}\)，定义</li>
+</ol>
+
+\[
+\int \varphi \, d\mu = \sum_i a_i \mu(A_i).
+\]
+
+<ol start="2">
+<li>对非负可测函数 \(f\)，定义 \(\int f \, d\mu = \sup\{\int \varphi \, d\mu : 0 \leq \varphi \leq f, \varphi \text{ 简单}\}\)。</li>
+<li>对一般可测函数 \(f\)，分成正负部 \(f = f^+ - f^-\)，分别积分再相减。</li>
+</ol>
+
+<p>这样定义出来的 Lebesgue 积分有几个 Riemann 积分没有的优势：</p>
+
+<ul>
+<li>对许多 Riemann 不可积的函数仍然可积（如 Dirichlet 函数 \(\int_0^1 \mathbf{1}_{\mathbb{Q}}(x) \, d\lambda = 0\)）。</li>
+<li>跟极限的交换性质强得多（单调收敛、控制收敛——下一节）。</li>
+<li>对 Riemann 可积函数，两个积分相等——所以 Lebesgue 积分是 Riemann 积分的真正<em>推广</em>。</li>
+</ul>
+
+<p>对一般的测度空间（不只是 \(\mathbb{R}\)），Lebesgue 积分提供了"对任何测度都能积分" 的统一框架——这就是下一节"统一处理离散与连续"的基石。</p>
+
+<h2 id="secA-5">A.5 \(\mathbb{E}[X] = \int X \, dP\) 的统一定义</h2>
+
+<p>本书的尴尬之一：第 5 章里离散随机变量的期望是 \(\mathbb{E}[X] = \sum_x x P(X = x)\)（求和），第 7 章里连续随机变量的期望是 \(\mathbb{E}[X] = \int x f(x) \, dx\)（积分）——两套定义形式不同、得分情况讨论。还有一些"混合型" 随机变量（既有离散点也有连续部分），两套都不直接适用。</p>
+
+<p>测度论一举把它们统一：在概率空间 \((\Omega, \mathcal{F}, P)\) 上，把随机变量 \(X\) 看成可测函数 \(X : \Omega \to \mathbb{R}\)，定义</p>
+
+\[
+\boxed{\mathbb{E}[X] = \int_\Omega X \, dP.}
+\]
+
+<p>这是个 Lebesgue 积分——对概率测度 \(P\) 而言。它适用于所有可测的 \(X\)（只要积分存在）。</p>
+
+<p>验证它涵盖前两种情形：</p>
+
+<ul>
+<li>若 \(X\) 离散取 \(x_1, x_2, \ldots\)，对应概率 \(p_1, p_2, \ldots\)：\(\int X \, dP = \sum_i x_i p_i\)，跟离散情形吻合。</li>
+<li>若 \(X\) 有密度 \(f\) 关于 Lebesgue 测度：\(\int X \, dP = \int x f(x) \, d\lambda\)，跟连续情形吻合。</li>
+<li>若 \(X\) 是混合型（部分离散点 + 部分连续）：测度论自然处理，不需要分情况。</li>
+</ul>
+
+<p>这种"统一" 不只是美学——它让数学论证（如证明大数定律、中心极限定理）可以一次性写好，不需对离散/连续分别证。这是测度论给概率论带来的最大方便之一。</p>
+
+<h2 id="secA-6">A.6 收敛定理：单调收敛、控制收敛</h2>
+
+<p>测度论里两条最常用的"积分与极限交换"定理。它们是 Lebesgue 积分相比 Riemann 积分的核心优势。</p>
+
+<p><strong>单调收敛定理</strong>（Monotone Convergence Theorem, MCT）：设 \(0 \leq f_1 \leq f_2 \leq \cdots\) 是非负可测函数列，逐点单调递增到 \(f\)。则</p>
+
+\[
+\int f \, d\mu = \lim_{n \to \infty} \int f_n \, d\mu.
+\]
+
+<p>用人话讲：对单调递增的非负函数列，"积分与极限可换"。</p>
+
+<p><strong>控制收敛定理</strong>（Dominated Convergence Theorem, DCT）：设 \(f_n \to f\) 逐点收敛（不必单调），且存在<em>可积</em>的 \(g \geq 0\)（即 \(\int g \, d\mu < \infty\)）使 \(|f_n| \leq g\) 对所有 \(n\) 成立。则</p>
+
+\[
+\int f \, d\mu = \lim_{n \to \infty} \int f_n \, d\mu.
+\]
+
+<p>关键是"控制函数 \(g\)" 的存在——它阻止了 \(f_n\) "跑到无穷"。</p>
+
+<p>这两个定理是<em>无数</em>极限论证的工具。例如：证明"\(\mathbb{E}[X_n] \to \mathbb{E}[X]\) 当 \(X_n \to X\)" 通常通过 DCT；证明级数与积分可以交换 \(\int \sum_n f_n = \sum_n \int f_n\)（对非负函数）通过 MCT。</p>
+
+<p>跟 Riemann 积分的对比：Riemann 积分要"积分与极限可换"需要"一致收敛"——这是个非常强的条件，许多自然的极限（如逐点收敛）满足不了。Lebesgue 积分的 DCT 只需"逐点收敛 + 一致控制"，弱得多——这就是为什么测度论是分析的"现代标配"。</p>
+
+<h2 id="secA-7">A.7 用测度论统一处理 RV 与分布</h2>
+
+<p>在测度论框架下，"随机变量 \(X\) 的分布" 不再是模糊的概念——它是一个具体的<em>测度</em>。</p>
+
+<p>设 \((\Omega, \mathcal{F}, P)\) 是概率空间，\(X : \Omega \to \mathbb{R}\) 是可测函数。\(X\) 在 \(\mathbb{R}\) 上"诱导" 出一个概率测度 \(\mu_X\)，叫做 \(X\) 的<strong>分布</strong>（或<em>像测度</em>）：</p>
+
+\[
+\mu_X(B) = P(X^{-1}(B)) = P(\{\omega : X(\omega) \in B\}), \quad B \in \mathcal{B}(\mathbb{R}).
+\]
+
+<p>这就是"\(X\) 落在集合 \(B\) 中的概率"。它是 \((\mathbb{R}, \mathcal{B}(\mathbb{R}))\) 上的概率测度。</p>
+
+<p>用 \(\mu_X\) 我们可以写</p>
+
+\[
+\mathbb{E}[g(X)] = \int_\Omega g(X(\omega)) \, dP(\omega) = \int_\mathbb{R} g(x) \, d\mu_X(x).
+\]
+
+<p>右边的"积分关于诱导测度" 是把"在 \(\Omega\) 上的积分"翻译成了"在 \(\mathbb{R}\) 上的积分"——本质上是变量替换。</p>
+
+<p>分布 \(\mu_X\) 的两种特殊情形：</p>
+
+<ul>
+<li>若 \(\mu_X = \sum_i p_i \delta_{x_i}\)（离散，集中在可数点上）：\(X\) 是<em>离散随机变量</em>。</li>
+<li>若 \(\mu_X\) 关于 Lebesgue 测度<em>绝对连续</em>（即存在 \(f \geq 0\) 使 \(\mu_X(B) = \int_B f \, d\lambda\)）：\(X\) 是<em>连续随机变量</em>，\(f\) 是它的密度（这就是 PDF 的严格定义）。</li>
+</ul>
+
+<p>大多数自然的随机变量都属于这两类之一；但理论上还有"奇异连续"分布（如 Cantor 分布），既不是离散也没有 PDF——这些"病态"分布在工程实践中几乎不出现，但理论上必须容许。</p>
+
+<p>测度论还给了我们：</p>
+
+<ul>
+<li><strong>Radon-Nikodym 定理</strong>：在适当条件下，分布 \(\mu_X\) 可以表为关于另一测度的密度——这是"概率密度"的最一般定义，也是"条件期望" 的严格定义基础。</li>
+<li><strong>Fubini 定理</strong>：在乘积空间上，"二重积分等于二次积分"——为联合分布、独立性、乘积测度提供严格化。</li>
+<li><strong>Kolmogorov 延拓定理</strong>：从有限维分布构造无限维过程——是研究 Brownian 运动、Markov 过程的基石。</li>
+</ul>
+
+<p>这些定理我们就不细讲了——它们是高阶概率论课程的内容。本附录的目标只是让你看到："严格的概率论 = 测度论 + 概率诠释" 这一基本事实，不再被"为什么离散和连续要分开处理"困扰。</p>
+
+<p>本附录到此结束。如果你将来要深入概率论或随机过程，下面几本书值得一读：</p>
+
+<ul>
+<li>Patrick Billingsley, <em>Probability and Measure</em>——经典严格教材。</li>
+<li>Rick Durrett, <em>Probability: Theory and Examples</em>——平衡严格性与直觉，研究生标准。</li>
+<li>Olav Kallenberg, <em>Foundations of Modern Probability</em>——百科全书式的高阶参考。</li>
+</ul>
+
+<p>读完本书的正文加这个附录，你已经具备读懂这些书前几章的全部背景。祝深入愉快。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch25.html">← 上一章 · 第 25 章 信息论入门</a><a href="appB.html">下一章 · 附录 B 常用分布速查 →</a></nav>
+
+</main>
+</body>
+</html>

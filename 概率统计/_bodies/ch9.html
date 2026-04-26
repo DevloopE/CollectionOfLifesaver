@@ -1,0 +1,626 @@
+<h1 id="ch9">第 9 章 协方差、相关与多元正态</h1>
+
+<p>第 8 章我们学会了把两个或更多随机变量"绑在一起"看——画联合分布、求边缘、做条件、判断独立。可是把"\(X\) 与 \(Y\) 之间的关系"画成一张二维联合 PDF 图固然完整，却<em>过于复杂</em>：实际工作中我们经常想用<em>一个数</em>把"\(X\) 和 \(Y\) 关系有多紧"概括下来。</p>
+
+<p>这个数是什么？最自然的候选——也是统计学里最被反复使用的——叫做<strong>协方差</strong> \(\mathrm{Cov}(X, Y)\)。它捕捉了"\(X\) 和 \(Y\) 是否同向变化"。归一化以后变成<strong>相关系数</strong> \(\rho\)，落在区间 \([-1, 1]\) 内，更直接地度量"线性关系强度"。</p>
+
+<p>本章要做的事：</p>
+
+<ul>
+<li>定义协方差，列举它的代数性质（双线性、对称、与方差的关系）。</li>
+<li>给出协方差的几何/统计直觉：测量"共同变化"。</li>
+<li>明确"<em>独立 \(\Rightarrow\) 协方差为零</em>"，但<em>反向不成立</em>（经典反例 \(Y = X^2\)）——这件事必须烙在你脑子里。</li>
+<li>定义相关系数 \(\rho\)，证明 \(|\rho| \leq 1\)（用 Cauchy-Schwarz），并理解 \(|\rho| = 1\) 的几何含义（线性关系）。</li>
+<li>把 \(n\) 个变量的协方差信息打包成<strong>协方差矩阵</strong> \(\Sigma\)（对称正半定），看它和方差和、二次型的联系。</li>
+<li>压轴：<strong>多元正态分布</strong>。它的密度长什么样？等密度面是椭球？为什么这是<em>独立 \(\iff\) 不相关</em> 的少数情形之一？条件分布、边缘分布的简洁公式。</li>
+<li>简介协方差矩阵在 PCA（主成分分析）里的角色——这是连接到线性代数<em>谱定理</em>的桥。</li>
+</ul>
+
+<p>这一章的工具，统计学三个最常见模块（线性回归、PCA、卡尔曼滤波）全都建立在它的基础上。请慢慢消化。</p>
+
+<h2 id="sec9-1">9.1 协方差的定义</h2>
+
+<p>设 \(X, Y\) 是两个随机变量（联合分布已知，期望和方差都存在）。先记住两件事：</p>
+
+<ul>
+<li>\(\mathrm{Var}(X) = \mathbb{E}[(X - \mathbb{E} X)^2] = \mathbb{E}[X^2] - (\mathbb{E} X)^2\)。这是单变量的方差，度量 \(X\) 围绕自己均值波动的"幅度"。</li>
+<li>方差是<em>正定</em>的（\(\geq 0\)，且为 0 当且仅当 \(X\) 是常数）。</li>
+</ul>
+
+<p>把这条公式从"一个变量"推广到"两个变量"的最自然方式：</p>
+
+\[
+\boxed{\mathrm{Cov}(X, Y) = \mathbb{E}\big[(X - \mathbb{E} X)(Y - \mathbb{E} Y)\big].}
+\]
+
+<p>这就是<strong>协方差</strong>。展开括号：</p>
+
+\[
+\mathrm{Cov}(X, Y) = \mathbb{E}[XY - X \cdot \mathbb{E} Y - \mathbb{E} X \cdot Y + \mathbb{E} X \cdot \mathbb{E} Y] = \mathbb{E}[XY] - \mathbb{E} X \cdot \mathbb{E} Y.
+\]
+
+<p>所以协方差还有另一个等价形式（计算上更常用）：</p>
+
+\[
+\boxed{\mathrm{Cov}(X, Y) = \mathbb{E}[XY] - \mathbb{E}[X] \cdot \mathbb{E}[Y].}
+\]
+
+<p>请记住这两个等价定义——前者直观（"\(X, Y\) 偏离均值的乘积期望"），后者实用（用 LOTUS 算 \(\mathbb{E}[XY]\)、再减去 \(\mathbb{E} X \mathbb{E} Y\)）。</p>
+
+<p><strong>例 9.1（接第 8 章的三角形）</strong>　仍以例 8.7 的 \(f_{X, Y} = 2\) on \(\{0 \leq x \leq y \leq 1\}\)。我们已经算了 \(\mathbb{E}[X] = 1/3, \mathbb{E}[Y] = 2/3, \mathbb{E}[XY] = 1/4\)。所以</p>
+
+\[
+\mathrm{Cov}(X, Y) = \tfrac{1}{4} - \tfrac{1}{3} \cdot \tfrac{2}{3} = \tfrac{1}{4} - \tfrac{2}{9} = \tfrac{9}{36} - \tfrac{8}{36} = \tfrac{1}{36}.
+\]
+
+<p>正数 \(\Rightarrow\) \(X\) 与 \(Y\) <em>正相关</em>——\(X\) 大时 \(Y\) 也倾向大，反之亦然。这与几何吻合：约束 \(X \leq Y\) 让 \((X, Y)\) 落在三角形上，\(X\) 越大越接近上界，\(Y\) 也被推高。</p>
+
+<h2 id="sec9-2">9.2 几何意义：测量"共同变化"</h2>
+
+<p>协方差直观上是怎么"度量关系"的？看公式</p>
+
+\[
+\mathrm{Cov}(X, Y) = \mathbb{E}\big[(X - \mu_X)(Y - \mu_Y)\big].
+\]
+
+<p>对 \((X, Y)\) 的每个抽样：</p>
+
+<ul>
+<li>如果 \(X > \mu_X\) <em>且</em> \(Y > \mu_Y\)（两者同时高于均值），则 \((X - \mu_X)(Y - \mu_Y) > 0\)。</li>
+<li>如果 \(X < \mu_X\) <em>且</em> \(Y < \mu_Y\)（两者同时低于均值），则 \((X - \mu_X)(Y - \mu_Y) > 0\)（负负得正）。</li>
+<li>如果一个高于均值另一个低于（"反向"），则 \((X - \mu_X)(Y - \mu_Y) < 0\)。</li>
+</ul>
+
+<p>所以 \(\mathrm{Cov}(X, Y)\) 是这些"贡献"的<em>平均</em>：</p>
+
+<ul>
+<li>\(\mathrm{Cov} > 0\)：\(X, Y\) 同向变化为主——"\(X\) 高时 \(Y\) 也倾向高"。</li>
+<li>\(\mathrm{Cov} < 0\)：\(X, Y\) 反向变化为主——"\(X\) 高时 \(Y\) 倾向低"。</li>
+<li>\(\mathrm{Cov} = 0\)：同向贡献与反向贡献相互抵消（"<em>不相关</em>"，但<em>不</em>等于独立！见 9.3）。</li>
+</ul>
+
+<p>这就是为什么协方差被叫做"<em>共同变化</em>"（co-variance）——它是两个变量"共同"偏离均值的程度。</p>
+
+<h2 id="sec9-3">9.3 协方差的性质</h2>
+
+<p>协方差有一组非常好用的代数性质，类似"内积"——这不是巧合，第 9.4 节会看到这个类比的深处。</p>
+
+<h3 id="sec9-3-1">9.3.1 双线性</h3>
+
+<p>对任意常数 \(a, b, c, d\) 和随机变量 \(X, Y, Z\)：</p>
+
+\[
+\boxed{\mathrm{Cov}(aX + bZ, Y) = a \cdot \mathrm{Cov}(X, Y) + b \cdot \mathrm{Cov}(Z, Y).}
+\]
+
+<p>证明：用 \(\mathrm{Cov}(\cdot, \cdot) = \mathbb{E}[\cdot \cdot] - \mathbb{E}[\cdot]\mathbb{E}[\cdot]\) 与期望线性：</p>
+
+\[
+\mathrm{Cov}(aX + bZ, Y) = \mathbb{E}[(aX + bZ) Y] - \mathbb{E}[aX + bZ] \mathbb{E}[Y]
+\]
+
+\[
+= a \mathbb{E}[XY] + b \mathbb{E}[ZY] - a \mathbb{E}[X]\mathbb{E}[Y] - b \mathbb{E}[Z]\mathbb{E}[Y] = a \mathrm{Cov}(X, Y) + b \mathrm{Cov}(Z, Y).
+\]
+
+<p>同理 \(\mathrm{Cov}(X, cY + dW) = c \mathrm{Cov}(X, Y) + d \mathrm{Cov}(X, W)\)。两个变量都线性 \(\Rightarrow\) "<em>双线性</em>"。</p>
+
+<h3 id="sec9-3-2">9.3.2 对称</h3>
+
+\[
+\mathrm{Cov}(X, Y) = \mathrm{Cov}(Y, X).
+\]
+
+<p>从定义直接读出（乘积的顺序无关）。</p>
+
+<h3 id="sec9-3-3">9.3.3 与方差的关系</h3>
+
+\[
+\boxed{\mathrm{Cov}(X, X) = \mathrm{Var}(X).}
+\]
+
+<p>因为 \(\mathrm{Cov}(X, X) = \mathbb{E}[(X - \mathbb{E} X)^2] = \mathrm{Var}(X)\)。这是为什么协方差是方差的"两变量推广"。</p>
+
+<h3 id="sec9-3-4">9.3.4 加常数不影响</h3>
+
+\[
+\mathrm{Cov}(X + c, Y) = \mathrm{Cov}(X, Y), \qquad \mathrm{Cov}(X, Y + d) = \mathrm{Cov}(X, Y).
+\]
+
+<p>因为 \((X + c) - \mathbb{E}[X + c] = X - \mathbb{E} X\)，常数被减掉了。所以协方差只与"波动"有关、与"中心位置"无关。</p>
+
+<h3 id="sec9-3-5">9.3.5 独立 \(\Rightarrow\) 协方差为 0</h3>
+
+<p>这是 8.10 节的直接推论：如果 \(X \perp Y\)，则 \(\mathbb{E}[XY] = \mathbb{E} X \mathbb{E} Y\)，所以 \(\mathrm{Cov}(X, Y) = 0\)。</p>
+
+<p>请<em>注意</em>：<em>反过来不对！</em></p>
+
+<p>这件事必须刻在心上：<strong>"协方差为 0" 不蕴含 "独立"</strong>。协方差只测量了"<em>线性</em>关系"——两变量可以有强烈的<em>非线性</em>关系而协方差为 0。</p>
+
+<p><strong>反例（Banner 经典）</strong>：设 \(X\) 是<em>对称</em>分布（如 \(X \sim \mathcal{N}(0, 1)\)，或 \(X\) 在 \([-1, 1]\) 上均匀），令 \(Y = X^2\)。那么：</p>
+
+<ul>
+<li>\(X\) 与 \(Y\) <em>显然不独立</em>——\(Y\) 完全由 \(X\) 决定，知道 \(X\) 就知道 \(Y\)。</li>
+<li>但 \(\mathbb{E}[XY] = \mathbb{E}[X^3]\)。\(X\) 对称 \(\Rightarrow X^3\) 对称 \(\Rightarrow \mathbb{E}[X^3] = 0\)。</li>
+<li>\(\mathbb{E}[X] = 0\)（对称），所以 \(\mathbb{E}[X] \mathbb{E}[Y] = 0 \cdot \mathbb{E}[X^2] = 0\)。</li>
+<li>故 \(\mathrm{Cov}(X, Y) = 0 - 0 = 0\)。</li>
+</ul>
+
+<p>这就明确说明了"协方差 0 \(\Leftarrow\) 独立"，但反向<em>不</em>成立。直观上：\(Y = X^2\) 是个抛物线关系——\(X\) 大或 \(X\) 小（绝对值大）时 \(Y\) 都大；\(X\) 接近 0 时 \(Y\) 也小。这种"\(U\) 形"关系不是<em>线性</em>的，所以协方差捕捉不到。协方差只是"<em>线性</em>关系的探测器"。</p>
+
+<p>这件事的实际意义：当你在数据里看到 \(\mathrm{Cov}(X, Y) \approx 0\) 时，<em>不要</em>急于声称"它们独立"——可能只是没有线性关系，仍然可能有强非线性关系（如平方、绝对值、周期）。</p>
+
+<h2 id="sec9-4">9.4 相关系数</h2>
+
+<p>协方差有一个不便之处：它的<em>单位</em>是 \(X\) 的单位 × \(Y\) 的单位。两者放在不同尺度上时（如一个 cm，一个 kg），协方差数值难以解读——它会随尺度任意缩放。比如把身高从 cm 换成 mm（数值变 10 倍），\(\mathrm{Cov}(\text{身高}, \text{体重})\) 也变 10 倍——但实质关系没变。</p>
+
+<p>解决办法是<em>归一化</em>：把 \(\mathrm{Cov}(X, Y)\) 除以"它最大可能的绝对值"。这就是<strong>相关系数</strong>：</p>
+
+\[
+\boxed{\rho_{X, Y} = \frac{\mathrm{Cov}(X, Y)}{\sigma_X \sigma_Y} = \frac{\mathrm{Cov}(X, Y)}{\sqrt{\mathrm{Var}(X) \cdot \mathrm{Var}(Y)}}.}
+\]
+
+<p>它的关键性质：</p>
+
+\[
+-1 \leq \rho_{X, Y} \leq 1.
+\]
+
+<p>而且这个范围是<em>紧的</em>——\(\rho = \pm 1\) 是真正能取到的。</p>
+
+<p><strong>证明 \(|\rho| \leq 1\)（用 Cauchy-Schwarz）</strong>：把"协方差"看成"内积"——两个去中心后的随机变量 \(\tilde X = X - \mathbb{E} X, \tilde Y = Y - \mathbb{E} Y\)。Cauchy-Schwarz 不等式（在概率版本）：</p>
+
+\[
+|\mathbb{E}[\tilde X \tilde Y]| \leq \sqrt{\mathbb{E}[\tilde X^2]} \cdot \sqrt{\mathbb{E}[\tilde Y^2]} = \sigma_X \sigma_Y.
+\]
+
+<p>左边就是 \(|\mathrm{Cov}(X, Y)|\)，右边就是 \(\sigma_X \sigma_Y\)。所以 \(|\rho| = |\mathrm{Cov}| / (\sigma_X \sigma_Y) \leq 1\)。</p>
+
+<p>这条 Cauchy-Schwarz 不等式背后的几何："两个向量的内积模长不超过它们各自模长的积"——把它从 \(\mathbb{R}^n\) 类比到"随机变量空间"，协方差扮演内积的角色，方差扮演模长平方的角色。这个类比远不只是漂亮——下一节它<em>就是</em>判定"何时取等"的工具。</p>
+
+<h3 id="sec9-4-1">9.4.1 \(\rho\) 与 \(\mathrm{Cov}\) 的统一观点</h3>
+
+<p>请<em>注意</em>：\(\rho\) 是<em>无单位的</em>。它对线性变换（缩放、平移）保持不变（除了符号）：若 \(U = aX + b\)（\(a > 0\)），\(V = cY + d\)（\(c > 0\)），则 \(\rho_{U, V} = \rho_{X, Y}\)。<em>所以 \(\rho\) 是"内禀"的——它只取决于 \(X, Y\) 的"形状关系"</em>，与单位无关。这是为什么报告"相关系数 \(\rho = 0.7\)"比报告"协方差 = 49"信息量大：前者的解读不依赖于变量单位。</p>
+
+<h2 id="sec9-5">9.5 \(|\rho| = 1\) 的几何含义</h2>
+
+<p>Cauchy-Schwarz 取等号当且仅当 \(\tilde Y = a \tilde X\)（\(a\) 是某个常数）。翻译回原始变量：\(Y - \mathbb{E} Y = a (X - \mathbb{E} X)\)，即</p>
+
+\[
+Y = a X + b, \qquad b = \mathbb{E} Y - a \mathbb{E} X.
+\]
+
+<p>这就是\(Y\) 是 \(X\) 的<em>线性函数</em>（确定的、几乎确定意义下）。具体：</p>
+
+\[
+\boxed{|\rho_{X, Y}| = 1 \iff Y = aX + b \text{ 几乎处处, } a \neq 0.}
+\]
+
+<p>且 \(\rho = +1\) 当 \(a > 0\)（同向线性），\(\rho = -1\) 当 \(a < 0\)（反向线性）。</p>
+
+<p>对中间值 \(\rho \in (-1, 1)\)：表示存在线性关系但是<em>不完美</em>，"\(X\) 解释了 \(Y\) 的一部分变化、但不是全部"。\(|\rho|\) 越接近 1，线性关系越紧。</p>
+
+<p><strong>解读 \(\rho^2\)：决定系数（coefficient of determination）</strong>　\(\rho^2\) 的统计学含义是<em>线性回归预测 \(Y\) 时，由 \(X\) 解释的方差比例</em>。具体：以 \(X\) 线性预测 \(Y\)（最佳预测器为 \(\hat Y = \mathbb{E} Y + \rho \sigma_Y / \sigma_X (X - \mathbb{E} X)\)），残差方差为 \(\sigma_Y^2 (1 - \rho^2)\)。所以 \(\rho^2\) 是"被 \(X\) 解释的相对方差"。\(\rho^2 = 0.49\)（如 \(\rho = 0.7\)）意味着 49% 的 \(Y\) 方差由 \(X\) 解释。这就是 8.18 例题里"知道身高把体重的不确定性减少 49%"的来源。</p>
+
+<p><strong>例 9.2（一个具体的相关系数）</strong>　从例 9.1 接续：\(\mathrm{Cov}(X, Y) = 1/36\)。还需要算 \(\sigma_X, \sigma_Y\)。\(\mathbb{E}[X^2] = \int_0^1 x^2 \cdot 2(1 - x) dx = 2 \int_0^1 (x^2 - x^3) dx = 2(1/3 - 1/4) = 1/6\)。\(\mathrm{Var}(X) = 1/6 - 1/9 = 3/18 - 2/18 = 1/18\)，\(\sigma_X = 1/\sqrt{18}\)。同理 \(\mathbb{E}[Y^2] = \int_0^1 y^2 \cdot 2y dy = 2 \cdot 1/4 = 1/2\)，\(\mathrm{Var}(Y) = 1/2 - 4/9 = 9/18 - 8/18 = 1/18\)，\(\sigma_Y = 1/\sqrt{18}\)。</p>
+
+\[
+\rho = \frac{1/36}{1/\sqrt{18} \cdot 1/\sqrt{18}} = \frac{1/36}{1/18} = \frac{18}{36} = \frac{1}{2}.
+\]
+
+<p>所以 \(\rho_{X, Y} = 0.5\)——中等强度的正相关。这与几何（"\(X\) 必须 \(\leq Y\)"）吻合：约束在三角形里，\(X, Y\) 之间有真实的正向倾向，但不强到完全线性。</p>
+
+<h2 id="sec9-6">9.6 协方差矩阵</h2>
+
+<p>有 \(n\) 个随机变量 \(X_1, X_2, \ldots, X_n\) 怎么办？所有"两两协方差"凑起来形成一个 \(n \times n\) 矩阵。</p>
+
+<p>把它们打包成一个<em>随机向量</em> \(\mathbf{X} = (X_1, X_2, \ldots, X_n)^T\)（这里转置使它成列向量）。它的<strong>协方差矩阵</strong> \(\Sigma\) 是 \(n \times n\) 矩阵，其 \((i, j)\) 元素为</p>
+
+\[
+\Sigma_{ij} = \mathrm{Cov}(X_i, X_j).
+\]
+
+<p>用矩阵语言写：设 \(\boldsymbol\mu = \mathbb{E}[\mathbf{X}] = (\mathbb{E} X_1, \ldots, \mathbb{E} X_n)^T\)，则</p>
+
+\[
+\boxed{\Sigma = \mathrm{Cov}(\mathbf{X}) = \mathbb{E}\big[(\mathbf{X} - \boldsymbol\mu)(\mathbf{X} - \boldsymbol\mu)^T\big].}
+\]
+
+<p>这是个外积的期望——\((\mathbf{X} - \boldsymbol\mu)\) 是 \(n \times 1\) 列向量，\((\mathbf{X} - \boldsymbol\mu)^T\) 是 \(1 \times n\) 行向量，乘积是 \(n \times n\) 矩阵；它的第 \((i, j)\) 元素就是 \((X_i - \mu_i)(X_j - \mu_j)\)，期望后就是 \(\mathrm{Cov}(X_i, X_j)\)。</p>
+
+<p>协方差矩阵的关键性质：</p>
+
+<ol>
+<li><strong>对称</strong>：\(\Sigma^T = \Sigma\)（因为 \(\mathrm{Cov}(X_i, X_j) = \mathrm{Cov}(X_j, X_i)\)）。</li>
+<li><strong>对角线 = 方差</strong>：\(\Sigma_{ii} = \mathrm{Var}(X_i)\)。</li>
+<li><strong>正半定</strong>：对任意 \(\mathbf{a} \in \mathbb{R}^n\)，\(\mathbf{a}^T \Sigma \mathbf{a} \geq 0\)。</li>
+</ol>
+
+<p>第三条是为什么 \(\Sigma\) 这种矩阵在线性代数里被叫做"<em>正半定矩阵</em>"（positive semi-definite，PSD）。证明：</p>
+
+\[
+\mathbf{a}^T \Sigma \mathbf{a} = \mathbf{a}^T \mathbb{E}[(\mathbf{X} - \boldsymbol\mu)(\mathbf{X} - \boldsymbol\mu)^T] \mathbf{a} = \mathbb{E}[\mathbf{a}^T (\mathbf{X} - \boldsymbol\mu)(\mathbf{X} - \boldsymbol\mu)^T \mathbf{a}] = \mathbb{E}[(\mathbf{a}^T (\mathbf{X} - \boldsymbol\mu))^2] \geq 0.
+\]
+
+<p>关键技巧：把 \(\mathbf{a}^T (\mathbf{X} - \boldsymbol\mu)\)（一个标量）平方，写作它自身乘以它转置；外面"\(\mathbb{E}\)"和向量 \(\mathbf{a}\) 可以互换位置（因为 \(\mathbf{a}\) 是确定的）。</p>
+
+<p>正半定的几何含义：所有特征值 \(\geq 0\)。这件事将在 9.10 节谈 PCA 时正面登场。</p>
+
+<p><strong>例 9.3（二维协方差矩阵）</strong>　对 \((X, Y)\)，</p>
+
+\[
+\Sigma = \begin{pmatrix} \mathrm{Var}(X) & \mathrm{Cov}(X, Y) \\ \mathrm{Cov}(X, Y) & \mathrm{Var}(Y) \end{pmatrix} = \begin{pmatrix} \sigma_X^2 & \rho \sigma_X \sigma_Y \\ \rho \sigma_X \sigma_Y & \sigma_Y^2 \end{pmatrix}.
+\]
+
+<p>验证正半定：\(\det \Sigma = \sigma_X^2 \sigma_Y^2 - \rho^2 \sigma_X^2 \sigma_Y^2 = \sigma_X^2 \sigma_Y^2 (1 - \rho^2) \geq 0\) 因为 \(|\rho| \leq 1\) ✓。当 \(|\rho| < 1\) 时正定（\(\det > 0\)）；\(|\rho| = 1\) 时正半定但不正定（\(\det = 0\)，矩阵奇异，对应"\(Y\) 是 \(X\) 的线性函数"这一退化情形）。</p>
+
+<h2 id="sec9-7">9.7 方差和的公式</h2>
+
+<p>协方差的双线性立刻给出一条非常实用的恒等式：</p>
+
+\[
+\boxed{\mathrm{Var}(X + Y) = \mathrm{Var}(X) + \mathrm{Var}(Y) + 2 \mathrm{Cov}(X, Y).}
+\]
+
+<p>证明：</p>
+
+\[
+\mathrm{Var}(X + Y) = \mathrm{Cov}(X + Y, X + Y) = \mathrm{Cov}(X, X) + \mathrm{Cov}(X, Y) + \mathrm{Cov}(Y, X) + \mathrm{Cov}(Y, Y)
+\]
+
+\[
+= \mathrm{Var}(X) + 2 \mathrm{Cov}(X, Y) + \mathrm{Var}(Y).
+\]
+
+<p>用了双线性和对称。\(2 \mathrm{Cov}\) 那项叫做"<em>交叉项</em>"，是把单变量公式"方差是平方"推广到双变量后多出来的部分。</p>
+
+<p>关键观察：</p>
+
+<ul>
+<li>当 \(\mathrm{Cov}(X, Y) = 0\)（特别是 \(X \perp Y\) 时），\(\mathrm{Var}(X + Y) = \mathrm{Var}(X) + \mathrm{Var}(Y)\)——"独立和的方差等于方差和"。这是为什么 \(\mathrm{Bin}(n, p) = \sum X_i\)（独立伯努利）的方差是 \(n p(1 - p) = \) 单个 \(p(1 - p)\) 的 \(n\) 倍。</li>
+<li>当 \(\mathrm{Cov} > 0\)：和的方差<em>更大</em>——"两个变量同向变动会放大整体波动"。</li>
+<li>当 \(\mathrm{Cov} < 0\)：和的方差<em>更小</em>——"反向变动相互抵消"。这就是为什么投资组合里要选<em>负相关</em>的股票来"对冲"（hedge）。</li>
+</ul>
+
+<p><strong>更一般地</strong>，对 \(n\) 个随机变量 \(X_1, \ldots, X_n\)：</p>
+
+\[
+\mathrm{Var}\left(\sum_{i=1}^n X_i\right) = \sum_{i=1}^n \mathrm{Var}(X_i) + 2 \sum_{i < j} \mathrm{Cov}(X_i, X_j) = \sum_{i, j} \mathrm{Cov}(X_i, X_j) = \mathbf{1}^T \Sigma \mathbf{1},
+\]
+
+<p>其中 \(\mathbf{1}\) 是全 1 向量。这又回到协方差矩阵的二次型形式——9.6 节正半定证明的特例。</p>
+
+<p>对 \(n\) 个独立同分布的 \(X_i\)（每个均值 \(\mu\)、方差 \(\sigma^2\)），<em>样本均值</em> \(\bar X_n = \frac{1}{n} \sum X_i\) 的方差是</p>
+
+\[
+\mathrm{Var}(\bar X_n) = \frac{1}{n^2} \mathrm{Var}\left(\sum X_i\right) = \frac{1}{n^2} \cdot n \sigma^2 = \frac{\sigma^2}{n}.
+\]
+
+<p>这就是<em>大数定律</em>的核心：样本均值的方差以 \(1/n\) 衰减，所以越多样本越接近真值。第 12 章会沿着这一脉络走到中心极限定理。</p>
+
+<p><strong>例 9.4（两只股票的对冲）</strong>　两只股票 \(A, B\) 的日收益率均值都是 0.1%、方差都是 \((1\%)^2 = 0.0001\)，相关系数 \(\rho = -0.5\)。等量买两只（每只 50%），组合 \(P = 0.5 A + 0.5 B\) 的方差？</p>
+
+\[
+\mathrm{Var}(P) = 0.25 \mathrm{Var}(A) + 0.25 \mathrm{Var}(B) + 2 \cdot 0.5 \cdot 0.5 \mathrm{Cov}(A, B)
+\]
+
+\[
+= 0.25 \cdot 0.0001 + 0.25 \cdot 0.0001 + 0.5 \cdot (-0.5) \sqrt{0.0001 \cdot 0.0001}
+\]
+
+\[
+= 0.000025 + 0.000025 - 0.000025 = 0.000025.
+\]
+
+<p>组合方差 \(0.000025\) 比单只股票方差 \(0.0001\) 减少了 75%。<em>对冲</em>的威力——负相关的两只股票合起来风险显著降低。如果两只股票完全独立（\(\rho = 0\)），组合方差是 \(0.00005\)，减少 50%；如果完全正相关（\(\rho = 1\)），组合方差等于单只方差 \(0.0001\)，没有任何分散效应。这正是为什么"分散投资"的智慧——找<em>不正相关</em>（最好负相关）的资产。</p>
+
+<h2 id="sec9-8">9.8 多元正态分布（MVN）</h2>
+
+<p>所有这些工具的最佳"展示舞台"，是<strong>多元正态分布</strong>（multivariate normal，MVN）——它把所有"协方差和均值"信息打包成一个完整的概率分布，并且<em>什么都漂亮</em>：边缘是正态、条件是正态、独立 \(\iff\) 不相关、等密度面是椭球，等等。本节先给定义，再列性质。</p>
+
+<h3 id="sec9-8-1">9.8.1 一维标准正态：复习</h3>
+
+<p>\(X \sim \mathcal{N}(0, 1)\) 的密度</p>
+
+\[
+\varphi(x) = \frac{1}{\sqrt{2\pi}} e^{-x^2/2}.
+\]
+
+<p>一般 \(X \sim \mathcal{N}(\mu, \sigma^2)\) 的密度</p>
+
+\[
+f_X(x) = \frac{1}{\sqrt{2\pi \sigma^2}} \exp\left(-\frac{(x - \mu)^2}{2 \sigma^2}\right) = \frac{1}{\sqrt{2\pi} \sigma} \exp\left(-\frac{1}{2} \cdot \frac{(x - \mu)^2}{\sigma^2}\right).
+\]
+
+<h3 id="sec9-8-2">9.8.2 多元正态的定义</h3>
+
+<p>设 \(\mathbf{X} = (X_1, \ldots, X_n)^T\) 是 \(n\) 维随机向量，均值向量 \(\boldsymbol\mu \in \mathbb{R}^n\)，协方差矩阵 \(\Sigma\)（\(n \times n\) 对称正定）。\(\mathbf{X}\) 服从<strong>多元正态分布</strong> \(\mathbf{X} \sim \mathcal{N}_n(\boldsymbol\mu, \Sigma)\) 当其联合 PDF 为</p>
+
+\[
+\boxed{f_{\mathbf{X}}(\mathbf{x}) = \frac{1}{(2\pi)^{n/2} |\det \Sigma|^{1/2}} \exp\left(-\frac{1}{2} (\mathbf{x} - \boldsymbol\mu)^T \Sigma^{-1} (\mathbf{x} - \boldsymbol\mu)\right).}
+\]
+
+<p>解读这个看起来吓人的密度：</p>
+
+<ul>
+<li>外面的常数 \(1/[(2\pi)^{n/2} |\det \Sigma|^{1/2}]\) 是归一化因子，保证 PDF 积分为 1。</li>
+<li>指数里的 \((\mathbf{x} - \boldsymbol\mu)^T \Sigma^{-1} (\mathbf{x} - \boldsymbol\mu)\) 是<strong>二次型</strong>，叫做<em>马氏距离</em>（Mahalanobis distance）的平方——它是一种"按协方差归一化"的距离。</li>
+<li>当 \(n = 1\) 时，\(\Sigma = \sigma^2\)（标量），\(\Sigma^{-1} = 1/\sigma^2\)，\(|\det \Sigma|^{1/2} = \sigma\)，二次型变成 \((x - \mu)^2 / \sigma^2\)——回到 9.8.1 节的一维公式。</li>
+</ul>
+
+<h3 id="sec9-8-3">9.8.3 等密度面：椭球</h3>
+
+<p>密度 \(f_{\mathbf{X}}(\mathbf{x})\) 等于常数当且仅当指数等于常数，即</p>
+
+\[
+(\mathbf{x} - \boldsymbol\mu)^T \Sigma^{-1} (\mathbf{x} - \boldsymbol\mu) = c
+\]
+
+<p>对某个 \(c > 0\)。这是一个<em>二次型等于常数</em>的方程——在 \(\mathbb{R}^n\) 里描述一个以 \(\boldsymbol\mu\) 为中心的<strong>椭球</strong>。</p>
+
+<p>椭球的轴方向由 \(\Sigma\) 的<em>特征向量</em>给出，半轴长度与<em>特征值</em>开根号成正比。这正是线性代数里的<em>谱定理</em>给出的：实对称矩阵可以正交对角化 \(\Sigma = Q \Lambda Q^T\)，其中 \(Q\) 是正交阵（列为特征向量），\(\Lambda = \mathrm{diag}(\lambda_1, \ldots, \lambda_n)\)（特征值）。</p>
+
+<p>所以 MVN 的等密度面"椭球"<em>就是</em>"协方差矩阵 \(\Sigma\) 的几何"——这是把协方差矩阵的代数性质（正半定、特征值）<em>看见</em>的方式。这条直觉把 9.10 节的 PCA 故事提前剧透了：PCA 就是在 \(\Sigma\) 的椭球轴上"重新选坐标"。</p>
+
+<h3 id="sec9-8-4">9.8.4 二维 MVN 与相关系数</h3>
+
+<p>聚焦 \(n = 2\)：\((X, Y) \sim \mathcal{N}_2(\boldsymbol\mu, \Sigma)\)，\(\boldsymbol\mu = (\mu_X, \mu_Y)^T\)，</p>
+
+\[
+\Sigma = \begin{pmatrix} \sigma_X^2 & \rho \sigma_X \sigma_Y \\ \rho \sigma_X \sigma_Y & \sigma_Y^2 \end{pmatrix}.
+\]
+
+<p>逆矩阵 \(\Sigma^{-1}\) 与 \(\det \Sigma = \sigma_X^2 \sigma_Y^2 (1 - \rho^2)\) 代入密度，化简后得到二维 MVN 的具体公式：</p>
+
+\[
+f_{X, Y}(x, y) = \frac{1}{2 \pi \sigma_X \sigma_Y \sqrt{1 - \rho^2}} \exp\left(-\frac{Q(x, y)}{2(1 - \rho^2)}\right),
+\]
+
+<p>其中</p>
+
+\[
+Q(x, y) = \frac{(x - \mu_X)^2}{\sigma_X^2} - 2 \rho \cdot \frac{(x - \mu_X)(y - \mu_Y)}{\sigma_X \sigma_Y} + \frac{(y - \mu_Y)^2}{\sigma_Y^2}.
+\]
+
+<p>等密度集 \(\{Q = c\}\) 是<em>椭圆</em>。形状由 \(\rho\) 决定：</p>
+
+<ul>
+<li>\(\rho = 0\)：椭圆轴对齐坐标轴，半轴 \(\sigma_X, \sigma_Y\)（"独立的两个正态分布"，密度可拆为 \(f_X(x) f_Y(y)\)）。</li>
+<li>\(\rho > 0\)：椭圆"向右上倾斜"——\(X\) 与 \(Y\) 同方向（"高个子重")。</li>
+<li>\(\rho < 0\)：椭圆"向右下倾斜"——\(X\) 与 \(Y\) 反方向。</li>
+<li>\(|\rho| \to 1\)：椭圆变得越来越"细"——退化为一条直线（\(Y = aX + b\)）。</li>
+</ul>
+
+<p>这就是 9.5 节"\(|\rho| = 1\) 时是线性关系"的几何画面：MVN 等密度椭圆在 \(\rho \to 1\) 时坍缩为直线。</p>
+
+<h2 id="sec9-9">9.9 多元正态的关键性质</h2>
+
+<p>多元正态享有一组其他分布<em>不一定有</em>的"完美"性质。这些事实的证明需要更多线性代数和特征函数工具，本书不做完整证明（细节参见教材或附录），但你必须掌握它们的结论。</p>
+
+<h3 id="sec9-9-1">9.9.1 边缘分布还是正态</h3>
+
+<p>设 \(\mathbf{X} \sim \mathcal{N}_n(\boldsymbol\mu, \Sigma)\)。任取若干个分量构成子向量（比如挑出 \(X_1, X_2, X_5\)），它们的<em>联合分布仍然是正态的</em>，均值是 \(\boldsymbol\mu\) 的对应分量、协方差是 \(\Sigma\) 的对应子矩阵。</p>
+
+<p>特例：单个 \(X_i\) 的边缘分布是 \(\mathcal{N}(\mu_i, \Sigma_{ii})\)。</p>
+
+<p>这条性质<em>不</em>是显然——一般情况下从一个非正态联合分布积分得到的边缘可以是任何东西。MVN 的"边缘也是正态"是它特有的优雅。</p>
+
+<h3 id="sec9-9-2">9.9.2 条件分布还是正态</h3>
+
+<p>设 \((X, Y) \sim \mathcal{N}_2((\mu_X, \mu_Y), \Sigma)\)。给定 \(X = x\)，\(Y\) 的条件分布也是正态：</p>
+
+\[
+\boxed{Y \mid X = x \sim \mathcal{N}\left(\mu_Y + \rho \frac{\sigma_Y}{\sigma_X}(x - \mu_X), \quad \sigma_Y^2 (1 - \rho^2)\right).}
+\]
+
+<p>条件均值是 \(x\) 的<em>线性</em>函数：</p>
+
+\[
+\mathbb{E}[Y \mid X = x] = \mu_Y + \rho \frac{\sigma_Y}{\sigma_X}(x - \mu_X).
+\]
+
+<p>它的斜率是 \(\rho \sigma_Y / \sigma_X\)——这正是<em>线性回归系数</em>。事实上，对二元正态而言，"\(Y\) 给定 \(X\) 的条件期望"<em>恰好</em>是"\(Y\) 关于 \(X\) 的最佳线性预测"——这就是回归分析最干净的例子。</p>
+
+<p>条件方差 \(\sigma_Y^2 (1 - \rho^2)\) 比 \(\sigma_Y^2\) 小，缩减因子是 \((1 - \rho^2)\)；\(\rho^2\) 是"被 \(X\) 解释的方差比例"，这是 9.5 节"决定系数"的来源。</p>
+
+<p>更一般地，对 \(n\) 维 MVN \(\mathbf{X} = (\mathbf{X}_1, \mathbf{X}_2)\) 划分，给定 \(\mathbf{X}_2 = \mathbf{x}_2\)，\(\mathbf{X}_1\) 的条件分布也是 MVN，公式（不展开）为</p>
+
+\[
+\mathbf{X}_1 \mid \mathbf{X}_2 = \mathbf{x}_2 \sim \mathcal{N}(\boldsymbol\mu_1 + \Sigma_{12} \Sigma_{22}^{-1}(\mathbf{x}_2 - \boldsymbol\mu_2), \; \Sigma_{11} - \Sigma_{12} \Sigma_{22}^{-1} \Sigma_{21}).
+\]
+
+<p>这个公式是<em>卡尔曼滤波</em>、高斯过程回归、多变量贝叶斯推断的核心工具。</p>
+
+<h3 id="sec9-9-3">9.9.3 MVN 中独立 \(\iff\) 不相关</h3>
+
+<p>9.3 节我们强调过：一般地，"<em>协方差为 0</em>" 不蕴含 "<em>独立</em>"。<strong>但 MVN 是个例外！</strong></p>
+
+\[
+\boxed{(X, Y) \sim \mathcal{N}_2 : \quad \mathrm{Cov}(X, Y) = 0 \iff X \perp Y.}
+\]
+
+<p>"\(\Leftarrow\)" 永远成立。"\(\Rightarrow\)" 是 MVN 特有的：把 \(\rho = 0\) 代入 9.8.4 节的二维 MVN 密度，</p>
+
+\[
+f_{X, Y}(x, y) = \frac{1}{2\pi \sigma_X \sigma_Y} \exp\left(-\frac{(x - \mu_X)^2}{2 \sigma_X^2} - \frac{(y - \mu_Y)^2}{2\sigma_Y^2}\right) = f_X(x) f_Y(y).
+\]
+
+<p>密度因子化 \(\Rightarrow\) 独立。</p>
+
+<p>请<em>注意</em>：这条命题的前提是 \((X, Y)\) 联合 MVN——光是"\(X\) 是正态、\(Y\) 是正态、协方差 0"<em>不</em>足以推出独立！举个反例：\(X \sim \mathcal{N}(0, 1)\)，独立掷一枚公平硬币，\(Y = X\) 若正面、\(Y = -X\) 若反面。则 \(Y\) 的边缘也是 \(\mathcal{N}(0, 1)\)，\(\mathrm{Cov}(X, Y) = 0\)（自检），但 \(X, Y\) <em>不</em>独立（\(|X| = |Y|\)）——而且 \((X, Y)\) <em>不是</em>二元 MVN（联合密度有支撑在两条直线 \(y = x\) 和 \(y = -x\) 上的奇异行为）。所以两个边缘正态<em>不</em>等于联合 MVN。</p>
+
+<p>这条 "MVN 里不相关 \(=\) 独立" 是少数例外情形。请把它和 9.3 节的反例一起记住。</p>
+
+<h2 id="sec9-10">9.10 PCA：协方差矩阵的几何应用</h2>
+
+<p>本节简介<strong>主成分分析</strong>（Principal Component Analysis，PCA）——把协方差矩阵的<em>谱定理</em>翻译成数据降维的实用算法，是线性代数与统计学交汇的典型例子。</p>
+
+<p>设你有 \(n\) 维随机向量 \(\mathbf{X}\)，协方差 \(\Sigma\)（对称正半定）。谱定理告诉你 \(\Sigma\) 可以正交对角化：</p>
+
+\[
+\Sigma = Q \Lambda Q^T, \qquad \Lambda = \mathrm{diag}(\lambda_1, \ldots, \lambda_n), \quad \lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_n \geq 0,
+\]
+
+<p>\(Q\) 列为正交特征向量 \(\mathbf{v}_1, \ldots, \mathbf{v}_n\)。这些特征向量定义了 \(n\) 个新坐标轴；把 \(\mathbf{X}\) 沿这些轴投影 \(Y_i = \mathbf{v}_i^T (\mathbf{X} - \boldsymbol\mu)\)，得到的新随机变量 \(Y_1, \ldots, Y_n\) 满足：</p>
+
+<ul>
+<li>每个 \(Y_i\) 的方差就是对应特征值 \(\lambda_i\)。</li>
+<li>不同 \(Y_i, Y_j\) <em>不相关</em>（即 \(\mathrm{Cov}(Y_i, Y_j) = 0\) for \(i \neq j\)）——这是协方差矩阵正交对角化的几何含义。</li>
+</ul>
+
+<p>因为 \(\lambda_1\) 最大，方向 \(\mathbf{v}_1\) 是<em>方差最大的方向</em>——叫做<strong>第一主成分</strong>。它捕捉了数据中最多的"波动"。\(\mathbf{v}_2\) 是第二主成分（与 \(\mathbf{v}_1\) 正交，方差次大），以此类推。</p>
+
+<p>PCA 的<em>降维</em>用法：保留前 \(k\)（\(k < n\)）个主成分，丢掉后 \(n - k\) 个（它们方差小，"信号"少），可以把 \(n\) 维数据用 \(k\) 维近似。在图像识别、基因表达分析、推荐系统里这是基本预处理工具。</p>
+
+<p>从 MVN 几何上看，PCA 就是<em>把椭球的轴方向找出来</em>——主成分就是椭球的轴。这是协方差矩阵在统计学里唯一最重要的应用。具体的算法和 SVD 实现见线性代数读本第 25 章左右的章节。</p>
+
+<h2 id="sec9-11">9.11 综合详细例题</h2>
+
+<p>本节用几个详细例题把全章的工具串起来。</p>
+
+<p><strong>例 9.5（二元正态算条件分布）</strong>　设 \((X, Y) \sim \mathcal{N}_2((0, 0), \Sigma)\) 其中 \(\Sigma = \begin{pmatrix} 4 & 2 \\ 2 & 9 \end{pmatrix}\)。求：</p>
+
+<p>(a) \(X, Y\) 的边缘分布、相关系数 \(\rho\)。</p>
+
+<p>(b) 给定 \(X = 3\)，\(Y\) 的条件分布。</p>
+
+<p>(c) \(P(Y > 5 \mid X = 3)\) 的概率。</p>
+
+<p>解 (a)：从协方差矩阵读：\(\sigma_X^2 = 4 \Rightarrow \sigma_X = 2\)，\(\sigma_Y^2 = 9 \Rightarrow \sigma_Y = 3\)，\(\mathrm{Cov}(X, Y) = 2\)。所以 \(\rho = 2/(2 \cdot 3) = 1/3\)。\(X \sim \mathcal{N}(0, 4), Y \sim \mathcal{N}(0, 9)\)。</p>
+
+<p>(b)：用 9.9.2 节公式：</p>
+
+\[
+\mathbb{E}[Y \mid X = 3] = 0 + \tfrac{1}{3} \cdot \tfrac{3}{2} \cdot 3 = \tfrac{3}{2}, \qquad \mathrm{Var}(Y \mid X = 3) = 9 (1 - 1/9) = 8.
+\]
+
+<p>所以 \(Y \mid X = 3 \sim \mathcal{N}(1.5, 8)\)，标准差 \(\sqrt 8 \approx 2.83\)。</p>
+
+<p>(c)：\(P(Y > 5 \mid X = 3) = P(Z > (5 - 1.5)/\sqrt 8) = P(Z > 3.5 / 2.83) = P(Z > 1.237)\)。查表 \(\approx 1 - 0.892 = 0.108\)，约 11%。</p>
+
+<p>对照"无条件" \(P(Y > 5) = P(Z > 5/3) = P(Z > 1.667) \approx 0.048\)，约 5%。条件比无条件高<em>一倍多</em>——因为知道 \(X = 3\)（高于均值）把 \(Y\) 的条件均值往上拉了一点。这正是相关性的具体作用。</p>
+
+<p><strong>例 9.6（协方差零但不独立的反例）</strong>　设 \(X \sim \mathcal{U}[-1, 1]\)，令 \(Y = X^2\)。求 \(\mathbb{E}[X], \mathbb{E}[Y], \mathbb{E}[XY], \mathrm{Cov}(X, Y), \rho\)。\(X\) 与 \(Y\) 独立吗？</p>
+
+<p>解：\(\mathbb{E}[X] = 0\)（对称）。\(\mathbb{E}[Y] = \mathbb{E}[X^2] = \mathrm{Var}(X) = 1/3\)（均匀方差为 \((b - a)^2 / 12 = 4/12 = 1/3\)）。\(\mathbb{E}[XY] = \mathbb{E}[X^3] = \int_{-1}^1 x^3 \cdot (1/2) \, dx = 0\)（奇函数对称区间）。所以</p>
+
+\[
+\mathrm{Cov}(X, Y) = 0 - 0 \cdot 1/3 = 0, \qquad \rho = 0.
+\]
+
+<p>但 \(Y = X^2\) <em>完全</em>由 \(X\) 决定——独立不可能。这就是 9.3.5 节强调的反例：协方差测量的是<em>线性</em>关系，像 \(Y = X^2\) 这种<em>对称</em>非线性关系它无能为力。</p>
+
+<p>（额外）有意思：如果换成 \(Y = X^2\) 但 \(X \sim \mathcal{U}[0, 1]\)（不对称），则 \(\mathbb{E}[XY] = \int_0^1 x^3 dx = 1/4\)，\(\mathbb{E}[X] \mathbb{E}[Y] = (1/2)(1/3) = 1/6\)，\(\mathrm{Cov} = 1/4 - 1/6 = 1/12 > 0\)——非零。在 \([0, 1]\) 上 \(X^2\) 与 \(X\) 的线性关系是<em>正向</em>的（\(X\) 大则 \(X^2\) 也大），所以协方差能检出。<em>对称</em>是反例的关键。</p>
+
+<p><strong>例 9.7（用全期望公式 + 全方差公式）</strong>　把第 8 章例 8.21 的复合泊松接续：今天的雷雨次数 \(N \sim \mathrm{Poisson}(\lambda)\)，每次电流强度 \(I_i\) i.i.d.、均值 \(\mu\)、方差 \(\sigma^2\)，与 \(N\) 独立。\(S = \sum_{i = 1}^N I_i\)。求 \(\mathrm{Var}(S)\)。</p>
+
+<p>解：用<strong>全方差公式</strong>（条件方差 + 期望的条件方差）：</p>
+
+\[
+\mathrm{Var}(S) = \mathbb{E}[\mathrm{Var}(S \mid N)] + \mathrm{Var}(\mathbb{E}[S \mid N]).
+\]
+
+<p>给定 \(N = n\)，\(S\) 是 \(n\) 个独立 i.i.d. 的和：\(\mathbb{E}[S \mid N = n] = n \mu, \mathrm{Var}(S \mid N = n) = n \sigma^2\)。所以</p>
+
+\[
+\mathbb{E}[\mathrm{Var}(S \mid N)] = \mathbb{E}[N \sigma^2] = \sigma^2 \mathbb{E}[N] = \sigma^2 \lambda,
+\]
+
+\[
+\mathrm{Var}(\mathbb{E}[S \mid N]) = \mathrm{Var}(N \mu) = \mu^2 \mathrm{Var}(N) = \mu^2 \lambda.
+\]
+
+<p>合起来：</p>
+
+\[
+\mathrm{Var}(S) = \sigma^2 \lambda + \mu^2 \lambda = \lambda(\sigma^2 + \mu^2) = \lambda \mathbb{E}[I^2].
+\]
+
+<p>这就是<em>复合泊松的方差公式</em>。它把"次数随机"和"每次随机"两层不确定性都考虑进来：第一项 \(\sigma^2 \lambda\) 是"<em>每次</em>随机"贡献的方差（条件方差的期望），第二项 \(\mu^2 \lambda\) 是"<em>次数</em>随机"贡献的方差（期望的条件方差）。</p>
+
+<p><strong>例 9.8（线性回归最佳预测）</strong>　给定二维 r.v. \((X, Y)\)（不必正态）。问：在所有形如 \(\hat Y = a + b X\) 的<em>线性</em>预测中，使均方误差 \(\mathbb{E}[(Y - \hat Y)^2]\) 最小的 \(a, b\) 是什么？最优均方误差等于多少？</p>
+
+<p>解：均方误差 \(L(a, b) = \mathbb{E}[(Y - a - bX)^2]\)。对 \(a, b\) 求偏导并置零：</p>
+
+\[
+\frac{\partial L}{\partial a} = -2 \mathbb{E}[Y - a - bX] = 0 \Rightarrow a = \mathbb{E}[Y] - b \mathbb{E}[X],
+\]
+
+\[
+\frac{\partial L}{\partial b} = -2 \mathbb{E}[X(Y - a - bX)] = 0 \Rightarrow \mathbb{E}[XY] = a \mathbb{E}[X] + b \mathbb{E}[X^2].
+\]
+
+<p>把 \(a\) 代入第二式：</p>
+
+\[
+\mathbb{E}[XY] = (\mathbb{E} Y - b \mathbb{E} X) \mathbb{E} X + b \mathbb{E}[X^2] = \mathbb{E} X \mathbb{E} Y + b (\mathbb{E} X^2 - (\mathbb{E} X)^2) = \mathbb{E} X \mathbb{E} Y + b \mathrm{Var}(X).
+\]
+
+<p>整理：</p>
+
+\[
+b = \frac{\mathbb{E}[XY] - \mathbb{E} X \mathbb{E} Y}{\mathrm{Var}(X)} = \frac{\mathrm{Cov}(X, Y)}{\mathrm{Var}(X)} = \rho \frac{\sigma_Y}{\sigma_X}.
+\]
+
+<p>所以最优线性预测是</p>
+
+\[
+\hat Y = \mathbb{E}[Y] + \rho \frac{\sigma_Y}{\sigma_X}(X - \mathbb{E}[X]).
+\]
+
+<p>这<em>正是</em> 9.9.2 节给出的"二元正态条件期望"公式！但是请<em>注意</em>区别：这里我们<em>没有</em>假设 \((X, Y)\) 是正态——这条公式是<strong>任何</strong>分布的<em>最佳线性</em>预测。当 \((X, Y)\) 是正态时，最佳线性预测<em>恰好</em>等于最佳预测（因为 MVN 的条件期望本身就是线性的）；非正态时，可能存在<em>非线性</em>预测比这条更准，但在<em>线性</em>类内这条最优。</p>
+
+<p>最优均方误差：</p>
+
+\[
+\min L = \mathrm{Var}(Y) - \frac{\mathrm{Cov}(X, Y)^2}{\mathrm{Var}(X)} = \sigma_Y^2 (1 - \rho^2).
+\]
+
+<p>正是 9.5 节 "决定系数" 的来源——\(\rho^2\) 是被 \(X\) 解释的方差比例，残余 \(1 - \rho^2\) 是无法用线性关系预测的部分。</p>
+
+<p><strong>例 9.9（椭球的"主轴"）</strong>　二元 MVN \((X, Y) \sim \mathcal{N}_2((0, 0), \Sigma)\) 其中 \(\Sigma = \begin{pmatrix} 5 & 4 \\ 4 & 5 \end{pmatrix}\)。求等密度椭圆 \(\{(x, y) : \mathbf{x}^T \Sigma^{-1} \mathbf{x} = 1\}\) 的主轴方向与长度。</p>
+
+<p>解：先求 \(\Sigma\) 的特征值：\(\det(\Sigma - \lambda I) = (5 - \lambda)^2 - 16 = 0 \Rightarrow 5 - \lambda = \pm 4 \Rightarrow \lambda_1 = 9, \lambda_2 = 1\)。特征向量：\(\lambda_1 = 9\) 时 \((\Sigma - 9 I) \mathbf{v} = 0 \Rightarrow \begin{pmatrix} -4 & 4 \\ 4 & -4 \end{pmatrix} \mathbf{v} = 0 \Rightarrow \mathbf{v}_1 \propto (1, 1)\)。归一化 \(\mathbf{v}_1 = (1, 1)/\sqrt 2\)。同理 \(\mathbf{v}_2 = (1, -1)/\sqrt 2\)。</p>
+
+<p>椭圆的主轴方向：\(\mathbf{v}_1 = (1/\sqrt 2, 1/\sqrt 2)\)（即 \(45°\)对角线方向）和 \(\mathbf{v}_2 = (1/\sqrt 2, -1/\sqrt 2)\)（\(135°\) 方向）。</p>
+
+<p>椭圆 \(\mathbf{x}^T \Sigma^{-1} \mathbf{x} = 1\) 在主轴坐标下成 \(u^2 / \lambda_1 + v^2 / \lambda_2 = 1\)，即半轴长 \(\sqrt{\lambda_1} = 3, \sqrt{\lambda_2} = 1\)。所以椭圆是<em>沿对角方向 \((1, 1)/\sqrt 2\) 拉伸 3、垂直方向拉伸 1</em>。</p>
+
+<p>注意 \(\rho = 4/(\sqrt 5 \cdot \sqrt 5) = 4/5 = 0.8\)——很强的正相关，所以椭圆显著沿对角线"瘦长"，与几何结果（轴比 3:1）一致。</p>
+
+<p>这就是协方差矩阵的几何"看见"：椭圆的主轴 = 协方差矩阵的特征向量；椭圆的轴长 = 特征值开根号。这同时也是 PCA 的几何（9.10 节）：第一主成分 = 最大轴方向 \(\mathbf{v}_1\)，它解释了 \(\lambda_1 / (\lambda_1 + \lambda_2) = 9/10 = 90\%\) 的总方差。</p>
+
+<p><strong>例 9.10（独立 + 同分布的均值方差）</strong>　设 \(X_1, X_2, \ldots, X_n\) 独立同分布，每个 \(X_i \sim \mathcal{N}(\mu, \sigma^2)\)。样本均值 \(\bar X_n = \frac{1}{n} \sum X_i\)。求 \(\bar X_n\) 的分布、均值、方差。</p>
+
+<p>解：\(\bar X_n\) 是独立正态的线性组合，<em>仍然</em>是正态——这是 MVN 的另一条"漂亮"性质（独立正态的线性组合 = 正态）。均值与方差用线性性立得：</p>
+
+\[
+\mathbb{E}[\bar X_n] = \tfrac{1}{n} \sum \mathbb{E}[X_i] = \mu, \qquad \mathrm{Var}(\bar X_n) = \tfrac{1}{n^2} \sum \mathrm{Var}(X_i) = \sigma^2 / n.
+\]
+
+<p>（这里用了独立性把交叉项去掉。）</p>
+
+<p>所以 \(\bar X_n \sim \mathcal{N}(\mu, \sigma^2 / n)\)。</p>
+
+<p>这条结果是统计推断的基石：</p>
+
+<ul>
+<li>\(\bar X_n\) 的均值就是真值 \(\mu\)，<em>无偏估计</em>。</li>
+<li>\(\bar X_n\) 的标准差是 \(\sigma / \sqrt n\)——<em>以 \(1/\sqrt n\) 衰减</em>。要让标准误差减半，得抽 4 倍样本；要减到 1/10，得抽 100 倍。</li>
+<li>\(P(|\bar X_n - \mu| < \epsilon) \to 1\) as \(n \to \infty\)——大数定律。</li>
+<li>分布形状是 \(\mathcal{N}(\mu, \sigma^2/n)\)，可以做精确推断（置信区间、假设检验）。这是第 10-12 章的核心。</li>
+</ul>
+
+<p>把例 9.10 看成一个"<em>缩小</em>正态"——把 \(\mathcal{N}(\mu, \sigma^2)\) 收缩到方差 \(\sigma^2 / n\)，就是统计推断里"<em>采集越多数据，估计越准</em>"的精确刻画。</p>
+
+<p>本章到此结束。我们建立了"<em>协方差—相关—协方差矩阵—MVN</em>"这条主线：</p>
+
+<ul>
+<li>协方差 \(\mathrm{Cov}(X, Y) = \mathbb{E}[XY] - \mathbb{E} X \mathbb{E} Y\) 是"线性关系"的探测器，独立蕴含协方差零、反向不真。</li>
+<li>相关系数 \(\rho = \mathrm{Cov}/(\sigma_X \sigma_Y) \in [-1, 1]\) 是协方差的归一化版本，\(|\rho| = 1\) 当且仅当线性关系。</li>
+<li>协方差矩阵 \(\Sigma\) 把所有两两协方差打包成对称正半定矩阵，方差和公式 \(\mathrm{Var}(\sum X_i) = \mathbf{1}^T \Sigma \mathbf{1}\)。</li>
+<li>多元正态 \(\mathcal{N}(\boldsymbol\mu, \Sigma)\) 是这套理论的最佳展示：边缘还是正态、条件还是正态、不相关 \(\iff\) 独立、等密度面是椭球。</li>
+<li>协方差矩阵的<em>谱分解</em>给出 PCA 的主成分——线性代数与统计学交汇的标杆。</li>
+</ul>
+
+<p>下一章我们走入<strong>统计推断</strong>的世界——给定一组观测样本，如何<em>反推</em>背后的概率分布？这就把概率论（"已知分布求概率"）的方向倒转，变成统计学（"已知数据求分布"）。准备好。</p>

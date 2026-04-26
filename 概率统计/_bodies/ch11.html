@@ -1,0 +1,388 @@
+<h1 id="ch11">第 11 章 不等式</h1>
+
+<p>到这里为止，每当我们想知道"某个事件的概率"，我们都老老实实地<em>算</em>它——把概率密度函数积分、把概率质量函数求和、把组合数挨个数清。可现实中我们经常碰到这种情况：</p>
+
+<ul>
+<li>我们<em>不知道</em>这个随机变量的精确分布，只知道它的均值和方差。</li>
+<li>分布太复杂，没有解析表达式可算。</li>
+<li>我们只想要一个"过得去"的<em>上界</em>来宽松估算"超出这个范围的概率不超过多少"。</li>
+</ul>
+
+<p>本章给三件这样的工具——<strong>Markov</strong>、<strong>Chebyshev</strong>、<strong>Jensen</strong>不等式。它们的共同特征是：它们用<em>非常</em>少的信息（一个均值，一个方差，或者一个凸函数性质）就能给出对概率或期望的<em>定量控制</em>。这听起来玄乎——居然只用均值就能限制"超大概率"？事实上确实如此，下面就看。</p>
+
+<p>这一章的主线很短：</p>
+
+<ul>
+<li>Markov 不等式：只用均值控制 \(P(X \geq a)\)。</li>
+<li>Chebyshev 不等式（由 Markov 推得）：用方差控制 \(P(|X - \mu| \geq k\sigma)\)。</li>
+<li>Jensen 不等式：用凸性控制 \(g(\mathbb{E}X)\) 与 \(\mathbb{E}[g(X)]\) 的大小关系。</li>
+<li>Chernoff 界：把 Markov 用到 \(e^{tX}\) 上得到的指数型尾界。</li>
+<li>Cauchy-Schwarz 不等式：协方差 \(\to\) 相关系数 \(\in [-1, 1]\) 这条事实的来源。</li>
+</ul>
+
+<p>第 12 章的大数定律将<em>直接</em>用 Chebyshev 推出。所以请先把这一章吞下。</p>
+
+<h2 id="sec11-1">11.1 Markov 不等式：只用均值控制尾巴</h2>
+
+<p>开门见山。第一条不等式叫做<strong>Markov 不等式</strong>，由 19 世纪末俄国数学家 Markov 给出。陈述如下：</p>
+
+<p style="text-align:center"><strong>设 \(X \geq 0\) 是非负随机变量，\(a > 0\)。则 \(P(X \geq a) \leq \dfrac{\mathbb{E}[X]}{a}\)。</strong></p>
+
+\[
+\boxed{P(X \geq a) \leq \frac{\mathbb{E}[X]}{a}, \qquad X \geq 0,\ a > 0.}
+\]
+
+<p>请你<em>注意</em>两个使用前提：(1) \(X\) 是<strong>非负</strong>的；(2) \(a\) 是<strong>正</strong>的。这两条少不得——下面证明里你立刻看到为什么。</p>
+
+<p>这条不等式的证明只有<em>一行</em>，且优雅得让人喷饭。我们写离散情形：</p>
+
+\[
+\mathbb{E}[X] = \sum_{x} x\, p(x) \geq \sum_{x \geq a} x\, p(x) \geq \sum_{x \geq a} a\, p(x) = a \cdot P(X \geq a).
+\]
+
+<p>第一步：把求和限到 \(x \geq a\)，少加几项；因为所有 \(x \geq 0\)，少加只可能让总和<em>变小</em>，所以是 \(\geq\)。第二步：在 \(x \geq a\) 那一段，把每个 \(x\) 换成 \(a\)（更小），所以又是 \(\geq\)。最后把 \(a\) 提到求和外。把首尾连起来：\(\mathbb{E}[X] \geq a P(X \geq a)\)，除以 \(a\) 即得。</p>
+
+<p>连续情形完全平行（把求和换成积分）。这就是为什么我们说 Markov 是"一行证明"。</p>
+
+<h3 id="sec11-1-1">11.1.1 几何理解</h3>
+
+<p>把 \(X\) 想成一根杆子，\(\mathbb{E}[X]\) 是它的<em>重心</em>。把分布想成"质量分布"。Markov 在说："如果重心在 \(\mu\) 处，那么<em>过 \(a\) 处的质量比例</em>不超过 \(\mu/a\)。"</p>
+
+<p>直觉性的论证：要使 \(X \geq a\) 的概率"很大"——比如 \(p\)——就要把 \(p\) 比例的质量都放到 \(\geq a\) 处，这单这一部分就给重心贡献至少 \(p \cdot a\)。所以 \(\mu \geq p \cdot a\)，即 \(p \leq \mu / a\)。这就是 Markov。</p>
+
+<p>这条不等式的好处是<strong>普适</strong>——不需要知道分布形状、不需要方差、什么都不需要，只需要均值。坏处是它<strong>非常松</strong>——\(P(X \geq 100\mu) \leq 1/100 = 1\%\)，听起来不错，但很多分布实际上 \(P(X \geq 100\mu)\) 远小于 \(10^{-10}\)。所以 Markov 是<em>底线保证</em>，不是精细估计。</p>
+
+<p><strong>例 11.1（Markov 的初等练习）</strong>　某网店每天的销售额 \(X\)（万元）平均为 5。试问 \(P(X \geq 50)\) 不超过多少？</p>
+
+<p>解：直接套 Markov（\(X \geq 0\)，\(a = 50\)）：</p>
+
+\[
+P(X \geq 50) \leq \frac{\mathbb{E}[X]}{50} = \frac{5}{50} = \frac{1}{10}.
+\]
+
+<p>"销售额超过日均 10 倍的概率不超过 10%"。注意我们对销售额的分布<em>一无所知</em>——它可能是正态、可能是指数、可能是奇形怪状的混合。Markov 仍然给出这个保证。</p>
+
+<h3 id="sec11-1-2">11.1.2 Markov 紧吗？</h3>
+
+<p>能不能让 \(P(X \geq a) = \mathbb{E}[X]/a\) <em>恰好</em>成立？能。让 \(X\) 取两个值：\(P(X = 0) = 1 - p\)、\(P(X = a) = p\)。那 \(\mathbb{E}[X] = pa\)，\(P(X \geq a) = p = \mathbb{E}[X]/a\)。等式取到。</p>
+
+<p>所以 Markov 在<em>原则上</em>是紧的——存在分布使等号成立。这告诉我们如果只知道均值，<em>不可能有比 Markov 更紧的尾界</em>。要想更紧的界，必须用更多信息——比如方差，那就引出 Chebyshev。</p>
+
+<h2 id="sec11-2">11.2 Chebyshev 不等式：用方差控制偏离</h2>
+
+<p>Chebyshev 不等式说：随机变量超出均值若干倍标准差以外的概率有上界，且与具体分布<em>无关</em>。准确陈述：</p>
+
+\[
+\boxed{P(|X - \mu| \geq k\sigma) \leq \frac{1}{k^2},}
+\]
+
+<p>其中 \(\mu = \mathbb{E}[X]\)，\(\sigma = \sqrt{\mathrm{Var}(X)} > 0\)，\(k > 0\) 是任意正数。</p>
+
+<p>等价的"非倍数"形式：</p>
+
+\[
+P(|X - \mu| \geq \varepsilon) \leq \frac{\mathrm{Var}(X)}{\varepsilon^2}.
+\]
+
+<p>两种形式实质一样——令 \(\varepsilon = k\sigma\) 互换。</p>
+
+<h3 id="sec11-2-1">11.2.1 由 Markov 推 Chebyshev</h3>
+
+<p>这条不等式的证明是 Markov 的<em>巧妙搬移</em>。诀窍：对<em>非负</em>变量 \((X - \mu)^2\) 用 Markov。</p>
+
+<p>注意 \((X - \mu)^2 \geq 0\) 总成立，且 \(\mathbb{E}[(X - \mu)^2] = \mathrm{Var}(X) = \sigma^2\)。事件"\(|X - \mu| \geq \varepsilon\)" 等价于 "\((X - \mu)^2 \geq \varepsilon^2\)"。所以</p>
+
+\[
+P(|X - \mu| \geq \varepsilon) = P((X - \mu)^2 \geq \varepsilon^2) \stackrel{\text{Markov}}{\leq} \frac{\mathbb{E}[(X - \mu)^2]}{\varepsilon^2} = \frac{\sigma^2}{\varepsilon^2}.
+\]
+
+<p>令 \(\varepsilon = k\sigma\)：</p>
+
+\[
+P(|X - \mu| \geq k\sigma) \leq \frac{\sigma^2}{k^2 \sigma^2} = \frac{1}{k^2}. \quad \square
+\]
+
+<p>这就是为什么前面强调 Markov 一行证完很重要——它是 Chebyshev 的脊梁。</p>
+
+<h3 id="sec11-2-2">11.2.2 解读：两倍标准差外不超过 1/4</h3>
+
+<p>取 \(k = 2\)：\(P(|X - \mu| \geq 2\sigma) \leq 1/4\)。也就是说 <em>"偏离均值两倍标准差以上"的概率不超过 25%</em>，<strong>对任何分布</strong>。</p>
+
+<p>取 \(k = 3\)：\(P(|X - \mu| \geq 3\sigma) \leq 1/9 \approx 11\%\)。</p>
+
+<p>取 \(k = 10\)：\(P(|X - \mu| \geq 10\sigma) \leq 1\%\)。</p>
+
+<p>请你<em>注意</em>这条结果跟<em>分布形状</em>毫无关系——你不需要知道是正态、是指数、是离散还是连续。只要知道均值和方差，就有这个保证。当然这又是个<em>底线</em>——对正态分布而言，\(P(|X - \mu| \geq 2\sigma) \approx 4.6\%\)，比 25% 紧得多。但 Chebyshev 的用途是"我连分布都不知道，能保多少？"</p>
+
+<p>Chebyshev 不等式在数学界叫"<em>最弱的有用不等式</em>"——它弱（远不如对正态分布的精确尾界），但在不知道分布的情况下又强到能<strong>直接证大数定律</strong>。下章我们就看 Chebyshev 是怎么把"\(\mathrm{Var}(\bar X_n) = \sigma^2/n \to 0\)"翻译成"\(\bar X_n \to \mu\) 依概率"。</p>
+
+<p><strong>例 11.2（用 Chebyshev 估硬币正面比例）</strong>　抛 \(n = 10000\) 次公平硬币，记 \(\bar X_n\) 为正面比例。求 "\(\bar X_n\) 偏离 0.5 至少 0.01" 的概率上界。</p>
+
+<p>解：每次抛硬币 \(X_i \in \{0, 1\}\)，\(\mu = 1/2\)，\(\sigma^2 = 1/4\)。样本均值的方差 \(\mathrm{Var}(\bar X_n) = (1/4)/10000 = 1/40000\)。Chebyshev：</p>
+
+\[
+P(|\bar X_n - 1/2| \geq 0.01) \leq \frac{1/40000}{(0.01)^2} = \frac{1/40000}{1/10000} = \frac{1}{4} = 25\%.
+\]
+
+<p>"抛一万次，正面比例偏离 50% 一个百分点以上"的概率不超过 25%。这<em>非常松</em>——实际值约 0.05%。但 Chebyshev 给的是无脑保证。</p>
+
+<p>把样本量提到 \(n = 10^6\)：</p>
+
+\[
+P(|\bar X_n - 1/2| \geq 0.01) \leq \frac{(1/4)/10^6}{10^{-4}} = \frac{1}{400} = 0.25\%.
+\]
+
+<p>样本越多，偏离概率越小——Chebyshev 给我们一个具体的<em>速率</em>。这就是大数定律的雏形。</p>
+
+<h2 id="sec11-3">11.3 Jensen 不等式：凸函数与期望</h2>
+
+<p>Markov 和 Chebyshev 是关于<em>概率</em>的不等式。本节的 <strong>Jensen 不等式</strong>是关于<em>期望</em>的不等式——它说凸函数和期望的顺序怎样换。</p>
+
+<p>先复习一下"凸"的概念。一个函数 \(g : \mathbb{R} \to \mathbb{R}\) 叫<strong>凸函数</strong>（convex），如果对任意 \(x_1, x_2\) 和 \(\lambda \in [0, 1]\)，</p>
+
+\[
+g(\lambda x_1 + (1 - \lambda) x_2) \leq \lambda g(x_1) + (1 - \lambda) g(x_2).
+\]
+
+<p>几何含义：函数图像两点之间的<em>弦</em>位于图像<em>上方</em>。等价地，函数曲线"向上弯"。常见的凸函数：\(g(x) = x^2\)、\(g(x) = e^x\)、\(g(x) = -\ln x\)（\(x > 0\)）、\(g(x) = |x|\)、\(g(x) = x^p\)（\(p \geq 1\)，\(x \geq 0\)）。</p>
+
+<p>"凹"是凸的反面——\(g\) 凹当 \(-g\) 凸；典型凹函数：\(\ln x\)、\(\sqrt x\)。</p>
+
+<p>Jensen 不等式：</p>
+
+\[
+\boxed{g \text{ 凸} \Longrightarrow g(\mathbb{E}[X]) \leq \mathbb{E}[g(X)].}
+\]
+
+<p>反过来，\(g\) 凹 \(\Rightarrow g(\mathbb{E}[X]) \geq \mathbb{E}[g(X)]\)。</p>
+
+<h3 id="sec11-3-1">11.3.1 证明：用切线</h3>
+
+<p>设 \(\mu = \mathbb{E}[X]\)。\(g\) 凸时，过点 \((\mu, g(\mu))\) 总能画一条<em>支撑直线</em>（切线或一般的支撑线），使整条曲线在它的上方。设这条支撑直线为 \(L(x) = a + b(x - \mu)\)，满足 \(L(\mu) = g(\mu)\) 且 \(L(x) \leq g(x)\) 对所有 \(x\)。</p>
+
+<p>对所有 \(x\) 取期望：</p>
+
+\[
+\mathbb{E}[L(X)] = a + b(\mathbb{E}[X] - \mu) = a + 0 = g(\mu).
+\]
+
+<p>而由 \(L(x) \leq g(x)\) 且期望保单调性，\(\mathbb{E}[L(X)] \leq \mathbb{E}[g(X)]\)。所以</p>
+
+\[
+g(\mu) = \mathbb{E}[L(X)] \leq \mathbb{E}[g(X)]. \quad \square
+\]
+
+<p>等号成立的条件是 \(X\) 几乎处处取常数（或 \(g\) 在 \(X\) 取值范围内恰为线性）。</p>
+
+<h3 id="sec11-3-2">11.3.2 应用一：方差永远非负</h3>
+
+<p>取 \(g(x) = x^2\)（凸）。Jensen 给</p>
+
+\[
+(\mathbb{E}[X])^2 \leq \mathbb{E}[X^2].
+\]
+
+<p>移项：\(\mathbb{E}[X^2] - (\mathbb{E}[X])^2 \geq 0\)。但这左边正是 \(\mathrm{Var}(X)\)！所以 Jensen 直接给出：<em>方差非负</em>。这条性质我们一直用，但这是它最干净的来源。</p>
+
+<h3 id="sec11-3-3">11.3.3 应用二：算术-几何均值不等式（AM-GM）</h3>
+
+<p>取 \(g(x) = -\ln x\)（凸；因为 \((-\ln x)'' = 1/x^2 > 0\)）。让 \(X\) 在 \(\{x_1, \ldots, x_n\}\)（正数）上均匀取值（每个概率 \(1/n\)）。Jensen：</p>
+
+\[
+-\ln\!\left(\frac{x_1 + \cdots + x_n}{n}\right) \leq \frac{1}{n}\sum_{i=1}^n (-\ln x_i).
+\]
+
+<p>两边乘 \(-1\)（变号反向）：</p>
+
+\[
+\ln\!\left(\frac{x_1 + \cdots + x_n}{n}\right) \geq \frac{1}{n}\sum \ln x_i = \ln\!\left(\sqrt[n]{x_1 \cdots x_n}\right).
+\]
+
+<p>取指数（保单调）：</p>
+
+\[
+\boxed{\frac{x_1 + x_2 + \cdots + x_n}{n} \geq \sqrt[n]{x_1 x_2 \cdots x_n}.}
+\]
+
+<p>这就是<strong>算术-几何均值不等式</strong>——左边算术均值，右边几何均值。中学竞赛里要费力证明的事情，用 Jensen 三行就完。</p>
+
+<h3 id="sec11-3-4">11.3.4 应用三：信息论的非负性</h3>
+
+<p>另一个 Jensen 经典应用：信息论里的 KL 散度（Kullback-Leibler divergence）非负。设两个离散概率分布 \(p, q\) 在同一支集上，定义</p>
+
+\[
+D(p \| q) = \sum_x p(x) \ln \frac{p(x)}{q(x)} = \mathbb{E}_p\!\left[\ln \frac{p(X)}{q(X)}\right].
+\]
+
+<p>由 \(-\ln\) 凸性（Jensen，反向方向）：</p>
+
+\[
+D(p \| q) = \mathbb{E}_p\!\left[-\ln \frac{q(X)}{p(X)}\right] \geq -\ln\, \mathbb{E}_p\!\left[\frac{q(X)}{p(X)}\right] = -\ln\, \sum_x p(x) \cdot \frac{q(x)}{p(x)} = -\ln\, 1 = 0.
+\]
+
+<p>所以 \(D(p \| q) \geq 0\)，且等号当且仅当 \(p = q\)。这条事实是整个信息论与现代机器学习里"交叉熵损失"的<em>原理性根据</em>。一切由 Jensen 一招推出。</p>
+
+<p><strong>例 11.3（Jensen 的初等示意）</strong>　一只股票每年随机增长 +50% 或 -50%，等概率独立。"平均"年增长率是 0。请问 10 年后你<em>预期</em>剩下多少本金？又"平均下来"剩多少？</p>
+
+<p>解：设初始 \(\$1\)。10 年后本金 \(W = (1 + R_1)(1 + R_2)\cdots(1 + R_{10})\)，其中每个 \(1 + R_i \in \{1.5, 0.5\}\) 各 \(1/2\)。</p>
+
+<p>"预期剩多少"——求 \(\mathbb{E}[W]\)：</p>
+
+\[
+\mathbb{E}[W] = \prod_{i=1}^{10} \mathbb{E}[1 + R_i] = (1.0)^{10} = 1.
+\]
+
+<p>"平均下来"——更接近"几何均值"，即 \(W^{1/10}\)。其期望或<em>典型值</em>：</p>
+
+\[
+\mathbb{E}[\ln W] = 10 \cdot \mathbb{E}[\ln(1+R)] = 10 \cdot \frac{1}{2}(\ln 1.5 + \ln 0.5) = 10 \cdot \frac{1}{2} \cdot \ln 0.75 \approx -1.44.
+\]
+
+<p>所以"中位"本金 \(\approx e^{-1.44} \approx 0.24\)——只剩 24%！</p>
+
+<p>这就是<strong>Jensen 在金融里的著名结论</strong>："期望增长率"和"长期典型增长率"<em>不一样</em>。期望被极少数大胜利拉高了，绝大多数路径其实在亏。这就是为什么"上涨 50%、下跌 50%"轮替不会让你回到原点——而是亏。Jensen 不等式给出严格的方向：\(\mathbb{E}[\ln W] \leq \ln \mathbb{E}[W]\)（\(\ln\) 凹），所以"对数期望"小于"期望对数"，长期路径"压制"住了平均收益。</p>
+
+<h2 id="sec11-4">11.4 Chernoff 界：指数型 Markov</h2>
+
+<p>Markov 不等式只用一阶矩，给出的是 \(O(1/a)\) 形式的衰减，对很多场合都太松。一个标准的<em>加强</em>办法是把 Markov 用到 \(e^{tX}\) 上——这能利用 \(X\) 的<em>所有</em>矩信息（通过 MGF），从而给出指数衰减的尾界。这就是 <strong>Chernoff 界</strong>。</p>
+
+<p>对任意 \(t > 0\)：事件 "\(X \geq a\)" 等价于事件 "\(e^{tX} \geq e^{ta}\)"（指数函数严增）。\(e^{tX}\) 是非负的，所以可以用 Markov：</p>
+
+\[
+P(X \geq a) = P(e^{tX} \geq e^{ta}) \leq \frac{\mathbb{E}[e^{tX}]}{e^{ta}} = e^{-ta}\, M_X(t).
+\]
+
+<p>这条对每个 \(t > 0\) 都成立，所以可以选最优的 \(t\) 让上界最小：</p>
+
+\[
+\boxed{P(X \geq a) \leq \inf_{t > 0}\, e^{-ta}\, M_X(t).}
+\]
+
+<p>这是<strong>Chernoff 界</strong>。它的强大之处在于：当 \(M_X(t)\) 是某个"良性"形式（比如指数函数），对 \(t\) 优化后通常能给出像 \(e^{-c \cdot a^2}\) 这种 <em>指数级衰减</em> 的界——比 Markov 的 \(1/a\) 强得多。</p>
+
+<p><strong>例 11.4（Chernoff 用在 \(n\) 次硬币）</strong>　设 \(S_n\) 是 \(n\) 次独立公平硬币的正面数（\(\mathrm{Bin}(n, 1/2)\)）。求 \(P(S_n \geq n/2 + a)\) 的 Chernoff 界。</p>
+
+<p>解：MGF \(M_{S_n}(t) = \big(\frac{1+e^t}{2}\big)^n\)。Chernoff：</p>
+
+\[
+P(S_n \geq n/2 + a) \leq e^{-t(n/2 + a)}\, \left(\frac{1 + e^t}{2}\right)^n.
+\]
+
+<p>把 \(t\) 取小（具体优化要算导数为零，结果 \(t \approx 4a/n\) 当 \(a \ll n\)）。最终（标准结果）：</p>
+
+\[
+P(S_n \geq n/2 + a) \leq e^{-2 a^2 / n}.
+\]
+
+<p>这是著名的 <strong>Hoeffding 不等式</strong>——它告诉你"超过均值 \(a\)"的概率<em>指数式</em>衰减，速度由 \(2a^2/n\) 控制。</p>
+
+<p>对比一下：</p>
+
+<ul>
+<li>Chebyshev 给 \(P(S_n \geq n/2 + a) \leq \frac{n/4}{a^2}\)（用 \(\mathrm{Var}(S_n) = n/4\)），即 \(O(n/a^2)\)。</li>
+<li>Chernoff 给 \(O(e^{-2 a^2/n})\)。</li>
+</ul>
+
+<p>取 \(n = 100\)，\(a = 30\)：Chebyshev 给 \(\leq 25/900 \approx 2.8\%\)；Chernoff 给 \(\leq e^{-1800/100} = e^{-18} \approx 1.5 \times 10^{-8}\)。差了 6 个数量级！这就是为什么 Chernoff 界在现代算法、机器学习、随机化算法里被频繁使用。</p>
+
+<p>本节我们只取一个例子的味道，更系统的 Chernoff 界处理留给概率论进阶教材。</p>
+
+<h2 id="sec11-5">11.5 Cauchy-Schwarz 不等式：协方差与相关系数</h2>
+
+<p>本章最后一条不等式叫 <strong>Cauchy-Schwarz 不等式</strong>。它原本是关于<em>向量内积</em>的，在期望版本里说的是：</p>
+
+\[
+\boxed{|\mathbb{E}[XY]|^2 \leq \mathbb{E}[X^2] \cdot \mathbb{E}[Y^2].}
+\]
+
+<p>等价形式（取平方根）：\(|\mathbb{E}[XY]| \leq \sqrt{\mathbb{E}[X^2]} \cdot \sqrt{\mathbb{E}[Y^2]}\)。</p>
+
+<h3 id="sec11-5-1">11.5.1 证明：判别式法</h3>
+
+<p>对任意实数 \(t\)，考虑非负量</p>
+
+\[
+\mathbb{E}[(X - tY)^2] \geq 0.
+\]
+
+<p>展开：</p>
+
+\[
+\mathbb{E}[X^2] - 2t \mathbb{E}[XY] + t^2 \mathbb{E}[Y^2] \geq 0.
+\]
+
+<p>这是 \(t\) 的二次多项式，恒非负。所以判别式 \(\leq 0\)：</p>
+
+\[
+4 (\mathbb{E}[XY])^2 - 4 \mathbb{E}[X^2] \mathbb{E}[Y^2] \leq 0,
+\]
+
+<p>整理即得 Cauchy-Schwarz。</p>
+
+<h3 id="sec11-5-2">11.5.2 用在协方差上：相关系数 \(\in [-1, 1]\)</h3>
+
+<p>把 Cauchy-Schwarz 用到 "中心化" 变量 \(X - \mu_X\)、\(Y - \mu_Y\) 上：</p>
+
+\[
+|\mathrm{Cov}(X, Y)|^2 = |\mathbb{E}[(X - \mu_X)(Y - \mu_Y)]|^2 \leq \mathbb{E}[(X-\mu_X)^2] \mathbb{E}[(Y-\mu_Y)^2] = \mathrm{Var}(X) \mathrm{Var}(Y).
+\]
+
+<p>开方：</p>
+
+\[
+|\mathrm{Cov}(X, Y)| \leq \sigma_X \cdot \sigma_Y.
+\]
+
+<p>这条不等式让我们能定义一个标准化的"线性相关度量"：</p>
+
+\[
+\boxed{\rho(X, Y) = \frac{\mathrm{Cov}(X, Y)}{\sigma_X\, \sigma_Y} \in [-1, +1].}
+\]
+
+<p>这就是<strong>相关系数</strong>（correlation coefficient），中文也叫<em>皮尔逊相关系数</em>。</p>
+
+<ul>
+<li>\(\rho = +1\)：\(X\) 和 \(Y\) 完全正线性相关，即存在 \(a > 0, b\) 使 \(Y = aX + b\)。</li>
+<li>\(\rho = -1\)：完全负线性相关，\(Y = aX + b\)，\(a < 0\)。</li>
+<li>\(\rho = 0\)：<em>线性</em>无关；但<em>不</em>意味着独立（10.4 节那个 \(Y = X^2\) 的反例 \(\rho = 0\) 但有强非线性依赖）。</li>
+</ul>
+
+<p>等号 \(|\rho| = 1\) 在 Cauchy-Schwarz 中，恰对应"\(X - tY\) 退化为常数"——即 \(X\) 是 \(Y\) 的<em>仿射函数</em>。所以相关系数确实只反映<em>线性</em>关系。</p>
+
+<p><strong>例 11.5（计算相关系数）</strong>　设 \(X \sim \mathrm{Uniform}(-1, 1)\)，\(Y = X^2\)。求 \(\rho(X, Y)\)。</p>
+
+<p>解：\(\mathbb{E}[X] = 0\)，\(\mathbb{E}[X^3] = 0\)（奇）。所以</p>
+
+\[
+\mathrm{Cov}(X, Y) = \mathbb{E}[XY] - \mathbb{E}[X]\mathbb{E}[Y] = \mathbb{E}[X^3] - 0 = 0.
+\]
+
+<p>从而 \(\rho = 0\)。但 \(X\) 与 \(Y = X^2\) 显然<em>不</em>独立。这又一次提醒：\(\rho = 0\) 仅意味着<em>线性</em>无关，不意味着独立。</p>
+
+<p><strong>例 11.6（线性回归的"最佳"系数）</strong>　设 \(X, Y\) 为随机变量，参数 \(\mu_X, \mu_Y, \sigma_X, \sigma_Y, \rho\)。要找常数 \(a, b\) 使均方误差 \(\mathbb{E}[(Y - a - bX)^2]\) 最小。求 \(a, b\)。</p>
+
+<p>解：对 \(a, b\) 求偏导为零。\(\partial/\partial a = -2 \mathbb{E}[Y - a - bX] = 0\) 给 \(a = \mu_Y - b\mu_X\)。\(\partial/\partial b = -2\mathbb{E}[X(Y - a - bX)] = 0\) 给 \(\mathbb{E}[XY] = a\mu_X + b \mathbb{E}[X^2]\)。代入 \(a\) 解出</p>
+
+\[
+b = \frac{\mathrm{Cov}(X, Y)}{\mathrm{Var}(X)} = \rho \cdot \frac{\sigma_Y}{\sigma_X}.
+\]
+
+<p>这就是著名的<strong>简单线性回归</strong>系数公式。请你<em>注意</em>：相关系数 \(\rho\) 直接给出"最佳线性预测斜率"——\(\rho = 0\) 时最佳斜率为 0（\(X\) 对预测 \(Y\) 没有线性贡献）；\(|\rho| = 1\) 时预测完美。</p>
+
+<p><strong>例 11.7（Markov 用到非线性变换）</strong>　设 \(X \geq 0\)。试证 \(P(X \geq a) \leq e^{-ta}\, \mathbb{E}[e^{tX}]\) 对任意 \(t > 0\)。这条不等式比 Markov 紧吗？</p>
+
+<p>解：注意 \(X \geq a \iff e^{tX} \geq e^{ta}\)（\(t > 0\)）。\(e^{tX}\) 非负，对它用 Markov：</p>
+
+\[
+P(e^{tX} \geq e^{ta}) \leq \frac{\mathbb{E}[e^{tX}]}{e^{ta}} = e^{-ta}\, M_X(t).
+\]
+
+<p>这就是 11.4 节的 Chernoff 界推导。它<em>更紧</em>当且仅当 \(M_X\) 长得 "够好"（在某个 \(t\) 处使 \(e^{-ta} M_X(t) < \mathbb{E}[X]/a\)）。对正态、伯努利等良性分布通常都更紧。</p>
+
+<p><strong>例 11.8（Jensen 在金融的另一个例子）</strong>　投资 \(X\) 的"对数收益率" \(\ln(1 + R)\) 服从某个分布（不必正态）。证明：复利预期收益率 \(\mathbb{E}[\ln(1 + R)]\) <em>不会</em> 超过简单预期收益率的对数 \(\ln\, \mathbb{E}[1 + R]\)。</p>
+
+<p>解：\(\ln\) 是凹函数。Jensen：\(\ln \mathbb{E}[1 + R] \geq \mathbb{E}[\ln(1 + R)]\)。证毕。</p>
+
+<p>意思：长期复利的"几何均值"不会超过短期算术均值的对数。这条事实在长期投资文献里反复出现——它在数学上是 Jensen 一行，金融上则解释了"为什么主动管理基金长期跑不赢指数"等无数现象。</p>
+
+<p>这一章我们攒下了几把"小刀"——Markov、Chebyshev、Jensen、Chernoff、Cauchy-Schwarz——它们用极少信息控制概率与期望。下一章的<strong>大数定律</strong>，将把 Chebyshev 当作主刀：用一行计算把 \(\mathrm{Var}(\bar X_n) = \sigma^2/n\) 翻成 "\(\bar X_n\) 收敛到 \(\mu\)"。请你准备好——大数定律是统计学全部基础的"基础的基础"。</p>

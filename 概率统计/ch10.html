@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 期望与方差的运算 — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 协方差、相关与多元正态</a><a href="ch11.html">下一章 · 第 11 章 不等式 →</a></nav>
+<h1 id="ch10">第 10 章 期望与方差的运算</h1>
+
+<p>到目前为止，我们已经见过了期望 \(\mathbb{E}[X]\) 和方差 \(\mathrm{Var}(X)\)——但都是对<em>单个</em>随机变量的定义。然而，真实问题中的随机变量从来不孤独。一次保险理赔涉及许多客户，一次投票民调涉及许多受访者，一次质检涉及许多次抽样。当 \(n\) 个随机变量同时出现在一个表达式里时，我们能不能把它们的"期望"和"方差"拆开来一项一项算？</p>
+
+<p>这一章给出的答案令人惊讶地<em>不对称</em>。<strong>期望</strong>那一边美得过分：它是<em>线性</em>的，不需要独立性，不需要任何条件。<strong>方差</strong>那一边复杂得多：方差只对<em>独立</em>变量才相加，否则要补上一个"协方差"的修正项。本章就要把这两条规则讲到你形成肌肉记忆——以至于看到 \(\mathbb{E}[X + Y]\) 时，你的手会自动写下 \(\mathbb{E}[X] + \mathbb{E}[Y]\)，<em>哪怕你完全不知道 \(X\) 和 \(Y\) 是什么</em>。</p>
+
+<p>本章会讲：</p>
+
+<ul>
+<li>期望的<strong>线性</strong>——无条件成立的最有用的事实之一。</li>
+<li><strong>indicator 技巧</strong>——把"出现次数"分解成一堆 0/1 变量之和。这一招是组合概率的瑞士军刀。</li>
+<li>方差的展开 \(\mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y) + 2\mathrm{Cov}(X,Y)\)，独立时协方差为零。</li>
+<li><strong>样本均值</strong> \(\bar X_n = \frac{1}{n}\sum X_i\) 的方差是 \(\sigma^2/n\)——这是 12 章大数定律的种子。</li>
+<li><strong>矩生成函数</strong>（MGF）\(M_X(t) = \mathbb{E}[e^{tX}]\)：求矩、识别分布、处理独立和的三合一工具。</li>
+</ul>
+
+<h2 id="sec10-1">10.1 线性的力量：\(\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y]\) 总成立</h2>
+
+<p>你大概听过这条公式。但你可能没有意识到它有多<em>蛮横</em>。</p>
+
+<p>设 \(X\)、\(Y\) 是同一个概率空间上的两个随机变量——可以是离散的，可以是连续的，可以是<em>高度相关</em>的，甚至可以是 \(Y = -X\) 这种"恶心"的依赖关系。无论它们的联合分布长什么样，下面这条等式<strong>毫无例外地成立</strong>：</p>
+
+\[
+\boxed{\mathbb{E}[X + Y] = \mathbb{E}[X] + \mathbb{E}[Y].}
+\]
+
+<p>更一般地，对任意常数 \(a, b\) 与任意随机变量 \(X_1, \ldots, X_n\)：</p>
+
+\[
+\boxed{\mathbb{E}\!\left[\sum_{i=1}^n a_i X_i\right] = \sum_{i=1}^n a_i \, \mathbb{E}[X_i].}
+\]
+
+<p>这就叫<strong>期望的线性</strong>。它<em>不需要</em>独立性，不需要同分布，不需要任何对联合分布的假设——只要每个 \(\mathbb{E}[X_i]\) 都有限，等式就对。</p>
+
+<p>为什么这件事这么强？因为它把"算和的期望"变成了"分别算各自的期望，然后把数字加起来"。这是<em>典型的</em>把困难拆成简单——只是这次拆得格外干净。</p>
+
+<p>证明思路（离散情形）一行就完：</p>
+
+\[
+\mathbb{E}[X + Y] = \sum_{x,y} (x + y)\, p(x,y) = \sum_{x,y} x\, p(x,y) + \sum_{x,y} y\, p(x,y) = \mathbb{E}[X] + \mathbb{E}[Y].
+\]
+
+<p>关键一步是<em>把和拆开</em>，再认出 \(\sum_{y} p(x,y) = p_X(x)\) 是 \(X\) 的边缘分布。注意这里<em>没有用到独立性</em>——独立性会让 \(p(x,y) = p_X(x) p_Y(y)\)，但我们这里只用到边缘求和，不要求乘积形式。这就是线性强大的根源。</p>
+
+<p>请你<em>注意</em>：期望线性的反面是<em>乘积的期望</em>。\(\mathbb{E}[XY]\) 一般<strong>不</strong>等于 \(\mathbb{E}[X] \cdot \mathbb{E}[Y]\)！只有当 \(X\) 和 \(Y\) 独立时，这条等式才成立。比方说取 \(X = Y\)（极端依赖），那 \(\mathbb{E}[X^2] = \mathbb{E}[X] \cdot \mathbb{E}[X] = (\mathbb{E}[X])^2\) 显然不对——前者比后者大 \(\mathrm{Var}(X)\)。所以线性是<em>加法</em>独有的特权，不要往乘法上推。</p>
+
+<h2 id="sec10-2">10.2 用线性技巧解硬题：匹配问题</h2>
+
+<p>现在我们示范一下"线性能解什么硬题"。来一个传说级的经典——<strong>匹配问题</strong>（matching problem）。</p>
+
+<p>有 \(n\) 张写好名字的请柬和 \(n\) 个对应的信封。秘书把请柬<em>完全随机</em>地塞进信封（也就是从 \(n!\) 种装法里均匀挑一种）。问：平均下来，有多少封请柬<em>正好</em>装进了它对应的信封？</p>
+
+<p>用记号说：设 \(\sigma\) 是 \(\{1, \ldots, n\}\) 上的一个随机置换，\(M\) 是 \(\sigma\) 的<em>不动点</em>个数，即 \(M = |\{i : \sigma(i) = i\}|\)。求 \(\mathbb{E}[M]\)。</p>
+
+<p>第一反应很可能是这样：先求 \(M\) 的分布，再算期望。可我们很快发现 \(M\) 的分布<em>极其难看</em>。\(M = k\) 的概率涉及"恰有 \(k\) 个不动点"的置换计数，要用容斥原理，公式是</p>
+
+\[
+P(M = k) = \frac{1}{k!}\sum_{j=0}^{n-k}\frac{(-1)^j}{j!}.
+\]
+
+<p>看到这种东西就知道直接算 \(\mathbb{E}[M] = \sum_k k \cdot P(M = k)\) 是自找麻烦。</p>
+
+<p>等等！我们何必算分布？我们要的是<em>期望</em>。期望<em>是线性的</em>。所以只要把 \(M\) 写成一堆"小变量"之和，分别算各自的期望，再相加就行——而每个"小变量"的期望，往往一目了然。</p>
+
+<p>这就是著名的<strong>indicator 技巧</strong>：对每个 \(i \in \{1, \ldots, n\}\)，定义</p>
+
+\[
+X_i = \begin{cases} 1, & \sigma(i) = i \text{（第 } i \text{ 张请柬装对了）},\\ 0, & \text{否则}. \end{cases}
+\]
+
+<p>这种"取值只能是 0 或 1"的随机变量叫<strong>指示变量</strong>（indicator variable），常记作 \(\mathbf{1}_{\{A\}}\) 或类似符号。它有一条平凡得过分的性质：</p>
+
+\[
+\mathbb{E}[X_i] = 1 \cdot P(X_i = 1) + 0 \cdot P(X_i = 0) = P(\sigma(i) = i).
+\]
+
+<p>也就是说，<em>指示变量的期望就是事件发生的概率</em>。这条朴素得离谱的事实，是 indicator 技巧的全部力量来源。</p>
+
+<p>那么 \(P(\sigma(i) = i)\) 是多少？秘书均匀随机地装请柬，第 \(i\) 张请柬等可能落入 \(n\) 个信封中的任何一个，所以恰好落进第 \(i\) 个信封的概率是 \(\frac{1}{n}\)。这件事和 \(i\) 是几无关——对每个 \(i\) 都是 \(\frac{1}{n}\)。</p>
+
+<p>现在 \(M = X_1 + X_2 + \cdots + X_n\)。用线性：</p>
+
+\[
+\mathbb{E}[M] = \sum_{i=1}^n \mathbb{E}[X_i] = \sum_{i=1}^n \frac{1}{n} = n \cdot \frac{1}{n} = 1.
+\]
+
+\[
+\boxed{\mathbb{E}[M] = 1, \quad \text{对一切 } n \geq 1.}
+\]
+
+<p>——平均<em>恰好一封</em>请柬装对，无论 \(n\) 是 10、100 还是 100 万。这是一个非常违反直觉的结果。请你停下来，让它沉淀一下：100 万封请柬，平均也只有 1 封装对。</p>
+
+<p>关键的观察：<em>我们从来没有用到 \(X_i\) 之间的独立性</em>。事实上，它们高度相关——比如如果 \(X_1 = 1\)（第 1 张装对），那别的 \(X_i\) 的概率会略微改变。但<strong>这没关系</strong>！因为期望是线性的，相关性根本不参与计算。这正是线性技巧最妙的地方。</p>
+
+<h2 id="sec10-3">10.3 indicator 技巧的一般框架</h2>
+
+<p>上节的"匹配"是一个特例。indicator 技巧的一般使用步骤是：</p>
+
+<ol>
+<li>把"某个东西出现的次数 \(N\)"看成<em>许多 0/1 事件</em>的指示变量之和：\(N = \sum_i \mathbf{1}_{A_i}\)，其中 \(A_i\) 是"第 \(i\) 个候选位置发生了那个事件"。</li>
+<li>每一项 \(\mathbf{1}_{A_i}\) 的期望就是 \(P(A_i)\)。</li>
+<li>用线性把这些 \(P(A_i)\) 全部加起来，得到 \(\mathbb{E}[N] = \sum P(A_i)\)。</li>
+</ol>
+
+\[
+\boxed{\mathbb{E}\!\left[\sum_{i} \mathbf{1}_{A_i}\right] = \sum_{i} P(A_i).}
+\]
+
+<p>事件 \(A_i\) 之间是否独立、是否互斥、是否同分布——<em>统统不重要</em>。只要你能算出每个 \(P(A_i)\)，整个和的期望就有了。</p>
+
+<p>来再做几个例子，让这条招数变成肌肉。</p>
+
+<p><strong>例 10.1（生日问题：期望共享生日的对数）</strong>　一屋子里有 \(n\) 个人。假设每个人的生日在 365 天里均匀独立分布（忽略闰年）。问：屋里所有 \(\binom{n}{2}\) 对人中，<em>预期</em>有多少对人生日相同？</p>
+
+<p>解：对每对 \(\{i, j\}\)，让</p>
+
+\[
+X_{ij} = \mathbf{1}_{\{\text{第 } i \text{ 个人和第 } j \text{ 个人生日相同}\}}.
+\]
+
+<p>共享生日的对数是 \(N = \sum_{i < j} X_{ij}\)。期望是：</p>
+
+\[
+\mathbb{E}[N] = \sum_{i < j} P(\text{生日相同}) = \binom{n}{2} \cdot \frac{1}{365}.
+\]
+
+<p>取 \(n = 23\)：\(\binom{23}{2} = 253\)，\(\mathbb{E}[N] = 253/365 \approx 0.69\)。也就是说 23 个人时，平均近 0.7 对——已经接近 1 了。这就是著名的"生日悖论"为什么在 \(n = 23\) 附近发生：当期望对数过 1 后，"至少有一对"就有较大概率。线性技巧让这件事用<em>一行</em>就算完了，根本不必算复杂的"至少一对"概率。</p>
+
+<p><strong>例 10.2（优惠券收集：期望抽几次集齐 \(n\) 种）</strong>　一种麦片每盒里随机送一张优惠券，共 \(n\) 种，每盒里出现某一种的概率是 \(\frac{1}{n}\)（独立）。要把全部 \(n\) 种<em>都</em>集齐，预期要买几盒？</p>
+
+<p>解：把"集齐过程"分成阶段——第 \(k\) 阶段是"已经有了 \(k-1\) 种、正在等第 \(k\) 种新卡片出现"。设 \(T_k\) 是第 \(k\) 阶段所需的盒数。则总盒数是 \(T = T_1 + T_2 + \cdots + T_n\)。</p>
+
+<p>第 \(k\) 阶段，每抽一盒拿到"新卡片"的概率是 \(\frac{n - (k-1)}{n} = \frac{n-k+1}{n}\)（剩 \(n-k+1\) 种没拿过）。所以 \(T_k\) 服从几何分布，参数 \(p_k = (n-k+1)/n\)，期望 \(\mathbb{E}[T_k] = \frac{1}{p_k} = \frac{n}{n-k+1}\)。</p>
+
+<p>用线性：</p>
+
+\[
+\mathbb{E}[T] = \sum_{k=1}^n \frac{n}{n-k+1} = n \sum_{j=1}^n \frac{1}{j} = n H_n,
+\]
+
+<p>其中 \(H_n\) 是<em>调和数</em>。当 \(n\) 大时，\(H_n \approx \ln n + \gamma\)（\(\gamma \approx 0.5772\) 是欧拉常数）。比如 \(n = 50\)：\(\mathbb{E}[T] = 50 \cdot H_{50} \approx 50 \cdot 4.499 \approx 225\) 盒。这又是一个用线性把"看起来很难"变成"看起来很容易"的例子。</p>
+
+<p>注意这里 \(T_k\) 之间是<em>独立</em>的——这条独立性我们没有用，但反正用了线性也得对。如果你用方差，就会用到独立性，下面会看。</p>
+
+<h2 id="sec10-4">10.4 方差不像期望——出现协方差</h2>
+
+<p>现在轮到方差了。我们立即会发现方差<em>不</em>是线性的。事实上：</p>
+
+\[
+\boxed{\mathrm{Var}(X + Y) = \mathrm{Var}(X) + \mathrm{Var}(Y) + 2\,\mathrm{Cov}(X, Y),}
+\]
+
+<p>其中 <strong>协方差</strong>定义为</p>
+
+\[
+\mathrm{Cov}(X, Y) = \mathbb{E}\big[(X - \mathbb{E}X)(Y - \mathbb{E}Y)\big] = \mathbb{E}[XY] - \mathbb{E}[X]\,\mathbb{E}[Y].
+\]
+
+<p>怎么推这条公式？把方差展开：</p>
+
+\[
+\mathrm{Var}(X + Y) = \mathbb{E}\big[(X + Y - \mathbb{E}(X+Y))^2\big] = \mathbb{E}\big[(X - \mathbb{E}X) + (Y - \mathbb{E}Y))^2\big].
+\]
+
+<p>把里面平方展开（用 \((a + b)^2 = a^2 + 2ab + b^2\)）：</p>
+
+\[
+= \mathbb{E}\big[(X - \mathbb{E}X)^2\big] + 2\mathbb{E}\big[(X - \mathbb{E}X)(Y - \mathbb{E}Y)\big] + \mathbb{E}\big[(Y - \mathbb{E}Y)^2\big].
+\]
+
+<p>第一项 = \(\mathrm{Var}(X)\)，第三项 = \(\mathrm{Var}(Y)\)，中间正是 \(2\mathrm{Cov}(X, Y)\)。证毕。</p>
+
+<p>如果 \(X\) 和 \(Y\) <em>独立</em>，那 \(\mathbb{E}[XY] = \mathbb{E}[X]\mathbb{E}[Y]\)（这是独立的定义级推论），所以协方差 \(= 0\)。这时方差才"乖乖"相加：</p>
+
+\[
+\boxed{X \perp Y \Longrightarrow \mathrm{Var}(X + Y) = \mathrm{Var}(X) + \mathrm{Var}(Y).}
+\]
+
+<p>请你<em>注意</em>：协方差为 0 <strong>不一定</strong>意味着独立。独立 \(\Rightarrow\) 协方差为 0，但反过来不对。常见的反例：让 \(X\) 服从 \(\{-1, 0, 1\}\) 上均匀，\(Y = X^2\)。则 \(\mathbb{E}[XY] = \mathbb{E}[X^3] = 0\)（奇函数对对称分布），\(\mathbb{E}[X] = 0\)，所以 \(\mathrm{Cov}(X, Y) = 0\)。但 \(X\) 和 \(Y\) 显然<em>不</em>独立——\(X\) 知道了 \(Y\) 就完全确定（或差一个符号）。所以"协方差为零"是独立的<em>必要而非充分</em>条件，它只刻画了"线性相关性"为 0。</p>
+
+<h3 id="sec10-4-1">10.4.1 协方差的几条性质</h3>
+
+<p>把协方差当作一种"二元运算"，它满足：</p>
+
+<ul>
+<li><strong>对称</strong>：\(\mathrm{Cov}(X, Y) = \mathrm{Cov}(Y, X)\)。</li>
+<li><strong>双线性</strong>：\(\mathrm{Cov}(aX + b, Y) = a \cdot \mathrm{Cov}(X, Y)\)；\(\mathrm{Cov}(X_1 + X_2, Y) = \mathrm{Cov}(X_1, Y) + \mathrm{Cov}(X_2, Y)\)。</li>
+<li><strong>退化情形</strong>：\(\mathrm{Cov}(X, X) = \mathrm{Var}(X)\)。这是协方差的"对角线"，方差是它的特例。</li>
+<li><strong>常数透明</strong>：\(\mathrm{Cov}(X, c) = 0\) 对任意常数 \(c\)。</li>
+</ul>
+
+<p>这些性质让协方差表现得像内积——事实上在测度论里它确实是个内积，下一章 11.5 节用 Cauchy-Schwarz 时会见到。</p>
+
+<h2 id="sec10-5">10.5 独立和的方差：方差也变线性</h2>
+
+<p>把 10.4 的"两个变量"推广到 \(n\) 个：</p>
+
+\[
+\mathrm{Var}\!\left(\sum_{i=1}^n X_i\right) = \sum_{i=1}^n \mathrm{Var}(X_i) + 2\sum_{i < j} \mathrm{Cov}(X_i, X_j).
+\]
+
+<p>当 \(X_1, \ldots, X_n\) <em>两两独立</em>（pairwise independent）时，所有 \(i \neq j\) 的协方差为零，于是：</p>
+
+\[
+\boxed{\mathrm{Var}\!\left(\sum_{i=1}^n X_i\right) = \sum_{i=1}^n \mathrm{Var}(X_i) \quad (\text{两两独立}).}
+\]
+
+<p>事实上"两两独立"已经够，<em>不需要</em>完全独立——只要每对协方差为零就行。这是一条比较微妙的事实，但很有用。</p>
+
+<p>更一般地，对常数 \(a_i\)：</p>
+
+\[
+\mathrm{Var}\!\left(\sum a_i X_i\right) = \sum a_i^2 \mathrm{Var}(X_i) + 2\sum_{i<j} a_i a_j \mathrm{Cov}(X_i, X_j).
+\]
+
+<p>注意 \(a_i^2\)——常数从方差里"提"出来时要平方，因为方差按 "差的平方" 定义。这件事偶尔会让初学者翻车，请记住：</p>
+
+\[
+\mathrm{Var}(aX) = a^2\, \mathrm{Var}(X), \qquad \mathrm{SD}(aX) = |a| \cdot \mathrm{SD}(X).
+\]
+
+<p>常数 \(b\) 不影响方差：\(\mathrm{Var}(X + b) = \mathrm{Var}(X)\)（"平移不变"）。这与期望的行为对照：\(\mathbb{E}[X + b] = \mathbb{E}[X] + b\)（"平移共变"）。</p>
+
+<h2 id="sec10-6">10.6 样本均值的方差：\(\sigma^2 / n\)</h2>
+
+<p>本节把 10.5 用到统计学最核心的对象：<strong>样本均值</strong>。设 \(X_1, \ldots, X_n\) 是<strong>独立同分布</strong>（i.i.d.）随机变量，每个 \(\mathbb{E}[X_i] = \mu\)，\(\mathrm{Var}(X_i) = \sigma^2\)。定义</p>
+
+\[
+\bar X_n = \frac{1}{n}\sum_{i=1}^n X_i.
+\]
+
+<p>这就是<em>样本均值</em>——你抽 \(n\) 个数据，把它们求平均。请你想：\(\bar X_n\) 自己也是个随机变量（因为每次抽的样本不同，\(\bar X_n\) 也会不同），它有自己的期望和方差。算它们：</p>
+
+<p><em>期望</em>（用线性，无须独立）：</p>
+
+\[
+\mathbb{E}[\bar X_n] = \frac{1}{n}\sum_{i=1}^n \mathbb{E}[X_i] = \frac{1}{n} \cdot n\mu = \mu.
+\]
+
+<p>这条等式说："样本均值的期望，就是真实均值。" 用统计学的话讲，\(\bar X_n\) 是 \(\mu\) 的<strong>无偏估计</strong>（unbiased estimator）。漂亮。</p>
+
+<p><em>方差</em>（这次要独立！）：</p>
+
+\[
+\mathrm{Var}(\bar X_n) = \mathrm{Var}\!\left(\frac{1}{n}\sum X_i\right) = \frac{1}{n^2} \mathrm{Var}\!\left(\sum X_i\right) = \frac{1}{n^2} \cdot n\sigma^2 = \frac{\sigma^2}{n}.
+\]
+
+\[
+\boxed{\mathbb{E}[\bar X_n] = \mu, \qquad \mathrm{Var}(\bar X_n) = \frac{\sigma^2}{n}.}
+\]
+
+<p>这两条公式合起来说了一个革命性的事实：<strong>样本数越多，样本均值越接近真实均值，且偏离程度按 \(1/\sqrt n\) 缩小</strong>（标准差是方差的开根，\(\sigma/\sqrt n\)）。</p>
+
+<p>这就是<strong>大数定律的种子</strong>——\(\mathrm{Var}(\bar X_n) \to 0\) 当 \(n \to \infty\)，所以 \(\bar X_n\) 集中到 \(\mu\)。第 12 章会把这条直觉拧成正式定理。这同时也是<strong>中心极限定理</strong>的种子——"按 \(1/\sqrt n\) 缩小" 这个速率，会在第 13 章的 \(\mathcal{N}(0, 1)\) 极限里再次出现。所以这个 \(\sigma^2/n\) 公式是后两章的灵魂。请把它牢记。</p>
+
+<p><strong>例 10.3（民调样本量）</strong>　一个民调员想估某候选人的支持率 \(p\)。他随机访问 \(n\) 个人，记录是否支持（\(X_i \in \{0, 1\}\)，\(P(X_i = 1) = p\)）。则 \(X_i\) 是伯努利变量，\(\mathbb{E}[X_i] = p\)，\(\mathrm{Var}(X_i) = p(1-p)\)。样本均值 \(\bar X_n\) 估的就是 \(p\)。</p>
+
+<p>它的标准差（"标准误差"）是 \(\sqrt{p(1-p)/n}\)。最坏情况 \(p = 1/2\) 时上界为 \(\frac{1}{2\sqrt n}\)。所以要让标准差 \(\leq 0.03\)（即 \(\pm 3\%\) 的误差），需要</p>
+
+\[
+\frac{1}{2\sqrt n} \leq 0.03 \iff \sqrt n \geq \frac{1}{0.06} \approx 16.7 \iff n \geq 278.
+\]
+
+<p>实际操作中民调常做 \(n \approx 1000\) 上下，标准误差大约 \(\pm 1.5\%\)。这就是新闻里"误差 \(\pm 3\%\)"的来源。第 13.6 节再用 CLT 把这个"标准差"翻译成"95% 置信区间宽度"。</p>
+
+<h2 id="sec10-7">10.7 矩生成函数（MGF）：一个能编码所有矩的工具</h2>
+
+<p>到目前为止，我们碰到一个随机变量都问"它的期望是多少？方差是多少？"——这些都是它的<strong>矩</strong>。一阶矩 \(\mathbb{E}[X]\)、二阶矩 \(\mathbb{E}[X^2]\)、三阶矩 \(\mathbb{E}[X^3]\) ……</p>
+
+<p>有没有一个对象能把所有矩"打包"在一起？有，叫做<strong>矩生成函数</strong>（moment generating function，简称 MGF）。定义如下：对随机变量 \(X\)，</p>
+
+\[
+\boxed{M_X(t) = \mathbb{E}[e^{tX}].}
+\]
+
+<p>它是关于实参数 \(t\) 的一个函数（只要期望存在）。\(t = 0\) 时 \(M_X(0) = \mathbb{E}[e^0] = 1\)，永远；其它 \(t\) 值则提供有用信息——下一节就讲。</p>
+
+<p>请你<em>注意</em>：MGF 不一定对所有 \(t\) 都存在。比如柯西分布的 MGF 在任何 \(t \neq 0\) 都发散——因为它的尾巴太重，\(\mathbb{E}[e^{tX}] = \infty\)。我们所有"良性"分布（正态、伽马、指数、二项、泊松等等）的 MGF 都至少在 0 的某个邻域里有限——这一邻域就够用了。</p>
+
+<p>常见分布的 MGF（推导是直接积分或求和，留给读者验证）：</p>
+
+<ul>
+<li><strong>伯努利</strong>（\(P(X=1)=p\)，\(P(X=0)=1-p\)）：\(M_X(t) = (1-p) + p e^t\)。</li>
+<li><strong>二项</strong> \(\mathrm{Bin}(n, p)\)：\(M_X(t) = ((1-p) + p e^t)^n\)。</li>
+<li><strong>泊松</strong> \(\mathrm{Poi}(\lambda)\)：\(M_X(t) = e^{\lambda(e^t - 1)}\)。</li>
+<li><strong>几何</strong>（\(P(X=k) = (1-p)^{k-1} p\)，\(k \geq 1\)）：\(M_X(t) = \frac{p e^t}{1 - (1-p)e^t}\)（要 \(t < -\ln(1-p)\)）。</li>
+<li><strong>指数</strong> \(\mathrm{Exp}(\lambda)\)：\(M_X(t) = \frac{\lambda}{\lambda - t}\)，对 \(t < \lambda\)。</li>
+<li><strong>正态</strong> \(\mathcal N(\mu, \sigma^2)\)：\(M_X(t) = e^{\mu t + \sigma^2 t^2 / 2}\)。</li>
+<li><strong>伽马</strong> \(\Gamma(\alpha, \lambda)\)：\(M_X(t) = \left(\frac{\lambda}{\lambda - t}\right)^\alpha\)，对 \(t < \lambda\)。</li>
+</ul>
+
+<p>这些表达式不必硬背——下节看看用 MGF 怎么干活，自然记住。</p>
+
+<h2 id="sec10-8">10.8 MGF 的两条用：求矩与识别分布</h2>
+
+<h3 id="sec10-8-1">10.8.1 求矩：求导取零</h3>
+
+<p>MGF 的"魔术"在于把 \(e^{tX}\) 展成幂级数：</p>
+
+\[
+e^{tX} = 1 + tX + \frac{t^2 X^2}{2!} + \frac{t^3 X^3}{3!} + \cdots
+\]
+
+<p>取期望（能交换的话）：</p>
+
+\[
+M_X(t) = \mathbb{E}[e^{tX}] = 1 + t \mathbb{E}[X] + \frac{t^2}{2!} \mathbb{E}[X^2] + \frac{t^3}{3!} \mathbb{E}[X^3] + \cdots
+\]
+
+<p>哎呀！这是 \(M_X(t)\) 在 \(t = 0\) 附近的<em>泰勒展开</em>，而每一项的系数恰好是 \(X\) 的一个矩除以阶乘。所以 <strong>矩可以从 MGF 逐次求导得到</strong>：</p>
+
+\[
+\boxed{\mathbb{E}[X^n] = M_X^{(n)}(0) = \frac{d^n}{dt^n}\, M_X(t) \bigg|_{t=0}.}
+\]
+
+<p>这就解释了名字"矩生成函数"——它"生成"了所有矩。来一个例子。</p>
+
+<p><strong>例 10.4（指数分布的矩）</strong>　设 \(X \sim \mathrm{Exp}(\lambda)\)。求 \(\mathbb{E}[X]\)、\(\mathbb{E}[X^2]\)、\(\mathrm{Var}(X)\)。</p>
+
+<p>解：MGF 为 \(M_X(t) = \frac{\lambda}{\lambda - t}\)。求一阶导：</p>
+
+\[
+M_X'(t) = \frac{\lambda}{(\lambda - t)^2} \implies M_X'(0) = \frac{1}{\lambda} = \mathbb{E}[X].
+\]
+
+<p>求二阶导：</p>
+
+\[
+M_X''(t) = \frac{2\lambda}{(\lambda - t)^3} \implies M_X''(0) = \frac{2}{\lambda^2} = \mathbb{E}[X^2].
+\]
+
+<p>方差 = \(\mathbb{E}[X^2] - (\mathbb{E}[X])^2 = \frac{2}{\lambda^2} - \frac{1}{\lambda^2} = \frac{1}{\lambda^2}\)。</p>
+
+<p>这两条结果——指数分布的均值和方差分别为 \(1/\lambda\) 和 \(1/\lambda^2\)——你大概在第 6 章已见过；现在用 MGF 重做了一遍，过程<em>纯机械</em>，没有积分。这就是 MGF 的实用价值之一。</p>
+
+<h3 id="sec10-8-2">10.8.2 识别分布：唯一性定理</h3>
+
+<p>MGF 还有一条更深的功效：<strong>不同的分布有不同的 MGF</strong>。准确地：</p>
+
+<p style="text-align:center"><strong>唯一性定理：如果两个随机变量 \(X\)、\(Y\) 有相同的 MGF（在某个含有 0 的开区间上），那它们有相同的分布。</strong></p>
+
+<p>这件事的证明属于测度论级别（要用复变里的"特征函数"和 Fourier 反变换），我们不证。但它带来一种<em>实用</em>的策略：要证 \(X\) 服从某个特定分布，可以算它的 MGF，然后<em>对照"已知 MGF 表"</em>看它是哪个分布。</p>
+
+<p>这个对照法在下节"独立和"里会大放光彩——MGF 把 "和的分布" 这件复杂事，化为 "MGF 相乘" 这件简单事。</p>
+
+<h2 id="sec10-9">10.9 独立和的 MGF 是各 MGF 之积</h2>
+
+<p>本节是 MGF 的<strong>大杀招</strong>。</p>
+
+<p>设 \(X\)、\(Y\) 是独立的随机变量，求 \(X + Y\) 的 MGF：</p>
+
+\[
+M_{X+Y}(t) = \mathbb{E}[e^{t(X+Y)}] = \mathbb{E}[e^{tX} e^{tY}] \stackrel{\text{独立}}{=} \mathbb{E}[e^{tX}] \cdot \mathbb{E}[e^{tY}] = M_X(t) \cdot M_Y(t).
+\]
+
+<p>关键一步是<em>独立性允许把期望"拆开"</em>——\(e^{tX}\) 和 \(e^{tY}\) 是独立函数，乘积的期望等于期望的乘积。结论：</p>
+
+\[
+\boxed{X \perp Y \Longrightarrow M_{X+Y}(t) = M_X(t) \cdot M_Y(t).}
+\]
+
+<p>更一般地，独立的 \(X_1, \ldots, X_n\) 的和 \(S_n = \sum X_i\) 满足</p>
+
+\[
+M_{S_n}(t) = \prod_{i=1}^n M_{X_i}(t).
+\]
+
+<p>把它和"唯一性定理"结合，立刻得到大量"分布闭合"性质。来逐条看。</p>
+
+<p><strong>正态 + 正态 = 正态</strong>。设 \(X \sim \mathcal N(\mu_1, \sigma_1^2)\)，\(Y \sim \mathcal N(\mu_2, \sigma_2^2)\)，独立。它们的 MGF 之积是</p>
+
+\[
+M_{X+Y}(t) = e^{\mu_1 t + \sigma_1^2 t^2/2} \cdot e^{\mu_2 t + \sigma_2^2 t^2/2} = e^{(\mu_1 + \mu_2) t + (\sigma_1^2 + \sigma_2^2) t^2 / 2}.
+\]
+
+<p>这<em>正是</em>正态分布 \(\mathcal N(\mu_1 + \mu_2, \sigma_1^2 + \sigma_2^2)\) 的 MGF！由唯一性，</p>
+
+\[
+X + Y \sim \mathcal N(\mu_1 + \mu_2, \sigma_1^2 + \sigma_2^2).
+\]
+
+<p>这是一条惊人结果：正态加正态<em>仍然是正态</em>。换成别的分布族就未必有这条性质——比如均匀加均匀就不再是均匀（变成三角形分布）。</p>
+
+<p><strong>泊松 + 泊松 = 泊松</strong>。\(X \sim \mathrm{Poi}(\lambda_1)\)、\(Y \sim \mathrm{Poi}(\lambda_2)\)，独立。MGF 之积：</p>
+
+\[
+M_{X+Y}(t) = e^{\lambda_1(e^t - 1)} \cdot e^{\lambda_2(e^t - 1)} = e^{(\lambda_1 + \lambda_2)(e^t - 1)},
+\]
+
+<p>正是 \(\mathrm{Poi}(\lambda_1 + \lambda_2)\)。所以泊松也"加法闭合"——参数加起来。</p>
+
+<p><strong>二项 + 二项</strong>（同 \(p\)）<strong>= 二项</strong>。\(X \sim \mathrm{Bin}(n_1, p)\)、\(Y \sim \mathrm{Bin}(n_2, p)\)，独立，<em>同概率 \(p\)</em>。MGF 之积 \(= ((1-p) + p e^t)^{n_1 + n_2}\)，正是 \(\mathrm{Bin}(n_1 + n_2, p)\)。直观地说：\(n_1\) 次试验加 \(n_2\) 次试验等于 \(n_1 + n_2\) 次试验，全部 Bernoulli(\(p\))。请<em>注意</em>必须是同 \(p\)；否则不闭合。</p>
+
+<p><strong>伽马 + 伽马</strong>（同 \(\lambda\)）<strong>= 伽马</strong>。\(X \sim \Gamma(\alpha_1, \lambda)\)、\(Y \sim \Gamma(\alpha_2, \lambda)\)，独立，同 \(\lambda\)。MGF 之积 \(= (\lambda/(\lambda - t))^{\alpha_1 + \alpha_2}\)，正是 \(\Gamma(\alpha_1 + \alpha_2, \lambda)\)。所以伽马在 \(\alpha\) 上加法闭合。<em>形状参数</em>相加，<em>速率参数</em>不变。</p>
+
+<p>还有一条特例值得指出：<strong>\(n\) 个独立 Exp(\(\lambda\)) 的和服从 \(\Gamma(n, \lambda)\)</strong>。因为指数分布就是 \(\Gamma(1, \lambda)\)，\(n\) 个相加按上面规则是 \(\Gamma(n, \lambda)\)。这条事实在排队论与可靠性中天天用到——比如 "等候 \(n\) 个独立顾客全部到达" 的时间。</p>
+
+<h2 id="sec10-10">10.10 详细例题</h2>
+
+<p><strong>例 10.5（用 MGF 重证 \(\mathrm{Var}(X+Y)\) 公式）</strong>　设 \(X, Y\) 独立，\(\mathbb{E}[X] = \mu_1\)、\(\mathrm{Var}(X) = \sigma_1^2\)；同理 \(Y\) 是 \(\mu_2, \sigma_2^2\)。用 MGF 法求 \(X + Y\) 的方差。</p>
+
+<p>解：MGF 之积 \(M_{X+Y}(t) = M_X(t) M_Y(t)\)。取对数：\(\log M_{X+Y}(t) = \log M_X(t) + \log M_Y(t)\)。"对数 MGF" 又叫<em>累积量生成函数</em>（cumulant generating function），它的二阶导（在 0 处）就是方差（这条事实自己验证）。所以</p>
+
+\[
+\mathrm{Var}(X + Y) = \big[\log M_{X+Y}\big]''(0) = \big[\log M_X\big]''(0) + \big[\log M_Y\big]''(0) = \mathrm{Var}(X) + \mathrm{Var}(Y).
+\]
+
+<p>这就用 MGF 路径再次重得"独立和方差相加"——和上节一致。</p>
+
+<p><strong>例 10.6（彩票合伙买票的期望中奖数）</strong>　100 个人合伙，每人买 1 张彩票，独立中奖概率均为 \(p = 1/1000\)。求<em>这群人共中几张奖</em>的期望与方差。</p>
+
+<p>解：让 \(X_i \in \{0, 1\}\) 是第 \(i\) 个人是否中奖的指示变量，独立 Bernoulli(\(p\))。设 \(T = X_1 + \cdots + X_{100}\) 是总中奖数。</p>
+
+<p>期望（线性，不需独立）：\(\mathbb{E}[T] = 100 \cdot p = 100/1000 = 0.1\)。</p>
+
+<p>方差（独立，所以协方差 = 0）：\(\mathrm{Var}(T) = 100 \cdot p(1-p) = 100 \cdot (1/1000)(999/1000) \approx 0.0999\)。</p>
+
+<p>标准差 \(\approx 0.316\)。也就是说"平均中 0.1 张，但波动较大"——中 0 张和中 1 张都有不可忽略的概率。注意 \(T \sim \mathrm{Bin}(100, 1/1000)\)。\(np = 0.1\) 较小、\(n\) 较大，\(T\) 还可以用 \(\mathrm{Poi}(0.1)\) 近似（第 5 章讲过的"稀有事件极限"）。</p>
+
+<p><strong>例 10.7（赌徒的"独立次数"）</strong>　一名赌徒玩独立的赌局，每局赢 \(\$1\) 概率 \(0.49\)、输 \(\$1\) 概率 \(0.51\)。打 \(n = 100\) 局，求他总盈利 \(W\) 的期望、方差与标准差。</p>
+
+<p>解：每局结果 \(X_i \in \{+1, -1\}\)，期望 \(\mathbb{E}[X_i] = 0.49 - 0.51 = -0.02\)，方差 \(\mathrm{Var}(X_i) = \mathbb{E}[X_i^2] - (\mathbb{E}[X_i])^2 = 1 - 0.0004 \approx 0.9996\)。</p>
+
+<p>总盈利 \(W = \sum X_i\)。期望 \(= 100 \cdot (-0.02) = -2\)（"平均输 \(\$2\)"），方差 \(\approx 100 \cdot 0.9996 \approx 99.96\)，标准差 \(\approx 10\)。</p>
+
+<p>结论很有意思：平均输 2 块，但波动 10 块。这意味着即便长期下来"应该输"，单次 100 局里很可能因为运气而盈利或大亏。这是赌场让赌徒"以为自己有赢面"的真正原因——平均亏额被波动盖住了。但赌场玩 1000 万局，期望就是输 \(20\) 万、波动只有 \(\sqrt{10^7} \cdot 1 \approx 3162\)，标准差远小于期望，"赌场必赢" 是大数定律保证的（第 12 章详谈）。</p>
+
+<p><strong>例 10.8（用 MGF 求和：均匀和正态的混合？）</strong>　设 \(X \sim \mathcal N(0, 1)\)，\(Y \sim \mathcal N(0, 1)\)，独立。求 \(Z = X + 2 Y\) 的分布。</p>
+
+<p>解：先注意 \(2Y \sim \mathcal N(0, 4)\)（方差按系数平方放大）。\(X\) 与 \(2Y\) 独立。MGF 之积：</p>
+
+\[
+M_Z(t) = e^{t^2/2} \cdot e^{4 t^2 /2} = e^{5 t^2/2}.
+\]
+
+<p>这是 \(\mathcal N(0, 5)\) 的 MGF。所以 \(Z \sim \mathcal N(0, 5)\)。验证：\(\mathbb{E}[Z] = 0 + 2 \cdot 0 = 0\)、\(\mathrm{Var}(Z) = 1 + 4 = 5\)。一致。</p>
+
+<p>这个例子展示 MGF 的"组合"能力：要求"独立正态的线性组合"的分布，按 MGF 公式立刻可得。下章 13 节中心极限定理证明的核心也是这套 MGF 操纵。</p>
+
+<p><strong>例 10.9（matching 问题的方差）</strong>　回到 10.2 节的匹配问题。\(M\) 是 \(n\) 张请柬中"装对了"的张数。10.2 节求得 \(\mathbb{E}[M] = 1\)。问 \(\mathrm{Var}(M) = ?\)</p>
+
+<p>解：这次方差<em>不能</em>当独立项简单加，因为 \(X_i\) 之间有依赖。我们老老实实用方差展开公式：</p>
+
+\[
+\mathrm{Var}(M) = \sum_{i=1}^n \mathrm{Var}(X_i) + 2 \sum_{i<j} \mathrm{Cov}(X_i, X_j).
+\]
+
+<p>每个 \(X_i\) 是 Bernoulli(\(1/n\))，\(\mathrm{Var}(X_i) = \frac{1}{n}(1 - \frac{1}{n}) = \frac{n-1}{n^2}\)。求和共 \(n\) 项 \(= \frac{n-1}{n}\)。</p>
+
+<p>协方差：\(\mathrm{Cov}(X_i, X_j) = \mathbb{E}[X_i X_j] - \mathbb{E}[X_i]\mathbb{E}[X_j]\)。由于 \(X_i X_j = \mathbf{1}_{\{X_i = 1\}\cap\{X_j = 1\}}\)，</p>
+
+\[
+\mathbb{E}[X_i X_j] = P(\sigma(i) = i,\, \sigma(j) = j) = \frac{(n-2)!}{n!} = \frac{1}{n(n-1)}.
+\]
+
+<p>而 \(\mathbb{E}[X_i]\mathbb{E}[X_j] = \frac{1}{n^2}\)。所以</p>
+
+\[
+\mathrm{Cov}(X_i, X_j) = \frac{1}{n(n-1)} - \frac{1}{n^2} = \frac{n - (n-1)}{n^2(n-1)} = \frac{1}{n^2(n-1)}.
+\]
+
+<p>共 \(\binom n 2\) 对，乘 2：</p>
+
+\[
+2 \sum_{i<j} \mathrm{Cov} = 2 \cdot \binom n 2 \cdot \frac{1}{n^2(n-1)} = 2 \cdot \frac{n(n-1)}{2} \cdot \frac{1}{n^2(n-1)} = \frac{1}{n}.
+\]
+
+<p>合计：</p>
+
+\[
+\mathrm{Var}(M) = \frac{n-1}{n} + \frac{1}{n} = 1.
+\]
+
+\[
+\boxed{\mathbb{E}[M] = 1,\quad \mathrm{Var}(M) = 1, \quad \forall n \geq 2.}
+\]
+
+<p>方差和均值都是 1——而且不依赖 \(n\)！事实上当 \(n\) 大时，\(M\) 的分布<em>非常</em>接近 \(\mathrm{Poi}(1)\)，即"参数为 1 的泊松"——这又是那一令人愉快的"稀有事件 \(\to\) 泊松"现象。这条匹配数收敛到泊松的事实，组合数学里叫做<em>Montmort（蒙莫尔）问题</em>，是概率史上的早期珠宝。</p>
+
+<p><strong>例 10.10（小结练习：常考类型）</strong>　设 \(X \sim \mathrm{Bin}(20, 0.3)\)、\(Y \sim \mathrm{Poi}(4)\)，独立。求 \(\mathbb{E}[3X - 2Y + 5]\) 与 \(\mathrm{Var}(3X - 2Y + 5)\)。</p>
+
+<p>解：用线性，\(\mathbb{E}[X] = np = 6\)、\(\mathbb{E}[Y] = \lambda = 4\)。所以</p>
+
+\[
+\mathbb{E}[3X - 2Y + 5] = 3 \cdot 6 - 2 \cdot 4 + 5 = 18 - 8 + 5 = 15.
+\]
+
+<p>方差用独立：\(\mathrm{Var}(X) = np(1-p) = 20 \cdot 0.3 \cdot 0.7 = 4.2\)，\(\mathrm{Var}(Y) = \lambda = 4\)。常数 \(+5\) 对方差没影响。系数要平方：</p>
+
+\[
+\mathrm{Var}(3X - 2Y + 5) = 9 \cdot 4.2 + 4 \cdot 4 = 37.8 + 16 = 53.8.
+\]
+
+<p>标准差 \(\approx \sqrt{53.8} \approx 7.34\)。注意 \(-2Y\) 的系数虽然是负的，但平方后是 \(+4\)，所以方差总是非负。</p>
+
+<p>这一章的核心已经讲完。下章我们换一种风味——讨论<em>不等式</em>，那里我们将看到怎样从一个变量的少数几个矩出发，控制它"偏离均值"的概率。Markov、Chebyshev、Jensen 三大不等式将一一登场，并直接为第 12 章的大数定律铺路。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 协方差、相关与多元正态</a><a href="ch11.html">下一章 · 第 11 章 不等式 →</a></nav>
+
+</main>
+</body>
+</html>

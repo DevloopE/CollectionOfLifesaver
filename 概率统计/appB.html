@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 常用分布速查 — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 严格性：测度论速通</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+<h1 id="appB">附录 B 常用分布速查</h1>
+
+<p>本附录列出本书涉及的 16 种最常见概率分布的"速查表"——分布名、参数、PMF/PDF、期望、方差、矩生成函数（MGF）、典型应用场景。复习考试或写代码时翻一翻即可。</p>
+
+<p>请你<em>注意</em>：</p>
+
+<ul>
+<li>表中"\(B(\alpha, \beta)\)" 是 Beta 函数，"\(\Gamma(\alpha)\)" 是 Gamma 函数。</li>
+<li>"MGF" 列：若 MGF 不存在或表达式过于复杂，标 "—"。</li>
+<li>对多元/矩阵分布，期望和方差栏给出向量/矩阵形式。</li>
+</ul>
+
+<h2 id="secB-1">B.1 离散分布</h2>
+
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr>
+<th>分布</th>
+<th>参数</th>
+<th>PMF</th>
+<th>期望</th>
+<th>方差</th>
+<th>MGF</th>
+<th>典型应用</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+<td><strong>Bernoulli</strong></td>
+<td>\(p \in [0, 1]\)</td>
+<td>\(P(X = 1) = p\)，\(P(X = 0) = 1 - p\)</td>
+<td>\(p\)</td>
+<td>\(p(1 - p)\)</td>
+<td>\(1 - p + p e^t\)</td>
+<td>抛硬币、单次试验是否成功</td>
+</tr>
+
+<tr>
+<td><strong>二项 Binomial</strong></td>
+<td>\(n \in \mathbb{N}\)，\(p \in [0, 1]\)</td>
+<td>\(\binom{n}{k} p^k (1 - p)^{n - k}\)，\(k = 0, 1, \ldots, n\)</td>
+<td>\(np\)</td>
+<td>\(np(1 - p)\)</td>
+<td>\((1 - p + p e^t)^n\)</td>
+<td>\(n\) 次独立同分布试验中成功次数；质控；A/B 测试</td>
+</tr>
+
+<tr>
+<td><strong>几何 Geometric</strong></td>
+<td>\(p \in (0, 1]\)</td>
+<td>\(P(X = k) = (1 - p)^{k - 1} p\)，\(k = 1, 2, \ldots\)</td>
+<td>\(\dfrac{1}{p}\)</td>
+<td>\(\dfrac{1 - p}{p^2}\)</td>
+<td>\(\dfrac{p e^t}{1 - (1 - p) e^t}\)，\(t < -\ln(1 - p)\)</td>
+<td>第一次成功所需试验次数；等待时间</td>
+</tr>
+
+<tr>
+<td><strong>负二项 NegBin</strong></td>
+<td>\(r \in \mathbb{N}\)，\(p \in (0, 1]\)</td>
+<td>\(\binom{k - 1}{r - 1} p^r (1 - p)^{k - r}\)，\(k = r, r + 1, \ldots\)</td>
+<td>\(\dfrac{r}{p}\)</td>
+<td>\(\dfrac{r(1 - p)}{p^2}\)</td>
+<td>\(\left(\dfrac{p e^t}{1 - (1 - p) e^t}\right)^r\)</td>
+<td>第 \(r\) 次成功所需试验次数；过度离散计数数据建模</td>
+</tr>
+
+<tr>
+<td><strong>Poisson</strong></td>
+<td>\(\lambda > 0\)</td>
+<td>\(P(X = k) = \dfrac{\lambda^k e^{-\lambda}}{k!}\)，\(k = 0, 1, 2, \ldots\)</td>
+<td>\(\lambda\)</td>
+<td>\(\lambda\)</td>
+<td>\(\exp(\lambda(e^t - 1))\)</td>
+<td>稀有事件计数；电话呼叫数；放射衰变；车流量</td>
+</tr>
+
+<tr>
+<td><strong>超几何 Hypergeometric</strong></td>
+<td>\(N, K, n \in \mathbb{N}\)，\(K \leq N\)，\(n \leq N\)</td>
+<td>\(\dfrac{\binom{K}{k}\binom{N - K}{n - k}}{\binom{N}{n}}\)</td>
+<td>\(\dfrac{nK}{N}\)</td>
+<td>\(\dfrac{nK(N - K)(N - n)}{N^2(N - 1)}\)</td>
+<td>—</td>
+<td>不放回抽样；扑克牌问题；总体小时的质控</td>
+</tr>
+
+<tr>
+<td><strong>多项 Multinomial</strong></td>
+<td>\(n\)，\(\mathbf{p} = (p_1, \ldots, p_k)\)，\(\sum p_i = 1\)</td>
+<td>\(\dfrac{n!}{x_1! \cdots x_k!} \prod_i p_i^{x_i}\)，\(\sum x_i = n\)</td>
+<td>\((np_1, \ldots, np_k)\)</td>
+<td>\(\Sigma_{ij} = -np_i p_j\)（\(i \ne j\)），\(\Sigma_{ii} = np_i(1 - p_i)\)</td>
+<td>—</td>
+<td>分类计数；卡方拟合优度；语料库词频</td>
+</tr>
+
+</tbody>
+</table>
+
+<h2 id="secB-2">B.2 连续分布</h2>
+
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr>
+<th>分布</th>
+<th>参数</th>
+<th>PDF</th>
+<th>期望</th>
+<th>方差</th>
+<th>MGF</th>
+<th>典型应用</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+<td><strong>均匀 Uniform</strong></td>
+<td>\(a < b\)</td>
+<td>\(\dfrac{1}{b - a}\)，\(x \in [a, b]\)</td>
+<td>\(\dfrac{a + b}{2}\)</td>
+<td>\(\dfrac{(b - a)^2}{12}\)</td>
+<td>\(\dfrac{e^{tb} - e^{ta}}{t(b - a)}\)</td>
+<td>无信息先验；随机数生成；输入采样</td>
+</tr>
+
+<tr>
+<td><strong>指数 Exponential</strong></td>
+<td>\(\lambda > 0\)</td>
+<td>\(\lambda e^{-\lambda x}\)，\(x \geq 0\)</td>
+<td>\(\dfrac{1}{\lambda}\)</td>
+<td>\(\dfrac{1}{\lambda^2}\)</td>
+<td>\(\dfrac{\lambda}{\lambda - t}\)，\(t < \lambda\)</td>
+<td>无记忆等待时间；可靠性；Poisson 过程间隔时间</td>
+</tr>
+
+<tr>
+<td><strong>Gamma</strong></td>
+<td>\(\alpha > 0\)，\(\beta > 0\)（率）</td>
+<td>\(\dfrac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha - 1} e^{-\beta x}\)，\(x > 0\)</td>
+<td>\(\dfrac{\alpha}{\beta}\)</td>
+<td>\(\dfrac{\alpha}{\beta^2}\)</td>
+<td>\(\left(\dfrac{\beta}{\beta - t}\right)^\alpha\)，\(t < \beta\)</td>
+<td>\(\alpha\) 次指数等待时间和；Poisson 率的 Bayes 共轭先验；保险理赔</td>
+</tr>
+
+<tr>
+<td><strong>正态 Normal</strong></td>
+<td>\(\mu \in \mathbb{R}\)，\(\sigma^2 > 0\)</td>
+<td>\(\dfrac{1}{\sigma\sqrt{2\pi}} e^{-(x - \mu)^2 / (2\sigma^2)}\)</td>
+<td>\(\mu\)</td>
+<td>\(\sigma^2\)</td>
+<td>\(\exp(\mu t + \sigma^2 t^2 / 2)\)</td>
+<td>测量误差；样本均值的极限分布（CLT）；几乎一切回归的前提</td>
+</tr>
+
+<tr>
+<td><strong>Beta</strong></td>
+<td>\(\alpha, \beta > 0\)</td>
+<td>\(\dfrac{x^{\alpha - 1}(1 - x)^{\beta - 1}}{B(\alpha, \beta)}\)，\(x \in [0, 1]\)</td>
+<td>\(\dfrac{\alpha}{\alpha + \beta}\)</td>
+<td>\(\dfrac{\alpha\beta}{(\alpha + \beta)^2(\alpha + \beta + 1)}\)</td>
+<td>—（复杂超几何）</td>
+<td>Bernoulli/二项的共轭先验；比率/百分比建模</td>
+</tr>
+
+<tr>
+<td><strong>卡方 \(\chi^2\)</strong></td>
+<td>\(k \in \mathbb{N}\)（自由度）</td>
+<td>\(\dfrac{1}{2^{k/2}\Gamma(k/2)} x^{k/2 - 1} e^{-x/2}\)，\(x > 0\)</td>
+<td>\(k\)</td>
+<td>\(2k\)</td>
+<td>\((1 - 2t)^{-k/2}\)，\(t < 1/2\)</td>
+<td>样本方差的分布；卡方拟合优度检验；ANOVA</td>
+</tr>
+
+<tr>
+<td><strong>\(t\) 分布 Student</strong></td>
+<td>\(\nu > 0\)（自由度）</td>
+<td>\(\dfrac{\Gamma((\nu + 1)/2)}{\sqrt{\nu\pi}\Gamma(\nu/2)} \left(1 + \dfrac{x^2}{\nu}\right)^{-(\nu + 1)/2}\)</td>
+<td>\(0\)（\(\nu > 1\)）</td>
+<td>\(\dfrac{\nu}{\nu - 2}\)（\(\nu > 2\)）</td>
+<td>—</td>
+<td>样本均值的标准化分布（小样本，未知方差）；\(t\) 检验</td>
+</tr>
+
+<tr>
+<td><strong>\(F\) 分布</strong></td>
+<td>\(d_1, d_2 \in \mathbb{N}\)（两个自由度）</td>
+<td>\(\dfrac{1}{B(d_1/2, d_2/2)} \cdot (d_1/d_2)^{d_1/2} \cdot \dfrac{x^{d_1/2 - 1}}{(1 + d_1 x / d_2)^{(d_1 + d_2)/2}}\)，\(x > 0\)</td>
+<td>\(\dfrac{d_2}{d_2 - 2}\)（\(d_2 > 2\)）</td>
+<td>\(\dfrac{2 d_2^2 (d_1 + d_2 - 2)}{d_1 (d_2 - 2)^2 (d_2 - 4)}\)（\(d_2 > 4\)）</td>
+<td>—</td>
+<td>两组样本方差比；ANOVA；回归整体显著性</td>
+</tr>
+
+<tr>
+<td><strong>多元正态 MVN</strong></td>
+<td>\(\boldsymbol\mu \in \mathbb{R}^k\)，\(\Sigma\) 正定</td>
+<td>\(\dfrac{1}{\sqrt{(2\pi)^k |\Sigma|}} \exp\left(-\tfrac{1}{2}(\mathbf{x} - \boldsymbol\mu)^T \Sigma^{-1}(\mathbf{x} - \boldsymbol\mu)\right)\)</td>
+<td>\(\boldsymbol\mu\)</td>
+<td>\(\Sigma\)（协方差矩阵）</td>
+<td>\(\exp(\boldsymbol\mu^T \mathbf{t} + \tfrac{1}{2}\mathbf{t}^T \Sigma \mathbf{t})\)</td>
+<td>多元数据；线性回归误差；Kalman 滤波；高斯过程</td>
+</tr>
+
+</tbody>
+</table>
+
+<h2 id="secB-3">B.3 关键关系与速记</h2>
+
+<p>下面是几条经常用到的"分布之间的关系"，记住它们能帮你少推导很多。</p>
+
+<ul>
+<li><strong>Bernoulli \(\to\) 二项</strong>：\(n\) 个 iid Bernoulli\((p)\) 之和服从 Binomial\((n, p)\)。</li>
+<li><strong>几何 \(\to\) 负二项</strong>：\(r\) 个 iid Geometric\((p)\) 之和服从 NegBin\((r, p)\)。</li>
+<li><strong>指数 \(\to\) Gamma</strong>：\(\alpha\) 个 iid Exp\((\beta)\) 之和服从 Gamma\((\alpha, \beta)\)。</li>
+<li><strong>Poisson 极限定理</strong>：当 \(n \to \infty\)、\(p \to 0\)、\(np \to \lambda\) 时，Binomial\((n, p) \to\) Poisson\((\lambda)\)。</li>
+<li><strong>正态 \(\to\) 卡方</strong>：若 \(Z_1, \ldots, Z_k\) iid \(N(0, 1)\)，则 \(\sum_{i=1}^k Z_i^2 \sim \chi^2_k\)。</li>
+<li><strong>正态 + 卡方 \(\to t\)</strong>：\(\dfrac{Z}{\sqrt{V/\nu}}\) 服从 \(t_\nu\)，其中 \(Z \sim N(0, 1)\)、\(V \sim \chi^2_\nu\) 独立。</li>
+<li><strong>两个卡方 \(\to F\)</strong>：\(\dfrac{V_1/d_1}{V_2/d_2}\) 服从 \(F_{d_1, d_2}\)，其中 \(V_i \sim \chi^2_{d_i}\) 独立。</li>
+<li><strong>Beta \(\to\) 均匀</strong>：Beta\((1, 1) =\) Uniform\([0, 1]\)。</li>
+<li><strong>Gamma \(\to\) 卡方</strong>：Gamma\((k/2, 1/2)\) = \(\chi^2_k\)（形状-率参数化下）。</li>
+<li><strong>多项 \(\to\) 二项</strong>：Multinomial 的边际分量是二项。</li>
+<li><strong>MVN \(\to\) 正态</strong>：MVN 的任一线性组合 \(\mathbf{a}^T \mathbf{X}\) 是一元正态。</li>
+</ul>
+
+<h2 id="secB-4">B.4 共轭先验对照表</h2>
+
+<p>Bayes 统计常用的共轭先验对，方便查找：</p>
+
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr>
+<th>似然</th>
+<th>未知参数</th>
+<th>共轭先验</th>
+<th>后验形式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bernoulli / Binomial</td>
+<td>\(p\)（成功概率）</td>
+<td>Beta\((\alpha, \beta)\)</td>
+<td>Beta\((\alpha + k, \beta + n - k)\)</td>
+</tr>
+<tr>
+<td>Poisson</td>
+<td>\(\lambda\)（率）</td>
+<td>Gamma\((\alpha, \beta)\)</td>
+<td>Gamma\((\alpha + \sum x_i, \beta + n)\)</td>
+</tr>
+<tr>
+<td>指数</td>
+<td>\(\lambda\)（率）</td>
+<td>Gamma\((\alpha, \beta)\)</td>
+<td>Gamma\((\alpha + n, \beta + \sum x_i)\)</td>
+</tr>
+<tr>
+<td>正态（已知 \(\sigma^2\)）</td>
+<td>\(\mu\)</td>
+<td>\(N(\mu_0, \tau_0^2)\)</td>
+<td>\(N(\mu_n, \tau_n^2)\)（按精度加权）</td>
+</tr>
+<tr>
+<td>正态（已知 \(\mu\)）</td>
+<td>\(1/\sigma^2\)（精度）</td>
+<td>Gamma\((\alpha, \beta)\)</td>
+<td>Gamma\((\alpha + n/2, \beta + \tfrac{1}{2}\sum (x_i - \mu)^2)\)</td>
+</tr>
+<tr>
+<td>正态（均未知）</td>
+<td>\((\mu, \sigma^2)\)</td>
+<td>Normal-Inverse-Gamma</td>
+<td>Normal-Inverse-Gamma（更新参数）</td>
+</tr>
+<tr>
+<td>多项</td>
+<td>\((p_1, \ldots, p_k)\)</td>
+<td>Dirichlet\((\alpha_1, \ldots, \alpha_k)\)</td>
+<td>Dirichlet\((\alpha_i + x_i)\)</td>
+</tr>
+<tr>
+<td>MVN（已知 \(\Sigma\)）</td>
+<td>\(\boldsymbol\mu\)</td>
+<td>MVN\((\boldsymbol\mu_0, \Sigma_0)\)</td>
+<td>MVN（精度加权）</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="secB-5">B.5 临界值速记（常用）</h2>
+
+<p>做假设检验和置信区间时常需要的几个数（保留四位有效数字）：</p>
+
+<ul>
+<li><strong>标准正态分位数</strong>：\(z_{0.05} = 1.645\)，\(z_{0.025} = 1.960\)，\(z_{0.01} = 2.326\)，\(z_{0.005} = 2.576\)。</li>
+<li><strong>\(t_{n-1}\) 分位数（双尾 95%，即 \(t_{0.025}\)）</strong>：\(n = 5\) 时 2.776；\(n = 10\) 时 2.262；\(n = 30\) 时 2.045；\(n = 100\) 时 1.984；\(n \to \infty\) 时 1.960（与 \(z\) 一致）。</li>
+<li><strong>\(\chi^2_k\) 分位数（95%）</strong>：\(k = 1\) 时 3.841；\(k = 5\) 时 11.07；\(k = 10\) 时 18.31；\(k = 20\) 时 31.41。</li>
+<li><strong>\(F\) 分布临界值（95%）</strong>：依赖两个自由度，请查 \(F\) 表或软件函数（R 的 <code>qf(0.95, d1, d2)</code>）。</li>
+</ul>
+
+<p>本附录到此结束。把它放在书桌前，备考或写代码时随手翻一翻。希望对你有用。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 严格性：测度论速通</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+
+</main>
+</body>
+</html>

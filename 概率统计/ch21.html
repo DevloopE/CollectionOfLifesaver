@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 多元线性回归 — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 简单线性回归</a><a href="ch22.html">下一章 · 第 22 章 方差分析（ANOVA） →</a></nav>
+<h1 id="ch21">第 21 章 多元线性回归</h1>
+
+<p>第 20 章我们用一个预测变量 \(X\) 解释响应 \(Y\)。这是个好开端，但真实世界里很少这样朴素：解释一个人的体重不能只用身高，还要看年龄、性别、体脂率；解释一栋房子的价格不能只看面积，还要看地段、楼龄、装修等级；解释一种药品的效果不能只看剂量，还要看年龄、性别、并发症。我们要把第 20 章的"\(Y = \beta_0 + \beta_1 X + \epsilon\)"扩展为<em>多元</em>版本，让多个 \(X\) 同时上场。</p>
+
+<p>好消息：第 20 章建立的<em>所有</em>核心概念——最小二乘、平方和分解、\(R^2\)、\(t\) 检验、置信区间、预测带、残差诊断——全都原封不动搬过来。<em>形式</em>改变了（标量 \(\hat\beta_1\) 变成向量 \(\hat{\boldsymbol\beta}\)，\(S_{XX}^{-1}\) 变成矩阵 \((\mathbf{X}^T \mathbf{X})^{-1}\)），<em>本质</em>没变。如果你 20.6 节的几何视角吃透了，这一章读起来会有"就这？"的感觉。</p>
+
+<p>但本章不仅仅是"换符号"。多元回归带来三类新问题：</p>
+
+<ul>
+<li><em>多个变量之间的关系</em>。两个 \(X\) 互相高度相关（共线性）时，回归系数会变得不稳定，需要诊断。</li>
+<li><em>"哪些变量该留、哪些该丢"</em>。这是模型选择问题，靠 AIC、BIC、交叉验证等工具决断。</li>
+<li><em>非数值变量怎么办</em>。性别（男/女）、地区（A/B/C）这些"类别"变量用<em>哑变量</em>编码后纳入回归。</li>
+</ul>
+
+<p>本章还会简短谈谈交互项、非线性扩展（多项式与对数）、广义线性模型（GLM）——它们都是"线性回归"框架的自然延伸。最后还有一节关于"相关 \(\ne\) 因果"的提醒——这是统计学最容易踩、也最容易让人翻车的雷区。</p>
+
+<h2 id="sec21-1">21.1 推广：\(Y = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p + \epsilon\)</h2>
+
+<p>设我们有 \(p\) 个预测变量 \(X_1, X_2, \ldots, X_p\) 和 1 个响应变量 \(Y\)。<strong>多元线性回归模型</strong>假设：</p>
+
+\[
+\boxed{Y_i = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \cdots + \beta_p X_{ip} + \epsilon_i, \qquad i = 1, 2, \ldots, n,}
+\]
+
+<p>其中：</p>
+
+<ul>
+<li>\(X_{ij}\) 是第 \(i\) 个观测在第 \(j\) 个预测变量上的取值（已知常数）；</li>
+<li>\(\beta_0\) 是截距，\(\beta_1, \ldots, \beta_p\) 是 \(p\) 个回归系数（未知，要估计）；</li>
+<li>\(\epsilon_i \stackrel{\text{i.i.d.}}{\sim} \mathcal{N}(0, \sigma^2)\)，假设同 20.2 节。</li>
+</ul>
+
+<p>请注意"线性"二字的含义：模型对<em>系数</em> \(\beta_j\) 是线性的，<em>不</em>是要求 \(Y\) 对 \(X\) 是线性的。比如 \(Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \epsilon\) 仍然是<em>线性回归</em>——因为它对 \(\beta_0, \beta_1, \beta_2\) 是线性的——尽管它对 \(X\) 是二次的。这一点 21.13 节会详细谈。</p>
+
+<p>每一个回归系数 \(\beta_j\)（\(j = 1, \ldots, p\)）的解释是：<em>在保持其他预测变量不变的前提下，\(X_j\) 每增加 1 单位，\(Y\) 的期望值改变 \(\beta_j\) 单位</em>。这"保持其他不变"是关键修饰——<em>偏</em>效应（partial effect），非"边际"效应。多元回归的全部威力，正在它能扣除其他变量的混杂、给出一个变量的"独立贡献"。</p>
+
+<p>例如：在房价模型 \(Y = \beta_0 + \beta_1 \cdot \text{面积} + \beta_2 \cdot \text{楼龄} + \epsilon\) 里，\(\beta_1\) 的解释是"楼龄相同时，面积每多 1 平米，价格平均增加 \(\beta_1\) 元"——它<em>不是</em>"面积大 1 平米的房子比小 1 平米的房子总均价大多少"（因为大面积的房子可能也更新）。</p>
+
+<h2 id="sec21-2">21.2 矩阵形式</h2>
+
+<p>把上一节的方程写成 \(n\) 条很麻烦，写成矩阵就一句话。定义：</p>
+
+\[
+\mathbf{Y} = \begin{pmatrix} Y_1 \\ Y_2 \\ \vdots \\ Y_n \end{pmatrix}, \qquad \boldsymbol\beta = \begin{pmatrix} \beta_0 \\ \beta_1 \\ \vdots \\ \beta_p \end{pmatrix}, \qquad \boldsymbol\epsilon = \begin{pmatrix} \epsilon_1 \\ \epsilon_2 \\ \vdots \\ \epsilon_n \end{pmatrix},
+\]
+
+<p>设计矩阵</p>
+
+\[
+\mathbf{X} = \begin{pmatrix} 1 & X_{11} & X_{12} & \cdots & X_{1p} \\ 1 & X_{21} & X_{22} & \cdots & X_{2p} \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ 1 & X_{n1} & X_{n2} & \cdots & X_{np} \end{pmatrix} \in \mathbb{R}^{n \times (p+1)}.
+\]
+
+<p>第一列全是 1，对应截距；后面每列是一个预测变量在 \(n\) 个观测下的取值。注意 \(\mathbf{X}\) 是 \(n \times (p + 1)\) 矩阵，因为加上了截距列。这样模型简写为</p>
+
+\[
+\boxed{\mathbf{Y} = \mathbf{X} \boldsymbol\beta + \boldsymbol\epsilon, \qquad \boldsymbol\epsilon \sim \mathcal{N}_n(\mathbf{0}, \sigma^2 \mathbf{I}_n).}
+\]
+
+<p>其中 \(\mathcal{N}_n(\mathbf{0}, \sigma^2 \mathbf{I})\) 是 \(n\) 维多元正态：均值零向量，协方差矩阵 \(\sigma^2 \mathbf{I}_n\)（对角矩阵）。这与"\(\epsilon_i\) 独立同方差正态"完全等价。</p>
+
+<p>这一记号的好处不仅是简洁。它把"一组方程"压缩为"一个矩阵方程"，让我们能用线性代数的所有工具——矩阵乘法、转置、逆、列空间、投影——一口气解决问题。下一节就动手算 \(\hat{\boldsymbol\beta}\)。</p>
+
+<h2 id="sec21-3">21.3 最小二乘解：\(\hat{\boldsymbol\beta} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Y}\)</h2>
+
+<p>残差平方和写成矩阵：</p>
+
+\[
+S(\boldsymbol\beta) = \sum_i (Y_i - \mathbf{x}_i^T \boldsymbol\beta)^2 = \|\mathbf{Y} - \mathbf{X}\boldsymbol\beta\|^2 = (\mathbf{Y} - \mathbf{X}\boldsymbol\beta)^T (\mathbf{Y} - \mathbf{X}\boldsymbol\beta).
+\]
+
+<p>展开：</p>
+
+\[
+S(\boldsymbol\beta) = \mathbf{Y}^T \mathbf{Y} - 2 \boldsymbol\beta^T \mathbf{X}^T \mathbf{Y} + \boldsymbol\beta^T \mathbf{X}^T \mathbf{X} \boldsymbol\beta.
+\]
+
+<p>对 \(\boldsymbol\beta\) 求梯度（\(p + 1\) 维向量）并令其为零：</p>
+
+\[
+\nabla_{\boldsymbol\beta} S = -2 \mathbf{X}^T \mathbf{Y} + 2 \mathbf{X}^T \mathbf{X} \boldsymbol\beta = \mathbf{0}.
+\]
+
+<p>整理：</p>
+
+\[
+\mathbf{X}^T \mathbf{X} \hat{\boldsymbol\beta} = \mathbf{X}^T \mathbf{Y}.
+\]
+
+<p>这就是<strong>法方程</strong>（normal equations），其矩阵形式比 20.4 节的标量形式还要干净。如果矩阵 \(\mathbf{X}^T \mathbf{X}\) 可逆（即 \(\mathbf{X}\) 列满秩，等价于 \(p + 1 \leq n\) 且没有完美共线性），唯一解为</p>
+
+\[
+\boxed{\hat{\boldsymbol\beta} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Y}.}
+\]
+
+<p>这是整本书里最值得用方框框起来的公式之一。它优美地把"\(n\) 维数据 + \(p + 1\) 个未知系数 + 最小二乘准则"全部压缩成一个矩阵表达式。如果你只能记住本章一个公式，记住它。</p>
+
+<p>请你<em>注意</em>：</p>
+
+<ul>
+<li>\(\mathbf{X}^T \mathbf{X}\) 是 \((p+1) \times (p+1)\) 方阵，可逆当且仅当 \(\mathbf{X}\) 列满秩。</li>
+<li>\(\mathbf{X}^T \mathbf{Y}\) 是 \((p+1) \times 1\) 向量。</li>
+<li>所以 \(\hat{\boldsymbol\beta}\) 是 \((p+1) \times 1\) 向量——\(\hat\beta_0, \hat\beta_1, \ldots, \hat\beta_p\)。</li>
+</ul>
+
+<p>当 \(p = 1\) 时，把矩阵展开就回到 20.4 节的 \(\hat\beta_0, \hat\beta_1\) 公式——同一件事的两种写法。</p>
+
+<p><strong>例 21.1（手算两元回归）</strong>　数据 \(n = 4\)，\(p = 2\)：</p>
+
+\[
+\begin{array}{c|c|c|c}
+i & X_{i1} & X_{i2} & Y_i \\
+\hline
+1 & 1 & 1 & 5 \\
+2 & 1 & 2 & 7 \\
+3 & 2 & 1 & 8 \\
+4 & 2 & 2 & 11
+\end{array}
+\]
+
+<p>解：写 \(\mathbf{X}\) 与 \(\mathbf{Y}\)：</p>
+
+\[
+\mathbf{X} = \begin{pmatrix} 1 & 1 & 1 \\ 1 & 1 & 2 \\ 1 & 2 & 1 \\ 1 & 2 & 2 \end{pmatrix}, \qquad \mathbf{Y} = \begin{pmatrix} 5 \\ 7 \\ 8 \\ 11 \end{pmatrix}.
+\]
+
+<p>算 \(\mathbf{X}^T \mathbf{X}\)：</p>
+
+\[
+\mathbf{X}^T \mathbf{X} = \begin{pmatrix} 4 & 6 & 6 \\ 6 & 10 & 9 \\ 6 & 9 & 10 \end{pmatrix}.
+\]
+
+<p>（验证：第 (1,1) 是 \(\sum 1 \cdot 1 = 4\)；第 (1,2) 是 \(\sum 1 \cdot X_{i1} = 6\)；第 (2,3) 是 \(\sum X_{i1} X_{i2} = 1 + 2 + 2 + 4 = 9\)；其余类推。）</p>
+
+<p>算 \(\mathbf{X}^T \mathbf{Y}\)：</p>
+
+\[
+\mathbf{X}^T \mathbf{Y} = \begin{pmatrix} 5 + 7 + 8 + 11 \\ 5 + 7 + 16 + 22 \\ 5 + 14 + 8 + 22 \end{pmatrix} = \begin{pmatrix} 31 \\ 50 \\ 49 \end{pmatrix}.
+\]
+
+<p>解 \(\mathbf{X}^T \mathbf{X} \hat{\boldsymbol\beta} = \mathbf{X}^T \mathbf{Y}\)。这里 \(3 \times 3\) 矩阵求逆比较麻烦，我们用<em>消元</em>。三元方程组：</p>
+
+\[
+\begin{cases}
+4\hat\beta_0 + 6\hat\beta_1 + 6\hat\beta_2 = 31, \\
+6\hat\beta_0 + 10\hat\beta_1 + 9\hat\beta_2 = 50, \\
+6\hat\beta_0 + 9\hat\beta_1 + 10\hat\beta_2 = 49.
+\end{cases}
+\]
+
+<p>第三式减第二式得 \(-\hat\beta_1 + \hat\beta_2 = -1\)，即 \(\hat\beta_2 = \hat\beta_1 - 1\)。代入第二式：\(6\hat\beta_0 + 10\hat\beta_1 + 9(\hat\beta_1 - 1) = 50\)，即 \(6\hat\beta_0 + 19\hat\beta_1 = 59\)。代入第一式：\(4\hat\beta_0 + 6\hat\beta_1 + 6(\hat\beta_1 - 1) = 31\)，即 \(4\hat\beta_0 + 12\hat\beta_1 = 37\)。</p>
+
+<p>解 \(6\hat\beta_0 + 19\hat\beta_1 = 59\) 与 \(4\hat\beta_0 + 12\hat\beta_1 = 37\)。第一式乘 2、第二式乘 3：\(12\hat\beta_0 + 38\hat\beta_1 = 118\)，\(12\hat\beta_0 + 36\hat\beta_1 = 111\)。相减得 \(2\hat\beta_1 = 7\)，\(\hat\beta_1 = 3.5\)。回代：\(\hat\beta_2 = 2.5\)；\(4\hat\beta_0 = 37 - 12 \cdot 3.5 = -5\)，\(\hat\beta_0 = -1.25\)。</p>
+
+<p>最终：\(\hat Y = -1.25 + 3.5 X_1 + 2.5 X_2\)。</p>
+
+<p>验证：把四个观测代入：\(\hat Y_1 = -1.25 + 3.5 + 2.5 = 4.75\)，\(\hat Y_2 = -1.25 + 3.5 + 5.0 = 7.25\)，\(\hat Y_3 = -1.25 + 7.0 + 2.5 = 8.25\)，\(\hat Y_4 = -1.25 + 7.0 + 5.0 = 10.75\)。残差 \(0.25, -0.25, -0.25, 0.25\)；和为 0 ✓。</p>
+
+<h2 id="sec21-4">21.4 几何：投影到 \(\mathrm{Col}(\mathbf{X})\)</h2>
+
+<p>第 20.6 节说过，简单线性回归是把 \(\mathbf{Y}\) 投影到由"全 1 列"和"\(X\) 列"张成的二维子空间。多元情形完全一样——只是子空间维数从 2 升到 \(p + 1\)。</p>
+
+<p>把 \(\mathbf{X}\) 的 \(p + 1\) 列张成的子空间记为 \(\mathrm{Col}(\mathbf{X}) \subset \mathbb{R}^n\)。最小二乘解 \(\hat{\mathbf{Y}} = \mathbf{X}\hat{\boldsymbol\beta}\) 是 \(\mathbf{Y}\) 到 \(\mathrm{Col}(\mathbf{X})\) 的<strong>正交投影</strong>。"投影"这件事用矩阵写出来：</p>
+
+\[
+\hat{\mathbf{Y}} = \mathbf{X}\hat{\boldsymbol\beta} = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Y} = \mathbf{H}\mathbf{Y},
+\]
+
+<p>其中 \(\mathbf{H} = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T\) 称为<strong>帽子矩阵</strong>（hat matrix）——它"把 \(\mathbf{Y}\) 戴上帽子变成 \(\hat{\mathbf{Y}}\)"。它有几个非常重要的性质，请你记住：</p>
+
+<ul>
+<li><em>对称</em>：\(\mathbf{H}^T = \mathbf{H}\)。</li>
+<li><em>幂等</em>：\(\mathbf{H}^2 = \mathbf{H}\)。投影两次等于投影一次。</li>
+<li><em>秩</em>：\(\mathrm{rank}(\mathbf{H}) = \mathrm{trace}(\mathbf{H}) = p + 1\)。</li>
+</ul>
+
+<p>残差向量 \(\mathbf{e} = \mathbf{Y} - \hat{\mathbf{Y}} = (\mathbf{I} - \mathbf{H})\mathbf{Y}\) 落在 \(\mathrm{Col}(\mathbf{X})\) 的<em>正交补</em>里——这是为什么 \(\mathbf{X}^T \mathbf{e} = \mathbf{0}\)（残差正交于每个预测变量）。"残差和为零"则是这条等式的第一行。"残差与每个 \(X_j\) 的样本协方差为零"则是这条等式的第 \(j+1\) 行。本质上和第 20 章是同一回事，只是维度更高了。</p>
+
+<p>这个几何视角的真正威力在<em>下一节</em>：它让 \(\hat{\boldsymbol\beta}\) 的协方差矩阵不需要再"分别推导每个 \(\hat\beta_j\) 的方差"，一行就出来。</p>
+
+<h2 id="sec21-5">21.5 \(\hat{\boldsymbol\beta}\) 的协方差矩阵</h2>
+
+<p>把 \(\hat{\boldsymbol\beta} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Y}\) 看作 \(\mathbf{Y}\) 的线性函数。\(\mathbf{Y} \sim \mathcal{N}_n(\mathbf{X}\boldsymbol\beta, \sigma^2 \mathbf{I})\)，所以</p>
+
+\[
+\mathrm{E}[\hat{\boldsymbol\beta}] = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{X} \boldsymbol\beta = \boldsymbol\beta.
+\]
+
+<p>所以 \(\hat{\boldsymbol\beta}\) 是 \(\boldsymbol\beta\) 的<em>无偏估计</em>。</p>
+
+<p>协方差矩阵：用"\(\mathrm{Cov}(\mathbf{A}\mathbf{Y}) = \mathbf{A} \cdot \mathrm{Cov}(\mathbf{Y}) \cdot \mathbf{A}^T\)"的规则，\(\mathbf{A} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T\)：</p>
+
+\[
+\mathrm{Cov}(\hat{\boldsymbol\beta}) = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \cdot \sigma^2 \mathbf{I} \cdot \mathbf{X} (\mathbf{X}^T \mathbf{X})^{-1} = \sigma^2 (\mathbf{X}^T \mathbf{X})^{-1}.
+\]
+
+\[
+\boxed{\mathrm{Cov}(\hat{\boldsymbol\beta}) = \sigma^2 (\mathbf{X}^T \mathbf{X})^{-1}.}
+\]
+
+<p>这条公式信息密度极高。\(\hat\beta_j\) 的方差就是 \(\sigma^2 \cdot [(\mathbf{X}^T \mathbf{X})^{-1}]_{jj}\)（这个矩阵的第 \(j\) 个对角元）。两个不同 \(\hat\beta_j\) 与 \(\hat\beta_k\) 的<em>协方差</em>就是 \(\sigma^2 \cdot [(\mathbf{X}^T \mathbf{X})^{-1}]_{jk}\)（非对角元）——一般非零，意思是不同回归系数估计<em>不</em>独立。这个相关性是 21.9 节"多重共线性"的源头。</p>
+
+<p>把 \(\sigma^2\) 替换为它的无偏估计</p>
+
+\[
+\hat\sigma^2 = s^2 = \frac{\mathrm{SSE}}{n - p - 1} = \frac{\mathbf{e}^T \mathbf{e}}{n - p - 1},
+\]
+
+<p>分母 \(n - p - 1\) 是<em>自由度</em>——因为模型用掉了 \(p + 1\) 个参数。然后 \(\hat\beta_j\) 的<em>标准误</em>：</p>
+
+\[
+\mathrm{SE}(\hat\beta_j) = s \sqrt{[(\mathbf{X}^T \mathbf{X})^{-1}]_{jj}}.
+\]
+
+<p>下一节就拿这个去做 \(t\) 检验。</p>
+
+<h2 id="sec21-6">21.6 各 \(\hat\beta_j\) 的 \(t\) 检验</h2>
+
+<p>在标准假设下（\(\epsilon_i\) i.i.d. 正态等方差），可以证明：</p>
+
+\[
+\frac{\hat\beta_j - \beta_j}{\mathrm{SE}(\hat\beta_j)} \sim t_{n - p - 1}.
+\]
+
+<p>所以 \(\beta_j\) 的 \(100(1 - \alpha)\%\) 置信区间是</p>
+
+\[
+\hat\beta_j \pm t_{\alpha/2,\, n - p - 1} \cdot \mathrm{SE}(\hat\beta_j).
+\]
+
+<p>检验 \(H_0 : \beta_j = 0\)（即"\(X_j\) 在控制其他变量后对 \(Y\) 没有线性贡献"）：算 \(t_j = \hat\beta_j / \mathrm{SE}(\hat\beta_j)\)，与 \(t_{\alpha/2, n-p-1}\) 比较，或算 \(p\) 值。</p>
+
+<p>请你<em>注意</em>，这是<em>偏</em> \(t\) 检验——它检验 "在<em>已经控制</em>其他 \(p - 1\) 个变量后，\(X_j\) 是否还有独立贡献"。这与"单独看 \(X_j\) 与 \(Y\) 的相关"<em>不一样</em>。两个 \(X\) 高度共线时，单独看每个都"显著"，放在一起两个都"不显著"——因为它们提供的信息几乎重复。这是 21.9 节多重共线性的典型症状。</p>
+
+<p><strong>例 21.2（继续例 21.1）</strong>　接前例的两元回归，给 \(\hat\beta_1\) 的 95% 置信区间，并检验 \(H_0 : \beta_1 = 0\)。</p>
+
+<p>解：先算 \(\mathrm{SSE}\)。残差为 \((0.25, -0.25, -0.25, 0.25)\)：\(\mathrm{SSE} = 0.0625 \times 4 = 0.25\)。自由度 \(n - p - 1 = 4 - 2 - 1 = 1\)。\(s^2 = 0.25\)、\(s = 0.5\)。</p>
+
+<p>需要 \((\mathbf{X}^T \mathbf{X})^{-1}\)。从 \(\mathbf{X}^T \mathbf{X} = \begin{pmatrix} 4 & 6 & 6 \\ 6 & 10 & 9 \\ 6 & 9 & 10 \end{pmatrix}\) 算行列式：</p>
+
+\[
+\det = 4(100 - 81) - 6(60 - 54) + 6(54 - 60) = 4 \cdot 19 - 6 \cdot 6 + 6 \cdot (-6) = 76 - 36 - 36 = 4.
+\]
+
+<p>余子式给出逆矩阵的对角元：\([(\mathbf{X}^T \mathbf{X})^{-1}]_{11} = (10 \cdot 10 - 9 \cdot 9)/4 = 19/4\)，对应截距；\([(\mathbf{X}^T \mathbf{X})^{-1}]_{22} = (4 \cdot 10 - 6 \cdot 6)/4 = 4/4 = 1\)，对应 \(\hat\beta_1\)；\([(\mathbf{X}^T \mathbf{X})^{-1}]_{33} = (4 \cdot 10 - 6 \cdot 6)/4 = 1\)，对应 \(\hat\beta_2\)。</p>
+
+<p>所以 \(\mathrm{SE}(\hat\beta_1) = s \sqrt{1} = 0.5\)。</p>
+
+<p>查 \(t_{0.025, 1} = 12.706\)（自由度只有 1，区间会非常宽）。\(\hat\beta_1\) 的 95% 置信区间：\(3.5 \pm 12.706 \cdot 0.5 = 3.5 \pm 6.353 = (-2.85, 9.85)\)——区间含 0，不能拒绝 \(H_0\)。</p>
+
+<p>这个例子的"自由度只有 1"暴露了一个根本问题：<em>样本太少不足以做强推断</em>。在多元回归里，\(n\) 至少要远大于 \(p + 1\)，否则估计极不可靠。这是为什么实际工作中通常要求 \(n / p \geq 10\)（每个变量至少 10 个观测）。</p>
+
+<h2 id="sec21-7">21.7 \(F\) 检验：整体显著性</h2>
+
+<p>各 \(\hat\beta_j\) 的 \(t\) 检验回答"<em>这一个</em>变量重不重要"，但还有一个更基础的问题：<em>整个模型</em>有用吗？也就是要检验</p>
+
+\[
+H_0 : \beta_1 = \beta_2 = \cdots = \beta_p = 0 \quad \text{vs} \quad H_1 : \text{至少一个 }\beta_j \neq 0.
+\]
+
+<p>注意 \(H_0\) 不限制 \(\beta_0\)——截距永远在；\(H_0\) 只说"所有<em>斜率</em>都为零"，等价于"模型只是一个常数 \(\bar Y\)，预测变量统统没用"。</p>
+
+<p>用同样的平方和分解 \(\mathrm{SST} = \mathrm{SSR} + \mathrm{SSE}\)，构造统计量：</p>
+
+\[
+\boxed{F = \frac{\mathrm{SSR}/p}{\mathrm{SSE}/(n - p - 1)} = \frac{\mathrm{MSR}}{\mathrm{MSE}}.}
+\]
+
+<p>分子 \(\mathrm{MSR} = \mathrm{SSR}/p\) 是"被模型解释的均方"，分母 \(\mathrm{MSE} = \mathrm{SSE}/(n - p - 1)\) 是"残差均方"。在 \(H_0\) 下，</p>
+
+\[
+F \sim F_{p,\, n - p - 1}.
+\]
+
+<p>查 \(F\) 分布的临界值 \(F_{\alpha,\, p,\, n - p - 1}\)，若 \(F > F_\alpha\)（或 \(p\)-value \(< \alpha\)），拒绝 \(H_0\)，断言至少有一个 \(\beta_j\) 显著不为零——也就是说<em>整个</em>模型有解释力。</p>
+
+<p>"为什么是 \(F\)？" \(F\) 分布的本质是"两个独立卡方除以各自自由度"的比；这里 \(\mathrm{SSR}/\sigma^2 \sim \chi^2_p\)、\(\mathrm{SSE}/\sigma^2 \sim \chi^2_{n-p-1}\)，且独立——所以比值服从 \(F_{p, n-p-1}\)。在 \(p = 1\) 时退化到第 20 章的简单情形，且 \(F = T^2\)（\(t\) 统计量的平方），两种检验等价。</p>
+
+<p>请你<em>注意</em>一件事："整体 \(F\) 显著" 与 "某个 \(t\) 显著"<em>并不</em>是一回事。可能 \(F\) 显著但每个 \(t\) 都不显著（共线性）；也可能 \(F\) 不显著但某个 \(t\) 显著（数据中只有少量信号被多个变量稀释）。这两种"分歧"都是诊断模型的重要信号。</p>
+
+<h2 id="sec21-8">21.8 调整后的 \(R^2\)</h2>
+
+<p>\(R^2 = \mathrm{SSR}/\mathrm{SST}\) 在多元回归里仍然定义。但有一个让人不舒服的事实：<em>无论加多少无关变量，\(R^2\) 只会上升或不变，绝不下降</em>。</p>
+
+<p>为什么？因为<em>添加</em>一列变量给 \(\mathbf{X}\)，相当于扩大了 \(\mathrm{Col}(\mathbf{X})\) 子空间；投影到更大子空间的距离 \(\|\mathbf{Y} - \hat{\mathbf{Y}}\|^2\) 不可能变大。即使新加的变量是<em>完全无关</em>的随机噪声，它在某个特定数据集里多少也能"贴合"几个点，让 \(R^2\) 上升那么一点点。</p>
+
+<p>这就把"用 \(R^2\) 比较模型"这件事坑了：你只要不停加变量，\(R^2\) 就一直涨，但你<em>没有</em>真的改进模型——只是在<em>过拟合</em>。</p>
+
+<p>修正方法是<strong>调整后的 \(R^2\)</strong>（adjusted \(R^2\)）：</p>
+
+\[
+\boxed{\bar R^2 = 1 - \frac{\mathrm{SSE}/(n - p - 1)}{\mathrm{SST}/(n - 1)} = 1 - (1 - R^2) \cdot \frac{n - 1}{n - p - 1}.}
+\]
+
+<p>它等价于把 \(\mathrm{SSE}\) 和 \(\mathrm{SST}\) 都除以各自的自由度。这样在加变量时，\(p\) 增加会让 \(n - p - 1\) 减小、罚项 \((n-1)/(n-p-1)\) 变大；只有新变量带来的 \(R^2\) 提升超过这个罚项，\(\bar R^2\) 才会真的上升。</p>
+
+<p>请你<em>注意</em>，\(\bar R^2\) 可以为负（当模型连平均值都比不过时），这是它和 \(R^2\) 又一不同。</p>
+
+<p>\(\bar R^2\) 是<em>模型选择</em>的常用工具之一。下一节我们看更"现代"的指标 AIC、BIC、交叉验证。</p>
+
+<h2 id="sec21-9">21.9 多重共线性与 VIF</h2>
+
+<p>设你做房价回归，加入了"卧室数"和"总房间数"两个变量。这两者高度相关——大房子卧室也多。用最小二乘拟合后会发生什么？</p>
+
+<p>第一，\(\mathbf{X}^T \mathbf{X}\) 的两列几乎平行，行列式接近零，逆矩阵的元素变得非常大。第二，\(\mathrm{Cov}(\hat{\boldsymbol\beta}) = \sigma^2 (\mathbf{X}^T \mathbf{X})^{-1}\) 中对应这两个变量的对角元爆炸——\(\mathrm{Var}(\hat\beta_j)\) 和 \(\mathrm{Var}(\hat\beta_k)\) 都非常大，标准误巨大。第三，\(t\) 统计量小，\(p\) 值大，这两个变量都"不显著"——尽管单独看每个都跟房价高度相关。这就是<strong>多重共线性</strong>（multicollinearity）的典型症状。</p>
+
+<p>诊断指标：<strong>方差膨胀因子</strong>（Variance Inflation Factor，VIF）。对第 \(j\) 个变量定义</p>
+
+\[
+\mathrm{VIF}_j = \frac{1}{1 - R_j^2},
+\]
+
+<p>其中 \(R_j^2\) 是把<em>变量 \(X_j\)</em> 当做响应、用其他 \(p - 1\) 个 \(X\) 做回归得到的 \(R^2\)。直观地：如果 \(X_j\) 几乎可以被其他变量线性组合解释，\(R_j^2 \to 1\)，VIF \(\to \infty\)。</p>
+
+<p>经验法则：</p>
+
+<ul>
+<li>VIF \(< 5\)：基本没问题；</li>
+<li>VIF \(\in [5, 10]\)：有共线性，注意；</li>
+<li>VIF \(> 10\)：严重共线性，应当处理。</li>
+</ul>
+
+<p>处理办法：(a) 把高度共线的变量合并（如把"卧室"和"客厅"合为"总房间"）；(b) 删除其中之一；(c) 用主成分回归、岭回归（ridge regression）等正则化方法（这些是高级课题，本章只点到为止）。</p>
+
+<p>请你<em>注意</em>一件容易混的事：共线性<em>不</em>降低预测精度——\(\hat{\mathbf{Y}}\) 仍然是 \(\mathbf{Y}\) 在 \(\mathrm{Col}(\mathbf{X})\) 上的投影、依然准。它只<em>降低</em>了对各个 \(\hat\beta_j\) 的解释——你说不清"是哪一个变量"在贡献。如果你的目的只是<em>预测</em>，共线性可忍；如果是<em>解释</em>哪个因素重要，共线性是大麻烦。</p>
+
+<h2 id="sec21-10">21.10 模型选择：AIC、BIC、交叉验证</h2>
+
+<p>回到 21.8 节的"该加哪些变量"问题。除了调整后的 \(R^2\)，还有几种主流准则：</p>
+
+<p><strong>AIC</strong>（Akaike Information Criterion）：</p>
+
+\[
+\mathrm{AIC} = -2 \ln L + 2k,
+\]
+
+<p>其中 \(L\) 是模型的最大似然值，\(k = p + 2\) 是参数总数（系数 \(p + 1\) 加上 \(\sigma^2\)）。在正态线性模型里，\(\mathrm{AIC} = n \ln(\mathrm{SSE}/n) + 2k +\) 常数。<em>越小越好</em>。AIC 在"似然 + 罚项"框架下平衡拟合度（似然项）与复杂度（罚项 \(2k\)）。</p>
+
+<p><strong>BIC</strong>（Bayesian Information Criterion）：</p>
+
+\[
+\mathrm{BIC} = -2 \ln L + k \ln n.
+\]
+
+<p>同样越小越好，但罚项是 \(k \ln n\)，比 AIC 的 \(2k\) <em>更狠</em>（\(\ln n > 2\) 当 \(n > 7\)），因此倾向选更稀疏的模型。</p>
+
+<p><strong>交叉验证</strong>（cross-validation, CV）。把数据分成 \(k\) 折，每次留一折作"测试集"、其余 \(k - 1\) 折作"训练集"拟合模型，把测试集上的预测误差累加。常用 \(k = 5\) 或 \(k = 10\)；当 \(k = n\) 时叫"留一交叉验证"（LOOCV）。CV 的好处是<em>直接</em>衡量"对新数据的预测能力"——这是几乎所有模型选择的最终目标。</p>
+
+<p>三种方法各有侧重：AIC 适合预测目的，BIC 适合"找真实模型"目的，CV 是金标准但计算量大。实际工作里通常多种结合用。</p>
+
+<h2 id="sec21-11">21.11 哑变量：处理类别预测变量</h2>
+
+<p>到此为止所有 \(X\) 都是<em>数值</em>变量（身高、年龄、广告费）。但很多实际变量是<em>类别</em>（性别：男/女；季节：春夏秋冬；地区：A/B/C）。怎么把它们塞进回归？</p>
+
+<p>办法：用<strong>哑变量</strong>（dummy variable）编码。对一个有 \(K\) 个类别的变量，引入 \(K - 1\) 个 0/1 哑变量。例如"季节"有 4 类，引入</p>
+
+\[
+D_2 = \mathbb{1}\{\text{夏}\}, \quad D_3 = \mathbb{1}\{\text{秋}\}, \quad D_4 = \mathbb{1}\{\text{冬}\}.
+\]
+
+<p>(春不需要哑变量，它当"基准类"，\(D_2 = D_3 = D_4 = 0\) 时模型就是春天的预测。)</p>
+
+<p>模型变成 \(Y = \beta_0 + \beta_2 D_2 + \beta_3 D_3 + \beta_4 D_4 + \cdots + \epsilon\)。解释：\(\beta_0\) 是春天的均值；\(\beta_2\) 是"夏天比春天多多少"；类似地 \(\beta_3, \beta_4\) 分别是秋、冬<em>相对春天的差异</em>。</p>
+
+<p>请你<em>注意</em>"为什么是 \(K - 1\) 个而非 \(K\) 个"：如果都引入 \(K\) 个，加上截距列就和"全 1 列"线性相关（春 + 夏 + 秋 + 冬 \(\equiv 1\)），\(\mathbf{X}\) 不再列满秩，\(\mathbf{X}^T \mathbf{X}\) 不可逆。这叫"哑变量陷阱"（dummy variable trap）。把基准类省略一个就避免。</p>
+
+<p><strong>例 21.3（性别 + 教育的工资模型）</strong>　设工资 \(Y\) 与性别（男/女）和教育年数 \(X\) 的关系。引入哑变量 \(D = \mathbb{1}\{\text{女}\}\)，模型 \(Y = \beta_0 + \beta_1 X + \beta_2 D + \epsilon\)。</p>
+
+<p>解释：</p>
+
+<ul>
+<li>男性工资曲线：\(Y = \beta_0 + \beta_1 X\)；</li>
+<li>女性工资曲线：\(Y = (\beta_0 + \beta_2) + \beta_1 X\)。</li>
+</ul>
+
+<p>两条线<em>平行</em>（同斜率），相差 \(\beta_2\) 的截距。如果 \(\beta_2 < 0\) 且显著，则在控制教育年数后女性工资比男性低 \(|\beta_2|\)。</p>
+
+<p>但如果你<em>怀疑</em>"教育对工资的回报对男女不同"——比如女性多读一年书涨得没男性多——那就需要"交互项"，下一节展开。</p>
+
+<h2 id="sec21-12">21.12 交互项</h2>
+
+<p>承接上一节的工资例子。如果"教育对工资的影响"在男女间不同，模型应当让<em>斜率</em>也随性别变。引入<strong>交互项</strong> \(X \cdot D\)：</p>
+
+\[
+Y = \beta_0 + \beta_1 X + \beta_2 D + \beta_3 (X \cdot D) + \epsilon.
+\]
+
+<p>展开两个性别：</p>
+
+<ul>
+<li>男性（\(D = 0\)）：\(Y = \beta_0 + \beta_1 X\)，斜率 \(\beta_1\)。</li>
+<li>女性（\(D = 1\)）：\(Y = (\beta_0 + \beta_2) + (\beta_1 + \beta_3) X\)，斜率 \(\beta_1 + \beta_3\)。</li>
+</ul>
+
+<p>所以 \(\beta_3\) 解释为"女性教育回报比男性多多少（如果 \(\beta_3 < 0\) 则少多少）"。检验 \(H_0 : \beta_3 = 0\) 即检验"教育回报有无性别差异"。</p>
+
+<p>更一般地，对任意两个变量 \(X_1, X_2\)，模型可以加 \(X_1 \cdot X_2\) 作为交互项；它捕捉"\(X_1\) 对 \(Y\) 的边际效应取决于 \(X_2\) 的值"这种现象。比如药剂量 \(X_1\) 与年龄 \(X_2\) 的交互：剂量对老人的影响可能比对年轻人更猛——交互项捕捉这种<em>条件依赖</em>。</p>
+
+<p><strong>例 21.4（销售：广告与季节的交互）</strong>　某零售商记录了 24 个月的"广告费 \(X\)（万元）"和销售额 \(Y\)（万元），并记录每月是否为"促销季"（\(D = 1\) 为促销季、否则 \(D = 0\)）。建议模型：</p>
+
+\[
+Y = \beta_0 + \beta_1 X + \beta_2 D + \beta_3 (X \cdot D) + \epsilon.
+\]
+
+<p>非促销季的回归直线斜率 \(\beta_1\) 表示"非促销季每多投 1 万广告，销售额涨多少"；促销季的斜率 \(\beta_1 + \beta_3\) 表示"促销季每多投 1 万广告，销售额涨多少"。如果 \(\beta_3 > 0\) 显著，意味着"促销季的广告效率更高"——这是一个对生意决策非常有用的结论。</p>
+
+<p>请你<em>注意</em>，加交互项后样本需求陡增——每多一个交互，多一个系数；需要更多观测才能稳估。盲目堆交互项会过拟合，要靠 21.10 节的模型选择工具控制。</p>
+
+<h2 id="sec21-13">21.13 非线性扩展：多项式、对数、GLM 简介</h2>
+
+<p>"线性回归"中的"线性"指的是<em>对系数</em>线性。所以下面这些其实都是线性回归：</p>
+
+<p><strong>(a) 多项式回归</strong>。\(Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \epsilon\)。把 \(X^2, X^3\) 看作"新的预测变量"，模型对 \(\beta_j\) 仍然线性，所有 21.1–21.10 节工具直接用。</p>
+
+<p>但请<em>注意</em>，多项式高次会带来严重共线性（\(X\) 与 \(X^2\) 当 \(X > 0\) 时高度相关），通常用<em>正交多项式</em>（如勒让德多项式）替代以缓解。</p>
+
+<p><strong>(b) 对数变换</strong>。如果 \(Y\) 是非负且有偏（如收入、肿瘤大小），\(\log Y\) 可能更接近正态。模型 \(\log Y = \beta_0 + \beta_1 X + \epsilon\) 对应"\(Y = e^{\beta_0} e^{\beta_1 X} e^\epsilon\)"——指数增长模型。同理，可以对 \(X\) 取 \(\log\)，对应"幂函数关系" \(Y = a X^b\)。</p>
+
+<p><strong>(c) 广义线性模型</strong>（Generalized Linear Model, GLM）。当 \(Y\) 不是连续、近似正态的，比如：</p>
+
+<ul>
+<li>\(Y\) 是二元（成功/失败）：用<em>逻辑回归</em>，链接函数 \(\mathrm{logit}(p) = \ln(p/(1-p)) = \beta_0 + \beta_1 X + \cdots\)。</li>
+<li>\(Y\) 是计数（事件次数）：用<em>泊松回归</em>，链接函数 \(\ln(\lambda) = \beta_0 + \beta_1 X + \cdots\)。</li>
+<li>\(Y\) 是正连续偏态：用<em>伽马回归</em>。</li>
+</ul>
+
+<p>GLM 的统一框架：响应变量服从指数族分布；通过一个<em>链接函数</em> \(g(\cdot)\) 把均值与线性预测器相连：\(g(\mathrm{E}[Y]) = \mathbf{X}\boldsymbol\beta\)。求解用迭代加权最小二乘（IRLS）。具体细节超出本章范围，但请你记住框架——它是现代统计学最重要的扩展之一。</p>
+
+<p><strong>例 21.5（逻辑回归小示例）</strong>　学生通过/不通过考试 \(Y \in \{0, 1\}\)，预测变量是复习小时数 \(X\)。模型：</p>
+
+\[
+\Pr(Y = 1 \mid X) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X)}}.
+\]
+
+<p>这是 S 形曲线：\(X\) 小时通过率近 0，\(X\) 大时通过率近 1。\(\beta_1 > 0\) 显著意味着复习确实帮助通过；\(e^{\beta_1}\) 的解释是"每多复习 1 小时，通过/不通过的<em>赔率</em>（odds）变为原来的 \(e^{\beta_1}\) 倍"。</p>
+
+<p>这个简短例子表明，GLM 把"线性预测器 + 链接函数"思想推广到了几乎任何分布的响应。它和本章的普通线性回归是同一种世界观下的不同实例。</p>
+
+<h2 id="sec21-14">21.14 注意：相关 \(\ne\) 因果</h2>
+
+<p>本章最后这一节短而极重要。回归找到的"\(X\) 与 \(Y\) 显著相关"，<em>不</em>意味着 \(X\) <em>导致</em> \(Y\)。这条警告在实际工作中被违反的次数，多到不可数。原因主要有三：</p>
+
+<p><strong>(1) 反向因果</strong>。是 \(X \to Y\) 还是 \(Y \to X\)？回归本身分不清。比如"读书时间 \(X\) 与考试成绩 \(Y\) 正相关"——可能是读书提高成绩（\(X \to Y\)），也可能是成绩好的人更愿意读书（\(Y \to X\)），或两者都有。要判断方向需要实验干预或理论支撑。</p>
+
+<p><strong>(2) 混杂变量</strong>（confounder）。某个第三变量 \(Z\) 同时影响 \(X\) 和 \(Y\)，造成"\(X\) 与 \(Y\) 相关"的假象。著名的例子：冰淇淋销量 \(X\) 与溺水人数 \(Y\) 高度正相关——但显然不是冰淇淋导致溺水，而是夏天 \(Z\) 同时让人买冰淇淋、又让人下水游泳。把 \(Z\)（季节、气温）加入回归后，\(X\) 的系数应该不再显著。"加入混杂变量"是回归的最大用途之一。</p>
+
+<p><strong>(3) 辛普森悖论的回归版本</strong>。同一个数据集，整体看 \(X\) 与 \(Y\) 正相关，分组看每组里都<em>负</em>相关——这是辛普森悖论。在回归里它表现为：不加分组哑变量时 \(\hat\beta_1\) 为正且显著，加了分组哑变量后 \(\hat\beta_1\) 变成负且显著——结论方向完全翻转。哪个是对的？取决于你想问的<em>科学</em>问题——是"边际效应"还是"组内效应"。这是统计学最深的陷阱之一，需要清醒头脑。</p>
+
+<p>解决"相关 \(\ne\) 因果"的根本办法是<em>随机化实验</em>——给受试者随机分配 \(X\) 的水平。随机化打断了"\(Z \to X\)"的可能路径，让任何"\(X\) 与 \(Y\) 的关联"必然来自因果。这就是为什么药物试验要随机分组、A/B 测试是产品决策的金标准。在不能做实验的观察性研究里（比如经济学、流行病学），人们发展了倾向得分匹配、工具变量、断点回归、双重差分等准实验方法——它们都是"用观察数据近似实验"的努力。</p>
+
+<p>请你记住：<strong>多元回归是描述工具，不是因果工具</strong>。把它当作"在数据里揭示模式"的强大手段，但不要轻率地把"显著系数"读成"因果效应"——那是另一个故事。</p>
+
+<p>本章到此结束。下一章 22 我们处理另一类经典问题：比较<em>多个组</em>的均值是否相同——方差分析（ANOVA）。你将看到，ANOVA 跟回归本质上是同一件事的两种说法（22.10 节会证明这一点），但它的语言、术语、思维框架自有传统，值得专门一章。</p>
+
+<p><strong>例 21.6（综合应用：房价多元回归）</strong>　某城市记录 6 套二手房的售价 \(Y\)（万元）、面积 \(X_1\)（平方米）、楼龄 \(X_2\)（年）：</p>
+
+\[
+\begin{array}{c|c|c|c}
+i & X_{i1} & X_{i2} & Y_i \\
+\hline
+1 & 60 & 5 & 250 \\
+2 & 80 & 10 & 300 \\
+3 & 100 & 15 & 340 \\
+4 & 120 & 20 & 380 \\
+5 & 90 & 8 & 330 \\
+6 & 110 & 12 & 370
+\end{array}
+\]
+
+<p>解（要点）：构造 \(\mathbf{X}\)（含截距列）、\(\mathbf{Y}\)，算 \(\mathbf{X}^T \mathbf{X}\)、\(\mathbf{X}^T \mathbf{Y}\)、解线性方程组得 \(\hat{\boldsymbol\beta}\)。读者可作为练习。完整计算后大约得到 \(\hat\beta_0 \approx 167\)、\(\hat\beta_1 \approx 1.7\)、\(\hat\beta_2 \approx 0.8\)（数值取决于精确计算）。解释：在控制楼龄不变时，每多 1 平米，价格平均涨约 1.7 万元；在控制面积不变时，每多 1 年楼龄，价格反而涨 0.8 万元——这与常识"楼龄越大越便宜"相反，可能是该数据中面积和楼龄高度共线（大房子往往更新或更老），共线性扭曲了系数解释。这正是 21.9 节多重共线性的现实表现，提醒我们读多元回归时要谨慎。</p>
+
+<p><strong>例 21.7（哑变量 + 交互的分析）</strong>　继续例 21.6 的房价问题，记录每套房所属"地段"（A 区或 B 区）。引入哑变量 \(D = \mathbb{1}\{\text{B 区}\}\) 和交互项 \(X_1 \cdot D\)：</p>
+
+\[
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 D + \beta_4 (X_1 \cdot D) + \epsilon.
+\]
+
+<p>分析：A 区房价线 \(Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2\)；B 区房价线 \(Y = (\beta_0 + \beta_3) + (\beta_1 + \beta_4) X_1 + \beta_2 X_2\)。\(\beta_3\) 是"同面积同楼龄下 B 区比 A 区贵多少"；\(\beta_4\) 是"B 区每多 1 平米比 A 区每多 1 平米贵多少"。如果 \(\beta_4 > 0\) 显著，意味着 B 区的"面积溢价"更高——可能是 B 区是富人区，房子越大越值钱。</p>
+
+<p>这种"主效应 + 交互"的建模，既能控制类别差异，又能让斜率随类别变化，是多元回归最常见的用法。本章我们点到为止，更细致的诊断与选择留给专门的回归课程。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 简单线性回归</a><a href="ch22.html">下一章 · 第 22 章 方差分析（ANOVA） →</a></nav>
+
+</main>
+</body>
+</html>

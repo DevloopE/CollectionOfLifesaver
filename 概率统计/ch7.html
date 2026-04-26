@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 重要连续分布 — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 连续随机变量与密度</a><a href="ch8.html">下一章 · 第 8 章 联合分布与条件分布 →</a></nav>
+<h1 id="ch7">第 7 章 重要连续分布</h1>
+
+<p>第 6 章建立了"连续随机变量 + 概率密度函数"这套通用语言。本章把这套语言用到一族<em>具体</em>分布上——均匀、指数、Gamma、正态、Beta、卡方、还有简单提一下 \(t\) 与 \(F\)。这些分布之于连续概率，相当于伯努利、二项、泊松之于离散：它们是一切应用统计的"积木"。</p>
+
+<p>你将在本章看到一种规整的展示模式：对每个分布给出</p>
+
+<ul>
+<li>定义（参数、支撑）</li>
+<li>密度函数 PDF（必给）和 CDF（如果它的形式不太复杂）</li>
+<li>期望与方差（结果记一下，推导给一遍）</li>
+<li>它在什么场景出现（应用）</li>
+</ul>
+
+<p>把这些信息当成<em>词汇表</em>背下来——下次见到一个实际问题，你的第一反应应当是"这看起来像什么分布"。这种"模式识别"在应用统计里值千金。</p>
+
+<p>本章末尾我们会预告几件下游会反复用到的事实——为什么正态分布如此核心、为什么 Beta 是伯努利的"共轭先验"、卡方/\(t\)/\(F\) 在假设检验里的角色。每一件都点到为止；正式处理留给第 13 章（中心极限定理）、第 18 章（假设检验）、第 22 章（线性回归）、第 23 章（Bayes 推断）。</p>
+
+<h2 id="sec7-1">7.1 均匀分布 \(\mathrm{Unif}(a, b)\)</h2>
+
+<p>这是连续分布里最简单、最直观的一个——"在 \([a, b]\) 上等可能取值"。</p>
+
+<p><strong>定义：</strong> 设 \(a < b\)。称 \(X\) 服从 \([a, b]\) 上的<em>均匀分布</em>，记 \(X \sim \mathrm{Unif}(a, b)\)，若它的密度为</p>
+
+\[
+\boxed{f(x) = \begin{cases} \dfrac{1}{b - a} & \text{若 } a \leq x \leq b, \\ 0 & \text{其他}. \end{cases}}
+\]
+
+<p>密度在区间内是常数 \(1/(b - a)\)、区间外为 0。常数高度的选取是为了归一化——\(\int_a^b \frac{1}{b - a} dx = 1\) ✓。</p>
+
+<p>"均匀"两字的含义：落在区间内任何长度相等的小段，概率相同。具体地，对 \(a \leq c < d \leq b\)：</p>
+
+\[
+P(c \leq X \leq d) = \int_c^d \frac{1}{b - a} dx = \frac{d - c}{b - a}.
+\]
+
+<p>"概率 = 区间长度 / 总长度"——这与几何概率一脉相承。</p>
+
+<p><strong>CDF：</strong></p>
+
+\[
+F(x) = \begin{cases} 0 & x < a, \\ \dfrac{x - a}{b - a} & a \leq x \leq b, \\ 1 & x > b. \end{cases}
+\]
+
+<p>是一条从 \(a\) 到 \(b\) 线性上升的折线。</p>
+
+<p><strong>期望与方差：</strong> 由对称性 \(\mathbb{E}[X] = (a + b)/2\)（区间的中点）。算 \(\mathbb{E}[X^2]\)：</p>
+
+\[
+\mathbb{E}[X^2] = \int_a^b x^2 \cdot \frac{1}{b - a} dx = \frac{1}{b - a} \cdot \frac{x^3}{3} \bigg|_a^b = \frac{b^3 - a^3}{3(b - a)} = \frac{a^2 + ab + b^2}{3}.
+\]
+
+<p>方差：</p>
+
+\[
+\mathrm{Var}(X) = \frac{a^2 + ab + b^2}{3} - \left(\frac{a + b}{2}\right)^2.
+\]
+
+<p>展开第二项 \(\frac{(a + b)^2}{4} = \frac{a^2 + 2 a b + b^2}{4}\)，通分（公分母 12）：</p>
+
+\[
+\mathrm{Var}(X) = \frac{4(a^2 + ab + b^2) - 3(a^2 + 2 ab + b^2)}{12} = \frac{a^2 - 2 ab + b^2}{12} = \frac{(b - a)^2}{12}.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\mathbb{E}[X] = \frac{a + b}{2}, \qquad \mathrm{Var}(X) = \frac{(b - a)^2}{12}.}
+\]
+
+<p>请你记住 "\((b-a)^2/12\)" 这个结果——它在数值方法（如 Monte Carlo 误差估计）里反复出现。一个验证：\(\mathrm{Unif}(0, 1)\) 的方差是 \(1/12 \approx 0.083\)，标准差 \(\approx 0.289\)，与 6.10 节的直觉一致。</p>
+
+<p><strong>何时出现：</strong> 这一分布在"我们对一段实数上的位置毫无信息"时是默认建模选择。具体场景：</p>
+
+<ul>
+<li>圆桌随机分配座位的角度位置 \(\sim \mathrm{Unif}(0, 2\pi)\)。</li>
+<li>计算机产生的（伪）随机数 \(\sim \mathrm{Unif}(0, 1)\)，然后通过例 6.9 那类逆变换抽样法生成其他分布的随机数。</li>
+<li>四舍五入误差：把测量结果四舍五入到最近的整数，"实际值与读数之差" 通常建模为 \(\mathrm{Unif}(-1/2, 1/2)\)。</li>
+</ul>
+
+<p><strong>例 7.1（Monte Carlo 估计 \(\pi\)）</strong>　设 \(X, Y \sim \mathrm{Unif}(0, 1)\) 独立。问点 \((X, Y)\) 落在 1/4 圆 \(x^2 + y^2 \leq 1\)（\(x, y \geq 0\)）内的概率是多少？</p>
+
+<p>解：由几何概率，"概率 = 1/4 圆面积 / 单位正方形面积" \(= \pi/4\)。所以如果你产生大量独立 \((X_i, Y_i)\) 对，统计落在 1/4 圆内的比例 \(\hat p\)，那么 \(4 \hat p\) 是 \(\pi\) 的一个估计。这是著名的"Monte Carlo 算 \(\pi\)" 实验，也是均匀分布最经典的应用之一。</p>
+
+<h2 id="sec7-2">7.2 指数分布 \(\mathrm{Exp}(\lambda)\)</h2>
+
+<p>"等下一辆公车要等多久？"、"灯泡还能用多久？"、"放射原子下一次衰变还要多久？"——这些"等待时间"问题，最自然的连续分布是指数分布。</p>
+
+<p><strong>定义：</strong> 设 \(\lambda > 0\) 是一个参数（通常解读为"事件发生的速率"，单位为"次/单位时间"）。称 \(X\) 服从参数 \(\lambda\) 的<em>指数分布</em>，记 \(X \sim \mathrm{Exp}(\lambda)\)，若它的密度为</p>
+
+\[
+\boxed{f(x) = \begin{cases} \lambda e^{-\lambda x} & \text{若 } x \geq 0, \\ 0 & \text{若 } x < 0. \end{cases}}
+\]
+
+<p>检查归一化：\(\int_0^\infty \lambda e^{-\lambda x} dx = -e^{-\lambda x} \big|_0^\infty = 0 - (-1) = 1\) ✓。</p>
+
+<p><strong>CDF：</strong></p>
+
+\[
+F(x) = \int_0^x \lambda e^{-\lambda t} dt = 1 - e^{-\lambda x}, \qquad x \geq 0.
+\]
+
+<p>这条 CDF 出名地有用——许多场合写成"超过时间 \(x\) 才发生"，即 \(P(X > x) = 1 - F(x) = e^{-\lambda x}\)。这条"指数尾"是指数分布的标志。</p>
+
+<p><strong>期望：</strong></p>
+
+\[
+\mathbb{E}[X] = \int_0^\infty x \cdot \lambda e^{-\lambda x} dx.
+\]
+
+<p>用分部积分（取 \(u = x\)、\(dv = \lambda e^{-\lambda x} dx\)，则 \(du = dx\)、\(v = -e^{-\lambda x}\)）：</p>
+
+\[
+\mathbb{E}[X] = \left[-x e^{-\lambda x}\right]_0^\infty + \int_0^\infty e^{-\lambda x} dx = 0 + \frac{1}{\lambda} = \frac{1}{\lambda}.
+\]
+
+<p>第一项中 \(x e^{-\lambda x} \to 0\)（指数压倒线性，\(x \to \infty\) 时）和 \(0 \cdot 1 = 0\)，都为 0。剩下 \(\int_0^\infty e^{-\lambda x} dx = 1/\lambda\)。</p>
+
+<p>这条 \(\mathbb{E}[X] = 1/\lambda\) 极其直观：如果事件以"每单位时间 \(\lambda\) 次"的速率发生，平均每次等 \(1/\lambda\) 单位时间。比如车每小时来 6 班（\(\lambda = 6\) /小时），平均等 \(1/6\) 小时即 10 分钟。</p>
+
+<p><strong>方差：</strong> 类似算 \(\mathbb{E}[X^2]\)。两次分部积分（或直接利用 \(\int_0^\infty x^n e^{-\lambda x} dx = n!/\lambda^{n+1}\) 这条公式）：\(\mathbb{E}[X^2] = 2/\lambda^2\)。所以</p>
+
+\[
+\boxed{\mathbb{E}[X] = \frac{1}{\lambda}, \qquad \mathrm{Var}(X) = \mathbb{E}[X^2] - \left(\frac{1}{\lambda}\right)^2 = \frac{2}{\lambda^2} - \frac{1}{\lambda^2} = \frac{1}{\lambda^2}.}
+\]
+
+<p>方差与期望平方相等——这是指数分布的一个特征性质（变异系数 \(\sigma/\mu = 1\)）。</p>
+
+<h3 id="sec7-2-1">7.2.1 无记忆性</h3>
+
+<p>指数分布有一条非常神奇、几乎是"独家"的性质——<strong>无记忆性</strong>（memoryless property）。</p>
+
+<p><strong>命题：</strong> 设 \(X \sim \mathrm{Exp}(\lambda)\)，\(s, t > 0\)。则</p>
+
+\[
+P(X > s + t \mid X > s) = P(X > t).
+\]
+
+<p>翻译成话："已知至少等了 \(s\) 那么久，再等至少 \(t\) 的概率，等于一开始就要等至少 \(t\) 的概率。" 也就是：等了多久不影响"还要再等多久"的分布。</p>
+
+<p>证明很短。由条件概率定义，</p>
+
+\[
+P(X > s + t \mid X > s) = \frac{P(X > s + t \text{ 且 } X > s)}{P(X > s)} = \frac{P(X > s + t)}{P(X > s)}.
+\]
+
+<p>第二个等号：\(\{X > s + t\} \subset \{X > s\}\)，所以并集等于前者。代入 \(P(X > x) = e^{-\lambda x}\)：</p>
+
+\[
+= \frac{e^{-\lambda(s + t)}}{e^{-\lambda s}} = e^{-\lambda t} = P(X > t). \checkmark
+\]
+
+<p>这条性质把指数分布和其他"等待时间"分布严格区分开来。事实上可以证明：在所有连续分布中，唯有指数分布有无记忆性（这是个不平凡的反向命题，证明涉及柯西方程）。</p>
+
+<p>无记忆性的直观后果："灯泡用了 100 小时仍未坏" 这件事，对"它再撑 50 小时"的概率<em>没有任何影响</em>——只要灯泡寿命服从指数分布。这是一个理想化假设——实际灯泡有"老化"现象（用得越久越易坏），所以不严格服从指数分布。但很多<em>非</em>老化系统（如放射衰变）严格服从。</p>
+
+<p><strong>应用场景：</strong></p>
+
+<ul>
+<li><em>放射衰变</em>：单个原子核到下一次衰变的时间。无记忆性是物理事实。</li>
+<li><em>电话呼叫到达间隔</em>：在排队论里，"呼叫之间的时间间隔" 通常假设为指数（即"到达过程是 Poisson 过程"）。</li>
+<li><em>设备寿命</em>（在不发生老化的简化下）。</li>
+<li><em>赛车下一次故障</em>，<em>下一次顾客进店</em> 等等。</li>
+</ul>
+
+<p><strong>例 7.2（指数等待）</strong>　某客服热线平均每 5 分钟收到一通电话，到达过程视为指数分布。问：(a) 下一通电话在 3 分钟内到达的概率；(b) 已经等了 4 分钟还没来电，再等至少 3 分钟才有的概率。</p>
+
+<p>解：到达间隔 \(T \sim \mathrm{Exp}(\lambda)\)，期望 \(1/\lambda = 5\)，所以 \(\lambda = 0.2\) /分钟。</p>
+
+<p>(a) \(P(T \leq 3) = 1 - e^{-0.2 \cdot 3} = 1 - e^{-0.6} \approx 1 - 0.549 = 0.451\)。</p>
+
+<p>(b) 由无记忆性，\(P(T > 4 + 3 \mid T > 4) = P(T > 3) = e^{-0.6} \approx 0.549\)。"等了 4 分钟"这件事对再要等多久毫无影响。</p>
+
+<h2 id="sec7-3">7.3 Gamma 分布</h2>
+
+<p>指数分布刻画"等下一次事件需多久"。如果你问"等到第 \(n\) 次事件需多久"，答案是 \(n\) 个独立 \(\mathrm{Exp}(\lambda)\) 变量之和——这就引出 <strong>Gamma 分布</strong>。</p>
+
+<p>但 Gamma 不止做"整数次等待"。它把那个"\(n\)" 推广为<em>任意正实数</em> \(\alpha\)，给出一族非常灵活的分布。要写出它的密度，先得介绍 <strong>Gamma 函数</strong>。</p>
+
+<h3 id="sec7-3-1">7.3.1 Gamma 函数 \(\Gamma(\alpha)\)</h3>
+
+<p>定义：对实数 \(\alpha > 0\)，</p>
+
+\[
+\Gamma(\alpha) = \int_0^\infty x^{\alpha - 1} e^{-x} dx.
+\]
+
+<p>这是阶乘的<em>连续推广</em>：</p>
+
+<ul>
+<li>\(\Gamma(1) = \int_0^\infty e^{-x} dx = 1\)。</li>
+<li>\(\Gamma(\alpha + 1) = \alpha \cdot \Gamma(\alpha)\)（用分部积分；这条递推是 Gamma 函数的命脉）。</li>
+<li>由此对正整数 \(n\)：\(\Gamma(n) = (n - 1)!\)。比如 \(\Gamma(5) = 4! = 24\)。</li>
+<li>有一个非平凡值：\(\Gamma(1/2) = \sqrt{\pi}\)（这条联系着正态分布的归一化）。</li>
+</ul>
+
+<p>把 Gamma 函数想成"阶乘的丰满版"——它不仅在整数处给出 \((n-1)!\)，还在所有正实数处都有意义。</p>
+
+<h3 id="sec7-3-2">7.3.2 Gamma 分布的定义</h3>
+
+<p><strong>定义：</strong> 设 \(\alpha > 0\)（"形状参数"）、\(\beta > 0\)（"率参数"）。称 \(X\) 服从 <em>Gamma 分布</em>，记 \(X \sim \mathrm{Gamma}(\alpha, \beta)\)，若它的密度为</p>
+
+\[
+\boxed{f(x) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha - 1} e^{-\beta x}, \qquad x \geq 0.}
+\]
+
+<p>归一性：变量替换 \(u = \beta x\)，\(\int_0^\infty \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1} e^{-\beta x} dx = \frac{\beta^\alpha}{\Gamma(\alpha)} \cdot \frac{1}{\beta^\alpha} \int_0^\infty u^{\alpha-1} e^{-u} du = \frac{\Gamma(\alpha)}{\Gamma(\alpha)} = 1\) ✓。</p>
+
+<p><strong>注意</strong>：不同教科书对参数化的约定不一。有的用"率参数 \(\beta\)"（密度里 \(e^{-\beta x}\)），有的用"尺度参数 \(\theta = 1/\beta\)"（密度里 \(e^{-x/\theta}\)）。本书统一用率参数 \(\beta\)。每次看到 Gamma 都要确认作者用的是哪种约定，否则期望与方差的公式会错。</p>
+
+<p><strong>期望与方差：</strong> 用 LOTUS + Gamma 函数的递推性质，</p>
+
+\[
+\boxed{\mathbb{E}[X] = \frac{\alpha}{\beta}, \qquad \mathrm{Var}(X) = \frac{\alpha}{\beta^2}.}
+\]
+
+<p>推导思路（不细做）：\(\mathbb{E}[X^k] = \int_0^\infty x^k \cdot \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1} e^{-\beta x} dx = \frac{\Gamma(\alpha + k)}{\beta^k \Gamma(\alpha)}\)；取 \(k = 1\) 得 \(\alpha/\beta\)，取 \(k = 2\) 得 \(\alpha(\alpha+1)/\beta^2\)，相减得方差 \(\alpha/\beta^2\)。</p>
+
+<h3 id="sec7-3-3">7.3.3 与指数分布的关系</h3>
+
+<p>当 \(\alpha = 1\) 时：\(f(x) = \beta e^{-\beta x}\)——正是 \(\mathrm{Exp}(\beta)\)！所以指数分布是 Gamma 分布的一个特殊情形（\(\alpha = 1\)）。</p>
+
+<p>更深入的关系：如果 \(X_1, \ldots, X_n\) 独立同分布于 \(\mathrm{Exp}(\lambda)\)，则 \(S = X_1 + \cdots + X_n \sim \mathrm{Gamma}(n, \lambda)\)。所以"等到第 \(n\) 次事件的时间"恰好是 \(\mathrm{Gamma}(n, \lambda)\)。这条"\(\alpha\) 是事件次数"的解读，对整数 \(\alpha\) 特别有用；非整数 \(\alpha\) 时是数学上的推广，没有这种直接计数解读，但分布本身仍然非常实用。</p>
+
+<p><strong>应用场景：</strong></p>
+
+<ul>
+<li><em>排队论</em>：等到第 \(n\) 个顾客到达的时间。</li>
+<li><em>保险</em>：保险公司一年内累计赔付额的分布建模。</li>
+<li><em>可靠性工程</em>：复杂系统中某些故障时间的分布。</li>
+<li><em>Bayes 统计</em>：作为某些参数的先验分布（特别是 Poisson 分布的 \(\lambda\) 参数）。</li>
+</ul>
+
+<p><strong>例 7.3（保险年度赔付）</strong>　某保险公司一年内的总赔付额 \(X\) 建模为 \(\mathrm{Gamma}(\alpha = 3, \beta = 0.5)\)（单位：百万元）。求期望赔付与标准差。</p>
+
+<p>解：\(\mathbb{E}[X] = 3/0.5 = 6\) 百万元。\(\mathrm{Var}(X) = 3/0.25 = 12\)，标准差 \(\sqrt{12} \approx 3.46\) 百万元。"平均 600 万、波动约 350 万" ——这类数字直接进保险公司的精算模型，决定保费定价与准备金。</p>
+
+<h2 id="sec7-4">7.4 正态（高斯）分布 \(\mathcal{N}(\mu, \sigma^2)\)</h2>
+
+<p>这是统计学里最最最重要的连续分布。重要到这一节会比其他节都长。</p>
+
+<p><strong>定义：</strong> 设 \(\mu \in \mathbb{R}\)、\(\sigma > 0\)。称 \(X\) 服从均值 \(\mu\)、方差 \(\sigma^2\) 的<em>正态分布</em>，记 \(X \sim \mathcal{N}(\mu, \sigma^2)\)，若它的密度为</p>
+
+\[
+\boxed{f(x) = \frac{1}{\sqrt{2\pi}\, \sigma} \exp\!\left(-\frac{(x - \mu)^2}{2 \sigma^2}\right), \qquad x \in \mathbb{R}.}
+\]
+
+<p>这个密度有一个非常出名的"钟形曲线"图——关于 \(x = \mu\) 对称，在 \(\mu\) 处达到峰值 \(\frac{1}{\sqrt{2\pi}\sigma}\)，两边按 \(e^{-x^2}\) 速度迅速衰减。\(\mu\) 控制位置（钟峰位置），\(\sigma\) 控制宽窄（标准差越大，钟越扁、越宽）。</p>
+
+<p>特殊情形 \(\mu = 0\)、\(\sigma = 1\)，叫做<strong>标准正态分布</strong>，记 \(Z \sim \mathcal{N}(0, 1)\)，密度 \(\varphi(z) = \frac{1}{\sqrt{2\pi}} e^{-z^2/2}\)，CDF 用专门符号 \(\Phi(z)\)。\(\Phi\) 没有初等闭形式，但它的数值早就被列成表（"标准正态表"），并嵌入所有统计软件中。</p>
+
+<p>归一性 \(\int_{-\infty}^\infty \varphi(z) dz = 1\) 是个不平凡的等式——它的证明用一个聪明的"平方化二维积分"（详见任何概率论教材），最后归结为 \(\Gamma(1/2) = \sqrt{\pi}\) 这条恒等式。这里我们直接接受。</p>
+
+<p><strong>期望与方差：</strong> 由对称性 \(\mathbb{E}[Z] = 0\)；通过直接积分（或矩生成函数）得 \(\mathrm{Var}(Z) = 1\)。所以对一般 \(X = \mu + \sigma Z\)（这是下面会讲的标准化的逆操作）：\(\mathbb{E}[X] = \mu\)、\(\mathrm{Var}(X) = \sigma^2\)。这个一致性是参数化的"功劳"——参数 \(\mu, \sigma^2\) 直接就是均值与方差。</p>
+
+<h3 id="sec7-4-1">7.4.1 68%-95%-99.7% 法则</h3>
+
+<p>正态分布有一组著名的概率近似数字，工程师与科学家几乎每天用：</p>
+
+\[
+\boxed{\begin{aligned} P(\mu - \sigma \leq X \leq \mu + \sigma) &\approx 0.6827 \\ P(\mu - 2\sigma \leq X \leq \mu + 2\sigma) &\approx 0.9545 \\ P(\mu - 3\sigma \leq X \leq \mu + 3\sigma) &\approx 0.9973 \end{aligned}}
+\]
+
+<p>读作"在均值上下一个标准差内有约 68% 的概率，两个标准差内有约 95%，三个标准差内有约 99.7%"。简称<strong>68-95-99.7 法则</strong>（empirical rule，"经验法则"）。</p>
+
+<p>这些数字怎么来？回忆 \(P(\mu - k\sigma \leq X \leq \mu + k\sigma) = P(|X - \mu|/\sigma \leq k) = P(|Z| \leq k) = 2\Phi(k) - 1\)。查标准正态表：</p>
+
+<ul>
+<li>\(\Phi(1) \approx 0.8413\)，所以 \(2 \cdot 0.8413 - 1 = 0.6827\)。</li>
+<li>\(\Phi(2) \approx 0.9772\)，所以 \(2 \cdot 0.9772 - 1 = 0.9545\)。</li>
+<li>\(\Phi(3) \approx 0.9987\)，所以 \(2 \cdot 0.9987 - 1 = 0.9973\)。</li>
+</ul>
+
+<p>这条法则对快速判断"某个值有多么异常"非常有用。看到一个数据点偏离均值 \(2\sigma\)，你应当心想"这种偏离的概率约 5%、不算非常奇怪但值得注意"；偏离 \(3\sigma\)，"概率不到 0.3%、相当罕见"；偏离 \(5\sigma\)（粒子物理里"发现新粒子"的标准），"概率小于百万分之一"。</p>
+
+<h3 id="sec7-4-2">7.4.2 标准化</h3>
+
+<p>"标准化"是把一般的 \(\mathcal{N}(\mu, \sigma^2)\) 化为 \(\mathcal{N}(0, 1)\) 的标准做法，让你只需要一张标准正态表就能算所有正态概率。</p>
+
+<p>设 \(X \sim \mathcal{N}(\mu, \sigma^2)\)，定义</p>
+
+\[
+\boxed{Z = \frac{X - \mu}{\sigma}.}
+\]
+
+<p>那么 \(Z \sim \mathcal{N}(0, 1)\)。</p>
+
+<p>证明：用例 6.8 的线性变换公式（\(a = 1/\sigma\)、\(b = -\mu/\sigma\)），</p>
+
+\[
+f_Z(z) = \frac{1}{|1/\sigma|} f_X(\sigma z + \mu) = \sigma \cdot \frac{1}{\sqrt{2\pi}\sigma} e^{-((\sigma z + \mu) - \mu)^2 / (2\sigma^2)} = \frac{1}{\sqrt{2\pi}} e^{-z^2/2}.
+\]
+
+<p>正是标准正态密度 ✓。</p>
+
+<p>实践中，求"\(P(a \leq X \leq b)\)"时，先标准化两端：</p>
+
+\[
+P(a \leq X \leq b) = P\!\left(\frac{a - \mu}{\sigma} \leq Z \leq \frac{b - \mu}{\sigma}\right) = \Phi\!\left(\frac{b - \mu}{\sigma}\right) - \Phi\!\left(\frac{a - \mu}{\sigma}\right).
+\]
+
+<p>查表两次、相减，搞定。</p>
+
+<p><strong>例 7.4（智商）</strong>　假设智商 IQ \(\sim \mathcal{N}(100, 15^2)\)。问 IQ 在 115 到 130 之间的概率。</p>
+
+<p>解：标准化端点。\(z_1 = (115 - 100)/15 = 1\)，\(z_2 = (130 - 100)/15 = 2\)。所以</p>
+
+\[
+P(115 \leq \text{IQ} \leq 130) = \Phi(2) - \Phi(1) \approx 0.9772 - 0.8413 = 0.1359.
+\]
+
+<p>大约 14% 的人 IQ 落在这一区间。一个直觉验证：68% 的人在 \([85, 115]\) 内，所以高于 115 的有 \((100 - 68)/2 = 16\%\)；其中超过 130 的占 \((100 - 95)/2 = 2.5\%\)；二者之差约 \(13.5\%\)，与精确值吻合 ✓。</p>
+
+<h3 id="sec7-4-3">7.4.3 标准正态表的使用</h3>
+
+<p>标准正态表通常列出 \(\Phi(z)\) 对 \(z \geq 0\) 的值（步长 0.01 或 0.001）。负 \(z\) 用对称性 \(\Phi(-z) = 1 - \Phi(z)\)。</p>
+
+<p>常用查询：</p>
+
+<ul>
+<li>\(\Phi(0) = 0.5\)（标准正态对称于 0）</li>
+<li>\(\Phi(1.645) \approx 0.95\)（"单尾 5% 临界值"）</li>
+<li>\(\Phi(1.96) \approx 0.975\)（"双尾 5% 临界值"，所以 \(P(|Z| \leq 1.96) = 0.95\)，常用于 95% 置信区间）</li>
+<li>\(\Phi(2.33) \approx 0.99\)（"单尾 1% 临界值"）</li>
+<li>\(\Phi(2.576) \approx 0.995\)（双尾 1% 临界值）</li>
+</ul>
+
+<p>"1.96" 这个数字，凡是做实证研究的科学家都背得下来——它是"95% 置信区间宽度"的标准乘子。第 14 章正式讲置信区间时会反复出现。</p>
+
+<h3 id="sec7-4-4">7.4.4 性质：正态的线性组合还是正态</h3>
+
+<p>这是正态分布最珍贵的代数性质之一：</p>
+
+<p>设 \(X_1, \ldots, X_n\) 独立，\(X_i \sim \mathcal{N}(\mu_i, \sigma_i^2)\)。设常数 \(a_1, \ldots, a_n, b\)，令 \(Y = a_1 X_1 + \cdots + a_n X_n + b\)。则</p>
+
+\[
+Y \sim \mathcal{N}\!\left(\sum_i a_i \mu_i + b, \sum_i a_i^2 \sigma_i^2\right).
+\]
+
+<p>"独立正态变量的线性组合仍然是正态。" 期望与方差由线性性给出，是一句话；新东西是<em>分布形状仍然是正态</em>。这条性质在统计学中无处不在——它使得"样本均值"、"差"、"加权平均"等量都能用正态语言精确描述。证明用矩生成函数或特征函数三行可成，这里跳过。</p>
+
+<p><strong>例 7.5（两人身高差）</strong>　设男性身高 \(M \sim \mathcal{N}(175, 7^2)\)、女性身高 \(F \sim \mathcal{N}(162, 6^2)\)（厘米），独立。问随机抽一对男女、男比女高的概率。</p>
+
+<p>解：设 \(D = M - F\)。\(D\) 是两个独立正态的线性组合，所以 \(D\) 是正态的，期望 \(\mathbb{E}[D] = 175 - 162 = 13\)，方差 \(\mathrm{Var}(D) = 49 + 36 = 85\)（独立时 \(\mathrm{Var}(M - F) = \mathrm{Var}(M) + \mathrm{Var}(F)\)，注意是<em>加</em>不是减），标准差 \(\sqrt{85} \approx 9.22\)。所以 \(D \sim \mathcal{N}(13, 85)\)。</p>
+
+<p>"男比女高" = \(D > 0\)，</p>
+
+\[
+P(D > 0) = P\!\left(Z > \frac{0 - 13}{9.22}\right) = P(Z > -1.41) = \Phi(1.41) \approx 0.9207.
+\]
+
+<p>约 92% 的概率男比女高。这与直觉吻合——男女身高差分布的均值是 +13 cm，相对于 9.22 的标准差是大的偏离，所以"\(D > 0\)" 是大概率事件。</p>
+
+<h3 id="sec7-4-5">7.4.5 为什么正态如此重要——预告中心极限定理</h3>
+
+<p>到这里你可能问：钟形分布很多，为什么偏偏正态分布占据中心地位？答案是<strong>中心极限定理</strong>（Central Limit Theorem，简写 CLT）：</p>
+
+<p style="text-align:center"><strong>大量"独立、同分布、有限方差"的随机变量之和——无论原分布是什么——其分布趋近正态。</strong></p>
+
+<p>这条定理的精确陈述与证明留给第 13 章。这里的 takeaway 是：正态分布是<em>"许多小独立随机干扰加在一起"的极限</em>。这就解释了为什么自然界里"测量误差"、"身高"、"考试分数"这些<em>由众多小因素叠加而成</em>的量，往往近似正态——因为它们就<em>是</em> CLT 的应用对象。</p>
+
+<p>这条定理是统计推断的基石。一切"用样本均值估计总体均值"的方法，都默默依赖 CLT 来给出抽样分布的形状。所以从某种意义上说，正态分布<em>不是</em>一个特殊的分布——它是<em>所有"许多小事相加"的结果分布</em>。这就是它在统计学中地位崇高的根源。</p>
+
+<h2 id="sec7-5">7.5 Beta 分布 \(\mathrm{Beta}(\alpha, \beta)\)</h2>
+
+<p>需要建模一个"百分比"或"概率"——即落在 \([0, 1]\) 内的随机量——时，最自然的工具是 <strong>Beta 分布</strong>。</p>
+
+<p><strong>定义：</strong> 设 \(\alpha > 0\)、\(\beta > 0\)。称 \(X\) 服从 <em>Beta 分布</em>，记 \(X \sim \mathrm{Beta}(\alpha, \beta)\)，若它的密度为</p>
+
+\[
+\boxed{f(x) = \frac{1}{B(\alpha, \beta)} x^{\alpha - 1} (1 - x)^{\beta - 1}, \qquad 0 \leq x \leq 1,}
+\]
+
+<p>其中 <strong>Beta 函数</strong>是归一化常数：</p>
+
+\[
+B(\alpha, \beta) = \int_0^1 x^{\alpha - 1} (1 - x)^{\beta - 1} dx = \frac{\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha + \beta)}.
+\]
+
+<p>(Beta 函数与 Gamma 函数有这条优雅联系，证明用一个二维积分变量替换；不展开。)</p>
+
+<p><strong>期望与方差：</strong></p>
+
+\[
+\boxed{\mathbb{E}[X] = \frac{\alpha}{\alpha + \beta}, \qquad \mathrm{Var}(X) = \frac{\alpha \beta}{(\alpha + \beta)^2 (\alpha + \beta + 1)}.}
+\]
+
+<p>请你<em>注意</em>这个期望——它是 \(\alpha\) 与 "总和 \(\alpha + \beta\)" 之比，看起来像"成功比例"。后面在 Bayes 推断的语境中会看到，这两个参数确实分别对应"成功次数"与"失败次数"的概念。</p>
+
+<h3 id="sec7-5-1">7.5.1 形状的多样性</h3>
+
+<p>Beta 分布在不同 \((\alpha, \beta)\) 下形状变化极大。这是它的优势——"几乎任何"\([0, 1]\) 上合理的连续分布，都能用某组 Beta 参数近似描述。</p>
+
+<ul>
+<li><strong>\(\alpha = \beta = 1\)</strong>：\(f(x) = 1\)——退化为 \(\mathrm{Unif}(0, 1)\)。</li>
+<li><strong>\(\alpha = \beta\)</strong>：分布关于 \(x = 0.5\) 对称。\(\alpha = \beta > 1\) 给出钟形（中间高、两边低）；\(\alpha = \beta < 1\) 给出"U 形"（两端高、中间低）。</li>
+<li><strong>\(\alpha > \beta\)</strong>：分布偏右（密度集中在 0.5 以上）。比如 \(\mathrm{Beta}(5, 2)\)。</li>
+<li><strong>\(\alpha < \beta\)</strong>：分布偏左。比如 \(\mathrm{Beta}(2, 5)\)。</li>
+<li><strong>\(\alpha = 1\)、\(\beta > 1\)</strong>：单调递减。</li>
+<li><strong>\(\alpha > 1\)、\(\beta = 1\)</strong>：单调递增。</li>
+</ul>
+
+<p>如果你画一组 Beta 密度曲线（\(\alpha, \beta\) 各取几个不同值），你会看到一族从平的、到 U 形的、到钟形的、到偏左偏右的曲线——非常灵活。这种灵活性使得 Beta 在 Bayes 统计与模型先验设定中地位很高。</p>
+
+<h3 id="sec7-5-2">7.5.2 Beta 作为伯努利的共轭先验</h3>
+
+<p>这一节是个"预告"——正式处理在第 23 章。但因为它是 Beta 分布在统计中最常出现的角色，这里不能不提。</p>
+
+<p>设你对一枚硬币的"正面概率" \(p\) 一无所知，用一个先验分布 \(p \sim \mathrm{Beta}(\alpha_0, \beta_0)\) 来描述这种"无知 + 一点先验信念"。然后扔了 \(n\) 次硬币，记录到 \(k\) 次正面、\(n - k\) 次反面。Bayes 公式（第 23 章）告诉我们：</p>
+
+\[
+p \mid \text{数据} \sim \mathrm{Beta}(\alpha_0 + k, \beta_0 + n - k).
+\]
+
+<p>"<em>后验分布仍然是 Beta</em>"——这就是<em>共轭性</em>。Beta 是伯努利似然的<em>共轭先验</em>，意思是它和数据"相乘"后还是 Beta。这件事让 Bayes 计算极其简洁——不需要数值积分，不需要 MCMC，只需要把先验参数更新为 \(\alpha_0 + k\) 和 \(\beta_0 + n - k\) 即可。</p>
+
+<p>共轭性也给 Beta 参数一个直观解释：\(\alpha\) 像"虚拟的成功次数"、\(\beta\) 像"虚拟的失败次数"。Beta 后验的均值 \(\frac{\alpha}{\alpha + \beta}\) 自然就是"成功比例"。这种"虚拟样本"解读，是 Bayes 入门时最有用的直觉。</p>
+
+<p><strong>例 7.6（Beta 在民意调查中的应用）</strong>　某民意调查中，已知某候选人的支持率 \(p\) 服从 \(\mathrm{Beta}(2, 2)\) 先验（"对称地相信 \(p\) 接近 0.5、但不是非常确定"）。然后调查 100 人，60 人支持。求 \(p\) 的后验分布与后验均值。</p>
+
+<p>解：后验 \(p \mid \text{数据} \sim \mathrm{Beta}(2 + 60, 2 + 40) = \mathrm{Beta}(62, 42)\)。后验均值 \(62/(62 + 42) = 62/104 \approx 0.596\)。</p>
+
+<p>对照：纯频率估计（不用先验）会给 \(\hat p = 60/100 = 0.6\)。Bayes 估计 \(0.596\) 略向 0.5（先验均值）拉了一点点——这是先验"虚拟数据"对真实数据的轻微"软化"。当样本量很大时，这种拉动可以忽略；但样本小时，先验作用明显。这是 Bayes 思想的核心：用先验信念给小样本"加保护"。</p>
+
+<h2 id="sec7-6">7.6 卡方分布 \(\chi^2_n\)</h2>
+
+<p>卡方（chi-squared）分布是正态分布的"亲戚"——它由若干独立标准正态变量的平方和定义，在统计假设检验里非常重要。</p>
+
+<p><strong>定义：</strong> 设 \(Z_1, Z_2, \ldots, Z_n\) 独立同分布于 \(\mathcal{N}(0, 1)\)。称 \(Y = Z_1^2 + Z_2^2 + \cdots + Z_n^2\) 服从<em>自由度为 \(n\) 的卡方分布</em>，记 \(Y \sim \chi_n^2\)。</p>
+
+<p>密度公式（不细推）：</p>
+
+\[
+f(y) = \frac{1}{2^{n/2} \Gamma(n/2)} y^{n/2 - 1} e^{-y/2}, \qquad y > 0.
+\]
+
+<p>把它和 7.3 节的 Gamma 密度比较——这正是 \(\mathrm{Gamma}(n/2, 1/2)\)！所以<em>卡方分布是 Gamma 分布的特殊情形</em>。这条联系把这一族分布拼到了一起。</p>
+
+<p><strong>期望与方差：</strong> 由 Gamma 公式（取 \(\alpha = n/2\)、\(\beta = 1/2\)）：</p>
+
+\[
+\boxed{\mathbb{E}[Y] = \frac{n/2}{1/2} = n, \qquad \mathrm{Var}(Y) = \frac{n/2}{(1/2)^2} = 2n.}
+\]
+
+<p>有一种漂亮的"基础推法"：对单个 \(Z \sim \mathcal{N}(0, 1)\)，\(\mathbb{E}[Z^2] = \mathrm{Var}(Z) + (\mathbb{E}[Z])^2 = 1 + 0 = 1\)。所以 \(\mathbb{E}[Z_1^2 + \cdots + Z_n^2] = n\) 由期望线性性。方差 \(2n\) 用类似手段得来。</p>
+
+<h3 id="sec7-6-1">7.6.1 在假设检验中的角色</h3>
+
+<p>卡方分布最经典的应用是<strong>卡方拟合优度检验</strong>与<strong>卡方独立性检验</strong>（两者将在第 18 章详细讲）。它们都在比较"观测频数"与"理论期望频数"的偏离时，构造一个形如 \(\sum (O_i - E_i)^2 / E_i\) 的统计量；这个统计量在零假设下近似服从卡方分布（自由度由分析框架决定）。如果统计量过大（落到卡方分布的右尾），就拒绝零假设。</p>
+
+<p>另一个地方：样本方差。如果 \(X_1, \ldots, X_n \sim \mathcal{N}(\mu, \sigma^2)\) 独立，定义样本方差 \(S^2 = \frac{1}{n-1}\sum (X_i - \bar X)^2\)，则 \((n-1) S^2/\sigma^2 \sim \chi_{n-1}^2\)。这个事实是构造正态总体方差的置信区间所需的关键工具，留给第 14 章正式处理。</p>
+
+<p>请你现在记住一句话：<em>看到"平方和"——尤其是"标准化后的正态量的平方和"——脑子里就要响起卡方</em>。</p>
+
+<h2 id="sec7-7">7.7 \(t\) 分布与 \(F\) 分布（轻描淡写）</h2>
+
+<p>这两族分布也由正态变量生成，但场合更专门，详细处理留给后面章节。</p>
+
+<p><strong>\(t\) 分布</strong>（Student's \(t\)）：设 \(Z \sim \mathcal{N}(0, 1)\) 与 \(Y \sim \chi_n^2\) 独立，则</p>
+
+\[
+T = \frac{Z}{\sqrt{Y/n}}
+\]
+
+<p>服从<em>自由度 \(n\) 的 \(t\) 分布</em>。形状像正态——对称于 0、钟形——但尾部更厚。当 \(n \to \infty\) 时 \(t_n \to \mathcal{N}(0, 1)\)。\(t\) 分布在小样本下做"均值的置信区间"或"\(t\) 检验"时不可或缺，详细讨论留给第 14 章。</p>
+
+<p><strong>\(F\) 分布</strong>：设 \(Y_1 \sim \chi_{n_1}^2\) 与 \(Y_2 \sim \chi_{n_2}^2\) 独立，则</p>
+
+\[
+F = \frac{Y_1 / n_1}{Y_2 / n_2}
+\]
+
+<p>服从<em>自由度 \((n_1, n_2)\) 的 \(F\) 分布</em>。它出现在"比较两个方差"或"线性回归方差分析"中，详细讲解留给第 22 章。</p>
+
+<p>这一节我们只把"它们存在、它们是用正态/卡方变量构造出来的"这件事说清楚——具体形式、期望方差、概率表查询等等，都到该用时再讲。</p>
+
+<h2 id="sec7-8">7.8 速查表</h2>
+
+<p>本节是这一章的"卡片"——把上述所有分布的关键信息压成一张表。建议你把它印出来贴在桌前，反复看到熟。</p>
+
+<table style="margin: 0 auto; border-collapse: collapse; font-size: 0.95em;">
+<tr style="border-bottom: 2px solid #333;">
+<th style="padding: 0.5em;">分布</th>
+<th style="padding: 0.5em;">PDF</th>
+<th style="padding: 0.5em;">期望</th>
+<th style="padding: 0.5em;">方差</th>
+<th style="padding: 0.5em;">典型应用</th>
+</tr>
+<tr>
+<td style="padding: 0.4em;">\(\mathrm{Unif}(a, b)\)</td>
+<td style="padding: 0.4em;">\(1/(b-a)\) on \([a, b]\)</td>
+<td style="padding: 0.4em;">\((a+b)/2\)</td>
+<td style="padding: 0.4em;">\((b-a)^2/12\)</td>
+<td style="padding: 0.4em;">几何概率、Monte Carlo</td>
+</tr>
+<tr>
+<td style="padding: 0.4em;">\(\mathrm{Exp}(\lambda)\)</td>
+<td style="padding: 0.4em;">\(\lambda e^{-\lambda x}\), \(x \geq 0\)</td>
+<td style="padding: 0.4em;">\(1/\lambda\)</td>
+<td style="padding: 0.4em;">\(1/\lambda^2\)</td>
+<td style="padding: 0.4em;">等待时间、放射衰变</td>
+</tr>
+<tr>
+<td style="padding: 0.4em;">\(\mathrm{Gamma}(\alpha, \beta)\)</td>
+<td style="padding: 0.4em;">\(\frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1} e^{-\beta x}\)</td>
+<td style="padding: 0.4em;">\(\alpha/\beta\)</td>
+<td style="padding: 0.4em;">\(\alpha/\beta^2\)</td>
+<td style="padding: 0.4em;">保险、可靠性</td>
+</tr>
+<tr>
+<td style="padding: 0.4em;">\(\mathcal{N}(\mu, \sigma^2)\)</td>
+<td style="padding: 0.4em;">\(\frac{1}{\sqrt{2\pi}\sigma} e^{-(x-\mu)^2/(2\sigma^2)}\)</td>
+<td style="padding: 0.4em;">\(\mu\)</td>
+<td style="padding: 0.4em;">\(\sigma^2\)</td>
+<td style="padding: 0.4em;">CLT 的一切应用</td>
+</tr>
+<tr>
+<td style="padding: 0.4em;">\(\mathrm{Beta}(\alpha, \beta)\)</td>
+<td style="padding: 0.4em;">\(\frac{1}{B(\alpha,\beta)} x^{\alpha-1}(1-x)^{\beta-1}\)</td>
+<td style="padding: 0.4em;">\(\alpha/(\alpha+\beta)\)</td>
+<td style="padding: 0.4em;">\(\alpha\beta/[(\alpha+\beta)^2(\alpha+\beta+1)]\)</td>
+<td style="padding: 0.4em;">百分比建模、共轭先验</td>
+</tr>
+<tr>
+<td style="padding: 0.4em;">\(\chi_n^2\)</td>
+<td style="padding: 0.4em;">Gamma\((n/2, 1/2)\)</td>
+<td style="padding: 0.4em;">\(n\)</td>
+<td style="padding: 0.4em;">\(2n\)</td>
+<td style="padding: 0.4em;">拟合优度、独立性检验</td>
+</tr>
+<tr>
+<td style="padding: 0.4em;">\(t_n\)</td>
+<td style="padding: 0.4em;">\(Z/\sqrt{Y/n}\), \(Y \sim \chi_n^2\)</td>
+<td style="padding: 0.4em;">0（\(n > 1\)）</td>
+<td style="padding: 0.4em;">\(n/(n-2)\)（\(n > 2\)）</td>
+<td style="padding: 0.4em;">小样本均值检验</td>
+</tr>
+<tr>
+<td style="padding: 0.4em;">\(F_{n_1, n_2}\)</td>
+<td style="padding: 0.4em;">\((Y_1/n_1)/(Y_2/n_2)\)</td>
+<td style="padding: 0.4em;">\(n_2/(n_2-2)\)</td>
+<td style="padding: 0.4em;">（公式略）</td>
+<td style="padding: 0.4em;">方差分析、回归</td>
+</tr>
+</table>
+
+<p>这张表加上"如何标准化正态"和"如何用变量替换公式"，就构成了你做大部分连续概率题目的基本武器。</p>
+
+<h2 id="sec7-9">7.9 综合例题</h2>
+
+<p>本节通过几个具体问题，把上述分布串起来用一遍。</p>
+
+<p><strong>例 7.7（指数极小：最早故障的那一个）</strong>　设 \(X_1, X_2, \ldots, X_n\) 独立，\(X_i \sim \mathrm{Exp}(\lambda_i)\)，分别表示 \(n\) 个并联部件的故障时间。求 \(M = \min(X_1, \ldots, X_n)\) 的分布。</p>
+
+<p>解：用"最小值"的标准技巧：求 \(P(M > x)\) 比求 \(P(M \leq x)\) 容易。</p>
+
+\[
+P(M > x) = P(X_1 > x, \ldots, X_n > x) = \prod_{i=1}^n P(X_i > x) = \prod_i e^{-\lambda_i x} = e^{-(\sum_i \lambda_i) x}.
+\]
+
+<p>这正是 \(\mathrm{Exp}(\sum \lambda_i)\) 的尾概率。所以</p>
+
+\[
+\boxed{M \sim \mathrm{Exp}\!\left(\sum_{i=1}^n \lambda_i\right).}
+\]
+
+<p>"独立指数变量的最小值仍然是指数，率参数为各率参数之和。" 这条性质在排队论与可靠性分析中非常出名——它说"\(n\) 个独立的故障来源，整体最早故障率是各率之和"。</p>
+
+<p><strong>例 7.8（标准化正态比较）</strong>　两个班的成绩都服从正态。班 A：\(\mathcal{N}(75, 10^2)\)，班 B：\(\mathcal{N}(80, 5^2)\)。某学生在班 A 得 85 分，另一学生在班 B 得 87 分。问哪一位"相对于自己班"更突出？</p>
+
+<p>解：分别标准化。</p>
+
+<p>班 A 的学生 \(z_A = (85 - 75)/10 = 1.0\)。</p>
+
+<p>班 B 的学生 \(z_B = (87 - 80)/5 = 1.4\)。</p>
+
+<p>班 B 的学生 \(z\) 值更高，所以"相对于自己班"更突出——他在班里超过了 \(\Phi(1.4) \approx 91.9\%\) 的同学，而班 A 那位只超过了 \(\Phi(1.0) \approx 84.1\%\) 的同学。这个例子展示标准化的核心用处：把不同尺度的分数<em>放在同一个尺子上</em>比较。</p>
+
+<p><strong>例 7.9（Beta 后验更新）</strong>　续例 7.6。后验 \(p \sim \mathrm{Beta}(62, 42)\)。求 95% 后验置信区间（即满足 \(P(p_L \leq p \leq p_U \mid \text{数据}) = 0.95\) 的 \(p_L, p_U\)）。</p>
+
+<p>解：精确计算需要数值方法（Beta 的 CDF 没有闭形式）。但有一个常用近似：当 \(\alpha + \beta\) 较大时，\(\mathrm{Beta}(\alpha, \beta)\) 近似于均值 \(\alpha/(\alpha+\beta) \approx 0.596\)、方差 \(\alpha\beta/[(\alpha+\beta)^2(\alpha+\beta+1)] = 62 \cdot 42 / (104^2 \cdot 105) \approx 0.00229\)、标准差 \(\approx 0.0479\) 的正态。</p>
+
+<p>用 95% 双尾正态：\(p \approx 0.596 \pm 1.96 \cdot 0.0479 \approx [0.502, 0.690]\)。这是 Bayes 后验的近似 95% 置信区间。</p>
+
+<p>这个区间不包含 0.5，所以"该候选人的支持率超过半数"在后验意义下被支持（约 95% 后验概率）——一个具体的数据驱动结论。</p>
+
+<p><strong>例 7.10（卡方与方差）</strong>　从 \(\mathcal{N}(0, 1)\) 独立抽 5 个样本 \(Z_1, \ldots, Z_5\)。问 \(\sum Z_i^2 > 11\) 的概率。</p>
+
+<p>解：\(\sum Z_i^2 \sim \chi_5^2\)。期望 5、方差 10、标准差 \(\sqrt{10} \approx 3.16\)。值 11 离均值 \(11 - 5 = 6\)，约 \(6/3.16 \approx 1.9\) 个标准差。如果用正态近似（卡方分布在自由度大时近似正态），约 \(1 - \Phi(1.9) \approx 2.9\%\)。精确查卡方表：\(P(\chi_5^2 > 11.07) = 0.05\)，所以 \(P(\chi_5^2 > 11) \approx 0.05\)（精确值约 \(0.052\)）。两个估计接近，但精确值更准——"自由度 5"还不算大，正态近似只是"还行"。这是为什么卡方表（或软件）有用的原因。</p>
+
+<p><strong>例 7.11（指数和 = Gamma）</strong>　某客服中心，电话以速率 \(\lambda = 0.2\) /分钟到达（指数间隔）。求第 5 通电话到达时间 \(S\) 的期望与超过 30 分钟的概率。</p>
+
+<p>解：\(S \sim \mathrm{Gamma}(5, 0.2)\)（5 个独立 \(\mathrm{Exp}(0.2)\) 之和）。期望 \(\mathbb{E}[S] = 5/0.2 = 25\) 分钟。方差 \(5/0.04 = 125\)，标准差 \(\approx 11.18\)。所以"第 5 通电话平均 25 分钟来、上下波动约 11 分钟"。</p>
+
+<p>"30 分钟还没来" 即 \(P(S > 30)\)。直接积分繁琐。用一个聪明手法：<em>"30 分钟内没收到 5 通"等价于"30 分钟内来了 0、1、2、3 或 4 通"</em>。Poisson 过程下 30 分钟内的电话数 \(N \sim \mathrm{Poisson}(\lambda \cdot 30) = \mathrm{Poisson}(6)\)，所以</p>
+
+\[
+P(S > 30) = P(N \leq 4) = \sum_{k=0}^4 \frac{6^k e^{-6}}{k!}.
+\]
+
+<p>计算：\(e^{-6} \approx 0.00248\)。各项：\(k=0: 0.00248\)；\(k=1: 0.0149\)；\(k=2: 0.0446\)；\(k=3: 0.0892\)；\(k=4: 0.1339\)。和约 \(0.285\)。所以约 28.5% 的概率"30 分钟内还没来 5 通"。这个"Poisson \(\leftrightarrow\) Gamma"的对偶关系在排队论里非常常用——记住它。</p>
+
+<p>本章到此结束。把这 6-8 种连续分布认熟、把它们的"何时出现"刻进直觉，是后续整本书工作的基础。下一章我们将进入<em>多维</em>连续分布——"两个或更多连续随机变量同时出现"的情形——并讨论联合密度、边际密度、独立性、条件分布、协方差等。准备好。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 连续随机变量与密度</a><a href="ch8.html">下一章 · 第 8 章 联合分布与条件分布 →</a></nav>
+
+</main>
+</body>
+</html>

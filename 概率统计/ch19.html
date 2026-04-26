@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 多重检验与现代议题 — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 经典检验</a><a href="ch20.html">下一章 · 第 20 章 简单线性回归 →</a></nav>
+<h1 id="ch19">第 19 章 多重检验与现代议题</h1>
+
+<p>过去两章我们建好了假设检验的工具箱。这一章是它的<em>反思</em>章——我们要谈这套工具用在<em>大规模</em>场景时会出的乱子，以及统计学界过去十多年关于"\(p < 0.05\) 文化"的<em>痛切反思</em>。</p>
+
+<p>有几个事实，让我先摆在桌面上：</p>
+
+<ul>
+<li>2005 年，希腊裔美国流行病学家 John Ioannidis 发表《为什么大多数已发表的研究发现是假的》，引爆了"<em>重现性危机</em>"的讨论；</li>
+<li>2015 年，<em>科学</em>杂志的一项重做实验显示：100 篇心理学顶刊论文里只有 39% 的结论能被重现；</li>
+<li>癌症生物学领域类似研究里，可重现率甚至更低——20% 上下；</li>
+<li>2016 年美国统计协会（ASA）发布关于 \(p\) 值的官方声明，矛头直指误用；</li>
+<li>2018 年，一群学者在 <em>Nature Human Behaviour</em> 上联名提议把 \(p < 0.05\) 改成 \(p < 0.005\)；</li>
+<li>2019 年，<em>Nature</em> 上 800 多位科学家联名呼吁"不要再说'统计显著'这个词"。</li>
+</ul>
+
+<p>这是一个真正的危机——不是统计学家关起门来吵架，而是关系到药品上市、心理学结论、社会科学政策建议的<em>诚信</em>问题。这一章不是教你新公式，是教你<em>怎样不被这套工具骗</em>，以及<em>怎样诚实地用它</em>。</p>
+
+<p>本章覆盖：</p>
+
+<ul>
+<li>多重检验问题：做 100 次独立检验，期望 5 个假阳性；</li>
+<li>家族错误率（FWER）vs 假发现率（FDR）；</li>
+<li>Bonferroni 修正：最简单也最保守的修正；</li>
+<li>Holm 修正、Šidák 修正——比 Bonferroni 灵敏一些；</li>
+<li>Benjamini-Hochberg：基因组学里的 FDR 控制；</li>
+<li>\(p\)-hacking 与各种"扫数据找显著"的招数；</li>
+<li>重现性危机：心理学、生物学、医学的当下议题；</li>
+<li>效应量 vs 显著性：为什么"显著"≠"重要"；</li>
+<li>预注册与开放科学；</li>
+<li>贝叶斯替代视角；</li>
+<li>现实建议：怎么诚实地做统计。</li>
+</ul>
+
+<h2 id="sec19-1">19.1 多重检验问题：100 次检验里的 5 个假阳性</h2>
+
+<p>让我们从一个让人不安的算术开始。</p>
+
+<p>我们做<em>一</em>次检验，控制 \(\alpha = 0.05\)——意思是即便 \(H_0\) 真，我们也有 5% 概率错误地拒绝它（类型 I 错误）。这没问题。</p>
+
+<p>但如果做<em>两</em>次独立检验，每次 \(\alpha = 0.05\)，全部 \(H_0\) 真，那"<em>至少有一次错误拒绝</em>"的概率是多少？</p>
+
+\[
+P(\text{至少一次错拒}) = 1 - P(\text{两次都正确不拒}) = 1 - 0.95^2 = 1 - 0.9025 = 0.0975.
+\]
+
+<p>从 5% 涨到 9.75%。继续，做 \(k\) 次独立检验：</p>
+
+\[
+P(\text{至少一次错拒}) = 1 - (1 - \alpha)^k.
+\]
+
+<p>对 \(\alpha = 0.05\)：</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr><th style="border:1px solid #888; padding:0.3em 0.7em">\(k\)</th><th style="border:1px solid #888; padding:0.3em 0.7em">\(P(\text{至少一次错拒})\)</th></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">1</td><td style="border:1px solid #888; padding:0.3em 0.7em">5%</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">5</td><td style="border:1px solid #888; padding:0.3em 0.7em">22.6%</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">10</td><td style="border:1px solid #888; padding:0.3em 0.7em">40.1%</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">20</td><td style="border:1px solid #888; padding:0.3em 0.7em">64.2%</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">50</td><td style="border:1px solid #888; padding:0.3em 0.7em">92.3%</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.7em">100</td><td style="border:1px solid #888; padding:0.3em 0.7em">99.4%</td></tr>
+</table>
+
+<p>做 100 次独立检验，几乎<em>肯定</em>至少出一个假阳性！而且<em>期望</em>的假阳性数目是 \(100 \cdot 0.05 = 5\) 个——也就是即便所有 \(H_0\) 都真，我们平均也会得到 5 个 "\(p < 0.05\)" 的"显著"结论。</p>
+
+<p>这件事有多严重？取决于你做几次检验。在脑成像（fMRI）研究里，一个大脑被切成几万个体素，每个体素都做一次检验——做几万次检验！在基因组学里，做<em>全基因组关联</em>研究（GWAS），同时检验几百万个 SNP 与某性状的关联。在 A/B 测试里，一家大公司可能每天跑几百个实验。在金融数据挖掘里，扫几千个"策略"找盈利的。在社会学研究里，回归一个变量对几十个潜在解释变量。</p>
+
+<p>这些场景里，<em>不</em>做修正就报 \(p < 0.05\) 显著，<em>几乎注定</em>会得出大量假发现。这就是<strong>多重检验问题</strong>（multiple testing problem 或 multiple comparisons problem）。</p>
+
+<p>有一个广为流传的卡通图叫"绿果冻致癌"（来自 xkcd 第 882 期），讲一群科学家测试 20 种不同颜色的果冻是否致癌、每种颜色一个独立检验，最后绿果冻给出 \(p < 0.05\)，然后报纸大标题"绿果冻显著致癌！"——这正是没修正多重检验的祸害。20 次独立检验下，期望就有 1 个假显著，本来就是统计的"自然产物"。</p>
+
+<p>怎么办？下两节谈两套思路：FWER 和 FDR。</p>
+
+<h2 id="sec19-2">19.2 家族错误率 (FWER) vs 假发现率 (FDR)</h2>
+
+<p>"修正多重检验" 不是一招，是两类思路。先把术语认清。</p>
+
+<p>设我们做 \(m\) 个检验。把它们按"\(H_0\) 真" / "\(H_1\) 真" 与"拒绝" / "不拒绝" 摆成 2 × 2 表：</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr>
+<td style="border:1px solid #888; padding:0.3em 0.7em"></td>
+<th style="border:1px solid #888; padding:0.3em 0.7em">\(H_0\) 真</th>
+<th style="border:1px solid #888; padding:0.3em 0.7em">\(H_1\) 真</th>
+<th style="border:1px solid #888; padding:0.3em 0.7em">合计</th>
+</tr>
+<tr>
+<th style="border:1px solid #888; padding:0.3em 0.7em">不拒绝</th>
+<td style="border:1px solid #888; padding:0.3em 0.7em">\(U\) (真阴)</td>
+<td style="border:1px solid #888; padding:0.3em 0.7em">\(T\) (假阴)</td>
+<td style="border:1px solid #888; padding:0.3em 0.7em">\(m - R\)</td>
+</tr>
+<tr>
+<th style="border:1px solid #888; padding:0.3em 0.7em">拒绝</th>
+<td style="border:1px solid #888; padding:0.3em 0.7em">\(V\) (假阳)</td>
+<td style="border:1px solid #888; padding:0.3em 0.7em">\(S\) (真阳)</td>
+<td style="border:1px solid #888; padding:0.3em 0.7em">\(R\)</td>
+</tr>
+<tr>
+<th style="border:1px solid #888; padding:0.3em 0.7em">合计</th>
+<td style="border:1px solid #888; padding:0.3em 0.7em">\(m_0\)</td>
+<td style="border:1px solid #888; padding:0.3em 0.7em">\(m_1\)</td>
+<td style="border:1px solid #888; padding:0.3em 0.7em">\(m\)</td>
+</tr>
+</table>
+
+<p>其中只有 \(R\)（"我们拒绝了多少个"）是观测的；\(V\)、\(S\) 等是隐藏量。</p>
+
+<ul>
+<li><strong>FWER</strong>（family-wise error rate，家族错误率）= \(P(V \geq 1)\)，即"<em>至少有一个</em>假阳性"的概率。FWER 修正的目标是把这个数控制在某个 \(\alpha\)（一般还是 0.05）以下。</li>
+<li><strong>FDR</strong>（false discovery rate，假发现率）= \(E[V/R]\)（约定 \(0/0 = 0\)），即"<em>在我们宣称发现的那一堆里</em>，假发现占的比例"的期望。FDR 修正的目标是把这个比例控制在某个水平（一般 \(q = 0.05\) 或 0.10）。</li>
+</ul>
+
+<p>请你<em>对比</em>这两种目标。FWER 严苛——它说"<em>一个假阳性都不能有</em>"。FDR 宽松——它允许有假阳性，只要在所有"发现"里占比不太大。</p>
+
+<p>什么时候用哪个？</p>
+
+<ul>
+<li><strong>FWER 适合</strong>：少量检验、每个假阳性的代价高。比如临床试验同时考察几个安全终点——任何一个错误结论都可能让无效药上市。</li>
+<li><strong>FDR 适合</strong>：海量检验、目的是"筛选出值得后续验证的候选"。基因组学里同时检验几百万个 SNP，本来就接受"大部分发现还要后续验证"，那允许 5% 假发现是可接受的成本。</li>
+</ul>
+
+<p>下面三节讲 FWER 修正（Bonferroni、Holm、Šidák），后一节讲 FDR 修正（Benjamini-Hochberg）。</p>
+
+<h2 id="sec19-3">19.3 Bonferroni 修正：\(\alpha / k\)</h2>
+
+<p>这是最简单也最保守的 FWER 修正。规则：</p>
+
+<p style="text-align:center">做 \(k\) 个检验，每个检验<em>各自</em>用 \(\alpha / k\) 而非 \(\alpha\) 作为显著性阈值。</p>
+
+<p>等价地：把 \(p\) 值都<em>乘以 \(k\)</em>（如果超过 1 就截到 1），再跟原本的 \(\alpha\) 比。</p>
+
+<p>这种修正的<em>道理</em>来自一个简单的概率不等式（Bonferroni 不等式或 Boole 不等式）：</p>
+
+\[
+P(A_1 \cup A_2 \cup \cdots \cup A_k) \leq P(A_1) + P(A_2) + \cdots + P(A_k).
+\]
+
+<p>把 \(A_i\) = "第 \(i\) 个检验出假阳性"，则 \(P(A_i) \leq \alpha/k\)，所以</p>
+
+\[
+P(\text{至少一次假阳}) \leq k \cdot (\alpha/k) = \alpha.
+\]
+
+<p>FWER 被控制在 \(\alpha\) 之下。</p>
+
+<p><strong>例 19.1（果冻）</strong>　测试 20 种颜色果冻，每种独立 \(t\) 检验。原本 \(\alpha = 0.05\)。Bonferroni 修正：每个检验的阈值变成 \(0.05/20 = 0.0025\)。</p>
+
+<p>原始 \(p\) 值：紫 0.31、红 0.92、蓝 0.04、绿 0.04、橙 0.85、……。修正后只有 \(p < 0.0025\) 才算显著。绿色 \(p = 0.04\) 不达标——绿色不显著了。皆大欢喜。</p>
+
+<p>Bonferroni 的<em>优点</em>：极简、不需要任何分布假设、对相关检验也成立（甚至不需要独立性）。<em>缺点</em>：保守。如果检验间有强正相关，Bonferroni 修正得太狠，<em>真</em>显著的发现也会被埋没——损失功效。</p>
+
+<h2 id="sec19-4">19.4 Holm 修正、Šidák 修正</h2>
+
+<p>有几个比 Bonferroni 略好（即略不那么保守）的 FWER 修正。</p>
+
+<h3 id="sec19-4-1">19.4.1 Holm 修正（也叫 Holm-Bonferroni）</h3>
+
+<p>这是一个"<em>逐步</em>" 程序，比 Bonferroni 灵敏。规则：</p>
+
+<ol>
+<li>把 \(k\) 个 \(p\) 值<em>从小到大</em>排序：\(p_{(1)} \leq p_{(2)} \leq \cdots \leq p_{(k)}\)；</li>
+<li>从最小的开始，逐个比较：\(p_{(1)}\) 与 \(\alpha/k\) 比，\(p_{(2)}\) 与 \(\alpha/(k-1)\) 比，\(p_{(3)}\) 与 \(\alpha/(k-2)\) 比，……一般地 \(p_{(i)}\) 与 \(\alpha/(k - i + 1)\) 比；</li>
+<li>遇到第一个 <em>不</em>通过（\(p_{(i)} > \alpha/(k - i + 1)\)）的，就停止——它和后面所有 \(p\) 都不拒绝；之前那些都拒绝。</li>
+</ol>
+
+<p><strong>例 19.2</strong>　六个检验，\(p\) 值已排序：0.001, 0.008, 0.02, 0.03, 0.04, 0.20。\(\alpha = 0.05\)、\(k = 6\)。</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr><th style="border:1px solid #888; padding:0.3em 0.6em">序</th><th style="border:1px solid #888; padding:0.3em 0.6em">\(p_{(i)}\)</th><th style="border:1px solid #888; padding:0.3em 0.6em">阈值 \(\alpha/(k-i+1)\)</th><th style="border:1px solid #888; padding:0.3em 0.6em">通过？</th></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">1</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.001</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.05/6 = 0.00833</td><td style="border:1px solid #888; padding:0.3em 0.6em">是 ✓</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">2</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.008</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.05/5 = 0.01000</td><td style="border:1px solid #888; padding:0.3em 0.6em">是 ✓</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">3</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.02</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.05/4 = 0.01250</td><td style="border:1px solid #888; padding:0.3em 0.6em">否 ✗，停</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">4</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.03</td><td style="border:1px solid #888; padding:0.3em 0.6em">—</td><td style="border:1px solid #888; padding:0.3em 0.6em">不拒绝</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">5</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.04</td><td style="border:1px solid #888; padding:0.3em 0.6em">—</td><td style="border:1px solid #888; padding:0.3em 0.6em">不拒绝</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">6</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.20</td><td style="border:1px solid #888; padding:0.3em 0.6em">—</td><td style="border:1px solid #888; padding:0.3em 0.6em">不拒绝</td></tr>
+</table>
+
+<p>结果：拒绝前两个 \(H_0\)。如果用 Bonferroni（每个跟 0.00833 比），就只拒绝第一个（0.001 < 0.00833；0.008 < 0.00833 也通过……让我重看）——其实 0.008 也 < 0.00833，所以 Bonferroni 也拒绝前两个。例子选的不够典型，但 Holm <em>永远不少于</em> Bonferroni 拒绝的数目，可以严格证明。结论：能用 Holm 就别用 Bonferroni——同样控制 FWER，但多保留一些发现。</p>
+
+<h3 id="sec19-4-2">19.4.2 Šidák 修正</h3>
+
+<p>Bonferroni 用的是宽松不等式 \(P(\cup A_i) \leq \sum P(A_i)\)。如果各检验<em>独立</em>，可以更紧地写：</p>
+
+\[
+P(\cup A_i) = 1 - \prod (1 - P(A_i)) = 1 - (1 - \alpha')^k.
+\]
+
+<p>设这等于 \(\alpha\)，解得 \(\alpha' = 1 - (1 - \alpha)^{1/k}\)。这就是 <strong>Šidák 修正</strong>的每个检验阈值。</p>
+
+<p>对小 \(\alpha\)，\(\alpha' \approx \alpha/k\)，跟 Bonferroni 几乎相同。Šidák 比 Bonferroni 略松一点（多一点点功效），但要求独立性。实务里用 Bonferroni 或 Holm 更普遍。</p>
+
+<h2 id="sec19-5">19.5 Benjamini-Hochberg：控制 FDR</h2>
+
+<p>FWER 修正在<em>大量</em>检验场景里太苛刻——做几百万个检验，每个阈值除以几百万，几乎什么都拒绝不了。1995 年 Benjamini 和 Hochberg 提出"<em>不必把假阳数控制为 0，只需控制其在所有发现里的比例</em>"——这就是控制 FDR 的思路。</p>
+
+<p>规则（BH 程序）：</p>
+
+<ol>
+<li>把 \(p\) 值从小到大排序：\(p_{(1)} \leq p_{(2)} \leq \cdots \leq p_{(m)}\)；</li>
+<li>找最大的 \(i\) 使 \(p_{(i)} \leq \dfrac{i}{m} \cdot q\)（\(q\) 是希望控制的 FDR 水平）；</li>
+<li>拒绝从第 1 到第 \(i\) 这些 \(H_0\)。</li>
+</ol>
+
+<p>注意"找<em>最大</em>的 \(i\)"——比 Holm 还宽松，因为前面那些 \(p\) 即便比自己的 BH 阈值大，只要后面有一个通过、它也跟着拒绝。</p>
+
+<p><strong>例 19.3（基因表达）</strong>　某基因芯片同时检测 1000 个基因在患病组与对照组的表达差异，每个基因一个 \(t\) 检验。希望控制 \(\text{FDR} = 0.05\)。</p>
+
+<p>结果（按 \(p\) 排序前 10 个）：</p>
+
+<table style="margin:1em auto; border-collapse:collapse">
+<tr><th style="border:1px solid #888; padding:0.3em 0.6em">序 \(i\)</th><th style="border:1px solid #888; padding:0.3em 0.6em">\(p_{(i)}\)</th><th style="border:1px solid #888; padding:0.3em 0.6em">BH 阈值 \(i \cdot q / m\)</th><th style="border:1px solid #888; padding:0.3em 0.6em">通过？</th></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">1</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.000004</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00005</td><td style="border:1px solid #888; padding:0.3em 0.6em">✓</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">2</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00007</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00010</td><td style="border:1px solid #888; padding:0.3em 0.6em">✓</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">3</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00015</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00015</td><td style="border:1px solid #888; padding:0.3em 0.6em">✓ (恰好)</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">4</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.0003</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00020</td><td style="border:1px solid #888; padding:0.3em 0.6em">✗</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">5</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.0005</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00025</td><td style="border:1px solid #888; padding:0.3em 0.6em">✗</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">6</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.0007</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00030</td><td style="border:1px solid #888; padding:0.3em 0.6em">✗</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">7</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.0010</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00035</td><td style="border:1px solid #888; padding:0.3em 0.6em">✗</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">8</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.0035</td><td style="border:1px solid #888; padding:0.3em 0.6em">0.00040</td><td style="border:1px solid #888; padding:0.3em 0.6em">✗</td></tr>
+<tr><td style="border:1px solid #888; padding:0.3em 0.6em">…</td><td style="border:1px solid #888; padding:0.3em 0.6em">…</td><td style="border:1px solid #888; padding:0.3em 0.6em">…</td><td style="border:1px solid #888; padding:0.3em 0.6em">…</td></tr>
+</table>
+
+<p>BH 找<em>最大</em>的通过 \(i\)。如果后面都不再通过，则<em>最大</em>的通过 \(i\) 是 3，所以拒绝前 3 个 \(H_0\)。意思是：发现 3 个差异表达的基因，FDR 控制在 5% 以下，意即<em>期望</em>约 0.15 个是假发现，其余约 2.85 个是真发现。</p>
+
+<p>对比：如果用 Bonferroni 修正（FWER 0.05），每个检验阈值 \(0.05/1000 = 0.00005\)，只有 \(p_{(1)} < 0.00005\) 通过——只发现 1 个基因。BH 多保留了 2 个发现，付出的代价是允许期望的少量假阳。基因组学里 BH 因此成了标配。</p>
+
+<p>这一招的发明，让基因组学整个领域得以"大规模筛选"成为可能。Benjamini-Hochberg 的论文是统计学过去 30 年被引用最多的论文之一。</p>
+
+<h2 id="sec19-6">19.6 \(p\)-hacking：警惕"扫数据找显著"</h2>
+
+<p>多重检验问题不仅出现在你<em>明确做了</em> 100 次检验的场景里——它<em>更隐蔽</em>地出现在"<em>看似</em>只做了 1 次检验，实际上偷偷试了 50 种方式" 的场景里。这种行为统称 <strong>\(p\)-hacking</strong>（\(p\) 值黑客）。常见招数：</p>
+
+<ul>
+<li><strong>边收数据边偷看 \(p\) 值</strong>。每收一批数据就跑一次检验，\(p < 0.05\) 时立刻停手发表。这种"<em>顺序检验</em>"在没有特殊调整下会大幅膨胀 FWER，因为本质是多重检验。</li>
+<li><strong>挑选/剔除观测</strong>。"3 号样本看起来是异常值，去掉重算"——但这种"看完数据再去掉"会让显著性虚高。</li>
+<li><strong>多变量回归里挑显著的报告</strong>。回归 \(Y\) 对 20 个潜在解释变量，期望就有 1 个 \(p < 0.05\)。只报告这一个、隐藏其他 19 个，整个故事就成了"\(X_7\) 显著影响 \(Y\)"。</li>
+<li><strong>多种数据变换比较</strong>。对原始 \(Y\)、\(\log Y\)、\(\sqrt Y\) 各做一遍检验，挑显著的报。</li>
+<li><strong>子群分析</strong>。整体不显著时，按性别、年龄、地域切子群，"在 60 岁以上女性中，新药显著"。如果你切了 10 个子群，期望就有 0.5 个显著。</li>
+<li><strong>HARKing</strong>（Hypothesizing After the Results are Known）：先看数据找 pattern，再回头宣称"我们假设了 X" 来发表。这是科学诚信问题，也是 \(p\) 值膨胀。</li>
+</ul>
+
+<p>每一项单独看都"<em>有合理理由</em>"，但合在一起的统计后果是<em>把 5% 的假阳率推到 50% 以上</em>。Simmons、Nelson、Simonsohn 在 2011 年的著名论文 "False-Positive Psychology" 里用模拟显示，几个常见 \(p\)-hacking 行为组合起来，能让<em>完全无效</em>的实验有 60% 概率出 \(p < 0.05\)。这是一个<em>令人毛骨悚然</em>的数字——它解释了为什么心理学里几十年的"经典"结论在 2010 年代的重做实验里大批"消失"。</p>
+
+<p>怎么防 \(p\)-hacking？最有效的方法是 <strong>预注册</strong>（pre-registration），见 19.9 节。</p>
+
+<h2 id="sec19-7">19.7 重现性危机</h2>
+
+<p>把上一节的诊断放大到整个学科，就是<strong>重现性危机</strong>（reproducibility crisis）。</p>
+
+<p>2015 年的"重现性项目：心理学" 由 Brian Nosek 领导，270 多名研究者合作，挑选 2008 年三大心理学顶刊（<em>Psychological Science</em>、<em>JPSP</em>、<em>JEP</em>）上 100 篇论文，原原本本重做。结果：原研究 \(p < 0.05\) 显著的 97 篇里，重做实验只有 36 篇仍然 \(p < 0.05\)；而且重做的<em>效应量</em>平均只有原研究的<em>一半</em>。意思是即便能重现"显著"，效应也通常没原文说的那么大。</p>
+
+<p>癌症生物学的"重现性项目"（2017）类似——重做的 50 项实验里只有 10 项左右能完全重现。整个心理学、生物学、社会科学、医学都受到强烈震荡。</p>
+
+<p>原因是<em>多方面</em>的，下面几条只是主要的：</p>
+
+<ol>
+<li><strong>\(p\)-hacking</strong> 与有意识/无意识的"选择性报告"，如上节所说；</li>
+<li><strong>出版偏差</strong>：期刊偏爱"显著"结果，"不显著"的论文常被退回或藏在抽屉里。这导致已发表文献严重高估真实效应；</li>
+<li><strong>未充分功效</strong>：很多研究样本量太小，功效不到 30%。即使 \(H_1\) 真，也只有不到 30% 的概率能"看见"；勉强看见的那 30%，往往效应被高估；</li>
+<li><strong>实验/分析方法的"研究者自由度"</strong>：同一份数据，给 29 个独立分析团队各自分析"球员肤色与红牌的关系"，得出的结论从"无关"到"强相关"——纯方法选择就能让结论翻盘；</li>
+<li><strong>样本不代表性</strong>：用大学生当被试推断全人类，用美国人当被试推断全球，等等；</li>
+<li><strong>欺诈</strong>：极少数情况下是直接造假数据。</li>
+</ol>
+
+<p>这场危机的回应是好的——科学家们在反思，工具在改进。下面三节谈正在发生的几件具体的好事。</p>
+
+<h2 id="sec19-8">19.8 效应量 vs 显著性：为什么"显著"≠"重要"</h2>
+
+<p>这件事第 17 章谈过一次，这里要展开。</p>
+
+<p><strong>统计显著</strong>问的是："观测到的效应是否大到不像偶然" ——\(p\) 值小就行。<strong>实际重要</strong>问的是："效应大到值得在意吗" ——这跟 \(p\) 值无关，是<em>效应量</em>（effect size）的问题。</p>
+
+<p>常见效应量度量：</p>
+
+<ul>
+<li>均值差异：\(\bar X_1 - \bar X_2\)（原始单位）；</li>
+<li>标准化均值差：Cohen's \(d = (\bar X_1 - \bar X_2)/S_p\)（无单位，便于跨研究比较）。Cohen 给的"<em>启发</em>" 标杆：\(d = 0.2\) 小、\(d = 0.5\) 中、\(d = 0.8\) 大；</li>
+<li>风险差：\(p_1 - p_2\)；相对风险：\(p_1/p_2\)；优势比：\(\frac{p_1/(1-p_1)}{p_2/(1-p_2)}\)；</li>
+<li>相关系数 \(r\)；决定系数 \(R^2\)；</li>
+<li>组间方差解释比例 \(\eta^2\)。</li>
+</ul>
+
+<p><strong>例 19.4（大样本带来的虚假"显著"）</strong>　一项调查 \(n = 100000\) 人，发现"喝咖啡的人比不喝咖啡的人寿命平均长 0.1 年"，\(p < 0.001\)。请问该不该把"咖啡延寿"印在新闻头版？</p>
+
+<p>回答：不该。0.1 年 ≈ 1 个月——临床和实际意义微乎其微，可能完全被其他生活习惯（喝咖啡的人可能更容易早起锻炼、社会经济地位等）混淆。\(p < 0.001\) 只说明"在如此大的样本里这点差异不像随机抖动"，根本<em>没</em>说"这点差异有意义"。</p>
+
+<p>反之，<strong>例 19.5（小样本掩盖了大效应）</strong>　一项罕见病新药试验，\(n = 20\)，新药组生存期平均长 5 年，\(p = 0.18\)（不显著）。该不该放弃这个药？</p>
+
+<p>回答：未必。5 年是巨大的临床效应，但样本量只有 20 显然功效不足，\(p\) 大不奇怪——证据"<em>不充分</em>"，但效应量提示<em>极可能真实</em>。应当扩大样本继续研究，而不是简单"未达显著"就丢弃。</p>
+
+<p>实务忠告：<strong>每篇论文都报效应量和置信区间</strong>，<em>无论</em> \(p\) 值如何。光报 \(p\) 值是被审稿人骂的。</p>
+
+<h2 id="sec19-9">19.9 预注册与开放科学</h2>
+
+<p>对抗 \(p\)-hacking 和 HARKing 的最强工具是 <strong>预注册</strong>（pre-registration）：</p>
+
+<p style="text-align:center">在收数据<em>之前</em>，把研究问题、假设、分析方法、样本量、停止规则<em>全部</em>公开记录到中立的注册库里。</p>
+
+<p>这样研究者就<em>不能</em>看完数据再调整方法挑显著——因为所有事先承诺都已经在注册库里有时间戳。</p>
+
+<p>临床试验领域早就这么做了——2007 年起 FDA 要求所有 III 期临床试验必须在 ClinicalTrials.gov 预注册，否则不能用于监管申请。这条规定执行后，新药试验的"<em>显著</em>" 比例从 57% 暴跌到 8%——直接证实了之前大量"显著结果"是 \(p\)-hacking 出来的。</p>
+
+<p>心理学、社会学、经济学也在跟进。OSF (Open Science Framework)、AsPredicted 都是常用的预注册平台。新型的"<strong>注册报告</strong>"（registered reports）期刊模式更进一步——论文先按计划提交、被审稿评估"研究设计是否合理"、获得"原则上接受"后再开始收数据；最终结果<em>无论显著与否</em>都保证发表。这一彻底瓦解了出版偏差。</p>
+
+<p><strong>开放科学</strong>是一个更大的伞，包含：</p>
+
+<ul>
+<li>预注册（如上）；</li>
+<li>开放数据：原始数据上传供他人复核；</li>
+<li>开放代码：分析脚本公开供他人重跑；</li>
+<li>开放材料：实验材料（问卷、刺激）公开；</li>
+<li>开放访问：论文不收订阅费。</li>
+</ul>
+
+<p>"开放" 听起来像意识形态，其实是<em>实证</em>主义——只有可被他人审查、重做、复核的研究，才是真正的科学。这是科学方法的回归，不是创新。</p>
+
+<h2 id="sec19-10">19.10 贝叶斯替代视角（预告 第 23 章）</h2>
+
+<p>本章的所有讨论都在<em>频率</em>派框架内——\(p\) 值、置信区间、Type I/II 错误，全部基于"重复抽样下 \(\alpha\) 比例的错误"这种长程频率解读。还有另一个学派——<strong>贝叶斯</strong>派——他们对假设检验有完全不同的看法。第 23 章会专门讲，这里只预告几条要点：</p>
+
+<ul>
+<li>贝叶斯派关心 \(P(H_1 \mid \text{数据})\) ——在看到数据后，"\(H_1\) 真" 的概率。这正是<em>常人想要</em>的那个概率（也是 \(p\) 值<em>常被误读为</em>的那个），频率派坚持算不出来——它需要"先验" \(P(H_1)\)；</li>
+<li>贝叶斯派的"贝叶斯因子" \(BF_{10} = \dfrac{P(\text{数据} \mid H_1)}{P(\text{数据} \mid H_0)}\) 度量"数据对 \(H_1\) vs \(H_0\) 的支持比"。它不需要先验，是一个客观量。\(BF_{10} = 10\) 表示数据让 \(H_1\) 的相对支持度提高了 10 倍。$BF$ 没有"显著/不显著"的二元割裂，是个连续度量；</li>
+<li>贝叶斯方法在小样本场景、需要把先验信息纳入分析的场景下尤其有优势；</li>
+<li>贝叶斯框架自然处理"<em>积累证据</em>"——边看数据边更新后验，没有"<em>顺序检验导致 FWER 膨胀</em>" 的问题；</li>
+<li>但贝叶斯也有自己的争议——"先验" 怎么选、如何防止"<em>主观</em>"——这些第 23 章再谈。</li>
+</ul>
+
+<p>读到这里你可能想问：那我以后到底用频率派还是贝叶斯派？答案是：<em>都学</em>。两套框架并不互斥，互相补充。绝大多数实务统计仍然以频率派为主，但贝叶斯方法在某些场景（如临床试验适应性设计、机器学习、A/B 测试停时规则）越来越普及。会两套思路、知道何时用哪一套，是合格统计学家的标志。</p>
+
+<h2 id="sec19-11">19.11 现实建议：怎么诚实地做统计</h2>
+
+<p>这一节把全章浓缩成几条<em>处事原则</em>。它们不是公式，但比公式更值钱——它们是一个诚实统计学家的<em>戒律</em>。</p>
+
+<p><strong>戒律一：在收数据之前就把分析方案写下来。</strong> 包括：哪些变量是主要关心的、用什么检验、双边还是单边、\(\alpha\) 多少、样本量怎么算的、停止规则、子群分析有哪些（如果有）。如果可能，预注册到中立平台。</p>
+
+<p><strong>戒律二：报告完整结果，不要只挑显著的报。</strong> 你做了 10 个检验，把 10 个 \(p\) 值都报出来——并指出做了多重检验、是否做了修正。挑选性报告是 \(p\)-hacking 的祖宗。</p>
+
+<p><strong>戒律三：做功效分析。</strong> 在收数据前，根据"希望检测到的最小有意义效应" 算所需样本量。功效低于 80% 的研究开不开值得三思——别开了一个一开始就注定看不见真相的实验。</p>
+
+<p><strong>戒律四：报告效应量与置信区间。</strong> 不要光报 \(p\)。"\(p < 0.05\)" 不告诉读者效应有多大；CI 同时给出"<em>多大</em>" 和"<em>多确定</em>"。</p>
+
+<p><strong>戒律五：区分"<em>探索性</em>" 与"<em>确证性</em>" 分析。</strong> 探索性分析（看数据、找 pattern、试不同模型）是合法的、必要的——但你<em>不能</em>把探索的结果当确证发表。如果数据让你想到一个新假设，那要拿<em>新数据</em>来检验它，不能用同一份数据既"<em>找</em>" 又"<em>验</em>"。</p>
+
+<p><strong>戒律六：多重检验时做修正。</strong> Bonferroni、Holm、BH 任选，但<em>必须</em>选一个。"我做了 100 个检验、5 个显著、就报这 5 个" 不诚实。</p>
+
+<p><strong>戒律七：不要把"<em>未拒绝</em> \(H_0\)" 解读为"<em>证明</em> \(H_0\)"。</strong> 第 17 章再强调一次。"没看见效应" ≠ "没有效应"——可能是没收够数据。</p>
+
+<p><strong>戒律八：警惕"<em>统计显著</em> ≠ <em>实际重要</em>"。</strong> 大样本下小效应也能"显著"——但小效应可能没意义。</p>
+
+<p><strong>戒律九：相关 ≠ 因果。</strong> \(\chi^2\) 独立性显著只说"<em>有关联</em>"。要建立因果关系，需要随机对照、自然实验、或正式的因果推断方法（工具变量、双重差分、断点回归等）。</p>
+
+<p><strong>戒律十：把数据、代码、分析过程公开供他人复核。</strong> 你要么自信到敢公开，要么不要发表。</p>
+
+<p>这十条戒律凑起来其实只说了一件事：<em>统计学是一门要诚实地用的工具</em>。它不会替你回答问题，它只能客观地报告"在你的假设下，数据有多让人惊讶"。剩下的判断、解读、推断——属于你的责任。</p>
+
+<p>第 17、18、19 章合起来，搭出了"<em>检验</em>" 这个工具的<em>骨架</em>、<em>肌肉</em>、与<em>良知</em>。下一章我们要讲<em>方差分析</em>（ANOVA）——把两组比较推广到<em>多组</em>比较，再下一章讲<em>线性回归</em>，把"两组均值差" 推广到"<em>变量与变量之间的依赖</em>" 这一更通用的语言。等你再走完那两章，你就拥有了从事任何应用统计工作的<em>核心装备</em>。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 经典检验</a><a href="ch20.html">下一章 · 第 20 章 简单线性回归 →</a></nav>
+
+</main>
+</body>
+</html>

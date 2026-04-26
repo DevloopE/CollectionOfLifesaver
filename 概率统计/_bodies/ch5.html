@@ -1,0 +1,707 @@
+<h1 id="ch5">第 5 章 重要离散分布</h1>
+
+<p>第 4 章把"离散随机变量、PMF、CDF、期望、方差"这些通用工具准备好了。本章把这套工具用在六种最常用、最经典的<em>具体分布</em>上：</p>
+
+<ul>
+<li><strong>伯努利</strong>：单次成功/失败试验；</li>
+<li><strong>二项</strong>：\(n\) 次独立伯努利里的成功次数；</li>
+<li><strong>几何</strong>：等到第一次成功之前要失败几次（或试几次）；</li>
+<li><strong>负二项</strong>：等到第 \(r\) 次成功之前要失败几次；</li>
+<li><strong>泊松</strong>：单位时间或空间里"稀有事件"的发生数；</li>
+<li><strong>超几何</strong>：从有限总体里不放回抽样得到的"标记物"个数。</li>
+</ul>
+
+<p>每种分布学一遍下来要点有四：</p>
+
+<ol>
+<li><em>定义</em>——它在描述什么样的实验。这是<em>建模</em>的关键：什么时候你应该说"这个量服从某某分布"。</li>
+<li><em>PMF</em>——具体的取值-概率公式。</li>
+<li><em>期望与方差</em>——两个汇总数字。每条都要会推导，至少在脑子里能复述出"为什么是这个数"。</li>
+<li><em>典型应用场景</em>——它出现在哪一类问题里。</li>
+</ol>
+
+<p>你可能会问："为什么挑这 6 种？" 因为<em>所有标准课程、所有标准考试、所有标准应用</em>都绕不开这 6 种。它们就像微积分里的 \(\sin, \cos, e^x, \ln x\)——基础积木，用不上其它分布的场合太罕见了。本章学完，再学下一组连续分布（正态、指数、伽马等）时，你会发现"在每种连续分布里都能找到一个离散原型"——分布之间是有"亲缘"的。</p>
+
+<p>本章节奏会比第 4 章稍快——很多公式都在做"代入和求和"，但每一种分布都附 1-2 道"建模 + 计算"的完整例题。本章末有<em>速查表</em>（5.7 节）和<em>选用指南</em>（5.9 节），考前一晚翻它就够。</p>
+
+<h2 id="sec5-1">5.1 伯努利分布 \(\mathrm{Bern}(p)\)</h2>
+
+<p>最简单的离散分布。一次试验，结果只有"成功"和"失败"两种，成功概率 \(p\)，失败概率 \(1 - p\)（也常记 \(q = 1 - p\)）。把"成功"赋值 1、"失败"赋值 0，得到一个取值在 \(\{0, 1\}\) 的随机变量 \(X\)，称 \(X\) 服从<strong>伯努利分布</strong>，记作</p>
+
+\[
+X \sim \mathrm{Bern}(p).
+\]
+
+<p><strong>PMF</strong>：</p>
+
+\[
+\boxed{p_X(1) = p, \qquad p_X(0) = 1 - p.}
+\]
+
+<p>也可以紧凑地写成 \(p_X(k) = p^k (1 - p)^{1 - k}\)（\(k \in \{0, 1\}\)）——但这种紧凑写法没什么实际用处，记住"\(1\) 概率 \(p\)、\(0\) 概率 \(1-p\)"就够。</p>
+
+<p><strong>期望</strong>：</p>
+
+\[
+\mathbb{E}[X] = 1 \cdot p + 0 \cdot (1 - p) = p.
+\]
+
+<p><strong>方差</strong>：先算 \(\mathbb{E}[X^2]\)。但 \(X \in \{0, 1\}\)，所以 \(X^2 = X\)（因为 \(0^2 = 0\)、\(1^2 = 1\)）；从而 \(\mathbb{E}[X^2] = \mathbb{E}[X] = p\)。代入 4.10 节的关键公式：</p>
+
+\[
+\mathrm{Var}(X) = \mathbb{E}[X^2] - (\mathbb{E}[X])^2 = p - p^2 = p(1 - p).
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\mathbb{E}[X] = p, \qquad \mathrm{Var}(X) = p(1 - p).}
+\]
+
+<p>请你<em>注意</em>方差 \(p(1 - p)\) 在 \(p = 1/2\) 时最大（\(= 1/4\)），在 \(p \to 0\) 或 \(p \to 1\) 时趋于 0。直觉非常对——\(p = 1/2\) 是最"难预测"的（最随机），方差最大；\(p\) 接近 0 或 1 时，结果几乎确定，方差小。</p>
+
+<p>伯努利单独使用机会不多——它通常作为<em>构件</em>出现在更复杂分布里。下面四节的二项、几何、负二项分布，本质都是"许多个独立伯努利试验"的某种汇总。</p>
+
+<p><strong>例 5.1（指示函数即伯努利）</strong>　对任何事件 \(A\)，定义指示函数 \(I_A = \mathbf{1}\{A \text{ 发生}\}\)。这是一个 \(\mathrm{Bern}(p)\) 分布，其中 \(p = P(A)\)。所以 \(\mathbb{E}[I_A] = P(A)\)、\(\mathrm{Var}(I_A) = P(A) \cdot (1 - P(A))\)——后面例题会到处用。</p>
+
+<h2 id="sec5-2">5.2 二项分布 \(\mathrm{Bin}(n, p)\)</h2>
+
+<p>把 \(n\) 次独立的、成功概率都为 \(p\) 的伯努利试验合在一起，记 \(X\) 为这 \(n\) 次里"成功"出现的总次数。\(X\) 的取值在 \(\{0, 1, 2, \ldots, n\}\)，称 \(X\) 服从<strong>二项分布</strong>，记作</p>
+
+\[
+X \sim \mathrm{Bin}(n, p).
+\]
+
+<p>这是离散概率论里出场频率最高的分布，请你<em>认真对待</em>。</p>
+
+<h3 id="sec5-2-1">5.2.1 PMF 推导</h3>
+
+<p>问 \(P(X = k)\) 是多少。两步思考：</p>
+
+<ol>
+<li>"\(n\) 次试验里某<em>特定</em>的 \(k\) 次成功、其余 \(n - k\) 次失败"——比如成功发生在第 \(1, 3, 5\) 次（其余失败）——的概率是多少？由独立性，\(p^k (1 - p)^{n - k}\)。<em>这一表达式只取决于"成功的次数"，而不取决于"成功是哪几次"</em>。</li>
+<li>"恰好 \(k\) 次成功" 这件事，可以由 \(\binom{n}{k}\) 种"哪几次成功"的具体模式实现——这些模式互不相容，概率相加。所以</li>
+</ol>
+
+\[
+\boxed{p_X(k) = P(X = k) = \binom{n}{k} p^k (1 - p)^{n - k}, \qquad k = 0, 1, \ldots, n.}
+\]
+
+<p>这条公式的归一性 \(\sum_{k=0}^n p_X(k) = 1\) 来自二项式定理：\(\sum_{k=0}^n \binom{n}{k} p^k (1-p)^{n-k} = (p + (1-p))^n = 1^n = 1\)。这正是"二项分布"得名的来源——它的 PMF 就是二项式 \((p + q)^n\) 展开式的各项。</p>
+
+<h3 id="sec5-2-2">5.2.2 期望——两种推法</h3>
+
+<p>\(\mathrm{Bin}(n, p)\) 的期望是 \(n p\)。这条结果非常重要，也非常符合直觉——抛 \(n\) 次、每次成功概率 \(p\)，平均成功 \(n p\) 次。但是怎么<em>证</em>？</p>
+
+<p><strong>方法 1：暴力求和</strong>（"硬算派"）。</p>
+
+\[
+\mathbb{E}[X] = \sum_{k=0}^n k \binom{n}{k} p^k (1-p)^{n-k}.
+\]
+
+<p>注意 \(k = 0\) 那项是 0，从 \(k = 1\) 起。用恒等式 \(k \binom{n}{k} = n \binom{n-1}{k-1}\)（请你验证：\(k \cdot \tfrac{n!}{k! (n-k)!} = \tfrac{n!}{(k-1)!(n-k)!} = n \cdot \tfrac{(n-1)!}{(k-1)!(n-k)!} = n \binom{n-1}{k-1}\)）：</p>
+
+\[
+\mathbb{E}[X] = \sum_{k=1}^n n \binom{n-1}{k-1} p^k (1-p)^{n-k} = n p \sum_{k=1}^n \binom{n-1}{k-1} p^{k-1} (1-p)^{n-k}.
+\]
+
+<p>令 \(j = k - 1\)：</p>
+
+\[
+\mathbb{E}[X] = n p \sum_{j=0}^{n-1} \binom{n-1}{j} p^j (1-p)^{(n-1)-j} = n p \cdot 1 = n p,
+\]
+
+<p>因为最后那个求和是 \(\mathrm{Bin}(n-1, p)\) 的 PMF 全和，等于 1。</p>
+
+<p><strong>方法 2：线性性 + 指示分解</strong>（"优雅派"）。这才是真正应该记住的方法。</p>
+
+<p>把 \(X\) 分解成 \(n\) 个伯努利的和：\(X = I_1 + I_2 + \cdots + I_n\)，其中 \(I_j = \mathbf{1}\{\text{第 \(j\) 次成功}\}\) 是独立的 \(\mathrm{Bern}(p)\)。每个 \(\mathbb{E}[I_j] = p\)，由线性性</p>
+
+\[
+\mathbb{E}[X] = \mathbb{E}[I_1] + \cdots + \mathbb{E}[I_n] = n p.
+\]
+
+<p><em>三行结束</em>。请你<em>注意</em>这两种方法解决同一问题的悬殊代价——这就是"线性性 + 指示分解"的威力。今后只要看见"许多个 0/1 变量的和"，你的第一反射就应该是这个分解。</p>
+
+<h3 id="sec5-2-3">5.2.3 方差</h3>
+
+<p>用同样的分解。因为 \(I_1, \ldots, I_n\) 互相<em>独立</em>，且 \(\mathrm{Var}(I_j) = p(1-p)\)，则<em>独立和的方差等于方差之和</em>（这条性质留到第 6 章证明，但你直觉上应该接受）：</p>
+
+\[
+\mathrm{Var}(X) = \sum_{j=1}^n \mathrm{Var}(I_j) = n p (1 - p).
+\]
+
+<p>所以</p>
+
+\[
+\boxed{X \sim \mathrm{Bin}(n, p) \implies \mathbb{E}[X] = n p, \quad \mathrm{Var}(X) = n p (1 - p).}
+\]
+
+<p>请你<em>注意</em>独立性这一条件——如果 \(n\) 次试验<em>不独立</em>（比如不放回抽样的 5.6 节超几何分布），方差公式就不一样。</p>
+
+<h3 id="sec5-2-4">5.2.4 应用与例题</h3>
+
+<p>二项分布出现的场合：</p>
+
+<ul>
+<li>抛硬币 \(n\) 次的正面数；</li>
+<li>对 \(n\) 个产品做"合格 / 不合格"质量检验，得到的合格数；</li>
+<li>A/B 测试中，某变体被点击的次数（前提是用户独立同分布）；</li>
+<li>临床试验中接受治疗的 \(n\) 个患者中"治愈"的数目；</li>
+<li>一份 \(n\) 道选择题的考试中、瞎猜的总分（每题独立、每题猜对概率 \(p\)）。</li>
+</ul>
+
+<p><strong>例 5.2（质量控制）</strong>　某工厂的零件次品率 \(p = 0.02\)。从一批中随机抽 50 个独立检验，记 \(X\) 为次品数。求 (a) \(P(X = 0)\)；(b) \(P(X \leq 1)\)；(c) \(\mathbb{E}[X]\) 与 \(\mathrm{Var}(X)\)。</p>
+
+<p>解：\(X \sim \mathrm{Bin}(50, 0.02)\)。</p>
+
+<p>(a) \(P(X = 0) = \binom{50}{0} (0.02)^0 (0.98)^{50} = (0.98)^{50}\)。算一下 \(\log_{10}(0.98^{50}) = 50 \log_{10} 0.98 \approx 50 \cdot (-0.0088) = -0.439\)，所以 \((0.98)^{50} \approx 10^{-0.439} \approx 0.364\)。</p>
+
+<p>(b) \(P(X \leq 1) = P(X = 0) + P(X = 1) = (0.98)^{50} + 50 \cdot 0.02 \cdot (0.98)^{49} \approx 0.364 + 50 \cdot 0.02 \cdot 0.371 \approx 0.364 + 0.371 = 0.735\)。</p>
+
+<p>(c) \(\mathbb{E}[X] = 50 \cdot 0.02 = 1\)。\(\mathrm{Var}(X) = 50 \cdot 0.02 \cdot 0.98 = 0.98 \approx 1\)。请你注意期望和方差几乎相等——这是 \(p\) 很小、\(n p\) 中等时的"准泊松"特征，5.5 节就讲。</p>
+
+<p><strong>例 5.3（A/B 测试）</strong>　某网站测试新版按钮：旧版点击率 5%，假设新版也是 5%（零假设）。给 200 名访客展示新版，观察到 16 次点击。问：在零假设下"看到至少 16 次点击"的概率有多大？</p>
+
+<p>解：在零假设下 \(X \sim \mathrm{Bin}(200, 0.05)\)，\(\mathbb{E}[X] = 10\)、\(\mathrm{Var}(X) = 9.5\)、标准差 \(\approx 3.08\)。"16 次"高出均值约 \((16-10)/3.08 \approx 2\) 个标准差——准确算 \(P(X \geq 16) \approx 0.038\)（比如用泊松近似 \(\lambda = 10\)，得 0.0487；精确值略小）。这是一个 \(< 5\%\) 的"显著事件"——有理由怀疑新版更好。这种用 \(\mathrm{Bin}\) 算 p 值的小推理，是 A/B 测试的核心；具体怎么"判定"留到第 14 章。</p>
+
+<p><strong>例 5.4（瞎猜选择题）</strong>　一份 20 题的多选题考试，每题 4 个选项、唯一正确。一个学生完全不会，统统瞎猜。设 \(X\) 为答对题数。\(\mathbb{E}[X] = ?\)，\(P(X \geq 10) = ?\)（即"瞎猜及格"的概率）。</p>
+
+<p>解：\(X \sim \mathrm{Bin}(20, 0.25)\)。\(\mathbb{E}[X] = 5\)（直觉上对——四题猜一题），\(\mathrm{Var}(X) = 20 \cdot 0.25 \cdot 0.75 = 3.75\)。 \(P(X \geq 10) = \sum_{k=10}^{20} \binom{20}{k}(0.25)^k(0.75)^{20-k}\)，估算约 0.014——大约 1.4% 的概率。所以瞎猜及格基本不可能。</p>
+
+<h2 id="sec5-3">5.3 几何分布 \(\mathrm{Geom}(p)\)</h2>
+
+<p>把试验的视角换一下。仍然是独立的、成功概率 \(p\) 的伯努利重复，但这次我们关心的不是"\(n\) 次里成功几次"，而是"<em>等到第一次成功</em>之前要试几次（或失败几次）"。</p>
+
+<p><em>这里有两套约定，必须立刻分清</em>。教科书里"几何分布"的两种意思：</p>
+
+<ul>
+<li><strong>约定 A</strong>：\(X\) 为"<em>第一次成功之前的失败次数</em>"（不含成功本身），取值在 \(\{0, 1, 2, \ldots\}\)。</li>
+<li><strong>约定 B</strong>：\(X\) 为"<em>第一次成功所发生的试验序号</em>"（含成功本身），取值在 \(\{1, 2, 3, \ldots\}\)。</li>
+</ul>
+
+<p>两套约定相差 1：约定 B 的 \(X\) 等于约定 A 的 \(X + 1\)。本章选用<strong>约定 B</strong>（多数中文教材的习惯——\(X\) 是"第一次成功的次数"）。如果你看到约定 A，请把"减 1"放在脑子里换算即可。</p>
+
+<h3 id="sec5-3-1">5.3.1 PMF</h3>
+
+<p>问 \(P(X = k)\) 是多少（\(k = 1, 2, 3, \ldots\)）。事件 "\(X = k\)" 意思是"前 \(k - 1\) 次都失败、第 \(k\) 次成功"。由独立性</p>
+
+\[
+\boxed{p_X(k) = P(X = k) = (1 - p)^{k - 1} p, \qquad k = 1, 2, 3, \ldots}
+\]
+
+<p>检查归一：\(\sum_{k=1}^\infty (1-p)^{k-1} p = p \sum_{j=0}^\infty (1-p)^j = p \cdot \tfrac{1}{1 - (1 - p)} = p \cdot \tfrac{1}{p} = 1\)，OK——用了几何级数和的公式，所以这个分布得名"几何"。</p>
+
+<h3 id="sec5-3-2">5.3.2 期望</h3>
+
+<p>\(\mathrm{Geom}(p)\) 的期望是 \(1/p\)。直觉上很合理——成功概率每 \(p\) 一次的实验，平均要做 \(1/p\) 次才能等到一次成功。比如 \(p = 1/6\)（掷骰等出现 6），平均要等 6 次。</p>
+
+<p><strong>推导</strong>。直接求和：</p>
+
+\[
+\mathbb{E}[X] = \sum_{k=1}^\infty k (1-p)^{k-1} p.
+\]
+
+<p>有一条经典恒等式：\(\sum_{k=1}^\infty k x^{k-1} = \tfrac{1}{(1-x)^2}\)（对 \(|x| < 1\)）。这是几何级数 \(\sum_{k=0}^\infty x^k = 1/(1-x)\) 对 \(x\) 求导得到的。代入 \(x = 1-p\)：</p>
+
+\[
+\mathbb{E}[X] = p \cdot \sum_{k=1}^\infty k (1-p)^{k-1} = p \cdot \tfrac{1}{p^2} = \tfrac{1}{p}.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\mathbb{E}[X] = \tfrac{1}{p}.}
+\]
+
+<p>有兴趣的话，第二种"无求和"的推法是用<em>条件期望</em>："要么第一次就成功（概率 \(p\)，等了 1 次），要么第一次失败（概率 \(1-p\)，等了 1 次再'重新开始'，再等平均 \(\mathbb{E}[X]\) 次)。" 写成方程：\(\mathbb{E}[X] = p \cdot 1 + (1-p)(1 + \mathbb{E}[X])\)。解出 \(\mathbb{E}[X] = 1/p\)。这种"用'重新开始'递归"的招式，叫"first-step analysis"，在第 8 章讲条件期望和马氏链时还会大放光彩。</p>
+
+<h3 id="sec5-3-3">5.3.3 方差</h3>
+
+<p>类似地，\(\mathbb{E}[X^2]\) 可以用 \(\sum k^2 x^{k-1}\) 公式算出，最后得到</p>
+
+\[
+\boxed{\mathrm{Var}(X) = \tfrac{1 - p}{p^2}.}
+\]
+
+<p>具体推导：用恒等式 \(\sum_{k=1}^\infty k^2 x^{k-1} = \tfrac{1+x}{(1-x)^3}\)，代入算出 \(\mathbb{E}[X^2] = (2-p)/p^2\)，然后 \(\mathrm{Var} = \mathbb{E}[X^2] - (\mathbb{E}[X])^2 = (2-p)/p^2 - 1/p^2 = (1-p)/p^2\)。</p>
+
+<p>请你<em>注意</em>："约定 A"（失败次数）的几何分布期望是 \(1/p - 1 = (1-p)/p\)，方差<em>仍然</em>是 \((1-p)/p^2\)（方差对加常数不变）。两套约定共用同一个方差公式——这是 4.11 节"\(\mathrm{Var}(X + b) = \mathrm{Var}(X)\)" 的一个具体表现。</p>
+
+<h3 id="sec5-3-4">5.3.4 无记忆性</h3>
+
+<p>几何分布有一个非常特殊的性质，叫<strong>无记忆性</strong>（memoryless property）。直观说："已经等了 \(m\) 次都没成功，这件事完全<em>不影响</em>你对'再等 \(n\) 次还没成功'的预测——好像那 \(m\) 次失败从未发生过"。形式表达：对任意正整数 \(m, n\)，</p>
+
+\[
+\boxed{P(X > m + n \mid X > m) = P(X > n).}
+\]
+
+<p>证明很短：\(P(X > k) = (1-p)^k\)（"前 \(k\) 次全失败"），所以</p>
+
+\[
+P(X > m + n \mid X > m) = \tfrac{P(X > m + n)}{P(X > m)} = \tfrac{(1-p)^{m+n}}{(1-p)^m} = (1-p)^n = P(X > n).
+\]
+
+<p>请你<em>注意</em>这件事的反直觉——很多赌徒坚信"我连输十次了，下一把该赢了"，这正是<em>对几何/伯努利的无记忆性的误解</em>。事实是：硬币、骰子<em>没有记忆</em>，过去的失败不会"积累"到未来的概率上。下一节的"负二项"和未来的"指数分布"是几何无记忆性的兄弟版本。</p>
+
+<p>有一条有趣的逆定理：在所有<em>取正整数值的</em>离散分布里，<em>只有几何分布满足无记忆性</em>。（连续情形里只有指数分布满足）。这从某种意义上说，几何/指数是描述"没有内在时钟、只看现在"的<em>唯一</em>分布。</p>
+
+<p><strong>例 5.5（等待第一次 6）</strong>　反复掷一颗公正骰子，记 \(X\) 为第一次出现 6 时的总掷数。求：(a) \(\mathbb{E}[X]\)；(b) \(P(X \leq 10)\)；(c) 若已经掷了 5 次都没出 6，问"再过至多 5 次就出 6"的概率。</p>
+
+<p>解：\(X \sim \mathrm{Geom}(1/6)\)（约定 B）。</p>
+
+<p>(a) \(\mathbb{E}[X] = 1 / (1/6) = 6\)。</p>
+
+<p>(b) \(P(X \leq 10) = 1 - P(X > 10) = 1 - (5/6)^{10} \approx 1 - 0.1615 = 0.8385\)。</p>
+
+<p>(c) "再过至多 5 次出 6" \(= P(X \leq 10 \mid X > 5) = 1 - P(X > 10 \mid X > 5)\)。无记忆性说 \(P(X > 10 \mid X > 5) = P(X > 5) = (5/6)^5 \approx 0.402\)。所以答案 \(\approx 0.598\)——和"从头开始问'前 5 次内出 6'的概率" \(P(X \leq 5) = 1 - (5/6)^5 \approx 0.598\) 一致。<em>之前的 5 次失败，对于现在的预测毫无帮助</em>。</p>
+
+<h2 id="sec5-4">5.4 负二项分布 \(\mathrm{NegBin}(r, p)\)</h2>
+
+<p>把几何分布"等到第 1 次成功"推广为"等到第 \(r\) 次成功"，得到<strong>负二项分布</strong>。同样有约定差异，本章选：</p>
+
+<p>\(X\) = "等到第 \(r\) 次成功之前的<em>失败次数</em>"（注意：是失败次数，不含那 \(r\) 次成功），取值 \(\{0, 1, 2, \ldots\}\)，记作 \(X \sim \mathrm{NegBin}(r, p)\)。也有书把"总试验数"作为 \(X\)，那时取值 \(\{r, r+1, \ldots\}\)。</p>
+
+<p><strong>PMF</strong>。事件"\(X = k\)"意思是：在前 \(r + k - 1\) 次试验中恰好成功 \(r - 1\) 次（失败 \(k\) 次），且第 \(r + k\) 次成功。前者概率（用二项展开）是 \(\binom{r+k-1}{k} p^{r-1} (1-p)^k\)，第 \(r+k\) 次成功概率 \(p\)，独立相乘：</p>
+
+\[
+\boxed{p_X(k) = \binom{r + k - 1}{k} p^r (1 - p)^k, \qquad k = 0, 1, 2, \ldots}
+\]
+
+<p>注意 \(\binom{r+k-1}{k} = \binom{r+k-1}{r-1}\)（"在前 \(r+k-1\) 次中选哪 \(r-1\) 次成功"或"选哪 \(k\) 次失败"，两种数等)。</p>
+
+<p>"负二项"这个名字来源于一个广义二项式恒等式（涉及 \((1-x)^{-r}\) 的展开），不是本章重点。</p>
+
+<p><strong>期望与方差</strong>。最优雅的推法仍然是分解：把"等到第 \(r\) 次成功"看作"先等到第 1 次成功（\(W_1\) 次失败），再等到下一次成功（\(W_2\) 次失败），……再等到第 \(r\) 次成功（\(W_r\) 次失败）"。每个 \(W_i\) 独立、都服从约定 A 的几何分布——失败次数 \(\mathrm{Geom}_A(p)\)，期望 \((1-p)/p\)、方差 \((1-p)/p^2\)。所以总失败 \(X = W_1 + \cdots + W_r\) 满足</p>
+
+\[
+\boxed{\mathbb{E}[X] = r \cdot \tfrac{1 - p}{p} = \tfrac{r(1 - p)}{p}, \qquad \mathrm{Var}(X) = r \cdot \tfrac{1 - p}{p^2} = \tfrac{r(1 - p)}{p^2}.}
+\]
+
+<p>当 \(r = 1\) 时退化回 5.3 节的几何分布——正如几何是负二项的特殊情形。</p>
+
+<p><strong>例 5.6（NBA 七战四胜）</strong>　两队水平相当（每场胜率 0.5），打七战四胜制。问"系列赛在第 5 场就分胜负"的概率（即胜方在第 5 场拿到第 4 胜）。</p>
+
+<p>解：把"胜方"那一队视作研究对象，每场 \(p = 0.5\) 胜率（暂时不区分主客场）。"胜方在第 5 场拿到第 4 胜" 意思是：前 4 场中胜方<em>恰好胜了 3 场</em>（败了 1 场），且第 5 场又胜。第 1 部分概率 \(\binom{4}{3} (0.5)^3 (0.5)^1 = 4/16 = 0.25\)，第 5 场胜概率 \(0.5\)，乘起来 \(0.125\)。但因为<em>哪一队是胜方都对称</em>（A 队胜或 B 队胜各一种"5 场分胜负"），所以总概率为 \(2 \cdot 0.125 = 0.25\)——即 25% 的"系列赛恰好 5 场结束"概率。</p>
+
+<p>这正是负二项 PMF 的应用——"\(r\) 次成功在第 \(r + k\) 试验时恰好达成"。</p>
+
+<h2 id="sec5-5">5.5 泊松分布 \(\mathrm{Pois}(\lambda)\)</h2>
+
+<p>本节登场的泊松分布，是离散分布里最有"故事"的一个。它描述<em>稀有事件在连续时间或空间里的发生数</em>——比如"一小时电话总机接到的呼叫数"、"某段路一年发生的交通事故数"、"显微镜下某面积内细菌的个数"、"放射性物质单位时间内的衰变次数"。</p>
+
+<p>定义：\(X\) 服从参数 \(\lambda > 0\) 的<strong>泊松分布</strong>，记 \(X \sim \mathrm{Pois}(\lambda)\)，意思是 \(X\) 取值在 \(\{0, 1, 2, \ldots\}\) 且</p>
+
+\[
+\boxed{p_X(k) = e^{-\lambda} \cdot \tfrac{\lambda^k}{k!}, \qquad k = 0, 1, 2, \ldots}
+\]
+
+<p>检查归一：\(\sum_{k=0}^\infty e^{-\lambda} \tfrac{\lambda^k}{k!} = e^{-\lambda} \cdot e^\lambda = 1\)（用了 \(e^x\) 的泰勒展开 \(\sum_k x^k / k!\)），OK。这是为什么有 \(e^{-\lambda}\) 这个"奇怪"系数——它是为了归一。</p>
+
+<h3 id="sec5-5-1">5.5.1 由二项的极限推出</h3>
+
+<p>泊松分布最自然的"出处"，是<em>稀有事件的二项极限</em>。考虑：</p>
+
+<p>固定一个 \(\lambda > 0\)。把它看成"单位时间内事件总数的期望"。</p>
+
+<p>把单位时间分成 \(n\) 个小段（\(n\) 很大），每段内"出现一个事件"的概率约等于 \(\lambda / n\)（"每段事件期望"），各段独立。这样总事件数 \(X_n \sim \mathrm{Bin}(n, \lambda / n)\)，期望 \(n \cdot \lambda / n = \lambda\)。</p>
+
+<p>取极限 \(n \to \infty\)（同时 \(p = \lambda / n \to 0\)，\(n p = \lambda\) 保持不变），\(X_n\) 的极限分布是什么？</p>
+
+\[
+P(X_n = k) = \binom{n}{k} \left(\tfrac{\lambda}{n}\right)^k \left(1 - \tfrac{\lambda}{n}\right)^{n - k}.
+\]
+
+<p>分三块化简：</p>
+
+<ul>
+<li>\(\binom{n}{k} = \tfrac{n(n-1)(n-2)\cdots(n-k+1)}{k!}\)。当 \(n \to \infty\)、\(k\) 固定时，这是 \(\tfrac{n^k}{k!} \cdot (1)(1 - \tfrac{1}{n})(1 - \tfrac{2}{n}) \cdots (1 - \tfrac{k-1}{n}) \to \tfrac{n^k}{k!}\)。</li>
+<li>\((\lambda/n)^k = \lambda^k / n^k\)。</li>
+<li>\((1 - \lambda/n)^{n - k} = (1 - \lambda/n)^n \cdot (1 - \lambda/n)^{-k}\)。前一段 \((1 - \lambda/n)^n \to e^{-\lambda}\)（这是 \(e\) 的经典极限定义）；后一段 \(\to 1\)。</li>
+</ul>
+
+<p>把三块乘起来：</p>
+
+\[
+P(X_n = k) \to \tfrac{n^k}{k!} \cdot \tfrac{\lambda^k}{n^k} \cdot e^{-\lambda} = \tfrac{\lambda^k}{k!} e^{-\lambda},
+\]
+
+<p>正好就是 \(\mathrm{Pois}(\lambda)\) 的 PMF。这条推导叫做<strong>泊松极限定理</strong>，是泊松分布最关键的"出生证明"。它告诉你：<em>泊松分布是"很多很多次、每次很微小可能成功"的二项分布的极限</em>——所以适用于"事件稀有但试验次数极多"的所有场合。</p>
+
+<p><strong>实用启示</strong>：当二项分布的 \(n\) 很大、\(p\) 很小、\(np = \lambda\) 适中时（比如 \(n \geq 30\)、\(p \leq 0.05\)），可以用 \(\mathrm{Pois}(np)\) 近似 \(\mathrm{Bin}(n, p)\)。这在历史上重要，因为泊松 PMF 比二项 PMF 算起来简单得多——不需要算 \(\binom{n}{k}\) 这种大数。</p>
+
+<h3 id="sec5-5-2">5.5.2 期望与方差</h3>
+
+<p>\(\mathrm{Pois}(\lambda)\) 的期望和方差都是 \(\lambda\)——这是泊松分布的标志性特征。</p>
+
+<p><strong>期望</strong>：</p>
+
+\[
+\mathbb{E}[X] = \sum_{k=0}^\infty k \cdot e^{-\lambda} \tfrac{\lambda^k}{k!} = e^{-\lambda} \sum_{k=1}^\infty \tfrac{\lambda^k}{(k-1)!} = e^{-\lambda} \cdot \lambda \sum_{j=0}^\infty \tfrac{\lambda^j}{j!} = e^{-\lambda} \cdot \lambda \cdot e^\lambda = \lambda.
+\]
+
+<p>第二步把 \(k = 0\) 项删掉、用 \(k / k! = 1/(k-1)!\)；第三步令 \(j = k - 1\) 并提出 \(\lambda\)。</p>
+
+<p><strong>方差</strong>：先算 \(\mathbb{E}[X(X - 1)]\) 比直接算 \(\mathbb{E}[X^2]\) 方便：</p>
+
+\[
+\mathbb{E}[X(X-1)] = \sum_{k=0}^\infty k(k-1) e^{-\lambda} \tfrac{\lambda^k}{k!} = e^{-\lambda} \sum_{k=2}^\infty \tfrac{\lambda^k}{(k-2)!} = e^{-\lambda} \cdot \lambda^2 \sum_{j=0}^\infty \tfrac{\lambda^j}{j!} = \lambda^2.
+\]
+
+<p>所以 \(\mathbb{E}[X^2] = \mathbb{E}[X(X-1)] + \mathbb{E}[X] = \lambda^2 + \lambda\)，从而</p>
+
+\[
+\mathrm{Var}(X) = \mathbb{E}[X^2] - (\mathbb{E}[X])^2 = (\lambda^2 + \lambda) - \lambda^2 = \lambda.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{X \sim \mathrm{Pois}(\lambda) \implies \mathbb{E}[X] = \lambda, \quad \mathrm{Var}(X) = \lambda.}
+\]
+
+<p>"期望 = 方差 = \(\lambda\)" 是泊松分布的<em>身份证号</em>。看到一份数据，如果样本均值约等于样本方差，先想想是不是泊松。</p>
+
+<h3 id="sec5-5-3">5.5.3 应用</h3>
+
+<p>泊松分布建模"在<em>固定</em>时间段或空间区域里、独立稀有事件的发生总数"。经典例子：</p>
+
+<ul>
+<li>电话总机一小时接到呼叫数（设 \(\lambda\) = "平均每小时呼叫数"）；</li>
+<li>某 DNA 段在 \(n\) 个碱基上发生的随机突变数；</li>
+<li>放射性物质在 1 秒内发生的衰变次数；</li>
+<li>某城市一年发生的 6 级以上地震数；</li>
+<li>显微镜视野内某种细菌的个数（如果均匀分布在液体中）；</li>
+<li>在线广告系统某秒内的展示请求数（高峰期）；</li>
+<li>书中印刷错误密度（页数 = "时间段"，错误 = "事件"）。</li>
+</ul>
+
+<p>使用泊松的两条隐含假设：(a) 在不重叠区域内事件数<em>独立</em>；(b) 事件率 \(\lambda\) 是<em>恒定</em>的（即"均匀"）。当这两条不成立时（例如交通流量在工作日 5 PM 高峰），需要用更复杂的"非齐次泊松过程"——但这不在本章范围。</p>
+
+<p><strong>例 5.7（呼叫中心）</strong>　某客服热线平均每小时接 3 通电话，假设泊松分布。求 (a) 一小时<em>恰好</em>接 5 通电话的概率；(b) 一小时<em>没有</em>电话的概率；(c) 一小时<em>至少</em> 1 通的概率；(d) <em>两小时内</em>恰好接 4 通的概率。</p>
+
+<p>解：(a)、(b)、(c) 用 \(X \sim \mathrm{Pois}(3)\)。</p>
+
+<p>(a) \(P(X = 5) = e^{-3} \cdot 3^5 / 5! = e^{-3} \cdot 243 / 120 = e^{-3} \cdot 2.025 \approx 0.0498 \cdot 2.025 \approx 0.1008\)，约 10.1%。</p>
+
+<p>(b) \(P(X = 0) = e^{-3} \approx 0.0498\)，约 5%。</p>
+
+<p>(c) \(P(X \geq 1) = 1 - P(X = 0) = 1 - e^{-3} \approx 0.95\)。</p>
+
+<p>(d) 两小时呼叫数 \(Y\)，平均率 \(\lambda' = 6\)（"两小时平均 6 通"），\(Y \sim \mathrm{Pois}(6)\)。\(P(Y = 4) = e^{-6} \cdot 6^4 / 4! = e^{-6} \cdot 1296/24 = 54 e^{-6} \approx 54 \cdot 0.00248 \approx 0.134\)，约 13.4%。</p>
+
+<p>请你<em>注意</em> (d) 的关键步骤——"把时间段加倍，参数 \(\lambda\) 也加倍"。这是泊松分布的<em>可加性</em>：独立的 \(\mathrm{Pois}(\lambda_1)\) 和 \(\mathrm{Pois}(\lambda_2)\) 之和服从 \(\mathrm{Pois}(\lambda_1 + \lambda_2)\)。在第 6 章会正式证。</p>
+
+<p><strong>例 5.8（用泊松近似二项）</strong>　某城市一年发生 6 级以上地震的频率历史记录显示是 \(p = 1/200\) 概率/年。考察 1000 个城市，问 1 年里至少 3 个城市发生过的概率。</p>
+
+<p>解：城市间近似独立。"全年 1000 个城市发生地震的总数" \(X \sim \mathrm{Bin}(1000, 1/200)\)。\(np = 5\)，\(n\) 大、\(p\) 小，可用 \(\mathrm{Pois}(5)\) 近似。</p>
+
+\[
+P(X \geq 3) = 1 - P(X \leq 2) = 1 - e^{-5}(1 + 5 + 12.5) \approx 1 - 0.00674 \cdot 18.5 \approx 1 - 0.125 = 0.875.
+\]
+
+<p>所以约 87.5% 的概率"今年至少 3 个城市出 6 级以上"。直接用二项算精确值会得到一个非常接近的数（约 0.876）——泊松近似在 \(n p\) 中等时极准。</p>
+
+<h2 id="sec5-6">5.6 超几何分布 \(\mathrm{Hyp}(N, K, n)\)</h2>
+
+<p>本节是离散分布家族里最后一位重量级成员。它的应用场景是"<em>不放回抽样</em>"——这一点和二项分布的"独立、放回抽样"形成鲜明对照，请你认真区分。</p>
+
+<p>问题模板：袋子里有 \(N\) 个球，其中 \(K\) 个是"红球"（"标记"或"成功"类）、\(N - K\) 个是"白球"（"非标记"类）。从袋子里<em>不放回</em>抽 \(n\) 个，记 \(X\) 为抽到的红球数。则 \(X\) 服从<strong>超几何分布</strong>，记</p>
+
+\[
+X \sim \mathrm{Hyp}(N, K, n).
+\]
+
+<p><strong>PMF</strong>：用古典概型数。"\(n\) 个球里恰好 \(k\) 个红"：从 \(K\) 红中选 \(k\)、从 \(N - K\) 白中选 \(n - k\)；总抽法 \(\binom{N}{n}\)。所以</p>
+
+\[
+\boxed{p_X(k) = \tfrac{\binom{K}{k} \binom{N - K}{n - k}}{\binom{N}{n}}, \qquad \max(0, n - (N - K)) \leq k \leq \min(n, K).}
+\]
+
+<p>取值范围 \(\max\) 和 \(\min\) 那一行的限制，是因为"\(k\) 不能大于红球总数 \(K\) 也不能大于抽数 \(n\)"，"\(k\) 不能小于 0 也不能小于 \(n - (N-K)\)"（后者是"白球太少时被迫抽到红的最小数"）。</p>
+
+<p><strong>期望</strong>：\(\mathbb{E}[X] = n \cdot \tfrac{K}{N}\)。直觉：袋中红球比例 \(K/N\)，抽 \(n\) 个，平均抽到 \(n \cdot (K/N)\) 个红——和"放回抽 \(n\) 次（每次成功率 \(K/N\)）"的二项期望一样。证明用线性性 + 指示分解：让 \(I_j = \mathbf{1}\{\text{第 \(j\) 次抽到红}\}\)，每个 \(\mathbb{E}[I_j] = K/N\)（与放回情形相同——这一点请回看 4.12 节例 4.13 那段类似的对称论证），所以 \(\mathbb{E}[X] = n \cdot K/N\)。</p>
+
+<p><strong>方差</strong>：</p>
+
+\[
+\boxed{\mathrm{Var}(X) = n \cdot \tfrac{K}{N} \cdot \tfrac{N - K}{N} \cdot \tfrac{N - n}{N - 1}.}
+\]
+
+<p>把它和二项方差 \(n p (1 - p)\) 对比（其中 \(p = K/N\)）：超几何方差 = 二项方差 \(\times \tfrac{N-n}{N-1}\)。这个 \(\tfrac{N-n}{N-1}\) 因子叫<em>有限总体修正</em>。它捕捉了"不放回带来的负相关"——因为抽中红球后剩下池子里红球少了，第二次抽中红球的可能就降低了一点，所以 \(I_1\) 与 \(I_2\) 之间是负相关，整体方差比独立情形小。当 \(N \to \infty\)（"总体超大"），\(\tfrac{N-n}{N-1} \to 1\)，超几何分布退化为二项——直观对：在"无穷大池子"里抽，放回与不放回没区别。</p>
+
+<p><strong>例 5.9（扑克：起手 5 张拿到几个 A）</strong>　从 52 张标准扑克牌中无放回抽 5 张。\(X\) 为 A 的张数。求 \(\mathbb{E}[X]\) 与 \(P(X = 2)\)。</p>
+
+<p>解：\(N = 52\)，\(K = 4\)（4 个 A），\(n = 5\)，所以 \(X \sim \mathrm{Hyp}(52, 4, 5)\)。</p>
+
+<p>\(\mathbb{E}[X] = 5 \cdot 4/52 = 5/13 \approx 0.385\)。直觉：5 张里"应该"有约 0.385 个 A——因为整副牌 A 比例 4/52 = 1/13。</p>
+
+<p>\(P(X = 2) = \tfrac{\binom{4}{2}\binom{48}{3}}{\binom{52}{5}} = \tfrac{6 \cdot 17296}{2598960} = \tfrac{103776}{2598960} \approx 0.0399\)，约 4%。</p>
+
+<p>请你<em>注意</em>这里"抽样不放回"是关键——如果"放回"地抽 5 次（每次 4/52 概率拿到 A），就用 \(\mathrm{Bin}(5, 4/52)\)，结果 \(P(\mathrm{Bin} = 2) = \binom{5}{2}(4/52)^2(48/52)^3 \approx 10 \cdot 0.0059 \cdot 0.788 \approx 0.0467\)。两者数值接近（因为 \(n = 5\) 比 \(N = 52\) 小很多，"修正因子" \(\tfrac{52-5}{51} \approx 0.92\) 接近 1），但<em>不完全一样</em>。建模时要诚实区分。</p>
+
+<p><strong>例 5.10（抽样产品检验）</strong>　一批 100 个零件中有 10 个次品。检验员从中无放回抽 20 个，记 \(X\) 为抽到的次品数。求 \(\mathbb{E}[X]\)、\(\mathrm{Var}(X)\)、\(P(X = 0)\)。</p>
+
+<p>解：\(N = 100\)、\(K = 10\)、\(n = 20\)。</p>
+
+<p>\(\mathbb{E}[X] = 20 \cdot 10/100 = 2\)。</p>
+
+<p>\(\mathrm{Var}(X) = 20 \cdot 0.1 \cdot 0.9 \cdot \tfrac{80}{99} = 1.8 \cdot \tfrac{80}{99} \approx 1.455\)。比放回情形的二项方差 \(20 \cdot 0.1 \cdot 0.9 = 1.8\) 略小——是修正因子在起作用。</p>
+
+<p>\(P(X = 0) = \tfrac{\binom{10}{0}\binom{90}{20}}{\binom{100}{20}} = \tfrac{\binom{90}{20}}{\binom{100}{20}}\)。粗算：\(\tfrac{\binom{90}{20}}{\binom{100}{20}} = \tfrac{90! / (20! \cdot 70!)}{100! / (20! \cdot 80!)} = \tfrac{90! \cdot 80!}{70! \cdot 100!} = \tfrac{80 \cdot 79 \cdot 78 \cdots 71}{100 \cdot 99 \cdot 98 \cdots 91}\) ——10 个分式连乘，每个约 0.8 量级，总积约 0.095。所以约 9.5% 的概率"20 个抽样里没抽到次品"。</p>
+
+<h2 id="sec5-7">5.7 分布速查表</h2>
+
+<p>把本章六个分布的关键事实集中在一张表里，考前一晚翻它。</p>
+
+<table style="border-collapse:collapse; width:100%">
+<thead>
+<tr style="border-bottom:2px solid #555">
+<th style="text-align:left; padding:6px">分布</th>
+<th style="text-align:left; padding:6px">参数</th>
+<th style="text-align:left; padding:6px">PMF</th>
+<th style="text-align:left; padding:6px">取值</th>
+<th style="text-align:left; padding:6px">出现场合</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{Bern}(p)\)</td>
+<td style="padding:6px">\(p \in [0, 1]\)</td>
+<td style="padding:6px">\(p_X(1) = p\)，\(p_X(0) = 1 - p\)</td>
+<td style="padding:6px">\(\{0, 1\}\)</td>
+<td style="padding:6px">单次成功 / 失败</td>
+</tr>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{Bin}(n, p)\)</td>
+<td style="padding:6px">\(n \in \mathbb{N}\)，\(p \in [0, 1]\)</td>
+<td style="padding:6px">\(\binom{n}{k} p^k (1-p)^{n-k}\)</td>
+<td style="padding:6px">\(\{0, 1, \ldots, n\}\)</td>
+<td style="padding:6px">\(n\) 次独立伯努利的成功数</td>
+</tr>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{Geom}(p)\)</td>
+<td style="padding:6px">\(p \in (0, 1]\)</td>
+<td style="padding:6px">\((1-p)^{k-1} p\)</td>
+<td style="padding:6px">\(\{1, 2, 3, \ldots\}\)</td>
+<td style="padding:6px">第一次成功的试验序号</td>
+</tr>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{NegBin}(r, p)\)</td>
+<td style="padding:6px">\(r \in \mathbb{N}\)，\(p \in (0, 1]\)</td>
+<td style="padding:6px">\(\binom{r+k-1}{k} p^r (1-p)^k\)</td>
+<td style="padding:6px">\(\{0, 1, 2, \ldots\}\)</td>
+<td style="padding:6px">第 \(r\) 次成功前的失败数</td>
+</tr>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{Pois}(\lambda)\)</td>
+<td style="padding:6px">\(\lambda > 0\)</td>
+<td style="padding:6px">\(e^{-\lambda} \lambda^k / k!\)</td>
+<td style="padding:6px">\(\{0, 1, 2, \ldots\}\)</td>
+<td style="padding:6px">单位时间稀有事件计数</td>
+</tr>
+<tr>
+<td style="padding:6px">\(\mathrm{Hyp}(N, K, n)\)</td>
+<td style="padding:6px">整数 \(N \geq K \geq 0\)，\(n \leq N\)</td>
+<td style="padding:6px">\(\binom{K}{k}\binom{N-K}{n-k} / \binom{N}{n}\)</td>
+<td style="padding:6px">\(\{\max(0, n - N + K), \ldots, \min(n, K)\}\)</td>
+<td style="padding:6px">不放回抽样中"标记"个数</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="sec5-8">5.8 期望和方差速查</h2>
+
+<table style="border-collapse:collapse; width:100%">
+<thead>
+<tr style="border-bottom:2px solid #555">
+<th style="text-align:left; padding:6px">分布</th>
+<th style="text-align:left; padding:6px">期望 \(\mathbb{E}[X]\)</th>
+<th style="text-align:left; padding:6px">方差 \(\mathrm{Var}(X)\)</th>
+<th style="text-align:left; padding:6px">备注</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{Bern}(p)\)</td>
+<td style="padding:6px">\(p\)</td>
+<td style="padding:6px">\(p(1 - p)\)</td>
+<td style="padding:6px">最简单的"积木"</td>
+</tr>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{Bin}(n, p)\)</td>
+<td style="padding:6px">\(n p\)</td>
+<td style="padding:6px">\(n p (1 - p)\)</td>
+<td style="padding:6px">独立 \(n\) 个 \(\mathrm{Bern}(p)\) 之和</td>
+</tr>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{Geom}(p)\) (约定 B)</td>
+<td style="padding:6px">\(1 / p\)</td>
+<td style="padding:6px">\((1 - p) / p^2\)</td>
+<td style="padding:6px">无记忆性</td>
+</tr>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{NegBin}(r, p)\)</td>
+<td style="padding:6px">\(r(1 - p) / p\)</td>
+<td style="padding:6px">\(r(1 - p) / p^2\)</td>
+<td style="padding:6px">\(r\) 个独立几何之和</td>
+</tr>
+<tr style="border-bottom:1px solid #ccc">
+<td style="padding:6px">\(\mathrm{Pois}(\lambda)\)</td>
+<td style="padding:6px">\(\lambda\)</td>
+<td style="padding:6px">\(\lambda\)</td>
+<td style="padding:6px">期望 = 方差是泊松的"指纹"</td>
+</tr>
+<tr>
+<td style="padding:6px">\(\mathrm{Hyp}(N, K, n)\)</td>
+<td style="padding:6px">\(n K / N\)</td>
+<td style="padding:6px">\(n \tfrac{K}{N} \tfrac{N-K}{N} \tfrac{N-n}{N-1}\)</td>
+<td style="padding:6px">比 \(\mathrm{Bin}(n, K/N)\) 方差小</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="sec5-9">5.9 用什么分布建模什么问题</h2>
+
+<p>本节给出"<em>遇到一个新问题，应该选哪个分布</em>"的诊断流程。这是本章——可能也是本书最重要的"考前能力"。</p>
+
+<h3 id="sec5-9-1">5.9.1 决策流程</h3>
+
+<p>面对一个随机变量 \(X\)，按下面顺序问自己几个问题：</p>
+
+<ol>
+<li><strong>取值离散还是连续？</strong> 离散——本章；连续——第 7 章。</li>
+<li><strong>结果只有"成功 / 失败"两种？</strong> 是 → \(\mathrm{Bern}(p)\)。</li>
+<li><strong>"重复 \(n\) 次独立试验"，问"成功几次"？</strong> 是 → \(\mathrm{Bin}(n, p)\)。<br>
+  <em>"重复"意味着 \(n\) 是固定的；"独立"意味着每次试验互不影响</em>。</li>
+<li><strong>"重复独立试验直到出现第 1 次成功"，问"试了几次（或失败几次）"？</strong> 是 → \(\mathrm{Geom}(p)\)。<br>
+  关键词："等到"、"first"、"直到"。</li>
+<li><strong>"等到第 \(r\) 次成功"？</strong> 是 → \(\mathrm{NegBin}(r, p)\)。</li>
+<li><strong>"在固定时间 / 空间区域里、稀有独立事件的<em>总计数</em>"？</strong> 是 → \(\mathrm{Pois}(\lambda)\)。<br>
+  关键词："计数"、"率"、"per hour / per cm²"。或者：原本是 \(\mathrm{Bin}(n, p)\) 但 \(n\) 大、\(p\) 小、\(np\) 适中，用泊松近似。</li>
+<li><strong>"从有限总体里<em>不放回</em>抽 \(n\) 个，问得到'标记'的个数"？</strong> 是 → \(\mathrm{Hyp}(N, K, n)\)。<br>
+  关键词："不放回"、"抽样"、"袋中红白球"。</li>
+</ol>
+
+<h3 id="sec5-9-2">5.9.2 易混点辨析</h3>
+
+<p>请你<em>注意</em>以下三组容易混的对子：</p>
+
+<p><strong>(a) 二项 vs. 几何 vs. 负二项</strong>——都是"独立伯努利序列"的描述，但视角不同：</p>
+
+<ul>
+<li>二项：固定<em>试验数</em> \(n\)，问<em>成功数</em>。</li>
+<li>几何：固定<em>成功数</em> \(= 1\)，问<em>试验数</em>（或失败数）。</li>
+<li>负二项：固定<em>成功数</em> \(= r\)，问<em>试验数</em>（或失败数）。</li>
+</ul>
+
+<p>记忆口诀："\(n\) 固定问几次成功 → 二项；成功固定问试几次 → 几何 / 负二项。"</p>
+
+<p><strong>(b) 二项 vs. 超几何</strong>——"放回 vs. 不放回"。</p>
+
+<ul>
+<li>二项 = 放回（独立）。</li>
+<li>超几何 = 不放回（不独立）。</li>
+</ul>
+
+<p>当 \(N\) 远大于 \(n\) 时，两者数值非常接近——这是为什么"民意调查"经常用二项做近似（人口 \(N\) = 数百万，样本 \(n\) = 千）。</p>
+
+<p><strong>(c) 二项 vs. 泊松</strong>——"小概率事件"。</p>
+
+<ul>
+<li>二项 = 已知 \(n\) 和 \(p\)。</li>
+<li>泊松 = 只关心 \(\lambda = np\)，且 \(p\) 小、\(n\) 大。</li>
+</ul>
+
+<p>泊松一般在"率（rate）"已经给出的场合更自然（如"每小时 5 通电话"）；二项在"次数和单次概率"已知时更自然。</p>
+
+<h3 id="sec5-9-3">5.9.3 综合例题</h3>
+
+<p>下面 5 个问题，请你先<em>不要看解答</em>，自己判断每个 \(X\) 服从什么分布，然后再核对答案。这是本章最关键的练习。</p>
+
+<p><strong>例 5.11（综合判别）</strong></p>
+
+<p>(i) 一个射手命中率 80%，向同一靶射 10 发，\(X\) = 命中数。</p>
+
+<p>(ii) 同一射手射，记 \(Y\) = 第一次命中时所用的发数。</p>
+
+<p>(iii) 同一射手射，记 \(Z\) = 5 次命中所用的<em>失败</em>数。</p>
+
+<p>(iv) 一袋 30 枚硬币，5 枚是金币、25 枚是铜币。随机抽 10 枚，\(W\) = 抽到金币数。</p>
+
+<p>(v) 某客服中心平均每分钟接 0.5 通电话，假设泊松。\(V\) = 一刻钟（15 分）接到的电话数。</p>
+
+<p>解答：</p>
+
+<p>(i) \(X \sim \mathrm{Bin}(10, 0.8)\)——固定 10 次独立伯努利。\(\mathbb{E}[X] = 8\)，\(\mathrm{Var}(X) = 1.6\)。</p>
+
+<p>(ii) \(Y \sim \mathrm{Geom}(0.8)\)（约定 B）——"等到第 1 次成功的试验序号"。\(\mathbb{E}[Y] = 1/0.8 = 1.25\)；这位高手平均 1.25 发就命中第一发。</p>
+
+<p>(iii) \(Z \sim \mathrm{NegBin}(5, 0.8)\)——"5 次成功之前的失败数"。\(\mathbb{E}[Z] = 5 \cdot 0.2/0.8 = 1.25\)；平均失败 1.25 发就拿到 5 命中（即平均 6.25 发）。</p>
+
+<p>(iv) \(W \sim \mathrm{Hyp}(30, 5, 10)\)——不放回抽样、问"标记"数。\(\mathbb{E}[W] = 10 \cdot 5/30 = 5/3 \approx 1.67\)。</p>
+
+<p>(v) 一刻钟率 \(\lambda = 0.5 \cdot 15 = 7.5\)；\(V \sim \mathrm{Pois}(7.5)\)。\(\mathbb{E}[V] = 7.5 = \mathrm{Var}(V)\)。</p>
+
+<p><strong>例 5.12（综合应用——保险公司的精算）</strong>　某保险公司持有 1000 份相同类型的保单，每份保单一年内"出险"的概率为 \(p = 0.005\)，相互独立。每出一次险公司赔付 \(10000\) 元。问：(a) 一年总出险数 \(X\) 的期望与标准差；(b) 用泊松近似估算 \(P(X \leq 4)\)；(c) 公司一年赔付总额 \(L\) 的期望与标准差。</p>
+
+<p>解：(a) \(X \sim \mathrm{Bin}(1000, 0.005)\)。\(\mathbb{E}[X] = 5\)，\(\mathrm{Var}(X) = 1000 \cdot 0.005 \cdot 0.995 = 4.975 \approx 5\)，标准差 \(\approx 2.23\)。</p>
+
+<p>(b) 因为 \(n\) 大、\(p\) 小、\(np = 5\) 中等——泊松近似优秀。\(X \approx \mathrm{Pois}(5)\)。\(P(X \leq 4) = e^{-5}(1 + 5 + 12.5 + 20.833 + 26.042) \approx 0.00674 \cdot 65.375 \approx 0.440\)。所以一年出险数 \(\leq 4\) 的概率约 44%。</p>
+
+<p>(c) \(L = 10000 \cdot X\)。由 4.7 节仿射变换：\(\mathbb{E}[L] = 10000 \cdot 5 = 50000\) 元；\(\mathrm{SD}(L) = 10000 \cdot 2.23 = 22300\) 元。所以预算 5 万作为"基准赔付"，但单年波动有 ±2.2 万的标准差——这就是为什么保险公司必须有充足储备金。</p>
+
+<p><strong>例 5.13（综合应用——掷骰直到所有面都出现过）</strong>　反复掷一颗公正骰子，\(T\) = "六个面都至少出现过一次所需的总掷数"。求 \(\mathbb{E}[T]\)。</p>
+
+<p>解：这是著名的<em>"集邮问题"</em>（Coupon Collector's Problem）。把 \(T\) 分解为"等到第 1 个新面"、"等到第 2 个新面"、……、"等到第 6 个新面"所用的次数：</p>
+
+\[
+T = T_1 + T_2 + T_3 + T_4 + T_5 + T_6.
+\]
+
+<p>已经收集了 \(i - 1\) 个不同面后，下一掷"出现新面"的概率为 \(p_i = (6 - i + 1)/6 = (7 - i)/6\)：因为剩下未见的面有 \(6 - (i-1) = 7 - i\) 个。所以"等到第 \(i\) 个新面" \(T_i \sim \mathrm{Geom}(p_i)\)（约定 B）——一个独立的几何分布。\(\mathbb{E}[T_i] = 1/p_i = 6/(7-i)\)。</p>
+
+<p>由线性性：</p>
+
+\[
+\mathbb{E}[T] = \sum_{i=1}^6 \tfrac{6}{7 - i} = 6 \cdot \left(\tfrac{1}{6} + \tfrac{1}{5} + \tfrac{1}{4} + \tfrac{1}{3} + \tfrac{1}{2} + \tfrac{1}{1}\right) = 6 \cdot \tfrac{49}{20} = \tfrac{147}{10} = 14.7.
+\]
+
+<p>所以平均要掷 14.7 次才能让六个面都出现过。直觉上对：前几个新面来得快，<em>最后一个</em>新面平均要等 6 次（\(p_6 = 1/6\)）。线性性把"独立 \(\mathrm{Geom}\) 之和"的期望化作六个分数相加——这个推导漂亮极了，请你<em>记住</em>这个套路。</p>
+
+<p>顺便：求 \(\mathrm{Var}(T)\) 也用同样的"几何分布之和、独立可加"，得 \(\mathrm{Var}(T) = \sum_{i=1}^6 (1 - p_i)/p_i^2\)；具体值留给你算（约 38.99）。</p>
+
+<p><strong>例 5.14（综合应用——选举出口民调）</strong>　某选举两位候选人 A、B 平分秋色，假设每位选民独立投 A 的概率为 \(p\)。出口民调随机问 \(n = 1000\) 名出场选民。\(X\) = 民调中支持 A 的人数。如果 \(p = 0.51\)，问 \(P(X \leq 500)\)（即"民调显示 A 不占优"的概率）。</p>
+
+<p>解：\(X \sim \mathrm{Bin}(1000, 0.51)\)。\(\mathbb{E}[X] = 510\)，\(\mathrm{Var}(X) = 1000 \cdot 0.51 \cdot 0.49 = 249.9\)，标准差 \(\approx 15.8\)。"\(X \leq 500\)" 是离均值 510 大约 0.63 个标准差。具体精确算（或用第 12 章的中心极限定理近似）得 \(P(X \leq 500) \approx 0.27\)——仍有 27% 的概率民调"看上去 A 不占优"。这就是为什么微弱多数候选人在小样本民调里常常"输"——是真正可能的统计现象。</p>
+
+<p><strong>例 5.15（综合应用——基因突变）</strong>　某段 DNA 长 \(n = 10^6\) 个碱基，每个碱基独立地以 \(p = 10^{-7}\) 概率发生突变。\(M\) = 该段 DNA 上的总突变数。求 \(\mathbb{E}[M]\)、\(P(M = 0)\)、\(P(M \geq 2)\)。</p>
+
+<p>解：\(M \sim \mathrm{Bin}(10^6, 10^{-7})\)，\(np = 0.1\)。<em>极典型的泊松场景</em>——\(n\) 巨大，\(p\) 极小。用 \(\mathrm{Pois}(0.1)\) 近似。</p>
+
+<p>\(\mathbb{E}[M] \approx 0.1\)；\(P(M = 0) \approx e^{-0.1} \approx 0.905\)；\(P(M \geq 2) = 1 - P(M = 0) - P(M = 1) = 1 - e^{-0.1}(1 + 0.1) \approx 1 - 0.995 = 0.005\)。</p>
+
+<p>结论：90% 概率这段 DNA 不发生突变；1.0 - 0.005 = 99.5% 概率突变数 ≤ 1；多突变（\(\geq 2\)）只有 0.5% 概率。</p>
+
+<p><strong>例 5.16（综合应用——彩票号码匹配）</strong>　某乐透从 1-49 中抽 6 个号码（无放回）。你也选了 6 个号码，问"匹配恰好 4 个"的概率。</p>
+
+<p>解：把"开奖的 6 个"当作"袋中红球"。袋共 \(N = 49\)，红球 \(K = 6\)，你"抽" \(n = 6\) 个号码（从 49 中无放回——你的 6 个号码就是抽样），看抽到几个红球。所以 \(X \sim \mathrm{Hyp}(49, 6, 6)\)。</p>
+
+\[
+P(X = 4) = \tfrac{\binom{6}{4}\binom{43}{2}}{\binom{49}{6}} = \tfrac{15 \cdot 903}{13983816} = \tfrac{13545}{13983816} \approx 9.69 \times 10^{-4}.
+\]
+
+<p>大约 1/1032。所以"中 4 个号"的概率约千分之一——这就是为什么乐透 4 个号码奖比头奖容易，但仍然不容易。</p>
+
+<h3 id="sec5-9-4">5.9.4 为下一章铺垫</h3>
+
+<p>本章工具到此为齐——但有几条"伏笔"，请你<em>注意</em>它们：</p>
+
+<ul>
+<li>多次独立 \(\mathrm{Bern}(p)\) 之和 → \(\mathrm{Bin}(n, p)\)。这是一类"独立和的分布"问题。下一章我们要系统讨论<em>多个随机变量的联合分布</em>，并把"独立和"作为最基础的运算。</li>
+<li>\(\mathrm{Bin}(n, p)\) 在 \(n\) 大、\(p\) 小时极限到 \(\mathrm{Pois}(np)\)。这条"分布的极限定理"在第 12 章会发展为<em>大数定律</em>和<em>中心极限定理</em>——届时你会看到"许多独立小贡献的和"普遍趋近于<em>正态分布</em>。</li>
+<li>几何分布的无记忆性 + 等待时间——下一组连续分布的<em>指数分布</em>是它的连续兄弟，泊松过程在连续时间里的等待时间正是指数分布。第 9 章会做这个对应。</li>
+<li>"线性性 + 指示分解"已经在本章和第 4 章反复出场。下一章联合分布定义后，这一招会被推广为<em>协方差</em>与<em>相关系数</em>。</li>
+</ul>
+
+<p>请你做完本章后，把"我会用什么分布建模什么问题"这个能力，亲自跑过 5.9 节的 6 个例题——能在 30 秒内说出每题的分布名称、参数、期望和方差，本章就算掌握了。下一章见。</p>

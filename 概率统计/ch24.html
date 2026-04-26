@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 24 章 Markov 链 — 普林斯顿概率统计读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 Bayes 统计入门</a><a href="ch25.html">下一章 · 第 25 章 信息论入门 →</a></nav>
+<h1 id="ch24">第 24 章 Markov 链</h1>
+
+<p>到目前为止我们处理的随机变量都是<em>独立的</em>（或至少假设独立）：抛硬币 100 次，每次结果跟前面无关；测量 100 个人的身高，假设是独立同分布。这一假设让数学变得方便，但它把许多有趣的现象排除在外了——现实里许多随机过程<em>不是</em>独立的，而是有"记忆"的：今天的天气跟昨天有关、股价跟前一天有关、棋盘上你下一步在哪取决于现在在哪。</p>
+
+<p>本章引入处理"序列依赖"的最简单、最优雅的数学结构：<strong>Markov 链</strong>（Markov chain）。它的定义只比独立性宽一点点——"下一步只依赖于现在，不依赖于过去"——但这一让步换来了一整套丰富的理论：转移矩阵、平稳分布、收敛定理、可逆性。这些工具的应用范围之广，超出你能预想：天气预报、Google 的 PageRank、自然语言处理（HMM）、统计物理（Ising 模型）、棋盘游戏（蛇梯）、Bayes 计算（MCMC）、强化学习……几乎只要"序列依赖 + 随机性"出现，Markov 链就在背后。</p>
+
+<p>本章的目标：让你看清楚 Markov 链是什么、转移矩阵 \(P\) 怎么定义和使用、为什么它和线性代数的特征向量是同一回事、平稳分布在什么条件下唯一存在、何时 \(P^n\) 会收敛、以及一些经典模型（天气链、随机游走、Ehrenfest 模型、PageRank）。最后我们简提两个延伸：MCMC（Bayes 计算的发动机）和 HMM（语音识别等的基石）。</p>
+
+<h2 id="sec24-1">24.1 动机：股票、天气、棋盘、PageRank</h2>
+
+<p>先看几个具体场景，让你对"Markov 性"有个直觉。</p>
+
+<p><strong>天气</strong>：明天是晴还是雨？粗略地，明天的天气主要由<em>今天</em>的天气决定——前天、上周的天气当然也有影响，但其影响是"通过今天传递"的。这种"昨天和大前天的影响都汇集到今天"的观点，正是 Markov 性的精神。</p>
+
+<p><strong>棋盘游戏</strong>：玩"蛇梯棋"，你现在的位置决定你下一步可能落到哪——你<em>怎么</em>走到现在这个位置不重要。围棋虽然规则复杂，但棋盘当前的局面（再加上谁该走）就完全决定了未来可能性的概率分布——历史走过哪几步在当下不直接出现。</p>
+
+<p><strong>股票价格的简单模型</strong>：假设明天的股价只由今天的股价决定（再叠加一个随机扰动）——这是教科书里"几何布朗运动"的离散原型，是金融数学的起点之一。</p>
+
+<p><strong>Google 的 PageRank</strong>：把整个 Web 想成一张图——每个网页是一个节点，每条超链接是一条边。一个"无聊的随机冲浪者"在每个网页随机点击一个外链跳转，他长时间下来"在每个网页停留的频率"，正是 PageRank 给该网页打的分数。这是 Larry Page 和 Sergey Brin 把 Markov 链用于搜索引擎的伟大想法——PageRank 算的就是某条 Markov 链的<em>平稳分布</em>。这件事我们 24.8 节细说。</p>
+
+<p>共同的精神：<em>状态</em>足够丰富以至于"现在的状态"已经包含了"为预测未来所需的全部信息"，过去的轨迹可以扔掉。这是 Markov 性。</p>
+
+<h2 id="sec24-2">24.2 Markov 性质</h2>
+
+<p>设有一列随机变量 \(X_0, X_1, X_2, \ldots\)，取值在某个有限或可数的集合 \(\mathcal{S}\)（叫做<strong>状态空间</strong>）里。我们说这列变量构成一个<strong>Markov 链</strong>（一阶、离散时间），如果对每个 \(n \geq 0\) 与每个状态序列 \(s_0, s_1, \ldots, s_{n+1}\) 满足</p>
+
+\[
+\boxed{P(X_{n+1} = s_{n+1} \mid X_n = s_n, X_{n-1} = s_{n-1}, \ldots, X_0 = s_0) = P(X_{n+1} = s_{n+1} \mid X_n = s_n).}
+\]
+
+<p>用人话讲：<em>给定"现在" \(X_n\) 后，"未来" \(X_{n+1}\) 与"过去" \(X_{n-1}, \ldots, X_0\) 条件独立</em>。这就是 Markov 性。</p>
+
+<p>请你<em>注意</em>：Markov 性<em>不</em>等于"未来与过去无关"——条件独立和真无关是两回事。比如你要预测下周天气：知道今天天气以后，知不知道昨天天气就不重要了（条件独立）；可如果你<em>不</em>知道今天的天气，那么知道昨天天气当然有用（无条件依赖仍存在）。Markov 性说的是<em>当前状态屏蔽了过去与未来的直接联系</em>。</p>
+
+<p>另一种说法：Markov 链是"无记忆"的——只要你看着"现在"这个状态，过去如何走到的全部细节，对预测未来都不再有任何额外帮助。</p>
+
+<p>这一假设强不强？取决于你怎么<em>定义状态</em>。如果天气只用"晴/阴"两种状态，Markov 性可能不成立——气压、湿度等"被遗忘"的因素会让"过去几天的趋势"包含未在今天天气里的信息。但如果你把状态扩张到"今天的天气 + 气压 + 湿度 + 风速"，Markov 性就更成立。所以"找对状态"是用 Markov 链建模的灵魂。</p>
+
+<h2 id="sec24-3">24.3 转移矩阵 \(P\)</h2>
+
+<p>对一个 Markov 链，关键的对象是<strong>一步转移概率</strong></p>
+
+\[
+P_{ij} = P(X_{n+1} = j \mid X_n = i),
+\]
+
+<p>从状态 \(i\) 一步跳到状态 \(j\) 的概率。我们假设这概率<em>不依赖时间 \(n\)</em>——这种 Markov 链叫<strong>时间齐次</strong>（time-homogeneous）。绝大多数应用都是时间齐次的，本章默认如此。</p>
+
+<p>把所有 \(P_{ij}\) 排成一个矩阵，得到<strong>转移矩阵</strong> \(P = (P_{ij})\)：第 \(i\) 行第 \(j\) 列的元素是从 \(i\) 跳到 \(j\) 的概率。</p>
+
+<p>转移矩阵有两条简单但要紧的性质：</p>
+
+<ul>
+<li>每个元素都非负：\(P_{ij} \geq 0\)。</li>
+<li>每行之和等于 1：\(\sum_j P_{ij} = 1\)（因为从状态 \(i\) 出发"一定要跳到某个状态"——总概率守恒）。</li>
+</ul>
+
+<p>满足这两条的矩阵叫<strong>随机矩阵</strong>（stochastic matrix）。每一个时间齐次 Markov 链都对应一个随机矩阵；反过来给定一个随机矩阵和初始分布，就唯一确定了一条 Markov 链。</p>
+
+<p><strong>例 24.1（两态天气链）</strong>　两种天气：晴（S）、雨（R）。假设</p>
+<ul>
+<li>今天晴，明天 80% 仍晴、20% 转雨。</li>
+<li>今天雨，明天 60% 仍雨、40% 转晴。</li>
+</ul>
+
+<p>状态空间 \(\mathcal{S} = \{S, R\}\)。转移矩阵</p>
+
+\[
+P = \begin{pmatrix} P_{SS} & P_{SR} \\ P_{RS} & P_{RR} \end{pmatrix} = \begin{pmatrix} 0.8 & 0.2 \\ 0.4 & 0.6 \end{pmatrix}.
+\]
+
+<p>验证：每行加起来是 \(0.8 + 0.2 = 1\)、\(0.4 + 0.6 = 1\) ✓。</p>
+
+<p><strong>例 24.2（三态心情链）</strong>　某人每天心情有三种状态：好（G）、中（N）、差（B）。从经验上，</p>
+
+\[
+P = \begin{pmatrix} 0.7 & 0.2 & 0.1 \\ 0.3 & 0.5 & 0.2 \\ 0.2 & 0.3 & 0.5 \end{pmatrix},
+\]
+
+<p>行依次对应今天为 G/N/B，列对应明天为 G/N/B。每行加起来是 1。</p>
+
+<h2 id="sec24-4">24.4 \(n\) 步转移：\(P^n\)</h2>
+
+<p>定义了"一步"以后，自然要问"\(n\) 步"——从状态 \(i\) 出发，\(n\) 步之后落在状态 \(j\) 的概率是多少？记为</p>
+
+\[
+P_{ij}^{(n)} = P(X_n = j \mid X_0 = i).
+\]
+
+<p>关键事实：</p>
+
+\[
+\boxed{P^{(n)} = P^n,}
+\]
+
+<p>即<em>"\(n\) 步转移概率矩阵 = 一步转移矩阵的 \(n\) 次幂"</em>。这件事直接是矩阵乘法和"全概率公式"组合的产物。证明思路：从 \(i\) 经过 \(n\) 步到 \(j\)，可以分两段——前 \(m\) 步从 \(i\) 到某中间状态 \(k\)，再 \(n - m\) 步从 \(k\) 到 \(j\)；对所有可能的 \(k\) 求和：</p>
+
+\[
+P_{ij}^{(n)} = \sum_k P_{ik}^{(m)} P_{kj}^{(n - m)}.
+\]
+
+<p>这正是矩阵乘法 \(P^n = P^m P^{n - m}\) 的元素形式。这条等式叫<strong>Chapman-Kolmogorov 方程</strong>。</p>
+
+<p>所以：要算"\(n\) 步以后落在哪里"的概率，只要把 \(P\) 自乘 \(n\) 次。如果初始分布是 \(\boldsymbol\pi_0\)（行向量），则 \(n\) 步后的分布是</p>
+
+\[
+\boldsymbol\pi_n = \boldsymbol\pi_0 P^n.
+\]
+
+<p><strong>例 24.3（两态天气链的两步）</strong>　继续例 24.1。如果今天晴，后天还晴的概率是？</p>
+
+<p>解：算 \(P^2\)：</p>
+
+\[
+P^2 = \begin{pmatrix} 0.8 & 0.2 \\ 0.4 & 0.6 \end{pmatrix}^2 = \begin{pmatrix} 0.8 \cdot 0.8 + 0.2 \cdot 0.4 & 0.8 \cdot 0.2 + 0.2 \cdot 0.6 \\ 0.4 \cdot 0.8 + 0.6 \cdot 0.4 & 0.4 \cdot 0.2 + 0.6 \cdot 0.6 \end{pmatrix} = \begin{pmatrix} 0.72 & 0.28 \\ 0.56 & 0.44 \end{pmatrix}.
+\]
+
+<p>所以 \(P_{SS}^{(2)} = 0.72\)：今天晴，后天仍晴的概率是 72%（不再是 80%——因为可能"明天转雨，后天再转回晴"）。验证：行和 \(0.72 + 0.28 = 1\) ✓。</p>
+
+<p>请你<em>注意</em>："今天晴，后天仍晴"既可以走 S→S→S 路径（概率 \(0.8 \times 0.8 = 0.64\)），也可以走 S→R→S 路径（概率 \(0.2 \times 0.4 = 0.08\)），合计 \(0.72\)，与矩阵乘法吻合。这就是为什么矩阵幂"对应到"多步转移——它把所有中间路径"自动求和"了。</p>
+
+<h2 id="sec24-5">24.5 平稳分布 \(\boldsymbol\pi P = \boldsymbol\pi\)</h2>
+
+<p>把例 24.1 的 \(P\) 自乘很多次（比如 \(P^{10}, P^{20}, P^{50}\)），你会发现一个惊人现象：</p>
+
+\[
+P^{50} \approx \begin{pmatrix} 2/3 & 1/3 \\ 2/3 & 1/3 \end{pmatrix}.
+\]
+
+<p>两行<em>变得一样</em>！它告诉你一件事：长期来看，无论你今天的天气是什么，五十天以后晴和雨的概率分别是 \(2/3\) 与 \(1/3\)。"今天的初始状态"被完全忘掉了。</p>
+
+<p>这个 \((2/3, 1/3)\) 叫做该 Markov 链的<strong>平稳分布</strong>（stationary distribution）。它的定义是：一个行向量 \(\boldsymbol\pi = (\pi_1, \pi_2, \ldots)\) 满足</p>
+
+\[
+\boxed{\boldsymbol\pi P = \boldsymbol\pi, \quad \sum_i \pi_i = 1, \quad \pi_i \geq 0.}
+\]
+
+<p>用人话说：如果你<em>当前</em>的分布就是 \(\boldsymbol\pi\)，那么<em>下一步</em>的分布还是 \(\boldsymbol\pi\)——它是对 \(P\) 的"不动点"。</p>
+
+<p>请你<em>注意</em>这条公式 \(\boldsymbol\pi P = \boldsymbol\pi\)：把它改写成 \(\boldsymbol\pi P = 1 \cdot \boldsymbol\pi\)，它说"\(\boldsymbol\pi\) 是 \(P^T\) 关于特征值 1 的<em>左特征向量</em>"。这跟线性代数（线代第 25 章）讲的特征值问题完全一样！每条平稳分布都对应一个特征向量；反过来，求平稳分布就是解特征向量方程。这是<strong>线性代数与概率论的最美交点之一</strong>——抽象的特征向量在 Markov 链里有了非常具体的诠释。</p>
+
+<p><strong>例 24.4（求两态天气链的平稳分布）</strong>　继续例 24.1。求 \(\boldsymbol\pi = (\pi_S, \pi_R)\)。</p>
+
+<p>解：方程组 \(\boldsymbol\pi P = \boldsymbol\pi\) 展开为</p>
+
+\[
+\pi_S = 0.8 \pi_S + 0.4 \pi_R, \qquad \pi_R = 0.2 \pi_S + 0.6 \pi_R.
+\]
+
+<p>第一条整理：\(0.2 \pi_S = 0.4 \pi_R\)，即 \(\pi_S = 2 \pi_R\)。结合 \(\pi_S + \pi_R = 1\)，解出 \(\pi_S = 2/3\)、\(\pi_R = 1/3\)。验证 \(P^{50}\) 的两行确实是 \((2/3, 1/3)\) ✓。</p>
+
+<h2 id="sec24-6">24.6 何时存在唯一平稳分布：不可约 + 非周期</h2>
+
+<p>不是每个 Markov 链都有唯一的平稳分布。例如考虑一个二态链 \(P = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}\)（两个状态都是"吸收态"，永远停在自己），任何分布 \((p, 1 - p)\) 都是平稳分布——平稳分布不唯一。又例如周期-2 链 \(P = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}\)，虽然 \(\boldsymbol\pi = (1/2, 1/2)\) 是平稳分布，但 \(P^n\) 在 \(n\) 奇/偶时交替——它<em>不收敛</em>。</p>
+
+<p>什么样的 Markov 链有<em>唯一</em>的平稳分布、并且 \(P^n\) <em>收敛</em>到它？关键概念两条：</p>
+
+<ul>
+<li><strong>不可约</strong>（irreducible）：任意两个状态 \(i, j\) 之间都<em>可达</em>——存在某个 \(n\) 使 \(P_{ij}^{(n)} > 0\)。换句话说，状态空间不能分成两块互相隔绝的子集。</li>
+<li><strong>非周期</strong>（aperiodic）：每个状态 \(i\) 的"周期" \(\gcd\{n : P_{ii}^{(n)} > 0\} = 1\)。即从状态 \(i\) 回到自己所需的步数没有公因数大于 1 的限制。一个简单的充分条件是<em>"存在某状态 \(i\) 使 \(P_{ii} > 0\)"</em>（即可以"原地不动"）。</li>
+</ul>
+
+<p>这两条加起来叫"<strong>遍历</strong>"（ergodic）。结论是 Markov 链理论的明珠：</p>
+
+<p style="text-align:center"><strong>有限状态、不可约、非周期的 Markov 链有<em>唯一</em>的平稳分布 \(\boldsymbol\pi\)，且对任何初始分布 \(\boldsymbol\pi_0\)，\(\boldsymbol\pi_0 P^n \to \boldsymbol\pi\)。</strong></p>
+
+<p>这个命题叫<strong>遍历定理</strong>。对无限状态空间，需要再加一个"正常返"条件，但精神一样。</p>
+
+<h2 id="sec24-7">24.7 收敛定理：\(P^n \to \mathbf{1} \boldsymbol\pi\)</h2>
+
+<p>遍历定理的矩阵形式：</p>
+
+\[
+\boxed{P^n \to \mathbf{1} \boldsymbol\pi \quad (n \to \infty),}
+\]
+
+<p>其中 \(\mathbf{1}\) 是全 1 列向量、\(\boldsymbol\pi\) 是平稳分布行向量；它们的乘积是个矩阵，每一行都是 \(\boldsymbol\pi\)。这就是为什么例 24.5 的 \(P^{50}\) 两行都变成了 \((2/3, 1/3)\)——它在朝 \(\mathbf{1} \boldsymbol\pi\) 收敛。</p>
+
+<p>收敛速率由 \(P\) 的<em>第二大特征值</em> \(\lambda_2\)（按模）控制——具体而言 \(\|P^n - \mathbf{1}\boldsymbol\pi\| \sim |\lambda_2|^n\)。\(|\lambda_2|\) 越接近 1，收敛越慢；越接近 0，收敛越快。这是线性代数与概率论又一处美妙交汇。</p>
+
+<h2 id="sec24-8">24.8 详细例题：天气、随机游走、Ehrenfest、PageRank</h2>
+
+<p><strong>例 24.5（带"完美晴"状态的天气链）</strong>　把例 24.1 改造：增加一个状态"暴雨"（H），转移矩阵</p>
+
+\[
+P = \begin{pmatrix} 0.7 & 0.2 & 0.1 \\ 0.3 & 0.5 & 0.2 \\ 0.2 & 0.4 & 0.4 \end{pmatrix}.
+\]
+
+<p>求平稳分布。</p>
+
+<p>解：解 \(\boldsymbol\pi P = \boldsymbol\pi\) 加 \(\sum \pi_i = 1\)。展开：</p>
+
+\[
+\pi_S = 0.7 \pi_S + 0.3 \pi_R + 0.2 \pi_H,
+\]
+\[
+\pi_R = 0.2 \pi_S + 0.5 \pi_R + 0.4 \pi_H,
+\]
+\[
+\pi_H = 0.1 \pi_S + 0.2 \pi_R + 0.4 \pi_H.
+\]
+
+<p>用 \(\pi_S + \pi_R + \pi_H = 1\) 替代第三条（这三条是冗余的）。整理前两条解得 \(\pi_S \approx 0.461\)、\(\pi_R \approx 0.347\)、\(\pi_H \approx 0.192\)（请你自己验证）。</p>
+
+<p><strong>例 24.6（一维随机游走）</strong>　考虑整数线 \(\{\ldots, -2, -1, 0, 1, 2, \ldots\}\) 上的随机游走：每步等概率 \(1/2\) 向左、\(1/2\) 向右。这是 Markov 链——下一步只看你现在在哪。</p>
+
+<p>这条链<em>没有</em>平稳分布——状态空间是无限的，所有平稳分布的候选 \(\pi_i = c\)（常数）都不能归一化（无限和发散）。它属于"零常返"（null recurrent）：从任意起点出发，回到该点的<em>期望时间</em>是无穷大；尽管几乎必然会回去，但"平均要等多久"是无穷。这种现象只有在无限状态空间里才会出现——有限链不会。</p>
+
+<p>如果改成"反射边界"——比如限制在 \(\{0, 1, 2, \ldots, N\}\)，到了边界就反弹——这条链是有限、不可约、非周期的（如果加一点"原地停留"的概率），就有唯一平稳分布。请你想想看那分布会是什么样：在中间均匀，还是在两头堆积？</p>
+
+<p><strong>例 24.7（Ehrenfest 模型）</strong>　这是 1907 年由 Paul 和 Tatiana Ehrenfest 提出的模型，用来"具体化"统计力学里的"熵增"现象。</p>
+
+<p>设有两个房间 A 和 B，里面共有 \(N\) 个分子。每个时刻随机选一个分子（每个被选概率 \(1/N\)），把它从所在房间移到另一个房间。状态用"A 房间里有多少分子"（取值 \(0, 1, \ldots, N\)）描述。</p>
+
+<p>转移概率：若当前 A 中有 \(i\) 个分子，则下一步</p>
+
+<ul>
+<li>"被选到的分子在 A 中"的概率 \(i/N\)，跳后 A 里有 \(i - 1\) 个；</li>
+<li>"被选到的分子在 B 中"的概率 \((N - i)/N\)，跳后 A 里有 \(i + 1\) 个。</li>
+</ul>
+
+<p>所以 \(P_{i, i-1} = i/N\)、\(P_{i, i+1} = (N - i)/N\)。这条链不可约（任意状态都可达）但<em>是周期为 2 的</em>——每步状态都"奇偶交替"（每次跳变 \(\pm 1\)）。如果我们引入"以小概率原地不动"的修改，就破除周期性。</p>
+
+<p>它的平稳分布（详细推导是个不错的练习）是 \(\pi_i = \binom{N}{i} / 2^N\)——也就是<strong>二项 \(\mathrm{Binomial}(N, 1/2)\)</strong>。这跟"每个分子独立等概率落在 A 或 B"得到的分布一致——这正是统计力学预言的"平衡态"。Ehrenfest 模型给"为什么宇宙趋向最大熵"提供了一个干净的数学示意。</p>
+
+<p><strong>例 24.8（PageRank）</strong>　把整个 Web 想成一张有向图：节点 = 网页，边 = 超链接。设节点 \(i\) 出度为 \(d_i\)（出去 \(d_i\) 条链接）。"随机冲浪者" 在每个时刻：</p>
+
+<ul>
+<li>以概率 \(1 - \alpha\)（典型 \(\alpha = 0.15\)），从当前节点的出链中等概率随机选一条跳过去；</li>
+<li>以概率 \(\alpha\)（叫"传送"），跳到全网任意一个节点（等概率）。</li>
+</ul>
+
+<p>这条修改后的链一定是不可约且非周期的（"传送"机制保证了任意两点都可达，且可以原地停留）——所以唯一平稳分布存在。该平稳分布给每个网页打的"概率分数" 就是它的 PageRank。</p>
+
+<p>"传送"机制是 PageRank 算法的关键创新——它解决了原始 Web 图里"死胡同"（出度为 0 的节点）和"封闭子图"（互相只链向自己几个节点的小圈子）的麻烦，确保了平稳分布的存在与唯一。</p>
+
+<p>实际计算上，PageRank 对几十亿节点的 Web 图，不会真去解 \(N\) 元线性方程组，而是用迭代——从均匀分布出发，反复用 \(\boldsymbol\pi_{n+1} = \boldsymbol\pi_n P\) 迭代，直到收敛。这是<strong>幂迭代法</strong>（power iteration），跟线代里求最大特征值用的同一招。这就是 Google 搜索引擎背后最核心的数学之一。</p>
+
+<h2 id="sec24-9">24.9 时间反演与可逆链</h2>
+
+<p>给定 Markov 链 \(\{X_n\}\) 和它的平稳分布 \(\boldsymbol\pi\)，定义"反向链" \(\hat X_n = X_{T - n}\)（把时间倒过来），它仍然是 Markov 链——但转移矩阵不一定与原链相同。如果<em>恰好相同</em>，即</p>
+
+\[
+\boxed{\pi_i P_{ij} = \pi_j P_{ji}, \quad \forall i, j,}
+\]
+
+<p>就说该链是<strong>可逆的</strong>（reversible）。这条等式叫<strong>详细平衡方程</strong>（detailed balance）——它说"从 \(i\) 流向 \(j\) 的概率流量"等于"从 \(j\) 流向 \(i\) 的概率流量"。直觉上："时间正反看不出来"。</p>
+
+<p>验证一条 Markov 链的可逆性，是 MCMC 里至关重要的一步——你设计一条 Markov 链让它的平稳分布就是你想抽样的目标分布 \(\pi\)，最简单的设计就是要求详细平衡。Metropolis-Hastings 算法（24.10 节）就是这样设计出来的。</p>
+
+<p>不是所有链都可逆。例 24.1 的天气链可逆吗？验证：\(\pi_S P_{SR} = (2/3)(0.2) = 2/15\)，\(\pi_R P_{RS} = (1/3)(0.4) = 4/30 = 2/15\) ✓。可逆。许多"对称"的 Markov 链（如 Ehrenfest 模型）是可逆的。但 PageRank 链就不一定可逆——Web 上的链接是单向的，时间反演下"从 B 跳到 A"不等于"从 A 跳到 B"。</p>
+
+<h2 id="sec24-10">24.10 MCMC 抽样：Metropolis-Hastings 简介</h2>
+
+<p>Bayes 统计常常面临一个工程难题：手上有个目标分布 \(\pi(\theta)\)（典型是某个后验），形状古怪、归一化常数算不出，但<em>密度的相对大小</em>能算（即 \(\tilde\pi(\theta) \propto \pi(\theta)\) 可计算）。如何从 \(\pi\) 中抽样？</p>
+
+<p>Metropolis-Hastings 给出的答案：构造一条 Markov 链，它的平稳分布<em>正好</em>是 \(\pi\)，跑足够长后从这条链里取样。</p>
+
+<p>算法核心：</p>
+
+<ol>
+<li>当前在 \(\theta_n\)，从某个"提议分布" \(q(\theta' \mid \theta_n)\) 抽一个候选 \(\theta'\)。</li>
+<li>计算"接受概率"</li>
+</ol>
+
+\[
+\alpha = \min\left(1, \;\frac{\tilde\pi(\theta') \cdot q(\theta_n \mid \theta')}{\tilde\pi(\theta_n) \cdot q(\theta' \mid \theta_n)}\right).
+\]
+
+<ol start="3">
+<li>以概率 \(\alpha\) 接受："\(\theta_{n+1} = \theta'\)"；以概率 \(1 - \alpha\) 拒绝："\(\theta_{n+1} = \theta_n\)"。</li>
+</ol>
+
+<p>这条算法的精妙之处：归一化常数在 \(\alpha\) 的分子分母中被消掉了——所以即使你只知道 \(\tilde\pi \propto \pi\)（不知道归一化常数），也能跑算法。</p>
+
+<p>为什么它对？验证它构造的链的平稳分布<em>就是</em> \(\pi\)——具体而言它满足详细平衡方程 \(\pi(\theta) P(\theta, \theta') = \pi(\theta') P(\theta', \theta)\)，所以 \(\pi\) 是该链的（唯一）平稳分布。结合不可约性、非周期性（合适提议下成立），由 24.7 节的收敛定理，链长时间运行后的样本分布趋于 \(\pi\)。</p>
+
+<p>这是现代 Bayes 统计、粒子物理、计算化学、机器学习等领域的核心工具之一。把它的细节展开需要单独一章；这里你先记住"MCMC = Markov 链构造的抽样方法"。</p>
+
+<h2 id="sec24-11">24.11 隐 Markov 模型 (HMM) 简介</h2>
+
+<p>本章最后简提一个 Markov 链的强大延伸——<strong>隐 Markov 模型</strong>（Hidden Markov Model, HMM）。它在语音识别、生物信息学（基因序列分析）、自然语言处理（词性标注）等领域有深远应用。</p>
+
+<p>背景设定：你有一条 Markov 链 \(\{X_n\}\)，但<em>看不到它</em>——\(X_n\) 是"隐藏的状态"。你能看到的是另一列变量 \(\{Y_n\}\)，每个 \(Y_n\) 由 \(X_n\) 生成（按照某条件分布 \(P(Y_n \mid X_n)\)），但跟其他 \(X\) 或 \(Y\) 无关。给定一段观测 \(y_1, y_2, \ldots, y_T\)，要推断隐藏状态序列 \(x_1, x_2, \ldots, x_T\)。</p>
+
+<p>例（语音识别）：\(X_n\) = "时刻 \(n\) 应该说的音素"（隐藏，因为听者不直接看到说话者的"心智"）；\(Y_n\) = "时刻 \(n\) 麦克风录到的声学特征"（可见）。把 \(P(X_n \mid X_{n-1})\)（音素之间的过渡，由语言决定）和 \(P(Y_n \mid X_n)\)（每个音素发出来什么样，由声学决定）都建模出来，就能用 HMM 算法（前向-后向、Viterbi）从声学信号中"解出"最可能的音素序列。</p>
+
+<p>例（生物信息学）：\(X_n\) = "DNA 上位置 \(n\) 是否在编码区"（隐藏）；\(Y_n\) = "位置 \(n\) 的核苷酸 A/T/G/C"（可见）。HMM 推断把基因组中的"基因"位置切出来。</p>
+
+<p>HMM 的细节展开同样需要单独一章，这里只是放个名字。重要的是知道："Markov 链 + 观测噪声"这一通用的"动态系统 + 观测"框架，是 HMM、Kalman 滤波、粒子滤波、(部分可观测)强化学习等等许多大领域的共同基底。</p>
+
+<p>本章到此结束。我们见识了 Markov 链——一种简洁但强大的随机过程模型；它把"序列依赖"用一个矩阵 \(P\) 完全捕捉，借助平稳分布把"长期行为"算出来，并通过 MCMC、HMM 等延伸进入了现代统计与机器学习的广阔疆域。下一章我们换一个话题——<strong>信息论</strong>——它讨论"信息"作为一种可量化的物理量是什么意思，与 ML 中的"交叉熵损失"、Shannon 的源编码定理等深刻地联系在一起。Markov 链与信息论并非毫无关系——熵率、信道容量等概念都有 Markov 链版本——但限于篇幅我们各自独立讲。准备好。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 Bayes 统计入门</a><a href="ch25.html">下一章 · 第 25 章 信息论入门 →</a></nav>
+
+</main>
+</body>
+</html>
