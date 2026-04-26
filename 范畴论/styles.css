@@ -1,0 +1,293 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg: #fbf9f4;
+    --ink: #1c1917;
+    --ink-soft: #44403c;
+    --accent: #6b3410;
+    --rule: #d6d3d1;
+    --boxed-bg: #f5f2ea;
+    --boxed-border: #c9c1ad;
+    --table-stripe: #f3f0e8;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Source Serif Pro", "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
+    font-size: 17px;
+    line-height: 1.85;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem 2rem;
+  }
+
+  header.book-title {
+    text-align: center;
+    margin: 4rem 0 6rem 0;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  header.book-title h1 {
+    font-size: 2.6rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    letter-spacing: 0.02em;
+    border: none;
+    padding: 0;
+  }
+
+  header.book-title .subtitle {
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 0;
+  }
+
+  header.book-title .byline {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin-top: 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin: 5rem 0 1.8rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--ink);
+    line-height: 1.4;
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 3rem 0 1.2rem 0;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  h3 {
+    font-size: 1.12rem;
+    font-weight: 600;
+    margin: 2rem 0 0.8rem 0;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+  p {
+    margin: 0 0 1.2em 0;
+    text-align: justify;
+    text-justify: inter-character;
+    hyphens: auto;
+  }
+
+  p, li {
+    text-indent: 0;
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  em {
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  ol, ul {
+    margin: 0.8em 0 1.4em 0;
+    padding-left: 2em;
+  }
+
+  ol li, ul li {
+    margin-bottom: 0.5em;
+  }
+
+  ol ol, ul ul, ol ul, ul ol {
+    margin: 0.4em 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    margin: 1.5em auto;
+    font-size: 0.95em;
+    width: 100%;
+    background: var(--bg);
+  }
+
+  thead th {
+    background: var(--ink);
+    color: var(--bg);
+    font-weight: 600;
+    padding: 0.6em 1em;
+    text-align: left;
+    border: 1px solid var(--ink);
+  }
+
+  tbody td, tbody th {
+    padding: 0.55em 1em;
+    border: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  tbody tr:nth-child(even) {
+    background: var(--table-stripe);
+  }
+
+  tbody th {
+    font-weight: 600;
+    background: var(--boxed-bg);
+  }
+
+  /* MathJax display equations: gentle accent on the boxed ones */
+  mjx-container[display="true"] {
+    margin: 1.4em 0 !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  /* Subtle styling for boxed equations rendered by \boxed{} — MathJax handles this natively */
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent);
+  }
+
+  a:hover {
+    border-bottom-style: solid;
+  }
+
+  /* Table of contents specific styling */
+  nav.toc, .toc-chapter {
+    margin: 1.5rem 0;
+  }
+
+  .toc-chapter h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 1.3rem 0 0.4rem 0;
+    border: none;
+    padding: 0;
+  }
+
+  .toc-chapter h2 a {
+    color: var(--ink);
+    border: none;
+  }
+
+  .toc-chapter ul {
+    margin: 0.2rem 0 0.8rem 1.5rem;
+    padding: 0;
+    list-style: none;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+
+  .toc-chapter ul li {
+    margin: 0.15rem 0;
+  }
+
+  .toc-chapter ul ul {
+    margin-left: 1.4rem;
+    font-size: 0.9rem;
+  }
+
+  .toc-page {
+    color: var(--rule);
+    font-size: 0.85em;
+    margin-left: 0.6em;
+  }
+
+  /* End-of-chapter small ornament */
+  hr.section-end {
+    border: none;
+    text-align: center;
+    margin: 3rem auto;
+    width: 60%;
+  }
+
+  hr.section-end::before {
+    content: "✦  ✦  ✦";
+    color: var(--rule);
+    letter-spacing: 1em;
+  }
+
+  /* Chinese spacing tweaks */
+  body { word-wrap: break-word; }
+
+  /* Print friendly */
+  @media print {
+    body { background: white; color: black; font-size: 11pt; }
+    main { padding: 1cm; max-width: none; }
+    h1, h2, h3 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    main { padding: 2rem 1.2rem 3rem 1.2rem; }
+    body { font-size: 16px; line-height: 1.75; }
+    header.book-title h1 { font-size: 2rem; }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.2rem; }
+    table { font-size: 0.88em; }
+    th, td { padding: 0.4em 0.6em; }
+  }
+/* ---------- 章节间导航条 ---------- */
+nav.page-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+  padding: 0.85em 1em;
+  background: var(--boxed-bg);
+  border: 1px solid var(--boxed-border);
+  border-radius: 4px;
+  font-size: 0.92em;
+}
+
+nav.page-nav a {
+  border: none;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+nav.page-nav a:hover {
+  text-decoration: underline;
+}
+
+nav.page-nav .nav-disabled {
+  color: var(--rule);
+}
+
+/* 章节间导航条：底部那条留出与上一段间距 */
+h1 + nav.page-nav,
+nav.page-nav + h1 { margin-top: 0; }
+
+/* TOC 卡片化，目录页更可读 */
+nav.toc {
+  margin: 2rem 0;
+}
+
+@media (max-width: 640px) {
+  nav.page-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.85em;
+  }
+}

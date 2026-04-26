@@ -1,0 +1,564 @@
+<h1 id="ch3">第 3 章 函子</h1>
+
+<p>如果说上一章只是把“世界”一个个摆上桌面，那么这一章要做的事，就是研究世界与世界之间怎样系统翻译。把一个群忘成集合、把一个拓扑空间忘成集合、把一个集合生成为自由群、把一个带基点空间送到它的基本群、把一个群表示重写成从 \(BG\) 到 \(\mathbf{Vect}_k\) 的函子——这些动作看起来内容很不一样，但逻辑骨架完全相同：对象要送成对象，箭头要送成箭头，而且复合与恒等必须被保留下来。</p>
+
+<p>这就是函子的角色。它不是“在两个范畴之间随便做个配对”，而是把一整张箭头网络完整搬运过去。你若只保对象不保箭头，那就只是字典，不是翻译；你若保箭头却不保复合，那许多真正值钱的结构会在中途断掉。函子的精髓就在这里：它尊重结构，不只是尊重名单。</p>
+
+<p>这一章的读法可以很具体。你不必一开始就把“函子”当成高悬半空的定义；只要把每个例子都问一遍：它对对象做了什么？对态射做了什么？它为什么保恒等？为什么保复合？如果你每次都把这四问走清楚，函子这个词很快就会从抽象名词变成一种工作习惯。</p>
+
+<h2 id="sec3-1">3.1 定义：对象要过去，箭头也要过去</h2>
+
+<p>设 \(\mathcal C,\mathcal D\) 是两个范畴。一个协变函子</p>
+
+\[
+F:\mathcal C\to\mathcal D
+\]
+
+<p>必须做两件事。第一，对每个对象 \(A\in\mathcal C\)，指定一个对象 \(F(A)\in\mathcal D\)。第二，对每个态射 \(f:A\to B\)，指定一个态射</p>
+
+\[
+F(f):F(A)\to F(B).
+\]
+
+<p>但这还不够。若只做到这一步，你只是把对象和箭头搬家了，还没有保证结构被保留下来。真正的关键是下面两条公理：</p>
+
+\[
+\boxed{F(g\circ f)=F(g)\circ F(f),\qquad F(\operatorname{id}_A)=\operatorname{id}_{F(A)}.}
+\]
+
+<p>也就是说，先在原范畴里复合再做 \(F\)，与先分别做 \(F\) 再在目标范畴里复合，结果必须一样；恒等箭头也必须被送成恒等箭头。没有这两条式子，函子就会把世界的交通规则破坏掉。</p>
+
+<p style="background:var(--boxed-bg); border-left:4px solid var(--accent); padding:0.8em 1em; margin:1.5em 0;"><strong>定义。</strong>协变函子 \(F:\mathcal C\to\mathcal D\) 由对象映射与态射映射组成，并满足保复合与保恒等。若态射方向被反过来，即每个 \(f:A\to B\) 被送成
+\[
+F(f):F(B)\to F(A),
+\]
+且满足
+\[
+F(g\circ f)=F(f)\circ F(g),
+\]
+则称 \(F\) 为反变函子。</p>
+
+<p><strong>例 3.1.1。</strong>验证忘掉函子</p>
+
+\[
+U:\mathbf{Grp}\to \mathbf{Set}
+\]
+
+<p>确实是一个函子。</p>
+
+<p>解。对每个群 \(G\)，令 \(U(G)\) 是它的底层集合。对每个群同态 \(\varphi:G\to H\)，令 \(U(\varphi)\) 就是同一个底层函数</p>
+
+\[
+U(\varphi):U(G)\to U(H),\qquad g\mapsto \varphi(g).
+\]
+
+<p>恒等保持显然，因为群上的恒等同态作为函数仍是恒等函数：</p>
+
+\[
+U(\operatorname{id}_G)=\operatorname{id}_{U(G)}.
+\]
+
+<p>复合也显然。若</p>
+
+\[
+G\xrightarrow{\varphi}H\xrightarrow{\psi}K
+\]
+
+<p>是两个群同态，则对任意 \(g\in G\)，有</p>
+
+\[
+U(\psi\circ\varphi)(g)=(\psi\circ\varphi)(g)=\psi(\varphi(g))
+=U(\psi)(U(\varphi)(g)).
+\]
+
+<p>所以</p>
+
+\[
+U(\psi\circ\varphi)=U(\psi)\circ U(\varphi).
+\]
+
+<p>因此 \(U\) 是函子。它做的事看起来只是“忘掉群运算”，但因为箭头也被一起保留，这个“忘掉”是非常有组织的。</p>
+
+<h2 id="sec3-2">3.2 协变与反变：方向什么时候会翻过来</h2>
+
+<p>最自然的函子通常是协变的：箭头往前，它也往前。比如群同态 \(\varphi:G\to H\) 被忘到集合函数 \(U(\varphi):U(G)\to U(H)\)；连续映射 \(f:X\to Y\) 被忘到集合函数 \(U(f):U(X)\to U(Y)\)。可数学里还有大量构造会把方向翻过来。你上一章看到的限制映射就是如此：大开集上的函数可以限制到小开集上。</p>
+
+<p>在最朴素的集合论里，这种反向已经出现过。给定函数</p>
+
+\[
+f:X\to Y,
+\]
+
+<p>你总能把 \(Y\) 的子集拉回到 \(X\) 的子集：</p>
+
+\[
+f^{-1}:\mathcal P(Y)\to \mathcal P(X),\qquad B\mapsto f^{-1}(B).
+\]
+
+<p>注意方向：原函数是 \(X\to Y\)，逆像却是 \(\mathcal P(Y)\to\mathcal P(X)\)。所以幂集构造天然是反变的。</p>
+
+\[
+\boxed{f:X\to Y\qquad\Longmapsto\qquad f^{-1}:\mathcal P(Y)\to\mathcal P(X).}
+\]
+
+<p><strong>例 3.2.1。</strong>验证幂集逆像保复合，但顺序会反过来。</p>
+
+<p>解。设</p>
+
+\[
+X\xrightarrow{f}Y\xrightarrow{g}Z
+\]
+
+<p>是两个函数，取任意 \(C\subset Z\)。则</p>
+
+\[
+(g\circ f)^{-1}(C)=\{x\in X:(g\circ f)(x)\in C\}.
+\]
+
+<p>这等价于</p>
+
+\[
+\{x\in X:f(x)\in g^{-1}(C)\}=f^{-1}(g^{-1}(C)).
+\]
+
+<p>所以</p>
+
+\[
+(g\circ f)^{-1}=f^{-1}\circ g^{-1}.
+\]
+
+<p>顺序确实反了。恒等映射也没问题：</p>
+
+\[
+(\operatorname{id}_X)^{-1}=\operatorname{id}_{\mathcal P(X)}.
+\]
+
+<p>因此幂集给出一个反变函子</p>
+
+\[
+\mathcal P:\mathbf{Set}^{op}\to\mathbf{Set}.
+\]
+
+<p>你若把这一例和上一章的预层例子并排看，就会发现“逆像”和“限制”其实属于同一种反向机制。</p>
+
+<p>还有一个组织反变的标准记号非常重要。任何反变函子 \(\mathcal C\to\mathcal D\)，都可以等价地写成协变函子</p>
+
+\[
+\mathcal C^{op}\to\mathcal D.
+\]
+
+<p>因此很多书会说“\(\operatorname{Hom}(-,A)\) 是从 \(\mathcal C^{op}\) 到 \(\mathbf{Set}\) 的函子”“预层是 \(\operatorname{Open}(X)^{op}\) 到 \(\mathbf{Set}\) 的函子”。这样写不是卖弄记号，而是把“方向反过来”一次性吸收到定义里。</p>
+
+<h2 id="sec3-3">3.3 忘掉函子：把结构拆下来，但别把箭头弄丢</h2>
+
+<p>忘掉函子几乎是每个范畴论课程里最先出现的一批例子，因为它们既简单又无处不在。你可以忘掉群的乘法，只留底层集合；也可以忘掉拓扑，只留底层集合；还可以忘掉向量空间的数乘与加法，只留阿贝尔群结构。</p>
+
+\[
+U:\mathbf{Grp}\to\mathbf{Set},\qquad
+U:\mathbf{Top}\to\mathbf{Set},\qquad
+U:\mathbf{Vect}_k\to\mathbf{Set}.
+\]
+
+<p>这些函子对对象的处理都很像：拿掉一部分结构，保留更粗糙的底层对象。对箭头的处理也很像：原来的保结构映射，仍然先作为函数存在，所以可以继续往更粗糙的范畴里走。换句话说，忘掉函子并不是“什么都不管了”；它仍然仔细保留了所有复合关系。</p>
+
+<p><strong>例 3.3.1。</strong>验证忘掉函子</p>
+
+\[
+U:\mathbf{Top}\to\mathbf{Set}
+\]
+
+<p>与连续映射的复合相容。</p>
+
+<p>解。对每个拓扑空间 \(X\)，令 \(U(X)\) 是同一底层集合。对连续映射 \(f:X\to Y\)，令 \(U(f)\) 是同一底层函数。若再有连续映射 \(g:Y\to Z\)，则对任意 \(x\in X\)，</p>
+
+\[
+U(g\circ f)(x)=(g\circ f)(x)=g(f(x))=U(g)(U(f)(x)).
+\]
+
+<p>所以</p>
+
+\[
+U(g\circ f)=U(g)\circ U(f).
+\]
+
+<p>这说明 \(U\) 不是随便抹去拓扑，而是在“连续映射仍是函数”这个事实上做了完全兼容的简化。</p>
+
+<p>你现在可以把忘掉函子看成一条常见学习策略：当某个范畴太复杂时，先忘掉一部分结构，把它投影到一个更容易看的世界里。可惜这样做有时会丢信息，于是下一节自然就会问：有没有办法反过来，从更简单的对象自由地长出最小的结构？这正是自由函子的动机。</p>
+
+<h2 id="sec3-4">3.4 自由函子：从集合长出最少的群结构</h2>
+
+<p>忘掉函子往下走很容易；往回走就困难得多。给一个集合 \(S\)，你当然可以给它塞进很多不同的群结构，但哪一种最自然？范畴论的答案是：取那个“除了必须满足群公理外，不额外强加任何关系”的对象。这就是自由群。</p>
+
+<p>设 \(S\) 是集合。自由群 \(F(S)\) 的直观模型，是由字母 \(S\) 和形式逆元 \(S^{-1}\) 生成的一切约化词组成。若 \(S=\{x,y\}\)，那么</p>
+
+\[
+x y x^{-1} y^{-1},\qquad y^3x^{-2},\qquad e
+\]
+
+<p>都是 \(F(S)\) 中的元素。关键点不在这个具体模型，而在它满足的通用性质：任意从 \(S\) 到某群 \(G\) 的集合映射，都唯一延拓成群同态 \(F(S)\to G\)。</p>
+
+\[
+\boxed{\operatorname{Hom}_{\mathbf{Grp}}(F(S),G)\cong \operatorname{Hom}_{\mathbf{Set}}(S,U(G)).}
+\]
+
+<p>这个双射自然于 \(S\) 与 \(G\)。它一方面说 \(F\) 是一个函子</p>
+
+\[
+F:\mathbf{Set}\to\mathbf{Grp},
+\]
+
+<p>另一方面也预告了第 11 章的伴随：自由是忘掉的左伴随。</p>
+
+<p><strong>例 3.4.1。</strong>取 \(S=\{x,y\}\)，令 \(G=S_3\)，并定义集合映射</p>
+
+\[
+\alpha:S\to U(S_3),\qquad \alpha(x)=(12),\quad \alpha(y)=(123).
+\]
+
+<p>求唯一延拓的群同态 \(\widetilde\alpha:F(S)\to S_3\) 在词 \(w=xyx^{-1}\) 上的值。</p>
+
+<p>解。由自由群的通用性质，存在唯一群同态 \(\widetilde\alpha\) 满足</p>
+
+\[
+\widetilde\alpha(x)=(12),\qquad \widetilde\alpha(y)=(123).
+\]
+
+<p>于是</p>
+
+\[
+\widetilde\alpha(x^{-1})=\widetilde\alpha(x)^{-1}=(12)^{-1}=(12).
+\]
+
+<p>因此</p>
+
+\[
+\widetilde\alpha(w)=\widetilde\alpha(x)\widetilde\alpha(y)\widetilde\alpha(x^{-1})
+=(12)(123)(12).
+\]
+
+<p>在 \(S_3\) 中做共轭计算，得到</p>
+
+\[
+(12)(123)(12)=(132).
+\]
+
+<p>所以</p>
+
+\[
+\widetilde\alpha(xyx^{-1})=(132).
+\]
+
+<p>这正体现了“自由”的意思：你只要先告诉我生成元往哪里去，剩下所有词的像都被唯一强迫出来。</p>
+
+<p>自由函子之所以是范畴论里极经典的例子，恰恰因为它让你第一次清楚看到：一个构造不仅能给每个对象分配结果，还能对每个态射分配结果，并且这个分配由通用性质保证天然相容。</p>
+
+<h2 id="sec3-5">3.5 群表示就是函子 \(BG\to \mathbf{Vect}_k\)</h2>
+
+<p>上一章我们已经从动机层面看过这个观点，现在把它正式嵌进函子语言。给定群 \(G\)，先构造单对象范畴 \(BG\)：只有一个对象 \(*\)，且</p>
+
+\[
+\operatorname{Hom}_{BG}(*,*)=G.
+\]
+
+<p>复合由群乘法给出。于是一个函子</p>
+
+\[
+F:BG\to \mathbf{Vect}_k
+\]
+
+<p>做的事非常明确：它把唯一对象 \(*\) 送到一个 \(k\)-向量空间 \(V\)，把每个群元 \(g\) 送到一个线性同构 \(F(g):V\to V\)，并满足</p>
+
+\[
+F(gh)=F(g)\circ F(h),\qquad F(e)=\operatorname{id}_V.
+\]
+
+<p>这和 <a href="../表示论/ch2.html">《表示论读本》第 2 章</a> 中的定义</p>
+
+\[
+\rho:G\to GL(V)
+\]
+
+<p>完全等价。你若把 \(F(g)\) 记成 \(\rho(g)\)，那就是同一个对象换了件衣服。</p>
+
+\[
+\boxed{(V,\rho)\text{ 是 }G\text{ 的表示}\;\Longleftrightarrow\;F_\rho:BG\to\mathbf{Vect}_k\text{ 是函子}.}
+\]
+
+<p><strong>例 3.5.1。</strong>把 \(C_2=\{e,t\}\) 的符号表示写成函子。</p>
+
+<p>解。取 \(V=\mathbb R\)。定义</p>
+
+\[
+F(*)=\mathbb R,\qquad F(e)=\operatorname{id}_{\mathbb R},\qquad F(t)(x)=-x.
+\]
+
+<p>由于</p>
+
+\[
+t^2=e,
+\]
+
+<p>而</p>
+
+\[
+F(t)\circ F(t)(x)=F(t)(-x)=x=\operatorname{id}_{\mathbb R}(x)=F(e)(x),
+\]
+
+<p>所以函子条件成立。这就是 \(C_2\) 的一维符号表示。</p>
+
+<p>这一重写的真正好处，要到下一章才会完全显现。因为一旦把表示看成函子，表示之间的 intertwiner 就会自然地变成自然变换。你在 <a href="../表示论/ch3.html">《表示论读本》第 3 章</a> 已经见过条件</p>
+
+\[
+\sigma(g)T=T\rho(g).
+\]
+
+<p>这句式子其实正是“对 \(BG\) 中每条箭头 \(g\)，相应方块都交换”。范畴论并没有发明新现象；它只是指出这是更一般的统一模式。</p>
+
+<h2 id="sec3-6">3.6 \(\operatorname{Hom}(A,-)\) 与 \(\operatorname{Hom}(-,A)\)：用一个固定对象去探测整个范畴</h2>
+
+<p>函子最基本、也最深的来源之一，是把一个对象固定住，然后看所有从它发出的箭头，或者所有射向它的箭头。给定范畴 \(\mathcal C\) 中的对象 \(A\)，你总能定义协变函子</p>
+
+\[
+\operatorname{Hom}_{\mathcal C}(A,-):\mathcal C\to\mathbf{Set},
+\]
+
+<p>其在对象 \(B\) 上的值是集合</p>
+
+\[
+\operatorname{Hom}_{\mathcal C}(A,B).
+\]
+
+<p>若 \(f:B\to C\) 是态射，则</p>
+
+\[
+\operatorname{Hom}(A,f):\operatorname{Hom}(A,B)\to \operatorname{Hom}(A,C)
+\]
+
+<p>定义为“后复合”：</p>
+
+\[
+h\mapsto f\circ h.
+\]
+
+<p>同样地，还有反变函子</p>
+
+\[
+\operatorname{Hom}_{\mathcal C}(-,A):\mathcal C^{op}\to\mathbf{Set},
+\]
+
+<p>它在态射 \(f:B\to C\) 上通过“前复合”作用：</p>
+
+\[
+\operatorname{Hom}(f,A):\operatorname{Hom}(C,A)\to \operatorname{Hom}(B,A),\qquad k\mapsto k\circ f.
+\]
+
+\[
+\boxed{\operatorname{Hom}(A,-):\mathcal C\to\mathbf{Set},\qquad \operatorname{Hom}(-,A):\mathcal C^{op}\to\mathbf{Set}.}
+\]
+
+<p><strong>例 3.6.1。</strong>在 \(\mathbf{Ab}\) 中取 \(A=\mathbb Z\)，说明函子 \(\operatorname{Hom}_{\mathbf{Ab}}(\mathbb Z,-)\) 与“取底层阿贝尔群”几乎一样具体。</p>
+
+<p>解。给定阿贝尔群 \(B\)，每个群同态</p>
+
+\[
+\phi:\mathbb Z\to B
+\]
+
+<p>都被 \(\phi(1)\) 唯一决定，因为</p>
+
+\[
+\phi(n)=n\phi(1)\qquad (n\in\mathbb Z).
+\]
+
+<p>因此有自然双射</p>
+
+\[
+\operatorname{Hom}_{\mathbf{Ab}}(\mathbb Z,B)\cong B.
+\]
+
+<p>例如当 \(B=\mathbb Z/6\mathbb Z\) 时，同态完全由 \(\phi(1)\in\mathbb Z/6\mathbb Z\) 决定，所以恰有六个同态。</p>
+
+<p>再看箭头。设</p>
+
+\[
+\mu_2:\mathbb Z/6\mathbb Z\to\mathbb Z/6\mathbb Z,\qquad \bar x\mapsto \overline{2x}.
+\]
+
+<p>那么</p>
+
+\[
+\operatorname{Hom}(\mathbb Z,\mu_2):\operatorname{Hom}(\mathbb Z,\mathbb Z/6\mathbb Z)\to \operatorname{Hom}(\mathbb Z,\mathbb Z/6\mathbb Z)
+\]
+
+<p>把 \(\phi\) 送到 \(\mu_2\circ\phi\)。若 \(\phi(1)=\bar a\)，则</p>
+
+\[
+(\mu_2\circ\phi)(1)=\mu_2(\bar a)=\overline{2a}.
+\]
+
+<p>所以在上面的自然识别下，这个诱导映射就是</p>
+
+\[
+\bar a\mapsto \overline{2a}.
+\]
+
+<p>也就是说，\(\operatorname{Hom}(\mathbb Z,-)\) 真的像一台探针：它通过“从 \(\mathbb Z\) 射进去的所有方式”把群 \(B\) 看了出来。第 9 章的 Yoneda 引理会把这种现象系统推到极致。</p>
+
+<h2 id="sec3-7">3.7 基本群是函子：\(\pi_1:\mathbf{Top}_*\to\mathbf{Grp}\)</h2>
+
+<p>现在回到本章最重要的几何例子。你在 <a href="../代数拓扑/ch4.html">《代数拓扑读本》第 4 章</a> 学过，带基点拓扑空间 \((X,x_0)\) 有一个基本群 \(\pi_1(X,x_0)\)。若</p>
+
+\[
+f:(X,x_0)\to (Y,y_0)
+\]
+
+<p>是保基点连续映射，即 \(f(x_0)=y_0\)，则它诱导一个群同态</p>
+
+\[
+\pi_1(f):\pi_1(X,x_0)\to \pi_1(Y,y_0),\qquad [\gamma]\mapsto [f\circ\gamma].
+\]
+
+<p>这不是巧合性的附属操作，而是一个真正的函子：</p>
+
+\[
+\boxed{\pi_1:\mathbf{Top}_*\to \mathbf{Grp}.}
+\]
+
+<p>恒等映射诱导恒等同态，因为</p>
+
+\[
+\pi_1(\operatorname{id}_X)([\gamma])=[\operatorname{id}_X\circ\gamma]=[\gamma].
+\]
+
+<p>复合也完全相容。若</p>
+
+\[
+(X,x_0)\xrightarrow{f}(Y,y_0)\xrightarrow{g}(Z,z_0),
+\]
+
+<p>则</p>
+
+\[
+\pi_1(g\circ f)([\gamma])
+=[(g\circ f)\circ\gamma]
+=[g\circ(f\circ\gamma)]
+=\pi_1(g)(\pi_1(f)([\gamma])).
+\]
+
+<p>于是</p>
+
+\[
+\pi_1(g\circ f)=\pi_1(g)\circ \pi_1(f).
+\]
+
+<p><strong>例 3.7.1。</strong>对圆周映射</p>
+
+\[
+f_m:S^1\to S^1,\qquad f_m(z)=z^m,
+\]
+
+<p>计算 \(\pi_1(f_m)\)。</p>
+
+<p>解。取基点 \(1\in S^1\)，并以标准回路</p>
+
+\[
+\gamma(t)=e^{2\pi i t}
+\]
+
+<p>代表 \(\pi_1(S^1,1)\cong\mathbb Z\) 的生成元。则</p>
+
+\[
+(f_m\circ\gamma)(t)=e^{2\pi i mt},
+\]
+
+<p>它恰好绕圆 \(m\) 圈，所以</p>
+
+\[
+\pi_1(f_m)(1)=m.
+\]
+
+<p>因此在 \(\mathbb Z\) 的语言里，\(\pi_1(f_m)\) 就是乘 \(m\) 的映射：</p>
+
+\[
+\pi_1(f_m):\mathbb Z\to\mathbb Z,\qquad n\mapsto mn.
+\]
+
+<p>若再与 \(f_n\) 复合，则</p>
+
+\[
+f_m\circ f_n=f_{mn},
+\]
+
+<p>于是</p>
+
+\[
+\pi_1(f_m\circ f_n)=\pi_1(f_{mn})=(\times mn)
+=(\times m)\circ(\times n)
+=\pi_1(f_m)\circ\pi_1(f_n).
+\]
+
+<p>所以函子性在这个例子里不是抽象公理，而是肉眼可算的事实。</p>
+
+<p>同样的故事在同调里再来一次，只不过目标范畴从 \(\mathbf{Grp}\) 变成了 \(\mathbf{Ab}\)：</p>
+
+\[
+H_n:\mathbf{Top}\to\mathbf{Ab}.
+\]
+
+<p>到了 <a href="../代数拓扑/ch12.html">《代数拓扑读本》第 12 章</a>，Mayer–Vietoris 序列之所以能沿连续映射形成交换图，靠的正是这种函子性。基本群给你的是第一份非交换样本；同调则把函子语言推进到一整套长正合列机器。</p>
+
+<h2 id="sec3-8">3.8 函子的合成：翻译器也能串联</h2>
+
+<p>函子之所以好用，还有一个根本原因：它们自己可以复合。若</p>
+
+\[
+F:\mathcal C\to\mathcal D,\qquad G:\mathcal D\to\mathcal E
+\]
+
+<p>是两个协变函子，那么定义</p>
+
+\[
+(G\circ F)(A)=G(F(A)),
+\qquad
+(G\circ F)(f)=G(F(f)).
+\]
+
+<p>这仍然是一个函子。因为</p>
+
+\[
+(G\circ F)(g\circ f)=G(F(g\circ f))=G(F(g)\circ F(f))=G(F(g))\circ G(F(f)),
+\]
+
+<p>即</p>
+
+\[
+(G\circ F)(g\circ f)=(G\circ F)(g)\circ (G\circ F)(f).
+\]
+
+<p>恒等也类似：</p>
+
+\[
+(G\circ F)(\operatorname{id}_A)=G(\operatorname{id}_{F(A)})=\operatorname{id}_{G(F(A))}.
+\]
+
+\[
+\boxed{F:\mathcal C\to\mathcal D,\ G:\mathcal D\to\mathcal E\quad\Longrightarrow\quad G\circ F:\mathcal C\to\mathcal E.}
+\]
+
+<p>这件事听上去平淡，却是后面所有高层结构能工作的基础。因为很多真正有力的构造，都是把几道翻译串起来：先忘掉，再自由生成；先取某个 \(\operatorname{Hom}\)-探针，再用 Yoneda 识别对象；先取链复形，再取同调，再沿长正合列比较。若函子不能复合，现代数学里大量的“从一个世界走到另一个世界再走到第三个世界”的交通都会中断。</p>
+
+<p>你甚至可以把本章前面的例子排成一串看。比如</p>
+
+\[
+\mathbf{Top}_*\xrightarrow{\pi_1}\mathbf{Grp}\xrightarrow{U}\mathbf{Set}
+\]
+
+<p>把一个带基点空间先送到它的基本群，再忘成底层集合；又比如</p>
+
+\[
+\mathbf{Set}\xrightarrow{F}\mathbf{Grp}\xrightarrow{U}\mathbf{Set}
+\]
+
+<p>把一个集合先变成自由群，再忘回集合。后者当然不会回到原集合本身，而会回到“由原集合字母构成的一切约化词”的集合。这种“走一圈回来对象变了，但变法完全可控”的现象，正是伴随与单子将在后面系统研究的内容。</p>
+
+<p>把这一章收成三句话。第一，函子不是对象列表，而是尊重复合与恒等的结构翻译器，所以它能把整张箭头网络从一个范畴搬到另一个范畴。第二，忘掉、自由、\(\operatorname{Hom}(A,-)\)、\(BG\to\mathbf{Vect}_k\)、\(\pi_1\) 这些看似分散的构造，其实都只是函子的不同面孔。第三，函子可以合成，因此现代数学里那些跨学科的大型机器，往往都不是一步到位，而是许多结构翻译器首尾相接的结果。</p>

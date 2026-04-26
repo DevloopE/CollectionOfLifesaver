@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 2 章 范畴的定义与例子 — 普林斯顿范畴论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论：为什么需要范畴论</a><a href="ch3.html">下一章 · 第 3 章 函子 →</a></nav>
+<h1 id="ch2">第 2 章 范畴的定义与例子</h1>
+
+<p>上一章我们一直在强调一句话：范畴论不是在发明新对象，而是在把“对象连同它们之间的保结构映射”一起看。现在该把这句话精确化了。你很快会发现，范畴的正式定义其实不长；真正需要时间消化的，从来不是那几条公理本身，而是你要学会在很多不同场景里认出“对象是谁、箭头是谁、复合是什么”。</p>
+
+<p>也正因为如此，这一章的重心不会只放在定义上，而会放在例子上。你需要看到 \(\mathbf{Set}\)、\(\mathbf{Grp}\)、\(\mathbf{Ab}\)、\(\mathbf{Ring}\)、\(\mathbf{Top}\)、\(\mathbf{Vect}_k\)、\(R\text{-}\mathbf{Mod}\)、\(\mathbf{Sch}\)、\(\mathbf{Mfld}\) 都属于同一个句法；你也需要看到离散范畴、单对象范畴、偏序集范畴这些看似极简的玩具，其实把很多后续思想提前压缩成了最短模型。最后，你还要开始适应一个重要事实：在范畴里，“单态射”“满态射”“同构”虽然来自熟悉经验，却并不等同于“单射”“满射”“相等”。</p>
+
+<p>读这一章时，一个很有效的习惯是不断问自己：如果我把对象和箭头改了，哪些定义还原样成立？这个问题看似朴素，却正是范畴论训练你的地方。它逼你从元素层面退后半步，去看那些真正只依赖于复合和恒等箭头的结构。</p>
+
+<h2 id="sec2-1">2.1 定义：数据是什么，公理又是什么</h2>
+
+<p>一个范畴 \(\mathcal C\) 由两层东西组成。第一层是数据：对象、对象之间的态射、态射的复合、每个对象的恒等态射。第二层是公理：复合必须结合，恒等态射必须像单位元那样工作。写成公式，就是下面这张极短的清单。</p>
+
+\[
+\operatorname{Ob}(\mathcal C),\qquad
+\operatorname{Hom}_{\mathcal C}(A,B),\qquad
+\circ,\qquad
+\operatorname{id}_A.
+\]
+
+<p style="background:var(--boxed-bg); border-left:4px solid var(--accent); padding:0.8em 1em; margin:1.5em 0;"><strong>定义。</strong>一个范畴 \(\mathcal C\) 包含：<br>
+一类对象 \(\operatorname{Ob}(\mathcal C)\)；<br>
+对每对对象 \(A,B\)，一个态射集合 \(\operatorname{Hom}_{\mathcal C}(A,B)\)；<br>
+对每个对象 \(A\)，一个恒等态射 \(\operatorname{id}_A\in \operatorname{Hom}_{\mathcal C}(A,A)\)；<br>
+对每三个对象 \(A,B,C\)，一个复合法则
+\[
+\operatorname{Hom}(B,C)\times \operatorname{Hom}(A,B)\to \operatorname{Hom}(A,C),\qquad (g,f)\mapsto g\circ f.
+\]
+这些数据满足结合律与单位律。</p>
+
+\[
+\boxed{h\circ(g\circ f)=(h\circ g)\circ f,\qquad \operatorname{id}_B\circ f=f,\qquad g\circ \operatorname{id}_B=g.}
+\]
+
+<p>这里有两点先说明。第一，对象的集合通常并不要求真的是集合，往往只要求是一类；这就是为什么记号常写作“对象类”。第二，\(\operatorname{Hom}_{\mathcal C}(A,B)\) 在这本书里默认都是集合；若以后遇到更大的情形，再到附录里讨论“局部小范畴”之类的技术。</p>
+
+<p>这个定义之所以看起来有点“过分节省”，正是它的力量所在。你会发现它根本不要求对象有元素，也不要求态射是函数，更不要求有加法、乘法、拓扑或度量。它只问：对象之间有没有箭头？箭头能不能接起来？有没有什么都不做的单位箭头？这是一个几乎瘦到只剩骨架的定义。</p>
+
+<p><strong>例 2.1.1。</strong>验证 \(\mathbf{Set}\) 构成一个范畴。</p>
+
+<p>解。对象取所有集合。对两个集合 \(A,B\)，定义</p>
+
+\[
+\operatorname{Hom}_{\mathbf{Set}}(A,B)=\{f:A\to B\mid f\text{ 是函数}\}.
+\]
+
+<p>复合就是普通函数复合。给定</p>
+
+\[
+f:A\to B,\qquad g:B\to C,\qquad h:C\to D,
+\]
+
+<p>有</p>
+
+\[
+h\circ(g\circ f)=(h\circ g)\circ f
+\]
+
+<p>因为两边对任意 \(a\in A\) 的取值都等于 \(h(g(f(a)))\)。每个集合 \(A\) 的恒等态射就是恒等函数</p>
+
+\[
+\operatorname{id}_A:A\to A,\qquad a\mapsto a.
+\]
+
+<p>显然</p>
+
+\[
+\operatorname{id}_B\circ f=f,\qquad g\circ \operatorname{id}_B=g.
+\]
+
+<p>所以 \(\mathbf{Set}\) 满足范畴公理。这是所有例子的母模型，因为后面很多别的范畴都只是把“函数”换成了别的保结构映射。</p>
+
+<h2 id="sec2-2">2.2 你最熟悉的范畴：Set、Grp、Ab、Ring、Top、Vect\(_k\)、Mod\(_R\)</h2>
+
+<p>一旦 \(\mathbf{Set}\) 的模型看明白了，很多别的范畴几乎是按同一模板复制出来的。对象是谁，态射就取对应的保结构映射。</p>
+
+\[
+\mathbf{Grp}:\ \text{对象是群，态射是群同态};
+\qquad
+\mathbf{Ab}:\ \text{对象是阿贝尔群，态射仍是群同态}.
+\]
+
+\[
+\mathbf{Ring}:\ \text{对象是含幺环，态射是保 }1\text{ 的环同态};
+\qquad
+\mathbf{Top}:\ \text{对象是拓扑空间，态射是连续映射}.
+\]
+
+\[
+\mathbf{Vect}_k:\ \text{对象是 }k\text{-向量空间，态射是 }k\text{-线性映射};
+\qquad
+R\text{-}\mathbf{Mod}:\ \text{对象是左 }R\text{-模，态射是模同态}.
+\]
+
+<p>这六个例子就是后面所有抽象定义的主要实验室。你若来自 <a href="../线性代数/ch10.html">《线性代数读本》第 10 章</a>，\(\mathbf{Vect}_k\) 里的箭头一点都不陌生；你若来自 <a href="../代数拓扑/ch2.html">《代数拓扑读本》第 2 章</a>，\(\mathbf{Top}\) 里的连续映射已经是第一公民；你若来自 <a href="../表示论/ch2.html">《表示论读本》第 2 章</a>，群同态进 \(GL(V)\) 也只是 \(\mathbf{Grp}\) 里的箭头被送到 \(\mathbf{Vect}_k\) 里而已。</p>
+
+<p>值得留意的是，这些范畴的复合都极其自然。两个群同态复合后仍是群同态，两个线性映射复合后仍是线性映射，两个连续映射复合后仍是连续映射。也就是说，范畴公理之所以经常自动成立，是因为“保结构映射”本来就该在复合下稳定。</p>
+
+<p><strong>例 2.2.1。</strong>说明 \(\operatorname{Hom}_{\mathbf{Vect}_{\mathbb R}}(\mathbb R^2,\mathbb R^3)\) 可以被具体看成所有 \(3\times 2\) 实矩阵。</p>
+
+<p>解。给定线性映射 \(T:\mathbb R^2\to \mathbb R^3\)，由 <a href="../线性代数/ch11.html">《线性代数读本》第 11 章</a> 你知道，一旦选定标准基，它就由矩阵唯一决定：</p>
+
+\[
+T(x)=Ax,\qquad A\in M_{3\times 2}(\mathbb R).
+\]
+
+<p>反过来，每个 \(3\times2\) 矩阵 \(A\) 也定义一个线性映射。于是</p>
+
+\[
+\operatorname{Hom}_{\mathbf{Vect}_{\mathbb R}}(\mathbb R^2,\mathbb R^3)\cong M_{3\times2}(\mathbb R).
+\]
+
+<p>若再给一个线性映射 \(S:\mathbb R^3\to\mathbb R^4\)，对应矩阵 \(B\in M_{4\times3}(\mathbb R)\)，则复合 \(S\circ T\) 对应的正是矩阵乘法</p>
+
+\[
+B A\in M_{4\times 2}(\mathbb R).
+\]
+
+<p>所以“矩阵乘法为什么长这样”这个问题，从范畴论眼光看，其实只是“线性映射复合在坐标下怎样写出来”。</p>
+
+<h2 id="sec2-3">2.3 再大一点的舞台：Sch 与 Mfld</h2>
+
+<p>范畴绝不只属于初等代数。现代几何里最典型的两个大范畴，是概形范畴 \(\mathbf{Sch}\) 与流形范畴 \(\mathbf{Mfld}\)。前者的对象是 schemes，态射是 scheme morphisms；后者的对象是光滑流形，态射是光滑映射。它们的共同点，在于都不是“拿一个集合再加点额外结构”那么简单，却仍然完美适配范畴语言。</p>
+
+\[
+\mathbf{Sch}:\ \text{对象是概形，态射是概形态射};
+\qquad
+\mathbf{Mfld}:\ \text{对象是光滑流形，态射是光滑映射}.
+\]
+
+<p>为什么这很重要？因为现代数学里很多构造根本不是靠“元素计算”被理解，而是靠映射性质被理解。概形上的纤维积、模空间的可表性、流形上的积与拉回丛，这些都天然属于“先问箭头如何组织，再问对象长什么样”的世界。换句话说，范畴论不是给初等例子做装饰，而是给高阶例子提供母语。</p>
+
+<p>你在本书前几章暂时还不会深挖 \(\mathbf{Sch}\) 与 \(\mathbf{Mfld}\) 的内部细节；但从现在开始记住它们的名字是很有帮助的。它们提醒你：范畴定义虽然短，却足够宽，能够容纳从集合到几何的大量世界。</p>
+
+<h2 id="sec2-4">2.4 反范畴：把所有箭头全部倒过来</h2>
+
+<p>很多构造天然会把方向反过来。预层如此，上同调如此，拉回与逆像往往也如此。为了不每次都单独说“方向反着来”，范畴论把这件事一次性打包成反范畴。</p>
+
+<p>给定范畴 \(\mathcal C\)，它的反范畴 \(\mathcal C^{op}\) 有同样的对象，但每条箭头全部反向：</p>
+
+\[
+\operatorname{Ob}(\mathcal C^{op})=\operatorname{Ob}(\mathcal C),
+\qquad
+\operatorname{Hom}_{\mathcal C^{op}}(A,B)=\operatorname{Hom}_{\mathcal C}(B,A).
+\]
+
+<p>复合要特别小心顺序。在 \(\mathcal C^{op}\) 里，若</p>
+
+\[
+f^{op}:A\to B,\qquad g^{op}:B\to C,
+\]
+
+<p>它们对应到 \(\mathcal C\) 中其实是</p>
+
+\[
+f:B\to A,\qquad g:C\to B.
+\]
+
+<p>所以在反范畴里的复合定义为</p>
+
+\[
+\boxed{g^{op}\circ_{\mathcal C^{op}} f^{op}=(f\circ_{\mathcal C} g)^{op}.}
+\]
+
+<p><strong>例 2.4.1。</strong>把一个拓扑空间 \(X\) 的开集按包含关系看成范畴，再看它的反范畴。</p>
+
+<p>解。先定义 \(\operatorname{Open}(X)\)：对象是 \(X\) 的开集；若 \(U\subset V\)，就放一条唯一箭头</p>
+
+\[
+U\to V.
+\]
+
+<p>这其实是一个偏序范畴，下一节会系统解释。在它的反范畴 \(\operatorname{Open}(X)^{op}\) 中，箭头方向反过来，所以 \(U\subset V\) 时有唯一箭头</p>
+
+\[
+V\to U.
+\]
+
+<p>这恰好和限制映射的方向一致：大开集上的函数、截面或局部对象，可以限制到小开集上。于是预层 \(\mathcal F\) 最自然地不是 \(\operatorname{Open}(X)\to\mathbf{Set}\)，而是</p>
+
+\[
+\mathcal F:\operatorname{Open}(X)^{op}\to\mathbf{Set}.
+\]
+
+<p>所以反范畴并不是纯记号游戏，而是把“方向反着来的函子”变回普通协变函子的标准手段。</p>
+
+<h2 id="sec2-5">2.5 离散范畴、单对象范畴与等价关系范畴</h2>
+
+<p>范畴有时可以非常瘦。瘦到只剩对象，没有非平凡箭头；也可以瘦到只剩一个对象，所有信息全装在它的自同态里。这些极端例子非常值钱，因为后面很多大概念在它们身上会变得异常透明。</p>
+
+<p>先看离散范畴。给定一个集合 \(S\)，定义范畴 \(\operatorname{Disc}(S)\) 为：对象是 \(S\) 的元素，而</p>
+
+\[
+\operatorname{Hom}(x,y)=
+\begin{cases}
+\{\operatorname{id}_x\},&x=y,\\
+\varnothing,&x\neq y.
+\end{cases}
+\]
+
+<p>也就是说，除了恒等箭头外什么都没有。离散范畴提醒你：范畴不一定富于结构，有时它只是“把一堆对象放在一起”，完全不允许彼此交流。</p>
+
+<p>再看单对象范畴。给定一个幺半群 \(M\)，造一个只有一个对象 \(*\) 的范畴，定义</p>
+
+\[
+\operatorname{Hom}(*,*)=M,
+\]
+
+<p>而态射复合就用 \(M\) 的乘法。结合律与单位律恰好对应幺半群公理。所以</p>
+
+\[
+\boxed{\text{幺半群 }M\;\Longleftrightarrow\;\text{一个单对象范畴}.}
+\]
+
+<p>群只是其中每条箭头都可逆的特殊情形。</p>
+
+<p><strong>例 2.5.1。</strong>把循环群 \(C_3=\{e,r,r^2\}\) 看成单对象范畴。</p>
+
+<p>解。定义唯一对象为 \(*\)，并令</p>
+
+\[
+\operatorname{Hom}(*,*)=\{e,r,r^2\}.
+\]
+
+<p>复合由群乘法决定，比如</p>
+
+\[
+r\circ r=r^2,\qquad r^2\circ r=e,\qquad e\circ r=r.
+\]
+
+<p>由于群乘法满足结合律，范畴复合也满足结合律；单位元 \(e\) 正是恒等箭头。并且每条箭头都有逆：</p>
+
+\[
+r^{-1}=r^2,\qquad (r^2)^{-1}=r.
+\]
+
+<p>所以“群就是每条箭头都可逆的单对象范畴”。这个观点对第 3 章特别重要，因为表示 \(G\to GL(V)\) 很快就会被重写成函子 \(BG\to \mathbf{Vect}_k\)。</p>
+
+<p>还有一种很容易被忽略、但很能训练眼力的模型，是由等价关系得到的范畴。设 \(X\) 上有等价关系 \(\sim\)。可以定义一个范畴：对象是 \(X\) 的元素，而若 \(x\sim y\)，就放一条唯一箭头 \(x\to y\)；若 \(x\not\sim y\)，就没有箭头。等价关系的自反、对称、传递恰好保证恒等、可逆、可复合。这类范畴其实是“薄群胚”的最简单版本。</p>
+
+\[
+x\sim y,\ y\sim z\ \Longrightarrow\ x\sim z
+\]
+
+<p>在这里正对应着箭头复合的存在性。你已经可以感到，范畴论很擅长把关系结构与代数结构压缩成同一种箭头语法。</p>
+
+<h2 id="sec2-6">2.6 偏序集作为范畴</h2>
+
+<p>再把视角向另一头推。若一个范畴里任意两个对象之间至多有一条箭头，它就被称为薄范畴。偏序集是这种范畴最重要的来源。设 \((P,\le)\) 是偏序集，定义范畴 \(\mathcal P\) 为：</p>
+
+\[
+\operatorname{Ob}(\mathcal P)=P,
+\qquad
+\operatorname{Hom}_{\mathcal P}(x,y)=
+\begin{cases}
+\{*\},&x\le y,\\
+\varnothing,&x\not\le y.
+\end{cases}
+\]
+
+<p>反身性 \(x\le x\) 给出恒等箭头，传递性 \(x\le y\le z\Rightarrow x\le z\) 给出复合，而反对称性则控制什么时候会出现同构。</p>
+
+<p><strong>例 2.6.1。</strong>取正整数集合 \(\mathbb N_{>0}\)，偏序用整除关系 \(m\mid n\)。验证它构成范畴，并找出其中的积直觉。</p>
+
+<p>解。对象是正整数。若 \(m\mid n\)，就有唯一箭头 \(m\to n\)。比如</p>
+
+\[
+2\to 6,\qquad 6\to 30
+\]
+
+<p>都存在，因为 \(2\mid 6\) 且 \(6\mid 30\)。复合对应整除关系的传递性：</p>
+
+\[
+2\mid 6,\ 6\mid 30\ \Longrightarrow\ 2\mid 30,
+\]
+
+<p>所以存在复合箭头</p>
+
+\[
+2\to 30.
+\]
+
+<p>恒等箭头来自 \(m\mid m\)。在这个范畴里，两个对象的“公共下界”与“公共上界”已经在暗示以后极限与余极限的味道；而最大公因数与最小公倍数，正是这类偏序范畴里极其典型的通用对象。</p>
+
+<p>更重要的是，这个例子说明：范畴里的箭头根本不必是具体函数。它们可以只是“某种关系成立”的记号。一旦你接受了这点，许多抽象定义就会顺很多。</p>
+
+<h2 id="sec2-7">2.7 同构、单态射与满态射</h2>
+
+<p>在任何范畴里，最先要学会的三个箭头词是：同构、单态射、满态射。它们都只用复合语言定义，因此不会依赖元素描述。</p>
+
+<p style="background:var(--boxed-bg); border-left:4px solid var(--accent); padding:0.8em 1em; margin:1.5em 0;"><strong>定义。</strong>在范畴 \(\mathcal C\) 中：<br>
+态射 \(f:A\to B\) 是<strong>同构</strong>，若存在 \(g:B\to A\) 使
+\[
+g\circ f=\operatorname{id}_A,\qquad f\circ g=\operatorname{id}_B.
+\]
+态射 \(f:A\to B\) 是<strong>单态射</strong>，若对任意对象 \(X\) 及任意 \(u,v:X\to A\)，
+\[
+f\circ u=f\circ v\Rightarrow u=v.
+\]
+态射 \(f:A\to B\) 是<strong>满态射</strong>，若对任意对象 \(Y\) 及任意 \(r,s:B\to Y\)，
+\[
+r\circ f=s\circ f\Rightarrow r=s.
+\]</p>
+
+\[
+\boxed{\text{iso}=\text{可逆},\qquad \text{mono}=\text{左可消},\qquad \text{epi}=\text{右可消}.}
+\]
+
+<p>在 \(\mathbf{Set}\) 中，这三个词分别对应双射、单射、满射；但一离开集合范畴，它们就不一定还是你熟悉的那三个元素级概念。范畴论故意只保留“可消性”和“可逆性”这种箭头级信息，因此定义适用范围极广。</p>
+
+<p><strong>例 2.7.1。</strong>证明在 \(\mathbf{Set}\) 中，单态射恰好是单射，满态射恰好是满射。</p>
+
+<p>解。先证“单射 \(\Rightarrow\) 单态射”。设 \(f:A\to B\) 单射，且 \(u,v:X\to A\) 满足 \(f\circ u=f\circ v\)。对任意 \(x\in X\)，有</p>
+
+\[
+f(u(x))=(f\circ u)(x)=(f\circ v)(x)=f(v(x)).
+\]
+
+<p>由 \(f\) 单射，得 \(u(x)=v(x)\)。故 \(u=v\)。所以 \(f\) 是单态射。</p>
+
+<p>反过来，设 \(f\) 是单态射，欲证其单射。若 \(f(a_1)=f(a_2)\)，取单点集合 \(\{*\}\)，定义</p>
+
+\[
+u(* )=a_1,\qquad v(* )=a_2.
+\]
+
+<p>则 \(f\circ u=f\circ v\)。由单态射条件得 \(u=v\)，从而 \(a_1=a_2\)。所以 \(f\) 单射。</p>
+
+<p>再证“满射 \(\Rightarrow\) 满态射”。设 \(f:A\to B\) 满射，且 \(r,s:B\to Y\) 满足 \(r\circ f=s\circ f\)。任取 \(b\in B\)，由满射性可取 \(a\in A\) 使 \(f(a)=b\)。于是</p>
+
+\[
+r(b)=r(f(a))=(r\circ f)(a)=(s\circ f)(a)=s(f(a))=s(b).
+\]
+
+<p>所以 \(r=s\)，故 \(f\) 为满态射。</p>
+
+<p>反过来，设 \(f\) 是满态射但不是满射。取某个 \(b_0\in B\setminus f(A)\)。定义两个函数</p>
+
+\[
+r,s:B\to \{0,1\}
+\]
+
+<p>为</p>
+
+\[
+r(b)=0\quad(\forall b\in B),
+\]
+
+\[
+s(b)=
+\begin{cases}
+1,&b=b_0,\\
+0,&b\neq b_0.
+\end{cases}
+\]
+
+<p>由于 \(b_0\) 不在 \(f(A)\) 中，所以对所有 \(a\in A\)，都有 \(s(f(a))=0=r(f(a))\)。于是</p>
+
+\[
+r\circ f=s\circ f.
+\]
+
+<p>但 \(r\neq s\)，这与 \(f\) 为满态射矛盾。所以 \(f\) 必为满射。</p>
+
+<p>所以在 \(\mathbf{Set}\) 里，单态射与满态射确实退化成熟悉的单射和满射。但这种幸运并不会到处持续。</p>
+
+<p><strong>例 2.7.2。</strong>在 \(\mathbf{Ring}\) 中，包含映射</p>
+
+\[
+i:\mathbb Z\hookrightarrow \mathbb Q
+\]
+
+<p>是满态射，但不是满射。</p>
+
+<p>解。它不是满射这一点显然，因为 \(\frac12\notin i(\mathbb Z)\)。现在证它是满态射。设有两个环同态</p>
+
+\[
+f,g:\mathbb Q\to R
+\]
+
+<p>满足</p>
+
+\[
+f\circ i=g\circ i.
+\]
+
+<p>任取有理数 \(\frac mn\in\mathbb Q\)（其中 \(n\neq0\)）。因为 \(f\) 和 \(g\) 都是环同态，所以</p>
+
+\[
+f\!\left(\frac mn\right)=f(m)\,f(n)^{-1},\qquad
+g\!\left(\frac mn\right)=g(m)\,g(n)^{-1}.
+\]
+
+<p>而 \(f\circ i=g\circ i\) 意味着它们在每个整数上相等，于是</p>
+
+\[
+f(m)=g(m),\qquad f(n)=g(n).
+\]
+
+<p>因此</p>
+
+\[
+f\!\left(\frac mn\right)=g\!\left(\frac mn\right).
+\]
+
+<p>对任意 \(\frac mn\) 都成立，所以 \(f=g\)。这就证明了 \(i\) 是满态射。</p>
+
+<p>这个例子很重要，因为它提醒你：在一般范畴里，epi 并不等同于“像是整个目标”。范畴论只关心右可消，而右可消未必要通过元素满射实现。</p>
+
+<h2 id="sec2-8">2.8 这些例子真正训练你的是什么</h2>
+
+<p>读到这里，定义本身其实已经结束了。剩下的工作是训练眼睛。你要开始习惯于：碰到一个数学世界，第一反应不是先问“它里面有什么元素”，而是先问“对象是谁、箭头是谁、箭头如何复合、哪些箭头可逆”。只要这四件事答清楚，一个范畴往往就站住了。</p>
+
+<p>你也应该已经看见，不同例子之间真正共享的不是具体内容，而是语法。无论是集合与函数、群与同态、向量空间与线性映射，还是偏序集与关系箭头、幺半群与单对象范畴，它们都只是在同一张空白表格里填了不同答案。范畴论强迫你把这些答案并排比较，于是很多原本只在单科里才显眼的现象，会忽然变成普遍模式。</p>
+
+<p>最后，单态射、满态射与同构这三个词给你上的第一课也很关键：范畴里真正可靠的定义必须只用箭头语言说出来。一旦如此，它们才有资格跨学科流动。这个原则到了下一章会立刻升级，因为函子的定义同样只用对象、箭头、复合和恒等，就能把“一个世界怎样系统翻译到另一个世界”说得完全精确。</p>
+
+<p>把这一章收成三句话。第一，范畴的正式定义极短，但它足够宽，能同时容纳代数、拓扑、几何与顺序结构。第二，离散范畴、单对象范畴、偏序范畴这些极简模型并不是玩具，而是后面很多一般理论的缩影。第三，单态射、满态射、同构之所以重要，正是因为它们只用箭头语言定义，因此能在所有范畴里稳定生效，而不被元素直觉绑死。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论：为什么需要范畴论</a><a href="ch3.html">下一章 · 第 3 章 函子 →</a></nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 Yoneda 引理 — 普林斯顿范畴论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 函子范畴 \([C,D]\)</a><a href="ch10.html">下一章 · 第 10 章 表示函子 →</a></nav>
+<h1 id="ch9">第 9 章 Yoneda 引理</h1>
+
+<p>如果说前一章告诉你“函子范畴是现代数学最自然的工作空间之一”，那么这一章要告诉你的就是：<strong>原来的对象根本不该老老实实待在原范畴里，它们应该被送进某个函子范畴里被观察。</strong> 这句话听起来像是要开启抽象模式，但它的真正意思非常朴素。一个对象 \(A\) 到底是什么？在范畴论里，我们越来越少把它理解成“一团内部元素”，而越来越多把它理解成“别的对象如何映到它、它又如何映到别的对象”。换句话说，对象是由它的箭头关系刻画的。</p>
+
+<p>Yoneda 引理把这件事说到了一个让人几乎不敢相信的程度：如果你知道所有从 \(A\) 出发的箭头怎样被某个函子 \(F\) 读取，你其实就等价于知道了 \(F(A)\) 的一个元素；反过来，给出 \(F(A)\) 的一个元素，就自动给出一整个自然变换。那种“整族自然变换”和“单个元素”之间的一一对应，就是 Yoneda 的核心。它之所以被无数数学家反复称为范畴论的心脏，不是因为陈述多么豪华，而是因为它让“通过探针认识对象”这件事彻底精确化了。</p>
+
+<p>你在<a href="../代数几何/appB.html">《代数几何读本》附录 B</a>已经预热过这层思路：概形往往不是通过它自己的点集，而是通过所有测试概形 \(S\) 对它的映入 \(\operatorname{Hom}(S,X)\) 来被识别；你在<a href="../代数拓扑/ch12.html">《代数拓扑读本》第 12 章</a>看到基本群是函子时，也已经接受了“不是对象孤零零地存在，而是对象对箭头的反应构成真正的数据”。Yoneda 引理把这种分散的经验收束成一个统一的结构定理。</p>
+
+<h2 id="sec9-1">9.1 表示函子是“探针记录器”</h2>
+
+<p>先固定一个局部约定。若 \(A\in C\)，记</p>
+
+\[
+h^A=\operatorname{Hom}_C(A,-)\colon C\to\mathrm{Set},
+\]
+
+<p>这是一个协变函子；对箭头 \(u\colon X\to Y\)，它把 \(f\colon A\to X\) 送到复合 \(u\circ f\colon A\to Y\)。这就是“从 \(A\) 出发去探测其他对象”的记录器。与之对偶的还有反变版本</p>
+
+\[
+h_A=\operatorname{Hom}_C(-,A)\colon C^{op}\to\mathrm{Set},
+\]
+
+<p>它记录“别的对象怎样探进 \(A\)”。这两个函子都叫表示函子，只是方向相反。为了先对应用户给定的陈述，我们先主讲协变版本 \(h^A\)，后面再顺手转到反变版本，因为 Yoneda 嵌入恰恰落在 \([C^{op},\mathrm{Set}]\) 中。</p>
+
+<p>为什么 \(\operatorname{Hom}(A,-)\) 值得特别看？因为它把对象 \(X\) 压成集合 \(\operatorname{Hom}(A,X)\)，也就是“所有以 \(A\) 为源的测试箭头”。如果你把 \(A\) 想成一个探针，那么 \(h^A(X)\) 就是 \(X\) 对这个探针的全部反应。换句话说，我们不是直接摸 \(X\) 的内部，而是拿 \(A\) 去敲它，看会产生哪些箭头。</p>
+
+<p>这层直觉在很多学科里都很自然。在线性代数里，拿 \(\mathbb R\) 去探一个向量空间 \(V\)，\(\operatorname{Hom}(\mathbb R,V)\) 基本就等于 \(V\) 本身，因为线性映射由 \(1\) 的像决定；在群论里，拿 \(\mathbb Z\) 去探一个群 \(G\)，\(\operatorname{Hom}(\mathbb Z,G)\) 也基本等于 \(G\)，因为群同态由 \(1\) 的像决定；在代数几何里，拿各种 \(\operatorname{Spec}R\) 去探一个概形 \(X\)，\(\operatorname{Hom}(\operatorname{Spec}R,X)\) 则记录了 \(X\) 的 \(R\)-点。Yoneda 说的，正是这种“探针读数”并非辅助信息，而是对象的核心信息。</p>
+
+<h3 id="sec9-1-1">先算一个一眼就懂的例子：\(\operatorname{Hom}(\{*\},-)\)</h3>
+
+<p>在 \(C=\mathrm{Set}\) 中，取 \(A=\{*\}\) 为单点集。对任何集合 \(X\)，\(\operatorname{Hom}(\{*\},X)\) 就是从单点到 \(X\) 的函数集合。这样的函数由唯一点 \(*\) 的像决定，所以</p>
+
+\[
+\operatorname{Hom}(\{*\},X)\cong X.
+\]
+
+<p>更具体地，给定 \(x\in X\)，对应函数 \(f_x\colon \{*\}\to X\) 满足 \(f_x(*)=x\)。因此单点集真的是最原始的“元素探针”。你在集合论里说“元素 \(x\in X\)”，翻译成范畴论语言就是“从终对象 \(\{*\}\) 到 \(X\) 的一个箭头”。这看似只是改口，其实非常关键：一旦离开 Set，元素未必存在，但“广义元素” \(A\to X\) 始终存在。Yoneda 的视野从一开始就不是传统元素，而是各种广义元素。</p>
+
+<h2 id="sec9-2">9.2 Yoneda 引理的完整陈述</h2>
+
+<p>现在给出正式陈述。设 \(C\) 是局部小范畴，\(A\in C\)，\(F\colon C\to\mathrm{Set}\) 是任意协变函子。那么有自然双射</p>
+
+\[
+\boxed{\operatorname{Nat}(h^A,F)\cong F(A).}
+\]
+
+<p>这里左边是所有自然变换 \(\alpha\colon h^A\Rightarrow F\) 的集合。右边只是一个普通集合 \(F(A)\)。这句话的震撼之处在于：左边看上去是一整族对象上的数据，每个对象 \(X\) 都要给一张函数</p>
+
+\[
+\alpha_X\colon \operatorname{Hom}(A,X)\to F(X),
+\]
+
+<p>并且还得对每条箭头 \(u\colon X\to Y\) 满足自然性；右边却只是 \(F(A)\) 的一个元素。Yoneda 说这两者严格等价，而且等价是自然的。也就是说，整套兼容数据完全由在 \(A\) 上取到的一个值控制。</p>
+
+<p>同样地，对反变函子 \(P\colon C^{op}\to\mathrm{Set}\)，也有对偶版本</p>
+
+\[
+\operatorname{Nat}(h_A,P)\cong P(A).
+\]
+
+<p>下一节我们先证明协变版本。证明并不长，但极漂亮，因为它完全不靠技巧，只靠你肯不肯盯住恒等态射 \(1_A\)。这又是范畴论一个很常见的场景：真正的控制信息，不藏在复杂的图里，恰恰藏在最朴素的恒等箭头身上。</p>
+
+<p>在动手证明前，先把直觉说透。给一个自然变换 \(\alpha\colon h^A\Rightarrow F\)，你完全可以先问：它在对象 \(A\) 上把恒等态射 \(1_A\in h^A(A)\) 送到哪里？得到一个元素</p>
+
+\[
+\alpha_A(1_A)\in F(A).
+\]
+
+<p>Yoneda 说，这个元素其实就是全部自然变换的“种子”。因为对任意 \(f\colon A\to X\)，自然性迫使 \(\alpha_X(f)\) 必须等于 \(F(f)\bigl(\alpha_A(1_A)\bigr)\)。也就是说，一旦你知道了 \(\alpha_A(1_A)\)，所有别的分量就都被推出来了。这是整个证明的灵魂。</p>
+
+<h2 id="sec9-3">9.3 从自然变换到元素：\(\Phi(\alpha)=\alpha_A(1_A)\)</h2>
+
+<p>先定义第一张映射：</p>
+
+\[
+\Phi\colon \operatorname{Nat}(h^A,F)\to F(A),\qquad
+\Phi(\alpha)=\alpha_A(1_A).
+\]
+
+<p>这一步当然容易写，但它为什么是正确的方向？因为 \(1_A\colon A\to A\) 是 \(h^A(A)\) 中最原始的箭头，而任意 \(f\colon A\to X\) 都可分解成</p>
+
+\[
+f=f\circ 1_A.
+\]
+
+<p>于是自然性方块</p>
+
+\[
+\begin{array}{ccc}
+\operatorname{Hom}(A,A) & \xrightarrow{\alpha_A} & F(A)\\
+\downarrow{h^A(f)} & & \downarrow{F(f)}\\
+\operatorname{Hom}(A,X) & \xrightarrow{\alpha_X} & F(X)
+\end{array}
+\]
+
+<p>一旦作用在元素 \(1_A\) 上，就立刻得到</p>
+
+\[
+\alpha_X(f)=F(f)\bigl(\alpha_A(1_A)\bigr).
+\]
+
+<p>这里左边用了 \(h^A(f)(1_A)=f\circ1_A=f\)。因此 \(\alpha\) 的任一分量、任一输入，都被 \(\alpha_A(1_A)\) 决定了。换句话说，\(\Phi\) 至少应该是单射，因为若两个自然变换 \(\alpha,\beta\) 满足</p>
+
+\[
+\alpha_A(1_A)=\beta_A(1_A),
+\]
+
+<p>那么对所有 \(f\colon A\to X\) 都有</p>
+
+\[
+\alpha_X(f)=F(f)\bigl(\alpha_A(1_A)\bigr)=F(f)\bigl(\beta_A(1_A)\bigr)=\beta_X(f).
+\]
+
+<p>所以 \(\alpha=\beta\)。这说明：在 Yoneda 里，恒等箭头不是个配角，而是完整数据的发生点。</p>
+
+<h3 id="sec9-3-1">在群范畴里算一次：为什么 \(\mathbb Z\) 真是“通用元素探针”</h3>
+
+<p>取 \(C=\mathrm{Grp}\)，\(A=\mathbb Z\)，\(F=U\colon \mathrm{Grp}\to\mathrm{Set}\) 为忘掉函子。Yoneda 说</p>
+
+\[
+\operatorname{Nat}\bigl(\operatorname{Hom}_{\mathrm{Grp}}(\mathbb Z,-),U\bigr)\cong U(\mathbb Z)=\mathbb Z.
+\]
+
+<p>也就是说，从“\(\mathbb Z\)-探针读数函子”到忘掉函子的自然变换，恰好由一个整数参数化。这个结论如果你直接看左边，会觉得离谱：一个自然变换似乎要对每个群 \(G\) 指定一张函数</p>
+
+\[
+\alpha_G\colon \operatorname{Hom}(\mathbb Z,G)\to U(G),
+\]
+
+<p>并且对每个群同态 \(u\colon G\to H\) 都自然。为什么最后只剩一个整数？</p>
+
+<p>原因正是上面说的恒等元原则。因为 \(\alpha\) 完全由</p>
+
+\[
+\alpha_{\mathbb Z}(1_{\mathbb Z})\in U(\mathbb Z)=\mathbb Z
+\]
+
+<p>决定。设这个整数是 \(n\)。那么对任意群同态 \(f\colon \mathbb Z\to G\)，必有</p>
+
+\[
+\alpha_G(f)=U(f)(n)=f(n).
+\]
+
+<p>所以整数 \(n\) 对应的自然变换，就是“把 \(f\) 送到 \(f(n)\)”。特别地，\(n=1\) 给出的自然变换是</p>
+
+\[
+f\longmapsto f(1),
+\]
+
+<p>它把一个由生成元像决定的同态，送到那个像本身。你在群论里熟悉的“\(\mathbb Z\) 是一个自由生成元的自由群”，此刻就被 Yoneda 精确翻译成了“自然操作由 \(\mathbb Z\) 中的一个元素控制”。</p>
+
+<h2 id="sec9-4">9.4 从元素回到自然变换：\(\Psi(x)\) 的构造与逆验证</h2>
+
+<p>现在做反方向。给定 \(x\in F(A)\)，定义一族映射</p>
+
+\[
+\Psi(x)_X\colon \operatorname{Hom}(A,X)\to F(X),\qquad
+\Psi(x)_X(f)=F(f)(x).
+\]
+
+<p>首先要检查 \(\Psi(x)\) 是自然变换。设 \(u\colon X\to Y\)。我们需要证明交换：</p>
+
+\[
+F(u)\bigl(\Psi(x)_X(f)\bigr)=\Psi(x)_Y(u\circ f).
+\]
+
+<p>但按定义，左边等于</p>
+
+\[
+F(u)\bigl(F(f)(x)\bigr)=F(u\circ f)(x),
+\]
+
+<p>而右边正是</p>
+
+\[
+\Psi(x)_Y(u\circ f)=F(u\circ f)(x).
+\]
+
+<p>所以自然性成立。这样我们得到第二张映射</p>
+
+\[
+\Psi\colon F(A)\to \operatorname{Nat}(h^A,F),\qquad x\mapsto \Psi(x).
+\]
+
+<p>接下来验证 \(\Phi\) 与 \(\Psi\) 互为逆。先算 \(\Phi(\Psi(x))\)：</p>
+
+\[
+\Phi(\Psi(x))=\Psi(x)_A(1_A)=F(1_A)(x)=x.
+\]
+
+<p>因为函子保单位，所以 \(F(1_A)=1_{F(A)}\)。再算 \(\Psi(\Phi(\alpha))\)。对任意 \(f\colon A\to X\)，有</p>
+
+\[
+\Psi(\Phi(\alpha))_X(f)
+=F(f)\bigl(\Phi(\alpha)\bigr)
+=F(f)\bigl(\alpha_A(1_A)\bigr).
+\]
+
+<p>而根据上一节从自然性推出的公式，这正好等于 \(\alpha_X(f)\)。所以</p>
+
+\[
+\Psi(\Phi(\alpha))=\alpha.
+\]
+
+<p>至此双射证明完成。</p>
+
+\[
+\boxed{\Phi(\alpha)=\alpha_A(1_A),\qquad \Psi(x)_X(f)=F(f)(x),\qquad \Phi^{-1}=\Psi.}
+\]
+
+<p>这就是 Yoneda 引理最核心也最美的一部分。你若回头看，会发现整个证明连半页都不到，却把“整族自然变换”和“单个元素”严丝合缝地缝在了一起。真正起作用的只有两件事：函子保单位、自然变换的方块交换。范畴论很多大定理都有这个气质：形式并不臃肿，真正难的是先想到正确的观察角度。</p>
+
+<h3 id="sec9-4-1">再算一个简单却极说明问题的例子：\(\mathrm{Set}\) 中的单点探针</h3>
+
+<p>仍取 \(C=\mathrm{Set}\)，\(A=\{*\}\)，设 \(F\colon \mathrm{Set}\to\mathrm{Set}\) 任意。Yoneda 给出</p>
+
+\[
+\operatorname{Nat}(\operatorname{Hom}(\{*\},-),F)\cong F(\{*\}).
+\]
+
+<p>假设你手里有 \(x\in F(\{*\})\)。按 \(\Psi\) 的构造，对每个集合 \(X\) 和每个元素 \(a\in X\cong \operatorname{Hom}(\{*\},X)\)，自然变换的分量就是</p>
+
+\[
+\Psi(x)_X(a)=F(f_a)(x),
+\]
+
+<p>其中 \(f_a\colon \{*\}\to X\) 是把唯一点送到 \(a\) 的函数。也就是说，\(F\) 对任意集合 \(X\) 的“广义元素生成规则”，完全由 \(F\) 在单点集上的一个元素决定。这个例子在 Set 里显得几乎平凡，但它训练的是非常重要的眼光：广义元素不是次要的，它们是自然变换的生成机制。</p>
+
+<h2 id="sec9-5">9.5 自然性不是附赠品：Yoneda 双射本身也是自然的</h2>
+
+<p>Yoneda 引理若只是说“存在某个双射”，已经很有力；但真正强的是，这个双射对 \(A\) 与 \(F\) 都是自然的。先说对 \(F\) 的自然性。若 \(\tau\colon F\Rightarrow G\) 是自然变换，那么有交换图</p>
+
+\[
+\begin{array}{ccc}
+\operatorname{Nat}(h^A,F) & \xrightarrow{\cong} & F(A)\\
+\downarrow{\tau\circ(-)} & & \downarrow{\tau_A}\\
+\operatorname{Nat}(h^A,G) & \xrightarrow{\cong} & G(A)
+\end{array}
+\]
+
+<p>也就是说，先把 \(\alpha\colon h^A\Rightarrow F\) 与 \(\tau\) 复合，或先取元素 \(\alpha_A(1_A)\) 再作用 \(\tau_A\)，结果相同。这是直接计算：</p>
+
+\[
+(\tau\circ\alpha)_A(1_A)=\tau_A(\alpha_A(1_A)).
+\]
+
+<p>再说对 \(A\) 的自然性。若 \(u\colon A'\to A\)，那么由预合成可得自然变换</p>
+
+\[
+h^u\colon h^A\Rightarrow h^{A'}.
+\]
+
+<p>于是对任意 \(F\) 有交换图</p>
+
+\[
+\begin{array}{ccc}
+\operatorname{Nat}(h^A,F) & \xrightarrow{\cong} & F(A)\\
+\downarrow{(-)\circ h^u} & & \downarrow{F(u)}\\
+\operatorname{Nat}(h^{A'},F) & \xrightarrow{\cong} & F(A')
+\end{array}
+\]
+
+<p>这个式子值得你慢一点看。左边是“先把表示函子换掉，再看自然变换”；右边是“先在 \(F(A)\) 取元素，再沿 \(u\) 把它送到 \(F(A')\)”。两者相容，说明 Yoneda 双射不是孤零零的集合双射，而是和整个范畴结构粘合在一起的。</p>
+
+<p>正因为这种自然性存在，Yoneda 才能被真正拿去用。很多时候我们不需要单独记忆某个对象的奇特表示，只要知道它是 Yoneda 双射的一部分，就可以放心地把结构从函子侧拉回对象侧，或者反过来把对象侧问题推到函子侧去算。后面你会看到，“表示函子”“伴随函子”“对象由探针决定”这些说法，本质上都在利用这种自然性。</p>
+
+<h2 id="sec9-6">9.6 Yoneda 嵌入：把对象送进预层范畴</h2>
+
+<p>现在回到反变版本。定义一个函子</p>
+
+\[
+\boxed{y\colon C\to [C^{op},\mathrm{Set}],\qquad y(A)=h_A=\operatorname{Hom}_C(-,A).}
+\]
+
+<p>对箭头 \(f\colon A\to B\)，定义 \(y(f)\colon h_A\Rightarrow h_B\) 的分量为</p>
+
+\[
+y(f)_X\colon \operatorname{Hom}(X,A)\to \operatorname{Hom}(X,B),\qquad
+g\mapsto f\circ g.
+\]
+
+<p>这显然是自然的，因为若 \(u\colon X'\to X\)，则</p>
+
+\[
+y(f)_{X'}(g\circ u)=f\circ g\circ u=y(f)_X(g)\circ u.
+\]
+
+<p>于是 \(y\) 的确是一个函子，它把每个对象 \(A\) 送到“所有指向 \(A\) 的箭头”构成的表示预层。这就叫 Yoneda 嵌入。它的哲学意义极大：我们把原范畴 \(C\) 送进了一个函子范畴，而且送入方式不是随便找个模型，而是用 \(C\) 中箭头本身定义出来的。</p>
+
+<p>你若从几何一侧理解，这正是<a href="../代数几何/appB.html">《代数几何读本》附录 B</a>里 functor of points 的一般原型。对象 \(X\) 被送到预层</p>
+
+\[
+T\longmapsto \operatorname{Hom}(T,X).
+\]
+
+<p>所谓“用所有测试对象去看 \(X\)”并不是代数几何的私房技巧，而是 Yoneda 嵌入在那个具体范畴里的展开。范畴论只是把它抽象到所有 \(C\) 上。</p>
+
+<h3 id="sec9-6-1">在单纯集合里，\(n\)-单形为什么就是从 \(\Delta[n]\) 来的态射</h3>
+
+<p>设 \(X\in[\Delta^{op},\mathrm{Set}]\) 是一个单纯集合。对每个 \(n\)，令 \(\Delta[n]\) 表示对象 \([n]\) 所对应的表示预层</p>
+
+\[
+\Delta[n]=h_{[n]}=\operatorname{Hom}_{\Delta}(-,[n]).
+\]
+
+<p>把 Yoneda 用在范畴 \(C=\Delta\) 上，便得到</p>
+
+\[
+\operatorname{Nat}(\Delta[n],X)\cong X_n.
+\]
+
+<p>这句话在代数拓扑里非常著名：一个单纯集合 \(X\) 的 \(n\)-单形，不多不少，正是从标准 \(n\)-单形 \(\Delta[n]\) 到 \(X\) 的一个态射。于是“\(X\) 里的一条边”“\(X\) 里的一个三角形”“\(X\) 里的一个四面体”，都被统一解释成某个表示单形对 \(X\) 的映入。你在<a href="../代数拓扑/ch12.html">《代数拓扑读本》第 12 章</a>学基本群时，路径和 2-单形的粘合之所以总爱用标准单形作探针，背后就是这个机制。</p>
+
+<p>这也是为什么很多人一旦学会 Yoneda，再看单纯集合会突然豁然开朗：原来“单形”不是图像上的直觉附会，而是表示对象。</p>
+
+<h2 id="sec9-7">9.7 \(y\) 是完全忠实嵌入：对象由它如何被探针看出来决定</h2>
+
+<p>Yoneda 嵌入之所以叫“嵌入”，不是修辞，而是因为它真的不丢信息。更准确地说，它是完全忠实的。</p>
+
+\[
+\boxed{\operatorname{Nat}(yA,yB)\cong \operatorname{Hom}_C(A,B).}
+\]
+
+<p>这正是把 Yoneda 引理用在反变函子 \(yB=h_B\) 上得到的结果：</p>
+
+\[
+\operatorname{Nat}(h_A,h_B)\cong h_B(A)=\operatorname{Hom}_C(A,B).
+\]
+
+<p>于是 \(C\) 中从 \(A\) 到 \(B\) 的箭头，和预层范畴中从 \(yA\) 到 \(yB\) 的自然变换一一对应。完全忠实的意思也就立刻读出来了：对任意对象对 \((A,B)\)，Yoneda 嵌入诱导 Hom-集合双射，所以所有箭头都被忠实且完整地记住了。</p>
+
+<p>这句话有一个极其重要的口号版本：</p>
+
+\[
+\boxed{\text{对象由它如何被所有探针看出来决定。}}
+\]
+
+<p>更具体地说，如果 \(yA\cong yB\) 作为预层同构，那么 \(A\cong B\) 在原范畴里就必然同构。你不能有两个真正不同的对象，却对所有测试对象 \(X\) 都给出同样的 Hom-集合，而且这种相同还自然兼容。只要探针足够多，也就是“所有对象都来探”，对象本身就无处遁形。</p>
+
+<p>这正是范畴论版的“黑箱识别”原则。你不必打开对象内部，只要知道从别处如何映进去、从它如何映出去，就足够把它识别出来。代数几何里用 functor of points 识别概形，表示论里用 intertwiner 识别表示，拓扑里用广义元素识别构造，这些都在共享这个原则。</p>
+
+<h3 id="sec9-7-1">在开集偏序范畴里看一眼：自然变换为什么就是包含关系</h3>
+
+<p>设 \(C=\operatorname{Open}(X)\) 为某拓扑空间的开集偏序范畴。固定两个开集 \(U,V\)。对应的表示预层分别是 \(h_U,h_V\)。Yoneda 告诉你</p>
+
+\[
+\operatorname{Nat}(h_U,h_V)\cong \operatorname{Hom}_{\operatorname{Open}(X)}(U,V).
+\]
+
+<p>而右边在偏序范畴里要么是单元素集合、要么是空集，于是自然变换存在当且仅当 \(U\subseteq V\)。换句话说，开集之间的包含关系完全等价于表示预层之间是否有自然变换。若存在，那张自然变换也唯一。这是“对象由探针识别”的一个非常具体、非常几何的样子。</p>
+
+<p>你如果回想上一章里 \(h_U(W)\) 的 explicit 公式，会发现这件事并不神秘：\(h_U\) 记录了“哪些开集能映进 \(U\)”，而 \(h_V\) 记录“哪些开集能映进 \(V\)”。若前者总能自然地嵌进后者，那正是在说所有能落进 \(U\) 的探针也都能落进 \(V\)，于是 \(U\subseteq V\)。Yoneda 把这种直觉压成了一条一行的定理。</p>
+
+<h2 id="sec9-8">9.8 用 Yoneda 证乘积的唯一性：通用性质为什么天然只差唯一同构</h2>
+
+<p>现在做一个真正有力的应用。设 \(A,B\in C\)。若对象 \(P\) 带有投影</p>
+
+\[
+p_1\colon P\to A,\qquad p_2\colon P\to B,
+\]
+
+<p>并满足乘积的通用性质，那么对每个对象 \(X\) 都有自然双射</p>
+
+\[
+\operatorname{Hom}(X,P)\cong \operatorname{Hom}(X,A)\times \operatorname{Hom}(X,B).
+\]
+
+<p>现在假设 \(P'\) 也是 \(A,B\) 的一个乘积，于是同样有自然双射</p>
+
+\[
+\operatorname{Hom}(X,P')\cong \operatorname{Hom}(X,A)\times \operatorname{Hom}(X,B).
+\]
+
+<p>把两式拼起来，就得到对每个 \(X\) 的自然双射</p>
+
+\[
+\operatorname{Hom}(X,P)\cong \operatorname{Hom}(X,P').
+\]
+
+<p>也就是说，预层 \(yP\) 与 \(yP'\) 同构。由 Yoneda 嵌入完全忠实，立刻推出</p>
+
+\[
+P\cong P'.
+\]
+
+<p>这就证明了乘积在唯一同构意义下唯一。整个论证一笔带过，没有去“手工构造 \(P\to P'\) 和 \(P'\to P\) 再验证互逆”，因为那些手工操作其实正是 Yoneda 语言的展开。</p>
+
+\[
+\boxed{\text{任何由通用性质定义的对象，都由所表示的函子唯一确定到唯一同构。}}
+\]
+
+<p>这一句几乎值得你抄在书页边上。因为它不只适用于乘积，还适用于终对象、拉回、等化子、自由对象、表示对象、伴随对象，乃至后面会出现的大量模空间。范畴论里“唯一性”很少是“ literally 只有一个对象”，而总是“表示同一个函子，因此唯一到唯一同构”。Yoneda 正是把这句话变成了可证明的定理。</p>
+
+<h3 id="sec9-8-1">把“手工构造互逆”也写一遍，看看它和 Yoneda 是同一回事</h3>
+
+<p>如果你坚持不用 Yoneda，也能手工做。因为 \(P\) 是乘积，把 \(P'\) 上的两个投影送进它，可得唯一箭头</p>
+
+\[
+u\colon P'\to P.
+\]
+
+<p>同理，由 \(P'\) 的通用性质得到唯一箭头</p>
+
+\[
+v\colon P\to P'.
+\]
+
+<p>现在看复合 \(u\circ v\colon P\to P\)。它与恒等态射 \(1_P\) 有同样的两个投影复合，因此由 \(P\) 的通用性质必相等。于是 \(u\circ v=1_P\)。同理 \(v\circ u=1_{P'}\)。所以 \(u,v\) 互逆，\(P\cong P'\)。</p>
+
+<p>你现在应该看出来了：这套“存在唯一箭头，再用唯一性比较复合”的手工证明，正是 Yoneda 语言在对象层面的展开。Yoneda 的价值不是发明了从未见过的结论，而是让所有这类证明一眼归入同一个模板里。</p>
+
+<h2 id="sec9-9">9.9 这一章真正该留下来的眼光</h2>
+
+<p>到这里，Yoneda 的证明、自然性、嵌入和完全忠实性都已经到位。现在最重要的是把它压成几句你以后会真的拿来用的话。</p>
+
+<ul>
+  <li>一个自然变换 \(\operatorname{Hom}(A,-)\Rightarrow F\) 并不是“很多对象上的很多函数”，而是 \(F(A)\) 的一个元素展开出来的整族兼容数据。</li>
+  <li>对象 \(A\) 可以被送进预层范畴，变成 \(yA=\operatorname{Hom}(-,A)\)。这不是近似，而是完全忠实嵌入。</li>
+  <li>只要两个对象表示同一个函子，它们就唯一到唯一同构。这正是所有通用性质的唯一性来源。</li>
+</ul>
+
+<p>你在后面两章会立刻看到这三句如何落地。第 10 章的“表示函子”，其实就是问某个 \(C\to\mathrm{Set}\) 的函子是否同构于某个 \(\operatorname{Hom}(A,-)\)；第 11 章的“伴随函子”，则是问两个函子诱导出来的 Hom-函子之间是否自然同构。可以说，Yoneda 并不是一章孤立的技术，而是后面半本书的语法发动机。</p>
+
+<p>如果你只想把这一章记成一句带点文学味却完全准确的话，那就是：<strong>对象不是先天带着本质等你打开，它的本质就藏在所有箭头如何进出它这件事里。</strong> Yoneda 引理把这句话从口号变成了定理。它也是范畴论最像“方法论”的地方：少盯内部，多盯关系；少问元素，多问探针；少问它是什么，多问它如何被所有别的东西看见。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 函子范畴 \([C,D]\)</a><a href="ch10.html">下一章 · 第 10 章 表示函子 →</a></nav>
+
+</main>
+</body>
+</html>

@@ -21,6 +21,7 @@ A growing series of Chinese-language math textbooks in the **Adrian Banner / *Ca
 | 第十一卷 | 普林斯顿代数几何读本 | 20 章 + 2 附录 |
 | 第十二卷 | 普林斯顿黎曼几何读本 | 20 章 + 2 附录 |
 | 第十三卷 | 普林斯顿表示论读本 | 20 章 + 2 附录 |
+| 第十四卷 | 普林斯顿范畴论读本 | 20 章 + 2 附录 |
 
 每章一个独立 HTML 文件（13–50 KB），数学符号用 MathJax 渲染（自动从 CDN 加载）。每本书都有共享的 `styles.css` 和上下章导航。
 

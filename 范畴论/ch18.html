@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 派生范畴与导出函子简介：把“正合失败的误差”系统留下来 — 普林斯顿范畴论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 阿贝尔范畴入门：把线性代数的语法推广到整个同调代数</a><a href="ch19.html">下一章 · 第 19 章 拓扑斯初探：每个“空间世界”都携带自己的逻辑 →</a></nav>
+<h1 id="ch18">第 18 章 派生范畴与导出函子简介：把“正合失败的误差”系统留下来</h1>
+
+<p>如果你只看第 17 章，会觉得阿贝尔范畴已经非常完美：核、余核、像、余像都在，短正合列也在，连长正合列的影子都出现了。可真正做同调代数时，你很快会撞上一道墙：很多最自然的函子根本不完全正合。张量积通常只右正合，\(\operatorname{Hom}\) 通常只左正合，取全局截面也往往只左正合。你要么把这些“失去正合性”的误差一个个补成 \(\operatorname{Tor}\)、\(\operatorname{Ext}\)、层上同调；要么更进一步，直接搭一个统一舞台，让这些误差不是零散补丁，而是同一个大结构的不同投影。这个统一舞台就是派生范畴。</p>
+
+<p>第一次听到“把拟同构取定域”时，很容易觉得它像纯技术。其实动机非常简单。一个对象若有很多不同的分辨，比如投射分辨、内射分辨、自由分辨，那么这些分辨在细节上通常完全不同，但它们所表达的同调信息应该被视为同一个对象。普通复形范畴记得太多，连同调等价但形式不同的复形也分得很开；同伦范畴忘掉了一部分细节，但仍然不够，因为“同伦等价”比“同调相同”强得多。派生范畴做的就是再往前一步：凡是诱导同调同构的箭头，都强行变成可逆。于是它保留的，不再是某个具体复形长什么样，而是这个复形真正携带的同调内容。</p>
+
+<p>这一章我们按最自然的次序走。先搭链复形范畴 \(\operatorname{Ch}(\mathcal A)\)，再过到同伦范畴 \(K(\mathcal A)\)，然后解释为什么还要继续把拟同构取定域，得到派生范畴 \(D(\mathcal A)\)。接着引入导出函子 \(LF\) 与 \(RG\)，并用最经典的整数模例子把</p>
+
+\[
+\operatorname{Tor}_i
+\quad\text{与}\quad
+\operatorname{Ext}^i
+\]
+
+<p>真正算出来。最后再回到一开始的动机：为什么长正合列、\(\delta\)-函子、层上同调与各种“分辨”其实都在催你进入派生范畴的视角。</p>
+
+<h2 id="sec18-1">18.1 为什么只盯对象和态射还不够：误差往往藏在复形里</h2>
+
+<p>先从一个你已经见过很多次的现象开始。设 \(M\) 是一个 \(R\)-模。把函子</p>
+
+\[
+-\otimes_R M
+\]
+
+<p>施加到短正合列</p>
+
+\[
+0\to A'\to A\to A''\to 0
+\]
+
+<p>上，你通常只能得到</p>
+
+\[
+A'\otimes_R M\to A\otimes_R M\to A''\otimes_R M\to 0
+\]
+
+<p>右边正合，左边未必正合。也就是说，张量积“漏掉”的信息恰好是一种左端误差。第 17 章说过，这种误差不会白白消失，而会被某个长正合列的下一项接住；对张量积来说，接手者就是 \(\operatorname{Tor}\)。</p>
+
+<p>同理，\(\operatorname{Hom}_R(M,-)\) 左正合但通常不右正合：</p>
+
+\[
+0\to \operatorname{Hom}_R(M,A')\to \operatorname{Hom}_R(M,A)\to \operatorname{Hom}_R(M,A'')
+\]
+
+<p>之后常常断掉。那一截断掉的右端误差，就由 \(\operatorname{Ext}\) 记录。再往几何里走，取全局截面函子 \(\Gamma(X,-)\) 也左正合而不完全正合，因此会生出层上同调群 \(H^i(X,\mathcal F)\)。你在 <a href="../代数几何/ch16.html">《代数几何读本》第 16 章</a> 已经见过这一套。</p>
+
+<p>所以问题不是“某个函子偶尔不正合”，而是：<strong>很多最有用的函子本来就只半正合，它们的高阶误差才是信息最密的部分。</strong> 如果你每碰到一个函子都另起炉灶发明一套修正量，当然也能做事；可更好的办法是找到一个统一装置，让这些高阶误差都来自“对复形做函子后取同调”。这就是导出函子的基本想法。</p>
+
+\[
+\boxed{\text{导出函子并不是额外发明的新对象，而是把“函子失去正合性”的误差系统收编。}}
+\]
+
+<p>而复形正是装这种误差的天然容器。因为“正合失败”本质上总表现为某个核没有完全等于某个像，这种“核模像”的结构天生就是复形与同调的语法。</p>
+
+<h2 id="sec18-2">18.2 链复形范畴 \(\operatorname{Ch}(\mathcal A)\)：对象不再是单个模块，而是一串模块</h2>
+
+<p>设 \(\mathcal A\) 是阿贝尔范畴。一个<strong>链复形</strong>，这里我们用上标记 cochain 习惯，写作</p>
+
+\[
+C^\bullet=(\cdots\to C^{n-1}\xrightarrow{d^{n-1}}C^n\xrightarrow{d^n}C^{n+1}\to\cdots),
+\]
+
+<p>并要求</p>
+
+\[
+d^{n}\circ d^{n-1}=0
+\qquad\text{对所有 }n.
+\]
+
+<p>也就是任何两步连续走都变成零。于是可以定义第 \(n\) 阶同调（更准确说在 cochain 记号下叫 cohomology）为</p>
+
+\[
+H^n(C^\bullet)=\ker(d^n)/\operatorname{im}(d^{n-1}).
+\]
+
+\[
+\boxed{H^n(C^\bullet)=\ker(d^n)\big/\operatorname{im}(d^{n-1}).}
+\]
+
+<p>复形之间的态射叫链映射。若 \(f^\bullet:C^\bullet\to D^\bullet\)，它是一族态射</p>
+
+\[
+f^n:C^n\to D^n
+\]
+
+<p>使得每个方块交换：</p>
+
+\[
+d_D^n\circ f^n=f^{n+1}\circ d_C^n.
+\]
+
+<p>于是所有复形与链映射组成一个范畴，记为</p>
+
+\[
+\operatorname{Ch}(\mathcal A).
+\]
+
+<p>你可以把它理解成：对象不是单个模或单个层，而是一整串对象外加一串“边界/上边界”箭头；态射也不是一根箭头，而是一整列与微分相容的箭头。第 17 章里的正合列在这里被拉长成真正的几何形状。</p>
+
+<h3 id="sec18-2-1">完整例子：两项复形 \(\mathbb Z\xrightarrow{\cdot n}\mathbb Z\)</h3>
+
+<p>把 \(\mathbb Z\) 放在 \(0\) 与 \(1\) 次位置，考虑复形</p>
+
+\[
+C^\bullet:\qquad
+0\to \mathbb Z\xrightarrow{\cdot n}\mathbb Z\to 0.
+\]
+
+<p>其余次数都为零。因为相邻两步里必有一个零映射，所以确实满足 \(d^2=0\)。它的同调容易算：</p>
+
+\[
+H^0(C^\bullet)=\ker(\cdot n)=
+\begin{cases}
+0,&n\neq 0,\\
+\mathbb Z,&n=0,
+\end{cases}
+\]
+
+\[
+H^1(C^\bullet)=\operatorname{coker}(\cdot n)=\mathbb Z/n\mathbb Z.
+\]
+
+<p>若 \(n\neq 0\)，这说明这个复形在 \(1\) 次位置“表示”的恰好就是模 \(\mathbb Z/n\)。换句话说，一个普通对象本来可以被看成一个只在单一次数非零的复形；而短正合列、分辨、导出函子则会迫使你考虑更长的复形。</p>
+
+<p>这也是复形最重要的第一层直觉：它不是额外复杂化，而是在把“一个对象如何由一串更简单对象拼装出来”显式记录下来。</p>
+
+<h2 id="sec18-3">18.3 同伦范畴 \(K(\mathcal A)\)：先忘掉“只差一个链同伦”的细节</h2>
+
+<p>\(\operatorname{Ch}(\mathcal A)\) 仍然记得太细。两个链映射有时看起来不同，但它们在同调上诱导的作用完全一样。区分这类映射往往没有意义，因此我们引入链同伦。</p>
+
+<p>给定链映射 \(f^\bullet,g^\bullet:C^\bullet\to D^\bullet\)，若存在一族态射</p>
+
+\[
+h^n:C^n\to D^{n-1}
+\]
+
+<p>使得对所有 \(n\)，</p>
+
+\[
+f^n-g^n=d_D^{n-1}h^n+h^{n+1}d_C^n,
+\]
+
+<p>则称 \(f^\bullet\) 与 \(g^\bullet\) <strong>链同伦</strong>，记作</p>
+
+\[
+f^\bullet\simeq g^\bullet.
+\]
+
+<p>链同伦的核心意义是：它保证 \(f^\bullet\) 与 \(g^\bullet\) 在每一阶同调上诱导相同映射。</p>
+
+\[
+H^n(f^\bullet)=H^n(g^\bullet).
+\]
+
+<p>于是我们可以把 \(\operatorname{Ch}(\mathcal A)\) 中的态射按链同伦取商，得到<strong>同伦范畴</strong></p>
+
+\[
+K(\mathcal A).
+\]
+
+<p>这里对象仍然是复形，但态射不再是链映射本身，而是链映射的同伦类。你可以把 \(K(\mathcal A)\) 理解成“先把复形理论里明显冗余的一层差异抹掉”。</p>
+
+<h3 id="sec18-3-1">完整例子：可缩复形为何在同伦范畴里等于零</h3>
+
+<p>考虑复形</p>
+
+\[
+0\to A\xrightarrow{1_A}A\to 0,
+\]
+
+<p>其中左边的 \(A\) 在次数 \(0\)，右边的 \(A\) 在次数 \(1\)。它的同调显然全为零，因为</p>
+
+\[
+\ker(1_A)=0,\qquad \operatorname{coker}(1_A)=0.
+\]
+
+<p>更强的是，这个复形在同伦意义下就已经是零复形。原因是它有一个收缩同伦：令</p>
+
+\[
+s^1:A\to A
+\]
+
+<p>取为恒等，其他 \(s^n\) 为零，则可以检查</p>
+
+\[
+1_{C^\bullet}=ds+sd.
+\]
+
+<p>这说明恒等映射同伦于零映射，于是这个复形在 \(K(\mathcal A)\) 中与零对象同构。这样的复形叫<strong>可缩</strong>。它提醒你：同调全零与“在同伦范畴中等于零”虽然很接近，但在一般情况下并不完全等价。下面我们就会看到，真正需要倒转的是拟同构，而不是所有同调为零的复杂细节。</p>
+
+<h2 id="sec18-4">18.4 拟同构与派生范畴 \(D(\mathcal A)\)：把“同调相同”正式变成同一个对象</h2>
+
+<p>即使过到同伦范畴，信息还是太细。两个复形可能同调完全相同，但并不同伦等价。对导出函子来说，我们真正想保留的通常只有同调层面的信息。因此定义：链映射</p>
+
+\[
+f^\bullet:C^\bullet\to D^\bullet
+\]
+
+<p>若在每一阶诱导同调同构</p>
+
+\[
+H^n(f^\bullet):H^n(C^\bullet)\xrightarrow{\sim} H^n(D^\bullet),
+\]
+
+<p>则称 \(f^\bullet\) 为<strong>拟同构</strong>。</p>
+
+<p>派生范畴的核心操作就是：把所有拟同构都强行变成可逆。形式上写作</p>
+
+\[
+D(\mathcal A)=K(\mathcal A)\bigl[\text{quasi-isomorphisms}^{-1}\bigr].
+\]
+
+\[
+\boxed{D(\mathcal A)=K(\mathcal A)[\text{拟同构}^{-1}].}
+\]
+
+<p>这句“取定域”初看有点抽象，但它的意义异常直接：从现在起，只要两个复形携带同样的同调信息，我们就允许通过一串拟同构把它们视为同一个对象。于是一个对象的不同分辨，在派生范畴里终于可以被看成同一件事。</p>
+
+<p>最典型的例子是一个对象 \(A\) 的投射分辨。设</p>
+
+\[
+\cdots\to P^{-2}\to P^{-1}\to P^0\to A\to 0
+\]
+
+<p>是分辨，把 \(A\) 视为只在 \(0\) 次非零的复形，则分辨复形到 \(A\) 的增强映射是拟同构。不同的投射分辨彼此未必同构，甚至未必同伦等价，但在派生范畴里它们都与 \(A\) 成为同一个对象的不同模型。</p>
+
+<p>这一步非常关键。若没有 \(D(\mathcal A)\)，导出函子总得不停地说“先取一个分辨，再证明跟分辨选择无关”。有了派生范畴，这件事被压缩成一句：分辨本来就在 \(D(\mathcal A)\) 里和原对象是同一个对象，因此对分辨做的构造天然只依赖原对象。</p>
+
+<p>你也可以把派生范畴看成“把分辨合法化”的范畴。投射分辨、内射分辨、平坦分辨之所以有力量，不是因为它们形式漂亮，而是因为派生范畴保证：所有这些好模型都会在正确的层面上代表同一个对象。</p>
+
+<h2 id="sec18-5">18.5 导出函子 \(LF\) 与 \(RG\)：正合失败以后，高阶项不再是补丁而是结构</h2>
+
+<p>现在说导出函子。设</p>
+
+\[
+F:\mathcal A\to\mathcal B
+\]
+
+<p>是一个右正合函子，比如张量积。为了补回它左边丢掉的正合性，我们选取对象 \(A\) 的一个投射分辨</p>
+
+\[
+P^\bullet\to A,
+\]
+
+<p>把 \(F\) 施加到整个复形上：</p>
+
+\[
+F(P^\bullet).
+\]
+
+<p>这个新复形的同调就定义了 \(F\) 的左导出函子：</p>
+
+\[
+L_iF(A)=H^{-i}(F(P^\bullet))
+\]
+
+<p>（若你用 homological 记号，也可写成 \(H_i\)；本章只抓思想，不纠缠指标方向）。把整个复形级别的对象记下来，就得到总左导出函子</p>
+
+\[
+LF:D(\mathcal A)\to D(\mathcal B).
+\]
+
+<p>同样地，若</p>
+
+\[
+G:\mathcal A\to\mathcal B
+\]
+
+<p>是左正合函子，比如 \(\operatorname{Hom}\) 或全局截面函子，那么选取内射分辨</p>
+
+\[
+A\to I^\bullet,
+\]
+
+<p>然后定义右导出函子</p>
+
+\[
+R^iG(A)=H^i(G(I^\bullet)),
+\]
+
+<p>总右导出函子则是</p>
+
+\[
+RG:D(\mathcal A)\to D(\mathcal B).
+\]
+
+\[
+\boxed{
+LF\text{ 由好投射/平坦分辨定义，}\qquad
+RG\text{ 由好内射分辨定义。}}
+\]
+
+<p>这时第 17 章末尾那条关于长正合列的朦胧描述，就变成精确结构：高阶导出函子 \(L_iF\)、\(R^iG\) 自动沿短正合列组装成长正合列。于是 \(\operatorname{Tor}\)、\(\operatorname{Ext}\)、层上同调不再是三套彼此平行的故事，而是同一个“导出”的不同实例。</p>
+
+<p>最标准的两条定义就是：</p>
+
+\[
+\operatorname{Tor}_i^R(M,N)=L_i(M\otimes_R-)(N),
+\]
+
+\[
+\operatorname{Ext}_R^i(M,N)=R^i\operatorname{Hom}_R(M,-)(N).
+\]
+
+<p>而在几何中，若 \(\Gamma(X,-)\) 是全局截面函子，则</p>
+
+\[
+H^i(X,\mathcal F)=R^i\Gamma(X,\mathcal F).
+\]
+
+<p>这正是 <a href="../代数几何/ch16.html">代数几何第 16 章</a> 后半部分的真正函子论解释。</p>
+
+<h2 id="sec18-6">18.6 两个必须亲手算的例子：\(\operatorname{Tor}\) 与 \(\operatorname{Ext}\)</h2>
+
+<p>如果这一章只停在定义，派生范畴会显得离地。最好的补救办法就是拿最经典的整数模例子算到头。令</p>
+
+\[
+M=\mathbb Z/n\mathbb Z.
+\]
+
+<p>它有一个最简单的自由分辨</p>
+
+\[
+0\longrightarrow \mathbb Z\xrightarrow{\cdot n}\mathbb Z\longrightarrow \mathbb Z/n\mathbb Z\longrightarrow 0.
+\]
+
+<p>这条分辨几乎所有入门 \(\operatorname{Tor}\)、\(\operatorname{Ext}\) 的公式都从它长出来。</p>
+
+<h3 id="sec18-6-1">完整例子一：\(\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,\mathbb Z/m)\)</h3>
+
+<p>把上面的分辨对 \(\mathbb Z/m\) 张量，得到两项复形</p>
+
+\[
+0\longrightarrow \mathbb Z/m\xrightarrow{\cdot n}\mathbb Z/m\longrightarrow 0.
+\]
+
+<p>因此</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,\mathbb Z/m)
+=
+\ker\bigl(\mathbb Z/m\xrightarrow{\cdot n}\mathbb Z/m\bigr).
+\]
+
+<p>这个核是什么？它由满足 \(n\bar x=0\) 的元素组成，也就是满足</p>
+
+\[
+m\mid nx
+\]
+
+<p>的同余类。设 \(d=\gcd(m,n)\)，写</p>
+
+\[
+m=dm',\qquad n=dn',\qquad \gcd(m',n')=1.
+\]
+
+<p>则 \(m\mid nx\) 等价于</p>
+
+\[
+dm'\mid dn'x
+\iff
+m'\mid n'x.
+\]
+
+<p>由于 \(\gcd(m',n')=1\)，这又等价于</p>
+
+\[
+m'\mid x.
+\]
+
+<p>所以核恰好由</p>
+
+\[
+\overline{0},\ \overline{m'},\ \overline{2m'},\ \dots,\ \overline{(d-1)m'}
+\]
+
+<p>这 \(d\) 个元素构成，因此</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,\mathbb Z/m)\cong \mathbb Z/d\mathbb Z.
+\]
+
+<p>也就是</p>
+
+\[
+\boxed{\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,\mathbb Z/m)\cong \mathbb Z/\gcd(m,n)\mathbb Z.}
+\]
+
+<p>顺手一提，零阶项就是通常张量积：</p>
+
+\[
+(\mathbb Z/n)\otimes_{\mathbb Z}(\mathbb Z/m)\cong \mathbb Z/\gcd(m,n)\mathbb Z,
+\]
+
+<p>但它来自同一个复形的余核，而不是核。你看到的正是“同一个分辨在不同阶数吐出不同同调信息”的具体样子。</p>
+
+<h3 id="sec18-6-2">完整例子二：\(\operatorname{Ext}_{\mathbb Z}^1(\mathbb Z/n,\mathbb Z)\)</h3>
+
+<p>现在对同一条分辨施加 \(\operatorname{Hom}_{\mathbb Z}(-,\mathbb Z)\)。由于</p>
+
+\[
+\operatorname{Hom}_{\mathbb Z}(\mathbb Z,\mathbb Z)\cong \mathbb Z,
+\]
+
+<p>我们得到复形</p>
+
+\[
+0\longrightarrow \mathbb Z\xrightarrow{\cdot n}\mathbb Z\longrightarrow 0,
+\]
+
+<p>但这次它位于相反方向的 cochain 位置上。于是</p>
+
+\[
+\operatorname{Ext}_{\mathbb Z}^1(\mathbb Z/n,\mathbb Z)
+=
+\operatorname{coker}\bigl(\mathbb Z\xrightarrow{\cdot n}\mathbb Z\bigr)
+=
+\mathbb Z/n\mathbb Z.
+\]
+
+<p>同时</p>
+
+\[
+\operatorname{Hom}_{\mathbb Z}(\mathbb Z/n,\mathbb Z)=0,
+\]
+
+<p>因为从有限群到 \(\mathbb Z\) 没有非零群同态。于是完整结论是</p>
+
+\[
+\operatorname{Hom}_{\mathbb Z}(\mathbb Z/n,\mathbb Z)=0,
+\qquad
+\operatorname{Ext}_{\mathbb Z}^1(\mathbb Z/n,\mathbb Z)\cong \mathbb Z/n\mathbb Z.
+\]
+
+<p>若把目标换成一般模 \(M\)，同样计算给出</p>
+
+\[
+\operatorname{Hom}_{\mathbb Z}(\mathbb Z/n,M)\cong M[n],
+\]
+
+\[
+\operatorname{Ext}_{\mathbb Z}^1(\mathbb Z/n,M)\cong M/nM.
+\]
+
+<p>这条公式以后会反复出现，因为它把“\(n\)-扭元”与“模掉 \(n\) 倍子群”的两类现象统一编码到了 \(\operatorname{Hom}\) 与 \(\operatorname{Ext}\) 两个层级上。</p>
+
+<h2 id="sec18-7">18.7 为什么需要派生范畴，而不是只要导出函子：三角与长正合列的统一</h2>
+
+<p>你可能会问：既然 \(\operatorname{Tor}\)、\(\operatorname{Ext}\)、\(H^i\) 都能通过分辨逐个定义出来，为什么还要专门搭一个派生范畴？只做导出函子不行吗？</p>
+
+<p>只做导出函子当然也能算很多东西，但你会失去一个更深的统一：<strong>长正合列本身不是零散奇迹，而是派生范畴里三角结构的投影。</strong> 这句话第一次看抽象，但含义非常实际。</p>
+
+<p>在派生范畴里，每个复形 \(C^\bullet\) 都有移位对象 \(C^\bullet[1]\)。若</p>
+
+\[
+f^\bullet:C^\bullet\to D^\bullet
+\]
+
+<p>是一个链映射，则可以构造它的映射锥 \(\operatorname{Cone}(f^\bullet)\)。于是得到一个三角</p>
+
+\[
+C^\bullet\longrightarrow D^\bullet\longrightarrow \operatorname{Cone}(f^\bullet)\longrightarrow C^\bullet[1].
+\]
+
+<p>当你对这个三角取同调，就会自动长出一条长正合列：</p>
+
+\[
+\cdots\to H^n(C^\bullet)\to H^n(D^\bullet)\to H^n(\operatorname{Cone}(f^\bullet))
+\to H^{n+1}(C^\bullet)\to\cdots
+\]
+
+<p>这正是长正合列最深的来源。于是“短正合列给长正合列”“映射圆锥给长正合列”“导出函子给长正合列”这些看似不同的现象，在派生范畴里会被解释成同一个三角机制。</p>
+
+\[
+\boxed{\text{在派生范畴里，长正合列不是额外附送，而是三角结构在同调上的阴影。}}
+\]
+
+<p>这就是为什么第 18 章的真正主角不是单个 \(\operatorname{Tor}_1\) 或 \(\operatorname{Ext}^2\)，而是整个 derived picture。单个导出函子只告诉你“某个函子在第 \(i\) 阶出了什么误差”；派生范畴则告诉你“所有这些误差如何彼此组织、如何被三角统一、如何在复形之间传递”。</p>
+
+<h3 id="sec18-7-1">一个最直接的应用场景：短正合列的分辨比较</h3>
+
+<p>设有短正合列</p>
+
+\[
+0\to A'\to A\to A''\to 0.
+\]
+
+<p>若你分别取三个对象的投射分辨，然后想比较它们之间的关系，单个对象层面的语言会很快变笨。可一旦把这些分辨放进派生范畴，这个短正合列就可以被提升为一个三角</p>
+
+\[
+A'\to A\to A''\to A'[1].
+\]
+
+<p>于是任何导出函子自动把它送到另一个三角，再由同调函子自动吐出长正合列。你终于不用每换一个函子、每换一种对象就重新发明“蛇引理式”的修补过程，因为派生范畴已经把修补机制本身吸收进背景结构里了。</p>
+
+<h2 id="sec18-8">18.8 从这里往外看：几何、表示、拓扑为什么都被迫走向 derived</h2>
+
+<p>现在回看最初动机，派生范畴会显得自然得多。几何里，层上同调本来就是右导出函子；更进一步，\(\mathcal O_X\)-模层之间的张量积往往不完全正合，于是其左导出就给出导出张量积</p>
+
+\[
+\mathcal F\overset{L}{\otimes}_{\mathcal O_X}\mathcal G.
+\]
+
+<p>这在交叉理论、上同调配对与变形理论里都是核心对象。你若只停在普通张量积，就会在非平坦情形下不断丢信息。</p>
+
+<p>表示论里也一样。群表示范畴、代数表示范畴以及其模范畴中，\(\operatorname{Ext}\) 群测量扩张、\(\operatorname{Tor}\) 群测量张量的非正合性。很多表示的分块、分辨与同调维数问题，本质上都在 derived setting 中最清楚。连 <a href="../表示论/ch11.html">表示论第 11 章</a> 讲到的张量积，如果你进一步追问“张量何时 exact、何时需要 higher correction”，也会被引向 derived functor 的语言。</p>
+
+<p>拓扑学更是如此。奇异链复形、上链复形、映射锥、长正合列，本来就是派生视角最古老的训练场之一。你在 <a href="../代数拓扑/ch15.html">《代数拓扑读本》第 15 章</a> 看上同调时，其实已经在日常使用“复形决定对象、同调只看核模像”的思维了。派生范畴不过是把这种思维从拓扑里的链复形，提升到任意阿贝尔范畴中的一般复形。</p>
+
+<p>所以本章最应该带走的并不是某个定义，而是一条层层递进的主线。第一步：复形把对象之间的误差组织成可取同调的形式。第二步：同伦范畴先抹掉明显冗余，但还不够。第三步：把拟同构变成同构，得到派生范畴，于是分辨在正确层面上真的代表同一对象。第四步：导出函子、\(\operatorname{Tor}\)、\(\operatorname{Ext}\)、层上同调、长正合列，全都只是这幅 derived 图景在不同方向上的投影。</p>
+
+<p>第 19 章我们会把视野再挪一次，去看 topos 这种比阿贝尔范畴更靠近“逻辑与空间”交界的对象。那时你会发现，范畴论的抽象并不是一路直线往上升，而是在不同类型的结构之间来回切换：张量范畴抓“并排”，阿贝尔范畴抓“正合”，派生范畴抓“高阶误差”，而拓扑斯则会把“空间与逻辑”的关系一次性卷进来。</p>
+
+<h2 id="sec18-9">18.9 分辨为什么看起来不唯一却能给同一个答案：比较定理的直觉</h2>
+
+<p>只要一提导出函子，立刻就会有人追问：投射分辨、内射分辨明明不唯一，为什么最后算出来的 \(\operatorname{Tor}\)、\(\operatorname{Ext}\)、\(H^i\) 却是唯一的？这个问题不能只靠“定理说无关”敷衍过去，你至少要知道背后是什么机制在起作用。</p>
+
+<p>最粗糙的答案是：不同分辨之间可以比较。更准确地说，若</p>
+
+\[
+P^\bullet\to A,\qquad Q^\bullet\to A
+\]
+
+<p>是同一对象 \(A\) 的两个投射分辨，那么存在链映射</p>
+
+\[
+\phi^\bullet:P^\bullet\to Q^\bullet
+\]
+
+<p>提升恒等映射 \(1_A\)，并且这种提升在链同伦意义下唯一。反过来，也有</p>
+
+\[
+\psi^\bullet:Q^\bullet\to P^\bullet
+\]
+
+<p>提升 \(1_A\)。两个复合在同伦意义下都等于恒等，于是</p>
+
+\[
+P^\bullet\simeq Q^\bullet
+\qquad\text{在 }K(\mathcal A)\text{ 中同构。}
+\]
+
+<p>这就是所谓比较定理背后的核心图像。分辨虽然表面有很多版本，但所有版本在同伦范畴里早就被锁成同一个对象了；过到派生范畴后，它们更是自动都与 \(A\) 本身同构。</p>
+
+\[
+\boxed{\text{不同好分辨之所以给同一导出结果，是因为它们在 }K(\mathcal A)\text{ 中已被比较定理统一。}}
+\]
+
+<p>这一点很重要，因为它说明“先选一个分辨”并不是不可控制的人为步骤，而只是给派生范畴中的同一个对象挑一个可算模型。你做计算时好像在依赖选取，真正的结构上却并没有依赖。</p>
+
+<p>在更高层次上，人们甚至会直接寻找那些“对所有拟同构都足够稳定”的复形，比如 \(K\)-投射复形、\(K\)-内射复形、\(K\)-平坦复形。这样一来，整个 derived functor 可以直接在这些好模型上定义，而不必每次从头重新挑分辨。这条思路在层范畴里尤其重要，因为具体写投射分辨往往不现实，而内射分辨和 \(K\)-内射对象则更自然。</p>
+
+<h3 id="sec18-9-1">一个小而具体的比较：\(\mathbb Z/n\) 的两种“看上去不同”的模型</h3>
+
+<p>对象 \(\mathbb Z/n\) 最朴素的模型当然是只在某一阶非零的复形：</p>
+
+\[
+\cdots\to 0\to \mathbb Z/n\to 0\to\cdots
+\]
+
+<p>但计算导出函子时，我们更常用它的自由分辨</p>
+
+\[
+\cdots\to 0\to \mathbb Z\xrightarrow{\cdot n}\mathbb Z\to 0\to\cdots
+\]
+
+<p>加上增强映射到 \(\mathbb Z/n\)。这两个复形显然长得完全不同，一个只有一个非零对象，另一个有两项非零对象；可它们之间有拟同构，因此在派生范畴里是同一个对象。于是你既可以把 \(\mathbb Z/n\) 当普通模，也可以把它当一个两项自由复形来算，最后结果不会冲突。这正是“derived 中对象由好模型代表”的最微型样板。</p>
+
+<h2 id="sec18-10">18.10 长正合列为什么会同时生出 \(\operatorname{Tor}\) 与 \(\operatorname{Ext}\)</h2>
+
+<p>第 17 章已经说过，半正合函子在短正合列上会拉出长正合列。现在借派生函子的语言，这件事终于能被说得完全对称。</p>
+
+<p>若</p>
+
+\[
+0\to A'\to A\to A''\to 0
+\]
+
+<p>是短正合列，而 \(F\) 是右正合函子，则它的左导出自动给出长正合列</p>
+
+\[
+\cdots\to L_1F(A'')\to F(A')\to F(A)\to F(A'')\to 0.
+\]
+
+<p>若 \(G\) 是左正合函子，则右导出自动给出</p>
+
+\[
+0\to G(A')\to G(A)\to G(A'')
+\to R^1G(A')\to R^1G(A)\to R^1G(A'')\to\cdots
+\]
+
+<p>于是 \(\operatorname{Tor}\) 和 \(\operatorname{Ext}\) 看起来像两个不同家族，其实只是“左导出”与“右导出”两面。</p>
+
+<h3 id="sec18-10-1">完整例子：\(\operatorname{Tor}\) 的长正合列如何出现</h3>
+
+<p>还是从短正合列</p>
+
+\[
+0\to \mathbb Z\xrightarrow{\cdot n}\mathbb Z\to \mathbb Z/n\to 0
+\]
+
+<p>出发，对它张量一个固定模 \(M\)。由于张量只右正合，你得到的不是短正合列，而是长正合列的一段：</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z,M)\to
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,M)\to
+\mathbb Z\otimes M\xrightarrow{\cdot n}
+\mathbb Z\otimes M\to
+\mathbb Z/n\otimes M\to 0.
+\]
+
+<p>而</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z,M)=0,
+\qquad
+\mathbb Z\otimes M\cong M.
+\]
+
+<p>于是化简为</p>
+
+\[
+0\to \operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,M)\to
+M\xrightarrow{\cdot n}M\to
+\mathbb Z/n\otimes M\to 0.
+\]
+
+<p>这条短一些的正合列立刻给出两端的具体描述：</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,M)\cong \ker(M\xrightarrow{\cdot n}M)=M[n],
+\]
+
+\[
+\mathbb Z/n\otimes M\cong \operatorname{coker}(M\xrightarrow{\cdot n}M)=M/nM
+\]
+
+<p>若 \(M=\mathbb Z/m\)，这就回到了我们前面算出的公式。也就是说，长正合列不是补充说明，而是那个具体计算真正的结构来源。</p>
+
+<h3 id="sec18-10-2">完整例子：\(\operatorname{Ext}\) 的长正合列如何出现</h3>
+
+<p>同样从</p>
+
+\[
+0\to \mathbb Z\xrightarrow{\cdot n}\mathbb Z\to \mathbb Z/n\to 0
+\]
+
+<p>出发，这次对第二变量施加左正合函子 \(\operatorname{Hom}_{\mathbb Z}(-,M)\)。长正合列的一段是</p>
+
+\[
+0\to \operatorname{Hom}_{\mathbb Z}(\mathbb Z/n,M)\to
+\operatorname{Hom}_{\mathbb Z}(\mathbb Z,M)\xrightarrow{\cdot n}
+\operatorname{Hom}_{\mathbb Z}(\mathbb Z,M)\to
+\operatorname{Ext}^1_{\mathbb Z}(\mathbb Z/n,M)\to 0.
+\]
+
+<p>由于</p>
+
+\[
+\operatorname{Hom}_{\mathbb Z}(\mathbb Z,M)\cong M,
+\]
+
+<p>便得到</p>
+
+\[
+0\to \operatorname{Hom}_{\mathbb Z}(\mathbb Z/n,M)\to
+M\xrightarrow{\cdot n}M\to
+\operatorname{Ext}^1_{\mathbb Z}(\mathbb Z/n,M)\to 0.
+\]
+
+<p>因此</p>
+
+\[
+\operatorname{Hom}_{\mathbb Z}(\mathbb Z/n,M)\cong M[n],
+\qquad
+\operatorname{Ext}^1_{\mathbb Z}(\mathbb Z/n,M)\cong M/nM.
+\]
+
+<p>和 \(\operatorname{Tor}\) 那条完全并排。你看到的是一幅非常工整的图：同一条短正合列，在张量那边生出扭性核，在 Hom 那边生出商模余项。这正是 derived functor 思维的美感所在。</p>
+
+<h2 id="sec18-11">18.11 为什么现代几何几乎绕不开 \(D(\mathcal A)\)</h2>
+
+<p>到这一步，很多人仍会觉得：\(\operatorname{Tor}\)、\(\operatorname{Ext}\)、层上同调我都能分别学，真的需要把它们统一到派生范畴里吗？如果你只做少量低阶计算，也许暂时不需要；但一旦问题开始涉及复合函子、基变换、投影公式、谱序列或更高配对，不进入 derived 视角就会越来越吃力。</p>
+
+<p>以代数几何为例。设 \(f:X\to Y\) 是一个态射。若你只考虑普通推前 \(f_\ast\) 与普通张量积，就会不断撞见“先推前再张量”和“先张量再推前”不相等、“限制到纤维以后遗漏高阶信息”等问题。真正正确的公式往往必须写成</p>
+
+\[
+Rf_\ast(\mathcal F^\bullet),\qquad
+\mathcal F^\bullet\overset{L}{\otimes}\mathcal G^\bullet,\qquad
+R\mathcal Hom(\mathcal F^\bullet,\mathcal G^\bullet).
+\]
+
+<p>也就是说，你不再拿单个层做运算，而是拿派生范畴里的对象做运算。高阶误差不再是事后修补，而是从一开始就被并入符号本身。很多现代几何公式之所以写起来反而更短，正是因为 derived notation 已经把所有 correction term 都隐含进去。</p>
+
+<p>同样地，在表示论与模论中，一个表示是否有投射分辨、分辨长度多长、不同扩张类如何组合，都会自然落进</p>
+
+\[
+D(\operatorname{Mod}_R)
+\]
+
+<p>这样的派生范畴里。你若只盯单个 \(\operatorname{Ext}^1\) 或 \(\operatorname{Tor}_2\)，看到的是零件；过到 derived setting，看到的则是整台机器如何运转。</p>
+
+<p>再回到拓扑。映射锥、长正合序列、同调等价、谱序列，这些东西本来就在训练你：真正有意义的对象常常不是某个链群本身，而是其复形在同调意义下的等价类。派生范畴只是把这种训练从拓扑里的链复形，推广到了任意阿贝尔范畴的复形世界。</p>
+
+\[
+\boxed{\text{派生范畴的价值，不在于多造了一个范畴，而在于它让“高阶误差”从补救措施升级成基本结构。}}
+\]
+
+<p>所以本章真正的后劲并不体现在某一个算例，而在于视角转换。以后只要看到一个函子不是完全正合，你就不再只问“第一处坏在哪里”，而会本能地问：它的总导出是什么？它在派生范畴里怎样表现？相关的长正合列或三角从哪里来？这时你才算真正开始用 derived language 思考，而不是只把 \(\operatorname{Tor}\)、\(\operatorname{Ext}\) 当作一张公式表背诵。</p>
+
+<h2 id="sec18-12">18.12 一个真正“只有 derived 才看得见”的例子：\(\mathbb Z/2\otimes^L \mathbb Z/2\)</h2>
+
+<p>如果你想知道派生范畴为什么不是把普通同调代数重写一遍，而是真的保留了更多信息，最好的例子之一就是导出张量积。普通张量积会把高阶 \(\operatorname{Tor}\) 全部压成单个对象；导出张量积则把这些高阶项作为复形的一部分完整留下来。</p>
+
+<p>来看最经典的对象</p>
+
+\[
+\mathbb Z/2.
+\]
+
+<p>它的自由分辨是</p>
+
+\[
+P^\bullet:\qquad 0\to \mathbb Z\xrightarrow{\cdot 2}\mathbb Z\to 0.
+\]
+
+<p>导出张量积</p>
+
+\[
+\mathbb Z/2\overset{L}{\otimes}_{\mathbb Z}\mathbb Z/2
+\]
+
+<p>的定义，就是把一个因子换成投射分辨再张量：</p>
+
+\[
+P^\bullet\otimes_{\mathbb Z}\mathbb Z/2.
+\]
+
+<p>可这正是复形</p>
+
+\[
+0\to \mathbb Z/2\xrightarrow{\cdot 2}\mathbb Z/2\to 0.
+\]
+
+<p>但在 \(\mathbb Z/2\) 上，“乘以 2”就是零映射，所以这个复形实际上变成</p>
+
+\[
+0\to \mathbb Z/2\xrightarrow{0}\mathbb Z/2\to 0.
+\]
+
+<p>它的同调不是只有一项，而是两项都非零：</p>
+
+\[
+H^0\bigl(\mathbb Z/2\overset{L}{\otimes}_{\mathbb Z}\mathbb Z/2\bigr)\cong \mathbb Z/2,
+\]
+
+\[
+H^{-1}\bigl(\mathbb Z/2\overset{L}{\otimes}_{\mathbb Z}\mathbb Z/2\bigr)\cong \mathbb Z/2.
+\]
+
+<p>其中零阶同调就是普通张量积</p>
+
+\[
+(\mathbb Z/2)\otimes_{\mathbb Z}(\mathbb Z/2)\cong \mathbb Z/2,
+\]
+
+<p>而负一阶同调恰好是</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/2,\mathbb Z/2)\cong \mathbb Z/2.
+\]
+
+\[
+\boxed{
+\mathbb Z/2\overset{L}{\otimes}_{\mathbb Z}\mathbb Z/2
+\text{ 不是单个 }\mathbb Z/2,
+\text{ 而是一个还记住 }\operatorname{Tor}_1\text{ 的复形对象。}}
+\]
+
+<p>这就是 derived 真正比普通对象世界更丰富的地方。普通张量积只告诉你“结果有一个 \(\mathbb Z/2\)”；导出张量积则告诉你“这里其实有一层隐藏在高阶同调里的自交信息”。现代几何中许多交叉数、非平坦基变换与奇点效应，靠的正是这种“高阶重合信息”不被压扁。</p>
+
+<p>如果你把这个现象翻回几何语言，它会特别像“两个子空间相交时，单看集合交还不够，必须连交的重数与高阶缠绕一起记下”。派生张量积就是把这种高阶重合系统地内建到对象里。也正因此，derived algebraic geometry 会把很多普通 fiber product 换成 derived fiber product，因为后者才能忠实保留交叉中的 \(\operatorname{Tor}\) 信息。</p>
+
+<h3 id="sec18-12-1">另一个角度：\(R\Gamma\) 把 Čech 复形本身提升成对象</h3>
+
+<p>导出思想在几何里还有一个同样重要的版本，就是总右导出全局截面</p>
+
+\[
+R\Gamma(X,\mathcal F).
+\]
+
+<p>在 <a href="../代数几何/ch16.html">代数几何第 16 章</a>，你已经直接用 Čech 复形算过上同调。比如在 \(\mathbf P^1\) 的标准覆盖 \(U_0,U_1\) 下，结构层 \(\mathcal O\) 的 Čech 复形是</p>
+
+\[
+0\to \mathcal O(U_0)\oplus \mathcal O(U_1)\to \mathcal O(U_0\cap U_1)\to 0.
+\]
+
+<p>从传统角度，你会说“取这个复形的上同调得到 \(H^0\) 与 \(H^1\)”。从 derived 角度，更自然的说法是：这个复形本身就是 \(R\Gamma(\mathbf P^1,\mathcal O)\) 的一个模型。于是</p>
+
+\[
+H^0\bigl(R\Gamma(\mathbf P^1,\mathcal O)\bigr)\cong H^0(\mathbf P^1,\mathcal O),
+\]
+
+\[
+H^1\bigl(R\Gamma(\mathbf P^1,\mathcal O)\bigr)\cong H^1(\mathbf P^1,\mathcal O).
+\]
+
+<p>这看起来像措辞变化，实则非常关键。因为一旦把 \(R\Gamma(X,\mathcal F)\) 当作派生范畴中的一个对象，你就不仅能提取各阶同调群，还能把它与别的 derived object 做映射、做三角、做谱序列。换句话说，原本“只是一串群”的数据，现在重新被收回到一个单一对象里，而这个对象保留了这些群之间如何被微分连接起来的全部关系。</p>
+
+<p>这也是为什么现代文献更喜欢写</p>
+
+\[
+R\Gamma(X,\mathcal F)
+\]
+
+<p>而不只是列出所有 \(H^i(X,\mathcal F)\)。前者像是整个乐谱，后者更像把每个音单独抄出来。若你只想知道某个特定音高，单个同调群当然够用；但若你想知道整段旋律如何起伏、如何和别的旋律互动，就必须把复形对象本身留下。</p>
+
+<p>到这里，本章其实已经把 derived 的最低限度核心讲全了：复形组织误差，同伦抹掉显然冗余，拟同构抓住真正的同调信息，派生范畴让所有好模型合法代表同一对象，而总导出函子则把 \(\operatorname{Tor}\)、\(\operatorname{Ext}\)、上同调与长正合列统一收编。以后你再看到某个“高阶校正项”，最好立刻问自己：它是不是某个 derived object 的某一阶同调？一旦这个问题变成反射动作，你就已经跨过本章真正的门槛了。</p>
+
+<h2 id="sec18-13">18.13 章末再钉一次：derived 语言真正改变的是你提问的方式</h2>
+
+<p>这一章如果只被读成“复形、同伦、拟同构、定域”四个新名词，那么其实只学到表层。它真正要迫使你改变的，是问问题的方法。过去你看到一个不完全正合的函子，通常会问：它坏在第几步？有没有一个 \(\operatorname{Tor}_1\) 或 \(\operatorname{Ext}^1\) 能补上？这样的问法当然没错，但它仍然把高阶信息当作普通函子的附属品。derived 视角则会倒过来问：真正该算的对象是不是从一开始就该写成 \(LF\)、\(RG\)、\(R\mathcal Hom\)、\(R\Gamma\)？如果是，那普通函子反而只是这个 derived object 的零阶影子。</p>
+
+<p>这层转换一旦稳下来，很多原本零散的公式会自动归位。你不会再把 \(\operatorname{Tor}\) 看成“张量积偶尔冒出来的一串修正项”，而会把它看成导出张量积的各阶同调。你不会再把 \(\operatorname{Ext}\) 看成“某种分类扩张的神秘群”，而会把它看成 \(R\operatorname{Hom}\) 的可见分量。你也不会再把 Čech 复形只看成一个算上同调的技巧，而会知道：那整个复形本身就可能是 \(R\Gamma(X,\mathcal F)\) 的模型，单个 \(H^i\) 只是它被逐阶拆开的截面。</p>
+
+<p>因此，派生范畴最耐用的价值不在于让你多会几道题，而在于让你不再把“高阶校正”当成例外。只要普通对象世界里的某个运算开始失真，derived 语言就会提醒你：真正稳定的对象早就不在原范畴里，而在 \(D(\mathcal A)\) 中。那里分辨不再是临时工具，而是代表对象的好模型；长正合列不再是每次现推，而是三角结构的投影；高阶群也不再是事后附会，而是同一 derived object 的不同同调层级。下一次你在别的书里看到 \(R f_\ast\)、\(\otimes^L\)、\(R\Gamma\) 这些记号时，最好立刻意识到：作者并不是故意把事情写复杂，而是在提前把所有本会晚些出现的 correction term 一次性写进正确的对象里。</p>
+
+<p>也正因为如此，derived 语言真正改变的不是你会不会多记几个符号，而是你对“答案应该长成什么样”的期待。普通对象若已经不够稳定，就别再强迫答案停留在普通对象层面；高阶误差既然反复出现，就该把它们整体收回成一个复形对象。这个期待一旦建立起来，派生范畴就不再像一道额外门槛，而会开始像许多现代公式背后那个最省力、也最诚实的背景语言。</p>
+
+<p>从学习体验上说，这种变化通常发生得很突然。前面你还在把各种高阶群零零散散地记作公式，后面某一天会忽然意识到：原来真正应当被比较、被推动、被张量、被取 Hom 的，从来不是某一阶群，而是支撑这些群的整个复形对象。那一刻开始，派生范畴就不再像额外负担，而会开始像把许多分裂主题重新拧成一股的那条主线。</p>
+
+<p>所以，若本章最后只剩一句话应该被留下，那大概就是：derived 不是把世界复杂化，而是在承认世界本来就有高阶误差之后，拒绝再把这些误差假装成附注。承认这一点，后面的很多现代符号才会开始显得自然，而不是显得故作高深。</p>
+
+<p>等你以后真的开始读更深一点的几何或表示论文时，这种自然感会非常重要。它会让你在看到 \(Rf_\ast\)、\(\otimes^L\)、\(R\mathcal Hom\) 时，不是先退缩，而是先把它们认作“把高阶信息一起带着走”的诚实记号。只要这层识别建立起来，derived 的门就算真正推开了。</p>
+
+<p>从这个意义上说，派生范畴并不是把初等同调代数推翻重来，而是在给它补上一层最关键的组织原则：不要把高阶信息拆碎以后再勉强缝回去，而要一开始就把能够产生这些高阶信息的复形对象保留在手边。这样一来，分辨、长正合列、连接同态、导出张量与上同调计算就不再像许多平行技巧，而会开始显得像同一个舞台上不同方向的光。</p>
+
+<p>而这种组织原则一旦被你接受，后面的很多困难章节都会自动矮一截。因为你知道自己不需要逐项追着补洞，而应该先去找那个把所有洞一次性装进去的复形对象。这正是 derived 视角最值钱的地方。</p>
+
+<p>它会让你逐渐习惯先找背景对象，再读单个不变量；先找整段结构，再读其中一阶群。这种阅读顺序一旦形成，派生范畴就真正从定义变成了工作语言。</p>
+
+<p>而一旦它真的变成工作语言，许多原本像障碍的高阶符号，反而会开始像最省力的捷径。</p>
+
+<p>那时你会第一次真切感觉到，derived 不是绕路，而是把绕路压缩进背景结构之后得到的直线。</p>
+
+<p>而这条直线，通常正是后面整片现代语言真正的入口。</p>
+
+<p>值得反复回看。</p>
+
+<p>后面会不断用到它。</p>
+
+<p>真的如此。</p>
+
+<p>以后常常还要用它。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 阿贝尔范畴入门：把线性代数的语法推广到整个同调代数</a><a href="ch19.html">下一章 · 第 19 章 拓扑斯初探：每个“空间世界”都携带自己的逻辑 →</a></nav>
+
+</main>
+</body>
+</html>

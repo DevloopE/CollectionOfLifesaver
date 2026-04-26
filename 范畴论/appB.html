@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 同调代数预备：链复形、长正合列、五引理、蛇引理与 Tor / Ext — 普林斯顿范畴论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 集合论与基础：大集合、proper class 与 Grothendieck 宇宙</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+<h1 id="appB">附录 B 同调代数预备：链复形、长正合列、五引理、蛇引理与 Tor / Ext</h1>
+
+<p>这本书前半段一直在讲范畴、函子、伴随、极限，看起来和同调代数像隔着一层；可一到<a href="ch17.html">第 17 章</a>阿贝尔范畴、<a href="ch18.html">第 18 章</a>导出函子、再到本章谈派生几何与 \(\infty\)-范畴，你会突然发现同调代数根本不是旁支，而是“范畴论如何处理不精确构造”的主舞台。Tor、Ext、长正合列、蛇引理这些名字反复出现，正是在提醒你：一旦普通函子不再完全保精确，丢失的信息本身就会长成新的对象。</p>
+
+<p>这一附录的目标很明确。第一，把链复形与同调的基本骨架抽出来。第二，说明短正合列为什么会长成长期有效的长正合列。第三，把五引理与蛇引理压成可以随手调用的模板。第四，用最常见的投射分解，把 Tor 与 Ext 算到手。最后，再把这些代数机器和<a href="../实分析/ch15.html">《实分析读本》第 15 章</a>、<a href="../实分析/ch24.html">第 24 章</a>以及<a href="../代数拓扑/ch11.html">《代数拓扑读本》第 11 章</a>、<a href="../代数拓扑/ch12.html">第 12 章</a>接起来，让你看见它们不是另起炉灶，而是在给别卷里已经出现过的结构补后台。</p>
+
+<h2 id="secB-1">B.1 链复形与同调：\(\partial^2=0\) 这句短话为何值钱</h2>
+
+<p>一个链复形 \(C_\bullet\) 就是一串对象与边界算子</p>
+
+\[
+\cdots \xrightarrow{\partial_{n+2}} C_{n+1}
+\xrightarrow{\partial_{n+1}} C_n
+\xrightarrow{\partial_n} C_{n-1}
+\xrightarrow{\partial_{n-1}}\cdots
+\]
+
+<p>满足最核心的关系</p>
+
+\[
+\boxed{\partial_n\partial_{n+1}=0\qquad(\forall n).}
+\]
+
+<p>这就是“边界的边界为零”。一旦这句话成立，就能定义循环与边界：</p>
+
+\[
+Z_n(C)=\ker\partial_n,\qquad
+B_n(C)=\operatorname{im}\partial_{n+1}.
+\]
+
+<p>因为 \(\partial_n\partial_{n+1}=0\)，所以 \(B_n(C)\subset Z_n(C)\)。于是第 \(n\) 个同调群自然定义为</p>
+
+\[
+\boxed{
+H_n(C)=Z_n(C)/B_n(C)=\ker\partial_n\big/\operatorname{im}\partial_{n+1}.
+}
+\]
+
+<p>这一定义的味道很值得你咂摸一下。\(Z_n\) 里放的是“闭的对象”，\(B_n\) 里放的是“其实只是上一级边界的对象”，而同调就是把“真的新闭环”和“只是边界的伪闭环”区分开。它测量的不是对象本身，而是<strong>精确性失败了多少</strong>。</p>
+
+<p>先算一个两步例子：</p>
+
+\[
+0\longrightarrow \mathbb Z
+\xrightarrow{\cdot 2}
+\mathbb Z
+\longrightarrow 0,
+\]
+
+<p>把左边 \(\mathbb Z\) 放在次数 \(1\)，右边放在次数 \(0\)。那么</p>
+
+\[
+H_1=\ker(\cdot 2)=0,
+\qquad
+H_0=\mathbb Z/2\mathbb Z.
+\]
+
+<p>这说明同调并不只属于拓扑“有洞的空间”，而是任何链复形的代数读数。拓扑不过是它最著名的来源。你在<a href="../代数拓扑/ch11.html">《代数拓扑读本》第 11 章</a>看到奇异链复形时，做的正是这套事，只不过 \(C_n\) 里的元素换成了单形线性组合。</p>
+
+<p>复形之间的映射也必须与边界相容。一个链映射 \(f_\bullet\colon C_\bullet\to D_\bullet\) 满足</p>
+
+\[
+\partial^D_n f_n=f_{n-1}\partial^C_n.
+\]
+
+<p>于是 \(f_\bullet\) 自动诱导同调上的同态 \(H_n(C)\to H_n(D)\)。这一步非常关键，因为它让“取同调”本身变成一个函子。这也是同调代数和本书主线接上的第一处：同调不是一个数值技巧，而是一个函子化的比较机器。</p>
+
+<h2 id="secB-2">B.2 短正合列为什么会长出长正合列</h2>
+
+<p>短正合列</p>
+
+\[
+0\longrightarrow A_\bullet
+\xrightarrow{i}
+B_\bullet
+\xrightarrow{p}
+C_\bullet
+\longrightarrow 0
+\]
+
+<p>表示对每个次数 \(n\)，都有</p>
+
+\[
+0\longrightarrow A_n\xrightarrow{i_n}B_n\xrightarrow{p_n}C_n\longrightarrow 0
+\]
+
+<p>正合，并且 \(i,p\) 都和边界算子交换。你可以把它看成：\(A_\bullet\) 是 \(B_\bullet\) 里的子机器，\(C_\bullet\) 是商机器，而边界运算与这种“嵌入 / 投影”完全兼容。</p>
+
+<p>这时同调不会保持成短正合，而会长出一条更长的链：</p>
+
+\[
+\cdots \to H_n(A)\to H_n(B)\to H_n(C)
+\xrightarrow{\delta}
+H_{n-1}(A)\to H_{n-1}(B)\to H_{n-1}(C)\to\cdots
+\]
+
+<p>最值钱的是那个连接同态 \(\delta\)。它的构造很具体。取一个类 \([c]\in H_n(C)\)，先挑 lift \(b\in B_n\) 使 \(p_n(b)=c\)。由于 \(c\) 是循环，有</p>
+
+\[
+p_{n-1}(\partial b)=\partial p_n(b)=\partial c=0.
+\]
+
+<p>故 \(\partial b\in \ker p_{n-1}=\operatorname{im} i_{n-1}\)。于是存在 \(a\in A_{n-1}\) 使</p>
+
+\[
+i_{n-1}(a)=\partial b.
+\]
+
+<p>再由 \(\partial^2=0\) 与 \(i\) 单射可知 \(a\) 也是循环，于是定义</p>
+
+\[
+\boxed{\delta([c])=[a].}
+\]
+
+<p>这件事第一次看像技巧，实际上它在反复出现。你在<a href="../代数拓扑/ch12.html">《代数拓扑读本》第 12 章</a>见到 Mayer-Vietoris 或相对同调的长正合列时，背后就是同样的连接映射模板。几乎所有“局部信息怎样追回全局缺口”的长正合列，骨架都长这个样子。</p>
+
+<h2 id="secB-3">B.3 五引理与蛇引理：比较两张图时最常用的判断器</h2>
+
+<p>同调代数最常干的事，不是算一个群，而是比较两张交换图里哪些箭头必然是同构、哪些核和余核会被连接起来。五引理与蛇引理正是这两类工作最标准的模板。</p>
+
+<p>先说五引理。设有交换图，两行都正合：</p>
+
+\[
+\begin{array}{ccccccccc}
+A_1 &\to& A_2 &\to& A_3 &\to& A_4 &\to& A_5\\
+\downarrow && \downarrow && \downarrow && \downarrow && \downarrow\\
+B_1 &\to& B_2 &\to& B_3 &\to& B_4 &\to& B_5
+\end{array}
+\]
+
+<p>若四个外侧纵箭头已知是同构，并满足通常的单 / 满条件，那么中间那根 \(A_3\to B_3\) 也是同构。你可以把它读成一句工作口令：<strong>在一条足够长的正合链里，若左右都已经被锁死，中间也会被夹成同构。</strong></p>
+
+<p>它的典型应用是比较两条长正合列。比如在拓扑里，一个连续映射若在覆盖中的各块上都诱导同调同构，那么把 Mayer-Vietoris 的两条长正合列排成图，再用五引理，往往就能推出整体上也是同调同构。也就是说，五引理是把“局部都对”升级成“全局也对”的机械臂。</p>
+
+<p>蛇引理则更基础。设有交换图</p>
+
+\[
+\begin{array}{ccccccccc}
+0&\to&A'&\to&A&\to&A''&\to&0\\
+&&\downarrow&&\downarrow&&\downarrow\\
+0&\to&B'&\to&B&\to&B''&\to&0
+\end{array}
+\]
+
+<p>两行都正合，则存在自然长链</p>
+
+\[
+\boxed{
+\ker(A'\to B')
+\to
+\ker(A\to B)
+\to
+\ker(A''\to B'')
+\xrightarrow{\delta}
+\operatorname{coker}(A'\to B')
+\to
+\operatorname{coker}(A\to B)
+\to
+\operatorname{coker}(A''\to B'').
+}
+\]
+
+<p>它之所以叫“蛇”，只是因为构造连接映射时，你要沿着图里的箭头蛇形追元素。真正该记的是用途：当你有一张由短正合列组成的交换图时，蛇引理会自动把核与余核接成一条长正合列。长正合列不是凭空掉下来的，它往往就是蛇引理在不同场景里的投影。</p>
+
+<p>一个很实用的应用，是给乘法映射造出短正合列。比如</p>
+
+\[
+0\to \mathbb Z\xrightarrow{\cdot n}\mathbb Z\to \mathbb Z/n\mathbb Z\to 0
+\]
+
+<p>先在这里出场，随后被张量积或 \(\operatorname{Hom}\) 推过去。你马上就会看到，Tor 与 Ext 其实都能看成“普通函子破坏正合性后，蛇引理和长正合列把缺掉的信息重新拽出来”的结果。</p>
+
+<h2 id="secB-4">B.4 投射模、内射模与分解：为什么要先把对象换成好算的模型</h2>
+
+<p>导出函子之所以能定义，靠的是先把一个对象换成“足够好”的分解。对左导出函子，最常用的是投射分解；对右导出函子，最常用的是内射分解。</p>
+
+<p>一个 \(R\)-模 \(P\) 叫投射，如果对每个满射 \(M\twoheadrightarrow N\) 和每个映射 \(P\to N\)，都能提升成 \(P\to M\)。图像上，它有这种 lifting 性：</p>
+
+\[
+\begin{array}{ccc}
+& & M\\
+& \nearrow & \downarrow\\
+P & \longrightarrow & N
+\end{array}
+\]
+
+<p>自由模都是投射模，投射模是自由模的直和因子。于是很多时候你可以先用自由模分解，再把它看成投射分解。投射分解就是一串投射模</p>
+
+\[
+\cdots \to P_2\to P_1\to P_0\to M\to 0
+\]
+
+<p>去解析 \(M\)。</p>
+
+<p>内射模则把箭头方向反过来。一个模 \(I\) 叫内射，如果对每个单射 \(M\hookrightarrow N\) 和每个映射 \(M\to I\)，都能延拓成 \(N\to I\)。也就是：</p>
+
+\[
+\begin{array}{ccc}
+M & \hookrightarrow & N\\
+\downarrow & & \downarrow\\
+I & = & I
+\end{array}
+\]
+
+<p>在 \(\mathbb Z\)-模，也就是阿贝尔群的世界里，\(\mathbb Q/\mathbb Z\) 这类可除群提供典型内射对象。于是右导出函子通常通过内射分解来算。</p>
+
+<p>这一步的哲学和本书前面的通用性质非常一致：你不直接对一个任意对象硬下手，而是先把它放进一个“对目标函子足够友好”的模型里。投射和内射不是技术性附录，它们正是“先做一个通用替换，再把真实信息从替换后的同调里读出来”的经典体现。</p>
+
+<h2 id="secB-5">B.5 Tor 的具体算法：张量积不左正合时，缺口在哪里</h2>
+
+<p>函子 \(-\otimes_R N\) 总是右正合，但一般不左正合。换句话说，它擅长保住商，却未必保住核。Tor 就是在测量这份失败。若</p>
+
+\[
+\cdots \to P_1\to P_0\to M\to 0
+\]
+
+<p>是 \(M\) 的投射分解，则定义</p>
+
+\[
+\boxed{
+\operatorname{Tor}^R_i(M,N)=H_i(P_\bullet\otimes_R N).
+}
+\]
+
+<p>最该背熟的算例，是在 \(R=\mathbb Z\) 上用</p>
+
+\[
+0\to \mathbb Z\xrightarrow{\cdot n}\mathbb Z\to \mathbb Z/n\to 0
+\]
+
+<p>来分解 \(\mathbb Z/n\)。把它和任意阿贝尔群 \(A\) 张量后得到</p>
+
+\[
+0\to \operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,A)
+\to A\xrightarrow{\cdot n}A\to
+(\mathbb Z/n)\otimes A\to 0.
+\]
+
+<p>于是立刻读出</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,A)\cong A[n]=\{a\in A\mid na=0\},
+\]
+
+\[
+(\mathbb Z/n)\otimes A\cong A/nA.
+\]
+
+<p>也就是说，Tor 看到的是“被 \(n\) 杀掉的扭元素”。这句非常重要。以后你在万有系数定理里碰到 Tor，不要把它当作公式尾巴，而要立刻想到：某些扭元素正在通过换系数说话。</p>
+
+<p>再算一个手边就能核对的例子。取 \(A=\mathbb Z/m\)。那么</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,\mathbb Z/m)
+\cong
+(\mathbb Z/m)[n]
+\cong
+\mathbb Z/\gcd(m,n)\mathbb Z.
+\]
+
+<p>比如 \(m=6,n=4\) 时，被 \(4\) 杀掉的元素只有 \(0,3\)，所以 Tor 就是一个 \(\mathbb Z/2\)。这类算例最好自己手算一次，因为它会把“Tor 记录扭信息”这句话从抽象名词变成真正摸得着的对象。</p>
+
+<h2 id="secB-6">B.6 Ext 的具体算法：Hom 不右正合时，缺口在哪里</h2>
+
+<p>和张量积相对，\(\operatorname{Hom}_R(M,-)\) 是左正合而一般不右正合。它擅长保住核，却未必保住商。Ext 则测量这份失败。若用投射分解算第一变量，则</p>
+
+\[
+\boxed{
+\operatorname{Ext}^i_R(M,N)=H^i(\operatorname{Hom}_R(P_\bullet,N)).
+}
+\]
+
+<p>继续拿 \(\mathbb Z/n\) 的分解来算。对</p>
+
+\[
+0\to \mathbb Z\xrightarrow{\cdot n}\mathbb Z\to \mathbb Z/n\to 0
+\]
+
+<p>施加 \(\operatorname{Hom}_{\mathbb Z}(-,A)\)，得到余链复形</p>
+
+\[
+0\to \operatorname{Hom}(\mathbb Z,A)
+\xrightarrow{\cdot n}
+\operatorname{Hom}(\mathbb Z,A)\to 0.
+\]
+
+<p>由于 \(\operatorname{Hom}(\mathbb Z,A)\cong A\)，可直接读出</p>
+
+\[
+\operatorname{Ext}^1_{\mathbb Z}(\mathbb Z/n,A)\cong A/nA.
+\]
+
+<p>这和刚才的张量结果看起来很像，但意义不同。Tor 看到“被 \(n\) 杀掉的元素”，Ext\(^1\) 看到“模去 \(n\) 倍以后还剩什么”。对 \(A=\mathbb Z/m\) 而言，同样得到</p>
+
+\[
+\operatorname{Ext}^1_{\mathbb Z}(\mathbb Z/n,\mathbb Z/m)
+\cong
+\mathbb Z/\gcd(m,n)\mathbb Z.
+\]
+
+<p>在阿贝尔群世界里，\(\operatorname{Ext}^1\) 还有一个很重要的解释：它分类短正合列</p>
+
+\[
+0\to A\to E\to M\to 0
+\]
+
+<p>的扩张类型。也就是说，Ext 不只是一个“导出后得到的群”，它本身在记“对象如何被非平凡地拼起来”。这和第<a href="ch6.html"> 6 章</a>推出、拉回那种“通过通用性质拼对象”的感觉，其实非常同频，只不过这里的拼接已经进入阿贝尔范畴与同调层面。</p>
+
+<h2 id="secB-7">B.7 和实分析、代数拓扑的接口：同一台机器在别卷里怎样工作</h2>
+
+<p>如果你只把同调代数当作代数拓扑的后台，会低估它；如果你只把它当作范畴论的技术层，也会低估它。更好的看法是：它是一套统一处理“核、像、商、正合性与失真项”的语法，在别卷里早就反复出现了。</p>
+
+<p>先看和实分析的接口。你在<a href="../实分析/ch15.html">《实分析读本》第 15 章</a>学微积分基本定理时，其实已经见过一个完全正合的短链：</p>
+
+\[
+0\longrightarrow \mathbb R
+\longrightarrow C^1([a,b])
+\xrightarrow{\frac{d}{dx}}
+C([a,b])
+\longrightarrow 0.
+\]
+
+<p>这里核是常函数，导数映射又因存在原函数而满。也就是说，“导数的核是什么、像是什么”本身就是一次正合性判断。到了<a href="../实分析/ch24.html">第 24 章</a>函数空间与 \(L^p\) 语言，你进一步学会把函数空间看成真正的对象世界；de Rham 复形正是这件事的高维几何升级版：</p>
+
+\[
+0\to \mathbb R\to \Omega^0(M)\xrightarrow{d}\Omega^1(M)\xrightarrow{d}\Omega^2(M)\to\cdots
+\]
+
+<p>而 de Rham 上同调恰恰就是“这串 \(d\) 在哪里不再正合”的测量。</p>
+
+<p>再看代数拓扑。奇异链复形 \(C_\bullet(X)\) 是同调代数最经典的来源之一，而<a href="../代数拓扑/ch12.html">《代数拓扑读本》第 12 章</a> 的 Mayer-Vietoris、相对同调、以及附录 B 里的蛇引理版本，都在反复调用本附录的 B.2 与 B.3。你在拓扑里看到的长正合列，不是那门课的特殊魔法，而是短正合列的链复形被“取同调”之后普遍会长出来的形状。</p>
+
+<p>最后回到本卷。第<a href="ch17.html"> 17 章</a> 阿贝尔范畴让“核、余核、短正合列”成为结构语言；第<a href="ch18.html"> 18 章</a> 导出函子让 Tor 与 Ext 正式登场；本章又把这些对象送进派生范畴和稳定 \(\infty\)-范畴。换句话说，这份附录不是在书后临时补一块背景，而是在把一台早就开始工作的机器拆开给你看。</p>
+
+<p>如果一定要把同调代数压成一句总纲，那就是：当某个普通构造不再完全保精确时，丢掉的信息不会消失，而会以同调、连接同态、Tor、Ext 或更高导出函子的形式重新出现。学会这句，你以后在几何、拓扑、表示论、甚至分析里再次碰到长正合列时，就不会再觉得它们像临时凑出来的箭头森林。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 集合论与基础：大集合、proper class 与 Grothendieck 宇宙</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+
+</main>
+</body>
+</html>

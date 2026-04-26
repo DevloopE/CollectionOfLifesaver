@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 伴随函子（adjunction） — 普林斯顿范畴论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 表示函子</a><a href="ch12.html">下一章 · 第 12 章 伴随的等价定义与例子库 →</a></nav>
+<h1 id="ch11">第 11 章 伴随函子（adjunction）</h1>
+
+<p>如果你把前面十章读得足够认真，会慢慢发现一个奇怪的重复：自由群的定义在说“从一个集合出发，最自由地造一个群”；乘积的定义在说“从两张映射出发，最通用地装进一个对象”；指数对象在说“从 \(A\times X\to Y\) 的映射出发，等价地看成 \(A\to Y^X\) 的映射”；阿贝尔化则在说“把群中所有交换子压掉，得到最接近原群的阿贝尔群”。这些故事看起来题材完全不同，但句法极其像：总有某个对象或函子，把一类映射问题和另一类映射问题自然地对应起来。</p>
+
+<p>伴随函子正是对这种重复的统一刻画。它把“通用解”“自由构造”“内部化”“最佳近似”这些在数学里几乎无处不在的现象，全都压缩成一个 Hom-集合的自然双射。也正因此，很多数学家会把伴随叫做“范畴论真正的工作马”。Yoneda 像一面镜子，告诉你对象能被什么看见；伴随则像一台变换器，告诉你两种不同范畴里的映射问题其实何时是同一回事。</p>
+
+<p>这一章会先把定义写清，再用最经典的三个例子反复体会：自由群与忘掉函子，阿贝尔化与包含函子，积与指数对象。然后我们把由 Hom-双射长出来的 unit 与 counit 写出来，最后证明三角等式。到那时你会看到：伴随并不是在“再加一个高级结构”，而是在给所有通用性质找一个共同骨架。</p>
+
+<h2 id="sec11-1">11.1 伴随的定义：两类映射问题自然等价</h2>
+
+<p>设 \(F\colon C\to D\) 与 \(G\colon D\to C\) 是两个函子。我们说 \(F\) 左伴随于 \(G\)，记作</p>
+
+\[
+F\dashv G,
+\]
+
+<p>若对每个 \(A\in C\) 与 \(B\in D\)，存在自然双射</p>
+
+\[
+\boxed{\operatorname{Hom}_D(F A,B)\cong \operatorname{Hom}_C(A,G B).}
+\]
+
+<p>这里“自然”是关键。它不是说每对对象碰巧有某个双射，而是说当 \(A\) 和 \(B\) 变化时，这些双射与两边的态射复合相容。也就是说，左边“先在 \(D\) 中复合再转过去”，和右边“先转过去再在 \(C\) 中复合”，结果一样。</p>
+
+<p>这条公式应该被读成一句中文：从 \(F A\) 到 \(B\) 的箭头，与从 \(A\) 到 \(G B\) 的箭头是一回事，而且这种对应对 \(A,B\) 的变化是系统一致的。于是 \(F\) 被看成一种“自由地往左边世界造对象”的过程，而 \(G\) 则是一种“把右边对象拉回左边世界”的过程。两者不是互逆，因为对象本身通常不会互相恢复；真正互相匹配的是映射问题。</p>
+
+<p>这和第 10 章的 representability 极像，但层级高了一层。第 10 章说某个 Set 值函子是否由一个对象表示；现在我们是在问：对每个 \(B\in D\)，函子</p>
+
+\[
+A\longmapsto \operatorname{Hom}_D(F A,B)
+\]
+
+<p>是否被对象 \(G B\) 表示，而且这种表示对 \(B\) 自然变化。换句话说，伴随就是“一整个参数族的 representability，而且表示对象也随参数函子化”。你若记住这一层关系，后面的例子会好理解很多。</p>
+
+<p>还有一个很值得形成的直觉：左伴随往往“加结构”，右伴随往往“忘结构”或“抽出底层信息”。这是经验规律，不是定义，但极准。自由群把集合送成群，自由向量空间把集合送成向量空间，离散拓扑把集合送成拓扑空间，这些都是左伴随的味道；而忘掉群结构、忘掉拓扑、取底层集合，则是右伴随的味道。</p>
+
+<h3 id="sec11-1-1">先看一个顺手的序理论例子：上取整与下取整都是伴随</h3>
+
+<p>把偏序集看成范畴后，伴随就退化成 Galois connection。设 \(\mathbb Z\) 与 \(\mathbb R\) 都视为按大小比较的范畴，包含函子 \(i\colon \mathbb Z\hookrightarrow \mathbb R\) 只是把整数看成实数。此时</p>
+
+\[
+i\dashv \lfloor-\rfloor
+\]
+
+<p>意味着对任意整数 \(m\) 和实数 \(r\)，有</p>
+
+\[
+i(m)\le r\quad\Longleftrightarrow\quad m\le \lfloor r\rfloor.
+\]
+
+<p>这是真的，因为“整数 \(m\) 不大于 \(r\)”当且仅当“它不大于 \(r\) 的最大整数部分”。同理也有</p>
+
+\[
+\lceil-\rceil\dashv i,
+\]
+
+<p>因为</p>
+
+\[
+\lceil r\rceil\le n\quad\Longleftrightarrow\quad r\le i(n).
+\]
+
+<p>这个例子没有任何代数负担，却把伴随的味道说得很清楚：左伴随像“往上做最紧的离散逼近”，右伴随像“往下做最松的离散逼近”。伴随并不是专属于高深代数的结构，它甚至在取整函数里都已经出现了。</p>
+
+<h2 id="sec11-2">11.2 自由 \(\dashv\) 忘掉：伴随最经典的原型</h2>
+
+<p>现在回到大家最熟悉的例子。设</p>
+
+\[
+\mathrm{Free}\colon \mathrm{Set}\to\mathrm{Grp},\qquad
+U\colon \mathrm{Grp}\to\mathrm{Set}
+\]
+
+<p>分别是自由群函子与忘掉函子。自由群的通用性质说：对每个集合 \(S\) 和每个群 \(G\)，从 \(S\) 到 \(U(G)\) 的函数，与从 \(\mathrm{Free}(S)\) 到 \(G\) 的群同态自然一一对应：</p>
+
+\[
+\boxed{\operatorname{Hom}_{\mathrm{Grp}}(\mathrm{Free}(S),G)\cong \operatorname{Hom}_{\mathrm{Set}}(S,U(G)).}
+\]
+
+<p>这就是 \(\mathrm{Free}\dashv U\)。左边是“结构已经加好之后的群同态”，右边是“原始集合里的任意取值规则”。自由群之所以自由，是因为你只要在生成元层面给出一张函数，它就唯一延拓成群同态。</p>
+
+<p>注意这里的自然性很重要。若有集合映射 \(a\colon S'\to S\)，右边可以通过预合成得到</p>
+
+\[
+\operatorname{Hom}_{\mathrm{Set}}(S,U(G))\to \operatorname{Hom}_{\mathrm{Set}}(S',U(G)).
+\]
+
+<p>左边则通过 \(\mathrm{Free}(a)\colon \mathrm{Free}(S')\to \mathrm{Free}(S)\) 的预合成得到相应映射。另一方面，若有群同态 \(v\colon G\to H\)，两边又都能通过后合成推进。通用性质说这两边的变化彼此兼容，所以我们真的得到一个关于 \((S,G)\) 的自然双射族，而不是无关联的个别巧合。</p>
+
+<h3 id="sec11-2-1">把伴随双射真正算一遍：两生成自由群映到 \(S_3\)</h3>
+
+<p>取集合 \(S=\{x,y\}\)，群 \(G=S_3\)。右边</p>
+
+\[
+\operatorname{Hom}_{\mathrm{Set}}(S,U(S_3))
+\]
+
+<p>就是把 \(x,y\) 各自送到一个置换的所有方式，所以它有 \(|S_3|^2=36\) 个元素。左边</p>
+
+\[
+\operatorname{Hom}_{\mathrm{Grp}}(\mathrm{Free}(x,y),S_3)
+\]
+
+<p>看上去像非常大的对象，因为自由群元素有无限多词。但伴随说它也恰好有 36 个群同态，因为每个同态完全由</p>
+
+\[
+\varphi(x),\ \varphi(y)\in S_3
+\]
+
+<p>决定。举例说，若</p>
+
+\[
+\varphi(x)=(12),\qquad \varphi(y)=(123),
+\]
+
+<p>那么</p>
+
+\[
+\varphi(xy^{-1}x)= (12)(132)(12).
+\]
+
+<p>你可以直接在置换群里算出它等于 \((123)\)。无论自由群里词多复杂，同态的全部信息都压缩在生成元的像上。这正是伴随双射的力量：左边是一整个“结构世界”的 Hom-集合，右边却是一个没有任何关系约束的底层函数集。伴随把它们说成同一回事。</p>
+
+<p>如果你把这条双射和第 10 章的 representability 放在一起看，会发现自由群的通用性质同时在说两件事：对固定集合 \(S\)，函子 \(G\mapsto\operatorname{Set}(S,U(G))\) 被 \(\mathrm{Free}(S)\) 表示；而当 \(S\) 随之变化时，这些表示对象组织成了一个左伴随函子 \(\mathrm{Free}\)。所以伴随可以被理解为“成批出现的 representability”。</p>
+
+<h2 id="sec11-3">11.3 阿贝尔化 \(\dashv\) 包含：最接近原群的阿贝尔群</h2>
+
+<p>第二个例子几乎和自由群一样经典，但味道有些不同。设</p>
+
+\[
+\operatorname{ab}\colon \mathrm{Grp}\to\mathrm{Ab},\qquad
+\iota\colon \mathrm{Ab}\hookrightarrow \mathrm{Grp}
+\]
+
+<p>分别是阿贝尔化函子与包含函子。对任意群 \(G\)，其阿贝尔化定义为</p>
+
+\[
+G_{\mathrm{ab}}=G/[G,G],
+\]
+
+<p>其中 \([G,G]\) 是交换子子群。直观上，这是把群中“一切不交换的信息”全部压掉，得到最接近 \(G\) 的阿贝尔群。</p>
+
+<p>伴随陈述是：</p>
+
+\[
+\boxed{\operatorname{Hom}_{\mathrm{Ab}}(G_{\mathrm{ab}},A)\cong \operatorname{Hom}_{\mathrm{Grp}}(G,\iota A).}
+\]
+
+<p>这是什么意思？意思是说：从 \(G\) 到任意阿贝尔群 \(A\) 的群同态，必然唯一分解经过商映射</p>
+
+\[
+\pi_G\colon G\to G_{\mathrm{ab}}.
+\]
+
+<p>因为阿贝尔群里所有交换子都必须被送成单位元，所以任何群同态 \(f\colon G\to A\) 都自动满足 \([G,G]\subseteq \ker f\)。于是商映射的普遍性质保证存在唯一阿贝尔群同态 \(\overline f\colon G_{\mathrm{ab}}\to A\) 使</p>
+
+\[
+f=\iota(\overline f)\circ \pi_G.
+\]
+
+<p>这就是左伴随的典型味道：阿贝尔化不是“尽量保留所有信息”，而是“在进入阿贝尔世界这一前提下，保留尽可能多的信息”。从通用性质角度看，它是 \(G\) 到阿贝尔范畴 \(\mathrm{Ab}\) 的最佳逼近。</p>
+
+<h3 id="sec11-3-1">用 \(S_3\) 算一次：为什么映到 \(\mathbb Z/2\) 的同态都经过阿贝尔化</h3>
+
+<p>先算 \(S_3\) 的阿贝尔化。你若记得群论，\(A_3\) 是它的交换子子群，所以</p>
+
+\[
+(S_3)_{\mathrm{ab}}\cong S_3/A_3\cong \mathbb Z/2.
+\]
+
+<p>现在取目标阿贝尔群 \(A=\mathbb Z/2\)。伴随告诉你</p>
+
+\[
+\operatorname{Hom}_{\mathrm{Ab}}(\mathbb Z/2,\mathbb Z/2)
+\cong
+\operatorname{Hom}_{\mathrm{Grp}}(S_3,\mathbb Z/2).
+\]
+
+<p>左边只有两个群同态：零同态和恒等同态。于是右边也只能有两个。事实上，右边那两个同态正是：</p>
+
+<ul>
+  <li>把所有元素都送到 \(0\) 的零同态；</li>
+  <li>符号同态 \(\operatorname{sgn}\colon S_3\to\{\pm1\}\cong\mathbb Z/2\)。</li>
+</ul>
+
+<p>更重要的是，任何 \(f\colon S_3\to\mathbb Z/2\) 都自动经过商映射 \(S_3\to S_3/A_3\)。因此“研究 \(S_3\) 到阿贝尔群的同态”实际上等价于“研究 \((S_3)_{\mathrm{ab}}\) 到该阿贝尔群的同态”。伴随把一个群论观察提升成了一条函子层面的统一原则。</p>
+
+<p>这个例子也帮你形成另一个经验：左伴随常常像某种“自由添加”或“强制施加关系后的最优对象”。自由群是加最少关系，阿贝尔化是加上所有交换关系。两者性格相反，却都满足左伴随的通用模式。伴随统一的是模式，不是材料。</p>
+
+<h2 id="sec11-4">11.4 \(-\times X\dashv (-)^X\)：指数对象把“两个变量”塞回一个变量</h2>
+
+<p>第三个核心例子来自笛卡尔闭范畴。先在 \(\mathrm{Set}\) 中看。固定一个集合 \(X\)。定义两个函子</p>
+
+\[
+-\times X\colon \mathrm{Set}\to\mathrm{Set},\qquad
+(-)^X\colon \mathrm{Set}\to\mathrm{Set},
+\]
+
+<p>其中 \(Y^X=\operatorname{Hom}_{\mathrm{Set}}(X,Y)\) 是从 \(X\) 到 \(Y\) 的函数集。伴随陈述是：</p>
+
+\[
+\boxed{\operatorname{Hom}(A\times X,B)\cong \operatorname{Hom}(A,B^X).}
+\]
+
+<p>这就是你在初等集合论或程序设计里熟悉的 curry/uncurry。给一张函数</p>
+
+\[
+f\colon A\times X\to B,
+\]
+
+<p>等价于给一张函数</p>
+
+\[
+\widetilde f\colon A\to B^X,
+\]
+
+<p>其中 \(\widetilde f(a)\) 本身是从 \(X\) 到 \(B\) 的函数，定义为</p>
+
+\[
+\widetilde f(a)(x)=f(a,x).
+\]
+
+<p>反过来，若给定 \(g\colon A\to B^X\)，便可定义</p>
+
+\[
+\widehat g\colon A\times X\to B,\qquad
+\widehat g(a,x)=g(a)(x).
+\]
+
+<p>两步互逆，所以得到双射。这里的自然性也完全直观：你无论先在 \(A\) 或 \(B\) 上改变量，再 curry，还是先 curry 再改变量，得到的函数都一样。</p>
+
+<h3 id="sec11-4-1">做一遍有限集合的具体 curry：四张表其实是一回事</h3>
+
+<p>取</p>
+
+\[
+A=\{0,1\},\qquad X=\{a,b\},\qquad B=\{u,v\}.
+\]
+
+<p>先给一个函数 \(f\colon A\times X\to B\)，规定</p>
+
+\[
+f(0,a)=u,\quad f(0,b)=v,\quad f(1,a)=v,\quad f(1,b)=v.
+\]
+
+<p>那么 curry 后得到 \(\widetilde f\colon A\to B^X\)。这里 \(B^X\) 的元素就是从 \(\{a,b\}\) 到 \(\{u,v\}\) 的函数，总共有四个。具体地：</p>
+
+\[
+\widetilde f(0)=
+\begin{cases}
+a\mapsto u,\\
+b\mapsto v,
+\end{cases}
+\qquad
+\widetilde f(1)=
+\begin{cases}
+a\mapsto v,\\
+b\mapsto v.
+\end{cases}
+\]
+
+<p>反过来，若有人只把 \(\widetilde f\) 给你，你完全能恢复原函数表格，因为</p>
+
+\[
+f(0,a)=\widetilde f(0)(a),\qquad
+f(0,b)=\widetilde f(0)(b),\qquad
+f(1,a)=\widetilde f(1)(a),\qquad
+f(1,b)=\widetilde f(1)(b).
+\]
+
+<p>这就是伴随双射最直接的样子：左边是一张二元函数表，右边是一张“给每个 \(a\) 指派一个 \(X\to B\) 的函数”的一元函数表。数据没有变，只是打包方式变了。</p>
+
+<p>你若从程序语言角度看，这就是函数式编程里 currying 的数学原型；若从几何角度看，这就是指数对象把“参数化映射”内部化的方式；若从范畴论角度看，这就是最典型的伴随之一。到了<a href="../表示论/ch11.html">《表示论读本》第 11 章</a>你会看到张量与 Hom 的伴随，那时这个模式会换一个更线性的外壳继续出现。</p>
+
+<h2 id="sec11-5">11.5 unit 与 counit：从 Hom-双射里长出来的两支箭头</h2>
+
+<p>一旦有伴随 \(F\dashv G\)，就会自动长出两族非常关键的态射。先看 unit。对任意 \(A\in C\)，把左边 Hom-集合中的恒等态射</p>
+
+\[
+1_{F A}\in \operatorname{Hom}_D(F A,F A)
+\]
+
+<p>通过伴随双射送到右边，就得到一条箭头</p>
+
+\[
+\eta_A\colon A\to G F A.
+\]
+
+<p>这对所有 \(A\) 自然变化，于是形成一个自然变换</p>
+
+\[
+\eta\colon 1_C\Rightarrow G F.
+\]
+
+<p>这叫伴随的 unit。</p>
+
+<p>同样地，对任意 \(B\in D\)，把右边 Hom-集合中的恒等态射</p>
+
+\[
+1_{G B}\in \operatorname{Hom}_C(G B,G B)
+\]
+
+<p>通过双射反向送回左边，得到</p>
+
+\[
+\varepsilon_B\colon F G B\to B.
+\]
+
+<p>这对 \(B\) 自然变化，于是形成</p>
+
+\[
+\varepsilon\colon F G\Rightarrow 1_D.
+\]
+
+<p>这叫伴随的 counit。</p>
+
+\[
+\boxed{\eta_A\colon A\to GFA,\qquad \varepsilon_B\colon FGB\to B.}
+\]
+
+<p>如果你把伴随看成一台“把左边映射问题转译到右边”的机器，那么 unit 是把一个对象 \(A\) 送进“先左后右”的复合 \(GFA\) 的最原始方式；counit 则是把“先右后左”得到的 \(FGB\) 收缩回 \(B\) 的最原始方式。它们不是额外附加结构，而是伴随双射对恒等态射的读数。</p>
+
+<h3 id="sec11-5-1">在自由群伴随里，\(\eta\) 和 \(\varepsilon\) 分别是什么</h3>
+
+<p>对 \(\mathrm{Free}\dashv U\)，unit 在集合 \(S\) 上的分量</p>
+
+\[
+\eta_S\colon S\to U(\mathrm{Free}(S))
+\]
+
+<p>就是把每个元素当作自由生成元送进去的那张最原始函数。比如 \(S=\{x,y\}\) 时，\(\eta_S(x)=x,\eta_S(y)=y\)。它恰好是第 10 章自由群 representability 中的通用元素。</p>
+
+<p>而 counit 在群 \(G\) 上的分量</p>
+
+\[
+\varepsilon_G\colon \mathrm{Free}(U(G))\to G
+\]
+
+<p>则是“把以 \(G\) 的底层元素为字母形成的自由词，按 \(G\) 里的乘法真正算值”。例如，自由词 \(g_1g_2^{-1}g_3\) 被送到群元素 \(g_1g_2^{-1}g_3\in G\)。它之所以存在且唯一，正是因为自由群的通用性质允许“在生成元层面取恒等函数 \(U(G)\to U(G)\)”唯一延拓成群同态。</p>
+
+<p>这两个箭头非常值得记牢，因为它们几乎把“自由群”的全部直觉都压进去了：unit 是把裸元素嵌进最自由的结构里，counit 是把自由结构按目标对象的真实运算收缩回去。很多伴随的 unit/counit 都有类似味道。</p>
+
+<h2 id="sec11-6">11.6 三角等式：来回折返为什么必须退回恒等</h2>
+
+<p>unit 和 counit 不是随便长出来的，它们满足两个决定性的恒等式，叫三角等式：</p>
+
+\[
+\boxed{G\varepsilon\circ \eta G=1_G,\qquad \varepsilon F\circ F\eta=1_F.}
+\]
+
+<p>把它们在对象层面写开就是：</p>
+
+\[
+G(B)\xrightarrow{\eta_{G(B)}}GFG(B)\xrightarrow{G(\varepsilon_B)}G(B)
+\]
+
+<p>等于 \(1_{G(B)}\)，以及</p>
+
+\[
+F(A)\xrightarrow{F(\eta_A)}FGF(A)\xrightarrow{\varepsilon_{F(A)}}F(A)
+\]
+
+<p>等于 \(1_{F(A)}\)。为什么这两条一定成立？最透明的证明是直接回到伴随双射，追踪恒等态射如何来回对应。</p>
+
+<p>例如证明 \(\varepsilon_{F(A)}\circ F(\eta_A)=1_{F(A)}\)。注意 \(\eta_A\) 是 \(1_{F(A)}\) 在双射下的像。现在把 \(\eta_A\) 再通过双射反向送回去，按定义应当回到 \(1_{F(A)}\)。而反向送回去的公式，正是把 \(\eta_A\) 先作用 \(F\)，再接上 counit，也就是</p>
+
+\[
+\varepsilon_{F(A)}\circ F(\eta_A).
+\]
+
+<p>所以它必须等于 \(1_{F(A)}\)。另一条三角等式完全对偶。</p>
+
+<p>这两条式子有非常强的几何意味。它们说：如果你先用 unit 把一个对象送进“先左后右”的世界，再用 counit 拉回来，沿着相应一侧折返，最终没有多出来任何扭曲。也就是说，伴随不是胡乱地在两边来回传递信息，而是以一种最紧、最稳的方式实现映射问题之间的等价。</p>
+
+<h3 id="sec11-6-1">在阿贝尔化伴随里看三角等式：压掉交换子后再嵌回去不会再损失</h3>
+
+<p>对 \(\operatorname{ab}\dashv \iota\)，unit 在群 \(G\) 上就是商映射</p>
+
+\[
+\eta_G=\pi_G\colon G\to \iota(G_{\mathrm{ab}}).
+\]
+
+<p>而 counit 在阿贝尔群 \(A\) 上其实就是恒等同构</p>
+
+\[
+\varepsilon_A\colon (\iota A)_{\mathrm{ab}}\to A,
+\]
+
+<p>因为阿贝尔群的阿贝尔化什么也不改。于是三角等式的一边变成：先把 \(A\) 视作群，再阿贝尔化，再用 counit 回来，当然等于 \(1_A\)。另一边则说：从群 \(G\) 先商掉交换子得到 \(G_{\mathrm{ab}}\)，再把它作为群看待并再阿贝尔化，不会发生第二次新的压缩。因为一次阿贝尔化已经把该杀掉的都杀干净了。</p>
+
+<p>你看，三角等式并不只是形式公理，它们精确表达了“第一次自由化或商化已经做到位，折返时不会再多做事”。这也解释了为什么 unit/counit 经常被视为伴随的操作性核心：它们直接告诉你对象怎样进入伴随、怎样从伴随折返。</p>
+
+<h2 id="sec11-7">11.7 伴随到底在统一什么：从通用箭头到下一章</h2>
+
+<p>现在把这一章放回整本书的主线里看。第 10 章说 representability 是“某个 Set 值函子被对象表示”；本章说 adjunction 是“对每个右边对象 \(B\)，函子 \(A\mapsto \operatorname{Hom}_D(F A,B)\) 被 \(G B\) 表示，而且对 \(B\) 自然”。于是伴随本质上就是一整排 representability 同时发生。</p>
+
+<p>这也解释了一个常见经验：一旦你怀疑某个构造是左伴随，证明路径往往不是去猜一个神秘 Hom-双射，而是去问“给定右边对象 \(B\)，我能否为每个 \(A\) 的某类数据找一个通用解？”自由对象、阿贝尔化、局部化、张量积、sheafification、Spec/全局截面，这些后面会遇到的例子几乎都按这条思路走。</p>
+
+<p>还要记住，伴随并不要求 \(F\) 和 \(G\) 互为等价。一般来说它们远远没有那么强。自由群的底层集合再忘掉后并不回到原集合，阿贝尔化也不可能从一个阿贝尔群完全恢复原群。伴随保存的不是对象本身，而是某类映射问题的最优对应。它比等价弱得多，却因为正好抓住了通用性质而强得刚好够用。</p>
+
+<p>这一章最该带走的四句话可以压成下面这样。</p>
+
+<ul>
+  <li>\(F\dashv G\) 的含义是 \(\operatorname{Hom}_D(FA,B)\cong \operatorname{Hom}_C(A,GB)\) 自然于 \(A,B\)。</li>
+  <li>自由 \(\dashv\) 忘掉、阿贝尔化 \(\dashv\) 包含、\(-\times X\dashv(-)^X\) 是三种最基本的伴随原型。</li>
+  <li>每个伴随都会自动给出 unit \(\eta\) 与 counit \(\varepsilon\)。</li>
+  <li>三角等式表达了“沿伴随来回折返，恰好退回恒等”的最小一致性。</li>
+</ul>
+
+<p>下一章我们会把这整套结构再拆开重看：Hom-双射、unit/counit、通用箭头，这三种定义如何彼此等价；更多例子如何被批量识别出来；尤其是<a href="../代数几何/ch11.html">《代数几何读本》第 11 章</a>里出现的 \(\operatorname{Spec}\) 与全局截面，为什么也是一个伴随。你若现在已经觉得伴随像一种“到处都在出现但此前没被点名”的模式，那就说明读对了。它确实就是这样一种结构。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 表示函子</a><a href="ch12.html">下一章 · 第 12 章 伴随的等价定义与例子库 →</a></nav>
+
+</main>
+</body>
+</html>

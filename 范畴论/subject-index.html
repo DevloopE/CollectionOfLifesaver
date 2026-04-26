@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>索引 — 普林斯顿范畴论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B 同调代数预备：链复形、长正合列、五引理、蛇引理与 Tor / Ext</a><span class="nav-disabled">下一章 →</span></nav>
+<h1 id='subject-index'>索引</h1>
+
+<p>这份索引按拼音字母分组，但条目尽量写成“你现在想做什么”而不是只堆术语。数字默认指本卷章节；需要补基础时，我会直接写附录 A 或附录 B。最推荐的用法不是从头读到尾，而是先把你手上的问题翻成一个动作，再来找对应条目。</p>
+
+<h2 id="index-B">B</h2>
+
+<ul>
+  <li><strong>伴随函子</strong> 想判断一个“自由构造”到底在不在解某个最优问题，先看 11、12；想知道左伴随为何保余极限、右伴随为何保极限，再看 13。</li>
+  <li><strong>表示函子</strong> 想知道“某个参数问题是否由一个对象代表”这句话到底在说什么，先看 10；想看它怎样直接进入概形与模空间，接 20.1-20.2。</li>
+</ul>
+
+<h2 id="index-D">D</h2>
+
+<ul>
+  <li><strong>单子</strong> 想把“先自由生成、再忘掉结构”压成一个自函子上的代数，先看 14；想知道它怎样长成 Eilenberg-Moore 与 Kleisli 范畴，再看 15。</li>
+  <li><strong>导出函子</strong> 想知道 Tor、Ext 为什么不是技术尾巴，而是在补普通函子的精确性缺口，先看 18 和附录 B；想看它怎样进入派生几何，再接 20.5。</li>
+</ul>
+
+<h2 id="index-F">F</h2>
+
+<ul>
+  <li><strong>范畴</strong> 想从“对象 + 保结构映射”真正起步，先看 1、2；想知道为什么这门课不是改名词，而是在改对象观，回看 20.8。</li>
+  <li><strong>反范畴</strong> 想搞清 presheaf、反变函子和 Yoneda 为什么总带一个 \(op\)，先看 2、3、8、9。</li>
+  <li><strong>函子</strong> 想把“一个构造会随映射自然移动”说成正式语言，先看 3；想看群表示、基本群和 functor of points 都是同一套语法，再看 20.1、20.6。</li>
+  <li><strong>函子范畴</strong> 想把“对象是函子、态射是自然变换”的世界真正当成工作平台，先看 8；想看 presheaf 范畴与 Yoneda 嵌入怎样会师，再看 9。</li>
+</ul>
+
+<h2 id="index-G">G</h2>
+
+<ul>
+  <li><strong>Grothendieck 宇宙</strong> 想知道为什么“所有集合”不能再装成一个集合，以及范畴论怎样安全地谈大小，先看附录 A.5-A.6。</li>
+  <li><strong>广义元素</strong> 想把“\(S\)-点”而不只是普通点当成对象的探针，先看 10；想看它怎样直接进入概形与模空间，再看 20.1-20.2。</li>
+</ul>
+
+<h2 id="index-J">J</h2>
+
+<ul>
+  <li><strong>极限</strong> 想把积、等化子、拉回统一看成一个图表的通用解，先看 5、6、7；想知道右伴随为何天然保极限，再看 13。</li>
+  <li><strong>局部小</strong> 想知道为什么对象可以“大”，但 Hom 最好仍是集合，先看附录 A.3。</li>
+</ul>
+
+<h2 id="index-K">K</h2>
+
+<ul>
+  <li><strong>可表函子</strong> 想把“一个函子真来自某个对象”说成正式语言，先看 10；想看它在代数几何模空间里怎样真正落地，再看 20.1-20.2。</li>
+</ul>
+
+<h2 id="index-L">L</h2>
+
+<ul>
+  <li><strong>拉回 / 推出</strong> 想知道“沿映射改基底”与“沿公共部分粘对象”为什么是一对最基本图形，先看 6；想看拉回为何又会在类型论里变成 substitution，再看 20.3。</li>
+  <li><strong>locally small</strong> 想知道 Yoneda 为什么需要每个 Hom 都是集合，而不一定要整个对象类都是集合，先看附录 A.3-A.4。</li>
+</ul>
+
+<h2 id="index-P">P</h2>
+
+<ul>
+  <li><strong>presheaf</strong> 想把“对象被所有测试器观察”的思想系统化，先看 8、9；想看它为何是拓扑斯和模空间语言的入口，再看 19、20.1。</li>
+  <li><strong>proper class</strong> 想知道“太大而不能是集合”到底是什么意思，以及为什么 \(\mathbf{Set}\) 不是自己的对象，先看附录 A.2-A.4。</li>
+</ul>
+
+<h2 id="index-Q">Q</h2>
+
+<ul>
+  <li><strong>群作为单对象范畴</strong> 想知道为什么表示就是函子、为什么对称能自然进入范畴语言，先看 2、3；想看它怎样升级成 2-表示，再看 20.6。</li>
+</ul>
+
+<h2 id="index-S">S</h2>
+
+<ul>
+  <li><strong>自然变换</strong> 想知道两个函子之间“逐对象给箭头”为什么还要满足自然方块，先看 4；想看这件事为何决定 Yoneda 和 2-表示的写法，再看 9、20.6。</li>
+  <li><strong>stack</strong> 想知道为什么模空间不能总是集合值函子，以及自动同构怎样逼出更高值域，先看 20.2。</li>
+  <li><strong>蛇引理</strong> 想把一张交换图里的核与余核自动接成长正合列，先看附录 B.3。</li>
+</ul>
+
+<h2 id="index-T">T</h2>
+
+<ul>
+  <li><strong>topos</strong> 想知道为什么一个范畴也能带自己的内部逻辑，先看 19；想看它和类型论、cohesive 结构如何继续相遇，再看 20.3、20.7。</li>
+  <li><strong>同调代数</strong> 想快速补链复形、长正合列、Tor、Ext 的后台，直接看附录 B；想看这些工具为何会流入派生范畴，再回 18。</li>
+  <li><strong>同伦类型论</strong> 想知道为什么“等式像路径”“类型像 \(\infty\)-群胚”，先看 20.3、20.7。</li>
+  <li><strong>通用性质</strong> 想摆脱“对象靠显式构造定义”的习惯，学会用唯一性刻画对象，先看 5、6；想看这种想法怎样一路推到可表函子，再看 10。</li>
+</ul>
+
+<h2 id="index-W">W</h2>
+
+<ul>
+  <li><strong>无穷范畴</strong> 想知道“态射之间还有态射”到底在补什么坑，先看 20.4；想把它和高阶同伦、派生世界接起来，再看 20.5。</li>
+  <li><strong>五引理</strong> 想在两条长正合列之间把局部同构推出整体同构，先看附录 B.3。</li>
+</ul>
+
+<h2 id="index-X">X</h2>
+
+<ul>
+  <li><strong>想把一个模空间问题说成函子问题</strong> 先看 10、20.1、20.2；若卡在 functor of points 的直觉上，再补附录 A 与《代数几何读本》附录 B。</li>
+  <li><strong>想知道为什么同一个图表里老在出现拉回、推出、极限、伴随</strong> 先看 6、7、11、13，再回 20.8 把大图焊起来。</li>
+  <li><strong>想弄清普通范畴哪里不够，为什么还要上 \(\infty\)-范畴</strong> 直接看 20.4；若后面想接高阶代数与派生几何，再看 20.5。</li>
+</ul>
+
+<h2 id="index-Y">Y</h2>
+
+<ul>
+  <li><strong>Yoneda 引理</strong> 想真正理解“对象由它如何被所有测试对象看到而决定”，先看 9；想看这句话怎样直接进入概形、模空间与 functor of points，再看 20.1-20.2。</li>
+  <li><strong>余极限</strong> 想把余积、余等化子、推出统一看成一个图表的通用余解，先看 5、6、7；想知道左伴随为何天然保余极限，再看 13。</li>
+  <li><strong>宇宙</strong> 想知道为什么范畴论作者爱说“取一个足够大的宇宙”，直接看附录 A.5-A.6。</li>
+</ul>
+
+<h2 id="index-Z">Z</h2>
+
+<ul>
+  <li><strong>自然性</strong> 想判断一个构造到底是不是“和所有映射兼容”，先看 4、9、11；想看自然性如何在长正合列与连接同态里继续出现，再补附录 B。</li>
+  <li><strong>张量范畴</strong> 想知道“对象能相乘”这件事为何要带结合约束与单位约束，先看 16；想看它怎样升级到高阶代数，再看 20.5。</li>
+  <li><strong>证明为什么总在比较图表而不是只算元素</strong> 先看 4、6、9、13；若你想看这种风格在更高处怎样继续工作，收尾看 20.4-20.8。</li>
+</ul>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B 同调代数预备：链复形、长正合列、五引理、蛇引理与 Tor / Ext</a><span class="nav-disabled">下一章 →</span></nav>
+
+</main>
+</body>
+</html>
