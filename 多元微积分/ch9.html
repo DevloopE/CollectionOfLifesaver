@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 多元链式法则 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 切平面与线性化</a><a href="ch10.html">下一章 · 第 10 章 梯度与方向导数 →</a></nav>
+<h1 id="ch9">第 9 章 多元链式法则</h1>
+
+<p>一元链式法则讲的是这样一件事:如果 \(y\) 是 \(u\) 的函数,而 \(u\) 又是 \(x\) 的函数,那么把这两层函数复合得到 \(y(x)\),它对 \(x\) 的导数等于各阶导数之积:\(\dfrac{dy}{dx} = \dfrac{dy}{du}\cdot\dfrac{du}{dx}\)。这个公式背后的精神是非常物理的——"中间变量 \(u\) 对 \(x\) 敏感的程度"乘以"\(y\) 对 \(u\) 敏感的程度",就是 \(y\) 对 \(x\) 整体的敏感程度。一连串小齿轮咬合,把扰动从一头传到另一头。</p>
+
+<p>多元链式法则做完全同样的事,但当中间步骤不止一个变量、或最终的自变量也不止一个时,把每一条<em>贡献路径</em>加起来这件事就要做得格外明白。这一章我们一步一步把它建立起来:从一根中间变量到一棵完整的依赖树,从显式的代入计算到隐函数求导的优雅写法。每一处的诀窍其实都同一件事——画出依赖树,数出路径,沿每条路径把因子乘起来,把所有路径加起来。</p>
+
+<h2 id="sec9-1">9.1 链式法则:单中间变量情形</h2>
+
+<p>设 \(z = f(x, y)\),并且 \(x = x(t)\)、\(y = y(t)\) 都依赖于一个共同的参数 \(t\)。那么沿着 \(t \to (x, y) \to z\) 的链条,\(z\) 间接地变成了 \(t\) 的函数。它对 \(t\) 的导数是</p>
+
+<p>\[\boxed{\frac{dz}{dt} = \frac{\partial f}{\partial x}\cdot\frac{dx}{dt} + \frac{\partial f}{\partial y}\cdot\frac{dy}{dt}.}\]</p>
+
+<p>这个公式凭"线性近似"能直接读出来。当 \(t\) 增加一点 \(dt\),\(x\) 改变约 \(\dfrac{dx}{dt}\,dt\),\(y\) 改变约 \(\dfrac{dy}{dt}\,dt\)。\(z\) 是 \((x, y)\) 的函数,根据第 8 章的全微分公式,改变约</p>
+
+<p>\[dz \approx \frac{\partial f}{\partial x}\,dx + \frac{\partial f}{\partial y}\,dy = \left(\frac{\partial f}{\partial x}\cdot\frac{dx}{dt} + \frac{\partial f}{\partial y}\cdot\frac{dy}{dt}\right)dt.\]</p>
+
+<p>两端除以 \(dt\) 取极限,就得上式。换言之,链式法则不是一个新原理,只是全微分公式 \(dz = f_x\,dx + f_y\,dy\) 在 \(x, y\) 都依赖 \(t\) 时的自然推论。</p>
+
+<p>如果你愿意画一棵依赖树:把 \(z\) 放在最上面,它的两个孩子是 \(x\) 和 \(y\),再下一层是它们共同的父变量 \(t\)。从 \(z\) 沿每一条路径走到 \(t\),每条路径上把"上一节点对下一节点的偏导/导数"乘起来,把所有路径相加,就得到 \(\dfrac{dz}{dt}\)。这棵树有两条路径:\(z \to x \to t\) 给出 \(\dfrac{\partial f}{\partial x}\cdot\dfrac{dx}{dt}\);\(z \to y \to t\) 给出 \(\dfrac{\partial f}{\partial y}\cdot\dfrac{dy}{dt}\)。两者相加。</p>
+
+<p>看一道。设 \(z = x^2 y + y^3\),其中 \(x = \sin t\)、\(y = \cos t\)。求 \(\dfrac{dz}{dt}\)。</p>
+
+<p>四个偏导/导数:\(f_x = 2xy\);\(f_y = x^2 + 3y^2\);\(dx/dt = \cos t\);\(dy/dt = -\sin t\)。代进公式:</p>
+
+<p>\[\frac{dz}{dt} = (2xy)(\cos t) + (x^2 + 3y^2)(-\sin t).\]</p>
+
+<p>用 \(x = \sin t\)、\(y = \cos t\) 代回去化简:</p>
+
+<p>\[= 2\sin t \cos t \cdot \cos t + (\sin^2 t + 3\cos^2 t)(-\sin t) = 2\sin t\cos^2 t - \sin^3 t - 3\sin t\cos^2 t.\]</p>
+
+<p>合并同类项:\(-\sin t \cos^2 t - \sin^3 t = -\sin t(\cos^2 t + \sin^2 t) = -\sin t\)。</p>
+
+<p>检查一下。这一题里我们其实可以"先代入再求导":\(z = \sin^2 t\cos t + \cos^3 t = \cos t(\sin^2 t + \cos^2 t) = \cos t\),所以 \(dz/dt = -\sin t\)。两条路径殊途同归。</p>
+
+<p>那为什么还要费力气走链式法则那条路?因为在大多数实际情境下,你<em>无法</em>把所有东西展开化简,或者展开了也看不出门道。再看一道:设 \(z = f(x, y)\) 是一个抽象函数(题目并没有给出公式),只告诉你 \(f_x(2, 1) = 3\)、\(f_y(2, 1) = -1\),\(x = 2 + t^2\)、\(y = 1 - t\),问 \(\dfrac{dz}{dt}\) 在 \(t = 0\) 处的值。</p>
+
+<p>\(t = 0\) 时,\(x = 2\)、\(y = 1\),刚好对应给的偏导数信息。\(dx/dt = 2t\) 在 \(t = 0\) 是 \(0\);\(dy/dt = -1\)。所以</p>
+
+<p>\[\left.\frac{dz}{dt}\right|_{t=0} = (3)(0) + (-1)(-1) = 1.\]</p>
+
+<p>注意这里我们根本不知道 \(f\) 长什么样,但链式法则照样给出明确的数。这种"局部信息就够"的能力,是它最强大的地方。</p>
+
+<p>再看一道带物理味道的。一只蚂蚁在平面上沿轨迹 \((x(t), y(t)) = (3\cos t, 2\sin t)\) 走(一个椭圆),周围温度场是 \(T(x, y) = x^2 + 2y^2\)。问蚂蚁感受到的温度变化率 \(dT/dt\)。</p>
+
+<p>\(\partial T/\partial x = 2x\),\(\partial T/\partial y = 4y\);\(dx/dt = -3\sin t\),\(dy/dt = 2\cos t\)。代入:</p>
+
+<p>\[\frac{dT}{dt} = 2x(-3\sin t) + 4y(2\cos t) = -6x\sin t + 8y\cos t.\]</p>
+
+<p>用 \(x = 3\cos t\)、\(y = 2\sin t\) 代回:\(\dfrac{dT}{dt} = -18\cos t\sin t + 16\sin t\cos t = -2\sin t\cos t = -\sin(2t)\)。所以蚂蚁感受到的温度变化是周期 \(\pi\) 的振荡函数,在 \(t = \pi/4\) 时下降最快。</p>
+
+<p>再来一道几何味儿的。一个气球的形状是球,半径 \(r(t)\) 在 \(t\) 秒时变化(它在被吹胀),其表面积 \(S = 4\pi r^2\)。这是退化的"链式法则"——只有一个中间变量,但能让你看清结构:\(\dfrac{dS}{dt} = \dfrac{dS}{dr}\cdot\dfrac{dr}{dt} = 8\pi r\cdot\dfrac{dr}{dt}\)。如果在某瞬间 \(r = 5\,\mathrm{cm}\),\(dr/dt = 0.2\,\mathrm{cm/s}\),则 \(dS/dt = 8\pi(5)(0.2) = 8\pi \approx 25.1\,\mathrm{cm^2/s}\)。这是一元链式法则的伪装——但它告诉我们,链式法则的精神在多元里只是路径多了几条,并没有在原理上添什么新东西。</p>
+
+<p>什么时候链式法则比"先代入"省事?当 \(f\) 难以化简但 \(f_x, f_y, dx/dt, dy/dt\) 都易得时;当 \(f\) 是抽象记号、只有局部数据时;当问题问的是"在某一点的瞬间变化率"而不要求全局公式时。这些情形下,链式法则是直接、最自然的工具。</p>
+
+<h2 id="sec9-2">9.2 多中间变量情形</h2>
+
+<p>把上面的故事扩展一档。如果 \(z = f(x, y)\),但现在 \(x = x(s, t)\)、\(y = y(s, t)\) 都依赖于<em>两</em>个独立变量 \(s\) 和 \(t\),那么 \(z\) 是 \((s, t)\) 的函数,它的偏导数为</p>
+
+<p>\[\boxed{\frac{\partial z}{\partial s} = \frac{\partial f}{\partial x}\cdot\frac{\partial x}{\partial s} + \frac{\partial f}{\partial y}\cdot\frac{\partial y}{\partial s},}\]</p>
+
+<p>\[\boxed{\frac{\partial z}{\partial t} = \frac{\partial f}{\partial x}\cdot\frac{\partial x}{\partial t} + \frac{\partial f}{\partial y}\cdot\frac{\partial y}{\partial t}.}\]</p>
+
+<p>每一个 \(\partial z/\partial s\)、\(\partial z/\partial t\) 都通过 \(x\) 与 \(y\) 这两条<em>路径</em>对最终的输入变量做贡献,把它们加起来即可。</p>
+
+<p>更一般地,如果 \(z = f(x_1, \ldots, x_n)\),每个 \(x_i = x_i(t_1, \ldots, t_m)\),那么</p>
+
+<p>\[\frac{\partial z}{\partial t_j} = \sum_{i=1}^n \frac{\partial f}{\partial x_i}\cdot\frac{\partial x_i}{\partial t_j}.\]</p>
+
+<p>看上去很复杂,实际上脑子里要做的还是同一件事:画一张依赖树,从 \(z\) 出发,经过每一个中间变量 \(x_i\),最终落到要求偏导数的那个 \(t_j\),沿每条路径把因子乘起来,把所有路径相加。</p>
+
+<p>稍稍把这棵树画在脑子里:根是 \(z\),它的孩子是中间变量 \(x_1, x_2, \ldots, x_n\)(每个 \(x_i\) 旁边的那条边记成 \(\partial f/\partial x_i\)),再下一层每个 \(x_i\) 的孩子是它依赖的所有 \(t_j\)(\(x_i \to t_j\) 的边记成 \(\partial x_i/\partial t_j\))。求 \(\partial z/\partial t_j\) 时,你只考虑那些通向 \(t_j\) 的路径,把每条路径上的两段边相乘,然后所有这种路径相加。</p>
+
+<p>有意思的是,这个"路径相加"的精神和概率论里的<em>全概率公式</em>很像——某件事可以经过若干互不相干的途径发生,每条途径有自己的概率,把它们加起来就是总概率。这里则是某个变量的扰动可以经过若干互不相干的中间变量传到末端,每条途径有自己的"传导率",把它们加起来就是总传导率。</p>
+
+<p>看一道。设 \(z = e^{xy}\),其中 \(x = s + t\)、\(y = st\)。求 \(\partial z/\partial s\) 与 \(\partial z/\partial t\)。</p>
+
+<p>对 \(f\) 求偏导:\(f_x = ye^{xy}\);\(f_y = xe^{xy}\)。对中间变量求偏导:\(x_s = 1\),\(x_t = 1\);\(y_s = t\),\(y_t = s\)。所以</p>
+
+<p>\[\frac{\partial z}{\partial s} = ye^{xy}\cdot 1 + xe^{xy}\cdot t = e^{xy}(y + xt),\]</p>
+
+<p>\[\frac{\partial z}{\partial t} = ye^{xy}\cdot 1 + xe^{xy}\cdot s = e^{xy}(y + xs).\]</p>
+
+<p>如果题目要求把答案写成 \(s, t\) 的最终表达式,就把 \(x = s + t\)、\(y = st\) 代回去:\(\partial z/\partial s = e^{(s+t)st}(st + (s+t)t) = e^{(s+t)st}(2st + t^2)\);类似地 \(\partial z/\partial t = e^{(s+t)st}(2st + s^2)\)。</p>
+
+<p>再看一道含三个中间变量的。设 \(w = f(x, y, z) = x^2 + y^2 + z^2\),其中 \(x = r\cos\theta\),\(y = r\sin\theta\),\(z = r\)。求 \(\partial w/\partial r\) 与 \(\partial w/\partial \theta\)。</p>
+
+<p>\(f_x = 2x\),\(f_y = 2y\),\(f_z = 2z\);\(x_r = \cos\theta\),\(x_\theta = -r\sin\theta\);\(y_r = \sin\theta\),\(y_\theta = r\cos\theta\);\(z_r = 1\),\(z_\theta = 0\)。</p>
+
+<p>\[\frac{\partial w}{\partial r} = 2x\cos\theta + 2y\sin\theta + 2z\cdot 1.\]</p>
+
+<p>用 \(x = r\cos\theta\) 等代回:\(= 2r\cos^2\theta + 2r\sin^2\theta + 2r = 2r + 2r = 4r\)。</p>
+
+<p>\[\frac{\partial w}{\partial \theta} = 2x(-r\sin\theta) + 2y(r\cos\theta) + 2z\cdot 0 = -2r^2\cos\theta\sin\theta + 2r^2\sin\theta\cos\theta = 0.\]</p>
+
+<p>检查一下。事实上 \(w = x^2 + y^2 + z^2 = r^2\cos^2\theta + r^2\sin^2\theta + r^2 = 2r^2\);所以 \(\partial w/\partial r = 4r\) 和 \(\partial w/\partial \theta = 0\) 都对得上。这种"先代入再求"的方法在这一题里更省事,但链式法则的优势在于:你<em>不需要</em>先把所有东西化简就能写出答案。当 \(f\) 是个"抽象"函数,或代入后表达式很丑时,链式法则不可替代。</p>
+
+<p>再来一道抽象情形的。设 \(f\) 是个二元可微函数,\(F(s, t) = f(s + t, st)\)。求 \(F_s\) 与 \(F_t\),把答案用 \(f_x, f_y\) 表示(下标表示对第一、第二个变量的偏导数)。</p>
+
+<p>这里的中间变量是 \(x = s + t\) 和 \(y = st\)。\(x_s = 1\),\(x_t = 1\);\(y_s = t\),\(y_t = s\)。所以</p>
+
+<p>\[F_s = f_x \cdot 1 + f_y \cdot t = f_x + t f_y, \qquad F_t = f_x \cdot 1 + f_y \cdot s = f_x + s f_y,\]</p>
+
+<p>这里 \(f_x, f_y\) 都是在 \((x, y) = (s + t, st)\) 处取值的。这种"答案里还带着 \(f_x, f_y\) 的"写法是抽象链式法则的常态——它告诉你扰动是如何在依赖网络中传播的,而不要求你具体知道 \(f\) 是什么。</p>
+
+<p>顺便指出一个常见误会。当你看到 \(F(s, t) = f(s + t, st)\) 时,人很容易忘记 \(f_x\) 和 \(f_y\) 是<em>对 \(f\) 的<strong>原</strong>变量</em>求的偏导,而不是对 \(s, t\) 的。如果你写 \(\dfrac{\partial f(s+t, st)}{\partial s} = f_s\),那就完全错了——\(f\) 根本就不直接是 \(s\) 的函数。链式法则的整个意义就是把"\(f\) 对 \(s\) 的依赖"<em>分解</em>为"\(f\) 对 \(x\)、对 \(y\) 的依赖"和"\(x, y\) 对 \(s\) 的依赖"两层。</p>
+
+<h2 id="sec9-3">9.3 重新审视隐函数求导</h2>
+
+<p>一元里,我们有隐函数求导的标准例子:\(x^2 + y^2 = 1\) 隐式地定义了 \(y\) 是 \(x\) 的函数(在 \(y > 0\) 或 \(y < 0\) 的范围内);两边对 \(x\) 求导得 \(2x + 2y\, y' = 0\),所以 \(y' = -x/y\)。这种"两边求导,把 \(y'\) 当作未知数解出来"的过程在一元微积分里要讲半节课。</p>
+
+<p>多元链式法则给我们一种<em>优雅得多</em>的写法,而且推导本身就是链式法则的一行应用。设方程 \(F(x, y) = 0\) 隐式定义了 \(y\) 为 \(x\) 的函数,则</p>
+
+<p>\[\boxed{\frac{dy}{dx} = -\frac{F_x}{F_y}.}\]</p>
+
+<p>推导很短:方程 \(F(x, y(x)) = 0\) 两端对 \(x\) 求导。左边的 \(F\) 通过两条路径依赖 \(x\)——直接的(第一个槽里),以及间接的(经由 \(y\))。链式法则说,\(F\) 对 \(x\) 的总导数是 \(F_x\cdot 1 + F_y\cdot y' = F_x + F_y\,y'\)。右边的 \(0\) 对 \(x\) 的导数是 \(0\)。所以 \(F_x + F_y\,y' = 0\),解出 \(y' = -F_x/F_y\)。</p>
+
+<p>看一道。\(x^2 + y^2 = 1\)。设 \(F = x^2 + y^2 - 1\)。\(F_x = 2x\),\(F_y = 2y\)。所以 \(y' = -2x/(2y) = -x/y\)。和"两边求导"得到的答案一致,但过程明显更短——只需要算两个偏导数,然后写一个分数。</p>
+
+<p>更广义地,三元方程 \(F(x, y, z) = 0\) 隐式定义 \(z\) 为 \((x, y)\) 的函数,则</p>
+
+<p>\[\boxed{\frac{\partial z}{\partial x} = -\frac{F_x}{F_z},\qquad \frac{\partial z}{\partial y} = -\frac{F_y}{F_z}.}\]</p>
+
+<p>同样的推导:把 \(F(x, y, z(x, y)) = 0\) 两端对 \(x\) 求偏导。\(F\) 经由三条途径依赖 \(x\)(直接、经由 \(y\)、经由 \(z\)),但 \(y\) 是与 \(x\) 独立的输入变量,故 \(\partial y/\partial x = 0\),那条路径的贡献为零。所以 \(F_x + F_z \cdot \partial z/\partial x = 0\),解出 \(\partial z/\partial x = -F_x/F_z\)。\(\partial z/\partial y\) 同理。</p>
+
+<p>看一道。椭球面 \(x^2 + 2y^2 + 3z^2 = 6\) 在点 \((1, 1, 1)\) 处,求 \(\partial z/\partial x\) 与 \(\partial z/\partial y\)。设 \(F = x^2 + 2y^2 + 3z^2 - 6\)。则 \(F_x = 2x = 2\),\(F_y = 4y = 4\),\(F_z = 6z = 6\)。所以 \(\partial z/\partial x = -2/6 = -1/3\),\(\partial z/\partial y = -4/6 = -2/3\)。</p>
+
+<p>再看一道含超越函数的。设 \(F(x, y, z) = \sin(xyz) + xyz - 1 = 0\) 在点 \((1, 1, \pi/2)\) 附近隐式定义 \(z = z(x, y)\)。求 \(\partial z/\partial x\) 在该点。</p>
+
+<p>\(F_x = yz\cos(xyz) + yz\),\(F_z = xy\cos(xyz) + xy\)。在 \((1, 1, \pi/2)\) 处,\(xyz = \pi/2\),\(\cos(\pi/2) = 0\),所以 \(F_x = (1)(\pi/2)(0) + (\pi/2) = \pi/2\),\(F_z = (1)(1)(0) + 1 = 1\)。则 \(\partial z/\partial x = -F_x/F_z = -\pi/2\)。</p>
+
+<p>这一节里值得提一句的是:隐函数求导<em>能用</em>的前提是 \(F_z \neq 0\)(对应于"\(z\) 真的能由 \((x, y)\) 解出"这件事,这是隐函数定理的一部分,严格陈述见 A.6 节)。如果 \(F_z = 0\),那个分母就出问题了——几何上对应于在那一点等值面变成"竖直"的(法向量没有 \(z\) 分量),在那一点你无法把 \(z\) 写成 \((x, y)\) 的单值函数。这一类细节我们这里不深究,但你心里要有数。</p>
+
+<p>第 10 章我们认识<strong>梯度</strong>——一个把所有偏导数打包到一个向量里的对象。它看起来只是个记号上的便利,但藏在它背后的是几条让人惊艳的几何性质,会把切平面、方向导数、最优化方向这些事统统串起来。</p>
+
+<hr/>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 切平面与线性化</a><a href="ch10.html">下一章 · 第 10 章 梯度与方向导数 →</a></nav>
+
+</main>
+</body>
+</html>

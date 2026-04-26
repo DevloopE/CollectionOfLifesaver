@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目录 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+<header class="title-block">
+  <h1 class="book-title">普林斯顿多元微积分读本</h1>
+  <p class="book-subtitle">学好多元微积分所需的全部工具</p>
+  <p class="book-byline">一本写给真正想把它弄懂的你</p>
+</header>
+
+<h1 id="preface">前言</h1>
+
+<p>欢迎你翻开这本书。在你正式开始读它之前，请允许我先和你说几句话——不是讲多元微积分本身，而是讲我希望你和这本书之间会发生什么样的一段关系。</p>
+
+<p>不论你此刻坐在大学一年级的教室里，正第一次撞上"梯度"这个词；还是你已经把课程上完了一半，心里隐约觉得自己始终没看清楚那条主线；又或者你早已大学毕业很多年，因为做物理、做工程、做机器学习、做经济学，需要重新把这门课捡回来——我都希望本书是适合你的那一本。我尽力让它对每一种读者都说得上话。</p>
+
+<p>我是按当年我自己学这些东西时所希望有人这样写出来的方式来写它的。多元微积分给人的印象，是一片公式的森林：梯度、旋度、散度、雅可比、斯托克斯、格林、高斯，外加十几种看上去都差不多的积分号。这个印象并不公平。一旦你认出穿过它的几条路，这片森林其实并不大。整本书真正只有三个大想法——<strong>导数被推广，积分被推广，微积分基本定理被推广</strong>——其余的一切都只是记账。诀窍就在这套记账方式。</p>
+
+<p>所以，请不要在第一次接触某个新符号时就觉得自己被压垮了。那些符号大多只是同一件事在不同情境下换上的衣服。我会在每一处都尝试把"它真正在说什么"说出来，并把"它和你已经会的东西有什么关系"指出来。如果你能做到耐心地读、动手地读，你会发现这门课比它的名声友善得多。</p>
+
+<h2>为什么要看这本书？</h2>
+
+<p>我假设你是真的想把这门课学好，而不只是想凑合过去。所以你已经准备好投入一些时间和精力。很好。作为交换，本书只对你提一个要求：<strong>当你看到一道带演算的例题时，先用手挡住下一段，自己动手做一做。</strong> 五分钟的卡壳所带给你的进步，要超过看一小时演算。这是一条听起来简单、但几乎所有人都做不到的规则；如果你能做到，本书对你就有用得多。</p>
+
+<h2>在读这本书之前我需要知道什么？</h2>
+
+<p>你需要一元微积分：极限、导数、积分、链式法则、基本积分技巧，以及对数列与级数的基本认识（在两个地方我们会用到泰勒级数，仅此而已）。你需要预备的代数与三角学知识。你<strong>不</strong>需要线性代数——本书所需要的那一小部分线性代数会在第 1、2 章从零讲起。</p>
+
+<p>如果你的一元微积分基础有些动摇，去找本书的"前传"——Adrian Banner 的《普林斯顿微积分读本》——把它放在手边，每当我说"正如我们在一元微积分中见过的"时，你就翻一翻它。一元微积分牢固的人学多元微积分会顺得多，这一点没有捷径。</p>
+
+<h2>"我下周就要考试了，从哪里开始？"</h2>
+
+<p>下一节是按主题分类的<a href="#reverse-index">反向索引表</a>。找到你要的主题，去对应的小节读那几节，把里面的例题做出来，然后随便翻翻周围的内容。<strong>别想从头读到尾——没那个时间。</strong>反向索引表是为这种情形量身打造的：先解决眼前那门考试，等学期结束，你再回头按章节读，把这本书当作真正的教材。</p>
+
+<h2>例题在哪里？</h2>
+
+<p>它们就嵌在正文里。看别人在黑板上漂亮地解出一道题，并不会教会你像他那样思考。所以本书没有"例 1.2.4. 求……的梯度"这样的格式。我向你展示的是：<strong>当我看见这道题时，我心里在想什么。</strong>第一反应、产生的怀疑、重新构思的瞬间、最后的检查。这种思维过程贯穿全书，是本书最核心的工具。它不是花哨的修辞——而是因为，能不能像数学家那样想问题，往往比能不能"算对"更决定一个人能走多远。</p>
+
+<h2>定理的证明在哪里？</h2>
+
+<p>本书中的大多数定理都给出了某种程度的论证——通常这种论证在直觉上是完整的，只是省略了一些技术性的假设。技术细节在<a href="appA.html">附录 A</a>里。你不必读附录就能使用这些定理；但等你能熟练运用它们之后，你应该回头去把附录读一遍。那是你从"会用"走向"真懂"的一步。</p>
+
+<h2>习题在哪里？</h2>
+
+<p>本书没有几百道习题。每一节里都嵌入了 1 到 3 道带详细思路的例题。如果要刷题，你需要一本专门的习题册——任何一本标准的多元微积分习题集都可以。<strong>用这本书学如何去想，再用一本习题书把那些想法变成本能。</strong>两件事本来就是不一样的，最好分开来做。</p>
+
+<h2>我要找的主题没出现怎么办？</h2>
+
+<p>去看索引。本书的索引是面向"行为"的：比如"切平面，用线性化求"，而不是只有"切平面"。如果还是找不到，那这个主题可能超出了标准多元微积分课程的范围（比如微分形式、流形、张量分析）。我故意把这些砍掉，是为了让本书是一本"读本"，而不是一本"百科全书"。它有它清晰的边界。</p>
+
+<h2>可以把本书当作教材吗？</h2>
+
+<p>可以。章节顺序与一学期的标准课程是匹配的。各章末尾没有习题，但例题可以拿来再用，而且课程结束以后那张反向索引表也让本书很容易当成参考书来查。许多读者最终把它放在书桌上，几年都不再合上。</p>
+
+<h2>勘误与补充材料</h2>
+
+<p>我会在网上维护勘误和额外的例题。如果你发现错误，请告诉我，我宁愿知道。一本书的好坏，最终是被它的读者一点一点改出来的。</p>
+
+<h1 id="how-to-use">如何使用本书</h1>
+
+<p>这本书的写法和你过去见过的大多数数学书都不太一样。在你读到第一页正文之前，让我把本书的几条阅读约定告诉你，免得你后来反复疑惑。</p>
+
+<h2>书中你会反复见到的几种段落</h2>
+
+<p>正文里偶尔会出现一段"配方式"的总结，把刚刚讲完的方法浓缩成几条可以机械执行的步骤。看到这种段落，请把它当作你做题时可以照着抄的菜谱。重要的是记住"什么时候触发它"，而不是脱离上下文地去背步骤。</p>
+
+<p>你也会经常在例题里看到一句类似"请你先自己试一下再往下读"的提示。请认真对待它。停下来。拿一张纸。试一下。哪怕你完全做不出来。<strong>特别是</strong>做不出来的时候——那时候下一段教给你的东西最多，因为你已经亲身体会过它要解决的困难。</p>
+
+<p>当你看到"正如我们在 X.Y 节中所见"这种回指——就去翻一下。这些小节都很短。我引用它，是因为联系是真实存在的，而不是仅仅为了凑形式。多元微积分中的"不同主题"，背后往往都是同一个想法换了件衣服；这些回指就是那条隐线。</p>
+
+<p>当你看到"参见附录 A.K"——那是附录 A 中的严格论证。第一遍读时跳过它，等你能熟练运用之后再回去看。<em>先用，再证</em>，是数学初学时最高效的次序。</p>
+
+<h2>记号与排印约定</h2>
+
+<p>本书的几条小约定值得你提前留意：</p>
+
+<ul>
+  <li>向量用<strong>粗体</strong>排印，例如 \(\mathbf{v}\)；手写时常加箭头，例如 \(\vec{v}\)。两者意思相同。</li>
+  <li>向量的分量写在<strong>尖括号</strong>里，例如 \(\langle 1, -2, 3 \rangle\)，以区别于点的圆括号 \((1, -2, 3)\)。</li>
+  <li>单位向量戴一顶<strong>帽子</strong>，例如 \(\hat{\mathbf{v}}\)。</li>
+  <li>关键结论会用<strong>方框</strong>圈出来。看到方框就把它抄下来。</li>
+  <li>遇到"\(\Longrightarrow\)" "\(\Longleftrightarrow\)"等符号，请按"推出"与"等价于"理解。</li>
+</ul>
+
+<h1 id="learning-habits">学习建议</h1>
+
+<p>如果你只愿意从这本书里采纳两个建议，请采纳下面这两个。它们能给你带来读完整本书 80% 的好处，几乎不需要额外成本。请去做。</p>
+
+<ol>
+  <li>
+    <p><strong>自己整理一份公式表。</strong>不要复印别人的，不要从网上下载一份，要自己写。<strong>写下它的过程</strong>，正是把那些公式锁在你脑子里的过程。数学不是历史课中那种背日期式的记忆，但确实有一些公式你必须随手就能调出来——而你只能通过亲手把它们写下来这一种方式，让它们到达指尖。每学完一章，就把当章值得记住的公式增补进去；学期结束时，你会有一份比任何参考资料都更适合你自己的小册子。</p>
+  </li>
+  <li>
+    <p><strong>模拟考试条件。</strong>选一道例题，盖住答案，定个时间。不许看手机，不许放音乐，不许吃零食，不许偷看。做。<strong>然后</strong>核对。这是唯一一种方式，能让你弄清楚哪些步骤你真会，哪些步骤你只是以为自己会。"以为自己会"是数学考场上最常见的失败模式；这个练习就是对付它最直接的解药。</p>
+  </li>
+</ol>
+
+<h1 id="reverse-index">主题反向索引</h1>
+
+<p>这张表是按"考试主题"组织的。如果你正在临阵磨枪，请在左栏找到你要的主题，去右栏给出的小节，跳过其他一切。如果你是按章节顺序学习，那么这张表是你期末复习时的好朋友——把它打印出来贴在墙上。</p>
+
+<table class="reverse-index">
+  <thead>
+    <tr>
+      <th>主题</th>
+      <th>小节</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><th colspan="2" class="topic-group">向量基础</th></tr>
+    <tr><td>向量、分量、模</td><td>1.2, 1.3</td></tr>
+    <tr><td>点积，向量间的夹角</td><td>1.5</td></tr>
+    <tr><td>叉积，平行四边形，三重积</td><td>1.6</td></tr>
+
+    <tr><th colspan="2" class="topic-group">三维几何</th></tr>
+    <tr><td>三维空间中的直线</td><td>2.1</td></tr>
+    <tr><td>三维空间中的平面</td><td>2.2</td></tr>
+    <tr><td>点到平面 / 点到直线的距离</td><td>2.3</td></tr>
+    <tr><td>二次曲面</td><td>2.4</td></tr>
+    <tr><td>柱面</td><td>2.5</td></tr>
+
+    <tr><th colspan="2" class="topic-group">曲线与运动</th></tr>
+    <tr><td>参数曲线</td><td>3.1, 3.4</td></tr>
+    <tr><td>向量函数的导数</td><td>3.3</td></tr>
+    <tr><td>曲线的切线</td><td>3.5</td></tr>
+    <tr><td>速度、速率、加速度</td><td>4.1</td></tr>
+    <tr><td>弧长</td><td>4.2</td></tr>
+    <tr><td>曲率，TNB 标架</td><td>4.3, 4.4</td></tr>
+    <tr><td>加速度的切向分量与法向分量</td><td>4.5</td></tr>
+
+    <tr><th colspan="2" class="topic-group">多元函数</th></tr>
+    <tr><td>图象、等高线、等值面</td><td>5.1, 5.2</td></tr>
+    <tr><td>极限与连续性</td><td>6.1, 6.2</td></tr>
+    <tr><td>证明极限不存在</td><td>6.3</td></tr>
+
+    <tr><th colspan="2" class="topic-group">偏导数及相关概念</th></tr>
+    <tr><td>偏导数，计算</td><td>7.1, 7.2</td></tr>
+    <tr><td>高阶偏导数，混合偏导数相等</td><td>7.3</td></tr>
+    <tr><td>切平面，线性化</td><td>8.1, 8.2</td></tr>
+    <tr><td>微分与小变化估计</td><td>8.3</td></tr>
+    <tr><td>链式法则（多元）</td><td>9.1, 9.2</td></tr>
+    <tr><td>隐函数求导</td><td>9.3</td></tr>
+    <tr><td>方向导数，梯度</td><td>10.1, 10.2</td></tr>
+    <tr><td>梯度的几何意义</td><td>10.3</td></tr>
+
+    <tr><th colspan="2" class="topic-group">优化问题</th></tr>
+    <tr><td>临界点，二阶导数判别法</td><td>11.1, 11.2</td></tr>
+    <tr><td>闭有界区域上的最值</td><td>11.3</td></tr>
+    <tr><td>拉格朗日乘数法（一个约束）</td><td>12.1</td></tr>
+    <tr><td>拉格朗日乘数法（两个约束）</td><td>12.2</td></tr>
+
+    <tr><th colspan="2" class="topic-group">重积分</th></tr>
+    <tr><td>矩形区域上的二重积分</td><td>13.1</td></tr>
+    <tr><td>一般区域上的二重积分</td><td>14.1, 14.2</td></tr>
+    <tr><td>交换积分次序</td><td>14.3</td></tr>
+    <tr><td>极坐标二重积分</td><td>15.1</td></tr>
+    <tr><td>三重积分（直角坐标）</td><td>16.1</td></tr>
+    <tr><td>三重积分（柱面坐标）</td><td>17.1</td></tr>
+    <tr><td>三重积分（球面坐标）</td><td>17.2</td></tr>
+    <tr><td>换元法，雅可比行列式</td><td>18.1, 18.2</td></tr>
+    <tr><td>应用：质量、质心、力矩</td><td>16.2, 17.3</td></tr>
+
+    <tr><th colspan="2" class="topic-group">向量微积分</th></tr>
+    <tr><td>向量场</td><td>19.1</td></tr>
+    <tr><td>第一型曲线积分（标量）</td><td>20.1</td></tr>
+    <tr><td>第二型曲线积分（向量场，做功）</td><td>20.2</td></tr>
+    <tr><td>保守场，曲线积分基本定理</td><td>21.1, 21.2</td></tr>
+    <tr><td>求势函数</td><td>21.3</td></tr>
+    <tr><td>格林定理</td><td>22.1, 22.2</td></tr>
+    <tr><td>参数曲面，曲面面积</td><td>23.1, 23.2</td></tr>
+    <tr><td>第一型曲面积分（标量）</td><td>24.1</td></tr>
+    <tr><td>通量积分</td><td>24.2</td></tr>
+    <tr><td>斯托克斯定理</td><td>25.1</td></tr>
+    <tr><td>散度定理</td><td>26.1</td></tr>
+  </tbody>
+</table>
+
+<h1 id="acknowledgments">致谢</h1>
+
+<p>我要感谢每一位曾经盯着我满脸困惑、逼我换一种讲法的学生——你们才是这本书真正的合著者。感谢那些读了草稿、并直接告诉我哪里偷懒了的同事，他们没有客套地放过任何一处含糊的句子。感谢 Adrian Banner，是他的《普林斯顿微积分读本》示范了"教科书也是可以有声音的"。也感谢家人，忍受了无数个"再多写一道例题就好"的夜晚。这本书属于他们和你们。</p>
+
+<h1 id="toc">目录</h1>
+
+<p>下面是全书 27 章加附录的完整目录。每一章后面附了页码与小节列表，方便你直接跳到自己要看的地方。</p>
+
+<nav class="toc">
+
+  <section class="toc-chapter">
+    <h2><a href="ch1.html">第 1 章　向量与三维空间</a> <span class="toc-page">第 1 页</span></h2>
+    <ul>
+      <li>1.1　从数轴到空间</li>
+      <li>1.2　向量是什么，又不是什么</li>
+      <li>1.3　加、减与数乘</li>
+      <li>1.4　模与单位向量</li>
+      <li>1.5　点积
+        <ul>
+          <li>1.5.1　代数定义与运算性质</li>
+          <li>1.5.2　几何意义：夹角与投影</li>
+          <li>1.5.3　例题</li>
+        </ul>
+      </li>
+      <li>1.6　叉积
+        <ul>
+          <li>1.6.1　定义与行列式记忆法</li>
+          <li>1.6.2　几何意义：面积与方向</li>
+          <li>1.6.3　标量三重积</li>
+          <li>1.6.4　例题</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch2.html">第 2 章　直线、平面与曲面</a> <span class="toc-page">第 31 页</span></h2>
+    <ul>
+      <li>2.1　三维直线
+        <ul>
+          <li>2.1.1　参数式</li>
+          <li>2.1.2　对称式</li>
+          <li>2.1.3　两条直线：平行、相交还是异面？</li>
+        </ul>
+      </li>
+      <li>2.2　三维平面
+        <ul>
+          <li>2.2.1　法向量式</li>
+          <li>2.2.2　三点确定一个平面</li>
+          <li>2.2.3　两平面的交线</li>
+        </ul>
+      </li>
+      <li>2.3　距离问题
+        <ul>
+          <li>2.3.1　点到平面</li>
+          <li>2.3.2　点到直线</li>
+          <li>2.3.3　异面两直线之间</li>
+        </ul>
+      </li>
+      <li>2.4　二次曲面——动物园游览</li>
+      <li>2.5　柱面与其他棱柱型曲面</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch3.html">第 3 章　向量值函数与曲线</a> <span class="toc-page">第 60 页</span></h2>
+    <ul>
+      <li>3.1　参数曲线：基本想法</li>
+      <li>3.2　向量函数的极限与连续性</li>
+      <li>3.3　向量函数的导数</li>
+      <li>3.4　常见曲线动物园</li>
+      <li>3.5　切向量与切线</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch4.html">第 4 章　空间中的运动</a> <span class="toc-page">第 84 页</span></h2>
+    <ul>
+      <li>4.1　速度、速率与加速度</li>
+      <li>4.2　弧长</li>
+      <li>4.3　单位切向量与曲率</li>
+      <li>4.4　法向量与副法向量；TNB 标架</li>
+      <li>4.5　加速度的切向分量与法向分量</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch5.html">第 5 章　多元函数</a> <span class="toc-page">第 105 页</span></h2>
+    <ul>
+      <li>5.1　二元函数的图象</li>
+      <li>5.2　等高线与等值面</li>
+      <li>5.3　三元及三元以上的函数</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch6.html">第 6 章　极限与连续性</a> <span class="toc-page">第 123 页</span></h2>
+    <ul>
+      <li>6.1　多元极限的基本想法</li>
+      <li>6.2　计算存在的极限</li>
+      <li>6.3　证明极限不存在（双路径法）</li>
+      <li>6.4　连续性</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch7.html">第 7 章　偏导数</a> <span class="toc-page">第 144 页</span></h2>
+    <ul>
+      <li>7.1　偏导数：定义与计算</li>
+      <li>7.2　几何意义与物理意义</li>
+      <li>7.3　高阶偏导；克莱罗定理</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch8.html">第 8 章　切平面与线性化</a> <span class="toc-page">第 161 页</span></h2>
+    <ul>
+      <li>8.1　图象的切平面</li>
+      <li>8.2　线性化与微分</li>
+      <li>8.3　估计小变化；误差传播</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch9.html">第 9 章　多元链式法则</a> <span class="toc-page">第 180 页</span></h2>
+    <ul>
+      <li>9.1　单中间变量情形</li>
+      <li>9.2　多中间变量情形</li>
+      <li>9.3　重新审视隐函数求导</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch10.html">第 10 章　梯度与方向导数</a> <span class="toc-page">第 198 页</span></h2>
+    <ul>
+      <li>10.1　方向导数</li>
+      <li>10.2　梯度向量</li>
+      <li>10.3　为什么梯度指向"上坡方向"</li>
+      <li>10.4　等值面的切平面</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch11.html">第 11 章　局部极值与最值</a> <span class="toc-page">第 218 页</span></h2>
+    <ul>
+      <li>11.1　临界点</li>
+      <li>11.2　二阶导数判别法</li>
+      <li>11.3　闭有界区域上的最值</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch12.html">第 12 章　拉格朗日乘数法</a> <span class="toc-page">第 240 页</span></h2>
+    <ul>
+      <li>12.1　一个约束</li>
+      <li>12.2　两个约束</li>
+      <li>12.3　该方法为什么有效</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch13.html">第 13 章　矩形区域上的二重积分</a> <span class="toc-page">第 260 页</span></h2>
+    <ul>
+      <li>13.1　黎曼和与基本想法</li>
+      <li>13.2　累次积分（富比尼定理）</li>
+      <li>13.3　例题</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch14.html">第 14 章　一般区域上的二重积分</a> <span class="toc-page">第 278 页</span></h2>
+    <ul>
+      <li>14.1　I 型与 II 型区域</li>
+      <li>14.2　设置上下限</li>
+      <li>14.3　交换积分次序</li>
+      <li>14.4　例题</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch15.html">第 15 章　极坐标二重积分</a> <span class="toc-page">第 300 页</span></h2>
+    <ul>
+      <li>15.1　极坐标复习</li>
+      <li>15.2　极坐标下的面积元素</li>
+      <li>15.3　何时该换到极坐标（何时不该）</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch16.html">第 16 章　三重积分</a> <span class="toc-page">第 318 页</span></h2>
+    <ul>
+      <li>16.1　累次三重积分</li>
+      <li>16.2　选择积分次序</li>
+      <li>16.3　应用：体积、质量、质心</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch17.html">第 17 章　柱面坐标与球面坐标</a> <span class="toc-page">第 340 页</span></h2>
+    <ul>
+      <li>17.1　柱面坐标</li>
+      <li>17.2　球面坐标</li>
+      <li>17.3　选择恰当的坐标系</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch18.html">第 18 章　换元法与雅可比行列式</a> <span class="toc-page">第 362 页</span></h2>
+    <ul>
+      <li>18.1　二维换元公式</li>
+      <li>18.2　计算雅可比行列式</li>
+      <li>18.3　例题</li>
+      <li>18.4　三维换元公式</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch19.html">第 19 章　向量场</a> <span class="toc-page">第 384 页</span></h2>
+    <ul>
+      <li>19.1　向量场是什么</li>
+      <li>19.2　常见例子</li>
+      <li>19.3　散度与旋度：定义</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch20.html">第 20 章　曲线积分</a> <span class="toc-page">第 402 页</span></h2>
+    <ul>
+      <li>20.1　标量函数的曲线积分（第一型）</li>
+      <li>20.2　向量场的曲线积分（第二型 / 做功）</li>
+      <li>20.3　与参数化方式无关</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch21.html">第 21 章　保守向量场</a> <span class="toc-page">第 422 页</span></h2>
+    <ul>
+      <li>21.1　路径无关性</li>
+      <li>21.2　曲线积分基本定理</li>
+      <li>21.3　求势函数</li>
+      <li>21.4　平面情形的旋度判别法</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch22.html">第 22 章　格林定理</a> <span class="toc-page">第 442 页</span></h2>
+    <ul>
+      <li>22.1　定理叙述与基本例子</li>
+      <li>22.2　两种形式（环量形式与通量形式）</li>
+      <li>22.3　区域有"洞"的情形</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch23.html">第 23 章　参数曲面与曲面面积</a> <span class="toc-page">第 462 页</span></h2>
+    <ul>
+      <li>23.1　曲面的参数化</li>
+      <li>23.2　曲面面积公式</li>
+      <li>23.3　例题</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch24.html">第 24 章　曲面积分</a> <span class="toc-page">第 482 页</span></h2>
+    <ul>
+      <li>24.1　第一型曲面积分（标量）</li>
+      <li>24.2　通量积分</li>
+      <li>24.3　选择定向</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch25.html">第 25 章　斯托克斯定理</a> <span class="toc-page">第 502 页</span></h2>
+    <ul>
+      <li>25.1　定理叙述与直观理解</li>
+      <li>25.2　例题</li>
+      <li>25.3　它如何推广格林定理</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch26.html">第 26 章　散度定理</a> <span class="toc-page">第 522 页</span></h2>
+    <ul>
+      <li>26.1　定理叙述与直观理解</li>
+      <li>26.2　例题</li>
+      <li>26.3　与格林定理、斯托克斯定理的关系</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch27.html">第 27 章　如何解决多元微积分问题</a> <span class="toc-page">第 540 页</span></h2>
+    <ul>
+      <li>27.1　主决策树</li>
+      <li>27.2　常见错误与如何避免</li>
+      <li>27.3　综合性问题</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter toc-appendix">
+    <h2><a href="appA.html">附录 A　严格处理</a> <span class="toc-page">第 560 页</span></h2>
+    <ul>
+      <li>A.1　多元极限的 ε-球定义</li>
+      <li>A.2　高维夹逼定理</li>
+      <li>A.3　可微 vs. 偏导数存在</li>
+      <li>A.4　为什么克莱罗定理需要连续性</li>
+      <li>A.5　链式法则的严格叙述与证明</li>
+      <li>A.6　黎曼和的收敛性</li>
+      <li>A.7　换元定理</li>
+      <li>A.8　斯托克斯与散度定理：严格的版本</li>
+    </ul>
+  </section>
+
+  <section class="toc-chapter toc-index">
+    <h2>索引</h2>
+  </section>
+
+</nav>
+
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+</main>
+</body>
+</html>

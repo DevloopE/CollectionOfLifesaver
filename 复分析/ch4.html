@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 Cauchy-Riemann 方程与调和函数 — 普林斯顿复分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 复微分与解析性</a><a href="ch5.html">下一章 · 第 5 章 初等复函数 →</a></nav>
+<h1 id="ch4">第 4 章 Cauchy-Riemann 方程与调和函数</h1>
+
+<p>第 3 章的最后一节，我们已经"嗅到"了一个奇怪的事实：复可导这个看似温和的条件，实际上把一个复函数 \(f(z) = u(x, y) + i v(x, y)\) 的实部 \(u\) 和虚部 \(v\) 强行<em>耦合</em>了起来。共轭函数 \(\bar z = x - iy\) 之所以处处不可导，本质上是因为它的实部 \(u = x\) 和虚部 \(v = -y\) 没有按这种特定方式耦合；而 \(z^2 = x^2 - y^2 + 2 i x y\) 之所以处处可导，本质上是因为它的实部 \(u = x^2 - y^2\) 和虚部 \(v = 2 x y\) 满足了那种耦合关系。</p>
+
+<p>本章的全部任务，就是把这种"耦合"显式地写出来——它就是<strong>柯西—黎曼方程</strong> (Cauchy-Riemann equations，简记 CR)。CR 是复分析里最基本、最频繁使用的方程，它在判别"哪些函数解析"、构造解析函数、连接复分析与偏微分方程之间扮演了核心角色。</p>
+
+<p>本章的具体内容是：</p>
+
+<ul>
+<li>从复可导的定义出发，正式推导 CR 方程。</li>
+<li>把 CR 方程的不同写法都罗列一遍：直角坐标版、Wirtinger 算子版、极坐标版。</li>
+<li>讨论 CR 是<em>必要</em>条件还是<em>充分</em>条件——这件事比看起来微妙。</li>
+<li>用 CR 实战判别若干具体函数的解析性。</li>
+<li>引出<strong>调和函数</strong> (harmonic function) 概念，证明"解析函数的实部与虚部都是调和函数"，从而把复分析与 Laplace 方程连接起来。</li>
+<li>给定一个调和函数 \(u\)，反过来求它的"调和共轭" \(v\)，从而构造一个完整的解析函数 \(u + iv\)。</li>
+<li>简述这件事在物理学（稳态热传导、静电势、二维不可压流动）中的应用——为什么物理学家对解析函数情有独钟。</li>
+</ul>
+
+<h2 id="sec4-1">4.1 推导 Cauchy-Riemann 方程</h2>
+
+<p>第 3.6 节里我们已经做了一次粗略的推导。本节把它做得严格一些、再把记号统一好。</p>
+
+<p>设 \(f: \Omega \to \mathbb{C}\) 是定义在开集 \(\Omega \subset \mathbb{C}\) 上的复函数，把它的输出按实部与虚部拆开：</p>
+
+\[
+f(z) = u(x, y) + i\, v(x, y), \quad \text{其中 } z = x + iy.
+\]
+
+<p>这里 \(u, v: \Omega \to \mathbb{R}\) 是两个实值函数，分别叫做 \(f\) 的<strong>实部</strong>与<strong>虚部</strong>。</p>
+
+<p>假设 \(f\) 在某个内点 \(z_0 = x_0 + i y_0 \in \Omega\) 处复可导，导数为 \(f'(z_0)\)。按定义：</p>
+
+\[
+f'(z_0) = \lim_{h \to 0} \frac{f(z_0 + h) - f(z_0)}{h}.
+\]
+
+<p>这个极限的关键是"\(h\) 沿任意路径趋于 0 都给出同一个值"。我们利用这一点，挑两条特别简单的路径分别算极限，再让它们相等。</p>
+
+<p><strong>路径一：实方向 \(h = \Delta x\)，\(\Delta x \to 0\)。</strong> 这时 \(z_0 + h = (x_0 + \Delta x) + i y_0\)，差商为</p>
+
+\[
+\frac{f(z_0 + \Delta x) - f(z_0)}{\Delta x} = \frac{u(x_0 + \Delta x, y_0) - u(x_0, y_0)}{\Delta x} + i\, \frac{v(x_0 + \Delta x, y_0) - v(x_0, y_0)}{\Delta x}.
+\]
+
+<p>当 \(\Delta x \to 0\) 时，按二元函数偏导的定义，右边趋于</p>
+
+\[
+\frac{\partial u}{\partial x}(x_0, y_0) + i\, \frac{\partial v}{\partial x}(x_0, y_0) = u_x + i v_x.
+\]
+
+<p>这里我们简记 \(u_x = u_x(x_0, y_0)\) 等等，约定省略求值点。所以</p>
+
+\[
+f'(z_0) = u_x + i v_x. \tag{*}
+\]
+
+<p><strong>路径二：纯虚方向 \(h = i \Delta y\)，\(\Delta y \to 0\)。</strong> 这时 \(z_0 + h = x_0 + i(y_0 + \Delta y)\)，差商为</p>
+
+\[
+\frac{f(z_0 + i \Delta y) - f(z_0)}{i \Delta y} = \frac{[u(x_0, y_0 + \Delta y) - u(x_0, y_0)] + i [v(x_0, y_0 + \Delta y) - v(x_0, y_0)]}{i \Delta y}.
+\]
+
+<p>分母里的 \(i\) 用 \(1/i = -i\) 处理掉：</p>
+
+\[
+= -i \cdot \frac{u(x_0, y_0 + \Delta y) - u(x_0, y_0)}{\Delta y} + (-i)(i) \cdot \frac{v(x_0, y_0 + \Delta y) - v(x_0, y_0)}{\Delta y}.
+\]
+
+<p>因 \((-i)(i) = -i^2 = 1\)，化为</p>
+
+\[
+= \frac{v(x_0, y_0 + \Delta y) - v(x_0, y_0)}{\Delta y} - i \cdot \frac{u(x_0, y_0 + \Delta y) - u(x_0, y_0)}{\Delta y}.
+\]
+
+<p>当 \(\Delta y \to 0\) 时，按对 \(y\) 的偏导定义，趋于</p>
+
+\[
+v_y - i u_y. \tag{**}
+\]
+
+<p>所以另一条路径给出 \(f'(z_0) = v_y - i u_y\)。</p>
+
+<p>"复可导"要求 (*) 和 (**) 相等：</p>
+
+\[
+u_x + i v_x = v_y - i u_y.
+\]
+
+<p>把实部对实部、虚部对虚部分别相等：</p>
+
+\[
+\boxed{u_x = v_y, \qquad u_y = -v_x.}
+\]
+
+<p>这就是<strong>柯西—黎曼方程</strong>。它是关于 \(u, v\) 的两个一阶偏微分方程的系统，把"\(u\) 对 \(x\) 的偏导"和"\(v\) 对 \(y\) 的偏导"绑在一起、把"\(u\) 对 \(y\) 的偏导"和"\(v\) 对 \(x\) 的偏导（取负）"绑在一起。</p>
+
+<p>另外把 (*) 单独存档：解析函数的导数有一个非常方便的公式</p>
+
+\[
+\boxed{f'(z) = u_x + i v_x = v_y - i u_y.}
+\]
+
+<p>等价的写法还有 \(f'(z) = u_x - i u_y\)（用 CR 把 \(v_x\) 换成 \(-u_y\)）和 \(f'(z) = v_y + i v_x\)（用 CR 把 \(u_x\) 换成 \(v_y\)）。这四个表达式两两等价、随便挑一个用。</p>
+
+<h2 id="sec4-2">4.2 直接验证：\(z^2\) 与 \(\bar z\) 再次登场</h2>
+
+<p>把上面这条结论用在第 3 章的两个老熟人身上。</p>
+
+<p><strong>例 1。</strong> \(f(z) = z^2 = (x + iy)^2 = (x^2 - y^2) + i(2 x y)\)。所以 \(u = x^2 - y^2\)、\(v = 2 x y\)。计算偏导：</p>
+
+\[
+u_x = 2 x, \quad u_y = -2 y, \quad v_x = 2 y, \quad v_y = 2 x.
+\]
+
+<p>检查 CR：\(u_x = 2 x = v_y\)（对 ✓），\(u_y = -2 y = -v_x\)（对 ✓）。两条都满足，且偏导都连续，所以 \(z^2\) 处处解析（这件事我们 3.3 节已经直接证明了）。导数为 \(f'(z) = u_x + i v_x = 2 x + 2 i y = 2(x + iy) = 2 z\)，跟 3.3 节算的 \(f'(z) = 2 z\) 完全一致。</p>
+
+<p><strong>例 2。</strong> \(f(z) = \bar z = x - iy\)。所以 \(u = x\)、\(v = -y\)。计算偏导：</p>
+
+\[
+u_x = 1, \quad u_y = 0, \quad v_x = 0, \quad v_y = -1.
+\]
+
+<p>检查 CR：\(u_x = 1\) 而 \(v_y = -1\)，不相等 ✗。CR 不成立，所以 \(\bar z\) 处处不解析（也跟 3.4 节结论一致）。</p>
+
+<p>这两个例子展示了 CR 作为<em>判别工具</em>的标准用法：把 \(f\) 写成 \(u + iv\)，算四个偏导，对照 CR 两条等式。如果失败，函数不解析；如果两条都对、且偏导连续（这一点的重要性见 4.4 节），函数解析。</p>
+
+<h2 id="sec4-3">4.3 形式优雅的写法：Wirtinger 算子</h2>
+
+<p>CR 方程还有一种格外优雅的写法，需要先引入两个微分算子。把 \(z = x + iy\) 和 \(\bar z = x - iy\) 看成"两个独立变量"（这是一种形式上的把戏，但非常有效），引入</p>
+
+\[
+\frac{\partial}{\partial z} = \frac{1}{2}\left(\frac{\partial}{\partial x} - i \frac{\partial}{\partial y}\right), \qquad \frac{\partial}{\partial \bar z} = \frac{1}{2}\left(\frac{\partial}{\partial x} + i \frac{\partial}{\partial y}\right).
+\]
+
+<p>这两个算子叫做<strong>Wirtinger 算子</strong>，简洁地说它们是"对 \(z\) 与对 \(\bar z\) 求偏导"。如果你形式地把 \(x = (z + \bar z)/2\)、\(y = (z - \bar z)/(2 i)\) 代回去，再按链式法则展开 \(\partial / \partial x\)、\(\partial / \partial y\)，正好得到上面的定义——所以这套形式记号是自洽的。</p>
+
+<p>用 Wirtinger 算子作用在 \(f = u + iv\) 上，看它给出什么。先算 \(\partial f / \partial \bar z\)：</p>
+
+\[
+\frac{\partial f}{\partial \bar z} = \frac{1}{2}\left(\frac{\partial}{\partial x} + i \frac{\partial}{\partial y}\right)(u + iv) = \frac{1}{2}\left[(u_x + i v_x) + i (u_y + i v_y)\right]
+\]
+
+\[
+= \frac{1}{2}\left[(u_x - v_y) + i (u_y + v_x)\right].
+\]
+
+<p>把它令为 0，得到 \(u_x = v_y\) 且 \(u_y + v_x = 0\)，即 \(u_y = -v_x\)——正好是 CR 两条方程！所以</p>
+
+\[
+\boxed{\text{CR 方程} \iff \frac{\partial f}{\partial \bar z} = 0.}
+\]
+
+<p>用日常语言说：解析函数就是"不依赖于 \(\bar z\)"的函数。这种说法非常符合直觉——\(z^2 = z \cdot z\) 显然只用到 \(z\) 不用到 \(\bar z\)，所以解析；\(\bar z\) 显然只用到 \(\bar z\) 不用到 \(z\)，所以反解析；\(|z|^2 = z \bar z\) 同时用到了 \(z\) 和 \(\bar z\)，所以两边都不沾。</p>
+
+<p>同样地，类比一下 \(\partial f / \partial z\) 在解析时是什么：</p>
+
+\[
+\frac{\partial f}{\partial z} = \frac{1}{2}\left(\frac{\partial}{\partial x} - i \frac{\partial}{\partial y}\right)(u + iv) = \frac{1}{2}\left[(u_x + v_y) + i (v_x - u_y)\right].
+\]
+
+<p>用 CR \(u_x = v_y\)、\(u_y = -v_x\) 化简：</p>
+
+\[
+\frac{\partial f}{\partial z} = \frac{1}{2}\left[2 u_x + i (2 v_x)\right] = u_x + i v_x = f'(z).
+\]
+
+<p>所以对解析函数，\(\partial f / \partial z\) 就是普通的复导数。这两个 Wirtinger 算子从完全不同的角度刻画了解析性：一个为零、一个为通常的复导数。这种写法在多元复分析里至关重要，本书我们只浅浅一用，主要为了把"解析 = 不含 \(\bar z\)"这个直觉说清楚。</p>
+
+<h2 id="sec4-4">4.4 必要 vs 充分：CR 不是万灵丹</h2>
+
+<p>4.1 节我们的推导逻辑是："\(f\) 复可导 \(\Rightarrow\) CR 成立"。所以 CR 是<em>必要</em>条件——没满足 CR 的函数一定不可导。但反过来呢？如果 \(u, v\) 在某点 \(z_0\) 处满足 CR，\(f = u + iv\) 在 \(z_0\) 一定复可导吗？</p>
+
+<p>答：<em>未必</em>。这件事比初学者预想的要微妙得多。原因是 4.1 节的推导只用了"沿实方向、沿虚方向"两条特殊路径——这两条都给出 \(f'(z_0)\) 的同一个候选值 \(u_x + i v_x = v_y - i u_y\)（CR 保证了这一点）。但要让 \(f\) 真正复可导，差商沿任<em>意</em>路径都得趋于这个候选值。这就需要更强的假设。</p>
+
+<p>这里有一个经典的"反例"：定义</p>
+
+\[
+f(z) = \begin{cases} \dfrac{\bar z^{\,2}}{z}, & z \ne 0, \\ 0, & z = 0. \end{cases}
+\]
+
+<p>如果你计算 \(u, v\) 在原点的<em>偏导</em>（注意是偏导，不是复导），会发现两个偏导都存在，而且 CR 在原点成立。但这个函数在原点<em>不复可导</em>——沿不同方向的差商极限其实不一致。具体的验证留给你做，这里只指出"CR 偏导成立"和"复可导"之间确实有缝隙。</p>
+
+<p>什么时候 CR 是<em>充分</em>的？答案是：当 \(u, v\) 的偏导<em>连续</em>时。具体来说：</p>
+
+<p><strong>定理 (Looman-Menchoff 较弱版本，称作 CR 充分性定理)</strong>。设 \(u, v\) 在开集 \(\Omega\) 上有<em>连续</em>的一阶偏导数，且在 \(\Omega\) 的每一点都满足 CR 方程。则 \(f = u + iv\) 在 \(\Omega\) 上解析。</p>
+
+<p>"偏导连续 + CR"是判别解析性的标准充分条件。证明用到的是连续偏导带来的"线性逼近"——即 \(u(x_0 + \Delta x, y_0 + \Delta y) - u(x_0, y_0) = u_x \Delta x + u_y \Delta y + o(\sqrt{\Delta x^2 + \Delta y^2})\)，类似 \(v\)。代入差商，结合 CR，会发现差商沿任意方向都趋于同一个值。这件事的详细论证我们放到附录，这里只把结论用起来。</p>
+
+<p>实际操作中，几乎所有"显式写出的"函数（多项式、有理函数、初等超越函数）都自动满足"偏导连续"的假设——它们的偏导都是显式表达的连续函数。所以在实际工作里你大可使用一个"<em>实战版</em>"的判据：</p>
+
+<p style="text-align:center"><strong>把 \(f\) 写成 \(u + iv\)，算四个偏导。如果偏导是连续的、且满足 CR，则 \(f\) 解析。</strong></p>
+
+<p>这就是接下来 4.5 节要做的事情。</p>
+
+<h2 id="sec4-5">4.5 用 CR 判别几个例子</h2>
+
+<p>这一节把 CR 用来判别若干具体函数。每个例子都按"写出 u, v / 算偏导 / 验证 CR / 写导数"的固定流程走，目的就是让这套流程变成你的反射动作。</p>
+
+<p><strong>例 1。</strong> \(f(z) = e^z\)。</p>
+
+<p>把 \(z = x + iy\) 代入：\(e^z = e^{x + iy} = e^x (\cos y + i \sin y)\)。所以 \(u = e^x \cos y\)、\(v = e^x \sin y\)。计算偏导：</p>
+
+\[
+u_x = e^x \cos y, \quad u_y = -e^x \sin y, \quad v_x = e^x \sin y, \quad v_y = e^x \cos y.
+\]
+
+<p>检查 CR：\(u_x = e^x \cos y = v_y\) ✓；\(u_y = -e^x \sin y = -v_x\) ✓。偏导显然处处连续。所以 \(e^z\) 在整个 \(\mathbb{C}\) 上解析（整函数）。导数</p>
+
+\[
+f'(z) = u_x + i v_x = e^x \cos y + i e^x \sin y = e^x (\cos y + i \sin y) = e^z,
+\]
+
+<p>跟我们一直说的 \((e^z)' = e^z\) 完美吻合。</p>
+
+<p><strong>例 2。</strong> \(f(z) = \sin z\)。</p>
+
+<p>用第 2 章给出的定义 \(\sin z = (e^{iz} - e^{-iz})/(2i)\)。这是两个整函数的线性组合，所以 \(\sin z\) 也是整函数。但用 CR 验证一遍也很有教益。先算</p>
+
+\[
+\sin z = \sin(x + iy) = \sin x \cos(iy) + \cos x \sin(iy).
+\]
+
+<p>用 \(\cos(iy) = \cosh y\)、\(\sin(iy) = i \sinh y\)（这两条公式从 \(\cos w = (e^{iw} + e^{-iw})/2\)、\(\sin w = (e^{iw} - e^{-iw})/(2i)\) 直接代 \(w = iy\) 验证），得到</p>
+
+\[
+\sin z = \sin x \cosh y + i \cos x \sinh y.
+\]
+
+<p>所以 \(u = \sin x \cosh y\)、\(v = \cos x \sinh y\)。算偏导：</p>
+
+\[
+u_x = \cos x \cosh y, \quad u_y = \sin x \sinh y, \quad v_x = -\sin x \sinh y, \quad v_y = \cos x \cosh y.
+\]
+
+<p>CR：\(u_x = \cos x \cosh y = v_y\) ✓；\(u_y = \sin x \sinh y = -(-\sin x \sinh y) = -v_x\) ✓。整函数。导数</p>
+
+\[
+f'(z) = u_x + i v_x = \cos x \cosh y - i \sin x \sinh y = \cos z.
+\]
+
+<p>所以 \((\sin z)' = \cos z\)，跟实情形一致。</p>
+
+<p><strong>例 3。</strong> \(f(z) = z + \bar z\)。</p>
+
+<p>表达式里赫然一个 \(\bar z\)，按 4.3 节末尾的诊断我们已经知道答案：不解析。但严格起来还是按 CR 验证一下。\(z + \bar z = 2 x\)，所以 \(u = 2 x\)、\(v = 0\)。偏导：\(u_x = 2\)、\(u_y = 0\)、\(v_x = 0\)、\(v_y = 0\)。检查 CR：\(u_x = 2\) 而 \(v_y = 0\)，不相等 ✗。所以处处不解析。</p>
+
+<p><strong>例 4。</strong> \(f(z) = e^{\bar z}\)。</p>
+
+<p>这是个微妙的例子。它跟 \(e^z\) 长得一字之差，但解析性完全不同。把 \(\bar z = x - iy\) 代入：</p>
+
+\[
+e^{\bar z} = e^{x - iy} = e^x (\cos y - i \sin y).
+\]
+
+<p>所以 \(u = e^x \cos y\)、\(v = -e^x \sin y\)。偏导：</p>
+
+\[
+u_x = e^x \cos y, \quad u_y = -e^x \sin y, \quad v_x = -e^x \sin y, \quad v_y = -e^x \cos y.
+\]
+
+<p>检查 CR：\(u_x = e^x \cos y\)、\(v_y = -e^x \cos y\)，二者一般不相等（除非 \(e^x \cos y = 0\)，但 \(e^x \ne 0\)，所以要 \(\cos y = 0\) 即 \(y = \pi/2 + k \pi\)，离散点而已）。所以 \(e^{\bar z}\) 处处不解析（最多只在那些 \(\cos y = 0\) 的离散点上"偶然"满足 CR 的一个，但即便那里另一条也得检验，且这类孤立点上的可导无关紧要——见 3.5 节关于"孤岛式可导"的讨论）。</p>
+
+<p><strong>例 5。</strong> \(f(z) = z^2 \bar z\)。</p>
+
+<p>表达式含 \(\bar z\)，预期不解析。但它含一个因子 \(z^2\)——这意味着它在原点处的"病态"会被压住，可能在原点处可导。让我们仔细算。</p>
+
+<p>\(z^2 \bar z = (x + iy)^2 (x - iy) = (x^2 - y^2 + 2 i x y)(x - iy)\)。展开：</p>
+
+\[
+= (x^2 - y^2) x + (x^2 - y^2)(-i y) + 2 i x y \cdot x + 2 i x y \cdot (-i y)
+\]
+
+\[
+= (x^3 - x y^2) + (-i x^2 y + i y^3) + (2 i x^2 y) + (2 x y^2)
+\]
+
+\[
+= (x^3 - x y^2 + 2 x y^2) + i(- x^2 y + y^3 + 2 x^2 y)
+\]
+
+\[
+= (x^3 + x y^2) + i (x^2 y + y^3) = x(x^2 + y^2) + i y(x^2 + y^2).
+\]
+
+<p>所以 \(u = x(x^2 + y^2)\)、\(v = y(x^2 + y^2)\)。算偏导：</p>
+
+\[
+u_x = (x^2 + y^2) + x(2x) = 3 x^2 + y^2, \quad u_y = x(2y) = 2 x y,
+\]
+
+\[
+v_x = y(2x) = 2 x y, \quad v_y = (x^2 + y^2) + y(2y) = x^2 + 3 y^2.
+\]
+
+<p>CR 第一式 \(u_x = v_y\)：\(3 x^2 + y^2 = x^2 + 3 y^2\) ⟹ \(2 x^2 = 2 y^2\) ⟹ \(x^2 = y^2\)。CR 第二式 \(u_y = -v_x\)：\(2 x y = -2 x y\) ⟹ \(x y = 0\)。两条同时成立要求 \(x y = 0\) 且 \(x^2 = y^2\)。\(x y = 0\) 给出 \(x = 0\) 或 \(y = 0\)；前者代入 \(x^2 = y^2\) 得 \(y = 0\)、后者得 \(x = 0\)。所以唯一可能是 \(x = y = 0\)，即原点 \(z = 0\)。</p>
+
+<p>结论：\(f(z) = z^2 \bar z\) 仅在原点处复可导（在所有其它点不解析也不可导）。这跟 3.5 节 \(|z|^2 = z \bar z\) 仅在原点可导的结论非常类似——都是 \(\bar z\) 跟原点处取零的因子相乘，导致原点处"病态被压住"。</p>
+
+<p><strong>例 6。</strong> \(f(z) = x^2 + i y^2\)（直接给出 \(u = x^2\)、\(v = y^2\)）。</p>
+
+<p>偏导：\(u_x = 2 x\)、\(u_y = 0\)、\(v_x = 0\)、\(v_y = 2 y\)。CR：\(u_x = 2 x = v_y = 2 y\) ⟹ \(x = y\)；\(u_y = 0 = -v_x = 0\) ✓（恒成立）。第一条要求 \(x = y\)，是平面上一根直线。所以 CR 仅在 \(x = y\) 这条直线上成立——但<em>没有任何开集上处处成立</em>（一根直线没有内点）。结论：\(f\) 处处不解析（虽然在 \(x = y\) 这条直线的每一点上都"复可导"，那也只是孤立可导，不构成开集上的解析）。</p>
+
+<p>这类例子让你看清"CR 在某条曲线上成立"和"在开集上成立"之间的天壤之别。复分析里我们在乎的是后者。</p>
+
+<h2 id="sec4-6">4.6 极坐标版的 CR</h2>
+
+<p>很多复函数用极坐标 \(z = r e^{i \theta}\) 写起来更自然，比如对数 \(\log z = \log r + i \theta\)、幂 \(z^\alpha = r^\alpha e^{i \alpha \theta}\)。这时候用直角坐标版的 CR 算偏导会很笨重。我们换一套坐标，把 CR 写成极坐标形式。</p>
+
+<p>设 \(f(z) = u(r, \theta) + i v(r, \theta)\)（这里 \(u, v\) 是 \(r, \theta\) 的函数；本章为了不引入新符号，我们继续叫它们 \(u, v\)，但记得现在自变量换了）。极坐标下的 CR 方程是</p>
+
+\[
+\boxed{u_r = \frac{1}{r} v_\theta, \qquad v_r = -\frac{1}{r} u_\theta.}
+\]
+
+<p>推导用链式法则：从 \(x = r \cos \theta\)、\(y = r \sin \theta\) 出发，</p>
+
+\[
+u_r = u_x \cos \theta + u_y \sin \theta, \quad u_\theta = -u_x r \sin \theta + u_y r \cos \theta,
+\]
+
+<p>同样有 \(v_r = v_x \cos \theta + v_y \sin \theta\)、\(v_\theta = -v_x r \sin \theta + v_y r \cos \theta\)。把直角坐标 CR \(u_x = v_y\)、\(u_y = -v_x\) 代进去：</p>
+
+\[
+u_r = v_y \cos \theta - v_x \sin \theta = \frac{1}{r}\left(v_y r \cos \theta - v_x r \sin \theta\right) = \frac{1}{r} v_\theta.
+\]
+
+<p>第一条得证。第二条 \(v_r = -u_\theta / r\) 类似可以推出，留给读者。</p>
+
+<p>极坐标版的 CR 方程在处理对数、幂等极坐标自然函数时极其方便。来一个具体例子。</p>
+
+<p><strong>例。</strong> 验证主值对数 \(\mathrm{Log}\, z = \log r + i \theta\)（\(\theta \in (-\pi, \pi)\)）在 \(\Omega = \mathbb{C} \setminus (-\infty, 0]\) 上解析，并求其导数。</p>
+
+<p>取 \(u = \log r\)、\(v = \theta\)。极坐标偏导：</p>
+
+\[
+u_r = \frac{1}{r}, \quad u_\theta = 0, \quad v_r = 0, \quad v_\theta = 1.
+\]
+
+<p>检查极坐标 CR：\(u_r = 1/r = (1/r) v_\theta = (1/r) \cdot 1\) ✓；\(v_r = 0 = -(1/r) u_\theta = -(1/r) \cdot 0 = 0\) ✓。两条都成立，且偏导在 \(r > 0\) 处连续。所以 \(\mathrm{Log}\, z\) 在 \(\Omega\) 上解析。</p>
+
+<p>导数怎么写？回到直角坐标版的 \(f' = u_x + i v_x\) 反而麻烦。一个更聪明的办法：直接用"\(\mathrm{Log}\, z\) 是 \(e^z\) 的逆函数"这件事，配合反函数的求导规则 \((f^{-1})'(w) = 1/f'(f^{-1}(w))\)。这里 \(f(z) = e^z\)、\(f'(z) = e^z\)，所以 \((\mathrm{Log})'(w) = 1/e^{\mathrm{Log}\, w} = 1/w\)。也就是</p>
+
+\[
+(\mathrm{Log}\, z)' = \frac{1}{z}, \quad z \in \Omega.
+\]
+
+<p>跟实情形 \((\ln x)' = 1/x\) 形式上完全一致。</p>
+
+<h2 id="sec4-7">4.7 调和函数</h2>
+
+<p>现在我们走到本章下半部分——把"解析"这个复分析的概念，跟"调和"这个偏微分方程概念连接起来。</p>
+
+<p><strong>定义。</strong> 设 \(\Omega \subset \mathbb{R}^2\) 是一个开集。一个二阶可导的实值函数 \(\varphi: \Omega \to \mathbb{R}\) 叫做<strong>调和函数</strong> (harmonic function)，如果它满足<strong>Laplace 方程</strong></p>
+
+\[
+\Delta \varphi := \varphi_{xx} + \varphi_{yy} = 0
+\]
+
+<p>在 \(\Omega\) 的每一点。这里 \(\Delta\) 叫做 Laplace 算子（在二维），\(\varphi_{xx}\)、\(\varphi_{yy}\) 是二阶偏导。</p>
+
+<p>调和函数在数学物理里无处不在。它描述了：</p>
+
+<ul>
+<li>稳态（不随时间变化的）热分布——温度场满足 \(\Delta T = 0\)。</li>
+<li>无电荷区域内的静电势——\(\Delta \phi = 0\)。</li>
+<li>不可压缩、无旋的二维流体的速度势——\(\Delta \psi = 0\)。</li>
+<li>稳态扩散问题、肥皂膜（极小曲面的线性化近似）、引力势（在真空区域）等等。</li>
+</ul>
+
+<p>这些物理问题表面上五花八门，但数学上都归结为同一条方程 \(\Delta \varphi = 0\)。这一现象的出现有一个共通的物理理由：每当我们关心某个量在"稳态"（不随时间变）且"无源"（局部没有产生或消耗）的二维场景里如何分布时，物理定律都能化为 Laplace 方程。所以谁会解 Laplace 方程，谁就同时会做物理上一大类问题。</p>
+
+<p>下一节我们将看到，复分析"碰巧"提供了求解 Laplace 方程的一个极强大的工具——这是复分析在物理学里如此受欢迎的根本原因。</p>
+
+<h2 id="sec4-8">4.8 关键定理：解析函数的实部与虚部都是调和函数</h2>
+
+<p>本节是本章最重要的定理。</p>
+
+<p><strong>定理。</strong> 设 \(f = u + iv\) 在开集 \(\Omega\) 上解析，且假设 \(u, v\) 是二阶连续可微的（这件事其实可以从解析性自动推出来——见第 5 章——但我们这里先假设之）。则 \(u\) 和 \(v\) 都是 \(\Omega\) 上的调和函数。</p>
+
+<p><strong>证明</strong>。CR 方程给出 \(u_x = v_y\) 和 \(u_y = -v_x\)。把第一式对 \(x\) 求偏导：</p>
+
+\[
+u_{xx} = (u_x)_x = (v_y)_x = v_{yx}.
+\]
+
+<p>把第二式对 \(y\) 求偏导：</p>
+
+\[
+u_{yy} = (u_y)_y = (-v_x)_y = -v_{xy}.
+\]
+
+<p>把这两条相加：</p>
+
+\[
+u_{xx} + u_{yy} = v_{yx} - v_{xy}.
+\]
+
+<p>由于 \(v\) 二阶连续可微，混合偏导可交换：\(v_{yx} = v_{xy}\)。所以 \(u_{xx} + u_{yy} = 0\)，即 \(u\) 调和。</p>
+
+<p>对 \(v\) 完全类似：把 CR 第一式对 \(y\) 求偏导得 \(u_{xy} = v_{yy}\)，第二式对 \(x\) 求偏导得 \(u_{yx} = -v_{xx}\)。相减：\(0 = u_{xy} - u_{yx} = v_{yy} + v_{xx}\)，即 \(v\) 调和。证毕。</p>
+
+<p>这个证明很短（核心就是"求两次偏导，再相加，用 CR 配上偏导可交换"），但结论之深远难以高估。它告诉我们：<em>每一个解析函数都<strong>免费</strong>送了你两个调和函数</em>——它的实部和虚部。所以只要能写出一个解析函数，就同时给出了 Laplace 方程的两个解。</p>
+
+<p>检验一下。例 1：取 \(f(z) = z^2 = (x^2 - y^2) + i(2 x y)\)。实部 \(u = x^2 - y^2\)：\(u_{xx} = 2\)、\(u_{yy} = -2\)，相加 = 0 ✓。虚部 \(v = 2 x y\)：\(v_{xx} = 0\)、\(v_{yy} = 0\)，相加 = 0 ✓。两个都是调和函数。</p>
+
+<p>例 2：取 \(f(z) = e^z = e^x \cos y + i e^x \sin y\)。实部 \(u = e^x \cos y\)：\(u_{xx} = e^x \cos y\)、\(u_{yy} = -e^x \cos y\)，相加 = 0 ✓。虚部 \(v = e^x \sin y\)：\(v_{xx} = e^x \sin y\)、\(v_{yy} = -e^x \sin y\)，相加 = 0 ✓。又是两个调和函数。</p>
+
+<p>例 3：取 \(f(z) = \mathrm{Log}\, z = \log r + i \theta\)（极坐标）。实部 \(u = \log r = \tfrac{1}{2} \log(x^2 + y^2)\)。算 \(u_x = x / (x^2 + y^2)\)、\(u_y = y / (x^2 + y^2)\)、\(u_{xx} = (y^2 - x^2)/(x^2 + y^2)^2\)、\(u_{yy} = (x^2 - y^2)/(x^2 + y^2)^2\)，相加 = 0 ✓（在 \(\Omega = \mathbb{C} \setminus (-\infty, 0]\) 上）。所以 \(\log r\) 也是调和函数。这个事实在二维静电学里非常有名：一个无穷长直线电荷产生的电势正是 \(\log r\)（除一个常数外）。</p>
+
+<p>反过来呢？给一个调和函数 \(u\)，它一定是某个解析函数的实部吗？这正是下一节"调和共轭"要问的问题。</p>
+
+<h2 id="sec4-9">4.9 调和共轭</h2>
+
+<p><strong>定义。</strong> 设 \(u: \Omega \to \mathbb{R}\) 是一个调和函数。一个实值函数 \(v: \Omega \to \mathbb{R}\) 叫做 \(u\) 的<strong>调和共轭</strong> (harmonic conjugate)，如果 \(v\) 也是调和的，并且 \(f = u + iv\) 在 \(\Omega\) 上解析（等价地，\(u, v\) 满足 CR）。</p>
+
+<p>问题：给一个调和 \(u\)，调和共轭存在吗？唯一吗？</p>
+
+<p><strong>存在性</strong>。如果 \(\Omega\) 是<strong>单连通</strong>区域（没有"洞"），那么调和共轭一定存在。证明的思路：CR 方程 \(v_x = -u_y\)、\(v_y = u_x\) 把 \(v\) 的偏导<em>完全</em>规定下来了——也就是给出了一个向量场 \((v_x, v_y) = (-u_y, u_x)\)。问题转化为"这个向量场是不是某个标量函数 \(v\) 的梯度"。它是梯度场的判据是它的旋度为零，即</p>
+
+\[
+(v_y)_x - (v_x)_y = (u_x)_x - (-u_y)_y = u_{xx} + u_{yy}.
+\]
+
+<p>这正好等于 0（因为 \(u\) 调和！）。所以只要 \(\Omega\) 单连通，向量场是保守的，存在某个 \(v\) 使其梯度为它，即 \(v\) 是 \(u\) 的调和共轭。</p>
+
+<p>如果 \(\Omega\) 有"洞"（比如 \(\Omega = \mathbb{C} \setminus \{0\}\)），调和共轭<em>未必</em>存在。一个经典例子：\(u = \log r\) 在 \(\mathbb{C} \setminus \{0\}\) 上调和，但它的"自然"调和共轭是 \(\theta\)——而 \(\theta\) 在绕原点一圈后会跳 \(2 \pi\)，不是单值函数！所以 \(u = \log r\) 在 \(\mathbb{C} \setminus \{0\}\) 上没有单值的调和共轭。要让它有，必须把区域切成单连通的，比如取 \(\Omega = \mathbb{C} \setminus (-\infty, 0]\)，那时 \(\theta\) 限制在 \((-\pi, \pi)\) 上是单值，\(\mathrm{Log}\, z = \log r + i \theta\) 解析。</p>
+
+<p><strong>唯一性</strong>。如果 \(v_1, v_2\) 都是 \(u\) 的调和共轭，则 \(f_1 = u + i v_1\)、\(f_2 = u + i v_2\) 都解析，二者之差 \(f_1 - f_2 = i (v_1 - v_2)\) 也解析。这是一个虚值的解析函数。在<em>连通</em>开集上，这种函数必为常数（练习；用 CR 推出 \(v_1 - v_2\) 的两个偏导都是 0）。所以 \(v_1\) 和 \(v_2\) 至多差一个实常数，调和共轭"在差一个常数的意义下"唯一。</p>
+
+<p><strong>构造方法</strong>。给出 \(u\)，怎么实际算出 \(v\)？标准做法是用 CR 方程做"积分凑配"：</p>
+
+<ol>
+<li>从 \(v_y = u_x\) 出发，把右边对 \(y\) 积分：\(v(x, y) = \int u_x \, dy + g(x)\)，其中 \(g(x)\) 是积分常数（依赖于 \(x\)，因为我们对 \(y\) 积分时把 \(x\) 当常数）。</li>
+<li>对刚得到的 \(v(x, y)\) 求 \(v_x\)，用第二条 CR \(v_x = -u_y\) 把 \(g'(x)\) 解出来。</li>
+<li>积分 \(g(x)\)，加进 \(v\)。</li>
+</ol>
+
+<p>下一节立刻用例题演示。</p>
+
+<h2 id="sec4-10">4.10 详细例题：构造解析函数</h2>
+
+<p><strong>例 1。</strong> 验证 \(u(x, y) = x^2 - y^2\) 调和，并求它的调和共轭 \(v\)。</p>
+
+<p>第一步，验证调和：\(u_{xx} = 2\)、\(u_{yy} = -2\)，\(u_{xx} + u_{yy} = 0\) ✓。</p>
+
+<p>第二步，构造 \(v\)。先算 \(u_x = 2 x\)、\(u_y = -2 y\)。CR 第二式 \(v_y = u_x = 2 x\)，对 \(y\) 积分：</p>
+
+\[
+v(x, y) = 2 x y + g(x).
+\]
+
+<p>对 \(x\) 求偏导得 \(v_x = 2 y + g'(x)\)。CR 第一式 \(v_x = -u_y = -(-2 y) = 2 y\)。所以 \(2 y + g'(x) = 2 y\) ⟹ \(g'(x) = 0\) ⟹ \(g(x) = C\)（常数）。结论：</p>
+
+\[
+v(x, y) = 2 x y + C.
+\]
+
+<p>对应的解析函数</p>
+
+\[
+f(z) = (x^2 - y^2) + i (2 x y + C) = z^2 + i C.
+\]
+
+<p>跟我们的猜测一致：\(z^2\) 的实部是 \(x^2 - y^2\)，所以 \(u\) 当然是它的实部，\(v\) 自然就是它的虚部 \(2 x y\)（加任意常数）。</p>
+
+<p><strong>例 2。</strong> 验证 \(u(x, y) = e^x \cos y\) 调和，并求它的调和共轭。</p>
+
+<p>第一步：\(u_x = e^x \cos y\)，\(u_{xx} = e^x \cos y\)，\(u_y = -e^x \sin y\)，\(u_{yy} = -e^x \cos y\)。\(u_{xx} + u_{yy} = 0\) ✓。</p>
+
+<p>第二步：CR 第二式 \(v_y = u_x = e^x \cos y\)，对 \(y\) 积分：</p>
+
+\[
+v(x, y) = e^x \sin y + g(x).
+\]
+
+<p>求 \(v_x = e^x \sin y + g'(x)\)。CR 第一式 \(v_x = -u_y = -(-e^x \sin y) = e^x \sin y\)。所以 \(g'(x) = 0\) ⟹ \(g(x) = C\)。结论：</p>
+
+\[
+v(x, y) = e^x \sin y + C.
+\]
+
+<p>解析函数 \(f = e^x \cos y + i (e^x \sin y + C) = e^z + i C\)。跟我们已知的"\(e^z\) 实部是 \(e^x \cos y\)"对应。</p>
+
+<p><strong>例 3。</strong> 给定 \(u(x, y) = x^3 - 3 x y^2\)，求调和共轭并写出对应的解析函数。</p>
+
+<p>验证调和：\(u_x = 3 x^2 - 3 y^2\)，\(u_{xx} = 6 x\)。\(u_y = -6 x y\)，\(u_{yy} = -6 x\)。\(u_{xx} + u_{yy} = 0\) ✓。</p>
+
+<p>构造 \(v\)：CR 第二式 \(v_y = u_x = 3 x^2 - 3 y^2\)，对 \(y\) 积分：</p>
+
+\[
+v(x, y) = 3 x^2 y - y^3 + g(x).
+\]
+
+<p>求 \(v_x = 6 x y + g'(x)\)。CR 第一式 \(v_x = -u_y = -(-6 x y) = 6 x y\)。所以 \(g'(x) = 0\) ⟹ \(g(x) = C\)。</p>
+
+<p>\(v(x, y) = 3 x^2 y - y^3 + C\)。对应 \(f = (x^3 - 3 x y^2) + i (3 x^2 y - y^3) + i C = z^3 + i C\)（最后一步可以用 \(z^3 = (x + iy)^3\) 展开验证：实部 \(x^3 - 3 x y^2\) ✓，虚部 \(3 x^2 y - y^3\) ✓）。</p>
+
+<p>这例子让你看到一个有趣的模式："实部是次数为 \(n\) 的某种实多项式"对应"\(z^n\) 这种解析函数"——这并非偶然，而是因为 \(z^n = r^n e^{i n \theta} = r^n \cos n \theta + i r^n \sin n \theta\)，所以它的实部就是 \(r^n \cos n \theta\)，把这种东西展开成 \(x, y\) 的多项式就是上面这种"齐次调和多项式"。</p>
+
+<p><strong>例 4。</strong> 给定 \(u(x, y) = \log(x^2 + y^2) = 2 \log r\)，求调和共轭（如果存在）。</p>
+
+<p>这就是上一节最后讨论的著名反例。\(u\) 在 \(\mathbb{R}^2 \setminus \{(0, 0)\}\) 上调和（因为 \(2 \log r\) 是 \(2 \mathrm{Re}(\mathrm{Log}\, z) = \mathrm{Re}(2 \log z)\)，是解析函数 \(2 \mathrm{Log}\, z\) 的实部，在去掉负实轴后单值）。但定义域 \(\mathbb{R}^2 \setminus \{(0, 0)\}\) 不是单连通的（有一个洞）。</p>
+
+<p>"调和共轭"应当是 \(2 \theta\)。但 \(\theta\) 在绕原点一圈后跳 \(2 \pi\)，所以 \(2 \theta\) 跳 \(4 \pi\)——这不是一个单值函数。所以在 \(\mathbb{R}^2 \setminus \{(0, 0)\}\) 上没有单值的调和共轭。要构造解析函数，必须切掉一条射线让区域变成单连通；比如切掉负实轴，得到 \(\Omega = \mathbb{C} \setminus (-\infty, 0]\)，这时 \(2 \mathrm{Log}\, z\) 是一个真正的解析函数。</p>
+
+<p>这个例子演示了"区域拓扑结构"对调和共轭存在性的关键作用——单连通区域上一切顺利，多连通区域上可能出问题。</p>
+
+<p><strong>例 5。</strong> 判别 \(u(x, y) = x^2 + y^2\) 是不是某个解析函数的实部。</p>
+
+<p>检查调和：\(u_{xx} = 2\)、\(u_{yy} = 2\)，相加 = 4 ≠ 0。<em>不</em>调和。所以 \(u\) 不可能是任何解析函数的实部。</p>
+
+<p>这个例子让我们看到"调和"是一个真正的限制——并非随便一个 \(C^2\) 实值函数都能当解析函数的实部。事实上 \(x^2 + y^2 = |z|^2\)，正是 3.5 节那个仅在原点可导的非解析函数；它的"实部"等于它本身（虚部为零），而它本身不解析，所以也不是任何解析函数的实部。</p>
+
+<p><strong>例 6。</strong> 给定 \(u(x, y) = \dfrac{x}{x^2 + y^2}\)（在 \(\mathbb{R}^2 \setminus \{(0, 0)\}\) 上定义），找它的调和共轭并识别对应的解析函数。</p>
+
+<p>先猜后算。这个 \(u\) 看起来像是 \(\mathrm{Re}(1/z) = \mathrm{Re}\dfrac{\bar z}{|z|^2} = \dfrac{x}{x^2 + y^2}\)——正是！所以猜想 \(f(z) = 1/z = (x - iy)/(x^2 + y^2)\)，实部 \(x/(x^2+y^2)\)、虚部 \(-y/(x^2 + y^2)\)。</p>
+
+<p>用我们的方法验证一遍。算 \(u_x\)：用商法则，</p>
+
+\[
+u_x = \frac{(x^2 + y^2) - x (2 x)}{(x^2 + y^2)^2} = \frac{y^2 - x^2}{(x^2 + y^2)^2}.
+\]
+
+<p>类似 \(u_y = -2 x y / (x^2 + y^2)^2\)。CR 第二式 \(v_y = u_x = (y^2 - x^2)/(x^2 + y^2)^2\)。这个对 \(y\) 的积分需要一些技巧——把 \(y^2 - x^2 = (y^2 + x^2) - 2 x^2\) 拆开：</p>
+
+\[
+\frac{y^2 - x^2}{(x^2 + y^2)^2} = \frac{1}{x^2 + y^2} - \frac{2 x^2}{(x^2 + y^2)^2}.
+\]
+
+<p>所以 \(v = \int \dfrac{1}{x^2 + y^2}\, dy - \int \dfrac{2 x^2}{(x^2 + y^2)^2}\, dy + g(x)\)。第一个积分 \(\int \dfrac{1}{x^2 + y^2}\, dy = \dfrac{1}{x} \arctan(y/x) + C\)（当 \(x \ne 0\)），第二个积分用部分分式 / 三角换元也能做出来。这个流程实际上挺繁琐——<em>但我们已经猜到答案了</em>：\(v = -y/(x^2 + y^2)\)。直接验证：</p>
+
+\[
+v_y = \frac{-(x^2 + y^2) - (-y)(2 y)}{(x^2 + y^2)^2} = \frac{-x^2 - y^2 + 2 y^2}{(x^2 + y^2)^2} = \frac{y^2 - x^2}{(x^2 + y^2)^2}.
+\]
+
+<p>跟 \(u_x\) 吻合 ✓。\(v_x = \dfrac{-(-y)(2 x)}{(x^2 + y^2)^2} = \dfrac{2 x y}{(x^2 + y^2)^2}\)，跟 \(-u_y = -(-2 x y)/(x^2 + y^2)^2 = 2 x y/(x^2 + y^2)^2\) 吻合 ✓。CR 满足。</p>
+
+<p>所以 \(v(x, y) = -\dfrac{y}{x^2 + y^2} + C\)，对应的解析函数是 \(1/z\)（再加一个虚常数）。</p>
+
+<p>这个例子的教训：构造调和共轭时，<em>先</em>努力识别 \(u\) 的"复变身份"，比硬积要省力。常见的"实部即…"清单：\(\mathrm{Re}(z) = x\)、\(\mathrm{Re}(z^n) = r^n \cos n \theta\)、\(\mathrm{Re}(e^z) = e^x \cos y\)、\(\mathrm{Re}(\sin z) = \sin x \cosh y\)、\(\mathrm{Re}(\mathrm{Log}\, z) = \log r\)、\(\mathrm{Re}(1/z) = x/(x^2 + y^2)\)。看到题目里的 \(u\) 像清单里哪个，多半就是它。</p>
+
+<h2 id="sec4-11">4.11 物理意义：为什么物理学家爱解析函数</h2>
+
+<p>4.7 节我们提了一句：调和函数描述各种"稳态、无源"的二维物理场。本节把这件事说得稍微具体一点，让你看到复分析在物理学里的实际地位。</p>
+
+<p><strong>稳态热分布</strong>。设一块薄板（视为二维区域 \(\Omega\)）的边界温度被某种方式固定下来，板内部没有热源。问：板内部各点的稳态温度 \(T(x, y)\) 是多少？物理学告诉我们 \(T\) 满足 Laplace 方程</p>
+
+\[
+\Delta T = T_{xx} + T_{yy} = 0,
+\]
+
+<p>边界条件就是给定的边界温度 \(T|_{\partial \Omega} = f\)（\(f\) 是边界上的某个函数）。这叫<strong>Dirichlet 边值问题</strong>。在简单形状的区域（圆盘、半平面）上，复分析能给出极漂亮的解；这件事我们到第 7 章才会展开（涉及 Poisson 积分公式、调和测度）。</p>
+
+<p><strong>静电势</strong>。在不含电荷的真空二维区域里，电势 \(\phi(x, y)\) 也满足 Laplace 方程 \(\Delta \phi = 0\)。在电极（导体）上电势是给定的常数。这又是一个 Dirichlet 问题，技术上跟稳态热完全一样。一个三维问题（无穷长直线电极）通常可以约化到二维 Laplace 方程。</p>
+
+<p><strong>无旋不可压流</strong>。考虑一个不可压缩、无旋（无涡）的二维流体的速度场 \(\vec v = (v_1(x,y), v_2(x,y))\)。"不可压"是 \(\partial v_1/\partial x + \partial v_2/\partial y = 0\)，"无旋"是 \(\partial v_2/\partial x - \partial v_1/\partial y = 0\)。可以证明：存在<em>速度势</em> \(\phi\) 使 \(\vec v = \nabla \phi\)，而且 \(\phi\) 满足 Laplace 方程 \(\Delta \phi = 0\)。同时存在<em>流函数</em> \(\psi\) 使 \(v_1 = \partial \psi/\partial y\)、\(v_2 = -\partial \psi/\partial x\)，而 \(\psi\) 也调和。</p>
+
+<p>关键观察：\(\phi\) 和 \(\psi\) 之间的关系正好是 CR 方程！\(\partial \phi/\partial x = v_1 = \partial \psi/\partial y\)、\(\partial \phi/\partial y = v_2 = -\partial \psi/\partial x\)。所以复函数 \(W(z) = \phi + i \psi\) 是解析的。它叫做<strong>复势</strong> (complex potential)。一个二维流动问题就完全归结为求一个解析函数 \(W(z)\)，使 \(\mathrm{Re}\, W = \phi\) 满足边界条件。</p>
+
+<p>这就是为什么<em>所有</em>研究二维势流的航空工程师都要学复分析——一个具体例子是机翼周围的流场分析（Joukowski 变换），它把简单形状（圆）的解通过保角映射变成机翼形状的解。</p>
+
+<p>把这三个例子放在一起，你看到的是同一个数学对象（解析函数）描述三个完全不同的物理场景。这正是 4.7 节那段话的具体兑现：物理上的"稳态 + 无源"在数学上塌缩为 Laplace 方程，而 Laplace 方程的解恰好就是解析函数的实部。</p>
+
+<p>有一个反过来的视角值得提一下：物理直觉常常给出关于解析函数的猜测。比如，调和函数有一个著名的<strong>极值原理</strong>：在有界区域内，调和函数的最大值和最小值都在边界上取到，内部不可能有极值。物理上这非常合理——稳态温度场内部不可能有"局部最热点"，因为如果有，热量就会从那里流出去，不就不"稳态"了。这条原理我们将在第 6 章正式证明，但它的物理直觉早在我们写下证明之前就告诉了我们答案应该如何。</p>
+
+<p>这一章到此结束。我们从 CR 方程出发，最终走到了二维稳态物理的边界。下一章我们将转向另一个支柱：<strong>复积分</strong>。我们会发现，在解析的世界里，复积分有一种实分析里完全没有的"刚性"——围绕闭曲线的积分往往为零（Cauchy 定理），并且函数在内部任何一点的值都被它在边界上的值唯一决定（Cauchy 积分公式）。这两条结论将一举解释"解析函数为什么自动无穷可微、自动有幂级数展开"等一系列奇迹。准备好。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 复微分与解析性</a><a href="ch5.html">下一章 · 第 5 章 初等复函数 →</a></nav>
+
+</main>
+</body>
+</html>

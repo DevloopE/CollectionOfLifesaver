@@ -1,0 +1,278 @@
+<h1 id="appA">附录 A 严格性</h1>
+
+<p>本书正文一直在做一个有意识的取舍：把"直觉先行"的故事讲清楚，而把"\(\varepsilon\)-\(\delta\) 形式的严格论证"延后到本附录里。在这里，我们补齐若干本课程中最重要的命题的<em>严格</em>证明。这些证明不是装饰——它们是百余年来分析学家把直觉打磨成精钢的过程，掌握它们，是从"会用复分析"走到"懂复分析"的必经之路。</p>
+
+<p>本附录涉及：</p>
+
+<ul>
+<li>A.1 Cauchy–Goursat 定理的严格证明（先三角形，用嵌套分割）。</li>
+<li>A.2 Goursat 引理：仅假设 \(f\) 解析（不假设 \(f'\) 连续）即可推出 Cauchy。</li>
+<li>A.3 Cauchy 积分公式的严格推导。</li>
+<li>A.4 高阶导数公式的严格推导。</li>
+<li>A.5 Liouville 定理的精确陈述与证明。</li>
+<li>A.6 留数定理的严格证明。</li>
+<li>A.7 解析延拓的唯一性（孤立零点定理）。</li>
+</ul>
+
+<p>读这部分的方法：先从主章里把直觉记牢，再来读这里。每一条定理的证明都遵循同一种节奏——先把结论拆成几个引理，再把每个引理用紧致性、覆盖、嵌套或一致连续来攻破。</p>
+
+<h2 id="secA-1">A.1 Cauchy–Goursat 定理的严格证明</h2>
+
+<p>我们先证一个最基本的形式，称为 <strong>Cauchy–Goursat 三角形定理</strong>：</p>
+
+<p><strong>定理 A.1.1（三角形版）.</strong> 设 \(f\) 在某开域 \(\Omega \subset \mathbb{C}\) 上解析。若 \(\Delta\) 是一个闭三角形（包括边界）且 \(\Delta \subset \Omega\)，则 \(\oint_{\partial\Delta} f(z)\, dz = 0\)，其中 \(\partial\Delta\) 是三角形边界（按某固定方向走一圈）。</p>
+
+<p><strong>证明.</strong> 设原三角形为 \(\Delta\)，记 \(I(\Delta) = \oint_{\partial\Delta} f(z)\, dz\)。我们要证 \(I(\Delta) = 0\)。</p>
+
+<p>反证法。设 \(|I(\Delta)| = M > 0\)。把 \(\Delta\) 用<em>三条中位线</em>分成四个小三角形 \(\Delta_1, \Delta_2, \Delta_3, \Delta_4\)（其中 \(\Delta_4\) 是中央倒立的那个）。对每条中位线，相邻的两个小三角形在它上的积分方向相反，互相抵消。所以</p>
+
+\[
+I(\Delta) = I(\Delta_1) + I(\Delta_2) + I(\Delta_3) + I(\Delta_4).
+\]
+
+<p>由三角不等式 \(|I(\Delta)| \leq \sum_{k=1}^{4} |I(\Delta_k)|\)。所以四个里至少有一个 \(\Delta_{k_1}\) 满足 \(|I(\Delta_{k_1})| \geq M/4\)。把 \(\Delta_{k_1}\) 命名为 \(\Delta^{(1)}\)。注意：</p>
+
+<ul>
+<li>\(\Delta^{(1)}\) 的边长是 \(\Delta\) 的一半，周长 \(\mathrm{per}(\Delta^{(1)}) = \tfrac{1}{2}\mathrm{per}(\Delta)\)。</li>
+<li>直径 \(\mathrm{diam}(\Delta^{(1)}) = \tfrac{1}{2}\mathrm{diam}(\Delta)\)。</li>
+</ul>
+
+<p>对 \(\Delta^{(1)}\) 重复上面的程序：分四个、找其中一个使 \(|I| \geq |I(\Delta^{(1)})|/4 \geq M/4^2\)；命名 \(\Delta^{(2)}\)，周长是 \(\Delta\) 的 \(1/4\)，直径是 \(\Delta\) 的 \(1/4\)。</p>
+
+<p>归纳下去得到一列<em>嵌套</em>闭三角形 \(\Delta \supset \Delta^{(1)} \supset \Delta^{(2)} \supset \ldots\)，满足</p>
+
+\[
+|I(\Delta^{(n)})| \geq \frac{M}{4^n}, \quad \mathrm{per}(\Delta^{(n)}) = \frac{\mathrm{per}(\Delta)}{2^n}, \quad \mathrm{diam}(\Delta^{(n)}) = \frac{\mathrm{diam}(\Delta)}{2^n}.
+\]
+
+<p>由<strong>嵌套闭区间定理</strong>（在 \(\mathbb{C}\) 里它的二维版本，由 \(\mathbb{R}^2\) 完备性给出）：嵌套闭三角形列的交不空，存在唯一的 \(z_0 \in \bigcap_n \Delta^{(n)}\)。</p>
+
+<p>由于 \(z_0 \in \Delta \subset \Omega\)，\(f\) 在 \(z_0\) 解析。所以可以写</p>
+
+\[
+f(z) = f(z_0) + f'(z_0)(z - z_0) + \varepsilon(z)(z - z_0),
+\]
+
+<p>其中 \(\varepsilon(z) \to 0\) 当 \(z \to z_0\)。具体地：给 \(\eta > 0\)，存在 \(\delta > 0\) 使 \(|z - z_0| < \delta\) 时 \(|\varepsilon(z)| < \eta\)。</p>
+
+<p>对 \(\Delta^{(n)}\) 算 \(I\)：</p>
+
+\[
+I(\Delta^{(n)}) = \oint_{\partial\Delta^{(n)}} \big[f(z_0) + f'(z_0)(z - z_0) + \varepsilon(z)(z - z_0)\big]\, dz.
+\]
+
+<p>前两项都是<em>多项式</em>，而多项式的环路积分等于零（因为它们有原函数 \(f(z_0) z\)、\(\tfrac{1}{2} f'(z_0) (z - z_0)^2\)）。所以</p>
+
+\[
+I(\Delta^{(n)}) = \oint_{\partial\Delta^{(n)}} \varepsilon(z)(z - z_0)\, dz.
+\]
+
+<p>当 \(n\) 足够大时 \(\Delta^{(n)} \subset B_\delta(z_0)\)（因为直径 \(\to 0\)）。在 \(\Delta^{(n)}\) 上 \(|\varepsilon(z)| < \eta\)，\(|z - z_0| \leq \mathrm{diam}(\Delta^{(n)})\)。用 ML-估计：</p>
+
+\[
+|I(\Delta^{(n)})| \leq \eta \cdot \mathrm{diam}(\Delta^{(n)}) \cdot \mathrm{per}(\Delta^{(n)}) = \eta \cdot \frac{\mathrm{diam}(\Delta) \cdot \mathrm{per}(\Delta)}{4^n}.
+\]
+
+<p>把这个和 \(|I(\Delta^{(n)})| \geq M/4^n\) 比较，得 \(M \leq \eta \cdot \mathrm{diam}(\Delta) \cdot \mathrm{per}(\Delta)\) 对任意 \(\eta > 0\) 成立。所以 \(M = 0\)，矛盾。\(\square\)</p>
+
+<p><strong>从三角形推到一般闭曲线.</strong> 三角形的情况一旦搞定，其他闭曲线只需"用三角形拼"。具体地：</p>
+
+<p><strong>推论 A.1.2.</strong> 设 \(f\) 在凸开域 \(\Omega\) 上解析，则 \(f\) 在 \(\Omega\) 上有原函数 \(F\)，因此对任意 \(\Omega\) 中的闭曲线 \(\gamma\)，\(\oint_\gamma f\, dz = 0\)。</p>
+
+<p>构造 \(F\)：固定 \(z_0 \in \Omega\)，对任意 \(z \in \Omega\) 定义 \(F(z) = \int_{[z_0, z]} f(w)\, dw\)（沿直线段积分）。要证 \(F'(z) = f(z)\)。计算差分：对小的 \(h\)，\([z_0, z]\)、\([z, z + h]\)、\([z + h, z_0]\) 三段组成一个三角形，由 A.1.1 围道积分为零，所以</p>
+
+\[
+F(z + h) - F(z) = \int_{[z, z+h]} f(w)\, dw.
+\]
+
+<p>把它除以 \(h\) 并取极限，由 \(f\) 的连续性得 \(F'(z) = f(z)\)。\(\square\)</p>
+
+<p>对一般单连通区域，只需用 \(\Omega\) 的开覆盖（凸圆盘组成）+ 紧致性（紧曲线只需要有限多个圆盘）+ 链积分等价，证明就走通了。完整细节见标准教材如 Conway 或 Stein–Shakarchi。这里我们给出三角形版作为整个 Cauchy 理论的基石。</p>
+
+<h2 id="secA-2">A.2 Goursat 引理</h2>
+
+<p>注意上面 A.1.1 的证明里，我们只用了"\(f\) 在 \(z_0\) 解析"，即 \(f'(z_0)\) 存在，而<em>没有</em>用到 \(f'\) 连续。这是 Goursat 在 1900 年左右的伟大改进——Cauchy 原版证明假设了 \(f'\) 连续（用 Green 定理），Goursat 把这个多余假设去掉了。</p>
+
+<p><strong>Goursat 引理.</strong> 若 \(f\) 在开域 \(\Omega\) 上有<em>处处</em>导数（不必先验地连续），则 \(f\) 满足 Cauchy 定理：在任何 \(\Omega\) 中的（合适意义下的）闭曲线上积分为零。</p>
+
+<p>证明就是 A.1.1（重读那个证明，会发现"\(f'\) 连续"从未出现）。</p>
+
+<p>Goursat 引理的妙处在于它打开了"<em>仅由可微推出无穷可微</em>"这条神奇通道。具体地：</p>
+
+<ol>
+<li>\(f\) 处处可微 \(\xrightarrow{\text{Goursat}}\) Cauchy 定理成立。</li>
+<li>Cauchy 定理 \(\xrightarrow{}\) Cauchy 积分公式。</li>
+<li>Cauchy 积分公式 \(\xrightarrow{}\) \(f\) 可在公式右端逐次求导无限次（求导落在分母上），所以 \(f\) 无穷可微，并且其导数也都解析。</li>
+</ol>
+
+<p>所以"复可微一次 \(\Rightarrow\) 实际上无穷可微 \(\Rightarrow\) 解析"——这条复分析独有的奇迹链条，根子就在 Goursat 引理。</p>
+
+<h2 id="secA-3">A.3 Cauchy 积分公式的严格推导</h2>
+
+<p><strong>定理 A.3.1.</strong> 设 \(f\) 在 \(\Omega\) 上解析，\(D = B_R(z_0) \subset \Omega\) 是闭圆盘，\(\gamma = \partial D\) 是其边界（逆时针）。则对任意 \(z \in B_R(z_0)\)（即 \(D\) 的内部），</p>
+
+\[
+f(z) = \frac{1}{2\pi i} \oint_\gamma \frac{f(w)}{w - z}\, dw.
+\]
+
+<p><strong>证明.</strong> 固定内点 \(z\)。考虑函数</p>
+
+\[
+g(w) = \frac{f(w) - f(z)}{w - z}.
+\]
+
+<p>它在 \(w = z\) 处似乎奇异，但由 \(f\) 在 \(z\) 解析，\(g\) 实际上在 \(z\) 处<em>有界</em>（\(\lim_{w \to z} g(w) = f'(z)\)）。所以可以延拓 \(g\) 到 \(z\) 处取值 \(f'(z)\)，得到一个在闭圆盘 \(D\) 上连续、在 \(D \setminus \{z\}\) 上解析的函数。</p>
+
+<p>关键引理：在这种"只一个孤立点上未必解析、但有界连续"的情形，Cauchy 定理仍然成立——这是 <em>Riemann 可去奇性定理</em>的特例（有界 \(\Rightarrow\) 可去）。所以 \(\oint_\gamma g(w)\, dw = 0\)，即</p>
+
+\[
+\oint_\gamma \frac{f(w)}{w - z}\, dw = f(z) \oint_\gamma \frac{dw}{w - z}.
+\]
+
+<p>右边的积分用直接参数化算：\(w = z_0 + R e^{i\theta}\)，\(dw = iR e^{i\theta}\, d\theta\)，</p>
+
+\[
+\oint_\gamma \frac{dw}{w - z} = \int_0^{2\pi} \frac{iR e^{i\theta}}{z_0 + R e^{i\theta} - z}\, d\theta.
+\]
+
+<p>这个积分等于 \(2\pi i\)（这件事等价于 \(\dfrac{1}{w - z}\) 在 \(z\) 周围的"绕数"等于 1），具体计算可以通过：把积分对象按 \(\dfrac{1}{w - z}\) 在 \(z_0\) 处的洛朗（这里其实是泰勒，因为 \(w \neq z\) 没问题）展开，再积；或更直接地 deform 到一个以 \(z\) 为圆心的小圆，那个小圆上参数化立刻给 \(2\pi i\)。</p>
+
+<p>把它代回去得到 Cauchy 公式。\(\square\)</p>
+
+<p><strong>关键步骤的细节：可去奇性引理.</strong> 设 \(g\) 在 \(D \setminus \{z\}\) 上解析，在 \(z\) 附近有界。则 \(g\) 可延拓为 \(D\) 上的解析函数。</p>
+
+<p>证明：考虑 \(h(w) = (w - z)^2 g(w)\)。它在 \(z\) 处取值 0，且 \(\lim_{w \to z} \dfrac{h(w) - 0}{w - z} = \lim_{w \to z} (w - z) g(w) = 0\)（用了有界性）。所以 \(h\) 在 \(z\) 处可微，导数为 0。\(h\) 在 \(D\) 上处处可微，由 Goursat 它解析。它在 \(z\) 处的泰勒级数 \(h(w) = \sum_{n \geq 2} a_n (w - z)^n\)（前两项都为零）。所以 \(g(w) = h(w)/(w - z)^2 = \sum_{n \geq 0} a_{n+2}(w - z)^n\) 是一个泰勒级数，定义了 \(D\) 上的解析延拓。\(\square\)</p>
+
+<h2 id="secA-4">A.4 高阶导数公式的严格推导</h2>
+
+<p><strong>定理 A.4.1.</strong> 在 A.3.1 的条件下，\(f\) 在 \(B_R(z_0)\) 内任意阶可导，且</p>
+
+\[
+f^{(n)}(z) = \frac{n!}{2\pi i} \oint_\gamma \frac{f(w)}{(w - z)^{n+1}}\, dw.
+\]
+
+<p><strong>证明思路.</strong> 用归纳。基础是 \(n = 0\)，就是 A.3.1。归纳步骤：假设 \(f^{(n)}(z)\) 由上式给出。要证 \(f^{(n+1)}\) 存在，并由相应公式给出。</p>
+
+<p>计算差商：</p>
+
+\[
+\frac{f^{(n)}(z + h) - f^{(n)}(z)}{h} = \frac{n!}{2\pi i} \oint_\gamma \frac{f(w)}{h} \left[\frac{1}{(w - z - h)^{n+1}} - \frac{1}{(w - z)^{n+1}}\right] dw.
+\]
+
+<p>方括号里的差，用代数恒等式 \(a^{-(n+1)} - b^{-(n+1)} = -(a - b) \sum_{k=0}^{n} a^{-(k+1)} b^{-(n-k+1)}\)（或更简单：当 \(h \to 0\)，方括号 \(\to (n+1) \cdot \dfrac{1}{(w - z)^{n+2}} \cdot 1\) 由直接 Taylor 展开），所以</p>
+
+\[
+\frac{1}{h}\left[\frac{1}{(w-z-h)^{n+1}} - \frac{1}{(w-z)^{n+1}}\right] \to \frac{n+1}{(w-z)^{n+2}}, \quad h \to 0.
+\]
+
+<p>这个收敛在 \(\gamma\) 上是<em>一致</em>的（因为 \(\gamma\) 紧致、\(z\) 远离 \(\gamma\)，所以 \(|w - z|\) 有正下界）。一致收敛允许积分与极限交换：</p>
+
+\[
+\lim_{h \to 0} \frac{f^{(n)}(z + h) - f^{(n)}(z)}{h} = \frac{n!}{2\pi i} \oint_\gamma \frac{(n+1) f(w)}{(w - z)^{n+2}}\, dw = \frac{(n+1)!}{2\pi i} \oint_\gamma \frac{f(w)}{(w - z)^{n+2}}\, dw.
+\]
+
+<p>右边是 \(f^{(n+1)}\) 的公式，左边是 \(f^{(n+1)}(z)\) 的定义。归纳完成。\(\square\)</p>
+
+<p>这条定理的<em>含义</em>比公式本身更重要：它说 \(f\) 在某点的<em>所有阶</em>导数都由 \(f\) 在围绕该点的圆周上的值<em>积分</em>得到。这是为什么解析函数在一点的局部行为可以由它在远处的行为完全决定——它没有"自由度"在中间偷偷变。</p>
+
+<h2 id="secA-5">A.5 Liouville 定理的精确陈述</h2>
+
+<p><strong>定理 A.5.1（Liouville）.</strong> 整函数（在整个 \(\mathbb{C}\) 上解析的函数）若有界，则必为常数。</p>
+
+<p><strong>证明.</strong> 设 \(f\) 整、有界，\(|f(z)| \leq M\) 对所有 \(z \in \mathbb{C}\) 成立。固定任一点 \(z_0 \in \mathbb{C}\)。用 A.4.1 在以 \(z_0\) 为心、半径 \(R\) 的圆 \(\gamma_R\) 上：</p>
+
+\[
+f'(z_0) = \frac{1}{2\pi i} \oint_{\gamma_R} \frac{f(w)}{(w - z_0)^2}\, dw.
+\]
+
+<p>用 ML-估计：周长 \(2\pi R\)，被积函数模 \(\leq M/R^2\)，所以</p>
+
+\[
+|f'(z_0)| \leq \frac{1}{2\pi} \cdot 2\pi R \cdot \frac{M}{R^2} = \frac{M}{R}.
+\]
+
+<p>这对任意 \(R > 0\) 成立。让 \(R \to \infty\) 得 \(|f'(z_0)| \leq 0\)，所以 \(f'(z_0) = 0\)。这对任意 \(z_0\) 成立，所以 \(f' \equiv 0\)，由连通性 \(f\) 为常数。\(\square\)</p>
+
+<p>看那个 \(M/R\) 的估计——\(R\) 是任意可以放大的，而 \(M\) 是固定的"全局上界"，二者一比，立刻挤死 \(f'\)。这就是为什么"整 + 有界 = 常数"，是复分析里最反直觉但又最快速的结果之一。</p>
+
+<p>Liouville 定理的一个直接推论是<strong>代数基本定理</strong>：每个非常数复系数多项式都有零点。证明用反证：若 \(p(z)\) 处处不为零，则 \(1/p(z)\) 整。由 \(|p(z)| \to \infty\) 当 \(|z| \to \infty\)，\(1/p\) 在外面有界；在大圆盘里它连续因而有界。所以 \(1/p\) 全局有界，由 Liouville 是常数，于是 \(p\) 是常数，矛盾。\(\square\)</p>
+
+<h2 id="secA-6">A.6 留数定理的严格证明</h2>
+
+<p><strong>定理 A.6.1（留数定理）.</strong> 设 \(\Omega \subset \mathbb{C}\) 是开集，\(f\) 在 \(\Omega \setminus \{a_1, \ldots, a_n\}\) 上解析（\(a_k\) 是 \(\Omega\) 内孤立奇点）。设 \(\gamma\) 是 \(\Omega\) 中的一条简单闭曲线（约定 Jordan 内部完全嵌入 \(\Omega\)），逆时针方向，且 \(\gamma\) 不通过任何 \(a_k\)。设 \(\{a_k\}\) 中位于 \(\gamma\) 内部的为 \(a_{k_1}, \ldots, a_{k_m}\)。则</p>
+
+\[
+\oint_\gamma f(z)\, dz = 2\pi i \sum_{j=1}^{m} \mathrm{Res}_{z = a_{k_j}} f(z).
+\]
+
+<p><strong>证明.</strong> 关键想法：用小圆"挖掉"每个内部奇点，把 \(f\) 在剩下的洞洞区域上变为解析；那个洞洞区域是有限连通的，对它用 Cauchy 定理。</p>
+
+<p>对每个内部奇点 \(a_{k_j}\)，取一个以 \(a_{k_j}\) 为圆心、半径 \(\rho_j\) 充分小的圆 \(C_j\)（顺时针方向，意味着从挖洞后的区域看是边界正方向之外）使得各 \(C_j\) 互不相交、都在 \(\gamma\) 内、且都完全位于 \(\Omega\) 内。</p>
+
+<p>把 \(\gamma\) 与所有 \(-C_j\)（即 \(C_j\) 反向，逆时针）合在一起，得到的<em>多连通区域</em>"被孔挖空的 \(\gamma\) 内部"上 \(f\) 解析。由 Cauchy 定理（多连通版本——这是单连通版加几个剪开的标准应用，详见 Stein–Shakarchi 第 3 章）：</p>
+
+\[
+\oint_\gamma f\, dz + \sum_j \oint_{-C_j} f\, dz = 0,
+\]
+
+<p>等价地</p>
+
+\[
+\oint_\gamma f\, dz = \sum_j \oint_{C_j^+} f\, dz,
+\]
+
+<p>其中 \(C_j^+\) 是逆时针方向的小圆。</p>
+
+<p>下面计算每个 \(\oint_{C_j^+} f\, dz\)。在 \(a_{k_j}\) 周围 \(f\) 有 Laurent 展开</p>
+
+\[
+f(z) = \sum_{n = -\infty}^{\infty} c_n^{(j)} (z - a_{k_j})^n, \quad 0 < |z - a_{k_j}| < r_j.
+\]
+
+<p>取 \(\rho_j < r_j\)。在 \(C_j^+\) 上参数化 \(z = a_{k_j} + \rho_j e^{i\theta}\)：</p>
+
+\[
+\oint_{C_j^+} (z - a_{k_j})^n\, dz = \int_0^{2\pi} \rho_j^n e^{in\theta} \cdot i\rho_j e^{i\theta}\, d\theta = i \rho_j^{n+1} \int_0^{2\pi} e^{i(n+1)\theta}\, d\theta.
+\]
+
+<p>当 \(n + 1 \neq 0\)（即 \(n \neq -1\)）时积分为 0；当 \(n = -1\) 时积分为 \(2\pi\)，所以 \(\oint = i \cdot \rho_j^0 \cdot 2\pi = 2\pi i\)。</p>
+
+<p>由 Laurent 级数的一致收敛性（在紧致圆周 \(C_j^+\) 上），可以逐项积分：</p>
+
+\[
+\oint_{C_j^+} f\, dz = \sum_n c_n^{(j)} \oint_{C_j^+} (z - a_{k_j})^n\, dz = c_{-1}^{(j)} \cdot 2\pi i = 2\pi i \cdot \mathrm{Res}_{z = a_{k_j}} f.
+\]
+
+<p>把所有 \(j\) 加起来：</p>
+
+\[
+\oint_\gamma f\, dz = 2\pi i \sum_{j=1}^{m} \mathrm{Res}_{z = a_{k_j}} f. \quad \square
+\]
+
+<p>这条证明是整本书最具"建筑结构"的——它把 Cauchy 定理（无奇性时积分为零）和 Laurent 级数（在奇性附近的展开）这两件武器配合到一起。理解了这条证明，你就理解了为什么"留数 = Laurent 系数 \(c_{-1}\)"——它正是积分时唯一不被 \(\int e^{i k \theta}\, d\theta = 0\) 杀掉的那一项。</p>
+
+<h2 id="secA-7">A.7 解析延拓的唯一性</h2>
+
+<p><strong>定理 A.7.1（孤立零点定理）.</strong> 设 \(f\) 在连通开域 \(\Omega\) 上解析。如果 \(f\) 的零点集 \(\{z \in \Omega : f(z) = 0\}\) 在 \(\Omega\) 中有<em>聚点</em>（即存在零点列 \(z_n \to z_\infty \in \Omega\)），则 \(f \equiv 0\) 于 \(\Omega\) 上。</p>
+
+<p><strong>证明.</strong> 设 \(z_\infty \in \Omega\) 是零点的聚点。\(f\) 在 \(z_\infty\) 解析，有 Taylor 展开 \(f(z) = \sum_{n = 0}^{\infty} a_n (z - z_\infty)^n\) 收敛在 \(B_r(z_\infty) \subset \Omega\) 上。</p>
+
+<p>断言：所有 \(a_n = 0\)。反证：设 \(a_N\) 是第一个非零系数（最小的 \(N\) 使 \(a_N \neq 0\)）。则 \(f(z) = (z - z_\infty)^N [a_N + a_{N+1}(z - z_\infty) + \ldots] = (z - z_\infty)^N g(z)\)，其中 \(g(z_\infty) = a_N \neq 0\)。由 \(g\) 连续，存在 \(z_\infty\) 的邻域使 \(g \neq 0\)。在该邻域里 \(f(z) = 0\) 唯一可能的解是 \(z = z_\infty\)。但题设里有零点列 \(z_n \to z_\infty\)、\(z_n \neq z_\infty\)（聚点定义）、\(f(z_n) = 0\)——矛盾。所以所有 \(a_n = 0\)，\(f \equiv 0\) 在 \(B_r(z_\infty)\) 上。</p>
+
+<p>把这件事推广到整个 \(\Omega\)：令 \(A = \{z \in \Omega : f \text{ 在 } z \text{ 的某邻域上恒为 0}\}\)。</p>
+
+<ul>
+<li>\(A\) 开（定义就是这样）。</li>
+<li>\(A\) 闭（在 \(\Omega\) 的相对拓扑里）：若 \(z_n \in A\)、\(z_n \to z\)，则 \(z\) 是 \(f\) 零点的聚点（因为 \(z_n\) 周围 \(f\) 都为 0），所以由上面 \(f \equiv 0\) 在 \(z\) 的某邻域，即 \(z \in A\)。</li>
+<li>\(A\) 非空（包含 \(z_\infty\)）。</li>
+</ul>
+
+<p>由 \(\Omega\) 连通性 \(A = \Omega\)。\(\square\)</p>
+
+<p><strong>推论（解析延拓唯一性）.</strong> 设 \(\Omega\) 是连通域，\(f, g\) 都在 \(\Omega\) 上解析。如果 \(f, g\) 在 \(\Omega\) 的某子集 \(E\) 上一致，且 \(E\) 在 \(\Omega\) 中有聚点，则 \(f \equiv g\) 于 \(\Omega\) 上。</p>
+
+<p>证明：对 \(f - g\) 用 A.7.1。</p>
+
+<p>这条唯一性是"解析延拓"概念之所以可以谈的根。比如：\(\sin z\) 在实轴上和实数定义的 \(\sin x\) 一致，\(\mathbb{R}\) 在 \(\mathbb{C}\) 中含聚点（每个实数都是聚点），所以 \(\mathbb{C}\) 上的"复 \(\sin\)" 是<em>唯一</em>的解析延拓——再没有第二个候选。同理 \(\Gamma\)、\(\zeta\) 这些函数从它们的"自然定义域"（\(\mathrm{Re}\, s > 0\) 或 \(\mathrm{Re}\, s > 1\)）到 \(\mathbb{C}\) 的解析延拓也是唯一的。这件事赋予数学家一种"自由"——只要在小区域上把函数定义好，它在更大区域上的延拓如果存在就是被命定的，没有歧义。</p>
+
+<p>本附录到此结束。这七个证明搭起了本课程的"严格脊柱"。读它们的方式是：把每个证明读懂之后，遮住答案，自己再写一遍——很多步骤是机械的（嵌套、覆盖、Laurent 展开），重复一两次手就熟了。这种证明能力，是从"会用工具"到"造工具"的关键过渡。</p>

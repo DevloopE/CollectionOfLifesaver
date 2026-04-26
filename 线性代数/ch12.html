@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章　坐标与基变换 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章　矩阵作为线性变换</a><a href="ch13.html">下一章 · 第 13 章 行列式 →</a></nav>
+<h1 id="ch12">第 12 章　坐标与基变换</h1>
+
+<p>本章是线性代数中公认最让人晕的一章。难点不在于代数——代数其实非常直接。难点在于<em>同一件东西突然有了两套名字</em>，而我们要随时记得自己说的是哪一套。</p>
+
+<p>别担心。我会非常小心地把概念一步一步搭起来，并用例子反复验证。如果你在某个地方卡住，请回到 12.1 节那个最基本的定义读三遍——所有的混乱归根结底都是 12.1 节的混乱。</p>
+
+<p>本章覆盖：</p>
+
+<ul>
+  <li>"在某个基下的坐标"是什么意思（12.1）</li>
+  <li>同一向量在不同基下的不同坐标（12.2）</li>
+  <li>基变换矩阵（12.3）</li>
+  <li>同一线性变换在不同基下有不同矩阵（12.4）</li>
+  <li>相似矩阵 \(B = P^{-1}AP\)（12.5）</li>
+  <li>为什么这一切重要——选好基让矩阵变干净（12.6）</li>
+  <li>用斜基的几何例子（12.7）</li>
+</ul>
+
+<h2 id="sec-12-1">12.1　在某个基下的坐标</h2>
+
+<p>到现在为止，每当我们写下 \(\mathbf{v} = \begin{pmatrix}3\\-2\\5\end{pmatrix}\)，我们都把这三个数解读成"\(\mathbf{v}\) 的 \(x\)、\(y\)、\(z\) 分量"。但其实，<strong>这三个数并不是 \(\mathbf{v}\) 自己的属性——它们是 \(\mathbf{v}\) 相对于某个基的属性</strong>。我们之所以从来没意识到这件事，是因为我们一直默认用的是<em>标准基</em>。</p>
+
+<p>这一节的目标，就是把这个隐式的"默认"显式化。</p>
+
+<p>设 \(V\) 是一个 \(n\) 维向量空间，\(\mathcal{B} = \{\mathbf{b}_1, \mathbf{b}_2, \ldots, \mathbf{b}_n\}\) 是 \(V\) 的一组基。由"基"的定义，每个 \(\mathbf{v}\in V\) 都<em>唯一</em>地写成基向量的线性组合：</p>
+
+\[
+\mathbf{v} = c_1 \mathbf{b}_1 + c_2 \mathbf{b}_2 + \cdots + c_n \mathbf{b}_n.
+\]
+
+<p>那 \(n\) 个标量系数 \(c_1, c_2, \ldots, c_n\)，被叫做<strong>\(\mathbf{v}\) 在基 \(\mathcal{B}\) 下的坐标</strong>。我们把它们排成一列，记作</p>
+
+\[
+[\mathbf{v}]_\mathcal{B} = \begin{pmatrix}c_1 \\ c_2 \\ \vdots \\ c_n\end{pmatrix}.
+\]
+
+<p>请你<em>反复</em>读这个定义，因为本章后面所有的内容都建立在这一行上。它说的是：</p>
+
+<p><strong>"\(\mathbf{v}\) 在基 \(\mathcal{B}\) 下的坐标"\,=\,"把 \(\mathbf{v}\) 写成基向量的线性组合时，那些系数"。</strong></p>
+
+<p>不多，不少。每次你忘了它是什么的时候，把它默念两遍。</p>
+
+<h3>注意一个非常关键的细节</h3>
+
+<p>\([\mathbf{v}]_\mathcal{B}\) <strong>是一个 \(\mathbb{R}^n\) 中的列向量</strong>——一列数。它和 \(\mathbf{v}\) <em>不一样</em>：\(\mathbf{v}\) 是 \(V\) 中的一个对象（可能是多项式，可能是矩阵，可能是函数）；\([\mathbf{v}]_\mathcal{B}\) 是描述 \(\mathbf{v}\) 的一组数。</p>
+
+<p>当 \(V = \mathbb{R}^n\) 而 \(\mathcal{B}\) 又是标准基时，\(\mathbf{v}\) 和 \([\mathbf{v}]_\mathcal{B}\) 看起来一样——但即便如此，它们在概念上仍然是两样东西。请克制住把它们混为一谈的冲动。</p>
+
+<h3>例 12.1.1：标准基下的坐标</h3>
+
+<p>取 \(V = \mathbb{R}^2\)，\(\mathcal{B} = \{\mathbf{e}_1, \mathbf{e}_2\}\) 标准基，\(\mathbf{v} = \begin{pmatrix}3\\-2\end{pmatrix}\)。</p>
+
+<p>把 \(\mathbf{v}\) 写成 \(\mathbf{e}_1, \mathbf{e}_2\) 的组合：\(\mathbf{v} = 3\mathbf{e}_1 + (-2)\mathbf{e}_2\)。所以系数是 \(3\) 和 \(-2\)。即</p>
+
+\[
+[\mathbf{v}]_\mathcal{B} = \begin{pmatrix}3 \\ -2\end{pmatrix}.
+\]
+
+<p>看起来跟 \(\mathbf{v}\) 一模一样——这正是为什么我们平时不需要写 \([\,\cdot\,]_\mathcal{B}\)。<strong>在标准基下，坐标就是分量本身</strong>。</p>
+
+<h3>例 12.1.2：换个基</h3>
+
+<p>取 \(V = \mathbb{R}^2\)，<em>另一组</em>基 \(\mathcal{C} = \{\mathbf{c}_1, \mathbf{c}_2\}\)，其中</p>
+
+\[
+\mathbf{c}_1 = \begin{pmatrix}1\\1\end{pmatrix},\qquad \mathbf{c}_2 = \begin{pmatrix}1\\-1\end{pmatrix}.
+\]
+
+<p>仍取 \(\mathbf{v} = \begin{pmatrix}3\\-2\end{pmatrix}\)。\(\mathbf{v}\) 在 \(\mathcal{C}\) 下的坐标是什么？</p>
+
+<p>按定义，要找 \(c_1, c_2\) 使得</p>
+
+\[
+\mathbf{v} = c_1\mathbf{c}_1 + c_2\mathbf{c}_2,
+\]
+
+<p>即</p>
+
+\[
+\begin{pmatrix}3\\-2\end{pmatrix} = c_1\begin{pmatrix}1\\1\end{pmatrix} + c_2\begin{pmatrix}1\\-1\end{pmatrix} = \begin{pmatrix}c_1+c_2\\c_1-c_2\end{pmatrix}.
+\]
+
+<p>解方程组 \(c_1+c_2=3\)、\(c_1-c_2=-2\)：相加得 \(2c_1 = 1\)，所以 \(c_1 = 1/2\)；进而 \(c_2 = 5/2\)。所以</p>
+
+\[
+[\mathbf{v}]_\mathcal{C} = \begin{pmatrix}1/2 \\ 5/2\end{pmatrix}.
+\]
+
+<p>请你停下来：<strong>同一个向量 \(\mathbf{v}\)，在标准基下的坐标是 \((3,-2)\)，在 \(\mathcal{C}\) 下的坐标是 \((1/2, 5/2)\)</strong>。它<em>没有</em>变；<em>它的表达方式</em>变了。</p>
+
+<p>这是本章后面一切的源头：<em>向量自己永远是同一个，但描述它的数会随着我们选哪一组基而改变</em>。</p>
+
+<h3>例 12.1.3：多项式的坐标</h3>
+
+<p>取 \(V = P_2\)，标准基 \(\mathcal{E} = \{1, x, x^2\}\)。多项式 \(p = 4 - 3x + 7x^2\) 在这组基下的坐标是</p>
+
+\[
+[p]_\mathcal{E} = \begin{pmatrix}4 \\ -3 \\ 7\end{pmatrix}.
+\]
+
+<p>因为 \(p = 4\cdot 1 + (-3)\cdot x + 7\cdot x^2\)，系数就是 \(4, -3, 7\)。这就是把多项式空间 \(P_2\) 同构到 \(\mathbb{R}^3\) 的"翻译"——每一组基都给出一个这样的翻译。</p>
+
+<h2 id="sec-12-2">12.2　不同基下的不同坐标</h2>
+
+<p>上一节例 12.1.2 已经展示了关键现象。我们再多举一些例子，把直觉打牢。</p>
+
+<h3>例 12.2.1：用斜基描述 \(\mathbb{R}^2\)</h3>
+
+<p>取 \(\mathcal{C} = \{\mathbf{c}_1, \mathbf{c}_2\}\)，</p>
+
+\[
+\mathbf{c}_1 = \begin{pmatrix}2\\1\end{pmatrix},\qquad \mathbf{c}_2 = \begin{pmatrix}-1\\1\end{pmatrix}.
+\]
+
+<p>请你先验证一下 \(\mathcal{C}\) 确实是 \(\mathbb{R}^2\) 的一组基（两个向量不平行就行；这里它们显然不平行）。</p>
+
+<p>取 \(\mathbf{v} = \begin{pmatrix}3\\3\end{pmatrix}\)。在标准基下，\(\mathbf{v}\) 的坐标当然是 \((3,3)\)。在 \(\mathcal{C}\) 下呢？</p>
+
+<p>解 \(\mathbf{v} = c_1\mathbf{c}_1 + c_2\mathbf{c}_2\)：</p>
+
+\[
+\begin{pmatrix}3\\3\end{pmatrix} = c_1\begin{pmatrix}2\\1\end{pmatrix} + c_2\begin{pmatrix}-1\\1\end{pmatrix} = \begin{pmatrix}2c_1-c_2 \\ c_1+c_2\end{pmatrix}.
+\]
+
+<p>方程组：\(2c_1-c_2=3\)、\(c_1+c_2=3\)。相加：\(3c_1 = 6\)，\(c_1=2\)。代入：\(c_2 = 1\)。所以</p>
+
+\[
+[\mathbf{v}]_\mathcal{C} = \begin{pmatrix}2\\1\end{pmatrix}.
+\]
+
+<p>同一个 \(\mathbf{v}\)，标准基下叫 \((3,3)\)，\(\mathcal{C}\) 下叫 \((2,1)\)。</p>
+
+<p>几何上请你想象一下：在标准基下，你沿 \(x\) 轴走 3 步，沿 \(y\) 轴走 3 步，到达 \(\mathbf{v}\)。在 \(\mathcal{C}\) 下，你沿 \(\mathbf{c}_1\) 方向走 2 步，沿 \(\mathbf{c}_2\) 方向走 1 步，到达<em>同一个点</em>。两种走法都对，只是用了不同的"方向单位"。</p>
+
+<h3>一个常被混淆的点</h3>
+
+<p>有些初学者会问：当我们写 \(\mathbf{c}_1 = \begin{pmatrix}2\\1\end{pmatrix}\)，那个 \(\begin{pmatrix}2\\1\end{pmatrix}\) 不也是一种坐标吗——是 \(\mathbf{c}_1\) 在某个基下的坐标？</p>
+
+<p>是的！我们写 \(\mathbf{c}_1 = \begin{pmatrix}2\\1\end{pmatrix}\) 时，<strong>实际上</strong>是在标准基下描述 \(\mathbf{c}_1\)。也就是 \([\mathbf{c}_1]_\mathcal{E} = \begin{pmatrix}2\\1\end{pmatrix}\)（其中 \(\mathcal{E}\) 是标准基）。</p>
+
+<p>这件事看起来在循环——"用一个基描述另一个基"——但其实没有问题。我们承认标准基是"原生坐标系"，所有其他基都通过它来描述自己。这就像所有的语言最终都通过母语来翻译一样。</p>
+
+<h2 id="sec-12-3">12.3　基变换矩阵</h2>
+
+<p>每次都解一个方程组来"换基"显然太累。我们想要一个统一的工具，能把"在 \(\mathcal{B}\) 下的坐标"<em>一次性</em>翻译成"在 \(\mathcal{C}\) 下的坐标"。这个工具就是<strong>基变换矩阵</strong>。</p>
+
+<p>设 \(\mathcal{B} = \{\mathbf{b}_1, \ldots, \mathbf{b}_n\}\) 和 \(\mathcal{C} = \{\mathbf{c}_1, \ldots, \mathbf{c}_n\}\) 都是 \(V\) 的基。我们想找一个 \(n\times n\) 矩阵 \(P\)，使得</p>
+
+\[
+[\mathbf{v}]_\mathcal{C} = P\,[\mathbf{v}]_\mathcal{B}\qquad \text{对一切 }\mathbf{v}\in V.
+\]
+
+<p>这个 \(P\) 称为<strong>从 \(\mathcal{B}\) 到 \(\mathcal{C}\) 的基变换矩阵</strong>，常记作 \(P_{\mathcal{C}\leftarrow\mathcal{B}}\)。</p>
+
+<p>怎么找它？用第 11 章的"看基向量去哪"的菜谱！具体地，"从 \(\mathcal{B}\) 坐标到 \(\mathcal{C}\) 坐标"这个映射的标准基是什么？是 \(\mathbb{R}^n\) 中的标准基 \(\mathbf{e}_1,\ldots,\mathbf{e}_n\)。但 \(\mathbf{e}_i\) 作为"\(\mathcal{B}\) 下的坐标"对应的向量是 \(\mathbf{b}_i\) 本身（因为 \(\mathbf{b}_i = 1\cdot\mathbf{b}_i + 0\cdot\mathbf{b}_j\) for \(j\ne i\)）。所以"从 \(\mathcal{B}\) 坐标到 \(\mathcal{C}\) 坐标"这个映射作用在 \(\mathbf{e}_i\) 上的结果，正是 \(\mathbf{b}_i\) 在 \(\mathcal{C}\) 下的坐标 \([\mathbf{b}_i]_\mathcal{C}\)。</p>
+
+<p>所以——</p>
+
+\[
+\boxed{\,P_{\mathcal{C}\leftarrow\mathcal{B}} = \big[\, [\mathbf{b}_1]_\mathcal{C}\ \big|\ [\mathbf{b}_2]_\mathcal{C}\ \big|\ \cdots\ \big|\ [\mathbf{b}_n]_\mathcal{C}\,\big].\,}
+\]
+
+<p>用语言说：<strong>基变换矩阵 \(P_{\mathcal{C}\leftarrow\mathcal{B}}\) 的第 \(i\) 列，就是 \(\mathcal{B}\) 的第 \(i\) 个基向量 \(\mathbf{b}_i\) 在 \(\mathcal{C}\) 下的坐标</strong>。</p>
+
+<p>这条规则记忆起来有个小诀窍：箭头方向 \(\mathcal{C}\leftarrow\mathcal{B}\) 中，<em>箭头来源</em>那一边的基向量被<em>放进矩阵的列</em>，列里的内容则是<em>箭头指向</em>那一边的坐标。"列里装的，是来源基；列里写的方式，是去向基"。</p>
+
+<h3>例 12.3.1：从标准基 \(\mathcal{E}\) 到 \(\mathcal{C}\)</h3>
+
+<p>设 \(\mathcal{C} = \{\mathbf{c}_1,\mathbf{c}_2\}\)，</p>
+
+\[
+\mathbf{c}_1 = \begin{pmatrix}2\\1\end{pmatrix},\quad \mathbf{c}_2 = \begin{pmatrix}-1\\1\end{pmatrix}.
+\]
+
+<p>要算 \(P_{\mathcal{C}\leftarrow\mathcal{E}}\)。按公式：列里要装的是标准基向量 \(\mathbf{e}_1, \mathbf{e}_2\) 在 \(\mathcal{C}\) 下的坐标。</p>
+
+<p>\(\mathbf{e}_1 = \begin{pmatrix}1\\0\end{pmatrix}\) 在 \(\mathcal{C}\) 下：解 \(\mathbf{e}_1 = c_1\mathbf{c}_1 + c_2\mathbf{c}_2\)，即 \(2c_1 - c_2 = 1\)、\(c_1+c_2=0\)。相加：\(3c_1=1\)，\(c_1=1/3\)；\(c_2=-1/3\)。所以 \([\mathbf{e}_1]_\mathcal{C} = \begin{pmatrix}1/3\\-1/3\end{pmatrix}\)。</p>
+
+<p>\(\mathbf{e}_2 = \begin{pmatrix}0\\1\end{pmatrix}\) 在 \(\mathcal{C}\) 下：解 \(2c_1-c_2=0\)、\(c_1+c_2=1\)。相加：\(3c_1=1\)，\(c_1=1/3\)；\(c_2=2/3\)。所以 \([\mathbf{e}_2]_\mathcal{C} = \begin{pmatrix}1/3\\2/3\end{pmatrix}\)。</p>
+
+<p>所以</p>
+
+\[
+P_{\mathcal{C}\leftarrow\mathcal{E}} = \begin{pmatrix}1/3 & 1/3 \\ -1/3 & 2/3\end{pmatrix}.
+\]
+
+<p>稍嫌麻烦。让我们试一下反向——<strong>从 \(\mathcal{C}\) 到 \(\mathcal{E}\) 的矩阵 \(P_{\mathcal{E}\leftarrow\mathcal{C}}\)</strong> 反而非常容易。按公式，列里装的是 \(\mathcal{C}\) 的基向量在<em>标准基</em>下的坐标——但 \(\mathbf{c}_1, \mathbf{c}_2\) 我们一开始就是用标准基写出来的！所以</p>
+
+\[
+P_{\mathcal{E}\leftarrow\mathcal{C}} = \big[\, \mathbf{c}_1\ \big|\ \mathbf{c}_2 \,\big] = \begin{pmatrix}2 & -1 \\ 1 & 1\end{pmatrix}.
+\]
+
+<p>就是把 \(\mathcal{C}\) 的基向量直接拼成列。这个规则非常重要，请记下来：</p>
+
+<p><strong>方框结论。</strong>设 \(\mathcal{C}=\{\mathbf{c}_1,\ldots,\mathbf{c}_n\}\) 是 \(\mathbb{R}^n\) 的一组基，每个 \(\mathbf{c}_i\) 用标准基写出。则<strong>从 \(\mathcal{C}\) 到标准基 \(\mathcal{E}\) 的基变换矩阵</strong>就是把 \(\mathbf{c}_i\) 拼成列得到的矩阵：</p>
+
+\[
+\boxed{\,P_{\mathcal{E}\leftarrow\mathcal{C}} = \big[\, \mathbf{c}_1\ \big|\ \mathbf{c}_2\ \big|\ \cdots\ \big|\ \mathbf{c}_n\,\big].\,}
+\]
+
+<p>这是后面所有计算的入口。</p>
+
+<h3>验证：用 \(P_{\mathcal{E}\leftarrow\mathcal{C}}\) 把 \(\mathcal{C}\) 坐标翻译回标准基</h3>
+
+<p>例 12.2.1 中，\(\mathbf{v}\) 的标准基坐标是 \((3,3)\)，\(\mathcal{C}\) 坐标是 \((2,1)\)。按 \(P_{\mathcal{E}\leftarrow\mathcal{C}}\) 应有 \([\mathbf{v}]_\mathcal{E} = P_{\mathcal{E}\leftarrow\mathcal{C}}\,[\mathbf{v}]_\mathcal{C}\)：</p>
+
+\[
+\begin{pmatrix}2&-1\\1&1\end{pmatrix}\begin{pmatrix}2\\1\end{pmatrix} = \begin{pmatrix}3\\3\end{pmatrix}. \checkmark
+\]
+
+<p>对了。</p>
+
+<h3>双向变换互为逆矩阵</h3>
+
+<p>如果 \(P_{\mathcal{C}\leftarrow\mathcal{B}}\) 是从 \(\mathcal{B}\) 到 \(\mathcal{C}\) 的，那 \(P_{\mathcal{B}\leftarrow\mathcal{C}}\) 是反方向的。它们是不是互为逆？</p>
+
+<p>当然是。把 \(\mathcal{B}\) 坐标翻译成 \(\mathcal{C}\) 坐标，再翻译回 \(\mathcal{B}\) 坐标，回到原地。即</p>
+
+\[
+P_{\mathcal{B}\leftarrow\mathcal{C}} \cdot P_{\mathcal{C}\leftarrow\mathcal{B}} = I.
+\]
+
+<p>所以 <strong>\(P_{\mathcal{B}\leftarrow\mathcal{C}} = (P_{\mathcal{C}\leftarrow\mathcal{B}})^{-1}\)</strong>。这给我们一条捷径：要算 \(P_{\mathcal{C}\leftarrow\mathcal{E}}\)（即从标准基到 \(\mathcal{C}\)），<em>不必</em>一个一个解方程——只要先把容易算的 \(P_{\mathcal{E}\leftarrow\mathcal{C}}\)（把 \(\mathcal{C}\) 拼成列）算出来，再求它的逆。</p>
+
+<p>让我们验证一下。\(P_{\mathcal{E}\leftarrow\mathcal{C}} = \begin{pmatrix}2&-1\\1&1\end{pmatrix}\)，行列式 \(=2\cdot 1 - (-1)\cdot 1 = 3\)，逆是 \(\frac{1}{3}\begin{pmatrix}1&1\\-1&2\end{pmatrix} = \begin{pmatrix}1/3 & 1/3\\-1/3 & 2/3\end{pmatrix}\)。和我们之前一项项算的 \(P_{\mathcal{C}\leftarrow\mathcal{E}}\) 完全一致。✓</p>
+
+<h2 id="sec-12-4">12.4　同一线性变换在不同基下的不同矩阵</h2>
+
+<p>到了本章的核心。请你深呼吸，慢慢读这一节。</p>
+
+<p>设 \(T:\mathbb{R}^n\to\mathbb{R}^n\) 是一个线性变换。在标准基下，\(T\) 的矩阵我们已经知道怎么求了——把 \(T(\mathbf{e}_i)\) 拼成列。我们把这个矩阵简记为 \(A\)。</p>
+
+<p>现在让我们换一组基 \(\mathcal{B} = \{\mathbf{b}_1,\ldots,\mathbf{b}_n\}\)。在<em>这组基下</em>，\(T\) 也有一个矩阵——我们把它记作 \([T]_\mathcal{B}\)。它的定义是：使得</p>
+
+\[
+[T(\mathbf{v})]_\mathcal{B} = [T]_\mathcal{B}\,[\mathbf{v}]_\mathcal{B}\qquad \text{对一切 }\mathbf{v}.
+\]
+
+<p>用语言说：\([T]_\mathcal{B}\) 是一个矩阵，它在 \(\mathcal{B}\) 坐标的世界里执行 \(T\) 这个变换——输入是 \(\mathbf{v}\) 的 \(\mathcal{B}\) 坐标，输出是 \(T(\mathbf{v})\) 的 \(\mathcal{B}\) 坐标。</p>
+
+<p>这个 \([T]_\mathcal{B}\) 和原来的 \(A=[T]\) 是<em>同一个变换的两个不同矩阵</em>。哪一个"对"呢？两个都对——它们只是用了不同的"语言"描述同一个动作。</p>
+
+<h3>怎么算 \([T]_\mathcal{B}\)？</h3>
+
+<p>有一条非常好用的公式。设 \(P = P_{\mathcal{E}\leftarrow\mathcal{B}}\)（从 \(\mathcal{B}\) 到标准基的变换矩阵，也就是把 \(\mathcal{B}\) 的基向量拼成列得到的矩阵）。那么</p>
+
+\[
+\boxed{\,[T]_\mathcal{B} = P^{-1}\, A\, P.\,}
+\]
+
+<p>请你停下来体会这条公式。它由三步组成，正是 \([T]_\mathcal{B}\) 在<em>定义上</em>必须做的三件事：</p>
+
+<ol>
+  <li><strong>右乘 \(P\)</strong>：把"\(\mathcal{B}\) 坐标 \([\mathbf{v}]_\mathcal{B}\)"翻译成"标准基坐标 \([\mathbf{v}]_\mathcal{E}\)"。</li>
+  <li><strong>左乘 \(A\)</strong>：在标准基里执行 \(T\)，得到"标准基坐标 \([T(\mathbf{v})]_\mathcal{E}\)"。</li>
+  <li><strong>左乘 \(P^{-1}\)</strong>：把结果再翻译回"\(\mathcal{B}\) 坐标 \([T(\mathbf{v})]_\mathcal{B}\)"。</li>
+</ol>
+
+<p>所以 \(P^{-1}AP\) 的几何含义是：<em>"翻译到标准基 → 在标准基里做事 → 翻译回原来"</em>。这是一个非常自然的"环游"过程。</p>
+
+<p>稍加形式化的推导：从右往左作用在 \([\mathbf{v}]_\mathcal{B}\) 上，</p>
+
+\[
+P^{-1}AP\,[\mathbf{v}]_\mathcal{B} = P^{-1}A\,[\mathbf{v}]_\mathcal{E} = P^{-1}\,[T(\mathbf{v})]_\mathcal{E} = [T(\mathbf{v})]_\mathcal{B}.
+\]
+
+<p>所以 \(P^{-1}AP\) 确实就是"在 \(\mathcal{B}\) 坐标下执行 \(T\)"的矩阵——也即 \([T]_\mathcal{B}\)。</p>
+
+<h3>例 12.4.1：剪切变换在斜基下的样子</h3>
+
+<p>取 \(T : \mathbb{R}^2\to\mathbb{R}^2\) 为水平剪切 \(T(x,y) = (x+y, y)\)。在标准基下，\(A = [T] = \begin{pmatrix}1&1\\0&1\end{pmatrix}\)（按 11.3 节）。</p>
+
+<p>取一组斜基 \(\mathcal{B} = \{\mathbf{b}_1, \mathbf{b}_2\}\)，</p>
+
+\[
+\mathbf{b}_1 = \begin{pmatrix}1\\0\end{pmatrix},\qquad \mathbf{b}_2 = \begin{pmatrix}1\\1\end{pmatrix}.
+\]
+
+<p>这意味着 \(P = P_{\mathcal{E}\leftarrow\mathcal{B}} = \begin{pmatrix}1&1\\0&1\end{pmatrix}\)。注意 \(P = A\) 在数值上是同一个矩阵——这只是巧合，没有特别意义。</p>
+
+<p>计算 \(P^{-1}\)。\(\det P = 1\)，所以 \(P^{-1} = \begin{pmatrix}1&-1\\0&1\end{pmatrix}\)。</p>
+
+<p>计算 \([T]_\mathcal{B} = P^{-1}AP\)：</p>
+
+\[
+P^{-1}A = \begin{pmatrix}1&-1\\0&1\end{pmatrix}\begin{pmatrix}1&1\\0&1\end{pmatrix} = \begin{pmatrix}1&0\\0&1\end{pmatrix} = I.
+\]
+
+\[
+[T]_\mathcal{B} = (P^{-1}A)\,P = I\cdot P = P = \begin{pmatrix}1&1\\0&1\end{pmatrix}.
+\]
+
+<p>所以这一例 \([T]_\mathcal{B}\) 也等于 \(\begin{pmatrix}1&1\\0&1\end{pmatrix}\)——和标准基下一样。这是因为我们恰好选了一个对剪切来说"很合身"的基。</p>
+
+<h3>例 12.4.2：把投影写干净</h3>
+
+<p>取 \(T : \mathbb{R}^2\to\mathbb{R}^2\) 为"投影到直线 \(y=x\)"。这种投影沿着直线 \(y=-x\) 方向把每个点压到直线 \(y=x\) 上。</p>
+
+<p>用标准基算 \(A = [T]\) 颇为麻烦——你得把 \(\mathbf{e}_1, \mathbf{e}_2\) 沿 \(y=-x\) 方向投到 \(y=x\) 上，会得到 \(\begin{pmatrix}1/2&1/2\\1/2&1/2\end{pmatrix}\)。请你自己验证一下。</p>
+
+<p>但如果换基 \(\mathcal{B} = \{\mathbf{b}_1, \mathbf{b}_2\}\)，</p>
+
+\[
+\mathbf{b}_1 = \begin{pmatrix}1\\1\end{pmatrix}\,(\text{沿 } y=x), \qquad \mathbf{b}_2 = \begin{pmatrix}1\\-1\end{pmatrix}\,(\text{沿 } y=-x),
+\]
+
+<p>那么 \(T(\mathbf{b}_1) = \mathbf{b}_1\)（\(\mathbf{b}_1\) 在投影线上，原地不动），\(T(\mathbf{b}_2) = \mathbf{0}\)（\(\mathbf{b}_2\) 沿投影方向，被压成零）。所以在 \(\mathcal{B}\) 坐标下：</p>
+
+\[
+[T(\mathbf{b}_1)]_\mathcal{B} = \begin{pmatrix}1\\0\end{pmatrix},\quad [T(\mathbf{b}_2)]_\mathcal{B} = \begin{pmatrix}0\\0\end{pmatrix}.
+\]
+
+<p>把它们拼成列：</p>
+
+\[
+[T]_\mathcal{B} = \begin{pmatrix}1 & 0 \\ 0 & 0\end{pmatrix}.
+\]
+
+<p><strong>对角矩阵</strong>。比标准基下的 \(\begin{pmatrix}1/2&1/2\\1/2&1/2\end{pmatrix}\) 干净得多。</p>
+
+<p>请你停下来体会这件事。同一个 \(T\)：</p>
+
+<ul>
+  <li>在标准基下，是一个有 \(1/2\) 的"乱"矩阵。</li>
+  <li>在精心挑选的 \(\mathcal{B}\) 下，是一个对角矩阵。</li>
+</ul>
+
+<p>两个都是 \(T\) 的"真实样子"——只是描述它的语言不同。<em>选好了基，矩阵就变干净；选不好基，矩阵就难看</em>。这是 12.6 节将要展开的核心动机，也是第 15 章对角化的全部精神。</p>
+
+<h2 id="sec-12-5">12.5　相似矩阵</h2>
+
+<p>上一节我们看到，同一个变换在不同基下有不同的矩阵，且它们之间通过 \(B = P^{-1}AP\) 联系起来。这个等式的形式如此典型，以至于我们专门给它一个名字。</p>
+
+<p><strong>定义。</strong>两个 \(n\times n\) 方阵 \(A\) 和 \(B\) 称为<strong>相似</strong>（similar），如果存在可逆方阵 \(P\)，使得</p>
+
+\[
+B = P^{-1} A P.
+\]
+
+<p>用变换的语言：<strong>\(A\) 和 \(B\) 相似当且仅当它们是<em>同一个线性变换</em>在两组不同基下的矩阵</strong>。\(P\) 起的作用是这两组基之间的变换矩阵。</p>
+
+<p>这是相似关系的全部含义——它在外表上看是一个代数关系，在本质上是一个几何关系。每当你看到两个矩阵相似，请你脑子里浮现的画面是：<em>"它们是一回事，只是穿了不同的衣服"</em>。</p>
+
+<h3>相似的不变量</h3>
+
+<p>"\(A\) 和 \(B\) 是同一个变换"意味着它们必须共享变换本身的某些不变属性——而这些属性就成了"相似"关系的<strong>不变量</strong>。哪些？</p>
+
+<p>下面这些量在相似变换下是不变的：</p>
+
+<table>
+  <thead>
+    <tr><th>不变量</th><th>含义</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>行列式 \(\det\)</td><td>变换对体积的缩放比例</td></tr>
+    <tr><td>迹 \(\mathrm{tr}\)（对角元素之和）</td><td>与某种"平均缩放"相关</td></tr>
+    <tr><td>秩 \(\mathrm{rank}\)</td><td>变换像的维数</td></tr>
+    <tr><td>特征值（multiset）</td><td>变换在某些方向上的缩放因子</td></tr>
+    <tr><td>特征多项式</td><td>编码所有特征值</td></tr>
+  </tbody>
+</table>
+
+<p>这些不变量本质上都是<em>变换</em>的属性，而不是<em>矩阵表示</em>的属性。它们在改基（即"相似"）下不变，是因为变换本身没变。</p>
+
+<p>让我们快速验证<strong>行列式</strong>的不变性。如果 \(B = P^{-1}AP\)，那么</p>
+
+\[
+\det B = \det(P^{-1}AP) = \det(P^{-1})\det(A)\det(P) = \frac{1}{\det P}\cdot \det A \cdot \det P = \det A.
+\]
+
+<p>对了。把第 5 章的"行列式相乘等于乘积的行列式"用一遍就行。</p>
+
+<p>对<strong>迹</strong>，我们用第 3 章证过的"\(\mathrm{tr}(AB) = \mathrm{tr}(BA)\)"：</p>
+
+\[
+\mathrm{tr}(P^{-1}AP) = \mathrm{tr}((P^{-1}A)P) = \mathrm{tr}(P(P^{-1}A)) = \mathrm{tr}(A).
+\]
+
+<p>同样直接。</p>
+
+<p><strong>特征值</strong>的不变性我们留到第 14 章——那里会先讲特征值是什么。但请你提前体会：<em>特征值反映的是变换"在哪些方向有缩放、缩放多少"，这件事是几何属性，不依赖描述用的基</em>。所以特征值是相似不变量。</p>
+
+<h3>相似不蕴含相等</h3>
+
+<p>请注意，<em>相似的两个矩阵几乎肯定不相等</em>。例 12.4.2 中，</p>
+
+\[
+A = \begin{pmatrix}1/2 & 1/2 \\ 1/2 & 1/2\end{pmatrix},\qquad B = [T]_\mathcal{B} = \begin{pmatrix}1 & 0 \\ 0 & 0\end{pmatrix}
+\]
+
+<p>是相似的，但它们的元素完全不同。它们共享行列式（都是 0）、迹（都是 1）、秩（都是 1）、特征值（都是 \(\{0, 1\}\)），但<em>整体看起来完全不同</em>。</p>
+
+<p>这就是相似关系的力量与微妙之处：它把"代数上看起来不同"和"几何上是同一回事"分开了。两个矩阵在你眼里可能完全是陌生人，但它们其实是一对孪生兄弟——只是穿了不同的衣服。</p>
+
+<h2 id="sec-12-6">12.6　为什么这件事重要：选好基让矩阵变干净</h2>
+
+<p>本节的目的是把动机拉到台前。我们花了这么多力气讲基变换，归根结底是为了什么？</p>
+
+<p>一句话：<strong>选合适的基，可以让矩阵变得对角或近对角，让一切计算简化。</strong></p>
+
+<h3>对角矩阵有多好</h3>
+
+<p>对角矩阵 \(D = \mathrm{diag}(d_1, \ldots, d_n)\) 的运算极为简单：</p>
+
+<ul>
+  <li>\(D\mathbf{x}\) 就是把 \(\mathbf{x}\) 的每个分量分别乘以 \(d_i\)——\(O(n)\) 次乘法，不是 \(O(n^2)\)。</li>
+  <li>\(D^k\)（求幂）就是 \(\mathrm{diag}(d_1^k, \ldots, d_n^k)\)——常数时间。</li>
+  <li>\(\det D = d_1 d_2\cdots d_n\)——一目了然。</li>
+  <li>\(D\) 可逆当且仅当所有 \(d_i\ne 0\)，且 \(D^{-1} = \mathrm{diag}(1/d_1,\ldots,1/d_n)\)。</li>
+  <li>\(D\) 的特征值就是 \(d_1,\ldots,d_n\)，特征向量就是标准基。</li>
+</ul>
+
+<p>所有这些运算，对一般的方阵都是棘手的。但只要找到一组基把矩阵变成对角，所有问题都瞬间变得平凡。</p>
+
+<h3>对角化的核心想法</h3>
+
+<p>这就引出了一个根本性的问题：</p>
+
+<p><strong>给一个变换 \(T\)（或它的标准矩阵 \(A\)），能不能找到一组基 \(\mathcal{B}\) 使 \([T]_\mathcal{B}\) 是对角矩阵？</strong></p>
+
+<p>用相似的语言：能不能找到可逆 \(P\)，使 \(P^{-1}AP = D\) 是对角矩阵？</p>
+
+<p>这个问题就是<strong>对角化</strong>。它的答案是"有时候能，有时候不能"——什么时候能、怎样去找——是第 14、15 章的核心内容。</p>
+
+<p>但我希望你现在就先看到一件事：<em>对角化不是一种"代数化简技巧"，而是一种"换坐标系"的几何操作</em>。当我们成功把 \(A\) 对角化时，我们其实是找到了一组特别契合 \(T\) 的"自然方向"。沿着这些方向，\(T\) 的作用就是简单的"分别缩放"——这就是为什么矩阵变成对角。</p>
+
+<h3>例 12.6.1：对角化让幂方便</h3>
+
+<p>设 \(A = \begin{pmatrix}1/2 & 1/2 \\ 1/2 & 1/2\end{pmatrix}\)（即例 12.4.2 中投影到 \(y=x\) 的矩阵）。要算 \(A^{100}\)。</p>
+
+<p>直接乘？做 99 次矩阵乘法，痛苦不堪。但我们已经看到 \([T]_\mathcal{B} = \begin{pmatrix}1&0\\0&0\end{pmatrix} = D\)，其中 \(\mathcal{B} = \{(1,1),(1,-1)\}\)。所以 \(A = PDP^{-1}\)，其中 \(P = \begin{pmatrix}1&1\\1&-1\end{pmatrix}\)。</p>
+
+<p>那么</p>
+
+\[
+A^{100} = (PDP^{-1})^{100} = PD^{100}P^{-1}.
+\]
+
+<p>这里中间的所有 \(P^{-1}P\) 互相消掉了——只剩下 \(D^{100}\)。但 \(D^{100} = \begin{pmatrix}1^{100}&0\\0&0^{100}\end{pmatrix} = \begin{pmatrix}1&0\\0&0\end{pmatrix} = D\)！所以 \(A^{100} = PDP^{-1} = A\)。</p>
+
+<p>请你看：99 次矩阵乘法被压缩成一次"翻译—执行—翻译回"的过程。这就是对角化的力量。</p>
+
+<p>（顺便说，"投影的高次幂等于自身"是几何上明显的——投影一次后已经在像子空间上了，再投影任何次都不动。所以 \(A^{100} = A\) 在物理上是合理的。我们的代数刚刚和这件几何事实对齐。）</p>
+
+<h2 id="sec-12-7">12.7　几何例子：用斜基让矩阵变干净</h2>
+
+<p>本节我们再做一个完整的几何例子，把上面所有想法串联起来。</p>
+
+<p>取 \(T:\mathbb{R}^2\to\mathbb{R}^2\) 为"沿直线 \(y=2x\) 方向延长 3 倍，沿垂直方向延长 1 倍（即不变）"。直觉上，这个变换的"自然方向"是 \(y=2x\) 的方向和它的垂直方向。</p>
+
+<h3>第一步：在标准基下求 \(T\) 的矩阵</h3>
+
+<p>这一步颇为麻烦。我们要把 \(\mathbf{e}_1=(1,0)\) 沿这两个自然方向分解：</p>
+
+<p>方向 1（沿 \(y=2x\)）的单位向量是 \(\mathbf{u}_1 = (1,2)/\sqrt{5}\)。方向 2（垂直）的单位向量是 \(\mathbf{u}_2 = (-2,1)/\sqrt{5}\)。把 \(\mathbf{e}_1\) 投到这两个方向：</p>
+
+\[
+\mathbf{e}_1 = (\mathbf{e}_1\cdot\mathbf{u}_1)\mathbf{u}_1 + (\mathbf{e}_1\cdot\mathbf{u}_2)\mathbf{u}_2 = \frac{1}{\sqrt 5}\mathbf{u}_1 + \frac{-2}{\sqrt 5}\mathbf{u}_2.
+\]
+
+<p>沿 \(\mathbf{u}_1\) 的部分要 \(\times 3\)，沿 \(\mathbf{u}_2\) 的部分 \(\times 1\)：</p>
+
+\[
+T(\mathbf{e}_1) = \frac{3}{\sqrt 5}\mathbf{u}_1 + \frac{-2}{\sqrt 5}\mathbf{u}_2 = \frac{3}{5}(1,2) + \frac{-2}{5}(-2,1) = \left(\frac{3+4}{5}, \frac{6-2}{5}\right) = \left(\frac{7}{5}, \frac{4}{5}\right).
+\]
+
+<p>类似地（请你自己算），\(T(\mathbf{e}_2) = (4/5, 8/5+1/5) = (4/5, 8/5)\)。</p>
+
+<p>嗯，让我重新算 \(T(\mathbf{e}_2)\)。\(\mathbf{e}_2 = (\mathbf{e}_2\cdot\mathbf{u}_1)\mathbf{u}_1 + (\mathbf{e}_2\cdot\mathbf{u}_2)\mathbf{u}_2 = \frac{2}{\sqrt 5}\mathbf{u}_1 + \frac{1}{\sqrt 5}\mathbf{u}_2\)。\(T\) 后：\(\frac{6}{\sqrt 5}\mathbf{u}_1 + \frac{1}{\sqrt 5}\mathbf{u}_2 = \frac{6}{5}(1,2) + \frac{1}{5}(-2,1) = (4/5, 13/5)\)。</p>
+
+<p>所以 \(A = [T] = \begin{pmatrix}7/5 & 4/5 \\ 4/5 & 13/5\end{pmatrix}\)。颇为难看。</p>
+
+<h3>第二步：换到自然基</h3>
+
+<p>取 \(\mathcal{B} = \{\mathbf{b}_1, \mathbf{b}_2\} = \{(1,2), (-2,1)\}\)（沿两个自然方向，长度选成方便的形式）。在 \(\mathcal{B}\) 坐标下，\(T\) 是怎样的？</p>
+
+<p>非常简单。\(T(\mathbf{b}_1) = 3\mathbf{b}_1\)（沿 \(y=2x\) 方向延长 3 倍），\(T(\mathbf{b}_2) = 1\cdot\mathbf{b}_2 = \mathbf{b}_2\)（垂直方向不变）。所以在 \(\mathcal{B}\) 坐标下的像分别是 \(\begin{pmatrix}3\\0\end{pmatrix}\) 和 \(\begin{pmatrix}0\\1\end{pmatrix}\)：</p>
+
+\[
+[T]_\mathcal{B} = \begin{pmatrix}3 & 0 \\ 0 & 1\end{pmatrix}.
+\]
+
+<p><strong>对角矩阵。</strong></p>
+
+<h3>第三步：欣赏对照</h3>
+
+<p>同一个 \(T\) 的两副面孔：</p>
+
+\[
+A = \begin{pmatrix}7/5 & 4/5 \\ 4/5 & 13/5\end{pmatrix}\quad\text{(标准基)} \qquad\text{vs.}\qquad [T]_\mathcal{B} = \begin{pmatrix}3 & 0 \\ 0 & 1\end{pmatrix}\quad(\mathcal{B}\text{ 基}).
+\]
+
+<p>它们之间应该满足 \(A = P\,[T]_\mathcal{B}\,P^{-1}\)，其中 \(P = P_{\mathcal{E}\leftarrow\mathcal{B}} = \begin{pmatrix}1&-2\\2&1\end{pmatrix}\)。请你自己用矩阵乘法验证一下——你会算出 \(A = \begin{pmatrix}7/5&4/5\\4/5&13/5\end{pmatrix}\) ✓。</p>
+
+<p>它们共享所有相似不变量。\(\det A = 7/5\cdot 13/5 - 16/25 = 91/25 - 16/25 = 75/25 = 3 = \det D\)。\(\mathrm{tr}\,A = 7/5+13/5 = 20/5 = 4 = \mathrm{tr}\,D\)。秩都是 2。特征值都是 \(\{3, 1\}\)。</p>
+
+<h3>本章的全景</h3>
+
+<p>这个例子把本章的所有概念都用了一遍。我们：</p>
+
+<ol>
+  <li>看到了同一向量、同一变换在不同基下的不同坐标 / 矩阵；</li>
+  <li>用基变换矩阵 \(P\) 把它们联系起来；</li>
+  <li>看到了 \(A = PDP^{-1}\)（即 \(D = P^{-1}AP\)）的相似关系；</li>
+  <li>看到了"换好基让矩阵变成对角"的威力。</li>
+</ol>
+
+<p>这恰好是接下来第 14、15 章要正面攻击的问题：<em>给一个矩阵 \(A\)，怎么找到那组特别的基 \(\mathcal{B}\)？怎么知道这件事什么时候做得到？</em></p>
+
+<p>那组特别的基的成员有一个名字，叫"<strong>特征向量</strong>"。它们对应的对角元素叫"<strong>特征值</strong>"。整本书最重要的两个概念，就在那里等着我们。</p>
+
+<p>所以请你在结束本章前，把下面这件事印在脑子里：</p>
+
+<p><strong>对角化的本质是换坐标系。\(P^{-1}AP = D\) 不是一条代数恒等式，而是一句几何陈述：换到由特征向量构成的基，变换的矩阵就变成对角的。</strong></p>
+
+<p>带着这一句话，进入第 13 章关于秩与维数的总结，再进入第 14 章遇见特征值。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章　矩阵作为线性变换</a><a href="ch13.html">下一章 · 第 13 章 行列式 →</a></nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>索引 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 严格处理</a><span class="nav-disabled">下一章 →</span></nav>
+<h1 id="index">索引</h1>
+
+<p>本索引按主题聚类，再大致按汉语拼音排序。每条尽量"行为化"——不只是写一个名词，还告诉你"它出现在解决什么问题时"，方便你按题目类型反查。完整版（含全部小节定位）请看本书附带的电子版。</p>
+
+<h2 id="index-A">A — 几何基础与向量代数</h2>
+<ul>
+  <li>叉积（cross product），求平面法向、求平行四边形面积、求向量的"垂直分量"——1.6</li>
+  <li>点积（dot product），求投影、求夹角、判断垂直——1.5</li>
+  <li>单位向量（unit vector），归一化已有向量——1.4</li>
+  <li>方向余弦——1.4</li>
+  <li>三重标量积（triple scalar product），求平行六面体体积——1.6</li>
+  <li>向量（vector），加减、数乘、长度——1.2</li>
+  <li>向量分解（vector decomposition），分量与坐标——1.3</li>
+  <li>正交基（orthonormal basis），\(\mathbf{i}, \mathbf{j}, \mathbf{k}\)——1.3</li>
+</ul>
+
+<h2 id="index-B">B — 直线、平面与二次曲面</h2>
+<ul>
+  <li>点到平面距离——2.3</li>
+  <li>椭球面（ellipsoid）——2.4</li>
+  <li>二次曲面（quadric surface）总览——2.4</li>
+  <li>抛物面（paraboloid），椭圆型 / 双曲型——2.4</li>
+  <li>平面方程（plane equation），点法式 / 三点式——2.2</li>
+  <li>双曲面（hyperboloid），单叶 / 双叶——2.4</li>
+  <li>圆柱面（cylinder），广义柱面定义——2.5</li>
+  <li>直线（line），3D 中的参数式与对称式——2.1</li>
+  <li>锥面（cone），二次锥——2.4</li>
+</ul>
+
+<h2 id="index-C">C — 空间曲线与运动学</h2>
+<ul>
+  <li>弧长（arc length），参数化曲线的长度——4.2</li>
+  <li>弧长参数化（arc-length parametrization），"按距离重参数化"——4.2</li>
+  <li>加速度（acceleration），切向分量 \(a_T\) / 法向分量 \(a_N\)——4.1, 4.5</li>
+  <li>螺旋线（helix），最常出现的"测试用例"——3.4</li>
+  <li>曲率（curvature），衡量"弯得多快"——4.3</li>
+  <li>切向量（tangent vector）与单位切向量 \(\mathbf{T}\)——3.5, 4.3</li>
+  <li>速度 / 速率（velocity / speed）——4.1</li>
+  <li>TNB 标架（Frenet frame），\(\mathbf{T}, \mathbf{N}, \mathbf{B}\)——4.4</li>
+  <li>主法向量 \(\mathbf{N}\) 与副法向量 \(\mathbf{B}\)——4.4</li>
+</ul>
+
+<h2 id="index-D">D — 多元函数、图象与极限</h2>
+<ul>
+  <li>等高线（level curve），\(f(x, y) = c\) 的轨迹——5.2</li>
+  <li>等值面（level surface），三元函数的"等高曲面"——5.2.1</li>
+  <li>多元函数图象（graph），\(z = f(x, y)\) 的画法——5.1</li>
+  <li>极限（limit），多元的 \(\varepsilon\)-球定义——6.1，附录 A.1</li>
+  <li>极限不存在（limit does not exist），双路径法——6.3</li>
+  <li>极限计算（limit, computation），代入 / 极坐标 / 夹逼——6.2</li>
+  <li>夹逼定理（squeeze theorem），高维版——6.4，附录 A.2</li>
+  <li>连续性（continuity），多元定义——6.5</li>
+</ul>
+
+<h2 id="index-E">E — 偏导数、可微与近似</h2>
+<ul>
+  <li>偏导数（partial derivative），定义与几何意义——7.1, 7.2</li>
+  <li>可微（differentiability），比"偏导存在"更强的条件——8.1，附录 A.3</li>
+  <li>克莱罗定理（Clairaut's theorem），混合偏导可换序——7.3，附录 A.4</li>
+  <li>链式法则（chain rule），单中间情形——9.1</li>
+  <li>链式法则，多中间情形（链式图）——9.2</li>
+  <li>切平面（tangent plane），等于线性化的图象——8.1</li>
+  <li>切平面，对等值面而言——10.4</li>
+  <li>全微分（total differential）——8.2</li>
+  <li>线性化（linearization），求近似值与误差估计——8.2</li>
+  <li>隐函数求导（implicit differentiation），用链式法则反推——9.3</li>
+  <li>微分（differential），\(df = f_x\,dx + f_y\,dy\)——8.2</li>
+</ul>
+
+<h2 id="index-F">F — 梯度与方向导数</h2>
+<ul>
+  <li>方向导数（directional derivative），沿任意单位向量的变化率——10.1</li>
+  <li>梯度（gradient），求最大增长方向——10.2</li>
+  <li>梯度，求等值面的法向——10.4</li>
+  <li>梯度，零增长方向（与梯度垂直）——10.2</li>
+  <li>梯度场（gradient field），保守场的另一面——21.3</li>
+</ul>
+
+<h2 id="index-G">G — 极值（无约束 / 有约束）</h2>
+<ul>
+  <li>判别式（discriminant），\(D = f_{xx}f_{yy} - f_{xy}^2\)——11.2</li>
+  <li>临界点（critical point），\(\nabla f = \mathbf{0}\)——11.1</li>
+  <li>鞍点（saddle point），\(D < 0\) 时——11.2</li>
+  <li>闭区域上的最值（absolute extrema on closed region），内部 + 边界两步——11.3</li>
+  <li>拉格朗日乘数法（Lagrange multipliers），单约束——12.1</li>
+  <li>拉格朗日乘数法，双约束——12.2</li>
+  <li>极大 / 极小（local max / min），二阶判别——11.2</li>
+</ul>
+
+<h2 id="index-H">H — 多重积分（直角与极 / 柱 / 球）</h2>
+<ul>
+  <li>富比尼定理（Fubini's theorem），累次积分换序——13.2，附录 A.6</li>
+  <li>极坐标二重积分（polar double integral），\(dA = r\,dr\,d\theta\)——15.1, 15.2</li>
+  <li>矩形上的二重积分——13.1</li>
+  <li>累次积分（iterated integral），内 / 外限的依赖关系——13.2, 14.1</li>
+  <li>球面坐标（spherical coordinates），\(dV = \rho^2\sin\phi\,d\rho\,d\phi\,d\theta\)——17.2</li>
+  <li>三重积分（triple integral），直角形式——第 16 章</li>
+  <li>体积、质量、质心，多重积分应用——14.3, 16.3</li>
+  <li>一般区域上的二重积分（"上下两条曲线"）——14.1, 14.2</li>
+  <li>柱面坐标（cylindrical coordinates），\(dV = r\,dr\,d\theta\,dz\)——17.1</li>
+  <li>雅可比行列式（Jacobian），换元因子——18.2，附录 A.7</li>
+  <li>换元定理（change of variables），二维 / 三维——第 18 章，附录 A.7</li>
+</ul>
+
+<h2 id="index-I">I — 向量场、散度、旋度</h2>
+<ul>
+  <li>保守向量场（conservative field），定义、判别——21.2, 21.4</li>
+  <li>保守场，找势函数——21.3</li>
+  <li>不变量与守恒量（conserved quantities），物理动机——19.4</li>
+  <li>势函数（potential function），通过偏积分构造——21.3</li>
+  <li>散度（divergence），衡量"源 / 汇"强度——19.3</li>
+  <li>无散场（divergence-free），与"无源"等价——19.3</li>
+  <li>无旋场（curl-free），保守的另一面——21.2</li>
+  <li>旋度（curl），衡量局部"打转"程度——19.3</li>
+  <li>向量场（vector field），定义与画图——19.1</li>
+  <li>向量场操作子（del, \(\nabla\)），统一记号——19.2</li>
+</ul>
+
+<h2 id="index-J">J — 曲线积分</h2>
+<ul>
+  <li>曲线积分，第一型（沿弧长，标量场）——20.1</li>
+  <li>曲线积分，第二型（沿位移，向量场，做功）——20.2</li>
+  <li>路径无关（path independence），保守场的等价描述——21.1</li>
+  <li>环量（circulation），闭曲线上的第二型积分——20.2</li>
+  <li>端点公式（endpoint formula），\(\int_C \nabla f\cdot d\mathbf{r} = f(\text{终点}) - f(\text{起点})\)——21.1</li>
+  <li>线密度、质量、质心（曲线上）——20.1</li>
+</ul>
+
+<h2 id="index-K">K — 三大定理</h2>
+<ul>
+  <li>格林定理（Green's theorem），平面闭路径——22.1, 22.2</li>
+  <li>格林定理，区域有"洞"的版本——22.3</li>
+  <li>斯托克斯定理（Stokes' theorem），曲面上的旋度通量——25.1，附录 A.8</li>
+  <li>散度定理 / 高斯定理（Divergence / Gauss' theorem），闭曲面通量——26.1，附录 A.8</li>
+  <li>三大定理的统一视角（广义斯托克斯）——附录 A.8.3</li>
+  <li>边界定向（boundary orientation），右手定则与"区域在左"——22.1, 25.1</li>
+</ul>
+
+<h2 id="index-L">L — 曲面与曲面积分</h2>
+<ul>
+  <li>参数化曲面（parametrized surface），\(\mathbf{r}(u, v)\)——23.1</li>
+  <li>曲面定向（orientation of surface），外法向 / 内法向——24.2</li>
+  <li>曲面面积（surface area），\(\iint_D |\mathbf{r}_u\times\mathbf{r}_v|\,dA\)——23.2</li>
+  <li>曲面积分，第一型（标量场上的）——24.1</li>
+  <li>通量积分（flux integral），\(\iint_S \mathbf{F}\cdot d\mathbf{S}\)——24.2</li>
+  <li>切平面（曲面上）——23.3</li>
+  <li>面元 \(dS\) 与 \(d\mathbf{S}\) 的区别——24.1, 24.2</li>
+</ul>
+
+<h2 id="index-M">M — 物理量、应用与名词</h2>
+<ul>
+  <li>电场、流场（physical interpretations）——19.1, 19.4</li>
+  <li>功（work），\(\int_C \mathbf{F}\cdot d\mathbf{r}\)——20.2</li>
+  <li>通量（flux），物理直观——24.2</li>
+  <li>守恒律（conservation law），从散度定理出发——26.3</li>
+  <li>质量、矩、质心（多种维数）——14.3, 16.3, 20.1</li>
+</ul>
+
+<h2 id="index-N">N — 严格处理（附录 A 索引）</h2>
+<ul>
+  <li>\(\varepsilon\)-球极限定义——附录 A.1</li>
+  <li>夹逼定理，高维证明——附录 A.2</li>
+  <li>可微与偏导存在的差异，反例——附录 A.3</li>
+  <li>克莱罗定理为何要求连续，反例——附录 A.4</li>
+  <li>链式法则的严格证明——附录 A.5</li>
+  <li>黎曼可积性、紧集 + 一致连续——附录 A.6</li>
+  <li>富比尼定理（连续情形）——附录 A.6</li>
+  <li>换元定理的几何骨架——附录 A.7</li>
+  <li>斯托克斯、散度定理的统一证明骨架——附录 A.8.2</li>
+  <li>广义斯托克斯定理（微分形式视角）——附录 A.8.3</li>
+  <li>历史脉络与下一步阅读——附录 A.9</li>
+</ul>
+
+<h2 id="index-Z">Z — 解题与方法论</h2>
+<ul>
+  <li>常见错误清单（十二条）——27.3</li>
+  <li>读题八步法——27.2</li>
+  <li>决策树（主流程）——27.1</li>
+  <li>综合题：参数化 + 弧长 + 第一型积分——27.4.1</li>
+  <li>综合题：拉格朗日 + 隐式约束——27.4.2</li>
+  <li>综合题：散度定理回避复杂表面积分——27.4.3</li>
+  <li>综合题：斯托克斯把曲面积分换为曲线积分——27.4.4</li>
+  <li>综合题：保守场 + 势函数 + 端点法——27.4.5</li>
+</ul>
+
+<hr/>
+
+<p style="text-align: center;"><em>全书完。</em></p>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 严格处理</a><span class="nav-disabled">下一章 →</span></nav>
+
+</main>
+</body>
+</html>

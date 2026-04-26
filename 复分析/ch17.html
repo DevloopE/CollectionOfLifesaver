@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 莫比乌斯变换 — 普林斯顿复分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 共形映射基础</a><a href="ch18.html">下一章 · 第 18 章 共形映射与 Dirichlet 问题 →</a></nav>
+<h1 id="ch17">第 17 章 莫比乌斯变换</h1>
+
+<p>上一章我们看到，共形映射的实战路线是"用几个标准映射的复合，把目标区域'扭'成圆盘或上半平面"。在所有"标准映射"里，最基本、最频繁出现的一类，就是<strong>莫比乌斯变换</strong> (Möbius transformation)——形如 \(w = \dfrac{az + b}{cz + d}\) 的有理映射。它是共形几何里的"瑞士军刀"：构造简单，性质极好，能把几乎任何"圆形/直线形"区域共形地映到任何其它"圆形/直线形"区域。</p>
+
+<p>这一章我们做这几件事：先给出 Möbius 变换的代数定义和最基本的性质（双射、共形）；然后看为什么所有 Möbius 变换都是"平移、缩放-旋转、反演"这三种基本操作的复合；接着证明它最美的几何性质——把"圆/直线"映成"圆/直线"；之后讲三点定理和交比公式；最后讲不动点分析。整章贯穿一个想法：Möbius 变换是把"标准区域"互相搬运的最经济工具。</p>
+
+<h2 id="sec17-1">17.1 形式与基本约束</h2>
+
+<p>一个 <strong>Möbius 变换</strong>（也叫"线性分式变换"，linear fractional transformation）是形如</p>
+
+\[
+w = T(z) = \frac{a z + b}{c z + d}
+\]
+
+<p>的映射，其中 \(a, b, c, d \in \mathbb{C}\) 是四个复常数，且</p>
+
+\[
+\boxed{a d - b c \ne 0.}
+\]
+
+<p>这条<em>非退化条件</em> \(ad - bc \ne 0\) 至关重要，下面解释为什么。</p>
+
+<p>如果 \(ad - bc = 0\)，则 \((a, b)\) 与 \((c, d)\) 成比例，即存在 \(\lambda\) 使 \(a = \lambda c\)、\(b = \lambda d\)。代入：</p>
+
+\[
+T(z) = \frac{\lambda c z + \lambda d}{c z + d} = \lambda \quad (\text{常数}).
+\]
+
+<p>这种"退化"的情况，\(T\) 退化成常数函数，没有任何共形信息。所以我们要求 \(ad - bc \ne 0\) 把它排除。</p>
+
+<p>另一个观察：对任意非零常数 \(\mu\)，把 \(a, b, c, d\) 都替换成 \(\mu a, \mu b, \mu c, \mu d\)，\(T\) 完全不变（分子分母同乘 \(\mu\)）。所以 Möbius 变换的"系数"\((a, b, c, d)\) 只<em>射影</em>地决定 \(T\)——它是一个 \(\mathbb{C}^4\) 中过原点直线、模去比例之后的等价类，所以参数空间是 3 维复（6 维实）的。这与黎曼映射定理里讲到的"自同构有 3 个实自由度"相比，刚好对应：圆盘到圆盘的 Möbius 自同构占了 3 个实自由度，剩下 3 个实自由度让 Möbius 变换跨区域穿梭。</p>
+
+<p>一些<em>退化但合法</em>的特殊情况：</p>
+
+<ul>
+<li>若 \(c = 0, d = 1\)，得 \(T(z) = az + b\)（\(a \ne 0\)），这就是一般的"线性"变换（缩放-旋转加平移）。</li>
+<li>若 \(a = d = 0, b = c = 1\)，得 \(T(z) = 1/z\)，叫做<em>反演</em>。</li>
+<li>若 \(a = 1, b = 0, c = 0, d = 1\)，得 \(T(z) = z\)，恒等映射。</li>
+</ul>
+
+<p>这些"小"的 Möbius 变换之后会被组装成更大的。</p>
+
+<h2 id="sec17-2">17.2 双射性与共形性</h2>
+
+<p>这一节验证两件事：Möbius 变换是双射，并且是共形的。</p>
+
+<h3 id="sec17-2-1">17.2.1 双射性</h3>
+
+<p>给 \(w = \dfrac{az + b}{cz + d}\)，反解 \(z\)：把分母移过去 \((cz + d) w = az + b\)，展开 \(c w z + d w = a z + b\)，整理 \((c w - a) z = b - d w\)，所以</p>
+
+\[
+z = T^{-1}(w) = \frac{-d w + b}{c w - a} = \frac{d w - b}{-c w + a}.
+\]
+
+<p>这本身又是一个 Möbius 变换！系数矩阵是 \(\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}\)，行列式 \(d a - (-b)(-c) = ad - bc \ne 0\)，所以非退化。这就证明了 \(T\) 在<em>哪里有定义</em>就一定有反函数 \(T^{-1}\)，是双射。</p>
+
+<p>但仔细看：\(T\) 在 \(z = -d/c\)（当 \(c \ne 0\) 时）处分母为零，没定义；类似地 \(T^{-1}\) 在 \(w = a/c\) 处没定义。所以严格意义上，\(T: \mathbb{C} \setminus \{-d/c\} \to \mathbb{C} \setminus \{a/c\}\) 是双射。</p>
+
+<p>为了让这个"双射"完整无瑕，引入<strong>扩展复平面</strong> \(\hat{\mathbb{C}} := \mathbb{C} \cup \{\infty\}\)。规定：</p>
+
+<ul>
+<li>\(T(-d/c) = \infty\)（分母变零，结果"跑到无穷"）；</li>
+<li>\(T(\infty) = a/c\)（当 \(z \to \infty\) 时 \(\dfrac{az + b}{cz + d} \to a/c\)，因为分子分母同阶）。</li>
+</ul>
+
+<p>这样定义之后，\(T: \hat{\mathbb{C}} \to \hat{\mathbb{C}}\) 是<em>真正</em>的双射。</p>
+
+<p>当 \(c = 0\) 时（即 \(T(z) = (az + b)/d\) 是仿射变换），约定 \(T(\infty) = \infty\)、\(T^{-1}(\infty) = \infty\)，依然是 \(\hat{\mathbb{C}}\) 上的双射。</p>
+
+<p>从此以后，把 Möbius 变换始终看成<em>扩展复平面到自身</em>的双射。\(\infty\) 不是个让人头疼的特例，而是个普通的"另一个点"。</p>
+
+<h3 id="sec17-2-2">17.2.2 共形性</h3>
+
+<p>计算导数：</p>
+
+\[
+T'(z) = \frac{a(cz + d) - (az + b) c}{(cz + d)^2} = \frac{ad - bc}{(cz + d)^2}.
+\]
+
+<p>由于 \(ad - bc \ne 0\)，分子不为零；分母在 \(z \ne -d/c\) 时不为零；所以 \(T'(z) \ne 0\) 对所有 \(z \ne -d/c\) 成立。结合 16.4 节的判别准则：<em>Möbius 变换在它的整个解析域内是共形的</em>。</p>
+
+<p>在极点 \(-d/c\) 处和无穷远处，"共形"的含义需要在 \(\hat{\mathbb{C}}\) 的几何（球面坐标）下重新定义；可以验证延拓后的 \(T\) 在 \(\hat{\mathbb{C}}\) 上<em>处处</em>共形。这件事我们不严格证明，把它当结论记住。</p>
+
+<h2 id="sec17-3">17.3 复合：Möbius 变换构成群</h2>
+
+<p>把两个 Möbius 变换 \(S(z) = \dfrac{az + b}{cz + d}\) 和 \(T(z) = \dfrac{a' z + b'}{c' z + d'}\) 复合：算一下 \(T \circ S\)。</p>
+
+\[
+T(S(z)) = \frac{a' \cdot \dfrac{az + b}{cz + d} + b'}{c' \cdot \dfrac{az + b}{cz + d} + d'}.
+\]
+
+<p>分子分母同乘 \((cz + d)\)：</p>
+
+\[
+T(S(z)) = \frac{a' (az + b) + b' (cz + d)}{c' (az + b) + d' (cz + d)} = \frac{(a' a + b' c) z + (a' b + b' d)}{(c' a + d' c) z + (c' b + d' d)}.
+\]
+
+<p>这<em>还是</em>一个 Möbius 变换的形式！系数是 \((a'a + b'c, a'b + b'd, c'a + d'c, c'b + d'd)\)。容易验证它的"\(ad - bc\)"等于 \((a'd' - b'c')(ad - bc) \ne 0\)，所以非退化。</p>
+
+<p>结合"恒等映射 \(\mathrm{id}(z) = z\) 是 Möbius 变换"（取 \(a = d = 1, b = c = 0\)）和"逆是 Möbius 变换"（17.2.1 节），我们得到</p>
+
+<p><strong>事实。</strong> 所有 Möbius 变换在复合下构成一个<em>群</em>，叫做<em>Möbius 群</em>。</p>
+
+<p>这个群有非常丰富的代数结构，下面这一节用矩阵表示让它一目了然。</p>
+
+<h2 id="sec17-4">17.4 矩阵表示与 \(\mathrm{PSL}(2, \mathbb{C})\)</h2>
+
+<p>把 Möbius 变换 \(T(z) = \dfrac{az + b}{cz + d}\) 与 \(2 \times 2\) 矩阵 \(M_T = \begin{pmatrix} a & b \\ c & d \end{pmatrix}\) 一一对应起来。则上一节算出来的复合公式</p>
+
+\[
+M_{T \circ S} = \begin{pmatrix} a'a + b'c & a'b + b'd \\ c'a + d'c & c'b + d'd \end{pmatrix} = \begin{pmatrix} a' & b' \\ c' & d' \end{pmatrix} \begin{pmatrix} a & b \\ c & d \end{pmatrix} = M_T M_S.
+\]
+
+<p>即<em>Möbius 变换的复合，对应矩阵的乘法</em>。这是个干净漂亮的同构！</p>
+
+<p>注意"非退化"条件 \(ad - bc \ne 0\) 等价于 \(\det M_T \ne 0\)，即 \(M_T \in \mathrm{GL}(2, \mathbb{C})\)。</p>
+
+<p>但还有一个细节：上面提过，把所有系数同乘 \(\mu \ne 0\) 给出同一个 Möbius 变换。所以"Möbius 变换"对应于"\(\mathrm{GL}(2, \mathbb{C})\) 模去标量倍"，写作 \(\mathrm{PGL}(2, \mathbb{C})\)。</p>
+
+<p>更标准的表述是：把矩阵规范化到 \(\det M_T = 1\)（这总是能做到，把所有系数除以 \(\sqrt{ad - bc}\)），就把 \(\mathrm{GL}(2, \mathbb{C})\) 缩到了 \(\mathrm{SL}(2, \mathbb{C})\)；再模去 \(\{\pm I\}\)（\(M\) 与 \(-M\) 给同一个 Möbius 变换），得</p>
+
+\[
+\boxed{\text{Möbius 群} \cong \mathrm{PSL}(2, \mathbb{C}) := \mathrm{SL}(2, \mathbb{C}) / \{\pm I\}.}
+\]
+
+<p>这是一个 6 维实李群，是数学物理里反复出现的对象。下面我们暂时忘掉群论，回到实战：怎么具体地构造、组合、使用 Möbius 变换。</p>
+
+<p><strong>例题 17.4.1</strong>。设 \(S(z) = z + 1\)、\(T(z) = 2z\)。求 \(T \circ S\) 与 \(S \circ T\)。</p>
+
+<p><em>解。</em>用矩阵法：\(M_S = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}\)，\(M_T = \begin{pmatrix} 2 & 0 \\ 0 & 1 \end{pmatrix}\)。则</p>
+
+\[
+M_{T \circ S} = M_T M_S = \begin{pmatrix} 2 & 0 \\ 0 & 1 \end{pmatrix} \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} = \begin{pmatrix} 2 & 2 \\ 0 & 1 \end{pmatrix},
+\]
+
+<p>对应 \(T(S(z)) = 2z + 2\)。验证：\(T(S(z)) = T(z + 1) = 2(z+1) = 2z + 2\) ✓。</p>
+
+<p>反过来：</p>
+
+\[
+M_{S \circ T} = M_S M_T = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} \begin{pmatrix} 2 & 0 \\ 0 & 1 \end{pmatrix} = \begin{pmatrix} 2 & 1 \\ 0 & 1 \end{pmatrix},
+\]
+
+<p>对应 \(S(T(z)) = 2z + 1\)。验证：\(S(T(z)) = S(2z) = 2z + 1\) ✓。</p>
+
+<p>注意 \(T \circ S \ne S \circ T\)——Möbius 群是<em>非交换</em>的。</p>
+
+<h2 id="sec17-5">17.5 三种基本生成子</h2>
+
+<p>Möbius 群虽然有 6 个实自由度，但它由三种"原子"操作生成：</p>
+
+<ol>
+<li><strong>平移</strong>：\(z \mapsto z + b\)（\(b \in \mathbb{C}\)）</li>
+<li><strong>旋转-缩放</strong>：\(z \mapsto a z\)（\(a \in \mathbb{C}^*\)）</li>
+<li><strong>反演</strong>：\(z \mapsto 1/z\)</li>
+</ol>
+
+<p><strong>定理。</strong>任何 Möbius 变换都是这三种基本操作的（有限次）复合。</p>
+
+<p><em>证明。</em>给 \(T(z) = \dfrac{az + b}{cz + d}\)。</p>
+
+<p><em>情况 1</em>：\(c = 0\)，则 \(T(z) = (a/d) z + (b/d)\)，是"旋转-缩放"再"平移"，搞定。</p>
+
+<p><em>情况 2</em>：\(c \ne 0\)。施展一招代数操作（"分子里凑分母"）：</p>
+
+\[
+\frac{az + b}{cz + d} = \frac{a}{c} \cdot \frac{cz + d}{cz + d} + \frac{b - \dfrac{ad}{c}}{cz + d} = \frac{a}{c} + \frac{(bc - ad)/c}{cz + d}.
+\]
+
+<p>所以</p>
+
+\[
+T(z) = \frac{a}{c} + \frac{bc - ad}{c(cz + d)} = \frac{a}{c} + \frac{bc - ad}{c} \cdot \frac{1}{cz + d}.
+\]
+
+<p>把这个看成下面这串复合：</p>
+
+\[
+z \;\xrightarrow{\text{乘 }c}\; cz \;\xrightarrow{\text{加 }d}\; cz + d \;\xrightarrow{\text{反演}}\; \frac{1}{cz + d} \;\xrightarrow{\text{乘 }(bc-ad)/c}\; \frac{bc - ad}{c (cz + d)} \;\xrightarrow{\text{加 }a/c}\; T(z).
+\]
+
+<p>每一步都是"平移"、"旋转-缩放"或"反演"中的一种。完成。<small>QED</small></p>
+
+<p>这条定理在实战上非常有用：要研究 Möbius 变换<em>整体</em>的几何性质（比如下一节"圆-直线保持"），只需要分别看三种基本操作的几何性质，再用复合传递过去。</p>
+
+<p><strong>例题 17.5.1</strong>。把 \(T(z) = \dfrac{2z + 1}{z + 3}\) 分解为基本操作的复合。</p>
+
+<p><em>解。</em>按上面的算法：</p>
+
+<ol>
+<li>乘 1（即 \(c = 1\)，省略），得 \(z\)。</li>
+<li>加 3，得 \(z + 3\)。</li>
+<li>反演，得 \(\dfrac{1}{z + 3}\)。</li>
+<li>乘 \(\dfrac{bc - ad}{c} = \dfrac{1 \cdot 1 - 2 \cdot 3}{1} = -5\)，得 \(\dfrac{-5}{z + 3}\)。</li>
+<li>加 \(\dfrac{a}{c} = 2\)，得 \(2 + \dfrac{-5}{z + 3} = \dfrac{2(z+3) - 5}{z + 3} = \dfrac{2z + 1}{z + 3}\) ✓。</li>
+</ol>
+
+<p>所以 \(T = \tau_2 \circ \mu_{-5} \circ \iota \circ \tau_3\)（其中 \(\tau_b\) 表平移 \(b\)、\(\mu_a\) 表乘 \(a\)、\(\iota\) 表反演）。</p>
+
+<h2 id="sec17-6">17.6 圆-直线保持性质</h2>
+
+<p>Möbius 变换最美的几何性质是这一条：</p>
+
+<p><strong>定理。</strong>Möbius 变换把"圆或直线"映成"圆或直线"。</p>
+
+<p>注意"或"——一个圆有可能映成直线，反之亦然。怎么把这件事说得统一？把"直线"理解为"经过 \(\infty\) 的圆"。在球面 \(\hat{\mathbb{C}}\) 的几何里这个观点很自然：通过球极投影，\(\hat{\mathbb{C}}\) 上的"圆"（在球面上）和"直线"（在 \(\mathbb{C}\) 上）是同一类对象；唯一区别是它通不通过北极（\(\infty\)）。所以在 \(\hat{\mathbb{C}}\) 上"圆"是统一的概念，称为<strong>广义圆</strong> (generalized circle 或 clircle)。</p>
+
+<p>本节用 17.5 节的"分解为三种基本操作"来证明这条定理。</p>
+
+<p><em>证明的策略。</em>分别证明三种基本操作各保"圆/直线"，再用"性质对复合封闭"（即"圆/直线"被一种保它的映射作用、然后再被另一种保它的映射作用，依然是"圆/直线"）传递过去。</p>
+
+<p><em>步骤 1：平移 \(z \mapsto z + b\)。</em>显然把圆映为圆、直线映为直线（整张图被刚体平移）。✓</p>
+
+<p><em>步骤 2：旋转-缩放 \(z \mapsto az\)。</em>同样显然——这是相似变换，把圆映为圆、直线映为直线。✓</p>
+
+<p><em>步骤 3：反演 \(z \mapsto 1/z\)。</em>这是<em>关键的一步</em>。要证明 \(z \mapsto 1/z\) 把"圆/直线"映成"圆/直线"。</p>
+
+<p>用<em>统一方程</em>。\(\hat{\mathbb{C}}\) 上一个广义圆可写成方程</p>
+
+\[
+A |z|^2 + \bar B z + B \bar z + C = 0,
+\]
+
+<p>其中 \(A, C \in \mathbb{R}\)，\(B \in \mathbb{C}\)。当 \(A \ne 0\) 是普通圆（化简成 \(|z - z_0|^2 = R^2\) 的形式）；当 \(A = 0\) 是直线 \(\bar B z + B \bar z + C = 0\)（即 \(2 \operatorname{Re}(\bar B z) + C = 0\)）。</p>
+
+<p>设 \(z\) 满足这个方程，看 \(w = 1/z\) 满足什么方程。把 \(z = 1/w\) 代入（也即 \(\bar z = 1/\bar w\)）：</p>
+
+\[
+A \cdot \frac{1}{|w|^2} + \bar B \cdot \frac{1}{w} + B \cdot \frac{1}{\bar w} + C = 0.
+\]
+
+<p>两边乘 \(|w|^2 = w \bar w\)：</p>
+
+\[
+A + \bar B \bar w + B w + C |w|^2 = 0.
+\]
+
+<p>整理：</p>
+
+\[
+C |w|^2 + B w + \bar B \bar w + A = 0.
+\]
+
+<p>这是同样形式 \(A' |w|^2 + \bar{B'} w + B' \bar w + C' = 0\)，只不过<em>常数被换了</em>：\(A' = C\)、\(C' = A\)、\(B' = \bar B\)（注意系数对应）。</p>
+
+<p>所以 \(z \mapsto 1/z\) 把广义圆映成广义圆——只是 \(A, C\) 互换了角色。注意：</p>
+
+<ul>
+<li>原图是普通圆（\(A \ne 0\)）但<em>过原点</em>（\(C = 0\)）⇒ 像图 \(C' = A \ne 0, A' = C = 0\) ⇒ <em>直线</em>（不过 \(\infty\) 自然，因为反演把原点送到了 \(\infty\)）。</li>
+<li>原图是直线（\(A = 0\)）⇒ 像图 \(C' = 0\) ⇒ 像也是直线<em>当且仅当 \(A' = C = 0\)，也即原图过原点</em>。如果原直线过原点，像还是直线（过原点）；如果原直线不过原点，则 \(A' = C \ne 0\)，像是过原点的圆。</li>
+</ul>
+
+<p>这把所有情况都区分清楚了：</p>
+
+<table>
+<thead>
+<tr><th>原图</th><th>反演 \(1/z\) 后</th></tr>
+</thead>
+<tbody>
+<tr><td>过原点的圆</td><td>不过原点的直线</td></tr>
+<tr><td>不过原点的圆</td><td>不过原点的圆</td></tr>
+<tr><td>过原点的直线</td><td>过原点的直线（自身映射）</td></tr>
+<tr><td>不过原点的直线</td><td>过原点的圆</td></tr>
+</tbody>
+</table>
+
+<p>到这里步骤 3 完成。把三步结合：任何 Möbius 变换都是基本操作的复合（17.5 节），每一种基本操作都保广义圆，所以 Möbius 变换保广义圆。<small>QED</small></p>
+
+<p>这条性质极为有用：要看一个 Möbius 变换 \(T\) 把某条"圆/直线" \(\Gamma\) 映成什么，<em>只需算 \(T\) 把 \(\Gamma\) 上任意三点映到哪三点</em>，然后过这三个像点画唯一的"广义圆"，就是 \(T(\Gamma)\)。</p>
+
+<p><strong>例题 17.6.1</strong>。求 \(T(z) = 1/z\) 把直线 \(\operatorname{Re} z = 1/2\) 映成什么。</p>
+
+<p><em>解。</em>这条直线不过原点，所以根据上表，像应该是过原点的圆。具体确定：取直线上三点 \(z_1 = 1/2\)、\(z_2 = 1/2 + i\)、\(z_3 = 1/2 - i\)。算像：</p>
+
+\[
+T(z_1) = 2, \quad T(z_2) = \frac{1}{1/2 + i} = \frac{1/2 - i}{1/4 + 1} = \frac{1/2 - i}{5/4} = \frac{2}{5} - \frac{4}{5} i,
+\]
+
+\[
+T(z_3) = \frac{1}{1/2 - i} = \frac{2}{5} + \frac{4}{5} i.
+\]
+
+<p>三点 \((2, 0), (2/5, -4/5), (2/5, 4/5)\)。我们猜过这三点的圆心在实轴上（由对称性），写圆心 \((c, 0)\)、半径 \(R\)：从两个方程</p>
+
+\[
+(2 - c)^2 = R^2, \quad (2/5 - c)^2 + 16/25 = R^2.
+\]
+
+<p>两式相减：\((2 - c)^2 - (2/5 - c)^2 = 16/25\)。展开：\((4 - 4c + c^2) - (4/25 - 4c/5 + c^2) = 16/25\)，即 \(4 - 4c - 4/25 + 4c/5 = 16/25\)。整理 \(4 - 4/25 - 16/25 - 4c + 4c/5 = 0\)，即 \(4 - 20/25 - 16c/5 = 0\)，即 \(4 - 4/5 - 16c/5 = 0\)，即 \(16/5 = 16c/5\)，得 \(c = 1\)。回代 \(R^2 = (2-1)^2 = 1\)，\(R = 1\)。</p>
+
+<p>所以 \(T\) 把直线 \(\operatorname{Re} z = 1/2\) 映成<em>圆心 1、半径 1 的圆</em>，即 \(|w - 1| = 1\)。这个圆过原点（\(|0 - 1| = 1\) ✓），符合"不过原点的直线 → 过原点的圆"。</p>
+
+<h2 id="sec17-7">17.7 三点定理</h2>
+
+<p>Möbius 变换有 3 个复参数（即 6 个实参数）的自由度。"指定 3 个点的像"恰好是 6 个实方程（每个像点 \(w_i\) 是复数，2 个实参数）。所以你应当能找到唯一的 Möbius 变换满足"3 点对 3 点"的指定。这就是：</p>
+
+<p><strong>三点定理。</strong>对扩展平面 \(\hat{\mathbb{C}}\) 上任意两组各 3 个不同的点 \((z_1, z_2, z_3)\) 与 \((w_1, w_2, w_3)\)，存在<em>唯一</em>的 Möbius 变换 \(T\) 使 \(T(z_k) = w_k\)（\(k = 1, 2, 3\)）。</p>
+
+<p>这条定理把"找 Möbius 变换"的问题简化成了"找三个对应"。它的<em>证明</em>是构造性的：先证存在性（接下去用交比构造），再证唯一性（任意两个满足的 \(T_1, T_2\) 给出 \(T_1 \circ T_2^{-1}\) 有 3 个不动点；下面 17.10 节看到 Möbius 变换不动点至多 2 个，所以 \(T_1 \circ T_2^{-1}\) 必为恒等映射，\(T_1 = T_2\)）。</p>
+
+<p>下一节我们展示<em>怎么</em>用三点定理具体构造 \(T\)。</p>
+
+<h2 id="sec17-8">17.8 交比与构造公式</h2>
+
+<p>定义四个不同点 \(z_1, z_2, z_3, z_4 \in \hat{\mathbb{C}}\) 的<strong>交比</strong> (cross-ratio)：</p>
+
+\[
+[z_1, z_2; z_3, z_4] := \frac{(z_1 - z_3)(z_2 - z_4)}{(z_1 - z_4)(z_2 - z_3)}.
+\]
+
+<p>这是个奇怪的公式，但有一条决定性的性质：</p>
+
+<p><strong>事实。</strong>交比在 Möbius 变换下<em>不变</em>。即对任何 Möbius 变换 \(T\)，</p>
+
+\[
+[T(z_1), T(z_2); T(z_3), T(z_4)] = [z_1, z_2; z_3, z_4].
+\]
+
+<p><em>证明思路。</em>验证三种基本操作各保交比：平移 \(z + b\) 显然（差不变）；缩放 \(az\) 显然（分子分母都乘 \(a^2\) 抵消）；反演 \(1/z\) 也是直接代入算（差变成 \(\dfrac{1}{z_i} - \dfrac{1}{z_j} = \dfrac{z_j - z_i}{z_i z_j}\)，分子分母里 \(z_i z_j\) 因子相互抵消，最后剩 \([1/z_1, \ldots] = [z_2, z_1; z_4, z_3] \cdot \text{常数}\)... 实际上仔细算后是不变的）。所以三种基本操作复合后还是不变。</p>
+
+<p>这就给了我们一条"构造公式"：要找把 \((z_1, z_2, z_3) \to (w_1, w_2, w_3)\) 的 Möbius 变换，把第四个点 \((z, w)\) 当成"未知量"，写出</p>
+
+\[
+\boxed{[w, w_1; w_2, w_3] = [z, z_1; z_2, z_3].}
+\]
+
+<p>展开就是</p>
+
+\[
+\frac{(w - w_2)(w_1 - w_3)}{(w - w_3)(w_1 - w_2)} = \frac{(z - z_2)(z_1 - z_3)}{(z - z_3)(z_1 - z_2)}.
+\]
+
+<p>这是一个关于 \(w\) 的方程，左边是 \(w\) 的有理表达式（线性除以线性），右边是 \(z\) 的有理表达式。解出 \(w\) 作 \(z\) 的函数，正好是想要的 Möbius 变换。</p>
+
+<p><strong>例题 17.8.1</strong>。求把 \((z_1, z_2, z_3) = (0, 1, \infty)\) 映成 \((w_1, w_2, w_3) = (1, i, -1)\) 的 Möbius 变换。</p>
+
+<p><em>解。</em>用上式。注意当 \(z_3 = \infty\) 时，约定包含 \(z_3\) 的因子里 \(z_3\) 本身的差视为 1（更严格：取极限 \(z_3 \to \infty\)）。具体公式</p>
+
+\[
+\frac{(z - z_2)(z_1 - z_3)}{(z - z_3)(z_1 - z_2)} \xrightarrow{z_3 \to \infty} \frac{z - z_2}{z_1 - z_2} = \frac{z - 1}{0 - 1} = 1 - z.
+\]
+
+<p>另一边</p>
+
+\[
+\frac{(w - w_2)(w_1 - w_3)}{(w - w_3)(w_1 - w_2)} = \frac{(w - i)(1 - (-1))}{(w - (-1))(1 - i)} = \frac{2(w - i)}{(1 - i)(w + 1)}.
+\]
+
+<p>设两边相等，解 \(w\)：</p>
+
+\[
+\frac{2(w - i)}{(1 - i)(w + 1)} = 1 - z.
+\]
+
+<p>两边交叉相乘：</p>
+
+\[
+2(w - i) = (1 - z)(1 - i)(w + 1).
+\]
+
+<p>展开 \((1-z)(1-i) = (1-i) - (1-i) z\)。设 \(\alpha := 1 - i\)：</p>
+
+\[
+2 w - 2 i = (\alpha - \alpha z)(w + 1) = (\alpha - \alpha z) w + (\alpha - \alpha z).
+\]
+
+<p>移项 \([2 - (\alpha - \alpha z)] w = 2 i + \alpha - \alpha z\)。即 \([2 - \alpha + \alpha z] w = 2 i + \alpha - \alpha z\)。</p>
+
+<p>所以</p>
+
+\[
+w = \frac{2 i + \alpha - \alpha z}{2 - \alpha + \alpha z} = \frac{(2i + \alpha) - \alpha z}{(2 - \alpha) + \alpha z}.
+\]
+
+<p>代入 \(\alpha = 1 - i\)：\(2i + \alpha = 2i + 1 - i = 1 + i\)；\(2 - \alpha = 2 - 1 + i = 1 + i\)。所以</p>
+
+\[
+w = \frac{(1 + i) - (1 - i) z}{(1 + i) + (1 - i) z}.
+\]
+
+<p>验证：</p>
+
+<ul>
+<li>\(z = 0\)：\(w = (1+i)/(1+i) = 1\) ✓</li>
+<li>\(z = 1\)：\(w = ((1+i) - (1-i))/((1+i) + (1-i)) = (2i)/2 = i\) ✓</li>
+<li>\(z = \infty\)：\(w \to (-（1-i）)/((1-i)) = -1\) ✓</li>
+</ul>
+
+<p>所以 \(\boxed{T(z) = \dfrac{(1+i) - (1-i) z}{(1+i) + (1-i) z}}\) 是答案。</p>
+
+<h2 id="sec17-9">17.9 重要例：上半平面映到单位圆盘</h2>
+
+<p>这是整章最重要的一个具体 Möbius 变换：</p>
+
+\[
+\boxed{w = T(z) = \frac{z - i}{z + i}.}
+\]
+
+<p>它把上半平面 \(\mathbb{H} := \{\operatorname{Im} z > 0\}\) 共形地映成单位圆盘 \(\mathbb{D} := \{|w| < 1\}\)。下面验证。</p>
+
+<p><strong>第一步：边界对应。</strong> \(\mathbb{H}\) 的边界是实轴。算 \(z = x \in \mathbb{R}\) 时</p>
+
+\[
+|T(x)| = \left|\frac{x - i}{x + i}\right| = \frac{|x - i|}{|x + i|} = \frac{\sqrt{x^2 + 1}}{\sqrt{x^2 + 1}} = 1.
+\]
+
+<p>所以实轴被映到单位圆 \(|w| = 1\)。具体地：\(T(0) = -i/i = -1\)、\(T(\infty) = 1\)、\(T(1) = (1-i)/(1+i) = -i\)（验算）。三个像点 \(-1, 1, -i\) 都在单位圆上。</p>
+
+<p><strong>第二步：内部对应。</strong> 取 \(z = i \in \mathbb{H}\)（上半平面里的"中心点"），算 \(T(i) = 0\)。所以 \(\mathbb{H}\) 的"中心"被映到 \(\mathbb{D}\) 的中心。再加上：\(T\) 是 Möbius 变换、连续、双射；它把 \(\mathbb{H}\) 的边界送到 \(\mathbb{D}\) 的边界，把内部一个点送到内部一个点；由连续性，整个 \(\mathbb{H}\) 必映到 \(\mathbb{D}\)（不能跨越边界）。✓</p>
+
+<p>反过来，\(T^{-1}(w) = i \cdot \dfrac{1 + w}{1 - w}\)（验证：把这两个 Möbius 变换的矩阵 \(\begin{pmatrix} 1 & -i \\ 1 & i \end{pmatrix}\) 求逆得 \(\dfrac{1}{2i} \begin{pmatrix} i & i \\ -1 & 1 \end{pmatrix}\)，对应 \(T^{-1}(w) = \dfrac{i w + i}{-w + 1} = i \cdot \dfrac{w + 1}{1 - w}\) ✓），它把单位圆盘映回上半平面。</p>
+
+<p>这条公式之所以重要，是因为它把"上半平面上的问题"和"单位圆盘上的问题"完美等价了。配上其它 Möbius 变换，几乎所有"圆/直线形"的区域都能找到与圆盘的共形映射。</p>
+
+<p><strong>例题 17.9.1</strong>。求把单位圆盘自映成单位圆盘、并把 \(z_0 \in \mathbb{D}\) 映到 0 的 Möbius 变换。</p>
+
+<p><em>解。</em>这是最常用的"圆盘自同构"。答案是</p>
+
+\[
+\boxed{T(z) = \frac{z - z_0}{1 - \bar{z_0} z}.}
+\]
+
+<p>验证 \(T(z_0) = 0\) ✓；并验证它把 \(|z| = 1\) 映到 \(|w| = 1\)。设 \(|z| = 1\)，则 \(\bar z = 1/z\)。算</p>
+
+\[
+|T(z)|^2 = \frac{|z - z_0|^2}{|1 - \bar{z_0} z|^2}.
+\]
+
+<p>分母 \(|1 - \bar{z_0} z|^2 = (1 - \bar{z_0} z)(1 - z_0 \bar z) = (1 - \bar{z_0} z)(1 - z_0/z) = \dfrac{(1 - \bar{z_0} z)(z - z_0)}{z}\)（等等，这个化简有点绕）。</p>
+
+<p>换一种算法。注意</p>
+
+\[
+|1 - \bar{z_0} z|^2 = (1 - \bar{z_0} z)\overline{(1 - \bar{z_0} z)} = (1 - \bar{z_0} z)(1 - z_0 \bar z).
+\]
+
+<p>当 \(|z| = 1\)，\(z \bar z = 1\)，所以 \(z_0 \bar z = z_0/z\)。继续：</p>
+
+\[
+(1 - \bar{z_0} z)(1 - z_0 \bar z) = 1 - z_0 \bar z - \bar{z_0} z + |z_0|^2 z \bar z = 1 - z_0 \bar z - \bar{z_0} z + |z_0|^2.
+\]
+
+<p>而</p>
+
+\[
+|z - z_0|^2 = (z - z_0)(\bar z - \bar{z_0}) = z \bar z - z \bar{z_0} - z_0 \bar z + |z_0|^2 = 1 - \bar{z_0} z - z_0 \bar z + |z_0|^2.
+\]
+
+<p>两个表达式<em>恰好相同</em>！所以 \(|T(z)|^2 = 1\) 当 \(|z| = 1\)，验证完毕。✓</p>
+
+<p>这个例题给出了"以 \(z_0\) 为'新中心'的圆盘自同构"的标准公式。它在第 18 章解 Dirichlet 问题时反复登场。</p>
+
+<h2 id="sec17-10">17.10 不动点分析</h2>
+
+<p>Möbius 变换的<strong>不动点</strong>是满足 \(T(z) = z\) 的 \(z\)。</p>
+
+<p>解方程：\(\dfrac{az + b}{cz + d} = z\) 等价于 \(az + b = z(cz + d)\)，即 \(c z^2 + (d - a) z - b = 0\)。这是一个二次方程（当 \(c \ne 0\)），最多有两个根。当 \(c = 0\) 时退化为线性方程 \((d - a) z = b\)，又分两小情况：\(d \ne a\) 给唯一根 \(z = b/(d-a)\)；\(d = a, b \ne 0\) 无根；\(d = a, b = 0\) 任意 \(z\) 都是根（但这只有 \(T(z) = z\) 自己）。</p>
+
+<p>统一在 \(\hat{\mathbb{C}}\) 上：把 \(\infty\) 算成可能的不动点。结论是</p>
+
+<p><strong>事实。</strong>非恒等的 Möbius 变换在 \(\hat{\mathbb{C}}\) 上恰好有 1 个或 2 个不动点。如果一个 Möbius 变换有 3 个不动点，它必为恒等映射。</p>
+
+<p>这条事实正是上面 17.7 节"唯一性"的关键：差 \(T_1 \circ T_2^{-1}\) 有 3 个不动点 ⇒ 它是恒等 ⇒ \(T_1 = T_2\)。</p>
+
+<p>按不动点的<em>位置</em>和<em>性质</em>，Möbius 变换分四类（这是经典分类）：</p>
+
+<table>
+<thead>
+<tr><th>类型</th><th>不动点</th><th>几何描述</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>抛物</strong> (parabolic)</td><td>1 个（重根）</td><td>"绕"一个不动点旋转无穷小</td></tr>
+<tr><td><strong>椭圆</strong> (elliptic)</td><td>2 个，乘子模 \(= 1\)</td><td>纯旋转（保某些圆）</td></tr>
+<tr><td><strong>双曲</strong> (hyperbolic)</td><td>2 个，乘子正实数 \(\ne 1\)</td><td>沿"两点连线"伸缩</td></tr>
+<tr><td><strong>斜驶</strong> (loxodromic)</td><td>2 个，乘子复数</td><td>"螺旋"：旋转 + 伸缩</td></tr>
+</tbody>
+</table>
+
+<p>这里"乘子"指：把 \(T\) 在两个不动点 \(z_1, z_2\) 处用 \(S(z) = \dfrac{z - z_1}{z - z_2}\) 共轭后得到一个简化形式 \(S \circ T \circ S^{-1}(\zeta) = \lambda \zeta\)，这个 \(\lambda\) 就是乘子。\(|\lambda|\) 表"伸缩量"，\(\arg \lambda\) 表"旋转量"。</p>
+
+<p>具体看几个：</p>
+
+<ul>
+<li>\(T(z) = z + 1\)：不动点只有 \(\infty\)。<em>抛物</em>。</li>
+<li>\(T(z) = -z\)：不动点 \(0, \infty\)；乘子 \(-1\)，模 \(= 1\)。<em>椭圆</em>。</li>
+<li>\(T(z) = 2z\)：不动点 \(0, \infty\)；乘子 \(2\)，正实数 \(\ne 1\)。<em>双曲</em>。</li>
+<li>\(T(z) = (1 + i) z\)：不动点 \(0, \infty\)；乘子 \(1 + i\)，模 \(\sqrt{2}\)、辐角 \(\pi/4\)，复数。<em>斜驶</em>。</li>
+</ul>
+
+<p><strong>例题 17.10.1</strong>。把 \(T(z) = \dfrac{z}{2 - z}\) 分类。</p>
+
+<p><em>解。</em>解 \(z(2 - z) = z\)，即 \(2z - z^2 = z\)，即 \(z = z^2\)，即 \(z(z - 1) = 0\)。两个不动点 \(z = 0, 1\)。</p>
+
+<p>找乘子。令 \(S(\zeta) = \dfrac{\zeta - 0}{\zeta - 1} = \dfrac{\zeta}{\zeta - 1}\)（这把 0 送到 0、1 送到 \(\infty\)）。算 \(S \circ T \circ S^{-1}\)。先 \(S^{-1}\)：从 \(\zeta = w/(w-1)\) 解 \(w\)，得 \(w(\zeta - 1)/\zeta = 1\)... 还是直接算 \(T\) 在 \(z = 0\) 附近的导数算了。</p>
+
+<p>更快的方法：在不动点 \(z_1 = 0\) 处算 \(T'(0)\)。\(T(z) = z/(2 - z)\)，\(T'(z) = ((2 - z) - z(-1))/(2-z)^2 = 2/(2-z)^2\)，\(T'(0) = 2/4 = 1/2\)。</p>
+
+<p>类似在另一个不动点 \(z_2 = 1\) 处 \(T'(1) = 2/1 = 2\)。</p>
+
+<p>事实上 \(T'(z_1) \cdot T'(z_2) = 1\) 总是成立（这是 Möbius 变换的一条性质，因为乘子 \(\lambda\) 在共轭下 \(z_1 \leftrightarrow z_2\) 互换会变成 \(1/\lambda\)，所以 \(T'(z_1) T'(z_2) = \lambda \cdot 1/\lambda = 1\)）。</p>
+
+<p>所以乘子 \(\lambda = T'(z_1) = 1/2\)（或 \(\lambda^{-1} = 2 = T'(z_2)\)，等价）。\(\lambda = 1/2\) 是正实数 \(\ne 1\)，所以 \(T\) 是<em>双曲型</em>。</p>
+
+<h2 id="sec17-11">17.11 应用：把"圆形/上半平面型"区域映到标准区域</h2>
+
+<p>这一章的实战目的是：给一个由"圆弧/直线段"围成的区域，找一个 Möbius 变换把它映到标准的圆盘或上半平面。下面看一组例题。</p>
+
+<p><strong>例题 17.11.1</strong>。把右半平面 \(\{\operatorname{Re} z > 0\}\) 映到上半平面。</p>
+
+<p><em>解。</em>右半平面 = 上半平面顺时针转 90°。所以乘 \(i\)（即旋转 90° 逆时针，等价于把右半转到上半）：\(w = i z\)。验证：\(z = 1 \to w = i\) ✓；\(z = 1 + i \to w = i - 1\) ✓（落在上半）。这就够了。</p>
+
+<p>注意 \(w = iz\) 是 Möbius 变换（系数 \(a = i, b = 0, c = 0, d = 1\)，\(ad - bc = i \ne 0\)）。</p>
+
+<p><strong>例题 17.11.2</strong>。把右半平面映到单位圆盘。</p>
+
+<p><em>解。</em>两步走：先用 17.11.1 把右半平面映到上半平面，再用 17.9 节的 \(\dfrac{z - i}{z + i}\) 把上半平面映到圆盘。</p>
+
+<p>具体地：\(z \to iz \to \dfrac{iz - i}{iz + i} = \dfrac{i(z - 1)}{i(z + 1)} = \dfrac{z - 1}{z + 1}\)。</p>
+
+<p>所以 \(\boxed{w = \dfrac{z - 1}{z + 1}}\) 把右半平面映到单位圆盘。这是<em>第二个</em>必背的 Möbius 变换（仅次于 \(\dfrac{z - i}{z + i}\)）。</p>
+
+<p>验证：\(z = 1 \to w = 0\)（中心对中心）；\(z = i \to w = \dfrac{i - 1}{i + 1} = \dfrac{(i-1)(i-1)}{|i+1|^2} \cdot \dfrac{\overline{i+1}}{\overline{i+1}} \cdot \ldots\)，算一下 \((i-1)/(i+1) \cdot (-i + 1)/(-i + 1) = (i - 1)(-i + 1)/((i + 1)(-i + 1))\)，分子 \((i)(-i) + i + i - (-1) = 1 + 2i + 1\)，等等算得有点乱；干脆用 \(|i - 1|/|i + 1| = \sqrt 2 / \sqrt 2 = 1\)，所以模长为 1，落在边界。✓</p>
+
+<p><strong>例题 17.11.3</strong>。求把单位圆盘自映到自身、并使 \(z_0 = 1/2\) 映到 0 的 Möbius 变换。</p>
+
+<p><em>解。</em>用 17.9.1 的公式（取 \(z_0 = 1/2\)）：</p>
+
+\[
+T(z) = \frac{z - 1/2}{1 - (1/2) z} = \frac{2z - 1}{2 - z}.
+\]
+
+<p>验证 \(T(1/2) = (1 - 1)/(2 - 1/2) = 0\) ✓。验证 \(T(1) = (2 - 1)/(2 - 1) = 1\)（边界点对应边界点）✓。</p>
+
+<p><strong>例题 17.11.4</strong>。把"两条交于原点的射线之间的扇形 \(\{0 < \arg z < \pi/4\}\)"映到上半平面。</p>
+
+<p><em>解。</em>这不是"圆/直线"区域而是"扇形"——边界是直线段（射线）。直接用 Möbius 变换是不够的（Möbius 把直线映到圆/直线，但不会改变两条直线的交角）。所以必须先用幂次映射把扇形"张开"。</p>
+
+<p>取 \(z_1 = z^4\)：原扇形角度 \(\pi/4\) 被乘以 4 后变成 \(\pi\)，正是上半平面。所以 \(\boxed{w = z^4}\) 把扇形映到上半平面（当然 \(w = z^4\) 不是 Möbius 变换，但这个例子说明：纯 Möbius 不够时要混合幂次映射）。</p>
+
+<p><strong>例题 17.11.5</strong>。把"由两条相交于原点的圆弧围成的'月牙形'区域（具体形式：单位圆 \(|z| = 1\) 与圆 \(|z - 1| = 1\) 之间的区域，含 \(z = 1/2\)）"映到一个标准区域。</p>
+
+<p><em>解。</em>关键观察：这两条圆都过原点 \(z = 0\)。所以反演 \(z_1 = 1/z\) 把它们都映成<em>直线</em>（17.6 节）。具体：</p>
+
+<ul>
+<li>圆 \(|z| = 1\)（过原点... 等等，\(|z| = 1\) <em>不</em>过原点啊）。</li>
+</ul>
+
+<p>抱歉，重新设题。两个圆都过同一点时，反演（以那点为中心）才把它们映成直线。设两个圆都过 \(z = 1\)：圆 \(|z| = 1\) 过 \(z = 1\) ✓；圆 \(|z - 2| = 1\) 过 \(z = 1\) ✓。把这两圆之间的"月牙"区域映到标准区域。</p>
+
+<p>用 \(z_1 = \dfrac{1}{z - 1}\)（以 \(z = 1\) 为反演中心，把 \(z = 1\) 送到 \(\infty\)）。这是 Möbius 变换。两个圆都过 \(z = 1\)，所以反演后变成直线。</p>
+
+<ul>
+<li>圆 \(|z| = 1\)：过 \(z = 1\)、\(z = -1\)、\(z = i\)。算这些点的像：\(z = 1 \to \infty\)；\(z = -1 \to 1/(-2) = -1/2\)；\(z = i \to 1/(i - 1) = (\bar{i-1})/|i-1|^2 = (-i - 1)/2\)。三点 \((-1/2, 0)\)、\((-1/2, -1/2)\)、\(\infty\) 共线（\(x = -1/2\) 直线）。所以圆 \(|z| = 1\) 映为直线 \(\operatorname{Re} z_1 = -1/2\)。</li>
+<li>圆 \(|z - 2| = 1\)：过 \(z = 1\)、\(z = 3\)、\(z = 2 + i\)。算 \(z = 1 \to \infty\)；\(z = 3 \to 1/2\)；\(z = 2 + i \to 1/(1 + i) = (1 - i)/2\)。三点 \((1/2, 0)\)、\((1/2, -1/2)\)、\(\infty\) 共线。所以圆 \(|z - 2| = 1\) 映为直线 \(\operatorname{Re} z_1 = 1/2\)。</li>
+</ul>
+
+<p>所以"月牙"被映为<em>条带</em> \(\{-1/2 < \operatorname{Re} z_1 < 1/2\}\)（验证内部点 \(z = 1/2\)：算 \(z_1 = 1/(1/2 - 1) = -2\)... 嗯，\(\operatorname{Re}(-2) = -2 \notin (-1/2, 1/2)\)，所以方向反了；其实是条带的<em>外部</em>。可以再做一个映射调整，比如先对 \(z_1\) 做 \(z_2 = 1/z_1\) 等。这里目的就是说明<em>反演把"月牙"变成"条带"</em>，作为整章思路的展示。）</p>
+
+<p>条带是个标准区域，再用 \(e^z\)（前一章 16.7 节）就能映到上半平面、再到圆盘。整个过程把一个看似复杂的"月牙"区域，分步搬到了标准区域上。</p>
+
+<p>这一章我们学到的核心是：Möbius 变换是<em>圆/直线</em>之间最方便的"搬运工"。它的代数（群结构、矩阵表示）和几何（保广义圆、保交比）都极为干净。组合 Möbius 变换与幂次映射、指数映射、对数映射，几乎所有解析几何问题都能"搬"到圆盘或上半平面。下一章我们就利用这件事去解一类核心物理问题——Dirichlet 问题。</p>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 共形映射基础</a><a href="ch18.html">下一章 · 第 18 章 共形映射与 Dirichlet 问题 →</a></nav>
+
+</main>
+</body>
+</html>

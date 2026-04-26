@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 矩阵与向量的语言 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 高斯消元法</a><a href="ch4.html">下一章 · 第 4 章 矩阵代数 →</a></nav>
+<h1 id="ch3">第 3 章 矩阵与向量的语言</h1>
+
+<p>第 1 章把线性方程组看成几何对象的相交;第 2 章把它当作可以机械求解的数表。这两个视角已经能让你解出绝大多数题目。但这门课真正的思维深度还没出来——它要在本章登场。</p>
+
+<p>本章我们停下来,仔细盘点一下手里的语言:什么是矩阵、什么是向量、矩阵乘向量是什么意思。最关键的是,我们要把"\(A\mathbf{x}\)"这个表达式从两个不同的角度理解。第一个角度叫"行解读",这是初学者最先学到的、按定义算的版本——结果是对的,但它把 \(A\mathbf{x}\) 看作一堆点积,几何上没什么深度。第二个角度叫"列解读",它把 \(A\mathbf{x}\) 看作 \(A\) 的<em>列</em>的线性组合——这是初学者通常错过、却几乎决定全部后续课程能否理解的关键视角。整个第 4 章及以后(列空间、零空间、秩、线性无关、维数)都建立在列解读上;所以本章如果没把列解读真正看透,后面会处处碰壁。请你在这一章上花足够的时间。</p>
+
+<h2 id="sec3-1">3.1 矩阵就是数表,向量就是列</h2>
+
+<p>从最基本的术语说起,以免后面有任何疑义。</p>
+
+<p>一个 \(m \times n\) <strong>矩阵</strong>就是 \(m\) 行 \(n\) 列的一张数表。我们用大写字母 \(A, B, C\) 等表示。第 \(i\) 行第 \(j\) 列的那个数,记作 \(a_{ij}\) 或 \([A]_{ij}\) 或 \(A_{ij}\)(三种写法都常见,意思一样)。</p>
+
+<p>一个例子:</p>
+
+\[
+A = \begin{pmatrix}
+2 & -1 & 0 & 5 \\
+1 & 3 & -2 & 4 \\
+0 & 7 & 1 & -1
+\end{pmatrix}
+\]
+
+<p>这是一个 \(3 \times 4\) 矩阵——3 行 4 列。\(a_{11} = 2\),\(a_{23} = -2\),\(a_{34} = -1\)。注意这个尺寸约定是<em>行数在前、列数在后</em>。"\(3 \times 4\)" 不是"四 × 三",顺序是固定的。错了的话,后面所有的"乘法可不可行""尺寸怎么相加"都会算错。</p>
+
+<p>一个特殊情形:只有一列的矩阵,叫做<strong>列向量</strong>(column vector),简称<em>向量</em>。我们把它印成小写粗体字母 \(\mathbf{x}, \mathbf{v}\) 等等。一个 \(n\) 维列向量就是一个 \(n \times 1\) 矩阵:</p>
+
+\[
+\mathbf{x} = \begin{pmatrix} x_1 \\ x_2 \\ \vdots \\ x_n \end{pmatrix}.
+\]
+
+<p>它属于 \(\mathbb{R}^n\)(\(n\) 维实数空间)。在本书里,<strong>"向量"默认指列向量</strong>,而且默认实数分量。手写时常把列向量竖着写,印刷时也是竖着写;如果出于排版原因要横着写,我们会写成 \((x_1, x_2, \ldots, x_n)^T\),那个 \(T\) 是<em>转置</em>(transpose)的标记,意思是"把这一行立起来变成一列"。所以 \((1, 2, 3)^T\) 和 \(\begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix}\) 是同一个东西。</p>
+
+<p>对应地,只有一行的矩阵叫做<strong>行向量</strong>(row vector)。它是一个 \(1 \times n\) 矩阵:\((y_1, y_2, \ldots, y_n)\)。在本书里,"向量"默认<em>不</em>指行向量;要是我们偶尔需要行向量,会明说"行向量"以避免误会。这并不是说行向量不重要——它在第 6 章讨论"对偶""行空间"等话题时是主角——只是为了节省术语,本书里"向量"二字单独出现时,总是指列向量。</p>
+
+<p>矩阵的<strong>行</strong>本身是行向量;矩阵的<strong>列</strong>本身是列向量。对于一个 \(m \times n\) 矩阵,它有 \(m\) 行(每行是一个 \(n\) 维行向量)和 \(n\) 列(每列是一个 \(m\) 维列向量)。这件事很重要——<em>行的"长度"是列数,列的"长度"是行数</em>——一开始容易绕晕,但只要扣紧"行就是横着的、列就是竖着的、长度就是它有多少格"这条直觉就不会错。</p>
+
+<p>记一种紧凑写法。如果我们想强调矩阵 \(A\) 是由它的列拼起来的,可以写</p>
+
+\[
+A = \begin{pmatrix} \mathbf{a}_1 & \mathbf{a}_2 & \cdots & \mathbf{a}_n \end{pmatrix},
+\]
+
+<p>其中每个 \(\mathbf{a}_j\) 是 \(A\) 的第 \(j\) 列(它本身是一个 \(m\) 维列向量)。这种"按列拼"的写法在本章核心的 3.2 节"列解读"里会大放光芒。同样地,也可以写</p>
+
+\[
+A = \begin{pmatrix} \mathbf{r}_1^T \\ \mathbf{r}_2^T \\ \vdots \\ \mathbf{r}_m^T \end{pmatrix},
+\]
+
+<p>把 \(A\) 看作 \(m\) 个行向量(转置)堆起来。两种写法是同一个矩阵,只是看的角度不同。本书会在不同语境下使用这两种,你都要适应。</p>
+
+<h2 id="sec3-2">3.2 矩阵-向量乘积 \(A\mathbf{x}\) 的两种解读</h2>
+
+<p>核心的来了。给定一个 \(m \times n\) 矩阵 \(A\) 和一个 \(n\) 维列向量 \(\mathbf{x}\),它们的<strong>积</strong> \(A\mathbf{x}\) 是一个 \(m\) 维列向量,定义如下:</p>
+
+\[
+A\mathbf{x} = \begin{pmatrix}
+a_{11} x_1 + a_{12} x_2 + \cdots + a_{1n} x_n \\
+a_{21} x_1 + a_{22} x_2 + \cdots + a_{2n} x_n \\
+\vdots \\
+a_{m1} x_1 + a_{m2} x_2 + \cdots + a_{mn} x_n
+\end{pmatrix}.
+\]
+
+<p>要点先说:<strong>\(A\) 的列数必须等于 \(\mathbf{x}\) 的维数</strong>,否则乘法没定义。如果 \(A\) 是 \(m \times n\),那么 \(\mathbf{x}\) 必须是 \(n\) 维(\(n \times 1\)),结果 \(A\mathbf{x}\) 是 \(m\) 维(\(m \times 1\))。"\(n\) 在中间被消掉,\(m\) 留在外面"——这是矩阵乘法尺寸的通用规则,\(m \times n\) 乘 \(n \times 1\) 得 \(m \times 1\)。</p>
+
+<p>这个公式我们已经在 1.6 节见过——它就是把方程组 \(A\mathbf{x} = \mathbf{b}\) 写紧凑用的那个"乘法"。但现在我们要做的事情不是仅仅把它当个记号用,而是<em>真正理解它在说什么</em>。同一个公式可以用两种完全不同的眼光看,结果都是同样的数,但<strong>意义完全不同</strong>。这两种眼光分别是<em>行解读</em>和<em>列解读</em>。</p>
+
+<h3>3.2.1 行解读:每个分量是一次点积</h3>
+
+<p>第一种眼光把 \(A\mathbf{x}\) 的<em>每个分量</em>分别看。\(A\mathbf{x}\) 的第 \(i\) 个分量是</p>
+
+\[
+(A\mathbf{x})_i = a_{i1} x_1 + a_{i2} x_2 + \cdots + a_{in} x_n = \mathbf{r}_i \cdot \mathbf{x},
+\]
+
+<p>其中 \(\mathbf{r}_i = (a_{i1}, a_{i2}, \ldots, a_{in})\) 是 \(A\) 的<strong>第 \(i\) 行</strong>(看成一个 \(n\) 维向量,跟 \(\mathbf{x}\) 维数对得上)。所以 \(A\mathbf{x}\) 的每个分量,就是 \(A\) 的对应行与 \(\mathbf{x}\) 的<strong>点积</strong>。</p>
+
+<p>把它写成口诀:<strong>"\(A\mathbf{x}\) 的第 \(i\) 个分量 = \(A\) 的第 \(i\) 行点乘 \(\mathbf{x}\)"。</strong></p>
+
+<p>看一个具体例子。设</p>
+
+\[
+A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{pmatrix}, \qquad \mathbf{x} = \begin{pmatrix} 7 \\ 8 \\ 9 \end{pmatrix}.
+\]
+
+<p>用行解读:</p>
+
+<ul>
+<li>第 1 个分量 = (第 1 行) · \(\mathbf{x}\) = \((1)(7) + (2)(8) + (3)(9) = 7 + 16 + 27 = 50\)。</li>
+<li>第 2 个分量 = (第 2 行) · \(\mathbf{x}\) = \((4)(7) + (5)(8) + (6)(9) = 28 + 40 + 54 = 122\)。</li>
+</ul>
+
+<p>所以 \(A\mathbf{x} = \begin{pmatrix} 50 \\ 122 \end{pmatrix}\)。这是一个 2 维向量(因为 \(A\) 有 2 行),正如尺寸规则所预言。</p>
+
+<p>行解读是<em>计算</em>用的最方便方法——你拿到题就一行一行算下去,不会漏。它对的、它快、它机械。但它有一个致命的缺陷:它把 \(A\mathbf{x}\) 拆成 \(m\) 个独立的点积,看不见 \(A\) 各<em>列</em>之间的联系。整个矩阵的"列结构"在行解读里是隐形的。所以单靠行解读,你永远看不见后面要讲的"列空间""线性组合""线性无关"等概念——它们都活在另一种解读里。我们现在就去看那一种。</p>
+
+<h3>3.2.2 列解读:\(A\mathbf{x}\) 是 \(A\) 的列的线性组合</h3>
+
+<p>这是本章最重要的一句话。重写一下 \(A\mathbf{x}\) 的定义,但这次我们把它"按列"重组一下:</p>
+
+\[
+A\mathbf{x} = \begin{pmatrix}
+a_{11} x_1 + a_{12} x_2 + \cdots + a_{1n} x_n \\
+a_{21} x_1 + a_{22} x_2 + \cdots + a_{2n} x_n \\
+\vdots \\
+a_{m1} x_1 + a_{m2} x_2 + \cdots + a_{mn} x_n
+\end{pmatrix}.
+\]
+
+<p>把 \(x_1\) 提出来到所有行的"\(\cdot x_1\)"那一项前——它对应 \(A\) 的第一列;把 \(x_2\) 提出来到对应第二列的项前;以此类推。也就是把这个大向量按"\(x_j\) 是公共因子"的方式拆开:</p>
+
+\[
+A\mathbf{x} = x_1 \begin{pmatrix} a_{11} \\ a_{21} \\ \vdots \\ a_{m1} \end{pmatrix} + x_2 \begin{pmatrix} a_{12} \\ a_{22} \\ \vdots \\ a_{m2} \end{pmatrix} + \cdots + x_n \begin{pmatrix} a_{1n} \\ a_{2n} \\ \vdots \\ a_{mn} \end{pmatrix}.
+\]
+
+<p>但 \(\begin{pmatrix} a_{11} \\ a_{21} \\ \vdots \\ a_{m1} \end{pmatrix}\) 就是 \(A\) 的<strong>第一列</strong>,我们记作 \(\mathbf{a}_1\);同理 \(\mathbf{a}_2, \ldots, \mathbf{a}_n\) 是 \(A\) 的其余各列。所以</p>
+
+\[
+\boxed{A\mathbf{x} = x_1 \mathbf{a}_1 + x_2 \mathbf{a}_2 + \cdots + x_n \mathbf{a}_n.}
+\]
+
+<p>这就是<strong>列解读</strong>,是本章最重要的等式。请你先把它抄一遍,把它默念几遍,把它画在你的笔记本上,然后用粉笔抄到桌面上——它真的就是那么重要。它的口诀是:</p>
+
+<p><strong>\(A\mathbf{x}\) 是 \(A\) 的列的线性组合,其中组合系数恰好是 \(\mathbf{x}\) 的各个分量。</strong></p>
+
+<p>用刚才那个例子重新算一遍。\(A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{pmatrix}\),三列分别是 \(\mathbf{a}_1 = \begin{pmatrix} 1 \\ 4 \end{pmatrix}\),\(\mathbf{a}_2 = \begin{pmatrix} 2 \\ 5 \end{pmatrix}\),\(\mathbf{a}_3 = \begin{pmatrix} 3 \\ 6 \end{pmatrix}\)。\(\mathbf{x} = (7, 8, 9)^T\)。所以:</p>
+
+\[
+A\mathbf{x} = 7 \begin{pmatrix} 1 \\ 4 \end{pmatrix} + 8 \begin{pmatrix} 2 \\ 5 \end{pmatrix} + 9 \begin{pmatrix} 3 \\ 6 \end{pmatrix} = \begin{pmatrix} 7 \\ 28 \end{pmatrix} + \begin{pmatrix} 16 \\ 40 \end{pmatrix} + \begin{pmatrix} 27 \\ 54 \end{pmatrix} = \begin{pmatrix} 50 \\ 122 \end{pmatrix}.
+\]
+
+<p>结果跟行解读一模一样——必须一样,因为这两种解读是对<em>同一个</em>表达式的两种重组。但<em>过程</em>完全不同:这次我们没做任何点积,而是把三个 2 维列向量按系数 \(7, 8, 9\) 加权相加。整个意义都变了——\(A\mathbf{x}\) 不再是"一堆点积",而是"\(A\) 的列在 \(\mathbf{x}\) 的系数下的合成"。</p>
+
+<p>为什么列解读这么重要?因为它把矩阵-向量积重新定义为一个<em>合成</em>动作:你拿出 \(A\) 的若干列,按 \(\mathbf{x}\) 给的系数把它们加起来,得到一个新向量。这种"<strong>把已有的向量按某些系数加起来</strong>"的操作叫做<strong>线性组合</strong>(linear combination),是整个线性代数最核心的动词。\(A\) 的列是"原料",\(\mathbf{x}\) 的分量是"配方",\(A\mathbf{x}\) 是"成品"。这个隐喻可以贯穿你以后学到的几乎所有内容。</p>
+
+<p>从此以后每当你看到 \(A\mathbf{x}\),请你<em>不要</em>立刻去算点积;请你先在脑子里看到"\(A\) 的几个列"和"它们按 \(\mathbf{x}\) 的系数被合成"。久而久之,这个画面会主导你的思维,行解读会沦为辅助计算工具。这正是本章希望帮你完成的视角切换。</p>
+
+<h2 id="sec3-3">3.3 把整个方程组重新理解为列的合成</h2>
+
+<p>有了列解读,现在我们回头看 1.6 节那个方程 \(A\mathbf{x} = \mathbf{b}\),它在说什么变得让人耳目一新。</p>
+
+<p>用列解读,\(A\mathbf{x} = \mathbf{b}\) 翻译成</p>
+
+\[
+x_1 \mathbf{a}_1 + x_2 \mathbf{a}_2 + \cdots + x_n \mathbf{a}_n = \mathbf{b}.
+\]
+
+<p>这条等式问的是:<strong>能不能找到一组系数 \(x_1, \ldots, x_n\),使得 \(A\) 的列按这组系数线性组合出 \(\mathbf{b}\)?</strong></p>
+
+<p>把这一条句子和 1.6 节那个"找方程组的解"的问法对比一下,你会发现两者完全等价——但<em>味道</em>截然不同。原本"求 \(\mathbf{x}\) 使 \(A\mathbf{x} = \mathbf{b}\)"听起来是一个抽象的方程问题;经过列解读,它变成一个具体的合成问题——"\(\mathbf{b}\) 是不是 \(A\) 的列能合成出来的?"这个新问法立刻把焦点从"\(\mathbf{x}\) 长什么样"转移到"\(A\) 的列能<em>覆盖</em>哪些 \(\mathbf{b}\)"。这种焦点的转移就是后面引出"列空间"概念的入口。</p>
+
+<p>看一个具体的小例子。设</p>
+
+\[
+A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix},\qquad \mathbf{b} = \begin{pmatrix} 5 \\ 11 \end{pmatrix}.
+\]
+
+<p>能否找到 \(x_1, x_2\) 使 \(x_1 \begin{pmatrix} 1 \\ 3 \end{pmatrix} + x_2 \begin{pmatrix} 2 \\ 4 \end{pmatrix} = \begin{pmatrix} 5 \\ 11 \end{pmatrix}\)?用消元一算就知道:这相当于解 \(x_1 + 2 x_2 = 5\) 和 \(3 x_1 + 4 x_2 = 11\),解出 \(x_1 = 1, x_2 = 2\)。所以 \(\mathbf{b}\) 确实是 \(A\) 两列的某个线性组合(具体地,系数 \((1, 2)\))。</p>
+
+<p>那如果 \(\mathbf{b} = \begin{pmatrix} 0 \\ 0 \end{pmatrix}\) 呢?那需要 \(x_1 \mathbf{a}_1 + x_2 \mathbf{a}_2 = \mathbf{0}\)。\(x_1 = x_2 = 0\) 显然行(给所有列乘以零)。还有别的解吗?对这道题没有(因为 \(\mathbf{a}_1, \mathbf{a}_2\) 不平行,只有零系数才能合成出零向量)。但如果换一对列向量 \(\mathbf{a}_1 = \begin{pmatrix} 1 \\ 2 \end{pmatrix},\ \mathbf{a}_2 = \begin{pmatrix} 2 \\ 4 \end{pmatrix} = 2 \mathbf{a}_1\),那么除了 \((0, 0)\) 之外还有 \((2, -1)\)、\((4, -2)\)……等等,因为 \(2 \mathbf{a}_1 - \mathbf{a}_2 = 2 \mathbf{a}_1 - 2 \mathbf{a}_1 = \mathbf{0}\)。这是因为 \(\mathbf{a}_2\) 平行于 \(\mathbf{a}_1\)——这种"两列彼此依赖"的情形,正是后面"线性相关"这个概念的诞生之处。</p>
+
+<p>把这些观察归纳一下,关于 \(A\mathbf{x} = \mathbf{b}\) 的可解性,有三个非常基本的问题:</p>
+
+<ol>
+<li>\(\mathbf{b}\) 能否由 \(A\) 的列线性组合而来?——这决定方程组有没有解。</li>
+<li>如果能,组合的系数是否唯一?——这决定解是唯一还是无穷多。</li>
+<li>所有可能的 \(\mathbf{b}\) 组成的集合是什么形状?——这决定 \(A\) 这个矩阵能"达到"哪些目标。</li>
+</ol>
+
+<p>第三个问题的答案,是一个非常重要的对象,叫做 \(A\) 的<strong>列空间</strong>(column space),记作 \(\mathrm{Col}(A)\) 或 \(C(A)\)。它的非正式定义是:</p>
+
+\[
+\mathrm{Col}(A) = \{\, x_1 \mathbf{a}_1 + x_2 \mathbf{a}_2 + \cdots + x_n \mathbf{a}_n : x_1, \ldots, x_n \in \mathbb{R}\,\} = \{\, A\mathbf{x} : \mathbf{x} \in \mathbb{R}^n \,\}.
+\]
+
+<p>用文字说:列空间是 \(A\) 的<em>列</em>的所有线性组合的集合,等价地,是 \(A\mathbf{x}\) 在 \(\mathbf{x}\) 跑遍 \(\mathbb{R}^n\) 时所能达到的所有值的集合。它住在 \(\mathbb{R}^m\) 里(因为每个 \(A\mathbf{x}\) 是 \(m\) 维的)。这个对象在第 4-5 章会被深入研究——它的"维数"叫做 \(A\) 的<em>秩</em>,它和"零空间"的关系给出"秩-零度定理"等等。但这些都是后话;<em>现在</em>你只需要把这个朴素的图景记住:</p>
+
+<ul>
+<li>列空间 = 所有"\(A\) 的列能合成出来的"目标向量的集合。</li>
+<li>方程 \(A\mathbf{x} = \mathbf{b}\) 有解 \(\iff\) \(\mathbf{b} \in \mathrm{Col}(A)\)。</li>
+<li>方程 \(A\mathbf{x} = \mathbf{b}\) 无解 \(\iff\) \(\mathbf{b}\) 在列空间之外。</li>
+</ul>
+
+<p>这种"几何上"看待方程组的方式,一旦渗透进你的思维,你看一切线性问题的眼光都会变。"为什么 \(A\mathbf{x} = \mathbf{b}\) 无解?"——不再仅仅是"消元做到一行有 \(0 = 5\)",而是"\(\mathbf{b}\) 不在 \(A\) 列张成的子空间里"。"为什么有无穷多解?"——不再仅仅是"有自由变量",而是"列之间存在依赖,所以同一个 \(\mathbf{b}\) 有多种合成方式"。这种几何洞察是这门课要教给你的最重要的东西。</p>
+
+<p>列解读还自然解释了为什么 \(A\) 的列数必须等于 \(\mathbf{x}\) 的维数:你需要给每个列都配一个系数,所以系数的个数就等于列的个数。同样自然解释了为什么 \(A\mathbf{x}\) 的维数等于 \(A\) 的行数:每个列本身是 \(m\) 维向量,它们的任意线性组合也仍然是 \(m\) 维。"乘法的尺寸规则"在列解读下变成<em>显然</em>。</p>
+
+<h2 id="sec3-4">3.4 一些重要矩阵</h2>
+
+<p>本节登记几种特殊形状的矩阵——它们因为在公式里反复出现而值得起名字。每一种都有它的"性格",熟悉这些性格能让你在面对复杂的矩阵问题时,凭眼睛就识别出某些子结构。</p>
+
+<h3>单位矩阵 \(I\)</h3>
+
+<p>\(n \times n\) 的<strong>单位矩阵</strong>(identity matrix),记作 \(I_n\) 或就 \(I\),是这样一个方阵:对角线元素全是 \(1\),其余元素全是 \(0\)。</p>
+
+\[
+I_3 = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}.
+\]
+
+<p>它在矩阵乘法里的地位,跟数字 \(1\) 在普通乘法里的地位一模一样:乘什么都不变。具体说,对于任何 \(n\) 维列向量 \(\mathbf{x}\),都有 \(I \mathbf{x} = \mathbf{x}\)。原因可以两种解读:行解读下,\(I\) 的第 \(i\) 行只有第 \(i\) 个元素是 1,其余为 0,所以与 \(\mathbf{x}\) 点积只取出 \(x_i\),给出第 \(i\) 个分量;列解读下,\(I\) 的列就是<em>标准基向量</em> \(\mathbf{e}_1, \mathbf{e}_2, \ldots, \mathbf{e}_n\)(各只有一个 1、其余为 0),所以 \(I \mathbf{x} = x_1 \mathbf{e}_1 + x_2 \mathbf{e}_2 + \cdots = (x_1, x_2, \ldots, x_n)^T = \mathbf{x}\)。两种解读都通,而且都解释了为什么 \(I\) 表现得像"乘法的 1"。</p>
+
+<p>"标准基向量" \(\mathbf{e}_j\) 这个术语我们后面会反复用到。它是 \(I\) 的第 \(j\) 列,也即只有第 \(j\) 个分量为 1、其余为 0 的向量。任何 \(n\) 维向量 \(\mathbf{x}\) 都可以写成 \(\mathbf{x} = \sum_j x_j \mathbf{e}_j\)——这是把 \(\mathbf{x}\) 的"分量"还原成"沿坐标轴方向的成分"的最自然分解。</p>
+
+<h3>零矩阵 \(O\)</h3>
+
+<p>所有元素都是 0 的矩阵,记作 \(O\) 或 \(\mathbf{0}\),叫做<strong>零矩阵</strong>(zero matrix)。它在加法里的地位,跟数字 0 在普通加法里的地位一样:加上它什么都不变(\(A + O = A\))。在乘法里它把任何向量打成零向量(\(O \mathbf{x} = \mathbf{0}\))。这两件事都是无聊的——零矩阵的"性格"很弱——但它在公式推导里作为占位元素到处出现,所以你要熟。</p>
+
+<p>注意零矩阵的<strong>尺寸</strong>不是固定的;\(O_{2 \times 3}\) 是 \(2 \times 3\) 的零矩阵,\(O_{5 \times 5}\) 是 \(5 \times 5\) 的零矩阵,它们当然不是"同一个"零矩阵。本书里出现 \(O\) 时,从上下文推测它的尺寸,通常没有歧义。</p>
+
+<h3>对角矩阵</h3>
+
+<p>一个方阵叫<strong>对角矩阵</strong>(diagonal matrix),如果它<em>对角线之外</em>的所有元素都是 0;对角线上的元素可以是任何数。例子:</p>
+
+\[
+D = \begin{pmatrix} 5 & 0 & 0 \\ 0 & -2 & 0 \\ 0 & 0 & 7 \end{pmatrix}.
+\]
+
+<p>有时简记为 \(D = \mathrm{diag}(5, -2, 7)\)——只列出对角元,其余补 0。</p>
+
+<p>对角矩阵性格特别"友好",因为它的乘法效果非常简单。\(D \mathbf{x}\) 怎么算?用行解读,第 \(i\) 个分量等于第 \(i\) 行点乘 \(\mathbf{x}\),而第 \(i\) 行只有第 \(i\) 个元素 \(d_i\) 非零,所以 \((D\mathbf{x})_i = d_i x_i\)。也就是说<strong>对角矩阵作用在向量上,就是"按分量分别缩放"</strong>:把第 \(i\) 个分量乘以 \(d_i\)。每个坐标轴方向各自被独立伸缩,互不干扰。这是对角矩阵的几何画面——它代表了"沿坐标轴各自伸缩"这种最简单的线性变换。</p>
+
+<p>单位矩阵 \(I\) 是对角矩阵的特殊情形(对角元全是 1)。零矩阵在它是方阵时也是对角矩阵的特殊情形(对角元全是 0,虽然这时它什么都不"做",只把所有东西打成零)。</p>
+
+<h3>上三角矩阵和下三角矩阵</h3>
+
+<p>一个方阵叫<strong>上三角矩阵</strong>(upper triangular matrix),如果它<em>对角线下方</em>的所有元素都是 0;对角线上和上方的元素任意。例子:</p>
+
+\[
+U = \begin{pmatrix} 1 & 2 & 3 \\ 0 & 4 & 5 \\ 0 & 0 & 6 \end{pmatrix}.
+\]
+
+<p>类似地,<strong>下三角矩阵</strong>(lower triangular matrix)是对角线上方全为 0 的方阵:</p>
+
+\[
+L = \begin{pmatrix} 1 & 0 & 0 \\ 2 & 3 & 0 \\ 4 & 5 & 6 \end{pmatrix}.
+\]
+
+<p>这两种矩阵在线性代数里出现得特别频繁,因为高斯消元的整个过程,本质就是把任意矩阵化到上三角型(REF 就是带主元约束的上三角)。一旦你的方程组的系数矩阵是上三角的,反代法就特别容易——从最后一个变量开始,一路反代到第一个,每一步都只解一元方程。这就是为什么"化到上三角"是消元的目标。</p>
+
+<p>同时既是上三角又是下三角的矩阵,只能是<em>对角矩阵</em>——因为非对角元素必须同时既"在对角线下"又"在对角线上",只可能为 0。这件小事是个不错的脑筋急转弯,值得自己想一想。</p>
+
+<p>顺便提一种特殊的三角矩阵:<strong>单位三角矩阵</strong>,即对角元全为 1 的三角矩阵。它在矩阵分解(LU 分解)里有专门的角色,但本章不细讲;只是想让你看到它的名字以后不会陌生。</p>
+
+<h3>其他偶尔出现的命名</h3>
+
+<p>还有一些矩阵会偶尔出现,稍微提一下,免得后面看到时陌生:</p>
+
+<ul>
+<li><strong>方阵</strong>(square matrix):行数等于列数的矩阵 \(n \times n\)。本书里很多结论(如"逆矩阵存在""行列式定义")只对方阵成立。</li>
+<li><strong>对称矩阵</strong>(symmetric matrix):满足 \(A^T = A\) 的方阵,即 \(a_{ij} = a_{ji}\)。它的几何意义涉及"二次型"和"主轴"等话题,会在第 11 章谈到。</li>
+<li><strong>稀疏矩阵</strong>(sparse matrix):大部分元素为 0 的矩阵。这不是一个数学定义,而是一个"经验性"分类——它在数值计算里很重要。本课基本上不区分稀疏和稠密。</li>
+</ul>
+
+<p>这些都不是当下要担心的,先存档。下一节我们去看 \(A\mathbf{x} = \mathbf{b}\) 的最深刻的几何画面——这是本章压轴。</p>
+
+<h2 id="sec3-5">3.5 \(A\mathbf{x} = \mathbf{b}\) 的几何画面</h2>
+
+<p>到目前为止,你看待 \(A\mathbf{x} = \mathbf{b}\) 至少有了三种角度:</p>
+
+<ol>
+<li><strong>方程组角度</strong>:\(m\) 条方程 \(n\) 个未知数,几何上是 \(m\) 张超平面在 \(\mathbb{R}^n\) 里求公共点(第 1 章)。</li>
+<li><strong>行解读角度</strong>:\(A\mathbf{x}\) 的每个分量是 \(A\) 一行与 \(\mathbf{x}\) 的点积。</li>
+<li><strong>列解读角度</strong>:\(A\mathbf{x}\) 是 \(A\) 的列按 \(\mathbf{x}\) 的系数线性组合(3.2 节)。</li>
+</ol>
+
+<p>本节加上第四种,也是后续课程最常使用的:<strong>变换角度</strong>。这里的核心想法是:把矩阵 \(A\) 不当作"一组系数",而当作一个<em>动作</em>——一个把 \(\mathbb{R}^n\) 中的向量"送到" \(\mathbb{R}^m\) 中的动作。</p>
+
+<p>具体说,设 \(A\) 是 \(m \times n\) 矩阵。考虑函数</p>
+
+\[
+T_A: \mathbb{R}^n \to \mathbb{R}^m,\qquad T_A(\mathbf{x}) = A\mathbf{x}.
+\]
+
+<p>这个 \(T_A\) 是一个从 \(n\) 维空间到 \(m\) 维空间的<em>映射</em>:输入一个 \(\mathbb{R}^n\) 中的向量 \(\mathbf{x}\),输出一个 \(\mathbb{R}^m\) 中的向量 \(A\mathbf{x}\)。这是一个货真价实的函数,跟你在微积分里学的 \(f: \mathbb{R} \to \mathbb{R}\) 完全可比——只是<em>定义域</em>和<em>陪域</em>都升了维。</p>
+
+<p>从这个角度看,\(A\mathbf{x} = \mathbf{b}\) 这道方程问的是:"<strong>哪些 \(\mathbf{x} \in \mathbb{R}^n\) 在 \(T_A\) 下被送到 \(\mathbf{b} \in \mathbb{R}^m\)?</strong>"换句话说,它问的是 \(T_A\) 在 \(\mathbf{b}\) 处的<em>原像</em>(preimage)。</p>
+
+<ul>
+<li>如果 \(\mathbf{b}\) 不在 \(T_A\) 的<em>值域</em>(也就是上一节定义的<em>列空间</em>)里,那么没有任何 \(\mathbf{x}\) 会被送到它,即原像是空集——方程<em>无解</em>。</li>
+<li>如果 \(\mathbf{b}\) 在值域里,且 \(T_A\) 是<em>一对一</em>(单射)——也就是不同的 \(\mathbf{x}\) 被送到不同的 \(A\mathbf{x}\)——那么原像恰好是一个点,方程<em>有唯一解</em>。</li>
+<li>如果 \(\mathbf{b}\) 在值域里,但 \(T_A\) 不是一对一——也就是好几个 \(\mathbf{x}\) 都被送到同一个 \(A\mathbf{x}\)——那么原像是好几个点,方程<em>有多解</em>。事实上(我们将在第 5 章证明)对线性映射这种情形,原像总是一个"线性平直对象",所以是无穷多解。</li>
+</ul>
+
+<p>这个第四种视角把"方程有几个解"翻译成了"映射 \(T_A\) 的覆盖性和单射性"。这是非常物理的看法——它把 \(A\) 当作一个<em>机器</em>:你给它输入一个 \(\mathbb{R}^n\) 中的向量,它吐出一个 \(\mathbb{R}^m\) 中的向量。问"\(A\mathbf{x} = \mathbf{b}\) 有解吗?"等价于问"这个机器能造出 \(\mathbf{b}\) 这种产品吗?"问"解唯一吗?"等价于问"造出 \(\mathbf{b}\) 的配方是不是只有一份?"这种"机器"和"产品"的隐喻贯穿后面整个线性代数课程,尤其是在<strong>线性变换</strong>(linear transformation)那一章会被正式化。</p>
+
+<p>"线性变换"的精确含义、它和矩阵的对应关系、它的例子(旋转、反射、投影、缩放、剪切……),我们留到第 7 章详细讲。但现在你应该已经能感觉到这是怎么回事:</p>
+
+<ul>
+<li>\(A\) 矩阵 \(\Longleftrightarrow\) 一个把 \(\mathbb{R}^n\) 的向量"搬运"到 \(\mathbb{R}^m\) 的动作。</li>
+<li>\(A\mathbf{x}\) 那个公式 \(\Longleftrightarrow\) 这个动作的具体执行细节。</li>
+<li>列空间 \(\Longleftrightarrow\) 这个动作的"输出范围"。</li>
+<li>方程 \(A\mathbf{x} = \mathbf{b}\) \(\Longleftrightarrow\) 反向问题:"找到所有能产出 \(\mathbf{b}\) 的输入。"</li>
+</ul>
+
+<p>观察一个简单例子,让这一切落地。设</p>
+
+\[
+A = \begin{pmatrix} 2 & 0 \\ 0 & 3 \end{pmatrix}.
+\]
+
+<p>这是一个对角矩阵,所以它代表"沿坐标轴各自伸缩"——把任何 \(\mathbf{x} = (x_1, x_2)^T\) 映到 \((2 x_1, 3 x_2)^T\)。在几何上,它把 \(\mathbb{R}^2\) 中的"单位正方形"\([0,1] \times [0,1]\) 拉伸成 \([0,2] \times [0,3]\) 的矩形。这就是 \(A\) 这个"机器"做的事:把 \(x\) 方向拉长 2 倍,把 \(y\) 方向拉长 3 倍。它的列空间是整个 \(\mathbb{R}^2\)(因为两列 \((2,0)^T\) 和 \((0,3)^T\) 显然能合成出 \(\mathbb{R}^2\) 里任何向量),所以方程 \(A\mathbf{x} = \mathbf{b}\) 对任何 \(\mathbf{b} \in \mathbb{R}^2\) 都有解,而且解唯一(单射)。</p>
+
+<p>再看一个不那么"满"的例子。设</p>
+
+\[
+B = \begin{pmatrix} 1 & 2 \\ 2 & 4 \end{pmatrix}.
+\]
+
+<p>它的两列是 \((1,2)^T\) 和 \((2,4)^T = 2 \cdot (1,2)^T\)——一列是另一列的两倍。所以它们的所有线性组合都沿着 \((1,2)^T\) 这条直线分布;列空间不是整个 \(\mathbb{R}^2\),而仅仅是<em>过原点的某一条直线</em>。这个"机器"把整个 \(\mathbb{R}^2\) 都压扁到这条直线上!对于 \(\mathbf{b}\) 在这条直线上的情形,方程 \(B\mathbf{x} = \mathbf{b}\) 有解(而且无穷多,因为很多 \(\mathbf{x}\) 都被压扁到同一个点);对于 \(\mathbf{b}\) 不在这条直线上的情形,方程<em>无解</em>(机器够不着)。这就是"维度坍塌"的几何画面——它在第 4-5 章我们讨论<em>秩</em>时会被严格化。</p>
+
+<p>从这个变换角度看,本章前几节所有的讨论瞬间都获得了新的统一性。每一道关于 \(A\mathbf{x} = \mathbf{b}\) 的题目,本质上都在问:"\(A\) 这个机器能造出 \(\mathbf{b}\) 吗?如果能,有几种配方?"线性方程组、矩阵乘法、列空间、行解读、列解读……所有这些都不过是这一个核心问题的不同切面。</p>
+
+<p>到此,本章的目的就达成了。你现在应该已经能够:用矩阵-向量积的两种解读看待 \(A\mathbf{x}\),用列解读把方程组重新表述为线性组合问题,认识几种常见特殊矩阵,并把整个 \(A\mathbf{x} = \mathbf{b}\) 的问题想象成一个"机器把输入映成输出"的过程。这些是后面所有内容的基础。第 4 章我们会顺着列空间这条线走下去,引入<em>子空间</em>、<em>线性组合的张成</em>、<em>线性无关</em>等正式概念——它们就是把本章末尾那些非正式直觉变成精确数学语言的工具。我们去那里看看。</p>
+
+<hr/>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 高斯消元法</a><a href="ch4.html">下一章 · 第 4 章 矩阵代数 →</a></nav>
+
+</main>
+</body>
+</html>

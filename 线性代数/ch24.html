@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 24 章 奇异值分解 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 二次型与正定</a><a href="ch25.html">下一章 · 第 25 章 应用：PageRank、PCA、图像压缩 →</a></nav>
+<h1 id="ch24">第 24 章 奇异值分解</h1>
+
+<p>谱定理给了我们一件强大的工具——但只在矩阵<em>方阵且对称</em>时才能用。绝大多数现实里出现的矩阵都不是这样：数据矩阵往往是 \(1000 \times 5\)（一千个样本，五个特征），图像是 \(512 \times 768\)（行数和列数都很大但通常不相等），用户-物品矩阵是几百万乘几万。这些矩阵既不方也不对称，谱定理无能为力。</p>
+
+<p>那是不是说，对一般的矩阵，我们就只能盯着它的元素看，没办法"看清结构"了？</p>
+
+<p>——并不是。本章要讲的<strong>奇异值分解</strong>（Singular Value Decomposition，SVD）就是为这件事而生的。SVD 说：<em>任何</em>实矩阵 \(A\)（任何形状！），都可以写成
+\[
+A = U \Sigma V^T,
+\]
+其中 \(U, V\) 是正交矩阵、\(\Sigma\) 是"对角"矩阵（这里"对角"加引号，因为 \(\Sigma\) 不一定是方阵，下面会解释）。这个分解几乎像谱定理一样美——只是它的代价是你得学会用<em>两组</em>正交基（一组在输入端、一组在输出端），而不是一组。</p>
+
+<p>SVD 是整本书的最高峰之一。它把"线性变换 = 旋转 + 缩放 + 旋转"这件几何事实写得透亮；它给出了任何矩阵的"最佳低秩近似"；它是 PCA、图像压缩、推荐系统、Google 搜索（PageRank 之外那条线）的底层数学。学会它，你才有资格说自己"懂矩阵"。</p>
+
+<h2 id="sec24-1">24.1 动机</h2>
+
+<p>我们已有的对角化工具有两条：</p>
+
+<ul>
+  <li><strong>一般的对角化</strong>（第 21 章）：方阵 \(A\)，若有 \(n\) 个线性无关的特征向量，就能写成 \(A = P D P^{-1}\)。问题：\(P\) 不一定是正交的；\(A\) 不可对角化时（重根不够特征向量）就完全失败；并且要求 \(A\) 是方阵。</li>
+  <li><strong>谱定理</strong>（第 22 章）：对称矩阵 \(A\) 一定能正交对角化 \(A = Q D Q^T\)。优点：\(Q\) 是正交的、特征值是实数。缺点：要求 \(A\) 是方阵且对称。</li>
+</ul>
+
+<p>SVD 把"一定能分解"和"用正交矩阵"这两件好事一起带给我们，代价是分解的形式略变——左右两边的正交矩阵不一样了。来正式地写下结论。</p>
+
+<p><strong>奇异值分解定理</strong>　对任何 \(m \times n\) 实矩阵 \(A\)，存在</p>
+
+<ul>
+  <li>\(m \times m\) 正交矩阵 \(U\)；</li>
+  <li>\(n \times n\) 正交矩阵 \(V\)；</li>
+  <li>\(m \times n\) "对角"矩阵 \(\Sigma\)，其对角线（即 \(\Sigma_{ii}\)，\(i \le \min(m, n)\)）上是非负数 \(\sigma_1 \ge \sigma_2 \ge \cdots \ge \sigma_r > 0\)（\(r\) 是 \(A\) 的秩），\(\sigma_{r+1} = \cdots = 0\)，其它位置为零；</li>
+</ul>
+
+<p>使得</p>
+
+\[
+\boxed{\ A = U \Sigma V^T.\ }
+\]
+
+<p>\(\sigma_1, \sigma_2, \ldots\) 叫做 \(A\) 的<strong>奇异值</strong>，\(U\) 的列叫<strong>左奇异向量</strong>，\(V\) 的列叫<strong>右奇异向量</strong>。我们暂时不证明这条定理（证明放在附录 A.4），先看它在几何上说了什么、怎么算、怎么用。</p>
+
+<p>关于 \(\Sigma\) 的形状再多说一句。如果 \(A\) 是 \(3 \times 5\)，那 \(\Sigma\) 也是 \(3 \times 5\)，长这样：
+\[
+\Sigma = \begin{pmatrix} \sigma_1 & 0 & 0 & 0 & 0 \\ 0 & \sigma_2 & 0 & 0 & 0 \\ 0 & 0 & \sigma_3 & 0 & 0 \end{pmatrix}.
+\]
+如果 \(A\) 是 \(5 \times 3\)，那 \(\Sigma\) 是 \(5 \times 3\)：
+\[
+\Sigma = \begin{pmatrix} \sigma_1 & 0 & 0 \\ 0 & \sigma_2 & 0 \\ 0 & 0 & \sigma_3 \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.
+\]
+"对角"指的是只有 \(\Sigma_{ii}\) 那一串可以非零；多出来的行或列全是零。</p>
+
+<h2 id="sec24-2">24.2 几何解释（最重要的一节）</h2>
+
+<p>SVD 的几何意义可以一句话概括：<strong>任何线性变换 = 旋转 + 沿坐标轴缩放 + 旋转</strong>。</p>
+
+<p>展开来说。把 \(A\) 看成从 \(\mathbb{R}^n\) 到 \(\mathbb{R}^m\) 的线性变换 \(\mathbf{x} \mapsto A\mathbf{x}\)。SVD 把这件事拆成三步：</p>
+
+<ol>
+  <li>先用 \(V^T\) 处理输入。\(V\) 是正交矩阵，\(V^T\) 也是。在几何上 \(V^T\) 是一次<strong>旋转</strong>（或反射）——把输入向量 \(\mathbf{x}\) 表示在 \(V\) 的列向量这组基下。换句话说，\(V^T \mathbf{x}\) 就是 \(\mathbf{x}\) 在新基里的"坐标"。</li>
+  <li>再用 \(\Sigma\) 沿新坐标轴<strong>缩放</strong>。第一坐标乘以 \(\sigma_1\)，第二坐标乘以 \(\sigma_2\)，依此类推。多余的轴（如果输出维度比输入大）补零；少掉的轴（输入比输出大）截断。</li>
+  <li>最后用 \(U\) 把缩放后的向量<strong>旋转</strong>到输出空间——把它从"\(U\) 的基"翻译回标准坐标。</li>
+</ol>
+
+<p>看一个具体的画面。设 \(A\) 是 \(2 \times 2\) 方阵。把单位圆 \(\{\mathbf{x} : \|\mathbf{x}\| = 1\}\) 输入 \(A\)，输出会是什么形状？</p>
+
+<p>第一步 \(V^T\) 是旋转——单位圆经过旋转后还是单位圆，没动。第二步 \(\Sigma = \mathrm{diag}(\sigma_1, \sigma_2)\) 是缩放——把单位圆变成<em>椭圆</em>，半长轴 \(\sigma_1\)，半短轴 \(\sigma_2\)。第三步 \(U\) 是旋转——把这个轴对齐坐标系的椭圆旋转到原本不那么对齐的方向。</p>
+
+<p>结论：<strong>任何 \(2 \times 2\) 矩阵把单位圆变成一个椭圆</strong>（如果矩阵奇异，椭圆退化成线段）。椭圆的两条半轴方向就是 \(U\) 的两列，长度就是奇异值 \(\sigma_1, \sigma_2\)。</p>
+
+<p>这条几何描述可以推广到任何维：<strong>\(m \times n\) 矩阵 \(A\) 把 \(\mathbb{R}^n\) 中的单位球面映成 \(\mathbb{R}^m\) 中的"椭球面的一部分"</strong>，主轴方向是 \(U\) 的列，主轴长度是奇异值。如果 \(m > n\)，输出椭球只在某个 \(n\) 维子空间里（即 \(A\) 的列空间），其余方向被压成零。如果 \(n > m\)，则 \(\mathbb{R}^n\) 中有一个 \((n - m)\) 维子空间被整个压成零（即 \(A\) 的零空间）；剩下的部分被映成完整的椭球。</p>
+
+<p>这个几何观察是 SVD 最重要的一面。如果你只能从本章带走一件事，请带走它：<strong>每一个矩阵都是一次"旋转-拉伸-旋转"</strong>。</p>
+
+<h2 id="sec24-3">24.3 SVD 与 \(A^T A\)、\(A A^T\) 的关系</h2>
+
+<p>SVD 看上去神秘——一个非方阵怎么会有这种"对角化"？秘密是：<strong>SVD 的所有信息都藏在两个对称矩阵 \(A^T A\) 和 \(A A^T\) 里</strong>。这两个矩阵当然是对称的（\((A^T A)^T = A^T A\)），可以用谱定理对角化。SVD 不过是把这两个对角化粘到了一起。</p>
+
+<p>我们来推导这件事。设 \(A = U \Sigma V^T\)。则
+\[
+A^T A = (U \Sigma V^T)^T (U \Sigma V^T) = V \Sigma^T U^T U \Sigma V^T = V \Sigma^T \Sigma V^T = V (\Sigma^T \Sigma) V^T.
+\]
+\(\Sigma^T \Sigma\) 是 \(n \times n\) 对角矩阵，对角元是 \(\sigma_1^2, \sigma_2^2, \ldots, \sigma_r^2, 0, 0, \ldots, 0\)。所以这条式子告诉我们：</p>
+
+<ul>
+  <li>\(A^T A\) 的<strong>特征值</strong>是 \(\sigma_1^2, \ldots, \sigma_r^2, 0, \ldots, 0\)；</li>
+  <li>\(A^T A\) 的<strong>特征向量</strong>就是 \(V\) 的列（即<em>右</em>奇异向量）。</li>
+</ul>
+
+<p>对称地处理 \(A A^T\)：
+\[
+A A^T = U \Sigma V^T V \Sigma^T U^T = U (\Sigma \Sigma^T) U^T,
+\]
+\(\Sigma \Sigma^T\) 是 \(m \times m\) 对角矩阵，对角元同样是 \(\sigma_1^2, \ldots, \sigma_r^2, 0, \ldots, 0\)（只是数量根据 \(m\) 调整）。所以：</p>
+
+<ul>
+  <li>\(A A^T\) 的<strong>特征值</strong>也是 \(\sigma_1^2, \ldots, \sigma_r^2, 0, \ldots, 0\)；</li>
+  <li>\(A A^T\) 的<strong>特征向量</strong>就是 \(U\) 的列（即<em>左</em>奇异向量）。</li>
+</ul>
+
+<p>这就是<strong>SVD 的算法</strong>：</p>
+
+<ol>
+  <li>算 \(A^T A\)；</li>
+  <li>对它做谱定理（求特征值和正交化的特征向量）；特征值开方得 \(\sigma_i\)，特征向量按特征值降序排列得 \(V\)；</li>
+  <li>对每个 \(\sigma_i > 0\)，令 \(\mathbf{u}_i = \frac{1}{\sigma_i} A \mathbf{v}_i\)；这些 \(\mathbf{u}_i\) 自动两两正交（你可以验证这一点：\(\mathbf{u}_i^T \mathbf{u}_j = \frac{1}{\sigma_i \sigma_j} \mathbf{v}_i^T A^T A \mathbf{v}_j = \frac{\sigma_j^2}{\sigma_i \sigma_j} \mathbf{v}_i^T \mathbf{v}_j = 0\) 当 \(i \neq j\)），且都是单位向量。</li>
+  <li>如果 \(r < m\)，把这 \(r\) 个 \(\mathbf{u}_i\) 扩成 \(\mathbb{R}^m\) 的标准正交基（用 Gram-Schmidt 补出剩下的列），凑齐 \(U\)。</li>
+</ol>
+
+<p><em>等等——为什么 \(A^T A\) 的特征值都非负？</em>因为 \(A^T A\) 是<em>半正定</em>的：对任何 \(\mathbf{v}\)，\(\mathbf{v}^T A^T A \mathbf{v} = (A\mathbf{v})^T (A\mathbf{v}) = \|A\mathbf{v}\|^2 \ge 0\)。所以特征值非负，开方是合法的。这一观察是 SVD 存在性证明的核心（参见附录 A.4）。</p>
+
+<h2 id="sec24-4">24.4 实操：一个完整的 SVD 计算</h2>
+
+<p>设 \(A = \begin{pmatrix} 3 & 0 \\ 4 & 5 \end{pmatrix}\)。求它的 SVD。</p>
+
+<p><em>第一步：算 \(A^T A\)。</em>
+\[
+A^T A = \begin{pmatrix} 3 & 4 \\ 0 & 5 \end{pmatrix}\begin{pmatrix} 3 & 0 \\ 4 & 5 \end{pmatrix} = \begin{pmatrix} 25 & 20 \\ 20 & 25 \end{pmatrix}.
+\]</p>
+
+<p><em>第二步：对 \(A^T A\) 做谱分解。</em>特征多项式 \((25 - \lambda)^2 - 400 = 0\)，给 \(25 - \lambda = \pm 20\)，特征值 \(\lambda_1 = 45\)、\(\lambda_2 = 5\)。所以奇异值是 \(\sigma_1 = \sqrt{45} = 3\sqrt{5}\)，\(\sigma_2 = \sqrt{5}\)。</p>
+
+<p>特征向量。对 \(\lambda = 45\)：\(A^T A - 45 I = \begin{pmatrix} -20 & 20 \\ 20 & -20 \end{pmatrix}\)，零空间由 \(\begin{pmatrix}1 \\ 1\end{pmatrix}\) 张成。对 \(\lambda = 5\)：\(A^T A - 5 I = \begin{pmatrix} 20 & 20 \\ 20 & 20 \end{pmatrix}\)，零空间由 \(\begin{pmatrix}1 \\ -1\end{pmatrix}\) 张成。单位化：
+\[
+\mathbf{v}_1 = \frac{1}{\sqrt{2}}\begin{pmatrix}1 \\ 1\end{pmatrix}, \quad \mathbf{v}_2 = \frac{1}{\sqrt{2}}\begin{pmatrix}1 \\ -1\end{pmatrix}.
+\]
+所以 \(V = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}\)。</p>
+
+<p><em>第三步：算左奇异向量。</em>
+\[
+\mathbf{u}_1 = \frac{1}{\sigma_1} A \mathbf{v}_1 = \frac{1}{3\sqrt{5}} \cdot \frac{1}{\sqrt{2}}\begin{pmatrix} 3 & 0 \\ 4 & 5 \end{pmatrix}\begin{pmatrix}1 \\ 1\end{pmatrix} = \frac{1}{3\sqrt{10}}\begin{pmatrix}3 \\ 9\end{pmatrix} = \frac{1}{\sqrt{10}}\begin{pmatrix}1 \\ 3\end{pmatrix}.
+\]
+\[
+\mathbf{u}_2 = \frac{1}{\sigma_2} A \mathbf{v}_2 = \frac{1}{\sqrt{5}} \cdot \frac{1}{\sqrt{2}}\begin{pmatrix} 3 & 0 \\ 4 & 5 \end{pmatrix}\begin{pmatrix}1 \\ -1\end{pmatrix} = \frac{1}{\sqrt{10}}\begin{pmatrix}3 \\ -1\end{pmatrix}.
+\]
+单位化已经做好了（你可以验证 \(\|\mathbf{u}_1\| = \|\mathbf{u}_2\| = 1\) 且 \(\mathbf{u}_1 \cdot \mathbf{u}_2 = 0\)）。所以
+\[
+U = \frac{1}{\sqrt{10}}\begin{pmatrix} 1 & 3 \\ 3 & -1 \end{pmatrix}.
+\]</p>
+
+<p><em>第四步：组装。</em>
+\[
+A = U \Sigma V^T = \frac{1}{\sqrt{10}}\begin{pmatrix} 1 & 3 \\ 3 & -1 \end{pmatrix} \begin{pmatrix} 3\sqrt{5} & 0 \\ 0 & \sqrt{5} \end{pmatrix} \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}.
+\]
+你可以亲手乘开验证它确实等于 \(\begin{pmatrix}3 & 0 \\ 4 & 5\end{pmatrix}\)。</p>
+
+<p>这就是一个完整的 SVD。注意整个流程的<em>形状</em>：先在 \(A^T A\)（输入端）那边做谱定理拿到 \(V\) 和 \(\sigma_i\)，再把 \(V\) 的列推过 \(A\) 缩放为 \(\sigma_i \mathbf{u}_i\)。这个工作流可以套到任何维的矩阵上，只是手算很快就吃力——通常 \(3 \times 3\) 已经是手算的极限。计算机里的 SVD 算法（如 Jacobi、Householder QR）走的是不同的路，但理论结果是一样的。</p>
+
+<h2 id="sec24-5">24.5 截断 SVD 与 Eckart-Young 定理</h2>
+
+<p>SVD 还有一个让人惊艳的副产品。把分解 \(A = U \Sigma V^T\) 写成<em>外积之和</em>的形式：
+\[
+A = \sum_{i=1}^{r} \sigma_i \mathbf{u}_i \mathbf{v}_i^T.
+\]
+这个等式是 SVD 的"按列展开"——每一项 \(\sigma_i \mathbf{u}_i \mathbf{v}_i^T\) 是一个秩-1 的矩阵，几个秩-1 矩阵加起来得到 \(A\)。\(r\) 是 \(A\) 的秩，所以 \(A\) 总是<em>它的奇异值个数</em>个秩-1 矩阵的和。</p>
+
+<p>有意思的事情来了：如果只取前 \(k < r\) 项，得到一个<em>近似</em>
+\[
+A_k = \sum_{i=1}^{k} \sigma_i \mathbf{u}_i \mathbf{v}_i^T,
+\]
+那它是一个秩-\(k\) 的矩阵，比原 \(A\) 简单得多，但仍然"差不太多"。<em>差多少？</em>差掉的部分是 \(A - A_k = \sum_{i=k+1}^{r} \sigma_i \mathbf{u}_i \mathbf{v}_i^T\)，被丢掉的奇异值越小，差距就越小。</p>
+
+<p>这件事可以做得非常精确。<strong>Eckart-Young 定理</strong>说：</p>
+
+\[
+\boxed{\ A_k = \sum_{i=1}^{k} \sigma_i \mathbf{u}_i \mathbf{v}_i^T \text{ 是所有秩-}k\text{ 矩阵中，与 } A \text{ Frobenius 距离最近的那一个。}\ }
+\]
+
+<p>具体来说，对任何秩 \(\le k\) 的矩阵 \(B\)，
+\[
+\|A - A_k\|_F \le \|A - B\|_F,
+\]
+而 \(\|A - A_k\|_F^2 = \sigma_{k+1}^2 + \sigma_{k+2}^2 + \cdots + \sigma_r^2\)（被丢掉的那些奇异值的平方和）。这里 \(\|\cdot\|_F\) 是 Frobenius 范数，定义为所有元素平方和的开方。</p>
+
+<p>这个定理的力量在于它给了"最佳近似"一个干净的描述。如果你的 \(A\) 是一个 \(1000 \times 1000\) 的矩阵但奇异值在第 50 个之后就变得很小，那么用 \(A_{50}\) 来近似 \(A\) 几乎不损失信息——而 \(A_{50}\) 只需要存 \(50 \cdot (1000 + 1000 + 1) \approx 100000\) 个数，远少于原来的 \(1000000\) 个。压缩比 10:1 几乎免费。</p>
+
+<p>这个观察就是<em>所有低秩近似类应用</em>的根。下一节我们看它在三件事上的用法：图像压缩、PCA 降维、推荐系统的低秩补全。这是第 25 章的全部内容。</p>
+
+<h2 id="sec24-6">24.6 应用预告</h2>
+
+<p>本章最后用一段话提示一下接下来：第 25 章会用 SVD 真刀真枪地做三件事：</p>
+
+<ul>
+  <li>把一张灰度图像（一个数百维矩阵）截断到秩 \(k = 50\)，看图像质量损失多少、存储节省多少；</li>
+  <li>用 PCA 做高维数据可视化——把 64 维数字图像投影到 2 维平面，看不同数字是不是分簇；</li>
+  <li>用低秩补全做推荐系统——根据用户对部分电影的评分，预测他对没看过的电影的评分。</li>
+</ul>
+
+<p>每一件事都是 SVD 直接给出来的——你现在拥有的工具已经够用了。读下一章时如果某一步觉得跳得快，就翻回这一章对照。下一章的目标是让你<em>看见</em> SVD 在做什么，而不是再多教你新的数学。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 二次型与正定</a><a href="ch25.html">下一章 · 第 25 章 应用：PageRank、PCA、图像压缩 →</a></nav>
+
+</main>
+</body>
+</html>

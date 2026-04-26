@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 最小二乘 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 正交投影</a><a href="ch21.html">下一章 · 第 21 章 Gram-Schmidt 与 QR 分解 →</a></nav>
+<h1 id="ch20">第 20 章 最小二乘</h1>
+
+<p>这一章我们解决一个非常实际的问题:<strong>当线性方程组 \(A\mathbf{x} = \mathbf{b}\) 没有解时,该怎么办?</strong></p>
+
+<p>"没有解"的方程组在工程与数据科学里几乎是<strong>常态</strong>。每当你测量一组数据并尝试用一个简单模型(直线、抛物线、指数函数……)去拟合它,你都会得到一个"超定"的方程组——方程数比未知数多——而由于测量噪声,它<em>不可能</em>同时被精确满足。"找不出严格的解"不是世界末日;真正有用的问题是"找到一个最接近真解的近似",而<strong>最小二乘</strong>就是回答这个问题的工具。</p>
+
+<p>本章会涉及:</p>
+
+<ul>
+  <li>什么时候 \(A\mathbf{x} = \mathbf{b}\) 无解,以及无解的几何意义;</li>
+  <li>"最小二乘解"的定义;</li>
+  <li>把最小二乘问题翻译到投影的几何;</li>
+  <li>法方程的推导;</li>
+  <li>什么时候法方程有唯一解;</li>
+  <li>应用:直线拟合(线性回归);</li>
+  <li>应用:抛物线、指数等曲线的拟合;</li>
+  <li>误差的几何分解。</li>
+</ul>
+
+<p>这是工程师和数据科学家最爱本书的一章——本章学完,你已经在做"线性回归",这是机器学习课的<em>第一</em>道菜。</p>
+
+<h2 id="sec20-1">20.1 现实问题:超定方程组</h2>
+
+<p>给一个 \(m\times n\) 矩阵 \(A\) 和一个 \(\mathbb{R}^m\) 中的右端向量 \(\mathbf{b}\):</p>
+
+\[
+A\mathbf{x} = \mathbf{b}.
+\]
+
+<p>当 \(m > n\) 时(方程比未知数多,所谓"超定"),通常无解。几何上的原因:\(A\mathbf{x}\) 总是 \(A\) 的列的线性组合,所以它<strong>必须</strong>落在 \(\mathrm{Col}(A) \subseteq \mathbb{R}^m\) 里。而 \(\mathrm{Col}(A)\) 是一个最多 \(n\) 维的子空间,但 \(\mathbf{b}\) 可以是 \(\mathbb{R}^m\) 中的任意向量——\(\mathbf{b}\) 一般<strong>不在</strong> \(\mathrm{Col}(A)\) 里,所以方程组没有 \(\mathbf{x}\) 能让 \(A\mathbf{x} = \mathbf{b}\)。</p>
+
+<p>看一道具体的题。考虑数据点 \((1, 2)\)、\((2, 2)\)、\((3, 4)\),你想用直线 \(y = mx + c\) 去拟合它们。如果三个点真的都在某条直线上,你只需要</p>
+
+\[
+\begin{cases} m\cdot 1 + c = 2 \\ m\cdot 2 + c = 2 \\ m\cdot 3 + c = 4 \end{cases}
+\]
+
+<p>同时成立。写成矩阵形式:</p>
+
+\[
+A = \begin{pmatrix}1 & 1\\2 & 1\\3 & 1\end{pmatrix},\ \mathbf{x} = \begin{pmatrix}m\\c\end{pmatrix},\ \mathbf{b} = \begin{pmatrix}2\\2\\4\end{pmatrix}.
+\]
+
+<p>这是 \(3\times 2\) 的——三条方程两个未知数。一般来说没解。事实上你可以快速验证:第一与第二条说 \(m + c = 2\) 而 \(2m + c = 2\),所以 \(m = 0\)、\(c = 2\),代入第三条 \(3\cdot 0 + 2 = 2 \neq 4\)。果然无解。三个点不共线。</p>
+
+<p>那怎么办?现实中的回答是:<strong>找到"最不离谱"的 \(m, c\),让那条直线尽可能<em>靠近</em>这三个点</strong>。下一节给"靠近"一个数学定义。</p>
+
+<h2 id="sec20-2">20.2 退而求其次:最小二乘解</h2>
+
+<p>既然 \(A\mathbf{x} = \mathbf{b}\) 没有 \(\mathbf{x}\) 可让 \(\mathbf{b} - A\mathbf{x} = \mathbf{0}\),我们退一步,选一个 \(\hat{\mathbf{x}}\) 让 \(\mathbf{b} - A\hat{\mathbf{x}}\) 这个"残差向量"<strong>尽可能小</strong>。</p>
+
+<p>"尽可能小"如何度量?我们用上一章建立的范数,选范数最小,也就是<strong>残差长度的平方最小</strong>:</p>
+
+\[
+\boxed{\hat{\mathbf{x}} \;=\; \arg\min_{\mathbf{x}}\, \|\mathbf{b} - A\mathbf{x}\|^2.}
+\]
+
+<p>把 \(\|\mathbf{b} - A\mathbf{x}\|^2\) 展开,它就是残差各分量的平方和:</p>
+
+\[
+\|\mathbf{b} - A\mathbf{x}\|^2 = \sum_{i=1}^m (b_i - (A\mathbf{x})_i)^2.
+\]
+
+<p>这就是"最小二乘"得名的由来——我们最小化"平方和"(英文 "least squares"="最小的平方和")。</p>
+
+<p>为什么用"平方和"而不是"绝对值和"或"最大值"?三个原因:</p>
+
+<ol>
+  <li>平方处处可微,容易求最小值;绝对值在零处不可微,处理起来麻烦。</li>
+  <li>它对应"长度"——和我们刚学的内积、范数完全一致。</li>
+  <li>在某些统计假设下(误差服从独立同分布的高斯分布),它给出最大似然估计。这一条是机器学习课上反复强调的。</li>
+</ol>
+
+<p>这三条加在一起,使得"平方和"成为"误差"的默认度量。</p>
+
+<h2 id="sec20-3">20.3 几何解释:投影</h2>
+
+<p>现在我们用上一章的工具来看这个问题。\(A\mathbf{x}\) 跑遍所有可能的 \(\mathbf{x}\),它的取值范围是 \(\mathrm{Col}(A)\)——\(A\) 的列空间。所以最小二乘问题就是:</p>
+
+<blockquote>
+<p>在 \(\mathrm{Col}(A)\) 中,找一个向量 \(\mathbf{p}\),使得 \(\|\mathbf{b} - \mathbf{p}\|^2\) 最小;然后再倒推出哪个 \(\hat{\mathbf{x}}\) 让 \(A\hat{\mathbf{x}} = \mathbf{p}\)。</p>
+</blockquote>
+
+<p>但"在子空间中找距离 \(\mathbf{b}\) 最近的向量"——这正是上一章 19.8 节最后证明的事!那个最近的向量就是 \(\mathbf{b}\) 在 \(\mathrm{Col}(A)\) 上的<strong>正交投影</strong>:</p>
+
+\[
+\boxed{\mathbf{p} \;=\; \mathrm{proj}_{\mathrm{Col}(A)}\mathbf{b}.}
+\]
+
+<p>所以最小二乘问题 = 投影问题。本章讲的整个故事,是上一章正交投影的<strong>一个名字</strong>。"最小二乘"这一术语只是它在数据拟合里的化名;几何上看,它是投影。</p>
+
+<p>把这件事画出来:在 \(\mathbb{R}^m\) 里,\(\mathrm{Col}(A)\) 是一个最多 \(n\) 维的子空间。\(\mathbf{b}\) 一般不在里面。从 \(\mathbf{b}\) 向 \(\mathrm{Col}(A)\) 作垂线,垂足就是 \(\mathbf{p}\)——最近的代表。\(\hat{\mathbf{x}}\) 是"达到这个最近代表所需的系数"。残差 \(\mathbf{b} - A\hat{\mathbf{x}} = \mathbf{b} - \mathbf{p}\) 与整个 \(\mathrm{Col}(A)\) 垂直。</p>
+
+<h2 id="sec20-4">20.4 法方程</h2>
+
+<p>"残差与 \(\mathrm{Col}(A)\) 垂直"这一几何条件,代数上等价于:残差与 \(A\) 的<strong>每一列</strong>都垂直。也就是</p>
+
+\[
+A^\top (\mathbf{b} - A\hat{\mathbf{x}}) = \mathbf{0},
+\]
+
+<p>整理:</p>
+
+\[
+\boxed{A^\top A\, \hat{\mathbf{x}} \;=\; A^\top \mathbf{b}.}
+\]
+
+<p>这就是<strong>法方程</strong>。它把"最小化残差长度"变成了"解一个 \(n\times n\) 的线性方程组"。注意维度:原方程组是 \(m\times n\)(可能很高瘦),法方程是 \(n\times n\)(短小精悍)。这是个戏剧性的化简。</p>
+
+<p>(请你回头对照 19.3 节——这里的法方程跟那里完全是同一条等式;那里 \(\mathbf{v}\) 是被投影的向量,这里换名字叫 \(\mathbf{b}\),仅此而已。)</p>
+
+<p>如果你觉得"残差垂直于列"这个推导太"几何",这里也给出一条<strong>纯解析</strong>的推导,不依赖几何直觉。把目标函数</p>
+
+\[
+J(\mathbf{x}) = \|\mathbf{b} - A\mathbf{x}\|^2 = (\mathbf{b} - A\mathbf{x})^\top (\mathbf{b} - A\mathbf{x})
+\]
+
+<p>展开:</p>
+
+\[
+J(\mathbf{x}) = \mathbf{b}^\top\mathbf{b} - 2\mathbf{x}^\top A^\top \mathbf{b} + \mathbf{x}^\top A^\top A \mathbf{x}.
+\]
+
+<p>对 \(\mathbf{x}\) 求梯度并令为零:</p>
+
+\[
+\nabla J(\mathbf{x}) = -2 A^\top \mathbf{b} + 2 A^\top A \mathbf{x} = \mathbf{0}.
+\]
+
+<p>整理得 \(A^\top A \mathbf{x} = A^\top \mathbf{b}\)——同样的法方程!两条路径殊途同归。这也告诉你"几何"和"解析"在这里说的是同一件事。</p>
+
+<h2 id="sec20-5">20.5 法方程何时有唯一解</h2>
+
+<p>法方程 \(A^\top A \hat{\mathbf{x}} = A^\top \mathbf{b}\) <strong>总是有解</strong>(从几何上看,投影 \(\mathbf{p}\) 总存在,而 \(\hat{\mathbf{x}}\) 是表达 \(\mathbf{p}\) 的系数,系数总能找到)。问题是<em>解唯一吗</em>?</p>
+
+<p>由 19.4 节的引理:\(\mathrm{Null}(A^\top A) = \mathrm{Null}(A)\)。所以 \(A^\top A\) 可逆 \(\Longleftrightarrow\) \(\mathrm{Null}(A) = \{\mathbf{0}\}\) \(\Longleftrightarrow\) <strong>\(A\) 的列线性无关</strong>。在这种情况下,</p>
+
+\[
+\hat{\mathbf{x}} = (A^\top A)^{-1} A^\top \mathbf{b},\qquad \text{投影} \mathbf{p} = A\hat{\mathbf{x}} = A(A^\top A)^{-1} A^\top \mathbf{b}.
+\]
+
+<p>反过来,如果 \(A\) 的列线性相关,则 \(\hat{\mathbf{x}}\) 不唯一(同一个投影 \(\mathbf{p}\) 可以由多组系数表达),但<strong>投影 \(\mathbf{p}\) 本身仍然唯一</strong>——它由几何决定。在统计实战里,这种"列线性相关"叫做"多重共线性",会让回归系数变得不稳定;但拟合值还是唯一的,这是好的。</p>
+
+<p>本章后面所有的应用,我们都假设 \(A\) 的列线性无关——这在直线拟合、抛物线拟合等标准例子里几乎自动成立。</p>
+
+<h2 id="sec20-6">20.6 实操:几道最小二乘题</h2>
+
+<p>把上面的工具实际用一遍。下面四道例题,前两道纯计算,后两道开始有"故事"。</p>
+
+<h3 id="sec20-6-1">例 1: 一道基础最小二乘</h3>
+
+<p>解 \(A\mathbf{x} = \mathbf{b}\) 的最小二乘问题,其中</p>
+
+\[
+A = \begin{pmatrix}1 & 1\\1 & 2\\1 & 3\\1 & 4\end{pmatrix},\qquad \mathbf{b} = \begin{pmatrix}0\\1\\2\\5\end{pmatrix}.
+\]
+
+<p>四条方程两个未知数,显然超定。算 \(A^\top A\) 和 \(A^\top \mathbf{b}\):</p>
+
+\[
+A^\top A = \begin{pmatrix}1 & 1 & 1 & 1\\1 & 2 & 3 & 4\end{pmatrix}\begin{pmatrix}1 & 1\\1 & 2\\1 & 3\\1 & 4\end{pmatrix} = \begin{pmatrix}4 & 10\\10 & 30\end{pmatrix}.
+\]
+
+\[
+A^\top \mathbf{b} = \begin{pmatrix}1 & 1 & 1 & 1\\1 & 2 & 3 & 4\end{pmatrix}\begin{pmatrix}0\\1\\2\\5\end{pmatrix} = \begin{pmatrix}8\\28\end{pmatrix}.
+\]
+
+<p>解 \(\begin{pmatrix}4 & 10\\10 & 30\end{pmatrix}\hat{\mathbf{x}} = \begin{pmatrix}8\\28\end{pmatrix}\)。\(2\times 2\) 求逆:行列式 = \(4\cdot 30 - 10\cdot 10 = 20\),所以 \((A^\top A)^{-1} = \tfrac{1}{20}\begin{pmatrix}30 & -10\\-10 & 4\end{pmatrix}\)。</p>
+
+\[
+\hat{\mathbf{x}} = \tfrac{1}{20}\begin{pmatrix}30 & -10\\-10 & 4\end{pmatrix}\begin{pmatrix}8\\28\end{pmatrix} = \tfrac{1}{20}\begin{pmatrix}240 - 280\\-80 + 112\end{pmatrix} = \tfrac{1}{20}\begin{pmatrix}-40\\32\end{pmatrix} = \begin{pmatrix}-2\\1.6\end{pmatrix}.
+\]
+
+<p>所以最小二乘解是 \(\hat{\mathbf{x}} = (-2, 1.6)^\top\)。残差是</p>
+
+\[
+\mathbf{b} - A\hat{\mathbf{x}} = \begin{pmatrix}0\\1\\2\\5\end{pmatrix} - \begin{pmatrix}1\cdot(-2) + 1\cdot 1.6\\1\cdot(-2) + 2\cdot 1.6\\1\cdot(-2) + 3\cdot 1.6\\1\cdot(-2) + 4\cdot 1.6\end{pmatrix} = \begin{pmatrix}0\\1\\2\\5\end{pmatrix} - \begin{pmatrix}-0.4\\1.2\\2.8\\4.4\end{pmatrix} = \begin{pmatrix}0.4\\-0.2\\-0.8\\0.6\end{pmatrix}.
+\]
+
+<p>验证残差与 \(A\) 的两列都垂直:</p>
+
+\[
+(0.4)(1) + (-0.2)(1) + (-0.8)(1) + (0.6)(1) = 0.\,\checkmark
+\]
+
+\[
+(0.4)(1) + (-0.2)(2) + (-0.8)(3) + (0.6)(4) = 0.4 - 0.4 - 2.4 + 2.4 = 0.\,\checkmark
+\]
+
+<p>残差长度的平方 \(\|\mathbf{b} - A\hat{\mathbf{x}}\|^2 = 0.16 + 0.04 + 0.64 + 0.36 = 1.2\)——这是<em>所有</em>可能的 \(\mathbf{x}\) 中最小的那个值。</p>
+
+<p>顺带,你看 \(A\) 的两列分别是 \((1,1,1,1)^\top\) 和 \((1,2,3,4)^\top\)——一根全 1 的常量与一根递增的"时间"。其实,这道题就是"用直线 \(y = mx + c\) 去拟合数据点 \((1, 0), (2, 1), (3, 2), (4, 5)\)"!\(\hat{\mathbf{x}} = (c, m)^\top\),也就是 \(c = -2\), \(m = 1.6\),所以最佳拟合直线是 \(y = 1.6 x - 2\)。下一节我们会把"直线拟合"这个故事单独讲。</p>
+
+<h3 id="sec20-6-2">例 2: 另一道</h3>
+
+<p>解 \(A\mathbf{x} = \mathbf{b}\) 的最小二乘问题,</p>
+
+\[
+A = \begin{pmatrix}1 & 0\\0 & 1\\1 & 1\end{pmatrix},\qquad \mathbf{b} = \begin{pmatrix}1\\2\\3\end{pmatrix}.
+\]
+
+\[
+A^\top A = \begin{pmatrix}1 & 0 & 1\\0 & 1 & 1\end{pmatrix}\begin{pmatrix}1 & 0\\0 & 1\\1 & 1\end{pmatrix} = \begin{pmatrix}2 & 1\\1 & 2\end{pmatrix},\qquad A^\top \mathbf{b} = \begin{pmatrix}4\\5\end{pmatrix}.
+\]
+
+<p>\((A^\top A)^{-1} = \tfrac{1}{3}\begin{pmatrix}2 & -1\\-1 & 2\end{pmatrix}\),</p>
+
+\[
+\hat{\mathbf{x}} = \tfrac{1}{3}\begin{pmatrix}2 & -1\\-1 & 2\end{pmatrix}\begin{pmatrix}4\\5\end{pmatrix} = \tfrac{1}{3}\begin{pmatrix}8 - 5\\-4 + 10\end{pmatrix} = \tfrac{1}{3}\begin{pmatrix}3\\6\end{pmatrix} = \begin{pmatrix}1\\2\end{pmatrix}.
+\]
+
+<p>投影 \(\mathbf{p} = A\hat{\mathbf{x}} = (1, 2, 3)^\top = \mathbf{b}\)?等等——这意味着 \(\mathbf{b}\) 已经在 \(\mathrm{Col}(A)\) 里!验证:\((1, 2, 3)^\top = 1\cdot(1,0,1)^\top + 2\cdot(0,1,1)^\top\)?\((1, 2, 1+2) = (1, 2, 3)\)。是的。所以这道题<strong>原方程实际上有精确解</strong>(虽然形式上是 \(3\times 2\) 的"超定"),最小二乘把它给找了出来。这是个不错的合理性检查:当方程有精确解时,最小二乘解就是那个精确解。</p>
+
+<h3 id="sec20-6-3">例 3: 一个三维投影问题</h3>
+
+<p>这道题以"投影"的口吻提出。求向量 \(\mathbf{b} = (1, 1, 1)^\top\) 在子空间 \(W = \mathrm{span}\{(1,0,1)^\top, (0,1,1)^\top\}\) 上的正交投影。</p>
+
+<p>把 \(W\) 的基拼成矩阵:</p>
+
+\[
+A = \begin{pmatrix}1 & 0\\0 & 1\\1 & 1\end{pmatrix}.
+\]
+
+<p>这<strong>就是上一题的</strong> \(A\)!所以法方程的左边一样。\(A^\top \mathbf{b} = (2, 2)^\top\)(算一下)。</p>
+
+\[
+\hat{\mathbf{x}} = \tfrac{1}{3}\begin{pmatrix}2 & -1\\-1 & 2\end{pmatrix}\begin{pmatrix}2\\2\end{pmatrix} = \tfrac{1}{3}\begin{pmatrix}2\\2\end{pmatrix} = \begin{pmatrix}2/3\\2/3\end{pmatrix}.
+\]
+
+<p>投影 \(\mathbf{p} = A\hat{\mathbf{x}} = \tfrac{2}{3}(1,0,1)^\top + \tfrac{2}{3}(0,1,1)^\top = (2/3, 2/3, 4/3)^\top\)。</p>
+
+<p>残差 \(\mathbf{b} - \mathbf{p} = (1 - 2/3, 1 - 2/3, 1 - 4/3)^\top = (1/3, 1/3, -1/3)^\top\)。这个残差应该与 \(W\) 中每个向量正交:</p>
+
+\[
+(1/3, 1/3, -1/3)\cdot(1, 0, 1) = 1/3 + 0 - 1/3 = 0.\,\checkmark
+\]
+
+\[
+(1/3, 1/3, -1/3)\cdot(0, 1, 1) = 0 + 1/3 - 1/3 = 0.\,\checkmark
+\]
+
+<p>"投影"题与"最小二乘"题在公式上完全等价——只是问的是"投影点"还是"系数"。把 \(\mathbf{b}\) 换成 \(\mathbf{v}\),把"\(A\) 的列张成的子空间"换成"任意子空间 \(W\) 的基",故事一字不变。</p>
+
+<h3 id="sec20-6-4">例 4: 一个高维但简单的</h3>
+
+<p>设</p>
+
+\[
+A = \begin{pmatrix}1 & 0 & 0\\1 & 1 & 0\\1 & 0 & 1\\1 & 1 & 1\end{pmatrix},\qquad \mathbf{b} = \begin{pmatrix}1\\3\\2\\5\end{pmatrix}.
+\]
+
+<p>这是 \(4\times 3\),三个未知数四条方程。算:</p>
+
+\[
+A^\top A = \begin{pmatrix}1 & 1 & 1 & 1\\0 & 1 & 0 & 1\\0 & 0 & 1 & 1\end{pmatrix}\begin{pmatrix}1 & 0 & 0\\1 & 1 & 0\\1 & 0 & 1\\1 & 1 & 1\end{pmatrix} = \begin{pmatrix}4 & 2 & 2\\2 & 2 & 1\\2 & 1 & 2\end{pmatrix}.
+\]
+
+\[
+A^\top \mathbf{b} = \begin{pmatrix}1+3+2+5\\3+5\\2+5\end{pmatrix} = \begin{pmatrix}11\\8\\7\end{pmatrix}.
+\]
+
+<p>解 \(3\times 3\) 方程组 \(\begin{pmatrix}4 & 2 & 2\\2 & 2 & 1\\2 & 1 & 2\end{pmatrix}\hat{\mathbf{x}} = \begin{pmatrix}11\\8\\7\end{pmatrix}\)。用高斯消元:</p>
+
+<p>把第二、第三行减去 \(\tfrac{1}{2}\) 倍的第一行:</p>
+
+\[
+\begin{pmatrix}4 & 2 & 2 \;\big|\; 11\\0 & 1 & 0 \;\big|\; 8 - 11/2\\0 & 0 & 1 \;\big|\; 7 - 11/2\end{pmatrix} = \begin{pmatrix}4 & 2 & 2 \;\big|\; 11\\0 & 1 & 0 \;\big|\; 5/2\\0 & 0 & 1 \;\big|\; 3/2\end{pmatrix}.
+\]
+
+<p>已经成上三角。回代:</p>
+
+<ul>
+  <li>第三行 \(\hat{x}_3 = 3/2\)。</li>
+  <li>第二行 \(\hat{x}_2 = 5/2\)。</li>
+  <li>第一行 \(4\hat{x}_1 + 2(5/2) + 2(3/2) = 11\),即 \(4\hat{x}_1 + 5 + 3 = 11\),\(\hat{x}_1 = 3/4\)。</li>
+</ul>
+
+<p>所以 \(\hat{\mathbf{x}} = (3/4, 5/2, 3/2)^\top\)。投影:</p>
+
+\[
+A\hat{\mathbf{x}} = \tfrac{3}{4}\begin{pmatrix}1\\1\\1\\1\end{pmatrix} + \tfrac{5}{2}\begin{pmatrix}0\\1\\0\\1\end{pmatrix} + \tfrac{3}{2}\begin{pmatrix}0\\0\\1\\1\end{pmatrix} = \begin{pmatrix}3/4\\3/4 + 5/2\\3/4 + 3/2\\3/4 + 5/2 + 3/2\end{pmatrix} = \begin{pmatrix}3/4\\13/4\\9/4\\19/4\end{pmatrix}.
+\]
+
+<p>残差 \(\mathbf{b} - A\hat{\mathbf{x}} = (1 - 3/4, 3 - 13/4, 2 - 9/4, 5 - 19/4)^\top = (1/4, -1/4, -1/4, 1/4)^\top\)。检查与第一列(\((1,1,1,1)^\top\))的正交性:\(1/4 - 1/4 - 1/4 + 1/4 = 0\) ✓。第二、第三列同理(自己验)。</p>
+
+<h2 id="sec20-7">20.7 重要应用:直线拟合(线性回归)</h2>
+
+<p>现在到了机器学习课的"开胃菜"。给数据点</p>
+
+\[
+(x_1, y_1),\ (x_2, y_2),\ \ldots,\ (x_n, y_n),
+\]
+
+<p>问:用直线 \(y = mx + c\) 来"拟合"它们,什么样的 \(m, c\) 让"误差"最小?</p>
+
+<p>"误差"我们采用每个点到直线的<strong>纵向残差</strong> \(y_i - (mx_i + c)\),并最小化它们的<strong>平方和</strong>:</p>
+
+\[
+\boxed{\min_{m, c}\ \sum_{i=1}^n (y_i - mx_i - c)^2.}
+\]
+
+<p>这就是<strong>最小二乘直线拟合</strong>,也叫<strong>简单线性回归</strong>。把它翻译到 \(A\mathbf{x} = \mathbf{b}\) 的形式:</p>
+
+\[
+\underbrace{\begin{pmatrix}x_1 & 1\\x_2 & 1\\\vdots & \vdots\\x_n & 1\end{pmatrix}}_{A}\underbrace{\begin{pmatrix}m\\c\end{pmatrix}}_{\mathbf{x}} = \underbrace{\begin{pmatrix}y_1\\y_2\\\vdots\\y_n\end{pmatrix}}_{\mathbf{b}}.
+\]
+
+<p>(\(A\) 的两列分别是 \(x\) 值与全 1。)如果数据真的共线,这个方程组有精确解;一般则没有,我们求最小二乘解。</p>
+
+<p>套用法方程的公式:</p>
+
+\[
+A^\top A = \begin{pmatrix}\sum x_i^2 & \sum x_i\\\sum x_i & n\end{pmatrix},\qquad A^\top \mathbf{b} = \begin{pmatrix}\sum x_i y_i\\\sum y_i\end{pmatrix}.
+\]
+
+<p>(每个求和都是从 \(i=1\) 到 \(n\) 的求和。)法方程:</p>
+
+\[
+\begin{pmatrix}\sum x_i^2 & \sum x_i\\\sum x_i & n\end{pmatrix}\begin{pmatrix}m\\c\end{pmatrix} = \begin{pmatrix}\sum x_i y_i\\\sum y_i\end{pmatrix}.
+\]
+
+<p>用 \(2\times 2\) 求逆公式解:行列式 = \(n \sum x_i^2 - (\sum x_i)^2\),把这个分母叫 \(D\)。则</p>
+
+\[
+\boxed{m = \frac{n\sum x_i y_i - \sum x_i \sum y_i}{n\sum x_i^2 - (\sum x_i)^2},\qquad c = \frac{\sum x_i^2 \sum y_i - \sum x_i \sum x_i y_i}{n\sum x_i^2 - (\sum x_i)^2}.}
+\]
+
+<p>这是直线拟合的<strong>封闭公式</strong>。在你做统计课的"线性回归"时,<em>背后</em>就是这两条公式。</p>
+
+<p>让我们在原先那道题上跑一遍。数据 \((1, 2)\)、\((2, 2)\)、\((3, 4)\)。</p>
+
+\[
+\sum x_i = 6,\ \sum y_i = 8,\ \sum x_i^2 = 1+4+9 = 14,\ \sum x_i y_i = 2+4+12 = 18.
+\]
+
+\[
+n = 3,\quad D = 3\cdot 14 - 36 = 6.
+\]
+
+\[
+m = \frac{3\cdot 18 - 6\cdot 8}{6} = \frac{54 - 48}{6} = 1.
+\]
+
+\[
+c = \frac{14\cdot 8 - 6\cdot 18}{6} = \frac{112 - 108}{6} = \frac{4}{6} = \tfrac{2}{3}.
+\]
+
+<p>所以最佳拟合直线是 \(y = x + 2/3\)。</p>
+
+<p>验证:在 \(x = 1, 2, 3\) 处直线给出 \(5/3, 8/3, 11/3 \approx 1.67, 2.67, 3.67\),与真值 \(2, 2, 4\) 的残差分别是 \(0.33, -0.67, 0.33\),平方和 \(0.11 + 0.44 + 0.11 = 0.67\)——其它任何 \((m, c)\) 选择都不会比这个更小。</p>
+
+<h3 id="sec20-7-1">20.7.1 用样本均值改写</h3>
+
+<p>上面的封闭公式可以写得更"漂亮"。设 \(\bar{x} = \tfrac{1}{n}\sum x_i\),\(\bar{y} = \tfrac{1}{n}\sum y_i\) 分别是 \(x\) 与 \(y\) 的<strong>样本均值</strong>。代数演算可以得到</p>
+
+\[
+\boxed{m = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sum (x_i - \bar{x})^2},\qquad c = \bar{y} - m\bar{x}.}
+\]
+
+<p>第一条:\(m\) 是"\(x\) 与 \(y\) 的协方差除以 \(x\) 的方差"——这正是统计课上学的"回归系数"。第二条:直线必经过<strong>数据的重心</strong> \((\bar{x}, \bar{y})\)。这两条几何上都很好记忆。</p>
+
+<p>留作练习,把上一道题用这个公式重新算一遍:\(\bar{x} = 2\),\(\bar{y} = 8/3\)。\((x_i - \bar{x}) = (-1, 0, 1)\),\((y_i - \bar{y}) = (-2/3, -2/3, 4/3)\)。乘积之和 \(= 2/3 + 0 + 4/3 = 2\)。\(\sum(x_i - \bar{x})^2 = 1 + 0 + 1 = 2\)。所以 \(m = 2/2 = 1\),\(c = 8/3 - 1\cdot 2 = 2/3\)。和上面完全一致。</p>
+
+<h2 id="sec20-8">20.8 一般曲线拟合</h2>
+
+<p>上一节的故事不仅适用于直线。事实上,只要拟合函数是<strong>对未知系数线性</strong>的,最小二乘的整套机器都直接搬过来。</p>
+
+<h3 id="sec20-8-1">20.8.1 抛物线拟合</h3>
+
+<p>用 \(y = ax^2 + bx + c\) 拟合 \((x_i, y_i)\)。系数三个,数据 \(n\) 条。把它写成 \(A\mathbf{x} = \mathbf{b}\):</p>
+
+\[
+A = \begin{pmatrix}x_1^2 & x_1 & 1\\x_2^2 & x_2 & 1\\\vdots & \vdots & \vdots\\x_n^2 & x_n & 1\end{pmatrix},\quad \mathbf{x} = \begin{pmatrix}a\\b\\c\end{pmatrix},\quad \mathbf{b} = \begin{pmatrix}y_1\\y_2\\\vdots\\y_n\end{pmatrix}.
+\]
+
+<p>每列对应一个"基函数"——分别是 \(x^2\)、\(x\)、\(1\)。直接套法方程 \(A^\top A \hat{\mathbf{x}} = A^\top \mathbf{b}\),解出 \((a, b, c)\) 就完事。整个过程跟直线拟合几乎一样,只是矩阵列数从 2 变到 3,法方程变成 \(3\times 3\)。</p>
+
+<p>更一般地,\(p\) 阶多项式拟合 \(y = c_p x^p + \cdots + c_1 x + c_0\) 给出的 \(A\) 是 \(n\times (p+1)\) 的,法方程是 \((p+1)\times (p+1)\) 的。结构完全平行。</p>
+
+<h3 id="sec20-8-2">20.8.2 对系数线性的任意函数</h3>
+
+<p>更一般:用</p>
+
+\[
+y = c_1 \phi_1(x) + c_2 \phi_2(x) + \cdots + c_k \phi_k(x)
+\]
+
+<p>来拟合数据,其中 \(\phi_1, \ldots, \phi_k\) 是<strong>事先选好</strong>的函数(称为<em>基函数</em>),\(c_1, \ldots, c_k\) 是待定系数。把这个写成矩阵:</p>
+
+\[
+A_{ij} = \phi_j(x_i),\qquad (\mathbf{b})_i = y_i.
+\]
+
+<p>然后 \(A\mathbf{x} = \mathbf{b}\) 的最小二乘解 \(\hat{\mathbf{x}} = (c_1, \ldots, c_k)\) 给出最佳系数。</p>
+
+<p>例如,你可以用 \(y = c_1 + c_2 \sin x + c_3 \cos x\) 去拟合一段数据,只要把 \(A\) 的三列分别填上 1, \(\sin x_i\), \(\cos x_i\),其余照旧。这种<strong>"基函数 + 线性组合"</strong>的拟合是工程里最常用的方式之一。</p>
+
+<h3 id="sec20-8-3">20.8.3 取对数变成线性</h3>
+
+<p>有些<strong>非线性</strong>的拟合形式可以用对数把它"变成线性",从而走最小二乘的路。</p>
+
+<p>(a) <strong>指数模型</strong> \(y = ae^{bx}\)。两边取自然对数:\(\ln y = \ln a + bx\)。令 \(Y = \ln y\),\(C = \ln a\):</p>
+
+\[
+Y = bx + C.
+\]
+
+<p>这是关于 \(b, C\) 的<strong>直线</strong>!对数据 \((x_i, \ln y_i)\) 做直线拟合,得到 \(b\) 和 \(C\),然后 \(a = e^C\)。</p>
+
+<p>(b) <strong>幂律模型</strong> \(y = ax^b\)。两边取对数:\(\ln y = \ln a + b\ln x\)。令 \(X = \ln x\),\(Y = \ln y\),\(C = \ln a\):\(Y = bX + C\)——还是直线。对数据 \((\ln x_i, \ln y_i)\) 做直线拟合就行。</p>
+
+<p>看一道例题。给数据 \((1, 1)\)、\((2, 4)\)、\((4, 16)\),猜想 \(y = ax^b\)。</p>
+
+<p>\(X_i = \ln x_i = (0, 0.693, 1.386)\),\(Y_i = \ln y_i = (0, 1.386, 2.773)\)(取 \(\ln 4 = 2\ln 2 \approx 1.386\),\(\ln 16 = 4\ln 2 \approx 2.773\))。</p>
+
+\[
+\sum X_i = 2.079,\ \sum Y_i = 4.159,\ \sum X_i^2 = 0.480 + 1.922 = 2.402,\ \sum X_i Y_i = 0.961 + 3.844 = 4.805.
+\]
+
+<p>(我用了 \(0.693^2 \approx 0.480\), \(1.386^2 \approx 1.922\), 等等。)\(n = 3\),\(D = 3(2.402) - 2.079^2 = 7.206 - 4.322 = 2.884\)。</p>
+
+\[
+b = \frac{3(4.805) - 2.079(4.159)}{2.884} = \frac{14.415 - 8.647}{2.884} \approx 2.000.
+\]
+
+\[
+C = \frac{2.402(4.159) - 2.079(4.805)}{2.884} = \frac{9.990 - 9.989}{2.884} \approx 0.
+\]
+
+<p>所以 \(b \approx 2\),\(\ln a \approx 0\),\(a \approx 1\),拟合给出 \(y = x^2\)——正是这三个点恰好在 \(y = x^2\) 上的事实。漂亮。</p>
+
+<p><strong>注意一个微妙的点</strong>:取对数之后最小化的"平方和"是 \(\sum (\ln y_i - \text{预测})^2\),不是原始的 \(\sum (y_i - \text{预测})^2\)。这两个不一样,所以这种"对数线性化"得到的解严格说不是原问题的最小二乘解,而是<em>对数尺度上</em>的最小二乘解。在数据涵盖好几个数量级时,对数尺度往往更合理(给"小值"和"大值"等同的相对权重)。但你应该清楚地知道你最小化的是什么。</p>
+
+<h2 id="sec20-9">20.9 误差的几何分解</h2>
+
+<p>本章最后一节,把"误差有多大"这一问题用几何画面回答。</p>
+
+<p>给最小二乘解 \(\hat{\mathbf{x}}\),投影 \(\mathbf{p} = A\hat{\mathbf{x}}\),残差 \(\mathbf{r} = \mathbf{b} - \mathbf{p}\)。这三个向量满足关系</p>
+
+\[
+\mathbf{b} = \mathbf{p} + \mathbf{r},\qquad \mathbf{p}\in\mathrm{Col}(A),\qquad \mathbf{r}\in\mathrm{Col}(A)^\perp = \mathrm{Null}(A^\top).
+\]
+
+<p>由勾股定理(\(\mathbf{p}\) 与 \(\mathbf{r}\) 正交):</p>
+
+\[
+\boxed{\|\mathbf{b}\|^2 \;=\; \|\mathbf{p}\|^2 + \|\mathbf{r}\|^2.}
+\]
+
+<p>这是<strong>误差的几何分解</strong>。把 \(\|\mathbf{b}\|^2\) 想成"总信息",\(\|\mathbf{p}\|^2\) 是"被模型解释的部分",\(\|\mathbf{r}\|^2\) 是"残余的、未被解释的部分"。两者加起来恰好是 \(\|\mathbf{b}\|^2\)。</p>
+
+<p>用夹角的语言:\(\mathbf{b}\) 与子空间 \(\mathrm{Col}(A)\) 之间的"夹角"是 \(\mathbf{b}\) 与它在 \(\mathrm{Col}(A)\) 上投影的夹角 \(\theta\)。从直角三角形 \(\mathbf{0} \to \mathbf{p} \to \mathbf{b}\):</p>
+
+<ul>
+  <li>"邻边" \(\|\mathbf{p}\| = \|\mathbf{b}\|\cos\theta\);</li>
+  <li>"对边" \(\|\mathbf{r}\| = \|\mathbf{b}\|\sin\theta\)。</li>
+</ul>
+
+<p>所以</p>
+
+\[
+\boxed{\|\mathbf{b} - A\hat{\mathbf{x}}\| \;=\; \|\mathbf{r}\| \;=\; \|\mathbf{b}\|\sin\theta.}
+\]
+
+<p>残差长度等于 \(\mathbf{b}\) 的长度乘以"\(\mathbf{b}\) 与 \(\mathrm{Col}(A)\) 的夹角的正弦"。</p>
+
+<p>这个画面统计学家叫做"<strong>方差分解</strong>"。设</p>
+
+\[
+\text{TSS} = \sum (y_i - \bar{y})^2,\qquad \text{ESS} = \sum (\hat{y}_i - \bar{y})^2,\qquad \text{RSS} = \sum (y_i - \hat{y}_i)^2,
+\]
+
+<p>分别是"总平方和"、"被解释平方和"、"残差平方和",则有</p>
+
+\[
+\text{TSS} = \text{ESS} + \text{RSS}.
+\]
+
+<p>这条等式正是上面勾股定理(在去均值之后写出来的版本)——线性代数与统计的语言之间不过是一层翻译。</p>
+
+<p>定义"<strong>决定系数</strong>" \(R^2 = 1 - \text{RSS}/\text{TSS} = \cos^2\theta\)。它在 \([0, 1]\) 之间,告诉你模型能"解释"数据中多少比例的变化。\(R^2 = 1\) 意味着完美拟合;\(R^2 = 0\) 意味着模型一点儿都没解释,等于在用均值预测。这个指标在所有线性回归报告里都会出现,你现在看到它的几何根源:它就是 \(\mathbf{b}\) 在 \(\mathrm{Col}(A)\) 上投影的"分量比例的平方"。</p>
+
+<p>本章讲完了。下一章我们要回到一个未解决的问题:如果给我们一组<strong>非</strong>正交的基,我们怎么把它"打磨"成一组正交基?这就是 Gram-Schmidt 过程——它把上两章的所有"奇迹"(瞬间求坐标、瞬间投影)从"幸运情形"扩展到"通用情形"。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 正交投影</a><a href="ch21.html">下一章 · 第 21 章 Gram-Schmidt 与 QR 分解 →</a></nav>
+
+</main>
+</body>
+</html>

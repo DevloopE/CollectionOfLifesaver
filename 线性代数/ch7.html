@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 张成、线性无关 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 向量空间与子空间</a><a href="ch8.html">下一章 · 第 8 章 基与维数 →</a></nav>
+<h1 id="ch7">第 7 章 张成、线性无关</h1>
+
+<p>第 6 章我们看到，子空间是向量空间内部"自给自足"的封闭子集：含零、加法封闭、数乘封闭。那么它们具体是怎么<em>来</em>的？通常我们手里有<em>几个</em>向量——可能是两三个，可能是一打——我们想知道：把这几个向量及它们的所有"组合"放到一起，得到的是什么？</p>
+
+<p>答案是一个特别自然的子空间，叫做这几个向量的<strong>张成</strong>。一旦你理解了张成，你就掌握了"从向量构造子空间"的标准方法。然后下一个问题立刻浮现：在那几个向量里，有没有"冗余"的——即去掉不影响张成的——向量？这就是<strong>线性无关</strong>的概念。本章把这两个概念建立起来。它们是第 8 章"基"与"维数"两个核心定义的两块原料。</p>
+
+<p>本章你会学到：</p>
+
+<ul>
+<li>什么是线性组合；它的几何含义。</li>
+<li>什么是一组向量的张成；为什么张成必然是子空间。</li>
+<li>张成在 \(\mathbb{R}^2\) 和 \(\mathbb{R}^3\) 中的几何形态——点、线、面、全空间。</li>
+<li>什么是线性无关与线性相关；两套等价描述（"系数全零"与"无人是别人的组合"）。</li>
+<li>怎么用 RREF 判别一组向量是否线性无关。</li>
+<li>一条神奇的事实：在 \(\mathbb{R}^n\) 中超过 \(n\) 个向量必线性相关。</li>
+</ul>
+
+<p>本章的"魂"是：<strong>线性无关 \(=\) 不冗余</strong>。把这五个字记牢，本章一切定义和定理都是它的展开。</p>
+
+<h2 id="sec7-1">7.1 线性组合</h2>
+
+<p>给定向量空间 \(V\) 中的一组向量 \(\mathbf{v}_1, \mathbf{v}_2, \ldots, \mathbf{v}_k\)，以及一组实数 \(c_1, c_2, \ldots, c_k\)，表达式</p>
+
+\[c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \cdots + c_k \mathbf{v}_k\]
+
+<p>叫做这些向量的一个<strong>线性组合</strong>。这里的 \(c_i\) 叫做<em>系数</em>。系数不需要是正的，可以是任意实数（包括零和负数）。</p>
+
+<p>"加权平均"是一个有用的隐喻——但要小心，这里的"权"可正可负且不必之和为 \(1\)，所以严格说不是统计意义上的"加权平均"。把它叫"加权和"更准确，不过"加权平均"作为非正式直觉很顺手：你把每个向量按一个伸缩因子缩放，再首尾相加，得到一个新向量。</p>
+
+<p>具体例子。在 \(\mathbb{R}^2\) 里，取 \(\mathbf{v}_1 = (1, 0)^\top\)、\(\mathbf{v}_2 = (0, 1)^\top\)。线性组合 \(3 \mathbf{v}_1 + 2 \mathbf{v}_2 = (3, 0)^\top + (0, 2)^\top = (3, 2)^\top\)。换组系数：\(-1 \cdot \mathbf{v}_1 + 4 \mathbf{v}_2 = (-1, 4)^\top\)。系数全零：\(0 \cdot \mathbf{v}_1 + 0 \cdot \mathbf{v}_2 = (0, 0)^\top = \mathbf{0}\)。</p>
+
+<p>注意一件事：这两个特殊向量 \((1, 0)^\top\)、\((0, 1)^\top\) 的所有线性组合，<em>恰好覆盖了整个 \(\mathbb{R}^2\)</em>——任意 \((a, b)^\top\) 都可以写成 \(a \mathbf{v}_1 + b \mathbf{v}_2\)。这暗示了"张成"的概念，下一节就要正式定义。</p>
+
+<p>再换一组向量。取 \(\mathbf{v}_1 = (1, 1)^\top\)、\(\mathbf{v}_2 = (2, 2)^\top\)。线性组合 \(c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 = (c_1 + 2c_2, c_1 + 2c_2)^\top\)，两个分量始终相等。所以这组向量的所有线性组合<em>只能</em>是 \((t, t)^\top\) 的形式——一条对角线。完全覆盖不了 \(\mathbb{R}^2\)。原因是 \(\mathbf{v}_2 = 2 \mathbf{v}_1\)，两者共线；多了一个共线的向量并不增加表达能力。这就开始触及"冗余"的概念了，7.4 节我们会精确化它。</p>
+
+<p>多项式空间里同样可以做线性组合。在 \(P_2\) 里取 \(\mathbf{v}_1 = 1\)、\(\mathbf{v}_2 = x\)、\(\mathbf{v}_3 = x^2\)。线性组合 \(c_1 \cdot 1 + c_2 \cdot x + c_3 \cdot x^2 = c_1 + c_2 x + c_3 x^2\)——这正是 \(P_2\) 的<em>所有</em>多项式！所以 \(\{1, x, x^2\}\) 的线性组合覆盖整个 \(P_2\)。</p>
+
+<p>"等等！"——你可能想到——"这些'\(1\)、\(x\)、\(x^2\)'不是数字也不是数列，能算'向量'吗？" 回顾第 6 章：在抽象向量空间的视角下，<em>多项式就是向量</em>。它们的线性组合就是按系数加权再相加，结果还是多项式。一切照常。把抽象代数的眼镜戴稳。</p>
+
+<h2 id="sec7-2">7.2 张成</h2>
+
+<p>给定 \(V\) 中的一组向量 \(\mathbf{v}_1, \ldots, \mathbf{v}_k\)，它们的<strong>张成</strong>定义为它们的所有线性组合构成的集合：</p>
+
+<p>\(\boxed{\mathrm{span}(\mathbf{v}_1, \ldots, \mathbf{v}_k) = \{c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \cdots + c_k \mathbf{v}_k : c_1, \ldots, c_k \in \mathbb{R}\}}\)</p>
+
+<p>这是 \(V\) 中"用这 \(k\) 个向量能表达出来的全体"——每一种可能的系数分配都给出一个 \(V\) 中元素，所有这些元素的总集就是 \(\mathrm{span}\)。</p>
+
+<p>关键的结构性事实：</p>
+
+<p>\(\boxed{\textbf{张成定理：}}\) 对 \(V\) 中任意有限个向量 \(\mathbf{v}_1, \ldots, \mathbf{v}_k\)，\(\mathrm{span}(\mathbf{v}_1, \ldots, \mathbf{v}_k)\) <strong>是 \(V\) 的子空间</strong>。</p>
+
+<p>证明很短，就是 6.5 节的三条款判别。设 \(W = \mathrm{span}(\mathbf{v}_1, \ldots, \mathbf{v}_k)\)。</p>
+
+<p>(1) 取所有系数为零：\(0 \mathbf{v}_1 + \cdots + 0 \mathbf{v}_k = \mathbf{0}\)。所以 \(\mathbf{0} \in W\)。✓</p>
+
+<p>(2) 加法封闭：\((c_1 \mathbf{v}_1 + \cdots + c_k \mathbf{v}_k) + (d_1 \mathbf{v}_1 + \cdots + d_k \mathbf{v}_k) = (c_1 + d_1) \mathbf{v}_1 + \cdots + (c_k + d_k) \mathbf{v}_k\)，仍是 \(\mathbf{v}_i\) 们的线性组合。✓</p>
+
+<p>(3) 数乘封闭：\(t \cdot (c_1 \mathbf{v}_1 + \cdots + c_k \mathbf{v}_k) = (tc_1) \mathbf{v}_1 + \cdots + (tc_k) \mathbf{v}_k\)，仍是线性组合。✓</p>
+
+<p>三条都过，\(W\) 是子空间。✓</p>
+
+<p>请你停下来体会这条定理的意义：<em>任何一组向量都自动张成一个子空间</em>。我们不需要从外面去检查 8 条公理或是 3 条款，"张成"这个构造保证了输出物自动是子空间。这就给了一种<strong>从下而上构造子空间</strong>的标准方法——挑几个向量，取它们的张成，立刻得到一个子空间。</p>
+
+<p>而且这个子空间不是任意的——它是"<strong>包含所有 \(\mathbf{v}_i\) 的最小子空间</strong>"。任何包含所有 \(\mathbf{v}_i\) 的子空间，由封闭性必须包含它们的所有线性组合，所以必须包含 \(\mathrm{span}(\mathbf{v}_1, \ldots, \mathbf{v}_k)\)。</p>
+
+<p>具体的张成实例：</p>
+
+<p><strong>例：</strong>\(\mathrm{span}((1, 0)^\top, (0, 1)^\top)\) 是什么？所有 \(c_1 (1, 0) + c_2 (0, 1) = (c_1, c_2)\)，能得到任何 \(\mathbb{R}^2\) 中的向量。所以 \(\mathrm{span}((1, 0)^\top, (0, 1)^\top) = \mathbb{R}^2\)。</p>
+
+<p><strong>例：</strong>\(\mathrm{span}((1, 1)^\top, (2, 2)^\top)\) 是什么？所有 \(c_1 (1, 1) + c_2 (2, 2) = (c_1 + 2c_2, c_1 + 2c_2)\)——两个分量始终相等。所以张成是 \(\{(t, t)^\top : t \in \mathbb{R}\}\)，一条过原点的对角线。</p>
+
+<p><strong>例：</strong>\(\mathrm{span}(1, x, x^2)\) 在 \(P_2\) 中是什么？所有 \(c_0 + c_1 x + c_2 x^2\)——正是 \(P_2\) 全体。所以 \(\mathrm{span}(1, x, x^2) = P_2\)。</p>
+
+<p>这三个例子展示了张成的两种结局：要么"撑满"原空间（如第一、第三例），要么"塌缩"成更小的子空间（如第二例）。是否撑满取决于这组向量是否"指向真正不同的方向"——即是否线性无关。这正是 7.4 节的主题。</p>
+
+<p>来一个稍稍灵巧的判断题：判定向量 \(\mathbf{b} = (3, 5)^\top\) 是否在 \(\mathrm{span}((1, 1)^\top, (1, 2)^\top)\) 中。</p>
+
+<p>问题翻译为：是否存在 \(c_1, c_2\) 使 \(c_1 (1, 1)^\top + c_2 (1, 2)^\top = (3, 5)^\top\)？这等于解线性方程组</p>
+
+\[\begin{cases} c_1 + c_2 = 3 \\ c_1 + 2 c_2 = 5 \end{cases}\]
+
+<p>第二式减第一式：\(c_2 = 2\)；代回第一式：\(c_1 = 1\)。所以 \(\mathbf{b} = 1 \cdot (1, 1)^\top + 2 \cdot (1, 2)^\top\)，<em>是</em>张成里的元素。✓</p>
+
+<p>这是一种通用技巧：<strong>"\(\mathbf{b}\) 是否在 \(\mathrm{span}(\mathbf{v}_1, \ldots, \mathbf{v}_k)\) 中" \(\iff\) "线性方程组 \(c_1 \mathbf{v}_1 + \cdots + c_k \mathbf{v}_k = \mathbf{b}\) 是否有解" \(\iff\) "把向量拼成矩阵 \(A = [\mathbf{v}_1 | \cdots | \mathbf{v}_k]\) 后方程 \(A \mathbf{c} = \mathbf{b}\) 是否有解"</strong>。第三个等价说法把判断"\(\mathbf{b} \in \mathrm{span}\)"完全归结为求解线性方程组——从而又回到了第 3、4 章的高斯消元法。</p>
+
+<p>用列空间的语言更紧凑：<strong>\(\mathbf{b} \in \mathrm{span}(\mathbf{v}_1, \ldots, \mathbf{v}_k) \iff \mathbf{b} \in \mathrm{Col}(A)\)</strong>，其中 \(A\) 是把 \(\mathbf{v}_i\) 们做列得到的矩阵。换句话说，<em>\(\mathrm{Col}(A)\) 就是 \(A\) 的列向量们的张成</em>——这是 6.6 节列空间定义的另一个角度。</p>
+
+<h2 id="sec7-3">7.3 张成的几何直观</h2>
+
+<p>来把张成画出来。</p>
+
+<p><strong>一个非零向量的张成 \(\mathrm{span}(\mathbf{v})\)。</strong> 所有 \(c \mathbf{v}\)，\(c\) 在 \(\mathbb{R}\) 中跑遍所有实数——这就是从原点出发、经过 \(\mathbf{v}\) 终点的<em>整条直线</em>（包括负方向延长部分）。<em>非零向量的张成总是过原点的一条直线</em>。</p>
+
+<p>如果 \(\mathbf{v} = \mathbf{0}\)，则 \(\mathrm{span}(\mathbf{0}) = \{c \cdot \mathbf{0} : c \in \mathbb{R}\} = \{\mathbf{0}\}\)，只是原点一点。这是退化情形。</p>
+
+<p><strong>两个向量的张成 \(\mathrm{span}(\mathbf{v}_1, \mathbf{v}_2)\)。</strong> 所有 \(c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2\)，两个独立系数自由变化——这是从原点出发、由 \(\mathbf{v}_1\) 和 \(\mathbf{v}_2\) 作为"轴向"展开的<em>整张过原点的平面</em>，<strong>前提是 \(\mathbf{v}_1\) 和 \(\mathbf{v}_2\) 不共线</strong>。</p>
+
+<p>如果 \(\mathbf{v}_2 = c \mathbf{v}_1\)（共线），则 \(c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 = c_1 \mathbf{v}_1 + c c_2 \mathbf{v}_1 = (c_1 + c c_2) \mathbf{v}_1\)，所有线性组合塌缩为 \(\mathbf{v}_1\) 的数乘——只是<em>一条直线</em>。所以"两个向量"在共线情形下张成跟"一个向量"张成的东西是一样的——多余的那一个白加了。</p>
+
+<p>这是一条小预告：当一组向量中有"冗余"——即某个向量是别的线性组合时——张成就不会随着向量数目增多而扩张。这就是 7.4 节"线性无关"概念的几何根源。</p>
+
+<p><strong>三个向量在 \(\mathbb{R}^3\) 中的张成。</strong> 几种可能：</p>
+
+<ul>
+<li>三个共线（互成倍数）：张成是过原点的一条直线。</li>
+<li>三个共面但不全共线：张成是过原点的一张平面。</li>
+<li>三个不共面：张成是整个 \(\mathbb{R}^3\)。</li>
+</ul>
+
+<p>看出规律了吗？<strong>张成的几何尺寸 = 这组向量"独立方向"的数目</strong>。零向量加进来不增加尺寸；共线向量加进来不增加尺寸；不共面向量加进来才增一维。</p>
+
+<p>这条规律精确化之后就是<strong>维数定理</strong>——\(\mathrm{span}(\mathbf{v}_1, \ldots, \mathbf{v}_k)\) 的维数等于 \(\{\mathbf{v}_1, \ldots, \mathbf{v}_k\}\) 中"线性无关向量的最大数目"。这是第 8 章主线，本章先把"线性无关"打磨清楚。</p>
+
+<p>用一张表把 \(\mathbb{R}^2\) 和 \(\mathbb{R}^3\) 的"几何 \(\leftrightarrow\) 张成"对应总结一下：</p>
+
+<table>
+<thead>
+<tr><th>所给向量</th><th>张成的几何</th></tr>
+</thead>
+<tbody>
+<tr><td>\(\mathbb{R}^2\) 中无向量（空集）</td><td>\(\{\mathbf{0}\}\)（仅原点）</td></tr>
+<tr><td>\(\mathbb{R}^2\) 中一个非零向量</td><td>过原点的直线</td></tr>
+<tr><td>\(\mathbb{R}^2\) 中两个不共线向量</td><td>整个 \(\mathbb{R}^2\)</td></tr>
+<tr><td>\(\mathbb{R}^3\) 中一个非零向量</td><td>过原点的直线</td></tr>
+<tr><td>\(\mathbb{R}^3\) 中两个不共线向量</td><td>过原点的平面</td></tr>
+<tr><td>\(\mathbb{R}^3\) 中三个不共面向量</td><td>整个 \(\mathbb{R}^3\)</td></tr>
+</tbody>
+</table>
+
+<p>把这张表内化——做题时立刻就能从"几个向量、张成是什么"切换到"张成的几何是什么"，反向也成立。</p>
+
+<h2 id="sec7-4">7.4 线性无关与线性相关</h2>
+
+<p>现在到了本章心脏部分。让我们把"冗余"这个直觉的概念变成精确的数学定义。</p>
+
+<p>\(\boxed{\textbf{线性无关的定义：}}\) 向量空间 \(V\) 中的一组向量 \(\mathbf{v}_1, \mathbf{v}_2, \ldots, \mathbf{v}_k\) 称为<strong>线性无关</strong>，若线性方程</p>
+
+\[c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \cdots + c_k \mathbf{v}_k = \mathbf{0}\]
+
+<p>的<strong>唯一解是 \(c_1 = c_2 = \cdots = c_k = 0\)</strong>。换言之，<em>把它们组合出零向量的唯一方式是所有系数都取零</em>。</p>
+
+<p>反之，若存在某组<em>不全为零</em>的系数 \((c_1, \ldots, c_k) \neq (0, \ldots, 0)\) 使上式成立，则称这组向量<strong>线性相关</strong>。</p>
+
+<p>这个定义乍看奇怪——为什么是"组合出零"？为什么是"系数全零"？我们一会儿就把它的几何含义解释清楚。先看几个例子上手。</p>
+
+<p><strong>例：</strong>\(\mathbb{R}^2\) 中 \(\mathbf{v}_1 = (1, 0)^\top\)、\(\mathbf{v}_2 = (0, 1)^\top\)。线性方程</p>
+
+\[c_1 \begin{pmatrix} 1 \\ 0 \end{pmatrix} + c_2 \begin{pmatrix} 0 \\ 1 \end{pmatrix} = \begin{pmatrix} c_1 \\ c_2 \end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix}\]
+
+<p>当且仅当 \(c_1 = c_2 = 0\)。唯一解是零解，所以 <strong>线性无关</strong>。</p>
+
+<p><strong>例：</strong>\(\mathbb{R}^2\) 中 \(\mathbf{v}_1 = (1, 1)^\top\)、\(\mathbf{v}_2 = (2, 2)^\top\)。线性方程 \(c_1 (1, 1)^\top + c_2 (2, 2)^\top = (c_1 + 2c_2, c_1 + 2c_2)^\top = (0, 0)^\top\) 等价于 \(c_1 + 2 c_2 = 0\)——只有一条方程，两个未知数，有<em>无穷多</em>非零解（如 \(c_1 = -2, c_2 = 1\)）。所以<strong>线性相关</strong>。</p>
+
+<p><strong>例：</strong>\(\mathbb{R}^3\) 中 \(\mathbf{v}_1 = (1, 0, 0)^\top\)、\(\mathbf{v}_2 = (0, 1, 0)^\top\)、\(\mathbf{v}_3 = (1, 1, 0)^\top\)。线性方程</p>
+
+\[c_1 (1, 0, 0) + c_2 (0, 1, 0) + c_3 (1, 1, 0) = (c_1 + c_3, c_2 + c_3, 0) = (0, 0, 0)\]
+
+<p>给出 \(c_1 + c_3 = 0\)、\(c_2 + c_3 = 0\)、第三式恒成立。设 \(c_3 = 1\)，则 \(c_1 = -1, c_2 = -1\)，验证 \(-1 \cdot (1, 0, 0) - 1 \cdot (0, 1, 0) + 1 \cdot (1, 1, 0) = (0, 0, 0)\) ✓。非零解存在，所以<strong>线性相关</strong>。</p>
+
+<p>注意一下第三个例子。线性相关的几何根源在于 \(\mathbf{v}_3 = \mathbf{v}_1 + \mathbf{v}_2\)——\(\mathbf{v}_3\) 是 \(\mathbf{v}_1\) 和 \(\mathbf{v}_2\) 的线性组合，所以"冗余"。这一观察可以推广为下面这条等价描述。</p>
+
+<p>\(\boxed{\textbf{线性相关的等价描述：}}\) 一组向量 \(\mathbf{v}_1, \ldots, \mathbf{v}_k\) 线性相关，<strong>当且仅当其中至少一个向量是其他向量的线性组合</strong>。</p>
+
+<p><em>证明思路：</em>若 \(\mathbf{v}_j = \sum_{i \neq j} a_i \mathbf{v}_i\)，则 \(\sum a_i \mathbf{v}_i - \mathbf{v}_j = \mathbf{0}\) 是一个非平凡的零组合（\(\mathbf{v}_j\) 的系数 \(-1 \neq 0\)），故线性相关。反之若 \(c_1 \mathbf{v}_1 + \cdots + c_k \mathbf{v}_k = \mathbf{0}\) 有非零系数 \(c_j \neq 0\)，则可解出 \(\mathbf{v}_j = -\frac{1}{c_j} \sum_{i \neq j} c_i \mathbf{v}_i\)，即 \(\mathbf{v}_j\) 是其他向量的线性组合。</p>
+
+<p>这条等价描述把抽象定义翻译成日常语言：<strong>线性相关 = 有冗余成员；线性无关 = 没有冗余成员</strong>。这就是为什么"线性无关 \(\iff\) 不冗余"是本章最重要的一句口诀。</p>
+
+<p>现在再回头看正式定义"\(c_1 \mathbf{v}_1 + \cdots = \mathbf{0}\) 的唯一解是全零"，它的几何含义就清楚了：如果有非零组合得到 \(\mathbf{0}\)，意味着某些向量"互相抵消"——而抵消只可能在它们之间存在线性依赖时才发生。零解永远存在（取所有系数为零自然是 \(\mathbf{0}\)）；定义关心的是<em>有没有别的解</em>。"零解是唯一解"\(\iff\)"无其他依赖关系"\(\iff\)"无冗余"。</p>
+
+<p>几何上，<strong>在 \(\mathbb{R}^n\) 中，线性无关意味着这些向量"指向真正不同的方向"</strong>。对于两个向量，线性无关意味着不共线；对于三个向量，线性无关意味着不共面；对于 \(k\) 个向量，线性无关意味着没有任何一个落在其他 \(k - 1\) 个的张成里。每加进一个向量都"开启了一个新方向"——这是张成的维数能增长的必要条件。</p>
+
+<h3>几个常用的小观察</h3>
+
+<p><strong>(a) 含零向量的集合必线性相关。</strong> 若 \(\mathbf{v}_1 = \mathbf{0}\)，取 \(c_1 = 1, c_2 = \cdots = c_k = 0\)，得到 \(1 \cdot \mathbf{0} + 0 \cdot \mathbf{v}_2 + \cdots = \mathbf{0}\)，是非零系数解。所以线性相关。</p>
+
+<p><strong>(b) 单一非零向量必线性无关。</strong> 若 \(c \mathbf{v} = \mathbf{0}\) 而 \(\mathbf{v} \neq \mathbf{0}\)，则必有 \(c = 0\)。</p>
+
+<p><strong>(c) 两个非零向量线性无关 \(\iff\) 它们不共线（不互成倍数）。</strong> 共线即 \(\mathbf{v}_2 = c \mathbf{v}_1\)，给出 \(c \mathbf{v}_1 - \mathbf{v}_2 = \mathbf{0}\) 这一非零组合。</p>
+
+<p><strong>(d) 子集若线性相关，整组也线性相关。</strong> 子集中的非零组合直接扩成全组的非零组合（其余系数取零）。等价地：<em>线性无关组的任意子集仍线性无关</em>。</p>
+
+<p>这些小观察在解题时反复有用——很多题不必动手算就可以靠 (a)–(d) 直接判定。</p>
+
+<h2 id="sec7-5">7.5 怎么判别线性无关：把向量拼成矩阵</h2>
+
+<p>对于 \(\mathbb{R}^n\) 中的向量，判别线性无关有一套机械流程，完全归结为高斯消元。这就是把"判别线性无关"接入第 3、4 章已有机器的桥梁。</p>
+
+<p>设 \(\mathbf{v}_1, \ldots, \mathbf{v}_k \in \mathbb{R}^n\)。组合方程 \(c_1 \mathbf{v}_1 + \cdots + c_k \mathbf{v}_k = \mathbf{0}\) 等价于矩阵方程</p>
+
+\[A \mathbf{c} = \mathbf{0},\quad A = [\mathbf{v}_1 \mid \mathbf{v}_2 \mid \cdots \mid \mathbf{v}_k] \in \mathbb{R}^{n \times k},\ \mathbf{c} = (c_1, \ldots, c_k)^\top.\]
+
+<p>线性无关的定义说"唯一解是 \(\mathbf{c} = \mathbf{0}\)"——这正是齐次方程 \(A \mathbf{c} = \mathbf{0}\) <em>只有零解</em>。从第 4 章我们知道：</p>
+
+<p><strong>齐次方程 \(A \mathbf{c} = \mathbf{0}\) 只有零解 \(\iff\) \(A\) 的 RREF 中每一列都有主元 \(\iff\) 主元个数 \(=\) \(A\) 的列数 \(k\)</strong>。</p>
+
+<p>所以判别流程是：</p>
+
+<ol>
+<li>把 \(\mathbf{v}_1, \ldots, \mathbf{v}_k\) 作为列拼成 \(n \times k\) 矩阵 \(A\)。</li>
+<li>把 \(A\) 化为 RREF。</li>
+<li>数主元个数。如果 \(=\) 列数 \(k\)，<strong>线性无关</strong>；如果 \(<\) \(k\)，<strong>线性相关</strong>。</li>
+</ol>
+
+<p><strong>例：</strong>判别 \(\mathbf{v}_1 = (1, 2, 3)^\top\)、\(\mathbf{v}_2 = (4, 5, 6)^\top\)、\(\mathbf{v}_3 = (7, 8, 9)^\top\) 在 \(\mathbb{R}^3\) 中是否线性无关。</p>
+
+<p>拼成矩阵</p>
+
+\[A = \begin{pmatrix} 1 & 4 & 7 \\ 2 & 5 & 8 \\ 3 & 6 & 9 \end{pmatrix}.\]
+
+<p>消元：\(R_2 \leftarrow R_2 - 2 R_1\) 得 \((0, -3, -6)\)；\(R_3 \leftarrow R_3 - 3 R_1\) 得 \((0, -6, -12)\)。然后 \(R_3 \leftarrow R_3 - 2 R_2\) 得 \((0, 0, 0)\)。</p>
+
+\[A \to \begin{pmatrix} 1 & 4 & 7 \\ 0 & -3 & -6 \\ 0 & 0 & 0 \end{pmatrix}.\]
+
+<p>主元只有 2 个（列数 \(= 3\)），所以<strong>线性相关</strong>。</p>
+
+<p>验证一下：从 \(R_3 \to 0\) 这件事我们能反推出关系。其实 \(\mathbf{v}_3 - 2 \mathbf{v}_2 + \mathbf{v}_1 = (1 - 8 + 7, 2 - 10 + 8, 3 - 12 + 9) = (0, 0, 0)\)。所以 \(\mathbf{v}_3 = 2 \mathbf{v}_2 - \mathbf{v}_1\)——\(\mathbf{v}_3\) 是 \(\mathbf{v}_1\)、\(\mathbf{v}_2\) 的线性组合，冗余。</p>
+
+<p><strong>例：</strong>判别 \(\mathbf{v}_1 = (1, 0, 1)^\top\)、\(\mathbf{v}_2 = (1, 1, 0)^\top\)、\(\mathbf{v}_3 = (0, 1, 1)^\top\) 是否线性无关。</p>
+
+\[A = \begin{pmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \\ 1 & 0 & 1 \end{pmatrix}.\]
+
+<p>消元：\(R_3 \leftarrow R_3 - R_1\) 得 \((0, -1, 1)\)；\(R_3 \leftarrow R_3 + R_2\) 得 \((0, 0, 2)\)。</p>
+
+\[A \to \begin{pmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \\ 0 & 0 & 2 \end{pmatrix}.\]
+
+<p>三列都有主元，<strong>线性无关</strong>。</p>
+
+<h3>方阵：用行列式</h3>
+
+<p>当向量个数恰好等于维数（即 \(k = n\)，\(A\) 是 \(n \times n\) 方阵）时，可以用行列式判断：</p>
+
+<p><strong>\(\mathbf{v}_1, \ldots, \mathbf{v}_n \in \mathbb{R}^n\) 线性无关 \(\iff \det(A) \neq 0\)</strong>。</p>
+
+<p>这是判别 "\(n\) 个向量在 \(\mathbb{R}^n\) 里"线性无关性的最快方法。\(\det\) 的具体计算与意义留到第 13 章；现在你只要知道这条等价关系。</p>
+
+<p>用上一例：\(A = \begin{pmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \\ 1 & 0 & 1 \end{pmatrix}\)，沿首行展开（这是第 13 章会教的方法）：\(\det = 1 \cdot \det\begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} - 1 \cdot \det\begin{pmatrix} 0 & 1 \\ 1 & 1 \end{pmatrix} + 0 = 1 \cdot 1 - 1 \cdot (-1) = 2 \neq 0\)。所以线性无关——和 RREF 给的结论一致。</p>
+
+<p>对于 \(2 \times 2\) 方阵 \(\begin{pmatrix} a & b \\ c & d \end{pmatrix}\)，行列式 \(= ad - bc\)，记忆门槛极低：两个 \(\mathbb{R}^2\) 向量 \((a, c)^\top\)、\((b, d)^\top\) 线性无关 \(\iff ad - bc \neq 0\)。比如 \((1, 1)^\top\)、\((2, 2)^\top\) 行列式 \(1 \cdot 2 - 1 \cdot 2 = 0\)，相关；\((1, 1)^\top\)、\((1, 2)^\top\) 行列式 \(1 \cdot 2 - 1 \cdot 1 = 1 \neq 0\)，无关。</p>
+
+<h2 id="sec7-6">7.6 \(\mathbb{R}^n\) 中超过 \(n\) 个向量必线性相关</h2>
+
+<p>这是本章最深刻的一条事实，值得反复咀嚼：</p>
+
+<p>\(\boxed{\textbf{鸽笼定理：}}\) 在 \(\mathbb{R}^n\) 中，<strong>任意 \(k\) 个向量，只要 \(k > n\)，必线性相关</strong>。</p>
+
+<p>换言之：\(\mathbb{R}^n\) 里的线性无关组最多有 \(n\) 个向量；想往里面再塞一个，必然破坏无关性。</p>
+
+<p>直观上为什么？因为 \(\mathbb{R}^n\) 的"几何容量"只有 \(n\) 个独立方向。超过 \(n\) 个向量挤进 \(n\) 维空间，必然有人重复地指向已经存在的方向之上的某种组合——也就是说，必然有冗余。</p>
+
+<p>简要论证。设 \(\mathbf{v}_1, \ldots, \mathbf{v}_k \in \mathbb{R}^n\)，\(k > n\)。考察方程 \(c_1 \mathbf{v}_1 + \cdots + c_k \mathbf{v}_k = \mathbf{0}\)，等价于齐次线性方程组 \(A \mathbf{c} = \mathbf{0}\)，\(A\) 是 \(n \times k\) 矩阵（\(n\) 行 \(k\) 列）。</p>
+
+<p>这个齐次方程组有 \(n\) 个方程和 \(k\) 个未知数。方程数 \(n <\) 未知数 \(k\)——由第 4 章关于齐次方程的分析（"未知数比方程多则必有非零解"），这个方程组<em>必有非零解</em>。所以存在某组非零 \((c_1, \ldots, c_k)\) 使组合等于 \(\mathbf{0}\)，<strong>线性相关</strong>。证毕。</p>
+
+<p>更具体地用 RREF 看：\(A\) 是 \(n \times k\)，最多有 \(n\) 个主元（受行数限制）。但有 \(k > n\) 列——总有 \(k - n > 0\) 个"自由列"，对应自由变量，给出 \(k - n\) 维的非零解空间。所以非零解多得很。</p>
+
+<p>这条定理的应用极广。举例：</p>
+
+<ul>
+<li>\(\mathbb{R}^2\) 中 4 个向量必线性相关；\(\mathbb{R}^3\) 中 5 个向量必线性相关。</li>
+<li>\(\mathbb{R}^{100}\) 中 101 个向量必线性相关——不需要看任何具体数据。</li>
+<li>判别题里如果向量个数已经超过维数，连算都不必算，直接答"线性相关"。</li>
+</ul>
+
+<p>这条定理和 7.5 节的"主元数 = 向量数"判别法是同一回事的两个面：当 \(k > n\) 时矩阵 \(A\) 列数比行数多，主元最多 \(n < k\)，必相关。</p>
+
+<p>这个事实第 8 章会推广：在<em>任意</em>有限维向量空间中，超过维数那么多的向量必线性相关——这正是"维数"概念的硬核含义之一。</p>
+
+<h2 id="sec7-7">7.7 综合例题</h2>
+
+<p>来一组综合例题，把本章的工具全部用一遍。</p>
+
+<h3>例 1：判别一组向量是否线性无关</h3>
+
+<p>\(\mathbf{v}_1 = (1, 2, -1)^\top\)、\(\mathbf{v}_2 = (3, 1, 2)^\top\)、\(\mathbf{v}_3 = (-1, 4, -7)^\top\)。线性无关吗？</p>
+
+<p>拼矩阵：</p>
+
+\[A = \begin{pmatrix} 1 & 3 & -1 \\ 2 & 1 & 4 \\ -1 & 2 & -7 \end{pmatrix}.\]
+
+<p>消元。\(R_2 \leftarrow R_2 - 2 R_1\) 得 \((0, -5, 6)\)；\(R_3 \leftarrow R_3 + R_1\) 得 \((0, 5, -8)\)；\(R_3 \leftarrow R_3 + R_2\) 得 \((0, 0, -2)\)。</p>
+
+\[A \to \begin{pmatrix} 1 & 3 & -1 \\ 0 & -5 & 6 \\ 0 & 0 & -2 \end{pmatrix}.\]
+
+<p>三列都有主元，<strong>线性无关</strong>。</p>
+
+<p>另解：方阵，用行列式。沿首列展开：\(\det A = 1 \cdot (1 \cdot (-7) - 4 \cdot 2) - 2 \cdot (3 \cdot (-7) - (-1) \cdot 2) + (-1) \cdot (3 \cdot 4 - (-1) \cdot 1) = (-15) - 2(-19) - 13 = -15 + 38 - 13 = 10 \neq 0\)。线性无关。两种方法一致。</p>
+
+<h3>例 2：判别一个向量是否在张成中</h3>
+
+<p>问 \(\mathbf{b} = (4, 1, 5)^\top\) 是否在 \(\mathrm{span}((1, 1, 1)^\top, (1, -1, 0)^\top)\) 中？</p>
+
+<p>等价于：方程 \(c_1 (1, 1, 1)^\top + c_2 (1, -1, 0)^\top = (4, 1, 5)^\top\) 有解吗？写出</p>
+
+\[\begin{cases} c_1 + c_2 = 4 \\ c_1 - c_2 = 1 \\ c_1 = 5. \end{cases}\]
+
+<p>第三式给 \(c_1 = 5\)。代入第一式：\(c_2 = -1\)；代入第二式：\(5 - (-1) = 6 \neq 1\)，矛盾。所以方程无解，<strong>\(\mathbf{b} \notin \mathrm{span}\)</strong>。</p>
+
+<p>用增广矩阵 + RREF 也可以做：</p>
+
+\[\left( \begin{array}{cc|c} 1 & 1 & 4 \\ 1 & -1 & 1 \\ 1 & 0 & 5 \end{array} \right) \to \cdots\]
+
+<p>消元后会出现"\(0 = \text{非零}\)"的矛盾行，方程无解。</p>
+
+<p>用列空间语言总结：\(\mathbf{b} \notin \mathrm{Col}(A)\)，其中 \(A = [(1,1,1)^\top \mid (1,-1,0)^\top]\)。</p>
+
+<h3>例 3：找张成的几何</h3>
+
+<p>描述 \(W = \mathrm{span}((1, 0, 1)^\top, (2, 1, 3)^\top)\) 的几何形态。</p>
+
+<p>两个向量在 \(\mathbb{R}^3\) 里。先看是否线性无关：第二个是不是第一个的倍数？\(2 \mathbf{v}_1 = (2, 0, 2)^\top \neq (2, 1, 3)^\top\)，不是倍数，所以两个向量不共线，<strong>线性无关</strong>。由 7.3 节几何，\(W\) 是<strong>过原点的一张平面</strong>。</p>
+
+<p>能不能写出这张平面的方程？设平面方程 \(ax + by + cz = 0\)，把 \(\mathbf{v}_1, \mathbf{v}_2\) 都代入：\(a + c = 0\)、\(2a + b + 3c = 0\)。从第一式 \(c = -a\)；代入第二式 \(2a + b - 3a = 0\)，即 \(b = a\)。取 \(a = 1\)，得 \(b = 1\)、\(c = -1\)。所以平面方程是 \(x + y - z = 0\)。</p>
+
+<p>检验：\((1, 0, 1)\) 代入 \(1 + 0 - 1 = 0\) ✓；\((2, 1, 3)\) 代入 \(2 + 1 - 3 = 0\) ✓。完美。所以 \(W = \{(x, y, z) : x + y - z = 0\}\)。</p>
+
+<h3>例 4：判别多项式空间中的线性无关</h3>
+
+<p>问 \(P_2\) 中的多项式 \(p_1(x) = 1 + x\)、\(p_2(x) = x + x^2\)、\(p_3(x) = 1 + x^2\) 是否线性无关？</p>
+
+<p>设 \(c_1 p_1 + c_2 p_2 + c_3 p_3 = 0\)（即零多项式）。展开：</p>
+
+\[c_1 (1 + x) + c_2 (x + x^2) + c_3 (1 + x^2) = (c_1 + c_3) + (c_1 + c_2) x + (c_2 + c_3) x^2 = 0.\]
+
+<p>多项式恒为零意味着各次系数都为零：</p>
+
+\[\begin{cases} c_1 + c_3 = 0 \\ c_1 + c_2 = 0 \\ c_2 + c_3 = 0. \end{cases}\]
+
+<p>从第一式 \(c_3 = -c_1\)；代入第三式 \(c_2 - c_1 = 0\)，即 \(c_2 = c_1\)；代入第二式 \(c_1 + c_1 = 0\)，得 \(c_1 = 0\)，故 \(c_2 = c_3 = 0\)。唯一解全零，<strong>线性无关</strong>。</p>
+
+<p>注意我们没用到任何"\(P_n\) 特有"的技巧——一切归结为<em>系数</em>所满足的线性方程组。这是把抽象向量空间的线性无关问题归约为 \(\mathbb{R}^n\) 问题的标准做法：把每个抽象向量按某组"基本向量"展开成系数列，然后做矩阵判别。我们到第 8 章会把这一做法系统化为"坐标"。</p>
+
+<h3>例 5：用鸽笼定理瞬间判别</h3>
+
+<p>问 \(\mathbf{v}_1 = (1, 2)^\top\)、\(\mathbf{v}_2 = (3, 4)^\top\)、\(\mathbf{v}_3 = (5, 6)^\top\) 是否线性无关？</p>
+
+<p>3 个向量在 \(\mathbb{R}^2\) 中——\(k = 3 > 2 = n\)，由鸽笼定理（7.6 节）<strong>必线性相关</strong>。结束，连算都不必算。</p>
+
+<p>非要找出关系也很容易：\(\mathbf{v}_3 - 2 \mathbf{v}_2 + \mathbf{v}_1 = (5 - 6 + 1, 6 - 8 + 2)^\top = (0, 0)^\top\)，所以 \(\mathbf{v}_3 = 2 \mathbf{v}_2 - \mathbf{v}_1\)。这种"相邻数差为常数"的列向量族总是线性相关。</p>
+
+<h3>例 6：找张成的"精简表示"</h3>
+
+<p>设 \(W = \mathrm{span}((1, 2)^\top, (2, 4)^\top, (3, 6)^\top, (1, 1)^\top)\) 在 \(\mathbb{R}^2\) 里。这个张成是什么？里面有冗余吗？</p>
+
+<p>四个向量在 \(\mathbb{R}^2\) 中，由鸽笼定理必线性相关。具体看：前三个 \((1, 2), (2, 4), (3, 6)\) 互成倍数，都共线，张成<em>它们仨</em>就是 \((1, 2)\) 的数乘——一条过原点的直线。再加上 \((1, 1)\)：与 \((1, 2)\) 不共线（行列式 \(1 \cdot 1 - 2 \cdot 1 = -1 \neq 0\)），所以加进来"开启了第二个方向"，张成扩展到整个 \(\mathbb{R}^2\)。所以 \(W = \mathbb{R}^2\)。</p>
+
+<p>"精简"地讲，\(W = \mathrm{span}((1, 2)^\top, (1, 1)^\top)\)——只用两个就够了。事实上，我们可以从原始四个里挑出任意一个 \((1, 2), (2, 4), (3, 6)\) 的非零代表（比如 \((1, 2)\)）和 \((1, 1)\)，就构成"精简"的张成集合。这种"从给定生成集中筛选出无冗余子集"的思想，正是第 8 章<strong>基</strong>的概念。我们将看到，每一个有限维向量空间都有一种"最经济"的描述，叫作基。</p>
+
+<h3>例 7：综合判断题</h3>
+
+<p>下面四组向量中，哪些是 \(\mathbb{R}^3\) 的子空间，哪些不是？请用 6.5 节三条款判别。</p>
+
+<ol>
+<li>\(W_1 = \{(x, y, z) : 2x - y + z = 0\}\)</li>
+<li>\(W_2 = \{(x, y, z) : x + y + z = 1\}\)</li>
+<li>\(W_3 = \{(x, y, z) : x = y \text{ 且 } y = z\}\)</li>
+<li>\(W_4 = \{(x, y, z) : xyz = 0\}\)</li>
+</ol>
+
+<p>\(W_1\)：齐次线性方程的解集，自动是子空间（参考 6.5 节例 3）。<strong>是子空间</strong>。几何上是过原点的平面，可以写成 \(\mathrm{span}((1, 2, 0)^\top, (0, 1, 1)^\top)\)（系数稍作工就能找到张成集）。</p>
+
+<p>\(W_2\)：非齐次方程，不过原点（\((0, 0, 0)\) 不满足 \(0 = 1\)）。<strong>不是子空间</strong>。几何上是不过原点的平面。</p>
+
+<p>\(W_3\)：等价于"\((x, y, z) = (t, t, t)\)"——过原点的对角线。三条款都过：含原点，加法封闭（\((t, t, t) + (s, s, s) = (t + s, t + s, t + s)\)），数乘封闭。<strong>是子空间</strong>，等于 \(\mathrm{span}((1, 1, 1)^\top)\)。</p>
+
+<p>\(W_4\)：\(xyz = 0\) 意味着 \(x, y, z\) 至少一个为零——几何上是三个坐标平面 \(yz, xz, xy\) 的<em>并集</em>。含原点 ✓。但加法不封闭：\((1, 0, 1) \in W_4\)（\(y = 0\)），\((0, 1, 1) \in W_4\)（\(x = 0\)）。相加得 \((1, 1, 2)\)，乘积 \(1 \cdot 1 \cdot 2 = 2 \neq 0\)，不在 \(W_4\) 里。<strong>不是子空间</strong>。</p>
+
+<p>这道题的教训：<em>非线性约束（如 \(xyz = 0\) 这种乘积型）几乎不可能给出子空间；线性齐次约束几乎总能给出子空间</em>。这条经验法在快速排查时极有用。</p>
+
+<h3>例 8：把张成和线性无关结合起来</h3>
+
+<p>设 \(\mathbf{v}_1, \mathbf{v}_2, \mathbf{v}_3\) 在 \(\mathbb{R}^4\) 中线性无关。问：\(\mathbf{u}_1 = \mathbf{v}_1 + \mathbf{v}_2\)、\(\mathbf{u}_2 = \mathbf{v}_2 + \mathbf{v}_3\)、\(\mathbf{u}_3 = \mathbf{v}_3 + \mathbf{v}_1\) 是否也线性无关？</p>
+
+<p>设 \(c_1 \mathbf{u}_1 + c_2 \mathbf{u}_2 + c_3 \mathbf{u}_3 = \mathbf{0}\)。展开：</p>
+
+\[c_1 (\mathbf{v}_1 + \mathbf{v}_2) + c_2 (\mathbf{v}_2 + \mathbf{v}_3) + c_3 (\mathbf{v}_3 + \mathbf{v}_1) = (c_1 + c_3) \mathbf{v}_1 + (c_1 + c_2) \mathbf{v}_2 + (c_2 + c_3) \mathbf{v}_3 = \mathbf{0}.\]
+
+<p>因为 \(\mathbf{v}_1, \mathbf{v}_2, \mathbf{v}_3\) 线性无关，<em>它们的</em>系数必须全为零：</p>
+
+\[\begin{cases} c_1 + c_3 = 0 \\ c_1 + c_2 = 0 \\ c_2 + c_3 = 0. \end{cases}\]
+
+<p>这是同一个方程组（巧合是个对称的）。从前两式 \(c_2 = c_3\)；代入第三式 \(2 c_3 = 0\)，故 \(c_3 = 0\)，进而 \(c_1 = c_2 = 0\)。唯一全零解，所以 \(\mathbf{u}_1, \mathbf{u}_2, \mathbf{u}_3\) <strong>线性无关</strong>。</p>
+
+<p>这道题揭示一个一般技巧：<em>把抽象向量空间中的线性无关性问题，转化为系数所满足的方程组问题</em>。只要原向量是无关的，系数方程组的非零解情况就完全决定了新向量的无关性。这种"两层"思维是抽象代数推理的标准方式，多练几次会变成本能。</p>
+
+<h3>本章总结</h3>
+
+<p>用一张表把本章的关键概念和判别方法总结如下：</p>
+
+<table>
+<thead>
+<tr><th>概念</th><th>定义 / 判别</th></tr>
+</thead>
+<tbody>
+<tr><td>线性组合</td><td>\(c_1 \mathbf{v}_1 + \cdots + c_k \mathbf{v}_k\)，系数任意实数</td></tr>
+<tr><td>张成 \(\mathrm{span}\)</td><td>所有线性组合的集合；自动是子空间</td></tr>
+<tr><td>"\(\mathbf{b} \in \mathrm{span}\)"</td><td>方程 \(c_1 \mathbf{v}_1 + \cdots = \mathbf{b}\) 有解 \(\iff \mathbf{b} \in \mathrm{Col}(A)\)</td></tr>
+<tr><td>线性无关</td><td>\(c_1 \mathbf{v}_1 + \cdots = \mathbf{0}\) 唯一解全零</td></tr>
+<tr><td>线性无关 \(\iff\) 不冗余</td><td>没有任何向量是其余的线性组合</td></tr>
+<tr><td>RREF 判别</td><td>主元数 \(=\) 向量数 \(\iff\) 无关</td></tr>
+<tr><td>方阵判别</td><td>\(\det A \neq 0 \iff\) 无关（\(k = n\) 时）</td></tr>
+<tr><td>鸽笼定理</td><td>\(\mathbb{R}^n\) 中超过 \(n\) 个向量必相关</td></tr>
+</tbody>
+</table>
+
+<p>第 8 章我们将合并这两个概念。一组向量如果<em>同时</em>张成整个空间又线性无关，就叫做空间的<strong>基</strong>——最经济的"骨架"。每个有限维向量空间的所有基都有相同的元素数目，这个数就是空间的<strong>维数</strong>。基与维数把 \(\mathbb{R}^n\) 中"\(n\) 维"这一含混说法精确化为代数概念，并使我们能够在抽象向量空间（\(P_n\)、\(\mathbb{R}^{m \times n}\)、解空间……）里同样谈论维数——把它们都缩归为某个 \(\mathbb{R}^d\) 的"翻版"。这是抽象向量空间理论的第一次大胜利，请期待。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 向量空间与子空间</a><a href="ch8.html">下一章 · 第 8 章 基与维数 →</a></nav>
+
+</main>
+</body>
+</html>

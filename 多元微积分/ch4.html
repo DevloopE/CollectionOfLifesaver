@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 空间中的运动 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 向量值函数与曲线</a><a href="ch5.html">下一章 · 第 5 章 多元函数 →</a></nav>
+<h1 id="ch4">第 4 章 空间中的运动</h1>
+
+<p>第 3 章里我们把 \(\mathbf{r}(t)\) 当作纯粹的几何对象来研究。这一章我们换一副眼镜:把它读成"<em>某个质点在时刻 \(t\) 的位置</em>"。一旦把时间这个解读放进来,\(\mathbf{r}'(t)\) 立刻就有了一个家喻户晓的名字——<strong>速度</strong>;它的模 \(|\mathbf{r}'(t)|\) 是<strong>速率</strong>;\(\mathbf{r}''(t)\) 是<strong>加速度</strong>。本章里所有这些概念的形式与一元微积分完全一致,只不过现在每一项都是空间中的向量,几何细节因此变得丰富。</p>
+
+<p>真正的新意来自几何这一面:我们要学会量化"<em>这条曲线有多长</em>"(<strong>弧长</strong>)、"<em>这条曲线弯得有多厉害</em>"(<strong>曲率</strong>),以及把任何加速度向量优雅地拆成"<em>提速的那一份</em>"和"<em>转弯的那一份</em>"——也就是切向分量与法向分量。沿途我们还会搭起跟随曲线一起运动的<strong>TNB 标架</strong>:一个由单位切向 \(\mathbf{T}\)、主法向 \(\mathbf{N}\)、副法向 \(\mathbf{B}\) 组成的"小车坐标系"。这一套语言一旦掌握,你看一切运动——卫星轨道、过山车、子弹飞行、电子在磁场里打转——都会变得清晰许多。</p>
+
+<h2 id="sec4-1">4.1 速度、速率与加速度</h2>
+
+<p>我们从最基本的定义开始。设质点的位置为 \(\mathbf{r}(t) = \langle x(t),\ y(t),\ z(t)\rangle\),那么:</p>
+
+<ul>
+<li><strong>速度</strong>(向量):\(\mathbf{v}(t) = \mathbf{r}'(t) = \langle x'(t),\ y'(t),\ z'(t)\rangle\)。它指向当前的运动方向,长度等于当前速率。</li>
+<li><strong>速率</strong>(标量):\(v(t) = |\mathbf{v}(t)| = \sqrt{x'(t)^2 + y'(t)^2 + z'(t)^2}\)。它是"现在跑多快",一个非负数。</li>
+<li><strong>加速度</strong>(向量):\(\mathbf{a}(t) = \mathbf{v}'(t) = \mathbf{r}''(t)\)。它告诉你"速度向量正在如何改变",其中可能既包含速率的改变,也包含方向的改变。</li>
+</ul>
+
+<p>速率和速度的区别非常关键,绝不只是文字游戏:速率只关心"快慢",速度同时关心"快慢和方向"。一辆车以 60 mph 向北行驶,另一辆以 60 mph 向南行驶;它们的<em>速率</em>相等,但<em>速度</em>正好相反——速度向量符号都翻了。这种区分很容易在叙述题里被混淆,务必养成"看到 v 是向量,看到 |v| 才是标量"的反射。</p>
+
+<p>看一道具体题。设质点位置为 \(\mathbf{r}(t) = \langle t^2, t^3, t\rangle\),要求 \(t = 1\) 时的速度、速率与加速度。把每一步小心地走一遍:速度向量为 \(\mathbf{v}(t) = \langle 2t,\ 3t^2,\ 1\rangle\),代入 \(t = 1\) 得 \(\mathbf{v}(1) = \langle 2, 3, 1\rangle\)。速率是它的模:\(|\mathbf{v}(1)| = \sqrt{4 + 9 + 1} = \sqrt{14}\)。再求加速度:\(\mathbf{a}(t) = \langle 2,\ 6t,\ 0\rangle\),代入得 \(\mathbf{a}(1) = \langle 2, 6, 0\rangle\)。</p>
+
+<p>注意一个值得展开的小观察:加速度向量 \(\langle 2, 6, 0 \rangle\) 与速度向量 \(\langle 2, 3, 1\rangle\) <strong>不平行</strong>——它们也不垂直。这意味着加速度既有沿速度方向的分量(导致速率变化),也有垂直于速度方向的分量(导致方向变化)。换句话说,这位质点既在<em>提速</em>,又在<em>转弯</em>。我们将在 4.5 节用 \(a_T, a_N\) 把这两件事干净地分开。</p>
+
+<p>再看一道不同风格的:\(\mathbf{r}(t) = \langle 3\cos t,\ 3\sin t,\ 4t\rangle\),这是螺旋线的一个变种(半径 3,每圈上升 \(8\pi\))。求速度、速率与加速度。\(\mathbf{v}(t) = \langle -3\sin t,\ 3\cos t,\ 4\rangle\);速率为 \(|\mathbf{v}| = \sqrt{9\sin^2 t + 9\cos^2 t + 16} = \sqrt{9 + 16} = \sqrt{25} = 5\),与 \(t\) 无关——质点以恒定速率 5 在螺旋线上盘绕。加速度为 \(\mathbf{a}(t) = \langle -3\cos t,\ -3\sin t,\ 0\rangle\),它的模是 \(\sqrt{9\cos^2 t + 9\sin^2 t + 0} = 3\),也是常数。这位质点不提速,也不减速,但持续以 \(|\mathbf{a}| = 3\) 的强度<em>转向</em>。这就是均匀圆周运动(更准确地说,是均匀螺旋运动)的特征:速率恒定,加速度全部用于改变方向。</p>
+
+<p>第三个例子:把一颗石子向上抛,初速 \(\mathbf{v}_0 = \langle 1, 0, 10\rangle\) m/s,只受重力 \(\mathbf{g} = \langle 0, 0, -9.8\rangle\) m/s\(^2\)。位置函数(假设 \(t = 0\) 时在原点)就是</p>
+
+<p>\[\mathbf{r}(t) = \mathbf{v}_0 t + \tfrac{1}{2}\mathbf{g} t^2 = \langle t,\ 0,\ 10t - 4.9 t^2\rangle.\]</p>
+
+<p>速度 \(\mathbf{v}(t) = \langle 1,\ 0,\ 10 - 9.8 t\rangle\);加速度 \(\mathbf{a}(t) = \langle 0, 0, -9.8\rangle\),恒为重力。这是"匀加速运动"在向量语言下的样子——加速度恒定,速度线性变化,位置是二次的。这也是抛体运动的标准模型。</p>
+
+<h2 id="sec4-2">4.2 弧长</h2>
+
+<p>很自然的下一个问题:从 \(t = a\) 到 \(t = b\),质点究竟<em>走了多远</em>?注意是"走了多远",不是"位移多少"——位移只关心起点终点,走了多远要把每一段路径长度都加起来。</p>
+
+<p>这种"积小成大"的事情正是积分干的活,我们用<em>无穷小</em>的图像来导出公式。设想把时间 \(t\) 切成无数个小段,每段长 \(dt\)。在长度为 \(dt\) 的微小时间间隔里,质点几乎走了一段直的小线段;这段小线段的长度就是 \(|\mathbf{r}'(t)|\,dt = v(t)\,dt\)——速率乘以时间间隔,正是"距离 = 速率 × 时间"在无穷小尺度下的化身。把所有微小段加起来,就得到</p>
+
+<p>\[\boxed{L = \int_a^b |\mathbf{r}'(t)|\, dt = \int_a^b \sqrt{x'(t)^2 + y'(t)^2 + z'(t)^2}\, dt.}\]</p>
+
+<p>一句口诀:<strong>弧长就是速率对时间的积分</strong>。和你在一元微积分里学的"路程是速率的积分" \(\int v\,dt\) 完全一致,只不过现在 \(v(t)\) 是三个分量平方和开根号的"空间速率"。</p>
+
+<p>来个例子,先用螺旋线试手。求 \(\mathbf{r}(t) = \langle \cos t, \sin t, t\rangle\) 在 \(t \in [0, 2\pi]\) 上的弧长。先算速率:\(\mathbf{r}'(t) = \langle -\sin t, \cos t, 1\rangle\),\(|\mathbf{r}'(t)| = \sqrt{\sin^2 t + \cos^2 t + 1} = \sqrt{2}\),恒等于 \(\sqrt{2}\)。所以</p>
+
+<p>\[L = \int_0^{2\pi} \sqrt{2}\,dt = 2\pi\sqrt{2}.\]</p>
+
+<p>验证一下:螺旋线每转一圈水平方向走单位圆周长 \(2\pi\),与此同时竖直方向上升 \(2\pi\)(因为 \(z = t\),从 \(0\) 到 \(2\pi\) 涨了 \(2\pi\))。如果你把螺旋线"剥开"摊到平面上,它就是一条水平 \(2\pi\)、竖直 \(2\pi\) 的斜边,由勾股定理斜边长为 \(\sqrt{(2\pi)^2 + (2\pi)^2} = 2\pi\sqrt{2}\)。完美吻合。</p>
+
+<p>再做一个:抛物线 \(\mathbf{r}(t) = \langle t,\ t^2,\ 0\rangle\) 从 \(t = 0\) 到 \(t = 1\)。\(\mathbf{r}'(t) = \langle 1,\ 2t,\ 0\rangle\),\(|\mathbf{r}'(t)| = \sqrt{1 + 4t^2}\)。所以</p>
+
+<p>\[L = \int_0^1 \sqrt{1 + 4t^2}\,dt.\]</p>
+
+<p>这个积分需要点功夫(三角换元 \(2t = \tan\theta\) 或者直接用双曲换元),最终结果是 \(L = \tfrac{1}{2}\sqrt{5} + \tfrac{1}{4}\ln(2 + \sqrt{5})\)。要点不在于算到底,而在于<em>能把弧长表达式写下来</em>,这一步几乎从不出错。真正的难度往往压在底下那个一元积分上,而那是一元微积分的事。</p>
+
+<p>第三个,考虑椭圆 \(\mathbf{r}(t) = \langle a\cos t, b\sin t, 0\rangle\) 一周的弧长。\(\mathbf{r}'(t) = \langle -a\sin t, b\cos t, 0\rangle\),\(|\mathbf{r}'(t)| = \sqrt{a^2 \sin^2 t + b^2 \cos^2 t}\),所以</p>
+
+<p>\[L = \int_0^{2\pi} \sqrt{a^2 \sin^2 t + b^2 \cos^2 t}\,dt.\]</p>
+
+<p>这个积分实际上不能用初等函数表达,它就是著名的"<em>椭圆积分</em>",名字就是从这儿来的。不能写成初等函数并不丢人——它依然是一个完美的、可数值计算的量。注意当 \(a = b = r\) 退化成圆时,被积函数化为 \(\sqrt{r^2(\sin^2 t + \cos^2 t)} = r\),积分给出 \(2\pi r\),与你熟悉的"圆周长 \(2\pi r\)" 一致。</p>
+
+<p>这里要拨开一个非常容易引起混乱的迷雾:<strong>弧长依赖的是曲线本身,不依赖你用的参数化方式</strong>。如果你把 \(t\) 换成 \(2t\),你会以两倍的速率沿同一条曲线走;但被积函数 \(|\mathbf{r}'|\) 会乘 2,而积分上下限会缩半,两者抵消,最终结果不变。<em>必然不变</em>:曲线本身没变,长度怎么会变。</p>
+
+<p>把这件事亲手做一遍最有说服力。把上面那个螺旋线重新参数化为 \(\mathbf{r}(s) = \langle \cos(2s), \sin(2s), 2s\rangle\),其中 \(s \in [0, \pi]\)。求导得 \(\mathbf{r}'(s) = \langle -2\sin(2s), 2\cos(2s), 2\rangle\),模为 \(\sqrt{4\sin^2(2s) + 4\cos^2(2s) + 4} = \sqrt{8} = 2\sqrt{2}\)。所以 \(L = \int_0^\pi 2\sqrt{2}\,ds = 2\sqrt{2}\cdot\pi = 2\pi\sqrt{2}\),与之前完全一样。这就是"几何量与参数化无关"的定理在我们手底下兑现。</p>
+
+<h3 id="sec4-2-1">弧长参数化</h3>
+
+<p>在所有可能的参数化里,有一种特别"标准":用<em>已经走过的弧长</em>本身做参数。具体地说,如果一个参数 \(s\) 满足 \(|\mathbf{r}'(s)| = 1\) 处处成立——也就是说你以恒定速率 1 沿曲线行走——我们就说 \(\mathbf{r}(s)\) 是<strong>弧长参数化</strong>。这种参数化里,参数 \(s\) 直接读出"已走过的距离"。习惯上记号也跟着变:用 \(s\) 而不用 \(t\),既提醒读者参数有特殊含义,也避免与时间混淆。</p>
+
+<p>怎么从一般参数化 \(\mathbf{r}(t)\) 转成弧长参数化?套路上分三步:</p>
+
+<ol>
+<li>计算到时刻 \(t\) 已走过的弧长 \(s(t) = \int_a^t |\mathbf{r}'(\tau)|\, d\tau\)。这是个一元函数,\(s\) 从 0 单调上升。</li>
+<li>把这个关系反解,得到 \(t\) 是 \(s\) 的函数 \(t = t(s)\)。</li>
+<li>代回原参数化:\(\mathbf{r}(s) := \mathbf{r}(t(s))\)。</li>
+</ol>
+
+<p>原则上完美,实操中第二步几乎总是地狱——\(s(t)\) 经常是个不能用初等函数反解的积分。所以我们其实<em>很少</em>真去把弧长参数化算出来;它的价值在于<em>理论</em>层面,许多公式(尤其是关于曲率的)在弧长参数化下表达起来才最干净。把它当一个"理想化的标准坐标"来理解,在心中保留它,是有用的。</p>
+
+<p>在那少数能算出来的例子里,螺旋线是首选。我们刚算过 \(|\mathbf{r}'(t)| = \sqrt{2}\) 是常数,所以 \(s(t) = \int_0^t \sqrt{2}\,d\tau = \sqrt{2}\,t\),反解得 \(t = s/\sqrt{2}\)。代回去就是螺旋线的弧长参数化:</p>
+
+<p>\[\mathbf{r}(s) = \langle \cos(s/\sqrt{2}),\ \sin(s/\sqrt{2}),\ s/\sqrt{2}\rangle.\]</p>
+
+<p>验证一下:对 \(s\) 求导,\(\mathbf{r}'(s) = \tfrac{1}{\sqrt{2}}\langle -\sin(s/\sqrt{2}),\ \cos(s/\sqrt{2}),\ 1\rangle\),其模为 \(\tfrac{1}{\sqrt{2}}\sqrt{1 + 1} = 1\)。漂亮,正是单位速率。这种"运气"建立在原速率本身就是常数上;如果原速率是个变化函数,反解几乎总是写不出闭式。但即便写不出来,弧长参数化作为概念依然存在,而且是接下来定义曲率时最自然的视角。</p>
+
+<h2 id="sec4-3">4.3 单位切向量与曲率</h2>
+
+<p>3.5 节末尾我们已经定义过<strong>单位切向量</strong></p>
+
+<p>\[\mathbf{T}(t) = \frac{\mathbf{r}'(t)}{|\mathbf{r}'(t)|}.\]</p>
+
+<p>它的模恒为 1,方向沿着曲线"前进方向"。它把"快慢"信息扔掉,只留下"朝哪走"。这是描述曲线<em>方向</em>变化的纯粹工具——而曲线弯得多厉害,本质上就是它的方向变化得多快。</p>
+
+<p>这就把我们引到本节核心:<strong>曲率</strong>。直观地说,曲率衡量的是"方向随路程改变的快慢"。如果你沿一条曲线走一个单位长度的弧,你的前进方向旋转了多少角度?旋转得多——曲率大;几乎没旋转——曲率小;干脆是直线——曲率为零。把这个直觉转写成公式,就是</p>
+
+<p>\[\boxed{\kappa = \left|\frac{d\mathbf{T}}{ds}\right|.}\]</p>
+
+<p>这里的 \(s\) 是弧长参数;\(d\mathbf{T}/ds\) 是单位切向量对弧长的导数,刻画 \(\mathbf{T}\) 转动的速度。我们取它的模(因为方向以后由 \(\mathbf{N}\) 来记录),就得到曲率。注意单位:\(d\mathbf{T}\) 是无量纲(单位向量),\(ds\) 是长度,所以 \(\kappa\) 的单位是 1/长度。这与下面要看到的"\(\kappa = 1/R\)"完美一致——曲率的倒数就是某个长度。</p>
+
+<p>这个定义干净漂亮,但有一个实际问题:它是关于<em>弧长</em> \(s\) 的导数,而我们手上常常没有弧长参数化。怎么办?用链式法则把它转回到原参数 \(t\) 上。注意 \(\dfrac{d\mathbf{T}}{dt} = \dfrac{d\mathbf{T}}{ds} \cdot \dfrac{ds}{dt}\),而 \(\dfrac{ds}{dt} = |\mathbf{r}'(t)|\)(刚才弧长公式给出的)。所以</p>
+
+<p>\[\left|\frac{d\mathbf{T}}{ds}\right| = \frac{|d\mathbf{T}/dt|}{|ds/dt|} = \frac{|\mathbf{T}'(t)|}{|\mathbf{r}'(t)|},\]</p>
+
+<p>即 \(\kappa = |\mathbf{T}'(t)|/|\mathbf{r}'(t)|\)。这个能算:先求 \(\mathbf{T}\) 关于 \(t\) 的导数,取模,再除以速率。</p>
+
+<p>但还有一个更省事的版本,根本不需要先把 \(\mathbf{T}\) 显式写出来:</p>
+
+<p>\[\boxed{\kappa = \frac{|\mathbf{r}'(t) \times \mathbf{r}''(t)|}{|\mathbf{r}'(t)|^3}.}\]</p>
+
+<p>这是处理曲率题目的<em>主力公式</em>:你只要算 \(\mathbf{r}'\) 和 \(\mathbf{r}''\)、做一次叉积、取模、除以速率的立方,就完成了。它的推导(把 \(\mathbf{T} = \mathbf{r}'/|\mathbf{r}'|\) 求导后整理)在附录 A.5 给出,这里我们直接拿来用。</p>
+
+<p>在动手之前,先把曲率的几何含义稳稳落地,这样你对算出来的数才有"那当然如此"的感受:</p>
+
+<ul>
+<li>直线处处 \(\kappa = 0\)。直线根本不转向,方向恒定,所以 \(d\mathbf{T}/ds = \mathbf{0}\)。</li>
+<li>半径为 \(R\) 的圆,处处 \(\kappa = 1/R\)。这是个非常重要的"参照单位",我们马上验证它。</li>
+<li>\(\kappa\) 的单位是 1/长度,所以 \(\rho := 1/\kappa\) 是个长度,叫<strong>曲率半径</strong>。它的几何含义:在曲线的任一点处,曲线被一个半径为 \(\rho\) 的圆"贴身近似"——这个圆叫做<strong>密切圆</strong>(osculating circle),它是与曲线在该点接触最紧的圆。</li>
+</ul>
+
+<p>来看为什么半径 \(R\) 的圆有 \(\kappa = 1/R\)。考虑 \(\mathbf{r}(t) = \langle R\cos t, R\sin t, 0\rangle\)。先看几何:你以恒定的角速度走在圆上,每走一段弧 \(ds = R\,d\theta\),你的方向角就变 \(d\theta\)——所以单位弧长上方向变化是 \(d\theta/ds = 1/R\)。这正是曲率的几何定义,直接给出 \(\kappa = 1/R\)。再用公式验算一下:\(\mathbf{r}'(t) = \langle -R\sin t, R\cos t, 0\rangle\),\(|\mathbf{r}'| = R\);\(\mathbf{r}''(t) = \langle -R\cos t, -R\sin t, 0\rangle\)。算叉积:</p>
+
+<p>\[\mathbf{r}' \times \mathbf{r}'' = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ -R\sin t & R\cos t & 0 \\ -R\cos t & -R\sin t & 0 \end{vmatrix} = \langle 0, 0, R^2 \sin^2 t + R^2 \cos^2 t\rangle = \langle 0, 0, R^2\rangle.\]</p>
+
+<p>所以 \(|\mathbf{r}' \times \mathbf{r}''| = R^2\),且 \(|\mathbf{r}'|^3 = R^3\),代入主力公式得 \(\kappa = R^2/R^3 = 1/R\),与几何论证一致。这非常令人安心:小圆弯得急(\(\kappa\) 大),大圆弯得缓(\(\kappa\) 小);如果让 \(R \to \infty\),圆退化成直线,\(\kappa \to 0\),完全合理。</p>
+
+<p>再算一道:螺旋线 \(\mathbf{r}(t) = \langle \cos t, \sin t, t\rangle\) 的曲率。我们已经知道 \(\mathbf{r}'(t) = \langle -\sin t, \cos t, 1\rangle\),\(|\mathbf{r}'| = \sqrt{2}\)。\(\mathbf{r}''(t) = \langle -\cos t, -\sin t, 0\rangle\)。算叉积:</p>
+
+<p>\[\mathbf{r}'\times\mathbf{r}'' = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ -\sin t & \cos t & 1 \\ -\cos t & -\sin t & 0 \end{vmatrix}.\]</p>
+
+<p>逐分量展开:\(\mathbf{i}\) 分量为 \(\cos t \cdot 0 - 1\cdot(-\sin t) = \sin t\);\(\mathbf{j}\) 分量为 \(-[(-\sin t)\cdot 0 - 1\cdot(-\cos t)] = -\cos t\);\(\mathbf{k}\) 分量为 \((-\sin t)(-\sin t) - \cos t\cdot(-\cos t) = \sin^2 t + \cos^2 t = 1\)。所以 \(\mathbf{r}'\times\mathbf{r}'' = \langle \sin t, -\cos t, 1\rangle\),其模为 \(\sqrt{\sin^2 t + \cos^2 t + 1} = \sqrt{2}\)。代入主力公式:</p>
+
+<p>\[\kappa = \frac{\sqrt{2}}{(\sqrt{2})^3} = \frac{\sqrt{2}}{2\sqrt{2}} = \frac{1}{2}.\]</p>
+
+<p>所以螺旋线<em>每一点</em>的曲率都是 \(\kappa = 1/2\),曲率半径 \(\rho = 2\)。注意一个非常容易被误读的地方:这个 \(\rho = 2\) 并<strong>不是</strong>螺旋线所绕的柱面半径(那个是 1)。螺旋线弯得比平面上半径 1 的圆要"缓"一些,因为它一边绕一边在向上爬,这个上爬"分散"了一部分弯曲——所以它的密切圆比 1 大,\(\rho = 2\)。这种"几何要从三维真正看,不要只看水平投影"的感觉,需要你慢慢培养。</p>
+
+<p>再看一道,体会曲率随位置变化:\(\mathbf{r}(t) = \langle t,\ t^2,\ 0\rangle\),抛物线 \(y = x^2\) 的标准参数化。\(\mathbf{r}'(t) = \langle 1, 2t, 0\rangle\),\(|\mathbf{r}'| = \sqrt{1 + 4t^2}\);\(\mathbf{r}''(t) = \langle 0, 2, 0\rangle\)。算叉积,因为只有 \(z\) 分量非零(其他坐标都在 \(xy\) 平面),展开后 \(\mathbf{r}' \times \mathbf{r}'' = \langle 0, 0, 1\cdot 2 - 2t \cdot 0\rangle = \langle 0, 0, 2\rangle\),模为 \(2\)。代入:</p>
+
+<p>\[\kappa(t) = \frac{2}{(1 + 4t^2)^{3/2}}.\]</p>
+
+<p>在 \(t = 0\)(即抛物线的顶点)处,\(\kappa(0) = 2\),曲率半径 \(\rho = 1/2\)——这正是抛物线在顶点处的密切圆半径。在 \(|t|\) 很大处,\(\kappa \to 0\),曲率半径很大,曲线渐渐"拉直"。这与你的视觉印象完全一致:抛物线在顶点弯得最厉害,远处越来越平。</p>
+
+<h2 id="sec4-4">4.4 法向量与副法向量;TNB 标架</h2>
+
+<p>到这里我们已经有了一个伴随曲线的方向: \(\mathbf{T}(t)\),沿曲线前进。一个方向并不足以描述曲线的局部姿态——我们还需要"曲线在这一点正向哪一侧弯"。这就引出第二个伴随向量:<strong>主法向量</strong> \(\mathbf{N}\)。再加上由两者叉积自动产生的<strong>副法向量</strong> \(\mathbf{B}\),我们就有了一个跟随质点一起翻滚旋转的<strong>右手正交标架</strong>,叫做<strong>TNB 标架</strong>(也叫 Frenet–Serret 标架)。</p>
+
+<p>形式上,三个向量这样定义:</p>
+
+<ul>
+<li>单位切向: \(\mathbf{T}(t) = \mathbf{r}'(t)/|\mathbf{r}'(t)|\)。</li>
+<li>主法向: \(\mathbf{N}(t) = \mathbf{T}'(t)/|\mathbf{T}'(t)|\)。</li>
+<li>副法向: \(\mathbf{B}(t) = \mathbf{T}(t) \times \mathbf{N}(t)\)。</li>
+</ul>
+
+<p>每一个都是单位向量,且两两正交。下面我们一一解释为什么这样定义最合理。</p>
+
+<p>先看 \(\mathbf{N}\)。我们说"\(\mathbf{T}'\) 与 \(\mathbf{T}\) 垂直",这一点立刻就由 3.3 节末尾的"球面 + 求导 = 垂直"事实给出:\(\mathbf{T}\) 是单位向量,所以 \(|\mathbf{T}|^2 = 1\) 是常数,对 \(t\) 求导得 \(2\mathbf{T}\cdot \mathbf{T}' = 0\),即 \(\mathbf{T}' \perp \mathbf{T}\)。把 \(\mathbf{T}'\) 除以它自己的模就得到 \(\mathbf{N}\),它仍然垂直于 \(\mathbf{T}\),长度为 1。</p>
+
+<p>\(\mathbf{N}\) 的几何含义非常重要:它是<em>曲线正在弯向的那一侧</em>。想象你开车沿一条弯路走,\(\mathbf{T}\) 永远指向车头方向,而 \(\mathbf{N}\) 总是指向"<em>你现在正在转向的内侧</em>"——比如你向左转弯,\(\mathbf{N}\) 就指向你的左手边。所以 \(\mathbf{N}\) 自动"知道"曲线弯向何方。这一点对于物理学来说极其重要,稍后讨论加速度分解时会反复用到。</p>
+
+<p>再看 \(\mathbf{B} = \mathbf{T}\times \mathbf{N}\)。叉积自动给出与 \(\mathbf{T}\) 和 \(\mathbf{N}\) 都垂直的向量,且按右手法则定向。两个单位且互相垂直的向量叉积仍是单位向量,所以 \(|\mathbf{B}| = 1\)。这就完成了三脚架:\((\mathbf{T}, \mathbf{N}, \mathbf{B})\) 在每一点处都构成一个跟随曲线翻滚的右手正交坐标系。</p>
+
+<p>为了把这种跟随感真正抓住,把它想成一台小车在曲线上跑:车头方向是 \(\mathbf{T}\)、车的左侧(假设车朝左转)是 \(\mathbf{N}\)、车顶向上的方向是 \(\mathbf{B}\)。三者随车一起翻滚旋转,在每一点都给你一个"局部坐标系"。这个标架不是空间的固定坐标系,而是与曲线绑定、和曲线一起运动的——这一点是它最特别的地方。</p>
+
+<p>三个标架向量两两正交,因此它们也张成三个互相正交的平面,各有名字:</p>
+
+<ul>
+<li>\(\mathbf{T}\) 与 \(\mathbf{N}\) 张成<strong>密切平面</strong>(osculating plane)。曲线在这一点的<em>密切圆</em>就躺在这个平面里,也是局部上"曲线最贴近的平面"。</li>
+<li>\(\mathbf{N}\) 与 \(\mathbf{B}\) 张成<strong>法平面</strong>。它垂直于运动方向,把曲线"切断"——所有垂直于切线的方向都在里面。</li>
+<li>\(\mathbf{T}\) 与 \(\mathbf{B}\) 张成<strong>纠正平面</strong>(rectifying plane)。这是相对少见的概念,在某些挠率讨论里会出现,大多数本科课程不会考。</li>
+</ul>
+
+<p>实际计算中,我们大多并不需要把整个 TNB 标架显式写出来——代数往往很重,叉积、模、再求导,层层叠叠。它的真正用处是为下一节的"加速度分解"提供一个干净的几何坐标系,在物理上把"提速 vs 转向"分得清清楚楚。具体的 TNB 算例,如果有兴趣,可以挑一道简单的题目(比如 \(\mathbf{r}(t) = \langle \cos t, \sin t, 0\rangle\),你会得到 \(\mathbf{T} = \langle -\sin t, \cos t, 0\rangle, \mathbf{N} = \langle -\cos t, -\sin t, 0\rangle, \mathbf{B} = \langle 0, 0, 1\rangle\),可以验证三者两两正交且模为 1)亲手算一遍,熟悉一下流程就够。</p>
+
+<h2 id="sec4-5">4.5 加速度的切向分量与法向分量</h2>
+
+<p>这一节是本章的高潮。我们要做的事情是:把任何一个加速度向量 \(\mathbf{a}\) 优雅地分解成两份——一份沿着 \(\mathbf{T}\) 方向(改变速率的那一份),一份沿着 \(\mathbf{N}\) 方向(改变方向的那一份)。换句话说,</p>
+
+<p>\[\mathbf{a} = a_T \mathbf{T} + a_N \mathbf{N},\]</p>
+
+<p>其中 \(a_T\) 是<strong>切向分量</strong>(标量),\(a_N\) 是<strong>法向分量</strong>(标量,我们会把它取作非负)。</p>
+
+<p>物理直觉极其清晰,而且非常优美。开车做类比:</p>
+
+<ul>
+<li>\(a_T\) 是<em>油门和刹车</em>的效果——它让车子<em>提速</em>(\(a_T > 0\))或<em>减速</em>(\(a_T < 0\))。它沿着行进方向 \(\mathbf{T}\)。</li>
+<li>\(a_N\) 是<em>方向盘</em>的效果——它让车子<em>转向</em>。它沿着 \(\mathbf{N}\),也就是车正在弯向的那一侧,因此 \(a_N\) 取作非负数(已经把"哪边"的信息让 \(\mathbf{N}\) 去管了)。</li>
+</ul>
+
+<p>这两件事是物理上独立的两个动作:你可以只踩油门(直线加速,\(a_N = 0\));也可以匀速绕弯(只有方向变,\(a_T = 0\));也可以同时踩油门 + 打方向盘(两者都不为零)。把加速度分成这两份,是<em>看清运动学发生了什么</em>的最直接方式。</p>
+
+<p>注意一件事——加速度向量里没有 \(\mathbf{B}\) 分量。也就是说,<strong>加速度永远在密切平面内</strong>。直观原因:曲线在局部就躺在它的密切平面里,任何"出平面"的加速度都没法让你留在曲线上。这件事在后面的论证里会自动验证。</p>
+
+<p>怎么算 \(a_T, a_N\)?有非常干净的公式:</p>
+
+<p>\[\boxed{a_T = \frac{\mathbf{r}'(t)\cdot \mathbf{r}''(t)}{|\mathbf{r}'(t)|}, \qquad a_N = \frac{|\mathbf{r}'(t)\times \mathbf{r}''(t)|}{|\mathbf{r}'(t)|}.}\]</p>
+
+<p>这两个公式只用 \(\mathbf{r}'\) 和 \(\mathbf{r}''\),不需要先求 \(\mathbf{T}, \mathbf{N}\)——这是天大的好消息,因为显式求 \(\mathbf{N}\) 通常很贵。</p>
+
+<p>更妙的是,\(a_N\) 还有一个等价表达,把它和曲率联系了起来:</p>
+
+<p>\[a_N = \kappa\,|\mathbf{r}'|^2 = \kappa\,v^2.\]</p>
+
+<p>看到这一行你可能觉得似曾相识——这正是物理课上"<em>向心加速度</em> \(v^2/R\)"那个公式!回忆一下:在半径 \(R\) 的圆上以速率 \(v\) 做匀速圆周运动,向心加速度为 \(v^2/R\)。这里 \(\kappa = 1/R\),所以 \(\kappa v^2 = v^2/R\),完全一致。这不是巧合:本章的曲率 \(\kappa\) 正是为了把"圆周运动的弯曲程度"推广到任意曲线而定义的,所以"向心加速度"在我们语言里就是 \(\kappa v^2\)——\(R\) 被换成了局部曲率半径 \(\rho = 1/\kappa\),公式照旧。</p>
+
+<p>这两个公式怎么来的?看 \(a_T\):\(\mathbf{a}\cdot \mathbf{T}\) 就是 \(\mathbf{a}\) 沿 \(\mathbf{T}\) 方向的投影长度,这是基本的标量投影。把 \(\mathbf{T} = \mathbf{r}'/|\mathbf{r}'|\) 代入,\(\mathbf{a}\cdot \mathbf{T} = (\mathbf{r}''\cdot \mathbf{r}')/|\mathbf{r}'|\),正是 \(a_T\) 的公式。再看 \(a_N\):\(|\mathbf{a}\times \mathbf{T}|\) 给出 \(\mathbf{a}\) 在垂直于 \(\mathbf{T}\) 方向上的分量长度(因为 \(\mathbf{T}\) 是单位向量,\(|\mathbf{a}\times\mathbf{T}| = |\mathbf{a}|\sin\theta\),正是垂直分量),代入 \(\mathbf{T} = \mathbf{r}'/|\mathbf{r}'|\) 得 \(|\mathbf{r}''\times \mathbf{r}'|/|\mathbf{r}'| = |\mathbf{r}'\times \mathbf{r}''|/|\mathbf{r}'|\)(叉积反号不改变模)。把曲率主力公式 \(\kappa = |\mathbf{r}'\times \mathbf{r}''|/|\mathbf{r}'|^3\) 反过来,\(|\mathbf{r}'\times \mathbf{r}''| = \kappa\,|\mathbf{r}'|^3\),代入即得 \(a_N = \kappa\,|\mathbf{r}'|^2\)。</p>
+
+<p>动手做一道。回到老朋友螺旋线 \(\mathbf{r}(t) = \langle \cos t, \sin t, t\rangle\),求任意时刻 \(t\) 的 \(a_T\) 与 \(a_N\)。我们之前已经算了一大堆:\(\mathbf{r}' = \langle -\sin t, \cos t, 1\rangle\),\(\mathbf{r}'' = \langle -\cos t, -\sin t, 0\rangle\),\(|\mathbf{r}'| = \sqrt{2}\),\(|\mathbf{r}'\times\mathbf{r}''| = \sqrt{2}\)。剩下需要的是点积:</p>
+
+<p>\[\mathbf{r}'\cdot\mathbf{r}'' = (-\sin t)(-\cos t) + (\cos t)(-\sin t) + (1)(0) = \sin t \cos t - \sin t\cos t + 0 = 0.\]</p>
+
+<p>所以 \(a_T = 0/\sqrt{2} = 0\),而 \(a_N = \sqrt{2}/\sqrt{2} = 1\)。</p>
+
+<p>怎么解读?\(a_T = 0\) 说明<em>螺旋线上的质点没有提速也没有减速</em>。这与我们之前算出"速率 \(|\mathbf{r}'| = \sqrt{2}\) 是常数"完全一致——速率不变,自然没有切向加速度。\(a_N = 1\) 说明它的全部加速度都用于<em>转向</em>。验算:用 \(a_N = \kappa v^2\) 也能得到同样的答案,因为 \(\kappa = 1/2\) 而 \(v^2 = 2\),所以 \(\kappa v^2 = 1\)。两条独立的路径给出同一个数,是数学一致性的小礼花。</p>
+
+<p>再来一道更有意思的——一个既提速又转弯的例子。考虑 \(\mathbf{r}(t) = \langle t,\ t^2,\ 0\rangle\),也就是抛物线 \(y = x^2\)。\(\mathbf{r}'(t) = \langle 1, 2t, 0\rangle\),\(|\mathbf{r}'| = \sqrt{1 + 4t^2}\);\(\mathbf{r}''(t) = \langle 0, 2, 0\rangle\)。点积 \(\mathbf{r}'\cdot \mathbf{r}'' = 0 + 4t + 0 = 4t\)。叉积我们之前算过 \(\mathbf{r}'\times\mathbf{r}'' = \langle 0, 0, 2\rangle\),模为 2。所以</p>
+
+<p>\[a_T = \frac{4t}{\sqrt{1 + 4t^2}}, \qquad a_N = \frac{2}{\sqrt{1 + 4t^2}}.\]</p>
+
+<p>来读它们:在 \(t = 0\)(抛物线的顶点)处,\(a_T = 0, a_N = 2\)——质点经过顶点的瞬间速率达到极小,所以瞬时不提速,但弯得最厉害,所有加速度都用来转弯。在 \(t\) 很大处,\(a_T \to 1, a_N \to 0\):远处曲线已经几乎拉直,转弯成份微乎其微,而质点正在以单位的切向加速度持续提速。这种数值与几何直觉的吻合是这一节最让人享受的事情。</p>
+
+<p>最后,在结束本章前提一两个最容易踩的坑。第一,<em>必须</em>把 \(\mathbf{r}'\) 和 \(\mathbf{r}''\) 当作向量先算出来,再做点积或叉积。如果你提前对模做了简化,常常会失去关键的几何信息。第二,\(\mathbf{r}'\) 和 \(|\mathbf{r}'|\) 是<em>不同的对象</em>——一个是向量,一个是标量;在公式里它们扮演的角色完全不同,不能混。第三,\(a_N\) 在我们这种约定里恒为非负数(它的"哪边"信息已经被 \(\mathbf{N}\) 吸收了);如果你算出了一个负值,说明哪里出了符号错误,回头检查叉积。</p>
+
+<p>到这里第 4 章告一段落。我们已经为空间运动建立了一整套完整的语言:速度与速率、加速度的方向、弧长积分、单位切向、曲率与密切圆、TNB 标架,以及最实用的"切向 + 法向"分解。从下一章开始,本书改换风向——从"一个变量的向量函数(也就是曲线)"切换到"<em>多个变量的标量函数</em>",也就是 \(f(x, y), f(x, y, z)\) 这一类对象。这是真正意义上的多元微积分主战场——一元微积分到这里才不再是"加几个坐标的简单推广",而开始变成全新的几何与分析。</p>
+
+<hr>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 向量值函数与曲线</a><a href="ch5.html">下一章 · 第 5 章 多元函数 →</a></nav>
+
+</main>
+</body>
+</html>

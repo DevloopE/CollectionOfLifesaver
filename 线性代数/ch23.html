@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 23 章 二次型与正定 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 对称矩阵与谱定理</a><a href="ch24.html">下一章 · 第 24 章 奇异值分解 →</a></nav>
+<h1 id="ch23">第 23 章 二次型与正定</h1>
+
+<p>到了第 22 章末尾，谱定理把"对称矩阵"这件事推到了一个非常干净的位置：任何实对称矩阵都可以正交对角化，特征值是实数，特征向量可以选成两两正交。这件事本身已经很漂亮，但在它被讲完之后，往往还会留下一个轻微的疑问——<em>对称矩阵到底有什么用？</em>对角化本身只是工具，工具总要去开门才有意义。</p>
+
+<p>本章就是去开第一扇门。我们要把对称矩阵翻译成一种叫做"二次型"的对象——一个变量的二次齐次多项式——然后看谱定理在这种语言里说了什么。这一翻译会立刻把我们带到三个互相联系的目的地：</p>
+
+<ul>
+  <li>一个关于多元二次表达式的"标准型化"程序，叫<strong>主轴定理</strong>；</li>
+  <li>一组判断某个二次型是不是恒为正、恒为负、还是有正有负的判别准则——这就是<strong>正定、半正定、负定、不定</strong>的分类；</li>
+  <li>把上述结果用在几何上：识别椭圆、双曲线、抛物线，以及它们的高维表亲（椭球面、双曲面）。如果你还记得多元微积分里的二阶导数判别法，会发现它就在这里悄悄出现。</li>
+</ul>
+
+<p>这一章是把"对称矩阵的代数"和"几何曲面的形状"联系起来的一座桥。请慢慢走过它。</p>
+
+<h2 id="sec23-1">23.1 二次型是什么</h2>
+
+<p>先看一个具体的二次多项式：\(Q(x, y) = 3x^2 + 4xy + y^2\)。它是 \(x\) 和 \(y\) 的二次齐次式——所有项的总次数都是 2，没有一次项也没有常数项。如果你换个例子 \(Q(x, y, z) = x^2 + y^2 + z^2 - 2xy + 6yz\)，照样是二次齐次的。这种"二次齐次多项式"我们就叫<strong>二次型</strong>。</p>
+
+<p>把它写成矩阵语言会非常省事。\(Q(x, y) = 3x^2 + 4xy + y^2\) 可以拆成：
+\[
+Q(x, y) = (x, y) \begin{pmatrix} 3 & 2 \\ 2 & 1 \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix}.
+\]
+你可以亲手把这个矩阵乘法做一遍验证。注意中间那个矩阵是<em>对称</em>的——对角线上是 \(x^2\) 和 \(y^2\) 的系数（3 和 1），对角线外两个 \(2\) 加起来是 \(xy\) 的系数 \(4\)。这不是巧合：把 \(xy\) 系数<em>对半分</em>放到 \((1, 2)\) 和 \((2, 1)\) 两个位置上，矩阵就自动是对称的。</p>
+
+<p>一般地，给定一个 \(n \times n\) 实对称矩阵 \(A\)，定义函数
+\[
+\boxed{\ Q(\mathbf{x}) = \mathbf{x}^T A \mathbf{x}\ }
+\]
+这就是 \(A\) 所诱导的二次型。展开后它是 \(\sum_{i, j} a_{ij} x_i x_j\) 这种二次齐次多项式。</p>
+
+<p><em>等等——我能不能用一个非对称矩阵来定义同样的二次型？</em>可以，但意义不大。如果 \(B\) 是任意 \(n \times n\) 矩阵（不必对称），\(\mathbf{x}^T B \mathbf{x}\) 仍然是 \(\mathbf{x}\) 的某个二次型。但请注意一件小事：\(\mathbf{x}^T B \mathbf{x}\) 是一个数，因此它等于自身的转置。算一下：
+\[
+\mathbf{x}^T B \mathbf{x} = (\mathbf{x}^T B \mathbf{x})^T = \mathbf{x}^T B^T \mathbf{x},
+\]
+所以
+\[
+\mathbf{x}^T B \mathbf{x} = \mathbf{x}^T \tfrac{1}{2}(B + B^T) \mathbf{x}.
+\]
+而 \(\frac{1}{2}(B + B^T)\) 永远是对称的（它就是 \(B\) 的"对称化"）。结论是：<strong>每一个二次型都唯一地对应一个对称矩阵</strong>。所以从一开始就规定 \(A\) 对称，是为了一一对应。这也是大多数书的标准约定。</p>
+
+<p>你可能会问：那"反对称部分"\(\frac{1}{2}(B - B^T)\) 哪里去了？答案是它对二次型没贡献。任何反对称矩阵 \(C\)（即 \(C^T = -C\)）一定有 \(\mathbf{x}^T C \mathbf{x} = 0\)，因为 \(\mathbf{x}^T C \mathbf{x} = (\mathbf{x}^T C \mathbf{x})^T = \mathbf{x}^T C^T \mathbf{x} = -\mathbf{x}^T C \mathbf{x}\)，于是这个数等于它自己的相反数，只能是零。所以非对称那一半在二次型里是不可见的——舍掉它对结果没有任何影响。这就是"约定 \(A\) 对称"为什么没有损失一般性。</p>
+
+<h2 id="sec23-2">23.2 二维的画像</h2>
+
+<p>把所有的注意力先聚焦到 \(n = 2\) 的情形。那时
+\[
+Q(x, y) = a x^2 + 2 b x y + c y^2 = (x, y) \begin{pmatrix} a & b \\ b & c \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix}.
+\]
+注意我们把 \(xy\) 的系数写成 \(2b\) 而不是 \(b\)——这是为了让矩阵的非对角元干净地等于 \(b\)。这是一个值得记住的小约定。</p>
+
+<p>这个二次型的图像是什么样？把 \(z = Q(x, y)\) 画在三维空间里。它是一张过原点的<em>二次曲面</em>——具体形状由 \(a, b, c\) 决定。我们看几个特殊例子，让自己的眼睛先适应：</p>
+
+<ul>
+  <li>\(Q(x, y) = x^2 + y^2\)：朝上的旋转抛物面（"碗"）。\(Q\) 在原点取最小值 \(0\)；任何方向走出去 \(Q\) 都增加。</li>
+  <li>\(Q(x, y) = -(x^2 + y^2)\)：朝下的旋转抛物面（"反碗"）。\(Q\) 在原点取最大值 \(0\)。</li>
+  <li>\(Q(x, y) = x^2 - y^2\)：马鞍面。沿 \(x\) 轴方向 \(Q\) 上升，沿 \(y\) 轴方向 \(Q\) 下降。原点既不是最大也不是最小。</li>
+  <li>\(Q(x, y) = x^2\)：一个"槽"——沿 \(y\) 轴方向 \(Q\) 不变，沿 \(x\) 轴方向 \(Q\) 是抛物线。</li>
+</ul>
+
+<p>这四种姿态分别对应矩阵的<em>正定、负定、不定、半正定</em>。在 23.4 节我们将给出准确的定义；在那之前，先记住这四个画面。</p>
+
+<p>但是问题来了：如果给一个一般的 \(Q(x, y) = 3x^2 + 4xy + y^2\)，它的图像到底是上面四种里的哪一种？凭眼力直接看不出来，因为<em>带着 \(xy\) 这种"交叉项"</em>的二次型，图像被旋转了一个角度，主轴不再沿坐标轴。我们需要一种系统的方式把它"扶正"。</p>
+
+<p>这正是下一节要做的事。先用谱定理把对称矩阵正交对角化；然后做一次坐标系旋转，把新坐标轴对准对角化所选的特征向量方向。在新坐标下，交叉项消失了——二次型变成纯粹的"对角和"：\(\lambda_1 y_1^2 + \lambda_2 y_2^2\)。剩下的事就只是看 \(\lambda_1, \lambda_2\) 的符号。</p>
+
+<h2 id="sec23-3">23.3 主轴定理</h2>
+
+<p>设 \(A\) 是 \(n \times n\) 实对称矩阵。由谱定理（参见第 22 章及附录 A.3），存在正交矩阵 \(Q\) 和对角矩阵 \(D = \mathrm{diag}(\lambda_1, \ldots, \lambda_n)\) 使得
+\[
+A = Q D Q^T.
+\]
+这里 \(Q\) 的列是 \(A\) 的相互正交的单位特征向量；\(D\) 的对角元是相应的特征值。把这个分解代入二次型：
+\[
+\mathbf{x}^T A \mathbf{x} = \mathbf{x}^T Q D Q^T \mathbf{x} = (Q^T \mathbf{x})^T D (Q^T \mathbf{x}).
+\]
+让 \(\mathbf{y} = Q^T \mathbf{x}\)（这是把 \(\mathbf{x}\) 的坐标换成"\(Q\) 的列向量"那组基下的坐标），则
+\[
+\boxed{\ Q(\mathbf{x}) = \mathbf{y}^T D \mathbf{y} = \lambda_1 y_1^2 + \lambda_2 y_2^2 + \cdots + \lambda_n y_n^2.\ }
+\]
+这条公式叫<strong>主轴定理</strong>。它说的是：经过一个<em>正交</em>坐标变换，任何二次型都可以被写成"纯对角形式"——只剩平方项，没有交叉项。系数恰好是矩阵的特征值。</p>
+
+<p>"正交变换"在几何上是<em>旋转</em>（或反射）——不改变长度也不改变角度。所以这个定理在几何上的意思就是：<strong>把坐标系旋转到合适的方向，二次曲面的方程就变得最简单</strong>。新坐标系的轴方向就是 \(A\) 的特征向量方向，被称为这条二次曲面的<strong>主轴</strong>。</p>
+
+<p>来做一个例子。考虑 \(Q(x, y) = 3x^2 + 4xy + y^2\) 对应的对称矩阵
+\[
+A = \begin{pmatrix} 3 & 2 \\ 2 & 1 \end{pmatrix}.
+\]
+特征多项式 \(\det(A - \lambda I) = (3 - \lambda)(1 - \lambda) - 4 = \lambda^2 - 4\lambda - 1\)，特征值 \(\lambda = 2 \pm \sqrt{5}\)。也就是说一个特征值是 \(2 + \sqrt{5} \approx 4.24\)（正），另一个是 \(2 - \sqrt{5} \approx -0.24\)（负）。所以在主轴坐标系里，这个二次型变成
+\[
+Q = (2 + \sqrt{5}) y_1^2 + (2 - \sqrt{5}) y_2^2.
+\]
+一正一负——这是一个<em>不定</em>二次型，几何上是一张马鞍面。换个角度看坐标系，原来"\(3x^2 + 4xy + y^2\)"那个看起来纠缠的表达式，骨子里就是 \(x^2 - y^2\) 那种鞍面，只是被旋转了一下。</p>
+
+<p>请注意一个细节：标准型只剩平方项，所以 \(Q(\mathbf{x})\) 的<strong>符号性质</strong>完全由特征值符号决定。如果所有 \(\lambda_i > 0\)，那么 \(Q(\mathbf{x}) = \sum \lambda_i y_i^2 > 0\) 对一切非零 \(\mathbf{y}\)（因此对一切非零 \(\mathbf{x}\)）；如果都 \(< 0\)，则 \(Q(\mathbf{x}) < 0\)；如果有正有负，则 \(Q\) 在不同方向上正负皆有。这就是 23.4 节的分类。</p>
+
+<p><em>等等，为什么变量从 \(\mathbf{x}\) 换到 \(\mathbf{y}\) 之后，"非零"这件事不变？</em>因为正交矩阵是可逆的——\(\mathbf{y} = Q^T \mathbf{x}\) 是一个一一对应。\(\mathbf{x} = \mathbf{0}\) 当且仅当 \(\mathbf{y} = \mathbf{0}\)；其他时候 \(\mathbf{x} \neq \mathbf{0}\) 当且仅当 \(\mathbf{y} \neq \mathbf{0}\)。所以"对一切非零 \(\mathbf{x}\)"和"对一切非零 \(\mathbf{y}\)"是同一件事。</p>
+
+<h2 id="sec23-4">23.4 用特征值符号给二次型分类</h2>
+
+<p>主轴定理把一切归结到特征值的符号。下面是标准的分类术语：</p>
+
+<table>
+<thead>
+<tr><th>名称</th><th>定义（对一切非零 \(\mathbf{x}\)）</th><th>等价的特征值条件</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>正定</strong> (positive definite)</td><td>\(\mathbf{x}^T A \mathbf{x} > 0\)</td><td>所有 \(\lambda_i > 0\)</td></tr>
+<tr><td><strong>半正定</strong> (positive semidefinite)</td><td>\(\mathbf{x}^T A \mathbf{x} \ge 0\)</td><td>所有 \(\lambda_i \ge 0\)</td></tr>
+<tr><td><strong>负定</strong> (negative definite)</td><td>\(\mathbf{x}^T A \mathbf{x} < 0\)</td><td>所有 \(\lambda_i < 0\)</td></tr>
+<tr><td><strong>半负定</strong> (negative semidefinite)</td><td>\(\mathbf{x}^T A \mathbf{x} \le 0\)</td><td>所有 \(\lambda_i \le 0\)</td></tr>
+<tr><td><strong>不定</strong> (indefinite)</td><td>\(\mathbf{x}^T A \mathbf{x}\) 时正时负</td><td>有正有负</td></tr>
+</tbody>
+</table>
+
+<p>请注意"正定"与"半正定"的区别只在于<em>是否允许零</em>。正定要求严格大于零（除原点外），等价于<strong>没有特征值为零</strong>且全部为正——也即矩阵<em>可逆</em>且<em>所有 \(\lambda_i > 0\)</em>。半正定允许有零特征值出现：那时存在某些非零 \(\mathbf{x}\) 使 \(Q(\mathbf{x}) = 0\)。</p>
+
+<p>来对几个例子下判定：</p>
+
+<ul>
+  <li>\(A = \begin{pmatrix} 2 & 0 \\ 0 & 5 \end{pmatrix}\)：已经是对角的，特征值 \(2, 5\) 全正——<strong>正定</strong>。</li>
+  <li>\(A = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}\)：特征值 \(1, 0\)——<strong>半正定</strong>（有非零向量 \((0, 1)^T\) 使二次型为零）。</li>
+  <li>\(A = \begin{pmatrix} 3 & 2 \\ 2 & 1 \end{pmatrix}\)：23.3 节算过特征值是 \(2 \pm \sqrt{5}\)，一正一负——<strong>不定</strong>。</li>
+  <li>\(A = \begin{pmatrix} -2 & 1 \\ 1 & -2 \end{pmatrix}\)：特征多项式 \((\lambda + 2)^2 - 1 = 0\) 给 \(\lambda = -1, -3\)，全负——<strong>负定</strong>。</li>
+</ul>
+
+<p>有几条关于正定矩阵的"零代价"性质值得记住：</p>
+
+<ul>
+  <li>正定矩阵<strong>可逆</strong>（特征值全非零）。</li>
+  <li>正定矩阵的<strong>逆</strong>仍然是正定的（因为 \(A^{-1}\) 的特征值是 \(1/\lambda_i\)，都为正）。</li>
+  <li>正定矩阵的<strong>对角元</strong>必都为正（取 \(\mathbf{x} = \mathbf{e}_i\)，则 \(\mathbf{x}^T A \mathbf{x} = a_{ii} > 0\)）。</li>
+  <li>正定矩阵的<strong>行列式</strong>必为正（特征值都正，乘积也正）。</li>
+</ul>
+
+<p>反过来这些条件却<em>不</em>足以保证正定。比如 \(\begin{pmatrix} 1 & 3 \\ 3 & 1 \end{pmatrix}\)，对角元都为 \(1 > 0\)，但行列式 \(1 - 9 = -8 < 0\)，所以它不正定（事实上它不定，特征值是 \(4\) 和 \(-2\)）。"对角元正"远不足以保证正定，请记住这一点。</p>
+
+<h2 id="sec23-5">23.5 谢尔维斯特判定（顺序主子式）</h2>
+
+<p>判断一个矩阵是不是正定，最直接的方法是把所有特征值算出来。但这在矩阵稍大一点时会变得吃力——求特征多项式的根本身就不容易。幸好有一条<em>不需要算特征值</em>的判别法，叫<strong>谢尔维斯特判定法</strong>（Sylvester's criterion）：</p>
+
+<p>设 \(A\) 是 \(n \times n\) 对称矩阵。\(A\) 的<strong>顺序主子式</strong>是指：取 \(A\) 的左上角 \(k \times k\) 子矩阵的行列式，记作 \(D_k\)，\(k = 1, 2, \ldots, n\)。</p>
+
+\[
+D_1 = a_{11}, \quad D_2 = \det\!\begin{pmatrix}a_{11} & a_{12} \\ a_{21} & a_{22}\end{pmatrix}, \quad \ldots, \quad D_n = \det A.
+\]
+
+<p>判定法说：</p>
+
+\[
+\boxed{\ A \text{ 正定} \iff D_1 > 0,\ D_2 > 0,\ \ldots,\ D_n > 0.\ }
+\]
+
+<p>负定的情形稍微复杂一点：要求顺序主子式<em>交错变号</em>——\(D_1 < 0, D_2 > 0, D_3 < 0, \ldots\)（也就是 \(D_k\) 的符号是 \((-1)^k\)）。这是因为 \(-A\) 正定等价于 \(A\) 负定，而 \(-A\) 的顺序主子式 \(D_k(-A) = (-1)^k D_k(A)\)。</p>
+
+<p>来用这条规则判一道题：\(A = \begin{pmatrix} 4 & 2 & 1 \\ 2 & 5 & 3 \\ 1 & 3 & 6 \end{pmatrix}\) 是否正定？</p>
+
+<p>逐个算顺序主子式：
+\[
+D_1 = 4, \qquad D_2 = \det\!\begin{pmatrix}4 & 2 \\ 2 & 5\end{pmatrix} = 20 - 4 = 16,
+\]
+\[
+D_3 = \det A = 4(30 - 9) - 2(12 - 3) + 1(6 - 5) = 84 - 18 + 1 = 67.
+\]
+\(D_1, D_2, D_3\) 都为正，所以 \(A\) 正定。</p>
+
+<p>再来判一道反例：\(A = \begin{pmatrix} 1 & 2 \\ 2 & 1 \end{pmatrix}\)。\(D_1 = 1 > 0\)，但 \(D_2 = 1 - 4 = -3 < 0\)。所以 \(A\) 不正定。事实上 \(A\) 的特征值是 \(3\) 和 \(-1\)，确实不定。</p>
+
+<p>判半正定要不要也这么干？——<strong>请注意：</strong>谢尔维斯特判定<em>不直接推广到半正定</em>。"所有顺序主子式 \(\ge 0\)"<em>不</em>等价于半正定。一个反例是 \(A = \begin{pmatrix} 0 & 0 \\ 0 & -1 \end{pmatrix}\)，顺序主子式都是 \(0\)（\(D_1 = 0\)、\(D_2 = 0\)），但这个矩阵的特征值是 \(0\) 和 \(-1\)，所以它<em>半负定</em>而非半正定。判半正定的正确条件是<em>所有主子式</em>（不只顺序主子式）非负——这个判别法叫"全主子式判别法"，比较繁琐，实际工作中通常宁愿直接算特征值。</p>
+
+<h2 id="sec23-6">23.6 几何：二次曲线与曲面的分类</h2>
+
+<p>把上面的分类放到几何里去，立刻就能看见画面。考虑形如 \(Q(x, y) = c\)（\(c\) 是某个非零常数）的方程在平面上画出的曲线——这种曲线叫<strong>二次曲线</strong>。配合 \(Q\) 的不同分类：</p>
+
+<ul>
+  <li><strong>正定</strong>（\(\lambda_1, \lambda_2 > 0\)）：\(Q(\mathbf{x}) = c\)（\(c > 0\)）画出的是<em>椭圆</em>。在主轴坐标里它是 \(\lambda_1 y_1^2 + \lambda_2 y_2^2 = c\)，半长轴 \(\sqrt{c/\lambda_1}\) 和 \(\sqrt{c/\lambda_2}\)。</li>
+  <li><strong>负定</strong>（\(\lambda_1, \lambda_2 < 0\)）：\(Q(\mathbf{x}) = c\)（\(c < 0\)）也是椭圆。\(c > 0\) 时无解。</li>
+  <li><strong>不定</strong>（\(\lambda_1 > 0 > \lambda_2\)）：\(Q(\mathbf{x}) = c\) 是<em>双曲线</em>。无论 \(c\) 的正负都有解，只是双曲线分支的方向不同。</li>
+  <li><strong>半正定且不正定</strong>（其中一个特征值为零）：方程退化成 \(\lambda_1 y_1^2 = c\)，要么是两条平行直线，要么无解，要么单一直线。</li>
+</ul>
+
+<p>"抛物线"哪里去了？在<em>纯二次型</em>的语言里抛物线不会出现——抛物线方程是 \(y = x^2\) 之类，含一次项。如果你允许加入一次项 \(\mathbf{b}^T \mathbf{x} + c_0\)，那么完整的"二次曲线"分类里就会有椭圆、双曲线、抛物线三种情形。这与你在中学解析几何里见过的"圆锥曲线"完全一致。</p>
+
+<p>几何上有一个非常省事的<strong>2×2 速判表</strong>。对二次型 \(Q(x, y) = \mathbf{x}^T A \mathbf{x}\)，只看
+\[
+\det A = \lambda_1 \lambda_2, \qquad \mathrm{tr} A = \lambda_1 + \lambda_2.
+\]
+特征值的"积"和"和"完全决定符号格局：</p>
+
+<table>
+<thead>
+<tr><th>\(\det A\) 的符号</th><th>\(\mathrm{tr} A\) 的符号</th><th>分类</th><th>曲线 \(Q = c > 0\) 的形状</th></tr>
+</thead>
+<tbody>
+<tr><td>\(> 0\)</td><td>\(> 0\)</td><td>正定</td><td>椭圆</td></tr>
+<tr><td>\(> 0\)</td><td>\(< 0\)</td><td>负定</td><td>无解</td></tr>
+<tr><td>\(< 0\)</td><td>任意</td><td>不定</td><td>双曲线</td></tr>
+<tr><td>\(= 0\)</td><td>\(\neq 0\)</td><td>半定（不正定）</td><td>退化（两直线 / 一直线 / 无解）</td></tr>
+<tr><td>\(= 0\)</td><td>\(= 0\)</td><td>零矩阵</td><td>整个平面或空集</td></tr>
+</tbody>
+</table>
+
+<p><em>这与多元微积分里的二阶导数判别法是同一件事吗？</em>是的——而且就是同一件事换了件衣服。多元微积分课上你见过判别式
+\[
+D = f_{xx} f_{yy} - (f_{xy})^2
+\]
+用来分辨临界点是极大、极小还是鞍点。这个 \(D\) 不就是 Hessian 矩阵 \(H = \begin{pmatrix} f_{xx} & f_{xy} \\ f_{xy} & f_{yy} \end{pmatrix}\) 的行列式吗？而 Hessian 是对称的，二阶泰勒展开里那块二次型 \(\frac{1}{2} \mathbf{h}^T H \mathbf{h}\) 决定了临界点的类型——正定是极小，负定是极大，不定是鞍点。所以"二阶导数判别法"在线性代数语言里就是"Hessian 矩阵的正定性判定"。两门课讲的是同一个故事。</p>
+
+<p>三维的情形也是同样的格局。\(Q(x, y, z) = \mathbf{x}^T A \mathbf{x} = c\) 这种方程在三维空间里画出<strong>二次曲面</strong>。三个特征值的符号决定形状：</p>
+
+<ul>
+  <li>三个全正：椭球面（鸡蛋形）；</li>
+  <li>两正一负：单叶双曲面（"沙漏的腰" / 散热塔）；</li>
+  <li>一正两负：双叶双曲面（两片碗背靠背）；</li>
+  <li>三个全负：取 \(c < 0\) 时是椭球面，否则无解；</li>
+  <li>有零特征值：退化成柱面之类。</li>
+</ul>
+
+<p>每个椭球面、双曲面的<em>主轴</em>就是相应特征向量的方向，<em>半轴长度</em>由特征值的绝对值决定。这是把"特征值/特征向量"用到几何里最美的一个画面。</p>
+
+<h2 id="sec23-7">23.7 综合例题</h2>
+
+<p>本节我们做两道题，把前面所有工具连在一起跑一遍。</p>
+
+<p><strong>例 23.1</strong>　判断二次型 \(Q(x, y, z) = 2x^2 + 3y^2 + 2z^2 + 2xz\) 是否正定。</p>
+
+<p>对应的矩阵是
+\[
+A = \begin{pmatrix} 2 & 0 & 1 \\ 0 & 3 & 0 \\ 1 & 0 & 2 \end{pmatrix}.
+\]
+（提醒一下：\(xz\) 的系数 \(2\) 要"对半分"放进 \((1, 3)\) 和 \((3, 1)\)，所以这两位置都填 \(1\)。）用谢尔维斯特：
+\[
+D_1 = 2,\quad D_2 = \det\!\begin{pmatrix}2 & 0 \\ 0 & 3\end{pmatrix} = 6,\quad D_3 = \det A.
+\]
+计算 \(D_3\)：按第二行展开，因为第二行是 \((0, 3, 0)\)，只有 \(a_{22} = 3\) 不为零，余子式是 \(\det\!\begin{pmatrix}2 & 1 \\ 1 & 2\end{pmatrix} = 3\)。所以 \(D_3 = 3 \cdot 3 = 9\)。三个顺序主子式都正，所以 \(Q\) <strong>正定</strong>。</p>
+
+<p>顺便把特征值算一下来验证。注意第二行第二列那个 \(3\) 已经被分块了——子矩阵 \(\begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}\) 的特征值是 \(1\) 和 \(3\)（对称矩阵，迹 \(4\)、行列式 \(3\)，所以特征多项式 \(\lambda^2 - 4\lambda + 3 = (\lambda - 1)(\lambda - 3)\)）。所以 \(A\) 的三个特征值是 \(1, 3, 3\)，都正——确实正定。</p>
+
+<p><strong>例 23.2</strong>　把二次型 \(Q(x, y) = 2x^2 - 4xy + 5y^2\) 化为标准型，并写出对应的坐标变换。</p>
+
+<p>对应的矩阵是 \(A = \begin{pmatrix} 2 & -2 \\ -2 & 5 \end{pmatrix}\)。先求特征值：
+\[
+\det(A - \lambda I) = (2 - \lambda)(5 - \lambda) - 4 = \lambda^2 - 7\lambda + 6 = (\lambda - 1)(\lambda - 6).
+\]
+特征值 \(\lambda_1 = 1\)，\(\lambda_2 = 6\)。两个都正——\(Q\) 正定。</p>
+
+<p>求特征向量。对于 \(\lambda = 1\)：
+\[
+A - I = \begin{pmatrix} 1 & -2 \\ -2 & 4 \end{pmatrix}, \quad \text{零空间由 } \begin{pmatrix}2 \\ 1\end{pmatrix} \text{ 张成}.
+\]
+对于 \(\lambda = 6\)：
+\[
+A - 6I = \begin{pmatrix} -4 & -2 \\ -2 & -1 \end{pmatrix}, \quad \text{零空间由 } \begin{pmatrix}1 \\ -2\end{pmatrix} \text{ 张成}.
+\]
+两个特征向量已自动正交（这是对称矩阵的性质）。把它们单位化得
+\[
+\mathbf{q}_1 = \frac{1}{\sqrt{5}}\begin{pmatrix}2 \\ 1\end{pmatrix}, \quad \mathbf{q}_2 = \frac{1}{\sqrt{5}}\begin{pmatrix}1 \\ -2\end{pmatrix}.
+\]
+正交矩阵
+\[
+Q = \frac{1}{\sqrt{5}}\begin{pmatrix} 2 & 1 \\ 1 & -2 \end{pmatrix}.
+\]
+坐标变换是 \(\mathbf{y} = Q^T \mathbf{x}\)，亦即
+\[
+y_1 = \tfrac{1}{\sqrt{5}}(2x + y), \qquad y_2 = \tfrac{1}{\sqrt{5}}(x - 2y).
+\]
+在新坐标下，\(Q(x, y) = y_1^2 + 6 y_2^2\)。这就是标准型——一个椭圆！如果你把 \(Q = 1\) 这条曲线画出来，它在原坐标系里是斜的椭圆，在新坐标系里是正椭圆，半长轴 \(1\)（沿 \(\mathbf{q}_1\) 方向），半短轴 \(1/\sqrt{6}\)（沿 \(\mathbf{q}_2\) 方向）。</p>
+
+<p>请把这道题的整个流程在脑子里过一遍：<em>写下 \(A\) → 求特征值 → 求特征向量 → 单位化、放进 \(Q\) → 写出标准型</em>。这五步是这一章里最值得反复练习的工作流。下一章我们要把它推广到非方阵——任何形状的矩阵都能做"奇异值分解"。那是一座更大的山。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 对称矩阵与谱定理</a><a href="ch24.html">下一章 · 第 24 章 奇异值分解 →</a></nav>
+
+</main>
+</body>
+</html>

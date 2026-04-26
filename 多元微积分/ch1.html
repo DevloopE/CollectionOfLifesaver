@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 1 章 向量与三维空间 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><span class="nav-disabled">← 上一章</span><a href="ch2.html">下一章 · 第 2 章 直线、平面与曲面 →</a></nav>
+<h1 id="ch1">第 1 章 向量与三维空间</h1>
+
+<p>你已经回避不了"空间"了。一元微积分发生在数轴上：你能向左走、向右走，整个世界就这么大。一个粒子的位置只用一个数 \(x(t)\) 就交代清楚，速度是它的导数 \(x'(t)\)，加速度是 \(x''(t)\)。整个故事干净利落，但也仅此而已。可现实世界有三个方向。物理上有意义的函数往往不止一个输入——某地的气温依赖于纬度、经度<strong>和</strong>海拔；一份食谱的成本依赖于每种原料的价格；机械臂末端工具的位置存在于三维空间中，每一个关节都在贡献自己的自由度；股票市场则更夸张——某一只股票的收益取决于成百上千个宏观变量。</p>
+
+<p>所以我们必须学会在不止一个方向上做微积分。这正是整本书要做的事。但是在动用任何导数或积分之前，我们需要一种<strong>语言</strong>来谈论空间中的"点"和"方向"——这门语言就是<strong>向量</strong>。本章是把这门语言一字一句地教给你：先认识点和坐标轴，再让向量这个对象登场，然后建立两种乘法——点积和叉积——它们将贯穿后面所有章节。如果你在物理课上见过向量，本章前半部分会像复习；如果你没见过，慢慢来。后面每一章都建立在这一章之上，把这一章咬透，后面就轻松一半。</p>
+
+<p>关于"为什么是向量而不是别的"再多说一句。向量这个概念是十九世纪中后期由哈密顿（Hamilton）、格拉斯曼（Grassmann）和吉布斯（Gibbs）等人逐步整理出来的，它的诞生本身就是为了优雅地描写物理学——磁场强度、电流密度、力——这些既有大小又有方向的量。在向量出现之前，物理学家不得不把每一个分量分开写、分开求导，公式冗长得让人发疯。向量记号一旦统一，麦克斯韦方程就可以写在半张纸上。所以本章学的不仅仅是几个公式，而是一种压缩思维的工具。</p>
+
+<h2 id="sec1-1">1.1 从数轴到空间</h2>
+
+<p>一元微积分活在实数轴 \(\mathbb{R}\) 上。轴上的一个"点"就是一个数，比如 \(3\)、\(-\sqrt{2}\) 或者 \(\pi\)。你可以把它想成一根无限长的、带刻度的尺子,所有可能的"位置"都已经摆在那里。</p>
+
+<p>要描述平面上的点,需要<strong>两个</strong>数。平面上的一个点是一个<em>有序对</em> \((x, y)\)。所有这样的有序对组成的集合记作 \(\mathbb{R}^2\)。"有序"是关键:\((1, 3)\) 和 \((3, 1)\) 是不同的点,尽管它们涉及的两个数完全一样。第一个数是水平坐标(沿 \(x\) 轴),第二个是竖直坐标(沿 \(y\) 轴)。这套描述方式是笛卡尔(Descartes)在十七世纪发明的——据说他是躺在床上看到天花板上的一只苍蝇时,意识到只要选定两条相交的轴就能用两个数把苍蝇的位置钉死。这个想法听起来微不足道,却把代数和几何彻底缝合在了一起。</p>
+
+<p>要描述空间中的点,需要<strong>三个</strong>数。空间中的一个点是一个<em>有序三元组</em> \((x, y, z)\)。所有三元组的集合记作 \(\mathbb{R}^3\)。同样的道理:顺序很重要;\((1, 2, 3)\) 和 \((3, 2, 1)\) 是不同的点。如果一个数让你能在尺子上找到一个位置,两个数让你能在桌面上找到一个位置,那么三个数让你能在整间屋子里找到一个位置。再往上推:四个数让你能在"四维"里找到一个位置——这超出了我们的视觉,但代数完全说得通,而本书后面也确实需要 \(\mathbb{R}^4\)、\(\mathbb{R}^n\) 这样的高维空间。</p>
+
+<p>本书余下的部分中最常见的约定是:\(x\) 轴指向"右",\(y\) 轴指向"后"(屏幕里面),\(z\) 轴指向"上"。这叫做<strong>右手坐标系</strong>。这个名字背后是有原因的,我们会在 1.6 节遇到它。还有一种叫做<em>左手坐标系</em>的体系,常用于计算机图形学,它把 \(z\) 的方向反过来。本书一律用右手系。</p>
+
+<p>把这套约定具体到你身边:坐在房间里,把地板与两面墙的交点当作原点,\(x\) 轴沿着一面墙的墙脚线,\(y\) 轴沿着另一面墙的墙脚线,\(z\) 轴沿着两面墙的交线竖直向上。那么点 \((2, 0, 1)\) 就是:沿 \(x\) 那面墙走 2 米,紧贴墙面(\(y = 0\)),再沿墙竖直爬高 1 米——基本上是某个挂钩的位置。点 \((2, 3, 1)\) 则是从同样的水平位置再往房间里走 3 米,大约就是房间中央上方一米的某处。如果你能在脑子里把这两个点都"指出来",你就已经掌握了三维坐标的根本。</p>
+
+<p>\(\mathbb{R}^3\) 中两个点之间的<strong>距离</strong>是平面上勾股定理的推广:</p>
+
+\[
+d\big((x_1, y_1, z_1),\ (x_2, y_2, z_2)\big) = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}.
+\]
+
+<p>这个公式其实就是把勾股定理用了两次。想象先在水平地面里从 \((x_1, y_1)\) 走到 \((x_2, y_2)\),走了 \(\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}\) 这么远,然后竖直爬升 \(|z_2 - z_1|\)。这两段走的方向互相垂直,所以再用一次勾股定理就把斜线长度算出来,正是上面这个根号式子。我们以后会反复用到它,值得记下来。</p>
+
+<p>看一道具体的题:从 \((1, 2, 3)\) 到 \((4, 6, 15)\) 的距离是多少?直接代公式:\(\sqrt{(4-1)^2 + (6-2)^2 + (15-3)^2} = \sqrt{9 + 16 + 144} = \sqrt{169} = 13\)。这个数恰好是整数,不是巧合——出题的时候挑选了 \((3, 4, 12, 13)\) 这一组毕达哥拉斯三元组,所以平方和正好开得尽。在练习题里你会经常碰到这种"凑好"的数字,因为出题人希望你把注意力放在思路上,而不是开方。</p>
+
+<h2 id="sec1-2">1.2 向量是什么,又不是什么</h2>
+
+<p>假设我告诉你某个房间里有一只苍蝇,<strong>位置</strong>在 \((2, 3, 5)\)。这是一个<em>点</em>:它告诉你去哪里找这只苍蝇。</p>
+
+<p>现在再假设我告诉你这只苍蝇的<strong>速度</strong>是 \(\langle 1, -2, 3 \rangle\)。这告诉你它每秒在 \(+x\) 方向上移动 1 个单位,在 \(-y\) 方向上移动 2 个单位,在 \(+z\) 方向上移动 3 个单位。这是一个<em>向量</em>:它告诉你方向和大小,但没有告诉你苍蝇此刻在哪里。两只飞在房间不同角落的苍蝇,完全可以以同一个速度向量飞行。</p>
+
+<p>同样的三元数。完全不同的角色。我们用<strong>尖括号</strong> \(\langle \cdot \rangle\) 而不是圆括号,是为了提醒自己这是向量,不是点。我们也用<strong>粗体</strong>排印向量,所以速度记作 \(\mathbf{v} = \langle 1, -2, 3 \rangle\)。有时你也会看到加箭头的写法 \(\vec{v}\),意思一样。手写的时候建议加箭头(粗体不容易写出来),印刷品里通常用粗体。</p>
+
+<p>向量在几何上画作<strong>一个箭头</strong>。这个箭头有两端——尾和头——但只有它的<em>长度</em>和<em>方向</em>才重要。你可以把这个箭头拿起来在空间中随便挪动,只要你既不旋转也不拉伸它,它就还是同一个向量。换句话说,两个箭头是同一个向量,当且仅当它们长度相等、方向相同。</p>
+
+<p>这是初学向量时最让人混乱的一件事。我再说一遍,因为后面会反复用到。向量并不是那个从原点画到某点的箭头。向量是<em>一类物体</em>,它唯一的属性是长度和方向。我们经常画向量为从原点出发的箭头,因为这样比较方便、容易和坐标对应起来。但把箭头挪到别处,并不会得到一个不同的向量——它还是同一个向量,只是放在了不同的位置。</p>
+
+<p>为什么这一点很重要?想象两只鸟在编队飞行,速度都是 \(\mathbf{v} = \langle 1, -2, 3 \rangle\),其中一只在位置 \((0, 0, 0)\),另一只在 \((10, 10, 10)\)。它们的速度向量是同一个,尽管它们身处不同的位置。再想一个更日常的例子:你早晨从家出发,以"向北 30 公里每小时"的速度开车,你的同事也以"向北 30 公里每小时"的速度开车,但你们的家相距很远。你们的速度向量是相同的,位置却完全不同。这种"向量与位置脱钩"的看法,将驱动我们后面要做的大量几何工作——尤其是当我们讨论方向导数、梯度场和力场的时候,把同一个向量"复制"到每个空间点上是家常便饭。</p>
+
+<h3 id="sec1-2-1">1.2.1 由点变向量,由向量变点</h3>
+
+<p>如果你有两个点 \(P = (1, 2, 3)\) 和 \(Q = (4, 6, 9)\),从 \(P\) 到 \(Q\) 的<strong>位移向量</strong>是</p>
+
+\[
+\overrightarrow{PQ} = \langle 4 - 1,\ 6 - 2,\ 9 - 3 \rangle = \langle 3, 4, 6 \rangle.
+\]
+
+<p>头减尾。把这个顺序记牢:\(\overrightarrow{PQ}\) 是从 \(P\) 走向 \(Q\),计算时是 \(Q - P\),不是 \(P - Q\)。把它读作"从 \(P\) 到 \(Q\) 的位移",这个名称本身就把方向告诉你了。如果反过来要从 \(Q\) 走回 \(P\),那当然就是 \(\overrightarrow{QP} = -\overrightarrow{PQ} = \langle -3, -4, -6 \rangle\)。</p>
+
+<p>反过来:点 \(P = (a, b, c)\) 的<strong>位置向量</strong>就是从原点指向 \(P\) 的向量 \(\langle a, b, c \rangle\)。我们经常会模糊点 \(P\) 与它的位置向量之间的区别,但只在原点固定且明显时才这么做。在一些更抽象的设定里——比如在曲面上做几何——根本就没有所谓的"原点",这时点和位置向量的区别就变得无可回避。</p>
+
+<p>这里很自然会冒出一个问题:既然向量和点是同样的三元数,为什么还要起两个不同的名字?答案是:它们在运算下表现不同。你可以把一个向量加到一个点上,得到一个新的点(从这里出发,沿这个方向走这么远);你可以把两个点相减,得到一个向量(从这里到那里要怎么走);你可以把两个向量相加,得到一个新的向量(先这样走,再那样走)。但你不能对两个点求"和"——"\((1, 2, 3)\) 与 \((4, 5, 6)\) 之和"作为位置是什么意思?它根本不是一个地点,毫无意义。保持名字的区分,正是阻止你做出这种荒谬之事的原因。</p>
+
+<p>用一个表格把允许和禁止的运算总结一下:点 \(+\) 向量 \(=\) 点;点 \(-\) 点 \(=\) 向量;向量 \(+\) 向量 \(=\) 向量;向量 \(-\) 向量 \(=\) 向量;但点 \(+\) 点是无意义的。这个"代数语法"贯穿整本书:每当你看到一个符号操作时,先问"这是点还是向量?"——这能让你早早抓出大量的概念错误。</p>
+
+<h2 id="sec1-3">1.3 加、减与数乘</h2>
+
+<p>向量有三种基本运算。它们都来自一个直觉:既然向量是一种"既有方向又有大小"的对象,那么相加就该是"接力前进",数乘就该是"按比例伸缩"。下面把这三种运算分别说清楚。</p>
+
+<p>第一种是<strong>加法</strong>。按分量相加:</p>
+
+\[
+\langle a_1, a_2, a_3 \rangle + \langle b_1, b_2, b_3 \rangle = \langle a_1 + b_1,\ a_2 + b_2,\ a_3 + b_3 \rangle.
+\]
+
+<p>几何上是怎么回事?把第二个箭头的尾巴接在第一个箭头的头部,从最初的尾巴到最终的头部所形成的箭头就是它们的和。这就是<em>首尾相接</em>法,值得在纸上画一次以确认。等价地,你也可以把两个向量都从同一个起点画出,然后做出由它们张成的平行四边形,对角线就是它们的和——这是<em>平行四边形法则</em>,跟首尾相接其实是同一回事的两种画法。</p>
+
+<p>看一个具体例子。设 \(\mathbf{a} = \langle 2, 1, 0 \rangle\),\(\mathbf{b} = \langle -1, 3, 2 \rangle\)。则 \(\mathbf{a} + \mathbf{b} = \langle 1, 4, 2 \rangle\)。物理意义:如果你先沿着 \(\mathbf{a}\) 走,再接着沿着 \(\mathbf{b}\) 走,最终的净位移就是 \(\mathbf{a} + \mathbf{b}\),不管中间停了几次,只看最后落到哪里。</p>
+
+<p>第二种是<strong>减法</strong>。同理,加上一个负号:</p>
+
+\[
+\mathbf{a} - \mathbf{b} = \langle a_1 - b_1,\ a_2 - b_2,\ a_3 - b_3 \rangle.
+\]
+
+<p>几何上有两种等价的看法。其一:把 \(\mathbf{a}\) 和 \(\mathbf{b}\) 都从原点画出,从 \(\mathbf{b}\) 的头部指向 \(\mathbf{a}\) 的头部的那个箭头就是 \(\mathbf{a} - \mathbf{b}\)——它代表"从 \(\mathbf{b}\) 头出发,要怎么走才能到达 \(\mathbf{a}\) 头"。其二:\(\mathbf{a} + (-\mathbf{b})\),其中 \(-\mathbf{b}\) 是把 \(\mathbf{b}\) 反向。这两种看法是等价的,你用哪种都行。我个人倾向于第一种,因为减法在几何上往往就是"求两点间的位移",和它的字面含义吻合。</p>
+
+<p>第三种是<strong>数乘</strong>。每个分量都乘以一个数(此时这个数被称作"标量"):</p>
+
+\[
+c \, \langle a_1, a_2, a_3 \rangle = \langle ca_1,\ ca_2,\ ca_3 \rangle.
+\]
+
+<p>几何上:把箭头按因子 \(c\) 拉伸(或压缩)。如果 \(c\) 为负,再翻转方向。例如:</p>
+
+\[
+3 \langle 2, -1, 4 \rangle = \langle 6, -3, 12 \rangle, \qquad -\tfrac{1}{2} \langle 4, 6, -2 \rangle = \langle -2, -3, 1 \rangle.
+\]
+
+<p>第一个例子里箭头被拉长了 3 倍,方向不变;第二个例子里箭头被压缩到原来的一半,方向翻转。"标量"这个名字本身就反映了它的作用:它只能改变向量的<em>尺度</em>(scale),不能改变方向(除了反向)。</p>
+
+<p>这三种运算满足与普通算术相同的规律:加法可交换、可结合,数乘对加法满足分配律,等等。我们不一一列出;在你需要的地方它们都"显然成立",只要按分量算就能验证。如果你以后要做线性代数,会看到把这些规律抽象出来,得到所谓"向量空间"的概念——任何满足这些公理的对象集都被称为向量空间,远不止 \(\mathbb{R}^n\) 一种。</p>
+
+<p>这里特别容易出错的是把两个向量"按分量相乘"。"\(\langle 1, 2, 3 \rangle \cdot \langle 4, 5, 6 \rangle = \langle 4, 10, 18 \rangle\)" 这种写法<strong>没有</strong>定义。向量的逐分量乘法在几何中没有意义——它依赖于你恰好选了哪一组坐标轴,换一组坐标轴答案就完全不一样,这种"运算"不是真正的几何对象之间的运算。两个真正的"向量乘积"是<em>点积</em>(1.5 节),它产生一个数;和<em>叉积</em>(1.6 节),它产生一个向量。两者都不是逐分量的,两者都有真正的几何意义。</p>
+
+<p>顺便说一句:向量除以向量也<strong>没有</strong>定义。如果你要"约掉"一个向量,你必须用某种乘积(通常是点积)把它变成数,然后才能除。这是初学者最常犯的代数错误之一。</p>
+
+<h2 id="sec1-4">1.4 模与单位向量</h2>
+
+<p>向量 \(\mathbf{v} = \langle v_1, v_2, v_3 \rangle\) 的<strong>模</strong>(也叫<em>长度</em>或<em>范数</em>)是</p>
+
+\[
+|\mathbf{v}| = \sqrt{v_1^2 + v_2^2 + v_3^2}.
+\]
+
+<p>这就是变了装的距离公式:向量的模就是从原点到它头部的距离。再次强调,虽然向量本身可以挪到任何地方,但它的长度只取决于分量的平方和,跟你把箭头放在哪里无关。</p>
+
+<p><strong>单位向量</strong>就是模为 1 的向量。要把任何非零向量 \(\mathbf{v}\) 变成同方向的单位向量,除以它自己的模即可:</p>
+
+\[
+\hat{\mathbf{v}} = \frac{\mathbf{v}}{|\mathbf{v}|}.
+\]
+
+<p>我们用"帽子"标记单位向量。有些书用 \(\mathbf{u}\),效果一样。这个操作在英文里叫做 <em>normalization</em>,中文叫"单位化"。它是把"方向"信息从"长度"信息里剥离出来的标准手段:模告诉你"走多远",单位向量告诉你"朝哪里"。</p>
+
+<p>来一个具体例子。若 \(\mathbf{v} = \langle 3, 4, 0 \rangle\),则 \(|\mathbf{v}| = \sqrt{9 + 16 + 0} = 5\),于是</p>
+
+\[
+\hat{\mathbf{v}} = \tfrac{1}{5} \langle 3, 4, 0 \rangle = \langle \tfrac{3}{5}, \tfrac{4}{5}, 0 \rangle.
+\]
+
+<p>验证一下:\(|\hat{\mathbf{v}}| = \sqrt{(3/5)^2 + (4/5)^2 + 0} = \sqrt{9/25 + 16/25} = \sqrt{25/25} = 1\)。对了。再来一个:若 \(\mathbf{w} = \langle 1, 2, 2 \rangle\),则 \(|\mathbf{w}| = \sqrt{1 + 4 + 4} = 3\),于是 \(\hat{\mathbf{w}} = \langle 1/3, 2/3, 2/3 \rangle\)。验证:\((1/3)^2 + (2/3)^2 + (2/3)^2 = 1/9 + 4/9 + 4/9 = 1\)。再对。</p>
+
+<p>有三个特殊的单位向量到处都会出现:</p>
+
+\[
+\mathbf{i} = \langle 1, 0, 0 \rangle, \quad \mathbf{j} = \langle 0, 1, 0 \rangle, \quad \mathbf{k} = \langle 0, 0, 1 \rangle.
+\]
+
+<p>它们叫做<strong>标准基向量</strong>,分别指向 \(x\)、\(y\)、\(z\) 轴的正方向。任何向量都可以用它们来写:</p>
+
+\[
+\langle a, b, c \rangle = a\mathbf{i} + b\mathbf{j} + c\mathbf{k}.
+\]
+
+<p>这个写法的好处是把每个分量的"含义"都明明白白地写在面上:\(a\) 是沿 \(x\) 方向的分量,\(b\) 是沿 \(y\) 方向的,以此类推。\(\mathbf{i}, \mathbf{j}, \mathbf{k}\) 这种记号在物理和工程里随处可见——电磁学的教科书里几乎只用这种写法。习惯在 \(\langle\cdot,\cdot,\cdot\rangle\) 与 \(\mathbf{i}\mathbf{j}\mathbf{k}\) 两种写法之间无缝切换。本书两者都会用。</p>
+
+<p>二维情形里基向量只有 \(\mathbf{i}, \mathbf{j}\)。在更高维里我们会写成 \(\mathbf{e}_1, \mathbf{e}_2, \ldots, \mathbf{e}_n\),不再用单独的字母——一个原因是字母不够用了。</p>
+
+<p>最后顺手做一道复合题,把模和数乘联起来用。求长度为 7、与向量 \(\langle 1, 2, 2 \rangle\) 同方向的向量。先把 \(\langle 1, 2, 2 \rangle\) 单位化得到 \(\langle 1/3, 2/3, 2/3 \rangle\),然后乘 7,得 \(\langle 7/3, 14/3, 14/3 \rangle\)。验证模:\(\sqrt{(7/3)^2 + (14/3)^2 + (14/3)^2} = \frac{1}{3}\sqrt{49 + 196 + 196} = \frac{1}{3}\sqrt{441} = \frac{21}{3} = 7\)。完美。这种"先单位化、再缩放"的两步法,后面会无数次出现。</p>
+
+<h2 id="sec1-5">1.5 点积</h2>
+
+<p>点积是向量上第一个不平凡的运算。它"吃下"两个向量,"吐出"一个数。这个数在几何上有两层相关的含义:它告诉你两向量之间的<strong>夹角</strong>,也告诉你一个向量在另一个向量上<strong>投影</strong>了多少。这两层含义听起来似乎不同,其实是同一件事的两个侧面——这正是点积的优雅之处。</p>
+
+<h3 id="sec1-5-1">1.5.1 代数定义</h3>
+
+<p>向量 \(\mathbf{a} = \langle a_1, a_2, a_3 \rangle\) 与 \(\mathbf{b} = \langle b_1, b_2, b_3 \rangle\) 的点积是</p>
+
+\[
+\mathbf{a} \cdot \mathbf{b} = a_1 b_1 + a_2 b_2 + a_3 b_3.
+\]
+
+<p>就是这样:把对应分量相乘,加起来,得到一个数。注意输出是一个数,不是一个向量。所以"\(\mathbf{a} \cdot \mathbf{b} \cdot \mathbf{c}\)" 这种写法严格意义上是没有定义的——\(\mathbf{a} \cdot \mathbf{b}\) 已经是一个数了,跟向量 \(\mathbf{c}\) 不能继续做点积。它当然可以再乘以 \(\mathbf{c}\) 当数乘,但那是另一回事。</p>
+
+<p>例如:</p>
+
+\[
+\langle 1, 2, 3 \rangle \cdot \langle 4, -5, 6 \rangle = (1)(4) + (2)(-5) + (3)(6) = 4 - 10 + 18 = 12.
+\]
+
+<p>再来一个:</p>
+
+\[
+\langle 2, 0, -1 \rangle \cdot \langle 3, 5, 1 \rangle = 6 + 0 - 1 = 5.
+\]
+
+<p>点积满足类似普通乘法的运算律:</p>
+
+<ul>
+<li>\(\mathbf{a} \cdot \mathbf{b} = \mathbf{b} \cdot \mathbf{a}\)(交换律);</li>
+<li>\(\mathbf{a} \cdot (\mathbf{b} + \mathbf{c}) = \mathbf{a} \cdot \mathbf{b} + \mathbf{a} \cdot \mathbf{c}\)(对加法的分配律);</li>
+<li>\((c \mathbf{a}) \cdot \mathbf{b} = c (\mathbf{a} \cdot \mathbf{b}) = \mathbf{a} \cdot (c\mathbf{b})\)(标量可以提出来);</li>
+<li>\(\mathbf{a} \cdot \mathbf{a} = |\mathbf{a}|^2\)。</li>
+</ul>
+
+<p>最后那条很巧妙也很有用:把一个向量和它自己点积,得到模的平方。所以 \(|\mathbf{a}| = \sqrt{\mathbf{a} \cdot \mathbf{a}}\)。这意味着,只要会做点积,你就也会算模——它们其实是同一件事。</p>
+
+<h3 id="sec1-5-2">1.5.2 几何意义:夹角与投影</h3>
+
+<p>下面这件事让点积值得我们去关心。设 \(\theta\) 是两向量 \(\mathbf{a}\) 和 \(\mathbf{b}\) 之间的夹角(如果你把两个箭头都从同一点画出来,所量出的那个角,取 \(0 \le \theta \le \pi\)),则</p>
+
+\[
+\boxed{\mathbf{a} \cdot \mathbf{b} = |\mathbf{a}|\, |\mathbf{b}|\, \cos\theta.}
+\]
+
+<p>这是点积的<strong>几何公式</strong>。它把一个完全代数的运算(按分量相乘再求和)和一个完全几何的量(两个箭头之间的夹角)联系起来——这正是为什么点积值得拥有自己的名字。如果你曾觉得"分量相乘再相加"这个定义有些武断,那么这个等式就是它的辩护词:这个运算并不是随便堆出来的,它精准地对应着角度。</p>
+
+<p>为什么是这个公式?干净的证明用余弦定理:在三角形中,以 \(\mathbf{a}\) 和 \(\mathbf{b}\) 为两边、\(\mathbf{a} - \mathbf{b}\) 为第三边,余弦定理给出 \(|\mathbf{a} - \mathbf{b}|^2 = |\mathbf{a}|^2 + |\mathbf{b}|^2 - 2|\mathbf{a}||\mathbf{b}|\cos\theta\),把左边按分量展开就直接化成 \(\mathbf{a} \cdot \mathbf{b} = |\mathbf{a}||\mathbf{b}|\cos\theta\)。完整推导参见附录的 A.0.1 节。但下面这些观察应该能让公式可信:</p>
+
+<ul>
+<li>如果 \(\mathbf{a}\) 和 \(\mathbf{b}\) 指<em>同方向</em>,则 \(\theta = 0\),\(\cos\theta = 1\),\(\mathbf{a} \cdot \mathbf{b} = |\mathbf{a}||\mathbf{b}|\),是它能取到的最大值。</li>
+<li>如果 \(\mathbf{a}\) 和 \(\mathbf{b}\) <em>垂直</em>,则 \(\theta = \pi/2\),\(\cos\theta = 0\),\(\mathbf{a} \cdot \mathbf{b} = 0\)。</li>
+<li>如果它们指<em>反方向</em>,\(\theta = \pi\),\(\cos\theta = -1\),\(\mathbf{a} \cdot \mathbf{b} = -|\mathbf{a}||\mathbf{b}|\),是它能取到的最负值。</li>
+</ul>
+
+<p>所以点积在两向量大致同向时取大正值,垂直时为零,大致反向时取大负值。点积的符号本身就是一种"是否同方向"的快速指示器。</p>
+
+<p>由此得到最常用的推论:两个非零向量 \(\mathbf{a}\) 和 \(\mathbf{b}\) 垂直,当且仅当 \(\mathbf{a} \cdot \mathbf{b} = 0\)。这是<strong>垂直判定</strong>,后面会被反复使用。每当几何要求"找到与某向量垂直的向量"时,我们就把点积设为零去解。在第 2 章描述平面、第 14 章求梯度、第 21 章算环量时,这个判定都会一次又一次出现。</p>
+
+<p>把上式解出 \(\theta\) 得到</p>
+
+\[
+\cos\theta = \frac{\mathbf{a} \cdot \mathbf{b}}{|\mathbf{a}|\, |\mathbf{b}|},
+\]
+
+<p>这就是我们计算两向量夹角的公式。注意分母上分别是两个向量各自的模,不能搞混。</p>
+
+<p>关于<strong>投影</strong>。设 \(\mathbf{a}\) 与 \(\mathbf{b}\) 是向量,且 \(\mathbf{b} \neq \mathbf{0}\),则 <em>\(\mathbf{a}\) 在 \(\mathbf{b}\) 上的投影</em>就是 \(\mathbf{a}\) 沿 \(\mathbf{b}\) 方向的"影子":</p>
+
+\[
+\mathrm{proj}_{\mathbf{b}} \mathbf{a} = \frac{\mathbf{a} \cdot \mathbf{b}}{|\mathbf{b}|^2} \, \mathbf{b}.
+\]
+
+<p>这个公式看起来挺丑。让我把它解读一下。想象太阳从垂直于 \(\mathbf{b}\) 方向的某个方向照射过来,把 \(\mathbf{a}\) 投到 \(\mathbf{b}\) 所在那条直线上,得到的影子就是这个投影向量。标量 \(\frac{\mathbf{a} \cdot \mathbf{b}}{|\mathbf{b}|}\) 是影子的<em>带符号长度</em>——同向为正,反向为负。要把这个长度变成真正的向量,再乘以单位向量 \(\hat{\mathbf{b}} = \mathbf{b}/|\mathbf{b}|\)。组合起来:\(\bigl(\mathbf{a} \cdot \mathbf{b}/|\mathbf{b}|\bigr)\bigl(\mathbf{b}/|\mathbf{b}|\bigr) = (\mathbf{a} \cdot \mathbf{b})/|\mathbf{b}|^2 \cdot \mathbf{b}\)。这就是公式的来源。</p>
+
+<p>投影是 \(\mathbf{a}\) 中沿 \(\mathbf{b}\) 方向的那部分。\(\mathbf{a}\) 的"另一部分"是与 \(\mathbf{b}\) 垂直的那部分:</p>
+
+\[
+\mathbf{a}_\perp = \mathbf{a} - \mathrm{proj}_{\mathbf{b}} \mathbf{a}.
+\]
+
+<p>这个分解——任何向量都可以分成沿 \(\mathbf{b}\) 方向和与 \(\mathbf{b}\) 垂直方向的两部分——是向量几何的主力工具。它会出现在 4.5 节(分解加速度成切向分量和法向分量)、21.2 节(沿路径做功)等许多地方。从物理上看,这种"分解一个力"的操作每天都在发生:斜面上的重力可以分解成沿斜面向下的分量(让物体滑下来)和垂直于斜面的分量(被斜面顶住),这两部分的代数表达正是上面的公式。</p>
+
+<h3 id="sec1-5-3">1.5.3 一些具体题目</h3>
+
+<p>来求 \(\mathbf{a} = \langle 1, 2, 2 \rangle\) 与 \(\mathbf{b} = \langle 3, 0, -4 \rangle\) 之间的夹角。公式是 \(\cos\theta = (\mathbf{a} \cdot \mathbf{b})/(|\mathbf{a}|\,|\mathbf{b}|)\),所以需要三个数:点积、\(|\mathbf{a}|\)、\(|\mathbf{b}|\)。三个都不难。</p>
+
+<ul>
+<li>\(\mathbf{a} \cdot \mathbf{b} = (1)(3) + (2)(0) + (2)(-4) = 3 + 0 - 8 = -5\)。</li>
+<li>\(|\mathbf{a}| = \sqrt{1 + 4 + 4} = \sqrt{9} = 3\)。</li>
+<li>\(|\mathbf{b}| = \sqrt{9 + 0 + 16} = \sqrt{25} = 5\)。</li>
+</ul>
+
+<p>于是 \(\cos\theta = -5/(3 \cdot 5) = -1/3\),所以 \(\theta = \arccos(-1/3) \approx 1.911\) 弧度,约为 \(109.5°\)。这个 \(109.5°\) 化学专业的人应该眼熟——甲烷的键角,正是把四面体的中心连到四个顶点所形成的夹角。点积是负的,这意味着夹角在 \(90°\) 与 \(180°\) 之间;反过来讲,如果你算完夹角发现钝角而点积却是正的,那一定是哪里算错了。</p>
+
+<p>再看一道:证明 \(\mathbf{u} = \langle 2, -1, 3 \rangle\) 与 \(\mathbf{v} = \langle 1, 5, 1 \rangle\) 垂直。"垂直"的意思就是"点积为零",所以算一算就行:\(\mathbf{u} \cdot \mathbf{v} = (2)(1) + (-1)(5) + (3)(1) = 2 - 5 + 3 = 0\)。完。根本不必求夹角或模——光凭点积就够了。这就是为什么垂直判定如此好用:它把一个看起来需要三角学的问题,化成了一次乘加运算。</p>
+
+<p>第三道:求 \(\mathbf{a} = \langle 4, 1, -2 \rangle\) 在 \(\mathbf{b} = \langle 1, 2, 2 \rangle\) 上的投影。需要 \(\mathbf{a} \cdot \mathbf{b}\) 和 \(|\mathbf{b}|^2\),然后拼起来。算:\(\mathbf{a} \cdot \mathbf{b} = 4 + 2 - 4 = 2\),\(|\mathbf{b}|^2 = 1 + 4 + 4 = 9\)。所以</p>
+
+\[
+\mathrm{proj}_{\mathbf{b}} \mathbf{a} = \tfrac{2}{9} \langle 1, 2, 2 \rangle = \langle \tfrac{2}{9}, \tfrac{4}{9}, \tfrac{4}{9} \rangle.
+\]
+
+<p>注意我从头到尾没有计算 \(|\mathbf{b}|\) 本身,只计算了 \(|\mathbf{b}|^2\),因为公式里分母正是 \(|\mathbf{b}|^2\)。能避免开方就避免开方,这是计算上的小习惯,日积月累节省的力气可观。这里特别容易出错的是:投影公式中分母上是 \(|\mathbf{b}|^2\),也就是被投影到的那个向量的模,不是被投影的那个 \(\mathbf{a}\) 的模。把这两个搞混是最标准的失误。</p>
+
+<p>来一道更"现实"的题:一个 100 牛的力 \(\mathbf{F} = \langle 60, 80, 0 \rangle\) 作用在物体上,物体沿方向 \(\mathbf{d} = \langle 1, 0, 0 \rangle\) 移动了 5 米。问做了多少功?在物理学里,功的定义是 \(W = \mathbf{F} \cdot \mathbf{s}\),其中 \(\mathbf{s}\) 是位移向量。这里 \(\mathbf{s} = 5 \mathbf{d} = \langle 5, 0, 0 \rangle\),所以 \(W = \mathbf{F} \cdot \mathbf{s} = (60)(5) + 0 + 0 = 300\) 焦耳。直觉上这一点也不奇怪:只有沿位移方向的那一份力(也就是 60 牛)在"做功",垂直于位移的 80 牛分量完全没贡献。点积自动帮你做了这个分解——这是为什么物理学家如此喜爱点积。</p>
+
+<p>再做一道关于角度的:求向量 \(\langle 1, 1, 1 \rangle\) 与各坐标轴的夹角(称为<em>方向角</em>)。三个坐标轴方向上的单位向量分别是 \(\mathbf{i}, \mathbf{j}, \mathbf{k}\)。\(|\langle 1,1,1 \rangle| = \sqrt{3}\)。所以分别有 \(\cos\alpha = 1/\sqrt{3}, \cos\beta = 1/\sqrt{3}, \cos\gamma = 1/\sqrt{3}\),三个角都等于 \(\arccos(1/\sqrt{3}) \approx 54.7°\)。这三个余弦值的平方和恰好是 \(1\),不是巧合:任何向量的方向余弦的平方和都等于 1,这是单位向量条件 \(|\hat{\mathbf{v}}| = 1\) 的等价说法。</p>
+
+<h2 id="sec1-6">1.6 叉积</h2>
+
+<p>叉积是三维特有的运算。它"吃下"两个向量,"吐出"<strong>第三个向量</strong>,与前两者都垂直。在二维空间中没有类似物——根本没有"与平面里两个向量都垂直的、还在平面里的方向";在更高维空间中最接近的类似物涉及"楔积"(wedge product),那是另一本书的故事。叉积之所以只在三维里成立,本质原因是只有在三维里,"两个向量的公共垂线"才唯一(在带方向意义上)。这个事实让叉积既神奇又脆弱:它是为我们这个三维宇宙量身定制的。</p>
+
+<h3 id="sec1-6-1">1.6.1 定义与行列式记忆法</h3>
+
+<p>向量 \(\mathbf{a} = \langle a_1, a_2, a_3 \rangle\) 与 \(\mathbf{b} = \langle b_1, b_2, b_3 \rangle\) 的叉积是</p>
+
+\[
+\mathbf{a} \times \mathbf{b} = \langle a_2 b_3 - a_3 b_2,\ a_3 b_1 - a_1 b_3,\ a_1 b_2 - a_2 b_1 \rangle.
+\]
+
+<p>这一长串很难记。无痛的方式是把它写成一个 \(3\times 3\) 行列式:</p>
+
+\[
+\mathbf{a} \times \mathbf{b} = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ a_1 & a_2 & a_3 \\ b_1 & b_2 & b_3 \end{vmatrix}.
+\]
+
+<p>第一行放基向量 \(\mathbf{i}, \mathbf{j}, \mathbf{k}\)(虽然行列式里出现向量看起来有点怪,但这只是一种助记的形式,严格意义上的行列式当然只对数定义),第二行放 \(\mathbf{a}\) 的分量,第三行放 \(\mathbf{b}\) 的分量。按第一行做余子式展开:</p>
+
+\[
+\mathbf{a} \times \mathbf{b} = \mathbf{i}\begin{vmatrix} a_2 & a_3 \\ b_2 & b_3 \end{vmatrix} - \mathbf{j}\begin{vmatrix} a_1 & a_3 \\ b_1 & b_3 \end{vmatrix} + \mathbf{k}\begin{vmatrix} a_1 & a_2 \\ b_1 & b_2 \end{vmatrix}.
+\]
+
+<p>如果你不记得行列式,你只需要这个:\(2\times 2\) 行列式 \(\begin{vmatrix} a & b \\ c & d \end{vmatrix} = ad - bc\)。叉积公式的形式可以用文字描述为:"\(\mathbf{i}\) 乘以挡掉第 1 列后剩下的 \(2\times 2\) 行列式,减去 \(\mathbf{j}\) 乘以挡掉第 2 列后剩下的行列式,加上 \(\mathbf{k}\) 乘以挡掉第 3 列后剩下的行列式"。中间项前面的减号<strong>不</strong>是排版错误,<strong>不</strong>能省。这是大家都犯的同一个错误。规律是 \(+,-,+\)。</p>
+
+<p>下面是一个具体计算:</p>
+
+\[
+\langle 1, 2, 3 \rangle \times \langle 4, 5, 6 \rangle = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 1 & 2 & 3 \\ 4 & 5 & 6 \end{vmatrix}
+\]
+
+\[
+= \mathbf{i}(2 \cdot 6 - 3 \cdot 5) - \mathbf{j}(1 \cdot 6 - 3 \cdot 4) + \mathbf{k}(1 \cdot 5 - 2 \cdot 4)
+\]
+
+\[
+= \mathbf{i}(12 - 15) - \mathbf{j}(6 - 12) + \mathbf{k}(5 - 8)
+\]
+
+\[
+= -3\mathbf{i} + 6\mathbf{j} - 3\mathbf{k} = \langle -3, 6, -3 \rangle.
+\]
+
+<p>叉积应当与两个输入向量都垂直。我们来检验一下:\(\langle -3, 6, -3 \rangle \cdot \langle 1, 2, 3 \rangle = -3 + 12 - 9 = 0\) ✓;\(\langle -3, 6, -3 \rangle \cdot \langle 4, 5, 6 \rangle = -12 + 30 - 18 = 0\) ✓。在初学阶段一定要做这个检验,能立刻抓出符号错误。这种"算完后用点积验证垂直"的习惯几乎不花时间,却能挽救你的成绩。</p>
+
+<p>再来一个练手:</p>
+
+\[
+\langle 2, -1, 0 \rangle \times \langle 0, 3, 1 \rangle = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 2 & -1 & 0 \\ 0 & 3 & 1 \end{vmatrix}
+= \mathbf{i}(-1-0) - \mathbf{j}(2-0) + \mathbf{k}(6-0) = \langle -1, -2, 6 \rangle.
+\]
+
+<p>检验:\(\langle -1, -2, 6 \rangle \cdot \langle 2, -1, 0 \rangle = -2 + 2 + 0 = 0\) ✓;\(\langle -1, -2, 6 \rangle \cdot \langle 0, 3, 1 \rangle = 0 - 6 + 6 = 0\) ✓。</p>
+
+<h3 id="sec1-6-2">1.6.2 几何意义:面积与方向</h3>
+
+<p>叉积既有大小又有方向,两者都有意义。先说大小:\(|\mathbf{a} \times \mathbf{b}| = |\mathbf{a}|\,|\mathbf{b}|\sin\theta\),其中 \(\theta\) 是 \(\mathbf{a}\) 与 \(\mathbf{b}\) 之间的夹角(取 \(0 \le \theta \le \pi\))。几何上,这就是 \(\mathbf{a}\) 与 \(\mathbf{b}\) 张成的<strong>平行四边形的面积</strong>。把它除以 2,就得到三角形面积:</p>
+
+\[
+\boxed{\mathrm{Area}(\triangle) = \tfrac{1}{2}|\mathbf{a} \times \mathbf{b}|.}
+\]
+
+<p>注意点积公式里出现的是 \(\cos\theta\),叉积里是 \(\sin\theta\),这是它们在几何上各管一摊的根源:点积擅长抓"平行的程度"(同向时最大),叉积擅长抓"垂直的程度"(垂直时最大)。两者合起来正好穷尽了"两个向量的相对方向"这件事。</p>
+
+<p>方向方面:\(\mathbf{a} \times \mathbf{b}\) 与 \(\mathbf{a}\)、\(\mathbf{b}\) 都垂直,具体方向由<strong>右手法则</strong>给出。把右手手指从 \(\mathbf{a}\) 弯向 \(\mathbf{b}\)(从短的那个角度弯,不要走远路),大拇指就指向 \(\mathbf{a} \times \mathbf{b}\) 的方向。这条法则正是右手系定义本身:\(\mathbf{i} \times \mathbf{j} = \mathbf{k}\),\(\mathbf{j} \times \mathbf{k} = \mathbf{i}\),\(\mathbf{k} \times \mathbf{i} = \mathbf{j}\)——按 \(\mathbf{i} \to \mathbf{j} \to \mathbf{k} \to \mathbf{i}\) 这个循环走,叉积顺序对就得正,顺序反就得负:\(\mathbf{j} \times \mathbf{i} = -\mathbf{k}\)。</p>
+
+<p>这里有一个关键的非对称性:叉积<strong>不</strong>满足交换律。\(\mathbf{a} \times \mathbf{b} = -\mathbf{b} \times \mathbf{a}\)。这叫做<em>反交换律</em>。这是为了能从叉积里抽出一个有意义的"方向"所付出的代价——交换顺序就翻转定向。一个有用的推论:\(\mathbf{a} \times \mathbf{a} = \mathbf{0}\)。理由有两个,选一个你喜欢的:平行四边形面积为零(把一个向量和自己张成的"平行四边形"是一条线段,没有面积);或者按反交换律,\(\mathbf{a} \times \mathbf{a} = -\mathbf{a} \times \mathbf{a}\),所以它必须是零向量。两种解释殊途同归。</p>
+
+<p>由此引出<strong>平行判定</strong>:两个非零向量 \(\mathbf{a}\) 与 \(\mathbf{b}\) 平行,当且仅当 \(\mathbf{a} \times \mathbf{b} = \mathbf{0}\)。把它和 1.5 节的垂直判定对比:点积为零意味着垂直;叉积为零意味着平行。别把这两个搞混。一个简单的记法:点积在两向量同向(平行)时最大,在垂直时为零;叉积在垂直时最大(此时平行四边形是矩形,面积最大),在平行时为零(此时平行四边形塌成一条线段)。</p>
+
+<p>叉积在物理上的最经典应用是<em>力矩</em>(torque)和<em>角动量</em>。如果在杠杆某点 \(\mathbf{r}\) 处施加力 \(\mathbf{F}\),那么相对于支点的力矩就是 \(\boldsymbol{\tau} = \mathbf{r} \times \mathbf{F}\)。这个公式自动地告诉你:沿杠杆方向用力(\(\mathbf{r}\) 与 \(\mathbf{F}\) 平行)力矩为零(没用),垂直于杠杆用力时力矩最大(最有效),而力矩的方向就是旋转轴的方向。中学物理里的"力矩 = 力臂 × 力"只是这个三维公式在二维下的影子。</p>
+
+<h3 id="sec1-6-3">1.6.3 标量三重积</h3>
+
+<p>如果你有三个向量 \(\mathbf{a}, \mathbf{b}, \mathbf{c}\),<strong>标量三重积</strong>是 \(\mathbf{a} \cdot (\mathbf{b} \times \mathbf{c})\)。它是一个数。它的几何意义是:</p>
+
+\[
+\big|\mathbf{a} \cdot (\mathbf{b} \times \mathbf{c})\big| = \mathbf{a}, \mathbf{b}, \mathbf{c} \text{ 张成的平行六面体的体积}.
+\]
+
+<p>为什么?\(\mathbf{b} \times \mathbf{c}\) 的模是底面平行四边形的面积,方向是底面的法向。\(\mathbf{a} \cdot (\mathbf{b} \times \mathbf{c}) = |\mathbf{a}||\mathbf{b} \times \mathbf{c}|\cos\theta\),其中 \(\cos\theta\) 把 \(\mathbf{a}\) 投影到底面的法向上,得到的就是平行六面体的"高"。底乘高就是体积。整个公式就是把"底面积 × 高"用一行式子写出来。</p>
+
+<p>可以把它写成一个 \(3\times 3\) 行列式来一次算出:</p>
+
+\[
+\mathbf{a} \cdot (\mathbf{b} \times \mathbf{c}) = \begin{vmatrix} a_1 & a_2 & a_3 \\ b_1 & b_2 & b_3 \\ c_1 & c_2 & c_3 \end{vmatrix}.
+\]
+
+<p>这个公式特别便利,因为你不必先算叉积再做点积——一个行列式直接搞定。</p>
+
+<p>一个好的推论:三个向量<strong>共面</strong>(位于过原点的一个公共平面内)当且仅当它们的标量三重积为零。如果三重积为零,平行六面体的体积为零,也就是"扁平"了;否则就有正体积,说明三个向量不共面。这个判定将在 2.1 节判别两条直线是否相交时用到——你会看到,共面性这件事在三维几何里反复出现。</p>
+
+<p>三重积有几条优美的性质:循环对称(\(\mathbf{a} \cdot (\mathbf{b} \times \mathbf{c}) = \mathbf{b} \cdot (\mathbf{c} \times \mathbf{a}) = \mathbf{c} \cdot (\mathbf{a} \times \mathbf{b})\)),也就是说三个向量"轮换"位置不改变值;但任何两个交换位置都会变号。这从行列式角度看显然——交换两行行列式变号,循环换三行不变号。</p>
+
+<h3 id="sec1-6-4">1.6.4 一些具体题目</h3>
+
+<p>来求一个与 \(\mathbf{a} = \langle 1, 0, 1 \rangle\) 和 \(\mathbf{b} = \langle 2, 1, 0 \rangle\) 都垂直的向量。"与两者都垂直"——这正是叉积要做的事。算 \(\mathbf{a} \times \mathbf{b}\):</p>
+
+\[
+\mathbf{a} \times \mathbf{b} = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 1 & 0 & 1 \\ 2 & 1 & 0 \end{vmatrix} = \mathbf{i}(0 - 1) - \mathbf{j}(0 - 2) + \mathbf{k}(1 - 0) = \langle -1, 2, 1 \rangle.
+\]
+
+<p>检验:\(\langle -1, 2, 1 \rangle \cdot \langle 1, 0, 1 \rangle = -1 + 0 + 1 = 0\) ✓;\(\langle -1, 2, 1 \rangle \cdot \langle 2, 1, 0 \rangle = -2 + 2 + 0 = 0\) ✓。完。值得注意:\(\langle -1, 2, 1 \rangle\) 的任何非零标量倍数也都满足要求——比如 \(\langle -2, 4, 2 \rangle\),或 \(\langle 1/2, -1, -1/2 \rangle\)。叉积给出某个特定的垂直向量;题目只是要求一个,所以这条方向上的任何答案都行。</p>
+
+<p>下一道:求顶点为 \(P = (1, 1, 1)\)、\(Q = (2, 3, 4)\)、\(R = (4, 1, -1)\) 的三角形的面积。给了三个点,要求面积。三角形面积是平行四边形面积的一半,平行四边形面积是某个叉积的模。所以我需要张成这三角形的两个向量,容易:\(\overrightarrow{PQ}\) 与 \(\overrightarrow{PR}\)(从同一个顶点出发的两条边)。</p>
+
+<p>\(\overrightarrow{PQ} = Q - P = \langle 1, 2, 3 \rangle\),\(\overrightarrow{PR} = R - P = \langle 3, 0, -2 \rangle\)。</p>
+
+\[
+\overrightarrow{PQ} \times \overrightarrow{PR} = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 1 & 2 & 3 \\ 3 & 0 & -2 \end{vmatrix} = \mathbf{i}(-4) - \mathbf{j}(-2 - 9) + \mathbf{k}(0 - 6) = \langle -4, 11, -6 \rangle.
+\]
+
+<p>模:\(\sqrt{16 + 121 + 36} = \sqrt{173}\)。所以平行四边形面积是 \(\sqrt{173}\),三角形面积是 \(\sqrt{173}/2 \approx 6.58\)。注意我从哪个顶点出发并不影响最终面积——你可以试试用 \(\overrightarrow{QP}\) 和 \(\overrightarrow{QR}\) 重做一遍,叉积的值会不一样,但模相等。</p>
+
+<p>第三道:点 \(A = (1,1,1)\)、\(B = (2,3,5)\)、\(C = (4,5,7)\)、\(D = (1,0,2)\) 共面吗?"四点共面"等价于"从其中一点出发的三个位移向量共面",等价于"它们的标量三重积为零"。挑 \(A\) 当大本营。</p>
+
+<p>\(\overrightarrow{AB} = \langle 1, 2, 4 \rangle\),\(\overrightarrow{AC} = \langle 3, 4, 6 \rangle\),\(\overrightarrow{AD} = \langle 0, -1, 1 \rangle\)。</p>
+
+\[
+\overrightarrow{AB} \cdot (\overrightarrow{AC} \times \overrightarrow{AD}) = \begin{vmatrix} 1 & 2 & 4 \\ 3 & 4 & 6 \\ 0 & -1 & 1 \end{vmatrix}
+\]
+
+\[
+= 1(4 + 6) - 2(3 - 0) + 4(-3 - 0) = 10 - 6 - 12 = -8.
+\]
+
+<p>不是零,所以这四个点<strong>不</strong>共面。它们构成一个体积为 \(|-8|/6 = 4/3\) 的(非退化)四面体。四面体的体积是平行六面体体积的 \(1/6\),这是一个值得记的几何事实——把一个平行六面体沿对角线切成几块,可以拼出 6 个相同体积的四面体。</p>
+
+<p>最后来一道源自物理的题:某行星距太阳的位置向量是 \(\mathbf{r} = \langle 3, 4, 0 \rangle\)(单位:天文单位),它的速度是 \(\mathbf{v} = \langle 0, 5, 0 \rangle\)。它的"角动量方向"——也就是 \(\mathbf{r} \times \mathbf{v}\) 的方向——是什么?算 \(\mathbf{r} \times \mathbf{v} = \mathbf{i}(4 \cdot 0 - 0 \cdot 5) - \mathbf{j}(3 \cdot 0 - 0 \cdot 0) + \mathbf{k}(3 \cdot 5 - 4 \cdot 0) = \langle 0, 0, 15 \rangle\)。方向是 \(+\mathbf{k}\),也就是说,行星的轨道平面就是 \(xy\) 平面,而它在沿逆时针方向绕(从 \(+\mathbf{k}\) 方向看下去)。开普勒第二定律的现代表述就用到这个 \(\mathbf{r} \times \mathbf{v}\):它在引力作用下守恒,等价于"行星向径在等时间内扫过相等面积"。一个简单的叉积,牵动了整个天体力学。</p>
+
+<h3 id="sec1-6-5">1.6.5 关于点积与叉积的小卡片</h3>
+
+<p>后面整本书都要用到这两者。这里是一张速查表,但我建议你看完之后合上书,自己重新写一份——动笔写过的东西,记忆会牢得多。</p>
+
+<table>
+<thead>
+<tr><th></th><th>点积 \(\mathbf{a} \cdot \mathbf{b}\)</th><th>叉积 \(\mathbf{a} \times \mathbf{b}\)</th></tr>
+</thead>
+<tbody>
+<tr><td>输入</td><td>两个向量</td><td>两个向量(仅三维)</td></tr>
+<tr><td>输出</td><td>一个数</td><td>一个向量</td></tr>
+<tr><td>公式</td><td>\(a_1 b_1 + a_2 b_2 + a_3 b_3\)</td><td>\(\langle a_2 b_3 - a_3 b_2,\ a_3 b_1 - a_1 b_3,\ a_1 b_2 - a_2 b_1\rangle\)</td></tr>
+<tr><td>大小</td><td>\(|\mathbf{a}||\mathbf{b}|\cos\theta\)</td><td>\(|\mathbf{a}||\mathbf{b}|\sin\theta\)</td></tr>
+<tr><td>何时为零</td><td>\(\mathbf{a} \perp \mathbf{b}\)</td><td>\(\mathbf{a} \parallel \mathbf{b}\)</td></tr>
+<tr><td>对称性</td><td>交换律</td><td>反交换律</td></tr>
+<tr><td>几何意义</td><td>投影 / 夹角</td><td>公共垂线 / 面积</td></tr>
+<tr><td>典型物理用途</td><td>功、能量</td><td>力矩、角动量、磁力</td></tr>
+</tbody>
+</table>
+
+<p>第 2 章里我们会用这两种乘积来描述直线与平面——三维空间中最基本的几何对象。那里面的几乎每一条公式,要么来自垂直判定(用于平面的法向量),要么来自平行判定(用于直线的方向向量)。工具你已经备齐了,接下来就是把它们组合起来用。</p>
+
+<hr/>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><span class="nav-disabled">← 上一章</span><a href="ch2.html">下一章 · 第 2 章 直线、平面与曲面 →</a></nav>
+
+</main>
+</body>
+</html>

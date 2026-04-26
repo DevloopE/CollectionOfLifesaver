@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 初等复函数 — 普林斯顿复分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 Cauchy-Riemann 方程与调和函数</a><a href="ch6.html">下一章 · 第 6 章 多值函数与分支切割 →</a></nav>
+<h1 id="ch5">第 5 章 初等复函数</h1>
+
+<p>到上一章为止，我们已经把"复函数何时可微"这件事讲清楚了：解析就是 Cauchy–Riemann 加上偏导连续。但我们手上其实还没有<strong>哪怕一个</strong>真正非平凡的解析函数，可以拿来反复运算和欣赏。多项式当然是解析的，那只是把实数情形的多项式直接搬过来，没什么新鲜事。\(1/z\) 也算一个，但它在 \(z = 0\) 有奇点，能玩的把戏有限。本章要做的事情非常具体：把你在微积分里熟悉的那些"超越函数"——\(e^x\)、\(\sin x\)、\(\cos x\)、\(\sinh x\)、\(\cosh x\)、\(\ln x\)、\(x^a\)——一个一个搬到复平面上来，看看它们各自变成了什么样。</p>
+
+<p>这件事远不像"把 \(x\) 改写成 \(z\)"那么简单。复指数 \(e^z\) 把实指数和实三角函数<em>同时吞掉</em>——欧拉公式 \(e^{i\theta} = \cos \theta + i \sin \theta\) 揭示了一件惊人的事：实指数和实三角函数，只是同一个复函数的两个截面。复正弦余弦不再有界——\(\cos(i)\) 大概是 1.54。复对数天然多值——绕原点一圈，它就跳了 \(2\pi i\)。复幂 \(i^i\) 居然是个实数。这些"反直觉"不是 bug 而是 feature——它们正是复分析威力的来源。</p>
+
+<p>本章的写法和上一章不同。上一章我们花大篇幅讨论"什么是导数"；本章导数的定义已经定下，我们只是把它<em>用</em>到具体函数上，所以节奏会快很多。每个函数我们都问同样三个问题：怎么定义？是不是整函数？有什么<em>新的</em>性质（不同于实情形）？最后两节专门留给复对数和复幂——这两个对象天然多值，处理起来微妙得多，多值带来的"分支切割"问题直接催生了第 6 章。</p>
+
+<h2 id="sec5-1">5.1 复指数：欧拉公式的全功能版</h2>
+
+<p>定义复指数 \(e^z\) 之前，先想一想我们<em>希望</em>它是什么样的。在实情形里 \(e^x\) 满足三件事：\(e^0 = 1\)；\(e^{x_1 + x_2} = e^{x_1} e^{x_2}\)；\((e^x)' = e^x\)。我们当然希望复版本继续保留这三条。再加一条更强的要求：当 \(z\) 落回实轴时，复 \(e^z\) 必须等于实 \(e^x\)。</p>
+
+<p>把 \(z = x + iy\) 代入指数律 \(e^{z_1 + z_2} = e^{z_1} e^{z_2}\)，得到</p>
+
+\[
+e^z = e^{x + iy} = e^x \cdot e^{iy}.
+\]
+
+<p>右边的 \(e^x\) 我们已经知道（标准实指数）；问题就剩下：\(e^{iy}\) 该是什么？这里 \(y\) 是实数，但指数里多了个 \(i\)，光从实情形看不出答案。怎么办？我们用一个非常自然的"幂级数代入"的办法。把实指数函数的 Taylor 级数</p>
+
+\[
+e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!} = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots
+\]
+
+<p>形式地把 \(x\) 换成 \(iy\)（这是一个值得后面证明的"形式操作"，但它的结果太漂亮，先别打断）：</p>
+
+\[
+e^{iy} = 1 + (iy) + \frac{(iy)^2}{2!} + \frac{(iy)^3}{3!} + \frac{(iy)^4}{4!} + \cdots
+\]
+
+<p>注意 \(i^2 = -1\)、\(i^3 = -i\)、\(i^4 = 1\)，每四项一循环。把实部和虚部分开整理：</p>
+
+\[
+e^{iy} = \underbrace{\left(1 - \frac{y^2}{2!} + \frac{y^4}{4!} - \cdots\right)}_{=\cos y} + i \underbrace{\left(y - \frac{y^3}{3!} + \frac{y^5}{5!} - \cdots\right)}_{=\sin y}.
+\]
+
+<p>右边正好就是 \(\cos y\) 和 \(\sin y\) 的 Taylor 级数。<em>这不是巧合</em>——它告诉我们：</p>
+
+\[
+\boxed{e^{iy} = \cos y + i \sin y.}
+\]
+
+<p>这就是大名鼎鼎的<strong>欧拉公式</strong>。代回去得到复指数的完整表达式：</p>
+
+\[
+\boxed{e^z = e^{x+iy} = e^x (\cos y + i \sin y).}
+\]
+
+<p>这就是我们以后所有用 \(e^z\) 做事的出发点。从右边看回左边：复指数把实部 \(x\) 当作"放大因子" \(e^x\)，把虚部 \(y\) 当作"旋转角度"\(\cos y + i \sin y\)。一个"放大"，一个"旋转"——这正是上一章里我们反复强调的"复数乘法 = 放大加旋转"的几何，而它<em>就长在 \(e^z\) 身上</em>。</p>
+
+<p>有人会问：上面"形式代入"是不是合法？正经的处理是：我们直接用 \(e^z := e^x (\cos y + i \sin y)\) 作为定义，然后<em>验证</em>它满足实指数的所有性质（实轴上 \(e^z = e^x\)、\(e^{z_1+z_2} = e^{z_1} e^{z_2}\)、\(e^0 = 1\)），并且它在整个 \(\mathbb{C}\) 上解析。这就是 5.2 节要做的事。</p>
+
+<p><strong>例 5.1.1（求几个特殊值）</strong>。算 \(e^{i\pi}\)、\(e^{i\pi/2}\)、\(e^{1+i\pi}\)。</p>
+
+<p>由欧拉公式，\(e^{i\pi} = \cos \pi + i \sin \pi = -1 + 0 i = -1\)。这就是被誉为"数学最美等式"的恒等式 \(e^{i\pi} + 1 = 0\)——它把五个最重要的数 \(0, 1, i, e, \pi\) 用一个加法和一个等号串在一起。</p>
+
+<p>\(e^{i\pi/2} = \cos(\pi/2) + i \sin(\pi/2) = 0 + i = i\)。这就解释了 \(i = e^{i\pi/2}\) 的几何含义——\(i\) 是单位圆上 90° 处的点，所以它的"指数表示"自然就是这个角度。</p>
+
+<p>\(e^{1+i\pi} = e^1 \cdot e^{i\pi} = e \cdot (-1) = -e\)。注意我们用了 \(e^{z_1 + z_2} = e^{z_1} e^{z_2}\)；但这条性质<em>本身</em>还要在 5.2 节验证——这里先用着。</p>
+
+<p><strong>例 5.1.2（极坐标重写）</strong>。任何非零复数 \(w = r(\cos \theta + i \sin \theta)\) 都可以写成 \(w = r e^{i\theta}\)。原来微积分里那种长串的"模乘以括号内余弦加 i 倍正弦"，从今往后用一个紧凑的 \(r e^{i\theta}\) 就解决了。</p>
+
+<p>这个写法的威力在于乘法：\(w_1 w_2 = r_1 r_2 e^{i(\theta_1 + \theta_2)}\)，模相乘、辐角相加。除法：\(w_1 / w_2 = (r_1/r_2) e^{i(\theta_1 - \theta_2)}\)。开方：\(w^{1/n}\) 有 \(n\) 个值，分别是 \(r^{1/n} e^{i(\theta + 2k\pi)/n}\)（\(k = 0, 1, \ldots, n-1\)）。所有这些"复数代数运算"用 \(e^{i\theta}\) 写出来都干净得让人想笑。</p>
+
+<h2 id="sec5-2">5.2 \(e^z\) 是周期为 \(2\pi i\) 的整函数</h2>
+
+<p>定义有了，现在我们逐条验证它确实"配得上"\(e^z\) 这个名字。</p>
+
+<p><strong>性质一：\(e^z\) 在 \(\mathbb{C}\) 上处处解析（即<em>整函数</em>）。</strong>设 \(e^z = u(x,y) + i v(x,y)\)，其中 \(u(x,y) = e^x \cos y\)、\(v(x,y) = e^x \sin y\)。先算偏导：</p>
+
+\[
+u_x = e^x \cos y, \quad u_y = -e^x \sin y, \quad v_x = e^x \sin y, \quad v_y = e^x \cos y.
+\]
+
+<p>检查 Cauchy–Riemann：</p>
+
+\[
+u_x = e^x \cos y = v_y \quad ✓, \qquad u_y = -e^x \sin y = -v_x \quad ✓.
+\]
+
+<p>四个偏导都是初等函数，处处连续。由上一章的解析性判据：CR 满足 + 偏导连续 \(\Longrightarrow\) 解析。所以 \(e^z\) 在 \(\mathbb{C}\) 上处处可导，是<strong>整函数</strong>。</p>
+
+<p><strong>性质二：\(\dfrac{d}{dz} e^z = e^z\)。</strong>导数公式（来自 \(f'(z) = u_x + i v_x\)）给</p>
+
+\[
+\frac{d}{dz} e^z = u_x + i v_x = e^x \cos y + i e^x \sin y = e^x (\cos y + i \sin y) = e^z.
+\]
+
+<p>实情形里"\(e^x\) 的导数等于自身"这条美妙性质，毫无变化地搬到了复情形。</p>
+
+<p><strong>性质三：\(e^{z_1 + z_2} = e^{z_1} e^{z_2}\)。</strong>设 \(z_1 = x_1 + i y_1\)，\(z_2 = x_2 + i y_2\)。左边 \(e^{z_1+z_2} = e^{x_1+x_2}[\cos(y_1+y_2) + i \sin(y_1+y_2)]\)。右边 \(e^{z_1} e^{z_2} = e^{x_1}(\cos y_1 + i \sin y_1) \cdot e^{x_2}(\cos y_2 + i \sin y_2)\)。把右边展开：</p>
+
+\[
+\begin{aligned}
+e^{z_1} e^{z_2} &= e^{x_1+x_2}\Big[(\cos y_1 \cos y_2 - \sin y_1 \sin y_2) + i (\sin y_1 \cos y_2 + \cos y_1 \sin y_2)\Big] \\
+&= e^{x_1+x_2}\Big[\cos(y_1+y_2) + i \sin(y_1+y_2)\Big]
+\end{aligned}
+\]
+
+<p>用了实情形里的"和角公式"。和左边一致。指数律得证。</p>
+
+<p>注意一件事：是<em>实数</em>三角函数的和角公式，"反过来"证明了复指数的指数律。这种"实情形知识保送复情形"在本章会反复出现。</p>
+
+<p><strong>性质四（这一条是新的、实情形里没有的）：\(e^z\) 是周期为 \(2 \pi i\) 的函数。</strong>具体地，对任意 \(z \in \mathbb{C}\)：</p>
+
+\[
+e^{z + 2\pi i} = e^z.
+\]
+
+<p>验证：\(e^{z + 2\pi i} = e^z \cdot e^{2\pi i} = e^z \cdot (\cos 2\pi + i \sin 2\pi) = e^z \cdot 1 = e^z\)。</p>
+
+<p>这件事完全没有实数对应物——实指数 \(e^x\) 是严格单调递增的，谈不上周期。但复指数<em>沿虚方向</em>是周期的，周期 \(2\pi i\)。几何上看：\(e^z\) 把竖直线段 \(\{z : \mathrm{Re}\, z = c, \, 0 \le \mathrm{Im}\, z < 2\pi\}\) 映成模为 \(e^c\) 的整个圆周，而<em>把竖直线段 \(\{z : \mathrm{Re}\, z = c, \, 2\pi \le \mathrm{Im}\, z < 4\pi\}\) 映到同一个圆周上</em>——重复一遍。复平面在 \(e^z\) 下分成无穷多条水平带子，每一条带子\([2k\pi, 2(k+1)\pi)\) 都被映成同一个像。</p>
+
+<p>这件事的代价我们到 5.9 节才能完整看到：\(e^z\) 不是单射，所以它的<em>反函数</em>\(\log\) 不可能是单值的——这就是复对数天然多值的根源。</p>
+
+<p><strong>性质五：\(e^z\) 在 \(\mathbb{C}\) 上<em>从不取零</em>。</strong>因为 \(|e^z| = |e^x (\cos y + i \sin y)| = e^x \cdot 1 = e^x > 0\)。无论 \(z\) 在哪里，\(e^z\) 的模都严格为正。这条简单事实之后会反复用到（比如：\(e^z = w\) 这个方程当 \(w = 0\) 时无解；当 \(w \ne 0\) 时有<em>无穷多</em>解，差 \(2\pi i\) 的整数倍——这就是 \(\log\) 多值的另一种说法）。</p>
+
+<h2 id="sec5-3">5.3 \(|e^z| = e^x\)；\(\arg e^z = y\)</h2>
+
+<p>把 \(e^z\) 看作复数本身，可以问：它的模是多少？辐角是多少？答案在 5.2 节末已经露脸了，但值得专门拎出来。</p>
+
+<p>由 \(e^z = e^x (\cos y + i \sin y)\)，模是 \(e^x \cdot |\cos y + i \sin y| = e^x \cdot \sqrt{\cos^2 y + \sin^2 y} = e^x \cdot 1 = e^x\)。所以</p>
+
+\[
+\boxed{|e^z| = e^x \quad \text{（即 } |e^z| = e^{\mathrm{Re}\, z}\text{）}.}
+\]
+
+<p>辐角呢？\(e^z\) 写成"模 \(\times\) (\(\cos\theta + i \sin\theta\))" 的标准极坐标形式，\(\theta = y\)。所以</p>
+
+\[
+\boxed{\arg e^z = y \quad (\text{差 } 2\pi \text{ 的整数倍}).}
+\]
+
+<p>这两条公式把"复指数的模与辐角"分别简化为"实部"和"虚部"两件极容易的事。它们是后面所有具体计算的算术起点。</p>
+
+<p><strong>例 5.3.1（解 \(e^z = 1\)）</strong>。我们要求所有满足 \(e^z = 1\) 的 \(z\)。比较模：\(|e^z| = e^x = |1| = 1\)，所以 \(x = 0\)。比较辐角：\(\arg e^z = y\) 应该等于 \(\arg 1 = 0\)（差 \(2\pi\) 的整数倍），即 \(y = 2k\pi\)（\(k\) 是整数）。所以 \(z = 2k\pi i\)，\(k \in \mathbb{Z}\)。</p>
+
+<p>这印证了周期性：\(e^z = 1\) 在实数情形只有 \(x = 0\) 一个解；在复情形有无穷多个，沿虚轴均匀分布。</p>
+
+<p><strong>例 5.3.2（解 \(e^z = -1\)）</strong>。模：\(e^x = 1 \Rightarrow x = 0\)。辐角：\(y = \pi + 2k\pi = (2k+1)\pi\)。所以 \(z = (2k+1)\pi i\)。当 \(k = 0\) 得到 \(z = \pi i\)，对应 \(e^{i\pi} = -1\)（欧拉恒等式）；当 \(k = 1\) 得到 \(z = 3\pi i\)，对应 \(e^{3\pi i} = -1\)；都对，因为周期 \(2\pi i\)。</p>
+
+<p><strong>例 5.3.3（解 \(e^z = 1 + i\)）</strong>。先把 \(1 + i\) 写成极坐标形式：模 \(\sqrt{2}\)，辐角 \(\pi/4\)（差 \(2\pi\) 整数倍）。所以</p>
+
+\[
+e^x = \sqrt{2} \Rightarrow x = \tfrac{1}{2} \ln 2; \quad y = \tfrac{\pi}{4} + 2k\pi.
+\]
+
+<p>解：\(z = \tfrac{1}{2}\ln 2 + i(\tfrac{\pi}{4} + 2k\pi)\)，\(k \in \mathbb{Z}\)。这其实就是\(\log(1+i)\) 的全部值——5.9 节会回头说。</p>
+
+<h2 id="sec5-4">5.4 \(e^z\) 的几何：水平直线被映成过原点的射线</h2>
+
+<p>我们把 \(e^z\) 当成一个映射 \(\mathbb{C} \to \mathbb{C}\)，看它如何变形复平面。最方便的办法是看它把<em>简单的直线</em>映到什么形状。</p>
+
+<p><strong>水平直线 \(y = c\)（\(c\) 是常数）</strong>。这条直线上的点是 \(z = x + ic\)，\(x\) 取遍 \(\mathbb{R}\)。代入 \(e^z\)：</p>
+
+\[
+e^{x + ic} = e^x (\cos c + i \sin c).
+\]
+
+<p>把它看作一个变量 \(x\) 的函数：因子 \((\cos c + i \sin c)\) 是固定的、模为 1、辐角为 \(c\) 的方向；\(e^x\) 是从 0 到 \(+\infty\) 的实参数（因为 \(x \in \mathbb{R}\) 时 \(e^x \in (0, \infty)\)）。所以像是<em>从原点出发、辐角为 \(c\) 的开射线</em>（不含端点 0）。</p>
+
+<p>结论：水平直线 \(y = c\) \(\overset{e^z}{\longrightarrow}\) 过原点、辐角 \(c\) 的射线。</p>
+
+<p>这件事很好记：水平方向的"前进"对应模的"放大或缩小"——往右走 \(x\) 增大，模 \(e^x\) 增大；往左走 \(x\) 减小，模 \(e^x\) 接近 0 但永远不到。所以一条水平线被拉成从原点伸出的整条射线。</p>
+
+<p><strong>竖直直线 \(x = c\)（\(c\) 是常数）</strong>。点 \(z = c + iy\)，\(y\) 取遍 \(\mathbb{R}\)。代入：</p>
+
+\[
+e^{c + iy} = e^c (\cos y + i \sin y).
+\]
+
+<p>因子 \(e^c\) 是固定的正实数（模）；\(\cos y + i \sin y\) 在 \(y\) 变化时跑遍单位圆。所以像是<em>以原点为圆心、半径 \(e^c\) 的圆周</em>。</p>
+
+<p>结论：竖直直线 \(x = c\) \(\overset{e^z}{\longrightarrow}\) 半径 \(e^c\) 的圆周。但这个圆周被<em>反复绕</em>——每当 \(y\) 增加 \(2\pi\)，\(e^z\) 就走完一圈、回到原处。</p>
+
+<p>把这两件事综合起来，可以画一张极有教益的图：复平面的<strong>笛卡尔网格</strong>（水平线和竖直线交织）在 \(e^z\) 下被映成<strong>极坐标网格</strong>（射线和同心圆交织）。复指数把"加法格子"换成"乘法格子"——这正是它最深的几何含义。</p>
+
+<p><strong>例 5.4.1（一条带子的像）</strong>。考虑水平带 \(B = \{z : -\pi < \mathrm{Im}\, z \le \pi\}\)。我们已经知道每条水平直线 \(y = c\) 被映成辐角为 \(c\) 的射线。当 \(c\) 在 \((-\pi, \pi]\) 之间扫过时，对应的射线辐角扫过 \((-\pi, \pi]\)——也就是说<em>所有非零方向都被扫到一次且仅一次</em>。所以 \(B\) 在 \(e^z\) 下的像是 \(\mathbb{C} \setminus \{0\}\)，且这个映射是双射。</p>
+
+<p>这条带子叫做 \(e^z\) 的一个<strong>基本域</strong>（fundamental domain）。所有"\(e^z = w\) 的解"恰好都在 \(B\) 中各取一个（除了 \(w = 0\) 无解）。这是后面定义"主值对数"的几何依据：把对数限制在<em>反过来从 \(B\) 取值</em>，就得到一个单值函数。</p>
+
+<p><strong>例 5.4.2（一个矩形的像）</strong>。考虑矩形 \(R = \{z : 0 \le x \le 1, \, 0 \le y \le \pi/2\}\)（一个 \(1 \times \pi/2\) 的矩形）。它的像呢？把它的四条边各看一遍：</p>
+
+<p>左边 \(x = 0\)：被映成单位圆的弧（\(0 \le y \le \pi/2\) 对应辐角 \([0, \pi/2]\) 的弧）。</p>
+<p>右边 \(x = 1\)：被映成半径 \(e\) 的圆的弧（同样辐角 \([0, \pi/2]\)）。</p>
+<p>下边 \(y = 0\)：被映成正实轴上的线段 \([1, e]\)（\(0 \le x \le 1\) 对应模 \([1, e]\)、辐角 0 的线段）。</p>
+<p>上边 \(y = \pi/2\)：被映成虚轴上的线段 \([i, ei]\)。</p>
+
+<p>所以这个矩形被映成"圆环 \(1 \le |w| \le e\) 在第一象限的扇形部分"——一个"扇环"。这个变形把直边变成了弯曲的弧，是复函数典型的"非线性"图景。</p>
+
+<h2 id="sec5-5">5.5 复三角函数</h2>
+
+<p>实情形里，我们用单位圆几何定义 \(\sin x\) 和 \(\cos x\)；用 Taylor 级数也行；用微分方程 \(y'' + y = 0\) 也行。这些定义在复情形都不再直观——单位圆没有明显的复版本，等等。最干净的途径反而是<strong>用 \(e^z\) 来定义</strong>。</p>
+
+<p>动机来自欧拉公式。把 \(y\) 换成实数 \(\theta\)：</p>
+
+\[
+e^{i\theta} = \cos \theta + i \sin \theta, \qquad e^{-i\theta} = \cos \theta - i \sin \theta.
+\]
+
+<p>两式相加：\(e^{i\theta} + e^{-i\theta} = 2 \cos \theta\)。两式相减：\(e^{i\theta} - e^{-i\theta} = 2 i \sin \theta\)。所以</p>
+
+\[
+\cos \theta = \frac{e^{i\theta} + e^{-i\theta}}{2}, \qquad \sin \theta = \frac{e^{i\theta} - e^{-i\theta}}{2i}.
+\]
+
+<p>这两条公式在实情形里成立。把它们的 \(\theta\) 换成<em>复变量</em> \(z\)，就得到复三角函数的定义：</p>
+
+\[
+\boxed{\sin z := \frac{e^{iz} - e^{-iz}}{2i}, \qquad \cos z := \frac{e^{iz} + e^{-iz}}{2}.}
+\]
+
+<p>当 \(z\) 是实数时，这两个定义恰好回到老朋友 \(\sin x\)、\(\cos x\)（按上面的推导）。当 \(z\) 是任意复数时，它们提供了我们想要的"延拓"。</p>
+
+<p>同样可以定义</p>
+
+\[
+\tan z := \frac{\sin z}{\cos z}, \quad \cot z := \frac{\cos z}{\sin z}, \quad \sec z := \frac{1}{\cos z}, \quad \csc z := \frac{1}{\sin z}.
+\]
+
+<p>它们各自在分母不为零的地方有定义。比如 \(\tan z\) 在 \(\cos z = 0\) 处奇异，这些奇异点的位置我们在 5.7 节会算。</p>
+
+<h2 id="sec5-6">5.6 复三角函数也是整函数；恒等式继续成立</h2>
+
+<p>用上一节的定义，立刻就能证明：</p>
+
+<p><strong>整性</strong>：\(\sin z\)、\(\cos z\) 是<em>整函数</em>。这是因为 \(e^{iz}\) 和 \(e^{-iz}\) 都是整函数（前者是 \(e^z\) 与解析函数 \(iz\) 的复合；同理后者），而整函数的线性组合仍是整函数。</p>
+
+<p><strong>导数</strong>：</p>
+
+\[
+\frac{d}{dz} \sin z = \frac{i e^{iz} - (-i) e^{-iz}}{2i} = \frac{i(e^{iz} + e^{-iz})}{2i} = \frac{e^{iz} + e^{-iz}}{2} = \cos z.
+\]
+
+<p>同理 \((\cos z)' = -\sin z\)。所以求导规则跟实情形一模一样：sin 求导成 cos，cos 求导成负 sin。</p>
+
+<p><strong>关键恒等式 \(\sin^2 z + \cos^2 z = 1\)</strong>。推导极简单：</p>
+
+\[
+\sin^2 z + \cos^2 z = \left(\frac{e^{iz} - e^{-iz}}{2i}\right)^2 + \left(\frac{e^{iz} + e^{-iz}}{2}\right)^2.
+\]
+
+<p>第一项：\(\dfrac{(e^{iz} - e^{-iz})^2}{-4} = \dfrac{e^{2iz} - 2 + e^{-2iz}}{-4}\)。第二项：\(\dfrac{(e^{iz} + e^{-iz})^2}{4} = \dfrac{e^{2iz} + 2 + e^{-2iz}}{4}\)。两者相加：</p>
+
+\[
+\frac{-(e^{2iz} - 2 + e^{-2iz}) + (e^{2iz} + 2 + e^{-2iz})}{4} = \frac{4}{4} = 1.
+\]
+
+<p>所以恒等式成立。</p>
+
+<p>同样的代数办法，可以验证一切常见的实三角恒等式继续在复情形成立：</p>
+
+\[
+\sin(z_1 \pm z_2) = \sin z_1 \cos z_2 \pm \cos z_1 \sin z_2,
+\]
+\[
+\cos(z_1 \pm z_2) = \cos z_1 \cos z_2 \mp \sin z_1 \sin z_2,
+\]
+\[
+\sin(2z) = 2 \sin z \cos z, \quad \cos(2z) = \cos^2 z - \sin^2 z.
+\]
+
+<p>所有这些<em>恒等式</em>都不需要新证明——把右边用 \(e^{\pm iz}\) 写出来展开，左边也是；两边相等。把验证留作练习。</p>
+
+<p><strong>对称性</strong>：\(\sin(-z) = -\sin z\)（奇函数），\(\cos(-z) = \cos z\)（偶函数）。同样直接看定义就清楚。</p>
+
+<p><strong>周期性</strong>：\(\sin(z + 2\pi) = \sin z\)、\(\cos(z + 2\pi) = \cos z\)。验证：\(e^{i(z+2\pi)} = e^{iz} e^{2\pi i} = e^{iz}\)，所以代入定义不变。所以复正余弦的<em>实方向</em>周期是 \(2\pi\)，跟实情形一样。但<em>沿虚方向</em>它们却不再周期——这就是 5.7 节要看的反差。</p>
+
+<h2 id="sec5-7">5.7 但 \(\sin z, \cos z\) 不有界！</h2>
+
+<p>本节是本章一个让人吃惊的转折。在实情形里，\(|\sin x| \le 1\) 和 \(|\cos x| \le 1\) 是大家从初中就会反复用到的事实——它们在数轴上"被夹在 \(\pm 1\) 之间"。在复情形里，这件事<em>完全失效</em>。</p>
+
+<p>具体看：取 \(z = i y\)（\(y\) 是实数）。代入定义：</p>
+
+\[
+\cos(i y) = \frac{e^{i \cdot iy} + e^{-i \cdot iy}}{2} = \frac{e^{-y} + e^{y}}{2} = \cosh y.
+\]
+
+\[
+\sin(iy) = \frac{e^{i \cdot iy} - e^{-i \cdot iy}}{2i} = \frac{e^{-y} - e^{y}}{2i} = \frac{-(e^y - e^{-y})}{2i} = -\frac{\sinh y}{i} = i \sinh y.
+\]
+
+<p>把这两条关系写出来：</p>
+
+\[
+\boxed{\cos(iy) = \cosh y, \qquad \sin(iy) = i \sinh y.}
+\]
+
+<p>注意结果——\(\cosh y\) 当 \(y \to \infty\) 时趋于 \(+\infty\)；\(\sinh y\) 同样无界。所以 \(|\cos(iy)|\) 和 \(|\sin(iy)|\) 在虚轴上<em>无界</em>。比如 \(\cos(10 i) = \cosh 10 \approx 11013\)；\(\cos(100 i) = \cosh 100 \approx 1.34 \times 10^{43}\)。</p>
+
+<p>这件事的几何含义：实正余弦在数轴上"上下振动"，幅度永远不超过 1；但复正余弦沿<em>虚方向</em>是<em>指数增长</em>的。复平面是一个二维的舞台，正余弦沿其中一个方向振动有界，沿另一个方向却爆炸式增长。</p>
+
+<p>对一般复数 \(z = x + iy\)，可以用和角公式算：</p>
+
+\[
+\cos z = \cos(x + iy) = \cos x \cos(iy) - \sin x \sin(iy) = \cos x \cosh y - i \sin x \sinh y.
+\]
+
+<p>所以 \(\mathrm{Re}\, \cos z = \cos x \cosh y\)、\(\mathrm{Im}\, \cos z = -\sin x \sinh y\)。模的平方：</p>
+
+\[
+|\cos z|^2 = \cos^2 x \cosh^2 y + \sin^2 x \sinh^2 y.
+\]
+
+<p>用 \(\cosh^2 y = 1 + \sinh^2 y\) 化简：\(|\cos z|^2 = \cos^2 x (1 + \sinh^2 y) + \sin^2 x \sinh^2 y = \cos^2 x + \sinh^2 y\)。所以</p>
+
+\[
+\boxed{|\cos z|^2 = \cos^2 x + \sinh^2 y.}
+\]
+
+<p>同理 \(|\sin z|^2 = \sin^2 x + \sinh^2 y\)。两个量都因为 \(\sinh^2 y\) 这一项当 \(|y| \to \infty\) 时趋向无穷。</p>
+
+<p><strong>例 5.7.1（求 \(\cos z = 2\) 的所有解）</strong>。这件事在实情形<em>无解</em>，因为 \(|\cos x| \le 1\)。但复情形可解。设 \(z = x + iy\)，要 \(\cos x \cosh y - i \sin x \sinh y = 2\)。比较实部和虚部：</p>
+
+\[
+\cos x \cosh y = 2, \qquad \sin x \sinh y = 0.
+\]
+
+<p>第二式给两种情况：(i) \(\sin x = 0\)，即 \(x = k \pi\)；(ii) \(\sinh y = 0\)，即 \(y = 0\)。</p>
+
+<p>情况 (ii)：\(y = 0\)，第一式变成 \(\cos x \cdot 1 = 2\)，\(\cos x = 2\)，无实解。所以 (ii) 不行。</p>
+
+<p>情况 (i)：\(x = k\pi\)。当 \(k\) 偶数时 \(\cos x = 1\)，第一式 \(\cosh y = 2\)，所以 \(y = \pm \mathrm{arcosh}\, 2 = \pm \ln(2 + \sqrt{3})\)。当 \(k\) 奇数时 \(\cos x = -1\)，第一式 \(-\cosh y = 2\)，但 \(\cosh y \ge 1 > 0\)，无解。</p>
+
+<p>所以 \(\cos z = 2\) 的所有解是 \(z = 2k\pi \pm i \ln(2 + \sqrt{3})\)，\(k \in \mathbb{Z}\)。原本"无解"的方程，到了复平面上有<em>无穷多</em>解。这是复分析的另一个魅力——许多在实情形"卡死"的方程，在复情形里"豁然开朗"。</p>
+
+<h2 id="sec5-8">5.8 复双曲函数</h2>
+
+<p>实数双曲函数 \(\sinh x = \dfrac{e^x - e^{-x}}{2}\)、\(\cosh x = \dfrac{e^x + e^{-x}}{2}\) 直接搬到复情形：</p>
+
+\[
+\boxed{\sinh z := \frac{e^z - e^{-z}}{2}, \qquad \cosh z := \frac{e^z + e^{-z}}{2}.}
+\]
+
+<p>它们是整函数（同理 \(e^{\pm z}\) 都是），导数 \((\sinh z)' = \cosh z\)、\((\cosh z)' = \sinh z\)（注意符号——双曲情形没有"负号"）。基本恒等式 \(\cosh^2 z - \sinh^2 z = 1\)（注意减号），同样可由定义直接验证。</p>
+
+<p>但复双曲函数和复三角函数<em>不再独立</em>——它们其实是同一族函数的两个面。看：</p>
+
+\[
+\cosh z = \frac{e^z + e^{-z}}{2} = \frac{e^{i \cdot (-iz)} + e^{-i \cdot (-iz)}}{2} = \cos(-iz) = \cos(iz).
+\]
+
+<p>（最后一步用了 \(\cos\) 是偶函数。）所以</p>
+
+\[
+\boxed{\cos(iz) = \cosh z, \qquad \sin(iz) = i \sinh z.}
+\]
+
+<p>第二条同样从定义直接得到：\(\sin(iz) = \dfrac{e^{i \cdot iz} - e^{-i \cdot iz}}{2i} = \dfrac{e^{-z} - e^z}{2i} = \dfrac{-(e^z - e^{-z})}{2i} = i \cdot \dfrac{e^z - e^{-z}}{2} = i \sinh z\)。</p>
+
+<p>这两个公式说明：复双曲函数和复三角函数，<em>本质上是同一种东西，差一个 \(i\) 的代换</em>。所以你只要熟悉一类函数，另一类自动就知道。比如：</p>
+
+<ul>
+<li>\(\cosh^2 z - \sinh^2 z = 1\) 等价于 \(\cos^2(iz) - (i \sinh z)^2 / \cdots\)——你可以推；事实上从 \(\cos^2 + \sin^2 = 1\) 的复版本里，把 \(z\) 换成 \(iz\)，立刻得到 \(\cos^2(iz) + \sin^2(iz) = 1\)，即 \(\cosh^2 z + (i \sinh z)^2 = \cosh^2 z - \sinh^2 z = 1\)。</li>
+<li>双曲恒等式 \(\sinh(2z) = 2 \sinh z \cosh z\) 等等，都可以用同样办法从三角恒等式翻过去。</li>
+</ul>
+
+<p><strong>例 5.8.1（计算 \(\sinh(1 + i)\)）</strong>。直接从定义，但更聪明的办法是用 \(\sinh z = -i \sin(iz)\)：</p>
+
+\[
+\sinh(1+i) = -i \sin(i(1+i)) = -i \sin(i - 1) = -i \sin(-1 + i).
+\]
+
+<p>用和角公式：\(\sin(-1 + i) = \sin(-1) \cos(i) + \cos(-1) \sin(i) = -\sin 1 \cosh 1 + \cos 1 (i \sinh 1) = -\sin 1 \cosh 1 + i \cos 1 \sinh 1\)。乘 \(-i\)：</p>
+
+\[
+\sinh(1+i) = -i \cdot (-\sin 1 \cosh 1 + i \cos 1 \sinh 1) = i \sin 1 \cosh 1 + \cos 1 \sinh 1 = \sinh 1 \cos 1 + i \cosh 1 \sin 1.
+\]
+
+<p>数值上 \(\sinh 1 \approx 1.175\)、\(\cosh 1 \approx 1.543\)、\(\sin 1 \approx 0.841\)、\(\cos 1 \approx 0.540\)，所以 \(\sinh(1 + i) \approx 0.635 + 1.298 i\)。</p>
+
+<p>更直接的办法：\(\sinh z = \dfrac{e^z - e^{-z}}{2}\)，\(\sinh(1+i) = \dfrac{e^{1+i} - e^{-1-i}}{2} = \dfrac{e(\cos 1 + i \sin 1) - e^{-1}(\cos 1 - i \sin 1)}{2}\)。整理：实部 \(\dfrac{e - e^{-1}}{2} \cos 1 = \sinh 1 \cos 1\)，虚部 \(\dfrac{e + e^{-1}}{2} \sin 1 = \cosh 1 \sin 1\)。一致。</p>
+
+<h2 id="sec5-9">5.9 复对数</h2>
+
+<p>实情形里，\(\ln x\)（\(x > 0\)）是 \(e^x\) 的反函数：\(e^{\ln x} = x\)。在复情形我们想做同一件事——找出 \(\log z\) 使得 \(e^{\log z} = z\)。这件事<strong>有问题</strong>，因为我们已经在 5.2 节看到 \(e^z\) 是周期的、不是单射；所以"反函数"不可能唯一。</p>
+
+<p>具体推导。我们要解方程 \(e^w = z\)（其中 \(z\) 给定，\(w\) 待求）。设 \(w = u + iv\)，\(z = r e^{i\theta}\)（\(r > 0\)、\(\theta\) 是 \(z\) 的某个辐角）。方程变成 \(e^u (\cos v + i \sin v) = r (\cos \theta + i \sin \theta)\)。比较模和辐角：</p>
+
+\[
+e^u = r \Rightarrow u = \ln r; \qquad v = \theta + 2k\pi, \quad k \in \mathbb{Z}.
+\]
+
+<p>所以 \(w = \ln r + i (\theta + 2k\pi)\)。这就是<strong>复对数</strong>：</p>
+
+\[
+\boxed{\log z := \ln |z| + i \arg z, \quad z \ne 0.}
+\]
+
+<p>这里 \(\ln |z|\) 是<em>实自然对数</em>（取的是正实数 \(|z|\) 的对数，单值），\(\arg z\) 是 \(z\) 的辐角，<em>它本身多值</em>——任何两个 \(\arg z\) 的值差 \(2\pi\) 的整数倍。所以 \(\log z\) 也多值，任何两个值差 \(2\pi i\) 的整数倍。</p>
+
+<p>注意几件事：</p>
+
+<p><strong>定义域</strong>：\(\log z\) 在 \(z = 0\) 没定义（因为没有任何 \(w\) 满足 \(e^w = 0\)；而且 \(\ln 0\) 本身就不存在）。\(z = 0\) 是 \(\log\) 的<em>分支点</em>（branch point）—— 6.2 节会专门讨论这个概念。</p>
+
+<p><strong>多值意味着什么</strong>：\(\log z\) 不是一个普通函数（每个 \(z\) 对一个 \(w\)），而是一个"多值函数"——每个非零 \(z\) 对应无穷多个 \(w\)。处理多值函数，最干净的办法之一是<em>选取一个分支</em>，让它在某个区域上变成单值。这就是 5.10 节的主值对数。</p>
+
+<p><strong>例 5.9.1（计算 \(\log(1)\)）</strong>。\(|1| = 1\)，所以 \(\ln |1| = \ln 1 = 0\)。\(\arg 1 = 0 + 2k\pi = 2k\pi\)。所以 \(\log 1 = 0 + i \cdot 2k\pi = 2k\pi i\)。注意——和实情形 \(\ln 1 = 0\) 不同，复对数 \(\log 1\) 有<em>无穷多个</em>值：\(0\)、\(\pm 2\pi i\)、\(\pm 4\pi i\)、……</p>
+
+<p><strong>例 5.9.2（计算 \(\log(-1)\)）</strong>。\(|-1| = 1\)，\(\ln 1 = 0\)。\(\arg(-1) = \pi + 2k\pi = (2k+1)\pi\)。所以 \(\log(-1) = i(2k+1)\pi\)，即 \(\pm \pi i, \pm 3\pi i, \ldots\) 这就解释了"负数的对数"为什么在实情形不存在——它的所有值都纯虚。</p>
+
+<p><strong>例 5.9.3（计算 \(\log(1 + i)\)）</strong>。\(|1 + i| = \sqrt{2}\)，\(\ln \sqrt{2} = \tfrac{1}{2} \ln 2\)。\(\arg(1+i) = \tfrac{\pi}{4} + 2k\pi\)。所以 \(\log(1+i) = \tfrac{1}{2}\ln 2 + i\left(\tfrac{\pi}{4} + 2k\pi\right)\)。</p>
+
+<p><strong>恒等式陷阱</strong>。在实情形我们有 \(\ln(ab) = \ln a + \ln b\) 和 \(\ln(a^n) = n \ln a\)。这些恒等式在复情形<em>不再以"等式"形式成立</em>——它们只在"差 \(2\pi i\) 整数倍的精度下"成立。具体地：</p>
+
+\[
+\log(z_1 z_2) = \log z_1 + \log z_2 + 2 k \pi i \quad \text{对某个整数 } k.
+\]
+
+<p>之所以会有差，是因为 \(\arg(z_1 z_2)\) 和 \(\arg z_1 + \arg z_2\) 也差 \(2\pi\) 的整数倍。这是初学者的经典坑：随手把"\(\log\) 的乘法律"用在复数上而忘了多值性，会得出 \(\log 1 = 2 \log(-1)\) 之类的"悖论"——左边 \(= 0\)（取主值），右边 \(= 2 \cdot i\pi = 2\pi i \ne 0\)。区别就在于不同分支的选取。</p>
+
+<h2 id="sec5-10">5.10 主值对数 \(\mathrm{Log}\, z\)</h2>
+
+<p>把 \(\log z\) 这个"多值函数"变成"单值函数"的标准办法：限制 \(\arg z\) 取一个特定的值。最常用的选择是 \(\arg z \in (-\pi, \pi]\)（即把负实轴上方算到 \(+\pi\)，下方算到 \(-\pi\) 但<em>不取等</em>）。这个选定的辐角叫做<strong>主辐角</strong>，记作 \(\mathrm{Arg}\, z\)。对应的对数叫做<strong>主值对数</strong>：</p>
+
+\[
+\boxed{\mathrm{Log}\, z := \ln |z| + i \mathrm{Arg}\, z, \quad \mathrm{Arg}\, z \in (-\pi, \pi].}
+\]
+
+<p>这是一个<em>单值函数</em>，定义域 \(\mathbb{C} \setminus \{0\}\)。当 \(z\) 为正实数时，\(\mathrm{Log}\, z = \ln z\)（实自然对数），所以它确实"延拓了"实对数。</p>
+
+<p><strong>例 5.10.1（主值对数的几个值）</strong>。\(\mathrm{Log}\, 1 = 0\)、\(\mathrm{Log}\, (-1) = i\pi\)、\(\mathrm{Log}\, i = i \pi/2\)、\(\mathrm{Log}\,(-i) = -i\pi/2\)、\(\mathrm{Log}\,(1+i) = \tfrac{1}{2}\ln 2 + i\pi/4\)。</p>
+
+<p><strong>性质：\(\mathrm{Log}\, z\) 在 \(\mathbb{C} \setminus (-\infty, 0]\) 上解析</strong>，且导数 \((\mathrm{Log}\, z)' = 1/z\)。</p>
+
+<p>解析性的证明（草稿）：在去掉负实轴和原点的开集上，\(\mathrm{Arg}\, z\) 是 \(z\) 的连续函数（甚至 \(C^\infty\)）；用极坐标下的 CR 方程或者直接在 \(z = z_0\) 处算 \(\lim_{w \to z_0} \dfrac{\mathrm{Log}\, w - \mathrm{Log}\, z_0}{w - z_0}\)。简便办法：用反函数定理。\(\mathrm{Log}\, z\) 是 \(e^z\) 在带子 \(\{z : -\pi < \mathrm{Im}\, z \le \pi\}\) 上的反函数，而 \(e^z\) 处处可导且导数 \(e^z \ne 0\)，所以反函数也可导，其导数为 \(\dfrac{1}{e^{\mathrm{Log}\, z}} = \dfrac{1}{z}\)。</p>
+
+<p><strong>切割线 \((-\infty, 0]\)</strong>。在这条切割线上，\(\mathrm{Log}\) 不连续。具体看：取 \(z = -1\) 附近。从上半平面靠近：\(z = -1 + \epsilon i\)（\(\epsilon \to 0^+\)），\(\mathrm{Arg}\, z \to \pi\)，\(\mathrm{Log}\, z \to i\pi\)。从下半平面靠近：\(z = -1 - \epsilon i\)，\(\mathrm{Arg}\, z \to -\pi\)，\(\mathrm{Log}\, z \to -i\pi\)。所以 \(\mathrm{Log}\) 跨越负实轴时，跳了 \(2\pi i\)。这就是分支切割带来的"不连续"代价——但代价是值得的，因为换来了单值性。</p>
+
+<p>这条不连续线叫<strong>分支切割</strong>（branch cut）。我们在第 6 章会详细讨论：分支切割可以选别的曲线（比如沿正实轴），不同选择给不同的"分支"，但<em>必须</em>有一条切割，否则不可能让 \(\log\) 单值。</p>
+
+<p><strong>例 5.10.2（注意 \(\mathrm{Log}\, z_1 z_2 \ne \mathrm{Log}\, z_1 + \mathrm{Log}\, z_2\) 的情况）</strong>。取 \(z_1 = z_2 = -1 + i\)（位于第二象限）。\(\mathrm{Arg}(-1+i) = 3\pi/4\)。所以 \(\mathrm{Log}\, z_1 = \tfrac{1}{2} \ln 2 + i \cdot 3\pi/4\)，\(\mathrm{Log}\, z_1 + \mathrm{Log}\, z_2 = \ln 2 + i \cdot 3\pi/2\)。</p>
+
+<p>另一边，\(z_1 z_2 = (-1+i)^2 = 1 - 2i + i^2 = -2i\)。\(|{-2i}| = 2\)，\(\mathrm{Arg}(-2i) = -\pi/2\)。所以 \(\mathrm{Log}(z_1 z_2) = \ln 2 + i \cdot (-\pi/2) = \ln 2 - i\pi/2\)。</p>
+
+<p>两者差：\(\mathrm{Log}(z_1 z_2) - (\mathrm{Log}\, z_1 + \mathrm{Log}\, z_2) = (\ln 2 - i\pi/2) - (\ln 2 + i 3\pi/2) = -2 \pi i\)。差了 \(-2\pi i = -1 \cdot 2 \pi i\)——正是 \(2 \pi i\) 的整数倍。一致。</p>
+
+<p>这说明：用主值时<em>必须谨慎</em>。乘法律只在"两个辐角加起来还落在 \((-\pi, \pi]\) 里"的时候才是直接相等。否则需要加减 \(2\pi i\) 修正。</p>
+
+<h2 id="sec5-11">5.11 复幂</h2>
+
+<p>实情形里 \(a^x = e^{x \ln a}\)（当 \(a > 0\)）。这条公式的<em>结构</em>可以照搬到复情形——复幂用复对数定义：</p>
+
+\[
+\boxed{z^a := e^{a \log z}, \quad z \ne 0, \, a \in \mathbb{C}.}
+\]
+
+<p>注意几件事：</p>
+
+<p><strong>多值性</strong>：因为 \(\log z\) 多值，所以 \(z^a\) 一般也多值。具体地，若 \(\log z\) 的不同值差 \(2k\pi i\)，那么 \(z^a\) 的不同值差 \(e^{a \cdot 2k\pi i} - 1\) 这个比例因子；不一定都不同——下面分类讨论。</p>
+
+<p><strong>(i) \(a\) 是整数 \(n\)</strong>。\(z^n = e^{n \log z} = e^{n \ln |z|} \cdot e^{i n \arg z}\)。无论 \(\log z\) 取哪个分支，\(e^{i n \arg z}\) 都不变（因为 \(\arg z\) 改变 \(2\pi\) 时，\(n \arg z\) 改变 \(2 n \pi\)，\(e^{2 n \pi i} = 1\)）。所以 \(z^n\) 是<em>单值</em>的——和我们以前理解的整数幂一致。</p>
+
+<p><strong>(ii) \(a\) 是有理数 \(p/q\)（最简分数）</strong>。\(z^{p/q}\) 取 \(q\) 个不同值。因为 \(\arg z\) 改变 \(2\pi\) 时，\((p/q) \arg z\) 改变 \(2\pi p/q\)；这个差经过 \(q\) 步才回到 \(2\pi\) 整数倍。所以幂值循环周期为 \(q\)。这和我们已知的"\(z^{1/q}\) 有 \(q\) 个值"完全一致。</p>
+
+<p><strong>(iii) \(a\) 是无理数</strong>，或更广义 \(a\) 是任意非整数复数。\(z^a\) 取<em>无穷多</em>个不同值。因为 \(2\pi a\) 此时永远不是 \(2\pi i\) 的整数倍。</p>
+
+<p>选定主值对数 \(\mathrm{Log}\, z\)，就得到<strong>主值幂</strong>：\(z^a := e^{a \mathrm{Log}\, z}\)。这是单值的，定义在 \(\mathbb{C} \setminus (-\infty, 0]\)。</p>
+
+<p><strong>导数</strong>：在主值幂的解析区域上，\(\dfrac{d}{dz}(z^a) = a z^{a-1}\)（用同样的解析约定）。</p>
+
+<p><strong>例 5.11.1（求 \(2^i\)）</strong>。\(2^i = e^{i \log 2} = e^{i (\ln 2 + 2 k \pi i)} = e^{i \ln 2} \cdot e^{-2 k \pi}\)（注意 \(e^{i \cdot i \cdot 2k\pi} = e^{-2k\pi}\)）。所以 \(2^i\) 有无穷多个值，主值对应 \(k = 0\)：</p>
+
+\[
+2^i_{\text{主}} = e^{i \ln 2} = \cos(\ln 2) + i \sin(\ln 2).
+\]
+
+<p>数值上 \(\ln 2 \approx 0.693\)，所以 \(2^i_{\text{主}} \approx \cos 0.693 + i \sin 0.693 \approx 0.769 + 0.639 i\)。</p>
+
+<p>其他值（\(k \ne 0\)）就是这个值乘上 \(e^{-2k\pi}\)：当 \(k = 1\) 大约 \((0.769 + 0.639 i) \cdot e^{-2\pi} \approx (0.769 + 0.639 i) \cdot 0.00187\)，值变成相当小的复数。</p>
+
+<p><strong>例 5.11.2（求 \((-1)^{1/2}\)）</strong>。\(\log(-1) = i(2k+1)\pi\)。所以 \((-1)^{1/2} = e^{(1/2) \cdot i (2k+1)\pi} = e^{i (k + 1/2) \pi}\)。当 \(k\) 偶数：\(e^{i\pi/2} = i\)；当 \(k\) 奇数：\(e^{i 3\pi/2} = -i\)。所以 \((-1)^{1/2} = \pm i\)——和我们已知的 \(\sqrt{-1}\) 有两个值（\(\pm i\)）一致。</p>
+
+<h2 id="sec5-12">5.12 \(i^i\) 是个实数</h2>
+
+<p>本章用一个让人惊艳的具体计算收尾：\(i^i\)。这件事在 1746 年由欧拉发现，至今还有人觉得"虚数的虚数次幂怎么会是实数"很反直觉。我们一步步算给你看。</p>
+
+<p>从定义开始：\(i^i = e^{i \log i}\)。所以问题归结为算 \(\log i\)。</p>
+
+<p>\(|i| = 1\)，所以 \(\ln |i| = 0\)。\(\arg i = \pi/2\)（差 \(2\pi\) 整数倍）。所以</p>
+
+\[
+\log i = 0 + i\left(\frac{\pi}{2} + 2 k \pi\right) = i\left(\frac{\pi}{2} + 2 k \pi\right), \quad k \in \mathbb{Z}.
+\]
+
+<p>把这个代入 \(i^i = e^{i \log i}\)：</p>
+
+\[
+i^i = e^{i \cdot i (\pi/2 + 2k\pi)} = e^{-(\pi/2 + 2k\pi)} = e^{-\pi/2 - 2k\pi}.
+\]
+
+<p>仔细看右边：\(e^{-\pi/2 - 2k\pi}\) 是<em>实数</em>。无论 \(k\) 取什么整数，它都是一个正实数——因为底数 \(e\) 是正实数，指数 \(-\pi/2 - 2k\pi\) 是实数。</p>
+
+<p>所以 \(i^i\) 取无穷多个<em>实</em>值！每一个值都是某个 \(e^{-\pi/2 - 2k\pi}\)（\(k\) 是整数），它们彼此相差 \(e^{2\pi}\) 这个倍数。</p>
+
+<p>主值（\(k = 0\)）就是大家最常引用的那个：</p>
+
+\[
+\boxed{(i^i)_{\text{主}} = e^{-\pi/2} \approx 0.20788\ldots}
+\]
+
+<p>这件事的"奇异"在于：从外表看，\(i^i\) 应该是"虚的某种东西"——表达式里全是 \(i\)。但代数告诉我们答案是一个简单的正实数，约等于 0.2。证明就上面那几步。</p>
+
+<p>欧拉自己 1746 年第一次发现这件事时，写信告诉戈德巴赫，描述说"非常令人惊讶"（mirabile dictu）。两百八十年后这件事仍然在反复出现在每一本复分析入门书里——不只因为它有用，也因为它是"复数的世界比看起来宽广"的一个直观证据。</p>
+
+<p><strong>例 5.12.1（推广：\((-1)^i\) 和 \((1+i)^{1+i}\)）</strong>。先 \((-1)^i = e^{i \log(-1)} = e^{i \cdot i (2k+1)\pi} = e^{-(2k+1)\pi}\)。又是无穷多个实值，主值（\(k = 0\)）是 \(e^{-\pi} \approx 0.0432\)。</p>
+
+<p>更一般的 \((1+i)^{1+i}\)：\(\log(1+i) = \tfrac{1}{2}\ln 2 + i(\pi/4 + 2k\pi)\)。乘 \((1+i)\)：</p>
+
+\[
+(1+i) \log(1+i) = (1+i)\left[\tfrac{1}{2}\ln 2 + i(\pi/4 + 2k\pi)\right].
+\]
+
+<p>展开：</p>
+
+\[
+= \tfrac{1}{2}\ln 2 \cdot (1+i) + i (\pi/4 + 2k\pi) (1+i) = \tfrac{1}{2}\ln 2 + \tfrac{i}{2}\ln 2 + i (\pi/4 + 2k\pi) - (\pi/4 + 2k\pi).
+\]
+
+<p>分实虚部：实部 \(\tfrac{1}{2}\ln 2 - \pi/4 - 2k\pi\)，虚部 \(\tfrac{1}{2}\ln 2 + \pi/4 + 2k\pi\)。</p>
+
+<p>所以 \((1+i)^{1+i} = e^{\text{实部}}(\cos(\text{虚部}) + i \sin(\text{虚部}))\)。主值 \(k = 0\)：实部 \(= \tfrac{1}{2}\ln 2 - \pi/4 \approx 0.347 - 0.785 = -0.438\)，虚部 \(= \tfrac{1}{2}\ln 2 + \pi/4 \approx 1.132\)。</p>
+
+\[
+(1+i)^{1+i}_{\text{主}} \approx e^{-0.438}(\cos 1.132 + i \sin 1.132) \approx 0.645 (0.428 + 0.904 i) \approx 0.276 + 0.583 i.
+\]
+
+<p>这种"复数的复数次幂"的运算，全都按 \(z^a = e^{a \log z}\) 的两步走（先求 \(\log\) 多值，再代回去）就能算清楚。一旦熟练之后并不难。</p>
+
+<p>本章我们把指数、三角、双曲、对数、幂这五大类初等函数都搬到了复情形。三个新现象值得反复强调：</p>
+
+<ul>
+<li>复指数 \(e^z\) 有<em>虚周期</em> \(2\pi i\)——这是复正余弦无界、复对数多值的根源。</li>
+<li>复正余弦在虚方向<em>无界</em>，与双曲函数互通。</li>
+<li>复对数与复幂天然<em>多值</em>，必须通过"分支切割"才能限制成单值函数。</li>
+</ul>
+
+<p>第三件事是下一章的全部主题——多值函数与分支切割。\(\log z\) 我们已经用"主值"草草处理了，但如果我们想沿一条绕原点的路径积分 \(1/z\)，会怎样？沿一条在原点附近"穿越切割"的路径，函数值会跳吗？\(\sqrt{z^2 - 1}\) 这种带两个分支点的怪兽要怎么处理？这些问题的答案需要一套新工具，我们下章见。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 Cauchy-Riemann 方程与调和函数</a><a href="ch6.html">下一章 · 第 6 章 多值函数与分支切割 →</a></nav>
+
+</main>
+</body>
+</html>

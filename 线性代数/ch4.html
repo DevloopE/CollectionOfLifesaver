@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 矩阵代数 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 矩阵与向量的语言</a><a href="ch5.html">下一章 · 第 5 章 矩阵的逆 →</a></nav>
+<h1 id="ch4">第 4 章 矩阵代数</h1>
+
+<p>到现在为止，我们一直把矩阵当作一种"方便的记账本"——它的每一行是一个方程，整个 \(A\mathbf{x} = \mathbf{b}\) 把一组线性方程压缩成了一行。这种看法本身很好，但也是非常被动的：矩阵在它里面只是个被读取的对象，从未主动做过什么。本章要做的事情很不一样：我们要让矩阵之间彼此<strong>运算</strong>——相加、相乘、转置、求幂——并且要在每一步问"这种运算到底是在做什么"。</p>
+
+<p>这一章你会学到：</p>
+
+<ul>
+<li>矩阵的加法与数乘——比想象中要无聊一些，但必须先打牢；</li>
+<li>矩阵乘法 \(AB\)——这是全章的重头戏。同一个乘积有四种不同的"读法"，每一种都对应一种使用矩阵的场景。我会逐一讲清楚，并在不同例子里反复轮换；</li>
+<li>为什么乘法<em>偏偏</em>要这样定义——其实是为了让"线性变换的复合"看上去仍然是矩阵；</li>
+<li>乘法的代数性质，以及一个重要警告：<strong>\(AB\) 一般不等于 \(BA\)</strong>。这是新手最容易摔的跤；</li>
+<li>矩阵的幂 \(A^k\) 和单位矩阵 \(I = A^0\)；</li>
+<li>转置 \(A^T\)，以及它与乘积的相互作用——\((AB)^T = B^T A^T\)，那个"翻过来再乘"的法则；</li>
+<li>一些常用的特殊矩阵：对称、反对称、对角、上下三角，以及"按块写矩阵"这种相当好用的简记。</li>
+</ul>
+
+<p>有了这一章作为代数底子，下一章我们才好谈"逆"——也就是当 \(A\) 把 \(\mathbf{x}\) 变成了 \(A\mathbf{x}\) 之后，怎么把它变回去。</p>
+
+<h2 id="sec4-1">4.1 加法与数乘</h2>
+
+<p>这一节短而轻。两个<strong>同型</strong>的矩阵相加，就是按位置相加；用一个数乘矩阵，就是把这个数分到每个位置上。</p>
+
+<p>给定两个 \(m \times n\) 矩阵 \(A\) 和 \(B\)，它们的和 \(A + B\) 是一个 \(m \times n\) 矩阵，第 \((i,j)\) 个位置是</p>
+
+\[
+(A + B)_{ij} = A_{ij} + B_{ij}.
+\]
+
+<p>注意"同型"这个前提：你不能把一个 \(2 \times 3\) 矩阵和一个 \(3 \times 2\) 矩阵相加，哪怕它们都包含 6 个数。位置必须能一一对应才有意义。</p>
+
+<p>比如</p>
+
+\[
+\begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} + \begin{pmatrix} 0 & -1 \\ 5 & 7 \end{pmatrix} = \begin{pmatrix} 1 & 1 \\ 8 & 11 \end{pmatrix}.
+\]
+
+<p>没什么花样：每个位置各管各的。</p>
+
+<p>给定一个数 \(c\) 和一个矩阵 \(A\)，它们的<strong>数乘</strong> \(cA\) 是把 \(c\) 乘进每一个分量：</p>
+
+\[
+(cA)_{ij} = c \cdot A_{ij}.
+\]
+
+<p>例如</p>
+
+\[
+3 \begin{pmatrix} 1 & -2 \\ 0 & 4 \end{pmatrix} = \begin{pmatrix} 3 & -6 \\ 0 & 12 \end{pmatrix}.
+\]
+
+<p>这两种运算结合得起来：\(2A - 3B\)、\(\tfrac{1}{2}(A + B)\) 这样的表达式都按字面意思理解就行。它们满足你预期的所有规律——加法可交换、可结合，数乘对加法满足分配律——因为它们说到底都是分量上普通数字算术的"集体执行"。如果你想，可以一条一条写下来验证；但说实话，这些规律对你以后做题没什么实际负担，记住"按位置算"就够了。</p>
+
+<p>有一件值得指出的事：所有元素都为 \(0\) 的 \(m \times n\) 矩阵叫做<strong>零矩阵</strong>，记作 \(O\)（有时是 \(\mathbf{0}\)）。它在加法上的角色和数 \(0\) 一样：\(A + O = A\)。看起来微不足道，但等我们引入"逆"和"行列式"之后，它会反复出现。</p>
+
+<p>真正有意思的运算，是矩阵<em>之间</em>的乘法。下一节开始。</p>
+
+<h2 id="sec4-2">4.2 矩阵乘法 \(AB\)：四种读法</h2>
+
+<p>矩阵乘法是这门学科里最具迷惑性的运算之一。它的定义乍看之下很别扭——为什么要"行乘列"？为什么不是按位置相乘像加法那样？为什么要求左边的列数等于右边的行数？</p>
+
+<p>这些问题都有答案，而且都很自然。但答案藏在"矩阵乘法是线性变换的复合"这个事实里——4.3 节会提一句，到了第 11 章再彻底展开。在那之前，我们的策略是：先把<em>怎么算</em>讲清楚，再讲它的<em>四种读法</em>。每种读法都会让你在某种特定情境下看清楚矩阵乘法在干什么。</p>
+
+<p>先把维度的约定写下来：</p>
+
+\[
+\boxed{\text{若 } A \text{ 是 } m \times n,\ B \text{ 是 } n \times p,\text{ 则 } AB \text{ 是 } m \times p.}
+\]
+
+<p>注意中间那个 \(n\) 必须相同——\(A\) 的<em>列数</em>必须等于 \(B\) 的<em>行数</em>。否则乘法无定义。一个记忆口诀是看维度："（\(m \times n\)）（\(n \times p\)）"中间的两个 \(n\) 抵消，剩下的 \(m \times p\) 就是结果的维度。</p>
+
+<p>这个维度限制本身就给你一个有用的快查表：\(A\) 和 \(B\) 都是方阵且同型时，\(AB\) 和 \(BA\) 都有定义，但它们一般也不相等（4.4 节再讲）。\(A\) 是 \(2 \times 3\)、\(B\) 是 \(3 \times 4\) 时，\(AB\) 有定义而 \(BA\) 完全没有定义——你想算都算不了。</p>
+
+<h3 id="sec4-2-1">4.2.1 第一种读法：入口对入口</h3>
+
+<p>这是教科书最常给的定义。\(AB\) 的第 \((i,j)\) 个元素是</p>
+
+\[
+\boxed{(AB)_{ij} = \sum_{k=1}^{n} A_{ik} B_{kj}.}
+\]
+
+<p>用人话说：拿出 \(A\) 的<strong>第 \(i\) 行</strong>，把它和 \(B\) 的<strong>第 \(j\) 列</strong>"逐位相乘再求和"——这正好是这两个向量的点积。所以一个口头禅：<em>"行点乘列。"</em></p>
+
+<p>看一个具体的 \(2 \times 2\) 例子。设</p>
+
+\[
+A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}, \qquad B = \begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix}.
+\]
+
+<p>要计算 \(AB\) 的第 \((1,1)\) 个元素，拿 \(A\) 的第 1 行 \((1, 2)\) 和 \(B\) 的第 1 列 \((5, 7)\)，做点积：\(1 \cdot 5 + 2 \cdot 7 = 5 + 14 = 19\)。</p>
+
+<p>第 \((1,2)\) 元素：\(A\) 的第 1 行 \((1,2)\) 点 \(B\) 的第 2 列 \((6,8)\)，得到 \(1 \cdot 6 + 2 \cdot 8 = 22\)。</p>
+
+<p>第 \((2,1)\)：\(A\) 的第 2 行 \((3,4)\) 点 \(B\) 的第 1 列 \((5,7)\)，得 \(15 + 28 = 43\)。</p>
+
+<p>第 \((2,2)\)：\((3,4) \cdot (6,8) = 18 + 32 = 50\)。</p>
+
+<p>把四个结果摆好：</p>
+
+\[
+AB = \begin{pmatrix} 19 & 22 \\ 43 & 50 \end{pmatrix}.
+\]
+
+<p>来一个尺寸不规整的例子，让你确信"行列匹配"的口诀真的有用。设</p>
+
+\[
+A = \begin{pmatrix} 1 & 0 & 2 \\ -1 & 3 & 1 \end{pmatrix}_{2 \times 3}, \qquad B = \begin{pmatrix} 4 \\ 1 \\ 2 \end{pmatrix}_{3 \times 1}.
+\]
+
+<p>\(A\) 的列数 3 等于 \(B\) 的行数 3，所以 \(AB\) 有定义，结果是 \(2 \times 1\)：</p>
+
+\[
+AB = \begin{pmatrix} 1 \cdot 4 + 0 \cdot 1 + 2 \cdot 2 \\ -1 \cdot 4 + 3 \cdot 1 + 1 \cdot 2 \end{pmatrix} = \begin{pmatrix} 8 \\ 1 \end{pmatrix}.
+\]
+
+<p>这个例子里 \(B\) 是一个列向量。所以"矩阵乘列向量"其实只是矩阵乘法的特例——这一点我们其实早就用过：在第 3 章的 \(A \mathbf{x}\) 里。换言之，<em>解线性方程组</em>这件事，从一开始就藏在矩阵乘法的定义里。</p>
+
+<h3 id="sec4-2-2">4.2.2 第二种读法：列解读</h3>
+
+<p>入口对入口的定义虽然权威，但它一次只看一个数。下面这种读法一次看一整列，往往更有启发。</p>
+
+<p>把 \(B\) 按列写出来：\(B = \begin{pmatrix} | & | & & | \\ \mathbf{b}_1 & \mathbf{b}_2 & \cdots & \mathbf{b}_p \\ | & | & & | \end{pmatrix}\)，其中 \(\mathbf{b}_j\) 是 \(B\) 的第 \(j\) 列（一个 \(n \times 1\) 列向量）。那么</p>
+
+\[
+\boxed{AB = \begin{pmatrix} | & | & & | \\ A \mathbf{b}_1 & A \mathbf{b}_2 & \cdots & A \mathbf{b}_p \\ | & | & & | \end{pmatrix}.}
+\]
+
+<p>用人话说：<strong>\(AB\) 的第 \(j\) 列等于 \(A\) 乘以 \(B\) 的第 \(j\) 列。</strong>也就是说，<em>\(B\) 的每一列都被 \(A\) "处理"了一次</em>。\(A\) 在这里扮演了"加工厂"的角色，\(B\) 的每一列是依次送进去的原料，得到的产品按顺序排成 \(AB\) 的列。</p>
+
+<p>用之前的例子验证。\(A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}\)，\(B\) 的第一列是 \(\begin{pmatrix} 5 \\ 7 \end{pmatrix}\)。算 \(A\) 乘它：</p>
+
+\[
+\begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} \begin{pmatrix} 5 \\ 7 \end{pmatrix} = \begin{pmatrix} 1 \cdot 5 + 2 \cdot 7 \\ 3 \cdot 5 + 4 \cdot 7 \end{pmatrix} = \begin{pmatrix} 19 \\ 43 \end{pmatrix},
+\]
+
+<p>正是 \(AB\) 的第一列。再算第二列：</p>
+
+\[
+\begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} \begin{pmatrix} 6 \\ 8 \end{pmatrix} = \begin{pmatrix} 22 \\ 50 \end{pmatrix},
+\]
+
+<p>正是 \(AB\) 的第二列。把两列拼起来再次得到</p>
+
+\[
+AB = \begin{pmatrix} 19 & 22 \\ 43 & 50 \end{pmatrix}.
+\]
+
+<p>这种读法是<em>实践中算矩阵乘积时</em>真正用得最多的——尤其当 \(B\) 只有少数几列时，逐列计算更不容易出错。它也是"<strong>同时解多个方程组</strong>"的关键：要解 \(A \mathbf{x}_j = \mathbf{b}_j\)（\(j = 1, 2, \ldots, p\)），不必把消元算 \(p\) 次，可以把所有 \(\mathbf{b}_j\) 拼成一个矩阵 \(B\)，一次性求解整个 \(AX = B\)——下一章求逆矩阵就用到这个想法。</p>
+
+<h3 id="sec4-2-3">4.2.3 第三种读法：行解读</h3>
+
+<p>把 \(A\) 按行写出来：\(A = \begin{pmatrix} - & \mathbf{a}_1^T & - \\ - & \mathbf{a}_2^T & - \\ & \vdots & \\ - & \mathbf{a}_m^T & - \end{pmatrix}\)，其中 \(\mathbf{a}_i^T\) 是 \(A\) 的第 \(i\) 行（一个 \(1 \times n\) 行向量）。那么</p>
+
+\[
+\boxed{AB = \begin{pmatrix} - & \mathbf{a}_1^T B & - \\ - & \mathbf{a}_2^T B & - \\ & \vdots & \\ - & \mathbf{a}_m^T B & - \end{pmatrix}.}
+\]
+
+<p>用人话说：<strong>\(AB\) 的第 \(i\) 行等于 \(A\) 的第 \(i\) 行乘以整个 \(B\)。</strong>这是上一种读法的对偶视角：第二种读法里 \(A\) 是工厂、\(B\) 的列是原料；第三种读法里 \(B\) 是工厂、\(A\) 的行是控制信号。</p>
+
+<p>还是用上面的例子。\(A\) 的第 1 行是 \((1, 2)\)，整个 \(B = \begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix}\)。"行向量乘矩阵"按入口对入口算：</p>
+
+\[
+(1, 2) \begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix} = (1 \cdot 5 + 2 \cdot 7,\ 1 \cdot 6 + 2 \cdot 8) = (19, 22),
+\]
+
+<p>正是 \(AB\) 的第 1 行。第 2 行：\((3, 4) B = (43, 50)\)。再次得到 \(AB\)。</p>
+
+<p>这一读法的真正洞察是：<em>\((\mathbf{a}_i^T) B\) 的结果是 \(B\) 的行的某种线性组合</em>，组合系数恰好是 \(\mathbf{a}_i^T\) 的分量。具体写：</p>
+
+\[
+(a_{i1}, a_{i2}, \ldots, a_{in}) B = a_{i1} \cdot (B \text{ 的第 1 行}) + a_{i2} \cdot (B \text{ 的第 2 行}) + \cdots + a_{in} \cdot (B \text{ 的第 } n \text{ 行}).
+\]
+
+<p>验证一下：\((1, 2)\) 让 \(B\) 的第 1 行 \((5, 6)\) 乘以 1，第 2 行 \((7, 8)\) 乘以 2，相加得 \((5+14, 6+16) = (19, 22)\)。完全对应。</p>
+
+<p>所以："<strong>\(A\) 的每一行去挑选并组合 \(B\) 的若干行</strong>。"这种看法在分析"行变换"时极有用——例如把第 \(i\) 行换成它和第 \(j\) 行的某个组合，恰好等价于左乘一个特定的矩阵。我们在第 5 章求逆和讨论 LU 分解时就会重新调用这个观察。</p>
+
+<h3 id="sec4-2-4">4.2.4 第四种读法：外积之和</h3>
+
+<p>这一种读法最不直观，但常常是<em>理论上</em>最强大的——它把 \(AB\) 重写成一组小的"秩 1"矩阵的和。</p>
+
+<p>记 \(\mathbf{a}_k\) 为 \(A\) 的第 \(k\) <em>列</em>（注意，是列，不是行；维度是 \(m \times 1\)），\(\mathbf{b}_k^T\) 为 \(B\) 的第 \(k\) <em>行</em>（维度是 \(1 \times p\)）。它们俩的乘积 \(\mathbf{a}_k \mathbf{b}_k^T\) 是 \(m \times p\) 的——一个"列乘行"，叫做<strong>外积</strong>。那么</p>
+
+\[
+\boxed{AB = \sum_{k=1}^{n} \mathbf{a}_k \mathbf{b}_k^T = \mathbf{a}_1 \mathbf{b}_1^T + \mathbf{a}_2 \mathbf{b}_2^T + \cdots + \mathbf{a}_n \mathbf{b}_n^T.}
+\]
+
+<p>每个 \(\mathbf{a}_k \mathbf{b}_k^T\) 是一个看起来"高度结构化"的 \(m \times p\) 矩阵——它的每一行都是 \(\mathbf{b}_k^T\) 的某个倍数，每一列都是 \(\mathbf{a}_k\) 的某个倍数。这种矩阵叫做<em>秩 1 矩阵</em>。这种读法在说："任何乘积都能写成秩 1 矩阵的累加。"</p>
+
+<p>验证：还是 \(A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}\)、\(B = \begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix}\)。\(A\) 的第 1 列是 \(\begin{pmatrix} 1 \\ 3 \end{pmatrix}\)，\(B\) 的第 1 行是 \((5, 6)\)，所以</p>
+
+\[
+\mathbf{a}_1 \mathbf{b}_1^T = \begin{pmatrix} 1 \\ 3 \end{pmatrix} (5, 6) = \begin{pmatrix} 1 \cdot 5 & 1 \cdot 6 \\ 3 \cdot 5 & 3 \cdot 6 \end{pmatrix} = \begin{pmatrix} 5 & 6 \\ 15 & 18 \end{pmatrix}.
+\]
+
+<p>第二项：\(A\) 的第 2 列 \(\begin{pmatrix} 2 \\ 4 \end{pmatrix}\)，\(B\) 的第 2 行 \((7, 8)\)：</p>
+
+\[
+\mathbf{a}_2 \mathbf{b}_2^T = \begin{pmatrix} 2 \\ 4 \end{pmatrix} (7, 8) = \begin{pmatrix} 14 & 16 \\ 28 & 32 \end{pmatrix}.
+\]
+
+<p>把两个秩 1 矩阵加起来：</p>
+
+\[
+\mathbf{a}_1 \mathbf{b}_1^T + \mathbf{a}_2 \mathbf{b}_2^T = \begin{pmatrix} 5 + 14 & 6 + 16 \\ 15 + 28 & 18 + 32 \end{pmatrix} = \begin{pmatrix} 19 & 22 \\ 43 & 50 \end{pmatrix}.
+\]
+
+<p>正是 \(AB\)。</p>
+
+<p>外积读法在第一次见时往往觉得"何必呢"，但它在两类场景中是无可替代的：一是<em>低秩近似</em>（比如奇异值分解 SVD 把矩阵写成秩 1 矩阵的最佳累加），二是<em>分块矩阵的乘法证明</em>。我们这本书后面遇到一次就指一次。</p>
+
+<h3 id="sec4-2-5">4.2.5 一道把四种读法都用一遍的例题</h3>
+
+<p>考虑</p>
+
+\[
+A = \begin{pmatrix} 1 & 0 & -1 \\ 2 & 1 & 3 \end{pmatrix}, \qquad B = \begin{pmatrix} 1 & 2 \\ 0 & 1 \\ -1 & 0 \end{pmatrix}.
+\]
+
+<p>\(A\) 是 \(2 \times 3\)，\(B\) 是 \(3 \times 2\)。\(A\) 的列数 3 等于 \(B\) 的行数 3，所以 \(AB\) 有定义，是 \(2 \times 2\)。我们用四种读法各算一遍，互相印证。</p>
+
+<p><em>入口对入口。</em>第 \((1,1)\)：\(A\) 第 1 行 \((1, 0, -1)\) 点 \(B\) 第 1 列 \((1, 0, -1)\)，得 \(1 + 0 + 1 = 2\)。第 \((1,2)\)：\((1, 0, -1) \cdot (2, 1, 0) = 2 + 0 + 0 = 2\)。第 \((2,1)\)：\((2, 1, 3) \cdot (1, 0, -1) = 2 + 0 - 3 = -1\)。第 \((2,2)\)：\((2, 1, 3) \cdot (2, 1, 0) = 4 + 1 + 0 = 5\)。所以</p>
+
+\[
+AB = \begin{pmatrix} 2 & 2 \\ -1 & 5 \end{pmatrix}.
+\]
+
+<p><em>列解读。</em>\(B\) 的第 1 列是 \((1, 0, -1)^T\)。\(A\) 乘它：第 1 行得 \(1 \cdot 1 + 0 \cdot 0 + (-1)(-1) = 2\)，第 2 行得 \(2 + 0 - 3 = -1\)。所以 \(AB\) 第 1 列是 \((2, -1)^T\)。\(B\) 第 2 列 \((2, 1, 0)^T\)，\(A\) 乘它得 \((2, 5)^T\)。拼起来仍是 \(\begin{pmatrix} 2 & 2 \\ -1 & 5 \end{pmatrix}\)。</p>
+
+<p><em>行解读。</em>\(A\) 第 1 行 \((1, 0, -1)\) 乘 \(B\)：用 \(B\) 的行作组合，\(1 \cdot (1, 2) + 0 \cdot (0, 1) + (-1)(-1, 0) = (1, 2) + (1, 0) = (2, 2)\)。\(A\) 第 2 行 \((2, 1, 3)\) 乘 \(B\)：\(2(1, 2) + 1(0, 1) + 3(-1, 0) = (2, 4) + (0, 1) + (-3, 0) = (-1, 5)\)。再次拼出同一个 \(AB\)。</p>
+
+<p><em>外积之和。</em>\(A\) 有 3 列、\(B\) 有 3 行，所以是三个外积相加：</p>
+
+\[
+\begin{pmatrix} 1 \\ 2 \end{pmatrix}(1, 2) + \begin{pmatrix} 0 \\ 1 \end{pmatrix}(0, 1) + \begin{pmatrix} -1 \\ 3 \end{pmatrix}(-1, 0).
+\]
+
+<p>分别算：第一项 \(\begin{pmatrix} 1 & 2 \\ 2 & 4 \end{pmatrix}\)，第二项 \(\begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix}\)，第三项 \(\begin{pmatrix} 1 & 0 \\ -3 & 0 \end{pmatrix}\)。相加得 \(\begin{pmatrix} 2 & 2 \\ -1 & 5 \end{pmatrix}\)。又一次相同。</p>
+
+<p>四种方法都给出同一个答案——这不是巧合，它们本来就是同一个定义的四种重新整理。但每一种在不同情境下读得出不同的信息：入口对入口告诉你"位置"，列解读告诉你"\(A\) 怎么处理了 \(B\) 的每一列"，行解读告诉你"\(A\) 怎么挑选 \(B\) 的行作组合"，外积之和把乘积分解成了若干个秩 1 块。在做题、在读证明、在理解算法时，主动选用合适的读法会让你从"机械执行"变成"看到结构"。</p>
+
+<h2 id="sec4-3">4.3 为什么乘法偏要这样定义</h2>
+
+<p>到这里你也许还在想：行点乘列、维度要相配、四种读法——这一套<em>是有用</em>，但它的"必然性"在哪里？为什么不是别的什么定义？</p>
+
+<p>简短的回答是：<strong>矩阵乘法之所以这样定义，是因为它正好对应着"线性变换的复合"。</strong></p>
+
+<p>稍微展开。回忆我们在前面章节提到的：每个矩阵 \(A\) 都可以看作一种"把向量 \(\mathbf{x}\) 送到向量 \(A\mathbf{x}\)"的<strong>变换</strong>。如果 \(A\) 把 \(\mathbf{x}\) 变成 \(\mathbf{y} = A\mathbf{x}\)，再用另一个矩阵 \(B\) 把 \(\mathbf{y}\) 变成 \(\mathbf{z} = B\mathbf{y}\)，那么"先 \(A\) 再 \(B\)"这个组合变换把 \(\mathbf{x}\) 送到 \(\mathbf{z} = B(A\mathbf{x})\)。</p>
+
+<p>问题是：这个组合变换<em>本身</em>能不能也写成一个矩阵乘以 \(\mathbf{x}\) 的形式？答案是：能，而且那个矩阵就是 \(BA\)（注意顺序：先 \(A\) 再 \(B\)，写出来是 \(BA\)，因为 \(A\) 离 \(\mathbf{x}\) 最近）。</p>
+
+\[
+B(A \mathbf{x}) = (BA) \mathbf{x}.
+\]
+
+<p>这个等式当然不是凭空成立的——它要求矩阵乘法满足结合律。而矩阵乘法之所以定义成"行点乘列"，正是因为这条等式自动成立。如果你换一种"乘法"，比如按位置相乘（即 \(C_{ij} = A_{ij} B_{ij}\)），那么这条等式就不再成立——这样的"乘法"对应不上变换的复合，作为线性代数的工具就立刻失去了价值。</p>
+
+<p>这背后的细节我们到第 11 章讲线性变换时再彻底拆开来看。在那之前，你只需要记住：<em>矩阵乘法不是一个数学家拍脑袋定的算法。它是"先做这件事再做那件事"这一原始操作，被翻译成数字之后必然得到的样子。</em></p>
+
+<p>这也解释了为什么"\(A\) 的列数必须等于 \(B\) 的行数"。因为 \(A: \mathbb{R}^n \to \mathbb{R}^m\) 把 \(n\) 维向量送到 \(m\) 维向量，要把它的输出 \(A\mathbf{x}\) 再喂给另一个变换，那个变换的输入空间就必须是 \(\mathbb{R}^m\)——也就是说接下来的 \(B\) 必须能吃下 \(m\) 维的输入，所以 \(B\) 必须有 \(m\) 列。把这个翻译成"行列匹配"，就是我们前面看到的口诀。</p>
+
+<h2 id="sec4-4">4.4 乘法的代数性质，以及它<strong>不</strong>满足什么</h2>
+
+<p>把矩阵乘法和数的乘法对比一下。两者有不少相同，也有一处关键的不同。</p>
+
+<p>相同的地方：</p>
+
+<ul>
+<li><strong>结合律</strong>：\((AB)C = A(BC)\)，只要三者维度匹配。所以连乘 \(ABC\) 不必加括号——你愿意怎么算都行；</li>
+<li><strong>对加法的分配律</strong>：\(A(B + C) = AB + AC\) 以及 \((B + C)A = BA + CA\)。注意要写两遍，因为乘法不交换，左分配和右分配是两件事；</li>
+<li><strong>与数乘的兼容</strong>：\((cA)B = c(AB) = A(cB)\)，标量可以在乘积里任意"穿过"；</li>
+<li><strong>单位元的存在</strong>：单位矩阵 \(I\)（\(n \times n\) 的对角线全 1、其余为 0 的方阵）满足 \(IA = AI = A\)。它在矩阵乘法中扮演的角色和数 1 一模一样。</li>
+</ul>
+
+<p>但有一处<strong>极其重要</strong>的不同：</p>
+
+\[
+\boxed{\text{矩阵乘法一般不可交换：} AB \ne BA.}
+\]
+
+<p>请把这件事当成下意识的反应——每次写"\(AB\)" 和"\(BA\)"时都警觉一下顺序。</p>
+
+<p>看一个简单的反例。设</p>
+
+\[
+A = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}, \qquad B = \begin{pmatrix} 1 & 0 \\ 1 & 1 \end{pmatrix}.
+\]
+
+<p>算 \(AB\)：</p>
+
+\[
+AB = \begin{pmatrix} 1 \cdot 1 + 1 \cdot 1 & 1 \cdot 0 + 1 \cdot 1 \\ 0 \cdot 1 + 1 \cdot 1 & 0 \cdot 0 + 1 \cdot 1 \end{pmatrix} = \begin{pmatrix} 2 & 1 \\ 1 & 1 \end{pmatrix}.
+\]
+
+<p>算 \(BA\)：</p>
+
+\[
+BA = \begin{pmatrix} 1 \cdot 1 + 0 \cdot 0 & 1 \cdot 1 + 0 \cdot 1 \\ 1 \cdot 1 + 1 \cdot 0 & 1 \cdot 1 + 1 \cdot 1 \end{pmatrix} = \begin{pmatrix} 1 & 1 \\ 1 & 2 \end{pmatrix}.
+\]
+
+<p>\(AB\) 和 \(BA\) 都是合法的 \(2 \times 2\) 矩阵，但它们不相等。</p>
+
+<p>为什么不交换？最直观的说法是回到 4.3 节："先穿外套再披斗篷"和"先披斗篷再穿外套"是两件不同的事——尤其是后者外套已经卡在了袖管里。把这个直觉移到几何上：先"绕 \(z\) 轴转 90 度"再"沿 \(x\) 轴拉伸 2 倍"，结果完全不等于"先拉伸再旋转"。变换的顺序本来就有意义，相应的矩阵乘法也就不交换。</p>
+
+<p>不交换性带来一些必须留意的连锁后果。例如，普通数字算术里常用的展开公式</p>
+
+\[
+(A + B)^2 = A^2 + 2AB + B^2 \qquad \text{（错！）}
+\]
+
+<p>对矩阵<em>不成立</em>。正确的展开是</p>
+
+\[
+(A + B)^2 = (A + B)(A + B) = A^2 + AB + BA + B^2,
+\]
+
+<p>中间两项 \(AB\) 和 \(BA\) 不能合并。同理</p>
+
+\[
+(A - B)(A + B) = A^2 + AB - BA - B^2,
+\]
+
+<p>不是 \(A^2 - B^2\)。在做题时一旦动用这种"二项式式"展开，先停下来想：我有没有依赖了交换律？如果有，那就出错了。</p>
+
+<p>另一个反直觉的现象：两个非零矩阵相乘可以得到零矩阵。例如</p>
+
+\[
+\begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix} \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix} = \begin{pmatrix} 0 & 0 \\ 0 & 0 \end{pmatrix}.
+\]
+
+<p>所以"\(AB = O\) 推出 \(A = O\) 或 \(B = O\)"<em>对矩阵不成立</em>。这意味着你不能"消去"——\(AC = BC\) 不能直接推出 \(A = B\)（除非 \(C\) 可逆，下一章再说）。每当看到一条对数字成立的算术规律，都要在矩阵语境里再问一遍："它真的成立吗？"</p>
+
+<h2 id="sec4-5">4.5 矩阵的幂与单位矩阵</h2>
+
+<p>方阵 \(A\) 可以乘自己，所以可以谈"幂"。定义</p>
+
+\[
+A^k = \underbrace{A \cdot A \cdots A}_{k \text{ 个}}, \qquad k \ge 1.
+\]
+
+<p>结合律保证你可以用 \(k - 1\) 次乘法计算它，并且不必关心怎么加括号。注意这里强调"方阵"——只有方阵才有 \(A^2\)，因为 \(A\) 必须能乘自己。</p>
+
+<p>按惯例 \(A^0 = I\)（单位矩阵）。这和数字里 \(a^0 = 1\) 是同一个约定，理由也类似：要让指数法则 \(A^j A^k = A^{j+k}\) 一直成立，\(A^0\) 必须是乘法单位元。</p>
+
+<p>幂的两条基本性质，对任何方阵 \(A\) 都成立：</p>
+
+\[
+A^j A^k = A^{j+k}, \qquad (A^j)^k = A^{jk}.
+\]
+
+<p>注意：\((AB)^k\) <em>一般不等于</em> \(A^k B^k\)。比如 \((AB)^2 = (AB)(AB) = ABAB\)，要"重新排列"就需要把中间那个 \(BA\) 换成 \(AB\)，而这正是 4.4 节告诉我们一般做不到的事。\((AB)^k = A^k B^k\) 仅在 \(A\) 和 \(B\) 互相交换时才成立。</p>
+
+<p>看一个好玩的小例子。设 \(A = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}\)。算几个幂：</p>
+
+\[
+A^2 = \begin{pmatrix} 1 & 2 \\ 0 & 1 \end{pmatrix}, \quad A^3 = \begin{pmatrix} 1 & 3 \\ 0 & 1 \end{pmatrix}, \quad \ldots, \quad A^k = \begin{pmatrix} 1 & k \\ 0 & 1 \end{pmatrix}.
+\]
+
+<p>看到规律没？这个矩阵的几何含义其实是一个"剪切"——它把任何向量沿 \(x\) 方向滑动一定距离，距离与 \(y\) 分量成正比。重复 \(k\) 次，滑动距离也变成原来的 \(k\) 倍。所以幂的"\(k\)"在这里有了具体几何意义。这种"对幂作几何解读"的思路，在第 14 章特征值分析里会被推到极致。</p>
+
+<p>另一个例子。设 \(N = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}\)。算：\(N^2 = \begin{pmatrix} 0 & 0 \\ 0 & 0 \end{pmatrix} = O\)。一个非零矩阵的平方居然是零矩阵——这种叫做<em>幂零</em>矩阵。一般而言：若存在某个 \(k\) 使 \(A^k = O\)，则 \(A\) 称为幂零矩阵。这种现象在数字里完全不可能（\(a^k = 0\) 推出 \(a = 0\)），又一次提醒你矩阵世界比数字世界宽广得多。</p>
+
+<h2 id="sec4-6">4.6 转置</h2>
+
+<p>把矩阵 \(A\) 沿"主对角线"翻折一下——即把第 \(i\) 行和第 \(i\) 列对调——得到的矩阵叫做 \(A\) 的<strong>转置</strong>，记作 \(A^T\)。形式上：</p>
+
+\[
+\boxed{(A^T)_{ij} = A_{ji}.}
+\]
+
+<p>如果 \(A\) 是 \(m \times n\)，那么 \(A^T\) 是 \(n \times m\)。例子：</p>
+
+\[
+A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{pmatrix}, \qquad A^T = \begin{pmatrix} 1 & 4 \\ 2 & 5 \\ 3 & 6 \end{pmatrix}.
+\]
+
+<p>\(A\) 是 \(2 \times 3\)，\(A^T\) 是 \(3 \times 2\)。原矩阵的第 1 行 \((1, 2, 3)\) 变成了 \(A^T\) 的第 1 列 \((1, 2, 3)^T\)。</p>
+
+<p>转置满足这些规律，全都直接从定义出发就能验证：</p>
+
+<ul>
+<li>\((A^T)^T = A\)（翻两次回到原样）；</li>
+<li>\((A + B)^T = A^T + B^T\)（与加法兼容）；</li>
+<li>\((cA)^T = c A^T\)（标量穿过）。</li>
+</ul>
+
+<p>但和乘积的相互作用值得专门讨论：</p>
+
+\[
+\boxed{(AB)^T = B^T A^T.}
+\]
+
+<p>注意右边<strong>顺序反过来了</strong>。为什么？分两步看。</p>
+
+<p>第一步是维度的"自检"。设 \(A\) 是 \(m \times n\)、\(B\) 是 \(n \times p\)，则 \(AB\) 是 \(m \times p\)，\((AB)^T\) 是 \(p \times m\)。要把 \((AB)^T\) 写成 \(A^T\) 和 \(B^T\) 的乘积，左边的因子必须有 \(p\) 行——只能是 \(B^T\)（它是 \(p \times n\)）。右边因子必须有 \(m\) 列——只能是 \(A^T\)（它是 \(n \times m\)）。所以唯一可能写得通的是 \(B^T A^T\)。维度上自洽——这已经是个强提示。</p>
+
+<p>第二步是分量上的验证。利用入口对入口的定义：</p>
+
+\[
+((AB)^T)_{ij} = (AB)_{ji} = \sum_k A_{jk} B_{ki}.
+\]
+
+<p>另一边：</p>
+
+\[
+(B^T A^T)_{ij} = \sum_k (B^T)_{ik} (A^T)_{kj} = \sum_k B_{ki} A_{jk}.
+\]
+
+<p>两个求和里被加的东西完全一样——只是因子顺序变了，而它们都是普通数字，可以交换。所以两个求和结果相等。证毕。</p>
+
+<p>这条规律推广到三个或更多的矩阵：\((ABC)^T = C^T B^T A^T\)，反序是关键。一个口诀："转置乘积，反序转置。"</p>
+
+<p>看一个具体的例子加深印象。设 \(A = \begin{pmatrix} 1 & 2 \\ 0 & 1 \end{pmatrix}\)、\(B = \begin{pmatrix} 1 & 0 \\ 3 & 1 \end{pmatrix}\)。先算 \(AB\)：</p>
+
+\[
+AB = \begin{pmatrix} 1 + 6 & 0 + 2 \\ 0 + 3 & 0 + 1 \end{pmatrix} = \begin{pmatrix} 7 & 2 \\ 3 & 1 \end{pmatrix},
+\]
+
+<p>所以 \((AB)^T = \begin{pmatrix} 7 & 3 \\ 2 & 1 \end{pmatrix}\)。另一边：\(A^T = \begin{pmatrix} 1 & 0 \\ 2 & 1 \end{pmatrix}\)，\(B^T = \begin{pmatrix} 1 & 3 \\ 0 & 1 \end{pmatrix}\)，所以</p>
+
+\[
+B^T A^T = \begin{pmatrix} 1 & 3 \\ 0 & 1 \end{pmatrix} \begin{pmatrix} 1 & 0 \\ 2 & 1 \end{pmatrix} = \begin{pmatrix} 1 + 6 & 0 + 3 \\ 0 + 2 & 0 + 1 \end{pmatrix} = \begin{pmatrix} 7 & 3 \\ 2 & 1 \end{pmatrix}.
+\]
+
+<p>果然吻合。如果你写成 \(A^T B^T\)（不反序），算一下会得到 \(\begin{pmatrix} 1 & 3 \\ 2 & 7 \end{pmatrix}\)，<em>不</em>等于 \((AB)^T\)。这就是为什么记顺序如此关键。</p>
+
+<h2 id="sec4-7">4.7 几种特殊矩阵</h2>
+
+<p>有几类方阵会反复出现，值得一次性认下来。</p>
+
+<p><strong>对称矩阵</strong>：满足 \(A^T = A\) 的方阵。即第 \((i, j)\) 个分量等于第 \((j, i)\) 个分量——以主对角线为镜像。例：</p>
+
+\[
+\begin{pmatrix} 1 & 2 & 3 \\ 2 & 4 & 5 \\ 3 & 5 & 6 \end{pmatrix}.
+\]
+
+<p>对称矩阵在第 14 章谱定理里扮演主角；在统计学的协方差矩阵里也是基本对象。它们具有极其良好的代数性质，比一般矩阵要"温和"得多。</p>
+
+<p><strong>反对称矩阵</strong>（也叫斜对称）：满足 \(A^T = -A\) 的方阵。即 \(A_{ji} = -A_{ij}\)，从而对角元 \(A_{ii} = -A_{ii}\)，必有 \(A_{ii} = 0\)。例：</p>
+
+\[
+\begin{pmatrix} 0 & 2 & -3 \\ -2 & 0 & 5 \\ 3 & -5 & 0 \end{pmatrix}.
+\]
+
+<p>注意对角线上全为 0——这是反对称矩阵的特征。在三维里反对称矩阵和向量"叉积"有一一对应的关系，物理上常见。</p>
+
+<p>顺便指出一个漂亮的事实：任何方阵 \(A\) 都可以唯一地写成一个对称矩阵和一个反对称矩阵之和：</p>
+
+\[
+A = \tfrac{1}{2}(A + A^T) + \tfrac{1}{2}(A - A^T).
+\]
+
+<p>第一项验证 \((\tfrac{1}{2}(A + A^T))^T = \tfrac{1}{2}(A^T + A) = \tfrac{1}{2}(A + A^T)\)，对称；第二项验证 \((\tfrac{1}{2}(A - A^T))^T = \tfrac{1}{2}(A^T - A) = -\tfrac{1}{2}(A - A^T)\)，反对称。这种"对称化 + 反对称化"分解在多元微积分里也出现过——应变张量与旋度张量的拆分用的是同一思路。</p>
+
+<p><strong>对角矩阵</strong>：除了对角线元素以外，其它都为 0 的方阵。常记作 \(D = \mathrm{diag}(d_1, d_2, \ldots, d_n)\)。例：</p>
+
+\[
+\begin{pmatrix} 3 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & 5 \end{pmatrix} = \mathrm{diag}(3, -1, 5).
+\]
+
+<p>对角矩阵的好处是<em>极其</em>好算。两个对角矩阵相乘还是对角矩阵：\(\mathrm{diag}(a_1, \ldots, a_n) \cdot \mathrm{diag}(b_1, \ldots, b_n) = \mathrm{diag}(a_1 b_1, \ldots, a_n b_n)\)，不必走入口对入口那一套。它的几何意义是"沿坐标轴各方向独立缩放"。第 14 章里"对角化"的目标，就是把一个一般矩阵用换基的办法变成对角矩阵，从而让它的运算变简单。</p>
+
+<p>单位矩阵 \(I\) 是对角矩阵的特例：\(I = \mathrm{diag}(1, 1, \ldots, 1)\)。</p>
+
+<p><strong>上三角矩阵</strong>：主对角线下方都是 0 的方阵。比如</p>
+
+\[
+\begin{pmatrix} 1 & 2 & 3 \\ 0 & 4 & 5 \\ 0 & 0 & 6 \end{pmatrix}.
+\]
+
+<p><strong>下三角矩阵</strong>：主对角线上方都是 0 的方阵。两个上三角矩阵相乘还是上三角；下三角同理。这一点在 5.8 节讲 LU 分解时会派上大用场。三角形式的方程组很容易解——只需用回代——这就是为什么消元法的最终目标是"化为三角"。</p>
+
+<h3 id="sec4-7-1">4.7.1 按块写矩阵</h3>
+
+<p>有时把矩阵切成"小块"再讨论会方便很多。设</p>
+
+\[
+M = \left( \begin{array}{cc|cc} 1 & 2 & 5 & 6 \\ 3 & 4 & 7 & 8 \\ \hline 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{array} \right).
+\]
+
+<p>这个 \(4 \times 4\) 矩阵被竖虚线和横虚线划分成四个 \(2 \times 2\) 块，可以记作</p>
+
+\[
+M = \begin{pmatrix} A & B \\ O & I \end{pmatrix},
+\]
+
+<p>其中 \(A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}\)、\(B = \begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix}\)、\(O\) 是 \(2 \times 2\) 零块、\(I\) 是 \(2 \times 2\) 单位块。</p>
+
+<p>分块矩阵的妙处是：<em>当尺寸匹配时，分块矩阵之间的乘法可以"按块乘"，跟普通矩阵乘法形式上一模一样</em>。也就是说</p>
+
+\[
+\begin{pmatrix} A_1 & B_1 \\ C_1 & D_1 \end{pmatrix} \begin{pmatrix} A_2 & B_2 \\ C_2 & D_2 \end{pmatrix} = \begin{pmatrix} A_1 A_2 + B_1 C_2 & A_1 B_2 + B_1 D_2 \\ C_1 A_2 + D_1 C_2 & C_1 B_2 + D_1 D_2 \end{pmatrix},
+\]
+
+<p>只要每一对要相乘的块在尺寸上行列匹配。这条规则<em>看上去</em>像把分块当成"标量"用普通的 \(2 \times 2\) 乘法做出来——但实际上不是；它是矩阵乘法定义在分块结构下的一个干净重排。证明只需要对每一个分块按入口对入口写开，然后把求和按"哪些指标在同一块里"分组。我们不在这里写出来；下次需要它的时候我们会回来给细节。</p>
+
+<p>分块矩阵在很多场合都有用：处理大型矩阵时，把它按 \(2 \times 2\) 分块，可以把整体的代数性质转化成几个小块之间的关系；在第 5 章把增广矩阵写成 \([A | \mathbf{b}]\) 时也是分块；将来在线性变换的矩阵表示里，把不同子空间上的作用拼起来就是天然的分块结构。所以请把"分块"看作一种<em>记账方法</em>——它没有引入新概念，只是让你能把同样的概念在更高的颗粒度上推。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 矩阵与向量的语言</a><a href="ch5.html">下一章 · 第 5 章 矩阵的逆 →</a></nav>
+
+</main>
+</body>
+</html>

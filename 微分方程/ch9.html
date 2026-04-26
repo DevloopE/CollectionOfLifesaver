@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 拉普拉斯变换基础 — 普林斯顿微分方程读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 二阶方程的物理应用</a><a href="ch10.html">下一章 · 第 10 章 用拉普拉斯解 ODE →</a></nav>
+<h1 id="ch9">第 9 章 拉普拉斯变换基础</h1>
+
+<p>到目前为止,我们解微分方程的方式都很"直接":在时间域 \(t\) 里,把方程当作微分方程来对付——分离变量、找积分因子、猜形如 \(e^{rt}\) 的解、套常数变易公式等等。这些方法都管用,但它们有一个共同的特点:你必须在"函数"这个层级上做手脚。导数就是导数,积分就是积分,你绕不过去。</p>
+
+<p>本章登场的<strong>拉普拉斯变换</strong>(Laplace transform)是另一种思路。它说:别在时间域里硬碰硬,把整个函数<em>挪到另一个空间</em>去——一个我们暂且叫它"\(s\)-域"的地方。在那里,微分变成了"乘以 \(s\)",积分变成了"除以 \(s\)",一个常系数线性 ODE 在 \(s\)-域里就只是一个普通的代数方程。解出代数方程,再把答案<em>挪回</em>时间域,你就得到了原方程的解。"难题——变换——简单题——逆变换——答案",就是这套打法的全部骨架。</p>
+
+<p>第一次见到这个想法的人会犯嘀咕:绕这一大圈值得吗?毕竟我们已经会解二阶常系数 ODE 了。答案是,值得,而且越往后越值得。原因有三个:第一,带初值的问题(IVP)在拉普拉斯下<strong>自动</strong>把初值塞进了代数方程,根本不需要"先求通解再代初值"的两步走;第二,右端项是分段函数(比如开关在某个时刻打开)、冲量(比如锤子敲一下)甚至是 Dirac \(\delta\) 这种"广义函数"时,经典方法处理起来非常笨拙,而拉普拉斯几乎不为所动;第三,工程系统(电路、控制、信号)里的"传递函数"概念就是 \(s\)-域的产物,你要看懂任何控制理论的教材,这一节都是入场券。</p>
+
+<p>本章先把"工具"备齐:</p>
+
+<ul>
+<li>9.1 直觉上为什么换域能简化问题。</li>
+<li>9.2 拉普拉斯变换的定义。</li>
+<li>9.3 哪些 \(s\) 让定义中的积分收敛。</li>
+<li>9.4 基础变换表——每一条都给推导,而不是只列结果。</li>
+<li>9.5 线性性。</li>
+<li>9.6 一阶平移定理(\(s\)-平移)。</li>
+<li>9.7 微分定理——后面解 ODE 全靠它。</li>
+<li>9.8 积分定理。</li>
+<li>9.9 \(t\) 乘的定理。</li>
+<li>9.10 综合例题。</li>
+</ul>
+
+<p>第 10 章会用本章的工具<strong>解</strong>常微分方程,第 11 章再加上"阶跃"、"冲击"和"卷积"这些更厉害的家伙。先把本章咬透,后两章就只是熟练度的问题。</p>
+
+<h2 id="sec9-1">9.1 直觉:把"时间域的难题"换到 \(s\)-域</h2>
+
+<p>先看一个比喻,跟微分方程没关系。</p>
+
+<p>你有两个数 \(x = 12345\) 和 \(y = 6789\),让你算 \(x \times y\)。可以,但乘起来挺费劲。如果你手头只有对数表,你会怎么办?你查 \(\log x\) 与 \(\log y\),把它们相加,得到 \(\log(xy)\),再反查对数表得到 \(xy\)。一次"难"运算(乘法),被换成了三次"易"操作:查表 + 加法 + 反查表。</p>
+
+<p>这就是<em>变换</em>的精髓。把对象从一个域(普通数)换到另一个域(对数),让原来困难的运算(乘)变成简单的运算(加),做完之后再换回来。对数的天才之处就是 \(\log(xy) = \log x + \log y\):它把"乘"变成了"加"。</p>
+
+<p>拉普拉斯变换在做的是同一种事,只不过对象换成了"函数",难运算换成了"求导"。我们想要一种把函数 \(f(t)\) 映到另一个函数 \(F(s)\) 的操作,使得</p>
+
+\[
+\text{(求导)在时间域} \quad \longleftrightarrow \quad \text{(乘以 }s\text{)在 }s\text{-域}.
+\]
+
+<p>如果真有这样的变换,那么微分方程</p>
+
+\[
+y'' + 3y' + 2y = f(t)
+\]
+
+<p>变到 \(s\)-域之后就成了</p>
+
+\[
+s^2 Y(s) + 3 s Y(s) + 2 Y(s) = F(s),
+\]
+
+<p>这是<strong>普通的代数方程</strong>(\(Y(s)\) 出现在加减乘里,没有微分),你可以一步把 \(Y(s)\) 解出来。然后逆变换回去得到 \(y(t)\)。整个过程跟"用对数算乘法"完全一样:换域、化简、回域。</p>
+
+<p>"\(s\)" 在物理上有几种解读,我们这里只挑最有用的一种:把它当成一个<em>复频率</em>。\(t\) 是时间,\(s\) 是"对应于时间的另一个变量",刻画的是函数随时间衰减或振荡的"速率"。但你完全可以把 \(s\) 仅仅看作一个临时变量,等同于查对数表里的"对数刻度",意义是次要的,工具性才是主要的。本章我们就把 \(s\) 当成临时变量。</p>
+
+<p>设计这种变换的关键,是找到一个操作能把"求导"变成"乘 \(s\)"。下一节我们就给出这个操作——它由一个看似神秘的积分定义,但用一次分部积分就能验证它确实把求导变成了乘 \(s\)。这一刻你会觉得整件事忽然合上了。</p>
+
+<h2 id="sec9-2">9.2 定义</h2>
+
+<p>设 \(f(t)\) 是定义在 \([0, \infty)\) 上的函数。它的<strong>拉普拉斯变换</strong>是</p>
+
+\[
+\boxed{\,\mathcal{L}\{f(t)\} = F(s) = \int_0^\infty e^{-st} f(t)\,dt.\,}
+\]
+
+<p>左边的 \(\mathcal{L}\{\cdot\}\) 是一个算子(吃下函数,吐出函数);右边的 \(F(s)\) 是变换的结果,它是一个<em>关于 \(s\) 的函数</em>。注意几件事:</p>
+
+<ul>
+<li>积分下限是 \(0\),不是 \(-\infty\)。这就是所谓的<em>单边</em>拉普拉斯变换,它适合处理"从某一时刻起开始演化"的初值问题——这正是 ODE 用得上的场景。</li>
+<li>积分上限是 \(\infty\)。所以 \(F(s)\) 是一个广义积分,要存在就要求被积函数衰减得够快。这一点 9.3 节专门处理。</li>
+<li>因子 \(e^{-st}\) 充当一个"调节器":对足够大的 \(s\),它压制 \(f(t)\) 在 \(t \to \infty\) 处的增长,使积分能收敛。</li>
+<li>\(t\) 是积分变量,积完之后 \(t\) 不见了,留下来的全是 \(s\)——所以结果叫 \(F(s)\) 不叫 \(F(t)\)。</li>
+</ul>
+
+<p>有几个等价的记号都通用:\(\mathcal{L}\{f(t)\}\)、\(\mathcal{L}\{f\}(s)\)、\(F(s)\)、甚至直接用大写字母对应小写函数(\(y \leftrightarrow Y\),\(f \leftrightarrow F\))。本书一律用小写表示时间域、大写表示 \(s\)-域,这样一眼就能看出某个符号"住在哪一边"。</p>
+
+<p>来做第一个具体计算。设 \(f(t) = 1\)(常数函数),则</p>
+
+\[
+\mathcal{L}\{1\} = \int_0^\infty e^{-st} \cdot 1 \, dt = \left[ -\frac{1}{s} e^{-st} \right]_0^\infty.
+\]
+
+<p>当 \(t \to \infty\),只要 \(s > 0\),\(e^{-st} \to 0\),上限那一段就是 \(0\)。下限 \(t = 0\) 给出 \(-\frac{1}{s} e^0 = -\frac{1}{s}\)。所以</p>
+
+\[
+\mathcal{L}\{1\} = 0 - \left(-\frac{1}{s}\right) = \frac{1}{s} \quad (s > 0).
+\]
+
+<p>记下这个第一条:</p>
+
+\[
+\boxed{\,\mathcal{L}\{1\} = \frac{1}{s}.\,}
+\]
+
+<p>它会反复出现。注意我特意写了 "\(s > 0\)" 这个条件——只有这样积分才收敛。9.3 节会详细谈这件事。</p>
+
+<p>再做一个,看看积分能不能算出来。设 \(f(t) = e^{at}\),其中 \(a\) 是某个常数。则</p>
+
+\[
+\mathcal{L}\{e^{at}\} = \int_0^\infty e^{-st} e^{at} \, dt = \int_0^\infty e^{-(s-a)t} \, dt.
+\]
+
+<p>这又是一个指数积分,跟刚才几乎一样,只不过把 \(s\) 换成了 \(s - a\)。同样的算法:</p>
+
+\[
+= \left[ -\frac{1}{s-a} e^{-(s-a)t} \right]_0^\infty = \frac{1}{s-a} \quad (s > a).
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\,\mathcal{L}\{e^{at}\} = \frac{1}{s-a}.\,}
+\]
+
+<p>这里收敛条件变成了 \(s > a\):必须让 \(s - a > 0\) 才能让指数 \(e^{-(s-a)t}\) 衰减。如果 \(a < 0\),那条件 \(s > a\) 在 \(s > 0\) 区域里自动成立;如果 \(a > 0\)(也就是函数 \(e^{at}\) 自己在膨胀),那 \(s\) 必须更大才能"压住"它。</p>
+
+<p>注意一件事:取 \(a = 0\) 时,\(e^{at} = 1\),公式给出 \(\mathcal{L}\{1\} = 1/s\),跟前面对上了。这种"特殊情形互相印证"的小动作以后会经常做,目的是抓粗心错误。</p>
+
+<h2 id="sec9-3">9.3 收敛性:哪些 \(s\) 让积分收敛</h2>
+
+<p>定义里有个广义积分 \(\int_0^\infty\),所以"收敛"是一个绕不开的话题。但好消息是,对本书涉及的几乎所有函数(指数型、多项式、三角函数及其乘积),收敛区域都是某个形如 \(s > \alpha\) 的右半轴,而我们解 ODE 时只需保证 \(s\) 在这个区域里就行。逆变换会自动把答案延拓回时间域,无需我们操心。</p>
+
+<p>但还是要说清楚条件。一个函数 \(f(t)\) 称为<strong>指数型</strong>(of exponential order),如果存在常数 \(M, \alpha\),使得</p>
+
+\[
+|f(t)| \le M e^{\alpha t} \quad \text{对所有 } t \ge T \text{(某个 }T\text{)}.
+\]
+
+<p>简单地说,\(f(t)\) 增长得不比某个指数快。多项式当然指数型(因为多项式比任何 \(e^{\alpha t}\) 都慢),\(\sin\)、\(\cos\) 也指数型(它们有界),\(e^{at}\) 自己也指数型(取 \(\alpha = a\) 就好)。但 \(e^{t^2}\) 就<strong>不</strong>是指数型——它增长得太快,任何 \(e^{\alpha t}\) 都罩不住它。这种"超指数增长"的函数没有拉普拉斯变换。我们这本书不会碰到它们。</p>
+
+<p>对于指数型函数,只要再加上"在 \([0, T]\) 上分段连续"这种温和条件,就能证明:对所有 \(s > \alpha\),拉普拉斯变换的积分收敛。证明的思路简单:</p>
+
+\[
+|e^{-st} f(t)| \le e^{-st} \cdot M e^{\alpha t} = M e^{-(s-\alpha)t},
+\]
+
+<p>而 \(\int_0^\infty M e^{-(s-\alpha)t} dt = M/(s - \alpha)\) 在 \(s > \alpha\) 时存在。由比较判别法,\(\int_0^\infty e^{-st} f(t) dt\) 绝对收敛。</p>
+
+<p>这意味着,9.4 节里我们计算每个变换时<strong>都会顺便给出收敛区域</strong>(比如 \(\mathcal{L}\{e^{at}\} = 1/(s - a)\) 对 \(s > a\) 成立),但你大可在心里记下:"反正存在某个右半轴让它收敛,我们解 ODE 时只在那个右半轴里干活。"对工程问题这就够用。等到后面要做严格的反变换或者讨论稳定性时,收敛域才会真正登场。</p>
+
+<p>还有一个小观察值得指出:如果 \(F(s)\) 是某个 \(f(t)\) 的拉普拉斯变换,那么必有 \(F(s) \to 0\) 当 \(s \to \infty\)。直觉上,因为 \(e^{-st}\) 越大的 \(s\) 把 \(f(t)\) 压得越扁,积分也就越小。这是一个"合法性"判据:如果你算出某个 \(F(s)\) 当 \(s \to \infty\) 时不趋于零(比如 \(F(s) = 1\) 或 \(F(s) = s\)),那它<strong>不可能</strong>是任何普通函数的拉普拉斯变换。我们将在第 11 章碰到一个"反例":\(\mathcal{L}\{\delta(t)\} = 1\)——但 \(\delta\) 不是普通函数,而是广义函数,这正是它的特别之处。</p>
+
+<h2 id="sec9-4">9.4 基础变换表</h2>
+
+<p>下面把最基础的几条变换一次性算完。每条都用定义直接积出来,不背公式。看一遍就够了,真用的时候查表回头看。</p>
+
+<h3 id="sec9-4-1">9.4.1 幂函数 \(t^n\)</h3>
+
+<p>从 \(n = 1\) 开始。\(\mathcal{L}\{t\} = \int_0^\infty e^{-st} \cdot t \, dt\)。这是一个分部积分:取 \(u = t\),\(dv = e^{-st} dt\),则 \(du = dt\),\(v = -\frac{1}{s} e^{-st}\)。</p>
+
+\[
+\int_0^\infty t e^{-st} dt = \left[ -\frac{t}{s} e^{-st} \right]_0^\infty + \frac{1}{s} \int_0^\infty e^{-st} dt.
+\]
+
+<p>边界项:\(t = 0\) 给 \(0\);\(t \to \infty\) 时,\(t e^{-st} \to 0\)(指数压住多项式),所以这一项是 \(0\)。剩下的积分是 \(\mathcal{L}\{1\} = 1/s\)。代入:</p>
+
+\[
+\mathcal{L}\{t\} = \frac{1}{s} \cdot \frac{1}{s} = \frac{1}{s^2}.
+\]
+
+<p>再试 \(n = 2\)。\(\mathcal{L}\{t^2\} = \int_0^\infty t^2 e^{-st} dt\),分部积分,\(u = t^2\),\(dv = e^{-st} dt\),则 \(du = 2t dt\),\(v = -\frac{1}{s} e^{-st}\)。</p>
+
+\[
+\int_0^\infty t^2 e^{-st} dt = \left[ -\frac{t^2}{s} e^{-st} \right]_0^\infty + \frac{2}{s} \int_0^\infty t e^{-st} dt = 0 + \frac{2}{s} \cdot \frac{1}{s^2} = \frac{2}{s^3}.
+\]
+
+<p>看出规律没?每多一阶 \(t\),就多一个 \(1/s\) 因子,而且系数从 \(1\) 变 \(1\) 变 \(2\) 变 \(6\)——也就是阶乘。一般地,</p>
+
+\[
+\boxed{\,\mathcal{L}\{t^n\} = \frac{n!}{s^{n+1}} \quad (n = 0, 1, 2, \ldots).\,}
+\]
+
+<p>归纳证明:对 \(n - 1\) 已知 \(\mathcal{L}\{t^{n-1}\} = (n-1)!/s^n\),分部积分(\(u = t^n\),\(dv = e^{-st} dt\))给出</p>
+
+\[
+\mathcal{L}\{t^n\} = \frac{n}{s} \mathcal{L}\{t^{n-1}\} = \frac{n}{s} \cdot \frac{(n-1)!}{s^n} = \frac{n!}{s^{n+1}}.
+\]
+
+<p>归纳成立。\(n = 0\) 时退化为 \(\mathcal{L}\{1\} = 1/s\)。这条公式以后是看到 \(t^n\) 就直接套。</p>
+
+<h3 id="sec9-4-2">9.4.2 指数 \(e^{at}\)</h3>
+
+<p>9.2 节已经算过:</p>
+
+\[
+\boxed{\,\mathcal{L}\{e^{at}\} = \frac{1}{s - a} \quad (s > a).\,}
+\]
+
+<h3 id="sec9-4-3">9.4.3 余弦 \(\cos(\omega t)\) 与正弦 \(\sin(\omega t)\)</h3>
+
+<p>有两条路。一条是直接做积分,要做两次分部积分把 \(\sin\) 和 \(\cos\) 互换,然后从一个等式里把答案"解"出来。另一条是用<em>欧拉公式</em> \(e^{i\omega t} = \cos(\omega t) + i \sin(\omega t)\),先求 \(\mathcal{L}\{e^{i\omega t}\}\),再分实虚部。第二条干净得多,我们走这条。</p>
+
+<p>由 \(\mathcal{L}\{e^{at}\} = 1/(s - a)\),把 \(a\) 换成 \(i\omega\):</p>
+
+\[
+\mathcal{L}\{e^{i\omega t}\} = \frac{1}{s - i\omega} = \frac{1}{s - i\omega} \cdot \frac{s + i\omega}{s + i\omega} = \frac{s + i\omega}{s^2 + \omega^2}.
+\]
+
+<p>左边 \(\mathcal{L}\{e^{i\omega t}\} = \mathcal{L}\{\cos(\omega t)\} + i \mathcal{L}\{\sin(\omega t)\}\)(线性性,9.5 节;变换是个线性算子,实部和虚部分别变换)。所以</p>
+
+\[
+\mathcal{L}\{\cos(\omega t)\} + i \mathcal{L}\{\sin(\omega t)\} = \frac{s}{s^2 + \omega^2} + i \frac{\omega}{s^2 + \omega^2}.
+\]
+
+<p>对实虚部:</p>
+
+\[
+\boxed{\,\mathcal{L}\{\cos(\omega t)\} = \frac{s}{s^2 + \omega^2}, \quad \mathcal{L}\{\sin(\omega t)\} = \frac{\omega}{s^2 + \omega^2}.\,}
+\]
+
+<p>注意收敛条件:这里要求 \(\mathrm{Re}(s) > 0\),也就是 \(s > 0\) 在实数情况下。这两条公式后面解振动方程时会被反复使用。</p>
+
+<p>顺便对一下 \(\omega = 0\):\(\mathcal{L}\{\cos 0\} = \mathcal{L}\{1\} = 1/s\),公式给 \(s/(s^2 + 0) = 1/s\) ✓;\(\mathcal{L}\{\sin 0\} = \mathcal{L}\{0\} = 0\),公式给 \(0/s^2 = 0\) ✓。一致。</p>
+
+<h3 id="sec9-4-4">9.4.4 双曲余弦与双曲正弦</h3>
+
+<p>双曲函数定义为 \(\cosh(at) = (e^{at} + e^{-at})/2\),\(\sinh(at) = (e^{at} - e^{-at})/2\)。利用线性性和指数公式:</p>
+
+\[
+\mathcal{L}\{\cosh(at)\} = \tfrac{1}{2}\left(\frac{1}{s - a} + \frac{1}{s + a}\right) = \tfrac{1}{2} \cdot \frac{2s}{s^2 - a^2} = \frac{s}{s^2 - a^2}.
+\]
+
+\[
+\mathcal{L}\{\sinh(at)\} = \tfrac{1}{2}\left(\frac{1}{s - a} - \frac{1}{s + a}\right) = \tfrac{1}{2} \cdot \frac{2a}{s^2 - a^2} = \frac{a}{s^2 - a^2}.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\,\mathcal{L}\{\cosh(at)\} = \frac{s}{s^2 - a^2}, \quad \mathcal{L}\{\sinh(at)\} = \frac{a}{s^2 - a^2}.\,}
+\]
+
+<p>跟三角公式比一比:把分母里的 \(+\omega^2\) 换成 \(-a^2\) 就得到双曲版本。这绝不是巧合——正弦余弦对应纯虚指数,双曲正余弦对应纯实指数,它们在 \(s\)-域里的分母自然差一个符号。这种"代数对称"会一直陪着你。</p>
+
+<h3 id="sec9-4-5">9.4.5 把上面这些汇成一张表</h3>
+
+<table>
+<thead>
+<tr><th>\(f(t)\)</th><th>\(F(s) = \mathcal{L}\{f(t)\}\)</th><th>收敛区域</th></tr>
+</thead>
+<tbody>
+<tr><td>\(1\)</td><td>\(\dfrac{1}{s}\)</td><td>\(s > 0\)</td></tr>
+<tr><td>\(t\)</td><td>\(\dfrac{1}{s^2}\)</td><td>\(s > 0\)</td></tr>
+<tr><td>\(t^n\) (\(n=0,1,2,\ldots\))</td><td>\(\dfrac{n!}{s^{n+1}}\)</td><td>\(s > 0\)</td></tr>
+<tr><td>\(e^{at}\)</td><td>\(\dfrac{1}{s - a}\)</td><td>\(s > a\)</td></tr>
+<tr><td>\(\cos(\omega t)\)</td><td>\(\dfrac{s}{s^2 + \omega^2}\)</td><td>\(s > 0\)</td></tr>
+<tr><td>\(\sin(\omega t)\)</td><td>\(\dfrac{\omega}{s^2 + \omega^2}\)</td><td>\(s > 0\)</td></tr>
+<tr><td>\(\cosh(at)\)</td><td>\(\dfrac{s}{s^2 - a^2}\)</td><td>\(s > |a|\)</td></tr>
+<tr><td>\(\sinh(at)\)</td><td>\(\dfrac{a}{s^2 - a^2}\)</td><td>\(s > |a|\)</td></tr>
+</tbody>
+</table>
+
+<p>这张表是基础。下面几节的"定理"会大幅扩展它的适用范围:线性性让我们能变换两条之和(几乎免费),平移定理让我们能变换 \(e^{at} \cos(\omega t)\) 这种乘积(也几乎免费),微分定理让我们能直接处理 \(y'\)、\(y''\)。等到第 11 章再加上阶跃和卷积,这张表就足以覆盖一切常见 ODE。</p>
+
+<h2 id="sec9-5">9.5 线性性</h2>
+
+<p>这是最基础也最常用的性质。拉普拉斯变换是一个<strong>线性算子</strong>:对任意常数 \(a, b\) 和函数 \(f, g\),</p>
+
+\[
+\boxed{\,\mathcal{L}\{a f(t) + b g(t)\} = a F(s) + b G(s).\,}
+\]
+
+<p>证明就是积分的线性性:</p>
+
+\[
+\int_0^\infty e^{-st} (a f + b g) \, dt = a \int_0^\infty e^{-st} f \, dt + b \int_0^\infty e^{-st} g \, dt = a F + b G.
+\]
+
+<p>没什么花活。但实战中线性性几乎决定了拉普拉斯变换的"代价"——你用变换表逐项查,然后把它们加起来,这就是大多数变换题的全部内容。</p>
+
+<p>一个例子。求 \(\mathcal{L}\{3t^2 - 5e^{-2t} + 4\sin(3t)\}\)。逐项查表(\(t^2 \to 2/s^3\),\(e^{-2t} \to 1/(s+2)\),\(\sin(3t) \to 3/(s^2+9)\)),按线性性加起来:</p>
+
+\[
+\mathcal{L}\{3t^2 - 5e^{-2t} + 4\sin(3t)\} = \frac{6}{s^3} - \frac{5}{s + 2} + \frac{12}{s^2 + 9}.
+\]
+
+<p>就是这样。看到一串项相加,逐项查表,系数原样保留,合在一起就是答案。</p>
+
+<h2 id="sec9-6">9.6 一阶平移定理(\(s\)-平移)</h2>
+
+<p>这个定理告诉你<em>怎么处理 \(e^{at}\) 乘以某个东西</em>。它说:</p>
+
+\[
+\boxed{\,\mathcal{L}\{e^{at} f(t)\} = F(s - a).\,}
+\]
+
+<p>用文字说:函数乘以 \(e^{at}\) 等于把变换 \(F(s)\) 的自变量整体<em>右移</em> \(a\)(变成 \(F(s - a)\))。所以这个定理也叫 "\(s\)-平移定理" 或者第一平移定理。</p>
+
+<p>证明就是定义:</p>
+
+\[
+\mathcal{L}\{e^{at} f(t)\} = \int_0^\infty e^{-st} e^{at} f(t) \, dt = \int_0^\infty e^{-(s - a)t} f(t) \, dt = F(s - a).
+\]
+
+<p>看到没?里面的 "\(s\)" 全被换成了 "\(s - a\)",就这么简单。</p>
+
+<p>这个公式是"工厂"。来用它制造几条新条目:</p>
+
+<ul>
+<li>已知 \(\mathcal{L}\{t^n\} = n!/s^{n+1}\)。所以 \(\mathcal{L}\{e^{at} t^n\} = n!/(s - a)^{n+1}\)。这是含阻尼的多项式振动里会大量出现的形式。</li>
+<li>已知 \(\mathcal{L}\{\cos(\omega t)\} = s/(s^2 + \omega^2)\)。所以 \(\mathcal{L}\{e^{at} \cos(\omega t)\} = (s - a)/((s - a)^2 + \omega^2)\)。把每个 \(s\) 都换成 \(s - a\)。这是阻尼简谐振动的典型变换。</li>
+<li>已知 \(\mathcal{L}\{\sin(\omega t)\} = \omega/(s^2 + \omega^2)\)。所以 \(\mathcal{L}\{e^{at} \sin(\omega t)\} = \omega/((s - a)^2 + \omega^2)\)。</li>
+</ul>
+
+<p>把它们补到表里:</p>
+
+<table>
+<thead>
+<tr><th>\(f(t)\)</th><th>\(F(s)\)</th></tr>
+</thead>
+<tbody>
+<tr><td>\(e^{at} t^n\)</td><td>\(\dfrac{n!}{(s - a)^{n+1}}\)</td></tr>
+<tr><td>\(e^{at} \cos(\omega t)\)</td><td>\(\dfrac{s - a}{(s - a)^2 + \omega^2}\)</td></tr>
+<tr><td>\(e^{at} \sin(\omega t)\)</td><td>\(\dfrac{\omega}{(s - a)^2 + \omega^2}\)</td></tr>
+</tbody>
+</table>
+
+<p>具体例子:求 \(\mathcal{L}\{e^{-3t} \cos(2t)\}\)。模式是 \(e^{at} \cos(\omega t)\),取 \(a = -3, \omega = 2\):</p>
+
+\[
+\mathcal{L}\{e^{-3t} \cos(2t)\} = \frac{s - (-3)}{(s - (-3))^2 + 4} = \frac{s + 3}{(s + 3)^2 + 4}.
+\]
+
+<p>注意所有 \(s\) 都换成了 \(s + 3\),不只是分子那个。这是初学者最常踩的坑——只把分子的 \(s\) 平移,忘了分母里也要平移。一个简单的检查:把 \(a\) 设成 \(0\),看看公式是否退化为不带 \(e^{at}\) 的版本。这里 \(a = 0\) 时 \((s + 0)/((s + 0)^2 + 4) = s/(s^2 + 4)\) ✓。</p>
+
+<p>逆方向也常用:看到 \((s - a)\) 出现在分母,先做 "\(s\)-平移"还原,再查表。比如 \(F(s) = 1/((s - 2)^2 + 9)\) 应当是 \(\mathcal{L}\{e^{2t} \cdot ?\}\),其中 \(?\) 满足 \(?\) 的变换是 \(1/(s^2 + 9) = (1/3) \cdot 3/(s^2 + 9) = (1/3) \mathcal{L}\{\sin(3t)\}\)。所以 \(F(s) = (1/3) \mathcal{L}\{e^{2t} \sin(3t)\}\),也就是 \(f(t) = (1/3) e^{2t} \sin(3t)\)。这种"还原"过程在第 10 章求逆变换时是家常便饭。</p>
+
+<h2 id="sec9-7">9.7 微分定理</h2>
+
+<p>这是本章的<strong>主菜</strong>。它告诉你 \(\mathcal{L}\{f'\}\) 和 \(\mathcal{L}\{f''\}\) 怎么算,而它们正是把 ODE 变换成代数方程的关键。</p>
+
+<p>对一阶导:</p>
+
+\[
+\boxed{\,\mathcal{L}\{f'(t)\} = s F(s) - f(0).\,}
+\]
+
+<p>注意右边自动出现了初值 \(f(0)\)——这是为什么拉普拉斯方法对 IVP 这么省事的原因之一。</p>
+
+<p>证明就是分部积分。设 \(u = f(t)\),\(dv = e^{-st} dt\),则 \(du = f'(t) dt\),\(v = -\frac{1}{s} e^{-st}\)(为了避开下面的 \(1/s\) 因子,实际上反过来取 \(u = e^{-st}, dv = f'(t) dt\) 更直接)。换个取法:\(u = e^{-st}\),\(du = -s e^{-st} dt\),\(dv = f'(t) dt\),\(v = f(t)\)。</p>
+
+\[
+\mathcal{L}\{f'\} = \int_0^\infty e^{-st} f'(t) dt = \left[ e^{-st} f(t) \right]_0^\infty - \int_0^\infty (-s) e^{-st} f(t) dt.
+\]
+
+<p>边界项:\(t = 0\) 给 \(f(0)\)(带个负号:\(-f(0)\));\(t \to \infty\) 时,只要 \(f(t)\) 指数型且 \(s\) 足够大,\(e^{-st} f(t) \to 0\)。所以边界项总共是 \(0 - f(0) = -f(0)\)。剩下的积分是 \(s \int_0^\infty e^{-st} f(t) dt = s F(s)\)。合起来:</p>
+
+\[
+\mathcal{L}\{f'\} = -f(0) + s F(s) = s F(s) - f(0).
+\]
+
+<p>这就是为什么这个定理里"自动带初值"——分部积分的边界项恰好把 \(f(0)\) 提了出来。把 \(s\) 想成"求导算子"在 \(s\)-域里的化身,而 \(-f(0)\) 是"对应原始函数在 \(t = 0\) 处的值"这个边界条件。</p>
+
+<p>对二阶导,把上面这条用两次:</p>
+
+\[
+\mathcal{L}\{f''\} = \mathcal{L}\{(f')'\} = s \mathcal{L}\{f'\} - f'(0) = s(s F(s) - f(0)) - f'(0) = s^2 F(s) - s f(0) - f'(0).
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\,\mathcal{L}\{f''(t)\} = s^2 F(s) - s f(0) - f'(0).\,}
+\]
+
+<p>初值变成了两个:\(f(0)\) 与 \(f'(0)\)。这正是二阶 ODE 的初值问题需要的两个数据。完美对应。</p>
+
+<p>一般地,对 \(n\) 阶导,</p>
+
+\[
+\mathcal{L}\{f^{(n)}\} = s^n F(s) - s^{n-1} f(0) - s^{n-2} f'(0) - \cdots - s f^{(n-2)}(0) - f^{(n-1)}(0).
+\]
+
+<p>规律:每升一阶,前面多乘一个 \(s\),后面多减一个 \(s^{?}\) 乘以低一阶的初值。\(n\) 阶导需要 \(n\) 个初值,正好与 \(n\) 阶 ODE 配套。</p>
+
+<p>用一个例子来感受这件事的威力。我们<em>不用任何变换表</em>,就用微分定理来求 \(\mathcal{L}\{\sin(\omega t)\}\)。设 \(f(t) = \sin(\omega t)\),则 \(f'(t) = \omega \cos(\omega t)\),\(f''(t) = -\omega^2 \sin(\omega t) = -\omega^2 f(t)\)。两边取拉普拉斯:</p>
+
+\[
+\mathcal{L}\{f''\} = -\omega^2 F(s).
+\]
+
+<p>用微分定理:\(\mathcal{L}\{f''\} = s^2 F(s) - s f(0) - f'(0) = s^2 F(s) - s \cdot 0 - \omega = s^2 F(s) - \omega\)。所以</p>
+
+\[
+s^2 F(s) - \omega = -\omega^2 F(s) \implies (s^2 + \omega^2) F(s) = \omega \implies F(s) = \frac{\omega}{s^2 + \omega^2}.
+\]
+
+<p>跟前面通过欧拉公式得到的一样。这个例子展示了微分定理的另一面:它有时候让你<em>不必算积分</em>就能求出变换——只要函数满足某个简单的 ODE,就能把变换问题转化为代数问题。这种"对偶"会在很多地方出现。</p>
+
+<h2 id="sec9-8">9.8 积分定理</h2>
+
+<p>跟微分定理对偶的是<strong>积分定理</strong>:</p>
+
+\[
+\boxed{\,\mathcal{L}\left\{\int_0^t f(\tau)\,d\tau\right\} = \frac{F(s)}{s}.\,}
+\]
+
+<p>用文字说:对函数从 \(0\) 到 \(t\) 积分,在 \(s\)-域里就是<em>除以 \(s\)</em>。它是微分定理的逆操作:微分对应"乘 \(s\)",积分对应"除 \(s\)"。这种对称性正是 \(s\)-域如此优雅的来源。</p>
+
+<p>证明用微分定理。设 \(g(t) = \int_0^t f(\tau) d\tau\),则 \(g'(t) = f(t)\)(基本定理)且 \(g(0) = 0\)。由微分定理 \(\mathcal{L}\{g'\} = s G(s) - g(0) = s G(s)\),也就是 \(F(s) = s G(s)\),所以 \(G(s) = F(s)/s\)。完。</p>
+
+<p>用法举例:已知 \(\mathcal{L}\{\cos(\omega t)\} = s/(s^2 + \omega^2)\),求 \(\mathcal{L}\{\sin(\omega t)/\omega\}\)。注意 \(\sin(\omega t)/\omega = \int_0^t \cos(\omega \tau) d\tau\)(直接积一下),所以由积分定理</p>
+
+\[
+\mathcal{L}\{\sin(\omega t)/\omega\} = \frac{1}{s} \cdot \frac{s}{s^2 + \omega^2} = \frac{1}{s^2 + \omega^2}.
+\]
+
+<p>所以 \(\mathcal{L}\{\sin(\omega t)\} = \omega/(s^2 + \omega^2)\)。又一次得到了同样的公式,但走的是不同的路径。这就是数学里"任何条件都可以从多个方向证明"的乐趣——也是检查自己理解程度的最快方法。</p>
+
+<h2 id="sec9-9">9.9 \(t\) 乘的定理</h2>
+
+<p>跟"乘 \(e^{at}\)" 对应有 \(s\)-平移,跟"乘 \(t\)" 对应的是<em>对 \(s\) 求导</em>:</p>
+
+\[
+\boxed{\,\mathcal{L}\{t f(t)\} = -F'(s).\,}
+\]
+
+<p>证明就是在 \(F(s) = \int_0^\infty e^{-st} f(t) dt\) 两边对 \(s\) 求导(假设交换求导和积分合法,这对指数型函数可以严格证明):</p>
+
+\[
+F'(s) = \int_0^\infty \frac{\partial}{\partial s} e^{-st} f(t) dt = \int_0^\infty (-t) e^{-st} f(t) dt = -\mathcal{L}\{t f(t)\}.
+\]
+
+<p>所以 \(\mathcal{L}\{t f(t)\} = -F'(s)\)。一般地,</p>
+
+\[
+\mathcal{L}\{t^n f(t)\} = (-1)^n F^{(n)}(s).
+\]
+
+<p>每多乘一个 \(t\) 就在 \(s\)-域里多对 \(s\) 求一次导,带个负号。</p>
+
+<p>用法:求 \(\mathcal{L}\{t \sin(\omega t)\}\)。已知 \(F(s) = \mathcal{L}\{\sin(\omega t)\} = \omega/(s^2 + \omega^2)\),求导:</p>
+
+\[
+F'(s) = \omega \cdot \left(-\frac{2s}{(s^2 + \omega^2)^2}\right) = -\frac{2\omega s}{(s^2 + \omega^2)^2}.
+\]
+
+<p>所以</p>
+
+\[
+\mathcal{L}\{t \sin(\omega t)\} = -F'(s) = \frac{2\omega s}{(s^2 + \omega^2)^2}.
+\]
+
+<p>类似地 \(\mathcal{L}\{t \cos(\omega t)\}\):取 \(F(s) = s/(s^2 + \omega^2)\),求导(用商规则):</p>
+
+\[
+F'(s) = \frac{(s^2 + \omega^2) - s \cdot 2s}{(s^2 + \omega^2)^2} = \frac{\omega^2 - s^2}{(s^2 + \omega^2)^2}.
+\]
+
+\[
+\mathcal{L}\{t \cos(\omega t)\} = -F'(s) = \frac{s^2 - \omega^2}{(s^2 + \omega^2)^2}.
+\]
+
+<p>这两条公式在<em>共振</em>问题里(右端项的频率恰好等于自然频率)会出现——因为共振解里有 \(t \cos(\omega t)\) 这种"线性增长包络"的因子。我们到第 10 章会再碰到它们。</p>
+
+<h2 id="sec9-10">9.10 一些综合例题</h2>
+
+<p>本章的工具已经够多了。下面五道题把它们组合着用,目标是熟练地"看见 \(f(t)\) → 写出 \(F(s)\)"。</p>
+
+<p><strong>例 9.10.1</strong> 求 \(\mathcal{L}\{(t + 2)^2\}\)。先把括号展开:\((t + 2)^2 = t^2 + 4t + 4\)。然后逐项查表 + 线性性:</p>
+
+\[
+\mathcal{L}\{t^2\} = \frac{2}{s^3}, \quad \mathcal{L}\{t\} = \frac{1}{s^2}, \quad \mathcal{L}\{1\} = \frac{1}{s}.
+\]
+
+\[
+\mathcal{L}\{(t + 2)^2\} = \frac{2}{s^3} + \frac{4}{s^2} + \frac{4}{s}.
+\]
+
+<p>有人可能想直接套 "\(t\)-平移" 或别的什么。<em>不行</em>——\(t\)-平移定理(第 11 章)要求乘以阶跃函数,这里没有。最稳妥的做法就是展开。这种小题里的"想偷懒走捷径"经常变成踩坑。</p>
+
+<p><strong>例 9.10.2</strong> 求 \(\mathcal{L}\{e^{-t}(t^2 + 3t + 1)\}\)。先注意整体是 \(e^{-t}\) 乘以一个多项式。\(s\)-平移定理告诉我们:乘 \(e^{-t}\) 等于把 \(s\) 替换成 \(s - (-1) = s + 1\)。所以先求 \(\mathcal{L}\{t^2 + 3t + 1\}\):</p>
+
+\[
+\mathcal{L}\{t^2 + 3t + 1\} = \frac{2}{s^3} + \frac{3}{s^2} + \frac{1}{s}.
+\]
+
+<p>然后把每个 \(s\) 换成 \(s + 1\):</p>
+
+\[
+\mathcal{L}\{e^{-t}(t^2 + 3t + 1)\} = \frac{2}{(s + 1)^3} + \frac{3}{(s + 1)^2} + \frac{1}{s + 1}.
+\]
+
+<p><strong>例 9.10.3</strong> 求 \(\mathcal{L}\{\sin^2(\omega t)\}\)。看起来是 \(\sin\),但平方让事情复杂——直接积分要费很大力气。这里的关键技巧是<em>用三角恒等式把平方化掉</em>:</p>
+
+\[
+\sin^2(\omega t) = \frac{1 - \cos(2\omega t)}{2}.
+\]
+
+<p>这是中学三角公式。然后线性 + 查表:</p>
+
+\[
+\mathcal{L}\{\sin^2(\omega t)\} = \frac{1}{2}\left(\mathcal{L}\{1\} - \mathcal{L}\{\cos(2\omega t)\}\right) = \frac{1}{2}\left(\frac{1}{s} - \frac{s}{s^2 + 4\omega^2}\right).
+\]
+
+<p>整理一下分子:</p>
+
+\[
+= \frac{1}{2} \cdot \frac{(s^2 + 4\omega^2) - s^2}{s(s^2 + 4\omega^2)} = \frac{1}{2} \cdot \frac{4\omega^2}{s(s^2 + 4\omega^2)} = \frac{2\omega^2}{s(s^2 + 4\omega^2)}.
+\]
+
+<p>这道题的教训:遇到三角函数的高次方,先用降幂公式化成基本三角函数的线性组合,不要硬上拉普拉斯。</p>
+
+<p><strong>例 9.10.4</strong> 求 \(\mathcal{L}\{t e^{-2t} \cos(3t)\}\)。这里有三种"装饰":\(t\) 乘、\(e^{-2t}\) 乘、还有 \(\cos(3t)\)。该按什么顺序用定理?有效的策略是:<em>先用平移把 \(e^{-2t}\) 和 \(\cos(3t)\) 处理掉,最后用 \(t\) 乘的定理处理 \(t\)</em>。</p>
+
+<p>第一步,\(\mathcal{L}\{\cos(3t)\} = s/(s^2 + 9)\)。</p>
+
+<p>第二步,\(s\)-平移(乘 \(e^{-2t}\) 把 \(s\) 替成 \(s + 2\)):\(\mathcal{L}\{e^{-2t} \cos(3t)\} = (s + 2)/((s + 2)^2 + 9)\)。把这个记作 \(G(s)\)。</p>
+
+<p>第三步,\(t\) 乘的定理:\(\mathcal{L}\{t \cdot e^{-2t} \cos(3t)\} = -G'(s)\)。求导(对 \(s\) 求导,用商规则):</p>
+
+\[
+G(s) = \frac{s + 2}{(s + 2)^2 + 9}.
+\]
+
+<p>设 \(u = s + 2\)(只是为了写起来短),则 \(G = u/(u^2 + 9)\),\(dG/du = ((u^2 + 9) - u \cdot 2u)/(u^2 + 9)^2 = (9 - u^2)/(u^2 + 9)^2\)。再因为 \(du/ds = 1\),\(G'(s) = (9 - u^2)/(u^2 + 9)^2\),把 \(u = s + 2\) 代回:</p>
+
+\[
+G'(s) = \frac{9 - (s + 2)^2}{((s + 2)^2 + 9)^2}.
+\]
+
+\[
+\mathcal{L}\{t e^{-2t} \cos(3t)\} = -G'(s) = \frac{(s + 2)^2 - 9}{((s + 2)^2 + 9)^2}.
+\]
+
+<p>看起来挺乱,但每一步都是机械的。如果中间不引 \(u\) 这个临时变量,直接对 \(s\) 求导,符号就会乱成一团。这是个小习惯:展开式复杂时,临时换个符号让代数干净。</p>
+
+<p><strong>例 9.10.5</strong> 求 \(\mathcal{L}\{\int_0^t e^{-\tau} \sin\tau \, d\tau\}\)。看到 "\(\int_0^t\)",立即想到积分定理:\(\mathcal{L}\{\int_0^t f(\tau) d\tau\} = F(s)/s\)。这里 \(f(t) = e^{-t} \sin t\),先求 \(F(s)\)。</p>
+
+<p>用 \(s\)-平移:\(\mathcal{L}\{\sin t\} = 1/(s^2 + 1)\),\(\mathcal{L}\{e^{-t} \sin t\} = 1/((s + 1)^2 + 1)\)。所以</p>
+
+\[
+\mathcal{L}\left\{\int_0^t e^{-\tau} \sin\tau \, d\tau\right\} = \frac{1}{s} \cdot \frac{1}{(s + 1)^2 + 1} = \frac{1}{s\,((s + 1)^2 + 1)}.
+\]
+
+<p>验证一下:\(s \to \infty\) 时这个表达式趋于 \(0\),符合"任何拉普拉斯变换在 \(s \to \infty\) 时趋于零"的合法性判据。</p>
+
+<p><strong>例 9.10.6</strong> 求 \(\mathcal{L}\{f(t)\}\),其中</p>
+
+\[
+f(t) = \begin{cases} t, & 0 \le t < 1 \\ 1, & t \ge 1 \end{cases}.
+\]
+
+<p>这是一个分段函数。本章的工具<em>勉强</em>能处理:直接拆积分。</p>
+
+\[
+F(s) = \int_0^\infty e^{-st} f(t) dt = \int_0^1 t e^{-st} dt + \int_1^\infty e^{-st} dt.
+\]
+
+<p>第一段 \(\int_0^1 t e^{-st} dt\):分部积分,\(u = t, dv = e^{-st} dt\),\(du = dt, v = -e^{-st}/s\)。</p>
+
+\[
+\int_0^1 t e^{-st} dt = \left[-\frac{t}{s} e^{-st}\right]_0^1 + \frac{1}{s}\int_0^1 e^{-st} dt = -\frac{e^{-s}}{s} + \frac{1}{s}\left[-\frac{1}{s}e^{-st}\right]_0^1
+\]
+
+\[
+= -\frac{e^{-s}}{s} + \frac{1}{s^2}(1 - e^{-s}) = \frac{1}{s^2} - \frac{e^{-s}}{s^2} - \frac{e^{-s}}{s}.
+\]
+
+<p>第二段 \(\int_1^\infty e^{-st} dt = [-e^{-st}/s]_1^\infty = e^{-s}/s\)(\(s > 0\) 时上限是 \(0\))。</p>
+
+<p>合起来:</p>
+
+\[
+F(s) = \frac{1}{s^2} - \frac{e^{-s}}{s^2} - \frac{e^{-s}}{s} + \frac{e^{-s}}{s} = \frac{1}{s^2} - \frac{e^{-s}}{s^2} = \frac{1 - e^{-s}}{s^2}.
+\]
+
+<p>这道题展示了本章工具的"边界"——分段函数是能算,但很笨。第 11 章引入<em>单位阶跃函数</em> \(u(t - a)\) 和它的 \(t\)-平移定理之后,这种题会变成"瞬间秒杀":\(f(t) = t - (t - 1)u(t - 1)\),分段一秒钟就能写成单一表达式,变换也是几个标准条目相加。所以你看到这道题的"长答案"时,记住:这只是因为我们故意只用本章工具来做。下一章和第 11 章就是为了让这种题变得轻松。</p>
+
+<hr/>
+
+<p>本章把"工具箱"搭好了。我们有了一套定义、八条基础变换、五条计算定理,组合使用就能变换出绝大多数常见函数。下一章把这套工具用到 ODE 上——你会看到为什么大家爱用它解 IVP,以及反变换怎么做。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 二阶方程的物理应用</a><a href="ch10.html">下一章 · 第 10 章 用拉普拉斯解 ODE →</a></nav>
+
+</main>
+</body>
+</html>

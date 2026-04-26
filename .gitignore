@@ -1,0 +1,15 @@
+# 原始 PDF 与从中抽取的文本（太大、不必入仓）
+*.pdf
+book_utf8.txt
+
+# 历史的"片段"目录（已被每章独立 HTML 取代）
+book_html/
+book_html_la/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 系统文件
+.DS_Store
+Thumbs.db

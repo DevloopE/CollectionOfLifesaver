@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章　矩阵作为线性变换 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章　线性变换</a><a href="ch12.html">下一章 · 第 12 章　坐标与基变换 →</a></nav>
+<h1 id="ch11">第 11 章　矩阵作为线性变换</h1>
+
+<p>第 10 章我们做了一件事：把"线性映射"从矩阵中独立出来，变成一个一般的几何概念。本章我们要做反过来的事：在最重要的特殊情形——从 \(\mathbb{R}^n\) 到 \(\mathbb{R}^m\) 的线性映射——证明<em>每一个线性映射都唯一对应一个矩阵</em>。这条对应关系是整本线性代数书的命脉。</p>
+
+<p>这一章看起来像是"具体计算"，但其中藏着两条非常深的洞见：</p>
+
+<ol>
+  <li>找一个变换的矩阵的方法，简单到让人发笑：<strong>看 \(T\) 把标准基向量送到哪里，把那些像向量拼成列。</strong>（11.2 节）</li>
+  <li>矩阵乘法那条让人生厌的规则——"左行点右列"——其实并不是某个数学家拍脑袋发明的。它是<em>两个线性变换串联</em>这件事自然产生的代数结果。（11.4 节）</li>
+</ol>
+
+<p>本章覆盖：</p>
+
+<ul>
+  <li>主定理：每个 \(\mathbb{R}^n\to\mathbb{R}^m\) 的线性变换唯一对应一个矩阵（11.1）</li>
+  <li>"标准矩阵"的求法：作用在标准基上（11.2）</li>
+  <li>常见几何变换的标准矩阵：旋转、反射、投影、缩放、剪切（11.3）</li>
+  <li>复合变换 \(=\) 矩阵乘法：矩阵乘法的几何来源（11.4）</li>
+  <li>几何复合的不交换：先转再反射 vs 先反射再转（11.5）</li>
+  <li>可逆变换 \(\Longleftrightarrow\) 可逆矩阵（11.6）</li>
+  <li>用变换语言重述四个子空间（11.7）</li>
+</ul>
+
+<h2 id="sec-11-1">11.1　主定理：变换 \(\Longleftrightarrow\) 矩阵</h2>
+
+<p>第 10 章我们验证过：每个 \(m\times n\) 矩阵 \(A\) 给出一个线性映射 \(T_A : \mathbb{R}^n\to\mathbb{R}^m\)。本章主定理是反过来：</p>
+
+<p><strong>主定理（线性变换的矩阵表示）。</strong>设 \(T:\mathbb{R}^n\to\mathbb{R}^m\) 是线性映射。则<strong>存在唯一</strong>的 \(m\times n\) 矩阵 \(A\)，使</p>
+
+\[
+T(\mathbf{x}) = A\mathbf{x}\qquad \text{对一切 }\mathbf{x}\in\mathbb{R}^n.
+\]
+
+<p>这个 \(A\) 称为 \(T\) 的<strong>标准矩阵</strong>，记作 \([T]\)。</p>
+
+<p>这条定理意味着：在 \(\mathbb{R}^n\to\mathbb{R}^m\) 的世界里，"线性变换"和"\(m\times n\) 矩阵"是同一回事——只是同一对象的两种描述方式。"线性变换"是几何描述，"矩阵"是代数描述；二者一一对应。</p>
+
+<p>这种"几何 \(\Longleftrightarrow\) 代数"的对应是数学里非常深刻、非常有力的结构。它让我们可以<em>用代数手段计算几何问题</em>（这就是为什么我们在乎矩阵），也让我们可以<em>用几何直觉理解代数现象</em>（这就是为什么我们在乎线性变换）。</p>
+
+<p>那么，怎么找这个矩阵呢？这是下一节的问题。但这条定理的<em>证明</em>本身就告诉我们怎么找——所以我们不再单独证明，而是直接进入构造。</p>
+
+<h2 id="sec-11-2">11.2　如何找标准矩阵：看基向量去哪</h2>
+
+<p>这一节是本章——也许是本书——最重要的"机械技能"之一。请认真读。</p>
+
+<p>设 \(T:\mathbb{R}^n\to\mathbb{R}^m\) 是线性映射。我们要找一个矩阵 \(A\) 使 \(T(\mathbf{x}) = A\mathbf{x}\) 对一切 \(\mathbf{x}\) 成立。</p>
+
+<p>关键的洞察是：<strong>\(\mathbf{x}\) 可以写成标准基的线性组合</strong>。具体地，</p>
+
+\[
+\mathbf{x} = \begin{pmatrix}x_1\\x_2\\\vdots\\x_n\end{pmatrix} = x_1 \mathbf{e}_1 + x_2 \mathbf{e}_2 + \cdots + x_n \mathbf{e}_n,
+\]
+
+<p>其中 \(\mathbf{e}_i\) 是第 \(i\) 个分量为 1、其余为 0 的标准基向量。</p>
+
+<p>由 \(T\) 的线性性，</p>
+
+\[
+T(\mathbf{x}) = T(x_1\mathbf{e}_1 + \cdots + x_n\mathbf{e}_n) = x_1 T(\mathbf{e}_1) + \cdots + x_n T(\mathbf{e}_n).
+\]
+
+<p>请你停下来看一眼这个等式。它在说什么？它在说：<em>\(T\) 在任何向量上的值，都被 \(T\) 在 \(n\) 个标准基向量上的值完全决定</em>。如果你知道 \(T(\mathbf{e}_1), T(\mathbf{e}_2), \ldots, T(\mathbf{e}_n)\) 是哪 \(n\) 个向量，你就掌握了 \(T\) 的全部信息。</p>
+
+<p>但右边那个 \(x_1 T(\mathbf{e}_1) + \cdots + x_n T(\mathbf{e}_n)\) 是什么？它是<em>把 \(n\) 个向量 \(T(\mathbf{e}_i)\) 按 \(x_1,\ldots,x_n\) 加权求和</em>。这正是矩阵乘向量的几何含义（第 3 章我们反复强调过）！如果我们把这 \(n\) 个像向量 \(T(\mathbf{e}_1),\ldots,T(\mathbf{e}_n)\) 拼成一个 \(m\times n\) 矩阵的列，那么</p>
+
+\[
+A = \big[\, T(\mathbf{e}_1)\ \big|\ T(\mathbf{e}_2)\ \big|\ \cdots\ \big|\ T(\mathbf{e}_n)\,\big],
+\]
+
+<p>则 \(A\mathbf{x}\) 就等于 \(x_1\) 倍第一列加 \(x_2\) 倍第二列……正好等于 \(T(\mathbf{x})\)。</p>
+
+<p>这就是标准矩阵的构造，也是主定理的全部内容。</p>
+
+<p><strong>方框结论。</strong>给定线性映射 \(T:\mathbb{R}^n\to\mathbb{R}^m\)，它的标准矩阵是</p>
+
+\[
+\boxed{\,[T] = \big[\, T(\mathbf{e}_1)\ \big|\ T(\mathbf{e}_2)\ \big|\ \cdots\ \big|\ T(\mathbf{e}_n)\,\big].\,}
+\]
+
+<p>这是一条<em>几乎万能</em>的计算菜谱。每当题目说"求某个线性变换 \(T\) 的矩阵"，你只要做下面三步：</p>
+
+<ol>
+  <li>把标准基向量 \(\mathbf{e}_1, \ldots, \mathbf{e}_n\) 一个一个塞给 \(T\)，算出 \(T(\mathbf{e}_i)\) 是什么向量。</li>
+  <li>把这 \(n\) 个向量按顺序排成列。</li>
+  <li>那个矩阵就是答案。</li>
+</ol>
+
+<p>请你把这三句话抄一遍。它会成为你做几何变换题时的肌肉记忆。</p>
+
+<h3>例 11.2.1：投影到 \(x\) 轴的矩阵</h3>
+
+<p>\(T:\mathbb{R}^2\to\mathbb{R}^2\)，\(T(x,y) = (x,0)\)。</p>
+
+<p>标准基 \(\mathbf{e}_1 = (1,0)\)、\(\mathbf{e}_2 = (0,1)\)。</p>
+
+\[
+T(\mathbf{e}_1) = T(1,0) = (1,0),\qquad T(\mathbf{e}_2) = T(0,1) = (0,0).
+\]
+
+<p>把这两个像拼成列：</p>
+
+\[
+[T] = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}.
+\]
+
+<p>验证一下：\([T]\begin{pmatrix}x\\y\end{pmatrix} = \begin{pmatrix}1&0\\0&0\end{pmatrix}\begin{pmatrix}x\\y\end{pmatrix} = \begin{pmatrix}x\\0\end{pmatrix}\)。对了。</p>
+
+<h3>例 11.2.2：缩放矩阵</h3>
+
+<p>\(T(\mathbf{v}) = 2\mathbf{v}\)。\(T(\mathbf{e}_1) = 2\mathbf{e}_1 = (2,0)\)，\(T(\mathbf{e}_2) = 2\mathbf{e}_2 = (0,2)\)。</p>
+
+\[
+[T] = \begin{pmatrix}2 & 0 \\ 0 & 2\end{pmatrix} = 2I.
+\]
+
+<p>意料之中。</p>
+
+<h2 id="sec-11-3">11.3　常见几何变换的标准矩阵</h2>
+
+<p>下面我们用 11.2 节的菜谱，把几个最常用的几何变换的矩阵都求出来。这些都是"必背"清单——不是为了背公式，而是为了练熟"看基向量去哪"这个动作。</p>
+
+<h3>11.3.1　二维旋转</h3>
+
+<p>\(T:\mathbb{R}^2\to\mathbb{R}^2\) 是绕原点逆时针旋转 \(\theta\) 度。求 \([T]\)。</p>
+
+<p>按菜谱：把 \(\mathbf{e}_1 = (1,0)\) 旋转 \(\theta\) 度去哪？画一个单位圆，原来在角度 0 处的点旋转到角度 \(\theta\) 处，坐标变成 \((\cos\theta, \sin\theta)\)。</p>
+
+<p>把 \(\mathbf{e}_2 = (0,1)\) 旋转 \(\theta\) 度去哪？原来在角度 \(\pi/2\) 处的点旋转到角度 \(\pi/2+\theta\) 处，坐标是 \((\cos(\pi/2+\theta), \sin(\pi/2+\theta)) = (-\sin\theta, \cos\theta)\)。</p>
+
+<p>把这两个像拼成列：</p>
+
+\[
+[T] = R_\theta = \begin{pmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{pmatrix}.
+\]
+
+<p>这是<strong>旋转矩阵</strong>。请你把这个矩阵记下来——它是后面所有"旋转"问题的基础。</p>
+
+<p>检验一下。取 \(\theta=\pi/2\)，则 \(R_{\pi/2} = \begin{pmatrix}0&-1\\1&0\end{pmatrix}\)。把 \((1,0)\) 旋转 \(90^\circ\) 应该得 \((0,1)\)；用矩阵：\(R_{\pi/2}\begin{pmatrix}1\\0\end{pmatrix} = \begin{pmatrix}0\\1\end{pmatrix}\)。对。</p>
+
+<h3>11.3.2　反射</h3>
+
+<p><strong>关于 \(x\) 轴反射。</strong>\(T(x,y) = (x,-y)\)。\(T(\mathbf{e}_1) = (1,0)\)，\(T(\mathbf{e}_2) = (0,-1)\)。</p>
+
+\[
+[T] = \begin{pmatrix}1 & 0 \\ 0 & -1\end{pmatrix}.
+\]
+
+<p><strong>关于 \(y\) 轴反射。</strong>\(T(x,y) = (-x,y)\)。\(T(\mathbf{e}_1) = (-1,0)\)，\(T(\mathbf{e}_2) = (0,1)\)。</p>
+
+\[
+[T] = \begin{pmatrix}-1 & 0 \\ 0 & 1\end{pmatrix}.
+\]
+
+<p><strong>关于直线 \(y=x\) 反射。</strong>关于 \(y=x\) 反射的几何效果是把 \((x,y)\) 变成 \((y,x)\)——交换两个坐标。所以 \(T(\mathbf{e}_1) = T(1,0) = (0,1) = \mathbf{e}_2\)，\(T(\mathbf{e}_2) = T(0,1) = (1,0) = \mathbf{e}_1\)。</p>
+
+\[
+[T] = \begin{pmatrix}0 & 1 \\ 1 & 0\end{pmatrix}.
+\]
+
+<p>关于直线 \(y=-x\) 反射也类似——请你自己求一下。</p>
+
+<h3>11.3.3　投影到 \(x\) 轴</h3>
+
+<p>已经在 11.2 节算过：\([T] = \begin{pmatrix}1&0\\0&0\end{pmatrix}\)。</p>
+
+<p>类似地，<strong>投影到 \(y\) 轴</strong>是 \(\begin{pmatrix}0&0\\0&1\end{pmatrix}\)。</p>
+
+<h3>11.3.4　三维绕坐标轴旋转</h3>
+
+<p>三维空间里，最常用的是绕三个坐标轴的旋转。</p>
+
+<p><strong>绕 \(z\) 轴旋转 \(\theta\) 度</strong>：\(z\) 坐标不变，\((x,y)\) 部分按二维旋转。所以 \(T(\mathbf{e}_1)=(\cos\theta,\sin\theta,0)\)，\(T(\mathbf{e}_2)=(-\sin\theta,\cos\theta,0)\)，\(T(\mathbf{e}_3)=(0,0,1)\)。</p>
+
+\[
+R_z(\theta) = \begin{pmatrix}\cos\theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1\end{pmatrix}.
+\]
+
+<p>类似地，<strong>绕 \(x\) 轴旋转 \(\theta\) 度</strong>：</p>
+
+\[
+R_x(\theta) = \begin{pmatrix}1 & 0 & 0 \\ 0 & \cos\theta & -\sin\theta \\ 0 & \sin\theta & \cos\theta\end{pmatrix}.
+\]
+
+<p><strong>绕 \(y\) 轴</strong>稍微注意一下：要让"右手坐标系"里的旋转方向自洽，矩阵的 \(\sin\) 符号位置和上面两个不一样：</p>
+
+\[
+R_y(\theta) = \begin{pmatrix}\cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ -\sin\theta & 0 & \cos\theta\end{pmatrix}.
+\]
+
+<p>这一个的符号是常见的考试坑——请你格外小心。</p>
+
+<h3>11.3.5　剪切（shear）</h3>
+
+<p><strong>水平剪切。</strong>\(T(x,y) = (x+ky, y)\)。这相当于把上面的点向右推，下面的点向左推（如果 \(k>0\)），整体效果像一个把矩形拉成平行四边形的"扭"。</p>
+
+<p>\(T(\mathbf{e}_1) = (1,0)\)（\(y=0\) 时不变），\(T(\mathbf{e}_2) = (k,1)\)。</p>
+
+\[
+[T] = \begin{pmatrix}1 & k \\ 0 & 1\end{pmatrix}.
+\]
+
+<p>剪切是除旋转、反射、投影、缩放之外，第五种最常见的几何变换。它的几何效果不那么"干净"，但在计算机图形学和工程上极其常用。</p>
+
+<h3>11.3.6　缩放（不一定各向同性）</h3>
+
+<p>\(T(x,y) = (ax, by)\)。\(T(\mathbf{e}_1) = (a,0)\)，\(T(\mathbf{e}_2) = (0,b)\)。</p>
+
+\[
+[T] = \begin{pmatrix}a & 0 \\ 0 & b\end{pmatrix}.
+\]
+
+<p>当 \(a=b\) 时是各向同性缩放；当 \(a\ne b\) 时是各方向不一样的缩放。当 \(a\) 或 \(b\) 为负时还包含一次反射。</p>
+
+<h3>记号小总结</h3>
+
+<p>下面这张表把上面的 \(\mathbb{R}^2\) 中的常见变换汇总起来。我建议你把它抄下来——看到几何变换题时，先在这张表里找。</p>
+
+<table>
+  <thead>
+    <tr><th>几何变换</th><th>标准矩阵</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>绕原点逆时针旋转 \(\theta\) 度</td><td>\(\begin{pmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{pmatrix}\)</td></tr>
+    <tr><td>关于 \(x\) 轴反射</td><td>\(\begin{pmatrix}1 & 0 \\ 0 & -1\end{pmatrix}\)</td></tr>
+    <tr><td>关于 \(y\) 轴反射</td><td>\(\begin{pmatrix}-1 & 0 \\ 0 & 1\end{pmatrix}\)</td></tr>
+    <tr><td>关于 \(y=x\) 反射</td><td>\(\begin{pmatrix}0 & 1 \\ 1 & 0\end{pmatrix}\)</td></tr>
+    <tr><td>投影到 \(x\) 轴</td><td>\(\begin{pmatrix}1 & 0 \\ 0 & 0\end{pmatrix}\)</td></tr>
+    <tr><td>投影到 \(y\) 轴</td><td>\(\begin{pmatrix}0 & 0 \\ 0 & 1\end{pmatrix}\)</td></tr>
+    <tr><td>各向异性缩放 \((x,y)\to(ax,by)\)</td><td>\(\begin{pmatrix}a & 0 \\ 0 & b\end{pmatrix}\)</td></tr>
+    <tr><td>水平剪切 \((x,y)\to(x+ky,y)\)</td><td>\(\begin{pmatrix}1 & k \\ 0 & 1\end{pmatrix}\)</td></tr>
+  </tbody>
+</table>
+
+<h2 id="sec-11-4">11.4　复合 = 矩阵乘法</h2>
+
+<p>这一节告诉你，<strong>矩阵乘法是从哪里来的</strong>。</p>
+
+<p>到目前为止，矩阵乘法的规则——"\(A\) 的第 \(i\) 行点乘 \(B\) 的第 \(j\) 列"——一直是一条<em>外加的</em>规则。它有用，但看起来很怪：为什么要这样定义？为什么不能就把对应位置的元素相乘？</p>
+
+<p>答案在线性变换的语言里。它是一条<em>必然</em>的规则——只要我们想让"复合两个变换"对应"乘两个矩阵"，就只能这样定义。</p>
+
+<p>设 \(T_A : \mathbb{R}^n \to \mathbb{R}^m\) 由矩阵 \(A\) 给出，\(T_B : \mathbb{R}^p \to \mathbb{R}^n\) 由矩阵 \(B\) 给出。我们可以把它们串联起来——先用 \(T_B\)，再用 \(T_A\)：</p>
+
+\[
+T_A \circ T_B : \mathbb{R}^p \to \mathbb{R}^m,\qquad (T_A\circ T_B)(\mathbf{x}) = T_A(T_B(\mathbf{x})).
+\]
+
+<p>请你想一下：复合 \(T_A \circ T_B\) 还是不是线性的？是的——你可以自己快速验证：</p>
+
+\[
+(T_A\circ T_B)(c_1\mathbf{u}+c_2\mathbf{v}) = T_A(T_B(c_1\mathbf{u}+c_2\mathbf{v})) = T_A(c_1 T_B(\mathbf{u}) + c_2 T_B(\mathbf{v})) = c_1 T_A(T_B(\mathbf{u})) + c_2 T_A(T_B(\mathbf{v})).
+\]
+
+<p>每一步用的是 \(T_B\) 或 \(T_A\) 的线性性。</p>
+
+<p>所以 \(T_A\circ T_B\) 是 \(\mathbb{R}^p\to\mathbb{R}^m\) 的线性映射，由主定理，它有一个唯一的标准矩阵。问题是：那个矩阵是什么？</p>
+
+<p>答案当然——是 \(AB\)：</p>
+
+\[
+(T_A \circ T_B)(\mathbf{x}) = T_A(T_B(\mathbf{x})) = T_A(B\mathbf{x}) = A(B\mathbf{x}) = (AB)\mathbf{x} = T_{AB}(\mathbf{x}).
+\]
+
+<p>这一串等式里，倒数第二步——\(A(B\mathbf{x}) = (AB)\mathbf{x}\)——是矩阵乘法的<em>结合律</em>。它告诉我们：</p>
+
+\[
+\boxed{\,T_A \circ T_B = T_{AB}.\,}
+\]
+
+<p>用语言说：<strong>复合两个变换，等于乘它们的矩阵</strong>。</p>
+
+<p>请你停下来体会这件事。它有两层含义：</p>
+
+<ol>
+  <li><em>实用层面</em>：每当你要做"先变换 \(B\) 再变换 \(A\)"，你不必每次都拿出输入向量来跑两遍——你可以一次性算出乘积矩阵 \(AB\)，以后所有的输入都用这个 \(AB\) 处理就行。这就是为什么"乘法"在线性代数里这么重要：它把"一连串变换"压缩成一个变换。</li>
+  <li><em>哲学层面</em>：矩阵乘法的"行点列"规则不是数学家发明的奇怪游戏。它是<em>由线性变换的复合自然导出的</em>——你把"要让 \((AB)\mathbf{x} = A(B\mathbf{x})\)"这条要求展开，得到的乘法规则就是我们熟悉的那一条，没有任何选择。</li>
+</ol>
+
+<p>第二点尤其重要。如果你以前觉得矩阵乘法的定义"古怪"，请回到第 3 章那条规则，把它和上面这条 \(T_A\circ T_B = T_{AB}\) 对照——你会发现古怪的不是规则本身，而是"先讲规则、后讲意义"的教学次序。从今往后，<em>矩阵乘法对你应该有几何含义</em>：它是变换的复合。</p>
+
+<h2 id="sec-11-5">11.5　几何复合：矩阵乘法不交换</h2>
+
+<p>矩阵乘法不满足交换律——\(AB \ne BA\) 是常态——这一点你早就听过。但听过和看到具体反例，是两回事。本节用几何的方法把它演示一遍，让你<em>看</em>到为什么不能交换。</p>
+
+<h3>例：先旋转 \(90^\circ\) 再关于 \(x\) 轴反射，与 反过来</h3>
+
+<p>取 \(R = R_{\pi/2} = \begin{pmatrix}0&-1\\1&0\end{pmatrix}\)（旋转 \(90^\circ\)）。</p>
+
+<p>取 \(F = \begin{pmatrix}1&0\\0&-1\end{pmatrix}\)（关于 \(x\) 轴反射）。</p>
+
+<p>看一下 \(\mathbf{e}_1 = (1,0)\) 在两种顺序下的运动：</p>
+
+<p><strong>顺序甲：先旋转 \(90^\circ\) 再反射。</strong>用矩阵就是 \(F R\)（"先 \(R\) 再 \(F\)" 写成矩阵 \(F R\)，因为我们从右到左读）。让我们直接看它对 \(\mathbf{e}_1\) 做什么：</p>
+
+<p>\(\mathbf{e}_1 = (1,0)\) 旋转 \(90^\circ\)：变成 \((0,1)\)。再关于 \(x\) 轴反射：变成 \((0,-1)\)。所以 \(FR\,\mathbf{e}_1 = (0,-1)\)。</p>
+
+<p><strong>顺序乙：先反射再旋转。</strong>矩阵是 \(RF\)。让我们对 \(\mathbf{e}_1\) 做：</p>
+
+<p>\(\mathbf{e}_1 = (1,0)\) 关于 \(x\) 轴反射：还是 \((1,0)\)（它本来就在 \(x\) 轴上）。再旋转 \(90^\circ\)：变成 \((0,1)\)。所以 \(RF\,\mathbf{e}_1 = (0,1)\)。</p>
+
+<p>两种顺序下，\(\mathbf{e}_1\) 的最终落点不同——一个是 \((0,-1)\)，另一个是 \((0,1)\)。<em>所以 \(FR \ne RF\)</em>。</p>
+
+<p>用矩阵直接算也能验证：</p>
+
+\[
+FR = \begin{pmatrix}1&0\\0&-1\end{pmatrix}\begin{pmatrix}0&-1\\1&0\end{pmatrix} = \begin{pmatrix}0&-1\\-1&0\end{pmatrix},\qquad RF = \begin{pmatrix}0&-1\\1&0\end{pmatrix}\begin{pmatrix}1&0\\0&-1\end{pmatrix} = \begin{pmatrix}0&1\\1&0\end{pmatrix}.
+\]
+
+<p>果然不一样。</p>
+
+<p>这个例子好在哪里？它告诉你<strong>"矩阵乘法不交换"不是一个代数怪癖，而是一个几何事实</strong>——"先做 A 再做 B" 和 "先做 B 再做 A" 在物理世界里本来就是两件不同的事。把袜子穿在脚上、把鞋穿在脚上 —— 顺序换一下，结果就不一样。矩阵乘法只是忠实记录了这件事。</p>
+
+<p>从此以后，如果你在某道题里写出 \(AB = BA\) 而又不是因为某个特殊原因（比如其中一个是单位矩阵、或者它们是同一个矩阵的幂），请停下来：你大概率写错了。</p>
+
+<h2 id="sec-11-6">11.6　可逆变换 ↔ 可逆矩阵</h2>
+
+<p>第 6 章我们讲过矩阵的逆：方阵 \(A\) 可逆当且仅当存在 \(A^{-1}\) 使 \(A A^{-1} = A^{-1} A = I\)。本节我们看这件事在变换语言里是什么意思。</p>
+
+<p><strong>定义。</strong>线性变换 \(T:\mathbb{R}^n\to\mathbb{R}^n\) 称为<strong>可逆</strong>，如果它是双射——也即既单射又满射。</p>
+
+<p>当 \(T\) 可逆时，可以定义它的<strong>逆变换</strong> \(T^{-1}:\mathbb{R}^n\to\mathbb{R}^n\)：对每个 \(\mathbf{w}\in\mathbb{R}^n\)，由满射存在 \(\mathbf{v}\) 使 \(T(\mathbf{v})=\mathbf{w}\)；由单射这个 \(\mathbf{v}\) 唯一。我们就定义 \(T^{-1}(\mathbf{w}) = \mathbf{v}\)。</p>
+
+<p>请你自己快速验证 \(T^{-1}\) 也是线性的——把 \(T(\mathbf{v}_1)=\mathbf{w}_1\)，\(T(\mathbf{v}_2)=\mathbf{w}_2\)，由线性 \(T(c_1\mathbf{v}_1+c_2\mathbf{v}_2) = c_1\mathbf{w}_1+c_2\mathbf{w}_2\)，所以 \(T^{-1}(c_1\mathbf{w}_1+c_2\mathbf{w}_2) = c_1\mathbf{v}_1+c_2\mathbf{v}_2 = c_1 T^{-1}(\mathbf{w}_1) + c_2 T^{-1}(\mathbf{w}_2)\)。</p>
+
+<p>有了这个，我们可以陈述本节的关键事实：</p>
+
+<p><strong>命题。</strong>设 \(T:\mathbb{R}^n\to\mathbb{R}^n\) 是线性变换，标准矩阵为 \(A = [T]\)。则<strong>\(T\) 可逆当且仅当 \(A\) 可逆</strong>。此时 \([T^{-1}] = A^{-1}\)。</p>
+
+<p>这是一条"两边对应"的命题：</p>
+
+<ul>
+  <li>变换可逆 \(\Longleftrightarrow\) 矩阵可逆。</li>
+  <li>逆变换的矩阵 \(=\) 矩阵的逆。</li>
+</ul>
+
+<p>第二条特别让人愉快：你不必单独"求逆变换的矩阵"——只要把 \(A\) 求逆，那个就是 \([T^{-1}]\)。</p>
+
+<h3>例 11.6.1：旋转的逆</h3>
+
+<p>旋转 \(\theta\) 的逆是旋转 \(-\theta\)——这是几何上明显的事。让我们用矩阵验证。\(R_\theta = \begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}\) 的逆是什么？</p>
+
+<p>用 2 阶矩阵的逆公式：\(R_\theta^{-1} = \frac{1}{\det R_\theta}\begin{pmatrix}\cos\theta & \sin\theta \\ -\sin\theta & \cos\theta\end{pmatrix}\)。注意 \(\det R_\theta = \cos^2\theta + \sin^2\theta = 1\)，所以分母为 1。</p>
+
+\[
+R_\theta^{-1} = \begin{pmatrix}\cos\theta & \sin\theta \\ -\sin\theta & \cos\theta\end{pmatrix} = R_{-\theta}.
+\]
+
+<p>正是旋转 \(-\theta\) 的矩阵——\(\cos(-\theta) = \cos\theta\)，\(\sin(-\theta) = -\sin\theta\)。代数和几何完美一致。</p>
+
+<h3>例 11.6.2：投影不可逆</h3>
+
+<p>投影 \(T(x,y)=(x,0)\) 的矩阵是 \(\begin{pmatrix}1&0\\0&0\end{pmatrix}\)。它的行列式是 0，所以矩阵不可逆。变换上：投影把 \(y\) 轴上所有点压成原点，丢掉了信息——你拿到原点没法反推出原来在 \(y\) 轴的哪里。所以变换也不可逆。两边对应。</p>
+
+<h2 id="sec-11-7">11.7　用变换语言重述四个子空间</h2>
+
+<p>到这里我们把第 7、8 章学过的"矩阵的四个子空间"重新过一遍，这次用变换的语言。这不是新内容——只是把已知事实换一种说法。但换说法本身就是一种深化理解。</p>
+
+<p>设 \(A\) 是 \(m\times n\) 矩阵，\(T_A : \mathbb{R}^n\to\mathbb{R}^m\) 是它给出的线性变换。下面这张表把矩阵语言和变换语言并排放：</p>
+
+<table>
+  <thead>
+    <tr><th>矩阵语言（之前的）</th><th>变换语言（现在的）</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>列空间 \(\mathrm{Col}(A)\)</td><td>像 \(\mathrm{im}(T_A)\)</td></tr>
+    <tr><td>零空间 \(\mathrm{Null}(A)\)</td><td>核 \(\ker(T_A)\)</td></tr>
+    <tr><td>秩 \(\mathrm{rank}(A) = \dim\mathrm{Col}(A)\)</td><td>像的维数 \(\dim \mathrm{im}(T_A)\)</td></tr>
+    <tr><td>零度 \(\mathrm{nullity}(A) = \dim\mathrm{Null}(A)\)</td><td>核的维数 \(\dim \ker(T_A)\)</td></tr>
+  </tbody>
+</table>
+
+<p>请你认真看一下这张表。每一行的两列都不是"近似的对应"，而是<em>同一个集合的两个名字</em>。</p>
+
+<p>有了这种对应，第 8 章的<strong>秩-零度定理</strong></p>
+
+\[
+\mathrm{rank}(A) + \mathrm{nullity}(A) = n
+\]
+
+<p>变成</p>
+
+\[
+\dim\mathrm{im}(T) + \dim\ker(T) = \dim V,
+\]
+
+<p>对任何 \(T:V\to W\) 的线性映射成立（其中 \(V\) 是定义域）。这是一个非常深刻、非常有用的几何陈述：<strong>"被压成零的维数"加上"留下来的维数"等于"输入空间的总维数"</strong>。</p>
+
+<p>用一个直观的比喻：\(T\) 像一个数据压缩器。一些维度被它压扁（变成零），另一些维度被它保留下来（成为像里的）。两者之和正是原本的总维度——一个不少。秩-零度定理就是这个守恒律。</p>
+
+<h3>例：投影</h3>
+
+<p>投影 \(T:\mathbb{R}^2\to\mathbb{R}^2\)，\(T(x,y)=(x,0)\)。</p>
+
+<ul>
+  <li>核（\(y\) 轴）维数 \(=1\)。</li>
+  <li>像（\(x\) 轴）维数 \(=1\)。</li>
+  <li>核维数 \(+\) 像维数 \(=2 =\dim\mathbb{R}^2\)。✓</li>
+</ul>
+
+<p>定理对上了。</p>
+
+<h3>例：求导</h3>
+
+<p>\(D : P_3 \to P_2\)，\(D(p) = p'\)。</p>
+
+<ul>
+  <li>核（常数多项式）维数 \(=1\)。</li>
+  <li>像（整个 \(P_2\)）维数 \(=3\)。</li>
+  <li>\(1 + 3 = 4 = \dim P_3\)。✓</li>
+</ul>
+
+<p>这个例子里，\(D\) 不是 \(\mathbb{R}^n\to\mathbb{R}^m\) 之间的，但秩-零度定理依然成立——这正是把它从矩阵抬升到一般线性映射后所获得的力量。</p>
+
+<p>本章到这里告一段落。我们用 \(T(\mathbf{e}_i)\) 这个简单的菜谱学会了求标准矩阵；我们用变换的复合理解了矩阵乘法的几何来源；我们看见了"矩阵不交换 = 变换顺序不能换"这条几何事实；我们把"矩阵的四个子空间"重新解释为变换的核与像。</p>
+
+<p>下一章我们要做最后的、也是最容易让人晕的一步：当我们换一组基的时候，<em>同一个变换的矩阵会变样</em>。这件事直接通向第 14 章的特征值和第 15 章的对角化。请你深呼吸，进入下一章。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章　线性变换</a><a href="ch12.html">下一章 · 第 12 章　坐标与基变换 →</a></nav>
+
+</main>
+</body>
+</html>

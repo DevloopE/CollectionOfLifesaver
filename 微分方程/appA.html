@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 存在唯一性 — 普林斯顿微分方程读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 综合应用：从模型到解</a><a href="appB.html">下一章 · 附录 B 常用积分与变换表 →</a></nav>
+<h1 id="appA">附录 A 存在唯一性</h1>
+
+<p>正文里我们解了无数微分方程——一阶的、二阶的、线性的、非线性的——并且每次都默默假设："只要给定初值，解存在并且唯一"。这种安心来自<strong>存在唯一性定理</strong>。本附录把这件事讲清楚：在什么条件下解一定存在？在什么条件下它一定唯一？以及——更让人警觉的——在什么条件下这两件事会失效？</p>
+
+<p>我们不追求最严格的证明。这里的目标是：让你<em>看出</em>条件的合理性，<em>记住</em>常见的反例，以及在以后写出方程时<em>知道</em>什么时候要小心。完整严格的证明散见于任何一本本科级常微分方程教材（如 Coddington 与 Levinson）。</p>
+
+<h2 id="secA-1">A.1 一阶 ODE 的 Picard–Lindelöf 定理</h2>
+
+<p>考虑一阶初值问题</p>
+
+\[
+y' = f(t, y), \qquad y(t_0) = y_0.
+\]
+
+<p>"<strong>解存在</strong>"是说：能找到一个区间 \(I \subset \mathbb{R}\) 包含 \(t_0\)，以及一个可微函数 \(y: I \to \mathbb{R}\)，使得对所有 \(t \in I\) 都有 \(y'(t) = f(t, y(t))\) 并且 \(y(t_0) = y_0\)。"<strong>解唯一</strong>"是说：在那个区间上，这样的 \(y\) 只有一个。</p>
+
+<p>定理（<strong>Picard–Lindelöf</strong>，1890 前后）：设 \(f\) 在矩形 \(R = \{(t, y) : |t - t_0| \le a, |y - y_0| \le b\}\) 上<em>连续</em>，且对 \(y\) 满足<em>Lipschitz</em>条件，即存在常数 \(L\) 使得对 \(R\) 中所有 \((t, y_1), (t, y_2)\) 都有</p>
+
+\[
+|f(t, y_1) - f(t, y_2)| \le L \, |y_1 - y_2|.
+\]
+
+<p>则初值问题在区间 \([t_0 - h, t_0 + h]\) 上有<strong>唯一</strong>解，其中 \(h = \min(a, b/M)\)，\(M = \max_R |f|\)。</p>
+
+<p>这两个条件——连续性和 Lipschitz——分管两件事：</p>
+
+<ul>
+<li><em>连续性</em>保证<strong>存在</strong>。这是 Peano 定理（更弱）就能给的。直观：如果 \(f\) 是连续的，方向场是平滑变化的，沿着方向场总能"画出"一条曲线。</li>
+<li><em>Lipschitz</em>额外保证<strong>唯一</strong>。如果 \(f\) 不 Lipschitz，可能有多条解曲线从同一个 \((t_0, y_0)\) 出发——这种现象 A.3 节会展示。</li>
+</ul>
+
+<p>定理的证明骨架（Picard 迭代法）：把 ODE 改写成积分方程</p>
+
+\[
+y(t) = y_0 + \int_{t_0}^{t} f(s, y(s))\, ds.
+\]
+
+<p>定义算子 \(T[y](t) = y_0 + \int_{t_0}^{t} f(s, y(s))\, ds\)。在合适的函数空间（连续函数空间，配上上确界范数）里，Lipschitz 条件让 \(T\) 成为<em>压缩映射</em>，由 Banach 不动点定理，\(T\) 有唯一不动点，那就是初值问题的解。这套思路漂亮在它<em>构造性</em>——你可以从 \(y^{(0)}(t) = y_0\) 出发，迭代 \(y^{(n+1)} = T[y^{(n)}]\)，序列收敛到真解。</p>
+
+<p>实用上你不一定要会证；要会的是<em>识别</em>条件什么时候成立、什么时候失效。</p>
+
+<h2 id="secA-2">A.2 Lipschitz 条件的意义</h2>
+
+<p>Lipschitz 条件 \(|f(t, y_1) - f(t, y_2)| \le L |y_1 - y_2|\) 长得很数学，但意思朴素：<strong>\(f\) 关于 \(y\) 的"涨跌速度"被一个常数顶住</strong>。如果你画 \(y \mapsto f(t, y)\)（固定 \(t\)）的曲线，这条曲线上任意两点之间的连线斜率都不超过 \(L\)。</p>
+
+<p>常见的"足以保证 Lipschitz"的判据：</p>
+
+<ol>
+<li><strong>有连续偏导 \(\partial f / \partial y\) 且在某有界区域内</strong>。则 \(L\) 可以取这个偏导数的最大模。证明用中值定理即可。</li>
+<li><strong>\(f\) 关于 \(y\) 是仿射的</strong>，比如 \(f(t, y) = a(t) y + b(t)\)，\(a, b\) 连续——这时 \(L\) 可取为 \(a\) 在区间上的最大模。<em>线性</em>方程总是 Lipschitz 的（在有界 \(t\) 区间上）。</li>
+<li><strong>\(f\) 是 \(y\) 的多项式</strong>，并把 \(y\) 限制在有界区域。</li>
+</ol>
+
+<p>典型的 Lipschitz <em>失败</em>是发生在</p>
+
+<ul>
+<li>函数对 \(y\) 不可导，比如 \(\sqrt{|y|}\) 在 \(y = 0\) 附近导数趋于 \(\infty\)；</li>
+<li>函数对 \(y\) 是分数次幂，比如 \(y^{2/3}\) 同样在 \(y = 0\) 附近偏导无界；</li>
+<li>函数有奇点。</li>
+</ul>
+
+<p>在这些点附近就要小心唯一性。</p>
+
+<h3 id="secA-2-1">A.2.1 一个反差对照</h3>
+
+<p>方程 \(y' = y\) 中 \(f(t, y) = y\)。\(\partial f / \partial y = 1\)，处处 Lipschitz（\(L = 1\)）。所以从任何 \((t_0, y_0)\) 出发都有唯一解。我们当然知道是 \(y(t) = y_0 e^{t - t_0}\)。</p>
+
+<p>方程 \(y' = y^{2/3}\) 中 \(f(t, y) = y^{2/3}\)。\(\partial f / \partial y = (2/3) y^{-1/3}\)，在 \(y = 0\) 处<em>无界</em>。所以从 \((t_0, 0)\) 出发，Picard–Lindelöf 不保证唯一性。下一节我们就来看，唯一性确实失效。</p>
+
+<h2 id="secA-3">A.3 反例：\(y' = y^{2/3}\)，\(y(0) = 0\) 的多解性</h2>
+
+<p>考虑</p>
+
+\[
+y' = y^{2/3}, \qquad y(0) = 0.
+\]
+
+<p>明显的"零解"是 \(y(t) \equiv 0\)。它满足方程（\(0 = 0^{2/3}\)）和初值。</p>
+
+<p>但还有另一个解。可分离：\(y^{-2/3} dy = dt\)，积分 \(3 y^{1/3} = t + C\)。代初值 \(y(0) = 0\) 给 \(C = 0\)。所以 \(y(t) = (t/3)^3 = t^3 / 27\)。验证：\(y' = 3t^2 / 27 = t^2 / 9\)，\(y^{2/3} = (t^3/27)^{2/3} = t^2 / 9\)。对！这个解也满足方程和初值。</p>
+
+<p>更糟：还有<em>无穷多</em>个解。对任何 \(\tau \ge 0\)，定义</p>
+
+\[
+y_\tau(t) = \begin{cases} 0, & 0 \le t \le \tau, \\ (t - \tau)^3 / 27, & t > \tau. \end{cases}
+\]
+
+<p>它满足初值 \(y_\tau(0) = 0\)，并在每个 \(t\) 处满足 \(y' = y^{2/3}\)（\(t = \tau\) 时左导数右导数都等于 0）。直观：解可以"赖在 0 上任意久"，然后任何时刻"启动"沿 \(t^3/27\) 的曲线起飞。物理上这是<em>不确定</em>的——同一个初始条件给不出唯一未来。这种现象叫"<em>分支</em>"或"<em>非唯一性</em>"。</p>
+
+<p>原因正是 \(f(t, y) = y^{2/3}\) 在 \(y = 0\) 处<em>非 Lipschitz</em>。当解经过 \(y = 0\) 这条 horizontal isocline 时，方向场没有"足够强"的指向把解曲线钉住。</p>
+
+<p>这个反例的教育意义：<em>解的存在</em>需要弱条件（连续就够），<em>解的唯一</em>需要强条件（至少 Lipschitz）。如果你写出一个非 Lipschitz 的方程并想用它做物理建模，你应该认真检查解是不是物理上的确定演化——可能不是。</p>
+
+<h2 id="secA-4">A.4 \(y' = y^2\) 的爆破</h2>
+
+<p>看下一种失效：解唯一<em>但只在有限时间内存在</em>。</p>
+
+\[
+y' = y^2, \qquad y(0) = 1.
+\]
+
+<p>这里 \(f(t, y) = y^2\)，\(\partial f / \partial y = 2y\) 在每个有界 \(y\) 区域内都 Lipschitz。所以局部存在唯一性没问题。但解到底活多久？</p>
+
+<p>分离变量：\(dy/y^2 = dt\)，积分 \(-1/y = t + C\)。代 \(y(0) = 1\)：\(C = -1\)。所以 \(y(t) = 1/(1 - t)\)。</p>
+
+<p>这个解<em>在 \(t = 1\) 处爆掉</em>。\(y(t) \to +\infty\) 当 \(t \to 1^-\)。当 \(t \ge 1\) 时根本就没有解。我们说解在 \(t = 1\) 处<strong>爆破</strong>（blow up）。</p>
+
+<p>定理保证的"\(h = \min(a, b/M)\)"已经隐含了这一点——\(h\) 受 \(b/M\) 的限制，而 \(M = \max |f|\) 在 \(y\) 大的区域里很大，所以保证的存在区间很短。<em>非线性</em>方程通常只能保证<em>局部</em>存在性，全局存在并不自动。</p>
+
+<p>另一个鼓舞人心的对比：\(y' = y\)（线性）。这里 \(f(t, y) = y\)，对所有 \((t, y)\) Lipschitz（\(L = 1\)）；解 \(y = y_0 e^t\) 对所有 \(t\) 都存在，全局解。<em>线性方程不会爆破</em>（在系数有界的前提下）——这是线性方程的优秀性质之一，下一节会展开。</p>
+
+<p>口头上：</p>
+
+<ul>
+<li>非线性方程：解可能爆破，存在区间是<em>局部</em>的。</li>
+<li>线性方程（系数有界）：解全程存在。</li>
+</ul>
+
+<p>这就是为什么物理学家热爱线性化——它把"会不会突然爆掉"的担忧转移走了。</p>
+
+<h2 id="secA-5">A.5 线性方程的整体存在性</h2>
+
+<p>线性方程</p>
+
+\[
+y' = a(t) y + b(t)
+\]
+
+<p>有一个比 Picard–Lindelöf 更强的结果：<strong>只要 \(a, b\) 在一个区间 \(I\) 上连续，初值问题在<em>整个</em> \(I\) 上有唯一解。</strong>不需要"局部"。</p>
+
+<p>原因：线性的 \(f(t, y) = a(t) y + b(t)\) 关于 \(y\) 的 Lipschitz 常数就是 \(|a(t)|\)——它跟 \(y\) 无关，所以在每个紧子区间上都被一个常数顶住。Picard 迭代收敛到全局解。具体地，整体解可以由积分因子直接写出来：</p>
+
+\[
+y(t) = e^{\int_{t_0}^t a(s) ds} \left[ y_0 + \int_{t_0}^t b(s) e^{-\int_{t_0}^s a(\sigma) d\sigma} ds \right].
+\]
+
+<p>这表达式只用到 \(a, b\) 在 \([t_0, t]\) 上的积分；只要这积分有意义（被积函数连续），公式就给出一个解。所以整体存在性是<em>显式构造</em>出来的，不只是抽象保证。</p>
+
+<p>这条结果对二阶线性方程也成立：</p>
+
+\[
+y'' + p(t) y' + q(t) y = g(t),
+\]
+
+<p>只要 \(p, q, g\) 在区间 \(I\) 上连续，给定 \(y(t_0), y'(t_0)\) 的初值问题在整个 \(I\) 上有唯一解。这背后的机制是把它化成一阶方程组 \(\mathbf{x} = (y, y')^T\)，然后用下一节的方程组版本。</p>
+
+<h2 id="secA-6">A.6 系统的存在唯一性</h2>
+
+<p>把 Picard–Lindelöf 推广到方程组：</p>
+
+\[
+\dot{\mathbf{x}} = \mathbf{f}(t, \mathbf{x}), \qquad \mathbf{x}(t_0) = \mathbf{x}_0,
+\]
+
+<p>其中 \(\mathbf{x}, \mathbf{f} \in \mathbb{R}^n\)。</p>
+
+<p>定理：设 \(\mathbf{f}\) 在某个柱形区域上连续，并对 \(\mathbf{x}\) 满足 Lipschitz 条件</p>
+
+\[
+\|\mathbf{f}(t, \mathbf{x}_1) - \mathbf{f}(t, \mathbf{x}_2)\| \le L \, \|\mathbf{x}_1 - \mathbf{x}_2\|,
+\]
+
+<p>则初值问题在 \(t_0\) 的某个邻域内有唯一解。证明完全类似——把单变量 Picard 迭代里的绝对值换成范数即可。</p>
+
+<p>这个结果的最大价值：<em>把高阶方程化成一阶方程组</em>之后，存在唯一性自动成立。比如 \(y'' = f(t, y, y')\) 引入 \(\mathbf{x} = (y, y')^T\)，得到</p>
+
+\[
+\dot{\mathbf{x}} = \begin{pmatrix} x_2 \\ f(t, x_1, x_2) \end{pmatrix}.
+\]
+
+<p>只要 \(f\) 关于 \((y, y')\) Lipschitz，二阶方程的初值问题就有唯一解。我们在第 7-8 章一直默认这点；现在我们知道它从哪里来。</p>
+
+<h3 id="secA-6-1">A.6.1 线性方程组的整体性</h3>
+
+<p>对 \(\dot{\mathbf{x}} = A(t) \mathbf{x} + \mathbf{b}(t)\)，只要 \(A, \mathbf{b}\) 在区间 \(I\) 上连续，整体解存在唯一——和单方程版本同理。这一点保证了我们在第 12-13 章的所有线性方程组讨论。</p>
+
+<h3 id="secA-6-2">A.6.2 非线性方程组的局部性与爆破</h3>
+
+<p>非线性方程组同样可能爆破。比如</p>
+
+\[
+\dot x_1 = x_1^2 + x_2^2, \qquad \dot x_2 = x_1 x_2,
+\]
+
+<p>从 \((1, 0)\) 出发立刻退化为 \(\dot x_1 = x_1^2\)，跟 A.4 节一样在有限时间爆破。</p>
+
+<p>对一般非线性系统，"<em>解全程存在</em>"通常需要额外的<strong>先验估计</strong>——比如 Lyapunov 函数有界、能量守恒、解被某个不变集捕获，等等。物理学家一般通过守恒律论证（"能量有界，所以速度有界，所以位置不会爆破"）。这正是为什么 Hamilton 系统（守能量）通常全局存在，而耗散系统（能量减少）也常常全局存在；但<em>反向</em>耗散系统（向越来越大的能量演化）会爆破。</p>
+
+<h3 id="secA-6-3">A.6.3 一个总结性的诊断列表</h3>
+
+<p>给定一个 ODE 或 ODE 组，按下面列表自检：</p>
+
+<ol>
+<li><strong>\(f\) 在初值 \((t_0, y_0)\) 邻域连续吗？</strong> 如果不，连存在性都没有保证；要单独分析。</li>
+<li><strong>\(f\) 关于 \(y\) Lipschitz 吗？</strong> 大多数实际情况只需要看 \(\partial f/\partial y\) 是否在邻域有界。是 → 唯一性也有；否 → 警惕 A.3 类型的反例。</li>
+<li><strong>方程是不是线性的？</strong> 是 → 系数连续就够，整体解存在唯一。</li>
+<li><strong>方程是非线性的吗？</strong> 是 → 只能保证局部解；想要整体解需要额外论证（守恒律 / 不变集 / 先验估计）。</li>
+<li><strong>解可能爆破吗？</strong> 看 \(f\) 在 \(|y| \to \infty\) 时的增长速度。如果 \(f\) 关于 \(y\) 增长比线性快很多（如 \(y^2, e^y\)），警惕爆破。</li>
+</ol>
+
+<p>这五点过完，你就对一个微分方程在<em>数学</em>层面上的"良性"有了基本判断。剩下的，是去解它（或数值地算它）。</p>
+
+<p>本附录到此为止。整本书几乎不引用这些定理——但当你写下"\(y(t)\) 满足……"的时候，这些定理在<em>背后</em>保证你确实在谈论一个良定义的对象。这种"安静的支持"，正是分析学相对于具体技巧的位置。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 综合应用：从模型到解</a><a href="appB.html">下一章 · 附录 B 常用积分与变换表 →</a></nav>
+
+</main>
+</body>
+</html>

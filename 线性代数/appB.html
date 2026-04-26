@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 复数复习 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 严格处理</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+<h1 id="appB">附录 B 复数复习</h1>
+
+<p>正文里复数偶尔登场——主要是在第 22 章谈"非对称矩阵的特征值可以是复的"那一节。如果你已经学过中学的复数，可以跳过本附录；如果你忘了或者从来没系统学过，本附录是一份"五分钟够用"的速通。</p>
+
+<h2 id="secB-1">B.1 复数的代数</h2>
+
+<p><strong>定义。</strong>　实数 \(\mathbb{R}\) 里方程 \(x^2 + 1 = 0\) 没有解。把这件事"修补"——人为引入一个新对象 \(i\)，规定 \(i^2 = -1\)，再让这个 \(i\) 与所有实数自由地相加、相乘——就得到<strong>复数</strong>。复数的标准形式是
+\[
+z = a + b i, \qquad a, b \in \mathbb{R}.
+\]
+\(a\) 叫做 \(z\) 的<strong>实部</strong>（\(\mathrm{Re}\,z\)），\(b\) 叫做<strong>虚部</strong>（\(\mathrm{Im}\,z\)）。所有复数构成的集合记作 \(\mathbb{C}\)。</p>
+
+<p><strong>四则运算。</strong>　把 \(i\) 当成普通字母运算，遇到 \(i^2\) 就替换成 \(-1\)：
+\[
+(a + bi) + (c + di) = (a + c) + (b + d) i,
+\]
+\[
+(a + bi)(c + di) = ac + adi + bci + bdi^2 = (ac - bd) + (ad + bc) i.
+\]
+减法与加法同理（每项变号）。除法稍麻烦——用"分母有理化"的技巧。设 \(z = c + di \neq 0\)，先定义<strong>共轭</strong>
+\[
+\bar z = c - di.
+\]
+注意 \(z \bar z = (c + di)(c - di) = c^2 + d^2\) 是<em>实数</em>而且非负。所以
+\[
+\frac{a + bi}{c + di} = \frac{(a + bi)(c - di)}{(c + di)(c - di)} = \frac{(ac + bd) + (bc - ad) i}{c^2 + d^2}.
+\]
+分子是普通的复数乘法，分母是实数。</p>
+
+<p><strong>共轭的性质。</strong>　共轭运算与四则运算相容：
+\[
+\overline{z + w} = \bar z + \bar w, \quad \overline{zw} = \bar z \bar w, \quad \overline{\bar z} = z.
+\]
+而且 \(z + \bar z = 2 \mathrm{Re}\, z\)、\(z - \bar z = 2 i \mathrm{Im}\, z\)、\(z \bar z = |z|^2\)（见下节）。这些恒等式在做矩阵证明时反复会用到。</p>
+
+<h2 id="secB-2">B.2 几何形式：复平面</h2>
+
+<p>把复数 \(z = a + b i\) 当成<em>平面上的一点</em> \((a, b)\)——实部是横坐标、虚部是纵坐标。这就是<strong>复平面</strong>（也叫阿尔冈图）。\(a\) 轴叫"实轴"，\(b\) 轴叫"虚轴"。每个复数对应平面上的一个点；实数对应实轴上的点；纯虚数（\(a = 0\)）对应虚轴上的点。</p>
+
+<p>这个几何视角立刻让两件事有了画面：</p>
+
+<ul>
+  <li><strong>模</strong>（modulus）：复数 \(z\) 的模 \(|z|\) 就是它在平面上到原点的距离：
+  \[
+  |z| = \sqrt{a^2 + b^2}.
+  \]
+  注意 \(|z|^2 = a^2 + b^2 = z \bar z\)——把模平方写成 \(z \bar z\) 是经常使用的把戏，因为它把"绝对值"这种带"开方"的事情转成纯代数运算。</li>
+  <li><strong>辐角</strong>（argument）：从正实轴出发，逆时针旋转到 \(z\) 的射线，所转过的角度叫 \(z\) 的辐角，记作 \(\arg z\)。它取值在 \([0, 2\pi)\)（或 \((-\pi, \pi]\)，取决于约定）。</li>
+</ul>
+
+<p>有了模和辐角，复数就有了<strong>极坐标形式</strong>：
+\[
+z = |z| (\cos \theta + i \sin \theta), \qquad \theta = \arg z.
+\]
+反过来，\(a = |z| \cos \theta\)、\(b = |z| \sin \theta\)。这种表达把"代数形式"翻译成"几何形式"，对乘法尤其方便（见下节）。</p>
+
+<h2 id="secB-3">B.3 欧拉公式</h2>
+
+<p>复数最美的一条恒等式可能是<strong>欧拉公式</strong>：
+\[
+\boxed{\ e^{i\theta} = \cos \theta + i \sin \theta.\ }
+\]
+这条公式通过把指数函数 \(e^x\) 推广到虚数指数得到——具体推导用 \(e^x\) 的泰勒级数：把 \(x\) 替换成 \(i\theta\)，分离实部虚部，分别得到 \(\cos \theta\) 和 \(\sin \theta\) 的泰勒级数。这里我们不重新推导这件事，只说明它的<em>用途</em>。</p>
+
+<p>有了欧拉公式，复数的极坐标形式可以紧凑地写成
+\[
+z = |z| e^{i \theta}.
+\]
+这个写法的好处是<strong>乘法变成了加法</strong>。设 \(z_1 = r_1 e^{i \theta_1}\)、\(z_2 = r_2 e^{i \theta_2}\)。则
+\[
+z_1 z_2 = r_1 r_2 e^{i(\theta_1 + \theta_2)}.
+\]
+读出来：<em>两复数相乘 = 模相乘、辐角相加</em>。这是中学公式 \(\cos(\theta_1 + \theta_2) = \cos \theta_1 \cos \theta_2 - \sin \theta_1 \sin \theta_2\) 的优雅来源——你只要把上面那条等式两边展开，自动得到所有的"和差化积"恒等式。</p>
+
+<p>欧拉公式有一个特别迷人的特例：取 \(\theta = \pi\)，得到
+\[
+e^{i \pi} = -1, \quad \text{即} \quad e^{i \pi} + 1 = 0.
+\]
+这条等式（"欧拉恒等式"）把数学里五个最基本的常数 \(0, 1, i, \pi, e\) 用最少的运算符号串到了一起，被许多人称为"数学里最美的式子"。这种美感是<em>真正的</em>——它来自于"指数、三角、虚数"原本看似毫无关系的三件事，在复数语言里被识破成同一件事的不同侧面。</p>
+
+<h2 id="secB-4">B.4 复数的几何运算</h2>
+
+<p>把"复数乘法 = 模相乘、辐角相加"反过来读：<strong>乘以一个复数 = 在平面上做一次旋转加缩放</strong>。具体来说，乘以 \(z = r e^{i\theta}\)：</p>
+
+<ul>
+  <li>把每个点到原点的距离<em>乘以 \(r\)</em>；</li>
+  <li>把每个点关于原点<em>逆时针旋转 \(\theta\) 角</em>。</li>
+</ul>
+
+<p>几个特例值得记住：</p>
+
+<ul>
+  <li>乘以 \(i\)（即 \(r = 1\)、\(\theta = \pi/2\)）：把点逆时针旋转 \(90^\circ\)。所以 \(i \cdot 1 = i\)、\(i \cdot i = -1\)、\(i \cdot (-1) = -i\)、\(i \cdot (-i) = 1\)——这正是为什么 "\(i^4 = 1\)"。在几何上，\(\{1, i, -1, -i\}\) 是单位圆上间隔 \(90^\circ\) 的四个点，每次乘 \(i\) 走一步。</li>
+  <li>乘以 \(-1\)（即 \(r = 1\)、\(\theta = \pi\)）：把点旋转 \(180^\circ\)，等价于关于原点对称。</li>
+  <li>乘以 \(2\)（实数）：保持方向不变，距离翻倍。</li>
+  <li>乘以 \(2 e^{i\pi/3}\)：旋转 \(60^\circ\) 同时距离乘 2。</li>
+</ul>
+
+<p>这种"乘法 = 旋转加缩放"的画面是为什么复数在物理（电学的相量、量子力学）和工程（信号处理的傅立叶变换）里如此根深蒂固——许多自然现象本身就是"旋转 + 振幅"的叠加，复数语言把它写成最干净的形式。</p>
+
+<p>在线性代数里复数的主要登场场所是<em>非对称实矩阵的特征值</em>。比如旋转矩阵
+\[
+R = \begin{pmatrix} \cos \theta & -\sin \theta \\ \sin \theta & \cos \theta \end{pmatrix}
+\]
+的特征多项式是 \(\lambda^2 - 2\lambda \cos\theta + 1 = 0\)，根是 \(\lambda = \cos\theta \pm i \sin\theta = e^{\pm i \theta}\)。两个复特征值的模都是 1（旋转不改变长度），辐角是 \(\pm \theta\)（正负旋转方向）。这件事在实数视角下看不见——必须借助复数。</p>
+
+<p>这便是你在线性代数里需要掌握的全部复数知识。如果你想更深入地学习复变函数（解析函数、洛朗级数、留数定理之类），那是另一门完整的课，超出了本书的范围。但本附录的内容足够你应付任何关于"复特征值"的题目，也足够你看懂工程书里那些含 \(e^{j\omega t}\)（电气工程界把虚数单位写作 \(j\) 不是 \(i\)，是为了避免与电流符号 \(i\) 冲突）的公式。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 严格处理</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+
+</main>
+</body>
+</html>

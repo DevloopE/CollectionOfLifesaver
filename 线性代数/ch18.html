@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 内积与正交 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 矩阵指数与线性微分方程</a><a href="ch19.html">下一章 · 第 19 章 正交投影 →</a></nav>
+<h1 id="ch18">第 18 章 内积与正交</h1>
+
+<p>到目前为止,我们关心的是向量空间的"代数骨架":线性组合、张成、线性无关、基与维数、矩阵作为线性变换、行列式、特征值与对角化。这些骨架上没有"长度"也没有"角度"——它们只关心"哪些向量能被另一些向量线性组合得到",而不关心"两个向量之间相距多远"或"它们之间夹了多大的角"。</p>
+
+<p>这一章我们要把<strong>几何</strong>装回到向量空间里。回到中学:你早就知道平面上两个箭头之间有夹角,你也知道一个箭头有"长短"。这种长短和角度的概念,代数上由<strong>内积</strong>(也叫<em>点积</em>)统一捕捉。一旦内积出现,长度、夹角、垂直、投影、距离——这些几何概念瞬间全部回来了。</p>
+
+<p>本章的剧情可以用一句话概括:<strong>内积让我们重新拥有几何;而其中最重要的几何概念是"正交"。</strong>当一组基向量两两正交,而且每一个的长度都是 1 时,它叫作<em>标准正交基</em>。在标准正交基下,你可以"瞬间"读出任何向量的坐标——不必再去解 \(n\) 元线性方程组。这件"奇迹"是后面 Gram-Schmidt 过程(第 21 章)和谱定理(第 22 章)的全部动机。</p>
+
+<p>本章会涉及的内容:</p>
+
+<ul>
+  <li>\(\mathbb{R}^n\) 中的点积及其代数性质;</li>
+  <li>由点积导出的"长度"(范数)与"夹角";</li>
+  <li>柯西-施瓦茨不等式与三角不等式;</li>
+  <li>正交向量、正交集与标准正交基;</li>
+  <li>标准正交基下"坐标 = 内积"的奇迹;</li>
+  <li>正交矩阵 \(Q\) 及其几何(保长度、保角度);</li>
+  <li>抽象内积空间的轻描淡写——函数也可以"有夹角"。</li>
+</ul>
+
+<h2 id="sec18-1">18.1 \(\mathbb{R}^n\) 中的点积</h2>
+
+<p>给两个 \(\mathbb{R}^n\) 中的列向量</p>
+
+\[
+\mathbf{u} = \begin{pmatrix} u_1 \\ u_2 \\ \vdots \\ u_n \end{pmatrix},\qquad
+\mathbf{v} = \begin{pmatrix} v_1 \\ v_2 \\ \vdots \\ v_n \end{pmatrix},
+\]
+
+<p>它们的<strong>点积</strong>(也叫<em>内积</em>,或<em>标量积</em>)定义为</p>
+
+\[
+\boxed{\mathbf{u}\cdot\mathbf{v} \;=\; u_1 v_1 + u_2 v_2 + \cdots + u_n v_n \;=\; \sum_{i=1}^{n} u_i v_i.}
+\]
+
+<p>注意输出是一个<strong>数</strong>,不是向量。这是它得名"标量积"的原因。</p>
+
+<p>用我们前几章建立的矩阵语言,这个定义可以更紧凑地写成</p>
+
+\[
+\mathbf{u}\cdot\mathbf{v} = \mathbf{u}^\top \mathbf{v}.
+\]
+
+<p>右边是一个 \(1\times n\) 矩阵乘以一个 \(n\times 1\) 矩阵,结果是一个 \(1\times 1\) 矩阵——也就是一个数。这两种写法完全等价,书里我们会随时切换:思考几何时写 \(\mathbf{u}\cdot\mathbf{v}\),做矩阵推导时写 \(\mathbf{u}^\top\mathbf{v}\),它们说的是同一件事。</p>
+
+<p>看一道具体的题。设 \(\mathbf{u} = (1, 2, -1, 3)^\top\),\(\mathbf{v} = (2, 0, 4, 1)^\top\)。它们的点积是</p>
+
+\[
+\mathbf{u}\cdot\mathbf{v} = 1\cdot 2 + 2\cdot 0 + (-1)\cdot 4 + 3\cdot 1 = 2 + 0 - 4 + 3 = 1.
+\]
+
+<p>就是这么简单。把对应的位置相乘,然后加起来,完工。</p>
+
+<p>点积有几条几乎"显然"的代数性质,但为后面的论证我们必须把它们记住:</p>
+
+<ul>
+  <li><strong>对称性:</strong> \(\mathbf{u}\cdot\mathbf{v} = \mathbf{v}\cdot\mathbf{u}\)。</li>
+  <li><strong>对加法的双线性:</strong> \((\mathbf{u}+\mathbf{w})\cdot\mathbf{v} = \mathbf{u}\cdot\mathbf{v} + \mathbf{w}\cdot\mathbf{v}\),且类似的等式对第二个变量也成立。</li>
+  <li><strong>数乘的相容性:</strong> \((c\mathbf{u})\cdot\mathbf{v} = c(\mathbf{u}\cdot\mathbf{v}) = \mathbf{u}\cdot(c\mathbf{v})\)。</li>
+  <li><strong>正定性:</strong> \(\mathbf{v}\cdot\mathbf{v} \geq 0\),并且等号成立当且仅当 \(\mathbf{v} = \mathbf{0}\)。</li>
+</ul>
+
+<p>前三条可以直接从分量公式逐项验证;不用我证你也信。第四条最关键:\(\mathbf{v}\cdot\mathbf{v} = v_1^2 + v_2^2 + \cdots + v_n^2\) 是一堆实数的平方和,显然非负;而它为零当且仅当每个 \(v_i\) 都是零,也就是说 \(\mathbf{v} = \mathbf{0}\)。这就是<strong>正定性</strong>。它为下一节定义"长度"提供了合法性。</p>
+
+<h2 id="sec18-2">18.2 长度与夹角</h2>
+
+<p>在 \(\mathbb{R}^2\) 里,你早就知道一个向量 \(\mathbf{v} = (v_1, v_2)^\top\) 的"长度"是 \(\sqrt{v_1^2 + v_2^2}\)——勾股定理。在 \(\mathbb{R}^3\) 里同样:\(\sqrt{v_1^2 + v_2^2 + v_3^2}\)。注意这两个表达式恰好等于 \(\sqrt{\mathbf{v}\cdot\mathbf{v}}\)。所以我们就用这个公式作为<strong>任意 \(\mathbb{R}^n\) 中向量长度的定义</strong>:</p>
+
+\[
+\boxed{\|\mathbf{v}\| \;=\; \sqrt{\mathbf{v}\cdot\mathbf{v}} \;=\; \sqrt{v_1^2 + v_2^2 + \cdots + v_n^2}.}
+\]
+
+<p>这个量也叫向量的<strong>范数</strong>(norm)或<strong>模</strong>。在 \(n=2\) 或 \(n=3\) 时它就是你熟悉的几何长度;在 \(n \geq 4\) 时几何上你画不出来,但代数上它毫无问题——你完全可以认为它是"勾股定理的高维推广"。</p>
+
+<p>正定性恰好告诉我们:\(\|\mathbf{v}\| \geq 0\),且 \(\|\mathbf{v}\| = 0\) 当且仅当 \(\mathbf{v} = \mathbf{0}\)。也就是说,只有零向量长度为零;这是任何"长度"都应当满足的最起码要求。</p>
+
+<p>另外,数乘对长度的影响是直截了当的:</p>
+
+\[
+\|c\mathbf{v}\| = \sqrt{(c\mathbf{v})\cdot(c\mathbf{v})} = \sqrt{c^2(\mathbf{v}\cdot\mathbf{v})} = |c|\,\|\mathbf{v}\|.
+\]
+
+<p>把一个向量数乘 \(c\),长度就乘 \(|c|\)——绝对值是必要的,因为 \(c\) 可以是负数,但长度永远非负。</p>
+
+<p>看一个具体的例子。\(\mathbf{v} = (3, -4, 12)^\top\) 的长度是</p>
+
+\[
+\|\mathbf{v}\| = \sqrt{9 + 16 + 144} = \sqrt{169} = 13.
+\]
+
+<p>这个 \(3\)-\(4\)-\(12\)-\(13\) 是一组毕达哥拉斯四元组,出题时常常借用,这样不必开方就出整数。</p>
+
+<h3 id="sec18-2-1">18.2.1 单位向量</h3>
+
+<p>长度为 1 的向量叫做<strong>单位向量</strong>。给任意一个非零向量 \(\mathbf{v}\),都可以把它"归一化",得到方向相同、长度为 1 的单位向量:</p>
+
+\[
+\hat{\mathbf{v}} = \frac{\mathbf{v}}{\|\mathbf{v}\|}.
+\]
+
+<p>直接代上面的式子验证:\(\|\hat{\mathbf{v}}\| = \|\mathbf{v}\| / \|\mathbf{v}\| = 1\)。比如对于 \(\mathbf{v} = (3, -4, 12)^\top\) 来说,\(\hat{\mathbf{v}} = (3/13, -4/13, 12/13)^\top\)。检验一下:\(9/169 + 16/169 + 144/169 = 169/169 = 1\),OK。</p>
+
+<p>"归一化"这个动作贯穿全书。我们在描述方向时往往只关心"指哪儿",不关心"走多远",这时候用单位向量最合适。后面讲到正交基、Gram-Schmidt、QR 分解,归一化几乎是每一步都要做的事。</p>
+
+<h3 id="sec18-2-2">18.2.2 夹角</h3>
+
+<p>现在到了点积最神奇的用途。在 \(\mathbb{R}^2\) 或 \(\mathbb{R}^3\) 里,如果两个向量 \(\mathbf{u}\) 和 \(\mathbf{v}\) 都从原点出发,它们之间形成一个夹角 \(\theta\)(取 \(0 \leq \theta \leq \pi\))。<strong>点积、长度、夹角</strong>之间的关系是:</p>
+
+\[
+\boxed{\mathbf{u}\cdot\mathbf{v} \;=\; \|\mathbf{u}\|\,\|\mathbf{v}\|\,\cos\theta.}
+\]
+
+<p>这个公式怎么来的?用余弦定理。把 \(\mathbf{u}\)、\(\mathbf{v}\) 看作三角形的两条边,它们的差 \(\mathbf{u} - \mathbf{v}\) 是第三条边。那么</p>
+
+\[
+\|\mathbf{u}-\mathbf{v}\|^2 = \|\mathbf{u}\|^2 + \|\mathbf{v}\|^2 - 2\|\mathbf{u}\|\|\mathbf{v}\|\cos\theta.
+\]
+
+<p>另一方面,把左边展开:</p>
+
+\[
+\|\mathbf{u}-\mathbf{v}\|^2 = (\mathbf{u}-\mathbf{v})\cdot(\mathbf{u}-\mathbf{v}) = \mathbf{u}\cdot\mathbf{u} - 2\mathbf{u}\cdot\mathbf{v} + \mathbf{v}\cdot\mathbf{v} = \|\mathbf{u}\|^2 - 2\mathbf{u}\cdot\mathbf{v} + \|\mathbf{v}\|^2.
+\]
+
+<p>把这两个表达式都对照一下,中间项必须相等:\(-2\|\mathbf{u}\|\|\mathbf{v}\|\cos\theta = -2\mathbf{u}\cdot\mathbf{v}\),所以</p>
+
+\[
+\mathbf{u}\cdot\mathbf{v} = \|\mathbf{u}\|\,\|\mathbf{v}\|\,\cos\theta.
+\]
+
+<p>这是 \(\mathbb{R}^2\) 与 \(\mathbb{R}^3\) 中的几何事实。</p>
+
+<p>对于 \(\mathbb{R}^n\)(\(n \geq 4\))怎么办?夹角根本看不见。我们<strong>反过来</strong>用这个公式作为夹角的<em>定义</em>:</p>
+
+\[
+\cos\theta = \frac{\mathbf{u}\cdot\mathbf{v}}{\|\mathbf{u}\|\,\|\mathbf{v}\|},
+\]
+
+<p>然后取 \(\theta = \arccos\) 这一比值。这个定义在 \(\mathbb{R}^2\) 与 \(\mathbb{R}^3\) 里和你的几何直觉一致;而在更高维里,它<strong>就是</strong>"夹角"应有的意思。当然,这要求右边那个比值落在 \([-1, 1]\) 里——否则反余弦没意义。这正是下一节柯西-施瓦茨不等式要保证的事。</p>
+
+<p>来一个例题。求 \(\mathbf{u} = (1, 2, 2)^\top\) 与 \(\mathbf{v} = (4, 0, -3)^\top\) 之间的夹角。</p>
+
+<p>第一步,算点积:</p>
+
+\[
+\mathbf{u}\cdot\mathbf{v} = 1\cdot 4 + 2\cdot 0 + 2\cdot(-3) = 4 - 6 = -2.
+\]
+
+<p>第二步,算两个长度:</p>
+
+\[
+\|\mathbf{u}\| = \sqrt{1+4+4} = 3,\qquad \|\mathbf{v}\| = \sqrt{16+0+9} = 5.
+\]
+
+<p>第三步,代公式:</p>
+
+\[
+\cos\theta = \frac{-2}{3\cdot 5} = -\frac{2}{15}.
+\]
+
+<p>所以 \(\theta = \arccos(-2/15) \approx 97.66^\circ\)。点积是负的,告诉我们两个向量之间的夹角是钝角(大于 90°);如果点积是正的,夹角是锐角;如果点积是零,正好是直角——这一点我们 18.5 节再细谈。</p>
+
+<h2 id="sec18-3">18.3 柯西-施瓦茨不等式</h2>
+
+<p>上一节我们冒着险用</p>
+
+\[
+\cos\theta = \frac{\mathbf{u}\cdot\mathbf{v}}{\|\mathbf{u}\|\,\|\mathbf{v}\|}
+\]
+
+<p>给夹角下了定义。<strong>但</strong>:反余弦只在 \([-1, 1]\) 上有定义。我们怎么保证那个分数总是落在这个区间里?换句话说,我们必须证明</p>
+
+\[
+\boxed{|\mathbf{u}\cdot\mathbf{v}| \;\leq\; \|\mathbf{u}\|\,\|\mathbf{v}\|.}
+\]
+
+<p>这就是<strong>柯西-施瓦茨不等式</strong>(Cauchy-Schwarz inequality),线性代数与分析里最有用的不等式之一,以两位 19 世纪的法国与德国数学家命名。等号成立当且仅当 \(\mathbf{u}\) 和 \(\mathbf{v}\) 共线(其中一个是另一个的标量倍)。</p>
+
+<p>证明出乎意料地短。如果 \(\mathbf{v} = \mathbf{0}\),两边都是零,不等式平凡成立。否则,考虑下面这个关于实数 \(t\) 的二次函数:</p>
+
+\[
+f(t) = \|\mathbf{u} - t\mathbf{v}\|^2 = (\mathbf{u} - t\mathbf{v})\cdot(\mathbf{u} - t\mathbf{v}).
+\]
+
+<p>由内积的双线性展开:</p>
+
+\[
+f(t) = \mathbf{u}\cdot\mathbf{u} - 2t(\mathbf{u}\cdot\mathbf{v}) + t^2(\mathbf{v}\cdot\mathbf{v}) = \|\mathbf{v}\|^2\,t^2 - 2(\mathbf{u}\cdot\mathbf{v})\,t + \|\mathbf{u}\|^2.
+\]
+
+<p>注意 \(f(t)\) 是 \(t\) 的二次多项式,而且<strong>对所有 \(t\)</strong> 它都非负——因为它是某个向量的长度平方。一个二次多项式 \(at^2 + bt + c\)(\(a > 0\))对所有 \(t\) 都非负,等价于判别式 \(b^2 - 4ac \leq 0\)。把 \(a = \|\mathbf{v}\|^2\),\(b = -2(\mathbf{u}\cdot\mathbf{v})\),\(c = \|\mathbf{u}\|^2\) 代入:</p>
+
+\[
+4(\mathbf{u}\cdot\mathbf{v})^2 - 4\|\mathbf{v}\|^2\|\mathbf{u}\|^2 \leq 0
+\]
+
+<p>整理:</p>
+
+\[
+(\mathbf{u}\cdot\mathbf{v})^2 \leq \|\mathbf{u}\|^2 \|\mathbf{v}\|^2.
+\]
+
+<p>两边开方,同时取绝对值,正是柯西-施瓦茨不等式:</p>
+
+\[
+|\mathbf{u}\cdot\mathbf{v}| \leq \|\mathbf{u}\|\,\|\mathbf{v}\|.
+\]
+
+<p>等号何时成立?当判别式正好为零时。这意味着 \(f(t)\) 有一个实根 \(t_0\),也就是 \(\|\mathbf{u} - t_0 \mathbf{v}\|^2 = 0\),也就是 \(\mathbf{u} = t_0\mathbf{v}\)——两个向量共线。</p>
+
+<p>柯西-施瓦茨这个证明值得你自己重写一遍。它的"魂"是:<strong>把一个不等式问题转化为一个关于二次多项式判别式的问题</strong>。这种把"非负性"翻译成"判别式"的招数在分析里反复出现,记下它。</p>
+
+<p>有了这个不等式,我们之前给夹角的定义</p>
+
+\[
+\cos\theta = \frac{\mathbf{u}\cdot\mathbf{v}}{\|\mathbf{u}\|\,\|\mathbf{v}\|}
+\]
+
+<p>就是合法的——右边的绝对值不超过 1,所以反余弦总是给出一个 \([0,\pi]\) 中的角。</p>
+
+<h2 id="sec18-4">18.4 三角不等式</h2>
+
+<p>柯西-施瓦茨马上有一个几何后果:<strong>三角不等式</strong>。它说的是:三角形的两条边之和不小于第三条边。代数上写出来就是</p>
+
+\[
+\boxed{\|\mathbf{u} + \mathbf{v}\| \;\leq\; \|\mathbf{u}\| + \|\mathbf{v}\|.}
+\]
+
+<p>证明:</p>
+
+\[
+\|\mathbf{u}+\mathbf{v}\|^2 = (\mathbf{u}+\mathbf{v})\cdot(\mathbf{u}+\mathbf{v}) = \|\mathbf{u}\|^2 + 2\mathbf{u}\cdot\mathbf{v} + \|\mathbf{v}\|^2.
+\]
+
+<p>用柯西-施瓦茨:\(\mathbf{u}\cdot\mathbf{v} \leq |\mathbf{u}\cdot\mathbf{v}| \leq \|\mathbf{u}\|\|\mathbf{v}\|\),所以</p>
+
+\[
+\|\mathbf{u}+\mathbf{v}\|^2 \leq \|\mathbf{u}\|^2 + 2\|\mathbf{u}\|\|\mathbf{v}\| + \|\mathbf{v}\|^2 = (\|\mathbf{u}\| + \|\mathbf{v}\|)^2.
+\]
+
+<p>两边开平方根,得</p>
+
+\[
+\|\mathbf{u}+\mathbf{v}\| \leq \|\mathbf{u}\| + \|\mathbf{v}\|.
+\]
+
+<p>等号成立当且仅当 \(\mathbf{u}\) 与 \(\mathbf{v}\) 同向(其中一个是另一个的非负倍)。几何上你早就知道:如果你想从 \(A\) 经过中转点 \(B\) 到达 \(C\),走两段折线一定不短于走一段直线;两条线段在 \(B\) 处对齐成一直线时,长度加起来正好等于直线长度。</p>
+
+<p>三角不等式不仅仅是个"几何小事实"——它是<strong>距离</strong>这一概念的基石之一。我们用 \(\|\mathbf{u} - \mathbf{v}\|\) 定义两个向量之间的距离,而距离要满足"三点之间走折线不短于直线",这正是上面那条不等式的内容。任何满足"非负性、对称性、三角不等式"的二元函数都被叫做<em>度量</em>(metric);你会在分析、拓扑、机器学习里反复遇见这个名字。</p>
+
+<h2 id="sec18-5">18.5 正交</h2>
+
+<p>从夹角公式我们立刻看到一件事:两个非零向量的点积为零,等价于 \(\cos\theta = 0\),等价于 \(\theta = 90^\circ\)——它们互相<strong>垂直</strong>。</p>
+
+<p>线性代数里我们更喜欢"<strong>正交</strong>"(orthogonal)这个词,它和"垂直"意思一样,但适用于任意维数,听上去也不那么"二维平面"味儿。我们记号用 \(\mathbf{u} \perp \mathbf{v}\) 表示正交。定义:</p>
+
+\[
+\boxed{\mathbf{u}\perp\mathbf{v} \;\iff\; \mathbf{u}\cdot\mathbf{v} = 0.}
+\]
+
+<p>注意这个定义不要求 \(\mathbf{u}\) 与 \(\mathbf{v}\) 都非零——按惯例,<strong>零向量与一切向量正交</strong>(因为零向量与任何向量的点积都是零)。这听上去有点滑稽,但代数上更顺手——许多定理在允许零向量参与的情形下表述更简洁。</p>
+
+<p>看几个具体例子。在 \(\mathbb{R}^3\) 里,标准基 \(\mathbf{e}_1 = (1,0,0)^\top\),\(\mathbf{e}_2 = (0,1,0)^\top\),\(\mathbf{e}_3 = (0,0,1)^\top\) 两两正交——直接代点积全是零。再如 \(\mathbf{u} = (1,2,3)^\top\) 与 \(\mathbf{v} = (-2,1,0)^\top\):它们的点积是 \(-2+2+0 = 0\),所以它们正交。你可以画一下,确实是垂直的两个箭头。</p>
+
+<p>正交性给我们一个推广的<strong>勾股定理</strong>:如果 \(\mathbf{u} \perp \mathbf{v}\),那么</p>
+
+\[
+\boxed{\|\mathbf{u} + \mathbf{v}\|^2 \;=\; \|\mathbf{u}\|^2 + \|\mathbf{v}\|^2.}
+\]
+
+<p>证明只用三行:</p>
+
+\[
+\|\mathbf{u}+\mathbf{v}\|^2 = \|\mathbf{u}\|^2 + 2\mathbf{u}\cdot\mathbf{v} + \|\mathbf{v}\|^2 = \|\mathbf{u}\|^2 + 0 + \|\mathbf{v}\|^2.
+\]
+
+<p>这条公式表面上是中学的勾股定理,但它的<strong>表达力</strong>远不止于此——它适用于任何维数,它是后面"垂直分解"和"正交投影"的全部理由。每当你想把一个向量"分解"成相互正交的几个部分,长度的平方就有"加和"性质,使得几何与代数得以彼此印证。</p>
+
+<h2 id="sec18-6">18.6 正交集与正交基</h2>
+
+<p>一个向量集合 \(\{\mathbf{v}_1, \mathbf{v}_2, \ldots, \mathbf{v}_k\}\) 被称作<strong>正交集</strong>,如果其中任意两个不同向量都正交:</p>
+
+\[
+\mathbf{v}_i\cdot\mathbf{v}_j = 0 \quad \text{当 } i \neq j.
+\]
+
+<p>(对 \(i = j\) 的情形我们不要求,即向量自己跟自己的点积可以非零——事实上,只要向量非零,这个内积一定正。)</p>
+
+<p>更进一步,如果一个正交集里的每个向量都是<strong>单位向量</strong>(长度为 1),它就被叫做<strong>标准正交集</strong>(orthonormal set)——也常叫"单位正交集"。用一行公式概括:</p>
+
+\[
+\mathbf{q}_i\cdot\mathbf{q}_j = \delta_{ij} = \begin{cases} 1 & i = j \\ 0 & i \neq j \end{cases}.
+\]
+
+<p>这里 \(\delta_{ij}\) 叫做<strong>克罗内克 \(\delta\)</strong>(Kronecker delta),是个简便记号。我们之后会反复用它。</p>
+
+<p>正交集有一条非常有用的性质:<strong>由非零向量构成的正交集自动是线性无关的</strong>。证明在一行里:假设</p>
+
+\[
+c_1\mathbf{v}_1 + c_2\mathbf{v}_2 + \cdots + c_k\mathbf{v}_k = \mathbf{0}.
+\]
+
+<p>两边对 \(\mathbf{v}_j\)(任选一个)做点积:</p>
+
+\[
+c_1(\mathbf{v}_1\cdot\mathbf{v}_j) + \cdots + c_j(\mathbf{v}_j\cdot\mathbf{v}_j) + \cdots + c_k(\mathbf{v}_k\cdot\mathbf{v}_j) = 0.
+\]
+
+<p>其他项都为零(因为正交),只剩 \(c_j \|\mathbf{v}_j\|^2 = 0\)。\(\mathbf{v}_j\) 非零意味着 \(\|\mathbf{v}_j\|^2 > 0\),所以 \(c_j = 0\)。这对每一个 \(j\) 都成立,所以所有系数都得是零——线性无关。</p>
+
+<p>这是一条非常厉害的"自动结论"。回想第 7 章你为了判定一组向量是否线性无关,要写一个齐次方程组、跑一遍高斯消元——好麻烦。这里只要"两两正交且非零",免费送你"线性无关"。这告诉我们,正交是一种"加强"了的线性无关。</p>
+
+<p>有了这条,如果一个正交集恰好包含 \(n\) 个非零向量、而且整个空间是 \(n\) 维的,那么它就是一组<strong>正交基</strong>。如果还要求每个向量都是单位向量,就叫做<strong>标准正交基</strong>(orthonormal basis,简称 ONB)。</p>
+
+<p>看一个例子。在 \(\mathbb{R}^3\) 里,</p>
+
+\[
+\mathbf{q}_1 = \frac{1}{3}\begin{pmatrix}2\\2\\1\end{pmatrix},\quad
+\mathbf{q}_2 = \frac{1}{3}\begin{pmatrix}-2\\1\\2\end{pmatrix},\quad
+\mathbf{q}_3 = \frac{1}{3}\begin{pmatrix}1\\-2\\2\end{pmatrix}
+\]
+
+<p>是一组标准正交基。检验:</p>
+
+<ul>
+  <li>\(\mathbf{q}_1\cdot\mathbf{q}_1 = (4+4+1)/9 = 1\),\(\mathbf{q}_1\) 是单位向量。同理 \(\mathbf{q}_2\),\(\mathbf{q}_3\) 也都是。</li>
+  <li>\(\mathbf{q}_1\cdot\mathbf{q}_2 = (2\cdot(-2) + 2\cdot 1 + 1\cdot 2)/9 = (-4+2+2)/9 = 0\)。</li>
+  <li>\(\mathbf{q}_1\cdot\mathbf{q}_3 = (2\cdot 1 + 2\cdot(-2) + 1\cdot 2)/9 = (2-4+2)/9 = 0\)。</li>
+  <li>\(\mathbf{q}_2\cdot\mathbf{q}_3 = ((-2)\cdot 1 + 1\cdot(-2) + 2\cdot 2)/9 = (-2-2+4)/9 = 0\)。</li>
+</ul>
+
+<p>所以这三个向量两两正交且都是单位向量。再加上"它们是 3 维空间里的 3 个线性无关向量",所以它们构成 \(\mathbb{R}^3\) 的标准正交基。</p>
+
+<p>等等,你可能会问:为什么要专门去构造像上面这种"奇怪"的标准正交基?\(\mathbb{R}^3\) 已经有一组很自然的标准正交基了——就是 \(\mathbf{e}_1, \mathbf{e}_2, \mathbf{e}_3\)。是的,那是最简单的一组。但许多问题里你会发现"标准基"并不适合手头的问题——比如某个子空间不是由 \(\mathbf{e}_i\) 张成的;或者你想让坐标轴沿着某些有物理意义的方向(比如某个对称矩阵的特征向量方向)。这种时候你需要"为这个子空间专门定做一组标准正交基"。下一章 Gram-Schmidt 过程就是干这件事的。</p>
+
+<h2 id="sec18-7">18.7 标准正交基的奇迹:坐标 = 内积</h2>
+
+<p>这是本章最重要的一节。请你慢慢读。</p>
+
+<p>给一组任意的基 \(\{\mathbf{v}_1, \mathbf{v}_2, \ldots, \mathbf{v}_n\}\)(不一定正交)和一个向量 \(\mathbf{v}\),怎么求出 \(\mathbf{v}\) 在这组基下的坐标?也就是,怎么找系数 \(c_1, c_2, \ldots, c_n\) 使得</p>
+
+\[
+\mathbf{v} = c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \cdots + c_n \mathbf{v}_n?
+\]
+
+<p>把基向量并成矩阵 \(V = [\mathbf{v}_1 | \mathbf{v}_2 | \cdots | \mathbf{v}_n]\),这就是解线性方程组 \(V\mathbf{c} = \mathbf{v}\)——要做高斯消元,要算 \(V^{-1}\)。在 \(\mathbb{R}^n\) 里这是 \(n^3\) 量级的工作量。烦。</p>
+
+<p>但是——如果这组基<strong>恰好是标准正交基</strong> \(\{\mathbf{q}_1, \ldots, \mathbf{q}_n\}\),会怎样?让我们试着求出第 \(j\) 个系数 \(c_j\)。把</p>
+
+\[
+\mathbf{v} = c_1 \mathbf{q}_1 + c_2 \mathbf{q}_2 + \cdots + c_n \mathbf{q}_n
+\]
+
+<p>两边对 \(\mathbf{q}_j\) 做内积:</p>
+
+\[
+\mathbf{v}\cdot\mathbf{q}_j = c_1(\mathbf{q}_1\cdot\mathbf{q}_j) + c_2(\mathbf{q}_2\cdot\mathbf{q}_j) + \cdots + c_n(\mathbf{q}_n\cdot\mathbf{q}_j).
+\]
+
+<p>注意 \(\mathbf{q}_i\cdot\mathbf{q}_j = \delta_{ij}\)——其他项全部是零,只剩 \(c_j \cdot 1 = c_j\)。所以:</p>
+
+\[
+\boxed{c_j \;=\; \mathbf{v}\cdot\mathbf{q}_j.}
+\]
+
+<p>读读这个式子,然后再读一遍。<strong>不需要</strong>解任何方程组。<strong>不需要</strong>算逆矩阵。每一个坐标只需要做<em>一次内积</em>就出来了。把所有坐标合在一起:</p>
+
+\[
+\boxed{\mathbf{v} \;=\; (\mathbf{v}\cdot\mathbf{q}_1)\,\mathbf{q}_1 + (\mathbf{v}\cdot\mathbf{q}_2)\,\mathbf{q}_2 + \cdots + (\mathbf{v}\cdot\mathbf{q}_n)\,\mathbf{q}_n.}
+\]
+
+<p>这就是标准正交基的"奇迹"——一个向量在标准正交基下的展开,坐标可以"瞬间"算出来。每个坐标就是该向量与对应基向量的内积。</p>
+
+<p>看一个具体的例子。还是上面那组在 \(\mathbb{R}^3\) 里的标准正交基:</p>
+
+\[
+\mathbf{q}_1 = \frac{1}{3}\begin{pmatrix}2\\2\\1\end{pmatrix},\quad
+\mathbf{q}_2 = \frac{1}{3}\begin{pmatrix}-2\\1\\2\end{pmatrix},\quad
+\mathbf{q}_3 = \frac{1}{3}\begin{pmatrix}1\\-2\\2\end{pmatrix}.
+\]
+
+<p>取 \(\mathbf{v} = (3, 0, -3)^\top\)。它在这组基下的坐标是?</p>
+
+<p>分别算三个内积:</p>
+
+\[
+\mathbf{v}\cdot\mathbf{q}_1 = \tfrac{1}{3}(3\cdot 2 + 0\cdot 2 + (-3)\cdot 1) = \tfrac{1}{3}(6 - 3) = 1.
+\]
+
+\[
+\mathbf{v}\cdot\mathbf{q}_2 = \tfrac{1}{3}(3\cdot(-2) + 0\cdot 1 + (-3)\cdot 2) = \tfrac{1}{3}(-6 - 6) = -4.
+\]
+
+\[
+\mathbf{v}\cdot\mathbf{q}_3 = \tfrac{1}{3}(3\cdot 1 + 0\cdot(-2) + (-3)\cdot 2) = \tfrac{1}{3}(3 - 6) = -1.
+\]
+
+<p>所以 \(\mathbf{v} = 1\cdot\mathbf{q}_1 + (-4)\cdot\mathbf{q}_2 + (-1)\cdot\mathbf{q}_3\)。验证一下:</p>
+
+\[
+\mathbf{q}_1 - 4\mathbf{q}_2 - \mathbf{q}_3 = \tfrac{1}{3}\begin{pmatrix}2\\2\\1\end{pmatrix} - \tfrac{4}{3}\begin{pmatrix}-2\\1\\2\end{pmatrix} - \tfrac{1}{3}\begin{pmatrix}1\\-2\\2\end{pmatrix}
+\]
+
+\[
+= \tfrac{1}{3}\begin{pmatrix}2 + 8 - 1\\2 - 4 + 2\\1 - 8 - 2\end{pmatrix} = \tfrac{1}{3}\begin{pmatrix}9\\0\\-9\end{pmatrix} = \begin{pmatrix}3\\0\\-3\end{pmatrix} = \mathbf{v}.\,\checkmark
+\]
+
+<p>三次内积,然后写下答案,完事。如果让你解 \(V\mathbf{c} = \mathbf{v}\) 这个方程组——三个未知数三条方程,要做高斯消元——你少说也得花两三倍的时间,而且可能算错。这就是标准正交基的力量。</p>
+
+<p>注意在<strong>非标准</strong>正交基下(基两两正交但长度不为 1),公式稍稍变形:</p>
+
+\[
+c_j = \frac{\mathbf{v}\cdot\mathbf{v}_j}{\mathbf{v}_j\cdot\mathbf{v}_j} = \frac{\mathbf{v}\cdot\mathbf{v}_j}{\|\mathbf{v}_j\|^2}.
+\]
+
+<p>分母 \(\|\mathbf{v}_j\|^2\) 对长度做了归一化。如果长度恰好是 1,这个分母就是 1,公式回到上面的简单形式。</p>
+
+<p>这条"奇迹"贯穿后面三章——它是 Gram-Schmidt 过程(第 21 章)的全部动机:既然标准正交基这么好用,我们就花点功夫把任何一组基"打磨"成标准正交基,然后就一劳永逸。它也是傅里叶级数的本质——把"标准正交基"换成"两两正交的三角函数",同样的公式给出傅里叶系数。一旦你认出这条主线,后面很多看似不同的内容会"塌"成同一回事。</p>
+
+<h2 id="sec18-8">18.8 正交矩阵</h2>
+
+<p>把上面那组 \(\mathbf{q}_1, \mathbf{q}_2, \ldots, \mathbf{q}_n\) 拼成一个矩阵的列,得到一个 \(n\times n\) 矩阵</p>
+
+\[
+Q = [\,\mathbf{q}_1 \;|\; \mathbf{q}_2 \;|\; \cdots \;|\; \mathbf{q}_n\,].
+\]
+
+<p>这种"列向量恰好构成标准正交基"的方阵被叫做<strong>正交矩阵</strong>(orthogonal matrix)。</p>
+
+<p>这个名字其实有点不公平——按字面理解,它似乎只要求"列向量两两正交",忽略了"长度为 1"的要求;但传统就是这样,记下来就好。也有人主张应该叫"标准正交矩阵",更准确,但叫法没改过来。</p>
+
+<p>正交矩阵的特征性等价描述是:</p>
+
+\[
+\boxed{Q^\top Q \;=\; I.}
+\]
+
+<p>怎么看出这一点?\(Q^\top Q\) 这个矩阵的 \((i, j)\) 元素是 \(Q^\top\) 的第 \(i\) 行点乘 \(Q\) 的第 \(j\) 列,而 \(Q^\top\) 的第 \(i\) 行就是 \(\mathbf{q}_i^\top\),\(Q\) 的第 \(j\) 列就是 \(\mathbf{q}_j\),所以</p>
+
+\[
+(Q^\top Q)_{ij} = \mathbf{q}_i^\top \mathbf{q}_j = \mathbf{q}_i\cdot\mathbf{q}_j = \delta_{ij}.
+\]
+
+<p>这恰好是单位矩阵 \(I\) 的元素。所以 \(Q^\top Q = I\) <strong>当且仅当</strong>列两两正交且单位长度。</p>
+
+<p>这一条等式带来一个非常方便的副产品:对正交矩阵,<strong>逆矩阵就是转置</strong>:</p>
+
+\[
+\boxed{Q^{-1} \;=\; Q^\top.}
+\]
+
+<p>对一般的可逆矩阵,求逆要么花掉 \(n^3\) 的高斯消元,要么列伴随矩阵——这两种都不轻松。但对正交矩阵,你<strong>不算</strong>就有了它的逆——直接转置就好。这也是正交矩阵在数值计算里被珍惜的原因之一。</p>
+
+<p>由 \(Q^\top Q = I\) 还可以推出 \(QQ^\top = I\)(对方阵 \(Q\) 来说,左逆等于右逆),也就是说 \(Q\) 的<strong>行</strong>同样构成一组标准正交基。这是个值得记住的对称美。</p>
+
+<p>注意这里的"\(n \times n\)"很重要——只有方阵才能叫"正交矩阵"。如果 \(Q\) 是一个 \(m\times n\) 的高瘦矩阵,但其列仍然两两正交且单位长度,那 \(Q^\top Q = I_n\) 仍然成立(只要算一下就明白),但 \(QQ^\top\) 一般不等于 \(I_m\),也就没有"行也是标准正交基"这种说法。这种"列正交但不是方阵"的矩阵将在第 19 章和 21 章里大量出现,我们会保持区分。</p>
+
+<h2 id="sec18-9">18.9 正交矩阵的几何:保长度、保角度</h2>
+
+<p>把正交矩阵 \(Q\) 看作一个线性变换 \(\mathbf{x} \mapsto Q\mathbf{x}\):它对几何做了什么?</p>
+
+<p>看长度。对任意 \(\mathbf{x}\),</p>
+
+\[
+\|Q\mathbf{x}\|^2 = (Q\mathbf{x})\cdot(Q\mathbf{x}) = (Q\mathbf{x})^\top (Q\mathbf{x}) = \mathbf{x}^\top Q^\top Q \mathbf{x} = \mathbf{x}^\top I \mathbf{x} = \mathbf{x}^\top \mathbf{x} = \|\mathbf{x}\|^2.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\|Q\mathbf{x}\| \;=\; \|\mathbf{x}\|.}
+\]
+
+<p>正交变换<strong>保长度</strong>(也叫等距变换或 isometry)。</p>
+
+<p>看夹角。对任意 \(\mathbf{x}, \mathbf{y}\),</p>
+
+\[
+(Q\mathbf{x})\cdot(Q\mathbf{y}) = \mathbf{x}^\top Q^\top Q \mathbf{y} = \mathbf{x}^\top \mathbf{y} = \mathbf{x}\cdot\mathbf{y}.
+\]
+
+<p>正交变换<strong>保内积</strong>。结合长度也守住,夹角的公式 \(\cos\theta = \mathbf{x}\cdot\mathbf{y}/(\|\mathbf{x}\|\|\mathbf{y}\|)\) 的右边整体不变,所以正交变换也<strong>保夹角</strong>。</p>
+
+<p>这告诉我们:正交变换是"刚性变换"——它把刚体从空间中的一个位置移到另一个位置而不变形。在 \(\mathbb{R}^2\) 里,所有正交变换都是<strong>旋转</strong>或<strong>反射</strong>(或两者的复合),没有别的。在 \(\mathbb{R}^3\) 里,加上"绕一根轴的旋转 + 关于一个平面的反射"。一般地,\(\det Q = \pm 1\):\(\det Q = +1\) 对应"纯旋转"(保定向),\(\det Q = -1\) 对应"翻转"(变定向)。</p>
+
+<p>看一道例题。在 \(\mathbb{R}^2\) 中,\(\theta\) 弧度的旋转矩阵是</p>
+
+\[
+R_\theta = \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}.
+\]
+
+<p>验证它是正交矩阵:</p>
+
+\[
+R_\theta^\top R_\theta = \begin{pmatrix} \cos\theta & \sin\theta \\ -\sin\theta & \cos\theta \end{pmatrix}\begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix} = \begin{pmatrix} \cos^2\theta + \sin^2\theta & 0 \\ 0 & \cos^2\theta + \sin^2\theta \end{pmatrix} = I.\,\checkmark
+\]
+
+<p>另一道:关于直线 \(y = (\tan\alpha)\,x\) 的反射矩阵</p>
+
+\[
+F_\alpha = \begin{pmatrix} \cos 2\alpha & \sin 2\alpha \\ \sin 2\alpha & -\cos 2\alpha \end{pmatrix}
+\]
+
+<p>同样可以直接验证 \(F_\alpha^\top F_\alpha = I\)(\(\sin^2 + \cos^2 = 1\) 一举搞定)。注意 \(\det R_\theta = +1\) 而 \(\det F_\alpha = -1\):一个旋转,一个反射,两者都是正交变换。</p>
+
+<p>看到正交矩阵就立即想到"它是某种刚性变换"——这种条件反射会节省你大量的"它到底干了什么"的猜测。</p>
+
+<h2 id="sec18-10">18.10 抽象内积空间(轻描淡写)</h2>
+
+<p>到这里为止的一切讨论都发生在 \(\mathbb{R}^n\) 里,内积是"分量乘积加起来"。但这个故事的<strong>真正威力</strong>在于:只要一个向量空间里有"内积"这种结构(满足对称性、双线性、正定性),整套理论——长度、夹角、正交、柯西-施瓦茨、勾股定理、标准正交基——<strong>逐字逐句</strong>照搬,毫无变动。这种空间叫做<strong>内积空间</strong>(inner product space)。</p>
+
+<p>最重要的非 \(\mathbb{R}^n\) 例子:连续函数空间 \(C[a, b]\)(所有在闭区间 \([a, b]\) 上连续的实值函数构成的向量空间——回忆第 6 章我们见过它)。在这里我们可以定义</p>
+
+\[
+\boxed{\langle f, g \rangle \;=\; \int_a^b f(x)\,g(x)\,dx.}
+\]
+
+<p>这个二元运算满足内积的所有公理:</p>
+
+<ul>
+  <li>对称:\(\langle f, g\rangle = \langle g, f\rangle\),因为 \(fg = gf\)。</li>
+  <li>双线性:积分本身就是线性的。</li>
+  <li>正定:\(\langle f, f\rangle = \int_a^b f(x)^2 dx \geq 0\),且等号成立当且仅当 \(f\) 几乎处处为零(对连续函数,就是恒为零)。</li>
+</ul>
+
+<p>有了这个内积,我们就有"函数的长度":</p>
+
+\[
+\|f\| = \sqrt{\int_a^b f(x)^2\,dx},
+\]
+
+<p>叫做 \(L^2\) 范数。我们也有"两个函数之间的夹角":</p>
+
+\[
+\cos\theta = \frac{\int_a^b f(x)g(x)dx}{\|f\|\|g\|}.
+\]
+
+<p>柯西-施瓦茨变成了:</p>
+
+\[
+\left| \int_a^b f(x)g(x) dx \right| \leq \sqrt{\int_a^b f^2 dx} \cdot \sqrt{\int_a^b g^2 dx}.
+\]
+
+<p>这是分析学里最常用的不等式之一。我们一行就证完了——只要把上一节柯西-施瓦茨的证明里把 \(\mathbf{u}\cdot\mathbf{v}\) 换成 \(\langle f, g\rangle\),同样的二次多项式判别式论证完全照搬。</p>
+
+<p>"两个函数正交"的意思就是 \(\int f g = 0\)。一个让你大吃一惊的例子:在区间 \([-\pi, \pi]\) 上,</p>
+
+\[
+\int_{-\pi}^{\pi} \sin(mx) \sin(nx)\,dx = 0 \qquad (m \neq n,\ m, n \in \mathbb{Z}^+).
+\]
+
+\[
+\int_{-\pi}^{\pi} \cos(mx) \cos(nx)\,dx = 0 \qquad (m \neq n).
+\]
+
+\[
+\int_{-\pi}^{\pi} \sin(mx) \cos(nx)\,dx = 0 \qquad (\text{对所有 } m, n).
+\]
+
+<p>用积化和差或换元就能验。这意味着 \(\{1, \sin x, \cos x, \sin 2x, \cos 2x, \sin 3x, \cos 3x, \ldots\}\) 在内积空间 \(C[-\pi, \pi]\) 里是一个<strong>正交集</strong>!</p>
+
+<p>把它们再各自归一化(除以自己的 \(L^2\) 范数),就得到一个标准正交集——而这个集合"几乎张成"整个 \(C[-\pi, \pi]\)(在恰当的极限意义下)。这就是<strong>傅里叶级数</strong>的由来:任何"性质足够好"的周期函数 \(f\) 都可以展开成</p>
+
+\[
+f(x) = \frac{a_0}{2} + \sum_{n=1}^\infty \big(a_n \cos(nx) + b_n \sin(nx)\big),
+\]
+
+<p>而每个系数都由"内积公式"——也就是上一节那个奇迹,搬到函数空间里——直接给出:</p>
+
+\[
+a_n = \frac{1}{\pi}\int_{-\pi}^{\pi} f(x)\cos(nx)\,dx,\qquad b_n = \frac{1}{\pi}\int_{-\pi}^{\pi} f(x)\sin(nx)\,dx.
+\]
+
+<p>这跟"\(c_j = \mathbf{v}\cdot\mathbf{q}_j\)"是<strong>同一件事</strong>,只是把 \(\mathbf{v}\) 换成 \(f\),把 \(\mathbf{q}_j\) 换成 \(\sin(jx)\) 或 \(\cos(jx)\),把"和"换成"积分"。线性代数里学到的"在标准正交基下展开"这一招,在傅里叶分析里翻倍发挥威力。后面我们不会深入傅里叶——那是另外一本书的内容——但你应该看到这条桥已经搭好。当你再听到"傅里叶系数"这个词,你脑子里跳出来的应该是 \(\mathbf{v}\cdot\mathbf{q}_j\)。</p>
+
+<p>本章讲完了。下一章我们要把"正交"这一概念用到最具体、也最有用的工程上——把一个向量"投影"到一个子空间。这是机器学习里几乎所有"近似"的基础。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 矩阵指数与线性微分方程</a><a href="ch19.html">下一章 · 第 19 章 正交投影 →</a></nav>
+
+</main>
+</body>
+</html>

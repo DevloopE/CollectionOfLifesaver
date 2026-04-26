@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 保守向量场 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 曲线积分</a><a href="ch22.html">下一章 · 第 22 章 格林定理 →</a></nav>
+<h1 id="ch21">第 21 章 保守向量场</h1>
+
+<p>一元微积分里有一条结论你一定记得：</p>
+
+<p>\[\int_a^b f'(x)\,dx = f(b) - f(a).\]</p>
+
+<p>这就是<em>微积分基本定理</em>。它的意思是：把一个导数从 \(a\) 积到 \(b\)，结果只取决于<em>端点处原函数的差</em>——中间过程被一笔抹掉。这是单变量微积分里最重要的事实之一。</p>
+
+<p>多元情形里有没有类似的结论？我们想问：能不能找到某种向量场 \(\mathbf{F}\) 和某种"<em>原函数</em>" \(f\)，使得 \(\mathbf{F}\) 沿任何一条从 \(A\) 到 \(B\) 的曲线 \(C\) 的积分都等于 \(f(B) - f(A)\)，与中间路径无关？</p>
+
+<p>答案是<em>有</em>，但只对一类很特别的向量场成立——<strong>保守向量场</strong>。本章把这件事讲透：先解释什么是"路径无关"；再给出曲线积分基本定理（也就是上面那条理想结论的精确表述）；接着告诉你怎么从一个向量场反推出势函数 \(f\)；最后用旋度判别法把"是不是保守"这件事变成一个机械可算的问题。这一章是后半部分的灵魂——你今后看到的格林定理、斯托克斯定理、高斯定理，本质上都是它在更高维上的推广。</p>
+
+<h2 id="sec21-1">21.1 路径无关性</h2>
+
+<p>设向量场 \(\mathbf{F}\) 定义在区域 \(D\) 上。我们说 \(\mathbf{F}\) 在 \(D\) 上<strong>路径无关</strong>（path independent），是指：对 \(D\) 中任意两点 \(A\) 与 \(B\)，以及任意两条从 \(A\) 走到 \(B\) 的（分段光滑的）路径 \(C_1, C_2\)，</p>
+
+<p>\[\int_{C_1}\mathbf{F}\cdot d\mathbf{r} = \int_{C_2}\mathbf{F}\cdot d\mathbf{r}.\]</p>
+
+<p>换句话说：积分的值只看起点和终点，不看中间走了什么样的路。</p>
+
+<p>这条定义有一个等价说法，常常更方便用。设想 \(C_1\) 与 \(C_2\) 都是从 \(A\) 到 \(B\)。把 \(C_2\) 反向得到 \(-C_2\)（从 \(B\) 到 \(A\)），把 \(C_1\) 与 \(-C_2\) 接起来得到一条从 \(A\) 出发又回到 \(A\) 的<em>闭合路径</em>。沿这条闭合路径的积分等于</p>
+
+<p>\[\int_{C_1}\mathbf{F}\cdot d\mathbf{r} + \int_{-C_2}\mathbf{F}\cdot d\mathbf{r} = \int_{C_1}\mathbf{F}\cdot d\mathbf{r} - \int_{C_2}\mathbf{F}\cdot d\mathbf{r}.\]</p>
+
+<p>所以"\(\int_{C_1} = \int_{C_2}\)"完全等价于"沿那条闭合路径的积分为零"。我们由此可以把"路径无关"重新表述为：对 \(D\) 中<em>任意</em>闭合路径 \(C\)（起点 = 终点），</p>
+
+<p>\[\oint_C \mathbf{F}\cdot d\mathbf{r} = 0.\]</p>
+
+<p>（"\(\oint\)"是闭合路径积分的标准记号，圆圈强调闭合。）</p>
+
+<p>这两种表述完全等价，今后我们会按场合选择使用。一般地讲，路径无关是个<strong>非常强</strong>的性质——大多数向量场都<em>没有</em>它。比如上一章里我们算过 \(\mathbf{F} = \langle y, -x\rangle\) 沿单位圆一周积分等于 \(-2\pi \ne 0\)，所以这个旋转场<em>不</em>路径无关。但是另一类向量场——<strong>保守场</strong>——一定路径无关。下一节我们就把"保守"定义清楚，再揭示它和"路径无关"的等价关系。</p>
+
+<h2 id="sec21-2">21.2 曲线积分基本定理</h2>
+
+<p>向量场 \(\mathbf{F}\) 称为<strong>保守</strong>（conservative），是指存在一个标量函数 \(f\) 使得</p>
+
+<p>\[\mathbf{F} = \nabla f.\]</p>
+
+<p>这个标量函数 \(f\) 叫 \(\mathbf{F}\) 的<strong>势函数</strong>（potential function）或<em>位势</em>。</p>
+
+<p>"势函数"这个名字来自物理。在物理里，重力场和静电场都是某个"势能"函数的负梯度——负号只是约定（让势能在被吸引的方向上变低）。"势函数 \(f\) 的梯度是 \(\mathbf{F}\)"这件事的物理含义是："\(f\) 给出了在每一点的'潜在能量'，质点会沿能量下降最快的方向运动"。</p>
+
+<p>有了"保守"这个定义，我们就可以陈述并证明本章的核心结论：</p>
+
+<p>\[\boxed{\text{若 }\mathbf{F} = \nabla f,\ C\text{ 是从 }A\text{ 到 }B\text{ 的曲线，则 }\int_C \mathbf{F}\cdot d\mathbf{r} = f(B) - f(A).}\]</p>
+
+<p>这就是<strong>曲线积分基本定理</strong>。请把它和一元基本定理 \(\int_a^b f'(x)\,dx = f(b) - f(a)\) 并排放在一起看：左边都是"导数沿一条一维路径的积分"，右边都是"原函数在端点的差"。多元基本定理就是把一元基本定理里的"端点 \(a, b\)"换成"曲线起点 \(A\) 与终点 \(B\)"。形式之美令人难以拒绝。</p>
+
+<p>证明十分干净，只要一行链式法则。设 \(\mathbf{r}(t)\)、\(t \in [a, b]\) 是 \(C\) 的参数化，\(\mathbf{r}(a) = A\)、\(\mathbf{r}(b) = B\)。令 \(g(t) = f(\mathbf{r}(t))\)。由链式法则</p>
+
+<p>\[g'(t) = \nabla f(\mathbf{r}(t))\cdot \mathbf{r}'(t) = \mathbf{F}(\mathbf{r}(t))\cdot \mathbf{r}'(t).\]</p>
+
+<p>所以</p>
+
+<p>\[\int_C \mathbf{F}\cdot d\mathbf{r} = \int_a^b g'(t)\,dt \stackrel{\text{一元 FTC}}{=} g(b) - g(a) = f(B) - f(A).\]</p>
+
+<p>从这条结果可以立刻读出两个推论：第一，<strong>保守场的曲线积分路径无关</strong>——因为右边只含端点；第二，<strong>保守场沿任何闭合路径的积分为零</strong>——因为闭合时 \(A = B\)，\(f(B) - f(A) = 0\)。</p>
+
+<p>事实上"保守"与"路径无关"在<em>连通</em>区域上等价：路径无关也反过来推出向量场可以表示为某个 \(f\) 的梯度。这条反方向稍长（要构造 \(f\)：固定一个基点 \(P_0\)，定义 \(f(P) = \int_{P_0}^{P}\mathbf{F}\cdot d\mathbf{r}\)，因路径无关所以有定义；再验证 \(\nabla f = \mathbf{F}\)）。两条合在一起说：<strong>"保守"、"路径无关"、"沿任何闭合路径积分为零"在连通域上是同一回事</strong>。</p>
+
+<p>看一个例子。设 \(\mathbf{F} = \langle 2xy + z, x^2, x\rangle\)。我们先承认它是保守的（下一节会教你怎么找势函数），势函数 \(f = x^2 y + xz\)（验证：\(\nabla f = \langle 2xy + z, x^2, x\rangle\)，对）。要算 \(\int_C \mathbf{F}\cdot d\mathbf{r}\)，其中 \(C\) 是从 \((0, 0, 0)\) 到 \((1, 2, 3)\) 的<em>任意</em>曲线。直接套基本定理：</p>
+
+<p>\[f(1, 2, 3) - f(0, 0, 0) = (1)(2) + (1)(3) - 0 = 5.\]</p>
+
+<p>到此为止。<strong>不需要知道 \(C\) 的形状</strong>——基本定理把它消掉了。这就是保守场的"魔法"：明明被积场看起来挺复杂、明明 \(C\) 可以任意弯，可是你只要把势函数算出来、再代两个端点，答案就出来了。</p>
+
+<p>再看一个例子，对比一下"非保守 vs. 保守"。\(\mathbf{F} = \langle y, x\rangle\) 是保守的，势函数 \(f = xy\)。它沿任何从 \((0, 0)\) 到 \((1, 1)\) 的路径积分都等于 \(f(1, 1) - f(0, 0) = 1\)——上一章我们用两条不同路径都算出 \(1\)，正是这条结论的具体兑现。</p>
+
+<p>而 \(\mathbf{F} = \langle y, -x\rangle\) <em>不</em>是保守的——你可以验证它的旋度（二维标量旋度 \(\partial_x(-x) - \partial_y y = -1 - 1 = -2\)）不为零。所以它沿不同路径积分会得到不同的值（沿单位圆一周得到 \(-2\pi\)）。</p>
+
+<p>这两个例子的对比很清晰：保守场是<em>路径无关、闭合积分为零、有势函数</em>的；非保守场则可以<em>路径敏感</em>，闭合积分非零。本章接下来要做两件事：怎么从一个 \(\mathbf{F}\) 反推出 \(f\)（21.3 节），以及怎么先判别"是不是保守"再决定要不要去找 \(f\)（21.4 节）。</p>
+
+<h2 id="sec21-3">21.3 求势函数</h2>
+
+<p>给定保守场 \(\mathbf{F} = \langle P, Q, R\rangle\)，怎么求势函数 \(f\)？由 \(\nabla f = \mathbf{F}\) 得三条联立方程</p>
+
+<p>\[f_x = P,\qquad f_y = Q,\qquad f_z = R.\]</p>
+
+<p>策略：把这三条方程一条一条"消化"。先对 \(f_x = P\) 关于 \(x\) 积分，得到一个含未知"积分常数"的 \(f\)；这个常数现在不再是真常数，而是<em>所有不依赖 \(x\) 的东西</em>，也就是 \(y, z\) 的某个未知函数 \(g(y, z)\)。把这个 \(f\) 代入第二条方程 \(f_y = Q\)，比较两边、解出 \(g_y\)；再对 \(g_y\) 关于 \(y\) 积分，得到 \(g\)，但又会冒出一个新的"积分常数" \(h(z)\)。再代入第三条 \(f_z = R\)，比较两边，解出 \(h'(z)\)，最后把 \(h\) 也积出来。把所有片段拼回 \(f\) 即可。</p>
+
+<p>用一句话：<em>逐变量积分，逐步消去未知量</em>。</p>
+
+<p>看一个完整的演算。要求 \(\mathbf{F} = \langle 2xy + z, x^2 + 2y, x\rangle\) 的势函数。</p>
+
+<p>第一步：\(f_x = 2xy + z\)，对 \(x\) 积分得 \(f = x^2 y + xz + g(y, z)\)。这里 \(g(y, z)\) 是一个尚未确定的函数；它的特点是不依赖 \(x\)。</p>
+
+<p>第二步：把上式对 \(y\) 求偏导得 \(f_y = x^2 + g_y\)。它应当等于 \(Q = x^2 + 2y\)。比较得 \(g_y = 2y\)，对 \(y\) 积分得 \(g = y^2 + h(z)\)。其中 \(h(z)\) 是一个不依赖 \(x, y\) 的函数。</p>
+
+<p>第三步：现在的 \(f = x^2 y + xz + y^2 + h(z)\)。对 \(z\) 求偏导得 \(f_z = x + h'(z)\)。它应当等于 \(R = x\)。比较得 \(h'(z) = 0\)，所以 \(h(z) = \) 常数；为简单取 \(h = 0\)。</p>
+
+<p>结论：\(f = x^2 y + xz + y^2\)。验证：\(\nabla f = \langle 2xy + z, x^2 + 2y, x\rangle\)，正是 \(\mathbf{F}\)，对。</p>
+
+<p>注意势函数<em>不是唯一</em>的——你可以加任意常数得到另一个同样合法的势函数（梯度不变）。所以"取 \(h = 0\)"完全没问题。</p>
+
+<p>再看一个三维稍简单的例子。\(\mathbf{F} = \langle 2x, 2y, 2z\rangle\)。第一步：\(f_x = 2x \Rightarrow f = x^2 + g(y, z)\)。第二步：\(f_y = g_y = 2y \Rightarrow g = y^2 + h(z)\)，所以 \(f = x^2 + y^2 + h(z)\)。第三步：\(f_z = h'(z) = 2z \Rightarrow h(z) = z^2\)。所以 \(f = x^2 + y^2 + z^2\)。这一结果你"猜"也猜得出来——但请你按机械流程走一遍，因为下面更复杂的题就只能靠流程不能靠猜。</p>
+
+<p>再来一个二维的例子。\(\mathbf{F} = \langle 3x^2 y + y^3, x^3 + 3xy^2\rangle\)。第一步：\(f_x = 3x^2 y + y^3 \Rightarrow f = x^3 y + xy^3 + g(y)\)。第二步：\(f_y = x^3 + 3xy^2 + g'(y) = Q = x^3 + 3xy^2\)。所以 \(g'(y) = 0\)，\(g\) 为常数，取 \(g = 0\)。势函数 \(f = x^3 y + xy^3\)。验证：\(\nabla f = \langle 3x^2 y + y^3, x^3 + 3xy^2\rangle\)，对。</p>
+
+<p>有一个常见的"出错信号"务必要识别：如果你按这套流程走到第二步，发现解出的 \(g_y\) 居然<em>含有 \(x\)</em>——那就说明系统不自洽，<strong>\(\mathbf{F}\) 根本不是保守场</strong>。因为 \(g\) 按定义不依赖 \(x\)，它的偏导也不会含 \(x\)。如果含了 \(x\)，矛盾。所以在动手求势函数之前，最好先用下一节的判别法验证一下"\(\mathbf{F}\) 真的是保守的吗？"。</p>
+
+<h2 id="sec21-4">21.4 旋度判别法</h2>
+
+<p>怎么先判断 \(\mathbf{F}\) 是不是保守场？前一章里已经用克莱罗定理证明：<strong>梯度场的旋度恒为零</strong>。所以"\(\operatorname{curl}\mathbf{F} = \mathbf{0}\)"是 \(\mathbf{F}\) 保守的<em>必要条件</em>。</p>
+
+<p>更妙的是：在某种"区域条件"下，它<em>也</em>是充分的。这种区域条件叫"<strong>单连通</strong>"（simply connected）。一个区域是单连通的，是指它<em>连通</em>，并且<em>区域内的任何一条闭合环路都可以连续地缩到一点而不离开区域</em>。直观地说：<em>没有洞挡住</em>。</p>
+
+<p>例子：整个 \(\mathbb{R}^2\)、整个 \(\mathbb{R}^3\)、任何开圆盘、任何凸区域、上半平面都是单连通的；但<em>挖掉一个点</em>的平面 \(\mathbb{R}^2 \setminus \{0\}\)、<em>圆环</em>区域（两同心圆之间）、甜甜圈表面都<em>不</em>是单连通——它们里面有一些环路绕着洞走，没法缩到一点。</p>
+
+<p>有了这条，我们可以陈述判别法。对二维向量场 \(\mathbf{F} = \langle P(x, y), Q(x, y)\rangle\)，<strong>在单连通区域上</strong>，</p>
+
+<p>\[\boxed{\mathbf{F}\text{ 保守}\iff \frac{\partial Q}{\partial x} = \frac{\partial P}{\partial y}.}\]</p>
+
+<p>等价地，二维标量旋度 \(Q_x - P_y = 0\)。</p>
+
+<p>对三维向量场，则在单连通区域上，</p>
+
+<p>\[\boxed{\mathbf{F}\text{ 保守}\iff \operatorname{curl}\mathbf{F} = \mathbf{0}.}\]</p>
+
+<p>在<em>非</em>单连通区域上，"\(\Rightarrow\)"仍然成立（保守必无旋），但"\(\Leftarrow\)"不再保证——下面就有一个反例。</p>
+
+<p>看一个直接判别的例子。\(\mathbf{F} = \langle 3x^2 y + y^3, x^3 + 3xy^2\rangle\)。\(P_y = 3x^2 + 3y^2\)，\(Q_x = 3x^2 + 3y^2\)，相等。区域是整个 \(\mathbb{R}^2\)，单连通。所以 \(\mathbf{F}\) 保守，可以放心地按 21.3 节的方法求势函数（我们刚算过：\(f = x^3 y + xy^3\)）。</p>
+
+<p>再看一个<em>不</em>保守的：\(\mathbf{F} = \langle y, -x\rangle\)。\(P_y = 1\)，\(Q_x = -1\)，不等。所以非保守。对它<em>不要</em>去试图求势函数。</p>
+
+<p>三维例子：\(\mathbf{F} = \langle 2xy + z, x^2 + 2y, x\rangle\)。算旋度：</p>
+
+<p>\[\operatorname{curl}\mathbf{F} = \langle 0 - 0,\ 1 - 1,\ 2x - 2x\rangle = \mathbf{0}.\]</p>
+
+<p>区域整个 \(\mathbb{R}^3\)，单连通。所以保守。势函数我们已算过 \(f = x^2 y + xz + y^2\)。</p>
+
+<p>下面是这一节的<em>主菜</em>——一个旋度为零、但<em>不</em>保守的反例。它出现在所有标准的多元微积分课本里，是一定要见过的：</p>
+
+<p>\[\boxed{\mathbf{F}(x, y) = \left\langle \frac{-y}{x^2 + y^2},\ \frac{x}{x^2 + y^2}\right\rangle,\quad (x, y) \ne (0, 0).}\]</p>
+
+<p>这个向量场常被称作<em>角度场</em>，因为它本质上是"角度函数"\(\theta = \arctan(y/x)\) 的"梯度"——但下面会看到，"梯度"的引号要打得很重。</p>
+
+<p>第一步：算旋度。算 \(P_y\) 与 \(Q_x\)，请你自己拿笔验证：</p>
+
+<p>\[P = \frac{-y}{x^2 + y^2},\quad P_y = \frac{-(x^2 + y^2) - (-y)(2y)}{(x^2 + y^2)^2} = \frac{-x^2 - y^2 + 2y^2}{(x^2 + y^2)^2} = \frac{y^2 - x^2}{(x^2 + y^2)^2}.\]</p>
+
+<p>\[Q = \frac{x}{x^2 + y^2},\quad Q_x = \frac{(x^2 + y^2) - x(2x)}{(x^2 + y^2)^2} = \frac{y^2 - x^2}{(x^2 + y^2)^2}.\]</p>
+
+<p>所以 \(P_y = Q_x\)——旋度为零。看上去它"应该是保守的"。</p>
+
+<p>第二步：算闭合积分。让 \(C\) 是单位圆周，逆时针。参数化 \(\mathbf{r}(t) = \langle\cos t, \sin t\rangle\)，\(t \in [0, 2\pi]\)。\(x^2 + y^2 = 1\)，\(\mathbf{F}(\mathbf{r}(t)) = \langle -\sin t, \cos t\rangle\)。\(\mathbf{r}'(t) = \langle -\sin t, \cos t\rangle\)。点积 \(= \sin^2 t + \cos^2 t = 1\)。所以</p>
+
+<p>\[\oint_C \mathbf{F}\cdot d\mathbf{r} = \int_0^{2\pi} 1\,dt = 2\pi \ne 0.\]</p>
+
+<p>结论：尽管 \(\operatorname{curl}\mathbf{F} = 0\)（处处！），但 \(\mathbf{F}\) <strong>不是</strong>保守场——闭合积分非零。</p>
+
+<p>哪里出了岔子？答：定义域 \(\mathbb{R}^2 \setminus \{0\}\) 不是单连通的——原点这个洞挡住了"把环路缩到一点"。判别法的"\(\Leftarrow\)"方向需要单连通性，这里不满足，所以"旋度为零 \(\Rightarrow\) 保守"不能推出。</p>
+
+<p>那它本质上是什么？\(\mathbf{F}\) 形式上是 \(\theta = \arctan(y/x)\) 的"梯度"——你算 \(\nabla \arctan(y/x)\) 会得到正是这个 \(\mathbf{F}\)。但 \(\theta\) 在 \(\mathbb{R}^2 \setminus \{0\}\) 上<em>不能定义为单值函数</em>——你绕原点走一圈，\(\theta\) 增加 \(2\pi\) 而不回到原值。所以 \(\mathbf{F}\) 在<em>局部</em>是某个 \(f\) 的梯度（在不绕原点的小区域上），但在<em>全局</em>上没有单值势函数。</p>
+
+<p>正因为这条性质，沿一条绕原点 \(n\) 圈的闭合曲线积分恰好等于 \(2\pi n\)——给出了"<strong>绕数</strong>"（winding number）的雏形：积分值除以 \(2\pi\) 就是曲线绕原点的圈数（带正负号，逆时针为正）。这是一个非常深刻的拓扑性质，是后来代数拓扑的起点之一。</p>
+
+<p>实务上有一条建议。习题里的区域绝大多数是单连通的（典型情形：整个平面、整个空间、一块圆盘、一个矩形）；只要旋度为零，就放心用判别法。如果区域有洞（比如除掉了原点、或除掉了一条直线），<strong>第一件事</strong>是看洞的位置，<strong>第二件事</strong>是把上面这个角度场反例放到脑子里——它会提醒你"旋度为零未必保守"。</p>
+
+<p>下一章的格林定理把"沿闭合路径的积分"与"区域上的二重积分"联系起来——这条工具会让我们以另一种角度重新理解这一章的所有内容。</p>
+
+<hr>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 曲线积分</a><a href="ch22.html">下一章 · 第 22 章 格林定理 →</a></nav>
+
+</main>
+</body>
+</html>

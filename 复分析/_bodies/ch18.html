@@ -1,0 +1,583 @@
+<h1 id="ch18">第 18 章 共形映射与 Dirichlet 问题</h1>
+
+<p>到现在为止我们已经学了两件事：第一，调和函数（满足 Laplace 方程 \(\Delta u = 0\) 的实值函数）是解析函数的实部和虚部，有大量好性质——可被均值公式描述、最值在边界达到、等等；第二，共形映射能把"形状奇怪"的区域共形地映成圆盘或上半平面。把这两件事拼起来，我们就拥有了解决<em>实际</em>物理问题的强大武器。本章就是讲这件事。</p>
+
+<p>具体场景叫做<strong>Dirichlet 问题</strong>：给一片区域 \(D\) 和它边界上的"温度分布" \(f\)，求 \(D\) 内部稳态的温度 \(u\)。这个 \(u\) 必须在 \(D\) 内调和（否则不会"稳态"），且在 \(\partial D\) 上等于 \(f\)。这同时建模了静电势分布、薄膜形变、不可压缩无旋流体的速度势——同一条 PDE，多种物理诠释。</p>
+
+<p>本章的中心思想是<strong>"映射 + 显式公式"两步法</strong>：</p>
+
+<ol>
+<li>对圆盘和上半平面这两个"标准区域"，Dirichlet 问题有<em>显式</em>解（Poisson 公式）。</li>
+<li>对其它区域 \(D\)，找一个共形映射 \(\phi: D \to \) 标准区域，把问题"搬"到标准区域上解，再"搬"回来。</li>
+</ol>
+
+<p>整章我们做这几件事：定义 Dirichlet 问题；推导圆盘和上半平面的 Poisson 公式；证明"共形复合保调和"这条关键事实；用例题展示扇形、半带、矩形上 Dirichlet 问题的完整解法；最后看几个物理应用（稳态热传导、电势、流体）。</p>
+
+<h2 id="sec18-1">18.1 Dirichlet 问题的提出</h2>
+
+<p>设 \(D \subset \mathbb{R}^2\)（或等价地 \(D \subset \mathbb{C}\)）是一片有界开区域，\(\partial D\) 是它的边界曲线（合理假设光滑或分段光滑）。再给一个边界上的连续函数 \(f: \partial D \to \mathbb{R}\)。</p>
+
+<p><strong>Dirichlet 问题。</strong>找一个函数 \(u: \overline D \to \mathbb{R}\)，满足</p>
+
+\[
+\Delta u = u_{xx} + u_{yy} = 0 \quad \text{在 } D \text{ 内},
+\]
+
+\[
+u = f \quad \text{在 } \partial D \text{ 上}.
+\]
+
+<p>第一行是<em>偏微分方程</em>（PDE）：要 \(u\) 在内部调和。第二行是<em>边界条件</em>：要 \(u\) 在边界上等于给定的 \(f\)。</p>
+
+<p><em>物理诠释。</em>把 \(D\) 看成一片金属薄板。在它的边缘上你以某种方式把每一点的温度<em>固定</em>住（电控加热器之类）：边缘上每一点 \(z \in \partial D\) 的温度恒定为 \(f(z)\)。让薄板等待足够久达到<em>稳态</em>。这时薄板内部每一点的温度 \(u(z)\) 就由稳态热传导方程 \(\Delta u = 0\) 决定。Dirichlet 问题就是问：知道边缘的温度，怎么算出内部的温度？</p>
+
+<p>这个问题在物理上非常自然，但数学上一点不平凡。它涉及"无穷多个未知数"（\(u\) 是个函数）和"无穷多个约束"（\(\Delta u = 0\) 在每一点要成立）。需要相当的工具才能<em>明确</em>地解出来。</p>
+
+<p>关于 Dirichlet 问题的几个事实（不证明，但要记住）：</p>
+
+<ol>
+<li><strong>解存在</strong>：在合理的条件下（\(D\) 边界足够光滑，\(f\) 连续），Dirichlet 问题总有解。</li>
+<li><strong>解唯一</strong>：调和函数最值原理保证了它的唯一性。若 \(u_1, u_2\) 都是解，则 \(u_1 - u_2\) 在 \(D\) 内调和、在 \(\partial D\) 上为 0，由最值原理 \(u_1 - u_2\) 在 \(D\) 上处处为 0，所以 \(u_1 = u_2\)。</li>
+<li><strong>解连续依赖于边界数据</strong>：边界数据 \(f\) 微小变化，解 \(u\) 也只微小变化（"稳定性"）。</li>
+</ol>
+
+<p>这三件事在一起说：Dirichlet 问题是<em>适定</em>的（well-posed）问题。</p>
+
+<h2 id="sec18-2">18.2 简单区域上的显式解</h2>
+
+<p>对一般区域 \(D\)，Dirichlet 问题没有"代数"形式的显式解；只能用积分公式或数值方法。但对几个<em>非常对称</em>的标准区域，有漂亮的显式公式。本节列出两个最重要的。</p>
+
+<h3 id="sec18-2-1">18.2.1 圆盘上的 Poisson 公式（陈述）</h3>
+
+<p>设 \(D = \{|z| < R\}\) 是半径 \(R\) 的开圆盘。设边界 \(\partial D\) 上的数据 \(f\) 用极坐标写成 \(f(R e^{i\phi}) = f(\phi)\)（视为周期 \(2\pi\) 的角函数）。</p>
+
+<p><strong>圆盘上的 Poisson 公式。</strong> Dirichlet 问题在 \(D\) 内的解是</p>
+
+\[
+\boxed{u(r e^{i\theta}) = \frac{1}{2\pi} \int_0^{2\pi} \frac{R^2 - r^2}{R^2 - 2 R r \cos(\theta - \phi) + r^2} f(\phi) \, d\phi.}
+\]
+
+<p>这个公式叫做<strong>圆盘上的 Poisson 公式</strong>，里面那个核（积分号下分式）叫做<strong>Poisson 核</strong>。详细推导见 18.3 节。</p>
+
+<p>注意这是一个<em>积分</em>表达式：把边界上每一点 \(R e^{i\phi}\) 的温度 \(f(\phi)\) 用 Poisson 核加权后积起来，就得到内部一点 \(r e^{i\theta}\) 的温度。</p>
+
+<h3 id="sec18-2-2">18.2.2 上半平面上的 Poisson 公式</h3>
+
+<p>设 \(D = \{\operatorname{Im} z > 0\}\) 是上半平面，边界数据 \(f(t)\) 是实轴上的连续函数（合理衰减）。</p>
+
+<p><strong>上半平面上的 Poisson 公式。</strong></p>
+
+\[
+\boxed{u(x + iy) = \frac{1}{\pi} \int_{-\infty}^{\infty} \frac{y}{(x - t)^2 + y^2} f(t) \, dt, \quad y > 0.}
+\]
+
+<p>这个 Poisson 核 \(\dfrac{y}{(x - t)^2 + y^2}\) 在 \(t \in \mathbb{R}\) 上对 \(t\) 积分等于 \(\pi\)（验证：是 Cauchy 分布，积分为 \(\pi\)），所以乘 \(1/\pi\) 后核积分为 1，"加权平均"的解读自然。</p>
+
+<p>这条公式将在 18.4 节推导。</p>
+
+<h2 id="sec18-3">18.3 圆盘上的 Poisson 公式：推导</h2>
+
+<p>这一节简略推导圆盘上的 Poisson 公式。我们不追求严格性，目的是让你看懂<em>这个公式从何而来</em>。</p>
+
+<p><em>策略</em>：用 Cauchy 公式（在第 8 章学过）写出"圆盘内部一点处的解析函数"，取实部，整理。</p>
+
+<p>设 \(F\) 是 \(\overline{D}\) 上的解析函数，记它的实部 \(u = \operatorname{Re} F\)（这个 \(u\) 自动调和）。Cauchy 积分公式给出：对任意 \(z\) 在圆盘内，</p>
+
+\[
+F(z) = \frac{1}{2\pi i} \oint_{|\zeta| = R} \frac{F(\zeta)}{\zeta - z} d\zeta.
+\]
+
+<p>这就在内部点 \(z\) 处把 \(F\) 表达成边界上 \(F(\zeta)\) 的积分。</p>
+
+<p>但我们想取实部。直接取上式实部得不到漂亮的形式，因为 \(\dfrac{1}{\zeta - z}\) 是复的。要"对称化"。</p>
+
+<p><em>对称化的技巧</em>：再用一个辅助点 \(z^* = R^2 / \bar z\)（这是 \(z\) 关于圆 \(|\zeta| = R\) 的"反演点"，落在圆<em>外</em>）。Cauchy 公式说</p>
+
+\[
+0 = \frac{1}{2\pi i} \oint_{|\zeta| = R} \frac{F(\zeta)}{\zeta - z^*} d\zeta
+\]
+
+<p>（因为 \(z^*\) 在闭路<em>外</em>，被积函数解析，积分为 0）。</p>
+
+<p>把两式相减：</p>
+
+\[
+F(z) = \frac{1}{2\pi i} \oint_{|\zeta| = R} F(\zeta) \left[ \frac{1}{\zeta - z} - \frac{1}{\zeta - z^*} \right] d\zeta.
+\]
+
+<p>计算方括号里：通分</p>
+
+\[
+\frac{1}{\zeta - z} - \frac{1}{\zeta - z^*} = \frac{z - z^*}{(\zeta - z)(\zeta - z^*)}.
+\]
+
+<p>注意 \(z^* = R^2/\bar z\)，且在边界 \(|\zeta| = R\) 上有 \(\bar \zeta = R^2/\zeta\)，所以 \(\zeta - z^* = \zeta - R^2/\bar z = (\bar z \zeta - R^2)/\bar z = -(\bar z/\bar z) \cdot (R^2 - \bar z \zeta)/\bar z\)... 让我换一种代法。在 \(|\zeta| = R\)上，\(\bar \zeta \zeta = R^2\)，所以 \(\bar \zeta = R^2/\zeta\)。代入</p>
+
+\[
+\zeta - z^* = \zeta - \frac{R^2}{\bar z} = \frac{\bar z \zeta - R^2}{\bar z} = \frac{\bar z \zeta - \zeta \bar \zeta}{\bar z} = \frac{\zeta(\bar z - \bar \zeta)}{\bar z}.
+\]
+
+<p>所以</p>
+
+\[
+\frac{z - z^*}{(\zeta - z)(\zeta - z^*)} = \frac{(z - R^2/\bar z) \cdot \bar z}{(\zeta - z) \cdot \zeta (\bar z - \bar \zeta)} = \frac{(z \bar z - R^2)}{(\zeta - z) \zeta (\bar z - \bar \zeta)}.
+\]
+
+<p>注意 \(z \bar z = |z|^2 = r^2\)，\(R^2 - r^2 = -(z\bar z - R^2)\)，所以</p>
+
+\[
+\frac{z - z^*}{(\zeta - z)(\zeta - z^*)} = -\frac{R^2 - r^2}{\zeta (\zeta - z)(\bar z - \bar \zeta)} = \frac{R^2 - r^2}{\zeta (\zeta - z)(\bar \zeta - \bar z)}.
+\]
+
+<p>到这一步把它代回 \(F(z) = \dfrac{1}{2\pi i} \oint F(\zeta) \cdot [\text{上式}] \, d\zeta\)。同时注意在 \(|\zeta| = R\) 上 \(\zeta = R e^{i\phi}\)、\(d\zeta = i R e^{i\phi} d\phi = i \zeta d\phi\)，所以 \(d\zeta / \zeta = i d\phi\)。计算：</p>
+
+\[
+F(z) = \frac{1}{2\pi i} \int_0^{2\pi} F(\zeta) \cdot \frac{R^2 - r^2}{\zeta (\zeta - z)(\bar \zeta - \bar z)} \cdot i \zeta d\phi = \frac{1}{2\pi} \int_0^{2\pi} \frac{R^2 - r^2}{|\zeta - z|^2} F(\zeta) d\phi.
+\]
+
+<p>（用了 \((\zeta - z)(\bar \zeta - \bar z) = |\zeta - z|^2\)，因为 \((\bar \zeta - \bar z) = \overline{\zeta - z}\)。）</p>
+
+<p>分母 \(|\zeta - z|^2\) 用极坐标算：\(|R e^{i\phi} - r e^{i\theta}|^2 = R^2 - 2 R r \cos(\phi - \theta) + r^2\)。所以</p>
+
+\[
+F(z) = \frac{1}{2\pi} \int_0^{2\pi} \frac{R^2 - r^2}{R^2 - 2 R r \cos(\theta - \phi) + r^2} F(R e^{i\phi}) d\phi.
+\]
+
+<p>取实部（左边 \(\operatorname{Re} F = u\)；积分核是实的；右边 \(\operatorname{Re} F = u\)）：</p>
+
+\[
+u(r e^{i\theta}) = \frac{1}{2\pi} \int_0^{2\pi} \frac{R^2 - r^2}{R^2 - 2 R r \cos(\theta - \phi) + r^2} u(R e^{i\phi}) d\phi.
+\]
+
+<p>这正是 Poisson 公式。把 \(u\) 在边界上的值就是 Dirichlet 问题给定的 \(f(\phi)\)，得到</p>
+
+\[
+\boxed{u(r e^{i\theta}) = \frac{1}{2\pi} \int_0^{2\pi} \frac{R^2 - r^2}{R^2 - 2 R r \cos(\theta - \phi) + r^2} f(\phi) d\phi.}
+\]
+
+<p>推导完。</p>
+
+<p><em>检验</em>：取 \(f(\phi) \equiv 1\)（边界温度恒为 1）。则解应该是 \(u \equiv 1\)（内部也恒为 1，由唯一性）。验证：</p>
+
+\[
+\frac{1}{2\pi} \int_0^{2\pi} \frac{R^2 - r^2}{R^2 - 2 R r \cos(\theta - \phi) + r^2} d\phi \stackrel{?}{=} 1.
+\]
+
+<p>这个"Poisson 核归一化"的事实可以用残数定理验证（积分等于 \(2\pi\)），所以 \(u = 1\) ✓。</p>
+
+<p><em>另一检验</em>：取 \(r = 0\)（中心点）。得 \(u(0) = \dfrac{1}{2\pi} \int_0^{2\pi} f(\phi) d\phi\)——边界上 \(f\) 的<em>平均值</em>。这就是<strong>调和函数的均值性质</strong>！中心点的值等于边界值的平均，符合我们之前学到的。</p>
+
+<h2 id="sec18-4">18.4 上半平面上的 Poisson 公式：推导</h2>
+
+<p>上半平面的 Poisson 公式可以用同样的"对称化 Cauchy 公式"思路推导，也可以直接通过共形变换从圆盘的版本"搬"过来。我们用第二种方法，简洁得多。</p>
+
+<p>17.9 节我们看到 \(\Phi(z) = \dfrac{z - i}{z + i}\) 把上半平面 \(\mathbb{H}\) 映到单位圆盘 \(\mathbb{D}\)。它的反映射 \(\Phi^{-1}(w) = i \dfrac{1 + w}{1 - w}\)。设要解的 Dirichlet 问题是：在 \(\mathbb{H}\) 内解 \(u\)，使 \(u(t) = f(t)\) 对 \(t \in \mathbb{R}\) 成立。</p>
+
+<p>"搬到圆盘上"：定义 \(\tilde u: \mathbb{D} \to \mathbb{R}\) 由 \(\tilde u(w) := u(\Phi^{-1}(w))\)。则 18.6 节的事实告诉我们 \(\tilde u\) 在 \(\mathbb{D}\) 内调和，并满足边界条件 \(\tilde u(e^{i\phi}) = u(\Phi^{-1}(e^{i\phi})) = f(\Phi^{-1}(e^{i\phi}))\)，记为 \(\tilde f(\phi)\)。这是个 \(\mathbb{D}\) 上的 Dirichlet 问题，用圆盘 Poisson 公式解。最后再"搬回"得 \(u(z) = \tilde u(\Phi(z))\)。</p>
+
+<p>把 Poisson 核做变量替换。详细地：圆盘里 \(w = \rho e^{i\psi}\)、\(\zeta = e^{i\phi}\)；上半平面里 \(z = x + iy\)、边界点 \(t \in \mathbb{R}\)。由 \(\Phi\) 的形式，\(\Phi(t) = \dfrac{t - i}{t + i}\)，并且 \(d\phi = \dfrac{2}{1 + t^2} dt\)（验证：\(\dfrac{d}{dt} \arg \Phi(t) = \dfrac{2}{t^2 + 1}\)；这是 Cauchy 分布的 CDF 的导数）。</p>
+
+<p>把所有量代回，简化（这是个有点繁的代数练习），最终得到</p>
+
+\[
+\boxed{u(x + iy) = \frac{1}{\pi} \int_{-\infty}^{\infty} \frac{y}{(x - t)^2 + y^2} f(t) dt.}
+\]
+
+<p>这就是上半平面的 Poisson 公式。它的<em>核</em> \(\dfrac{y}{(x - t)^2 + y^2}\) 是高度 \(y\) 处对边界点 \(t\) 的"权重"。当 \(y \to 0^+\)（接近边界）时，这个核变成集中在 \(t = x\) 附近的窄峰（以 Dirac \(\delta\) 函数为极限），所以 \(u(x, y) \to f(x)\)，符合边界条件。</p>
+
+<p><em>检验。</em>取 \(f(t) \equiv 1\)。则</p>
+
+\[
+u(x + iy) = \frac{1}{\pi} \int_{-\infty}^{\infty} \frac{y}{(x-t)^2 + y^2} dt = \frac{1}{\pi} \cdot \arctan \left(\frac{t - x}{y}\right) \Big|_{-\infty}^{\infty} = \frac{1}{\pi} \cdot \pi = 1.
+\]
+
+<p>所以 \(u \equiv 1\) ✓。</p>
+
+<p><em>例题 18.4.1</em>。在上半平面解 Dirichlet 问题，边界条件 \(f(t) = \begin{cases} 1, & t > 0 \\ 0, & t < 0 \end{cases}\)（"半个区域加热到 1，另一半保持 0"）。</p>
+
+<p><em>解。</em>用 Poisson 公式：</p>
+
+\[
+u(x + iy) = \frac{1}{\pi} \int_0^{\infty} \frac{y}{(x - t)^2 + y^2} dt = \frac{1}{\pi} \arctan \frac{t - x}{y} \Big|_0^{\infty} = \frac{1}{\pi} \left[ \frac{\pi}{2} - \arctan\left(\frac{-x}{y}\right) \right] = \frac{1}{2} + \frac{1}{\pi} \arctan \frac{x}{y}.
+\]
+
+<p>更对称地写：</p>
+
+\[
+\boxed{u(x, y) = \frac{1}{2} + \frac{1}{\pi} \arctan \frac{x}{y} = 1 - \frac{\theta}{\pi},}
+\]
+
+<p>其中 \(\theta = \arg(z) \in (0, \pi)\) 是上半平面里的极角。验证：</p>
+
+<ul>
+<li>\(z\) 在正实轴上方（\(\theta \to 0^+\)）：\(u \to 1\) ✓</li>
+<li>\(z\) 在负实轴上方（\(\theta \to \pi^-\)）：\(u \to 0\) ✓</li>
+<li>\(z\) 在正虚轴上（\(\theta = \pi/2\)）：\(u = 1/2\) ✓</li>
+</ul>
+
+<p>这个解叫做<strong>"角函数解"</strong>：在上半平面里，"加热区到 1，其余为 0"的稳态温度，正比于"从该点看加热区张角的反向"。这是后面例题的基本砖块。</p>
+
+<h2 id="sec18-5">18.5 一般区域：用共形映射搬过去</h2>
+
+<p>对一般区域 \(D\)，Dirichlet 问题没有显式 Poisson 公式。但有了共形映射，我们可以这么操作：</p>
+
+<p><strong>解 Dirichlet 问题的标准流程</strong>：</p>
+
+<ol>
+<li>找一个共形映射 \(\phi: D \to \) 标准区域（圆盘 \(\mathbb{D}\) 或上半平面 \(\mathbb{H}\)）；</li>
+<li>把边界数据"搬"过去：\(\partial D\) 上的 \(f\) 通过 \(\phi^{-1}\) 翻译成 \(\partial \mathbb{D}\) 或 \(\partial \mathbb{H}\) 上的 \(\tilde f\)；</li>
+<li>在标准区域上用 Poisson 公式解出 \(\tilde u\)；</li>
+<li>把答案"搬"回来：\(u(z) := \tilde u(\phi(z))\)，即 \(D\) 上的解。</li>
+</ol>
+
+<p>这个流程为什么有效？两个关键事实：</p>
+
+<ul>
+<li><strong>事实 1：</strong>调和函数和解析函数复合后还是调和函数（18.6 节证明）。所以从 \(\tilde u\) 调和推出 \(u = \tilde u \circ \phi\) 调和。</li>
+<li><strong>事实 2：</strong>共形映射在<em>边界</em>上的对应（在合适条件下）是连续的双射，所以"边界数据"可以无歧义地翻译。</li>
+</ul>
+
+<p>有了这两件事，整套流程就闭环了。下面 18.6 节先把"事实 1"推导清楚，再 18.7 节看完整例题。</p>
+
+<h2 id="sec18-6">18.6 关键事实：调和与解析复合后还是调和</h2>
+
+<p>这一节细说"为什么共形映射保调和性"——它是整章方法的核心。</p>
+
+<p><strong>定理。</strong>设 \(\phi: D_1 \to D_2\) 是解析函数（不必是共形/双射，解析就够），\(\tilde u: D_2 \to \mathbb{R}\) 是调和函数。则 \(u(z) := \tilde u(\phi(z))\) 在 \(D_1\) 上调和。</p>
+
+<p><em>证明 1（用解析的"调和共轭"概念）。</em>在 \(D_2\) 上 \(\tilde u\) 调和，所以在<em>局部</em>有调和共轭 \(\tilde v\)，使 \(\tilde F := \tilde u + i \tilde v\) 在 \(D_2\)（局部）解析。把它和 \(\phi\) 复合：\(F := \tilde F \circ \phi\)。两个解析函数的复合还是解析（标准事实），所以 \(F\) 在 \(D_1\)（局部）解析。它的实部 \(\operatorname{Re} F = \operatorname{Re}(\tilde F \circ \phi) = \tilde u \circ \phi = u\)。一个解析函数的实部自动调和（标准事实）。所以 \(u\) 在 \(D_1\) 上局部调和；调和性是"局部 ⇒ 全局"的（只看 \(\Delta u = 0\) 是局部判据），所以 \(u\) 在 \(D_1\) 上调和。<small>QED</small></p>
+
+<p><em>证明 2（用链式法则直接验证 \(\Delta u = 0\)）。</em>这是更"动手"的方法，不依赖"调和共轭"。设 \(\phi(z) = \xi(x, y) + i \eta(x, y)\)（\(\xi, \eta\) 是 \(\phi\) 的实部和虚部），则 \(u(x, y) = \tilde u(\xi(x, y), \eta(x, y))\)。</p>
+
+<p>用链式法则算 \(u_x\)：</p>
+
+\[
+u_x = \tilde u_\xi \cdot \xi_x + \tilde u_\eta \cdot \eta_x.
+\]
+
+<p>再算 \(u_{xx}\)：</p>
+
+\[
+u_{xx} = (\tilde u_\xi \xi_x + \tilde u_\eta \eta_x)_x = (\tilde u_\xi)_x \xi_x + \tilde u_\xi \xi_{xx} + (\tilde u_\eta)_x \eta_x + \tilde u_\eta \eta_{xx}.
+\]
+
+<p>其中 \((\tilde u_\xi)_x = \tilde u_{\xi\xi} \xi_x + \tilde u_{\xi \eta} \eta_x\)，\((\tilde u_\eta)_x = \tilde u_{\eta \xi} \xi_x + \tilde u_{\eta \eta} \eta_x\)。所以</p>
+
+\[
+u_{xx} = \tilde u_{\xi\xi} \xi_x^2 + 2 \tilde u_{\xi \eta} \xi_x \eta_x + \tilde u_{\eta\eta} \eta_x^2 + \tilde u_\xi \xi_{xx} + \tilde u_\eta \eta_{xx}.
+\]
+
+<p>类似</p>
+
+\[
+u_{yy} = \tilde u_{\xi\xi} \xi_y^2 + 2 \tilde u_{\xi \eta} \xi_y \eta_y + \tilde u_{\eta\eta} \eta_y^2 + \tilde u_\xi \xi_{yy} + \tilde u_\eta \eta_{yy}.
+\]
+
+<p>相加：</p>
+
+\[
+\Delta u = u_{xx} + u_{yy} = \tilde u_{\xi\xi} (\xi_x^2 + \xi_y^2) + 2 \tilde u_{\xi \eta} (\xi_x \eta_x + \xi_y \eta_y) + \tilde u_{\eta\eta} (\eta_x^2 + \eta_y^2) + \tilde u_\xi \Delta \xi + \tilde u_\eta \Delta \eta.
+\]
+
+<p>现在用 \(\phi\) 解析的两个性质：</p>
+
+<ol>
+<li><strong>Cauchy–Riemann</strong>：\(\xi_x = \eta_y\) 且 \(\xi_y = -\eta_x\)。这给出</li>
+</ol>
+
+<p>\(\xi_x^2 + \xi_y^2 = \xi_x^2 + (-\eta_x)^2 = \xi_x^2 + \eta_x^2 = |\phi'(z)|^2\)（因为 \(\phi'(z) = \xi_x + i \eta_x\)，模平方就是 \(\xi_x^2 + \eta_x^2\)）；</p>
+
+<p>同样 \(\eta_x^2 + \eta_y^2 = \eta_x^2 + \xi_x^2 = |\phi'(z)|^2\)；</p>
+
+<p>而 \(\xi_x \eta_x + \xi_y \eta_y = \xi_x \eta_x + (-\eta_x) \xi_x = 0\)（用了 \(\xi_y = -\eta_x\) 和 \(\eta_y = \xi_x\)）。</p>
+
+<ol start="2">
+<li><strong>\(\xi, \eta\) 自身调和</strong>（解析函数的实部、虚部都调和）：\(\Delta \xi = 0\)、\(\Delta \eta = 0\)。</li>
+</ol>
+
+<p>把这些代入 \(\Delta u\) 的表达式：</p>
+
+\[
+\Delta u = \tilde u_{\xi\xi} \cdot |\phi'(z)|^2 + 2 \tilde u_{\xi \eta} \cdot 0 + \tilde u_{\eta\eta} \cdot |\phi'(z)|^2 + 0 + 0 = |\phi'(z)|^2 (\tilde u_{\xi\xi} + \tilde u_{\eta\eta}) = |\phi'(z)|^2 \cdot \Delta \tilde u.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\Delta u(z) = |\phi'(z)|^2 \cdot \Delta \tilde u(\phi(z)).}
+\]
+
+<p>这是个相当漂亮的恒等式：复合后的 Laplacian 是<em>原 Laplacian 乘共形缩放因子的平方</em>。</p>
+
+<p>由于 \(\tilde u\) 在 \(D_2\) 调和，\(\Delta \tilde u = 0\) 处处，所以 \(\Delta u = 0\) 处处，\(u\) 调和。<small>QED</small></p>
+
+<p>这条事实<em>就</em>是共形映射方法能解 Dirichlet 问题的根本原因。</p>
+
+<h2 id="sec18-7">18.7 完整例题</h2>
+
+<p>下面用四个例题展示完整的"映射 + Poisson"解法。</p>
+
+<h3 id="sec18-7-1">18.7.1 扇形上的 Dirichlet 问题</h3>
+
+<p><strong>例题 18.7.1</strong>。在扇形 \(D = \{0 < \arg z < \pi/3, |z| < \infty\}\)（即 60° 的无界扇形）内解 Dirichlet 问题，边界条件：</p>
+
+<ul>
+<li>沿正实轴 \(\arg z = 0\) 上 \(u = 0\)；</li>
+<li>沿射线 \(\arg z = \pi/3\) 上 \(u = 1\)。</li>
+</ul>
+
+<p><em>解。</em></p>
+
+<p><em>第一步：找映射</em>。把扇形（角度 \(\pi/3\)）映到上半平面（角度 \(\pi\)），用 \(\phi(z) = z^3\)。原扇形 \(\arg z \in (0, \pi/3)\)，平方后 \(\arg z^3 \in (0, \pi)\)，正是上半平面。</p>
+
+<p>设 \(w = \phi(z) = z^3\)。边界对应：</p>
+
+<ul>
+<li>\(\arg z = 0\)（正实轴）→ \(\arg w = 0\)（正实轴）；</li>
+<li>\(\arg z = \pi/3\) → \(\arg w = \pi\)（负实轴）。</li>
+</ul>
+
+<p><em>第二步：搬边界数据</em>。在 \(w\) 平面（上半平面）上，\(\tilde u(w)\) 应满足：</p>
+
+<ul>
+<li>正实轴上 \(\tilde u = 0\)；</li>
+<li>负实轴上 \(\tilde u = 1\)。</li>
+</ul>
+
+<p><em>第三步：解上半平面 Dirichlet</em>。这正是 18.4 节例题 18.4.1 的镜像（这次是负实轴是 1）。借用那个解：原例题"正实轴 1、负实轴 0"的答案是 \(\tilde u = 1 - \theta/\pi\)（其中 \(\theta = \arg w\)）。本例题"正实轴 0、负实轴 1" → 把答案"翻转"得</p>
+
+\[
+\tilde u(w) = \frac{\theta}{\pi} = \frac{\arg w}{\pi}.
+\]
+
+<p>验证：\(\arg w = 0 \to \tilde u = 0\) ✓；\(\arg w = \pi \to \tilde u = 1\) ✓；\(\Delta \tilde u = 0\)（\(\arg\) 是上半平面里的调和函数，是 \(\log w\) 的虚部）。</p>
+
+<p><em>第四步：搬回 \(z\) 平面</em>。\(u(z) = \tilde u(\phi(z)) = \tilde u(z^3) = \dfrac{\arg z^3}{\pi} = \dfrac{3 \arg z}{\pi}\)（在原扇形内 \(\arg z \in (0, \pi/3)\)，所以 \(\arg z^3 = 3 \arg z\) 而非 \(3 \arg z + 2\pi k\)）。</p>
+
+<p>所以</p>
+
+\[
+\boxed{u(z) = \frac{3 \arg z}{\pi}.}
+\]
+
+<p>验证：\(\arg z = 0 \to u = 0\) ✓；\(\arg z = \pi/3 \to u = 1\) ✓；\(u\) 是 \(\dfrac{3}{\pi} \arg z\)，\(\arg\) 调和（在不含原点的扇形内），所以 \(u\) 调和 ✓。</p>
+
+<p>实际上你可能已经想到："这本来就是个角度的线性函数，何必用映射？"对，本例题简单到一眼就能写出。但<em>方法</em>是普适的；下面例题的边界条件如果稍复杂，"一眼看出"就不行了，必须老老实实用 Poisson。</p>
+
+<h3 id="sec18-7-2">18.7.2 半带上的 Dirichlet 问题</h3>
+
+<p><strong>例题 18.7.2</strong>。在半带 \(D = \{0 < \operatorname{Im} z < \pi, \operatorname{Re} z > 0\}\) 内解 Dirichlet 问题：</p>
+
+<ul>
+<li>下边 \(\operatorname{Im} z = 0\) 上 \(u = 0\)；</li>
+<li>上边 \(\operatorname{Im} z = \pi\) 上 \(u = 1\)；</li>
+<li>左边 \(\operatorname{Re} z = 0, 0 \le \operatorname{Im} z \le \pi\) 上 \(u = 0\)。</li>
+</ul>
+
+<p><em>解。</em></p>
+
+<p><em>第一步：找映射</em>。回忆 16.7 节：\(w = e^z\) 把<em>整条</em>水平条带 \(\{0 < \operatorname{Im} z < \pi\}\) 映到上半平面。我们这里只是"半条带"（\(\operatorname{Re} z > 0\)），把它映到哪里？</p>
+
+<p>沿 \(\operatorname{Re} z = 0, \operatorname{Im} z \in (0, \pi)\)（左边）：\(w = e^{iy}\)，模 \(= 1\)、辐角 \(\in (0, \pi)\)，是<em>上半单位圆弧</em>。</p>
+
+<p>沿 \(\operatorname{Re} z > 0, \operatorname{Im} z = 0\)（下边）：\(w = e^x\)，正实数 \(> 1\)。</p>
+
+<p>沿 \(\operatorname{Re} z > 0, \operatorname{Im} z = \pi\)（上边）：\(w = -e^x\)，负实数 \(< -1\)。</p>
+
+<p>所以 \(w = e^z\) 把"半带"映到<em>"上半平面去掉上半单位圆盘"</em>，即 \(\{|w| > 1, \operatorname{Im} w > 0\}\)（"上半平面外的上半半平面"）——这不是标准区域。需要再来一步。</p>
+
+<p>用 \(w_1 = w + 1/w = e^z + e^{-z} = 2 \cosh z\)。这是把"上半平面外的上半"映到上半平面的标准技巧（Joukowsky 变换）：</p>
+
+<ul>
+<li>沿单位圆 \(w = e^{i\phi}, \phi \in (0, \pi)\)：\(w_1 = e^{i\phi} + e^{-i\phi} = 2 \cos \phi \in (-2, 2)\)，落在实轴 \([-2, 2]\)。</li>
+<li>沿正实轴 \(w > 1\)：\(w_1 = w + 1/w > 2\)，落在实轴 \(> 2\)。</li>
+<li>沿负实轴 \(w < -1\)：\(w_1 = w + 1/w < -2\)，落在实轴 \(< -2\)。</li>
+</ul>
+
+<p>所以 \(w_1 = 2 \cosh z\) 把"半带"映到上半平面 \(\{\operatorname{Im} w_1 > 0\}\)。漂亮！</p>
+
+<p><em>第二步：搬边界数据</em>。在 \(w_1\) 平面（上半平面）上，边界数据是：</p>
+
+<ul>
+<li>对应"半带左边"\(\operatorname{Re} z = 0\)：\(w_1 \in [-2, 2]\)，原值 \(u = 0\) ⇒ \(\tilde u = 0\)。</li>
+<li>对应"半带下边"\(\operatorname{Im} z = 0\)：\(w_1 > 2\)，原值 \(u = 0\) ⇒ \(\tilde u = 0\)。</li>
+<li>对应"半带上边"\(\operatorname{Im} z = \pi\)：\(w_1 < -2\)，原值 \(u = 1\) ⇒ \(\tilde u = 1\)。</li>
+</ul>
+
+<p>整理：在 \(w_1 \in \mathbb{R}\) 上，\(\tilde u = 1\) 当 \(w_1 < -2\)，\(\tilde u = 0\) 当 \(w_1 > -2\)。</p>
+
+<p><em>第三步：解上半平面 Dirichlet</em>。和例题 18.4.1 完全同款，只不过分界点在 \(-2\) 而非 \(0\)，且"加热区"在左边而非右边。借用"角函数解"思路：解是"从该点看加热区张角"除以 \(\pi\)。具体地</p>
+
+\[
+\tilde u(w_1) = \frac{1}{\pi} \arg(w_1 + 2),
+\]
+
+<p>其中 \(\arg(w_1 + 2) \in (0, \pi)\) 是把 \(w_1 + 2\) 看成上半平面里的点取的极角。验证：</p>
+
+<ul>
+<li>\(w_1 < -2\)：\(w_1 + 2 < 0\)，\(\arg(w_1 + 2) = \pi\)（如果 \(w_1\) 略往上偏一点点），所以 \(\tilde u = 1\) ✓</li>
+<li>\(w_1 > -2\)：\(w_1 + 2 > 0\)，\(\arg = 0\)，\(\tilde u = 0\) ✓</li>
+</ul>
+
+<p><em>第四步：搬回 \(z\) 平面</em>。</p>
+
+\[
+u(z) = \tilde u(2 \cosh z) = \frac{1}{\pi} \arg(2 \cosh z + 2).
+\]
+
+<p>用 \(2 \cosh z + 2 = e^z + e^{-z} + 2 = (e^{z/2} + e^{-z/2})^2 = 4 \cosh^2(z/2)\)（注意是恒等式）。所以</p>
+
+\[
+\arg(2 \cosh z + 2) = \arg(4 \cosh^2(z/2)) = 2 \arg(\cosh(z/2)) \pmod{2\pi}.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{u(z) = \frac{2}{\pi} \arg \cosh(z/2)} \pmod{2}.
+\]
+
+<p>这是答案。在半带内 \(\arg \cosh(z/2)\) 是连续的、在 \([0, \pi/2]\) 之间，所以 \(u\) 在 \([0, 1]\) 之间，符合"内部值在边界值之间"的最值原理。</p>
+
+<p>这个例题展示了完整的"两步映射"流程。最后形式看起来不简单，但每一步都自然——"扇形 → 半带 → 圆盘外的半平面 → 半平面"，每一步都用一个标准映射。</p>
+
+<h3 id="sec18-7-3">18.7.3 上半圆盘上的 Dirichlet 问题</h3>
+
+<p><strong>例题 18.7.3</strong>。在上半圆盘 \(D = \{|z| < 1, \operatorname{Im} z > 0\}\) 内解 Dirichlet 问题：</p>
+
+<ul>
+<li>沿底边 \([-1, 1]\) 上 \(u = 0\)；</li>
+<li>沿上半圆弧 \(\{e^{i\theta}, \theta \in (0, \pi)\}\) 上 \(u = 1\)。</li>
+</ul>
+
+<p><em>解。</em></p>
+
+<p><em>第一步：找映射</em>。16.11 节例题 16.11.1 我们建立了"上半圆盘 → 单位圆盘"的映射。但这里更直接：先把上半圆盘映到第一象限（用 \(z_1 = \dfrac{1 + z}{1 - z}\)），再用 \(z_2 = z_1^2\) 映到上半平面。</p>
+
+<p>第一象限里：底边 \([-1, 1]\)（在 \(z\) 平面）映成正实轴（在 \(z_1\) 平面）；上半圆弧映成正虚轴。</p>
+
+<p>第一象限平方后：正实轴还是正实轴；正虚轴变成负实轴。所以：</p>
+
+<p>在 \(z_2\) 平面（上半平面）上，边界数据：</p>
+
+<ul>
+<li>正实轴 → \(\tilde u = 0\)；</li>
+<li>负实轴 → \(\tilde u = 1\)。</li>
+</ul>
+
+<p><em>第二步：解上半平面 Dirichlet</em>。这正是例题 18.7.1 第三步同款。答案 \(\tilde u(z_2) = \dfrac{\arg z_2}{\pi}\)。</p>
+
+<p><em>第三步：搬回 \(z\) 平面</em>。\(u(z) = \dfrac{\arg z_2}{\pi} = \dfrac{\arg z_1^2}{\pi} = \dfrac{2 \arg z_1}{\pi} = \dfrac{2}{\pi} \arg \dfrac{1 + z}{1 - z}\)。</p>
+
+<p>所以</p>
+
+\[
+\boxed{u(z) = \frac{2}{\pi} \arg\left(\frac{1 + z}{1 - z}\right).}
+\]
+
+<p>验证：</p>
+
+<ul>
+<li>\(z = 0\)：\(u = (2/\pi) \arg 1 = 0\)（虽然 0 在底边上，但底边附近 \(u \to 0\) ✓）。</li>
+<li>\(z = i/2\)（"靠近顶部"）：\((1 + i/2)/(1 - i/2) = (1 + i/2)^2/|1 - i/2|^2 = (1 + i - 1/4)/(5/4) = (3/4 + i)/(5/4) = 3/5 + 4i/5\)，\(\arg = \arctan(4/3) \approx 0.927\)，\(u \approx 0.59\)（介于 0 和 1）✓</li>
+</ul>
+
+<h3 id="sec18-7-4">18.7.4 矩形上的 Dirichlet 问题（草拟）</h3>
+
+<p><strong>例题 18.7.4</strong>。在矩形 \(D = \{0 < x < a, 0 < y < b\}\) 内解 Dirichlet 问题。</p>
+
+<p><em>解（草拟）。</em>矩形的共形映射到上半平面是<strong>Schwarz–Christoffel 映射</strong>：</p>
+
+\[
+\phi^{-1}(w) = \int_0^w \frac{d\zeta}{\sqrt{(1 - \zeta^2)(1 - k^2 \zeta^2)}}
+\]
+
+<p>（一种"椭圆积分"）。具体形式不基本，但思路相同：找到映射，搬数据，解 Poisson，搬回来。这个例题在标准本科课程里通常用 Fourier 级数解，因为映射太复杂——这给了我们一个有意思的对照：共形映射方法对"几何漂亮"的区域（圆/扇/带）最有效，对"代数漂亮"的区域（矩形）反而 Fourier 更顺手。</p>
+
+<h2 id="sec18-8">18.8 物理应用</h2>
+
+<p>Dirichlet 问题（更广义的"调和函数边值问题"）在物理学里有<em>同一个</em>数学骨架，<em>多个</em>物理身份。</p>
+
+<h3 id="sec18-8-1">18.8.1 稳态热传导</h3>
+
+<p>把 \(D\) 看成金属薄板，边界温度 \(f\) 给定，等达到热平衡。内部每点的温度 \(u\) 满足 \(\Delta u = 0\)。这就是上面 18.1 节的物理诠释。"稳态"意味着不随时间变化——动态地，温度满足热方程 \(u_t = \Delta u\)，等 \(t \to \infty\) 时 \(u_t \to 0\)，得稳态 \(\Delta u = 0\)。</p>
+
+<p>例题：把"扇形"看成一片金属扇形，两边各保持不同温度，求内部温度分布。这就是例题 18.7.1。答案 \(u = (3/\pi) \arg z\) 告诉你：等温线是<em>过原点的射线</em>（\(\arg z =\) 常数）。</p>
+
+<h3 id="sec18-8-2">18.8.2 静电势</h3>
+
+<p>在没有电荷的二维区域里（实际是三维问题的某些"无穷长"对称情形约化），电势 \(\varphi\) 满足 Laplace 方程 \(\Delta \varphi = 0\)。如果你给定边界上的电压（导体边界），内部就是 Dirichlet 问题。求出 \(\varphi\) 后，电场 \(\mathbf{E} = -\nabla \varphi\)。</p>
+
+<p>例题："两块平行板（电压差 \(V\)）之间的电势"。这是上半带例题的镜像；可以用上面的方法解出。结果是"等势线 = 平行于板的直线"（不出意外）。</p>
+
+<h3 id="sec18-8-3">18.8.3 流体的速度势</h3>
+
+<p>不可压缩、无旋的二维流体，速度场 \(\mathbf{v}\) 可以写成 \(\mathbf{v} = \nabla \varphi\)，其中 \(\varphi\) 是<em>速度势</em>。无源条件 \(\nabla \cdot \mathbf{v} = 0\) 给 \(\Delta \varphi = 0\)。所以速度势也是调和函数。</p>
+
+<p>给定固体边界（流体不能穿过去）和远场速度，就能解出整片流场。这是空气动力学的基础（飞机翼周围气流的二维近似就是这么算的）。</p>
+
+<h2 id="sec18-9">18.9 简单流体力学：复势</h2>
+
+<p>把上一节的"速度势" \(\varphi\) 与它的<em>调和共轭</em> \(\psi\)（即与 \(\varphi\) 一起组成解析函数 \(F = \varphi + i \psi\) 的实虚部）配对，会得到一个特别有用的对象：<strong>复势</strong> (complex potential) \(F(z) = \varphi(x, y) + i \psi(x, y)\)。</p>
+
+<p>这里 \(\psi\) 叫做<strong>流函数</strong> (stream function)。它的几何意义是：<em>\(\psi =\) 常数 的曲线就是流线</em>。让我们看为什么。</p>
+
+<p><em>速度场分量</em>：\(\mathbf{v} = \nabla \varphi = (\varphi_x, \varphi_y)\)，所以 \(v_1 = \varphi_x\)、\(v_2 = \varphi_y\)。</p>
+
+<p>由 Cauchy–Riemann 方程，\(\psi\) 满足 \(\psi_y = \varphi_x = v_1\)、\(\psi_x = -\varphi_y = -v_2\)。</p>
+
+<p>沿一条 \(\psi =\) 常数的曲线，\(d\psi = \psi_x dx + \psi_y dy = -v_2 dx + v_1 dy = 0\)，即 \(\dfrac{dy}{dx} = \dfrac{v_2}{v_1}\)——切向恰好与速度场方向一致。这就是流线的定义。</p>
+
+<p>所以<strong>解析函数 \(F = \varphi + i \psi\) 自动给你一个二维平面流场</strong>：</p>
+
+<ul>
+<li>实部 \(\varphi\) 给速度势；</li>
+<li>虚部 \(\psi\) 给流函数（等值线即流线）；</li>
+<li>速度 \(\bar v_1 + i v_2 = \overline{\nabla \varphi} = \overline{F'(z)}\)（用 CR 验证）。</li>
+</ul>
+
+<p>这是一个非常生产性的事实：<em>每一个解析函数都自动给一个流场</em>。变换 \(F\) 就变换流场。下面看几个标准的复势。</p>
+
+<p><strong>例题 18.9.1（均匀流）</strong>。\(F(z) = U z\)（\(U > 0\) 实常数）。</p>
+
+<p><em>解读。</em>\(\varphi = U x\)（速度势）、\(\psi = U y\)（流函数）。流线 \(\psi = c\) 即 \(y = c/U\)，是水平线。速度 \(\overline{F'(z)} = U\)（即 \(v_1 = U, v_2 = 0\)）——一致沿正 \(x\) 方向流动。这就是<em>均匀流</em>。</p>
+
+<p><strong>例题 18.9.2（点源）</strong>。\(F(z) = (Q/(2\pi)) \log z\)（\(Q\) 实常数）。</p>
+
+<p><em>解读。</em>\(\log z = \log r + i \theta\)（\(z = r e^{i\theta}\)），所以 \(\varphi = (Q/(2\pi)) \log r\)、\(\psi = (Q/(2\pi)) \theta\)。流线 \(\psi = c\) 即 \(\theta = 2\pi c/Q\)，是<em>从原点发射的射线</em>。速度场沿径向流出（若 \(Q > 0\)），这就是<em>点源</em>（流量 \(Q\)）。</p>
+
+<p>注意 \(\log z\) 在原点不解析（\(F\) 在原点是奇点）——这正是"点源"的物理意义：原点是流体的<em>源</em>，无穷小的"喷口"。</p>
+
+<p><strong>例题 18.9.3（点涡）</strong>。\(F(z) = -(i \Gamma/(2\pi)) \log z\)（\(\Gamma\) 实常数）。</p>
+
+<p><em>解读。</em>\(F = (\Gamma/(2\pi)) (-i)(\log r + i \theta) = (\Gamma/(2\pi)) (\theta - i \log r)\)，所以 \(\varphi = (\Gamma/(2\pi)) \theta\)、\(\psi = -(\Gamma/(2\pi)) \log r\)。流线 \(\psi = c\) 即 \(\log r =\) 常数，<em>圆周</em>。速度沿圆周方向（绕原点旋转），这是<em>点涡</em>（环量 \(\Gamma\)）。</p>
+
+<p>有趣观察：把例题 18.9.2 和 18.9.3 加起来，得 \(F = (Q - i\Gamma)/(2\pi) \log z\)，这是<em>螺旋流</em>——既径向流出又绕旋转，流线是对数螺线。这是真实的"龙卷风"的最简单数学模型。</p>
+
+<p><strong>例题 18.9.4（绕圆柱的流动）</strong>。考虑均匀流 \(U\) 流过半径 \(a\) 的圆柱，求复势。</p>
+
+<p><em>解（思路）。</em>无穷远处应是均匀流 \(F \sim U z\)。圆柱表面 \(|z| = a\) 必须是<em>流线</em>（流体不穿过固体）。这是个共形映射 + 反射的标准技巧。</p>
+
+<p>"反射技巧"：把均匀流的复势 \(U z\) 加上一个"对圆柱反射"的项 \(U a^2/z\)，得</p>
+
+\[
+F(z) = U \left(z + \frac{a^2}{z}\right).
+\]
+
+<p><em>验证圆柱表面是流线</em>：\(z = a e^{i\theta}\) 上，\(F = U(a e^{i\theta} + a e^{-i\theta}) = 2 U a \cos \theta\)，是<em>纯实数</em>，所以 \(\psi = \operatorname{Im} F = 0\)。这条 "\(\psi = 0\) 的曲线"包含整个圆周 \(|z| = a\)，所以圆柱表面是流线 ✓。</p>
+
+<p><em>验证无穷远是均匀流</em>：\(z \to \infty\) 时 \(F \to U z\) ✓。</p>
+
+<p>所以 \(F(z) = U(z + a^2/z)\) 描述了"均匀流绕半径 \(a\) 的圆柱"的流场。这是经典空气动力学的"标准例题"，从中可以推出许多物理结论（比如对称流动给零升力——D'Alembert 悖论的二维形式）。要给圆柱一个"升力"，还得叠加一个点涡（例题 18.9.3）：</p>
+
+\[
+F(z) = U\left(z + \frac{a^2}{z}\right) - \frac{i \Gamma}{2 \pi} \log z.
+\]
+
+<p>这就给出"环量 \(\Gamma\) 的圆柱"的流场，也是 Magnus 效应（旋转的足球或棒球弯曲飞行）的基本模型。</p>
+
+<p><strong>例题 18.9.5（机翼）</strong>。把"绕圆柱的流场"通过 Joukowsky 变换 \(\zeta = z + 1/z\) 共形映射过去，圆柱被映成一个翼型（"Joukowsky 翼型"）；流场也被映过去，得到了"绕翼型的流场"。机翼上的升力公式（Kutta–Joukowsky 定理 \(L = \rho U \Gamma\)）就是用这个映射推出来的。</p>
+
+<p>从这一系列例题你能体会到：<em>共形映射不仅是数学工具，它直接对应着物理上的"用一个简单几何近似复杂几何"</em>。圆柱周围的流场是简单的（用反射就能写出），但翼型周围的流场极其复杂——通过 Joukowsky 变换，二者被等价起来，所以"复杂"的流场可以从"简单"的流场<em>解析地</em>导出。这是 20 世纪初空气动力学最经典的成就之一。</p>
+
+<p>本章和上两章一起，把"解析函数的几何"翻译成了"实际可解的物理问题"。我们走的路是：第 16 章告诉你解析函数的几何长什么样（共形）；第 17 章给你最基本的工具（Möbius 变换）；本章把工具用在物理问题（Dirichlet 问题、流体）上，看到它的真正威力。下一章我们会从"几何"回到"分析"，转向解析延拓和单值化的话题——那是另一段旅程。</p>

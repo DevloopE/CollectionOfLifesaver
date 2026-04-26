@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 Gram-Schmidt 与 QR 分解 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 最小二乘</a><a href="ch22.html">下一章 · 第 22 章 对称矩阵与谱定理 →</a></nav>
+<h1 id="ch21">第 21 章 Gram-Schmidt 与 QR 分解</h1>
+
+<p>上一章我们见识了正交基的"奇迹"：投影系数变成简单的内积，最小二乘的法方程退化为对角，整个计算过程从一团乱麻变成几次相乘相加。这些好处太大，以至于一旦尝过它的甜头，你就再也不会愿意回到一般基的世界去做事。</p>
+
+<p>但麻烦在于：现实中递到你手里的，几乎从来都不是正交基。给你一个矩阵 \(A\)，它的列也许线性无关，也许张成了你想要的子空间，但它们绝不会"恰好"两两正交——这是一种过分的奢求。</p>
+
+<p>那怎么办？把它<strong>变成</strong>正交的。本章要讲的就是这件事：给一组任意的线性无关向量 \(\{\mathbf{v}_1, \ldots, \mathbf{v}_n\}\)，构造一组同张成、同维数的正交基 \(\{\mathbf{u}_1, \ldots, \mathbf{u}_n\}\)，使得</p>
+
+\[
+\mathrm{span}\{\mathbf{v}_1, \ldots, \mathbf{v}_k\} = \mathrm{span}\{\mathbf{u}_1, \ldots, \mathbf{u}_k\}
+\quad \text{对每个 } k = 1, \ldots, n.
+\]
+
+<p>这个构造的名字叫 <strong>Gram-Schmidt 过程</strong>。它的中心想法只有一个——"减去已经处理过的部分的投影"——可一旦把它的代数账算清楚，便顺势得到一个被工程师和数值分析家共同奉为基础工具的矩阵分解：<strong>QR 分解</strong>。这就是本章要走过的路。</p>
+
+<p>本章我们会讲：</p>
+
+<ul>
+<li>Gram-Schmidt 过程的核心想法：依次减去已正交化部分的投影；</li>
+<li>从正交化到标准正交化（单位化）；</li>
+<li>一个完整的 \(\mathbb{R}^3\) 例题，每一步都摆在台面上；</li>
+<li>多项式空间下的 Gram-Schmidt——勒让德多项式从天而降；</li>
+<li>QR 分解 \(A = QR\)：把 Gram-Schmidt 的"代数账"打包成矩阵；</li>
+<li>用 QR 求最小二乘——比直接解法方程更稳定；</li>
+<li>关于数值稳定性的一则告诫，以及现实中真正用什么。</li>
+</ul>
+
+<h2 id="sec21-1">21.1 动机：从有正交基到没有正交基</h2>
+
+<p>先把上一章的"奇迹"摆出来再看一眼。如果 \(\{\mathbf{q}_1, \ldots, \mathbf{q}_n\}\) 是某子空间 \(W\) 的标准正交基，那么任意 \(\mathbf{w} \in W\) 都可以写成</p>
+
+\[
+\mathbf{w} = (\mathbf{q}_1 \cdot \mathbf{w})\mathbf{q}_1 + \cdots + (\mathbf{q}_n \cdot \mathbf{w})\mathbf{q}_n.
+\]
+
+<p>系数就是内积。投影到 \(W\) 也只是把这一公式照抄一遍。最小二乘的法方程 \(A^TA = I\)，退化为"什么都不用解"。这一切美好都建立在一个前提上——你有正交基。</p>
+
+<p>但生活总是反过来的。你得到的是一组线性无关向量 \(\{\mathbf{v}_1, \mathbf{v}_2, \mathbf{v}_3\}\)，它们看起来很普通：彼此之间夹角是某个奇怪的度数，长度也不是 \(1\)。直接拿它们作内积、做投影，所有的公式都立刻变难。</p>
+
+<p>你<em>可能会想</em>："那就重新选一组基吧。"——但等等。这组向量并不是凭空出现的；它们也许是数据矩阵的列，承载着具体的信息。我们不能随意丢掉它们换一套，必须在<strong>不改变它们所张成空间</strong>的前提下，把它们"扶正"。换句话说，我们要找的新基 \(\{\mathbf{u}_1, \mathbf{u}_2, \mathbf{u}_3\}\) 必须满足两件事：</p>
+
+<ol>
+<li>两两正交；</li>
+<li>每一段前缀的张成相同——\(\mathrm{span}\{\mathbf{u}_1\} = \mathrm{span}\{\mathbf{v}_1\}\)，\(\mathrm{span}\{\mathbf{u}_1, \mathbf{u}_2\} = \mathrm{span}\{\mathbf{v}_1, \mathbf{v}_2\}\)，依此类推。</li>
+</ol>
+
+<p>第二条要求是关键。它意味着我们处理向量的顺序有"方向性"——\(\mathbf{u}_1\) 只能依赖 \(\mathbf{v}_1\)，\(\mathbf{u}_2\) 只能依赖 \(\mathbf{v}_1, \mathbf{v}_2\)，等等。这种"逐步累积"的结构，待会儿会变成 \(R\) 的上三角性质，请你记在心里。</p>
+
+<h2 id="sec21-2">21.2 Gram-Schmidt 过程的核心想法</h2>
+
+<p>怎么开始？最简单的做法是<strong>把第一步抄下来</strong>。</p>
+
+\[
+\mathbf{u}_1 = \mathbf{v}_1.
+\]
+
+<p>第一步免费。一只向量谈不上"正交"，所以 \(\mathbf{v}_1\) 直接拿过来就是。</p>
+
+<p>第二步开始，问题就来了。我们要从 \(\mathbf{v}_2\) 出发造出 \(\mathbf{u}_2\)，要求 \(\mathbf{u}_2 \perp \mathbf{u}_1\)，并且 \(\{\mathbf{u}_1, \mathbf{u}_2\}\) 张成的空间还是原来那个二维平面。</p>
+
+<p>怎么办？把 \(\mathbf{v}_2\) 沿着 \(\mathbf{u}_1\) 方向的"分量"去掉就行。这正是上一章的投影公式做的事——投影 \(\mathbf{v}_2\) 到 \(\mathbf{u}_1\) 上：</p>
+
+\[
+\mathrm{proj}_{\mathbf{u}_1} \mathbf{v}_2 = \frac{\mathbf{u}_1 \cdot \mathbf{v}_2}{\mathbf{u}_1 \cdot \mathbf{u}_1} \mathbf{u}_1.
+\]
+
+<p>从 \(\mathbf{v}_2\) 中扣掉它，剩下的部分必然垂直于 \(\mathbf{u}_1\)（这是上一章的核心几何事实）：</p>
+
+\[
+\boxed{\;\mathbf{u}_2 = \mathbf{v}_2 - \frac{\mathbf{u}_1 \cdot \mathbf{v}_2}{\mathbf{u}_1 \cdot \mathbf{u}_1} \mathbf{u}_1.\;}
+\]
+
+<p>注意它是从 \(\mathbf{v}_2\) 减去一个 \(\mathbf{u}_1\) 的倍数，所以仍然在 \(\mathrm{span}\{\mathbf{v}_1, \mathbf{v}_2\}\) 里——张成不变。同时，由于 \(\mathbf{v}_1, \mathbf{v}_2\) 线性无关，\(\mathbf{u}_2\) 不会变成零向量。这两件事合起来意味着：第二步既给了我们一个新的方向，又让它正好垂直于第一步。</p>
+
+<p>第三步开始，思路完全相同——只是要"扣掉"<em>两</em>个方向上的投影：</p>
+
+\[
+\mathbf{u}_3 = \mathbf{v}_3 - \mathrm{proj}_{\mathbf{u}_1} \mathbf{v}_3 - \mathrm{proj}_{\mathbf{u}_2} \mathbf{v}_3.
+\]
+
+<p>把两个投影写开来：</p>
+
+\[
+\mathbf{u}_3 = \mathbf{v}_3 - \frac{\mathbf{u}_1 \cdot \mathbf{v}_3}{\mathbf{u}_1 \cdot \mathbf{u}_1} \mathbf{u}_1 - \frac{\mathbf{u}_2 \cdot \mathbf{v}_3}{\mathbf{u}_2 \cdot \mathbf{u}_2} \mathbf{u}_2.
+\]
+
+<p>剩下来的 \(\mathbf{u}_3\) 同时垂直于 \(\mathbf{u}_1\) 和 \(\mathbf{u}_2\)。这一点你可以直接验证：用 \(\mathbf{u}_1\) 点乘上式两边，由于 \(\mathbf{u}_1 \cdot \mathbf{u}_2 = 0\)，第二项被点掉，剩下 \(\mathbf{u}_1 \cdot \mathbf{v}_3 - \frac{\mathbf{u}_1 \cdot \mathbf{v}_3}{\mathbf{u}_1 \cdot \mathbf{u}_1}(\mathbf{u}_1 \cdot \mathbf{u}_1) = 0\)。完美。</p>
+
+<p>到这里你已经看出递推的样子了。一般的第 \(k\) 步公式是：</p>
+
+\[
+\boxed{\;\mathbf{u}_k = \mathbf{v}_k - \sum_{j=1}^{k-1} \frac{\mathbf{u}_j \cdot \mathbf{v}_k}{\mathbf{u}_j \cdot \mathbf{u}_j} \mathbf{u}_j.\;}
+\]
+
+<p>用一句话翻译这条公式：<em>从 \(\mathbf{v}_k\) 中减去它在已经造好的所有 \(\mathbf{u}_j\) 方向上的投影。</em></p>
+
+<p>这就是 Gram-Schmidt 过程的全部。就这么简单——一个递归的"清账"动作。</p>
+
+<p>为什么它一定行得通？因为：</p>
+
+<ul>
+<li><strong>正交性</strong>：每一步从 \(\mathbf{v}_k\) 中扣掉的，正好是 \(\mathbf{v}_k\) 在 \(\mathrm{span}\{\mathbf{u}_1, \ldots, \mathbf{u}_{k-1}\}\) 中的投影；剩下的当然垂直于这个子空间。</li>
+<li><strong>张成不变</strong>：\(\mathbf{u}_k\) 是 \(\mathbf{v}_k\) 与若干 \(\mathbf{u}_j\) 的线性组合，因此 \(\mathbf{u}_k \in \mathrm{span}\{\mathbf{v}_1, \ldots, \mathbf{v}_k\}\)；反过来 \(\mathbf{v}_k\) 也可以由 \(\mathbf{u}_j\) 们表示出来。所以两组的前缀张成始终相等。</li>
+<li><strong>不会塌成零</strong>：如果 \(\mathbf{u}_k = \mathbf{0}\)，那意味着 \(\mathbf{v}_k\) 已经躺在 \(\mathrm{span}\{\mathbf{v}_1, \ldots, \mathbf{v}_{k-1}\}\) 之中——这与"线性无关"矛盾。</li>
+</ul>
+
+<p>三件事都对，过程就完美自洽。</p>
+
+<h2 id="sec21-3">21.3 单位化：从正交基到标准正交基</h2>
+
+<p>到目前为止我们造出的 \(\{\mathbf{u}_1, \ldots, \mathbf{u}_n\}\) 是一组<strong>正交</strong>基，但不是<strong>标准</strong>正交基——长度不一定是 \(1\)。要把它们变成标准正交，只需各自除以自己的模长：</p>
+
+\[
+\mathbf{q}_k = \frac{\mathbf{u}_k}{\|\mathbf{u}_k\|}.
+\]
+
+<p>这一步叫<strong>单位化</strong>（normalization），毫不神秘。完成之后，\(\{\mathbf{q}_1, \ldots, \mathbf{q}_n\}\) 就是我们朝思暮想的标准正交基。它满足</p>
+
+\[
+\mathbf{q}_i \cdot \mathbf{q}_j = \delta_{ij} = \begin{cases} 1, & i = j, \\ 0, & i \ne j, \end{cases}
+\]
+
+<p>其中 \(\delta_{ij}\) 是<strong>克罗内克 \(\delta\) 记号</strong>。</p>
+
+<p>实践中，单位化往往和 Gram-Schmidt 的每一步交错进行——每造出一个 \(\mathbf{u}_k\) 就立刻把它单位化成 \(\mathbf{q}_k\)，然后下一步用 \(\mathbf{q}_k\) 而不是 \(\mathbf{u}_k\) 去做投影。这样投影公式还能简化一些（分母变成 \(1\)）。我们等下做例题时会看到这两种风格的对比。</p>
+
+<h2 id="sec21-4">21.4 一个完整的 ℝ³ 例题</h2>
+
+<p>纸上谈兵到这里就够了。让我们拿一组真正的向量来跑一遍，把每一步都摆在台面上。</p>
+
+<p>取</p>
+
+\[
+\mathbf{v}_1 = \begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix}, \quad
+\mathbf{v}_2 = \begin{pmatrix} 1 \\ 0 \\ 1 \end{pmatrix}, \quad
+\mathbf{v}_3 = \begin{pmatrix} 0 \\ 1 \\ 1 \end{pmatrix}.
+\]
+
+<p>这三个向量线性无关（行列式为 \(-2 \ne 0\)），所以 Gram-Schmidt 一定能跑下去。</p>
+
+<p><strong>第一步</strong>：</p>
+
+\[
+\mathbf{u}_1 = \mathbf{v}_1 = \begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix}.
+\]
+
+<p>顺手算一下后面要用的几个量：\(\mathbf{u}_1 \cdot \mathbf{u}_1 = 1 + 1 + 0 = 2\)。</p>
+
+<p><strong>第二步</strong>：先算 \(\mathbf{u}_1 \cdot \mathbf{v}_2 = 1 \cdot 1 + 1 \cdot 0 + 0 \cdot 1 = 1\)。所以投影系数是 \(\frac{1}{2}\)，</p>
+
+\[
+\mathrm{proj}_{\mathbf{u}_1} \mathbf{v}_2 = \frac{1}{2} \begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix} = \begin{pmatrix} 1/2 \\ 1/2 \\ 0 \end{pmatrix}.
+\]
+
+<p>从 \(\mathbf{v}_2\) 减去：</p>
+
+\[
+\mathbf{u}_2 = \begin{pmatrix} 1 \\ 0 \\ 1 \end{pmatrix} - \begin{pmatrix} 1/2 \\ 1/2 \\ 0 \end{pmatrix} = \begin{pmatrix} 1/2 \\ -1/2 \\ 1 \end{pmatrix}.
+\]
+
+<p>检验一下正交性：\(\mathbf{u}_1 \cdot \mathbf{u}_2 = 1 \cdot \frac{1}{2} + 1 \cdot (-\frac{1}{2}) + 0 \cdot 1 = 0\)。漂亮。</p>
+
+<p>顺便算 \(\mathbf{u}_2 \cdot \mathbf{u}_2 = \frac{1}{4} + \frac{1}{4} + 1 = \frac{3}{2}\)。</p>
+
+<p><strong>第三步</strong>：现在要从 \(\mathbf{v}_3\) 中扣掉它在 \(\mathbf{u}_1, \mathbf{u}_2\) 上的两份投影。</p>
+
+<p>先算两个内积：</p>
+
+\[
+\mathbf{u}_1 \cdot \mathbf{v}_3 = 1 \cdot 0 + 1 \cdot 1 + 0 \cdot 1 = 1,
+\]
+
+\[
+\mathbf{u}_2 \cdot \mathbf{v}_3 = \tfrac{1}{2} \cdot 0 + (-\tfrac{1}{2}) \cdot 1 + 1 \cdot 1 = \tfrac{1}{2}.
+\]
+
+<p>两个投影系数分别是 \(\frac{1}{2}\) 和 \(\frac{1/2}{3/2} = \frac{1}{3}\)。</p>
+
+\[
+\mathrm{proj}_{\mathbf{u}_1} \mathbf{v}_3 = \tfrac{1}{2} \begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix} = \begin{pmatrix} 1/2 \\ 1/2 \\ 0 \end{pmatrix},
+\]
+
+\[
+\mathrm{proj}_{\mathbf{u}_2} \mathbf{v}_3 = \tfrac{1}{3} \begin{pmatrix} 1/2 \\ -1/2 \\ 1 \end{pmatrix} = \begin{pmatrix} 1/6 \\ -1/6 \\ 1/3 \end{pmatrix}.
+\]
+
+<p>把两份都从 \(\mathbf{v}_3\) 减去：</p>
+
+\[
+\mathbf{u}_3 = \begin{pmatrix} 0 \\ 1 \\ 1 \end{pmatrix} - \begin{pmatrix} 1/2 \\ 1/2 \\ 0 \end{pmatrix} - \begin{pmatrix} 1/6 \\ -1/6 \\ 1/3 \end{pmatrix} = \begin{pmatrix} -2/3 \\ 2/3 \\ 2/3 \end{pmatrix}.
+\]
+
+<p>验算正交性：\(\mathbf{u}_1 \cdot \mathbf{u}_3 = -\frac{2}{3} + \frac{2}{3} + 0 = 0\)；\(\mathbf{u}_2 \cdot \mathbf{u}_3 = -\frac{1}{3} - \frac{1}{3} + \frac{2}{3} = 0\)。两道关都过了。</p>
+
+<p>到这里我们已经有一组正交基：</p>
+
+\[
+\mathbf{u}_1 = \begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix}, \quad
+\mathbf{u}_2 = \begin{pmatrix} 1/2 \\ -1/2 \\ 1 \end{pmatrix}, \quad
+\mathbf{u}_3 = \begin{pmatrix} -2/3 \\ 2/3 \\ 2/3 \end{pmatrix}.
+\]
+
+<p><strong>单位化</strong>：</p>
+
+\[
+\|\mathbf{u}_1\| = \sqrt{2}, \quad \|\mathbf{u}_2\| = \sqrt{3/2} = \frac{\sqrt{6}}{2}, \quad \|\mathbf{u}_3\| = \sqrt{4/9 + 4/9 + 4/9} = \frac{2\sqrt{3}}{3}.
+\]
+
+<p>除下来：</p>
+
+\[
+\mathbf{q}_1 = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix}, \quad
+\mathbf{q}_2 = \frac{1}{\sqrt{6}}\begin{pmatrix} 1 \\ -1 \\ 2 \end{pmatrix}, \quad
+\mathbf{q}_3 = \frac{1}{\sqrt{3}}\begin{pmatrix} -1 \\ 1 \\ 1 \end{pmatrix}.
+\]
+
+<p>（中间几个分数我把分子分母化掉了，请你自己核对一遍——这是 Gram-Schmidt 在练习题上最容易栽跟头的地方。）</p>
+
+<p>这样我们就把一个普通的三元组扶成了 \(\mathbb{R}^3\) 里漂亮的标准正交基。</p>
+
+<p><em>等等。</em>这三个 \(\mathbf{q}_k\) 张成的空间是什么？是整个 \(\mathbb{R}^3\)，因为原来的 \(\mathbf{v}_k\) 张成的就是整个 \(\mathbb{R}^3\)。所以这三个 \(\mathbf{q}_k\) 是 \(\mathbb{R}^3\) 的一组标准正交基。如果原来的 \(\mathbf{v}_k\) 只张成一个二维子空间（比如 \(\mathbf{v}_1, \mathbf{v}_2\)），Gram-Schmidt 就只跑两步，得到那个子空间的标准正交基。<strong>过程对维数完全无所谓</strong>——它只关心你给了它几个线性无关的向量。</p>
+
+<h2 id="sec21-5">21.5 多项式空间的 Gram-Schmidt：勒让德多项式</h2>
+
+<p>到此你可能以为 Gram-Schmidt 只是一种处理"列向量"的招数。完全不是。它依赖的只有<strong>内积</strong>这一个结构，而内积可以定义在任何向量空间上——包括函数空间。</p>
+
+<p>取所有"实系数次数 \(\le 2\) 的多项式"组成的向量空间，加上下面这个内积：</p>
+
+\[
+\langle f, g \rangle = \int_{-1}^{1} f(x) g(x) \, dx.
+\]
+
+<p>这是一个对称、双线性、正定的函数对——所有内积该有的性质它都有，所以 Gram-Schmidt 直接套上去就行。</p>
+
+<p>给我们的"基"是最自然的那一组：\(\mathbf{v}_1 = 1\)，\(\mathbf{v}_2 = x\)，\(\mathbf{v}_3 = x^2\)。它们线性无关——这是因为一个非零的次数 \(\le 2\) 的多项式至多有两个根，所以不可能恒等于零。</p>
+
+<p>开始跑过程。</p>
+
+<p><strong>第一步</strong>：\(\mathbf{u}_1 = 1\)。算 \(\langle 1, 1 \rangle = \int_{-1}^1 1 \, dx = 2\)。</p>
+
+<p><strong>第二步</strong>：算 \(\langle 1, x \rangle = \int_{-1}^1 x \, dx = 0\)。</p>
+
+<p>奥，投影系数是零。所以</p>
+
+\[
+\mathbf{u}_2 = x - 0 \cdot 1 = x.
+\]
+
+<p>这是巧合吗？不是。\(x\) 是奇函数，在 \([-1, 1]\) 上的积分一定是零。这告诉我们：<em>奇偶性自动正交</em>。这件事在物理和工程的傅里叶分析中会反复出现。</p>
+
+<p>顺便算 \(\langle x, x \rangle = \int_{-1}^1 x^2 \, dx = \frac{2}{3}\)。</p>
+
+<p><strong>第三步</strong>：算两个内积。</p>
+
+\[
+\langle 1, x^2 \rangle = \int_{-1}^1 x^2 \, dx = \frac{2}{3},
+\]
+
+\[
+\langle x, x^2 \rangle = \int_{-1}^1 x^3 \, dx = 0.
+\]
+
+<p>第二个又是因为奇偶性自动归零。所以</p>
+
+\[
+\mathbf{u}_3 = x^2 - \frac{2/3}{2} \cdot 1 - 0 \cdot x = x^2 - \frac{1}{3}.
+\]
+
+<p>检验：\(\langle 1, x^2 - \frac{1}{3}\rangle = \frac{2}{3} - \frac{1}{3} \cdot 2 = 0\)。\(\langle x, x^2 - \frac{1}{3}\rangle\) 是奇函数积分，自动为零。</p>
+
+<p>所以我们得到一组正交多项式：</p>
+
+\[
+\mathbf{u}_1 = 1, \qquad \mathbf{u}_2 = x, \qquad \mathbf{u}_3 = x^2 - \frac{1}{3}.
+\]
+
+<p>这些就是大名鼎鼎的<strong>勒让德多项式</strong>（的前三个，未做归一化）！它们在物理中描写球谐函数、在数值积分中是高斯求积的根、在量子力学的氢原子角动量本征态中再次现身——但它们的来源仅仅是：把 \(\{1, x, x^2\}\) 用上面这个内积做 Gram-Schmidt。</p>
+
+<p>这就是抽象的力量。一个看似只服务于几何的算法，在函数空间上自动产生了一族重要的特殊函数。请你<em>停下来想一想</em>——这件事说明 Gram-Schmidt 不是一种"工具"，而是一种"原理"：它在哪里有内积，就在哪里发挥作用。</p>
+
+<h2 id="sec21-6">21.6 QR 分解：把 Gram-Schmidt 的代数账打包</h2>
+
+<p>现在我们换一种眼光看 Gram-Schmidt 过程。每一步我们都把 \(\mathbf{v}_k\) 表达成了若干个 \(\mathbf{u}_j\)（或 \(\mathbf{q}_j\)）的线性组合。让我们把这件事写成矩阵形式——你会看到一个全新的对象浮现出来。</p>
+
+<p>从 21.4 的例子开始。我们做完 Gram-Schmidt 后得到了 \(\{\mathbf{q}_1, \mathbf{q}_2, \mathbf{q}_3\}\)。反过来问：\(\mathbf{v}_k\) 用 \(\mathbf{q}_j\) 怎么表达？</p>
+
+<p>因为 \(\{\mathbf{q}_1, \ldots, \mathbf{q}_k\}\) 张成与 \(\{\mathbf{v}_1, \ldots, \mathbf{v}_k\}\) 同样的空间，所以 \(\mathbf{v}_k\) 一定可以写成</p>
+
+\[
+\mathbf{v}_k = r_{1k}\mathbf{q}_1 + r_{2k}\mathbf{q}_2 + \cdots + r_{kk}\mathbf{q}_k,
+\]
+
+<p>注意右边求和只到 \(k\)——\(\mathbf{v}_k\) 不可能用到 \(\mathbf{q}_{k+1}\) 之后的方向，因为它就在前 \(k\) 个 \(\mathbf{q}_j\) 张成的空间里。</p>
+
+<p>把这一关系写成矩阵：把所有 \(\mathbf{v}_k\) 当作矩阵 \(A\) 的列，\(\mathbf{q}_j\) 当作矩阵 \(Q\) 的列，系数 \(r_{jk}\) 排成矩阵 \(R\)，则</p>
+
+\[
+\boxed{\;A = QR.\;}
+\]
+
+<p>此即 <strong>QR 分解</strong>。</p>
+
+<p>来看看 \(R\) 长什么样。第 \(k\) 列是 \(\mathbf{v}_k\) 的展开系数 \(r_{1k}, r_{2k}, \ldots, r_{kk}, 0, 0, \ldots, 0\)。也就是说，从第 \(k+1\) 行开始全是零。这正是<strong>上三角矩阵</strong>的定义。</p>
+
+\[
+R = \begin{pmatrix} r_{11} & r_{12} & r_{13} & \cdots & r_{1n} \\ 0 & r_{22} & r_{23} & \cdots & r_{2n} \\ 0 & 0 & r_{33} & \cdots & r_{3n} \\ \vdots & & & \ddots & \vdots \\ 0 & 0 & 0 & \cdots & r_{nn} \end{pmatrix}.
+\]
+
+<p>而 \(Q\) 的列是标准正交向量，所以 \(Q^T Q = I\)。如果 \(A\) 是方阵，\(Q\) 也是方阵，那 \(Q\) 还是<strong>正交矩阵</strong>，满足 \(Q^TQ = QQ^T = I\)。如果 \(A\) 是 \(m \times n\) 且 \(m > n\)（"高瘦"矩阵），那 \(Q\) 是 \(m \times n\)，\(R\) 是 \(n \times n\)，此时只有 \(Q^TQ = I\) 成立——这通常就够用了，叫做"约简 QR"或"瘦 QR"。</p>
+
+<p>所以一句话总结：</p>
+
+<blockquote>
+<p><strong>任何列线性无关的矩阵都可以分解为 \(A = QR\)，其中 \(Q\) 的列两两正交单位长，\(R\) 是上三角且对角元为正。</strong></p>
+</blockquote>
+
+<p>"对角元为正"这个细节是为了让分解唯一。如果不要求，我们可以把某个 \(\mathbf{q}_j\) 取反号，然后在 \(R\) 的对应行上也取反号，结果一样。约定 \(r_{kk} > 0\) 把这种自由度去掉。</p>
+
+<h2 id="sec21-7">21.7 R 的元素的显式表达式</h2>
+
+<p>QR 分解告诉我们 \(R\) 存在，但怎么<strong>算</strong>它？答案出奇地简洁。</p>
+
+<p>用 \(\mathbf{q}_j\) 点乘等式 \(\mathbf{v}_k = \sum_{i \le k} r_{ik}\mathbf{q}_i\) 两边。由于 \(\mathbf{q}_i \cdot \mathbf{q}_j = \delta_{ij}\)，右边只剩第 \(j\) 项：</p>
+
+\[
+\mathbf{q}_j \cdot \mathbf{v}_k = r_{jk}.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\;r_{jk} = \mathbf{q}_j \cdot \mathbf{v}_k = \mathbf{q}_j^T \mathbf{v}_k\;} \quad (j \le k).
+\]
+
+<p>对于 \(j > k\)，\(r_{jk} = 0\)（上三角性质）。</p>
+
+<p>把这个对所有 \(j, k\) 一起写出来，就是 \(R = Q^T A\)。等等——这不是循环论证吗？我们要算 \(R\)，结果说 \(R = Q^T A\)，可 \(Q\) 又依赖于 Gram-Schmidt 过程……</p>
+
+<p>不矛盾。Gram-Schmidt 是<strong>算 \(Q\)</strong> 的过程；一旦 \(Q\) 算出来了，\(R = Q^T A\) 是一行公式就把 \(R\) 求完。事实上，在做 Gram-Schmidt 的<em>过程中</em> \(R\) 的元素就一个一个被算出来了——\(r_{jj} = \|\mathbf{u}_j\|\)（单位化时除掉的那个数），\(r_{jk}\)（对 \(j < k\)）是过程中减去的那些投影系数。换言之：</p>
+
+<blockquote>
+<p>Gram-Schmidt 走完一遍，\(Q\) 和 \(R\) 同时出现，不需要额外的工作。</p>
+</blockquote>
+
+<p>让我们用 21.4 的例子把 \(R\) 写出来。回忆我们算过：</p>
+
+<ul>
+<li>\(r_{11} = \|\mathbf{u}_1\| = \sqrt{2}\)；</li>
+<li>\(r_{12} = \mathbf{q}_1 \cdot \mathbf{v}_2 = \frac{1}{\sqrt{2}}(1 + 0 + 0) = \frac{1}{\sqrt{2}}\)；</li>
+<li>\(r_{22} = \|\mathbf{u}_2\| = \sqrt{3/2} = \frac{\sqrt{6}}{2}\)；</li>
+<li>\(r_{13} = \mathbf{q}_1 \cdot \mathbf{v}_3 = \frac{1}{\sqrt{2}}(0 + 1 + 0) = \frac{1}{\sqrt{2}}\)；</li>
+<li>\(r_{23} = \mathbf{q}_2 \cdot \mathbf{v}_3 = \frac{1}{\sqrt{6}}(0 - 1 + 2) = \frac{1}{\sqrt{6}}\)；</li>
+<li>\(r_{33} = \|\mathbf{u}_3\| = \frac{2\sqrt{3}}{3} = \frac{2}{\sqrt{3}}\)。</li>
+</ul>
+
+<p>所以</p>
+
+\[
+R = \begin{pmatrix} \sqrt{2} & 1/\sqrt{2} & 1/\sqrt{2} \\ 0 & \sqrt{6}/2 & 1/\sqrt{6} \\ 0 & 0 & 2/\sqrt{3} \end{pmatrix},
+\]
+
+<p>且 \(A = QR\) 用方才的 \(Q\)（列为 \(\mathbf{q}_1, \mathbf{q}_2, \mathbf{q}_3\)）成立。这个分解你可以亲手相乘验证一遍——很值得做一次，因为亲手验证的过程会让你明白：QR 分解里所有的"魔法"，就只是 Gram-Schmidt 的账目重排。</p>
+
+<h2 id="sec21-8">21.8 用 QR 求最小二乘</h2>
+
+<p>QR 分解最大的实用价值之一，是它把上一章的<strong>法方程</strong>大大简化。</p>
+
+<p>回忆一下：要解最小二乘问题 \(\min \|A\hat{\mathbf{x}} - \mathbf{b}\|\)，正常的做法是解</p>
+
+\[
+A^T A \hat{\mathbf{x}} = A^T \mathbf{b}.
+\]
+
+<p>这是一个 \(n \times n\) 线性系统，矩阵 \(A^TA\) 是对称正定的，理论上挺好。但实际计算时它有一个隐患——<strong>条件数加倍</strong>。粗略地说，\(A^TA\) 的"病态程度"是 \(A\) 的"病态程度"的平方，所以即便 \(A\) 本身只是稍微难算，\(A^TA\) 就变得显著难算。在数值上这是一记重击。</p>
+
+<p>QR 来救场。代入 \(A = QR\)：</p>
+
+\[
+A^T A = R^T Q^T Q R = R^T R,
+\]
+
+<p>因为 \(Q^TQ = I\)。同时 \(A^T \mathbf{b} = R^T Q^T \mathbf{b}\)。法方程变成</p>
+
+\[
+R^T R \hat{\mathbf{x}} = R^T Q^T \mathbf{b}.
+\]
+
+<p>由于 \(R\) 列满秩（对角元都不为零），\(R^T\) 可消去，得到</p>
+
+\[
+\boxed{\;R \hat{\mathbf{x}} = Q^T \mathbf{b}.\;}
+\]
+
+<p>注意右边 \(Q^T\mathbf{b}\) 只是一个矩阵向量乘法（容易），而左边 \(R\) 是上三角矩阵——只需<strong>回代</strong>就能把 \(\hat{\mathbf{x}}\) 解出来，根本不用做矩阵求逆，也不用解一般的线性方程组。</p>
+
+<p>所以基于 QR 的最小二乘流程是：</p>
+
+<ol>
+<li>对 \(A\) 做 QR 分解：\(A = QR\)。</li>
+<li>计算 \(\mathbf{c} = Q^T \mathbf{b}\)。</li>
+<li>解 \(R \hat{\mathbf{x}} = \mathbf{c}\)（回代，几乎免费）。</li>
+</ol>
+
+<p>这套流程的数值稳定性比直接形成 \(A^TA\) 解法方程好得多——这是为什么科学计算里的最小二乘几乎都走 QR 路线（更高级的还有 SVD，等到第 26 章我们再谈）。</p>
+
+<p><strong>例题</strong>。回到一个简单的最小二乘。给数据点 \((1, 2), (2, 2), (3, 4)\)，要拟合直线 \(y = a + bx\)。设</p>
+
+\[
+A = \begin{pmatrix} 1 & 1 \\ 1 & 2 \\ 1 & 3 \end{pmatrix}, \quad \mathbf{b} = \begin{pmatrix} 2 \\ 2 \\ 4 \end{pmatrix}.
+\]
+
+<p>对 \(A\) 做 Gram-Schmidt。第一列 \(\mathbf{v}_1 = (1, 1, 1)^T\)，\(\mathbf{u}_1 = \mathbf{v}_1\)，\(\|\mathbf{u}_1\| = \sqrt{3}\)，所以</p>
+
+\[
+\mathbf{q}_1 = \frac{1}{\sqrt{3}}\begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix}.
+\]
+
+<p>第二列 \(\mathbf{v}_2 = (1, 2, 3)^T\)。投影系数 \(\mathbf{q}_1 \cdot \mathbf{v}_2 = \frac{6}{\sqrt{3}} = 2\sqrt{3}\)（这就是 \(r_{12}\)）。</p>
+
+\[
+\mathbf{u}_2 = \mathbf{v}_2 - 2\sqrt{3} \cdot \mathbf{q}_1 = \begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix} - 2\begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix} = \begin{pmatrix} -1 \\ 0 \\ 1 \end{pmatrix}.
+\]
+
+<p>\(\|\mathbf{u}_2\| = \sqrt{2}\)（即 \(r_{22}\)），</p>
+
+\[
+\mathbf{q}_2 = \frac{1}{\sqrt{2}}\begin{pmatrix} -1 \\ 0 \\ 1 \end{pmatrix}.
+\]
+
+<p>所以</p>
+
+\[
+Q = \begin{pmatrix} 1/\sqrt{3} & -1/\sqrt{2} \\ 1/\sqrt{3} & 0 \\ 1/\sqrt{3} & 1/\sqrt{2} \end{pmatrix}, \quad
+R = \begin{pmatrix} \sqrt{3} & 2\sqrt{3} \\ 0 & \sqrt{2} \end{pmatrix}.
+\]
+
+<p>计算 \(Q^T \mathbf{b}\)：</p>
+
+\[
+Q^T \mathbf{b} = \begin{pmatrix} (2 + 2 + 4)/\sqrt{3} \\ (-2 + 0 + 4)/\sqrt{2} \end{pmatrix} = \begin{pmatrix} 8/\sqrt{3} \\ 2/\sqrt{2} \end{pmatrix} = \begin{pmatrix} 8/\sqrt{3} \\ \sqrt{2} \end{pmatrix}.
+\]
+
+<p>解 \(R \hat{\mathbf{x}} = Q^T\mathbf{b}\) 用回代。下面的方程是</p>
+
+\[
+\sqrt{2} \, b = \sqrt{2} \implies b = 1,
+\]
+
+<p>上面的方程是</p>
+
+\[
+\sqrt{3} \, a + 2\sqrt{3} \cdot 1 = \frac{8}{\sqrt{3}} \implies a + 2 = \frac{8}{3} \implies a = \frac{2}{3}.
+\]
+
+<p>所以最佳拟合直线是 \(y = \frac{2}{3} + x\)。如果你用 21.0 章的法方程算法直接做，会得到完全相同的答案——但 QR 路线在每一步都更简洁，并且在数值上更稳。</p>
+
+<h2 id="sec21-9">21.9 数值稳定性的告诫</h2>
+
+<p>Gram-Schmidt 在纸面上漂亮无瑕，但在浮点算术下它有一个让人头疼的缺点：<strong>数值不稳定</strong>。</p>
+
+<p>麻烦出在哪？回顾我们的公式 \(\mathbf{u}_k = \mathbf{v}_k - \sum_j (\text{投影})\)。如果 \(\mathbf{v}_k\) 与已经造好的 \(\{\mathbf{u}_j\}\) 张成的子空间几乎共线（即投影几乎"用完"了 \(\mathbf{v}_k\)），那扣完之后剩下的 \(\mathbf{u}_k\) 就是两个差不多大的数的差——经典的数值灾难场景，叫做<strong>灾难性抵消</strong>（catastrophic cancellation）。结果是：理论上 \(\mathbf{u}_k\) 应该垂直于所有 \(\mathbf{u}_j\)，但浮点误差让它只是"差不多"垂直，然后这个误差在后面继续传播。</p>
+
+<p>解药一：<strong>修正 Gram-Schmidt</strong>（Modified Gram-Schmidt, MGS）。它的算法只换了执行顺序——不是一次性减去所有投影，而是边减边更新："先用 \(\mathbf{u}_1\) 把 \(\mathbf{v}_2, \ldots, \mathbf{v}_n\) 都'清理'一次，然后用更新后的 \(\mathbf{u}_2\) 再清理 \(\mathbf{v}_3, \ldots, \mathbf{v}_n\)，依此类推。"在精确算术下两者完全等价，但 MGS 在浮点下显著更稳。它至今仍是教学和中等规模问题的常用算法。</p>
+
+<p>解药二：<strong>Householder 反射</strong>。这是真正"工业级"的 QR 算法，思路全然不同——通过一连串"镜面反射"把 \(A\) 变成上三角，反射矩阵的复合就是 \(Q^T\)。它对最坏情况下的数值误差有最优控制，是 LAPACK、MATLAB、NumPy 等工具底层 QR 实现的基础。本书不展开 Householder 的细节（它的几何挺漂亮，但代码层面比 Gram-Schmidt 复杂），但你应该知道它的存在——以后看到 <code>numpy.linalg.qr</code> 或 <code>scipy.linalg.qr</code>，里面跑的就是 Householder。</p>
+
+<p>实践层面的建议：</p>
+
+<ul>
+<li>纸笔题、教学例题、维数小于 \(\sim 10\) 的手算：经典 Gram-Schmidt 没问题；</li>
+<li>程序里自己写：至少用修正 Gram-Schmidt；</li>
+<li>真实工程：调用现成的 QR 库，让 Householder 替你操心。</li>
+</ul>
+
+<p>总之 QR 这一对象是无可替代的。<strong>怎么算它</strong>是数值分析的活，<strong>它意味着什么</strong>是线性代数的活——而你要在线性代数这门课里掌握的，是后者。</p>
+
+<hr class="section-end">
+
+<p>这一章我们把上一章的"投影"用到了极致：投影几次，正交基出现；投影系数列成矩阵，QR 分解出现；QR 分解打包，最小二乘一行解决。Gram-Schmidt 不是一个孤立技巧——它是"凡是可以谈正交，就值得正交化"这个想法的具体实现，从向量到多项式到无穷维函数空间通通如此。</p>
+
+<p>下一章我们将看到"正交"的另一种深得令人吃惊的出现方式。给你一个对称矩阵——任何对称矩阵——它的特征向量竟然<em>自动</em>张成一组正交基。这事实就是<strong>谱定理</strong>，它是整个线性代数最美的定理。我们去看一看。</p>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 最小二乘</a><a href="ch22.html">下一章 · 第 22 章 对称矩阵与谱定理 →</a></nav>
+
+</main>
+</body>
+</html>

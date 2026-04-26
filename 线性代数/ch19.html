@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 正交投影 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 内积与正交</a><a href="ch20.html">下一章 · 第 20 章 最小二乘 →</a></nav>
+<h1 id="ch19">第 19 章 正交投影</h1>
+
+<p>上一章我们建立了内积、长度、夹角和正交。现在我们把这些工具用起来,做一个非常具体的几何动作:把一个向量<strong>投影</strong>到一个子空间。</p>
+
+<p>"投影"这件事你早就熟悉。太阳从正上方照下来,把一个三维物体的"影子"打在地面上——这就是投影。在数学里,我们关心的是:给一个空间(比如 \(\mathbb{R}^n\))里的一个子空间 \(W\) 和一个向量 \(\mathbf{v}\),怎么找出 \(\mathbf{v}\) 在 \(W\) 中"距离最近"的那个代表?这个最近的代表就叫 \(\mathbf{v}\) 在 \(W\) 上的<strong>正交投影</strong>。</p>
+
+<p>这一章是几何与代数的高潮——它把"近似"和"投影"画上了等号。下一章的最小二乘问题,就是把这一章的几何"翻译"到方程组的语言里。本章会涉及:</p>
+
+<ul>
+  <li>把向量投影到一条直线(一维子空间)上;</li>
+  <li>把向量投影到由若干正交向量张成的子空间——直接累加;</li>
+  <li>把向量投影到一般子空间——用法方程;</li>
+  <li>投影矩阵 \(P\) 及其性质 \(P^2 = P\),\(P^\top = P\);</li>
+  <li>正交补 \(W^\perp\) 的定义与性质;</li>
+  <li>任何向量唯一分解为 \(\mathbf{v} = \mathbf{v}_W + \mathbf{v}_{W^\perp}\);</li>
+  <li>四个基本子空间之间的正交关系。</li>
+</ul>
+
+<h2 id="sec19-1">19.1 一维投影</h2>
+
+<p>从最简单的情形开始。给一个非零向量 \(\mathbf{u}\),它张成一条过原点的直线 \(L = \{c\mathbf{u} : c \in \mathbb{R}\}\)。给另一个向量 \(\mathbf{v}\),我们想问:在直线 \(L\) 上,哪一个点离 \(\mathbf{v}\) 最近?</p>
+
+<p>用脑子里的图像:从 \(\mathbf{v}\) 的头部向 \(L\) 作垂线,垂足就是答案。这条垂足向量我们记作 \(\mathrm{proj}_{\mathbf{u}}\mathbf{v}\)——"\(\mathbf{v}\) 在 \(\mathbf{u}\) 方向上的投影"。</p>
+
+<p>怎么计算它?它一定是 \(\mathbf{u}\) 的某个倍数:\(\mathrm{proj}_{\mathbf{u}}\mathbf{v} = c\mathbf{u}\),问题是 \(c\) 等于多少。</p>
+
+<p>关键的几何条件是:从投影点指向 \(\mathbf{v}\) 的那条"残差"向量必须与 \(\mathbf{u}\) 垂直。也就是说,</p>
+
+\[
+(\mathbf{v} - c\mathbf{u})\perp\mathbf{u} \iff (\mathbf{v} - c\mathbf{u})\cdot\mathbf{u} = 0.
+\]
+
+<p>展开:\(\mathbf{v}\cdot\mathbf{u} - c(\mathbf{u}\cdot\mathbf{u}) = 0\),解出 \(c\):</p>
+
+\[
+c = \frac{\mathbf{v}\cdot\mathbf{u}}{\mathbf{u}\cdot\mathbf{u}} = \frac{\mathbf{v}\cdot\mathbf{u}}{\|\mathbf{u}\|^2}.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\mathrm{proj}_{\mathbf{u}}\mathbf{v} \;=\; \frac{\mathbf{v}\cdot\mathbf{u}}{\mathbf{u}\cdot\mathbf{u}}\,\mathbf{u} \;=\; \frac{\mathbf{v}\cdot\mathbf{u}}{\|\mathbf{u}\|^2}\,\mathbf{u}.}
+\]
+
+<p>如果 \(\mathbf{u}\) 已经是单位向量(\(\|\mathbf{u}\| = 1\)),分母就是 1,公式简化为</p>
+
+\[
+\mathrm{proj}_{\mathbf{u}}\mathbf{v} = (\mathbf{v}\cdot\mathbf{u})\,\mathbf{u}.
+\]
+
+<p>看一道例题。设 \(\mathbf{v} = (2, 3)^\top\),\(\mathbf{u} = (1, 0)^\top\)(也就是 \(x\) 轴方向)。投影是</p>
+
+\[
+\mathrm{proj}_{\mathbf{u}}\mathbf{v} = \frac{(2)(1) + (3)(0)}{1^2 + 0^2}(1, 0)^\top = \frac{2}{1}(1, 0)^\top = (2, 0)^\top.
+\]
+
+<p>这正是把 \((2, 3)\) "压扁"到 \(x\) 轴上得到的点。如你所料。</p>
+
+<p>看一道更不显然的。设 \(\mathbf{v} = (4, 5)^\top\),\(\mathbf{u} = (3, 1)^\top\)。</p>
+
+\[
+\mathbf{v}\cdot\mathbf{u} = 12 + 5 = 17,\qquad \|\mathbf{u}\|^2 = 9 + 1 = 10.
+\]
+
+\[
+\mathrm{proj}_{\mathbf{u}}\mathbf{v} = \frac{17}{10}\begin{pmatrix}3\\1\end{pmatrix} = \begin{pmatrix}51/10\\17/10\end{pmatrix} = (5.1, 1.7)^\top.
+\]
+
+<p>验证一下:残差 \(\mathbf{v} - \mathrm{proj}_{\mathbf{u}}\mathbf{v} = (4 - 5.1, 5 - 1.7)^\top = (-1.1, 3.3)^\top\),它与 \(\mathbf{u}\) 的点积是 \((-1.1)(3) + (3.3)(1) = -3.3 + 3.3 = 0\)。✓ 残差确实垂直于 \(\mathbf{u}\)。</p>
+
+<p>"投影 + 残差"的分解可以重写为</p>
+
+\[
+\mathbf{v} = \underbrace{\mathrm{proj}_{\mathbf{u}}\mathbf{v}}_{\text{沿 }\mathbf{u}\text{ 方向的分量}} + \underbrace{(\mathbf{v} - \mathrm{proj}_{\mathbf{u}}\mathbf{v})}_{\text{垂直于 }\mathbf{u}\text{ 的分量}}.
+\]
+
+<p>这是一种最简单的"正交分解"——把向量沿着一个方向和与它垂直的方向拆开。下一节我们要把这个想法推广到"沿着子空间和它的正交补"。</p>
+
+<h2 id="sec19-2">19.2 投影到由正交基张成的子空间</h2>
+
+<p>现在让我们把目光抬高一层。不是投影到一条直线上,而是投影到一个 \(k\) 维子空间 \(W\) 上。</p>
+
+<p>核心问题:给 \(W\) 的一组基,以及空间中的一个向量 \(\mathbf{v}\),如何求 \(\mathbf{v}\) 在 \(W\) 中"最近的代表"?</p>
+
+<p><strong>幸运情形:这组基恰好是正交基。</strong>记基为 \(\{\mathbf{q}_1, \ldots, \mathbf{q}_k\}\),其中两两正交(单位长度更好,但不强求)。猜测:把每个分量方向上的投影加起来。</p>
+
+\[
+\mathrm{proj}_W \mathbf{v} \stackrel{?}{=} \sum_{i=1}^k \frac{\mathbf{v}\cdot\mathbf{q}_i}{\|\mathbf{q}_i\|^2}\,\mathbf{q}_i.
+\]
+
+<p>这条公式对吗?要验证它,只需检查"残差"是否与 \(W\) 中的每一个向量垂直——也就是与每一个基向量 \(\mathbf{q}_j\) 垂直。</p>
+
+\[
+\Big(\mathbf{v} - \sum_i \frac{\mathbf{v}\cdot\mathbf{q}_i}{\|\mathbf{q}_i\|^2}\mathbf{q}_i\Big)\cdot\mathbf{q}_j = \mathbf{v}\cdot\mathbf{q}_j - \sum_i \frac{\mathbf{v}\cdot\mathbf{q}_i}{\|\mathbf{q}_i\|^2}(\mathbf{q}_i\cdot\mathbf{q}_j).
+\]
+
+<p>由正交性,\(\mathbf{q}_i\cdot\mathbf{q}_j = 0\) 当 \(i \neq j\),所以求和里只剩 \(i = j\) 一项:</p>
+
+\[
+= \mathbf{v}\cdot\mathbf{q}_j - \frac{\mathbf{v}\cdot\mathbf{q}_j}{\|\mathbf{q}_j\|^2}\|\mathbf{q}_j\|^2 = \mathbf{v}\cdot\mathbf{q}_j - \mathbf{v}\cdot\mathbf{q}_j = 0.\,\checkmark
+\]
+
+<p>残差确实与每个 \(\mathbf{q}_j\) 垂直,因此与 \(W\) 中所有向量都垂直(因为 \(W\) 中的每个向量都是 \(\mathbf{q}_j\) 们的线性组合)。所以这个候选答案确实是正交投影。</p>
+
+<p>把它写成方框公式:</p>
+
+\[
+\boxed{\mathrm{proj}_W \mathbf{v} \;=\; \sum_{i=1}^k \frac{\mathbf{v}\cdot\mathbf{q}_i}{\|\mathbf{q}_i\|^2}\,\mathbf{q}_i.}
+\]
+
+<p>当基是<strong>标准</strong>正交时(\(\|\mathbf{q}_i\| = 1\)),公式更整洁:</p>
+
+\[
+\mathrm{proj}_W \mathbf{v} \;=\; (\mathbf{v}\cdot\mathbf{q}_1)\,\mathbf{q}_1 + (\mathbf{v}\cdot\mathbf{q}_2)\,\mathbf{q}_2 + \cdots + (\mathbf{v}\cdot\mathbf{q}_k)\,\mathbf{q}_k.
+\]
+
+<p>对照上一章 18.7 节的"奇迹"——当 \(W\) 整个就是空间时,这一等式给出 \(\mathbf{v}\) 本身。所以,正交投影只是"在标准正交基下展开"这件事的部分版本——只展开 \(W\) 的方向那部分。</p>
+
+<p>看一道例题。在 \(\mathbb{R}^3\) 里,设</p>
+
+\[
+\mathbf{q}_1 = \frac{1}{\sqrt{2}}\begin{pmatrix}1\\1\\0\end{pmatrix},\qquad \mathbf{q}_2 = \frac{1}{\sqrt{6}}\begin{pmatrix}1\\-1\\2\end{pmatrix},
+\]
+
+<p>它们正交且都是单位向量(自己验一下:\(\mathbf{q}_1\cdot\mathbf{q}_2 = (1-1+0)/\sqrt{12} = 0\),\(\|\mathbf{q}_1\| = 1\),\(\|\mathbf{q}_2\| = 1\))。子空间 \(W = \mathrm{span}\{\mathbf{q}_1, \mathbf{q}_2\}\) 是 \(\mathbb{R}^3\) 中的一个二维平面。</p>
+
+<p>取 \(\mathbf{v} = (3, 2, 4)^\top\),求 \(\mathrm{proj}_W \mathbf{v}\)。</p>
+
+<p>第一步算 \(\mathbf{v}\cdot\mathbf{q}_1\):\((3 + 2 + 0)/\sqrt{2} = 5/\sqrt{2}\)。第二步算 \(\mathbf{v}\cdot\mathbf{q}_2\):\((3 - 2 + 8)/\sqrt{6} = 9/\sqrt{6}\)。代公式:</p>
+
+\[
+\mathrm{proj}_W \mathbf{v} = \tfrac{5}{\sqrt{2}}\cdot\tfrac{1}{\sqrt{2}}\begin{pmatrix}1\\1\\0\end{pmatrix} + \tfrac{9}{\sqrt{6}}\cdot\tfrac{1}{\sqrt{6}}\begin{pmatrix}1\\-1\\2\end{pmatrix}
+= \tfrac{5}{2}\begin{pmatrix}1\\1\\0\end{pmatrix} + \tfrac{9}{6}\begin{pmatrix}1\\-1\\2\end{pmatrix}
+\]
+
+\[
+= \begin{pmatrix}5/2\\5/2\\0\end{pmatrix} + \begin{pmatrix}3/2\\-3/2\\3\end{pmatrix} = \begin{pmatrix}4\\1\\3\end{pmatrix}.
+\]
+
+<p>验证残差 \(\mathbf{v} - \mathrm{proj}_W \mathbf{v} = (3,2,4)^\top - (4,1,3)^\top = (-1, 1, 1)^\top\) 是否与 \(\mathbf{q}_1, \mathbf{q}_2\) 都垂直:</p>
+
+\[
+(-1, 1, 1)\cdot(1, 1, 0) = -1 + 1 + 0 = 0,\,\checkmark\qquad (-1, 1, 1)\cdot(1, -1, 2) = -1 - 1 + 2 = 0.\,\checkmark
+\]
+
+<p>很好。注意整个过程<strong>没有解任何方程组</strong>——三次内积、两次数乘、一次相加。这就是有正交基的好处。</p>
+
+<h2 id="sec19-3">19.3 投影到一般子空间:法方程</h2>
+
+<p>但生活通常不会送我们一组现成的正交基。常见情形:你被给出 \(W\) 的一组<strong>普通</strong>基 \(\{\mathbf{a}_1, \ldots, \mathbf{a}_k\}\)(它们线性无关,但<em>不</em>正交),你要把 \(\mathbf{v}\) 投影到 \(W\) 上。</p>
+
+<p>有两条路。第一条:先跑一遍 Gram-Schmidt(下一章的内容)把这组基"打磨"成正交基,然后用上一节的公式。第二条:直接干,用<strong>法方程</strong>(normal equations)。本节走第二条路;Gram-Schmidt 留给第 21 章。</p>
+
+<p>把基拼成矩阵:\(A = [\mathbf{a}_1 | \mathbf{a}_2 | \cdots | \mathbf{a}_k]\),它是 \(n\times k\) 的。子空间 \(W = \mathrm{Col}(A)\)——\(A\) 的列空间。我们要找 \(\mathbf{v}\) 在 \(W\) 上的投影。这个投影是 \(W\) 中的某个向量,所以可写作</p>
+
+\[
+\mathrm{proj}_W \mathbf{v} = A\hat{\mathbf{x}}
+\]
+
+<p>其中 \(\hat{\mathbf{x}}\) 是某个 \(k\times 1\) 的待定系数向量。问题转化为:<strong>求 \(\hat{\mathbf{x}}\)</strong>。</p>
+
+<p>关键的几何条件,和一维情形完全一样:残差 \(\mathbf{v} - A\hat{\mathbf{x}}\) 必须与 \(W\) 中的每个向量垂直,等价地,必须与每个基向量 \(\mathbf{a}_j\) 垂直,也就是</p>
+
+\[
+\mathbf{a}_j^\top (\mathbf{v} - A\hat{\mathbf{x}}) = 0 \quad \text{对所有 } j = 1, \ldots, k.
+\]
+
+<p>把这 \(k\) 条方程并起来——\(\mathbf{a}_j^\top\) 是矩阵 \(A^\top\) 的第 \(j\) 行——就是</p>
+
+\[
+A^\top (\mathbf{v} - A\hat{\mathbf{x}}) = \mathbf{0},
+\]
+
+<p>整理:</p>
+
+\[
+\boxed{A^\top A\,\hat{\mathbf{x}} \;=\; A^\top \mathbf{v}.}
+\]
+
+<p>这就是著名的<strong>法方程</strong>(normal equations)。"法"取自"法向量"——因为这条方程本质上要求残差是 \(W\) 的法向量。它把"求投影"转化为"解一个 \(k\times k\) 的线性方程组"——通常可以直接用高斯消元解出。</p>
+
+<p>注意是 \(k \times k\),不是原来的 \(n \times k\)——法方程把维度从"原空间"降到了"子空间"。当 \(n \gg k\)(后面最小二乘里就会这样),这是一个巨大的简化。</p>
+
+<p>当 \(A\) 的列线性无关时(我们要求 \(\mathbf{a}_j\) 们是 \(W\) 的一组基,所以总是这样),\(A^\top A\) 是<strong>可逆</strong>的(我们 19.4 节会证),所以</p>
+
+\[
+\hat{\mathbf{x}} = (A^\top A)^{-1} A^\top \mathbf{v},
+\]
+
+<p>从而</p>
+
+\[
+\mathrm{proj}_W \mathbf{v} = A\hat{\mathbf{x}} = A(A^\top A)^{-1} A^\top \mathbf{v}.
+\]
+
+<p>右边那一长串矩阵</p>
+
+\[
+\boxed{P \;=\; A(A^\top A)^{-1} A^\top}
+\]
+
+<p>就是<strong>投影矩阵</strong>——一个把任何 \(\mathbf{v}\) 直接打到 \(W\) 上的算子。下一节细谈它。</p>
+
+<p>让我们跑一道例题,把这条公式实际用一遍。在 \(\mathbb{R}^3\) 中,设 \(W\) 由 \(\mathbf{a}_1 = (1, 1, 0)^\top\) 和 \(\mathbf{a}_2 = (1, 0, 1)^\top\) 张成。这两个不正交(它们的内积是 1)。把 \(\mathbf{v} = (4, 1, 3)^\top\) 投影到 \(W\)。</p>
+
+<p>第一步:</p>
+
+\[
+A = \begin{pmatrix}1 & 1\\1 & 0\\0 & 1\end{pmatrix},\qquad A^\top = \begin{pmatrix}1 & 1 & 0\\1 & 0 & 1\end{pmatrix}.
+\]
+
+<p>第二步,算 \(A^\top A\) 和 \(A^\top \mathbf{v}\):</p>
+
+\[
+A^\top A = \begin{pmatrix}1 & 1 & 0\\1 & 0 & 1\end{pmatrix}\begin{pmatrix}1 & 1\\1 & 0\\0 & 1\end{pmatrix} = \begin{pmatrix}2 & 1\\1 & 2\end{pmatrix}.
+\]
+
+\[
+A^\top \mathbf{v} = \begin{pmatrix}1 & 1 & 0\\1 & 0 & 1\end{pmatrix}\begin{pmatrix}4\\1\\3\end{pmatrix} = \begin{pmatrix}5\\7\end{pmatrix}.
+\]
+
+<p>第三步,解 \(\begin{pmatrix}2 & 1\\1 & 2\end{pmatrix}\hat{\mathbf{x}} = \begin{pmatrix}5\\7\end{pmatrix}\)。用 \(2\times 2\) 求逆公式 \((A^\top A)^{-1} = \tfrac{1}{3}\begin{pmatrix}2 & -1\\-1 & 2\end{pmatrix}\):</p>
+
+\[
+\hat{\mathbf{x}} = \tfrac{1}{3}\begin{pmatrix}2 & -1\\-1 & 2\end{pmatrix}\begin{pmatrix}5\\7\end{pmatrix} = \tfrac{1}{3}\begin{pmatrix}10 - 7\\-5 + 14\end{pmatrix} = \tfrac{1}{3}\begin{pmatrix}3\\9\end{pmatrix} = \begin{pmatrix}1\\3\end{pmatrix}.
+\]
+
+<p>第四步,</p>
+
+\[
+\mathrm{proj}_W \mathbf{v} = A\hat{\mathbf{x}} = 1\cdot\begin{pmatrix}1\\1\\0\end{pmatrix} + 3\cdot\begin{pmatrix}1\\0\\1\end{pmatrix} = \begin{pmatrix}4\\1\\3\end{pmatrix}.
+\]
+
+<p>等等——投影<strong>恰好等于 \(\mathbf{v}\)</strong> 本身?这意味着 \(\mathbf{v}\) 已经在 \(W\) 里了!验证:\(\mathbf{v} = (4, 1, 3)^\top = 1\cdot(1,1,0)^\top + 3\cdot(1,0,1)^\top\)?\((1+3, 1+0, 0+3) = (4, 1, 3)\),正是。所以这道题里 \(\mathbf{v}\) 已经在子空间内,投影把它原封不动地"还回去"。这是个不错的合理性检查:<strong>子空间内的向量,投影后不变</strong>。</p>
+
+<p>换一个 \(\mathbf{v}\) 来感受非平凡的投影。\(\mathbf{v}' = (1, 1, 1)^\top\),投影到同一个 \(W\):</p>
+
+\[
+A^\top \mathbf{v}' = \begin{pmatrix}2\\2\end{pmatrix}.
+\]
+
+\[
+\hat{\mathbf{x}} = \tfrac{1}{3}\begin{pmatrix}2 & -1\\-1 & 2\end{pmatrix}\begin{pmatrix}2\\2\end{pmatrix} = \tfrac{1}{3}\begin{pmatrix}2\\2\end{pmatrix} = \begin{pmatrix}2/3\\2/3\end{pmatrix}.
+\]
+
+\[
+\mathrm{proj}_W \mathbf{v}' = \tfrac{2}{3}\begin{pmatrix}1\\1\\0\end{pmatrix} + \tfrac{2}{3}\begin{pmatrix}1\\0\\1\end{pmatrix} = \begin{pmatrix}4/3\\2/3\\2/3\end{pmatrix}.
+\]
+
+<p>残差 \(\mathbf{v}' - \mathrm{proj}_W \mathbf{v}' = (1 - 4/3,\ 1 - 2/3,\ 1 - 2/3)^\top = (-1/3, 1/3, 1/3)^\top\)。验证:</p>
+
+\[
+(-1/3, 1/3, 1/3)\cdot(1, 1, 0) = -1/3 + 1/3 + 0 = 0,\,\checkmark
+\]
+
+\[
+(-1/3, 1/3, 1/3)\cdot(1, 0, 1) = -1/3 + 0 + 1/3 = 0.\,\checkmark
+\]
+
+<p>所有几何条件都满足。法方程那一招稳得很。</p>
+
+<h2 id="sec19-4">19.4 投影矩阵</h2>
+
+<p>把上一节的 \(P = A(A^\top A)^{-1} A^\top\) 这一长串看作一个独立对象——它是把任意 \(\mathbf{v}\) 投影到 \(W = \mathrm{Col}(A)\) 上的算子:</p>
+
+\[
+\mathrm{proj}_W \mathbf{v} = P\mathbf{v}.
+\]
+
+<p>这个 \(P\) 是个 \(n\times n\) 矩阵(因为 \(A\) 是 \(n\times k\),\(A^\top A\) 是 \(k\times k\) 可逆,合起来 \(P = A \cdot (k\times k) \cdot A^\top\) 是 \(n\times n\))。它有几条惊人的性质,值得我们专门挑出来看。</p>
+
+<h3 id="sec19-4-1">19.4.1 性质 1:幂等 \(P^2 = P\)</h3>
+
+<p>"幂等"(idempotent)的意思是<strong>做两次和做一次效果相同</strong>。投一次到 \(W\) 上,得到 \(P\mathbf{v}\)——它已经在 \(W\) 里了。再投一次?它已经在 \(W\) 里,投影不动它。所以 \(P(P\mathbf{v}) = P\mathbf{v}\),也就是 \(P^2 = P\)。</p>
+
+<p>代数验证:</p>
+
+\[
+P^2 = A(A^\top A)^{-1} A^\top \cdot A(A^\top A)^{-1} A^\top = A(A^\top A)^{-1} \underbrace{(A^\top A)(A^\top A)^{-1}}_{= I} A^\top = A(A^\top A)^{-1} A^\top = P.\,\checkmark
+\]
+
+<p>"幂等"是所有投影算子的本质特征。<strong>反过来,任何幂等矩阵都是某种投影</strong>(只是不一定是<em>正交</em>投影)。</p>
+
+<h3 id="sec19-4-2">19.4.2 性质 2:对称 \(P^\top = P\)</h3>
+
+<p>这一条捕捉的是"<strong>正交</strong>"二字。一般的投影矩阵(只满足 \(P^2 = P\))并不要求对称——它代表"沿某条平行于 \(W\) 的方向投到 \(W\) 上"。但如果投影方向是<em>垂直</em>于 \(W\) 的,这个 \(P\) 就<strong>必然对称</strong>。</p>
+
+<p>验证:</p>
+
+\[
+P^\top = (A(A^\top A)^{-1} A^\top)^\top = A\,((A^\top A)^{-1})^\top\,A^\top = A\,((A^\top A)^\top)^{-1}\,A^\top = A(A^\top A)^{-1} A^\top = P.\,\checkmark
+\]
+
+<p>这里用了两个事实:<strong>(\(M^{-1}\))^\top = (\(M^\top\))^{-1}</strong>(逆与转置可以交换次序),以及 \(A^\top A\) 本身就是对称的(\((A^\top A)^\top = A^\top (A^\top)^\top = A^\top A\))。</p>
+
+<p>两条放一起:<strong>正交投影矩阵的特征是 \(P^2 = P\) 与 \(P^\top = P\)。</strong>反过来同样成立——任何同时满足这两条的方阵都是某个子空间的正交投影。这是判定一个给定矩阵是不是"正交投影"的最快办法。</p>
+
+<h3 id="sec19-4-3">19.4.3 性质 3:像与零空间</h3>
+
+<p>\(P\) 这个变换的像(\(\mathrm{Col}(P)\),也叫值域)是什么?显然是 \(W = \mathrm{Col}(A)\):任何 \(P\mathbf{v}\) 都形如 \(A\hat{\mathbf{x}}\),所以它是 \(A\) 的列的线性组合。反过来,\(W\) 中的每个向量 \(\mathbf{w}\) 都满足 \(P\mathbf{w} = \mathbf{w}\)(投影一个已在 \(W\) 中的向量,不动它),所以 \(\mathbf{w} \in \mathrm{Col}(P)\)。结论:\(\mathrm{Col}(P) = W\)。</p>
+
+<p>\(P\) 的零空间呢?\(P\mathbf{v} = \mathbf{0}\) 意味着 \(\mathbf{v}\) 在 \(W\) 上的投影为零——也就是 \(\mathbf{v}\) 完全垂直于 \(W\) 中的每个向量。这种向量构成的集合,叫做 \(W\) 的<strong>正交补</strong>,记作 \(W^\perp\)(下一节正式定义)。所以 \(\mathrm{Null}(P) = W^\perp\)。</p>
+
+<p>把这两点放一起:</p>
+
+\[
+\boxed{\mathrm{Col}(P) = W,\qquad \mathrm{Null}(P) = W^\perp.}
+\]
+
+<p>这是投影矩阵的几何身份证。</p>
+
+<h3 id="sec19-4-4">19.4.4 \(A^\top A\) 的可逆性</h3>
+
+<p>我们一直在用 \((A^\top A)^{-1}\),欠一个证明:在 \(A\) 的列线性无关时,\(A^\top A\) 真的可逆吗?</p>
+
+<p>关键引理:<strong>对任何 \(n\times k\) 矩阵 \(A\),\(\mathrm{Null}(A^\top A) = \mathrm{Null}(A)\)</strong>。</p>
+
+<p>证明用一个聪明的小招数。一个方向 \((\subseteq)\):若 \(A\mathbf{x} = \mathbf{0}\) 则 \(A^\top A\mathbf{x} = A^\top \mathbf{0} = \mathbf{0}\)——平凡。另一方向 \((\supseteq)\):若 \(A^\top A\mathbf{x} = \mathbf{0}\),两边左乘 \(\mathbf{x}^\top\):\(\mathbf{x}^\top A^\top A\mathbf{x} = 0\),也就是 \((A\mathbf{x})^\top (A\mathbf{x}) = 0\),也就是 \(\|A\mathbf{x}\|^2 = 0\),也就是 \(A\mathbf{x} = \mathbf{0}\)。</p>
+
+<p>所以两个零空间相等。当 \(A\) 的列线性无关时,\(\mathrm{Null}(A) = \{\mathbf{0}\}\),所以 \(\mathrm{Null}(A^\top A) = \{\mathbf{0}\}\)——但 \(A^\top A\) 是个方阵 \(k\times k\),零空间为零等价于可逆,完事。</p>
+
+<p>所以法方程在 "\(A\) 列线性无关" 这一条件下总是有<strong>唯一解</strong>。这条假设几乎是免费的——只要你给的"基"真的是基,它就成立。</p>
+
+<h2 id="sec19-5">19.5 正交补</h2>
+
+<p>给一个子空间 \(W \subseteq \mathbb{R}^n\),它的<strong>正交补</strong>(orthogonal complement)是</p>
+
+\[
+\boxed{W^\perp \;=\; \{\mathbf{v} \in \mathbb{R}^n \;:\; \mathbf{v}\cdot\mathbf{w} = 0\ \text{对所有}\ \mathbf{w}\in W\}.}
+\]
+
+<p>读作"W perp"——所有与 \(W\) 中每一个向量都垂直的那些向量。</p>
+
+<p>看几个例子。在 \(\mathbb{R}^3\) 里:</p>
+
+<ul>
+  <li>\(W = \) 一条过原点的直线 \(\Longrightarrow\) \(W^\perp = \) 与之垂直的过原点的平面。</li>
+  <li>\(W = \) 一个过原点的平面 \(\Longrightarrow\) \(W^\perp = \) 与之垂直的过原点的直线。</li>
+  <li>\(W = \{\mathbf{0}\} \Longrightarrow W^\perp = \mathbb{R}^3\)(零向量与一切都垂直)。</li>
+  <li>\(W = \mathbb{R}^3 \Longrightarrow W^\perp = \{\mathbf{0}\}\)(只有零向量与所有向量都垂直)。</li>
+</ul>
+
+<p>请注意一个看上去显然但常常令人意外的事:\(W^\perp\) 总是一个<strong>子空间</strong>,无论 \(W\) 是不是。验证子空间公理:</p>
+
+<ul>
+  <li>\(\mathbf{0} \in W^\perp\)(零向量与一切正交)。</li>
+  <li>若 \(\mathbf{u}, \mathbf{v} \in W^\perp\),则对任意 \(\mathbf{w}\in W\),\((\mathbf{u}+\mathbf{v})\cdot\mathbf{w} = \mathbf{u}\cdot\mathbf{w} + \mathbf{v}\cdot\mathbf{w} = 0 + 0 = 0\)。所以 \(\mathbf{u}+\mathbf{v} \in W^\perp\)。</li>
+  <li>若 \(\mathbf{u} \in W^\perp\) 且 \(c \in \mathbb{R}\),则 \((c\mathbf{u})\cdot\mathbf{w} = c(\mathbf{u}\cdot\mathbf{w}) = 0\),所以 \(c\mathbf{u} \in W^\perp\)。</li>
+</ul>
+
+<p>三条公理都满足。\(W^\perp\) 是子空间,皆大欢喜。</p>
+
+<p>看一道计算题。在 \(\mathbb{R}^3\) 里,\(W = \mathrm{span}\{(1, 1, 1)^\top\}\),求 \(W^\perp\)。</p>
+
+<p>\(W^\perp\) 由所有 \((x, y, z)^\top\) 满足 \((x, y, z)\cdot(1, 1, 1) = 0\) 的向量构成,也就是 \(x + y + z = 0\)。这条方程定义了 \(\mathbb{R}^3\) 中过原点的一个平面。任意挑一组基:令 \(z\) 自由,选 \(x = -1, y = 0, z = 1\) 给 \((-1, 0, 1)\);选 \(x = -1, y = 1, z = 0\) 给 \((-1, 1, 0)\)。所以</p>
+
+\[
+W^\perp = \mathrm{span}\Big\{\begin{pmatrix}-1\\0\\1\end{pmatrix},\ \begin{pmatrix}-1\\1\\0\end{pmatrix}\Big\}.
+\]
+
+<p>注意:\(\dim W = 1\),\(\dim W^\perp = 2\),两者之和等于 \(\dim \mathbb{R}^3 = 3\)。这不是巧合,下一节我们看到这一规律普遍成立。</p>
+
+<h2 id="sec19-6">19.6 直和分解 \(W \oplus W^\perp = V\)</h2>
+
+<p>本章一个重要的全局事实:对任何子空间 \(W \subseteq \mathbb{R}^n\),</p>
+
+\[
+\boxed{\mathbb{R}^n = W \oplus W^\perp.}
+\]
+
+<p>"\(\oplus\)" 读作"直和",意思是:每个向量 \(\mathbf{v} \in \mathbb{R}^n\) 都<strong>唯一地</strong>分解为</p>
+
+\[
+\mathbf{v} = \mathbf{v}_W + \mathbf{v}_{W^\perp}
+\]
+
+<p>其中 \(\mathbf{v}_W \in W\) 而 \(\mathbf{v}_{W^\perp} \in W^\perp\)。</p>
+
+<p>"存在性"我们 19.4 节已经证过——\(\mathbf{v}_W = P\mathbf{v}\) 是投影,\(\mathbf{v}_{W^\perp} = \mathbf{v} - P\mathbf{v}\) 是残差。"唯一性":假设 \(\mathbf{v} = \mathbf{u}_1 + \mathbf{u}_2 = \mathbf{u}_1' + \mathbf{u}_2'\) 是两种分解(\(\mathbf{u}_1, \mathbf{u}_1' \in W\),\(\mathbf{u}_2, \mathbf{u}_2' \in W^\perp\))。整理:\(\mathbf{u}_1 - \mathbf{u}_1' = \mathbf{u}_2' - \mathbf{u}_2\)。左边在 \(W\),右边在 \(W^\perp\)——它们相等的同时,既在 \(W\) 又在 \(W^\perp\)——只能是零向量(\(W \cap W^\perp = \{\mathbf{0}\}\),自己想想为什么)。所以 \(\mathbf{u}_1 = \mathbf{u}_1'\) 且 \(\mathbf{u}_2 = \mathbf{u}_2'\),分解唯一。</p>
+
+<p>顺带,这个分解的维度账是清楚的:</p>
+
+\[
+\boxed{\dim W + \dim W^\perp = n.}
+\]
+
+<p>把两个子空间的基拼起来,就得到整个 \(\mathbb{R}^n\) 的基(它们线性无关——因为 \(W \cap W^\perp = \{\mathbf{0}\}\)——而且数目恰好是 \(n\))。</p>
+
+<p>直和分解 \(\mathbf{v} = \mathbf{v}_W + \mathbf{v}_{W^\perp}\) 是几何直观最强的画面之一:任何向量都可以被"分解"成"沿 \(W\)"和"垂直于 \(W\)"两部分。这两部分各自唯一。任何"近似 \(\mathbf{v}\) 用 \(W\) 中元素"的尝试,都得用到 \(\mathbf{v}_W\),否则就是浪费。这正是下一章最小二乘的基础。</p>
+
+<h2 id="sec19-7">19.7 四个基本子空间的正交关系</h2>
+
+<p>第 9 章我们认识了任何 \(m\times n\) 矩阵 \(A\) 的"四个基本子空间":列空间 \(\mathrm{Col}(A) \subseteq \mathbb{R}^m\)、零空间 \(\mathrm{Null}(A) \subseteq \mathbb{R}^n\)、行空间 \(\mathrm{Row}(A) = \mathrm{Col}(A^\top) \subseteq \mathbb{R}^n\)、左零空间 \(\mathrm{Null}(A^\top) \subseteq \mathbb{R}^m\)。当时我们建立了它们的<em>维数</em>关系——秩-零度定理。现在我们要建立它们的<em>正交</em>关系,这是它们之间更细的"几何"联系。</p>
+
+<p><strong>事实 1:\(\mathrm{Row}(A) \perp \mathrm{Null}(A)\)。</strong>(在 \(\mathbb{R}^n\) 里。)</p>
+
+<p>怎么看出?设 \(\mathbf{x} \in \mathrm{Null}(A)\),即 \(A\mathbf{x} = \mathbf{0}\)。把 \(A\mathbf{x}\) 按"行视角"展开——\(A\) 的第 \(i\) 行点乘 \(\mathbf{x}\) 是 \(A\mathbf{x}\) 的第 \(i\) 个分量,而这一分量为零。也就是说,\(A\) 的<strong>每一行</strong>都与 \(\mathbf{x}\) 正交。\(A\) 的行张成 \(\mathrm{Row}(A)\),所以 \(\mathrm{Row}(A)\) 中的<em>每一个</em>向量(它们都是行的线性组合)都与 \(\mathbf{x}\) 正交。\(\mathbf{x}\) 任取,完事。</p>
+
+<p>更精确地,\(\mathrm{Null}(A)\) 不仅是 \(\mathrm{Row}(A)\) 的"一个"正交子空间——它就是 \(\mathrm{Row}(A)^\perp\)。证明:维度账。\(\dim \mathrm{Row}(A) = \mathrm{rank}(A) = r\)(行秩等于列秩,见第 9 章),\(\dim \mathrm{Null}(A) = n - r\)(秩-零度定理)。\(r + (n-r) = n = \dim \mathbb{R}^n\)。我们知道 \(\dim \mathrm{Row}(A) + \dim \mathrm{Row}(A)^\perp = n\)(上一节直和定理),所以 \(\dim \mathrm{Row}(A)^\perp = n - r = \dim \mathrm{Null}(A)\),又有"正交于 \(\mathrm{Row}(A)\) \(\Longleftrightarrow\) 在 \(\mathrm{Null}(A)\) 中"那一方向的包含,所以两者相等:</p>
+
+\[
+\boxed{\mathrm{Null}(A) \;=\; \mathrm{Row}(A)^\perp.}
+\]
+
+<p><strong>事实 2:\(\mathrm{Null}(A^\top) = \mathrm{Col}(A)^\perp\)。</strong>(在 \(\mathbb{R}^m\) 里。)</p>
+
+<p>这只是把上面的 \(A\) 换成 \(A^\top\)。对 \(A^\top\) 应用事实 1:\(\mathrm{Null}(A^\top) = \mathrm{Row}(A^\top)^\perp = \mathrm{Col}(A)^\perp\)。</p>
+
+\[
+\boxed{\mathrm{Null}(A^\top) \;=\; \mathrm{Col}(A)^\perp.}
+\]
+
+<p>这两条等式画出了"四子空间"的几何全景:</p>
+
+<ul>
+  <li>在 \(\mathbb{R}^n\) 里:\(\mathrm{Row}(A)\) 与 \(\mathrm{Null}(A)\) 垂直,合起来填满 \(\mathbb{R}^n\)。</li>
+  <li>在 \(\mathbb{R}^m\) 里:\(\mathrm{Col}(A)\) 与 \(\mathrm{Null}(A^\top)\) 垂直,合起来填满 \(\mathbb{R}^m\)。</li>
+</ul>
+
+<p>用图(Strang 在他的书里画过一张著名的"四子空间图"):一个 \(n\) 维空间被切成 \(\mathrm{Row}(A) + \mathrm{Null}(A)\),另一个 \(m\) 维空间被切成 \(\mathrm{Col}(A) + \mathrm{Null}(A^\top)\)。变换 \(\mathbf{x} \mapsto A\mathbf{x}\) 把 \(\mathrm{Row}(A)\) 一对一地映到 \(\mathrm{Col}(A)\),把 \(\mathrm{Null}(A)\) 全压成零。这张图把"线性变换的几何"压缩到极简。如果你只能从本章带走一张图,带这张走。</p>
+
+<h2 id="sec19-8">19.8 投影的几何画面</h2>
+
+<p>把本章一切汇总成一张图。给子空间 \(W \subseteq \mathbb{R}^n\) 和向量 \(\mathbf{v}\):</p>
+
+<ol>
+  <li>\(\mathbf{v}\) 唯一分解为 \(\mathbf{v} = \mathbf{v}_W + \mathbf{v}_{W^\perp}\),其中 \(\mathbf{v}_W \in W\),\(\mathbf{v}_{W^\perp} \in W^\perp\)。</li>
+  <li>\(\mathbf{v}_W = \mathrm{proj}_W \mathbf{v} = P\mathbf{v}\),\(P = A(A^\top A)^{-1} A^\top\)(若 \(W = \mathrm{Col}(A)\))。</li>
+  <li>\(\mathbf{v}_{W^\perp} = \mathbf{v} - \mathbf{v}_W = (I - P)\mathbf{v}\)。注意 \(I - P\) 也是个投影矩阵——它把 \(\mathbf{v}\) 投到 \(W^\perp\) 上。</li>
+  <li>勾股定理:\(\|\mathbf{v}\|^2 = \|\mathbf{v}_W\|^2 + \|\mathbf{v}_{W^\perp}\|^2\)。</li>
+</ol>
+
+<p>最后一条勾股定理来自 \(\mathbf{v}_W \perp \mathbf{v}_{W^\perp}\)(它们一个在 \(W\),一个在 \(W^\perp\),所以正交)。</p>
+
+<p><strong>"最近"的解释。</strong>本章开篇我们说 \(\mathrm{proj}_W\mathbf{v}\) 是 \(W\) 中"距离 \(\mathbf{v}\) 最近"的向量。让我们正式证明这一点。对任何 \(\mathbf{w} \in W\),</p>
+
+\[
+\|\mathbf{v} - \mathbf{w}\|^2 = \|(\mathbf{v} - \mathbf{v}_W) + (\mathbf{v}_W - \mathbf{w})\|^2.
+\]
+
+<p>注意 \(\mathbf{v} - \mathbf{v}_W = \mathbf{v}_{W^\perp} \in W^\perp\),而 \(\mathbf{v}_W - \mathbf{w} \in W\)(因为 \(\mathbf{v}_W\) 与 \(\mathbf{w}\) 都在 \(W\) 中)。所以这两个向量正交。用勾股定理:</p>
+
+\[
+\|\mathbf{v} - \mathbf{w}\|^2 = \|\mathbf{v}_{W^\perp}\|^2 + \|\mathbf{v}_W - \mathbf{w}\|^2 \geq \|\mathbf{v}_{W^\perp}\|^2 = \|\mathbf{v} - \mathbf{v}_W\|^2.
+\]
+
+<p>等号成立当且仅当 \(\mathbf{v}_W - \mathbf{w} = \mathbf{0}\),即 \(\mathbf{w} = \mathbf{v}_W\)。所以 \(\mathbf{v}_W\) 确实是 \(W\) 中唯一与 \(\mathbf{v}\) 距离最短的向量。</p>
+
+<p>这条"投影 = 最佳近似"是下一章最小二乘的<strong>全部根基</strong>。请把它牢牢记下来,带进下一章的阅读里。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 内积与正交</a><a href="ch20.html">下一章 · 第 20 章 最小二乘 →</a></nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 曲线积分 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 向量场</a><a href="ch21.html">下一章 · 第 21 章 保守向量场 →</a></nav>
+<h1 id="ch20">第 20 章 曲线积分</h1>
+
+<p>到现在为止你做过的所有积分，被积区域要么是一段实数区间、要么是一片二维区域、要么是一块三维立体。本章引入一种新的"被积区域"——<strong>曲线</strong>。它是一维的，但它弯弯曲曲地嵌在二维或三维空间里。沿曲线积分的结果是一个数；过程则视情况分两种：</p>
+
+<ol>
+<li><strong>第一型曲线积分</strong>：被积对象是<em>标量函数</em> \(f\)。物理图像：一根弯曲的钢丝，每一处的线密度（单位长度的质量）由 \(f\) 给出，问钢丝的总质量。</li>
+<li><strong>第二型曲线积分</strong>：被积对象是<em>向量场</em> \(\mathbf{F}\)。物理图像：一个力场推着一个质点沿一条预定的路径运动，问力场对质点做了多少功。</li>
+</ol>
+
+<p>第二型积分会自然地把上一章的向量场和"做功"对接起来，并且为下面三章（保守场、格林定理、斯托克斯）铺好舞台。第一型积分则更像是一元定积分 \(\int_a^b f(x)\,dx\) 的"直接推广"——只是把"在直线段上积分"换成"沿一条曲线积分"。我们先把它们各自的定义、计算与直觉讲清楚，再说明一个关键性质：第二型积分只依赖于曲线和它的方向，与具体的参数化无关。</p>
+
+<h2 id="sec20-1">20.1 第一型曲线积分（标量沿曲线积分）</h2>
+
+<p>设 \(C\) 是一条参数曲线 \(\mathbf{r}(t) = \langle x(t), y(t), z(t)\rangle\)，\(t \in [a, b]\)。设 \(f(x, y, z)\) 是定义在 \(C\) 上的标量函数。\(f\) 沿 \(C\) 的<strong>第一型曲线积分</strong>定义为</p>
+
+<p>\[\boxed{\int_C f\,ds = \int_a^b f(\mathbf{r}(t))\,|\mathbf{r}'(t)|\,dt.}\]</p>
+
+<p>这条公式的来历不难理解。把曲线 \(C\) 切成许多极小段，每一段的长度近似为弧长元素 \(ds\)。在第 4 章里我们已经知道</p>
+
+<p>\[ds = |\mathbf{r}'(t)|\,dt,\]</p>
+
+<p>因为 \(|\mathbf{r}'(t)|\) 是参数曲线的"瞬时速率"（每单位 \(t\) 走过的弧长）。把 \(f\) 在每一小段上的值乘以那一段的弧长，全部加起来再取极限，就得到上面的公式。它本质上是<strong>把每一段"无限小弧"按 \(f\) 加权再求和</strong>。</p>
+
+<p>物理直觉一：钢丝的质量。如果 \(f\) 是钢丝在 \((x, y, z)\) 处的<em>线密度</em>（单位长度上的质量），那么 \(\int_C f\,ds\) 就是钢丝的总质量——把每一小段的"长度 \(\times\) 密度"加起来嘛。</p>
+
+<p>物理直觉二：一段山路上"步数"按高度加权的总和。如果 \(f(x, y, z) = z\)（高度），\(C\) 是一段登山路径，则 \(\int_C f\,ds\) 度量了"沿路高度的累计"——可以理解为某种"被高度按弧长加权后的总和"，常出现在重心、引力势等问题里。</p>
+
+<p>第一型积分有一条立刻可以观察到的对称性：<strong>它与曲线的方向无关</strong>。把 \(C\) 反向（让参数从 \(b\) 走到 \(a\)）后，\(|\mathbf{r}'(t)|\,dt\) 中的 \(|\mathbf{r}'(t)|\) 是绝对值（永远非负），\(dt\) 取负但积分上下限也对调，两次反号抵消。所以第一型积分是<em>无方向</em>的。这一点与下一节的第二型积分形成对照。</p>
+
+<p>计算流程几乎是机械的：写出参数化、算 \(|\mathbf{r}'|\)、把 \(f\) 限制到曲线上、做一元积分。下面看几个例子。</p>
+
+<p>第一个例子。\(\int_C (x^2 + y^2)\,ds\)，\(C\) 是螺旋线 \(\mathbf{r}(t) = \langle\cos t, \sin t, t\rangle\)，\(t \in [0, 2\pi]\)。把 \(f = x^2 + y^2\) 限制到曲线上：\(f(\mathbf{r}(t)) = \cos^2 t + \sin^2 t = 1\)。算速率：\(\mathbf{r}'(t) = \langle -\sin t, \cos t, 1\rangle\)，\(|\mathbf{r}'(t)| = \sqrt{\sin^2 t + \cos^2 t + 1} = \sqrt{2}\)。所以</p>
+
+<p>\[\int_C f\,ds = \int_0^{2\pi} 1 \cdot \sqrt{2}\,dt = 2\pi\sqrt{2}.\]</p>
+
+<p>第二个例子。\(\int_C y\,ds\)，\(C\) 是从 \((0, 0)\) 到 \((1, 1)\) 的线段 \(y = x\)。参数化 \(\mathbf{r}(t) = \langle t, t\rangle\)，\(t \in [0, 1]\)。\(|\mathbf{r}'| = \sqrt{2}\)。\(f(\mathbf{r}(t)) = t\)。所以</p>
+
+<p>\[\int_C y\,ds = \int_0^1 t \cdot \sqrt{2}\,dt = \frac{\sqrt{2}}{2}.\]</p>
+
+<p>第三个例子（钢丝质量）。一根半圆形钢丝沿 \(x^2 + y^2 = 1, y \ge 0\)，线密度 \(\rho(x, y) = y\)。求总质量。参数化 \(\mathbf{r}(t) = \langle\cos t, \sin t\rangle\)，\(t \in [0, \pi]\)。\(|\mathbf{r}'(t)| = 1\)。\(\rho(\mathbf{r}(t)) = \sin t\)。所以总质量</p>
+
+<p>\[M = \int_C \rho\,ds = \int_0^\pi \sin t\,dt = 2.\]</p>
+
+<p>第四个例子。\(\int_C xz\,ds\)，\(C\) 是从 \((0, 0, 0)\) 到 \((1, 2, 3)\) 的线段。参数化 \(\mathbf{r}(t) = \langle t, 2t, 3t\rangle\)，\(t \in [0, 1]\)。\(\mathbf{r}'(t) = \langle 1, 2, 3\rangle\)，\(|\mathbf{r}'| = \sqrt{14}\)。\(f(\mathbf{r}(t)) = t \cdot 3t = 3t^2\)。所以</p>
+
+<p>\[\int_C xz\,ds = \int_0^1 3t^2 \cdot \sqrt{14}\,dt = \sqrt{14}.\]</p>
+
+<p>四个例子都按同一个流程走：参数化、算速率、把被积函数限制到曲线上、做一元积分。这就是第一型曲线积分的全部技术。</p>
+
+<h2 id="sec20-2">20.2 第二型曲线积分（向量场沿曲线积分，"做功"）</h2>
+
+<p>第二型曲线积分的舞台是<em>向量场</em>。设 \(\mathbf{F}(x, y, z)\) 是空间里的向量场，\(C\) 是参数曲线 \(\mathbf{r}(t)\)，\(t \in [a, b]\)。<strong>\(\mathbf{F}\) 沿 \(C\) 的第二型曲线积分</strong>定义为</p>
+
+<p>\[\boxed{\int_C \mathbf{F}\cdot d\mathbf{r} = \int_a^b \mathbf{F}(\mathbf{r}(t))\cdot \mathbf{r}'(t)\,dt.}\]</p>
+
+<p>物理含义最透彻的解释是<strong>做功</strong>。一元物理里我们知道：力 \(F\) 沿位移 \(d\) 做的功是 \(F \cdot d\)（这里 \(F\) 与 \(d\) 是同向标量）。如果力随位置变化、位移又是沿一条弯曲路径，那么"做功"的定义就要细化：在每一小段路径 \(d\mathbf{r}\) 上，力 \(\mathbf{F}\) 做的功是 \(\mathbf{F}\cdot d\mathbf{r}\)（点积只挑出力沿位移方向的那一分量），把所有小段加起来再取极限就得到</p>
+
+<p>\[W = \int_C \mathbf{F}\cdot d\mathbf{r}.\]</p>
+
+<p>这就是第二型曲线积分的物理本相——它就是"<strong>沿一条路径所做的总功</strong>"。事实上，"\(\mathbf{F}\cdot d\mathbf{r}\)"的写法本身就是一种助记：它告诉你被积的"微元"是<em>力点乘位移</em>。</p>
+
+<p>除了做功，还有几个等价的物理图像可以同时记住。其一：把 \(\mathbf{F}\) 当作流体的速度场，\(C\) 当作流体里一根线——则 \(\int_C \mathbf{F}\cdot d\mathbf{r}\) 是<strong>流体沿这条线的"切向流量"</strong>，又叫"<em>环量</em>"（circulation）。如果 \(C\) 是闭合环路，这个量度量了流体绕着环路转动的总倾向（正：沿环路方向流；负：逆环路方向流；零：不偏不倚）。其二：把 \(\mathbf{F}\) 当作电场，\(\mathbf{F}\cdot d\mathbf{r}\) 就是电势差的微元——这一点正是麦克斯韦方程组里"\(\oint \mathbf{E}\cdot d\mathbf{l}\)"出现的物理背景。</p>
+
+<p>第二型积分有一条与第一型截然不同的性质：<strong>它带方向</strong>。把 \(C\) 反向，\(d\mathbf{r}\) 反号、\(\mathbf{F}\) 不变，所以积分整体反号：</p>
+
+<p>\[\int_{-C} \mathbf{F}\cdot d\mathbf{r} = -\int_C \mathbf{F}\cdot d\mathbf{r}.\]</p>
+
+<p>物理上很直观：你顺风走时风对你做正功，逆风走时风对你做负功，两者大小相等、方向相反。请把这条性质钉在脑子里——它在格林定理和保守场判别中都会反复用到。</p>
+
+<p>第二型积分还可以拆成分量形式。若 \(\mathbf{F} = \langle P, Q, R\rangle\)，则 \(d\mathbf{r} = \langle dx, dy, dz\rangle\)，于是</p>
+
+<p>\[\int_C \mathbf{F}\cdot d\mathbf{r} = \int_C P\,dx + Q\,dy + R\,dz.\]</p>
+
+<p>这种"\(P\,dx + Q\,dy + R\,dz\)"的写法在历史上更早，称作<em>微分形式</em>。看到这种式子，你只要记得它和 \(\int_C \mathbf{F}\cdot d\mathbf{r}\) 是一回事，按下面方法计算即可。</p>
+
+<p>计算第二型曲线积分的标准流程一共五步：先选择一种参数化 \(\mathbf{r}(t)\)，\(t \in [a, b]\)，注意它走的方向应当与题目要求的方向一致；再算导数 \(\mathbf{r}'(t)\)；接着把 \(\mathbf{F}\) 在曲线上的值写出，即 \(\mathbf{F}(\mathbf{r}(t))\)；然后做点积 \(\mathbf{F}\cdot \mathbf{r}'\)；最后在 \([a, b]\) 上做一元定积分。</p>
+
+<p>第一个例子。\(\mathbf{F} = \langle y, -x, 0\rangle\) 沿单位圆 \(\mathbf{r}(t) = \langle\cos t, \sin t, 0\rangle\)、\(t \in [0, 2\pi]\)（逆时针）的积分。</p>
+
+<p>把 \(\mathbf{F}\) 限制到曲线上：\(\mathbf{F}(\mathbf{r}(t)) = \langle \sin t, -\cos t, 0\rangle\)。算 \(\mathbf{r}'(t) = \langle -\sin t, \cos t, 0\rangle\)。点积 \(\mathbf{F}\cdot\mathbf{r}' = -\sin^2 t - \cos^2 t = -1\)。所以</p>
+
+<p>\[\int_C \mathbf{F}\cdot d\mathbf{r} = \int_0^{2\pi}(-1)\,dt = -2\pi.\]</p>
+
+<p>解释为什么是负号：\(\mathbf{F} = \langle y, -x, 0\rangle\) 是一个<em>顺时针</em>旋转场（在原点附近沿 \(-\theta\) 方向打转），而曲线 \(\mathbf{r}(t)\) 是<em>逆时针</em>走的。所以 \(\mathbf{F}\) 一直与运动方向相反，做的"功"为负。这与物理直觉吻合。</p>
+
+<p>第二个例子。\(\mathbf{F} = \langle x, y\rangle\)（径向场）沿单位圆 \(\mathbf{r}(t) = \langle\cos t, \sin t\rangle\)、\(t \in [0, 2\pi]\) 的积分。\(\mathbf{F}(\mathbf{r}(t)) = \langle \cos t, \sin t\rangle\)，\(\mathbf{r}'(t) = \langle -\sin t, \cos t\rangle\)。点积 \(\mathbf{F}\cdot\mathbf{r}' = -\sin t\cos t + \sin t\cos t = 0\)。所以 \(\int_C \mathbf{F}\cdot d\mathbf{r} = 0\)。这一结果有非常清晰的几何解释：径向场处处<em>径向</em>，而圆周路径处处<em>切向</em>——两者处处垂直，点积处处为零，自然总积分为零。</p>
+
+<p>第三个例子（一段折线）。\(\mathbf{F} = \langle y, x\rangle\) 沿 \((0, 0) \to (1, 0) \to (1, 1)\) 的折线。把折线分成两段 \(C_1\)（横段）和 \(C_2\)（竖段），分别算。</p>
+
+<p>横段 \(C_1\)：\(\mathbf{r}(t) = \langle t, 0\rangle\)，\(t \in [0, 1]\)。\(\mathbf{r}' = \langle 1, 0\rangle\)。\(\mathbf{F}(\mathbf{r}) = \langle 0, t\rangle\)。点积 \(= 0\)。\(\int_{C_1} = 0\)。</p>
+
+<p>竖段 \(C_2\)：\(\mathbf{r}(t) = \langle 1, t\rangle\)，\(t \in [0, 1]\)。\(\mathbf{r}' = \langle 0, 1\rangle\)。\(\mathbf{F}(\mathbf{r}) = \langle t, 1\rangle\)。点积 \(= 1\)。\(\int_{C_2} = 1\)。</p>
+
+<p>合起来 \(\int_C \mathbf{F}\cdot d\mathbf{r} = 0 + 1 = 1\)。</p>
+
+<p>第四个例子（直接走对角线）。同样的 \(\mathbf{F} = \langle y, x\rangle\)，但路径换成从 \((0, 0)\) 到 \((1, 1)\) 的直线段。\(\mathbf{r}(t) = \langle t, t\rangle\)，\(\mathbf{r}' = \langle 1, 1\rangle\)。\(\mathbf{F}(\mathbf{r}) = \langle t, t\rangle\)。点积 \(= 2t\)。\(\int_0^1 2t\,dt = 1\)。</p>
+
+<p>注意第三和第四两个例子：起点都是 \((0, 0)\)，终点都是 \((1, 1)\)，但路径不同。两个积分却<em>都等于 1</em>。这不是巧合——后面 21 章会告诉你 \(\mathbf{F} = \langle y, x\rangle\) 是<em>保守场</em>（势函数 \(f = xy\)），所以它沿任何从 \((0, 0)\) 到 \((1, 1)\) 的路径积分都等于 \(f(1, 1) - f(0, 0) = 1\)。</p>
+
+<h2 id="sec20-3">20.3 与参数化方式无关</h2>
+
+<p>第二型曲线积分的<em>定义</em>看起来牵涉具体的参数化 \(\mathbf{r}(t)\)，但它<em>结果</em>只依赖于曲线和它的方向，<strong>不依赖于</strong>具体怎么参数化。换一种参数化（同向），积分值不变。</p>
+
+<p>这件事可以从换元法看清楚。设 \(\mathbf{r}_1(t)\)、\(t \in [a, b]\) 与 \(\mathbf{r}_2(s)\)、\(s \in [c, d]\) 是同一条曲线、同一方向的两种参数化，存在严格递增的可微函数 \(\varphi: [c, d] \to [a, b]\) 使 \(\mathbf{r}_2(s) = \mathbf{r}_1(\varphi(s))\)。那么 \(\mathbf{r}_2'(s) = \mathbf{r}_1'(\varphi(s))\,\varphi'(s)\)，于是</p>
+
+<p>\[\int_c^d \mathbf{F}(\mathbf{r}_2(s))\cdot \mathbf{r}_2'(s)\,ds = \int_c^d \mathbf{F}(\mathbf{r}_1(\varphi(s)))\cdot \mathbf{r}_1'(\varphi(s))\,\varphi'(s)\,ds.\]</p>
+
+<p>右边正是 \(\int_a^b \mathbf{F}(\mathbf{r}_1(t))\cdot\mathbf{r}_1'(t)\,dt\) 经过换元 \(t = \varphi(s)\)、\(dt = \varphi'(s)\,ds\) 得到的形式。所以两个积分相等。</p>
+
+<p>用一个具体例子来确认这一点。\(\mathbf{F} = \langle y, x\rangle\) 沿从 \((0, 0)\) 到 \((1, 1)\) 的线段。</p>
+
+<p>第一种参数化：\(\mathbf{r}_1(t) = \langle t, t\rangle\)，\(t \in [0, 1]\)。\(\mathbf{r}_1' = \langle 1, 1\rangle\)，\(\mathbf{F}(\mathbf{r}_1) = \langle t, t\rangle\)，点积 \(= 2t\)，积分 \(= \int_0^1 2t\,dt = 1\)。</p>
+
+<p>第二种参数化：\(\mathbf{r}_2(s) = \langle s^2, s^2\rangle\)，\(s \in [0, 1]\)。同一条线段，但走得越来越快。\(\mathbf{r}_2' = \langle 2s, 2s\rangle\)，\(\mathbf{F}(\mathbf{r}_2) = \langle s^2, s^2\rangle\)，点积 \(= 4s^3\)，积分 \(= \int_0^1 4s^3\,ds = 1\)。</p>
+
+<p>两种参数化给出同一个数。第二型曲线积分对参数化"漠不关心"——只要曲线本身和走向不变就行。这条性质让我们今后<em>挑最方便的参数化</em>来算积分，不必每次都担心"换了一种走法结果会不会变"。第一型积分同样有这条性质（你可以照样验证）；它甚至连方向也不在乎。</p>
+
+<p>下一章我们将看到一类特别美的向量场——<strong>保守场</strong>——它们的曲线积分进一步<em>对路径本身漠不关心</em>，只看起点和终点。</p>
+
+<hr>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 向量场</a><a href="ch21.html">下一章 · 第 21 章 保守向量场 →</a></nav>
+
+</main>
+</body>
+</html>

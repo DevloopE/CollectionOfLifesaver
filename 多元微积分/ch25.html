@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 25 章 斯托克斯定理 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 上一章 · 第 24 章 曲面积分</a><a href="ch26.html">下一章 · 第 26 章 散度定理 →</a></nav>
+<h1 id="ch25">第 25 章 斯托克斯定理</h1>
+
+<p>第 22 章的格林定理告诉我们一件惊人的事：在二维平面里，<strong>沿着区域边界绕一圈的曲线积分</strong>，等价于<strong>区域内部某个量的二重积分</strong>。它是一元微积分基本定理在平面上的推广——把"边界端点的赋值差"换成了"边界曲线上的环路积分"，把"原函数的端点差"换成了"区域上的二重积分"。</p>
+
+<p>本章的<strong>斯托克斯定理</strong>做完全相同的事，但维数升了一阶。它处理的不再是平面区域，而是嵌在三维空间中的<strong>曲面</strong> \(S\)；它把"沿边界曲线 \(\partial S\) 的曲线积分"与"曲面 \(S\) 上某个量的曲面积分"挂钩。如果你愿意把上一章和这一章并排看，你会觉得这是同一种思想在不同舞台上演两次：</p>
+
+<ul>
+  <li>格林定理：平面区域 \(D\)，边界 \(\partial D\) 是平面闭曲线，"内部量"是<strong>二维旋度</strong>\(Q_x - P_y\) 的二重积分。</li>
+  <li>斯托克斯定理：空间曲面 \(S\)，边界 \(\partial S\) 是空间闭曲线，"内部量"是<strong>三维旋度</strong>\(\nabla\times\mathbf{F}\) 的法向分量在曲面上的积分（也就是"旋度的通量"）。</li>
+</ul>
+
+<p>把曲面 \(S\) 取为 \(xy\) 平面里的一块区域 \(D\)，斯托克斯定理就<strong>退化</strong>为格林定理——这件事这一章末尾会做出来。</p>
+
+<p>斯托克斯定理的精确叙述是这样的。设 \(S\) 是三维空间中的有向光滑曲面，其边界曲线 \(\partial S\) 的方向按"右手与 \(\mathbf{n}\) 配套"的规则取定（参见 24.3 节）。设 \(\mathbf{F}\) 在含 \(S\) 的开集上有连续的偏导。则</p>
+
+<p>\[\boxed{\,\oint_{\partial S} \mathbf{F}\cdot d\mathbf{r} = \iint_S (\nabla\times\mathbf{F})\cdot d\mathbf{S}.\,}\]</p>
+
+<p>左边是边界上的曲线积分（环量），右边是<strong>旋度的通量</strong>。这就是这一章要细细品味的等式。</p>
+
+<h2 id="sec25-1">25.1 定理叙述与直观理解</h2>
+
+<p>为什么右边的"旋度通量"会等于左边的"边界环量"？请把这条思路想清楚——它是斯托克斯定理几何味道最浓的地方。</p>
+
+<p>把曲面 \(S\) 切成无数微小的"瓦片"——每一片小到几乎是平面，可以近似看作小平面区域。在每一片瓦片上，"局部环量"近似等于<strong>该片处旋度沿瓦片法向分量乘以瓦片面积</strong>，也就是 \((\nabla\times\mathbf{F})\cdot\mathbf{n}\,dS\)。这是旋度作为"单位面积上的环量密度"那条几何含义（第 22 章里我们对二维旋度也做过类似的论证）。把所有小瓦片的局部环量加起来——会发生什么？</p>
+
+<p>关键的几何观察是：<strong>相邻两片瓦片共享的那一条边，在两片各自"绕边界一圈"时被走了两次，方向相反，正好抵消</strong>。请把它想象成两块拼图，左拼图沿其边逆时针走一圈、右拼图沿其边逆时针走一圈，它们共享的那条公共边在左拼图里被向上走了一次，在右拼图里被向下走了一次——两次方向相反、值相加为零。</p>
+
+<p>结果，无数小瓦片的局部环量相加，<strong>所有内部边</strong>都成对相消，只剩下整张曲面的最外面那一圈——也就是 \(\partial S\)——的曲线积分还活着。这就是斯托克斯定理的几何来源。</p>
+
+<p>与格林定理几乎是一字不改：那里我们也是把平面区域切成小方块，每个小方块的"局部环量"近似 \(2\)D 旋度乘小面积，相邻方块的公共边相消，剩下区域边界的积分。本质相同，只是这里的瓦片可以挂在三维空间任意一张曲面上、它们的法向方向各不相同。</p>
+
+<p>这条几何论证也立刻揭示了斯托克斯定理一条非常有用的性质："右手边只依赖于<strong>边界 \(\partial S\)</strong>"。也就是说，<strong>任何两张以同一条曲线 \(C\) 为边界的有向曲面 \(S_1\)、\(S_2\)（朝向匹配）</strong>，都给出同一个</p>
+
+<p>\[\iint_{S_1}(\nabla\times\mathbf{F})\cdot d\mathbf{S} = \iint_{S_2}(\nabla\times\mathbf{F})\cdot d\mathbf{S} = \oint_C \mathbf{F}\cdot d\mathbf{r}.\]</p>
+
+<p>形象地说：你想算单位圆 \(C: x^2 + y^2 = 1, z = 0\) 上的曲线积分，可以拿单位圆盘当 \(S\)（最朴素），可以拿上半球面 \(z = \sqrt{1 - x^2 - y^2}\) 当 \(S\)，甚至可以拿一个冒尖的"帐篷顶"当 \(S\)——只要它们的边界都是这个单位圆、定向也匹配，三种选择给出<strong>同一个数</strong>。这就是斯托克斯定理的"曲面自由"——而且在做题时它经常是你的救星：直接算曲线积分要分段、要参数化每段、要逐段做积分，用斯托克斯换成曲面积分后选一张<strong>最容易的</strong>曲面，往往直接走到答案。</p>
+
+<h2 id="sec25-2">25.2 例题</h2>
+
+<h3>例 1：把曲线积分换成圆盘上的二重积分</h3>
+
+<p>求 \(\oint_C \mathbf{F}\cdot d\mathbf{r}\)，其中 \(\mathbf{F} = \langle -y, x, z\rangle\)，\(C\) 是单位圆 \(x^2 + y^2 = 1\)、\(z = 0\)（自上方俯视取逆时针方向）。</p>
+
+<p>第一种走法（直接算曲线积分）。\(\mathbf{r}(t) = \langle \cos t, \sin t, 0\rangle\)，\(\mathbf{r}'(t) = \langle -\sin t, \cos t, 0\rangle\)。\(\mathbf{F}(\mathbf{r}(t)) = \langle -\sin t, \cos t, 0\rangle\)。点积 \(\mathbf{F}\cdot\mathbf{r}' = \sin^2 t + \cos^2 t = 1\)。所以 \(\oint_C\mathbf{F}\cdot d\mathbf{r} = \int_0^{2\pi}1\,dt = 2\pi\)。</p>
+
+<p>第二种走法（用斯托克斯）。算 \(\nabla\times\mathbf{F}\)：</p>
+
+<p>\[\nabla\times\mathbf{F} = \left|\begin{matrix}\mathbf{i}&\mathbf{j}&\mathbf{k}\\\partial_x&\partial_y&\partial_z\\-y&x&z\end{matrix}\right| = \langle 0, 0, 2\rangle.\]</p>
+
+<p>\(C\) 围着的最简单曲面是单位圆盘 \(S = \{x^2 + y^2\le 1, z = 0\}\)。"\(C\) 上方俯视逆时针" + 右手定则得到 \(\mathbf{n} = \langle 0, 0, 1\rangle\)（向上）。所以 \(d\mathbf{S} = \langle 0, 0, 1\rangle\,dA\)。</p>
+
+<p>\[\iint_S(\nabla\times\mathbf{F})\cdot d\mathbf{S} = \iint_S\langle 0, 0, 2\rangle\cdot\langle 0, 0, 1\rangle\,dA = \iint_S 2\,dA = 2\cdot\pi = 2\pi.\quad\checkmark\]</p>
+
+<p>两种走法答案一致。这是一个最干净的"直接算 vs. 斯托克斯"的对照——两种都不算难，但第二种更简短。</p>
+
+<p>同一道题，请你想想：如果我把 \(S\) 换成"以 \(C\) 为底口的上半球面"，斯托克斯定理还应给同样的 \(2\pi\)。事实上 \(\nabla\times\mathbf{F} = \langle 0, 0, 2\rangle\) 在上半球面的每点法向 \(\mathbf{n}\) 上的投影是 \(2z\)。而 \(\iint_{\text{上半球面}}2z\,dS = 2\cdot 2\pi\cdot\bar{z}\cdot R^2/(...) \)——你可以亲手算一遍，会发现得到的也是 \(2\pi\)。一切都对得上。</p>
+
+<h3>例 2：三角形周线上的曲线积分</h3>
+
+<p>设 \(\mathbf{F} = \langle z, x, y\rangle\)，\(C\) 是三角形 \((1, 0, 0)\to(0, 1, 0)\to(0, 0, 1)\to(1, 0, 0)\) 的周线。求 \(\oint_C \mathbf{F}\cdot d\mathbf{r}\)。</p>
+
+<p>直接算需要分三段、每段做参数化、再做三次曲线积分——可行但繁琐。用斯托克斯，把 \(S\) 取为这个三角形本身（它躺在平面 \(x + y + z = 1\) 上）。</p>
+
+<p>旋度</p>
+
+<p>\[\nabla\times\mathbf{F} = \left|\begin{matrix}\mathbf{i}&\mathbf{j}&\mathbf{k}\\\partial_x&\partial_y&\partial_z\\z&x&y\end{matrix}\right| = \langle 1, 1, 1\rangle.\]</p>
+
+<p>平面 \(x + y + z = 1\) 的单位法向有两支——指向远离原点那一支是 \(\mathbf{n} = \frac{1}{\sqrt{3}}\langle 1, 1, 1\rangle\)。我们需要它与所给的边界方向 \((1,0,0)\to(0,1,0)\to(0,0,1)\) 配套：用右手定则检验，从 \((1,0,0)\) 指向 \((0,1,0)\) 的边再到 \((0,0,1)\)，绕这一圈所"涌出"的方向正是 \(\langle 1, 1, 1\rangle\) 那一面——所以选这一支没错。</p>
+
+<p>\((\nabla\times\mathbf{F})\cdot\mathbf{n} = \dfrac{1 + 1 + 1}{\sqrt{3}} = \sqrt{3}\)，是个常数。所以</p>
+
+<p>\[\iint_S(\nabla\times\mathbf{F})\cdot d\mathbf{S} = \sqrt{3}\cdot(\text{三角形面积}).\]</p>
+
+<p>三角形以 \(\mathbf{a} = \langle -1, 1, 0\rangle\)、\(\mathbf{b} = \langle -1, 0, 1\rangle\) 为两边，叉积 \(\mathbf{a}\times\mathbf{b} = \langle 1, 1, 1\rangle\)，模 \(\sqrt{3}\)；面积是 \(\sqrt{3}/2\)。因此</p>
+
+<p>\[\oint_C\mathbf{F}\cdot d\mathbf{r} = \sqrt{3}\cdot\frac{\sqrt{3}}{2} = \frac{3}{2}.\]</p>
+
+<p>从分三段、解三个积分，到一行点积一行乘法。这就是斯托克斯定理在"换平台"上的好处。</p>
+
+<h3>例 3：曲面的自由——选最容易的那张</h3>
+
+<p>设 \(\mathbf{F} = \langle y, -x, e^{xz}\rangle\)，\(C\) 是 \(x^2 + y^2 = 4\)、\(z = 3\)（自上方俯视取逆时针方向）。求 \(\oint_C\mathbf{F}\cdot d\mathbf{r}\)。</p>
+
+<p>直接算曲线积分：\(\mathbf{r}(t) = \langle 2\cos t, 2\sin t, 3\rangle\)，\(\mathbf{r}'(t) = \langle -2\sin t, 2\cos t, 0\rangle\)。\(\mathbf{F}(\mathbf{r}) = \langle 2\sin t, -2\cos t, e^{6\cos t}\rangle\)。点积 \(\mathbf{F}\cdot\mathbf{r}' = -4\sin^2 t - 4\cos^2 t + 0 = -4\)。积分 \(\int_0^{2\pi}(-4)\,dt = -8\pi\)。</p>
+
+<p>用斯托克斯：算旋度</p>
+
+<p>\[\nabla\times\mathbf{F} = \left|\begin{matrix}\mathbf{i}&\mathbf{j}&\mathbf{k}\\\partial_x&\partial_y&\partial_z\\y&-x&e^{xz}\end{matrix}\right| = \langle 0 - 0,\ x e^{xz} - 0,\ -1 - 1\rangle = \langle 0, x e^{xz}, -2\rangle.\]</p>
+
+<p>选 \(S\) = 以 \(C\) 为边界的圆盘 \(\{x^2 + y^2\le 4, z = 3\}\)，\(\mathbf{n} = \langle 0, 0, 1\rangle\)。点积 \((\nabla\times\mathbf{F})\cdot\mathbf{n} = -2\)。所以</p>
+
+<p>\[\oint_C\mathbf{F}\cdot d\mathbf{r} = \iint_S(-2)\,dA = -2\cdot\pi\cdot 4 = -8\pi.\quad\checkmark\]</p>
+
+<p>注意这道题的"惊艳之处"：被积式里有 \(e^{xz}\) 这种讨厌的指数，但因为我们选的曲面在 \(z = 3\) 平面上、法向是 \(\langle 0, 0, 1\rangle\)，所以旋度的 \(y\)-分量（含 \(e^{xz}\)）<strong>对点积没贡献</strong>，整个指数项就消失了。这正是"曲面自由"带给你的实战利益：选一张最贴合 \(\mathbf{n}\) 方向的曲面，让被积式里你不想见到的项被点积"杀掉"。</p>
+
+<h3>例 4：旋度为零的场——一个潜在陷阱</h3>
+
+<p>设 \(\mathbf{F} = \nabla f\)（任意保守场，如 \(\mathbf{F} = \langle 2x, 2y, 2z\rangle = \nabla(x^2 + y^2 + z^2)\)）。则 \(\nabla\times\mathbf{F} = \mathbf{0}\)（向量演算的恒等式）。所以由斯托克斯，对<strong>任何</strong>带边界曲面 \(S\)，\(\oint_{\partial S}\mathbf{F}\cdot d\mathbf{r} = 0\)。</p>
+
+<p>这与第 21 章里"保守场沿闭曲线积分为零"是一回事——那里我们用了"原函数差"的论证，这里我们用了斯托克斯。两条路径走到同一个结论。这种"多条路径会合"的现象，是判断你对一个理论是否真的吃透的一个很好的指标。</p>
+
+<h2 id="sec25-3">25.3 它如何推广格林定理</h2>
+
+<p>把曲面 \(S\) 取为 \(xy\) 平面里的一块区域 \(D\)（取 \(\mathbf{n} = \mathbf{k} = \langle 0, 0, 1\rangle\)）；边界 \(\partial S = \partial D\) 是平面闭曲线（按右手定则取逆时针方向）。考虑只在 \(xy\) 平面里的向量场 \(\mathbf{F} = \langle P(x, y), Q(x, y), 0\rangle\)。</p>
+
+<p>算旋度：</p>
+
+<p>\[\nabla\times\mathbf{F} = \left|\begin{matrix}\mathbf{i}&\mathbf{j}&\mathbf{k}\\\partial_x&\partial_y&\partial_z\\P&Q&0\end{matrix}\right| = \langle 0, 0, Q_x - P_y\rangle.\]</p>
+
+<p>那么 \((\nabla\times\mathbf{F})\cdot\mathbf{n} = Q_x - P_y\)；右手边 \(\iint_S(\nabla\times\mathbf{F})\cdot d\mathbf{S} = \iint_D(Q_x - P_y)\,dA\)。左手边的曲线积分 \(\oint_{\partial D}\mathbf{F}\cdot d\mathbf{r} = \oint_{\partial D}P\,dx + Q\,dy\)。所以斯托克斯在这种情形下读为</p>
+
+<p>\[\oint_{\partial D} P\,dx + Q\,dy = \iint_D (Q_x - P_y)\,dA.\]</p>
+
+<p>这正是<strong>格林定理（环量形式）</strong>。结论：<strong>格林定理是斯托克斯定理在曲面变成平面情形的特殊情形</strong>。它解释了为什么前几章学的格林定理与这一章的斯托克斯定理"长得这么像"——它们本来就是同一棵树上的两根枝条，只是一根伸进了三维空间，另一根留在了平面上。</p>
+
+<p>到这里，这本书里"边界曲线积分 = 内部某种积分"的两种代表性公式（格林、斯托克斯）已经齐全。第 26 章里还要讲一种——它处理的"内部"是三维立体，"边界"是闭曲面，被积变成了散度的体积分。三大定理凑齐之后，会有一种意外的对称感扑面而来。</p>
+
+<hr/>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 上一章 · 第 24 章 曲面积分</a><a href="ch26.html">下一章 · 第 26 章 散度定理 →</a></nav>
+
+</main>
+</body>
+</html>

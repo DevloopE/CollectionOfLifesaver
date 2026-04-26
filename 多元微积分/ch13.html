@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 章 矩形区域上的二重积分 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 拉格朗日乘数法</a><a href="ch14.html">下一章 · 第 14 章 一般区域上的二重积分 →</a></nav>
+<h1 id="ch13">第 13 章 矩形区域上的二重积分</h1>
+
+<p>在一元微积分里，定积分 \(\int_a^b f(x)\,dx\) 是一种"扫一遍 \([a, b]\) 然后把所有微小贡献加起来"的机器：从几何上看，它度量的是曲线 \(y = f(x)\) 与 \(x\) 轴之间在区间 \([a, b]\) 上夹出的那块带符号面积。整套理论的灵魂——黎曼和、定积分定义、微积分基本定理、换元法——都建立在"分割—近似—求和—取极限"这一套节奏上。</p>
+
+<p>把这套节奏搬到二维，故事的主角就变成了二重积分。我们不再扫一段直线，而是扫一整片平面区域；不再把曲线下面的<em>面积</em>加起来，而是把曲面下面的<em>体积</em>加起来。形式上，我们写</p>
+
+<p>\[\iint_R f(x, y)\,dA\]</p>
+
+<p>来表示曲面 \(z = f(x, y)\) 与 \(xy\) 平面之间在平面区域 \(R\) 上夹出的带符号体积。如果 \(f \ge 0\)，这就是一个实在的物理体积；如果 \(f\) 取负值，那块就被记成"负体积"。从第 13 章一直到第 18 章——也就是本书的整个第二部分——我们都在反复回答三件事：这种积分怎么定义？怎么具体地把它算出来？怎么用它去解决实际问题？</p>
+
+<p>先从最干净的情形入手：积分区域 \(R\) 是一个矩形 \([a, b] \times [c, d]\)。这种几何最简单，没有任何"边界曲线"的麻烦，所有的注意力都可以放在<strong>累次积分</strong>这件新事情上。等到第 14 章，再把矩形换成被曲线围出的不规则形状；第 15 章，把直角坐标换成极坐标；第 16 章再把维数从二升到三。所有这些后续讨论都是本章思想的逐层推广。</p>
+
+<h2 id="sec13-1">13.1 黎曼和：用一座高低不等的"积木塔"逼近体积</h2>
+
+<p>让我们慢慢把"二维黎曼和"这件事画在脑子里。取一个矩形 \(R = [a, b] \times [c, d]\) 和一个定义在它上面的函数 \(f(x, y)\)。把 \([a, b]\) 平均分成 \(m\) 段，每段长 \(\Delta x = (b - a)/m\)；把 \([c, d]\) 平均分成 \(n\) 段，每段长 \(\Delta y = (d - c)/n\)。这两组分点在矩形 \(R\) 内画出一张细密的网格，把它切成 \(mn\) 个小矩形。每个小矩形的面积都是</p>
+
+<p>\[\Delta A = \Delta x \cdot \Delta y.\]</p>
+
+<p>在第 \((i, j)\) 个小矩形里随便选一个采样点 \((x_i^*, y_j^*)\)。在这个点处，函数取值是 \(f(x_i^*, y_j^*)\)。现在做一件几何上极有画面感的事：在这个小矩形<strong>正上方</strong>立起一个长方体盒子，底是这个小矩形，高是 \(f(x_i^*, y_j^*)\)。这个盒子的体积自然是</p>
+
+<p>\[f(x_i^*, y_j^*) \cdot \Delta A.\]</p>
+
+<p>对所有 \(mn\) 个小矩形都做同一件事，把所有盒子摆在一起，得到的就是一座坑坑洼洼、高低错落的"积木塔"——它的顶面像一片由小台阶拼出来的离散版曲面，模仿着真正的曲面 \(z = f(x, y)\)。这座积木塔的总体积，就是<strong>黎曼和</strong></p>
+
+<p>\[S_{m, n} = \sum_{i=1}^m \sum_{j=1}^n f(x_i^*, y_j^*) \, \Delta A.\]</p>
+
+<p>这里有几件值得注意的事。第一，外层的 \(\sum_i\) 与内层的 \(\sum_j\) 顺序无关——加法是交换的，先沿哪一行加都一样；这是后面富比尼定理"先 \(x\) 后 \(y\) 等于先 \(y\) 后 \(x\)"的最初版本。第二，盒子高在某些地方可能是负的，这时候盒子被算成"负体积"——它把曲面在 \(xy\) 平面下方的那部分扣掉。这正是"带符号体积"几个字的全部含义。第三，每个盒子能精确等于真实曲面下那一小块的体积吗？当然不能——盒子顶是水平的，曲面顶是斜的，差一点。但只要切得够细，差距越来越小。</p>
+
+<p>当切分越来越细，也就是 \(m, n \to \infty\) 同时 \(\Delta x, \Delta y \to 0\)，黎曼和如果存在极限、且这个极限不依赖采样点的具体选法，我们就把这个公共极限定义为<strong>二重积分</strong>：</p>
+
+<p>\[\boxed{\iint_R f(x, y)\,dA = \lim_{\substack{m, n \to \infty}} \sum_{i=1}^m \sum_{j=1}^n f(x_i^*, y_j^*) \, \Delta A.}\]</p>
+
+<p>记号上的 \(dA\) 就是 \(\Delta A\) 的"无穷小版本"，它是面积元，提醒我们这是在加面积乘函数值。事实上对于一切常见的函数（连续函数当然可以，连续性偶尔被打破也大多没事），这个极限一定存在；这是一个理论结果，证明放在附录里。我们把所有的精力都放在<strong>怎么算它</strong>。</p>
+
+<p>计算的钥匙叫累次积分。</p>
+
+<h2 id="sec13-2">13.2 累次积分与富比尼定理</h2>
+
+<p>定义看起来漂亮，但你不能真的对每一个 \(m, n\) 都去算 \(mn\) 个采样然后求和取极限——那是无穷多步。富比尼定理给了我们一条惊人的捷径：在矩形上，二重积分可以化成两个一元积分，外层套内层，连续做两次。具体地说，</p>
+
+<p>\[\boxed{\iint_R f(x, y)\,dA = \int_c^d \int_a^b f(x, y)\,dx\,dy = \int_a^b \int_c^d f(x, y)\,dy\,dx.}\]</p>
+
+<p>读这串等式时，请按"由内往外"的方向读。先看右边第一个表达式 \(\int_c^d \int_a^b f(x, y)\,dx\,dy\)。它真正的意思是</p>
+
+<p>\[\int_c^d \left[\int_a^b f(x, y)\,dx\right] dy.\]</p>
+
+<p>内层那个方括号里的一元积分 \(\int_a^b f(x, y)\,dx\)，是把 \(y\) <strong>暂时当作常数</strong>，对 \(x\) 在 \([a, b]\) 上做普通的一元定积分。结果当然依赖于那个被扣作常数的 \(y\)，所以它本身是一个 \(y\) 的函数；记作 \(F(y)\)。然后外层 \(\int_c^d F(y)\,dy\) 再把这个 \(y\) 的函数在 \([c, d]\) 上做一元定积分，得到一个数。</p>
+
+<p>为什么这件事是对的？画面是这样：把"积木塔"按平行于 \(x\) 轴的方向一片一片切。每一片是一个垂直的"切片"，它的面积正好是 \(\int_a^b f(x, y)\,dx\)（这是把这一片当作单变量函数 \(x \mapsto f(x, y)\) 下的面积）。然后把所有切片的面积乘以厚度 \(dy\) 加起来——也就是 \(\int_c^d \cdots dy\)——就得到了整座塔的体积。这正是定积分在三维下的卡瓦列里原理。</p>
+
+<p>富比尼定理还有一句更神奇的话：<strong>两种积分顺序结果相同</strong>。先 \(x\) 后 \(y\)，等于先 \(y\) 后 \(x\)。这个等式在矩形区域上对任何足够规矩的 \(f\)（连续就够）总是成立。它给了你一种宝贵的自由：你可以选哪一种顺序更易计算的那种。一道二重积分按某个顺序写出来需要分部三次还要换元，按另一顺序可能两步就完。<strong>"选顺序"是这一章里最值得养成的本能。</strong></p>
+
+<p>下面通过一道极小的题看看这一切是怎么落地的。求</p>
+
+<p>\[\iint_R xy^2\,dA, \quad R = [0, 1] \times [0, 2].\]</p>
+
+<p>先按"先 \(x\) 后 \(y\)"做。把 \(y\) 当常数，</p>
+
+<p>\[\int_0^1 xy^2\,dx = y^2 \cdot \frac{x^2}{2}\Big|_0^1 = \frac{y^2}{2}.\]</p>
+
+<p>这是一个 \(y\) 的函数。再外层对 \(y\) 积，</p>
+
+<p>\[\int_0^2 \frac{y^2}{2}\,dy = \frac{1}{2} \cdot \frac{y^3}{3}\Big|_0^2 = \frac{1}{2} \cdot \frac{8}{3} = \frac{4}{3}.\]</p>
+
+<p>再按"先 \(y\) 后 \(x\)"做一遍来对答案。把 \(x\) 当常数，</p>
+
+<p>\[\int_0^2 xy^2\,dy = x \cdot \frac{y^3}{3}\Big|_0^2 = \frac{8x}{3}.\]</p>
+
+<p>外层对 \(x\) 积，</p>
+
+<p>\[\int_0^1 \frac{8x}{3}\,dx = \frac{8}{3} \cdot \frac{x^2}{2}\Big|_0^1 = \frac{4}{3}.\]</p>
+
+<p>两种顺序得到同样的 \(\dfrac{4}{3}\)。富比尼帮了我们一个忙。</p>
+
+<h3>把被积函数拆成两个单变量函数的乘积</h3>
+
+<p>在上面的例子里，被积函数 \(xy^2\) 还有一个让人愉快的结构：它是 \(x\) 的函数 \(g(x) = x\) 与 \(y\) 的函数 \(h(y) = y^2\) 的乘积。一旦你识别出这个结构，二重积分立刻坍缩成两个一元积分的<em>乘积</em>。原因极其简单：在</p>
+
+<p>\[\int_a^b \int_c^d g(x) h(y)\,dy\,dx = \int_a^b g(x) \left[\int_c^d h(y)\,dy\right] dx\]</p>
+
+<p>里，方括号内是一个不依赖 \(x\) 的常数（因为是对 \(y\) 积出来的数），可以提到外层去：</p>
+
+<p>\[= \left[\int_c^d h(y)\,dy\right] \cdot \int_a^b g(x)\,dx = \left(\int_a^b g(x)\,dx\right)\left(\int_c^d h(y)\,dy\right).\]</p>
+
+<p>用大方框圈起来：</p>
+
+<p>\[\boxed{\iint_R g(x) h(y)\,dA = \left(\int_a^b g(x)\,dx\right)\left(\int_c^d h(y)\,dy\right) \quad (R = [a, b] \times [c, d]).}\]</p>
+
+<p>这是一个值得专门记住的小窍门。回到上面那道 \(\iint_R xy^2\,dA\)，我们立刻有</p>
+
+<p>\[\iint_R xy^2\,dA = \int_0^1 x\,dx \cdot \int_0^2 y^2\,dy = \frac{1}{2} \cdot \frac{8}{3} = \frac{4}{3}.\]</p>
+
+<p>三秒就完。一旦养成识别"乘积形式"的本能，许多看起来要硬算的题都瞬间瓦解。请注意：这一招只在<strong>矩形区域</strong>且<strong>被积函数是分离形式</strong>时成立——一般区域上要小心，这一点我们在第 14 章会专门强调。</p>
+
+<h2 id="sec13-3">13.3 矩形区域上的更多例题</h2>
+
+<p>下面通过一连串例题把上节的工具用熟。</p>
+
+<p><strong>例 1.</strong> 求 \(\displaystyle\iint_R \sin(x + y)\,dA\)，其中 \(R = [0, \pi/2] \times [0, \pi/2]\)。</p>
+
+<p>这里被积函数<em>不是</em>分离形式（\(\sin(x + y) \ne \sin x \cdot \sin y\)），所以乘积技巧用不上。直接累次积分，从内层 \(x\) 开始：把 \(y\) 当常数，</p>
+
+<p>\[\int_0^{\pi/2} \sin(x + y)\,dx = -\cos(x + y)\Big|_0^{\pi/2} = -\cos\!\left(\tfrac{\pi}{2} + y\right) + \cos y.\]</p>
+
+<p>用 \(\cos(\pi/2 + y) = -\sin y\) 化简，得到 \(\sin y + \cos y\)。再外层对 \(y\) 积：</p>
+
+<p>\[\int_0^{\pi/2}(\sin y + \cos y)\,dy = (-\cos y + \sin y)\Big|_0^{\pi/2} = (0 + 1) - (-1 + 0) = 2.\]</p>
+
+<p>所以 \(\iint_R \sin(x + y)\,dA = 2\)。</p>
+
+<p><strong>例 2.</strong> 求 \(\displaystyle\iint_R x e^{xy}\,dA\)，其中 \(R = [0, 1] \times [0, 1]\)。</p>
+
+<p>这道题最值得说的是顺序选择。如果先对 \(y\) 积，把 \(x\) 当常数，那个 \(e^{xy}\) 关于 \(y\) 的原函数是 \(e^{xy}/x\)（再乘前面的 \(x\) 就抵消了），</p>
+
+<p>\[\int_0^1 x e^{xy}\,dy = e^{xy}\Big|_{y=0}^{y=1} = e^x - 1.\]</p>
+
+<p>外层对 \(x\) 积，</p>
+
+<p>\[\int_0^1 (e^x - 1)\,dx = (e^x - x)\Big|_0^1 = (e - 1) - 1 = e - 2.\]</p>
+
+<p>反过来如果先对 \(x\) 积，那个 \(\int_0^1 x e^{xy}\,dx\) 要做分部，再外层还要积——比上面麻烦得多。这就是为什么说"选顺序很重要"。</p>
+
+<p><strong>例 3.</strong> 求 \(\displaystyle\iint_R (x^2 + y^2)\,dA\)，其中 \(R = [0, 2] \times [0, 3]\)。</p>
+
+<p>这是经典的"分离不分离"题。\(x^2 + y^2\) 不是 \(g(x) h(y)\) 的形式，但它是<em>两个分离函数之和</em>。利用积分的线性性，</p>
+
+<p>\[\iint_R (x^2 + y^2)\,dA = \iint_R x^2\,dA + \iint_R y^2\,dA.\]</p>
+
+<p>每一项都是一个常数因子乘以一个一元积分（用上节的乘积技巧，把另一变量看作"常数 \(\times 1\)"）：</p>
+
+<p>\[\iint_R x^2\,dA = \int_0^2 x^2\,dx \cdot \int_0^3 1\,dy = \frac{8}{3} \cdot 3 = 8,\]</p>
+
+<p>\[\iint_R y^2\,dA = \int_0^2 1\,dx \cdot \int_0^3 y^2\,dy = 2 \cdot 9 = 18.\]</p>
+
+<p>合起来 \(8 + 18 = 26\)。</p>
+
+<p><strong>例 4.</strong> 求 \(\displaystyle\iint_R \frac{1}{(x + y + 1)^2}\,dA\)，其中 \(R = [0, 1] \times [0, 1]\)。</p>
+
+<p>先对 \(x\) 积容易，因为 \(\dfrac{1}{(x + y + 1)^2}\) 的关于 \(x\) 的原函数是 \(-\dfrac{1}{x + y + 1}\)：</p>
+
+<p>\[\int_0^1 \frac{dx}{(x + y + 1)^2} = -\frac{1}{x + y + 1}\Big|_0^1 = -\frac{1}{y + 2} + \frac{1}{y + 1} = \frac{1}{y + 1} - \frac{1}{y + 2}.\]</p>
+
+<p>外层对 \(y\) 积，</p>
+
+<p>\[\int_0^1 \left[\frac{1}{y + 1} - \frac{1}{y + 2}\right] dy = \ln(y + 1) - \ln(y + 2)\Big|_0^1 = (\ln 2 - \ln 3) - (\ln 1 - \ln 2) = 2\ln 2 - \ln 3 = \ln \frac{4}{3}.\]</p>
+
+<p>这种"两步对数"的小积分在整本书里反复出现——一旦认出 \(\dfrac{1}{(\cdot)^2}\) 形式，原函数就在脑子里。</p>
+
+<p><strong>例 5.</strong> 求 \(\displaystyle\iint_R y \cos(xy)\,dA\)，其中 \(R = [0, 1] \times [0, \pi]\)。</p>
+
+<p>这道题外表吓人，但只要选对顺序就轻松了。注意 \(\dfrac{d}{dx}[\sin(xy)] = y\cos(xy)\)，所以先对 \(x\) 积刚好对应一个干净的原函数：</p>
+
+<p>\[\int_0^1 y\cos(xy)\,dx = \sin(xy)\Big|_{x=0}^{x=1} = \sin y.\]</p>
+
+<p>外层 \(\int_0^\pi \sin y\,dy = -\cos y\Big|_0^\pi = 2\)。如果反过来先对 \(y\) 积，就要分部 \(\int y \cos(xy)\,dy\)，比上面繁琐一倍。</p>
+
+<p>到此为止，矩形区域上的二重积分基本就讲完了——核心就两件事：用富比尼把它写成累次积分，再选一个让你少做功的顺序。下一章我们要离开矩形，走进真正的"区域"——被曲线围出的、不规则的、需要先画图再设上下限的世界。</p>
+
+<hr>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 拉格朗日乘数法</a><a href="ch14.html">下一章 · 第 14 章 一般区域上的二重积分 →</a></nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 换元法与雅可比行列式 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 柱面坐标与球面坐标</a><a href="ch19.html">下一章 · 第 19 章 向量场 →</a></nav>
+<h1 id="ch18">第 18 章 换元法与雅可比行列式</h1>
+
+<p>到目前为止，我们已经熟悉了三种特殊的换元：极坐标、柱面坐标、球面坐标。每一种都附带一个体积元素的"魔法因子"——\(r\)、\(r\)、\(\rho^2\sin\phi\)。这些魔法因子都不是凭空写下的；它们的几何来源我们也都讲过。但如果有一天我们需要的换元不是这三种之一——比如换元 \(u = x + y\)、\(v = x - y\)，或者 \(x = au, y = bv\)，或者更怪的——我们应该怎么知道修正因子是什么？</p>
+
+<p>本章把这件事做成<strong>一般理论</strong>。所有"换元"的修正因子都来自同一个对象：<strong>雅可比行列式</strong>。极、柱、球只是这个一般公式的三个特例。从此你就有能力面对任意一个光滑双射换元，把它的修正因子算出来。</p>
+
+<p>本章的安排：先把二维换元公式与雅可比行列式的定义写下来；再用一节专门讲它的<strong>几何意义</strong>——为什么一个看起来像行列式的东西恰好告诉我们面积如何被缩放；再做几道线性换元和一般换元的例题；最后把整套理论推广到三维，并把柱面、球面坐标当作"验证"过一遍。</p>
+
+<h2 id="sec18-1">18.1 二维换元公式</h2>
+
+<p>设你想用新变量 \((u, v)\) 取代原变量 \((x, y)\)，关系由</p>
+
+\[
+x = x(u, v),\quad y = y(u, v)
+\]
+
+<p>给出（要求是光滑、且至少在我们关心的区域内是双射的——一对一对应）。设 \(D\) 是 \((x, y)\) 空间中的一块区域，\(D'\) 是它在 \((u, v)\) 空间中对应的区域。则</p>
+
+\[
+\boxed{\iint_D f(x, y)\,dA = \iint_{D'} f(x(u, v),\ y(u, v))\,|J|\,du\,dv,}
+\]
+
+<p>其中 \(J\) 是<strong>雅可比行列式</strong>：</p>
+
+\[
+J = \frac{\partial(x, y)}{\partial(u, v)} = \begin{vmatrix} \dfrac{\partial x}{\partial u} & \dfrac{\partial x}{\partial v} \\[4pt] \dfrac{\partial y}{\partial u} & \dfrac{\partial y}{\partial v} \end{vmatrix} = \frac{\partial x}{\partial u}\cdot\frac{\partial y}{\partial v} - \frac{\partial x}{\partial v}\cdot\frac{\partial y}{\partial u}.
+\]
+
+<p>绝对值 \(|J|\) 起到"修正因子"的作用——它告诉你 \((u, v)\) 空间里的小矩形 \(du\,dv\) 在 \((x, y)\) 空间里被映成的小平行四边形的面积是多少。换元前后<strong>区域</strong>变了、<strong>变量</strong>变了、<strong>面积元素</strong>也变了；这一切的代价就是乘上 \(|J|\)。</p>
+
+<p>在动手算具体题之前，请先停一停，看看这个公式在你已经熟悉的特例上是否对得上。</p>
+
+<p>极坐标：\(x = r\cos\theta\)，\(y = r\sin\theta\)。算四个偏导：\(\partial x/\partial r = \cos\theta\)，\(\partial x/\partial\theta = -r\sin\theta\)，\(\partial y/\partial r = \sin\theta\)，\(\partial y/\partial\theta = r\cos\theta\)。</p>
+
+\[
+J = \begin{vmatrix} \cos\theta & -r\sin\theta \\ \sin\theta & r\cos\theta\end{vmatrix} = r\cos^2\theta - (-r\sin^2\theta) = r(\cos^2\theta + \sin^2\theta) = r.
+\]
+
+<p>所以 \(dA = |J|\,dr\,d\theta = r\,dr\,d\theta\)。这与第 15 章的结果完全一致——一般理论在这一特例上把它"重新讲了一遍"，而且讲得更深刻：那个 \(r\) 是<strong>从行列式里掉出来的</strong>，不是凭空写的。</p>
+
+<h2 id="sec18-2">18.2 几何意义：把雅可比看成"小平行四边形的面积"</h2>
+
+<p>请允许我用一节的篇幅把雅可比行列式的几何来源讲清楚。这是整门课里最值得理解、也最经常被囫囵吞下的一小段。等你看清了，"雅可比行列式 = 面积缩放比"将不再是一句口号，而是一幅在脑中清晰可见的图。</p>
+
+<p>固定 \((u, v)\) 空间里的一个点 \((u_0, v_0)\)，看它附近的一个小矩形：\(u \in [u_0, u_0 + \Delta u]\)、\(v \in [v_0, v_0 + \Delta v]\)。这是一个边长 \(\Delta u\)、\(\Delta v\) 的小矩形，面积是 \(\Delta u\,\Delta v\)。</p>
+
+<p>用映射 \(\mathbf{T}(u, v) = (x(u, v), y(u, v))\) 把它送到 \((x, y)\) 空间。原矩形的四个顶点变成：</p>
+
+<ul>
+  <li>\(P_0 = \mathbf{T}(u_0, v_0)\) — 原点的像；</li>
+  <li>\(P_u = \mathbf{T}(u_0 + \Delta u,\ v_0)\) — 沿 \(u\) 方向走一步；</li>
+  <li>\(P_v = \mathbf{T}(u_0,\ v_0 + \Delta v)\) — 沿 \(v\) 方向走一步；</li>
+  <li>\(P_{uv} = \mathbf{T}(u_0 + \Delta u,\ v_0 + \Delta v)\) — 两个方向都走一步。</li>
+</ul>
+
+<p>当 \(\Delta u, \Delta v\) 足够小，把 \(\mathbf{T}\) 在 \((u_0, v_0)\) 处一阶展开（线性化），得到</p>
+
+\[
+P_u - P_0 \approx \left(\frac{\partial x}{\partial u},\ \frac{\partial y}{\partial u}\right)\Delta u =: \mathbf{a}\,\Delta u,
+\]
+
+\[
+P_v - P_0 \approx \left(\frac{\partial x}{\partial v},\ \frac{\partial y}{\partial v}\right)\Delta v =: \mathbf{b}\,\Delta v.
+\]
+
+<p>请把这一对向量 \(\mathbf{a} = (\partial x/\partial u,\ \partial y/\partial u)\) 与 \(\mathbf{b} = (\partial x/\partial v,\ \partial y/\partial v)\) 想象成"映射在该点把 \(u\) 方向、\(v\) 方向小步分别送到了什么向量"。原本相互垂直、长度 \(\Delta u\) 与 \(\Delta v\) 的两条边，被送成了 \(\mathbf{a}\,\Delta u\) 与 \(\mathbf{b}\,\Delta v\) 这一对向量。它们一般<strong>不再垂直</strong>，长度也变了。映射出来的那块小区域，近似是以 \(P_0\) 为一个顶点、由这两条向量张出的<strong>小平行四边形</strong>。</p>
+
+<p>第 2 章我们已经知道，二维平面里两条向量 \(\mathbf{a}, \mathbf{b}\) 张成的平行四边形面积，等于以它们为行（或为列）的 \(2 \times 2\) 行列式的绝对值：</p>
+
+\[
+\text{面积}(\mathbf{a}, \mathbf{b}) = \left|\det\begin{pmatrix} a_1 & a_2 \\ b_1 & b_2 \end{pmatrix}\right| = |a_1 b_2 - a_2 b_1|.
+\]
+
+<p>把 \(\mathbf{a}\,\Delta u\)、\(\mathbf{b}\,\Delta v\) 代进去：</p>
+
+\[
+\text{平行四边形面积} = |\mathbf{a}\,\Delta u \times \mathbf{b}\,\Delta v| = \Delta u\,\Delta v \cdot \left|\det\begin{pmatrix} \partial x/\partial u & \partial y/\partial u \\ \partial x/\partial v & \partial y/\partial v\end{pmatrix}\right| = \Delta u\,\Delta v \cdot |J|.
+\]
+
+<p>这就告诉我们：在 \((u, v)\) 空间里那个小矩形的面积 \(\Delta u\,\Delta v\)，被映成了 \((x, y)\) 空间里一块面积 \(|J|\,\Delta u\,\Delta v\) 的小平行四边形。\(|J|\) 就是<strong>面积的局部缩放比</strong>。</p>
+
+<p>当我们写 \(dA = |J|\,du\,dv\)，这一行公式翻译过来就是上面这段话。它和"链式法则"在一元微积分里表现的"\(dx = (dx/du)\,du\)"是同一种语言，只是从 1 维换元升到了 2 维换元。换言之，<strong>雅可比行列式就是多维世界的"\(dx/du\)"</strong>——只不过它不再是个标量比，而是一个对面积的"有向缩放因子"。</p>
+
+<p>取绝对值是为什么？因为我们关心的是面积本身，而面积总是正的。如果 \(J\) 本身是负的，那是在告诉你映射 \(\mathbf{T}\) 把 \(uv\) 平面的"逆时针"翻转成了 \(xy\) 平面的"顺时针"——它带着定向信息，和雅克比矩阵作为一个线性映射在两个方向之间转换基的"右手系/左手系"是一回事。但只要我们做的是<strong>面积</strong>积分（或体积积分），就只取绝对值，符号交给定向去操心。</p>
+
+<h2 id="sec18-3">18.3 计算雅可比与几道例题</h2>
+
+<p>把"算雅可比"做成可以照抄的步骤：</p>
+
+<ol>
+  <li>写下 \(x = x(u, v)\)、\(y = y(u, v)\)（如果题目给的是反过来的关系——\(u = u(x, y)\)、\(v = v(x, y)\)——先解出 \(x, y\)，否则你要算的是<strong>反向雅可比</strong>，再取倒数）。</li>
+  <li>算四个一阶偏导 \(\partial x/\partial u\)、\(\partial x/\partial v\)、\(\partial y/\partial u\)、\(\partial y/\partial v\)。</li>
+  <li>算 \(J = (\partial x/\partial u)(\partial y/\partial v) - (\partial x/\partial v)(\partial y/\partial u)\)。</li>
+  <li>取绝对值 \(|J|\) 用作面积元素的修正因子。</li>
+</ol>
+
+<p>关于"反向雅可比"的一句小提醒：如果你只能算 \(\partial(u, v)/\partial(x, y)\)（即把 \(u, v\) 对 \(x, y\) 求偏导）而懒得反解，一个可用的等式是</p>
+
+\[
+\frac{\partial(x, y)}{\partial(u, v)} = \frac{1}{\partial(u, v)/\partial(x, y)}.
+\]
+
+<p>它把"换元 + 反换元"对应的两组雅可比绑在一起，互为倒数——这正是反函数链式法则的二维版本。</p>
+
+<p><strong>第一例（线性换元）。</strong>计算 \(\iint_D (x + y)\,dA\)，其中 \(D\) 是由 \(x + y = 1\)、\(x + y = 3\)、\(x - y = 0\)、\(x - y = 2\) 围成的平行四边形。</p>
+
+<p>这个 \(D\) 在直角坐标下别扭——四条边都是斜的——但它的<strong>边界</strong>已经替我们暗示了正确的换元：让 \(u = x + y\)、\(v = x - y\)。在 \((u, v)\) 空间里 \(D\) 退化为干净的矩形 \(u \in [1, 3]\)、\(v \in [0, 2]\)。</p>
+
+<p>反解：\(x = (u + v)/2\)、\(y = (u - v)/2\)。雅可比：</p>
+
+\[
+J = \begin{vmatrix} 1/2 & 1/2 \\ 1/2 & -1/2\end{vmatrix} = (1/2)(-1/2) - (1/2)(1/2) = -\frac{1}{4} - \frac{1}{4} = -\frac{1}{2}.
+\]
+
+<p>\(|J| = 1/2\)。换元后被积函数 \(x + y = u\)。</p>
+
+\[
+\iint_D (x + y)\,dA = \int_1^3 \int_0^2 u \cdot \frac{1}{2}\,dv\,du = \frac{1}{2}\cdot 2 \cdot \int_1^3 u\,du = 1 \cdot 4 = 4.
+\]
+
+<p>注意这里的关键：是 \(D\) 的<strong>四条边</strong>告诉我们应该选什么换元——让边界变成"\(u = \) 常数"和"\(v = \) 常数"的直线。这是"看着边界设计换元"的最朴素版本。</p>
+
+<p><strong>第二例（椭圆面积）。</strong>求椭圆 \(\dfrac{x^2}{a^2} + \dfrac{y^2}{b^2} \le 1\) 的面积。</p>
+
+<p>换元 \(x = au\)、\(y = bv\)：椭圆变为单位圆盘 \(u^2 + v^2 \le 1\)。雅可比</p>
+
+\[
+J = \begin{vmatrix} a & 0 \\ 0 & b\end{vmatrix} = ab.
+\]
+
+<p>所以</p>
+
+\[
+\text{面积} = \iint_D 1\,dA = \iint_{D'} ab\,du\,dv = ab \cdot (\text{单位圆面积}) = ab \cdot \pi = \pi ab.
+\]
+
+<p>这就是著名的椭圆面积公式 \(S = \pi ab\)。它的几何意义在新坐标下一目了然：把椭圆"沿两个轴方向不等比例地拉直"成单位圆，面积按 \(ab\) 倍放大。雅可比行列式正是把这个"不等比例缩放"翻译成代数。</p>
+
+<p><strong>第三例（旋转 + 缩放）。</strong>计算 \(\iint_D (x^2 + y^2)\,dA\)，\(D\) 是由 \(x^2 - 2xy + y^2 = 1\)、\(x^2 - 2xy + y^2 = 4\) 与 \(x = 0\)、\(y = 0\) 围成的某区域（在 \(x + y > 0\) 一侧）。</p>
+
+<p>注意 \(x^2 - 2xy + y^2 = (x - y)^2\)，所以前两条边是 \(|x - y| = 1\) 和 \(|x - y| = 2\)。在 \(x \ge 0, y \ge 0\)、\(x + y > 0\) 这一带里，\(D\) 的边界由 \(x - y = \pm 1\)、\(x - y = \pm 2\) 与坐标轴围出。换元 \(u = x + y\)、\(v = x - y\)，\(D\) 变成两个矩形之并；雅可比 \(|J| = 1/2\)（同第一例）。被积 \(x^2 + y^2 = (u^2 + v^2)/2\)。</p>
+
+<p>具体把上下限写出来不是这道题的重点；关键是：<strong>当你看到边界是 \(x \pm y\) 的形式</strong>，几乎一定要试 \(u = x + y\)、\(v = x - y\) 这一对。它把边界折成竖线和横线，剩下的便都是常规积分。</p>
+
+<p><strong>第四例（旋转坐标轴）。</strong>计算 \(\iint_D \exp(-(x^2 + 4y^2))\,dA\)，\(D\) 是椭圆 \(x^2 + 4y^2 \le 1\)。</p>
+
+<p>换元 \(x = u, y = v/2\)，雅可比 \(|J| = 1/2\)。椭圆变成单位圆盘 \(u^2 + v^2 \le 1\)。被积 \(\exp(-(u^2 + v^2))\)。换到极坐标（这一步是<strong>第二次</strong>换元）：</p>
+
+\[
+\iint_D e^{-(x^2 + 4y^2)}\,dA = \frac{1}{2}\int_0^{2\pi}\int_0^1 e^{-r^2}\,r\,dr\,d\theta = \frac{1}{2}\cdot 2\pi \cdot \frac{1 - e^{-1}}{2} = \frac{\pi(1 - e^{-1})}{2}.
+\]
+
+<p>"先做一次线性换元把椭圆变圆，再换到极坐标"是处理椭圆区域上"半径型"被积函数的标准两步法。第一次换元交给雅可比，第二次换元也交给雅可比——两次叠加而已。</p>
+
+<h2 id="sec18-4">18.4 三维换元公式</h2>
+
+<p>把整套理论原封不动地升到三维。设 \(x = x(u, v, w)\)、\(y = y(u, v, w)\)、\(z = z(u, v, w)\)，则</p>
+
+\[
+\boxed{\iiint_E f(x, y, z)\,dV = \iiint_{E'} f(x(u, v, w),\ y(u, v, w),\ z(u, v, w))\,|J|\,du\,dv\,dw,}
+\]
+
+<p>其中 \(J\) 是 \(3 \times 3\) 雅可比行列式</p>
+
+\[
+J = \frac{\partial(x, y, z)}{\partial(u, v, w)} = \begin{vmatrix} \dfrac{\partial x}{\partial u} & \dfrac{\partial x}{\partial v} & \dfrac{\partial x}{\partial w} \\[4pt] \dfrac{\partial y}{\partial u} & \dfrac{\partial y}{\partial v} & \dfrac{\partial y}{\partial w} \\[4pt] \dfrac{\partial z}{\partial u} & \dfrac{\partial z}{\partial v} & \dfrac{\partial z}{\partial w}\end{vmatrix}.
+\]
+
+<p>几何意义和二维如出一辙：\((u, v, w)\) 空间里的小立方体 \(du\,dv\,dw\)，被映成 \((x, y, z)\) 空间里以"三条像向量"\(\mathbf{a}, \mathbf{b}, \mathbf{c}\)（分别是 \(\mathbf{T}\) 在该点对 \(u, v, w\) 的偏导）张出的<strong>小平行六面体</strong>。三维平行六面体的体积，等于以 \(\mathbf{a}, \mathbf{b}, \mathbf{c}\) 为行（或列）的 \(3 \times 3\) 行列式的绝对值——这就是 \(|J|\) 的几何来源。</p>
+
+<p>把柱面、球面坐标重新放回这个一般公式来"验证"。这一步不是为了推出新结果，而是为了让你看到：那两条公式不是天上掉下来的，它们就是 \(3 \times 3\) 雅可比行列式的特例，写一下就出。</p>
+
+<p>柱面坐标：\(x = r\cos\theta\)、\(y = r\sin\theta\)、\(z = z\)。雅可比</p>
+
+\[
+J = \begin{vmatrix} \cos\theta & -r\sin\theta & 0 \\ \sin\theta & r\cos\theta & 0 \\ 0 & 0 & 1\end{vmatrix}.
+\]
+
+<p>沿第三行展开（只剩一个非零的 \(1\)）：\(J = 1 \cdot (\cos\theta \cdot r\cos\theta - (-r\sin\theta)\cdot \sin\theta) = r\cos^2\theta + r\sin^2\theta = r\)。所以 \(dV = r\,dr\,d\theta\,dz\)，与 17.1 节一致。</p>
+
+<p>球面坐标：\(x = \rho\sin\phi\cos\theta\)、\(y = \rho\sin\phi\sin\theta\)、\(z = \rho\cos\phi\)。雅可比</p>
+
+\[
+J = \begin{vmatrix} \sin\phi\cos\theta & \rho\cos\phi\cos\theta & -\rho\sin\phi\sin\theta \\ \sin\phi\sin\theta & \rho\cos\phi\sin\theta & \rho\sin\phi\cos\theta \\ \cos\phi & -\rho\sin\phi & 0\end{vmatrix}.
+\]
+
+<p>沿第三行展开。\(\cos\phi\) 那一项是</p>
+
+\[
+\cos\phi \cdot \begin{vmatrix} \rho\cos\phi\cos\theta & -\rho\sin\phi\sin\theta \\ \rho\cos\phi\sin\theta & \rho\sin\phi\cos\theta\end{vmatrix} = \cos\phi \cdot \rho^2\sin\phi\cos\phi (\cos^2\theta + \sin^2\theta) = \rho^2\sin\phi\cos^2\phi.
+\]
+
+<p>\(-(-\rho\sin\phi)\) 那一项是</p>
+
+\[
+\rho\sin\phi \cdot \begin{vmatrix} \sin\phi\cos\theta & -\rho\sin\phi\sin\theta \\ \sin\phi\sin\theta & \rho\sin\phi\cos\theta\end{vmatrix} = \rho\sin\phi \cdot \rho\sin^2\phi (\cos^2\theta + \sin^2\theta) = \rho^2\sin^3\phi.
+\]
+
+<p>第三行的最后一项是 \(0 \cdot (\cdots) = 0\)。求和：</p>
+
+\[
+J = \rho^2 \sin\phi\cos^2\phi + \rho^2\sin^3\phi = \rho^2\sin\phi(\cos^2\phi + \sin^2\phi) = \rho^2\sin\phi.
+\]
+
+<p>所以 \(dV = \rho^2\sin\phi\,d\rho\,d\phi\,d\theta\)——和 17.2 节用几何法导出的完全一样。这两次"验证"是一种自我确认：一般理论与你前面熟悉的两种特殊换元彼此自洽。</p>
+
+<p><strong>三维线性换元的一个例子。</strong>求椭球体 \(\dfrac{x^2}{a^2} + \dfrac{y^2}{b^2} + \dfrac{z^2}{c^2} \le 1\) 的体积。</p>
+
+<p>换元 \(x = au, y = bv, z = cw\)：椭球体变为单位球 \(u^2 + v^2 + w^2 \le 1\)。雅可比</p>
+
+\[
+J = \begin{vmatrix} a & 0 & 0 \\ 0 & b & 0 \\ 0 & 0 & c\end{vmatrix} = abc.
+\]
+
+<p>所以</p>
+
+\[
+V = \iiint_E 1\,dV = \iiint_{E'} abc\,du\,dv\,dw = abc \cdot \frac{4\pi}{3} = \frac{4}{3}\pi abc.
+\]
+
+<p>这就是椭球体积的经典公式。它的几何意义和椭圆面积如出一辙：把椭球沿三个轴方向不等比例地拉成单位球，体积按 \(abc\) 倍放大。当 \(a = b = c = R\) 时退化为 \(\tfrac{4}{3}\pi R^3\)，与第 17 章一致。</p>
+
+<p>第二部分（积分学）到此为止。我们从一元积分一路推广到了二维、三维；从直角坐标推广到了极、柱、球；最终把所有"换元"的修正因子都收进了雅可比行列式这一个统一的对象里。<strong>第三部分</strong>（向量微积分）从第 19 章开始：我们要把"被积分的东西"和"被求导的东西"都从标量函数升级为<strong>向量场</strong>——物理上是力场、流场、电磁场——然后把"积分基本定理"在向量场上推广出三个版本：格林、斯托克斯、高斯。换言之，前两部分搭好的所有积分机器，将在第三部分变成描述自然界的语言。</p>
+
+<hr/>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 柱面坐标与球面坐标</a><a href="ch19.html">下一章 · 第 19 章 向量场 →</a></nav>
+
+</main>
+</body>
+</html>

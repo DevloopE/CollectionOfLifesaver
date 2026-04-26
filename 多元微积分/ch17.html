@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 柱面坐标与球面坐标 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 三重积分</a><a href="ch18.html">下一章 · 第 18 章 换元法与雅可比行列式 →</a></nav>
+<h1 id="ch17">第 17 章 柱面坐标与球面坐标</h1>
+
+<p>在二维世界里，极坐标对圆形、扇形、环形区域几乎是一场"压倒性的"胜利。第 15 章里那道高斯积分——直角坐标下根本算不出，极坐标下两行就完——就是它最显眼的证据。三维世界里有两种类似的"自然坐标系"，分别对应两种不同的对称性：<strong>柱面坐标</strong>专治圆柱、圆锥、绕 \(z\) 轴旋转的曲面，而<strong>球面坐标</strong>专治球、半球、球冠、球壳。</p>
+
+<p>这一章的任务是把这两种坐标讲透——它们的转换公式、它们的体积元素、它们在脑中应有的几何形象——然后用相当多的篇幅讨论"什么时候用哪种"。前半场是工具的介绍；后半场是对工具的鉴赏。前者让你能算，后者让你算得快。</p>
+
+<h2 id="sec17-1">17.1 柱面坐标</h2>
+
+<p>柱面坐标做的事情，是对二维极坐标做"竖直方向不变"的拉伸。点 \((x, y, z)\) 在柱面坐标里被写成 \((r, \theta, z)\)：水平方向用极坐标 \((r, \theta)\)，竖直方向保持 \(z\) 不变。</p>
+
+\[
+x = r\cos\theta,\quad y = r\sin\theta,\quad z = z.
+\]
+
+<p>反过来：\(r = \sqrt{x^2 + y^2}\)，\(\tan\theta = y/x\)，\(z\) 仍是 \(z\)。请把柱面坐标想成"用直立的玻璃管把整个空间套了起来"——每根管子是一个固定 \(r\)、固定 \(\theta\) 的竖直直线，一根细针。沿着这根针 \(z\) 上下走，就走出了一根细管。所有"细管"加起来才是整个 \(\mathbb{R}^3\)。</p>
+
+<p>体积元素是这一节真正的重点。在二维极坐标里我们花了不少力气解释 \(dA = r\,dr\,d\theta\) 里那个 \(r\) 的来源。三维下完全相同的故事再演一次：先在水平方向取一个小极坐标矩形——\(r\) 变化 \(dr\)，\(\theta\) 变化 \(d\theta\)——它的面积是 \(r\,dr\,d\theta\)；再让它沿 \(z\) 方向"拔高"出 \(dz\) 的薄片厚度，体积自然就是面积乘高度：</p>
+
+\[
+\boxed{dV = r\,dr\,d\theta\,dz.}
+\]
+
+<p>请把"那个 \(r\)"刻进脑子里。漏掉它，是这一章最常见、最容易拿不到分的失误。它的几何理由也很容易记：在柱面坐标下，"角度变 \(d\theta\)"对应的弧长不是 \(d\theta\)，而是 \(r\,d\theta\)；离原点越远的细管，"角度一步"对应的弧越长，体积也就被这个 \(r\) 倍数地放大。</p>
+
+<p>柱面坐标适合的对象——可以背成一句口诀："凡是绕 \(z\) 轴旋转出来的东西，柱面坐标几乎一定占便宜"。具体地，圆柱 \(r = R\)、圆锥 \(z = ar\)（顶点在原点）、旋转抛物面 \(z = r^2\)、单叶双曲面 \(r^2 - z^2 = 1\) 等等——它们在直角坐标里都长着一身的 \(\sqrt{x^2 + y^2}\)，到柱面坐标里则一身轻松。判别式可以再加几条：</p>
+
+<ul>
+  <li>区域是<strong>圆柱、圆锥、绕 \(z\) 轴旋转的曲面</strong>所围。</li>
+  <li>被积函数含 \(\sqrt{x^2 + y^2}\)（在柱面下变成 \(r\)）或 \(x^2 + y^2\)（变成 \(r^2\)），同时 \(z\) 仍出现得相对干净。</li>
+  <li>立体在 \(xy\) 平面上的影子是圆盘、扇形或圆环。</li>
+</ul>
+
+<p>来一个直接套用的例子。求圆柱体 \(x^2 + y^2 \le 1\)、\(0 \le z \le 4\) 的质量，密度 \(\rho = z\)。</p>
+
+<p>在柱面坐标里，立体的描述非常痛快：\(0 \le r \le 1\)、\(0 \le \theta \le 2\pi\)、\(0 \le z \le 4\)。三个变量的范围全是<strong>常数</strong>，这是柱面坐标用得对的标志。</p>
+
+\[
+m = \iiint_E z\,dV = \int_0^4 \int_0^{2\pi} \int_0^1 z \cdot r\,dr\,d\theta\,dz.
+\]
+
+<p>三个积分彼此独立，可以"乘开"：</p>
+
+\[
+\int_0^4 z\,dz \cdot \int_0^{2\pi} d\theta \cdot \int_0^1 r\,dr = 8 \cdot 2\pi \cdot \frac{1}{2} = 8\pi.
+\]
+
+<p>第二个例子稍微带点曲面。求由抛物面 \(z = x^2 + y^2\) 与平面 \(z = 4\) 围成的立体的体积。在柱面坐标下：抛物面是 \(z = r^2\)，平面是 \(z = 4\)，两者交线满足 \(r^2 = 4\)，即 \(r = 2\)。立体被描述成 \(0 \le r \le 2\)、\(0 \le \theta \le 2\pi\)、\(r^2 \le z \le 4\)。</p>
+
+\[
+V = \int_0^{2\pi} \int_0^2 \int_{r^2}^{4} dz\,r\,dr\,d\theta = 2\pi \int_0^2 (4 - r^2)\,r\,dr = 2\pi\left[2r^2 - \frac{r^4}{4}\right]_0^2 = 2\pi(8 - 4) = 8\pi.
+\]
+
+<p>第三个例子带"被积函数有 \(\sqrt{x^2+y^2}\)" 的味道。求 \(\iiint_E \sqrt{x^2+y^2}\,dV\)，其中 \(E\) 是 \(0 \le z \le \sqrt{x^2+y^2}\)、\(x^2+y^2 \le 1\) 的立体（一个上方被锥面盖住、下方在 \(xy\) 平面、影子是单位圆盘的"锥皮包"）。</p>
+
+<p>柱面：\(0 \le r \le 1\)、\(0 \le \theta \le 2\pi\)、\(0 \le z \le r\)。被积 \(\sqrt{x^2+y^2} = r\)。</p>
+
+\[
+\iiint_E r\,dV = \int_0^{2\pi}\int_0^1 \int_0^r r \cdot r\,dz\,dr\,d\theta = 2\pi \int_0^1 r^2 \cdot r\,dr = 2\pi \cdot \frac{1}{4} = \frac{\pi}{2}.
+\]
+
+<p>这一题留意：内层 \(z\) 积分上限本身就是 \(r\)，所以 \(\int_0^r r\,dz = r \cdot r = r^2\)，再乘上体积元素里的那个 \(r\)，外层就剩 \(\int r^3\,dr\)。</p>
+
+<p>第四个例子，把柱面坐标真正的"省事"展示出来。计算无穷长圆柱内部的"高斯型"积分 \(\iiint_E e^{-(x^2+y^2)}\,dV\)，其中 \(E\) 是 \(0 \le z \le 1\)、\(x^2 + y^2 \le 4\)。</p>
+
+\[
+\int_0^1 \int_0^{2\pi}\int_0^2 e^{-r^2} \cdot r\,dr\,d\theta\,dz = 1 \cdot 2\pi \cdot \int_0^2 r e^{-r^2}\,dr.
+\]
+
+<p>令 \(u = r^2\)：\(\int_0^4 \tfrac{1}{2}e^{-u}\,du = \tfrac{1}{2}(1 - e^{-4})\)，结果是 \(\pi(1 - e^{-4})\)。在直角坐标里这道题里那个 \(\int e^{-x^2}\,dx\) 同样无解；柱面坐标里它就是一行。这又是一次极坐标 \(\rightarrow\) 柱面坐标版本的胜利。</p>
+
+<h2 id="sec17-2">17.2 球面坐标</h2>
+
+<p>球面坐标是为"以原点为中心的对称性"量身定做的。点 \((x, y, z)\) 在球面坐标里被写成 \((\rho, \phi, \theta)\)，三个变量分别有清楚的几何意义：</p>
+
+<ul>
+  <li>\(\rho\) 是这个点到<strong>原点</strong>的距离，\(\rho \ge 0\)。</li>
+  <li>\(\phi\) 是这个点的位置矢量与<strong>正 \(z\) 轴</strong>之间的夹角，\(0 \le \phi \le \pi\)。请把它想成"地球上的纬度"——只是从北极开始算：\(\phi = 0\) 是北极，\(\phi = \pi/2\) 是赤道，\(\phi = \pi\) 是南极。</li>
+  <li>\(\theta\) 是经度——从正 \(x\) 轴起在 \(xy\) 平面里逆时针测量的方位角，\(0 \le \theta < 2\pi\)。它和柱面坐标里的 \(\theta\) 同义。</li>
+</ul>
+
+<p>转换公式是把"\(\rho\)、\(\phi\)、\(\theta\)" 这三个量翻译回 \((x, y, z)\)。先算这个点到 \(z\) 轴的距离——这正是柱面坐标里的 \(r\)：在与 \(z\) 轴的夹角为 \(\phi\) 的方向上走 \(\rho\) 这么远，水平投影的长度是 \(\rho\sin\phi\)，竖直分量是 \(\rho\cos\phi\)。然后水平方向再用极坐标分解：</p>
+
+\[
+x = \rho\sin\phi\cos\theta,\quad y = \rho\sin\phi\sin\theta,\quad z = \rho\cos\phi.
+\]
+
+<p>反过来 \(\rho^2 = x^2 + y^2 + z^2\)；\(\cos\phi = z/\rho\)；\(\tan\theta = y/x\)。这三组关系值得直接背下来。</p>
+
+<p>关于这三个变量惯例的一句小提醒，不能不说。数学家用 \(\phi\) 当"与 \(z\) 轴的夹角（极角）"、\(\theta\) 当"方位角"；很多物理学家与工程师正好把这两个字母颠倒过来——\(\theta\) 当极角、\(\phi\) 当方位角。本书一律采用<strong>数学家的惯例</strong>。如果你正在看的物理书或工程书把它们颠倒，请不要把两套混着用——把每本书的约定先看清，再开算。</p>
+
+<p>球面坐标的体积元素是本章最该刻进脑子里的公式：</p>
+
+\[
+\boxed{dV = \rho^2 \sin\phi\,d\rho\,d\phi\,d\theta.}
+\]
+
+<p>那个 \(\rho^2 \sin\phi\) 漏不得。漏掉它就是这一章里第一名的失误。先把它的几何来源讲一遍——这不是为了背公式，而是为了让你看它一眼就能知道它该长成那样。</p>
+
+<p>想象一个"球面坐标小盒子"：固定 \((\rho, \phi, \theta)\)，让它们各自变化 \(d\rho\)、\(d\phi\)、\(d\theta\)。这个小盒子在三个互相<strong>垂直</strong>的方向上有三条边，分别对应"\(\rho\) 变了一点点"、"\(\phi\) 变了一点点"、"\(\theta\) 变了一点点"。我们一条边一条边地算它们的长度。</p>
+
+<ul>
+  <li>径向（\(\rho\) 增加 \(d\rho\)）：是沿着位置矢量方向的一段，长度就是 \(d\rho\)。</li>
+  <li>极角方向（\(\phi\) 增加 \(d\phi\)）：固定 \(\rho\) 与 \(\theta\)，让点在以原点为中心、半径 \(\rho\) 的球面上沿着<strong>经线</strong>（一条大圆）走一小段。这一小段对应的弧长是 \(\rho\,d\phi\)（半径乘弧度）。</li>
+  <li>方位角方向（\(\theta\) 增加 \(d\theta\)）：固定 \(\rho\) 与 \(\phi\)，让点沿着<strong>纬线</strong>（与赤道平行的小圆）走一小段。这条纬线的半径不是 \(\rho\)——它是该纬线所在的水平圆的半径，等于 \(\rho\sin\phi\)。所以弧长是 \(\rho\sin\phi\,d\theta\)。</li>
+</ul>
+
+<p>三条边长相乘：\(d\rho \cdot \rho\,d\phi \cdot \rho\sin\phi\,d\theta = \rho^2\sin\phi\,d\rho\,d\phi\,d\theta\)。这正是体积元素里那一坨 \(\rho^2 \sin\phi\) 的几何来源。</p>
+
+<p>你应当能够<strong>不靠死记</strong>地恢复出这条公式：径向贡献一个 \(\rho^0\)，极角贡献一个 \(\rho\)（沿大圆走），方位角贡献一个 \(\rho\sin\phi\)（沿纬线走，纬线半径变小了 \(\sin\phi\) 倍）；三者一乘就是 \(\rho^2 \sin\phi\)。"为什么有 \(\sin\phi\)？"——因为靠近极点的纬线短，\(\theta\) 走一步走出的弧长就短。这正是为什么北极附近"经线之间挤得越来越窄"——\(\sin\phi \to 0\)。</p>
+
+<p>球面坐标适合的对象，可以同样背成口诀："凡是带球对称、或边界由 \(\rho =\) 函数自然描述的，球面坐标几乎一定占便宜"。具体地：</p>
+
+<ul>
+  <li>区域是<strong>球、半球、球冠、球壳</strong>，或两个同心球之间的"夹层"。</li>
+  <li>被积函数含 \(x^2 + y^2 + z^2\)（变成 \(\rho^2\)）或 \(\sqrt{x^2 + y^2 + z^2}\)（变成 \(\rho\)）。</li>
+  <li>有锥面以原点为顶点（\(z = a\sqrt{x^2+y^2}\) 在球面下变成 \(\phi = \) 常数，简化得不能再简化）。</li>
+</ul>
+
+<p>球面坐标登场的最经典例子，不能不算"导出半径 \(R\) 的球的体积"。这是一道几乎一行就能完的题——前提是把体积元素写对。立体描述：\(0 \le \rho \le R\)、\(0 \le \phi \le \pi\)、\(0 \le \theta \le 2\pi\)。</p>
+
+\[
+V = \int_0^{2\pi}\int_0^{\pi}\int_0^{R} \rho^2 \sin\phi\,d\rho\,d\phi\,d\theta.
+\]
+
+<p>三个积分分开：\(\int_0^R \rho^2\,d\rho = R^3/3\)；\(\int_0^\pi \sin\phi\,d\phi = -\cos\phi\big|_0^\pi = 2\)；\(\int_0^{2\pi} d\theta = 2\pi\)。乘起来：</p>
+
+\[
+V = \frac{R^3}{3}\cdot 2\cdot 2\pi = \frac{4}{3}\pi R^3.
+\]
+
+<p>这就是初中起就背过的那个 \(\tfrac{4}{3}\pi R^3\)。它在直角坐标里要用到一对累次根号；在球面坐标里只是三个独立单变量积分的乘积。这就是球面坐标的力量。</p>
+
+<p>第二个例子带被积函数：求 \(\iiint_E (x^2 + y^2 + z^2)\,dV\)，\(E\) 是单位球。被积 \(= \rho^2\)，乘上体积元素得 \(\rho^4\sin\phi\)。</p>
+
+\[
+\int_0^{2\pi}\int_0^\pi \int_0^1 \rho^4 \sin\phi\,d\rho\,d\phi\,d\theta = 2\pi \cdot 2 \cdot \frac{1}{5} = \frac{4\pi}{5}.
+\]
+
+<p>第三个例子带<strong>球冠</strong>。求"上半球" \(E: x^2 + y^2 + z^2 \le 4,\ z \ge 0\) 的体积。半球意味着 \(\phi\) 只走 \(0\) 到 \(\pi/2\)（从北极走到赤道）。</p>
+
+\[
+V = \int_0^{2\pi}\int_0^{\pi/2}\int_0^2 \rho^2 \sin\phi\,d\rho\,d\phi\,d\theta = 2\pi \cdot 1 \cdot \frac{8}{3} = \frac{16\pi}{3},
+\]
+
+<p>正好是整球体积 \(\tfrac{32\pi}{3}\) 的一半，与几何对称性吻合。</p>
+
+<p>第四个例子带<strong>锥面</strong>。求 \(\iiint_E z\,dV\)，其中 \(E\) 是被锥面 \(z = \sqrt{x^2 + y^2}\) 与球面 \(x^2 + y^2 + z^2 = 1\) 围成的"冰激凌甜筒"——锥面在下，球面在上。</p>
+
+<p>把锥面翻成球面坐标：\(z = \sqrt{x^2 + y^2}\) 即 \(\rho\cos\phi = \rho\sin\phi\)，\(\tan\phi = 1\)，\(\phi = \pi/4\)。所以这块立体在球面坐标里是漂亮的"楔形"：\(0 \le \rho \le 1\)、\(0 \le \phi \le \pi/4\)、\(0 \le \theta \le 2\pi\)。被积 \(z = \rho\cos\phi\)。</p>
+
+\[
+\iiint_E z\,dV = \int_0^{2\pi}\int_0^{\pi/4}\int_0^1 \rho\cos\phi \cdot \rho^2\sin\phi\,d\rho\,d\phi\,d\theta.
+\]
+
+<p>分开三个积分。\(\int_0^1 \rho^3\,d\rho = 1/4\)；\(\int_0^{\pi/4} \sin\phi\cos\phi\,d\phi = \tfrac{1}{2}\sin^2\phi\big|_0^{\pi/4} = 1/4\)；\(\int_0^{2\pi}d\theta = 2\pi\)。结果 \(\tfrac{1}{4}\cdot\tfrac{1}{4}\cdot 2\pi = \pi/8\)。</p>
+
+<p>把锥面化为 \(\phi = \pi/4\) 这一笔，是球面坐标对锥面立体最大的赠礼：在直角坐标里你要写一对方根，在球面里那道边界只是 "\(\phi\) 走到 \(\pi/4\) 为止"——一个常数。</p>
+
+<h2 id="sec17-3">17.3 选择恰当的坐标系</h2>
+
+<p>到此为止，我们手里有三套坐标系：直角、柱面、球面。哪种立体配哪种坐标，是这一节要专门讨论的事。先把粗略的三条原则摆出来，再借质量和质心的若干例子做一段长一点的实战。</p>
+
+<p><strong>直角坐标</strong>适合：长方体；被平面、抛物柱面、椭圆柱面等"直角对齐"的曲面围出的立体；被积函数本身就是 \(x, y, z\) 的多项式或指数等"和坐标轴相处和睦"的函数。</p>
+
+<p><strong>柱面坐标</strong>适合：圆柱、圆锥（顶点不必在原点）、旋转抛物面，以及一切绕 \(z\) 轴对称、影子在 \(xy\) 平面是圆形的立体；被积函数里出现 \(x^2 + y^2\) 或 \(\sqrt{x^2 + y^2}\)，但 \(z\) 仍以"温和"的方式参与。</p>
+
+<p><strong>球面坐标</strong>适合：球、半球、球冠、球壳；被积函数里出现 \(x^2 + y^2 + z^2\) 或 \(\sqrt{x^2 + y^2 + z^2}\)；以原点为顶点的锥面（在球面下退化为 \(\phi = \) 常数）。</p>
+
+<p>选择坐标系的步骤几乎从不出错：先画图，再看立体是哪一种对称性——长方体型 → 直角；圆柱对称 → 柱面；球对称 → 球面；都不像 → 想想线性变换或其他换元。然后看被积函数：\(\sqrt{x^2 + y^2}\) 推你向柱面，\(\sqrt{x^2 + y^2 + z^2}\) 推你向球面。两个判据如果指向同一个坐标系——动手；指向不同坐标系——以立体形状为重，因为上下限的简洁程度通常比被积函数的简洁程度更重要。</p>
+
+<p>下面用四个连续的例子把这套判据过一遍。它们都是质量或质心问题，一方面这是三重积分最常见的实际用途，另一方面在这种问题里，"选错坐标系会怎样"也最一目了然。</p>
+
+<p><strong>第一例：圆柱里的不均匀质量。</strong>密度 \(\rho(x, y, z) = z\) 的圆柱体，半径 \(R\)、高 \(h\)，底面在 \(z = 0\)。求质心。</p>
+
+<p>立体是圆柱——立刻指向柱面。被积里也有 \(x^2 + y^2 \to r^2\)（虽然这一题里没出现），但 \(z\) 是密度——同样配合柱面。在 \(z\) 上密度线性增大，所以质心 \(\bar z\) 一定偏向上半部，对称性给出 \(\bar x = \bar y = 0\)。</p>
+
+\[
+m = \int_0^h \int_0^{2\pi}\int_0^R z \cdot r\,dr\,d\theta\,dz = \int_0^h z\,dz \cdot 2\pi \cdot \frac{R^2}{2} = \frac{h^2}{2}\cdot \pi R^2 = \frac{\pi R^2 h^2}{2}.
+\]
+
+\[
+\iiint_E z \cdot z\,dV = \int_0^h z^2\,dz \cdot 2\pi \cdot \frac{R^2}{2} = \frac{h^3}{3}\cdot \pi R^2.
+\]
+
+\[
+\bar z = \frac{\pi R^2 h^3 / 3}{\pi R^2 h^2 / 2} = \frac{2h}{3}.
+\]
+
+<p>密度沿 \(z\) 线性增大，结果质心偏向上方，落在 \(2h/3\)——比中点 \(h/2\) 高出一段。这在物理上完全合理：上端越重，质心越高。</p>
+
+<p><strong>第二例：球壳的质量。</strong>密度 \(\rho(x, y, z) = \sqrt{x^2 + y^2 + z^2}\) 的球壳 \(1 \le x^2 + y^2 + z^2 \le 4\)，求质量。</p>
+
+<p>立体是同心球壳——指向球面。被积是 \(\rho\)（这里我重新使用 \(\rho\) 充当球面坐标的那个径向变量；为了不和密度变量打架，我把密度暂且写成 \(\delta(x, y, z) = \sqrt{x^2+y^2+z^2}\)）。</p>
+
+\[
+m = \int_0^{2\pi}\int_0^\pi \int_1^2 \rho \cdot \rho^2 \sin\phi\,d\rho\,d\phi\,d\theta = 2\pi \cdot 2 \cdot \int_1^2 \rho^3\,d\rho = 4\pi \cdot \frac{15}{4} = 15\pi.
+\]
+
+<p>三行——三个独立的单变量积分。直角坐标下你光是写出这块"球壳"的上下限就要分若干种情况。这是球面坐标的胜利的最纯粹形式。</p>
+
+<p><strong>第三例：圆锥的质心。</strong>实心圆锥，顶点在原点、轴沿 \(+z\)、半顶角 \(\pi/4\)、被平面 \(z = 1\) 截掉。密度均匀。求质心。</p>
+
+<p>它有圆柱对称——\(\bar x = \bar y = 0\)——所以只算 \(\bar z\)。立体在柱面里是 \(0 \le r \le 1\)、\(r \le z \le 1\)、\(0 \le \theta \le 2\pi\)；在球面里则是 \(0 \le \rho \le \sec\phi\)（来自 \(z \le 1\)，即 \(\rho\cos\phi \le 1\)）、\(0 \le \phi \le \pi/4\)、\(0 \le \theta \le 2\pi\)。两套都行。柱面里的描述更平直，那就柱面。</p>
+
+\[
+V = \int_0^{2\pi}\int_0^1 \int_r^1 r\,dz\,dr\,d\theta = 2\pi \int_0^1 (1 - r)\,r\,dr = 2\pi \cdot \frac{1}{6} = \frac{\pi}{3}.
+\]
+
+<p>（顺手验证：底半径 \(R = 1\)、高 \(h = 1\)、所以 \(V = \tfrac{1}{3}\pi R^2 h = \tfrac{\pi}{3}\)。✓）</p>
+
+\[
+\iiint_E z\,dV = \int_0^{2\pi}\int_0^1 \int_r^1 z\,r\,dz\,dr\,d\theta = 2\pi \int_0^1 \frac{1 - r^2}{2}\,r\,dr = \pi \cdot \left[\frac{r^2}{2} - \frac{r^4}{4}\right]_0^1 = \frac{\pi}{4}.
+\]
+
+\[
+\bar z = \frac{\pi/4}{\pi/3} = \frac{3}{4}.
+\]
+
+<p>圆锥的质心高度 \(3h/4\)（这里 \(h = 1\)，所以 \(\bar z = 3/4\)）——上一章里我们用直角坐标（按高度切片）也做过同一道题，得到 \(\bar z = h/4\)，注意那时圆锥<strong>底在下、尖在上</strong>，质心在 \(h/4\)；现在我们让<strong>尖在下、底在上</strong>（顶点在原点，平面在上），质心当然就反过来落在 \(3h/4\)。同一个圆锥，倒一倒，质心的几何位置（距宽端 \(h/4\)）不变。</p>
+
+<p><strong>第四例：上半球的质心，再做一遍。</strong>设 \(E: x^2 + y^2 + z^2 \le 4,\ z \ge 0\)，密度均匀，求 \(\bar z\)。</p>
+
+<p>由对称 \(\bar x = \bar y = 0\)。\(V = \tfrac{16\pi}{3}\)（前一节算过）。算 \(\iiint_E z\,dV\)，球面里 \(z = \rho\cos\phi\)：</p>
+
+\[
+\iiint_E z\,dV = \int_0^{2\pi}\int_0^{\pi/2}\int_0^2 \rho\cos\phi \cdot \rho^2 \sin\phi\,d\rho\,d\phi\,d\theta.
+\]
+
+<p>三个积分分开。\(\int_0^2 \rho^3\,d\rho = 4\)；\(\int_0^{\pi/2}\sin\phi\cos\phi\,d\phi = \tfrac{1}{2}\)；\(\int_0^{2\pi}d\theta = 2\pi\)。乘起来 \(4 \cdot \tfrac{1}{2}\cdot 2\pi = 4\pi\)。所以</p>
+
+\[
+\bar z = \frac{4\pi}{16\pi/3} = \frac{12}{16} = \frac{3}{4}.
+\]
+
+<p>用 \(R = 2\) 写出来，\(\bar z = 3R/8\)——这是均匀实心半球的质心高度的经典公式。它比"半球的几何中点 \(R/2\)"低，原因和圆锥的情形是同一种：把半球切成水平片，下方（赤道附近）的圆片大，上方（极冠附近）的圆片小，质量被拉向下方。</p>
+
+<p>四个例子放在一起，能看出选坐标的逻辑非常稳定：<strong>立体的对称性决定了哪种坐标的上下限最干净</strong>，被积函数只是顺势锦上添花。如果立体是圆柱、被积是 \(\sqrt{x^2+y^2+z^2}\)——两个判据冲突，要相信立体形状（柱面），然后认命地把 \(\sqrt{r^2 + z^2}\) 作为被积函数算下去。这就是真实生活里出题的样子，没那么干净，但选错坐标系一定后悔。</p>
+
+<p>第 18 章把"换坐标"做成一个一般理论：不管你换的是极、柱、球，还是为某个具体题量身设计的某种线性变换，都通过<strong>雅可比行列式</strong>来一次性记账。</p>
+
+<hr/>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 三重积分</a><a href="ch18.html">下一章 · 第 18 章 换元法与雅可比行列式 →</a></nav>
+
+</main>
+</body>
+</html>

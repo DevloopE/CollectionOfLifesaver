@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>索引 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B 复数复习</a><span class="nav-disabled">下一章 →</span></nav>
+<h1 id="index">索引</h1>
+
+<p>这是一份面向"行为"的索引——每一条条目说的不是"某个名词在哪里出现"，而是"想做某件事时去哪里查"。如果你忘了一个概念在书的什么地方，先在这里找；找不到再回头按章节翻。</p>
+
+<table>
+<thead>
+<tr><th>条目</th><th>位置</th></tr>
+</thead>
+<tbody>
+<tr><td>二次型，对称矩阵的对应</td><td>23.1</td></tr>
+<tr><td>二次型，化为标准型</td><td>23.3, 23.7</td></tr>
+<tr><td>二次型，分类（正定 / 半正定 / 负定 / 不定）</td><td>23.4</td></tr>
+<tr><td>二次曲线的几何分类</td><td>23.6</td></tr>
+<tr><td>二次曲面的几何分类</td><td>23.6</td></tr>
+<tr><td>正定矩阵的判定（谢尔维斯特）</td><td>23.5</td></tr>
+<tr><td>正定矩阵的性质</td><td>23.4</td></tr>
+<tr><td>主轴定理</td><td>23.3</td></tr>
+<tr><td>奇异值分解的定义</td><td>24.2</td></tr>
+<tr><td>奇异值分解的几何意义（旋转-缩放-旋转）</td><td>24.2</td></tr>
+<tr><td>奇异值分解的算法</td><td>24.3, 24.4</td></tr>
+<tr><td>SVD 的存在性证明</td><td>A.4</td></tr>
+<tr><td>截断 SVD（Eckart-Young）</td><td>24.5</td></tr>
+<tr><td>左奇异向量、右奇异向量</td><td>24.1, 24.3</td></tr>
+<tr><td>PageRank 的定义</td><td>25.1</td></tr>
+<tr><td>幂法</td><td>25.1</td></tr>
+<tr><td>阻尼因子</td><td>25.1</td></tr>
+<tr><td>主成分分析（PCA）</td><td>25.2</td></tr>
+<tr><td>协方差矩阵</td><td>25.2</td></tr>
+<tr><td>降维与可视化</td><td>25.2</td></tr>
+<tr><td>图像压缩（用 SVD）</td><td>25.3</td></tr>
+<tr><td>低秩矩阵补全</td><td>25.4</td></tr>
+<tr><td>推荐系统的潜因子模型</td><td>25.4</td></tr>
+<tr><td>向量空间的公理</td><td>A.1</td></tr>
+<tr><td>替换引理（Steinitz）</td><td>A.2</td></tr>
+<tr><td>谱定理的完整证明</td><td>A.3</td></tr>
+<tr><td>行列式的公理化定义</td><td>A.5</td></tr>
+<tr><td>复数的代数</td><td>B.1</td></tr>
+<tr><td>共轭复数</td><td>B.1</td></tr>
+<tr><td>复数的模、辐角</td><td>B.2</td></tr>
+<tr><td>欧拉公式</td><td>B.3</td></tr>
+<tr><td>复数乘法的几何意义</td><td>B.4</td></tr>
+</tbody>
+</table>
+
+<p>本书到这里真正地结束了。如果你愿意把这本书放在书桌上、隔几个月翻一翻——尤其是在你做一个新项目、遇到一个似曾相识的矩阵问题时——那它就完成了它的使命。线性代数是<em>会用一辈子</em>的工具，这本书希望成为你工具箱里那一本最贴手的小册子。祝好运。</p>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B 复数复习</a><span class="nav-disabled">下一章 →</span></nav>
+
+</main>
+</body>
+</html>

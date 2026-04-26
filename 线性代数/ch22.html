@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 22 章 对称矩阵与谱定理 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 Gram-Schmidt 与 QR 分解</a><a href="ch23.html">下一章 · 第 23 章 二次型与正定 →</a></nav>
+<h1 id="ch22">第 22 章 对称矩阵与谱定理</h1>
+
+<p>上一章我们靠 Gram-Schmidt"<em>制造</em>"正交基。这一章我们要讲的，是有一类矩阵<strong>免费</strong>送给我们一组正交基——而且它们在自然界、统计学、物理学、机器学习中又出奇地普遍。这就是<strong>对称矩阵</strong>。</p>
+
+<p>说"奇迹"也不为过。一般的方阵，它的特征值可以是复数（即便矩阵是实的），它的特征向量未必构成正交基，甚至可能根本不能对角化（对应 Jordan 标准形那一套麻烦事）。可一旦 \(A^T = A\)，所有这些麻烦都消失：特征值全是实数，不同特征值的特征向量自动正交，整个矩阵总能用一组正交基把自己彻底对角化。</p>
+
+<p>把这个事实写成一行公式，就是</p>
+
+\[
+A = QDQ^T,
+\]
+
+<p>其中 \(Q\) 是正交矩阵（列是 \(A\) 的正交单位特征向量），\(D\) 是对角矩阵（对角元是 \(A\) 的特征值）。这叫<strong>谱定理</strong>（spectral theorem），是本书余下三分之一全部建筑的地基。</p>
+
+<p>本章我们会讲：</p>
+
+<ul>
+<li>对称矩阵在哪里出现——协方差、二次型、图、应力张量；</li>
+<li>谱定理的精确陈述及其两个核心奇迹：实特征值，正交特征向量；</li>
+<li>"实数性"的推导（用一点点复数）；</li>
+<li>"正交性"的推导（用一行计算）；</li>
+<li>正交对角化的具体例题（\(2 \times 2\) 与 \(3 \times 3\)）；</li>
+<li>谱分解 \(A = \sum \lambda_i \mathbf{q}_i \mathbf{q}_i^T\) 的几何意义；</li>
+<li>它如何衍生出 PCA、二次型分类、振动模态等大主题；</li>
+<li>复对称（埃尔米特）矩阵的同样定理（点到为止）。</li>
+</ul>
+
+<h2 id="sec22-1">22.1 对称矩阵的特殊性</h2>
+
+<p>形式上 \(A^T = A\) 只是一个简单要求："转置等于自身"，相当于要求矩阵关于主对角线对称：\(a_{ij} = a_{ji}\)。\(2 \times 2\) 的对称矩阵长这样：</p>
+
+\[
+A = \begin{pmatrix} a & b \\ b & c \end{pmatrix}.
+\]
+
+<p>三个独立参数，而不是四个。形式简单，但它远不只是节约存储——它在<em>无数</em>地方出现。</p>
+
+<p><strong>1. 协方差矩阵</strong>。统计中，对一个随机向量 \(\mathbf{X} = (X_1, \ldots, X_n)\)，其协方差矩阵 \(\Sigma\) 的元素是 \(\Sigma_{ij} = \mathrm{Cov}(X_i, X_j)\)。由于协方差对换两个变量保持不变，\(\Sigma_{ij} = \Sigma_{ji}\)，所以 \(\Sigma\) 是对称的。这是数据分析的核心对象——所有 PCA、白化、马氏距离都建立在对它的对角化上。</p>
+
+<p><strong>2. 二次型矩阵</strong>。一个 \(n\) 元二次型可以写成 \(Q(\mathbf{x}) = \mathbf{x}^T A \mathbf{x}\) 的样子，其中 \(A\) 总可以选成对称矩阵（如果不对称就替换成 \(\frac{1}{2}(A + A^T)\)，结果完全一样）。例如 \(Q(x, y) = x^2 + 4xy + 3y^2\) 对应</p>
+
+\[
+A = \begin{pmatrix} 1 & 2 \\ 2 & 3 \end{pmatrix}.
+\]
+
+<p>这是椭圆、双曲线、椭球、马鞍面背后的矩阵。我们下一章会专门讲二次型。</p>
+
+<p><strong>3. 无向图的邻接矩阵</strong>。把图的顶点编号 \(1, \ldots, n\)，定义 \(A_{ij} = 1\)（若 \(i\) 和 \(j\) 间有边）或 \(0\)（无边）。无向图意味着 \(i\)-\(j\) 有边等价于 \(j\)-\(i\) 有边，所以 \(A = A^T\)。它的特征值——所谓"图谱"——蕴含着图的连通性、二分性、聚类结构等大量信息，是谱图论的主角。</p>
+
+<p><strong>4. 力学的应力张量</strong>。在连续介质力学里，描述一点附近内力分布的应力张量 \(\sigma\) 是 \(3 \times 3\) 矩阵，由角动量守恒它必须对称（\(\sigma_{ij} = \sigma_{ji}\)）。它的特征值就是<strong>主应力</strong>，特征向量是<strong>主应力方向</strong>——工程上设计桥梁、机翼时直接读这两个量。</p>
+
+<p>这些不同领域的"对称矩阵"分享同一个数学结构：谱定理。理解了这条定理，你就同时握住了 PCA、二次型几何、图谱论、连续介质力学的<em>同一把钥匙</em>。</p>
+
+<h2 id="sec22-2">22.2 谱定理</h2>
+
+<p>把陈述明明白白写出来：</p>
+
+<blockquote>
+<p><strong>谱定理（实对称矩阵）。</strong>设 \(A\) 是 \(n \times n\) 实对称矩阵。那么：</p>
+<ol>
+<li>\(A\) 的所有特征值都是实数；</li>
+<li>对应于不同特征值的特征向量自动两两正交；</li>
+<li>总存在一组由 \(A\) 的特征向量构成的 \(\mathbb{R}^n\) 的标准正交基。</li>
+</ol>
+</blockquote>
+
+<p>三件事每一件都不平凡。一般矩阵都没有这种待遇——一般矩阵的特征值常常是复数（旋转矩阵就是例子），不同特征值的特征向量未必正交（你可以试 \(\begin{pmatrix} 0 & 1 \\ 0 & 2 \end{pmatrix}\)），有些矩阵甚至根本不能被对角化。对称性把这三个隐患<strong>同时</strong>清除——所以才说它是"奇迹"。</p>
+
+<p>第三条要小心一点：如果某个特征值有重数（比如 \(\lambda = 3\) 的特征空间是二维的），那么这个特征空间内任何选择的两个线性无关向量未必正交——但你可以在这个特征空间里跑 Gram-Schmidt（21 章！）把它们正交化。无论怎样，最终总能<em>选出</em>一组特征向量正交基。</p>
+
+<h2 id="sec22-3">22.3 推论：正交对角化</h2>
+
+<p>第三条立刻意味着：把这组正交单位特征向量按列排成矩阵 \(Q\)，再把对应的特征值排在对角矩阵 \(D\) 上，则</p>
+
+\[
+A Q = Q D
+\]
+
+<p>（这是"\(A\mathbf{q}_i = \lambda_i \mathbf{q}_i\)"按列写在一起的形式）。又因为 \(Q\) 的列两两正交单位长，\(Q\) 是正交矩阵，\(Q^{-1} = Q^T\)。所以</p>
+
+\[
+\boxed{\;A = QDQ^T.\;}
+\]
+
+<p>此即<strong>正交对角化</strong>。把它和一般的对角化 \(A = PDP^{-1}\) 对比一下：在一般情形下 \(P\) 只是可逆矩阵，\(P^{-1}\) 算起来要麻烦；而对称矩阵这里，\(Q\) 是正交矩阵，\(Q^{-1}\) 就是 \(Q^T\)——免费的转置。计算量、误差、几何理解都被极大简化。</p>
+
+<p>这个公式是后面三章一切的源头。请把它抄在笔记本第一页：</p>
+
+\[
+\boxed{\;A = QDQ^T \quad \text{对每个实对称} \, A.\;}
+\]
+
+<h2 id="sec22-4">22.4 第一个奇迹：特征值都是实数</h2>
+
+<p>怎么相信这件事？我们来用一招"复数侧门"。这是谱定理证明里最讨人喜欢的一段——既短又透。</p>
+
+<p>设 \(\lambda\) 是 \(A\) 的某个特征值，对应特征向量 \(\mathbf{v} \ne \mathbf{0}\)（暂时允许它是复向量）。<strong>定义</strong>复内积</p>
+
+\[
+\langle \mathbf{x}, \mathbf{y} \rangle = \overline{\mathbf{x}}^T \mathbf{y} = \sum_i \overline{x_i} y_i,
+\]
+
+<p>其中 \(\overline{\cdot}\) 是复共轭。这个内积保证 \(\langle \mathbf{v}, \mathbf{v} \rangle = \sum_i |v_i|^2 > 0\)（只要 \(\mathbf{v} \ne \mathbf{0}\)），所以非退化。</p>
+
+<p>计算 \(\langle \mathbf{v}, A\mathbf{v}\rangle\)。一方面 \(A\mathbf{v} = \lambda \mathbf{v}\)，所以</p>
+
+\[
+\langle \mathbf{v}, A\mathbf{v}\rangle = \langle \mathbf{v}, \lambda \mathbf{v}\rangle = \lambda \langle \mathbf{v}, \mathbf{v}\rangle.
+\]
+
+<p>另一方面，把 \(A\) 挪到左边——这里 \(A\) 是实对称，所以 \(\overline{A} = A\) 且 \(A^T = A\)：</p>
+
+\[
+\langle \mathbf{v}, A\mathbf{v}\rangle = \overline{\mathbf{v}}^T A \mathbf{v} = (\overline{A^T \mathbf{v}})^T \mathbf{v}\cdots
+\]
+
+<p>嗯，让我把这一步写得更细一点。\(\langle A\mathbf{v}, \mathbf{v}\rangle = \overline{A\mathbf{v}}^T \mathbf{v} = (\overline{A}\overline{\mathbf{v}})^T \mathbf{v} = \overline{\mathbf{v}}^T \overline{A}^T \mathbf{v} = \overline{\mathbf{v}}^T A \mathbf{v}\)（用了 \(A\) 实对称）。所以 \(\langle A\mathbf{v}, \mathbf{v}\rangle = \langle \mathbf{v}, A\mathbf{v}\rangle\)。</p>
+
+<p>但 \(\langle A\mathbf{v}, \mathbf{v}\rangle = \langle \lambda \mathbf{v}, \mathbf{v}\rangle = \overline{\lambda} \langle \mathbf{v}, \mathbf{v}\rangle\)（注意这里出现复共轭——内积的左变量取共轭是定义里的事）。</p>
+
+<p>把两个表达式比一下：</p>
+
+\[
+\overline{\lambda} \langle \mathbf{v}, \mathbf{v}\rangle = \lambda \langle \mathbf{v}, \mathbf{v}\rangle.
+\]
+
+<p>由于 \(\langle \mathbf{v}, \mathbf{v}\rangle \ne 0\)，可消去，得 \(\overline{\lambda} = \lambda\)。这正是"\(\lambda\) 是实数"的精确定义。</p>
+
+<p>论证完毕。整个推理的灵魂是一句话：<em>对称性逼迫特征值"自共轭"，因而是实数。</em>这个"自共轭"在更高级的语境（量子力学的可观测算符）中改头换面再次出现——它是物理量"应当具有实测量值"这一信念背后的数学根基。</p>
+
+<h2 id="sec22-5">22.5 第二个奇迹：不同特征值的特征向量正交</h2>
+
+<p>第二件奇迹的论证更短，只用一行代数。</p>
+
+<p>设 \(A\mathbf{v}_1 = \lambda_1 \mathbf{v}_1\) 和 \(A\mathbf{v}_2 = \lambda_2 \mathbf{v}_2\)，其中 \(\lambda_1 \ne \lambda_2\)。要证 \(\mathbf{v}_1 \cdot \mathbf{v}_2 = 0\)。</p>
+
+<p>看 \(\mathbf{v}_1^T A \mathbf{v}_2\) 这个标量。两种算法：</p>
+
+<p><strong>算法一</strong>：让 \(A\) 作用到右边，</p>
+
+\[
+\mathbf{v}_1^T A \mathbf{v}_2 = \mathbf{v}_1^T (\lambda_2 \mathbf{v}_2) = \lambda_2 (\mathbf{v}_1 \cdot \mathbf{v}_2).
+\]
+
+<p><strong>算法二</strong>：让 \(A\) 作用到左边——这里用到对称性 \(A^T = A\)：</p>
+
+\[
+\mathbf{v}_1^T A \mathbf{v}_2 = (A^T \mathbf{v}_1)^T \mathbf{v}_2 = (A\mathbf{v}_1)^T \mathbf{v}_2 = (\lambda_1 \mathbf{v}_1)^T \mathbf{v}_2 = \lambda_1 (\mathbf{v}_1 \cdot \mathbf{v}_2).
+\]
+
+<p>两种算法应该结果一致：</p>
+
+\[
+\lambda_1 (\mathbf{v}_1 \cdot \mathbf{v}_2) = \lambda_2 (\mathbf{v}_1 \cdot \mathbf{v}_2).
+\]
+
+<p>移项，</p>
+
+\[
+(\lambda_1 - \lambda_2)(\mathbf{v}_1 \cdot \mathbf{v}_2) = 0.
+\]
+
+<p>由于 \(\lambda_1 \ne \lambda_2\)，必须 \(\mathbf{v}_1 \cdot \mathbf{v}_2 = 0\)。</p>
+
+<p>就这一行。请你<em>停下来欣赏一下</em>这个推理：从对称性这个看似仅是"形式上"的要求，竟然能逼出"不同方向的特征向量必须互垂"这种<strong>几何上</strong>的结论。这是数学经常会让人吃一惊的瞬间。</p>
+
+<p>对于<em>同一</em>特征值的多个特征向量，论证不直接给正交，但如前所述，那个特征空间的内部可以用 Gram-Schmidt 正交化——所以最终我们一定能凑出一组正交单位特征向量基。第三条就此成立。</p>
+
+<h2 id="sec22-6">22.6 实操：正交对角化的例题</h2>
+
+<p>定理讲透了，让我们做点真活。</p>
+
+<p><strong>例 1：2×2</strong>。取</p>
+
+\[
+A = \begin{pmatrix} 4 & 1 \\ 1 & 4 \end{pmatrix}.
+\]
+
+<p>特征值由 \(\det(A - \lambda I) = 0\) 决定：</p>
+
+\[
+(4 - \lambda)^2 - 1 = 0 \implies (4 - \lambda)^2 = 1 \implies \lambda = 4 \pm 1.
+\]
+
+<p>所以 \(\lambda_1 = 5\)，\(\lambda_2 = 3\)。两个都是实数（如理论所言），且不同。</p>
+
+<p>对 \(\lambda_1 = 5\) 找特征向量：解 \((A - 5I)\mathbf{v} = 0\)，</p>
+
+\[
+\begin{pmatrix} -1 & 1 \\ 1 & -1 \end{pmatrix} \mathbf{v} = 0.
+\]
+
+<p>得 \(\mathbf{v}_1 = (1, 1)^T\)（或它的任何非零标量倍）。</p>
+
+<p>对 \(\lambda_2 = 3\)，\((A - 3I)\mathbf{v} = 0\)：</p>
+
+\[
+\begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix} \mathbf{v} = 0,
+\]
+
+<p>得 \(\mathbf{v}_2 = (1, -1)^T\)。</p>
+
+<p>注意 \(\mathbf{v}_1 \cdot \mathbf{v}_2 = 1 - 1 = 0\)——自动正交！这<strong>不是</strong>巧合，是 22.5 的定理在替我们工作。</p>
+
+<p>单位化：\(\|\mathbf{v}_1\| = \|\mathbf{v}_2\| = \sqrt{2}\)，所以</p>
+
+\[
+Q = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}, \quad D = \begin{pmatrix} 5 & 0 \\ 0 & 3 \end{pmatrix}.
+\]
+
+<p>验算 \(QDQ^T\)：先算 \(QD\)，</p>
+
+\[
+QD = \frac{1}{\sqrt{2}}\begin{pmatrix} 5 & 3 \\ 5 & -3 \end{pmatrix},
+\]
+
+<p>再乘 \(Q^T\)（即 \(Q\) 自己，因为 \(Q\) 对称）：</p>
+
+\[
+QDQ^T = \frac{1}{2}\begin{pmatrix} 5 & 3 \\ 5 & -3 \end{pmatrix}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} = \frac{1}{2}\begin{pmatrix} 8 & 2 \\ 2 & 8 \end{pmatrix} = \begin{pmatrix} 4 & 1 \\ 1 & 4 \end{pmatrix} = A. \checkmark
+\]
+
+<p>完美。</p>
+
+<p><strong>例 2：3×3</strong>。取</p>
+
+\[
+A = \begin{pmatrix} 2 & 1 & 1 \\ 1 & 2 & 1 \\ 1 & 1 & 2 \end{pmatrix}.
+\]
+
+<p>特征值由 \(\det(A - \lambda I) = 0\)。展开（你也可以用注意到 \(A = I + J\) 的取巧——这里 \(J\) 是全 \(1\) 矩阵）。我们直接展开：</p>
+
+\[
+\det\begin{pmatrix} 2-\lambda & 1 & 1 \\ 1 & 2-\lambda & 1 \\ 1 & 1 & 2-\lambda \end{pmatrix}.
+\]
+
+<p>利用 \(A = I + J\)（其中 \(J = \mathbf{1}\mathbf{1}^T\)，\(\mathbf{1} = (1,1,1)^T\)），\(A - \lambda I = (1 - \lambda)I + J\)。\(J\) 的特征值是 \(3, 0, 0\)（一个对应 \(\mathbf{1}\)，两个对应 \(\mathbf{1}\) 的正交补），所以 \(A\) 的特征值是 \((1-\lambda)\) 加上 \(J\) 的特征值——等等，这逻辑反了。让我重新来。</p>
+
+<p>\(A = I + J\) 意味着 \(A\) 与 \(J\) 共享特征向量。\(J\) 的特征值是 \(3\)（重数 1，特征向量 \(\mathbf{1}\)）和 \(0\)（重数 2，特征空间是 \(\mathbf{1}^\perp\)）。所以 \(A\) 的特征值是 \(I\) 的 \(1\) 加上对应的 \(J\) 特征值：\(\lambda_1 = 1 + 3 = 4\)（重数 1）和 \(\lambda_2 = 1 + 0 = 1\)（重数 2）。</p>
+
+<p>对 \(\lambda_1 = 4\)，特征向量是 \(\mathbf{q}_1 = \frac{1}{\sqrt{3}}(1, 1, 1)^T\)。</p>
+
+<p>对 \(\lambda_2 = 1\)，特征空间是 \(\mathbf{1}^\perp = \{(x, y, z) : x + y + z = 0\}\)，二维。我们在里面挑两个正交向量。比如 \((1, -1, 0)\) 和 \((1, 1, -2)\)（验：第一个垂直 \((1,1,1)\)，是；第二个也垂直 \((1,1,1)\)，是；两者点积 \(1 - 1 + 0 = 0\)，垂直）。单位化：</p>
+
+\[
+\mathbf{q}_2 = \frac{1}{\sqrt{2}}(1, -1, 0)^T, \quad \mathbf{q}_3 = \frac{1}{\sqrt{6}}(1, 1, -2)^T.
+\]
+
+<p>所以</p>
+
+\[
+Q = \begin{pmatrix} 1/\sqrt{3} & 1/\sqrt{2} & 1/\sqrt{6} \\ 1/\sqrt{3} & -1/\sqrt{2} & 1/\sqrt{6} \\ 1/\sqrt{3} & 0 & -2/\sqrt{6} \end{pmatrix}, \quad D = \begin{pmatrix} 4 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix},
+\]
+
+<p>且 \(A = QDQ^T\)。如果你愿意花十分钟验证一下乘出来确实等于原 \(A\)——动手，那种"哦真的对了"的瞬间值得一次。</p>
+
+<p>注意一个细节：\(\lambda_2 = 1\) 是重根，对应的特征空间是二维的，里面的两个特征向量 \((1, -1, 0)\) 和 \((1, 1, -2)\) 不是"自动正交"的（因为它们对应同一个特征值），是我们<em>手动</em>挑的。如果你随便选两个线性无关的，比如 \((1, -1, 0)\) 和 \((1, 0, -1)\)，它们就不正交（点积是 \(1\)）；这时你需要在它们身上跑一次 Gram-Schmidt 正交化。这是 21 章在 22 章里的"客串演出"。</p>
+
+<h2 id="sec22-7">22.7 谱分解</h2>
+
+<p>把 \(A = QDQ^T\) 重新写一下。设 \(Q = [\mathbf{q}_1 | \mathbf{q}_2 | \cdots | \mathbf{q}_n]\)，\(D\) 对角元 \(\lambda_1, \ldots, \lambda_n\)。直接展开矩阵乘法：</p>
+
+\[
+A = \sum_{i=1}^n \lambda_i \mathbf{q}_i \mathbf{q}_i^T.
+\]
+
+<p>这叫<strong>谱分解</strong>（spectral decomposition）。它说：</p>
+
+<blockquote>
+<p>每个对称矩阵都可以写成"特征值"乘"秩-1 投影矩阵"的<strong>加权和</strong>。</p>
+</blockquote>
+
+<p>"秩-1 投影矩阵" \(\mathbf{q}_i \mathbf{q}_i^T\) 是什么？让我们看看它对一个向量 \(\mathbf{x}\) 做了什么：</p>
+
+\[
+(\mathbf{q}_i \mathbf{q}_i^T) \mathbf{x} = \mathbf{q}_i (\mathbf{q}_i^T \mathbf{x}) = (\mathbf{q}_i \cdot \mathbf{x}) \mathbf{q}_i.
+\]
+
+<p>这正是 \(\mathbf{x}\) 在 \(\mathbf{q}_i\) 方向上的<strong>投影</strong>！所以 \(\mathbf{q}_i \mathbf{q}_i^T\) 是"投影到 \(\mathbf{q}_i\) 这条直线"的矩阵——一个秩为 \(1\) 的投影矩阵，常记作 \(P_i\)。</p>
+
+<p>把这件事代回去看 \(A\mathbf{x}\)：</p>
+
+\[
+A\mathbf{x} = \sum_{i=1}^n \lambda_i (\mathbf{q}_i \cdot \mathbf{x})\, \mathbf{q}_i.
+\]
+
+<p>翻译成几何："对任意 \(\mathbf{x}\)，先把它分解到 \(n\) 个正交方向 \(\mathbf{q}_i\) 上；每个分量乘以对应的特征值 \(\lambda_i\)；再加起来。"</p>
+
+<p>用一句更俗的话：<strong>对称矩阵 \(A\) 在 \(n\) 个特定方向上分别是"放缩"，倍数就是特征值。</strong>没有旋转，没有混合——只是各方向独立缩放。这是对称矩阵的本质。</p>
+
+<p>这种几何图像异常重要。后面：</p>
+
+<ul>
+<li>当我们讲椭球的方程 \(\mathbf{x}^T A \mathbf{x} = 1\) 时，\(\mathbf{q}_i\) 就是椭球的<strong>主轴</strong>，\(1/\sqrt{\lambda_i}\) 是主半轴长（要 \(\lambda_i > 0\)）；</li>
+<li>当我们讲 PCA 时，\(\mathbf{q}_i\) 是数据"主成分方向"，\(\lambda_i\) 是该方向上的方差；</li>
+<li>当我们讲 SVD 时，\(\mathbf{q}_i\) 推广为奇异向量，\(\sqrt{\lambda_i}\) 是奇异值；</li>
+<li>当我们做振动分析时，\(\mathbf{q}_i\) 是<strong>正常模式</strong>（normal mode），\(\sqrt{\lambda_i}\) 是该模式的角频率。</li>
+</ul>
+
+<p>同一个公式 \(A = \sum \lambda_i \mathbf{q}_i \mathbf{q}_i^T\)，在不同语境下穿不同衣服出场。这是数学最美的那种"形式统一"。</p>
+
+<h2 id="sec22-8">22.8 应用：从 PCA 到振动模态</h2>
+
+<p>谱定理为什么这么重要？因为它是后面三、四章一切的核心。简单点名一下：</p>
+
+<p><strong>主成分分析（PCA）</strong>。给一组样本数据，先做中心化（减去均值），形成数据矩阵 \(X\)。计算协方差矩阵 \(\Sigma = \frac{1}{n}X^TX\)（对称的！）。对 \(\Sigma\) 做谱分解 \(\Sigma = Q \Lambda Q^T\)。\(Q\) 的列就是<strong>主成分方向</strong>，对应的 \(\lambda_i\) 是该方向上的方差。把数据投影到前 \(k\) 个主成分（最大的 \(k\) 个 \(\lambda_i\) 对应的方向）就完成降维。整个 PCA 算法就是<strong>对协方差矩阵做谱分解</strong>。我们将在第 25 章详细讲。</p>
+
+<p><strong>二次型分类</strong>。一个二次型 \(Q(\mathbf{x}) = \mathbf{x}^T A \mathbf{x}\) 是凸的、凹的、还是马鞍状？答案完全由 \(A\) 的特征值的<em>正负号</em>决定：全正——凸（正定）；全负——凹（负定）；有正有负——马鞍（不定）。这条规则叫<strong>惯性指数</strong>，背后正是谱分解。我们将在第 23 章详细讲。</p>
+
+<p><strong>振动模态与稳定性</strong>。一个由弹簧和质量组成的多自由度系统，运动方程 \(M\ddot{\mathbf{x}} + K\mathbf{x} = 0\)，其中 \(M, K\) 都是对称矩阵。解的形式由广义特征值问题 \(K \mathbf{q} = \omega^2 M \mathbf{q}\) 决定。每一个 \((\omega_i, \mathbf{q}_i)\) 描述系统的一个<strong>正常模式</strong>——以频率 \(\omega_i\) 集体振动的形态。所有复杂的振动都是这些模式的叠加。如果某个 \(\omega_i^2 < 0\)（即 \(K\) 在某方向不正定），系统在那个方向是<strong>不稳定</strong>的——它会发散而非振荡。从桥梁的工程到分子的红外光谱，这套语言无处不在。</p>
+
+<p>注意上面三个应用全部建立在<strong>同一个公式</strong> \(A = QDQ^T\) 上。这就是为什么我们花两章铺它。</p>
+
+<h2 id="sec22-9">22.9 复对称（埃尔米特）矩阵</h2>
+
+<p>最后一句忠告。如果矩阵的元素是<strong>复数</strong>，那"对称"应该改成<strong>埃尔米特</strong>（Hermitian）：</p>
+
+\[
+A^* = A, \quad \text{即 } A = \overline{A}^T.
+\]
+
+<p>这里 \(A^*\) 是<strong>共轭转置</strong>（也写作 \(A^H\) 或 \(A^\dagger\)）。对实矩阵，\(A^* = A^T\)，所以"埃尔米特"退化为"对称"。</p>
+
+<p>谱定理对埃尔米特矩阵<strong>原样成立</strong>：特征值实数、不同特征值的特征向量正交、可以幺正对角化（unitary diagonalization）</p>
+
+\[
+A = U D U^*,
+\]
+
+<p>其中 \(U\) 是<strong>幺正矩阵</strong>（unitary matrix），\(U^*U = I\)。证明思路与实情形完全平行——本节不展开。</p>
+
+<p>这件事在量子力学里关键到不可缺：可观测量对应的算子必须是埃尔米特，其特征值就是测量值，特征向量是测量"塌缩"到的态。"测量值是实数"这一物理事实，背后正是 22.4 节那个简洁的"\(\overline{\lambda} = \lambda\)"论证。</p>
+
+<p>所以对你来说，"实对称"是入门，"埃尔米特"是它在复数世界的孪生兄弟。两者的几何与代数结构是同一个故事。</p>
+
+<hr class="section-end">
+
+<p>谱定理是线性代数最美的定理。它的陈述简短，论证只用一行代数加上一点点复数侧门，结论却辐射到统计学、几何、物理的腹地。它告诉我们：<strong>对称矩阵就是一组正交方向上的独立缩放</strong>。一旦你看到"对称"，你应当条件反射地想到："椭球"、"主轴"、"特征值是缩放比"。</p>
+
+<p>下一章我们要把这个图像具体化。我们会问："二次型 \(\mathbf{x}^T A \mathbf{x} = c\) 长什么样？"——答案是一族椭球（或双曲面、或马鞍面），它的主轴正是 \(A\) 的特征向量，主半轴长由特征值决定。这是谱定理的第一份"几何红利"。</p>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 Gram-Schmidt 与 QR 分解</a><a href="ch23.html">下一章 · 第 23 章 二次型与正定 →</a></nav>
+
+</main>
+</body>
+</html>

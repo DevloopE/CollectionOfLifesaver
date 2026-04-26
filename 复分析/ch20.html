@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 应用：傅里叶/拉普拉斯变换的复视角 — 普林斯顿复分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 调和函数与边值问题</a><a href="appA.html">下一章 · 附录 A 严格性 →</a></nav>
+<h1 id="ch20">第 20 章 应用：傅里叶/拉普拉斯变换的复视角</h1>
+
+<p>到目前为止你看到的复分析像是一门内省的学科——围绕解析性、留数、调和函数自我展开。但真正让复分析在现代科学中地位永久不可撼动的，是它<em>给整个分析学提供了一个统一框架</em>：傅里叶分析、Laplace 变换、信号处理、量子力学、解析数论——这些看起来千差万别的领域，全都用复变量 \(s = \sigma + i\xi\) 作为它们的"基本货币"。本章我们快速走过这些应用，让你看到本课程学的每一个工具（围道积分、留数、解析延拓、调和函数）是怎么变成"工程师手里的螺丝刀"的。</p>
+
+<p>本章不长，但跨度极大。我们会涉及：</p>
+
+<ul>
+<li>傅里叶变换的定义、留数计算典例（\(1/(1+x^2)\) 的变换是 \(\pi e^{-|\xi|}\)）。</li>
+<li>反演公式与 Plancherel 等式的简介。</li>
+<li>Laplace 变换：作为 \(s\) 的解析函数，定义域是某个右半平面。</li>
+<li>反 Laplace 变换的 Bromwich 围道：在复平面上一条竖直线积分，再用留数。</li>
+<li>z-变换简介——离散信号的 Laurent 级数。</li>
+<li>信号处理直觉：传递函数零极的物理含义。</li>
+<li>量子力学速通：波函数本质是复函数；位置-动量的傅里叶对偶；解析性等价于因果性。</li>
+<li>Riemann 假设极简介绍：\(\zeta\) 函数的零点为什么是数学最大悬案。</li>
+</ul>
+
+<p>读这一章的方式不是"消化每一个细节"，而是"建立一张地图"——下次你在物理或工程书里碰到这些变换，要能够说出它们在复分析里属于哪一格。</p>
+
+<h2 id="sec20-1">20.1 傅里叶变换</h2>
+
+<p>傅里叶变换是把一个关于"时间"或"位置"的函数 \(f(x)\) 翻译成关于"频率"或"波数"的函数 \(\hat f(\xi)\)。最常用的定义是：</p>
+
+\[\boxed{\hat f(\xi) = \int_{-\infty}^{\infty} f(x)\, e^{-i\xi x}\, dx.}\]
+
+<p>这条定义对哪些 \(f\) 适用？最稳妥的是 \(f \in L^1(\mathbb{R})\)（绝对可积）；那时上面积分对所有 \(\xi \in \mathbb{R}\) 收敛。如果 \(f \in L^1 \cap L^2\) 还能延拓到 \(L^2\) 上，那是 Plancherel 的故事。本章只讨论"漂亮的 \(f\)"，不去钻研收敛细节。</p>
+
+<p>为什么这个定义里要把 \(e^{-i\xi x}\) 放进去？因为 \(e^{i \xi x}\)（与它的共轭 \(e^{-i\xi x}\)）是平移算符的"特征函数"——它在平移 \(x \to x + a\) 下只乘以 \(e^{i\xi a}\) 这个常数。傅里叶变换其实就是把任意 \(f\) 分解成这些特征函数的"线性组合"（积分形式），从而把"对 \(x\) 的微分"这样的复杂操作翻译成"对 \(\hat f\) 乘以 \(i\xi\)" 这样的简单乘法。这就是为什么傅里叶变换是物理和工程的核心工具：它把微分方程变成代数方程。</p>
+
+<p>具体的几个性质（这里只列，不证）：</p>
+
+<ul>
+<li>线性性：\(\widehat{af + bg} = a \hat f + b \hat g\)。</li>
+<li>平移：\(\widehat{f(\cdot - a)}(\xi) = e^{-i\xi a} \hat f(\xi)\)。</li>
+<li>调制：\(\widehat{e^{i a x} f(x)}(\xi) = \hat f(\xi - a)\)。</li>
+<li>缩放：\(\widehat{f(c \cdot)}(\xi) = \dfrac{1}{|c|} \hat f(\xi/c)\)。</li>
+<li>导数变乘法：\(\widehat{f'}(\xi) = i\xi \hat f(\xi)\)（假设 \(f, f' \in L^1\) 且边界值衰减）。</li>
+<li>卷积变乘积：\(\widehat{f * g} = \hat f \cdot \hat g\)，其中 \((f*g)(x) = \int f(y) g(x - y)\, dy\)。</li>
+</ul>
+
+<p>本节的目的是让你看出：傅里叶变换是个<em>积分</em>，而本课学过的最强的"算积分工具"是<strong>留数定理</strong>。所以下一节我们用一个经典例题展示如何用留数算傅里叶变换。</p>
+
+<h2 id="sec20-2">20.2 用留数算傅里叶变换：经典例题</h2>
+
+<p><strong>问题.</strong> 计算 \(f(x) = \dfrac{1}{1 + x^2}\) 的傅里叶变换。</p>
+
+<p>按定义</p>
+
+\[
+\hat f(\xi) = \int_{-\infty}^{\infty} \frac{e^{-i\xi x}}{1 + x^2}\, dx.
+\]
+
+<p>这是第 16 章那种"实积分用复围道"的标准题目。我们把积分对象看成复变量 \(z\) 的函数 \(\dfrac{e^{-i\xi z}}{1 + z^2}\)。它的奇点是 \(1 + z^2 = 0\) 的两根：\(z = \pm i\)。是简单极点。</p>
+
+<p><strong>选择围道.</strong> 这一步是技术核心：把哪个半平面闭合？看 \(e^{-i\xi z}\) 的衰减方向。设 \(z = x + iy\)，\(|e^{-i\xi z}| = |e^{-i\xi(x + iy)}| = |e^{-i\xi x}| \cdot |e^{\xi y}| = e^{\xi y}\)。所以：</p>
+
+<ul>
+<li>当 \(\xi > 0\) 时，\(e^{-i\xi z}\) 在<em>下</em>半平面（\(y < 0\)）衰减。我们要把围道闭合在下半平面。</li>
+<li>当 \(\xi < 0\) 时，\(e^{-i\xi z}\) 在<em>上</em>半平面（\(y > 0\)）衰减。围道闭合在上半平面。</li>
+</ul>
+
+<p>分别处理。</p>
+
+<p><strong>情形 \(\xi > 0\).</strong> 围道是实轴 \([-R, R]\) 加上下半圆 \(C_R^- = \{R e^{i\theta} : \theta \in [-\pi, 0]\}\)（顺时针绕一圈）。这条闭围道把极点 \(z = -i\) 包在里面（注意 \(z = +i\) 在上半平面，不在闭围道内）。围道方向是顺时针，所以由留数定理</p>
+
+\[
+\oint = -2\pi i \cdot \mathrm{Res}_{z = -i} \frac{e^{-i\xi z}}{1 + z^2}.
+\]
+
+<p>留数计算：\(z = -i\) 是 \(1 + z^2 = (z - i)(z + i)\) 的简单零点，\(\mathrm{Res}_{z = -i} = \dfrac{e^{-i\xi \cdot (-i)}}{(-i) - i} = \dfrac{e^{-\xi}}{-2i}\)。所以</p>
+
+\[
+\oint = -2\pi i \cdot \frac{e^{-\xi}}{-2i} = \pi e^{-\xi}.
+\]
+
+<p>另一方面，由 Jordan 引理（或直接估计：\(|e^{-i\xi z}| = e^{\xi y} \leq 1\) 在下半平面，\(|1 + z^2| \geq R^2 - 1\) 在 \(|z| = R\) 上），下半圆上积分当 \(R \to \infty\) 时趋于 0。剩下实积分：</p>
+
+\[
+\int_{-\infty}^{\infty} \frac{e^{-i\xi x}}{1 + x^2}\, dx = \pi e^{-\xi}, \qquad \xi > 0.
+\]
+
+<p><strong>情形 \(\xi < 0\).</strong> 围道是实轴加上半圆 \(C_R^+\)（逆时针）。这条闭围道把 \(z = i\) 包在里面。逆时针，由留数定理</p>
+
+\[
+\oint = 2\pi i \cdot \mathrm{Res}_{z = i} \frac{e^{-i\xi z}}{1 + z^2} = 2\pi i \cdot \frac{e^{-i\xi \cdot i}}{i - (-i)} = 2\pi i \cdot \frac{e^{\xi}}{2i} = \pi e^{\xi}.
+\]
+
+<p>对 \(\xi < 0\)，\(e^{\xi} = e^{-|\xi|}\)。同理上半圆积分趋于 0，得</p>
+
+\[
+\int_{-\infty}^{\infty} \frac{e^{-i\xi x}}{1 + x^2}\, dx = \pi e^{\xi} = \pi e^{-|\xi|}, \qquad \xi < 0.
+\]
+
+<p><strong>情形 \(\xi = 0\).</strong> 直接积：\(\int \dfrac{dx}{1 + x^2} = \arctan x\big|_{-\infty}^{\infty} = \pi\)。也等于 \(\pi e^{-|0|} = \pi\)。</p>
+
+<p>三种情形合并：</p>
+
+\[\boxed{\hat f(\xi) = \pi e^{-|\xi|}.}\]
+
+<p>这是傅里叶分析里最著名的"教科书对子"之一：洛仑兹型函数 \(\dfrac{1}{1 + x^2}\) 的傅里叶变换是双指数 \(\pi e^{-|\xi|}\)。它的逆向也成立——双指数的傅里叶变换是洛仑兹（差因子）。</p>
+
+<p><strong>注意几件事.</strong> 第一，不用复分析这个积分硬算非常困难——分部积分套不出来，三角换元会无穷循环。复变量加留数把它变成"算两个简单极点的留数"，三行就完。第二，结果 \(e^{-|\xi|}\) 含 <em>绝对值</em>，反映了原函数 \(f(x) = 1/(1 + x^2)\) 是<em>偶</em>函数，所以 \(\hat f\) 也偶。第三，两个情形 \(\xi > 0\) 与 \(\xi < 0\) 必须<em>分开围道</em>处理，因为衰减方向不同——这是用留数算傅里叶变换时最容易出错的一步。</p>
+
+<p><strong>例 20.2.1（再来一题）.</strong> 计算 \(g(x) = \dfrac{x}{(x^2 + 1)^2}\) 的傅里叶变换。</p>
+
+<p>同样的程序。\(\dfrac{z}{(z^2 + 1)^2}\) 在 \(z = \pm i\) 是<em>二阶</em>极点。考虑 \(\xi > 0\)，闭合下半平面（顺时针）：</p>
+
+\[
+\mathrm{Res}_{z = -i} \frac{z e^{-i\xi z}}{(z^2 + 1)^2}.
+\]
+
+<p>把分母写成 \((z - i)^2 (z + i)^2\)。\(z = -i\) 是 \((z + i)^2\) 的二阶零点，留数公式</p>
+
+\[
+\mathrm{Res}_{z = -i} = \lim_{z \to -i} \frac{d}{dz} \left[(z + i)^2 \cdot \frac{z e^{-i\xi z}}{(z - i)^2 (z + i)^2}\right] = \lim_{z \to -i} \frac{d}{dz} \frac{z e^{-i\xi z}}{(z - i)^2}.
+\]
+
+<p>求导（用商法则或乘法则——把 \((z - i)^{-2}\) 当作一个因子）：</p>
+
+\[
+\frac{d}{dz} \frac{z e^{-i\xi z}}{(z - i)^2} = \frac{e^{-i\xi z}(1 - i\xi z)(z - i)^2 - z e^{-i\xi z} \cdot 2(z - i)}{(z - i)^4} = \frac{e^{-i\xi z}[(1 - i\xi z)(z - i) - 2z]}{(z - i)^3}.
+\]
+
+<p>代 \(z = -i\)：分子里 \((1 - i\xi(-i))(-2i) - 2(-i) = (1 - \xi)(-2i) + 2i = -2i(1 - \xi) + 2i = 2i \xi\)。乘上 \(e^{-i\xi(-i)} = e^{-\xi}\)。分母 \((-2i)^3 = 8i\)。所以</p>
+
+\[
+\mathrm{Res}_{z = -i} = \frac{e^{-\xi} \cdot 2i\xi}{8i} = \frac{\xi e^{-\xi}}{4}.
+\]
+
+<p>顺时针 \(\hat g(\xi) = -2\pi i \cdot \dfrac{\xi e^{-\xi}}{4} = -\dfrac{i\pi}{2} \xi e^{-\xi}\) 当 \(\xi > 0\)。</p>
+
+<p>对 \(\xi < 0\) 类似算（留给你）得到 \(-\dfrac{i\pi}{2} \xi e^{\xi}\)。两种情形合起来：</p>
+
+\[
+\hat g(\xi) = -\frac{i\pi}{2} \xi e^{-|\xi|}.
+\]
+
+<p>注意结果是<em>纯虚</em>的，反映了 \(g\) 是<em>奇</em>函数（傅里叶变换把奇函数送到纯虚函数）。</p>
+
+<h2 id="sec20-3">20.3 反演公式</h2>
+
+<p>傅里叶变换的能用，关键在于它有<em>反演</em>——\(\hat f\) 不是丢失信息的"压缩"，而是<em>等价</em>的另一种表示。反演公式是</p>
+
+\[\boxed{f(x) = \frac{1}{2\pi} \int_{-\infty}^{\infty} \hat f(\xi)\, e^{i\xi x}\, d\xi.}\]
+
+<p>注意几件事。第一，正变换的核是 \(e^{-i\xi x}\)，反变换的核是 \(e^{+i\xi x}\)——差一个共轭。第二，反变换前面有 \(\dfrac{1}{2\pi}\) 的因子（不同教科书放因子的位置不同——有人把 \(\dfrac{1}{\sqrt{2\pi}}\) 对称放在两个变换前；我们用工程界最常用的"全因子在反变换"的约定）。第三，"在哪里成立"这件事相当微妙——如果 \(f, \hat f \in L^1\)，反演逐点几乎处处成立；若 \(f\) 还连续，反演<em>处处</em>成立。</p>
+
+<p>反演公式的<em>形式</em>证明十分迷人。把正变换的定义代入反变换的右端：</p>
+
+\[
+\frac{1}{2\pi} \int_{-\infty}^{\infty} \left[\int_{-\infty}^{\infty} f(y) e^{-i\xi y}\, dy\right] e^{i\xi x}\, d\xi = \int_{-\infty}^{\infty} f(y) \left[\frac{1}{2\pi} \int_{-\infty}^{\infty} e^{i\xi(x - y)}\, d\xi\right] dy.
+\]
+
+<p>方括号里的内积分——\(\dfrac{1}{2\pi} \int e^{i\xi(x-y)}\, d\xi\)——形式上是 \(\delta(x - y)\)（Dirac 函数）。代回去得 \(\int f(y) \delta(x - y)\, dy = f(x)\)。这是物理学家的 \(\delta\)-函数推导，严格化要走 Schwartz 速降函数空间或 \(L^2\) 路径，但启发式地它说得通。</p>
+
+<p><strong>例 20.3.1（验证 20.2 节的结果）.</strong> 我们算出 \(\widehat{1/(1+x^2)} = \pi e^{-|\xi|}\)。反过来：\(\widehat{\pi e^{-|\xi|}}(?)\) 应当回到 \(\dfrac{2\pi}{1 + x^2}\)（多一个 \(2\pi\) 因子，因为我们没把因子对称放）。算一下：</p>
+
+\[
+\frac{1}{2\pi} \int_{-\infty}^{\infty} \pi e^{-|\xi|} e^{i\xi x}\, d\xi = \frac{1}{2} \int_{-\infty}^{\infty} e^{-|\xi|} e^{i\xi x}\, d\xi.
+\]
+
+<p>分两段：</p>
+
+\[
+\frac{1}{2} \int_{0}^{\infty} e^{-\xi(1 - ix)}\, d\xi + \frac{1}{2} \int_{-\infty}^{0} e^{\xi(1 + ix)}\, d\xi = \frac{1}{2} \cdot \frac{1}{1 - ix} + \frac{1}{2} \cdot \frac{1}{1 + ix} = \frac{1}{1 + x^2}.
+\]
+
+<p>正是 \(f(x)\)。完美闭环。</p>
+
+<h2 id="sec20-4">20.4 Laplace 变换</h2>
+
+<p>Laplace 变换是傅里叶变换的"单边、实指数"版本：</p>
+
+\[\boxed{F(s) = \mathcal{L}\{f\}(s) = \int_0^{\infty} f(t) e^{-s t}\, dt.}\]
+
+<p>这里 \(s\) 起初被想成实数，但<em>立刻</em>可以扩展为复数 \(s = \sigma + i\xi\)。如果 \(f(t)\) 当 \(t \to \infty\) 时增长不超过指数 \(e^{a t}\)（即"指数阶"），则上面积分在 \(\mathrm{Re}\, s = \sigma > a\) 的右半平面绝对收敛。在该收敛半平面里，\(F(s)\) 是 \(s\) 的<strong>解析</strong>函数。</p>
+
+<p>解析性证明思路：差分商 \(\dfrac{F(s + h) - F(s)}{h} = \int_0^{\infty} f(t) \dfrac{e^{-(s + h)t} - e^{-s t}}{h}\, dt \to \int_0^{\infty} f(t) (-t) e^{-st}\, dt\) 当 \(h \to 0\)（极限通过支配收敛理由）。所以 \(F'(s) = -\int_0^{\infty} t f(t) e^{-st}\, dt\) 存在；类似地 \(F^{(n)}(s) = (-1)^n \int t^n f(t) e^{-st}\, dt\) 都存在。因此 \(F\) 在收敛半平面无穷可微即解析。</p>
+
+<p>常用的 Laplace 变换对子（建议背几个）：</p>
+
+<table>
+<thead>
+<tr><th>\(f(t)\) 当 \(t \geq 0\)</th><th>\(F(s)\)</th><th>收敛域</th></tr>
+</thead>
+<tbody>
+<tr><td>\(1\)</td><td>\(1/s\)</td><td>\(\mathrm{Re}\, s > 0\)</td></tr>
+<tr><td>\(t\)</td><td>\(1/s^2\)</td><td>\(\mathrm{Re}\, s > 0\)</td></tr>
+<tr><td>\(t^n\)</td><td>\(n!/s^{n+1}\)</td><td>\(\mathrm{Re}\, s > 0\)</td></tr>
+<tr><td>\(e^{a t}\)</td><td>\(1/(s - a)\)</td><td>\(\mathrm{Re}\, s > a\)</td></tr>
+<tr><td>\(\sin(\omega t)\)</td><td>\(\omega/(s^2 + \omega^2)\)</td><td>\(\mathrm{Re}\, s > 0\)</td></tr>
+<tr><td>\(\cos(\omega t)\)</td><td>\(s/(s^2 + \omega^2)\)</td><td>\(\mathrm{Re}\, s > 0\)</td></tr>
+<tr><td>\(e^{a t}\sin(\omega t)\)</td><td>\(\omega/[(s-a)^2 + \omega^2]\)</td><td>\(\mathrm{Re}\, s > a\)</td></tr>
+</tbody>
+</table>
+
+<p>关键性质：\(\mathcal{L}\{f'\}(s) = s F(s) - f(0)\)。这一条把"对 \(t\) 微分"变成"乘 \(s\)"——和傅里叶变换异曲同工，但能"自动处理初始条件"。这是为什么 Laplace 变换是解常微分方程初值问题的标准工具。</p>
+
+<p>注意 \(F(s)\) 通常可以<em>解析延拓</em>到比初始收敛半平面更大的区域，去到比如有限个极点之外的整个 \(\mathbb{C}\)。例 \(f(t) = 1\) 给 \(F(s) = 1/s\)——表面上"\(\mathrm{Re}\, s > 0\)"，但 \(1/s\) 作为有理函数自然延拓到 \(\mathbb{C} \setminus \{0\}\)。这就是为什么我们说"Laplace 变换在它的极点之外活在整个复平面"。这件事下一节就要用。</p>
+
+<h2 id="sec20-5">20.5 反 Laplace 变换：Bromwich 围道</h2>
+
+<p>给一个 \(F(s)\)，怎么把它"反"回去得到 \(f(t)\)？反 Laplace 变换的公式叫 <strong>Bromwich 公式</strong>（或 Mellin 反演公式）：</p>
+
+\[\boxed{f(t) = \frac{1}{2\pi i} \int_{\gamma - i\infty}^{\gamma + i\infty} F(s) e^{s t}\, ds, \qquad t > 0,}\]
+
+<p>其中积分路径是复平面上一条<em>竖直线</em> \(\mathrm{Re}\, s = \gamma\)，\(\gamma\) 取得足够大使得它处在 \(F\) 的所有奇点的右边（保证落在收敛半平面里）。</p>
+
+<p>这条公式怎么来的？把 Laplace 变换看成"沿 \(\mathrm{Re}\, s = \gamma\) 这条直线的傅里叶变换"——令 \(s = \gamma + i\xi\)，则 \(F(\gamma + i\xi) = \int_0^{\infty} f(t) e^{-(\gamma + i\xi) t}\, dt = \int e^{-\gamma t} f(t)\, e^{-i\xi t}\, dt = \widehat{e^{-\gamma t} f(t)}(\xi)\)。所以 \(F(\gamma + i\xi)\) 是 \(e^{-\gamma t} f(t)\) 的傅里叶变换。把傅里叶反演公式套上去：</p>
+
+\[
+e^{-\gamma t} f(t) = \frac{1}{2\pi} \int_{-\infty}^{\infty} F(\gamma + i\xi) e^{i\xi t}\, d\xi.
+\]
+
+<p>两边乘 \(e^{\gamma t}\)，并把变量换成 \(s = \gamma + i\xi\)（\(ds = i\, d\xi\)）：</p>
+
+\[
+f(t) = \frac{1}{2\pi i} \int_{\gamma - i\infty}^{\gamma + i\infty} F(s) e^{st}\, ds.
+\]
+
+<p>正是 Bromwich 公式。</p>
+
+<p>实际计算时，我们几乎不在那条竖直线上"硬积"。常用招数是<strong>把竖直线闭合成一条围道，用留数</strong>。具体地：当 \(t > 0\) 时，\(e^{st}\) 在<em>左</em>半平面（\(\mathrm{Re}\, s < 0\)）衰减（因为 \(|e^{st}| = e^{\sigma t}\) 当 \(\sigma < 0\) 是衰减）。所以把竖直线闭合成一条向左的大半圆 \(C_R^L\)（逆时针），如果 \(F(s)\) 在大圆上衰减得"够快"（Jordan 引理的变形），围道积分等于围在内部的所有奇点的留数和。</p>
+
+\[\boxed{f(t) = \sum_{\text{所有奇点 } s_k} \mathrm{Res}_{s = s_k} \big[F(s) e^{st}\big].}\]
+
+<p>这就是 Bromwich 围道的实战形式：<em>反 Laplace 等于 \(F(s) e^{st}\) 在所有奇点的留数之和</em>。</p>
+
+<p><strong>例 20.5.1.</strong> 反 Laplace \(F(s) = \dfrac{1}{s^2 + 1}\)。</p>
+
+<p>奇点是 \(s = \pm i\)，简单极点。</p>
+
+\[
+\mathrm{Res}_{s = i} \frac{e^{st}}{s^2 + 1} = \frac{e^{it}}{2i}, \qquad \mathrm{Res}_{s = -i} = \frac{e^{-it}}{-2i}.
+\]
+
+<p>相加：\(\dfrac{e^{it} - e^{-it}}{2i} = \sin t\)。所以 \(f(t) = \sin t\)，符合表里的对子 \(\mathcal{L}\{\sin t\} = 1/(s^2 + 1)\)。</p>
+
+<p><strong>例 20.5.2（解一个 ODE 初值问题）.</strong> 求解 \(y'' + y = \cos(2t)\)，\(y(0) = 0\)、\(y'(0) = 0\)。</p>
+
+<p>对方程两边 Laplace 变换。设 \(Y(s) = \mathcal{L}\{y\}\)。\(\mathcal{L}\{y''\} = s^2 Y - s y(0) - y'(0) = s^2 Y\)（用了零初值）。\(\mathcal{L}\{\cos 2t\} = s/(s^2 + 4)\)。所以</p>
+
+\[
+s^2 Y + Y = \frac{s}{s^2 + 4}, \quad Y(s) = \frac{s}{(s^2 + 1)(s^2 + 4)}.
+\]
+
+<p>反 Laplace 用部分分式。\(\dfrac{s}{(s^2 + 1)(s^2 + 4)} = \dfrac{As + B}{s^2 + 1} + \dfrac{Cs + D}{s^2 + 4}\)。通分配系数：</p>
+
+\[
+s = (As + B)(s^2 + 4) + (Cs + D)(s^2 + 1).
+\]
+
+<p>取 \(s = i\)：\(i = (Ai + B)(3)\)，所以 \(B = 0\)、\(A = 1/3\)。取 \(s = 2i\)：\(2i = (2Ci + D)(-3)\)，所以 \(D = 0\)、\(C = -1/3\)。</p>
+
+\[
+Y(s) = \frac{1}{3} \cdot \frac{s}{s^2 + 1} - \frac{1}{3} \cdot \frac{s}{s^2 + 4}.
+\]
+
+<p>查表反 Laplace：\(y(t) = \dfrac{1}{3}(\cos t - \cos 2t)\)。</p>
+
+<p>对照 ODE 的"特征方程 + 待定系数"传统方法，Laplace 变换法的优势是：自动处理初值，不用解齐次解再凑特解，整个过程纯代数。这正是 19 世纪末电气工程兴起时把 Laplace 变换"产业化"的原因——电路的 RLC 方程经 Laplace 一变就成了"代数 + 部分分式 + 反查表"的流水线。</p>
+
+<h2 id="sec20-6">20.6 z-变换：离散版本</h2>
+
+<p>把 Laplace 变换"离散化"——把"时间 \(t \in [0, \infty)\)"换成"采样点 \(n = 0, 1, 2, \ldots\)"——就得到信号处理里的<strong> z-变换</strong>：给一个序列 \(\{x_n\}_{n \geq 0}\)，定义</p>
+
+\[\boxed{X(z) = \sum_{n=0}^{\infty} x_n\, z^{-n}.}\]
+
+<p>这是一个关于 \(z\) 的<em>Laurent 级数</em>（更准确地说是只含 \(z^{-n}\) 项的幂级数）。它的收敛域是某个外圆 \(|z| > R\)，其中 \(R = \limsup |x_n|^{1/n}\)。在该收敛域里，\(X(z)\) 是<em>解析</em>的。</p>
+
+<p>z-变换和本课学过的所有"洛朗级数"机器是同一个东西，只是换了个变量名。例如 \(x_n = a^n\) 给</p>
+
+\[
+X(z) = \sum_{n=0}^{\infty} (a/z)^n = \frac{1}{1 - a/z} = \frac{z}{z - a}, \quad |z| > |a|.
+\]
+
+<p>这是个有理函数，在 \(z = a\) 有一个极点。</p>
+
+<p><strong>反 z-变换</strong>用围道积分：</p>
+
+\[
+x_n = \frac{1}{2\pi i} \oint_{|z| = R'} X(z) z^{n - 1}\, dz,
+\]
+
+<p>其中 \(R'\) 是收敛域里的某个圆。这就是 Laurent 级数的系数公式（第 14 章你应该见过）。用留数算它非常机械化。</p>
+
+<p>z-变换在数字信号处理（DSP）里无所不在——一切数字滤波器、IIR/FIR、控制系统的 Z 域分析，全都靠它。</p>
+
+<h2 id="sec20-7">20.7 信号处理直觉：零极分布 = 信号"成分"</h2>
+
+<p>给一个线性时不变（LTI）系统，它的<strong>传递函数</strong> \(H(s)\)（或离散版的 \(H(z)\)）是 Laplace（z-）变换意义下"输出 / 输入"的比。\(H\) 通常是 \(s\) 的有理函数，所以可以写成</p>
+
+\[
+H(s) = K \cdot \frac{(s - z_1)(s - z_2)\cdots(s - z_m)}{(s - p_1)(s - p_2)\cdots(s - p_n)}.
+\]
+
+<p>其中 \(z_k\) 是<strong>零点</strong> (zeros)，\(p_k\) 是<strong>极点</strong> (poles)。把这些点画在复平面上得到所谓的<em>零极图</em>。</p>
+
+<p>这张图蕴含整个系统的"性格"：</p>
+
+<ul>
+<li><strong>稳定性.</strong> 系统稳定 \(\iff\) 所有极点 \(p_k\) 都在<em>左</em>半平面（\(\mathrm{Re}\, p_k < 0\)）。原因：反 Laplace 给出的时域响应包含 \(e^{p_k t}\)，要求它衰减就要 \(\mathrm{Re}\, p_k < 0\)。极点跑到右半平面，对应的指数发散，系统响应"爆掉"。</li>
+<li><strong>振荡频率.</strong> 极点的虚部 \(\mathrm{Im}\, p_k\) 是该模态的振荡角频率。所以极点 \(p_k = -1 + 5i\) 对应"以 5 rad/s 振荡、衰减时间常数 1 秒"的模态。</li>
+<li><strong>零点意义.</strong> 零点对应"不能被传过去的频率"——若输入恰好是 \(e^{i\omega_0 t}\) 而 \(z_k = i\omega_0\)，则输出为零（输入被"陷掉"）。陷波滤波器就是这么工作的。</li>
+<li><strong>因果性.</strong> 系统因果 \(\iff\) \(H(s)\) 在某右半平面解析（即所有极点的实部都比某个 \(\sigma\) 小，存在收敛域包含 \(\mathrm{Re}\, s > \sigma\) 的右半平面）。</li>
+</ul>
+
+<p>这是为什么"画零极图"是控制工程师的本能动作——一眼看到零极图，你立刻知道系统稳不稳、能多快响应、什么频率会被截掉。所有这些都是<em>复平面上的几何</em>。</p>
+
+<p><strong>例 20.7.1.</strong> 一个 RC 低通滤波器的传递函数 \(H(s) = \dfrac{1}{1 + RCs}\) 极点在 \(s = -1/(RC)\)（左半平面，稳定）；它把大于 \(\omega_c = 1/(RC)\) 的频率衰减下去。这就是"低通"含义。</p>
+
+<p><strong>例 20.7.2.</strong> 一个二阶谐振系统 \(H(s) = \dfrac{\omega_n^2}{s^2 + 2\zeta \omega_n s + \omega_n^2}\) 的极点是 \(p = -\zeta \omega_n \pm i \omega_n \sqrt{1 - \zeta^2}\)（设 \(0 < \zeta < 1\)，欠阻尼）。极点在左半平面，距虚轴 \(\zeta \omega_n\)（决定衰减速度），距实轴 \(\omega_n \sqrt{1 - \zeta^2}\)（决定振荡频率）。\(\zeta\) 是阻尼比——\(\zeta \to 0\) 极点贴上虚轴，振荡几乎不衰减；\(\zeta \to 1\) 极点合到负实轴上，纯衰减无振荡。整个系统的"个性"全部由两个共轭极点的位置说清。</p>
+
+<h2 id="sec20-8">20.8 量子力学速通</h2>
+
+<p>这里花两段把量子力学的复分析骨架抽出来，让你看到为什么量子力学"必须"用复数。</p>
+
+<p>非相对论量子力学的基本对象是<strong>波函数</strong> \(\psi(x, t)\)，它是个<em>复</em>值函数。\(|\psi(x, t)|^2\) 是粒子在 \(x\) 处出现的概率密度（Born 规则）。波函数演化遵循 Schrödinger 方程</p>
+
+\[
+i \hbar\, \frac{\partial \psi}{\partial t} = -\frac{\hbar^2}{2m}\, \frac{\partial^2 \psi}{\partial x^2} + V(x)\, \psi.
+\]
+
+<p>方程左边那个 \(i\) 不是装饰——它是<em>必须</em>的。如果换成实数版本（去掉 \(i\)），方程就变成了热扩散方程，描述的是"粒子被涂抹开"的耗散过程，没有任何振荡或干涉。\(i\) 让方程具有<em>波动</em>性质：解形如 \(\psi \sim e^{-i E t/\hbar}\)，呈现复指数振荡。<em>量子干涉</em>本质上来自不同复振幅的相加。如果 \(\psi\) 是实的，"两条路径相加为零"的相消干涉就不可能存在。</p>
+
+<p><strong>位置-动量的傅里叶对偶.</strong> 设 \(\psi(x)\)（去掉 \(t\) 简化）是位置表象的波函数。在动量表象里它是</p>
+
+\[
+\tilde\psi(p) = \frac{1}{\sqrt{2\pi\hbar}} \int_{-\infty}^{\infty} \psi(x) e^{-ipx/\hbar}\, dx,
+\]
+
+<p>这正是傅里叶变换（带 \(\hbar\) 因子的版本）。位置和动量是傅里叶对偶——这就是<em>不确定性原理</em>的根：一个函数和它的傅里叶变换不可能同时窄。所以同时知道位置和动量的精度被 \(\Delta x \cdot \Delta p \gtrsim \hbar/2\) 限制——这是傅里叶分析的数学事实，把它翻译成物理就是 Heisenberg 不确定性原理。</p>
+
+<p><strong>解析性 \(\Leftrightarrow\) 因果性.</strong> 物理学的<em>因果性</em>原理（"未来不能影响过去"）数学上等价于：响应函数 \(G(t) = 0\) 当 \(t < 0\)。它的傅里叶变换 \(\tilde G(\omega)\) 自动延拓为<em>下</em>半 \(\omega\) 平面上的解析函数（因为 \(\int_0^\infty G(t) e^{i\omega t}\, dt\) 在 \(\mathrm{Im}\, \omega < 0\) 收敛）。这就是为什么物理学家在散射理论、色散关系里会说"因果性 = \(S\)-矩阵的解析性"——这一句话其实就是傅里叶对偶 + 单边支持。</p>
+
+<p>由此推出的<strong> Kramers–Kronig 关系</strong>把响应的实部与虚部联系起来，是介电常数、折射率等物理量必须满足的"积分恒等式"。这是复分析在物理学里"无可替代"的最强证据之一。</p>
+
+<h2 id="sec20-9">20.9 Riemann 假设极简介绍</h2>
+
+<p>本章最后一节，作为彩蛋，我们简单看一眼<em>整个数学领域最大的悬案</em>——Riemann 假设。</p>
+
+<p>定义（仅在 \(\mathrm{Re}\, s > 1\) 内）<strong>Riemann zeta 函数</strong></p>
+
+\[
+\zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s}.
+\]
+
+<p>这个级数在 \(\mathrm{Re}\, s > 1\) 收敛，定义了一个解析函数。Riemann 在 1859 年的伟大论文里证明：\(\zeta(s)\) 可以解析延拓到整个 \(\mathbb{C}\)，除了 \(s = 1\) 处一个简单极点。延拓后的 \(\zeta\) 满足美妙的<strong>函数方程</strong></p>
+
+\[
+\zeta(s) = 2^s \pi^{s-1} \sin\frac{\pi s}{2}\, \Gamma(1 - s)\, \zeta(1 - s),
+\]
+
+<p>把 \(s\) 与 \(1 - s\) 联系起来——\(s\) 与 \(1 - s\) 关于直线 \(\mathrm{Re}\, s = 1/2\) 对称。这条直线就是<em>临界线</em>。</p>
+
+<p>\(\zeta\) 的零点分两类：</p>
+
+<ol>
+<li><strong>平凡零点</strong>：\(s = -2, -4, -6, \ldots\) （来自函数方程里 \(\sin(\pi s/2) = 0\) 的项）。</li>
+<li><strong>非平凡零点</strong>：所有其他零点。它们都落在<em>临界带</em> \(0 < \mathrm{Re}\, s < 1\) 里。</li>
+</ol>
+
+<p><strong>Riemann 假设.</strong> 所有非平凡零点都在临界线 \(\mathrm{Re}\, s = 1/2\) 上。</p>
+
+<p>到 2024 年，已经验证了前 \(10^{13}\) 个非平凡零点都在临界线上，但<em>没有</em>一般性的证明。这个假设是 Clay 数学研究所"千禧年七大问题"之一，悬赏 100 万美元。</p>
+
+<p><strong>它为什么重要？</strong>因为 \(\zeta\) 的非平凡零点的分布精确控制着<em>素数的分布</em>。具体地，由 Riemann 的"显式公式"，素数分布函数 \(\pi(x)\)（\(\leq x\) 的素数个数）的"误差项"</p>
+
+\[
+\pi(x) - \mathrm{Li}(x) \approx -\sum_{\rho} \frac{x^\rho}{\rho \log x}
+\]
+
+<p>（\(\mathrm{Li}\) 是对数积分，\(\rho\) 跑遍所有非平凡零点）的振幅由 \(\mathrm{Re}\, \rho\) 控制。如果所有 \(\mathrm{Re}\, \rho = 1/2\)（即 RH 成立），误差项不超过 \(O(\sqrt{x} \log x)\)——这是素数分布"最规则"的可能。如果 RH 失败，存在 \(\mathrm{Re}\, \rho > 1/2\) 的零点，素数分布就会有更大的"波动"。</p>
+
+<p>所以 RH 不只是关于一个抽象函数的命题，它是<em>关于素数最深刻的结构性命题</em>。无数关于素数的"几乎所有定理"都是"假设 RH 成立"才能证的——一旦哪天有人证明了 RH，数论里几百条结论会从"条件"变成"无条件"。</p>
+
+<p>本章止步于此。本课的复分析框架——解析性、留数、围道积分、调和函数、解析延拓——已经把现代物理与工程的数学骨架搭起来。下一步要去哪里？多复变、Riemann 曲面、共形几何、椭圆函数、L-函数与解析数论、量子场论里的 Wick 转动——这些都是复分析的"高山"。本课只是带你登上第一座山头，让你看见后面还有更壮阔的山脉。</p>
+
+<p>剩下的路，由你自己走。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 调和函数与边值问题</a><a href="appA.html">下一章 · 附录 A 严格性 →</a></nav>
+
+</main>
+</body>
+</html>

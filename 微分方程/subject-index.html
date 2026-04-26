@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>索引 — 普林斯顿微分方程读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B 常用积分与变换表</a><span class="nav-disabled">下一章 →</span></nav>
+<h1 id="subject-index">索引</h1>
+
+<p>本索引以"<strong>你想做什么</strong>"为索引线，而不是以单个名词。每条目后给出最直接相关的章节号。如果有多个章节交叉，列出主要的两到三个。按拼音首字母分组排序。</p>
+
+<h2 id="idx-A">A</h2>
+
+<ul>
+<li>奥意尔（Euler）法 → 见"E：Euler 法"。</li>
+<li>埃尔米特方程 → 第 20 章 (幂级数与正交多项式)。</li>
+<li>阿贝尔公式（Wronskian 行列式的演化）→ 第 7.5 节。</li>
+</ul>
+
+<h2 id="idx-B">B</h2>
+
+<ul>
+<li>爆破（解在有限时间内变无穷）→ 附录 A.4；非线性方程的典型病态。</li>
+<li>本征值（特征值）→ 见"T：特征值"。</li>
+<li>本征函数 → 见"T：特征函数"和"S：Sturm-Liouville 问题"。</li>
+<li>边界条件
+  <ul>
+    <li>Dirichlet（端点值给定）→ 第 17.2 节、第 18.3 节。</li>
+    <li>Neumann（端点导数给定）→ 第 17.3 节、第 18.5 节。</li>
+    <li>Robin（混合）→ 第 17.4 节。</li>
+    <li>周期 → 第 19.4 节（傅里叶级数）。</li>
+  </ul>
+</li>
+<li>变量代换技巧
+  <ul>
+    <li>把 Bernoulli 化成线性：\(v = y^{1-n}\) → 第 5.4 节。</li>
+    <li>把齐次方程化成可分离：\(v = y/x\) → 第 5.5 节。</li>
+    <li>把高阶化成方程组：\(\mathbf{x} = (y, y')^T\) → 第 12.1 节、附录 A.6。</li>
+  </ul>
+</li>
+<li>波动方程（一维、固定端）→ 第 19.1-19.3 节；分离变量解。</li>
+<li>不变集（动力系统中解被困住的区域）→ 第 16.5 节。</li>
+<li>Bernoulli 方程 → 第 5.4 节。</li>
+<li>BDF（向后微分公式）→ 第 21.7 节末，作为隐式方法的家族。</li>
+</ul>
+
+<h2 id="idx-C">C</h2>
+
+<ul>
+<li>常数变易法 → 第 8.2 节（参数变易，二阶非齐次的通解构造）。</li>
+<li>常微分方程的存在唯一性 → 附录 A 全。</li>
+<li>常系数线性方程
+  <ul>
+    <li>一阶：\(y' = ay + b\) → 第 3.4 节。</li>
+    <li>二阶齐次：特征方程法 → 第 7 章。</li>
+    <li>二阶非齐次：待定系数 / 参数变易 → 第 8 章。</li>
+    <li>方程组：特征值/特征向量法 → 第 12-13 章。</li>
+  </ul>
+</li>
+<li>常微分方程的数值方法 → 第 21 章全；推荐 RK4 / RK45。</li>
+<li>充分性 vs 必要性（Lipschitz 是唯一性的<em>充分</em>条件）→ 附录 A.2。</li>
+<li>初值问题（IVP）的良定性 → 附录 A.1, A.6。</li>
+<li>抽样定理（Nyquist）→ 提及，未细讲。</li>
+<li>差分方程（离散化的产物）→ 第 21.2 节作为思想，详细见数值分析教材。</li>
+</ul>
+
+<h2 id="idx-D">D</h2>
+
+<ul>
+<li>待定系数法（猜形式凑非齐次解）→ 第 8.1 节；外驱是多项式/指数/三角时奏效。</li>
+<li>单摆方程
+  <ul>
+    <li>线性化（小角度）→ 第 12.4 节。</li>
+    <li>非线性（大角度）→ 第 16.3 节、第 21.1 节作为没有闭式解的例子。</li>
+  </ul>
+</li>
+<li>Dirac \(\delta\) 函数
+  <ul>
+    <li>定义与极限意义 → 第 11.1 节。</li>
+    <li>Laplace 变换 → 附录 B.2。</li>
+    <li>用法（脉冲外驱）→ 第 11.3 节。</li>
+  </ul>
+</li>
+<li>Dirichlet 问题 → 见"B：边界条件"。</li>
+<li>对角化（线性方程组解耦的核心）→ 第 13.2 节；要求矩阵可对角化。</li>
+<li>对偶（Laplace / Fourier）→ 第 9 章引言、第 19 章引言。</li>
+</ul>
+
+<h2 id="idx-E">E</h2>
+
+<ul>
+<li>Euler 法（forward Euler，显式）→ 第 21.3 节。</li>
+<li>Euler 法（backward Euler，隐式）→ 第 21.7 节；对刚性问题首选。</li>
+<li>Euler 公式 \(e^{ix} = \cos x + i \sin x\) → 第 7.3 节、附录 B.4。</li>
+<li>Euler-Lagrange 方程（提及，未细讲）→ 第 18 章引言。</li>
+</ul>
+
+<h2 id="idx-F">F</h2>
+
+<ul>
+<li>方程组（线性常系数）解法
+  <ul>
+    <li>实特征值 → 第 13.1 节。</li>
+    <li>复特征值（产生振动）→ 第 13.3 节。</li>
+    <li>重特征值 → 第 13.4 节（广义特征向量）。</li>
+  </ul>
+</li>
+<li>方向场（slope field）的画法 → 第 4.3 节。</li>
+<li>分离变量
+  <ul>
+    <li>常微分方程 → 第 3.2 节。</li>
+    <li>偏微分方程（PDE）→ 第 18.2 节、第 19.2 节。</li>
+  </ul>
+</li>
+<li>分式分解（Laplace 反变换的主要工具）→ 第 10.2 节、附录 B.2。</li>
+<li>Frobenius 法（正则奇点附近的级数解）→ 第 20.4 节。</li>
+<li>傅里叶级数
+  <ul>
+    <li>三角函数族的正交性 → 第 19.1 节。</li>
+    <li>系数公式 → 第 19.2 节。</li>
+    <li>逐点收敛与 Gibbs 现象 → 第 19.5 节。</li>
+  </ul>
+</li>
+<li>傅里叶变换（连续）→ 第 19.7 节、附录 B.3 (变换表)。</li>
+<li>覆盖（解的存在区间为何被压短）→ 附录 A.4 (爆破)。</li>
+</ul>
+
+<h2 id="idx-G">G</h2>
+
+<ul>
+<li>共振（强迫频率与固有频率重合）→ 第 8.4 节、第 22.4.2 节。</li>
+<li>古典力学的微分方程描述 → 第 12.4 节、第 22.1 节。</li>
+<li>固有频率（natural frequency）→ 第 7.4 节、第 22.1 节（耦合振子的简正频率）。</li>
+<li>过阻尼 / 临界阻尼 / 欠阻尼分类 → 第 7.4 节。</li>
+<li>跟踪解直到爆破 → 附录 A.4。</li>
+<li>各类方法选择决策树 → 第 22.6 节。</li>
+</ul>
+
+<h2 id="idx-H">H</h2>
+
+<ul>
+<li>核函数（Green 函数）→ 第 11.4 节作为脉冲响应。</li>
+<li>Heun 法（改进 Euler 法 / 二阶预测-校正）→ 第 21.5 节。</li>
+<li>Hermite 方程 → 第 20 章。</li>
+<li>恒等式（三角 / 双曲 / Euler）→ 附录 B.4。</li>
+<li>耗散项的物理意义（阻尼）→ 第 7.4 节。</li>
+<li>化学反应动力学
+  <ul>
+    <li>一级反应 \(\dot a = -k a\) → 第 3 章引例。</li>
+    <li>二级反应 \(\dot a = -k a^2\) → 第 3.3 节。</li>
+    <li>连锁反应 \(A \to B \to C\) → 第 22.2 节。</li>
+  </ul>
+</li>
+<li>滑动方向场 → 见"F：方向场"。</li>
+</ul>
+
+<h2 id="idx-J">J</h2>
+
+<ul>
+<li>积分因子 \(\mu = e^{\int p\, dt}\) → 第 3.4 节、附录 B.5 (一阶模板)。</li>
+<li>积分变换的统一思想 → 第 9 章引言。</li>
+<li>极坐标下的相平面分析（轨道方程改写）→ 第 16.4 节。</li>
+<li>极限环 → 第 16.6 节。</li>
+<li>渐近稳定 vs 稳定 → 第 15.3 节、第 16.2 节。</li>
+<li>解的延拓 → 附录 A.4-A.5。</li>
+<li>解析解 vs 数值解 → 第 21.1 节、第 22.6 节。</li>
+<li>解的爆破 → 附录 A.4。</li>
+<li>阶（数值方法的）→ 第 21.4 节, 21.5 节, 21.6 节。</li>
+<li>结点（node）/ 鞍点 / 螺旋 / 中心 → 第 15 章相图分类表。</li>
+</ul>
+
+<h2 id="idx-K">K</h2>
+
+<ul>
+<li>开普勒第二定律（角动量守恒）→ 第 12 章物理动机。</li>
+<li>可分离变量 → 第 3.2 节。</li>
+<li>可解析的方程 vs 不可解析的 → 第 21.1 节。</li>
+<li>控制系统的稳定性判据 → 第 13.5 节、第 15.5 节。</li>
+<li>快慢分离（多尺度分析）→ 第 22.5 节作为简介。</li>
+<li>刚性方程的诊断与处理 → 第 21.7 节、第 21.8 节。</li>
+</ul>
+
+<h2 id="idx-L">L</h2>
+
+<ul>
+<li>拉普拉斯（Laplace）变换
+  <ul>
+    <li>定义与基本性质 → 第 9 章。</li>
+    <li>导数定理 → 第 9.3 节。</li>
+    <li>位移定理 → 第 10.3 节。</li>
+    <li>卷积定理 → 第 11.5 节。</li>
+    <li>反变换 → 第 10 章；首要技巧是分式分解 + 配方。</li>
+    <li>反变换的常用窍门 → 第 10.2-10.4 节、附录 B.2 末。</li>
+    <li>变换表 → 附录 B.2。</li>
+  </ul>
+</li>
+<li>Laplace 方程（PDE）→ 第 18 章；调和函数。</li>
+<li>Lipschitz 条件 → 附录 A.2 (定义与判别)、A.3 (失效反例)。</li>
+<li>线性化（在平衡点附近）→ 第 15.2 节。</li>
+<li>线性方程的整体存在性 → 附录 A.5。</li>
+<li>李雅普诺夫（Lyapunov）函数 → 第 16.5 节；用能量论证稳定。</li>
+<li>勒让德方程 → 第 20.3 节。</li>
+<li>临界阻尼 → 见"G：过阻尼"。</li>
+<li>逻辑斯蒂方程 \(y' = ry(1 - y/K)\) → 第 4.4 节；非线性的、有限载量的人口模型。</li>
+<li>Lipschitz 失效的反例（\(y' = y^{2/3}\)）→ 附录 A.3。</li>
+</ul>
+
+<h2 id="idx-M">M</h2>
+
+<ul>
+<li>模态分析（耦合振子的振动模式）→ 第 13.6 节、第 22.1 节。</li>
+<li>模态频率 = 矩阵特征值的平方根 → 第 22.1.2 节。</li>
+<li>母方程（Frobenius 法的指标方程）→ 第 20.4 节。</li>
+</ul>
+
+<h2 id="idx-N">N</h2>
+
+<ul>
+<li>能量积分（一维守能量系统的相轨道）→ 第 16.3 节。</li>
+<li>Neumann 条件 → 见"B：边界条件"。</li>
+<li>逆变换（Laplace）→ 见"L：拉普拉斯变换"。</li>
+</ul>
+
+<h2 id="idx-P">P</h2>
+
+<ul>
+<li>Picard–Lindelöf 定理 → 附录 A.1。</li>
+<li>Picard 迭代（不动点构造）→ 附录 A.1 末。</li>
+<li>偏微分方程（PDE）
+  <ul>
+    <li>热方程 → 第 18 章。</li>
+    <li>波动方程 → 第 19 章。</li>
+    <li>Laplace / Poisson 方程 → 第 18.5 节。</li>
+    <li>耦合 PDE → 第 22.5 节。</li>
+  </ul>
+</li>
+<li>平衡点（fixed point）
+  <ul>
+    <li>一维定义与稳定性 → 第 4.1 节。</li>
+    <li>二维分类（结点/鞍点/螺旋/中心）→ 第 15.4 节。</li>
+    <li>非孤立平衡集 → 第 22.3.2 节（SIR 模型）。</li>
+  </ul>
+</li>
+<li>谱（线性算子的本征值集合）→ 第 17.5 节。</li>
+<li>普朗克常数 → 不出现，本书完全是经典。</li>
+<li>Poincaré-Bendixson 定理（二维流必趋极限环或平衡）→ 第 16.6 节。</li>
+</ul>
+
+<h2 id="idx-Q">Q</h2>
+
+<ul>
+<li>奇点（singular point of an ODE）
+  <ul>
+    <li>正则奇点 → 第 20.3 节。</li>
+    <li>非正则奇点 → 第 20.5 节。</li>
+  </ul>
+</li>
+<li>奇异解（Lipschitz 失效带来）→ 附录 A.3。</li>
+<li>欠阻尼 → 第 7.4 节。</li>
+<li>群体免疫（SIR 模型的 \(S_\infty\)）→ 第 22.3.5 节。</li>
+</ul>
+
+<h2 id="idx-R">R</h2>
+
+<ul>
+<li>Runge-Kutta 4 阶（RK4）
+  <ul>
+    <li>公式 → 第 21.6 节。</li>
+    <li>例题 → 第 21.6.1 节、21.9 节。</li>
+  </ul>
+</li>
+<li>RK45（自适应）→ 第 21.8 节。</li>
+<li>RLC 电路
+  <ul>
+    <li>无外驱 → 第 7.4 节作为阻尼振子。</li>
+    <li>有外驱方波 → 第 22.4.1 节。</li>
+    <li>共振 → 第 22.4.2 节。</li>
+  </ul>
+</li>
+<li>Robin 边界 → 见"B：边界条件"。</li>
+<li>热方程 → 第 18 章。</li>
+</ul>
+
+<h2 id="idx-S">S</h2>
+
+<ul>
+<li>SIR 流行病模型 → 第 22.3 节。
+  <ul>
+    <li>基本再生数 \(R_0\) → 第 22.3.3 节。</li>
+    <li>"压平曲线"策略 → 第 22.3.6 节。</li>
+  </ul>
+</li>
+<li>双弹簧-质量系统 → 第 22.1 节。</li>
+<li>双曲恒等式 → 附录 B.4。</li>
+<li>稳定性
+  <ul>
+    <li>一维 \(\dot x = f(x)\)：用 \(f'\) 在平衡点的符号判别 → 第 4.1 节。</li>
+    <li>二维线性：迹/行列式判据 → 第 15.4 节。</li>
+    <li>非线性 + 线性化（Hartman-Grobman 思想）→ 第 15.5 节。</li>
+    <li>Lyapunov 第二方法 → 第 16.5 节。</li>
+  </ul>
+</li>
+<li>Sturm-Liouville 问题
+  <ul>
+    <li>一般形式与正交性定理 → 第 17.5 节。</li>
+    <li>本征值递增、本征函数正交 → 第 17.6 节。</li>
+    <li>对 PDE 分离变量的统一作用 → 第 18.4 节。</li>
+  </ul>
+</li>
+<li>Simpson 法（数值积分，与 RK4 权重一致）→ 第 21.6 节末。</li>
+<li>守恒律（守能量、守质量）作为平衡判据 → 第 16.3 节、第 22.2 节、第 22.3.4 节。</li>
+<li>三角函数族的正交性 → 第 19.1 节。</li>
+<li>三角恒等式 → 附录 B.4。</li>
+<li>试探解的形式（待定系数法）→ 第 8.1 节中的查表。</li>
+</ul>
+
+<h2 id="idx-T">T</h2>
+
+<ul>
+<li>特征方程（线性 ODE 的）→ 第 7.1 节。</li>
+<li>特征值 / 特征向量
+  <ul>
+    <li>定义与计算 → 第 12.2 节。</li>
+    <li>解一阶线性方程组 → 第 13 章。</li>
+    <li>简正频率 = 特征值的平方根 → 第 22.1.2 节。</li>
+    <li>稳定性判据 → 第 15.4 节。</li>
+  </ul>
+</li>
+<li>梯度系统 → 第 16.5 节。</li>
+<li>条件稳定 vs 无条件稳定（数值方法）→ 第 21.7 节。</li>
+<li>特征函数（在 Sturm-Liouville 框架下）→ 见"S：Sturm-Liouville 问题"。</li>
+<li>统一变换思想（Laplace、Fourier、Z 变换）→ 第 9 章引言。</li>
+</ul>
+
+<h2 id="idx-W">W</h2>
+
+<ul>
+<li>Wronskian 行列式（线性独立性判据）→ 第 7.5 节。</li>
+<li>位移定理（Laplace）→ 第 10.3 节、附录 B.2。</li>
+<li>稳态解 vs 瞬态解 → 第 8.3 节、第 22.4.2 节。</li>
+<li>无穷区间 PDE 与 Fourier 变换 → 第 19.7 节。</li>
+<li>外驱（forcing function） → 见"Y：右端 / 外驱"。</li>
+</ul>
+
+<h2 id="idx-X">X</h2>
+
+<ul>
+<li>显式 vs 隐式数值方法 → 第 21.7 节。</li>
+<li>线性化 → 见"L：线性化"。</li>
+<li>线性方程的所有定理 → 见 "L"、"X"、附录 A.5。</li>
+<li>线性独立（用 Wronskian）→ 第 7.5 节。</li>
+<li>相平面 → 见"X：相图"。</li>
+<li>相图（phase portrait）的画法 → 第 15-16 章。</li>
+<li>相轨道（trajectory）守恒律 → 第 16.3 节、第 22.3.4 节。</li>
+<li>幂级数解（在常点附近）→ 第 20.2 节。</li>
+<li>幂级数解（在正则奇点附近）→ 第 20.4 节 (Frobenius)。</li>
+</ul>
+
+<h2 id="idx-Y">Y</h2>
+
+<ul>
+<li>右端 / 外驱（forcing）
+  <ul>
+    <li>多项式、指数、三角 → 待定系数（第 8.1 节）。</li>
+    <li>分段、阶跃 → Laplace（第 11.3 节）。</li>
+    <li>\(\delta\) 脉冲 → Laplace（第 11.4 节，Green 函数）。</li>
+    <li>一般 → 参数变易（第 8.2 节）。</li>
+  </ul>
+</li>
+<li>欧拉方法 → 见"E：Euler 法"。</li>
+<li>有限差分（数值 PDE，提及）→ 第 22.5 节末。</li>
+<li>隐式 Euler → 见"E：Euler 法（backward）"。</li>
+<li>隐函数定理在 ODE 中的应用 → 附录 A.6 末。</li>
+<li>预测-校正法（Heun）→ 第 21.5 节。</li>
+<li>压平曲线 → 见"S：SIR 流行病模型"。</li>
+</ul>
+
+<h2 id="idx-Z">Z</h2>
+
+<ul>
+<li>正交性（函数族）→ 第 17.6 节、第 19.1 节。</li>
+<li>正则奇点 → 第 20.3 节。</li>
+<li>振子（oscillator）
+  <ul>
+    <li>无阻尼简谐 → 第 7.2 节。</li>
+    <li>阻尼分类 → 第 7.4 节。</li>
+    <li>带外驱 → 第 8 章。</li>
+    <li>耦合（多自由度）→ 第 22.1 节。</li>
+  </ul>
+</li>
+<li>整体存在性（整个区间上）→ 附录 A.5（线性）、A.6.2（非线性的额外论证）。</li>
+<li>状态空间表示（高阶化为一阶组）→ 第 12.1 节。</li>
+<li>主特征值（最大或最小）→ 第 17.5 节。</li>
+<li>自适应步长（数值方法）→ 第 21.8 节。</li>
+<li>自治系统（autonomous） → 第 4 章引言、第 15-16 章主体。</li>
+<li>阻尼振子 → 见"Z：振子"。</li>
+<li>最长存在区间（解的）→ 附录 A.4-A.5。</li>
+<li>组合工具（多个章节合用解一题）→ 第 22 章全。</li>
+<li>祝你好运 → 整本书。</li>
+</ul>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B 常用积分与变换表</a><span class="nav-disabled">下一章 →</span></nav>
+
+</main>
+</body>
+</html>

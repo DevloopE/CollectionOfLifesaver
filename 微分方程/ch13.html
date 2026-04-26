@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 章 用特征值法解线性方程组 — 普林斯顿微分方程读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 方程组与矩阵记号</a><a href="ch14.html">下一章 · 第 14 章 相平面与稳定性分析 →</a></nav>
+<h1 id="ch13">第 13 章 用特征值法解线性方程组</h1>
+
+<p>上一章把"高阶单方程"和"几个耦合方程"统一成了一种格式：常系数齐次线性方程组 \(\mathbf{x}' = A \mathbf{x}\)。我们也已经知道它的解空间是 \(n\) 维的，所以只要找到 \(n\) 个线性无关的解，通解就出来了。</p>
+
+<p>但<em>怎么找</em>这 \(n\) 个解？这就是本章要回答的问题。答案干净到让人发笑：<strong>把矩阵 \(A\) 的特征值和特征向量算出来，每一对 \((\lambda, \mathbf{v})\) 自动给出一个解 \(e^{\lambda t}\mathbf{v}\)；如果运气好，把它们拼起来就是通解</strong>。线性代数和微分方程在这里碰头，握手，融为一体。</p>
+
+<p>本章具体要做的事：</p>
+
+<ul>
+  <li>从猜 ansatz \(\mathbf{x}(t) = e^{\lambda t} \mathbf{v}\) 出发，导出特征值方程 \(A \mathbf{v} = \lambda \mathbf{v}\)；</li>
+  <li>处理三种"运气"：实数互异特征值（最容易）、复特征值（成对、给出三角函数解）、重特征值（最棘手，可能需要广义特征向量）；</li>
+  <li>引入<strong>矩阵指数</strong> \(e^{At}\)，把"通解"装进一个统一的封闭表达式 \(\mathbf{x}(t) = e^{At} \mathbf{x}_0\)；</li>
+  <li>用矩阵指数解非齐次方程组 \(\mathbf{x}' = A\mathbf{x} + \mathbf{g}(t)\)；</li>
+  <li>做几道大型综合例题：耦合弹簧的振动模态、化学反应级联、电路网络。</li>
+</ul>
+
+<p>整章的灵魂是一句话：<em>把 \(A\) 用它的特征基换装一下，方程组就解耦成了几个独立的 \(y' = \lambda y\)</em>。这听起来玄，做起来简单——你已经有了所有工具。</p>
+
+<h2 id="sec13-1">13.1 寻找指数形式解</h2>
+
+<p>面对方程组 \(\mathbf{x}' = A \mathbf{x}\)，需要做一个聪明的猜测。</p>
+
+<p>回忆单方程的情形。\(y' = ky\) 的解是 \(y = c e^{kt}\)。指数函数之所以是这条方程的解，关键是<em>它的导数等于自己乘以一个常数</em>。这个性质在向量情形下应该如何推广？</p>
+
+<p>试一个 ansatz：</p>
+
+\[
+\mathbf{x}(t) = e^{\lambda t} \mathbf{v},
+\]
+
+<p>其中 \(\lambda\) 是一个常数（暂时不知道是几），\(\mathbf{v}\) 是一个常向量（暂时也不知道是哪个）。它的求导是</p>
+
+\[
+\mathbf{x}'(t) = \lambda e^{\lambda t} \mathbf{v}.
+\]
+
+<p>对，向量函数的导数是按分量求导，而 \(\mathbf{v}\) 是常向量，所以只有 \(e^{\lambda t}\) 这部分对 \(t\) 求导得到一个 \(\lambda\) 因子，结果就是 \(\lambda e^{\lambda t} \mathbf{v}\)。把 \(\mathbf{x}\) 与 \(\mathbf{x}'\) 一起代入方程 \(\mathbf{x}' = A\mathbf{x}\)：</p>
+
+\[
+\lambda e^{\lambda t} \mathbf{v} = A \cdot e^{\lambda t} \mathbf{v} = e^{\lambda t} A \mathbf{v}.
+\]
+
+<p>消去两边都有的 \(e^{\lambda t}\)（它永远不为零）：</p>
+
+\[
+\boxed{A \mathbf{v} = \lambda \mathbf{v}.}
+\]
+
+<p>这正是<strong>特征值方程</strong>！我们的 ansatz 之所以能成为解，<em>当且仅当</em> \(\mathbf{v}\) 是 \(A\) 的特征向量、\(\lambda\) 是对应的特征值。换句话说，<strong>每一对特征值-特征向量 \((\lambda, \mathbf{v})\) 就送给你一个微分方程组的解 \(e^{\lambda t} \mathbf{v}\)</strong>。</p>
+
+<p>这一推导看似微不足道，意义却惊人。它把<em>微分方程组</em>这个动力学问题，化成了<em>特征值</em>这个纯代数问题。线性代数学好了，方程组就解完了。"特征值"四个字解决了这一整个章节。</p>
+
+<p>顺手回忆一下特征值是怎么算的。\(\lambda\) 是 \(A\) 的特征值意味着齐次方程 \((A - \lambda I)\mathbf{v} = \mathbf{0}\) 有非零解 \(\mathbf{v}\)。这要求矩阵 \(A - \lambda I\) 不可逆，即</p>
+
+\[
+\det(A - \lambda I) = 0.
+\]
+
+<p>这是关于 \(\lambda\) 的 \(n\) 次多项式方程，叫做<strong>特征多项式方程</strong>。它的根（共 \(n\) 个，复数计入重数）就是 \(A\) 的特征值。求出每个特征值后，把它代回 \((A - \lambda I)\mathbf{v} = \mathbf{0}\) 解出特征向量。流程你应该非常熟悉了；如果不熟，回去翻一下《线性代数读本》第 14 章。</p>
+
+<h2 id="sec13-2">13.2 \(A\) 有 \(n\) 个线性无关实特征向量</h2>
+
+<p>最舒服的情形：\(n \times n\) 矩阵 \(A\) 有 \(n\) 个线性无关的实特征向量 \(\mathbf{v}_1, \ldots, \mathbf{v}_n\)，对应实特征值 \(\lambda_1, \ldots, \lambda_n\)（不必互不相同）。这种情形下方程组的通解是</p>
+
+\[
+\boxed{\mathbf{x}(t) = c_1 e^{\lambda_1 t} \mathbf{v}_1 + c_2 e^{\lambda_2 t} \mathbf{v}_2 + \cdots + c_n e^{\lambda_n t} \mathbf{v}_n.}
+\]
+
+<p>每一项 \(e^{\lambda_k t} \mathbf{v}_k\) 都是上一节那个 ansatz 给出的解；线性组合还是解（叠加原理）；总共 \(n\) 项，正好对应 \(n\) 维解空间。</p>
+
+<p>为什么这 \(n\) 个解 \(\{e^{\lambda_k t} \mathbf{v}_k\}\) 一定线性无关？算它们在 \(t = 0\) 处的值——就是 \(\{\mathbf{v}_k\}\)。这 \(n\) 个向量按假设线性无关，所以基本矩阵 \(\Phi(0) = [\mathbf{v}_1 | \cdots | \mathbf{v}_n]\) 的行列式不为零，即 \(W(0) \ne 0\)。由阿贝尔公式 \(W(t) \ne 0\) 处处成立，于是这 \(n\) 个解线性无关。完。</p>
+
+<p>这个情形之所以"舒服"，是因为<em>不需要任何额外的工夫</em>：把 \(A\) 的特征值和特征向量算出来，把它们各自塞到 \(e^{\lambda t} \mathbf{v}\) 里，加起来。完成。</p>
+
+<p><em>什么时候这种舒服情形成立</em>？两个充分条件值得记住：（1）\(A\) 的 \(n\) 个特征值互不相同（"互异特征值"必然给出 \(n\) 个线性无关的特征向量，这是特征值理论的基本结论）；（2）\(A\) 是对称矩阵（实对称矩阵总是可以正交对角化）。这两条覆盖了实际中的绝大多数情形。下一节就专门处理"互异实特征值"这一典型情形。</p>
+
+<h2 id="sec13-3">13.3 详细的 \(2 \times 2\) 例题</h2>
+
+<p>把上面的方法在一个具体例子上跑完一遍。</p>
+
+<p><strong>例 13.3.1</strong>。求 \(\mathbf{x}' = \begin{pmatrix} 1 & 2 \\ 4 & 3 \end{pmatrix} \mathbf{x}\) 的通解。</p>
+
+<p><em>第一步：求特征值</em>。算特征多项式：</p>
+
+\[
+\det(A - \lambda I) = \det \begin{pmatrix} 1 - \lambda & 2 \\ 4 & 3 - \lambda \end{pmatrix} = (1-\lambda)(3-\lambda) - 8 = \lambda^2 - 4\lambda - 5.
+\]
+
+<p>因式分解：\(\lambda^2 - 4\lambda - 5 = (\lambda - 5)(\lambda + 1)\)。所以特征值是 \(\lambda_1 = 5, \lambda_2 = -1\)。两个互异实根，落在最舒服的情形里。</p>
+
+<p><em>第二步：求每个特征值的特征向量</em>。对 \(\lambda_1 = 5\)，解 \((A - 5I)\mathbf{v} = \mathbf{0}\)：</p>
+
+\[
+\begin{pmatrix} -4 & 2 \\ 4 & -2 \end{pmatrix} \mathbf{v} = \mathbf{0}.
+\]
+
+<p>两行其实是同一行（差一个负号），所以约束只有一条：\(-4 v_1 + 2 v_2 = 0\)，即 \(v_2 = 2 v_1\)。取 \(v_1 = 1\) 得到 \(\mathbf{v}_1 = \begin{pmatrix} 1 \\ 2 \end{pmatrix}\)。</p>
+
+<p>对 \(\lambda_2 = -1\)，解 \((A + I)\mathbf{v} = \mathbf{0}\)：</p>
+
+\[
+\begin{pmatrix} 2 & 2 \\ 4 & 4 \end{pmatrix} \mathbf{v} = \mathbf{0}.
+\]
+
+<p>两行也是同一行；约束 \(2v_1 + 2v_2 = 0\)，即 \(v_2 = -v_1\)。取 \(v_1 = 1\) 得 \(\mathbf{v}_2 = \begin{pmatrix} 1 \\ -1 \end{pmatrix}\)。</p>
+
+<p><em>第三步：写通解</em>。</p>
+
+\[
+\mathbf{x}(t) = c_1 e^{5t} \begin{pmatrix} 1 \\ 2 \end{pmatrix} + c_2 e^{-t} \begin{pmatrix} 1 \\ -1 \end{pmatrix}.
+\]
+
+<p>按分量写出来：\(x_1(t) = c_1 e^{5t} + c_2 e^{-t}\)，\(x_2(t) = 2 c_1 e^{5t} - c_2 e^{-t}\)。两个常数 \(c_1, c_2\) 任选。</p>
+
+<p><em>第四步（如果有 IVP）：解出常数</em>。设要满足 \(\mathbf{x}(0) = \begin{pmatrix} 4 \\ 5 \end{pmatrix}\)。代 \(t = 0\)：</p>
+
+\[
+c_1 \begin{pmatrix} 1 \\ 2 \end{pmatrix} + c_2 \begin{pmatrix} 1 \\ -1 \end{pmatrix} = \begin{pmatrix} 4 \\ 5 \end{pmatrix} \implies \begin{cases} c_1 + c_2 = 4, \\ 2c_1 - c_2 = 5. \end{cases}
+\]
+
+<p>两式相加：\(3 c_1 = 9\)，得 \(c_1 = 3, c_2 = 1\)。所以 IVP 的解是</p>
+
+\[
+\mathbf{x}(t) = 3 e^{5t} \begin{pmatrix} 1 \\ 2 \end{pmatrix} + e^{-t} \begin{pmatrix} 1 \\ -1 \end{pmatrix}.
+\]
+
+<p>解完。整个流程是机械的："求特征值 → 求特征向量 → 拼通解 → 用初值定常数"。这就是为什么本章的核心可以浓缩成一句话——一旦特征值理论你掌握了，方程组的求解就是套路。</p>
+
+<p><strong>例 13.3.2</strong>。一个三维的例子。求 \(\mathbf{x}' = \begin{pmatrix} 2 & 0 & 0 \\ 1 & 3 & 0 \\ 0 & 1 & 4 \end{pmatrix} \mathbf{x}\) 的通解。</p>
+
+<p>这个矩阵是<em>下三角</em>，特征值就是对角线元素：\(\lambda_1 = 2, \lambda_2 = 3, \lambda_3 = 4\)。三个互异，舒服。</p>
+
+<p>求每个特征向量。对 \(\lambda_1 = 2\)，\((A - 2I)\mathbf{v} = \mathbf{0}\)：</p>
+
+\[
+\begin{pmatrix} 0 & 0 & 0 \\ 1 & 1 & 0 \\ 0 & 1 & 2 \end{pmatrix} \mathbf{v} = \mathbf{0}.
+\]
+
+<p>第一行无信息；第二行 \(v_1 + v_2 = 0\)；第三行 \(v_2 + 2 v_3 = 0\)。从最后一行 \(v_2 = -2 v_3\)；代入倒数第二行 \(v_1 = -v_2 = 2 v_3\)。取 \(v_3 = 1\) 得 \(\mathbf{v}_1 = (2, -2, 1)^T\)。</p>
+
+<p>对 \(\lambda_2 = 3\)，\((A - 3I)\mathbf{v} = \mathbf{0}\)：</p>
+
+\[
+\begin{pmatrix} -1 & 0 & 0 \\ 1 & 0 & 0 \\ 0 & 1 & 1 \end{pmatrix} \mathbf{v} = \mathbf{0}.
+\]
+
+<p>第一与第二行给出 \(v_1 = 0\)；第三行 \(v_2 + v_3 = 0\)，即 \(v_2 = -v_3\)。取 \(v_3 = 1\) 得 \(\mathbf{v}_2 = (0, -1, 1)^T\)。</p>
+
+<p>对 \(\lambda_3 = 4\)，\((A - 4I)\mathbf{v} = \mathbf{0}\)：</p>
+
+\[
+\begin{pmatrix} -2 & 0 & 0 \\ 1 & -1 & 0 \\ 0 & 1 & 0 \end{pmatrix} \mathbf{v} = \mathbf{0}.
+\]
+
+<p>第一行 \(v_1 = 0\)；第三行 \(v_2 = 0\)；\(v_3\) 自由。取 \(v_3 = 1\) 得 \(\mathbf{v}_3 = (0, 0, 1)^T\)。</p>
+
+<p>通解：</p>
+
+\[
+\mathbf{x}(t) = c_1 e^{2t} \begin{pmatrix} 2 \\ -2 \\ 1 \end{pmatrix} + c_2 e^{3t} \begin{pmatrix} 0 \\ -1 \\ 1 \end{pmatrix} + c_3 e^{4t} \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}.
+\]
+
+<p>三个互异实特征值，三个特征向量，三项叠加，通解装满 \(\mathbb{R}^3\)。</p>
+
+<h2 id="sec13-4">13.4 复特征值情形</h2>
+
+<p>不是所有矩阵都那么客气地给你实特征值。考虑一个旋转-缩放矩阵 \(A = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}\)。它的特征多项式 \(\lambda^2 + 1 = 0\) 给出 \(\lambda = \pm i\)——纯虚根。这并不表示方程组没有解；只是用复数语言来表达比较自然。</p>
+
+<p>关键的观察：<strong>实矩阵的复特征值必定成共轭对出现</strong>。如果 \(\lambda = \alpha + i \beta\) 是 \(A\) 的特征值，则 \(\bar\lambda = \alpha - i\beta\) 也是，且对应的特征向量也是共轭的：若 \(A \mathbf{v} = \lambda \mathbf{v}\)，则 \(A \bar{\mathbf{v}} = \bar\lambda \bar{\mathbf{v}}\)（对 \(A \mathbf{v} = \lambda \mathbf{v}\) 两边取共轭，注意 \(A\) 是实矩阵所以 \(\bar A = A\)）。这条事实让我们可以用一对解来代替两个共轭复解。</p>
+
+<p>设 \(\lambda = \alpha + i\beta\)（\(\beta \ne 0\)）是 \(A\) 的复特征值，对应的复特征向量 \(\mathbf{v} = \mathbf{u} + i \mathbf{w}\)（\(\mathbf{u}, \mathbf{w}\) 是实向量）。则 \(\mathbf{x}(t) = e^{\lambda t} \mathbf{v}\) 是方程组的（复值）解。展开：</p>
+
+\[
+e^{\lambda t} \mathbf{v} = e^{(\alpha + i\beta) t} (\mathbf{u} + i\mathbf{w}) = e^{\alpha t} (\cos\beta t + i \sin\beta t)(\mathbf{u} + i\mathbf{w}).
+\]
+
+<p>把 \((\cos\beta t + i \sin\beta t)(\mathbf{u} + i\mathbf{w})\) 展开：</p>
+
+\[
+= \cos\beta t \cdot \mathbf{u} - \sin\beta t \cdot \mathbf{w} + i(\sin\beta t \cdot \mathbf{u} + \cos\beta t \cdot \mathbf{w}).
+\]
+
+<p>所以</p>
+
+\[
+e^{\lambda t} \mathbf{v} = e^{\alpha t}\big(\cos\beta t\, \mathbf{u} - \sin\beta t\, \mathbf{w}\big) + i\, e^{\alpha t}\big(\sin\beta t\, \mathbf{u} + \cos\beta t\, \mathbf{w}\big).
+\]
+
+<p>实部与虚部各自是方程组的解（这是因为方程组的系数是实的；如果 \(\mathbf{x}\) 是复值解，把它的实部与虚部分别代入，由 \(A\) 实的事实，二者各自都满足方程）。所以下面这两个<em>实数</em>向量函数都是方程组的解：</p>
+
+\[
+\boxed{\mathbf{x}_1(t) = e^{\alpha t}\big(\cos\beta t\, \mathbf{u} - \sin\beta t\, \mathbf{w}\big), \qquad \mathbf{x}_2(t) = e^{\alpha t}\big(\sin\beta t\, \mathbf{u} + \cos\beta t\, \mathbf{w}\big).}
+\]
+
+<p>这就是把"一对共轭复特征值"转化为"两个实数解"的标准公式。\(\alpha\) 控制振幅的指数增减（正则增长，负则衰减，零则纯振荡）；\(\beta\) 是振荡的角频率；\(\mathbf{u}, \mathbf{w}\) 共同决定振荡的方向与相位。</p>
+
+<p>注意：<em>不要</em>把 \(\bar\lambda\) 那个共轭复特征值再算一遍——它对应的特征向量是 \(\bar{\mathbf{v}}\)，给出的两个实数解是上面 \(\mathbf{x}_1, \mathbf{x}_2\) 的线性组合（差一个符号），<strong>没有提供新的信息</strong>。一对共轭复特征值贡献两个实解，仅此而已。</p>
+
+<p><strong>例 13.4.1</strong>。求 \(\mathbf{x}' = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix} \mathbf{x}\) 的通解。</p>
+
+<p>特征多项式 \(\lambda^2 + 1 = 0\)，\(\lambda = \pm i\)。取 \(\lambda = i\)（即 \(\alpha = 0, \beta = 1\)），求特征向量。</p>
+
+<p>\((A - iI) \mathbf{v} = \mathbf{0}\)：</p>
+
+\[
+\begin{pmatrix} -i & -1 \\ 1 & -i \end{pmatrix} \mathbf{v} = \mathbf{0}.
+\]
+
+<p>第一行 \(-i v_1 - v_2 = 0\)，即 \(v_2 = -i v_1\)。取 \(v_1 = 1\) 得 \(\mathbf{v} = \begin{pmatrix} 1 \\ -i \end{pmatrix}\)。验证：第二行 \(v_1 - i v_2 = 1 - i(-i) = 1 - 1 = 0\) ✓。</p>
+
+<p>把 \(\mathbf{v}\) 拆成实部加虚部：\(\mathbf{v} = \begin{pmatrix} 1 \\ 0 \end{pmatrix} + i \begin{pmatrix} 0 \\ -1 \end{pmatrix}\)，所以 \(\mathbf{u} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \mathbf{w} = \begin{pmatrix} 0 \\ -1 \end{pmatrix}\)。</p>
+
+<p>代公式：</p>
+
+\[
+\mathbf{x}_1(t) = \cos t \begin{pmatrix} 1 \\ 0 \end{pmatrix} - \sin t \begin{pmatrix} 0 \\ -1 \end{pmatrix} = \begin{pmatrix} \cos t \\ \sin t \end{pmatrix},
+\]
+
+\[
+\mathbf{x}_2(t) = \sin t \begin{pmatrix} 1 \\ 0 \end{pmatrix} + \cos t \begin{pmatrix} 0 \\ -1 \end{pmatrix} = \begin{pmatrix} \sin t \\ -\cos t \end{pmatrix}.
+\]
+
+<p>通解：</p>
+
+\[
+\mathbf{x}(t) = c_1 \begin{pmatrix} \cos t \\ \sin t \end{pmatrix} + c_2 \begin{pmatrix} \sin t \\ -\cos t \end{pmatrix}.
+\]
+
+<p>核对一下：第一个分量 \(x_1 = c_1 \cos t + c_2 \sin t\)，求导得 \(-c_1 \sin t + c_2 \cos t\)；按方程 \(x_1' = -x_2\) 应该等于 \(-(c_1 \sin t - c_2 \cos t) = -c_1 \sin t + c_2 \cos t\)。一致。✓ 这个解描述的是平面上以原点为中心的圆周运动（实部恒为 \(0\)，纯振荡），跟矩阵 \(A\) 是 \(90°\) 旋转的几何意义吻合。</p>
+
+<p><strong>例 13.4.2</strong>。求 \(\mathbf{x}' = \begin{pmatrix} 1 & -2 \\ 2 & 1 \end{pmatrix} \mathbf{x}\) 的通解。</p>
+
+<p>特征多项式 \((1-\lambda)^2 + 4 = 0\)，即 \(\lambda = 1 \pm 2i\)（\(\alpha = 1, \beta = 2\)）。取 \(\lambda = 1 + 2i\)。</p>
+
+<p>\((A - (1+2i)I)\mathbf{v} = \mathbf{0}\)：</p>
+
+\[
+\begin{pmatrix} -2i & -2 \\ 2 & -2i \end{pmatrix} \mathbf{v} = \mathbf{0}.
+\]
+
+<p>第一行 \(-2i v_1 - 2 v_2 = 0\)，即 \(v_2 = -i v_1\)。取 \(v_1 = 1\)，\(\mathbf{v} = \begin{pmatrix} 1 \\ -i \end{pmatrix} = \begin{pmatrix} 1 \\ 0 \end{pmatrix} + i \begin{pmatrix} 0 \\ -1 \end{pmatrix}\)。所以 \(\mathbf{u} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \mathbf{w} = \begin{pmatrix} 0 \\ -1 \end{pmatrix}\)。</p>
+
+<p>套公式：</p>
+
+\[
+\mathbf{x}_1(t) = e^t \big(\cos 2t\, \mathbf{u} - \sin 2t\, \mathbf{w}\big) = e^t \begin{pmatrix} \cos 2t \\ \sin 2t \end{pmatrix},
+\]
+
+\[
+\mathbf{x}_2(t) = e^t \big(\sin 2t\, \mathbf{u} + \cos 2t\, \mathbf{w}\big) = e^t \begin{pmatrix} \sin 2t \\ -\cos 2t \end{pmatrix}.
+\]
+
+<p>通解：\(\mathbf{x}(t) = c_1 e^t \begin{pmatrix} \cos 2t \\ \sin 2t \end{pmatrix} + c_2 e^t \begin{pmatrix} \sin 2t \\ -\cos 2t \end{pmatrix}\)。</p>
+
+<p>这个解描述了一个<em>螺旋向外</em>的轨迹：振幅 \(e^t\) 指数增长，方向以角速度 \(2\) 在转。\(\alpha > 0\) 总意味着外旋（不稳定螺旋），\(\alpha < 0\) 意味着内旋（稳定螺旋），\(\alpha = 0\) 意味着纯圆/椭圆周（中心，临界稳定）。下一章会用相平面图把这件事画得很清楚。</p>
+
+<h2 id="sec13-5">13.5 重特征值情形</h2>
+
+<p>第三种"运气"：特征值有重根。设 \(\lambda\) 是 \(A\) 的特征值，<em>代数重数</em> \(m_a\)（在特征多项式中作为根的重数），<em>几何重数</em> \(m_g\)（对应的特征空间 \(\ker(A - \lambda I)\) 的维数）。一般有 \(1 \le m_g \le m_a\)。</p>
+
+<p><strong>子情形 5a：\(m_g = m_a\)</strong>（几何重数等于代数重数）。这种情形下，每个特征值<em>都</em>有足够的特征向量，所以总共能凑齐 \(n\) 个线性无关的特征向量，方法跟 13.2 节一模一样：</p>
+
+\[
+\mathbf{x}(t) = \sum c_k e^{\lambda_k t} \mathbf{v}_k,
+\]
+
+<p>只是允许若干 \(\lambda_k\) 相等。一个典型例子是<em>对称矩阵</em>——它总有 \(m_g = m_a\)，所以总能正交对角化。</p>
+
+<p><strong>子情形 5b：\(m_g < m_a\)</strong>（特征向量不够）。这种情形下，靠纯特征向量凑不出 \(n\) 个线性无关的解，需要"补"——所谓<strong>广义特征向量</strong>。</p>
+
+<p>具体怎么补？以最简单的 \(2 \times 2\) 矩阵为例。设 \(\lambda\) 是二重特征值，但只有一个特征向量 \(\mathbf{v}\)（\(m_a = 2, m_g = 1\)）。\(e^{\lambda t} \mathbf{v}\) 给出一个解，但通解需要两个，怎么找第二个？</p>
+
+<p>类比单方程二重根的情形：\(y'' - 2\lambda y' + \lambda^2 y = 0\) 的解是 \(e^{\lambda t}\) 和 \(t e^{\lambda t}\)。受到启发，我们试一个 ansatz</p>
+
+\[
+\mathbf{x}(t) = e^{\lambda t}(t \mathbf{v} + \mathbf{w}),
+\]
+
+<p>其中 \(\mathbf{v}\) 是已知的特征向量，\(\mathbf{w}\) 是待定的实向量。求导：</p>
+
+\[
+\mathbf{x}'(t) = \lambda e^{\lambda t}(t \mathbf{v} + \mathbf{w}) + e^{\lambda t} \mathbf{v} = e^{\lambda t}\big(\lambda t \mathbf{v} + \lambda \mathbf{w} + \mathbf{v}\big).
+\]
+
+<p>另一边 \(A \mathbf{x} = e^{\lambda t} A(t \mathbf{v} + \mathbf{w}) = e^{\lambda t}(t A\mathbf{v} + A\mathbf{w})\)。要 \(\mathbf{x}' = A \mathbf{x}\)，对所有 \(t\) 成立，按 \(t\) 的幂次比较系数：</p>
+
+<p><em>\(t^1\) 系数</em>：\(\lambda \mathbf{v} = A \mathbf{v}\)。这正好就是 \(\mathbf{v}\) 是特征向量这件事，自动满足。</p>
+
+<p><em>\(t^0\) 系数</em>：\(\lambda \mathbf{w} + \mathbf{v} = A \mathbf{w}\)，即</p>
+
+\[
+\boxed{(A - \lambda I) \mathbf{w} = \mathbf{v}.}
+\]
+
+<p>这是一个非齐次线性方程组。称满足它的 \(\mathbf{w}\) 为<strong>广义特征向量</strong>（generalized eigenvector），第二级。它一定存在（可以从 Jordan 标准型理论得知；这里我们不证），所以我们总能找到一个 \(\mathbf{w}\)，从而得到第二个解 \(e^{\lambda t}(t\mathbf{v} + \mathbf{w})\)。</p>
+
+<p>两个解 \(\mathbf{x}_1 = e^{\lambda t} \mathbf{v}\) 与 \(\mathbf{x}_2 = e^{\lambda t}(t\mathbf{v} + \mathbf{w})\) 线性无关吗？算 \(t = 0\) 处的 Wronskian：\(W(0) = \det[\mathbf{v}, \mathbf{w}]\)。我们需要 \(\mathbf{v}, \mathbf{w}\) 线性无关。事实是这样的：因为 \((A - \lambda I)\mathbf{w} = \mathbf{v} \ne \mathbf{0}\)，所以 \(\mathbf{w} \notin \ker(A - \lambda I)\)，特别 \(\mathbf{w}\) 不是 \(\mathbf{v}\) 的标量倍（如果它是 \(\mathbf{w} = c \mathbf{v}\)，那么 \(\mathbf{v} = (A - \lambda I)\mathbf{w} = c (A - \lambda I)\mathbf{v} = \mathbf{0}\)，矛盾）。所以 \(\mathbf{v}, \mathbf{w}\) 线性无关，Wronskian 不为零，两个解线性无关。✓</p>
+
+<p><strong>例 13.5.1</strong>。求 \(\mathbf{x}' = \begin{pmatrix} 3 & -1 \\ 1 & 1 \end{pmatrix} \mathbf{x}\) 的通解。</p>
+
+<p>特征多项式：\((3-\lambda)(1-\lambda) + 1 = \lambda^2 - 4\lambda + 4 = (\lambda - 2)^2\)。所以 \(\lambda = 2\) 是二重根，\(m_a = 2\)。</p>
+
+<p>求特征空间。\((A - 2I) \mathbf{v} = \mathbf{0}\)：</p>
+
+\[
+\begin{pmatrix} 1 & -1 \\ 1 & -1 \end{pmatrix} \mathbf{v} = \mathbf{0}.
+\]
+
+<p>两行相同，约束只有一条 \(v_1 - v_2 = 0\)，特征空间是一维，\(m_g = 1\)。\(m_g < m_a\)，需要广义特征向量。</p>
+
+<p>取特征向量 \(\mathbf{v} = \begin{pmatrix} 1 \\ 1 \end{pmatrix}\)。求广义特征向量 \((A - 2I)\mathbf{w} = \mathbf{v}\)：</p>
+
+\[
+\begin{pmatrix} 1 & -1 \\ 1 & -1 \end{pmatrix} \mathbf{w} = \begin{pmatrix} 1 \\ 1 \end{pmatrix}.
+\]
+
+<p>两行都给出 \(w_1 - w_2 = 1\)。任取一个解：\(w_1 = 1, w_2 = 0\)，即 \(\mathbf{w} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}\)。</p>
+
+<p>组装两个解：</p>
+
+\[
+\mathbf{x}_1(t) = e^{2t} \begin{pmatrix} 1 \\ 1 \end{pmatrix}, \qquad \mathbf{x}_2(t) = e^{2t}\Big(t \begin{pmatrix} 1 \\ 1 \end{pmatrix} + \begin{pmatrix} 1 \\ 0 \end{pmatrix}\Big) = e^{2t} \begin{pmatrix} t + 1 \\ t \end{pmatrix}.
+\]
+
+<p>通解：</p>
+
+\[
+\mathbf{x}(t) = c_1 e^{2t} \begin{pmatrix} 1 \\ 1 \end{pmatrix} + c_2 e^{2t} \begin{pmatrix} t + 1 \\ t \end{pmatrix}.
+\]
+
+<p>注意第二个解里出现的"\(t\) 倍 \(e^{2t}\)" 项——这是缺特征向量时的代价。物理上它对应着<em>临界阻尼</em>那种非纯指数衰减的行为。</p>
+
+<p>对于更高重数的情形（比如 \(\lambda\) 是三重根，\(m_g = 1\)），还要继续往上推：找第三级广义特征向量 \(\mathbf{u}\) 满足 \((A - \lambda I)\mathbf{u} = \mathbf{w}\)，然后第三个解是 \(e^{\lambda t}\big(\frac{t^2}{2} \mathbf{v} + t \mathbf{w} + \mathbf{u}\big)\)。形式是显然的——每升一级，多一个 \(t\) 因子（按阶乘归一化），多一个 \(t\) 的幂。这套机制叫 <em>Jordan 链</em>，是 Jordan 标准型理论的内容；本书不深入，但你看到的"一连串 \(\frac{t^k}{k!}\) 因子"是它在解里的指纹。</p>
+
+<h2 id="sec13-6">13.6 矩阵指数 \(e^{At}\) 视角</h2>
+
+<p>到现在我们解方程组的招数是"分情形讨论"——实特征值这样、复特征值那样、重特征值再那样。这样做没错，但有点散。下面给出一种<em>统一</em>的视角：把所有情形都装进一个东西，叫<strong>矩阵指数</strong>。</p>
+
+<p>回忆标量情形：\(y' = ay\) 的解是 \(y(t) = e^{at} y_0\)。指数函数把"求导一次"变成"乘 \(a\)"，整个解一行写完。能不能在矩阵情形下也做到？答案是肯定的，关键是怎么定义"矩阵的指数"。</p>
+
+<p><strong>定义</strong>。对任意 \(n \times n\) 方阵 \(B\)，定义矩阵指数</p>
+
+\[
+e^B = I + B + \frac{B^2}{2!} + \frac{B^3}{3!} + \cdots = \sum_{k=0}^\infty \frac{B^k}{k!}.
+\]
+
+<p>这就是把标量指数的泰勒级数 \(e^x = \sum x^k/k!\) 直接搬过来，把 \(x\) 换成矩阵 \(B\)。<em>这条级数对任意方阵都收敛</em>（按矩阵范数；不证），所以定义是合理的。</p>
+
+<p>把它与 \(t\) 一起用：对方阵 \(A\) 和实数 \(t\)，</p>
+
+\[
+e^{At} = I + At + \frac{(At)^2}{2!} + \frac{(At)^3}{3!} + \cdots = \sum_{k=0}^\infty \frac{(At)^k}{k!} = \sum_{k=0}^\infty \frac{t^k}{k!} A^k.
+\]
+
+<p>它是一个 \(t\) 的函数，每个 \(t\) 给出一个 \(n \times n\) 矩阵。三条性质值得记住：</p>
+
+<ol>
+  <li>\(e^{A \cdot 0} = I\)（取 \(t = 0\)，只剩第一项）；</li>
+  <li>\(\frac{d}{dt} e^{At} = A e^{At} = e^{At} A\)（按级数项逐项求导，得 \(A + A^2 t + A^3 t^2/2! + \cdots = A(I + At + A^2 t^2/2! + \cdots) = A e^{At}\)；同理 \(= e^{At} A\)）；</li>
+  <li>当 \(AB = BA\)（互换）时，\(e^{A+B} = e^A e^B\)。<em>注意</em>：当 \(A, B\) 不互换时这条等式<strong>一般不成立</strong>（这是矩阵指数与标量指数的最关键区别）。</li>
+</ol>
+
+<p><strong>主结论</strong>：\(\mathbf{x}' = A\mathbf{x}\) 的初值问题 \(\mathbf{x}(0) = \mathbf{x}_0\) 的解是</p>
+
+\[
+\boxed{\mathbf{x}(t) = e^{At} \mathbf{x}_0.}
+\]
+
+<p>验证：\(\mathbf{x}(0) = e^{0} \mathbf{x}_0 = I \mathbf{x}_0 = \mathbf{x}_0\) ✓；\(\mathbf{x}'(t) = \frac{d}{dt}(e^{At}) \mathbf{x}_0 = A e^{At} \mathbf{x}_0 = A \mathbf{x}(t)\) ✓。所以 \(e^{At} \mathbf{x}_0\) 确实是 IVP 的解，且由唯一性它是<em>唯一</em>的解。</p>
+
+<p>这条公式的优雅在于：它把"通解 + 用初值定常数"这一两步合并成了一步。\(\mathbf{x}_0\) 在右边一站，左边的 \(e^{At}\) 自动把它推进未来。这跟标量公式 \(y(t) = e^{at} y_0\) 在结构上一字不差。</p>
+
+<p>但有一个问题：怎么<strong>实际算出</strong> \(e^{At}\)？光按级数展开通常算不出闭式（除非 \(A\) 特别简单）。下面给出三种实用算法。</p>
+
+<p><strong>算法 1：对角化</strong>。若 \(A\) 可对角化，写 \(A = P D P^{-1}\)，其中 \(D = \mathrm{diag}(\lambda_1, \ldots, \lambda_n)\)。则</p>
+
+\[
+A^k = (P D P^{-1})^k = P D^k P^{-1},
+\]
+
+<p>因为中间的 \(P^{-1} P\) 抵消。代入级数：</p>
+
+\[
+e^{At} = \sum_{k=0}^\infty \frac{t^k}{k!} P D^k P^{-1} = P\Big(\sum_{k=0}^\infty \frac{t^k}{k!} D^k\Big) P^{-1} = P \, e^{Dt} \, P^{-1}.
+\]
+
+<p>而 \(e^{Dt}\) 因为 \(D\) 对角而<em>极易</em>计算：</p>
+
+\[
+e^{Dt} = \mathrm{diag}\big(e^{\lambda_1 t}, e^{\lambda_2 t}, \ldots, e^{\lambda_n t}\big).
+\]
+
+<p>所以</p>
+
+\[
+\boxed{e^{At} = P \, \mathrm{diag}(e^{\lambda_1 t}, \ldots, e^{\lambda_n t}) \, P^{-1}.}
+\]
+
+<p>这是绝大多数实际问题里算 \(e^{At}\) 的方法。</p>
+
+<p><strong>算法 2：直接展开（仅当 \(A\) 幂零或近似幂零）</strong>。若存在 \(k\) 使 \(A^k = 0\)（\(A\) 是<em>幂零矩阵</em>），那么级数 \(e^{At} = I + At + \cdots + A^{k-1} t^{k-1}/(k-1)!\) 只有有限项，可以直接展开。这种情形不常见但有时方便。</p>
+
+<p><strong>算法 3：组合 \(A = \lambda I + N\)</strong>，其中 \(N\) 是幂零部分。利用 \(\lambda I\) 与 \(N\) 互换的事实（标量恒互换），得 \(e^{(\lambda I + N) t} = e^{\lambda t} e^{Nt}\)。\(e^{\lambda t}\) 是普通指数，\(e^{Nt}\) 因 \(N\) 幂零是有限和。这是处理 Jordan 块的标准技巧。</p>
+
+<p><strong>例 13.6.1</strong>。算 \(e^{At}\)，其中 \(A = \begin{pmatrix} 1 & 2 \\ 4 & 3 \end{pmatrix}\)（来自 13.3.1 节）。</p>
+
+<p>那一节算过特征值 \(\lambda_1 = 5, \lambda_2 = -1\)，特征向量 \(\mathbf{v}_1 = (1, 2)^T, \mathbf{v}_2 = (1, -1)^T\)。所以 \(P = \begin{pmatrix} 1 & 1 \\ 2 & -1 \end{pmatrix}\)，\(D = \begin{pmatrix} 5 & 0 \\ 0 & -1 \end{pmatrix}\)。</p>
+
+<p>算 \(P^{-1}\)：\(\det P = -1 - 2 = -3\)，所以 \(P^{-1} = \frac{1}{-3}\begin{pmatrix} -1 & -1 \\ -2 & 1 \end{pmatrix} = \frac{1}{3}\begin{pmatrix} 1 & 1 \\ 2 & -1 \end{pmatrix}\)。</p>
+
+<p>组装 \(e^{At} = P e^{Dt} P^{-1}\)：</p>
+
+\[
+e^{At} = \begin{pmatrix} 1 & 1 \\ 2 & -1 \end{pmatrix} \begin{pmatrix} e^{5t} & 0 \\ 0 & e^{-t} \end{pmatrix} \cdot \frac{1}{3}\begin{pmatrix} 1 & 1 \\ 2 & -1 \end{pmatrix}.
+\]
+
+<p>先算右两项的乘积：\(\begin{pmatrix} e^{5t} & 0 \\ 0 & e^{-t} \end{pmatrix} \cdot \frac{1}{3}\begin{pmatrix} 1 & 1 \\ 2 & -1 \end{pmatrix} = \frac{1}{3}\begin{pmatrix} e^{5t} & e^{5t} \\ 2 e^{-t} & -e^{-t} \end{pmatrix}\)。再左乘 \(P\)：</p>
+
+\[
+e^{At} = \frac{1}{3} \begin{pmatrix} e^{5t} + 2 e^{-t} & e^{5t} - e^{-t} \\ 2 e^{5t} - 2 e^{-t} & 2 e^{5t} + e^{-t} \end{pmatrix}.
+\]
+
+<p>检验：\(t = 0\) 给 \(\frac{1}{3}\begin{pmatrix} 3 & 0 \\ 0 & 3 \end{pmatrix} = I\) ✓。任取 IVP \(\mathbf{x}(0) = (4, 5)^T\)，则</p>
+
+\[
+\mathbf{x}(t) = e^{At}(4, 5)^T = \frac{1}{3}\begin{pmatrix} 4(e^{5t} + 2e^{-t}) + 5(e^{5t} - e^{-t}) \\ 4(2e^{5t} - 2e^{-t}) + 5(2 e^{5t} + e^{-t}) \end{pmatrix} = \frac{1}{3}\begin{pmatrix} 9 e^{5t} + 3 e^{-t} \\ 18 e^{5t} - 3 e^{-t} \end{pmatrix} = \begin{pmatrix} 3 e^{5t} + e^{-t} \\ 6 e^{5t} - e^{-t} \end{pmatrix}.
+\]
+
+<p>跟 13.3.1 节的答案一致。✓ 一行公式 \(\mathbf{x} = e^{At} \mathbf{x}_0\) 把整个解法装好；剩下的工作就是<em>怎么算 \(e^{At}\)</em>，而那是线性代数的事。</p>
+
+<h2 id="sec13-7">13.7 非齐次方程组</h2>
+
+<p>非齐次方程组 \(\mathbf{x}' = A\mathbf{x} + \mathbf{g}(t)\) 怎么解？最优雅的方法是<strong>积分因子</strong>，与一阶单方程的方法在结构上一字不差。</p>
+
+<p>方程是 \(\mathbf{x}' - A\mathbf{x} = \mathbf{g}(t)\)。两边左乘 \(e^{-At}\)：</p>
+
+\[
+e^{-At} \mathbf{x}' - e^{-At} A \mathbf{x} = e^{-At} \mathbf{g}(t).
+\]
+
+<p>左边的两项合起来是 \(\frac{d}{dt}(e^{-At} \mathbf{x})\) 吗？验证：</p>
+
+\[
+\frac{d}{dt}(e^{-At} \mathbf{x}) = (e^{-At})' \mathbf{x} + e^{-At} \mathbf{x}' = -A e^{-At} \mathbf{x} + e^{-At} \mathbf{x}' = e^{-At}(\mathbf{x}' - A\mathbf{x}),
+\]
+
+<p>这里第二步用了 \(\frac{d}{dt}(e^{-At}) = -A e^{-At}\)（注意 \(A\) 与 \(e^{-At}\) 互换，因为 \(e^{-At}\) 是 \(A\) 的多项式级数极限），第三步用了 \(A\) 与 \(e^{-At}\) 互换。结论：</p>
+
+\[
+\frac{d}{dt}(e^{-At} \mathbf{x}) = e^{-At} \mathbf{g}(t).
+\]
+
+<p>这就是积分因子方法的核心式。两边对 \(t\) 从 \(0\) 到 \(t\) 积分：</p>
+
+\[
+e^{-At} \mathbf{x}(t) - \mathbf{x}(0) = \int_0^t e^{-As} \mathbf{g}(s)\, ds.
+\]
+
+<p>两边左乘 \(e^{At}\)（注意 \(e^{At} \cdot e^{-At} = I\)，因为 \(At\) 与 \(-At\) 互换）：</p>
+
+\[
+\boxed{\mathbf{x}(t) = e^{At} \mathbf{x}_0 + \int_0^t e^{A(t-s)} \mathbf{g}(s)\, ds.}
+\]
+
+<p>这就是<strong>非齐次方程组的解析解公式</strong>。它分两块：</p>
+
+<ul>
+  <li><em>齐次解</em> \(e^{At} \mathbf{x}_0\)：响应初始条件；如果 \(\mathbf{g} \equiv \mathbf{0}\)，这就是全部解。</li>
+  <li><em>特解</em> \(\int_0^t e^{A(t-s)} \mathbf{g}(s) ds\)：响应"驱动"\(\mathbf{g}(s)\)。注意 \(e^{A(t-s)}\) 中的 \(t - s\) 是从"驱动施加时刻 \(s\)"到"观察时刻 \(t\)"的时间差——它把 \(s\) 时刻的驱动"传递"到 \(t\) 时刻。这正是<strong>卷积</strong>结构。</li>
+</ul>
+
+<p>这条公式叫<strong>变易常数公式</strong>（variation of parameters）或<strong>杜阿梅尔公式</strong>（Duhamel's principle），在线性系统理论里至关重要——任何线性时不变系统对任意输入的响应都长这个样子。</p>
+
+<p><strong>例 13.7.1</strong>。求 \(\mathbf{x}' = \begin{pmatrix} 0 & 1 \\ -2 & -3 \end{pmatrix} \mathbf{x} + \begin{pmatrix} 0 \\ e^t \end{pmatrix}\) 的特解（取 \(\mathbf{x}(0) = \mathbf{0}\)）。</p>
+
+<p>先要 \(e^{At}\)。\(A = \begin{pmatrix} 0 & 1 \\ -2 & -3 \end{pmatrix}\)。特征多项式 \(\lambda^2 + 3\lambda + 2 = 0\)，根 \(\lambda = -1, -2\)。求特征向量：对 \(\lambda = -1\)，\((A + I)\mathbf{v}_1 = 0\) 给 \(\begin{pmatrix} 1 & 1 \\ -2 & -2 \end{pmatrix}\mathbf{v}_1 = 0\)，约束 \(v_1 + v_2 = 0\)，取 \(\mathbf{v}_1 = (1, -1)^T\)。对 \(\lambda = -2\)，类似得 \(\mathbf{v}_2 = (1, -2)^T\)。\(P = \begin{pmatrix} 1 & 1 \\ -1 & -2 \end{pmatrix}\)，\(\det P = -1\)，\(P^{-1} = \begin{pmatrix} 2 & 1 \\ -1 & -1 \end{pmatrix}\)。</p>
+
+\[
+e^{At} = P \begin{pmatrix} e^{-t} & 0 \\ 0 & e^{-2t} \end{pmatrix} P^{-1} = \begin{pmatrix} 2 e^{-t} - e^{-2t} & e^{-t} - e^{-2t} \\ -2 e^{-t} + 2 e^{-2t} & -e^{-t} + 2 e^{-2t} \end{pmatrix}.
+\]
+
+<p>所以 \(e^{A(t-s)}\) 把 \(t\) 换成 \(t - s\) 即可。\(\mathbf{g}(s) = (0, e^s)^T\)，所以</p>
+
+\[
+e^{A(t-s)} \mathbf{g}(s) = \begin{pmatrix} (e^{-(t-s)} - e^{-2(t-s)}) e^s \\ (-e^{-(t-s)} + 2 e^{-2(t-s)}) e^s \end{pmatrix} = \begin{pmatrix} e^{2s - t} - e^{3s - 2t} \\ -e^{2s - t} + 2 e^{3s - 2t} \end{pmatrix}.
+\]
+
+<p>积分 \(\int_0^t (\cdot)\, ds\)。第一个分量：</p>
+
+\[
+\int_0^t (e^{2s-t} - e^{3s-2t})\, ds = e^{-t} \cdot \tfrac{1}{2}(e^{2t} - 1) - e^{-2t} \cdot \tfrac{1}{3}(e^{3t} - 1) = \tfrac{1}{2}(e^t - e^{-t}) - \tfrac{1}{3}(e^t - e^{-2t}).
+\]
+
+<p>整理：\(= \tfrac{1}{2} e^t - \tfrac{1}{2} e^{-t} - \tfrac{1}{3} e^t + \tfrac{1}{3} e^{-2t} = \tfrac{1}{6} e^t - \tfrac{1}{2} e^{-t} + \tfrac{1}{3} e^{-2t}\)。</p>
+
+<p>第二个分量类似积分（细节略）得 \(\tfrac{1}{6} e^t + \tfrac{1}{2} e^{-t} - \tfrac{2}{3} e^{-2t}\)。</p>
+
+<p>所以特解为</p>
+
+\[
+\mathbf{x}(t) = \begin{pmatrix} \tfrac{1}{6} e^t - \tfrac{1}{2} e^{-t} + \tfrac{1}{3} e^{-2t} \\ \tfrac{1}{6} e^t + \tfrac{1}{2} e^{-t} - \tfrac{2}{3} e^{-2t} \end{pmatrix}.
+\]
+
+<p>检验：第一个分量的导数 \(= \frac{1}{6} e^t + \frac{1}{2} e^{-t} - \frac{2}{3} e^{-2t}\)，恰是第二个分量。这与方程 \(x_1' = x_2\)（伴随矩阵的第一行）一致。✓</p>
+
+<p>这种积分通常很麻烦，但形式公式总是同一个。在实际应用里：（1）能用待定系数法就用待定系数法（比如 \(\mathbf{g}\) 是多项式、指数、正余弦的简单组合时）；（2）只有当 \(\mathbf{g}\) 形式古怪时，才动用变易常数公式。</p>
+
+<h2 id="sec13-8">13.8 综合例题</h2>
+
+<p>本节做几道有物理背景的大型综合例题，把整章的工具都拉出来用一遍。</p>
+
+<p><strong>例 13.8.1：耦合弹簧的振动模态</strong>。两个质量 \(m = 1\) 的质点 \(A, B\) 沿水平直线排成一列，左端固定到墙、中间一根弹簧 \(k_2 = 2\) 连接它们、右端固定到墙。两端的弹簧 \(k_1 = k_3 = 1\)。设 \(y_1, y_2\) 是两质点位移。运动方程</p>
+
+\[
+\begin{cases} y_1'' = -y_1 + 2(y_2 - y_1) = -3 y_1 + 2 y_2, \\ y_2'' = -2(y_2 - y_1) - y_2 = 2 y_1 - 3 y_2. \end{cases}
+\]
+
+<p>这是<em>两条耦合二阶</em>方程。可以化为 \(4\) 维一阶方程组，但本题有更巧的做法：直接看二阶系统 \(\mathbf{y}'' = K \mathbf{y}\)，其中 \(K = \begin{pmatrix} -3 & 2 \\ 2 & -3 \end{pmatrix}\)。试 \(\mathbf{y} = e^{i\omega t} \mathbf{u}\)（\(\mathbf{u}\) 是常向量），代入得 \(-\omega^2 \mathbf{u} = K \mathbf{u}\)，即 \(K \mathbf{u} = -\omega^2 \mathbf{u}\)。所以 \(-\omega^2\) 是 \(K\) 的特征值。</p>
+
+<p>算 \(K\) 的特征值：\((-3-\mu)^2 - 4 = 0\)，\(\mu = -3 \pm 2\)，即 \(\mu_1 = -1, \mu_2 = -5\)。所以 \(\omega_1^2 = 1, \omega_2^2 = 5\)，即 \(\omega_1 = 1, \omega_2 = \sqrt 5\)。这两个就是<strong>简正频率</strong>（normal frequencies）。</p>
+
+<p>对应特征向量。\(\mu_1 = -1\)：\((K + I)\mathbf{u}_1 = 0\) 给 \(\begin{pmatrix} -2 & 2 \\ 2 & -2 \end{pmatrix} \mathbf{u}_1 = 0\)，约束 \(u_2 = u_1\)，取 \(\mathbf{u}_1 = (1, 1)^T\)。\(\mu_2 = -5\)：\((K + 5I)\mathbf{u}_2 = 0\) 给 \(\begin{pmatrix} 2 & 2 \\ 2 & 2 \end{pmatrix} \mathbf{u}_2 = 0\)，约束 \(u_1 = -u_2\)，取 \(\mathbf{u}_2 = (1, -1)^T\)。</p>
+
+<p>这两个向量描述了两种<em>简正模式</em>：</p>
+
+<ul>
+  <li>\(\mathbf{u}_1 = (1, 1)^T\)，频率 \(\omega_1 = 1\)：两质点<em>同相</em>振动——一起向左、一起向右。中间那根弹簧不被拉伸或压缩，所以系统等效于"两个质点各被一根 \(k = 1\) 的弹簧拴住"，频率 \(\omega = \sqrt{1/1} = 1\)。✓</li>
+  <li>\(\mathbf{u}_2 = (1, -1)^T\)，频率 \(\omega_2 = \sqrt 5\)：两质点<em>反相</em>振动——一个向左另一个向右。中间那根弹簧被剧烈拉伸压缩，给出额外的恢复力，频率比同相模式高得多。</li>
+</ul>
+
+<p>通解：</p>
+
+\[
+\mathbf{y}(t) = (a_1 \cos t + b_1 \sin t) \begin{pmatrix} 1 \\ 1 \end{pmatrix} + (a_2 \cos\sqrt{5}\, t + b_2 \sin\sqrt{5}\, t) \begin{pmatrix} 1 \\ -1 \end{pmatrix}.
+\]
+
+<p>四个常数 \(a_1, b_1, a_2, b_2\) 由四个初始条件 \(y_1(0), y_1'(0), y_2(0), y_2'(0)\) 决定。</p>
+
+<p>这种"分解为简正模式"的做法是<em>所有</em>线性振动系统（包括量子力学、电路网络、晶格振动）的灵魂。每一个简正模式以单一频率振动，整个系统的运动就是若干模式的叠加。这一切由特征值理论自动给出。</p>
+
+<p><strong>例 13.8.2：化学反应级联（解析解）</strong>。回到 12.5.3 节的反应 \(A \xrightarrow{k_1} B \xrightarrow{k_2} C\)（取 \(k_1 \ne k_2\)）。方程组 \(\mathbf{c}' = M \mathbf{c}\)，\(M = \begin{pmatrix} -k_1 & 0 & 0 \\ k_1 & -k_2 & 0 \\ 0 & k_2 & 0 \end{pmatrix}\)。下三角矩阵，特征值 \(-k_1, -k_2, 0\)。</p>
+
+<p>求特征向量。对 \(\lambda_1 = -k_1\)：\((M + k_1 I) \mathbf{v} = 0\) 给</p>
+
+\[
+\begin{pmatrix} 0 & 0 & 0 \\ k_1 & k_1 - k_2 & 0 \\ 0 & k_2 & k_1 \end{pmatrix} \mathbf{v} = 0.
+\]
+
+<p>第二行 \(k_1 v_1 + (k_1 - k_2) v_2 = 0\)，第三行 \(k_2 v_2 + k_1 v_3 = 0\)。从第二 \(v_2 = -k_1/(k_1 - k_2) v_1\)；从第三 \(v_3 = -k_2/k_1 \cdot v_2 = k_2 / (k_1 - k_2) \cdot v_1\)。取 \(v_1 = k_1 - k_2\) 清掉分母得 \(\mathbf{v}_1 = (k_1 - k_2, -k_1, k_2)^T\)。</p>
+
+<p>对 \(\lambda_2 = -k_2\)：类似计算得 \(\mathbf{v}_2 = (0, 1, -1)^T\)。对 \(\lambda_3 = 0\)：\(M \mathbf{v} = 0\) 给 \(v_1 = 0, v_2 = 0\)，\(v_3\) 自由，所以 \(\mathbf{v}_3 = (0, 0, 1)^T\)。</p>
+
+<p>通解：</p>
+
+\[
+\mathbf{c}(t) = \alpha e^{-k_1 t}\begin{pmatrix} k_1 - k_2 \\ -k_1 \\ k_2 \end{pmatrix} + \beta e^{-k_2 t}\begin{pmatrix} 0 \\ 1 \\ -1 \end{pmatrix} + \gamma \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}.
+\]
+
+<p>典型初始条件 \(\mathbf{c}(0) = (a_0, 0, 0)^T\)（开始时只有 \(A\)，浓度 \(a_0\)）。代 \(t = 0\) 解：第一分量 \(\alpha (k_1 - k_2) = a_0\)，所以 \(\alpha = a_0/(k_1 - k_2)\)。第二分量 \(-\alpha k_1 + \beta = 0\)，即 \(\beta = \alpha k_1 = a_0 k_1/(k_1 - k_2)\)。第三分量 \(\alpha k_2 - \beta + \gamma = 0\)，即 \(\gamma = -\alpha k_2 + \beta = a_0(-k_2 + k_1)/(k_1 - k_2) = a_0\)（漂亮！\(\gamma = a_0\)）。</p>
+
+<p>所以</p>
+
+\[
+a(t) = a_0 e^{-k_1 t}, \qquad b(t) = \frac{a_0 k_1}{k_1 - k_2}\big(e^{-k_2 t} - e^{-k_1 t}\big), \qquad c(t) = a_0 - a(t) - b(t).
+\]
+
+<p>第一条公式说"\(A\) 按 \(k_1\) 速率指数衰减"，预期之中。第二条公式描述了 \(B\) 的浓度——它从零开始上升、到达极大、再下降，这种"中间产物的浓度峰"是化学动力学里的标准现象。\(c(t)\) 由质量守恒（总浓度 \(a + b + c = a_0\) 始终）直接得出。整个反应的全局动力学被一组特征值 + 三个特征向量完整地描述了。</p>
+
+<p><strong>例 13.8.3：电路网络</strong>。两个 LC 电路通过互感耦合。设两条电路的电流分别为 \(i_1(t), i_2(t)\)，电感 \(L_1 = L_2 = 1\)、电容 \(C_1 = C_2 = 1\)、互感系数 \(M = 0.5\)（无量纲化处理后）。基本方程（用 \(q_k\) 表示电容上的电荷，\(i_k = q_k'\)）：</p>
+
+\[
+\begin{cases} L_1 i_1' + M i_2' + q_1/C_1 = 0, \\ L_2 i_2' + M i_1' + q_2/C_2 = 0, \\ q_1' = i_1, \quad q_2' = i_2. \end{cases}
+\]
+
+<p>这是 \(4\) 维方程组。代入数值：\(i_1' + 0.5 i_2' + q_1 = 0\)，\(i_2' + 0.5 i_1' + q_2 = 0\)。从前两条解出 \(i_1', i_2'\)（视作未知 \(2 \times 2\) 系统）：</p>
+
+\[
+\begin{pmatrix} 1 & 0.5 \\ 0.5 & 1 \end{pmatrix} \begin{pmatrix} i_1' \\ i_2' \end{pmatrix} = - \begin{pmatrix} q_1 \\ q_2 \end{pmatrix}.
+\]
+
+<p>左边矩阵的逆 \(= \frac{1}{0.75}\begin{pmatrix} 1 & -0.5 \\ -0.5 & 1 \end{pmatrix}\)。所以</p>
+
+\[
+i_1' = -\tfrac{4}{3} q_1 + \tfrac{2}{3} q_2, \qquad i_2' = \tfrac{2}{3} q_1 - \tfrac{4}{3} q_2.
+\]
+
+<p>把 \(\mathbf{x} = (q_1, q_2, i_1, i_2)^T\) 设为状态向量，方程组矩阵</p>
+
+\[
+A = \begin{pmatrix} 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \\ -4/3 & 2/3 & 0 & 0 \\ 2/3 & -4/3 & 0 & 0 \end{pmatrix}.
+\]
+
+<p>这个 \(4 \times 4\) 矩阵的特征值理论上能算，但计算量较大。用一个对称性技巧：观察 \(A\) 在变换 \((q_1, q_2, i_1, i_2) \mapsto (q_2, q_1, i_2, i_1)\) 下不变（两条电路对称），说明<em>对称模式</em>与<em>反对称模式</em>会解耦。具体令 \(s = q_1 + q_2\)（对称模式电荷）、\(d = q_1 - q_2\)（反对称模式）、\(I_s = i_1 + i_2, I_d = i_1 - i_2\)。代入方程：对称模式 \(I_s' = -\frac{2}{3} s\)，反对称模式 \(I_d' = -2 d\)。所以两个简正频率：\(\omega_s = \sqrt{2/3}, \omega_d = \sqrt 2\)。</p>
+
+<p>这是一种<em>不直接动用 4 阶特征值多项式而获得答案</em>的捷径——利用系统的对称性把 \(4\) 维问题分解成两个独立的 \(2\) 维子问题。在实际工程里这种"对称性诱导的解耦"是节省力气的标准技巧；理论上它对应着<em>把 \(A\) 的特征基按"对称-反对称分量"分组</em>。</p>
+
+<p>无论用哪种方法，最终答案都形如</p>
+
+\[
+q_1(t) = \alpha_s \cos(\omega_s t + \phi_s) + \alpha_d \cos(\omega_d t + \phi_d),
+\]
+
+<p>同样 \(q_2(t) = \alpha_s \cos(\omega_s t + \phi_s) - \alpha_d \cos(\omega_d t + \phi_d)\)，反对称分量符号相反。两个频率混合，与双弹簧的简正模式情形完全一致。</p>
+
+<p><strong>例 13.8.4：带强迫的振荡器</strong>。求 \(\mathbf{x}' = \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} \mathbf{x} + \begin{pmatrix} 0 \\ \cos t \end{pmatrix}\) 的通解。</p>
+
+<p>齐次解：\(A = \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix}\)，特征值 \(\pm i\)，齐次解 \(\mathbf{x}_h = c_1 \begin{pmatrix} \cos t \\ -\sin t \end{pmatrix} + c_2 \begin{pmatrix} \sin t \\ \cos t \end{pmatrix}\)。</p>
+
+<p>这是一个原系统就是简谐振子（\(x_1'' + x_1 = 0\) 化成的方程组），强迫项 \(\cos t\) 恰好与<em>共振频率</em>一致——预计将出现共振增长（解里有 \(t \cos t\) 或 \(t \sin t\) 形式的项）。</p>
+
+<p>用待定系数：试 \(\mathbf{x}_p = \begin{pmatrix} \alpha t \cos t + \beta t \sin t \\ \gamma t \cos t + \delta t \sin t \end{pmatrix}\)（每个分量都包含 \(t\) 因子，因为常规试 ansatz \((a \cos t + b \sin t, c \cos t + d \sin t)\) 的解会落进齐次空间里没用）。代入方程组对系数进行匹配（细节略）得到 \(\alpha = 0, \beta = 1/2, \gamma = 1/2, \delta = 0\)，即</p>
+
+\[
+\mathbf{x}_p(t) = \tfrac{1}{2} \begin{pmatrix} t \sin t \\ t \cos t + \sin t \end{pmatrix}.
+\]
+
+<p>核对一下 \(x_1\)：原方程要求 \(x_1' = x_2\)。\(x_1 = \frac{1}{2} t \sin t\)，求导得 \(\frac{1}{2}(\sin t + t \cos t)\)，与 \(x_2 = \frac{1}{2}(t \cos t + \sin t)\) 一致。✓</p>
+
+<p>通解 \(\mathbf{x}(t) = \mathbf{x}_h + \mathbf{x}_p\)。注意特解里那个 \(t \sin t\) 因子——振幅随时间线性增长。这正是<strong>共振</strong>的数学指纹：当强迫频率与系统的固有频率一致时，能量持续累积，振幅无界增长。在物理上这种现象是塔科马大桥垮塌（1940）的肇因；在工程里设计任何振动系统都要刻意避开这种情况。</p>
+
+<p>这道例题完美收尾了一整章：齐次部分由特征值、特征向量给出；非齐次部分用变易常数（或对应的待定系数捷径）给出；总解由两者叠加。这条流水线适用于<em>任何</em>常系数线性方程组，无论 \(n\) 是多大。</p>
+
+<p>下一章我们把视线从"如何解"转向"解长什么样"——也就是相平面分析。同一个矩阵 \(A\) 的特征值结构（实/复，正/负，单/重）决定着方程组解在相空间里画出的图形——结点、鞍点、螺旋、中心。所以你即将看到，本章建立的特征值-特征向量结构，不光给我们解析解，还给我们一张<em>定性</em>的地图：不必算出 \(\mathbf{x}(t)\) 的解析式，光看 \(A\) 的特征值就能预测系统的长期行为。这是我们下一章要去的地方。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 方程组与矩阵记号</a><a href="ch14.html">下一章 · 第 14 章 相平面与稳定性分析 →</a></nav>
+
+</main>
+</body>
+</html>

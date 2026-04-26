@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>普林斯顿读本系列 · Collection of Lifesavers</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg: #fbf9f4;
+    --ink: #1c1917;
+    --ink-soft: #44403c;
+    --accent: #6b3410;
+    --rule: #d6d3d1;
+    --card-bg: #ffffff;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 14px rgba(0,0,0,0.05);
+    --card-shadow-hover: 0 4px 12px rgba(107,52,16,0.12), 0 14px 40px rgba(107,52,16,0.10);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Source Serif Pro", "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 5rem 2rem 6rem 2rem;
+  }
+
+  header.cover {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  header.cover .small-mark {
+    color: var(--accent);
+    font-size: 0.85rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+
+  header.cover h1 {
+    margin: 0 0 0.6rem 0;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.25;
+  }
+
+  header.cover .subtitle-en {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 1.1rem;
+    margin: 0 0 2rem 0;
+  }
+
+  header.cover .blurb {
+    max-width: 640px;
+    margin: 0 auto;
+    color: var(--ink-soft);
+    text-align: justify;
+  }
+
+  section.philosophy {
+    margin: 4rem 0;
+    padding: 1.8rem 2rem;
+    border-left: 3px solid var(--accent);
+    background: rgba(107,52,16,0.04);
+  }
+
+  section.philosophy h2 {
+    margin: 0 0 0.6rem 0;
+    font-size: 1.15rem;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  section.philosophy p {
+    margin: 0 0 0.8em 0;
+    color: var(--ink-soft);
+  }
+
+  section.philosophy p:last-child { margin-bottom: 0; }
+
+  h2.section-title {
+    margin: 4rem 0 1.5rem 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 0.4rem;
+  }
+
+  .books {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 720px) {
+    .books { grid-template-columns: 1fr; }
+    main { padding: 3rem 1.2rem; }
+    header.cover h1 { font-size: 2rem; }
+  }
+
+  .book-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.8rem 1.6rem;
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    box-shadow: var(--card-shadow);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .book-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--accent);
+  }
+
+  .book-card .vol {
+    color: var(--accent);
+    font-size: 0.78rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .book-card .title-zh {
+    font-size: 1.32rem;
+    font-weight: 600;
+    margin: 0 0 0.3rem 0;
+    line-height: 1.3;
+  }
+
+  .book-card .title-en {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 0 0 1rem 0;
+  }
+
+  .book-card .desc {
+    flex-grow: 1;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    margin: 0 0 1.2rem 0;
+  }
+
+  .book-card .stats {
+    color: var(--rule);
+    font-size: 0.85rem;
+    border-top: 1px dashed var(--rule);
+    padding-top: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .book-card .stats .enter {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  footer {
+    margin-top: 6rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+  }
+
+  footer p { margin: 0.4rem 0; }
+
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent);
+  }
+
+  footer a:hover { border-bottom-style: solid; }
+</style>
+</head>
+<body>
+
+<main>
+
+<header class="cover">
+  <div class="small-mark">Collection of Lifesavers</div>
+  <h1>普林斯顿读本系列</h1>
+  <p class="subtitle-en">A Banner-style series for the second-year math sequence</p>
+  <p class="blurb">这套书脱胎于 Adrian Banner 的《普林斯顿微积分读本》——它示范了"教科书也是可以有声音的"。本系列把同样的"内心独白"教学法应用到大学第二、三学期的核心课程：每一本都不只是工具的清单，而是把概念慢慢推上去、一边走一边说话，让你既知道<em>怎么做</em>，也明白<em>为什么这么做</em>。</p>
+</header>
+
+<section class="philosophy">
+  <h2>本系列的方法</h2>
+  <p>具体先于抽象、画面先于公式、动机先于定义。每一道例题都把"我会怎么想"写出来，而不只是把答案写出来。每一种方法都有名字、有触发条件、有失败模式。</p>
+  <p>四本书互相挂钩：线性代数的特征值理论被微分方程第 12–17 章直接复用；多元微积分的偏导被微分方程的 PDE 三章用到；复分析的留数把多元微积分的实积分变成代数运算。</p>
+</section>
+
+<h2 class="section-title">四本书</h2>
+
+<div class="books">
+
+  <a class="book-card" href="多元微积分/index.html">
+    <div class="vol">第一卷</div>
+    <h3 class="title-zh">普林斯顿多元微积分读本</h3>
+    <p class="title-en">Multivariable Calculus Lifesaver</p>
+    <p class="desc">把单变量微积分搬到三维空间里——向量、偏导、梯度、多重积分、向量场、Stokes 与散度定理。讲到能让你"看见"曲面与场。</p>
+    <div class="stats">
+      <span>27 章 + 附录 A</span>
+      <span class="enter">进入 →</span>
+    </div>
+  </a>
+
+  <a class="book-card" href="线性代数/index.html">
+    <div class="vol">第二卷</div>
+    <h3 class="title-zh">普林斯顿线性代数读本</h3>
+    <p class="title-en">Linear Algebra Lifesaver</p>
+    <p class="desc">从方程组开始，把矩阵讲成"一种语言"再讲成"一种几何"——四个基本子空间、特征值、谱定理、奇异值分解、PCA、PageRank。</p>
+    <div class="stats">
+      <span>25 章 + 附录 A、B</span>
+      <span class="enter">进入 →</span>
+    </div>
+  </a>
+
+  <a class="book-card" href="微分方程/index.html">
+    <div class="vol">第三卷</div>
+    <h3 class="title-zh">普林斯顿微分方程读本</h3>
+    <p class="title-en">Differential Equations Lifesaver</p>
+    <p class="desc">从一阶到拉普拉斯变换、相平面与稳定性，再到偏微分方程入门（热方程、波动方程、傅里叶级数）。物理直觉贯穿始终。</p>
+    <div class="stats">
+      <span>22 章 + 附录 A、B</span>
+      <span class="enter">进入 →</span>
+    </div>
+  </a>
+
+  <a class="book-card" href="复分析/index.html">
+    <div class="vol">第四卷</div>
+    <h3 class="title-zh">普林斯顿复分析读本</h3>
+    <p class="title-en">Complex Analysis Lifesaver</p>
+    <p class="desc">解析函数的"刚性"奇迹、留数定理把实积分变成数手指头的游戏、共形映射把 PDE 边界问题搬到圆盘上解。复变函数的数学之美。</p>
+    <div class="stats">
+      <span>20 章 + 附录 A、B</span>
+      <span class="enter">进入 →</span>
+    </div>
+  </a>
+
+</div>
+
+<footer>
+  <p>© 2026 · 写给所有想真正弄懂数学的你 · 简体中文</p>
+  <p>致敬 <em>Adrian Banner, The Calculus Lifesaver, Princeton University Press, 2007</em></p>
+  <p><a href="https://github.com/DevloopE/CollectionOfLifesaver">GitHub 源码</a></p>
+</footer>
+
+</main>
+
+</body>
+</html>

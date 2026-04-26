@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 矩阵指数与线性微分方程 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 复特征值与旋转</a><a href="ch18.html">下一章 · 第 18 章 内积与正交 →</a></nav>
+<h1 id="ch17">第 17 章 矩阵指数与线性微分方程</h1>
+
+<p>这一章是本书最具<em>纵深应用感</em>的一章。我们把前面学过的全部线性代数工具——特征值、对角化、复特征值——整合起来去解决一个真正大的问题：<strong>线性微分方程组</strong>。</p>
+
+<p>线性微分方程是物理、工程、生物、经济、机器学习的通用语言。简谐振子、电路、化学反应动力学、人口动态、扩散方程、神经网络的连续时间动力学——全都化归为</p>
+
+<p>\[\frac{d\mathbf{x}}{dt} = A\mathbf{x}\]</p>
+
+<p>这一种形式，其中 \(\mathbf{x}(t) \in \mathbb{R}^n\) 是状态向量，\(A\) 是 \(n \times n\) 矩阵。本章要讲清楚这种方程怎么解。本章会做以下几件事：</p>
+
+<ul>
+  <li>把标量指数 \(e^x = 1 + x + x^2/2! + \cdots\) 推广成矩阵指数 \(\exp(A)\)；</li>
+  <li>给出矩阵指数的几条基本性质，特别强调 \(e^{A+B} = e^A e^B\) 在 \(AB \ne BA\) 时<em>不成立</em>这条陷阱；</li>
+  <li>说明可对角化时怎么用 \(\exp(A) = P \exp(D) P^{-1}\) 算 \(\exp(A)\)；</li>
+  <li>把 \(\dfrac{d\mathbf{x}}{dt} = A\mathbf{x}\) 的通解写成 \(\mathbf{x}(t) = \exp(At)\mathbf{x}_0\)；</li>
+  <li>给出对角化情形的具体形式：\(\mathbf{x}(t) = \sum c_i e^{\lambda_i t} \mathbf{v}_i\)；</li>
+  <li>处理复特征值——它们组合后变成 \(e^{at}\cos(bt), e^{at}\sin(bt)\) 形式；</li>
+  <li>讲一下相空间几何：稳定/不稳定结点、鞍点、螺旋；</li>
+  <li>用例题做完整演练（弹簧-质量、捕食-被捕食）。</li>
+</ul>
+
+<p>本章里有一个题外话：本书的正文一直假设你不需要会微积分。这一章是个<em>例外</em>——我们要讨论的是带 \(d/dt\) 的方程。如果你完全没学过微积分，先把这一章跳过，等学过一些导数和指数函数的运算之后再回来。但即便如此，我也会尽量把所有概念分解到"线性代数"那一边，让你哪怕用粗糙的微积分知识也能跟得上。</p>
+
+<h2 id="sec17-1">17.1 从 \(e^x\) 到矩阵指数 \(\exp(A)\)</h2>
+
+<p>先回忆标量指数函数的级数展开：</p>
+
+<p>\[e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots = \sum_{k=0}^\infty \frac{x^k}{k!}.\]</p>
+
+<p>这条级数对所有实数 \(x\)（其实对所有复数 \(x\)）都收敛。它定义出"指数"这个函数。注意一件事——这条公式里的<em>每一项都是 \(x\) 的某个幂</em>。我们已经知道矩阵也可以乘自己——\(A^k\) 是有意义的对象。所以一个自然的想法是：把每个 \(x^k\) 替换成 \(A^k\)，定义</p>
+
+<p>\[\boxed{\exp(A) = e^A := I + A + \frac{A^2}{2!} + \frac{A^3}{3!} + \cdots = \sum_{k=0}^\infty \frac{A^k}{k!}.}\]</p>
+
+<p>这里有几件事值得检查：</p>
+
+<ol>
+  <li>第一项是 \(I\) 而不是 \(1\)——因为按对应方式 \(x^0 = 1\) 在矩阵里对应 \(A^0 = I\)。这两件事在记号上有微妙差别，但概念上同样自然。</li>
+  <li>这条级数对<em>任何</em>方阵 \(A\) 都收敛。理由是 \(\|A^k/k!\| \le \|A\|^k/k!\)，而 \(\sum \|A\|^k/k!\) 是普通的指数级数 \(e^{\|A\|}\)，收敛。所以 \(\exp(A)\) 是一个良定义的<em>矩阵</em>。</li>
+  <li>\(\exp(A)\) 的<em>大小</em>与 \(A\) 一样——若 \(A\) 是 \(n \times n\)，\(\exp(A)\) 也是 \(n \times n\)。</li>
+</ol>
+
+<p>来做一个小例子。取 \(A = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}\)。\(A^2 = \begin{pmatrix} 0 & 0 \\ 0 & 0 \end{pmatrix} = 0\)，所以 \(A^k = 0\) 对 \(k \ge 2\)。级数只剩前两项：</p>
+
+<p>\[\exp(A) = I + A = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} + \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix} = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}.\]</p>
+
+<p>这个例子里级数终止得早，全靠 \(A\) 是<em>幂零</em>的。一般情况下级数有无穷项，得换一种算法。</p>
+
+<h2 id="sec17-2">17.2 矩阵指数的基本性质</h2>
+
+<p>下面几条性质是 \(\exp(A)\) 的基本工具，请背下来。</p>
+
+<p><strong>性质 1：\(\exp(0) = I\)。</strong>把 \(A = 0\) 代入级数：除了第一项 \(I\)，其余每项都含 \(A^k = 0\) 因而为零。所以 \(\exp(0) = I\)。这与标量 \(e^0 = 1\) 完全对应。</p>
+
+<p><strong>性质 2：当 \(AB = BA\) 时，\(e^{A+B} = e^A e^B\)。</strong></p>
+
+<p>这一条是几乎所有应用的灵魂，但它的<em>限制条件</em>必须强调：</p>
+
+<p><strong>!!! 警告 !!!</strong> 如果 \(AB \ne BA\)，那么 \(e^{A+B} \ne e^A e^B\) <em>一般成立</em>。这是矩阵指数与标量指数之间最大的差别，新手最容易栽跟头。</p>
+
+<p>为什么呢？把 \((A+B)^2\) 展开：\((A+B)^2 = A^2 + AB + BA + B^2\)。如果 \(AB = BA\)，\(AB + BA = 2AB\)，得 \(A^2 + 2AB + B^2\)，与标量公式一样。但如果 \(AB \ne BA\)，那 \(AB + BA\) 不能合成 \(2AB\)，二项展开公式失效，进而把级数推开后两边对不上。<em>"指数运算"在矩阵世界里高度敏感于"是否交换"。</em></p>
+
+<p>实际上，对任意两个矩阵都成立的是更复杂的<strong>BCH公式</strong>（Baker-Campbell-Hausdorff）：\(e^A e^B = e^{A + B + \frac{1}{2}[A,B] + \cdots}\)，其中 \([A,B] = AB - BA\) 是<em>对易子</em>。我们这里用不到它，仅做提醒。</p>
+
+<p>看一个具体的反例就明白了。取 \(A = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}\) 和 \(B = \begin{pmatrix} 0 & 0 \\ 1 & 0 \end{pmatrix}\)。这两个矩阵<em>不交换</em>：\(AB = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}\)、\(BA = \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix}\)，明显不同。前面 17.1 节算过 \(\exp(A) = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}\)，类似 \(\exp(B) = \begin{pmatrix} 1 & 0 \\ 1 & 1 \end{pmatrix}\)。</p>
+
+<p>所以 \(e^A e^B = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}\begin{pmatrix} 1 & 0 \\ 1 & 1 \end{pmatrix} = \begin{pmatrix} 2 & 1 \\ 1 & 1 \end{pmatrix}\)。但 \(A + B = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}\)，这是反射矩阵，特征值 \(\pm 1\)、特征向量 \((1, 1)\) 和 \((1, -1)\)。其指数 \(e^{A+B}\) 算出来是 \(\begin{pmatrix} \cosh 1 & \sinh 1 \\ \sinh 1 & \cosh 1 \end{pmatrix} \approx \begin{pmatrix} 1.543 & 1.175 \\ 1.175 & 1.543 \end{pmatrix}\)——和 \(e^A e^B\) 完全对不上。</p>
+
+<p>这就是<em>不交换</em>带来的代价：标量世界里习以为常的"指数律"在矩阵世界里失效了。学线性代数时这条陷阱要从一开始就<em>背下来</em>。</p>
+
+<p><strong>性质 3：\(e^A\) 可逆，逆是 \(e^{-A}\)。</strong>因为 \(A\) 与 \(-A\) 显然交换，所以可以用性质 2：\(e^A \cdot e^{-A} = e^{A + (-A)} = e^0 = I\)。所以 \(e^A\) 总是可逆，\((e^A)^{-1} = e^{-A}\)。</p>
+
+<p>这是一个非常有用的性质——<em>无论 \(A\) 多么奇怪，它的指数 \(\exp(A)\) 都不会奇异</em>。后面我们会看到，这意味着 \(\dfrac{d\mathbf{x}}{dt} = A\mathbf{x}\) 的解永远不会"塌成原点"——除非初值就是零。</p>
+
+<p><strong>性质 4：\(\dfrac{d}{dt} \exp(At) = A \exp(At) = \exp(At) A\)。</strong></p>
+
+<p>把 \(\exp(At)\) 看作 \(t\) 的矩阵函数——它对每个 \(t\) 给出一个 \(n \times n\) 矩阵。逐项对 \(t\) 求导：</p>
+
+<p>\[\frac{d}{dt}\exp(At) = \frac{d}{dt}\left[I + At + \frac{(At)^2}{2!} + \cdots\right] = A + A^2 t + \frac{A^3 t^2}{2!} + \cdots = A \exp(At).\]</p>
+
+<p>同理可写成 \(\exp(At) A\)（提取 \(A\) 在右边）。这条性质就是"\(\exp(At)\) 满足 \(\dot X = AX\)" 的明示——也是 17.4 节解微分方程的基础。</p>
+
+<h2 id="sec17-3">17.3 用对角化算 \(\exp(A)\)</h2>
+
+<p>17.1 节那个幂零矩阵的例子很特殊——级数早早终止了。一般情况下，\(\exp(A)\) 必须用别的办法算。<strong>对角化是关键</strong>。</p>
+
+<p>假设 \(A\) 可对角化：\(A = PDP^{-1}\)。那么</p>
+
+<p>\[A^k = (PDP^{-1})^k = PD^k P^{-1},\]</p>
+
+<p>代入级数：</p>
+
+<p>\[\exp(A) = \sum_{k=0}^\infty \frac{A^k}{k!} = \sum_{k=0}^\infty \frac{PD^k P^{-1}}{k!} = P \left(\sum_{k=0}^\infty \frac{D^k}{k!}\right) P^{-1} = P \exp(D) P^{-1}.\]</p>
+
+<p>而 \(\exp(D)\) 极其简单——\(D = \operatorname{diag}(\lambda_1, \ldots, \lambda_n)\)、\(D^k = \operatorname{diag}(\lambda_1^k, \ldots, \lambda_n^k)\)，所以</p>
+
+<p>\[\exp(D) = \operatorname{diag}(e^{\lambda_1}, e^{\lambda_2}, \ldots, e^{\lambda_n}).\]</p>
+
+<p>合起来：</p>
+
+<p>\[\boxed{\exp(A) = P \cdot \operatorname{diag}(e^{\lambda_1}, e^{\lambda_2}, \ldots, e^{\lambda_n}) \cdot P^{-1}.}\]</p>
+
+<p>这把"算 \(\exp(A)\)"——一个表面上无限项级数的工作——变成了"算 \(A\) 的特征分解，再取一次指数 + 一次矩阵乘法"。这就是为什么 \(15\) 章对角化是"巨大化简"的原因。</p>
+
+<p>更一般地，对任何<em>解析函数</em> \(f\)，可以同样定义</p>
+
+<p>\[f(A) = P \cdot \operatorname{diag}(f(\lambda_1), \ldots, f(\lambda_n)) \cdot P^{-1}\]</p>
+
+<p>（前提 \(A\) 可对角化）。所以 \(\sin A, \cos A, \log A\) 都有定义，只要把对应函数作用到特征值上。这种统一的视角叫"矩阵函数演算"，是控制论、量子计算、机器学习里很常用的工具。</p>
+
+<p><strong>例。</strong>取 \(A = \begin{pmatrix} 4 & 1 \\ 2 & 3 \end{pmatrix}\)（特征值 \(2, 5\)，已经在 14、15 章对角化过）。算 \(\exp(A)\)：</p>
+
+<p>\[\exp(A) = P \begin{pmatrix} e^2 & 0 \\ 0 & e^5 \end{pmatrix} P^{-1},\]</p>
+
+<p>其中 \(P = \begin{pmatrix} 1 & 1 \\ -2 & 1 \end{pmatrix}\)、\(P^{-1} = \frac{1}{3}\begin{pmatrix} 1 & -1 \\ 2 & 1 \end{pmatrix}\)。一步步乘开：</p>
+
+<p>\[\begin{pmatrix} e^2 & 0 \\ 0 & e^5 \end{pmatrix} \cdot \frac{1}{3}\begin{pmatrix} 1 & -1 \\ 2 & 1 \end{pmatrix} = \frac{1}{3}\begin{pmatrix} e^2 & -e^2 \\ 2e^5 & e^5 \end{pmatrix},\]</p>
+
+<p>\[P \cdot \frac{1}{3}\begin{pmatrix} e^2 & -e^2 \\ 2e^5 & e^5 \end{pmatrix} = \frac{1}{3}\begin{pmatrix} 1 & 1 \\ -2 & 1 \end{pmatrix}\begin{pmatrix} e^2 & -e^2 \\ 2e^5 & e^5 \end{pmatrix} = \frac{1}{3}\begin{pmatrix} e^2 + 2e^5 & -e^2 + e^5 \\ -2e^2 + 2e^5 & 2e^2 + e^5 \end{pmatrix}.\]</p>
+
+<p>这就是 \(\exp(A)\)。简单但麻烦——算 \(\exp(At)\)（任意 \(t\)）只需把 \(e^2, e^5\) 换成 \(e^{2t}, e^{5t}\)：</p>
+
+<p>\[\exp(At) = \frac{1}{3}\begin{pmatrix} e^{2t} + 2e^{5t} & -e^{2t} + e^{5t} \\ -2e^{2t} + 2e^{5t} & 2e^{2t} + e^{5t} \end{pmatrix}.\]</p>
+
+<p>注意 \(\exp(At)\) 是一个<em>矩阵值的 \(t\) 的函数</em>——给每个 \(t\) 它返回一个 \(2 \times 2\) 矩阵。</p>
+
+<h2 id="sec17-4">17.4 矩阵指数与线性微分方程组</h2>
+
+<p>现在我们要把矩阵指数<em>用</em>起来。问题是：</p>
+
+<p>\[\boxed{\frac{d\mathbf{x}}{dt} = A\mathbf{x}, \qquad \mathbf{x}(0) = \mathbf{x}_0.}\]</p>
+
+<p>未知量 \(\mathbf{x}(t)\) 是 \(\mathbb{R}^n\) 中的向量函数；\(A\) 是常数 \(n \times n\) 矩阵；\(\mathbf{x}_0\) 是初值。求 \(\mathbf{x}(t)\)。</p>
+
+<p>类比标量情形。当 \(n = 1\)，方程退化为 \(dy/dt = ay\)（\(y, a\) 都是数），解是 \(y(t) = e^{at} y_0\)。这条标量结果你应该相当熟悉。</p>
+
+<p>线性代数的奇迹是：<em>这条公式直接搬到向量/矩阵世界仍然成立</em>，只要把 \(e^{at}\) 换成矩阵指数 \(\exp(At)\)。也就是</p>
+
+<p>\[\boxed{\mathbf{x}(t) = \exp(At) \mathbf{x}_0.}\]</p>
+
+<p><strong>验证。</strong>用 17.2 性质 4 求导：</p>
+
+<p>\[\frac{d}{dt}\mathbf{x}(t) = \frac{d}{dt}[\exp(At) \mathbf{x}_0] = A \exp(At) \mathbf{x}_0 = A \mathbf{x}(t). \quad ✓\]</p>
+
+<p>初值：\(\mathbf{x}(0) = \exp(0) \mathbf{x}_0 = I \mathbf{x}_0 = \mathbf{x}_0\)。 ✓</p>
+
+<p>所以 \(\mathbf{x}(t) = \exp(At) \mathbf{x}_0\) 满足方程和初值。再加上线性微分方程组解的<em>唯一性</em>定理（这是分析里的一条标准结果，本书不证），它就是<strong>唯一</strong>的解。</p>
+
+<p>这条公式漂亮归漂亮，但实操上你没法直接用——因为 \(\exp(At)\) 没法不通过特征分解就算出来。下一节就讲怎么用对角化把它落地。</p>
+
+<p>但在落地之前，先停下来欣赏一下这条公式的漂亮。<em>线性代数把一个微分方程的解写成了一次矩阵指数运算作用在初值上</em>——这等价于把 \(\frac{d}{dt}\) 这个微分算子和 \(A\) 这个矩阵当作"同类对象"，让两者通过 \(\dot X = AX\) 这种形式联系起来；解就是把它们之间的关系"指数化"。这种<em>把分析问题变成代数问题</em>的飞跃，是数学里反复出现的主题——傅里叶变换、拉普拉斯变换、群论中的指数映射，都在做同样性质的事。</p>
+
+<p>另一个值得指出的事：解 \(\mathbf{x}(t) = \exp(At) \mathbf{x}_0\) <em>对所有 \(t \in \mathbb{R}\)</em> 都有定义——不只 \(t > 0\)。意味着你既能向前走时间（预测未来），也能向后走（重建过去）。代数上这件事来自 \(\exp(-At) \exp(At) = I\)，即 \(\exp(At)\) 永远可逆——一个非零状态被作用 \(t\) 时间后仍然是非零状态，绝不会"丢信息"。这种"时间可逆性"是<em>线性</em>系统的特性；非线性系统就没这么乖了。</p>
+
+<h2 id="sec17-5">17.5 用对角化具体求解 \(\dfrac{d\mathbf{x}}{dt} = A\mathbf{x}\)</h2>
+
+<p>假设 \(A\) 可对角化，特征值 \(\lambda_1, \ldots, \lambda_n\)，对应特征向量 \(\mathbf{v}_1, \ldots, \mathbf{v}_n\)。</p>
+
+<p><strong>关键想法：</strong>因为 \(\mathbf{v}_1, \ldots, \mathbf{v}_n\) 是一组基，初值 \(\mathbf{x}_0\) 可以唯一展开为</p>
+
+<p>\[\mathbf{x}_0 = c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \cdots + c_n \mathbf{v}_n,\]</p>
+
+<p>其中 \(c_i\) 是确定的常数。把它代入 \(\mathbf{x}(t) = \exp(At) \mathbf{x}_0\)：</p>
+
+<p>\[\mathbf{x}(t) = \exp(At) \sum_i c_i \mathbf{v}_i = \sum_i c_i \exp(At) \mathbf{v}_i.\]</p>
+
+<p>这里关键的事来了——\(\exp(At) \mathbf{v}_i\) 等于多少？回到级数：\(\exp(At) \mathbf{v}_i = \sum_k \frac{(At)^k}{k!} \mathbf{v}_i = \sum_k \frac{A^k t^k}{k!} \mathbf{v}_i\)。但 \(A^k \mathbf{v}_i = \lambda_i^k \mathbf{v}_i\)（因为 \(A \mathbf{v}_i = \lambda_i \mathbf{v}_i\)，迭代 \(k\) 次），所以</p>
+
+<p>\[\exp(At) \mathbf{v}_i = \sum_k \frac{\lambda_i^k t^k}{k!} \mathbf{v}_i = e^{\lambda_i t} \mathbf{v}_i.\]</p>
+
+<p>把它代回上面求和：</p>
+
+<p>\[\boxed{\mathbf{x}(t) = c_1 e^{\lambda_1 t} \mathbf{v}_1 + c_2 e^{\lambda_2 t} \mathbf{v}_2 + \cdots + c_n e^{\lambda_n t} \mathbf{v}_n.}\]</p>
+
+<p>这就是<strong>主定理</strong>。它告诉你：在特征基下，方程 \(\dot{\mathbf{x}} = A\mathbf{x}\) <em>解耦</em>成 \(n\) 个独立的标量方程 \(\dot c_i = \lambda_i c_i\)，每个的解是 \(c_i e^{\lambda_i t}\)，再用对应的特征方向 \(\mathbf{v}_i\) "翻译"回原来的坐标系。所有看起来纠缠在一起的方程，在<em>正确的基</em>下其实彼此完全独立。</p>
+
+<p><strong>例 1：实特征值情形。</strong>解 \(\dfrac{d\mathbf{x}}{dt} = A\mathbf{x}\)，其中 \(A = \begin{pmatrix} 4 & 1 \\ 2 & 3 \end{pmatrix}\)，初值 \(\mathbf{x}(0) = \begin{pmatrix} 3 \\ 0 \end{pmatrix}\)。</p>
+
+<p>已知特征值 \(\lambda_1 = 2, \lambda_2 = 5\)，特征向量 \(\mathbf{v}_1 = \begin{pmatrix} 1 \\ -2 \end{pmatrix}, \mathbf{v}_2 = \begin{pmatrix} 1 \\ 1 \end{pmatrix}\)。</p>
+
+<p>第一步：把初值展开为特征向量的组合。求 \(c_1, c_2\) 使 \(c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 = \mathbf{x}_0 = \begin{pmatrix} 3 \\ 0 \end{pmatrix}\)，即解</p>
+
+<p>\[\begin{pmatrix} 1 & 1 \\ -2 & 1 \end{pmatrix}\begin{pmatrix} c_1 \\ c_2 \end{pmatrix} = \begin{pmatrix} 3 \\ 0 \end{pmatrix}.\]</p>
+
+<p>左乘 \(P^{-1} = \frac{1}{3}\begin{pmatrix} 1 & -1 \\ 2 & 1 \end{pmatrix}\)：\(\begin{pmatrix} c_1 \\ c_2 \end{pmatrix} = \frac{1}{3}\begin{pmatrix} 3 - 0 \\ 6 + 0 \end{pmatrix} = \begin{pmatrix} 1 \\ 2 \end{pmatrix}\)。</p>
+
+<p>第二步：写出解。\(\mathbf{x}(t) = 1 \cdot e^{2t} \begin{pmatrix} 1 \\ -2 \end{pmatrix} + 2 \cdot e^{5t} \begin{pmatrix} 1 \\ 1 \end{pmatrix} = \begin{pmatrix} e^{2t} + 2e^{5t} \\ -2e^{2t} + 2e^{5t} \end{pmatrix}\)。</p>
+
+<p>验证 \(\mathbf{x}(0) = \begin{pmatrix} 1 + 2 \\ -2 + 2 \end{pmatrix} = \begin{pmatrix} 3 \\ 0 \end{pmatrix}\) ✓。这与 17.3 节算出来的 \(\exp(At)\) 作用在 \(\mathbf{x}_0\) 上的结果完全一致——两条路殊途同归。</p>
+
+<p>注意这个解的<strong>定性行为</strong>：因为两个特征值都是正数，两个分量都按指数增长。\(t \to \infty\) 时 \(e^{5t}\) 主导（增长更快），所以解最终沿 \(\mathbf{v}_2\) 方向无界增长。这种"长期方向由最大特征值的特征向量决定"的现象在动力系统里反复出现。</p>
+
+<p>在工程与机器学习里，这个观察有一个名字叫<strong>幂迭代</strong>（power iteration）——它说明若你从任意初值出发反复用矩阵 \(A\) 作用，结果会越来越接近<em>主特征向量</em>（最大模长特征值对应的特征向量）的方向。这是 PageRank、PCA 第一主成分等一系列著名算法的底层原理：你不必算出整个特征分解，只要反复迭代 \(A\)，自然会"找到"最大特征向量。下一段我们就来推导这件事。</p>
+
+<h3>幂迭代：长期行为由主特征向量决定</h3>
+
+<p>设 \(A\) 可对角化，特征值排序为 \(|\lambda_1| > |\lambda_2| \ge \cdots \ge |\lambda_n|\)。把任意初值展开：</p>
+
+<p>\[\mathbf{x}_0 = c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \cdots + c_n \mathbf{v}_n.\]</p>
+
+<p>则 \(A^k \mathbf{x}_0 = c_1 \lambda_1^k \mathbf{v}_1 + c_2 \lambda_2^k \mathbf{v}_2 + \cdots\)。提出 \(\lambda_1^k\)：</p>
+
+<p>\[A^k \mathbf{x}_0 = \lambda_1^k \left[c_1 \mathbf{v}_1 + c_2 \left(\frac{\lambda_2}{\lambda_1}\right)^k \mathbf{v}_2 + \cdots + c_n \left(\frac{\lambda_n}{\lambda_1}\right)^k \mathbf{v}_n\right].\]</p>
+
+<p>因为 \(|\lambda_i / \lambda_1| < 1\) 对 \(i \ge 2\)，每一项随 \(k\) 增大而衰减到零。所以括号内最后只剩下 \(c_1 \mathbf{v}_1\)（如果 \(c_1 \ne 0\)）。结论：</p>
+
+<p>\[A^k \mathbf{x}_0 \approx c_1 \lambda_1^k \mathbf{v}_1, \qquad k \to \infty.\]</p>
+
+<p>换言之，<em>反复作用 \(A\) 会自动放大主特征向量方向，把其他方向相对地压扁</em>。这是数值线性代数里最朴素也最有效的算法之一。</p>
+
+<p>同样的现象在连续时间下——\(\mathbf{x}(t) = \exp(At) \mathbf{x}_0\)——也成立：长期方向由<em>实部最大的</em>特征值对应的特征向量决定。这条规则在生态学（最快增长种群）、经济学（最强势的扰动模式）、物理（最不稳定的本征模式）里都有具体的物理意义。</p>
+
+<h2 id="sec17-6">17.6 复特征值的处理：振荡解</h2>
+
+<p>如果矩阵 \(A\) 是实矩阵但有复特征值，前面公式 \(\mathbf{x}(t) = \sum c_i e^{\lambda_i t} \mathbf{v}_i\) 还是对的——只是 \(\lambda_i\) 和 \(\mathbf{v}_i\) 都是复的。但物理意义上的解 \(\mathbf{x}(t)\) 必须是实数向量。怎么办？</p>
+
+<p>答案：复特征值<em>共轭成对出现</em>，配上对应的复特征向量也共轭。所以解里那些复项也共轭成对出现，加起来就<strong>抵消掉所有虚部</strong>，给出实数解。</p>
+
+<p>具体推导。设 \(\lambda = a + bi\)（\(b \ne 0\)）是 \(A\) 的特征值，对应特征向量 \(\mathbf{w} = \mathbf{u} + i\mathbf{v}\)（\(\mathbf{u}, \mathbf{v}\) 实）。则 \(\bar{\lambda} = a - bi\) 也是特征值，对应 \(\bar{\mathbf{w}} = \mathbf{u} - i\mathbf{v}\)。它们贡献到通解里的部分是</p>
+
+<p>\[c \cdot e^{(a+bi)t} (\mathbf{u} + i\mathbf{v}) + \bar{c} \cdot e^{(a-bi)t}(\mathbf{u} - i\mathbf{v}),\]</p>
+
+<p>其中 \(c\) 是某个复常数，\(\bar c\) 是它的共轭——为了保证最终的解是实的，必须共轭对成对地出现。</p>
+
+<p>用欧拉公式 \(e^{(a + bi) t} = e^{at}(\cos bt + i\sin bt)\)、\(e^{(a-bi)t} = e^{at}(\cos bt - i\sin bt)\)，并把 \(c = (\alpha + i\beta)/2\)（系数 \(\alpha, \beta\) 实）展开化简，最终得到</p>
+
+<p>\[\boxed{\mathbf{x}_{\text{这一对}}(t) = e^{at}\bigl[\alpha(\cos(bt) \, \mathbf{u} - \sin(bt) \, \mathbf{v}) + \beta(\sin(bt) \, \mathbf{u} + \cos(bt) \, \mathbf{v})\bigr].}\]</p>
+
+<p>这个公式看起来比较吓人，但它的<strong>结构</strong>非常清晰——每一对复特征值贡献两种实形式的解：</p>
+
+<p>\[e^{at} \cdot \cos(bt), \qquad e^{at} \cdot \sin(bt),\]</p>
+
+<p>分别配上某个实方向。<em>实部 \(a\) 决定衰减/增长</em>（\(a < 0\) 衰减，\(a > 0\) 增长），<em>虚部 \(b\) 决定振荡频率</em>。</p>
+
+<p><strong>例 2：纯虚特征值——纯振荡。</strong>解 \(\dot{\mathbf{x}} = A\mathbf{x}\)，\(A = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}\)。</p>
+
+<p>特征多项式 \(\lambda^2 + 1 = 0\)，特征值 \(\pm i\)。\(a = 0, b = 1\)（取上半边的特征值）。</p>
+
+<p>求 \(\lambda = i\) 的特征向量：\(A - iI = \begin{pmatrix} -i & -1 \\ 1 & -i \end{pmatrix}\)。第二行得 \(v_1 - i v_2 = 0\)，即 \(v_1 = i v_2\)。取 \(v_2 = 1\)：\(\mathbf{w} = \begin{pmatrix} i \\ 1 \end{pmatrix} = \begin{pmatrix} 0 \\ 1 \end{pmatrix} + i \begin{pmatrix} 1 \\ 0 \end{pmatrix}\)。所以 \(\mathbf{u} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}\)、\(\mathbf{v} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}\)。</p>
+
+<p>代入公式（\(a = 0\)，\(e^{at} = 1\)）：</p>
+
+<p>\[\mathbf{x}(t) = \alpha\bigl[\cos t \begin{pmatrix} 0 \\ 1 \end{pmatrix} - \sin t \begin{pmatrix} 1 \\ 0 \end{pmatrix}\bigr] + \beta\bigl[\sin t \begin{pmatrix} 0 \\ 1 \end{pmatrix} + \cos t \begin{pmatrix} 1 \\ 0 \end{pmatrix}\bigr],\]</p>
+
+<p>整理得</p>
+
+<p>\[\mathbf{x}(t) = \begin{pmatrix} -\alpha \sin t + \beta \cos t \\ \alpha \cos t + \beta \sin t \end{pmatrix}.\]</p>
+
+<p>这就是平面上的<em>圆周运动</em>——\(\mathbf{x}(t)\) 描出一个以原点为中心的圆，半径 \(\sqrt{\alpha^2 + \beta^2}\)（由初值决定）、角速度 \(1\)。这与"\(A\) 是 \(90°\) 旋转的'微分版'"的几何直觉完全一致。</p>
+
+<p><strong>例 3：复特征值带负实部——阻尼振荡。</strong>解 \(\dot{\mathbf{x}} = A\mathbf{x}\)，\(A = \begin{pmatrix} -1 & -1 \\ 1 & -1 \end{pmatrix}\)。</p>
+
+<p>特征多项式 \((-1-\lambda)^2 + 1 = 0\)，即 \(\lambda^2 + 2\lambda + 2 = 0\)，特征值 \((-2 \pm 2i)/2 = -1 \pm i\)。\(a = -1, b = 1\)。</p>
+
+<p>因为 \(a = -1 < 0\)，每分量都有 \(e^{-t}\) 因子，振幅指数衰减；同时有 \(\cos t, \sin t\) 因子，振荡周期 \(2\pi\)。<em>典型阻尼振荡</em>。</p>
+
+<p>具体特征向量演算与例 2 类似，留作练习——解的形式必然是</p>
+
+<p>\[\mathbf{x}(t) = e^{-t}\begin{pmatrix} c_1 \cos t + c_2 \sin t \\ c_3 \cos t + c_4 \sin t \end{pmatrix}\]</p>
+
+<p>类型。在相平面上画出来，是一条<em>螺旋向内</em>的曲线，渐近趋于原点。</p>
+
+<p>把这道题做完整。\(A = \begin{pmatrix} -1 & -1 \\ 1 & -1 \end{pmatrix}\)，特征值 \(\lambda = -1 \pm i\)。求 \(\lambda_1 = -1 + i\) 的特征向量：\(A - (-1 + i)I = \begin{pmatrix} -i & -1 \\ 1 & -i \end{pmatrix}\)。从第二行 \(v_1 - i v_2 = 0\) 得 \(v_1 = i v_2\)，取 \(v_2 = 1\)：\(\mathbf{w} = \begin{pmatrix} i \\ 1 \end{pmatrix} = \begin{pmatrix} 0 \\ 1 \end{pmatrix} + i \begin{pmatrix} 1 \\ 0 \end{pmatrix}\)。所以 \(\mathbf{u} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}\)、\(\mathbf{v} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}\)。</p>
+
+<p>把 \(a = -1, b = 1\) 与 \(\mathbf{u}, \mathbf{v}\) 代入 17.6 节的公式：</p>
+
+<p>\[\mathbf{x}(t) = e^{-t}\bigl[\alpha(\cos t \cdot \mathbf{u} - \sin t \cdot \mathbf{v}) + \beta(\sin t \cdot \mathbf{u} + \cos t \cdot \mathbf{v})\bigr],\]</p>
+
+<p>整理得</p>
+
+<p>\[\mathbf{x}(t) = e^{-t}\begin{pmatrix} -\alpha \sin t + \beta \cos t \\ \alpha \cos t + \beta \sin t \end{pmatrix}.\]</p>
+
+<p>从初值 \(\mathbf{x}(0) = \begin{pmatrix} \beta \\ \alpha \end{pmatrix}\) 解出 \(\alpha, \beta\)。如初值 \(\begin{pmatrix} 1 \\ 0 \end{pmatrix}\)，则 \(\beta = 1, \alpha = 0\)，解为 \(\mathbf{x}(t) = e^{-t}\begin{pmatrix} \cos t \\ \sin t \end{pmatrix}\)——一条螺旋向原点收缩的曲线，每转一圈幅值减小到原来的 \(e^{-2\pi}\)。</p>
+
+<h3>例：另一道带复特征值的题</h3>
+
+<p>再做一道复特征值的微分方程，让流程烂熟。解 \(\dot{\mathbf{x}} = A\mathbf{x}\)，\(A = \begin{pmatrix} 0 & 4 \\ -1 & 0 \end{pmatrix}\)，初值 \(\mathbf{x}(0) = \begin{pmatrix} 2 \\ 0 \end{pmatrix}\)。</p>
+
+<p>特征多项式 \(\lambda^2 + 4 = 0\)，特征值 \(\pm 2i\)。\(a = 0, b = 2\)——纯振荡，频率 \(\omega = 2\)。</p>
+
+<p>求 \(\lambda = 2i\) 的特征向量：\(A - 2i I = \begin{pmatrix} -2i & 4 \\ -1 & -2i \end{pmatrix}\)。从第二行 \(-v_1 - 2i v_2 = 0\) 得 \(v_1 = -2i v_2\)，取 \(v_2 = 1\) 得</p>
+
+<p>\[\mathbf{w} = \begin{pmatrix} -2i \\ 1 \end{pmatrix} = \begin{pmatrix} 0 \\ 1 \end{pmatrix} + i \begin{pmatrix} -2 \\ 0 \end{pmatrix}.\]</p>
+
+<p>所以 \(\mathbf{u} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}\)、\(\mathbf{v} = \begin{pmatrix} -2 \\ 0 \end{pmatrix}\)。</p>
+
+<p>用 17.6 的公式（\(a = 0\)）：</p>
+
+<p>\[\mathbf{x}(t) = \alpha\bigl[\cos(2t) \mathbf{u} - \sin(2t) \mathbf{v}\bigr] + \beta\bigl[\sin(2t) \mathbf{u} + \cos(2t) \mathbf{v}\bigr],\]</p>
+
+<p>展开：</p>
+
+<p>\[\mathbf{x}(t) = \begin{pmatrix} 2\alpha \sin(2t) - 2\beta \cos(2t) \\ \alpha \cos(2t) + \beta \sin(2t) \end{pmatrix}.\]</p>
+
+<p>代入 \(\mathbf{x}(0) = (2, 0)^T\)：\(-2\beta = 2 \Rightarrow \beta = -1\)；\(\alpha = 0\)。所以解为</p>
+
+<p>\[\mathbf{x}(t) = \begin{pmatrix} 2 \cos(2t) \\ -\sin(2t) \end{pmatrix}.\]</p>
+
+<p>验证：\(\mathbf{x}(0) = (2, 0)^T\) ✓。\(\dot{\mathbf{x}}(t) = (-4\sin(2t), -2\cos(2t))^T\)。代入 \(A\mathbf{x}\)：\(\begin{pmatrix} 0 & 4 \\ -1 & 0 \end{pmatrix}\begin{pmatrix} 2\cos(2t) \\ -\sin(2t) \end{pmatrix} = \begin{pmatrix} -4\sin(2t) \\ -2\cos(2t) \end{pmatrix}\) ✓。</p>
+
+<p>几何上：解描出的是<em>椭圆</em>——在相平面上，\((x_1/2)^2 + x_2^2 = \cos^2(2t) + \sin^2(2t) = 1\)，所以轨迹是椭圆 \(x_1^2/4 + x_2^2 = 1\)，长半轴 \(2\)（沿 \(x_1\)）、短半轴 \(1\)（沿 \(x_2\)）。</p>
+
+<p>请注意：哪怕系数矩阵看起来是<em>反对称的</em>（接近 \(\begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}\) 这种"旋转"形式），轨迹也<em>不一定</em>是圆——只有在特殊情况下才是圆，一般是椭圆。这是因为 \(A\) 的两个分量"不对称"——把 \(x_1\) 拉的快，把 \(x_2\) 拉的慢，结果就是椭圆而非圆。</p>
+
+<h2 id="sec17-7">17.7 相空间几何：稳定/不稳定结点、鞍点、螺旋</h2>
+
+<p>到此为止，我们已经能机械地求解 \(\dot{\mathbf{x}} = A\mathbf{x}\)。但更值得理解的是：<em>不同特征值结构对应的几何图像</em>。把 \(\mathbf{x}(t)\) 的轨迹画在<strong>相平面</strong>（\(2 \times 2\) 时是 \(x_1\)-\(x_2\) 平面）上，会得到一些非常优美的图案，叫<strong>相图</strong>。每种特征值结构对应一种相图。本节做一个分类。</p>
+
+<h3>情形 1：两个不同实特征值</h3>
+
+<p><strong>(a) 都是负的（稳定结点）：</strong>\(\lambda_1, \lambda_2 < 0\)。每个分量按 \(e^{\lambda_i t}\) 指数衰减，所有解都趋于原点。轨迹长得像"流向原点的水流"——所有曲线最终都汇入原点。例如 \(\lambda_1 = -1, \lambda_2 = -3\)：所有解被压向原点，沿绝对值小的特征向量（\(\mathbf{v}_1\)）方向衰减得慢，所以"切线"方向是 \(\mathbf{v}_1\)。</p>
+
+<p><strong>(b) 都是正的（不稳定结点）：</strong>\(\lambda_1, \lambda_2 > 0\)。所有解从原点出发指数发散。轨迹与 (a) 方向相反——"从原点流出"。</p>
+
+<p><strong>(c) 一正一负（鞍点）：</strong>\(\lambda_1 > 0 > \lambda_2\)。沿 \(\mathbf{v}_1\) 方向解发散，沿 \(\mathbf{v}_2\) 方向解收敛。一般初值的解先沿 \(\mathbf{v}_2\) 方向逼近原点，再被 \(\mathbf{v}_1\) 方向拉远——轨迹长得像马鞍面的等高线，所以叫"鞍点"。鞍点是<em>不稳定的</em>但在某些方向（恰好沿 \(\mathbf{v}_2\)）上是稳定的。</p>
+
+<h3>情形 2：复特征值 \(a \pm bi\)</h3>
+
+<p><strong>(a) 实部 \(a < 0\)（稳定螺旋）：</strong>解既振荡又衰减。轨迹是逐渐缩向原点的螺旋——典型的<em>阻尼振荡</em>。</p>
+
+<p><strong>(b) 实部 \(a > 0\)（不稳定螺旋）：</strong>解既振荡又增长。轨迹是逐渐扩张的螺旋——离心远去。</p>
+
+<p><strong>(c) 实部 \(a = 0\)（中心，纯振荡）：</strong>解只振荡不衰减也不增长。轨迹是一组以原点为中心的<em>同心椭圆</em>（圆是特殊情况）。这种情形<em>稳定但不渐近稳定</em>——解保持在一个固定圆上，既不靠近也不远离原点。</p>
+
+<h3>情形 3：重特征值</h3>
+
+<p><strong>(a) 几何重数 = 代数重数（可对角化）：</strong>\(A = \lambda I\)，所有方向都按同一速率 \(e^{\lambda t}\) 拉伸。轨迹是从原点出发的<em>射线</em>——"星形结点"。</p>
+
+<p><strong>(b) 几何重数 < 代数重数（不可对角化）：</strong>需要约当形式。轨迹长成"退化结点"或"非典型结点"——比情形 1 (a)/(b) 更有方向性，但不形成螺旋。我们这里不展开公式。</p>
+
+<p>把这些都汇总成一张诊断表，是动力系统课的核心内容——本书只点到为止，请有兴趣的读者去翻常微分方程教材。但记住<strong>关键的逻辑</strong>：</p>
+
+<table>
+  <thead><tr><th>特征值</th><th>相图类型</th><th>稳定性</th></tr></thead>
+  <tbody>
+    <tr><td>\(\lambda_{1,2}\) 同号（实，负）</td><td>稳定结点</td><td>渐近稳定</td></tr>
+    <tr><td>\(\lambda_{1,2}\) 同号（实，正）</td><td>不稳定结点</td><td>不稳定</td></tr>
+    <tr><td>\(\lambda_{1,2}\) 异号（实）</td><td>鞍点</td><td>不稳定</td></tr>
+    <tr><td>\(a \pm bi, a < 0\)</td><td>稳定螺旋</td><td>渐近稳定</td></tr>
+    <tr><td>\(a \pm bi, a > 0\)</td><td>不稳定螺旋</td><td>不稳定</td></tr>
+    <tr><td>\(\pm bi\)（纯虚）</td><td>中心</td><td>稳定（但不渐近）</td></tr>
+  </tbody>
+</table>
+
+<p>这张表回应了"特征值告诉你什么"这个问题——<em>实部决定稳定性，虚部决定是否振荡</em>。这两条规则是后面所有动力系统分析的底层语法。</p>
+
+<p>用一个稍微跨学科的视角再说一遍：在控制工程里，<em>系统稳定 \(\iff\) 所有特征值在复平面左半平面（即实部 \(< 0\)）</em>。这条规则被称为<strong>赫尔维茨稳定性判据</strong>（Hurwitz stability），是设计反馈控制器（PID 控制、状态反馈、LQR）的底层依据。一个无人机要不要"会自己飞稳"，归根结底就是这套小动力学方程的<em>系数矩阵的特征值在哪里</em>。所以本节的相图分类不只是一个理论玩具——它是工程师每天在用的诊断工具。</p>
+
+<h3>分岔：当系数变化时相图怎么变？</h3>
+
+<p>更进一步——如果 \(A\) 依赖某个参数 \(\mu\)（比如阻尼系数），随着 \(\mu\) 连续变化，特征值在复平面上会画出某种轨迹，而<em>相图类型</em>会在某些<em>临界 \(\mu\) 值</em>处发生跳变。这种现象叫<strong>分岔</strong>（bifurcation）。</p>
+
+<p>典型例子：<em>霍普夫分岔</em>（Hopf bifurcation）——当 \(\mu\) 跨过某个临界值时，复特征值的实部从负变正，相图从"稳定螺旋"突变为"不稳定螺旋"，系统从静止进入持续振荡。这种分岔在<em>心律失常</em>、<em>激光启动</em>、<em>湍流转捩</em>等许多自然现象里都被观察到。</p>
+
+<p>另一个：<em>鞍-结分岔</em>——当 \(\mu\) 变化时，两个实特征值"相遇"（变成重根）然后"消失"（变成共轭复对）。相图从"两条独立方向上的纯指数行为"突变为"螺旋行为"。</p>
+
+<p>这种"特征值的运动 → 相图的定性变化"研究，是<em>非线性动力学</em>的核心子领域，叫作<strong>分岔理论</strong>。它把"线性代数能算什么"和"实际系统会做什么"无缝衔接起来。本章只是入门——但你要知道，特征值的位置不只是数值，它们在复平面上的<em>移动</em>，预言着系统行为的所有可能转折。</p>
+
+<h3>关于"轨迹形状"的几个直觉</h3>
+
+<p>为了让你能闭着眼睛"画"出 \(2 \times 2\) 系统的相图，再补充几条规律。</p>
+
+<ol>
+  <li><strong>稳定结点的"切线方向"是绝对值小的特征值的特征向量。</strong>因为 \(e^{\lambda_1 t}\) 衰减得慢，所以解长期沿这条方向"落地"。</li>
+  <li><strong>不稳定结点的"切线方向"是绝对值小的特征值的特征向量。</strong>对称地，因为 \(e^{\lambda_2 t}\) 增长得快，反向看时间倒流，"近原点切线"还是绝对值小那条。</li>
+  <li><strong>鞍点有两条特殊轨迹：分别沿 \(\mathbf{v}_1\)（不稳定流形）和 \(\mathbf{v}_2\)（稳定流形）。</strong>所有其他轨迹都被它们"挤"成双曲线状。</li>
+  <li><strong>螺旋的旋转方向</strong>由复特征向量的<em>虚部方向</em>决定——根据约定，\(b > 0\) 时通常是逆时针。</li>
+</ol>
+
+<p>把这些规则记下来，你就能在拿到任何 \(2 \times 2\) 系数矩阵后，只需<em>算特征值</em>而不必解微分方程，就大致画出相图。这种"特征值视角"是工程师的标配能力。</p>
+
+<h2 id="sec17-8">17.8 例题：弹簧-质量与捕食-被捕食</h2>
+
+<h3>例 4：弹簧-质量系统</h3>
+
+<p>挂在墙上的弹簧上吊一个质量 \(m\) 的小球，弹性常数 \(k\)，阻尼系数 \(c\)。位移 \(x(t)\) 满足牛顿定律</p>
+
+<p>\[m \ddot x + c \dot x + k x = 0.\]</p>
+
+<p>把它降阶为一阶方程组。定义 \(\mathbf{y} = \begin{pmatrix} x \\ \dot x \end{pmatrix}\)，则</p>
+
+<p>\[\dot{\mathbf{y}} = \begin{pmatrix} \dot x \\ \ddot x \end{pmatrix} = \begin{pmatrix} \dot x \\ -\frac{k}{m} x - \frac{c}{m} \dot x \end{pmatrix} = \begin{pmatrix} 0 & 1 \\ -k/m & -c/m \end{pmatrix} \mathbf{y}.\]</p>
+
+<p>设系数矩阵 \(A = \begin{pmatrix} 0 & 1 \\ -k/m & -c/m \end{pmatrix}\)。它的特征多项式是 \(\lambda^2 + (c/m)\lambda + (k/m) = 0\)，特征值</p>
+
+<p>\[\lambda = \frac{-c/m \pm \sqrt{(c/m)^2 - 4k/m}}{2}.\]</p>
+
+<p>三种行为，对应三种 \(c\) 的范围：</p>
+
+<ul>
+  <li><strong>过阻尼</strong> \((c/m)^2 > 4k/m\)：判别式正，两个负实特征值——稳定结点，无振荡的指数衰减回平衡。</li>
+  <li><strong>临界阻尼</strong> \((c/m)^2 = 4k/m\)：判别式零，重特征值 \(-c/(2m) < 0\)——衰减最快的情形（汽车减震器追求这种调节）。</li>
+  <li><strong>欠阻尼</strong> \((c/m)^2 < 4k/m\)：判别式负，复特征值 \(-c/(2m) \pm i\sqrt{k/m - (c/(2m))^2}\)——稳定螺旋，阻尼振荡。</li>
+  <li><strong>无阻尼</strong> \(c = 0\)：特征值 \(\pm i\sqrt{k/m}\)——中心，纯振荡，频率 \(\sqrt{k/m}\)。</li>
+</ul>
+
+<p>所有这些定性结论都<em>不需要</em>把方程真的解出来——只看特征值就够了。这就是线性代数视角的威力。</p>
+
+<p>具体地，<em>欠阻尼</em>情形——汽车减震过软或大楼对地震过敏感都是这种——的解形如 \(x(t) = A e^{-\gamma t} \cos(\omega' t + \varphi)\)，其中 \(\gamma = c/(2m)\) 是衰减率，\(\omega' = \sqrt{k/m - \gamma^2}\) 是阻尼振荡频率，\(A, \varphi\) 由初值决定。<em>实部 \(-\gamma\)</em> 决定振幅按 \(e^{-\gamma t}\) 衰减、虚部 \(\omega'\) 决定振荡周期 \(2\pi/\omega'\)——这就是 17.7 节那条"实部 = 衰减、虚部 = 振荡"规则在物理里的具体兑现。</p>
+
+<p>工程师设计减震器时常用一个无量纲参数<em>阻尼比</em> \(\zeta = c / (2\sqrt{km})\)。\(\zeta < 1\) 欠阻尼、\(\zeta = 1\) 临界阻尼、\(\zeta > 1\) 过阻尼。汽车悬挂通常调到 \(\zeta \approx 0.3 \sim 0.5\)（兼顾舒适与稳定）。这背后的数学，正是本节的特征值分析。</p>
+
+<h3>例 5：洛特卡-沃尔泰拉捕食-被捕食模型（线性化）</h3>
+
+<p>种群动力学里有一个经典模型：兔子 \(x\) 和狐狸 \(y\) 之间的互动满足非线性方程</p>
+
+<p>\[\dot x = \alpha x - \beta xy, \qquad \dot y = -\gamma y + \delta xy.\]</p>
+
+<p>其中 \(\alpha, \beta, \gamma, \delta > 0\)。这条方程是非线性的（有 \(xy\) 项），不能直接用本章的方法解。但我们可以在<em>平衡点</em>附近<strong>线性化</strong>，把局部行为转化成线性问题。</p>
+
+<p>平衡点是 \(\dot x = \dot y = 0\) 的解：除了 \((0, 0)\) 之外还有 \((\gamma/\delta, \alpha/\beta)\)。在第二个平衡点附近，做小扰动 \(x = \gamma/\delta + u, y = \alpha/\beta + v\)，把方程展开到一阶（即丢掉 \(uv\) 高阶项），得到关于 \((u, v)\) 的线性方程组。具体计算（非线性微积分的链式规则）给出</p>
+
+<p>\[\begin{pmatrix} \dot u \\ \dot v \end{pmatrix} = \begin{pmatrix} 0 & -\beta\gamma/\delta \\ \alpha\delta/\beta & 0 \end{pmatrix} \begin{pmatrix} u \\ v \end{pmatrix}.\]</p>
+
+<p>这个矩阵的特征多项式是 \(\lambda^2 + \alpha\gamma = 0\)，特征值 \(\pm i\sqrt{\alpha\gamma}\)——纯虚！</p>
+
+<p>所以洛特卡-沃尔泰拉模型的平衡点是<em>中心</em>——周围的轨迹是闭合的椭圆。生态意义上：兔子多了狐狸增多 → 兔子被吃掉减少 → 狐狸饿死减少 → 兔子又增多……如此周而复始，<em>种群数量是周期性振荡的</em>，振荡频率由 \(\sqrt{\alpha\gamma}\) 决定。这是真实生态数据中（北方加拿大野兔与猞猁的毛皮交易记录）观察到的"周期振荡"现象的最简洁线性代数解释。</p>
+
+<p>当然，平衡点不止一个：\((0, 0)\) 也是平衡点（兔子和狐狸都灭绝）。在那一点附近线性化得到</p>
+
+<p>\[\begin{pmatrix} \dot u \\ \dot v \end{pmatrix} = \begin{pmatrix} \alpha & 0 \\ 0 & -\gamma \end{pmatrix}\begin{pmatrix} u \\ v \end{pmatrix},\]</p>
+
+<p>特征值 \(\alpha > 0, -\gamma < 0\)——<em>异号</em>，所以 \((0, 0)\) 是<strong>鞍点</strong>。物理意义：从"几乎没兔没狐狸"出发，兔子会指数增长（沿 \(u\) 轴方向不稳定），狐狸会指数衰减（沿 \(v\) 轴方向稳定）。所以这个状态是<em>不稳定</em>的——种群必然会跑离它。这与"完全灭绝是非物理状态"的直觉相符。</p>
+
+<p>这种"在每个平衡点局部线性化、用特征值判断稳定性"的方法，叫<strong>线性化稳定性分析</strong>，是研究非线性动力系统的第一步标配。</p>
+
+<p>注意：原方程是非线性的，所以"中心"只是<em>线性化</em>层面的结论。完整的非线性分析（有兴趣的读者可以查"哈密顿系统"）证明洛特卡-沃尔泰拉模型确实有真正的闭合周期轨道——线性化在这里的预测意外地准确。这种"先线性化，再用本章工具"的范式，是工程与生态学里几乎所有"小扰动稳定性"分析的标准操作。</p>
+
+<h3>本章末语</h3>
+
+<p>这一章把整本书的所有核心工具——特征值、特征向量、对角化、复数、矩阵指数——熔铸成<strong>一把钥匙</strong>，用来开启微分方程组这扇大门。从这一点上看，前面 16 章的所有铺垫终于有了一个集中的回报：你现在能用纯线性代数的语言，去预测振动、阻尼、增长、衰减、振荡、混沌的<em>线性近似</em>所允许的全部行为。</p>
+
+<p>但故事远未结束。线性代数还有半本书要讲——内积、正交、最小二乘、奇异值分解——而那些工具是面向<em>"如何处理'不完美'数据"</em>的：当矩阵不是方阵、当方程组没有精确解、当数据有噪声时，怎么办？这是后续章节的主题。请把第 14-17 章的特征值思维放在脑子里——它会一直在背后支持着你。</p>
+
+<h3>例 6：耦合振子——两个相互作用的弹簧</h3>
+
+<p>把两个质量、两个弹簧、相互连接的系统作为最后一个例题，把"特征值看动力学"的范式推到稍微更高的维度上。</p>
+
+<p>考虑两个质量 \(m\)，分别由弹性常数 \(k\) 的弹簧固定到墙上，中间又有一根弹性常数 \(\kappa\) 的弹簧把它们连起来。位移 \(x_1, x_2\)。无阻尼时</p>
+
+<p>\[m\ddot x_1 = -k x_1 - \kappa(x_1 - x_2), \qquad m\ddot x_2 = -k x_2 - \kappa(x_2 - x_1).\]</p>
+
+<p>令 \(\mathbf{x} = (x_1, x_2)^T\)，则 \(\ddot{\mathbf{x}} = -\frac{1}{m} K \mathbf{x}\)，其中</p>
+
+<p>\[K = \begin{pmatrix} k + \kappa & -\kappa \\ -\kappa & k + \kappa \end{pmatrix}.\]</p>
+
+<p>这是一个对称矩阵，特征值好算：\(\det(K - \mu I) = (k + \kappa - \mu)^2 - \kappa^2 = 0\)，得 \(k + \kappa - \mu = \pm \kappa\)，即 \(\mu_1 = k\)、\(\mu_2 = k + 2\kappa\)。</p>
+
+<p>对 \(\mu_1 = k\)：\(K - kI = \begin{pmatrix} \kappa & -\kappa \\ -\kappa & \kappa \end{pmatrix}\)，特征向量 \(\mathbf{v}_1 = \begin{pmatrix} 1 \\ 1 \end{pmatrix}\)（同向）。</p>
+
+<p>对 \(\mu_2 = k + 2\kappa\)：\(K - (k + 2\kappa)I = \begin{pmatrix} -\kappa & -\kappa \\ -\kappa & -\kappa \end{pmatrix}\)，特征向量 \(\mathbf{v}_2 = \begin{pmatrix} 1 \\ -1 \end{pmatrix}\)（反向）。</p>
+
+<p>这两个方向叫<strong>正规模态</strong>（normal modes）。对应的方程是</p>
+
+<p>\[\ddot \xi_1 = -\frac{k}{m} \xi_1, \qquad \ddot \xi_2 = -\frac{k + 2\kappa}{m} \xi_2,\]</p>
+
+<p>这里 \(\xi_1, \xi_2\) 是 \(\mathbf{x}\) 在 \(\{\mathbf{v}_1, \mathbf{v}_2\}\) 基下的坐标。<em>方程解耦了！</em>每一个都是简单的简谐振子。</p>
+
+<ul>
+  <li><strong>模态 1（同向运动）：</strong>两个质量同步左右晃，频率 \(\omega_1 = \sqrt{k/m}\)。中间的弹簧不被拉伸，所以频率只与外侧弹簧 \(k\) 有关。</li>
+  <li><strong>模态 2（反向运动）：</strong>两个质量相向左右拍，频率 \(\omega_2 = \sqrt{(k + 2\kappa)/m}\)。中间弹簧被反复拉伸压缩，所以中间弹簧 \(\kappa\) 也参与决定频率。</li>
+</ul>
+
+<p>任何初值的运动，都可以分解为这两种模态的线性叠加。比如把右边那块拉一下、左边那块不动——这等于把两种模态各放一半，结果是<em>"拍现象"</em>：两块质量交替振荡，能量在它们之间来回传递，频率差为 \(\omega_2 - \omega_1\)。</p>
+
+<p>这一套<em>"耦合振子 → 特征值 → 正规模态"</em>的方法是物理学里最普适的工具之一。从声学（多自由度乐器）、晶格振动（声子）、分子振动（红外光谱）、量子力学（原子轨道杂化），到工程力学（桥梁、楼宇、航天器结构动力学）——背后的<em>线性代数</em>都是相同的：找一个对称矩阵的特征值与特征向量，每个特征向量对应一种"独立的振动模态"。</p>
+
+<p>所以本章末了的最大收获是这样：<em>第 14 章学的"特征值与特征向量"，到这里有了真正的物理意义</em>。它们不只是符号操作的对象，而是<em>系统中独立的振动方式</em>——是大自然内置的"基"。学会用这种基去看世界，是从"会算特征值"到"理解线性代数"的关键一步。</p>
+
+<h3>本章末小结</h3>
+
+<p>把本章核心提炼成几句口诀：</p>
+
+<ul>
+  <li><strong>解线性微分方程组 \(\dot{\mathbf{x}} = A \mathbf{x}\) 的钥匙是 \(\exp(At)\)。</strong></li>
+  <li><strong>\(\exp(At)\) 在 \(A\) 可对角化时等于 \(P \exp(Dt) P^{-1}\)，其中 \(\exp(Dt)\) 逐元素 \(e^{\lambda_i t}\)。</strong></li>
+  <li><strong>解的形式是 \(\mathbf{x}(t) = \sum c_i e^{\lambda_i t} \mathbf{v}_i\)——\(n\) 个解耦的标量指数函数。</strong></li>
+  <li><strong>实部决定衰减/增长；虚部决定振荡频率。</strong></li>
+  <li><strong>相图按特征值类型分类：结点、鞍点、螺旋、中心。</strong></li>
+  <li><strong>非线性系统在平衡点附近可线性化，再用本章的工具分析局部稳定性。</strong></li>
+</ul>
+
+<p>这些原则在物理、工程、生物、经济、机器学习里反复出现。你现在能<em>看一个动力系统就大致预测它的行为</em>——只需算出系数矩阵的特征值。这是工程师必备的"线性代数直觉"。</p>
+
+<p>第 14-17 章合起来构成本书的"中段山顶"。前面 13 章为它做了所有铺垫；后面的章节会把它向<em>"如何处理非方阵和非完美数据"</em> 那个方向继续推广（内积、正交、奇异值分解）。但中间这块"特征值与对角化"的山顶，是任何<em>系统化</em>线性代数体系的核心，你已经爬上来了。</p>
+
+<h3>本章末速记表</h3>
+
+<table>
+  <thead><tr><th>问题</th><th>线性代数答案</th></tr></thead>
+  <tbody>
+    <tr><td>怎么解 \(\dot{\mathbf{x}} = A\mathbf{x}\)？</td><td>\(\mathbf{x}(t) = \exp(At) \mathbf{x}_0 = \sum c_i e^{\lambda_i t} \mathbf{v}_i\)</td></tr>
+    <tr><td>怎么算 \(\exp(A)\)？</td><td>对角化 \(A\) 后取 \(\exp(D)\) 逐元素</td></tr>
+    <tr><td>系统稳定吗？</td><td>所有特征值实部 \(< 0\)（赫尔维茨判据）</td></tr>
+    <tr><td>系统会振荡吗？</td><td>有<em>非零虚部</em>的特征值 \(\Rightarrow\) 振荡</td></tr>
+    <tr><td>振荡频率多少？</td><td>特征值的虚部 \(b\) 给角频率，周期 \(2\pi/b\)</td></tr>
+    <tr><td>衰减/增长率多少？</td><td>特征值的实部 \(a\) 给指数率（按 \(e^{at}\)）</td></tr>
+    <tr><td>相图是什么形状？</td><td>查 17.7 节的诊断表：结点/鞍/螺旋/中心</td></tr>
+  </tbody>
+</table>
+
+<p>这一切的共同语言是<em>特征值</em>。掌握"看特征值识系统"的本能后，你就能在工程、物理、生物的任何线性系统问题前保持冷静——把矩阵的特征分解算出来，剩下的几乎是机械工作。</p>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 复特征值与旋转</a><a href="ch18.html">下一章 · 第 18 章 内积与正交 →</a></nav>
+
+</main>
+</body>
+</html>

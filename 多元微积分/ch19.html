@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 向量场 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 换元法与雅可比行列式</a><a href="ch20.html">下一章 · 第 20 章 曲线积分 →</a></nav>
+<h1 id="ch19">第 19 章 向量场</h1>
+
+<p>在本书走到这一页之前，我们手里"被积"和"被求导"的对象一直只有一种身份——<strong>标量函数</strong>。你给它一个点，它还你一个数。这一类函数已经撑起了温度场、密度场、势能场、面积、体积、概率密度等等许多事情，看起来好像够用了。</p>
+
+<p>但只要你稍微靠近一点物理与工程，你就会撞上一类完全不一样的东西。它不再是给一个点配一个数，而是<strong>给一个点配一个向量</strong>。把手伸到河里，每一处的水分子都有它自己的速度——大小和方向都各不相同；风从云层下吹过，每一处的空气都有它自己的流向；正电荷周围的电场，每一点都告诉你"如果在这里放一个测试电荷，它会被推向哪边、被推得多猛"；地球周围的引力场，每一点都告诉你"如果一只苹果从这里掉下，它会朝哪边被拉、被拉多狠"。</p>
+
+<p>这些场景——风速、流速、电场、引力——它们的"被研究对象"都不是一个数，而是<strong>一片箭头</strong>。在每一点的位置上插一根带方向、带长度的小箭头，让箭头的方向告诉你"这里指向哪边"，让箭头的长度告诉你"这里有多大"。这片"针林"就是<strong>向量场</strong>。本章我们先把向量场从头讲清楚——它是什么、长什么样、怎么从一些标量函数里"造"出向量场来——然后立刻给出两个度量它的关键微分量：<strong>散度</strong>（divergence）与<strong>旋度</strong>（curl）。前者度量"这里在涌出还是吸入"，后者度量"这里在打转还是不在打转"。第 20 章开始我们就要拿向量场沿着曲线去积分，第 22 章则把这一切串成"格林定理"，再往后还要走到斯托克斯与高斯。但所有这些故事的主角，都是从这一章登场的。</p>
+
+<h2 id="sec19-1">19.1 向量场是什么</h2>
+
+<p>形式上的定义很短。一个<strong>二维向量场</strong>是一个把平面上的点 \((x, y)\) 映成 \(\mathbb{R}^2\) 中某个向量的函数：</p>
+
+<p>\[\mathbf{F}(x, y) = \langle P(x, y),\ Q(x, y)\rangle.\]</p>
+
+<p>这里 \(P\) 与 \(Q\) 是两个标量函数，分别给出向量场在 \((x, y)\) 处的横分量和纵分量。一个<strong>三维向量场</strong>同理：</p>
+
+<p>\[\mathbf{F}(x, y, z) = \langle P(x, y, z),\ Q(x, y, z),\ R(x, y, z)\rangle.\]</p>
+
+<p>定义虽短，但它的几何想象远比公式重要。请你这样在脑子里画它：在每一个点 \((x, y)\) 处，立一根尾巴扎在该点的小箭头，箭头的方向是 \(\mathbf{F}(x, y)\) 的方向，箭头的长度（按某个统一比例）是 \(|\mathbf{F}(x, y)|\)。当你把这种箭头画满整片平面时，你看到的就是一片"针林"——有的地方箭头都朝外、像太阳光一样发散；有的地方箭头都绕着一个中心打转、像一个洗手槽里排水时的漩涡；有的地方箭头一致朝右、像匀速吹过的风。<strong>向量场就是这片针林。</strong></p>
+
+<p>三维情形想象起来更费劲，但意思是一样的：把空间分成密密麻麻的格子，每个格子的中心插一根小箭头。打开一台烟雾发生器再打开一台风扇，你看到的烟雾轨迹就是被三维向量场推着走的图像。</p>
+
+<p>需要提醒你两个常见混淆。第一，<strong>向量场不是向量值函数沿一条曲线参数化</strong>那种东西——后者的输入是一个标量 \(t\)，输出是一个向量；而向量场的输入是空间里的一个点，输出是一个向量。两者的图像差异很大：参数化曲线画出来是一条线，而向量场画出来是满天的箭头。第二，<strong>向量场的方向不是它"流向哪一个点"</strong>，而是"如果你恰好站在这一点，你会被推向哪个方向"。当你跟随风而走时，你的轨迹会沿着每一处的风方向不断改向——这种"被向量场牵着走"的轨迹叫做向量场的<em>流线</em>，但流线本身并不是向量场，向量场是布满整个空间的箭头本身。</p>
+
+<h2 id="sec19-2">19.2 几个反复出现的例子</h2>
+
+<p>下面给四个会反复出现的向量场。请你在每一个上都花一分钟在脑子里"画一画"它的针林——这是你建立向量场直觉的关键。</p>
+
+<p>先看<strong>径向场</strong> \(\mathbf{F}(x, y) = \langle x, y\rangle\)。在点 \((x, y)\) 处，向量场的值就是该点的位置向量本身——也就是一根从原点指向 \((x, y)\)、再把同样的箭头平移到 \((x, y)\) 这里的针。把这种针画满整片平面，你看到的图像是：所有的针都从原点呈放射状向外射出，离原点越远的位置，针就越长（因为模 \(|\mathbf{F}| = \sqrt{x^2 + y^2}\) 就是到原点的距离）。物理上这像一颗正点电荷在原点产生的电场（不算单位）：每一处的电场都背着原点向外，且远离原点时迅速变弱（实际电场是 \(1/r^2\) 衰减，和这里的"\(r\)"不一样，但方向一致）。</p>
+
+<p>再看<strong>旋转场</strong> \(\mathbf{F}(x, y) = \langle -y, x\rangle\)。在点 \((x, y)\) 处的箭头是 \(\langle -y, x\rangle\)——这恰好是把位置向量 \(\langle x, y\rangle\) 逆时针转 \(90^\circ\) 得到的向量。所以画出来的图像是：所有的箭头都垂直于该点的"半径"，并且都按逆时针方向打转。模 \(|\mathbf{F}| = \sqrt{x^2 + y^2}\) 仍是到原点的距离，所以离原点越远的位置箭头越长。物理上这正是一个匀角速度旋转的圆盘表面的速度场——想象一台旋转的转盘，盘面上离中心越远的点动得越快、方向永远沿着切线。</p>
+
+<p><strong>常向量场</strong> \(\mathbf{F}(x, y) = \langle 1, 0\rangle\)。在每一点处的箭头都是同一个：长度为 \(1\)，朝向正 \(x\) 方向。这是一片整齐划一的箭头海洋，对应物理上的均匀流——比如一段稳态的层流水道里水面的速度场，或者地面上一阵均匀的风。</p>
+
+<p><strong>梯度场</strong>。给定一个标量函数 \(f(x, y)\)（或 \(f(x, y, z)\)），它的梯度</p>
+
+<p>\[\nabla f = \left\langle \frac{\partial f}{\partial x},\ \frac{\partial f}{\partial y}\right\rangle\]</p>
+
+<p>本身就是一个向量场。例如取 \(f(x, y) = x^2 + y^2\)，则 \(\nabla f = \langle 2x, 2y\rangle\)，这就是把上面那个"径向场"放大两倍。物理上：如果 \(f\) 是地形的高度，则 \(\nabla f\) 在每一点指向"上坡最陡的方向"，长度等于"那一处的最陡坡度"。如果 \(f\) 是温度，则 \(-\nabla f\)（注意负号）在每一点指向"温度下降最快的方向"，热量就沿着这个方向流。</p>
+
+<p>梯度场是向量场中最特别的一类——以至于第 21 章会专门为它起一个名字"<strong>保守场</strong>"。一个核心问题是：是不是任意向量场都长得像某个 \(f\) 的梯度？答案是<em>不</em>。比如旋转场 \(\langle -y, x\rangle\) 就<em>不</em>是任何 \(f\) 的梯度——以下小节定义的"旋度"会立刻揭示这一点。判别"是不是梯度场"，是后面整整三章的主线。</p>
+
+<p>顺手记一个有用的物理画法：你可以先画 \(f\) 的<em>等高线图</em>，再把梯度场叠在上面——梯度场总是<strong>垂直于等高线</strong>、并且<strong>从矮指向高</strong>。这一条小性质对你脑补"向量场和它的势函数"两边的图像非常有用。</p>
+
+<h2 id="sec19-3">19.3 散度——这里在涌出还是吸入</h2>
+
+<p>给一个向量场，最自然的两个微分量分别度量两件不同的事：在这一点，向量场<em>整体上</em>是不是在朝外散开（或朝内汇聚）？以及，它<em>局部</em>是不是在打转？前者叫散度，后者叫旋度。我们先讲散度，再讲旋度。</p>
+
+<p>对二维向量场 \(\mathbf{F} = \langle P, Q\rangle\) 与三维向量场 \(\mathbf{F} = \langle P, Q, R\rangle\)，<strong>散度</strong>定义为</p>
+
+<p>\[\boxed{\operatorname{div}\mathbf{F} = \nabla \cdot \mathbf{F} = \frac{\partial P}{\partial x} + \frac{\partial Q}{\partial y} + \frac{\partial R}{\partial z}.}\]</p>
+
+<p>（二维情形里就只取前两项。）注意这是一个<em>标量</em>——输入向量场，输出标量场。记号 \(\nabla \cdot\) 把梯度算子 \(\nabla = \langle \partial_x, \partial_y, \partial_z\rangle\) 当成一个"形式上的向量"，再与 \(\mathbf{F}\) 做点积。这种"算子向量做点积"的写法只是一种助记，但它把"散度长得像点积"这件事讲得明明白白。</p>
+
+<p>散度的物理含义最适合放到流体里去想。把 \(\mathbf{F}\) 当作流体的速度场，把空间里的某一点 \(P_0\) 周围画一个很小很小的封闭盒子。<strong>散度 \(\nabla \cdot \mathbf{F}(P_0)\) 就是单位体积单位时间从这个小盒子里净流出去的流体量</strong>。</p>
+
+<p>解释一下"净流出去"：流体从小盒子的一面流入、另一面流出。如果流入和流出恰好相等，盒子里没有"凭空多出来"或"凭空消失掉"的流体，散度为零。如果流出比流入多，盒子里像有一个隐形的小水龙头在源源不断地"吐出"流体——这一点就是<em>源</em>，散度为正。如果流入比流出多，盒子像一个隐形的小排水口在不断"吞掉"流体——这一点就是<em>汇</em>，散度为负。所以散度也叫"<strong>源/汇密度</strong>"。</p>
+
+<p>看几个例子。径向场 \(\mathbf{F} = \langle x, y\rangle\) 的散度是 \(\partial_x x + \partial_y y = 1 + 1 = 2\)，处处为正——这和图像吻合，因为径向场在每一点都"朝外散开"，所以处处是源。常向量场 \(\mathbf{F} = \langle 1, 0\rangle\) 的散度是 \(0\)——也对，因为流体只是均匀地从左向右流过，每一个小盒子流入多少就流出多少，没有源也没有汇。旋转场 \(\mathbf{F} = \langle -y, x\rangle\) 的散度也是 \(0\)——同样合理，因为旋转场只是绕着原点转圈，每个小盒子被流体"切过"，没有积累也没有亏空。</p>
+
+<p>再看一个不平凡的：\(\mathbf{F} = \langle x^2, -2xy\rangle\)。散度是 \(\partial_x(x^2) + \partial_y(-2xy) = 2x - 2x = 0\)。所以这个看起来挺奇怪的向量场是"<em>无源无汇</em>"的（也叫<em>无散</em>或<em>不可压缩</em>）。物理上，理想的不可压缩流体（如水）的速度场总是无散的，因为水不能凭空出现也不能凭空消失。</p>
+
+<p>反过来一个有源的例子：\(\mathbf{F} = \langle x^2, y^2, z^2\rangle\)。散度是 \(2x + 2y + 2z\)，在第一卦限处处为正（强源），在第三卦限处处为负（强汇），其余则正负混合。这个场不对应任何真实流体，但作为练习它把"散度有正有负"这件事说得很清楚。</p>
+
+<p>散度的图像还可以这样看："如果向量场的箭头在某点附近<em>整体上越来越长</em>，那这点是源；如果整体上越来越短，那这点是汇。"这条粗略的视觉规律不能算定理，但当你只能看图猜散度时它非常管用。</p>
+
+<h2 id="sec19-4">19.4 旋度——这里在打转还是不在打转</h2>
+
+<p>第二个微分量是<strong>旋度</strong>。三维情形是一个向量，定义为</p>
+
+<p>\[\boxed{\operatorname{curl}\mathbf{F} = \nabla \times \mathbf{F} = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ \dfrac{\partial}{\partial x} & \dfrac{\partial}{\partial y} & \dfrac{\partial}{\partial z} \\ P & Q & R\end{vmatrix}.}\]</p>
+
+<p>展开行列式得到</p>
+
+<p>\[\nabla \times \mathbf{F} = \left\langle \frac{\partial R}{\partial y} - \frac{\partial Q}{\partial z},\ \frac{\partial P}{\partial z} - \frac{\partial R}{\partial x},\ \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}\right\rangle.\]</p>
+
+<p>注意旋度是一个<em>向量</em>——输入向量场，输出向量场。记号 \(\nabla \times\) 把 \(\nabla\) 当作形式上的向量再与 \(\mathbf{F}\) 做叉积；和散度的"形式点积"是一对。</p>
+
+<p>物理含义最经典的图像是<strong>水中的小桨轮</strong>。把 \(\mathbf{F}\) 当成流体的速度场，在空间某一点 \(P_0\) 处放一个微小的轻质桨轮（想象一个十字形的小风车，转轴指向某个方向）。流体推得桨轮转动，转动的方向与转动的快慢就分别由 \(\operatorname{curl}\mathbf{F}(P_0)\) 的方向与大小给出：</p>
+
+<ul>
+<li>桨轮的转轴沿 \(\operatorname{curl}\mathbf{F}\) 方向（按右手定则：拇指指向 \(\operatorname{curl}\mathbf{F}\)，四指卷曲方向就是桨轮转动方向）；</li>
+<li>桨轮的角速度（粗略地）正比于 \(|\operatorname{curl}\mathbf{F}|\)。</li>
+</ul>
+
+<p>所以 <strong>旋度度量"局部旋转倾向"</strong>。注意"局部"这两个字——它说的不是大尺度上向量场画出来的图案是不是绕着圆心打转，而是<em>极小尺度上</em>的小桨轮会不会旋转。这两件事不是一回事：稍后会有一个反例展现出"看起来在打转、但旋度处处为零"的向量场。</p>
+
+<p>看几个例子。常向量场 \(\mathbf{F} = \langle 1, 0, 0\rangle\) 的旋度是 \(\mathbf{0}\)——合理，每一处的小桨轮被均匀的"风"推着，左右两边受力相等，不会转。旋转场 \(\mathbf{F} = \langle -y, x, 0\rangle\)：用公式算 \(\partial_x x - \partial_y(-y) = 1 - (-1) = 2\)，所以 \(\operatorname{curl}\mathbf{F} = \langle 0, 0, 2\rangle\)。意思是：在<em>任何</em>一点，把一个小桨轮转轴朝 \(z\) 正方向放下去，它都会以单位时间 \(2\) 的速率（按右手定则的方向）转——这正合"匀角速度旋转场"的本来意思（角速度为 \(1\)，旋度为 \(2\) 倍角速度，这是一个标准结论）。</p>
+
+<p>再看径向场 \(\mathbf{F} = \langle x, y, 0\rangle\)：每个分量只对自己那一变量有依赖，所以所有交叉偏导都是零，\(\operatorname{curl}\mathbf{F} = \mathbf{0}\)。和图像一致——径向场只朝外发散，没有任何"打转"成分，小桨轮被左右拉得一样大，纹丝不动。</p>
+
+<p>计算练习：取 \(\mathbf{F} = \langle xy,\ y^2 z,\ x z^2\rangle\)。散度是</p>
+
+<p>\[\operatorname{div}\mathbf{F} = \partial_x(xy) + \partial_y(y^2 z) + \partial_z(xz^2) = y + 2yz + 2xz.\]</p>
+
+<p>旋度按行列式展开：</p>
+
+<p>\[\operatorname{curl}\mathbf{F} = \langle \partial_y(xz^2) - \partial_z(y^2 z),\ \partial_z(xy) - \partial_x(xz^2),\ \partial_x(y^2 z) - \partial_y(xy)\rangle = \langle -y^2,\ -z^2,\ -x\rangle.\]</p>
+
+<p>再来一个：\(\mathbf{F} = \langle yz, xz, xy\rangle\)。散度是 \(\partial_x(yz) + \partial_y(xz) + \partial_z(xy) = 0 + 0 + 0 = 0\)。旋度：</p>
+
+<p>\[\operatorname{curl}\mathbf{F} = \langle \partial_y(xy) - \partial_z(xz),\ \partial_z(yz) - \partial_x(xy),\ \partial_x(xz) - \partial_y(yz)\rangle = \langle x - x,\ y - y,\ z - z\rangle = \mathbf{0}.\]</p>
+
+<p>所以这个向量场既无源无汇又"无旋"。其实它就是 \(f = xyz\) 的梯度场——稍后我们会看到，凡是梯度场的旋度都是零。</p>
+
+<p>二维情形里旋度怎么办？把二维向量场 \(\mathbf{F} = \langle P(x, y), Q(x, y)\rangle\) 看成三维场 \(\langle P, Q, 0\rangle\)（即让 \(z\)-分量为零、且 \(P, Q\) 都不依赖 \(z\)），代入旋度公式得到</p>
+
+<p>\[\nabla \times \mathbf{F} = \left\langle 0,\ 0,\ \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}\right\rangle.\]</p>
+
+<p>所以二维情形的"旋度"实际上是一个垂直于平面的向量，方向永远沿 \(z\) 轴。我们通常就把这个唯一的非零分量当作一个标量来看，并把它简记为</p>
+
+<p>\[\operatorname{curl}_{2D}\mathbf{F} = \frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}.\]</p>
+
+<p>这一标量在平面上点点处都有定义，它就是"<em>把小桨轮平放在 \(xy\) 平面上、转轴朝 \(z\) 正方向</em>"时的旋转速率（带正负号，正表示逆时针，负表示顺时针）。第 22 章里格林定理的"环量形式"中出现的那个被积函数 \(Q_x - P_y\) 就是它。</p>
+
+<h2 id="sec19-5">19.5 两条恒等式：div(curl) = 0 与 curl(grad) = 0</h2>
+
+<p>散度与旋度之间存在两条优美又重要的恒等式：</p>
+
+<p>\[\boxed{\operatorname{div}(\operatorname{curl}\mathbf{F}) = 0,\qquad \operatorname{curl}(\nabla f) = \mathbf{0}.}\]</p>
+
+<p>第一条说：<em>任意</em>向量场 \(\mathbf{F}\) 的旋度的散度恒为零。第二条说：<em>任意</em>标量函数 \(f\) 的梯度的旋度恒为零向量。</p>
+
+<p>两条恒等式都可以由"<strong>混合偏导对称性</strong>"——即第 7 章里的克莱罗定理 \(f_{xy} = f_{yx}\)——直接验证。我们快速演示第二条；第一条留给你自己照同样的套路验证。</p>
+
+<p>令 \(\mathbf{F} = \nabla f = \langle f_x, f_y, f_z\rangle\)，则</p>
+
+<p>\[\operatorname{curl}(\nabla f) = \langle (f_z)_y - (f_y)_z,\ (f_x)_z - (f_z)_x,\ (f_y)_x - (f_x)_y\rangle.\]</p>
+
+<p>由克莱罗定理 \((f_z)_y = (f_y)_z\) 等等，三个分量都是零，所以 \(\operatorname{curl}(\nabla f) = \mathbf{0}\)。</p>
+
+<p>这两条恒等式不是花哨的代数小把戏，它们将在第 21 章里担当主角。第二条直接告诉你：<strong>梯度场的旋度永远为零</strong>。所以如果一个向量场 \(\mathbf{F}\) 的旋度<em>不</em>为零，它就<em>不可能</em>是任何 \(f\) 的梯度。换句话说：旋度为零是一个向量场可能"长成梯度"的<em>必要条件</em>。第 21 章的核心问题就是反过来问：旋度为零是不是<em>充分</em>的？答案在大多数情况下是"是"，但有一个臭名昭著的反例（角度场），那是因为定义域有"洞"——这条故事我们留到 21.4 节细讲。</p>
+
+<p>第一条恒等式 \(\operatorname{div}(\operatorname{curl}\mathbf{F}) = 0\) 也很关键，将在第 26 章高斯（散度）定理与斯托克斯定理的协调关系里反复用到。物理上它的含义是：旋度场是无散的——不管原向量场是什么样，把它"打转的部分"提取出来后，新的向量场不会有源也不会有汇。</p>
+
+<p>下一章我们就把向量场拿去沿曲线积分。</p>
+
+<hr>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 换元法与雅可比行列式</a><a href="ch20.html">下一章 · 第 20 章 曲线积分 →</a></nav>
+
+</main>
+</body>
+</html>

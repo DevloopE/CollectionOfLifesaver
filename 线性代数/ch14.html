@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 14 章 特征值与特征向量 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 行列式</a><a href="ch15.html">下一章 · 第 15 章 对角化 →</a></nav>
+<h1 id="ch14">第 14 章 特征值与特征向量</h1>
+
+<p>到目前为止，我们看待矩阵的方式一直是"它把一个向量送到另一个向量"。给一个 \(n \times n\) 的方阵 \(A\)，输入 \(\mathbf{x}\)，输出 \(A\mathbf{x}\)。在第 11 章里我们已经看到，从几何上讲，这就是一种<strong>线性变换</strong>：它会把整个空间拉伸、旋转、压扁、剪切。一般来说，输入向量与输出向量之间的关系是一团乱麻——不同方向上的向量会被以不同的方式拉成不同的方向。</p>
+
+<p>现在我们要问一个看似简单、实则改变一切的问题：<em>有没有那么一些特别的方向，被 \(A\) 作用以后方向不变，只是变长或变短？</em>如果有的话，它们是哪些方向？这一章就是这个问题的答案。这些"被矩阵保持方向"的特殊向量叫作 \(A\) 的<strong>特征向量</strong>，它们被拉伸的倍数叫<strong>特征值</strong>。本章会做以下几件事：</p>
+
+<ul>
+  <li>把"被保持方向"这件事翻译成 \(A\mathbf{v} = \lambda \mathbf{v}\) 这一行公式；</li>
+  <li>用旋转、反射、投影、缩放四种几何例子培养你对特征值/特征向量的直觉；</li>
+  <li>引出特征多项式 \(\det(A - \lambda I) = 0\) 作为求特征值的标准工具；</li>
+  <li>给出"先求特征值、再求特征向量"的标准流程，并演练大量 \(2\times2\) 与 \(3\times3\) 例题；</li>
+  <li>讨论特征值的两条速记性质：行列式 = 特征值之积，迹 = 特征值之和；</li>
+  <li>区分代数重数与几何重数，并展示它们何时不相等；</li>
+  <li>证明：不同特征值对应的特征向量必定线性无关。</li>
+</ul>
+
+<p>这些事情构成下两章——对角化和复特征值——的全部地基。请慢慢读，把每一道例题都自己动手做一遍。</p>
+
+<p>另外说一句"为什么这件事重要"。如果只把矩阵看作一堆数字，特征值看上去就是一种例行的代数计算。但实际上，特征值是矩阵<em>身份</em>的一部分——它在<em>任何相似变换下都保持不变</em>。两个看起来完全不同的矩阵，如果有相同的特征值（且每个的代数与几何重数一致），它们就是<em>同一个</em>线性变换在不同基下的不同长相。所以特征值告诉你"这个变换<em>到底</em>是什么"，把表面差异剥掉之后剩下的<em>本质</em>。我们后面整本书的工作——对角化、奇异值分解、谱定理、二次型——都是在以不同的方式回答同一个问题：把矩阵的本质暴露出来。</p>
+
+<h2 id="sec14-1">14.1 直觉：寻找"被矩阵保持方向"的向量</h2>
+
+<p>取一张白纸，画上一个普通的二维向量 \(\mathbf{x}\)。让 \(A\) 是某个 \(2\times 2\) 矩阵。你算 \(A\mathbf{x}\)，得到另一个向量 \(\mathbf{y}\)。一般情况下，\(\mathbf{y}\) 既不与 \(\mathbf{x}\) 同向，也不与它反向——它就是从 \(\mathbf{x}\) 出发被扯到了某个新的位置。</p>
+
+<p>但如果运气好，对某些特殊的 \(\mathbf{x}\)，\(A\mathbf{x}\) 恰好落在 \(\mathbf{x}\) 所确定的那条直线上，只是被拉长或缩短了一些。这种情况下我们可以写</p>
+
+<p>\[A\mathbf{x} = \lambda \mathbf{x},\]</p>
+
+<p>这里 \(\lambda\) 是一个标量，记录了"被拉伸了几倍"。\(\lambda = 2\) 表示同方向放大一倍；\(\lambda = -1\) 表示反向但等长；\(\lambda = 0\) 表示被压成原点；\(\lambda = 0.5\) 表示同方向缩短一半。换句话说，<strong>这条直线被 \(A\) 整体保持了下来</strong>——上面的每个向量被映射后还在这条直线上。</p>
+
+<p>这是一个非常局部的性质：它说的是"在<em>这一条</em>方向上，\(A\) 的作用退化成了一个简单的缩放"。哪怕在别的方向上 \(A\) 可能在做剧烈的旋转或剪切，只要我们把目光锁定在这条特殊的直线上，看到的就只是一个标量乘法。</p>
+
+<p>这种特殊的向量 \(\mathbf{x}\) 叫作 <strong>\(A\) 的特征向量</strong>，对应的标量 \(\lambda\) 叫 <strong>\(A\) 的特征值</strong>。两者一定要成对出现：特征向量本身没意义，必须问"它对应的特征值是几"；特征值本身也很难想象，必须问"它对应的方向是哪条"。一对 \((\lambda, \mathbf{v})\) 像锁与钥匙——锁是 \(A\) 这个矩阵，钥匙是这一对数据。</p>
+
+<p>注意：等式 \(A\mathbf{x} = \lambda\mathbf{x}\) 永远有一个无聊的解——令 \(\mathbf{x} = \mathbf{0}\)，那么不管 \(\lambda\) 是几等式都成立。这个解我们要排除掉，否则一切都没意义。所以特征向量的定义里必须明确写"\(\mathbf{v} \ne \mathbf{0}\)"。</p>
+
+<p>为什么我们要找这种向量？因为<em>一旦找到了它们</em>，矩阵的行为就被极大简化了。后面两章你会反复看到这个主题：用特征向量作基的话，矩阵在这组基下变成对角形式；对角矩阵想算几次幂就算几次幂；解微分方程组可以解耦成一个一个独立的标量方程。所有这些便利，都源自"在特征方向上，\(A\) 退化成了缩放"这一个简单的事实。</p>
+
+<p>有一个常见的误解需要预先纠正。<em>你可能会想：既然 \(A\mathbf{v} = \lambda \mathbf{v}\) 是对所有非零 \(\mathbf{v}\) 都希望成立的条件，那它就只能对很少几个 \(\mathbf{v}\) 成立——大多数向量不会被矩阵保持方向。</em>这话<strong>有一半对、一半错</strong>：错在前半句的逻辑（条件本来就只对极少数向量成立），对在后半句的结论（确实只有极少数方向）。事实上对于一个"普通的" \(n \times n\) 矩阵，特征向量通常恰好张成 \(n\) 条独立的方向——一个方向比一个方向多就不行（不可能 \(n+1\) 条独立方向，因为空间只有 \(n\) 维），少了又对应着前面提到的"几何重数失衡"。所以 \(n\) 条独立的特征方向是<em>典型情况</em>，正是这件事让对角化普遍可行。</p>
+
+<p>另一个值得指出的事：特征向量与特征值<em>不依赖于坐标系</em>。如果你换一组基，\(A\) 的矩阵表示会变成 \(P^{-1} A P\)，但特征值不变（你可以自己代入定义验证）；特征向量当然会按基变换的方式重新表达。这条"基无关性"是特征值之所以能成为矩阵<em>内在量</em>的根本理由。</p>
+
+<h2 id="sec14-2">14.2 几何例子：旋转、反射、投影、缩放</h2>
+
+<p>抽象地谈"被保持方向的向量"远不如看具体例子有效。下面四个 \(2 \times 2\) 矩阵把这件事画得清清楚楚。</p>
+
+<h3>例 1：缩放矩阵——所有方向都被保持</h3>
+
+<p>取 \(A = \begin{pmatrix} 3 & 0 \\ 0 & 3 \end{pmatrix}\)。对任意向量 \(\mathbf{x} = \begin{pmatrix} x_1 \\ x_2 \end{pmatrix}\)，</p>
+
+<p>\[A\mathbf{x} = \begin{pmatrix} 3x_1 \\ 3x_2 \end{pmatrix} = 3\mathbf{x}.\]</p>
+
+<p>每一个非零向量都满足 \(A\mathbf{x} = 3\mathbf{x}\)，所以每一个非零方向都是特征向量，对应的特征值都是 \(3\)。这种"满空间都是特征向量"的现象只出现在<strong>标量乘以单位矩阵</strong>这种最对称的情形里。</p>
+
+<h3>例 2：对角矩阵——两个互相垂直的方向被保持</h3>
+
+<p>取 \(A = \begin{pmatrix} 2 & 0 \\ 0 & 5 \end{pmatrix}\)。对 \(\mathbf{e}_1 = \begin{pmatrix} 1 \\ 0 \end{pmatrix}\)，</p>
+
+<p>\[A\mathbf{e}_1 = \begin{pmatrix} 2 \\ 0 \end{pmatrix} = 2 \mathbf{e}_1.\]</p>
+
+<p>所以 \(\mathbf{e}_1\) 是特征向量，特征值是 \(2\)。同样地 \(A\mathbf{e}_2 = 5\mathbf{e}_2\)，所以 \(\mathbf{e}_2\) 是特征向量，特征值是 \(5\)。在这两个互相垂直的方向上，\(A\) 退化成了缩放（一个倍数 2，一个倍数 5）；其他方向都不是特征方向。</p>
+
+<h3>例 3：反射矩阵——一条线不变，另一条线反向</h3>
+
+<p>取 \(A = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}\)。它把任意向量关于 \(x\) 轴翻转。\(x\) 轴上的向量被作用后保持不动，所以 \(\mathbf{e}_1\) 是特征向量、特征值 \(\lambda = 1\)。\(y\) 轴上的向量被翻成相反方向、长度不变，所以 \(\mathbf{e}_2\) 是特征向量、特征值 \(\lambda = -1\)。</p>
+
+<p>更一般的反射也有类似的结构：关于一条过原点直线 \(\ell\) 的反射，\(\ell\) 方向上的向量保持不变（特征值 \(1\)），与 \(\ell\) 垂直方向的向量被反向（特征值 \(-1\)）。所以任意一个反射矩阵的特征值都是 \(\pm 1\)。</p>
+
+<h3>例 4：投影矩阵——一条线保持，另一条线被压扁</h3>
+
+<p>取 \(A = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}\)。它把任意向量正交投影到 \(x\) 轴上：\(\begin{pmatrix} x \\ y \end{pmatrix} \mapsto \begin{pmatrix} x \\ 0 \end{pmatrix}\)。\(x\) 轴上的向量被自己映回到自己（特征值 \(1\)）；\(y\) 轴上的向量被压成原点（特征值 \(0\)）。所以投影矩阵的特征值是 \(0\) 与 \(1\)。</p>
+
+<p>注意：特征值 \(0\) 不是禁忌——它只意味着这个特征方向被矩阵"压死了"。换句话说，零特征值对应的特征向量正是 \(A\) 的零空间里的向量（\(A\mathbf{v} = \mathbf{0}\)）。<strong>\(\lambda = 0\) 是特征值当且仅当 \(A\) 不可逆。</strong>这是一条值得记住的快捷判定。</p>
+
+<h3>例 5：旋转矩阵——没有任何实方向被保持</h3>
+
+<p>取 \(A = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}\)，这是一个把平面逆时针旋转 \(90°\) 的矩阵。直觉上想：哪一个方向旋转 \(90°\) 后还落在自己原本的直线上？<em>没有任何方向</em>。每个非零向量被旋转 \(90°\) 之后都落到一条全新的、与自己垂直的直线上。所以 \(A\) 在实数范围内<strong>没有特征向量</strong>。</p>
+
+<p>这听起来像是个坏消息——线性代数里居然有矩阵没有特征向量？等等，先别下结论。如果允许特征值是<em>复数</em>，故事就完全不一样了：\(A\) 的特征值是 \(\pm i\)，对应的特征向量也是复向量。第 16 章我们会专门把这件事讲清楚——在这一章我们暂时只看实数情况。</p>
+
+<h3>例 6：剪切矩阵——只有一条特征方向</h3>
+
+<p>取 \(A = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}\)。它把 \(\mathbf{e}_1\) 留在原地：\(A\mathbf{e}_1 = \mathbf{e}_1\)。但 \(A\mathbf{e}_2 = \begin{pmatrix} 1 \\ 1 \end{pmatrix}\)——这与 \(\mathbf{e}_2\) 不在同一直线上。事实上你会发现，<strong>整个 \(\mathbb{R}^2\) 里只有 \(x\) 轴这一条特征方向</strong>。这种"特征方向不够多"的情形非常重要，它在 14.8 节会变成"几何重数 < 代数重数"的核心反例。</p>
+
+<p>这六个例子合在一起告诉你：特征向量的"丰富程度"千差万别——可以铺满整个空间（缩放），可以恰好两条互相垂直（对角、反射、投影），可以只有一条（剪切），可以一条都没有（实数下的旋转）。剩下的整章就是把这些可能性系统化。</p>
+
+<p><strong>一个停下来想一想的小问题：</strong>看一下例 4 的投影矩阵 \(A = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}\)。它的特征值是 \(0\) 和 \(1\)，特征向量分别是 \(\mathbf{e}_2\) 和 \(\mathbf{e}_1\)。现在请你回答：什么矩阵的特征值是 \(\{0, 0\}\)（重数 \(2\) 个零）？答案是<em>零矩阵 \(0\)</em>——它把所有向量都送到原点。<em>所有非零向量</em>都满足 \(0\mathbf{v} = 0 \cdot \mathbf{v}\)，所以全是特征值 \(0\) 的特征向量。这是一个极端但合法的例子，提醒你"特征向量"不是稀奇古怪的对象，而是定义自然延伸到的极限情形。</p>
+
+<p>同样的，<em>什么矩阵的特征值是 \(\{1, 1\}\)（重数 \(2\) 个 \(1\)）？</em>答案不止一个：单位矩阵 \(I\) 满足，但剪切矩阵 \(\begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}\) 也满足（它的特征多项式是 \((1-\lambda)^2\)）。两者特征值完全相同，但<em>几何含义</em>差天差地——一个不动空间，一个剪切。所以光看特征值是不够的，还要看特征空间是不是"够大"。这条小观察是 14.8 节"代数重数 vs 几何重数"故事的种子。</p>
+
+<h2 id="sec14-3">14.3 形式定义</h2>
+
+<p>把上一节的画面拧紧成正式定义：</p>
+
+<p><strong>定义。</strong>设 \(A\) 是 \(n \times n\) 矩阵。如果存在一个非零向量 \(\mathbf{v} \in \mathbb{R}^n\)（或 \(\mathbb{C}^n\)）和一个标量 \(\lambda\)，使得</p>
+
+<p>\[\boxed{A\mathbf{v} = \lambda \mathbf{v}, \qquad \mathbf{v} \ne \mathbf{0}},\]</p>
+
+<p>那么 \(\mathbf{v}\) 称为 \(A\) 的<strong>特征向量</strong>（eigenvector），\(\lambda\) 称为 \(A\) 的<strong>特征值</strong>（eigenvalue），并且我们说 \(\mathbf{v}\) 与 \(\lambda\) <strong>对应</strong>。</p>
+
+<p>"\(\mathbf{v} \ne \mathbf{0}\)" 这条不能少——零向量满足 \(A\mathbf{0} = \lambda \mathbf{0}\) 对任何 \(\lambda\) 成立，所以如果不排除它，特征值就完全没有意义。但反过来，"\(\lambda = 0\)" 是允许的——它意味着 \(\mathbf{v}\) 被 \(A\) 压成了零。</p>
+
+<p>另外注意一件事：如果 \(\mathbf{v}\) 是特征值 \(\lambda\) 的特征向量，那么对任意非零标量 \(c\)，\(c\mathbf{v}\) 也是同一个特征值的特征向量——因为 \(A(c\mathbf{v}) = c A\mathbf{v} = c \lambda \mathbf{v} = \lambda (c\mathbf{v})\)。所以"特征向量"严格说不是一个唯一的向量，而是一整条直线上所有非零向量。我们经常给这一条直线一个名字：</p>
+
+<p><strong>定义。</strong>对每一个特征值 \(\lambda\)，集合</p>
+
+<p>\[E_\lambda = \{\mathbf{v} \in \mathbb{R}^n : A\mathbf{v} = \lambda \mathbf{v}\} = \{\mathbf{v} : (A - \lambda I)\mathbf{v} = \mathbf{0}\}\]</p>
+
+<p>叫作 <strong>\(\lambda\) 的特征空间</strong>（eigenspace）。它就是 \((A - \lambda I)\) 的零空间，所以一定是 \(\mathbb{R}^n\) 的一个子空间，必然包含零向量。<em>特征空间内除零外的全体向量，就是特征值 \(\lambda\) 的特征向量。</em></p>
+
+<p>把"\(\mathbf{v}\) 是特征向量"翻译为"\(\mathbf{v}\) 是某个特征空间里的非零元素"——这是一种更代数、更便于操作的视角，因为它把研究特征向量化简为研究子空间。</p>
+
+<h2 id="sec14-4">14.4 特征多项式：求特征值的关键方程</h2>
+
+<p>定义已经摆好，但下一个真正的问题是：<strong>给一个矩阵 \(A\)，怎么把它的特征值找出来？</strong>定义 \(A\mathbf{v} = \lambda \mathbf{v}\) 涉及两个未知量——\(\lambda\) 和 \(\mathbf{v}\)。一个标量、一个向量同时未知，没法直接解。我们需要先把 \(\lambda\) 单独抓出来。</p>
+
+<p>方法是这样。把 \(A\mathbf{v} = \lambda \mathbf{v}\) 移项到一边：</p>
+
+<p>\[A\mathbf{v} - \lambda \mathbf{v} = \mathbf{0}.\]</p>
+
+<p>提出公因子时小心：\(A\) 是矩阵、\(\lambda\) 是标量，不能直接合并。要先把 \(\lambda \mathbf{v}\) 写成 \(\lambda I \mathbf{v}\)（这里 \(I\) 是单位矩阵），现在两边都是矩阵作用在 \(\mathbf{v}\) 上：</p>
+
+<p>\[(A - \lambda I)\mathbf{v} = \mathbf{0}.\]</p>
+
+<p>这就是关键。我们要找的是<em>非零</em>的 \(\mathbf{v}\) 使得这个齐次方程组成立。回忆第 9 章的基本事实：齐次方程组 \(M\mathbf{v} = \mathbf{0}\) 有非零解当且仅当矩阵 \(M\) 不可逆，等价地当且仅当 \(\det M = 0\)。所以</p>
+
+<p>\[\boxed{\lambda \text{ 是 } A \text{ 的特征值} \iff \det(A - \lambda I) = 0.}\]</p>
+
+<p>这一条等价关系是这一章所有计算的基础。<em>请把这一行的逻辑链条记下来：\(A\mathbf{v} = \lambda \mathbf{v}\) ⟺ \((A - \lambda I)\mathbf{v} = \mathbf{0}\) 有非零解 ⟺ \(A - \lambda I\) 不可逆 ⟺ \(\det(A - \lambda I) = 0\)。</em>每一步都是前一步的等价改写，没有任何额外条件。</p>
+
+<p>等式 \(\det(A - \lambda I) = 0\) 有一个名字，叫 \(A\) 的<strong>特征方程</strong>（characteristic equation）。把左边那个表达式当作 \(\lambda\) 的函数，得到的多项式叫 \(A\) 的<strong>特征多项式</strong>，记作</p>
+
+<p>\[p_A(\lambda) = \det(A - \lambda I).\]</p>
+
+<p>对 \(n \times n\) 的矩阵，\(p_A(\lambda)\) 是一个关于 \(\lambda\) 的 \(n\) 次多项式。它的领导项是 \((-\lambda)^n\)，常数项是 \(\det A\)。所以</p>
+
+<p>\[p_A(\lambda) = (-\lambda)^n + \cdots + \det A.\]</p>
+
+<p>而 \(p_A(\lambda) = 0\) 的根（按重数算共有 \(n\) 个，可能复，可能重）就是 \(A\) 的全部特征值。</p>
+
+<p>看一个最小的例子。取 \(A = \begin{pmatrix} 4 & 1 \\ 2 & 3 \end{pmatrix}\)。则</p>
+
+<p>\[A - \lambda I = \begin{pmatrix} 4 - \lambda & 1 \\ 2 & 3 - \lambda \end{pmatrix},\]</p>
+
+<p>\[p_A(\lambda) = \det(A - \lambda I) = (4 - \lambda)(3 - \lambda) - 2 \cdot 1 = \lambda^2 - 7\lambda + 12 - 2 = \lambda^2 - 7\lambda + 10.\]</p>
+
+<p>解 \(\lambda^2 - 7\lambda + 10 = 0\) 得 \(\lambda = 2\) 和 \(\lambda = 5\)。这就是 \(A\) 的两个特征值。下一节我们再去找它们对应的特征向量。</p>
+
+<h2 id="sec14-5">14.5 标准做法：先求特征值，再求特征向量</h2>
+
+<p>从上一节出发，我们可以总结出一个机械的两步流程，几乎所有线性代数考试里的"求特征值与特征向量"题都按这个流程做。</p>
+
+<p><strong>流程（求 \(A\) 的全体特征值与特征向量）。</strong></p>
+
+<ol>
+  <li>写出 \(A - \lambda I\)，计算它的行列式得到特征多项式 \(p_A(\lambda)\)。</li>
+  <li>解方程 \(p_A(\lambda) = 0\)，得到所有特征值 \(\lambda_1, \lambda_2, \ldots\)（按重数列出）。</li>
+  <li>对每一个 \(\lambda_i\)：把它代回 \(A - \lambda_i I\)，求齐次方程组 \((A - \lambda_i I)\mathbf{v} = \mathbf{0}\) 的全部解。这些解（除零外）就是 \(\lambda_i\) 的特征向量；它们组成的子空间就是 \(\lambda_i\) 的特征空间。</li>
+</ol>
+
+<p>第 1 步、第 2 步是<em>纯多项式</em>计算，第 3 步是<em>纯齐次方程</em>计算——后者就是第 5 章里你已经做过几十遍的高斯消元。两件事都是熟练工。</p>
+
+<p>把上节的例子做完。\(A = \begin{pmatrix} 4 & 1 \\ 2 & 3 \end{pmatrix}\)，特征值是 \(\lambda_1 = 2, \lambda_2 = 5\)。</p>
+
+<p><strong>对 \(\lambda_1 = 2\)：</strong></p>
+
+<p>\[A - 2I = \begin{pmatrix} 2 & 1 \\ 2 & 1 \end{pmatrix}.\]</p>
+
+<p>第二行是第一行的复本，所以方程 \((A - 2I)\mathbf{v} = \mathbf{0}\) 简化为单条</p>
+
+<p>\[2v_1 + v_2 = 0 \implies v_2 = -2v_1.\]</p>
+
+<p>令 \(v_1 = 1\)，则 \(v_2 = -2\)。一个特征向量是 \(\mathbf{v}_1 = \begin{pmatrix} 1 \\ -2 \end{pmatrix}\)。整个特征空间是 \(\operatorname{span}\!\left\{\begin{pmatrix} 1 \\ -2 \end{pmatrix}\right\}\)，一条直线。</p>
+
+<p><strong>对 \(\lambda_2 = 5\)：</strong></p>
+
+<p>\[A - 5I = \begin{pmatrix} -1 & 1 \\ 2 & -2 \end{pmatrix}.\]</p>
+
+<p>第二行是第一行的 \(-2\) 倍，所以方程化为</p>
+
+<p>\[-v_1 + v_2 = 0 \implies v_2 = v_1.\]</p>
+
+<p>令 \(v_1 = 1\)，则 \(v_2 = 1\)。特征向量 \(\mathbf{v}_2 = \begin{pmatrix} 1 \\ 1 \end{pmatrix}\)。特征空间是 \(\operatorname{span}\!\left\{\begin{pmatrix} 1 \\ 1 \end{pmatrix}\right\}\)。</p>
+
+<p>检验一下结果。\(A \mathbf{v}_1 = \begin{pmatrix} 4 & 1 \\ 2 & 3 \end{pmatrix} \begin{pmatrix} 1 \\ -2 \end{pmatrix} = \begin{pmatrix} 4 - 2 \\ 2 - 6 \end{pmatrix} = \begin{pmatrix} 2 \\ -4 \end{pmatrix} = 2 \mathbf{v}_1\)。对了。同样 \(A\mathbf{v}_2 = \begin{pmatrix} 5 \\ 5 \end{pmatrix} = 5\mathbf{v}_2\)，对了。</p>
+
+<p>两步法的精髓就是这样——别想跳步，老老实实按顺序做。下一节我们多做几道题把它练熟。</p>
+
+<h2 id="sec14-6">14.6 大量例题：\(2 \times 2\) 与 \(3 \times 3\)</h2>
+
+<p>这一节把 14.5 的流程跑过六道题，每一道都换一种结构，让你逐步习惯各种"形状"的特征问题。请每道都自己先做一遍再看解答。</p>
+
+<p><strong>例 1：对称矩阵。</strong>求 \(A = \begin{pmatrix} 3 & 1 \\ 1 & 3 \end{pmatrix}\) 的特征值与特征向量。</p>
+
+<p>\[\det(A - \lambda I) = \det\begin{pmatrix} 3 - \lambda & 1 \\ 1 & 3 - \lambda \end{pmatrix} = (3 - \lambda)^2 - 1.\]</p>
+
+<p>展开 \((3-\lambda)^2 - 1 = 0\) 得 \((3-\lambda)^2 = 1\)，所以 \(3 - \lambda = \pm 1\)，特征值 \(\lambda = 2, 4\)。</p>
+
+<p>对 \(\lambda = 2\)：\(A - 2I = \begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}\)，方程 \(v_1 + v_2 = 0\)，特征向量 \(\begin{pmatrix} 1 \\ -1 \end{pmatrix}\)。</p>
+
+<p>对 \(\lambda = 4\)：\(A - 4I = \begin{pmatrix} -1 & 1 \\ 1 & -1 \end{pmatrix}\)，方程 \(v_1 = v_2\)，特征向量 \(\begin{pmatrix} 1 \\ 1 \end{pmatrix}\)。</p>
+
+<p>请注意一个无心的副产品：这两个特征向量正好<em>互相正交</em>（点积 \(1\cdot 1 + (-1)\cdot 1 = 0\)）。这不是巧合——对称矩阵的不同特征向量总是正交的。这件事叫"谱定理"，将在第 22 章详谈。</p>
+
+<p><strong>例 2：上三角矩阵。</strong>求 \(A = \begin{pmatrix} 4 & 7 \\ 0 & -2 \end{pmatrix}\) 的特征值。</p>
+
+<p>\[\det(A - \lambda I) = (4 - \lambda)(-2 - \lambda) - 0 = (4 - \lambda)(-2 - \lambda).\]</p>
+
+<p>所以特征值是 \(\lambda = 4\) 与 \(\lambda = -2\)——<em>恰好就是对角线上的两个元素</em>。</p>
+
+<p>这不是偶然。对任意上三角（或下三角）矩阵 \(A\)，\(A - \lambda I\) 仍然是三角的，它的行列式等于对角线之积 \((a_{11} - \lambda)(a_{22} - \lambda) \cdots (a_{nn} - \lambda)\)。所以特征多项式直接读出，特征值就是对角元。这是一条值得记住的捷径。</p>
+
+<p><strong>例 3：剪切矩阵——重根。</strong>求 \(A = \begin{pmatrix} 2 & 1 \\ 0 & 2 \end{pmatrix}\) 的特征值与特征向量。</p>
+
+<p>用上一例的捷径，直接读出特征值是 \(\lambda = 2\)（出现两次）。</p>
+
+<p>对 \(\lambda = 2\)：\(A - 2I = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}\)。方程 \(v_2 = 0\)，所以解空间是 \(\operatorname{span}\!\left\{\begin{pmatrix} 1 \\ 0 \end{pmatrix}\right\}\)——只有一条直线。</p>
+
+<p>这就是 14.2 节那个剪切矩阵：特征值 \(\lambda = 2\) 出现两次（在多项式意义上），但对应的特征空间只有一维。这种"重数失衡"的现象我们会在 14.8 节正式命名。</p>
+
+<p><strong>例 4：旋转矩阵——无实特征值。</strong>求 \(A = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}\) 的特征值。</p>
+
+<p>\[\det(A - \lambda I) = \det\begin{pmatrix} -\lambda & -1 \\ 1 & -\lambda \end{pmatrix} = \lambda^2 + 1.\]</p>
+
+<p>方程 \(\lambda^2 + 1 = 0\) 在实数里无解；如果允许复数，则 \(\lambda = \pm i\)。这与几何直觉一致——\(90°\) 旋转在实数里没有特征方向。第 16 章会专门处理这种复特征值。</p>
+
+<p><strong>例 5：\(3 \times 3\) 对角矩阵。</strong>求 \(A = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 2 & 0 \\ 0 & 0 & 3 \end{pmatrix}\) 的特征值与特征向量。</p>
+
+<p>由"三角矩阵特征值即对角元"，特征值是 \(1, 2, 3\)。每个对应一条坐标轴：\(\mathbf{e}_1, \mathbf{e}_2, \mathbf{e}_3\)。这是最直接的对角化情形——三个特征向量已经互相正交、长度也已规范化。</p>
+
+<p><strong>例 6：\(3 \times 3\) 非平凡。</strong>求 \(A = \begin{pmatrix} 4 & -2 & 1 \\ 2 & 0 & 1 \\ 2 & -2 & 3 \end{pmatrix}\) 的特征值与特征向量。</p>
+
+<p>\[A - \lambda I = \begin{pmatrix} 4-\lambda & -2 & 1 \\ 2 & -\lambda & 1 \\ 2 & -2 & 3-\lambda \end{pmatrix}.\]</p>
+
+<p>沿第一行展开行列式：</p>
+
+<p>\[\det(A - \lambda I) = (4-\lambda)\det\begin{pmatrix} -\lambda & 1 \\ -2 & 3-\lambda \end{pmatrix} - (-2)\det\begin{pmatrix} 2 & 1 \\ 2 & 3-\lambda \end{pmatrix} + 1\cdot \det\begin{pmatrix} 2 & -\lambda \\ 2 & -2 \end{pmatrix}.\]</p>
+
+<p>逐个算：第一个子行列式 \(= -\lambda(3-\lambda) - (-2)(1) = -3\lambda + \lambda^2 + 2 = \lambda^2 - 3\lambda + 2\)；第二个 \(= 2(3-\lambda) - 2 = 4 - 2\lambda\)；第三个 \(= -4 + 2\lambda = 2\lambda - 4\)。代入：</p>
+
+<p>\[p_A(\lambda) = (4-\lambda)(\lambda^2 - 3\lambda + 2) + 2(4 - 2\lambda) + (2\lambda - 4).\]</p>
+
+<p>展开第一个乘积 \((4-\lambda)(\lambda^2 - 3\lambda + 2) = 4\lambda^2 - 12\lambda + 8 - \lambda^3 + 3\lambda^2 - 2\lambda = -\lambda^3 + 7\lambda^2 - 14\lambda + 8\)。再加上后面两项 \(8 - 4\lambda + 2\lambda - 4 = 4 - 2\lambda\)：</p>
+
+<p>\[p_A(\lambda) = -\lambda^3 + 7\lambda^2 - 16\lambda + 12.\]</p>
+
+<p>试根。代 \(\lambda = 1\)：\(-1 + 7 - 16 + 12 = 2 \ne 0\)。试 \(\lambda = 2\)：\(-8 + 28 - 32 + 12 = 0\)，对了！所以 \(\lambda = 2\) 是根，可以做综合除法把 \(p_A(\lambda)\) 分掉 \((\lambda - 2)\)。把 \(p_A\) 写成 \(-(\lambda^3 - 7\lambda^2 + 16\lambda - 12)\)，做除法 \(\lambda^3 - 7\lambda^2 + 16\lambda - 12 = (\lambda - 2)(\lambda^2 - 5\lambda + 6) = (\lambda-2)(\lambda-2)(\lambda-3)\)。所以特征值是 \(\lambda = 2\)（重根，二重）与 \(\lambda = 3\)（单根）。</p>
+
+<p>对 \(\lambda = 2\)：\(A - 2I = \begin{pmatrix} 2 & -2 & 1 \\ 2 & -2 & 1 \\ 2 & -2 & 1 \end{pmatrix}\)。三行完全相同，方程化为单条 \(2v_1 - 2v_2 + v_3 = 0\)，解空间是二维（自由变量两个）。取 \(v_2 = 1, v_3 = 0\) 得 \(v_1 = 1\)；取 \(v_2 = 0, v_3 = 2\) 得 \(v_1 = -1\)。两个线性无关的特征向量：\(\begin{pmatrix} 1 \\ 1 \\ 0 \end{pmatrix}, \begin{pmatrix} -1 \\ 0 \\ 2 \end{pmatrix}\)。所以 \(\lambda = 2\) 的特征空间是<em>二维</em>的。</p>
+
+<p>对 \(\lambda = 3\)：\(A - 3I = \begin{pmatrix} 1 & -2 & 1 \\ 2 & -3 & 1 \\ 2 & -2 & 0 \end{pmatrix}\)。做行变换：\(R_2 - 2R_1 \to R_2\) 给 \((0, 1, -1)\)，\(R_3 - 2R_1 \to R_3\) 给 \((0, 2, -2)\)，再 \(R_3 - 2R_2 \to R_3\) 给 \((0, 0, 0)\)。所以剩两条非平凡方程：\(v_1 - 2v_2 + v_3 = 0\) 与 \(v_2 - v_3 = 0\)。从第二条 \(v_2 = v_3\)，代入第一条 \(v_1 = 2v_2 - v_3 = v_2\)。取 \(v_2 = 1\) 得 \(\begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix}\)。</p>
+
+<p>所以这个 \(3 \times 3\) 矩阵有特征值 \(\lambda = 2\)（特征空间二维）和 \(\lambda = 3\)（特征空间一维），加起来正好凑够三个线性无关的特征向量。这种"凑够"的好运在第 15 章我们要专门讨论——它就是"可对角化"的同义词。</p>
+
+<p>把这道 \(3 \times 3\) 题再过一遍要点：<em>核心难点不在求特征值（可以试根法找），而在每个特征值出来后正确地从一个秩亏的方程组里读出全部独立特征向量</em>。当代数重数大于 \(1\) 时，对应的 \(A - \lambda I\) 必然有较大的零空间，需要找<em>多个</em>独立向量；很多人只找到一个就停了，错过了其他的。这里有个机械的小窍门：把 \(A - \lambda I\) 行简化后看自由变量的数量——自由变量数 = 特征空间维数 = 几何重数。这条简单观察让"几何重数"从抽象概念变成具体的高斯消元产物。</p>
+
+<h3>一道更典型的 \(3 \times 3\) 例题</h3>
+
+<p><strong>例 7：常见的"非典型"\(3 \times 3\)。</strong>求 \(A = \begin{pmatrix} 1 & -3 & 3 \\ 3 & -5 & 3 \\ 6 & -6 & 4 \end{pmatrix}\) 的全部特征值与特征向量。</p>
+
+<p>先用<em>迹和行列式</em>做一个粗略检查。\(\operatorname{tr} A = 1 - 5 + 4 = 0\)，所以三个特征值之和应该是 \(0\)；\(\det A\) 算一下（沿第一行）= \(1 \cdot ((-5)(4) - 3 \cdot (-6)) - (-3)(3 \cdot 4 - 3 \cdot 6) + 3(3 \cdot (-6) - (-5) \cdot 6) = 1(-20 + 18) + 3(12 - 18) + 3(-18 + 30) = -2 - 18 + 36 = 16\)。所以三个特征值之积应该是 \(16\)。</p>
+
+<p>现在算特征多项式。把 \(A - \lambda I\) 的行列式沿第一行展开（细节略，请你自己作为练习），最后整理得</p>
+
+<p>\[p_A(\lambda) = -\lambda^3 + 12\lambda + 16.\]</p>
+
+<p>试 \(\lambda = -2\)：\(8 - 24 + 16 = 0\) ✓。所以 \(\lambda = -2\) 是根。综合除法把 \(-\lambda^3 + 12\lambda + 16\) 除以 \(\lambda + 2\)，得 \(-(\lambda - 4)(\lambda + 2)^2\)。所以特征值是 \(\lambda = -2\)（二重）与 \(\lambda = 4\)（一重）。验证：\(-2 + (-2) + 4 = 0\) ✓；\((-2)(-2)(4) = 16\) ✓。两条速记性质都对得上。</p>
+
+<p>对 \(\lambda = -2\)：\(A + 2I = \begin{pmatrix} 3 & -3 & 3 \\ 3 & -3 & 3 \\ 6 & -6 & 6 \end{pmatrix}\)，三行成比例，化为单条 \(v_1 - v_2 + v_3 = 0\)。两个自由变量，特征空间二维。取 \(v_2 = 1, v_3 = 0\) 得 \((1, 1, 0)\)；取 \(v_2 = 0, v_3 = 1\) 得 \((-1, 0, 1)\)。</p>
+
+<p>对 \(\lambda = 4\)：\(A - 4I = \begin{pmatrix} -3 & -3 & 3 \\ 3 & -9 & 3 \\ 6 & -6 & 0 \end{pmatrix}\)。行简化（\(R_2 + R_1, R_3 + 2R_1\)）：\(\begin{pmatrix} -3 & -3 & 3 \\ 0 & -12 & 6 \\ 0 & -12 & 6 \end{pmatrix}\)，再消第三行得 \(\begin{pmatrix} -3 & -3 & 3 \\ 0 & -12 & 6 \\ 0 & 0 & 0 \end{pmatrix}\)。从第二行 \(-12 v_2 + 6 v_3 = 0\) 得 \(v_3 = 2 v_2\)；从第一行 \(-3 v_1 - 3 v_2 + 3 v_3 = 0\) 得 \(v_1 = v_3 - v_2 = v_2\)。取 \(v_2 = 1\) 得 \((1, 1, 2)\)。</p>
+
+<p>验证：\(A(1, 1, 2)^T = (1 - 3 + 6, 3 - 5 + 6, 6 - 6 + 8)^T = (4, 4, 8)^T = 4(1,1,2)^T\) ✓。一切正确。这个矩阵代数重数与几何重数都对得上，所以可对角化（下章主题）。</p>
+
+<h3>关于解题的几条建议</h3>
+
+<p>在结束这一节大量例题之前，把<em>实战中容易踩的坑</em>列一下：</p>
+
+<ol>
+  <li><strong>注意符号。</strong>\(\det(A - \lambda I)\) 与 \(\det(\lambda I - A)\) 差一个 \((-1)^n\) 倍，但<em>它们的根集合相同</em>。两种约定都常见，只要保持一致即可。</li>
+  <li><strong>试根法是 \(3 \times 3\) 题的通用入口。</strong>如果特征多项式没有明显的因式分解，试 \(\lambda = 0, \pm 1, \pm 2, \pm 3\)（可能的整数根）。如果矩阵元素都是小整数，根往往也是小整数。</li>
+  <li><strong>用迹和行列式自检。</strong>算完特征值后立刻验证两条速记性质（下一节会讲）——如果对不上，立刻回去检查。</li>
+  <li><strong>找特征向量时记得检查"零空间维数"。</strong>对重根，\(A - \lambda I\) 应该有秩亏，自由变量数 = 几何重数。常见错误是"找到一个特征向量就停"——错过其他。</li>
+  <li><strong>验证 \(A\mathbf{v} = \lambda \mathbf{v}\) 是免费的检查。</strong>算出 \(\mathbf{v}\) 后代回去乘一下，比起重做高斯消元便宜得多。每道题都做这个检查。</li>
+</ol>
+
+<p>这些建议看起来琐碎，但累积起来能减少 50% 以上的解题错误率。把它们当成肌肉记忆来培养。</p>
+
+<h2 id="sec14-7">14.7 特征值的两条速记性质</h2>
+
+<p>计算特征多项式有时候很烦——\(3 \times 3\) 的行列式展开经常要写满半页纸。幸好特征多项式的<strong>系数</strong>与矩阵元素之间有一些非常漂亮的关系，可以让你做"自检"或者"快速估计"。</p>
+
+<p>对 \(n \times n\) 矩阵 \(A\)，把它的特征值（按重数）记作 \(\lambda_1, \ldots, \lambda_n\)，则：</p>
+
+<p>\[\boxed{\det A = \lambda_1 \lambda_2 \cdots \lambda_n, \qquad \operatorname{tr} A = \lambda_1 + \lambda_2 + \cdots + \lambda_n.}\]</p>
+
+<p>这里 \(\operatorname{tr} A = a_{11} + a_{22} + \cdots + a_{nn}\) 是矩阵的<strong>迹</strong>（对角线元素之和）。两条公式合起来读：<em>行列式 = 特征值之积，迹 = 特征值之和</em>。</p>
+
+<p>简要解释一下为什么。特征多项式 \(p_A(\lambda) = \det(A - \lambda I)\) 可以写成它的根的乘积形式：</p>
+
+<p>\[p_A(\lambda) = (\lambda_1 - \lambda)(\lambda_2 - \lambda)\cdots(\lambda_n - \lambda).\]</p>
+
+<p>把 \(\lambda = 0\) 代入，左边变成 \(\det A\)，右边变成 \(\lambda_1 \lambda_2 \cdots \lambda_n\)。所以 \(\det A = \lambda_1 \cdots \lambda_n\)。另一边，比较 \(\lambda^{n-1}\) 的系数：左边 \(p_A(\lambda)\) 的 \(\lambda^{n-1}\) 系数是 \((-1)^{n-1}(a_{11} + a_{22} + \cdots + a_{nn})\)（这是一个我们暂时承认的事实），右边乘开后 \(\lambda^{n-1}\) 的系数是 \((-1)^{n-1}(\lambda_1 + \cdots + \lambda_n)\)，所以两个相等。</p>
+
+<p>实战中这两条几乎是必备的<strong>检查工具</strong>。回到 14.5 节那个例子 \(A = \begin{pmatrix} 4 & 1 \\ 2 & 3 \end{pmatrix}\)，特征值是 \(2\) 和 \(5\)。验证：\(\det A = 4 \cdot 3 - 1 \cdot 2 = 10 = 2 \cdot 5\) ✓；\(\operatorname{tr} A = 4 + 3 = 7 = 2 + 5\) ✓。如果你算错了任何一个特征值，这两个检查都会暴露错误。</p>
+
+<p>另外还有一条已经在 14.6 例 2 里讲过、值得在这里重述的事实：</p>
+
+<p><strong>三角矩阵的特征值就是对角元。</strong></p>
+
+<p>这条不用证——就是 \(\det(A - \lambda I)\) 在三角时等于对角线之积的直接结果。</p>
+
+<p>由两条速记性质还可以引出几条<em>有用的小推论</em>，值得放进你的"线性代数小宝典"里：</p>
+
+<ul>
+  <li><strong>\(A\) 可逆 \(\iff\) \(0\) 不是 \(A\) 的特征值。</strong>因为 \(\det A = \prod \lambda_i\)，所以 \(\det A \ne 0\) 当且仅当所有 \(\lambda_i \ne 0\)。</li>
+  <li><strong>\(A^{-1}\) 的特征值是 \(A\) 特征值的倒数。</strong>从 \(A\mathbf{v} = \lambda \mathbf{v}\) 出发，两边左乘 \(A^{-1}\)：\(\mathbf{v} = \lambda A^{-1} \mathbf{v}\)，所以 \(A^{-1} \mathbf{v} = (1/\lambda) \mathbf{v}\)。同一个特征向量，特征值取倒数。</li>
+  <li><strong>\(A^k\) 的特征值是 \(A\) 特征值的 \(k\) 次方。</strong>反复应用 \(A \mathbf{v} = \lambda \mathbf{v}\) 得 \(A^k \mathbf{v} = \lambda^k \mathbf{v}\)。</li>
+  <li><strong>多项式 \(p(A)\) 的特征值是 \(p(\lambda_i)\)。</strong>这是上一条的自然推广：把 \(A^k\) 推广为任意多项式。例如 \(A^2 - 3A + 2I\) 的特征值是 \(\lambda_i^2 - 3\lambda_i + 2\)。</li>
+  <li><strong>\(A\) 与 \(A^T\) 有相同的特征值。</strong>因为 \(\det(A - \lambda I) = \det((A - \lambda I)^T) = \det(A^T - \lambda I)\)。但<em>特征向量不一定相同</em>——\(A^T\) 的特征向量叫"左特征向量"，与 \(A\) 的右特征向量在一般情形下没有简单关系。</li>
+</ul>
+
+<p>这五条小事实在解题时常常能让你少走弯路。比如题目让你算 \(A^{100}\) 的迹——你不必把 \(A^{100}\) 写出来，只要知道 \(A\) 的特征值 \(\lambda_1, \lambda_2\)，迹就是 \(\lambda_1^{100} + \lambda_2^{100}\)。这种几何级数式的化简正是特征值思维的标志。</p>
+
+<h2 id="sec14-8">14.8 代数重数与几何重数</h2>
+
+<p>14.6 例 3 与例 6 暗示了一件微妙的事：一个特征值在<em>多项式里</em>出现的次数，与它对应的<em>特征空间的维数</em>，可能不一样。这个区别值得正式命名。</p>
+
+<p><strong>定义。</strong>设 \(\lambda_0\) 是 \(A\) 的特征值。</p>
+
+<ul>
+  <li>\(\lambda_0\) 在特征多项式 \(p_A(\lambda)\) 里作为根的<strong>重数</strong>，叫作 \(\lambda_0\) 的<strong>代数重数</strong>（algebraic multiplicity），记 \(m_a(\lambda_0)\)。</li>
+  <li>\(\lambda_0\) 对应的特征空间 \(E_{\lambda_0} = \ker(A - \lambda_0 I)\) 的<strong>维数</strong>，叫作 \(\lambda_0\) 的<strong>几何重数</strong>（geometric multiplicity），记 \(m_g(\lambda_0)\)。</li>
+</ul>
+
+<p>从 14.6 例 3 看：剪切矩阵 \(\begin{pmatrix} 2 & 1 \\ 0 & 2 \end{pmatrix}\) 的特征多项式是 \((\lambda - 2)^2\)，所以 \(\lambda = 2\) 的代数重数是 \(2\)；但 \(A - 2I = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}\) 的零空间只有一维，所以几何重数是 \(1\)。<strong>代数 \(2\)，几何 \(1\)。</strong></p>
+
+<p>从 14.6 例 6 看：\(\lambda = 2\) 的代数重数是 \(2\)（双根），几何重数也是 \(2\)（特征空间二维）；\(\lambda = 3\) 的代数与几何都是 \(1\)。这里两个都"凑够了"。</p>
+
+<p>这两个数之间的关系不是任意的：</p>
+
+<p>\[\boxed{1 \le m_g(\lambda_0) \le m_a(\lambda_0).}\]</p>
+
+<p>左边 \(\ge 1\) 是因为 \(\lambda_0\) 既然是特征值，它至少有一个特征向量，所以特征空间至少一维。右边 \(\le\) 这一边比较微妙，证明思路是：把特征空间 \(E_{\lambda_0}\) 的一组基扩展成 \(\mathbb{R}^n\) 的基，在这组基下 \(A\) 矩阵长成"上三角块状"的形式，特征多项式中 \((\lambda - \lambda_0)\) 至少出现 \(\dim E_{\lambda_0}\) 次。这条不等式的严格证明放在附录里，正文先承认它。</p>
+
+<p>这个不等式有一个值得记住的<strong>极端情形</strong>：当所有特征值都满足 \(m_g = m_a\) 时，\(A\) 有"足够多"的特征向量，可以拼成 \(\mathbb{R}^n\) 的一组基。这时我们说 \(A\) <strong>可对角化</strong>——这正是第 15 章的核心。</p>
+
+<p>反过来，<em>只要有一个特征值的几何重数严格小于代数重数</em>，\(A\) 就不可对角化。剪切矩阵 \(\begin{pmatrix} 2 & 1 \\ 0 & 2 \end{pmatrix}\) 就是不可对角化的标准反例——它的特征向量不够多。</p>
+
+<p>用一个略微更大的例子来对比。考虑两个 \(3 \times 3\) 矩阵：</p>
+
+<p>\[A = \begin{pmatrix} 5 & 1 & 0 \\ 0 & 5 & 1 \\ 0 & 0 & 5 \end{pmatrix}, \qquad B = \begin{pmatrix} 5 & 0 & 0 \\ 0 & 5 & 0 \\ 0 & 0 & 5 \end{pmatrix} = 5I.\]</p>
+
+<p>两者的特征多项式都是 \((5 - \lambda)^3\)，所以特征值都是 \(\lambda = 5\)，代数重数 \(3\)。</p>
+
+<p>但几何重数<em>极不一样</em>。对 \(B\)：\(B - 5I = 0\)，零空间是<em>整个 \(\mathbb{R}^3\)</em>，几何重数 \(3\)。所以 \(B\) 可对角化（事实上它已经对角）。</p>
+
+<p>对 \(A\)：\(A - 5I = \begin{pmatrix} 0 & 1 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0 \end{pmatrix}\)，秩 \(2\)，零空间一维（\(\mathbf{e}_1\) 那一条），几何重数 \(1\)。所以 \(A\) <em>不可对角化</em>，"缺了"两个特征向量。\(A\) 是一个 \(3 \times 3\) <strong>约当块</strong>——下章末尾会再次出现。</p>
+
+<p>这两个矩阵的<em>特征值数据完全相同</em>，但<em>性质千差万别</em>——这就是为什么必须把代数重数和几何重数<em>分开</em>来记，而不能笼统地说"特征值的重数"。</p>
+
+<h2 id="sec14-9">14.9 不同特征值对应的特征向量线性无关</h2>
+
+<p>这是本章最重要的一个结构性事实。它的内容用一句话说出来：</p>
+
+<p><strong>定理。</strong>设 \(\mathbf{v}_1, \mathbf{v}_2, \ldots, \mathbf{v}_k\) 分别是 \(A\) 的特征值 \(\lambda_1, \lambda_2, \ldots, \lambda_k\) 的特征向量，且 \(\lambda_1, \ldots, \lambda_k\) <em>两两不同</em>。那么 \(\mathbf{v}_1, \ldots, \mathbf{v}_k\) 线性无关。</p>
+
+<p>这听起来抽象，意义却很具体。它告诉你：如果一个 \(n \times n\) 矩阵有 \(n\) 个不同的特征值，那它一定有 \(n\) 个线性无关的特征向量——也就是说它一定可以对角化。两个不同特征值不可能"挤在同一条直线"，三个不同特征值不可能"共面"。它们必然占据彼此独立的方向。</p>
+
+<p><strong>证明思路（归纳法）。</strong>对 \(k\) 做归纳。\(k = 1\) 时只有一个非零向量 \(\mathbf{v}_1\)，自然线性无关。</p>
+
+<p>假设结论对 \(k - 1\) 成立。考虑 \(k\) 个特征向量。设</p>
+
+<p>\[c_1 \mathbf{v}_1 + c_2 \mathbf{v}_2 + \cdots + c_k \mathbf{v}_k = \mathbf{0}. \quad (\star)\]</p>
+
+<p>我们要证 \(c_1 = c_2 = \cdots = c_k = 0\)。</p>
+
+<p>左乘以 \(A\)：因为 \(A\mathbf{v}_i = \lambda_i \mathbf{v}_i\)，</p>
+
+<p>\[c_1 \lambda_1 \mathbf{v}_1 + c_2 \lambda_2 \mathbf{v}_2 + \cdots + c_k \lambda_k \mathbf{v}_k = \mathbf{0}. \quad (\star\star)\]</p>
+
+<p>另一方面，把 \((\star)\) 两边乘以 \(\lambda_k\)：</p>
+
+<p>\[c_1 \lambda_k \mathbf{v}_1 + c_2 \lambda_k \mathbf{v}_2 + \cdots + c_k \lambda_k \mathbf{v}_k = \mathbf{0}. \quad (\star\star\star)\]</p>
+
+<p>把 \((\star\star)\) 减去 \((\star\star\star)\)，最后一项 \(c_k \lambda_k \mathbf{v}_k\) 被消去：</p>
+
+<p>\[c_1(\lambda_1 - \lambda_k) \mathbf{v}_1 + c_2(\lambda_2 - \lambda_k) \mathbf{v}_2 + \cdots + c_{k-1}(\lambda_{k-1} - \lambda_k) \mathbf{v}_{k-1} = \mathbf{0}.\]</p>
+
+<p>这是 \(k - 1\) 个特征向量的组合等于零。由归纳假设它们线性无关，所以每个系数都是零：</p>
+
+<p>\[c_1(\lambda_1 - \lambda_k) = c_2(\lambda_2 - \lambda_k) = \cdots = c_{k-1}(\lambda_{k-1} - \lambda_k) = 0.\]</p>
+
+<p>但因为 \(\lambda_i \ne \lambda_k\) 对 \(i = 1, \ldots, k-1\) 都成立，所以差 \(\lambda_i - \lambda_k \ne 0\)。能得 \(c_1 = c_2 = \cdots = c_{k-1} = 0\)。代回 \((\star)\) 只剩 \(c_k \mathbf{v}_k = \mathbf{0}\)，但 \(\mathbf{v}_k \ne \mathbf{0}\)，所以 \(c_k = 0\)。证毕。</p>
+
+<p>这条定理有一个直接的<strong>推论</strong>：</p>
+
+<p>如果 \(n \times n\) 矩阵 \(A\) 有 \(n\) 个互不相同的特征值，那么 \(A\) 可对角化。</p>
+
+<p>但反过来不对——一个矩阵可能有重特征值却仍然可对角化（例如对角矩阵 \(\begin{pmatrix} 3 & 0 \\ 0 & 3 \end{pmatrix}\)，特征值 \(3\) 重数为 \(2\) 但矩阵明显已经是对角的）。这种情况下，重特征值的几何重数恰好等于代数重数。</p>
+
+<p>到这里，关于"特征值是什么、怎么算、有什么性质"的故事就讲完了。下一章我们正式拿起这些工具，去做一件叫"对角化"的大事——它会把 \(A^k\)、\(\exp(A)\)、微分方程组的求解全部一起搞定。</p>
+
+<h3>本章末的小结</h3>
+
+<p>临走前帮你把本章核心要点压成一张速记表，请记下来或自己重写一遍。</p>
+
+<table>
+  <thead><tr><th>概念</th><th>核心定义</th><th>怎么算</th></tr></thead>
+  <tbody>
+    <tr><td>特征值</td><td>\(A\mathbf{v} = \lambda \mathbf{v}\)（\(\mathbf{v} \ne 0\)）中的标量 \(\lambda\)</td><td>解 \(\det(A - \lambda I) = 0\)</td></tr>
+    <tr><td>特征向量</td><td>满足上式的非零 \(\mathbf{v}\)</td><td>解齐次方程 \((A - \lambda I)\mathbf{v} = 0\)</td></tr>
+    <tr><td>特征空间 \(E_\lambda\)</td><td>\(\ker(A - \lambda I)\)</td><td>同上，求解空间的一组基</td></tr>
+    <tr><td>特征多项式 \(p_A(\lambda)\)</td><td>\(\det(A - \lambda I)\)</td><td>展开行列式</td></tr>
+    <tr><td>代数重数 \(m_a(\lambda_0)\)</td><td>\(\lambda_0\) 在 \(p_A\) 中的重数</td><td>因式分解</td></tr>
+    <tr><td>几何重数 \(m_g(\lambda_0)\)</td><td>\(\dim E_{\lambda_0}\)</td><td>数 \(A - \lambda_0 I\) 的零空间的维数</td></tr>
+    <tr><td>速记关系</td><td>\(\det A = \prod \lambda_i\)、\(\operatorname{tr} A = \sum \lambda_i\)</td><td>用作检查工具</td></tr>
+  </tbody>
+</table>
+
+<p>另外把"几条小推论"再列一遍：</p>
+
+<ul>
+  <li>三角矩阵的特征值就是对角元；</li>
+  <li>\(0\) 是特征值 \(\iff A\) 不可逆；</li>
+  <li>\(A^{-1}\) 的特征值是 \(A\) 特征值的倒数；</li>
+  <li>\(A^k\) 的特征值是 \(A\) 特征值的 \(k\) 次方；</li>
+  <li>对称矩阵的不同特征向量互相正交；</li>
+  <li>不同特征值对应的特征向量必线性无关；</li>
+  <li>\(1 \le m_g(\lambda_0) \le m_a(\lambda_0)\)，等号取决于"几何够不够"；</li>
+  <li>\(A\) 与 \(A^T\) 同特征值。</li>
+</ul>
+
+<p>这套小工具足以应付任何<em>标准的</em>本科特征值问题。下一章把它们组装起来去做对角化。</p>
+
+<hr>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 行列式</a><a href="ch15.html">下一章 · 第 15 章 对角化 →</a></nav>
+
+</main>
+</body>
+</html>

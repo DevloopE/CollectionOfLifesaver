@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 26 章 散度定理 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch25.html">← 上一章 · 第 25 章 斯托克斯定理</a><a href="ch27.html">下一章 · 第 27 章 如何解决多元微积分问题 →</a></nav>
+<h1 id="ch26">第 26 章 散度定理</h1>
+
+<p>第 22 章里，格林定理有<strong>两个</strong>形式：环量形式（与旋度挂钩）与<strong>通量形式</strong>（与散度挂钩）。前者已经在斯托克斯定理那里被升级为三维；后者也有它自己的三维"升级版本"——这就是<strong>散度定理</strong>，也叫<strong>高斯定理</strong>。</p>
+
+<p>它的精确叙述是这样的。设 \(E\) 是三维空间中的一个有界立体，其边界曲面 \(\partial E\) 是一张闭曲面（比如一个球面、一个长方体表面、一个椭球面），按惯例取<strong>外法向</strong>。设 \(\mathbf{F}\) 在含 \(E\) 的开集上有连续偏导。则</p>
+
+<p>\[\boxed{\,\oiint_{\partial E} \mathbf{F}\cdot d\mathbf{S} = \iiint_E \nabla\cdot\mathbf{F}\,dV.\,}\]</p>
+
+<p>读法：<strong>"\(\mathbf{F}\) 流出 \(\partial E\) 的总通量"</strong>等于<strong>"\(\nabla\cdot\mathbf{F}\) 在立体 \(E\) 内的总和"</strong>。符号 \(\oiint\) 是闭曲面积分的强调写法，与 \(\oint\) 的意思类似——提醒你曲面是闭的，里头封着一块体积。</p>
+
+<p>它是格林通量形式的"再升一维"，也是斯托克斯定理的"姐妹定理"。这一章我们把它的几何意味、物理意味都讲清楚，并把它与前两条定理摆在一起作总览。</p>
+
+<h2 id="sec26-1">26.1 定理叙述与直观理解</h2>
+
+<p>散度的物理含义在第 22 章已经介绍过：在某点 \(\nabla\cdot\mathbf{F}\) 的值，是该点处<strong>单位体积上向外流出的"流量密度"</strong>——形象点说，你站在那一点，把它当作一个微小的"水龙头"或"漏斗"：散度为正意味着这一点在源源不断<strong>产生</strong>流体，散度为负意味着它在<strong>吞食</strong>流体，散度为零意味着流入流出相等、是个无源也无汇的点。</p>
+
+<p>把这种"逐点产生量"在整块立体 \(E\) 上加起来，就是 \(\iiint_E\nabla\cdot\mathbf{F}\,dV\)——它度量的是<strong>立体 \(E\) 内部一切"产生 / 吞食"的总和</strong>。流体力学的常识告诉我们：水<strong>不会消失</strong>。如果立体内部某些点在产生水，这些水必须以某种方式"跑出去"——而跑出去的唯一通道，就是边界曲面 \(\partial E\)。所以</p>
+
+<p>\[\text{内部产生量总和} = \text{从边界流出的总通量},\]</p>
+
+<p>这正是散度定理在物理上要说的事。</p>
+
+<p>从微元论证的角度看，证明的精神和斯托克斯定理几乎相同——只是从"曲面切瓦片"换成"立体切小立方体"。把立体 \(E\) 切成无数微小立方体，每个立方体六个面都有"流入流出"，<strong>相邻立方体共享的那个面</strong>上，左立方体的"流出"恰好是右立方体的"流入"，两者方向相反、值相加为零。把所有立方体的局部通量加起来，所有内部面相互抵消，只剩下立体最外面的<strong>边界曲面</strong>上的通量——这就是 \(\oiint_{\partial E}\mathbf{F}\cdot d\mathbf{S}\)。同时，每个立方体的"局部通量"近似等于"散度乘小体积"\(\nabla\cdot\mathbf{F}\,dV\)，加起来就是 \(\iiint_E\nabla\cdot\mathbf{F}\,dV\)。两边相等。</p>
+
+<p>这条几何论证里，<strong>"边界要封闭"是关键的前提</strong>——如果立体的边界没有完全封死（比如把一片球面而不是整个球面拿出来），那么内部立方体的内部面就并不是处处都被它的相邻立方体匹配上，"抵消"的过程会少抵消一部分，等式就不成立。所以散度定理的左手边一定写成<strong>闭曲面</strong>积分 \(\oiint\)。这跟斯托克斯定理可以用任何"以同一边界曲线为边界的曲面"形成鲜明对照——后者的右手边是"任何带边界的曲面"，前者的左手边必须"完全封死"。</p>
+
+<h2 id="sec26-2">26.2 例题</h2>
+
+<h3>例 1：径向场穿出单位球面</h3>
+
+<p>\(\mathbf{F} = \langle x, y, z\rangle\)，求它通过单位球面（外法向）的通量。</p>
+
+<p>用散度定理。\(\nabla\cdot\mathbf{F} = 1 + 1 + 1 = 3\)，常数。所以</p>
+
+<p>\[\oiint_{S^2}\mathbf{F}\cdot d\mathbf{S} = \iiint_{B^3}3\,dV = 3\cdot V(B^3) = 3\cdot\frac{4\pi}{3} = 4\pi.\]</p>
+
+<p>直接验：球面上 \(\mathbf{n} = \langle x, y, z\rangle\)（径向单位向量），\(\mathbf{F}\cdot\mathbf{n} = x^2 + y^2 + z^2 = 1\)；\(\oiint_{S^2}1\,dS = 4\pi\)。两条途径一致。</p>
+
+<p>这道题虽然简单，但请把"用散度定理 vs. 直接算曲面积分"两条路并排看一下。直接算需要把三维向量场点上球面单位法向、再写球面坐标的 \(dS\)、再做二重积分；用散度定理只需要算一个偏导和一个体积。后者轻得多。下一节我们会把这种"轻"作为一条选用诀窍专门拎出来。</p>
+
+<h3>例 2：立方体上的散度定理</h3>
+
+<p>\(\mathbf{F} = \langle x^2, y^2, z^2\rangle\)，\(E\) 是单位立方体 \([0, 1]^3\)。用散度定理算 \(\oiint_{\partial E}\mathbf{F}\cdot d\mathbf{S}\)。</p>
+
+<p>\(\nabla\cdot\mathbf{F} = 2x + 2y + 2z\)。三重积分</p>
+
+<p>\[\iiint_E(2x + 2y + 2z)\,dV = 2\int_0^1\int_0^1\int_0^1(x + y + z)\,dx\,dy\,dz.\]</p>
+
+<p>对称性允许把三项各算一遍：\(\iiint x\,dV = \int_0^1 x\,dx\cdot 1\cdot 1 = 1/2\)，三项加起来 \(3/2\)。乘 2 得通量 \(= 3\)。</p>
+
+<p>如果你直接算，需要把立方体六个面分别参数化（六个二维矩形）、对每个面算法向上的 \(\mathbf{F}\cdot\mathbf{n}\)、做二重积分、再相加六个数。每一步都不难，但步骤繁多。散度定理把六道二重积分一次性合并成一道三重积分。</p>
+
+<h3>例 3：穿过球面（高次场）</h3>
+
+<p>\(\mathbf{F} = \langle x^3, y^3, z^3\rangle\)，求它通过半径 \(R\) 球面的通量。</p>
+
+<p>\(\nabla\cdot\mathbf{F} = 3(x^2 + y^2 + z^2) = 3\rho^2\)（球面坐标）。三重积分换球面坐标：</p>
+
+<p>\[\iiint_E 3\rho^2\,dV = 3\int_0^{2\pi}\int_0^\pi\int_0^R \rho^2\cdot \rho^2\sin\phi\,d\rho\,d\phi\,d\theta = 3\cdot 2\pi\cdot 2\cdot\frac{R^5}{5} = \frac{12\pi R^5}{5}.\]</p>
+
+<p>这道题如果硬要直接算，要做的曲面积分是 \(\oiint_S\langle x^3, y^3, z^3\rangle\cdot\mathbf{n}\,dS\)——可行，但麻烦得多。散度定理把它一抓就把"高次的代数"压回了三重积分形式。</p>
+
+<h3>例 4：流入与流出抵消</h3>
+
+<p>\(\mathbf{F} = \langle 0, 0, 1\rangle\)（"垂直向上"的均匀流）通过单位球面（外法向）的通量。</p>
+
+<p>用散度定理：\(\nabla\cdot\mathbf{F} = 0\)，三重积分为零，通量为零。</p>
+
+<p>物理上完美：这股均匀流，在单位球底部"流进来"多少水，就在顶部"流出去"多少，净通量为零。常向量场（任何 \(\mathbf{F} = \mathbf{c}\)）穿过任何闭曲面的通量都等于零——\(\nabla\cdot\mathbf{c} = 0\)。</p>
+
+<p>这个例子另有一个引申："散度恒为零的场（无源场）穿过任何闭曲面的通量都为零"。无源场是流体力学里一类极重要的场（不可压缩流），它的所有"线"都不会从某点"凭空冒出"，于是流入流出永远平衡。</p>
+
+<p>什么时候用散度定理？一条很实用的指导原则：<strong>看到闭曲面上的通量积分</strong>，<strong>而 \(\mathbf{F}\) 的散度容易算</strong>，几乎一定要用散度定理。直接算曲面积分往往涉及"分多块"的烦琐分段——立方体的六个面、圆柱的"侧面+顶+底"、椭球的曲面坐标——而三重积分通常一气呵成。反过来，如果题目给的是<strong>带边界的曲面</strong>（不闭），散度定理就直接用不上——它要求 \(\partial E\) 完全封死。如果你需要把一张不闭的曲面"封起来"才能用散度定理（比如加一个底盖让它变成闭曲面），可以——只要在最后把那一块"添上去的"曲面对通量的贡献减回去就行。这是一种叫"补曲面"的实战技巧；在习题里你迟早会碰到。</p>
+
+<h2 id="sec26-3">26.3 与格林、斯托克斯的关系</h2>
+
+<p>本书后半部分由三条<strong>同祖的定理</strong>结构起：格林定理、斯托克斯定理、散度定理。它们并不是互不相干的三条公式，而是同一种思想（"边界上的积分 = 内部某个量的积分"，亦即"微积分基本定理"在高维的化身）在不同舞台上演的三次。</p>
+
+<p>把它们放在一张表里对照——这是本书后半段的"指南针"：</p>
+
+<table>
+  <thead>
+    <tr><th>定理</th><th>维数</th><th>边界</th><th>"内部"积分</th><th>边界积分</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>格林（环量形式）</td>
+      <td>2</td>
+      <td>平面闭曲线</td>
+      <td>\(\iint_D (Q_x - P_y)\,dA\)</td>
+      <td>\(\oint_{\partial D} P\,dx + Q\,dy\)</td>
+    </tr>
+    <tr>
+      <td>格林（通量形式）</td>
+      <td>2</td>
+      <td>平面闭曲线</td>
+      <td>\(\iint_D (P_x + Q_y)\,dA\)</td>
+      <td>\(\oint_{\partial D} \mathbf{F}\cdot \mathbf{n}\,ds\)</td>
+    </tr>
+    <tr>
+      <td>斯托克斯</td>
+      <td>3</td>
+      <td>曲面的边界曲线</td>
+      <td>\(\iint_S (\nabla\times\mathbf{F})\cdot d\mathbf{S}\)</td>
+      <td>\(\oint_{\partial S} \mathbf{F}\cdot d\mathbf{r}\)</td>
+    </tr>
+    <tr>
+      <td>散度定理</td>
+      <td>3</td>
+      <td>立体的边界曲面</td>
+      <td>\(\iiint_E \nabla\cdot\mathbf{F}\,dV\)</td>
+      <td>\(\oiint_{\partial E} \mathbf{F}\cdot d\mathbf{S}\)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>请允许我把这张表读一读。<strong>每一行都长得一样：左边是某种"导数算子（旋度或散度）"在区域内部的积分，右边是"原向量场"在边界上的积分</strong>。一元微积分里的基本定理 \(\int_a^b f'(x)\,dx = f(b) - f(a)\) 也长这样：左边是一阶导数的"内部积分"，右边是 \(f\) 在"边界（区间端点）"上的赋值差。所有这些定理本质都在说一件事：</p>
+
+<blockquote><p><strong>"对一个量取适当的导数再在区域上积分，结果只依赖于这个量在区域的边界上"。</strong></p></blockquote>
+
+<p>如果你以后学微分形式（高级微积分或微分几何课程里），你会看到这一切都是同一条公式 \(\int_M d\omega = \int_{\partial M}\omega\) 的不同情形——\(\omega\) 是某种"形式"（可以是函数、可以是向量场、可以是更高阶的对象），\(d\) 是一种统一的求导算子（外微分），\(\partial\) 是取边界的算子；在不同维数和不同次数的形式下，这条公式分别就化身为本节这张表里的四种情形（外加最熟悉的一元基本定理）。</p>
+
+<p>把这张表抄在公式表上。它不仅在期末考试时是张<strong>速查表</strong>，更重要的是——它会成为你心里关于"多元微积分这门课到底在说什么"的一个统一图像。</p>
+
+<p>到这里，这本书的"理论核心"已经全部走完。第 27 章里，我们把这些工具放到一张<strong>决策树</strong>上：当你看到一道多元微积分的题时，应该如何识别它属于哪一类、应该掏出哪一把工具来处理。</p>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch25.html">← 上一章 · 第 25 章 斯托克斯定理</a><a href="ch27.html">下一章 · 第 27 章 如何解决多元微积分问题 →</a></nav>
+
+</main>
+</body>
+</html>

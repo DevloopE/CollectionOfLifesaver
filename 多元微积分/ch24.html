@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 24 章 曲面积分 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 参数曲面与曲面面积</a><a href="ch25.html">下一章 · 第 25 章 斯托克斯定理 →</a></nav>
+<h1 id="ch24">第 24 章 曲面积分</h1>
+
+<p>学到这里，"积分"这个动作已经在我们手里被推广了好几次：从一元函数沿区间的积分，到二元、三元函数在二维、三维区域上的积分，再到沿曲线的<strong>曲线积分</strong>（第 21 章）。第 21 章里我们看见曲线积分有两种风格：把<strong>标量</strong>沿曲线积出去（"细丝的总质量"那一型），以及把<strong>向量场</strong>沿曲线积出去（"力场沿路径所做的功"那一型）。</p>
+
+<p>本章要把<strong>这两种风格</strong>都升级一维：从沿曲线的积分，升级为沿曲面的积分。所以同样会出现两种类型——</p>
+
+<ul>
+  <li><strong>第一型曲面积分</strong>：把标量函数沿曲面积出去。物理对应：一片弯曲薄壳的总质量、总电荷、总热量。</li>
+  <li><strong>第二型曲面积分（通量积分）</strong>：把向量场沿曲面积出去。物理对应：流体经过曲面的体积流量、电场穿过闭曲面所产生的电通量。</li>
+</ul>
+
+<p>第一型是第 23 章里曲面面积公式的"直接推广"；第二型则需要一个新的几何概念——曲面的<strong>定向</strong>，也就是给每一点钉一个"哪一面是正面"的箭头。这一章我们把这两种积分都建立起来，并且把通量积分的物理意味讲透——它会成为下两章斯托克斯与散度定理的主角。</p>
+
+<h2 id="sec24-1">24.1 第一型曲面积分（标量沿曲面）</h2>
+
+<p>设 \(S\) 是参数曲面 \(\mathbf{r}(u, v)\)（\((u, v)\in D\)），\(f(x, y, z)\) 是定义在 \(S\) 上的标量函数。\(f\) 在 \(S\) 上的<strong>第一型曲面积分</strong>定义为</p>
+
+<p>\[\boxed{\,\iint_S f\,dS = \iint_D f(\mathbf{r}(u, v))\,|\mathbf{r}_u \times \mathbf{r}_v|\,du\,dv.\,}\]</p>
+
+<p>读法："把 \(f\) 在曲面上每一点的值，乘以那一点的'面元素'\(dS = |\mathbf{r}_u \times \mathbf{r}_v|\,du\,dv\)，再加起来"。</p>
+
+<p>把 \(f\equiv 1\) 代入，公式立刻退化为 23 章的曲面面积——所以"曲面面积"是"第一型曲面积分"的最简单情形。</p>
+
+<p>第一型曲面积分的物理意味很直白。设想 \(S\) 是一片<strong>很薄的金属壳</strong>（厚度可以忽略），它在每一点的<strong>面密度</strong>（单位面积的质量）由 \(f(x, y, z)\) 给出。则 \(\iint_S f\,dS\) 就是这片薄壳的<strong>总质量</strong>。同样地，如果 \(f\) 是面电荷密度，积分给出总电荷；如果 \(f\) 是温度，乘上比热与厚度，就能得到这片壳内总的热含量。"密度乘大小再加"，是一切积分的灵魂——而第一型曲面积分只是把这套思路落到一张弯曲的二维"地皮"上。</p>
+
+<p>下面我们做几个例子。</p>
+
+<h3>例 1：一片半球壳的"高度积分"</h3>
+
+<p>求 \(\iint_S z^2\,dS\)，\(S\) 是单位球面 \(x^2 + y^2 + z^2 = 1\)。</p>
+
+<p>用球面参数化：\(z = \cos\phi\)、\(dS = \sin\phi\,d\phi\,d\theta\)。代进去</p>
+
+<p>\[\iint_S z^2\,dS = \int_0^{2\pi}\int_0^\pi \cos^2\phi\,\sin\phi\,d\phi\,d\theta.\]</p>
+
+<p>内层用代换 \(u = \cos\phi\)，\(du = -\sin\phi\,d\phi\)：</p>
+
+<p>\[\int_0^\pi \cos^2\phi\,\sin\phi\,d\phi = -\int_1^{-1}u^2\,du = \int_{-1}^1 u^2\,du = \frac{2}{3}.\]</p>
+
+<p>乘上外层 \(2\pi\)：积分 = \(\dfrac{4\pi}{3}\)。</p>
+
+<p>稍作引申。由对称性，\(\iint_S x^2\,dS\)、\(\iint_S y^2\,dS\) 显然等于 \(\iint_S z^2\,dS\)，三者之和等于 \(\iint_S (x^2 + y^2 + z^2)\,dS = \iint_S 1\cdot dS = 4\pi\)。所以每一项都是 \(4\pi/3\)。一致——很好。</p>
+
+<h3>例 2：抛物面薄壳的质量</h3>
+
+<p>设抛物面 \(z = x^2 + y^2\)（\(0\le z\le 1\)）的面密度为 \(f(x, y, z) = z\)。求壳的总质量。</p>
+
+<p>这是第 23 章例 2 的"加密度版"。投影 \(D\) 仍是单位圆盘，"面元素" \(dS = \sqrt{1 + 4x^2 + 4y^2}\,dA\)。质量</p>
+
+<p>\[m = \iint_S z\,dS = \iint_D (x^2 + y^2)\sqrt{1 + 4(x^2 + y^2)}\,dA.\]</p>
+
+<p>极坐标：\(x^2 + y^2 = r^2\)，</p>
+
+<p>\[m = \int_0^{2\pi}\int_0^1 r^2\sqrt{1 + 4r^2}\,r\,dr\,d\theta = 2\pi\int_0^1 r^3\sqrt{1 + 4r^2}\,dr.\]</p>
+
+<p>令 \(u = 1 + 4r^2\)，\(du = 8r\,dr\)，\(r^2 = (u - 1)/4\)：</p>
+
+<p>\[\int_0^1 r^3\sqrt{1 + 4r^2}\,dr = \int_0^1 r^2\cdot r\sqrt{1 + 4r^2}\,dr = \frac{1}{32}\int_1^5 (u - 1)\sqrt{u}\,du.\]</p>
+
+<p>把 \((u - 1)\sqrt{u} = u^{3/2} - u^{1/2}\) 拆开：</p>
+
+<p>\[\int_1^5 (u^{3/2} - u^{1/2})\,du = \left[\tfrac{2}{5}u^{5/2} - \tfrac{2}{3}u^{3/2}\right]_1^5 = \tfrac{2}{5}(25\sqrt{5}) - \tfrac{2}{3}(5\sqrt{5}) - \tfrac{2}{5} + \tfrac{2}{3} = 10\sqrt{5} - \tfrac{10\sqrt{5}}{3} + \tfrac{4}{15} = \tfrac{20\sqrt{5}}{3} + \tfrac{4}{15}.\]</p>
+
+<p>所以</p>
+
+<p>\[m = 2\pi\cdot\frac{1}{32}\left(\frac{20\sqrt{5}}{3} + \frac{4}{15}\right) = \frac{\pi}{16}\left(\frac{20\sqrt{5}}{3} + \frac{4}{15}\right) = \frac{\pi(100\sqrt{5} + 4)}{240} = \frac{\pi(25\sqrt{5} + 1)}{60}.\]</p>
+
+<p>这种问题代数稍多，但每一步都"按部就班"。重要的不是数字，而是"先选参数化，再写 \(dS\)，再代被积函数，再对参数区域积分"这条流程。</p>
+
+<h3>例 3：一段圆柱面的"高度均值"</h3>
+
+<p>设 \(S\) 是 \(x^2 + y^2 = 1\)（\(0\le z\le 2\)）的圆柱侧面。求 \(\iint_S (z + 1)\,dS\)。</p>
+
+<p>\(\mathbf{r}(\theta, z) = \langle \cos\theta, \sin\theta, z\rangle\)，\(dS = 1\cdot d\theta\,dz\)。所以</p>
+
+<p>\[\iint_S (z + 1)\,dS = \int_0^{2\pi}\int_0^2 (z + 1)\,dz\,d\theta = 2\pi\cdot[z^2/2 + z]_0^2 = 2\pi\cdot(2 + 2) = 8\pi.\]</p>
+
+<p>这是个最干净的例子，正适合做信心检验：\(\iint_S 1\,dS = 4\pi\) 是侧面积，\(\iint_S z\,dS = 4\pi\) 是"\(z\) 沿侧面的总量"，相加正是 \(8\pi\)。一切都对得上。</p>
+
+<h2 id="sec24-2">24.2 通量积分（向量场穿过曲面）</h2>
+
+<p>第二种曲面积分跟第一种走的是不同的路。它的物理动机是<strong>流体力学</strong>。</p>
+
+<p>设想空间里弥漫着一股流动的水（或者空气），每一点的<strong>速度</strong>由向量场 \(\mathbf{F}(x, y, z)\) 给出——它是一个三维向量，长度告诉你流速多快、方向告诉你水朝哪儿走。空间里挂着一张曲面 \(S\)（想象一张破渔网）。我们想问：<strong>每秒有多少体积的水穿过这张渔网</strong>？这个量就叫做向量场 \(\mathbf{F}\) 通过 \(S\) 的<strong>通量</strong>。</p>
+
+<p>为了把这个问题量化，我们要做一件不再能回避的事：<strong>给曲面定一个朝向</strong>。否则"穿过"就没有正负——水从这边流到那边，与从那边流到这边，应该被算作相反的两件事。给定向就是给曲面上每一点钉一个<strong>单位法向量</strong>\(\mathbf{n}\)，这些 \(\mathbf{n}\) 在曲面上连续地变化，整张曲面就有了"正面"与"反面"。具体怎样给定向，下一节专门讲；这里先假定我们已经有了 \(\mathbf{n}\)。</p>
+
+<p>取曲面上一小块，面积是 \(dS\)，那一点的法向是 \(\mathbf{n}\)。那一小段时间 \(dt\) 内，恰好"流过这一小块"的水体形如一个底面是 \(dS\)、斜高是 \(\mathbf{F}\,dt\) 的小斜柱体，体积等于"底面 \(\times\) 高在法向上的投影"，也就是</p>
+
+<p>\[(\mathbf{F}\,dt)\cdot \mathbf{n}\,dS = (\mathbf{F}\cdot \mathbf{n})\,dS\,dt.\]</p>
+
+<p>所以"每秒"穿过的体积就是 \((\mathbf{F}\cdot\mathbf{n})\,dS\)。把它在整张曲面上加起来：</p>
+
+<p>\[\boxed{\,\iint_S \mathbf{F}\cdot d\mathbf{S} := \iint_S \mathbf{F}\cdot \mathbf{n}\,dS.\,}\]</p>
+
+<p>这就是<strong>通量积分</strong>的定义。它读起来是"\(\mathbf{F}\) 穿过 \(S\) 的通量"。符号 \(d\mathbf{S}\) 是 \(\mathbf{n}\,dS\) 的"打包写法"——一个有方向的"面元素"。</p>
+
+<p>实际计算时，我们手里通常已经有参数化 \(\mathbf{r}(u, v)\)。第 23 章里已经看到 \(\mathbf{r}_u \times \mathbf{r}_v\) 兼有两种身份：它的<strong>模</strong>给出"面元素的大小"\(dS\)，它的<strong>方向</strong>给出曲面的法向（取个单位向量就是 \(\mathbf{n}\)）。所以两者实际上可以合并写成</p>
+
+<p>\[d\mathbf{S} = \mathbf{n}\,dS = (\mathbf{r}_u \times \mathbf{r}_v)\,du\,dv.\]</p>
+
+<p>注意右边没有取模也没有取单位——叉积本身就同时承载了大小与方向。带进通量积分里，得</p>
+
+<p>\[\boxed{\,\iint_S \mathbf{F}\cdot d\mathbf{S} = \iint_D \mathbf{F}(\mathbf{r}(u, v))\cdot (\mathbf{r}_u \times \mathbf{r}_v)\,du\,dv.\,}\]</p>
+
+<p>这个公式漂亮的地方在于：你<strong>不需要</strong>单独去算单位法向 \(\mathbf{n}\) 和 \(dS\)——它们打包在叉积 \(\mathbf{r}_u \times \mathbf{r}_v\) 里。把 \(\mathbf{F}\) 在曲面上的值与 \(\mathbf{r}_u \times \mathbf{r}_v\) 直接做点积，就完了。</p>
+
+<p>请把它和第 21 章的曲线积分作个对照，你会立刻看出"亲戚关系"：</p>
+
+<ul>
+  <li>曲线积分：\(\displaystyle\int_C \mathbf{F}\cdot d\mathbf{r} = \int_a^b \mathbf{F}(\mathbf{r}(t))\cdot \mathbf{r}'(t)\,dt\)。被积式是 \(\mathbf{F}\cdot\)（参数化的"切向速度"）。</li>
+  <li>通量积分：\(\displaystyle\iint_S \mathbf{F}\cdot d\mathbf{S} = \iint_D \mathbf{F}(\mathbf{r}(u, v))\cdot (\mathbf{r}_u\times\mathbf{r}_v)\,du\,dv\)。被积式是 \(\mathbf{F}\cdot\)（参数化的"法向速度"）。</li>
+</ul>
+
+<p>同一种节奏：取参数化、对参数求导、点积、积分。前者用导数 \(\mathbf{r}'(t)\)，后者用叉积 \(\mathbf{r}_u\times\mathbf{r}_v\)；前者沿一维曲线，后者沿二维曲面。</p>
+
+<h3>例 1：径向场穿过上半球面</h3>
+
+<p>\(\mathbf{F}(x, y, z) = \langle x, y, z\rangle\) 通过单位上半球 \(z = \sqrt{1 - x^2 - y^2}\)（取向上法向）的通量。</p>
+
+<p>用 \(\mathbf{r}(x, y) = \langle x, y, \sqrt{1 - x^2 - y^2}\rangle\)，\(D\) 是单位圆盘。算偏导：</p>
+
+<p>\[\mathbf{r}_x = \langle 1, 0, -x/\sqrt{1 - x^2 - y^2}\rangle,\qquad \mathbf{r}_y = \langle 0, 1, -y/\sqrt{1 - x^2 - y^2}\rangle.\]</p>
+
+<p>叉积</p>
+
+<p>\[\mathbf{r}_x \times \mathbf{r}_y = \langle x/\sqrt{1 - x^2 - y^2},\ y/\sqrt{1 - x^2 - y^2},\ 1\rangle.\]</p>
+
+<p>注意它的 \(z\)-分量是 \(+1\)——这印证了我们选了"向上"的法向，方向正确。\(\mathbf{F}\) 在曲面上的表达是 \(\mathbf{F}(\mathbf{r}) = \langle x, y, \sqrt{1 - x^2 - y^2}\rangle\)。点积</p>
+
+<p>\[\mathbf{F}\cdot(\mathbf{r}_x \times \mathbf{r}_y) = \frac{x^2 + y^2}{\sqrt{1 - x^2 - y^2}} + \sqrt{1 - x^2 - y^2} = \frac{x^2 + y^2 + (1 - x^2 - y^2)}{\sqrt{1 - x^2 - y^2}} = \frac{1}{\sqrt{1 - x^2 - y^2}}.\]</p>
+
+<p>极坐标：</p>
+
+<p>\[\iint_D \frac{1}{\sqrt{1 - r^2}}r\,dr\,d\theta = 2\pi\int_0^1 \frac{r\,dr}{\sqrt{1 - r^2}} = 2\pi\left[-\sqrt{1 - r^2}\right]_0^1 = 2\pi.\]</p>
+
+<p>所以通量为 \(2\pi\)。</p>
+
+<p>有种"几何安心"的检验。径向场 \(\mathbf{F} = \langle x, y, z\rangle\) 在单位球面上每一点的方向恰好是<strong>外法向</strong>，长度恰好是 1。所以 \(\mathbf{F}\cdot\mathbf{n} = 1\)，"穿过整个球面"的通量是 \(\iint_S 1\,dS = 4\pi\)。上半球承担其中一半，正是 \(2\pi\)。</p>
+
+<h3>例 2：常向量场穿过倾斜平面</h3>
+
+<p>\(\mathbf{F} = \langle 0, 0, 1\rangle\) 穿过平面 \(x + y + z = 1\) 在第一卦限的那块三角形（取上方法向）的通量。</p>
+
+<p>三角形顶点为 \((1,0,0)\)、\((0,1,0)\)、\((0,0,1)\)。把它写成显函数 \(z = 1 - x - y\)，\(D\) 是 \(xy\) 平面里 \(x, y \ge 0\)、\(x + y \le 1\) 的三角形。\(\mathbf{r}(x, y) = \langle x, y, 1 - x - y\rangle\)；偏导 \(\mathbf{r}_x = \langle 1, 0, -1\rangle\)、\(\mathbf{r}_y = \langle 0, 1, -1\rangle\)；叉积 \(\mathbf{r}_x \times \mathbf{r}_y = \langle 1, 1, 1\rangle\)。这一向量正指向"远离原点的一侧"——也就是上方法向，符合题意。</p>
+
+<p>\(\mathbf{F}\cdot(\mathbf{r}_x \times \mathbf{r}_y) = 1\)。所以</p>
+
+<p>\[\iint_S \mathbf{F}\cdot d\mathbf{S} = \iint_D 1\,dA = (\text{三角形 }D\text{ 的面积}) = \tfrac{1}{2}.\]</p>
+
+<p>几何含义：常向量场 \(\langle 0, 0, 1\rangle\) "向上吹"，吹过这块倾斜的三角形——通量等于这块三角形<strong>水平投影</strong>的面积。投影正是 \(D\)，面积 \(1/2\)。结论与直觉一致。</p>
+
+<h3>例 3：匀速场穿过球面</h3>
+
+<p>\(\mathbf{F} = \langle 0, 0, 1\rangle\)（垂直向上的均匀流）通过单位球面（外法向）的通量。</p>
+
+<p>不需要做积分。物理上想：水从下面进、从上面出，进与出的"截面"都是同一个赤道圆盘——上面流出去多少，下面就流进来多少，<strong>净通量为零</strong>。</p>
+
+<p>真要算的话，可以这样验：球面的外法向是 \(\mathbf{n} = \langle x, y, z\rangle\)，所以 \(\mathbf{F}\cdot\mathbf{n} = z\)。\(\iint_S z\,dS\)？球面对于 \(z\to -z\) 的反射对称，\(z\) 是奇函数，所以积分为 0。两条途径相符。</p>
+
+<h3>例 4：穿过圆柱侧面</h3>
+
+<p>\(\mathbf{F} = \langle x, y, 0\rangle\) 通过半径 1、高度从 \(z = 0\) 到 \(z = 2\) 的圆柱侧面（取外法向）的通量。</p>
+
+<p>用 \(\mathbf{r}(\theta, z) = \langle \cos\theta, \sin\theta, z\rangle\)。偏导 \(\mathbf{r}_\theta = \langle -\sin\theta, \cos\theta, 0\rangle\)、\(\mathbf{r}_z = \langle 0, 0, 1\rangle\)。叉积</p>
+
+<p>\[\mathbf{r}_\theta \times \mathbf{r}_z = \langle \cos\theta, \sin\theta, 0\rangle.\]</p>
+
+<p>这一向量指向"远离 \(z\) 轴"的方向——正是外法向。\(\mathbf{F}(\mathbf{r}) = \langle \cos\theta, \sin\theta, 0\rangle\)；点积</p>
+
+<p>\[\mathbf{F}\cdot(\mathbf{r}_\theta \times \mathbf{r}_z) = \cos^2\theta + \sin^2\theta = 1.\]</p>
+
+<p>积分</p>
+
+<p>\[\int_0^2\int_0^{2\pi} 1\,d\theta\,dz = 2\pi\cdot 2 = 4\pi.\]</p>
+
+<p>形象解释：场 \(\mathbf{F} = \langle x, y, 0\rangle\) 是水平的"四面八方向外推"的场，长度 \(\sqrt{x^2 + y^2} = 1\)（在圆柱面上恒为 1），方向恰好是外法向。所以 \(\mathbf{F}\cdot\mathbf{n} = 1\) 处处成立，乘以侧面积 \(2\pi\cdot 1\cdot 2 = 4\pi\) 得通量。两条途径再次相符。</p>
+
+<h2 id="sec24-3">24.3 给曲面定向</h2>
+
+<p>通量积分依赖于<strong>定向</strong>：把法向 \(\mathbf{n}\) 翻成 \(-\mathbf{n}\)，通量就改变符号。那么，"定向"到底是什么？怎么选？哪些曲面允许、哪些不允许？这些是这一节的主题。</p>
+
+<p>所谓<strong>给曲面 \(S\) 定向</strong>，就是在 \(S\) 上每一点选定一个单位法向 \(\mathbf{n}\)，使得这些 \(\mathbf{n}\) 在曲面上是<strong>连续</strong>变化的。换句话说，就是给整张曲面挑了一面叫"正面"——某种意义上的"涂上颜色"。</p>
+
+<p>对于大部分常见曲面，都能这么做。一个简单的判据：如果曲面是<strong>双面的</strong>——你站在它一面上，永远走不到另一面去（除非穿过边界），那它就<strong>可定向</strong>。球面、平面、圆柱面、圆锥面、抛物面、环面，都是双面的。但有一些奇怪的曲面例外——最著名的是<strong>莫比乌斯带</strong>：把一长条纸两端反向粘起来，沿着带子走一圈再回到出发点，你会发现自己站到了"另一面"。法向量在你绕一圈后变成了反方向——这意味着不可能在莫比乌斯带上连续地选一个方向的 \(\mathbf{n}\)。所以莫比乌斯带<strong>不可定向</strong>，对它谈通量积分就没有意义。我们这门课只跟"乖的"曲面打交道，请放心。</p>
+
+<p>给曲面定向，常见的做法有以下几种。</p>
+
+<p><strong>显函数曲面 \(z = f(x, y)\)。</strong>有"上方法向"和"下方法向"之分。前者法向的 \(z\)-分量为正（即 \(\langle -f_x, -f_y, 1\rangle\) 那一支），后者反过来。题目通常会明说"取上方法向"还是"下方法向"。如果没说，按常理选 \(z\)-分量为正——它对应你"从上方看"这张曲面。</p>
+
+<p><strong>闭曲面（如球面、椭球面、立方体表面）。</strong>所谓"闭曲面"是指它<strong>把一块体积封死</strong>——内部和外部分得清清楚楚，没有边界曲线。约定俗成的标准定向是<strong>外法向</strong>，也就是从内部指向外部的那一支。所有教材里讲"流出闭曲面的通量"、所有散度定理的"标准形式"，都默认外法向。</p>
+
+<p><strong>有边界的曲面。</strong>比如一片"半球壳"或"漏斗"。它有一条边界曲线 \(\partial S\)。两侧法向都允许——但一旦你选定其中一侧 \(\mathbf{n}\)，<strong>边界曲线 \(\partial S\) 的环行方向就被一并钉死</strong>，规则是<strong>右手定则</strong>：把右手的拇指对准 \(\mathbf{n}\)，则四指弯曲的方向就是 \(\partial S\) 的<strong>正方向</strong>。也就是说，沿着 \(\partial S\) 走的时候，曲面在你<strong>左手边</strong>。这条规则是斯托克斯定理里"边界方向"必须遵守的约定。</p>
+
+<p>形象一些来说："你站在 \(S\) 的正面上沿边界走，曲面应当在你左手边"——这与平面区域 \(D\) 的"逆时针"边界（站在 \(\langle 0, 0, 1\rangle\) 这一面上看，\(\partial D\) 逆时针）是同一种约定，只是搬到了三维的弯曲表面上。</p>
+
+<p>给曲面参数化时，叉积 \(\mathbf{r}_u \times \mathbf{r}_v\) 自动给出某一侧的法向——但它是哪一侧、是不是题目要的那一侧，需要你检查。一种典型情形：算出叉积后看它的某个分量符号；与"题目要求的法向那一分量符号"对一对，就知道方向是否对。如果反了，要么把通量积分结果加个负号，要么把参数 \(u\)、\(v\) 调换顺序——后一种做法等于把叉积反向。</p>
+
+<p>定向选错的代价就是一个负号。但对于闭曲面、对于斯托克斯定理那种要把曲面与边界配套使用的场合，一个负号足以让整道题的物理意义全错。所以请把"先确定定向、再写参数化、再算叉积、再核对方向"作为通量积分的固定流程。</p>
+
+<p>下一步顺理成章：第 21 章的曲线积分有格林定理把它和二重积分挂钩；本章的通量积分有<strong>斯托克斯定理</strong>把它和曲线积分挂钩，又有<strong>散度定理</strong>把它和三重积分挂钩。两条新的桥梁——它们就是 25、26 两章的主角。</p>
+
+<hr/>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 参数曲面与曲面面积</a><a href="ch25.html">下一章 · 第 25 章 斯托克斯定理 →</a></nav>
+
+</main>
+</body>
+</html>

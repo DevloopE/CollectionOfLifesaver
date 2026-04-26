@@ -1,0 +1,818 @@
+<h1 id="ch15">第 15 章 用留数计算实积分</h1>
+
+<p>到此为止你应该已经有"留数定理是个漂亮工具"的感觉——它把一个闭曲线上的复积分压缩成几个局部数字之和。这个事情的<em>语法</em>很优美，但它还有一个更刺激的<em>语义</em>：你可以拿留数定理去算<em>实积分</em>。你没看错——把一个完全发生在实数轴上、看起来与复数毫无关系的积分，<strong>嵌入</strong>到复平面里，借助留数定理几行就出结果。这是整本复分析里最实用、最神奇的一招，也是 19 世纪以来分析学的标配杀手锏。</p>
+
+<p>这种"实积分被复分析瞬解"的奇迹在第一次见到时几乎让人难以置信。比方说</p>
+
+\[
+\int_{-\infty}^{\infty} \frac{dx}{x^4 + 1} = \frac{\pi}{\sqrt{2}}.
+\]
+
+<p>用纯实分析方法（部分分式 + 反三角积分）当然也能算出来，但中间那段代数会让你怀疑人生。用留数：找出 \(1/(z^4+1)\) 在上半平面的两个极点，把它们的留数加起来乘以 \(2\pi i\)，几行结束。再比如</p>
+
+\[
+\int_0^\infty \frac{\sin x}{x}\, dx = \frac{\pi}{2}.
+\]
+
+<p>这个积分在实分析里是有名难算（它甚至不是绝对收敛的，要分部积分加技巧），但用复分析能用一个"绕过原点小半圆"的轮廓在两三行内完成。再比如</p>
+
+\[
+\int_0^\infty \frac{x^{a-1}}{1 + x}\, dx = \frac{\pi}{\sin(\pi a)}, \qquad 0 < a < 1.
+\]
+
+<p>这个积分的实分析做法是不存在的——你甚至不知道从哪下手。但用复分析里的"keyhole"轮廓，沿挖了切口的正实轴绕一圈，靠 \(z^{a-1}\) 在切口两侧的<em>分支跳跃</em>，立即得到答案。</p>
+
+<p>本章的目标是把这些"奇迹"系统化。我们把可用留数法处理的实积分按形式分成五大类，每一类配一个标准化的<em>轮廓</em>，让你看到一个新积分时能马上认出它属于哪一类、该用哪条轮廓。结尾的 15.7 节会把这五类汇成一张速查表——这是这一章你<em>必须背下来</em>的内容。</p>
+
+<p>本章讲的内容：</p>
+
+<ul>
+<li>15.1：把"实积分嵌入复积分"的总哲学。</li>
+<li>15.2：类型 1，三角函数有理积分（单位圆）。</li>
+<li>15.3：类型 2，实有理函数广义积分（上半圆）。</li>
+<li>15.4：类型 3，含 \(\sin/\cos\) 的振荡积分（Jordan 引理 + 上半圆）。</li>
+<li>15.5：类型 4，分数幂积分（keyhole 轮廓）。</li>
+<li>15.6：类型 5，含对数的积分。</li>
+<li>15.7：轮廓选择心法表。</li>
+</ul>
+
+<h2 id="sec15-1">15.1 哲学：把实积分嵌入复平面</h2>
+
+<p>在动手做题之前，先把这套方法的<em>共同套路</em>看清楚。它实际上每次都是同一个三步舞：</p>
+
+<p><strong>第一步——配方。</strong> 取一个待求的实积分 \(\int_a^b f(x)\, dx\)。把被积函数 \(f(x)\) "复化"成一个复函数 \(F(z)\)，它在实轴上 \(F(x) = f(x)\)（或者跟 \(f(x)\) 有一个清晰的关系，比如 \(f(x) = \mathrm{Re}\, F(x)\) 或 \(\mathrm{Im}\, F(x)\)）。</p>
+
+<p><strong>第二步——闭轮廓。</strong> 找到一条<em>闭曲线</em> \(\Gamma\)，使得：</p>
+<ol>
+<li>\(\Gamma\) 的某一段就是你要求的实积分路径（\([a, b]\) 或 \([-R, R]\) 等）。</li>
+<li>\(\Gamma\) 的剩余部分（"补段"）你能<em>分析地控制</em>——通常是证明它在某种取极限下趋于 0（比如让圆半径 \(R \to \infty\)）。</li>
+<li>\(F(z)\) 在 \(\Gamma\) 内部除有限个奇点外解析。</li>
+</ol>
+
+<p>常见的轮廓有：</p>
+<ul>
+<li><em>单位圆</em>（\(z = e^{i\theta}\)）：用于 \(\int_0^{2\pi} R(\cos\theta, \sin\theta)\, d\theta\)。</li>
+<li><em>上半圆</em>（\([-R, R]\) + 上半 \(|z| = R\)，让 \(R \to \infty\)）：用于 \(\int_{-\infty}^\infty\) 的有理函数或 \(R(x) e^{iax}\)。</li>
+<li><em>挖洞的上半圆</em>（再绕开实轴上的奇点）：用于 \(\sin x / x\) 这类奇点恰在路径上的情形。</li>
+<li><em>Keyhole 轮廓</em>（沿正实轴上下两侧 + 一大圆 + 一小圆）：用于 \(\int_0^\infty x^{a-1} R(x)\, dx\)。</li>
+<li><em>矩形轮廓</em>：用于含 \(e^{2\pi i x / T}\) 周期性的情形（不在本章详述）。</li>
+</ul>
+
+<p><strong>第三步——留数定理。</strong> 沿 \(\Gamma\) 整个用留数定理算 \(\oint_\Gamma F = 2\pi i \sum \mathrm{Res}\)。把这个"总和"拆成"实轴段 + 补段"。补段在某种极限下趋于 0（如果你选的轮廓对路），剩下的就是<em>你要的实积分</em>等于<em>右边那堆留数的明确组合</em>。</p>
+
+<p>整套程序的关键就在第二步——<em>选对轮廓</em>。不同形式的实积分需要不同的轮廓，没有"万能轮廓"。学会"看一眼积分就知道用哪条轮廓"是本章的核心技能。</p>
+
+<p>下面五节按类型逐个展开。每一类都给出"什么积分属于这一类"的判别、对应的标准轮廓、以及完整推导。学完之后再去 15.7 节看那张总表，整个体系就贯通了。</p>
+
+<h2 id="sec15-2">15.2 类型 1：三角函数有理积分</h2>
+
+<p>形如</p>
+
+\[
+I = \int_0^{2\pi} R(\cos\theta, \sin\theta)\, d\theta
+\]
+
+<p>的积分，其中 \(R(u, v)\) 是 \(u, v\) 的有理函数。换句话说，被积函数是 \(\cos\theta\) 和 \(\sin\theta\) 的某个有理表达式，在 \([0, 2\pi]\) 上有定义且不发散。</p>
+
+<p>这一类的轮廓是<strong>单位圆</strong>。诀窍是把 \(\theta\) 解释成 \(z = e^{i\theta}\) 的辐角——当 \(\theta\) 从 0 跑到 \(2\pi\) 时，\(z\) 沿单位圆 \(|z| = 1\) 逆时针绕一圈。</p>
+
+<h3 id="sec15-2-1">15.2.1 标准换元</h3>
+
+<p>设 \(z = e^{i\theta}\)。则</p>
+
+<ul>
+<li>\(\cos\theta = \dfrac{z + z^{-1}}{2} = \dfrac{z + 1/z}{2}\)（因为 \(\cos\theta = (e^{i\theta} + e^{-i\theta})/2\)）。</li>
+<li>\(\sin\theta = \dfrac{z - z^{-1}}{2i} = \dfrac{z - 1/z}{2i}\)。</li>
+<li>\(dz = i e^{i\theta} d\theta = i z\, d\theta\)，所以 \(d\theta = \dfrac{dz}{iz}\)。</li>
+</ul>
+
+<p>把这三件事代入实积分：</p>
+
+\[
+\int_0^{2\pi} R(\cos\theta, \sin\theta)\, d\theta = \oint_{|z| = 1} R\!\left(\frac{z + 1/z}{2},\, \frac{z - 1/z}{2i}\right) \frac{dz}{iz}.
+\]
+
+<p>右边是一个<em>沿单位圆</em>的复积分。把里面的式子整理一下，通常会变成单位圆里某个有理函数 \(F(z)\) 的积分。然后用留数定理：找出 \(F\) 在 \(|z| < 1\) 内的所有极点，求留数和，乘 \(2\pi i\)。</p>
+
+<h3 id="sec15-2-2">15.2.2 经典例题：\(\int_0^{2\pi} \dfrac{d\theta}{a + b \cos\theta}\)</h3>
+
+<p>这是教科书里几乎一定要算一遍的例题。设 \(a > |b| > 0\)（保证分母在 \([0, 2\pi]\) 上不为零）。</p>
+
+<p>套换元：</p>
+
+\[
+I = \oint_{|z|=1} \frac{1}{a + b \cdot \frac{z + 1/z}{2}} \cdot \frac{dz}{iz} = \oint_{|z|=1} \frac{1}{iz} \cdot \frac{2z}{2az + b z^2 + b}\, dz = \oint_{|z|=1} \frac{2}{i (b z^2 + 2 a z + b)}\, dz.
+\]
+
+<p>整理一下：</p>
+
+\[
+I = \frac{2}{i} \oint_{|z|=1} \frac{dz}{b z^2 + 2 a z + b}.
+\]
+
+<p>分母 \(b z^2 + 2 a z + b = 0\) 的两根：</p>
+
+\[
+z = \frac{-2a \pm \sqrt{4 a^2 - 4 b^2}}{2 b} = \frac{-a \pm \sqrt{a^2 - b^2}}{b}.
+\]
+
+<p>记 \(\alpha = \dfrac{-a + \sqrt{a^2 - b^2}}{b}\)，\(\beta = \dfrac{-a - \sqrt{a^2 - b^2}}{b}\)。注意 \(\alpha \beta = b/b = 1\)（Vieta 定理）。所以 \(\alpha\) 和 \(\beta\) 互为倒数。</p>
+
+<p>这是一个关键观察：<strong>两根互为倒数 ⇒ 一根在单位圆内、一根在单位圆外</strong>（除非两根都在单位圆上，那是边界情形）。具体来说，因为 \(a > |b| > 0\)，可以验证 \(|\alpha| < 1 < |\beta|\)（细节：\(\alpha\) 是"+"根，分子 \(-a + \sqrt{a^2 - b^2}\)，由于 \(\sqrt{a^2 - b^2} < a\)，分子是负数；\(b > 0\) 时 \(\alpha < 0\)，并且 \(|\alpha| = \dfrac{a - \sqrt{a^2 - b^2}}{b}\)，可以核实 \(|\alpha| < 1\)）。</p>
+
+<p>所以单位圆里只有<em>一个</em>极点 \(z = \alpha\)。它是一阶极点。用 \(g/h'\) 公式：分子 1，分母 \(h(z) = b z^2 + 2a z + b\)，\(h'(z) = 2 b z + 2 a\)，</p>
+
+\[
+\mathrm{Res}\!\left(\frac{1}{b z^2 + 2 a z + b},\, \alpha\right) = \frac{1}{2 b \alpha + 2 a} = \frac{1}{2(b \alpha + a)}.
+\]
+
+<p>而 \(b \alpha = -a + \sqrt{a^2 - b^2}\)，所以 \(b \alpha + a = \sqrt{a^2 - b^2}\)。于是留数 \(= \dfrac{1}{2 \sqrt{a^2 - b^2}}\)。</p>
+
+<p>留数定理：</p>
+
+\[
+\oint_{|z|=1} \frac{dz}{b z^2 + 2 a z + b} = 2 \pi i \cdot \frac{1}{2 \sqrt{a^2 - b^2}} = \frac{\pi i}{\sqrt{a^2 - b^2}}.
+\]
+
+<p>代回：</p>
+
+\[
+I = \frac{2}{i} \cdot \frac{\pi i}{\sqrt{a^2 - b^2}} = \boxed{\frac{2\pi}{\sqrt{a^2 - b^2}}.}
+\]
+
+<p>是不是非常干净？对比一下用纯实分析做：万能换元 \(t = \tan(\theta/2)\) 把它化成有理函数积分，再积出反正切，再代入端点……五分钟以上的代数。复分析法只用了两个公式：换元 \(z = e^{i\theta}\) 和留数公式，三五行结束。</p>
+
+<h3 id="sec15-2-3">15.2.3 验证：取具体值</h3>
+
+<p>来验证一下结果。取 \(a = 2, b = 1\)：\(I = \dfrac{2\pi}{\sqrt{3}}\)。这与已知结果（标准积分表）吻合。再取 \(a = b\) 的边界情形（不应套公式，因为 \(a > |b|\) 才成立）：公式给出 \(2\pi/0 = \infty\)，对应 \(\int_0^{2\pi} \dfrac{d\theta}{a(1 + \cos\theta)}\) 在 \(\theta = \pi\) 附近发散——\(1 + \cos\pi = 0\)。一致。</p>
+
+<h3 id="sec15-2-4">15.2.4 例题：\(\int_0^{2\pi} \dfrac{\cos 2\theta}{5 - 4 \cos\theta}\, d\theta\)</h3>
+
+<p>更花哨一点。利用 \(\cos 2\theta = (z^2 + z^{-2})/2\)：</p>
+
+\[
+\int_0^{2\pi} \frac{\cos 2\theta}{5 - 4\cos\theta}\, d\theta = \oint_{|z|=1} \frac{(z^2 + z^{-2})/2}{5 - 2(z + 1/z)} \cdot \frac{dz}{iz}.
+\]
+
+<p>分子分母同乘 \(z^2\)：</p>
+
+\[
+= \oint \frac{(z^4 + 1)/2}{(5 z - 2 z^2 - 2) z} \cdot \frac{dz}{i} \cdot \frac{1}{z} \cdot z^{-? } \ldots
+\]
+
+<p>让我重做这个化简，分步走更稳。先把分母 \(5 - 4 \cos\theta\) 替换：\(5 - 2(z + 1/z) = \dfrac{5z - 2z^2 - 2}{z} = -\dfrac{2 z^2 - 5 z + 2}{z}\)。分子：\((z^2 + z^{-2})/2 = \dfrac{z^4 + 1}{2 z^2}\)。所以</p>
+
+\[
+\frac{\cos 2\theta}{5 - 4\cos\theta} = \frac{(z^4 + 1)/(2 z^2)}{-(2 z^2 - 5 z + 2)/z} = -\frac{z^4 + 1}{2 z (2 z^2 - 5 z + 2)}.
+\]
+
+<p>乘上 \(d\theta = dz/(iz)\)：</p>
+
+\[
+\text{被积} \cdot d\theta = -\frac{z^4 + 1}{2 z (2 z^2 - 5 z + 2)} \cdot \frac{dz}{iz} = -\frac{z^4 + 1}{2 i z^2 (2 z^2 - 5 z + 2)}\, dz.
+\]
+
+<p>所以</p>
+
+\[
+I = -\frac{1}{2i} \oint_{|z|=1} \frac{z^4 + 1}{z^2 (2 z^2 - 5 z + 2)}\, dz.
+\]
+
+<p>分母 \(2 z^2 - 5 z + 2 = (2z - 1)(z - 2)\)。零点在 \(z = 1/2\) 和 \(z = 2\)。\(|1/2| = 1/2 < 1\)，进圈；\(|2| = 2 > 1\)，不进。再加上 \(z^2\) 给的二阶极点 \(z = 0\)，进圈。所以单位圆内有两个极点：\(z = 0\)（二阶）和 \(z = 1/2\)（一阶）。</p>
+
+<p>记 \(F(z) = \dfrac{z^4 + 1}{z^2 (2z - 1)(z - 2)}\)。</p>
+
+<p>\(\mathrm{Res}(F, 1/2) = \dfrac{(1/2)^4 + 1}{(1/2)^2 \cdot 2 \cdot (1/2 - 2)} = \dfrac{17/16}{(1/4)(2)(-3/2)} = \dfrac{17/16}{-3/4} = -\dfrac{17}{12}\)。</p>
+
+<p>\(\mathrm{Res}(F, 0)\)：二阶极点。</p>
+
+\[
+z^2 F = \frac{z^4 + 1}{(2z - 1)(z - 2)}.
+\]
+
+<p>求一次导，然后代 \(z = 0\)。把分母展开 \((2z-1)(z-2) = 2z^2 - 5z + 2\)。</p>
+
+\[
+\frac{d}{dz} \frac{z^4 + 1}{2 z^2 - 5 z + 2} = \frac{4 z^3 (2 z^2 - 5 z + 2) - (z^4 + 1)(4 z - 5)}{(2 z^2 - 5 z + 2)^2}.
+\]
+
+<p>代 \(z = 0\)：分子 \(= 0 - (1)(-5) = 5\)；分母 \(= (2)^2 = 4\)。所以 \(\mathrm{Res}(F, 0) = 5/4\)。</p>
+
+<p>留数和 \(= -\dfrac{17}{12} + \dfrac{5}{4} = -\dfrac{17}{12} + \dfrac{15}{12} = -\dfrac{2}{12} = -\dfrac{1}{6}\)。</p>
+
+<p>留数定理：\(\oint F\, dz = 2\pi i \cdot (-1/6) = -\pi i / 3\)。</p>
+
+<p>代回：</p>
+
+\[
+I = -\frac{1}{2i} \cdot \left(-\frac{\pi i}{3}\right) = \frac{\pi}{6}.
+\]
+
+<p>所以 \(\displaystyle\int_0^{2\pi} \dfrac{\cos 2\theta}{5 - 4\cos\theta}\, d\theta = \dfrac{\pi}{6}\)。</p>
+
+<p>这道例题展示了类型 1 的<em>实战流程</em>：换元化为单位圆复积分，整理到只剩有理函数 + \(dz\) 的形式，找极点，挑出在单位圆内的，套留数，最后乘回前面那个 \(1/i\) 因子。<em>步骤虽长但每一步都机械</em>——熟练后所有这类题都不超过五分钟。</p>
+
+<h2 id="sec15-3">15.3 类型 2：实有理函数广义积分</h2>
+
+<p>形如</p>
+
+\[
+I = \int_{-\infty}^{\infty} R(x)\, dx
+\]
+
+<p>的积分，其中 \(R(x) = P(x) / Q(x)\) 是实系数有理函数，满足以下条件：</p>
+
+<ol>
+<li>\(Q(x)\) 在实轴上没有零点（即没有实极点）。</li>
+<li>分母比分子至少高 2 阶（即 \(\deg Q \geq \deg P + 2\)）。这一条保证了被积函数衰减得足够快，积分在 \(\pm\infty\) 处收敛。</li>
+</ol>
+
+<p>这一类的轮廓是<strong>上半圆</strong>：实轴段 \([-R, R]\) 加上半圆弧 \(C_R: |z| = R, \mathrm{Im}\, z \geq 0\)（逆时针），合在一起构成一条闭曲线 \(\Gamma_R\)。</p>
+
+<p>在闭曲线 \(\Gamma_R\) 内部应用留数定理：</p>
+
+\[
+\oint_{\Gamma_R} R(z)\, dz = 2\pi i \sum_{\mathrm{Im}\, z_k > 0} \mathrm{Res}(R, z_k),
+\]
+
+<p>求和取 \(R\) 在<em>上半平面</em>的所有极点（如果 \(R\) 大到那些极点全都进圈）。</p>
+
+<p>把左边拆开：</p>
+
+\[
+\int_{-R}^{R} R(x)\, dx + \int_{C_R} R(z)\, dz = 2\pi i \sum_{\mathrm{Im}\, z_k > 0} \mathrm{Res}(R, z_k).
+\]
+
+<p>关键的一招——证明 \(\int_{C_R} R(z)\, dz \to 0\) 当 \(R \to \infty\)。原因：\(R(z) = O(1/z^2)\) 当 \(|z| \to \infty\)（因为分母比分子高 \(\geq 2\)），所以 \(|R(z)| \leq C/R^2\) 在 \(C_R\) 上；半圆周长 \(\pi R\)；总积分 \(\leq C/R^2 \cdot \pi R = C \pi / R \to 0\)。</p>
+
+<p>令 \(R \to \infty\)：左边第一项变成 \(\int_{-\infty}^{\infty} R(x)\, dx = I\)；左边第二项变 0；右边的留数和不依赖于 \(R\)（只要 \(R\) 大到把所有上半平面极点都圈进去就行）。所以</p>
+
+\[
+\boxed{\int_{-\infty}^{\infty} R(x)\, dx = 2\pi i \sum_{\mathrm{Im}\, z_k > 0} \mathrm{Res}(R, z_k).}
+\]
+
+<h3 id="sec15-3-1">15.3.1 经典例题：\(\int_{-\infty}^{\infty} \dfrac{dx}{x^4 + 1}\)</h3>
+
+<p>分母比分子高 4 阶，远超 2，所以积分收敛。\(R(z) = 1/(z^4 + 1)\)。极点：\(z^4 = -1\)，即 \(z = e^{i\pi/4}, e^{i 3\pi/4}, e^{i 5\pi/4}, e^{i 7\pi/4}\)。其中前两个在上半平面，后两个在下半平面。</p>
+
+<p>记 \(z_1 = e^{i \pi/4}, z_2 = e^{i 3\pi/4}\)。每个都是一阶极点。用 \(g/h'\) 公式（\(h(z) = z^4 + 1\)，\(h'(z) = 4 z^3\)）：</p>
+
+\[
+\mathrm{Res}(R, z_k) = \frac{1}{4 z_k^3}.
+\]
+
+<p>这是个很巧的形式。注意 \(z_k^4 = -1\)，所以 \(z_k^3 = -1/z_k\)，于是 \(\dfrac{1}{4 z_k^3} = \dfrac{-z_k}{4}\)。所以 \(\mathrm{Res}(R, z_k) = -z_k/4\)。</p>
+
+<p>两个之和：</p>
+
+\[
+\mathrm{Res}(R, z_1) + \mathrm{Res}(R, z_2) = -\frac{e^{i\pi/4} + e^{i 3\pi/4}}{4}.
+\]
+
+<p>计算 \(e^{i\pi/4} + e^{i 3\pi/4}\)：写出来 \(= (\cos \pi/4 + i \sin\pi/4) + (\cos 3\pi/4 + i \sin 3\pi/4) = (\tfrac{\sqrt 2}{2} - \tfrac{\sqrt 2}{2}) + i (\tfrac{\sqrt 2}{2} + \tfrac{\sqrt 2}{2}) = 0 + i \sqrt 2 = i \sqrt 2\)。</p>
+
+<p>所以 \(\mathrm{Res}(R, z_1) + \mathrm{Res}(R, z_2) = -\dfrac{i \sqrt 2}{4}\)。</p>
+
+<p>积分：</p>
+
+\[
+\int_{-\infty}^{\infty} \frac{dx}{x^4 + 1} = 2\pi i \cdot \left(-\frac{i \sqrt 2}{4}\right) = \frac{2 \pi \sqrt 2}{4} = \frac{\pi \sqrt 2}{2} = \boxed{\frac{\pi}{\sqrt 2}.}
+\]
+
+<p>三行就完。如果你试着用纯实分析做（部分分式 + arctan），需要把 \(x^4 + 1\) 分解成 \((x^2 + \sqrt 2 x + 1)(x^2 - \sqrt 2 x + 1)\)，然后做四个 arctan/log 的端点估值——绝对要熬几页纸。复分析法的胜利完全是<em>结构性的</em>：它直接绕开了部分分式分解。</p>
+
+<h3 id="sec15-3-2">15.3.2 例题：\(\int_{-\infty}^{\infty} \dfrac{x^2}{(x^2 + 1)(x^2 + 4)}\, dx\)</h3>
+
+<p>分子 2 阶，分母 4 阶，差 2，恰好满足收敛条件。</p>
+
+<p>\(R(z) = \dfrac{z^2}{(z^2 + 1)(z^2 + 4)}\)。极点：\(z = \pm i\)（来自 \(z^2 + 1\)），\(z = \pm 2i\)（来自 \(z^2 + 4\)）。上半平面里：\(z = i\) 和 \(z = 2i\)。</p>
+
+<p>都是一阶极点。用 14.5.2 \(g/h'\) 公式不太方便（分母是乘积），直接用 14.5.1 的极限公式：</p>
+
+\[
+\mathrm{Res}(R, i) = \lim_{z \to i} (z - i) \cdot \frac{z^2}{(z - i)(z + i)(z^2 + 4)} = \frac{i^2}{(2i)(i^2 + 4)} = \frac{-1}{(2i)(3)} = \frac{-1}{6i} = \frac{i}{6}.
+\]
+
+\[
+\mathrm{Res}(R, 2i) = \lim_{z \to 2i} (z - 2i) \cdot \frac{z^2}{(z^2 + 1)(z - 2i)(z + 2i)} = \frac{(2i)^2}{((2i)^2 + 1)(4i)} = \frac{-4}{(-3)(4i)} = \frac{-4}{-12i} = \frac{1}{3i} = -\frac{i}{3}.
+\]
+
+<p>之和 \(= \dfrac{i}{6} - \dfrac{i}{3} = \dfrac{i - 2i}{6} = -\dfrac{i}{6}\)。</p>
+
+\[
+I = 2\pi i \cdot \left(-\frac{i}{6}\right) = \frac{2 \pi}{6} = \frac{\pi}{3}.
+\]
+
+<p>结果是 \(\pi/3\)，一个干净的实数。注意右边 \(2\pi i\) 乘 \(-i/6\) 自动产生了"\(i \cdot i = -1\)" 的效果，把虚数因子消掉，给出纯实数——这是必然的，因为左边显然是实数。这也是一个交叉验证：<em>留数和必然是纯虚数（如果 \(R\) 是实有理函数）</em>，否则乘 \(2\pi i\) 后结果不是实数，跟左边矛盾。</p>
+
+<h2 id="sec15-4">15.4 类型 3：含 \(\sin/\cos\) 的振荡积分</h2>
+
+<p>形如</p>
+
+\[
+I = \int_{-\infty}^{\infty} R(x) \cos(a x)\, dx \quad \text{或} \quad \int_{-\infty}^{\infty} R(x) \sin(a x)\, dx,
+\]
+
+<p>其中 \(R(x)\) 是实有理函数，\(a > 0\)（\(a < 0\) 的情形对称处理）。条件：\(R\) 在实轴无极点，且分母比分子高 \(\geq 1\) 阶（不需要高 2 阶——下面会看到为什么）。</p>
+
+<p>诀窍是：考虑复版本 \(\int_{-\infty}^{\infty} R(x) e^{i a x}\, dx\)。这个积分的实部就是 \(\int R \cos(ax)\)，虚部就是 \(\int R \sin(ax)\)。一次算完就同时得到两个。</p>
+
+<p>用上半圆轮廓 \(\Gamma_R\)：</p>
+
+\[
+\oint_{\Gamma_R} R(z) e^{i a z}\, dz = \int_{-R}^{R} R(x) e^{i a x}\, dx + \int_{C_R} R(z) e^{i a z}\, dz.
+\]
+
+<p>右边 = \(2\pi i \sum_{\mathrm{上半平面极点}} \mathrm{Res}(R(z) e^{i a z}, z_k)\)。</p>
+
+<p>关键是证明 \(\int_{C_R} R(z) e^{i a z}\, dz \to 0\)。这件事不像类型 2 那样直接——\(e^{i a z}\) 在上半平面 \(\mathrm{Im}\, z > 0\) 时模 \(|e^{i a z}| = e^{-a \, \mathrm{Im}\, z} \leq 1\)，但不会自动让积分趋于零，因为 \(R\) 可能只衰减得像 \(1/z\)。这里要用<strong>Jordan 引理</strong>。</p>
+
+<h3 id="sec15-4-1">15.4.1 Jordan 引理</h3>
+
+<p><strong>Jordan 引理。</strong> 设 \(g(z)\) 在上半平面 \(|z| \geq R_0\) 中解析，且 \(\max_{|z|=R, \mathrm{Im}\, z \geq 0} |g(z)| \to 0\) 当 \(R \to \infty\)。则对任何 \(a > 0\)，</p>
+
+\[
+\lim_{R \to \infty} \int_{C_R} g(z) e^{i a z}\, dz = 0,
+\]
+
+<p>其中 \(C_R\) 是上半圆 \(|z| = R, \mathrm{Im}\, z \geq 0\)。</p>
+
+<p>证明梗概。在 \(C_R\) 上参数化 \(z = R e^{i\theta}\)，\(\theta \in [0, \pi]\)，\(dz = i R e^{i\theta}\, d\theta\)：</p>
+
+\[
+\left|\int_{C_R} g(z) e^{i a z}\, dz\right| \leq \int_0^\pi |g(R e^{i\theta})| \cdot |e^{i a R e^{i\theta}}| \cdot R\, d\theta.
+\]
+
+<p>计算 \(|e^{i a R e^{i\theta}}|\)：\(i a R e^{i\theta} = i a R(\cos\theta + i \sin\theta) = -a R \sin\theta + i a R \cos\theta\)，所以模 \(= e^{-a R \sin\theta}\)。代入：</p>
+
+\[
+\leq M(R) \cdot R \int_0^\pi e^{-a R \sin\theta}\, d\theta = M(R) \cdot 2 R \int_0^{\pi/2} e^{-a R \sin\theta}\, d\theta,
+\]
+
+<p>其中 \(M(R) = \max_{|z|=R, \mathrm{Im}\, z \geq 0} |g(z)| \to 0\)，并用了 \(\sin\theta\) 关于 \(\pi/2\) 的对称性。</p>
+
+<p>用 Jordan 不等式 \(\sin\theta \geq \tfrac{2\theta}{\pi}\)（\(\theta \in [0, \pi/2]\)）：</p>
+
+\[
+\int_0^{\pi/2} e^{-a R \sin\theta}\, d\theta \leq \int_0^{\pi/2} e^{-a R \cdot 2\theta/\pi}\, d\theta = \frac{\pi}{2 a R} (1 - e^{-a R}) \leq \frac{\pi}{2 a R}.
+\]
+
+<p>所以总估计</p>
+
+\[
+\left|\int_{C_R} g(z) e^{i a z}\, dz\right| \leq M(R) \cdot 2 R \cdot \frac{\pi}{2 a R} = \frac{\pi M(R)}{a}.
+\]
+
+<p>当 \(R \to \infty\)，\(M(R) \to 0\)，所以右边趋于 0。\(\square\)</p>
+
+<p>关键点：Jordan 引理只要求 \(R(z) \to 0\) 即可（不必 \(O(1/z^2)\)），是因为 \(e^{i a z}\) 在上半圆上有"指数小"的衰减 \(e^{-a R \sin\theta}\)，这弥补了 \(R\) 衰减不够的问题。</p>
+
+<h3 id="sec15-4-2">15.4.2 例题：\(\int_{-\infty}^{\infty} \dfrac{\cos x}{1 + x^2}\, dx\)</h3>
+
+<p>考虑复版 \(\int_{-\infty}^{\infty} \dfrac{e^{i x}}{1 + x^2}\, dx\)。被积函数 \(F(z) = \dfrac{e^{i z}}{1 + z^2}\)，奇点 \(z = \pm i\)。上半平面里只有 \(z = i\)。</p>
+
+<p>一阶极点。用 \(g/h'\) 公式：\(g(z) = e^{iz}\)，\(h(z) = 1 + z^2\)，\(h'(z) = 2z\)。</p>
+
+\[
+\mathrm{Res}(F, i) = \frac{e^{i \cdot i}}{2 i} = \frac{e^{-1}}{2 i} = \frac{1}{2 i e}.
+\]
+
+<p>留数定理 + Jordan 引理：</p>
+
+\[
+\int_{-\infty}^{\infty} \frac{e^{i x}}{1 + x^2}\, dx = 2 \pi i \cdot \frac{1}{2 i e} = \frac{\pi}{e}.
+\]
+
+<p>取实部得</p>
+
+\[
+\boxed{\int_{-\infty}^{\infty} \frac{\cos x}{1 + x^2}\, dx = \frac{\pi}{e}.}
+\]
+
+<p>取虚部得 \(\int_{-\infty}^{\infty} \dfrac{\sin x}{1 + x^2}\, dx = 0\)，这跟"\(\sin x / (1 + x^2)\) 是奇函数"的事实一致。</p>
+
+<p>这是一个有名的小奇迹——\(\int \cos / (1+x^2)\) 出现 \(1/e\) 这种"指数"因子，看起来跟实分析里的常规积分完全不像。它实质上是因为留数 \(e^{-1}/(2i)\) 里那个 \(e^{-1} = e^{i \cdot i}\) 自动算出了"\(e\) 项跑到结果里"。</p>
+
+<h3 id="sec15-4-3">15.4.3 一般化：\(\int_{-\infty}^{\infty} \dfrac{\cos(a x)}{1 + x^2}\, dx\)</h3>
+
+<p>同样的思路，留数变成 \(\dfrac{e^{i a \cdot i}}{2i} = \dfrac{e^{-a}}{2i}\)（\(a > 0\)）。所以</p>
+
+\[
+\int_{-\infty}^{\infty} \frac{\cos(a x)}{1 + x^2}\, dx = \pi e^{-a}, \qquad a > 0.
+\]
+
+<p>在 \(a > 0\) 上是 \(\pi e^{-a}\)；\(a < 0\) 时由 \(\cos\) 的偶性，结果是 \(\pi e^{-|a|}\)。所以一般地：\(\int \cos(ax)/(1+x^2) dx = \pi e^{-|a|}\)。注意必须用 \(|a|\)——因为 Jordan 引理要 \(a > 0\) 才能在<em>上</em>半圆衰减；\(a < 0\) 要换成下半圆，结果是同样的（这反映了 \(\cos\) 的偶对称）。</p>
+
+<h3 id="sec15-4-4">15.4.4 \(\sin x / x\) 的传奇</h3>
+
+<p>这是本节最经典也最棘手的例子。要算</p>
+
+\[
+\int_0^\infty \frac{\sin x}{x}\, dx.
+\]
+
+<p>由对称性 \((\sin x / x\) 是偶函数\()\)：</p>
+
+\[
+\int_0^\infty \frac{\sin x}{x}\, dx = \frac{1}{2} \int_{-\infty}^{\infty} \frac{\sin x}{x}\, dx.
+\]
+
+<p>但 \(\sin x / x\) 在 \(x = 0\) 处是可去奇点（极限为 1），所以这个实积分本身良定义，没有问题。</p>
+
+<p>麻烦在哪里？我们想用复版本 \(\int_{-\infty}^{\infty} \dfrac{e^{ix}}{x}\, dx\)，但 \(e^{ix}/x\) 在 \(x = 0\) 处<em>不</em>是可去奇点——它是真正的极点（虽然 \(\sin x / x\) 在 0 没事，但 \(e^{ix}/x = \cos x / x + i \sin x / x\)，前一项在 0 发散）。所以"原 路径直接积"会撞上奇点。</p>
+
+<p>解决：把奇点用一个<em>小半圆</em> \(\gamma_\epsilon\)（半径 \(\epsilon\)，从 \(-\epsilon\) 绕到 \(\epsilon\)，走上半平面）"绕过去"。轮廓变成：\([-R, -\epsilon]\) + \(\gamma_\epsilon\) + \([\epsilon, R]\) + 上半圆 \(C_R\)，整体逆时针闭合。这条轮廓<em>内部</em>没有 \(e^{iz}/z\) 的极点（被绕掉了）。所以</p>
+
+\[
+\oint = 0
+\]
+
+<p>（因为内部没奇点，留数和为零）。拆开：</p>
+
+\[
+\int_{-R}^{-\epsilon} \frac{e^{i x}}{x}\, dx + \int_{\gamma_\epsilon} \frac{e^{i z}}{z}\, dz + \int_{\epsilon}^{R} \frac{e^{i x}}{x}\, dx + \int_{C_R} \frac{e^{i z}}{z}\, dz = 0.
+\]
+
+<p>当 \(R \to \infty\)，\(C_R\) 那项由 Jordan 引理趋于 0。当 \(\epsilon \to 0\)，需要算<em>小半圆 \(\gamma_\epsilon\) 的贡献</em>。这是新东西，要单独算。</p>
+
+<p><strong>小半圆引理。</strong> 设 \(F(z)\) 在 \(z = z_0\) 处有<em>一阶极点</em>，留数 \(\mathrm{Res}(F, z_0) = R_0\)。\(\gamma_\epsilon\) 是以 \(z_0\) 为圆心、半径 \(\epsilon\)、张角 \(\alpha\) 的弧（逆时针）。则当 \(\epsilon \to 0\)，</p>
+
+\[
+\int_{\gamma_\epsilon} F(z)\, dz \to i \alpha \cdot R_0.
+\]
+
+<p>对一个完整圆，\(\alpha = 2\pi\)，结果是 \(2\pi i R_0\)，正好回到留数定理。对小半圆 \(\alpha = \pi\)，结果是 \(\pi i R_0\)。</p>
+
+<p>证明（草绘）：在 \(\gamma_\epsilon\) 附近 \(F(z) \approx R_0 / (z - z_0)\)（主部）+ 解析部分。解析部分在 \(\epsilon \to 0\) 时积分趋于零（积分长度趋零）。主部沿 \(z - z_0 = \epsilon e^{i\theta}\)（\(\theta\) 从 \(\theta_0\) 到 \(\theta_0 + \alpha\)）：</p>
+
+\[
+\int_{\gamma_\epsilon} \frac{R_0}{z - z_0}\, dz = R_0 \int_{\theta_0}^{\theta_0 + \alpha} \frac{i \epsilon e^{i\theta}}{\epsilon e^{i\theta}}\, d\theta = i R_0 \alpha.
+\]
+
+<p>注意结果与 \(\epsilon\) 无关——这是关键！\(\square\)</p>
+
+<p>回到主线。注意我们的小半圆 \(\gamma_\epsilon\) 是<em>顺时针</em>的（从 \(-\epsilon\) 到 \(\epsilon\) 走上半平面，相当于绕奇点 \(z = 0\) 走"顺"半圈，因为奇点在轮廓<em>外</em>了）。所以 \(\alpha = -\pi\)（减号代表顺时针）。\(F(z) = e^{iz}/z\) 在 \(z = 0\) 处的留数 \(= e^0 = 1\)。所以</p>
+
+\[
+\int_{\gamma_\epsilon} \frac{e^{iz}}{z}\, dz \to i (-\pi) \cdot 1 = -i \pi.
+\]
+
+<p>把所有项的极限放进闭曲线积分 = 0：</p>
+
+\[
+\int_{-\infty}^{0^-} \frac{e^{ix}}{x}\, dx + (- i \pi) + \int_{0^+}^{\infty} \frac{e^{ix}}{x}\, dx + 0 = 0.
+\]
+
+<p>整理：左边的两个无穷积分加起来就是<em>主值积分</em> \(\mathrm{P.V.}\, \int_{-\infty}^{\infty} \dfrac{e^{ix}}{x}\, dx\)。所以</p>
+
+\[
+\mathrm{P.V.} \int_{-\infty}^{\infty} \frac{e^{ix}}{x}\, dx = i \pi.
+\]
+
+<p>取虚部：</p>
+
+\[
+\mathrm{P.V.} \int_{-\infty}^{\infty} \frac{\sin x}{x}\, dx = \pi.
+\]
+
+<p>但 \(\sin x / x\) 在 \(x = 0\) 处可去奇点，主值就是普通积分，所以 \(\int_{-\infty}^{\infty} \sin x / x\, dx = \pi\)。最后</p>
+
+\[
+\boxed{\int_0^\infty \frac{\sin x}{x}\, dx = \frac{\pi}{2}.}
+\]
+
+<p>这道题的关键技术——<em>小半圆绕过实轴奇点</em>——是复分析里非常实用的一招。它处理那种"复积分形式上有实极点但实积分本身良定义"的情形。下一节的 keyhole 轮廓也有同样精神：用小圆把奇点局部"截断"。</p>
+
+<p>取实部得到 \(\mathrm{P.V.}\, \int \cos x / x\, dx = 0\)，吻合 \(\cos x / x\) 是奇函数（在主值意义下结果为 0）。</p>
+
+<h3 id="sec15-4-5">15.4.5 例题：\(\int_{-\infty}^{\infty} \dfrac{x \sin x}{x^2 + 1}\, dx\)</h3>
+
+<p>考虑复版 \(\int_{-\infty}^{\infty} \dfrac{x e^{i x}}{x^2 + 1}\, dx\)。\(F(z) = \dfrac{z e^{i z}}{z^2 + 1}\)。注意 \(F\) 在实轴<em>没</em>极点。极点 \(z = \pm i\)，上半平面只有 \(z = i\)。</p>
+
+<p>\(\mathrm{Res}(F, i) = \dfrac{i \cdot e^{i \cdot i}}{2 i} = \dfrac{e^{-1}}{2}\)。</p>
+
+<p>分子 1 阶、分母 2 阶，差 1。Jordan 引理仍然适用（只要 \(R(z) \to 0\)）。所以</p>
+
+\[
+\int_{-\infty}^{\infty} \frac{x e^{ix}}{x^2 + 1}\, dx = 2 \pi i \cdot \frac{1}{2 e} = \frac{\pi i}{e}.
+\]
+
+<p>取虚部：\(\int_{-\infty}^{\infty} \dfrac{x \sin x}{x^2 + 1}\, dx = \dfrac{\pi}{e}\)。取实部：\(\int \dfrac{x \cos x}{x^2 + 1}\, dx = 0\)（与 \(x \cos x / (x^2 + 1)\) 是奇函数一致）。</p>
+
+<p>这个例子展示了<em>类型 3 比类型 2 更宽松</em>——只需要 \(R(z) \to 0\)（即分母比分子高 \(\geq 1\) 阶），而不必高 2 阶。原因就是 Jordan 引理用 \(e^{iaz}\) 的指数小衰减替代了 \(R\) 的多项式衰减。</p>
+
+<h2 id="sec15-5">15.5 类型 4：分数幂积分（keyhole 轮廓）</h2>
+
+<p>形如</p>
+
+\[
+I = \int_0^\infty x^{a-1} R(x)\, dx
+\]
+
+<p>的积分，其中 \(0 < a < 1\) 是<em>非整数</em>，\(R(x)\) 是有理函数，并且整体表达式在 \(0\) 和 \(\infty\) 处都积分收敛。</p>
+
+<p>这一类的麻烦在于 \(z^{a - 1}\) 是<em>多值函数</em>——它在复平面上不是单值的。我们需要先做<em>分支切割</em>把它单值化。最自然的选法：沿正实轴切割（即 \(\arg z \in [0, 2\pi)\)，\(\arg z\) 不能跨越正实轴）。在切割上方 \(z\) 接近正实数 \(x\) 时 \(z^{a-1} = x^{a-1}\)；在切割下方时 \(z^{a-1} = x^{a-1} e^{2 \pi i (a - 1)} = x^{a-1} e^{2\pi i a}\)（绕了一圈）。</p>
+
+<p>这就是 <strong>keyhole 轮廓</strong> 的诞生背景：沿正实轴上方从 \(\epsilon\) 到 \(R\)（顶部），然后沿大圆 \(|z| = R\) 逆时针走一圈到正实轴下方，再沿正实轴下方从 \(R\) 倒回 \(\epsilon\)（底部），最后沿小圆 \(|z| = \epsilon\) 顺时针走半圈回到起点。整条轮廓"绕开"了正实轴上的切割，形状像一把钥匙的孔。</p>
+
+<h3 id="sec15-5-1">15.5.1 经典例题：\(\int_0^\infty \dfrac{x^{a-1}}{1 + x}\, dx\)</h3>
+
+<p>设 \(0 < a < 1\)，考虑 \(F(z) = \dfrac{z^{a-1}}{1 + z}\) 沿 keyhole 轮廓 \(\Gamma\) 积分。</p>
+
+<p>\(\Gamma\) 内部唯一的极点：\(z = -1\)（在分母里）。它的留数：</p>
+
+\[
+\mathrm{Res}(F, -1) = (-1)^{a-1} = e^{i\pi(a-1)} = -e^{i \pi a}.
+\]
+
+<p>这里 \((-1)^{a-1}\) 用我们选的分支：\(-1 = e^{i \pi}\)（\(\arg(-1) = \pi\)，落在切割上方与下方之间），所以 \((-1)^{a - 1} = e^{i \pi (a - 1)}\)。</p>
+
+<p>留数定理：\(\oint_\Gamma F = 2 \pi i \cdot (- e^{i \pi a}) = -2 \pi i e^{i \pi a}\)。</p>
+
+<p>把 \(\oint_\Gamma\) 拆成四段：</p>
+
+<ol>
+<li>顶段（沿正实轴上方，\(\epsilon \to R\)）：\(z = x\)，\(z^{a-1} = x^{a-1}\)，贡献 \(\int_\epsilon^R \dfrac{x^{a-1}}{1 + x}\, dx \to I\)。</li>
+<li>大圆段（\(|z| = R\)）：\(|F(z)| \leq R^{a-1}/(R - 1) \sim R^{a-2}\)；周长 \(2\pi R\)；总 \(\sim R^{a-1} \to 0\) 当 \(R \to \infty\)（因为 \(a < 1\)）。</li>
+<li>底段（沿正实轴下方，\(R \to \epsilon\)）：\(z = x\) 但 \(z^{a-1} = x^{a-1} e^{2\pi i (a - 1)} = x^{a-1} e^{2\pi i a}\)（注意 \(e^{-2\pi i} = 1\)）。方向是 \(R\) 到 \(\epsilon\)，反向；贡献 \(-\int_\epsilon^R \dfrac{x^{a-1} e^{2\pi i a}}{1 + x}\, dx \to -e^{2\pi i a} I\)。</li>
+<li>小圆段（\(|z| = \epsilon\)）：\(|F| \sim \epsilon^{a-1}\)；周长 \(2\pi\epsilon\)；总 \(\sim \epsilon^a \to 0\) 当 \(\epsilon \to 0\)（因为 \(a > 0\)）。</li>
+</ol>
+
+<p>所以总和：</p>
+
+\[
+I - e^{2 \pi i a} I = -2\pi i e^{i \pi a}.
+\]
+
+<p>解 \(I\)：</p>
+
+\[
+I (1 - e^{2 \pi i a}) = -2 \pi i e^{i \pi a},
+\]
+
+\[
+I = \frac{-2 \pi i e^{i \pi a}}{1 - e^{2\pi i a}} = \frac{-2 \pi i e^{i \pi a}}{-e^{i \pi a}(e^{i \pi a} - e^{-i\pi a})} = \frac{2 \pi i}{e^{i \pi a} - e^{-i \pi a}} = \frac{2 \pi i}{2 i \sin (\pi a)} = \frac{\pi}{\sin(\pi a)}.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\int_0^\infty \frac{x^{a-1}}{1 + x}\, dx = \frac{\pi}{\sin(\pi a)}, \qquad 0 < a < 1.}
+\]
+
+<p>这是个非常重要的公式——它就是<em>欧拉余元公式</em> \(\Gamma(a) \Gamma(1 - a) = \pi / \sin(\pi a)\) 的等价形式（因为左边正好是 Beta 函数 \(B(a, 1 - a) = \Gamma(a)\Gamma(1-a)\)）。复分析 keyhole 轮廓给出了它的<em>最快、最优雅</em>的证明。</p>
+
+<p>本例的精华是：<em>分支跳跃 \(e^{2\pi i a}\) 替代了"两段不同积分"的工作</em>——上下两条都是同一个实积分，但因子不同；二者相减后得到 \((1 - e^{2\pi i a}) I\)，这是 keyhole 轮廓的核心机制。</p>
+
+<h3 id="sec15-5-2">15.5.2 例题：\(\int_0^\infty \dfrac{x^{a-1}}{1 + x^2}\, dx\)</h3>
+
+<p>同样的 keyhole 轮廓，\(F(z) = \dfrac{z^{a-1}}{1 + z^2}\)，但分母 \(1 + z^2\) 现在有<em>两个</em>极点 \(z = \pm i\)，<em>都在 keyhole 内部</em>（不在切割上）。</p>
+
+<p>\(\mathrm{Res}(F, i)\)：写 \(i = e^{i \pi / 2}\)，\(z^{a-1}|_{z=i} = e^{i \pi (a-1)/2}\)。一阶极点，\(g/h'\)：\(\dfrac{e^{i\pi(a-1)/2}}{2 i}\)。</p>
+
+<p>\(\mathrm{Res}(F, -i)\)：写 \(-i = e^{i 3\pi/2}\)（注意：\(\arg \in [0, 2\pi)\)，所以 \(-i\) 的辐角是 \(3\pi/2\) 不是 \(-\pi/2\)）。\(z^{a-1}|_{-i} = e^{i 3\pi(a-1)/2}\)。\(g/h'\) 给出 \(\dfrac{e^{i 3\pi(a-1)/2}}{-2 i}\)。</p>
+
+<p>留数和：\(\dfrac{1}{2 i} \big[e^{i \pi(a-1)/2} - e^{i 3\pi (a-1)/2}\big]\)。</p>
+
+<p>把 \(e^{i\pi(a-1)/2}\) 提出来：\(= \dfrac{e^{i \pi(a-1)/2}}{2 i} \big[1 - e^{i \pi(a-1)}\big]\)。</p>
+
+<p>而 \(1 - e^{i \pi(a-1)} = 1 + e^{i \pi a}\)（因为 \(e^{i \pi(a-1)} = e^{i \pi a} e^{-i\pi} = -e^{i \pi a}\)）。所以留数和 \(= \dfrac{e^{i \pi(a-1)/2} (1 + e^{i \pi a})}{2 i}\)。</p>
+
+<p>留数定理：\(\oint = 2\pi i \cdot \dfrac{e^{i\pi(a-1)/2}(1 + e^{i\pi a})}{2 i} = \pi e^{i\pi(a-1)/2}(1 + e^{i\pi a})\)。</p>
+
+<p>另一方面，按照 keyhole 拆分（同 15.5.1）：\((1 - e^{2\pi i a}) I\)。等式：</p>
+
+\[
+(1 - e^{2 \pi i a}) I = \pi e^{i\pi(a-1)/2}(1 + e^{i \pi a}).
+\]
+
+<p>解：把 \(1 - e^{2\pi i a} = -e^{i\pi a}(e^{i\pi a} - e^{-i \pi a}) = -2 i e^{i \pi a} \sin(\pi a)\)。把 \(1 + e^{i\pi a} = e^{i\pi a/2}(e^{-i\pi a/2} + e^{i\pi a/2}) = 2 e^{i \pi a/2} \cos(\pi a/2)\)。代入：</p>
+
+\[
+-2 i e^{i\pi a} \sin(\pi a) \cdot I = 2 \pi e^{i \pi (a-1)/2} \cdot e^{i\pi a/2} \cos(\pi a/2) = 2\pi e^{i \pi a - i\pi/2} \cos(\pi a/2) = -2 \pi i e^{i \pi a} \cos(\pi a / 2).
+\]
+
+<p>两边除 \(-2 i e^{i \pi a}\)：</p>
+
+\[
+I \sin(\pi a) = \pi \cos(\pi a / 2),
+\]
+
+\[
+I = \frac{\pi \cos(\pi a / 2)}{\sin(\pi a)} = \frac{\pi \cos(\pi a/2)}{2 \sin(\pi a/2) \cos(\pi a / 2)} = \frac{\pi}{2 \sin(\pi a / 2)}.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\int_0^\infty \frac{x^{a - 1}}{1 + x^2}\, dx = \frac{\pi}{2 \sin(\pi a / 2)}, \qquad 0 < a < 2.}
+\]
+
+<p>验证：取 \(a = 1\)，得 \(\dfrac{\pi}{2 \sin(\pi/2)} = \dfrac{\pi}{2}\)。这跟 \(\int_0^\infty \dfrac{1}{1 + x^2}\, dx = \arctan x |_0^\infty = \pi/2\) 完全吻合。✓</p>
+
+<h2 id="sec15-6">15.6 类型 5：含对数的积分</h2>
+
+<p>形如</p>
+
+\[
+I = \int_0^\infty (\ln x) R(x)\, dx
+\]
+
+<p>的积分。这一类常见且有用，但处理思路有两种，看 \(R(x)\) 的具体形式。</p>
+
+<h3 id="sec15-6-1">15.6.1 思路 A：用 \(\log^2 z\) 代替 keyhole</h3>
+
+<p>把 \(F(z) = R(z) \cdot (\log z)^2\)（\(\log\) 取主值，\(\arg z \in [0, 2\pi)\)），沿 keyhole 轮廓积分。在切割上方 \(\log z = \ln x\)，下方 \(\log z = \ln x + 2 \pi i\)。所以上下两段的差：</p>
+
+\[
+(\ln x)^2 - (\ln x + 2 \pi i)^2 = (\ln x)^2 - (\ln x)^2 - 4 \pi i \ln x - (2 \pi i)^2 = -4 \pi i \ln x + 4 \pi^2.
+\]
+
+<p>沿整个 keyhole 积分（套同 15.5 的拆分）：</p>
+
+\[
+\oint_\Gamma R(z) (\log z)^2\, dz = \int_0^\infty R(x) [(\ln x)^2 - (\ln x + 2\pi i)^2]\, dx + (\text{大小圆趋零}) = -4\pi i \int_0^\infty R(x) \ln x\, dx + 4\pi^2 \int_0^\infty R(x)\, dx.
+\]
+
+<p>右边 \(= 2\pi i \sum \mathrm{Res}\)。所以</p>
+
+\[
+-4\pi i \int_0^\infty R \ln x\, dx + 4 \pi^2 \int_0^\infty R\, dx = 2\pi i \sum \mathrm{Res}.
+\]
+
+<p>分实虚部：左边的实部 \(= 4\pi^2 \int R\, dx\)；虚部 \(= -4\pi \int R \ln x\, dx\)。右边只有 \(2\pi i\) 乘留数和——所以从虚部：</p>
+
+\[
+-4\pi \int_0^\infty R(x) \ln x\, dx = 2 \pi \cdot \mathrm{Re}\, (\sum \mathrm{Res}),
+\]
+
+\[
+\boxed{\int_0^\infty R(x) \ln x\, dx = -\frac{1}{2} \mathrm{Re}\, \big(\sum \mathrm{Res}\, R(z) (\log z)^2\big).}
+\]
+
+<p>同时从实部还能得到 \(\int_0^\infty R\, dx\)（它出现在留数的虚部那部分），常常一举两得。</p>
+
+<h3 id="sec15-6-2">15.6.2 例题：\(\int_0^\infty \dfrac{\ln x}{1 + x^2}\, dx\)</h3>
+
+<p>套思路 A，\(R(z) = 1/(1 + z^2)\)。极点 \(z = \pm i\)，按 \(\arg \in [0, 2\pi)\) 写：\(i = e^{i\pi/2}\)，\(\log i = i \pi/2\)；\(-i = e^{i 3\pi/2}\)，\(\log(-i) = i 3\pi/2\)。</p>
+
+<p>留数 \(R(z)(\log z)^2\) 在 \(z = i\)：</p>
+
+\[
+\mathrm{Res} = \frac{(\log i)^2}{2 i} = \frac{(i \pi/2)^2}{2 i} = \frac{-\pi^2/4}{2 i} = \frac{-\pi^2}{8 i} = \frac{i \pi^2}{8}.
+\]
+
+<p>在 \(z = -i\)：</p>
+
+\[
+\mathrm{Res} = \frac{(\log(-i))^2}{-2 i} = \frac{(i \cdot 3\pi/2)^2}{-2 i} = \frac{-9 \pi^2/4}{-2 i} = \frac{9\pi^2}{8 i} = -\frac{9 i \pi^2}{8}.
+\]
+
+<p>留数和 \(= \dfrac{i\pi^2}{8} - \dfrac{9 i \pi^2}{8} = -\dfrac{8 i \pi^2}{8} = -i\pi^2\)。</p>
+
+<p>实部 \(= 0\)。所以</p>
+
+\[
+\int_0^\infty \frac{\ln x}{1 + x^2}\, dx = -\frac{1}{2} \cdot 0 = 0.
+\]
+
+<p>结果是 0！这件事如果你单看左边那个积分形式很难<em>看出来</em>，但有一个直观：换元 \(x \to 1/x\) 把 \(\int_0^\infty \dfrac{\ln x}{1 + x^2}\, dx\) 翻成 \(-\int_0^\infty \dfrac{\ln x}{1 + x^2}\, dx\)（\(d x \to -dx/x^2\)，\(\ln(1/x) = -\ln x\)，\(1 + (1/x)^2 = (x^2 + 1)/x^2\)）。所以这个积分 \(= -\) 自己 \(\Rightarrow\) 必为 0。但这只是验证；复分析法<em>结构性地</em>把它推出来。</p>
+
+<p>而且我们顺便从虚部得到 \(\int_0^\infty \dfrac{1}{1 + x^2}\, dx\)：留数和的虚部 \(= -\pi^2\)，所以 \(4 \pi^2 \int dx /(1 + x^2) = 2\pi \cdot (-\pi^2) \cdot ?\) 等等让我重看公式——左边公式 \(4\pi^2 \int R\, dx = 2\pi \cdot \mathrm{Im}(\sum \mathrm{Res})\)。\(\mathrm{Im}(-i \pi^2) = -\pi^2\)，所以 \(4\pi^2 \int = -2\pi^3\)，\(\int = -\pi/2\)？这不对——应该是正的 \(\pi/2\)。让我检查正负号。</p>
+
+<p>问题是 keyhole 拆分时方向：左边整体是 \(2\pi i \sum \mathrm{Res}\)（正定向 keyhole 包围里头的极点）；同时上下两段加大小圆 \(= -4\pi i \int R \ln x\, dx + 4\pi^2 \int R\, dx\)。设 \(S = \sum \mathrm{Res}\)。</p>
+
+\[
+-4\pi i J + 4 \pi^2 K = 2\pi i S, \qquad J = \int R \ln x\, dx,\ K = \int R\, dx.
+\]
+
+<p>取实部：\(4\pi^2 K = 2 \pi \cdot \mathrm{Re}(i S) = -2 \pi \cdot \mathrm{Im}(S)\)。代 \(\mathrm{Im}(S) = \mathrm{Im}(-i\pi^2) = -\pi^2\)：\(4\pi^2 K = -2\pi \cdot (-\pi^2) = 2 \pi^3\)，\(K = \pi/2\)。✓</p>
+
+<p>取虚部：\(-4\pi J = 2\pi \cdot \mathrm{Im}(i S) = 2\pi \cdot \mathrm{Re}(S)\)。代 \(\mathrm{Re}(S) = 0\)：\(J = 0\)。✓</p>
+
+<p>所以两件事都对。</p>
+
+<h3 id="sec15-6-3">15.6.3 例题：\(\int_0^\infty \dfrac{\ln x}{(1 + x)^2}\, dx\)</h3>
+
+<p>同样思路 A，但 \(R(z) = 1/(1 + z)^2\) 在 \(z = -1 = e^{i\pi}\) 处有<em>二阶</em>极点。需要算 \(\mathrm{Res}((\log z)^2 / (1 + z)^2, -1)\)。</p>
+
+<p>用 14.5.3 的 \(m = 2\) 公式：\((z + 1)^2 \cdot \dfrac{(\log z)^2}{(1+z)^2} = (\log z)^2\)。求一次导：\(\dfrac{d}{dz}(\log z)^2 = \dfrac{2 \log z}{z}\)。代 \(z = -1\)：\(\dfrac{2 \cdot i\pi}{-1} = -2 i \pi\)。</p>
+
+<p>所以留数 \(= -2 i \pi\)。\(\mathrm{Re} = 0\)，所以</p>
+
+\[
+J = -\frac{1}{2} \cdot 0 = 0?
+\]
+
+<p>这<em>不对</em>——这个积分实际上等于 \(-1\)（标准积分表）。让我重检：留数公式应该是 \(J = -\dfrac{1}{2} \mathrm{Re}\, S\)？回到推导：取虚部得 \(-4\pi J = 2\pi \mathrm{Re}(S)\)，所以 \(J = -\dfrac{\mathrm{Re}(S)}{2}\)。\(\mathrm{Re}(-2 i \pi) = 0\)，\(J = 0\)。</p>
+
+<p>但实际答案不是 0！让我从头检查这道例子。\(\int_0^\infty \dfrac{\ln x}{(1+x)^2}\, dx\)：换元 \(u = 1/x\)，\(du = -dx/x^2\)，得 \(\int_0^\infty \dfrac{-\ln u}{(1 + u)^2}\, du \cdot \dfrac{u^2}{1}\)？让我细心做：\(x = 1/u\)，\(dx = -du/u^2\)，\(\ln x = -\ln u\)，\(1 + x = 1 + 1/u = (u + 1)/u\)，\((1 + x)^2 = (u+1)^2/u^2\)。</p>
+
+\[
+\int_0^\infty \frac{\ln x}{(1+x)^2}\, dx = \int_\infty^0 \frac{-\ln u}{(u+1)^2 / u^2} \cdot \left(-\frac{du}{u^2}\right) = \int_0^\infty \frac{-\ln u \cdot u^2}{(u+1)^2 \cdot u^2}\, du = -\int_0^\infty \frac{\ln u}{(u+1)^2}\, du.
+\]
+
+<p>所以 \(J = -J\)，得 \(J = 0\)。<em>对的</em>——结果就是 0。我刚才说"等于 \(-1\)" 是记错了。复分析法给出 \(J = 0\)，与对称性论证一致。</p>
+
+<p>关于这道题再说一句：单独取实部我们还得到 \(K = \int_0^\infty \dfrac{dx}{(1+x)^2} = ?\)。\(\mathrm{Im}(S) = \mathrm{Im}(-2 i\pi) = -2\pi\)。\(4\pi^2 K = -2\pi \cdot (-2\pi) = 4 \pi^2\)，\(K = 1\)。验证：\(\int_0^\infty dx/(1+x)^2 = -1/(1+x) |_0^\infty = 0 - (-1) = 1\)。✓</p>
+
+<h3 id="sec15-6-4">15.6.4 思路 B：用半圆 + 对称</h3>
+
+<p>对一些积分，用上半圆轮廓配 \((\log z)\) 也能算。比如 \(\int_0^\infty \dfrac{\ln x}{x^2 + 1}\, dx = 0\) 还可以这样做：考虑 \(\int_{-\infty}^\infty \dfrac{\log z}{1 + z^2}\, dz\)（沿实轴 + 上半圆，\(\log\) 取主值 \(\arg \in (-\pi, \pi]\)）。上半圆部分趋于 0（指数级 + 多项式）；实轴正负两段相加，得 \(\int_0^\infty (\ln x + i \cdot 0)/(1 + x^2) dx + \int_0^\infty (\ln x + i \pi)/(1 + x^2)\, dx\)（左半轴 \(x < 0\) 用 \(z = e^{i\pi} |x|\)，\(\log z = \ln|x| + i\pi\)）。整理后取实部得 \(\int = 0\)。这种做法对"对称积分"特别快。</p>
+
+<p>到这里类型 5 算完。它展示了一个重要技术——<em>用 \(\log^2 z\) 把"对数权"积分通过 keyhole "翻"出来</em>。这一招在数论里也常用，比如算 \(\zeta\) 函数特殊值。</p>
+
+<h2 id="sec15-7">15.7 复积分算实积分的"轮廓选择心法"</h2>
+
+<p>这一章你学了五类标准做法。但临场遇到一个新积分，你怎么决定该用哪条轮廓？这里给出一张总表。</p>
+
+<table>
+<thead>
+<tr><th>类型</th><th>积分形式</th><th>轮廓</th><th>关键技术</th><th>备注</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>\(\int_0^{2\pi} R(\cos\theta, \sin\theta)\, d\theta\)</td>
+<td>单位圆 \(|z| = 1\)</td>
+<td>换元 \(z = e^{i\theta}\)</td>
+<td>三角函数有理积分</td>
+</tr>
+<tr>
+<td>2</td>
+<td>\(\int_{-\infty}^\infty R(x)\, dx\)</td>
+<td>上半圆（\([-R, R]\) + 上半 \(|z| = R\)）</td>
+<td>分母比分子高 \(\geq 2\) 阶</td>
+<td>实有理函数</td>
+</tr>
+<tr>
+<td>3</td>
+<td>\(\int_{-\infty}^\infty R(x) e^{iax}\, dx\) （\(a > 0\)）</td>
+<td>上半圆</td>
+<td>Jordan 引理（只需 \(R \to 0\)）</td>
+<td>取实/虚部得 \(\int R\cos\) 或 \(\int R\sin\)</td>
+</tr>
+<tr>
+<td>3'</td>
+<td>奇点恰在实轴（如 \(\sin x / x\)）</td>
+<td>上半圆 + 小半圆绕奇点</td>
+<td>小半圆引理 \(\int_{\gamma_\epsilon} F \to i\alpha R_0\)</td>
+<td>需用主值积分</td>
+</tr>
+<tr>
+<td>4</td>
+<td>\(\int_0^\infty x^{a-1} R(x)\, dx\) （\(0 < a < 1\)）</td>
+<td>Keyhole（绕正实轴切割）</td>
+<td>分支跳跃 \(z^{a-1} \to z^{a-1} e^{2\pi i a}\)</td>
+<td>分数幂</td>
+</tr>
+<tr>
+<td>5</td>
+<td>\(\int_0^\infty (\ln x) R(x)\, dx\)</td>
+<td>Keyhole，被积乘 \((\log z)^2\)</td>
+<td>分支跳跃中 \((\ln x + 2\pi i)^2 - (\ln x)^2\) 隔出 \(\ln x\) 项</td>
+<td>常顺便得到 \(\int R\, dx\)</td>
+</tr>
+</tbody>
+</table>
+
+<p>除了这五类的"主菜单"，还有几个少用但很重要的轮廓你应该知道：</p>
+
+<ul>
+<li><em>矩形轮廓</em>：用于含 \(e^{ax}\) 在两个实轴方向都出现 + 周期性的情形（比如 \(\int_{-\infty}^\infty \dfrac{e^{ax}}{e^x + 1}\, dx\)）。轮廓是 \([-R, R] \to [-R + 2\pi i, R + 2\pi i] \to\) 闭合。</li>
+<li><em>扇形轮廓</em>：用于 \(\int_0^\infty f(x^n)\, dx\) 这类，绕一个 \(2\pi/n\) 张角的扇形。</li>
+<li><em>挖洞 keyhole</em>：用于 \(\int_a^b\) 在端点 \(a, b\) 处有可积奇性的情形。</li>
+</ul>
+
+<p>临场<strong>怎么选</strong>？三步判断：</p>
+
+<ol>
+<li>积分区间是 \([0, 2\pi]\) 还是 \([-\infty, \infty]\) 还是 \([0, \infty]\)？前者用单位圆；后两者用半圆或 keyhole。</li>
+<li>被积函数有 \(\sin/\cos\) 振荡因子吗？有就考虑 \(e^{iax}\) 替换 + Jordan 引理（类型 3）。</li>
+<li>有分数幂 \(x^a\) 或 \(\ln x\) 吗？有就要 keyhole（类型 4 或 5）。</li>
+</ol>
+
+<p>三步走过去，轮廓基本就定了。剩下的就是机械化执行：找极点 → 算留数 → 加和乘 \(2\pi i\) → 减掉非"目标段"的贡献（往往为 0）。</p>
+
+<h3 id="sec15-7-1">15.7.1 怎么练熟</h3>
+
+<p>留数法算实积分这一招的"心法" 不在公式里，在<strong>看一眼积分能否在脑子里浮现轮廓</strong>。这需要练。建议你拿一张纸，把上面五类各做 5-10 道，每道都自己<em>选</em>轮廓（先别看答案）。一开始你会经常选错——比如把类型 1 的题用上半圆做（结果当然不收敛），或把分数幂题用类型 2 的上半圆做（结果分支不闭合）。<em>错就错</em>，错完之后回头看为什么这条轮廓不行——补段为什么不趋于 0？分支为什么不闭合？这些"为什么不行"的体验，比看十遍答案都管用。</p>
+
+<p>等你做完几十道后，看到一个新积分，应该能在<em>三秒内</em>说出"这是类型几，我用哪条轮廓"。到那时这一章就真正"装进你的脑子"了。</p>
+
+<h2 id="sec15-8">15.8 本章回顾</h2>
+
+<p>到这里我们走到了复分析的"高潮"。让我把这一章浓缩成几句话：</p>
+
+<ul>
+<li>留数定理把实积分变成"找极点 + 求几个留数"的几行计算。</li>
+<li>每种实积分形式有对应的<em>标准轮廓</em>。轮廓的选择不是任意的——它必须满足"目标段就是要求的实积分 + 补段在某种极限下趋于 0 + 函数在内部解析"。</li>
+<li>五类标准做法（单位圆 / 上半圆 / 上半圆+小半圆 / keyhole / keyhole+\(\log^2\)）覆盖了 95% 的实际问题。</li>
+<li>关键引理：Jordan 引理（控制 \(e^{iaz}\) 在上半圆的衰减）；小半圆引理（绕实轴奇点贡献 \(i\alpha R_0\)）。</li>
+</ul>
+
+<p>这把刀的力量来自一个深刻的事实：<em>实分析里看似"独立"的积分，在复平面里都是同一棵留数定理这棵大树的不同枝叶</em>。一旦你学会把实积分嵌入复积分，那些原本要熬几页代数才能算的怪东西，就变成几行就能写完的小练习。这种"统一性"是复分析最美的地方。</p>
+
+<p>下一章我们会回到"理论"——介绍一些关于全纯函数整体性质的定理（最大模原理、Schwarz 引理、辐角原理、Rouché 定理等）。这些定理有些直接用留数法证（如辐角原理），有些反过来给出留数法的更深应用（如计数零点）。等你学完那些理论性的定理，再回头看本章，会发现"用留数算实积分"只是一个最实用的<em>表象</em>，它背后的"全纯函数被局部信息完全决定"才是真正的灵魂。
+</content>
+</invoke>

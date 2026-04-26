@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 15 章 极坐标二重积分 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 一般区域上的二重积分</a><a href="ch16.html">下一章 · 第 16 章 三重积分 →</a></nav>
+<h1 id="ch15">第 15 章 极坐标二重积分</h1>
+
+<p>直角坐标里，圆的方程 \(x^2 + y^2 = 1\) 看起来一点也不优雅：你必须把它写成 \(y = \pm\sqrt{1 - x^2}\)，再分上下半圆各积一次。极坐标里，同一个圆只是 \(r = 1\) 一行而已。这种戏剧性的简化不是巧合：当区域具有<strong>圆对称性</strong>，或者被积函数里出现 \(x^2 + y^2\) 这样在直角坐标下一片混乱、却在极坐标下优雅得令人感动的组合时，换坐标几乎总能把积分变得一目了然。</p>
+
+<p>这一章告诉你三件事：极坐标下区域怎么描述，二重积分在极坐标下怎么写（特别是那个绝对不能漏的 \(r\) 因子从哪里来），以及什么时候该考虑换到极坐标。最后我们把这些工具用到一个代表性的"奇迹"上——<em>高斯积分</em>。</p>
+
+<h2 id="sec15-1">15.1 极坐标复习</h2>
+
+<p>把平面上每个点用一对数 \((r, \theta)\) 描述：\(r\) 是该点到原点的距离，\(\theta\) 是从正 \(x\) 轴出发逆时针旋转到该点所需的角度。两套坐标之间的转换公式是熟悉的：</p>
+
+<p>\[x = r\cos\theta, \quad y = r\sin\theta, \quad x^2 + y^2 = r^2, \quad \tan\theta = \frac{y}{x}.\]</p>
+
+<p>常见区域在极坐标里看起来是这样：</p>
+
+<ul>
+  <li>圆盘 \(x^2 + y^2 \le R^2\)：\(0 \le r \le R\)，\(0 \le \theta \le 2\pi\)。</li>
+  <li>圆环 \(a^2 \le x^2 + y^2 \le b^2\)：\(a \le r \le b\)，\(0 \le \theta \le 2\pi\)。</li>
+  <li>第一象限内的圆盘扇区：\(0 \le \theta \le \pi/2\)，\(0 \le r \le R\)。</li>
+  <li>右半圆（\(x \ge 0\) 部分）：\(-\pi/2 \le \theta \le \pi/2\)，\(0 \le r \le R\)。</li>
+  <li>心形线 \(r = 1 - \cos\theta\) 内部：\(0 \le \theta \le 2\pi\)，\(0 \le r \le 1 - \cos\theta\)。</li>
+  <li>圆 \(x^2 + y^2 = 2x\)（即 \((x - 1)^2 + y^2 = 1\)）所围圆盘：极坐标里这个圆的方程是 \(r = 2\cos\theta\)（把 \(r^2 = 2r\cos\theta\) 两边除以 \(r\)），所以区域是 \(-\pi/2 \le \theta \le \pi/2\)，\(0 \le r \le 2\cos\theta\)。</li>
+</ul>
+
+<p>请特别注意最后两种"\(r\) 上界依赖于 \(\theta\)"的情形——它们在极坐标里就是"I 型区域"的对应物：外层 \(\theta\) 取常数范围，内层 \(r\) 的上下限是 \(\theta\) 的函数。</p>
+
+<h2 id="sec15-2">15.2 极坐标下的面积元素：为什么是 \(r\,dr\,d\theta\)</h2>
+
+<p>直角坐标里，面积微元是简单的 \(dA = dx\,dy\)——一个边长 \(dx \times dy\) 的小矩形。极坐标里则不然。<strong>多出来一个 \(r\) 因子</strong>：</p>
+
+<p>\[\boxed{dA = r\,dr\,d\theta.}\]</p>
+
+<p>这个 \(r\) 是这一章里最常见的失误来源——把它漏掉，整道题就废了。所以让我们慢慢把它从几何上推导出来，让你<em>看见</em>它为什么必须出现。</p>
+
+<p>在极坐标里，"小区域"不是一个矩形，而是一个<strong>极坐标矩形</strong>：\(\theta\) 在 \([\theta, \theta + d\theta]\) 内变化，\(r\) 在 \([r, r + dr]\) 内变化。这一小块在平面上的形状，其实是"两条同心圆弧之间夹着两条径向线段所围出的小扇形薄片"。当 \(dr\) 与 \(d\theta\) 都很小，这个薄片几乎是一个长方形，但它的两条边长不一样：</p>
+
+<ul>
+  <li><em>径向</em>方向的边长直接是 \(dr\)（因为我们沿径向走了 \(dr\) 那么远）。</li>
+  <li><em>切向</em>（沿圆周）方向的边长是<strong>弧长</strong> \(r\,d\theta\)。原因是：在半径 \(r\) 的圆上，张角 \(d\theta\) 对应的弧长正好是 \(r \cdot d\theta\)，这是弧长公式 \(\text{弧长} = \text{半径} \times \text{弧度}\) 的直接推论。</li>
+</ul>
+
+<p>把这两个边长相乘，就得到面积近似</p>
+
+<p>\[dA \approx (r\,d\theta)(dr) = r\,dr\,d\theta.\]</p>
+
+<p>更严格一点，可以这样算：那个小扇形薄片是<em>一个大扇形减去一个小扇形</em>。大扇形半径 \(r + dr\)、张角 \(d\theta\)、面积 \(\tfrac{1}{2}(r + dr)^2 d\theta\)；小扇形半径 \(r\)、张角 \(d\theta\)、面积 \(\tfrac{1}{2}r^2 d\theta\)。差是</p>
+
+<p>\[\frac{1}{2}\left[(r + dr)^2 - r^2\right]d\theta = \frac{1}{2}\left[2r\,dr + (dr)^2\right]d\theta = r\,dr\,d\theta + \frac{1}{2}(dr)^2 d\theta.\]</p>
+
+<p>当 \(dr \to 0\)，二阶项 \((dr)^2\) 比一阶项 \(dr\) 小一阶，可以忽略，剩下的就是 \(r\,dr\,d\theta\)。这给出了同样的结论，但这次是从精确面积公式出发取极限得到的——所以那个 \(r\) 因子是<em>真实的</em>，不是某种近似的产物。</p>
+
+<p>从另一个角度看：那个 \(r\) 是直角坐标到极坐标的<strong>雅可比行列式</strong> \(\bigl|\det \tfrac{\partial(x, y)}{\partial(r, \theta)}\bigr|\)。展开计算：</p>
+
+<p>\[\frac{\partial(x, y)}{\partial(r, \theta)} = \begin{pmatrix} \partial x/\partial r & \partial x/\partial \theta \\ \partial y/\partial r & \partial y/\partial \theta \end{pmatrix} = \begin{pmatrix} \cos\theta & -r\sin\theta \\ \sin\theta & r\cos\theta \end{pmatrix},\]</p>
+
+<p>\[\det = r\cos^2\theta + r\sin^2\theta = r.\]</p>
+
+<p>取绝对值仍是 \(r\)。第 18 章我们会专门讲一般的雅可比换元法；在这里，你只需要<em>记得</em>极坐标下面积元就是 \(r\,dr\,d\theta\) 这一件事。</p>
+
+<p>把所有这些组合起来，二重积分在极坐标下的换元公式是</p>
+
+<p>\[\boxed{\iint_D f(x, y)\,dA = \iint_{D'} f(r\cos\theta, r\sin\theta)\,r\,dr\,d\theta,}\]</p>
+
+<p>其中 \(D'\) 是 \(D\) 在 \((r, \theta)\) 平面上的对应描述。请注意三处一定要做的替换：把被积函数里的 \(x\)、\(y\) 替换成 \(r\cos\theta\)、\(r\sin\theta\)；把面积元 \(dA\) 替换成 \(r\,dr\,d\theta\)；把区域换成它的极坐标参数化。三件都漏不得。</p>
+
+<h2 id="sec15-3">15.3 例题：从简单的圆盘开始</h2>
+
+<p><strong>例 1.</strong> 求 \(\displaystyle\iint_D (x^2 + y^2)\,dA\)，其中 \(D\) 是圆盘 \(x^2 + y^2 \le 4\)。</p>
+
+<p>直角坐标里这道题需要分两半积分，烦得很。极坐标里：被积函数 \(x^2 + y^2 = r^2\)；区域 \(0 \le r \le 2\)、\(0 \le \theta \le 2\pi\)。所以</p>
+
+<p>\[\iint_D (x^2 + y^2)\,dA = \int_0^{2\pi}\int_0^2 r^2 \cdot r\,dr\,d\theta = \int_0^{2\pi}d\theta \cdot \int_0^2 r^3\,dr = 2\pi \cdot \frac{r^4}{4}\Big|_0^2 = 2\pi \cdot 4 = 8\pi.\]</p>
+
+<p>这里用了上一章那个"被积式分离 + 矩形区域"的小窍门——在 \((r, \theta)\) 平面上，区域 \([0, 2] \times [0, 2\pi]\) 就是一个矩形，且被积式 \(r^3\) 不依赖于 \(\theta\)，所以两个积分分离开来直接相乘。这种简化在极坐标下经常出现，因为很多对称的极坐标区域在 \((r, \theta)\) 平面上就是矩形。</p>
+
+<p><strong>例 2.</strong> 求由 \(\displaystyle \int_0^1 \int_0^{\sqrt{1 - x^2}} (x^2 + y^2)^{3/2}\,dy\,dx\)。</p>
+
+<p>读一下区域：\(0 \le x \le 1\)，\(0 \le y \le \sqrt{1 - x^2}\)。后者就是单位圆的上半部 \(y \ge 0\)。再叠加 \(x \ge 0\)，就是单位圆盘的<em>第一象限部分</em>。被积函数 \((x^2 + y^2)^{3/2} = r^3\)。</p>
+
+<p>极坐标里，区域是 \(\theta \in [0, \pi/2]\)，\(r \in [0, 1]\)。所以</p>
+
+<p>\[\int_0^{\pi/2} \int_0^1 r^3 \cdot r\,dr\,d\theta = \int_0^{\pi/2}d\theta \cdot \int_0^1 r^4\,dr = \frac{\pi}{2} \cdot \frac{1}{5} = \frac{\pi}{10}.\]</p>
+
+<p><strong>例 3.</strong> 求 \(\displaystyle\iint_D \sqrt{x^2 + y^2}\,dA\)，其中 \(D\) 是圆环 \(1 \le x^2 + y^2 \le 4\)。</p>
+
+<p>被积函数 \(\sqrt{x^2 + y^2} = r\)。区域是矩形 \([1, 2] \times [0, 2\pi]\)（在 \((r, \theta)\) 平面上）。</p>
+
+<p>\[\iint_D r\,dA = \int_0^{2\pi}\int_1^2 r \cdot r\,dr\,d\theta = 2\pi \cdot \frac{r^3}{3}\Big|_1^2 = 2\pi \cdot \frac{8 - 1}{3} = \frac{14\pi}{3}.\]</p>
+
+<p><strong>例 4.</strong> 求心形线 \(r = 1 + \cos\theta\) 所围区域的面积。</p>
+
+<p>面积是 \(\iint_D 1\,dA = \iint_{D'} r\,dr\,d\theta\)。心形线在 \(\theta \in [0, 2\pi]\) 时给出整条曲线（\(r\) 在 \(\theta = 0\) 时是 2、在 \(\theta = \pi\) 时是 0，恰好闭合）。对每一个 \(\theta\)，\(r\) 从 0 走到 \(1 + \cos\theta\)。</p>
+
+<p>\[\text{Area} = \int_0^{2\pi}\int_0^{1 + \cos\theta} r\,dr\,d\theta = \int_0^{2\pi} \frac{(1 + \cos\theta)^2}{2}\,d\theta.\]</p>
+
+<p>展开 \((1 + \cos\theta)^2 = 1 + 2\cos\theta + \cos^2\theta\)。用 \(\cos^2\theta = (1 + \cos 2\theta)/2\) 化简：</p>
+
+<p>\[1 + 2\cos\theta + \frac{1 + \cos 2\theta}{2} = \frac{3}{2} + 2\cos\theta + \frac{\cos 2\theta}{2}.\]</p>
+
+<p>积一周（\(0\) 到 \(2\pi\)）：\(\cos\theta\) 与 \(\cos 2\theta\) 两项都积出零；常数项 \(\dfrac{3}{2}\) 给出 \(\dfrac{3}{2} \cdot 2\pi = 3\pi\)。再除以前面的 \(\tfrac{1}{2}\)，得</p>
+
+<p>\[\text{Area} = \frac{1}{2} \cdot 3\pi = \frac{3\pi}{2}.\]</p>
+
+<p>这道题展示了"内层 \(r\) 的上限是 \(\theta\) 的函数"这种常见的极坐标写法。</p>
+
+<p><strong>例 5.</strong> 求 \(\displaystyle\iint_D x\,dA\)，其中 \(D\) 是由 \(r = 2\cos\theta\) 所围圆盘（即原圆 \((x - 1)^2 + y^2 = 1\)）。</p>
+
+<p>这个圆完全位于 \(x \ge 0\) 的右半平面，且过原点。极坐标描述是 \(\theta \in [-\pi/2, \pi/2]\)，\(r \in [0, 2\cos\theta]\)。被积式 \(x = r\cos\theta\)。所以</p>
+
+<p>\[\iint_D x\,dA = \int_{-\pi/2}^{\pi/2}\int_0^{2\cos\theta} r\cos\theta \cdot r\,dr\,d\theta = \int_{-\pi/2}^{\pi/2}\cos\theta \cdot \frac{r^3}{3}\Big|_0^{2\cos\theta}\,d\theta.\]</p>
+
+<p>\[= \int_{-\pi/2}^{\pi/2}\cos\theta \cdot \frac{8\cos^3\theta}{3}\,d\theta = \frac{8}{3}\int_{-\pi/2}^{\pi/2}\cos^4\theta\,d\theta.\]</p>
+
+<p>用 \(\cos^4\theta = \left(\dfrac{1 + \cos 2\theta}{2}\right)^2 = \dfrac{1 + 2\cos 2\theta + \cos^2 2\theta}{4} = \dfrac{1 + 2\cos 2\theta + (1 + \cos 4\theta)/2}{4} = \dfrac{3 + 4\cos 2\theta + \cos 4\theta}{8}\)。</p>
+
+<p>积分 \(\int_{-\pi/2}^{\pi/2}\) 时，\(\cos 2\theta\) 与 \(\cos 4\theta\) 两项都给出零（因为 \(\sin 2\theta\) 与 \(\sin 4\theta\) 在 \(\pm\pi/2\) 处都为零）；剩下常数项 \(\tfrac{3}{8}\) 乘以区间长度 \(\pi\) 得 \(\dfrac{3\pi}{8}\)。所以</p>
+
+<p>\[\iint_D x\,dA = \frac{8}{3} \cdot \frac{3\pi}{8} = \pi.\]</p>
+
+<p>(顺带一提：圆盘面积是 \(\pi\)，所以这个积分等于"区域面积乘以质心横坐标"，给出质心 \(\bar x = 1\)，与几何直觉一致。)</p>
+
+<h2 id="sec15-4">15.4 高斯积分：极坐标的最华丽演出</h2>
+
+<p>下面这道题大概是整本书里最值得欣赏的一招。它在直角坐标里"算不出"——这里的算不出是一个具体的、可证明的事实：被积函数 \(e^{-x^2}\) 没有初等原函数。但同一个二维积分换到极坐标，<strong>两行就完</strong>。这件事的余韵会一直回响到概率论、统计学、量子力学、机器学习。让我们慢慢看。</p>
+
+<p>目标是求</p>
+
+<p>\[I = \int_{-\infty}^\infty e^{-x^2}\,dx.\]</p>
+
+<p>这是一个一元积分，但它没有初等闭式——你完全无法用对数、指数、三角等熟悉的函数把 \(e^{-x^2}\) 的原函数写出来。所有标准的一元技巧（换元、分部、各种代换）都无效。</p>
+
+<p>诀窍是，<strong>把它的平方</strong>当作一个二维积分写出来。具体地说，</p>
+
+<p>\[I^2 = \left(\int_{-\infty}^\infty e^{-x^2}\,dx\right)\left(\int_{-\infty}^\infty e^{-y^2}\,dy\right).\]</p>
+
+<p>注意第二个积分里我们换了一个名字 \(y\)，这只是符号问题——它的值还是 \(I\)。于是 \(I^2\) 就是 \(\int e^{-x^2}\,dx \cdot \int e^{-y^2}\,dy\)。把这两个一元积分合并起来：根据上一章我们记下的"分离式可以拆成乘积"的窍门反过来用，</p>
+
+<p>\[I^2 = \int_{-\infty}^\infty\int_{-\infty}^\infty e^{-x^2} e^{-y^2}\,dx\,dy = \int_{-\infty}^\infty\int_{-\infty}^\infty e^{-(x^2 + y^2)}\,dx\,dy.\]</p>
+
+<p>啊哈——指数上的 \(x^2 + y^2\) 是一个极坐标里极其干净的家伙：\(r^2\)。换坐标。整个 \(\mathbb{R}^2\) 平面在极坐标下是 \(r \in [0, \infty)\)、\(\theta \in [0, 2\pi)\)；面积元是 \(r\,dr\,d\theta\)。所以</p>
+
+<p>\[I^2 = \int_0^{2\pi}\int_0^\infty e^{-r^2} \cdot r\,dr\,d\theta = \left(\int_0^{2\pi}d\theta\right)\left(\int_0^\infty re^{-r^2}\,dr\right) = 2\pi \cdot \int_0^\infty re^{-r^2}\,dr.\]</p>
+
+<p>剩下的一元积分 \(\int_0^\infty re^{-r^2}\,dr\) 是一道常规题：用 \(u = r^2\)、\(du = 2r\,dr\)，</p>
+
+<p>\[\int_0^\infty re^{-r^2}\,dr = \frac{1}{2}\int_0^\infty e^{-u}\,du = \frac{1}{2}.\]</p>
+
+<p>合起来 \(I^2 = 2\pi \cdot \dfrac{1}{2} = \pi\)。所以</p>
+
+<p>\[\boxed{\int_{-\infty}^\infty e^{-x^2}\,dx = \sqrt{\pi}.}\]</p>
+
+<p>这就是高斯积分。请你停下来欣赏一下：单看一元 \(\int e^{-x^2}\,dx\) 完全看不出闭式；它的<em>平方</em>却奇迹般地是 \(\pi\)。秘密是那个<strong>多出来的 \(r\) 因子</strong>——正因为面积元变成 \(r\,dr\,d\theta\) 多出一个 \(r\)，刚好和 \(e^{-r^2}\) 的导数 \(-2re^{-r^2}\) 里的 \(r\) 配对，让 \(re^{-r^2}\) 立刻有了初等原函数 \(-\tfrac{1}{2}e^{-r^2}\)。一切都对上了。</p>
+
+<p>这个值在概率论里随处可见：标准正态分布的密度 \(\dfrac{1}{\sqrt{2\pi}}e^{-x^2/2}\) 之所以前面有那个 \(\dfrac{1}{\sqrt{2\pi}}\)，正是为了让积分等于 1——而这个归一化常数的存在，本质上就是我们刚刚算出来的 \(\sqrt{\pi}\)。从这一刻起，每次你在统计学课本里看到那个 \(\sqrt{2\pi}\)，请记起这道题。</p>
+
+<h2 id="sec15-5">15.5 何时该换到极坐标，何时不该</h2>
+
+<p>极坐标不是万能药——它在合适的题上会让你飞起来，在不合适的题上会让你陷进去。下面这几条经验规则告诉你怎么判断。</p>
+
+<p><strong>强烈考虑换极坐标，当：</strong></p>
+
+<ul>
+  <li>区域是<em>圆、扇形、环、心形线、玫瑰线</em>，或其它由 \(r\)、\(\theta\) 自然定义的曲线所围。</li>
+  <li>被积函数里出现 \(x^2 + y^2\)（变成 \(r^2\)）、\(\sqrt{x^2 + y^2}\)（变成 \(r\)）、\(\dfrac{1}{x^2 + y^2}\)（变成 \(\dfrac{1}{r^2}\)）等组合。</li>
+  <li>直角坐标下的积分上下限里出现 \(\sqrt{R^2 - x^2}\) 或类似的圆方程——这是"积分区域是圆盘的一部分"的明显信号。</li>
+  <li>被积函数有圆对称性（即只依赖于到原点的距离 \(r\)），比如 \(f(x, y) = e^{-(x^2 + y^2)}\)、\(f(x, y) = \dfrac{1}{(1 + x^2 + y^2)^{3/2}}\)。</li>
+</ul>
+
+<p><strong>不要</strong>换到极坐标，当：</p>
+
+<ul>
+  <li>区域是矩形或者由直线（不过原点）围出的多边形——极坐标会让边界变成丑陋的 \(\theta\) 函数。</li>
+  <li>被积函数里没有 \(x^2 + y^2\) 也没有 \(\sqrt{x^2 + y^2}\)，反而有诸如 \(xy\)、\(x + y\) 这种"被极坐标弄复杂"的项。</li>
+</ul>
+
+<p>下面再给两道判断题级别的小例子，把"该换"的本能练熟。</p>
+
+<p><strong>例 6.</strong> 计算 \(\displaystyle\int_{-1}^1\int_{-\sqrt{1-x^2}}^{\sqrt{1-x^2}} \frac{1}{(1 + x^2 + y^2)^2}\,dy\,dx\)。</p>
+
+<p>区域：单位圆盘 \(x^2 + y^2 \le 1\)。被积式：含 \(x^2 + y^2\)，是 \(\dfrac{1}{(1 + r^2)^2}\)。两条信号都指向极坐标。换。</p>
+
+<p>\[\int_0^{2\pi}\int_0^1 \frac{1}{(1 + r^2)^2} \cdot r\,dr\,d\theta = 2\pi \cdot \int_0^1 \frac{r\,dr}{(1 + r^2)^2}.\]</p>
+
+<p>令 \(u = 1 + r^2\)，\(du = 2r\,dr\)：</p>
+
+<p>\[\int_0^1 \frac{r\,dr}{(1 + r^2)^2} = \frac{1}{2}\int_1^2 \frac{du}{u^2} = \frac{1}{2}\left[-\frac{1}{u}\right]_1^2 = \frac{1}{2}\left(-\frac{1}{2} + 1\right) = \frac{1}{4}.\]</p>
+
+<p>合起来 \(2\pi \cdot \dfrac{1}{4} = \dfrac{\pi}{2}\)。</p>
+
+<p><strong>例 7.</strong> 计算 \(\displaystyle\iint_D \arctan\!\left(\frac{y}{x}\right)\,dA\)，其中 \(D\) 是由 \(x^2 + y^2 \le 4\)、\(x^2 + y^2 \ge 1\)、\(y \ge 0\)、\(y \le x\) 围出的区域。</p>
+
+<p>区域是圆环的一部分，且边界 \(y = x\)（即 \(\theta = \pi/4\)）和 \(y = 0\)（即 \(\theta = 0\)）正好是放射状的。被积式 \(\arctan(y/x) = \arctan(\tan\theta) = \theta\)（在我们这块 \(\theta \in [0, \pi/4]\) 的范围里这个等式成立）。</p>
+
+<p>极坐标描述：\(\theta \in [0, \pi/4]\)，\(r \in [1, 2]\)。两边都是矩形 \((r, \theta)\) 形式，被积式分离：</p>
+
+<p>\[\iint_D \theta\,dA = \int_0^{\pi/4}\int_1^2 \theta \cdot r\,dr\,d\theta = \int_0^{\pi/4}\theta\,d\theta \cdot \int_1^2 r\,dr = \frac{\theta^2}{2}\Big|_0^{\pi/4} \cdot \frac{r^2}{2}\Big|_1^2 = \frac{\pi^2}{32} \cdot \frac{3}{2} = \frac{3\pi^2}{64}.\]</p>
+
+<p>这道题精彩之处在于：直角坐标里，\(\arctan(y/x)\) 与那种"既圆又扇又环"的区域配在一起，简直是噩梦；换到极坐标，被积式直接变成了 \(\theta\)、区域变成了矩形，然后两个一元积分相乘就完了。这就是当一切对得上时极坐标能带来的爆炸性简化。</p>
+
+<p>下一章我们升一维：从二重积分跳到三重积分，把面积元 \(dA\) 升级为体积元 \(dV\)，把 I 型/II 型扩成更多更细致的"立体区域"分类。所有本章的直觉都会自然延伸过去——尤其是"画图、设上下限、选顺序"这一套节奏，在三维里更不可或缺。</p>
+
+<hr>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 一般区域上的二重积分</a><a href="ch16.html">下一章 · 第 16 章 三重积分 →</a></nav>
+
+</main>
+</body>
+</html>

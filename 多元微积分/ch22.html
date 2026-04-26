@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 22 章 格林定理 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 保守向量场</a><a href="ch23.html">下一章 · 第 23 章 参数曲面与曲面面积 →</a></nav>
+<h1 id="ch22">第 22 章 格林定理</h1>
+
+<p>格林定理把<strong>平面区域 \(D\) 边界上的曲线积分</strong>与<strong>该区域上的二重积分</strong>联系起来。它是平面上的"基本定理"——把第 20 章里令人头疼的曲线积分压缩成往往容易得多的二重积分；反过来，它也允许你把一个二重积分换成边界上的一条线积分。这种"<em>区域上的某个量等于边界上的某个量</em>"的故事在多元微积分里反复上演：上一章的曲线积分基本定理是它的一维版本，第 25 章的斯托克斯定理是它在曲面上的版本，第 26 章的高斯定理是它在三维体上的版本。这一族定理统称<em>斯托克斯型定理</em>，它们都从这一章的格林定理发源。</p>
+
+<p>这一章我们做三件事：陈述并演算格林定理（环量形式）；介绍它的另一种等价写法（通量形式）；处理"区域有洞"的情形。在每一处我都会同时给出一个"无穷小细胞 + 抵消"的几何直觉——这是格林定理为什么会成立的真正原因，请认真感受它。</p>
+
+<h2 id="sec22-1">22.1 定理叙述与基本例子</h2>
+
+<p>设 \(D\) 是平面上有界区域，边界 \(C = \partial D\) 是分段光滑的简单闭合曲线（"简单"指曲线本身不自相交）。规定 \(C\) 取<strong>正向</strong>，意思是：当你沿 \(C\) 行走时，区域 \(D\) 始终在你的左手边。对于一个简单闭合曲线（无洞），正向就是<em>逆时针</em>；当区域有洞时，正向的含义会再细化（22.3 节再说）。</p>
+
+<p>设 \(P(x, y)\) 与 \(Q(x, y)\) 在含 \(D\) 的开集上有连续偏导。则<strong>格林定理（环量形式）</strong>陈述</p>
+
+<p>\[\boxed{\oint_C P\,dx + Q\,dy = \iint_D \left(\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}\right)dA.}\]</p>
+
+<p>左边是边界上的曲线积分，右边是区域上的二重积分。被积量 \(Q_x - P_y\) 正是 19 章里我们定义的"<em>二维标量旋度</em>"。所以格林定理一句话可读为：<strong>"边界上的环量 \(=\) 区域上旋度的二重积分"</strong>。</p>
+
+<p>在我们演算之前，让我先把<em>为什么会成立</em>的几何直觉说出来。把区域 \(D\) 切成密密麻麻的极小方格 \(R_{i,j}\)，每一格的尺寸是 \(\Delta x \times \Delta y\)。考察任何一个小格，沿它的边界（小逆时针方框）做曲线积分。</p>
+
+<p>这个小积分由四段构成：底边、右边、顶边、左边。把每一段的 \(P\,dx + Q\,dy\) 用一阶泰勒展开估计——你会发现<em>底</em>边与<em>顶</em>边的 \(Q\,dy\) 项贡献为零（那两段上 \(dy = 0\)），而 \(P\,dx\) 项加在一起给出 \(P(\text{底})\Delta x - P(\text{顶})\Delta x \approx -P_y \Delta y \Delta x\)。同理<em>左</em>右两边 \(P\,dx\) 项贡献为零，\(Q\,dy\) 项给出 \(Q_x \Delta x \Delta y\)。两项相加得</p>
+
+<p>\[\oint_{\partial R_{i,j}}\!\! P\,dx + Q\,dy \approx (Q_x - P_y)\,\Delta x\,\Delta y.\]</p>
+
+<p>所以"小格上的边界积分 \(\approx\) 该格中心处的旋度 \(\times\) 小格面积"。这条公式正是"二维标量旋度"的另一种刻画——它度量"沿一个无穷小方框走一圈所积累的环量除以方框面积"。</p>
+
+<p>现在把所有小格的边界积分加起来。这里发生<strong>奇妙的抵消</strong>：两个相邻小格<em>共享</em>一条边，但这条边在两边的小格里被走了相反的两次（一边逆时针、一边顺时针），所以这两次的积分恰好<em>互相抵消</em>。所有<em>内部</em>的边都被走了两次、相互抵消；只有<em>外层</em>的边（也就是真正的边界 \(C\) 上的小段）被走了一次、不被抵消。所以</p>
+
+<p>\[\sum_{i,j}\oint_{\partial R_{i,j}}\!\! P\,dx + Q\,dy = \oint_C P\,dx + Q\,dy.\]</p>
+
+<p>另一边把每一格的近似值 \((Q_x - P_y)\Delta x\Delta y\) 全部加起来取极限，正是 \(\iint_D (Q_x - P_y)\,dA\)。两边相等，就是格林定理。</p>
+
+<p>这条<strong>"无穷小细胞 + 边界抵消"</strong>的图像比公式重要得多——它是斯托克斯型所有定理的统一证法。请你今后每读一遍格林定理，就把这幅图像在脑子里画一遍。</p>
+
+<p>看几个例子。第一个：算 \(\oint_C(y\,dx + x^2\,dy)\)，\(C\) 是单位圆周（逆时针）。</p>
+
+<p>直接算这个积分要参数化 \(\mathbf{r}(t) = \langle \cos t, \sin t\rangle\)，写出来再积——多少有些麻烦。但用格林：\(P = y\)，\(Q = x^2\)，\(Q_x - P_y = 2x - 1\)。所以</p>
+
+<p>\[\oint_C = \iint_D (2x - 1)\,dA,\quad D = \{(x, y): x^2 + y^2 \le 1\}.\]</p>
+
+<p>把它分成两部分。\(\iint_D 2x\,dA\)：被积函数关于 \(y\) 轴反对称、圆盘对称，所以等于 \(0\)。\(\iint_D 1\,dA = \pi\)（圆盘的面积）。所以总和 \(= -\pi\)。</p>
+
+<p>第二个：算 \(\oint_C (3y - x^2)\,dx + (x + 4y^3)\,dy\)，\(C\) 是矩形 \([0, 2]\times[0, 1]\) 的边界（逆时针）。直接算需要四段折线分别处理，烦。用格林：\(P = 3y - x^2\)，\(Q = x + 4y^3\)，\(Q_x - P_y = 1 - 3 = -2\)。所以</p>
+
+<p>\[\oint_C = \iint_D (-2)\,dA = -2 \cdot 2 \cdot 1 = -4.\]</p>
+
+<p>第三个（同向化简）：算 \(\oint_C \cos x\sin y\,dx + \sin x\cos y\,dy\)，\(C\) 任意简单闭合曲线（逆时针）。算 \(Q_x - P_y = \cos x\cos y - \cos x\cos y = 0\)。所以</p>
+
+<p>\[\oint_C = \iint_D 0\,dA = 0.\]</p>
+
+<p>这条结论与曲线本身长什么样无关——只要它是简单闭合的、定义域单连通就行。事实上，\(\langle \cos x\sin y, \sin x\cos y\rangle\) 正是 \(f = \sin x\sin y\) 的梯度场，所以是保守的，闭合积分自然为零——格林从另一个角度验证了这件事。</p>
+
+<p>有一条非常漂亮的应用：<strong>用线积分算面积</strong>。把格林定理中的 \(P, Q\) 选得使 \(Q_x - P_y = 1\)。最常用的两个选择是 \((P, Q) = (0, x)\) 或 \((P, Q) = (-y, 0)\)，或更对称的 \((P, Q) = (-y/2, x/2)\)。任何一种都给出</p>
+
+<p>\[\boxed{\operatorname{Area}(D) = \frac{1}{2}\oint_C(-y\,dx + x\,dy) = \oint_C x\,dy = -\oint_C y\,dx.}\]</p>
+
+<p>你只要算出边界上的线积分，就得到了 \(D\) 的面积。这是"鞋带公式"的连续版本。用它来算椭圆 \(x = a\cos t, y = b\sin t\)（\(t \in [0, 2\pi]\)）的面积：</p>
+
+<p>\[\operatorname{Area} = \frac{1}{2}\int_0^{2\pi}\!\!\big(-b\sin t \cdot (-a\sin t) + a\cos t \cdot b\cos t\big)\,dt = \frac{1}{2}\int_0^{2\pi} ab\,dt = \pi ab.\]</p>
+
+<p>验证了你早就知道的结论。这个方法看起来"杀鸡用牛刀"，但当区域形状复杂、不便于直接用 \(\iint dA\) 描述时，它会救你一命——只要知道边界曲线的参数化就够了。</p>
+
+<h2 id="sec22-2">22.2 通量形式</h2>
+
+<p>格林定理有一个完全等价的"通量"版本。设 \(\mathbf{F} = \langle P, Q\rangle\)。在边界 \(C\) 上的每一点，画外法向单位向量 \(\mathbf{n}\)（指向<em>外侧</em>，即指出区域 \(D\)）。则</p>
+
+<p>\[\boxed{\oint_C \mathbf{F}\cdot \mathbf{n}\,ds = \iint_D \operatorname{div}\mathbf{F}\,dA = \iint_D \left(\frac{\partial P}{\partial x} + \frac{\partial Q}{\partial y}\right)dA.}\]</p>
+
+<p>读法：<strong>"边界上的通量 \(=\) 区域上散度的二重积分"</strong>。"通量"就是单位时间穿过边界的"流体量"——把 \(\mathbf{F}\) 当成流体的速度场，\(\mathbf{F}\cdot \mathbf{n}\,ds\) 就是流体在边界小段 \(ds\) 上沿外法向的流出量；积分起来就是单位时间从 \(D\) 流出去的总流体量。</p>
+
+<p>这条"通量 \(=\) 散度的积分"完全契合 19 章里散度的物理含义——"<em>单位体积里源产生的净流量</em>"。把"源密度"在 \(D\) 上加起来，就是 \(D\) 内部源产生的<em>总</em>流量；它必然等于从边界<em>流出</em>去的量。</p>
+
+<p>通量形式与环量形式如何相互推出？它们其实是同一条定理在不同记号下的两种说法。设 \(\mathbf{F} = \langle P, Q\rangle\)，把它"逆时针旋转 \(90^\circ\)"得到 \(\widetilde{\mathbf{F}} = \langle -Q, P\rangle\)。那么 \(\widetilde{\mathbf{F}}\cdot d\mathbf{r}\)（环量形式中的被积式，对 \(\widetilde{\mathbf{F}}\)）就等于 \(\mathbf{F}\cdot \mathbf{n}\,ds\)（通量形式中的被积式，对 \(\mathbf{F}\)），因为旋转 \(90^\circ\) 把"切向" 变成"法向"。同时，\(\widetilde{\mathbf{F}}\) 的"二维旋度" \((P)_x - (-Q)_y = P_x + Q_y\) 正是 \(\mathbf{F}\) 的散度。所以把环量形式应用到 \(\widetilde{\mathbf{F}}\) 上，得到的正是 \(\mathbf{F}\) 的通量形式。</p>
+
+<p>两种形式合在一起讲：在平面上，<strong>边界上沿切向的积分给出旋度的总量；边界上沿法向的积分给出散度的总量</strong>。这两件事都是"边界 \(=\) 内部"的具体表达，是 26 章高斯定理与 25 章斯托克斯定理在二维上的并存。</p>
+
+<p>看一个通量形式的例子。\(\mathbf{F} = \langle x, y\rangle\)（径向场），\(D\) 是单位圆盘。直接通量形式右边：\(\operatorname{div}\mathbf{F} = 2\)，\(\iint_D 2\,dA = 2\pi\)。我们用左边边界算来验证：\(C\) 是单位圆周，\(\mathbf{n} = \langle\cos t, \sin t\rangle\)（外法向恰好是位置向量），\(\mathbf{F}\) 在 \(C\) 上 \(= \langle\cos t, \sin t\rangle\)，所以 \(\mathbf{F}\cdot \mathbf{n} = 1\)，\(ds = dt\)，\(\oint_C 1\,dt = 2\pi\)。两边一致。</p>
+
+<p>这条结论的物理含义美好：径向场 \(\langle x, y\rangle\) 处处"朝外吐"，每一点的散度是 \(2\)，所以把整个圆盘上的源加起来是 \(2\pi\)；而流体从边界圆周上均匀地流出去，单位长度上每秒流出 \(1\)，圆周长 \(2\pi\)，总流出 \(2\pi\)。一致。</p>
+
+<h2 id="sec22-3">22.3 区域有洞的情形</h2>
+
+<p>如果区域 \(D\) 不是单连通——它内部有一个洞——则它的边界由<em>两条</em>（或多条）曲线组成：<strong>外圈</strong> \(C_1\)（取逆时针）与<strong>内圈</strong> \(C_2\)（取顺时针）。两条都按"\(D\) 在我左手边"的规则定方向，于是外圈逆时针、内圈顺时针。</p>
+
+<p>格林定理对这种"环形"区域仍然成立，只要把"\(C\)"理解为这一对取适当方向的曲线之和：</p>
+
+<p>\[\oint_{C_1} P\,dx + Q\,dy + \oint_{C_2} P\,dx + Q\,dy = \iint_D (Q_x - P_y)\,dA.\]</p>
+
+<p>为什么？把环形区域用一条<em>切口</em>从外圈拉到内圈，把它"撑开"成一个无洞的区域；切口被走了两次（来回各一次）方向相反、相互抵消。所以最终的边界积分就是外圈与内圈之和，仍等于内部的二重积分。还可以回到 22.1 节末尾"无穷小细胞 + 抵消"的图像：把环形区域切成小格，相邻格的内边相互抵消，只剩外圈和内圈两层"未抵消"的边——这正对应了上式中两个 \(\oint\)。</p>
+
+<p>实务里这条更常被<em>反过来</em>用。如果直接算 \(C_2\) 上的积分很烦，但 \(C_1\) 上的容易、且 \(D\) 上的二重积分也容易，那就解出 \(\oint_{C_2}\)。或者，更常见的：把外圈 \(C_1\)（你想算的那条复杂曲线）配上一条形状漂亮的内圈 \(C_2\)（典型选小圆周），让 \(D\) 上的二重积分变成熟悉的形式。</p>
+
+<p>下面把这条思路用到上一章末尾的"角度场"上，得到一个非常优美的结论。设</p>
+
+<p>\[\mathbf{F} = \left\langle \frac{-y}{x^2 + y^2},\ \frac{x}{x^2 + y^2}\right\rangle.\]</p>
+
+<p>除原点外它的二维旋度处处为零（21.4 节已算过）。设 \(C\) 是<em>任意</em>包围原点的简单闭合曲线，取逆时针方向。我们想算 \(\oint_C \mathbf{F}\cdot d\mathbf{r}\)。</p>
+
+<p>设 \(C_2\) 是以原点为中心、半径 \(\varepsilon > 0\) 很小的小圆周，<em>顺时针</em>方向。让 \(D\) 是 \(C\)（外圈）与 \(C_2\)（内圈）之间的环形区域（要确保 \(\varepsilon\) 足够小，使小圆完全落在 \(C\) 内部）。在 \(D\) 上 \(Q_x - P_y = 0\)，所以</p>
+
+<p>\[\oint_C \mathbf{F}\cdot d\mathbf{r} + \oint_{C_2}\mathbf{F}\cdot d\mathbf{r} = \iint_D 0\,dA = 0.\]</p>
+
+<p>所以 \(\oint_C \mathbf{F}\cdot d\mathbf{r} = -\oint_{C_2}\mathbf{F}\cdot d\mathbf{r} = \oint_{-C_2}\mathbf{F}\cdot d\mathbf{r}\)，其中 \(-C_2\) 表示反向（即逆时针的小圆）。</p>
+
+<p>但 \(\oint_{-C_2}\mathbf{F}\cdot d\mathbf{r}\) 我们已经在 21.4 节里算过——是 \(2\pi\)（注意它跟半径 \(\varepsilon\) 无关，因为 \(\mathbf{F}\) 在小圆上各项被半径恰好抵消）。所以</p>
+
+<p>\[\oint_C \mathbf{F}\cdot d\mathbf{r} = 2\pi.\]</p>
+
+<p>结论非常美：<strong>任何</strong>包围原点的逆时针简单闭曲线，\(\mathbf{F}\) 沿它的积分都等于 \(2\pi\)——与曲线形状<em>无关</em>，只看"<em>它绕了原点几圈</em>"。如果绕了 \(n\) 圈（\(n\) 整数），结果就是 \(2\pi n\)。</p>
+
+<p>这就是<strong>绕数</strong>（winding number）概念的雏形，也是复变函数论里"留数定理"的最简单例子。它告诉你：在一个有"洞"的区域上，<em>仅靠局部信息（旋度）不能完全决定全局信息（环路积分）</em>；还需要拓扑信息（环路绕洞几圈）来补足。这一点与 21.4 节的反例彼此印证——它们其实是同一句话的两面。</p>
+
+<p>下一章我们走向曲面：先把曲面参数化，再为后面的曲面积分（24 章）和斯托克斯、高斯（25、26 章）准备好工具。</p>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 保守向量场</a><a href="ch23.html">下一章 · 第 23 章 参数曲面与曲面面积 →</a></nav>
+
+</main>
+</body>
+</html>

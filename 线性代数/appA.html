@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 严格处理 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch25.html">← 上一章 · 第 25 章 应用：PageRank、PCA、图像压缩</a><a href="appB.html">下一章 · 附录 B 复数复习 →</a></nav>
+<h1 id="appA">附录 A 严格处理</h1>
+
+<p>正文里许多定理我都用"直觉的论证"或"画面"代替了严格证明。这种做法在第一遍学习时是必要的——如果一上来就堆 ε-δ 风格的形式化推导，绝大多数初学者会被淹死。但<em>严格证明</em>本身是数学训练里最重要的一环；它把你从"会用工具"提升到"理解工具为什么必然成立"。</p>
+
+<p>本附录给出五件正文里我说"将在附录 A 中证明"的事情：</p>
+
+<ul>
+  <li>A.1 抽象向量空间的公理体系（每条公理为什么必要）；</li>
+  <li>A.2 维数 well-defined 性的证明（替换定理）；</li>
+  <li>A.3 谱定理（实对称矩阵的特征值实数性、特征向量正交性、可正交对角化）；</li>
+  <li>A.4 奇异值分解的存在性证明；</li>
+  <li>A.5 行列式的公理化定义。</li>
+</ul>
+
+<p>读这部分时请慢一点。一个证明读完一遍如果没看懂，那就再读一遍——通常第二遍就懂了。如果两遍仍不通，那就把每一步抄到纸上推一遍——抄一遍胜过读十遍。</p>
+
+<h2 id="secA-1">A.1 向量空间公理</h2>
+
+<p>正文里我把"向量空间"描述为"对加法和数乘封闭、有零向量、有逆元、满足交换律和分配律"的集合。完整的公理体系如下。设 \(V\) 是一个集合，定义了加法 \(+: V \times V \to V\) 与数乘 \(\cdot : \mathbb{R} \times V \to V\)。\(V\) 是<strong>实向量空间</strong>，如果对任意 \(\mathbf{u}, \mathbf{v}, \mathbf{w} \in V\) 和 \(\alpha, \beta \in \mathbb{R}\)，下面 8 条公理成立：</p>
+
+<ol>
+  <li>\(\mathbf{u} + \mathbf{v} = \mathbf{v} + \mathbf{u}\)（加法交换律）；</li>
+  <li>\((\mathbf{u} + \mathbf{v}) + \mathbf{w} = \mathbf{u} + (\mathbf{v} + \mathbf{w})\)（加法结合律）；</li>
+  <li>存在 \(\mathbf{0} \in V\) 使 \(\mathbf{v} + \mathbf{0} = \mathbf{v}\) 对一切 \(\mathbf{v}\) 成立（零向量）；</li>
+  <li>对每个 \(\mathbf{v}\)，存在 \(-\mathbf{v} \in V\) 使 \(\mathbf{v} + (-\mathbf{v}) = \mathbf{0}\)（加法逆元）；</li>
+  <li>\(\alpha (\mathbf{u} + \mathbf{v}) = \alpha \mathbf{u} + \alpha \mathbf{v}\)（数乘对加法的分配律）；</li>
+  <li>\((\alpha + \beta) \mathbf{v} = \alpha \mathbf{v} + \beta \mathbf{v}\)（数乘对数加法的分配律）；</li>
+  <li>\((\alpha \beta) \mathbf{v} = \alpha (\beta \mathbf{v})\)（数乘的结合律）；</li>
+  <li>\(1 \cdot \mathbf{v} = \mathbf{v}\)（标量 1 的中性性）。</li>
+</ol>
+
+<p>每条公理都不能省。第 1、2 条不省，否则线性组合的意义就模糊（如果加法不交换，\(2\mathbf{u} + 3\mathbf{v}\) 和 \(3\mathbf{v} + 2\mathbf{u}\) 就成了不同的东西）。第 3、4 条保证有"零"和"减法"——少了它们就连"线性方程"都写不出来。第 5、6 条让"分配律"成立，是把数乘和加法连起来的桥梁。第 7 条让"乘法可重排"。第 8 条看起来最不像公理，但其实必要——少了它，整个数乘可以被定义成"恒等于零"，这种平凡情况虽然满足前 7 条但显然不是我们想要的。</p>
+
+<p>从这 8 条公理可以推出一些"显然但需要证明"的小事实，比如：零向量唯一、加法逆元唯一、\(0 \cdot \mathbf{v} = \mathbf{0}\)、\((-1)\mathbf{v} = -\mathbf{v}\)。这些都是公理体系的"标准副产品"。例如证明零向量唯一：假设 \(\mathbf{0}_1, \mathbf{0}_2\) 都满足公理 3。则 \(\mathbf{0}_1 = \mathbf{0}_1 + \mathbf{0}_2\)（用 \(\mathbf{0}_2\) 是零向量），同时 \(\mathbf{0}_1 + \mathbf{0}_2 = \mathbf{0}_2\)（用 \(\mathbf{0}_1\) 是零向量并交换），故 \(\mathbf{0}_1 = \mathbf{0}_2\)。</p>
+
+<h2 id="secA-2">A.2 维数 well-defined 性</h2>
+
+<p>第 8 章我们说："每个有限维向量空间的所有基都有相同数目的向量；这个数目叫维数"。这件事不是显然的——为什么不同的基不能有不同的元素数？严格证明依靠下面这条引理。</p>
+
+<p><strong>替换引理（Steinitz）</strong>　设 \(V\) 是向量空间，\(\{\mathbf{v}_1, \ldots, \mathbf{v}_m\}\) 张成 \(V\)；\(\{\mathbf{u}_1, \ldots, \mathbf{u}_n\}\) 是 \(V\) 中线性无关的一组向量。则 \(n \le m\)。</p>
+
+<p><em>证明思路。</em>归纳。把 \(\mathbf{u}_1\) 用 \(\mathbf{v}_i\) 们线性表示——必有某个系数非零，比如 \(\mathbf{v}_1\) 的系数（必要时重排）。那么可以把 \(\mathbf{v}_1\) 用 \(\mathbf{u}_1, \mathbf{v}_2, \ldots, \mathbf{v}_m\) 反解出来；这意味着 \(\{\mathbf{u}_1, \mathbf{v}_2, \ldots, \mathbf{v}_m\}\) 仍张成 \(V\)。把 \(\mathbf{u}_2\) 用这组新基底表示——必有某个 \(\mathbf{v}_i\)（\(i \ge 2\)）的系数非零（否则 \(\mathbf{u}_2\) 是 \(\mathbf{u}_1\) 的倍数，与线性无关矛盾），把它换掉。如此进行 \(n\) 步：每一步用一个 \(\mathbf{u}\) 替掉一个 \(\mathbf{v}\)，要求至少有 \(n\) 个 \(\mathbf{v}\) 可换——故 \(n \le m\)。</p>
+
+<p><strong>推论：维数 well-defined。</strong>　设 \(\mathcal{B}_1 = \{\mathbf{v}_1, \ldots, \mathbf{v}_m\}\) 和 \(\mathcal{B}_2 = \{\mathbf{u}_1, \ldots, \mathbf{u}_n\}\) 都是 \(V\) 的基。\(\mathcal{B}_1\) 张成 \(V\)，\(\mathcal{B}_2\) 线性无关，故 \(n \le m\)；对称地 \(m \le n\)。所以 \(m = n\)。这个共同的数目即为维数。</p>
+
+<h2 id="secA-3">A.3 谱定理</h2>
+
+<p>谱定理有三件事要证：</p>
+
+<ol>
+  <li>实对称矩阵的特征值都是实数；</li>
+  <li>不同特征值对应的特征向量正交；</li>
+  <li>实对称矩阵可以正交对角化。</li>
+</ol>
+
+<p><strong>证明 (1)：</strong>设 \(A \in \mathbb{R}^{n \times n}\) 对称，\(\lambda \in \mathbb{C}\) 是 \(A\) 的特征值（暂时允许复数），\(\mathbf{v} \in \mathbb{C}^n\) 是相应特征向量。考虑 \(\overline{\mathbf{v}}^T A \mathbf{v}\)（\(\overline{\mathbf{v}}\) 表示对每个分量取共轭）。一方面
+\[
+\overline{\mathbf{v}}^T A \mathbf{v} = \overline{\mathbf{v}}^T (\lambda \mathbf{v}) = \lambda \overline{\mathbf{v}}^T \mathbf{v} = \lambda \|\mathbf{v}\|^2.
+\]
+另一方面，由于 \(A\) 实对称，
+\[
+\overline{\mathbf{v}}^T A \mathbf{v} = (A^T \overline{\mathbf{v}})^T \mathbf{v} = (A \overline{\mathbf{v}})^T \mathbf{v} = (\overline{A \mathbf{v}})^T \mathbf{v} = (\overline{\lambda \mathbf{v}})^T \mathbf{v} = \overline{\lambda} \|\mathbf{v}\|^2.
+\]
+两式相等：\(\lambda \|\mathbf{v}\|^2 = \overline{\lambda} \|\mathbf{v}\|^2\)。\(\mathbf{v}\) 非零，故 \(\lambda = \overline{\lambda}\)，即 \(\lambda\) 是实数。</p>
+
+<p><strong>证明 (2)：</strong>设 \(A \mathbf{v} = \lambda \mathbf{v}\)、\(A \mathbf{w} = \mu \mathbf{w}\)，\(\lambda \neq \mu\)。计算
+\[
+\lambda \mathbf{w}^T \mathbf{v} = \mathbf{w}^T (\lambda \mathbf{v}) = \mathbf{w}^T A \mathbf{v} = (A^T \mathbf{w})^T \mathbf{v} = (A \mathbf{w})^T \mathbf{v} = \mu \mathbf{w}^T \mathbf{v}.
+\]
+所以 \((\lambda - \mu) \mathbf{w}^T \mathbf{v} = 0\)。\(\lambda \neq \mu\) 故 \(\mathbf{w}^T \mathbf{v} = 0\)——两个特征向量正交。</p>
+
+<p><strong>证明 (3)：</strong>对维数归纳。\(n = 1\) 显然。设结论对 \((n-1) \times (n-1)\) 实对称成立。对 \(n \times n\) 实对称 \(A\)，由 (1) 它有一个实特征值 \(\lambda_1\)、相应单位特征向量 \(\mathbf{v}_1\)。把 \(\mathbf{v}_1\) 扩展成 \(\mathbb{R}^n\) 的标准正交基 \(\{\mathbf{v}_1, \mathbf{w}_2, \ldots, \mathbf{w}_n\}\)，记 \(P = [\mathbf{v}_1 \mid \mathbf{w}_2 \mid \cdots \mid \mathbf{w}_n]\)（正交矩阵）。计算 \(P^T A P\)：第一列是 \(P^T A \mathbf{v}_1 = P^T \lambda_1 \mathbf{v}_1 = \lambda_1 \mathbf{e}_1\)。又 \(P^T A P\) 仍对称（因为 \((P^T A P)^T = P^T A^T P = P^T A P\)），所以第一行也是 \(\lambda_1 \mathbf{e}_1^T\)。即
+\[
+P^T A P = \begin{pmatrix} \lambda_1 & 0 \\ 0 & A' \end{pmatrix},
+\]
+其中 \(A'\) 是 \((n-1) \times (n-1)\) 实对称矩阵。由归纳假设，存在 \((n-1)\) 阶正交矩阵 \(Q'\) 使 \(Q'^T A' Q' = D'\) 对角。令
+\[
+Q = P \begin{pmatrix} 1 & 0 \\ 0 & Q' \end{pmatrix},
+\]
+\(Q\) 是正交的（两个正交矩阵的积），且 \(Q^T A Q = \mathrm{diag}(\lambda_1) \oplus D'\) 对角。证毕。</p>
+
+<h2 id="secA-4">A.4 SVD 的存在性</h2>
+
+<p>设 \(A \in \mathbb{R}^{m \times n}\)。证明存在正交 \(U \in \mathbb{R}^{m \times m}\)、\(V \in \mathbb{R}^{n \times n}\) 和 \(\Sigma \in \mathbb{R}^{m \times n}\)（"对角"，对角元非负且降序）使 \(A = U \Sigma V^T\)。</p>
+
+<p><strong>证明。</strong>构造 \(B = A^T A\)。\(B\) 是 \(n \times n\) 实对称且半正定（因为 \(\mathbf{v}^T B \mathbf{v} = \|A \mathbf{v}\|^2 \ge 0\)）。由 A.3 节谱定理，存在正交 \(V \in \mathbb{R}^{n \times n}\) 和对角 \(D = \mathrm{diag}(d_1, \ldots, d_n)\)（\(d_1 \ge \cdots \ge d_n \ge 0\)）使 \(B = V D V^T\)。</p>
+
+<p>设其中前 \(r\) 个 \(d_i > 0\)（\(r\) 是 \(B\) 的秩）；其余 \(d_{r+1} = \cdots = d_n = 0\)。定义 \(\sigma_i = \sqrt{d_i}\)（\(i = 1, \ldots, r\)）。把 \(V\) 的列写作 \(\mathbf{v}_1, \ldots, \mathbf{v}_n\)。</p>
+
+<p>对 \(i = 1, \ldots, r\)，定义 \(\mathbf{u}_i = \frac{1}{\sigma_i} A \mathbf{v}_i \in \mathbb{R}^m\)。验证它们正交单位：
+\[
+\mathbf{u}_i^T \mathbf{u}_j = \frac{1}{\sigma_i \sigma_j} (A \mathbf{v}_i)^T (A \mathbf{v}_j) = \frac{1}{\sigma_i \sigma_j} \mathbf{v}_i^T A^T A \mathbf{v}_j = \frac{d_j}{\sigma_i \sigma_j} \mathbf{v}_i^T \mathbf{v}_j.
+\]
+当 \(i = j\) 这等于 \(d_i / \sigma_i^2 = 1\)；当 \(i \neq j\)，\(\mathbf{v}_i^T \mathbf{v}_j = 0\) 故等于 0。所以 \(\{\mathbf{u}_1, \ldots, \mathbf{u}_r\}\) 是 \(\mathbb{R}^m\) 中的标准正交集。</p>
+
+<p>把它扩成 \(\mathbb{R}^m\) 的标准正交基 \(\{\mathbf{u}_1, \ldots, \mathbf{u}_m\}\)（用 Gram-Schmidt 补出 \(\mathbf{u}_{r+1}, \ldots, \mathbf{u}_m\)）。设 \(U = [\mathbf{u}_1 \mid \cdots \mid \mathbf{u}_m]\)。</p>
+
+<p>定义 \(\Sigma \in \mathbb{R}^{m \times n}\)，\(\Sigma_{ii} = \sigma_i\)（\(i = 1, \ldots, r\)），\(\Sigma_{ii} = 0\)（\(i > r\)），其它位置零。</p>
+
+<p>验证 \(A = U \Sigma V^T\)。等价于验证 \(A V = U \Sigma\)，即对每个 \(i\)，\(A \mathbf{v}_i\) 等于 \(U \Sigma\) 的第 \(i\) 列。\(U \Sigma\) 的第 \(i\) 列是 \(\sigma_i \mathbf{u}_i\)（当 \(i \le r\)）或 \(\mathbf{0}\)（当 \(i > r\)）。当 \(i \le r\)，由 \(\mathbf{u}_i\) 的定义，\(A \mathbf{v}_i = \sigma_i \mathbf{u}_i\)，符合。当 \(i > r\)，\(d_i = 0\) 即 \(A^T A \mathbf{v}_i = 0\)，故 \(\|A \mathbf{v}_i\|^2 = \mathbf{v}_i^T A^T A \mathbf{v}_i = 0\)，即 \(A \mathbf{v}_i = \mathbf{0}\)，也符合。证毕。</p>
+
+<h2 id="secA-5">A.5 行列式的公理化定义</h2>
+
+<p>正文里我们用"按代数余子式展开"或"几何上是有向体积"来理解行列式。这两种是描述性的，不是定义。严格的定义有几种等价方式，最干净的是<strong>公理化</strong>：</p>
+
+<p><strong>定义。</strong>　行列式 \(\det : \mathbb{R}^{n \times n} \to \mathbb{R}\) 是唯一一个满足下列三条性质的函数：</p>
+
+<ol>
+  <li><strong>多线性</strong>：\(\det\) 把矩阵看作 \(n\) 列向量的函数，对每一列都是线性的。即固定其他列，作为该列的函数 \(\det\) 是线性映射。</li>
+  <li><strong>反对称</strong>：交换任意两列，\(\det\) 变号。</li>
+  <li><strong>归一化</strong>：\(\det(I_n) = 1\)。</li>
+</ol>
+
+<p>这三条性质<strong>唯一</strong>确定了 \(\det\)。证明唯一性的关键观察是：用初等列变换可以把任何矩阵变到对角形式（如果它可逆）或下三角零矩阵（如果它奇异）；初等列变换在三条公理下对 \(\det\) 的影响是已知的（缩放：缩放因子；交换：变号；加倍数：不变）。所以 \(\det\) 在任何矩阵上的值都被这三条公理唯一决定。</p>
+
+<p>存在性可以构造性地给出——比如著名的"莱布尼兹公式"：
+\[
+\det A = \sum_{\sigma \in S_n} \mathrm{sgn}(\sigma) \prod_{i=1}^{n} A_{i, \sigma(i)},
+\]
+其中 \(S_n\) 是 \(\{1, 2, \ldots, n\}\) 的所有置换，\(\mathrm{sgn}(\sigma)\) 是置换的符号（\(\pm 1\)）。可以验证这个公式确实满足三条公理。</p>
+
+<p>从这个公理化定义可以推出所有正文里用到的行列式性质：行列式按行展开（"拉普拉斯展开"）、\(\det(AB) = \det A \cdot \det B\)、\(\det A^T = \det A\)、行列式的几何意义（\(n\) 维平行多面体的有向体积）。每一条都来自于多线性 + 反对称这两条灵活的"代数性质"加上一些归纳。这套公理化进路把行列式从"一堆公式"变成了"由三条简单约束完全确定的对象"——这是数学家审美里非常经典的味道：用最少的承诺刻画最丰富的对象。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch25.html">← 上一章 · 第 25 章 应用：PageRank、PCA、图像压缩</a><a href="appB.html">下一章 · 附录 B 复数复习 →</a></nav>
+
+</main>
+</body>
+</html>

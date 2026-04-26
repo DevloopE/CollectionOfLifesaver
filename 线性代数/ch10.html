@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章　线性变换 — 普林斯顿线性代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  // 备用 CDN：jsdelivr 加载失败时切到 cdnjs
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 四个基本子空间与秩</a><a href="ch11.html">下一章 · 第 11 章　矩阵作为线性变换 →</a></nav>
+<h1 id="ch10">第 10 章　线性变换</h1>
+
+<p>到现在为止，每当我们写下 \(A\mathbf{x}\)，我们都把它看成一个矩阵和一个向量的乘法——一个具体的算术运算。但如果我们退一步，把"输入 \(\mathbf{x}\)，输出 \(A\mathbf{x}\)"看成一个完整的动作，那么 \(A\) 就是一个<strong>函数</strong>：它把 \(\mathbb{R}^n\) 中的每个向量送到 \(\mathbb{R}^m\) 中的一个向量。</p>
+
+<p>本章我们要做的，是把视角抬高一层——不局限于"矩阵作用"，而是去问：<em>什么样的函数 \(T:V\to W\) 才配得上"线性"这两个字？</em>这一抽象的小步带来的好处是巨大的。它让我们能用同一套语言去讨论旋转、反射、求导、积分——发现它们其实都是同一种东西的不同打扮。</p>
+
+<p>本章覆盖：</p>
+
+<ul>
+  <li>从"矩阵乘向量"到一般的映射 \(T:V\to W\)（10.1）</li>
+  <li>线性映射的两条定义性条件，以及它们合并成的一条（10.2）</li>
+  <li>大量经典例子：旋转、反射、投影、缩放、求导、积分、矩阵乘法（10.3）</li>
+  <li>三类常见的"看起来像但不是"的反例（10.4）</li>
+  <li>核 \(\ker(T)\) 与像 \(\mathrm{im}(T)\)，它们都是子空间（10.5）</li>
+  <li>用核与像判断单射、满射（10.6）</li>
+  <li>同构：当两个空间"本质相同"（10.7）</li>
+</ul>
+
+<h2 id="sec-10-1">10.1　从"矩阵乘向量"到映射</h2>
+
+<p>先来看一个具体的矩阵。取</p>
+
+\[
+A = \begin{pmatrix} 2 & 0 \\ 0 & 3 \end{pmatrix}.
+\]
+
+<p>给它一个输入 \(\mathbf{x} = \begin{pmatrix}1\\1\end{pmatrix}\)，输出是 \(A\mathbf{x} = \begin{pmatrix}2\\3\end{pmatrix}\)。再给它一个输入 \(\mathbf{x} = \begin{pmatrix}-1\\2\end{pmatrix}\)，输出是 \(\begin{pmatrix}-2\\6\end{pmatrix}\)。</p>
+
+<p>请你停下来想一想：你在做什么？你不是在"算一道矩阵乘法题"，而是在让 \(A\) 这个装置工作。每一个输入向量，它都给你一个输出向量。你给它平面上的一个点，它把那个点搬到平面上另一个位置。这就是<strong>函数</strong>的本意。</p>
+
+<p>从这个角度看，矩阵 \(A\) 定义了一个函数。我们给它起个名字——把它叫做 \(T_A\)，定义为</p>
+
+\[
+T_A(\mathbf{x}) = A\mathbf{x}.
+\]
+
+<p>这个 \(T_A\) 是一个 \(\mathbb{R}^2 \to \mathbb{R}^2\) 的函数：拿一个二维向量进来，吐一个二维向量出去。换一个 \(3\times 2\) 矩阵 \(B\)，那么 \(T_B\) 就是 \(\mathbb{R}^2 \to \mathbb{R}^3\) 的函数——输入二维，输出三维。一般地，\(m\times n\) 矩阵给出一个 \(\mathbb{R}^n \to \mathbb{R}^m\) 的函数。请注意 \(m\) 和 \(n\) 的位置：列数等于输入维数，行数等于输出维数。</p>
+
+<p>好。现在我们已经看出了第一件事：每个矩阵都给出一个函数。但反过来呢？每个 \(\mathbb{R}^n \to \mathbb{R}^m\) 的函数都来自一个矩阵吗？</p>
+
+<p>显然不。函数 \(f(x) = x^2\) 是 \(\mathbb{R} \to \mathbb{R}\) 的函数，但你写不出"乘哪个 \(1\times 1\) 矩阵"能得到 \(x^2\)。函数 \(g(x) = \sin x\) 也写不出来。所以"来自矩阵的函数"是函数中很特别的一类。</p>
+
+<p>它们特别在哪里？这就是<strong>线性</strong>这个词要回答的问题。我们要做的，就是把"矩阵函数"这一类的本质特征提炼出来——提炼出来的那两条性质，将成为"线性映射"的<em>定义</em>。然后我们会反过来证明：在 \(\mathbb{R}^n \to \mathbb{R}^m\) 的世界里，凡是满足那两条的，就一定来自某个矩阵。</p>
+
+<p>但在做这件事之前，我们要先把视野再放宽一点。"线性映射"这个概念其实不必局限于 \(\mathbb{R}^n \to \mathbb{R}^m\)。它可以是从任何一个向量空间到任何一个向量空间的函数。回想第 7 章，向量空间不一定要是 \(\mathbb{R}^n\)——多项式空间 \(P_n\)、矩阵空间 \(M_{m\times n}\)、连续函数空间 \(C[0,1]\)，都是向量空间。所以我们可以问：</p>
+
+<p>给一个向量空间 \(V\)，给另一个向量空间 \(W\)，函数 \(T:V\to W\) 在什么情况下"配得上线性"这两个字？</p>
+
+<p>这就是下一节要回答的。</p>
+
+<h2 id="sec-10-2">10.2　线性映射的两条定义性条件</h2>
+
+<p>让我们回到 \(A = \begin{pmatrix}2&0\\0&3\end{pmatrix}\) 这个例子。它定义了 \(T_A(\mathbf{x}) = A\mathbf{x}\)。</p>
+
+<p>取两个向量 \(\mathbf{u} = \begin{pmatrix}1\\0\end{pmatrix}\)、\(\mathbf{v}=\begin{pmatrix}0\\1\end{pmatrix}\)。先把它们加起来再作用：</p>
+
+\[
+T_A(\mathbf{u}+\mathbf{v}) = A\begin{pmatrix}1\\1\end{pmatrix} = \begin{pmatrix}2\\3\end{pmatrix}.
+\]
+
+<p>再先各自作用，然后加起来：</p>
+
+\[
+T_A(\mathbf{u}) + T_A(\mathbf{v}) = \begin{pmatrix}2\\0\end{pmatrix} + \begin{pmatrix}0\\3\end{pmatrix} = \begin{pmatrix}2\\3\end{pmatrix}.
+\]
+
+<p>结果一样。这不是巧合：根据矩阵乘法对加法的分配律，<strong>对任何 \(A\)、\(\mathbf{u}\)、\(\mathbf{v}\)，都有 \(A(\mathbf{u}+\mathbf{v}) = A\mathbf{u} + A\mathbf{v}\)</strong>。</p>
+
+<p>类似地，把 \(\mathbf{v}\) 先放大三倍再作用，跟先作用再放大三倍，结果也一样：\(A(3\mathbf{v}) = 3(A\mathbf{v})\)。</p>
+
+<p>这两条性质就是"线性"的本质。我们把它们抽象出来，作为<strong>线性映射</strong>的定义。</p>
+
+<p><strong>定义（线性映射）。</strong>设 \(V\)、\(W\) 都是向量空间。函数 \(T:V\to W\) 称为<strong>线性的</strong>，如果它满足下面两条：</p>
+
+<ol>
+  <li>对任意 \(\mathbf{u},\mathbf{v}\in V\)，有 \(T(\mathbf{u}+\mathbf{v}) = T(\mathbf{u}) + T(\mathbf{v})\)（保加法）。</li>
+  <li>对任意 \(\mathbf{v}\in V\) 和任意标量 \(c\)，有 \(T(c\mathbf{v}) = cT(\mathbf{v})\)（保数乘）。</li>
+</ol>
+
+<p>这两条加起来还有一个等价的、更紧凑的写法。请你先自己验证一下：从那两条出发，能不能推出</p>
+
+\[
+T(c_1\mathbf{u} + c_2\mathbf{v}) = c_1 T(\mathbf{u}) + c_2 T(\mathbf{v})\,?
+\]
+
+<p>当然能。把 \(c_1\mathbf{u}\) 看成一个向量，\(c_2\mathbf{v}\) 看成另一个向量。先用加法那条，再对每一项用数乘那条。</p>
+
+<p>反过来，如果上面那一条成立，分别取 \(c_1=c_2=1\) 就得到加法那条；取 \(c_2=0\) 就得到数乘那条。所以这一条单独成立，就等价于原来那两条同时成立。</p>
+
+<p>我们因此可以<strong>把线性映射的定义压缩成一句话</strong>：\(T:V\to W\) 是线性映射当且仅当对任意向量 \(\mathbf{u},\mathbf{v}\in V\) 和任意标量 \(c_1, c_2\)，都有</p>
+
+\[
+\boxed{\,T(c_1\mathbf{u} + c_2\mathbf{v}) = c_1 T(\mathbf{u}) + c_2 T(\mathbf{v}).\,}
+\]
+
+<p>用一句话说出它的几何含义：<em>"线性映射保持线性组合的结构"</em>——你怎样把输入向量线性组合，输出向量就以同样的方式被线性组合。这就是为什么这一类函数特别。</p>
+
+<h3>一个推论：\(T(\mathbf{0}) = \mathbf{0}\)</h3>
+
+<p>从定义出发，我们立刻能推出一件事。在数乘那条里取 \(c=0\)：</p>
+
+\[
+T(\mathbf{0}) = T(0\cdot\mathbf{v}) = 0\cdot T(\mathbf{v}) = \mathbf{0}.
+\]
+
+<p>所以<strong>线性映射必把零向量送到零向量</strong>。</p>
+
+<p>这件事看起来很小，但它特别有用——尤其是在<em>判断一个映射不是线性的</em>时候。如果你看到一个 \(T\) 满足 \(T(\mathbf{0})\ne \mathbf{0}\)，那么 \(T\) 一定不是线性映射，根本不必再去验证那两条。这是一个零成本的快速排除测试。</p>
+
+<p>我们马上就会用到它。</p>
+
+<h2 id="sec-10-3">10.3　几个经典的线性映射</h2>
+
+<p>到了举例的时候。下面这些例子，请你不要只是看一眼就跳过去——它们将构成你以后所有"线性映射直觉"的基础。每一条都请你停下来，先自己想一想"这个 \(T\) 是不是线性的？为什么？"。</p>
+
+<h3>例 10.3.1（缩放）</h3>
+
+<p>定义 \(T:\mathbb{R}^2\to\mathbb{R}^2\) 为 \(T(\mathbf{v}) = 2\mathbf{v}\)。即把每个向量放大两倍。</p>
+
+<p>线性吗？\(T(\mathbf{u}+\mathbf{v}) = 2(\mathbf{u}+\mathbf{v}) = 2\mathbf{u}+2\mathbf{v} = T(\mathbf{u})+T(\mathbf{v})\)。\(T(c\mathbf{v}) = 2c\mathbf{v} = c\cdot 2\mathbf{v} = cT(\mathbf{v})\)。两条都过了。所以是。几何上：缩放当然是线性的。</p>
+
+<h3>例 10.3.2（旋转）</h3>
+
+<p>定义 \(T:\mathbb{R}^2 \to \mathbb{R}^2\) 为"绕原点逆时针旋转 \(\theta\) 度"。</p>
+
+<p>这一次我们不能直接验证两条，因为我们还没有 \(T\) 的代数表达式。但从几何上，请你想一想下面这件事：</p>
+
+<p>取两个向量 \(\mathbf{u}\) 和 \(\mathbf{v}\)，按平行四边形法则把它们加起来得到 \(\mathbf{u}+\mathbf{v}\)。现在把整个平行四边形<em>整体</em>绕原点旋转 \(\theta\) 度。旋转后，原来那两条边变成 \(T(\mathbf{u})\) 和 \(T(\mathbf{v})\)，而原来的对角线 \(\mathbf{u}+\mathbf{v}\) 变成 \(T(\mathbf{u}+\mathbf{v})\)。但旋转后的平行四边形仍然是一个平行四边形！所以它的对角线就是它两条边的和：\(T(\mathbf{u}+\mathbf{v}) = T(\mathbf{u}) + T(\mathbf{v})\)。</p>
+
+<p>类似地，把一个向量延长 \(c\) 倍再旋转，跟先旋转再延长 \(c\) 倍，结果一样。所以旋转是线性的。</p>
+
+<p>这就是几何直观判断线性的典型方式：<em>看映射会不会破坏向量加法的"平行四边形结构"</em>。旋转、反射、投影、缩放——它们都不破坏平行四边形（或者说，把一个平行四边形仍然送到一个平行四边形）。所以它们都是线性的。</p>
+
+<h3>例 10.3.3（反射）</h3>
+
+<p>定义 \(T:\mathbb{R}^2\to\mathbb{R}^2\) 为"关于 \(x\) 轴反射"。即 \(T(x,y) = (x,-y)\)。</p>
+
+<p>请你自己验证两条性质——非常容易。或者用上面"平行四边形不被破坏"的几何直观也一目了然。所以反射是线性的。</p>
+
+<h3>例 10.3.4（投影）</h3>
+
+<p>定义 \(T:\mathbb{R}^2\to\mathbb{R}^2\) 为"投影到 \(x\) 轴"。即 \(T(x,y) = (x,0)\)。</p>
+
+<p>是线性的。\(T((x_1,y_1)+(x_2,y_2)) = T(x_1+x_2, y_1+y_2) = (x_1+x_2, 0) = (x_1,0)+(x_2,0) = T(x_1,y_1)+T(x_2,y_2)\)。数乘那条也类似。</p>
+
+<p>注意一个有趣的事实：投影丢失了信息。\(T(1,5)\) 和 \(T(1,-7)\) 都等于 \((1,0)\)。这意味着投影<em>不是单射</em>——后面我们会用核的语言精确地刻画这一点。但即使投影丢信息，它仍然是线性的。"线性"不蕴含"无损"。</p>
+
+<h3>例 10.3.5（\(\mathbb{R}^3\) 中绕 \(z\) 轴旋转）</h3>
+
+<p>三维情形差不多。"绕 \(z\) 轴旋转 \(\theta\) 度"是 \(\mathbb{R}^3\to\mathbb{R}^3\) 的线性映射。理由仍然是几何上的"平行四边形不被破坏"。</p>
+
+<h3>例 10.3.6（求导算子）</h3>
+
+<p>这是一个跳出 \(\mathbb{R}^n\) 的例子。设 \(P_n\) 是次数不超过 \(n\) 的多项式构成的向量空间。定义</p>
+
+\[
+D : P_n \to P_{n-1}, \qquad D(p) = p'.
+\]
+
+<p>即 \(D\) 把每个多项式 \(p(x)\) 送到它的导数 \(p'(x)\)。是线性的吗？</p>
+
+<p>是。这正是微积分里"和的导数等于导数的和"和"常数可以提到导数外面"这两条法则告诉我们的：</p>
+
+\[
+D(p+q) = (p+q)' = p' + q' = D(p) + D(q),\qquad D(cp) = (cp)' = cp' = cD(p).
+\]
+
+<p>请你停一下，体会这件事的奇妙之处：求导，这个看起来跟"矩阵"毫无关系的运算，原来是线性映射！这意味着它和旋转、反射、投影属于<em>同一种数学对象</em>。在第 11 章我们会更进一步——发现求导算子作用在 \(P_n\) 上时，竟然<em>真的可以写成一个矩阵</em>。这是线性代数最深的一个统一性的胜利。</p>
+
+<h3>例 10.3.7（积分算子）</h3>
+
+<p>类似地，定义 \(I : P_n \to P_{n+1}\) 为</p>
+
+\[
+I(p) = \int_0^x p(t)\,dt.
+\]
+
+<p>例如 \(I(x^2) = x^3/3\)。它把次数 \(\le n\) 的多项式送到次数 \(\le n+1\) 的多项式。线性吗？是。验证只要用积分的线性性质：和的积分等于积分的和；常数可以提到积分外面。</p>
+
+<h3>例 10.3.8（矩阵乘法）</h3>
+
+<p>这是最重要的例子，因为它把所有有限维线性映射统一起来。固定一个 \(m\times n\) 矩阵 \(A\)，定义</p>
+
+\[
+T_A : \mathbb{R}^n \to \mathbb{R}^m, \qquad T_A(\mathbf{x}) = A\mathbf{x}.
+\]
+
+<p>是线性的。我们在 10.2 节开头已经验证过这一点：矩阵乘法对加法的分配律就是 \(T_A(\mathbf{u}+\mathbf{v}) = T_A(\mathbf{u}) + T_A(\mathbf{v})\)；可以把标量提到矩阵外这条性质就是 \(T_A(c\mathbf{v}) = cT_A(\mathbf{v})\)。</p>
+
+<p>这个例子的真正价值在于<em>逆向陈述</em>。我们会在第 11 章证明：<strong>每一个 \(\mathbb{R}^n\to\mathbb{R}^m\) 的线性映射都是某个矩阵 \(A\) 给出的 \(T_A\)。</strong>没有例外。这意味着，在 \(\mathbb{R}^n\to\mathbb{R}^m\) 这个范围内，"线性映射"和"矩阵"是<em>同一个东西</em>，仅仅是两种说法。</p>
+
+<p>这正是为什么我们花这么大力气在矩阵上——矩阵就是线性映射的"代数表达"。</p>
+
+<h2 id="sec-10-4">10.4　看起来像但其实不是</h2>
+
+<p>有了正面例子之后，下面我们要看几个反面例子。这些是"看起来像线性的、但其实不是"的常见陷阱。请把它们刻在脑子里——线性这个概念因为太自然，反而容易被滥用。</p>
+
+<h3>反例 10.4.1：\(T(x) = x+1\)</h3>
+
+<p>定义 \(T:\mathbb{R}\to\mathbb{R}\) 为 \(T(x) = x+1\)。是线性的吗？</p>
+
+<p>很多人第一反应是"是的呀，\(y = x+1\) 在中学不就叫线性函数吗？"。<strong>等等。</strong>请用 10.2 节末尾那个零成本测试看一下：\(T(0) = 0+1 = 1 \ne 0\)。所以 \(T\) <em>不是</em>线性映射。完。</p>
+
+<p>问题出在哪儿？中学里的"线性函数"指的是图像是直线的函数 \(y=ax+b\)；线性代数里的"线性映射"指的是满足那两条结构性条件的函数。<strong>两者只在 \(b=0\) 时一致</strong>。带常数项的"\(ax+b\)"在线性代数里有一个专门的名字叫"<em>仿射</em>函数"，它不是线性映射。</p>
+
+<p>这是一个特别值得记住的语言陷阱。每当你以后看到"线性"两个字，请清醒地意识到它在哪个语境里使用。</p>
+
+<h3>反例 10.4.2：\(T(\mathbf{v}) = \|\mathbf{v}\|\)</h3>
+
+<p>定义 \(T:\mathbb{R}^2\to\mathbb{R}\) 为 \(T(\mathbf{v}) = \|\mathbf{v}\|\)，即取向量的长度。是线性的吗？</p>
+
+<p>试一下加法那条。取 \(\mathbf{u} = (1,0)\)、\(\mathbf{v} = (0,1)\)。则</p>
+
+\[
+T(\mathbf{u}+\mathbf{v}) = \|(1,1)\| = \sqrt{2},\quad T(\mathbf{u})+T(\mathbf{v}) = 1+1 = 2.
+\]
+
+<p>不相等。所以 \(T\) 不是线性映射。</p>
+
+<p>几何上这一点也很自然：把两个不平行的向量"按平行四边形法则"加起来，得到的对角线长度<em>不等于</em>两条边的长度之和（这就是三角不等式 \(\|\mathbf{u}+\mathbf{v}\|\le \|\mathbf{u}\|+\|\mathbf{v}\|\)）。所以"取长度"这个映射本来就破坏加法。</p>
+
+<h3>反例 10.4.3：\(T(x) = x^2\)</h3>
+
+<p>\(T:\mathbb{R}\to\mathbb{R}\)，\(T(x) = x^2\)。\(T(0) = 0\)，零向量条件没问题；但 \(T(1+1) = 4\) 而 \(T(1)+T(1) = 2\)。所以不是。</p>
+
+<p>更一般地，<em>带平方、立方、指数、三角等非线性函数的</em>，几乎都不是线性映射。它们破坏的是"输入按比例放大，输出也按相同比例放大"这条直觉。</p>
+
+<h3>反例 10.4.4：\(T(x,y) = (x+y, xy)\)</h3>
+
+<p>\(T:\mathbb{R}^2\to\mathbb{R}^2\)，第一个分量 \(x+y\) 是线性的，第二个分量 \(xy\) 不是。所以整个 \(T\) 不是线性的——<strong>只要有一个分量不是线性，整个映射就不是线性</strong>。</p>
+
+<p>这个反例提醒我们：在 \(\mathbb{R}^n\to\mathbb{R}^m\) 中，"线性"的意思就是<em>每一个输出分量都是输入分量的</em>纯一次齐次函数——没有常数项，没有平方项，没有交叉项。这正好对应"输出向量等于矩阵乘输入向量"的代数形式。</p>
+
+<h2 id="sec-10-5">10.5　核与像</h2>
+
+<p>现在 \(T:V\to W\) 是一个线性映射。和一切函数一样，我们可以问两个最基本的问题：</p>
+
+<ul>
+  <li>什么样的输入会被送到 \(\mathbf{0}\)？</li>
+  <li>所有可能的输出构成什么集合？</li>
+</ul>
+
+<p>这两个问题的答案，分别叫做 \(T\) 的<strong>核</strong>和<strong>像</strong>，它们是研究线性映射的两块基石。</p>
+
+<p><strong>定义。</strong>设 \(T:V\to W\) 是线性映射。</p>
+
+<ul>
+  <li>\(T\) 的<strong>核</strong>（kernel，也称<em>零空间</em>）是 \(V\) 中所有被 \(T\) 送到零的向量构成的集合：
+  \[\ker(T) = \{\mathbf{v}\in V : T(\mathbf{v}) = \mathbf{0}\}.\]</li>
+  <li>\(T\) 的<strong>像</strong>（image，也称<em>值域</em>）是 \(W\) 中所有形如 \(T(\mathbf{v})\) 的向量构成的集合：
+  \[\mathrm{im}(T) = \{T(\mathbf{v}) : \mathbf{v}\in V\}.\]</li>
+</ul>
+
+<p>这两个名字应该让你觉得熟悉。在第 4 章我们讲过矩阵 \(A\) 的零空间和列空间——它们正是 \(T_A\) 的核和像！我们等下会回头确认这一点。</p>
+
+<h3>核与像都是子空间</h3>
+
+<p>下面这件事看起来抽象，但其实是非常自然的：</p>
+
+<p><strong>命题。</strong>\(\ker(T)\) 是 \(V\) 的子空间；\(\mathrm{im}(T)\) 是 \(W\) 的子空间。</p>
+
+<p><em>核是子空间。</em>请你记得第 7 章对"子空间"的判定：含零、对加法封闭、对数乘封闭。</p>
+
+<ol>
+  <li>\(T(\mathbf{0}) = \mathbf{0}\)，所以 \(\mathbf{0}\in\ker(T)\)。</li>
+  <li>若 \(\mathbf{u},\mathbf{v}\in\ker(T)\)，那么 \(T(\mathbf{u}+\mathbf{v}) = T(\mathbf{u})+T(\mathbf{v}) = \mathbf{0}+\mathbf{0} = \mathbf{0}\)，所以 \(\mathbf{u}+\mathbf{v}\in\ker(T)\)。</li>
+  <li>若 \(\mathbf{v}\in\ker(T)\) 而 \(c\) 是标量，那么 \(T(c\mathbf{v}) = cT(\mathbf{v}) = c\cdot\mathbf{0} = \mathbf{0}\)，所以 \(c\mathbf{v}\in\ker(T)\)。</li>
+</ol>
+
+<p><em>像是子空间。</em>类似地：</p>
+
+<ol>
+  <li>\(\mathbf{0} = T(\mathbf{0})\) 是某个 \(T(\mathbf{v})\)，所以 \(\mathbf{0}\in\mathrm{im}(T)\)。</li>
+  <li>若 \(\mathbf{w}_1, \mathbf{w}_2 \in \mathrm{im}(T)\)，比如 \(\mathbf{w}_1 = T(\mathbf{v}_1)\)、\(\mathbf{w}_2 = T(\mathbf{v}_2)\)，则 \(\mathbf{w}_1+\mathbf{w}_2 = T(\mathbf{v}_1+\mathbf{v}_2)\)，仍然是某个 \(T(\cdot)\)，所以在像中。</li>
+  <li>若 \(\mathbf{w} = T(\mathbf{v})\)，则 \(c\mathbf{w} = T(c\mathbf{v})\)，仍然在像中。</li>
+</ol>
+
+<p>都是直接的验证。请注意，这两个证明都<em>只用了线性</em>那两条性质——这就是为什么我们要求 \(T\) 是线性的：正是这两条性质让核和像变成子空间。</p>
+
+<h3>例 10.5.1：投影</h3>
+
+<p>取 \(T:\mathbb{R}^2\to\mathbb{R}^2\)，\(T(x,y) = (x,0)\)。</p>
+
+<p>核是什么？要求 \(T(x,y) = (x,0) = (0,0)\)，即 \(x = 0\)。所以 \(\ker(T) = \{(0,y) : y\in\mathbb{R}\}\)——是 \(y\) 轴。</p>
+
+<p>像是什么？所有形如 \((x,0)\) 的向量。这正是 \(x\) 轴。</p>
+
+<p>请你看，几何上这完全合理：投影把 \(y\) 轴上的所有点压成原点（所以核是 \(y\) 轴），而结果只能落在 \(x\) 轴上（所以像是 \(x\) 轴）。</p>
+
+<h3>例 10.5.2：求导</h3>
+
+<p>取 \(D : P_3 \to P_2\)，\(D(p) = p'\)。</p>
+
+<p>核是什么？要求 \(p' = 0\)。哪些三次多项式的导数恒为零？只有常数。所以 \(\ker(D) = \{\text{常数多项式}\}\)，是 \(P_3\) 中的一维子空间。</p>
+
+<p>像是什么？哪些二次多项式可以是某个三次多项式的导数？所有二次多项式都行——给定任意 \(q\in P_2\)，让 \(p\) 等于它的不定积分（取常数为 0），就有 \(p' = q\)。所以 \(\mathrm{im}(D) = P_2\)，整个目标空间。</p>
+
+<h3>核就是零空间，像就是列空间</h3>
+
+<p>回到 \(T_A\) 的情况。\(T_A : \mathbb{R}^n\to\mathbb{R}^m\)，\(T_A(\mathbf{x}) = A\mathbf{x}\)。</p>
+
+<ul>
+  <li>\(\ker(T_A) = \{\mathbf{x} : A\mathbf{x}=\mathbf{0}\}\) ——这正是 \(A\) 的<strong>零空间</strong> \(\mathrm{Null}(A)\)。</li>
+  <li>\(\mathrm{im}(T_A) = \{A\mathbf{x} : \mathbf{x}\in\mathbb{R}^n\}\)。但 \(A\mathbf{x}\) 是 \(A\) 的列向量的线性组合（这是第 3 章告诉我们的事实），所以 \(\mathrm{im}(T_A)\) 等于 \(A\) 的列向量张成的空间——也就是 \(A\) 的<strong>列空间</strong> \(\mathrm{Col}(A)\)。</li>
+</ul>
+
+<p>请你停下来欣赏一下这两条等式：</p>
+
+\[
+\ker(T_A) = \mathrm{Null}(A),\qquad \mathrm{im}(T_A) = \mathrm{Col}(A).
+\]
+
+<p>之前我们把零空间和列空间作为<em>矩阵</em>的两个子空间，是从代数定义出发的。现在它们成了<em>映射</em>的核和像，是从函数视角出发的。两个看起来不相关的概念，原来是同一回事的两种说法。</p>
+
+<p>这就是为什么我之前说，把"矩阵看成映射"会让整本书翻个面：你之前学的所有"矩阵的子空间"，原来都有更直观的几何含义。</p>
+
+<h2 id="sec-10-6">10.6　单射、满射与核、像</h2>
+
+<p>有了核和像之后，"单射"和"满射"这两个概念就特别容易刻画。</p>
+
+<p>先回忆一下定义。函数 \(T:V\to W\) 称为：</p>
+
+<ul>
+  <li><strong>单射</strong>（injective），如果不同输入给出不同输出：\(\mathbf{u}\ne\mathbf{v}\Longrightarrow T(\mathbf{u})\ne T(\mathbf{v})\)；等价地，\(T(\mathbf{u})=T(\mathbf{v})\Longrightarrow \mathbf{u}=\mathbf{v}\)。</li>
+  <li><strong>满射</strong>（surjective），如果每个 \(\mathbf{w}\in W\) 都至少有一个原像：对任意 \(\mathbf{w}\in W\)，存在 \(\mathbf{v}\in V\) 使 \(T(\mathbf{v})=\mathbf{w}\)。</li>
+  <li><strong>双射</strong>（bijective），如果既单射又满射。</li>
+</ul>
+
+<p>这些是一般函数的概念。但对线性映射，它们有特别简洁的判别法。</p>
+
+<h3>满射 \(\Longleftrightarrow\) 像等于整个 \(W\)</h3>
+
+<p>这一条几乎是定义本身。\(T\) 满射，意思就是"任何 \(\mathbf{w}\in W\) 都是某个输出"，也就是 \(W = \mathrm{im}(T)\)。所以——</p>
+
+\[
+T \text{ 满射} \iff \mathrm{im}(T) = W.
+\]
+
+<p>对矩阵 \(A\) 来说，这就是说<strong>\(T_A\) 满射当且仅当 \(A\) 的列空间等于 \(\mathbb{R}^m\)</strong>，也就是 \(A\) 的秩等于 \(m\)。</p>
+
+<h3>单射 \(\Longleftrightarrow\) 核为零</h3>
+
+<p>这一条要稍微想一想，但其实非常优美。</p>
+
+<p>"<em>核为零</em>"的意思是 \(\ker(T) = \{\mathbf{0}\}\)——只有零向量被送到零。</p>
+
+<p><strong>命题。</strong>\(T\) 是线性映射。则 \(T\) 单射当且仅当 \(\ker(T) = \{\mathbf{0}\}\)。</p>
+
+<p><em>证明。</em>假设 \(T\) 单射。\(T(\mathbf{0})=\mathbf{0}\) 已知。所以如果 \(T(\mathbf{v})=\mathbf{0}\)，由单射 \(\mathbf{v}=\mathbf{0}\)。这说明核里只有零向量。</p>
+
+<p>反过来，假设 \(\ker(T) = \{\mathbf{0}\}\)。要证 \(T\) 单射。设 \(T(\mathbf{u}) = T(\mathbf{v})\)。两边相减并用线性：\(T(\mathbf{u}-\mathbf{v}) = \mathbf{0}\)。所以 \(\mathbf{u}-\mathbf{v}\in\ker(T)\)。但核里只有零，所以 \(\mathbf{u}-\mathbf{v}=\mathbf{0}\)，即 \(\mathbf{u}=\mathbf{v}\)。这正是单射。</p>
+
+<p>这条命题的几何含义请你停下来体会一下：<em>"线性映射的单射性，被它对零向量的行为完全决定"</em>。这是非线性函数完全没有的性质——比如 \(f(x)=x^2\) 不是单射（\(f(1)=f(-1)\)），但它满足"只有零被送到零"。问题在于 \(f\) 不是线性的；线性条件强大到把"对零的行为"放大成"对一切的行为"。</p>
+
+<h3>例 10.6.1（投影不单射）</h3>
+
+<p>\(T(x,y) = (x,0)\)。\(\ker(T) = \{(0,y)\} = \) \(y\) 轴 \(\ne \{\mathbf{0}\}\)。所以投影不单射。这跟我们之前注意到的"\(T(1,5)=T(1,-7)=(1,0)\)"是一致的。</p>
+
+<h3>例 10.6.2（旋转单射且满射）</h3>
+
+<p>\(T:\mathbb{R}^2\to\mathbb{R}^2\) 是绕原点旋转 \(\theta\) 度。哪些向量被旋转到原点？只有原点本身。所以 \(\ker(T)=\{\mathbf{0}\}\)，单射。哪些向量是某个向量旋转后的结果？任何向量都是——把它先反向旋转 \(\theta\) 度，再正向旋转 \(\theta\) 度就回来了。所以满射。综合：旋转是双射。</p>
+
+<h2 id="sec-10-7">10.7　同构</h2>
+
+<p>双射的线性映射有一个专门的名字，叫<strong>同构</strong>（isomorphism）。</p>
+
+<p><strong>定义。</strong>线性映射 \(T:V\to W\) 是<strong>同构</strong>，如果它既单射又满射。如果存在一个同构 \(V\to W\)，我们说 \(V\) 与 \(W\) 是<strong>同构的</strong>，记作 \(V\cong W\)。</p>
+
+<p>"同构"这个词的含义就是字面上的："形状相同"。两个空间同构，意思是你可以用 \(T\) 在它们之间一一对应，而且这种对应保持线性结构（加法、数乘）。在线性代数的视角下，<em>同构的两个空间是没有区别的</em>——它们在这个理论里是同一种东西。</p>
+
+<h3>例 10.7.1：\(P_2 \cong \mathbb{R}^3\)</h3>
+
+<p>多项式空间 \(P_2 = \{a + bx + cx^2 : a,b,c\in\mathbb{R}\}\) 与 \(\mathbb{R}^3\) 同构。</p>
+
+<p>定义 \(T : P_2 \to \mathbb{R}^3\) 为</p>
+
+\[
+T(a+bx+cx^2) = \begin{pmatrix}a\\b\\c\end{pmatrix}.
+\]
+
+<p>请你自己验证 \(T\) 是线性的（只是把多项式系数排成列向量）。它显然是双射——给一个三元组 \((a,b,c)\)，唯一确定一个多项式。所以 \(P_2 \cong \mathbb{R}^3\)。</p>
+
+<p>更一般地，\(P_n \cong \mathbb{R}^{n+1}\)，因为一个 \(n\) 次以下的多项式就由它的 \(n+1\) 个系数完全决定。</p>
+
+<h3>例 10.7.2：\(M_{2\times 3} \cong \mathbb{R}^6\)</h3>
+
+<p>所有 \(2\times 3\) 矩阵构成的空间和 \(\mathbb{R}^6\) 同构——把矩阵的六个元素按行（或者按列，都行）排成一列。验证类似上一例。</p>
+
+<h3>"本质相同"是什么意思</h3>
+
+<p>这两个例子合起来告诉我们一个让人惊讶的事实：<em>三维多项式空间 \(P_2\)、\(\mathbb{R}^3\) 和（行/列固定后的）某些矩阵空间，在线性代数的眼中是同一个空间</em>。它们的区别只在于"长什么样"——里面装的是多项式还是数对还是矩阵——但作为<em>线性结构</em>，它们完全一样。</p>
+
+<p>这件事的影响极为深远。它意味着：<strong>一旦我们学会了 \(\mathbb{R}^n\) 上的线性代数，我们其实就已经学会了所有 \(n\) 维向量空间上的线性代数。</strong>多项式、矩阵、连续函数——任何 \(n\) 维向量空间，本质上都是 \(\mathbb{R}^n\) 换了件衣服。我们之后会反复利用这一点：当你需要研究 \(P_n\) 上的线性映射时，可以"翻译"到 \(\mathbb{R}^{n+1}\) 上去研究——因为同构。</p>
+
+<p>这就是为什么我们在前几章敢花那么大力气只研究 \(\mathbb{R}^n\)：通过同构，那些工作覆盖了所有有限维空间。</p>
+
+<h3>同构与维数</h3>
+
+<p>事实上，可以证明（我们在第 13 章详细处理）：<strong>两个有限维向量空间同构当且仅当它们维数相同</strong>。维数是有限维向量空间的<em>唯一</em>不变量——一旦维数相同，就没有别的差别可分辨。</p>
+
+<p>所以 \(P_n \cong \mathbb{R}^{n+1}\) 不只是一个有趣的例子，而是这条规律的一个实例。\(P_n\) 的维数是 \(n+1\)（\(\{1,x,x^2,\ldots,x^n\}\) 是一组基），\(\mathbb{R}^{n+1}\) 的维数也是 \(n+1\)，所以它们同构——必然如此。</p>
+
+<p>本章到这里告一段落。我们已经把"线性映射"作为一个一般的概念立了起来，看了大量例子，并讨论了它的核、像、单射、满射、同构。下一章我们要做一件具体的事：在 \(\mathbb{R}^n\to\mathbb{R}^m\) 这个范围内，证明<em>每个线性映射都唯一对应一个矩阵</em>，并教会你怎样把一个具体的几何变换写出它的矩阵。这是从抽象回到具体的关键一步。</p>
+
+<hr class="section-end">
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 四个基本子空间与秩</a><a href="ch11.html">下一章 · 第 11 章　矩阵作为线性变换 →</a></nav>
+
+</main>
+</body>
+</html>

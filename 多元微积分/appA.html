@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 严格处理 — 普林斯顿多元微积分读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0],
+        ointclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2232}}\\nolimits', 0],
+        ointctrclockwise: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2233}}\\nolimits', 0],
+        varoiint: ['\\oiint', 0],
+        varoiiint: ['\\oiiint', 0],
+        DeclareMathOperator: ['{}', 2]
+      }
+    },
+    svg: { fontCache: 'global' },
+    options: {
+      menuOptions: { settings: { zoom: 'Click' } }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch27.html">← 上一章 · 第 27 章 如何解决多元微积分问题</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+<h1 id="appA">附录 A 严格处理</h1>
+
+<p>正文中我反复说过"为了保持节奏，这里把一些技术性假设藏起来"。本附录就是把那些被藏起来的东西摊开来。我把它放在书末，是因为<strong>第一遍读正文时跳过它毫不影响你学会用工具</strong>。等你能顺手算出梯度、写出累次积分、用散度定理跳过痛苦的曲面积分以后——那时再回到这里，把每个定理"为什么这样"看一遍。那将是你从"会用"过渡到"真懂"的一段路。</p>
+
+<p>阅读这部分时请有心理准备：风格会比正文略正式一些，论证会比正文略压缩一些。我假设你已经对工具的"操作版本"很熟，所以这里更多是把"为什么需要这些假设"和"假设失效会怎么样"讲清楚，而不是一字一句的演算。哪里有完整的现代证明，我会指给你下一站去哪儿读。</p>
+
+<p>本附录涵盖：</p>
+<ol>
+  <li>多元极限的 \(\varepsilon\)-球定义；</li>
+  <li>高维夹逼定理；</li>
+  <li>"可微"与"偏导存在"的真正区别；</li>
+  <li>克莱罗定理为何要求连续；</li>
+  <li>链式法则的严格陈述与证明骨架；</li>
+  <li>黎曼和的收敛性；</li>
+  <li>换元定理的几何骨架；</li>
+  <li>斯托克斯与散度定理：严格的版本及其几何根源；</li>
+  <li>历史脉络与通往进一步学习的桥梁。</li>
+</ol>
+
+<h2 id="appA-1">A.1 多元极限的 \(\varepsilon\)-球定义</h2>
+
+<p>一元微积分里，"\(\lim_{x\to a} f(x) = L\)"的严格定义是：对任何 \(\varepsilon > 0\)，存在 \(\delta > 0\)，只要 \(0 < |x - a| < \delta\)，就有 \(|f(x) - L| < \varepsilon\)。把"区间"换成"圆盘"，就得到了多元的版本。我们这样写：</p>
+
+<p>说 \(\lim_{(x, y) \to (a, b)} f(x, y) = L\)，意思是对任何 \(\varepsilon > 0\)，存在 \(\delta > 0\)，只要
+\[0 < \sqrt{(x - a)^2 + (y - b)^2} < \delta,\]
+就有 \(|f(x, y) - L| < \varepsilon\)。</p>
+
+<p>这里那条根号只是把"二维点 \((x, y)\) 离 \((a, b)\) 多远"用欧几里得距离写出来。同样的定义可以原样推广到 \(\mathbb{R}^n\)：把根号下的两项变成 \(n\) 项，把"圆盘"换成"\(n\) 维球"。一切照旧。</p>
+
+<p>关键的差别——也是多元极限比一元棘手得多的根源——藏在<strong>路径</strong>里。一元里"\(x \to a\)"只有两种走法：从左、从右。多元里点可以从无数方向、沿无数条曲线趋近 \((a, b)\)。\(\varepsilon\)-球定义保证了"无论怎么走"都让 \(f\) 趋近 \(L\)。这就是为什么"找到两条路径让极限不同"足以否证极限存在：定义被打破了。</p>
+
+<p>原则上，任何多元极限都可以用此定义验证。但实务里，第 6 章的两板斧——"双路径不一致 \(\Rightarrow\) 不存在"和"夹逼 \(\Rightarrow\) 存在"——已经覆盖了 99% 的考试题目。\(\varepsilon\)-球定义更多是为后续证明提供基础，而不是作为日常计算工具。</p>
+
+<h2 id="appA-2">A.2 高维夹逼定理</h2>
+
+<p>夹逼定理在多元情境下的陈述与一元几乎一字不差：若三个函数 \(g, f, h\) 在 \((a, b)\) 的某去心邻域内满足 \(g(x, y) \le f(x, y) \le h(x, y)\)，并且 \(\lim_{(x,y)\to(a,b)} g = \lim_{(x,y)\to(a,b)} h = L\)，则 \(\lim_{(x,y)\to(a,b)} f = L\)。</p>
+
+<p>证明骨架与一元相同。给定 \(\varepsilon > 0\)，由 \(g\) 的极限取 \(\delta_1\) 使得 \(|g - L| < \varepsilon\)；由 \(h\) 的极限取 \(\delta_2\) 使得 \(|h - L| < \varepsilon\)。取 \(\delta = \min(\delta_1, \delta_2)\)，则在距离 \((a, b)\) 不超过 \(\delta\) 的圆盘里，\(L - \varepsilon < g \le f \le h < L + \varepsilon\)，因此 \(|f - L| < \varepsilon\)。</p>
+
+<p>这个证明看起来"理所当然"，但请注意它只在<strong>距离</strong>意义下成立——不是沿某一条路径成立。这正是高维 \(\varepsilon\)-球定义的优势：它让所有方向上的"被夹"自动一起被照顾到。</p>
+
+<h2 id="appA-3">A.3 可微与偏导存在</h2>
+
+<p>这一节澄清一个常被误解的关系：在多元情境下，"偏导数都存在"是一个<strong>比"可微"弱得多</strong>的条件。一元里这两个概念合二为一，但二元起，它们裂成两件事，需要用心分辨。</p>
+
+<p>我们这样定义可微：\(f\) 在 \((a, b)\) 处可微，意思是存在常数 \(A, B\) 使得
+\[f(a + h, b + k) = f(a, b) + Ah + Bk + \varepsilon(h, k)\sqrt{h^2 + k^2},\]
+其中 \(\varepsilon(h, k) \to 0\) 当 \((h, k) \to (0, 0)\)。</p>
+
+<p>从形式看，这是把 \(f\) 在 \((a, b)\) 附近写成"常数 + 线性 + 比距离更小的余项"。换言之，<strong>切平面真的在贴住图象</strong>——余项 \(\varepsilon\sqrt{h^2 + k^2}\) 比一阶项 \(Ah + Bk\) 高一阶，无论从哪个方向接近 \((a, b)\) 都如此。如果可微，则不难验证 \(A = f_x(a, b)\)、\(B = f_y(a, b)\)，并且第 8.1 节那个切平面方程正是从这里冒出来的。</p>
+
+<p>那么"偏导存在"为什么不够？因为偏导只问"沿坐标轴方向 \(f\) 怎么变"，对其他方向上发生的事情<strong>毫无控制</strong>。考虑
+\[f(x, y) = \begin{cases}\dfrac{xy}{x^2 + y^2}, & (x, y) \neq (0, 0),\\[4pt] 0, & (x, y) = (0, 0).\end{cases}\]
+沿 \(x\) 轴 \(y = 0\)，\(f\equiv 0\)，所以 \(f_x(0, 0) = 0\)；沿 \(y\) 轴同理 \(f_y(0, 0) = 0\)。偏导都存在。<strong>但 \(f\) 在原点不连续</strong>——沿对角线 \(y = x\)，\(f \equiv 1/2\)，与 \(0\) 矛盾。一个不连续的函数当然不可能可微（那条切平面根本无法贴住）。这就是反例的核心。</p>
+
+<p>幸运的是，多数情况下我们关心的是一个充分条件——<strong>若 \(f_x, f_y\) 在 \((a, b)\) 的某邻域内都连续，则 \(f\) 在 \((a, b)\) 可微</strong>（特别也连续）。这是正文中我们悄悄假设、却一直没明说的东西：只要你写下一个看起来"行为良好"的函数（多项式、有理式在分母不为零处、指数、对数、三角等等的复合），它就属于"偏导处处连续"的范畴，自动可微。</p>
+
+<p>该充分条件的证明用的是"分两步走 + 中值定理"。把
+\[f(a + h, b + k) - f(a, b) = \underbrace{[f(a + h, b + k) - f(a, b + k)]}_{\text{先沿 }x\text{ 方向}} + \underbrace{[f(a, b + k) - f(a, b)]}_{\text{再沿 }y\text{ 方向}}\]
+拆开。每一项都是单变量差，对它用一元中值定理：第一项 \(= h\,f_x(\xi, b + k)\)（其中 \(\xi\) 介于 \(a\) 和 \(a + h\) 之间），第二项 \(= k\,f_y(a, \eta)\)。再用 \(f_x, f_y\) 的连续性把"中间点的偏导"换成"\((a, b)\) 的偏导"再加一个小余项。把所有余项收进 \(\varepsilon\sqrt{h^2 + k^2}\) 里，即得可微定义所要求的形式。详见 Apostol《Mathematical Analysis》第 12 章或 Rudin《Principles of Mathematical Analysis》第 9 章。</p>
+
+<h2 id="appA-4">A.4 为什么克莱罗定理需要连续</h2>
+
+<p>克莱罗定理的严格陈述是：若 \(f_{xy}, f_{yx}\) 在 \((a, b)\) 的某邻域内存在，并且都在 \((a, b)\) 处连续，则 \(f_{xy}(a, b) = f_{yx}(a, b)\)。</p>
+
+<p>正文里我把它当成"几乎对所有函数都成立"的事实使用。它确实几乎总成立——但当连续性失效时，它真的会出错。来看一个经典反例：
+\[f(x, y) = \begin{cases}\dfrac{xy(x^2 - y^2)}{x^2 + y^2}, & (x, y) \neq (0, 0),\\[4pt] 0, & (x, y) = (0, 0).\end{cases}\]
+直接算（这里推荐你自己动手验一遍——它会让你深刻理解偏导是怎么"沿轴"算的）：\(f_x(0, y) = -y\)，\(f_y(x, 0) = x\)，于是
+\[f_{xy}(0, 0) = \frac{\partial}{\partial y}\bigg|_{y=0} f_x(0, y) = -1,\qquad f_{yx}(0, 0) = \frac{\partial}{\partial x}\bigg|_{x=0} f_y(x, 0) = 1.\]
+两者不相等。问题在哪儿？仔细算一下 \(f_{xy}\) 和 \(f_{yx}\) 在原点附近的一般表达式，会发现它们都<strong>在原点不连续</strong>——这正是反例存在的根源。一旦失去连续性这个"桥梁"，混合偏导的两种顺序就可能给出不同结果。</p>
+
+<p>克莱罗定理的证明思路本身很巧妙。引入"二阶差分"
+\[\Delta = f(a + h, b + k) - f(a + h, b) - f(a, b + k) + f(a, b).\]
+对它分别按"先 \(y\) 再 \(x\)"和"先 \(x\) 再 \(y\)"两次使用一元中值定理，得到
+\[\Delta = h k\,f_{xy}(\xi_1, \eta_1) = h k\,f_{yx}(\xi_2, \eta_2),\]
+其中 \(\xi_1, \xi_2\) 在 \((a, a + h)\) 之间，\(\eta_1, \eta_2\) 在 \((b, b + k)\) 之间。两边除以 \(hk\)：
+\[f_{xy}(\xi_1, \eta_1) = f_{yx}(\xi_2, \eta_2).\]
+让 \(h, k \to 0\)。<strong>正是连续性</strong>把左右两边都拉到 \((a, b)\)，得到 \(f_{xy}(a, b) = f_{yx}(a, b)\)。如果连续性不在，"中间点趋近"和"函数值趋近"就脱钩，等式就保不住。</p>
+
+<p>这条证明里那个"二阶差分 \(\Delta\)"是个非常有用的对象——它把"二维上一个矩形角点处的函数值组合"和"内部的混合偏导"挂钩起来。它在数值微分、有限元理论里都会再出现。</p>
+
+<h2 id="appA-5">A.5 链式法则的严格叙述与证明</h2>
+
+<p>链式法则在正文里我们写过两个版本——"路径上的链式"（一个标量参数 \(t\) 进，多元 \(f\) 出）和"多变量到多变量"。这里我们把第一个版本的严格证明走一遍，第二个版本是对它的逐分量推广。</p>
+
+<p>陈述：若 \(\mathbf{r} : \mathbb{R} \to \mathbb{R}^n\) 在 \(t_0\) 处可微，\(f : \mathbb{R}^n \to \mathbb{R}\) 在 \(\mathbf{r}(t_0)\) 处可微，则复合 \(f \circ \mathbf{r}\) 在 \(t_0\) 处可微，并且
+\[(f \circ \mathbf{r})'(t_0) = \nabla f(\mathbf{r}(t_0)) \cdot \mathbf{r}'(t_0).\]</p>
+
+<p>证明骨架：用可微定义把 \(f\) 在 \(\mathbf{r}(t_0)\) 附近展开。设 \(\mathbf{p}_0 = \mathbf{r}(t_0)\)、\(\Delta\mathbf{p} = \mathbf{r}(t_0 + h) - \mathbf{r}(t_0)\)。由 \(f\) 在 \(\mathbf{p}_0\) 可微，
+\[f(\mathbf{p}_0 + \Delta\mathbf{p}) = f(\mathbf{p}_0) + \nabla f(\mathbf{p}_0)\cdot \Delta\mathbf{p} + \varepsilon_1(\Delta\mathbf{p})\,|\Delta\mathbf{p}|,\]
+其中 \(\varepsilon_1 \to 0\) 当 \(\Delta\mathbf{p} \to \mathbf{0}\)。再由 \(\mathbf{r}\) 在 \(t_0\) 可微，\(\Delta\mathbf{p} = \mathbf{r}'(t_0)\,h + \varepsilon_2(h)\,h\)，其中 \(\varepsilon_2 \to \mathbf{0}\) 当 \(h \to 0\)。代入：
+\[f(\mathbf{r}(t_0 + h)) - f(\mathbf{r}(t_0)) = \nabla f(\mathbf{p}_0)\cdot[\mathbf{r}'(t_0)h + \varepsilon_2(h)h] + \varepsilon_1(\Delta\mathbf{p})|\Delta\mathbf{p}|.\]
+两边除以 \(h\)，让 \(h \to 0\)。第一项给出 \(\nabla f(\mathbf{p}_0)\cdot\mathbf{r}'(t_0)\)；第二项里 \(\nabla f(\mathbf{p}_0)\cdot\varepsilon_2(h) \to 0\)；第三项里 \(|\Delta\mathbf{p}|/|h|\) 有界（趋于 \(|\mathbf{r}'(t_0)|\)），而 \(\varepsilon_1 \to 0\)，整体趋于 0。极限就是公式右边。</p>
+
+<p>注意这条证明里我们<strong>反复用了 \(f\) 的可微性</strong>，而不仅仅是"\(\nabla f\) 存在"。这正是 A.3 节中那条警告的具体表现：仅有偏导存在不够，第 9 章我们悄悄默认了"\(f\) 可微"——多数良好函数都满足，无需担心。但若你某天遇到一个反常的函数（比如人工构造的反例），链式法则会真的出问题。</p>
+
+<h2 id="appA-6">A.6 黎曼和的收敛性</h2>
+
+<p>多重黎曼积分的存在性比一元情形又稍微微妙一些，但骨架相同。我们这样陈述可积性：若 \(f\) 在闭有界区域 \(R\) 上连续（或仅在零测度集合上有不连续点），则二重黎曼和当切分越来越细时收敛到唯一极限——这个极限就是二重积分 \(\iint_R f\,dA\)。</p>
+
+<p>证明大纲：\(R\) 闭有界 \(\Rightarrow\) 紧；\(f\) 在紧集上连续 \(\Rightarrow\) 一致连续。一致连续的含义是：对任何 \(\varepsilon > 0\)，存在 \(\delta > 0\)，使得 \(R\) 中相距不到 \(\delta\) 的两点上 \(f\) 之差不到 \(\varepsilon\)。把 \(R\) 切成"小到直径都 \(< \delta\)"的小块；在每一块上 \(f\) 的振荡 \(\le \varepsilon\)；因此任何两个细分的黎曼和的差不超过 \(\varepsilon \cdot \text{Area}(R)\)。让 \(\varepsilon \to 0\)，黎曼和形成柯西网，必然收敛到唯一极限。</p>
+
+<p>富比尼定理的严格版本是：若 \(f\) 在 \([a, b] \times [c, d]\) 上连续，则两种累次积分都存在并都等于二重积分：
+\[\iint_R f\,dA = \int_a^b\!\!\int_c^d f(x, y)\,dy\,dx = \int_c^d\!\!\int_a^b f(x, y)\,dx\,dy.\]
+连续性是这条定理"无脑可换序"的免死金牌。如果 \(f\) 仅可积但不连续，富比尼仍可能成立，但需要更小心地核对（事实上经典反例在测度论入门书里随处可见，例如那个 \(f(x, y) = \frac{x^2 - y^2}{(x^2 + y^2)^2}\) 在 \([0, 1]^2\) 上的"两种顺序给不同答案"的例子）。本书所有题目里 \(f\) 都连续，无须担心。</p>
+
+<p>真正想看完整证明的话，Folland《Real Analysis》第 2 章是非常清晰的标准参考。它把这套机器从黎曼推到勒贝格，让"什么时候富比尼成立"变成一句话——\(|f|\) 可积。</p>
+
+<h2 id="appA-7">A.7 换元定理</h2>
+
+<p>第 18 章我们一直在用"\(dA = |J|\,du\,dv\)"这个口诀，没认真追问"为什么这个雅可比绝对值就是面积比"。本节给出几何骨架。</p>
+
+<p>陈述：设 \(\Phi : D' \to D\) 是 \(C^1\) 双射，\(D' \subset \mathbb{R}^2\)、\(D \subset \mathbb{R}^2\)，雅可比行列式 \(J(u, v) = \det \Phi'(u, v)\) 在 \(D'\) 上不为零。设 \(f\) 在 \(D\) 上可积。那么
+\[\iint_D f(x, y)\,dA = \iint_{D'} f(\Phi(u, v))\,|J(u, v)|\,du\,dv.\]</p>
+
+<p>几何骨架：在 \(D'\) 中取一个微小矩形 \([u, u + du] \times [v, v + dv]\)。它在 \(\Phi\) 下的像，到一阶近似，是由两个向量
+\[\Phi_u\,du = \begin{pmatrix}x_u\\ y_u\end{pmatrix}du,\qquad \Phi_v\,dv = \begin{pmatrix}x_v\\ y_v\end{pmatrix}dv\]
+张成的小平行四边形。这个平行四边形的面积等于行列式的绝对值：
+\[\left|\det\begin{pmatrix}x_u\,du & x_v\,dv\\ y_u\,du & y_v\,dv\end{pmatrix}\right| = |x_u y_v - x_v y_u|\,du\,dv = |J|\,du\,dv.\]
+也就是说，\(\Phi\) 把"面积 \(du\,dv\)"放大或缩小了"\(|J|\) 倍"。在每片微小区域上，\(f\) 视为常数；求和取极限，就把 \(D\) 上的积分变成了 \(D'\) 上的积分，乘以那个膨胀系数 \(|J|\)。</p>
+
+<p>实务里"双射"和"\(J \neq 0\)"经常在边界上偶尔失效（极坐标在原点，球坐标在 \(z\) 轴上 \(\phi = 0, \pi\)）。这并不致命：只要失效集是"零测度"——一条曲线、若干孤立点——就不影响积分值。这是为什么 18 章的所有换元都"边界上 \(J = 0\) 但我们继续用"。如需精确论证，Spivak《Calculus on Manifolds》第 3 章给出了非常干净的版本。</p>
+
+<p>三维的换元定理结构相同：\(dV = |J|\,du\,dv\,dw\)，\(J\) 是一个 \(3\times 3\) 行列式。柱面、球面坐标的因子 \(r\) 和 \(\rho^2\sin\phi\) 都从这条公式中算出来；如果某天你忘了它们，可以在草稿纸上花两分钟亲手算一次，永远比死记可靠。</p>
+
+<h2 id="appA-8">A.8 斯托克斯与散度定理：严格的版本</h2>
+
+<p>这一节我们把第 22、25、26 章的三大定理排成一行，看看它们的严格陈述和共同的几何根源。它们看上去面目不同——格林在平面、斯托克斯在曲面、散度在立体——但骨架是同一句话：<strong>"边界上的积分等于内部某个微分量的积分"</strong>。这个统一的骨架在更高的语言下叫"广义斯托克斯定理"，本节末我会简单提一下。</p>
+
+<h3 id="appA-8-1">A.8.1 三条定理的严格陈述</h3>
+
+<p>格林定理的严格版本：设 \(R\) 是 \(\mathbb{R}^2\) 中由分段光滑、简单闭曲线 \(\partial R\) 围成的有界区域，\(\partial R\) 取使 \(R\) 在左侧的方向（正方向）。若向量场 \(\mathbf{F} = \langle P, Q\rangle\) 在含 \(R\) 的开集上有连续偏导，则
+\[\oint_{\partial R} P\,dx + Q\,dy = \iint_R \left(\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}\right)dA.\]</p>
+
+<p>斯托克斯定理的严格版本：设 \(S\) 是 \(\mathbb{R}^3\) 中分段光滑、定向的有界曲面，\(\partial S\) 是其分段光滑的边界曲线，定向相容（右手定则）。若 \(\mathbf{F}\) 在含 \(S\) 的开集上有连续偏导，则
+\[\oint_{\partial S} \mathbf{F}\cdot d\mathbf{r} = \iint_S (\nabla\times\mathbf{F})\cdot d\mathbf{S}.\]</p>
+
+<p>散度定理（高斯定理）的严格版本：设 \(E\) 是 \(\mathbb{R}^3\) 中以分段光滑闭曲面 \(\partial E\) 为边界的有界立体，外法向已选定。若 \(\mathbf{F}\) 在含 \(E\) 的开集上有连续偏导，则
+\[\oiint_{\partial E} \mathbf{F}\cdot d\mathbf{S} = \iiint_E \nabla\cdot\mathbf{F}\,dV.\]</p>
+
+<p>三条定理对边界都要求"分段光滑"——意思是边界可以有有限个尖角，但不能"处处不光滑"（如分形曲线、Koch 雪花那样）。考试和工程应用里你不会遇到例外。</p>
+
+<h3 id="appA-8-2">A.8.2 共同的证明骨架</h3>
+
+<p>三条定理的证明思路本质上是同一个：<strong>切碎、本地展开、相邻贡献抵消</strong>。让我们以斯托克斯定理为例走一遍。</p>
+
+<p>把曲面 \(S\) 切成无数小片，每片小到可以视为近似平面的小平行四边形 \(\sigma_i\)。在每片上，旋度通量 \(\iint_{\sigma_i} (\nabla\times\mathbf{F})\cdot d\mathbf{S}\) 可由"沿 \(\sigma_i\) 边界的环量"近似：这是斯托克斯定理在"小平行四边形"这个最简单情形下的局部版本，可以由一阶泰勒展开 \(+\) 简单计算直接验证。所以
+\[\iint_{\sigma_i} (\nabla\times\mathbf{F})\cdot d\mathbf{S} \approx \oint_{\partial\sigma_i} \mathbf{F}\cdot d\mathbf{r}.\]
+现在把所有小片求和。<strong>关键观察</strong>：相邻两片共享一条边，但走的方向相反——一边的"正方向"是另一边的"负方向"，所以这条共享边上的贡献相互抵消。求和后，只剩下那些不被任何邻居共享的边——也就是<strong>整个 \(S\) 的外边界 \(\partial S\)</strong>。
+\[\sum_i \oint_{\partial\sigma_i} \mathbf{F}\cdot d\mathbf{r} = \oint_{\partial S} \mathbf{F}\cdot d\mathbf{r}.\]
+让切分越来越细、误差趋于零，左边变成 \(\iint_S (\nabla\times\mathbf{F})\cdot d\mathbf{S}\)，右边保持不变。证毕（骨架）。</p>
+
+<p>散度定理的骨架完全一样，只是把"曲面切成小平行四边形"换成"立体切成小立方体"，把"沿边界环量"换成"通过六面体表面通量"，相邻立方体共享面而抵消。格林定理是斯托克斯在二维平面上的退化版本，证明骨架被压缩到二维，更简单。</p>
+
+<p>把这条骨架严格化要做两件技术性的事：第一，证明"小平行四边形 / 小立方体上的近似误差"在切分细化时确实趋于零——这要用泰勒余项估计 + 一致连续性；第二，处理"边界曲面 \(\partial S\) 不是光滑而是分段光滑"时的角落点——技术上略微繁琐，结论不变。完整证明在 Spivak《Calculus on Manifolds》、Bachman《A Geometric Approach to Differential Forms》、Hubbard & Hubbard《Vector Calculus, Linear Algebra, and Differential Forms》中各有不同的处理风格。</p>
+
+<h3 id="appA-8-3">A.8.3 一个统一的视角：广义斯托克斯</h3>
+
+<p>三条定理形如"边界积分 = 内部积分"。如果允许我泄露一点未来的语言：在微分形式的框架里，这三条定理（连同微积分基本定理本身）<strong>统统是同一条公式</strong>
+\[\int_{\partial M} \omega = \int_M d\omega\]
+的特例。这里 \(\omega\) 是一个微分形式，\(d\omega\) 是它的"外微分"，\(M\) 是定向流形，\(\partial M\) 是其边界。</p>
+
+<p>在这个语言里：</p>
+<ul>
+  <li>一元微积分基本定理是 \(M = [a, b]\)、\(\omega = f\)、\(d\omega = f'\,dx\) 的情形；</li>
+  <li>格林定理是 \(M\) 是平面区域、\(\omega = P\,dx + Q\,dy\)；</li>
+  <li>斯托克斯定理是 \(M\) 是曲面、\(\omega\) 是 1-形式；</li>
+  <li>散度定理是 \(M\) 是立体、\(\omega\) 是 2-形式。</li>
+</ul>
+
+<p>把这套语言学下来，你会突然发现这门课其实只有<strong>一条定理</strong>，其余的全是它在不同维数、不同对象上的"翻译"。这种统一感是数学里少有的、纯粹的美。如果你愿意往那个方向走，前面提到的 Hubbard & Hubbard、Bachman 是最友好的入门；要更彻底地走进流形论，Lee《Introduction to Smooth Manifolds》是公认的标准。</p>
+
+<h2 id="appA-9">A.9 历史脉络与下一站</h2>
+
+<p>多元微积分这个学科是十九世纪几代人共同搭起来的：高斯（1813 年的著名定理 Theorema Egregium 和后来的散度定理）、格林（1828 年那本"私印的小册子"，把后来以他命名的定理引入英语世界）、斯托克斯（1854 年作为剑桥数学荣誉考试的一道题首次写下"斯托克斯定理"）、黎曼（黎曼和、黎曼曲面）、庞加莱（向量场的拓扑学）。它最初的动力来自物理——电磁、流体、热——这一点从"通量""环量""势"这些词的物理味道里就能闻到。</p>
+
+<p>把这些个别定理统一进"微分形式 + 广义斯托克斯"框架的，是二十世纪的事。Élie Cartan 在 1900 年代奠定了外微分的语言；de Rham 在 1930 年代把它和拓扑学搭桥。整个故事到 Stokes-Cartan 公式那一刻，简洁得像一首诗。今天的物理（广义相对论、规范场论）和现代几何（流形上的分析、微分拓扑）都建立在这个语言上。</p>
+
+<p>从本书出发，往哪走？这里给一个简短的"下一站"地图，供你参考。</p>
+
+<ul>
+  <li><strong>线性代数（如果还不牢）：</strong>Axler《Linear Algebra Done Right》是公认的最优雅入门。</li>
+  <li><strong>实分析：</strong>Rudin《Principles of Mathematical Analysis》（"小红宝书"，紧凑严苛），或 Abbott《Understanding Analysis》（亲和、动机充分）。</li>
+  <li><strong>多元分析与流形入门：</strong>Spivak《Calculus on Manifolds》——薄薄一本，把多元微积分搬到流形上；或 Hubbard & Hubbard《Vector Calculus, Linear Algebra, and Differential Forms》——更厚但更友好。</li>
+  <li><strong>微分形式与外微分：</strong>Bachman《A Geometric Approach to Differential Forms》。</li>
+  <li><strong>流形论：</strong>Lee《Introduction to Smooth Manifolds》——现代标准。</li>
+  <li><strong>偏微分方程（多元微积分的最大下游应用）：</strong>Strauss《Partial Differential Equations: An Introduction》。</li>
+</ul>
+
+<p>这门课没有"终点"。它最适合的姿态，是把它当作通往更广阔几何与分析的<strong>第一座山</strong>。等你以后再回来翻这本书，会发现自己看见了从前看不见的东西——这就是学数学最好的乐趣。</p>
+
+<hr/>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch27.html">← 上一章 · 第 27 章 如何解决多元微积分问题</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+
+</main>
+</body>
+</html>
