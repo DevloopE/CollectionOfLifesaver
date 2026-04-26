@@ -1,10 +1,10 @@
 # Collection of Lifesavers · 普林斯顿读本系列
 
-A five-volume series of Chinese-language math textbooks in the **Adrian Banner / *Calculus Lifesaver* mold** — every concept developed slowly through internal monologue, every method named, every common pitfall called out.
+A seven-volume series of Chinese-language math textbooks in the **Adrian Banner / *Calculus Lifesaver* mold** — every concept developed slowly through internal monologue, every method named, every common pitfall called out.
 
 **[📖 Read online (GitHub Pages)](https://devloope.github.io/CollectionOfLifesaver/)**
 
-## 五本书
+## 七本书
 
 | 卷 | 书 | 章节数 |
 |---|---|---|
@@ -13,6 +13,8 @@ A five-volume series of Chinese-language math textbooks in the **Adrian Banner /
 | 第三卷 | 普林斯顿微分方程读本 | 22 章 + 2 附录 |
 | 第四卷 | 普林斯顿复分析读本 | 20 章 + 2 附录 |
 | 第五卷 | 普林斯顿概率统计读本 | 25 章 + 2 附录 |
+| 第六卷 | 普林斯顿偏微分方程读本 | 23 章 + 2 附录 |
+| 第七卷 | 普林斯顿实分析读本 | 24 章 + 2 附录 |
 
 每章一个独立 HTML 文件（13–50 KB），数学符号用 MathJax 渲染（自动从 CDN 加载）。每本书都有共享的 `styles.css` 和上下章导航。
 
@@ -38,6 +40,8 @@ A five-volume series of Chinese-language math textbooks in the **Adrian Banner /
 ├── 微分方程/               # 第三卷
 ├── 复分析/                 # 第四卷
 ├── 概率统计/               # 第五卷
+├── 偏微分方程/             # 第六卷
+├── 实分析/                 # 第七卷
 │
 ├── BANNER_METHOD.md        # 写作方法的蒸馏文档
 ├── split_book.py           # 把单 HTML 切成每章一文件

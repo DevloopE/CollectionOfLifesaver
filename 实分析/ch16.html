@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 16 章 反常积分：无穷区间、奇点与参数 — 普林斯顿实分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 微积分基本定理：导数与积分终究是同一回事</a><a href="ch17.html">下一章 · 第 17 章 函数列：逐点收敛、一致收敛与交换极限的代价 →</a></nav>
+<h1 id="ch16">第 16 章 反常积分：无穷区间、奇点与参数</h1>
+
+<p>到目前为止，我们一直活在 Riemann 理论最舒服的地带：闭区间、函数有界、上下和直接可用。可真正重要的积分常常偏不肯这么配合。区间可能一直拖到无穷远，被积函数可能在端点甚至内部点炸开，参数一变你还会很想把极限、积分、导数互相交换。第 16 章就是开始认真处理这些边缘情况的地方。</p>
+
+<p>这章的总原则非常朴素：<strong>先承认边界有问题，再把问题翻译成极限。</strong> 一旦你这么做，反常积分就和前面的数列、级数、函数列突然变成了近亲。比较判别、绝对收敛、条件收敛、主值、极限交换——这些词会在这里扎堆出现，而且会一路追到<a href="../复分析/ch15.html">《复分析读本》第 15 章</a>、<a href="../偏微分方程/ch10.html">《偏微分方程读本》第 10 章</a>和第 20 章、以及第 23–24 章的 Lebesgue 世界。</p>
+
+<p>这一章分七步走：</p>
+
+<ul>
+  <li>先把三类常见反常积分的定义写清；</li>
+  <li>再用 \(p\)-型模型练最基本的敛散边界；</li>
+  <li>然后看比较法和局部触发条件怎么用；</li>
+  <li>接着做绝对收敛、条件收敛、主值的完整对比；</li>
+  <li>再看带振荡的积分为什么有时能靠抵消活下来；</li>
+  <li>然后做参数积分能否交换极限的正反例；</li>
+  <li>最后把这章和第 17、23、24 章接起来。</li>
+</ul>
+
+<h2 id="sec16-1">16.1 三类反常积分：先截断，再取极限</h2>
+
+<p>最常见的三类反常积分分别是：</p>
+
+\[
+\boxed{
+\int_a^\infty f(x)\,dx
+:=
+\lim_{R\to\infty}\int_a^R f(x)\,dx,
+}
+\]
+
+\[
+\boxed{
+\int_a^b f(x)\,dx
+:=
+\lim_{\varepsilon\to 0^+}\int_{a+\varepsilon}^b f(x)\,dx
+\quad
+\text{或}
+\quad
+\lim_{\varepsilon\to 0^+}\int_a^{b-\varepsilon} f(x)\,dx,
+}
+\]
+
+\[
+\boxed{
+\int_a^b f(x)\,dx
+:=
+\lim_{\varepsilon\to0^+}
+\left(
+\int_a^{c-\varepsilon}f(x)\,dx
++
+\int_{c+\varepsilon}^b f(x)\,dx
+\right),
+}
+\]
+
+<p>最后一种对应的是内部奇点 \(c\in(a,b)\)。这三条定义的口气完全一致：在安全区间上先做普通积分，再让截断点逼向危险边界。如果极限存在，我们才说反常积分收敛。</p>
+
+<p>请一定记住，反常积分不是“看起来像可以积就积”，而是一个极限命题。第 2–4 章所有关于收敛、比较、Cauchy 的直觉，在这里全都得重新上岗。</p>
+
+<h2 id="sec16-2">16.2 例题一：\(p\)-型积分把两种边界一刀切开</h2>
+
+<p>最该先背熟的模型永远是</p>
+
+\[
+\int_1^\infty \frac{1}{x^p}\,dx
+\qquad\text{和}\qquad
+\int_0^1 \frac{1}{x^p}\,dx.
+\]
+
+<p>它们看起来只差一个积分区间，敛散边界却刚好反过来。</p>
+
+<p><strong>例题 1A.</strong> 讨论 \(\int_1^\infty x^{-p}\,dx\) 的敛散性。</p>
+
+<p>若 \(p\neq 1\)，先截断到 \([1,R]\)：</p>
+
+\[
+\int_1^R x^{-p}\,dx
+=
+\frac{R^{1-p}-1}{1-p}.
+\]
+
+<p>当 \(R\to\infty\) 时，若 \(p&gt;1\)，则 \(1-p&lt;0\)，于是 \(R^{1-p}\to0\)，极限存在，值为 \(1/(p-1)\)。若 \(p&lt;1\)，则 \(R^{1-p}\to\infty\)，积分发散。至于 \(p=1\)，有</p>
+
+\[
+\int_1^R \frac1x\,dx=\ln R\to\infty.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{
+\int_1^\infty \frac{1}{x^p}\,dx
+\text{ 收敛 } \Longleftrightarrow p&gt;1.
+}
+\]
+
+<p><strong>例题 1B.</strong> 讨论 \(\int_0^1 x^{-p}\,dx\) 的敛散性。</p>
+
+<p>这次截断成 \([\varepsilon,1]\)：</p>
+
+\[
+\int_\varepsilon^1 x^{-p}\,dx
+=
+\frac{1-\varepsilon^{1-p}}{1-p}
+\qquad (p\neq1).
+\]
+
+<p>当 \(\varepsilon\to0^+\) 时，若 \(p&lt;1\)，则 \(1-p&gt;0\)，于是 \(\varepsilon^{1-p}\to0\)，积分收敛；若 \(p&gt;1\)，则 \(\varepsilon^{1-p}\to\infty\)，积分发散；\(p=1\) 时又回到 \(\int_\varepsilon^1 dx/x=-\ln\varepsilon\to\infty\)。因此</p>
+
+\[
+\boxed{
+\int_0^1 \frac{1}{x^p}\,dx
+\text{ 收敛 } \Longleftrightarrow p&lt;1.
+}
+\]
+
+<p>这组模型一定要形成肌肉记忆：在无穷远，衰减得不够快会死；在 0 附近，炸得太狠会死。第 4 章 \(p\)-级数的分界线，在这里几乎原封不动地重现了一遍。</p>
+
+<h2 id="sec16-3">16.3 比较法怎么快速抓主导行为</h2>
+
+<p>一旦 \(p\)-型模型站稳，很多反常积分题就只是比较题。你在做的其实不是直接算，而是判断“它在危险边界附近像谁”。</p>
+
+<p>比如 \(\int_0^1 \frac{1}{\sqrt{x}}\,dx\) 为什么收敛？因为它就是 \(p=1/2\) 的模型。再比如 \(\int_0^1 \frac{1}{x^{3/2}}\,dx\) 为什么发散？因为 \(p=3/2\ge1\)。</p>
+
+<p>还有一类很容易误判的例子是对数奇性。</p>
+
+<p><strong>例题 2.</strong> 计算并判断</p>
+
+\[
+\int_0^1 |\ln x|\,dx.
+\]
+
+<p>在 \((0,1]\) 上，\(|\ln x|=-\ln x\)。于是</p>
+
+\[
+\int_\varepsilon^1 |\ln x|\,dx
+=
+\int_\varepsilon^1 (-\ln x)\,dx
+=
+\Bigl[-x\ln x+x\Bigr]_\varepsilon^1.
+\]
+
+<p>这里最关键的小极限是 \(\varepsilon\ln\varepsilon\to0\)。所以</p>
+
+\[
+\int_0^1 |\ln x|\,dx
+=
+1.
+\]
+
+<p>也就是说，\(\ln x\) 在 0 附近虽然掉到 \(-\infty\)，但还没坏到不可积：</p>
+
+\[
+\int_0^1 |\ln x|\,dx=1.
+\]
+
+<p>这题提醒你：判断奇性强不强，不能只看“有没有无穷大”，还要看它是以什么速度靠近无穷大。对数发散通常比幂次奇性温和得多。</p>
+
+<h2 id="sec16-4">16.4 条件收敛是怎么靠振荡活下来的</h2>
+
+<p>现在来看一类更像级数世界的问题：带正负号、靠抵消活命的积分。</p>
+
+<p><strong>例题 3.</strong> 证明</p>
+
+\[
+\int_1^\infty \frac{\sin x}{x}\,dx
+\]
+
+<p>收敛，但不绝对收敛。</p>
+
+<p>先看普通收敛。对 \([1,R]\) 做分部积分，取 \(u=1/x\)，\(dv=\sin x\,dx\)，则 \(du=-x^{-2}dx\)，\(v=-\cos x\)。于是</p>
+
+\[
+\int_1^R \frac{\sin x}{x}\,dx
+=
+\left[-\frac{\cos x}{x}\right]_1^R
+-\int_1^R \frac{\cos x}{x^2}\,dx.
+\]
+
+<p>当 \(R\to\infty\) 时，边界项 \(-\cos R/R\to0\)，而</p>
+
+\[
+\int_1^\infty \frac{|\cos x|}{x^2}\,dx
+\le
+\int_1^\infty \frac{1}{x^2}\,dx
+&lt;\infty.
+\]
+
+<p>所以后面的积分绝对收敛，原积分因此收敛。</p>
+
+<p>再看为什么不绝对收敛。对每个整数 \(k\ge0\)，在区间</p>
+
+\[
+I_k=\left[k\pi+\frac{\pi}{6},\,k\pi+\frac{5\pi}{6}\right]
+\]
+
+<p>上，有 \(|\sin x|\ge 1/2\)。于是</p>
+
+\[
+\int_{I_k}\frac{|\sin x|}{x}\,dx
+\ge
+\frac12\int_{I_k}\frac{dx}{x}
+\ge
+\frac{c}{k+1}
+\]
+
+<p>对某个常数 \(c&gt;0\) 成立。把这些下界加起来会和调和级数同阶发散，因此</p>
+
+\[
+\int_1^\infty \frac{|\sin x|}{x}\,dx=\infty.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{
+\int_1^\infty \frac{\sin x}{x}\,dx
+\text{ 条件收敛，但不绝对收敛。}
+}
+\]
+
+<p>这题和第 4 章交错级数的味道完全一样：结果成立，但靠的是抵消，不是正项可控。这样的收敛比绝对收敛脆弱得多，后面在交换极限、换序、主值时都要格外小心。</p>
+
+<h2 id="sec16-5">16.5 绝对收敛、条件收敛、主值：三种结局必须分清</h2>
+
+<p>现在把三种最容易混淆的结局并排摆好。</p>
+
+<p><strong>绝对收敛例题.</strong> 计算</p>
+
+\[
+I=\int_0^\infty e^{-x}\cos x\,dx.
+\]
+
+<p>先看绝对收敛：</p>
+
+\[
+\int_0^\infty |e^{-x}\cos x|\,dx
+\le
+\int_0^\infty e^{-x}\,dx=1,
+\]
+
+<p>所以它绝对收敛。若你想顺手算值，对 \(\int_0^R e^{-x}\cos x\,dx\) 分部积分两次，或直接解线性方程组，都能得到极限值</p>
+
+\[
+\int_0^\infty e^{-x}\cos x\,dx=\frac12.
+\]
+
+<p><strong>条件收敛例题.</strong> 刚才那题 \(\int_1^\infty \sin x/x\,dx\) 就是标准代表：原积分收敛，但绝对值积分发散。</p>
+
+<p><strong>主值例题.</strong> 看</p>
+
+\[
+\int_{-1}^1 \frac{1}{x}\,dx.
+\]
+
+<p>如果你按普通反常积分的定义拆成两边，得到的是</p>
+
+\[
+\int_{-1}^0 \frac{1}{x}\,dx+\int_0^1 \frac{1}{x}\,dx,
+\]
+
+<p>两项分别都发散，所以普通意义下它不收敛。可若按对称方式逼近奇点，就得到 Cauchy 主值：</p>
+
+\[
+\text{p.v.}\int_{-1}^1 \frac{1}{x}\,dx
+:=
+\lim_{\varepsilon\to0^+}
+\left(
+\int_{-1}^{-\varepsilon}\frac{1}{x}\,dx
++
+\int_{\varepsilon}^{1}\frac{1}{x}\,dx
+\right).
+\]
+
+<p>而两项恰好互相抵消，所以</p>
+
+\[
+\boxed{
+\text{p.v.}\int_{-1}^1 \frac1x\,dx=0,
+\qquad
+\int_{-1}^1 \frac1x\,dx\ \text{普通意义下发散。}
+}
+\]
+
+<p>这就是主值最需要你保持清醒的地方：它不是普通收敛，只是某种对称极限。它在<a href="../复分析/ch15.html">复分析第 15 章</a>、Fourier 变换和调和分析里极其重要，但你绝不能把“主值存在”偷说成“反常积分收敛”。</p>
+
+<h2 id="sec16-6">16.6 参数积分：什么时候能把极限搬进积分号</h2>
+
+<p>现在来到现代分析里最容易出事故、也最值得你现在就养成警觉的一类题。设</p>
+
+\[
+F(\lambda)=\int f(x,\lambda)\,dx.
+\]
+
+<p>当 \(\lambda\to\lambda_0\) 时，你什么时候可以写</p>
+
+\[
+\lim_{\lambda\to\lambda_0}\int f(x,\lambda)\,dx
+=
+\int \lim_{\lambda\to\lambda_0}f(x,\lambda)\,dx\ ?
+\]
+
+<p>短答案是：逐点收敛通常不够，你需要统一控制。Riemann 世界里常见的安全条件是一致收敛；Lebesgue 世界里最有力的安全条件是支配收敛。第 17 章和第 24 章会把这件事彻底发展开。</p>
+
+<p><strong>安全例题.</strong> 设</p>
+
+\[
+F(\lambda)=\int_0^\infty e^{-x}\cos(\lambda x)\,dx.
+\]
+
+<p>当 \(\lambda\to0\) 时，对每个固定 \(x\)，有 \(e^{-x}\cos(\lambda x)\to e^{-x}\)。而且对所有 \(\lambda\)，</p>
+
+\[
+|e^{-x}\cos(\lambda x)|\le e^{-x},
+\]
+
+<p>右边在 \([0,\infty)\) 上可积。因此这里交换极限是安全的，于是</p>
+
+\[
+\lim_{\lambda\to0}F(\lambda)
+=
+\int_0^\infty e^{-x}\,dx
+=1.
+\]
+
+<p>你如果愿意，还能算出 \(F(\lambda)=1/(1+\lambda^2)\)，和上面的极限完全一致。</p>
+
+<p><strong>危险例题.</strong> 再看</p>
+
+\[
+G(\lambda)=\int_0^\infty \lambda e^{-\lambda x}\,dx,\qquad \lambda&gt;0.
+\]
+
+<p>先直接算积分。令 \(u=\lambda x\)，则</p>
+
+\[
+G(\lambda)=\int_0^\infty e^{-u}\,du=1.
+\]
+
+<p>所以对每个 \(\lambda&gt;0\)，函数值恒等于 1。可若固定 \(x\) 让 \(\lambda\to0^+\)，你有</p>
+
+\[
+\lambda e^{-\lambda x}\to 0.
+\]
+
+<p>于是逐点极限函数是 0，而</p>
+
+\[
+\int_0^\infty 0\,dx=0\neq 1.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{
+\lim_{\lambda\to0^+}\int_0^\infty \lambda e^{-\lambda x}\,dx
+\neq
+\int_0^\infty \lim_{\lambda\to0^+}\lambda e^{-\lambda x}\,dx.
+}
+\]
+
+<p>这题为什么失败？因为质量没有消失，而是一路往无穷远逃走了。它特别适合拿来当作第 17 章“逐点收敛太弱”和第 24 章“没有可积支配就别乱换极限”的第一记耳光。</p>
+
+<h2 id="sec16-7">16.7 收个尾</h2>
+
+<p>这一章把积分从安全区推到了边缘地带，也让你第一次系统看见：反常积分其实是极限问题，不是公式问题。</p>
+
+<p>绝对收敛、条件收敛、主值、参数极限交换这些区别，绝不是术语洁癖；它们会真正在复分析、Fourier、概率和 PDE 里决定你能不能合法操作。</p>
+
+<p>下一章我们正式转向函数列，而你会发现：本章那些“能不能交换极限与积分”的焦虑，原来只是更大主题的前奏。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 微积分基本定理：导数与积分终究是同一回事</a><a href="ch17.html">下一章 · 第 17 章 函数列：逐点收敛、一致收敛与交换极限的代价 →</a></nav>
+
+</main>
+</body>
+</html>

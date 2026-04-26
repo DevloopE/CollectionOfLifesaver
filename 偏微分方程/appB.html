@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B　工具箱：常用变换表、本征函数表与解题速查 — 普林斯顿偏微分方程读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A　严格性：Fourier 收敛、能量估计与弱导数</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+<h1 id="appB">附录 B　工具箱：常用变换表、本征函数表与解题速查</h1>
+
+<p>这份附录不是让你背诵的，而是让你在做题卡住时迅速翻一下：我现在该展开成哪族函数？该做 Fourier 还是 Laplace？眼前这个圆柱坐标分离出来的 ODE，到底是不是 Bessel？把这些模式认出来，比把每条公式硬背下来更重要。</p>
+
+<h2 id="secB-1">B.1 常用 Fourier / Laplace 变换对</h2>
+
+<p>本书 Fourier 变换采用</p>
+
+\[
+\hat f(\xi)=\int_{\mathbb R}f(x)e^{-ix\xi}\,dx,
+\qquad
+f(x)=\frac1{2\pi}\int_{\mathbb R}\hat f(\xi)e^{ix\xi}\,d\xi.
+\]
+
+<p>Laplace 变换采用</p>
+
+\[
+\mathcal L\{f\}(s)=\int_0^\infty e^{-st}f(t)\,dt.
+\]
+
+<table>
+<thead>
+<tr><th>Fourier 原函数</th><th>变换后</th><th>最常用的提醒</th></tr>
+</thead>
+<tbody>
+<tr><td>\(\delta(x)\)</td><td>\(1\)</td><td>“点源”在频域里是全频率等权</td></tr>
+<tr><td>\(1\)</td><td>\(2\pi\delta(\xi)\)</td><td>常数只占零频</td></tr>
+<tr><td>\(e^{-a|x|}\)（\(a&gt;0\)）</td><td>\(\dfrac{2a}{a^2+\xi^2}\)</td><td>有理函数和指数尾巴是一对老搭档</td></tr>
+<tr><td>\(e^{-ax^2}\)（\(a&gt;0\)）</td><td>\(\sqrt{\pi/a}\,e^{-\xi^2/(4a)}\)</td><td>高斯在 Fourier 下还是高斯</td></tr>
+<tr><td>\(f'(x)\)</td><td>\(i\xi\,\hat f(\xi)\)</td><td>导数 \(\to\) 乘法，这是第 13 章的核心</td></tr>
+<tr><td>\(f(x-x_0)\)</td><td>\(e^{-ix_0\xi}\hat f(\xi)\)</td><td>平移 \(\to\) 相位因子</td></tr>
+<tr><td>\((f*g)(x)\)</td><td>\(\hat f(\xi)\hat g(\xi)\)</td><td>卷积 \(\to\) 乘法</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead>
+<tr><th>Laplace 原函数</th><th>变换后</th><th>最常用的提醒</th></tr>
+</thead>
+<tbody>
+<tr><td>\(1\)</td><td>\(\dfrac1s\)</td><td>最基本的起点</td></tr>
+<tr><td>\(t^n\)</td><td>\(\dfrac{n!}{s^{n+1}}\)</td><td>幂函数变成高阶极点</td></tr>
+<tr><td>\(e^{at}\)</td><td>\(\dfrac1{s-a}\)</td><td>指数 \(\to\) 极点平移</td></tr>
+<tr><td>\(\sin bt\)</td><td>\(\dfrac{b}{s^2+b^2}\)</td><td>振荡 \(\to\) 二次分母</td></tr>
+<tr><td>\(\cos bt\)</td><td>\(\dfrac{s}{s^2+b^2}\)</td><td>和上面配对记</td></tr>
+<tr><td>\(f'(t)\)</td><td>\(sF(s)-f(0)\)</td><td>初值自动带出来</td></tr>
+<tr><td>\(u(t-a)\)</td><td>\(\dfrac{e^{-as}}{s}\)</td><td>延迟 \(\to\) 乘 \(e^{-as}\)</td></tr>
+<tr><td>\(\delta(t-a)\)</td><td>\(e^{-as}\)</td><td>瞬时输入最适合 Laplace</td></tr>
+<tr><td>\((f*g)(t)\)</td><td>\(F(s)G(s)\)</td><td>时间卷积 \(\to\) 代数乘法</td></tr>
+</tbody>
+</table>
+
+<p>做题时最值钱的往往不是表本身，而是触发条件：</p>
+
+<ul>
+<li>整条直线、常系数、空间导数很多：先想 Fourier 变换（13.1-13.4）。</li>
+<li>半直线、边界强迫、时间上有阶跃或冲击：先想 Laplace 变换（12.3-12.5）。</li>
+<li>已经长成卷积：别硬算，先看能不能一把变到频域。</li>
+</ul>
+
+<h2 id="secB-2">B.2 常见边界条件对应的本征函数</h2>
+
+<p>下面这张表只管最常用的一维区间 \([0,L]\)。真正重要的不是每条公式，而是“边界条件在替你选基底”。</p>
+
+<table>
+<thead>
+<tr><th>边界条件</th><th>本征值问题</th><th>本征函数</th><th>你通常会怎么展开</th></tr>
+</thead>
+<tbody>
+<tr><td>Dirichlet–Dirichlet<br>\(X(0)=X(L)=0\)</td><td>\(-X''=\lambda X\)</td><td>\(\sin \dfrac{n\pi x}{L}\), \(n\ge1\)<br>\(\lambda_n=\dfrac{n^2\pi^2}{L^2}\)</td><td>正弦级数；固定两端的热方程、波动方程最常见</td></tr>
+<tr><td>Neumann–Neumann<br>\(X'(0)=X'(L)=0\)</td><td>\(-X''=\lambda X\)</td><td>\(\cos \dfrac{n\pi x}{L}\), \(n\ge0\)<br>\(\lambda_n=\dfrac{n^2\pi^2}{L^2}\)</td><td>余弦级数；注意 \(n=0\) 的常数模态</td></tr>
+<tr><td>Dirichlet–Neumann<br>\(X(0)=0,\ X'(L)=0\)</td><td>\(-X''=\lambda X\)</td><td>\(\sin \dfrac{(n+\tfrac12)\pi x}{L}\), \(n\ge0\)</td><td>半整数正弦；一端固定、一端绝热</td></tr>
+<tr><td>Neumann–Dirichlet<br>\(X'(0)=0,\ X(L)=0\)</td><td>\(-X''=\lambda X\)</td><td>\(\cos \dfrac{(n+\tfrac12)\pi x}{L}\), \(n\ge0\)</td><td>半整数余弦；和上一行互为镜像</td></tr>
+<tr><td>Robin<br>\(X'(0)+h_0X(0)=0\), \(X'(L)+h_LX(L)=0\)</td><td>\(-X''=\lambda X\)</td><td>仍由正弦余弦组合而成，但 \(\mu=\sqrt\lambda\) 需满足超越方程</td><td>先接受“本征值不再整齐”，再照样做正交展开</td></tr>
+</tbody>
+</table>
+
+<p>Robin 情形最容易让人慌。其实结构没变：仍是自伴算子，仍有正交本征函数，仍能做谱展开；只是本征值不再像 \(n\pi/L\) 那样一眼写完。做题时别被“不能闭着眼背出本征值”这件事吓住。</p>
+
+<h2 id="secB-3">B.3 Bessel、Legendre、Chebyshev 的一页速览</h2>
+
+<table>
+<thead>
+<tr><th>名字</th><th>它通常从哪里冒出来</th><th>标准方程</th><th>最该记住的事</th></tr>
+</thead>
+<tbody>
+<tr><td>Bessel</td><td>圆盘、圆柱、径向对称；极坐标或柱坐标分离变量</td><td>\(r^2R''+rR'+(\lambda r^2-\nu^2)R=0\)</td><td>正则解是 \(J_\nu\)；若边界在 \(r=a\)，本征值常由 \(J_\nu(\sqrt\lambda\,a)=0\) 决定</td></tr>
+<tr><td>Legendre</td><td>球面、轴对称势问题；球坐标角变量</td><td>\((1-x^2)y''-2xy'+\ell(\ell+1)y=0\)</td><td>\(P_\ell(x)\) 在 \([-1,1]\) 上正交；球谐函数的最朴素影子就在这里</td></tr>
+<tr><td>Chebyshev</td><td>把 \(x=\cos\theta\) 代回去时；加权正交、多项式逼近</td><td>\((1-x^2)y''-xy'+n^2y=0\)</td><td>\(T_n(\cos\theta)=\cos n\theta\)；它本质上是余弦函数换了坐标</td></tr>
+</tbody>
+</table>
+
+<p>一眼识别的小口诀是：</p>
+
+<ul>
+<li>看到 \(r^2R''+rR'\)：先怀疑 Bessel。</li>
+<li>看到 \(1-x^2\) 乘在二阶导数前面：先怀疑球面角变量；多半是 Legendre 或 Chebyshev。</li>
+<li>看到“圆”“球”“径向”“轴对称”：别只盯着 PDE，分离后那条 ODE 才是真正的门。</li>
+</ul>
+
+<h2 id="secB-4">B.4 常见 PDE → 最顺手方法的速查表</h2>
+
+<table>
+<thead>
+<tr><th>你看到的题型</th><th>第一反应</th><th>去哪里看细节</th></tr>
+</thead>
+<tbody>
+<tr><td>有限区间上的热方程，齐次边界</td><td>分离变量 + 按边界条件选本征函数</td><td>3.1-3.4，5.2-5.5，8.3，appB.2</td></tr>
+<tr><td>有限区间上的波动方程，给初位移和初速度</td><td>模态展开；别忘了两套初始数据</td><td>6.2-6.5，8.1-8.4</td></tr>
+<tr><td>边界或源项非齐次</td><td>先减稳态把边界化齐次，再用 Duhamel 或模态展开</td><td>9.1-9.5</td></tr>
+<tr><td>整条直线上的热方程或波动方程</td><td>Fourier 变换；热方程也可直接用高斯核，波动方程也可直接用 d'Alembert</td><td>10.1-10.5，11.1-11.4，13.1-13.4</td></tr>
+<tr><td>半直线问题</td><td>先在脑中比较：镜像法更顺，还是时间 Laplace 变换更顺</td><td>12.1-12.5</td></tr>
+<tr><td>一阶线性输运方程</td><td>先画特征线，再沿线搬运数据</td><td>16.1-16.5</td></tr>
+<tr><td>守恒律、流量依赖于解本身</td><td>特征线只负责告诉你何时出事；一旦相交，转入弱解、激波、熵条件</td><td>17.1-17.5，21.3-21.4</td></tr>
+<tr><td>Laplace / Poisson 型边值问题</td><td>若题目要显式解，想 Green 函数或 Poisson 核；若只问唯一性和估计，先想最大值原理与能量法</td><td>15.1-15.5，19.1-19.5，20.4</td></tr>
+<tr><td>题目只问“是否唯一”“是否稳定”“能量会不会增长”</td><td>别先硬求公式；最大值原理、比较原理、能量法往往更快</td><td>19.1-19.4，20.1-20.5，appA.2</td></tr>
+<tr><td>题目长得像“算子作用一段时间以后会怎样”</td><td>把它当谱问题或半群问题看</td><td>22.1-22.5，appA.4</td></tr>
+</tbody>
+</table>
+
+<p>如果一张速查表最后只能留下一个印象，那就留下这个：<strong>先认几何和边界，再选工具。</strong> 不是先背方法名，再硬往题目上套。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A　严格性：Fourier 收敛、能量估计与弱导数</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+
+</main>
+</body>
+</html>

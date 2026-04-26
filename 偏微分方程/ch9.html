@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 非齐次边界、非齐次方程与 Duhamel 原理 — 普林斯顿偏微分方程读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 Sturm–Liouville：本征函数为什么够用</a><a href="ch10.html">下一章 · 第 10 章 整条直线上的热方程与高斯核 →</a></nav>
+<h1 id="ch9">第 9 章 非齐次边界、非齐次方程与 Duhamel 原理</h1>
+
+<p>到第 5、6、7 章为止，我们最顺手的题型其实都带着同一种“好脾气”：边界条件是齐次的，方程右边也是 0。于是分离变量一上来就能用，特征函数一展开就能算。可是真正的物理问题往往不这么配合：一根杆子的左端被维持在 \(100^\circ\)C，右端被维持在 \(20^\circ\)C；一根弦在外力持续拍打；系统内部还不断有热源往里送能量。你一看就会问：前面那套办法是不是立刻报废了？</p>
+
+<p>还没有。这个章节的关键想法其实很朴素：先把“不齐”的那一部分剥掉，剩下来的再交给我们已经会的齐次理论。一路做下去，你会看到一个非常自然的结论：如果外力在每个时刻都往系统里塞进一小块“初始数据”，那么总解就应该把这些小块解沿着时间积分起来。这就是 Duhamel 原理。</p>
+
+<p>这一章会做五件事：</p>
+
+<ul>
+<li>先把非齐次边界条件改写成齐次边界条件；</li>
+<li>解释为什么强迫项会变成“把过去每一刻的响应叠加起来”；</li>
+<li>把这种叠加写成 Duhamel 公式，并验证它真的满足原方程；</li>
+<li>拿热方程做一个强迫例子；</li>
+<li>再拿波动方程做一个强迫例子，顺便和第 7 章接上。</li>
+</ul>
+
+<p>后面第 10 章你会看到空间上的卷积；第 12 章你会看到时间上的 Laplace 变换。你可以把本章看成中间那块桥：它告诉你“非齐次”并不意味着重起炉灶，只是意味着多做一层叠加。</p>
+
+<h2 id="sec9-1">9.1 先减去稳态，把麻烦边界变齐次</h2>
+
+<p>先看一个最具体的问题。设热方程是</p>
+
+\[
+u_t = k u_{xx}, \qquad 0<x<L,\ t>0,
+\]
+
+<p>但边界条件不是前面那种 \(u(0,t)=u(L,t)=0\)，而是</p>
+
+\[
+u(0,t)=0,\qquad u(L,t)=1,\qquad u(x,0)=g(x).
+\]
+
+<p>如果你硬套分离变量 \(u(x,t)=X(x)T(t)\)，会立刻撞墙：\(X(0)T(t)=0\) 还行，可 \(X(L)T(t)=1\) 不可能对所有 \(t\) 都成立。问题不在方程本身，而在边界值带了一个固定的“背景坡度”。</p>
+
+<p>那就别让未知函数去背这个包袱。你很自然会想到先找一个最简单的函数，专门负责吃掉边界条件。这里最简单的就是直线</p>
+
+\[
+s(x)=\frac{x}{L},
+\]
+
+<p>因为它恰好满足 \(s(0)=0\) 和 \(s(L)=1\)。现在令</p>
+
+\[
+u(x,t)=s(x)+w(x,t).
+\]
+
+<p>把它代回去，由于 \(s\) 不依赖 \(t\)，而且 \(s''(x)=0\)，你马上得到</p>
+
+\[
+w_t = k w_{xx},\qquad w(0,t)=w(L,t)=0,\qquad w(x,0)=g(x)-\frac{x}{L}.
+\]
+
+<p>这就一下子退回第 5 章最熟悉的齐次边界热方程了。也就是说，非齐次边界没有摧毁我们的工具箱；它只是要求我们先做一次换元。</p>
+
+<p>如果边界值本身还随时间变，比如</p>
+
+\[
+u_t = k u_{xx}+f(x,t),\qquad u(0,t)=A(t),\qquad u(L,t)=B(t),
+\]
+
+<p>那也别慌。你可以先用最笨但很好用的插值函数</p>
+
+\[
+\phi(x,t)=A(t)+\frac{x}{L}\bigl(B(t)-A(t)\bigr),
+\]
+
+<p>它自动满足 \(\phi(0,t)=A(t)\)、\(\phi(L,t)=B(t)\)。再令 \(u=\phi+w\)，就得到</p>
+
+\[
+w_t = k w_{xx} + f(x,t)-\phi_t+k\phi_{xx},
+\qquad
+w(0,t)=w(L,t)=0.
+\]
+
+<p>因为这条 \(\phi\) 对 \(x\) 只是线性的，所以 \(\phi_{xx}=0\)，方程进一步化成</p>
+
+\[
+w_t = k w_{xx} + f(x,t)-\phi_t.
+\]
+
+<p>你应该看出套路了：边界条件是麻烦，就造一个函数先把边界吃掉；内部源项是麻烦，就把它们全部搬到右边。搬完以后，边界齐次了，我们就又回到了第 5、6、7 章已经建立好的地盘。</p>
+
+<h2 id="sec9-2">9.2 强迫项为什么会把“单个冲量”的解积起来</h2>
+
+<p>现在把边界先假设已经齐次化了，只剩下右边的强迫项。为了把想法看得最清楚，我们先把初值也暂时设成 0，只看</p>
+
+\[
+u_t = Lu + f(x,t),\qquad u(x,0)=0.
+\]
+
+<p>这里的 \(L\) 代表某个空间微分算子；对热方程它是 \(k\partial_{xx}\)，对波动方程会有对应的二阶时间版本。问题是：右边这个 \(f(x,t)\) 到底在做什么？</p>
+
+<p>把时间切成很多很短的小片。比如在时刻 \(\tau\) 到 \(\tau+\Delta\tau\) 之间，外力大约往系统里塞进了一小块数据</p>
+
+\[
+f(x,\tau)\,\Delta\tau.
+\]
+
+<p>这块数据一旦被塞进去，接下来会怎样？它之后的命运不再由新的强迫决定，而是由“对应齐次方程如何演化初始数据”来决定。也就是说，如果 \(S(t)\) 表示“让齐次方程跑 \(t\) 个单位时间”的演化算子，那么这一小块输入对最终时刻 \(t\) 的贡献大约就是</p>
+
+\[
+S(t-\tau)\bigl[f(\cdot,\tau)\,\Delta\tau\bigr].
+\]
+
+<p>于是总解应该长得像一个黎曼和：</p>
+
+\[
+u(\cdot,t)\approx \sum_j S(t-\tau_j)f(\cdot,\tau_j)\,\Delta\tau.
+\]
+
+<p>当时间切片越来越细时，这个和自然就变成积分：</p>
+
+\[
+u(\cdot,t)=\int_0^t S(t-\tau)f(\cdot,\tau)\,d\tau.
+\]
+
+<p>这已经是 Duhamel 原理的核心形状了。它背后的图像非常直接：不是“一个外力一次性作用完”，而是“每个时刻都投进一个小冲量，然后把这些小冲量后续演化的结果全部叠加”。线性方程允许你这么做，因为线性正是“分开算，再加起来”的许可证。</p>
+
+<h2 id="sec9-3">9.3 Duhamel 原理的推导与物理图像</h2>
+
+<p>现在把初值也放回来。设我们已经知道对应齐次问题</p>
+
+\[
+v_t = Lv,\qquad v(x,0)=g(x)
+\]
+
+<p>的解可以写成 \(v(\cdot,t)=S(t)g\)。那么对于非齐次问题</p>
+
+\[
+u_t = Lu + f(x,t),\qquad u(x,0)=g(x),
+\]
+
+<p>你很自然会猜：既然初值 \(g\) 会产生一块齐次解 \(S(t)g\)，而每个时刻 \(\tau\) 的输入 \(f(\cdot,\tau)\,d\tau\) 会再产生一块从 \(\tau\) 时刻开始演化的齐次解，那么总答案应该是</p>
+
+\[
+u(\cdot,t)=S(t)g+\int_0^t S(t-\tau)f(\cdot,\tau)\,d\tau.
+\]
+
+<p>这不是凭空猜出来的。你可以直接验算它。把右边记作 \(u\)，对 \(t\) 求导，第一项给出 \(LS(t)g\)。第二项用微积分基本定理和链式法则，会产生一个上限项 \(f(\cdot,t)\)，再加上把 \(L\) 拉进积分号后的那部分：</p>
+
+\[
+\frac{\partial}{\partial t}\int_0^t S(t-\tau)f(\cdot,\tau)\,d\tau
+
+=
+f(\cdot,t)+\int_0^t L\,S(t-\tau)f(\cdot,\tau)\,d\tau.
+\]
+
+<p>于是合起来就是</p>
+
+\[
+u_t
+=
+L\!\left(S(t)g+\int_0^t S(t-\tau)f(\cdot,\tau)\,d\tau\right)+f(\cdot,t)
+=
+Lu+f.
+\]
+
+<p>而在 \(t=0\) 时，积分项还没来得及积出任何东西，所以 \(u(\cdot,0)=g\)。这就验证完了。</p>
+
+<p>如果你更喜欢第 5、6、7 章那种特征函数语言，那么同一个公式会变成“先对空间做展开，再对时间做积分”。如果齐次问题的 Green 核是 \(G(x,\xi,t)\)，那么答案就会写成</p>
+
+\[
+u(x,t)=u_{\text{hom}}(x,t)+\int_0^t\int G(x,\xi,t-\tau)f(\xi,\tau)\,d\xi\,d\tau.
+\]
+
+<p>你可以把这看成两层叠加：先把每个时刻的源项拆成很多空间小块，再让每个小块从它出生的时刻一路传播到 \(t\)。第 10 章你会看到空间卷积正是这种叠加在整条直线上的极简版本；第 12 章的 Laplace 变换则会把时间卷积变成代数乘法。</p>
+
+<h2 id="sec9-4">9.4 热方程强迫例子</h2>
+
+<p>先做一个最顺手的热方程例子。设</p>
+
+\[
+u_t = k u_{xx}+e^{-t}\sin\frac{\pi x}{L},\qquad 0<x<L,
+\]
+
+\[
+u(0,t)=u(L,t)=0,\qquad u(x,0)=0.
+\]
+
+<p>为什么这个题几乎是在邀请你用第 5 章？因为右边的强迫项已经是一个现成的特征函数 \(\sin(\pi x/L)\)。既然系统只被这一模态喂食，你就猜解也只沿着这一模态长：</p>
+
+\[
+u(x,t)=a(t)\sin\frac{\pi x}{L}.
+\]
+
+<p>代回去以后，空间问题立刻塌成一个时间上的一阶方程：</p>
+
+\[
+a'(t)+\lambda a(t)=e^{-t},\qquad \lambda=\frac{k\pi^2}{L^2},\qquad a(0)=0.
+\]
+
+<p>如果你把它看成 Duhamel 原理，那么“单个时间冲量”的衰减核正是 \(e^{-\lambda(t-\tau)}\)，所以</p>
+
+\[
+a(t)=\int_0^t e^{-\lambda(t-\tau)}e^{-\tau}\,d\tau.
+\]
+
+<p>这个积分一算就得到</p>
+
+\[
+a(t)=\frac{e^{-t}-e^{-\lambda t}}{\lambda-1}\qquad (\lambda\neq 1).
+\]
+
+<p>因此</p>
+
+\[
+u(x,t)=\frac{e^{-t}-e^{-\lambda t}}{\lambda-1}\sin\frac{\pi x}{L}.
+\]
+
+<p>这个公式很好读。\(e^{-\tau}\) 表示较晚的强迫本身已经变弱了；\(e^{-\lambda(t-\tau)}\) 表示更早注入的热量又已经扩散掉了。所以真正留下来的，是“源项历史”和“系统遗忘速度”两者共同权衡后的结果。热方程对过去的记忆是单调衰减的，这一点到下一节和波动方程一比就特别明显。</p>
+
+<h2 id="sec9-5">9.5 波动方程强迫例子</h2>
+
+<p>现在把同样的想法放到波动方程上。设</p>
+
+\[
+u_{tt}=c^2u_{xx}+h(t)\sin\frac{\pi x}{L},\qquad 0<x<L,
+\]
+
+\[
+u(0,t)=u(L,t)=0,\qquad u(x,0)=u_t(x,0)=0.
+\]
+
+<p>这次第 7 章的经验告诉你，单个模态仍然会自成一个小世界。所以还是设</p>
+
+\[
+u(x,t)=a(t)\sin\frac{\pi x}{L}.
+\]
+
+<p>代入以后得到</p>
+
+\[
+a''(t)+\omega^2 a(t)=h(t),\qquad \omega=\frac{c\pi}{L},\qquad a(0)=a'(0)=0.
+\]
+
+<p>跟热方程相比，最关键的变化不是“还是模态化”，而是时间核变了。对这个二阶系统来说，在时刻 \(\tau\) 打进去的一小块冲量，会以简谐振子的方式继续振荡，所以 Duhamel 公式变成</p>
+
+\[
+a(t)=\frac{1}{\omega}\int_0^t \sin\bigl(\omega(t-\tau)\bigr)h(\tau)\,d\tau.
+\]
+
+<p>如果你取最简单的持续外力 \(h(t)\equiv 1\)，那么</p>
+
+\[
+a(t)=\frac{1}{\omega}\int_0^t \sin\bigl(\omega(t-\tau)\bigr)\,d\tau
+=
+\frac{1-\cos(\omega t)}{\omega^2}.
+\]
+
+<p>于是解就是</p>
+
+\[
+u(x,t)=\frac{1-\cos(\omega t)}{\omega^2}\sin\frac{\pi x}{L}.
+\]
+
+<p>你应该把这里和热方程的结果并排看：热方程的记忆核是指数衰减的，所以过去越久，影响越淡；波动方程的记忆核是正弦函数，所以过去的输入不会只是“慢慢忘掉”，而会在系统里继续以振荡的方式来回交换。再往前一步，如果 \(h(t)\) 的频率正好接近 \(\omega\)，你就会看到共振开始冒头。这件事在第 20 章的能量观点里会说得更清楚，而第 11 章整条直线上的达朗贝尔公式，则会把这种“冲量沿特征传播”的图像彻底照亮。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 Sturm–Liouville：本征函数为什么够用</a><a href="ch10.html">下一章 · 第 10 章 整条直线上的热方程与高斯核 →</a></nav>
+
+</main>
+</body>
+</html>

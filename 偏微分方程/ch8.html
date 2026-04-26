@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 Sturm–Liouville：本征函数为什么够用 — 普林斯顿偏微分方程读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 Laplace 方程：时间停下以后的样子</a><a href="ch9.html">下一章 · 第 9 章 非齐次边界、非齐次方程与 Duhamel 原理 →</a></nav>
+<h1 id="ch8">第 8 章 Sturm–Liouville：本征函数为什么够用</h1>
+
+<p>到这里你大概已经有点不耐烦了。第 3 章分离变量一出场，空间部分就老是在解 \(-X''=\lambda X\)。第 4 章 Fourier 级数在说正弦、余弦。第 6 章弦的模态还是正弦。第 7 章矩形上的 Laplace 方程又是正弦。难道这一切只是因为数学家偏爱三角函数吗？当然不是。</p>
+
+<p>真正的原因是：这些函数不是“碰巧好用”，而是某个边值问题的<strong>本征函数</strong>。而只要算子是自伴的、边界条件也配得上这种自伴结构，本征函数就会彼此正交，并且在很大一类问题里足够张成你要展开的函数空间。把这句话翻成你熟悉的语言，就是《线性代数读本》第 19–22 章那条主线：正交投影、最小二乘、对称矩阵、谱定理。这里只不过把有限维向量换成了函数，把矩阵换成了微分算子。</p>
+
+<p>所以这一章的任务不是再教你几条新公式，而是回答一个结构问题：<em>为什么这套展开法不是魔术，而是无穷维线性代数？</em>一旦这件事想通了，第 7 章的正弦展开、第 14 章会遇见的 Bessel 模态，以及第 22 章的谱观点，就会自动并到一根线上。</p>
+
+<h2 id="sec8-1">8.1 从 \(-X''=\lambda X\) 走到一般的 Sturm–Liouville 形式</h2>
+
+<p>先从你最熟的那块地面起步。比如第 7 章矩形上的 Laplace 方程，分离变量后得到</p>
+
+\[
+X''+\lambda X=0.
+\]
+
+<p>如果边界条件是 \(X(0)=X(L)=0\)，那我们已经反复算过：\(\lambda=0\) 只给平凡解，\(\lambda<0\) 也只给平凡解，真正留下来的只有</p>
+
+\[
+\lambda_n=\left(\frac{n\pi}{L}\right)^2,\qquad
+X_n(x)=\sin\frac{n\pi x}{L},\qquad n=1,2,3,\dots
+\]
+
+<p>这就是最朴素的“本征值—本征函数”对。你可以把它和矩阵特征值问题 \(A\mathbf{v}=\lambda \mathbf{v}\) 平行地读：这里矩阵 \(A\) 的位置被微分算子 \(-d^2/dx^2\) 取代了，向量 \(\mathbf{v}\) 的位置被函数 \(X\) 取代了。</p>
+
+<p>但现实问题不会永远这么整齐。要是杆的导热系数随位置变化，或者弦的张力、密度不均匀，或者你在极坐标、球坐标里分离变量，空间方程就会从</p>
+
+\[
+-X''=\lambda X
+\]
+
+<p>长成更一般的样子：</p>
+
+\[
+-(p(x)X'(x))'+q(x)X(x)=\lambda\, w(x)X(x).
+\]
+
+<p>这就是 <strong>Sturm–Liouville 形式</strong>。其中通常要求 \(p(x)>0\)、\(w(x)>0\)。\(p\) 可以理解成“微分项前面的材料系数”，\(q\) 像一个势能项，\(w\) 则是权函数。边界条件也不再只会是 \(X(a)=X(b)=0\)，而常常写成</p>
+
+\[
+\alpha_1X(a)+\alpha_2p(a)X'(a)=0,\qquad
+\beta_1X(b)+\beta_2p(b)X'(b)=0.
+\]
+
+<p>为什么是这种形式，而不是乱写一通？答案是：这种写法正好能和后面 8.2 节的自伴结构接上。</p>
+
+<p>举个非常具体的物理例子。设一根非均匀弦，张力是常数 \(T\)，线密度是 \(\rho(x)\)。分离变量以后，空间部分满足</p>
+
+\[
+-(T X')'=\lambda \rho(x)X.
+\]
+
+<p>这已经是 Sturm–Liouville 了，其中 \(p=T\)、\(q=0\)、\(w=\rho\)。所以“权函数”不是凭空发明的抽象符号，它首先就是材料在不同位置的权重。重的地方，在正交性和能量里就该算得更重。</p>
+
+<p>到这里先把第 7 章回看一下。矩形上的正弦之所以反复出现，并不是因为 Laplace 方程天然爱正弦，而是因为那一题的横向边值问题恰好是</p>
+
+\[
+-X''=\lambda X,\qquad X(0)=X(L)=0,
+\]
+
+<p>也就是最简单的 Sturm–Liouville 成员。你在那里看到的是整个理论最基础的一张脸。</p>
+
+<h2 id="sec8-2">8.2 自伴、正交、权函数到底在干什么</h2>
+
+<p>这一节是全章核心。先别被“自伴”这个词吓到。它在 PDE 里的真正工作，其实只有一句话：<strong>分部积分以后，边界项能够干净地消掉</strong>。一旦这件事成立，正交性就会像《线性代数读本》第 22 章对称矩阵那样自己冒出来。</p>
+
+<p>记</p>
+
+\[
+L[X]:=-(pX')'+qX.
+\]
+
+<p>对任意两个足够光滑的函数 \(X,Y\)，做一遍分部积分，可以得到</p>
+
+\[
+\int_a^b \bigl(YL[X]-XL[Y]\bigr)\,dx
+=\Bigl[p(x)\bigl(XY'-YX'\bigr)\Bigr]_{a}^{b}.
+\]
+
+<p>右边这一坨叫边界型。只要边界条件选得好，比如 Dirichlet、Neumann、Robin 这几类标准条件，它就会在端点自动为 0。于是我们得到</p>
+
+\[
+\int_a^b YL[X]\,dx=\int_a^b XL[Y]\,dx.
+\]
+
+<p>这就是“自伴”的工作版本：把 \(L\) 从一个函数身上挪到另一个函数身上，内积不变。你如果还记得《线性代数读本》第 22 章，实对称矩阵满足 \(\mathbf{u}^\top A\mathbf{v}=(A\mathbf{u})^\top\mathbf{v}\)；这里就是它的积分版。</p>
+
+<p>现在让 \(X_m,X_n\) 是两个本征函数，满足</p>
+
+\[
+L[X_n]=\lambda_n wX_n,\qquad L[X_m]=\lambda_m wX_m.
+\]
+
+<p>把它们塞进上面的恒等式：</p>
+
+\[
+\int_a^b X_m(\lambda_n wX_n)\,dx
+\;=\;
+\int_a^b X_n(\lambda_m wX_m)\,dx.
+\]
+
+<p>整理一下：</p>
+
+\[
+(\lambda_n-\lambda_m)\int_a^b w(x)X_n(x)X_m(x)\,dx=0.
+\]
+
+<p>所以只要 \(\lambda_n\neq \lambda_m\)，就必有</p>
+
+\[
+\int_a^b w(x)X_n(x)X_m(x)\,dx=0.
+\]
+
+<p>这就是 <strong>加权正交性</strong>。注意这里不是普通积分 \(\int X_nX_m\)，而是带着 \(w\) 的积分。为什么？因为问题本身就是用 \(w\) 来衡量“长度”和“角度”的。对非均匀弦来说，\(w=\rho(x)\)；重的地方确实应该更有发言权。对以后第 14 章的径向问题，你会看见权函数常常变成 \(r\)，因为平面面积元本来就是 \(r\,dr\,d\theta\)。这正是“几何如何偷偷溜进正交性”的地方。</p>
+
+<p>所以权函数不是附属品，而是内积的一部分。真正该记住的内积其实是</p>
+
+\[
+\langle f,g\rangle_w:=\int_a^b w(x)f(x)g(x)\,dx.
+\]
+
+<p>一旦用这个内积说话，Sturm–Liouville 本征函数就和《线性代数读本》第 19 章里的正交基非常像了。展开系数也完全平行：</p>
+
+\[
+c_n=\frac{\langle f,X_n\rangle_w}{\langle X_n,X_n\rangle_w}.
+\]
+
+<p>这就是为什么第 7 章一做边界匹配，系数公式看起来总像投影。因为它本来就是投影，只不过投影对象从向量变成了函数。</p>
+
+<h2 id="sec8-3">8.3 Dirichlet / Neumann / Robin 边界各自对应什么本征函数家族</h2>
+
+<p>现在回到最简单的算子 \(-X''\)，看看边界条件一改，本征函数家族怎样跟着换脸。这一节几乎就是在给第 7 章做注脚：你当时用的是哪一族，不是主观喜好，而是边界自己决定的。</p>
+
+<h3 id="sec8-3-1">8.3.1 Dirichlet：固定端点，正弦登场</h3>
+
+<p>如果</p>
+
+\[
+X(0)=X(L)=0,
+\]
+
+<p>那就是最标准的 Dirichlet 边界。它对应“端点值被固定住”，比如两端温度被指定、或者弦两端被钉死。非平凡本征函数是</p>
+
+\[
+X_n(x)=\sin\frac{n\pi x}{L},\qquad
+\lambda_n=\left(\frac{n\pi}{L}\right)^2.
+\]
+
+<p>这正是第 7 章矩形 Laplace 方程用到的家族。因为左右边界都被压成 0，所以横向模态只能选那些在两端自动为零的函数。</p>
+
+<h3 id="sec8-3-2">8.3.2 Neumann：绝热端点，余弦登场</h3>
+
+<p>如果边界条件换成</p>
+
+\[
+X'(0)=X'(L)=0,
+\]
+
+<p>那就是 Neumann 边界。对热传导来说，它表示端点绝热，法向热流为 0；对振动来说，它更像“端点没有被固定位置，只是斜率受约束”。这时非平凡本征函数变成</p>
+
+\[
+X_n(x)=\cos\frac{n\pi x}{L},\qquad
+\lambda_n=\left(\frac{n\pi}{L}\right)^2,\qquad n=0,1,2,\dots
+\]
+
+<p>注意这里多了 \(n=0\) 的常数模态。这个常数模态很重要：它意味着如果边界绝热，总热量可以被保留下来，于是稳态里允许存在“整根都是同一个常数温度”这种零频模式。第 5 章热方程里“平均值最后活下来”的现象，正是这个 \(n=0\) 模态在发力。</p>
+
+<h3 id="sec8-3-3">8.3.3 Robin：边界自己也会交换信息</h3>
+
+<p>Robin 边界把函数值和导数绑在一起。物理上最常见的是牛顿冷却定律：边界上的热流与边界温度偏离环境温度的程度成正比。为了看见它长什么样，取一个小例子：</p>
+
+\[
+X''+\lambda X=0,\qquad X'(0)=0,\qquad X(L)+hX'(L)=0,
+\]
+
+<p>其中 \(h>0\) 是某个换热参数。设 \(\lambda=k^2>0\)。由 \(X'(0)=0\) 可知正弦项被杀掉，只剩</p>
+
+\[
+X(x)=A\cos(kx).
+\]
+
+<p>再代入 \(x=L\) 处的 Robin 条件：</p>
+
+\[
+\cos(kL)-hk\sin(kL)=0.
+\]
+
+<p>所以允许的 \(k\) 不再是整整齐齐的 \(n\pi/L\)，而是这条超越方程的根 \(k_1,k_2,\dots\)。对应本征函数是</p>
+
+\[
+X_n(x)=\cos(k_nx).
+\]
+
+<p>这非常值得记住：<strong>Robin 边界不会毁掉谱结构，只会把“均匀排布的频率”扭成一串不那么整齐的频率</strong>。本征函数依然存在，依然正交，只是零点位置和特征值间距不再像正弦余弦那样一眼看穿。</p>
+
+<p>所以你现在可以把第 7 章那套分离变量重新解释一遍了。矩形上为什么是正弦？因为那题的横向边界是 Dirichlet。要是两侧绝热，你就会看见余弦。要是边界和外界交换热量，就会改成 Robin 家族。边界条件不是附注；边界条件在决定你能用哪一组“坐标轴”。</p>
+
+<h2 id="sec8-4">8.4 为什么这其实就是对称矩阵谱定理的无穷维延长</h2>
+
+<p>现在把所有对象一一对表。这张表几乎就是本章的中心结论。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>有限维线性代数</th>
+      <th>Sturm–Liouville / 函数空间</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>向量 \(\mathbf{v}\)</td>
+      <td>函数 \(f(x)\)</td>
+    </tr>
+    <tr>
+      <td>点积 \(\mathbf{u}\cdot\mathbf{v}\)</td>
+      <td>加权内积 \(\langle f,g\rangle_w=\int_a^b wfg\)</td>
+    </tr>
+    <tr>
+      <td>对称矩阵 \(A=A^\top\)</td>
+      <td>自伴微分算子 \(L\)</td>
+    </tr>
+    <tr>
+      <td>特征向量 \(A\mathbf{q}_n=\lambda_n\mathbf{q}_n\)</td>
+      <td>本征函数 \(L[X_n]=\lambda_n wX_n\)</td>
+    </tr>
+    <tr>
+      <td>正交基展开 \(\mathbf{v}=\sum c_n\mathbf{q}_n\)</td>
+      <td>级数展开 \(f=\sum c_nX_n\)</td>
+    </tr>
+    <tr>
+      <td>投影系数 \(c_n=\mathbf{v}\cdot \mathbf{q}_n/\|\mathbf{q}_n\|^2\)</td>
+      <td>投影系数 \(c_n=\langle f,X_n\rangle_w/\langle X_n,X_n\rangle_w\)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>如果你把《线性代数读本》第 19 章正交投影、第 20 章最小二乘、第 22 章对称矩阵与谱定理连起来看，这张表会显得非常自然。第 19 章说：给定一个正交基，坐标就是投影。第 20 章说：截断投影给出最佳近似。第 22 章说：对称矩阵有一组正交特征向量，因而可以对角化。Sturm–Liouville 只是把这三件事搬到了无穷维里。</p>
+
+<p>比如第 7 章你把上边界数据 \(f(x)\) 展开成正弦级数，其实就是把 \(f\) 投影到子空间 \(\mathrm{span}\{\sin(n\pi x/L)\}\) 上。把级数截断到前 \(N\) 项，就是在这 \(N\) 维模态子空间里做最优近似。你要是觉得这句话耳熟，那正是因为它和《线性代数读本》第 20 章最小二乘的语气是一模一样的。</p>
+
+<p>当然，和有限维相比，这里多出一个真正困难的新点：<strong>完备性</strong>。在 \(n\) 维向量空间里，\(n\) 个线性无关向量自动张满全空间；在函数空间里，一串两两正交的本征函数并不会自动张满你关心的所有函数。完备性需要额外的分析定理来保证。标准的正则 Sturm–Liouville 问题恰恰享有这份好运，所以“本征函数为什么够用”不是信仰，而是定理。第 22 章会从谱的角度把这件事再总括一次。</p>
+
+<p>也正因此，本章不妨被你读成一句大胆的话：<strong>PDE 里的模态展开，就是把对称矩阵的谱定理放大到函数空间</strong>。如果这句话现在开始顺耳了，那么后面的 Fourier–Bessel 展开、Legendre 展开，都会立刻少很多神秘感。</p>
+
+<h2 id="sec8-5">8.5 Bessel / Legendre 只做预告，不必展开太深</h2>
+
+<p>最后把眼睛抬离区间，看看更大的地形。只要分离变量的几何变了，Sturm–Liouville 家族也会换脸。下一次你最明显地看到这一点，会是在第 14 章的径向对称问题里。</p>
+
+<p>在圆盘或圆柱里分离变量，径向方程常常变成</p>
+
+\[
+r^2R''+rR'+(\lambda r^2-m^2)R=0,
+\]
+
+<p>这就是 Bessel 方程。它也可以改写成 Sturm–Liouville 的样子：</p>
+
+\[
+(rR')'+\left(\lambda r-\frac{m^2}{r}\right)R=0.
+\]
+
+<p>这里的权函数本质上就是 \(r\)。这不是偶然；它来自极坐标面积元 \(r\,dr\,d\theta\)。所以权函数一旦出现，你不妨先问：是不是几何或材料本身在重新定义“长度”和“正交”？</p>
+
+<p>在球面问题里，你又会碰到</p>
+
+\[
+\frac{d}{dx}\!\left((1-x^2)Y'(x)\right)+\ell(\ell+1)Y(x)=0,
+\]
+
+<p>这就是 Legendre 方程。它对应球谐函数背后的角向结构。第 14 章会让你先看见这些方程从哪里冒出来，第 22 章则会把它们重新归入“算子—谱—展开”的统一视角。</p>
+
+<p>所以这一章可以回头总括成这样。第 7 章里那串正弦并不特殊，它只是最简单 Sturm–Liouville 问题的本征函数。自伴结构保证不同本征值对应的函数彼此正交，权函数告诉你内积该怎么定义，边界条件决定你选哪一族模态，而完备性则保证这族模态真的够用。等你在第 14 章第一次认真遇见 Bessel，在第 22 章再次从谱的高度俯视全书时，你会发现：本征函数之所以“够用”，根本不是巧合，而是结构在说话。</p>
+
+<hr class="section-end">
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 Laplace 方程：时间停下以后的样子</a><a href="ch9.html">下一章 · 第 9 章 非齐次边界、非齐次方程与 Duhamel 原理 →</a></nav>
+
+</main>
+</body>
+</html>

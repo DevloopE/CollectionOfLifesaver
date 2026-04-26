@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>索引 — 普林斯顿实分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B　工具箱：判别法速查、反例库与定理触发条件</a><span class="nav-disabled">下一章 →</span></nav>
+<h1 id="subject-index">索引</h1>
+
+<p>本索引按拼音字母分组，但条目尽量写成"你现在想解决什么问题"的样子，而不是干巴巴堆术语。括号里的数字指向章节号或附录号。找不到某个词时，试着去它最常出现的动作下面找——比如"一致收敛"也常躲在"交换极限"后面，"测度零"也常躲在"坏点集合多大才算真的大"后面。</p>
+
+<h2 id="index-B">B</h2>
+
+<ul>
+<li><strong>闭包 / 边界 / 内部</strong>
+<ul>
+<li>总分不清谁在说"真正里面"、谁在说"极限补全"（8.2）</li>
+<li>想把图像直觉翻成可写定义（8.1-8.3，20.2）</li>
+</ul></li>
+<li><strong>比较判别</strong>
+<ul>
+<li>正项级数先拿谁当参照物（4.2，4.5，appB.1）</li>
+<li>反常积分像哪种 \(1/x^p\) 模型（16.2）</li>
+</ul></li>
+<li><strong>Bolzano–Weierstrass</strong>
+<ul>
+<li>想从有界序列里抽出收敛子列（3.3，21.2）</li>
+<li>想看它和紧致性是什么关系（6.4，21.1-21.2，appA.2）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-C">C</h2>
+
+<ul>
+<li><strong>Cauchy 列</strong>
+<ul>
+<li>不先猜极限也想判断收敛（3.4，appA.2）</li>
+<li>想知道完备性到底在兜什么底（2.3，21.3）</li>
+</ul></li>
+<li><strong>Cantor 集</strong>
+<ul>
+<li>想看一个既不可数又测度零的集合（8.4，23.4）</li>
+</ul></li>
+<li><strong>连续性</strong>
+<ul>
+<li>想把"别乱跳"写成 \(\varepsilon\)–\(\delta\)（5.1-5.3，appA.1）</li>
+<li>想知道它为什么能推出极值 / 介值 / 一致连续（6.4，7.1-7.5）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-D">D</h2>
+
+<ul>
+<li><strong>Darboux 上下和</strong>
+<ul>
+<li>想真正定义 Riemann 积分（13.2-13.4）</li>
+</ul></li>
+<li><strong>Dirichlet 函数</strong>
+<ul>
+<li>想看 Riemann 积分为什么会被处处振荡卡死（14.4）</li>
+</ul></li>
+<li><strong>导数</strong>
+<ul>
+<li>想把它看成局部线性，而不只是斜率（9.1）</li>
+<li>想知道为什么可导必连续但反过来不行（9.2）</li>
+<li>想从导数符号推出单调性或误差控制（10.2-10.3）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-F">F</h2>
+
+<ul>
+<li><strong>Fourier 级数</strong>
+<ul>
+<li>想知道它到底按什么意义收敛（19.1-19.3）</li>
+<li>想看 Gibbs 现象和 PDE 为什么扯在一起（19.3-19.5）</li>
+</ul></li>
+<li><strong>反常积分</strong>
+<ul>
+<li>无穷区间、奇点、主值和参数积分（16.1-16.5）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-J">J</h2>
+
+<ul>
+<li><strong>级数分型</strong>
+<ul>
+<li>见到一条级数先该问什么（4.5，appB.1）</li>
+</ul></li>
+<li><strong>几乎处处</strong>
+<ul>
+<li>想知道为什么坏点集合够小就能忽略（23.2-23.5，24.3）</li>
+</ul></li>
+<li><strong>紧致性</strong>
+<ul>
+<li>为什么闭且有界会如此值钱（6.1-6.5）</li>
+<li>在度量空间里为什么不再等于闭且有界（21.1-21.2，appB.4）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-L">L</h2>
+
+<ul>
+<li><strong>Lebesgue 积分</strong>
+<ul>
+<li>想知道为什么必须重定义积分（24.1-24.3）</li>
+<li>想看简单函数、支配收敛与 \(L^p\) 的第一眼（24.2-24.4，appA.5）</li>
+</ul></li>
+<li><strong>Lipschitz</strong>
+<ul>
+<li>想把导数上界翻成全局误差控制（10.3）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-M">M</h2>
+
+<ul>
+<li><strong>幂级数</strong>
+<ul>
+<li>为什么在收敛圆内像机器一样听话（18.3-18.4）</li>
+<li>想看它和复分析是什么关系（18.5）</li>
+</ul></li>
+<li><strong>每次都更近一点</strong>
+<ul>
+<li>想证明存在唯一但没有显式解（22.1-22.5）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-Q">Q</h2>
+
+<ul>
+<li><strong>区间套定理</strong>
+<ul>
+<li>想看它和完备性、Bolzano–Weierstrass 的关系（2.2，appA.2）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-S">S</h2>
+
+<ul>
+<li><strong>上确界 / 下确界</strong>
+<ul>
+<li>为什么分析总爱谈"最小上界"（2.1-2.3）</li>
+<li>想看 \(\sqrt2\) 怎样把有理数撕开一道口子（2.4）</li>
+</ul></li>
+<li><strong>收敛类型</strong>
+<ul>
+<li>逐点、一致、\(L^2\) 到底差在哪（17.1-17.5，19.3，24.4）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-T">T</h2>
+
+<ul>
+<li><strong>Taylor 公式</strong>
+<ul>
+<li>想知道多项式替身和余项到底在干什么（11.1-11.5）</li>
+</ul></li>
+<li><strong>凸性</strong>
+<ul>
+<li>想看二阶导数如何开始管形状（12.1-12.3）</li>
+<li>想知道它为什么会回到优化、概率和 PDE（12.5）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-W">W</h2>
+
+<ul>
+<li><strong>完备性</strong>
+<ul>
+<li>想知道"实数没有洞"到底是什么意思（2.1-2.5）</li>
+<li>想看它为什么会在压缩映射里再次出现（21.3，22.3）</li>
+</ul></li>
+<li><strong>Weierstrass \(M\) 判别</strong>
+<ul>
+<li>想用数项级数统一控制函数项级数（18.2）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-Y">Y</h2>
+
+<ul>
+<li><strong>一致连续</strong>
+<ul>
+<li>为什么连续函数在闭区间上会自动统一老实（7.3）</li>
+</ul></li>
+<li><strong>一致收敛</strong>
+<ul>
+<li>想保住连续性或积分，先看它（17.2-17.4）</li>
+<li>想知道逐点收敛为什么不够（17.1）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-Z">Z</h2>
+
+<ul>
+<li><strong>中值定理</strong>
+<ul>
+<li>想把局部斜率翻成全局控制（10.1-10.4）</li>
+</ul></li>
+<li><strong>主值</strong>
+<ul>
+<li>想分清普通反常积分和对称逼近的差别（16.3）</li>
+</ul></li>
+</ul>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B　工具箱：判别法速查、反例库与定理触发条件</a><span class="nav-disabled">下一章 →</span></nav>
+
+</main>
+</body>
+</html>
