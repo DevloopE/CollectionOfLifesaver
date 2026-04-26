@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 同调代数基础：链复形、长正合列、Snake 引理与 Tor / Ext — 普林斯顿代数拓扑读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 范畴论小补：从函子到 Yoneda 的预热</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+<h1 id="appB">附录 B 同调代数基础：链复形、长正合列、Snake 引理与 Tor / Ext</h1>
+
+<p>前面几章里，我们已经不断在用同一种代数骨架：先搭出一串群与边界算子，再取核、像和商，最后从短正合列里长出长正合列。你在<a href="ch10.html">第 10 章</a>的单纯同调、<a href="ch11.html">第 11 章</a>的奇异同调、<a href="ch12.html">第 12 章</a>的 Mayer-Vietoris、以及<a href="ch19.html">第 19 章</a>的谱序列里，其实一直都在和同调代数打交道。只是正文的重心是拓扑，不是这套代数机器本身。</p>
+
+<p>这一附录把那台机器单独摆出来。目标不是把你培养成同调代数专家，而是让你对几个反复出现的结构有清晰的、可反复调用的模板：链复形是什么，短正合列如何诱导长正合列，Snake 引理到底为什么对，以及 Tor 与 Ext 这两个总在万有系数定理附近出现的名字到底是在补什么洞。</p>
+
+<h2 id="secB-1">B.1 链复形：\(\partial^2=0\) 是一切的起点</h2>
+
+<p>一个链复形 \(C_\bullet\) 是一串阿贝尔群（或模）与边界算子</p>
+
+\[
+\cdots \xrightarrow{\partial_{n+2}} C_{n+1}\xrightarrow{\partial_{n+1}} C_n\xrightarrow{\partial_n}C_{n-1}\xrightarrow{\partial_{n-1}}\cdots
+\]
+
+<p>满足最关键的条件</p>
+
+\[
+\boxed{\partial_n\circ \partial_{n+1}=0\qquad(\forall n).}
+\]
+
+<p>这意味着“边界的边界等于零”。于是我们可以定义循环群与边界群：</p>
+
+\[
+Z_n(C)=\ker(\partial_n),\qquad B_n(C)=\operatorname{im}(\partial_{n+1}).
+\]
+
+<p>因为 \(\partial^2=0\)，有</p>
+
+\[
+B_n(C)\subset Z_n(C).
+\]
+
+<p>于是第 \(n\) 个同调群定义为</p>
+
+\[
+\boxed{H_n(C)=Z_n(C)/B_n(C)=\ker(\partial_n)\big/\operatorname{im}(\partial_{n+1}).}
+\]
+
+<p>你在拓扑里遇到的链复形，最常见的就是单纯链群与奇异链群。它们的边界算子来自“把一个 \(n\)-单形的面按交错符号相加”。同调代数做的事，只是把这个骨架抽象出来：以后不管 \(C_n\) 里的元素是单形、矩阵、模，还是别的什么，只要 \(\partial^2=0\)，就能谈同调。</p>
+
+<h3 id="secB-1-1">一个完整例子：最短的链复形也能有同调</h3>
+
+<p>看一个极简复形：</p>
+
+\[
+0\to \mathbb Z \xrightarrow{\times 2}\mathbb Z\to 0,
+\]
+
+<p>其中左边的 \(\mathbb Z\) 放在次数 \(1\)，右边的 \(\mathbb Z\) 放在次数 \(0\)。那么</p>
+
+\[
+H_1=\ker(\times 2)=0,
+\]
+
+\[
+H_0=\mathbb Z/\operatorname{im}(\times 2)\cong \mathbb Z/2\mathbb Z.
+\]
+
+<p>所以同调群不只是“有洞的几何空间”才有；它是任何链复形的代数产物。拓扑只是最重要的来源，不是唯一来源。</p>
+
+<p>光有链复形还不够，我们还需要复形之间的映射。一个链映射 \(f_\bullet\colon C_\bullet\to D_\bullet\) 是一族映射 \(f_n\colon C_n\to D_n\)，满足</p>
+
+\[
+\partial^D_n\circ f_n=f_{n-1}\circ \partial^C_n.
+\]
+
+<p>这句话的意思是：先做边界再映过去，和先映过去再做边界，结果相同。于是链映射自动诱导同调群同态</p>
+
+\[
+f_*\colon H_n(C_\bullet)\longrightarrow H_n(D_\bullet).
+\]
+
+<p>如果两个链映射 \(f_\bullet,g_\bullet\) 只差一个链同伦，也就是存在一族映射 \(s_n\colon C_n\to D_{n+1}\) 使</p>
+
+\[
+f_n-g_n=\partial^D_{n+1}s_n+s_{n-1}\partial^C_n,
+\]
+
+<p>那么它们在同调上诱导同一个映射。这个事实非常重要，因为它说明：同调真正看见的不是链复形的每个细节，而是它的链同伦类型。拓扑里“同伦等价诱导同调同构”，在代数层面正是这条原则的直接投影。</p>
+<h2 id="secB-2">B.2 短正合列：把三台链复形机器并排比较</h2>
+
+<p>一个短正合列</p>
+
+\[
+0\to A\xrightarrow{i}B\xrightarrow{p}C\to 0
+\]
+
+<p>表示三件事同时成立：</p>
+
+\[
+i\ \text{单射},\qquad p\ \text{满射},\qquad \operatorname{im}(i)=\ker(p).
+\]
+
+<p>当它出现在每个次数上，而且这些映射与边界算子相容时，就得到短正合列的链复形：</p>
+
+\[
+0\to A_\bullet \xrightarrow{i_\bullet} B_\bullet \xrightarrow{p_\bullet} C_\bullet\to 0.
+\]
+
+<p>所谓“与边界算子相容”，就是对每个 \(n\)，有交换图</p>
+
+\[
+\partial^A_n\circ i_n=i_{n-1}\circ \partial^B_n,
+\qquad
+\partial^C_n\circ p_n=p_{n-1}\circ \partial^B_n.
+\]
+
+<p>这意味着 \(i_\bullet\) 和 \(p_\bullet\) 都是链映射。你可以把它理解成：\(A_\bullet\) 是 \(B_\bullet\) 里的一台子机器，\(C_\bullet\) 则是商机器，而边界运算和“先嵌进去 / 先投出去”完全兼容。</p>
+
+<p>一旦有了这样的短正合列，同调就不会乖乖保持短正合。它会更有趣地长出一条长正合列。这也是为什么同调代数真正强大的对象不是单个同调群，而是它们被一串连接同态串成的整个长链。</p>
+
+<h2 id="secB-3">B.3 长正合列：连接同态是怎么长出来的</h2>
+
+<p>设</p>
+
+\[
+0\to A_\bullet \xrightarrow{i_\bullet} B_\bullet \xrightarrow{p_\bullet} C_\bullet\to 0
+\]
+
+<p>是链复形的短正合列。那么会诱导长正合列</p>
+
+\[
+\cdots \to H_n(A)\xrightarrow{i_*}H_n(B)\xrightarrow{p_*}H_n(C)\xrightarrow{\delta}H_{n-1}(A)\to H_{n-1}(B)\to \cdots
+\]
+
+<p>这里最值得解释的不是左右两边那两个自然诱导映射，而是中间那张“掉一次次数”的连接同态</p>
+
+\[
+\delta\colon H_n(C)\to H_{n-1}(A).
+\]
+
+<p>它的定义非常具体。给定一个同调类 \([c_n]\in H_n(C)\)，也就是 \(c_n\in C_n\) 满足</p>
+
+\[
+\partial^C_n(c_n)=0.
+\]
+
+<p>因为 \(p_n\colon B_n\to C_n\) 满射，可取 \(b_n\in B_n\) 使得</p>
+
+\[
+p_n(b_n)=c_n.
+\]
+
+<p>然后看它的边界。由链映射性质，</p>
+
+\[
+p_{n-1}(\partial^B_n b_n)=\partial^C_n(p_n b_n)=\partial^C_n(c_n)=0.
+\]
+
+<p>所以 \(\partial^B_n b_n\in \ker p_{n-1}=\operatorname{im} i_{n-1}\)。于是存在 \(a_{n-1}\in A_{n-1}\) 使得</p>
+
+\[
+i_{n-1}(a_{n-1})=\partial^B_n b_n.
+\]
+
+<p>再检查 \(a_{n-1}\) 是循环。因为</p>
+
+\[
+i_{n-2}(\partial^A_{n-1}a_{n-1})
+=\partial^B_{n-1}(i_{n-1}a_{n-1})
+=\partial^B_{n-1}\partial^B_n b_n
+=0,
+\]
+
+<p>而 \(i_{n-2}\) 单射，所以</p>
+
+\[
+\partial^A_{n-1}a_{n-1}=0.
+\]
+
+<p>因此 \(a_{n-1}\) 确实代表 \(H_{n-1}(A)\) 里的一个类。定义</p>
+
+\[
+\boxed{\delta([c_n])=[a_{n-1}].}
+\]
+
+<p>之后要检查这和 lift \(b_n\) 的选择无关，和代表元 \(c_n\) 的选择无关。验证并不难：若换一个 lift，差值落在 \(\operatorname{im} i_n\) 里；若换一个同调等价代表，差值是边界；两种改变最终只会让 \(a_{n-1}\) 改变一个边界类。于是 \(\delta\) 良定义。</p>
+
+<p>这条长正合列是拓扑里最常出现的工具之一。Mayer-Vietoris 是它的亲戚，谱序列是它的高维迭代版，而万有系数定理和相对同调也都在反复调用它。</p>
+
+<h2 id="secB-4">B.4 Snake 引理：完整证明</h2>
+
+<p>现在把所有长正合列背后的最经典元件单独拿出来。设有交换图</p>
+
+\[
+\begin{matrix}
+A' & \xrightarrow{u} & A & \xrightarrow{v} & A'' \\
+\downarrow \alpha &  & \downarrow \beta &  & \downarrow \gamma \\
+B' & \xrightarrow{u'} & B & \xrightarrow{v'} & B''
+\end{matrix}
+\]
+
+<p>并且两行都正合。Snake 引理断言存在自然的长箭头</p>
+
+\[
+\delta\colon \ker\gamma\to \operatorname{coker}\alpha
+\]
+
+<p>使下列序列正合：</p>
+
+\[
+\boxed{\ker\alpha \to \ker\beta \to \ker\gamma \xrightarrow{\delta}
+\operatorname{coker}\alpha \to \operatorname{coker}\beta \to \operatorname{coker}\gamma.}
+\]
+
+<p>下面给完整证明。整个证明就是一场精确的 element chase。</p>
+
+<h3 id="secB-4-1">第一步：定义连接映射 \(\delta\)</h3>
+
+<p>取 \(c''\in \ker\gamma\subset A''\)。因为 \(v\colon A\to A''\) 满射，可取 \(a\in A\) 使得</p>
+
+\[
+v(a)=c''.
+\]
+
+<p>对它作用 \(\beta\)，再往右推：</p>
+
+\[
+v'(\beta(a))=\gamma(v(a))=\gamma(c'')=0.
+\]
+
+<p>由下排正合，\(\ker v'=\operatorname{im}u'\)，故存在 \(b'\in B'\) 使得</p>
+
+\[
+u'(b')=\beta(a).
+\]
+
+<p>定义</p>
+
+\[
+\delta(c'')=[b']\in \operatorname{coker}\alpha=B'/\operatorname{im}\alpha.
+\]
+
+<p>现在要证明这个定义与选择无关。若换一个 lift \(a_1\) 满足 \(v(a_1)=c''\)，则</p>
+
+\[
+v(a_1-a)=0.
+\]
+
+<p>由上排正合，存在 \(a'\in A'\) 使得</p>
+
+\[
+u(a')=a_1-a.
+\]
+
+<p>于是</p>
+
+\[
+\beta(a_1)-\beta(a)=\beta(u(a'))=u'(\alpha(a')).
+\]
+
+<p>若 \(u'(b'_1)=\beta(a_1)\)，则</p>
+
+\[
+u'(b'_1-b')=u'(\alpha(a')).
+\]
+
+<p>因 \(u'\) 单射，得到</p>
+
+\[
+b'_1-b'=\alpha(a').
+\]
+
+<p>所以 \([b'_1]=[b']\) 在 \(\operatorname{coker}\alpha\) 里同类。故 \(\delta\) 良定义。</p>
+
+<h3 id="secB-4-2">第二步：证明在 \(\ker\beta\) 与 \(\ker\gamma\) 处正合</h3>
+
+<p>先看左半段。映射 \(\ker\alpha\to \ker\beta\) 由 \(u\) 诱导，\(\ker\beta\to \ker\gamma\) 由 \(v\) 诱导。因为图交换，确实有</p>
+
+\[
+\beta(u(a'))=u'(\alpha(a'))=0
+\]
+
+<p>和</p>
+
+\[
+\gamma(v(a))=v'(\beta(a))=0.
+\]
+
+<p>显然</p>
+
+\[
+v\circ u=0,
+\]
+
+<p>所以 \(\operatorname{im}(\ker\alpha\to\ker\beta)\subset \ker(\ker\beta\to\ker\gamma)\)。反过来，若 \(a\in\ker\beta\) 且 \(v(a)=0\)，则由上排正合，存在 \(a'\in A'\) 使得</p>
+
+\[
+u(a')=a.
+\]
+
+<p>再看 \(\alpha(a')\)：</p>
+
+\[
+u'(\alpha(a'))=\beta(u(a'))=\beta(a)=0.
+\]
+
+<p>因 \(u'\) 单射，\(\alpha(a')=0\)，所以 \(a'\in\ker\alpha\)。这说明 \(a\) 来自 \(\ker\alpha\)。故在 \(\ker\beta\) 处正合。</p>
+
+<p>再证明</p>
+
+\[
+\ker\delta=\operatorname{im}(\ker\beta\to\ker\gamma).
+\]
+
+<p>若 \(a\in\ker\beta\)，则 \(v(a)\in\ker\gamma\)。并且在定义 \(\delta(v(a))\) 时，我们可以直接取 lift 就是 \(a\)，于是对应的 \(b'\) 满足</p>
+
+\[
+u'(b')=\beta(a)=0.
+\]
+
+<p>由 \(u'\) 单射得 \(b'=0\)，所以 \(\delta(v(a))=0\)。故像包含在核里。</p>
+
+<p>反过来，若 \(c''\in\ker\gamma\) 且 \(\delta(c'')=0\)，按定义取 \(a\in A\) 满足 \(v(a)=c''\)，再取 \(b'\in B'\) 满足 \(u'(b')=\beta(a)\)。\(\delta(c'')=0\) 意味着 \([b']=0\) 于 \(\operatorname{coker}\alpha\)，故存在 \(a'\in A'\) 使得</p>
+
+\[
+b'=\alpha(a').
+\]
+
+<p>于是</p>
+
+\[
+\beta(a-u(a'))=\beta(a)-u'(\alpha(a'))=\beta(a)-u'(b')=0.
+\]
+
+<p>所以 \(a-u(a')\in\ker\beta\)，而</p>
+
+\[
+v(a-u(a'))=v(a)=c'',
+\]
+
+<p>因为 \(v\circ u=0\)。故 \(c''\) 来自 \(\ker\beta\)。于是 \(\ker\delta=\operatorname{im}(\ker\beta\to\ker\gamma)\) 成立。</p>
+
+<h3 id="secB-4-3">第三步：证明在各个余核处正合</h3>
+
+<p>映射 \(\operatorname{coker}\alpha\to \operatorname{coker}\beta\) 由 \(u'\) 诱导：</p>
+
+\[
+[b']\mapsto [u'(b')].
+\]
+
+<p>先证 \(\operatorname{im}\delta\subset \ker(\operatorname{coker}\alpha\to\operatorname{coker}\beta)\)。若 \([b']=\delta(c'')\)，则按定义存在 \(a\in A\) 使得</p>
+
+\[
+u'(b')=\beta(a).
+\]
+
+<p>因此 \([u'(b')]=0\) 于 \(\operatorname{coker}\beta\)。所以像确实落在核里。</p>
+
+<p>反过来，若 \([b']\in \operatorname{coker}\alpha\) 映到 \(\operatorname{coker}\beta\) 中的零元，说明 \(u'(b')\in \operatorname{im}\beta\)。于是存在 \(a\in A\) 使得</p>
+
+\[
+u'(b')=\beta(a).
+\]
+
+<p>将它往右推：</p>
+
+\[
+\gamma(v(a))=v'(\beta(a))=v'(u'(b'))=0.
+\]
+
+<p>故 \(v(a)\in\ker\gamma\)。而按 \(\delta\) 的定义，\(\delta(v(a))=[b']\)。于是核包含在像里。故在 \(\operatorname{coker}\alpha\) 处正合。</p>
+
+<p>最后一段 \(\operatorname{coker}\alpha\to \operatorname{coker}\beta\to \operatorname{coker}\gamma\) 的正合性，直接由图交换和两行正合推出：一个 \(B\) 中元素的类送到 \(\operatorname{coker}\gamma\) 为零，当且仅当它在 \(B''\) 中的像来自某个 \(A''\)，再由正合性追回到 \(B'\) 的像。细节与你刚刚在前一步做的 chase 完全同型。</p>
+
+<p>至此，Snake 引理证明完毕。它之所以被称为 snake，不是因为内容神秘，而是因为证明时你总在图里沿着箭头“蛇形爬行”。一旦习惯这种 chase，很多长正合列的构造都会变得像套模板。</p>
+
+<h2 id="secB-5">B.5 Tor 与 Ext：当张量和 Hom 还不够精确时</h2>
+
+<p>最后解释两个经常在上同调与系数变化里冒出来的名字：Tor 和 Ext。它们的哲学都一样：普通函子有时“不够精确”，于是要测量它失真了多少。</p>
+
+<p>比如张量积 \(-\otimes_R N\) 是右正合的，但不一定左正合。它保持满射，却未必保持单射。Tor 就是测量这份失真的导出对象。若</p>
+
+\[
+\cdots \to P_1\to P_0\to M\to 0
+\]
+
+<p>是 \(M\) 的一个投射分解，则定义</p>
+
+\[
+\boxed{\operatorname{Tor}^R_i(M,N)=H_i(P_\bullet\otimes_R N).}
+\]
+
+<p>同样地，\(\operatorname{Hom}_R(-,N)\) 是左正合的，但不一定右正合，于是它的右导出给出 Ext：</p>
+
+\[
+\boxed{\operatorname{Ext}^i_R(M,N)=H^i(\operatorname{Hom}_R(P_\bullet,N)).}
+\]
+
+<p>在本书最常见的底环 \(R=\mathbb Z\) 上，它们有很具体的味道。比如</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n\mathbb Z,A)\cong A[n]
+\]
+
+<p>衡量 \(A\) 里被 \(n\) 杀掉的扭元素；而</p>
+
+\[
+\operatorname{Ext}^1_{\mathbb Z}(\mathbb Z/n\mathbb Z,A)\cong A/nA
+\]
+
+<p>衡量“模去 \(n\) 倍”的商结构。</p>
+
+<p>这就是为什么它们会在万有系数定理里出现。对同调有</p>
+
+\[
+0\to H_n(X;\mathbb Z)\otimes G\to H_n(X;G)\to \operatorname{Tor}\bigl(H_{n-1}(X;\mathbb Z),G\bigr)\to 0,
+\]
+
+<p>对上同调有</p>
+
+\[
+0\to \operatorname{Ext}\bigl(H_{n-1}(X;\mathbb Z),G\bigr)\to H^n(X;G)\to \operatorname{Hom}\bigl(H_n(X;\mathbb Z),G\bigr)\to 0.
+\]
+
+<p>所以 Tor 与 Ext 不是凭空多出来的怪名字，它们是在提醒你：只看张量积或只看 Hom，还不足以完整记录“换系数以后发生了什么”。额外缺的那一层信息，正由导出函子来补。</p>
+
+<h3 id="secB-5-1">一个完整例子：为什么换到 \(\mathbb Z/2\) 系数时扭元素会突然浮出来</h3>
+
+<p>看一个最典型的场景。设某空间在整数系数下的一阶同调含有一个 \(\mathbb Z/2\) 扭项，比如 Klein 瓶满足</p>
+
+\[
+H_1(K;\mathbb Z)\cong \mathbb Z\oplus \mathbb Z/2.
+\]
+
+<p>若把系数换成 \(G=\mathbb Z/2\)，万有系数短正合列给出</p>
+
+\[
+0\to H_1(K;\mathbb Z)\otimes \mathbb Z/2\to H_1(K;\mathbb Z/2)\to \operatorname{Tor}(H_0(K;\mathbb Z),\mathbb Z/2)\to 0.
+\]
+
+<p>因为 \(H_0(K;\mathbb Z)\cong \mathbb Z\) 没有扭，所以末项为零，于是</p>
+
+\[
+H_1(K;\mathbb Z/2)\cong (\mathbb Z\oplus \mathbb Z/2)\otimes \mathbb Z/2.
+\]
+
+<p>再分别张量：</p>
+
+\[
+\mathbb Z\otimes \mathbb Z/2\cong \mathbb Z/2,\qquad
+(\mathbb Z/2)\otimes \mathbb Z/2\cong \mathbb Z/2.
+\]
+
+<p>因此</p>
+
+\[
+H_1(K;\mathbb Z/2)\cong \mathbb Z/2\oplus \mathbb Z/2.
+\]
+
+<p>这说明什么？说明原本在整数系数下那个“藏在扭项里的 \(\mathbb Z/2\)”一旦遇到 \(\mathbb Z/2\) 系数，就会被完整看见。你在正文里若发现某个空间用 \(\mathbb Z\) 系数时看起来信息不多，但换成 \(\mathbb Z/2\) 后 Betti 数突然变大，通常就是扭元素在通过 Tor 或张量积发声。Tor / Ext 的意义，正是在这种地方最容易被你手摸到，而不只是停在定义层面。</p>
+
+<p>若你想把 Tor 与 Ext 再摸实一点，最值得背的一组算式就是从短正合列</p>
+
+\[
+0\longrightarrow \mathbb Z\xrightarrow{\cdot n}\mathbb Z\longrightarrow \mathbb Z/n\longrightarrow 0
+\]
+
+<p>直接推出的结果。对任意阿贝尔群 \(A\)，把它张量上去会得到</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/n,A)\cong \{a\in A\mid na=0\}=A[n],
+\qquad
+(\mathbb Z/n)\otimes A\cong A/nA.
+\]
+
+<p>而对 \(\operatorname{Hom}(-,A)\) 做同样操作，则会得到</p>
+
+\[
+\operatorname{Ext}^1_{\mathbb Z}(\mathbb Z/n,A)\cong A/nA.
+\]
+
+<p>这几条式子把两种常见信息分得很清楚：Tor 盯的是“被 \(n\) 杀掉的扭元素”，Ext 盯的是“模去 \(n\) 倍以后还剩下什么”。名字虽然抽象，摸起来却非常具体。</p>
+<p>例如取 \(A=\mathbb Z/6\)。那么满足 \(4a=0\) 的元素只有 \(0\) 与 \(3\)，所以</p>
+
+\[
+\operatorname{Tor}_1^{\mathbb Z}(\mathbb Z/4,\mathbb Z/6)\cong \mathbb Z/2.
+\]
+
+<p>另一方面，\(4A=2A=\{0,2,4\}\)，故</p>
+
+\[
+(\mathbb Z/4)\otimes \mathbb Z/6\cong (\mathbb Z/6)/4(\mathbb Z/6)\cong \mathbb Z/2.
+\]
+
+<p>这个小算例很好，因为你能直接用手把元素列出来。它会训练你一种非常实用的直觉：Tor 往往在问“有哪些元素会被某个整数一下打死”，Ext 则常常在问“把某个倍数关系商掉以后，剩下的 extension 空间有多大”。以后你在万有系数定理、短正合列或系数变化里再次碰到它们时，就不会只把它们当成公式尾巴。</p>
+<p>从更高处看，Tor 与 Ext 之所以非得通过分解来定义，是因为很多函子并不完全保精确。把对象替换成投射分解或内射分解，再对整条分解施加张量积或 \(\operatorname{Hom}\)，最后取同调，这就是“导出”的核心思想。它和谱序列、分辨率、层上同调共享同一种哲学：先进入一个计算友好的分层世界，再把真正难看的误差项从同调里读出来。</p>
+<p>若你把这个视角和前面的 Snake 引理、长正合列放在一起看，会发现它们其实在服务同一个目标：普通函子一旦不再完全保精确，缺掉的信息不会无声蒸发，而会以连接同态、Tor、Ext 或更高导出函子的形式重新冒出来。同调代数最厉害的地方，就在于它不把这些“误差项”当作失败，而是把它们升级成新的对象来系统研究。很多现代数学看起来层层叠叠，骨子里不过是在反复做这件事。</p>
+<p>这也是为什么你一旦学会这套语言，后面遇到更复杂的谱序列、层上同调或导出范畴时，不会觉得它们完全换了学科；它们只是把这里的几条基本原则推得更远。</p>
+<h2 id="secB-6">B.6 这份工具箱真正该怎么用</h2>
+
+<p>如果你以后在正文里又看见链复形、长正合列、连接同态、Snake 引理，不要把它们当成彼此无关的术语。链复形提供骨架，短正合列把三台机器并排放在一起，Snake 引理解释连接箭头为什么会出现，长正合列则把这些箭头沿次数方向串起来。Tor 与 Ext 最后站出来，负责补足张量积和 Hom 在精确性上的亏空。</p>
+
+<p>换句话说，这一附录里的所有对象都在回答同一个问题：当你把一个复杂对象拆成一串群与映射之后，哪些信息会被保留，哪些信息会在做商、张量、Hom 时丢失，以及怎样把丢失的信息系统追回来。</p>
+
+<p>这就是同调代数的底层风格。它看上去在摆弄大量箭头和商群，实际上干的是一门非常务实的工作：给所有“局部数据如何组织成全局代数结论”的过程，造一套统一语法。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 范畴论小补：从函子到 Yoneda 的预热</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+
+</main>
+</body>
+</html>

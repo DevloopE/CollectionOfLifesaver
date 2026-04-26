@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 范畴论小补：从函子到 Yoneda 的预热 — 普林斯顿代数拓扑读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 应用：拓扑量子场论与不变量简介</a><a href="appB.html">下一章 · 附录 B 同调代数基础：链复形、长正合列、Snake 引理与 Tor / Ext →</a></nav>
+<h1 id="appA">附录 A 范畴论小补：从函子到 Yoneda 的预热</h1>
+
+<p>前面二十章里，我们已经反复在做一些很“范畴论”的事，只是还没正式叫出名字。比如你早就习惯了：一个连续映射 \(f\colon X\to Y\) 会诱导群同态</p>
+
+\[
+\pi_1(f)\colon \pi_1(X,x_0)\to \pi_1(Y,f(x_0)),
+\]
+
+<p>也会诱导同调群同态</p>
+
+\[
+H_n(f)\colon H_n(X)\to H_n(Y).
+\]
+
+<p>你也已经见过“两个不同构造之间还能自然地彼此对应”，例如 Hurewicz 映射把同伦类送进同调类。这整套语言如果只用“每次碰到一个映射就手工推一个诱导映射”去说，当然也能凑合；但一旦主题变多、构造变深，这样说会越来越笨。范畴论的作用，恰恰是把这种“对象与对象之间的映射，本身才是第一公民”的视角清楚地固定下来。</p>
+
+<p>这一附录不是一本迷你《范畴论》教材。目标只有两个。第一，把本书里其实已经默认用了很多次的几个词说准：范畴、函子、自然变换。第二，让你先感受一下 Yoneda 引理为什么会被称作“范畴论的心脏”。真正系统的版本，要等第 30 卷《范畴论》来展开；这里我们只搭好一座桥，让你以后走过去时不觉得突然。</p>
+
+<h2 id="secA-1">A.1 范畴：对象不是孤立的，箭头才是结构</h2>
+
+<p>一个范畴 \(\mathcal C\) 由三样东西组成：</p>
+
+\[
+\operatorname{Ob}(\mathcal C)\quad\text{对象},
+\qquad
+\operatorname{Hom}_{\mathcal C}(A,B)\quad\text{从 }A\text{ 到 }B\text{ 的态射集合},
+\]
+
+\[
+\circ\colon \operatorname{Hom}(B,C)\times \operatorname{Hom}(A,B)\to \operatorname{Hom}(A,C)\quad\text{复合}.
+\]
+
+<p>并满足两条公理：</p>
+
+\[
+h\circ(g\circ f)=(h\circ g)\circ f,
+\]
+
+\[
+\operatorname{id}_B\circ f=f,\qquad g\circ \operatorname{id}_B=g.
+\]
+
+<p>也就是说，复合要结合，每个对象要有恒等箭头。你可以把这看成“最少量的结构学”：不要求你先有加法、乘法、拓扑、度量，甚至不要求对象里有元素；只要求你知道对象之间能不能连箭头，以及箭头如何复合。</p>
+
+<p>本书最重要的几个范畴例子是：</p>
+
+\[
+\mathbf{Top}\quad\text{拓扑空间与连续映射},
+\]
+
+\[
+\mathbf{Top}_*\quad\text{带基点拓扑空间与保基点连续映射},
+\]
+
+\[
+\mathbf{Group}\quad\text{群与群同态},
+\qquad
+\mathbf{Ab}\quad\text{阿贝尔群与群同态}.
+\]
+
+<p>为什么要区分 \(\mathbf{Top}\) 和 \(\mathbf{Top}_*\)？因为基本群对基点敏感。你在<a href="ch4.html">第 4 章</a>已经看过，若不指定基点，\(\pi_1(X)\) 甚至连定义都不严谨；而同调群 \(H_n(X)\) 则不依赖基点，所以它自然活在 \(\mathbf{Top}\) 上。</p>
+
+<h2 id="secA-2">A.2 函子：把一种世界的箭头，系统翻译到另一种世界</h2>
+
+<p>函子就是范畴之间的“结构保持翻译器”。一个协变函子</p>
+
+\[
+F\colon \mathcal C\to \mathcal D
+\]
+
+<p>会把每个对象 \(A\in\mathcal C\) 送到一个对象 \(F(A)\in\mathcal D\)，把每个态射 \(f\colon A\to B\) 送到一个态射</p>
+
+\[
+F(f)\colon F(A)\to F(B),
+\]
+
+<p>并满足</p>
+
+\[
+\boxed{F(g\circ f)=F(g)\circ F(f),\qquad F(\operatorname{id}_A)=\operatorname{id}_{F(A)}.}
+\]
+
+<p>这两条式子太重要了。它们意味着“先在原范畴里复合再翻译”，和“先分别翻译再在目标范畴里复合”，结果一样；恒等箭头也保持不变。也就是说，函子不只是把对象配对，更把箭头网络整体搬过去。</p>
+
+<p>如果方向反过来，即</p>
+
+\[
+F\colon \mathcal C\to \mathcal D,\qquad f\colon A\to B\mapsto F(f)\colon F(B)\to F(A),
+\]
+
+<p>并满足</p>
+
+\[
+F(g\circ f)=F(f)\circ F(g),
+\]
+
+<p>那就叫反变函子。上同调 \(H^n\) 就是这种角色；前面第 15 章和第 16 章已经让你见过它。</p>
+
+<p>把这件事再往前压缩一步，就得到对偶范畴的语言。给定任意范畴 \(\mathcal C\)，可以造一个对偶范畴 \(\mathcal C^{op}\)：对象不变，但每条箭头全部反向。于是一个反变函子 \(\mathcal C\to\mathcal D\)，完全等价于一个协变函子 \(\mathcal C^{op}\to\mathcal D\)。这不是纯记号游戏，而是一个非常有用的整理动作。比如上同调最好就理解成</p>
+
+\[
+H^n\colon \mathbf{Top}^{op}\longrightarrow \mathbf{Ab},
+\]
+
+<p>这样你再看到拉回 \(f^*\) 时，就不会觉得“为什么方向老反着来”，而会明白：它只是因为你正在用的是对偶世界里的协变函子。</p>
+<p>这件事还能帮你分清两类常常长得很像、实则方向完全相反的探针。一个是 \(\operatorname{Hom}(C,-)\)，它问“从固定对象 \(C\) 射出去会看到什么”；另一个是 \(\operatorname{Hom}(-,C)\)，它问“别的对象射进 \(C\) 会看到什么”。在集合论层面它们只是把 \(C\) 放在不同位置，可到了拓扑与代数里，这两类探针记录的信息往往很不一样。Yoneda 引理之所以有协变版和反变版，正是因为这两种看世界的方向都同样基本。</p>
+<h2 id="secA-3">A.3 基本群为什么是函子：\(\mathbf{Top}_*\to \mathbf{Group}\)</h2>
+
+<p>现在正式说你在<a href="ch4.html">第 4 章</a>已经做过的事。对每个带基点空间 \((X,x_0)\)，我们赋予一个群</p>
+
+\[
+\pi_1(X,x_0).
+\]
+
+<p>对每个保基点连续映射</p>
+
+\[
+f\colon (X,x_0)\to (Y,y_0),
+\qquad f(x_0)=y_0,
+\]
+
+<p>定义诱导群同态</p>
+
+\[
+\pi_1(f)\colon \pi_1(X,x_0)\to \pi_1(Y,y_0),
+\qquad
+\pi_1(f)([\gamma])=[f\circ \gamma].
+\]
+
+<p>这当然得先检查良定义：若 \(\gamma_0\simeq \gamma_1\) 是保端点同伦，那么 \(f\circ\gamma_0\simeq f\circ\gamma_1\) 仍是保端点同伦，所以同伦类确实被送到同伦类。之后检查保复合：</p>
+
+\[
+\pi_1(g\circ f)([\gamma])
+=[(g\circ f)\circ \gamma]
+=[g\circ(f\circ\gamma)]
+=\pi_1(g)\bigl(\pi_1(f)([\gamma])\bigr).
+\]
+
+<p>于是</p>
+
+\[
+\boxed{\pi_1(g\circ f)=\pi_1(g)\circ \pi_1(f).}
+\]
+
+<p>对恒等映射也同样：</p>
+
+\[
+\pi_1(\operatorname{id}_X)([\gamma])=[\operatorname{id}_X\circ\gamma]=[\gamma].
+\]
+
+<p>所以基本群给出一个协变函子</p>
+
+\[
+\boxed{\pi_1\colon \mathbf{Top}_*\to \mathbf{Group}.}
+\]
+
+<h3 id="secA-3-1">一个完整例子：圆周上的 \(z\mapsto z^m\) 诱导什么群同态</h3>
+
+<p>取映射</p>
+
+\[
+f_m\colon S^1\to S^1,\qquad f_m(z)=z^m,
+\]
+
+<p>基点取 \(1\in S^1\)。你在<a href="ch5.html">第 5 章</a>已经知道</p>
+
+\[
+\pi_1(S^1,1)\cong \mathbb Z.
+\]
+
+<p>设 \([\gamma]\) 对应生成元 \(1\)，其中 \(\gamma(t)=e^{2\pi it}\)。那么</p>
+
+\[
+(f_m\circ \gamma)(t)=e^{2\pi i mt},
+\]
+
+<p>它正好绕圆 \(m\) 圈，所以</p>
+
+\[
+\pi_1(f_m)(1)=m.
+\]
+
+<p>更一般地，</p>
+
+\[
+\boxed{\pi_1(f_m)\colon \mathbb Z\to \mathbb Z,\qquad n\mapsto mn.}
+\]
+
+<p>这就是“函子性”最实在的样子：一个很几何的映射 \(z\mapsto z^m\)，被基本群翻译成了一个很代数的“乘以 \(m\)”的群同态。</p>
+
+<h2 id="secA-4">A.4 同调为什么是函子：\(\mathbf{Top}\to \mathbf{Ab}\)</h2>
+
+<p>同调的函子性与你在<a href="ch11.html">第 11 章</a>的构造是同一回事。给定连续映射</p>
+
+\[
+f\colon X\to Y,
+\]
+
+<p>每个奇异单形 \(\sigma\colon \Delta^n\to X\) 都可以和 \(f\) 复合，得到 \(f\circ \sigma\colon \Delta^n\to Y\)。于是 \(f\) 在链群上诱导链映射</p>
+
+\[
+f_\#\colon C_n(X)\to C_n(Y),
+\qquad
+f_\#(\sigma)=f\circ \sigma.
+\]
+
+<p>因为边界算子与复合可交换，满足</p>
+
+\[
+\partial\circ f_\#=f_\#\circ \partial,
+\]
+
+<p>所以 \(f_\#\) 会把循环送到循环、把边界送到边界，于是下降为同调群同态</p>
+
+\[
+H_n(f)\colon H_n(X)\to H_n(Y).
+\]
+
+<p>同样地，复合与恒等也都被保留：</p>
+
+\[
+\boxed{H_n(g\circ f)=H_n(g)\circ H_n(f),\qquad H_n(\operatorname{id}_X)=\operatorname{id}_{H_n(X)}.}
+\]
+
+<p>因此对每个固定的 \(n\)，同调给出一个协变函子</p>
+
+\[
+\boxed{H_n\colon \mathbf{Top}\to \mathbf{Ab}.}
+\]
+
+<p>这句话的价值，比“它是个函子”这五个字本身大得多。它意味着所有从映射导出的结构都自动兼容：包含映射、投影映射、商映射、同伦等价诱导的同构，都不需要你每次重新发明轮子。只要你先证明某个构造在链层面上是自然的，它就会在同调层面上系统成立。</p>
+
+<h2 id="secA-5">A.5 自然变换：不是只有对象会对应，构造之间也会对应</h2>
+
+<p>现在比函子再进一层。若 \(F,G\colon \mathcal C\to \mathcal D\) 是两个函子，一个自然变换</p>
+
+\[
+\eta\colon F\Rightarrow G
+\]
+
+<p>就是给每个对象 \(X\) 指定一个态射</p>
+
+\[
+\eta_X\colon F(X)\to G(X),
+\]
+
+<p>使得对每个态射 \(f\colon X\to Y\)，下图可交换：</p>
+
+\[
+G(f)\circ \eta_X=\eta_Y\circ F(f).
+\]
+
+<p>这不是一句形式主义废话。它说的是：从 \(F(X)\) 去 \(G(Y)\) 有两条路，先做 \(\eta\) 再做 \(G(f)\)，或者先做 \(F(f)\) 再做 \(\eta\)，结果必须一致。也就是说，\(\eta\) 不是零散地在每个对象上给一张箭头，而是以“对所有映射同时兼容”的方式给箭头。</p>
+
+<p>本书里最重要的例子之一，就是 Hurewicz 映射。对每个带基点空间 \((X,x_0)\)，有</p>
+
+\[
+h_X\colon \pi_1(X,x_0)\to H_1(X).
+\]
+
+<p>而且对每个保基点映射 \(f\colon (X,x_0)\to (Y,y_0)\)，满足</p>
+
+\[
+H_1(f)\circ h_X=h_Y\circ \pi_1(f).
+\]
+
+<p>这正是一张自然交换图。换句话说，Hurewicz 映射不是“每个空间上各自碰巧存在的一张箭头”，而是从基本群函子到第一同调函子的一个自然变换。</p>
+
+\[
+\boxed{h\colon \pi_1\Rightarrow H_1.}
+\]
+
+<p>你在<a href="ch18.html">第 18 章</a>看到的高阶 Hurewicz 映射，本质上也是同一件事。</p>
+
+<h2 id="secA-6">A.6 Yoneda 引理：一个对象由它和别人的所有箭头决定</h2>
+
+<p>终于到这份附录里最值得你先留下印象的一条定理。先固定一个范畴 \(\mathcal C\) 中的对象 \(C\)。它定义了一个从 \(\mathcal C\) 到集合范畴 \(\mathbf{Set}\) 的函子：</p>
+
+\[
+\operatorname{Hom}_{\mathcal C}(C,-)\colon X\mapsto \operatorname{Hom}_{\mathcal C}(C,X).
+\]
+
+<p>这叫可表函子。它的意思是：拿 \(C\) 当测试对象，去看 \(C\) 能怎么映进别的对象。Yoneda 引理说，如果 \(F\colon \mathcal C\to \mathbf{Set}\) 是任何函子，那么自然变换</p>
+
+\[
+\operatorname{Nat}\bigl(\operatorname{Hom}(C,-),F\bigr)
+\]
+
+<p>和集合 \(F(C)\) 一一对应：</p>
+
+\[
+\boxed{\operatorname{Nat}\bigl(\operatorname{Hom}_{\mathcal C}(C,-),F\bigr)\cong F(C).}
+\]
+
+<p>这条式子第一次看往往像咒语。其实它的意思很朴素：如果你知道“从 \(C\) 指向任何对象的箭头”怎样被自然地送到某个集合 \(F(X)\) 里，那么这一整套自然规则，完全等价于只指定 \(F(C)\) 里的一个元素。</p>
+
+<p>更通俗地说，<strong>对象 \(C\) 的全部信息，已经被“它朝外发出的所有箭头”编码了</strong>。这就是范畴论里极深的一种哲学：不要总想着对象内部长什么样，先看它如何与所有别的对象发生关系。</p>
+
+<p>在 \(\mathbf{Top}\) 里，\(\operatorname{Hom}(*,X)\) 基本就是 \(X\) 的点集；在带基点世界里，\(\operatorname{Hom}(S^n,X)\) 则逼近你在高阶同伦群里关心的“从球面进来的测试图”。到了更高阶的代数拓扑里，Eilenberg-MacLane 空间、表示上同调的理论、甚至 TQFT 里的函子观点，都带着浓厚的 Yoneda 味道。</p>
+
+<h3 id="secA-6-1">一个完整例子：为什么点对象已经能“表示”空间的点</h3>
+
+<p>若你觉得 Yoneda 还是太像咒语，最好的解毒办法是先看 \(\mathbf{Top}\) 里最便宜的例子。取单点空间 \(*\)。那么对任何拓扑空间 \(X\)，从 \(*\) 到 \(X\) 的连续映射只有一种数据：它把唯一那个点送到 \(X\) 的哪个点。所以</p>
+
+\[
+\operatorname{Hom}_{\mathbf{Top}}(*,X)\cong X
+\]
+
+<p>（右边暂时只当作集合看待）。也就是说，空间 \(X\) 的所有点，已经完全编码在“从单点对象射进 \(X\) 的所有箭头”里了。于是当你看到</p>
+
+\[
+\operatorname{Hom}(*,-)
+\]
+
+<p>这个函子时，别把它当成奇怪记号；它其实就是“取底层点集”的一种纯范畴表达。</p>
+
+<p>同样地，若把测试对象从 \(*\) 换成 \(S^1\)，那么</p>
+
+\[
+\operatorname{Hom}_{\mathbf{Top}_*}(S^1,X)
+\]
+
+<p>就开始记录 \(X\) 里的基点环路；再按同伦关系做商，便走向 \(\pi_1(X)\)。若测试对象换成 \(S^n\)，便走向高阶同伦群。于是你可以把 Yoneda 的直觉版本先记成一句很实在的话：<strong>选不同的测试对象，就是在问空间对不同探针的响应；而空间本身，恰恰由它对所有探针的响应方式共同决定</strong>。这句话以后会在表示函子、Eilenberg-MacLane 空间和 TQFT 的状态-边界对应里一再重现。</p>
+
+<p>再往前迈半步，就是“泛性质”与“伴随”的直觉。自由群函子 \(F\colon \mathbf{Set}\to\mathbf{Group}\) 与忘却函子 \(U\colon \mathbf{Group}\to\mathbf{Set}\) 满足：给一个集合映射 \(S\to U(G)\)，等价于给一个群同态 \(F(S)\to G\)。这说明“自由群”不是靠某种神秘构造被定义出来的，而是靠一个最优的映射性质被刻画出来的。积、余积、商、张量积、甚至很多拓扑构造，真正稳固的定义也都更像这种“满足唯一映射性质的对象”，而不是先写出若干元素再碰运气检查它好不好用。</p>
+<p>代数拓扑里最著名的伴随影子之一，就是悬挂与 loop space 的关系。严格说这要在同伦范畴里陈述，但你在<a href="ch19.html">第 19 章</a>已经见过它的味道：把“从某个空间映到 loop space”改写成“从它的悬挂映到原空间”，会让很多看似不同的构造突然互相对齐。第 30 卷《范畴论》真正展开伴随时，你会发现这不是额外装饰，而是大量几何构造之所以彼此咬合的核心原因。</p>
+<p>最后再提醒你一件很实用的小事：范畴论里那些交换图绝不是排版装饰。它们是在压缩一句很长的数学中文，例如“无论你先做这个构造还是先做那个构造，结果都一样”。一张图一旦可交换，后面很多验证就能从“逐个元素追踪”改成“检查几条箭头是否兼容”。这也是为什么自然变换、泛性质、伴随这些概念看起来抽象，实际却极其省力：它们把重复证明压缩成图的兼容性。</p>
+<h2 id="secA-7">A.7 这份小补丁真正想让你带走什么</h2>
+
+<p>范畴告诉你，数学对象最好连同它们之间的箭头一起看；函子告诉你，一门理论的真正力量，往往体现在它怎样系统翻译映射；自然变换告诉你，构造和构造之间的比较也必须对所有箭头同时兼容；Yoneda 则进一步说，对象甚至可以由它和别人的全部箭头关系来重建。</p>
+
+<p>这几句话听起来很抽象，但本书其实已经把它们用了一路。基本群、同调、上同调、谱序列、TQFT，没有一个是真的只关心“单个对象”；它们永远关心映射如何诱导、拼接如何兼容、比较如何自然。只不过到这里，我们终于给这层共通语言配上了名字。</p>
+
+<p>到第 30 卷《范畴论》时，你会看到这里略过的大量内容：反变函子、伴随、极限与余极限、表示对象、阿贝尔范畴、导出函子。那时你回头看这份附录，应该会觉得它像是一次轻量级热身，而不是一次突兀换轨。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 应用：拓扑量子场论与不变量简介</a><a href="appB.html">下一章 · 附录 B 同调代数基础：链复形、长正合列、Snake 引理与 Tor / Ext →</a></nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,1015 @@
+<h1 id="ch15">第 15 章 上同调 \(H^n\)</h1>
+
+<p>到目前为止，我们一直在用同调群 \(H_n(X)\) 记录空间里有什么 \(n\) 维洞。这个语言已经很有力量：它能区分球面、环面、莫比乌斯带、Klein 瓶，也能通过 Mayer-Vietoris 把复杂空间拆开重算。可如果你继续往后读，就会很快碰到一个新问题：同调群是一个很好的<strong>加法型</strong>不变量，但它还不够会“做乘法”。我们想知道的不只是“这里有几个一维洞、几个二维洞”，还想知道“这些洞彼此怎么交、怎么叠、怎么耦合”。这时直接从链群往前走就开始吃力，于是上同调登场。</p>
+
+<p>第一次见到上同调，很多人会觉得它像是“又把同调重新讲了一遍，只不过把箭头方向反过来”。这话不算错，但太轻描淡写了。真正应该记住的是：<strong>同调在收集几何循环，上同调在给这些循环安排测试函数。</strong> 同调类像是被你拿在手里的闭回路、闭曲面；上同调类像是某种“测量规则”，它告诉你每个循环会得到多少读数，而这个读数在加边界时不应该被扰动。你在 <a href="../多元微积分/ch21.html">《多元微积分读本》第 21 章</a> 学过保守场与路径无关；你在 <a href="../复分析/ch10.html">《复分析读本》第 10 章</a> 学过闭曲线积分能读出绕数。把这些现象抽象掉，背后就是“上同调类作用在同调类上”。</p>
+
+<p>这一章我们会先把对偶链群 \(C^n=\operatorname{Hom}(C_n,R)\) 定义出来，再定义上边界算子 \(\delta\)，然后把上同调群</p>
+
+\[
+H^n(X;R)=\ker \delta^n/\operatorname{im}\delta^{n-1}
+\]
+
+<p>真正算给你看。接着我们解释它为什么与同调是对偶关系：一个 cocycle 会在 cycles 上给出良定义的数，而 exact cochain 给不出新的信息。最后用万有系数定理的简化版本把这句话压缩成最常用的公式：在实系数或更一般的向量空间系数下，上同调就是同调的线性对偶。到那时你会看见，上同调并没有凭空多造出一套宇宙；它只是把前一章那些洞从“几何对象”变成了“可被测量的对象”。</p>
+
+<h2 id="sec15-1">15.1 为什么要把链群对偶化</h2>
+
+<p>先从一个非常朴素的观察开始。第 <a href="ch10.html">10 章</a> 到第 <a href="ch13.html">13 章</a> 里，我们反复把空间剖成单形、胞腔或者奇异单形，然后把这些东西线性组合起来，形成链群 \(C_n(X)\)。边界算子</p>
+
+\[
+\partial_n:C_n(X)\to C_{n-1}(X)
+\]
+
+<p>把一个 \(n\) 维链送到它的 \((n-1)\) 维边界。于是 cycles 是 \(\ker\partial_n\)，boundaries 是 \(\operatorname{im}\partial_{n+1}\)，同调群是它们的商。这是“从几何对象往下切边界”的语言。</p>
+
+<p>可很多时候，我们真正做的并不是“再拿一个链出来”，而是“给这个链一个数”。例如：</p>
+
+<ul>
+  <li>对一条闭曲线 \(\gamma\)，你可以积分 \(\int_\gamma \omega\)；</li>
+  <li>对一个二维闭曲面 \(\Sigma\)，你可以计算穿过它的通量；</li>
+  <li>对复平面里的一条曲线，你可以积分 \(\frac{1}{2\pi i}\int_\gamma \frac{dz}{z}\) 得到绕数。</li>
+</ul>
+
+<p>这些操作有一个共同点：它们都不是再生产一个新链，而是把链送到一个系数域或系数环里的元素，通常是 \(\mathbb R\)、\(\mathbb Z\) 或 \(\mathbb Z/2\)。也就是说，它们本质上是某种线性泛函。</p>
+
+<p>这正是对偶空间的思路。你在 <a href="../线性代数/ch10.html">《线性代数读本》第 10 章</a> 把向量空间换一个角度看成“所有线性函数的集合”时，已经摸过这个门把手。现在只是把有限维向量空间换成了链群：</p>
+
+\[
+\boxed{C^n(X;R)=\operatorname{Hom}(C_n(X;\mathbb Z),R).}
+\]
+
+<p>这里 \(R\) 是系数环或阿贝尔群。\(C^n\) 的元素叫做 \(n\) 阶<strong>上链</strong>。一句话解释：它是“给每个 \(n\) 维链分配一个 \(R\) 中元素，并且对加法线性”的规则。</p>
+
+<p>如果你觉得 \(\operatorname{Hom}\) 这个记号有点抽象，那就把一个上链 \(\varphi\in C^n(X;R)\) 直接想成</p>
+
+\[
+\varphi:C_n(X)\to R
+\]
+
+<p>的一条线性函数。你喂给它一个 \(n\) 维链 \(c\)，它吐出一个数 \(\varphi(c)\)。你喂进去和式，它就按线性性把数加起来。</p>
+
+<p>来做一个最小的具体例子。若 \(X\) 只有一个 1-单形 \(e\) 和一个 0-单形 \(v\)，那么</p>
+
+\[
+C_1(X;\mathbb Z)\cong \mathbb Z,\qquad C_0(X;\mathbb Z)\cong \mathbb Z.
+\]
+
+<p>于是取实系数时，</p>
+
+\[
+C^1(X;\mathbb R)=\operatorname{Hom}(\mathbb Z,\mathbb R)\cong \mathbb R,
+\qquad
+C^0(X;\mathbb R)=\operatorname{Hom}(\mathbb Z,\mathbb R)\cong \mathbb R.
+\]
+
+<p>为什么 \(\operatorname{Hom}(\mathbb Z,\mathbb R)\cong\mathbb R\)？因为一个从 \(\mathbb Z\) 到 \(\mathbb R\) 的群同态完全由 1 的像决定：你指定 \(\varphi(1)=a\)，就有 \(\varphi(k)=ka\)。所以一个上链其实就是“给每个基本单形指定一个系数”。这和在线性代数里“对偶向量由基上的取值决定”是同一件事。</p>
+
+<p>所以第一眼别把上同调看成一堆新符号。它真正做的是把“构造几何链”的语言，翻面成“测试几何链”的语言。前者给出同调，后者给出上同调。</p>
+
+<h2 id="sec15-2">15.2 上边界算子 \(\delta\)：它只是 \(\partial\) 的对偶</h2>
+
+<p>一旦有了上链空间 \(C^n\)，下一件事当然是：链复形那条箭头怎么反过来？答案非常自然。既然边界算子 \(\partial\) 把 \(n\) 维链送到 \((n-1)\) 维链，那么一个 \((n-1)\) 阶上链 \(\varphi\) 就可以先吃 \(\partial c\)，再对 \(c\) 产出一个值。于是定义</p>
+
+\[
+\delta^n:C^n(X;R)\to C^{n+1}(X;R)
+\]
+
+<p>为</p>
+
+\[
+\boxed{(\delta\varphi)(c)=\varphi(\partial c),\qquad c\in C_{n+1}(X).}
+\]
+
+<p>这就是<strong>上边界算子</strong>，也常叫 coboundary。你可以把它读成：“\(\delta\varphi\) 在一个高一维链上的读数，就是 \(\varphi\) 在那个链的边界上的读数。”</p>
+
+<p>这里最重要的不是定义本身，而是它立刻继承了</p>
+
+\[
+\partial^2=0
+\]
+
+<p>这件事。因为对任意 \(\varphi\in C^n\) 和任意 \(c\in C_{n+2}\)，</p>
+
+\[
+(\delta^{n+1}\delta^n\varphi)(c)
+=(\delta^n\varphi)(\partial c)
+=\varphi(\partial\partial c)
+=\varphi(0)
+=0.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{\delta^{n+1}\circ\delta^n=0.}
+\]
+
+<p>也就是说，cochain complex 确实是一条复形：</p>
+
+\[
+0\longrightarrow C^0(X;R)\xrightarrow{\delta^0}
+C^1(X;R)\xrightarrow{\delta^1}
+C^2(X;R)\xrightarrow{\delta^2}\cdots
+\]
+
+<p>这和链复形</p>
+
+\[
+\cdots\xrightarrow{\partial_2} C_1(X)\xrightarrow{\partial_1} C_0(X)\to 0
+\]
+
+<p>恰好箭头反向。</p>
+
+<p>来把这个定义算在一个三角形边界上。取 \(X=\partial\Delta^2\cong S^1\)，边有 \(e_{01},e_{12},e_{20}\)。设 \(\varphi\in C^1(X;\mathbb R)\) 满足</p>
+
+\[
+\varphi(e_{01})=1,\qquad
+\varphi(e_{12})=1,\qquad
+\varphi(e_{20})=1.
+\]
+
+<p>注意在 \(\partial\Delta^2\) 里，2-单形本身不在空间里，所以没有真正的 \(2\)-链来检验 \(\delta\varphi\)。换句话说</p>
+
+\[
+C_2(X)=0,\qquad C^2(X)=0.
+\]
+
+<p>于是自动有</p>
+
+\[
+\delta\varphi=0.
+\]
+
+<p>这说明 \(\varphi\) 是一个 1-cocycle。几何上，它在整条圆周上每一段都给出“1”的读数，绕一圈累加就是 3；若你改换归一化，也可以让它在整圈上读出 1。你应该开始感觉到：cocycle 已经像某种“沿环路计数”的规则了。</p>
+
+<p>再看一个 0-上链的例子。设 \(\psi\in C^0(X;\mathbb R)\) 在三个顶点上的取值分别为</p>
+
+\[
+\psi(v_0)=a,\qquad \psi(v_1)=b,\qquad \psi(v_2)=c.
+\]
+
+<p>那么对有向边 \(e_{01}\)，由于</p>
+
+\[
+\partial e_{01}=v_1-v_0,
+\]
+
+<p>所以</p>
+
+\[
+(\delta\psi)(e_{01})=\psi(v_1-v_0)=b-a.
+\]
+
+<p>同理，</p>
+
+\[
+(\delta\psi)(e_{12})=c-b,\qquad
+(\delta\psi)(e_{20})=a-c.
+\]
+
+<p>这跟多元微积分里“函数的微分在边上测出端点值之差”是不是很像？确实像。exact cochain 就是那种“由低一维势函数取差得到”的对象；closed cochain 则是“沿边界总和为零”的对象。只不过现在我们还没有把“微分形式”正式搬进来，而是在纯链复形层面先把骨架搭好。</p>
+
+<h2 id="sec15-3">15.3 上同调群 \(H^n\)：closed 与 exact 的商</h2>
+
+<p>一旦有了 \(\delta^2=0\)，定义就和同调那边完全平行了。我们把</p>
+
+\[
+Z^n(X;R)=\ker\delta^n
+\]
+
+<p>叫做 \(n\) 阶 cocycles，把</p>
+
+\[
+B^n(X;R)=\operatorname{im}\delta^{n-1}
+\]
+
+<p>叫做 \(n\) 阶 coboundaries。因为 \(\delta^2=0\)，有 \(B^n\subseteq Z^n\)。于是</p>
+
+\[
+\boxed{H^n(X;R)=Z^n(X;R)/B^n(X;R)}
+\]
+
+<p>称为 \(X\) 的第 \(n\) 阶上同调群。</p>
+
+<p>这一定义和同调的哲学完全对应：</p>
+
+<ul>
+  <li>cocycle 是“没有再高一层变化”的测试规则；</li>
+  <li>coboundary 是“从低一层势函数取差得到”的测试规则；</li>
+  <li>上同调类记录的是那些闭但不恰当的测试规则。</li>
+</ul>
+
+<p>别被“闭”“恰当”这组词吓住。它们只是为以后微分形式语言做铺垫。现在你完全可以把 \(H^n\) 读成：<strong>所有在边界上自动给零的 \(n\) 维测量规则，模掉那些其实只是低维势函数差值的规则。</strong></p>
+
+<p>现在开始真算。</p>
+
+<h3 id="sec15-3-1">例一：一点的上同调</h3>
+
+<p>若 \(X=\{\ast\}\) 是一点，则</p>
+
+\[
+C_0(X;\mathbb R)\cong \mathbb R,\qquad C_n(X;\mathbb R)=0\ (n\ge 1).
+\]
+
+<p>于是对偶后得到</p>
+
+\[
+C^0(X;\mathbb R)\cong \mathbb R,\qquad C^n(X;\mathbb R)=0\ (n\ge 1).
+\]
+
+<p>因此</p>
+
+\[
+H^0(X;\mathbb R)\cong \mathbb R,\qquad H^n(X;\mathbb R)=0\ (n\ge 1).
+\]
+
+<p>这和同调完全平行：一点只有连通成分，没有高维洞。</p>
+
+<h3 id="sec15-3-2">例二：圆周 \(S^1\)</h3>
+
+<p>用最省事的 CW 结构：一个 0-胞腔 \(e^0\)，一个 1-胞腔 \(e^1\)。于是 cellular chain complex 是</p>
+
+\[
+0\longrightarrow C_1\cong R \xrightarrow{\partial_1=0} C_0\cong R\longrightarrow 0.
+\]
+
+<p>对偶后得到</p>
+
+\[
+0\longrightarrow C^0\cong R \xrightarrow{\delta^0=0} C^1\cong R\longrightarrow 0.
+\]
+
+<p>所以</p>
+
+\[
+H^0(S^1;R)\cong R,\qquad H^1(S^1;R)\cong R.
+\]
+
+<p>这里的 \(H^1\cong R\) 非常重要。它说圆周上有一个本质的一维“测量类”，能对绕圈的 1-cycle 给出非零读数。你在多元微积分里见过的角形式</p>
+
+\[
+\omega=\frac{-y\,dx+x\,dy}{x^2+y^2}
+\]
+
+<p>在 \(\mathbb R^2\setminus\{0\}\) 上就是这个类的微分形式模型；它沿单位圆积分为 \(2\pi\)。你在 <a href="../复分析/ch10.html">《复分析读本》第 10 章</a> 用 \(\frac{dz}{z}\) 算绕数时，其实已经在与 \(H^1(S^1)\) 打照面了。</p>
+
+<h3 id="sec15-3-3">例三：球面 \(S^n\)</h3>
+
+<p>取球面的标准 CW 结构：一个 0-胞腔和一个 \(n\)-胞腔，中间没有别的胞腔。于是</p>
+
+\[
+C_k(S^n;R)=
+\begin{cases}
+R,&k=0,n,\\
+0,&\text{其余}.
+\end{cases}
+\]
+
+<p>所有边界映射都为 0，因此对偶后所有 coboundary 也都为 0。于是</p>
+
+\[
+H^k(S^n;R)=
+\begin{cases}
+R,&k=0,n,\\
+0,&\text{其余}.
+\end{cases}
+\]
+
+<p>这说明上同调和同调在球面上给出相同的 Betti 数。可你别太早把它当成巧合；第 17 章 Poincar&eacute; 对偶会告诉你，闭定向流形上这种“上下呼应”并不是偶然。</p>
+
+<h3 id="sec15-3-4">例四：射影平面 \(\mathbb RP^2\) 的实系数上同调</h3>
+
+<p>这例子非常值钱，因为它会让你亲眼看见“torsion 在实系数里消失”。\(\mathbb RP^2\) 的 CW 结构有一个 0-胞腔、一个 1-胞腔、一个 2-胞腔，边界为</p>
+
+\[
+\partial_1=0,\qquad \partial_2=2.
+\]
+
+<p>因此 cochain complex 是</p>
+
+\[
+0\longrightarrow C^0\cong \mathbb R
+\xrightarrow{\delta^0=0}
+C^1\cong \mathbb R
+\xrightarrow{\delta^1=2}
+C^2\cong \mathbb R
+\longrightarrow 0.
+\]
+
+<p>这里“\(\delta^1=2\)”的意思就是乘以 2。可在 \(\mathbb R\) 上，乘以 2 是同构，所以</p>
+
+\[
+\ker\delta^1=0,\qquad \operatorname{im}\delta^1=\mathbb R.
+\]
+
+<p>于是</p>
+
+\[
+H^0(\mathbb RP^2;\mathbb R)\cong \mathbb R,\qquad
+H^1(\mathbb RP^2;\mathbb R)=0,\qquad
+H^2(\mathbb RP^2;\mathbb R)=0.
+\]
+
+<p>对照第 <a href="ch13.html">13 章</a> 的整数同调，你会记得 \(\mathbb RP^2\) 的 \(H_1\) 里藏着一个 \(\mathbb Z/2\)。现在它不见了，因为从 \(\mathbb Z/2\) 到 \(\mathbb R\) 没有任何非零群同态。这个现象在万有系数定理里会被一口气说透。</p>
+
+<h2 id="sec15-4">15.4 上同调与同调的配对：cocycle 为什么能作用在 cycle 上</h2>
+
+<p>现在终于说本章最核心的直觉。一个 cocycle \(\varphi\in Z^n(X;R)\) 为什么能看成某种“同调类上的线性函数”？答案几乎写在定义里。</p>
+
+<p>设 \(z\in Z_n(X)\) 是一个 \(n\)-cycle，也就是 \(\partial z=0\)。那么 \(\varphi(z)\) 是一个 \(R\) 中元素。若我们把 \(z\) 换成同调等价的另一个 cycle，即</p>
+
+\[
+z'=z+\partial c,
+\]
+
+<p>则</p>
+
+\[
+\varphi(z')=\varphi(z)+\varphi(\partial c)=\varphi(z)+(\delta\varphi)(c)=\varphi(z),
+\]
+
+<p>因为 \(\delta\varphi=0\)。所以 cocycle 在同调等价的 cycle 上取值相同。</p>
+
+<p>反过来，若把 cocycle 换成同一上同调类里的另一个代表，也就是</p>
+
+\[
+\varphi'=\varphi+\delta\psi,
+\]
+
+<p>那么对任意 cycle \(z\) 有</p>
+
+\[
+\varphi'(z)=\varphi(z)+(\delta\psi)(z)=\varphi(z)+\psi(\partial z)=\varphi(z),
+\]
+
+<p>因为 \(\partial z=0\)。所以 exact 的改动不会改变对 cycle 的读数。</p>
+
+<p>于是评价式</p>
+
+\[
+\boxed{\langle[\varphi],[z]\rangle=\varphi(z)}
+\]
+
+<p>在商群上良定义，给出一个自然配对</p>
+
+\[
+H^n(X;R)\times H_n(X;\mathbb Z)\longrightarrow R.
+\]
+
+<p>这条配对值得你反复咀嚼。它说明一个上同调类 \([\varphi]\) 的真正内容，不是“某个神秘的 \(\operatorname{Hom}\) 元素”，而是：它会怎样在每个 \(n\)-维同调类上产出读数。也就是说，</p>
+
+\[
+\text{上同调类 } \approx \text{ 同调类上的线性测量规则。}
+\]
+
+<p>圆周例子最能说明这件事。设 \([S^1]\in H_1(S^1;\mathbb Z)\) 是生成元，而 \([\omega]\in H^1(S^1;\mathbb R)\) 是前面提到的角形式类。那么</p>
+
+\[
+\langle[\omega],[S^1]\rangle=\int_{S^1}\omega=2\pi.
+\]
+
+<p>若你把 \(\omega\) 除以 \(2\pi\)，就得到一个标准化生成元 \(\eta\)，满足</p>
+
+\[
+\langle[\eta],[S^1]\rangle=1.
+\]
+
+<p>这就是“上同调类作为同调类的对偶基向量”的最经典画面。你以后看到“某个 1-form 沿基本环路积分为 1”时，脑子里要自动跳出：这不是偶然算对了，而是在选取 \(H^1\) 与 \(H_1\) 的对偶基。</p>
+
+<p>再做一个二维例子。对环面 \(T^2=S^1\times S^1\)，有两条基本 1-cycle：</p>
+
+\[
+a=S^1\times\{\ast\},\qquad b=\{\ast\}\times S^1.
+\]
+
+<p>若 \(\alpha,\beta\in H^1(T^2;\mathbb R)\) 满足</p>
+
+\[
+\langle \alpha,[a]\rangle=1,\quad \langle \alpha,[b]\rangle=0,
+\]
+
+\[
+\langle \beta,[a]\rangle=0,\quad \langle \beta,[b]\rangle=1,
+\]
+
+<p>那么 \(\alpha,\beta\) 就是 \(H^1(T^2)\) 的对偶基。下一章的杯积会告诉你，\(\alpha\smile\beta\) 还会进一步记下 \(T^2\) 的 2-维基本类。这就是为什么上同调比单纯的“同调对偶”更有野心：它不只会对偶，还会相乘。</p>
+
+<h2 id="sec15-5">15.5 万有系数定理的简版：实系数下，上同调就是同调的对偶</h2>
+
+<p>上节只是告诉你“有一个自然配对”。现在我们要问：这个配对什么时候足够强，强到把 \(H^n\) 和 \(\operatorname{Hom}(H_n,R)\) 直接识别起来？答案由万有系数定理给出。</p>
+
+<p>一般地，对任意阿贝尔群系数 \(G\)，有一个短正合列</p>
+
+\[
+0\longrightarrow \operatorname{Ext}\bigl(H_{n-1}(X;\mathbb Z),G\bigr)
+\longrightarrow H^n(X;G)
+\longrightarrow \operatorname{Hom}\bigl(H_n(X;\mathbb Z),G\bigr)
+\longrightarrow 0.
+\]
+
+<p>这就是上同调版的万有系数定理。别被 \(\operatorname{Ext}\) 吓住。对本章最常用的系数 \(G=\mathbb R\) 而言，\(\mathbb R\) 是可除群，\(\operatorname{Ext}(-,\mathbb R)=0\)。于是上式直接坍缩成</p>
+
+\[
+\boxed{H^n(X;\mathbb R)\cong \operatorname{Hom}\bigl(H_n(X;\mathbb Z),\mathbb R\bigr).}
+\]
+
+<p>这就是你最该记住的版本。它说：<strong>实系数上同调就是整数同调的实线性对偶。</strong></p>
+
+<p>再把一个有限生成阿贝尔群分解成自由部分和挠部分：</p>
+
+\[
+H_n(X;\mathbb Z)\cong \mathbb Z^{b_n}\oplus T_n,
+\]
+
+<p>其中 \(T_n\) 是有限挠群。于是</p>
+
+\[
+\operatorname{Hom}(H_n(X;\mathbb Z),\mathbb R)
+\cong
+\operatorname{Hom}(\mathbb Z^{b_n},\mathbb R)\oplus \operatorname{Hom}(T_n,\mathbb R).
+\]
+
+<p>而有限挠群到 \(\mathbb R\) 的同态必为零，所以</p>
+
+\[
+\operatorname{Hom}(T_n,\mathbb R)=0.
+\]
+
+<p>因此</p>
+
+\[
+H^n(X;\mathbb R)\cong \mathbb R^{b_n}.
+\]
+
+<p>这说明实系数上同调只看 Betti 数，看不见 torsion。你现在应该明白刚才 \(\mathbb RP^2\) 例子里发生了什么：\(\mathbb Z/2\) 的那一截被“实系数对偶”自动抹掉了。</p>
+
+<p>如果你还想把“整数上同调”和“实上同调”直接连起来，那么在有限生成情形下还有</p>
+
+\[
+H^n(X;\mathbb Z)\otimes \mathbb R \cong H^n(X;\mathbb R),
+\]
+
+<p>从而</p>
+
+\[
+\boxed{H^n(X;\mathbb Z)\otimes\mathbb R
+\cong H^n(X;\mathbb R)
+\cong \operatorname{Hom}(H_n(X;\mathbb Z),\mathbb R).}
+\]
+
+<p>这基本就是用户提示里那条“\(H^n\otimes R\cong \operatorname{Hom}(H_n,R)\)”在实系数下的严格版本。写成这样，逻辑就清楚了：左边是把整数上同调张量到实数域，右边是把整数同调拿去取实对偶；两边都只保留自由部分。</p>
+
+<p>来把这条公式落在两个熟悉空间上。</p>
+
+<h3 id="sec15-5-1">例五：Klein 瓶</h3>
+
+<p>第 <a href="ch13.html">13 章</a> 我们算过</p>
+
+\[
+H_1(K;\mathbb Z)\cong \mathbb Z\oplus \mathbb Z/2.
+\]
+
+<p>于是</p>
+
+\[
+H^1(K;\mathbb R)\cong \operatorname{Hom}(\mathbb Z\oplus \mathbb Z/2,\mathbb R)
+\cong \mathbb R.
+\]
+
+<p>那块 \(\mathbb Z/2\) 不会贡献任何实系数 1-上同调类。所以若你只看 \(\mathbb R\) 系数，Klein 瓶的一维 cohomology 维数是 1，不是 2。</p>
+
+<h3 id="sec15-5-2">例六：环面 \(T^2\)</h3>
+
+<p>因为</p>
+
+\[
+H_1(T^2;\mathbb Z)\cong \mathbb Z^2,
+\]
+
+<p>所以</p>
+
+\[
+H^1(T^2;\mathbb R)\cong \operatorname{Hom}(\mathbb Z^2,\mathbb R)\cong \mathbb R^2.
+\]
+
+<p>也就是说，恰好有两个独立的一维测量规则，对偶于两条基本环路。这个结果你其实已经在上一节的配对中预支过一次；万有系数定理现在只是把它系统化了。</p>
+
+<h2 id="sec15-6">15.6 三个典型空间：点、球面、环面的上同调图景</h2>
+
+<p>现在把这一章最常用的三个样板空间放在一起看，会很有帮助。</p>
+
+<h3 id="sec15-6-1">点与连通分支：\(H^0\) 在记录什么</h3>
+
+<p>对任意空间 \(X\)，\(H^0(X;R)\) 记录的是连通分支上的常数函数空间。若 \(X\) 有 \(m\) 个道路连通分支，那么</p>
+
+\[
+H^0(X;R)\cong R^m.
+\]
+
+<p>为什么？因为 0-cocycle 的条件正是“在每条边两端取值相同”，于是每个连通分支上只能取一个常数；而 0-coboundary 又总是 0。这个现象和同调里的 \(H_0\) 完全平行，只不过现在它更像“每个分支上一份读数”。</p>
+
+<h3 id="sec15-6-2">球面：只有顶维与 0 维活着</h3>
+
+<p>前面已经算过</p>
+
+\[
+H^k(S^n;R)=
+\begin{cases}
+R,&k=0,n,\\
+0,&\text{其余}.
+\end{cases}
+\]
+
+<p>这说明球面没有非平凡的一维或中间维测量规则。你在第 <a href="ch14.html">14 章</a> 用度数研究 \(S^n\to S^n\) 时，靠的是顶维同调 \(H_n(S^n)\cong \mathbb Z\)；现在对应的顶维上同调 \(H^n(S^n)\cong R\) 会在第 17 章变成基本类的对偶代表。</p>
+
+<h3 id="sec15-6-3">环面：两个一维方向与一个二维整体</h3>
+
+<p>对 \(T^2\) 取一个 0-胞腔、两条 1-胞腔、一个 2-胞腔的 CW 结构，则 cellular chain complex 的边界全为 0，于是 cochain complex 也是</p>
+
+\[
+0\longrightarrow R \xrightarrow{0} R^2 \xrightarrow{0} R\longrightarrow 0.
+\]
+
+<p>因此</p>
+
+\[
+H^0(T^2;R)\cong R,\qquad
+H^1(T^2;R)\cong R^2,\qquad
+H^2(T^2;R)\cong R.
+\]
+
+<p>这和同调的 Betti 数一一对应：一个连通分支、两条基本 1-环路、一个整体 2-维基本类。但真正精彩的地方在下一章：这两个 \(H^1\) 生成元不是孤立摆着的，它们还能杯积成 \(H^2\) 的生成元。也就是说，环面的一维信息彼此能相乘出二维信息。</p>
+
+<p>这里你应该感受到一个风向变化。只看群结构时，点、球面、环面的上同调似乎只是“把同调再抄一遍”。但一旦乘法来了，这些群就会开始说比 Betti 数更多的话。所以下一章不是附加内容，而是上同调真正开始有牙齿的地方。</p>
+
+<h2 id="sec15-7">15.7 再做两个完整计算：图空间、圆柱与环面</h2>
+
+<p>前面那些例子已经够你上手，但还不够你形成“拿到一个 CW 结构后，cohomology 真是怎么一步步算出来的”肌肉记忆。这里我们故意把三个彼此相邻、但性质不同的空间摆在一起：字母 8 形 \(S^1\vee S^1\)、圆柱 \(S^1\times I\)、环面 \(T^2\)。你会看到它们的一维部分看起来像一家人，可二维部分会突然分叉，这正是下一章杯积要大显身手的地方。</p>
+
+<h3 id="sec15-7-1">例七：8 字形 \(S^1\vee S^1\)</h3>
+
+<p>取一个 0-胞腔 \(e^0\)，两条 1-胞腔 \(a,b\)，都从基点出发又回到基点。于是 cellular chain complex 是</p>
+
+\[
+0\longrightarrow C_1\cong R^2\xrightarrow{\partial_1=0} C_0\cong R\longrightarrow 0.
+\]
+
+<p>对偶后得到</p>
+
+\[
+0\longrightarrow C^0\cong R\xrightarrow{\delta^0=0} C^1\cong R^2\longrightarrow 0.
+\]
+
+<p>因此</p>
+
+\[
+H^0(S^1\vee S^1;R)\cong R,\qquad H^1(S^1\vee S^1;R)\cong R^2,
+\]
+
+<p>更高维全为 0。你可以把 \(H^1\) 的两个基想成“读第一圈绕了几次”和“读第二圈绕了几次”的两条独立规则。若 \(\alpha,\beta\) 是这组基，那么对由两条圆分别给出的 1-cycle \([a],[b]\) 有</p>
+
+\[
+\langle \alpha,[a]\rangle=1,\quad \langle \alpha,[b]\rangle=0,
+\]
+
+\[
+\langle \beta,[a]\rangle=0,\quad \langle \beta,[b]\rangle=1.
+\]
+
+<p>这和线性代数里取对偶基一模一样。更重要的是，由于空间没有 2-胞腔，任何一维读数规则都不可能“再乘出二维信息”。所以虽然 \(H^1\) 已经是二维，空间仍然只是一个图，不会凭空长出面积类。</p>
+
+<h3 id="sec15-7-2">例八：圆柱 \(S^1\times I\)</h3>
+
+<p>圆柱看起来比圆大一截，但它能形变收缩到中间那条圆，所以按第 <a href="ch3.html">3 章</a> 同伦不变性的总原则，应该与 \(S^1\) 有相同上同调。你若想把它算出来，也很简单：取一个 0-胞腔、一个 1-胞腔，再加上一条“沿着区间方向”的 1-胞腔和一个 2-胞腔；经过边界计算会发现，纵向那条 1-胞腔与 2-胞腔刚好互相抵消，剩下的 cohomology 正好与圆周一致：</p>
+
+\[
+H^0(S^1\times I;R)\cong R,\qquad H^1(S^1\times I;R)\cong R,\qquad H^{k}=0\ (k\ge 2).
+\]
+
+<p>这个例子很值得拿来和 8 字形做比较。两者都带着一维信息，可圆柱的一维信息只有一份，因为它只有一条本质圆；8 字形有两份，因为它有两条独立的圈。上同调把这个“到底有几种独立测量闭路的办法”记得很忠实。</p>
+
+<h3 id="sec15-7-3">例九：环面 \(T^2\) 再算一遍，但这次从 cochain complex 出发</h3>
+
+<p>环面的最省事 CW 结构还是一个 0-胞腔、两条 1-胞腔 \(a,b\)、一个 2-胞腔 \(e^2\)。2-胞腔按词</p>
+
+\[
+aba^{-1}b^{-1}
+\]
+
+<p>附着。因为这条附着词在 1-链层面的总代数和为 0，所以</p>
+
+\[
+\partial_2=0,\qquad \partial_1=0.
+\]
+
+<p>于是链复形是</p>
+
+\[
+0\longrightarrow R\xrightarrow{0} R^2\xrightarrow{0} R\longrightarrow 0,
+\]
+
+<p>对偶后的上链复形仍然是</p>
+
+\[
+0\longrightarrow R\xrightarrow{0} R^2\xrightarrow{0} R\longrightarrow 0.
+\]
+
+<p>因此</p>
+
+\[
+H^0(T^2;R)\cong R,\qquad H^1(T^2;R)\cong R^2,\qquad H^2(T^2;R)\cong R.
+\]
+
+<p>这看起来和刚才的 8 字形只多了一个 \(H^2\cong R\)，可就是这一个二维类，彻底改变了环结构的性格。因为它提供了“一维信息真正乘起来以后可以落脚的地方”。所以从加法型群看来，</p>
+
+\[
+S^1\vee S^1 \quad\text{与}\quad T^2
+\]
+
+<p>只差一个二维类；可从乘法看来，它们相差的是“有没有一个真正的二维整体把两条一维方向焊在一起”。这正是上同调从群走向环时，信息量突然暴涨的地方。</p>
+
+<p>这一小节你最好多读两遍。因为后面一旦空间变复杂，真正算 cohomology 的工作通常就是：先挑个好的 CW 结构，把链复形写成矩阵，再把矩阵转置成上链复形。很多时候，上同调并不是另起炉灶算一遍，而是“同一张边界矩阵翻面再算一遍”。</p>
+
+<h2 id="sec15-8">15.8 从微积分回头看：closed 但不 exact，到底就是 \(H^1\) 在说话</h2>
+
+<p>如果你对上同调最深的印象还停留在 \(\operatorname{Hom}(C_n,R)\) 这类符号上，那很容易把它当成一章纯代数技术。其实你早就在微积分里见过它的影子，只不过那时它披着微分形式、保守场和路径积分的外衣。</p>
+
+<p>先回忆 <a href="../多元微积分/ch21.html">《多元微积分读本》第 21 章</a>。若 \(\omega=dF\) 是一个 exact 1-form，那么对任意闭曲线 \(\gamma\) 都有</p>
+
+\[
+\int_\gamma \omega = \int_\gamma dF = 0.
+\]
+
+<p>这句话翻译成上同调语言，就是：exact 的 1-cocycle 在任何 1-cycle 上的配对都为零，所以它代表零上同调类。你在上一章看到的“coboundary 在 cycle 上不产生新读数”，和这里完全是同一件事。</p>
+
+<p>更有教育意义的是 closed 但不 exact 的例子。考虑穿孔平面 \(\mathbb R^2\setminus\{0\}\)，取 1-form</p>
+
+\[
+\omega=\frac{-y\,dx+x\,dy}{x^2+y^2}.
+\]
+
+<p>在原点外它满足</p>
+
+\[
+d\omega=0,
+\]
+
+<p>所以它是 closed 的。可沿单位圆 \(\gamma(t)=(\cos t,\sin t)\) 积分，有</p>
+
+\[
+\int_\gamma \omega
+=
+\int_0^{2\pi} 1\,dt
+=
+2\pi.
+\]
+
+<p>因此它不可能是 exact；否则闭路积分必须为零。这就说明</p>
+
+\[
+[\omega]\neq 0\in H^1(\mathbb R^2\setminus\{0\};\mathbb R).
+\]
+
+<p>而 \(\mathbb R^2\setminus\{0\}\) 形变收缩到 \(S^1\)，所以这恰好就是圆周 \(H^1\cong \mathbb R\) 的微分形式代表。你在 <a href="../复分析/ch10.html">《复分析读本》第 10 章</a> 里用 \(\frac{dz}{z}\) 读绕数时，本质上也在使用这同一个 cohomology class。</p>
+
+<p>再看环面。把 \(\mathbb R^2\) 中的坐标形式 \(dx,dy\) 降到</p>
+
+\[
+T^2=\mathbb R^2/\mathbb Z^2
+\]
+
+<p>上，它们仍然是良定义的 closed 1-form。沿两条基本环路积分，得到</p>
+
+\[
+\int_a dx=1,\qquad \int_a dy=0,
+\]
+
+\[
+\int_b dx=0,\qquad \int_b dy=1.
+\]
+
+<p>所以 \([dx]\) 和 \([dy]\) 正是上一章写过的那两个 1 维上同调生成元的 de Rham 模型。这意味着 \(H^1(T^2)\) 的两个基，不只是抽象存在；它们可以真的由“沿横向测长度”“沿纵向测长度”这两条闭形式实现出来。</p>
+
+<p>同样地，在 \(S^2\) 上一条面积 2-form \(\Omega\) 若归一化为</p>
+
+\[
+\int_{S^2}\Omega=1,
+\]
+
+<p>那么 \([\Omega]\) 就代表 \(H^2(S^2;\mathbb R)\) 的生成元。也就是说，顶维 cohomology class 在平滑模型里就是“可以积分出总体积或总面积的 closed 顶维形式”。这和第 <a href="../多元微积分/ch24.html">24 章</a>、<a href="../多元微积分/ch25.html">25 章</a> 里各种曲面积分、Stokes 定理之间的联系，其实比第一眼看起来要近得多。</p>
+
+<p>如果你把这些例子放在一起，会得到一个非常值得长期保留的翻译表：</p>
+
+<ul>
+  <li>closed form 对应 cocycle；</li>
+  <li>exact form 对应 coboundary；</li>
+  <li>沿 cycle 积分只依赖上同调类与同调类；</li>
+  <li>closed 但不 exact 的现象，正说明某个上同调群非零。</li>
+</ul>
+
+<p>所以当你以后在别的课里看到“这个形式 closed 但不 exact，因此定义了一个非平凡 cohomology class”时，不要觉得那是另一门学问。那只不过是本章语言换回了微积分里的脸。</p>
+
+<h2 id="sec15-9">15.9 反变函子：为什么连续映射会把上同调往回拉</h2>
+
+<p>前面我们一直在算群，却还没把上同调作为一个“函子”完整说出来。这一点其实很重要。因为你若只有群而没有映射之间的对应，就还不知道上同调究竟是不是一个真正可搬运的拓扑不变量。</p>
+
+<p>设 \(f:X\to Y\) 是连续映射。对任意 \(n\)-上链 \(\varphi\in C^n(Y;R)\)，定义拉回上链</p>
+
+\[
+f^*\varphi\in C^n(X;R)
+\]
+
+<p>为</p>
+
+\[
+(f^*\varphi)(c)=\varphi(f_\# c),\qquad c\in C_n(X),
+\]
+
+<p>也就是先把 \(X\) 里的链 \(c\) 经由 \(f\) 推到 \(Y\) 里，再让 \(\varphi\) 去读数。若你更喜欢单形表述，那么对奇异单形 \(\sigma:\Delta^n\to X\)，有</p>
+
+\[
+(f^*\varphi)(\sigma)=\varphi(f\circ \sigma).
+\]
+
+<p>这条定义的方向非常值得记住：同调是协变的，\(f_*:H_n(X)\to H_n(Y)\) 顺着箭头走；上同调则是<strong>反变的</strong>，</p>
+
+\[
+f^*:H^n(Y)\to H^n(X)
+\]
+
+<p>往回拉。原因一点也不神秘：上同调类是“测量规则”，目标空间上的测量规则当然可以通过 \(f\) 拉回到源空间上用。</p>
+
+<p>最关键的兼容性是</p>
+
+\[
+\delta\circ f^*=f^*\circ\delta.
+\]
+
+<p>验证只需一行。对任意 \(c\in C_{n+1}(X)\)，</p>
+
+\[
+(\delta f^*\varphi)(c)=(f^*\varphi)(\partial c)=\varphi(f_\#\partial c)
+\]
+
+<p>而链映射与边界交换，所以</p>
+
+\[
+f_\#\partial c=\partial f_\# c.
+\]
+
+<p>于是</p>
+
+\[
+(\delta f^*\varphi)(c)=\varphi(\partial f_\# c)=(\delta\varphi)(f_\# c)=(f^*\delta\varphi)(c).
+\]
+
+<p>因此 \(f^*\) 把 cocycle 拉成 cocycle，把 coboundary 拉成 coboundary，从而诱导出上同调上的映射</p>
+
+\[
+f^*:H^n(Y;R)\to H^n(X;R).
+\]
+
+<p>而且它满足函子律</p>
+
+\[
+(\operatorname{id}_X)^*=\operatorname{id}_{H^*(X)},
+\qquad
+(g\circ f)^*=f^*\circ g^*.
+\]
+
+<p>这就是上同调是反变函子的精确说法。</p>
+
+<p>同伦不变性也顺手出来了。若 \(f\simeq g:X\to Y\)，则链上存在链同伦，翻到上链后得到上链同伦，于是诱导相同的上同调映射：</p>
+
+\[
+f^*=g^*:H^n(Y;R)\to H^n(X;R).
+\]
+
+<p>这句话把上一章一直反复使用的“同伦等价给出同构”再说得更完整：若 \(X\simeq Y\)，就有</p>
+
+\[
+H^*(X;R)\cong H^*(Y;R)
+\]
+
+<p>作为分次群，下一章甚至会加强成作为分次环同构。</p>
+
+<p>来做一个最实在的例子。包含映射</p>
+
+\[
+i:S^1\hookrightarrow \mathbb R^2\setminus\{0\}
+\]
+
+<p>是同伦等价，所以拉回给出</p>
+
+\[
+i^*:H^1(\mathbb R^2\setminus\{0\};\mathbb R)\xrightarrow{\cong} H^1(S^1;\mathbb R).
+\]
+
+<p>换句话说，穿孔平面里那条由 \(\omega=\frac{-y\,dx+x\,dy}{x^2+y^2}\) 定义的类，拉回到单位圆上就是圆周的标准生成元。这说明上同调不仅能“算出有一份一维信息”，还能把那份信息沿具体映射稳定地拖来拖去。</p>
+
+<h2 id="sec15-10">15.10 真正做题时怎么用：上边界矩阵就是边界矩阵的转置</h2>
+
+<p>到目前为止，定义已经够了，但实战里还差一个非常值钱的计算习惯：若你用胞腔链复形或单纯链复形算同调，那么算上同调时几乎不用从头再来，直接把边界矩阵转置即可。这件事应该变成你的本能。</p>
+
+<p>设在某组基下，边界算子</p>
+
+\[
+\partial_n:C_n\to C_{n-1}
+\]
+
+<p>由矩阵 \(A_n\) 表示。那么对偶映射</p>
+
+\[
+\delta^{n-1}:C^{n-1}\to C^n
+\]
+
+<p>在对偶基下的矩阵就是</p>
+
+\[
+\boxed{\delta^{n-1}=A_n^{\mathsf T}.}
+\]
+
+<p>原因和线性代数里对偶映射的矩阵公式完全一样。若 \(\varphi\in C^{n-1}\)、\(c\in C_n\)，则</p>
+
+\[
+(\delta\varphi)(c)=\varphi(\partial c).
+\]
+
+<p>也就是说，\(\delta\) 正是 \(\partial\) 的代数转置。于是求</p>
+
+\[
+H^n=\ker\delta^n/\operatorname{im}\delta^{n-1}
+\]
+
+<p>从本质上说，就是在做和同调平行的一套线性代数。</p>
+
+<p>把这条窍门用回 \(\mathbb RP^2\)。其 cellular chain complex 在整数系数下满足</p>
+
+\[
+\partial_2=[2],\qquad \partial_1=[0].
+\]
+
+<p>于是 cochain complex 自动是</p>
+
+\[
+\delta^1=[2]^{\mathsf T}=[2],\qquad \delta^0=[0]^{\mathsf T}=[0].
+\]
+
+<p>所以无须重做任何几何分析，就能立刻得到</p>
+
+\[
+H^0(\mathbb RP^2;\mathbb Z)\cong \mathbb Z,\qquad
+H^1(\mathbb RP^2;\mathbb Z)=0,\qquad
+H^2(\mathbb RP^2;\mathbb Z)\cong \mathbb Z/2.
+\]
+
+<p>注意这里和上一节实系数结果不同：整数系数下 \(H^2\) 不是 0，而是 \(\mathbb Z/2\)。这再次说明换系数时，torsion 的命运会改变，而矩阵法让这种变化一眼就能看出来。</p>
+
+<p>再看 Klein 瓶。它的整数 cellular chain complex 可写成</p>
+
+\[
+0\to \mathbb Z \xrightarrow{\partial_2}
+\mathbb Z^2 \xrightarrow{\partial_1} \mathbb Z\to 0,
+\]
+
+<p>其中</p>
+
+\[
+\partial_2=
+\begin{pmatrix}
+0\\
+2
+\end{pmatrix},
+\qquad
+\partial_1=(0\ \ 0).
+\]
+
+<p>于是对偶后</p>
+
+\[
+\delta^1=
+\begin{pmatrix}
+0 & 2
+\end{pmatrix},
+\qquad
+\delta^0=
+\begin{pmatrix}
+0\\
+0
+\end{pmatrix}.
+\]
+
+<p>从这里马上读出</p>
+
+\[
+H^1(K;\mathbb Z)\cong \ker\delta^1/\operatorname{im}\delta^0
+\cong \mathbb Z,
+\]
+
+\[
+H^2(K;\mathbb Z)\cong \operatorname{coker}\delta^1\cong \mathbb Z/2.
+\]
+
+<p>如果改用实系数，同一个矩阵里的 2 就变成可逆元，于是 \(H^2(K;\mathbb R)=0\)。所以“矩阵转置”不仅是一个快算技巧，它还直接暴露了系数变化到底在改变什么。</p>
+
+<p>你以后真正做题时，应该把这一节内化成一句很短的话：先把链复形的边界矩阵写出来，再把它们转置，就是上链复形。很多教科书把上同调写得像一整章新内容，但在计算层面，它常常只是“把旧矩阵翻面”。</p>
+
+<h2 id="sec15-11">15.11 为什么还要学相对上同调：边界被压掉以后，新的类会冒出来</h2>
+
+<p>在结束本章之前，还得补一块经常和普通上同调一起出现、而且对下一章至关重要的语言：相对上同调。原因其实很简单。若空间里有一块子空间 \(A\subset X\) 已经被你当成“边界”“约束”或“可忽略部分”，那么普通上同调只会盯着 \(X\) 本身，不会自动把“模掉 \(A\)”这件事反映出来。相对上同调正是为此设计的。</p>
+
+<p>在链层面，我们先做商：</p>
+
+\[
+C_n(X,A)=C_n(X)/C_n(A).
+\]
+
+<p>然后定义相对上链为</p>
+
+\[
+C^n(X,A;R)=\operatorname{Hom}(C_n(X,A;\mathbb Z),R).
+\]
+
+<p>因为边界算子能下传到商链复形，相同的 \(\delta\) 机器依然成立，于是得到相对上同调群</p>
+
+\[
+H^n(X,A;R).
+\]
+
+<p>你可以把它理解成：那些只关心 \(X\) 中新出现部分、对 \(A\) 中旧部分不再单独记账的 cohomology class。</p>
+
+<p>最经典的例子就是圆盘与其边界：</p>
+
+\[
+(D^n,S^{n-1}).
+\]
+
+<p>普通上同调里，圆盘只有</p>
+
+\[
+H^0(D^n;R)\cong R,
+\]
+
+<p>高维全灭。可一旦把边界整体视为“已经压掉”，相对上同调里会突然冒出顶维类：</p>
+
+\[
+H^n(D^n,S^{n-1};R)\cong R,
+\qquad
+H^k(D^n,S^{n-1};R)=0\ (k\neq n).
+\]
+
+<p>这不是巧合，而是在说：整块圆盘内部确实是一份 \(n\) 维整体，只不过若不把边界模掉，它就无法作为绝对上同调类出现。下一章 Poincar&eacute; 对偶的边界版，恰恰要把这种“内部整体类”当成主角。</p>
+
+<p>相对上同调还有一条与相对同调平行的长正合列：</p>
+
+\[
+\cdots \to H^n(X,A)\to H^n(X)\to H^n(A)\to H^{n+1}(X,A)\to \cdots
+\]
+
+<p>它的意义非常实用：普通上同调告诉你“\(X\) 里有哪些测量规则”，子空间上同调告诉你“这些规则限制到 \(A\) 后还剩什么”，而相对上同调则恰好记录“哪些高一维新规则是在 \(A\) 上消失、却在 \(X\) 内部仍然活着”。</p>
+
+<p>如果把这一节和第 15.8 节连起来看，会更有味道。exact / non-exact 描述的是“在整个空间里能不能由低维势函数取差得到”；而 relative cohomology 描述的则是“若在边界上允许势函数归零，内部还剩哪些真正新的类”。这种边界条件意识，后面会在流形、Stokes、Poincar&eacute; 对偶和 PDE 里一再回潮。</p>
+
+<h2 id="sec15-12">15.12 上同调到底该怎么想</h2>
+
+<p>在正式收束前，再把三个最容易混淆的点单独拎一下。第一，closed 不等于 exact。若 \(\delta\varphi=0\)，只说明 \(\varphi\) 在边界上自动给零；它未必来自某个低一维 cochain 的 \(\delta\)。圆周、穿孔平面和环面上的那些非平凡 \(H^1\) 类，全都在提醒你这件事。</p>
+
+<p>第二，换系数不是把符号换一换那么简单。整数系数会看见 torsion，实系数会把 torsion 全部抹掉，\(\mathbb Z/2\) 系数则会把符号差异一概忽略。你若不先问清楚系数，很多“这个群到底是不是 0”“这个类到底还能不能被检测到”的判断都会错位。</p>
+
+<p>第三，\(H^0\) 虽然看起来平凡，却从来不是摆设。它记录连通分支，也充当上同调环的单位元。很多乘法结构、相对理论和 Poincar&eacute; 对偶的边界情形，到最后都要回到“谁来扮演 1”这个最基础的问题上。所以别把 0 维部分当作开胃菜；它往往是整盘结构里最稳定的那个齿轮。</p>
+
+<p>若你想把本章内容变成真正会用的工具，最实用的做题顺序通常是这样的：先选一个好模型，最好是 CW 结构或单纯复形；接着把边界矩阵写出来；然后立刻取转置得到上边界矩阵；最后再问你究竟需要的是群的维数、某个具体基、还是和某些 cycle 的配对数值。很多题目若一上来就死盯定义，会很慢；若先把“它其实是某张矩阵的核与像”看清楚，速度会快很多。</p>
+
+<p>再高一层地看，上同调之所以会在现代数学里处处出现，并不是因为大家偏爱 dual 这个词，而是因为“测试规则”往往比“被测试对象”更容易组合、拉回、相乘和局部化。积分、势函数、闭形式、边界条件、交叉配对，几乎全都是站在这一侧说话。你后面读杯积、Poincar&eacute; 对偶、de Rham 理论时，如果总把自己放在“我正在构造一种检测器”的视角上，很多抽象定义都会顺得多。</p>
+
+<p>现在把这一章压成几句判断。</p>
+
+<p>第一，\(C^n=\operatorname{Hom}(C_n,R)\) 的意思不是“为了抽象而抽象”，而是“把 \(n\) 维链拿来做线性测量”。你以后看到上链，就先问：它到底在给哪些 \(n\) 维几何对象记分？</p>
+
+<p>第二，\(\delta\) 只是 \(\partial\) 的对偶。链那边“边界的边界为零”，翻面后就是“上边界的上边界为零”。于是上同调仍然是 closed 模 exact，只不过这次是“闭测量规则模掉势函数差”。</p>
+
+<p>第三，实系数下的上同调与同调是对偶的：</p>
+
+\[
+H^n(X;\mathbb R)\cong \operatorname{Hom}(H_n(X;\mathbb Z),\mathbb R).
+\]
+
+<p>这句公式意味着：若你只关心实数读数，那么 torsion 一律看不见，留下来的只是 Betti 数。它也解释了为什么微积分里的积分、环路读数、通量这些东西会自然落到上同调里来：它们本来就是在对 homology class 取值。</p>
+
+<p>第四，也是最重要的一句：同调告诉你“有哪些洞”，上同调告诉你“有哪些办法检测这些洞”。真正让上同调比同调更锋利的，不是对偶本身，而是下一章要出现的杯积。那时你会看到，不同检测规则之间还能相乘，于是空间会长出一个上同调环 \(H^*(X)\)。从这一刻起，单纯的 Betti 数就不再是故事的全部了。</p>
+
+<p>所以如果你想给这一章找一句最像工作口令的话，那就是：<strong>把链换成测试器，把边界换成读数规则，把洞换成可被配对和积分的对象。</strong> 一旦这个翻面动作在脑子里稳定下来，上同调就不会再显得像“同调的镜像副本”，而会开始像一门真正会说话、会拉回、会相乘、会记边界条件的语言。下一章杯积之所以重要，恰恰是因为检测器之间也能彼此组合；而从这一刻起，代数拓扑作者看空间时的视角就已经彻底变了。</p>
+
+<p>所以别急着把第 15 章当成“定义堆砌章”翻过去。很多读者真正开始觉得代数拓扑变得顺手，往往就是从这里开始的：以前你只有几何洞的名单，现在你第一次拥有了系统的检测器、拉回映射和边界条件语言。后面所有更强的结构，几乎都会把这一章当作语法底层。</p>
+
+<p>读到这里，你最好已经能把“一个 cohomology class”下意识翻译成“一种稳定的测量规则”。只要这层翻译稳了，后面的乘法、对偶和交叉就都会顺着同一条语义线长出来。</p>
+
+<p>换句话说，这一章真正建立起来的，不只是定义，而是整本后半书反复复用的一套观察位置。</p>
+
+<p>后面一旦乘法、对偶和流形结构接进来，这套位置感会不断回报你。</p>
+
+<p>它会让后续所有抽象语言都有稳定落脚点。</p>
+
+<p>一旦这层落脚点稳住，你读定义时就不再只是背词，而是在辨认功能。</p>
+
+<p>而功能一旦认出来，符号就会自然变轻。</p>
