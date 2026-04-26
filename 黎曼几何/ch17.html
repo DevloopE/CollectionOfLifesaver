@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 球面、双曲空间、欧氏空间的具体计算：把常曲率模型真正算熟 — 普林斯顿黎曼几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 比较几何：Rauch、Toponogov 与“把弯曲程度拿去和标准模型比”</a><a href="ch18.html">下一章 · 第 18 章 Gauss-Bonnet 与 Chern-Gauss-Bonnet：曲率积分为什么会算出 Euler 示性数 →</a></nav>
+<h1 id="ch17">第 17 章 球面、双曲空间、欧氏空间的具体计算：把常曲率模型真正算熟</h1>
+
+<p>到这里你已经见过很多抽象对象：联络、曲率张量、Ricci 曲率、Jacobi 场、指数映射、Hopf-Rinow、Rauch、Toponogov。可如果这些概念只停留在定义层面，它们很容易在脑子里漂着。真正把黎曼几何内化，最可靠的方式还是回到那三个永远的模型：球面、欧氏空间、双曲空间，把所有量都亲手算过一遍。只有当你真的算到手感稳定，你才会知道“常曲率”到底意味着什么。</p>
+
+<p>这一章故意不追求概念新鲜，而追求计算彻底。你会看到，球面并不是“一个会转的大圆”那么简单，它的度量、体积元、Christoffel 符号、测地线方程、曲率张量都能被完整写下；双曲空间也不是“负曲率的镜像版”这么模糊，它在上半空间模型和 Poincaré 球模型里各有一套极其具体、而且可以真的拿来算距离与测地线的公式；欧氏空间则不是“显然是零曲率所以不用算”，恰恰相反，它是所有比较公式和 \(K\to 0\) 极限的中轴。</p>
+
+<p>你如果只想先记一张总表，那就是下面这行统一公式。设常截面曲率为 \(K\)，定义</p>
+
+\[
+s_K(r)=
+\begin{cases}
+\dfrac{1}{\sqrt K}\sin(\sqrt K\,r),&K&gt;0,\\[6pt]
+r,&K=0,\\[6pt]
+\dfrac{1}{\sqrt{-K}}\sinh(\sqrt{-K}\,r),&K&lt;0.
+\end{cases}
+\]
+
+<p>则 \(n\) 维常曲率空间在测地极坐标里都写成</p>
+
+\[
+\boxed{g=dr^2+s_K(r)^2\,g_{S^{n-1}}.}
+\]
+
+<p>而这一个公式，几乎已经包含了本章后面所有具体计算的骨架。</p>
+
+<h2 id="sec17-1">17.1 先把统一框架搭好：常曲率空间为什么都能写成 \(dr^2+s_K(r)^2g_{S^{n-1}}\)</h2>
+
+<p>先别急着分别看 \(S^n\)、\(\mathbb R^n\)、\(H^n\)。先看它们为什么会在极坐标里落到同一行结构。常曲率空间形式 \(M_K^n\) 的基本事实是：从一点 \(p\) 出发的所有径向测地线彼此完全等价，法向 Jacobi 场只依赖半径 \(r\) 而不依赖方向。所以如果 \(\theta\in S^{n-1}\) 表示方向，\(r\ge 0\) 表示极径，那么横向长度的伸缩比例一定由某个标量函数控制，这个函数恰好就是上一章的比较函数 \(s_K(r)\)。</p>
+
+<p>于是度量自然写成</p>
+
+\[
+g=dr^2+s_K(r)^2\,g_{S^{n-1}}.
+\]
+
+<p>其中 \(g_{S^{n-1}}\) 是单位 \((n-1)\)-球面的标准度量。你可以把这行公式读成一句很物理的话：沿半径方向走，长度就是真正的 \(dr\)；沿角方向挪一下，实际代价要乘上一个“半径因子” \(s_K(r)\)。欧氏空间里这个因子是 \(r\)，球面里是 \(\sin(r/R)\) 乘常数，双曲空间里则是 \(\sinh r\)。</p>
+
+<p>一旦写成 warped product 形式，体积元立即出来：</p>
+
+\[
+\boxed{dV=s_K(r)^{n-1}\,dr\,d\omega,}
+\]
+
+<p>其中 \(d\omega\) 是单位球面上的面积元。于是半径为 \(R\) 的测地球体面积与球体体积分别是</p>
+
+\[
+\boxed{\operatorname{Area}(\partial B_R)=\omega_{n-1}s_K(R)^{n-1},}
+\]
+
+\[
+\boxed{\operatorname{Vol}(B_R)=\omega_{n-1}\int_0^R s_K(r)^{n-1}\,dr,}
+\]
+
+<p>这里 \(\omega_{n-1}=\operatorname{Vol}(S^{n-1})\)。这已经把三种空间的体积增长律统一了起来：球面增长终会回头，欧氏是幂次增长，双曲是指数增长。</p>
+
+<p>还有一个统一的曲率检验也非常好用。对 warped product 度量 \(dr^2+f(r)^2g_{S^{n-1}}\)，径向截面曲率和球面方向截面曲率分别是</p>
+
+\[
+K(\partial_r\wedge U)=-\frac{f''(r)}{f(r)},
+\]
+
+\[
+K(U\wedge V)=\frac{1-(f'(r))^2}{f(r)^2},
+\]
+
+<p>其中 \(U,V\) 是单位球面方向向量。把 \(f=s_K\) 代进去，由</p>
+
+\[
+s_K''+Ks_K=0,
+\qquad
+(s_K')^2+Ks_K^2=1
+\]
+
+<p>立刻得到</p>
+
+\[
+K(\partial_r\wedge U)=K(U\wedge V)=K.
+\]
+
+<p>所以这确实是常截面曲率 \(K\) 的模型。注意第二个恒等式</p>
+
+\[
+(s_K')^2+Ks_K^2=1
+\]
+
+<p>可以直接逐个验证：\(\cos^2+\sin^2=1\)、\(1+0=1\)、\(\cosh^2-\sinh^2=1\)。它以后会不停地帮你把看似很长的曲率计算压回常数。</p>
+
+<p>如果你还记得 <a href="../实分析/ch18.html">《实分析读本》第 18 章</a> 里幂级数和 Taylor 展开怎样组织局部信息，那么这里的</p>
+
+\[
+s_K(r)=r-\frac{Kr^3}{6}+O(r^5)
+\]
+
+<p>其实已经把“小尺度近似欧氏”说得很清楚了：在 \(r\) 很小时，三种模型都先长得像 \(r\)，曲率只从三次项开始露头。</p>
+
+<h2 id="sec17-2">17.2 欧氏空间 \(\mathbb R^n\)：别因为它太熟就把零曲率算薄了</h2>
+
+<p>先从最平的空间开始。欧氏空间的标准度量在笛卡尔坐标里写成</p>
+
+\[
+g_{\mathrm{Euc}}=dx_1^2+\cdots+dx_n^2.
+\]
+
+<p>因此度量分量常数不变，Christoffel 符号全部为零：</p>
+
+\[
+\Gamma_{ij}^k=0.
+\]
+
+<p>于是测地线方程直接退化成</p>
+
+\[
+\ddot x^k=0,\qquad k=1,\dots,n.
+\]
+
+<p>解当然是仿射直线：</p>
+
+\[
+\boxed{\gamma(t)=p+tv.}
+\]
+
+<p>这不是“显然所以可以略过”的一步，而是整个几何直觉的基准点。因为在欧氏空间里，最短路、常速线段、零二阶导数、零 Christoffel 符号、零曲率张量，全都塌成了同一件事。其他模型空间的所有弯曲效应，都是围绕这一点长出来的。</p>
+
+<p>把笛卡尔坐标换成极坐标 \(r,\theta\)，欧氏度量变成</p>
+
+\[
+g=dr^2+r^2g_{S^{n-1}}.
+\]
+
+<p>这正对应于 \(s_0(r)=r\)。在二维里就是最熟悉的</p>
+
+\[
+ds^2=dr^2+r^2d\theta^2.
+\]
+
+<p>此时非零 Christoffel 符号只来自坐标本身的弯，而不是几何真的有曲率。二维情形下：</p>
+
+\[
+\Gamma^r_{\theta\theta}=-r,
+\qquad
+\Gamma^\theta_{r\theta}=\Gamma^\theta_{\theta r}=\frac1r.
+\]
+
+<p>这立刻给出极坐标里的测地线方程</p>
+
+\[
+\ddot r-r\dot\theta^2=0,
+\qquad
+\ddot\theta+\frac{2}{r}\dot r\dot\theta=0.
+\]
+
+<p>第二个方程等价于</p>
+
+\[
+\frac{d}{dt}(r^2\dot\theta)=0,
+\]
+
+<p>也就是角动量守恒。你从经典力学看过这行式子，从这里也能再看见一次：几何和动力系统并不真的分家。</p>
+
+<p>曲率张量当然为零：</p>
+
+\[
+\boxed{R(X,Y)Z=0,}
+\]
+
+<p>从而</p>
+
+\[
+\boxed{\operatorname{Ric}=0,\qquad S=0,\qquad K(\sigma)=0.}
+\]
+
+<p>体积元在极坐标中是</p>
+
+\[
+dV=r^{n-1}\,dr\,d\omega.
+\]
+
+<p>所以半径 \(R\) 的球体体积是</p>
+
+\[
+\operatorname{Vol}(B_R)=\omega_{n-1}\int_0^R r^{n-1}\,dr
+=\frac{\omega_{n-1}}{n}R^n
+=\omega_n R^n,
+\]
+
+<p>其中</p>
+
+\[
+\omega_n=\frac{\pi^{n/2}}{\Gamma\!\left(\frac n2+1\right)}.
+\]
+
+<p>而球面面积是</p>
+
+\[
+\operatorname{Area}(S_R^{n-1})=\omega_{n-1}R^{n-1}.
+\]
+
+<p>最后把欧氏空间再看成 \(K\to 0\) 极限，会得到一个以后很常用的原则：只要球面或双曲公式里出现了 \(\sin(\sqrt K\,r)\) 或 \(\sinh(\sqrt{-K}\,r)\)，把它对 \(K\) 做小参数展开，零阶项就应该回到欧氏公式。你可以把这当成检查自己算式是否靠谱的一块试金石。</p>
+
+<h2 id="sec17-3">17.3 球面 \(S_R^n\)：度量、测地线、曲率张量和体积一次算完</h2>
+
+<p>现在来看正曲率模型。设</p>
+
+\[
+S_R^n=\{x\in\mathbb R^{n+1}:|x|=R\},
+\]
+
+<p>取自 \(\mathbb R^{n+1}\) 的诱导度量。若用极角 \(\phi\in[0,\pi]\) 和球面方向 \(\omega\in S^{n-1}\) 参数化</p>
+
+\[
+x=(R\cos\phi,\ R\sin\phi\,\omega),
+\]
+
+<p>那么诱导度量是</p>
+
+\[
+g_{S_R^n}=R^2\,d\phi^2+R^2\sin^2\phi\,g_{S^{n-1}}.
+\]
+
+<p>若改用真正的测地半径 \(r=R\phi\)，便得到</p>
+
+\[
+\boxed{g_{S_R^n}=dr^2+R^2\sin^2\!\left(\frac rR\right)g_{S^{n-1}}.}
+\]
+
+<p>这正是统一公式里 \(K=1/R^2\) 的情形，因为</p>
+
+\[
+s_{1/R^2}(r)=R\sin\!\left(\frac rR\right).
+\]
+
+<p>在二维球面上，若坐标取为 \((\phi,\theta)\)，即</p>
+
+\[
+ds^2=R^2(d\phi^2+\sin^2\phi\,d\theta^2),
+\]
+
+<p>那么 Christoffel 符号可直接算出</p>
+
+\[
+\Gamma^\phi_{\theta\theta}=-\sin\phi\cos\phi,
+\qquad
+\Gamma^\theta_{\phi\theta}
+=\Gamma^\theta_{\theta\phi}
+=\cot\phi.
+\]
+
+<p>于是测地线方程是</p>
+
+\[
+\ddot\phi-\sin\phi\cos\phi\,\dot\theta^2=0,
+\]
+
+\[
+\ddot\theta+2\cot\phi\,\dot\phi\,\dot\theta=0.
+\]
+
+<p>第二个方程等价于</p>
+
+\[
+\frac{d}{dt}(\sin^2\phi\,\dot\theta)=0,
+\]
+
+<p>也就是球面版角动量守恒。它已经暗示测地线会待在某个过原点的二维平面里，但更漂亮的证明来自环境空间。</p>
+
+<p>把 \(\gamma(t)\in S_R^n\subset\mathbb R^{n+1}\) 看作欧氏向量值曲线。因 \(|\gamma|^2=R^2\) 恒定，所以</p>
+
+\[
+\langle \gamma,\dot\gamma\rangle =0,
+\qquad
+\langle \gamma,\ddot\gamma\rangle =-|\dot\gamma|^2.
+\]
+
+<p>测地线的切向加速度必须为零，因此 \(\ddot\gamma\) 只能指向法向 \(\gamma\) 本身。于是</p>
+
+\[
+\ddot\gamma=-\frac{|\dot\gamma|^2}{R^2}\gamma.
+\]
+
+<p>若 \(|\dot\gamma|=\alpha\) 常数，则解为</p>
+
+\[
+\boxed{
+\gamma(t)=\cos\!\left(\frac{\alpha t}{R}\right)p
++\frac{R}{\alpha}\sin\!\left(\frac{\alpha t}{R}\right)v,
+}
+\]
+
+<p>其中 \(p=\gamma(0)\in S_R^n\)、\(v=\dot\gamma(0)\in T_pS_R^n\)。这条公式说明 \(\gamma\) 完全待在由 \(p\) 和 \(v\) 张成的二维平面里，而该平面与球面相交得到一个大圆。所以</p>
+
+\[
+\boxed{\text{球面的测地线正是大圆的常速参数化}.}
+\]
+
+<p>两点之间的球面距离也因此能写成显式公式。若 \(p,q\in S_R^n\)，则它们夹角 \(\vartheta\) 满足</p>
+
+\[
+\cos\vartheta=\frac{\langle p,q\rangle}{R^2}.
+\]
+
+<p>较短大圆弧长度就是</p>
+
+\[
+\boxed{d(p,q)=R\arccos\!\left(\frac{\langle p,q\rangle}{R^2}\right).}
+\]
+
+<p>接着算曲率。球面是常曲率空间，所以结果应该是</p>
+
+\[
+\boxed{R(X,Y)Z=\frac{1}{R^2}\big(\langle Y,Z\rangle X-\langle X,Z\rangle Y\big).}
+\]
+
+<p>你可以用 Gauss 方程快速验证。因为嵌入球面的第二基本形式是</p>
+
+\[
+\mathrm{II}(X,Y)=\frac1R\langle X,Y\rangle \nu,
+\]
+
+<p>其中 \(\nu=x/R\) 是单位外法向。Gauss 方程给出</p>
+
+\[
+\langle R(X,Y)Z,W\rangle
+=\langle \mathrm{II}(X,W),\mathrm{II}(Y,Z)\rangle
+-\langle \mathrm{II}(X,Z),\mathrm{II}(Y,W)\rangle,
+\]
+
+<p>于是立刻得到上面的公式。故所有二维切平面的截面曲率都等于</p>
+
+\[
+\boxed{K(\sigma)=\frac1{R^2}.}
+\]
+
+<p>进一步缩并得到</p>
+
+\[
+\boxed{\operatorname{Ric}=\frac{n-1}{R^2}g,\qquad S=\frac{n(n-1)}{R^2}.}
+\]
+
+<p>体积元也很直接：</p>
+
+\[
+dV=R^n\sin^{n-1}\phi\,d\phi\,d\omega
+=R^{n-1}\sin^{n-1}\!\left(\frac rR\right)\,dr\,d\omega.
+\]
+
+<p>因此整个球面的体积是</p>
+
+\[
+\operatorname{Vol}(S_R^n)
+=R^n\operatorname{Vol}(S_1^n)
+=R^n\frac{2\pi^{(n+1)/2}}{\Gamma\!\left(\frac{n+1}{2}\right)}.
+\]
+
+<p>而半径 \(r\le \pi R\) 的测地球体体积是</p>
+
+\[
+\operatorname{Vol}(B_r)
+=\omega_{n-1}\int_0^r R^{n-1}\sin^{n-1}\!\left(\frac tR\right)\,dt.
+\]
+
+<p>在二维情形，面积公式特别漂亮：</p>
+
+\[
+\operatorname{Area}_{S_R^2}(B_r)=2\pi R^2\left(1-\cos\frac rR\right).
+\]
+
+<p>它和下一章 Gauss-Bonnet 会完美接上，因为球面三角形角和大于 \(\pi\) 的量，正好被正曲率积起来。</p>
+
+<h2 id="sec17-4">17.4 上半空间模型 \(H^n\)：Christoffel、测地线、距离和曲率都能手算</h2>
+
+<p>现在来看负曲率模型。上半空间模型定义为</p>
+
+\[
+H^n=\{(x_1,\dots,x_{n-1},y)\in\mathbb R^n:y&gt;0\},
+\]
+
+<p>配度量</p>
+
+\[
+\boxed{g_{H}= \frac{1}{y^2}\left(dx_1^2+\cdots+dx_{n-1}^2+dy^2\right).}
+\]
+
+<p>这是一张最值得你熟练掌握的公式，因为它几乎把双曲几何的所有显式计算都压在一个简单共形因子 \(y^{-2}\) 里。度量分量和逆矩阵是</p>
+
+\[
+g_{ij}=y^{-2}\delta_{ij},
+\qquad
+g^{ij}=y^2\delta_{ij}.
+\]
+
+<p>唯一非零偏导来自 \(y\) 方向：</p>
+
+\[
+\partial_y g_{ij}=-2y^{-3}\delta_{ij}.
+\]
+
+<p>于是 Christoffel 符号很快算出。若 \(a,b\in\{1,\dots,n-1\}\)，则</p>
+
+\[
+\Gamma^a_{bn}=\Gamma^a_{nb}=-\frac1y\delta^a_b,
+\]
+
+\[
+\Gamma^n_{ab}=\frac1y\delta_{ab},
+\qquad
+\Gamma^n_{nn}=-\frac1y,
+\]
+
+<p>其余全为零。</p>
+
+<p>这给出测地线方程</p>
+
+\[
+x_a''-\frac{2}{y}x_a' y'=0,\qquad a=1,\dots,n-1,
+\]
+
+\[
+y''+\frac{1}{y}\left(\sum_{a=1}^{n-1}(x_a')^2-(y')^2\right)=0.
+\]
+
+<p>先解最简单的一类：垂直线。若 \(x_a\equiv c_a\) 常数，则方程退化成</p>
+
+\[
+y''-\frac{1}{y}(y')^2=0.
+\]
+
+<p>令 \(u=\log y\)，就得到 \(u''=0\)，所以</p>
+
+\[
+y(t)=y_0e^{ct}.
+\]
+
+<p>若取单位速参数，则 \(c=\pm 1\)。因此垂直射线是测地线，且沿同一垂线两点 \((x,y_1)\)、\((x,y_2)\) 的双曲距离是</p>
+
+\[
+\boxed{d\big((x,y_1),(x,y_2)\big)=\left|\log\frac{y_2}{y_1}\right|.}
+\]
+
+<p>更一般的非垂直测地线是与边界平面 \(y=0\) 正交的半圆。你可以这样推出来：第一组方程等价于</p>
+
+\[
+\frac{d}{dt}\left(\frac{x_a'}{y^2}\right)=0,
+\]
+
+<p>故存在常数 \(c_a\) 使</p>
+
+\[
+x_a'=c_a y^2.
+\]
+
+<p>把它代回能量守恒</p>
+
+\[
+\frac{1}{y^2}\left(\sum_a (x_a')^2+(y')^2\right)=\text{常数},
+\]
+
+<p>消去参数后便得到轨迹落在某个欧氏圆或直线上；再由边界行为可知它必与 \(y=0\) 正交。于是</p>
+
+\[
+\boxed{\text{上半空间模型中的测地线是垂直直线或与边界正交的半圆}.}
+\]
+
+<p>一般两点间的双曲距离也有闭式公式：</p>
+
+\[
+\boxed{
+\cosh d(p,q)
+=1+\frac{|p-q|_{\mathrm{Euc}}^2}{2y_p y_q}.
+}
+\]
+
+<p>这条式子在实际运算里非常好用。特别地，当 \(p=(0,1)\)、\(q=(0,e^t)\) 时，右边变成 \(\cosh |t|\)，又回到垂直距离公式。</p>
+
+<p>接下来算曲率。用坐标直接算虽然能做，但用正交标架更快。设</p>
+
+\[
+E_a=y\partial_{x_a}\quad (a=1,\dots,n-1),\qquad E_n=y\partial_y.
+\]
+
+<p>这是一个正交规范标架。由前面的 Christoffel 符号可得</p>
+
+\[
+\nabla_{E_a}E_b=\delta_{ab}E_n,
+\qquad
+\nabla_{E_a}E_n=-E_a,
+\]
+
+\[
+\nabla_{E_n}E_a=0,
+\qquad
+\nabla_{E_n}E_n=0.
+\]
+
+<p>再注意到 Lie 括号</p>
+
+\[
+[E_a,E_n]=-E_a,
+\qquad
+[E_a,E_b]=0,
+\]
+
+<p>便能直接计算曲率。例如</p>
+
+\[
+\begin{aligned}
+R(E_a,E_n)E_n
+&=\nabla_{E_a}\nabla_{E_n}E_n
+-\nabla_{E_n}\nabla_{E_a}E_n
+-\nabla_{[E_a,E_n]}E_n\\
+&=0-0-\nabla_{-E_a}E_n\\
+&=-E_a.
+\end{aligned}
+\]
+
+<p>同样可得</p>
+
+\[
+R(E_a,E_b)E_b=-E_a\qquad (a\ne b).
+\]
+
+<p>因此任意二维平面的截面曲率都等于</p>
+
+\[
+\boxed{K(\sigma)=-1.}
+\]
+
+<p>于是双曲空间的 Ricci 与标量曲率是</p>
+
+\[
+\boxed{\operatorname{Ric}=-(n-1)g,\qquad S=-n(n-1).}
+\]
+
+<p>最后，体积元由行列式立刻算出：</p>
+
+\[
+\det(g)=y^{-2n},
+\qquad
+\boxed{dV=y^{-n}\,dx_1\cdots dx_{n-1}\,dy.}
+\]
+
+<p>这也解释了为什么双曲空间的高处和低处尺度完全不同：靠近边界 \(y=0\) 时，共形因子和体积元都会爆炸，所以欧氏看来很薄的一层，在双曲尺度下其实非常厚。</p>
+
+<h2 id="sec17-5">17.5 Poincaré 球模型：角度保形、距离爆炸，边界永远碰不到</h2>
+
+<p>双曲空间还有另一张极其常用的脸：单位球模型</p>
+
+\[
+B^n=\{u\in\mathbb R^n:|u|&lt;1\},
+\]
+
+<p>配上度量</p>
+
+\[
+\boxed{g_B=\frac{4}{(1-|u|^2)^2}\,g_{\mathrm{Euc}}.}
+\]
+
+<p>这就是 Poincaré 球模型。它和上半空间模型等距同构。一个显式的 Cayley 型变换是</p>
+
+\[
+\Phi(x,y)=
+\frac{1}{|x|^2+(y+1)^2}
+\bigl(2x,\ |x|^2+y^2-1\bigr),
+\]
+
+<p>其中 \((x,y)\in\mathbb R^{n-1}\times (0,\infty)\)。计算可验证</p>
+
+\[
+\Phi^*g_B=g_H.
+\]
+
+<p>因此球模型中的一切曲率数据都自动与上半空间模型相同：</p>
+
+\[
+\boxed{K(\sigma)=-1,\qquad \operatorname{Ric}=-(n-1)g_B,\qquad S=-n(n-1).}
+\]
+
+<p>但球模型最大的优点不是重新算曲率，而是它把“保形”写得非常直观。因为 \(g_B\) 只是欧氏度量乘一个标量因子，所以它保 Euclid 角。于是测地线在欧氏图形上表现为：直径，或者与单位球边界正交的圆弧。</p>
+
+\[
+\boxed{\text{球模型中的测地线是直径或与边界正交的圆弧}.}
+\]
+
+<p>从原点出发时，计算尤其干净。沿径向线段 \(u(t)=t\xi\)，\(|\xi|=1\)，长度元为</p>
+
+\[
+ds=\frac{2}{1-t^2}\,dt.
+\]
+
+<p>所以原点到半径 \(\rho\in(0,1)\) 的点的双曲距离是</p>
+
+\[
+d(0,\rho\xi)=\int_0^\rho \frac{2}{1-t^2}\,dt
+=\log\frac{1+\rho}{1-\rho}
+=2\,\operatorname{arctanh}\rho.
+\]
+
+<p>也就是</p>
+
+\[
+\boxed{d(0,u)=\log\frac{1+|u|}{1-|u|}.}
+\]
+
+<p>这行公式非常值得记。它告诉你欧氏半径趋向 \(1\) 时，双曲距离会发散到无穷：</p>
+
+\[
+|u|\uparrow 1\quad\Longrightarrow\quad d(0,u)\to\infty.
+\]
+
+<p>所以球模型那层边界看起来近在咫尺，实际上永远走不到。和开欧氏圆盘完全不同，Poincaré 球虽然也是个开球，但它在自己的双曲度量下是完备的。这一点如果你和 <a href="ch15.html">第 15 章</a> 的开圆盘反例并排看，会非常有助于建立“完备性不是底层集合拓扑，而是度量结构”这层直觉。</p>
+
+<p>球模型的体积元也很直接：</p>
+
+\[
+\boxed{dV_B=\left(\frac{2}{1-|u|^2}\right)^n du_1\cdots du_n.}
+\]
+
+<p>靠近边界时它同样爆炸，因此欧氏意义下看着有限的球，双曲意义下却拥有无限延伸的半径。这也是为什么双曲空间在 PDE、群论和动力系统里总会带来“指数型”的现象：边界附近被几何性地放大了。</p>
+
+<h2 id="sec17-6">17.6 把三个世界压回一张公式表：曲率张量、Ricci、体积增长与 \(K=0\) 极限</h2>
+
+<p>现在可以把前面分开的计算重新压缩。对于任意常截面曲率 \(K\) 的 \(n\) 维空间形式 \(M_K^n\)，曲率张量都有统一表达式</p>
+
+\[
+\boxed{R(X,Y)Z=K\big(\langle Y,Z\rangle X-\langle X,Z\rangle Y\big).}
+\]
+
+<p>由此立刻得出</p>
+
+\[
+\boxed{\operatorname{Ric}=(n-1)K\,g,\qquad S=n(n-1)K.}
+\]
+
+<p>所以只要知道一个常数 \(K\)，你就同时知道了全部 sectional、Ricci 和 scalar 曲率。球面对应 \(K&gt;0\)，欧氏对应 \(K=0\)，双曲对应 \(K&lt;0\)。</p>
+
+<p>极坐标里的统一度量是</p>
+
+\[
+g=dr^2+s_K(r)^2g_{S^{n-1}},
+\]
+
+<p>于是面积与体积的统一公式是</p>
+
+\[
+\operatorname{Area}(\partial B_r)=\omega_{n-1}s_K(r)^{n-1},
+\]
+
+\[
+\operatorname{Vol}(B_r)=\omega_{n-1}\int_0^r s_K(t)^{n-1}\,dt.
+\]
+
+<p>把三个具体函数代进去，可得：</p>
+
+\[
+\operatorname{Area}_{S_R^n}(\partial B_r)
+=\omega_{n-1}R^{n-1}\sin^{n-1}\!\left(\frac rR\right),
+\]
+
+\[
+\operatorname{Area}_{\mathbb R^n}(\partial B_r)
+=\omega_{n-1}r^{n-1},
+\]
+
+\[
+\operatorname{Area}_{H^n}(\partial B_r)
+=\omega_{n-1}\sinh^{n-1}r.
+\]
+
+<p>只看这一组式子，你就能把三种体积增长看得非常透：</p>
+
+\[
+\sin r\ \text{先涨后回头},\qquad
+r\ \text{线性增长},\qquad
+\sinh r\sim \frac12 e^r.
+\]
+
+<p>也就是说，球面是有限的、欧氏是多项式增长的、双曲是指数增长的。比较几何和几何分析里许多后来出现的现象，例如热核扩散速度、群增长率、谱性质差异，其根都埋在这三种体积增长律里。你在 <a href="../偏微分方程/ch5.html">《偏微分方程读本》第 5 章</a> 看到“扩散会削峰填谷”时，背景体积增长并不显眼；可一旦底层空间换成双曲空间，扩散会因为体积爆炸而表现出完全不同的大尺度行为。</p>
+
+<p>再看 \(K\to 0\) 极限。由 Taylor 展开，</p>
+
+\[
+s_K(r)=r-\frac{Kr^3}{6}+O(K^2r^5),
+\]
+
+<p>所以</p>
+
+\[
+s_K(r)^{n-1}
+=r^{n-1}\left(1-\frac{(n-1)Kr^2}{6}+O(K^2r^4)\right).
+\]
+
+<p>这说明体积元、球面积、球体体积都会连续退化到欧氏公式。比如二维测地圆盘面积：</p>
+
+\[
+\operatorname{Area}_{S_R^2}(B_r)=2\pi R^2\left(1-\cos\frac rR\right)
+=\pi r^2-\frac{\pi}{12R^2}r^4+O(r^6),
+\]
+
+\[
+\operatorname{Area}_{H^2}(B_r)=2\pi(\cosh r-1)
+=\pi r^2+\frac{\pi}{12}r^4+O(r^6).
+\]
+
+<p>两边相对于欧氏面积的偏差，符号正好一正一负：球面少一点，双曲多一点。这种“面积缺损 / 过剩”正是曲率在面积层面留下的第一道痕迹，下一章 Gauss-Bonnet 会把它升级成一个拓扑公式。</p>
+
+<h2 id="sec17-7">17.7 这章为什么是熟手训练场：几道算到头的模型计算</h2>
+
+<p>最后把三种模型再并排做几道最值得练的算例。</p>
+
+<p>第一道是二维测地圆盘面积。我们刚刚已经有统一体积公式，所以直接积分得到：</p>
+
+\[
+\operatorname{Area}_{S_R^2}(B_r)
+=2\pi\int_0^r R\sin\!\left(\frac tR\right)\,dt
+=2\pi R^2\left(1-\cos\frac rR\right),
+\]
+
+\[
+\operatorname{Area}_{\mathbb R^2}(B_r)
+=2\pi\int_0^r t\,dt
+=\pi r^2,
+\]
+
+\[
+\operatorname{Area}_{H^2}(B_r)
+=2\pi\int_0^r \sinh t\,dt
+=2\pi(\cosh r-1).
+\]
+
+<p>这三行放在一起，比较几何的直觉几乎不用再解释：正曲率让圆盘面积小于欧氏值，负曲率让圆盘面积大于欧氏值。</p>
+
+<p>第二道是沿径向的 Jacobi 场。若 \(E(t)\) 是平行法向量场，则模型空间里的 Jacobi 场为</p>
+
+\[
+J(t)=s_K(t)E(t).
+\]
+
+<p>于是长度分别是</p>
+
+\[
+|J_{S_R^n}(t)|=R\sin\!\left(\frac tR\right),
+\qquad
+|J_{\mathbb R^n}(t)|=t,
+\qquad
+|J_{H^n}(t)|=\sinh t.
+\]
+
+<p>所以球面在 \(t=\pi R\) 处出现共轭点，欧氏与双曲则没有。这是上一章 Rauch 比较定理在模型空间里的原始母体。</p>
+
+<p>第三道是原点到边界的距离。欧氏开单位球里，从 \(0\) 到 \(\rho\xi\) 的距离就是 \(\rho\)，当 \(\rho\uparrow 1\) 时趋向 \(1\)。所以欧氏开球是不完备的。可在 Poincaré 球模型里，</p>
+
+\[
+d(0,\rho\xi)=\log\frac{1+\rho}{1-\rho}\to\infty.
+\]
+
+<p>于是同样的底层集合“开单位球”，配不同度量后会一个不完备、一个完备。这正是 <a href="ch15.html">第 15 章</a> 完备性讨论最值得你带回来的教训。</p>
+
+<p>第四道是球面上的显式测地线。给定 \(p\in S_R^n\) 与 \(v\in T_pS_R^n\)，长度 \(|v|=\alpha\)，则</p>
+
+\[
+\gamma(t)=\cos\!\left(\frac{\alpha t}{R}\right)p+\frac{R}{\alpha}\sin\!\left(\frac{\alpha t}{R}\right)v.
+\]
+
+<p>把它对 \(t\) 求两次导数，立刻验证</p>
+
+\[
+\ddot\gamma=-\frac{\alpha^2}{R^2}\gamma,
+\qquad
+|\dot\gamma|=\alpha,
+\qquad
+|\gamma|=R.
+\]
+
+<p>也就是说，你不只知道“大圆是测地线”，你还真正知道它作为 ODE 解长什么样。这种“能把抽象定理落成显式公式”的手感，正是本章存在的理由。</p>
+
+<p>第一，三种常曲率模型并不是互不相干的三个例子，而是一整套被 \(s_K(r)\) 统一控制的空间形式；度量、Jacobi 场、体积元、曲率张量都能压回同一组函数里。</p>
+<p>第二，球面、欧氏空间、双曲空间的本质差异，已经在几条最具体的公式里写死了：\(\sin\)、\(r\)、\(\sinh\) 决定了测地线束会聚或发散，也决定了面积和体积是回头、幂次还是指数增长。</p>
+<p>第三，这一章之所以叫熟手训练场，是因为比较几何和全局定理最后都要落回这些模型计算；如果这些公式你能顺手写出，后面很多“抽象结论”就不再抽象了。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 比较几何：Rauch、Toponogov 与“把弯曲程度拿去和标准模型比”</a><a href="ch18.html">下一章 · 第 18 章 Gauss-Bonnet 与 Chern-Gauss-Bonnet：曲率积分为什么会算出 Euler 示性数 →</a></nav>
+
+</main>
+</body>
+</html>

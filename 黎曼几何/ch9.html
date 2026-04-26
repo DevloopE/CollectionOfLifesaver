@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 曲率张量 \(R\) — 普林斯顿黎曼几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 Levi-Civita 联络</a><a href="ch10.html">下一章 · 第 10 章 Ricci 与 scalar 曲率 →</a></nav>
+<h1 id="ch9">第 9 章 曲率张量 \(R\)</h1>
+
+<p>如果说<a href="ch7.html">第 7 章</a>和<a href="ch8.html">第 8 章</a>回答的是“怎样在流形上做导数”，那么这一章要回答的就是更尖锐的问题：<strong>这种导数规则本身有没有弯？</strong> 也就是说，你把一个向量沿着两条不同的小路搬过去，再搬回来，最后会不会和原向量完全一致？如果不会，差的那一点到底由什么控制？</p>
+
+<p>这听上去像是一个技术问题，但其实它就是“曲率”这个词在黎曼几何里的真正定义来源。我们日常说球面是弯的、平面是不弯的、双曲面比球面“反着弯”，真正能把这些直觉压成一个统一公式的，不是第二基本形式，也不是某个单一数字，而是一个四指标的对象：曲率张量 \(R\)。</p>
+
+<p>你可以把它理解成联络的“不可交换性测量器”。在平直欧氏空间里，普通偏导可交换，平行移动绕小矩形回来也不变；在弯曲流形里，两次协变导数一般不再交换，而这种不交换恰恰是由曲率张量编码的。它和<a href="../多元微积分/ch21.html">《多元微积分读本》第 21 章</a>里“保守场为什么路径无关”、以及<a href="../多元微积分/ch22.html">第 22 章</a>里“curl 如何测局部旋涡”的味道非常接近，只不过现在对象已经从标量函数和向量场升级成了 tangent bundle 上的联络。</p>
+
+<h2 id="sec9-1">9.1 曲率的动机：为什么绕一小圈回来会偏掉</h2>
+
+<p>先别急着写定义。先把最朴素的画面摆出来。设 \(V\) 是一点 \(p\in M\) 上的切向量。你沿着某条曲线把它平行移动到邻点 \(q\)，再沿另一条曲线搬到 \(r\)，最后走回 \(p\)。如果流形“像平面那样平”，你会期待它回到原位。可在球面上做这个实验时，你很快发现：绕一个球面三角形走一圈，向量会发生净旋转，而且旋转角和所围面积有关。</p>
+
+<p>这说明一件关键事实：<strong>平行移动一般依赖路径</strong>。而“依赖到什么程度”，在 infinitesimal level 上正是曲率。也因此，曲率不是一开始就应该被想成“某个点有多弯”的数，而该先被想成“局部 holonomy 的一阶非平凡项”。</p>
+
+<p>为了防止直觉跑偏，再拿平面极坐标提醒一次。上一章里我们已经看到，在极坐标 \((r,\theta)\) 下欧氏平面的 Christoffel 符号并不为零：</p>
+
+\[
+\Gamma^r_{\theta\theta}=-r,\qquad
+\Gamma^\theta_{r\theta}=\Gamma^\theta_{\theta r}=\frac1r.
+\]
+
+<p>可平面明明不弯。所以“Christoffel 非零”只能说明坐标基在动，不能说明空间真有曲率。真正可靠的对象必须能把这些纯坐标效应自动抵消掉。曲率张量的定义正是为此设计的。</p>
+
+<p>还有一个很有帮助的对照，是圆柱面。把一张纸卷成圆柱后，外观看起来弯了，可你沿圆柱做局部展开，又会发现它和平面在内蕴上几乎没区别。于是“外形弯”与“内在曲率非零”并不是一回事。这再一次提醒你：黎曼几何要测的，是切空间之间比较规则的内蕴扭曲，而不是环境空间里的外观曲线度。</p>
+
+<p>有了这层准备，我们现在才来写定义。你会发现它并不长；长的是它背后包含的几何信息。</p>
+
+<h2 id="sec9-2">9.2 曲率算子的定义：两次协变导数为什么不交换</h2>
+
+<p>设 \(\nabla\) 是流形上的一条联络。对向量场 \(X,Y,Z\)，定义曲率算子</p>
+
+\[
+\boxed{R(X,Y)Z
+=
+\nabla_X\nabla_YZ
+-\nabla_Y\nabla_XZ
+-\nabla_{[X,Y]}Z.}
+\]
+
+<p>这条式子需要慢慢读。前两项当然是在比较“先沿 \(Y\) 再沿 \(X\)”和“先沿 \(X\) 再沿 \(Y\)”的差异；第三项 \(-\nabla_{[X,Y]}Z\) 则是用来扣掉“底层方向场本身不交换”所带来的那部分假差异。没有这项，哪怕在平直空间里，非坐标向量场的交换失败也会污染你的测量。</p>
+
+<p>所以 \(R(X,Y)Z\) 真正在测的是：<strong>联络本身造成的不可交换性</strong>。在欧氏空间的平直联络里，\(\nabla_XY=D_XY\)，普通导数满足</p>
+
+\[
+D_XD_YZ-D_YD_XZ=D_{[X,Y]}Z,
+\]
+
+<p>于是 \(R\equiv 0\)。这和“平行移动路径无关”完全一致。</p>
+
+<p>还要注意两点。第一，\(R(X,Y)\) 对固定 \(X,Y\) 而言，是一个把向量场 \(Z\) 送到向量场 \(R(X,Y)Z\) 的线性算子，所以有时也把它叫做曲率变换。第二，它对 \(X,Y\) 是反对称的，因为把 \(X,Y\) 互换会让前两项换位，同时 \([Y,X]=-[X,Y]\)。于是</p>
+
+\[
+R(Y,X)Z=-R(X,Y)Z.
+\]
+
+<p>也就是说，曲率总是跟一块有向 2-平面而不是单一方向绑定。这一点到了第 11 章的截面曲率会变得非常自然：曲率最原始的几何单元不是一条方向，而是一个小平行四边形。</p>
+
+<p>在坐标向量场 \(\partial_i,\partial_j,\partial_k\) 下，因为 \([\partial_i,\partial_j]=0\)，公式立刻简化为</p>
+
+\[
+R(\partial_i,\partial_j)\partial_k
+=
+\nabla_{\partial_i}\nabla_{\partial_j}\partial_k
+-\nabla_{\partial_j}\nabla_{\partial_i}\partial_k.
+\]
+
+<p>这说明曲率在坐标系里就是 Christoffel 符号的一阶变化加上一些二次组合。换句话说，曲率比联络高一个微分层级；它记录的不是“基怎么动”，而是“这种动法在空间里是否自洽”。</p>
+
+<h2 id="sec9-3">9.3 为什么 \(R\) 真的是张量：Christoffel 不是，曲率却是</h2>
+
+<p>上一章我们已经强调过，Christoffel 符号不是张量。那 \(R\) 呢？结论非常关键：</p>
+
+\[
+\boxed{R\in \Gamma(T^1_3M).}
+\]
+
+<p>也就是说，它对 \(X,Y,Z\) 三个输入都 \(C^\infty(M)\)-线性，真正在每一点只依赖 \(X_p,Y_p,Z_p\)。这正是它能成为几何不变量的根本原因。</p>
+
+<p>先看第一个变量。对任意函数 \(f\)，有</p>
+
+\[
+R(fX,Y)Z
+=
+\nabla_{fX}\nabla_YZ-\nabla_Y\nabla_{fX}Z-\nabla_{[fX,Y]}Z.
+\]
+
+<p>逐项展开：</p>
+
+\[
+\nabla_{fX}\nabla_YZ=f\nabla_X\nabla_YZ,
+\]
+
+\[
+\nabla_Y\nabla_{fX}Z
+=
+\nabla_Y\bigl(f\nabla_XZ\bigr)
+=
+Y(f)\nabla_XZ+f\nabla_Y\nabla_XZ,
+\]
+
+\[
+[fX,Y]=f[X,Y]-Y(f)X.
+\]
+
+<p>因此</p>
+
+\[
+\nabla_{[fX,Y]}Z
+=
+f\nabla_{[X,Y]}Z-Y(f)\nabla_XZ.
+\]
+
+<p>把这些代回去，\(Y(f)\nabla_XZ\) 正好消掉，于是</p>
+
+\[
+R(fX,Y)Z=fR(X,Y)Z.
+\]
+
+<p>第二个变量同理，可得</p>
+
+\[
+R(X,fY)Z=fR(X,Y)Z.
+\]
+
+<p>第三个变量看上去最麻烦，其实更直接。因为联络在第二个变量里 obey Leibniz 规则，所以</p>
+
+\[
+R(X,Y)(fZ)
+=
+\nabla_X\bigl(Y(f)Z+f\nabla_YZ\bigr)
+-\nabla_Y\bigl(X(f)Z+f\nabla_XZ\bigr)
+-\nabla_{[X,Y]}(fZ).
+\]
+
+<p>把所有项展开后，涉及 \(X(f),Y(f),XY(f),YX(f)\) 的部分会全部抵消，只剩</p>
+
+\[
+R(X,Y)(fZ)=fR(X,Y)Z.
+\]
+
+<p>这条计算虽然看似只是 bookkeeping，却揭示了一个深刻区分：联络本身带有导数性质，所以不会张量化；而一旦你比较两次协变导数的不可交换部分，所有“求导函数系数”的污染恰好抵消，真正的几何核心就裸露出来了。曲率正是这种“把不坐标不张量的东西重新组合成张量”的第一位明星。</p>
+
+<p>从学习策略上说，这里有一条很好记的经验：凡是你在微分几何里看到“某些系数在不同坐标里长得乱七八糟”，都别急着失望。真正有意义的对象往往是把它们做某种差、某种交换子、某种外微分以后才出现的。联络、Lie 括号、外微分、曲率，几乎都遵循这个节奏。</p>
+
+<h2 id="sec9-4">9.4 坐标公式：\(\partial\Gamma+\Gamma\Gamma\) 从哪里来</h2>
+
+<p>现在把定义落到坐标里。设</p>
+
+\[
+\nabla_{\partial_i}\partial_j=\Gamma^\ell_{ij}\partial_\ell.
+\]
+
+<p>那么</p>
+
+\[
+\nabla_{\partial_i}\nabla_{\partial_j}\partial_k
+=
+\nabla_{\partial_i}\bigl(\Gamma^m_{jk}\partial_m\bigr)
+=
+\partial_i\Gamma^m_{jk}\,\partial_m+\Gamma^m_{jk}\nabla_{\partial_i}\partial_m
+\]
+
+\[
+=
+\bigl(\partial_i\Gamma^\ell_{jk}+\Gamma^m_{jk}\Gamma^\ell_{im}\bigr)\partial_\ell.
+\]
+
+<p>同理，</p>
+
+\[
+\nabla_{\partial_j}\nabla_{\partial_i}\partial_k
+=
+\bigl(\partial_j\Gamma^\ell_{ik}+\Gamma^m_{ik}\Gamma^\ell_{jm}\bigr)\partial_\ell.
+\]
+
+<p>由于坐标向量场交换，\([\partial_i,\partial_j]=0\)，故</p>
+
+\[
+R(\partial_i,\partial_j)\partial_k
+=
+\Bigl(
+\partial_i\Gamma^\ell_{jk}
+-\partial_j\Gamma^\ell_{ik}
++\Gamma^\ell_{im}\Gamma^m_{jk}
+-\Gamma^\ell_{jm}\Gamma^m_{ik}
+\Bigr)\partial_\ell.
+\]
+
+<p>于是定义分量</p>
+
+\[
+R(\partial_i,\partial_j)\partial_k
+=
+R^\ell{}_{kij}\partial_\ell,
+\]
+
+<p>便得到坐标公式</p>
+
+\[
+\boxed{
+R^\ell{}_{kij}
+=
+\partial_i\Gamma^\ell_{jk}
+-\partial_j\Gamma^\ell_{ik}
++\Gamma^\ell_{im}\Gamma^m_{jk}
+-\Gamma^\ell_{jm}\Gamma^m_{ik}.}
+\]
+
+<p>这条式子至少要看出四层意思。第一，曲率只用到 \(\Gamma\) 及其一阶导数。第二，它的结构确实是“\(\partial\Gamma+\Gamma\Gamma\)”，正如上一章末尾预告的那样。第三，若在某一点选法坐标使 \(\Gamma(p)=0\)，则该点的曲率简化成纯一阶导数差：</p>
+
+\[
+R^\ell{}_{kij}(p)=\partial_i\Gamma^\ell_{jk}(p)-\partial_j\Gamma^\ell_{ik}(p).
+\]
+
+<p>第四，这再次说明曲率是二阶效应：Christoffel 本身可以在一点抹掉，但它们的变化率一般抹不掉。</p>
+
+<p>若再用度量降指标，记</p>
+
+\[
+R_{m k i j}=g_{m\ell}R^\ell{}_{kij},
+\]
+
+<p>则对于 Levi-Civita 联络，还会得到一批对称性：</p>
+
+\[
+R_{mkij}=-R_{kmij},\qquad
+R_{mkij}=-R_{mkji}.
+\]
+
+<p>更强的对称 \(R_{mkij}=R_{ijmk}\) 也成立，但它稍后会从第一 Bianchi 恒等式和度量兼容一起显出。现在先别把指标森林背成纯形式，把它当作一个提醒就够了：Levi-Civita 曲率远不是任意四指标对象，它的自由度被严重压缩。</p>
+
+<h2 id="sec9-5">9.5 第一套完整算例：极坐标下的平面曲率为什么仍然是零</h2>
+
+<p>这一节专门用来打掉一个初学时最顽固的误会：Christoffel 非零并不等于曲率非零。我们用上一章的极坐标平面把这件事算到底。</p>
+
+<p>欧氏平面在极坐标下的非零 Christoffel 符号是</p>
+
+\[
+\Gamma^r_{\theta\theta}=-r,\qquad
+\Gamma^\theta_{r\theta}=\Gamma^\theta_{\theta r}=\frac1r.
+\]
+
+<p>先算 \(R^r{}_{\theta r\theta}\)。由公式</p>
+
+\[
+R^r{}_{\theta r\theta}
+=
+\partial_r\Gamma^r_{\theta\theta}
+-\partial_\theta\Gamma^r_{r\theta}
++\Gamma^r_{rm}\Gamma^m_{\theta\theta}
+-\Gamma^r_{\theta m}\Gamma^m_{r\theta}.
+\]
+
+<p>逐项看：</p>
+
+\[
+\partial_r\Gamma^r_{\theta\theta}=\partial_r(-r)=-1,
+\]
+
+\[
+\partial_\theta\Gamma^r_{r\theta}=0,
+\]
+
+\[
+\Gamma^r_{rm}\Gamma^m_{\theta\theta}=0
+\]
+
+<p>因为 \(\Gamma^r_{rr}=\Gamma^r_{r\theta}=0\)。最后一项只有 \(m=\theta\) 时非零：</p>
+
+\[
+-\Gamma^r_{\theta\theta}\Gamma^\theta_{r\theta}
+=
+-(-r)\cdot\frac1r
+=
+1.
+\]
+
+<p>于是</p>
+
+\[
+R^r{}_{\theta r\theta}=-1+0+0+1=0.
+\]
+
+<p>再算另一个分量 \(R^\theta{}_{r\theta r}\)：</p>
+
+\[
+R^\theta{}_{r\theta r}
+=
+\partial_\theta\Gamma^\theta_{rr}
+-\partial_r\Gamma^\theta_{\theta r}
++\Gamma^\theta_{\theta m}\Gamma^m_{rr}
+-\Gamma^\theta_{rm}\Gamma^m_{\theta r}.
+\]
+
+<p>这里 \(\Gamma^\theta_{rr}=0\)，所以第一项为零；第二项是</p>
+
+\[
+-\partial_r\left(\frac1r\right)=\frac1{r^2}.
+\]
+
+<p>第三项为零。第四项只有 \(m=\theta\) 非零：</p>
+
+\[
+-\Gamma^\theta_{r\theta}\Gamma^\theta_{\theta r}
+=
+-\frac1r\cdot\frac1r
+=
+-\frac1{r^2}.
+\]
+
+<p>于是</p>
+
+\[
+R^\theta{}_{r\theta r}=0.
+\]
+
+<p>所有曲率分量都灭了，所以平面依然平。你现在该把这个例子当成一条护身符：以后每次看见某套坐标里的 Christoffel 很热闹，都先别激动。先问一句：它们只是因为坐标基在动，还是因为空间真有曲率？第一个问题看 \(\Gamma\) 就够了，第二个问题必须看 \(R\)。</p>
+
+<p>这也就是为什么曲率张量是张量，而 Christoffel 不是。张量化的那一步，正是在剔除纯坐标噪音。</p>
+
+<h2 id="sec9-6">9.6 第一 Bianchi 恒等式：代数上的循环和为零</h2>
+
+<p>对无挠联络，曲率满足第一 Bianchi 恒等式：</p>
+
+\[
+\boxed{R(X,Y)Z+R(Y,Z)X+R(Z,X)Y=0.}
+\]
+
+<p>这是一个纯代数性质。它不像“度量兼容”那样直接谈长度，也不像“第二 Bianchi”那样涉及对曲率再求导；它说的是：当你对三个方向做循环求和时，曲率的最基本不对称性会自动抵消。</p>
+
+<p>最干净的证明方式，是在点 \(p\) 选一组法坐标。此时 \(\Gamma(p)=0\)，所以</p>
+
+\[
+R^\ell{}_{kij}(p)=\partial_i\Gamma^\ell_{jk}(p)-\partial_j\Gamma^\ell_{ik}(p).
+\]
+
+<p>对 \(i,j,k\) 做循环和：</p>
+
+\[
+R^\ell{}_{kij}+R^\ell{}_{jik}+R^\ell{}_{ikj}
+\]
+
+\[
+=
+(\partial_i\Gamma^\ell_{jk}-\partial_j\Gamma^\ell_{ik})
++(\partial_k\Gamma^\ell_{ij}-\partial_i\Gamma^\ell_{kj})
++(\partial_j\Gamma^\ell_{ki}-\partial_k\Gamma^\ell_{ji}).
+\]
+
+<p>由于 Levi-Civita 联络无挠，所以 \(\Gamma^\ell_{jk}=\Gamma^\ell_{kj}\)。于是上面每一项都成对抵消，得到</p>
+
+\[
+R^\ell{}_{kij}+R^\ell{}_{jik}+R^\ell{}_{ikj}=0.
+\]
+
+<p>这就是第一 Bianchi 的坐标分量形式。既然它在任意点、任意法坐标都成立，它便是一个坐标无关的张量恒等式。</p>
+
+<p>对 Levi-Civita 联络，这条恒等式还能与度量对称性结合，推出前面提到的交换对称</p>
+
+\[
+R_{ijkl}=R_{klij}.
+\]
+
+<p>这件事的技术证明稍长，但几何味很浓：曲率不只反映“前两条边的有向平面”，也对“后两条测试向量所张成的平面”有对等的响应。后面你学截面曲率时，这种双重对称会把曲率从四指标压回到二维子空间上的一个数。</p>
+
+<h2 id="sec9-7">9.7 第二 Bianchi 恒等式：曲率本身也满足微分约束</h2>
+
+<p>第一 Bianchi 只谈 \(R\) 本身。第二 Bianchi 则把协变导数再压到 \(R\) 身上：</p>
+
+\[
+\boxed{
+(\nabla_XR)(Y,Z)
++(\nabla_YR)(Z,X)
++(\nabla_ZR)(X,Y)=0.}
+\]
+
+<p>写成坐标分量，一种常见形式是</p>
+
+\[
+\boxed{
+\nabla_m R^\ell{}_{kij}
++\nabla_i R^\ell{}_{kjm}
++\nabla_j R^\ell{}_{kmi}
+=0.}
+\]
+
+<p>这条式子第一次见往往让人有点眩晕，因为它像是在说：“曲率已经够复杂了，怎么它自己还受一个更隐蔽的守恒律支配？” 但从法坐标角度看，思路其实不神秘。仍在一点 \(p\) 取法坐标，此时 \(\Gamma(p)=0\)，所以协变导数在 \(p\) 退化成普通偏导，而曲率分量又可写成 \(\Gamma\) 的一阶导数差。于是第二 Bianchi 的循环和，本质上是若干二阶偏导数的组合。</p>
+
+<p>更具体地说，在 \(p\) 有</p>
+
+\[
+\nabla_m R^\ell{}_{kij}(p)=\partial_m R^\ell{}_{kij}(p),
+\]
+
+<p>而</p>
+
+\[
+R^\ell{}_{kij}(p)=\partial_i\Gamma^\ell_{jk}(p)-\partial_j\Gamma^\ell_{ik}(p).
+\]
+
+<p>把这些代入循环和，就会出现一堆类似</p>
+
+\[
+\partial_m\partial_i\Gamma^\ell_{jk}
+-\partial_m\partial_j\Gamma^\ell_{ik}
++\partial_i\partial_j\Gamma^\ell_{mk}
+-\partial_i\partial_m\Gamma^\ell_{jk}
+\cdots
+\]
+
+<p>的项。最终一切都依赖于混合偏导可交换</p>
+
+\[
+\partial_m\partial_i=\partial_i\partial_m,
+\]
+
+<p>因此成对消掉。这就是第二 Bianchi 的证明思路。真正完整写到每一项当然会有些冗长，但核心逻辑并不深：在法坐标里，曲率的协变导数约束归根到底是“二阶微分的交换律”加上联络无挠所产生的循环抵消。</p>
+
+<p>这条恒等式的地位极高。下一章我们把它做一次缩并，就会得到</p>
+
+\[
+\nabla^i\Bigl(R_{ij}-\frac12Sg_{ij}\Bigr)=0,
+\]
+
+<p>也就是 Einstein 张量的散度为零。广义相对论里能量动量守恒之所以能和引力场方程兼容，背后站着的就是第二 Bianchi。你现在看到的这一长串纯几何公式，到了物理里会突然变成守恒律。</p>
+
+<h2 id="sec9-8">9.8 Levi-Civita 曲率的更多对称性：四个指标其实没那么自由</h2>
+
+<p>一旦联络是 Levi-Civita，曲率就不只满足反对称和两条 Bianchi。把最后一个指标再拿度量配上去，定义</p>
+
+\[
+R(X,Y,Z,W):=\langle R(X,Y)Z,W\rangle.
+\]
+
+<p>这个四线性对象会满足一连串极重要的对称性：</p>
+
+\[
+R(X,Y,Z,W)=-R(Y,X,Z,W),
+\]
+
+\[
+R(X,Y,Z,W)=-R(X,Y,W,Z),
+\]
+
+\[
+\boxed{R(X,Y,Z,W)=R(Z,W,X,Y).}
+\]
+
+<p>前两条分别是对前两个变量和后两个变量的反对称；第三条则是最有内容的交换对称，它说“前面那块有向 2-平面”和“后面那块测试 2-平面”在某种意义上是对等的。用分量写就是</p>
+
+\[
+R_{ijkl}=-R_{jikl}=-R_{ijlk}=R_{klij}.
+\]
+
+<p>这几条对称性不是装饰性的。它们大大压缩了独立分量数量。比如二维时，所有曲率信息最后只剩下一个独立标量；三维时，曲率张量也会被 Ricci 张量完全决定；四维以后自由度才真正大幅增加。换句话说，曲率张量虽然长得像一个庞大的四指标怪物，但 Levi-Civita 条件把它锁得很紧。</p>
+
+<p>为什么会有最后那条交换对称？一种做法是用第一 Bianchi 恒等式配合前面的反对称性反复换位；另一种做法是在法坐标里直接从 \(g\) 的二阶导数表达式出发去看。无论哪条路，最终都在表达同一件事：Levi-Civita 曲率不是随便拼出来的 \((0,4)\)-型张量，而是由同一个度量二阶数据压出的对象，所以前后两对指标之间存在深层耦合。</p>
+
+<p>你不必现在把这些对称性全背熟，但至少要记住一个学习上的收益：往后看 Ricci 缩并、截面曲率、Einstein 张量时，很多看似 miraculous 的化简，背后其实都在悄悄调用这里的对称性。它们是曲率世界的语法规则。</p>
+
+<h2 id="sec9-9">9.9 第二套完整算例：单位球面的曲率张量</h2>
+
+<p>现在算最经典的正曲率模型：单位球面 \(S^2\)。上一章我们已经得到球坐标 \((\theta,\phi)\) 下的非零 Christoffel 符号：</p>
+
+\[
+\Gamma^\theta_{\phi\phi}=-\sin\theta\cos\theta,\qquad
+\Gamma^\phi_{\theta\phi}=\Gamma^\phi_{\phi\theta}=\cot\theta.
+\]
+
+<p>先算一个核心分量 \(R^\theta{}_{\phi\theta\phi}\)。由坐标公式，</p>
+
+\[
+R^\theta{}_{\phi\theta\phi}
+=
+\partial_\theta\Gamma^\theta_{\phi\phi}
+-\partial_\phi\Gamma^\theta_{\theta\phi}
++\Gamma^\theta_{\theta m}\Gamma^m_{\phi\phi}
+-\Gamma^\theta_{\phi m}\Gamma^m_{\theta\phi}.
+\]
+
+<p>第二项为零，因为 \(\Gamma^\theta_{\theta\phi}=0\)。第三项也为零。第一项是</p>
+
+\[
+\partial_\theta(-\sin\theta\cos\theta)=\sin^2\theta-\cos^2\theta.
+\]
+
+<p>第四项只有 \(m=\phi\) 时非零：</p>
+
+\[
+-\Gamma^\theta_{\phi\phi}\Gamma^\phi_{\theta\phi}
+=
+-(-\sin\theta\cos\theta)\cot\theta
+=
+\cos^2\theta.
+\]
+
+<p>于是</p>
+
+\[
+R^\theta{}_{\phi\theta\phi}
+=
+(\sin^2\theta-\cos^2\theta)+\cos^2\theta
+=
+\sin^2\theta.
+\]
+
+<p>再算另一个分量 \(R^\phi{}_{\theta\phi\theta}\)：</p>
+
+\[
+R^\phi{}_{\theta\phi\theta}
+=
+\partial_\phi\Gamma^\phi_{\theta\theta}
+-\partial_\theta\Gamma^\phi_{\phi\theta}
++\Gamma^\phi_{\phi m}\Gamma^m_{\theta\theta}
+-\Gamma^\phi_{\theta m}\Gamma^m_{\phi\theta}.
+\]
+
+<p>第一项为零，因为 \(\Gamma^\phi_{\theta\theta}=0\)。第二项是</p>
+
+\[
+-\partial_\theta(\cot\theta)=\csc^2\theta.
+\]
+
+<p>第三项只有 \(m=\theta\) 但对应 \(\Gamma^\theta_{\theta\theta}=0\)，所以为零。第四项只有 \(m=\phi\) 非零：</p>
+
+\[
+-\Gamma^\phi_{\theta\phi}\Gamma^\phi_{\phi\theta}
+=
+-(\cot\theta)^2.
+\]
+
+<p>因此</p>
+
+\[
+R^\phi{}_{\theta\phi\theta}
+=
+\csc^2\theta-\cot^2\theta
+=
+1.
+\]
+
+<p>把指标降下来，得到</p>
+
+\[
+R_{\theta\phi\theta\phi}
+=
+g_{\theta\theta}R^\theta{}_{\phi\theta\phi}
+=
+1\cdot \sin^2\theta
+=
+\sin^2\theta.
+\]
+
+<p>于是球面的截面曲率为</p>
+
+\[
+K=
+\frac{R_{\theta\phi\theta\phi}}
+{g_{\theta\theta}g_{\phi\phi}-g_{\theta\phi}^2}
+=
+\frac{\sin^2\theta}{1\cdot\sin^2\theta-0}
+=
+1.
+\]
+
+<p>这和单位球面“常正曲率 1”完全吻合。更进一步，在任意切向量 \(X,Y,Z\) 上，都有</p>
+
+\[
+\boxed{R(X,Y)Z=\langle Y,Z\rangle X-\langle X,Z\rangle Y.}
+\]
+
+<p>这条公式是常曲率空间的标准模板。它漂亮的地方在于：曲率不再依赖于某套坐标，也不再依赖于某个特殊方向，而只通过度量和常数 \(1\) 出现。你可以把它理解成“单位球面里所有 2-平面都一样弯”。</p>
+
+<p>这又和极坐标平面的例子形成鲜明对照：在平面里，Christoffel 可以很花，但 \(R\) 全零；在球面里，\(R\) 会在任何点、任何方向上留下不可洗掉的正曲率。到这里，你应该已经真正感受到“联络系数”和“曲率张量”不是同一层级的对象了。</p>
+
+<h2 id="sec9-10">9.10 第三套完整算例：圆柱面为什么外观弯、内在却平</h2>
+
+<p>球面让你看到“外观弯且内在真弯”的情况。现在看另一个最容易把人直觉带偏的对象：圆柱面。半径为 \(a\) 的圆柱可用坐标 \((\theta,z)\) 参数化为</p>
+
+\[
+(\,a\cos\theta,\ a\sin\theta,\ z\,).
+\]
+
+<p>诱导度量是</p>
+
+\[
+ds^2=a^2\,d\theta^2+dz^2.
+\]
+
+<p>于是度量矩阵为</p>
+
+\[
+(g_{ij})=
+\begin{pmatrix}
+a^2&0\\
+0&1
+\end{pmatrix}.
+\]
+
+<p>请注意这是一张常数矩阵，所以所有一阶导数都为零：</p>
+
+\[
+\partial_\theta g_{ij}=0,\qquad \partial_z g_{ij}=0.
+\]
+
+<p>由 Christoffel 公式立刻得到</p>
+
+\[
+\Gamma^k_{ij}=0.
+\]
+
+<p>再由曲率公式，所有分量自然全为零：</p>
+
+\[
+R^\ell{}_{kij}=0.
+\]
+
+<p>也就是说，圆柱面的内蕴曲率完全和欧氏平面一样，都是零。它在 \(\mathbb R^3\) 里的“弯”，全部落在第二基本形式那边，而没有进入 Levi-Civita 曲率张量。把一张纸卷成圆柱却不撕不拉，局部长度和角度都没变，这件事在公式上的表达，正是 \(R\equiv0\)。</p>
+
+<p>这个算例非常重要，因为它把 Gauss 的内蕴观点压得极清楚：黎曼曲率测的不是“看起来有没有弯”，而是“内在测地结构有没有无法展开为平面”。球面做不到局部无失真展开，所以 \(R\neq0\)；圆柱面做得到，所以 \(R=0\)。若这两者在你脑中彻底分开了，后面很多概念都会轻松很多。</p>
+
+<h2 id="sec9-11">9.11 平行移动绕小圈的物理意义：holonomy 的无穷小版本</h2>
+
+<p>现在回到本章一开始的几何画面：绕一小圈回来，向量到底差多少？曲率张量给出的就是这一差值的无穷小主项。</p>
+
+<p>设 \(X,Y\in T_pM\) 两个方向，在点 \(p\) 附近张成一个很小的平行四边形，边长参数分别为 \(s,t\)。把一个向量 \(Z\in T_pM\) 沿这四条边做 Levi-Civita 平行移动，再搬回原点。则有</p>
+
+\[
+\boxed{
+P_{\square(s,t)}Z
+=
+Z+st\,R(X,Y)Z+O\bigl(st(s+t)\bigr).}
+\]
+
+<p>这里 \(P_{\square(s,t)}\) 表示绕小回路一圈的 holonomy。不同教材对符号约定可能差一个整体负号，但几何内容不变：<strong>偏差与面积 \(st\) 成正比，比例常数就是曲率</strong>。</p>
+
+<p>这条公式为什么合理？在点 \(p\) 取法坐标，使 \(\Gamma(p)=0\)。这样沿每条边平行移动时，一阶效应都被压掉了；最先留下来的就是二阶项，而二阶项恰由 Christoffel 的一阶导数差，也即 \(R\)，决定。于是曲率并不是某种神秘新量，而正是“局部 holonomy 的二阶主系数”。</p>
+
+<p>在球面上，这个画面尤其直观。你拿一支箭头沿着一个很小的球面三角形搬一圈，最后会发现箭头相对于原方向发生了微小转角。对单位球面而言，这个转角在一阶近似上等于所围面积；而“面积密度等于 1”正是 \(K=1\) 的几何内容。到了<a href="ch18.html">第 18 章</a>的 Gauss-Bonnet，你会看到这件事从局部近似升级为全球定理：总旋转与总曲率积分相连。</p>
+
+<p>如果你来自物理背景，这里还可以再听出一个熟悉味道。规范场论里联络 1-形式的曲率 2-形式衡量的，也是沿闭合回路做平行运输的失败量。黎曼几何中的 \(R\) 可以看成 tangent bundle 上的那份规范场强。只是这里结构群不是一般李群，而是由度量决定的正交群。</p>
+
+<h2 id="sec9-12">9.12 这一章真正该带走什么</h2>
+
+<p>到这里，曲率张量最该带走的第一句话是：它测量的不是“某套坐标看起来有多弯”，而是联络导致的协变导数不交换、平行移动绕圈不闭合。第二句话是：它之所以值钱，正因为它是张量；Christoffel 可以被坐标揉来揉去，曲率却洗不掉。第三句话是：第一、第二 Bianchi 恒等式并不是技术碎屑，而是曲率内部受到的最根本对称与守恒约束，它们会直接通向下一章的 Ricci 缩并与 Einstein 张量。</p>
+
+<p>若你愿意把这一章压成一个更实战的判断，也可以这样说：算曲率时先别被 \(\Gamma\) 吓住，先问自己所在空间是不是平面、球面、双曲面这类熟模型；再问是坐标效应还是内在弯曲；最后才用 \(\partial\Gamma+\Gamma\Gamma\) 做真正的验证。很多时候，好的几何直觉会比盲目展开公式更先告诉你答案应该是零、正还是负。</p>
+
+<p>下一章我们会把这团四指标对象进一步压缩。不是因为 \(R\) 不重要，而是因为它太丰富了；在很多全局问题和物理问题里，我们不需要知道每个方向上的全部弯曲，只想知道“平均弯曲”或者“体积在某方向上是如何被压缩的”。Ricci 张量与标量曲率做的，就是这一步缩并。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 Levi-Civita 联络</a><a href="ch10.html">下一章 · 第 10 章 Ricci 与 scalar 曲率 →</a></nav>
+
+</main>
+</body>
+</html>

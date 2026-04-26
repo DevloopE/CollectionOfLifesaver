@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 Hodge 理论入门 — 普林斯顿黎曼几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 Gauss-Bonnet 与 Chern-Gauss-Bonnet：曲率积分为什么会算出 Euler 示性数</a><a href="ch20.html">下一章 · 第 20 章 应用：广义相对论与 Ricci 流 →</a></nav>
+<h1 id="ch19">第 19 章 Hodge 理论入门</h1>
+
+<p>到<a href="ch18.html">第 18 章</a>为止，这本书已经把一条很强的主线铺好了：你先学会流形、张量、微分形式和外微分，再用联络与曲率看见几何怎样弯起来，最后在 Gauss-Bonnet 里第一次认真体会“积分一个几何量，居然能吐出一个拓扑不变量”。可你如果顺着这个感觉再追问一步，很自然会问：除了 Euler 示性数这种特别漂亮的总量之外，<strong>更细的拓扑信息能不能也用几何对象直接抓住</strong>？</p>
+
+<p>Hodge 理论回答的正是这个问题。它的口气很像是把两本书突然缝到一起：一边是<a href="ch4.html">第 4 章</a>和<a href="appB.html">附录 B</a>里的微分形式与 de Rham 上同调，另一边是<a href="ch5.html">第 5 章</a>和<a href="ch10.html">第 10 章</a>里的度量、体积、Laplace 型算子。de Rham 上同调本来只用到了 \(d\) 和“闭形式模掉恰当形式”；它看起来非常拓扑，因为没有任何距离和角度。Hodge 理论却说：一旦你给流形装上黎曼度量，每个上同调类里都会自动挑出一个最舒服、最对称、最不再含有“冗余振荡”的代表。这个代表就是<strong>调和形式</strong>。</p>
+
+<p>从哲学上说，这一章讲的是“把拓扑问题交给分析，再把分析答案送回拓扑”。你在<a href="../代数拓扑/ch15.html">《代数拓扑读本》第 15 章</a>第一次把上同调当作代数对象来处理时，核心语言是共边界、上链和商群；到了这里，同一个不变量将被重新翻译成偏微分方程 \(\Delta \omega=0\) 的解空间。于是“第 \(k\) 个 Betti 数”不再只是一个抽象维数，而变成“第 \(k\) 阶调和形式空间的维数”。这就是 Hodge 理论最迷人的地方：它不是给你另一个定义，而是给你一个新的入口。</p>
+
+<p>为了不让边界条件把主线搅乱，这一章默认 \(M\) 是<strong>紧致、定向、无边界</strong>的黎曼流形。若 \(M\) 有边界，那么很多公式仍然对，但 Hodge 分解需要附加绝对或相对边界条件；那是下一门课该细抠的技术。我们在这里先把最干净的版本讲透。</p>
+
+<h2 id="sec19-1">19.1 为什么拓扑问题会突然需要度量</h2>
+
+<p>先把最容易卡住人的地方说破。de Rham 上同调的定义是</p>
+
+\[
+H^k_{\mathrm{dR}}(M)=\frac{\ker\bigl(d\colon \Omega^k(M)\to \Omega^{k+1}(M)\bigr)}{\operatorname{im}\bigl(d\colon \Omega^{k-1}(M)\to \Omega^k(M)\bigr)}.
+\]
+
+<p>这行公式里没有长度、没有角度、没有 Christoffel 符号、甚至没有“哪一条曲线更短”这种度量味道。它之所以是拓扑不变量，靠的是 \(d\) 只和坐标变换的光滑性有关，不和具体的 \(g\) 有关。所以你可能会想：既然目标是拓扑，何必再引进度量？</p>
+
+<p>答案是：<strong>为了在每个等价类里选一个规范代表。</strong> 上同调类本质上是“无穷多种写法折叠后的结果”。例如在圆周 \(S^1\) 上，所有形如</p>
+
+\[
+\omega=f(\theta)\,d\theta
+\]
+
+<p>的 \(1\)-形式都自动满足 \(d\omega=0\)，因为一维流形上没有 \(2\)-形式可去了。可它们显然不都代表不同的上同调类。若 \(f\) 的平均值是零，那么 \(\omega=dF\) 就是恰当的；只有平均值那一小块真正留下来。Hodge 理论告诉你：在这个类里，最自然的代表其实就是常数倍的 \(d\theta\)。换句话说，<strong>度量会帮你把“闭形式很多、真正独立的类不多”这件事整理干净</strong>。</p>
+
+<p>这一想法和线性代数里“在一个仿射子空间里挑距离原点最近的点”很像。你在<a href="../线性代数/ch20.html">《线性代数读本》第 20 章</a>学过正交投影：一旦内积到位，很多原本不唯一的表示都会自动收缩出一个最优元。Hodge 理论只是把这个故事搬到无穷维空间 \(\Omega^k(M)\) 上。微分形式的世界里，正交补对应 \(d\Omega^{k-1}\) 与 \(d^\ast\Omega^{k+1}\)；投影剩下来的那块，就是调和形式空间。</p>
+
+<p>如果要把全章压成一句最先该记的口号，那就是</p>
+
+\[
+\boxed{\text{Hodge 理论 = 在微分形式空间上做正交分解，把拓扑类变成调和解。}}
+\]
+
+<p>这句话里每个词都还没展开，但路线已经全在里头了：你需要先有“微分形式上的内积”，才能谈“伴随算子 \(d^\ast\)”；有了 \(d^\ast\)，才能组装出 Laplace 算子 \(\Delta\)；有了 \(\Delta\)，才能定义调和形式；最后再证明每个上同调类恰有一个调和代表。</p>
+
+<h2 id="sec19-2">19.2 微分形式上的内积与 Hodge 星算子</h2>
+
+<p>我们从最根的结构开始。给定定向黎曼流形 \((M^n,g)\)，在每一点 \(p\in M\)，度量 \(g_p\) 先给切空间 \(T_pM\) 一个内积；它也自然诱导余切空间 \(T_p^\ast M\) 的内积，再进一步诱导 \(\Lambda^kT_p^\ast M\) 上的内积。坐标表达看起来有点长，但几何意思很简单：把 \(k\)-形式分解到一个正交规范余标架里，不同基向量正交，同一基向量范数为 \(1\)。</p>
+
+<p>若 \(\{e^1,\dots,e^n\}\) 是点 \(p\) 附近的正交规范余标架，那么</p>
+
+\[
+e^{i_1}\wedge\cdots\wedge e^{i_k}
+\]
+
+<p>（其中 \(i_1&lt;\cdots&lt;i_k\)）构成 \(\Lambda^kT_p^\ast M\) 的正交规范基。于是任意两条 \(k\)-形式</p>
+
+\[
+\alpha=\sum_I \alpha_I e^I,\qquad \beta=\sum_I \beta_I e^I
+\]
+
+<p>的点态内积就是</p>
+
+\[
+\langle \alpha,\beta\rangle_p=\sum_I \alpha_I\beta_I.
+\]
+
+<p>这里的求和指标 \(I\) 跑遍所有长度为 \(k\) 的严格递增多指标。别被记号吓到：它本质上就是“把两个向量按正交基展开后逐项相乘再求和”。</p>
+
+<p>真正值钱的是 Hodge 星算子 \(\ast\)。它把 \(k\)-形式送到 \((n-k)\)-形式，定义方式是要求</p>
+
+\[
+\alpha\wedge \ast\beta=\langle \alpha,\beta\rangle\, dV_g,
+\]
+
+<p>其中 \(dV_g\) 是由度量和定向给出的体积形式。这个定义值得你反复咀嚼。左边是一个 \(n\)-形式，可以被积分；右边是“内积乘体积”。也就是说，\(\ast\) 的工作不是凭空变魔术，而是把“点态内积”转换成“楔积后得到的顶阶形式”。因此全局 \(L^2\) 内积自然写成</p>
+
+\[
+\boxed{(\alpha,\beta)=\int_M \alpha\wedge\ast\beta=\int_M \langle \alpha,\beta\rangle\,dV_g.}
+\]
+
+<p>一旦这条式子到位，\(\Omega^k(M)\) 就不只是一个线性空间，而是一个带内积的无穷维空间。Hodge 理论后面的所有“正交”“伴随”“最小化”都从这里长出来。</p>
+
+<h3 id="sec19-2-1">一个最具体的算例：\(\mathbb R^2\) 上星算子怎样转 \(dx,dy\)</h3>
+
+<p>先回到你最熟悉的 Euclidean 平面，取标准度量 \(g=dx^2+dy^2\) 和标准定向 \(dx\wedge dy\)。由于 \(dx,dy\) 已经是正交规范余标架，体积形式就是</p>
+
+\[
+dV_g=dx\wedge dy.
+\]
+
+<p>我们来逐个算 \(\ast\)。先看 \(0\)-形式 \(1\)。定义要求</p>
+
+\[
+1\wedge \ast 1=\langle 1,1\rangle\,dx\wedge dy=dx\wedge dy,
+\]
+
+<p>所以</p>
+
+\[
+\ast 1=dx\wedge dy.
+\]
+
+<p>再看 \(1\)-形式 \(dx\)。我们要找一个 \(1\)-形式 \(\eta\)，使得</p>
+
+\[
+dx\wedge \eta=\langle dx,dx\rangle\,dx\wedge dy=dx\wedge dy.
+\]
+
+<p>显然取 \(\eta=dy\) 就行，因此</p>
+
+\[
+\ast dx=dy.
+\]
+
+<p>同理，对 \(dy\) 有</p>
+
+\[
+dy\wedge \eta=\langle dy,dy\rangle\,dx\wedge dy=dx\wedge dy.
+\]
+
+<p>注意这里若取 \(\eta=dx\)，则 \(dy\wedge dx=-dx\wedge dy\)，符号错了，所以必须取</p>
+
+\[
+\ast dy=-dx.
+\]
+
+<p>最后看顶阶形式：</p>
+
+\[
+(dx\wedge dy)\wedge \ast(dx\wedge dy)=\langle dx\wedge dy,dx\wedge dy\rangle\,dx\wedge dy.
+\]
+
+<p>由于左边已经是 \(2\)-维顶阶，\(\ast(dx\wedge dy)\) 只能是 \(0\)-形式 \(1\)，于是</p>
+
+\[
+\ast(dx\wedge dy)=1.
+\]
+
+<p>整理起来就是</p>
+
+\[
+\ast 1=dx\wedge dy,\qquad \ast dx=dy,\qquad \ast dy=-dx,\qquad \ast(dx\wedge dy)=1.
+\]
+
+<p>这正是“逆时针转九十度”的微分形式版本。你在向量分析里把 \((a,b)\) 旋到 \((-b,a)\) 的直觉，这里被 \(\ast\) 精确编码了。</p>
+
+<p>更一般地，在 \(n\) 维上有</p>
+
+\[
+\ast^2\big|_{\Omega^k}=(-1)^{k(n-k)}\operatorname{id}.
+\]
+
+<p>例如在二维 \(1\)-形式上，\(\ast^2=-\operatorname{id}\)；在三维 \(1\)-形式和 \(2\)-形式上，\(\ast^2=\operatorname{id}\)。这些符号以后会决定余微分的精确写法。</p>
+
+<h2 id="sec19-3">19.3 余微分 \(d^\ast\) 与 Hodge 拉普拉斯</h2>
+
+<p>既然 \(\Omega^k(M)\) 上有了内积，最自然的下一步就是问：外微分 \(d\) 的伴随算子是什么？也就是说，是否存在一个算子</p>
+
+\[
+d^\ast\colon \Omega^{k+1}(M)\to\Omega^k(M)
+\]
+
+<p>满足</p>
+
+\[
+(d\alpha,\beta)=(\alpha,d^\ast\beta)
+\]
+
+<p>对所有足够光滑的 \(\alpha\in\Omega^k(M)\)、\(\beta\in\Omega^{k+1}(M)\) 都成立？答案是肯定的。这个 \(d^\ast\) 就叫<strong>余微分</strong>或<strong>共微分</strong>。它是 \(d\) 的 \(L^2\)-伴随。</p>
+
+<p>在无边界紧流形上，Stokes 定理让边界项消失，于是 \(d^\ast\) 可以写成显式公式</p>
+
+\[
+\boxed{d^\ast=(-1)^{n(k+1)+1}\ast d\ast\quad\text{作用在 }\Omega^{k+1}(M)\text{ 上}.}
+\]
+
+<p>不同教材的符号约定会有细微差别，尤其是 Lorentz 度量或不同 Laplacian 符号时更容易变号。但你只要把“它是 \(d\) 的伴随”这一定义抓牢，符号就不会本末倒置。对初学者来说，伴随关系比记忆指数更本质。</p>
+
+<p>现在终于可以组装全章的第二个主角：</p>
+
+\[
+\boxed{\Delta=dd^\ast+d^\ast d.}
+\]
+
+<p>这就是 Hodge 拉普拉斯算子，作用在每一个次数的微分形式上。它和你在偏微分方程课里见过的 \(\sum \partial_i^2\) 长得不完全一样，原因是几何里常把 \(\Delta\) 选成<strong>非负算子</strong>。在这个约定下，对函数 \(f\in\Omega^0(M)\)，</p>
+
+\[
+\Delta f=d^\ast d f,
+\]
+
+<p>而在 Euclidean 坐标里它等于</p>
+
+\[
+\Delta f=-\sum_{i=1}^n \frac{\partial^2 f}{\partial x_i^2}.
+\]
+
+<p>这个负号正是为了保证</p>
+
+\[
+(\Delta f,f)=\|df\|^2\ge 0.
+\]
+
+<p>如果你习惯了<a href="../偏微分方程/ch5.html">《偏微分方程读本》第 5 章</a>里热方程的写法 \(u_t=\alpha\sum \partial_i^2u\)，不要慌：那是分析里常用的“负半定 Laplacian”约定。几何里把符号翻过来，是因为谱理论和最小化问题会更顺。对象是同一个对象，只是记号口味不同。</p>
+
+<p>Hodge 拉普拉斯最关键的一条恒等式是</p>
+
+\[
+(\Delta\omega,\omega)=\|d\omega\|^2+\|d^\ast\omega\|^2.
+\]
+
+<p>证明几乎就是把伴随关系展开：</p>
+
+\[
+(\Delta\omega,\omega)=(dd^\ast\omega,\omega)+(d^\ast d\omega,\omega)
+=(d^\ast\omega,d^\ast\omega)+(d\omega,d\omega).
+\]
+
+<p>于是我们马上得到一个极其值钱的结论：</p>
+
+\[
+\boxed{\Delta\omega=0\iff d\omega=0\text{ 且 }d^\ast\omega=0.}
+\]
+
+<p>“调和”因此等价于“既闭又余闭”。这条式子几乎可以看作 Hodge 理论的电梯按钮：按下去，后面所有结论就开始连锁反应。</p>
+
+<h3 id="sec19-3-1">一个一维算例：圆周上的 \(d^\ast\)</h3>
+
+<p>取单位圆 \(S^1\)，用角坐标 \(\theta\in[0,2\pi)\)，度量是 \(d\theta^2\)。任意 \(1\)-形式都写成</p>
+
+\[
+\omega=f(\theta)\,d\theta.
+\]
+
+<p>因为 \(S^1\) 是一维，\(\ast 1=d\theta\)，\(\ast d\theta=1\)。所以</p>
+
+\[
+d^\ast\omega=-\ast d\ast\omega=-\ast d(f)= -\ast(f'(\theta)\,d\theta)=-f'(\theta).
+\]
+
+<p>于是</p>
+
+\[
+\Delta\omega=dd^\ast\omega=d(-f'(\theta))=-f''(\theta)\,d\theta.
+\]
+
+<p>因此 \(\omega\) 调和当且仅当</p>
+
+\[
+f''(\theta)=0.
+\]
+
+<p>在圆周的周期条件下，线性函数不可能周期，故只能有常数解 \(f(\theta)\equiv c\)。所以</p>
+
+\[
+\mathcal H^1(S^1)=\{c\,d\theta:c\in\mathbb R\}.
+\]
+
+<p>这个结果非常重要，因为它和 \(H^1_{\mathrm{dR}}(S^1)\cong\mathbb R\) 完全吻合。你已经可以提前闻到第 19.6 节的结论了。</p>
+
+<h2 id="sec19-4">19.4 调和形式：把“没有净流入也没有净流出”做成方程</h2>
+
+<p>现在可以正式定义了。我们称 \(k\)-形式 \(\omega\in\Omega^k(M)\) 是<strong>调和的</strong>，如果</p>
+
+\[
+\Delta\omega=0.
+\]
+
+<p>所有调和 \(k\)-形式构成的向量空间记作</p>
+
+\[
+\mathcal H^k(M)=\ker\bigl(\Delta\colon \Omega^k(M)\to\Omega^k(M)\bigr).
+\]
+
+<p>结合上一节末尾的恒等式，你应当立刻把它记成另一个完全等价的样子：</p>
+
+\[
+\boxed{\mathcal H^k(M)=\{\omega\in\Omega^k(M):d\omega=0,\ d^\ast\omega=0\}.}
+\]
+
+<p>这个定义特别有几何味。\(d\omega=0\) 说的是“没有外微分意义上的旋涡残差”；\(d^\ast\omega=0\) 说的是“没有余微分意义上的散度残差”。因此调和形式像是一种全局平衡态：既没有局部源，也没有局部汇。它和热方程最终收敛到的稳态非常像，只不过现在对象从函数推广到了任意次数的微分形式。</p>
+
+<p>最基本的例子来自函数，也就是 \(0\)-形式。若 \(f\) 调和，则</p>
+
+\[
+\Delta f=0.
+\]
+
+<p>在紧致无边界流形上，把上式与 \(f\) 做内积，得到</p>
+
+\[
+0=(\Delta f,f)=\|df\|^2.
+\]
+
+<p>所以 \(df=0\)，这迫使 \(f\) 在每个连通分支上都是常数。于是</p>
+
+\[
+\mathcal H^0(M)\cong \mathbb R^{\,\#\text{连通分支}}.
+\]
+
+<p>这和拓扑结论 \(H^0_{\mathrm{dR}}(M)\) 的维数等于连通分支数再次吻合。仅凭这个最简单的次数，你已经看见分析与拓扑正在一拍一拍地对上节奏。</p>
+
+<h3 id="sec19-4-1">球面上为什么没有调和 \(1\)-形式</h3>
+
+<p>再看一个比圆周更能说明问题的例子：单位球面 \(S^2\)。你大概已经从拓扑直觉上知道 \(H^1(S^2)=0\)，因为球面没有“绕不过去的一维洞”。Hodge 理论则把这句话翻译成：</p>
+
+\[
+\mathcal H^1(S^2)=0.
+\]
+
+<p>为什么？一种最快的思路是先接受第 19.6 节即将证明的 Hodge 定理，于是由上同调为零立即推出调和形式空间为零。但如果你暂时不想借还没证明的结论，也可以从物理图像想。球面是紧的、正曲率的、没有手柄。任何闭的 \(1\)-形式若还要余闭，就像在球面上找一股既没有源汇、又绕不出全局循环的稳态流。它只能彻底静止。</p>
+
+<p>这个例子最值钱的地方，不是“零”这个答案，而是它让你看清：Hodge 理论不是凭空发明新不变量，而是在给旧不变量找 PDE 模型。球面的 \(H^1\) 为零，等价于“球面不支持非零调和 \(1\)-形式”。圆周的 \(H^1\) 为一维，等价于“圆周上恰好有一维的调和 \(1\)-形式”。</p>
+
+<h3 id="sec19-4-2">顶阶形式：体积形式自己就是调和的</h3>
+
+<p>在紧致定向 \(n\)-维流形上，体积形式 \(dV_g\) 本身提供了另一个标准样本。因为它已经是顶阶，自动有</p>
+
+\[
+d(dV_g)=0.
+\]
+
+<p>另一方面，\(\ast(dV_g)=1\)，所以</p>
+
+\[
+d^\ast(dV_g)=\pm \ast d\ast(dV_g)=\pm \ast d(1)=0.
+\]
+
+<p>因此</p>
+
+\[
+\Delta(dV_g)=0.
+\]
+
+<p>也就是说，体积形式是一个非零调和 \(n\)-形式。于是</p>
+
+\[
+\mathcal H^n(M)\neq 0
+\]
+
+<p>至少在连通定向情形下总有一维。这和 \(H^n_{\mathrm{dR}}(M)\cong\mathbb R\) 一样，都是定向在顶维留下的印记。你在<a href="../代数拓扑/ch17.html">《代数拓扑读本》第 17 章</a>里见过 Poincaré 对偶；这里体积形式就是那个对偶故事的分析入口。</p>
+
+<h2 id="sec19-5">19.5 Hodge 分解：每个形式都能拆成三块</h2>
+
+<p>现在来到全章的中心定理。在线性代数里，一个向量空间若被若干互相正交的子空间直和分解，你就得到了最稳定的坐标系统。Hodge 理论在 \(\Omega^k(M)\) 上做的正是这件事。</p>
+
+<p>在紧致定向无边界黎曼流形上，Hodge 分解定理说：</p>
+
+\[
+\boxed{\Omega^k(M)=\mathcal H^k(M)\oplus d\Omega^{k-1}(M)\oplus d^\ast\Omega^{k+1}(M).}
+\]
+
+<p>也就是说，每个 \(k\)-形式 \(\omega\) 都能唯一写成</p>
+
+\[
+\omega=\alpha+d\beta+d^\ast\gamma,
+\]
+
+<p>其中</p>
+
+\[
+\alpha\in\mathcal H^k(M),\qquad \beta\in\Omega^{k-1}(M),\qquad \gamma\in\Omega^{k+1}(M).
+\]
+
+<p>把这个式子读成中文，就是：任何形式都能拆成一块调和部分、一块恰当部分、一块余恰当部分。前两块由 \(d\) 和拓扑相关，最后一块则是“与闭类无关的摆动”。</p>
+
+<p>为什么这三块会正交？先看 \(d\Omega^{k-1}\) 与 \(d^\ast\Omega^{k+1}\)。若 \(\eta=d\beta\)、\(\zeta=d^\ast\gamma\)，则</p>
+
+\[
+(\eta,\zeta)=(d\beta,d^\ast\gamma)=(dd\beta,\gamma)=0,
+\]
+
+<p>因为 \(d^2=0\)。再看调和部分与恰当部分。若 \(\alpha\in\mathcal H^k\)，则</p>
+
+\[
+(\alpha,d\beta)=(d^\ast\alpha,\beta)=0.
+\]
+
+<p>同理，</p>
+
+\[
+(\alpha,d^\ast\gamma)=(d\alpha,\gamma)=0.
+\]
+
+<p>所以三块确实互相正交。这就是分解式里“\(\oplus\)”那条横杠背后的真账。</p>
+
+<p>当然，正交性还不是存在性。存在性来自更深一点的椭圆理论：\(\Delta\) 是一个自伴、非负、椭圆算子；在紧流形上，它的像闭，零空间有限维，于是整个空间可分成</p>
+
+\[
+\Omega^k(M)=\ker\Delta\oplus \operatorname{im}\Delta.
+\]
+
+<p>而</p>
+
+\[
+\operatorname{im}\Delta=\operatorname{im}(dd^\ast)\oplus \operatorname{im}(d^\ast d)
+\]
+
+<p>经过一点整理就变成上面的 Hodge 分解。你不必在第一遍就掌握椭圆理论的全部细节，但应当知道：这不是纯代数小把戏，背后是紧致性和椭圆正则性在发力。</p>
+
+<h3 id="sec19-5-1">圆周上的完整分解：任意 \(1\)-形式如何拆开</h3>
+
+<p>在 \(S^1\) 上，任意 \(1\)-形式写作 \(\omega=f(\theta)\,d\theta\)。由于一维流形上没有 \(2\)-形式，第三块 \(d^\ast\Omega^2\) 自动消失，所以 Hodge 分解退化为</p>
+
+\[
+\omega=\alpha+d\beta,
+\qquad \alpha\in\mathcal H^1(S^1).
+\]
+
+<p>上一节已经算过 \(\mathcal H^1(S^1)=\{c\,d\theta\}\)。设</p>
+
+\[
+c=\frac{1}{2\pi}\int_0^{2\pi}f(\theta)\,d\theta
+\]
+
+<p>是 \(f\) 的平均值。定义</p>
+
+\[
+F(\theta)=\int_0^\theta \bigl(f(t)-c\bigr)\,dt.
+\]
+
+<p>由于被积函数平均值为零，有</p>
+
+\[
+F(2\pi)-F(0)=\int_0^{2\pi}(f(t)-c)\,dt=0,
+\]
+
+<p>所以 \(F\) 确实是圆周上的良定义周期函数。于是</p>
+
+\[
+dF=(f(\theta)-c)\,d\theta.
+\]
+
+<p>整理得</p>
+
+\[
+\boxed{f(\theta)\,d\theta=c\,d\theta+dF.}
+\]
+
+<p>这就是 \(S^1\) 上的 Hodge 分解。它把“平均值”识别成调和部分，把“平均值为零的波动”识别成恰当部分。整件事和 Fourier 级数里“常数项 + 零均值振荡项”的拆法极其相像。</p>
+
+<h3 id="sec19-5-2">二维球面上 \(1\)-形式会发生什么</h3>
+
+<p>在 \(S^2\) 上，\(\mathcal H^1(S^2)=0\)。因此每个 \(1\)-形式都唯一写成</p>
+
+\[
+\omega=d\beta+d^\ast\gamma.
+\]
+
+<p>换句话说，球面上没有“真正拓扑性的” \(1\)-形式残留；所有 \(1\)-形式都完全由梯度型部分和旋度型部分拼成。这和流体力学里把向量场拆成无旋部分与无散部分的 Helmholtz 分解非常像，只不过 Hodge 分解给了一个在任意紧流形上的统一版本。</p>
+
+<p>你现在也能看出，Hodge 理论不只是给上同调服务。它同时告诉你：一个一般形式的“几何内容”与“拓扑内容”到底怎样分开。调和块是全局、刚性的；恰当与余恰当块是局部、可由势函数或共势函数制造出来的。</p>
+
+<h2 id="sec19-6">19.6 调和代表与 de Rham 上同调同构</h2>
+
+<p>终于可以把前面反复预告的主结论落地了。Hodge 分解一出来，de Rham 上同调几乎立刻就被算完。设 \(\omega\in\Omega^k(M)\) 是闭的，即 \(d\omega=0\)。由 Hodge 分解，存在唯一表示</p>
+
+\[
+\omega=\alpha+d\beta+d^\ast\gamma,
+\qquad \alpha\in\mathcal H^k(M).
+\]
+
+<p>对两边施加 \(d\)，得到</p>
+
+\[
+0=d\omega=d\alpha+d^2\beta+dd^\ast\gamma=dd^\ast\gamma,
+\]
+
+<p>因为调和形式满足 \(d\alpha=0\)，且 \(d^2=0\)。于是</p>
+
+\[
+0=(dd^\ast\gamma,\gamma)=(d^\ast\gamma,d^\ast\gamma),
+\]
+
+<p>从而 \(d^\ast\gamma=0\)。所以闭形式其实自动简化成</p>
+
+\[
+\omega=\alpha+d\beta.
+\]
+
+<p>这句话太重要了。它说：每个闭形式都与一个调和形式同调等价。换言之，每个 de Rham 上同调类里都至少有一个调和代表。</p>
+
+<p>唯一性同样简单。若两个调和形式 \(\alpha_1,\alpha_2\) 同属一个上同调类，那么</p>
+
+\[
+\alpha_1-\alpha_2=d\beta.
+\]
+
+<p>但左边仍然调和，因此</p>
+
+\[
+\|\alpha_1-\alpha_2\|^2=(\alpha_1-\alpha_2,d\beta)=(d^\ast(\alpha_1-\alpha_2),\beta)=0.
+\]
+
+<p>故 \(\alpha_1=\alpha_2\)。于是每个类里恰有一个调和代表。</p>
+
+<p>这就证明了</p>
+
+\[
+\boxed{\mathcal H^k(M)\cong H^k_{\mathrm{dR}}(M).}
+\]
+
+<p>更准确地说，同构由映射</p>
+
+\[
+\alpha\in\mathcal H^k(M)\longmapsto [\alpha]\in H^k_{\mathrm{dR}}(M)
+\]
+
+<p>给出。单射来自唯一性，满射来自存在性。于是调和形式空间不仅和上同调同构，而且马上推出几个大结论：</p>
+
+\[
+\dim H^k_{\mathrm{dR}}(M)=\dim \mathcal H^k(M)&lt;\infty,
+\]
+
+\[
+b_k(M)=\dim \mathcal H^k(M),
+\]
+
+<p>其中 \(b_k(M)\) 是第 \(k\) 个 Betti 数。换句话说，Betti 数就是“第 \(k\) 个调和形式空间的维数”。本来纯拓扑的整数，瞬间变成了椭圆 PDE 解空间的维数。桥梁至此完全搭好。</p>
+
+<h3 id="sec19-6-1">平坦二维环面 \(T^2\) 的完整样本</h3>
+
+<p>把上面的话真正算一次，最好的例子是平坦环面</p>
+
+\[
+T^2=\mathbb R^2/\mathbb Z^2
+\]
+
+<p>配上从 Euclidean 平面下降下来的度量。用周期坐标 \(x,y\)（模 \(1\)）描述，常系数形式</p>
+
+\[
+1,\qquad dx,\qquad dy,\qquad dx\wedge dy
+\]
+
+<p>都能下降到 \(T^2\) 上。因为系数常数，它们的外微分都为零；同时在平坦度量下也都余闭。于是</p>
+
+\[
+1\in\mathcal H^0(T^2),\qquad dx,dy\in\mathcal H^1(T^2),\qquad dx\wedge dy\in\mathcal H^2(T^2).
+\]
+
+<p>并且这些形式线性无关。所以至少有</p>
+
+\[
+\dim\mathcal H^0(T^2)\ge 1,\qquad \dim\mathcal H^1(T^2)\ge 2,\qquad \dim\mathcal H^2(T^2)\ge 1.
+\]
+
+<p>另一方面，拓扑上你早已知道</p>
+
+\[
+H^0_{\mathrm{dR}}(T^2)\cong\mathbb R,\qquad H^1_{\mathrm{dR}}(T^2)\cong\mathbb R^2,\qquad H^2_{\mathrm{dR}}(T^2)\cong\mathbb R.
+\]
+
+<p>因此它们恰好就是一组基，进而</p>
+
+\[
+\mathcal H^0(T^2)=\operatorname{span}\{1\},
+\qquad
+\mathcal H^1(T^2)=\operatorname{span}\{dx,dy\},
+\qquad
+\mathcal H^2(T^2)=\operatorname{span}\{dx\wedge dy\}.
+\]
+
+<p>这组例子把 Hodge 理论讲得极清楚：一个环面的两个“独立绕圈方向”，在分析侧恰好对应两条独立的调和 \(1\)-形式 \(dx\) 和 \(dy\)。</p>
+
+<h2 id="sec19-7">19.7 与代数拓扑的桥：从上同调类到可计算的几何代表</h2>
+
+<p>到这里你应当能重新看待<a href="../代数拓扑/ch15.html">《代数拓扑读本》第 15 章</a>的上同调了。在代数拓扑里，上同调首先是一个函子：空间一变，群跟着变；映射一来，拉回 \(f^\ast\) 跟着来。它之所以有力量，是因为它记录了全局粘合信息，还能通过杯积携带乘法结构。Hodge 理论并没有推翻那套语言，而是说：当空间是紧致定向黎曼流形时，那些抽象类可以被选成非常具体的微分形式，而且这个选择是唯一的。</p>
+
+<p>这座桥最常见的三个出口是：</p>
+
+<ul>
+  <li>Betti 数可以通过调和形式空间来算；</li>
+  <li>Poincaré 对偶可以借 \(\ast\) 在调和形式之间直接看见；</li>
+  <li>杯积在调和代表层面常能被楔积近似理解，虽然楔积后的形式未必仍然调和。</li>
+</ul>
+
+<p>第三点尤其值得你别想当然。若 \(\alpha,\beta\) 都调和，\(\alpha\wedge\beta\) 不一定仍调和。所以“调和形式空间本身对楔积封闭”一般是假的。真正正确的话是：\(\alpha\wedge\beta\) 至少是闭的，因此定义了一个上同调类；而这个类再由 Hodge 理论投影到唯一调和代表上。也就是说，乘法结构活在上同调类上，而不必逐点活在“调和”这个条件上。</p>
+
+<p>你还应当注意一个微妙而深刻的事实：调和形式空间 \(\mathcal H^k(M)\) 本身依赖于度量 \(g\)。换一副度量，具体哪些形式调和可能就变了。但它的维数</p>
+
+\[
+\dim \mathcal H^k(M)=b_k(M)
+\]
+
+<p>却不变，因为右边是纯拓扑量。这是 Hodge 理论最典型的“几何对象依赖度量，维数却依赖拓扑”的现象。很多几何分析定理都带着这个味道：对象会动，不变量不动。</p>
+
+<p>再往前一步，这一章其实已经把后续很多方向的门都推开了一条缝。若你把复流形结构放进来，调和形式会分裂成 \((p,q)\)-型，进而产生 Hodge 数；若你把边界放进来，会得到绝对/相对上同调的 Hodge 版本；若你把非紧流形或奇性空间放进来，故事又会变得更细。可它们全都建立在今天这个朴素骨架上：内积、伴随、Laplace 算子、调和代表。</p>
+
+<p>这一章最后最该留在脑子里的，不是某个符号，而是三层对应：</p>
+
+\[
+\text{闭形式模掉恰当形式}
+\quad\longleftrightarrow\quad
+\text{每个类里的唯一调和代表}
+\quad\longleftrightarrow\quad
+\text{椭圆算子 }\Delta\text{ 的核}.
+\]
+
+<p>第一层是拓扑，第二层是几何，第三层是分析。Hodge 理论把它们压成了同一个对象。</p>
+
+<p>如果只用三句话收尾，那就是：第一，给流形一个度量以后，微分形式空间就有了内积，\(d\) 于是长出伴随 \(d^\ast\)，并进而拼成 Hodge 拉普拉斯 \(\Delta=dd^\ast+d^\ast d\)。第二，紧致定向无边界流形上，调和形式正是 \(\Delta\) 的核，而 Hodge 分解把每个形式唯一拆成调和、恰当、余恰当三块。第三，正因为每个 de Rham 上同调类恰有一个调和代表，Betti 数就能被重新读成调和形式空间的维数，这正是几何、分析与代数拓扑真正会师的地方。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 Gauss-Bonnet 与 Chern-Gauss-Bonnet：曲率积分为什么会算出 Euler 示性数</a><a href="ch20.html">下一章 · 第 20 章 应用：广义相对论与 Ricci 流 →</a></nav>
+
+</main>
+</body>
+</html>

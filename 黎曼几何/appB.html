@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 微分形式与外微分 — 普林斯顿黎曼几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 张量代数速查</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+<h1 id="appB">附录 B 微分形式与外微分</h1>
+
+<p>如果说附录 A 是“张量记号别迷路”的路标，那这一份附录就是“微分形式到底在替谁说话”的速查版。你在<a href="ch4.html">第 4 章</a>第一次见到 \(k\)-形式时，也许会觉得它像一套专门为几何分析发明的新符号；等你读到<a href="ch18.html">第 18 章</a>和<a href="ch19.html">第 19 章</a>，你就会发现，微分形式其实是把积分、定向、Stokes 定理、上同调和 Hodge 理论同时塞进同一种语言里的最佳容器。</p>
+
+<h2 id="secB-1">B.1 \(k\)-形式：可积的交替张量</h2>
+
+<p>在点 \(p\in M\) 处，一个 \(k\)-形式是余切空间上的交替 \(k\)-线性映射，也就是</p>
+
+\[
+\omega_p\in \Lambda^kT_p^\ast M.
+\]
+
+<p>“交替”意味着只要交换两个输入，符号就反过来；若两个输入相同，结果必为零。因此 \(k\)-形式天然擅长测量“有向 \(k\) 维体积元”。</p>
+
+<p>在局部坐标 \((x^1,\dots,x^n)\) 下，任意 \(k\)-形式都可写成</p>
+
+\[
+\omega=\sum_{i_1&lt;\cdots&lt;i_k}\omega_{i_1\cdots i_k}\,dx^{i_1}\wedge\cdots\wedge dx^{i_k}.
+\]
+
+<p>这行式子的意思很简单：所有信息都浓缩在系数函数 \(\omega_{i_1\cdots i_k}\) 里，而基底由楔积出来的标准有向面积元、体积元组成。常见例子是：</p>
+
+\[
+f\in\Omega^0(M)\quad\text{就是光滑函数},
+\]
+
+\[
+\alpha=a_i\,dx^i\in\Omega^1(M)\quad\text{就是 }1\text{-形式},
+\]
+
+\[
+\beta=\frac12\,\beta_{ij}\,dx^i\wedge dx^j\in\Omega^2(M)\quad\text{就是 }2\text{-形式}.
+\]
+
+<p>顶阶形式 \(\Omega^n(M)\) 尤其重要，因为它们可以在定向流形上积分。体积形式、面积形式、通量积分，最后全都落到这里。</p>
+
+<h2 id="secB-2">B.2 楔积：把低阶形式拼成高阶形式</h2>
+
+<p>若 \(\alpha\in\Omega^p(M)\)、\(\beta\in\Omega^q(M)\)，它们的楔积是一个 \((p+q)\)-形式</p>
+
+\[
+\alpha\wedge\beta\in\Omega^{p+q}(M).
+\]
+
+<p>楔积的本质就是张量积的交替化，所以最关键的代数法则只有两条：</p>
+
+\[
+\alpha\wedge\beta=(-1)^{pq}\beta\wedge\alpha,
+\]
+
+\[
+(\alpha\wedge\beta)\wedge\gamma=\alpha\wedge(\beta\wedge\gamma).
+\]
+
+<p>第一条是分次交换律。特别地，两个 \(1\)-形式相交换会带一个负号；一个 \(1\)-形式和一个 \(2\)-形式相交换不带负号，因为 \((-1)^{1\cdot2}=1\)。很多符号错误都死在这里，所以每次遇到楔积，先把次数 \(p,q\) 数出来。</p>
+
+<p>最基础的算例是</p>
+
+\[
+(a\,dx+b\,dy)\wedge(c\,dx+d\,dy).
+\]
+
+<p>展开得</p>
+
+\[
+ac\,dx\wedge dx+ad\,dx\wedge dy+bc\,dy\wedge dx+bd\,dy\wedge dy.
+\]
+
+<p>由于 \(dx\wedge dx=dy\wedge dy=0\)，且 \(dy\wedge dx=-dx\wedge dy\)，所以</p>
+
+\[
+\boxed{(a\,dx+b\,dy)\wedge(c\,dx+d\,dy)=(ad-bc)\,dx\wedge dy.}
+\]
+
+<p>这就是二维行列式在微分形式里的影子。你在多元微积分里把面积缩放因子算成 Jacobian 行列式，这里它以完全相同的结构再次出现。</p>
+
+<h2 id="secB-3">B.3 外微分 \(d\)：统一梯度、旋度和散度的算子</h2>
+
+<p>外微分把 \(k\)-形式送到 \((k+1)\)-形式：</p>
+
+\[
+d\colon \Omega^k(M)\to\Omega^{k+1}(M).
+\]
+
+<p>它满足三条你必须熟到条件反射的规则：</p>
+
+\[
+d^2=0,
+\]
+
+\[
+d(\alpha+\beta)=d\alpha+d\beta,
+\]
+
+\[
+\boxed{d(\alpha\wedge\beta)=d\alpha\wedge\beta+(-1)^p\alpha\wedge d\beta\qquad (\alpha\in\Omega^p).}
+\]
+
+<p>第三条是分次 Leibniz 法则，负号由 \(\alpha\) 的次数决定。它几乎是所有手算的总规则。</p>
+
+<p>在坐标里，若</p>
+
+\[
+\omega=\sum_I \omega_I\,dx^I,
+\]
+
+<p>那么</p>
+
+\[
+d\omega=\sum_I d\omega_I\wedge dx^I
+=
+\sum_{j,I}\frac{\partial \omega_I}{\partial x^j}\,dx^j\wedge dx^I.
+\]
+
+<p>特别地，对函数 \(f\) 有</p>
+
+\[
+df=\frac{\partial f}{\partial x^i}\,dx^i.
+\]
+
+<p>所以 \(df\) 正是“梯度还没升指标之前”的版本。</p>
+
+<h3 id="secB-3-1">\(\mathbb R^3\) 上的一次完整对照</h3>
+
+<p>把向量分析翻译成形式语言最好的场景是 \(\mathbb R^3\)。设</p>
+
+\[
+\alpha=P\,dx+Q\,dy+R\,dz.
+\]
+
+<p>则</p>
+
+\[
+d\alpha
+=
+dP\wedge dx+dQ\wedge dy+dR\wedge dz.
+\]
+
+<p>展开整理后得到</p>
+
+\[
+d\alpha
+=
+\left(\frac{\partial R}{\partial y}-\frac{\partial Q}{\partial z}\right)dy\wedge dz
++\left(\frac{\partial P}{\partial z}-\frac{\partial R}{\partial x}\right)dz\wedge dx
++\left(\frac{\partial Q}{\partial x}-\frac{\partial P}{\partial y}\right)dx\wedge dy.
+\]
+
+<p>这正对应向量分析里的 \(\nabla\times(P,Q,R)\)。再往上一次，若</p>
+
+\[
+\beta=A\,dy\wedge dz+B\,dz\wedge dx+C\,dx\wedge dy,
+\]
+
+<p>则</p>
+
+\[
+d\beta=
+\left(\frac{\partial A}{\partial x}
++\frac{\partial B}{\partial y}
++\frac{\partial C}{\partial z}\right)
+dx\wedge dy\wedge dz,
+\]
+
+<p>它对应散度。于是</p>
+
+\[
+d^2=0
+\]
+
+<p>立刻统一了两条你熟悉的向量分析恒等式：</p>
+
+\[
+\nabla\times(\nabla f)=0,
+\qquad
+\nabla\cdot(\nabla\times \mathbf F)=0.
+\]
+
+<p>也正因为如此，<a href="../多元微积分/ch26.html">《多元微积分读本》第 26 章</a>里那些看似彼此独立的积分公式，到了形式语言里会被压成一句话。</p>
+
+<h2 id="secB-4">B.4 Stokes 定理：所有经典积分定理的总括</h2>
+
+<p>微分形式语言最强的地方，是它把 Newton-Leibniz、Green、Gauss、Stokes 这些经典积分公式统一成了一条总定理：</p>
+
+\[
+\boxed{\int_M d\omega=\int_{\partial M}\omega.}
+\]
+
+<p>这里 \(M\) 是带边界的定向流形，\(\omega\) 是一个紧支撑或足够光滑的 \((n-1)\)-形式。你可以把它读成：<strong>内部变化的总量 = 边界通量。</strong></p>
+
+<p>在一维区间 \(M=[a,b]\) 上，取 \(0\)-形式 \(\omega=f\)，则</p>
+
+\[
+\int_a^b df=f(b)-f(a),
+\]
+
+<p>这就是微积分基本定理。在平面上取 \(\omega=P\,dx+Q\,dy\)，便得到 Green 公式；在三维取合适的 \(2\)-形式，就得到散度定理或经典 Stokes 公式。于是你不再需要把它们当四条不同法术背诵，而会知道：它们只是一条边界-内部关系在不同维数和不同坐标中的投影。</p>
+
+<p>这条总定理也是为什么 \(d^2=0\) 如此自然。因为若 \(\omega=d\eta\)，则</p>
+
+\[
+\int_M d\omega=\int_M d(d\eta)=\int_{\partial M}d\eta.
+\]
+
+<p>而“边界的边界为空”暗示右边应该再次坍成零。这正是同调和上同调能建立起来的几何影子。</p>
+
+<h2 id="secB-5">B.5 闭形式、恰当形式与 de Rham 上同调</h2>
+
+<p>外微分 \(d\) 既然满足 \(d^2=0\)，就自动产生两类特殊对象：</p>
+
+\[
+\omega\in\Omega^k(M),\ d\omega=0
+\quad\Longrightarrow\quad
+\omega\text{ 是闭形式},
+\]
+
+\[
+\omega=d\eta
+\quad\Longrightarrow\quad
+\omega\text{ 是恰当形式}.
+\]
+
+<p>因为 \(d^2=0\)，每个恰当形式都自动闭。但反过来不一定。正是“闭而不恰当”的部分，记录了流形的全局拓扑障碍。于是定义第 \(k\) 个 de Rham 上同调群</p>
+
+\[
+\boxed{H^k_{\mathrm{dR}}(M)=\frac{\ker(d\colon\Omega^k\to\Omega^{k+1})}{\operatorname{im}(d\colon\Omega^{k-1}\to\Omega^k)}.}
+\]
+
+<p>最经典的例子是圆周 \(S^1\)。角形式 \(d\theta\) 是闭的，但不是全局恰当的；否则若 \(d\theta=df\)，\(f\) 就会在绕圆一圈后增加 \(2\pi\)，不可能单值。因此</p>
+
+\[
+[d\theta]\neq 0\in H^1_{\mathrm{dR}}(S^1),
+\]
+
+<p>并且这个类生成整个 \(H^1_{\mathrm{dR}}(S^1)\cong\mathbb R\)。这正是“圆周有一个一维洞”的形式版本。</p>
+
+<p>对球面 \(S^2\)，情况则相反：\(H^1_{\mathrm{dR}}(S^2)=0\)，但顶阶面积形式给出 \(H^2_{\mathrm{dR}}(S^2)\cong\mathbb R\)。所以 de Rham 上同调不仅能看一维环路，也能看高维“包裹不住的体积类”。</p>
+
+<h2 id="secB-6">B.6 你真正需要带走的速查表</h2>
+
+<p>若把这一附录压成最后一页备忘录，最常用的就是下面这些句子：</p>
+
+\[
+\omega=\omega_{i_1\cdots i_k}\,dx^{i_1}\wedge\cdots\wedge dx^{i_k},
+\]
+
+\[
+\alpha\wedge\beta=(-1)^{pq}\beta\wedge\alpha\qquad (\alpha\in\Omega^p,\ \beta\in\Omega^q),
+\]
+
+\[
+d(\alpha\wedge\beta)=d\alpha\wedge\beta+(-1)^p\alpha\wedge d\beta,
+\]
+
+\[
+d^2=0,
+\]
+
+\[
+\int_M d\omega=\int_{\partial M}\omega,
+\]
+
+\[
+H^k_{\mathrm{dR}}(M)=\ker d/\operatorname{im} d.
+\]
+
+<p>从这几条出发，外微分形式的代数、积分与拓扑几乎都能重新长回来。你在正文里遇到的很多复杂结构，其实只是这几句在不同场景下的展开：在<a href="ch4.html">第 4 章</a>它们组织微分形式；在<a href="ch18.html">第 18 章</a>它们把曲率积分和 Euler 示性数接起来；在<a href="ch19.html">第 19 章</a>它们又和 Hodge 星、余微分、Laplace 算子结合，变成上同调的调和代表理论。</p>
+
+<p>如果你以后忘了细节，只要先记住这一句总纲：微分形式是在用统一语言描述“有向 \(k\) 维测量”，外微分是在记录“边界如何从内部冒出来”，Stokes 定理是在把两者缝合，而 de Rham 上同调则是在衡量“哪些闭形式无法被写成全局边界”。一旦这句总纲还在，技术细节随时可以再长回来。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A 张量代数速查</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+
+</main>
+</body>
+</html>

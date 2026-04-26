@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>索引 — 普林斯顿黎曼几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B 微分形式与外微分</a><span class="nav-disabled">下一章 →</span></nav>
+<h1 id='subject-index'>索引</h1>
+
+<p>这份索引按拼音首字母分组，但故意不写成“名词解释表”，而写成“你现在手上卡着哪种几何动作”。如果一个概念既有第一次定义的入口，也有真正开始发力的计算页，我会把两处都标出来。最好的读法不是从 A 翻到 Z，而是先把你脑子里的问题翻成一句动词短语，再来找对应条目。</p>
+
+<h2 id="index-A">A</h2>
+
+<ul>
+  <li><strong>按坐标把流形真正搭起来</strong> 先看 2.1-2.4 的图册、转移函数与光滑结构；想顺手补切空间定义，再接 2.5-2.7。</li>
+  <li><strong>按张量语言读懂一条公式里每个指标在干什么</strong> 先看附录 A.1-A.5；想把升降指标和 \(TM\leftrightarrow T^\ast M\) 的桥补齐，看附录 A.6。</li>
+</ul>
+
+<h2 id="index-B">B</h2>
+
+<ul>
+  <li><strong>把“边界的边界为零”翻成微分形式语言</strong> 先看附录 B.3-B.5；想把它和 de Rham 上同调、Hodge 理论接上，再看 19.3-19.6。</li>
+  <li><strong>比较两个空间在曲率约束下为什么会有不同全局命运</strong> 先看 16.1-16.5 的 Rauch、Toponogov 与 Cartan-Hadamard。</li>
+</ul>
+
+<h2 id="index-C">C</h2>
+
+<ul>
+  <li><strong>Christoffel 符号到底是坐标假象，还是几何对象</strong> 先看 7.2-7.4 的局部表示与平行移动，再看 8.1-8.4 的 Levi-Civita 唯一性与显式公式。</li>
+  <li><strong>从曲率张量一路缩并到 Ricci 和标量曲率</strong> 先看 9.1-9.5，再接 10.1-10.4。</li>
+</ul>
+
+<h2 id="index-D">D</h2>
+
+<ul>
+  <li><strong>度量给了你哪些新结构</strong> 先看 5.1-5.5 的长度、角度、体积与正交标架；想看度量怎样进一步喂给 Hodge 星与余微分，再看 19.2-19.3。</li>
+  <li><strong>de Rham 上同调想从“闭形式模掉恰当形式”开始补</strong> 先看 4.6 与附录 B.5；想看它怎样被调和形式具体实现，看 19.6-19.7。</li>
+</ul>
+
+<h2 id="index-G">G</h2>
+
+<ul>
+  <li><strong>Gauss 曲率、截面曲率和高维曲率到底是什么关系</strong> 先看 11.1-11.4；想看它怎样在二维积成 Euler 示性数，再看 18.1-18.4。</li>
+  <li><strong>广义相对论为什么会把引力改写成几何</strong> 直接看 20.1-20.4；想先补 Ricci 与 Einstein 张量的几何背景，回看 10.1-10.5。</li>
+</ul>
+
+<h2 id="index-H">H</h2>
+
+<ul>
+  <li><strong>Hodge 理论到底桥接了什么</strong> 想从内积、余微分、Laplace 算子进入，看 19.2-19.4；想直接看“调和形式 = 上同调类的唯一代表”，看 19.5-19.7。</li>
+  <li><strong>Hopf-Rinow 为什么把完备、最短路和测地线连成一件事</strong> 看 15.1-15.5。</li>
+</ul>
+
+<h2 id="index-J">J</h2>
+
+<ul>
+  <li><strong>Jacobi 场是怎么从测地线变分里长出来的</strong> 先看 12.1-12.4；想看它怎样进入第二变分和共轭点，看 13.3、14.1-14.3。</li>
+</ul>
+
+<h2 id="index-L">L</h2>
+
+<ul>
+  <li><strong>Levi-Civita 联络为什么由“度量兼容 + 无挠”唯一确定</strong> 看 8.1-8.3；想把 Christoffel 公式算到底，看 8.4-8.5。</li>
+  <li><strong>拉普拉斯算子在这本书里到底有几种脸</strong> 函数与形式的版本看 19.3-19.4；想看它和热方程的类比如何进入几何流，看 20.5、20.9。</li>
+</ul>
+
+<h2 id="index-M">M</h2>
+
+<ul>
+  <li><strong>毛球定理为什么会在黎曼几何里突然出现</strong> 先看 3.5 的球面向量场，再对照 <a href="../代数拓扑/ch14.html">《代数拓扑读本》第 14 章</a> 的拓扑证明入口。</li>
+  <li><strong>想把流形上的微分算子重新看成几何对象</strong> 切丛与向量场看 3.1-3.4，协变导数看 7.1-7.5。</li>
+</ul>
+
+<h2 id="index-Q">Q</h2>
+
+<ul>
+  <li><strong>曲率张量为什么不是“二阶导数堆一堆”那么简单</strong> 先看 9.1-9.3 的定义与张量性；想看它的物理解释与绕圈平行移动，看 9.4-9.5。</li>
+  <li><strong>曲面、球面、双曲空间这些模型怎么真正算出度量和测地线</strong> 先看 6.3-6.5，再看 17.1-17.5 的整章熟手训练场。</li>
+</ul>
+
+<h2 id="index-R">R</h2>
+
+<ul>
+  <li><strong>Ricci 曲率到底在量什么</strong> 先看 10.1-10.4；想看它怎样控制直径、基本群和比较几何，看 14.4-14.5、16.1-16.5。</li>
+  <li><strong>Ricci 流为什么像热方程</strong> 直接看 20.5；想知道这条流怎样最终碰到 Poincaré 猜想，看 20.6-20.9，并对照 <a href="../偏微分方程/ch5.html">《偏微分方程读本》第 5 章</a> 的扩散直觉。</li>
+</ul>
+
+<h2 id="index-S">S</h2>
+
+<ul>
+  <li><strong>Stokes 定理想从统一版本一次看懂</strong> 先看附录 B.4，再回对照 <a href="../多元微积分/ch26.html">《多元微积分读本》第 26 章</a> 里 Green、Gauss、经典 Stokes 的三种脸。</li>
+  <li><strong>Schwarzschild 解哪里是真奇点，哪里只是坐标奇点</strong> 看 20.3-20.4。</li>
+</ul>
+
+<h2 id="index-T">T</h2>
+
+<ul>
+  <li><strong>切空间的两个定义为什么等价</strong> 先看 2.5-2.6；想把切映射 \(df_p\) 和链式法则一起补上，看 2.7。</li>
+  <li><strong>调和形式怎么把上同调类具体化</strong> 看 19.4-19.6；想顺手回补微分形式与外微分语法，看附录 B.1-B.5。</li>
+  <li><strong>Toponogov 比较到底在比较什么</strong> 看 16.2-16.4；想把它和负曲率流形的拓扑约束接上，看 16.5。</li>
+</ul>
+
+<h2 id="index-W">W</h2>
+
+<ul>
+  <li><strong>外微分为什么能统一梯度、旋度和散度</strong> 看附录 B.3；想把这个统一语言搬回向量分析练手，对照 <a href="../多元微积分/ch26.html">《多元微积分读本》第 26 章</a>。</li>
+</ul>
+
+<h2 id="index-X">X</h2>
+
+<ul>
+  <li><strong>想把一个几何问题先线性化、再看局部与整体怎么互动</strong> 测地线变分看 13-14 章，Jacobi 场看 12 章，Hodge 分解看 19.5。</li>
+  <li><strong>想知道向量场积分以后为什么会产生微分同胚单参数群</strong> 看 3.2-3.4。</li>
+</ul>
+
+<h2 id="index-Y">Y</h2>
+
+<ul>
+  <li><strong>用一个最短路径问题进入测地线</strong> 长度与能量泛函看 6.1-6.2；真正把 Euler-Lagrange 方程算出来，看 6.3。</li>
+  <li><strong>用一个 PDE 入口进入拓扑不变量</strong> 先看 19.3-19.6 的 Hodge 理论，再对照 <a href="../代数拓扑/ch15.html">《代数拓扑读本》第 15 章</a> 的上同调语言。</li>
+</ul>
+
+<h2 id="index-Z">Z</h2>
+
+<ul>
+  <li><strong>张量积、缩并、升降指标总是混在一起</strong> 附录 A.3-A.6 是最快的返工入口。</li>
+  <li><strong>正曲率、负曲率、零曲率各自最典型的空间模型</strong> 先看 11.3 与 17.1-17.5；想看这些模型怎样在比较几何里变成参照系，看 16.1-16.4。</li>
+  <li><strong>证明一个全局结论时总觉得局部计算和拓扑直觉接不上</strong> 回看 18 章的 Gauss-Bonnet、19 章的 Hodge 理论、20 章的 Ricci 流；这三章正是本书“局部曲率如何长成全局不变量”的主轴。</li>
+</ul>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B 微分形式与外微分</a><span class="nav-disabled">下一章 →</span></nav>
+
+</main>
+</body>
+</html>

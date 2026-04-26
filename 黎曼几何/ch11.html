@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 截面曲率 — 普林斯顿黎曼几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 Ricci 与 scalar 曲率</a><a href="ch12.html">下一章 · 第 12 章 Jacobi 场与共轭点 →</a></nav>
+<h1 id="ch11">第 11 章 截面曲率</h1>
+
+<p>到<a href="ch9.html">第 9 章</a>为止，我们已经把曲率张量 \(R\) 这个大机器搬了出来；到<a href="ch10.html">第 10 章</a>，又把 Ricci 曲率和标量曲率看成了某种“取迹以后剩下的平均量”。可你大概已经感觉到，事情还没有讲完。因为 \(R\) 太大，Ricci 又太粗。前者像一整张高维表格，信息很多，但一眼不容易看出几何图像；后者像把很多方向平均掉以后的统计量，适合讲总体趋势，却会丢掉某个具体二维方向上究竟是鼓起来还是塌下去。</p>
+
+<p>截面曲率正好卡在这两者之间。它做的事很朴素：在点 \(p\) 处先挑一个二维子空间 \(\sigma\subset T_pM\)，也就是先说清楚“你想在哪个切平面里看弯曲”，然后再测这一个平面里的曲率。你可以把它想成把高维流形拿一张极薄的二维刀片切开，问切出来的那片几何是偏向球面式的、平面式的，还是双曲式的。这个想法一旦抓住，很多后面的定理都会变得像在讲常识：正曲率会让测地线聚拢，负曲率会让它们发散；球面上三角形角和偏大，双曲空间里偏小；Ricci 曲率不过是把很多截面曲率加起来而已。</p>
+
+<p>这一章要做的，就是把这张二维刀片真正磨锋利。我们会先定义 \(K(\sigma)\)，再说明它和曲率张量 \(R\) 的关系；接着把欧氏空间、球面、双曲空间这三类常截面曲率模型算出来；然后回到二维曲面，解释为什么 Gauss 曲率其实就是截面曲率在二维时的唯一版本。到章末你应该能把一句话说顺：<strong>截面曲率是高维黎曼几何里最接近“高斯曲率”的局部量。</strong></p>
+
+<h2 id="sec11-1">11.1 为什么必须先选一个二维方向</h2>
+
+<p>在<a href="../多元微积分/ch4.html">《多元微积分读本》第 4 章</a>里，你第一次接触“曲率”时，研究对象是一条曲线。那时没有歧义，因为曲线只有一个切向方向；你沿着这条方向走，曲线往法向拐多厉害，曲率就是多少。可一旦对象从曲线变成曲面，再变成一般 \(n\) 维流形，问题立刻变了：在一点 \(p\) 附近，你可以朝无穷多种方向离开 \(p\)。不同方向混在一起时，弯曲通常不一样。</p>
+
+<p>想想地球表面就是最好的提醒。你站在北半球某点，朝正东走、朝正北走、朝东北走，局部几何都在同一个球面上，所以这三条方向的“弯”彼此有联系；但如果对象不是一个圆球，而是一张椭球或一张马鞍面，那么沿不同方向看到的弯曲就真的会不同。高维流形更是如此。一个点处的切空间 \(T_pM\) 是 \(n\) 维向量空间，你至少得先在里面挑出一个二维平面 \(\sigma\)，然后才能问：这张切平面里看见的曲率是多少？</p>
+
+<p>为什么偏偏是二维？因为曲率最原始的几何效果，体现在“由两条方向张成的小平行四边形绕一圈以后，向量平行移动回来会差多少”。这件事天然只依赖于那两条方向，也就是它们张成的二维子空间。曲率张量 \(R(X,Y)Z\) 正是这个现象的代数编码；而截面曲率，则是把这个编码压成一个标量。</p>
+
+<p>还有一个更实际的理由。Ricci 曲率和标量曲率都不是凭空来的。它们分别是：</p>
+
+\[
+\operatorname{Ric}(v,v)=\text{“所有包含 }v\text{ 的截面曲率之和”},
+\]
+
+\[
+S=\text{“所有正交二维截面曲率再求和”}.
+\]
+
+<p>所以如果你先把截面曲率这一级看清楚，那么第 10 章那些看上去有点抽象的取迹操作，会马上落回具体几何：Ricci 在看一个方向周围平均有多弯，标量曲率在看这一点总体有多弯。</p>
+
+<p>这里值得顺手打一个预防针。你可能会想：既然 Ricci 和标量曲率是更压缩的量，那它们是不是“更本质”？不一定。压缩意味着更容易估计，也意味着更容易丢信息。两个流形完全可能有相同的 Ricci 曲率，却在某些二维方向上有完全不同的截面曲率。后面讲 Jacobi 场、比较几何和 Bonnet-Myers 时，你会不断看见这件事的后果：有时一个方向的强烈正曲率就足够把测地线捏到一起；有时平均意义上的 Ricci 下界已经够用，因为你只需要总体聚焦效果。</p>
+
+<h2 id="sec11-2">11.2 定义：二维子空间的截面曲率</h2>
+
+<p>现在正式定义。取 \(p\in M\)，再取一个二维子空间 \(\sigma\subset T_pM\)。任意选一组线性无关向量 \(u,v\in T_pM\) 作为 \(\sigma\) 的基。我们定义 \(\sigma\) 的截面曲率为</p>
+
+\[
+\boxed{
+K(\sigma)
+=
+\frac{\langle R(u,v)v,u\rangle}
+{\langle u,u\rangle\langle v,v\rangle-\langle u,v\rangle^2}.
+}
+\]
+
+<p>分母那一块看着像行列式，其实正是由 \(u,v\) 张成平行四边形面积的平方，也就是 Gram 行列式：</p>
+
+\[
+\langle u,u\rangle\langle v,v\rangle-\langle u,v\rangle^2
+=
+\det
+\begin{pmatrix}
+\langle u,u\rangle & \langle u,v\rangle\\
+\langle v,u\rangle & \langle v,v\rangle
+\end{pmatrix}.
+\]
+
+<p>所以你可以把 \(K(\sigma)\) 理解为：<strong>把曲率张量在这张二维切平面上的“弯曲量”除以这张平面的面积尺度。</strong> 这样一除以后，定义就不再依赖于你把平面基向量取大还是取小。</p>
+
+<p>如果 \(\{e_1,e_2\}\) 是 \(\sigma\) 的一组正交规范基，也就是</p>
+
+\[
+\langle e_i,e_j\rangle=\delta_{ij},
+\]
+
+<p>那么分母等于 \(1\)，公式立刻简化成</p>
+
+\[
+\boxed{K(\sigma)=\langle R(e_1,e_2)e_2,e_1\rangle.}
+\]
+
+<p>这就是你真正会反复使用的版本。因为几何上最自然的做法，就是先在要看的切平面里取一组正交单位向量，然后直接读出 \(R\) 的那个分量。</p>
+
+<p>你可能还会追问：这个定义真的不依赖基的选择吗？要紧，因为我们要的是平面的曲率，不是某一对向量的曲率。设另一组基写成</p>
+
+\[
+u'=au+bv,\qquad v'=cu+dv,
+\]
+
+<p>也就是</p>
+
+\[
+\begin{pmatrix}
+u'\\
+v'
+\end{pmatrix}
+=
+\begin{pmatrix}
+a & b\\
+c & d
+\end{pmatrix}
+\begin{pmatrix}
+u\\
+v
+\end{pmatrix}.
+\]
+
+<p>由 \(R\) 对前两个变元的交替性、对最后一个变元的线性，以及内积的双线性，可以算出</p>
+
+\[
+\langle R(u',v')v',u'\rangle=(ad-bc)^2\,\langle R(u,v)v,u\rangle.
+\]
+
+<p>而分母的 Gram 行列式在基变换下也恰好乘上同一个因子：</p>
+
+\[
+\langle u',u'\rangle\langle v',v'\rangle-\langle u',v'\rangle^2
+=(ad-bc)^2\bigl(\langle u,u\rangle\langle v,v\rangle-\langle u,v\rangle^2\bigr).
+\]
+
+<p>于是商不变。这说明 \(K(\sigma)\) 确实只依赖二维子空间 \(\sigma\) 本身。</p>
+
+<p>第一道最应该算的例子是平直空间。设 \(M=\mathbb R^n\) 取标准欧氏度量。第 8 章我们已经知道 Christoffel 符号全为零，因此 Levi-Civita 联络就是普通求导，第 9 章的曲率张量自然为零：</p>
+
+\[
+R(X,Y)Z=0.
+\]
+
+<p>所以对任意 \(p\in \mathbb R^n\) 和任意二维子空间 \(\sigma\subset T_p\mathbb R^n\)，都有</p>
+
+\[
+\boxed{K(\sigma)=0.}
+\]
+
+<p>这件事看起来平淡，却很重要。它告诉你：截面曲率的零值，正是“局部像欧氏空间那样平”的定量表达。后面出现的“常截面曲率 \(0\) 空间”不是别的，就是欧氏几何本身。</p>
+
+<h2 id="sec11-3">11.3 截面曲率和曲率张量 \(R\) 到底是什么关系</h2>
+
+<p>定义已经写下来了，但你大概还有一个正常的怀疑：我们从一个四阶对象 \(R\) 压成了一个数 \(K(\sigma)\)。这个数到底保留了多少信息？答案分两层。</p>
+
+<p>第一层很直接。对任意线性无关的 \(X,Y\in T_pM\)，令 \(\sigma=\operatorname{span}\{X,Y\}\)，那么定义本身就可以改写成</p>
+
+\[
+\boxed{
+\langle R(X,Y)Y,X\rangle
+=
+K(\sigma)\Bigl(|X|^2|Y|^2-\langle X,Y\rangle^2\Bigr).
+}
+\]
+
+<p>所以 \(R\) 至少在这种“夹头夹尾”的组合上，完全由截面曲率给出。特别地，如果 \(X,Y\) 本身就是正交单位向量，那么</p>
+
+\[
+\langle R(X,Y)Y,X\rangle=K(\operatorname{span}\{X,Y\}).
+\]
+
+<p>第二层更有意思。取 \(T_pM\) 的一组正交规范基 \(e_1,\dots,e_n\)。那么第 10 章定义的 Ricci 曲率在基向量方向上满足</p>
+
+\[
+\operatorname{Ric}(e_1,e_1)
+=
+\sum_{i=1}^n \langle R(e_i,e_1)e_1,e_i\rangle.
+\]
+
+<p>其中 \(i=1\) 这一项为零，因为 \(R(e_1,e_1)=0\)。于是</p>
+
+\[
+\operatorname{Ric}(e_1,e_1)
+=
+\sum_{i=2}^n \langle R(e_i,e_1)e_1,e_i\rangle
+=
+\sum_{i=2}^n K(e_1\wedge e_i).
+\]
+
+<p>这里 \(e_1\wedge e_i\) 只是一个简写，表示由 \(e_1,e_i\) 张成的二维平面。于是我们得到一条极重要的关系：</p>
+
+\[
+\boxed{
+\operatorname{Ric}(v,v)
+=
+\sum_{i=2}^n K(v\wedge e_i)
+}
+\]
+
+<p>只要 \(v=e_1\) 是单位向量，而 \(e_2,\dots,e_n\) 补成正交规范基。也就是说，Ricci 曲率是把所有包含 \(v\) 的正交二维截面曲率加在一起。</p>
+
+<p>再对整个正交规范基取迹，标量曲率也立刻落了出来：</p>
+
+\[
+S=\sum_{j=1}^n \operatorname{Ric}(e_j,e_j)
+=
+\sum_{j=1}^n \sum_{i\neq j} \langle R(e_i,e_j)e_j,e_i\rangle.
+\]
+
+<p>每一对 \(i&lt;j\) 在这个双重求和里会出现两次，而且两次相等，因此</p>
+
+\[
+\boxed{
+S
+=
+2\sum_{1\le i&lt;j\le n} K(e_i\wedge e_j).
+}
+\]
+
+<p>这条式子非常值得记。它告诉你，第 10 章的标量曲率不是某种神秘的“总弯曲量”，而真的是所有正交二维方向上的截面曲率总和。</p>
+
+<p>在二维流形上，这个关系还会进一步塌缩。因为 \(T_pM\) 本身就是二维的，除了整个 \(T_pM\) 以外，没有别的二维子空间可选。于是只有一个截面曲率，它既是 sectional curvature，也是 Gauss curvature。换句话说，高维里需要 \(R\)、Ric、\(S\) 三个层级来描述的弯曲，在二维里全部被一个函数 \(K\) 吃掉了。这也是为什么曲面理论总显得格外漂亮：信息刚好够丰富，又没有多余自由度。</p>
+
+<p>不过在维数 \(\ge 3\) 时，事情就没那么便宜了。你可能知道所有 Ricci 曲率，却仍不知道每个二维方向到底怎样弯；你也可能知道标量曲率正，却找不到所有截面曲率都正。截面曲率是最细的方向性信息，Ricci 与标量只是它的压缩像。后面第 16 章的比较几何里，正是这种“细信息比粗信息强，但粗信息有时已经够用”的层次感在反复起作用。</p>
+
+<p>为了把“同一点不同二维方向真的会看到不同曲率”这件事再钉牢一点，最好看一眼乘积流形。设</p>
+
+\[
+M=S^2(R)\times \mathbb R
+\]
+
+<p>取乘积度量。任一点 \((x,z)\) 处的切空间分裂成</p>
+
+\[
+T_{(x,z)}M=T_xS^2(R)\oplus T_z\mathbb R.
+\]
+
+<p>若 \(\sigma\subset T_xS^2(R)\) 完全落在球面因子里，那么它的截面曲率当然继承自球面：</p>
+
+\[
+K(\sigma)=\frac1{R^2}.
+\]
+
+<p>但若 \(\sigma\) 是一个混合平面，比如由球面方向上的单位向量 \(u\) 和竖直向量 \(\partial_z\) 张成，那么乘积联络告诉你两个因子彼此独立，不会发生“横向弯曲耦合”，于是</p>
+
+\[
+R(u,\partial_z)\partial_z=0.
+\]
+
+<p>因此</p>
+
+\[
+K(\operatorname{span}\{u,\partial_z\})=0.
+\]
+
+<p>同一个点、同一个切空间里，一部分二维截面像球面那样正弯，另一部分却像平面那样零弯。这个例子非常值钱，因为它把“截面曲率依赖所选平面”说得一清二楚。再和 Ricci 曲率比较一下：对球面方向上的单位向量 \(u\) 有</p>
+
+\[
+\operatorname{Ric}(u,u)=\frac1{R^2},
+\]
+
+<p>而对竖直方向则有</p>
+
+\[
+\operatorname{Ric}(\partial_z,\partial_z)=0.
+\]
+
+<p>标量曲率则是</p>
+
+\[
+S=\frac{2}{R^2}.
+\]
+
+<p>所以 Ricci 和标量都没有错，但它们已经把“有些截面是 \(1/R^2\)，有些截面是 \(0\)”这种方向细节压缩掉了。以后你若想训练自己区分 sectional / Ricci / scalar 这三种信息层级，\(S^2(R)\times\mathbb R\) 会是一个非常好用的试金石。</p>
+
+<h2 id="sec11-4">11.4 常截面曲率空间：\(\mathbb R^n\)、\(S^n\)、\(H^n\)</h2>
+
+<p>现在进入最重要的一类模型。我们说流形 \(M\) 具有常截面曲率 \(k\)，是指对每一点 \(p\in M\) 和每个二维子空间 \(\sigma\subset T_pM\)，都有</p>
+
+\[
+K(\sigma)=k.
+\]
+
+<p>也就是说，不但不同点处曲率相同，而且同一点所有二维方向上的曲率也相同。这是高度对称的情形；几何上你可以把它看成“局部各向同性且各点都一样”。欧氏空间、圆球、双曲空间正是这三类最核心的模型，它们分别对应 \(k=0\)、\(k&gt;0\)、\(k&lt;0\)。</p>
+
+<p>在这种情况下，曲率张量会塌缩成一个极干净的公式：</p>
+
+\[
+\boxed{
+R(X,Y)Z
+=
+k\bigl(\langle Y,Z\rangle X-\langle X,Z\rangle Y\bigr).
+}
+\]
+
+<p>你可以立刻检验它确实给出常截面曲率 \(k\)。只要把 \(Z=Y\) 带进去，再和 \(X\) 做内积，就有</p>
+
+\[
+\langle R(X,Y)Y,X\rangle
+=
+k\bigl(\langle Y,Y\rangle\langle X,X\rangle-\langle X,Y\rangle^2\bigr).
+\]
+
+<p>两边除以分母，就得到</p>
+
+\[
+K(\operatorname{span}\{X,Y\})=k.
+\]
+
+<p>另一方面，这个公式也立刻把 Ricci 和标量曲率读了出来。取单位向量 \(v=e_1\) 并补成正交规范基 \(e_1,\dots,e_n\)，则</p>
+
+\[
+\operatorname{Ric}(e_1,e_1)=\sum_{i=2}^n K(e_1\wedge e_i)=\sum_{i=2}^n k=(n-1)k.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{\operatorname{Ric}=(n-1)k\,g.}
+\]
+
+<p>再取迹便得</p>
+
+\[
+\boxed{S=n(n-1)k.}
+\]
+
+<p>所以第 10 章里球面和双曲空间的 Ricci 公式，其实都只是常截面曲率公式的影子。你现在可以倒过来理解它们：球面之所以满足 \(\operatorname{Ric}=(n-1)g\)，是因为每一张二维切平面都像单位 2-球面那样弯；双曲空间之所以满足 \(\operatorname{Ric}=-(n-1)g\)，是因为每一张二维切平面都像双曲平面那样弯。</p>
+
+<p>第一类模型 \(\mathbb R^n\) 已经算过了：\(R=0\)，所以 \(k=0\)。这是平直几何。</p>
+
+<p>第二类模型是半径为 \(R\) 的圆球 \(S^n(R)\)。我们马上会在 11.6 节把它完整算到 \(K=1/R^2\)。</p>
+
+<p>第三类模型是双曲空间 \(H^n\)。最常用的几个模型里，曲率都等于某个负常数；标准归一化时就是 \(-1\)。11.7 节我们会先在二维上半平面模型里把 \(K=-1\) 真算出来。高维 \(H^n\) 的情形只是在任意二维截面里都复制同一个双曲平面计算，因此也有常截面曲率 \(-1\)。</p>
+
+<p>从这三类模型开始，你其实已经可以把很多几何直觉提前放进脑子里了。\(k=0\) 时，小三角形角和大约是 \(\pi\)；\(k&gt;0\) 时偏大；\(k&lt;0\) 时偏小。\(k&gt;0\) 时平行的测地线有聚拢趋势；\(k&lt;0\) 时有发散趋势。这些说法暂时还是图像，但到第 12 章讲 Jacobi 场、第 16 章讲 Rauch 与 Toponogov 时，它们都会被写成严密的定理。</p>
+
+<h2 id="sec11-5">11.5 曲面上的高斯曲率其实就是截面曲率</h2>
+
+<p>现在把维数降回 \(2\)。若 \(M\) 是二维黎曼流形，那么每一点处的切空间 \(T_pM\) 只有两个维度，因此二维子空间除了 \(T_pM\) 本身以外没有别的选择。于是截面曲率不再需要额外写 \(\sigma\)：</p>
+
+\[
+K(p):=K(T_pM).
+\]
+
+<p>这正是 Gauss 曲率。换句话说，<strong>Gauss 曲率不是截面曲率的类比，而就是截面曲率在二维时的本体。</strong></p>
+
+<p>这句话特别值得和第 1 章的 Theorema Egregium 放在一起看。Gauss 当年最震撼的发现是：曲面的曲率并不依赖它在 \(\mathbb R^3\) 里怎样嵌着看，而只依赖曲面自身的第一基本形式。现代语言说得更短：Gauss 曲率是内蕴量。现在你已经知道为什么了，因为它本来就是由 Levi-Civita 联络和曲率张量 \(R\) 算出来的，而这些对象全都只来自度量 \(g\)。</p>
+
+<p>不过若曲面确实嵌在 \(\mathbb R^3\) 里，外蕴语言仍然有一条非常漂亮的翻译。设形算子在点 \(p\) 的两个特征值是主曲率 \(\kappa_1,\kappa_2\)。那么 Gauss 曲率满足</p>
+
+\[
+K=\kappa_1\kappa_2.
+\]
+
+<p>这条公式把外蕴与内蕴焊在了一起。它告诉你：虽然 \(\kappa_1,\kappa_2\) 各自依赖法向和嵌入方式，但它们的乘积却只取决于曲面自身的度量。与此同时，这条乘积公式还给你一个极快的符号判据。若两个主曲率同号，比如球面，两条主方向都朝同一侧弯，于是 \(K&gt;0\)；若一正一负，比如马鞍面，\(K&lt;0\)；若其中一个为零，比如圆柱，\(K=0\)。</p>
+
+<p>最能说明“外面看着弯，里面却不弯”的例子是圆柱面。设半径为 \(r\) 的圆柱由参数化</p>
+
+\[
+X(\theta,z)=(r\cos\theta,r\sin\theta,z)
+\]
+
+<p>给出，其中 \(\theta\in(0,2\pi)\)，\(z\in\mathbb R\)。先求切向量：</p>
+
+\[
+X_\theta=(-r\sin\theta,r\cos\theta,0),\qquad X_z=(0,0,1).
+\]
+
+<p>于是第一基本形式系数是</p>
+
+\[
+E=\langle X_\theta,X_\theta\rangle=r^2,\qquad
+F=\langle X_\theta,X_z\rangle=0,\qquad
+G=\langle X_z,X_z\rangle=1.
+\]
+
+<p>所以圆柱的度量写成</p>
+
+\[
+g=r^2\,d\theta^2+dz^2.
+\]
+
+<p>现在做一个变量代换 \(x=r\theta\)。那么度量变成</p>
+
+\[
+g=dx^2+dz^2.
+\]
+
+<p>这正是平面条带上的欧氏度量。也就是说，局部上圆柱和一张平面条带等距。既然平面的曲率是零，而等距映射保持内蕴曲率，于是圆柱面满足</p>
+
+\[
+\boxed{K_{\text{cylinder}}=0.}
+\]
+
+<p>这是一个非常该记住的算例。因为圆柱在 \(\mathbb R^3\) 里明明“弯了”，但它的 Gauss 曲率却是零。你要是只靠视觉，就很容易把“沿某个法向看起来弯”跟“内蕴几何真有曲率”混在一起。截面曲率这个定义的价值之一，正是在这里替你切开两种不同的“弯”。</p>
+
+<p>如果你再从主曲率的角度复核一遍，这件事会更扎实。半径为 \(r\) 的圆柱沿圆周方向的主曲率是</p>
+
+\[
+\kappa_1=\frac1r,
+\]
+
+<p>而沿轴向的主曲率是</p>
+
+\[
+\kappa_2=0.
+\]
+
+<p>于是立刻有</p>
+
+\[
+K=\kappa_1\kappa_2=0.
+\]
+
+<p>这说明圆柱的“弯”其实全集中在一个方向里；另一个主方向根本不提供任何回复效应。截面曲率测的是二维几何里的综合弯曲，所以只要有一个方向完全平，乘积就会被压成零。这也解释了为什么圆柱能展开成平面而不拉伸：它从来没有在两个独立方向上同时储存曲率。</p>
+
+<p>若想看见“一张曲面上 \(K\) 可以换符号”，最经典的样板是标准环面。取大半径 \(a\)、小半径 \(b\)（其中 \(a&gt;b&gt;0\)），参数化为</p>
+
+\[
+X(u,v)=\bigl((a+b\cos u)\cos v,\,(a+b\cos u)\sin v,\,b\sin u\bigr).
+\]
+
+<p>它的两条主方向就是经线方向和纬线方向。对应主曲率可以写成</p>
+
+\[
+\kappa_1=\frac{1}{b},
+\qquad
+\kappa_2=\frac{\cos u}{a+b\cos u},
+\]
+
+<p>于是 Gauss 曲率为</p>
+
+\[
+K(u,v)=\kappa_1\kappa_2=\frac{\cos u}{b(a+b\cos u)}.
+\]
+
+<p>这个公式把符号变化说得一眼就明白了。当</p>
+
+\[
+\cos u&gt;0
+\]
+
+<p>时，也就是环面外鼓的那一圈，\(K&gt;0\)；当</p>
+
+\[
+\cos u&lt;0
+\]
+
+<p>时，也就是靠内侧像马鞍那样凹进去的区域，\(K&lt;0\)；而在</p>
+
+\[
+u=\frac{\pi}{2},\ \frac{3\pi}{2}
+\]
+
+<p>这两条过渡圈上，\(\cos u=0\)，所以 \(K=0\)。这是一道特别好的训练题，因为它告诉你：曲率并不一定“整张面同号”。同一张嵌入在 \(\mathbb R^3\) 里的光滑曲面，完全可能在某些地方像球面、某些地方像圆柱、某些地方像马鞍。</p>
+
+<p>这也顺手说明了为什么 Gauss 曲率比“看起来弯不弯”要精细得多。环面每个点在 \(\mathbb R^3\) 里都显然不是平的，可内蕴曲率却会随位置换符号；而且你若真沿着曲面走，会发现内外两侧的小测地三角形几何性格也确实不同。外侧更接近正曲率世界，内侧更接近负曲率世界。截面曲率之所以是局部量，正是因为它允许这种位置依赖与方向依赖同时存在。</p>
+
+<p>对比之下，球面就不可能像圆柱那样被铺平。它的每个方向都在积极地往回收，所以内蕴曲率是真正正的。下面我们就把这件事在坐标里算到最后。</p>
+
+<p>如果你想把这段和早期的曲面计算重新对上，可以回看<a href="../多元微积分/ch23.html">《多元微积分读本》第 23 章</a>里参数曲面的第一基本形式，以及<a href="../多元微积分/ch26.html">第 26 章</a>里曲面上的几何量怎样被坐标表达。那里你是在 \(\mathbb R^3\) 里做微积分；这里你会看见，同样的坐标语言完全可以内化成纯黎曼几何。</p>
+
+<h2 id="sec11-6">11.6 球面算例：半径 \(R\) 的球面满足 \(K=1/R^2\)</h2>
+
+<p>现在来做本章最重要的一道显式计算。设</p>
+
+\[
+S^2(R)=\{(x,y,z)\in\mathbb R^3:x^2+y^2+z^2=R^2\}.
+\]
+
+<p>取通常的球坐标参数化</p>
+
+\[
+X(\theta,\phi)=
+\bigl(
+R\sin\theta\cos\phi,\,
+R\sin\theta\sin\phi,\,
+R\cos\theta
+\bigr),
+\]
+
+<p>其中 \(0&lt;\theta&lt;\pi\)，\(0&lt;\phi&lt;2\pi\)。先求偏导：</p>
+
+\[
+X_\theta=
+\bigl(
+R\cos\theta\cos\phi,\,
+R\cos\theta\sin\phi,\,
+-R\sin\theta
+\bigr),
+\]
+
+\[
+X_\phi=
+\bigl(
+-R\sin\theta\sin\phi,\,
+R\sin\theta\cos\phi,\,
+0
+\bigr).
+\]
+
+<p>于是度量系数为</p>
+
+\[
+g_{\theta\theta}=\langle X_\theta,X_\theta\rangle=R^2,
+\qquad
+g_{\theta\phi}=0,
+\qquad
+g_{\phi\phi}=\langle X_\phi,X_\phi\rangle=R^2\sin^2\theta.
+\]
+
+<p>所以球面上的度量是</p>
+
+\[
+g=R^2\,d\theta^2+R^2\sin^2\theta\,d\phi^2.
+\]
+
+<p>逆矩阵也立刻写下：</p>
+
+\[
+(g^{ij})=
+\begin{pmatrix}
+R^{-2} & 0\\
+0 & (R^2\sin^2\theta)^{-1}
+\end{pmatrix}.
+\]
+
+<p>接下来用第 8 章的 Christoffel 公式</p>
+
+\[
+\Gamma^k_{ij}
+=
+\frac12 g^{k\ell}
+\bigl(\partial_i g_{j\ell}+\partial_j g_{i\ell}-\partial_\ell g_{ij}\bigr).
+\]
+
+<p>由于 \(g_{\theta\theta}=R^2\) 是常数，而 \(g_{\phi\phi}=R^2\sin^2\theta\)，唯一非零的导数是</p>
+
+\[
+\partial_\theta g_{\phi\phi}=2R^2\sin\theta\cos\theta.
+\]
+
+<p>于是非零 Christoffel 符号只有两类：</p>
+
+\[
+\Gamma^\theta_{\phi\phi}
+=
+-\frac12 g^{\theta\theta}\partial_\theta g_{\phi\phi}
+=
+-\frac12\cdot \frac1{R^2}\cdot 2R^2\sin\theta\cos\theta
+=
+-\sin\theta\cos\theta,
+\]
+
+\[
+\Gamma^\phi_{\theta\phi}
+=
+\Gamma^\phi_{\phi\theta}
+=
+\frac12 g^{\phi\phi}\partial_\theta g_{\phi\phi}
+=
+\frac12\cdot \frac1{R^2\sin^2\theta}\cdot 2R^2\sin\theta\cos\theta
+=
+\cot\theta.
+\]
+
+<p>现在算曲率。我们要的是</p>
+
+\[
+R(\partial_\theta,\partial_\phi)\partial_\phi.
+\]
+
+<p>按定义</p>
+
+\[
+R(\partial_\theta,\partial_\phi)\partial_\phi
+=
+\nabla_{\partial_\theta}\nabla_{\partial_\phi}\partial_\phi
+-\nabla_{\partial_\phi}\nabla_{\partial_\theta}\partial_\phi
+\]
+
+<p>因为坐标向量场对易，\([\partial_\theta,\partial_\phi]=0\)。先算第一项。由 \(\Gamma^\theta_{\phi\phi}=-\sin\theta\cos\theta\)，有</p>
+
+\[
+\nabla_{\partial_\phi}\partial_\phi
+=
+-\sin\theta\cos\theta\,\partial_\theta.
+\]
+
+<p>再对 \(\theta\) 求协变导数：</p>
+
+\[
+\nabla_{\partial_\theta}\nabla_{\partial_\phi}\partial_\phi
+=
+\nabla_{\partial_\theta}\bigl(-\sin\theta\cos\theta\,\partial_\theta\bigr)
+=
+(\sin^2\theta-\cos^2\theta)\,\partial_\theta,
+\]
+
+<p>因为 \(\nabla_{\partial_\theta}\partial_\theta=0\)。再算第二项。由 \(\Gamma^\phi_{\theta\phi}=\cot\theta\)，有</p>
+
+\[
+\nabla_{\partial_\theta}\partial_\phi=\cot\theta\,\partial_\phi.
+\]
+
+<p>于是</p>
+
+\[
+\nabla_{\partial_\phi}\nabla_{\partial_\theta}\partial_\phi
+=
+\nabla_{\partial_\phi}(\cot\theta\,\partial_\phi)
+=
+\cot\theta\,\nabla_{\partial_\phi}\partial_\phi
+=
+\cot\theta(-\sin\theta\cos\theta)\,\partial_\theta
+=
+-\cos^2\theta\,\partial_\theta.
+\]
+
+<p>两项相减得到</p>
+
+\[
+R(\partial_\theta,\partial_\phi)\partial_\phi
+=
+\sin^2\theta\,\partial_\theta.
+\]
+
+<p>再和 \(\partial_\theta\) 做内积：</p>
+
+\[
+\langle R(\partial_\theta,\partial_\phi)\partial_\phi,\partial_\theta\rangle
+=
+\sin^2\theta\,\langle \partial_\theta,\partial_\theta\rangle
+=
+R^2\sin^2\theta.
+\]
+
+<p>而分母是</p>
+
+\[
+\langle \partial_\theta,\partial_\theta\rangle
+\langle \partial_\phi,\partial_\phi\rangle
+-\langle \partial_\theta,\partial_\phi\rangle^2
+=
+R^2\cdot R^2\sin^2\theta
+=
+R^4\sin^2\theta.
+\]
+
+<p>因此球面的截面曲率为</p>
+
+\[
+K
+=
+\frac{R^2\sin^2\theta}{R^4\sin^2\theta}
+=
+\boxed{\frac1{R^2}.}
+\]
+
+<p>这就是我们要的结论。它有两个读法。一个读法是：球越大，曲率越小；半径趋于无穷时，球面局部越来越像平面。另一个读法是：单位球面的正曲率在每个点、每个方向都一样，所以它是最标准的正曲率模型。以后只要你在某个定理里看到“正曲率使测地线聚焦”，脑中先浮现的就应该是球面上大圆会再次相交这件事。</p>
+
+<h2 id="sec11-7">11.7 双曲平面算例：上半平面模型满足 \(K=-1\)</h2>
+
+<p>现在来做负曲率的标准模型。取上半平面</p>
+
+\[
+H^2=\{(x,y)\in\mathbb R^2:y&gt;0\},
+\]
+
+<p>配上度量</p>
+
+\[
+g=\frac{dx^2+dy^2}{y^2}.
+\]
+
+<p>这就是 Poincar&eacute; 上半平面模型。它看起来只是把欧氏度量乘了一个位置相关的因子 \(y^{-2}\)，但这个因子越靠近边界 \(y=0\) 越大，结果就是欧氏意义上很短的一段，在双曲度量下可能非常长。几何的性格因此彻底变了。</p>
+
+<p>先写出度量分量：</p>
+
+\[
+g_{11}=g_{22}=y^{-2},\qquad g_{12}=0,
+\]
+
+<p>所以</p>
+
+\[
+g^{11}=g^{22}=y^2,\qquad g^{12}=0.
+\]
+
+<p>对坐标 \(x^1=x\)、\(x^2=y\) 来说，只有对 \(y\) 的导数不为零：</p>
+
+\[
+\partial_y g_{11}=\partial_y g_{22}=-2y^{-3}.
+\]
+
+<p>带入 Christoffel 公式，非零项为</p>
+
+\[
+\Gamma^1_{12}=\Gamma^1_{21}=-\frac1y,
+\qquad
+\Gamma^2_{11}=\frac1y,
+\qquad
+\Gamma^2_{22}=-\frac1y.
+\]
+
+<p>于是协变导数的基本表是</p>
+
+\[
+\nabla_{\partial_x}\partial_x=\frac1y\,\partial_y,
+\qquad
+\nabla_{\partial_x}\partial_y=-\frac1y\,\partial_x,
+\]
+
+\[
+\nabla_{\partial_y}\partial_x=-\frac1y\,\partial_x,
+\qquad
+\nabla_{\partial_y}\partial_y=-\frac1y\,\partial_y.
+\]
+
+<p>现在来算 \(R(\partial_x,\partial_y)\partial_y\)。第一项：</p>
+
+\[
+\nabla_{\partial_x}\nabla_{\partial_y}\partial_y
+=
+\nabla_{\partial_x}\Bigl(-\frac1y\partial_y\Bigr)
+=
+-\frac1y\nabla_{\partial_x}\partial_y
+=
+\frac1{y^2}\partial_x,
+\]
+
+<p>因为 \(-1/y\) 对 \(x\) 的偏导数为零。第二项：</p>
+
+\[
+\nabla_{\partial_y}\nabla_{\partial_x}\partial_y
+=
+\nabla_{\partial_y}\Bigl(-\frac1y\partial_x\Bigr)
+=
+\frac1{y^2}\partial_x-\frac1y\nabla_{\partial_y}\partial_x
+=
+\frac1{y^2}\partial_x+\frac1{y^2}\partial_x
+=
+\frac{2}{y^2}\partial_x.
+\]
+
+<p>因此</p>
+
+\[
+R(\partial_x,\partial_y)\partial_y
+=
+\frac1{y^2}\partial_x-\frac{2}{y^2}\partial_x
+=
+-\frac1{y^2}\partial_x.
+\]
+
+<p>再和 \(\partial_x\) 做内积：</p>
+
+\[
+\langle R(\partial_x,\partial_y)\partial_y,\partial_x\rangle
+=
+-\frac1{y^2}\langle \partial_x,\partial_x\rangle
+=
+-\frac1{y^2}\cdot \frac1{y^2}
+=
+-\frac1{y^4}.
+\]
+
+<p>而分母是</p>
+
+\[
+\langle \partial_x,\partial_x\rangle
+\langle \partial_y,\partial_y\rangle
+-\langle \partial_x,\partial_y\rangle^2
+=
+\frac1{y^2}\cdot\frac1{y^2}
+=
+\frac1{y^4}.
+\]
+
+<p>所以双曲平面的截面曲率为</p>
+
+\[
+\boxed{K=-1.}
+\]
+
+<p>这和球面的结果正好相反。球面是每个方向都在“往回收”，上半平面模型则是每个方向都在“往外散”。在几何图像上，这会反映成测地线的发散、三角形角和小于 \(\pi\)、圆周长比欧氏空间增长得更快、面积也增长得更快。你在<a href="../微分方程/ch5.html">《微分方程读本》第 5 章</a>见过二阶常系数方程 \(u''-u=0\) 的解会指数增长；后面第 12 章把 Jacobi 场写成 \(j''+Kj=0\) 时，负曲率 \(K=-1\) 恰好就会把它变成这种双曲函数型增长。</p>
+
+<p>高维双曲空间 \(H^n\) 也是同样的故事。虽然坐标更多，但任取一点和任意二维子空间，都能在其中看见一张与 \(H^2\) 完全同型的双曲平面，因此所有截面曲率都等于 \(-1\)。这就是“常负截面曲率空间”的标准模型。</p>
+
+<h2 id="sec11-8">11.8 截面曲率为什么这么值钱</h2>
+
+<p>到这里，定义、算例和模型都齐了。现在该把它们拢成一句有用的话：<strong>截面曲率是控制测地线如何相互偏离、三角形如何偏离欧氏几何、以及整体拓扑会受到什么约束的局部量。</strong> 这不是宣传语，而是后面四章的主线。</p>
+
+<p>先看最直接的一层。若 \(K&gt;0\)，邻近测地线倾向于被拉回；若 \(K&lt;0\)，则倾向于彼此散开。球面和双曲平面已经把这两种极端行为摆在你眼前。第 12 章的 Jacobi 场方程</p>
+
+\[
+J''+R(J,\gamma')\gamma'=0
+\]
+
+<p>会把这句图像话翻译成精确的二阶线性方程；在二维时它甚至直接塌缩成</p>
+
+\[
+j''+Kj=0.
+\]
+
+<p>然后第 14 章的第二变分会告诉你，正曲率如何强到足以让测地线失去最短性，最终推出 Bonnet-Myers 这种“曲率下界推出直径上界和紧致性”的全局定理。</p>
+
+<p>再看和前一章的关系。第 10 章的 Ricci 曲率是截面曲率的和，所以 Ricci 的正下界其实是在说：每个方向周围，总体上有足够多的正弯曲。Bonnet-Myers 用的正是这种平均版信息，而不要求每一张二维切平面都正。也就是说，截面曲率是细局部信息，Ricci 是足够用于某些全局结论的平均信息。你如果把这层关系分清楚，后面的很多比较定理就不会再混。</p>
+
+<p>最后别忘了二维曲面这个老朋友。Gauss 曲率之所以在经典微分几何里像主角，不是因为二维特别幸运，而是因为截面曲率在二维恰好只剩一个方向可选。高维黎曼几何并没有抛弃高斯的想法；它只是把“曲率”从一个数，升级成了“每张二维切平面各有一个数”。从这个角度看，黎曼几何并不是离曲面理论越来越远，而是在把曲面理论的核心语言推广到任意维。</p>
+
+<p>如果你想把这一章压成一张最小地图，那么最值得反复比较的有四个样板：\(\mathbb R^n\) 里所有截面都平，所以 \(K=0\)；球面里所有截面都同样向内收，所以 \(K=1/R^2\)；双曲空间里所有截面都同样向外散，所以 \(K=-1\)；而像 \(S^2\times\mathbb R\) 这样的乘积流形，则把“不同二维方向上可以有完全不同的曲率”这件事直接摆在你眼前。以后不管碰到什么比较定理、刚性定理或体积定理，都先在这四个模型上各想一遍。能在这四幅图里站稳的直觉，往往才是真的稳。</p>
+
+<p>在真正离开这一章之前，还有两个很实用的小训练值得顺手放进脑子里。第一个是度量缩放。若把一个黎曼度量整体乘上常数 \(c^2\)，也就是</p>
+
+\[
+\widetilde g=c^2 g,
+\]
+
+<p>那么长度被放大 \(c\) 倍，面积被放大 \(c^2\) 倍，而截面曲率会按反平方缩小：</p>
+
+\[
+\boxed{K_{\widetilde g}=\frac{1}{c^2}K_g.}
+\]
+
+<p>为什么？直觉上很简单：曲率的量纲就是“长度的倒平方”。把空间整体放大两倍，所有弯曲都会显得平一半，而精确地说就是平到原来的四分之一。于是单位球面满足 \(K=1\) 时，半径为 \(R\) 的球面不过是把度量乘了 \(R^2\)，所以立刻得到</p>
+
+\[
+K=\frac1{R^2}.
+\]
+
+<p>这其实给了你另一种理解 11.6 节结果的方式：长坐标硬算当然可以，但更深的一层是“球面曲率的 \(1/R^2\) 规律本来就由缩放律强迫出来”。双曲空间的 \(-1/R^2\) 版本也是同样道理。以后看到某个模型前面多出一个整体尺度参数，先别急着重算一遍，先问缩放律能不能直接告诉你答案。</p>
+
+<p>第二个训练，是把截面曲率和三角形角和联系起来。严格定理要到 Gauss-Bonnet 和比较几何里才完整出现，但局部图像现在就可以先记：在一张小得足以近似为单一二维截面的测地三角形里，若 \(K&gt;0\)，角和会比 \(\pi\) 略大；若 \(K&lt;0\)，则会略小。球面上你已经见过最夸张的版本：从北极到赤道再回去组成的三角形，三个角都可以是直角，于是角和大于 \(\pi\)。双曲平面则相反，角和永远小于 \(\pi\)，而且面积越大，亏掉得越多。</p>
+
+<p>这一点不只是几何趣味。它说明截面曲率不是凭空塞进定义里的代数商，而是真的在支配“欧氏几何规则被扭曲了多少”。在欧氏平面里，平行公设、三角形角和、圆周长随半径线性增长，这些规律都捆成一束；一旦 \(K\neq 0\)，它们会一起偏离。以后第 16 章讲 Toponogov 比较时，你会看见这束偏离被压成了极其有力的边角估计。</p>
+
+<p>其实连最朴素的圆周长和面积也会立刻泄露曲率符号。把一点 \(p\) 附近的一张二维截面 \(\sigma\) 看成“局部模型平面”，半径很小时，测地圆周长和测地圆盘面积会有如下欧氏修正：</p>
+
+\[
+\operatorname{Length}(\partial B_\sigma(r))
+=
+2\pi r-\frac{\pi}{3}K(\sigma)\,r^3+O(r^5),
+\]
+
+\[
+\operatorname{Area}(B_\sigma(r))
+=
+\pi r^2-\frac{\pi}{12}K(\sigma)\,r^4+O(r^6).
+\]
+
+<p>你完全不需要现在去证明这些展开式，但读懂它们的符号已经很有帮助。若 \(K(\sigma)&gt;0\)，同样半径的测地圆会比欧氏圆稍短、稍小；若 \(K(\sigma)&lt;0\)，则会稍长、稍大。换句话说，正曲率把局部空间“压紧”，负曲率把局部空间“撑松”。第 12 章里 Jacobi 场对角度单元的放缩，正是这些展开式背后的动力学来源。</p>
+
+<p>所以学截面曲率时，最好别把它只当一个定义记下来。每次看到 \(K&gt;0\)、\(K=0\)、\(K&lt;0\)，都强迫自己同时问三件事：邻近测地线会聚还是发散？测地三角形角和比 \(\pi\) 大还是小？圆和球的面积增长比欧氏快还是慢？这三种提问彼此会互相纠错。若你的某个直觉只能回答其中一种，却答不好另外两种，那说明你还没真正把“曲率的符号”吃透。</p>
+
+<p>最后再提醒一个非常实际的坑：不同教材对曲率张量 \(R\) 的符号约定并不完全一致。有人把</p>
+
+\[
+R(X,Y)Z
+=
+\nabla_X\nabla_YZ-\nabla_Y\nabla_XZ-\nabla_{[X,Y]}Z
+\]
+
+<p>当作定义，也有人在整体前面差一个负号。于是同一本球面，在一种约定下会算出 \(K=+1/R^2\)，在另一种约定下则会通过定义把正负号吸收到 \(R\) 的写法里。真正不变的几何事实不是某个中间符号，而是：球面代表正曲率世界，双曲空间代表负曲率世界，平面代表零曲率世界。你以后看别的书时，只要先用球面校准一次符号，就不会迷路。</p>
+
+<p>还有一个阅读习惯也很有用。每当你算到某个截面曲率值，不要立刻停在那个数字上，而是继续追问一句：这意味着什么几何后果？如果你算出 \(K=0\)，那应该联想到局部像平面、Jacobi 场线性增长、三角形角和接近 \(\pi\)；如果算出 \(K&gt;0\)，那就该联想到测地线会聚和圆周增长变慢；如果算出 \(K&lt;0\)，则该联想到测地线发散和面积增长变快。养成这种“算完立刻翻译成几何”的习惯，比单纯记住公式更重要。</p>
+
+<p>如果把这一章再压成一个更实战的清单，那么你以后拿到一个新度量时，至少该按下面这套顺序在脑子里过一遍。先问：它是不是明显来自某个已知模型的缩放、乘积或局部等距？若是，很多曲率可以不算就猜到。再问：在二维时能不能通过主曲率乘积、等距展开或极坐标形状快速看出符号？若还是不行，再回到 Christoffel 符号和 \(R\) 的定义硬算。最后，算出数值以后一定要翻译回几何：正还是负？不同方向会不会不一样？对应的 Ricci 与标量曲率会怎样平均？这一整套动作比任何孤立公式都更接近真正做黎曼几何时的思考方式。</p>
+
+<p>顺手再记一件常被用来“偷懒”的事实：在低维里，截面曲率往往比你想象中更接近全部曲率信息。二维当然最极端，只有一个方向可选，所以 \(K\) 就是全部。三维时，虽然切空间已经有很多二维平面，但 Ricci 和截面曲率之间的关系仍然异常紧密，很多估计都能在三种正交截面的曲率之间来回翻译。这也是为什么三维几何和广义相对论的很多模型特别偏爱直接谈 sectional / Ricci 的原因：信息既丰富，又还没有高维那样分散。</p>
+
+<p>最后别把这一章的 \(K\) 和曲线论里的“曲率 \(\kappa\)”混成一回事。曲线曲率衡量的是一条一维轨迹在某个环境空间里拐弯有多快；截面曲率衡量的则是环境空间本身，在某张二维切平面里怎样弯。一个流形可以有很大的截面曲率，而其中某条测地线的曲线曲率却为零，因为测地线恰恰是不在流形内部继续拐弯的那批曲线。把这两层“谁在弯”分清楚，是从多元微积分过渡到黎曼几何时最重要的思想升级之一。</p>
+
+<p>若把这一章只留一句最实用的话，那就是：<strong>截面曲率是把“空间本身怎样弯”投影到每一张二维切平面上去看。</strong> 只要这句话真的进脑子，后面的 Jacobi 场、比较三角形、直径估计和体积比较都会自动各归其位。</p>
+
+<p>而一旦你真的习惯这样看，高维黎曼几何就不会再像一堆彼此无关的曲率名词。\(R\) 是总账，\(K(\sigma)\) 是单张二维账单，Ricci 是把一圈账单加总后的平均账，标量曲率则是总平均。第 11 章真正做成的，就是把这几层账本第一次彻底对齐。</p>
+
+<p>把这张账本对齐以后，你再回头看球面、双曲空间、乘积流形和环面，就会发现它们不再是四道孤立算题，而是四种最基本的曲率性格。</p>
+
+<p>而会不会在新例子里迅速认出它属于哪一种性格，正是这一章真正训练你的地方。</p>
+
+<p>这一章真正该留下来的第一句话是：截面曲率不是抽象补丁，而是高维里最接近高斯曲率的对象。</p>
+
+<p>第二句话是：\(R\) 记录全部方向信息，\(K(\sigma)\) 抽出某一张二维刀片上的信息，Ricci 和标量曲率则把这些信息继续平均。</p>
+
+<p>第三句话是：\(\mathbb R^n\)、\(S^n\)、\(H^n\) 这三类常截面曲率模型，会在后面所有比较几何里反复充当参照物。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 Ricci 与 scalar 曲率</a><a href="ch12.html">下一章 · 第 12 章 Jacobi 场与共轭点 →</a></nav>
+
+</main>
+</body>
+</html>

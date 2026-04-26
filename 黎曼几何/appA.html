@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 张量代数速查 — 普林斯顿黎曼几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 应用：广义相对论与 Ricci 流</a><a href="appB.html">下一章 · 附录 B 微分形式与外微分 →</a></nav>
+<h1 id="appA">附录 A 张量代数速查</h1>
+
+<p>这份附录不是用来第一次学张量的，而是用来在你读<a href="ch4.html">第 4 章</a>到<a href="ch10.html">第 10 章</a>、以及第 19-20 章时，随手翻一下“这个指标到底该放哪边”“这里的缩并在收哪两个位置”“\(\flat\) 和 \(\sharp\) 到底是谁把谁送到谁”。张量记号最大的麻烦从来不是深，而是密。只要把骨架理顺，很多看起来可怕的式子其实只是线性代数换了一层皮。</p>
+
+<h2 id="secA-1">A.1 型别：\(T^p_qM\) 到底在说什么</h2>
+
+<p>设 \(M\) 是一条光滑流形，点 \(p\in M\)。切空间记作 \(T_pM\)，余切空间记作 \(T_p^\ast M\)。本书采用微分几何里最常见的约定：</p>
+
+\[
+T^p_q(T_pM):=(T_pM)^{\otimes p}\otimes (T_p^\ast M)^{\otimes q}.
+\]
+
+<p>也就是说，<strong>上标 \(p\) 表示 \(p\) 次逆变（vector slots），下标 \(q\) 表示 \(q\) 次协变（covector slots）</strong>。很多中文资料会把“型别 \((p,q)\)”口头说成“\(p\) 个上指标、\(q\) 个下指标”，你把这句话记牢就够了。若你碰到别的书把字母顺序写反，不要死盯 \(p,q\) 这两个字母，要看它到底把 \(TM\) 放前面还是把 \(T^\ast M\) 放前面。</p>
+
+<p>等价地，一个 \((p,q)\)-型张量也可以看成一个多重线性映射</p>
+
+\[
+T\colon \underbrace{T_p^\ast M\times\cdots\times T_p^\ast M}_{p\text{ 个}}
+\times
+\underbrace{T_pM\times\cdots\times T_pM}_{q\text{ 个}}
+\to \mathbb R
+\]
+
+<p>它对每个变量都线性。这个定义和张量积定义是完全等价的，只是看问题的角度不同：前者像“多元函数”，后者像“基底展开”。</p>
+
+<p>最常见的几个例子是：</p>
+
+\[
+f\in C^\infty(M)\quad\leftrightarrow\quad (0,0)\text{-张量},
+\]
+
+\[
+X\in\Gamma(TM)\quad\leftrightarrow\quad (1,0)\text{-张量},
+\]
+
+\[
+\alpha\in\Gamma(T^\ast M)\quad\leftrightarrow\quad (0,1)\text{-张量},
+\]
+
+\[
+g\in\Gamma(T^\ast M\otimes T^\ast M)\quad\leftrightarrow\quad (0,2)\text{-张量},
+\]
+
+\[
+R\in\Gamma(T^\ast M^{\otimes 3}\otimes TM)\quad\leftrightarrow\quad (1,3)\text{-张量}.
+\]
+
+<p>其中 \(\Gamma(E)\) 表示向量丛 \(E\) 的光滑截面。说“张量场”无非就是“每一点给一个同型别张量，并且随点光滑变化”。</p>
+
+<h2 id="secA-2">A.2 基底、分量与坐标变换</h2>
+
+<p>在局部坐标 \((x^1,\dots,x^n)\) 下，切空间标准基是</p>
+
+\[
+\left\{\frac{\partial}{\partial x^1},\dots,\frac{\partial}{\partial x^n}\right\},
+\]
+
+<p>余切空间对偶基是</p>
+
+\[
+\{dx^1,\dots,dx^n\}.
+\]
+
+<p>于是一个 \((1,1)\)-型张量可以展开成</p>
+
+\[
+T=T^i_{\ j}\,\frac{\partial}{\partial x^i}\otimes dx^j.
+\]
+
+<p>一个 \((0,2)\)-型张量可以展开成</p>
+
+\[
+A=A_{ij}\,dx^i\otimes dx^j.
+\]
+
+<p>一个 \((2,0)\)-型张量则写成</p>
+
+\[
+B=B^{ij}\,\frac{\partial}{\partial x^i}\otimes \frac{\partial}{\partial x^j}.
+\]
+
+<p>换坐标时，分量会按 Jacobian 和逆 Jacobian 变换。最值得记的一条是：</p>
+
+\[
+\frac{\partial}{\partial x^i}
+=
+\frac{\partial y^\alpha}{\partial x^i}\frac{\partial}{\partial y^\alpha},
+\qquad
+dx^j=
+\frac{\partial x^j}{\partial y^\beta}dy^\beta.
+\]
+
+<p>因此 \((1,1)\)-型张量的分量变换为</p>
+
+\[
+\widetilde T^\alpha_{\ \beta}
+=
+\frac{\partial y^\alpha}{\partial x^i}
+\frac{\partial x^j}{\partial y^\beta}
+T^i_{\ j}.
+\]
+
+<p>你不必把每一种型别都硬背。原则只有一条：<strong>上指标跟着切向量那样变，下指标跟着余切向量那样变。</strong> 这也正是“逆变 / 协变”两个词真正的来历。</p>
+
+<h2 id="secA-3">A.3 Einstein 求和约定与缩并</h2>
+
+<p>Einstein 求和约定就是：当同一个指标在一项里一上一下各出现一次时，默认对它从 \(1\) 到 \(n\) 求和。例如</p>
+
+\[
+X^i\alpha_i
+\]
+
+<p>代表</p>
+
+\[
+\sum_{i=1}^n X^i\alpha_i.
+\]
+
+<p>这正是余向量 \(\alpha\) 作用在向量 \(X\) 上的坐标写法：</p>
+
+\[
+\alpha(X)=\alpha_iX^i.
+\]
+
+<p>更一般地，<strong>缩并</strong>就是把一个上指标和一个下指标配对求和，从而把型别 \((p,q)\) 降成 \((p-1,q-1)\)。例如对 \((1,1)\)-型张量 \(T^i_{\ j}\)，其迹就是</p>
+
+\[
+\operatorname{tr}(T)=T^i_{\ i}.
+\]
+
+<p>对曲率张量 \(R^i_{\ jkl}\)，Ricci 曲率正是一次缩并：</p>
+
+\[
+\operatorname{Ric}_{jk}=R^i_{\ jik}.
+\]
+
+<p>很多长公式看起来吓人，其实只是“造张量 + 缩并”两步在来回重复。只要你先数清楚上、下指标各有几个，型别就不容易乱。</p>
+
+<h2 id="secA-4">A.4 张量积、外积与内积</h2>
+
+<p>若 \(S\) 是 \((p,q)\)-型张量，\(T\) 是 \((r,s)\)-型张量，那么它们的张量积是 \((p+r,q+s)\)-型张量，记作</p>
+
+\[
+S\otimes T.
+\]
+
+<p>它最朴素的作用就是把两个多线性对象并排放在一起。坐标里，若</p>
+
+\[
+S=S^I_{\ J}\,e_I\otimes e^J,\qquad
+T=T^K_{\ L}\,e_K\otimes e^L,
+\]
+
+<p>那么</p>
+
+\[
+S\otimes T=S^I_{\ J}T^K_{\ L}\,e_I\otimes e_K\otimes e^J\otimes e^L.
+\]
+
+<p>外积 \(\wedge\) 是张量积的交替化，主要作用在协变张量尤其是微分形式上。对 \(1\)-形式 \(\alpha,\beta\)，有</p>
+
+\[
+\alpha\wedge\beta=\alpha\otimes\beta-\beta\otimes\alpha.
+\]
+
+<p>因此它自动满足反对称性</p>
+
+\[
+\alpha\wedge\beta=-\beta\wedge\alpha,
+\qquad
+\alpha\wedge\alpha=0.
+\]
+
+<p>更高阶时，\(\wedge\) 依旧只是“先张量积，再完全反对称化”。所以你以后看到 \(dx^i\wedge dx^j\)，要立刻想成“二维有向面积元”，而不是把它当成某个神秘新乘法。</p>
+
+<p>内积则需要度量 \(g\)。一旦 \(g\) 给出，就能把切向量和余切向量的长度、夹角以及更高阶张量的内积全部诱导出来。对 \(1\)-形式 \(\alpha=\alpha_i dx^i\)、\(\beta=\beta_i dx^i\)，有</p>
+
+\[
+\langle \alpha,\beta\rangle=g^{ij}\alpha_i\beta_j.
+\]
+
+<p>对向量 \(X=X^i\partial_i\)、\(Y=Y^i\partial_i\)，则是</p>
+
+\[
+\langle X,Y\rangle=g_{ij}X^iY^j.
+\]
+
+<p>更高阶张量的内积，就是把每个上指标用 \(g_{ij}\) 配对、每个下指标用 \(g^{ij}\) 配对后全部缩并。形式上有点长，但原则非常统一。</p>
+
+<h2 id="secA-5">A.5 升降指标：\(g\) 怎样在上下指标之间搭桥</h2>
+
+<p>有了度量 \(g=g_{ij}\,dx^i\otimes dx^j\) 以后，最常用的操作就是升降指标。对向量</p>
+
+\[
+X=X^i\frac{\partial}{\partial x^i},
+\]
+
+<p>降指标得到对应的 \(1\)-形式</p>
+
+\[
+X^\flat=g(X,\cdot)=g_{ij}X^j\,dx^i.
+\]
+
+<p>也就是分量公式</p>
+
+\[
+\boxed{X_i=g_{ij}X^j.}
+\]
+
+<p>反过来，对 \(1\)-形式 \(\alpha=\alpha_i dx^i\)，升指标得到向量</p>
+
+\[
+\alpha^\sharp=g^{ij}\alpha_j\,\frac{\partial}{\partial x^i},
+\]
+
+<p>即</p>
+
+\[
+\boxed{\alpha^i=g^{ij}\alpha_j.}
+\]
+
+<p>这里 \(g^{ij}\) 是矩阵 \((g_{ij})\) 的逆矩阵，所以</p>
+
+\[
+g^{ik}g_{kj}=\delta^i_{\ j}.
+\]
+
+<p>这就是为什么升完再降、降完再升都会回到原来对象。更一般地，对任意张量，你都可以在任何一个指标位置用 \(g\) 或 \(g^{-1}\) 把它抬上去或压下来。例如对 \((1,1)\)-型张量 \(T^i_{\ j}\)，可定义</p>
+
+\[
+T_{ij}=g_{ik}T^k_{\ j},
+\qquad
+T^{ij}=g^{jk}T^i_{\ k}.
+\]
+
+<p>最常见的例子就是把梯度、散度、Christoffel 符号、曲率张量的不同版本互相转换。比如标量函数 \(f\) 的微分是 \(df=\partial_i f\,dx^i\)，而梯度向量则是</p>
+
+\[
+\nabla f=(df)^\sharp=g^{ij}\partial_j f\,\frac{\partial}{\partial x^i}.
+\]
+
+<p>在 Euclidean 坐标里 \(g_{ij}=\delta_{ij}\)，所以升降指标看起来像什么都没做；这反而最容易害人，因为一到曲坐标或非平直度量里，\(g_{ij}\) 就不再是单位矩阵了。</p>
+
+<h2 id="secA-6">A.6 度量诱导的同构 \(TM\leftrightarrow T^\ast M\)</h2>
+
+<p>上一节其实已经给出了核心结论：若 \(g\) 非退化，那么每一点上都有自然线性同构</p>
+
+\[
+\flat\colon T_pM\to T_p^\ast M,\qquad X\mapsto X^\flat=g(X,\cdot),
+\]
+
+\[
+\sharp\colon T_p^\ast M\to T_pM,\qquad \alpha\mapsto \alpha^\sharp.
+\]
+
+<p>把这些点态同构拼起来，就得到向量丛同构</p>
+
+\[
+\boxed{TM\cong T^\ast M.}
+\]
+
+<p>注意：这不是“所有流形天生就有 \(TM\cong T^\ast M\)”，而是“<strong>一旦选定一个度量</strong>，就获得了这个同构”。也正因为如此，很多本来只定义在向量上的东西，能被转写成 \(1\)-形式；很多本来只定义在 \(1\)-形式上的东西，也能拉回到向量场上。</p>
+
+<p>Hodge 理论里这尤其重要。比如余微分 \(d^\ast\)、Hodge 星算子 \(\ast\) 与 \(L^2\) 内积，全部都依赖于度量；而度量之所以能和形式空间发生关系，背后就站着这套 \(TM\leftrightarrow T^\ast M\) 的桥梁。你在向量分析里熟悉的“梯度是把 \(df\) 抬成向量”“散度是把协变导数做缩并”，本质上都在重复同一个动作。</p>
+
+<p>最后给一张最短的速查表，方便你在正文里遇到公式时快速定位：</p>
+
+\[
+X^\flat=g_{ij}X^j\,dx^i,
+\qquad
+\alpha^\sharp=g^{ij}\alpha_j\,\partial_i,
+\]
+
+\[
+\alpha(X)=\alpha_iX^i,
+\qquad
+\langle X,Y\rangle=g_{ij}X^iY^j,
+\qquad
+\langle \alpha,\beta\rangle=g^{ij}\alpha_i\beta_j,
+\]
+
+\[
+\operatorname{tr}(T)=T^i_{\ i},
+\qquad
+\operatorname{Ric}_{jk}=R^i_{\ jik}.
+\]
+
+<p>若你每次都先问“它的型别是什么”“我现在是在做张量积、缩并还是升降指标”“这个式子里哪一个上指标和哪一个下指标在配对”，张量记号就会从密林变成语法。附录 A 的任务也就完成了。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 应用：广义相对论与 Ricci 流</a><a href="appB.html">下一章 · 附录 B 微分形式与外微分 →</a></nav>
+
+</main>
+</body>
+</html>

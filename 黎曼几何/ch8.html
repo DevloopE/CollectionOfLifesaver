@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 Levi-Civita 联络 — 普林斯顿黎曼几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 联络与协变导数</a><a href="ch9.html">下一章 · 第 9 章 曲率张量 \(R\) →</a></nav>
+<h1 id="ch8">第 8 章 Levi-Civita 联络</h1>
+
+<p><a href="ch7.html">第 7 章</a>做了一件很必要、但也很危险的事：它把联络作为一个一般概念完全放开了。这样做的好处是，你现在知道“协变导数”并不是度量自动长出来的，而是一种额外选择；可坏处也立刻出现了：如果选择太自由，几何就会失去方向。上一章里那条人造联络会把平面上一条直线上的平行向量指数缩短。它当然合法，可它显然不是我们在黎曼几何里真正想要的“长度几何”。</p>
+
+<p>所以这一章的中心问题非常明确：<strong>给定一个黎曼度量 \(g\)，有没有一条最自然的联络，既能微分向量场，又不会违背度量所编码的长度与角度？</strong> Levi-Civita 的伟大之处在于，答案不是“有很多条差不多的”，而是“恰有一条”。它由两条条件完全钉死：</p>
+
+\[
+\text{度量兼容}\qquad\text{和}\qquad\text{无挠}.
+\]
+
+<p>这两条看起来朴素，但它们一结合，会把上一章所有自由度几乎全部消掉。你在<a href="../线性代数/ch18.html">《线性代数读本》第 18 章</a>已经习惯了“内积会挑出正交、对称、自伴这些自然对象”；这里发生的是同样的事，只不过对象从一个固定向量空间上的矩阵，变成了流形上的导数规则。</p>
+
+<p>更重要的是，这一章会把第 6 章那串看似技术性的 Christoffel 符号真正解释成由度量导出来的系数。到了这一章末尾，你应该不再把</p>
+
+\[
+\Gamma^k_{ij}=\frac12 g^{k\ell}(\partial_ig_{j\ell}+\partial_jg_{i\ell}-\partial_\ell g_{ij})
+\]
+
+<p>当作一条需要背的公式，而会把它看成“保内积 + 无挠”两条几何要求在坐标中的代数影子。</p>
+
+<h2 id="sec8-1">8.1 为什么度量一给定，我们就想要一条“最合拍”的联络</h2>
+
+<p>回头看<a href="ch5.html">第 5 章</a>，黎曼度量 \(g\) 给我们的，是每一点切空间上的内积。于是长度、角度、体积、正交标架、能量泛函都被定义了出来。可只靠这些，你还不会微分向量场。上一章告诉你，要微分就得再给一条联络。</p>
+
+<p>问题是：一条随便给的联络，完全可能和度量打架。上一章那个例子</p>
+
+\[
+\widetilde\nabla_XY=\nabla_X^{\mathrm{flat}}Y+dx(X)Y
+\]
+
+<p>在 \(\mathbb R^2\) 上就会把平行向量沿 \(x\)-轴缩成 \(e^{-t}\) 倍。若我们仍然用标准欧氏度量</p>
+
+\[
+g=dx^2+dy^2,
+\]
+
+<p>沿曲线 \(\gamma(t)=(t,0)\) 的平行解是</p>
+
+\[
+V(t)=ae^{-t}\partial_x+be^{-t}\partial_y.
+\]
+
+<p>于是长度满足</p>
+
+\[
+|V(t)|^2=a^2e^{-2t}+b^2e^{-2t}=e^{-2t}|V(0)|^2.
+\]
+
+<p>也就是说，一个被叫做“平行”的向量场，长度却在持续变化。你如果把联络理解成“沿着曲线搬运向量的自然方式”，这种行为就太不自然了。因为度量已经告诉我们什么叫长度，联络如果连这点都不尊重，二者就像两套互相矛盾的物理单位制。</p>
+
+<p>所以我们要的第一条要求是：联络必须和度量兼容。直觉上说，平行移动应该保内积，至少不该在你没有任何理由时自己改变长度与夹角。</p>
+
+<p>第二条要求来自另一种不自然：挠率。上一章我们已经看见，一般联络可能带着某种“扭劲”，使得 \(\nabla_XY-\nabla_YX\) 和 Lie 括号 \([X,Y]\) 不一致。可对单纯由度量控制的几何来说，这种额外扭曲通常不是我们想保留的对象。我们想把“几何弯曲”完全交给曲率去测，而不是让联络先暗中塞进一层独立的扭曲。因此，Levi-Civita 还要求联络无挠。</p>
+
+<p>这两条要求其实很好记：</p>
+
+<ul>
+  <li>度量兼容：联络不能破坏度量已经定义好的长度和角度。</li>
+  <li>无挠：联络不应额外引入一种与度量无关的扭曲。</li>
+</ul>
+
+<p>下一节我们把这两句话写成精确公式。它们一旦写出来，你就会发现 Levi-Civita 联络并不是“经验上最顺手的一条”，而是被几何逻辑逼出来的那一条。</p>
+
+<h2 id="sec8-2">8.2 度量兼容与无挠，分别在说什么</h2>
+
+<p>设 \((M,g)\) 是黎曼流形，\(\nabla\) 是 \(M\) 上一条联络。我们说 \(\nabla\) 与 \(g\) 度量兼容，是指对任意向量场 \(X,Y,Z\)，都有</p>
+
+\[
+\boxed{X\langle Y,Z\rangle
+=
+\langle \nabla_XY,Z\rangle+\langle Y,\nabla_XZ\rangle.}
+\]
+
+<p>这里 \(\langle\cdot,\cdot\rangle\) 就是度量 \(g\) 给出的内积。你可以把这条式子读成“对内积求导时，导数像乘积法则那样分配到两个向量场上”。它是最自然的要求，因为在欧氏空间里普通导数本来就满足这件事。</p>
+
+<p>无挠则写作</p>
+
+\[
+\boxed{T(X,Y)=\nabla_XY-\nabla_YX-[X,Y]=0.}
+\]
+
+<p>若在坐标基 \(\partial_i\) 下，由于 \([\partial_i,\partial_j]=0\)，它等价于</p>
+
+\[
+\boxed{\Gamma^k_{ij}=\Gamma^k_{ji}.}
+\]
+
+<p>而度量兼容在坐标里则可写成</p>
+
+\[
+\boxed{\nabla_k g_{ij}
+=
+\partial_k g_{ij}
+-\Gamma^\ell_{ki}g_{\ell j}
+-\Gamma^\ell_{kj}g_{i\ell}
+=0.}
+\]
+
+<p>这三条盒子里的式子，就是整章后续全部推导的发动机。</p>
+
+<p>先看度量兼容的直接后果。设 \(\gamma\) 是一条曲线，\(V,W\) 是沿 \(\gamma\) 的向量场。那么</p>
+
+\[
+\frac{d}{dt}\langle V,W\rangle
+=
+\langle \tfrac{DV}{dt},W\rangle+\langle V,\tfrac{DW}{dt}\rangle.
+\]
+
+<p>若 \(V,W\) 都是平行的，即 \(\dfrac{DV}{dt}=0,\ \dfrac{DW}{dt}=0\)，便立刻得到</p>
+
+\[
+\frac{d}{dt}\langle V,W\rangle=0.
+\]
+
+<p>所以平行移动会保持内积，特别地会保持长度和角度。这正是我们想要的几何行为。</p>
+
+<p>把这条结论往前推半步，你马上得到一个在测地线理论里极其重要的小事实：Levi-Civita 测地线天然是恒速的。因为若 \(\gamma\) 是测地线，则 \(\dfrac{D\dot\gamma}{dt}=0\)。于是</p>
+
+\[
+\frac{d}{dt}\frac12|\dot\gamma|^2
+=
+\left\langle \frac{D\dot\gamma}{dt},\dot\gamma\right\rangle
+=
+0.
+\]
+
+<p>所以</p>
+
+\[
+|\dot\gamma(t)|\equiv \text{常数}.
+\]
+
+<p>这件事看上去像一个小推论，其实非常值钱。它告诉你：在 Levi-Civita 联络下，“自平行”与“以恒定速率前进”自动绑在一起。上一章的一般联络并没有这份福利；只有当联络和度量兼容时，才会出现这种和长度泛函、能量泛函彼此契合的现象。这正是<a href="ch6.html">第 6 章</a>里测地线既能由协变加速度为零来定义，又能由长度或能量变分来刻画的根本原因。</p>
+
+<p>同样地，若你在曲线起点选一组正交归一基 \(e_1,\dots,e_n\)，然后把它们都平行移动到曲线其他点，那么由于内积保持，这组向量在每个时刻仍然正交归一。也就是说，Levi-Civita 联络不仅搬运单个向量，还会自然地搬运整个正交结构。下一节正交标架里的反对称联络 1-形式，本质上就是这件事的局部微分版本。</p>
+
+<p>你可以用上一节的人造联络当场检验它为什么失败。沿 \(x\)-轴的平行场满足</p>
+
+\[
+V(t)=e^{-t}V(0).
+\]
+
+<p>于是</p>
+
+\[
+\frac{d}{dt}\langle V,V\rangle=-2e^{-2t}\langle V(0),V(0)\rangle\neq 0.
+\]
+
+<p>既然平行场长度不守恒，这条联络就不可能与欧氏度量兼容。也就是说，度量兼容不是一个抽象口号，而是一个会立刻排除坏例子的硬约束。</p>
+
+<p>再看无挠。它意味着：在坐标基下，联络对下两个指标对称；更几何地说，它保证“先沿 \(X\) 再沿 \(Y\)”与“先沿 \(Y\) 再沿 \(X\)”的差异，完全由向量场本身的不交换 \([X,Y]\) 来解释，而不会多出一层联络私自制造的扭曲。这一条会在推导 Christoffel 公式时节省掉整整一半自由度。</p>
+
+<p>到这里最好把逻辑顺序记牢：不是因为我们先写出了 Christoffel 公式，所以才发现它对称并保度量；而是反过来，<strong>正因为我们要求无挠与度量兼容，所以 Christoffel 公式才不得不长成那个样子</strong>。</p>
+
+<h2 id="sec8-3">8.3 唯一性从哪里来：Koszul 公式一步步推出来</h2>
+
+<p>Levi-Civita 定理最惊人的部分不是“存在”，而是“唯一”。也就是说，只要一条联络同时满足度量兼容和无挠，它就已经没有任何自由度了。证明唯一性的核心，是一条叫作 Koszul 公式的恒等式。</p>
+
+<p>推导并不神秘，只是耐心地把度量兼容写三遍。先写</p>
+
+\[
+X\langle Y,Z\rangle
+=
+\langle \nabla_XY,Z\rangle+\langle Y,\nabla_XZ\rangle.
+\tag{1}
+\]
+
+<p>把 \(X,Y,Z\) 循环排列，再写两条：</p>
+
+\[
+Y\langle Z,X\rangle
+=
+\langle \nabla_YZ,X\rangle+\langle Z,\nabla_YX\rangle,
+\tag{2}
+\]
+
+\[
+Z\langle X,Y\rangle
+=
+\langle \nabla_ZX,Y\rangle+\langle X,\nabla_ZY\rangle.
+\tag{3}
+\]
+
+<p>现在做一个很关键的线性组合：把 (1) 和 (2) 相加，再减去 (3)。左边得到</p>
+
+\[
+X\langle Y,Z\rangle+Y\langle Z,X\rangle-Z\langle X,Y\rangle.
+\]
+
+<p>右边则是</p>
+
+\[
+\langle \nabla_XY,Z\rangle+\langle Y,\nabla_XZ\rangle
++\langle \nabla_YZ,X\rangle+\langle Z,\nabla_YX\rangle
+-\langle \nabla_ZX,Y\rangle-\langle X,\nabla_ZY\rangle.
+\]
+
+<p>利用内积对称性把后几项改写一下：</p>
+
+\[
+=
+\langle \nabla_XY,Z\rangle+\langle \nabla_XZ,Y\rangle
++\langle \nabla_YZ,X\rangle+\langle \nabla_YX,Z\rangle
+-\langle \nabla_ZX,Y\rangle-\langle \nabla_ZY,X\rangle.
+\]
+
+<p>接下来把无挠条件代进来：</p>
+
+\[
+\nabla_YX=\nabla_XY-[X,Y],
+\]
+
+\[
+\nabla_ZX=\nabla_XZ-[X,Z],
+\]
+
+\[
+\nabla_ZY=\nabla_YZ-[Y,Z].
+\]
+
+<p>把这三条替进去，右边就变成</p>
+
+\[
+2\langle \nabla_XY,Z\rangle
+-\langle [X,Y],Z\rangle
++\langle [X,Z],Y\rangle
++\langle [Y,Z],X\rangle.
+\]
+
+<p>于是我们得到</p>
+
+\[
+2\langle \nabla_XY,Z\rangle
+=
+X\langle Y,Z\rangle+Y\langle Z,X\rangle-Z\langle X,Y\rangle
+\]
+
+\[
+\qquad
++\langle [X,Y],Z\rangle-\langle [X,Z],Y\rangle-\langle [Y,Z],X\rangle.
+\]
+
+<p>把 \([Z,X]=-[X,Z]\) 代进去，就得到更对称的标准写法：</p>
+
+\[
+\boxed{
+\begin{aligned}
+2\langle \nabla_XY,Z\rangle
+=\;&X\langle Y,Z\rangle+Y\langle Z,X\rangle-Z\langle X,Y\rangle\\
+&+\langle [X,Y],Z\rangle-\langle [Y,Z],X\rangle+\langle [Z,X],Y\rangle.
+\end{aligned}}
+\]
+
+<p>这就是 Koszul 公式。它的威力在于：右边只含度量 \(g\)、Lie 括号和向量场本身；完全没有“未知的联络系数”剩下。既然对任意 \(Z\) 都能算出 \(\langle \nabla_XY,Z\rangle\)，而度量是非退化的，\(\nabla_XY\) 就被唯一确定了。于是唯一性立刻成立。</p>
+
+<p>这个证明值得你细想，因为它非常像代数里“一个线性泛函对所有测试向量的配对都知道了，所以它自己被唯一确定”。你在<a href="../线性代数/ch19.html">《线性代数读本》第 19 章</a>看正交与对偶空间时，已经形成过这种思维。Koszul 公式做的，只是把这种线性代数判断搬到了每一点切空间上。</p>
+
+<p>还有一个细节值得你顺手收进脑子里。Koszul 公式右边虽然看着长，但它对 \(X\) 是 \(C^\infty(M)\)-线性的，对 \(Y\) 则满足 Leibniz 规则；这恰好与联络的三条公理一一吻合。也就是说，Koszul 公式并不是“某个满足条件的联络应当 obey 的附加恒等式”，而是已经把联络结构本身编码好了。你若愿意，完全可以把 Levi-Civita 联络定义成“满足 Koszul 公式的那条联络”，然后把度量兼容与无挠当作它的两个直接性质去验证。</p>
+
+<p>从这个角度看，Levi-Civita 定理的哲学很漂亮：一个度量并不直接告诉你“向量怎么比较”，但它通过内积的微分法则和无挠要求，把这种比较方式唯一推了出来。于是黎曼几何并不是“度量 + 另一份独立数据”，而更像“度量一旦给定，最自然的导数规则也随之被绑定”。</p>
+
+<h2 id="sec8-4">8.4 存在性与 Christoffel 公式：坐标里到底怎么落地</h2>
+
+<p>唯一性已经由 Koszul 公式给出了。存在性其实也被它暗示出来：你完全可以反过来，把右边那条式子当作 \(\nabla_XY\) 的定义。因为右边对 \(Z\) 是线性的，又由度量非退化性确定唯一向量，所以它确实定义出一条联络；直接检查即可验证它同时度量兼容且无挠。这就是 Levi-Civita 联络存在的本质理由。</p>
+
+<p>但实战中我们更关心局部坐标下的 Christoffel 公式。现在取坐标基 \(X=\partial_i,\ Y=\partial_j,\ Z=\partial_k\)。由于</p>
+
+\[
+[\partial_i,\partial_j]=0,
+\]
+
+<p>Koszul 公式里所有 Lie 括号项都消失，只剩</p>
+
+\[
+2\langle \nabla_{\partial_i}\partial_j,\partial_k\rangle
+=
+\partial_i\langle \partial_j,\partial_k\rangle
++\partial_j\langle \partial_k,\partial_i\rangle
+-\partial_k\langle \partial_i,\partial_j\rangle.
+\]
+
+<p>若记</p>
+
+\[
+g_{ij}=\langle \partial_i,\partial_j\rangle,
+\qquad
+\nabla_{\partial_i}\partial_j=\Gamma^\ell_{ij}\partial_\ell,
+\]
+
+<p>则左边变成</p>
+
+\[
+2\langle \Gamma^\ell_{ij}\partial_\ell,\partial_k\rangle
+=
+2\Gamma^\ell_{ij}g_{\ell k}.
+\]
+
+<p>右边则是</p>
+
+\[
+\partial_i g_{jk}+\partial_j g_{ki}-\partial_k g_{ij}.
+\]
+
+<p>因此得到</p>
+
+\[
+2\Gamma^\ell_{ij}g_{\ell k}
+=
+\partial_i g_{jk}+\partial_j g_{ik}-\partial_k g_{ij}.
+\]
+
+<p>把指标 \(k\) 看作最后一个自由指标，再用逆矩阵 \(g^{km}\) 提上去，就有</p>
+
+\[
+2\Gamma^m_{ij}
+=
+g^{mk}\bigl(\partial_i g_{jk}+\partial_j g_{ik}-\partial_k g_{ij}\bigr).
+\]
+
+<p>于是终于得到整章最著名的公式：</p>
+
+\[
+\boxed{
+\Gamma^k_{ij}
+=
+\frac12 g^{k\ell}
+\bigl(
+\partial_i g_{j\ell}
++\partial_j g_{i\ell}
+-\partial_\ell g_{ij}
+\bigr).}
+\]
+
+<p>这条公式至少要读出三层意思。第一，它只用度量及其一阶导数；所以 Levi-Civita 联络是“由 \(g\) 的一阶信息构造的”。第二，它在下两个指标上自动对称，正好对应无挠。第三，若坐标系里 \(g_{ij}\) 是常数矩阵，例如欧氏空间的笛卡尔坐标，则所有 Christoffel 符号都为零。</p>
+
+<p>为了让“完整推导”这四个字不只停留在一条引用 Koszul 公式的捷径上，我们再把同一结论直接用坐标方程推一遍。度量兼容给出</p>
+
+\[
+\partial_i g_{jk}
+=
+g_{\ell k}\Gamma^\ell_{ij}
++g_{j\ell}\Gamma^\ell_{ik},
+\tag{A}
+\]
+
+\[
+\partial_j g_{ik}
+=
+g_{\ell k}\Gamma^\ell_{ji}
++g_{i\ell}\Gamma^\ell_{jk},
+\tag{B}
+\]
+
+\[
+\partial_k g_{ij}
+=
+g_{\ell j}\Gamma^\ell_{ki}
++g_{i\ell}\Gamma^\ell_{kj}.
+\tag{C}
+\]
+
+<p>现在利用无挠，即 \(\Gamma^\ell_{ij}=\Gamma^\ell_{ji}\)，把 (A) 与 (B) 相加，再减去 (C)。右边第一组项变成</p>
+
+\[
+g_{\ell k}\Gamma^\ell_{ij}+g_{\ell k}\Gamma^\ell_{ij}=2g_{\ell k}\Gamma^\ell_{ij},
+\]
+
+<p>而另外两组</p>
+
+\[
+g_{j\ell}\Gamma^\ell_{ik}-g_{\ell j}\Gamma^\ell_{ki}=0,
+\qquad
+g_{i\ell}\Gamma^\ell_{jk}-g_{i\ell}\Gamma^\ell_{kj}=0,
+\]
+
+<p>同样因为下两个指标对称而互相抵消。于是就得到</p>
+
+\[
+\partial_i g_{jk}+\partial_j g_{ik}-\partial_k g_{ij}
+=
+2g_{\ell k}\Gamma^\ell_{ij}.
+\]
+
+<p>最后乘上逆矩阵 \(g^{km}\) 把最后一个指标提起来，便再次得到</p>
+
+\[
+\Gamma^m_{ij}
+=
+\frac12 g^{mk}
+\bigl(
+\partial_i g_{jk}+\partial_j g_{ik}-\partial_k g_{ij}
+\bigr).
+\]
+
+<p>这第二遍推导之所以值得写，不是因为它更高级，而是因为它把“度量兼容提供三条线性方程，无挠减少未知数，最后解出 \(\Gamma\)”的代数机制完全裸露出来了。很多人背熟公式却始终说不清它为何长这样，正是因为脑子里缺了这一步。</p>
+
+<p>最后这一点常被误解成“只要 Christoffel 为零，空间就平直”。更准确的说法是：<strong>若在一个坐标邻域里处处都能把 Christoffel 选成零，那么联络平直；但在单个点上把它们消成零则总可以通过合适坐标做到，并不说明曲率为零</strong>。这件事到<a href="ch9.html">第 9 章</a>讨论曲率张量时会变得关键。</p>
+
+<h2 id="sec8-5">8.5 第一套完整算例：极坐标下 \(\mathbb R^2\) 的 Levi-Civita 联络</h2>
+
+<p>现在把公式真正用起来。欧氏平面在极坐标 \((r,\theta)\) 下的度量是</p>
+
+\[
+ds^2=dr^2+r^2d\theta^2.
+\]
+
+<p>所以度量矩阵与逆矩阵分别是</p>
+
+\[
+(g_{ij})=
+\begin{pmatrix}
+1&0\\
+0&r^2
+\end{pmatrix},
+\qquad
+(g^{ij})=
+\begin{pmatrix}
+1&0\\
+0&r^{-2}
+\end{pmatrix}.
+\]
+
+<p>唯一非零的一阶导数是</p>
+
+\[
+\partial_r g_{\theta\theta}=2r.
+\]
+
+<p>先算 \(\Gamma^r_{\theta\theta}\)。由公式</p>
+
+\[
+\Gamma^r_{\theta\theta}
+=
+\frac12 g^{rr}
+\bigl(
+\partial_\theta g_{\theta r}
++\partial_\theta g_{r\theta}
+-\partial_r g_{\theta\theta}
+\bigr)
+\]
+
+\[
+=
+\frac12\cdot 1\cdot (0+0-2r)
+=
+-r.
+\]
+
+<p>再算 \(\Gamma^\theta_{r\theta}\)：</p>
+
+\[
+\Gamma^\theta_{r\theta}
+=
+\frac12 g^{\theta\theta}
+\bigl(
+\partial_r g_{\theta\theta}
++\partial_\theta g_{r\theta}
+-\partial_\theta g_{r\theta}
+\bigr)
+\]
+
+\[
+=
+\frac12\cdot r^{-2}\cdot 2r
+=
+\frac1r.
+\]
+
+<p>由下两个指标对称性，也有</p>
+
+\[
+\Gamma^\theta_{\theta r}=\frac1r.
+\]
+
+<p>其余符号都为零。于是非零 Christoffel 正是</p>
+
+\[
+\boxed{
+\Gamma^r_{\theta\theta}=-r,\qquad
+\Gamma^\theta_{r\theta}=\Gamma^\theta_{\theta r}=\frac1r.}
+\]
+
+<p>这和我们在上一章从坐标基直接求导得到的结果完全一致。现在你看得更清楚了：这些系数不是某个“极坐标专属技巧”，而是由度量 \(dr^2+r^2d\theta^2\) 强制出来的 Levi-Civita 联络。</p>
+
+<p>把它代回测地线方程，可得</p>
+
+\[
+\ddot r+\Gamma^r_{\theta\theta}\dot\theta^2=0,
+\qquad
+\ddot\theta+2\Gamma^\theta_{r\theta}\dot r\dot\theta=0,
+\]
+
+<p>也就是</p>
+
+\[
+\boxed{\ddot r-r\dot\theta^2=0,}
+\]
+
+\[
+\boxed{\ddot\theta+\frac{2}{r}\dot r\dot\theta=0.}
+\]
+
+<p>第二式可以改写成</p>
+
+\[
+r^2\dot\theta=C,
+\]
+
+<p>这就是角动量守恒的熟悉形式。它说明 Levi-Civita 联络与经典力学里“极坐标中的惯性项”其实在说同一件事：Christoffel 符号补偿的是活动坐标系自身的变化。</p>
+
+<p>从这两条方程立刻能看出几种简单 geodesic。若 \(\theta\) 恒定，则 \(\dot\theta=0\)，第一式化成 \(\ddot r=0\)，所以径向直线是测地线。若试图令 \(r\) 恒定且 \(\dot\theta\neq0\)，第一式变成 \(-r\dot\theta^2=0\)，不可能成立。这说明普通圆周不是欧氏平面的测地线。你在初等几何里说“平面上的最短路是直线”，在 Levi-Civita 语言里就变成了这组方程的结构结论。</p>
+
+<p>再往下算一点，还能看见这套方程怎样把“直线”伪装成极坐标下的复杂表达。由第二式得 \(r^2\dot\theta=C\)。把它代回第一式，可得</p>
+
+\[
+\ddot r-\frac{C^2}{r^3}=0.
+\]
+
+<p>再与恒速关系</p>
+
+\[
+\dot r^2+r^2\dot\theta^2=\dot r^2+\frac{C^2}{r^2}=E
+\]
+
+<p>联立，就能把轨迹积分成平面里的直线，只不过在极坐标中会写成</p>
+
+\[
+r(\theta)=\frac{a}{\cos(\theta-\theta_0)}
+\]
+
+<p>这种并不显眼的样子。这个现象很能提醒人：Levi-Civita 联络的职责不是让方程“看起来简单”，而是让方程真正坐标无关。坐标选得弯，直线也会写得弯；可其几何内容没有变化。</p>
+
+<h2 id="sec8-6">8.6 第二套完整算例：球面 \(S^2\) 上的 Christoffel 符号</h2>
+
+<p>现在看真正的曲面。取单位球面 \(S^2\)，用通常的球坐标 \((\theta,\phi)\)，其中 \(\theta\in(0,\pi)\) 是余纬，\(\phi\in(0,2\pi)\) 是经度。度量是</p>
+
+\[
+ds^2=d\theta^2+\sin^2\theta\,d\phi^2.
+\]
+
+<p>于是</p>
+
+\[
+(g_{ij})=
+\begin{pmatrix}
+1&0\\
+0&\sin^2\theta
+\end{pmatrix},
+\qquad
+(g^{ij})=
+\begin{pmatrix}
+1&0\\
+0&\csc^2\theta
+\end{pmatrix}.
+\]
+
+<p>唯一非零的一阶导数是</p>
+
+\[
+\partial_\theta g_{\phi\phi}=2\sin\theta\cos\theta.
+\]
+
+<p>先算 \(\Gamma^\theta_{\phi\phi}\)：</p>
+
+\[
+\Gamma^\theta_{\phi\phi}
+=
+\frac12 g^{\theta\theta}
+\bigl(
+\partial_\phi g_{\phi\theta}
++\partial_\phi g_{\theta\phi}
+-\partial_\theta g_{\phi\phi}
+\bigr)
+\]
+
+\[
+=
+\frac12\cdot 1\cdot (0+0-2\sin\theta\cos\theta)
+=
+-\sin\theta\cos\theta.
+\]
+
+<p>再算 \(\Gamma^\phi_{\theta\phi}\)：</p>
+
+\[
+\Gamma^\phi_{\theta\phi}
+=
+\frac12 g^{\phi\phi}
+\bigl(
+\partial_\theta g_{\phi\phi}
++\partial_\phi g_{\theta\phi}
+-\partial_\phi g_{\theta\phi}
+\bigr)
+\]
+
+\[
+=
+\frac12\csc^2\theta\cdot 2\sin\theta\cos\theta
+=
+\cot\theta.
+\]
+
+<p>由对称性，也有 \(\Gamma^\phi_{\phi\theta}=\cot\theta\)。于是球面的非零 Christoffel 符号为</p>
+
+\[
+\boxed{
+\Gamma^\theta_{\phi\phi}=-\sin\theta\cos\theta,\qquad
+\Gamma^\phi_{\theta\phi}=\Gamma^\phi_{\phi\theta}=\cot\theta.}
+\]
+
+<p>把它们代进测地线方程，得到</p>
+
+\[
+\boxed{\ddot\theta-\sin\theta\cos\theta\,\dot\phi^2=0,}
+\]
+
+\[
+\boxed{\ddot\phi+2\cot\theta\,\dot\theta\dot\phi=0.}
+\]
+
+<p>这两条式子立刻给出几个熟悉结论。若 \(\phi\) 恒定，那么 \(\dot\phi=0\)，第一式变成 \(\ddot\theta=0\)，所以经线是测地线。若 \(\theta\equiv \pi/2\)，则 \(\cot\theta=0\) 且 \(\sin\theta\cos\theta=0\)，于是赤道也是测地线。</p>
+
+<p>但若你试图令 \(\theta\equiv \theta_0\) 为别的常数，同时让 \(\dot\phi\neq0\)，第一式就变成</p>
+
+\[
+-\sin\theta_0\cos\theta_0\,\dot\phi^2=0.
+\]
+
+<p>除非 \(\theta_0=\pi/2\) 或退化到极点，否则不成立。也就是说，<strong>一般纬线不是测地线，只有赤道是</strong>。这和你的地球直觉完全一致：若你始终保持固定纬度飞行，会不断向北或向南“修正航向”；真正不拐弯的路线是大圆。</p>
+
+<p>球面方程还有一个和极坐标平面完全平行的守恒量。由第二式可改写为</p>
+
+\[
+\frac{d}{dt}\bigl(\sin^2\theta\,\dot\phi\bigr)=0.
+\]
+
+<p>因此</p>
+
+\[
+\sin^2\theta\,\dot\phi=C.
+\]
+
+<p>再结合恒速关系</p>
+
+\[
+\dot\theta^2+\sin^2\theta\,\dot\phi^2=E,
+\]
+
+<p>你就能看到：当 geodesic 靠近极点时，\(\sin\theta\) 变小，为了维持常数 \(C\)，\(\dot\phi\) 必须相应增大；这正是经线在高纬地区“看起来转得更快”的解析版本。若把球面嵌入 \(\mathbb R^3\) 去看，这些守恒律最终会合并成“测地线 lies in a plane through the origin”，于是 geodesic 全是大圆。可值得强调的是，Levi-Civita 方程本身已经把这件事的动力学内容写在内部了。</p>
+
+<p>你如果把球面当成嵌在 \(\mathbb R^3\) 里的曲面，这个结论当然还能从外在几何看出来；但 Levi-Civita 联络告诉你，连“不拐弯”这句话本身都是内蕴的。它只用球面自己的度量，就已经能恢复出大圆这一结论，而不需要任何环境空间帮助。</p>
+
+<h2 id="sec8-7">8.7 在正交标架里，Levi-Civita 联络会变得反对称</h2>
+
+<p>Levi-Civita 联络还有一个非常漂亮、也非常有用的表现：在局部正交标架里，它的联络 1-形式是反对称的。设 \(E_1,\dots,E_n\) 是一个局部正交标架，即</p>
+
+\[
+\langle E_a,E_b\rangle=\delta_{ab}.
+\]
+
+<p>记</p>
+
+\[
+\nabla E_b=\omega^a{}_b\otimes E_a.
+\]
+
+<p>由于 \(\langle E_a,E_b\rangle\) 是常数函数，度量兼容给出</p>
+
+\[
+0=X\langle E_a,E_b\rangle
+=
+\langle \nabla_XE_a,E_b\rangle+\langle E_a,\nabla_XE_b\rangle.
+\]
+
+<p>于是</p>
+
+\[
+\omega_{ab}(X)+\omega_{ba}(X)=0,
+\]
+
+<p>对所有 \(X\) 都成立，因此</p>
+
+\[
+\boxed{\omega_{ab}+\omega_{ba}=0.}
+\]
+
+<p>也就是说，在正交标架里，联络矩阵是斜对称的。这和欧氏线性代数里“保持内积的无穷小变换由斜对称矩阵给出”是同一个事实的流形版本。你在<a href="../线性代数/ch18.html">正交矩阵</a>那里见过的代数现象，在这里被微分化了。</p>
+
+<p>球面上可以把这件事算得很具体。取正交标架</p>
+
+\[
+e_1=\partial_\theta,\qquad e_2=\frac1{\sin\theta}\partial_\phi.
+\]
+
+<p>利用刚才算出的 Christoffel 符号，有</p>
+
+\[
+\nabla_{\partial_\theta}e_1=0,\qquad
+\nabla_{\partial_\theta}e_2=0,
+\]
+
+\[
+\nabla_{\partial_\phi}e_1
+=
+\nabla_{\partial_\phi}\partial_\theta
+=
+\Gamma^\phi_{\phi\theta}\partial_\phi
+=
+\cot\theta\,\partial_\phi
+=
+\cos\theta\,e_2,
+\]
+
+\[
+\nabla_{\partial_\phi}e_2
+=
+\nabla_{\partial_\phi}\Bigl(\frac1{\sin\theta}\partial_\phi\Bigr)
+=
+\frac1{\sin\theta}\nabla_{\partial_\phi}\partial_\phi
+=
+\frac1{\sin\theta}(-\sin\theta\cos\theta)\partial_\theta
+=
+-\cos\theta\,e_1.
+\]
+
+<p>所以在这组标架下，唯一独立的联络 1-形式就是</p>
+
+\[
+\omega^1{}_2=-\omega^2{}_1=-\cos\theta\,d\phi
+\]
+
+<p>（差一个整体符号只取决于你如何摆放指标和标架顺序）。这个单一 1-形式已经把球面联络的全部信息装了进去。下一章当我们把它再微分、再做外积时，就会看到曲率 2-形式如何冒出来。</p>
+
+<p>二维里出现“只有一个独立联络 1-形式”这件事很值得你记住，因为它把很多看似庞杂的公式压缩成了一个旋转角速度。对正交标架而言，Levi-Civita 联络从不做伸缩，只做无穷小旋转；反对称性正是在数学上表达这句话。你若把它和<a href="../多元微积分/ch17.html">《多元微积分读本》第 17 章</a>里极坐标、球坐标的活动基一起想，会发现那边“基在转”这件事，到这里终于被写进了严谨的联络语言。</p>
+
+<h2 id="sec8-8">8.8 法坐标的第一眼：为什么总能在一点把 \(\Gamma\) 消掉</h2>
+
+<p>Levi-Civita 联络还有一个极其重要、又经常在初学时被低估的局部现象：在任意一点 \(p\in M\)，总能找到一套坐标，使得</p>
+
+\[
+g_{ij}(p)=\delta_{ij},
+\qquad
+\Gamma^k_{ij}(p)=0.
+\]
+
+<p>这样的坐标叫做 \(p\) 点的法坐标或正规坐标。它的含义很直白：在单个点上，Levi-Civita 联络总可以被坐标选择“压平”到像欧氏空间那样。换句话说，Christoffel 符号在一点上从来不是几何不变量。</p>
+
+<p>为什么这不和球面、双曲面真的有曲率矛盾？因为你只能把 \(\Gamma\) 在一个点上消掉，通常无法在一个邻域里处处消掉。真正留不住的，是 Christoffel 本身；真正洗不掉的，是它们的一阶变化组合，也就是下一章的曲率张量。</p>
+
+<p>在法坐标里，由于 \(\Gamma^k_{ij}(p)=0\)，Christoffel 公式立刻给出</p>
+
+\[
+\partial_\ell g_{ij}(p)=0.
+\]
+
+<p>也就是说，度量在 \(p\) 点的一阶导数也一起消失。于是黎曼度量在一个点附近最像欧氏度量的近似，就是</p>
+
+\[
+g_{ij}(x)=\delta_{ij}+O(|x|^2).
+\]
+
+<p>这句近似非常值钱。它告诉你：曲率是二阶效应。零阶看去，任何黎曼流形都像 \(\mathbb R^n\)；一阶看去，仍然像 \(\mathbb R^n\)；到了二阶，真正的弯曲才开始露面。这也是为什么曲率张量会由 Christoffel 的一阶导数和二次项组合而成。</p>
+
+<p>从学习节奏上说，把这一点提前装进脑子里很有帮助。否则你下一章第一次看见“可以在一点令 \(\Gamma=0\)，但曲率仍未必为零”时，往往会有一种概念冲突感。其实根本没有冲突：\(\Gamma\) 不是张量，当然可以被坐标局部洗掉；曲率是张量，所以洗不掉。</p>
+
+<h2 id="sec8-9">8.9 从嵌入观点再看一眼：Levi-Civita 就是“先求导，再投影回切空间”</h2>
+
+<p>到这里你已经完全可以只从内蕴角度理解 Levi-Civita 联络了。但对曲面和具体子流形来说，还有一个极其有帮助的外在图像：若 \(M\subset \mathbb R^N\) 是欧氏空间里的一个光滑子流形，并带上诱导度量，那么 Levi-Civita 联络其实就是环境空间普通导数的切向投影。</p>
+
+\[
+\boxed{\nabla_XY=(D_XY)^T.}
+\]
+
+<p>这里 \(D\) 是 \(\mathbb R^N\) 的平直联络，\((\cdot)^T\) 表示取切向分量。剩下的法向分量则记作第二基本形式：</p>
+
+\[
+D_XY=\nabla_XY+\mathrm{II}(X,Y).
+\]
+
+<p>为什么切向投影恰好就是 Levi-Civita？先看度量兼容。因为诱导度量就是欧氏内积在切空间上的限制，所以</p>
+
+\[
+X\langle Y,Z\rangle
+=
+\langle D_XY,Z\rangle+\langle Y,D_XZ\rangle.
+\]
+
+<p>而 \(Z\) 与 \(D_XY\) 的法向分量正交，\(Y\) 与 \(D_XZ\) 的法向分量也正交，于是</p>
+
+\[
+X\langle Y,Z\rangle
+=
+\langle (D_XY)^T,Z\rangle+\langle Y,(D_XZ)^T\rangle
+=
+\langle \nabla_XY,Z\rangle+\langle Y,\nabla_XZ\rangle.
+\]
+
+<p>再看无挠。由于欧氏空间普通导数本身无挠，</p>
+
+\[
+D_XY-D_YX=[X,Y].
+\]
+
+<p>两边取切向分量便得</p>
+
+\[
+\nabla_XY-\nabla_YX=[X,Y].
+\]
+
+<p>所以这条投影联络同时满足度量兼容与无挠。由 Levi-Civita 的唯一性，它必然就是那条唯一自然联络。这个结论非常值得你记住，因为它把“内蕴导数”与“环境空间导数”之间的关系讲得一清二楚：真正几何的是切向部分；法向部分则记录了嵌入曲率，也就是第二基本形式。</p>
+
+<p>用这个观点重新看球面 geodesic，会特别省力。设单位球面上的一条大圆写成</p>
+
+\[
+\gamma(t)=\cos t\,u+\sin t\,v,
+\]
+
+<p>其中 \(u,v\in\mathbb R^3\) 是两条正交单位向量。则</p>
+
+\[
+\dot\gamma(t)=-\sin t\,u+\cos t\,v,
+\]
+
+\[
+\ddot\gamma(t)=-\cos t\,u-\sin t\,v=-\gamma(t).
+\]
+
+<p>请注意 \(-\gamma(t)\) 正好沿球面的法向，因为单位球面在点 \(\gamma(t)\) 的法向就是径向向量 \(\gamma(t)\) 本身。因此 \(\ddot\gamma\) 没有切向分量，于是</p>
+
+\[
+(\ddot\gamma)^T=0.
+\]
+
+<p>按照上面的投影公式，这就等价于</p>
+
+\[
+\nabla_{\dot\gamma}\dot\gamma=0.
+\]
+
+<p>所以大圆是球面的测地线。这和上一节坐标方程的结论完全一致，但外观看起来更干净：大圆的环境加速度全部指向球心，没有任何切向加速度，所以它在球面内部看来就是“不转弯”的。</p>
+
+<p>同样地，一条普通纬线 \(\theta=\theta_0\neq \pi/2\) 虽然在 \(\mathbb R^3\) 里也是圆，但它的加速度并不纯法向，而会分解出一部分切向分量。也正因为如此，它在球面内部看来必须不断“修方向”，因此不是测地线。这个外在解释与我们上一节从 Christoffel 方程得到的结论严丝合缝地对上了。</p>
+
+<p>你现在可以把内蕴与外蕴之间的分工看得很清楚：Levi-Civita 联络负责把环境导数中真正属于切空间的那一部分提纯出来，而第二基本形式负责记录“流形是如何坐在环境空间里”的法向弯曲。前者是黎曼几何内部必需的数据；后者则依赖嵌入方式。Gauss 的 Theorema Egregium 正是要告诉你：很多最重要的曲率信息，其实已经藏在前者里，而不需要后者来额外指定。</p>
+
+<h2 id="sec8-10">8.10 为什么它正好和能量泛函吻合</h2>
+
+<p>还有一块逻辑拼图现在也该补上了。<a href="ch6.html">第 6 章</a>里我们把测地线一方面看成长度或能量的临界曲线，另一方面又写成了</p>
+
+\[
+\ddot x^k+\Gamma^k_{ij}\dot x^i\dot x^j=0.
+\]
+
+<p>你现在已经知道 Christoffel 符号来自 Levi-Civita 联络，但还应该再问一句：为什么恰好是这条联络，而不是别的联络，会与能量泛函的 Euler-Lagrange 方程精确吻合？</p>
+
+<p>答案直接写在坐标计算里。把曲线 \(\gamma(t)\) 的能量写成</p>
+
+\[
+E[\gamma]=\frac12\int g_{ij}(x(t))\dot x^i\dot x^j\,dt.
+\]
+
+<p>对应的 Lagrangian 是</p>
+
+\[
+L(x,\dot x)=\frac12 g_{ij}(x)\dot x^i\dot x^j.
+\]
+
+<p>Euler-Lagrange 方程对每个指标 \(k\) 给出</p>
+
+\[
+\frac{d}{dt}\left(\frac{\partial L}{\partial \dot x^k}\right)
+-\frac{\partial L}{\partial x^k}=0.
+\]
+
+<p>先算第一项：</p>
+
+\[
+\frac{\partial L}{\partial \dot x^k}
+=
+\frac12 g_{ij}\frac{\partial(\dot x^i\dot x^j)}{\partial \dot x^k}
+=
+g_{k\ell}\dot x^\ell.
+\]
+
+<p>所以</p>
+
+\[
+\frac{d}{dt}\left(\frac{\partial L}{\partial \dot x^k}\right)
+=
+\frac{d}{dt}(g_{k\ell}\dot x^\ell)
+=
+\partial_i g_{k\ell}\,\dot x^i\dot x^\ell+g_{k\ell}\ddot x^\ell.
+\]
+
+<p>再算第二项：</p>
+
+\[
+\frac{\partial L}{\partial x^k}
+=
+\frac12 \partial_k g_{ij}\,\dot x^i\dot x^j.
+\]
+
+<p>于是 Euler-Lagrange 方程变成</p>
+
+\[
+g_{k\ell}\ddot x^\ell+\partial_i g_{k\ell}\dot x^i\dot x^\ell
+-\frac12 \partial_k g_{ij}\dot x^i\dot x^j=0.
+\]
+
+<p>把中间那项对 \(i,\ell\) 对称化，写成</p>
+
+\[
+\frac12(\partial_i g_{k\ell}+\partial_\ell g_{ki})\dot x^i\dot x^\ell,
+\]
+
+<p>便得到</p>
+
+\[
+g_{k\ell}\ddot x^\ell
++
+\frac12(\partial_i g_{k\ell}+\partial_\ell g_{ki}-\partial_k g_{i\ell})\dot x^i\dot x^\ell
+=
+0.
+\]
+
+<p>而括号里恰好是 \(2g_{k m}\Gamma^m_{i\ell}\)。因此</p>
+
+\[
+g_{k\ell}\ddot x^\ell+g_{km}\Gamma^m_{i\ell}\dot x^i\dot x^\ell=0,
+\]
+
+<p>也就是</p>
+
+\[
+g_{km}\bigl(\ddot x^m+\Gamma^m_{i\ell}\dot x^i\dot x^\ell\bigr)=0.
+\]
+
+<p>由于 \(g_{km}\) 非退化，最终得到</p>
+
+\[
+\boxed{\ddot x^m+\Gamma^m_{i\ell}\dot x^i\dot x^\ell=0.}
+\]
+
+<p>这正是 Levi-Civita 测地线方程。换句话说，变分法推出的“最省能量的曲线”和联络语言里的“自平行曲线”并不是偶然碰巧相同，而是因为 Levi-Civita 联络正是由度量唯一导出的那条联络。若你换一条不与度量兼容的联络，上一章那种会缩短平行向量的怪现象就会立即让这一闭环断掉。</p>
+
+<h2 id="sec8-11">8.11 这两条条件缺一不可</h2>
+
+<p>到这里最好再做一次“反面检查”。Levi-Civita 联络靠两条条件唯一确定：度量兼容与无挠。那如果你只保留其中一条，会发生什么？答案是：自由度立刻重新冒出来，而且会冒出你不想要的几何行为。</p>
+
+<p>先看“无挠但不度量兼容”。在 \(\mathbb R^2\) 上取标准欧氏度量，定义</p>
+
+\[
+\overline\nabla_XY
+=
+\nabla_X^{\mathrm{flat}}Y+dx(X)Y+dx(Y)X.
+\]
+
+<p>因为额外项对 \(X,Y\) 对称，所以</p>
+
+\[
+\overline\nabla_XY-\overline\nabla_YX
+=
+\nabla_X^{\mathrm{flat}}Y-\nabla_Y^{\mathrm{flat}}X
+=
+[X,Y],
+\]
+
+<p>故它无挠。但它并不保欧氏内积。取 \(X=\partial_x,\ Y=Z=\partial_y\)，则</p>
+
+\[
+X\langle Y,Z\rangle=0,
+\]
+
+<p>而</p>
+
+\[
+\langle \overline\nabla_XY,Z\rangle+\langle Y,\overline\nabla_XZ\rangle
+=
+\langle \partial_y,\partial_y\rangle+\langle \partial_y,\partial_y\rangle
+=
+2.
+\]
+
+<p>于是度量兼容失败。也就是说，哪怕你把挠率完全杀掉，只要不控制内积，联络仍会暗中拉伸向量。</p>
+
+<p>再看“度量兼容但有挠”。仍在 \(\mathbb R^2\) 上，记 \(J\) 为逆时针 \(90^\circ\) 旋转：</p>
+
+\[
+J(\partial_x)=\partial_y,\qquad J(\partial_y)=-\partial_x.
+\]
+
+<p>取任意 1-形式 \(\omega\)，定义</p>
+
+\[
+\widehat\nabla_XY
+=
+\nabla_X^{\mathrm{flat}}Y+\omega(X)JY.
+\]
+
+<p>由于 \(J\) 对欧氏内积是斜对称的，即</p>
+
+\[
+\langle JY,Z\rangle+\langle Y,JZ\rangle=0,
+\]
+
+<p>所以</p>
+
+\[
+X\langle Y,Z\rangle
+=
+\langle \widehat\nabla_XY,Z\rangle+\langle Y,\widehat\nabla_XZ\rangle.
+\]
+
+<p>它确实度量兼容。但挠率变成</p>
+
+\[
+T(X,Y)=\omega(X)JY-\omega(Y)JX,
+\]
+
+<p>一般不为零。也就是说，哪怕你把所有长度和角度都照顾好了，只要还允许额外扭劲，联络仍不唯一。</p>
+
+<p>这两个反例合起来告诉你：Levi-Civita 的两条条件不是随便拍脑袋挑出来的偏好，而是各自负责排除一类真实存在的坏自由度。无挠负责拿掉“扭”，度量兼容负责拿掉“乱拉伸”。只有两者同时要求，联络才真正被压到唯一。</p>
+
+<h2 id="sec8-12">8.12 Levi-Civita 联络真正给了我们什么</h2>
+
+<p>现在把这一章压缩成几句最重要的判断。第一，联络并不是度量自动送的；但一旦要求“保度量 + 无挠”，自由度就被完全压成了唯一的一条 Levi-Civita 联络。第二，Christoffel 公式并不是需要背诵的技巧，而是 Koszul 公式在坐标基里的直接投影。第三，球面与极坐标这两个算例告诉你：\(\Gamma^k_{ij}\) 会同时编码“空间真的弯”和“坐标基自己在动”这两层信息；真正把两者分开的工作，要由下一章的曲率张量来完成。</p>
+
+<p>如果把这一章压成一份真正可执行的计算清单，它其实很短。给定一张度量，先写出 \(g_{ij}\) 和 \(g^{ij}\)；再求一阶导数 \(\partial_k g_{ij}\)；然后把 Christoffel 公式代进去，找出哪些项 genuinely 非零；最后再把这些系数塞进测地线方程、平行方程或张量协变导数公式。整个过程从头到尾都没有黑箱，只有“度量的一阶信息如何变成导数规则”这一条主线。</p>
+
+<p>也正因为如此，黎曼几何里很多看起来像不同章节的内容，其实都是同一套系数在不同位置出现。你在这一章用它们写 geodesic，在下一章用它们取一阶导数组合出曲率，在第 10 章又会继续缩并出 Ricci 与 scalar 曲率。若把整本书看成一台机器，那么 Levi-Civita 联络就是第一层传动轴：一切真正的弯曲信息，都得先穿过它。</p>
+
+<p>最后还有一条判断特别值得你带走：在欧氏空间笛卡尔坐标里，\(\Gamma=0\) 是因为度量分量是常数；在一般坐标里，\(\Gamma\neq0\) 往往只是基在动；而只有当 Christoffel 的变化无法在一个邻域里整体洗掉时，你才真的碰到了曲率。这三层区分要是想清楚了，下一章你第一次看到曲率张量的定义时，就不会觉得它像一团神秘的组合拳，而会觉得它几乎是被这一章的逻辑强迫出来的。</p>
+
+<p>因此，别把 Levi-Civita 公式只当成一张算表。它真正告诉你的，是黎曼度量除了给长度和角度之外，还偷偷给出了“怎样做微分”这件事；而一旦微分规则被唯一确定，后面关于平行移动、曲率、Ricci 缩并乃至广义相对论的全部叙述，都开始有了坚实的共同语法。</p>
+
+<p>下一章你会看到，曲率张量之所以会长成“\(\partial\Gamma+\Gamma\Gamma\)”那类结构，并不是因为大家喜欢把式子写复杂，而是因为 Levi-Civita 联络先把一阶度量信息打包进了 \(\Gamma\)；等你再比较两次协变导数是否交换时，导数项与二次项就都会被不可避免地拉出来。</p>
+
+<p>一旦这层逻辑看清，后面的每一条曲率公式都会比第一次见到时顺眼得多，也不再像凭空拼起来的记号游戏，而像这一章逻辑的自然后果。</p>
+
+<p>这正是 Levi-Civita 联络在整门课里不可替代的原因，也是后续所有曲率计算的统一入口与共同语法，贯穿全书始终。</p>
+
+<p>少了它，后面几乎无从开讲，尤其在本书里更是如此。</p>
+
+<p>也正因为如此，这一章和<a href="ch6.html">第 6 章</a>、<a href="ch7.html">第 7 章</a>其实是一整块内容。第 6 章先让你从变分角度见到测地线，第 7 章把“沿曲线微分”这件事抽象成联络，这一章再用度量把联络唯一化。三章拼起来，才真正构成黎曼几何的运动学骨架。</p>
+
+<p>下一章曲率张量会做的事，可以先用一句不太严谨但很有帮助的话预告：如果 Levi-Civita 联络告诉你“怎样把向量平行地搬走”，那么曲率张量就告诉你“搬一圈回来以后，向量偏了多少，以及这种偏差是否能在局部被坐标完全抹掉”。到那时你会看到，Christoffel 不是最后答案，它只是曲率出场前的前台演员。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 联络与协变导数</a><a href="ch9.html">下一章 · 第 9 章 曲率张量 \(R\) →</a></nav>
+
+</main>
+</body>
+</html>

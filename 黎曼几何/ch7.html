@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 联络与协变导数 — 普林斯顿黎曼几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 测地线：能量与长度</a><a href="ch8.html">下一章 · 第 8 章 Levi-Civita 联络 →</a></nav>
+<h1 id="ch7">第 7 章 联络与协变导数</h1>
+
+<p>到<a href="ch6.html">第 6 章</a>为止，我们已经把测地线写成了一条看起来很像二阶常微分方程的东西：</p>
+
+\[
+\ddot x^k+\Gamma^k_{ij}\dot x^i\dot x^j=0.
+\]
+
+<p>你如果只把这条式子当成“曲面上的牛顿方程”，它当然已经能算题；可你心里应该还留着一个没被真正交代的疑问：这里那串 \(\Gamma^k_{ij}\) 到底是什么？它们为什么不是凭空掉下来的修正项，而是几何里必然出现的对象？</p>
+
+<p>答案是：一旦你离开欧氏空间，连“向量场的导数”这件事本身都不再是免费附送的。在 \(\mathbb R^n\) 里，向量都活在同一个固定的线性空间里，所以你可以把 \(Y(p+hX)-Y(p)\) 直接相减；在流形上，\(Y(p)\in T_pM\)，而 \(Y(q)\in T_qM\)，当 \(p\neq q\) 时这两个向量根本不在同一个房间里。你若想比较它们，就必须先规定“怎样把不同点的切空间放到一起看”。联络做的正是这件事。</p>
+
+<p>所以，联络不是附加在黎曼几何表面的一种技术装置；它几乎就是“微分几何的导数”本身。你在<a href="../多元微积分/ch10.html">《多元微积分读本》第 10 章</a>见过方向导数 \(D_{\mathbf v}f\)，那时求导对象还是标量函数，所有值都在同一个 \(\mathbb R\) 里，所以没有比较难题。现在求导对象换成向量场，比较问题立刻暴露出来。也正因为如此，联络会把<a href="../多元微积分/ch10.html">方向导数</a>、<a href="ch6.html">测地线</a>、下一章的 Levi-Civita 联络、再下一章的曲率，全都捆在一起。</p>
+
+<p>你不妨把它和“卷一张纸做成圆柱”这件事并排想。圆柱在 \(\mathbb R^3\) 里看上去弯了，可它和平面在内蕴几何上又极其接近：局部长度、角度、最短路径的很多性质几乎像是同一个东西。这说明外观上的弯曲并不能直接告诉你“向量沿曲面移动时该怎样比较”。联络要抓住的，恰恰不是外观，而是这种内蕴的比较制度。等你到了<a href="ch9.html">第 9 章</a>，会看到真正记录这种制度是否平直的对象不是嵌入图像，而是曲率张量。</p>
+
+<h2 id="sec7-1">7.1 为什么“向量场求导”在流形上突然变难</h2>
+
+<p>先把欧氏空间里那种太顺手、以至于常被忽视的情形摆出来。设 \(Y=Y^j\partial_j\) 是 \(\mathbb R^n\) 上的向量场，\(X=X^i\partial_i\) 是另一个向量场。你熟悉的方向导数写作</p>
+
+\[
+(X\cdot \nabla)Y
+=
+X^i\frac{\partial Y^j}{\partial x^i}\,\partial_j.
+\]
+
+<p>这个公式之所以成立，不是因为“偏导数本来就该这么写”，而是因为所有切空间都天然等同于同一个 \(\mathbb R^n\)。你把点 \(p\) 和 \(p+hX\) 挪开一点，向量 \(Y(p)\) 与 \(Y(p+hX)\) 仍然可以直接相减；没有谁跳出来阻止你。</p>
+
+<p>但在一般流形 \(M\) 上，\(T_pM\) 和 \(T_qM\) 只是同维数的向量空间，并没有一个事先选好的自然同一。你当然可以在某个局部坐标系里把它们都写成 \(\mathbb R^n\) 里的列向量，可那样得到的“差”会依赖你选了哪一套坐标。也就是说，<strong>单靠流形结构本身，向量场没有一个像标量函数那样现成的导数</strong>。</p>
+
+<p>这里最容易让人误判的，是把流形临时嵌进某个欧氏空间，然后偷用环境空间的导数。比方说球面 \(S^2\subset\mathbb R^3\) 上的切向量场，你可以把它当作 \(\mathbb R^3\)-值函数去微分；但那样得到的导数一般不再切于球面，需要再投影回来。这个“再投影”动作说明：真正要的不是环境空间里的普通导数，而是一种<strong>先比较、再丢掉法向分量</strong>的内蕴导数。对球面这样做似乎还合理，可如果流形根本没有先验嵌入，或者你换了另一种嵌入方式，会不会得到同样的结果？这正是内蕴几何必须回答的问题。</p>
+
+<p>你也可以把这个困难读成一句更日常的话：在曲面上走动时，附近两个点的“正北方向”并不自动平行。我们需要一条规则，告诉我们沿着某个方向移动时，向量场算是“没变”、算是“转了一点”、还是算是“伸长了”。一旦这条规则被规定，导数就跟着被规定了。</p>
+
+<p>这就是联络的角色。它不会凭空消灭“不同切空间无法直接比较”这个事实，而是诚实地承认：比较规则本来就需要额外选择。换句话说，<strong>联络是一种比较邻近切空间中向量的制度</strong>。制度不同，得到的导数不同；下一章我们会看到，黎曼度量会从所有可能制度里挑出一条最自然的，也就是 Levi-Civita 联络。</p>
+
+<p>先别急着要求它“保长度”“保角度”“没有扭曲”。这一章故意先把联络作为一个一般概念来谈，因为你若一上来只见 Levi-Civita，很容易误以为联络天生就该满足一切好性质。不是的。联络先是“导数的抽象形式”，然后才有“哪一条最适合度量几何”这个第二层问题。</p>
+
+<h2 id="sec7-2">7.2 联络的定义，以及那三条不能少的公理</h2>
+
+<p>记 \(X(M)\) 为流形 \(M\) 上全部光滑向量场的集合。一个联络就是一个映射</p>
+
+\[
+\nabla: X(M)\times X(M)\to X(M),
+\qquad
+(X,Y)\mapsto \nabla_XY,
+\]
+
+<p>它把“沿着 \(X\) 去微分 \(Y\)”这件事编码成另一个向量场 \(\nabla_XY\)。但如果你只写这个箭头，而不规定它应 obey 哪些代数规则，这个符号就还太空。联络至少必须满足三类条件。</p>
+
+\[
+\nabla_{fX+gZ}Y=f\nabla_XY+g\nabla_ZY,
+\]
+
+\[
+\nabla_X(Y+Z)=\nabla_XY+\nabla_XZ,\qquad
+\nabla_X(cY)=c\,\nabla_XY,
+\]
+
+\[
+\boxed{\nabla_X(fY)=X(f)\,Y+f\nabla_XY.}
+\]
+
+<p>这里 \(f,g\in C^\infty(M)\)，\(c\in\mathbb R\)。第一条说：联络对第一个变量是 \(C^\infty(M)\)-线性的；第二条说：对第二个变量至少是实线性的；第三条是 Leibniz 规则，它强迫联络在第二个变量里真正像“导数”那样对待函数系数。</p>
+
+<p>最值得你盯紧的是这条不对称性：第一个变量允许把函数 \(f\) 直接提出来，第二个变量却不行，而是会多出 \(X(f)Y\)。这不是写法习惯，而是本质。如果第二个变量也满足 \(\nabla_X(fY)=f\nabla_XY\)，那联络就根本看不见 \(Y\) 的系数如何变化，它只剩下一个纯代数双线性算子，不再像导数。</p>
+
+<p>这和<a href="../多元微积分/ch9.html">《多元微积分读本》第 9 章</a>链式法则里的味道完全一致。导数之所以能测出变化，不是因为它“线性”，而是因为它对乘积不盲。Leibniz 规则正是这种不盲的抽象版。</p>
+
+<p>最标准的例子来自 \(\mathbb R^n\)。在那里我们定义</p>
+
+\[
+\nabla^{\mathrm{flat}}_XY=(X^i\partial_iY^j)\partial_j.
+\]
+
+<p>这就是普通的方向导数，也常记为 \(D_XY\)。检验三条公理并不难。比方说，</p>
+
+\[
+\nabla^{\mathrm{flat}}_X(fY)
+=
+X^i\partial_i(fY^j)\partial_j
+=
+X^i(\partial_if)Y^j\partial_j+fX^i(\partial_iY^j)\partial_j
+=
+X(f)Y+f\nabla^{\mathrm{flat}}_XY.
+\]
+
+<p>所以平直欧氏空间上的普通导数，就是联络概念应该还原到的老朋友。</p>
+
+<p>但联络远不止这一条。拿一个 1-形式 \(\omega\) 来说，你可以从平直联络造出另一条：</p>
+
+\[
+\widetilde\nabla_XY=\nabla_X^{\mathrm{flat}}Y+\omega(X)Y.
+\]
+
+<p>你很容易检查它仍满足三条公理。第三条尤其直接：</p>
+
+\[
+\widetilde\nabla_X(fY)
+=
+\nabla_X^{\mathrm{flat}}(fY)+\omega(X)fY
+=
+X(f)Y+f\nabla_X^{\mathrm{flat}}Y+f\omega(X)Y
+=
+X(f)Y+f\widetilde\nabla_XY.
+\]
+
+<p>这说明一件重要事实：<strong>联络不是唯一的</strong>。即使在 \(\mathbb R^n\) 上，你也能造出无穷多条不同的联络。差别会在平行移动、长度变化、挠率、曲率这些地方表现出来。</p>
+
+<p>为了把这种“差别真会落到计算里”这件事说实，取 \(\mathbb R^2\) 上的 \(\omega=dx\)。则 \(\omega(\partial_x)=1\)，\(\omega(\partial_y)=0\)。沿着 \(x\)-轴曲线 \(\gamma(t)=(t,0)\)，设一个沿曲线向量场写成</p>
+
+\[
+V(t)=u(t)\partial_x+v(t)\partial_y.
+\]
+
+<p>在这条联络下，它的沿曲线协变导数会变成</p>
+
+\[
+\widetilde\nabla_{\dot\gamma}V
+=
+\frac{dV}{dt}+\omega(\dot\gamma)V
+=
+(u'+u)\partial_x+(v'+v)\partial_y,
+\]
+
+<p>因为 \(\dot\gamma=\partial_x\)，而 \(\omega(\dot\gamma)=1\)。于是平行方程 \(\widetilde\nabla_{\dot\gamma}V=0\) 等价于</p>
+
+\[
+u'+u=0,\qquad v'+v=0,
+\]
+
+<p>所以</p>
+
+\[
+u(t)=u(0)e^{-t},\qquad v(t)=v(0)e^{-t}.
+\]
+
+<p>也就是说，同样是在平面上沿直线走，若你改换联络，平行向量居然会指数衰减。这个例子很有用，因为它逼你接受：平行、长度是否保持、绕一圈是否回来，统统不是“微分自动送的”，而是联络决定的。下一章 Levi-Civita 联络之所以特别，就是因为它会把这些行为约束回我们在度量几何里想要的样子。</p>
+
+<h2 id="sec7-3">7.3 两条联络到底相差什么：答案是一个张量</h2>
+
+<p>到这里你也许会有一个很自然的疑问：联络既然不唯一，那两条不同联络之间的差别是否也像 Christoffel 那样坐标依赖、说不清楚？出人意料的是，<strong>联络本身不是张量，但两条联络的差却是张量</strong>。这是后面很多构造的代数骨架。</p>
+
+<p>设 \(\nabla\) 与 \(\widetilde\nabla\) 是 \(M\) 上两条联络，定义</p>
+
+\[
+A(X,Y):=\nabla_XY-\widetilde\nabla_XY.
+\]
+
+<p>先看第一个变量。对任意 \(f\in C^\infty(M)\)，有</p>
+
+\[
+A(fX,Y)
+=
+\nabla_{fX}Y-\widetilde\nabla_{fX}Y
+=
+f\nabla_XY-f\widetilde\nabla_XY
+=
+fA(X,Y).
+\]
+
+<p>再看第二个变量：</p>
+
+\[
+A(X,fY)
+=
+\nabla_X(fY)-\widetilde\nabla_X(fY)
+\]
+
+\[
+=
+\bigl(X(f)Y+f\nabla_XY\bigr)-\bigl(X(f)Y+f\widetilde\nabla_XY\bigr)
+=
+fA(X,Y).
+\]
+
+<p>所以 \(A\) 对两个变量都 \(C^\infty(M)\)-线性。也就是说，\(A\) 真正只依赖于每点的 \(X_p,Y_p\)，它是一个 \((1,2)\)-型张量场：</p>
+
+\[
+\boxed{A\in \Gamma(T^1_2M).}
+\]
+
+<p>这条结论很值得你停一下。联络之所以不像张量，是因为它要承担“求导”这件事，于是必然带着 Leibniz 规则中那一项 \(X(f)Y\)；而两条联络一相减，这项恼人的非张量部分恰好抵消，剩下的就是纯代数的张量。换句话说，所有联络的集合虽然不是向量空间，却是一个仿射空间：你固定一条联络，再加任意一个 \((1,2)\)-型张量，就得到另一条联络。</p>
+
+<p>把这句话放到前面的例子里看尤其清楚。对</p>
+
+\[
+\widetilde\nabla_XY=\nabla_X^{\mathrm{flat}}Y+dx(X)Y,
+\]
+
+<p>两条联络的差就是</p>
+
+\[
+A(X,Y)=\widetilde\nabla_XY-\nabla_X^{\mathrm{flat}}Y=dx(X)Y.
+\]
+
+<p>它当然对两个变量都线性：对第一个变量，\(dx(X)\) 给出一个数；对第二个变量，再拿这个数去乘 \(Y\)。如果你选定坐标基 \(\partial_i\)，那么</p>
+
+\[
+A(\partial_i,\partial_j)=A^k_{ij}\partial_k,
+\qquad
+A^k_{ij}=\Gamma^k_{ij}-\widetilde\Gamma^k_{ij}.
+\]
+
+<p>于是 Christoffel 符号虽然各自不张量，但它们的差的确按张量规律变换。后面我们定义挠率、曲率、Ricci 张量时，都会反复用到这个模式：真正几何的对象，是那些把“导数的不协调部分”相消之后留下来的量。</p>
+
+<p>你若熟悉<a href="../线性代数/ch12.html">《线性代数读本》第 12 章</a>里“同一个线性变换换一组基只是在改写矩阵”的语言，这里可以做一个很有帮助的类比：联络像“带一阶项的局部微分算子”，而张量像“纯代数多线性映射”。两者不是一回事；但一旦把微分那层剥掉，剩下的差值就进入了张量世界。</p>
+
+<h2 id="sec7-4">7.4 局部坐标下的样子：Christoffel 符号从哪里冒出来</h2>
+
+<p>联络的抽象定义很短，可真要计算，还是得落回局部坐标。设 \((x^1,\dots,x^n)\) 是一张坐标图，对应的坐标向量场记为 \(\partial_i=\dfrac{\partial}{\partial x^i}\)。由于 \(\partial_1,\dots,\partial_n\) 在每一点构成 \(T_pM\) 的一组基，向量场 \(\nabla_{\partial_i}\partial_j\) 必可唯一写成</p>
+
+\[
+\boxed{\nabla_{\partial_i}\partial_j=\Gamma^k_{ij}\partial_k.}
+\]
+
+<p>这里那批函数 \(\Gamma^k_{ij}\in C^\infty(M)\) 就是这条联络在该坐标系下的 Christoffel 符号。它们没有什么神秘起源：只是“联络如何作用在坐标基上”的系数。</p>
+
+<p>一旦这批系数知道了，联络对任意向量场的作用也就全知道了。设</p>
+
+\[
+X=X^i\partial_i,\qquad Y=Y^j\partial_j.
+\]
+
+<p>那么由三条公理一步一步展开：</p>
+
+\[
+\nabla_XY
+=
+\nabla_{X^i\partial_i}(Y^j\partial_j)
+=
+X^i\nabla_{\partial_i}(Y^j\partial_j)
+\]
+
+\[
+=
+X^i\bigl(\partial_iY^j\,\partial_j+Y^j\nabla_{\partial_i}\partial_j\bigr)
+\]
+
+\[
+=
+X^i\bigl(\partial_iY^k+\Gamma^k_{ij}Y^j\bigr)\partial_k.
+\]
+
+<p>所以得到最常用的一条坐标公式：</p>
+
+\[
+\boxed{\nabla_XY
+=
+X^i\bigl(\partial_iY^k+\Gamma^k_{ij}Y^j\bigr)\partial_k.}
+\]
+
+<p>如果你把它和欧氏空间里的普通方向导数比较，就会立刻看见联络真正新增的只有那一项 \(\Gamma^k_{ij}Y^j\)。普通偏导 \(\partial_iY^k\) 只会告诉你“分量怎么变”，而 Christoffel 项在补偿“基向量本身也在变”。这就是为什么曲线坐标、曲面坐标、一般流形坐标里会平白多出一串几何修正。</p>
+
+<p>用上一节的人造联络 \(\widetilde\nabla_XY=\nabla^{\mathrm{flat}}_XY+dx(X)Y\) 来做一次完整计算最合适。对 \(\mathbb R^2\) 的笛卡尔坐标 \((x,y)\)，有</p>
+
+\[
+\widetilde\nabla_{\partial_x}\partial_x=\partial_x,\qquad
+\widetilde\nabla_{\partial_x}\partial_y=\partial_y,\qquad
+\widetilde\nabla_{\partial_y}\partial_x=0,\qquad
+\widetilde\nabla_{\partial_y}\partial_y=0.
+\]
+
+<p>于是只有两个 Christoffel 符号非零：</p>
+
+\[
+\Gamma^1_{11}=1,\qquad \Gamma^2_{12}=1,
+\]
+
+<p>其余全为 \(0\)。现在取</p>
+
+\[
+X=x\partial_x+y\partial_y,\qquad
+Y=y\partial_x+x\partial_y.
+\]
+
+<p>由坐标公式，\(\partial_xY^1=0,\ \partial_yY^1=1,\ \partial_xY^2=1,\ \partial_yY^2=0\)。于是第一个分量为</p>
+
+\[
+X^i(\partial_iY^1+\Gamma^1_{ij}Y^j)
+=
+x(\partial_xY^1+\Gamma^1_{11}Y^1+\Gamma^1_{12}Y^2)
+y(\partial_yY^1+\Gamma^1_{21}Y^1+\Gamma^1_{22}Y^2)
+\]
+
+\[
+=
+x(0+1\cdot y+0)+y(1+0+0)
+=
+xy+y.
+\]
+
+<p>第二个分量为</p>
+
+\[
+X^i(\partial_iY^2+\Gamma^2_{ij}Y^j)
+=
+x(\partial_xY^2+\Gamma^2_{11}Y^1+\Gamma^2_{12}Y^2)
+y(\partial_yY^2+\Gamma^2_{21}Y^1+\Gamma^2_{22}Y^2)
+\]
+
+\[
+=
+x(1+0+1\cdot x)+y(0+0+0)
+=
+x+x^2.
+\]
+
+<p>所以</p>
+
+\[
+\widetilde\nabla_XY=(xy+y)\partial_x+(x+x^2)\partial_y.
+\]
+
+<p>这类演算看起来机械，但意义很大：它说明只要你掌握了 Christoffel 符号，联络就完全落地成了系数运算。也正因为如此，下一章求 Levi-Civita 联络，本质上就是要回答“度量给定以后，\(\Gamma^k_{ij}\) 到底被什么公式唯一钉死”。</p>
+
+<p>这里顺手强调一件常见误会：Christoffel 符号<strong>不是</strong>张量分量。你换一套坐标，它们的变换律里会冒出坐标变换的二阶导数，这和真正张量的线性变换规则不同。几何对象是联络本身，不是某一套坐标下的 \(\Gamma^k_{ij}\)。这件事下章、下下章都会反复回来：\(\Gamma\) 可以被坐标选得有大有小，曲率张量却不会被你这样洗掉。</p>
+
+<h2 id="sec7-5">7.5 换一套坐标以后，Christoffel 为什么会多出二阶导数</h2>
+
+<p>上一节末尾我说过，Christoffel 符号不是张量。最干净的证据，就是它的坐标变换公式里会多出一个真正张量不该有的二阶导数项。若 \((x^i)\) 与 \((\widetilde x^a)\) 是两套坐标，则有</p>
+
+\[
+\widetilde\Gamma^a_{bc}
+=
+\frac{\partial \widetilde x^a}{\partial x^k}
+\frac{\partial x^i}{\partial \widetilde x^b}
+\frac{\partial x^j}{\partial \widetilde x^c}
+\Gamma^k_{ij}
+\;+\;
+\frac{\partial \widetilde x^a}{\partial x^m}
+\frac{\partial^2 x^m}{\partial \widetilde x^b\partial \widetilde x^c}.
+\]
+
+<p>第一项看起来像张量的链式变换；第二项才是关键，它来自“坐标基自身也在变”。如果 \(\Gamma\) 真是一个 \((1,2)\)-型张量，这一项绝不会出现。于是只要坐标变换不是仿射线性的，你就不可能指望 Christoffel 符号在所有坐标里同时消失。</p>
+
+<p>平面上的极坐标是最值得亲手算一遍的例子，因为它把“\(\Gamma\) 不等于曲率”这件事暴露得非常彻底。先从笛卡尔坐标 \((x,y)\) 走到极坐标 \((r,\theta)\)，有</p>
+
+\[
+x=r\cos\theta,\qquad y=r\sin\theta.
+\]
+
+<p>欧氏平面的平直联络在笛卡尔坐标里当然满足 \(\Gamma^k_{ij}=0\)。但在极坐标下，坐标基已经不是常向量场了：</p>
+
+\[
+\partial_r=\cos\theta\,\partial_x+\sin\theta\,\partial_y,
+\]
+
+\[
+\partial_\theta=-r\sin\theta\,\partial_x+r\cos\theta\,\partial_y.
+\]
+
+<p>于是沿 \(\partial_r\) 微分 \(\partial_\theta\)，得到</p>
+
+\[
+\nabla^{\mathrm{flat}}_{\partial_r}\partial_\theta
+=
+\partial_r(-r\sin\theta)\partial_x+\partial_r(r\cos\theta)\partial_y
+\]
+
+\[
+=
+(-\sin\theta)\partial_x+(\cos\theta)\partial_y
+=
+\frac1r\partial_\theta.
+\]
+
+<p>同理，</p>
+
+\[
+\nabla^{\mathrm{flat}}_{\partial_\theta}\partial_r
+=
+\partial_\theta(\cos\theta)\partial_x+\partial_\theta(\sin\theta)\partial_y
+\]
+
+\[
+=
+(-\sin\theta)\partial_x+(\cos\theta)\partial_y
+=
+\frac1r\partial_\theta.
+\]
+
+<p>再算最关键的一项：</p>
+
+\[
+\nabla^{\mathrm{flat}}_{\partial_\theta}\partial_\theta
+=
+\partial_\theta(-r\sin\theta)\partial_x+\partial_\theta(r\cos\theta)\partial_y
+\]
+
+\[
+=
+(-r\cos\theta)\partial_x+(-r\sin\theta)\partial_y
+=
+-r\partial_r.
+\]
+
+<p>因此极坐标下的非零 Christoffel 符号是</p>
+
+\[
+\Gamma^r_{\theta\theta}=-r,\qquad
+\Gamma^\theta_{r\theta}=\Gamma^\theta_{\theta r}=\frac1r.
+\]
+
+<p>请把这件事牢牢记住：平面明明是最平的空间，可在极坐标里 Christoffel 符号却不为零。原因不是平面偷偷长出了曲率，而是坐标基 \(\partial_r,\partial_\theta\) 自己就在旋转、伸缩。你若把 Christoffel 当成“弯曲度”本身，很快就会犯错；真正测弯的量要到<a href="ch9.html">第 9 章</a>才出场，而且会把这些纯坐标效应扣掉。</p>
+
+<h2 id="sec7-6">7.6 沿曲线的协变导数：把联络压成一维 ODE</h2>
+
+<p>前面说的 \(\nabla_XY\) 是“向量场沿向量场”的导数。几何里更常用的，是沿一条具体曲线 \(\gamma:I\to M\) 去微分一个<strong>沿曲线的向量场</strong> \(V(t)\in T_{\gamma(t)}M\)。因为平行移动、测地线、Jacobi 场，统统都长在这个语境里。</p>
+
+<p>设 \(\gamma(t)\) 在坐标里写成 \(x^i(t)\)，向量场 \(V\) 在这条曲线附近可写作</p>
+
+\[
+V(t)=V^k(t)\partial_k\big|_{\gamma(t)}.
+\]
+
+<p>把 \(V\) 暂时延拓成附近的向量场 \(Y\)，然后定义</p>
+
+\[
+\frac{DV}{dt}:=\nabla_{\dot\gamma}Y\big|_{\gamma(t)}.
+\]
+
+<p>你也许会立刻追问：这会不会依赖于我怎样把 \(V\) 延拓到曲线外面？答案是不依赖，而最直接的证明就是把它写成坐标公式：</p>
+
+\[
+\dot\gamma=\dot x^i\partial_i,
+\]
+
+\[
+\frac{DV}{dt}
+=
+\dot x^i\bigl(\partial_iY^k+\Gamma^k_{ij}Y^j\bigr)\partial_k
+\bigg|_{\gamma(t)}.
+\]
+
+<p>沿曲线取值后，\(\partial_iY^k\dot x^i\) 就是 \(V^k(t)\) 的全导数 \(\dot V^k(t)\)。于是得到</p>
+
+\[
+\boxed{
+\frac{DV}{dt}
+=
+\left(\frac{dV^k}{dt}+\Gamma^k_{ij}(\gamma(t))\,\dot x^iV^j\right)\partial_k.
+}
+\]
+
+<p>右边只依赖曲线 \(\gamma\)、沿曲线分量 \(V^k(t)\) 和 Christoffel 符号在 \(\gamma\) 上的取值，不再涉及任何延拓。这就把沿曲线协变导数还原成了一条一维的线性微分算子。</p>
+
+<p>最熟悉的检验当然还是欧氏空间。在平直笛卡尔坐标中 \(\Gamma^k_{ij}=0\)，于是</p>
+
+\[
+\frac{DV}{dt}=\frac{dV^k}{dt}\partial_k,
+\]
+
+<p>也就是普通导数。比如在 \(\mathbb R^2\) 中取单位圆</p>
+
+\[
+\gamma(t)=(\cos t,\sin t),
+\qquad
+T(t)=\dot\gamma(t)=(-\sin t,\cos t).
+\]
+
+<p>则</p>
+
+\[
+\frac{DT}{dt}=(-\cos t,-\sin t).
+\]
+
+<p>这恰好是指向圆心的单位法向量的负值，也就是你在<a href="../多元微积分/ch4.html">《多元微积分读本》第 4 章</a>曲率公式里见过的那件事：圆的切向量一边走一边朝内转。把它放在这里看，你会发现那其实就是“沿曲线协变导数不为零”的最基础例子。</p>
+
+<p>若换成上一节的人造联络，在 \(x\)-轴曲线 \(\gamma(t)=(t,0)\) 上，\(\dot\gamma=\partial_x\)，而只有 \(\Gamma^1_{11}=1,\ \Gamma^2_{12}=1\) 非零。对</p>
+
+\[
+V(t)=u(t)\partial_x+v(t)\partial_y
+\]
+
+<p>便有</p>
+
+\[
+\frac{DV}{dt}
+=
+\bigl(u'+\Gamma^1_{11}\cdot 1\cdot u\bigr)\partial_x
+\;+\;
+\bigl(v'+\Gamma^2_{12}\cdot 1\cdot v\bigr)\partial_y
+\]
+
+\[
+=
+(u'+u)\partial_x+(v'+v)\partial_y.
+\]
+
+<p>这和上一节直接从定义算出的结果完全一致。你现在可以把“沿曲线协变导数”看成一件非常实用的事：只要把联络限制到一条曲线上，它立刻变成了熟悉的 ODE 语言，这也是为什么<a href="../微分方程/ch12.html">《微分方程读本》第 12–13 章</a>那套存在唯一性、矩阵方程、初值解法，在黎曼几何里会反复被调用。</p>
+
+<h2 id="sec7-7">7.7 平行向量场与平行移动：什么叫“一路都没转”</h2>
+
+<p>既然沿曲线导数已经有了，最自然的问题就是：什么时候它等于零？这给出“平行”的定义。</p>
+
+\[
+\boxed{\frac{DV}{dt}=0.}
+\]
+
+<p>如果沿曲线向量场 \(V\) 满足这条方程，我们就说 \(V\) 沿 \(\gamma\) 是平行的。你可以把它读成：“在这条联络规定的比较制度下，\(V\) 一路都没有变化。”</p>
+
+<p>把坐标公式代进去，平行条件变成</p>
+
+\[
+\frac{dV^k}{dt}+\Gamma^k_{ij}(\gamma(t))\,\dot x^iV^j=0.
+\]
+
+<p>这是一组一阶线性常微分方程。未知量是 \(V^1(t),\dots,V^n(t)\)，系数由曲线 \(\gamma\) 和联络 \(\Gamma^k_{ij}\) 给出。所以只要给定某个初值</p>
+
+\[
+V(t_0)=v_0\in T_{\gamma(t_0)}M,
+\]
+
+<p>标准 ODE 理论立刻告诉你：在局部总存在唯一平行解。这是一个很重要的结构结论。联络一旦给定，你就可以把起点的一个向量沿曲线“搬运”到终点，而且搬法唯一。这种搬运叫做平行移动。</p>
+
+<p>若把从 \(t_0\) 搬到 \(t_1\) 的操作记作 \(P^\nabla_{\gamma,t_0\to t_1}\)，那么</p>
+
+\[
+P^\nabla_{\gamma,t_0\to t_1}:T_{\gamma(t_0)}M\to T_{\gamma(t_1)}M
+\]
+
+<p>是线性的，而且满足组合律</p>
+
+\[
+P^\nabla_{\gamma,t_1\to t_2}\circ P^\nabla_{\gamma,t_0\to t_1}
+=
+P^\nabla_{\gamma,t_0\to t_2}.
+\]
+
+<p>也就是说，平行移动真正在不同切空间之间建立了一个由路径决定的线性同构。这里“由路径决定”四个字非常关键。一般来说，从 \(p\) 到 \(q\) 走不同路线，搬过去的结果未必一样；到了<a href="ch9.html">第 9 章</a>，曲率正是这种路径依赖的微分版本。</p>
+
+<p>还是拿 \(\widetilde\nabla_XY=\nabla^{\mathrm{flat}}_XY+dx(X)Y\) 的例子来做到底。沿 \(x\)-轴，平行方程已经算出是</p>
+
+\[
+u'+u=0,\qquad v'+v=0.
+\]
+
+<p>若起点给定 \(V(0)=a\partial_x+b\partial_y\)，那么唯一平行解为</p>
+
+\[
+V(t)=ae^{-t}\partial_x+be^{-t}\partial_y.
+\]
+
+<p>于是平行移动把向量整体乘上 \(e^{-t}\)。这件事和欧氏直觉明显不合：方向没改多少，长度却一直缩。正因为你已经亲眼看见了这种“奇怪联络”也完全合法，下一章才会明白 metric compatibility 其实是在排除什么。</p>
+
+<p>反过来，在 \(\mathbb R^n\) 的平直联络里，平行方程 simply 是</p>
+
+\[
+\frac{dV^k}{dt}=0,
+\]
+
+<p>所以平行向量的笛卡尔分量恒定不变。这就是你从初等几何起一直在使用的“平移一个向量而不旋转也不拉伸”的朴素图像。联络把这种朴素图像推广到了任意流形；只是一般情况下，“不变”的定义不再由全局坐标给出，而由 \(\nabla\) 自己给出。</p>
+
+<p>这里再补一层经常被忽略的直觉：平行并不意味着“相对于你手里的活动标架看起来不变”。比如即使在平面上，用极坐标标架 \(\partial_r,\partial_\theta\) 去看一个固定的笛卡尔向量，它的分量也会不断变化，因为标架本身在转。平行的含义不是“某套坐标分量不变”，而是“协变导数为零”。这句话现在看似抽象，可只要你下一章在极坐标和球面上做几次 Christoffel 计算，它会立刻变成具体经验。</p>
+
+<h2 id="sec7-8">7.8 换一个活动标架看，联络其实就是矩阵 ODE</h2>
+
+<p>前面一直在坐标基 \(\partial_i\) 下说话。那当然够用，但几何里更灵活的做法常常是：自己选一组局部标架 \(E_1,\dots,E_n\)，不一定来自坐标。只要它们在某个开集里处处线性无关，任何向量场都可写成</p>
+
+\[
+Y=Y^bE_b.
+\]
+
+<p>联络作用在这些基向量上时，仍可写成系数展开：</p>
+
+\[
+\nabla E_b=\omega^a{}_b\otimes E_a,
+\]
+
+<p>也就是对任意向量场 \(X\)，</p>
+
+\[
+\nabla_XE_b=\omega^a{}_b(X)E_a.
+\]
+
+<p>这里 \(\omega^a{}_b\) 是一组 1-形式，叫做联络 1-形式。它们和坐标系里的 Christoffel 符号讲的是同一件事，只不过把“基在变”这件事打包得更几何。若 \(V=v^bE_b\) 是沿曲线 \(\gamma\) 的向量场，那么</p>
+
+\[
+\frac{DV}{dt}
+=
+\frac{d}{dt}(v^bE_b)
+=
+\dot v^aE_a+v^b\nabla_{\dot\gamma}E_b
+\]
+
+\[
+=
+\left(\dot v^a+\omega^a{}_b(\dot\gamma)v^b\right)E_a.
+\]
+
+<p>这于是给出另一条非常紧凑的公式：</p>
+
+\[
+\boxed{\frac{DV}{dt}
+=
+\left(\dot v^a+\omega^a{}_b(\dot\gamma)v^b\right)E_a.}
+\]
+
+<p>如果把 \(v=(v^1,\dots,v^n)^T\) 看成列向量，把 \(\Omega(t)=(\omega^a{}_b(\dot\gamma(t)))\) 看成一族 \(n\times n\) 矩阵，那么平行方程就是</p>
+
+\[
+\boxed{\dot v+\Omega(t)v=0.}
+\]
+
+<p>这一瞬间，微分几何和<a href="../线性代数/ch13.html">《线性代数读本》第 13 章</a>、<a href="../微分方程/ch13.html">《微分方程读本》第 13 章</a>就接上了：平行移动其实就是一条随时间变化的线性系统的解算子。你在黎曼几何里看到的“沿曲线搬运向量”，从 ODE 的眼里看，不过是在一个活动基下解矩阵方程。</p>
+
+<p>最能说明问题的，是仍在平面上看极坐标的正交标架</p>
+
+\[
+e_r=\partial_r,\qquad e_\theta=\frac1r\partial_\theta.
+\]
+
+<p>这组标架比 \(\partial_r,\partial_\theta\) 更好，因为它们长度都归一。由前面算出的极坐标 Christoffel 符号，可以直接推出</p>
+
+\[
+\nabla_{e_r}e_r=0,\qquad \nabla_{e_r}e_\theta=0,
+\]
+
+\[
+\nabla_{e_\theta}e_r=\frac1r e_\theta,\qquad
+\nabla_{e_\theta}e_\theta=-\frac1r e_r.
+\]
+
+<p>现在沿半径为 \(R\) 的圆周 \(\gamma(t)=(R,\theta(t))\) 走。因为 \(\dot\gamma=\dot\theta\,\partial_\theta=R\dot\theta\,e_\theta\)，对</p>
+
+\[
+V=a(t)e_r+b(t)e_\theta
+\]
+
+<p>有</p>
+
+\[
+\frac{DV}{dt}
+=
+a'e_r+b'e_\theta
+a\nabla_{\dot\gamma}e_r+b\nabla_{\dot\gamma}e_\theta
+\]
+
+\[
+=
+a'e_r+b'e_\theta+a\dot\theta\,e_\theta-b\dot\theta\,e_r
+\]
+
+\[
+=
+(a'-b\dot\theta)e_r+(b'+a\dot\theta)e_\theta.
+\]
+
+<p>所以平行条件给出</p>
+
+\[
+a'=b\dot\theta,\qquad b'=-a\dot\theta.
+\]
+
+<p>若取参数就是转角本身，即 \(\theta=t\)，便得到</p>
+
+\[
+a'=b,\qquad b'=-a.
+\]
+
+<p>从而</p>
+
+\[
+a(t)=a(0)\cos t+b(0)\sin t,\qquad
+b(t)=-a(0)\sin t+b(0)\cos t.
+\]
+
+<p>请细看这个结果：在平面这种零曲率空间里，一个平行向量相对于活动的极坐标正交标架，分量仍会像二维旋转那样变化。变的是标架，不是向量本身。这个例子之所以好，是因为它把“协变导数才是真导数，普通分量导数会掺进基的变化”这句话几乎裸露地展示出来。</p>
+
+<h2 id="sec7-9">7.9 挠率的第一眼：联络可能自带“扭劲”</h2>
+
+<p>联络除了决定怎样比较邻近切空间，还会带出另一个自然对象：挠率。定义为</p>
+
+\[
+T(X,Y)=\nabla_XY-\nabla_YX-[X,Y].
+\]
+
+<p>这里 \([X,Y]\) 是向量场的 Lie 括号，它在<a href="ch3.html">第 3 章</a>已经出现过。为什么这里不能只写 \(\nabla_XY-\nabla_YX\)？因为光有前两项并不是张量性的，而减去括号后，坐标导数引入的那部分恰好抵消，留下一个真正在每点只依赖 \(X_p,Y_p\) 的对象。</p>
+
+<p>在坐标基 \(\partial_i\) 下，由于 \([\partial_i,\partial_j]=0\)，便有</p>
+
+\[
+T(\partial_i,\partial_j)
+=
+\nabla_{\partial_i}\partial_j-\nabla_{\partial_j}\partial_i
+=
+(\Gamma^k_{ij}-\Gamma^k_{ji})\partial_k.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{T=0\quad\Longleftrightarrow\quad \Gamma^k_{ij}=\Gamma^k_{ji}\ \text{在坐标基下成立}.}
+\]
+
+<p>这条判别式你下章会立刻用到：Levi-Civita 联络要求无挠，于是 Christoffel 符号在下两个指标上对称。</p>
+
+<p>继续拿我们的例子 \(\widetilde\nabla_XY=\nabla^{\mathrm{flat}}_XY+dx(X)Y\) 来看。由于平直联络本身无挠，而额外项会给出</p>
+
+\[
+T(X,Y)=dx(X)Y-dx(Y)X.
+\]
+
+<p>特别地，对基向量 \(\partial_x,\partial_y\)，有</p>
+
+\[
+T(\partial_x,\partial_y)
+=
+dx(\partial_x)\partial_y-dx(\partial_y)\partial_x
+=
+\partial_y.
+\]
+
+<p>所以这条联络不无挠。它的含义是：先沿 \(x\) 方向微分再沿 \(y\) 方向微分，与反过来做之间，多出来的不只是坐标括号那一部分，还夹带了联络自身的扭曲。挠率正是在测这种扭曲。</p>
+
+<p>如果你愿意用一个更形象的说法：曲率测的是“绕一小圈回来会不会转偏”，挠率测的是“一个看似平行四边形的小回路会不会闭不拢”。在一般仿射联络几何里，两者都可能存在；在黎曼几何里，我们最终会选择那条既保度量又无挠的联络，把“纯粹由度量引起的弯”单独留下来。</p>
+
+<h2 id="sec7-10">7.10 一旦会微分向量场，就会微分 1-形式与一般张量</h2>
+
+<p>虽然这一章把联络定义成 \(X(M)\times X(M)\to X(M)\) 的算子，但你不该把它误会成“只会作用在向量场上”。恰恰相反，一旦你知道怎样微分向量场，联络就会通过 Leibniz 规则自动扩展到<a href="ch4.html">第 4 章</a>出现过的所有张量场。这件事在后面太重要了，因为曲率最初虽然定义成作用在向量场上的算子，最后我们却经常要写它的 \((0,4)\)-型分量、Ricci 缩并和标量曲率。</p>
+
+<p>对函数 \(f\)，定义最简单：</p>
+
+\[
+\nabla_X f:=X(f).
+\]
+
+<p>这没有悬念，因为标量函数本来就有方向导数。真正需要说明的是 1-形式。若 \(\alpha\) 是余切丛上的一个截面，也就是 1-形式，那么我们定义</p>
+
+\[
+\boxed{(\nabla_X\alpha)(Y)=X(\alpha(Y))-\alpha(\nabla_XY).}
+\]
+
+<p>这看起来像是在模仿乘积求导，而它也确实就是。因为 \(\alpha(Y)\) 是函数，所以沿 \(X\) 的导数 \(X(\alpha(Y))\) 应该拆成“两部分都求导”。既然 \(Y\) 的导数已经由联络给出，那么 \(\alpha\) 的导数就被这条式子唯一逼出来了。</p>
+
+<p>把它写成坐标分量最清楚。若 \(\alpha=\alpha_jdx^j\)，则</p>
+
+\[
+(\nabla_{\partial_i}\alpha)(\partial_j)
+=
+\partial_i(\alpha_j)-\alpha(\nabla_{\partial_i}\partial_j)
+\]
+
+\[
+=
+\partial_i\alpha_j-\Gamma^k_{ij}\alpha_k.
+\]
+
+<p>所以 1-形式的协变导数分量是</p>
+
+\[
+\boxed{\nabla_i\alpha_j=\partial_i\alpha_j-\Gamma^k_{ij}\alpha_k.}
+\]
+
+<p>请比较向量场分量公式</p>
+
+\[
+\nabla_iY^k=\partial_iY^k+\Gamma^k_{ij}Y^j.
+\]
+
+<p>上指标前面是加号，下指标前面是减号。这正是“协变”和“逆变”两个词在计算中的实际含义：升着的指标与降着的指标，对基变化的响应方向相反。</p>
+
+<p>拿平面的极坐标来算一个小例子最能看明白。设 \(\alpha=dr\)。它的分量是</p>
+
+\[
+\alpha_r=1,\qquad \alpha_\theta=0.
+\]
+
+<p>利用前面算过的 Christoffel 符号 \(\Gamma^r_{\theta\theta}=-r\)，便有</p>
+
+\[
+(\nabla_{\partial_\theta}\alpha)_r
+=
+\partial_\theta(\alpha_r)-\Gamma^k_{\theta r}\alpha_k
+=
+0,
+\]
+
+<p>因为 \(\Gamma^r_{\theta r}=0,\ \Gamma^\theta_{\theta r}=1/r\)，而 \(\alpha_\theta=0\)。再看 \(\theta\)-分量：</p>
+
+\[
+(\nabla_{\partial_\theta}\alpha)_\theta
+=
+\partial_\theta(\alpha_\theta)-\Gamma^k_{\theta\theta}\alpha_k
+=
+-\Gamma^r_{\theta\theta}\alpha_r
+=
+r.
+\]
+
+<p>所以</p>
+
+\[
+\nabla_{\partial_\theta}dr=r\,d\theta.
+\]
+
+<p>这说明连余切基 \(dr,d\theta\) 也会随着位置变化而“转动”。如果你以后在 Ricci 张量和曲率 2-形式里总感觉指标上上下下像在打架，那就回来看这里：本质只是不同类型的张量对基变化响应方式不同。</p>
+
+<p>对一般 \((r,s)\)-型张量场 \(T\)，联络同样由 Leibniz 规则唯一扩展出来。坐标分量写成一口气的公式就是</p>
+
+\[
+\nabla_i T^{a_1\cdots a_r}{}_{b_1\cdots b_s}
+=
+\partial_iT^{a_1\cdots a_r}{}_{b_1\cdots b_s}
+\sum_{\mu=1}^r \Gamma^{a_\mu}_{ic}
+T^{a_1\cdots c\cdots a_r}{}_{b_1\cdots b_s}
+-\sum_{\nu=1}^s \Gamma^c_{ib_\nu}
+T^{a_1\cdots a_r}{}_{b_1\cdots c\cdots b_s}.
+\]
+
+<p>你不必现在就把这条大公式背下来；更值得记的是它背后的规律：每个上指标贡献一个“加号 Christoffel”，每个下指标贡献一个“减号 Christoffel”。这就是一般张量协变导数的全部算法。</p>
+
+<p>这里顺手看一个会在后面反复出现的小对象：Hessian。对函数 \(f\)，它就是 1-形式 \(df\) 的协变导数</p>
+
+\[
+\nabla^2f:=\nabla(df),
+\]
+
+<p>坐标分量为</p>
+
+\[
+(\nabla^2f)_{ij}=\partial_i\partial_jf-\Gamma^k_{ij}\partial_kf.
+\]
+
+<p>这条式子特别值得在极坐标里算一次，因为它会告诉你：普通二阶偏导并不直接给几何上的“二阶变化”，Christoffel 修正仍然少不了。取欧氏平面上的函数</p>
+
+\[
+f(r,\theta)=\frac12 r^2.
+\]
+
+<p>它的一阶偏导是</p>
+
+\[
+\partial_rf=r,\qquad \partial_\theta f=0.
+\]
+
+<p>于是</p>
+
+\[
+(\nabla^2f)_{rr}
+=
+\partial_r\partial_rf-\Gamma^k_{rr}\partial_kf
+=
+1,
+\]
+
+\[
+(\nabla^2f)_{r\theta}
+=
+\partial_r\partial_\theta f-\Gamma^k_{r\theta}\partial_kf
+=
+0,
+\]
+
+\[
+(\nabla^2f)_{\theta\theta}
+=
+\partial_\theta\partial_\theta f-\Gamma^r_{\theta\theta}\partial_rf
+=
+0-(-r)\cdot r
+=
+r^2.
+\]
+
+<p>所以</p>
+
+\[
+\nabla^2f=dr\otimes dr+r^2\,d\theta\otimes d\theta.
+\]
+
+<p>而这恰好就是平面在极坐标下的欧氏度量。这个算例很漂亮，因为如果你只看普通二阶偏导，会误以为 \(\partial^2_{\theta\theta}f=0\) 表示“沿角方向没有二阶变化”；可几何上并不是这样，沿着圆周方向移动，半径函数的二阶效应被坐标弯曲藏在了 Christoffel 项里。协变导数的价值，正是在把这些坐标假象扣干净之后，留下真正内蕴的二阶信息。</p>
+
+<h2 id="sec7-11">7.11 回到测地线：为什么 \(\nabla_{\dot\gamma}\dot\gamma=0\) 是对的</h2>
+
+<p>现在你终于可以回头重新看<a href="ch6.html">第 6 章</a>的测地线方程，而不是把它当作一条从天而降的坐标公式。测地线的几何定义其实极短：</p>
+
+\[
+\boxed{\nabla_{\dot\gamma}\dot\gamma=0.}
+\]
+
+<p>这句话的意思是：曲线的切向量沿着曲线自己平行移动。也就是说，测地线不是“二阶导数为零”的直接推广，而是“在联络所规定的比较方式下，没有横向转弯”的曲线。</p>
+
+<p>一旦写到局部坐标，这条定义就立刻还原成你已熟悉的二阶方程。把 \(V=\dot\gamma=\dot x^k\partial_k\) 代入上一节的沿曲线协变导数公式，得</p>
+
+\[
+\frac{D\dot\gamma}{dt}
+=
+\left(\ddot x^k+\Gamma^k_{ij}\dot x^i\dot x^j\right)\partial_k.
+\]
+
+<p>因此 \(\nabla_{\dot\gamma}\dot\gamma=0\) 等价于</p>
+
+\[
+\boxed{\ddot x^k+\Gamma^k_{ij}\dot x^i\dot x^j=0.}
+\]
+
+<p>这正是你在上一章见到的那串方程。现在它的意义清楚多了：\(\ddot x^k\) 不是单独几何的，因为它只对坐标分量求了普通导数；可一旦把“坐标基自身也在变”的 Christoffel 修正补上，整个表达式就成了坐标无关的加速度 \(\nabla_{\dot\gamma}\dot\gamma\)。</p>
+
+<p>在平直欧氏空间的笛卡尔坐标里，\(\Gamma^k_{ij}=0\)，于是测地线方程退化为</p>
+
+\[
+\ddot x^k=0.
+\]
+
+<p>它的解当然是</p>
+
+\[
+x^k(t)=a^k t+b^k,
+\]
+
+<p>也就是直线。你熟悉的“直线是最不弯的曲线”，在联络语言里不过是“平直联络下自平行的曲线”。而在一般流形上，测地线只是把“直线”这一直觉搬到了没有全局线性结构的世界里。</p>
+
+<p>再往前一步看，这个观点也解释了为什么黎曼几何里的很多方程最终都会长成 ODE。只要你把问题限制在一条曲线、一个标架或者一条测地线上，联络就把几何信息压成 Christoffel 系数，再把整个问题压成有限维微分方程。你在<a href="../线性代数/ch13.html">《线性代数读本》第 13 章</a>把线性系统写成矩阵方程时建立过同样的习惯：一旦选定基，抽象算子就落成系数矩阵。这里的 Christoffel 符号扮演的正是这种“基下系数”的角色，只不过对象已从一个固定向量空间变成沿点变化的切空间族。</p>
+
+<p>到这里，联络最该装进脑子的第一句话是：它是流形上“向量场求导”的规则，而不是某个附加技巧。第二句话是：Christoffel 符号只是这条规则在坐标基下的系数，不是几何本体。第三句话是：沿曲线协变导数、平行移动、测地线，全都只是同一个 \(\nabla\) 在不同场景下的展开。</p>
+
+<p>下一章我们要问的，不再是“联络是什么”，而是“度量一旦给定，哪条联络才和它最合拍”。答案会是：恰有一条联络既保内积又无挠；它就是 Levi-Civita 联络，而你在这一章已经准备好了理解它所需的全部语言。</p>
+
+<p>换句话说，这一章做的是“把导数装到流形上”，下一章做的则是“把度量装进这条导数里”。等这两步一扣上，曲率就不再只是一个抽象故障量，而会变成度量几何真正的核心角色。</p>
+
+<p>如果你此刻已经能把“导数”“平行”“自平行”“张量修正”这几个词在脑中接成一条线，那么这一章真正该完成的工作就已经完成了，而且是以内蕴的方式完成的。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 测地线：能量与长度</a><a href="ch8.html">下一章 · 第 8 章 Levi-Civita 联络 →</a></nav>
+
+</main>
+</body>
+</html>
