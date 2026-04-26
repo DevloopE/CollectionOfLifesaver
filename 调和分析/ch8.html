@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 Schwartz 空间 \(S(\mathbb R^n)\) 与测试函数 — 普林斯顿调和分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 Gibbs 现象</a><a href="ch9.html">下一章 · 第 9 章 \( \mathbb R^n \) 上的 Fourier 变换：基础性质 →</a></nav>
+<h1 id="ch8">第 8 章 Schwartz 空间 \(S(\mathbb R^n)\) 与测试函数</h1>
+
+<p>到第 7 章为止，你一直在和周期世界打交道。三角级数生活在圆周上，频率是离散的整数，核函数也是一串一串加出来的。可一旦你把眼睛从圆周挪到整条实轴，事情马上变了。频率不再是 \(n\in\mathbb Z\)，而是 \(\xi\in\mathbb R^n\) 这样的连续变量；部分和不再是有限和，而是积分；“这个函数能不能安全地做 Fourier 变换”也不再只是一个记号问题，而会立刻牵连到积分是否绝对收敛、微分能不能搬进积分号、反演时尾部会不会失控。</p>
+
+<p>你可能会想：那就直接在 \(C_c^\infty(\mathbb R^n)\) 上做不就完了？紧支光滑函数当然足够好，积分绝对收敛，分部积分也不怕边界项。但它又有点太小了。许多最自然的核，比如 Gaussian \(e^{-\pi |x|^2}\)，根本没有紧支撑；热核、Poisson 核、许多基本解也都拖着无穷尾巴。另一方面，如果你只要求 \(f\in L^1\)，那虽然变换能定义，可一旦你想反复微分、反复乘多项式、反复卷积，控制就开始松动。于是现代 Fourier 分析会先停在一个非常舒服的中间地带：函数不仅 \(C^\infty\)，而且连函数本身和所有导数都比任意多项式衰减得还快。</p>
+
+<p>这就是 Schwartz 空间 \(\mathcal S(\mathbb R^n)\)。它像一块特别平整的试验台：一边足够大，大到 Gaussian、紧支光滑函数、它们的卷积和导数都放得下；另一边又足够规矩，规矩到 Fourier 变换、微分、乘法、平移、伸缩这些操作都能在里面来回跑而不出界。你会在这一章看到，\(\mathcal S\) 不只是“好函数的集合”，它自带一套拓扑，知道什么叫“在所有导数和所有尾部控制下一起收敛”；它也不只是未来分布理论的技术前言，而是第 9 到第 11 章真正的出发点。</p>
+
+<p>如果要把这一章压成一句话，那就是：</p>
+
+\[
+\boxed{
+\mathcal S(\mathbb R^n)
+=
+\{\text{光滑到头，而且比任何多项式都衰减得更快的函数}\},
+}
+\]
+
+<p>而“测试函数”这个词，在这里第一次有了一个比 \(C_c^\infty\) 更宽、更适合 Fourier 分析的版本。到了<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>你已经见过卷积怎样把粗糙函数磨平，到<a href="../偏微分方程/ch21.html">《偏微分方程读本》第 21 章</a>你也见过弱导数为什么需要一族光滑探针。现在我们换一套更适合频率空间的探针，它会在后面三章一路工作到反演公式。</p>
+
+<h2 id="sec8-1">8.1 为什么整空间上的 Fourier 分析需要一块更稳的舞台</h2>
+
+<p>先别急着写定义，先把动机掰开。你希望一个“好函数空间”至少满足四件事。</p>
+
+<p>第一，函数本身应该可积，这样 Fourier 变换</p>
+
+\[
+\widehat f(\xi)=\int_{\mathbb R^n} f(x)e^{-2\pi i x\cdot \xi}\,dx
+\]
+
+<p>至少逐点有意义。第二，你希望能对 \(\xi\) 求导，于是最好 \(x^\alpha f(x)\) 也可积。因为对指数因子求导会拉下 \(x^\alpha\) 这样的因子。第三，你希望对 \(f\) 的 \(x\)-导数做 Fourier 变换，于是 \(\partial^\beta f\) 至少也该可积，并且分部积分时边界项最好自动消失。第四，你希望这些性质在卷积、平移、微分、乘多项式之后继续成立，否则每做一步就要重造一个空间，理论会很散。</p>
+
+<p>单独看这些要求都不夸张，可一合在一起，你就会自然走向“所有导数都快衰减”的条件。因为只靠 \(f\in L^1\) 只保证了零阶积分；只靠 \(C^\infty\) 只保证了局部光滑；只靠紧支撑又把 Gaussian 之类最自然的对象排除掉了。Fourier 分析最怕的不是函数不光滑，而是你不知道不光滑和不衰减会在哪一步突然咬你一口。Schwartz 空间的设计，就是把这些后患一开始就一起堵上。</p>
+
+<p>你可以把它和<a href="../线性代数/ch21.html">《线性代数读本》第 21 章</a>里“选一组好基底”的思想类比。一个好基底不是因为任何向量都只能用它来表示，而是因为一旦选了它，投影、坐标、正交、最小二乘这些事都会顺起来。同样，\(\mathcal S(\mathbb R^n)\) 不是唯一能做 Fourier 分析的空间，但它是最适合作为第一块工作台的空间：够大、够稳、够封闭，而且和后面的 \(L^2\)、分布、Sobolev 空间全都接得上。</p>
+
+<p><strong>例题 1.</strong> 看三个熟悉对象，判断谁更像是 Fourier 分析喜欢的函数：</p>
+
+\[
+f_1(x)=e^{-\pi x^2},\qquad
+f_2(x)=\frac1{1+x^2},\qquad
+f_3(x)=\mathbf 1_{[-1,1]}(x).
+\]
+
+<p>先看 \(f_1\)。它无限可微，而且每次求导都还是“多项式乘 Gaussian”的形式，所以尾部仍然是指数衰减。直觉上它非常好。</p>
+
+<p>再看 \(f_2\)。它也 \(C^\infty\)，而且可积，但衰减只有 \(1/x^2\) 量级。若你乘上 \(x^5\)，就得到</p>
+
+\[
+x^5 f_2(x)=\frac{x^5}{1+x^2},
+\]
+
+<p>这在无穷远处像 \(x^3\)，显然不受控。所以它不可能属于后面要定义的 Schwartz 空间。</p>
+
+<p>最后看 \(f_3\)。它有紧支撑，因此尾部其实最好，可它在 \(\pm1\) 处不连续，更别提光滑。它同样不属于 \(\mathcal S\)。</p>
+
+<p>这三个例子放在一起很有代表性：\(f_1\) 既光滑又快衰减，所以是“理想成员”；\(f_2\) 光滑但衰减不够；\(f_3\) 衰减极好但没有光滑性。Schwartz 空间正是要求两条都同时做到位。</p>
+
+\[
+\boxed{
+\text{只光滑不够，只衰减也不够；}\quad
+\mathcal S\text{ 要的是两者同时极强。}
+}
+\]
+
+<h2 id="sec8-2">8.2 多重指标语言与 Schwartz 函数的正式定义</h2>
+
+<p>在 \(\mathbb R^n\) 上，导数和多项式都最好用多重指标来写。设</p>
+
+\[
+\alpha=(\alpha_1,\dots,\alpha_n),\qquad
+\beta=(\beta_1,\dots,\beta_n),
+\]
+
+<p>其中每个分量都在 \(\mathbb N\cup\{0\}\)。记</p>
+
+\[
+|\alpha|=\alpha_1+\cdots+\alpha_n,\qquad
+x^\alpha=x_1^{\alpha_1}\cdots x_n^{\alpha_n},
+\]
+
+\[
+\partial^\beta
+=
+\frac{\partial^{|\beta|}}
+{\partial x_1^{\beta_1}\cdots \partial x_n^{\beta_n}}.
+\]
+
+<p>有了这套记号，Schwartz 空间的定义就能非常紧凑地写成一句话：</p>
+
+\[
+\boxed{
+\mathcal S(\mathbb R^n)
+=
+\left\{
+f\in C^\infty(\mathbb R^n):
+\sup_{x\in\mathbb R^n}|x^\alpha \partial^\beta f(x)|<\infty
+\text{ for all }\alpha,\beta
+\right\}.
+}
+\]
+
+<p>你可以把这句话拆成两层来读。第一层是“\(f\in C^\infty\)”；第二层是“任意阶导数 \(\partial^\beta f\) 乘上任意高次多项式 \(x^\alpha\) 后仍然有界”。后者等价于说：\(\partial^\beta f(x)\) 在 \(|x|\to\infty\) 时衰减得比任何负幂还快。因为若对每个 \(N\) 都有</p>
+
+\[
+|x|^N |\partial^\beta f(x)|\le C_{N,\beta},
+\]
+
+<p>那就意味着</p>
+
+\[
+|\partial^\beta f(x)|\le C_{N,\beta}(1+|x|)^{-N},
+\]
+
+<p>而 \(N\) 可以任意大。</p>
+
+<p>为什么定义里要同时允许所有 \(\alpha\) 和所有 \(\beta\)？因为 Fourier 变换天然会在“乘 \(x\)”和“求导”之间来回交换角色。第 9 章你会看到</p>
+
+\[
+\widehat{\partial^\beta f}(\xi)=(2\pi i\xi)^\beta \widehat f(\xi),
+\qquad
+\partial_\xi^\alpha \widehat f(\xi)
+=
+(-2\pi i)^{|\alpha|}
+\widehat{x^\alpha f}(\xi).
+\]
+
+<p>所以如果你只控制导数，不控制 \(x^\alpha f\)，那 Fourier 变换后的正则性就不完整；反过来，如果你只控制尾部而不控制导数，分部积分和反演都会变钝。Schwartz 定义恰好把这两个方向一次性打包。</p>
+
+<p>有时你也会看到等价写法</p>
+
+\[
+\sup_{x\in\mathbb R^n}(1+|x|)^N |\partial^\beta f(x)|<\infty
+\qquad
+\text{for all }N,\beta.
+\]
+
+<p>这和前面的 \(x^\alpha\) 写法是等价的。因为 \(x^\alpha\) 都被某个 \((1+|x|)^N\) 控住，而 \((1+|x|)^N\) 也能被有限个单项式的和控制。你在实际证明里会交替使用这两种语言：前者更适合和 Fourier 公式配对，后者更适合直观看“快速衰减”。</p>
+
+<h2 id="sec8-3">8.3 半范数族：\(\mathcal S\) 不只是集合，它还带着自己的拓扑</h2>
+
+<p>到这里若只停在“属于还是不属于 \(\mathcal S\)”这一层，事情还不够。因为后面你会不断处理函数列：Gaussian 近似、平滑核、截断函数、逼近恒等式、频率截断。于是你必须知道，什么叫做“在 Schwartz 空间里收敛”。这不是单纯的逐点收敛，也不是只看一个范数的收敛，而是同时要求所有导数和所有尾部控制都一起收敛。</p>
+
+<p>标准做法是引入一族半范数。对任意多重指标 \(\alpha,\beta\)，定义</p>
+
+\[
+\boxed{
+p_{\alpha,\beta}(f)
+=
+\sup_{x\in\mathbb R^n}|x^\alpha \partial^\beta f(x)|.
+}
+\]
+
+<p>它们叫半范数而不是范数，是因为可能有 \(p_{\alpha,\beta}(f)=0\) 对某些 \(\alpha,\beta\) 成立，而 \(f\) 并不一定是零函数；只有“对所有 \(\alpha,\beta\) 都为零”时，才能推出 \(f=0\)。真正的拓扑是由整族 \(\{p_{\alpha,\beta}\}\) 一起生成的。</p>
+
+<p>于是 \(f_k\to f\) 在 \(\mathcal S(\mathbb R^n)\) 中的意思是：</p>
+
+\[
+\forall \alpha,\beta,\qquad
+p_{\alpha,\beta}(f_k-f)\to 0.
+\]
+
+<p>把话翻译成人话，就是：不但 \(f_k\) 自己在所有多项式权重下都一致逼近 \(f\)，而且每一阶导数也都在所有多项式权重下一致逼近。这种收敛非常强。它强到足以保证你把微分、乘多项式、Fourier 变换这些操作都放心地逐项送过去。</p>
+
+<p>你可能会问：既然有半范数族，能不能把它们压成一个真正的度量？可以。先把所有成对指标 \((\alpha,\beta)\) 排成一列 \(q_1,q_2,\dots\)，其中每个</p>
+
+\[
+q_m(f)=p_{\alpha(m),\beta(m)}(f).
+\]
+
+<p>然后定义</p>
+
+\[
+d(f,g)=\sum_{m=1}^\infty 2^{-m}\frac{q_m(f-g)}{1+q_m(f-g)}.
+\]
+
+<p>这个度量和半范数族生成同一拓扑。于是 \(\mathcal S(\mathbb R^n)\) 变成一个可度量、完备、局部凸的拓扑向量空间，也就是所谓的 Fréchet 空间。</p>
+
+\[
+\boxed{
+\mathcal S(\mathbb R^n)
+\text{ 带着半范数族 }p_{\alpha,\beta}\text{ 成为一个 Fréchet 空间。}
+}
+\]
+
+<p>为什么这里偏偏不是 Banach 空间？因为你找不到一个单独范数同时精确编码“所有阶导数”和“所有阶尾部”这两串无穷条件；而半范数族却天然适合这件事。这种现象在现代分析里非常常见：Banach 空间适合只盯一个尺度，Fréchet 空间适合同时盯无穷多个尺度。Schwartz 空间正是后者的典型代表。</p>
+
+<p><strong>例题 2.</strong> 设 \(\phi(x)=e^{-\pi |x|^2}\)，定义</p>
+
+\[
+\phi_k(x)=\frac1{k}\phi(x).
+\]
+
+<p>证明 \(\phi_k\to 0\) 在 \(\mathcal S(\mathbb R^n)\) 中成立。</p>
+
+<p>对任意 \(\alpha,\beta\)，因为微分是线性的，</p>
+
+\[
+\partial^\beta \phi_k(x)=\frac1k \partial^\beta \phi(x).
+\]
+
+<p>于是</p>
+
+\[
+p_{\alpha,\beta}(\phi_k)
+=
+\sup_x |x^\alpha \partial^\beta \phi_k(x)|
+=
+\frac1k \sup_x |x^\alpha \partial^\beta \phi(x)|
+=
+\frac1k\, p_{\alpha,\beta}(\phi).
+\]
+
+<p>只要知道 \(\phi\in\mathcal S\)，右边就趋于 0。所以对所有 \(\alpha,\beta\) 都有 \(p_{\alpha,\beta}(\phi_k)\to0\)，即 \(\phi_k\to0\) 于 \(\mathcal S\)。</p>
+
+<p>这个例子很简单，却点出了关键：在 \(\mathcal S\) 中收敛不是抽象口号，而就是“所有半范数一起收敛”。以后你看到一列 mollifier、cutoff 或 Gaussian 逼近时，脑子里都该自动切换到这个标准。</p>
+
+<h2 id="sec8-4">8.4 第一批典型成员：Gaussian 以及多项式乘 Gaussian</h2>
+
+<p>Schwartz 空间里最重要的原型函数是 Gaussian。你几乎可以把它看成整套 Fourier 分析的“圆”。先从</p>
+
+\[
+\gamma(x)=e^{-\pi |x|^2}
+\]
+
+<p>开始。为什么它在 \(\mathcal S(\mathbb R^n)\) 里？关键是每次求导，都会得到“多项式乘同一个 Gaussian”。更准确地说，对每个多重指标 \(\beta\)，存在某个多项式 \(P_\beta(x)\)，使得</p>
+
+\[
+\partial^\beta \gamma(x)=P_\beta(x)e^{-\pi |x|^2}.
+\]
+
+<p>这件事你可以用归纳法证明。零阶时显然成立。若对 \(\beta\) 成立，那么对某个 \(j\) 再求一次导数，得到</p>
+
+\[
+\partial_j\bigl(P_\beta(x)e^{-\pi |x|^2}\bigr)
+=
+(\partial_j P_\beta)(x)e^{-\pi |x|^2}
+-2\pi x_j P_\beta(x)e^{-\pi |x|^2},
+\]
+
+<p>仍然是多项式乘 Gaussian 的形式。</p>
+
+<p>于是对任意 \(\alpha,\beta\)，</p>
+
+\[
+x^\alpha \partial^\beta \gamma(x)
+=
+x^\alpha P_\beta(x)e^{-\pi |x|^2}.
+\]
+
+<p>右边是某个多项式乘 \(e^{-\pi |x|^2}\)。而指数衰减会压倒任何多项式增长，所以它在整个 \(\mathbb R^n\) 上有界。这就证明了 \(\gamma\in\mathcal S(\mathbb R^n)\)。</p>
+
+<p><strong>例题 3.</strong> 证明对任意多项式 \(P(x)\)，函数</p>
+
+\[
+f(x)=P(x)e^{-\pi |x|^2}
+\]
+
+<p>仍属于 \(\mathcal S(\mathbb R^n)\)。</p>
+
+<p>设 \(\beta\) 任意。由 Leibniz 公式，\(\partial^\beta f\) 是有限和：</p>
+
+\[
+\partial^\beta f
+=
+\sum_{\eta\le \beta}
+\binom{\beta}{\eta}
+\bigl(\partial^\eta P\bigr)
+\bigl(\partial^{\beta-\eta} e^{-\pi |x|^2}\bigr).
+\]
+
+<p>而上面已经知道</p>
+
+\[
+\partial^{\beta-\eta} e^{-\pi |x|^2}
+=
+Q_{\beta-\eta}(x)e^{-\pi |x|^2}
+\]
+
+<p>对某个多项式 \(Q_{\beta-\eta}\) 成立，所以</p>
+
+\[
+\partial^\beta f(x)
+=
+R_\beta(x)e^{-\pi |x|^2}
+\]
+
+<p>其中 \(R_\beta\) 仍是多项式。再乘上任意 \(x^\alpha\)，得到</p>
+
+\[
+x^\alpha \partial^\beta f(x)
+=
+x^\alpha R_\beta(x)e^{-\pi |x|^2}.
+\]
+
+<p>这仍是多项式乘 Gaussian，于是有界。因此所有半范数都有限，\(f\in\mathcal S(\mathbb R^n)\)。</p>
+
+\[
+\boxed{
+P(x)e^{-\pi |x|^2}\in\mathcal S(\mathbb R^n)
+\qquad
+\text{对任意多项式 }P.
+}
+\]
+
+<p>这个结论以后会反复出现。因为很多 Fourier 变换计算到最后，都会长成“多项式乘 Gaussian”；热核、Hermite 函数、许多基本解的局部模型也都会在这一族附近活动。你可以把这一类函数视为 \(\mathcal S\) 里最顺手的一群显式成员。</p>
+
+<p>顺便说一句，Gaussian 之所以特别，不只是因为它在 \(\mathcal S\) 里，还因为第 9 章你会看到它的 Fourier 变换还是 Gaussian。也就是说，它同时在物理空间和频率空间里都是最规矩的那一个。一个对象能把两边都兼顾到这种程度，在分析里很罕见。</p>
+
+<h2 id="sec8-5">8.5 紧支光滑函数为什么自动属于 \(\mathcal S\)</h2>
+
+<p>虽然 \(\mathcal S\) 比 \(C_c^\infty\) 大，但紧支光滑函数当然全部包含在里面。这一点既简单，又非常重要，因为你在<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>里已经用过 \(C_c^\infty\) 的卷积稠密性；现在只要知道 \(C_c^\infty\subset\mathcal S\)，很多近似结论就能直接搬过来。</p>
+
+<p>设 \(f\in C_c^\infty(\mathbb R^n)\)。那么存在紧集 \(K\subset\mathbb R^n\)，使 \(f(x)=0\) 对 \(x\notin K\) 成立。于是对任意 \(\beta\)，导数 \(\partial^\beta f\) 也仍然紧支撑在 \(K\) 中。再乘上任意单项式 \(x^\alpha\)，函数</p>
+
+\[
+x^\alpha \partial^\beta f(x)
+\]
+
+<p>仍然连续且支撑在同一个紧集 \(K\) 中。连续函数在紧集上有界，所以</p>
+
+\[
+\sup_{x\in\mathbb R^n}|x^\alpha \partial^\beta f(x)|
+=
+\sup_{x\in K}|x^\alpha \partial^\beta f(x)|<\infty.
+\]
+
+<p>这对所有 \(\alpha,\beta\) 都成立，于是 \(f\in\mathcal S(\mathbb R^n)\)。</p>
+
+\[
+\boxed{
+C_c^\infty(\mathbb R^n)\subset \mathcal S(\mathbb R^n).
+}
+\]
+
+<p><strong>例题 4.</strong> 考虑标准 bump 函数</p>
+
+\[
+\psi(x)=
+\begin{cases}
+\exp\!\bigl(-\dfrac1{1-|x|^2}\bigr),& |x|&lt;1,\\[6pt]
+0,& |x|\ge 1.
+\end{cases}
+\]
+
+<p>证明 \(\psi\in\mathcal S(\mathbb R^n)\)。</p>
+
+<p>先说光滑性。对 \(|x|&lt;1\)，它是复合光滑函数；对 \(|x|&gt;1\)，恒等于 0；真正需要检查的是边界 \(|x|=1\) 处。经典结论是，\(\exp(-1/t)\) 在 \(t\downarrow0\) 时比任何幂次 \(t^m\) 都衰减得更快，因此它在边界处不仅趋于 0，而且所有导数也都趋于 0。于是延拓后的 \(\psi\) 属于 \(C^\infty(\mathbb R^n)\)。</p>
+
+<p>再看支撑。显然 \(\operatorname{supp}\psi\subset \overline{B(0,1)}\)，是紧集。所以对任意 \(\alpha,\beta\)，函数 \(x^\alpha \partial^\beta \psi\) 连续且紧支撑，因此有界。于是 \(\psi\in\mathcal S(\mathbb R^n)\)。</p>
+
+<p>这个例子值得你记住，因为它说明一件简单却常被忽略的事：Schwartz 空间不是“只允许无穷尾巴但衰减很快”的空间，紧支撑函数在里面当然也是合法成员。换句话说，\(\mathcal S\) 同时容纳了两种好对象：一种像 bump 那样“尾巴直接剪掉”，另一种像 Gaussian 那样“尾巴还在，但衰减快得几乎看不见”。</p>
+
+<p>反过来，并不是每个光滑可积函数都在 \(\mathcal S\) 里。比如一维函数</p>
+
+\[
+g(x)=\frac1{1+x^2}
+\]
+
+<p>就给出一个很好的反例。它当然 \(C^\infty\)，而且</p>
+
+\[
+\int_{\mathbb R}\frac1{1+x^2}\,dx=\pi&lt;\infty.
+\]
+
+<p>但若取 \(\alpha=3,\beta=0\)，则</p>
+
+\[
+x^3 g(x)=\frac{x^3}{1+x^2},
+\]
+
+<p>它在 \(|x|\to\infty\) 时像 \(x\)，因而无界。于是 \(p_{3,0}(g)=\infty\)，\(g\notin\mathcal S(\mathbb R)\)。这一刀很关键：\(\mathcal S\) 要的是“任意阶多项式都压不住它的尾部”，而不是“某个固定幂次下可积”这么弱的条件。</p>
+
+<h2 id="sec8-6">8.6 \(\mathcal S\) 里的基本运算：微分、乘多项式、平移与 \(L^p\) 可积性</h2>
+
+<p>一个函数空间值不值钱，不只看定义好不好听，还看它在常用操作下是否封闭。Schwartz 空间之所以稳，就是因为你最常做的那些动作几乎都不会把函数扔出去。</p>
+
+<p>先看微分。如果 \(f\in\mathcal S(\mathbb R^n)\)，那么对任意 \(\gamma\)，函数 \(\partial^\gamma f\) 仍在 \(\mathcal S\)。证明几乎不用算：对任意 \(\alpha,\beta\)，</p>
+
+\[
+p_{\alpha,\beta}(\partial^\gamma f)
+=
+\sup_x |x^\alpha \partial^{\beta+\gamma}f(x)|,
+\]
+
+<p>而右边有限，因为 \(f\in\mathcal S\)。</p>
+
+<p>再看乘多项式。若 \(x^\gamma f\) 表示把 \(f\) 乘上一个单项式，那么</p>
+
+\[
+\partial^\beta(x^\gamma f)
+\]
+
+<p>由 Leibniz 公式展开后，是有限个“多项式乘某阶导数”的和。由于 \(f\) 的所有这类对象都被半范数控制，所以 \(x^\gamma f\in\mathcal S\)。于是你可以把“求导”和“乘坐标”都理解成 \(\mathcal S\) 上的连续线性算子。</p>
+
+<p>平移也一样。若 \((\tau_a f)(x)=f(x-a)\)，那么</p>
+
+\[
+x^\alpha \partial^\beta(\tau_a f)(x)
+=
+x^\alpha (\partial^\beta f)(x-a).
+\]
+
+<p>把 \(y=x-a\) 代入后，\(x^\alpha=(y+a)^\alpha\) 可展开成有限个 \(y^\eta\) 的线性组合，因此仍被有限多个半范数控制。这说明每个固定平移 \(\tau_a\) 都把 \(\mathcal S\) 映到自身。</p>
+
+<p>这些稳定性并非只是形式漂亮。第 9 章里平移会对应频率空间里的相位因子，乘坐标会对应频率导数，微分会对应乘上 \(\xi\) 的多项式。若空间本身不在这些动作下封闭，Fourier 理论就会变成“每做一步都得重新检查定义域”的麻烦游戏。</p>
+
+<p>另一个必须记住的事实是：\(\mathcal S(\mathbb R^n)\subset L^p(\mathbb R^n)\) 对所有 \(1\le p\le\infty\) 都成立。理由并不复杂。给定 \(f\in\mathcal S\) 和 \(1\le p&lt;\infty\)，取整数 \(N&gt;n/p\)。由于</p>
+
+\[
+\sup_x (1+|x|)^N |f(x)| &lt; \infty,
+\]
+
+<p>存在常数 \(C_N\) 使</p>
+
+\[
+|f(x)|\le C_N(1+|x|)^{-N}.
+\]
+
+<p>于是</p>
+
+\[
+|f(x)|^p\le C_N^p(1+|x|)^{-Np}.
+\]
+
+<p>而 \(Np&gt;n\) 保证</p>
+
+\[
+\int_{\mathbb R^n}(1+|x|)^{-Np}\,dx&lt;\infty,
+\]
+
+<p>所以 \(f\in L^p\)。对 \(p=\infty\) 则更显然，因为 \(p_{0,0}(f)&lt;\infty\) 就说明 \(f\) 有界。</p>
+
+\[
+\boxed{
+f\in\mathcal S(\mathbb R^n)
+\Longrightarrow
+f\in L^p(\mathbb R^n)\quad \text{for every }1\le p\le\infty.
+}
+\]
+
+<p>这条结论以后会不断被默默使用。比如第 9 章你写 Fourier 变换时，不必担心积分是否存在；第 10 章讨论 \(L^2\) 等距时，\(\mathcal S\) 又自动是 \(L^2\) 的一个稠密子空间；第 11 章做 Gaussian 正则化时，\(L^1\) 和 \(L^\infty\) 两头的估计也都能从这里借力。</p>
+
+<h2 id="sec8-7">8.7 为什么说 \(\mathcal S\) 是“测试函数”空间</h2>
+
+<p>“测试函数”这个词第一次出场时，很多人会误会成“拿来做题的函数”。其实它真正的意思更像探针。你手里有一个可能很粗糙、甚至根本不是逐点函数的对象时，不一定能直接问它“你在 \(x\) 点等于多少”，但你往往还能问：“它和一个足够好的光滑函数配对之后给出什么数？”这就是测试函数空间的角色。</p>
+
+<p>在分布理论最经典的版本里，测试函数空间是 \(C_c^\infty\)。这在局部问题里非常好用，因为紧支撑意味着你只探测一个有限区域。可到了 Fourier 分析里，你经常需要测试函数在频率空间下仍然保持同等品质。这里 \(C_c^\infty\) 就不够圆滑了：一个紧支撑光滑函数的 Fourier 变换一般不再紧支撑。Schwartz 空间却刚好弥补这个缺口，因为第 9 章会证明</p>
+
+\[
+\mathcal F(\mathcal S)=\mathcal S.
+\]
+
+<p>也就是说，\(\mathcal S\) 在 Fourier 变换下闭合。你在物理空间里拿它做探针，变到频率空间里它还是同一种探针。这正是缓增分布 \(S'(\mathbb R^n)\) 会在第 12 章取代 \(D'(\mathbb R^n)\) 成为 Fourier 分析主角的原因。</p>
+
+<p>你现在即使还没学分布，也已经可以感受到这种设计的必要性。比如对 \(f\in L^1_{\mathrm{loc}}\) 和 \(\phi\in\mathcal S\)，配对</p>
+
+\[
+\langle f,\phi\rangle=\int_{\mathbb R^n} f(x)\phi(x)\,dx
+\]
+
+<p>往往比对任意连续函数都稳定得多，因为 \(\phi\) 的快速衰减会主动压低无穷远处的影响。再比如分部积分</p>
+
+\[
+\int_{\mathbb R^n} f(x)\,\partial^\beta \phi(x)\,dx
+\]
+
+<p>也不怕边界项，因为 \(\phi\) 及其导数都在无穷远处快得不能再快。你可以把这件事理解成：\(\mathcal S\) 不是随便选的一群好函数，而是专门为了让“微分”和“Fourier 变换”这两个操作都无后顾之忧地传递给粗糙对象而设计出来的。</p>
+
+<p>这和<a href="../实分析/ch24.html">《实分析读本》第 24 章</a>里你第一次接触 \(L^p\) 空间时的思路其实一脉相承。那里强调的是“点值并不总可靠，范数和积分结构才更稳”；这里更进一步，说的是“即便点值与经典导数都开始摇晃，只要你还会和一批足够好的探针配对，分析就还能继续做下去”。第 8 章的真正地位，正是在这里开始显现：它不只是下一章的预备知识，而是整条分布与 Fourier 技术线的语言起点。</p>
+
+<h2 id="sec8-8">8.8 \(C_c^\infty\subset\mathcal S\) 之后，为什么 \(\mathcal S\) 在 \(L^p\) 中也稠密</h2>
+
+<p>现在进入本章最实用的结论之一：对每个 \(1\le p&lt;\infty\)，\(\mathcal S(\mathbb R^n)\) 在 \(L^p(\mathbb R^n)\) 中稠密。也就是说，任意 \(L^p\) 函数都可以在 \(L^p\) 意义下被 Schwartz 函数逼近。</p>
+
+<p>如果你还记得<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>的结论，这件事其实已经几乎完成了。那里我们已经知道 \(C_c^\infty(\mathbb R^n)\) 在 \(L^p\) 中稠密；而第 8.5 节刚证明</p>
+
+\[
+C_c^\infty(\mathbb R^n)\subset \mathcal S(\mathbb R^n).
+\]
+
+<p>于是立刻得到</p>
+
+\[
+\overline{\mathcal S(\mathbb R^n)}^{\,L^p}=L^p(\mathbb R^n)
+\qquad (1\le p&lt;\infty).
+\]
+
+<p>这已经是一个完整证明。不过为了让你真正看见逼近是怎样发生的，我们还是把最常用的构造写一遍。设 \(f\in L^p(\mathbb R^n)\)，给定 \(\varepsilon&gt;0\)。先利用尾部可控性，取 \(R\) 足够大，使</p>
+
+\[
+\|f-f\mathbf 1_{B(0,R)}\|_p&lt;\frac{\varepsilon}{3}.
+\]
+
+<p>记 \(f_R=f\mathbf 1_{B(0,R)}\)。它已经有紧支撑，但未必光滑。接着取一个标准 mollifier \(\rho\in C_c^\infty(\mathbb R^n)\)，满足 \(\rho\ge0\)、\(\int\rho=1\)，并令</p>
+
+\[
+\rho_\delta(x)=\delta^{-n}\rho(x/\delta).
+\]
+
+<p>那么当 \(\delta\downarrow0\) 时，由卷积逼近恒等式，</p>
+
+\[
+\|f_R-f_R*\rho_\delta\|_p&lt;\frac{\varepsilon}{3}
+\]
+
+<p>对足够小的 \(\delta\) 成立。另一方面，\(f_R*\rho_\delta\in C_c^\infty(\mathbb R^n)\)，因此也属于 \(\mathcal S(\mathbb R^n)\)。于是取</p>
+
+\[
+\phi=f_R*\rho_\delta\in\mathcal S(\mathbb R^n),
+\]
+
+<p>就有</p>
+
+\[
+\|f-\phi\|_p
+\le
+\|f-f_R\|_p+\|f_R-f_R*\rho_\delta\|_p
+&lt;
+\frac{2\varepsilon}{3}.
+\]
+
+<p>若你还想更保险，可以在一开始先把 \(f\) 再做一次高度截断，让它先变成有界紧支撑函数，再卷积。这在处理某些局部估计时更方便，但对稠密性本身并不是必须的。</p>
+
+\[
+\boxed{
+\overline{\mathcal S(\mathbb R^n)}^{\,L^p}=L^p(\mathbb R^n),
+\qquad 1\le p&lt;\infty.
+}
+\]
+
+<p><strong>例题 5.</strong> 说明为什么上面的结论对 \(p=\infty\) 一般不成立。</p>
+
+<p>最简单的反例就是常数函数 \(f(x)\equiv1\)。任取 \(\phi\in\mathcal S(\mathbb R^n)\)，由于 \(\phi(x)\to0\) 当 \(|x|\to\infty\)，总能找到某个足够远的 \(x\) 使</p>
+
+\[
+|\phi(x)|&lt;\frac12.
+\]
+
+<p>于是</p>
+
+\[
+|1-\phi(x)|&gt;\frac12,
+\]
+
+<p>从而</p>
+
+\[
+\|1-\phi\|_\infty\ge \frac12.
+\]
+
+<p>这说明常数函数不可能被 Schwartz 函数在 \(L^\infty\) 范数下逼近。原因也很直观：\(\mathcal S\) 的所有成员都必须在无穷远处趋于 0，而常数函数永远不掉下去。所以“\(\mathcal S\) 在 \(L^p\) 中稠密”必须明确写成 \(1\le p&lt;\infty\)。</p>
+
+<p>这条边界感很重要。现代分析里很多漂亮结论都是“对所有 \(p&lt;\infty\) 成立，但在 \(p=\infty\) 处折断”。以后你会在极大函数、奇异积分和 Sobolev 嵌入里一遍又一遍看到同样的现象。</p>
+
+<h2 id="sec8-9">8.9 从这一章带走什么：\(\mathcal S\) 是 Fourier 与分布共同认可的工作语言</h2>
+
+<p>现在你可以回头看，第 8 章看似只是在定义一个特殊函数空间，实际上却完成了三件大事。第一，它找到了整空间 Fourier 分析的一块稳定试验台：函数足够光滑，尾部足够可控，操作足够封闭。第二，它把“收敛”从单一范数升级成了一族半范数控制下的 Fréchet 拓扑，于是你以后不只会说“这个函数列在 \(L^2\) 里收敛”，还会说“它在所有导数与所有尾部权重下一起收敛”。第三，它把测试函数的概念从局部用的 \(C_c^\infty\) 推到了全空间 Fourier 理论真正需要的 \(\mathcal S\)。</p>
+
+<p>从使用角度说，你以后可以把 \(\mathcal S(\mathbb R^n)\) 当成一个默认安全区。只要对象先待在这里，你就几乎总能放心地做下面这些操作：积分、分部积分、乘多项式、求任意阶导数、做 Fourier 变换、做反演、和 Gaussian 卷积、把极限送过这些操作。现代分析里大量证明之所以先从 Schwartz 函数开始，再通过稠密性推广到 \(L^2\)、\(L^p\) 或分布，原因不是大家喜欢绕路，而是这块安全区实在太稳。</p>
+
+<p>这也解释了为什么第 8 章必须先于第 9 到第 11 章出现。Fourier 变换最迷人的性质当然是卷积变乘法、Gaussian 仍是 Gaussian、Plancherel 等距、反演公式成立；但如果没有 \(\mathcal S\) 这块地板，这些结论一上来都只能半悬空。你现在已经把地板铺好了。下一章开始，Fourier 变换将第一次在 \(\mathbb R^n\) 上以最干净的形式出场。</p>
+
+<p>再往远一点看，第 8 章还有一层更深的意义。它告诉你，分析里的“函数空间”从来不只是容器，而是主动参与组织理论的结构件。你选什么空间开局，决定了后面哪些操作是天然的、哪些结论是闭合的、哪些推广是通过稠密性做出来的。Schwartz 空间之所以经典，不是因为它名字常见，而是因为它几乎以最经济的方式同时照顾了光滑、衰减、Fourier 对称性与分布配对这四件事。</p>
+
+<p>所以以后再看到 \(\phi\in\mathcal S(\mathbb R^n)\) 这种写法，别把它当成“随便取一个很好很好的函数”。那背后真正的意思是：我们接下来要在一个所有细节都已经被妥善驯服的世界里工作。一旦这个世界的规律搞清楚，再借稠密性、闭包和对偶把结论推向更粗糙的对象。这正是现代调和分析、偏微分方程与分布理论反复采用的推进方式。</p>
+
+<p>第 9 章开始，你会看到这套语言立刻开花结果：\(\mathcal S\) 在 Fourier 变换下保持不变，平移、调制、伸缩、求导和卷积都会在频率空间里找到干净的对应规则。到那时你会意识到，第 8 章并不是“定义堆积的一章”，而是后面一整段理论能够用同一种语法说话的关键转轴。</p>
+
+<hr class="section-end">
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 Gibbs 现象</a><a href="ch9.html">下一章 · 第 9 章 \( \mathbb R^n \) 上的 Fourier 变换：基础性质 →</a></nav>
+
+</main>
+</body>
+</html>

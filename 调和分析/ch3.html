@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 Fourier 系数与 Riemann-Lebesgue 引理 — 普林斯顿调和分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 三角级数与正交基视角</a><a href="ch4.html">下一章 · 第 4 章 Dirichlet 核与逐点收敛 →</a></nav>
+<h1 id="ch3">第 3 章 Fourier 系数与 Riemann-Lebesgue 引理</h1>
+
+<p>上一章我们把三角函数族放进了正交基的视角。那一章的重心是几何：系数是投影坐标，部分和是正交投影，Parseval 是无穷维勾股定理。现在要把目光聚焦到坐标本身，也就是 Fourier 系数 \(\widehat f(n)\)。一旦你认真盯住这些系数，就会发现很多关于函数粗糙度、局部结构和 PDE 正则化的信息，根本不用先看和式就已经写在它们的衰减速度里。</p>
+
+<p>粗略地说，函数越光滑，高频系数衰减越快；函数有跳跃，高频通常只能做到 \(1/n\) 级别；函数连续但有尖角，则往往能推进到 \(1/n^2\)。这类说法今天听起来很自然，可它背后其实连接着两个层次。较强的层次来自分部积分：只要你有导数，就能定量地换来一个 \(1/n\)。较弱但极其普遍的层次，则是 Riemann-Lebesgue 引理：哪怕 \(f\) 只有 \(L^1\) 可积那么粗，\(\widehat f(n)\) 仍然必定趋于零。</p>
+
+<p>这一章和 <a href="../实分析/ch19.html">《实分析读本》第 19 章</a> 之间联系极深。那一章主要关心部分和 \(S_Nf\) 的收敛，这一章则先把视角后撤一步，单独研究“坐标本身”会告诉你什么。它也会不断和 <a href="../偏微分方程/ch5.html">偏微分方程第 5 章</a> 遥相呼应：热方程的平滑效应为什么这么强，频率端看过去其实就是高频系数被额外乘上了强烈衰减因子。</p>
+
+<h2 id="sec3-1">3.1 Fourier 系数究竟是什么</h2>
+
+<p>对 \(2\pi\)-周期可积函数 \(f\)，复 Fourier 系数定义为</p>
+
+\[
+\boxed{\widehat f(n)=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-inx}\,dx,\qquad n\in\mathbb Z.}
+\]
+
+<p>如果你更喜欢实系数写法，那么</p>
+
+\[
+f(x)\sim \frac{a_0}{2}+\sum_{n=1}^{\infty}\bigl(a_n\cos nx+b_n\sin nx\bigr)
+\]
+
+<p>中的系数由</p>
+
+\[
+a_n=\frac1\pi\int_{-\pi}^{\pi}f(x)\cos(nx)\,dx,\qquad
+b_n=\frac1\pi\int_{-\pi}^{\pi}f(x)\sin(nx)\,dx
+\]
+
+<p>给出，并与复系数满足</p>
+
+\[
+\widehat f(0)=\frac{a_0}{2},\qquad
+\widehat f(n)=\frac{a_n-ib_n}{2}\ (n\ge1),\qquad
+\widehat f(-n)=\frac{a_n+ib_n}{2}\ (n\ge1).
+\]
+
+<p>所以研究 \(\widehat f(n)\) 与研究 \(a_n,b_n\) 没有本质差别。只是复写法把“正频率”和“负频率”放在同一个公式里，后面谈导数、卷积和 Fourier 变换时会更整洁。</p>
+
+<p>从 Hilbert 空间的角度说，\(\widehat f(n)\) 就是 \(f\) 在正交归一基</p>
+
+\[
+e_n(x)=\frac{1}{\sqrt{2\pi}}e^{inx}
+\]
+
+<p>上的坐标，只差一个归一化常数。也就是说，\(\widehat f(n)\) 不是神秘积分，而是频率 \(n\) 这一方向上的投影强度。于是高频系数小，意思不是“公式碰巧算出来小”，而是“函数在高频方向上的分量本来就弱”。</p>
+
+<h3 id="sec3-1-1">例题 1：\(f(x)=x\) 的复 Fourier 系数为什么只按 \(1/n\) 衰减</h3>
+
+<p>设 \(f(x)=x\) 在 \((-\pi,\pi)\) 上定义，并作 \(2\pi\)-周期延拓。上一章我们已经算出它的实系数为</p>
+
+\[
+a_n=0,\qquad b_n=\frac{2(-1)^{n+1}}{n}\qquad (n\ge1).
+\]
+
+<p>因此对 \(n\ge1\)，</p>
+
+\[
+\widehat f(n)=\frac{a_n-ib_n}{2}=-\frac{i}{2}\cdot \frac{2(-1)^{n+1}}{n}
+=\frac{i(-1)^n}{n}.
+\]
+
+<p>而对负指标 \(n=-m&lt;0\)，</p>
+
+\[
+\widehat f(-m)=\frac{a_m+ib_m}{2}=\frac{i}{2}\cdot \frac{2(-1)^{m+1}}{m}
+=-\frac{i(-1)^m}{m}
+=\frac{i(-1)^{-m}}{-m}.
+\]
+
+<p>于是统一写成</p>
+
+\[
+\widehat f(0)=0,\qquad \widehat f(n)=\frac{i(-1)^n}{n}\qquad (n\ne0).
+\]
+
+<p>这已经是一条非常重要的信号：\(x\) 在区间内部十分光滑，但它的周期延拓在 \(\pm\pi\) 处有跳跃，所以系数只能做到 \(1/n\) 级衰减，而不会更快。</p>
+
+<h2 id="sec3-2">3.2 分部积分第一次暴露了衰减率</h2>
+
+<p>如果 \(f\) 足够光滑，Fourier 系数为什么会衰减？最直接的答案来自分部积分。设 \(f\) 在 \([-\pi,\pi]\) 上绝对连续，并满足周期匹配条件 \(f(-\pi)=f(\pi)\)。对 \(n\ne0\)，有</p>
+
+\[
+\widehat f(n)=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-inx}\,dx.
+\]
+
+<p>对这个积分分部积分，取 \(u=f(x)\), \(dv=e^{-inx}\,dx\)，则 \(du=f'(x)\,dx\), \(v=e^{-inx}/(-in)\)。于是</p>
+
+\[
+\widehat f(n)
+=\frac{1}{2\pi}\left[\frac{f(x)e^{-inx}}{-in}\right]_{-\pi}^{\pi}
++\frac{1}{2\pi in}\int_{-\pi}^{\pi}f'(x)e^{-inx}\,dx.
+\]
+
+<p>边界项之所以消失，是因为 \(f(\pi)=f(-\pi)\)，而 \(e^{-in\pi}=e^{in\pi}=(-1)^n\)。所以</p>
+
+\[
+\boxed{\widehat f(n)=\frac{1}{in}\,\widehat{f'}(n)\qquad (n\ne0).}
+\]
+
+<p>立刻得到估计</p>
+
+\[
+|\widehat f(n)|
+\le \frac{1}{|n|}\cdot \frac{1}{2\pi}\int_{-\pi}^{\pi}|f'(x)|\,dx
+=\frac{\|f'\|_{L^1[-\pi,\pi]}}{2\pi |n|}.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{f'\in L^1,\ f(-\pi)=f(\pi)\quad\Longrightarrow\quad \widehat f(n)=O\!\left(\frac1n\right).}
+\]
+
+<p>这只是第一步。如果 \(f\) 还能再分部积分一次，也就是 \(f'\) 也足够好，并且 \(f'(-\pi)=f'(\pi)\)，那么继续做就得</p>
+
+\[
+\widehat f(n)=\frac{1}{(in)^2}\widehat{f''}(n),
+\]
+
+<p>于是 \(\widehat f(n)=O(1/n^2)\)。一般地，若 \(f^{(k)}\in L^1\) 且前 \(k-1\) 阶导数都周期匹配，则</p>
+
+\[
+\boxed{\widehat f(n)=\frac{1}{(in)^k}\widehat{f^{(k)}}(n)\qquad (n\ne0),}
+\]
+
+<p>从而</p>
+
+\[
+|\widehat f(n)|\le \frac{\|f^{(k)}\|_{L^1}}{2\pi |n|^k}.
+\]
+
+<p>这就是“越光滑，系数越快衰减”的第一层严格版本。它还没有触及最优条件，但已经足够把许多经典现象解释得非常透。</p>
+
+<h3 id="sec3-2-1">例题 2：\(f(x)=x^2\) 的系数为什么是 \(1/n^2\) 级别</h3>
+
+<p>设 \(f(x)=x^2\) 在 \((-\pi,\pi)\) 上定义并作 \(2\pi\)-周期延拓。因为 \(f\) 是偶函数，所以只有余弦项。先算常数项：</p>
+
+\[
+a_0=\frac1\pi\int_{-\pi}^{\pi}x^2\,dx=\frac{2}{\pi}\int_0^\pi x^2\,dx
+=\frac{2}{\pi}\cdot\frac{\pi^3}{3}
+=\frac{2\pi^2}{3}.
+\]
+
+<p>故常数部分为 \(a_0/2=\pi^2/3\)。再算 \(a_n\)：</p>
+
+\[
+a_n=\frac{2}{\pi}\int_0^\pi x^2\cos(nx)\,dx.
+\]
+
+<p>记</p>
+
+\[
+I_n=\int_0^\pi x^2\cos(nx)\,dx.
+\]
+
+<p>第一次分部积分取 \(u=x^2\), \(dv=\cos(nx)\,dx\)，得</p>
+
+\[
+I_n=\left[\frac{x^2\sin(nx)}{n}\right]_0^\pi-\frac{2}{n}\int_0^\pi x\sin(nx)\,dx.
+\]
+
+<p>边界项为零，所以只剩</p>
+
+\[
+I_n=-\frac{2}{n}\int_0^\pi x\sin(nx)\,dx.
+\]
+
+<p>而上一章已经算过</p>
+
+\[
+\int_0^\pi x\sin(nx)\,dx=-\frac{\pi(-1)^n}{n}.
+\]
+
+<p>于是</p>
+
+\[
+I_n=-\frac{2}{n}\cdot\left(-\frac{\pi(-1)^n}{n}\right)=\frac{2\pi(-1)^n}{n^2}.
+\]
+
+<p>代回 \(a_n\)：</p>
+
+\[
+a_n=\frac{2}{\pi}I_n=\frac{2}{\pi}\cdot \frac{2\pi(-1)^n}{n^2}=\frac{4(-1)^n}{n^2}.
+\]
+
+<p>因此</p>
+
+\[
+x^2\sim \frac{\pi^2}{3}+4\sum_{n=1}^{\infty}\frac{(-1)^n}{n^2}\cos(nx).
+\]
+
+<p>对应的复系数为</p>
+
+\[
+\widehat{(x^2)}(0)=\frac{\pi^2}{3},\qquad \widehat{(x^2)}(\pm n)=\frac{2(-1)^n}{n^2}\quad (n\ge1).
+\]
+
+<p>和上一节的 \(x\) 比较一下就够了：多一阶平滑，衰减就从 \(1/n\) 提升到了 \(1/n^2\)。</p>
+
+<h2 id="sec3-3">3.3 跳跃、尖角与“衰减阶梯”</h2>
+
+<p>现在可以把直觉组织得更像一张地图了。对周期函数来说，系数衰减率主要受两个因素控制：一是区间内部的光滑度，二是周期拼接点处到底是连续、可导，还是出现了跳跃。很多学生第一次见 \(x\) 与 \(x^2\) 的 Fourier 级数时会困惑：明明二者在 \((-\pi,\pi)\) 内都很光滑，为什么一个是 \(1/n\)，一个是 \(1/n^2\)？答案就在于周期延拓后的边界匹配不同。\(x\) 在 \(-\pi\) 与 \(\pi\) 之间有高度 \(2\pi\) 的跳跃，而 \(x^2\) 在函数值上是接起来的，只是导数不接。</p>
+
+<p>这启发我们记住一条经验律。若周期延拓出现真正跳跃，那么高频通常只能做到 \(1/n\)；若函数连续但斜率断开，常见衰减是 \(1/n^2\)；若再多一阶平滑，便继续多赚一个 \(1/n\)。这条经验律在严格定理里要加上若干技术假设，但作为直觉已经极其可靠。</p>
+
+<p>你甚至可以从分部积分的边界项看见这一点。假如 \(f\) 在若干分点之间光滑，但整体有跳跃，那么分部积分时边界项不会完全抵消，恰恰留下与跳跃幅度同阶的 \(1/n\) 项。若函数值连续而导数有跳，那么第一次边界项抵消，第二次才露出裂缝，于是得到 \(1/n^2\)。正是这种“边界项什么时候开始不老实”，决定了衰减阶数什么时候停止提升。</p>
+
+<p>这条规律对 PDE 也很有解释力。热方程之所以会立刻把解变得光滑，是因为它在频率端等于给每个 \(\widehat f(n)\) 再乘一个 \(e^{-n^2t}\)；即便原始系数只按 \(1/n\) 衰减，时间一正，高频也会被指数项一网打尽。波动方程却不会额外惩罚高频，于是原来数据里的粗糙度会被老老实实带着跑。</p>
+
+<h3 id="sec3-3-1">例题 3：阶梯函数为什么只能给出 \(1/n\) 衰减</h3>
+
+<p>设</p>
+
+\[
+f(x)=
+\begin{cases}
+1,&0&lt;x&lt;\pi,\\
+-1,&-\pi&lt;x&lt;0,
+\end{cases}
+\]
+
+<p>并作 \(2\pi\)-周期延拓。这就是最典型的阶梯函数，它在 \(0\) 与 \(\pm\pi\) 处都有跳跃。因为 \(f\) 为奇函数，所以只需计算 \(b_n\)：</p>
+
+\[
+b_n=\frac1\pi\int_{-\pi}^{\pi}f(x)\sin(nx)\,dx
+=\frac{2}{\pi}\int_0^\pi \sin(nx)\,dx.
+\]
+
+<p>积分得到</p>
+
+\[
+\int_0^\pi \sin(nx)\,dx=\left[-\frac{\cos(nx)}{n}\right]_0^\pi
+=\frac{1-(-1)^n}{n}.
+\]
+
+<p>故</p>
+
+\[
+b_n=\frac{2}{\pi}\cdot \frac{1-(-1)^n}{n}
+=
+\begin{cases}
+\dfrac{4}{\pi n},&n\text{ 为奇数},\\[6pt]
+0,&n\text{ 为偶数}.
+\end{cases}
+\]
+
+<p>因此</p>
+
+\[
+f(x)\sim \frac4\pi\left(\sin x+\frac{\sin 3x}{3}+\frac{\sin 5x}{5}+\cdots\right).
+\]
+
+<p>你看到的正是最慢的典型频率衰减：只有 \(1/n\)。这不是算术偶然，而是跳跃的代价。后面讨论 Gibbs 现象时，你会发现这种慢衰减几乎已经把跳点附近的振铃提前写在系数里了。</p>
+
+<h2 id="sec3-4">3.4 Riemann-Lebesgue 引理：哪怕只有 \(L^1\) 可积，高频也必须消失</h2>
+
+<p>分部积分给出的结论很强，但它要求 \(f\) 有导数。现实里很多函数并没有。于是一个更根本的问题出现了：若 \(f\) 只有 \(L^1[-\pi,\pi]\) 可积那么粗，Fourier 系数至少还会趋向零吗？答案是肯定的，这就是 Riemann-Lebesgue 引理。</p>
+
+\[
+\boxed{f\in L^1[-\pi,\pi]\quad\Longrightarrow\quad \widehat f(n)\to 0\qquad (|n|\to\infty).}
+\]
+
+<p>等价地说，</p>
+
+\[
+\int_{-\pi}^{\pi}f(x)\cos(nx)\,dx\to0,\qquad
+\int_{-\pi}^{\pi}f(x)\sin(nx)\,dx\to0.
+\]
+
+<p>这条结论非常弱，因为它只给出“趋于零”而不给速率；但它又极强，因为它只要求 \(L^1\) 可积。证明分两步：先对阶梯函数证明，再用 \(L^1\) 逼近推广。</p>
+
+<p>第一步，设 \(g\) 是阶梯函数。也就是说，存在分点</p>
+
+\[
+-\pi=x_0&lt;x_1&lt;\cdots&lt;x_m=\pi
+\]
+
+<p>以及常数 \(c_1,\dots,c_m\)，使得</p>
+
+\[
+g(x)=c_j\qquad (x_{j-1}&lt;x&lt;x_j).
+\]
+
+<p>那么</p>
+
+\[
+\int_{-\pi}^{\pi}g(x)e^{-inx}\,dx
+=\sum_{j=1}^{m}c_j\int_{x_{j-1}}^{x_j}e^{-inx}\,dx.
+\]
+
+<p>而每一段都可以显式积分：</p>
+
+\[
+\int_{x_{j-1}}^{x_j}e^{-inx}\,dx
+=\left[\frac{e^{-inx}}{-in}\right]_{x_{j-1}}^{x_j}
+=\frac{e^{-inx_{j-1}}-e^{-inx_j}}{in}.
+\]
+
+<p>因此</p>
+
+\[
+\left|\int_{-\pi}^{\pi}g(x)e^{-inx}\,dx\right|
+\le \sum_{j=1}^{m}|c_j|\cdot \frac{|e^{-inx_{j-1}}|+|e^{-inx_j}|}{|n|}
+=\frac{2}{|n|}\sum_{j=1}^{m}|c_j|.
+\]
+
+<p>右边显然随 \(|n|\to\infty\) 趋于零，所以阶梯函数情形成立。</p>
+
+<p>第二步，对一般 \(f\in L^1[-\pi,\pi]\)，利用阶梯函数在 \(L^1\) 中稠密。给定任意 \(\varepsilon>0\)，可取阶梯函数 \(g\) 使得</p>
+
+\[
+\int_{-\pi}^{\pi}|f(x)-g(x)|\,dx&lt;\varepsilon.
+\]
+
+<p>于是</p>
+
+\[
+\left|\int_{-\pi}^{\pi}f(x)e^{-inx}\,dx\right|
+\le
+\left|\int_{-\pi}^{\pi}(f-g)(x)e^{-inx}\,dx\right|
++
+\left|\int_{-\pi}^{\pi}g(x)e^{-inx}\,dx\right|.
+\]
+
+<p>第一项由 \(|e^{-inx}|=1\) 控制：</p>
+
+\[
+\left|\int_{-\pi}^{\pi}(f-g)(x)e^{-inx}\,dx\right|
+\le \int_{-\pi}^{\pi}|f(x)-g(x)|\,dx&lt;\varepsilon.
+\]
+
+<p>第二项因为 \(g\) 是阶梯函数，故当 \(|n|\) 足够大时小于 \(\varepsilon\)。于是对足够大的 \(|n|\)，有</p>
+
+\[
+\left|\int_{-\pi}^{\pi}f(x)e^{-inx}\,dx\right|&lt;2\varepsilon.
+\]
+
+<p>由于 \(\varepsilon\) 任意，便得</p>
+
+\[
+\int_{-\pi}^{\pi}f(x)e^{-inx}\,dx\to0.
+\]
+
+<p>再除以 \(2\pi\)，就是 \(\widehat f(n)\to0\)。证明完毕。</p>
+
+<p>这条证明的味道和 <a href="../测度论/ch12.html">测度论第 12 章</a> 很一致：先在一个容易控制的稠密类上做清楚，再用逼近把结论推给一般对象。Fourier 分析里这是一种反复出现的工作流。</p>
+
+<h2 id="sec3-5">3.5 Riemann-Lebesgue 很弱，却已经足够锋利</h2>
+
+<p>Riemann-Lebesgue 引理只说 \(\widehat f(n)\to0\)，看上去像一句很省的结论。可你千万别小看它。第一，它立刻排除了很多不可能：任何 \(L^1\) 函数都不可能拥有“长期不衰减”的高频尾巴。第二，它把 Fourier 系数和通常的项级数区分开来：一个任意数列想当某个可积函数的 Fourier 系数，至少得趋于零。第三，它说明分部积分得到的 \(1/n\)、\(1/n^2\) 等精细速率，并不是从真空里多变出来的，而是在一个更普遍的“必趋零”背景上继续精炼。</p>
+
+<p>但这条引理也确实很弱。它不会告诉你衰减速度，更不会告诉你 Fourier 级数一定逐点收敛。你完全可能有一个函数，其系数趋于零，却因为趋得太慢、排列得太坏，导致部分和的局部行为仍然很棘手。收敛问题之所以会在后面几章重新成为主角，正是因为“系数趋零”离“级数老老实实收敛”还差得很远。</p>
+
+<p>从 PDE 的眼光看，这条引理也很耐人寻味。它只依赖振荡积分的平均抵消，因此没有给出任何平滑速率；而热方程在频率端做的是更强的事，它不是只让系数趋零，而是对每个频率乘上 \(e^{-n^2t}\)。也正因为这个乘子太强，热方程才会一瞬间把粗糙数据变成解析得多的对象。</p>
+
+<h2 id="sec3-6">3.6 经典例子：\(f(x)=|x|\) 的系数为什么按 \(1/n^2\) 衰减</h2>
+
+<p>现在来看一个“连续但有尖角”的标准例子。设 \(f(x)=|x|\) 在 \((-\pi,\pi)\) 上定义并作 \(2\pi\)-周期延拓。它是偶函数，所以只需算余弦系数。</p>
+
+<h3 id="sec3-6-1">例题 4：\(|x|\) 的 Fourier 系数完整计算</h3>
+
+<p>常数项为</p>
+
+\[
+a_0=\frac1\pi\int_{-\pi}^{\pi}|x|\,dx
+=\frac{2}{\pi}\int_0^\pi x\,dx
+=\frac{2}{\pi}\cdot \frac{\pi^2}{2}
+=\pi.
+\]
+
+<p>所以常数部分为 \(\pi/2\)。对 \(n\ge1\)，</p>
+
+\[
+a_n=\frac1\pi\int_{-\pi}^{\pi}|x|\cos(nx)\,dx
+=\frac{2}{\pi}\int_0^\pi x\cos(nx)\,dx.
+\]
+
+<p>分部积分，取 \(u=x\), \(dv=\cos(nx)\,dx\)，则</p>
+
+\[
+\int_0^\pi x\cos(nx)\,dx
+=\left[\frac{x\sin(nx)}{n}\right]_0^\pi-\frac1n\int_0^\pi\sin(nx)\,dx.
+\]
+
+<p>第一项为零，而</p>
+
+\[
+\int_0^\pi\sin(nx)\,dx=\frac{1-(-1)^n}{n}.
+\]
+
+<p>于是</p>
+
+\[
+\int_0^\pi x\cos(nx)\,dx
+=-\frac{1-(-1)^n}{n^2}
+=\frac{(-1)^n-1}{n^2}.
+\]
+
+<p>故</p>
+
+\[
+a_n=\frac{2}{\pi}\cdot \frac{(-1)^n-1}{n^2}.
+\]
+
+<p>也就是说，偶数 \(n\) 时 \(a_n=0\)，奇数 \(n\) 时</p>
+
+\[
+a_n=-\frac{4}{\pi n^2}.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{|x|=\frac{\pi}{2}-\frac{4}{\pi}\sum_{k=0}^{\infty}\frac{\cos((2k+1)x)}{(2k+1)^2}.}
+\]
+
+<p>这就是 \(1/n^2\) 衰减的经典样板。它连续，所以没有像阶梯函数那样留下 \(1/n\) 级边界项；但它在 \(x=0\) 处有尖角，故还不够光滑，无法继续提升到更快衰减。这种“连续但拐折”的粗糙度，恰好被 \(1/n^2\) 记录下来。</p>
+
+<h2 id="sec3-7">3.7 再看阶梯函数：只有 \(1/n\) 衰减时，后面会发生什么</h2>
+
+<p>最后把最粗糙的典型情形再看一遍，不过这次强调它和后面章节的关系。仍取上一节的阶梯函数</p>
+
+\[
+f(x)=
+\begin{cases}
+1,&0&lt;x&lt;\pi,\\
+-1,&-\pi&lt;x&lt;0,
+\end{cases}
+\]
+
+<p>其 Fourier 级数为</p>
+
+\[
+f(x)\sim \frac4\pi\left(\sin x+\frac{\sin 3x}{3}+\frac{\sin 5x}{5}+\cdots\right).
+\]
+
+<p>把这件事翻译成复系数形式。对奇数 \(n\neq0\)，有</p>
+
+\[
+\widehat f(n)=\frac{-ib_n}{2}
+=-\frac{i}{2}\cdot \frac{4}{\pi n}
+=-\frac{2i}{\pi n}
+\qquad (n>0,\ n\text{ 奇}),
+\]
+
+<p>对负奇数则由共轭关系得到</p>
+
+\[
+\widehat f(n)=-\frac{2i}{\pi n}\qquad (n\text{ 为奇数}),
+\]
+
+<p>而偶数 \(n\) 上系数全为零。于是统一写成</p>
+
+\[
+\boxed{
+\widehat f(n)=
+\begin{cases}
+-\dfrac{2i}{\pi n},&n\text{ 为奇数},\\[8pt]
+0,&n\text{ 为偶数},
+\end{cases}
+\qquad n\ne0.}
+\]
+
+<p>这个公式的意义不在于它本身长得多漂亮，而在于它预示着后面整串现象。因为系数只按 \(1/n\) 衰减，所以部分和不可能像 \(|x|\) 那样温和；跳点附近会出现明显振铃，这就是 Gibbs 现象。也因为衰减太慢，Dirichlet 核的坏脾气会被充分暴露出来，逐点收敛问题就不再能靠“看起来应该没事”敷衍过去。</p>
+
+<p>换句话说，Fourier 系数的衰减速度已经在提前剧透后面的剧情。你看到 \(1/n^2\)，就该猜到收敛通常会比 \(1/n\) 时老实得多；你看到系数只有 \(1/n\)，就该立刻警觉：跳跃、振铃、求和方式的差异，很可能很快要登场。</p>
+
+<p>第一句话总结：Fourier 系数不是附属数据，而是函数粗糙度在频率端的直接记录，光滑度每多一阶，通常就能多赚一个 \(1/n\)。</p>
+
+<p>第二句话总结：Riemann-Lebesgue 引理虽然只给出 \(\widehat f(n)\to0\)，却已经说明所有 \(L^1\) 函数的高频最终都必须消失。</p>
+
+<p>第三句话总结：像 \(|x|\) 这样的尖角会给你 \(1/n^2\)，像阶梯函数这样的跳跃只给你 \(1/n\)，而后面关于收敛与 Gibbs 现象的大部分戏剧性，其实都藏在这个差别里。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 三角级数与正交基视角</a><a href="ch4.html">下一章 · 第 4 章 Dirichlet 核与逐点收敛 →</a></nav>
+
+</main>
+</body>
+</html>

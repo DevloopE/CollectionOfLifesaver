@@ -1,0 +1,995 @@
+<h1 id="ch13">第 13 章 分布的 Fourier 变换：把点质量变常数，把微分变乘法</h1>
+
+<p><a href="ch9.html">第 9 章</a>到<a href="ch11.html">第 11 章</a>已经把 Fourier 变换在好函数上的故事讲得很完整了：平移、调制、伸缩、卷积、Plancherel、反演，全都已经登场。可是真正的调和分析并不会满足于只在 \(L^1\cap L^2\) 或 Schwartz 函数里活动。上一章我们刚刚把 Dirac 质量、主值核、弱导数和振荡函数送进了缓增分布 \(S'\) 这个大盒子。现在自然要问：Fourier 变换能不能也跟着一起延长过去？</p>
+
+<p>答案不只是“能”，而且“延长过去以后反而更像它自己”。在普通函数世界里，你总要担心积分到底收不收敛；到了分布世界，Fourier 变换反而变成一句极干净的对偶定义。它不再直接对对象积分，而是先对测试函数做 Fourier 变换，再让原来的分布去作用。于是 \(\delta_0\) 的 Fourier 变换会直接变成常数 \(1\)，常数函数 \(1\) 的 Fourier 变换会直接变成 \(\delta_0\)，主值核 \(PV(1/x)\) 会露出 \(-i\pi\operatorname{sgn}(\xi)\) 这个乘子真身，而高斯函数会以最漂亮的方式在变换下保持不变。</p>
+
+<p>这几条结论你若只把它们当“会考的公式”，那就太亏了。它们真正重要的地方在于，它们把之前几章里零散出现的现象压成了一张非常紧的地图。点质量为什么会对应所有频率等权出现？常数为什么只集中在零频？主值核为什么天生带着符号函数乘子？高斯为什么同时在热方程、概率论和 Fourier 分析里反复出现？这一章会把这些问题连成一条线，并且直接给下一章的 PDE 分布解铺路。</p>
+
+<p>全章统一采用前面章节的 \(2\pi\) 规范：</p>
+
+\[
+\boxed{
+\widehat{f}(\xi)=\int_{\mathbb R^n} f(x)e^{-2\pi i x\cdot \xi}\,dx,
+\qquad
+\check{f}(x)=\int_{\mathbb R^n} f(\xi)e^{2\pi i x\cdot \xi}\,d\xi.
+}
+\]
+
+<p>用这个规范，\(\check{\widehat f}=f\)，而 \(\widehat{\widehat f}(x)=f(-x)\)。你后面看到的一切常数，都会以这套规范为准。调和分析最怕的不是公式长，而是规范混；所以这一章一开始就把坐标系钉死。</p>
+
+<h2 id="sec13-1">13.1 为什么 Fourier 变换必须延长到 \(S'\)</h2>
+
+<p>如果你只允许 \(f\in L^1(\mathbb R^n)\)，那 Fourier 变换当然已经定义好了。但这会立刻把太多关键对象挡在门外。常数函数 \(1\notin L^1\)，Dirac 质量更不是函数，\(PV(1/x)\) 在经典积分意义下也无从起步。可偏偏这些对象在分析里又极其自然。常数代表零频模式，Dirac 质量代表点源和抽样，主值核代表奇异积分的原型。于是“只在好函数上讨论 Fourier”根本不够。</p>
+
+<p>上一章已经替我们找到了更合身的对象类别：Schwartz 测试函数空间 \(\mathcal S(\mathbb R^n)\) 与它的对偶 \(S'(\mathbb R^n)\)。关键事实是，Fourier 变换在 \(\mathcal S\) 上是自同构：</p>
+
+\[
+\mathcal F:\mathcal S(\mathbb R^n)\to \mathcal S(\mathbb R^n)
+\]
+
+<p>既双射，又连续，逆映射同样连续。于是它自动诱导对偶空间上的变换。这正是泛函分析里最舒服的一种情况：先在测试函数空间上闭合，再把动作搬到对偶空间上。你不需要重新发明一套积分定义；你只需要认真地把“对偶”两个字用到底。</p>
+
+<p>这里真正深的地方不在技术，而在观点。Fourier 变换本来就不该被看成“某个积分算子”；它更应该被看成“频率坐标和物理坐标之间的基变换”。一旦你这么看，它就不该只对可积函数有意义，而应当对所有能被 Schwartz 函数稳定探测的对象有意义。分布正是为了满足这个需求而出现的。</p>
+
+<h2 id="sec13-2">13.2 \(S'\) 上的 Fourier 定义：对偶化一句话就够了</h2>
+
+<p>因为 \(\mathcal F\) 把 \(\mathcal S\) 映回 \(\mathcal S\)，所以对任意缓增分布 \(T\in S'(\mathbb R^n)\)，我们定义它的 Fourier 变换 \(\widehat T\) 为</p>
+
+\[
+\boxed{
+\langle \widehat T,\varphi\rangle
+=
+\langle T,\widehat\varphi\rangle,
+\qquad
+\varphi\in\mathcal S(\mathbb R^n).
+}
+\]
+
+<p>这正是题目里要求的那条定义。它看起来太短，短到像没有信息；但其实所有信息都在里面。线性显然成立。连续性也自动成立，因为 \(\varphi\mapsto\widehat\varphi\) 在 \(\mathcal S\) 上连续，而 \(T\) 本来就是连续线性泛函。于是 \(\widehat T\) 的确又是一个缓增分布。</p>
+
+<p>如果 \(f\in\mathcal S\) 本来就是好函数，那么这个定义和普通积分定义完全一致。因为对任意 \(\varphi\in\mathcal S\)，</p>
+
+\[
+\langle \widehat{T_f},\varphi\rangle
+=
+\langle T_f,\widehat\varphi\rangle
+=
+\int_{\mathbb R^n} f(x)\widehat\varphi(x)\,dx.
+\]
+
+<p>用 Fubini 和反演公式换序，就得到</p>
+
+\[
+\int_{\mathbb R^n} f(x)\widehat\varphi(x)\,dx
+=
+\int_{\mathbb R^n}\widehat f(\xi)\varphi(\xi)\,d\xi
+=
+\langle T_{\widehat f},\varphi\rangle.
+\]
+
+<p>所以</p>
+
+\[
+\widehat{T_f}=T_{\widehat f}.
+\]
+
+<p>这说明分布 Fourier 不是另起炉灶，而是对原有理论的真正延拓。新定义在老对象上不会改口径。你如果看到某个分布公式和函数公式长得一模一样，不要觉得巧；那正是这一定义被设计成这样要达到的效果。</p>
+
+<p>同理，逆 Fourier 变换也在 \(S'\) 上定义为</p>
+
+\[
+\langle \check T,\varphi\rangle
+=
+\langle T,\check\varphi\rangle.
+\]
+
+<p>于是 \(\check{\widehat T}=T\)，\(\widehat{\check T}=T\)，并且</p>
+
+\[
+\widehat{\widehat T}=T^\vee,
+\qquad
+\langle T^\vee,\varphi\rangle=\langle T,\varphi(-\cdot)\rangle.
+\]
+
+<p>也就是说，函数世界里的反射关系在分布世界里原封不动地保留下来了。</p>
+
+<h2 id="sec13-3">13.3 微分、乘法与平移：Fourier 规则怎样延长到分布</h2>
+
+<p>在好函数上，你早就知道</p>
+
+\[
+\widehat{\partial_{x_j}f}(\xi)=2\pi i\xi_j\,\widehat f(\xi),
+\qquad
+\widehat{x_j f}(\xi)=-\frac{1}{2\pi i}\partial_{\xi_j}\widehat f(\xi).
+\]
+
+<p>这两条规则在 \(S'\) 上仍然成立，而且意义更大。因为一旦对象变成分布，微分几乎总还合法，而点乘 \(x_j\) 也仍然把缓增分布送回缓增分布。于是 Fourier 变换照样把“微分”改写成“乘上多项式”，把“乘上坐标”改写成“频域微分”。正式地说，</p>
+
+\[
+\boxed{
+\widehat{\partial^\alpha T}(\xi)
+=(2\pi i\xi)^\alpha \widehat T(\xi),
+}
+\]
+
+\[
+\boxed{
+\widehat{x^\alpha T}(\xi)
+=
+\left(-\frac{1}{2\pi i}\partial_\xi\right)^\alpha \widehat T(\xi).
+}
+\]
+
+<p>这两条规则是后面所有常系数 PDE 求解的核心。只要你把微分方程送到频域，导数就不再是导数，而是代数乘子。这正是 Fourier 分析对 PDE 最致命的简化。</p>
+
+<p>平移和调制也保留原状。若 \(\tau_a f(x)=f(x-a)\)，则</p>
+
+\[
+\widehat{\tau_a f}(\xi)=e^{-2\pi i a\cdot \xi}\widehat f(\xi).
+\]
+
+<p>反过来，乘上指数 \(e^{2\pi i a\cdot x}\) 会把频谱平移。你若把这条规则和 Dirac 质量放在一起看，很快就会知道 \(\delta_a\) 的 Fourier 变换是什么样子。下一节正要做这件事。</p>
+
+<h2 id="sec13-4">13.4 \(\widehat\delta=1\) 与 \(\widehat 1=\delta\)：频域里最重要的一对镜像</h2>
+
+<p>现在进入本章最该背后的直觉，而不是最该背下来的公式。先看 \(\delta_a\)。对任意 \(\varphi\in\mathcal S(\mathbb R^n)\)，</p>
+
+\[
+\langle \widehat{\delta_a},\varphi\rangle
+=
+\langle \delta_a,\widehat\varphi\rangle
+=
+\widehat\varphi(a).
+\]
+
+<p>按 Fourier 定义展开，</p>
+
+\[
+\widehat\varphi(a)
+=
+\int_{\mathbb R^n}\varphi(\xi)e^{-2\pi i a\cdot \xi}\,d\xi
+=
+\left\langle e^{-2\pi i a\cdot \xi},\varphi(\xi)\right\rangle.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+\widehat{\delta_a}(\xi)=e^{-2\pi i a\cdot \xi}.
+}
+\]
+
+<p>特别地，取 \(a=0\)，就得到全章第一条关键公式：</p>
+
+\[
+\boxed{
+\widehat{\delta_0}=1.
+}
+\]
+
+<p>这句在直觉上应该一点都不奇怪。Dirac 质量是最局域化的对象，它把所有空间信息都压到一个点上。越局域的对象，在频域里就越分散；极端局域化对应极端不偏频，于是所有频率一视同仁，正好给出常数 \(1\)。调和分析里著名的“不确定性原理”，在这条公式里已经露了最原始的影子。</p>
+
+<p>现在反过来看常数函数 \(1\)。它不是 \(L^1\) 函数，但它是缓增分布。对任意 \(\varphi\in\mathcal S\)，</p>
+
+\[
+\langle \widehat 1,\varphi\rangle
+=
+\langle 1,\widehat\varphi\rangle
+=
+\int_{\mathbb R^n}\widehat\varphi(x)\,dx.
+\]
+
+<p>而 Fourier 反演在 \(0\) 点告诉你</p>
+
+\[
+\varphi(0)=\int_{\mathbb R^n}\widehat\varphi(x)\,dx.
+\]
+
+<p>所以</p>
+
+\[
+\langle \widehat 1,\varphi\rangle=\varphi(0)=\langle \delta_0,\varphi\rangle.
+\]
+
+<p>于是得到第二条关键公式：</p>
+
+\[
+\boxed{
+\widehat 1=\delta_0.
+}
+\]
+
+<p>这两条公式合起来，就是“最局域的空间对象对应最平的频域对象；最平的空间对象对应最局域的频域对象”。你若真把这句话装进脑子里，以后看到 Fourier 变换里各种尺度互换、频率集中与空间扩散的现象，就不会再觉得它们只是技巧，而会觉得它们是同一件事在不同极端下的表现。</p>
+
+<h3 id="sec13-4-1">例 13.1：\(\delta_0'\) 的 Fourier 变换是什么</h3>
+
+<p>上一章我们已经算过 \(\langle \delta_0',\varphi\rangle=-\varphi'(0)\)。现在把它送进 Fourier。对任意 \(\varphi\in\mathcal S(\mathbb R)\)，</p>
+
+\[
+\langle \widehat{\delta_0'},\varphi\rangle
+=
+\langle \delta_0',\widehat\varphi\rangle
+=
+-(\widehat\varphi)'(0).
+\]
+
+<p>而</p>
+
+\[
+(\widehat\varphi)'(0)
+=
+\frac{d}{dx}\Bigl(\int_{\mathbb R}\varphi(\xi)e^{-2\pi i x\xi}\,d\xi\Bigr)\Big|_{x=0}
+=
+\int_{\mathbb R}(-2\pi i\xi)\varphi(\xi)\,d\xi.
+\]
+
+<p>因此</p>
+
+\[
+\langle \widehat{\delta_0'},\varphi\rangle
+=
+\int_{\mathbb R}2\pi i\xi\,\varphi(\xi)\,d\xi.
+\]
+
+<p>也就是说</p>
+
+\[
+\boxed{
+\widehat{\delta_0'}(\xi)=2\pi i\xi.
+}
+\]
+
+<p>这就是“Dirac 导数抽样斜率”在频域里的代数影子：它恰好对应一次线性乘子。高阶 Dirac 导数自然对应高阶多项式乘子。</p>
+
+<h2 id="sec13-5">13.5 \(PV\frac1x\) 的 Fourier 变换：\(-i\pi\operatorname{sgn}(\xi)\)</h2>
+
+<p>这一节是本章技术味最重、但也最值得认真算到底的一节。我们要证明</p>
+
+\[
+\boxed{
+\widehat{PV\frac1x}(\xi)=-i\pi\,\operatorname{sgn}(\xi).
+}
+\]
+
+<p>这条公式是 Hilbert 变换的原型，所以后面<a href="ch17.html">第 17 章</a>会整章围着它转。但它在这里已经能完全算出来，不需要等到奇异积分理论成熟。</p>
+
+<p>第一步不是直接碰 \(PV(1/x)\)，而是先看一个平滑化的核</p>
+
+\[
+K_\varepsilon(x)=\frac{x}{x^2+\varepsilon^2},
+\qquad \varepsilon>0.
+\]
+
+<p>它在每个固定 \(\varepsilon\) 下都是真函数，而且当 \(\varepsilon\downarrow0\) 时在分布意义下趋于 \(PV(1/x)\)。这个极限上一章已经解释过本质：尖点附近靠奇偶抵消保住了极限。</p>
+
+<p>第二步是先算更容易的核 \((x^2+\varepsilon^2)^{-1}\) 的 Fourier 变换。令</p>
+
+\[
+g_\varepsilon(x)=e^{-2\pi\varepsilon|x|}.
+\]
+
+<p>直接计算得</p>
+
+\[
+\widehat{g_\varepsilon}(\xi)
+=
+\int_{-\infty}^{\infty}e^{-2\pi\varepsilon|x|}e^{-2\pi i x\xi}\,dx
+=
+2\int_0^\infty e^{-2\pi\varepsilon x}\cos(2\pi\xi x)\,dx.
+\]
+
+<p>而初等积分公式</p>
+
+\[
+\int_0^\infty e^{-ax}\cos(bx)\,dx=\frac{a}{a^2+b^2}
+\qquad (a>0)
+\]
+
+<p>给出</p>
+
+\[
+\widehat{g_\varepsilon}(\xi)
+=
+2\cdot
+\frac{2\pi\varepsilon}{(2\pi\varepsilon)^2+(2\pi\xi)^2}
+=
+\frac{\varepsilon}{\pi(\varepsilon^2+\xi^2)}.
+\]
+
+<p>于是</p>
+
+\[
+\widehat{e^{-2\pi\varepsilon|x|}}(\xi)
+=
+\frac{\varepsilon}{\pi(\varepsilon^2+\xi^2)}.
+\]
+
+<p>两边都是偶函数。再做一次 Fourier 变换，并用 \(\widehat{\widehat f}(x)=f(-x)\) 以及偶性，得到</p>
+
+\[
+\widehat{\frac{\varepsilon}{\pi(\varepsilon^2+x^2)}}(\xi)
+=
+e^{-2\pi\varepsilon|\xi|}.
+\]
+
+<p>于是</p>
+
+\[
+\boxed{
+\widehat{\frac{1}{x^2+\varepsilon^2}}(\xi)
+=
+\frac{\pi}{\varepsilon}e^{-2\pi\varepsilon|\xi|}.
+}
+\]
+
+<p>第三步，利用 \(x f(x)\) 的 Fourier 规则。对足够好的 \(f\)，有</p>
+
+\[
+\widehat{x f}(\xi)
+=
+-\frac1{2\pi i}\partial_\xi \widehat f(\xi).
+\]
+
+<p>应用到 \(f(x)=\dfrac{1}{x^2+\varepsilon^2}\)，便得</p>
+
+\[
+\widehat{K_\varepsilon}(\xi)
+=
+\widehat{\frac{x}{x^2+\varepsilon^2}}(\xi)
+=
+-\frac1{2\pi i}\partial_\xi
+\left(\frac{\pi}{\varepsilon}e^{-2\pi\varepsilon|\xi|}\right).
+\]
+
+<p>因为</p>
+
+\[
+\partial_\xi e^{-2\pi\varepsilon|\xi|}
+=
+-2\pi\varepsilon\,\operatorname{sgn}(\xi)\,e^{-2\pi\varepsilon|\xi|},
+\]
+
+<p>所以</p>
+
+\[
+\widehat{K_\varepsilon}(\xi)
+=
+-\frac1{2\pi i}\cdot \frac{\pi}{\varepsilon}\cdot
+\bigl(-2\pi\varepsilon\,\operatorname{sgn}(\xi)e^{-2\pi\varepsilon|\xi|}\bigr)
+=
+-i\pi\,\operatorname{sgn}(\xi)e^{-2\pi\varepsilon|\xi|}.
+\]
+
+<p>最后令 \(\varepsilon\downarrow0\)。一方面 \(K_\varepsilon\to PV(1/x)\) 于 \(S'\)；另一方面 \(e^{-2\pi\varepsilon|\xi|}\to1\)，而 \(\operatorname{sgn}(\xi)\varphi(\xi)\in L^1\) 对任意 \(\varphi\in\mathcal S\)，所以</p>
+
+\[
+-i\pi\,\operatorname{sgn}(\xi)e^{-2\pi\varepsilon|\xi|}
+\longrightarrow
+-i\pi\,\operatorname{sgn}(\xi)
+\quad\text{于 }S'.
+\]
+
+<p>因此极限给出</p>
+
+\[
+\boxed{
+\widehat{PV\frac1x}(\xi)=-i\pi\,\operatorname{sgn}(\xi).
+}
+\]
+
+<p>这条公式非常值钱。它说明主值核在频域里不是一个难缠奇点，而只是一个模长恒为 \(\pi\) 的符号乘子。也就是说，空间里的奇性换到频域以后，变成了非常干净的“正频取 \(-i\pi\)，负频取 \(i\pi\)”的分频操作。Hilbert 变换之所以能被看成“相位平移 \(90^\circ\)”的算子，根子就在这里。</p>
+
+<h2 id="sec13-6">13.6 高斯为什么保持不变：最听话的 Fourier 本征函数</h2>
+
+<p>如果说 \(\delta\) 和 \(PV(1/x)\) 展示的是奇性，那么高斯展示的就是平滑。令</p>
+
+\[
+g(x)=e^{-\pi x^2}.
+\]
+
+<p>我们来完整证明它在 Fourier 变换下保持不变：</p>
+
+\[
+\boxed{
+\widehat g(\xi)=e^{-\pi \xi^2}.
+}
+\]
+
+<p>记</p>
+
+\[
+I(\xi)=\widehat g(\xi)=\int_{\mathbb R}e^{-\pi x^2}e^{-2\pi i x\xi}\,dx.
+\]
+
+<p>对 \(\xi\) 求导，在积分号下合法，因为被积函数和它对 \(\xi\) 的导数都被可积函数控制：</p>
+
+\[
+I'(\xi)
+=
+\int_{\mathbb R}e^{-\pi x^2}(-2\pi i x)e^{-2\pi i x\xi}\,dx.
+\]
+
+<p>注意</p>
+
+\[
+\frac{d}{dx}e^{-\pi x^2}=-2\pi x e^{-\pi x^2},
+\]
+
+<p>于是</p>
+
+\[
+I'(\xi)
+=
+i\int_{\mathbb R}\frac{d}{dx}(e^{-\pi x^2})\,e^{-2\pi i x\xi}\,dx.
+\]
+
+<p>对 \(x\) 分部积分，边界项因高斯衰减消失，得到</p>
+
+\[
+I'(\xi)
+=
+i\int_{\mathbb R} e^{-\pi x^2}(2\pi i \xi)e^{-2\pi i x\xi}\,dx
+=
+-2\pi \xi\, I(\xi).
+\]
+
+<p>所以 \(I\) 满足常微分方程</p>
+
+\[
+I'(\xi)=-2\pi \xi I(\xi).
+\]
+
+<p>解出即为</p>
+
+\[
+I(\xi)=C e^{-\pi \xi^2}.
+\]
+
+<p>要确定常数 \(C\)，只需取 \(\xi=0\)：</p>
+
+\[
+C=I(0)=\int_{\mathbb R}e^{-\pi x^2}\,dx=1.
+\]
+
+<p>最后一个等号是经典高斯积分的归一化选择，这也是为什么我们偏爱 \(e^{-\pi x^2}\) 而不是 \(e^{-x^2}\)。于是</p>
+
+\[
+\widehat g(\xi)=e^{-\pi \xi^2}.
+\]
+
+<p>\(\mathbb R^n\) 版本立刻由张量积得到：</p>
+
+\[
+\widehat{e^{-\pi |x|^2}}(\xi)=e^{-\pi |\xi|^2}.
+\]
+
+<p>这条公式贯穿整个分析：在<a href="../偏微分方程/ch15.html">《偏微分方程读本》第 15 章</a>里，高斯是热核；在概率论里，它是正态密度；在 Fourier 分析里，它是最稳定的本征函数。你若把这三件事看成三门课里偶然撞脸，那就损失太大了。它们其实是在说同一个对象具有最平滑、最对称、最容易自我复制的传播结构。</p>
+
+<h3 id="sec13-6-1">例 13.2：缩放后的高斯怎样变换</h3>
+
+<p>令 \(a&gt;0\)，设</p>
+
+\[
+g_a(x)=e^{-\pi a x^2}.
+\]
+
+<p>把它写成</p>
+
+\[
+g_a(x)=g(\sqrt a\,x),
+\qquad
+g(x)=e^{-\pi x^2}.
+\]
+
+<p>由<a href="ch9.html">第 9 章</a>的伸缩公式</p>
+
+\[
+\widehat{f(b\,\cdot)}(\xi)=\frac{1}{|b|}\widehat f\!\left(\frac{\xi}{b}\right)
+\qquad (b\neq0),
+\]
+
+<p>立刻得到</p>
+
+\[
+\widehat{g_a}(\xi)
+=
+\frac{1}{\sqrt a}\widehat g\!\left(\frac{\xi}{\sqrt a}\right)
+=
+\frac{1}{\sqrt a}e^{-\pi \xi^2/a}.
+\]
+
+<p>也就是</p>
+
+\[
+\boxed{
+\widehat{e^{-\pi a x^2}}(\xi)=a^{-1/2}e^{-\pi \xi^2/a}.
+}
+\]
+
+<p>这条尺度公式在下一章会直接变成热核常数的来源。因为只要把 \(a\) 换成 \(1/(4\pi t)\) 这一类量，热方程频域里的指数衰减就会自动反演成空间里的高斯包。也就是说，热核的系数并不是背出来的，它是高斯在 Fourier 变换下的缩放律硬算出来的。</p>
+
+<h2 id="sec13-7">13.7 从分布公式读出结构：常数、导数、多项式和振荡</h2>
+
+<p>到这里你已经有几条看似分散、其实彼此紧扣的公式：</p>
+
+\[
+\widehat{\delta_0}=1,\qquad
+\widehat 1=\delta_0,\qquad
+\widehat{\delta_0'}=2\pi i\xi,\qquad
+\widehat{PV\frac1x}=-i\pi\operatorname{sgn}(\xi).
+\]
+
+<p>把它们并排看，能读出三个基本结构。</p>
+
+<p>第一，越局域的对象，频域越扩散；越平坦的对象，频域越集中。Dirac 与常数那一对镜像，已经把这点说到极致。</p>
+
+<p>第二，空间里的微分会在频域里长出多项式。于是 Dirac 的导数不再像“更尖的奇性”，而像线性函数 \(2\pi i\xi\)。这就是为什么常系数微分算子在 Fourier 语言里会退化成代数问题。</p>
+
+<p>第三，空间里的奇核在频域里经常会显露出非常干净的相位乘子。\(PV(1/x)\) 的频域真身是 \(-i\pi \operatorname{sgn}(\xi)\)，这意味着它并不改变频率大小，只改变正负频的相位关系。你如果以后在信号处理中听到“解析信号”“正负频分离”，或者在调和分析里看到 Hilbert 变换把 \(\cos\) 送成 \(\sin\)，背后都是这条乘子在工作。</p>
+
+<h3 id="sec13-7-1">例 13.3：为什么 \(\widehat{\delta_a}\) 只是多了一个相位因子</h3>
+
+<p>前面已经算出</p>
+
+\[
+\widehat{\delta_a}(\xi)=e^{-2\pi i a\cdot \xi}.
+\]
+
+<p>这句说明：把点质量从原点平移到 \(a\)，频域里不会改变“所有频率都被等权激活”这件事，只会给每个频率附上一个相位因子。也就是说，平移不会改谱的大小，只改谱的相位。这和<a href="ch9.html">第 9 章</a>里普通函数的平移公式完全一致，只不过现在对象已经不是函数而是点质量了。</p>
+
+<h3 id="sec13-7-2">例 13.4：为什么 \(e^{2\pi i a x}\) 的 Fourier 变换是 \(\delta_a\)</h3>
+
+<p>由上一例和反演立刻得到</p>
+
+\[
+\widehat{e^{2\pi i a x}}=\delta_a.
+\]
+
+<p>如果你想直接算，也很简单。对任意 \(\varphi\in\mathcal S(\mathbb R)\)，</p>
+
+\[
+\langle \widehat{e^{2\pi i a x}},\varphi\rangle
+=
+\int_{\mathbb R}e^{2\pi i a x}\widehat\varphi(x)\,dx.
+\]
+
+<p>把 \(\widehat\varphi\) 展开并用反演，就得到这个配对恰等于 \(\varphi(a)\)。因此它就是 \(\delta_a\)。这说明“纯频率波”在频域里极端局域化，正如“点质量”在空间里极端局域化一样。两头一尖一平，互为镜像。</p>
+
+<p>你如果把这条关系和<a href="../偏微分方程/ch21.html">弱解</a>联系起来，还会看到另一层意思：很多线性 PDE 的本征模式恰好是指数波 \(e^{2\pi i x\cdot \xi}\)。它们在 Fourier 变换里变成 Dirac 质量，于是“把解展开成平面波”与“在频域里集中在某些频率上”其实是同一句话的两种口音。</p>
+
+<h2 id="sec13-8">13.8 \(S'\) 上的运算字典：微分、乘 \(x\)、平移、调制全部还能算</h2>
+
+<p>上一章你已经看到，分布最重要的结构之一是“导数可以转移给测试函数”。到了 Fourier 变换这里，这套转移机制会再长出一整本运算字典。它的价值不在于公式多，而在于几乎每条公式都把一个麻烦操作换成另一个更干净的操作。对 \(T\in S'(\mathbb R^n)\)，最核心的四条是：</p>
+
+\[
+\boxed{
+\widehat{\partial^\alpha T}(\xi)
+=(2\pi i\xi)^\alpha \widehat T(\xi),
+\qquad
+\widehat{x^\alpha T}(\xi)
+=
+\left(\frac{i}{2\pi}\right)^{|\alpha|}
+\partial_\xi^\alpha \widehat T(\xi).
+}
+\]
+
+\[
+\boxed{
+\widehat{\tau_a T}(\xi)
+=
+e^{-2\pi i a\cdot\xi}\widehat T(\xi),
+\qquad
+\widehat{e^{2\pi i b\cdot x}T}
+=
+\tau_b \widehat T.
+}
+\]
+
+<p>这里 \(\tau_a T\) 表示平移后的分布，定义为</p>
+
+\[
+\langle \tau_a T,\varphi\rangle
+=
+\langle T,\varphi(\cdot+a)\rangle.
+\]
+
+<p>这些公式在普通 Schwartz 函数上你早就见过；现在唯一要确认的，是它们在分布配对里不会失效。以第一条为例，对任意 \(\varphi\in\mathcal S\)，</p>
+
+\[
+\langle \widehat{\partial^\alpha T},\varphi\rangle
+=
+\langle \partial^\alpha T,\widehat\varphi\rangle
+=
+(-1)^{|\alpha|}\langle T,\partial^\alpha \widehat\varphi\rangle.
+\]
+
+<p>而 \(\partial^\alpha \widehat\varphi\) 可以用 Fourier 反演重写成对 \(x^\alpha\varphi\) 的变换，整理后正好得到乘子 \((2\pi i\xi)^\alpha\)。其他三条公式也都只是把普通函数世界的等式通过对偶化抬到 \(S'\) 上。本质上，Fourier 变换并没有发明新代数；它只是把旧代数延长到了更大的线性空间。</p>
+
+<p>这一页公式最好别分开死记。它们讲的是同一件事：空间里的“局域操作”和频域里的“结构操作”互相对偶。微分对应乘多项式，乘坐标对应频域求导，平移对应相位，调制对应频移。只要这四个配对关系记牢，你以后遇到的大多数 Fourier 计算都能自己推出来。</p>
+
+<h3 id="sec13-8-1">例 13.5：多项式的 Fourier 变换为什么一定是 Dirac 及其导数</h3>
+
+<p>从 \(\widehat 1=\delta_0\) 出发，直接对坐标乘法公式反复使用，就得到</p>
+
+\[
+\widehat{x_j}
+=
+\frac{i}{2\pi}\partial_{\xi_j}\delta_0,
+\]
+
+<p>更一般地，若 \(\alpha\) 是多重指标，则</p>
+
+\[
+\boxed{
+\widehat{x^\alpha}
+=
+\left(\frac{i}{2\pi}\right)^{|\alpha|}\partial^\alpha \delta_0.
+}
+\]
+
+<p>这条公式非常有含义。它说明多项式在空间里增长得越快，频域里就越集中到原点，并且是以更高阶 Dirac 导数的方式集中。反过来，上一章的 \(\delta_0^{(\alpha)}\) 经过 Fourier 变换会变成多项式 \((2\pi i\xi)^\alpha\)。因此“多项式”和“原点处的有限阶奇性”互为镜像，这正是缓增分布这个类为什么天然容纳两者的原因。</p>
+
+<h2 id="sec13-9">13.9 Heaviside 的 Fourier 变换：为什么会同时长出主值项和 \(\delta\) 项</h2>
+
+<p>如果说 \(\widehat\delta=1\) 是最极端的局域化公式，那么 Heaviside 函数的 Fourier 变换就是最值得细看的“半极端”例子。它既不是可积函数，也不是纯点质量；它在空间里只有一个跳跃，在频域里则会分裂成两部分：一部分是主值奇核，一部分是集中在零频的 Dirac 质量。</p>
+
+<p>先从导数关系入手。因为</p>
+
+\[
+H'=\delta_0,
+\]
+
+<p>对两边取 Fourier 变换，立刻得到</p>
+
+\[
+2\pi i\xi\,\widehat H(\xi)=1.
+\]
+
+<p>形式上你会想写</p>
+
+\[
+\widehat H(\xi)=\frac{1}{2\pi i\xi}.
+\]
+
+<p>但这里要立刻警觉：\(\xi=0\) 处分母有奇点，所以右边不能按普通函数理解。更微妙的是，方程</p>
+
+\[
+\xi\,U=1
+\]
+
+<p>在分布意义下并不唯一，因为任何 \(c\delta_0\) 乘上 \(\xi\) 都等于 \(0\)。所以仅靠导数方程，你只能知道 \(\widehat H\) 的主奇性是 \(PV\frac{1}{2\pi i\xi}\)，却还差一个零频点质量。</p>
+
+<p>确定这项最干净的办法，是注意到作为分布，\(H\) 与</p>
+
+\[
+\frac12+\frac12\operatorname{sgn}(x)
+\]
+
+<p>完全相同，因为它们只可能在单点 \(x=0\) 上不同，而分布不看单点值。于是</p>
+
+\[
+\widehat H
+=
+\frac12\widehat 1+\frac12\widehat{\operatorname{sgn}}.
+\]
+
+<p>现在要识别 \(\widehat{\operatorname{sgn}}\)。由 \((\operatorname{sgn}x)'=2\delta_0\)，可得</p>
+
+\[
+2\pi i\xi\,\widehat{\operatorname{sgn}}(\xi)=2.
+\]
+
+<p>因此</p>
+
+\[
+\widehat{\operatorname{sgn}}(\xi)=PV\frac{1}{\pi i\xi}.
+\]
+
+<p>于是结论终于落地：</p>
+
+\[
+\boxed{
+\widehat H(\xi)
+=
+PV\frac{1}{2\pi i\xi}
++
+\frac12\delta_0.
+}
+\]
+
+<p>这条式子很值得慢慢消化。主值项负责记录跳跃带来的 \(1/\xi\) 型尾巴，\(\delta_0\) 项负责记录函数“平均值不为零”的零频贡献。你如果以后看到某个函数由常数背景加一个局部扰动组成，那么它的 Fourier 变换里经常都会同时出现一个集中在零频的质量和一个较平滑的连续部分。</p>
+
+<h3 id="sec13-9-1">例 13.6：用 \(H\) 的变换重新看 \(PV(1/x)\)</h3>
+
+<p>由</p>
+
+\[
+\operatorname{sgn}(x)=2H(x)-1
+\]
+
+<p>和上式立刻得到</p>
+
+\[
+\widehat{\operatorname{sgn}}(\xi)
+=
+PV\frac{1}{\pi i\xi}.
+\]
+
+<p>再对两边取 Fourier 变换，并利用上一节已经证明的对偶对称性，就会回到</p>
+
+\[
+\widehat{PV\frac1x}=-i\pi \operatorname{sgn}(\xi).
+\]
+
+<p>所以 \(H\)、\(\operatorname{sgn}\)、\(PV(1/x)\) 这三者并不是三条零散公式，而是一条链上的三个节点：跳跃经过求导变成点质量，点质量经过 Fourier 变换变成常数，常数再通过除以 \(\xi\) 长出主值核。整条链把“界面”“奇核”“乘子”三种语言焊在了一起。</p>
+
+<h2 id="sec13-10">13.10 卷积与乘法在分布里的边界：什么时候还能像函数那样算</h2>
+
+<p>分布 Fourier 变换真正好用，还因为它保留了卷积和乘法之间的对偶关系。不过这里必须比函数世界更谨慎：两个任意分布未必能卷积，也未必能相乘。真正安全的情形，是其中一边足够光滑或者足够快速衰减。</p>
+
+<p>最常见也最实用的两条规则是：</p>
+
+\[
+\boxed{
+\widehat{T*\phi}
+=
+\widehat T\,\widehat\phi,
+\qquad
+\phi\in\mathcal S,\ T\in S'.
+}
+\]
+
+\[
+\boxed{
+\widehat{\phi T}
+=
+\widehat\phi * \widehat T,
+\qquad
+\phi\in\mathcal S,\ T\in S'.
+}
+\]
+
+<p>第一条说明：只要拿一个 Schwartz 函数去平滑分布，频域里就只是把 \(\widehat T\) 乘上一个快速衰减的函数。第二条说明：若你在空间里把分布乘上一个局部化函数 \(\phi\)，那在频域里就是拿 \(\widehat T\) 去和 \(\widehat\phi\) 卷积，于是频率会被适度扩散。这两条操作恰好对应“物理空间平滑”和“物理空间截断”这两种最常见的分析动作。</p>
+
+<p>它们在弱解和 PDE 里特别重要。比如你若只知道一个解是分布，通常第一步就是先把它和 mollifier 卷积，得到平滑近似解；而在 Fourier 语言下，这只是把原来的频谱乘上一个平滑截止。反过来，若你想研究解在某个局部区域的性质，往往会先乘一个紧支撑截断函数；到了频域里，这等价于把谱和一个快速衰减核卷在一起，于是“局部化会破坏频率局域”这句物理直觉也被准确写成了数学公式。</p>
+
+<p>这两条规则和<a href="ch9.html">第 9 章</a>卷积定理表面上一样，实质上却强得多。因为现在的 \(T\) 可以是 \(\delta\)、\(PV(1/x)\)、多项式、振荡函数，甚至是 PDE 的基本解。也就是说，Fourier 工具箱在分布层面一旦闭合，很多以前只在“好函数”上成立的结构，就会自动升级成更普适的工作语言。</p>
+
+<h2 id="sec13-11">13.11 反演在 \(S'\) 上仍然成立：分布 Fourier 不是单向延长，而是双向同构</h2>
+
+<p>到这里你可能已经默认 Fourier 变换可以作用在 \(S'\) 上，但还有一个必须说清的问题：它到底有没有逆？答案是肯定的，而且几乎不需要额外证明。因为 \(\mathcal S\) 上的 Fourier 变换本来就是双射，并且 inverse 仍把 \(\mathcal S\) 映回 \(\mathcal S\)。于是对偶空间上的延长自动也该是双射。</p>
+
+<p>若记反变换为</p>
+
+\[
+\check\varphi(x)=\int_{\mathbb R^n}\varphi(\xi)e^{2\pi i x\cdot\xi}\,d\xi,
+\]
+
+<p>那么对分布 \(T\in S'\) 定义</p>
+
+\[
+\langle \mathcal F^{-1}T,\varphi\rangle
+=
+\langle T,\check\varphi\rangle.
+\]
+
+<p>由于 \(\check\varphi\in\mathcal S\)，这个定义完全良好。并且对任意 \(\varphi\in\mathcal S\)，有</p>
+
+\[
+\langle \mathcal F^{-1}\widehat T,\varphi\rangle
+=
+\langle \widehat T,\check\varphi\rangle
+=
+\langle T,\widehat{\check\varphi}\rangle
+=
+\langle T,\varphi\rangle.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+\mathcal F^{-1}\widehat T=T
+\qquad
+\text{在 }S' \text{ 上成立。}
+}
+\]
+
+<p>同理还能得到双重 Fourier 公式</p>
+
+\[
+\boxed{
+\widehat{\widehat T}=T^\vee,
+\qquad
+T^\vee(\varphi)=T(\varphi(-\cdot)).
+}
+\]
+
+<p>也就是说，做两次 Fourier 变换等于做空间反射。这和普通 Schwartz 函数的公式毫无二致。重要的不是公式本身，而是它说明：分布 Fourier 变换并不是“只能朝前走的一次性操作”，而是和函数层面一样，是 \(S'\) 上的真正线性同构。于是你在频域里做的每一步代数整理，都可以可靠地再拉回物理空间。</p>
+
+<p>这一点对后面的 PDE 至关重要。因为我们常常先在频域里把解写成某个分式、某个乘子或某个主值分布，再通过反变换回到原方程。若反演在 \(S'\) 上不成立，这整套策略就没有合法性基础。现在你应该把它看成已经完全打通：\(\mathcal S\) 和 \(S'\) 组成了一对在 Fourier 下双向闭合的空间。</p>
+
+<h2 id="sec13-12">13.12 用 Fourier 直接解分布方程：从 \(\partial_x T=\delta_0\) 到 resolvent 核</h2>
+
+<p>这一章真正的实战价值，在于它让“求分布解”变成了频域乘子问题。最简单的样板不是多维 PDE，而是一维分布方程</p>
+
+\[
+T'=\delta_0.
+\]
+
+<p>对两边取 Fourier 变换，得到</p>
+
+\[
+2\pi i\xi\,\widehat T(\xi)=1.
+\]
+
+<p>这和上一节求 \(\widehat H\) 时出现的是同一条方程。于是</p>
+
+\[
+\widehat T=PV\frac{1}{2\pi i\xi}+c\delta_0.
+\]
+
+<p>反变换回去便知</p>
+
+\[
+T=H+c.
+\]
+
+<p>也就是说，Fourier 方法不仅告诉你一个解 \(H\)，还顺手把全部解写出来了：任何两个解之差都必须满足零导数方程，因此只能是常数分布。这个例子非常短，却几乎把“频域乘子方法”的全部骨架露出来了：先把微分变乘法，再分析零点导致的非唯一性，最后用反变换回到原空间。</p>
+
+<h3 id="sec13-12-1">例 13.7：\((1-\partial_x^2)E=\delta_0\) 的基本解可以直接从频域读出</h3>
+
+<p>再看一个稍微更像 PDE 的例子。要求</p>
+
+\[
+(1-\partial_x^2)E=\delta_0
+\qquad \text{于 }\mathbb R.
+\]
+
+<p>对两边取 Fourier 变换，有</p>
+
+\[
+\bigl(1+4\pi^2\xi^2\bigr)\widehat E(\xi)=1,
+\]
+
+<p>因此</p>
+
+\[
+\widehat E(\xi)=\frac{1}{1+4\pi^2\xi^2}.
+\]
+
+<p>而在我们采用的 \(2\pi\) 约定下，上一卷常见积分公式给出</p>
+
+\[
+\boxed{
+E(x)=\frac12 e^{-|x|}.
+}
+\]
+
+<p>直接验算也很容易：\(x\neq0\) 时 \(E''=E\)，而 \(E'\) 在 \(0\) 点有大小为 \(-1\) 的跳跃，所以分布意义下恰有</p>
+
+\[
+(1-\partial_x^2)E=\delta_0.
+\]
+
+<p>这个例子极有代表性。它说明当频域分母 \(1+4\pi^2\xi^2\) 没有零点时，\(\widehat E\) 就是一个老实的 \(L^1\) 函数，基本解甚至会是普通函数；而当分母有零点时，比如 \(\xi=0\) 处的 \(|\xi|^2\)，就必须诉诸主值、\(\delta\) 项或更一般的分布来理解。也正是在这里，分布 Fourier 变换和基本解理论真正咬合起来。</p>
+
+<h3 id="sec13-12-2">例 13.8：零点意味着非唯一性，非零点意味着唯一可逆</h3>
+
+<p>你可以把上面两个例子放在一起看。对方程 \(T'=\delta_0\)，频域乘子是 \(2\pi i\xi\)，它在 \(\xi=0\) 处有零点，所以解不唯一，允许加上任意常数。对方程 \((1-\partial_x^2)E=\delta_0\)，乘子 \(1+4\pi^2\xi^2\) 处处非零，所以频域里可以直接除过去，解在 \(S'\) 里唯一。这条“零点决定障碍”的原则，在常系数 PDE 中会反复重现：</p>
+
+\[
+\boxed{
+P(2\pi i\xi)\ \text{若有零点，解的存在与唯一性就会出现额外结构；}
+}
+\]
+
+\[
+\boxed{
+P(2\pi i\xi)\ \text{若处处不零，Fourier 反演通常直接给出唯一基本解。}
+}
+\]
+
+<p>从这个角度看，分布理论不是在帮你“硬解奇怪方程”，而是在忠实记录乘子零点带来的代数后果。零点意味着某些频率模式不会被算子看见，于是可能长出齐次解、\(\delta\) 项或主值项；没有零点时，反算子则像普通乘子那样顺滑。下一章的 Laplace、热方程、波动方程，全都会沿着这条线展开。</p>
+
+<h2 id="sec13-13">13.13 点支撑、紧支撑与多项式频谱：局域和扩散在分布里走到极端会发生什么</h2>
+
+<p>到现在为止，这一章已经出现了不少“极端镜像”：</p>
+
+\[
+\delta_0 \longleftrightarrow 1,
+\qquad
+\delta_0^{(\alpha)} \longleftrightarrow (2\pi i\xi)^\alpha,
+\qquad
+x^\alpha \longleftrightarrow \partial^\alpha \delta_0.
+\]
+
+<p>这些公式放在一起看，会暴露出一个非常深、但直觉上又很清楚的原则：<strong>越局域的对象，频域越刚性地扩散；越集中在单点的分布，频域越像多项式；反过来，越像多项式增长的对象，频域越集中在单点。</strong> 这已经不是某个单独公式，而是一整类结构对应。</p>
+
+<p>上一章末尾提到过：若一个分布支撑在单点，它本质上只能是有限阶 Dirac 导数的线性组合。把这一点和本章的 Fourier 规则拼在一起，就立刻得到：</p>
+
+\[
+\boxed{
+\operatorname{supp}T\subset\{0\}
+\quad\Longrightarrow\quad
+\widehat T \text{ 是一个多项式。}
+}
+\]
+
+<p>反过来也成立：若 \(\widehat T\) 是多项式，那么 \(T\) 必是有限阶 Dirac 导数的线性组合。因此“单点支撑”与“多项式频谱”在 Fourier 语言里完全等价。你若把它和<a href="ch9.html">第 9 章</a>的高斯、sinc、矩形函数这些普通函数例子比较着看，会感受到：分布其实只是把那条“局域与平滑互相交换”的经验法则推到了端点。</p>
+
+<p>再往前一步，若 \(T\) 具有紧支撑但不一定只在单点，那么 \(\widehat T\) 虽不必是多项式，却仍会表现出很强的解析性。这正是 Paley-Wiener 理论的大方向：空间中的紧支撑，会在频域里变成一个非常刚性的整函数增长条件。我们这一章不进入完整定理，但你至少要先建立这个判断：Fourier 变换对支撑的作用绝不是随便的，它会把局域几何强行编码成频域的解析结构。</p>
+
+<h3 id="sec13-13-1">例 13.9：为什么“既紧支撑又带有限频支撑”的对象只能非常平凡</h3>
+
+<p>把上面的结构感再往前推一步，你会得到一种弱形式的不可能性原则。若一个非零对象在空间里极度局域，同时在频域里也极度局域，那么它通常不可能存在。对 Schwartz 函数而言，这会发展成各种 uncertainty principle；对分布而言，最极端的例子早已出现：\(\delta_0\) 在空间里完全集中，但它的频域却是常数，遍布全部频率；常数函数在空间里完全不衰减，但它的频域又只剩一个点质量。</p>
+
+<p>这说明 Fourier 变换并不会让“局域性”两头兼得，而是强迫你在空间与频率之间做交换。后面学奇异积分、Littlewood-Paley 分解和 Sobolev 空间时，这种交换会以更定量的形式一再出现。你若现在就能从 \(\delta\)、多项式、主值核、Heaviside 这些分布例子里看出这条骨架，后面的频率分解就会顺理成章得多。</p>
+
+<p>从应用角度说，这一节还解释了为什么 PDE 里那么多基本解在频域看起来像简单分式，而回到物理空间就会长出奇点、尾巴或慢衰减。因为频域里的局域代数操作，往往正对应原空间里更粗糙、更长程的结构。分布 Fourier 变换不是在制造复杂性；它只是忠实地把这种空间-频率交换摆在你面前。</p>
+
+<h2 id="sec13-14">13.14 这一章为什么直接通向 PDE</h2>
+
+<p>表面上看，这一章只是把 Fourier 变换从函数延长到了分布；实际上它已经把下一章的主要武器准备好了。设 \(P(D)\) 是一个常系数微分算子，例如</p>
+
+\[
+P(D)=\sum_{|\alpha|\le m} c_\alpha \partial^\alpha.
+\]
+
+<p>如果 \(E\) 是它的基本解，也就是</p>
+
+\[
+P(D)E=\delta_0,
+\]
+
+<p>那么对两边取 Fourier 变换，就得到</p>
+
+\[
+\boxed{
+P(2\pi i\xi)\,\widehat E(\xi)=1.
+}
+\]
+
+<p>这几乎把“找基本解”化成了“除以多项式”：</p>
+
+\[
+\widehat E(\xi)=\frac{1}{P(2\pi i\xi)}.
+\]
+
+<p>当然，真正的困难在于分母会不会有零点、这个商到底是不是函数、是不是只能在分布意义下理解。但不管后续技术有多麻烦，结构已经完全透明了：<strong>Fourier 变换把微分算子对角化，而分布语言保证右边的 \(\delta_0\) 也能被合法地变换。没有这两步，基本解理论根本无从起步。</strong></p>
+
+<p>你在<a href="../偏微分方程/ch15.html">《偏微分方程读本》第 15 章</a>看到 Green 函数与 Poisson 核，在<a href="../偏微分方程/ch21.html">第 21 章</a>看到弱解与弱导数；下一章我们要做的，就是把这两条线真正焊在一起：既允许右边出现 \(\delta\) 这样的点源，又允许解本身只以分布意义满足方程。到了那时，这一章看似抽象的公式会突然变得非常实战。</p>
+
+<h2 id="sec13-15">13.15 这一章最该留下的三句话</h2>
+
+<p>第一句话是：\(S'\) 上的 Fourier 变换根本不需要新的积分定义，它只是 \(\mathcal S\) 上 Fourier 变换的对偶延长。因为 \(\mathcal S\) 在变换下闭合，所以 \(S'\) 自动成为 Fourier 的天然舞台。</p>
+
+<p>第二句话是：\(\widehat\delta=1\) 与 \(\widehat 1=\delta\) 不是两条孤立公式，而是空间局域化与频率扩散互为镜像的最极端版本。主值核 \(PV(1/x)\) 对应 \(-i\pi\operatorname{sgn}\) 则说明，空间里的奇核往往在频域里变成干净的乘子。</p>
+
+<p>第三句话是：一旦你接受 Fourier 变换可以作用在分布上，常系数微分方程的基本解就几乎一定要在频域里寻找。下一章的 Laplace、热方程、波动方程和 Green 函数，都会直接从这里长出来。</p>
+
+<p>再补一句更实战的理解：本章所有公式真正教你的，是“先在物理空间识别结构，再去频域挑最便于计算的语言”。若对象是点支撑奇性，就优先想到 \(\delta\) 及其导数；若对象带跳跃，就警觉 \(1/\xi\) 型主值项和零频 \(\delta\) 项；若对象满足常系数微分方程，就立刻把算子送成乘子，看分母有没有零点。这样读分布 Fourier，你面对的就不再是一堆待背公式，而是一套非常稳定的故障排查流程。</p>
+
+<p>也正因如此，这一章在整本书里有点像一道闸门。过了这道闸门以后，Fourier 变换不再只是处理好函数的积分变换，而成了一个能直接操纵点源、主值核、弱解和基本解的总代数机器。后面每当你看到频域里出现多项式分母、零频奇性、相位乘子或主值分布时，都应当把它们追溯回本章已经建立的这些对偶规则。</p>
+
+<p>再说得更具体一点，本章其实给了你一张非常实用的“分布 Fourier 对照表”。空间里若出现点支撑，就去频域里找多项式；空间里若出现跳跃，就去频域里找 \(1/\xi\) 型主值奇性和零频 \(\delta\)；空间里若出现微分算子，就去频域里把它写成乘子；空间里若做平移和调制，就去频域里分别读相位和频移。很多看起来复杂的计算，只要先判断自己落在这张对照表的哪一格，后面的步骤往往就已经只剩代数整理。学会这一点，比单独会算某一个例子值钱得多。</p>
+
+<p>从更大的图景看，这章也在训练一种频率视角下的诚实。Fourier 变换不会替你消灭奇性，它只会把奇性搬到更适合分析的位置；它不会替你消灭非唯一性，只会把非唯一性的来源压缩成乘子零点；它不会替你自动给出良好函数，而是明确告诉你哪些对象必须以分布意义来理解。正因为这套语言足够诚实，后面的 PDE、奇异积分和 Sobolev 理论才能真正建立在稳固的地基上。</p>
+
+<p>因此读完这一章后，最好的自检方式不是重复某条公式，而是自己选几个对象做双向翻译：从 \(1\)、\(\delta\)、\(H\)、\(\operatorname{sgn}\)、\(PV(1/x)\)、多项式和高斯里任取两三个，试着先凭结构猜它们的 Fourier 画像，再用分布规则验证。只要这个练习能独立做通，你对分布 Fourier 的掌握就已经从“会看答案”跨到了“会自己组织答案”。</p>
+
+<p>而一旦这种组织能力建立起来，后面遇到的新对象其实都只是老模板的新组合：点源加上平移就是相位，主值核加上导数就是更高阶乘子，零频 \(\delta\) 项加上主值项就是跳跃函数的频谱。你真正掌握的不是若干孤例，而是一套能不断复用的频域语法。</p>
+
+<p>所以本章最深的收获，其实是开始把“对象是什么”改问成“它在 Fourier 语言里如何行动、如何被乘子看见、又如何被反演拉回去”。这套改问方式一旦稳定下来，分布和 Fourier 就会真正合成一门工具，而不再是两门并列知识。</p>
+
+<p>这门工具以后会反复出现，只是名称会从分布 Fourier 变成乘子方法、基本解方法、谱方法或弱解方法而已。</p>
+
+<p>名字会变，表面对象会变，但底层动作始终没变：把空间里的微分、平移、奇性和局域性翻译成频域里的乘子、相位、主值项与零点结构，再把结论准确地拉回原空间。</p>
+
+<p>只要这条主线不丢，分布 Fourier 里的细节公式就永远可以现推，而不必死背。</p>
+
+<p>这恰好就是成熟使用者和背公式者的分水岭。</p>
+
+<p>真正会用的人，最后靠的始终是结构判断而不是记忆负担。</p>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B　常用变换速查：Fourier、Laplace、Mellin、卷积与恒等式 — 普林斯顿调和分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A　经典不等式速查：Hardy、Hilbert、Hausdorff-Young 与插值</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+<h1 id="appB">附录 B　常用变换速查：Fourier、Laplace、Mellin、卷积与恒等式</h1>
+
+<p>这本书在 <a href="ch9.html">第 9 章</a> 以后大量使用 Fourier 变换，而且默认你已经能在“一个对象长什么样”和“它的变换长什么样”之间快速来回切换。真正做题时，你最怕的通常不是不会推导，而是明明知道应该变换，却卡在常数、符号、支撑位置和主值解释上。所以这份附录的目标很朴素：把本书最常用的约定统一下来，再把最常查的变换对和恒等式压成一页能翻的东西。</p>
+
+<p>这里所有 Fourier 公式默认都是一维写法，但大部分都能直接张量化到 \(\mathbb R^n\)。真正需要你格外留神的，只有两件事：第一，不同教材对 \(2\pi\) 的放法不同；第二，阶跃函数、常数函数、Dirac 质量、主值核这些对象往往只能在分布意义下谈变换。本附录会把这两点都摆在明面上，免得你在 <a href="ch12.html">第 12 章</a> 和 <a href="ch13.html">第 13 章</a> 来回切换时掉坑里。</p>
+
+<h2 id="secB-1">B.1 统一约定：本书用哪一种 Fourier 变换</h2>
+
+<p>本书固定采用</p>
+
+\[
+\boxed{\hat f(\xi)=\mathcal Ff(\xi)=\int_{\mathbb R} f(x)e^{-2\pi i x\xi}\,dx,}
+\qquad
+\boxed{f(x)=\int_{\mathbb R}\hat f(\xi)e^{2\pi i x\xi}\,d\xi.}
+\]
+
+<p>在这个约定下，Plancherel 没有额外常数，导数规则会长出 \(2\pi i\xi\)，而高斯 \(e^{-\pi x^2}\) 会保持自变换。这三件事是你检查公式是否写对的最好路标。</p>
+
+<p>下面还会用到两个记号：</p>
+
+\[
+\operatorname{rect}(x)=\mathbf 1_{[-1/2,\,1/2]}(x),\qquad
+\operatorname{sinc}(x)=
+\begin{cases}
+\dfrac{\sin(\pi x)}{\pi x},&x\ne 0,\\[6pt]
+1,&x=0.
+\end{cases}
+\]
+
+<p>对分布对象，我们把 \(\delta_a\) 记作点 \(a\) 的 Dirac 质量，把 \(\operatorname{PV}\frac1x\) 记作 Cauchy 主值。你如果忘了某条分布公式的符号，最快的检验法往往不是背，而是拿导数关系去核对：比如 \(H'=\delta_0\)、\((\operatorname{sgn}x)'=2\delta_0\)、\(\widehat{f'}=2\pi i\xi\,\hat f\)。</p>
+
+<h2 id="secB-2">B.2 Fourier 变换表：函数、分布与周期对象</h2>
+
+<table>
+<thead>
+<tr><th>对象 \(f(x)\)</th><th>\(\hat f(\xi)\)</th><th>备注</th></tr>
+</thead>
+<tbody>
+<tr><td>\(e^{-\pi x^2}\)</td><td>\(e^{-\pi \xi^2}\)</td><td>标准高斯，自变换</td></tr>
+<tr><td>\(e^{-\pi a x^2}\)（\(a&gt;0\)）</td><td>\(a^{-1/2}e^{-\pi \xi^2/a}\)</td><td>伸缩版高斯</td></tr>
+<tr><td>\(\operatorname{rect}(x)\)</td><td>\(\operatorname{sinc}(\xi)\)</td><td>紧支撑 \(\leftrightarrow\) 缓慢衰减</td></tr>
+<tr><td>\(\operatorname{sinc}(x)\)</td><td>\(\operatorname{rect}(\xi)\)</td><td>带限 \(\leftrightarrow\) 非紧支撑</td></tr>
+<tr><td>\(e^{-a|x|}\)（\(a&gt;0\)）</td><td>\(\dfrac{2a}{a^2+4\pi^2\xi^2}\)</td><td>双指数对应洛伦兹型衰减</td></tr>
+<tr><td>\(\dfrac1{a^2+x^2}\)（\(a&gt;0\)）</td><td>\(\dfrac{\pi}{a}e^{-2\pi a|\xi|}\)</td><td>有理衰减 \(\leftrightarrow\) 指数衰减</td></tr>
+<tr><td>\(\delta_a\)</td><td>\(e^{-2\pi i a\xi}\)</td><td>点质量变成纯相位</td></tr>
+<tr><td>\(1\)</td><td>\(\delta_0\)</td><td>常数只在零频率集中</td></tr>
+<tr><td>\(H(x)\)</td><td>\(\dfrac12\delta_0+\operatorname{PV}\dfrac1{2\pi i\xi}\)</td><td>阶跃函数，分布意义</td></tr>
+<tr><td>\(\operatorname{sgn}(x)\)</td><td>\(\operatorname{PV}\dfrac1{i\pi \xi}\)</td><td>由 \(2H-1\) 得到</td></tr>
+<tr><td>\(\operatorname{PV}\dfrac1x\)</td><td>\(-i\pi\,\operatorname{sgn}(\xi)\)</td><td><a href="ch13.html">第 13 章</a> 的关键例子</td></tr>
+</tbody>
+</table>
+
+<p>这里最值得你反复咀嚼的有三对。</p>
+
+<ul>
+  <li><strong>高斯 \(\leftrightarrow\) 高斯</strong>：它是热核、概率密度和 Fourier 对角化三条线交叉的中心，所以在 <a href="ch9.html">第 9 章</a>、<a href="ch14.html">第 14 章</a>、<a href="ch20.html">第 20 章</a> 都会回来。</li>
+  <li><strong>rect \(\leftrightarrow\) sinc</strong>：它说明“硬截断支撑”会在频域制造慢衰减和振铃，这正是 <a href="ch7.html">第 7 章</a> Gibbs 现象的直觉底层。</li>
+  <li><strong>\(\operatorname{PV}(1/x)\leftrightarrow -i\pi\,\operatorname{sgn}\)</strong>：它把 Hilbert 变换从卷积主值核变成频域乘子，于是 <a href="ch17.html">第 17 章</a> 的 \(L^2\) 理论会一下子变得透明。</li>
+</ul>
+
+<p>“周期延拓”最好单独记，因为它不再对应普通函数，而是对应一串离散频率。若</p>
+
+\[
+\Sha_T(x)=\sum_{k\in\mathbb Z}\delta(x-kT),
+\]
+
+<p>那么</p>
+
+\[
+\boxed{\widehat{\Sha_T}(\xi)=\frac1T\,\Sha_{1/T}(\xi).}
+\]
+
+<p>这就是 Dirac comb 的自对偶公式，也是 Poisson 求和公式的骨架。更一般地，若 \(f_{\mathrm{per}}(x)=\sum_{k\in\mathbb Z}f(x-kT)\) 是 \(f\) 的 \(T\)-周期延拓，则</p>
+
+\[
+\boxed{\widehat{f_{\mathrm{per}}}(\xi)=\frac1T\sum_{n\in\mathbb Z}\hat f\!\left(\frac{n}{T}\right)\delta\!\left(\xi-\frac{n}{T}\right).}
+\]
+
+<p>也就是说，周期化会把连续频谱抽样成离散谱；反过来，离散系数往往对应真实空间里的周期结构。这正是 <a href="ch2.html">第 2 章</a> 到 <a href="ch6.html">第 6 章</a> 的 Fourier 级数，和 <a href="ch9.html">第 9 章</a> 到 <a href="ch11.html">第 11 章</a> 的 Fourier 变换之间真正接上的地方。</p>
+
+<h2 id="secB-3">B.3 Laplace 变换与 Fourier 的关系：指数阻尼后的边界值</h2>
+
+<p>Laplace 变换定义为</p>
+
+\[
+\mathcal L f(s)=\int_0^\infty e^{-st}f(t)\,dt,\qquad s=\sigma+i\tau.
+\]
+
+<p>若把 \(\tau\) 改写成 \(2\pi \xi\)，你会立刻看出它就是 Fourier 变换的一个阻尼版本：</p>
+
+\[
+\boxed{\mathcal L f(\sigma+2\pi i\xi)
+=
+\widehat{\,e^{-\sigma t}f(t)\mathbf 1_{[0,\infty)}(t)\,}(\xi).}
+\]
+
+<p>这句公式几乎解释了 Laplace 与 Fourier 的全部关系。</p>
+
+<ul>
+  <li>Laplace 比 Fourier 多出来的 \(\sigma\) 是指数阻尼，所以它能把本来不在 \(L^1\) 的因果信号先压进可积世界。</li>
+  <li>当 \(\sigma\downarrow 0\) 时，Laplace 变换的边界值就会逼近对应的 Fourier 变换。这在因果系统、散射理论和边界值问题里都很重要。</li>
+  <li>微分方程里常见的 \(\dfrac1{s-a}\) 其实就是 \(e^{at}\mathbf 1_{t\ge 0}\) 的 Laplace 像，而把 \(s\) 放到虚轴附近看，本质上是在看 \(1/(a+2\pi i\xi)\) 这样的 Fourier 乘子。</li>
+</ul>
+
+<p>所以如果你在 <a href="../微分方程/ch18.html">《微分方程读本》第 18 章</a> 里已经会用 Laplace 解初值问题，不妨把那套技巧翻译成一句更抽象的话：Laplace 变换是在右半平面里看一个经过阻尼的 Fourier 变换。这样你再读本书的 Poisson 核、解析延拓和边界值时，会明显觉得它们不是散的。</p>
+
+<h2 id="secB-4">B.4 Mellin 变换简介：把伸缩问题改写成平移问题</h2>
+
+<p>Mellin 变换对加法结构不敏感，对乘法结构敏感。定义是</p>
+
+\[
+\boxed{\mathcal M f(s)=\int_0^\infty f(x)x^{s-1}\,dx.}
+\]
+
+<p>第一次看它最好的办法不是背公式，而是换元 \(x=e^u\)。设 \(s=c+2\pi i\xi\)，则</p>
+
+\[
+\mathcal M f(c+2\pi i\xi)
+=
+\int_{-\infty}^{\infty} f(e^u)e^{cu}e^{2\pi i\xi u}\,du.
+\]
+
+<p>也就是说，如果令</p>
+
+\[
+g_c(u)=e^{cu}f(e^u),
+\]
+
+<p>那么</p>
+
+\[
+\boxed{\mathcal M f(c+2\pi i\xi)=\widehat{g_c}(-\xi).}
+\]
+
+<p>这句话值得记，因为它说明 Mellin 变换其实就是“对数坐标下的 Fourier 变换”。于是很多 Fourier 语言都能翻过来：</p>
+
+<ul>
+  <li>实空间里的伸缩 \(f(ax)\) 会变成 Mellin 变量上的乘相位：\(\mathcal M[f(ax)](s)=a^{-s}\mathcal M f(s)\)。</li>
+  <li>乘法卷积 \((f*_M g)(x)=\int_0^\infty f(x/t)g(t)\,\dfrac{dt}{t}\) 会被 Mellin 变换送成点乘。</li>
+  <li>齐次核、幂函数、Gamma 函数、ζ 函数和尺度不变问题，往往天然更适合 Mellin 语法，而不是普通 Fourier 语法。</li>
+</ul>
+
+<p>在本书主线里，Mellin 不会像 Fourier 那样占据中心位置，但它是一块非常有用的旁门钥匙。只要你的问题更像“放大缩小会怎样”，而不是“平移会怎样”，就值得先问一句：能不能换成对数变量，把它交给 Fourier？Mellin 变换正是这一步的标准桥梁。</p>
+
+<h2 id="secB-5">B.5 卷积速查：哪一种核对应哪一种平滑</h2>
+
+<p>在 \(\mathbb R^n\) 上，卷积定义为</p>
+
+\[
+(f*g)(x)=\int_{\mathbb R^n} f(x-y)g(y)\,dy.
+\]
+
+<p>在圆周群 \(\mathbb T\) 上，则是一个周期积分。最重要的公式有五条：</p>
+
+\[
+\boxed{f*g=g*f,\qquad (f*g)*h=f*(g*h),}
+\]
+\[
+\boxed{\widehat{f*g}=\hat f\,\hat g,\qquad \widehat{fg}=\hat f * \hat g,}
+\]
+\[
+\boxed{\partial^\alpha(f*g)=(\partial^\alpha f)*g=f*(\partial^\alpha g).}
+\]
+
+<p>若 \(K\in L^1\)，还有 Young 不等式</p>
+
+\[
+\boxed{\|K*f\|_{L^p}\le \|K\|_{L^1}\|f\|_{L^p},\qquad 1\le p\le \infty.}
+\]
+
+<p>这条式子说明：只要核本身可积，卷积就不会把 \(L^p\) 范数搞炸。可调和分析最有趣的地方，恰恰是很多关键核并不只是“某个可积函数”。它们各自携带不同的几何任务：</p>
+
+<table>
+<thead>
+<tr><th>核</th><th>卷积后做什么</th><th>你该记住的性格</th></tr>
+</thead>
+<tbody>
+<tr><td>Dirichlet 核 \(D_N\)</td><td>\(S_Nf=f*D_N\)</td><td>能截断频率，但不是良核，\(\|D_N\|_1\sim \log N\)</td></tr>
+<tr><td>Fejér 核 \(F_N\)</td><td>\(\sigma_N f=f*F_N\)</td><td>正、归一、集中，是 Cesàro 平均的良核</td></tr>
+<tr><td>Poisson 核 \(P_r\)</td><td>\(P_r*f\)</td><td>把边界值延拓成圆盘内调和函数</td></tr>
+<tr><td>热核 \(G_t\)</td><td>\(G_t*f\)</td><td>立刻平滑化，满足半群 \(G_t*G_s=G_{t+s}\)</td></tr>
+<tr><td>主值核 \(\operatorname{PV}(1/x)\)</td><td>Hilbert 变换</td><td>不是 \(L^1\) 核，要靠奇性抵消与频域乘子理解</td></tr>
+</tbody>
+</table>
+
+<p>所以“卷积”不是一个意思，而是一整个家族。看到卷积时，你要先分清手里是哪一类核：是良核在做平均逼近，还是奇异核在做主值抵消，还是热核 / Poisson 核在做 PDE 演化。<a href="ch4.html">第 4 章</a> 到 <a href="ch7.html">第 7 章</a> 关心的是周期良核和坏核的差别；<a href="ch14.html">第 14 章</a> 关心的是基本解如何通过卷积制造 PDE 解；<a href="ch17.html">第 17 章</a> 则关心主值卷积为什么还能在 \(L^p\) 上有界。</p>
+
+<h2 id="secB-6">B.6 经典恒等式表：平移、调制、伸缩、导数、反演</h2>
+
+<table>
+<thead>
+<tr><th>真实空间操作</th><th>频域对应</th><th>备注</th></tr>
+</thead>
+<tbody>
+<tr><td>\(f(x-a)\)</td><td>\(e^{-2\pi i a\xi}\hat f(\xi)\)</td><td>平移变相位</td></tr>
+<tr><td>\(e^{2\pi i a x}f(x)\)</td><td>\(\hat f(\xi-a)\)</td><td>调制变平移</td></tr>
+<tr><td>\(f(ax)\)，\(a\ne 0\)</td><td>\(|a|^{-1}\hat f(\xi/a)\)</td><td>伸缩互逆</td></tr>
+<tr><td>\(f'(x)\)</td><td>\(2\pi i\xi\,\hat f(\xi)\)</td><td>微分变乘子</td></tr>
+<tr><td>\(x f(x)\)</td><td>\(\dfrac{i}{2\pi}\partial_\xi \hat f(\xi)\)</td><td>乘坐标变频域求导</td></tr>
+<tr><td>\(\overline{f(x)}\)</td><td>\(\overline{\hat f(-\xi)}\)</td><td>实偶函数的变换仍实偶</td></tr>
+<tr><td>\(f*g\)</td><td>\(\hat f\,\hat g\)</td><td>卷积定理</td></tr>
+<tr><td>\(fg\)</td><td>\(\hat f * \hat g\)</td><td>点乘变卷积</td></tr>
+<tr><td>\(\int f(x)\overline{g(x)}\,dx\)</td><td>\(\int \hat f(\xi)\overline{\hat g(\xi)}\,d\xi\)</td><td>Parseval / Plancherel</td></tr>
+<tr><td>\(\sum_{n\in\mathbb Z}f(n)\)</td><td>\(\sum_{k\in\mathbb Z}\hat f(k)\)</td><td>Poisson 求和，适用于 Schwartz 函数</td></tr>
+</tbody>
+</table>
+
+<p>这张表里最该练成反射动作的是前三行：平移、调制、伸缩。它们构成了几乎全部频率局部化技术的语法底层。你在 <a href="ch19.html">第 19 章</a> 看 dyadic 分块时，本质上一直在做“先把函数调制 / 伸缩到一个标准频带，再比较它们的 \(L^p\) 大小”。同样，导数变乘子这条式子则是 Sobolev 空间和 PDE Fourier 解法的主轴；如果你把它忘了，<a href="ch18.html">第 18 章</a> 和 <a href="ch20.html">第 20 章</a> 会显得像两本陌生书。</p>
+
+<p>最后，把这份附录最浓缩的结论说成一句话就是：Fourier 变换会把“局部变化有多快”翻译成“高频有多重”，把“卷积平滑”翻译成“频域乘法衰减”，把“周期结构”翻译成“离散谱”，把“尺度变化”翻译成“频域反向伸缩”。一旦你开始自动用这种语言看式子，本书后半段的大部分公式就不再像陌生字符，而像同一组语法的不同句子。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 上一章 · 附录 A　经典不等式速查：Hardy、Hilbert、Hausdorff-Young 与插值</a><a href="subject-index.html">下一章 · 索引 →</a></nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,635 @@
+<h1 id="ch2">第 2 章 三角级数与正交基视角</h1>
+
+<p>上一章我们是从 PDE 被迫退到 Fourier 展开的。现在要把镜头转过来：不再把三角函数只当作解题时偶然出现的演员，而把它们当作一组坐标轴来研究。只要“坐标轴”这几个字一出现，线性代数的影子就已经在场了。你在有限维里把向量沿着正交基分解；到了函数空间里，事情本质上并没有变，变的只是求和号被积分号替代，有限个坐标被无穷多个频率坐标替代。</p>
+
+<p>这一章的主线很简单：先把 \(\{1,\cos nx,\sin nx\}\) 的正交性算清楚，再把它们改写成复指数族 \(\{e^{inx}\}\)，随后把整个故事抬进 \(L^2[-\pi,\pi]\) 的 Hilbert 空间语言。到那时，Fourier 系数不再像凭空写出的积分公式，而会自然地显成正交投影的坐标；Bessel 不等式与 Parseval 等式也不再像孤立恒等式，而会显成勾股定理在无穷维里的延伸。</p>
+
+<p>这一章和 <a href="../测度论/ch12.html">《测度论读本》第 12 章</a> 与 <a href="../线性代数/ch21.html">《线性代数读本》第 21 章</a> 的关系非常紧：前者给出 \(L^2\) 作为 Hilbert 空间的背景，后者给出 Gram-Schmidt 与正交投影的有限维原型。你会不断感觉到，Fourier 级数并不是孤零零的一套公式，而是把那两本书之间的桥梁真正铺实了。</p>
+
+<h2 id="sec2-1">2.1 三角函数族为什么彼此正交</h2>
+
+<p>先在最具体的层面上说话。我们把区间固定为 \([-\pi,\pi]\)，考虑函数族</p>
+
+\[
+\{1,\cos x,\sin x,\cos 2x,\sin 2x,\dots\}.
+\]
+
+<p>所谓正交，指的是不同函数的内积为零。暂时先用最朴素的内积</p>
+
+\[
+\langle f,g\rangle=\int_{-\pi}^{\pi}f(x)g(x)\,dx.
+\]
+
+<p>第一件事是奇偶性。常数函数和余弦都是偶函数，正弦是奇函数，所以任何“偶 \(\times\) 奇”的乘积都是奇函数，其在对称区间上的积分必为零。于是</p>
+
+\[
+\int_{-\pi}^{\pi}\cos(mx)\sin(nx)\,dx=0\qquad (m,n\ge 1).
+\]
+
+<p>真正需要计算的是“余弦与余弦”以及“正弦与正弦”。这里最方便的是积化和差公式：</p>
+
+\[
+\cos(mx)\cos(nx)=\frac12\bigl(\cos((m-n)x)+\cos((m+n)x)\bigr),
+\]
+
+\[
+\sin(mx)\sin(nx)=\frac12\bigl(\cos((m-n)x)-\cos((m+n)x)\bigr).
+\]
+
+<p>若 \(m\ne n\)，那么 \(m-n\) 与 \(m+n\) 都不是零，故</p>
+
+\[
+\int_{-\pi}^{\pi}\cos(kx)\,dx=0\qquad (k\in\mathbb Z\setminus\{0\}),
+\]
+
+<p>从而立刻得到</p>
+
+\[
+\int_{-\pi}^{\pi}\cos(mx)\cos(nx)\,dx=0,\qquad
+\int_{-\pi}^{\pi}\sin(mx)\sin(nx)\,dx=0
+\qquad (m\ne n).
+\]
+
+<p>如果 \(m=n\)，上面的公式则变成</p>
+
+\[
+\cos^2(nx)=\frac{1+\cos(2nx)}{2},\qquad
+\sin^2(nx)=\frac{1-\cos(2nx)}{2}.
+\]
+
+<p>于是</p>
+
+\[
+\int_{-\pi}^{\pi}\cos^2(nx)\,dx=\int_{-\pi}^{\pi}\sin^2(nx)\,dx=\pi,
+\qquad n\ge 1,
+\]
+
+<p>而</p>
+
+\[
+\int_{-\pi}^{\pi}1^2\,dx=2\pi.
+\]
+
+<p>这些计算合起来就是这一节的核心结论：</p>
+
+\[
+\boxed{
+\begin{aligned}
+\int_{-\pi}^{\pi}\cos(mx)\cos(nx)\,dx&=
+\begin{cases}
+0,&m\ne n,\\
+\pi,&m=n\ge 1,
+\end{cases}\\[6pt]
+\int_{-\pi}^{\pi}\sin(mx)\sin(nx)\,dx&=
+\begin{cases}
+0,&m\ne n,\\
+\pi,&m=n\ge 1,
+\end{cases}\\[6pt]
+\int_{-\pi}^{\pi}\cos(mx)\sin(nx)\,dx&=0.
+\end{aligned}}
+\]
+
+<p>这不是装饰性计算。它的真正意义在于：一旦你把一个函数写成三角函数的线性组合，这些坐标之间不会互相污染。你乘上 \(\sin 5x\) 再积分，别的频率项会自动消失，只剩第 \(5\) 个频率留下痕迹。Fourier 系数之所以可算，全靠这件事。</p>
+
+<h3 id="sec2-1-1">例题 1：把正交性真的算到手上</h3>
+
+<p>先算</p>
+
+\[
+\int_{-\pi}^{\pi}\cos(2x)\sin(3x)\,dx.
+\]
+
+<p>因为 \(\cos(2x)\) 为偶，\(\sin(3x)\) 为奇，所以乘积是奇函数，故积分立刻为零：</p>
+
+\[
+\int_{-\pi}^{\pi}\cos(2x)\sin(3x)\,dx=0.
+\]
+
+<p>再算</p>
+
+\[
+\int_{-\pi}^{\pi}\cos(2x)\cos(5x)\,dx.
+\]
+
+<p>用积化和差公式：</p>
+
+\[
+\cos(2x)\cos(5x)=\frac12\bigl(\cos 3x+\cos 7x\bigr).
+\]
+
+<p>故</p>
+
+\[
+\int_{-\pi}^{\pi}\cos(2x)\cos(5x)\,dx
+=\frac12\int_{-\pi}^{\pi}\cos 3x\,dx+\frac12\int_{-\pi}^{\pi}\cos 7x\,dx=0.
+\]
+
+<p>最后算范数：</p>
+
+\[
+\int_{-\pi}^{\pi}\cos^2(2x)\,dx
+=\int_{-\pi}^{\pi}\frac{1+\cos 4x}{2}\,dx
+=\frac12\cdot 2\pi+\frac12\cdot 0
+=\pi.
+\]
+
+<p>这三步已经把“正交”和“归一化常数”都算了出来。后面所有系数公式，只不过是在重复利用这些结果。</p>
+
+<h2 id="sec2-2">2.2 从正交性到实 Fourier 系数公式</h2>
+
+<p>既然三角函数彼此正交，最自然的猜想就是把一个 \(2\pi\)-周期函数写成</p>
+
+\[
+f(x)\sim \frac{a_0}{2}+\sum_{n=1}^{\infty}\bigl(a_n\cos nx+b_n\sin nx\bigr).
+\]
+
+<p>这里的“\(\sim\)”暂时只表示形式展开，我们还没有讨论它收敛到谁。现在只做一件事：如果这样的展开成立，系数该怎样被逼出来？答案和线性代数里求正交坐标一模一样：乘上基向量，再积分。</p>
+
+<p>先求 \(a_m\)。把上式两边乘上 \(\cos(mx)\)，在 \([-\pi,\pi]\) 上积分：</p>
+
+\[
+\int_{-\pi}^{\pi}f(x)\cos(mx)\,dx
+=\frac{a_0}{2}\int_{-\pi}^{\pi}\cos(mx)\,dx
++\sum_{n=1}^{\infty}a_n\int_{-\pi}^{\pi}\cos(nx)\cos(mx)\,dx
++\sum_{n=1}^{\infty}b_n\int_{-\pi}^{\pi}\sin(nx)\cos(mx)\,dx.
+\]
+
+<p>当 \(m\ge 1\) 时，第一项为零，第三项全为零，第二项除了 \(n=m\) 外都为零，于是只剩</p>
+
+\[
+\int_{-\pi}^{\pi}f(x)\cos(mx)\,dx=a_m\pi.
+\]
+
+<p>所以</p>
+
+\[
+a_m=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(mx)\,dx,\qquad m\ge 1.
+\]
+
+<p>同理，乘上 \(\sin(mx)\) 并积分，就得到</p>
+
+\[
+b_m=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(mx)\,dx,\qquad m\ge 1.
+\]
+
+<p>至于常数项，只要对原展开直接积分即可：</p>
+
+\[
+\int_{-\pi}^{\pi}f(x)\,dx=\frac{a_0}{2}\cdot 2\pi,
+\]
+
+<p>故</p>
+
+\[
+a_0=\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\,dx.
+\]
+
+<p>因此实 Fourier 系数公式为</p>
+
+\[
+\boxed{
+a_0=\frac1\pi\int_{-\pi}^{\pi}f(x)\,dx,\qquad
+a_n=\frac1\pi\int_{-\pi}^{\pi}f(x)\cos(nx)\,dx,\qquad
+b_n=\frac1\pi\int_{-\pi}^{\pi}f(x)\sin(nx)\,dx.}
+\]
+
+<p>如果 \(f\) 是偶函数，那么所有 \(b_n\) 自动为零；如果 \(f\) 是奇函数，那么 \(a_0\) 与所有 \(a_n\) 自动为零。这一点经常能把计算量砍掉一半，甚至更多。</p>
+
+<h3 id="sec2-2-1">例题 2：一个有限三角多项式的系数怎样被正交性直接抽出来</h3>
+
+<p>设</p>
+
+\[
+f(x)=3-2\cos(2x)+5\sin(3x).
+\]
+
+<p>我们故意不用“眼睛直接读系数”，而用积分公式重新算一遍。先算常数项：</p>
+
+\[
+a_0=\frac1\pi\int_{-\pi}^{\pi}\bigl(3-2\cos(2x)+5\sin(3x)\bigr)\,dx.
+\]
+
+<p>其中余弦与正弦在整周期上的积分都为零，所以</p>
+
+\[
+a_0=\frac1\pi\cdot 3\cdot 2\pi=6.
+\]
+
+<p>注意这与展开式中的常数项 \(a_0/2\) 一致，因为 \(a_0/2=3\)。再看 \(a_2\)：</p>
+
+\[
+a_2=\frac1\pi\int_{-\pi}^{\pi}\bigl(3-2\cos(2x)+5\sin(3x)\bigr)\cos(2x)\,dx.
+\]
+
+<p>第一项因 \(\int \cos 2x=0\) 消失，第三项因正弦余弦正交消失，只剩</p>
+
+\[
+a_2=\frac1\pi\int_{-\pi}^{\pi}-2\cos^2(2x)\,dx=\frac1\pi(-2\pi)=-2.
+\]
+
+<p>同理对 \(b_3\)：</p>
+
+\[
+b_3=\frac1\pi\int_{-\pi}^{\pi}\bigl(3-2\cos(2x)+5\sin(3x)\bigr)\sin(3x)\,dx
+=\frac1\pi\int_{-\pi}^{\pi}5\sin^2(3x)\,dx
+=5.
+\]
+
+<p>其余 \(a_n,b_n\) 全为零。这个例子虽然简单，却把 Fourier 级数的本质说得很清楚：所谓“取第 \(n\) 个系数”，其实就是沿着第 \(n\) 个正交方向做投影。</p>
+
+<h2 id="sec2-3">2.3 复指数版 \(\{e^{inx}\}\)：坐标系突然变得更整洁</h2>
+
+<p>实三角级数已经够用，但很多公式写成复指数会更简洁。Euler 公式</p>
+
+\[
+e^{inx}=\cos(nx)+i\sin(nx)
+\]
+
+<p>告诉你，正弦与余弦其实只是同一个对象的实部和虚部。于是我们不妨改看形式展开</p>
+
+\[
+f(x)\sim \sum_{n\in\mathbb Z}\widehat f(n)e^{inx}.
+\]
+
+<p>此时最自然的内积是复 Hilbert 空间里的内积：</p>
+
+\[
+\langle f,g\rangle=\int_{-\pi}^{\pi}f(x)\overline{g(x)}\,dx.
+\]
+
+<p>对 \(m,n\in\mathbb Z\)，有</p>
+
+\[
+\langle e^{imx},e^{inx}\rangle
+=\int_{-\pi}^{\pi}e^{imx}\overline{e^{inx}}\,dx
+=\int_{-\pi}^{\pi}e^{i(m-n)x}\,dx.
+\]
+
+<p>若 \(m\ne n\)，则 \(m-n\ne0\)，故积分为零；若 \(m=n\)，则积分等于 \(2\pi\)。因此</p>
+
+\[
+\int_{-\pi}^{\pi}e^{imx}\overline{e^{inx}}\,dx=2\pi\,\delta_{mn}.
+\]
+
+<p>所以复 Fourier 系数的自然定义是</p>
+
+\[
+\boxed{\widehat f(n)=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x)e^{-inx}\,dx,\qquad n\in\mathbb Z.}
+\]
+
+<p>这时实三角系数和复系数之间可以互相翻译。若 \(f\) 为实值函数，则</p>
+
+\[
+\widehat f(0)=\frac{a_0}{2},\qquad
+\widehat f(n)=\frac{a_n-ib_n}{2}\ (n\ge1),\qquad
+\widehat f(-n)=\frac{a_n+ib_n}{2}\ (n\ge1).
+\]
+
+<p>因此，实展开与复展开完全等价；只是复写法把两列 \(\cos(nx)\) 和 \(\sin(nx)\) 合并成了一列更对称的 \(e^{inx}\)。后面一旦进入 Fourier 变换、卷积、调制与平移规则，复写法几乎总是最省力的。</p>
+
+<h3 id="sec2-3-1">例题 3：把一个简单实函数改写成复 Fourier 系数</h3>
+
+<p>设</p>
+
+\[
+f(x)=1+\cos x+\sin x.
+\]
+
+<p>先用 Euler 公式展开：</p>
+
+\[
+\cos x=\frac{e^{ix}+e^{-ix}}{2},\qquad
+\sin x=\frac{e^{ix}-e^{-ix}}{2i}.
+\]
+
+<p>因此</p>
+
+\[
+f(x)=1+\frac{e^{ix}+e^{-ix}}{2}+\frac{e^{ix}-e^{-ix}}{2i}.
+\]
+
+<p>把 \(1/(2i)\) 写成 \(-i/2\)，便有</p>
+
+\[
+f(x)=1+\left(\frac12-\frac{i}{2}\right)e^{ix}+\left(\frac12+\frac{i}{2}\right)e^{-ix}.
+\]
+
+<p>所以复 Fourier 系数直接读出为</p>
+
+\[
+\widehat f(0)=1,\qquad
+\widehat f(1)=\frac12-\frac{i}{2},\qquad
+\widehat f(-1)=\frac12+\frac{i}{2},
+\]
+
+\[
+\widehat f(n)=0\qquad (|n|\ge2).
+\]
+
+<p>你如果愿意，也可以反过来由 \(a_0=2,a_1=1,b_1=1\) 代入上一节的翻译公式，得到同样答案。两种语言只是写法不同，内容完全一致。</p>
+
+<h2 id="sec2-4">2.4 \(L^2[-\pi,\pi]\) 是真正的几何舞台</h2>
+
+<p>现在要把前面的积分技巧抬到结构层面。区间 \([-\pi,\pi]\) 上平方可积的函数构成空间 \(L^2[-\pi,\pi]\)。严格地说，这里的元素是“几乎处处相等”意义下的等价类；这个背景在 <a href="../测度论/ch12.html">测度论第 12 章</a> 已经系统说明。对我们现在最重要的是，\(L^2\) 带着内积</p>
+
+\[
+\langle f,g\rangle=\int_{-\pi}^{\pi}f(x)\overline{g(x)}\,dx
+\]
+
+<p>成为一个 Hilbert 空间，也就是一个完备的内积空间。于是长度、角度、正交、投影、最佳逼近这些有限维几何概念，全都可以原封不动搬过来。</p>
+
+<p>为了得到标准正交归一系，最方便的写法是</p>
+
+\[
+e_n(x)=\frac{1}{\sqrt{2\pi}}e^{inx},\qquad n\in\mathbb Z.
+\]
+
+<p>上一节的计算正好说明 \(\{e_n\}_{n\in\mathbb Z}\) 是正交归一系。更深一层的是它的完备性：它们张成的闭包竟然就是整个 \(L^2[-\pi,\pi]\)。换句话说，任意平方可积函数都能在 \(L^2\) 意义下由三角多项式逼近。</p>
+
+\[
+\boxed{L^2[-\pi,\pi]=\overline{\mathrm{span}\{e^{inx}:n\in\mathbb Z\}}.}
+\]
+
+<p>这个结论并不浅。它真正的证明要依赖连续函数在 \(L^2\) 中稠密，以及我们后面第 5 章会证明的 Fejér 定理：连续周期函数的 Cesàro 平均会一致收敛到原函数。一旦你知道三角多项式在连续函数里稠密，而连续函数又在 \(L^2\) 里稠密，就得到三角多项式在 \(L^2\) 里稠密。于是，如果某个 \(g\in L^2\) 与所有 \(e^{inx}\) 都正交，它便与所有三角多项式正交，也与它们的闭包正交，只能是零函数。完备性就在这里。</p>
+
+<p>你若从线性代数的眼光看，这其实就是“这些向量够不够张成整个空间”的无穷维版本。区别只是：在有限维里，“张成”是代数概念；在 \(L^2\) 里，“张成”必须加上闭包，因为你经常只能用极限去逼近一个对象，而未必能用有限和一次命中。</p>
+
+<h3 id="sec2-4-1">例题 4：用一个模态做最佳 \(L^2\) 逼近</h3>
+
+<p>设 \(f(x)=x\)，我们想在一维子空间</p>
+
+\[
+M=\mathrm{span}\{\sin x\}
+\]
+
+<p>里寻找离 \(f\) 最近的函数。按 Hilbert 空间的一般原理，最佳逼近就是正交投影：</p>
+
+\[
+P_Mf=\frac{\langle f,\sin x\rangle}{\langle \sin x,\sin x\rangle}\sin x.
+\]
+
+<p>先算分母：</p>
+
+\[
+\langle \sin x,\sin x\rangle=\int_{-\pi}^{\pi}\sin^2x\,dx=\pi.
+\]
+
+<p>再算分子。因为 \(x\sin x\) 为偶函数，故</p>
+
+\[
+\langle x,\sin x\rangle=2\int_0^{\pi}x\sin x\,dx.
+\]
+
+<p>分部积分：</p>
+
+\[
+\int_0^\pi x\sin x\,dx=\left[-x\cos x\right]_0^\pi+\int_0^\pi\cos x\,dx=\pi.
+\]
+
+<p>所以</p>
+
+\[
+\langle x,\sin x\rangle=2\pi.
+\]
+
+<p>代回去得到</p>
+
+\[
+P_Mf=\frac{2\pi}{\pi}\sin x=2\sin x.
+\]
+
+<p>这件事非常有几何意味：就“只允许保留一个频率”的限制下，\(x\) 最像的三角函数并不是随便哪个，而正是 \(2\sin x\)。后面 Fourier 部分和，本质上就是把这种单方向投影升级成多方向同时投影。</p>
+
+<h2 id="sec2-5">2.5 Bessel 不等式与 Parseval 等式是勾股定理的无穷维版本</h2>
+
+<p>设 \(\{e_n\}_{n\in\mathbb Z}\) 是 \(L^2[-\pi,\pi]\) 中的正交归一系。对任意 \(f\in L^2\)，考虑有限部分和</p>
+
+\[
+S_Nf=\sum_{n=-N}^{N}\langle f,e_n\rangle e_n.
+\]
+
+<p>这就是 \(f\) 在有限维子空间 \(\mathrm{span}\{e_{-N},\dots,e_N\}\) 上的正交投影。因为 \(f-S_Nf\) 与每个 \(e_n\) 正交，也就与整个投影空间正交，所以勾股定理给出</p>
+
+\[
+\|f\|_2^2=\|f-S_Nf\|_2^2+\|S_Nf\|_2^2.
+\]
+
+<p>另一方面，由于正交归一，</p>
+
+\[
+\|S_Nf\|_2^2=\sum_{n=-N}^{N}|\langle f,e_n\rangle|^2.
+\]
+
+<p>于是</p>
+
+\[
+\|f\|_2^2=\|f-S_Nf\|_2^2+\sum_{n=-N}^{N}|\langle f,e_n\rangle|^2.
+\]
+
+<p>右边第一项非负，立刻得到</p>
+
+\[
+\boxed{\sum_{n\in\mathbb Z}|\langle f,e_n\rangle|^2\le \|f\|_2^2.}
+\]
+
+<p>这就是 Bessel 不等式。它告诉你：任意正交坐标系抓到的能量总和，不可能超过原函数的总能量。</p>
+
+<p>如果这组正交归一系还是完备的，也就是上一节说的情形，那么 \(S_Nf\to f\) 在 \(L^2\) 中成立，故 \(\|f-S_Nf\|_2\to0\)。此时上式中的不等号升级为等号：</p>
+
+\[
+\boxed{\|f\|_2^2=\sum_{n\in\mathbb Z}|\langle f,e_n\rangle|^2.}
+\]
+
+<p>这就是 Parseval 等式。它用最简短的方式说出了 Fourier 理论的几何核心：函数的总能量恰好等于所有频率坐标能量的总和。</p>
+
+<p>如果你更喜欢实系数形式，那么 Parseval 等式可改写成</p>
+
+\[
+\boxed{\frac1\pi\int_{-\pi}^{\pi}|f(x)|^2\,dx=\frac{a_0^2}{2}+\sum_{n=1}^{\infty}\bigl(a_n^2+b_n^2\bigr).}
+\]
+
+<p>这条公式在外表上像一个积分恒等式，骨子里却是无限维勾股定理。它会在后面反复出现：有时帮你估计系数，有时帮你求级数，有时直接变成 PDE 里的能量法。</p>
+
+<h3 id="sec2-5-1">例题 5：用 Parseval 检查一个简单函数的能量分配</h3>
+
+<p>设</p>
+
+\[
+f(x)=1+\cos x.
+\]
+
+<p>显然它的实 Fourier 系数为</p>
+
+\[
+a_0=2,\qquad a_1=1,\qquad a_n=0\ (n\ge2),\qquad b_n=0\ (n\ge1).
+\]
+
+<p>Parseval 右边因此等于</p>
+
+\[
+\frac{a_0^2}{2}+\sum_{n=1}^{\infty}(a_n^2+b_n^2)=\frac{2^2}{2}+1^2=3.
+\]
+
+<p>左边则为</p>
+
+\[
+\frac1\pi\int_{-\pi}^{\pi}(1+\cos x)^2\,dx
+=\frac1\pi\int_{-\pi}^{\pi}\bigl(1+2\cos x+\cos^2x\bigr)\,dx.
+\]
+
+<p>逐项积分：</p>
+
+\[
+\int_{-\pi}^{\pi}1\,dx=2\pi,\qquad
+\int_{-\pi}^{\pi}\cos x\,dx=0,\qquad
+\int_{-\pi}^{\pi}\cos^2x\,dx=\pi.
+\]
+
+<p>所以</p>
+
+\[
+\frac1\pi\int_{-\pi}^{\pi}(1+\cos x)^2\,dx=\frac{2\pi+\pi}{\pi}=3.
+\]
+
+<p>两边一致。这虽然是一个小例子，却清楚说明了 Parseval 的意思：函数的能量可以被精确拆到各个频率上，而不会凭空丢失，也不会凭空多出。</p>
+
+<h2 id="sec2-6">2.6 这和 Gram-Schmidt 到底是什么关系</h2>
+
+<p>如果你觉得上面整套语言太像线性代数，那不是幻觉。它本来就是线性代数，只不过坐标空间从 \(\mathbb R^n\) 换成了 \(L^2[-\pi,\pi]\)。在 <a href="../线性代数/ch21.html">线性代数第 21 章</a> 里，Gram-Schmidt 过程告诉你：只要有内积，就可以把一组线性无关向量正交化；一旦正交化成功，投影、坐标与最小二乘问题都会陡然变简单。</p>
+
+<p>Fourier 理论里最幸福的事情是：这一步你几乎不用亲手做。正弦余弦族一上来就已经正交，所以 Gram-Schmidt 不是“必须执行的算法”，而是“你认出背后结构的眼镜”。真正需要的，只是把投影公式直接抄过来：</p>
+
+\[
+\text{系数}=\frac{\text{与基函数的内积}}{\text{基函数与自身的内积}}.
+\]
+
+<p>这就是为什么 Fourier 系数总长得像积分除以 \(\pi\) 或 \(2\pi\)。分母并不神秘，它只是基函数的平方范数。</p>
+
+<h3 id="sec2-6-1">例题 6：在 \(L^2[-\pi,\pi]\) 里亲手做一次 Gram-Schmidt</h3>
+
+<p>取两函数</p>
+
+\[
+v_1(x)=1,\qquad v_2(x)=1+x.
+\]
+
+<p>我们用内积 \(\langle f,g\rangle=\int_{-\pi}^{\pi}f(x)g(x)\,dx\) 对它们做 Gram-Schmidt。第一步当然是</p>
+
+\[
+u_1=v_1=1.
+\]
+
+<p>第二步要从 \(v_2\) 里减去它在 \(u_1\) 上的投影：</p>
+
+\[
+u_2=v_2-\frac{\langle v_2,u_1\rangle}{\langle u_1,u_1\rangle}u_1.
+\]
+
+<p>先算分母：</p>
+
+\[
+\langle u_1,u_1\rangle=\int_{-\pi}^{\pi}1\,dx=2\pi.
+\]
+
+<p>再算分子：</p>
+
+\[
+\langle v_2,u_1\rangle=\int_{-\pi}^{\pi}(1+x)\,dx=\int_{-\pi}^{\pi}1\,dx+\int_{-\pi}^{\pi}x\,dx=2\pi+0=2\pi.
+\]
+
+<p>所以投影系数为 \(1\)，从而</p>
+
+\[
+u_2=(1+x)-1=x.
+\]
+
+<p>结果很漂亮：Gram-Schmidt 把 \(\{1,1+x\}\) 变成了 \(\{1,x\}\)。这并不神秘，因为 \(x\) 是奇函数，天然与常数函数正交。你若把这个例子换成更复杂的函数组，算法照样工作，只是计算变长而已。于是你也就更能体会：Fourier 基不是天外来物，而是“一组已经替你正交化好的函数坐标轴”。</p>
+
+<h2 id="sec2-7">2.7 经典全例：\(f(x)=x\) 的 Fourier 系数</h2>
+
+<p>现在来做本章最经典的一道完整算例。设 \(f(x)=x\) 定义在 \((-\pi,\pi)\) 上，并作 \(2\pi\)-周期延拓。因为 \(f\) 是奇函数，所以</p>
+
+\[
+a_0=0,\qquad a_n=0\quad (n\ge1).
+\]
+
+<p>真正要算的只有 \(b_n\)：</p>
+
+\[
+b_n=\frac1\pi\int_{-\pi}^{\pi}x\sin(nx)\,dx.
+\]
+
+<p>由于 \(x\sin(nx)\) 是偶函数，可化成</p>
+
+\[
+b_n=\frac{2}{\pi}\int_{0}^{\pi}x\sin(nx)\,dx.
+\]
+
+<p>分部积分，取 \(u=x\), \(dv=\sin(nx)\,dx\)，则 \(du=dx\), \(v=-\cos(nx)/n\)。于是</p>
+
+\[
+\int_{0}^{\pi}x\sin(nx)\,dx
+=\left[-\frac{x\cos(nx)}{n}\right]_0^\pi+\frac1n\int_0^\pi\cos(nx)\,dx.
+\]
+
+<p>第二项为零，因为</p>
+
+\[
+\int_0^\pi\cos(nx)\,dx=\left[\frac{\sin(nx)}{n}\right]_0^\pi=0.
+\]
+
+<p>所以</p>
+
+\[
+\int_{0}^{\pi}x\sin(nx)\,dx=-\frac{\pi\cos(n\pi)}{n}=-\frac{\pi(-1)^n}{n}.
+\]
+
+<p>代回 \(b_n\)：</p>
+
+\[
+b_n=\frac{2}{\pi}\cdot\left(-\frac{\pi(-1)^n}{n}\right)=\frac{2(-1)^{n+1}}{n}.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{x\sim 2\sum_{n=1}^{\infty}\frac{(-1)^{n+1}}{n}\sin(nx),\qquad -\pi&lt;x&lt;\pi.}
+\]
+
+<p>这串公式一举多得。首先，它精确展示了奇函数只需要正弦项。其次，它告诉你系数只按 \(1/n\) 衰减，这已经在暗示 \(x\) 的周期延拓在端点有跳跃。最后，把 \(x=\pi/2\) 代进去，就得到</p>
+
+\[
+\frac{\pi}{2}=2\left(1-\frac13+\frac15-\frac17+\cdots\right),
+\]
+
+<p>也就是著名的 Leibniz 级数</p>
+
+\[
+\boxed{\frac{\pi}{4}=1-\frac13+\frac15-\frac17+\cdots.}
+\]
+
+<p>如果你愿意再往前走一步，对这个展开应用 Parseval，还能推出</p>
+
+\[
+\frac1\pi\int_{-\pi}^{\pi}x^2\,dx=\sum_{n=1}^{\infty}\left(\frac{2}{n}\right)^2,
+\]
+
+<p>即</p>
+
+\[
+\frac{2\pi^2}{3}=4\sum_{n=1}^{\infty}\frac1{n^2},
+\]
+
+<p>从而得到</p>
+
+\[
+\sum_{n=1}^{\infty}\frac1{n^2}=\frac{\pi^2}{6}.
+\]
+
+<p>一个函数的正交展开居然回头算出一个纯数项级数，这正是 Fourier 理论最迷人的地方之一：它让几何、积分与级数突然合流。</p>
+
+<p>第一句话总结：三角函数族之所以重要，首先不是因为它们会出现，而是因为它们彼此正交，因而能像坐标轴一样稳定地拆分函数。</p>
+
+<p>第二句话总结：一旦把 \(L^2[-\pi,\pi]\) 看成 Hilbert 空间，Fourier 系数就是正交投影坐标，Bessel 与 Parseval 就是勾股定理的无穷维版本。</p>
+
+<p>第三句话总结：后面我们研究收敛、核函数和 Gibbs 现象时，真正被反复追问的，其实都是这套正交坐标系到底能在多大范围内忠实重建原函数。</p>

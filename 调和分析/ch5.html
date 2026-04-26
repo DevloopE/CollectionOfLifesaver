@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 Fej&eacute;r 核与 Ces&agrave;ro 求和 — 普林斯顿调和分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 Dirichlet 核与逐点收敛</a><a href="ch6.html">下一章 · 第 6 章 Abel 求和与 Poisson 核 →</a></nav>
+<h1 id="ch5">第 5 章 Fej&eacute;r 核与 Ces&agrave;ro 求和</h1>
+
+<p>上一章我们已经把问题说得很尖锐了。直接部分和 \(S_N f\) 虽然是最自然的截断方式，但它背后站着的 Dirichlet 核既带振荡又有 \(\|D_N\|_1\sim\log N\) 的增长，所以只要正则性稍微不够，部分和就可能乱来。你如果只记住了这一层坏消息，会很容易误判 Fourier 级数：仿佛频率展开天然不稳定，仿佛“把函数拆成三角波再拼回来”这件事本身就靠不住。</p>
+
+<p>真正该学到的不是悲观，而是分辨。坏掉的不是 Fourier 分解本身，而是<strong>硬截断</strong>这件事。直接把 \(|n|&gt;N\) 的频率一刀砍掉，会在频率空间制造一个锋利边界；而一切锋利边界，回到物理空间里几乎都会以振荡作为代价。这个现象你在<a href="../偏微分方程/ch13.html">《偏微分方程读本》第 13 章</a>从 Fourier 变换看微分方程时还会再次见到。于是最自然的补救不是放弃 Fourier 级数，而是把“硬截断”改成“软平均”。</p>
+
+<p>Fej&eacute;r 的想法简单得近乎朴素：既然第 \(N\) 个部分和 \(S_N\) 容易有大幅振荡，那就别只看它，而去看前面所有部分和的平均：</p>
+
+\[
+\sigma_N f=\frac{S_0 f+S_1 f+\cdots+S_N f}{N+1}.
+\]
+
+<p>这看起来只是“多做了一次平均”，却把整个局面改写了。平均之后对应的核，不再是符号交替的 Dirichlet 核，而是一个非负、归一、且质量越来越向原点聚集的 Fej&eacute;r 核。你如果读过<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>的卷积与近似恒等元，就会立刻闻到熟悉气味：一旦核满足这些条件，连续函数就会被一致恢复。于是前一章所有令人不安的坏现象，在这里几乎被一刀切地修好。</p>
+
+<p>整章要做的事可以压成四步。先把 Ces&agrave;ro 平均的定义写开，推导 Fej&eacute;r 核 \(F_N\) 的两个关键闭式公式；再证明 \(F_N\) 真的是 \(L^1\) 良核，也就是它正、归一、聚集；然后完整证明 Fej&eacute;r 定理：任意连续 \(2\pi\)-周期函数的 Ces&agrave;ro 平均 \(\sigma_N f\) 一致收敛到 \(f\)；最后看几个算例，体会为什么平均会消掉上一章的振荡灾难。到章末你应该会彻底相信一句话：<strong>Fourier 级数不是不可靠，只是你得先学会用对求和方式。</strong></p>
+
+<h2 id="sec5-1">5.1 从硬截断到软截断：Ces&agrave;ro 平均的定义</h2>
+
+<p>设 \(f\in L^1(\mathbb T)\)，其第 \(N\) 个对称部分和为</p>
+
+\[
+S_N f(x)=\sum_{n=-N}^{N}\widehat f(n)e^{inx}.
+\]
+
+<p>Fej&eacute;r 不是直接修改 Fourier 系数，而是先把所有低阶部分和平均起来：</p>
+
+\[
+\boxed{
+\sigma_N f(x)=\frac{1}{N+1}\sum_{m=0}^{N}S_m f(x).
+}
+\]
+
+<p>这是 <strong>Ces&agrave;ro 平均</strong>，也叫 \(C,1\) 求和。它的思想很接地气：如果某个高阶部分和 \(S_N\) 恰好因为截止点太锋利而振荡很大，那把 \(S_0,S_1,\dots,S_N\) 全部混合起来，边界效应就会被摊薄。你可以把它和统计里的滑动平均、数值计算里的后处理滤波、以及<a href="../偏微分方程/ch5.html">《偏微分方程读本》第 5 章</a>里热方程“把细纹先磨掉”的直觉放在一起看：平均往往就是最廉价也最有效的稳定器。</p>
+
+<p>先把 \(\sigma_N\) 写成对 Fourier 系数的显式权重。把定义中的求和顺序交换：</p>
+
+\[
+\begin{aligned}
+\sigma_N f(x)
+&=\frac{1}{N+1}\sum_{m=0}^{N}\sum_{|n|\le m}\widehat f(n)e^{inx}\\
+&=\sum_{n=-N}^{N}\left(\frac{N+1-|n|}{N+1}\right)\widehat f(n)e^{inx}.
+\end{aligned}
+\]
+
+<p>因为一个频率 \(n\) 只会在那些 \(m\ge |n|\) 的部分和里出现，而这样的 \(m\) 恰好有 \(N+1-|n|\) 个。所以</p>
+
+\[
+\boxed{
+\sigma_N f(x)
+=\sum_{|n|\le N}\left(1-\frac{|n|}{N+1}\right)\widehat f(n)e^{inx}.
+}
+\]
+
+<p>这行公式非常关键。它说明 Ces&agrave;ro 平均不是简单地“只看 \(|n|\le N\)”，而是在频率截止边缘给了一层线性衰减的三角权重。频率越靠近 \(N\)，权重越小；最尖的边就这样被磨成了斜坡。你如果有线性代数直觉，可以把它理解成：\(S_N\) 是用方窗投影，\(\sigma_N\) 则是先做多次方窗投影再平均，于是乘子从矩形变成了三角形。</p>
+
+<p>先做一道最简单的算例。若</p>
+
+\[
+f(x)=\cos(mx),\qquad m\ge 1,
+\]
+
+<p>那么 \(\widehat f(\pm m)=1/2\)，其余系数都为 0。所以当 \(N\ge m\) 时，</p>
+
+\[
+\sigma_N f(x)
+=\left(1-\frac{m}{N+1}\right)\cos(mx).
+\]
+
+<p>当 \(N&lt;m\) 时，这个频率根本尚未进入求和，所以 \(\sigma_N f(x)=0\)。也就是说，Ces&agrave;ro 平均并不会对每个频率“一刀等权”；它会对越高的频率施加越强的衰减。这已经暗示了下一节的核心：Fej&eacute;r 求和本质上是一种低通平滑。</p>
+
+<h2 id="sec5-2">5.2 Fej&eacute;r 核的完整推导</h2>
+
+<p>像上一章那样，把 \(\sigma_N\) 重新写成卷积，是最有信息量的做法。定义</p>
+
+\[
+F_N(\theta)=\frac{1}{N+1}\sum_{m=0}^{N}D_m(\theta),
+\]
+
+<p>其中 \(D_m\) 是第 \(m\) 个 Dirichlet 核。因为 \(S_m f=f*D_m\)，所以平均之后自然得到</p>
+
+\[
+\boxed{
+\sigma_N f=f*F_N.
+}
+\]
+
+<p>因此 \(F_N\) 就是 Fej&eacute;r 求和的卷积核，称为 <strong>Fej&eacute;r 核</strong>。现在把它也算到底。</p>
+
+<p>第一种公式直接来自频率计数。因为</p>
+
+\[
+D_m(\theta)=\sum_{|n|\le m}e^{in\theta},
+\]
+
+<p>所以在 \(\sum_{m=0}^{N}D_m(\theta)\) 里，某个频率 \(e^{in\theta}\) 只要满足 \(|n|\le m\) 就会出现一次。也就是说，它会出现 \(N+1-|n|\) 次。于是</p>
+
+\[
+\begin{aligned}
+F_N(\theta)
+&=\frac{1}{N+1}\sum_{m=0}^{N}\sum_{|n|\le m}e^{in\theta}\\
+&=\sum_{|n|\le N}\left(1-\frac{|n|}{N+1}\right)e^{in\theta}.
+\end{aligned}
+\]
+
+<p>这和上一节给出的 \(\sigma_N f\) 权重完全一致，也再次验证了 \(\sigma_N f=f*F_N\)。</p>
+
+<p>更重要的是第二种公式。设</p>
+
+\[
+P_N(\theta)=\sum_{m=0}^{N}e^{im\theta}.
+\]
+
+<p>那么</p>
+
+\[
+|P_N(\theta)|^2
+=\sum_{m=0}^{N}\sum_{k=0}^{N}e^{i(m-k)\theta}.
+\]
+
+<p>把差 \(n=m-k\) 固定后计数，恰好也是 \(N+1-|n|\) 次，于是</p>
+
+\[
+|P_N(\theta)|^2
+=\sum_{|n|\le N}(N+1-|n|)e^{in\theta}.
+\]
+
+<p>两边除以 \(N+1\)，立刻得到</p>
+
+\[
+F_N(\theta)=\frac{1}{N+1}|P_N(\theta)|^2.
+\]
+
+<p>再用有限几何级数</p>
+
+\[
+P_N(\theta)=\frac{1-e^{i(N+1)\theta}}{1-e^{i\theta}}
+\]
+
+<p>和上一章同样的相位化简技巧，就有</p>
+
+\[
+\left|P_N(\theta)\right|
+=\left|\frac{\sin((N+1)\theta/2)}{\sin(\theta/2)}\right|.
+\]
+
+<p>于是 Fej&eacute;r 核的闭式公式是</p>
+
+\[
+\boxed{
+F_N(\theta)
+=\frac{1}{N+1}\left(\frac{\sin((N+1)\theta/2)}{\sin(\theta/2)}\right)^2.
+}
+\]
+
+<p>这一行和上一章的</p>
+
+\[
+D_N(\theta)=\frac{\sin((N+\frac12)\theta)}{\sin(\theta/2)}
+\]
+
+<p>摆在一起看，差别就很触目惊心了。Dirichlet 核分子只有一次正弦，所以会带正负号振荡；Fej&eacute;r 核是一个模平方，所以天然非负。前者像一个带相消尾巴的尖核，后者则像把尖核先平方再归一化，彻底洗掉了符号问题。</p>
+
+<p>再做一道核本身的算例。取 \(N=2\)，则</p>
+
+\[
+F_2(\theta)
+=\frac13\left(\frac{\sin(3\theta/2)}{\sin(\theta/2)}\right)^2.
+\]
+
+<p>也可以直接从定义算：</p>
+
+\[
+F_2(\theta)=\frac13(D_0+D_1+D_2)
+=1+\frac{4}{3}\cos\theta+\frac{2}{3}\cos2\theta.
+\]
+
+<p>例如在 \(\theta=0\) 处，</p>
+
+\[
+F_2(0)=3.
+\]
+
+<p>在 \(\theta=\pi\) 处，</p>
+
+\[
+F_2(\pi)=\frac13\left(\frac{\sin(3\pi/2)}{\sin(\pi/2)}\right)^2=\frac13.
+\]
+
+<p>你会发现它虽然也有主峰和副峰，但再也不会跑到负值去。只这一点，就已经在为一致收敛铺路了。</p>
+
+<h2 id="sec5-3">5.3 关键转折：\(F_N\) 是 \(L^1\) 良核</h2>
+
+<p>现在进入整章最重要的一节。上一章之所以处处受限，根本原因就是 \(D_N\) 不是 \(L^1\) 良核。可对 \(F_N\)，三件好事会同时发生：</p>
+
+\[
+\boxed{
+F_N(\theta)\ge 0,\qquad
+\frac{1}{2\pi}\int_{-\pi}^{\pi}F_N(\theta)\,d\theta=1,\qquad
+\int_{|\theta|\ge \delta}F_N(\theta)\,d\theta\to 0.
+}
+\]
+
+<p>这三条分别叫做<strong>正性</strong>、<strong>归一化</strong>、<strong>质量聚集</strong>。它们合在一起，正是<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>里近似恒等元的标准模板。只要这三条成立，卷积 \(f*F_N\) 就会像真正的局部平均一样工作。</p>
+
+<p>第一条最简单。由平方公式</p>
+
+\[
+F_N(\theta)=\frac{1}{N+1}|P_N(\theta)|^2
+\]
+
+<p>立刻得到</p>
+
+\[
+F_N(\theta)\ge 0.
+\]
+
+<p>第二条也几乎不用算。由频率表示</p>
+
+\[
+F_N(\theta)=\sum_{|n|\le N}\left(1-\frac{|n|}{N+1}\right)e^{in\theta},
+\]
+
+<p>对 \([-\pi,\pi]\) 积分时，只有常数项留下，所以</p>
+
+\[
+\int_{-\pi}^{\pi}F_N(\theta)\,d\theta=2\pi.
+\]
+
+<p>也就是说，在我们的卷积归一化约定下，\(F_N\) 的总质量永远是 1。</p>
+
+<p>第三条是最重要的。固定任意 \(\delta\in(0,\pi]\)。当 \(|\theta|\ge \delta\) 时，\(|\sin(\theta/2)|\) 有正下界，于是由平方公式</p>
+
+\[
+F_N(\theta)
+\le \frac{1}{N+1}\frac{1}{\sin^2(\delta/2)}.
+\]
+
+<p>因此</p>
+
+\[
+\int_{|\theta|\ge \delta}F_N(\theta)\,d\theta
+\le \frac{2\pi}{N+1}\frac{1}{\sin^2(\delta/2)}
+\longrightarrow 0.
+\]
+
+<p>这说明：虽然 \(F_N\) 也在 \(\theta=0\) 附近长出高度约 \(N+1\) 的峰，但峰外的质量会真正消失。和上一章的 Dirichlet 核不同，这一次副峰的总面积不会偷偷积成一堵对数高墙。</p>
+
+<p>这时一个附带结论就自动出来了：</p>
+
+\[
+\|F_N\|_1=\int_{-\pi}^{\pi}F_N(\theta)\,d\theta=2\pi.
+\]
+
+<p>因为 \(F_N\ge 0\)。于是</p>
+
+\[
+\boxed{
+\|F_N\|_1=2\pi\quad\text{对所有 }N.
+}
+\]
+
+<p>这就是我们一直想要、而在 \(D_N\) 身上失去的那条统一 \(L^1\) 控制。它意味着 Fej&eacute;r 算子</p>
+
+\[
+f\mapsto \sigma_N f=f*F_N
+\]
+
+<p>在 \(C(\mathbb T)\) 上的算子范数统一有界，不会像 \(S_N\) 那样悄悄长出 \(\log N\) 放大倍数。</p>
+
+<p>再做一道具体算例，把“正、归一、聚集”三条摸得更实。取任意 \(f\) 满足 \(0\le f\le 1\)。则</p>
+
+\[
+\sigma_N f(x)=\frac{1}{2\pi}\int_{-\pi}^{\pi}f(x-t)F_N(t)\,dt.
+\]
+
+<p>由于 \(F_N(t)\ge 0\) 且总质量为 \(2\pi\)，立刻得到</p>
+
+\[
+0\le \sigma_N f(x)\le 1.
+\]
+
+<p>这句看似平淡，后面却会非常值钱。因为它说明 Fej&eacute;r 平均绝不会制造“冲出范围”的新极值。到了<a href="ch7.html">第 7 章</a>讨论 Gibbs 现象时，你会看到这正是消除超调的核心机制。</p>
+
+<h2 id="sec5-4">5.4 Fej&eacute;r 定理：连续函数的 Ces&agrave;ro 平均一致收敛</h2>
+
+<p>现在可以证明整章主定理了。</p>
+
+<p style="background:var(--boxed-bg); border-left:4px solid var(--accent); padding:0.8em 1em; margin:1.5em 0;"><strong>Fej&eacute;r 定理。</strong> 若 \(f\in C(\mathbb T)\)，则
+\[
+\sigma_N f\longrightarrow f
+\quad\text{在 }\mathbb T\text{ 上一致收敛}.
+\]
+也就是说，任意连续 \(2\pi\)-周期函数都能被它自己的 Fourier 级数的 Ces&agrave;ro 平均一致恢复。</p>
+
+<p>证明非常漂亮，而且本质上就是“良核 + 一致连续”这两个事实的纯粹组合。先写出误差：</p>
+
+\[
+\sigma_N f(x)-f(x)
+=\frac{1}{2\pi}\int_{-\pi}^{\pi}\bigl(f(x-t)-f(x)\bigr)F_N(t)\,dt.
+\]
+
+<p>因此</p>
+
+\[
+\left|\sigma_N f(x)-f(x)\right|
+\le
+\frac{1}{2\pi}\int_{-\pi}^{\pi}|f(x-t)-f(x)|F_N(t)\,dt.
+\]
+
+<p>因为 \(f\) 连续且定义在紧集 \(\mathbb T\) 上，所以它一致连续。给定 \(\varepsilon&gt;0\)，存在 \(\delta&gt;0\)，使得只要 \(|t|&lt;\delta\)，就有</p>
+
+\[
+|f(x-t)-f(x)|&lt;\varepsilon
+\qquad\text{对所有 }x.
+\]
+
+<p>于是把积分分成近区和远区：</p>
+
+\[
+\begin{aligned}
+|\sigma_N f(x)-f(x)|
+&\le \frac{1}{2\pi}\int_{|t|&lt;\delta}|f(x-t)-f(x)|F_N(t)\,dt\\
+&\quad+\frac{1}{2\pi}\int_{|t|\ge\delta}|f(x-t)-f(x)|F_N(t)\,dt.
+\end{aligned}
+\]
+
+<p>对近区，利用 \(|f(x-t)-f(x)|&lt;\varepsilon\) 以及 \(\int F_N=2\pi\)，得到</p>
+
+\[
+\frac{1}{2\pi}\int_{|t|&lt;\delta}|f(x-t)-f(x)|F_N(t)\,dt
+\le \varepsilon.
+\]
+
+<p>对远区，用粗界 \(|f(x-t)-f(x)|\le 2\|f\|_\infty\)，于是</p>
+
+\[
+\frac{1}{2\pi}\int_{|t|\ge\delta}|f(x-t)-f(x)|F_N(t)\,dt
+\le \frac{2\|f\|_\infty}{2\pi}\int_{|t|\ge\delta}F_N(t)\,dt.
+\]
+
+<p>而上一节已经证明，固定 \(\delta\) 后这项随 \(N\to\infty\) 趋于 0。于是存在 \(N_0\)，当 \(N\ge N_0\) 时，远区贡献小于 \(\varepsilon\)。综合起来，对所有 \(x\) 都有</p>
+
+\[
+|\sigma_N f(x)-f(x)|\le 2\varepsilon,\qquad N\ge N_0.
+\]
+
+<p>这就完成了一致收敛证明。</p>
+
+<p>请你认真比较这个证明和上一章 Dini/Jordan 判别的气质。那里我们每一步都得小心地对付 Dirichlet 核的奇性和振荡；这里几乎没有任何技巧，只有两句朴素的话：一，连续函数在紧集上一致连续；二，Fej&eacute;r 核是一族正的近似恒等元。也正因为证明如此干净，Fej&eacute;r 定理在 Fourier 分析史上才显得那么决定性：它第一次用一种完全正面的方式告诉你，连续函数的 Fourier 理论其实是稳的，只是你得先把求和方法改对。</p>
+
+<p>顺手就有一个非常强的推论。因为每个 \(\sigma_N f\) 都是三角多项式，而 \(\sigma_N f\to f\) 一致，所以三角多项式在 \(C(\mathbb T)\) 中稠密。这等于说：就“逼近连续周期函数”这件事而言，正弦余弦族不仅是正交基，更是足够丰富的近似系统。它和<a href="../线性代数/ch21.html">《线性代数读本》第 21 章</a>里有限维正交投影的关系，到这里终于完全显形了：只是我们的基底已经从有限维变成了无穷维。</p>
+
+<h2 id="sec5-5">5.5 连续函数怎样被 Ces&agrave;ro 求和恢复：一个完整算例</h2>
+
+<p>Fej&eacute;r 定理是一般结论，但你最好再亲手看一个具体函数。取</p>
+
+\[
+f(x)=|x|,\qquad -\pi\le x\le \pi,
+\]
+
+<p>并作 \(2\pi\)-周期延拓。这是一个经典连续函数，在 \(x=0\) 与 \(x=\pm\pi\) 附近都有尖角，所以很适合用来观察“连续但不太光滑”的情况。第 3 章已经算过它的 Fourier 级数：</p>
+
+\[
+|x|
+=\frac{\pi}{2}-\frac{4}{\pi}\sum_{m=0}^{\infty}\frac{\cos((2m+1)x)}{(2m+1)^2}.
+\]
+
+<p>于是它的 Ces&agrave;ro 平均就是把每个频率乘上三角权重：</p>
+
+\[
+\sigma_N f(x)
+=\frac{\pi}{2}
+-\frac{4}{\pi}\sum_{\substack{2m+1\le N}}
+\left(1-\frac{2m+1}{N+1}\right)
+\frac{\cos((2m+1)x)}{(2m+1)^2}.
+\]
+
+<p>例如当 \(N=3\) 时，只会留下 \(1\) 和 \(3\) 这两个奇频：</p>
+
+\[
+\sigma_3 f(x)
+=\frac{\pi}{2}
+-\frac{4}{\pi}\left[\left(1-\frac14\right)\cos x+\left(1-\frac34\right)\frac{\cos 3x}{9}\right].
+\]
+
+<p>也就是</p>
+
+\[
+\sigma_3 f(x)
+=\frac{\pi}{2}-\frac{3}{\pi}\cos x-\frac{1}{9\pi}\cos 3x.
+\]
+
+<p>这个三角多项式当然还不等于 \(|x|\)，但 Fej&eacute;r 定理保证：随着 \(N\to\infty\)，这些带三角权重的部分和会在整个圆周上一致收敛回 \(|x|\)。注意这里用的是“一致收敛”，不是仅仅在每个点上各自收敛。也就是说，无论你盯哪一个尖角、哪一段平缓区、哪一个最坏误差点，Fej&eacute;r 平均都会同时把它们一起压平。</p>
+
+<p>这件事和上一章形成了鲜明对照。对 \(|x|\) 这种函数，普通 Fourier 部分和其实也会收敛；但 Fej&eacute;r 定理给你的控制更强、更稳、更不依赖额外判别，而且证明几乎不费力。它说明：在真正做重建时，适当的平均往往不是可有可无的装饰，而是稳定性的来源。</p>
+
+<h2 id="sec5-6">5.6 为什么平均能修好上一章的坏事</h2>
+
+<p>现在可以把第 4 章和本章的逻辑彻底拼起来了。上一章最刺眼的坏消息是：存在连续函数，其 Fourier 部分和 \(S_N f\) 在某点发散。这并不和本章矛盾，反而恰恰说明 Fej&eacute;r 定理有多强。因为它告诉你：即便普通部分和会失败，<strong>同一个函数</strong> 的 Ces&agrave;ro 平均 \(\sigma_N f\) 仍然会一致收敛回它本身。</p>
+
+<p>也就是说，du Bois-Reymond 现象不是 Fourier 分解“本身失效”，而是“用最硬的截止方式去读 Fourier 分解”失效。你如果换成更温和的平均，连续函数理论会重新站稳。</p>
+
+<p>这件事在频率空间里也很好理解。普通部分和用的是矩形权重</p>
+
+\[
+\mathbf 1_{\{|n|\le N\}},
+\]
+
+<p>而 Fej&eacute;r 平均用的是三角权重</p>
+
+\[
+\left(1-\frac{|n|}{N+1}\right)_+.
+\]
+
+<p>前者在边界 \(|n|=N\) 处有突兀断崖，所以物理空间里的核会出现强振荡；后者把断崖磨成斜坡，物理空间里的核自然也变得更像平均器。这就是“频率端越平滑，物理端越少振荡”这条基本原则的最早版本。到了后面的 Fourier 变换、Littlewood-Paley 分解和 PDE 乘子理论，这条原则还会被一遍遍重述。</p>
+
+<p>再看一个非常有触感的算例。仍取上一章的阶跃函数</p>
+
+\[
+h(x)=
+\begin{cases}
+-1,&-\pi&lt;x&lt;0,\\
+1,&0&lt;x&lt;\pi.
+\end{cases}
+\]
+
+<p>虽然 \(h\) 并不连续，Fej&eacute;r 卷积仍然满足</p>
+
+\[
+\sigma_N h(x)=\frac{1}{2\pi}\int_{-\pi}^{\pi}h(x-t)F_N(t)\,dt.
+\]
+
+<p>因为 \(F_N\ge 0\) 且总质量为 \(2\pi\)，于是对所有 \(x\) 都有</p>
+
+\[
+-1\le \sigma_N h(x)\le 1.
+\]
+
+<p>也就是说，Fej&eacute;r 平均永远不会像普通部分和那样在跳点附近冲到 \(1\) 以上或 \(-1\) 以下。它甚至还提前剧透了<a href="ch7.html">第 7 章</a>的核心结论：Gibbs 现象属于硬截断，不属于正的平均。</p>
+
+<p>如果你愿意把它和<a href="../偏微分方程/ch19.html">《偏微分方程读本》第 19 章</a>的最大值原理对照着看，会发现一种很有意思的结构相似：正的归一核卷积不会制造新极值，这和调和函数、热方程解不会在内部无中生有地冒出更大的峰值，是同一种“平均值不该把范围推爆”的直觉。Fej&eacute;r 定理之所以稳定，根上也在这里。</p>
+
+<h2 id="sec5-7">5.7 跳点处会怎样：Fej&eacute;r 平均收向左右极限的中点</h2>
+
+<p>虽然本章主定理是对连续函数的一致收敛，但 Fej&eacute;r 核的正性其实还允许你把结论向前推一步：只要某点 \(x\) 的左右极限存在，那么 Fej&eacute;r 平均就在 \(x\) 收向左右极限的平均。这一点和第 4 章的 Dirichlet-Jordan 判别形成漂亮呼应，只不过这里几乎不需要任何振荡积分技巧。</p>
+
+<p>设 \(f\in L^1(\mathbb T)\)，并且 \(f(x+)\)、\(f(x-)\) 存在。记</p>
+
+\[
+s_x=\frac{f(x+)+f(x-)}{2}.
+\]
+
+<p>由于 \(F_N\) 是偶函数，</p>
+
+\[
+\sigma_N f(x)
+=\frac{1}{2\pi}\int_0^\pi \bigl(f(x+t)+f(x-t)\bigr)F_N(t)\,dt.
+\]
+
+<p>又因为</p>
+
+\[
+\frac{1}{2\pi}\int_0^\pi F_N(t)\,dt=\frac12,
+\]
+
+<p>所以减去 \(s_x\) 后，恰好得到</p>
+
+\[
+\sigma_N f(x)-s_x
+=\frac{1}{2\pi}\int_0^\pi
+\Bigl(f(x+t)-f(x+)+f(x-t)-f(x-)\Bigr)F_N(t)\,dt.
+\]
+
+<p>这时证明和 Fej&eacute;r 定理几乎一样。给定 \(\varepsilon&gt;0\)。由左右极限存在，可取 \(\delta&gt;0\) 使得当 \(0&lt;t&lt;\delta\) 时，</p>
+
+\[
+|f(x+t)-f(x+)|&lt;\varepsilon,\qquad
+|f(x-t)-f(x-)|&lt;\varepsilon.
+\]
+
+<p>于是近区 \((0,\delta)\) 上被积函数绝对值不超过 \(2\varepsilon\)，从而这部分贡献不超过 \(\varepsilon\)。远区 \([\delta,\pi]\) 上，则用粗界</p>
+
+\[
+|f(x+t)-f(x+)+f(x-t)-f(x-)|\le C_x
+\]
+
+<p>乘上质量聚集性质</p>
+
+\[
+\int_{\delta\le |t|\le \pi}F_N(t)\,dt\to 0
+\]
+
+<p>便知远区贡献也趋于 0。于是</p>
+
+\[
+\boxed{
+\sigma_N f(x)\to \frac{f(x+)+f(x-)}2.
+}
+\]
+
+<p>这说明 Fej&eacute;r 平均并不只是“连续函数的一致恢复器”，还是“跳点处自动取中值”的正核平均器。它和第 4 章普通部分和的结论在极限值上是一致的，但达到这个结论的机制完全不同：普通部分和靠的是振荡抵消；Fej&eacute;r 平均靠的则是局部平均。</p>
+
+<p>再把这条结论落到最经典的阶跃函数上。对</p>
+
+\[
+h(x)=
+\begin{cases}
+-1,&-\pi&lt;x&lt;0,\\
+1,&0&lt;x&lt;\pi,
+\end{cases}
+\]
+
+<p>有 \(h(0-)=-1\)、\(h(0+)=1\)，所以</p>
+
+\[
+\sigma_N h(0)\to 0.
+\]
+
+<p>而且因为 \(-1\le h\le 1\) 且 \(F_N\ge 0\)，实际上所有 \(N\) 都满足</p>
+
+\[
+-1\le \sigma_N h(x)\le 1.
+\]
+
+<p>这正是“跳点取中值但没有超调”的最浓缩版本。第 7 章我们会把它和 Gibbs 现象正面比较：两者在极限值上都取中值，但一个在边缘附近大幅振铃，一个从头到尾不出界。</p>
+
+<h2 id="sec5-8">5.8 稠密性的含义：Fej&eacute;r 给出的不只是收敛，还有逼近程序</h2>
+
+<p>上一节末尾已经顺手提到：每个 \(\sigma_N f\) 都是三角多项式，而 \(\sigma_N f\to f\) 一致。这实际上给了你一个非常具体的逼近算法，而不仅仅是存在性定理。</p>
+
+\[
+\boxed{
+\forall f\in C(\mathbb T),\ \exists\ \text{三角多项式 }T_N=\sigma_N f,\ \text{使 }T_N\to f\ \text{一致}.
+}
+\]
+
+<p>这句话和 Weierstrass 逼近定理的精神非常接近，只不过这里逼近的不是任意闭区间上的普通多项式，而是圆周上的三角多项式。更重要的是，Fej&eacute;r 不只告诉你“能逼近”，还直接给出“该怎么逼近”：不用猜，不用解最优化问题，不用另造一列多项式，直接取 \(\sigma_N f\) 就行。</p>
+
+<p>这和有限维线性代数中的正交投影有一种很深的相似。你在<a href="../线性代数/ch21.html">《线性代数读本》第 21 章</a>学过：投影到一个子空间上，会给出“在这个子空间里最像原向量”的对象。Fourier 部分和 \(S_N f\) 在 \(L^2\) 意义下扮演的是正交投影；但它在一致范数里可能很不稳定。Fej&eacute;r 平均则像是在一串投影之间再做一次平均，于是虽然它未必还是正交投影，却换来了更强的 \(C(\mathbb T)\) 稳定性。</p>
+
+<p>可以把这一点再说得更“算法”一点。给定连续函数 \(f\)，若你真要在机器上拿三角多项式逼近它，直接取 \(S_N f\) 并不是最保险的，因为你可能会遇到上一章那种高 Lebesgue 常数带来的局部放大；而取 \(\sigma_N f\)，则至少可以保证下面这条稳定估计：</p>
+
+\[
+\|\sigma_N f\|_\infty\le \|f\|_\infty.
+\]
+
+<p>所以 Fej&eacute;r 逼近不是“存在但不稳定”的抽象结论，而是一套真正能上手执行的稳定程序。</p>
+
+<p>再看一个具体函数来体会“程序性”。取</p>
+
+\[
+f(\theta)=\cos^2\theta=\frac12+\frac12\cos2\theta.
+\]
+
+<p>对所有 \(N\ge 2\)，其 Fej&eacute;r 平均就是</p>
+
+\[
+\sigma_N f(\theta)
+=\frac12+\frac12\left(1-\frac{2}{N+1}\right)\cos2\theta.
+\]
+
+<p>比如 \(N=2\) 时，</p>
+
+\[
+\sigma_2 f(\theta)=\frac12+\frac16\cos2\theta.
+\]
+
+<p>比如 \(N=5\) 时，</p>
+
+\[
+\sigma_5 f(\theta)=\frac12+\frac13\cos2\theta.
+\]
+
+<p>随着 \(N\to\infty\)，权重 \(1-\frac{2}{N+1}\to 1\)，于是 \(\sigma_N f\to \cos^2\theta\)。对这样一个频率有限的函数，Fej&eacute;r 平均似乎比直接部分和“慢了一点”才恢复精确系数；但它换来的是对所有连续函数的统一稳定保证。这个 trade-off 非常值得记：稳定与锐利，往往不能两头都要。</p>
+
+<h2 id="sec5-9">5.9 稳定性到底强在哪：正性、收缩性与第 4 章的对照</h2>
+
+<p>本章最值得和第 4 章做硬对照的一件事，是算子稳定性。对普通部分和，\(\|S_N\|_{C\to C}\sim \log N\)，因此 \(N\) 越大，最坏情况下越会放大 \(\|f\|_\infty\)。对 Fej&eacute;r 平均，则有完全相反的结论：</p>
+
+\[
+\boxed{
+\|\sigma_N f\|_\infty\le \|f\|_\infty\qquad\text{对所有 }f\in C(\mathbb T),\ N\ge 0.
+}
+\]
+
+<p>证明只要一行。由卷积表示与 \(F_N\ge 0\)、\(\frac1{2\pi}\int F_N=1\)，</p>
+
+\[
+|\sigma_N f(x)|
+\le \frac{1}{2\pi}\int_{-\pi}^{\pi}|f(x-t)|F_N(t)\,dt
+\le \|f\|_\infty.
+\]
+
+<p>这说明 \(\sigma_N\) 是 \(C(\mathbb T)\) 上的一个<strong>正收缩算子</strong>。它保持常数函数不变，保持非负函数非负，也不会把函数范围放大。这种性质在调和分析里极其珍贵，因为它意味着很多关于函数形状的粗控制会自动被保留下来。</p>
+
+<p>例如若 \(m\le f\le M\)，则</p>
+
+\[
+m\le \sigma_N f\le M.
+\]
+
+<p>若 \(f\ge 0\)，则 \(\sigma_N f\ge 0\)。若 \(f\) 是偶函数、奇函数，\(\sigma_N f\) 仍保持对应对称性。这些都不是额外技巧，而是正核平均的直接副产品。你如果把它和<a href="../偏微分方程/ch19.html">《偏微分方程读本》第 19 章</a>的比较原理放在一起看，会发现两者气质异常相近：正结构会把范围和顺序一起带过去。</p>
+
+<p>再做一眼就能说明问题的算例。设</p>
+
+\[
+f(\theta)=1+\cos\theta.
+\]
+
+<p>显然 \(0\le f\le 2\)。于是无论 \(N\) 取多大，Fej&eacute;r 平均都满足</p>
+
+\[
+0\le \sigma_N f(\theta)\le 2.
+\]
+
+<p>但若你换成普通部分和去逼近一个带尖角或跳点的函数，这种范围控制就会立刻失效，因为 Dirichlet 核会带着负波瓣去做抵消和放大。也就是说，Fej&eacute;r 求和不只是“最终会收敛”，而是“在收敛全过程里都表现得像真正的平均”。这一点，才是它比普通部分和成熟得多的地方。</p>
+
+<h2 id="sec5-10">5.10 从连续推广到 \(L^1\)：Lebesgue 点上的 Fej&eacute;r 收敛</h2>
+
+<p>本章主定理是对连续函数的一致收敛，但 Fej&eacute;r 核真正的威力并不止于此。只要你愿意用<a href="../测度论/ch16.html">《测度论读本》第 16 章</a>的 Lebesgue 微分定理语言来看，它其实还给出一个更现代的结论：对 \(L^1\) 函数而言，Fej&eacute;r 平均会在几乎每一个 Lebesgue 点恢复原值。</p>
+
+<p>回忆 Lebesgue 点的定义。点 \(x\) 称为 \(f\in L^1(\mathbb T)\) 的 Lebesgue 点，如果</p>
+
+\[
+\lim_{h\to 0^+}\frac{1}{2h}\int_{-h}^{h}|f(x-t)-f(x)|\,dt=0.
+\]
+
+<p>直观上，这表示 \(x\) 附近的小区间平均值确实在回到 \(f(x)\)。Lebesgue 微分定理说：\(L^1\) 函数几乎处处都是自己的 Lebesgue 点。于是只要 Poisson 核或 Fej&eacute;r 核真的是局部平均器，它们就应该在这些点恢复原函数。</p>
+
+<p>对 Fej&eacute;r 核而言，证明思路和连续情形几乎一样，只不过“一致连续”要换成“在该点的小平均误差可控”。把误差写成</p>
+
+\[
+\sigma_N f(x)-f(x)=\frac{1}{2\pi}\int_{-\pi}^{\pi}(f(x-t)-f(x))F_N(t)\,dt.
+\]
+
+<p>固定一个 Lebesgue 点 \(x\)，取小 \(\delta&gt;0\)。由于 \(F_N\) 非负且集中于 0，我们只需控制 \(|t|&lt;\delta\) 上的平均误差。把</p>
+
+\[
+\Omega_x(h)=\frac{1}{2h}\int_{-h}^{h}|f(x-t)-f(x)|\,dt
+\]
+
+<p>记作局部平均振荡。Lebesgue 点条件就是 \(\Omega_x(h)\to 0\)。而 \(F_N\) 在小邻域上的质量主要集中在尺度 \(|t|\lesssim 1/N\)，因此卷积误差本质上就是把这些很小尺度上的 \(\Omega_x(h)\) 再做一次非负平均。于是可推出</p>
+
+\[
+\boxed{
+x\text{ 是 }f\text{ 的 Lebesgue 点}
+\Longrightarrow
+\sigma_N f(x)\to f(x).
+}
+\]
+
+<p>这条结论常被叫作 <strong>Fej&eacute;r-Lebesgue 定理</strong>。它比连续函数的一致收敛弱，但覆盖面大得多：对任意 \(f\in L^1(\mathbb T)\)，至少在几乎处处我们都能靠 Fej&eacute;r 平均恢复它。这和第 4 章 Kolmogorov 对普通部分和的坏消息形成了非常鲜明的对照：在 \(L^1\) 世界里，直接部分和可能几乎处处发散；可一旦换成 Ces&agrave;ro 平均，几乎处处恢复又重新成立。</p>
+
+<p>拿阶跃函数再看一眼，就会更有感觉。对单位阶跃 \(H\)，除跳点外的每个点都是 Lebesgue 点，因此 \(\sigma_N H(x)\to H(x)\)；在跳点处则收向左右极限中点 \(1/2\)。这几乎就是你对“正确重建”能提出的最好要求了：平坦处回到原值，边界处取对称平均，而且全程不超界。</p>
+
+<h2 id="sec5-11">5.11 普通收敛和 Ces&agrave;ro 收敛是什么关系</h2>
+
+<p>既然 Fej&eacute;r 平均这么好，一个自然问题就是：它和普通部分和到底是什么关系？这件事最好分两边说。</p>
+
+<p>第一边，若普通部分和本来就收敛，那么 Ces&agrave;ro 平均一定收敛到同一个极限。这其实是数列论里的一个基本事实：若数列 \(a_N\to L\)，则它的算术平均</p>
+
+\[
+\frac{a_0+\cdots+a_N}{N+1}\to L.
+\]
+
+<p>应用到 \(a_N=S_N f(x)\) 就得到：只要第 4 章那些普通收敛条件成立，比如 Dini 条件、局部 BV、或者干脆 \(f\) 是三角多项式，那么 Fej&eacute;r 平均不会改坏极限，它只是以更温和的方式抵达同一个终点。</p>
+
+<p>第二边，反过来却完全不对。Ces&agrave;ro 收敛并不推出普通收敛。上一章的 du Bois-Reymond 反例已经告诉你，存在连续函数 \(f\) 的普通部分和 \(S_N f\) 会发散；但本章 Fej&eacute;r 定理又保证，对同一个 \(f\) 来说 \(\sigma_N f\to f\) 仍然一致成立。也就是说，Ces&agrave;ro 求和不是“把已经收敛的数列再平均一下而已”，而是真正扩大了可恢复对象的范围。</p>
+
+\[
+\boxed{
+S_N f(x)\to L \Longrightarrow \sigma_N f(x)\to L,
+\qquad
+\sigma_N f(x)\to L \centernot\Longrightarrow S_N f(x)\to L.
+}
+\]
+
+<p>这条逻辑关系非常值得记。因为它说明 Fej&eacute;r 方法不是在和普通收敛“竞争”，而是在做一个更成熟的 extension：凡是本来就收得好的，它都继承；凡是原来因为硬截止而坏掉的，它还能修复一大块。</p>
+
+<p>再做一道小算例，把这件事写成看得见的公式。对方波 \(g\)，普通部分和 \(Q_N\) 在跳点附近会出现 Gibbs 超调；但 Fej&eacute;r 平均则始终保持在 \([-1,1]\) 内，并在跳点取值 0。于是同一个 Fourier 系数序列，单看普通部分和与先做 Ces&agrave;ro 平均，图像表现可以截然不同。这就是“求和法是理论的一部分”最直观的一次体现。</p>
+
+<p>从这层意义上说，本章不是第 4 章的附录，而是第 4 章真正的出路。第 4 章教你为什么直觉的硬截断会出问题；第 5 章则告诉你，解决方案不是放弃 Fourier，而是学会选择正确的重建程序。</p>
+
+<h2 id="sec5-12">5.12 为什么偏偏是 Fej&eacute;r：它是“最便宜”的正平均修复</h2>
+
+<p>读到这里再回头看，你会发现 Fej&eacute;r 平均之所以漂亮，不只是因为它“碰巧有效”，而是因为它几乎是修复第 4 章灾难的最便宜办法。你不需要重新发明一套和 Fourier 系数毫无关系的新逼近，也不需要求解某个复杂最优化问题；你只需把已有的部分和做最朴素的算术平均，三角权重和正核就自动冒出来了。</p>
+
+<p>这件事非常像概率与逼近论里反复出现的一个大原则：<strong>只要你能把振荡对象改写成正权重平均，稳定性往往就会立刻回来。</strong> 在区间 \([0,1]\) 上，Bernstein 多项式通过二项分布平均把连续函数一致恢复；在圆周上，Fej&eacute;r 核通过三角权重平均把连续周期函数一致恢复。两者长相不同，但哲学完全一样：不要用会相互抵消的尖锐符号组合，而要用正的、归一的、越来越局部化的平均器。</p>
+
+<p>从这一点看，Fej&eacute;r 权重</p>
+
+\[
+\left(1-\frac{|n|}{N+1}\right)_+
+\]
+
+<p>很像是在频率端给矩形窗套上了最简单的一层“钝化边缘”。它既保留了低频几乎全权进入的愿望，又把高频截止处最尖锐的那道断崖磨平到线性斜坡。若你把边缘磨得更柔和，当然还能得到别的窗函数；但 Fej&eacute;r 是第一种、也是代价最低的一种。正因为它只靠一次平均就出现，所以历史上才会这么早被发现，也这么早成为经典。</p>
+
+<p>还有一件事很值得注意。Fej&eacute;r 并没有试图“比原 Fourier 系数更聪明”。它做的不是重算系数，而是重排读取顺序。也就是说，问题不在信息不够，而在你怎么使用已有信息。这一点在调和分析里太重要了：很多时候我们不缺频率信息，缺的是一个稳定的阅读方式。第 4 章和第 5 章的对照，本质上就是“同一批系数，用硬方式读会翻车，用软方式读会稳定”。</p>
+
+<p>你甚至可以把 Fej&eacute;r 平均看成一种“最低剂量的正则化”。它没有像热方程那样用 \(e^{-cn^2t}\) 把高频迅速杀光，也没有像 Poisson 核那样用 \(r^{|n|}\) 给每个频率乘上几何衰减；它做的只是把最尖锐的频率边缘钝化一次。可就这一点点钝化，已经足以把 \(\log N\) 级的 Lebesgue 常数增长打回常数级，把连续函数的一致恢复重新夺回来。这种“只改最少，但效果巨大”的现象，在分析里总值得格外珍惜。</p>
+
+<p>所以从应用角度说，Fej&eacute;r 方法的气质非常务实。它不会给你最锋利的边缘重建，也不会给你最强的高频保真；但它会给你一个几乎不出岔子的默认方案。很多时候，这正是你真正需要的。先要一个不会出界、不会乱振、不会在连续函数上翻车的稳定重建；之后如果还想更锐利，再去讨论别的窗口、别的求和法、别的补偿技术。历史上 Fej&eacute;r 定理之所以站得住，也正是因为它把“先站稳”这件事做得过于漂亮了。</p>
+
+<p>这也是为什么 Fej&eacute;r 定理往往被视为古典 Fourier 分析真正成熟的起点。它第一次明确告诉大家：别把“级数本身怎么截断”当成天经地义。求和法不是边角料，而是理论结构的一部分。后面无论你读 Abel 求和、Poisson 积分、Bochner-Riesz 平均，还是读更现代的 Littlewood-Paley 分解，你都在延续这一认识：<strong>频率分析从来不只关心“分解”，同样关心“如何重组”。</strong></p>
+
+<p>如果你只想给自己留一个真正可执行的默认策略，那也很简单：面对连续周期函数，先别急着盯普通部分和，先把 \(\sigma_N f\) 写出来。因为它既保留了 Fourier 系数的全部信息，又自动带着正核平均的稳定性。很多时候，正是这一步默认切换，决定了你是会被第 4 章的反例吓住，还是会顺利进入后面更成熟的求和理论。</p>
+
+<p>而一旦你把这件事想通，Fej&eacute;r 定理就不再只是“一个证明不难的收敛结论”，而会变成你对整个古典 Fourier 理论的第一条使用原则：先求稳定，再谈锐利；先确认核是良性的，再去追求更精细的边缘分辨率。</p>
+
+<p>很多后续理论其实都可以被看成这条原则的高阶版本：你先选一种温和而稳定的重组方式，确认它不会把问题弄坏，然后再一点点把精度往回提。Fej&eacute;r 是这条思路最早、也最干净的一次示范。</p>
+
+<p>也正因此，Fej&eacute;r 方法在历史上留下来的，不只是一个名字，而是一种默认姿势：先把核变好，再谈收敛有多强。</p>
+
+<h2 id="sec5-13">5.13 这一步为什么是调和分析的转折点</h2>
+
+<p>Fej&eacute;r 定理在历史上的地位，不只是“又一个收敛定理”。它实际上改变了大家看 Fourier 级数的方式。在它之前，问题几乎总被问成：原级数本身到底收不收敛？在它之后，人们开始更成熟地问：<strong>应该用什么求和法去读这个级数，才能反映原函数真正的几何与分析信息？</strong></p>
+
+<p>这一步非常现代。因为调和分析后来越来越清楚地认识到：频率分解只是第一步，怎样加权、怎样截断、怎样平均，同样是理论的一部分。Bochner-Riesz 平均、Abel 求和、Poisson 积分、Littlewood-Paley 分块，甚至数值计算里各种 windowing，本质上都在回答同一个问题：你准备以什么方式把频率重新拼回物理空间？Fej&eacute;r 核只是这条大路上最早也最经典的一块路标。</p>
+
+<p>把这一章压成三句话。第一，把部分和再平均一次，硬截止就被磨成了三角权重，于是对应核从 Dirichlet 核变成了非负的 Fej&eacute;r 核。第二，\(F_N\) 正、归一、质量聚集，所以它是一族真正的 \(L^1\) 良核；连续函数与它卷积，会被一致恢复。第三，Fej&eacute;r 定理告诉你：Fourier 分解的失败并不必然来自频率展开本身，很多时候只是因为你的求和方式太硬。下一章我们会看到另一种软化方式：不用算术平均，而是用几何权重 \(r^{|n|}\) 做 Abel 求和，这将直接把我们带向 Poisson 核与调和延拓。</p>
+
+<hr class="section-end">
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 Dirichlet 核与逐点收敛</a><a href="ch6.html">下一章 · 第 6 章 Abel 求和与 Poisson 核 →</a></nav>
+
+</main>
+</body>
+</html>

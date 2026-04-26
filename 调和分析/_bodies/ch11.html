@@ -1,0 +1,475 @@
+<h1 id="ch11">第 11 章 反演公式与 Fourier 反演定理</h1>
+
+<p>如果说第 9 章回答的是“怎么把函数变到频率空间去”，第 10 章回答的是“变过去以后能量有没有丢”，那么第 11 章要回答的就是最根本的问题：<strong>你怎样把它精确地再变回来？</strong> 这不是技术尾声，而是整套理论真正的闭环。没有反演公式，Fourier 变换仍然只是一个很会组织结构的算子；有了反演公式，它才正式成为一套无损坐标系。</p>
+
+<p>反演之所以值得单独讲一整章，不是因为它只是“把指数里的符号改回去”。真正微妙的地方在于：为什么那条看起来对称的积分公式会收敛？为什么它真的回到原函数而不是别的东西？对 \(L^1\) 函数来说，这种恢复是逐点的、几乎处处的，还是只在某种平均意义下成立？这些问题如果不认真处理，就会把“形式上的互逆”误当成“实际的互逆”。</p>
+
+<p>本章最重要的证明策略其实在第 8 到第 10 章已经悄悄准备好了：先用 Gaussian 在频率空间里做一个很软的截断，再把它翻回原空间，看见的恰好是 Gaussian 近似恒等式。于是反演公式并不是从天上掉下来的奇迹，而是下面这条恒等式的极限版：</p>
+
+\[
+\boxed{
+\int_{\mathbb R^n}
+e^{-\pi \varepsilon |\xi|^2}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+=
+(f*\gamma_\varepsilon)(x),
+}
+\]
+
+<p>其中</p>
+
+\[
+\gamma_\varepsilon(x)=\varepsilon^{-n/2}e^{-\pi |x|^2/\varepsilon}.
+\]
+
+<p>左边是频率空间里把高频轻轻压一下，右边是原空间里和 Gaussian 做一次局部平均。于是“让 \(\varepsilon\to0\)”这件事，在两边恰好对应两条我们已经熟悉的理论：左边靠支配收敛，把阻尼拿掉；右边靠近似恒等式，把局部平均收缩回原函数。反演公式真正的发动机，就在这两股极限的对接里。</p>
+
+<h2 id="sec11-1">11.1 为什么反演才是 Fourier 理论真正的闭环</h2>
+
+<p>先把问题说得更直白一点。你在第 9 章定义了</p>
+
+\[
+\widehat f(\xi)=\int_{\mathbb R^n}f(x)e^{-2\pi i x\cdot\xi}\,dx.
+\]
+
+<p>这条公式至少说明：一个原函数 \(f\) 会产生一张频谱图 \(\widehat f\)。但如果你停在这里，Fourier 变换仍可能只是“一个把对象送进别处的编码器”。真正让人放心的，是你知道这种编码不会丢信息，而且解码规则也同样显式：</p>
+
+\[
+f(x)=\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi.
+\]
+
+<p>这条式子一旦成立，很多事情会立刻变成定理而不再只是直觉。比如：</p>
+
+<ul>
+  <li>频谱唯一确定原函数，所以不同函数不可能有同一张 Fourier 图；</li>
+  <li>频率空间里的乘子真的能定义出原空间里的算子，而不是只有形式意义；</li>
+  <li>第 10 章里暂时挂起的 \(L^2\) 反演会自动落地；</li>
+  <li>实积分、卷积核、PDE 基本解的很多计算都能从“先变过去，再变回来”这条路线完成。</li>
+</ul>
+
+<p>你也许会想：既然定义和逆定义这么对称，为什么不早一点直接宣布它们互逆？问题就在于积分是否真的收敛。对 \(f\in\mathcal S\)，\(\widehat f\) 也在 \(\mathcal S\) 里，这已经很理想；可对一般 \(L^1\) 函数，\(\widehat f\) 只知道连续且趋于 0，不一定再可积。于是“逆变换积分”有时甚至连绝对收敛都没有。第 11 章必须做的，正是把这些边界条件一层层说清。</p>
+
+<p>证明的顺序也会很讲究。我们不会一上来就冲向最一般的 \(L^1\) 版本，而是先在最安全的 Schwartz 空间里完成完整推导。因为在那里支配收敛、卷积、Gaussian 变换、分部积分全都稳。等骨架完全立住以后，再逐层削掉光滑性与衰减假设，把结论推进到 \(L^1\) 里该成立的位置。</p>
+
+<h2 id="sec11-2">11.2 Schwartz 类上的平滑反演：先把高频轻轻压一下</h2>
+
+<p>设 \(f\in\mathcal S(\mathbb R^n)\)。直接想证明</p>
+
+\[
+f(x)=\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+\]
+
+<p>其实不难，但最稳的路线不是硬上，而是先插入一个 Gaussian 阻尼因子。对 \(\varepsilon&gt;0\)，定义</p>
+
+\[
+I_\varepsilon(x)
+=
+\int_{\mathbb R^n}
+e^{-\pi \varepsilon |\xi|^2}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi.
+\]
+
+<p>这看上去像在频率空间里把高频模态乘上一个接近 1 但略有衰减的权重。由于 \(\widehat f\in\mathcal S\subset L^1\)，这个积分绝对收敛，而且 \(I_\varepsilon\) 本身是个非常光滑的函数。</p>
+
+<p>关键是把 \(I_\varepsilon\) 翻回原空间。把 \(\widehat f\) 的定义代进去：</p>
+
+\[
+I_\varepsilon(x)
+=
+\int_{\mathbb R^n}
+e^{-\pi \varepsilon |\xi|^2}
+\left(
+\int_{\mathbb R^n}
+f(y)e^{-2\pi i y\cdot\xi}\,dy
+\right)
+e^{2\pi i x\cdot\xi}\,d\xi.
+\]
+
+<p>由绝对可积性可以交换积分顺序，得</p>
+
+\[
+I_\varepsilon(x)
+=
+\int_{\mathbb R^n}
+f(y)
+\left(
+\int_{\mathbb R^n}
+e^{-\pi \varepsilon |\xi|^2}
+e^{2\pi i (x-y)\cdot\xi}\,d\xi
+\right)
+dy.
+\]
+
+<p>内层积分正是 Gaussian 的逆 Fourier 变换。由第 9 章的高斯公式，</p>
+
+\[
+\int_{\mathbb R^n}
+e^{-\pi \varepsilon |\xi|^2}
+e^{2\pi i z\cdot\xi}\,d\xi
+=
+\varepsilon^{-n/2}e^{-\pi |z|^2/\varepsilon}
+=
+\gamma_\varepsilon(z).
+\]
+
+<p>所以立刻得到</p>
+
+\[
+\boxed{
+I_\varepsilon(x)
+=
+\int_{\mathbb R^n}f(y)\gamma_\varepsilon(x-y)\,dy
+=(f*\gamma_\varepsilon)(x).
+}
+\]
+
+<p>这一步是整章真正的桥。左边看起来像“逆变换前先乘一个高斯频率截断”，右边看起来像“原函数先和高斯核做局部平均”。你在<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>已经学过近似恒等式的力量，现在它和 Fourier 反演正式接上了。</p>
+
+<h2 id="sec11-3">11.3 让 \(\varepsilon\to0\)：Schwartz 上的反演公式完整落地</h2>
+
+<p>上一步已经得到对每个 \(\varepsilon&gt;0\)，</p>
+
+\[
+I_\varepsilon(x)=(f*\gamma_\varepsilon)(x).
+\]
+
+<p>现在从两边同时让 \(\varepsilon\downarrow0\)。先看原空间一边。因为 \(\gamma_\varepsilon\) 是质量为 1 的 Gaussian 近似恒等式，而 \(f\in\mathcal S\subset C^\infty\cap L^1\)，所以</p>
+
+\[
+(f*\gamma_\varepsilon)(x)\to f(x)
+\qquad
+\text{for every }x\in\mathbb R^n.
+\]
+
+<p>事实上，这里不仅逐点收敛，甚至在 \(\mathcal S\) 拓扑里都收敛，但逐点已经够用。</p>
+
+<p>再看频率空间一边。因为 \(\widehat f\in\mathcal S\subset L^1\)，且</p>
+
+\[
+0\le e^{-\pi \varepsilon |\xi|^2}\le1,
+\qquad
+e^{-\pi \varepsilon |\xi|^2}\to1,
+\]
+
+<p>由支配收敛定理，对每个固定 \(x\)，</p>
+
+\[
+I_\varepsilon(x)
+\to
+\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi.
+\]
+
+<p>两边极限相同，于是得到 Schwartz 类上的 Fourier 反演公式：</p>
+
+\[
+\boxed{
+f(x)=\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+\qquad
+\text{for every }f\in\mathcal S(\mathbb R^n),\ x\in\mathbb R^n.
+}
+\]
+
+<p>这就是你一直在等的那条主公式。请注意它的逻辑不是“定义看起来对称，所以一定互逆”，而是“高斯正则化把逆变换问题改写成近似恒等式，之后两边极限自然对接”。也正因此，这条证明才会在 \(L^1\)、\(L^2\)、分布、热核与 Poisson 核这些看似不同的地方反复出现。</p>
+
+<p><strong>例题 1.</strong> 用反演公式重新证明 Gaussian 的逆变换还是 Gaussian。</p>
+
+<p>第 9 章已经证明</p>
+
+\[
+\widehat{\gamma}(\xi)=e^{-\pi |\xi|^2},
+\qquad
+\gamma(x)=e^{-\pi |x|^2}.
+\]
+
+<p>由于 \(\gamma\in\mathcal S\)，反演公式适用，于是</p>
+
+\[
+\gamma(x)
+=
+\int_{\mathbb R^n}\widehat\gamma(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+=
+\int_{\mathbb R^n}e^{-\pi |\xi|^2}e^{2\pi i x\cdot\xi}\,d\xi.
+\]
+
+<p>也就是说，\(\gamma\) 的逆 Fourier 变换正是它自己。这说明 Gaussian 不只是正向变换时保持形状，连反向恢复时也是最稳定、最对称的模板。</p>
+
+<h2 id="sec11-4">11.4 反演一旦成立，很多“形式事实”就立刻变成严格定理</h2>
+
+<p>反演公式最直接的第一个后果，是唯一性。若 \(f\in\mathcal S\) 且 \(\widehat f=0\)，那么由反演立即得</p>
+
+\[
+f(x)=\int_{\mathbb R^n}0\cdot e^{2\pi i x\cdot\xi}\,d\xi=0.
+\]
+
+<p>所以 Fourier 变换是单射。这件事看起来朴素，却极其关键：今后你在频率空间里得到某个公式，就不再只是“猜测原空间应该对应某个东西”，而是真的可以靠唯一性把它拉回来。</p>
+
+<p>第二个后果是双重变换公式。把反演写成</p>
+
+\[
+f(-x)=\int_{\mathbb R^n}\widehat f(\xi)e^{-2\pi i x\cdot\xi}\,d\xi,
+\]
+
+<p>你会发现右边正是 \(\widehat{\widehat f}(x)\)。因此</p>
+
+\[
+\boxed{
+\widehat{\widehat f}(x)=f(-x).
+}
+\]
+
+<p>再做两次，就得到</p>
+
+\[
+\boxed{
+\mathcal F^4 f=f.
+}
+\]
+
+<p>这说明 Fourier 变换在我们这套规范化下本质上是四阶对称。它不像普通反射那样平方就是恒等，而是两次变换对应空间反射，四次才完全回到原点。</p>
+
+<p><strong>例题 2.</strong> 证明对任意 \(f\in\mathcal S(\mathbb R^n)\)，有</p>
+
+\[
+\widehat{\widehat f}(x)=f(-x).
+\]
+
+<p>由反演公式，取任意 \(x\in\mathbb R^n\)，把它换成 \(-x\)，得</p>
+
+\[
+f(-x)
+=
+\int_{\mathbb R^n}\widehat f(\xi)e^{-2\pi i x\cdot\xi}\,d\xi.
+\]
+
+<p>而右边正是把 \(\widehat f\) 再做一次 Fourier 变换后在点 \(x\) 的值，所以</p>
+
+\[
+\widehat{\widehat f}(x)=f(-x).
+\]
+
+<p>这个结论以后会让很多符号运算极其省力。比如一旦你知道 \(\mathcal F^2\) 只是反射，那么 \(\mathcal F^{-1}\) 就可以写成“先反射再做 Fourier 变换”。也就是</p>
+
+\[
+f^\vee(x)=\widehat f(-x).
+\]
+
+<p>第 10 章里留下的 \(L^2\) 反演，也正是靠这套结构在稠密延拓下完成闭环的。</p>
+
+<h2 id="sec11-5">11.5 从 Schwartz 推到 \(L^1\)：反演首先在连续点和 Lebesgue 点成立</h2>
+
+<p>现在把光滑性慢慢剥掉。设 \(f\in L^1(\mathbb R^n)\)，并额外假设 \(\widehat f\in L^1(\mathbb R^n)\)。这时逆变换积分</p>
+
+\[
+g(x)=\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+\]
+
+<p>绝对收敛，因而定义了一个连续函数 \(g\)。问题是：\(g\) 和原来的 \(f\) 到底什么关系？答案是：在 \(f\) 的每个 Lebesgue 点上，\(g(x)=f(x)\)。特别地，在每个连续点上当然成立。</p>
+
+<p>证明几乎和 Schwartz 情形一模一样，只是最后原空间极限不再靠光滑性，而靠 Lebesgue 微分型的近似恒等式。仍定义</p>
+
+\[
+I_\varepsilon(x)
+=
+\int_{\mathbb R^n}
+e^{-\pi \varepsilon |\xi|^2}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi.
+\]
+
+<p>因为 \(\widehat f\in L^1\)，支配收敛定理给出</p>
+
+\[
+I_\varepsilon(x)\to g(x)
+\qquad
+\text{for every }x.
+\]
+
+<p>另一方面，和 Schwartz 情形完全同样的 Fubini 计算仍成立，得到</p>
+
+\[
+I_\varepsilon(x)=(f*\gamma_\varepsilon)(x).
+\]
+
+<p>现在如果 \(x\) 是 \(f\) 的 Lebesgue 点，由 Gaussian 近似恒等式可知</p>
+
+\[
+(f*\gamma_\varepsilon)(x)\to f(x).
+\]
+
+<p>因此 \(g(x)=f(x)\)。于是我们得到 \(L^1\) 反演定理的一种标准表述：</p>
+
+\[
+\boxed{
+f\in L^1,\ \widehat f\in L^1
+\Longrightarrow
+f(x)=\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+\text{ at every Lebesgue point of }f.
+}
+\]
+
+<p>如果 \(f\) 本身连续，那么每一点都是 Lebesgue 点，于是公式处处成立。若 \(f\) 只是 \(L^1\) 函数，则它仍在几乎处处成立，因为 Lebesgue differentiation theorem 保证几乎每点都是 Lebesgue 点。你在<a href="../测度论/ch16.html">《测度论读本》第 16 章</a>已经见过这种“几乎处处恢复”的思想，这里它终于和 Fourier 反演接通了。</p>
+
+<p>这条定理里的额外假设 \(\widehat f\in L^1\) 很关键。若频谱不再可积，逆积分本身就未必绝对收敛；这时反演要么只能以 \(L^2\) 意义理解，要么需要更细的求和方式，如 Abel 或 Cesàro 正则化。换句话说，第 11 章也在提醒你：反演不是一句总能逐点写下的神奇咒语，它会认真区分不同函数空间。</p>
+
+<h2 id="sec11-6">11.6 把证明再看一遍：反演公式和高斯逼近恒等式其实是同一件事</h2>
+
+<p>到这里最值得你停下来咀嚼的，不是某一条公式，而是整套论证的骨架。我们实际上从头到尾都在重复同一个模式：</p>
+
+\[
+\boxed{
+\text{频率空间乘 }e^{-\pi\varepsilon|\xi|^2}
+\Longleftrightarrow
+\text{原空间和 }\gamma_\varepsilon\text{ 卷积}.
+}
+\]
+
+<p>左边是“先把高频温柔地压一下”，右边是“先把原函数做一次局部平均”。你只要接受 Gaussian 的 Fourier 变换仍是 Gaussian，这个桥就自动成立。之后反演公式不过是在说：当 \(\varepsilon\to0\) 时，左边的频率阻尼消失，右边的局部平均也收缩回原函数。两边极限对接，信息自然回来。</p>
+
+<p>这也解释了为什么 Gaussian 在 Fourier 理论里这么特殊。它既能在原空间做近似恒等式，又能在频率空间做平滑截断，而且两边的形状保持在同一族里。你很难再找到第二类核，能把“卷积平均”和“频率乘子”这两张脸贴得如此紧。</p>
+
+<p>从技术角度说，这条桥还有一个巨大优点：它避免了直接处理振荡积分的尖锐尾部。你不需要一开始就问</p>
+
+\[
+\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+\]
+
+<p>如何逐点收敛，而是先问带阻尼的版本</p>
+
+\[
+\int_{\mathbb R^n}
+e^{-\pi\varepsilon |\xi|^2}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+\]
+
+<p>如何解释。这个版本既绝对收敛，又能翻译成卷积，再由近似恒等式安全地极限回来。这就是现代分析常见的工作方式：不是硬闯最尖锐的对象，而是先做一层平滑，再在极限中把平滑拿掉。</p>
+
+<p>所以第 11 章和第 8、10 章之间其实非常紧。第 8 章告诉你什么是合格的平滑核与测试函数；第 10 章告诉你 Gaussian 阻尼怎样抓住能量；第 11 章则告诉你，这个同样的 Gaussian 阻尼还负责把信息完整地带回来。三章看似分别在讲空间、等距和反演，其实是一套连续动作。</p>
+
+<h2 id="sec11-7">11.7 用反演公式算经典积分：\(\displaystyle \int_{-\infty}^{\infty}\frac{\sin x}{x}\,dx\)</h2>
+
+<p>现在来看本章最经典的应用。第 9 章已经算出</p>
+
+\[
+\operatorname{rect}(x)=\mathbf 1_{[-1/2,\,1/2]}(x)
+\]
+
+<p>的 Fourier 变换为</p>
+
+\[
+\widehat{\operatorname{rect}}(\xi)
+=
+\operatorname{sinc}(\xi)
+=
+\frac{\sin(\pi \xi)}{\pi \xi},
+\]
+
+<p>其中在 \(\xi=0\) 处按连续延拓取值 1。由于 \(\operatorname{rect}\in L^1\) 且 \(\operatorname{sinc}\in L^1_{\mathrm{loc}}\) 但不绝对可积，你如果直接对它写逐点反演会有点心虚。更稳的做法是先用上一节的 Gaussian 正则化，再让参数趋零；不过在 \(x=0\) 这个特殊点上，我们也可以借第 11.5 节的思路先对紧支撑近似或 Abel 型阻尼处理，最后得到标准结论</p>
+
+\[
+\operatorname{rect}(0)=\int_{\mathbb R}\operatorname{sinc}(\xi)\,d\xi.
+\]
+
+<p>因为 \(\operatorname{rect}(0)=1\)，所以</p>
+
+\[
+\int_{-\infty}^{\infty}\frac{\sin(\pi \xi)}{\pi \xi}\,d\xi=1.
+\]
+
+<p>再做变量替换 \(x=\pi \xi\)，\(d\xi=dx/\pi\)，得</p>
+
+\[
+1
+=
+\int_{-\infty}^{\infty}\frac{\sin x}{x}\frac{dx}{\pi}.
+\]
+
+<p>于是</p>
+
+\[
+\boxed{
+\int_{-\infty}^{\infty}\frac{\sin x}{x}\,dx=\pi.
+}
+\]
+
+<p>若只取半轴，再利用被积函数为偶函数，便有</p>
+
+\[
+\int_0^\infty \frac{\sin x}{x}\,dx=\frac{\pi}{2}.
+\]
+
+<p>这个积分在复分析里也能由留数方法得到，你若回头看<a href="../复分析/ch15.html">《复分析读本》第 15 章</a>，会发现两条路线虽然外表不同，实质上都在利用同一件事：矩形窗口和 sinc 函数是一对 Fourier 对偶。Fourier 反演把这种对偶直接翻成了积分值。</p>
+
+<p><strong>例题 3.</strong> 用反演思想恢复 rect 函数在内部点的取值。</p>
+
+<p>对任意 \(|x|&lt;1/2\)，\(\operatorname{rect}\) 在该点连续且取值 1。由反演定理的连续点版本，</p>
+
+\[
+1
+=
+\operatorname{rect}(x)
+=
+\int_{\mathbb R}
+\frac{\sin(\pi \xi)}{\pi \xi}
+e^{2\pi i x\xi}\,d\xi.
+\]
+
+<p>对任意 \(|x|&gt;1/2\)，同样得到</p>
+
+\[
+0
+=
+\int_{\mathbb R}
+\frac{\sin(\pi \xi)}{\pi \xi}
+e^{2\pi i x\xi}\,d\xi.
+\]
+
+<p>这说明 sinc 的逆 Fourier 变换正是在物理空间里切出一个盒子。你若把 \(x\) 看成时间、\(\xi\) 看成频率，这就是理想低通滤波器和矩形窗口之间最经典的一对互逆关系。</p>
+
+<h2 id="sec11-8">11.8 第 10 章留下的 \(L^2\) 反演，在这里正式闭环</h2>
+
+<p>现在我们终于可以把第 10 章故意留白的那一步补完了。第 10 章已经证明 Fourier 变换从 \(\mathcal S\) 延拓成 \(L^2(\mathbb R^n)\) 上的等距算子 \(\mathcal F_2\)。而本章刚证明了 Schwartz 上的反演公式，所以对每个 \(\phi\in\mathcal S\)，取 \(g=\phi^\vee\in\mathcal S\)，便有</p>
+
+\[
+\widehat g=\phi.
+\]
+
+<p>也就是说，\(\mathcal S\subset \operatorname{Ran}(\mathcal F_2)\)。但 \(\mathcal S\) 在 \(L^2\) 中稠密，而等距算子的像总是闭集，因此</p>
+
+\[
+\operatorname{Ran}(\mathcal F_2)=L^2(\mathbb R^n).
+\]
+
+<p>于是 \(\mathcal F_2\) 是酉算子，逆算子由逆 Fourier 变换给出。换句话说，对任意 \(f\in L^2\)，都有</p>
+
+\[
+\boxed{
+(\mathcal F_2^{-1}\mathcal F_2 f)=f,
+\qquad
+(\mathcal F_2\mathcal F_2^{-1} f)=f
+\quad \text{in }L^2.
+}
+\]
+
+<p>这一步看似只是给第 10 章补上收尾，实际上意义很大。它说明 Fourier 变换在 \(L^2\) 里不仅保能量，而且真的是一套完整坐标。你可以把一个 \(L^2\) 函数送去频率空间，做完乘子、截断、能量估计、正交投影，再毫发无损地带回来。这就是为什么现代 PDE、量子力学、信号分析几乎都把 \(L^2\) Fourier 变换当成默认基础设施。</p>
+
+<h2 id="sec11-9">11.9 收束成一句话：反演把“频谱是描述”升级成“频谱就是完整信息”</h2>
+
+<p>学到这里，Fourier 理论最核心的三根柱子终于齐了。第 9 章给出结构词典：平移、求导、卷积怎样在频率空间里重写；第 10 章给出几何地板：\(L^2\) 能量与正交结构怎样被无损保留；第 11 章则给出闭环：频谱不是原函数的模糊影子，而是能完整恢复原函数的信息本身。没有反演，前两章再漂亮也仍像半套语言；有了反演，整套语言才真正闭合。</p>
+
+<p>本章最该留下来的方法不是“记住一条逆积分”，而是记住 Gaussian 正则化这条证明主线。先在频率空间乘上 \(e^{-\pi\varepsilon|\xi|^2}\)，把尖锐问题软化；再把它翻成原空间和 \(\gamma_\varepsilon\) 卷积；最后让 \(\varepsilon\to0\)，一边靠支配收敛拿掉频率阻尼，一边靠近似恒等式把局部平均收回原函数。你往后学分布、热半群、Poisson 核、Sobolev 空间乃至 Littlewood-Paley 分解时，会一遍遍看到这条套路的变形。</p>
+
+<p>这也解释了为什么第 11 章会把高斯和 \(\sin x/x\) 这种看似风格差异很大的对象放在同一章里。前者给出最平滑、最对称的反演模板，后者则展示反演如何把一个经典振荡积分直接锁定。一个负责提供理论骨架，一个负责证明这套骨架真能落到具体计算上。两者合在一起，Fourier 反演就不再只是抽象定理，而是既能组织理论、又能打穿算例的一把总钥匙。</p>
+
+<p>所以如果你想给第 11 章下一句最准确的结论，那就是：从这里开始，频率不再只是观察函数的一个角度，而是与原函数本身完全等价的另一种坐标表达。你可以失去点值图像，却仍保留频谱；也可以只拿到频谱，却通过反演把对象完整带回。现代调和分析的很多后续主题，正是站在这条等价性上继续往前走的。</p>
+
+<p><strong>例题 4.</strong> 设 \(f\in\mathcal S(\mathbb R^n)\) 且 \(\widehat f=0\)。证明 \(f=0\)。</p>
+
+<p>由 Schwartz 反演公式，任意 \(x\in\mathbb R^n\) 都有</p>
+
+\[
+f(x)
+=
+\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+=
+\int_{\mathbb R^n}0\cdot e^{2\pi i x\cdot\xi}\,d\xi
+=0.
+\]
+
+<p>因此 \(f\equiv0\)。这条看似最简单的推论，其实正是 Fourier 理论中所有“先在频率空间解方程、再回原空间宣称唯一”的底层保障。</p>
+
+<hr class="section-end">

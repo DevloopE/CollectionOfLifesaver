@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 Dirichlet 核与逐点收敛 — 普林斯顿调和分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 Fourier 系数与 Riemann-Lebesgue 引理</a><a href="ch5.html">下一章 · 第 5 章 Fej&eacute;r 核与 Ces&agrave;ro 求和 →</a></nav>
+<h1 id="ch4">第 4 章 Dirichlet 核与逐点收敛</h1>
+
+<p>前一章我们已经把 Fourier 系数 \(\widehat f(n)\) 的定义、Riemann-Lebesgue 引理，以及“函数越光滑，系数衰减越快”这条朴素直觉建立起来了。到这里你很容易产生一个危险的乐观：既然系数能算、而且还能衰减，那把它们一项一项加回去，不就应该把原函数老老实实地拼回来吗？</p>
+
+<p>真正的麻烦恰恰从这里开始。Fourier 级数最难的地方，从来不是系数怎么求，而是<strong>部分和到底怎样收敛</strong>。你把一个函数拆成频率，再把频率截断到 \(|n|\le N\)，这件事看起来像在做无害的近似；可一旦你追问“当 \(N\to\infty\) 时会怎样”，就会立刻撞上调和分析里最深的一批现象：有的函数一点一点地收回来，有的函数在跳点收向左右极限平均，有的连续函数居然也会被自己的 Fourier 部分和反复背叛；更糟的是，在 \(L^1\) 这个只要求可积的世界里，部分和甚至可能在几乎处处发散。</p>
+
+<p>为什么会这样？答案藏在一个看似不起眼、其实贯穿整章的对象里：<strong>Dirichlet 核</strong>。一旦你把部分和写成和 \(D_N\) 的卷积，所有问题都会重新排列：逐点收敛，不再只是“级数项一项项相加”的问题，而变成“一个越来越尖、却又带着大幅振荡的核，在局部平均时到底做了什么”的问题。和<a href="../偏微分方程/ch5.html">《偏微分方程读本》第 5 章</a>里热核把尖角磨平完全相反，Dirichlet 核不是正的，也不是 \(L^1\) 上受控的；它不是一个温和的平均器，而更像一个会先贴近、再反咬一口的振荡滤波器。</p>
+
+<p>这一章我们会按下面的路线走。先把 \(S_N f\) 精确改写成 \(f*D_N\)，把 Dirichlet 核的闭式公式完整推出来；接着证明 \(\|D_N\|_1\sim \log N\)，看清它为什么不是<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>意义下的良核；然后给出两个最重要的逐点收敛判别：Dini 判别与 Dirichlet-Jordan 判别。最后我们要认真面对两个反例。du Bois-Reymond 告诉你：连续，远远不够。Kolmogorov 1923 告诉你：到了 \(L^1\)，事情会坏到几乎处处发散。到那时你会真正明白，为什么下一章必须转向 Fej&eacute;r 平均。</p>
+
+<h2 id="sec4-1">4.1 部分和其实是卷积：\(S_N=f*D_N\)</h2>
+
+<p>设 \(f\in L^1(\mathbb T)\)，其中 \(\mathbb T=\mathbb R/2\pi\mathbb Z\) 表示 \(2\pi\)-周期圆周。它的 Fourier 系数写作</p>
+
+\[
+\widehat f(n)=\frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)e^{-int}\,dt,\qquad n\in\mathbb Z.
+\]
+
+<p>第 \(N\) 个对称部分和定义为</p>
+
+\[
+S_N f(x)=\sum_{n=-N}^{N}\widehat f(n)e^{inx}.
+\]
+
+<p>到目前为止，这还是一个“把系数截断后再加起来”的定义。现在把系数代回去，交换有限求和与积分：</p>
+
+\[
+\begin{aligned}
+S_N f(x)
+&=\sum_{n=-N}^{N}\left(\frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)e^{-int}\,dt\right)e^{inx}\\
+&=\frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)\sum_{n=-N}^{N}e^{in(x-t)}\,dt.
+\end{aligned}
+\]
+
+<p>这就把问题压缩到了一个有限几何级数上。我们定义</p>
+
+\[
+\boxed{
+D_N(\theta)=\sum_{n=-N}^{N}e^{in\theta}.
+}
+\]
+
+<p>这就是 <strong>Dirichlet 核</strong>。于是立刻得到</p>
+
+\[
+\boxed{
+S_N f(x)=\frac{1}{2\pi}\int_{-\pi}^{\pi} f(t)\,D_N(x-t)\,dt.
+}
+\]
+
+<p>如果我们把圆周上的卷积记作</p>
+
+\[
+(f*g)(x)=\frac{1}{2\pi}\int_{-\pi}^{\pi} f(x-t)g(t)\,dt,
+\]
+
+<p>那么上式也可以写成</p>
+
+\[
+\boxed{
+S_N f=f*D_N.
+}
+\]
+
+<p>这一改写极其关键。因为从现在开始，我们研究的就不只是级数，而是一族核 \(D_N\) 对 \(f\) 做局部平均时的行为。你如果读过<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>关于卷积、软化和近似恒等元的讨论，就会立刻意识到：若 \(D_N\) 是一族正的、归一的、并且质量越来越集中在 0 附近的良核，那么 \(f*D_N\) 的收敛会相当听话。可惜它不是。整章的戏，就是从这句“可惜它不是”里长出来的。</p>
+
+<p>先看一道最简单、但最能说明本质的算例。设</p>
+
+\[
+f(x)=2-\sin 2x+3\cos 3x.
+\]
+
+<p>那么它只有有限个非零 Fourier 系数：\(\widehat f(0)=2\)，\(\widehat f(\pm 2)=\mp \frac{1}{2i}\)，\(\widehat f(\pm 3)=\frac{3}{2}\)。于是对任何 \(N\ge 3\)，部分和已经把所有频率都收进来了，所以</p>
+
+\[
+S_N f(x)=f(x),\qquad N\ge 3.
+\]
+
+<p>这说明什么？说明对三角多项式来说，事情完全没有悬念：因为真实频率只有有限多个，硬截断迟早会把它们全部捞进来。麻烦只会从“频率无穷多”那一刻开始。</p>
+
+<p style="background:var(--boxed-bg); border-left:4px solid var(--accent); padding:0.8em 1em; margin:1.5em 0;"><strong>这一节最该记住的话。</strong> Fourier 部分和不是“神秘地把频率加回去”，而是在拿 \(D_N\) 对 \(f\) 做卷积。于是收敛问题被翻译成：\(D_N\) 到底是不是一个好平均器。</p>
+
+<h2 id="sec4-2">4.2 Dirichlet 核的闭式公式：它尖、它振荡、它带正负号</h2>
+
+<p>现在把 \(D_N\) 算到底。由定义，</p>
+
+\[
+D_N(\theta)=e^{-iN\theta}+e^{-i(N-1)\theta}+\cdots+1+\cdots+e^{iN\theta}.
+\]
+
+<p>一种写法是把它看成关于 \(e^{i\theta}\) 的有限几何级数：</p>
+
+\[
+\begin{aligned}
+D_N(\theta)
+&=e^{-iN\theta}\sum_{k=0}^{2N}e^{ik\theta}\\
+&=e^{-iN\theta}\frac{1-e^{i(2N+1)\theta}}{1-e^{i\theta}}.
+\end{aligned}
+\]
+
+<p>但这个形式虽然紧凑，却不够几何。更有用的是把分子分母同时乘上一点相位，把它改写成纯实的三角式。注意到</p>
+
+\[
+1-e^{i(2N+1)\theta}
+=e^{i(N+\frac12)\theta}\left(e^{-i(N+\frac12)\theta}-e^{i(N+\frac12)\theta}\right)
+=-2i\,e^{i(N+\frac12)\theta}\sin\!\left(\left(N+\frac12\right)\theta\right),
+\]
+
+\[
+1-e^{i\theta}
+=e^{i\theta/2}\left(e^{-i\theta/2}-e^{i\theta/2}\right)
+=-2i\,e^{i\theta/2}\sin\!\left(\frac{\theta}{2}\right).
+\]
+
+<p>代回去，指数因子全部抵消，得到经典闭式公式</p>
+
+\[
+\boxed{
+D_N(\theta)=\frac{\sin\!\left(\left(N+\frac12\right)\theta\right)}{\sin(\theta/2)}.
+}
+\]
+
+<p>把实部和虚部分开，还能立刻看到</p>
+
+\[
+D_N(\theta)=1+2\sum_{n=1}^{N}\cos(n\theta),
+\]
+
+<p>因此 \(D_N\) 是偶函数、实函数，而且</p>
+
+\[
+D_N(0)=2N+1
+\]
+
+<p>（这里要按极限理解）。这已经暴露出它的第一张脸：在 \(0\) 附近，它会长出一个高度约为 \(2N+1\)、宽度约为 \(1/N\) 的尖峰。单看这一点，你也许会误以为它像高斯核那样是不错的近似恒等元。可再看一眼分子，你就会发现第二张脸：\(\sin((N+\tfrac12)\theta)\) 会快速振荡，于是 \(D_N\) 在峰外会出现一长串正负交替的波瓣。</p>
+
+<p>这个“尖峰 + 振荡尾巴”的结构，是整章最重要的图像。你可以把它和<a href="../偏微分方程/ch10.html">《偏微分方程读本》第 10 章</a>的高斯核对照来看：高斯核是正的、平滑的、尾巴单调衰减，所以它真的在做平均；Dirichlet 核虽然也把质量往 0 附近挤，却同时带着强烈的符号振荡，所以它会在平均的同时制造抵消和放大。</p>
+
+<p>把这个公式代入 \(S_N f\)，还能得到一个常用的对称表示。因为 \(D_N\) 是偶函数，所以</p>
+
+\[
+\begin{aligned}
+S_N f(x)
+&=\frac{1}{2\pi}\int_{-\pi}^{\pi} f(x-t)D_N(t)\,dt\\
+&=\frac{1}{2\pi}\int_{0}^{\pi}\bigl(f(x+t)+f(x-t)\bigr)D_N(t)\,dt.
+\end{aligned}
+\]
+
+<p>当我们要研究 \(S_N f(x)\) 和某个目标值 \(s\) 的差时，上式会自动变成</p>
+
+\[
+S_N f(x)-s
+=\frac{1}{2\pi}\int_{0}^{\pi}\bigl(f(x+t)+f(x-t)-2s\bigr)D_N(t)\,dt.
+\]
+
+<p>这是后面 Dini 判别和 Dirichlet-Jordan 判别的起点。它的逻辑非常透明：如果 \(x\) 左右附近的函数值都已经很靠近 \(s\)，那么括号里的那一坨就会很小；此时就要看核 \(D_N\) 剩下的作用到底是“帮忙”，还是“捣乱”。</p>
+
+<p>再做一道核本身的算例。取 \(N=2\)，则</p>
+
+\[
+D_2(\theta)=1+2\cos\theta+2\cos2\theta.
+\]
+
+<p>用闭式公式就是</p>
+
+\[
+D_2(\theta)=\frac{\sin(5\theta/2)}{\sin(\theta/2)}.
+\]
+
+<p>例如在 \(\theta=0\) 处，\(D_2(0)=5\)。在 \(\theta=\pi\) 处，</p>
+
+\[
+D_2(\pi)=1+2(-1)+2(1)=1.
+\]
+
+<p>在 \(\theta=2\pi/3\) 处，</p>
+
+\[
+D_2(2\pi/3)=1+2\cos(2\pi/3)+2\cos(4\pi/3)=1-1-1=-1.
+\]
+
+<p>一个只有 5 项频率的核，已经能在短短一个周期里从 \(5\) 掉到 \(-1\)，再回到正值。你现在应该开始对它保持警惕了：这不是一个“处处非负”的平均器。</p>
+
+<h2 id="sec4-3">4.3 为什么 \(D_N\) 不是 \(L^1\) 良核：\(\|D_N\|_1\sim \log N\)</h2>
+
+<p>如果一个核族真的是良好的近似恒等元，那么一个极自然的要求是：它们的 \(L^1\) 质量应该统一有界。因为卷积估计</p>
+
+\[
+\|f*g\|_\infty \le \frac{1}{2\pi}\|f\|_\infty\|g\|_1
+\]
+
+<p>告诉你，\(\|g\|_1\) 就是这个平均器在 \(C(\mathbb T)\) 上的放大倍数。对高斯核、Fej&eacute;r 核、Poisson 核这类“温和”对象，\(\|g\|_1\) 都是常数量级。可对 Dirichlet 核，事情完全不是这样。</p>
+
+\[
+\boxed{
+\|D_N\|_{L^1(-\pi,\pi)}\asymp \log N.
+}
+\]
+
+<p>这条结论里最值得你品的不是“对数”本身，而是它意味着：随着 \(N\) 增大，\(D_N\) 在 \(L^1\) 意义下越来越失控。尖峰固然在收窄，但波瓣的绝对值面积并没有老老实实消失，它们累加起来反而慢慢长大。下面把上下界都算出来。</p>
+
+<p>先做上界。对任何 \(\theta\in(0,\pi]\)，由闭式公式</p>
+
+\[
+|D_N(\theta)|=\left|\frac{\sin((N+\frac12)\theta)}{\sin(\theta/2)}\right|
+\le \frac{1}{|\sin(\theta/2)|}.
+\]
+
+<p>而在 \(0\le \theta\le \pi\) 上有初等估计</p>
+
+\[
+\sin(\theta/2)\ge \frac{\theta}{\pi}.
+\]
+
+<p>于是</p>
+
+\[
+|D_N(\theta)|\le \frac{\pi}{\theta},\qquad 0<\theta\le \pi.
+\]
+
+<p>另一方面，处处有粗糙但有用的界</p>
+
+\[
+|D_N(\theta)|\le 2N+1.
+\]
+
+<p>把积分拆成 \((0,1/N)\) 和 \((1/N,\pi)\) 两段：</p>
+
+\[
+\begin{aligned}
+\|D_N\|_1
+&=2\int_0^{\pi}|D_N(\theta)|\,d\theta\\
+&\le 2\int_0^{1/N}(2N+1)\,d\theta+2\int_{1/N}^{\pi}\frac{\pi}{\theta}\,d\theta\\
+&\le C + C\log N
+\end{aligned}
+\]
+
+<p>其中 \(C\) 与 \(N\) 无关。于是</p>
+
+\[
+\|D_N\|_1\le C_1\log N.
+\]
+
+<p>真正更有启发性的是下界。我们要把那一串波瓣的绝对值面积认真捡起来。令</p>
+
+\[
+I_k=\left[\frac{(k+\frac16)\pi}{N+\frac12},\ \frac{(k+\frac56)\pi}{N+\frac12}\right],\qquad k=1,2,\dots,\left\lfloor\frac{N}{6}\right\rfloor.
+\]
+
+<p>在每个这样的区间上，\((N+\tfrac12)\theta\) 落在</p>
+
+\[
+\left[(k+\tfrac16)\pi,\ (k+\tfrac56)\pi\right],
+\]
+
+<p>因此离整数倍 \(\pi\) 的位置至少有 \(\pi/6\) 这么远，于是</p>
+
+\[
+\left|\sin\!\left(\left(N+\frac12\right)\theta\right)\right|\ge \frac12,\qquad \theta\in I_k.
+\]
+
+<p>又因为 \(\sin(\theta/2)\le \theta/2\)，所以在 \(I_k\) 上有</p>
+
+\[
+|D_N(\theta)|\ge \frac{1}{\theta}.
+\]
+
+<p>于是</p>
+
+\[
+\int_{I_k}|D_N(\theta)|\,d\theta
+\ge \int_{I_k}\frac{d\theta}{\theta}
+=\log\frac{k+\frac56}{k+\frac16}.
+\]
+
+<p>对大 \(k\) 来说，这一项和 \(\dfrac{c}{k}\) 同阶。更具体地，利用</p>
+
+\[
+\log\frac{k+\frac56}{k+\frac16}
+=\log\!\left(1+\frac{2/3}{k+1/6}\right)
+\ge \frac{c}{k}
+\]
+
+<p>（这里用的是 \(\log(1+u)\ge cu\) 在小 \(u\) 上的初等估计），得到</p>
+
+\[
+\begin{aligned}
+\|D_N\|_1
+&\ge 2\sum_{k=1}^{\lfloor N/6\rfloor}\int_{I_k}|D_N(\theta)|\,d\theta\\
+&\ge c\sum_{k=1}^{\lfloor N/6\rfloor}\frac{1}{k}\\
+&\ge c_1\log N.
+\end{aligned}
+\]
+
+<p>上下界合起来就得到</p>
+
+\[
+\boxed{
+c\log N\le \|D_N\|_1\le C\log N.
+}
+\]
+
+<p>这就是所谓的 <strong>Lebesgue 常数</strong> 增长。它解释了为什么部分和算子在一致范数上会越来越不稳定。因为</p>
+
+\[
+S_N f=f*D_N,
+\]
+
+<p>所以</p>
+
+\[
+\|S_N f\|_\infty\le \frac{1}{2\pi}\|D_N\|_1\|f\|_\infty
+\le C\log N\,\|f\|_\infty.
+\]
+
+<p>一个本该“恢复函数”的算子，最坏情况下居然会把 \(\|f\|_\infty\) 放大到 \(\log N\) 倍。这是第一个明确信号：<strong>直接部分和绝不是稳定的重建程序</strong>。</p>
+
+<h2 id="sec4-4">4.4 Dini 判别：在一点附近够平滑，逐点就能收回来</h2>
+
+<p>既然 \(D_N\) 不是统一有界的 \(L^1\) 良核，那我们就不能指望“对所有连续函数都自动好使”。真正能救场的，是函数在<strong>具体这一点</strong>附近有多规整。Dini 判别讲的正是这件事。</p>
+
+<p>先把目标值写清楚。设 \(f\in L^1(\mathbb T)\)，并且 \(f\) 在点 \(x\) 左右极限都存在。记</p>
+
+\[
+s_x=\frac{f(x+)+f(x-)}{2}.
+\]
+
+<p>我们希望知道 \(S_N f(x)\) 是否收敛到这个平均值。由上一节的对称公式，</p>
+
+\[
+S_N f(x)-s_x
+=\frac{1}{2\pi}\int_0^\pi \phi_x(t)\,D_N(t)\,dt,
+\]
+
+<p>其中</p>
+
+\[
+\phi_x(t)=f(x+t)+f(x-t)-2s_x.
+\]
+
+<p>再代入 Dirichlet 核的闭式公式，就得到</p>
+
+\[
+S_N f(x)-s_x
+=\frac{1}{2\pi}\int_0^\pi \phi_x(t)\frac{\sin((N+\frac12)t)}{\sin(t/2)}\,dt.
+\]
+
+<p>这时最自然的条件就浮现出来了：如果 \(\phi_x(t)\) 在 \(t=0\) 附近衰减得比 \(1/\log(1/t)\) 稍好一点，使得</p>
+
+\[
+\frac{\phi_x(t)}{\sin(t/2)}
+\]
+
+<p>仍然可积，那么后面的振荡积分就会被 Riemann-Lebesgue 引理杀掉。于是得到 Dini 判别。</p>
+
+<p style="background:var(--boxed-bg); border-left:4px solid var(--accent); padding:0.8em 1em; margin:1.5em 0;"><strong>Dini 判别。</strong> 若对某个 \(\delta>0\) 有
+\[
+\int_0^\delta \frac{|\phi_x(t)|}{t}\,dt&lt;\infty,
+\]
+其中 \(\phi_x(t)=f(x+t)+f(x-t)-2s_x\)，那么
+\[
+S_N f(x)\longrightarrow s_x.
+\]
+若 \(f\) 在 \(x\) 连续，这里 \(s_x=f(x)\)，于是 \(S_N f(x)\to f(x)\)。</p>
+
+<p>证明并不长。把积分拆成 \((0,\delta)\) 和 \((\delta,\pi)\) 两段。在 \([\delta,\pi]\) 上，\(\sin(t/2)\) 离 0 有固定下界，所以</p>
+
+\[
+g_2(t)=\frac{\phi_x(t)\mathbf 1_{[\delta,\pi]}(t)}{\sin(t/2)}
+\]
+
+<p>是 \(L^1\) 函数。于是由<a href="ch3.html">第 3 章</a>的 Riemann-Lebesgue 引理，</p>
+
+\[
+\int_\delta^\pi \phi_x(t)\frac{\sin((N+\frac12)t)}{\sin(t/2)}\,dt\to 0.
+\]
+
+<p>在 \((0,\delta)\) 上，利用 \(2\sin(t/2)\sim t\) 这一初等事实，更准确地说，当 \(0&lt;t\le \delta\) 足够小时，存在常数 \(c,C&gt;0\) 使</p>
+
+\[
+ct\le 2\sin(t/2)\le Ct.
+\]
+
+<p>所以</p>
+
+\[
+\left|\frac{\phi_x(t)}{\sin(t/2)}\right|
+\le C\frac{|\phi_x(t)|}{t},
+\]
+
+<p>而右边按 Dini 条件可积。于是</p>
+
+\[
+g_1(t)=\frac{\phi_x(t)\mathbf 1_{(0,\delta)}(t)}{\sin(t/2)}
+\in L^1(0,\delta).
+\]
+
+<p>再次用 Riemann-Lebesgue 引理，就有</p>
+
+\[
+\int_0^\delta \phi_x(t)\frac{\sin((N+\frac12)t)}{\sin(t/2)}\,dt\to 0.
+\]
+
+<p>两段相加，结论成立。</p>
+
+<p>这个证明非常值得品。它告诉你：Dini 判别真正要求的，不是 \(f\) 在点 \(x\) 有多高阶可导，而只是 \(f(x+t)+f(x-t)-2s_x\) 这项能不能抵消掉核里的那一个 \(1/t\) 奇性。也就是说，控制的核心不在“频率空间”里，而在“函数在该点附近到底多像一个常数”这件事上。</p>
+
+<p>先做一道足够具体的算例。设</p>
+
+\[
+f(t)=|t|^\alpha,\qquad 0&lt;\alpha\le 1,
+\]
+
+<p>并作 \(2\pi\)-周期延拓。我们关心 \(x=0\) 处的 Fourier 部分和。这里 \(f(0)=0\)，而且</p>
+
+\[
+\phi_0(t)=f(t)+f(-t)-2f(0)=2|t|^\alpha.
+\]
+
+<p>于是</p>
+
+\[
+\int_0^\delta \frac{|\phi_0(t)|}{t}\,dt
+=2\int_0^\delta t^{\alpha-1}\,dt
+=\frac{2}{\alpha}\delta^\alpha&lt;\infty.
+\]
+
+<p>因此 Dini 判别给出</p>
+
+\[
+S_N f(0)\to 0.
+\]
+
+<p>这和你的直觉完全一致：\(|t|^\alpha\) 在 0 附近虽不一定可导，但已经足够平滑，可以压住 Dirichlet 核的奇性。特别地，任何局部 Hölder 连续函数都会满足 Dini 条件。</p>
+
+<p>反过来，Dini 条件也让你看见一个边界。比如若某函数在 \(x=0\) 附近满足</p>
+
+\[
+|f(t)-f(0)|\approx \frac{1}{|\log|t||},
+\]
+
+<p>那么</p>
+
+\[
+\int_0^\delta \frac{dt}{t|\log t|}
+\]
+
+<p>发散，Dini 条件就失效了。它并不自动意味着 Fourier 部分和一定发散，但至少说明“连续”与“足够可控的连续”之间，真的隔着一道细而锋利的门槛。</p>
+
+<h2 id="sec4-5">4.5 Dirichlet-Jordan 判别：局部有界变差，跳点也会收向平均值</h2>
+
+<p>Dini 判别的语言偏“模连续”。另一条同样经典、而且更适合处理跳点的准则，是 Dirichlet-Jordan 判别。它说的是：如果 \(f\) 在点 \(x\) 的某个邻域里有界变差，那么 Fourier 部分和在 \(x\) 处一定收敛到左右极限的平均。</p>
+
+<p>这条结论和<a href="../实分析/ch12.html">《实分析读本》第 12 章</a>里“变差衡量函数到底有多野”那条线连得很紧。局部 BV 的函数不必连续，但它们的跳跃是受控的、总起伏量是有限的，因此不会把 Dirichlet 核的振荡放大到失控。</p>
+
+<p>准确说法如下。若 \(f\) 在 \(x\) 的某个邻域上有界变差，则左右极限 \(f(x+)\)、\(f(x-)\) 自动存在。仍令</p>
+
+\[
+s_x=\frac{f(x+)+f(x-)}{2},\qquad
+\phi_x(t)=f(x+t)+f(x-t)-2s_x.
+\]
+
+<p>则有</p>
+
+\[
+\boxed{
+S_N f(x)\longrightarrow \frac{f(x+)+f(x-)}{2}.
+}
+\]
+
+<p>要看懂它为什么对，最好的办法不是硬背结论，而是看一遍主干证明。像上一节一样，先把 \((0,\pi)\) 拆成 \((0,\delta)\cup(\delta,\pi)\)。尾部 \([\delta,\pi]\) 依然由 Riemann-Lebesgue 引理解决，所以真正困难只在 \((0,\delta)\) 这一小段。</p>
+
+<p>定义</p>
+
+\[
+H_N(t)=\int_0^t D_N(u)\,du
+=\int_0^t \frac{\sin((N+\frac12)u)}{\sin(u/2)}\,du.
+\]
+
+<p>这是 Dirichlet 核的积分原函数。它有两个关键性质。</p>
+
+\[
+\boxed{
+\sup_{N\ge 0}\sup_{0\le t\le \pi}|H_N(t)|&lt;\infty.
+}
+\]
+
+<p>以及对每个固定 \(t&gt;0\)，</p>
+
+\[
+\boxed{
+H_N(t)\longrightarrow \pi.
+}
+\]
+
+<p>为什么第二条对？把变量换成 \(v=(N+\tfrac12)u\)，得到</p>
+
+\[
+H_N(t)=2\int_0^{(N+\frac12)t}\frac{\sin v}{v}\,\frac{v/(2N+1)}{\sin(v/(2N+1))}\,dv.
+\]
+
+<p>括号里那一项当 \(N\to\infty\) 时趋于 1，于是极限被压成著名的 Dirichlet 积分</p>
+
+\[
+2\int_0^\infty \frac{\sin v}{v}\,dv=\pi.
+\]
+
+<p>第一条统一有界性也来自同一个积分：\(\int_0^A \frac{\sin v}{v}dv\) 在 \(A\) 上有界，而 \(\dfrac{y}{\sin y}\) 在小 \(y\) 附近连续有界。于是 \(H_N\) 虽然振荡，却始终不会爆掉。</p>
+
+<p>现在对小段积分做 Stieltjes 型分部积分。因为 \(\phi_x\) 在 \([0,\delta]\) 上有界变差，且 \(\phi_x(0+)=0\)，我们有</p>
+
+\[
+\int_0^\delta \phi_x(t)D_N(t)\,dt
+=\phi_x(\delta)H_N(\delta)-\int_{(0,\delta]} H_N(t)\,d\phi_x(t).
+\]
+
+<p>这里 \(d\phi_x\) 是有限符号测度，因为 BV 函数的分布导数就是有限测度。由 \(H_N(t)\to \pi\)（每个固定 \(t&gt;0\)）与 \(|H_N(t)|\le C\)，对有限测度应用受控收敛，得到</p>
+
+\[
+\int_{(0,\delta]} H_N(t)\,d\phi_x(t)
+\longrightarrow
+\pi\int_{(0,\delta]} d\phi_x(t)
+=\pi\bigl(\phi_x(\delta)-\phi_x(0+)\bigr)
+=\pi\phi_x(\delta).
+\]
+
+<p>于是</p>
+
+\[
+\int_0^\delta \phi_x(t)D_N(t)\,dt\to 0.
+\]
+
+<p>再加上尾部也趋于 0，就得到 Dirichlet-Jordan 判别。</p>
+
+<p>这条证明的气质和 Dini 判别完全不同。Dini 是把 \(\phi_x(t)/t\) 放进 \(L^1\)，直接交给 Riemann-Lebesgue。Jordan 则承认：\(\phi_x(t)/t\) 未必可积，但 \(\phi_x\) 作为 BV 函数有足够好的“总起伏控制”，于是我们先把振荡核积起来，得到统一有界的 \(H_N\)，再把微分转移给 BV 数据本身。这就是为什么 Jordan 能覆盖跳点，而 Dini 往往更像连续情形的判据。</p>
+
+<p>最经典的算例当然是阶跃函数。设</p>
+
+\[
+h(x)=
+\begin{cases}
+-1,&-\pi&lt;x&lt;0,\\
+1,&0&lt;x&lt;\pi,
+\end{cases}
+\]
+
+<p>并作 \(2\pi\)-周期延拓。函数 \(h\) 在任何紧小区间上都只有有限次跳跃，所以局部 BV。特别是在 \(x=0\) 处，</p>
+
+\[
+h(0-)=-1,\qquad h(0+)=1.
+\]
+
+<p>因此 Dirichlet-Jordan 判别给出</p>
+
+\[
+S_N h(0)\to \frac{-1+1}{2}=0.
+\]
+
+<p>这个“收向中点”现象，正是 Fourier 级数在跳点上的标准行为。它不只是一个奇怪规定，而是由对称卷积自动逼出来的：Dirichlet 核左右对称，于是它看见跳点时，只能把左右两边各拿一半。这一点到<a href="ch7.html">第 7 章</a>讨论 Gibbs 现象时会变得格外重要。</p>
+
+<h2 id="sec4-6">4.6 连续还不够：du Bois-Reymond 反例与 Lebesgue 常数</h2>
+
+<p>到这里，你已经看到两条好消息了。够平滑，行。局部 BV，行。可接下来的坏消息必须正面说出来：<strong>连续，本身并不够</strong>。这是 du Bois-Reymond 在十九世纪给出的震撼性反例：存在连续的 \(2\pi\)-周期函数，它的 Fourier 级数在某点发散。</p>
+
+<p>从今天的眼光看，这件事几乎是被上一节的 \(\|D_N\|_1\sim\log N\) 逼出来的。因为 \(S_N\) 是从 \(C(\mathbb T)\) 到 \(C(\mathbb T)\) 的线性算子，并且</p>
+
+\[
+S_N f=f*D_N.
+\]
+
+<p>所以</p>
+
+\[
+\|S_N\|_{C\to C}\le \frac{1}{2\pi}\|D_N\|_1.
+\]
+
+<p>反过来，这个不等式几乎是 sharp 的。直观上，只要你把 \(f\) 选成和 \(\operatorname{sgn}D_N\) 同号的函数，就能逼近这个上界；严格地说，用连续函数逼近符号函数即可得到</p>
+
+\[
+\|S_N\|_{C\to C}\asymp \|D_N\|_1\asymp \log N.
+\]
+
+<p>也就是说，部分和算子的算子范数在 \(C(\mathbb T)\) 上并不有界。可如果每一个连续函数的 Fourier 部分和都在每一点有界，那这些线性泛函就不该允许这种统一失控。现代 Banach 空间语言把这件事压缩成一句非常利落的话：由<strong>一致有界原理</strong>，\(\{\|S_N\|_{C\to C}\}\) 无界就推出，存在某个 \(f\in C(\mathbb T)\) 使得</p>
+
+\[
+\sup_N \|S_N f\|_\infty=\infty.
+\]
+
+<p>于是 Fourier 部分和不可能处处收敛；特别地，它在某些点必然发散。这就是 du Bois-Reymond 现象的现代版证明。</p>
+
+<p>如果你不想借助泛函分析，也可以这样读它：Lebesgue 常数 \(\|D_N\|_1\) 的对数增长告诉你，存在越来越“坏”的连续函数，使得与 \(D_N\) 卷积后的放大效应越来越强。du Bois-Reymond 的原始构造，就是把这些越来越坏的局部模式精细地拼接起来，造出一个整体仍然连续、但某个点的部分和却不停失控的函数。</p>
+
+<p>这件事的哲学含义非常大。它告诉你：Fourier 级数不是“只要连续就自动听话”的代数机器。<a href="../实分析/ch17.html">《实分析读本》第 17 章</a>花了整章讲“逐点收敛与一致收敛之间的深鸿沟”；这里你看到的是它在 Fourier 级数里的第一张凶狠面孔。连续函数当然可以被三角多项式一致逼近，这一点下一章 Fej&eacute;r 定理会重新证明；但“存在一列三角多项式逼近 \(f\)”和“取最自然的那列对称部分和 \(S_N f\) 会逼近 \(f\)”完全是两件不同的事。</p>
+
+<p>顺手做一个很能说明逻辑层级的对照。若 \(f\) 本身满足 Dini 条件，那么 \(S_N f(x)\to f(x)\)。若 \(f\) 局部 BV，则 \(S_N f(x)\to \frac{f(x+)+f(x-)}2\)。但 du Bois-Reymond 告诉你：光有连续，并不能推出任何逐点收敛定理。这三条结论拼在一起，实际上已经把本章的地图画完了：<strong>Dirichlet 核的坏处必须靠额外正则性来抵消；没有正则性，就没有逐点收敛的普遍保障。</strong></p>
+
+<h2 id="sec4-7">4.7 更坏的结局：Kolmogorov 1923 的几乎处处发散</h2>
+
+<p>du Bois-Reymond 的反例已经足够令人警觉：连续都不够。可真正把十九世纪乐观主义彻底打碎的，是 Kolmogorov 在 1923 年的定理：</p>
+
+<p style="background:var(--boxed-bg); border-left:4px solid var(--accent); padding:0.8em 1em; margin:1.5em 0;"><strong>Kolmogorov 定理（1923）。</strong> 存在某个 \(f\in L^1(\mathbb T)\)，它的 Fourier 级数在几乎处处发散。</p>
+
+<p>这句话第一次读上去会很冲击。因为 \(L^1\) 只要求可积，连连续都不要；你也许会想“那坏一点也正常”。但“几乎处处发散”仍然强得吓人。它说的不是“在一堆零散坏点上出问题”，而是“在除了零测集以外的几乎所有点上，都没有极限”。换句话说，最自然的频率截断重建，在 \(L^1\) 世界里可以坏到几乎全面崩塌。</p>
+
+<p>Kolmogorov 的原始构造很长，但它的机制并不神秘。核心是构造一串“块” \(P_k\)，满足两件事：</p>
+
+\[
+\|P_k\|_1\le 2^{-k},
+\]
+
+<p>因此</p>
+
+\[
+\sum_{k=1}^{\infty}\|P_k\|_1&lt;\infty,
+\]
+
+<p>从而级数 \(\sum P_k\) 在 \(L^1\) 中收敛；与此同时，每个 \(P_k\) 都被安排成在一个大测度集合 \(E_k\) 上，某段部分和会非常大：</p>
+
+\[
+\max_{m_k\le n\le M_k}|S_n P_k(x)|\ge k,\qquad x\in E_k,
+\]
+
+<p>并且</p>
+
+\[
+|E_k^c|\le 2^{-k}.
+\]
+
+<p>这意味着什么？意味着除了一个总测度可控的小坏集外，第 \(k\) 个块会在绝大多数点上制造一个至少为 \(k\) 的巨大峰值。接下来，把每个块的频率支撑平移到彼此很远的位置：取很大的整数 \(L_k\)，考虑</p>
+
+\[
+Q_k(x)=e^{iL_kx}P_k(x).
+\]
+
+<p>乘上 \(e^{iL_kx}\) 不改变 \(L^1\) 范数，也不改变部分和峰值的形状，只是把整块频率搬到高频区去。若这些频率块彼此相隔足够远，那么在专门属于第 \(k\) 块的那一段部分和区间里，前面的块已经全部被算进来，后面的块还完全没开始出现，于是总部分和会近似等于“前块总和 + 当前块的一个巨大峰值”。</p>
+
+<p>最后定义</p>
+
+\[
+f(x)=\sum_{k=1}^{\infty}Q_k(x).
+\]
+
+<p>因为 \(\sum \|Q_k\|_1\le \sum 2^{-k}&lt;\infty\)，确实有 \(f\in L^1(\mathbb T)\)。另一方面，由</p>
+
+\[
+\sum_{k=1}^{\infty}|E_k^c|&lt;\infty
+\]
+
+<p>以及 Borel-Cantelli 型思想可知，几乎每个点 \(x\) 只会落在有限多个坏集 \(E_k^c\) 里；也就是说，对几乎每个 \(x\)，存在 \(k_0(x)\)，使得所有 \(k\ge k_0(x)\) 都有 \(x\in E_k\)。于是对这些 \(x\)，第 \(k\) 块会不断在某些部分和上制造至少为 \(k\) 的巨大峰值，所以 \(S_n f(x)\) 不可能收敛。</p>
+
+<p>这就是 Kolmogorov 反例的骨架。真正技术性的地方，是如何具体造出那些既 \(L^1\) 很小、又能让部分和最大值在大测度集合上很大的块 \(P_k\)。而这一步背后，起作用的正是本章前半段反复出现的两个事实：Dirichlet 核有又高又尖的局部集中，同时 \(\|D_N\|_1\) 还在对数增长。换句话说，Kolmogorov 不是“无中生有地变坏”；他只是把 Dirichlet 核本来就带着的坏脾气，一层一层放大到了极致。</p>
+
+<p>这条定理也解释了为什么调和分析后来必须发展出更稳定的求和方式。你不能再把“直接部分和 \(S_N\)”当成唯一主角了。下一章的 Fej&eacute;r 核之所以重要，正是因为它把 Dirichlet 核最致命的两个问题一起修掉了：一是它变成了非负核，二是它的 \(L^1\) 质量被重新压回常数级。到那时，你会看到连续函数为什么会被 Ces&agrave;ro 平均一致恢复；再往后，Poisson 核和 Abel 求和会给你另一条更接近 PDE 与复分析的路。</p>
+
+<h2 id="sec4-8">4.8 坏消息并没有毁掉一切：后来哪些空间又被救回来了</h2>
+
+<p>读到这里，很容易出现另一种过度悲观：既然连续函数都可能发散，\(L^1\) 里更有 Kolmogorov 几乎处处发散，那是不是 Fourier 部分和其实根本不值得信？这又走过头了。第 4 章真正告诉你的，不是“处处都坏”，而是“问题极其依赖你所在的函数空间”。</p>
+
+<p>在 \(L^1\) 里，Kolmogorov 证明了几乎处处发散可能发生；可到了 \(L^2\) 及更一般的 \(L^p\)（\(1&lt;p&lt;\infty\)）里，后来出现了深刻得多的正结果。Carleson 1966 年证明：若 \(f\in L^2(\mathbb T)\)，则 Fourier 部分和 \(S_N f(x)\) 对几乎处处的 \(x\) 收敛到 \(f(x)\)。Hunt 随后把它推广到 \(L^p(\mathbb T)\) 的全部 \(1&lt;p&lt;\infty\)。</p>
+
+<p>这两条定理在本书里不会证明，因为它们已经属于二十世纪调和分析的高峰之一；但你必须知道它们的存在。因为它们精确地画出了 Kolmogorov 反例的边界：坏到几乎处处发散，可以在 \(L^1\) 发生；但只要你向上走到 \(L^2\) 或 \(L^p\)（\(1&lt;p&lt;\infty\)），几乎处处收敛又会被救回来。</p>
+
+<p>这件事和<a href="../测度论/ch12.html">《测度论读本》第 12 章</a>里 \(L^2\) 空间的特殊地位是完全呼应的。\(L^2\) 之所以在分析学里反复出现，不只是因为它有内积、方便做正交展开，还因为在很多本来很危险的极限问题上，\(L^2\) 常常是第一个重新变得可控的临界空间。Carleson 定理正是这种“\(L^2\) 有奇特稳定性”的又一次爆发。</p>
+
+<p>这也顺便提醒你：第 4 章的反例并没有否定第 2 章和第 3 章的 \(L^2\) 正交理论。Parseval 等式、Bessel 不等式、\(L^2\) 收敛都还在那里，丝毫没坏。坏掉的是<strong>点态重建</strong>，尤其是在低正则性空间里的点态重建。换句话说，“在平方可积意义下恢复函数”和“在每一个点上恢复函数”是两件截然不同的事。调和分析很多最深的难题，本质上就是在这两种语言之间来回翻译。</p>
+
+<p>所以本章最成熟的读法不是“Fourier 部分和不行”，而是下面这张隐形地图：</p>
+
+\[
+\boxed{
+\text{连续或 BV 等附加正则性 } \Longrightarrow \text{点态结论；}
+}
+\]
+
+\[
+\boxed{
+L^2\text{ 或 }L^p\ (1&lt;p&lt;\infty)\Longrightarrow \text{几乎处处结论；}
+}
+\]
+
+\[
+\boxed{
+L^1\text{ 太弱，Kolmogorov 反例会真正爆炸。}
+}
+\]
+
+<p>这三行文字几乎概括了整个古典 Fourier 收敛理论的世界观。你后面读奇异积分、极大函数、Carleson 算子时，会发现大家做的其实都是同一件事：试图在不同函数空间里重新夺回那些在第 4 章里失去的点态控制。</p>
+
+<h2 id="sec4-9">4.9 真做题时该先问什么：Dini、Jordan 和反例地图</h2>
+
+<p>整章信息很多，最后最好把它压成一个读题时能立刻触发的判断流程。以后你一看到某个周期函数 \(f\)，想问它的 Fourier 部分和在点 \(x\) 会怎样，第一反应不要是“先把级数写出来再猜”，而是先问它在 \(x\) 附近属于哪一类。</p>
+
+<p>第一类，若 \(f\) 在 \(x\) 附近 Hölder 连续，比如满足</p>
+
+\[
+|f(x+t)-f(x)|\le C|t|^\alpha,\qquad \alpha&gt;0,
+\]
+
+<p>那 Dini 条件自动成立，因为</p>
+
+\[
+\int_0^\delta \frac{t^\alpha}{t}\,dt&lt;\infty.
+\]
+
+<p>于是 \(S_N f(x)\to f(x)\)。也就是说，任何局部 \(C^1\)、Lipschitz、分段 \(C^1\) 且不在跳点上的函数，都毫无悬念地属于这一类。</p>
+
+<p>第二类，若 \(f\) 在 \(x\) 附近只有有限次跳跃、其余地方单调或分段光滑，那么它通常局部 BV。于是 Dirichlet-Jordan 判别告诉你</p>
+
+\[
+S_N f(x)\to \frac{f(x+)+f(x-)}2.
+\]
+
+<p>这正是绝大多数工程 textbook 上画的波形：方波、锯齿波、三角波、分段线性波形。它们之所以还能在点态上被讨论，不是因为“工程上通常都很乖”，而是因为它们大多自动落在 BV 世界里。</p>
+
+<p>第三类，如果题目只告诉你“\(f\) 连续”，那你必须保持警惕。连续不足以推出普通部分和收敛；du Bois-Reymond 反例已经把这个希望打掉了。这时若问题真要一个普遍正确的重建定理，你脑子里应该立刻切到下一章：改问 Fej&eacute;r 平均，而不是继续死盯 \(S_N\)。</p>
+
+<p>第四类，如果只知道 \(f\in L^1\)，那就更不能默认点态收敛。Kolmogorov 说明几乎处处发散都可能发生。这时真正可说的话，往往要转向 \(L^1\) 意义的估计、极大函数、弱型不等式，或者干脆改换求和法。</p>
+
+<p>再拿一个小算例把这张地图具体化。设</p>
+
+\[
+f(x)=|x|+\mathbf 1_{(0,\pi)}(x),
+\]
+
+<p>并作 \(2\pi\)-周期延拓。这个函数在 \(x=0\) 有跳跃，在别的地方分段光滑。于是：</p>
+
+\[
+\text{在 }x\neq 0,\pm\pi\text{ 这些非跳点上，}S_N f(x)\to f(x);
+\]
+
+\[
+\text{在 }x=0\text{ 处，}S_N f(0)\to \frac{f(0+)+f(0-)}2.
+\]
+
+<p>因为这里完全属于局部 BV 情形。可如果你把 \(\mathbf 1_{(0,\pi)}\) 换成某个精心构造的连续但非常扭曲的小振荡函数，那么“在所有点都收敛”这句话就再也不能轻易说出口了。这就是第 4 章教你的成熟：<strong>别再把 Fourier 收敛问题当成一个统一命题，而要先看局部正则性和函数空间。</strong></p>
+
+<h2 id="sec4-10">4.10 从核的角度再看一遍：为什么普通部分和这样别扭</h2>
+
+<p>在结束本章之前，最好把所有结论重新压回到核语言里统一看一次。因为如果你只记住了很多判别法、很多名字，却没记住它们为什么会长成这样，下一章一换求和法你就又会觉得像换了门课。事实上，第 4 章全部内容都在反复说一件事：<strong>Dirichlet 核不是局部平均器，而是带强振荡的全局探针。</strong></p>
+
+<p>所谓“不是局部平均器”，至少有三层意思。第一，它有正有负，所以卷积不是纯平均，而是“局部加权 + 远处相消”。第二，它的 \(L^1\) 质量不是常数，而是 \(\log N\) 级增长，说明波瓣的绝对值面积会越积越多。第三，它虽然在 \(0\) 附近高度是 \(2N+1\)、宽度是 \(1/N\)，看起来像在集中质量，但这种集中并没有伴随尾巴的乖乖消失，而是伴随越来越强的符号振荡。这三条一合并，普通部分和就注定会比热核、Poisson 核、Fej&eacute;r 核难缠得多。</p>
+
+<p>这也是为什么第 4 章所有“好结论”都带着额外假设。Dini 条件本质上是在说：你得保证函数在该点附近足够像一个常数，好把核里的 \(1/t\) 奇性抵消掉。Jordan 条件本质上是在说：就算你有跳，至少总变差得有限，好让积分分部后那只积起来的 Dirichlet 核还能被有限测度压住。du Bois-Reymond 和 Kolmogorov 则分别告诉你，一旦这两类局部控制都拿掉，坏事就真的会发生，而且会一路坏到连续反例、坏到 \(L^1\) 的几乎处处发散。</p>
+
+<p>如果把第 4 章和第 5、6 章并排看，整个故事就更清楚了。Dirichlet 核对应“硬截断”，Fej&eacute;r 核对应“算术平均后的软截断”，Poisson 核对应“几何平均后的径向平滑”。后两者都是真正的良核，所以它们恢复连续函数几乎不用费力；只有 Dirichlet 核既保留了最锋利的截止边界，又把这种锋利用振荡方式送回了物理空间。因此，它反而成了所有细致收敛问题的真正试金石。</p>
+
+<p>所以你以后若再遇到一句“Fourier 级数收敛吗”，最成熟的反应应该不是直接答“收敛”或“不收敛”，而是先反问两句：你说的是普通部分和、Ces&agrave;ro 平均，还是 Abel/Poisson 求和？你说的是连续函数、BV 函数、\(L^2\) 函数，还是仅仅 \(L^1\) 函数？这两句反问，其实就是调和分析和初等级数论分家的地方。</p>
+
+<p>再换一个角度说，Dirichlet 核最有教育意义的地方，不在于它“坏”，而在于它把坏得很精确。它不是毫无结构地乱来，而是以一种完全可计算的方式乱来：主峰宽度是 \(1/N\) 量级，峰高是 \(N\) 量级，\(L^1\) 质量是 \(\log N\) 量级，局部剖面会在跳点附近制造 Gibbs 波纹，整体又和 Carleson-Hunt 理论发生精细互动。也正因为这种坏行为高度可量化，二十世纪后半叶的调和分析才能围绕它发展出极大算子、Carleson 算子、奇异积分等整套 machinery。换句话说，第 4 章不是一个“这东西不行所以赶紧绕开”的章节，而是整门学科很多深工具的出发点。</p>
+
+<p>最后再提醒一句很容易被忽略的事：第 4 章里所有反例都在说“普通部分和不能无条件信任”，但它们从来没有说“三角函数不适合逼近函数”。事实上，第 5 章马上就会告诉你，三角多项式对连续函数的逼近不仅存在，而且可以通过非常自然的 Fej&eacute;r 平均一致实现。真正出问题的，始终只是你选择的读取方式太硬。这种把“基底本身”和“读取基底的算法”分开的习惯，是理解后面所有 Fourier 分析、数值谱法和信号处理的第一步。</p>
+
+<p>所以如果要用一句更高层的话替本章收尾，那就是：第 4 章第一次逼你承认“函数展开”和“展开的收敛方式”不是同一个命题。很多初学者直到这里才真正进入调和分析，因为从这一步开始，你研究的已经不再只是公式，而是公式背后的算子、核、空间与收敛机制。</p>
+
+<p>把这一章压成三句话。第一，Fourier 部分和就是和 Dirichlet 核卷积，而 Dirichlet 核的闭式公式把一切都暴露了：它有尖峰，但更有振荡尾巴。第二，\(\|D_N\|_1\sim \log N\) 说明它不是良核，所以逐点收敛绝不可能无条件发生；Dini 条件与局部 BV 是两种典型的补救。第三，du Bois-Reymond 和 Kolmogorov 告诉你：连续不够，\(L^1\) 更会崩塌。也正因此，下一章我们必须学会“别直接看 \(S_N\)，而去看它们的平均”。</p>
+
+<hr class="section-end">
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 Fourier 系数与 Riemann-Lebesgue 引理</a><a href="ch5.html">下一章 · 第 5 章 Fej&eacute;r 核与 Ces&agrave;ro 求和 →</a></nav>
+
+</main>
+</body>
+</html>

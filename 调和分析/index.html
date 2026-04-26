@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目录 — 普林斯顿调和分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+<header class="book-title">
+  <h1>普林斯顿调和分析读本</h1>
+  <p class="subtitle">从 Fourier 级数到奇异积分：把频率视角、核方法与函数空间讲透</p>
+  <p class="byline">写给准备迈进研究生分析，以及将走向 PDE、信号处理、数论与量子理论的你</p>
+</header>
+
+<h1 id="preface">前言</h1>
+
+<p>欢迎你翻开这本书。调和分析有一种很特别的名声：它常常被描述成一门一上来就把人淹在符号里的课。黑板上会很快出现 Fourier 系数、Dirichlet 核、Poisson 核、Schwartz 空间、分布、极大函数、奇异积分、Sobolev、Littlewood-Paley。很多人第一次见到这些词时，会有一种并不冤的感觉：这门课像是把实分析、测度论、偏微分方程和线性代数的后半段突然拧在了一起，而且还额外要求你开始用“频率”而不只是“位置”去思考函数。</p>
+
+<p>但这恰恰就是它迷人的地方。调和分析并不是又添了一堆新技巧；它是在告诉你，前面很多课里那些看似分散的招式，其实一直在等一套共同语言把它们拢起来。为什么热方程一写到整条直线就自然变成卷积核？为什么 Laplace 方程会把边界数据交给 Poisson 核？为什么一个函数的粗糙、振荡、平滑、衰减，居然都能通过频率分布读出来？为什么有些算子在点上看起来很凶，却能在 \(L^2\) 里突然变得温顺？为什么解析数论、信号处理和量子理论会一遍又一遍回到同样的 Fourier 语言？这本书要做的，就是把这些“原来是一回事”的地方讲透。</p>
+
+<p>如果你正准备迈进研究生阶段的分析课程；如果你的来路是偏微分方程，已经在弱解、Green 函数、卷积和 Sobolev 这些词附近打转；如果你来自信号处理，早已习惯频谱、滤波、窗函数和采样，却还想知道它们背后的严格骨架；如果你关心解析数论里指数和、Poisson 求和与 theta 函数的影子；如果你来自量子理论，想把“位置空间”和“动量空间”之间的切换看成真正的数学，而不只是一种物理手感——那么这本书就是为你准备的。</p>
+
+<p>这是“普林斯顿读本系列”的第九本。它不是平地再起的一门平行课程，而是明确承接前面几本书已经摆到门口的那批问题。你在<a href="../实分析/ch19.html">《实分析读本》第 19 章</a>第一次认真见到 Fourier 级数的收敛、Gibbs 现象和它与 PDE 的挂钩；在<a href="../实分析/ch24.html">第 24 章</a>第一次看到 \(L^2\)、Lebesgue 积分与 Fourier 语言开始连上。你在<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>和<a href="../测度论/ch18.html">第 18 章</a>看见过卷积、软化、稠密性与 Fourier 变换的第一轮系统整理，在<a href="../测度论/ch10.html">第 10 章</a>和<a href="../测度论/ch12.html">第 12 章</a>学会把 \(L^p\) 空间和分布看成真正的对象。你在<a href="../复分析/ch19.html">《复分析读本》第 19 章</a>见过 Poisson 核与调和延拓，在<a href="../复分析/ch20.html">第 20 章</a>见过 Fourier 变换的复视角。你在<a href="../偏微分方程/ch4.html">《偏微分方程读本》第 4 章</a>和<a href="../偏微分方程/ch13.html">第 13 章</a>见过 Fourier 级数与 Fourier 变换如何把方程拆成模态，在<a href="../偏微分方程/ch21.html">第 21 章</a>见过弱导数、弱解与 Sobolev 的第一眼。调和分析做的事，就是把这些线索正式编成一张地图。</p>
+
+<h2>这门课到底在修什么？</h2>
+
+<p>一句话说，它在修三件事。</p>
+
+<p>第一，它在修<strong>频率视角</strong>。前面的课程大多教你在 \(x\)-空间里看函数：哪里连续，哪里可导，哪里有峰值，哪里有边界条件。调和分析会强迫你学会另一种看法：把函数拆成不同频率的叠加，再问哪些频率占主导，哪些高频在制造振荡，哪些低频在决定大尺度形状。你一旦习惯这种视角，许多在原空间里混成一团的现象都会自动分层。</p>
+
+<p>第二，它在修<strong>核、算子与极限交换的判断力</strong>。Dirichlet 核为什么危险，Fejér 核为什么更老实，Poisson 核为什么既平滑又保边界信息，Hilbert 变换为什么是奇异积分的原型，极大函数为什么老在“几乎处处收敛”这种地方冒出来——这些都不是互不相干的技术细节。它们共同在回答同一个问题：当你想逼近、求和、卷积、反演、换极限的时候，到底凭什么是合法的？</p>
+
+<p>第三，它在修<strong>函数空间里的几何感</strong>。到了这里，\(L^2\) 不再只是一个好用的记号，而是正交、投影、Plancherel、Littlewood-Paley 的共同舞台；Sobolev 空间不再只是“导数也在 \(L^2\) 里”，而是正则性和频率衰减之间的桥；分布也不再只是“比函数更广”的容器，而是允许你把导数、反演、基本解和弱解摆到同一张桌面上的语言。</p>
+
+<h2>为什么调和分析会出现在这么多学科的门口？</h2>
+
+<p>因为它正好站在几个方向真正会师的地方。</p>
+
+<p>对 PDE 来说，调和分析把“微分算子”变成“频率乘子”，于是热方程、波动方程、Laplace 方程、Schrödinger 方程的许多结构都会突然变得干净。对信号处理来说，滤波、去噪、窗口、带宽和时频分辨率，本来就在用调和分析的语言，只是工程上常常先算、后问为什么。对数论来说，Poisson 求和、theta 函数、圆法和指数和估计的背后，都是“把一个算术问题搬到频率空间再看一次”的本能。对量子理论来说，Fourier 变换几乎就是位置表象与动量表象之间的桥，而 Sobolev 型估计与不确定性思想又在更深处控制着正则性、衰减与能量。调和分析值钱，不是因为它拥有某一招独门秘籍，而是因为它提供了一套几乎到处都能复用的翻译系统。</p>
+
+<h2>这本书和前几本书的关系</h2>
+
+<p>如果说<a href="../实分析/ch19.html">《实分析读本》第 19 章</a>是在告诉你“Fourier 级数这件事值得怕，也值得学”，<a href="../测度论/ch18.html">《测度论读本》第 18 章</a>是在告诉你“Fourier 变换终于可以住进 \(L^1\) 与 \(L^2\) 的房子里”，<a href="../复分析/ch19.html">《复分析读本》第 19 章</a>是在告诉你“Poisson 核和边值问题有漂亮的二维几何解释”，而<a href="../偏微分方程/ch13.html">《偏微分方程读本》第 13 章</a>是在告诉你“Fourier 变换会把微分变成乘法”，那么这本书要做的，就是把这些零散的惊鸿一瞥改造成一套成体系的判断力。</p>
+
+<p>所以我并不希望你把这本书读成一份“术语总表”。我更希望你慢慢长出这样一种反应：看见一个核，先问它在频率空间里做了什么；看见一个算子，先问它究竟是局部对象、全局对象，还是一个乘子；看见一个正则性结论，先问它到底来自空间上的平滑，还是频率上的衰减；看见一个收敛命题，先问真正站在后面的是点态控制、平均控制、极大函数，还是正交性。到那时，调和分析就不会再像一堆杂技，而会像一套非常统一的母语。</p>
+
+<h1 id="how-to-use">如何使用本书</h1>
+
+<p>这本书的读法和一般按“定义、定理、证明、习题”流水线推进的教材不太一样。它更在乎你第一次看见一个对象时，脑子里应该先抓住什么。Fourier 级数要先抓正交展开和核；Fourier 变换要先抓平移、缩放、卷积和微分之间的交换关系；分布要先抓“为什么经典函数语言不够”；极大函数和奇异积分要先抓“它们到底在替哪种极限交换兜底”。所以在你进入第 1 章之前，我想先把几条阅读约定说清楚。</p>
+
+<h2>三种入口都成立</h2>
+
+<p><strong>如果你正在第一次系统学调和分析，</strong>请尽量按顺序读，尤其前 11 章别跳。很多人会觉得三角级数太古典，想直接冲到 Fourier 变换、Hilbert 变换或 Sobolev 空间；那通常会在第 15 章以后付出代价。因为调和分析里很多现代结论，骨头仍然是在第 2–7 章那批求和核、收敛与反例里长出来的。</p>
+
+<p><strong>如果你是为 PDE 来的，</strong>请把<a href="ch1.html">第 1 章</a>、<a href="ch6.html">第 6 章</a>、<a href="ch9.html">第 9 章</a>到<a href="ch14.html">第 14 章</a>、<a href="ch17.html">第 17 章</a>、<a href="ch18.html">第 18 章</a>和<a href="ch20.html">第 20 章</a>当成主线。你最需要的是 Fourier 展开怎样为边值问题服务，Fourier 变换怎样处理整空间上的方程，分布怎样接住弱解，Sobolev 与 Littlewood-Paley 又怎样把正则性重新翻译成频率信息。</p>
+
+<p><strong>如果你是为信号处理、数论或量子理论来的，</strong>请优先抓<a href="ch2.html">第 2 章</a>到<a href="ch7.html">第 7 章</a>、<a href="ch9.html">第 9 章</a>到<a href="ch13.html">第 13 章</a>，再接上<a href="ch19.html">第 19 章</a>和<a href="ch20.html">第 20 章</a>。前一段会给你频谱展开、求和与反演；后一段会告诉你为什么频带分解、平方函数和随机模型会自然冒出来。</p>
+
+<h2>别把“核”当成零件，把它们当成行为模式</h2>
+
+<p>Dirichlet 核、Fejér 核、Poisson 核看起来像三组公式，其实它们是三种完全不同的行为。Dirichlet 核告诉你“直接部分和”为什么危险；Fejér 核告诉你“先平均再逼近”为什么温顺；Poisson 核告诉你“带着一点耗散往里推”为什么同时带来平滑和边界恢复。读的时候请反复问自己：这个核在物理空间里做什么？在频率空间里做什么？它是在保结构，还是在修正结构？只要你把这三件事问顺，后面很多看似新的核都会自动归类。</p>
+
+<h2>分布章节不要只当技术补丁</h2>
+
+<p>很多读者会把 Schwartz 空间、测试函数、缓增分布看成“为了把 Fourier 变换写得更一般而不得不补的一段形式主义”。这会错过本书最重要的一次视角升级。分布并不是把函数替换掉，而是让你第一次真正接受：导数、边界层、delta、基本解、弱解这些对象，本来就应该住在比经典函数更大的空间里。后面 Sobolev、奇异积分、PDE 分布解的很多自然性，都建立在这一步上。</p>
+
+<h2>附录不是摆设</h2>
+
+<p><a href="appA.html">附录 A</a>不是随手放在最后的工具箱，而是把 Hardy、Hilbert、Hausdorff-Young 这些会在正文里反复触发的不等式集中整理出来。它们像几本前书里的“基本恒等式”一样，是会被一遍又一遍回借的骨架。<a href="appB.html">附录 B</a>则是常用变换速查，你在做 Fourier 反演、卷积、热核、Gaussian、主值积分时，会经常回来翻它。调和分析不像初等微积分那样只靠一张公式单就能走；但它也确实需要几张可靠的速查表，让你的注意力留给结构，而不是浪费在反复抄录配对上。</p>
+
+<h1 id="learning-habits">学习建议</h1>
+
+<p>如果你只愿意从这本书里带走几条习惯，请至少带走下面这几条。它们会决定你学到的是一堆散乱技巧，还是一整套会自己咬合起来的判断力。</p>
+
+<ol>
+  <li><strong>每做完一道展开题，都回头问一句：我到底是在做线性代数，还是在做分析？</strong> Fourier 系数表面上像积分公式，骨子里却是在正交基下做投影；Plancherel 看上去像范数恒等式，骨子里却是在说这个变换保留了几何。只要这条线不断，你后面学 Hilbert 空间、谱理论和 PDE 会顺很多。</li>
+  <li><strong>每学完一个新算子，都同时问它在物理空间和频率空间里分别干了什么。</strong> 卷积在物理空间里像平均，在频率空间里像乘法；微分在物理空间里像局部变化，在频率空间里像放大高频；乘以光滑截断在物理空间里像局部化，在频率空间里却会引入卷积尾巴。调和分析最值钱的判断，几乎都来自这两种描述的来回切换。</li>
+  <li><strong>别把“几乎处处成立”误读成“差一点无所谓”。</strong> 很多结论之所以只承诺几乎处处，是因为极大函数、弱型估计、CZ 分解这些工具本来就在用测度意义而不是逐点意义控制对象。你越早接受这一点，越不容易在后面误把点态直觉当成唯一标准。</li>
+  <li><strong>自己整理一张“对象 → 所在空间 → 可用工具”的表。</strong> 比如三角多项式住在展开论里，Schwartz 函数住在 Fourier 变换最舒服的舞台，分布住在弱导数和基本解的语言里，Sobolev 空间连着正则性，Littlewood-Paley 连着频带分解和平方函数。这张表会比单独背结论有用得多。</li>
+</ol>
+
+<h1 id="reverse-index">主题反向索引</h1>
+
+<p>下面这张表不是按章节顺序，而是按“你现在手上想解决什么问题”来排。如果你是在复习、赶进度，或者已经从 PDE / 信号处理 / 数论某个方向闯进来，先看这里最划算。</p>
+
+<table>
+  <thead>
+    <tr><th>如果你现在在找…</th><th>先去这里</th></tr>
+  </thead>
+  <tbody>
+    <tr><th colspan="2">Fourier 级数</th></tr>
+    <tr><td>为什么 PDE 会自然逼你把函数展开成正弦余弦</td><td>第 1 章、第 2 章</td></tr>
+    <tr><td>Fourier 系数到底怎样记录“每个频率有多少成分”</td><td>第 3 章</td></tr>
+    <tr><td>Dirichlet 核为什么危险，逐点收敛为什么麻烦</td><td>第 4 章</td></tr>
+    <tr><td>怎样用 Fejér / Abel / Poisson 这些求和方式把事情做稳</td><td>第 5 章、第 6 章</td></tr>
+    <tr><td>Gibbs 现象到底在提醒你什么</td><td>第 7 章</td></tr>
+
+    <tr><th colspan="2">Fourier 变换</th></tr>
+    <tr><td>Schwartz 空间为什么是最舒服的起跑线</td><td>第 8 章</td></tr>
+    <tr><td>平移、缩放、卷积、微分在频率空间里怎样改写</td><td>第 9 章</td></tr>
+    <tr><td>为什么 \(L^2\) 是 Fourier 理论真正稳定的地板</td><td>第 10 章</td></tr>
+    <tr><td>反演公式到底凭什么成立</td><td>第 11 章、附录 B</td></tr>
+
+    <tr><th colspan="2">分布</th></tr>
+    <tr><td>为什么经典函数语言接不住 delta、主值和弱导数</td><td>第 8 章、第 12 章</td></tr>
+    <tr><td>分布也能做 Fourier 变换是什么意思</td><td>第 13 章</td></tr>
+    <tr><td>想看分布如何真正进入 PDE</td><td>第 14 章</td></tr>
+
+    <tr><th colspan="2">极大函数与 CZ 分解</th></tr>
+    <tr><td>为什么“几乎处处收敛”背后总会冒出极大函数</td><td>第 15 章</td></tr>
+    <tr><td>Calderón-Zygmund 分解到底在替什么估计兜底</td><td>第 16 章</td></tr>
+    <tr><td>弱型估计与好坏部分分拆该从哪里入门</td><td>第 15 章、第 16 章</td></tr>
+
+    <tr><th colspan="2">奇异积分</th></tr>
+    <tr><td>Hilbert 变换为什么是第一位主角</td><td>第 17 章</td></tr>
+    <tr><td>主值积分、卷积核奇性与有界性该怎么一起看</td><td>第 16 章、第 17 章</td></tr>
+    <tr><td>想知道现代奇异积分理论最初的门把手在哪里</td><td>第 15 章到第 17 章</td></tr>
+
+    <tr><th colspan="2">Sobolev</th></tr>
+    <tr><td>弱导数、分布和 Sobolev 空间之间到底怎样接上</td><td>第 14 章、第 18 章</td></tr>
+    <tr><td>嵌入定理为什么能读成“频率衰减换正则性”</td><td>第 18 章</td></tr>
+    <tr><td>想把 PDE 里的正则性估计重新看成 Fourier 语言</td><td>第 18 章、第 20 章</td></tr>
+
+    <tr><th colspan="2">Littlewood-Paley</th></tr>
+    <tr><td>为什么要把函数分成一段一段频带来看</td><td>第 19 章</td></tr>
+    <tr><td>平方函数和 dyadic 分解到底值钱在哪</td><td>第 19 章</td></tr>
+    <tr><td>想从“一个整体函数”切换到“多尺度结构”</td><td>第 19 章、第 20 章</td></tr>
+
+    <tr><th colspan="2">应用</th></tr>
+    <tr><td>PDE 里的分布解、正则性与核方法</td><td>第 1 章、第 14 章、第 18 章、第 20 章</td></tr>
+    <tr><td>概率中的 Gauss 核、卷积与随机过程频谱视角</td><td>第 11 章、第 19 章、第 20 章</td></tr>
+    <tr><td>信号处理里的滤波、频带和平均平滑</td><td>第 5 章、第 9 章、第 15 章、第 19 章、附录 B</td></tr>
+    <tr><td>数论与量子理论里为什么总会回到 Fourier 语言</td><td>第 11 章、第 13 章、第 17 章、第 20 章</td></tr>
+  </tbody>
+</table>
+
+<h1 id="acknowledgments">致谢</h1>
+
+<p>感谢 Adrian Banner 再一次提醒我：数学书完全可以像一个认真负责的人在和你说话，而不必把自己伪装成法律条文。感谢 Elias M. Stein 与 Rami Shakarchi，他们把调和分析写成了一条从古典现象稳稳走向现代语言的路，而不是一本只会堆技术名词的手册。感谢 Loukas Grafakos，他把实变方法、奇异积分与 Littlewood-Paley 那套现代骨架摆得异常清楚。也感谢 Yitzhak Katznelson，他让三角级数的古典问题始终保留着锋利的牙齿：一切现代技术，最终都还要回头回答那些最早、也最难缠的收敛问题。</p>
+
+<h1 id="toc">目录</h1>
+
+<p>下面是全书 20 章、两个附录和索引的完整目录。每章一个独立 HTML 文件，方便你按主题跳读，也方便你把某一条技术线单独抽出来复习。</p>
+
+<nav class="toc">
+  <section class="toc-chapter">
+    <h2>第一部分　从三角级数出发</h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch1.html">第 1 章　引论：从 PDE 谈起为何需要 Fourier 展开</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch2.html">第 2 章　三角级数与正交基视角</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch3.html">第 3 章　Fourier 系数与 Riemann-Lebesgue 引理</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch4.html">第 4 章　Dirichlet 核与逐点收敛</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch5.html">第 5 章　Fejér 核与 Cesàro 求和</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch6.html">第 6 章　Abel 求和与 Poisson 核</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch7.html">第 7 章　Gibbs 现象</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2>第二部分　Fourier 变换与分布语言</h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch8.html">第 8 章　Schwartz 空间与测试函数</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch9.html">第 9 章　\(\mathbb{R}^n\) 上的 Fourier 变换：基础性质</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch10.html">第 10 章　Plancherel 定理与 L^2 框架</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch11.html">第 11 章　反演公式与 Fourier 反演定理</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch12.html">第 12 章　缓增分布 \(S'\)</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch13.html">第 13 章　分布的 Fourier 变换</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch14.html">第 14 章　PDE 的分布解</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2>第三部分　实变方法与奇异积分</h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch15.html">第 15 章　Hardy-Littlewood 极大函数</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch16.html">第 16 章　Calderón-Zygmund 分解</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch17.html">第 17 章　奇异积分算子：Hilbert 变换</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2>第四部分　函数空间与多尺度分解</h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch18.html">第 18 章　Sobolev 空间与嵌入定理</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch19.html">第 19 章　Littlewood-Paley 理论</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2>第五部分　回到应用</h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="ch20.html">第 20 章　调和分析在 PDE 与概率中的应用</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2>附录与索引</h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="appA.html">附录 A　经典不等式速查（Hardy、Hilbert、Hausdorff-Young）</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="appB.html">附录 B　常用变换速查</a></h2>
+  </section>
+
+  <section class="toc-chapter">
+    <h2><a href="subject-index.html">索引</a></h2>
+  </section>
+</nav>
+
+
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+
+</main>
+</body>
+</html>

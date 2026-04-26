@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 Plancherel 定理与 \(L^2\) 框架 — 普林斯顿调和分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 \( \mathbb R^n \) 上的 Fourier 变换：基础性质</a><a href="ch11.html">下一章 · 第 11 章 反演公式与 Fourier 反演定理 →</a></nav>
+<h1 id="ch10">第 10 章 Plancherel 定理与 \(L^2\) 框架</h1>
+
+<p>第 9 章的 Fourier 变换规则已经漂亮得像一张词典：平移变相位，调制变频移，求导变乘子，卷积变乘法。但只要你稍微往前走一步，就会发现单靠 \(L^1\) 还不够。很多自然函数并不在 \(L^1\) 里，却明明有稳定的“能量”；许多偏微分方程关心的不是函数总质量，而是平方可积意义下的能量守恒或能量衰减；很多正交展开真正舒服的归宿也不是 \(L^1\)，而是带内积的 \(L^2\)。</p>
+
+<p>这时 Fourier 变换会展示它最深的一层结构：它不只是把函数变成频谱，更会把 \(L^2(\mathbb R^n)\) 里的长度和角度原封不动搬到频率空间里去。你在圆周上的 Fourier 级数里已经见过 Parseval 等式，知道“系数平方和 = 原函数能量”；现在 Plancherel 定理要告诉你，整空间版本也完全成立，只不过离散求和换成了连续积分。</p>
+
+\[
+\boxed{
+\|\widehat f\|_2=\|f\|_2
+\qquad
+\text{(至少先对 }f\in\mathcal S(\mathbb R^n)\text{ 成立).}
+}
+\]
+
+<p>这条等式的意义远比“范数相等”四个字重。它说明 Fourier 变换不是一般算子，而是一个等距算子；再往前一步，它实际上会变成 \(L^2\) 上的酉算子。于是原空间里的正交、投影、闭包、最佳逼近、能量估计，全都可以无损搬运到频率空间里。你在<a href="../线性代数/ch21.html">《线性代数读本》第 21 章</a>里学过的内积空间几何，到这里第一次以真正无限维的样子完全展开。</p>
+
+<p>本章的节奏会刻意分成两层。先在 \(\mathcal S(\mathbb R^n)\) 上证明 Plancherel，因为那里一切积分与极限都可以直接操作；再借第 8 章的稠密性，把 Fourier 变换延拓到整个 \(L^2\)。这样做不是绕路，而是现代分析最可靠的推进方式：先在安全区把骨架搭好，再通过闭包把房子盖满。</p>
+
+<h2 id="sec10-1">10.1 为什么 \(L^2\) 才是 Fourier 分析的能量空间</h2>
+
+<p>先把“为什么偏偏是 \(L^2\)”说透。若你只看 \(L^1\)，Fourier 变换当然能逐点定义，可这个空间没有内积，正交结构也不完整。若你看 \(L^\infty\)，点态控制很强，可很多平均与极限行为却不稳定。只有 \(L^2\) 同时兼顾了两个世界：一方面它仍是函数空间，能和积分、卷积、微分发生关系；另一方面它又是 Hilbert 空间，带着最完整的几何结构。</p>
+
+<p>这件事在 Fourier 级数里你已经熟悉了。对 \(2\pi\)-周期函数，三角系 \(\{e^{inx}\}\) 之所以强，不是因为它把所有积分都算出来，而是因为它在 \(L^2[-\pi,\pi]\) 里形成正交基。于是一个函数的能量可以按模态拆开，互不干扰。整空间上的 Fourier 变换做的，本质上还是同一件事：它把函数拆成连续频率的模态，而 \(L^2\) 正是让这些模态可以“平方可和”地叠在一起的自然场所。</p>
+
+<p>你也可以从 PDE 角度理解。热方程、薛定谔方程、波动方程里最常见的量不是 \(\int |u|\)，而是 \(\int |u|^2\)。因为平方之后能量会和内积、正交、Pythagoras 关系紧密咬合。Fourier 变换若能保住这个平方积分，就等于保住了很多动力学最关心的守恒量或耗散量。第 10 章真正建立的，就是这种“频率分解不会损失总能量”的原则。</p>
+
+<p><strong>例题 1.</strong> 设一维 Gaussian</p>
+
+\[
+\gamma(x)=e^{-\pi x^2}.
+\]
+
+<p>利用第 9 章结论 \(\widehat\gamma=\gamma\)，计算 \(\|\gamma\|_2^2\)。</p>
+
+<p>由定义，</p>
+
+\[
+\|\gamma\|_2^2=\int_{\mathbb R}e^{-2\pi x^2}\,dx.
+\]
+
+<p>把经典公式</p>
+
+\[
+\int_{\mathbb R} e^{-\pi a x^2}\,dx=a^{-1/2}\qquad (a&gt;0)
+\]
+
+<p>代入 \(a=2\)，得到</p>
+
+\[
+\|\gamma\|_2^2=\frac1{\sqrt2}.
+\]
+
+<p>因此</p>
+
+\[
+\|\gamma\|_2=2^{-1/4}.
+\]
+
+<p>这个数值本身没什么戏剧性，真正重要的是：Gaussian 在原空间与频率空间里不仅形状一样，连 \(L^2\) 长度也完全一样。你可以把它当成 Plancherel 定理最直观的样板。</p>
+
+<h2 id="sec10-2">10.2 先在 \(\mathcal S\) 上证明等距：Gaussian 正则化是最稳的桥</h2>
+
+<p>现在进入本章核心。我们要证明：若 \(f\in\mathcal S(\mathbb R^n)\)，则</p>
+
+\[
+\|\widehat f\|_2=\|f\|_2.
+\]
+
+<p>如果你已经知道第 11 章的反演公式，那么这条结论可以从 Parseval 恒等式很快推出。但这里我们反过来做：先用 Gaussian 正则化直接证明等距，再把反演留到下一章详细处理。这样逻辑更干净。</p>
+
+<p>对 \(\varepsilon&gt;0\)，记</p>
+
+\[
+\Gamma_\varepsilon(\xi)=e^{-\pi \varepsilon |\xi|^2},
+\qquad
+\gamma_\varepsilon(x)=\varepsilon^{-n/2}e^{-\pi |x|^2/\varepsilon}.
+\]
+
+<p>第 9 章已经证明过这是一对 Fourier 变换：</p>
+
+\[
+\widehat{\gamma_\varepsilon}(\xi)=\Gamma_\varepsilon(\xi).
+\]
+
+<p>考虑截断后的频率能量</p>
+
+\[
+I_\varepsilon
+=
+\int_{\mathbb R^n}\Gamma_\varepsilon(\xi)|\widehat f(\xi)|^2\,d\xi.
+\]
+
+<p>因为 \(f,\widehat f\in\mathcal S\)，一切都绝对可积。把 \(|\widehat f(\xi)|^2\) 展开：</p>
+
+\[
+\widehat f(\xi)\overline{\widehat f(\xi)}
+=
+\left(\int_{\mathbb R^n}f(x)e^{-2\pi i x\cdot\xi}\,dx\right)
+\left(\int_{\mathbb R^n}\overline{f(y)}e^{2\pi i y\cdot\xi}\,dy\right).
+\]
+
+<p>代入后用 Fubini 换序，得</p>
+
+\[
+I_\varepsilon
+=
+\int_{\mathbb R^n}\int_{\mathbb R^n}
+f(x)\overline{f(y)}
+\left(
+\int_{\mathbb R^n}
+e^{-\pi \varepsilon |\xi|^2}
+e^{-2\pi i (x-y)\cdot\xi}\,d\xi
+\right)
+dx\,dy.
+\]
+
+<p>内层积分正是 \(\Gamma_\varepsilon\) 在点 \(x-y\) 的逆变换，也就是 \(\gamma_\varepsilon(x-y)\)。因此</p>
+
+\[
+I_\varepsilon
+=
+\int_{\mathbb R^n}\int_{\mathbb R^n}
+f(x)\overline{f(y)}\gamma_\varepsilon(x-y)\,dx\,dy.
+\]
+
+<p>把 \(x\) 积分看成卷积，便得</p>
+
+\[
+I_\varepsilon
+=
+\int_{\mathbb R^n}(f*\gamma_\varepsilon)(y)\,\overline{f(y)}\,dy.
+\]
+
+<p>现在让 \(\varepsilon\downarrow0\)。因为 \(\gamma_\varepsilon\) 是近似恒等式，而 \(f\in\mathcal S\subset L^2\)，有</p>
+
+\[
+f*\gamma_\varepsilon \to f
+\qquad \text{in }L^2(\mathbb R^n).
+\]
+
+<p>所以右边趋于</p>
+
+\[
+\int_{\mathbb R^n}|f(y)|^2\,dy=\|f\|_2^2.
+\]
+
+<p>另一方面，左边满足 \(0\le \Gamma_\varepsilon(\xi)\le1\) 且 \(\Gamma_\varepsilon(\xi)\to1\)。由于 \(\widehat f\in L^2\)，由支配收敛定理，</p>
+
+\[
+I_\varepsilon\to \int_{\mathbb R^n}|\widehat f(\xi)|^2\,d\xi=\|\widehat f\|_2^2.
+\]
+
+<p>两边极限相等，于是得到</p>
+
+\[
+\boxed{
+\|\widehat f\|_2=\|f\|_2
+\qquad \text{for every }f\in\mathcal S(\mathbb R^n).
+}
+\]
+
+<p>这就是 Plancherel 定理的核心证明。注意整个论证几乎只用了三件事：Gaussian 的自守性、近似恒等式、以及第 8 章建立的 Schwartz 技术安全区。它不像反演公式那样需要一开始就知道“怎样变回去”，却已经足够把 \(L^2\) 几何完全抓住。</p>
+
+<h2 id="sec10-3">10.3 从等距到 Parseval：内积、正交与能量分解全部保留下来</h2>
+
+<p>一旦范数等距成立，内积保持就几乎是线性代数练习。因为在复 Hilbert 空间里，内积由范数决定。对 \(f,g\in\mathcal S(\mathbb R^n)\)，用极化恒等式即可得到</p>
+
+\[
+\langle \widehat f,\widehat g\rangle_{L^2}
+=
+\langle f,g\rangle_{L^2}.
+\]
+
+<p>若你想把这一步写得完全显式，可以用</p>
+
+\[
+4\langle u,v\rangle
+=
+\|u+v\|_2^2-\|u-v\|_2^2
++\, i\|u+iv\|_2^2-i\|u-iv\|_2^2.
+\]
+
+<p>把 \(u=\widehat f\)、\(v=\widehat g\) 代入，再利用已经证明的等距性，就得到</p>
+
+\[
+\boxed{
+\int_{\mathbb R^n}\widehat f(\xi)\overline{\widehat g(\xi)}\,d\xi
+=
+\int_{\mathbb R^n}f(x)\overline{g(x)}\,dx.
+}
+\]
+
+<p>这就是整空间上的 Parseval 恒等式。它和圆周上的 Parseval 公式完全同构，只不过离散求和换成连续积分。于是你立刻得到两个非常重要的几何后果。</p>
+
+<p>第一，若 \(f\perp g\) 在 \(L^2\) 中正交，那么 \(\widehat f\perp \widehat g\) 也正交。第二，任意有限族正交函数在 Fourier 变换下仍然正交。因此“按模态分解能量”的观点在整空间里不是比喻，而是精确的 Hilbert 空间事实。</p>
+
+<p>这和<a href="../线性代数/ch21.html">《线性代数读本》第 21 章</a>的正交投影几乎是一回事，只不过这里的“坐标轴”不再是一组有限向量，而是一整个连续频率谱。你若把 \(\widehat f(\xi)\) 想成“频率 \(\xi\) 处的振幅”，Parseval 就是在说：总能量等于所有频率能量密度的积分和。</p>
+
+<p><strong>例题 2.</strong> 利用 Parseval 恒等式，计算</p>
+
+\[
+\int_{\mathbb R}
+\left(\frac{\sin(\pi \xi)}{\pi \xi}\right)^2\,d\xi.
+\]
+
+<p>第 9 章已经证明</p>
+
+\[
+\widehat{\operatorname{rect}}(\xi)=\frac{\sin(\pi \xi)}{\pi \xi},
+\qquad
+\operatorname{rect}(x)=\mathbf 1_{[-1/2,\,1/2]}(x).
+\]
+
+<p>由 Plancherel，</p>
+
+\[
+\int_{\mathbb R}
+\left|\frac{\sin(\pi \xi)}{\pi \xi}\right|^2\,d\xi
+=
+\int_{\mathbb R} |\operatorname{rect}(x)|^2\,dx.
+\]
+
+<p>而 \(\operatorname{rect}(x)\) 只有在区间 \([-1/2,1/2]\) 上等于 1，所以</p>
+
+\[
+\int_{\mathbb R} |\operatorname{rect}(x)|^2\,dx=1.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+\int_{\mathbb R}
+\left(\frac{\sin(\pi \xi)}{\pi \xi}\right)^2\,d\xi=1.
+}
+\]
+
+<p>这条积分公式在初等方法里并不短，可在 Plancherel 框架下几乎是“看一眼就结束”。这正是 \(L^2\) Fourier 分析的典型风格：你不直接硬算振荡积分，而是先把它认成某个函数的能量。</p>
+
+<h2 id="sec10-4">10.4 由 \(\mathcal S\) 延拓到整个 \(L^2(\mathbb R^n)\)：稠密性在这里真正发力</h2>
+
+<p>现在进入本章第二个核心动作。第 8 章已经证明 \(\mathcal S(\mathbb R^n)\) 在 \(L^2(\mathbb R^n)\) 中稠密。因此对任意 \(f\in L^2\)，都能选一列 \(f_m\in\mathcal S\) 使</p>
+
+\[
+f_m\to f \qquad \text{in }L^2.
+\]
+
+<p>由于 Schwartz 上已经有等距性，\(\{\widehat f_m\}\) 在 \(L^2\) 中也是 Cauchy：</p>
+
+\[
+\|\widehat f_m-\widehat f_k\|_2
+=
+\|f_m-f_k\|_2.
+\]
+
+<p>于是存在某个 \(g\in L^2(\mathbb R^n)\)，使</p>
+
+\[
+\widehat f_m\to g \qquad \text{in }L^2.
+\]
+
+<p>这个极限 \(g\) 与逼近列的选择无关。因为若 \(f_m'\to f\) 也是另一列 Schwartz 逼近，则</p>
+
+\[
+\|\widehat f_m-\widehat f_m'\|_2
+=
+\|f_m-f_m'\|_2\to0.
+\]
+
+<p>所以两列变换收敛到同一个极限。于是我们可以把 \(g\) 定义为 \(f\) 的 \(L^2\)-Fourier 变换：</p>
+
+\[
+\boxed{
+\mathcal F_2 f
+:=
+\lim_{m\to\infty}\widehat f_m
+\qquad \text{in }L^2.
+}
+\]
+
+<p>这样定义出的 \(\mathcal F_2\) 是 \(L^2\to L^2\) 的线性等距映射，而且在 \(\mathcal S\) 上与原来的积分定义一致。特别地，</p>
+
+\[
+\|\mathcal F_2 f\|_2=\|f\|_2
+\qquad
+\text{for all }f\in L^2(\mathbb R^n).
+\]
+
+<p>到这里有个很重要的认识转变：对一般 \(L^2\) 函数，\(\widehat f(\xi)\) 不一定还能逐点由积分定义解释，因为 \(f\) 未必在 \(L^1\) 里。但作为 \(L^2\) 元素，它的 Fourier 变换依然存在，而且仍然是完全等距的。也就是说，在 \(L^2\) 世界里，“频谱”首先是一个平方可积类，而不是一张必须逐点可见的函数图像。</p>
+
+<p>这正是现代分析常用的视角。很多对象没有好看的点态公式，可在函数空间里却完全稳健。第 10 章的 Fourier 变换已经从“一个积分定义”升级成“一个 Hilbert 空间上的等距算子”。这一步一旦完成，后面的内积、投影、弱收敛、频率截断都可以纯粹在 \(L^2\) 几何里运作。</p>
+
+<h2 id="sec10-5">10.5 \(L^2\) 反演为什么会自然出现：本章搭框架，下一章给显式公式</h2>
+
+<p>你现在最自然会追问：既然 \(\mathcal F_2\) 是等距映射，那它是不是可逆？答案是肯定的，而且它最终会成为酉算子。不过这里最好把逻辑顺序说清。真正的显式反演公式</p>
+
+\[
+f(x)=\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi
+\]
+
+<p>要到第 11 章才在 Schwartz 类和 \(L^1\) 框架里被详细证明。可一旦那条公式在 \(\mathcal S\) 上落地，\(L^2\) 版本几乎是自动的。</p>
+
+<p>具体说，先定义逆变换符号</p>
+
+\[
+g^\vee(x)=\int_{\mathbb R^n}g(\xi)e^{2\pi i x\cdot\xi}\,d\xi.
+\]
+
+<p>第 11 章会证明：若 \(f\in\mathcal S(\mathbb R^n)\)，则</p>
+
+\[
+(\widehat f)^\vee=f.
+\]
+
+<p>因此对任意 \(\phi\in\mathcal S\)，取 \(f=\phi^\vee\in\mathcal S\)，便有</p>
+
+\[
+\widehat f=\phi.
+\]
+
+<p>这说明 \(\mathcal S\subset \operatorname{Ran}(\mathcal F_2)\)。但 \(\mathcal S\) 在 \(L^2\) 中稠密，而 \(\mathcal F_2\) 的像又因等距而是闭的，所以</p>
+
+\[
+\operatorname{Ran}(\mathcal F_2)=L^2(\mathbb R^n).
+\]
+
+<p>于是 \(\mathcal F_2\) 是一个酉算子，逆算子正是 \(L^2\) 上连续延拓后的逆 Fourier 变换。也就是说，对任意 \(f\in L^2\)，都有</p>
+
+\[
+\boxed{
+(\mathcal F_2^{-1}\mathcal F_2 f)=f
+\qquad \text{in }L^2.
+}
+\]
+
+<p>如果你喜欢把这句话叫作“\(L^2\) 反演公式”，完全可以。只是要记得：这里的等号首先是 \(L^2\) 意义下的等号，而不是逐点等号。对一般 \(L^2\) 函数，你不能一上来就问“它在每个点是不是由那条积分给出”；能问、也最稳定的是“它作为平方可积类，能否被频谱完整恢复”。答案是：能，而且恢复过程是无损的。</p>
+
+<p>这种“先在好函数上证明显式公式，再用连续延拓推进到整个函数空间”的模式，和<a href="../测度论/ch17.html">《测度论读本》第 17 章</a>里先在光滑核上卷积，再送回 \(L^p\) 的做法是同一种工艺。现代分析真正可靠的推广，几乎都这样做。</p>
+
+<h2 id="sec10-6">10.6 卷积在 \(L^2\) 里应该怎样读：滤波、乘子与有界算子</h2>
+
+<p>第 9 章在 Schwartz 类里告诉你 \(\widehat{f*g}=\widehat f\,\widehat g\)。到了 \(L^2\) 框架，这句话有了更实用的算子意义。最常见的情形是：\(f\in L^2(\mathbb R^n)\)，\(g\in L^1(\mathbb R^n)\)。这时 \(f*g\in L^2\)，而且</p>
+
+\[
+\|f*g\|_2\le \|g\|_1\|f\|_2
+\]
+
+<p>由 Young 不等式成立。若进一步 \(g\) 够好，比如 \(g\in \mathcal S\) 或 \(g\in L^1\cap L^2\)，则 Fourier 变换把卷积算子直接变成乘子算子：</p>
+
+\[
+\widehat{f*g}(\xi)=\widehat f(\xi)\widehat g(\xi)
+\qquad \text{in }L^2.
+\]
+
+<p>这意味着“和 \(g\) 卷积”其实就是“把每个频率模态乘上 \(\widehat g(\xi)\)”。于是卷积核的 \(L^2\) 作用，完全由乘子 \(\widehat g\) 的大小决定。若 \(\widehat g\in L^\infty\)，便有</p>
+
+\[
+\|f*g\|_2
+=
+\|\widehat f\,\widehat g\|_2
+\le
+\|\widehat g\|_\infty\|\widehat f\|_2
+=
+\|\widehat g\|_\infty\|f\|_2.
+\]
+
+<p>这就是为什么平滑核会自然对应有界滤波器：你只需要控制它对每个频率的放大倍数，而不必在实空间里反复估卷积积分。</p>
+
+<p>还有一个很漂亮的 \(L^2\) 现象：若 \(f,g\in L^2\)，则 \(\widehat f\,\widehat g\in L^1\)，因为 Cauchy-Schwarz 给出</p>
+
+\[
+\int_{\mathbb R^n}|\widehat f(\xi)\widehat g(\xi)|\,d\xi
+\le
+\|\widehat f\|_2\|\widehat g\|_2
+=
+\|f\|_2\|g\|_2.
+\]
+
+<p>因此它至少可以做逆 Fourier 变换，从而定义出一个连续有界函数。这件事提示你：在 \(L^2\) 世界里，卷积与乘法之间的关系不但没消失，反而更适合从“算子与乘子”的角度去看。</p>
+
+\[
+\boxed{
+\text{在 }L^2\text{ 中，卷积核 }g\text{ 的真正身份是频率乘子 }\widehat g.
+}
+\]
+
+<h2 id="sec10-7">10.7 三个标准算例：sinc 的能量、热半群衰减、频率投影</h2>
+
+<p>现在把 Plancherel 当工具真正用几次。第一件事我们其实已经算过：rect 的频谱是 sinc，因此</p>
+
+\[
+\int_{\mathbb R}\operatorname{sinc}(\xi)^2\,d\xi=1.
+\]
+
+<p>这是 Parseval 的最典型一击：困难振荡积分，转成简单几何长度。</p>
+
+<p>第二件事是热半群的 \(L^2\) 耗散。设 \(G_t\) 是标准热核，满足</p>
+
+\[
+\widehat{G_t}(\xi)=e^{-4\pi^2 t|\xi|^2}.
+\]
+
+<p>对初值 \(f\in L^2\)，令</p>
+
+\[
+u(\cdot,t)=f*G_t.
+\]
+
+<p>则在频率空间里</p>
+
+\[
+\widehat u(\xi,t)=e^{-4\pi^2 t|\xi|^2}\widehat f(\xi).
+\]
+
+<p>由 Plancherel，</p>
+
+\[
+\|u(\cdot,t)\|_2^2
+=
+\int_{\mathbb R^n}e^{-8\pi^2 t|\xi|^2}|\widehat f(\xi)|^2\,d\xi
+\le
+\int_{\mathbb R^n}|\widehat f(\xi)|^2\,d\xi
+=
+\|f\|_2^2.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+\|f*G_t\|_2\le \|f\|_2.
+}
+\]
+
+<p>这说明热流在 \(L^2\) 中是收缩的。你在<a href="../偏微分方程/ch5.html">《偏微分方程读本》第 5 章</a>已经从物理角度理解过“扩散就是削峰填谷”，这里它的频率版本则是：高频模态被指数压低，所以总能量不会增加。</p>
+
+<p><strong>例题 3.</strong> 设 \(B_R=\{\xi\in\mathbb R^n: |\xi|\le R\}\)，定义频率截断算子</p>
+
+\[
+\widehat{P_{\le R}f}(\xi)=\mathbf 1_{B_R}(\xi)\widehat f(\xi).
+\]
+
+<p>证明 \(P_{\le R}\) 是 \(L^2\) 上的正交投影，且 \(\|P_{\le R}f\|_2\le \|f\|_2\)。</p>
+
+<p>先看幂等性：</p>
+
+\[
+\widehat{P_{\le R}(P_{\le R}f)}(\xi)
+=
+\mathbf 1_{B_R}(\xi)\mathbf 1_{B_R}(\xi)\widehat f(\xi)
+=
+\mathbf 1_{B_R}(\xi)\widehat f(\xi),
+\]
+
+<p>所以 \(P_{\le R}^2=P_{\le R}\)。</p>
+
+<p>再看正交性。若 \(\widehat g\) 支撑在 \(B_R\) 外，则</p>
+
+\[
+\langle P_{\le R}f,g\rangle
+=
+\int_{\mathbb R^n}\mathbf 1_{B_R}(\xi)\widehat f(\xi)\overline{\widehat g(\xi)}\,d\xi
+=0,
+\]
+
+<p>因为被积函数几乎处处为零。这说明 \(P_{\le R}f\) 落在“频谱支撑于 \(B_R\)”的子空间上，并且与其正交补正交，所以它正是正交投影。</p>
+
+<p>最后由 Plancherel，</p>
+
+\[
+\|P_{\le R}f\|_2^2
+=
+\int_{B_R}|\widehat f(\xi)|^2\,d\xi
+\le
+\int_{\mathbb R^n}|\widehat f(\xi)|^2\,d\xi
+=
+\|f\|_2^2.
+\]
+
+<p>这个例子把 Fourier 变换与 Hilbert 空间几何严丝合缝地扣在一起了：频率截断不是启发式滤波，而是一个真正的正交投影。</p>
+
+<p><strong>例题 4.</strong> 设 \(f,g\in L^2(\mathbb R^n)\)。证明函数</p>
+
+\[
+H(\xi)=\widehat f(\xi)\widehat g(\xi)
+\]
+
+<p>属于 \(L^1(\mathbb R^n)\)，并给出其 \(L^1\) 范数上界。</p>
+
+<p>由 Cauchy-Schwarz，</p>
+
+\[
+\int_{\mathbb R^n}|H(\xi)|\,d\xi
+\le
+\left(\int_{\mathbb R^n}|\widehat f(\xi)|^2\,d\xi\right)^{1/2}
+\left(\int_{\mathbb R^n}|\widehat g(\xi)|^2\,d\xi\right)^{1/2}.
+\]
+
+<p>再用 Plancherel，得到</p>
+
+\[
+\|H\|_1
+\le
+\|f\|_2\|g\|_2.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+\widehat f\,\widehat g\in L^1(\mathbb R^n),
+\qquad
+\|\widehat f\,\widehat g\|_1\le \|f\|_2\|g\|_2.
+}
+\]
+
+<p>这告诉你两个 \(L^2\) 函数虽然不一定都能直接卷出一个 \(L^2\) 函数，但它们的频谱乘积至少可积，因此能安全地做逆变换。很多双线性估计就是从这里起步的。</p>
+
+<h2 id="sec10-8">10.8 收束成一句话：Plancherel 把 Fourier 变换从公式提升成 \(L^2\) 几何</h2>
+
+<p>第 10 章真正完成的升级，是把 Fourier 变换从第 9 章的“结构词典”提升成一个 Hilbert 空间几何对象。Plancherel 定理告诉你：Fourier 变换不会扭曲 \(L^2\) 长度；Parseval 恒等式进一步告诉你：它连角度和正交也一并保住了。于是频率空间不再只是一个方便计算的辅助舞台，而是和原空间完全等价的另一套能量坐标。</p>
+
+<p>通过第 8 章的稠密性，这套等距结构被无缝延拓到整个 \(L^2(\mathbb R^n)\)。这一步极其关键，因为真正重要的对象往往并不都在 \(\mathcal S\) 里，但只要它们属于 \(L^2\)，Fourier 变换依然有稳固的意义。你不一定还能逐点写下变换积分，可你仍然能谈能量、正交、投影、频率截断、卷积乘子以及热半群的收缩性。这就是“函数空间视角”比单纯“积分公式视角”更现代的地方。</p>
+
+<p>本章还有一个逻辑上的伏笔：\(L^2\) 反演其实已经呼之欲出，只差把 Schwartz 上的显式反演公式钉牢。那正是下一章的任务。第 11 章会先在 \(\mathcal S\) 上完整证明</p>
+
+\[
+f(x)=\int_{\mathbb R^n}\widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi,
+\]
+
+<p>再把它推广到 \(L^1\) 的适当情形，并解释它与 Gaussian 近似恒等式之间的内在联系。到那时你会看见，Plancherel 与反演其实是同一枚硬币的两面：一个说能量不丢，一个说信息不丢。</p>
+
+<p>所以如果你想给第 10 章下一个最简洁的判断，那就是：从这一章开始，Fourier 变换不再只是会算，而是会“保几何”。而一旦一个算子开始保几何，它就会在分析里拥有远比几条显式公式更深的组织能力。</p>
+
+<hr class="section-end">
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 \( \mathbb R^n \) 上的 Fourier 变换：基础性质</a><a href="ch11.html">下一章 · 第 11 章 反演公式与 Fourier 反演定理 →</a></nav>
+
+</main>
+</body>
+</html>

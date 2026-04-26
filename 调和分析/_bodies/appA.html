@@ -1,0 +1,222 @@
+<h1 id="appA">附录 A　经典不等式速查：Hardy、Hilbert、Hausdorff-Young 与插值</h1>
+
+<p>正文到了 <a href="ch15.html">第 15 章</a> 以后，证明风格会突然变得很像在搭脚手架：先拿到一个端点估计，再把它插值到中间指数；先知道某个平均算子不会把 \(L^1\) 质量炸得太离谱，再顺着这个控制把极大函数、奇异积分和 Sobolev 正则性一层层推上去。你如果只记最后结论，会觉得这些章节像在背黑箱；可一旦把常用不等式的角色分清，它们其实非常像一个有组织的工具箱。</p>
+
+<p>这份附录就做两件事。第一，把几条在调和分析里反复出现的不等式和插值定理压成查表可用的版本；第二，把它们各自最常出现的触发场景说清楚。你应该带着一个问题来翻它：我眼前这个算子，是在做平均、做卷积、做频域乘法，还是在两个端点之间找中间指数？一旦问题归类正确，工具往往就自己浮出来了。</p>
+
+<h2 id="secA-1">A.1 先把地图装进脑子：平均、双线性核、端点插值</h2>
+
+<p>这几条不等式大致分成三类。</p>
+
+<ul>
+  <li><strong>Hardy 型</strong>：处理“累计平均会不会比原对象更坏”。它是从局部到整体的平均控制，所以和极大函数、部分和、单调重排、Sobolev 型估计都有亲缘。</li>
+  <li><strong>Hilbert / Hausdorff-Young 型</strong>：处理“卷积核或 Fourier 变换把质量挪到另一个空间时，范数怎样变化”。它们一边连着正交与 \(L^2\)，一边连着 \(L^1\to L^\infty\) 这样的粗端点。</li>
+  <li><strong>Riesz-Thorin / Marcinkiewicz</strong>：它们不是单条估计，而是把两个端点估计焊成整个指数区间的机器。前者要求两个端点都是真正的强型有界；后者允许你一侧只有弱型控制，因此在极大函数和 Calderón-Zygmund 理论里特别值钱。</li>
+</ul>
+
+<p>真正做题时，最有效的习惯不是“把所有定理都背一遍”，而是先问：我现在有没有两个端点？端点是强型还是弱型？算子是线性的还是至少次线性的？核是可积的、奇异的，还是只在主值意义下成立？这四个问题会决定你是该去翻本附录的前半段还是后半段。</p>
+
+<h2 id="secA-2">A.2 Hardy 不等式：平均不会比原函数坏太多</h2>
+
+<p>Hardy 不等式的主角是 Hardy 平均算子</p>
+
+\[
+Hf(x)=\frac1x\int_0^x f(t)\,dt,\qquad x&gt;0.
+\]
+
+<p>如果 \(1&lt;p&lt;\infty\)，那么它满足</p>
+
+\[
+\boxed{\|Hf\|_{L^p(0,\infty)}\le \frac{p}{p-1}\|f\|_{L^p(0,\infty)}.}
+\]
+
+<p>更常被写成积分版就是</p>
+
+\[
+\boxed{\int_0^\infty\left(\frac1x\int_0^x |f(t)|\,dt\right)^p dx
+\le \left(\frac{p}{p-1}\right)^p\int_0^\infty |f(x)|^p\,dx.}
+\]
+
+<p>这条式子在精神上非常重要：它说“先做累计平均”不会把 \(L^p\) 尺度放大到失控。常数 \(p'=\frac{p}{p-1}\) 还是 sharp 的，所以它不是随手糊出来的粗估计，而是平均算子真实的 \(L^p\) 大小。</p>
+
+<p>你可以把它和 <a href="ch15.html">第 15 章</a> 的极大函数放在一起看。极大函数 \(Mf\) 是对很多区间平均取上确界，Hardy 算子则是对一串嵌套区间只取其中一条最简单的平均路径。所以 Hardy 不等式像是“极大函数之前的单轨版训练”。很多时候你先在 Hardy 型情形里看明白平均如何缩放，再去接受极大函数的覆盖引理证明，阻力会小得多。</p>
+
+<p>离散版同样常用。对非负数列 \(a_n\) 与 \(1&lt;p&lt;\infty\)，令</p>
+
+\[
+A_n=\frac{a_1+\cdots+a_n}{n},
+\]
+
+<p>则有</p>
+
+\[
+\boxed{\sum_{n=1}^\infty A_n^p\le \left(\frac{p}{p-1}\right)^p\sum_{n=1}^\infty a_n^p.}
+\]
+
+<p>这就是级数版 Hardy 不等式。它常在两类地方冒出来。第一类是你把连续估计离散化以后，部分和或 dyadic block 的平均值需要重新装回 \(\ell^p\)；第二类是你在 <a href="ch19.html">第 19 章</a> 处理 Littlewood-Paley 分块时，需要从一串“累计到某尺度”的量回到原始块列本身。</p>
+
+<p>为什么它和调和分析这么近？因为调和分析本质上经常在问：局部震荡、局部平均、频带累计，到底会不会把范数放大太多。Hardy 不等式给出的答案是：对 \(1&lt;p&lt;\infty\)，累计平均依旧在同一个 \(L^p\) 尺度里。它失败的地方也同样值得记：在 \(p=1\) 端点没有强型有界，只能期待更弱的控制。这和极大函数在 \(L^1\) 端点的处境是同一张脸。</p>
+
+<h2 id="secA-3">A.3 Hilbert 不等式与 Hilbert 矩阵：Cauchy 型核的 \(\ell^2\) 控制</h2>
+
+<p>Hilbert 不等式最经典的离散版本是：若 \(a=(a_m)\)、\(b=(b_n)\) 都在 \(\ell^2\)，那么</p>
+
+\[
+\boxed{\left|\sum_{m=1}^\infty\sum_{n=1}^\infty \frac{a_m b_n}{m+n-1}\right|
+\le \pi \,\|a\|_{\ell^2}\|b\|_{\ell^2}.}
+\]
+
+<p>这里的核 \(\frac1{m+n-1}\) 看起来不像卷积核，因为它依赖的是 \(m+n\) 而不是 \(m-n\)。这正是它值得单独成名的地方：它是 Hankel / Hilbert 型核，而不是平移不变核。对应的无限矩阵</p>
+
+\[
+H=(h_{mn})_{m,n\ge 1},\qquad h_{mn}=\frac1{m+n-1},
+\]
+
+<p>就叫 <strong>Hilbert 矩阵</strong>。这条不等式等价于说 \(H\) 作为 \(\ell^2\to\ell^2\) 算子是有界的，而且</p>
+
+\[
+\boxed{\|H\|_{\ell^2\to\ell^2}=\pi.}
+\]
+
+<p>这件事第一次看常让人惊讶：矩阵条目衰减得不算特别快，为什么整体作用还这么整齐？一个常见解释是把核写成积分：</p>
+
+\[
+\frac1{m+n-1}=\int_0^1 x^{m+n-2}\,dx.
+\]
+
+<p>这样双重和就能被改写成一个单积分，里面站着两个幂级数；再用 Cauchy-Schwarz，就会看出 \(\ell^2\) 控制。这个思路很像调和分析里常见的“把奇怪核拆成更熟悉的平均或频率叠加”。</p>
+
+<p>连续版也值得记：</p>
+
+\[
+\boxed{\int_0^\infty\int_0^\infty \frac{f(x)g(y)}{x+y}\,dx\,dy
+\le \pi \|f\|_{L^2(0,\infty)}\|g\|_{L^2(0,\infty)}.}
+\]
+
+<p>它告诉你核 \((x+y)^{-1}\) 虽然在对角线附近带着奇性，但仍然能在 \(L^2\) 上稳定工作。你以后在 <a href="ch17.html">第 17 章</a> 研究 Hilbert 变换时，会碰到另一个长得很像却是 \((x-y)^{-1}\) 的核。一个依赖和，一个依赖差；一个更像 Hankel 算子，一个更像奇异积分。它们不是同一个对象，但共享同一种气味：都在考验你能否把“看上去要炸”的核放回 \(L^2\) 框架。</p>
+
+<p>如果你只想记一句触发条件，那就是：当双重和或双重积分里出现 \(\frac1{m+n}\)、\(\frac1{x+y}\) 这类“和型奇核”，并且两边自然地长出 \(\ell^2\) 或 \(L^2\) 范数时，先想 Hilbert 不等式；它经常是最快的路。</p>
+
+<h2 id="secA-4">A.4 Hausdorff-Young：Fourier 变换把 \(L^p\) 送到对偶指数</h2>
+
+<p>在本书采用的 Fourier 变换约定</p>
+
+\[
+\hat f(\xi)=\int_{\mathbb R^n} f(x)e^{-2\pi i x\cdot \xi}\,dx
+\]
+
+<p>下，Hausdorff-Young 不等式的标准形式是：若 \(1\le p\le 2\)，并令 \(q\) 满足</p>
+
+\[
+\frac1p+\frac1q=1,
+\]
+
+<p>那么对 \(f\in L^p(\mathbb R^n)\) 有</p>
+
+\[
+\boxed{\|\hat f\|_{L^q(\mathbb R^n)}\le \|f\|_{L^p(\mathbb R^n)}.}
+\]
+
+<p>在圆周群 \(\mathbb T\) 上，对 Fourier 系数同样有</p>
+
+\[
+\boxed{\|\hat f(n)\|_{\ell^q(\mathbb Z)}\le \|f\|_{L^p(\mathbb T)}.}
+\]
+
+<p>这条不等式把两个端点焊在了一起。\(p=1\) 时，\(|\hat f(\xi)|\le \|f\|_1\) 只是最基本的积分估计；\(p=2\) 时，\(\|\hat f\|_2=\|f\|_2\) 是 <a href="ch10.html">第 10 章</a> 的 Plancherel 等距。中间所有 \(1&lt;p&lt;2\) 的指数，就是通过插值得到的。于是它不只是一个独立定理，更像是“Fourier 变换在粗糙端点和正交端点之间如何过渡”的总说明。</p>
+
+<p>你最该记的不是式子，而是方向。Fourier 变换把 \(L^1\) 送进 \(L^\infty\)，把 \(L^2\) 留在 \(L^2\)，再把中间 \(L^p\) 送到对偶指数 \(L^q\)。这意味着：当 \(p\) 越靠近 1，频域控制越偏向“有界但可能不平方可积”；当 \(p\) 越靠近 2，频域控制越偏向能量意义。你在 <a href="ch18.html">第 18 章</a> 看 Sobolev 空间时，就会不断用到这种“实空间可积性和频域衰减强度之间的讨价还价”。</p>
+
+<p>反过来千万别误记成 \(p&gt;2\) 也成立。那通常是假的。也就是说，Hausdorff-Young 不是“Fourier 变换对所有 \(L^p\) 都有界”的许可证；它只覆盖从 \(L^1\) 到 \(L^2\) 这一半。再往右走，就得换别的结构，比如乘子定理、Sobolev 权、Littlewood-Paley 分解或奇异积分有界性。</p>
+
+<h2 id="secA-5">A.5 Riesz-Thorin：两个强型端点之间的复插值</h2>
+
+<p>Riesz-Thorin 定理是调和分析里最标准的“端点推出中间”机器。它的核心版本是：</p>
+
+\[
+\boxed{\begin{aligned}
+&\text{若线性算子 }T\text{ 满足 } \|Tf\|_{L^{q_0}}\le M_0\|f\|_{L^{p_0}},
+\quad \|Tf\|_{L^{q_1}}\le M_1\|f\|_{L^{p_1}},\\
+&\text{并令 } \frac1{p_\theta}=\frac{1-\theta}{p_0}+\frac{\theta}{p_1},\qquad
+\frac1{q_\theta}=\frac{1-\theta}{q_0}+\frac{\theta}{q_1},
+\qquad 0\le \theta\le 1,\\
+&\text{则 } \|Tf\|_{L^{q_\theta}}\le M_0^{1-\theta}M_1^\theta \|f\|_{L^{p_\theta}}.
+\end{aligned}}
+\]
+
+<p>最值得养成的直觉是：它插值的是<strong>对数尺度上的范数增长</strong>。端点估计给你两块木板，Riesz-Thorin 告诉你在指数平面里连成的整条线段上，算子范数不会突然冒出一个怪峰。所以它非常适合处理“两个端点都是真正强型有界”的线性算子。</p>
+
+<p>本书里最直接的应用就是 Hausdorff-Young。取 \(T=\mathcal F\)，我们知道</p>
+
+\[
+T:L^1\to L^\infty,\qquad T:L^2\to L^2,
+\]
+
+<p>于是插值立刻得到</p>
+
+\[
+T:L^p\to L^q,\qquad 1\le p\le 2,\ \frac1p+\frac1q=1.
+\]
+
+<p>同样地，若某个卷积算子既在 \(L^1\) 上有界又在 \(L^\infty\) 上有界，那么它在所有中间 \(L^p\) 上也有界；若它在 \(L^2\) 和 \(L^\infty\) 上有界，就能推出 \(2\le p\le\infty\) 的一整段。你会在 <a href="ch9.html">第 9 章</a> 到 <a href="ch11.html">第 11 章</a> 的 Fourier 变换基础、以及 <a href="ch20.html">第 20 章</a> 的 PDE 估计里不断看见这种套路。</p>
+
+<p>但要注意两点。第一，它要求 \(T\) 是线性的，至少在证明里强烈依赖复分析结构；第二，它要求端点本身已经是强型控制。如果你只有弱型端点，比如极大函数的弱 \((1,1)\)，那就该换下一节的 Marcinkiewicz。</p>
+
+<h2 id="secA-6">A.6 Marcinkiewicz：弱型端点也能推出中间强型</h2>
+
+<p>先把弱型语言写清楚。我们说次线性算子 \(T\) 具有弱型 \((p,q)\) 估计，是指存在常数 \(C\)，使得对任意 \(\lambda&gt;0\)，</p>
+
+\[
+\boxed{|\{x:|Tf(x)|&gt;\lambda\}|
+\le
+\left(\frac{C\|f\|_{L^p}}{\lambda}\right)^q.}
+\]
+
+<p>这比强型 \(L^p\to L^q\) 弱，因为它只控制超水平集测度，不直接控制 \(\|Tf\|_{L^q}\)。可它在端点往往更容易得到。典型例子就是 <a href="ch15.html">第 15 章</a> 的 Hardy-Littlewood 极大函数：\(M\) 在 \(L^\infty\) 上显然有界，在 \(L^1\) 上却不强有界，只能先证明弱 \((1,1)\)。</p>
+
+<p>Marcinkiewicz 插值定理的最常用版说：若 \(T\) 是次线性的，并且同时具有弱型 \((p_0,p_0)\) 与弱型 \((p_1,p_1)\) 估计，其中 \(p_0&lt;p_1\)，那么对任意中间指数 \(p_0&lt;p&lt;p_1\)，\(T\) 都具有强型 \((p,p)\) 估计。</p>
+
+\[
+\boxed{T:\text{weak }(p_0,p_0)\ \&\ \text{weak }(p_1,p_1)
+\Longrightarrow
+T:\text{strong }(p,p),\quad p_0&lt;p&lt;p_1.}
+\]
+
+<p>实际使用时，经常把其中一个端点写得更强一些。比如</p>
+
+\[
+\boxed{M:\text{weak }(1,1)\ \&\ \text{strong }(\infty,\infty)
+\Longrightarrow
+M:\text{strong }(p,p),\quad 1&lt;p\le\infty.}
+\]
+
+<p>这正是极大函数 \(L^p\) 有界性的标准路线。对 Hilbert 变换和更一般的 Calderón-Zygmund 算子，也常先拿到弱 \((1,1)\) 与 \(L^2\) 有界，再经 Marcinkiewicz 得到 \(1&lt;p\le 2\) 的强型估计；最后再用对偶性把 \(2\le p&lt;\infty\) 补齐。这就是 <a href="ch17.html">第 17 章</a> 那条最常见的逻辑链。</p>
+
+<p>如果你想把 Riesz-Thorin 和 Marcinkiewicz 的分工记成一句口令，可以记：</p>
+
+\[
+\boxed{\text{强型 + 强型，先想 Riesz-Thorin；弱型端点出现了，先想 Marcinkiewicz。}}
+\]
+
+<p>这句口令并不覆盖一切，但覆盖了本书后半段大多数第一反应。</p>
+
+<h2 id="secA-7">A.7 有界性插值速查表</h2>
+
+<p>下面这张表不是定理目录，而是“看到这种端点时先按哪条路走”的速查图。</p>
+
+<table>
+<thead>
+<tr><th>对象 / 端点信息</th><th>先用什么</th><th>得到什么</th><th>本书位置</th></tr>
+</thead>
+<tbody>
+<tr><td>Fourier 变换：\(L^1\to L^\infty\)，\(L^2\to L^2\)</td><td>Riesz-Thorin</td><td>Hausdorff-Young：\(L^p\to L^q\)，\(1\le p\le 2\)</td><td>10，appA.4-5</td></tr>
+<tr><td>卷积算子 \(f\mapsto K*f\)，且 \(K\in L^1\)</td><td>Young + Riesz-Thorin</td><td>\(L^p\to L^p\) 全段有界</td><td>6，9，20</td></tr>
+<tr><td>极大函数 \(M\)：weak \((1,1)\)，strong \((\infty,\infty)\)</td><td>Marcinkiewicz</td><td>\(M:L^p\to L^p\)，\(1&lt;p\le\infty\)</td><td>15，16，appA.6</td></tr>
+<tr><td>Hilbert 变换：weak \((1,1)\)，strong \((2,2)\)</td><td>Marcinkiewicz + 对偶</td><td>\(H:L^p\to L^p\)，\(1&lt;p&lt;\infty\)</td><td>17，appA.6</td></tr>
+<tr><td>平方函数或 dyadic 分块：先有 \(L^2\) 等距 / 等价</td><td>插值 + good-\(\lambda\)</td><td>\(L^p\) 范数等价</td><td>19</td></tr>
+<tr><td>累计平均、部分和平均、尺度累计量</td><td>Hardy 不等式</td><td>把累计控制拉回原 \(L^p\) 或 \(\ell^p\)</td><td>15，18，19，appA.2</td></tr>
+<tr><td>双重和里冒出 \((m+n)^{-1}\)、\((x+y)^{-1}\)</td><td>Hilbert 不等式</td><td>\(\ell^2\) / \(L^2\) 双线性控制</td><td>17，appA.3</td></tr>
+</tbody>
+</table>
+
+<p>把这张表和正文一起用，效果通常比把定理孤立背诵好得多。因为调和分析真正难的地方，往往不是某条不等式本身，而是你是否能在一堆看似杂乱的公式里认出：这其实只是“平均型”“核型”或“端点插值型”问题。认出来以后，路通常就不再那么黑了。</p>

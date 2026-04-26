@@ -1,0 +1,272 @@
+<h1 id='subject-index'>索引</h1>
+
+<p>这份索引按拼音字母分组，但条目尽量不只是堆术语，而是按“你现在卡在什么动作上”来写。遇到一个词却找不到时，别只在名词本身下面找；调和分析里很多概念其实更像动作。比如你想找 Fourier 反演，也可能要从“怎样把频域乘子重新翻回真实空间”去找；想找 Sobolev 嵌入，也常要从“频域权重怎样换成正则性”去找。</p>
+
+<h2 id="index-A">A</h2>
+
+<ul>
+<li><strong>Abel 求和</strong>
+<ul>
+<li>Fourier 级数本身不老实时，想先加一个 \(r^{|n|}\) 让它听话（6，appB.5）</li>
+<li>想把边界函数先送进圆盘做调和延拓，再从里面逼近边界（6，17）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-B">B</h2>
+
+<ul>
+<li><strong>Bessel 不等式</strong>
+<ul>
+<li>只知道正交，还没拿到完备，先想它控制 Fourier 系数平方和（2）</li>
+</ul></li>
+<li><strong>边界值先延拓再回来</strong>
+<ul>
+<li>圆盘上的调和函数、Poisson 核和 Abel 求和本来就是一回事（6，20，appB.5）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-C">C</h2>
+
+<ul>
+<li><strong>Cesàro 求和</strong>
+<ul>
+<li>部分和 \(S_N f\) 抖得厉害，想先看平均 \(\sigma_N f\) 会不会稳定（5）</li>
+<li>想知道为什么 Fejér 核比 Dirichlet 核更像真正的逼近恒等式（4-5，appB.5）</li>
+</ul></li>
+<li><strong>Calderón-Zygmund 分解</strong>
+<ul>
+<li>想把 \(L^1\) 函数拆成“好部分 + 坏部分”去打弱型估计（16）</li>
+<li>极大函数和奇异积分的弱 \((1,1)\) 证明总在这里汇合（15-17）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-D">D</h2>
+
+<ul>
+<li><strong>Dirichlet 核</strong>
+<ul>
+<li>想把 Fourier 部分和写成卷积，再问它到底为什么容易出事（4，appB.5）</li>
+<li>想知道 \(\|D_N\|_1\sim \log N\) 为什么预告了逐点收敛并不自动好看（4）</li>
+</ul></li>
+<li><strong>\(\delta\) 与分布</strong>
+<ul>
+<li>常数、点质量、主值核这些对象不再是普通函数时，从这里进（12-13，appB.2）</li>
+<li>想把 PDE 基本解写成“某个算子作用到 \(\delta\)”（14）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-F">F</h2>
+
+<ul>
+<li><strong>Fejér 核</strong>
+<ul>
+<li>想要一个正的、归一的、真正会平滑的周期良核（5，appB.5）</li>
+</ul></li>
+<li><strong>Fourier 变换</strong>
+<ul>
+<li>想把微分方程变成频域里的乘法或代数方程（9-14，20）</li>
+<li>想查高斯、rect、sinc、阶跃、\(\delta\)、\(\operatorname{PV}(1/x)\) 的变换表（9，13，appB.2）</li>
+</ul></li>
+<li><strong>Fourier 反演</strong>
+<ul>
+<li>想知道为什么频域信息真的能把函数找回来（11，13，appB.6）</li>
+<li>想用反演公式直接算某些经典积分（11）</li>
+</ul></li>
+<li><strong>Fourier 级数</strong>
+<ul>
+<li>想知道周期函数展开到底按什么意义收敛（2-7）</li>
+<li>想分清部分和、Cesàro 平均、Abel 平均三种恢复机制（4-6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-G">G</h2>
+
+<ul>
+<li><strong>Gibbs 现象</strong>
+<ul>
+<li>想知道跳跃附近那一圈永远不肯完全消失的振铃从哪来（7）</li>
+<li>信号处理里看到 ringing，想回到 Fourier 级数版本看原型（7）</li>
+</ul></li>
+<li><strong>高斯核</strong>
+<ul>
+<li>想看热方程基本解为什么是高斯，以及它为何在 Fourier 变换下最听话（9，14，20，appB.2）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-H">H</h2>
+
+<ul>
+<li><strong>Hardy 不等式</strong>
+<ul>
+<li>出现累计平均、部分和平均或尺度累计量，想把它们重新拉回 \(L^p\)（appA.2）</li>
+</ul></li>
+<li><strong>Hausdorff-Young</strong>
+<ul>
+<li>只知道 \(L^1\to L^\infty\) 和 \(L^2\to L^2\)，想插到中间指数（10，appA.4-5）</li>
+</ul></li>
+<li><strong>Hilbert 不等式 / Hilbert 矩阵</strong>
+<ul>
+<li>双重和里出现 \((m+n)^{-1}\) 这类核，想直接看 \(\ell^2\) 控制（appA.3）</li>
+</ul></li>
+<li><strong>Hilbert 变换</strong>
+<ul>
+<li>想把主值卷积核改写成频域乘子 \(-i\,\operatorname{sgn}\)（17，appB.2）</li>
+<li>想知道为什么它在 \(L^2\) 上最自然，却不在 \(L^1\) 上强有界（17，appA.6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-J">J</h2>
+
+<ul>
+<li><strong>极大函数</strong>
+<ul>
+<li>想把“局部平均的上确界”控制住，并从中推出几乎处处微分性质（15）</li>
+<li>只拿到弱 \((1,1)\) 时，不知道怎么推到所有 \(L^p\)（15，appA.6-7）</li>
+</ul></li>
+<li><strong>卷积</strong>
+<ul>
+<li>想分清 Dirichlet、Fejér、Poisson、热核、主值核各自到底在做什么（4-6，14，17，appB.5）</li>
+<li>想把真实空间的平滑翻成频域里的乘法（9，appB.5-6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-L">L</h2>
+
+<ul>
+<li><strong>Laplace 变换</strong>
+<ul>
+<li>已经会用它解因果 ODE / PDE，现在想看它和 Fourier 变换到底差在哪（appB.3）</li>
+</ul></li>
+<li><strong>Littlewood-Paley</strong>
+<ul>
+<li>想把函数按 dyadic 频带拆开，再用平方函数重建 \(L^p\) 大小（19）</li>
+<li>只会看整体 Fourier 变换，不会看“各个尺度分别有多重”时，从这里进（19）</li>
+</ul></li>
+<li><strong>Lebesgue 微分定理</strong>
+<ul>
+<li>想知道为什么局部平均最终会回到函数本身，现代证明通常要经过极大函数（15）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-M">M</h2>
+
+<ul>
+<li><strong>Marcinkiewicz 插值</strong>
+<ul>
+<li>端点只有弱型估计，却想推出中间 \(L^p\) 强有界时先看它（15，17，appA.6-7）</li>
+</ul></li>
+<li><strong>Mellin 变换</strong>
+<ul>
+<li>问题更像“放大缩小会怎样”，而不是“平移会怎样”时，从这里换语法（appB.4）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-P">P</h2>
+
+<ul>
+<li><strong>Plancherel</strong>
+<ul>
+<li>想把 Fourier 变换放进 \(L^2\) 等距框架里（10，appA.4，appB.6）</li>
+</ul></li>
+<li><strong>Poisson 核</strong>
+<ul>
+<li>想从边界函数造圆盘内调和函数，或把 Abel 求和看成调和延拓（6，20，appB.5）</li>
+</ul></li>
+<li><strong>PDE 先做 Fourier 再回来</strong>
+<ul>
+<li>热方程、Schrödinger、椭圆方程的基本解和正则性估计通常都从这里起步（14，18，20）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-Q">Q</h2>
+
+<ul>
+<li><strong>奇异积分</strong>
+<ul>
+<li>核不在 \(L^1\) 里，却还想让卷积在 \(L^p\) 上有界（17）</li>
+<li>主值、抵消、弱型端点和 \(L^2\) 乘子理论会在这里同时出现（13，17，appA.6，appB.2）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-R">R</h2>
+
+<ul>
+<li><strong>Riemann-Lebesgue 引理</strong>
+<ul>
+<li>想知道为什么 \(L^1\) 函数的 Fourier 系数或 Fourier 变换会在无穷远衰减（3，9）</li>
+</ul></li>
+<li><strong>Riesz-Thorin 插值</strong>
+<ul>
+<li>手里已经有两个强型端点，想把整段中间指数一次性拿下（10，appA.5-7）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-S">S</h2>
+
+<ul>
+<li><strong>Schwartz 空间</strong>
+<ul>
+<li>想在一个“怎么微分、怎么 Fourier 都不会出事”的试验场里先做计算（8-13）</li>
+</ul></li>
+<li><strong>Sobolev 空间</strong>
+<ul>
+<li>想把“导数在 \(L^p\) 里”或“频域带权可积”翻成正则性（18）</li>
+<li>想知道嵌入定理为什么能把频域衰减换成连续性或可微性（18）</li>
+</ul></li>
+<li><strong>收敛方式</strong>
+<ul>
+<li>逐点、Cesàro、Abel、\(L^2\)、分布意义到底差在哪（4-6，10，13）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-T">T</h2>
+
+<ul>
+<li><strong>调和延拓</strong>
+<ul>
+<li>想从边界数据进圆盘或半平面内部，Poisson 核就是最标准入口（6，20）</li>
+</ul></li>
+<li><strong>调制 / 平移 / 伸缩</strong>
+<ul>
+<li>想把频带搬到原点附近、换尺度比较、或读懂 Fourier 公式里的相位因子（9，19，appB.6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-X">X</h2>
+
+<ul>
+<li><strong>信号边缘振铃</strong>
+<ul>
+<li>图像或信号一有硬跳跃就出现波纹，想看它在数学上的原型（7，appB.2）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-Y">Y</h2>
+
+<ul>
+<li><strong>有界性到底怎么证明</strong>
+<ul>
+<li>不知道该用 Young、Plancherel、Riesz-Thorin 还是 Marcinkiewicz 时，先翻附录 A 的速查表（appA.7）</li>
+</ul></li>
+<li><strong>应用：概率与 PDE</strong>
+<ul>
+<li>想看热核、Brownian motion、特征函数法和色散估计怎样在 Fourier 语言里接上（14，20）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-Z">Z</h2>
+
+<ul>
+<li><strong>正交基</strong>
+<ul>
+<li>想把三角函数族真的看成 Hilbert 空间里的正交展开，而不只是算系数配方（2，10）</li>
+</ul></li>
+<li><strong>主值</strong>
+<ul>
+<li>\(\operatorname{PV}(1/x)\) 这种对象明明不绝对可积，却又必须保留时，从这里进（12-13，17，appB.2）</li>
+</ul></li>
+<li><strong>周期延拓</strong>
+<ul>
+<li>想把 Fourier 级数和 Fourier 变换真正接起来，记住 Dirac comb 与 Poisson 求和（2，9，appB.2，appB.6）</li>
+</ul></li>
+</ul>
