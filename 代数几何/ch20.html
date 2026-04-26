@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 应用：数论几何与 BSD 简介 — 普林斯顿代数几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 模空间初探</a><a href="appA.html">下一章 · 附录 A 交换代数速查 →</a></nav>
+<h1 id="ch20">第 20 章 应用：数论几何与 BSD 简介</h1>
+
+<p>到这里，这本书已经把代数几何最核心的语言铺得差不多了：你有簇与概形，有层与上同调，有除子、线丛、椭圆曲线、微分与对偶。现在该看一个最能说明“这些抽象语言究竟为什么值得”的方向了：<strong>数论几何</strong>。在这里，方程不只是定义一个复数域上的几何对象；你真正想问的是，它在 \(\mathbb Q\) 上有多少有理点、这些点是否能组织成群、局部模 \(p\) 的信息怎样拼成全局结论、以及为什么一个解析函数在 \(s=1\) 的零阶居然能预测有理点群的秩。</p>
+
+<p>如果你第一次听到 Birch–Swinnerton-Dyer 猜想，往往会觉得这件事像魔法：左边是一个代数对象 \(E(\mathbb Q)\)，右边是一个解析对象 \(L(E,s)\)，两者看上去来自完全不同的世界，却被一句</p>
+
+\[
+\operatorname{rank}E(\mathbb Q)=\operatorname{ord}_{s=1}L(E,s)
+\]
+
+<p>硬生生连在一起。可你若回头看本书的路线，会发现这并不突然。<a href="ch15.html">第 15 章</a>已经把椭圆曲线做成了群；<a href="ch16.html">第 16 章</a>与<a href="ch17.html">第 17 章</a>告诉你几何对象的全局结构往往要靠上同调与对偶来读；<a href="ch18.html">第 18 章</a>则把一阶信息压成微分。数论几何做的，是把这些几何结构搬到 \(\mathbb Q\) 上，并加入局部-整体、模 \(p\) 计数和 \(L\)-函数这几台新机器。</p>
+
+<p>这一章仍然是导论，不会去证明 Mordell-Weil、模性定理或 BSD。本章真正要做的是搭地图：先把“椭圆曲线 over \(\mathbb Q\)”这句话讲准；接着解释有理点群为什么自然形成阿贝尔群，以及有限生成到底意味着什么；再把 \(L(E,s)\) 从模 \(p\) 点数一路引到 Euler 乘积；然后陈述 BSD 猜想的最核心形式，并解释它为什么如此惊人；最后说清楚 Wiles 与 Taniyama-Shimura 在这张图上的位置，以及为什么 Langlands 纲领会被看作这条桥的更大版本。</p>
+
+<h2 id="sec20-1">20.1 从复几何到有理点：椭圆曲线 over \(\mathbb Q\)</h2>
+
+<p>在复数域上，一条椭圆曲线首先是一条亏格 \(1\) 的光滑射影曲线，带一个基点；在<a href="ch15.html">第 15 章</a>里你已经看到它可以写成 Weierstrass 形式并带有群结构。到了数论几何里，几何对象本身并没有变，变的是我们允许取值的域。与其问 \(E(\mathbb C)\) 长什么样，不如问 \(E(\mathbb Q)\) 里有多少点，也就是坐标全为有理数的点有多少。</p>
+
+<p>我们说一条椭圆曲线 over \(\mathbb Q\) 是一条满足</p>
+
+\[
+E\colon y^2=x^3+Ax+B,
+\qquad A,B\in \mathbb Q,
+\]
+
+<p>且判别式</p>
+
+\[
+\Delta=-16(4A^3+27B^2)
+\]
+
+<p>非零的光滑射影曲线，并把无穷远点 \(O\) 作为单位元。条件 \(\Delta\neq 0\) 的意义你在<a href="ch9.html">第 9 章</a>已经很熟悉：它正是在排除奇点。</p>
+
+<p>如果只在实数里看，很多方程也许只有有限个点，或者画成几段弧线就结束了；可一旦把目光改成 \(\mathbb Q\)，问题立刻完全不同。比如单位圆</p>
+
+\[
+x^2+y^2=1
+\]
+
+<p>有无穷多个有理点，因为通过点 \((-1,0)\) 的斜率参数化给出</p>
+
+\[
+x=\frac{1-t^2}{1+t^2},\qquad y=\frac{2t}{1+t^2},
+\qquad t\in\mathbb Q.
+\]
+
+<p>这是一条亏格 \(0\) 曲线的典型行为：一旦有一个有理点，往往整个曲线就能被参数化。椭圆曲线则是下一层复杂度。它们通常不再有这种单参数有理参数化，但又远没有“完全不可控”那么糟，因为有理点群会自动长成一个阿贝尔群。</p>
+
+<h2 id="sec20-2">20.2 有理点的群结构：几何图像真的能在 \(\mathbb Q\) 上工作</h2>
+
+<p>你在<a href="ch15.html">第 15 章</a>已经见过 chord-tangent 法则：过两点 \(P,Q\) 作直线，与三次曲线再交于第三点 \(R\)，然后关于 \(x\)-轴反射，得到 \(P+Q\)。只要方程系数在 \(\mathbb Q\) 中，且 \(P,Q\) 都是有理点，那么求交与反射用到的不过是有理四则运算，于是结果仍是有理点。换句话说，</p>
+
+\[
+\boxed{E(\mathbb Q)\ \text{在几何加法下构成阿贝尔群}.}
+\]
+
+<p>这不是“复点上有群结构，然后碰巧有理点凑成子集”；它是定义在 \(\mathbb Q\) 上的代数运算，所以 \(E(\mathbb Q)\) 本身就是一个子群。更具体地，若</p>
+
+\[
+P=(x_1,y_1),\qquad Q=(x_2,y_2),\qquad P\neq \pm Q,
+\]
+
+<p>则斜率为</p>
+
+\[
+\lambda=\frac{y_2-y_1}{x_2-x_1},
+\]
+
+<p>而和点 \(P+Q=(x_3,y_3)\) 满足</p>
+
+\[
+x_3=\lambda^2-x_1-x_2,
+\]
+
+\[
+y_3=\lambda(x_1-x_3)-y_1.
+\]
+
+<p>若 \(P=Q\)，切线斜率则变成</p>
+
+\[
+\lambda=\frac{3x_1^2+A}{2y_1},
+\]
+
+<p>同样代入上式即可。</p>
+
+<h3 id="sec20-2-1">一遍真正的有理运算</h3>
+
+<p>来看曲线</p>
+
+\[
+E\colon y^2=x^3-2.
+\]
+
+<p>点</p>
+
+\[
+P=(3,5)
+\]
+
+<p>显然在 \(E(\mathbb Q)\) 中，因为 \(5^2=25=27-2\)。现在把它加倍。切线斜率是</p>
+
+\[
+\lambda=\frac{3\cdot 3^2}{2\cdot 5}=\frac{27}{10}.
+\]
+
+<p>于是</p>
+
+\[
+x(2P)=\lambda^2-2\cdot 3=\frac{729}{100}-6=\frac{129}{100},
+\]
+
+\[
+y(2P)=\lambda\left(3-\frac{129}{100}\right)-5
+=\frac{27}{10}\cdot\frac{171}{100}-5
+=-\frac{383}{1000}.
+\]
+
+<p>因此</p>
+
+\[
+2P=\left(\frac{129}{100},-\frac{383}{1000}\right)\in E(\mathbb Q).
+\]
+
+<p>你可以把这件事想成：三次曲线不是只在复几何里有群，它会把一个有理点不断喂出更多有理点。这正是数论几何里最迷人的现象之一：几何构造与算术闭合性彼此完全兼容。</p>
+
+<p>当然，并不是每条椭圆曲线都有无穷多个有理点。比如</p>
+
+\[
+E\colon y^2=x^3-x=x(x-1)(x+1)
+\]
+
+<p>上至少有</p>
+
+\[
+O,\ (0,0),\ (1,0),\ (-1,0),
+\]
+
+<p>这些点都满足 \(2P=O\)，所以它们构成一个有限子群。于是我们立刻看见两种截然不同的可能：有的曲线只留下有限个有理点，有的则通过群法则不断产生新点。Mordell-Weil 定理的意义，就是把这两种可能统一装进同一个结构定理里。</p>
+
+<h2 id="sec20-3">20.3 Mordell-Weil：\(E(\mathbb Q)\) 是有限生成阿贝尔群</h2>
+
+<p>最核心的结构定理是：</p>
+
+\[
+\boxed{E(\mathbb Q)\cong E(\mathbb Q)_{\mathrm{tors}}\oplus \mathbb Z^r.}
+\]
+
+<p>这就是 Mordell-Weil 定理。它告诉你，不论有理点群多复杂，最终都只是“一个有限扭子群”加上“\(r\) 个自由生成元”。整数 \(r\) 叫做椭圆曲线的算术秩。若 \(r=0\)，有理点只有有限个；若 \(r\ge 1\)，就有无穷多个，因为你可以不断取某个无限阶点的倍数。</p>
+
+<p>所以椭圆曲线的第一个数论问题，常常就是：这个 \(r\) 到底是多少？这听起来像一个很纯代数的计数问题，但 BSD 猜想会告诉你，它竟由 \(L(E,s)\) 在 \(s=1\) 的零阶控制。</p>
+
+<p>Mordell-Weil 的证明不短，但骨架可以先记住。第一步是弱 Mordell 定理：对某个整数 \(m\ge 2\)，商群</p>
+
+\[
+E(\mathbb Q)/mE(\mathbb Q)
+\]
+
+<p>是有限的。第二步是引入高度函数，控制点“有多大”。对有理点</p>
+
+\[
+P=\left(\frac ab,\frac cd\right)
+\]
+
+<p>（约分后），朴素高度 roughly 反映分子分母的大小；再把它修正，得到 canonical height</p>
+
+\[
+\hat h\colon E(\mathbb Q)\to \mathbb R_{\ge 0}
+\]
+
+<p>满足</p>
+
+\[
+\boxed{\hat h(nP)=n^2\hat h(P).}
+\]
+
+<p>这个二次性极其重要，因为它让“点是否无限阶”与“高度是否严格正”对应起来。再结合“有界高度只有有限多个点”以及弱 Mordell 的有限性，就能做一个有点像无限下降的论证，推出整个群有限生成。</p>
+
+<p>在具体曲线上，扭子部分有时也能完全分类。比如 Barry Mazur 证明了 \(E(\mathbb Q)_{\mathrm{tors}}\) 只能是有限个特定群之一。我们不展开这张列表，只提醒你一点：Mordell-Weil 并不是说“扭子很小”或“自由部分好算”，而只是说整个群有一个非常刚性的代数形状。真正难的是：给定一条具体曲线，怎样算出 \(r\) 与生成元。</p>
+
+<h3 id="sec20-3-1">两条非常不同的曲线</h3>
+
+<p>前面提到的</p>
+
+\[
+E_1\colon y^2=x^3-x
+\]
+
+<p>有 rank \(0\)，而扭子部分包含四个点，实际上</p>
+
+\[
+E_1(\mathbb Q)\cong \mathbb Z/2\mathbb Z\times \mathbb Z/2\mathbb Z.
+\]
+
+<p>另一条著名曲线</p>
+
+\[
+E_2\colon y^2+y=x^3-x
+\]
+
+<p>则有 rank \(1\)；点 \((0,0)\) 是一个无限阶点，因此</p>
+
+\[
+E_2(\mathbb Q)\ \text{是无限群}.
+\]
+
+<p>这两条方程长得都不夸张，算术命运却完全不同。正因如此，任何能在不显式枚举所有点的情况下预测 rank 的理论，都会显得无比珍贵。这正是 \(L\)-函数和 BSD 要解决的事。</p>
+
+<h2 id="sec20-4">20.4 从模 \(p\) 点数到 \(L(E,s)\)</h2>
+
+<p>现在引入局部数据。对一个好素数 \(p\)（也就是 \(p\nmid \Delta\)，模 \(p\) 约化后仍光滑），可以在有限域 \(\mathbb F_p\) 上数点：</p>
+
+\[
+\#E(\mathbb F_p).
+\]
+
+<p>把它写成</p>
+
+\[
+\#E(\mathbb F_p)=p+1-a_p,
+\]
+
+<p>等价地定义</p>
+
+\[
+a_p=p+1-\#E(\mathbb F_p).
+\]
+
+<p>Hasse 定理告诉你</p>
+
+\[
+\boxed{|a_p|\le 2\sqrt p.}
+\]
+
+<p>所以 \(a_p\) 衡量的是模 \(p\) 点数相对“随机基线” \(p+1\) 的偏差。令人惊讶的是，把所有素数上的这些偏差打包起来，就得到椭圆曲线的 \(L\)-函数：</p>
+
+\[
+\boxed{
+L(E,s)=
+\prod_{p\nmid N}\left(1-a_p p^{-s}+p^{1-2s}\right)^{-1}
+\prod_{p\mid N}L_p(E,s)^{-1},
+}
+\]
+
+<p>其中 \(N\) 是导子，坏素数处的局部因子 \(L_p(E,s)\) 要按约化类型稍作修正。若把它展开成 Dirichlet 级数，则写成</p>
+
+\[
+L(E,s)=\sum_{n=1}^{\infty}\frac{a_n}{n^s},
+\]
+
+<p>其中系数 \(a_n\) 由各个 \(a_p\) 的乘法递推决定。</p>
+
+<h3 id="sec20-4-1">数一次 \(\mathbb F_5\) 上的点</h3>
+
+<p>还是看</p>
+
+\[
+E\colon y^2=x^3-x.
+\]
+
+<p>在 \(\mathbb F_5\) 里，逐个代入 \(x=0,1,2,3,4\)：</p>
+
+\[
+x^3-x\equiv 0,0,1,4,0 \pmod 5.
+\]
+
+<p>其中 \(0\) 有 1 个平方根，\(1\) 有 2 个平方根，\(4\) 也有 2 个平方根。所以仿射点数为</p>
+
+\[
+1+1+2+2+1=7.
+\]
+
+<p>再加上无穷远点 \(O\)，得到</p>
+
+\[
+\#E(\mathbb F_5)=8.
+\]
+
+<p>因此</p>
+
+\[
+a_5=5+1-8=-2.
+\]
+
+<p>也就是说，\(p=5\) 这个局部数据在 \(L(E,s)\) 里贡献的 good factor 是</p>
+
+\[
+\left(1+2\cdot 5^{-s}+5^{1-2s}\right)^{-1}.
+\]
+
+<p>这就是“从有限域点数长出解析对象”的第一步。你在<a href="../复分析/ch11.html">《复分析读本》第 11 章</a>学过解析延拓时，函数往往先由某个收敛域里的级数定义，再通过更深结构延拓到整个平面；椭圆曲线 \(L\)-函数也是同样的剧本，只不过它的系数不再来自手工编造，而是来自所有素数上的算术计数。</p>
+
+<h2 id="sec20-5">20.5 BSD 猜想：rank 与零阶为何会相遇</h2>
+
+<p>现在终于可以写出主角了。Birch 与 Swinnerton-Dyer 猜想的第一层形式是：</p>
+
+\[
+\boxed{\operatorname{rank}E(\mathbb Q)=\operatorname{ord}_{s=1}L(E,s).}
+\]
+
+<p>右边 \(\operatorname{ord}_{s=1}\) 表示 \(L(E,s)\) 在 \(s=1\) 的零点阶数，也叫解析秩。也就是说，BSD 说“有理点群里有几个独立的无限方向”，恰好等于“\(L\)-函数在中心点被压扁到几阶”。这是现代数学里最著名、也最反直觉的桥梁之一。</p>
+
+<p>更精细的 BSD 甚至不只给出 rank，还预测首项系数。若 \(r=\operatorname{rank}E(\mathbb Q)\)，则</p>
+
+\[
+\boxed{
+\frac{L^{(r)}(E,1)}{r!}
+=
+\frac{\Omega_E\,R_E\,|\Sha(E)|\,\prod c_p}{|E(\mathbb Q)_{\mathrm{tors}}|^2}.
+}
+\]
+
+<p>这里每个符号都带着几何或算术含义：</p>
+
+\[
+\Omega_E \text{ 是实周期，}\qquad
+R_E \text{ 是 regulator，}
+\]
+
+\[
+\Sha(E) \text{ 是 Tate-Shafarevich 群，}\qquad
+c_p \text{ 是 Tamagawa 数。}
+\]
+
+<p>换句话说，BSD 不是只说“左边等于右边”，而是把 rank、扭子、局部约化缺陷、全局高度配对和神秘的 \(\Sha\) 全部编进一条等式里。这也解释了为什么它会被视作“数论几何的大一统猜想”之一：它把局部数据、全局点、解析函数和同调式障碍一次性捆了起来。</p>
+
+<p>这个猜想目前仍未在一般情形下证明，但 rank \(0\) 与 rank \(1\) 的许多重要情况已经由 Gross-Zagier、Kolyvagin 以及后续工作解决。你现在不必记住这些名字背后的技术细节，只要记住一件事：BSD 不是凭空想象，而是由大量数值实验、模性理论和局部-整体现象共同逼出来的。</p>
+
+<p>从几何角度看，这件事也并不完全不可思议。你在<a href="../代数拓扑/ch15.html">《代数拓扑读本》第 15 章</a>已经见过：一个对象的全局结构常常不会直接写在定义里，而要通过上同调、配对或某种“计数修正项”间接显现。BSD 在数论几何中扮演的，正是一种极端精致的“全局不变量由解析行为读出”的角色。</p>
+
+<h2 id="sec20-6">20.6 Wiles、Taniyama-Shimura 与模性定理</h2>
+
+<p>若没有模性，BSD 甚至很难说得完整，因为 \(L(E,s)\) 是否能解析延拓到 \(s=1\) 附近本身就成问题。突破来自 Taniyama-Shimura-Weil 猜想，也就是今天的模性定理。它断言：每条椭圆曲线 \(E/\mathbb Q\) 都对应某个权 \(2\) 的模形式 \(f\)，并且</p>
+
+\[
+\boxed{L(E,s)=L(f,s).}
+\]
+
+<p>这意味着椭圆曲线的算术 \(L\)-函数，其实和模形式的 \(L\)-函数是同一个对象。于是解析延拓、函数方程和中心点 \(s=1\) 的对称性，全部从模形式理论继承下来。</p>
+
+<p>更具体地，模性给出函数方程</p>
+
+\[
+\Lambda(E,s)=w(E)\Lambda(E,2-s),
+\]
+
+<p>其中 \(w(E)=\pm 1\) 是根数，\(\Lambda(E,s)\) 是补上 Gamma 因子与导子后的 completed \(L\)-function。于是中心点就是</p>
+
+\[
+s=1.
+\]
+
+<p>若 \(w(E)=-1\)，函数方程迫使</p>
+
+\[
+L(E,1)=0,
+\]
+
+<p>从而解析秩至少是奇数。你已经能闻到 BSD 的味道了：解析符号 \(w(E)\) 竟然对有理点群的奇偶性发出强烈暗示。</p>
+
+<p>Wiles 在 1990 年代证明了足够多半稳定椭圆曲线的模性，从而推出 Fermat 大定理；随后 Breuil、Conrad、Diamond、Taylor 等人补全了全部椭圆曲线的模性。于是</p>
+
+\[
+\text{椭圆曲线}\quad\longleftrightarrow\quad \text{模形式}
+\]
+
+<p>不再只是猜想，而成了现代数论最基本的桥之一。你在<a href="ch19.html">第 19 章</a>看到椭圆曲线模空间 \(M_{1,1}\) 与 \(j\)-line，如今则看见同一类对象又通过模形式与 \(L\)-函数进入解析数论。一个几何对象，居然同时活在模空间、Galois 表示和 Fourier 系数三种语言里；这正是现代数论最震撼人的地方。</p>
+
+<h2 id="sec20-7">20.7 再往前：Langlands 纲领的方向</h2>
+
+<p>模性定理并不是终点，而是更大故事的二维版本。为了看见这个更大的轮廓，可以把椭圆曲线的 \(\ell\)-进 Tate 模写出来：</p>
+
+\[
+T_\ell(E)=\varprojlim_n E[\ell^n](\overline{\mathbb Q}),
+\]
+
+<p>它给出一个二维的 Galois 表示</p>
+
+\[
+\rho_{E,\ell}\colon \operatorname{Gal}(\overline{\mathbb Q}/\mathbb Q)\to \operatorname{GL}_2(\mathbb Z_\ell).
+\]
+
+<p>对好素数 \(p\neq \ell\)，Frobenius 元满足</p>
+
+\[
+\operatorname{tr}\rho_{E,\ell}(\operatorname{Frob}_p)=a_p,
+\]
+
+\[
+\det\rho_{E,\ell}(\operatorname{Frob}_p)=p.
+\]
+
+<p>也就是说，模 \(p\) 点数、\(L\)-函数局部因子与 Galois 表示的特征多项式其实是同一份数据的不同写法：</p>
+
+\[
+1-a_pT+pT^2.
+\]
+
+<p>Langlands 纲领大体上说的，就是这种桥在更高维、更一般的代数群与 automorphic representations 之间应当普遍存在。椭圆曲线对应权 \(2\) 模形式，只是最先被完全照亮的一块拼图。往上走，你会遇到阿贝尔簇、模形式的高维版本、自守表示、motives，以及比本章复杂得多的 \(L\)-函数世界。</p>
+
+<p>把这一章收束起来，最该带走的是五句话。第一，椭圆曲线 over \(\mathbb Q\) 把代数几何对象变成了有理点问题。第二，\(E(\mathbb Q)\) 在 chord-tangent 法则下是阿贝尔群，而 Mordell-Weil 说它总是有限生成。第三，模 \(p\) 点数通过 \(a_p\) 进入 Euler 乘积，拼成 \(L(E,s)\)。第四，BSD 猜想把 rank 与中心点零阶等同起来，并用首项系数公式把几何、算术和解析全部捆在一起。第五，Wiles 与模性定理告诉你，这条桥不是孤例，而是 Langlands 大图景在椭圆曲线上的第一次大胜。</p>
+
+<p>如果说本书前十九章一直在教你“怎样把方程看成几何对象”，那么这一章想让你再迈一步：<strong>有时候，最深的数论问题并不是在整数算术里单独求解，而是要先把它们抬高到几何、再从几何落回算术。</strong> BSD 的魅力正来自这里。它逼你承认：代数几何不是给数论加一点优雅外壳，而是数论最核心现象真正开始被统一理解的地方之一。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 模空间初探</a><a href="appA.html">下一章 · 附录 A 交换代数速查 →</a></nav>
+
+</main>
+</body>
+</html>

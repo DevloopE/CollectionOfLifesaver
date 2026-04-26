@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 交换代数速查 — 普林斯顿代数几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 应用：数论几何与 BSD 简介</a><a href="appB.html">下一章 · 附录 B 范畴论函子化思路 →</a></nav>
+<h1 id="appA">附录 A 交换代数速查</h1>
+
+<p>这份附录的目标不是替代一本交换代数教材，而是给你一张在本书中会反复用到的速查地图。前面的<a href="ch7.html">第 7 章</a>到<a href="ch13.html">第 13 章</a>已经让你见过环、理想、局部化、局部环与维数；后面的<a href="ch18.html">第 18 章</a>到<a href="ch20.html">第 20 章</a>又会把这些概念放进微分、模空间与数论几何。真正难的不是把每个定义孤零零背下来，而是知道它们各自管什么现象：Noether 性管“有限性会不会失控”，整闭包管“方程的根是否偷偷住在更大环里”，DVR 管“一维局部光滑行为”，平展管“换基底后是否突然塌陷”，Krull 维数与主理想定理则管“几个方程到底该切掉几维”。</p>
+
+<p>你可以把这份附录当成一本小词典，但最好别只当词典。每个词后面我都尽量写上它在代数几何里的真正几何含义，因为这些概念一旦只剩下符号，会很快变得死板；而一旦你知道它们在替什么几何现象记账，就会突然顺手很多。</p>
+
+<h2 id="secA-1">A.1 Noether 性：为什么“有限生成”是现代代数几何的空气</h2>
+
+<p>一个交换环 \(A\) 叫 Noether 环，意思是它的理想不会出现无穷上升链</p>
+
+\[
+I_1\subsetneq I_2\subsetneq I_3\subsetneq \cdots
+\]
+
+<p>永不稳定。等价地说，\(A\) 的每个理想都有限生成。也就是说：</p>
+
+\[
+\boxed{
+A\text{ Noether}
+\Longleftrightarrow
+\text{每个理想都有限生成}
+\Longleftrightarrow
+\text{理想满足 ACC}.
+}
+\]
+
+<p>这个等价性非常重要，因为它把“抽象的链条件”变成了“手上对象终究能由有限个方程描述”。代数几何里几乎所有可管理性都依赖它。没有 Noether 性，闭集可能需要无限个方程，局部数据可能永远收不住，归纳法也几乎无从下手。</p>
+
+<p>你最该记住的基本来源是 Hilbert 基底定理：</p>
+
+\[
+\boxed{A\text{ Noether}\Longrightarrow A[x]\text{ Noether}.}
+\]
+
+<p>反复迭代后得到</p>
+
+\[
+A[x_1,\dots,x_n]\text{ Noether}.
+\]
+
+<p>特别地，若 \(k\) 是域，则坐标环 \(k[x_1,\dots,x_n]/I\) 总是 Noether 的。于是代数簇和仿射概形的世界从一开始就被放进了“有限生成可控”的框架里。这也是为什么<a href="ch2.html">第 2 章</a>和<a href="ch3.html">第 3 章</a>的零点集理论能真的运转起来。</p>
+
+<p>对模也有同样的哲学。若 \(A\) Noether，则有限生成 \(A\)-模的子模仍有限生成。几何上，这保证了 coherent sheaf 世界不至于失控。你在<a href="ch10.html">第 10 章</a>和<a href="ch16.html">第 16 章</a>看到的很多“有限呈示”“有限维上同调”的结论，空气里都飘着 Noether 性。</p>
+
+<h2 id="secA-2">A.2 整闭包：什么时候一个元素其实已经被原环“强制出来”了</h2>
+
+<p>设 \(A\subset B\) 是环扩张。元素 \(b\in B\) 称为整于 \(A\)，如果它满足某个首一多项式方程</p>
+
+\[
+b^n+a_{n-1}b^{n-1}+\cdots+a_1b+a_0=0,
+\qquad a_i\in A.
+\]
+
+<p>也就是说：</p>
+
+\[
+\boxed{
+b\text{ 对 }A\text{ 整}
+\Longleftrightarrow
+b\text{ 满足首一多项式方程}.
+}
+\]
+
+<p>别把“首一”当成语法小细节。它的含义是：\(b\) 的高次幂最终可以用低次幂和 \(A\) 中系数表达，因而 \(A[b]\) 作为 \(A\)-模有限生成。换句话说，整元素不是随意漂浮在大环里的新自由度，而是已经被原环代数地困住的一类元素。</p>
+
+<p>所有整于 \(A\) 的元素构成一个子环，叫做 \(A\) 在 \(B\) 中的整闭包。若 \(A\) 等于其分式域中的整闭包，就说 \(A\) 是整闭的，或 normal。最常见的例子是：</p>
+
+\[
+\mathbb Z\subset \mathbb Z[i],\qquad
+k[t^2,t^3]\subset k[t].
+\]
+
+<p>第二个例子特别重要。环 \(k[t^2,t^3]\) 不是整闭的，因为 \(t\) 满足</p>
+
+\[
+t^2-(t^2)=0,
+\]
+
+<p>即它整于 \(k[t^2,t^3]\)，却不在其中。几何上，这对应尖点曲线</p>
+
+\[
+y^2=x^3
+\]
+
+<p>的归一化是直线。于是“取整闭包”在几何上常被理解为“把一维奇点拉直”。你在<a href="ch9.html">第 9 章</a>看到奇点的局部病态，这里则开始看到另一种修补它们的方式。</p>
+
+<p>一条特别好用的经验是：光滑往往推出整闭，但整闭远弱于光滑。整闭只是在排除某些 codimension 1 的坏行为；它不保证局部像坐标空间一样平滑。</p>
+
+<h2 id="secA-3">A.3 DVR：一维局部几何最干净的模型</h2>
+
+<p>离散赋值环（discrete valuation ring, DVR）是代数几何里最值得熟悉的一类局部环。直观上，它是“一维、局部、没有奇点”的最纯净模型。定义方式有几种等价版本。最常用的一种是：存在赋值</p>
+
+\[
+v\colon K^\times\to \mathbb Z
+\]
+
+<p>使得环 \(R\) 正是</p>
+
+\[
+R=\{x\in K\mid v(x)\ge 0\}\cup\{0\},
+\]
+
+<p>其中 \(K\) 是 \(R\) 的分式域。此时极大理想为</p>
+
+\[
+\mathfrak m=\{x\in K\mid v(x)>0\}\cup\{0\},
+\]
+
+<p>并且由某个 uniformizer \(\pi\) 生成：</p>
+
+\[
+\mathfrak m=(\pi).
+\]
+
+<p>更重要的是，DVR 还有几个极其实用的等价刻画：</p>
+
+\[
+\boxed{
+R\text{ 是 DVR}
+\Longleftrightarrow
+\begin{array}{l}
+R\text{ 是 Noether 局部整环，}\\
+\dim R=1,\ \mathfrak m\text{ 主，}\\
+\text{或等价地 }R\text{ 为一维整闭局部环。}
+\end{array}
+}
+\]
+
+<p>在 DVR 里，每个非零理想都长得特别整齐：</p>
+
+\[
+I=(\pi^n)
+\qquad (n\ge 0).
+\]
+
+<p>所以 divisors、零点阶数、极点阶数这些概念在曲线局部都能被一个整数完全记录。这正是你在<a href="ch14.html">第 14 章</a>写除子时背后默认使用的局部模型。</p>
+
+<p>最标准的例子是幂级数环</p>
+
+\[
+k[[t]],
+\]
+
+<p>以及光滑曲线在一点的局部环。若 \(C\) 在点 \(p\) 光滑，则 \(\mathcal O_{C,p}\) 是 DVR。几何上，这就是说：一条光滑曲线在每个点附近都像一根单独的参数 \(t\) 那样简单，一切函数都能按 \(t\) 的阶数来衡量消失与发散。</p>
+
+<h2 id="secA-4">A.4 平展：为什么换基底时纤维不该突然撕裂</h2>
+
+<p>平展性第一次出现时常被觉得过于代数，因为定义只说张量积是否保持正合。一个 \(A\)-模 \(M\) 称为 flat，如果函子</p>
+
+\[
+-\otimes_A M
+\]
+
+<p>是正合的。也就是说：</p>
+
+\[
+\boxed{
+M\text{ flat}
+\Longleftrightarrow
+\text{张量 }-\otimes_A M\text{ 不制造新的核}.
+}
+\]
+
+<p>这句抽象话在几何上是什么意思？意思是：当你把一个族沿基底做基变换时，关系式不会突然多出来，从而纤维不会出现“无缘无故粘在一起”或“维数跳错”的病态。平展不是保证一切都完美，但它是“族变化得还算均匀”的最低门槛之一。</p>
+
+<p>几个最该记住的例子非常简单：</p>
+
+\[
+\boxed{\text{自由模平展，投射模平展，局部化 }S^{-1}A\text{ 平展}.}
+\]
+
+<p>其中局部化平展尤其重要，因为这保证了在开集上限制对象不会引入额外代数病变。另一方面，商模通常不平展。最经典的反例是</p>
+
+\[
+\mathbb Z/n\mathbb Z
+\]
+
+<p>作为 \(\mathbb Z\)-模并不 flat，因为短正合列</p>
+
+\[
+0\to \mathbb Z\xrightarrow{\cdot n}\mathbb Z\to \mathbb Z/n\mathbb Z\to 0
+\]
+
+<p>张量上 \(\mathbb Z/n\mathbb Z\) 后，左端的单射会坏掉。</p>
+
+<p>对环同态 \(A\to B\)，若 \(B\) 作为 \(A\)-模平展，就说这个态射 flat。模空间、形变理论和算术几何里几乎处处都在问：一个家族 \(\mathcal X\to S\) 是否平展？因为这通常就是“纤维按预期连续变化”的代数表达。你在<a href="ch19.html">第 19 章</a>看到曲线家族时，这个词会不断回来。</p>
+
+<h2 id="secA-5">A.5 局部维数与 Krull 主理想定理</h2>
+
+<p>Krull 维数就是素理想链的最大长度。对局部环 \((A,\mathfrak m)\)，它测量的是“这个点附近真正有几维自由方向”。你在<a href="ch8.html">第 8 章</a>已经用过它来解释局部环与切空间的关系。最经典的例子是</p>
+
+\[
+\dim k[x_1,\dots,x_n]=n.
+\]
+
+<p>更局部地，若你把原点处局部化，则</p>
+
+\[
+\dim k[x_1,\dots,x_n]_{(x_1,\dots,x_n)}=n.
+\]
+
+<p>也就是说，局部化不会改变“你在这个点附近看见的维数”。</p>
+
+<p>真正值得牢牢记住的结构定理是 Krull 主理想定理。它说：若 \(A\) 是 Noether 环，\(f\in A\)，那么包含主理想 \((f)\) 的极小素理想 \(\mathfrak p\) 的高度满足</p>
+
+\[
+\boxed{\operatorname{ht}(\mathfrak p)\le 1.}
+\]
+
+<p>更一般地，若理想 \(I\) 由 \(r\) 个元素生成，那么任何极小素理想 \(\mathfrak p\supset I\) 都满足</p>
+
+\[
+\operatorname{ht}(\mathfrak p)\le r.
+\]
+
+<p>这正是“一个方程至多切掉一维，\(r\) 个方程至多切掉 \(r\) 维”的代数版本。你在几何上当然愿意相信它，但真正把它钉死的是这条理想论定理。它也是 complete intersection、余维与局部参数个数之间许多比较的底层逻辑。</p>
+
+<p>举个最便宜的例子。设</p>
+
+\[
+A=k[x,y]_{(x,y)}.
+\]
+
+<p>理想 \((y-x^2)\) 由一个元素生成，因此相应不可约分支的高度至多 \(1\)。几何上你看到的是：在二维平面里，抛物线确实是一维对象。主理想定理的角色，就是把这种“画图显然”的事实变成对任意 Noether 环都成立的结构定理。</p>
+
+<h2 id="secA-6">A.6 把这五个词放回几何里</h2>
+
+<p>现在把这份速查表再压一遍。Noether 性让“由有限个方程定义”真正可操作；整闭包告诉你哪些奇点能通过加回被首一方程逼出来的元素而修补；DVR 是一维光滑局部模型，所以除子、零点阶数和局部参数都以它为语法；平展性控制家族在换基底时是否均匀，因而是模空间与变形理论的基本门槛；Krull 维数与主理想定理则把“几个方程该切掉几维”这件事彻底代数化。</p>
+
+<p>如果你以后忘了某个定义的细节，先别急着翻公式，先问：它在几何上替我防哪种病？Noether 性防无限生成失控；整闭包防隐藏根；DVR 防一维局部混乱；平展防族突然撕裂；主理想定理防维数直觉失真。只要这五句判断还在，你对交换代数的方向感就还在。对一本代数几何读本来说，这往往比记住每一条技术引理更值钱。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 应用：数论几何与 BSD 简介</a><a href="appB.html">下一章 · 附录 B 范畴论函子化思路 →</a></nav>
+
+</main>
+</body>
+</html>

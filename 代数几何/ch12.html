@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 仿射概形 \(\operatorname{Spec}A\) — 普林斯顿代数几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 概形：Spec 与 Proj</a><a href="ch13.html">下一章 · 第 13 章 投影概形 \(\operatorname{Proj}S\) →</a></nav>
+<h1 id="ch12">第 12 章 仿射概形 \(\operatorname{Spec}A\)</h1>
+
+<p>上一章我们把概形的语法搭了起来：点是素理想，闭集写成 \(V(I)\)，局部函数由结构层 \(\mathcal O_X\) 提供，概形则是局部同构于某个 \(\operatorname{Spec}A\) 的局部赋环空间。那一章的重点是“为什么这个定义合理”。这一章的重点则是“拿在手里怎样算”。</p>
+
+<p>如果你不能把几个最基本的 \(\operatorname{Spec}A\) 算得滚瓜烂熟，概形语言就会一直悬在半空里。反过来，一旦你把 \(\operatorname{Spec}\mathbb Z\)、\(\operatorname{Spec}k[x]\)、\(\operatorname{Spec}k[x]/(x^2)\) 这些例子真正吃透，很多抽象定义会突然变得非常具体：泛点是什么，局部环是什么，nilpotent 的“厚度”在哪里，仿射直线为什么不仅仅是一个集合，而是一个带层的对象。你在 <a href="../线性代数/ch10.html">《线性代数读本》第 10 章</a> 已经习惯了“对象不仅靠点坐标，还要靠其函数性结构来认识”；仿射概形正是把这种视角推到几何对象上。</p>
+
+<p>这一章会先把仿射概形的完整定义重新整理一遍，然后逐个解剖这三个核心模型。最后我们再回头说明，经典仿射代数簇怎样作为 reduced、有限型、在代数闭域上的仿射概形嵌入这幅更大的图景里。你会看到，概形不是把老理论推翻，而是把老理论放进一个更稳定、更统一、能同时容纳数论与几何的环境。若你回想 <a href="../代数拓扑/ch15.html">《代数拓扑读本》第 15 章</a>，那里上同调会把局部测量规则压成整体不变量；仿射概形则是在更早的层面，把局部函数规则直接做成对象本身。</p>
+
+<h2 id="sec12-1">12.1 完整定义：底空间、拓扑、结构层、局部环</h2>
+
+<p>先把仿射概形的定义一口气写齐。给定一个交换环 \(A\)，它的仿射概形 \(\operatorname{Spec}A\) 由四层数据组成。</p>
+
+<p>第一层是底集合：</p>
+
+\[
+\operatorname{Spec}A=\{\mathfrak p\subsetneq A\mid \mathfrak p\text{ 是素理想}\}.
+\]
+
+<p>第二层是 Zariski 拓扑，其闭集由</p>
+
+\[
+V(I)=\{\mathfrak p\in\operatorname{Spec}A\mid I\subset\mathfrak p\}
+\]
+
+<p>给出。基本开集写成</p>
+
+\[
+D(f)=\operatorname{Spec}A\setminus V(f)
+=\{\mathfrak p\mid f\notin\mathfrak p\}.
+\]
+
+<p>它们构成一个拓扑基，满足</p>
+
+\[
+D(f)\cap D(g)=D(fg),\qquad D(1)=\operatorname{Spec}A,\qquad D(0)=\varnothing.
+\]
+
+<p>第三层是结构层。在基本开集上定义</p>
+
+\[
+\mathcal O_{\operatorname{Spec}A}(D(f))=A_f.
+\]
+
+<p>对一般开集 \(U\)，\(\mathcal O(U)\) 可理解为那些局部上由分式表示的截面。第四层是茎：对每个点 \(\mathfrak p\in \operatorname{Spec}A\)，有</p>
+
+\[
+\mathcal O_{\operatorname{Spec}A,\mathfrak p}\cong A_{\mathfrak p}.
+\]
+
+\[
+\boxed{\operatorname{Spec}A=(\text{素理想集合},\ \text{Zariski 拓扑},\ \text{结构层 } \mathcal O,\ \text{各点处局部环 }A_{\mathfrak p}).}
+\]
+
+<p>这是一个局部环，其极大理想为</p>
+
+\[
+\mathfrak m_{\mathfrak p}=\mathfrak pA_{\mathfrak p}.
+\]
+
+<p>于是 \((\operatorname{Spec}A,\mathcal O_{\operatorname{Spec}A})\) 自动是局部赋环空间。到这里，“仿射概形”不是一个口号，而已经是一个可以逐项检查、逐项计算的对象。</p>
+
+<p>先记住两条永远要随手调用的公式。第一，仿射概形的全局截面就是原环：</p>
+
+\[
+\Gamma(\operatorname{Spec}A,\mathcal O_{\operatorname{Spec}A})\cong A.
+\]
+
+\[
+\boxed{\Gamma(\operatorname{Spec}A,\mathcal O_{\operatorname{Spec}A})=A.}
+\]
+
+<p>第二，仿射概形上的态射完全由环同态控制：</p>
+
+\[
+\operatorname{Hom}_{\mathrm{Sch}}(\operatorname{Spec}B,\operatorname{Spec}A)
+\cong
+\operatorname{Hom}_{\mathrm{Ring}}(A,B).
+\]
+
+<p>这两条公式几乎就是整部仿射概形理论的骨干。第一条告诉你：把环做成几何对象再取回全局函数，能够原封不动拿回原环。第二条告诉你：仿射概形范畴与交换环范畴是反等价的。你在第 7 章学交换代数时积累的很多操作，如局部化、商环、张量积，从现在开始都会直接翻译成几何构造。</p>
+
+<h2 id="sec12-2">12.2 \(\operatorname{Spec}\mathbb Z\)：所有素数在同一张几何图里</h2>
+
+<p>先看最著名、也最能说明概形如何把数论几何化的例子：</p>
+
+\[
+\operatorname{Spec}\mathbb Z.
+\]
+
+<p>\(\mathbb Z\) 的素理想非常简单。因为 \(\mathbb Z\) 是 PID，所有素理想恰好是</p>
+
+\[
+(0)\quad\text{和}\quad (p)\ (p\text{ 为素数}).
+\]
+
+<p>因此底集合是</p>
+
+\[
+\operatorname{Spec}\mathbb Z=\{(0)\}\cup\{(p)\mid p\text{ 素}\}.
+\]
+
+<p>这里每个 \((p)\) 都是极大理想，所以是闭点；而 \((0)\) 不是极大理想，它是整个空间的泛点。为什么？因为</p>
+
+\[
+V(0)=\operatorname{Spec}\mathbb Z.
+\]
+
+<p>于是</p>
+
+\[
+\overline{\{(0)\}}=\operatorname{Spec}\mathbb Z.
+\]
+
+<p>这说明 \((0)\) 像是“特征 \(0\) 的一般位置”，而每个 \((p)\) 则像是在特征 \(p\) 处的专门化。</p>
+
+\[
+\boxed{\operatorname{Spec}\mathbb Z=\{(0)\}\cup\{(p)\mid p\text{ 为素数}\},\quad (0)\text{ 是整个空间的泛点}.}
+\]
+
+<p>再看闭集。设 \(n\in\mathbb Z\)，其素因子分解为</p>
+
+\[
+n=\pm p_1^{e_1}\cdots p_r^{e_r}.
+\]
+
+<p>那么</p>
+
+\[
+V(n)=V((n))=\{(p_1),\dots,(p_r)\}.
+\]
+
+<p>原因是：\((n)\subset (p)\) 当且仅当 \(p\mid n\)。所以 \(\operatorname{Spec}\mathbb Z\) 里的典型闭集就是有限个素数点。相应地，基本开集</p>
+
+\[
+D(n)=\operatorname{Spec}\mathbb Z\setminus V(n)
+\]
+
+<p>就是“把所有整除 \(n\) 的素数删掉”的开集。比如</p>
+
+\[
+D(6)=\operatorname{Spec}\mathbb Z\setminus\{(2),(3)\}.
+\]
+
+<p>这时结构层在 \(D(n)\) 上的截面环是</p>
+
+\[
+\mathcal O(D(n))=\mathbb Z_n=\mathbb Z\!\left[\frac1n\right].
+\]
+
+<p>例如</p>
+
+\[
+\mathcal O(D(6))=\mathbb Z\!\left[\frac16\right],
+\]
+
+<p>也就是允许分母只含 \(2\) 和 \(3\) 的有理数。几何上这非常漂亮：在去掉 \(2\) 与 \(3\) 这两个素数点的开集上，\(2\) 与 \(3\) 都变得可逆，于是 \(1/6\) 成为合法函数。</p>
+
+<p>现在算茎。闭点 \((p)\) 处的局部环是</p>
+
+\[
+\mathcal O_{\operatorname{Spec}\mathbb Z,(p)}\cong \mathbb Z_{(p)}
+=\left\{\frac ab\in\mathbb Q\;\middle|\;p\nmid b\right\}.
+\]
+
+<p>它的极大理想是</p>
+
+\[
+p\mathbb Z_{(p)}.
+\]
+
+<p>这和数论里“只盯着素数 \(p\) 看局部信息”的做法完全一致。另一方面，泛点 \((0)\) 处的局部环则是</p>
+
+\[
+\mathcal O_{\operatorname{Spec}\mathbb Z,(0)}\cong \mathbb Q,
+\]
+
+<p>因为在 \((0)\) 处所有非零整数都允许倒。你可以把它理解成：站在一般位置上，只看得到有理数域；当你专门化到某个素数 \(p\) 时，你开始区分哪些分母能被 \(p\) 整除。</p>
+
+<p>\(\operatorname{Spec}\mathbb Z\) 的几何图像因此很奇特：一个闭点无限多、但却由一个泛点统领的空间。它不是流形，不是经典点集几何能自然想象的东西，却又极度自然地把整数环的算术结构变成了空间结构。这正是概形发明后数论和几何得以真正融合的起点。第 20 章讲椭圆曲线与 BSD 时，你会不断回到这种“把算术对象当几何底空间”的视角。</p>
+
+<h2 id="sec12-3">12.3 \(\operatorname{Spec}k[x]\) 为什么就是仿射直线</h2>
+
+<p>现在看最基本的几何例子：</p>
+
+\[
+\mathbb A^1_k:=\operatorname{Spec}k[x].
+\]
+
+<p>若 \(k\) 代数闭，那么 \(k[x]\) 的素理想只有两类：</p>
+
+\[
+(0),\qquad (x-a)\ (a\in k).
+\]
+
+<p>于是</p>
+
+\[
+\operatorname{Spec}k[x]=\{(0)\}\cup\{(x-a)\mid a\in k\}.
+\]
+
+<p>每个 \((x-a)\) 对应经典仿射直线上的一个点 \(a\)。\((0)\) 则是整条直线的泛点。也就是说，\(\operatorname{Spec}k[x]\) 比经典点集 \(k\) 多了一个“总点”。这一个额外点并不是噱头，它让不可约性直接写进了拓扑：因为 \((0)\) 的闭包就是整个空间，所以 \(\operatorname{Spec}k[x]\) 不可约。</p>
+
+<p>再看闭集。若 \(f(x)\neq 0\)，在代数闭域上可分解为</p>
+
+\[
+f(x)=c\prod_{i=1}^r (x-a_i)^{m_i}.
+\]
+
+<p>于是</p>
+
+\[
+V(f)=\{(x-a_1),\dots,(x-a_r)\}.
+\]
+
+<p>注意指数 \(m_i\) 不影响闭点集合，只影响更细的 scheme 结构。几何上这和第 2 章零点集的描述完全吻合：一元多项式的零点就是有限多个点。不过概形把“整条直线作为不可约对象的泛点”额外放了进来。</p>
+
+<p>最值得算的是基本开集 \(D(x)\)。它等于</p>
+
+\[
+D(x)=\operatorname{Spec}k[x]\setminus\{(x)\},
+\]
+
+<p>也就是删掉原点的仿射直线再加上泛点。其结构层截面为</p>
+
+\[
+\mathcal O(D(x))=k[x]_x=k[x,x^{-1}].
+\]
+
+<p>这说明 \(1/x\) 在 \(D(x)\) 上是合法正则函数，但在整个 \(\operatorname{Spec}k[x]\) 上不是。为什么不是？因为如果它是全局正则函数，那它必须属于</p>
+
+\[
+\Gamma(\operatorname{Spec}k[x],\mathcal O)=k[x],
+\]
+
+<p>可 \(1/x\notin k[x]\)。于是“函数能否在某开集上正则”真的取决于你删掉了哪些点。层把这种局部性精确记录下来。</p>
+
+<p>再算闭点处的局部环。对点 \((x-a)\)，有</p>
+
+\[
+\mathcal O_{\mathbb A^1_k,(x-a)}\cong k[x]_{(x-a)}.
+\]
+
+<p>里面的元素可写成</p>
+
+\[
+\frac{f(x)}{g(x)},\qquad g(a)\neq 0.
+\]
+
+<p>于是局部环就是“在 \(a\) 附近没有极点的有理函数”。而泛点处的局部环是</p>
+
+\[
+\mathcal O_{\mathbb A^1_k,(0)}\cong k(x),
+\]
+
+<p>也就是整条直线的函数域。这个对比非常经典：闭点看到的是“在该点附近可正则”的函数，泛点看到的是“在一般位置可定义”的有理函数。</p>
+
+<p>如果 \(k\) 不是代数闭域，\(\operatorname{Spec}k[x]\) 还会多出由不可约多项式 \(p(x)\) 给出的闭点 \((p(x))\)。这说明概形天然知道域扩张信息。经典点集 \(k\) 只看得见 \(k\)-有理点，而 \(\operatorname{Spec}k[x]\) 把所有残差域扩张上的点也编码进来了。这也是概形比“只看坐标值”的几何更稳健的重要原因。</p>
+
+<h2 id="sec12-4">12.4 \(\operatorname{Spec}k[x]/(x^2)\)：只有一个点，却不是单点空间</h2>
+
+<p>现在看最能说明 nilpotent 重要性的例子。令</p>
+
+\[
+A=k[x]/(x^2).
+\]
+
+<p>把 \(x\) 在商环中的像仍记作 \(\varepsilon\)。于是</p>
+
+\[
+\varepsilon^2=0,\qquad \varepsilon\neq 0.
+\]
+
+<p>我们来求 \(\operatorname{Spec}A\) 的点。设 \(\mathfrak p\subset A\) 是素理想。由于 nilradical 总包含于所有素理想，而这里</p>
+
+\[
+\sqrt{(0)}=(\varepsilon),
+\]
+
+<p>所以任意素理想都必须包含 \((\varepsilon)\)。另一方面，商环</p>
+
+\[
+A/(\varepsilon)\cong k
+\]
+
+<p>是域，所以 \((\varepsilon)\) 本身就是极大理想，从而也是唯一的素理想。于是</p>
+
+\[
+\operatorname{Spec}A=\{(\varepsilon)\}.
+\]
+
+<p>拓扑上这确实是一个单点空间。可如果你因此断言“它和 \(\operatorname{Spec}k\) 没区别”，那就犯了经典点集几何最容易犯的错误。区别全藏在结构层里：全局截面环是</p>
+
+\[
+\Gamma(\operatorname{Spec}A,\mathcal O)=A=k[\varepsilon]/(\varepsilon^2),
+\]
+
+<p>不是 \(k\)。茎也同样是这个局部环：</p>
+
+\[
+\mathcal O_{\operatorname{Spec}A,(\varepsilon)}\cong k[\varepsilon]/(\varepsilon^2).
+\]
+
+<p>它的极大理想是</p>
+
+\[
+\mathfrak m=(\varepsilon),
+\]
+
+<p>而且</p>
+
+\[
+\mathfrak m^2=0.
+\]
+
+<p>这表示什么？表示这个点不是一颗“没有厚度的针尖”，而是带着一阶无穷小方向的胖点。它虽然没有第二个拓扑点可供你移动，但在函数层面却容纳了一个非零 nilpotent。很多微分几何直觉在这里会复活：\(\varepsilon\) 像是一个“一阶小量”，平方立刻消失。</p>
+
+\[
+\boxed{\operatorname{Spec}k[\varepsilon]/(\varepsilon^2)\text{ 的拓扑只是一个点，但结构层仍然记住 } \varepsilon^2=0\text{ 的厚度}.}
+\]
+
+<p>如果你愿意把第 8 章的切空间公式拿来试一下，会发现</p>
+
+\[
+\mathfrak m/\mathfrak m^2\cong (\varepsilon)/(0)\cong k,
+\]
+
+<p>所以对偶切空间是一维的：</p>
+
+\[
+T\cong (\mathfrak m/\mathfrak m^2)^\ast\cong k.
+\]
+
+<p>这说明这个胖原点确实携带一个一维无穷小方向。它像是“原点外加一阶切向厚度”。在经典点集里你什么都看不出来；在概形里，这种细节直接写在结构层里。</p>
+
+<p>这个例子之所以关键，是因为以后遇到交叉重数、切锥、无穷小邻域、变形理论时，类似的 ring with nilpotents 会无处不在。概形的一个巨大优点，就是它不需要为这些“病态对象”另写外传；它们从一开始就已经被纳入正统定义。</p>
+
+<h2 id="sec12-5">12.5 开集上的函数：局部化不是附会，而是函数本身</h2>
+
+<p>学到这里，你可能已经接受“开集 \(D(f)\) 上的函数环是 \(A_f\)”这件事，但最好再把它当函数真正算一次。因为代数几何里，“局部化”不是抽象操作，它就是开集上的局部函数。</p>
+
+<p>以 \(X=\operatorname{Spec}k[x]\) 为例。全局截面是</p>
+
+\[
+\Gamma(X,\mathcal O_X)=k[x].
+\]
+
+<p>所以整个仿射直线上的正则函数恰好是多项式。这和第 2 章的经典结论完全一致。可如果缩到</p>
+
+\[
+U=D(x),
+\]
+
+<p>正则函数环立刻扩张成</p>
+
+\[
+\Gamma(U,\mathcal O_X)=k[x,x^{-1}].
+\]
+
+<p>为什么不是所有有理函数 \(k(x)\)？因为像</p>
+
+\[
+\frac{1}{x-1}
+\]
+
+<p>在 \(x=1\) 仍有极点，而闭点 \((x-1)\) 还留在 \(D(x)\) 里，所以它不属于该开集上的正则函数。相反，</p>
+
+\[
+\frac{1}{x}
+\]
+
+<p>在 \(D(x)\) 上没有问题，因为唯一的极点原点已被删掉。你看到没有：局部化准确地对应“哪些极点被开集排除掉了”。</p>
+
+<p>再拿 \(\operatorname{Spec}\mathbb Z\) 算一次。对开集 \(D(6)\)，我们有</p>
+
+\[
+\Gamma(D(6),\mathcal O)=\mathbb Z\!\left[\frac16\right].
+\]
+
+<p>于是</p>
+
+\[
+\frac{5}{12}\in \Gamma(D(6),\mathcal O),\qquad \frac15\notin \Gamma(D(6),\mathcal O).
+\]
+
+<p>原因前者分母只含素因子 \(2,3\)，后者分母含 \(5\)，而点 \((5)\) 还留在开集里，所以 \(1/5\) 在该点附近不是正则的。这个例子把“正则函数”解释成一种局部算术条件，几乎没有比它更直观的了。</p>
+
+<p>把这两类例子放在一起看，你就会意识到：结构层不是附带的注释，而是空间本体的一部分。没有它，你根本说不清两个开集上的函数环为何不同，也说不清为何删掉若干点会把某些分母合法化。对流形来说，坐标图的过渡函数决定微分结构；对概形来说，基本开集上的局部化环决定代数结构。</p>
+
+<h2 id="sec12-6">12.6 仿射概形之间的态射：反等价在手上怎样用</h2>
+
+<p>上一章已经说过，仿射概形之间的态射与环同态反向对应。这一节把它真正用起来。给定环同态</p>
+
+\[
+\varphi:A\to B,
+\]
+
+<p>它诱导仿射概形态射</p>
+
+\[
+f:\operatorname{Spec}B\to\operatorname{Spec}A.
+\]
+
+<p>这个态射在点上是取逆像：</p>
+
+\[
+f(\mathfrak q)=\varphi^{-1}(\mathfrak q).
+\]
+
+<p>在结构层上，它由局部化诱导。例如若 \(D(a)\subset \operatorname{Spec}A\)，则</p>
+
+\[
+f^{-1}(D(a))=D(\varphi(a))\subset \operatorname{Spec}B,
+\]
+
+<p>因此开集上的拉回同态是</p>
+
+\[
+A_a\longrightarrow B_{\varphi(a)},\qquad
+\frac{r}{a^n}\longmapsto \frac{\varphi(r)}{\varphi(a)^n}.
+\]
+
+<p>这就是“把 \(A\) 上的函数拉回到 \(B\) 上”的局部版本。</p>
+
+<p>再做一个完整算例。令</p>
+
+\[
+\varphi:k[x]\to k[t],\qquad x\mapsto t^2.
+\]
+
+<p>我们已经知道它在闭点层面给出 \(t\mapsto t^2\)。现在看开集 \(D(x)\)。它的逆像是</p>
+
+\[
+f^{-1}(D(x))=D(t^2)=D(t).
+\]
+
+<p>在函数环上，拉回同态为</p>
+
+\[
+k[x,x^{-1}]\longrightarrow k[t,t^{-1}],\qquad x\mapsto t^2.
+\]
+
+<p>所以</p>
+
+\[
+\frac{1}{x}\longmapsto \frac{1}{t^2}.
+\]
+
+<p>这和普通函数复合完全一致：原来在 \(x\neq 0\) 上定义的函数 \(1/x\)，经由平方映射拉回后，就变成 \(t\neq 0\) 上的函数 \(1/t^2\)。概形态射不是新的神秘对象；它只是把“函数拉回”这件事做到局部环、局部化、泛点全都兼容。</p>
+
+<p>更重要的是，反等价告诉你很多几何构造可以直接转成代数构造。比如：</p>
+
+<ul>
+  <li>闭子概形对应商环 \(A\to A/I\)；</li>
+  <li>基本开集对应局部化 \(A\to A_f\)；</li>
+  <li>纤维积对应张量积 \(B\otimes_A C\)。</li>
+</ul>
+
+<p>第三条在以后会非常重要。它说明几何里的“底变换”本质上就是张量积，而你在第 7 章学过的模与张量积，从现在起会持续在几何侧出现。这也是为什么概形理论一旦建立，交换代数几乎立即变成几何的语法库。</p>
+
+<h2 id="sec12-7">12.7 与经典仿射代数簇的桥梁：旧世界没有被扔掉</h2>
+
+<p>讲到这里，有必要把读者最常见的心理障碍拆掉：概形是不是把经典仿射簇那套语言全推翻了？完全不是。更准确地说，经典仿射簇是仿射概形里最“干净”的一类。</p>
+
+<p>设 \(k\) 代数闭，\(X\subset \mathbb A_k^n\) 是经典仿射代数簇，对应坐标环</p>
+
+\[
+k[X]=k[x_1,\dots,x_n]/I(X).
+\]
+
+<p>因为 \(I(X)\) 是根理想，所以 \(k[X]\) 没有 nilpotent。于是仿射概形</p>
+
+\[
+\operatorname{Spec}k[X]
+\]
+
+<p>是一个 reduced、有限型的仿射概形。它的闭点恰好对应 \(X\) 的经典点，而第 3 章的零点定理保证</p>
+
+\[
+\operatorname{MaxSpec}k[X]\cong X.
+\]
+
+<p>也就是说，如果你只看闭点，经典仿射簇就坐在 \(\operatorname{Spec}k[X]\) 里面。但 \(\operatorname{Spec}k[X]\) 还多带了泛点、结构层、局部环，因此信息更全。</p>
+
+<p>举个简单但关键的例子。令</p>
+
+\[
+X=V(y-x^2)\subset \mathbb A_k^2.
+\]
+
+<p>它的坐标环是</p>
+
+\[
+k[X]\cong k[x,y]/(y-x^2)\cong k[t].
+\]
+
+<p>于是作为概形，\(X\) 与 \(\operatorname{Spec}k[t]\) 同构，也就是一条仿射直线。经典点集上这当然也是真的：抛物线可以由参数 \(t\mapsto (t,t^2)\) 描述。但概形语言额外告诉你，它们的结构层也一致，局部环也一致，函数域也一致。这个“不是只同胚，而是同构于同一仿射概形”的结论，力量比点集参数化大得多。</p>
+
+<p>再看一个能显出差别的例子。令</p>
+
+\[
+Y=\operatorname{Spec}k[x]/(x^2).
+\]
+
+<p>它的闭点集合和单点簇 \(V(x)\) 一样，都是一个点；但 \(Y\) 不是 reduced，而单点簇的坐标环 \(k\) 是 reduced。于是作为概形它们不可能同构。也就是说，概形不是只把“点放在哪儿”记下来，还把“点上压了多厚的 nilpotent 结构”记下来。经典簇看不见的，概形看得见；经典簇已经看得见的，概形则完整保留。</p>
+
+<p>所以最好的理解方式不是“概形替代代数簇”，而是</p>
+
+\[
+\boxed{\text{仿射代数簇} \subset \text{reduced finite type 仿射概形} \subset \text{所有仿射概形}.}
+\]
+
+<p>这条包含链既保住了旧理论，又把新对象全部纳入。你以后学除子、线丛、上同调、模空间时，正是因为底层对象已经放宽到概形，许多定理才能同时覆盖几何与数论两边。</p>
+
+<h2 id="sec12-8">12.8 本章回看</h2>
+
+<p>现在可以把仿射概形真正当作一个成熟对象了。它的点是素理想，闭集由 \(V(I)\) 给出，基本开集 \(D(f)\) 上的函数环是局部化 \(A_f\)，点 \(\mathfrak p\) 处的局部环是 \(A_{\mathfrak p}\)。这套字典一旦掌握，很多几何说法都能立即翻回代数。</p>
+
+<p>\(\operatorname{Spec}\mathbb Z\) 告诉你概形如何把素数本身看成几何点；\(\operatorname{Spec}k[x]\) 告诉你仿射直线比经典点集多出一个泛点与一层局部函数；\(\operatorname{Spec}k[x]/(x^2)\) 则告诉你一个只有单点的空间仍然可以带着非平凡的无穷小厚度。三者合起来，几乎把概形语言最核心的直觉都交代了。</p>
+
+<p>最后，经典仿射代数簇并没有消失。它们只是被识别为一类特别好的仿射概形：reduced、有限型、在代数闭域上看闭点时回到熟悉的零点集。下一章我们转向射影世界，去看分次环怎样通过 \(\operatorname{Proj}\) 生成射影概形，以及为什么 \(\operatorname{Proj}k[x_0,\dots,x_n]\) 正好就是 \(\mathbb P^n\)。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 概形：Spec 与 Proj</a><a href="ch13.html">下一章 · 第 13 章 投影概形 \(\operatorname{Proj}S\) →</a></nav>
+
+</main>
+</body>
+</html>
