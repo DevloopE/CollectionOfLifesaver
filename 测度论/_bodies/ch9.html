@@ -1,0 +1,514 @@
+<h1 id="ch9">第 9 章 多元测度与 Fubini-Tonelli</h1>
+
+<p>一元积分里，你切的是区间；到了多元积分，你切的是矩形、长方体、一般乘积空间。可真正麻烦的从来不是“多一个变量”，而是那句你在微积分里太习惯的话：<strong>先对 \(x\) 积，再对 \(y\) 积，应该和反过来一样吧？</strong></p>
+
+<p>你可能会想，既然二维面积就是很多小矩形拼起来，积分次序怎么换都该没事。但分析里最危险的词就是“应该”。一旦函数在某个细小区域里爆得很高、振得很快、或者正负抵消得很精巧，换次序这件事就不再是直觉，而必须由定理授权。Tonelli 和 Fubini 做的，正是给这件事发牌照：<strong>非负函数先交给 Tonelli，可积函数再交给 Fubini。</strong></p>
+
+<p>本章的主线非常清楚。先构造乘积测度，说明为什么“矩形的面积等于边长乘边长”会自然延伸成一般测度空间的 \(\mu\times\nu\)。然后证明 Tonelli：只要 \(f\ge0\) 可测，哪怕积分是 \(+\infty\)，两次迭代积分都合法，而且和双重积分一致。再证明 Fubini：只要 \(\int|f|\,d(\mu\times\nu)&lt;\infty\)，就可以安心换次序。最后我们用两个著名反例把边界照亮：一个告诉你少了绝对可积，Fubini 根本没有资格上场；另一个告诉你若硬换次序，答案真的会变。</p>
+
+<p>这一章和 <a href="../复分析/ch9.html">《复分析读本》第 9 章</a> 的气质很像。那一章的 Cauchy 积分公式说“边界一圈积分决定内部值”；这一章的 Fubini-Tonelli 说“多变量积分能不能拆成一圈一圈地做，取决于你有没有足够好的可积性控制”。一个是复分析里交换路径与求值的合法性，一个是实分析里交换变量与积分的合法性。背后其实是同一个问题：<strong>无限过程能否交换，必须看你手里有没有全局控制。</strong></p>
+
+<h2 id="sec9-1">9.1 从区间到矩形：乘积测度想解决什么</h2>
+
+<p>设 \((X,\mathcal M,\mu)\) 与 \((Y,\mathcal N,\nu)\) 是两个测度空间。我们当然希望在乘积空间 \(X\times Y\) 上也有一个自然测度，让矩形 \(A\times B\) 的大小等于“底边乘高边”：</p>
+
+\[
+(\mu\times\nu)(A\times B)=\mu(A)\nu(B).
+\]
+
+<p>这句话看起来太自然了，以至于容易让人忽略两件事。</p>
+
+<p>第一，\(X\times Y\) 上不是只有矩形。你以后真正要积分的集合会是圆盘、斜带、图像下方区域、甚至抽象概率空间上的 cylinder 集和它们生成的 \(\sigma\)-代数。乘积测度不能只在矩形上定义完就收工。</p>
+
+<p>第二，哪怕只从矩形起步，真正要延拓出去的也不是“面积直觉”，而是 \(\sigma\)-可加性。我们要确保：一旦矩形拆成可数个互不相交的可测块，测度仍然按和式相加。这意味着乘积测度不是画图定义，而是由测度论的延拓 machinery 真正构造出来的。</p>
+
+<p>因此正确的起点是：先把 \(X\times Y\) 上我们愿意讨论的集合组织成乘积 \(\sigma\)-代数</p>
+
+\[
+\mathcal M\otimes \mathcal N
+=
+\sigma\bigl(\{A\times B:A\in\mathcal M,\ B\in\mathcal N\}\bigr).
+\]
+
+<p>这就是由所有可测矩形生成的最小 \(\sigma\)-代数。然后我们才问：是否存在测度 \(\rho\) 在这上面满足 \(\rho(A\times B)=\mu(A)\nu(B)\)？若存在，它是否唯一？</p>
+
+<p>答案是肯定的，但为了避免技术陷阱，通常要加上 \(\sigma\)-有限假设。也就是说，\(X\) 和 \(Y\) 都能拆成可数个有限测度集合的并。在本书之后的大部分应用里，这个假设都天然满足：Lebesgue 测度在 \(\mathbb R^n\) 上是 \(\sigma\)-有限，计数测度在 \(\mathbb N\) 上是 \(\sigma\)-有限，绝大多数概率空间更是总测度等于 1。</p>
+
+<h2 id="sec9-2">9.2 乘积测度的构造与唯一性</h2>
+
+<p>现在把主定理写下来。</p>
+
+\[
+\boxed{
+\text{若 }\mu,\nu\text{ 都 }\sigma\text{-有限，则存在唯一测度 }\mu\times\nu\text{ 在 }\mathcal M\otimes\mathcal N\text{ 上满足 }
+(\mu\times\nu)(A\times B)=\mu(A)\nu(B).
+}
+\]
+
+<p>存在性来自你在第 3 章见过的 Carathéodory 延拓思想：先在矩形半代数上定义“预面积”</p>
+
+\[
+\rho_0(A\times B)=\mu(A)\nu(B),
+\]
+
+<p>检查它在有限并上的可加性，再延拓到由矩形生成的 \(\sigma\)-代数。这个过程本身并不神秘，只是技术上稍长；真正值得你记住的，是唯一性为什么成立。</p>
+
+<p>唯一性的核心是：矩形族</p>
+
+\[
+\mathcal R=\{A\times B:A\in\mathcal M,\ B\in\mathcal N\}
+\]
+
+<p>是一个 \(\pi\)-系统，因为两个矩形的交仍是矩形：</p>
+
+\[
+(A_1\times B_1)\cap(A_2\times B_2)
+=(A_1\cap A_2)\times(B_1\cap B_2).
+\]
+
+<p>若两个 \(\sigma\)-有限测度 \(\rho_1,\rho_2\) 在 \(\mathcal R\) 上一致，则由单调类或 \(\pi\)-\(\lambda\) 技巧，它们在 \(\sigma(\mathcal R)=\mathcal M\otimes\mathcal N\) 上处处一致。也就是说，矩形已经足够决定整个乘积测度。</p>
+
+<p>Fubini-Tonelli 还需要一个基本事实：如果 \(E\in\mathcal M\otimes\mathcal N\)，那么对每个固定 \(x\in X\)，截面</p>
+
+\[
+E_x=\{y\in Y:(x,y)\in E\}
+\]
+
+<p>属于 \(\mathcal N\)；对每个固定 \(y\in Y\)，截面</p>
+
+\[
+E^y=\{x\in X:(x,y)\in E\}
+\]
+
+<p>属于 \(\mathcal M\)。证明很标准。固定 \(x\)，考虑类</p>
+
+\[
+\mathcal C_x=\{E\subset X\times Y:E_x\in\mathcal N\}.
+\]
+
+<p>容易检查 \(\mathcal C_x\) 是一个 \(\sigma\)-代数；而对矩形 \(A\times B\)，其 \(x\)-截面要么是 \(B\)，要么是空集，所以 \(A\times B\in\mathcal C_x\)。因此 \(\mathcal M\otimes\mathcal N\subset\mathcal C_x\)。同理得 \(E^y\in\mathcal M\)。这个小事实非常值钱，因为一切迭代积分说到底都在讨论这些截面。</p>
+
+<p><strong>例题 1.</strong> 计算</p>
+
+\[
+\int_{[0,1]\times[0,\infty)} x^2e^{-y}\,d(\lambda\times\lambda)(x,y).
+\]
+
+<p>这里 \(f(x,y)=x^2e^{-y}\ge0\)，而且它直接分离成 \(g(x)h(y)\)。由 Tonelli 的精神你几乎已经知道答案会拆开，不过我们先按最朴素的方式算：</p>
+
+\[
+\int_0^\infty e^{-y}\,dy=1,
+\qquad
+\int_0^1 x^2\,dx=\frac13.
+\]
+
+<p>于是</p>
+
+\[
+\int_{[0,1]\times[0,\infty)} x^2e^{-y}\,d(\lambda\times\lambda)
+=
+\left(\int_0^1x^2\,dx\right)\left(\int_0^\infty e^{-y}\,dy\right)
+=\frac13.
+\]
+
+<p>这道题看着简单，但它已经把乘积测度最自然的使用方式说清楚了：只要函数能拆成“只看 \(x\)”乘“只看 \(y\)”，乘积空间上的积分往往也会跟着拆开。</p>
+
+<h2 id="sec9-3">9.3 Tonelli 定理：非负函数先上车</h2>
+
+<p>Tonelli 是第一个真正值得你背下来的大定理。它解决的是最安全的一类函数：非负可测函数。此时哪怕积分等于 \(+\infty\)，也没有正负抵消带来的模糊性，所以我们可以先把“换次序是否合法”这个问题做成绝对稳定的。</p>
+
+\[
+\boxed{
+\text{若 }f:X\times Y\to[0,\infty]\text{ 可测，则 }
+\int_{X\times Y}f\,d(\mu\times\nu)
+=
+\int_X\left(\int_Y f(x,y)\,d\nu(y)\right)d\mu(x)
+=
+\int_Y\left(\int_X f(x,y)\,d\mu(x)\right)d\nu(y).
+}
+\]
+
+<p>而且内部那两个截面积分定义出的函数</p>
+
+\[
+x\longmapsto \int_Y f(x,y)\,d\nu(y),
+\qquad
+y\longmapsto \int_X f(x,y)\,d\mu(x)
+\]
+
+<p>都是可测的。这条定理最好的证明方式，是“先简单函数，再单调极限”。</p>
+
+<p>第一步，若 \(f\) 是非负简单函数，写成</p>
+
+\[
+f=\sum_{k=1}^m a_k\,\mathbf 1_{E_k},
+\qquad a_k\ge0,\ E_k\in\mathcal M\otimes\mathcal N.
+\]
+
+<p>为了把计算写得最直观，我们先看矩形情形 \(E_k=A_k\times B_k\)。这时</p>
+
+\[
+\int_Y \mathbf 1_{A_k\times B_k}(x,y)\,d\nu(y)
+=
+\mathbf 1_{A_k}(x)\,\nu(B_k).
+\]
+
+<p>再对 \(x\) 积分便得</p>
+
+\[
+\int_X \mathbf 1_{A_k}(x)\,\nu(B_k)\,d\mu(x)
+=
+\mu(A_k)\nu(B_k)
+=(\mu\times\nu)(A_k\times B_k).
+\]
+
+<p>线性叠加以后，对所有非负简单函数都成立：</p>
+
+\[
+\int_{X\times Y} f\,d(\mu\times\nu)
+=
+\int_X\left(\int_Y f(x,y)\,d\nu(y)\right)d\mu(x).
+\]
+
+<p>第二步，推广到一般非负可测函数。取简单函数列 \(s_n\uparrow f\)。对每个 \(n\)，上一段已经给出</p>
+
+\[
+\int_{X\times Y}s_n\,d(\mu\times\nu)
+=
+\int_X\left(\int_Y s_n(x,y)\,d\nu(y)\right)d\mu(x).
+\]
+
+<p>记</p>
+
+\[
+g_n(x)=\int_Y s_n(x,y)\,d\nu(y).
+\]
+
+<p>由于 \(s_n\uparrow f\)，对每个固定 \(x\)，也有 \(g_n(x)\uparrow g(x)\)，其中</p>
+
+\[
+g(x)=\int_Y f(x,y)\,d\nu(y).
+\]
+
+<p>于是由单调收敛定理，</p>
+
+\[
+\int_X g(x)\,d\mu(x)
+=
+\lim_{n\to\infty}\int_X g_n(x)\,d\mu(x)
+=
+\lim_{n\to\infty}\int_{X\times Y}s_n\,d(\mu\times\nu)
+=
+\int_{X\times Y}f\,d(\mu\times\nu).
+\]
+
+<p>这就完成了一半。另一半换 \(x,y\) 的角色完全一样。</p>
+
+<p>Tonelli 的精神你一定要吃透：<strong>只要函数非负，就算积分发散到 \(+\infty\)，仍然可以先切截面、再积分，而且次序无关。</strong> 这和数项级数里“正项级数不怕重排”的味道几乎一模一样。</p>
+
+<h2 id="sec9-4">9.4 Fubini 定理：真正允许你换次序的是 \(\int|f|&lt;\infty\)</h2>
+
+<p>Tonelli 处理非负函数，Fubini 处理有正有负的函数。此时最大的危险不是积分发散，而是正负部分各自都很大，只是碰巧在某种次序下抵消掉。为了避免这种靠运气的抵消，Fubini 要求的正是绝对可积：</p>
+
+\[
+\int_{X\times Y}|f|\,d(\mu\times\nu)&lt;\infty.
+\]
+
+<p>完整陈述如下。</p>
+
+\[
+\boxed{
+\text{若 }f\in L^1(X\times Y,\mu\times\nu),
+\text{ 则对几乎处处的 }x,\ f(x,\cdot)\in L^1(Y,\nu),
+\text{ 对几乎处处的 }y,\ f(\cdot,y)\in L^1(X,\mu),
+}
+\]
+
+\[
+\boxed{
+\int_{X\times Y}f\,d(\mu\times\nu)
+=
+\int_X\left(\int_Y f(x,y)\,d\nu(y)\right)d\mu(x)
+=
+\int_Y\left(\int_X f(x,y)\,d\mu(x)\right)d\nu(y).
+}
+\]
+
+<p>证明只比 Tonelli 多一步：把 \(f\) 拆成正负部分</p>
+
+\[
+f=f^+-f^-,
+\qquad
+|f|=f^++f^-.
+\]
+
+<p>由于 \(|f|\in L^1\)，Tonelli 告诉我们</p>
+
+\[
+\int_X\left(\int_Y |f(x,y)|\,d\nu(y)\right)d\mu(x)
+=
+\int_{X\times Y}|f|\,d(\mu\times\nu)
+&lt;\infty.
+\]
+
+<p>因此对几乎处处的 \(x\)，内部积分 \(\int_Y |f(x,y)|\,d\nu(y)\) 有限，也就是说 \(f(x,\cdot)\in L^1(Y)\)。同理几乎处处的 \(y\) 也成立。</p>
+
+<p>然后对 \(f^+\) 和 \(f^-\) 分别用 Tonelli：</p>
+
+\[
+\int_{X\times Y}f^+\,d(\mu\times\nu)
+=
+\int_X\left(\int_Y f^+(x,y)\,d\nu(y)\right)d\mu(x),
+\]
+
+\[
+\int_{X\times Y}f^-\,d(\mu\times\nu)
+=
+\int_X\left(\int_Y f^-(x,y)\,d\nu(y)\right)d\mu(x).
+\]
+
+<p>两式相减便得到</p>
+
+\[
+\int_{X\times Y}f\,d(\mu\times\nu)
+=
+\int_X\left(\int_Y f(x,y)\,d\nu(y)\right)d\mu(x).
+\]
+
+<p>再交换 \(x,y\) 角色一次，就得到反方向的迭代积分公式。证明完毕。</p>
+
+<p>请把这条定理背成一句最实用的话：<strong>想换积分次序，先别看 \(f\) 本身长什么样，先看 \(\int |f|\) 是否有限。</strong> 真正给你发通行证的，是绝对可积，而不是“看上去应该能抵消”。</p>
+
+<h2 id="sec9-5">9.5 第一个反例：\(\dfrac{xy}{(x^2+y^2)^2}\) 为什么说明 Fubini 不能越权</h2>
+
+<p>现在来看用户要求必须写清的第一个反例：</p>
+
+\[
+f(x,y)=\frac{xy}{(x^2+y^2)^2},
+\qquad (x,y)\in[0,1]^2,
+\]
+
+<p>在原点处把它补成 0 也无济于事，因为真正的麻烦来自原点附近的奇性。这个函数在 \((0,1]^2\) 上是非负的，所以如果你误以为“非负就一定能直接换次序”，那其实你记错了定理：<strong>非负函数适用的是 Tonelli，它允许结果等于 \(+\infty\)；Fubini 处理的是 \(L^1\) 函数。</strong></p>
+
+<p><strong>例题 2.</strong> 计算它的迭代积分，并说明为什么这里不能说“Fubini 成立”。</p>
+
+<p>固定 \(y&gt;0\)。对 \(x\) 积分：</p>
+
+\[
+\int_0^1 \frac{xy}{(x^2+y^2)^2}\,dx.
+\]
+
+<p>令 \(u=x^2+y^2\)，则 \(du=2x\,dx\)。于是</p>
+
+\[
+\int_0^1 \frac{xy}{(x^2+y^2)^2}\,dx
+=
+\frac{y}{2}\int_{y^2}^{1+y^2}u^{-2}\,du
+=
+\frac{y}{2}\left[-u^{-1}\right]_{y^2}^{1+y^2}.
+\]
+
+<p>化简得</p>
+
+\[
+\int_0^1 \frac{xy}{(x^2+y^2)^2}\,dx
+=
+\frac{1}{2y}-\frac{y}{2(1+y^2)}.
+\]
+
+<p>现在再对 \(y\in(0,1]\) 积分。第二项没问题，第一项却在 \(y=0\) 附近像 \(1/(2y)\) 一样爆炸，所以</p>
+
+\[
+\int_0^1\left(\int_0^1 \frac{xy}{(x^2+y^2)^2}\,dx\right)dy
+=\infty.
+\]
+
+<p>由于函数对称，若先对 \(y\) 积再对 \(x\) 积，得到的也是 \(+\infty\)。于是 Tonelli 告诉我们</p>
+
+\[
+\int_{[0,1]^2} \frac{xy}{(x^2+y^2)^2}\,d(\lambda\times\lambda)=\infty.
+\]
+
+<p>你看，真正该说的是：</p>
+
+<ul>
+  <li>Tonelli 适用，因为函数非负可测；</li>
+  <li>结果是 \(+\infty\)；</li>
+  <li>Fubini 不适用，因为它要求 \(f\in L^1\)，这里显然不满足。</li>
+</ul>
+
+<p>所以这个反例的意义不是“Fubini 定理说错了”，而是“你不能把 Fubini 的前提偷成‘看起来可以算’”。</p>
+
+<h2 id="sec9-6">9.6 第二个反例：不可积时，积分次序真的会给出不同答案</h2>
+
+<p>上一节的函数是非负的，所以两种次序都给 \(+\infty\)。更尖锐的反例是：函数并非绝对可积，但每一道内层积分单看都能算，结果却因为次序不同而不同。经典样本是</p>
+
+\[
+g(x,y)=\frac{x^2-y^2}{(x^2+y^2)^2},
+\qquad (x,y)\in[0,1]^2,
+\]
+
+<p>同样在原点外定义，原点处随便补值也无关紧要。</p>
+
+<p><strong>例题 3.</strong> 计算两种迭代积分，说明它们为什么不同。</p>
+
+<p>先固定 \(y&gt;0\)，对 \(x\) 积分。注意到</p>
+
+\[
+\frac{d}{dx}\left(\frac{x}{x^2+y^2}\right)
+=
+\frac{y^2-x^2}{(x^2+y^2)^2}.
+\]
+
+<p>因此</p>
+
+\[
+\frac{x^2-y^2}{(x^2+y^2)^2}
+=
+-\frac{d}{dx}\left(\frac{x}{x^2+y^2}\right).
+\]
+
+<p>于是</p>
+
+\[
+\int_0^1 g(x,y)\,dx
+=
+-\left[\frac{x}{x^2+y^2}\right]_{0}^{1}
+=
+-\frac{1}{1+y^2}.
+\]
+
+<p>再对 \(y\) 积分：</p>
+
+\[
+\int_0^1\left(\int_0^1 g(x,y)\,dx\right)dy
+=
+-\int_0^1 \frac{1}{1+y^2}\,dy
+=
+-\arctan(1)
+=-\frac{\pi}{4}.
+\]
+
+<p>现在反过来。固定 \(x&gt;0\)，对 \(y\) 积分。因为</p>
+
+\[
+\frac{d}{dy}\left(\frac{y}{x^2+y^2}\right)
+=
+\frac{x^2-y^2}{(x^2+y^2)^2}
+=g(x,y),
+\]
+
+<p>所以</p>
+
+\[
+\int_0^1 g(x,y)\,dy
+=
+\left[\frac{y}{x^2+y^2}\right]_{0}^{1}
+=
+\frac{1}{1+x^2}.
+\]
+
+<p>再对 \(x\) 积分：</p>
+
+\[
+\int_0^1\left(\int_0^1 g(x,y)\,dy\right)dx
+=
+\int_0^1\frac{1}{1+x^2}\,dx
+=
+\arctan(1)
+=\frac{\pi}{4}.
+\]
+
+<p>于是我们真的得到了两个不同答案：</p>
+
+\[
+\boxed{
+\int_0^1\left(\int_0^1 g(x,y)\,dx\right)dy=-\frac{\pi}{4},
+\qquad
+\int_0^1\left(\int_0^1 g(x,y)\,dy\right)dx=\frac{\pi}{4}.
+}
+\]
+
+<p>这不是悖论，而是对前提的惩罚。因为 \(|g|\) 在原点附近像 \(1/(x^2+y^2)\) 一样不可积，所以 \(g\notin L^1([0,1]^2)\)。一旦绝对可积失效，先积哪一层就会影响你如何“切掉”原点附近那块奇性，因此答案真的可能不同。</p>
+
+<p>这道题最好和上一节对着记。上一节是“非负但发散，所以 Tonelli 给你 \(+\infty\)”；这一节是“有正有负且不绝对可积，所以换次序会改答案”。两者都在说同一句话：<strong>Fubini 不是形式操作，它是一条有前提的定理。</strong></p>
+
+<h2 id="sec9-7">9.7 应用：积分变换为什么总要偷偷借助 Fubini</h2>
+
+<p>最后看一个真正会在后面频繁出现的应用。许多积分变换之所以能算，不是因为你突然有灵感，而是因为你先把被积函数改写成一个二重积分，然后用 Fubini 交换顺序。下面这道题正好把这件事展示得非常透明。</p>
+
+<p><strong>例题 4.</strong> 设 \(s&gt;0\)，证明</p>
+
+\[
+\int_0^\infty e^{-sx}\frac{\sin x}{x}\,dx=\arctan\frac{1}{s}.
+\]
+
+<p>先用一个一元恒等式把 \(\sin x/x\) 改写掉：</p>
+
+\[
+\int_0^1 \cos(tx)\,dt
+=
+\left[\frac{\sin(tx)}{x}\right]_{0}^{1}
+=
+\frac{\sin x}{x}.
+\]
+
+<p>因此原积分可写成</p>
+
+\[
+\int_0^\infty e^{-sx}\left(\int_0^1\cos(tx)\,dt\right)dx.
+\]
+
+<p>现在检查是否可以交换次序。因为</p>
+
+\[
+\left|e^{-sx}\cos(tx)\right|\le e^{-sx},
+\]
+
+<p>而</p>
+
+\[
+\int_0^\infty\int_0^1 e^{-sx}\,dt\,dx
+=
+\int_0^\infty e^{-sx}\,dx
+=
+\frac1s&lt;\infty,
+\]
+
+<p>所以由 Fubini 可交换：</p>
+
+\[
+\int_0^\infty e^{-sx}\frac{\sin x}{x}\,dx
+=
+\int_0^1\left(\int_0^\infty e^{-sx}\cos(tx)\,dx\right)dt.
+\]
+
+<p>内层积分是初等 Laplace 变换。把它当作复指数的实部也行：</p>
+
+\[
+\int_0^\infty e^{-sx}\cos(tx)\,dx
+=
+\Re\int_0^\infty e^{-(s-it)x}\,dx
+=
+\Re\left(\frac{1}{s-it}\right)
+=
+\frac{s}{s^2+t^2}.
+\]
+
+<p>于是</p>
+
+\[
+\int_0^\infty e^{-sx}\frac{\sin x}{x}\,dx
+=
+\int_0^1 \frac{s}{s^2+t^2}\,dt
+=
+\left[\arctan\frac{t}{s}\right]_{0}^{1}
+=
+\arctan\frac1s.
+\]
+
+<p>这道题背后站着两层结构。第一层是 Fubini：没有它，你就不能把 \(\sin x/x\) 先拆成 \(\int_0^1\cos(tx)\,dt\)，再把 \(t\)-积分和 \(x\)-积分交换。第二层是复分析：\(\int_0^\infty e^{-(s-it)x}\,dx=1/(s-it)\) 这一步，本质上已经在调用你在 <a href="../复分析/ch9.html">《复分析读本》第 9 章</a> 里熟悉的“把参数揉进一个复核函数里”的思路。实变量的 Fubini 与复变量的 Cauchy 积分，看起来一横一竖，其实都在干一件事：让复杂积分被更好的结构拆开。</p>
+
+<p>这一章最该带走的第一句话是：非负函数交给 Tonelli，可积函数交给 Fubini。第二句话是：真正允许你换次序的不是手感，而是 \(\int|f|&lt;\infty\)。第三句话是：一旦次序交换有了合法性，积分变换、参数积分、卷积、Fourier 分析都会突然变得像在拼积木，而不是在赌运气。</p>
+
+<hr class="section-end">

@@ -1,10 +1,10 @@
 # Collection of Lifesavers · 普林斯顿读本系列
 
-A seven-volume series of Chinese-language math textbooks in the **Adrian Banner / *Calculus Lifesaver* mold** — every concept developed slowly through internal monologue, every method named, every common pitfall called out.
+A growing series of Chinese-language math textbooks in the **Adrian Banner / *Calculus Lifesaver* mold** — every concept developed slowly through internal monologue, every method named, every common pitfall called out.
 
 **[📖 Read online (GitHub Pages)](https://devloope.github.io/CollectionOfLifesaver/)**
 
-## 七本书
+## 已出版
 
 | 卷 | 书 | 章节数 |
 |---|---|---|
@@ -15,6 +15,7 @@ A seven-volume series of Chinese-language math textbooks in the **Adrian Banner 
 | 第五卷 | 普林斯顿概率统计读本 | 25 章 + 2 附录 |
 | 第六卷 | 普林斯顿偏微分方程读本 | 23 章 + 2 附录 |
 | 第七卷 | 普林斯顿实分析读本 | 24 章 + 2 附录 |
+| 第八卷 | 普林斯顿测度论与高级实分析读本 | 22 章 + 2 附录 |
 
 每章一个独立 HTML 文件（13–50 KB），数学符号用 MathJax 渲染（自动从 CDN 加载）。每本书都有共享的 `styles.css` 和上下章导航。
 

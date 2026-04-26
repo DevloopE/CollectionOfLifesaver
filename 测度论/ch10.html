@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 \(L^p\) 空间：Hölder、Minkowski 与完备性 — 普林斯顿测度论与高级实分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 多元测度与 Fubini-Tonelli</a><a href="ch11.html">下一章 · 第 11 章 \(L^p\) 的对偶：\((L^p)^*=L^q\) 的边界与余波 →</a></nav>
+<h1 id="ch10">第 10 章 \(L^p\) 空间：Hölder、Minkowski 与完备性</h1>
+
+<p>如果说前面几章是在回答“哪些函数可以积分”，那么从这一章开始，问题会悄悄换一个方向：<strong>函数能不能被当成一个空间里的点，而积分能不能变成这个空间里的距离、长度、角度或者大小？</strong></p>
+
+<p>这不是纯抽象爱好。你在 <a href="../实分析/ch24.html">《实分析读本》第 24 章</a> 已经见过 \(L^1\)、\(L^2\)、\(L^\infty\) 的第一眼；在概率论里，\(L^1\) 是可积随机变量，\(L^2\) 是方差有限的随机变量；在偏微分方程里，弱解常常活在某个 \(L^p\) 或 Sobolev 空间里；在 Fourier 分析里，Plancherel 和 Parseval 根本就是 \(L^2\) 语言。也就是说，\(L^p\) 不是“又一批新对象”，而是你前面见过的很多极限、估计、正交、收敛的共同母语。</p>
+
+<p>本章的重点有五个。第一，给出 \(L^p\) 范数与 \(L^\infty\) 的 ess sup 定义。第二，用 Young 不等式推导 Hölder，不靠神来之笔。第三，用 Hölder 推出 Minkowski，也就是 \(L^p\) 里的三角不等式。第四，说明有限测度空间上 \(p&gt;q\) 时为什么 \(L^p\subset L^q\)。第五，明确告诉你：对 \(1\le p\le\infty\)，\(L^p\) 的确是 Banach 空间，但完整完备性证明要留到第 21 章，因为那会需要我们更系统地处理 Cauchy 列。</p>
+
+<h2 id="sec10-1">10.1 为什么函数也该有“长度”</h2>
+
+<p>对向量 \(x=(x_1,\dots,x_n)\)，你很自然会写</p>
+
+\[
+\|x\|_p=\left(\sum_{k=1}^n |x_k|^p\right)^{1/p}.
+\]
+
+<p>如果把有限和换成积分，就得到函数的 \(L^p\) 大小：</p>
+
+\[
+\boxed{
+\|f\|_p=
+\left(\int_X |f|^p\,d\mu\right)^{1/p},
+\qquad 1\le p&lt;\infty.
+}
+\]
+
+<p>这定义看起来只是把求和符号 \(\sum\) 换成了积分号 \(\int\)，但语义变化很大。因为在 \(L^p\) 世界里，两函数只要在零测集之外相等，就被视为同一个点。也就是说，\(L^p(X)\) 里的元素不是具体函数，而是“几乎处处相等”的等价类。</p>
+
+<p>这不是技术挑剔，而是非常自然。假如你在一个点上偷偷把函数值从 1 改成 1000，\(\int |f|^p\) 根本不会变；对积分和几乎所有极限问题来说，这两个函数没有本质区别。于是 \(L^p\) 说：那就别假装有区别了，直接把它们认作同一个元素。</p>
+
+<p>这时“范数等于零”也就必须重新理解。你不能再说 \(\|f\|_p=0\) 推出 \(f\) 在每一点都等于 0；真正正确的话是：</p>
+
+\[
+\boxed{
+\|f\|_p=0
+\iff
+f=0\ \text{几乎处处}.
+}
+\]
+
+<p>一旦接受了这种 a.e. 视角，\(L^p\) 空间立刻开始像熟悉的线性空间：可以加、可以数乘、可以谈收敛、可以谈连续线性泛函。只是现在“距离”不是点对点最大偏差，而是积分意义上的平均偏差。</p>
+
+<p><strong>例题 1.</strong> 在 \((0,1)\) 上考虑 \(f_\alpha(x)=x^{-\alpha}\)，判断它何时属于 \(L^p(0,1)\)。</p>
+
+<p>直接看定义：</p>
+
+\[
+\|f_\alpha\|_p^p=\int_0^1 x^{-\alpha p}\,dx.
+\]
+
+<p>这是一元反常积分。你在 <a href="../实分析/ch16.html">《实分析读本》第 16 章</a> 已经见过结论：</p>
+
+\[
+\int_0^1 x^{-\beta}\,dx&lt;\infty
+\iff
+\beta&lt;1.
+\]
+
+<p>把 \(\beta=\alpha p\) 代入，便得</p>
+
+\[
+f_\alpha\in L^p(0,1)
+\iff
+\alpha p&lt;1
+\iff
+\alpha&lt;\frac1p.
+\]
+
+<p>所以边界恰好在 \(\alpha=1/p\)。这道题特别值钱，因为以后很多“某个奇性到底属不属于 \(L^p\)”的问题，本质上都在做这类指数比较。</p>
+
+<h2 id="sec10-2">10.2 \(L^p\) 范数的第一批基本性质</h2>
+
+<p>对 \(1\le p&lt;\infty\)，\(L^p\) 范数有三条最关键的性质：</p>
+
+\[
+\|cf\|_p=|c|\,\|f\|_p,
+\qquad
+\|f\|_p\ge0,
+\qquad
+\|f+g\|_p\le \|f\|_p+\|g\|_p.
+\]
+
+<p>前两条几乎一眼可见。真正有内容的是第三条，也就是 Minkowski 不等式；它要等到 10.4 节才能证明，因为证明本身要用到 Hölder。</p>
+
+<p>还有一个最常见的小计算，是集合指示函数的范数。若 \(E\in\mathcal M\) 且 \(\mu(E)&lt;\infty\)，那么</p>
+
+\[
+\|\mathbf 1_E\|_p
+=
+\left(\int_X \mathbf 1_E\,d\mu\right)^{1/p}
+=
+\mu(E)^{1/p}.
+\]
+
+<p>所以 \(L^p\) 范数可以被直观地理解成“集合大小的 \(1/p\) 次方”在指示函数上的延伸。这解释了为什么 \(L^2\) 会像欧几里得长度，\(L^1\) 会像总质量，而 \(L^\infty\) 则会变成最大高度。</p>
+
+<p><strong>例题 2.</strong> 设 \(E\) 可测且 \(0&lt;\mu(E)&lt;\infty\)。计算 \(\|\mathbf 1_E\|_p\) 与 \(\|\mathbf 1_E\|_\infty\)。</p>
+
+<p>对 \(1\le p&lt;\infty\)，上面已经算过：</p>
+
+\[
+\|\mathbf 1_E\|_p=\mu(E)^{1/p}.
+\]
+
+<p>而 \(L^\infty\) 的范数是 ess sup。因为 \(\mathbf 1_E\) 在 \(E\) 上等于 1，在补集上等于 0，所以它的本质上确界就是 1：</p>
+
+\[
+\|\mathbf 1_E\|_\infty=1.
+\]
+
+<p>这也说明随着 \(p\) 增大，\(\mu(E)^{1/p}\) 会越来越接近 1；你可以把这看成“\(L^p\) 对高峰越来越敏感，对大面积越来越迟钝”的第一眼直觉。</p>
+
+<h2 id="sec10-3">10.3 Young 不等式怎样推导出 Hölder</h2>
+
+<p>Hölder 不等式是 \(L^p\) 世界的主铰链。它告诉你：一个 \(L^p\) 函数乘上一个 \(L^q\) 函数，会落进 \(L^1\)。而这背后的基本数值估计，其实就是 Young 不等式。</p>
+
+<p>设 \(1&lt;p,q&lt;\infty\) 且</p>
+
+\[
+\frac1p+\frac1q=1.
+\]
+
+<p>这时 \(q\) 叫做 \(p\) 的共轭指数。Young 不等式说：对任意 \(a,b\ge0\)，</p>
+
+\[
+\boxed{
+ab\le \frac{a^p}{p}+\frac{b^q}{q}.
+}
+\]
+
+<p>它的几何意义很漂亮：曲线 \(u\mapsto u^p/p\) 和 \(v\mapsto v^q/q\) 这两种凸增长刚好互相配对，使乘积 \(ab\) 可以被它们控制。若你想看最短证明，可以用凸函数与切线，也可以用初等微积分：固定 \(a\)，考察函数</p>
+
+\[
+\phi(b)=\frac{a^p}{p}+\frac{b^q}{q}-ab.
+\]
+
+<p>有</p>
+
+\[
+\phi'(b)=b^{q-1}-a.
+\]
+
+<p>临界点在 \(b=a^{1/(q-1)}=a^{p-1}\)。代回去可得最小值恰为 0，因此 \(\phi(b)\ge0\)。Young 得证。</p>
+
+<p>现在把它喂给函数。设 \(f\in L^p(X)\)、\(g\in L^q(X)\)，且都不恒为 0。考虑归一化后的非负函数</p>
+
+\[
+F(x)=\frac{|f(x)|}{\|f\|_p},
+\qquad
+G(x)=\frac{|g(x)|}{\|g\|_q}.
+\]
+
+<p>对每个 \(x\) 用 Young：</p>
+
+\[
+F(x)G(x)\le \frac{F(x)^p}{p}+\frac{G(x)^q}{q}.
+\]
+
+<p>积分以后得到</p>
+
+\[
+\int_X \frac{|f(x)g(x)|}{\|f\|_p\|g\|_q}\,d\mu(x)
+\le
+\frac1p\int_X\frac{|f|^p}{\|f\|_p^p}\,d\mu
++
+\frac1q\int_X\frac{|g|^q}{\|g\|_q^q}\,d\mu.
+\]
+
+<p>右边恰好是</p>
+
+\[
+\frac1p+\frac1q=1.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+\int_X |f g|\,d\mu\le \|f\|_p\|g\|_q.
+}
+\]
+
+<p>这就是 Hölder 不等式。边界情形 \(p=1,q=\infty\) 也成立，因为这时</p>
+
+\[
+\int_X |fg|\,d\mu\le \|g\|_\infty\int_X |f|\,d\mu=\|f\|_1\|g\|_\infty.
+\]
+
+<p>Hölder 的价值不是一条漂亮公式，而是它把“两个不同阶的可积性”耦合起来了。很多时候你单看 \(f\) 或单看 \(g\) 都控制不住，但一旦它们的指数正好互为共轭，乘积就突然被压进 \(L^1\)。</p>
+
+<h2 id="sec10-4">10.4 Minkowski 不等式：三角不等式终于站稳</h2>
+
+<p>有了 Hölder，\(L^p\) 真正成为范数空间的最后一块拼图就可以补上了：Minkowski 不等式。</p>
+
+\[
+\boxed{
+\|f+g\|_p\le \|f\|_p+\|g\|_p,
+\qquad 1\le p\le\infty.
+}
+\]
+
+<p>\(p=\infty\) 时很直白，因为本质上确界显然满足</p>
+
+\[
+|f+g|\le |f|+|g|
+\Longrightarrow
+\|f+g\|_\infty\le \|f\|_\infty+\|g\|_\infty.
+\]
+
+<p>真正有内容的是 \(1&lt;p&lt;\infty\)。证明的套路非常值得记熟。设 \(\|f+g\|_p\neq0\)，则</p>
+
+\[
+\|f+g\|_p^p
+=
+\int_X |f+g|^p\,d\mu
+=
+\int_X |f+g|\,|f+g|^{p-1}\,d\mu.
+\]
+
+<p>再用 \(|f+g|\le |f|+|g|\)：</p>
+
+\[
+\|f+g\|_p^p
+\le
+\int_X |f|\,|f+g|^{p-1}\,d\mu
++
+\int_X |g|\,|f+g|^{p-1}\,d\mu.
+\]
+
+<p>现在对每一项应用 Hölder。设 \(q=p/(p-1)\) 是共轭指数，则 \((p-1)q=p\)。因此</p>
+
+\[
+\int_X |f|\,|f+g|^{p-1}\,d\mu
+\le
+\|f\|_p
+\left(\int_X |f+g|^{(p-1)q}\,d\mu\right)^{1/q}
+=
+\|f\|_p\,\|f+g\|_p^{p-1}.
+\]
+
+<p>同理</p>
+
+\[
+\int_X |g|\,|f+g|^{p-1}\,d\mu
+\le
+\|g\|_p\,\|f+g\|_p^{p-1}.
+\]
+
+<p>合起来便得</p>
+
+\[
+\|f+g\|_p^p
+\le
+(\|f\|_p+\|g\|_p)\|f+g\|_p^{p-1}.
+\]
+
+<p>若 \(\|f+g\|_p\neq0\)，两边除以 \(\|f+g\|_p^{p-1}\) 即得 Minkowski；若 \(\|f+g\|_p=0\)，结论更是平凡成立。</p>
+
+<p>这时 \(L^p\) 的三角不等式终于真正被证明了。你可以看到，它不是凭空来的，而是从 Hölder 这条乘积估计里长出来的。也因此，\(L^p\) 世界的很多几何性都要经过 Hölder 这道门。</p>
+
+<p><strong>例题 3.</strong> 说明为什么当 \(0&lt;p&lt;1\) 时，上面的三角不等式会失败。</p>
+
+<p>取两个不交可测集 \(A,B\)，使 \(\mu(A)=\mu(B)=1\)。令</p>
+
+\[
+f=\mathbf 1_A,\qquad g=\mathbf 1_B.
+\]
+
+<p>则</p>
+
+\[
+\|f\|_p=1,\qquad \|g\|_p=1.
+\]
+
+<p>而 \(f+g=\mathbf 1_{A\cup B}\)，且 \(\mu(A\cup B)=2\)，所以</p>
+
+\[
+\|f+g\|_p
+=
+\left(\int_X |f+g|^p\,d\mu\right)^{1/p}
+=
+\left(\mu(A\cup B)\right)^{1/p}
+=2^{1/p}.
+\]
+
+<p>当 \(0&lt;p&lt;1\) 时，\(2^{1/p}&gt;2\)，因此</p>
+
+\[
+\|f+g\|_p=2^{1/p}&gt;2=\|f\|_p+\|g\|_p.
+\]
+
+<p>所以 \(0&lt;p&lt;1\) 时这不是范数，只是一个 quasi-norm。这个小反例也提醒你：\(L^p\) 世界的很多好性质，是从 \(p\ge1\) 才开始的。</p>
+
+<h2 id="sec10-5">10.5 \(p=\infty\)：本质上确界到底在忽略什么</h2>
+
+<p>当 \(p\) 走到无穷大时，\(\left(\int |f|^p\right)^{1/p}\) 不再是直接可用的定义；它的极限对象变成了本质上确界：</p>
+
+\[
+\boxed{
+\|f\|_\infty
+=
+\operatorname*{ess\,sup}_{x\in X}|f(x)|
+=
+\inf\{M\ge0:\mu(\{|f|&gt;M\})=0\}.
+}
+\]
+
+<p>这个定义最容易被误读的地方在“ess”那三个字母。它不是普通 sup，而是“除了零测集之外，函数最多能有多大”。也就是说，少数孤立坏点根本不会影响 \(L^\infty\) 范数。</p>
+
+<p><strong>例题 4.</strong> 在 \([0,1]\) 上定义</p>
+
+\[
+f(x)=
+\begin{cases}
+10,&x=\frac12,\\
+1,&x\neq \frac12.
+\end{cases}
+\]
+
+<p>求 \(\|f\|_\infty\) 以及普通上确界 \(\sup f\)。</p>
+
+<p>普通上确界显然是</p>
+
+\[
+\sup_{x\in[0,1]} f(x)=10.
+\]
+
+<p>但 \(L^\infty\) 范数看的是本质上确界。因为集合 \(\{x:|f(x)|&gt;1\}\) 只有一个点 \(\{1/2\}\)，其 Lebesgue 测度为 0，所以 \(M=1\) 已经满足定义中的条件：</p>
+
+\[
+\lambda(\{|f|&gt;1\})=0.
+\]
+
+<p>另一方面，任何 \(M&lt;1\) 都不行，因为这时 \(\{|f|&gt;M\}\) 至少包含整个区间除去一点，测度为 1。于是</p>
+
+\[
+\|f\|_\infty=1.
+\]
+
+<p>这道题最好拿来反复提醒自己：\(L^\infty\) 只对“几乎处处的最大值”负责，不对孤零零几个异常点负责。</p>
+
+<p>这也解释了为什么 \(L^\infty\) 常常特别适合做 PDE 里的最大值估计、概率里的一致有界性、以及分析里的“支配函数”条件。它抓住的是绝大多数地方的高度上界，而不是某几个无关紧要的刺点。</p>
+
+<h2 id="sec10-6">10.6 有限测度下 \(p&gt;q\) 为什么推出 \(L^p\subset L^q\)</h2>
+
+<p>在有限测度空间上，高阶可积性会自动推出低阶可积性。这是 \(L^p\) 世界里非常实用的一条嵌入。</p>
+
+\[
+\boxed{
+\mu(X)&lt;\infty,\ p&gt;q\ge1
+\Longrightarrow
+L^p(X)\subset L^q(X),
+\qquad
+\|f\|_q\le \mu(X)^{1/q-1/p}\|f\|_p.
+}
+\]
+
+<p>证明只用一次 Hölder。设 \(r=p/q&gt;1\)，则其共轭指数为</p>
+
+\[
+r'=\frac{r}{r-1}=\frac{p}{p-q}.
+\]
+
+<p>于是</p>
+
+\[
+\int_X |f|^q\,d\mu
+=
+\int_X |f|^q\cdot 1\,d\mu
+\le
+\left(\int_X |f|^{qr}\,d\mu\right)^{1/r}
+\left(\int_X 1^{r'}\,d\mu\right)^{1/r'}.
+\]
+
+<p>由于 \(qr=p\)，这变成</p>
+
+\[
+\int_X |f|^q\,d\mu
+\le
+\left(\int_X |f|^p\,d\mu\right)^{q/p}\mu(X)^{1-q/p}.
+\]
+
+<p>两边取 \(q\) 次根就得到</p>
+
+\[
+\|f\|_q\le \mu(X)^{1/q-1/p}\|f\|_p.
+\]
+
+<p>这条不等式说明：在有限测度空间上，\(p\) 越大，要求其实越强；能进 \(L^p\) 的函数自动也能进所有较小指数的 \(L^q\)。</p>
+
+<p>但请千万别把这结论带到无限测度空间去。那时事情会变得很不一样。</p>
+
+<p><strong>例题 5.</strong> 在 \(\mathbb R\) 上取</p>
+
+\[
+f(x)=\frac{1}{(1+|x|)^{3/4}}.
+\]
+
+<p>说明 \(f\in L^2(\mathbb R)\) 但 \(f\notin L^1(\mathbb R)\)。</p>
+
+<p>先看 \(L^2\)。有</p>
+
+\[
+|f(x)|^2=\frac{1}{(1+|x|)^{3/2}}.
+\]
+
+<p>由于指数 \(3/2&gt;1\)，故</p>
+
+\[
+\int_{\mathbb R}\frac{dx}{(1+|x|)^{3/2}}&lt;\infty.
+\]
+
+<p>所以 \(f\in L^2(\mathbb R)\)。但对 \(L^1\)，</p>
+
+\[
+|f(x)|=\frac{1}{(1+|x|)^{3/4}},
+\]
+
+<p>而指数 \(3/4\le1\)，因此</p>
+
+\[
+\int_{\mathbb R}\frac{dx}{(1+|x|)^{3/4}}=\infty.
+\]
+
+<p>故 \(f\notin L^1(\mathbb R)\)。这说明在无限测度空间上，\(L^p\subset L^q\) 根本不再自动成立。有限测度假设不是装饰，而是嵌入不等式的真正支点。</p>
+
+<h2 id="sec10-7">10.7 \(L^p\) 是 Banach：为什么完备性要留到后面</h2>
+
+<p>到这里我们已经证明了：对 \(1\le p\le\infty\)，\(\|\cdot\|_p\) 至少确实是一个范数。下一步自然是问：这个范数空间完不完备？也就是说，每个 \(L^p\)-Cauchy 列会不会真的收敛到某个 \(L^p\) 函数？</p>
+
+<p>答案是肯定的：</p>
+
+\[
+\boxed{
+1\le p\le\infty
+\Longrightarrow
+L^p(X,\mu)\text{ 是 Banach 空间。}
+}
+\]
+
+<p>不过这里我们先不证明。原因很务实：完整证明要真正动用“从 Cauchy 列构造极限函数”“提取 a.e. 收敛子列”“再用 Fatou 或支配收敛把范数收敛补回去”这整套 machinery。把它放在第 21 章集中处理，会比现在零敲碎打更清楚。</p>
+
+<p>但你已经可以先理解这条定理为什么重要。完备性的意思是：在 \(L^p\) 范数意义下做逼近，不会逼近到空间外面去。多项式逼近、简单函数逼近、卷积光滑化、Fourier 部分和、弱解极限，都需要这个地板够结实。没有完备性，你做的一切 Cauchy 逼近都可能在最后一脚踩空。</p>
+
+<p>这一章最该带走的第一句话是：\(L^p\) 用积分把函数变成了一个真正可度量、可线性化的空间。第二句话是：Young 产出 Hölder，Hölder 产出 Minkowski，所以 \(L^p\) 的几何不是凭空掉下来的。第三句话是：有限测度下 \(p&gt;q\) 推出 \(L^p\subset L^q\)，但在无限测度空间里这条直觉会失效。带着这些结构进入下一章，我们就能开始讨论一个更深的问题：到底哪些连续线性泛函来自积分配对，也就是 \(L^p\) 的对偶空间。</p>
+
+<hr class="section-end">
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 多元测度与 Fubini-Tonelli</a><a href="ch11.html">下一章 · 第 11 章 \(L^p\) 的对偶：\((L^p)^*=L^q\) 的边界与余波 →</a></nav>
+
+</main>
+</body>
+</html>

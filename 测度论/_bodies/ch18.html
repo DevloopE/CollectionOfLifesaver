@@ -1,0 +1,1128 @@
+<h1 id="ch18">第 18 章 傅里叶变换在 \(L^1\) 与 \(L^2\) 上</h1>
+
+<p>如果第 17 章的卷积让你看到“局部平均会把函数磨平”，那么傅里叶变换会让你看到另一件同样震撼的事：<strong>在频率空间里，卷积居然只是一场乘法。</strong> 这就是为什么卷积、热核、Poisson 核、滤波、正交展开会在不同课程里反复冒出来。它们本质上一直在说同一件事，只是坐标系换了。</p>
+
+<p>傅里叶变换在分析里有两条大线索。对 \(L^1\) 来说，它首先是一种“把可积函数拆成频率”的积分变换；此时你能证明 \(\widehat f\) 连续、而且在无穷远处衰减到 0，这就是 Riemann–Lebesgue 引理。对 \(L^2\) 来说，事情更漂亮：傅里叶变换不只是一个算子，而是一个等距同构。它把 \(L^2\) 里的内积、范数、正交结构一并搬到频率空间里去。到了这里，它和<a href="../偏微分方程/ch22.html">《偏微分方程读本》第 22 章</a>的谱观点其实已经是同一种语言。</p>
+
+<p>这一章我们统一采用下面这套规范化：</p>
+
+\[
+\boxed{
+\widehat f(\xi)=\int_{\mathbb R^d}f(x)e^{-2\pi i x\cdot \xi}\,dx,
+\qquad
+f^\vee(x)=\int_{\mathbb R^d}f(\xi)e^{2\pi i x\cdot \xi}\,d\xi.
+}
+\]
+
+<p>这样做的好处是，Plancherel 公式里没有额外常数：</p>
+
+\[
+\|\widehat f\|_2=\|f\|_2.
+\]
+
+<p>如果你在别的书里见过 \(e^{-ix\xi}\) 或 \(1/\sqrt{2\pi}\) 的规范化，不必紧张。那只是常数分配方式不同，骨架完全一样。下一章如果你去看<a href="../复分析/ch15.html">《复分析读本》第 15 章</a>用留数算实积分，也会见到另一种常数写法；你只要在一章内部保持一致，就不会出事。</p>
+
+<h2 id="sec18-1">18.1 从 \(L^1\) 出发：定义、基本估计与第一眼直觉</h2>
+
+<p>先把定义落稳。若 \(f\in L^1(\mathbb R^d)\)，则对每个 \(\xi\in\mathbb R^d\)，被积函数</p>
+
+\[
+x\mapsto f(x)e^{-2\pi i x\cdot \xi}
+\]
+
+<p>仍然可积，因为指数因子模长恒等于 1。于是 \(\widehat f(\xi)\) 对每个 \(\xi\) 都有意义，而且立刻有上界</p>
+
+\[
+|\widehat f(\xi)|
+\le \int_{\mathbb R^d}|f(x)|\,dx
+=\|f\|_1.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{
+f\in L^1(\mathbb R^d)\Longrightarrow \widehat f\in L^\infty(\mathbb R^d),\qquad
+\|\widehat f\|_\infty\le \|f\|_1.
+}
+\]
+
+<p>这条估计看似简单，其实已经很重要。它说明傅里叶变换至少不会把 \(L^1\) 函数炸到点态无穷大。再往下一步，你会发现 \(\widehat f\) 甚至是连续的。若 \(\xi_n\to\xi\)，则对每个 \(x\)，</p>
+
+\[
+f(x)e^{-2\pi i x\cdot \xi_n}\to f(x)e^{-2\pi i x\cdot \xi},
+\]
+
+<p>并且绝对值始终被 \(|f(x)|\) 支配。由支配收敛定理，</p>
+
+\[
+\widehat f(\xi_n)\to \widehat f(\xi).
+\]
+
+<p>所以</p>
+
+\[
+\boxed{
+f\in L^1(\mathbb R^d)\Longrightarrow \widehat f\in C_0(\mathbb R^d)\ \text{的第一半：至少先连续。}
+}
+\]
+
+<p>这里我故意说“第一半”，因为真正的 \(C_0\) 还差“无穷远处趋于 0”。那正是 Riemann–Lebesgue 引理要补上的一脚。</p>
+
+<p><strong>例题 1.</strong> 在一维上令 \(f=\mathbf 1_{[-a,a]}\)（\(a&gt;0\)）。计算 \(\widehat f\)。</p>
+
+\[
+\widehat f(\xi)=\int_{-a}^a e^{-2\pi i x\xi}\,dx.
+\]
+
+<p>若 \(\xi\neq 0\)，直接积分：</p>
+
+\[
+\widehat f(\xi)
+=\left[\frac{e^{-2\pi i x\xi}}{-2\pi i \xi}\right]_{-a}^{a}
+=\frac{e^{-2\pi i a\xi}-e^{2\pi i a\xi}}{-2\pi i \xi}
+=\frac{\sin(2\pi a\xi)}{\pi \xi}.
+\]
+
+<p>若 \(\xi=0\)，则</p>
+
+\[
+\widehat f(0)=\int_{-a}^a 1\,dx=2a.
+\]
+
+<p>所以统一写成</p>
+
+\[
+\boxed{
+\widehat{\mathbf 1_{[-a,a]}}(\xi)=
+\begin{cases}
+\dfrac{\sin(2\pi a\xi)}{\pi \xi},&\xi\neq 0,\\[8pt]
+2a,&\xi=0.
+\end{cases}
+}
+\]
+
+<p>这条公式很值得你多看一眼。原函数是一个硬边界的盒子，变换后变成了缓慢衰减、带振荡的 sinc 型函数。它已经在暗示一条“粗糙与高频”原则：物理空间里越有尖角，频率空间里衰减越慢。</p>
+
+<h2 id="sec18-2">18.2 两个标准例子：sinc 与 Gaussian</h2>
+
+<p>刚才的区间指标函数给了你第一个图像。第二个必须看的例子是 Gaussian。它在傅里叶理论里就像单位圆在复分析里那样基础。</p>
+
+<p>先取一维标准 Gaussian</p>
+
+\[
+\gamma(x)=e^{-\pi x^2}.
+\]
+
+<p>它的神奇之处在于：傅里叶变换之后还是自己。</p>
+
+\[
+\boxed{
+\widehat\gamma(\xi)=e^{-\pi \xi^2}.
+}
+\]
+
+<p>证明有很多条路。这里给你最经典的一条。先设</p>
+
+\[
+I(\xi)=\int_{\mathbb R}e^{-\pi x^2}e^{-2\pi i x\xi}\,dx.
+\]
+
+<p>对 \(\xi\) 求导，形式上得到</p>
+
+\[
+I'(\xi)=\int_{\mathbb R}(-2\pi i x)e^{-\pi x^2}e^{-2\pi i x\xi}\,dx.
+\]
+
+<p>把 \(x e^{-\pi x^2}\) 改写成导数：</p>
+
+\[
+\frac{d}{dx}e^{-\pi x^2}=-2\pi x e^{-\pi x^2},
+\qquad
+x e^{-\pi x^2}=-\frac1{2\pi}\frac{d}{dx}e^{-\pi x^2}.
+\]
+
+<p>代回去并分部积分，边界项因 Gaussian 快速衰减而消失：</p>
+
+\[
+I'(\xi)
+=
+i\int_{\mathbb R}\frac{d}{dx}\bigl(e^{-\pi x^2}\bigr)e^{-2\pi i x\xi}\,dx
+=
+i\cdot (2\pi i \xi)\int_{\mathbb R}e^{-\pi x^2}e^{-2\pi i x\xi}\,dx.
+\]
+
+<p>所以</p>
+
+\[
+I'(\xi)=-2\pi \xi\,I(\xi).
+\]
+
+<p>这是一阶 ODE，解为</p>
+
+\[
+I(\xi)=Ce^{-\pi \xi^2}.
+\]
+
+<p>把 \(\xi=0\) 代入，利用熟悉的 Gaussian 积分</p>
+
+\[
+I(0)=\int_{\mathbb R}e^{-\pi x^2}\,dx=1,
+\]
+
+<p>得到 \(C=1\)。于是 \(\widehat\gamma=\gamma\)。</p>
+
+<p>多维情形也一样，因为</p>
+
+\[
+e^{-\pi |x|^2}
+=\prod_{j=1}^d e^{-\pi x_j^2},
+\]
+
+<p>而积分可拆成坐标乘积，所以</p>
+
+\[
+\widehat{e^{-\pi |x|^2}}(\xi)=e^{-\pi |\xi|^2}.
+\]
+
+<p><strong>例题 2.</strong> 利用上面的结果，求</p>
+
+\[
+\widehat{\gamma_\varepsilon}(\xi),
+\qquad
+\gamma_\varepsilon(x)=\varepsilon^{-d/2}e^{-\pi |x|^2/\varepsilon}.
+\]
+
+<p>把 \(\gamma_\varepsilon\) 写成缩放形式：</p>
+
+\[
+\gamma_\varepsilon(x)=\varepsilon^{-d/2}\gamma\!\left(\frac{x}{\sqrt\varepsilon}\right).
+\]
+
+<p>傅里叶变换对缩放的规则是</p>
+
+\[
+\widehat{f(ax)}(\xi)=|a|^{-d}\widehat f\!\left(\frac{\xi}{a}\right),
+\]
+
+<p>因此</p>
+
+\[
+\widehat{\gamma_\varepsilon}(\xi)
+=e^{-\pi\varepsilon |\xi|^2}.
+\]
+
+<p>这就是第 17 章近似恒等式里最常用的 Gaussian 核。下一节反演公式里，它会直接变成 Abel 型平滑截断。</p>
+
+<p>到这里你已经见到两端：硬边界的区间指标函数变成慢衰减的 sinc，超平滑的 Gaussian 变换后仍然是超平滑的 Gaussian。傅里叶分析里最重要的直觉之一，就是这种“光滑度与频率衰减”之间的交换关系。</p>
+
+<h2 id="sec18-3">18.3 Riemann–Lebesgue 引理：\(L^1\) 函数的频谱一定往远处掉</h2>
+
+<p>现在补完第 18.1 节欠下的那一半：若 \(f\in L^1\)，则 \(\widehat f(\xi)\to 0\) 当 \(|\xi|\to\infty\)。这就是 Riemann–Lebesgue 引理。</p>
+
+\[
+\boxed{
+f\in L^1(\mathbb R^d)
+\Longrightarrow
+\widehat f(\xi)\to 0
+\quad\text{as }|\xi|\to\infty.
+}
+\]
+
+<p>证明最干净的一条路，是先对紧支撑光滑函数做分部积分，再用第 17 章的稠密性推广到一般 \(L^1\) 函数。</p>
+
+<p>先看一维、\(f\in C_c^1(\mathbb R)\)。对 \(\xi\neq 0\)，分部积分得</p>
+
+\[
+\widehat f(\xi)
+=\int_{\mathbb R}f(x)e^{-2\pi i x\xi}\,dx
+=\frac1{2\pi i\xi}\int_{\mathbb R}f'(x)e^{-2\pi i x\xi}\,dx,
+\]
+
+<p>边界项因为 \(f\) 紧支撑而消失。于是</p>
+
+\[
+|\widehat f(\xi)|\le \frac{\|f'\|_1}{2\pi |\xi|}\to 0.
+\]
+
+<p>对一般 \(f\in L^1\)，由第 17 章 \(C_c^\infty\) 在 \(L^1\) 中稠密，任给 \(\varepsilon&gt;0\)，可取 \(g\in C_c^\infty\) 使</p>
+
+\[
+\|f-g\|_1&lt;\varepsilon.
+\]
+
+<p>于是对所有 \(\xi\)，</p>
+
+\[
+|\widehat f(\xi)-\widehat g(\xi)|\le \|f-g\|_1&lt;\varepsilon.
+\]
+
+<p>而 \(\widehat g(\xi)\to 0\)。所以当 \(|\xi|\) 足够大时，</p>
+
+\[
+|\widehat f(\xi)|
+\le |\widehat f(\xi)-\widehat g(\xi)|+|\widehat g(\xi)|
+&lt;2\varepsilon.
+\]
+
+<p>这就证明了引理。</p>
+
+<p>Riemann–Lebesgue 引理的意义非常直接：<strong>\(L^1\) 函数不可能把大量质量永远藏在超高频里。</strong> 它也解释了为什么频率空间适合做逼近：越往外跑的频率，贡献总得慢慢消失。</p>
+
+<p>当然，要小心别过度解读。RL 引理只说趋于 0，不说可积，不说衰减速度，更不说单调。比如第 18.1 节的 sinc 只按 \(1/|\xi|\) 衰减，既不绝对可积，也不特别快。光滑度再高一点，衰减才会更快。</p>
+
+<p><strong>例题 3.</strong> 用 Riemann–Lebesgue 引理解释为什么</p>
+
+\[
+\widehat{\mathbf 1_{[-a,a]}}(\xi)=\frac{\sin(2\pi a\xi)}{\pi\xi}
+\]
+
+<p>虽然一直振荡，却仍然趋于 0。</p>
+
+<p>这题直接从显式公式当然看得出：</p>
+
+\[
+\left|\frac{\sin(2\pi a\xi)}{\pi\xi}\right|
+\le \frac1{\pi|\xi|}
+\to 0.
+\]
+
+<p>但更重要的是，它吻合 RL 引理的普遍结论，因为 \(\mathbf 1_{[-a,a]}\in L^1\)。你该从这里学到的不是“这题会算”，而是“只要原函数可积，它的频谱总会在无穷远处掉下去；显式公式只是在某个特殊例子里把这件事写得更具体”。</p>
+
+<h2 id="sec18-4">18.4 反演公式：足够好的函数可以被频谱完整重建</h2>
+
+<p>光知道 \(\widehat f\) 存在还不够，真正值钱的是能不能反过来把 \(f\) 从 \(\widehat f\) 重建出来。对足够光滑、衰减足够快的函数，答案是肯定的。</p>
+
+\[
+\boxed{
+f,\widehat f\in L^1(\mathbb R^d)
+\Longrightarrow
+f(x)=\int_{\mathbb R^d}\widehat f(\xi)e^{2\pi i x\cdot \xi}\,d\xi
+\quad\text{对 }f\text{ 的每个 Lebesgue 点 }x.
+}
+\]
+
+<p>这已经比“足够光滑”更强一点了；为了叙述干净，我们就用这一版。证明思路和第 17 章软化器几乎一模一样，只不过这次软化发生在频率空间。</p>
+
+<p>取 Gaussian 截断因子 \(e^{-\pi\varepsilon |\xi|^2}\)，定义</p>
+
+\[
+I_\varepsilon(x)
+=
+\int_{\mathbb R^d}e^{-\pi\varepsilon |\xi|^2}\widehat f(\xi)e^{2\pi i x\cdot \xi}\,d\xi.
+\]
+
+<p>因为 \(\widehat f\in L^1\)，这个积分绝对收敛。又由于</p>
+
+\[
+\widehat{\gamma_\varepsilon}(\xi)=e^{-\pi\varepsilon |\xi|^2},
+\]
+
+<p>把第 17 章的卷积–乘法直觉先借来用，应该期待 \(I_\varepsilon=f*\gamma_\varepsilon\)。这可以直接验证：</p>
+
+\[
+I_\varepsilon(x)
+=
+\int_{\mathbb R^d}\left(\int_{\mathbb R^d}f(y)e^{-2\pi i y\cdot \xi}\,dy\right)e^{-\pi\varepsilon |\xi|^2}e^{2\pi i x\cdot \xi}\,d\xi.
+\]
+
+<p>由 Fubini 交换积分，得到</p>
+
+\[
+I_\varepsilon(x)
+=
+\int_{\mathbb R^d}f(y)\left(\int_{\mathbb R^d}e^{-\pi\varepsilon |\xi|^2}e^{2\pi i (x-y)\cdot \xi}\,d\xi\right)dy
+=
+\int_{\mathbb R^d}f(y)\gamma_\varepsilon(x-y)\,dy.
+\]
+
+<p>也就是</p>
+
+\[
+I_\varepsilon(x)=(f*\gamma_\varepsilon)(x).
+\]
+
+<p>现在第 17 章的近似恒等式立刻接管：当 \(\varepsilon\downarrow 0\)，对每个 Lebesgue 点 \(x\)，</p>
+
+\[
+(f*\gamma_\varepsilon)(x)\to f(x).
+\]
+
+<p>另一方面，由支配收敛，若 \(\widehat f\in L^1\)，则</p>
+
+\[
+I_\varepsilon(x)\to \int_{\mathbb R^d}\widehat f(\xi)e^{2\pi i x\cdot \xi}\,d\xi.
+\]
+
+<p>合起来就是反演公式。</p>
+
+<p>你看见了没有？这里真正的发动机根本不是某个神秘的“傅里叶魔法”，而仍然是第 17 章的近似恒等式。Gaussian 既在物理空间里是一团平滑核，也在频率空间里是一团平滑截断；两边正好互相咬住。</p>
+
+<p><strong>例题 4.</strong> 用反演公式求三角帽函数</p>
+
+\[
+T(x)=
+\begin{cases}
+1-|x|,&|x|\le 1,\\[4pt]
+0,&|x|&gt;1
+\end{cases}
+\]
+
+<p>的傅里叶变换。</p>
+
+<p>注意到第 17 章例题 1 已经算过</p>
+
+\[
+T=\mathbf 1_{[0,1]}*\mathbf 1_{[0,1]}
+\]
+
+<p>只差一个平移；更对称的写法是</p>
+
+\[
+T=\mathbf 1_{[-1/2,1/2]}*\mathbf 1_{[-1/2,1/2]}.
+\]
+
+<p>由第 18.1 节，</p>
+
+\[
+\widehat{\mathbf 1_{[-1/2,1/2]}}(\xi)=\frac{\sin(\pi\xi)}{\pi\xi}.
+\]
+
+<p>下一节我们会严格证明卷积定理；先把结果借来一用：</p>
+
+\[
+\widehat T(\xi)=\left(\frac{\sin(\pi\xi)}{\pi\xi}\right)^2.
+\]
+
+<p>这题特别适合你记住一句话：<strong>卷积一次，频谱就平方一次。</strong> 物理空间里函数变平，频率空间里高频被压得更狠，这两件事是同一枚硬币的两面。</p>
+
+<h2 id="sec18-5">18.5 卷积对偶：在 \(x\)-空间里卷，在频率空间里乘</h2>
+
+<p>现在正式把刚才借用过的结论证明出来。设 \(f,g\in L^1(\mathbb R^d)\)。则 \(f*g\in L^1\)，并且</p>
+
+\[
+\boxed{
+\widehat{f*g}(\xi)=\widehat f(\xi)\,\widehat g(\xi).
+}
+\]
+
+<p>证明非常短，只要 Fubini 可以用：</p>
+
+\[
+\widehat{f*g}(\xi)
+=
+\int_{\mathbb R^d}\left(\int_{\mathbb R^d}f(x-y)g(y)\,dy\right)e^{-2\pi i x\cdot\xi}\,dx.
+\]
+
+<p>交换积分次序：</p>
+
+\[
+=
+\int_{\mathbb R^d}g(y)\left(\int_{\mathbb R^d}f(x-y)e^{-2\pi i x\cdot\xi}\,dx\right)dy.
+\]
+
+<p>令 \(z=x-y\)，则 \(x=z+y\)，于是</p>
+
+\[
+\int_{\mathbb R^d}f(x-y)e^{-2\pi i x\cdot\xi}\,dx
+=
+\int_{\mathbb R^d}f(z)e^{-2\pi i (z+y)\cdot\xi}\,dz
+=
+e^{-2\pi i y\cdot\xi}\widehat f(\xi).
+\]
+
+<p>代回去：</p>
+
+\[
+\widehat{f*g}(\xi)
+=
+\widehat f(\xi)\int_{\mathbb R^d}g(y)e^{-2\pi i y\cdot\xi}\,dy
+=
+\widehat f(\xi)\widehat g(\xi).
+\]
+
+<p>完全证毕。</p>
+
+<p>在足够好条件下，乘法也会对偶成卷积：</p>
+
+\[
+\widehat{fg}=\widehat f * \widehat g.
+\]
+
+<p>这两条对偶关系几乎解释了傅里叶分析一半以上的现象。滤波器为什么要在频率空间里设计？因为你想做的平滑、微分、反问题正则化，到了频率空间里往往只剩乘法。热方程为什么会这么适合 Fourier 变换？因为 Laplacian 的卷积核到了频率空间里立刻对角化。你在<a href="../偏微分方程/ch13.html">《偏微分方程读本》第 13 章</a>看到的“微分变乘法”，正是这条思想的 PDE 版本。</p>
+
+<p><strong>例题 5.</strong> 计算 Poisson 核</p>
+
+\[
+P_a(x)=\frac{a}{\pi(a^2+x^2)},\qquad a&gt;0
+\]
+
+<p>的一维傅里叶变换，并说明它为什么和复分析的留数法自然相连。</p>
+
+<p>因为 \(P_a\) 是偶函数，</p>
+
+\[
+\widehat{P_a}(\xi)=2\int_0^\infty \frac{a}{\pi(a^2+x^2)}\cos(2\pi x\xi)\,dx.
+\]
+
+<p>这个实积分正是<a href="../复分析/ch15.html">《复分析读本》第 15 章</a>里留数法的标准菜。把</p>
+
+\[
+\int_{-\infty}^{\infty}\frac{a}{\pi(a^2+x^2)}e^{-2\pi i x\xi}\,dx
+\]
+
+<p>补成上半圆或下半圆围道，取决于 \(\xi\) 的符号。若 \(\xi&gt;0\)，闭合到下半平面，拾取极点 \(z=-ia\)；若 \(\xi&lt;0\)，闭合到上半平面，拾取极点 \(z=ia\)。两种情形最后都给出</p>
+
+\[
+\widehat{P_a}(\xi)=e^{-2\pi a|\xi|}.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{
+\widehat{P_a}(\xi)=e^{-2\pi a|\xi|}.
+}
+\]
+
+<p>这条公式极其重要。它说明 Poisson 核在频率空间里就是指数型阻尼，高频模态按 \(e^{-2\pi a|\xi|}\) 衰减。你在<a href="../复分析/ch19.html">《复分析读本》第 19 章</a>看到的调和延拓，也可以从这里得到完全等价的频率解释。</p>
+
+<h2 id="sec18-6">18.6 Plancherel 等距：\(L^2\) 世界里长度一分不差</h2>
+
+<p>到这里为止，傅里叶变换还是 \(L^1\) 上的积分变换。现在进入真正的主戏：\(L^2\)。在这个空间里，傅里叶变换不是单纯“定义出来”的，而是可以延拓成一个等距算子，甚至是酉算子。</p>
+
+<p>先从好函数开始。若 \(f,g\in C_c^\infty(\mathbb R^d)\)，则 \(\widehat f,\widehat g\in L^1\cap L^2\)。用刚才的反演公式，对 \(g\) 写</p>
+
+\[
+g(x)=\int_{\mathbb R^d}\widehat g(\xi)e^{2\pi i x\cdot\xi}\,d\xi.
+\]
+
+<p>于是</p>
+
+\[
+\int_{\mathbb R^d}f(x)\overline{g(x)}\,dx
+=
+\int_{\mathbb R^d}f(x)\left(\int_{\mathbb R^d}\overline{\widehat g(\xi)}e^{-2\pi i x\cdot\xi}\,d\xi\right)dx.
+\]
+
+<p>由 Fubini 交换积分次序，得到</p>
+
+\[
+\int_{\mathbb R^d}f(x)\overline{g(x)}\,dx
+=
+\int_{\mathbb R^d}\left(\int_{\mathbb R^d}f(x)e^{-2\pi i x\cdot\xi}\,dx\right)\overline{\widehat g(\xi)}\,d\xi
+=
+\int_{\mathbb R^d}\widehat f(\xi)\overline{\widehat g(\xi)}\,d\xi.
+\]
+
+<p>这就是 Parseval 恒等式的好函数版本：</p>
+
+\[
+\boxed{
+\langle f,g\rangle_{L^2}=\langle \widehat f,\widehat g\rangle_{L^2}
+\qquad (f,g\in C_c^\infty).
+}
+\]
+
+<p>把 \(g=f\) 代进去，立刻得到</p>
+
+\[
+\|\widehat f\|_2=\|f\|_2\qquad (f\in C_c^\infty).
+\]
+
+<p>接下来就轮到第 17 章的稠密性出手了。\(C_c^\infty(\mathbb R^d)\) 在 \(L^2(\mathbb R^d)\) 中稠密，所以对任意 \(f\in L^2\)，取 \(f_n\in C_c^\infty\) 使 \(f_n\to f\) 于 \(L^2\)。由上式，\(\widehat f_n\) 在 \(L^2\) 中也是 Cauchy，于是收敛到某个 \(F\in L^2\)。定义这个 \(F\) 就是 \(f\) 的 \(L^2\) 傅里叶变换。极限不依赖逼近列，因此傅里叶变换延拓成整个 \(L^2\) 上的线性等距映射。</p>
+
+\[
+\boxed{
+\|\,\widehat f\,\|_2=\|f\|_2,\qquad f\in L^2(\mathbb R^d).
+}
+\]
+
+<p>这就是 Plancherel 定理。它说明：在 \(L^2\) 世界里，傅里叶变换完全不损失长度、能量与正交结构。于是频率空间不只是“另一个观察窗口”，而是一个和原空间同样大的 Hilbert 空间。</p>
+
+<p>你现在应该能理解为什么 \(L^2\) 在<a href="../实分析/ch24.html">《实分析读本》第 24 章</a>和本书里总是地位特殊。不是因为 \(2\) 这个数字本身神秘，而是因为只有在 \(L^2\) 里，内积、正交与 Fourier 变换会完美扣在一起。</p>
+
+<p><strong>例题 6.</strong> 用 Plancherel 计算</p>
+
+\[
+\int_{-\infty}^{\infty}\left(\frac{\sin x}{x}\right)^2\,dx.
+\]
+
+<p>取</p>
+
+\[
+f=\mathbf 1_{[-1/2,1/2]}.
+\]
+
+<p>我们已经知道</p>
+
+\[
+\widehat f(\xi)=\frac{\sin(\pi\xi)}{\pi\xi}.
+\]
+
+<p>由 Plancherel，</p>
+
+\[
+\int_{-\infty}^{\infty}\left|\frac{\sin(\pi\xi)}{\pi\xi}\right|^2\,d\xi
+=
+\int_{-\infty}^{\infty}|f(x)|^2\,dx
+=1.
+\]
+
+<p>令 \(x=\pi\xi\)，则 \(d\xi=dx/\pi\)，于是</p>
+
+\[
+\frac1\pi\int_{-\infty}^{\infty}\left(\frac{\sin x}{x}\right)^2\,dx=1.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{
+\int_{-\infty}^{\infty}\left(\frac{\sin x}{x}\right)^2\,dx=\pi.
+}
+\]
+
+<p>这题和<a href="../复分析/ch15.html">《复分析读本》第 15 章</a>用留数法处理 \(\sin x/x\) 的路线完全不同，但最后答案一致。你可以把它当成一个漂亮的对照：复分析在实积分里走围道，傅里叶分析在 \(L^2\) 里走等距。</p>
+
+<h2 id="sec18-7">18.7 \(L^2\) 反演 a.e.：把频谱再送回函数</h2>
+
+<p>既然傅里叶变换在 \(L^2\) 上是等距的，自然想问：它能不能反过来？答案是肯定的。更准确地说，傅里叶变换在 \(L^2(\mathbb R^d)\) 上延拓成一个酉算子，逆算子正是</p>
+
+\[
+f^\vee(x)=\int_{\mathbb R^d}f(\xi)e^{2\pi i x\cdot \xi}\,d\xi
+\]
+
+<p>在 \(L^2\) 意义下的延拓。于是</p>
+
+\[
+(\widehat f)^\vee=f,\qquad \widehat{(f^\vee)}=f
+\quad\text{in }L^2.
+\]
+
+<p>如果只说 \(L^2\) 意义，结论已经很强了。但用户通常还想知道逐点上到底发生了什么。最稳的陈述是：对 \(f\in L^2\)，其 Gaussian 正则化反演</p>
+
+\[
+f_\varepsilon(x)
+=
+\int_{\mathbb R^d}e^{-\pi\varepsilon |\xi|^2}\widehat f(\xi)e^{2\pi i x\cdot \xi}\,d\xi
+\]
+
+<p>在 \(L^2\) 中收敛到 \(f\)，并且对 \(f\) 的几乎处处 Lebesgue 点有</p>
+
+\[
+f_\varepsilon(x)\to f(x).
+\]
+
+<p>为什么？因为</p>
+
+\[
+f_\varepsilon=f*\gamma_\varepsilon,
+\]
+
+<p>而第 17 章已经证明 \(\gamma_\varepsilon\) 是近似恒等式。于是 \(L^2\) 反演的 a.e. 版本，本质上仍然是第 16 章的 Lebesgue 微分定理加第 17 章的软化器逼近。只是这次你是从频率空间绕回来。</p>
+
+<p>这也是为什么我在这一章始终没有把“普通截断反演积分”硬说成对任意 \(L^2\) 函数点态成立。那需要更深的收敛定理。对现代分析来说，Gaussian 或 Cesàro 这样的温和求和方式已经足够稳定，也更自然。</p>
+
+<p>到这里，傅里叶变换的两张脸都齐了。在 \(L^1\) 上，它把可积函数送成连续且趋零的频谱；在 \(L^2\) 上，它甚至是一种不损失长度的坐标变换。卷积在物理空间里是局部平均，在频率空间里只是乘法；平滑在物理空间里是软化器，在频率空间里就是高频阻尼。等你再回头看热方程、Poisson 核、滤波器、弱导数和谱分解，会发现它们并不分散：它们只是同一个傅里叶世界，从不同方向照出来的影子。</p>
+
+<h2 id="sec18-8">18.8 一张真正该背下来的 Fourier 字典</h2>
+
+<p>学到这里，如果你还把傅里叶变换只看成“一个积分公式”，那其实只抓住了一半。真正值钱的是它会把几类最重要的操作，翻译成极其简单的频率动作。下面这张字典你最好真的背下来：</p>
+
+\[
+\boxed{
+\begin{aligned}
+&\text{平移 } \tau_a f(x)=f(x-a)
+&&\Longrightarrow&
+\widehat{\tau_a f}(\xi)=e^{-2\pi i a\cdot \xi}\widehat f(\xi),\\[4pt]
+&\text{调制 } M_bf(x)=e^{2\pi i b\cdot x}f(x)
+&&\Longrightarrow&
+\widehat{M_bf}(\xi)=\widehat f(\xi-b),\\[4pt]
+&\text{伸缩 } f_a(x)=f(ax)
+&&\Longrightarrow&
+\widehat{f_a}(\xi)=|a|^{-d}\widehat f(\xi/a),\\[4pt]
+&\text{微分 } \partial_j f
+&&\Longrightarrow&
+\widehat{\partial_j f}(\xi)=2\pi i \xi_j\,\widehat f(\xi).
+\end{aligned}
+}
+\]
+
+<p>这四条几乎就是整本调和分析的四则运算。平移在频率空间里只会多出一个相位；调制在频率空间里只会平移谱；伸缩会把频谱按相反方向拉伸；微分则干脆变成乘上多项式。你在 PDE 里看到“微分算子被对角化”，本质就是最后一条。</p>
+
+<p>这些公式都能在一行里验证。比如平移：</p>
+
+\[
+\widehat{\tau_a f}(\xi)
+=\int f(x-a)e^{-2\pi i x\cdot\xi}\,dx.
+\]
+
+<p>令 \(y=x-a\)，得到</p>
+
+\[
+\widehat{\tau_a f}(\xi)
+=e^{-2\pi i a\cdot\xi}\int f(y)e^{-2\pi i y\cdot\xi}\,dy
+=e^{-2\pi i a\cdot\xi}\widehat f(\xi).
+\]
+
+<p>微分公式也一样。对足够好 \(f\)，分部积分给出</p>
+
+\[
+\widehat{\partial_j f}(\xi)
+=\int \partial_j f(x)e^{-2\pi i x\cdot\xi}\,dx
+=2\pi i\xi_j\int f(x)e^{-2\pi i x\cdot\xi}\,dx.
+\]
+
+<p>这就是</p>
+
+\[
+\widehat{\partial_j f}(\xi)=2\pi i\xi_j\widehat f(\xi).
+\]
+
+<p>你应该能马上看出它和第 17 章的卷积平滑为什么是天然搭档：卷积在频率空间里是乘法，微分也在频率空间里是乘法，于是“先平滑再微分”和“先微分再平滑”会以最直接的方式兼容。</p>
+
+<p><strong>例题 7.</strong> 设 \(\gamma(x)=e^{-\pi x^2}\)。求函数</p>
+
+\[
+f(x)=e^{2\pi i b x}\gamma(x-a)
+\]
+
+<p>的一维傅里叶变换。</p>
+
+<p>先看平移：\(\gamma(x-a)=\tau_a\gamma(x)\)，所以</p>
+
+\[
+\widehat{\gamma(\cdot-a)}(\xi)=e^{-2\pi i a\xi}\widehat\gamma(\xi).
+\]
+
+<p>又因为 \(\widehat\gamma=\gamma\)，所以</p>
+
+\[
+\widehat{\gamma(\cdot-a)}(\xi)=e^{-2\pi i a\xi}e^{-\pi \xi^2}.
+\]
+
+<p>再施加调制 \(e^{2\pi i b x}\)，频谱整体平移 \(b\)。因此</p>
+
+\[
+\widehat f(\xi)=e^{-2\pi i a(\xi-b)}e^{-\pi (\xi-b)^2}.
+\]
+
+<p>这题很好地演示了 Fourier 字典的机械性：物理空间里“先平移再乘相位”的复杂动作，频率空间里只是“加一个相位因子并平移一个 Gaussian”。熟练以后，你常常根本不必重做积分。</p>
+
+<p>再把这张字典和第 17 章放在一起看，意义就更清楚了。第 17 章里你学会了如何在物理空间里控制卷积、支撑、平滑；这里则是在告诉你，这些操作在频率空间里几乎全都变成了最基本的代数动作。傅里叶分析的威力，从来不只是因为它能算积分，而是因为它提供了一本极其高效的翻译词典。</p>
+
+<h2 id="sec18-9">18.9 为什么 Fourier 天然属于 PDE：热方程与 Poisson 半群</h2>
+
+<p>要看 Fourier 变换为什么不是“只是另一个变换”，最好的办法就是看它对 PDE 做了什么。拿最经典的热方程</p>
+
+\[
+u_t-\Delta u=0,\qquad u(\cdot,0)=u_0
+\]
+
+<p>来说，对空间变量做 Fourier 变换，利用上一节的微分字典，得到</p>
+
+\[
+\partial_t \widehat u(\xi,t)+4\pi^2|\xi|^2\widehat u(\xi,t)=0.
+\]
+
+<p>这已经不是 PDE，而是对每个频率 \(\xi\) 的一条一阶 ODE。解为</p>
+
+\[
+\widehat u(\xi,t)=e^{-4\pi^2 t|\xi|^2}\widehat u_0(\xi).
+\]
+
+<p>于是热方程的整个时间演化，在频率空间里不过是“把每个模态按 \(e^{-4\pi^2 t|\xi|^2}\) 衰减”。频率越高，衰减越快；这就是热方程立刻磨平尖角的真正原因。回到物理空间，利用第 18.2 节 Gaussian 的变换公式，就得到</p>
+
+\[
+u(\cdot,t)=u_0*\Gamma_t,
+\]
+
+<p>其中</p>
+
+\[
+\Gamma_t(x)=(4\pi t)^{-d/2}e^{-|x|^2/(4t)}
+\]
+
+<p>是熟悉的热核。你在<a href="../偏微分方程/ch10.html">《偏微分方程读本》第 10 章</a>已经见过这条公式；现在你知道它为什么这么自然了：不是因为高斯神秘，而是因为频率空间里 ODE 的解就长这样。</p>
+
+<p>Poisson 半群也同样漂亮。若想在上半空间做调和延拓，写</p>
+
+\[
+\partial_t^2 u+\Delta_x u=0,\qquad u(x,0)=f(x),
+\]
+
+<p>对 \(x\) 做 Fourier 变换后，每个频率上得到</p>
+
+\[
+\partial_t^2 \widehat u(\xi,t)-4\pi^2|\xi|^2\widehat u(\xi,t)=0.
+\]
+
+<p>要求 \(t\to\infty\) 不爆炸，就只能保留衰减支：</p>
+
+\[
+\widehat u(\xi,t)=e^{-2\pi t|\xi|}\widehat f(\xi).
+\]
+
+<p>而第 18.5 节已经算过 \(e^{-2\pi t|\xi|}\) 的逆变换正是 Poisson 核 \(P_t\)，所以</p>
+
+\[
+u(\cdot,t)=f*P_t.
+\]
+
+<p>这说明热半群和 Poisson 半群本质上只是两个不同的频率阻尼：</p>
+
+\[
+e^{-4\pi^2 t|\xi|^2}
+\quad\text{和}\quad
+e^{-2\pi t|\xi|}.
+\]
+
+<p>前者对应扩散，后者对应调和延拓。你在<a href="../复分析/ch19.html">《复分析读本》第 19 章</a>看到的 Poisson 积分公式，在这里被彻底翻成了频率语言。</p>
+
+<p><strong>例题 8.</strong> 求热方程</p>
+
+\[
+u_t=\Delta u,\qquad u(x,0)=e^{-\pi |x|^2}
+\]
+
+<p>在 \(\mathbb R^d\) 上的解。</p>
+
+<p>因为初值是 Gaussian，第 18.2 节告诉你</p>
+
+\[
+\widehat{u_0}(\xi)=e^{-\pi |\xi|^2}.
+\]
+
+<p>于是频率空间里的解为</p>
+
+\[
+\widehat u(\xi,t)=e^{-4\pi^2 t|\xi|^2}e^{-\pi |\xi|^2}
+=e^{-\pi(1+4\pi t)|\xi|^2}.
+\]
+
+<p>再利用 Gaussian 的伸缩不变性做逆变换，得到</p>
+
+\[
+u(x,t)=(1+4\pi t)^{-d/2}\exp\!\left(-\frac{\pi |x|^2}{1+4\pi t}\right).
+\]
+
+<p>所以</p>
+
+\[
+\boxed{
+u(x,t)=(1+4\pi t)^{-d/2}\exp\!\left(-\frac{\pi |x|^2}{1+4\pi t}\right).
+}
+\]
+
+<p>这题几乎是 Fourier 变换为 PDE 服务的最纯粹展示：方程、初值、求解、回到实空间，整个流程都没有任何神秘跳步。</p>
+
+<h2 id="sec18-10">18.10 留数法与 Fourier 的握手：同一条频谱，不同的算路</h2>
+
+<p>这一章还应该和<a href="../复分析/ch15.html">《复分析读本》第 15 章</a>真正握一次手。因为很多一维傅里叶变换，最省力的求法根本不是直接积，而是用复平面上的围道积分。这不是两门课偶然碰一下，而是“频谱”与“留数”在同一个问题上从不同方向会师。</p>
+
+<p>最经典的例子是</p>
+
+\[
+f_a(x)=e^{-a|x|},\qquad a&gt;0.
+\]
+
+<p>因为它是偶函数，</p>
+
+\[
+\widehat{f_a}(\xi)=2\int_0^\infty e^{-ax}\cos(2\pi x\xi)\,dx.
+\]
+
+<p>你可以把这积分直接算掉，也可以像复分析里那样看成</p>
+
+\[
+\int_{-\infty}^{\infty} e^{-a|x|}e^{-2\pi i x\xi}\,dx
+\]
+
+<p>并适当拆成正半轴与负半轴。更快的一条路，是利用第 18.5 节的 Poisson 核结果反推。因为</p>
+
+\[
+\widehat{\frac{a}{\pi(a^2+x^2)}}(\xi)=e^{-2\pi a|\xi|},
+\]
+
+<p>对换 \(x\) 与 \(\xi\) 的角色并用反演，就得到</p>
+
+\[
+\widehat{e^{-a|x|}}(\xi)=\frac{2a}{a^2+4\pi^2\xi^2}.
+\]
+
+<p>如果你愿意直接验算，也很快：</p>
+
+\[
+\widehat{f_a}(\xi)
+=\int_0^\infty e^{-(a+2\pi i\xi)x}\,dx+\int_0^\infty e^{-(a-2\pi i\xi)x}\,dx
+=\frac1{a+2\pi i\xi}+\frac1{a-2\pi i\xi}.
+\]
+
+<p>于是</p>
+
+\[
+\boxed{
+\widehat{e^{-a|x|}}(\xi)=\frac{2a}{a^2+4\pi^2\xi^2}.
+}
+\]
+
+<p>你现在可以把第 18 章和第 15 章放在一张纸上对照着看：</p>
+
+<ul>
+  <li>复分析告诉你某些积分怎么最省力地算；</li>
+  <li>傅里叶分析告诉你这些积分为什么会组成一整套频谱字典；</li>
+  <li>PDE 则告诉你这套字典为什么会直接决定方程的演化。</li>
+</ul>
+
+<p>这三条线其实一直在互相喂养。留数法帮你把某些频谱算成闭式，频谱公式再把卷积、平滑、热核、Poisson 核和边值问题全部串起来。你如果只学其中一门，会觉得得到了一把工具；三门一起看，才会发现自己得到的是一套通用坐标系。</p>
+
+<h2 id="sec18-11">18.11 几组标准变换对最好形成肌肉记忆</h2>
+
+<p>学 Fourier 变换时，当然不该把自己训练成查表机器；但有几组最核心的变换对，最好真的看到就能在脑中自动跳出来。因为后面很多复杂对象，都是靠平移、伸缩、卷积、乘法从这些原型生成的。最常用的一张小表是：</p>
+
+\[
+\boxed{
+\begin{aligned}
+\mathbf 1_{[-a,a]}
+&\longleftrightarrow
+\dfrac{\sin(2\pi a\xi)}{\pi\xi},\\[6pt]
+\mathbf 1_{[-1/2,1/2]}*\mathbf 1_{[-1/2,1/2]}
+&\longleftrightarrow
+\left(\dfrac{\sin(\pi\xi)}{\pi\xi}\right)^2,\\[6pt]
+e^{-\pi|x|^2}
+&\longleftrightarrow
+e^{-\pi|\xi|^2},\\[6pt]
+\dfrac{a}{\pi(a^2+x^2)}
+&\longleftrightarrow
+e^{-2\pi a|\xi|},\\[6pt]
+e^{-a|x|}
+&\longleftrightarrow
+\dfrac{2a}{a^2+4\pi^2\xi^2}.
+\end{aligned}
+}
+\]
+
+<p>这张表背后几乎就是一整套经验法则：</p>
+
+<ul>
+  <li>盒子函数有硬边界，所以频谱是慢衰减的 sinc；</li>
+  <li>卷积一次变得更平，频谱就平方一次；</li>
+  <li>Gaussian 是“平滑和局部化的平衡点”，变换后仍然是自己；</li>
+  <li>Poisson 核对应指数衰减频谱，说明调和延拓本质上是低通滤波；</li>
+  <li>指数尖峰 \(e^{-a|x|}\) 对应有理型频谱，说明尖点会拖慢衰减。</li>
+</ul>
+
+<p>这五组原型一旦熟，你看到一个新函数时会自动开始判断：它更像盒子、帽子、Gaussian、Poisson，还是指数尖峰？这种“先看原型亲戚”的习惯，在真正做计算时比生背公式可靠得多。</p>
+
+<p>特别值得多看两眼的是 box 与 tent 这对兄弟。它们一起告诉你一个极实用的原则：<strong>物理空间里每多卷一次，高频就多衰减一阶。</strong> 因为</p>
+
+\[
+\widehat{f*f}=(\widehat f)^2.
+\]
+
+<p>所以只要你能把一个粗糙对象写成若干简单核的卷积，频谱上的衰减规律就会立刻显形。这也是为什么样条、B-spline、FEM 形函数背后总能看到卷积的影子。</p>
+
+<p>另一个非常值得记住的原型是 Poisson 核与 Cauchy 分布。它把概率、复分析和 PDE 真正压成一句话：边界调和延拓、稳定分布、指数型频率阻尼，其实是同一个对象在三种语言里的名字。</p>
+
+<h2 id="sec18-12">18.12 光滑度与频率衰减：为什么高阶导数会换来更快的掉尾巴</h2>
+
+<p>第 18.3 节的 Riemann–Lebesgue 引理只说了一句最基础的话：\(f\in L^1\) 会导致 \(\widehat f(\xi)\to 0\)。但它没有告诉你掉得有多快。真正决定衰减速度的，是 \(f\) 的光滑度。这个原则是傅里叶分析里最应该形成直觉的一句话：</p>
+
+\[
+\boxed{
+\text{物理空间里越光滑，频率空间里衰减越快；反过来，频率衰减越快，物理空间里通常越平滑。}
+}
+\]
+
+<p>最直接的版本来自反复分部积分。若一维函数 \(f\) 满足 \(f,f',\dots,f^{(m)}\in L^1(\mathbb R)\)，则对 \(\xi\neq 0\)，</p>
+
+\[
+\widehat f(\xi)
+=\frac{1}{(2\pi i\xi)^m}\widehat{f^{(m)}}(\xi).
+\]
+
+<p>于是</p>
+
+\[
+|\widehat f(\xi)|
+\le
+\frac{\|f^{(m)}\|_1}{(2\pi |\xi|)^m}.
+\]
+
+<p>也就是</p>
+
+\[
+\boxed{
+f^{(m)}\in L^1
+\Longrightarrow
+\widehat f(\xi)=O(|\xi|^{-m}).
+}
+\]
+
+<p>这条估计为什么值钱？因为它一眼解释了前面所有原型的性格：</p>
+
+<ul>
+  <li>区间指标函数只有 0 阶 \(L^1\) 正则性，故只能靠 RL 引理知道趋零，显式上确实只有 \(1/|\xi|\) 级衰减；</li>
+  <li>帐篷函数是一阶分段光滑，频谱衰减到 \(1/|\xi|^2\)；</li>
+  <li>Gaussian 有所有阶导数，所以比任何幂次都衰减得快；</li>
+  <li>\(e^{-a|x|}\) 在 0 处有尖点，所以只能得到二次有理型衰减。</li>
+</ul>
+
+<p>反方向也成立一部分。若 \((1+|\xi|)^m\widehat f(\xi)\in L^1\)，则反演积分可以逐次对 \(x\) 求导，从而得到 \(f\in C^m\)，并且</p>
+
+\[
+\partial^\alpha f(x)
+=
+\int_{\mathbb R^d}(2\pi i\xi)^\alpha \widehat f(\xi)e^{2\pi i x\cdot\xi}\,d\xi,
+\qquad |\alpha|\le m.
+\]
+
+<p>也就是说，频率空间里的可积权重会被翻译成物理空间里的可微性。你现在应该能更深地理解第 17 章软化器为什么有效了：把 \(\widehat f\) 乘上一个快速衰减核，等于在物理空间里把 \(f\) 卷上一团极光滑核，于是可微性会被批量制造出来。</p>
+
+<p><strong>例题 9.</strong> 用分部积分估计说明：若 \(f\in C_c^2(\mathbb R)\)，则</p>
+
+\[
+\widehat f(\xi)=O(|\xi|^{-2}).
+\]
+
+<p>因为 \(f\) 紧支撑，两次分部积分都没有边界项。第一次给出</p>
+
+\[
+\widehat f(\xi)=\frac{1}{2\pi i\xi}\widehat{f'}(\xi),
+\]
+
+<p>第二次再给出</p>
+
+\[
+\widehat{f'}(\xi)=\frac{1}{2\pi i\xi}\widehat{f''}(\xi).
+\]
+
+<p>因此</p>
+
+\[
+\widehat f(\xi)=\frac{1}{(2\pi i\xi)^2}\widehat{f''}(\xi).
+\]
+
+<p>取绝对值并用 \(L^1\to L^\infty\) 估计：</p>
+
+\[
+|\widehat f(\xi)|
+\le
+\frac{\|f''\|_1}{(2\pi |\xi|)^2},
+\]
+
+<p>所以 \(\widehat f(\xi)=O(|\xi|^{-2})\)。这条估计和第 17 章三角帽函数的显式公式完全同调：一个多卷了一次、也多平滑了一层的对象，频谱衰减就多出一个幂次。</p>
+
+<p>从这里再向前一步，就会进入 Sobolev 空间与 Fourier 乘子的世界。那时“有 \(s\) 阶导数”会被重新写成“\((1+|\xi|^2)^{s/2}\widehat f\in L^2\)”。你现在虽然还没正式进那扇门，但门把手其实已经在手里了：它就是这一节建立起来的“光滑度 \(\leftrightarrow\) 频率衰减”字典。</p>
+
+<h2 id="sec18-13">18.13 乘子观点：为什么很多算子在频率空间里像对角矩阵</h2>
+
+<p>把第 18 章真正吃透的最后一步，是把傅里叶变换从“积分变换”升级成“对角化工具”。在有限维线性代数里，你特别喜欢找一组基，使线性算子变成对角矩阵；在无穷维函数世界里，傅里叶变换常常就在扮演这件事。所谓 Fourier 乘子，就是指那些在频率空间里只做乘法的算子：</p>
+
+\[
+\widehat{Tf}(\xi)=m(\xi)\widehat f(\xi).
+\]
+
+<p>这里 \(m(\xi)\) 称为符号或乘子。你一旦知道了 \(m\)，算子 \(T\) 的很多性质就会直接显形。比如：</p>
+
+\[
+\partial_j
+\Longleftrightarrow
+2\pi i\xi_j,
+\qquad
+-\Delta
+\Longleftrightarrow
+4\pi^2|\xi|^2,
+\qquad
+(I-\Delta)^{-1}
+\Longleftrightarrow
+\frac1{1+4\pi^2|\xi|^2}.
+\]
+
+<p>这就是为什么说 Fourier 把微分算子“对角化”了。微分在实空间里是局部但纠缠的操作；到了频率空间，它只剩下乘以一个显式函数。你在<a href="../偏微分方程/ch22.html">《偏微分方程读本》第 22 章</a>看到的谱观点，其实正是这件事的结构化版本。</p>
+
+<p>这种视角的威力，拿一个最简单的椭圆方程就能看清。考虑</p>
+
+\[
+(I-\Delta)u=f\qquad \text{on }\mathbb R^d.
+\]
+
+<p>对两边做 Fourier 变换，得到</p>
+
+\[
+\bigl(1+4\pi^2|\xi|^2\bigr)\widehat u(\xi)=\widehat f(\xi).
+\]
+
+<p>于是如果你愿意，就可以直接定义</p>
+
+\[
+\widehat u(\xi)=\frac{\widehat f(\xi)}{1+4\pi^2|\xi|^2}.
+\]
+
+<p>这就把求解 PDE 变成了“乘上一个有界衰减乘子”。而这个乘子一眼告诉你两件事：</p>
+
+<ul>
+  <li>高频被压小，所以 \(u\) 比 \(f\) 更平滑；</li>
+  <li>乘子有界，所以 \(L^2\) 范数不会被放大得离谱。</li>
+</ul>
+
+<p>这正是椭圆正则性最原始的频率版直觉。你甚至不用先学 Sobolev 空间，就已经能看见“解比右端更平”的原因：因为高频除以 \(1+4\pi^2|\xi|^2\) 以后被削掉了。</p>
+
+<p>换个角度，第 17 章的卷积核也正可以被看成乘子。若 \(Tf=f*K\)，则</p>
+
+\[
+\widehat{Tf}(\xi)=\widehat K(\xi)\widehat f(\xi).
+\]
+
+<p>所以“卷积算子”与“乘子算子”本来就是一体两面：在物理空间里看，它是平均；在频率空间里看，它是对每个频率模态分别加权。热核、Poisson 核、Gaussian 软化器之所以有那么强的结构统一性，原因就在这里。</p>
+
+<p>这一节真正想让你留下的，不是又多了一个名词，而是一种视角转换：以后只要你看到某个线性算子和微分、卷积、平移不变性有关，就应该本能地问一句“它在频率空间里的乘子是什么”。一旦这个问题会自动跳出来，傅里叶变换才算真的进了你的工具箱，而不只是留在你会背的公式列表里。</p>
+
+<h2 id="sec18-14">18.14 \(L^1\) 与 \(L^2\) 既握手又分家：这正是 Fourier 理论的边界感</h2>
+
+<p>这一章最后再把 \(L^1\) 与 \(L^2\) 的关系专门说清一次。它们在 Fourier 理论里像两位性格完全不同、却又必须合作的主角。</p>
+
+<p>\(L^1\) 世界给你的是点态积分公式。因为 \(f\in L^1\)，你可以逐点定义 \(\widehat f(\xi)\)，可以谈它连续、趋零、可以在 \(\widehat f\in L^1\) 时把反演积分逐点写回去。这里你说的是“每个频率点 \(\xi\)”长什么样。</p>
+
+<p>\(L^2\) 世界给你的是几何结构。因为 \(L^2\) 是 Hilbert 空间，傅里叶变换在这里变成等距同构，Parseval 与 Plancherel 能把长度、内积、正交、能量全部无损搬运过去。这里你说的是“整个频谱作为一个向量”长什么样。</p>
+
+<p>两者的握手区是</p>
+
+\[
+L^1(\mathbb R^d)\cap L^2(\mathbb R^d).
+\]
+
+<p>在这个交集里，你同时拥有点态定义和 \(L^2\) 几何，所以第 18 章很多证明都会先在这里做完：一方面积分可以逐点写，另一方面又能用 Plancherel 的内积结构。然后再借第 17 章的稠密性，把结论往纯 \(L^2\) 世界延拓。</p>
+
+<p>它们分家的地方同样重要。一个函数可以在 \(L^2\) 里但不在 \(L^1\) 里，此时 \(\widehat f\) 仍然作为 \(L^2\) 元素存在，却不一定有你熟悉的逐点积分公式；反过来，一个函数可以在 \(L^1\) 里却不在 \(L^2\) 里，这时你能逐点定义频谱，却未必能谈等距或能量守恒。真正成熟的 Fourier 直觉，恰恰来自这种边界感：<strong>不是所有对象都同时享有 \(L^1\) 的点态好处和 \(L^2\) 的几何好处。</strong></p>
+
+<p>你现在应该能理解为什么很多定理都喜欢写成“先对 \(C_c^\infty\) 或 \(L^1\cap L^2\) 证明，再延拓”。这不是作者偷懒，而是因为那一块正是两个世界最和谐的交叉区。现代分析里最稳的做法，往往不是一开始就硬闯最大一般性，而是先在兼具两套结构的交集上把骨架搭好，再借闭包和密度把房子盖完。</p>
+
+<p>因此，第 18 章最后真正要留下的一句判断其实是：<strong>傅里叶变换从来不只是“一个公式”，它总是在某个函数空间里工作；而你之所以能做某种操作，往往正是因为你站在了对的空间上。</strong> 这也是为什么从 Fourier 走向 Sobolev、乘子、弱收敛和谱理论时，函数空间语言会越来越重。不是因为大家喜欢抽象，而是因为不用空间语言，你根本说不准哪些结论还真。</p>
+
+<h2 id="sec18-15">18.15 收束成一句话：Fourier 变换不是技巧，而是一套坐标系</h2>
+
+<p>学到这里，如果你还把 Fourier 变换理解成“碰到某些积分时可以换过去算一算”，那其实只拿到它最表面的一层。第 18 章真正想建立的是：Fourier 变换提供了一套新的坐标系。在这套坐标系里，卷积变乘法，微分变乘子，平移变相位，调和延拓变指数阻尼，热方程变模态衰减，\(L^2\) 范数变完全不变的长度。你不是学会了另一种计算技巧，而是学会了从另一个方向看同一个函数世界。</p>
+
+<p>也正因为它是一套坐标系，而不是一招独立技术，所以它会把第 17 章的卷积、第 19 章的测度对偶、以及<a href="../偏微分方程/ch13.html">《偏微分方程读本》第 13 章</a>与<a href="../偏微分方程/ch22.html">第 22 章</a>的 Fourier/PDE 谱观点全部串起来。以后你只要遇到平移不变算子、卷积核、滤波器、半群、频率截断、正则化这类词，脑子里都应该本能地问：它在频率空间里长什么样？一旦这个问题开始自动出现，Fourier 变换就不再是你记住的一章内容，而真正成了你思考问题时会主动切换过去的一套语言。</p>
+
+<p>这也是为什么第 18 章学完以后，很多原来看似完全不同的题会突然开始长得相像：算一个实积分、看一个卷积核、求一个 PDE 的基本解、做一个低通滤波、证明某个算子的 \(L^2\) 有界性，它们最后都会把你引到“先看频率空间里的符号”这一步。到那时，Fourier 变换就不再是结论，而会变成你解题时默认打开的视角。</p>
+
+<p>所以第 18 章真正该留下来的，不是若干张变换表，而是一种频率思维：先问对象由哪些模态组成，再问算子对这些模态各自做什么。只要这一步想清，很多原本纠缠在一起的微分、卷积、边界传播与能量估计，都会被拉直成几条一眼能读懂的频率曲线。这正是 Fourier 理论最深的组织能力。</p>
+
+<p>你以后如果在别的课程里突然又遇到“谱分解”“滤波”“模态”“传递函数”“频域”“特征函数展开”这些词，也几乎都可以把它们翻回第 18 章的语言里理解。名字会变，常数会变，空间会变，但那套“先换坐标，再看每个频率如何被单独处理”的骨架通常不会变。</p>
+
+<p>从学习策略上说，第 18 章最值得养成的习惯是“双面检查”。在物理空间里先看对象是否局部、是否平滑、是否可积；在频率空间里再看它是否衰减、是否集中、是否被某个乘子简单控制。很多时候一个问题在原空间里纠缠不清，可一旦变到频率空间就只剩简单乘法；也有些问题在频率空间里不好直接解释，回到原空间反而能立刻看到几何或局部结构。Fourier 思维真正成熟的标志，不是永远偏爱哪一边，而是知道什么时候该切换坐标。</p>
+
+<p>这也是为什么本章必须同时讲 \(L^1\) 与 \(L^2\)。如果只学 \(L^1\)，你会以为 Fourier 只是点态积分与趋零估计；如果只学 \(L^2\)，你又容易把它误解成纯 Hilbert 空间等距而忽略具体积分表示。把二者并置后，你才会看见频率分析真正的张力：一边是可写公式、可谈逐点行为，一边是几何完整、可谈能量守恒与正交分解。现代 Fourier 分析几乎所有高阶主题，都是在这条张力线上继续展开的。</p>
+
+<p>再从应用角度说，Fourier 变换最可贵的地方，是它经常把“难在相互耦合”的问题拆成“一堆互不干扰的模态”。热方程、波方程、椭圆方程、卷积滤波、概率中的特征函数、信号处理里的频带裁剪，本质上都在重复这一步。你未来若学到乘子定理、Littlewood-Paley 分解、Sobolev 空间、伪微分算子，会发现它们无非是在第 18 章这套坐标系上加装更精细的刻度尺。</p>
+
+<p>所以第 18 章最应该留在手上的，不是“这几个函数的变换表”本身，而是判断何时值得切去频率空间的经验。只要一个问题同时带着平移不变、卷积、微分、能量或振荡中的两三项，频率坐标往往就已经在招手了。反过来，如果问题强烈依赖局部几何、边界形状或非平移不变结构，你也应当知道 Fourier 语言可能只提供部分信息，而不是全部答案。这种知道何时切换、何时停手的判断，比多背几条公式更关键。</p>
+
+<p>把这层判断练出来以后，你会发现第 18 章真正改变的并不是计算速度，而是观察问题的角度。很多对象在原空间里像一团缠在一起的相互作用，到了频率空间却只是不同模态各自独立地被放大、衰减或截断。能看见这层“分模态治理”的结构，才算真正把 Fourier 语言装进了自己的工具箱。</p>
+
+<p>这也是为什么真正熟悉 Fourier 变换的人，往往并不是会背最多公式的人，而是最擅长在陌生问题里迅速认出“这里其实在做频率分解”的那个人。</p>
+
+<hr class="section-end">

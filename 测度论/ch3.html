@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 外测度与 Carathéodory 延拓 — 普林斯顿测度论与高级实分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 \(\sigma\)-代数：可测性的语言</a><a href="ch4.html">下一章 · 第 4 章 Lebesgue 测度在 \(\mathbb R\) 上：构造、平移不变与 Vitali 反例 →</a></nav>
+<h1 id="ch3">第 3 章 外测度与 Carathéodory 延拓</h1>
+
+<p>上一章我们搭好了“哪些集合值得被谈论”的语法：\(\sigma\)-代数。可只有语法还不够。你现在真正想问的是：既然 \([a,b]\) 有长度 \(b-a\)，那能不能把“长度”推广成一个对更多集合都有效的大小函数？而且这个大小函数最好还和我们熟悉的极限操作兼容，最好还别在可数并面前失控。</p>
+
+<p>这件事一开始看似简单：用区间去盖集合，把所有覆盖长度加起来，再取最小值不就行了？可你马上会发现，这个“最小值”往往拿不到，只能拿下确界；而且若你处理得稍不小心，例如只允许有限个区间覆盖，整个理论第一步就会走歪。所以第 3 章真正要做的，不是发明一个长度公式，而是把“怎么从长度造出稳定的大小概念”这件事做干净。</p>
+
+<p>Carathéodory 的想法极其漂亮：先不要急着问“所有集合的长度是多少”，而是先对所有集合定义一个比较粗的外测度 \(\mu^*\)，它只要求单调、次可加；然后再从 \(\mu^*\) 里筛出那些和切分最兼容的集合，把它们宣布为“可测集”。结果惊人地好：这批可测集自动形成 \(\sigma\)-代数，而 \(\mu^*\) 在上面自动变成真正的可数可加测度。Lebesgue 测度就是这么生出来的。</p>
+
+<h2 id="sec3-1">3.1 从区间长度到外测度：第一步就必须允许可数覆盖</h2>
+
+<p>先说定义。对任意集合 \(A\subset\mathbb R\)，我们用可数个开区间 \(I_1,I_2,\dots\) 去覆盖它，即要求</p>
+
+\[
+A\subset \bigcup_{k=1}^\infty I_k.
+\]
+
+<p>每个区间的长度记作 \(|I_k|\)。把所有覆盖的总长度取下确界，就得到由区间长度诱导的外测度：</p>
+
+\[
+\boxed{m^*(A)=\inf\left\{\sum_{k=1}^\infty |I_k|:\ A\subset\bigcup_{k=1}^\infty I_k,\ I_k\ \text{开区间}\right\}.}
+\]
+
+<p>这里最容易被忽视的词是“可数”。它不是技术细节，而是整个定义能工作下去的关键。因为一旦你只允许有限个区间覆盖，稠密可数集就会立刻被错判成“长度很大”。下面这个反例一定要算。</p>
+
+<h3 id="sec3-1-1">反例 1：如果只允许有限覆盖，\(\mathbb Q\cap[0,1]\) 会被错误地判成长度 1</h3>
+
+<p>定义一个错误版本的“外长度”：</p>
+
+\[
+\widetilde m(A)=\inf\left\{\sum_{k=1}^N |I_k|:\ A\subset\bigcup_{k=1}^N I_k,\ I_k\ \text{开区间},\ N&lt;\infty\right\}.
+\]
+
+<p>我们来算 \(A=\mathbb Q\cap[0,1]\)。先有上界：</p>
+
+\[
+\widetilde m(A)\le 1,
+\]
+
+<p>因为单个区间 \((0,1)\) 已经覆盖了 \(A\) 中除了端点以外的所有点，再略微扩大成 \((-1,2)\) 也行。总之，有限覆盖长度不难做到接近 \(1\)。</p>
+
+<p>关键是下界。设</p>
+
+\[
+U=\bigcup_{k=1}^N I_k
+\]
+
+<p>是一个有限开区间并，且 \(A\subset U\)。考虑补集</p>
+
+\[
+F=[0,1]\setminus U.
+\]
+
+<p>\(F\) 是闭集，而且由于 \(U\) 是有限个开区间的并，\(F\) 只能是有限个闭区间和有限个点的并。现在如果 \(F\) 含有某个真正长度大于零的闭区间 \([\alpha,\beta]\)，那么由有理数稠密性，\([\alpha,\beta]\) 中必有有理数，这就和 \(A\subset U\) 矛盾。所以 \(F\) 不能含有任何非退化闭区间，只能是有限个点。</p>
+
+<p>也就是说，任何有限开区间并若要覆盖 \(\mathbb Q\cap[0,1]\)，它在 \([0,1]\) 中至多漏掉有限个点。几何上这意味着它的总长度至少是 \(1\)。于是</p>
+
+\[
+\sum_{k=1}^N |I_k|\ge 1.
+\]
+
+<p>由于这是任意有限覆盖都满足的，下确界也至少为 \(1\)。结合上界，得到</p>
+
+\[
+\widetilde m(\mathbb Q\cap[0,1])=1.
+\]
+
+<p>可你在上一章已经看到，\(\mathbb Q\cap[0,1]\) 明明应该是“长度为零”的对象。这个错误精确说明了：<strong>为了看见可数集的小，覆盖本身就必须允许可数个区间</strong>。有限覆盖永远太粗。</p>
+
+<p>所以 \(m^*\) 的定义不是随意挑出来的，而是被这个反例逼出来的最小修正。</p>
+
+<h2 id="sec3-2">3.2 外测度的四条基本性质：它先是粗糙的，但已经很稳</h2>
+
+<p>用区间覆盖定义出来的 \(m^*\) 一开始并不保证“对可测集合可数可加”。它只是一个更弱的对象，叫外测度。抽象地说，定义在任意底集 \(X\) 上的映射 \(\mu^*:\mathcal P(X)\to[0,\infty]\) 若满足下面四件事，就叫外测度：</p>
+
+\[
+\boxed{\begin{array}{l}
+(1)\ \mu^*(A)\ge 0;\\
+(2)\ \mu^*(\varnothing)=0;\\
+(3)\ A\subset B\Rightarrow \mu^*(A)\le \mu^*(B);\\
+(4)\ \mu^*\left(\bigcup_{n=1}^\infty A_n\right)\le \sum_{n=1}^\infty \mu^*(A_n).
+\end{array}}
+\]
+
+<p>第四条就是可数次可加的弱版本：\(\sigma\)-次可加性。Carathéodory 的绝妙之处就在于：先别强求等号，只要你先拿到这四条，后面就能从中筛出一批真正可数可加的集合来。</p>
+
+<p>对区间长度构造出的 \(m^*\)，这四条都成立。</p>
+
+<p>非负性显然，因为长度和从不为负。空集的外测度为零，因为空集可以被“什么都不放”的覆盖理解为总长度 \(0\)，而外测度又不可能小于 \(0\)。</p>
+
+<p>单调性也直接：若 \(A\subset B\)，那任何覆盖 \(B\) 的区间族自动也覆盖 \(A\)。所以 \(A\) 的可选覆盖集合更大，下确界只会更小，故</p>
+
+\[
+m^*(A)\le m^*(B).
+\]
+
+<p>真正值得你掌握的是 \(\sigma\)-次可加性的推导。设 \(A\subset\bigcup_{n=1}^\infty A_n\)，给定任意 \(\varepsilon&gt;0\)。对每个 \(n\)，按下确界定义，可以选一族开区间 \(\{I_{n,k}\}_{k\ge1}\) 覆盖 \(A_n\)，使</p>
+
+\[
+\sum_{k=1}^\infty |I_{n,k}|\le m^*(A_n)+\frac{\varepsilon}{2^n}.
+\]
+
+<p>把所有这些区间合在一起，它们就覆盖了 \(\bigcup_n A_n\)，从而也覆盖了 \(A\)。于是</p>
+
+\[
+m^*\left(\bigcup_{n=1}^\infty A_n\right)
+\le \sum_{n=1}^\infty\sum_{k=1}^\infty |I_{n,k}|
+\le \sum_{n=1}^\infty m^*(A_n)+\sum_{n=1}^\infty \frac{\varepsilon}{2^n}.
+\]
+
+<p>而 \(\sum_{n=1}^\infty \varepsilon/2^n=\varepsilon\)，所以</p>
+
+\[
+m^*\left(\bigcup_{n=1}^\infty A_n\right)\le \sum_{n=1}^\infty m^*(A_n)+\varepsilon.
+\]
+
+<p>\(\varepsilon&gt;0\) 任意，于是</p>
+
+\[
+\boxed{m^*\left(\bigcup_{n=1}^\infty A_n\right)\le \sum_{n=1}^\infty m^*(A_n).}
+\]
+
+<p>这就是外测度最核心的稳定性。你以后会反复看到同一招：对每一项都选一个“近乎最优”的覆盖，把误差预算分成 \(\varepsilon/2^n\)，最后用可数求和收束。测度论里大量 \(\varepsilon\)-论证都长这个样子。</p>
+
+<h3 id="sec3-2-1">算例 2：单点与可数集的外测度为什么是 0</h3>
+
+<p>先看单点 \(A=\{x_0\}\)。对任意 \(\varepsilon&gt;0\)，区间</p>
+
+\[
+I=\left(x_0-\frac{\varepsilon}{2},x_0+\frac{\varepsilon}{2}\right)
+\]
+
+<p>覆盖 \(A\)，且长度 \(|I|=\varepsilon\)。因此</p>
+
+\[
+m^*(\{x_0\})\le \varepsilon.
+\]
+
+<p>\(\varepsilon\) 任意，只能有</p>
+
+\[
+m^*(\{x_0\})=0.
+\]
+
+<p>再看可数集 \(A=\{x_1,x_2,\dots\}\)。给定 \(\varepsilon&gt;0\)，对每个 \(n\) 取区间</p>
+
+\[
+I_n=\left(x_n-\frac{\varepsilon}{2^{n+2}},x_n+\frac{\varepsilon}{2^{n+2}}\right).
+\]
+
+<p>则 \(A\subset\bigcup_{n=1}^\infty I_n\)，且</p>
+
+\[
+\sum_{n=1}^\infty |I_n|
+=\sum_{n=1}^\infty \frac{\varepsilon}{2^{n+1}}
+=\frac{\varepsilon}{2}\sum_{n=1}^\infty \frac1{2^n}
+=\frac{\varepsilon}{2}.
+\]
+
+<p>于是</p>
+
+\[
+m^*(A)\le \frac{\varepsilon}{2}.
+\]
+
+<p>\(\varepsilon\) 任意，所以</p>
+
+\[
+\boxed{\text{每个可数集的外测度都等于 }0.}
+\]
+
+<p>这和<a href="../实分析/ch23.html">《实分析读本》第 23 章</a>里“可数集测度零”的结论完全对上了。不同的是，那一章更像是结论展示；现在你终于看见这个结论为什么从区间覆盖里自然长出来。</p>
+
+<h2 id="sec3-3">3.3 Carathéodory 准则：哪些集合和切分最兼容？</h2>
+
+<p>外测度已经很稳，但它还不够好。最大的问题是：对任意两个不交集合 \(E,F\)，我们并不知道</p>
+
+\[
+m^*(E\cup F)=m^*(E)+m^*(F)
+\]
+
+<p>一定成立。我们只知道“\(\le\)”这一边，因为外测度只有次可加性。要想把 \(m^*\) 变成真正的测度，就必须找出那些对切分完全兼容的集合。</p>
+
+<p>Carathéodory 的定义极其准确。设 \(\mu^*\) 是底集 \(X\) 上的外测度。若集合 \(E\subset X\) 满足</p>
+
+\[
+\boxed{\mu^*(A)=\mu^*(A\cap E)+\mu^*(A\cap E^c)\qquad (\forall A\subset X),}
+\]
+
+<p>就称 \(E\) 是 \(\mu^*\)-可测的。</p>
+
+<p>为什么这条式子合理？因为由 \(\sigma\)-次可加性，总有</p>
+
+\[
+\mu^*(A)\le \mu^*(A\cap E)+\mu^*(A\cap E^c),
+\]
+
+<p>毕竟 \(A=(A\cap E)\cup(A\cap E^c)\)。所以 Carathéodory 准则真正要求的是反向不等式也成立：用 \(E\) 把任何集合 \(A\) 一刀切成两块时，不会凭空制造额外“长度损失”。如果一切集合都能被 \(E\) 这样干净地切开，那 \(E\) 就值得被叫做可测。</p>
+
+<p>这一定义最美的地方在于，它不是只盯着 \(E\) 自己，而是要求 \(E\) 对所有测试集合 \(A\) 都表现良好。于是“可测”不再是某种局部图像直觉，而是“能不能和外测度结构兼容”的全局判别。</p>
+
+<p>你可以先用一句口语化的话记住它：<strong>可测集就是那些外测度不会在它们这里卡壳的切分界面。</strong></p>
+
+<h2 id="sec3-4">3.4 Carathéodory 定理：可测集自动形成 \(\sigma\)-代数</h2>
+
+<p>现在来到整章的核心。把所有 \(\mu^*\)-可测集记作</p>
+
+\[
+\mathcal M=\{E\subset X:\forall A\subset X,\ \mu^*(A)=\mu^*(A\cap E)+\mu^*(A\cap E^c)\}.
+\]
+
+<p>Carathéodory 定理说：</p>
+
+\[
+\boxed{\mathcal M\ \text{是一个}\sigma\text{-代数，且 }\mu^*|_{\mathcal M}\ \text{是测度}.}
+\]
+
+<p>这句陈述看上去像魔法：你只是先随便定义了一个外测度，再按一个切分准则筛一筛，居然就自动得到 \(\sigma\)-代数和真正测度。可它其实是一步一步长出来的。我们至少把骨架证明走清楚。</p>
+
+<p>先证 \(\Omega\in\mathcal M\)（更一般地 \(X\in\mathcal M\)）。对任意 \(A\subset X\)，有</p>
+
+\[
+A\cap X=A,\qquad A\cap X^c=\varnothing.
+\]
+
+<p>所以</p>
+
+\[
+\mu^*(A\cap X)+\mu^*(A\cap X^c)=\mu^*(A)+0=\mu^*(A),
+\]
+
+<p>故 \(X\) 可测。</p>
+
+<p>补闭包几乎是对称的。若 \(E\in\mathcal M\)，则对任意 \(A\)，</p>
+
+\[
+\mu^*(A)=\mu^*(A\cap E)+\mu^*(A\cap E^c).
+\]
+
+<p>把 \(E\) 与 \(E^c\) 交换，右边完全不变，所以 \(E^c\) 也可测。于是 \(\mathcal M\) 对补封闭。</p>
+
+<p>接下来处理不交并。设 \(E,F\in\mathcal M\) 且 \(E\cap F=\varnothing\)。任取 \(A\subset X\)。先用 \(E\) 的可测性：</p>
+
+\[
+\mu^*(A)=\mu^*(A\cap E)+\mu^*(A\cap E^c).
+\]
+
+<p>再把 \(F\) 的可测性应用到集合 \(A\cap E^c\) 上：</p>
+
+\[
+\mu^*(A\cap E^c)=\mu^*(A\cap E^c\cap F)+\mu^*(A\cap E^c\cap F^c).
+\]
+
+<p>因为 \(E\cap F=\varnothing\)，有 \(F\subset E^c\)，所以</p>
+
+\[
+A\cap E^c\cap F=A\cap F,
+\qquad
+A\cap E^c\cap F^c=A\cap (E\cup F)^c.
+\]
+
+<p>合并两式得到</p>
+
+\[
+\mu^*(A)=\mu^*(A\cap E)+\mu^*(A\cap F)+\mu^*(A\cap(E\cup F)^c).
+\]
+
+<p>另一方面，由次可加性总有</p>
+
+\[
+\mu^*(A\cap(E\cup F))
+\le \mu^*(A\cap E)+\mu^*(A\cap F).
+\]
+
+<p>于是反向不等式也补齐了，说明 \(E\cup F\in\mathcal M\)。这就给出有限个两两不交可测集的并仍可测，并且在这种情形下外测度已经表现得像真正的加法：</p>
+
+\[
+\mu^*(A\cap(E\cup F))=\mu^*(A\cap E)+\mu^*(A\cap F).
+\]
+
+<p>最后是可数并。给定可测集列 \(E_1,E_2,\dots\)，先把它们“去重”成两两不交列：</p>
+
+\[
+F_1=E_1,\qquad F_n=E_n\setminus \bigcup_{k=1}^{n-1}E_k\quad (n\ge2).
+\]
+
+<p>每个 \(F_n\) 可测，彼此不交，且</p>
+
+\[
+\bigcup_{n=1}^\infty E_n=\bigcup_{n=1}^\infty F_n.
+\]
+
+<p>设 \(E=\bigcup_{n=1}^\infty F_n\)。对任意 \(N\)，由有限不交并的结论有</p>
+
+\[
+\mu^*(A)\ge \sum_{n=1}^N \mu^*(A\cap F_n)+\mu^*(A\cap E^c).
+\]
+
+<p>令 \(N\to\infty\)，再用次可加性</p>
+
+\[
+\mu^*(A\cap E)\le \sum_{n=1}^\infty \mu^*(A\cap F_n),
+\]
+
+<p>就得到</p>
+
+\[
+\mu^*(A)\ge \mu^*(A\cap E)+\mu^*(A\cap E^c).
+\]
+
+<p>而反向不等式本来就总成立，所以等号成立，故 \(E\in\mathcal M\)。这就证明了 \(\mathcal M\) 对可数并封闭，于是它是 \(\sigma\)-代数。</p>
+
+<p>一旦 \(\mathcal M\) 已是 \(\sigma\)-代数，再看两两不交可测集列 \(\{E_n\}\)。把上面关于 \(A\) 的式子专门代入</p>
+
+\[
+A=\bigcup_{n=1}^\infty E_n,
+\]
+
+<p>就能推出</p>
+
+\[
+\mu^*\left(\bigcup_{n=1}^\infty E_n\right)=\sum_{n=1}^\infty \mu^*(E_n).
+\]
+
+<p>这说明 \(\mu^*\) 在 \(\mathcal M\) 上的限制确实是可数可加测度，而不再只是外测度。</p>
+
+<p>也就是说，Carathéodory 的整个策略可以概括成：</p>
+
+\[
+\text{先有外测度，再由“切分无损”筛出可测集，最后自动得到真正测度。}
+\]
+
+<p>这是测度论最核心的一次结构升级。</p>
+
+<h2 id="sec3-5">3.5 从区间长度到 Lebesgue 测度：长度终于被真正延拓出来</h2>
+
+<p>现在把前面抽象框架重新落回 \(\mathbb R\)。我们已经有由区间覆盖定义的外测度 \(m^*\)。接下来要做两件事：</p>
+
+<ul>
+  <li>先证明开区间是 \(m^*\)-可测的，从而所有 Borel 集都可测；</li>
+  <li>再证明区间的测度确实等于它们本来的长度。</li>
+</ul>
+
+<p>先证开区间可测。取 \(E=(a,b)\)。任意给定 \(A\subset\mathbb R\) 以及一个覆盖</p>
+
+\[
+A\subset \bigcup_{k=1}^\infty I_k,
+\]
+
+<p>其中每个 \(I_k\) 是开区间。每个 \(I_k\) 和 \(E\) 相交后，至多被切成三段：\(I_k\cap E\) 是一个开区间，\(I_k\cap E^c\) 则是至多两个开区间的并。并且长度满足</p>
+
+\[
+|I_k|=|I_k\cap E|+|I_k\cap E^c|.
+\]
+
+<p>于是所有 \(I_k\cap E\) 覆盖 \(A\cap E\)，所有切出来属于 \(E^c\) 的部分覆盖 \(A\cap E^c\)，总长度之和不变。所以对任意这样的覆盖都有</p>
+
+\[
+\sum_{k=1}^\infty |I_k|
+\ge m^*(A\cap E)+m^*(A\cap E^c).
+\]
+
+<p>再对左边所有覆盖取下确界，就得到</p>
+
+\[
+m^*(A)\ge m^*(A\cap E)+m^*(A\cap E^c).
+\]
+
+<p>反向不等式由次可加性总成立，因此等号成立，说明 \(E\) 可测。既然可测集构成 \(\sigma\)-代数，而所有开区间都在其中，所以</p>
+
+\[
+\mathcal B(\mathbb R)\subset \mathcal M.
+\]
+
+<p>也就是说，所有 Borel 集都是 \(m^*\)-可测的。</p>
+
+<p>下面真正算区间的测度。</p>
+
+<h3 id="sec3-5-1">算例 3：证明 \(m^*([a,b])=b-a\)</h3>
+
+<p>上界很容易。区间 \((a-\varepsilon,b+\varepsilon)\) 覆盖 \([a,b]\)，故</p>
+
+\[
+m^*([a,b])\le b-a+2\varepsilon.
+\]
+
+<p>令 \(\varepsilon\downarrow0\)，得到</p>
+
+\[
+m^*([a,b])\le b-a.
+\]
+
+<p>关键是下界。设 \([a,b]\subset\bigcup_{k=1}^\infty I_k\)。因为 \([a,b]\) 紧，由 Heine-Borel 定理可取有限子覆盖</p>
+
+\[
+[a,b]\subset I_1\cup\cdots\cup I_N.
+\]
+
+<p>把这有限多个开区间反复合并所有相交的部分，最后得到若干个两两不交的开区间 \(J_1,\dots,J_r\)，满足</p>
+
+\[
+I_1\cup\cdots\cup I_N=J_1\cup\cdots\cup J_r,
+\]
+
+<p>且</p>
+
+\[
+\sum_{j=1}^r |J_j|\le \sum_{k=1}^N |I_k|.
+\]
+
+<p>由于 \([a,b]\) 是连通的，而 \(J_1\cup\cdots\cup J_r\) 覆盖了它，所以其中至少有一个区间 \(J_{j_0}\) 必须整个跨过 \([a,b]\)，否则若分散在两个不相交开区间里，中间就会出现空隙，不可能覆盖整段闭区间。这就给出</p>
+
+\[
+|J_{j_0}|\ge b-a.
+\]
+
+<p>于是</p>
+
+\[
+\sum_{k=1}^N |I_k|\ge \sum_{j=1}^r |J_j|\ge |J_{j_0}|\ge b-a.
+\]
+
+<p>这个不等式对任意覆盖都成立，所以取下确界可得</p>
+
+\[
+m^*([a,b])\ge b-a.
+\]
+
+<p>和前面的上界合起来，得到</p>
+
+\[
+\boxed{m^*([a,b])=b-a.}
+\]
+
+<p>因此外测度在区间上确实恢复了原始长度。我们终于没有“为了推广而丢掉旧对象”。</p>
+
+<p>于是，把 \(m^*\) 限制在所有 \(m^*\)-可测集上，就得到 Lebesgue 测度 \(m\)。它满足：</p>
+
+<ul>
+  <li>所有 Borel 集都可测；</li>
+  <li>区间的测度等于长度；</li>
+  <li>对可数不交并可加；</li>
+  <li>对子集零测集完备。</li>
+</ul>
+
+<p>最后一条也值得一提。若 \(N\) 是零测集，即 \(m(N)=0\)，而 \(A\subset N\)，则 \(m^*(A)=0\)。于是对任意 \(E\)，</p>
+
+\[
+m^*(E\cap A)\le m^*(A)=0,
+\]
+
+<p>所以 \(m^*(E\cap A)=0\)，从而</p>
+
+\[
+m^*(E)=m^*(E\cap A)+m^*(E\cap A^c).
+\]
+
+<p>因此 \(A\) 也是可测的。这说明 Lebesgue 测度是<strong>完备</strong>的。它比只含 Borel 集的结构更大一点，但正是这“一点点 completion”，让后面许多 a.e. 命题变得天然。</p>
+
+<p>你在<a href="../实分析/ch24.html">《实分析读本》第 24 章</a>第一次看到 \(\int \mathbf 1_{\mathbb Q}\,dm=0\) 时，那里默认已经有了这个 \(m\)；现在你终于知道，这个符号背后站着的是外测度和 Carathéodory 准则，而不是一句凭空规定。</p>
+
+<h2 id="sec3-6">3.6 抽象 Carathéodory 延拓：不只给长度，也给概率空间和别的测度</h2>
+
+<p>前面我们是从区间长度出发造 Lebesgue 测度。但 Carathéodory 的方法远不止服务于“长度”。它的抽象版大意是：</p>
+
+<ul>
+  <li>先在一个容易控制的集合代数 \(\mathcal A\) 上定义前测度 \(\mu_0\)；</li>
+  <li>再用 \(\mathcal A\) 中集合去覆盖任意集合，定义外测度；</li>
+  <li>最后用 Carathéodory 准则筛出可测集，得到真正测度。</li>
+</ul>
+
+<p>具体地，若 \(\mathcal A\) 是 \(X\) 上的代数，\(\mu_0:\mathcal A\to[0,\infty]\) 满足可数可加性（对落在 \(\mathcal A\) 内的不交并），就称它为前测度。定义</p>
+
+\[
+\boxed{\mu^*(E)=\inf\left\{\sum_{n=1}^\infty \mu_0(A_n):\ E\subset\bigcup_{n=1}^\infty A_n,\ A_n\in\mathcal A\right\}.}
+\]
+
+<p>则 \(\mu^*\) 是外测度；由它诱导出的 Carathéodory 可测集构成 \(\sigma\)-代数 \(\mathcal M\)，且 \(\mu^*|_{\mathcal M}\) 是测度，并在 \(\mathcal A\) 上与原来的 \(\mu_0\) 一致。若 \(\mu_0\) 还是 \(\sigma\)-有限的，那么这个延拓到 \(\sigma(\mathcal A)\) 上是唯一的。</p>
+
+<p>这就是通常说的 Carathéodory 延拓定理。Lebesgue 测度是它最著名的实例，但不是唯一实例。</p>
+
+<h3 id="sec3-6-1">算例 4：无穷次公平抛硬币的概率测度就是这样延拓出来的</h3>
+
+<p>取底集 \(X=\{0,1\}^{\mathbb N}\)。先看有限 cylinder 集的有限并所成的代数 \(\mathcal A_{\mathrm{coin}}\)。对一个基本 cylinder</p>
+
+\[
+C(\varepsilon_1,\dots,\varepsilon_n)
+=\{\omega:\omega_1=\varepsilon_1,\dots,\omega_n=\varepsilon_n\},
+\]
+
+<p>定义前测度</p>
+
+\[
+\mu_0\bigl(C(\varepsilon_1,\dots,\varepsilon_n)\bigr)=2^{-n}.
+\]
+
+<p>这当然符合直觉：前 \(n\) 次结果被完全指定，概率就是 \(2^{-n}\)。更关键的是，它与 refinement 相容。例如</p>
+
+\[
+C(\varepsilon_1,\dots,\varepsilon_n)
+=C(\varepsilon_1,\dots,\varepsilon_n,0)\sqcup C(\varepsilon_1,\dots,\varepsilon_n,1),
+\]
+
+<p>而右边两块的前测度之和恰好是</p>
+
+\[
+2^{-(n+1)}+2^{-(n+1)}=2^{-n}.
+\]
+
+<p>所以 \(\mu_0\) 对 cylinder 的细分是可加的，进而能一致地延拓到有限并组成的代数上。</p>
+
+<p>接着把 \(\mu_0\) 放进上面的覆盖公式里，得到外测度 \(\mu^*\)；再用 Carathéodory 准则筛选可测集，就得到定义在</p>
+
+\[
+\sigma(\mathcal A_{\mathrm{coin}})=\sigma(\mathcal C_0)
+\]
+
+<p>上的真正概率测度 \(\mathbb P\)。这就是无穷次公平抛硬币空间的严肃数学版本。</p>
+
+<p>也就是说，上一章和本章一直在谈的“无限 coin toss 空间”并不是凭直觉拍脑袋写下来的。它之所以成立，靠的正是 Carathéodory 延拓：先在有限信息事件上把概率定好，再把它唯一地推到整个 cylinder \(\sigma\)-代数上。</p>
+
+<p>你会在<a href="../概率统计/ch12.html">《概率统计读本》第 12 章</a>看到几乎处处收敛，在<a href="../概率统计/ch13.html">第 13 章</a>看到极限定理；它们背后的样本空间若真要写严肃，第一步正是这类延拓。另一方面，在<a href="../偏微分方程/ch10.html">《偏微分方程读本》第 10 章</a>里，热核之所以能被看成概率密度，也同样需要一个已经搭好的测度空间来承载“总质量为 1”这种陈述。</p>
+
+<p>所以从 Lebesgue 长度到 Bernoulli 概率，表面上对象完全不同，骨架却是同一个：代数上的前测度 \(\to\) 外测度 \(\to\) Carathéodory 可测集 \(\to\) 真正测度。</p>
+
+<h2 id="sec3-7">3.7 这一章真正该留下的三句话</h2>
+
+<p>第一，外测度的定义看起来只是“拿区间去盖”，但可数覆盖这个词是被反例逼出来的；没有它，连 \(\mathbb Q\cap[0,1]\) 都会被错误地判成长度 \(1\)。</p>
+
+<p>第二，Carathéodory 准则把“哪些集合可测”重新解释成“哪些集合能把任意测试集合无损切分”，而这条准则奇迹般地自动产出 \(\sigma\)-代数和真正测度。</p>
+
+<p>第三，从区间长度得到 Lebesgue 测度、从 cylinder 概率得到无穷抛硬币空间，本质上都是同一个延拓定理在工作；这也就是为什么测度论能同时服务于实分析、概率和 PDE。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 \(\sigma\)-代数：可测性的语言</a><a href="ch4.html">下一章 · 第 4 章 Lebesgue 测度在 \(\mathbb R\) 上：构造、平移不变与 Vitali 反例 →</a></nav>
+
+</main>
+</body>
+</html>

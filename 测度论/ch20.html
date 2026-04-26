@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 弱收敛与紧致性 — 普林斯顿测度论与高级实分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 Riesz-Markov 定理</a><a href="ch21.html">下一章 · 第 21 章 \(L^p\) 完备性的完整证明 →</a></nav>
+<h1 id="ch20">第 20 章 弱收敛与紧致性</h1>
+
+<p>到<a href="ch10.html">第 10 章</a>我们已经习惯了这样一种收敛：\(\|f_n-f\|_p\to0\)。这当然是很强的控制，因为它直接说整块误差在 \(L^p\) 范数里消失了。可你一旦往泛函分析、概率论和变分法再走一步，就会发现这种收敛常常强得不现实。最典型的场景是：你明明能从一列函数里读出很多稳定信息，比如它们对每个测试函数的积分都趋于某个极限，它们的质量没有跑到无穷远，它们在每个固定坐标方向上都老实了，可就是没法在范数意义下收敛。</p>
+
+<p>于是分析学做了一件很像物理的事：把观察方式换掉。你不再坚持“图像本身整体贴上去”，而是改问“所有可测的宏观读数是否稳定”。在向量空间里，这些读数就是连续线性泛函；在概率论里，它们是有界连续测试函数；在傅里叶世界里，它们又会变成特征函数或傅里叶变换。所谓弱收敛，正是把“用什么仪器观测”这件事写进定义里。</p>
+
+<p>这一章要做四件事。第一，把弱收敛和弱*收敛的定义放准，特别是看清它们为什么不是同一个东西。第二，在 \(L^p\) 里对比弱与强，顺手把“强 \(\Rightarrow\) 弱，但反过来常常失败”这句老话彻底算明白。第三，解释 Banach-Alaoglu 为什么是现代紧致性的第一块地板：有了它，对偶空间的单位球就不再四散逃逸。第四，把这一切翻译到概率测度上，接上<a href="../概率统计/ch13.html">《概率统计读本》第 13 章</a>的中心极限定理，并用 Prokhorov 定理说明：什么时候一族概率测度至少能抽出弱收敛子列。</p>
+
+<h2 id="sec20-1">20.1 从范数收敛到“所有测试都收敛”</h2>
+
+<p>先从最基本的语言搭起来。设 \(X\) 是一个赋范线性空间，\(X^*\) 是它的连续对偶。对每个 \(\ell\in X^*\)，数 \(\ell(x)\) 都可以看成对向量 \(x\) 的一次“线性读数”。如果你在有限维线性代数里想象点积，那么 \(\ell(x)\) 就像“沿某个方向投影再读数”；只是到无限维以后，这些方向不再由向量本身给出，而是由连续泛函给出。</p>
+
+<p>于是弱收敛的定义自然就是：所有连续线性读数都收敛。</p>
+
+\[
+\boxed{x_n \rightharpoonup x \text{ in }X
+\iff
+\ell(x_n)\to \ell(x)\quad \text{对每个 }\ell\in X^*.}
+\]
+
+<p>这个箭头 \(\rightharpoonup\) 是你以后会高频见到的符号。它故意和普通极限箭头不同，就是为了提醒你：这里收敛的不是范数，而是所有测试泛函的值。</p>
+
+<p>先别急着把它想得太玄。弱收敛最直接的性质其实非常朴素：强收敛必然推出弱收敛。因为如果 \(\|x_n-x\|\to0\)，而 \(\ell\in X^*\) 连续，那么</p>
+
+\[
+|\ell(x_n)-\ell(x)|
+=
+|\ell(x_n-x)|
+\le
+\|\ell\|\,\|x_n-x\|
+\longrightarrow 0.
+\]
+
+<p>所以</p>
+
+\[
+\boxed{x_n\to x \text{ in norm } \Longrightarrow x_n\rightharpoonup x.}
+\]
+
+<p>真正有内容的地方恰恰在反方向通常失败。弱收敛只要求所有线性读数对了，并不要求原对象彼此靠得非常近。你可以把它理解成：所有阴影都收敛了，但实体未必靠到一起。</p>
+
+<p><strong>例 20.1（\(\ell^2\) 的标准基弱收敛到零）</strong>　令 \(e_n=(0,\dots,0,1,0,\dots)\in\ell^2\)，也就是第 \(n\) 个坐标为 \(1\)，其余为 \(0\)。我们来判断 \(e_n\) 是否收敛。</p>
+
+<p>先看强收敛。对每个 \(n\)，</p>
+
+\[
+\|e_n\|_2=1.
+\]
+
+<p>既然范数始终等于 \(1\)，它当然不可能在 \(\ell^2\) 范数下收敛到 \(0\)。</p>
+
+<p>再看弱收敛。任取 \(y=(y_k)\in\ell^2\)。由 Hilbert 空间中的对偶表示，任意 \(\ell\in(\ell^2)^*\) 都可写成 \(\ell(x)=\langle x,y\rangle\)。于是</p>
+
+\[
+\ell(e_n)=\langle e_n,y\rangle = y_n.
+\]
+
+<p>而 \(\ell^2\) 序列的坐标一定趋于 \(0\)，所以 \(y_n\to0\)。这说明</p>
+
+\[
+e_n\rightharpoonup 0 \quad\text{但}\quad \|e_n-0\|_2=1.
+\]
+
+<p>这就是你要牢牢记住的第一个反例：<strong>弱收敛并不推出强收敛</strong>。从这一章开始，很多紧致性论证的目标都只会是“抽出弱收敛子列”，因为那往往已经是极限过程中能稳定保住的全部信息了。</p>
+
+<h2 id="sec20-2">20.2 弱*收敛：把对偶空间再看成一个函数空间</h2>
+
+<p>弱收敛发生在 \(X\) 里。可如果我们自己就在对偶空间 \(X^*\) 中活动，事情会再细一层。因为 \(X^*\) 的元素本身就是定义在 \(X\) 上的连续线性函数，所以你有两种不同的观察方式：</p>
+
+<ul>
+<li>把 \(X^*\) 当成一个赋范空间，看它对所有 \(X^{**}\) 里的泛函怎么反应，这给出 \(X^*\) 上的弱拓扑；</li>
+<li>把 \(X^*\) 当成定义在 \(X\) 上的函数族，只要求它们在每个 \(x\in X\) 处的值收敛，这给出弱*拓扑。</li>
+</ul>
+
+<p>第二种更弱，也更常用。它的定义是：</p>
+
+\[
+\boxed{f_\alpha \overset{*}{\rightharpoonup} f \text{ in }X^*
+\iff
+f_\alpha(x)\to f(x)\quad \text{对每个 }x\in X.}
+\]
+
+<p>这里我故意用了下标 \(\alpha\)，因为弱*紧致里天然会遇到网，而不只是序列。不过在可分空间的有界集上，很多时候还是可以退回到序列语言。</p>
+
+<p>你要先看清一个方向：如果 \(f_n\rightharpoonup f\) 在 \(X^*\) 中弱收敛，那么当然也弱*收敛。因为对每个固定 \(x\in X\)，评价映射</p>
+
+\[
+\delta_x:X^*\to\mathbb{K},\qquad \delta_x(g)=g(x)
+\]
+
+<p>本身就是 \(X^*\) 上的连续线性泛函，也就是 \(\delta_x\in X^{**}\)。所以弱收敛自动推出 \(f_n(x)\to f(x)\)。于是</p>
+
+\[
+f_n\rightharpoonup f \text{ in }X^*
+\Longrightarrow
+f_n\overset{*}{\rightharpoonup} f.
+\]
+
+<p>但反过来一般不成立。弱*收敛只测试来自 \(X\) 的评价，弱收敛却要测试全部 \(X^{**}\)。如果 \(X\) 不是反身的，这两者就是不同层次的拓扑。你可以把这理解成：弱*只在原空间给你的坐标上读数；弱则还允许二次放大后的读数。</p>
+
+<p>这个区别在 \(L^\infty\) 里尤其重要。我们通常把 \(L^\infty\) 看成 \(L^1\) 的对偶，于是 \(L^\infty\) 上最自然的紧致结论是弱*紧致，而不是弱紧致。你后面读到 Radon-Nikodym、最优化或变分法时，经常看到一句“在 \(L^\infty\) 的有界列里抽取一个弱*收敛子列”，它的真正后台正是这一节的定义。</p>
+
+<p><strong>例 20.2（Dirac 质量作为 \(C_0\) 的对偶元）</strong>　在<a href="ch19.html">第 19 章</a>我们已经看到，局部紧 Hausdorff 空间上的 Radon 测度可以看成 \(C_0\) 的连续线性泛函。对每个点 \(x\in\mathbb{R}\)，Dirac 测度 \(\delta_x\) 作用在 \(C_0(\mathbb{R})\) 上就是</p>
+
+\[
+\delta_x(\varphi)=\varphi(x).
+\]
+
+<p>因此若 \(\delta_{x_n}\overset{*}{\rightharpoonup}\mu\) 作为 \(C_0(\mathbb{R})^*\) 中的弱*收敛，它的意思恰好是</p>
+
+\[
+\varphi(x_n)\to \int_{\mathbb{R}}\varphi\,d\mu
+\quad\text{对每个 }\varphi\in C_0(\mathbb{R}).
+\]
+
+<p>也就是说，测度的弱收敛本质上就是对偶空间里的弱*收敛。这件事会在 20.5 节和 20.7 节重新出现。概率论里的“分布收敛”，并不是另起炉灶的一门方言；它其实就是泛函分析里的弱*收敛翻到测度语言之后的样子。</p>
+
+<h2 id="sec20-3">20.3 \(L^p\) 里弱与强到底差在哪里</h2>
+
+<p>现在把定义翻译到你最熟悉的空间里。设 \(1\le p&lt;\infty\)，令 \(q\) 是 Hölder 共轭指数，即</p>
+
+\[
+\frac1p+\frac1q=1.
+\]
+
+<p>在 \(1&lt;p&lt;\infty\) 时，我们已经在<a href="ch11.html">第 11 章</a>证明过 \((L^p)^*=L^q\)。因此 \(f_n\rightharpoonup f\) 在 \(L^p\) 中的具体含义就是</p>
+
+\[
+\boxed{f_n\rightharpoonup f \text{ in }L^p
+\iff
+\int_X f_n g\,d\mu \to \int_X f g\,d\mu
+\quad \text{对每个 }g\in L^q.}
+\]
+
+<p>而强收敛则是</p>
+
+\[
+\boxed{f_n\to f \text{ strongly in }L^p
+\iff
+\|f_n-f\|_p\to0.}
+\]
+
+<p>请把这两个定义摆在一起看。强收敛是在直接控制误差本身；弱收敛是在控制误差与所有测试函数 \(g\) 的配对。前者更像“全图像贴近”，后者更像“对所有观测器读数一致”。</p>
+
+<p>在 \(p=1\) 时，弱收敛的测试空间是 \(L^\infty\)。在 \(p=\infty\) 时，事情更 delicate：\((L^\infty)^*\) 比 \(L^1\) 大得多，所以通常更实用的是把 \(L^\infty\) 看成 \(L^1\) 的对偶，在弱*意义下讨论收敛：</p>
+
+\[
+f_n \overset{*}{\rightharpoonup} f \text{ in }L^\infty
+\iff
+\int_X f_n g\,d\mu \to \int_X f g\,d\mu
+\quad \text{对每个 }g\in L^1.
+\]
+
+<p>你现在应该能听出三种语言的差别了：</p>
+
+<ul>
+<li>\(L^p\) 强收敛：误差的 \(p\) 次幂积分趋于零；</li>
+<li>\(L^p\) 弱收敛：误差对每个 \(L^q\) 测试函数的积分趋于零；</li>
+<li>\(L^\infty\) 弱*收敛：误差对每个 \(L^1\) 测试函数的积分趋于零。</li>
+</ul>
+
+<p><strong>例 20.3（振荡越来越快，弱收敛到零，但绝不强收敛）</strong>　在区间 \([0,2\pi]\) 上令</p>
+
+\[
+f_n(x)=e^{inx}.
+\]
+
+<p>先看强收敛。因为 \(|e^{inx}|=1\)，所以</p>
+
+\[
+\|f_n\|_2^2=\int_0^{2\pi}|e^{inx}|^2\,dx=\int_0^{2\pi}1\,dx=2\pi.
+\]
+
+<p>这说明 \(\|f_n\|_2=\sqrt{2\pi}\) 恒定不变，因此不可能在 \(L^2\) 强收敛到 \(0\)。</p>
+
+<p>再看弱收敛。任取三角多项式</p>
+
+\[
+P(x)=\sum_{k=-N}^N a_k e^{ikx}.
+\]
+
+<p>则</p>
+
+\[
+\int_0^{2\pi} f_n(x)\,\overline{P(x)}\,dx
+=
+\sum_{k=-N}^N \overline{a_k}\int_0^{2\pi} e^{i(n-k)x}\,dx.
+\]
+
+<p>当 \(n&gt;N\) 时，每个积分都为 \(0\)，因为</p>
+
+\[
+\int_0^{2\pi} e^{imx}\,dx=0\qquad (m\neq0).
+\]
+
+<p>所以对每个固定的三角多项式，配对积分最终就是 \(0\)。又由于三角多项式在 \(L^2\) 中稠密，对任意 \(g\in L^2\)，先取 \(P\) 逼近 \(g\)，再用 Hölder 不等式估计尾项，就能推出</p>
+
+\[
+\int_0^{2\pi} e^{inx}\overline{g(x)}\,dx \to 0.
+\]
+
+<p>因此</p>
+
+\[
+e^{inx}\rightharpoonup 0 \quad\text{in }L^2[0,2\pi],
+\]
+
+<p>但它绝不强收敛到 \(0\)。这个例子和<a href="../实分析/ch17.html">《实分析读本》第 17 章</a>里“逐点、一致、积分交换”的主题是同一路数：大量分析对象不是在“变小”，而是在“越震越快”；你若只看宏观测试，它们会消失，若看范数或点值，它们未必消失。</p>
+
+<p>还有一个非常重要的必要条件：弱收敛列一定有界。因为若 \(x_n\rightharpoonup x\)，则对每个 \(\ell\in X^*\)，数列 \(\ell(x_n)\) 收敛，当然有界。由一致有界原理可得 \(\{x_n\}\) 在 \(X\) 中有界。放到 \(L^p\) 里，这句话就是</p>
+
+\[
+f_n\rightharpoonup f \text{ in }L^p
+\Longrightarrow
+\sup_n \|f_n\|_p&lt;\infty.
+\]
+
+<p>所以任何弱紧致性的第一步，几乎总是先想办法拿到一致 \(L^p\) 估计。这一点你在<a href="../偏微分方程/ch21.html">《偏微分方程读本》第 21 章</a>看弱解极限时会再次碰到。</p>
+
+<h2 id="sec20-4">20.4 Banach-Alaoglu：对偶球在弱*拓扑下不会散掉</h2>
+
+<p>现在进入本章第一个真正的紧致性定理。它的内容短得惊人，但影响极大：</p>
+
+\[
+\boxed{\text{Banach-Alaoglu： }B_{X^*}=\{f\in X^*:\|f\|\le1\}
+\text{ 在弱*拓扑下紧。}}
+\]
+
+<p>如果你第一次看到这句话，最该感到惊讶的不是“紧”，而是“在哪个拓扑下紧”。在无限维里，单位球几乎从来不可能在范数拓扑下紧。比如 \(\ell^2\) 中那列标准基 \(\{e_n\}\) 全都落在单位球里，却彼此距离</p>
+
+\[
+\|e_n-e_m\|_2=\sqrt2\qquad (n\neq m),
+\]
+
+<p>所以根本不可能有任何范数 Cauchy 子列，更别说范数收敛子列了。也就是说，无限维单位球在强拓扑下通常非常不紧。</p>
+
+<p>Banach-Alaoglu 的魔力在于：只要你把拓扑换成弱*，单位球立刻变成紧集。为什么？因为弱*只要求每个点 \(x\in X\) 上的取值稳定。于是你可以把每个 \(f\in B_{X^*}\) 看成一个点族</p>
+
+\[
+\Phi(f)=(f(x))_{x\in X}.
+\]
+
+<p>对固定 \(x\)，由 \(|f(x)|\le \|f\|\,\|x\|\le \|x\|\)，坐标 \(f(x)\) 落在复平面或实轴上的闭圆盘</p>
+
+\[
+\overline D_{\|x\|}=\{z:|z|\le \|x\|\}.
+\]
+
+<p>于是</p>
+
+\[
+\Phi(B_{X^*})\subset \prod_{x\in X}\overline D_{\|x\|}.
+\]
+
+<p>右边是紧空间的笛卡尔积，靠 Tychonoff 定理仍然紧。再检查线性关系和有界性条件对应的是一个闭子集，就得到 \(B_{X^*}\) 的弱*紧致。</p>
+
+<p>也就是说，Banach-Alaoglu 的证明骨架其实极其朴素：</p>
+
+<ol>
+<li>把每个泛函看成一个坐标函数 \(x\mapsto f(x)\)；</li>
+<li>每个坐标都被 \(\|x\|\) 控住，所以落在紧区间或紧圆盘里；</li>
+<li>乘积紧；</li>
+<li>线性与连续性条件切出一个闭子集。</li>
+</ol>
+
+<p>你应该从这里看到一个非常现代的数学策略：直接证明“对象集本身紧”往往很难，但若能把对象嵌进一个坐标积空间，紧致性就能从抽象结构上空降下来。</p>
+
+<p><strong>例 20.4（\(\ell^\infty\) 单位球为什么至少有弱*极限点）</strong>　把 \(\ell^\infty\) 看成 \((\ell^1)^*\)。则</p>
+
+\[
+B_{\ell^\infty}=\{x=(x_n):\sup_n|x_n|\le1\}
+\]
+
+<p>在 \(\sigma(\ell^\infty,\ell^1)\) 拓扑下紧。于是任何有界序列 \(x^{(m)}\in\ell^\infty\) 都至少可以抽出一个弱*收敛子网；如果再加上 \(\ell^1\) 可分，单位球上的弱*拓扑实际上可度量，于是还能抽出弱*收敛子列。</p>
+
+<p>这和范数拓扑形成鲜明反差。比如标准基 \(e_n\) 在 \(\ell^\infty\) 范数下并不 Cauchy，但在弱*意义下却收敛到 \(0\)。验证很直接：任取 \(a=(a_k)\in\ell^1\)，有</p>
+
+\[
+\langle e_n,a\rangle=\sum_{k=1}^\infty e_n(k)a_k=a_n\to0.
+\]
+
+<p>所以</p>
+
+\[
+e_n \overset{*}{\rightharpoonup}0 \quad\text{in }\ell^\infty=(\ell^1)^*.
+\]
+
+<p>这正是 Banach-Alaoglu 的典型用法：你拿到一列一致有界的泛函，便知道至少可以在弱*意义下抽出极限。很多存在性证明并不需要更强的极限。</p>
+
+<p>还要补一句常被忽视但极重要的话：Banach-Alaoglu 给的是弱*紧致，不是弱*序列紧致，更不是范数紧致。序列够不够，取决于额外的可分性或可度量性。无限维里的紧致，从来不该默认和“每个序列都有收敛子列”等价。</p>
+
+<h2 id="sec20-5">20.5 概率测度的弱收敛：分布收敛其实是对偶收敛</h2>
+
+<p>现在把舞台从向量空间转到概率测度。设 \(S\) 是度量空间，\(\mathcal P(S)\) 是 \(S\) 上的概率测度全体。所谓 \(\mu_n\) 弱收敛到 \(\mu\)，直觉上是说：在所有有界连续测试函数看来，这些概率分布给出的期望都趋于同一个极限。</p>
+
+\[
+\boxed{\mu_n \Rightarrow \mu
+\iff
+\int_S \varphi\,d\mu_n \to \int_S \varphi\,d\mu
+\quad \text{对每个 }\varphi\in C_b(S).}
+\]
+
+<p>这里的 \(C_b(S)\) 表示有界连续函数空间，符号 \(\Rightarrow\) 是概率论里分布收敛的标准记号。你在<a href="../概率统计/ch13.html">《概率统计读本》第 13 章</a>已经见过它，只不过那里用的是随机变量版本：\(X_n\Rightarrow X\)。把它翻成测度，就是 \(X_n\) 的分布 \(\mu_{X_n}\) 弱收敛到 \(\mu_X\)。</p>
+
+<p>在 \(\mathbb{R}\) 上，这个定义还可以写成熟悉的分布函数语言。记</p>
+
+\[
+F_n(x)=\mu_n((-\infty,x]),\qquad F(x)=\mu((-\infty,x]).
+\]
+
+<p>则 Portmanteau 定理告诉你</p>
+
+\[
+\mu_n\Rightarrow\mu
+\iff
+F_n(x)\to F(x)\quad \text{对每个 }F\text{ 的连续点 }x.
+\]
+
+<p>“只在连续点上要求收敛”这句特别重要。因为分布函数天然可能跳跃，而跳点正对应原子质量；在那里强行要求逐点收敛，定义会太僵。</p>
+
+<p>你现在也应该看清它与 20.2 节的关系了。若 \(S\) 局部紧，Riesz-Markov 定理把有限 Radon 测度识别为 \(C_0(S)^*\) 的正泛函。于是概率测度的弱收敛本质上就是一个弱*收敛：</p>
+
+\[
+\mu_n\Rightarrow\mu
+\quad\Longleftrightarrow\quad
+\mu_n(\varphi)\to\mu(\varphi)\ \text{对每个 }\varphi\in C_0(S).
+\]
+
+<p>也就是说，概率论里的“分布收敛”与泛函分析里的“弱*收敛”其实是同一件事的两个外观。前者在说随机性，后者在说对偶。</p>
+
+<p><strong>例 20.5（Dirac 质量逼近 Dirac 质量）</strong>　令 \(\mu_n=\delta_{1/n}\)，\(\mu=\delta_0\)。对任意 \(\varphi\in C_b(\mathbb{R})\)，</p>
+
+\[
+\int \varphi\,d\mu_n=\varphi(1/n)\to \varphi(0)=\int \varphi\,d\mu.
+\]
+
+<p>因此</p>
+
+\[
+\delta_{1/n}\Rightarrow\delta_0.
+\]
+
+<p>这说明弱收敛并不要求密度存在，更不要求“图像像不像”；它只看测试函数的平均值。Dirac 质量这样最奇异的对象，在弱拓扑里反而是最自然的。</p>
+
+<h2 id="sec20-6">20.6 特征函数：把弱收敛变成傅里叶收敛</h2>
+
+<p>到了 \(\mathbb{R}\) 上，概率测度还有一件极其有力的工具：特征函数。对概率测度 \(\mu\) 定义</p>
+
+\[
+\varphi_\mu(t)=\int_{\mathbb{R}} e^{itx}\,d\mu(x),\qquad t\in\mathbb{R}.
+\]
+
+<p>如果 \(X\sim\mu\)，这也就是随机变量版的</p>
+
+\[
+\varphi_X(t)=\mathbb E[e^{itX}].
+\]
+
+<p>你在<a href="../概率统计/ch13.html">《概率统计读本》第 13 章</a>已经见过：中心极限定理最干净的证明路线，恰恰是把加法变成特征函数的乘法，再看极限。这里要补上的抽象结论是 Lévy 连续性定理：</p>
+
+\[
+\boxed{\mu_n\Rightarrow\mu
+\Longrightarrow
+\varphi_{\mu_n}(t)\to\varphi_\mu(t)\quad \text{对每个 }t\in\mathbb{R}.}
+\]
+
+<p>反过来，若 \(\varphi_{\mu_n}(t)\) 点态收敛到某个函数 \(\psi(t)\)，且 \(\psi\) 在 \(0\) 处连续，那么 \(\psi\) 本身就是某个概率测度 \(\mu\) 的特征函数，并且 \(\mu_n\Rightarrow\mu\)。也就是说，概率测度的弱收敛完全可以在傅里叶侧检测。</p>
+
+<p>为什么这是大事？因为测度的弱收敛本来是“对所有有界连续函数的积分都收敛”，测试函数多得近乎无法逐个检查；而特征函数只是一族 \(e^{itx}\)。它把海量测试压缩成了一条参数曲线。</p>
+
+<p><strong>例 20.6（中心极限定理重新翻译成弱收敛）</strong>　在<a href="../概率统计/ch13.html">概率统计第 13 章</a>里，若 \(X_1,X_2,\dots\) 独立同分布，均值 \(\mu\)、方差 \(\sigma^2\in(0,\infty)\)，定义</p>
+
+\[
+Z_n=\frac{(X_1+\cdots+X_n)-n\mu}{\sigma\sqrt n},
+\]
+
+<p>则 \(Z_n\Rightarrow N(0,1)\)。把这句话翻成测度语言，就是</p>
+
+\[
+\mu_{Z_n}\Rightarrow \gamma,
+\]
+
+<p>其中 \(\gamma\) 是标准正态分布。再翻成特征函数，就是</p>
+
+\[
+\varphi_{Z_n}(t)\to e^{-t^2/2}.
+\]
+
+<p>如果你把第 13 章里用矩母函数或特征函数做的计算重新回想一遍，会发现整个中心极限定理其实就是一个弱收敛定理：标准化和以后，那些分布在 \(C_b(\mathbb R)\) 的测试下都逼近正态。</p>
+
+<p>还有一个非常值得你保存到直觉里的例子：若 \(\mu_n=N(0,1/n)\)，则</p>
+
+\[
+\varphi_{\mu_n}(t)=e^{-t^2/(2n)}\to 1.
+\]
+
+<p>而常数函数 \(1\) 正是 \(\delta_0\) 的特征函数，所以</p>
+
+\[
+N(0,1/n)\Rightarrow \delta_0.
+\]
+
+<p>这很像“方差塌缩到零，所以质量收缩成一个点”。在弱拓扑里，集中成原子并不是病态，而是完全合法的极限。</p>
+
+<h2 id="sec20-7">20.7 紧致性与 Prokhorov：质量别逃到无穷远</h2>
+
+<p>到这里你已经知道：对偶球在弱*拓扑下可以紧，概率测度也有自己的弱拓扑。可对概率测度来说，真正的障碍往往不是振荡，而是<strong>逃逸</strong>：质量可能一点点跑到无穷远去。Prokhorov 定理正是处理这件事的标准语言。</p>
+
+<p>先定义紧性条件。概率测度族 \(\mathcal F\subset\mathcal P(S)\) 称为紧的（更准确地说是 tight），如果对任意 \(\varepsilon&gt;0\)，都存在紧集 \(K_\varepsilon\subset S\)，使得</p>
+
+\[
+\sup_{\mu\in\mathcal F}\mu(S\setminus K_\varepsilon)&lt;\varepsilon.
+\]
+
+<p>也就是</p>
+
+\[
+\boxed{\mathcal F \text{ tight }
+\iff
+\forall \varepsilon&gt;0,\ \exists K_\varepsilon\Subset S,\ 
+\sup_{\mu\in\mathcal F}\mu(K_\varepsilon^c)&lt;\varepsilon.}
+\]
+
+<p>“tight”这个词直译成“紧的”有点抽象，你不妨把它读成：这族分布的大部分质量都能被同一个紧集一起兜住。没有谁偷偷把一大块概率质量扔到无穷远。</p>
+
+<p>Prokhorov 定理的标准形式是：</p>
+
+\[
+\boxed{\text{若 }S\text{ 是 Polish 空间，则 }
+\mathcal F\subset\mathcal P(S)
+\text{ 相对弱紧 }
+\iff
+\mathcal F \text{ tight}.}
+\]
+
+<p>这里“相对弱紧”意思是：\(\mathcal F\) 的任意序列都能抽出一个弱收敛子列。定理告诉你，概率测度的弱紧致性有一个非常可检查的等价条件：tightness。你不必直接和“所有有界连续测试函数”搏斗，只要能把质量统一拴在某个紧集附近，就有弱收敛子列。</p>
+
+<p>这个定理和 Banach-Alaoglu 的气质非常像。Banach-Alaoglu 说：对偶球只要坐标一致有界，就能在弱*意义下抽极限。Prokhorov 说：概率测度只要质量不逃逸，就能在弱意义下抽极限。两者都是把“极限对象存在”降解成某种统一先验估计。</p>
+
+<p><strong>例 20.7（\(\delta_n\) 没有弱收敛子列，因为它不 tight）</strong>　令 \(\mu_n=\delta_n\) 在 \(\mathbb{R}\) 上。给定任意紧集 \(K\subset\mathbb{R}\)，必有 \(K\subset[-M,M]\) 对某个 \(M\) 成立。于是当 \(n&gt;M\) 时，\(\delta_n(K)=0\)，从而</p>
+
+\[
+\delta_n(K^c)=1.
+\]
+
+<p>所以无论你选哪个紧集 \(K\)，都不可能让所有 \(\delta_n\) 的质量绝大部分落在 \(K\) 里。换句话说，这族测度不 tight。</p>
+
+<p>由 Prokhorov 定理可知，\(\{\delta_n\}\) 不可能有弱收敛子列。直觉也完全一致：质量在一路向右跑，根本没有留下任何有限位置上的极限分布。</p>
+
+<p>反过来，若 \(\mu_n=N(0,\sigma_n^2)\) 且 \(\sup_n \sigma_n^2&lt;\infty\)，那么由切比雪夫不等式，对任意 \(R&gt;0\)，</p>
+
+\[
+\mu_n(|x|&gt;R)\le \frac{\sigma_n^2}{R^2}\le \frac{\sup_n \sigma_n^2}{R^2}.
+\]
+
+<p>让 \(R\to\infty\) 就得到 tightness。因此这族高斯测度至少可以抽出弱收敛子列。对高斯族我们当然还知道得更多，但这里关键是：二阶矩有统一界，往往正是 Prokhorov 紧性的最常见来源。</p>
+
+<p>在 \(\mathbb{R}^d\) 上，一个很实用的充分条件是存在某个 \(p&gt;0\) 使</p>
+
+\[
+\sup_n \int_{\mathbb{R}^d} |x|^p\,d\mu_n(x)&lt;\infty.
+\]
+
+<p>因为 Markov 不等式给出</p>
+
+\[
+\mu_n(|x|&gt;R)\le \frac{1}{R^p}\int |x|^p\,d\mu_n(x),
+\]
+
+<p>右边对 \(n\) 一致地趋于 \(0\)。所以统一矩估计 \(\Rightarrow\) tight \(\Rightarrow\) 可抽弱收敛子列。概率论里很多极限定理，先验有界矩就是这样开始工作的。</p>
+
+<h2 id="sec20-8">20.8 反例、边界与这一章真正该带走的东西</h2>
+
+<p>这一章里最容易犯的错，是把“弱”误解成“只是强的一种说法”。其实它们在无限维里真的是不同世界。强收敛给你对象本身的贴近；弱收敛只给你测试读数的贴近。于是像 \(\ell^2\) 标准基、\(L^2\) 里的高频振荡这样的序列，会在弱拓扑下消失，却在强拓扑下永远不消失。</p>
+
+<p>第二个必须压牢的点是：弱*收敛不是弱收敛的写法变化，而是对偶空间上的另一层拓扑。Banach-Alaoglu 之所以如此基础，恰恰是因为它保证了<strong>对偶单位球的弱*紧致</strong>，这在 \(L^\infty\)、测度空间、优化问题里远比范数紧致更现实。</p>
+
+<p>第三个要和概率论接起来的点是：分布收敛本质上就是测度的弱收敛，而在 Radon 测度框架下又正是一个弱*收敛。于是从<a href="../概率统计/ch13.html">中心极限定理</a>到 Prokhorov 紧性，再到你后面会在<a href="ch22.html">第 22 章</a>见到的各种反例，它们其实都在围绕同一句话打转：<strong>极限并不总在强拓扑里存在，但常常会在更弱的观察方式下存在。</strong></p>
+
+<p>如果你愿意把这一章压成三句话带走，那就是：</p>
+<p>第一，强收敛一定推出弱收敛，但弱收敛往往只是“所有测试函数都看不出差别”，并不代表对象本身靠近。</p>
+<p>第二，Banach-Alaoglu 给了现代泛函分析最基本的紧致性地板：对偶单位球在弱*拓扑下不会散掉。</p>
+<p>第三，概率测度的弱收敛与特征函数、tightness、Prokhorov 定理连成一条线，它们共同解释了“为什么极限分布经常能存在”。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 Riesz-Markov 定理</a><a href="ch21.html">下一章 · 第 21 章 \(L^p\) 完备性的完整证明 →</a></nav>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 \(L^p\) 的对偶：\((L^p)^*=L^q\) 的边界与余波 — 普林斯顿测度论与高级实分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 \(L^p\) 空间：Hölder、Minkowski 与完备性</a><a href="ch12.html">下一章 · 第 12 章 Hilbert 空间 \(L^2\) 的特殊地位 →</a></nav>
+<h1 id="ch11">第 11 章 \(L^p\) 的对偶：\((L^p)^*=L^q\) 的边界与余波</h1>
+
+<p>如果第 10 章解决的是“函数有没有大小”，那么这一章要解决的就是：<strong>谁在给这个大小空间里的向量做线性测量？</strong> 也就是说，\(L^p\) 上所有连续线性泛函到底长什么样。</p>
+
+<p>在线性代数里，你早就熟悉了对偶空间：一个向量空间的对偶由所有线性函数组成。到了无穷维空间，这个问题一下子变得更尖：不是每个线性泛函都该被接受，只有那些对范数连续的才真正有分析意义。于是 \((L^p)^*\) 问的是：<strong>哪些线性测量既线性，又不会对微小的 \(L^p\) 变化过分敏感？</strong></p>
+
+<p>最自然的候选当然是积分配对。给定 \(g\)，我们定义</p>
+
+\[
+\Lambda_g(f)=\int_X f(x)g(x)\,d\mu(x).
+\]
+
+<p>第 10 章的 Hölder 早就告诉你：如果 \(g\in L^q\)，那么这的确是 \(L^p\) 上的连续线性泛函。真正的奇迹是反过来：在合适的指数范围内，<strong>所有</strong>连续线性泛函都来自这样的积分配对。这就是 \(L^p\) 版本的 Riesz 表示定理。</p>
+
+<p>不过这一章还有一个必须先澄清的口误。很多人会把“\((L^p)^*=L^q\)”背成机械模板，然后顺手说出错误版本。标准事实是：</p>
+
+\[
+(L^p)^*=L^q\quad\text{对 }1&lt;p&lt;\infty\text{ 成立，}
+\]
+
+<p>而边界情形里，\((L^1)^*=L^\infty\) 也仍然成立；真正失败的是再往前一步硬套出 \((L^\infty)^*=L^1\)。那是错的，而且错得非常有代表性。我们会在本章中把这件事彻底说清楚。</p>
+
+<h2 id="sec11-1">11.1 从 Hölder 开始：\(L^q\) 总能嵌进 \((L^p)^*\)</h2>
+
+<p>设 \(1\le p&lt;\infty\)，\(q\) 是共轭指数，即 \(1/p+1/q=1\)（\(p=1\) 时取 \(q=\infty\)）。给定 \(g\in L^q(X)\)，定义</p>
+
+\[
+\Lambda_g(f)=\int_X f g\,d\mu,\qquad f\in L^p(X).
+\]
+
+<p>线性当然一眼可见。连续性则直接来自 Hölder：</p>
+
+\[
+|\Lambda_g(f)|
+=
+\left|\int_X fg\,d\mu\right|
+\le
+\int_X |fg|\,d\mu
+\le
+\|f\|_p\|g\|_q.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+\|\Lambda_g\|_{(L^p)^*}\le \|g\|_q.
+}
+\]
+
+<p>这至少说明 \(L^q\) 可以自然嵌入 \(L^p\) 的对偶里。更妙的是，这个嵌入其实还是等距的。对 \(1&lt;p&lt;\infty\)，若 \(g\neq0\)，取</p>
+
+\[
+f(x)=\frac{\operatorname{sgn}(g(x))\,|g(x)|^{q-1}}{\|g\|_q^{\,q-1}}.
+\]
+
+<p>这里 \(\operatorname{sgn}(g)\) 表示复数情形的相位或实数情形的符号。因为</p>
+
+\[
+p(q-1)=q,
+\]
+
+<p>所以</p>
+
+\[
+\|f\|_p^p
+=
+\int_X \frac{|g|^{(q-1)p}}{\|g\|_q^{(q-1)p}}\,d\mu
+=
+\frac{1}{\|g\|_q^q}\int_X |g|^q\,d\mu
+=1.
+\]
+
+<p>而</p>
+
+\[
+\Lambda_g(f)
+=
+\int_X \frac{|g|^q}{\|g\|_q^{q-1}}\,d\mu
+=
+\|g\|_q.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+\|\Lambda_g\|=\|g\|_q,
+\qquad 1&lt;p&lt;\infty.
+}
+\]
+
+<p>边界情形 \(p=1,q=\infty\) 也有同样的结论，只不过“取到范数”的函数要稍微改造一下。设 \(M=\|g\|_\infty\)。对任意 \(\varepsilon&gt;0\)，集合</p>
+
+\[
+E_\varepsilon=\{x:|g(x)|&gt;M-\varepsilon\}
+\]
+
+<p>必有正测度。令</p>
+
+\[
+f_\varepsilon=\frac{\operatorname{sgn}(g)\,\mathbf 1_{E_\varepsilon}}{\mu(E_\varepsilon)}.
+\]
+
+<p>则 \(\|f_\varepsilon\|_1=1\)，并且</p>
+
+\[
+\Lambda_g(f_\varepsilon)
+=
+\frac{1}{\mu(E_\varepsilon)}\int_{E_\varepsilon}|g|\,d\mu
+\ge M-\varepsilon.
+\]
+
+<p>让 \(\varepsilon\downarrow0\)，便得 \(\|\Lambda_g\|=\|g\|_\infty\)。所以从 \(L^q\) 到 \((L^p)^*\) 的这张地图，不仅自然，而且等距。</p>
+
+<p><strong>例题 1.</strong> 在 \([0,1]\) 上定义</p>
+
+\[
+g=\mathbf 1_{[0,1/2]}-\mathbf 1_{(1/2,1]}.
+\]
+
+<p>令 \(\Lambda(f)=\int_0^1 f(x)g(x)\,dx\)。求 \(\|\Lambda\|\) 作为 \(L^1([0,1])\) 上的连续线性泛函的范数。</p>
+
+<p>因为 \(g\in L^\infty\)，且 \(\|g\|_\infty=1\)，由上面的等距公式立刻得到</p>
+
+\[
+\|\Lambda\|=1.
+\]
+
+<p>若你想直接验证，也可以写</p>
+
+\[
+|\Lambda(f)|
+\le
+\int_0^1 |f(x)|\,|g(x)|\,dx
+\le
+\|f\|_1,
+\]
+
+<p>所以 \(\|\Lambda\|\le1\)。另一方面，取 \(f=g\)，则 \(\|f\|_1=1\) 且</p>
+
+\[
+\Lambda(f)=\int_0^1 g^2\,dx=1.
+\]
+
+<p>故 \(\|\Lambda\|=1\)。这道题把“积分配对给出线性泛函”这件事落到了最具体的函数上。</p>
+
+<h2 id="sec11-2">11.2 先看离散模型：\(\ell^p\) 的对偶为什么是 \(\ell^q\)</h2>
+
+<p>在一般测度空间上直接证明 \((L^p)^*=L^q\)，技术上多少有点跳。最好的热身方式，是先把 \(X\) 换成 \(\mathbb N\)，配上计数测度。这时 \(L^p\) 就变成了你在线性代数和泛函分析里最熟悉的序列空间 \(\ell^p\)。</p>
+
+<p>结论是：</p>
+
+\[
+\boxed{
+(\ell^p)^*=\ell^q,
+\qquad 1&lt;p&lt;\infty.
+}
+\]
+
+<p>而且证明几乎全都能手算。设 \(T\in(\ell^p)^*\)。对标准基向量 \(e_n=(0,\dots,0,1,0,\dots)\)，定义</p>
+
+\[
+a_n=T(e_n).
+\]
+
+<p>我们先证明 \(a=(a_n)\in\ell^q\)。对任意 \(N\)，构造有限支撑序列</p>
+
+\[
+x^{(N)}_n=
+\begin{cases}
+\operatorname{sgn}(a_n)|a_n|^{q-1},&1\le n\le N,\\[4pt]
+0,&n&gt;N.
+\end{cases}
+\]
+
+<p>则</p>
+
+\[
+T(x^{(N)})
+=
+\sum_{n=1}^N a_n\,\operatorname{sgn}(a_n)|a_n|^{q-1}
+=
+\sum_{n=1}^N |a_n|^q.
+\]
+
+<p>另一方面，连续性给出</p>
+
+\[
+|T(x^{(N)})|\le \|T\|\,\|x^{(N)}\|_p.
+\]
+
+<p>而</p>
+
+\[
+\|x^{(N)}\|_p^p
+=
+\sum_{n=1}^N |a_n|^{(q-1)p}
+=
+\sum_{n=1}^N |a_n|^q,
+\]
+
+<p>因为 \((q-1)p=q\)。于是</p>
+
+\[
+\sum_{n=1}^N |a_n|^q
+\le
+\|T\|
+\left(\sum_{n=1}^N |a_n|^q\right)^{1/p}.
+\]
+
+<p>若右边括号不为零，两边整理得</p>
+
+\[
+\left(\sum_{n=1}^N |a_n|^q\right)^{1/q}\le \|T\|.
+\]
+
+<p>所以这些部分和有统一上界，令 \(N\to\infty\) 即得 \(a\in\ell^q\)。</p>
+
+<p>接下来对任意有限支撑序列 \(x=(x_n)\)，由线性性</p>
+
+\[
+T(x)=\sum_{n=1}^\infty x_n a_n.
+\]
+
+<p>而有限支撑序列在 \(\ell^p\) 中稠密，于是该表示延拓到所有 \(x\in\ell^p\)。因此 \(T\) 恰好由某个 \(a\in\ell^q\) 通过配对</p>
+
+\[
+T(x)=\sum_{n=1}^\infty x_n a_n
+\]
+
+<p>给出。证明完成。</p>
+
+<p>这个离散模型已经把一般证明的骨架暴露出来了：<strong>先从泛函里抽出“系数”或“密度”，再用 Hölder 把它证明进 \(L^q\) 里。</strong> 一般测度空间里的区别只是：标准基向量不见了，取而代之的是指标函数与 Radon-Nikodym 密度。</p>
+
+<p><strong>例题 2.</strong> 在 \(\ell^2\) 上定义</p>
+
+\[
+T(x)=\sum_{n=1}^\infty \frac{x_n}{n}.
+\]
+
+<p>说明 \(T\) 连续，并求 \(\|T\|\)。</p>
+
+<p>这里系数列 \(a_n=1/n\)。因为</p>
+
+\[
+\sum_{n=1}^\infty \frac{1}{n^2}&lt;\infty,
+\]
+
+<p>所以 \(a\in\ell^2\)。由 \((\ell^2)^*=\ell^2\)，\(T\) 连续，而且其范数就是系数列的 \(\ell^2\) 范数：</p>
+
+\[
+\|T\|
+=
+\left(\sum_{n=1}^\infty \frac1{n^2}\right)^{1/2}
+=
+\left(\frac{\pi^2}{6}\right)^{1/2}
+=
+\frac{\pi}{\sqrt6}.
+\]
+
+<p>这道题特别能让你看见“线性泛函 = 内积或积分配对”这件事的可计算性：一旦知道对偶是谁，泛函范数常常不用再额外估。</p>
+
+<h2 id="sec11-3">11.3 一般的 \(L^p\)-Riesz 表示：\(1&lt;p&lt;\infty\)</h2>
+
+<p>现在进入主定理。为了把技术包袱压到合理范围，我们在这一节默认 \((X,\mathcal M,\mu)\) 是 \(\sigma\)-有限测度空间。这已经覆盖了本书后面绝大多数应用。</p>
+
+\[
+\boxed{
+\text{若 }1&lt;p&lt;\infty,\ \frac1p+\frac1q=1,
+\text{ 则每个 }T\in(L^p)^*\text{ 都存在唯一 }g\in L^q
+\text{ 使得 }
+T(f)=\int_X fg\,d\mu.
+}
+\]
+
+<p>唯一性先不难。若 \(g_1,g_2\in L^q\) 都表示同一个泛函，则</p>
+
+\[
+\int_X f(g_1-g_2)\,d\mu=0
+\qquad \text{对所有 }f\in L^p.
+\]
+
+<p>取 \(f=\operatorname{sgn}(g_1-g_2)|g_1-g_2|^{q-1}\) 的截断近似，就能推出 \(g_1=g_2\) 几乎处处。所以真正难的是存在性。</p>
+
+<p>存在性的标准路线，其实就是 Radon-Nikodym 的预演。思路如下。</p>
+
+<p>第一步，在有限测度集合上由 \(T\) 造出一个符号测度。对 \(\mu(E)&lt;\infty\) 的可测集 \(E\)，指标函数 \(\mathbf 1_E\in L^p\)，于是可以定义</p>
+
+\[
+\nu(E)=T(\mathbf 1_E).
+\]
+
+<p>由线性性，\(\nu\) 在有限测度集合上可加；由连续性，若 \(\mu(E)=0\)，则 \(\mathbf 1_E=0\) 在 \(L^p\) 里，所以 \(\nu(E)=0\)。也就是说，\(\nu\ll\mu\)。</p>
+
+<p>第二步，在每个有限测度块上应用 Radon-Nikodym。取一组 \(\sigma\)-有限分解 \(X=\bigcup_n X_n\)，每个 \(\mu(X_n)&lt;\infty\)。在每个 \(X_n\) 上，\(\nu\) 相对于 \(\mu\) 绝对连续，于是存在密度 \(g_n\in L^1(X_n)\)，使得</p>
+
+\[
+\nu(E\cap X_n)=\int_{E\cap X_n} g_n\,d\mu.
+\]
+
+<p>这些 \(g_n\) 在重叠部分几乎处处一致，因此可以拼成整个空间上的一个可测函数 \(g\)。</p>
+
+<p>第三步，说明 \(T\) 在简单函数上已经等于 \(f\mapsto\int fg\)。若</p>
+
+\[
+s=\sum_{k=1}^m c_k\mathbf 1_{E_k}
+\]
+
+<p>是有限支撑简单函数，则由线性性</p>
+
+\[
+T(s)=\sum_{k=1}^m c_k\nu(E_k)=\sum_{k=1}^m c_k\int_{E_k} g\,d\mu=\int_X s g\,d\mu.
+\]
+
+<p>第四步，证明 \(g\in L^q\)。这一点用的还是第 11.1 节里“取到 Hölder 等号”的套路。对 \(N,m\) 做截断，令</p>
+
+\[
+h_{N,m}
+=
+\operatorname{sgn}(g)\,|g|^{q-1}\mathbf 1_{X_N}\mathbf 1_{\{|g|\le m\}}.
+\]
+
+<p>则 \(h_{N,m}\in L^p\)，而</p>
+
+\[
+T(h_{N,m})=\int_X |g|^q \mathbf 1_{X_N}\mathbf 1_{\{|g|\le m\}}\,d\mu.
+\]
+
+<p>另一方面连续性给出</p>
+
+\[
+|T(h_{N,m})|\le \|T\|\,\|h_{N,m}\|_p.
+\]
+
+<p>和离散情形完全同样地整理，可以得到</p>
+
+\[
+\left(\int_X |g|^q \mathbf 1_{X_N}\mathbf 1_{\{|g|\le m\}}\,d\mu\right)^{1/q}
+\le \|T\|.
+\]
+
+<p>让 \(m,N\to\infty\)，由单调收敛得 \(g\in L^q\)，且 \(\|g\|_q\le\|T\|\)。而第 11.1 节已经知道反过来有 \(\|T\|\le\|g\|_q\)，所以 \(\|T\|=\|g\|_q\)。</p>
+
+<p>这就是一般 \(L^p\)-Riesz 表示的完整机制。你会发现：真正让它成立的，不是某个神秘技巧，而是三件事联手：</p>
+
+<ul>
+  <li>指标函数让线性泛函长出一个符号测度；</li>
+  <li>Radon-Nikodym 把这个测度变回密度函数；</li>
+  <li>Hölder 精确地告诉你这个密度必须落在 \(L^q\) 里。</li>
+</ul>
+
+<p>所以从逻辑上看，本章其实已经在给第 15 章的 Radon-Nikodym 定理打前站。等你那一章真正证明完 RN，再回头看这里，会发现整件事的拼图几乎完全闭合。</p>
+
+<h2 id="sec11-4">11.4 边界情形先澄清：\((L^1)^*=L^\infty\)，真正坏掉的是 \(L^\infty\)</h2>
+
+<p>这里必须把一个常见口误钉死：<strong>\((L^1)^*=L^\infty\) 是对的。</strong> 错的不是这一条，而是继续想当然地写出 \((L^\infty)^*=L^1\)。</p>
+
+<p>先说对的那条。第 11.1 节已经证明：每个 \(g\in L^\infty\) 都给出 \(L^1\) 上的连续线性泛函</p>
+
+\[
+\Lambda_g(f)=\int_X fg\,d\mu,
+\qquad
+\|\Lambda_g\|=\|g\|_\infty.
+\]
+
+<p>而第 11.3 节的 Radon-Nikodym 路线在 \(p=1\) 时仍然能跑通，于是得到</p>
+
+\[
+\boxed{
+(L^1)^*=L^\infty.
+}
+\]
+
+<p>真正失败的是再把 \(p=\infty\) 代回“共轭指数”模板，幻想 \((L^\infty)^*=L^1\)。这一步不成立。最经典的反例发生在 \(X=\mathbb N\) 配计数测度时，此时</p>
+
+\[
+L^\infty(X)=\ell^\infty,\qquad L^1(X)=\ell^1.
+\]
+
+<p>而 \((\ell^\infty)^*\) 远大于 \(\ell^1\)。标准证据就是 <strong>Banach limit</strong>：存在一个有界线性泛函</p>
+
+\[
+B:\ell^\infty\to\mathbb R
+\]
+
+<p>满足三条性质：</p>
+
+<ul>
+  <li>若 \(x_n\to L\)，则 \(B(x)=L\)；</li>
+  <li>\(B\) 平移不变，即 \(B(x_1,x_2,\dots)=B(x_2,x_3,\dots)\)；</li>
+  <li>\(B(1,1,1,\dots)=1\)。</li>
+</ul>
+
+<p>Banach limit 的存在性来自 Hahn-Banach，我们这里不重证，只拿它来当反例机器。</p>
+
+<p><strong>例题 3.</strong> 说明 Banach limit 不可能由任何 \(\ell^1\) 序列表示，因此 \((\ell^\infty)^*\neq \ell^1\)。</p>
+
+<p>反设存在 \(a=(a_n)\in\ell^1\)，使得</p>
+
+\[
+B(x)=\sum_{n=1}^\infty a_n x_n
+\qquad \text{对所有 }x\in\ell^\infty.
+\]
+
+<p>由平移不变性 \(B(x)=B(Sx)\)，其中 \(S(x_1,x_2,\dots)=(x_2,x_3,\dots)\)。先取 \(x=e_1=(1,0,0,\dots)\)，则</p>
+
+\[
+a_1=B(e_1)=B(0,0,0,\dots)=0.
+\]
+
+<p>再取 \(x=e_n\)（第 \(n\) 位为 1，其他为 0），对 \(n\ge2\) 有</p>
+
+\[
+a_n=B(e_n)=B(Se_n)=B(e_{n-1})=a_{n-1}.
+\]
+
+<p>由 \(a_1=0\) 递推得所有 \(a_n=0\)。于是若真有这种表示，就会得到</p>
+
+\[
+B(1,1,1,\dots)=\sum_{n=1}^\infty a_n=0,
+\]
+
+<p>这与 Banach limit 的性质 \(B(1,1,1,\dots)=1\) 矛盾。故不存在这样的 \(a\in\ell^1\)。因此</p>
+
+\[
+\boxed{
+(L^\infty)^*\neq L^1.
+}
+\]
+
+<p>这就是边界情形里最需要你记住的事实：\(L^1\) 的对偶很干净，是 \(L^\infty\)；但 \(L^\infty\) 的对偶开始包含更野的对象，它们不再由可积函数密度表示，而会牵涉到有限可加测度、超滤子、Banach limit 之类更深的结构。</p>
+
+<h2 id="sec11-5">11.5 反身性：为什么 \(1&lt;p&lt;\infty\) 是最舒服的指数区间</h2>
+
+<p>有了对偶空间以后，一个更高一级的问题自然出现：空间能不能通过自然嵌入完全认回自己的双对偶？这就是反身性。</p>
+
+<p>设 \(X\) 是 Banach 空间，定义自然映射</p>
+
+\[
+J:X\to X^{**},
+\qquad
+J(x)(\Phi)=\Phi(x)
+\quad (\Phi\in X^*).
+\]
+
+<p>若 \(J\) 是满射，就说 \(X\) 是反身的。在线性代数里有限维空间当然反身；在无穷维空间里，这是一件很强的性质。</p>
+
+<p>对 \(L^p\) 而言，结论极其漂亮：</p>
+
+\[
+\boxed{
+1&lt;p&lt;\infty
+\Longrightarrow
+L^p\text{ 是反身的。}
+}
+\]
+
+<p>理由几乎写在指数里。若 \(1&lt;p&lt;\infty\)，其共轭指数 \(q\) 也落在 \((1,\infty)\)。于是</p>
+
+\[
+(L^p)^*=L^q,\qquad (L^q)^*=L^p.
+\]
+
+<p>把这两条连起来，就得到</p>
+
+\[
+L^{p**}=(L^q)^*=L^p.
+\]
+
+<p>更准确地说，这个同构就是自然嵌入 \(J\)。所以 \(L^p\) 在 \(1&lt;p&lt;\infty\) 里是反身的。</p>
+
+<p>反过来，\(L^1\) 和 \(L^\infty\) 都不是反身的。对 \(L^\infty\) 来说，上一节已经看到其对偶大于 \(L^1\)；对 \(L^1\) 来说，因为 \((L^1)^*=L^\infty\) 而 \((L^\infty)^*\) 又远大于 \(L^1\)，所以 \(L^{1**}\) 也远大于 \(L^1\)。于是边界指数 \(1,\infty\) 再次显得特殊。</p>
+
+<p>从应用上看，这一点特别重要。很多弱收敛、紧致性、极小化问题之所以愿意呆在 \(1&lt;p&lt;\infty\) 的区间里，背后靠的正是反身性。到了第 20 章谈弱收敛时，你会明显感到：\(L^2\) 最听话，\(L^p\)（\(1&lt;p&lt;\infty\)）还不错，而 \(L^1\) 与 \(L^\infty\) 会开始长出额外的技术毛刺。</p>
+
+<h2 id="sec11-6">11.6 Banach-Saks 定理：弱收敛不一定强，但平均后会变强</h2>
+
+<p>本章最后提一个只做陈述、不完整证明的重要结论：Banach-Saks 定理。它说的是，在反身 \(L^p\) 空间里，弱收敛虽然通常不够强，但沿着某个子列取 Cesàro 平均，强收敛会重新长出来。</p>
+
+\[
+\boxed{
+1&lt;p&lt;\infty,\ \{f_n\}\subset L^p\text{ 有界}
+\Longrightarrow
+\text{存在子列 }\{f_{n_k}\},
+\text{ 使得 }
+\frac1N\sum_{k=1}^N f_{n_k}
+\text{ 在 }L^p\text{ 中强收敛。}
+}
+\]
+
+<p>这条定理的味道非常值得体会。单个序列项也许一直在抖、一直不肯在范数意义下收敛；但只要你肯先抽子列，再做平均，振荡会被磨平。这和概率里大数定律、Fourier 分析里的 Fejér 平均、数值分析里的迭代平滑，都有同一种“平均能稳住高频”的气质。</p>
+
+<p><strong>例题 4.</strong> 在 \([0,1]\) 上考虑 Rademacher 函数列 \(r_n\)，说明它们的 Cesàro 平均在 \(L^2\) 中趋于 0。</p>
+
+<p>你可以把 \(r_n\) 看成在 dyadic 划分上交替取 \(\pm1\) 的函数。它们在 \(L^2\) 中两两正交，且</p>
+
+\[
+\|r_n\|_2=1.
+\]
+
+<p>考虑平均</p>
+
+\[
+A_N=\frac1N\sum_{k=1}^N r_k.
+\]
+
+<p>由于正交性，</p>
+
+\[
+\|A_N\|_2^2
+=
+\left\langle \frac1N\sum_{k=1}^N r_k,\frac1N\sum_{j=1}^N r_j\right\rangle
+=
+\frac{1}{N^2}\sum_{k=1}^N \|r_k\|_2^2
+=
+\frac{N}{N^2}
+=
+\frac1N.
+\]
+
+<p>因此</p>
+
+\[
+\|A_N\|_2=\frac1{\sqrt N}\to0.
+\]
+
+<p>也就是说，这串各自都不趋于 0 的高频函数，一旦做 Cesàro 平均，立刻就在 \(L^2\) 中塌向 0。Banach-Saks 把这种现象推广到了所有有界序列的某个子列。</p>
+
+<h2 id="sec11-7">11.7 收个尾：对偶不是附录，而是空间结构的显影液</h2>
+
+<p>现在把本章压回最核心的三句话。</p>
+
+<p>第一，对 \(1&lt;p&lt;\infty\)，每个 \(L^p\) 上的连续线性泛函都来自某个 \(L^q\) 函数的积分配对：</p>
+
+\[
+T(f)=\int_X fg\,d\mu.
+\]
+
+<p>这不是漂亮巧合，而是“可测性 + Radon-Nikodym + Hölder”三者咬合出来的结果。</p>
+
+<p>第二，边界情形里必须口齿清楚：\((L^1)^*=L^\infty\) 仍然成立，真正失败的是 \((L^\infty)^*=L^1\)。Banach limit 之类的对象告诉你，一旦走到 \(L^\infty\)，对偶里会涌现出并非积分密度的更野泛函。</p>
+
+<p>第三，\(1&lt;p&lt;\infty\) 之所以是泛函分析最舒服的指数区间，不只是因为 Hölder 和 Minkowski 在那里最整齐，更因为反身性与 Banach-Saks 这类深层结构都在那里成立。下一章当我们把目光单独聚焦到 \(L^2\) 时，这种舒适感会进一步升级成正交、投影、完备正交系和 Hilbert 空间的特殊几何。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 \(L^p\) 空间：Hölder、Minkowski 与完备性</a><a href="ch12.html">下一章 · 第 12 章 Hilbert 空间 \(L^2\) 的特殊地位 →</a></nav>
+
+</main>
+</body>
+</html>

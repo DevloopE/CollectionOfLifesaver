@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 卷积、软化与稠密性 — 普林斯顿测度论与高级实分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 微分与积分：FTC 的现代版本</a><a href="ch18.html">下一章 · 第 18 章 傅里叶变换在 \(L^1\) 与 \(L^2\) 上 →</a></nav>
+<h1 id="ch17">第 17 章 卷积、软化与稠密性</h1>
+
+<p>如果说第 16 章告诉你“平均值可以把点值找回来”，那么这一章要说的是：<strong>平均值不只会找回来，它还会主动帮你把粗糙对象磨平。</strong> 这种“拿一个核去做局部平均”的操作，就是卷积。它在概率里像把两个独立随机量相加，在 PDE 里像把初值交给基本解传播，在调和分析里像滤波器，在数值分析里像低通平滑，在分布理论里则是最可靠的近似机器。</p>
+
+<p>卷积最迷人的地方，是它同时有两副面孔。用 \(x\)-空间看，它是在做局部加权平均；用频率空间看，它会在下一章变成单纯的乘法。你先在这一章把“平均”这张脸看熟，下一章再看“乘法”那张脸，两个世界就会忽然咬上。</p>
+
+<p>这一章和第 16 章连得非常紧。Lebesgue 微分定理已经告诉你，小半径平均在 Lebesgue 点上能回到原函数。现在我们把这个平均系统化：选一个质量为 1、越来越尖的核 \(\phi_\varepsilon\)，定义 \(f*\phi_\varepsilon\)。只要核选得对，这些平滑函数会在 \(L^p\) 里收敛回 \(f\)。于是<a href="../实分析/ch24.html">《实分析读本》第 24 章</a>第一次提到的 \(L^p\) 空间，在这里第一次拥有了一个非常具体的逼近机制；而<a href="../偏微分方程/ch21.html">《偏微分方程读本》第 21 章</a>里弱导数、弱解、分布的语言，也会在这里得到最自然的技术支撑。</p>
+
+<p>整章可以浓缩成四句话：</p>
+
+\[
+\boxed{
+\text{卷积把两份信息混在一起；}\quad
+\text{Young 不等式控制混完后的大小；}\quad
+\phi_\varepsilon\text{ 把粗糙函数磨成 }C^\infty;\quad
+C_c^\infty\text{ 因而在 }L^p\text{ 中稠密。}
+}
+\]
+
+<h2 id="sec17-1">17.1 卷积到底是什么：把局部信息按核做平均</h2>
+
+<p>先在 \(\mathbb R^d\) 上说话。给定两个可测函数 \(f,g\)，只要下式对几乎处处的 \(x\) 有意义，就定义它们的卷积为</p>
+
+\[
+\boxed{
+(f*g)(x)=\int_{\mathbb R^d} f(x-y)g(y)\,dy.
+}
+\]
+
+<p>这个公式第一眼很像在做平移后相乘再积分。把 \(y\) 看成偏移量，\(g(y)\) 看成权重，就会发现：\((f*g)(x)\) 正是在用核 \(g\) 对 \(f\) 在点 \(x\) 周围做加权平均。若 \(g\) 集中在原点附近，那么卷积主要看到的是 \(f\) 的局部结构；若 \(g\) 拖得很长，卷积就会把更远的信息也揉进来。</p>
+
+<p>从变量替换一眼就能看出卷积的对称性。令 \(z=x-y\)，则</p>
+
+\[
+(f*g)(x)
+=\int_{\mathbb R^d}f(z)g(x-z)\,dz
+=(g*f)(x).
+\]
+
+<p>所以卷积是交换的。只要 Fubini 可以用，卷积还是结合的：</p>
+
+\[
+(f*g)*h=f*(g*h).
+\]
+
+<p>而平移与卷积也天然兼容。若 \(\tau_af(x)=f(x-a)\)，则</p>
+
+\[
+\tau_a(f*g)=(\tau_af)*g=f*(\tau_ag).
+\]
+
+<p>这些代数性质之所以值钱，不是因为它们形式好看，而是因为它们让“先平滑再微分”和“先微分再平滑”开始可以交换。后面你会看到，这正是软化器真正的力量来源。</p>
+
+<p>在可积性方面，最基础的落脚点是：若 \(f\in L^p(\mathbb R^d)\)、\(g\in L^1(\mathbb R^d)\)，那么 \(f*g\) 至少定义得很好，而且仍落在 \(L^p\) 里。第 17.3 节的 Young 不等式会把这句话推广成完整的 \(L^p\)-\(L^q\)-\(L^r\) 估计。</p>
+
+<p><strong>例题 1.</strong> 在 \(\mathbb R\) 上令</p>
+
+\[
+f=\mathbf 1_{[0,1]},\qquad g=\mathbf 1_{[0,1]}.
+\]
+
+<p>求 \(f*g\)。</p>
+
+<p>按定义，</p>
+
+\[
+(f*g)(x)=\int_{\mathbb R}\mathbf 1_{[0,1]}(x-y)\mathbf 1_{[0,1]}(y)\,dy.
+\]
+
+<p>被积函数等于 1，当且仅当</p>
+
+\[
+0\le y\le 1,\qquad 0\le x-y\le 1.
+\]
+
+<p>第二个条件等价于</p>
+
+\[
+x-1\le y\le x.
+\]
+
+<p>所以积分值就是两个区间 \([0,1]\) 与 \([x-1,x]\) 的交长。于是分情形：</p>
+
+\[
+(f*g)(x)=
+\begin{cases}
+0,&x\le 0,\\[4pt]
+x,&0\le x\le 1,\\[4pt]
+2-x,&1\le x\le 2,\\[4pt]
+0,&x\ge 2.
+\end{cases}
+\]
+
+<p>它正是熟悉的三角帽函数。请你认真体会这件事：两个很硬的阶梯函数卷完以后，棱角已经被磨成了连续折线。</p>
+
+\[
+\boxed{
+\mathbf 1_{[0,1]}*\mathbf 1_{[0,1]}
+\text{ 是帐篷函数。}
+}
+\]
+
+<p>这是卷积第一眼最该留下的图像。它把“局部平均会平滑”的直觉直接变成了一张函数图。</p>
+
+<h2 id="sec17-2">17.2 卷积的三类基本性质：大小、支撑与微分</h2>
+
+<p>在真正证明估计之前，先把卷积最常用的三类结构记牢。</p>
+
+<p><strong>第一类是支撑。</strong> 若 \(f,g\) 都有紧支撑，则</p>
+
+\[
+\operatorname{supp}(f*g)\subset \operatorname{supp}(f)+\operatorname{supp}(g),
+\]
+
+<p>右边是 Minkowski 和，也就是所有 \(x+y\) 的集合。理由很直观：只有当 \(x-y\) 落在 \(\operatorname{supp}(f)\) 内、\(y\) 落在 \(\operatorname{supp}(g)\) 内时，被积函数才可能不为零。</p>
+
+<p><strong>第二类是积分守恒。</strong> 若 \(f,g\in L^1(\mathbb R^d)\)，由 Fubini 定理，</p>
+
+\[
+\int_{\mathbb R^d}(f*g)(x)\,dx
+=\int_{\mathbb R^d}\int_{\mathbb R^d}f(x-y)g(y)\,dy\,dx
+=\left(\int f\right)\left(\int g\right).
+\]
+
+<p>所以质量会相乘。特别地，若 \(\int g=1\)，卷积不会改变量的总质量，这正是“平均核”应有的性质。</p>
+
+<p><strong>第三类是微分交换。</strong> 如果 \(\phi\in C_c^\infty(\mathbb R^d)\)，而 \(f\in L^1_{\mathrm{loc}}\)，则对任意多重指标 \(\alpha\)，</p>
+
+\[
+\boxed{
+\partial^\alpha(f*\phi)=f*(\partial^\alpha\phi).
+}
+\]
+
+<p>这条式子看似简单，实则是软化器一切应用的源头。因为右边总是有意义，所以左边自动存在，而且是连续的；再对右边重复微分，你就得到任意高阶导数。这说明：<strong>只要拿一个足够光滑的核去卷，粗糙函数会被瞬间抹成 \(C^\infty\)。</strong></p>
+
+<p><strong>例题 2.</strong> 设在 \(\mathbb R\) 上</p>
+
+\[
+g_a(x)=e^{-a|x|},\qquad a&gt;0.
+\]
+
+<p>计算 \(g_a*g_a\)。</p>
+
+<p>由于 \(g_a\) 偶对称，只需先算 \(x\ge 0\)。此时</p>
+
+\[
+(g_a*g_a)(x)=\int_{-\infty}^{\infty} e^{-a|x-y|}e^{-a|y|}\,dy.
+\]
+
+<p>按 \(y&lt;0\)、\(0\le y\le x\)、\(y&gt;x\) 分段：</p>
+
+\[
+\int_{-\infty}^0 e^{-a(x-y)}e^{ay}\,dy
+\;+\;
+\int_0^x e^{-a(x-y)}e^{-ay}\,dy
+\;+\;
+\int_x^\infty e^{-a(y-x)}e^{-ay}\,dy.
+\]
+
+<p>逐段化简：</p>
+
+\[
+\int_{-\infty}^0 e^{-ax}e^{2ay}\,dy
+=e^{-ax}\cdot \frac1{2a},
+\]
+
+\[
+\int_0^x e^{-ax}\,dy
+=xe^{-ax},
+\]
+
+\[
+\int_x^\infty e^{ax}e^{-2ay}\,dy
+=e^{-ax}\cdot \frac1{2a}.
+\]
+
+<p>相加得到</p>
+
+\[
+(g_a*g_a)(x)=\left(x+\frac1a\right)e^{-ax},\qquad x\ge 0.
+\]
+
+<p>由偶对称性推广到全实轴：</p>
+
+\[
+\boxed{
+(g_a*g_a)(x)=\left(|x|+\frac1a\right)e^{-a|x|}.
+}
+\]
+
+<p>这个公式很漂亮，因为它告诉你：即使原函数在 \(0\) 处只有尖点，和自己卷一次之后，尖点已经被拉平了一层，前面还多出一个线性因子。下一章做傅里叶变换时，这个例子还会再回来。</p>
+
+<h2 id="sec17-3">17.3 Young 不等式：卷完以后到底有多大</h2>
+
+<p>现在进入本章最核心的估计。卷积会把两个函数揉在一起，但揉完以后到底会不会爆掉？Young 不等式给出精确控制。</p>
+
+\[
+\boxed{
+\|f*g\|_r \le \|f\|_p\,\|g\|_q,
+\qquad
+1\le p,q,r\le \infty,\quad
+1+\frac1r=\frac1p+\frac1q.
+}
+\]
+
+<p>这个条件</p>
+
+\[
+1+\frac1r=\frac1p+\frac1q
+\]
+
+<p>你最好现在就记住。它和 Hölder 的</p>
+
+\[
+\frac1p+\frac1q=1
+\]
+
+<p>长得像，但多出来的那一个 1，正是“积分掉一个变量”带来的量纲补偿。你也可以把它理解成：卷积吃掉了一个积分变量，所以指数关系会比乘积估计多一层偏移。</p>
+
+<p>先给出一个完整证明。设 \(1\le p,q,r&lt;\infty\)；端点 \(=\infty\) 的情形可用极限或单独估计处理。固定 \(x\)，把 integrand 写成三块：</p>
+
+\[
+|f(x-y)g(y)|
+=
+\bigl(|f(x-y)|^p|g(y)|^q\bigr)^{1/r}
+\cdot
+|f(x-y)|^{1-p/r}
+\cdot
+|g(y)|^{1-q/r}.
+\]
+
+<p>对这三个因子用 Hölder，不等式的指数分别取</p>
+
+\[
+r,\qquad \frac{p}{1-p/r},\qquad \frac{q}{1-q/r}.
+\]
+
+<p>为什么这三个指数合法？因为它们的倒数之和恰好等于 1：</p>
+
+\[
+\frac1r+\frac{1-p/r}{p}+\frac{1-q/r}{q}
+\;=\;
+\frac1p+\frac1q-\frac1r
+\;=\;1.
+\]
+
+<p>于是得到</p>
+
+\[
+|f*g(x)|
+\le
+\left(\int |f(x-y)|^p|g(y)|^q\,dy\right)^{1/r}
+\|f\|_p^{\,1-p/r}
+\|g\|_q^{\,1-q/r}.
+\]
+
+<p>两边取 \(r\) 次方：</p>
+
+\[
+|f*g(x)|^r
+\le
+\left(\int |f(x-y)|^p|g(y)|^q\,dy\right)
+\|f\|_p^{\,r-p}
+\|g\|_q^{\,r-q}.
+\]
+
+<p>再对 \(x\) 积分，并用 Fubini 交换积分次序：</p>
+
+\[
+\|f*g\|_r^r
+\le
+\|f\|_p^{\,r-p}\|g\|_q^{\,r-q}
+\int\!\!\int |f(x-y)|^p|g(y)|^q\,dy\,dx.
+\]
+
+<p>对内层做变量替换 \(z=x-y\)，得到</p>
+
+\[
+\int\!\!\int |f(x-y)|^p|g(y)|^q\,dy\,dx
+=
+\left(\int |f(z)|^p\,dz\right)\left(\int |g(y)|^q\,dy\right)
+=
+\|f\|_p^p\|g\|_q^q.
+\]
+
+<p>代回去：</p>
+
+\[
+\|f*g\|_r^r
+\le
+\|f\|_p^{\,r}\|g\|_q^{\,r}.
+\]
+
+<p>开 \(r\) 次方就得到 Young 不等式。</p>
+
+<p>最常用的两个特例你最好随手就能写出来：</p>
+
+\[
+\boxed{
+\|f*g\|_p\le \|f\|_p\|g\|_1
+\qquad (1\le p\le \infty),
+}
+\]
+
+\[
+\boxed{
+\|f*g\|_\infty\le \|f\|_p\|g\|_q
+\qquad \left(\frac1p+\frac1q=1\right).
+}
+\]
+
+<p>第一条说：用 \(L^1\) 核去平滑 \(L^p\) 函数，不会放大 \(L^p\) 范数超过核的总质量；第二条说：如果两个函数指数互为共轭，那么卷积会变成有界连续函数。这两条几乎贯穿整章。</p>
+
+<p><strong>例题 3.</strong> 用 Young 不等式证明：若 \(f\in L^2(\mathbb R^d)\)、\(g\in L^1(\mathbb R^d)\)，则 \(f*g\in L^2(\mathbb R^d)\)，且</p>
+
+\[
+\|f*g\|_2\le \|f\|_2\|g\|_1.
+\]
+
+<p>这里只需在 Young 不等式里取</p>
+
+\[
+p=2,\qquad q=1,\qquad r=2.
+\]
+
+<p>因为</p>
+
+\[
+1+\frac12=\frac12+1.
+\]
+
+<p>于是立刻得到</p>
+
+\[
+\boxed{
+\|f*g\|_2\le \|f\|_2\|g\|_1.
+}
+\]
+
+<p>这条特例以后会反复出现。比如当 \(g=\phi_\varepsilon\) 是质量为 1 的软化器时，上式直接变成</p>
+
+\[
+\|f*\phi_\varepsilon\|_2\le \|f\|_2.
+\]
+
+<p>所以软化不会把 \(L^2\) 能量炸大。这和<a href="../偏微分方程/ch20.html">《偏微分方程读本》第 20 章</a>里能量法的口味完全一致。</p>
+
+<h2 id="sec17-4">17.4 软化器：怎样系统地制造“越来越尖、总质量等于 1”的平滑核</h2>
+
+<p>卷积本身还只是一个操作。想把它变成逼近机器，你需要一族特别设计的核。最标准的做法是选一个非负、光滑、紧支撑、总质量为 1 的函数 \(\phi\)，再缩放成越来越窄的一家子 \(\phi_\varepsilon\)。</p>
+
+<p>在 \(\mathbb R^d\) 上，典型选择是</p>
+
+\[
+\phi(x)=
+\begin{cases}
+C\exp\!\left(-\dfrac1{1-|x|^2}\right),&|x|&lt;1,\\[8pt]
+0,&|x|\ge 1,
+\end{cases}
+\]
+
+<p>其中常数 \(C\) 由条件</p>
+
+\[
+\int_{\mathbb R^d}\phi(x)\,dx=1
+\]
+
+<p>确定。然后定义</p>
+
+\[
+\boxed{
+\phi_\varepsilon(x)=\varepsilon^{-d}\phi\!\left(\frac{x}{\varepsilon}\right),\qquad \varepsilon&gt;0.
+}
+\]
+
+<p>这几个性质你最好一口气记住：</p>
+
+\[
+\phi_\varepsilon\ge 0,\qquad
+\int_{\mathbb R^d}\phi_\varepsilon(x)\,dx=1,\qquad
+\operatorname{supp}\phi_\varepsilon\subset B(0,\varepsilon).
+\]
+
+<p>最后一条尤其重要：当 \(\varepsilon\to 0\) 时，核的质量被越来越紧地压回原点。这就是“近似单位元”的核心几何图像。</p>
+
+<p>若 \(f\in L^1_{\mathrm{loc}}(\mathbb R^d)\)，定义它的软化为</p>
+
+\[
+f_\varepsilon=f*\phi_\varepsilon.
+\]
+
+<p>由上一节说过的微分交换，\(f_\varepsilon\in C^\infty\)，并且</p>
+
+\[
+\partial^\alpha f_\varepsilon = f*(\partial^\alpha\phi_\varepsilon).
+\]
+
+<p>换句话说，哪怕 \(f\) 原来只有 \(L^1_{\mathrm{loc}}\) 正则性，卷一次软化器之后，所有阶导数都会被核吸收出来。你在 PDE 里看到的“先把粗糙初值用平滑函数逼近，再对平滑问题做估计，最后极限回去”的套路，底层几乎都是这一招。</p>
+
+<p><strong>例题 4.</strong> 令 \(H(x)=\mathbf 1_{[0,\infty)}(x)\) 为 Heaviside 阶跃函数，\(\phi\) 取偶的软化器。写出 \(H_\varepsilon=H*\phi_\varepsilon\)，并说明它为什么是把跳跃磨圆的标准模型。</p>
+
+\[
+H_\varepsilon(x)=\int_{\mathbb R}H(x-y)\phi_\varepsilon(y)\,dy.
+\]
+
+<p>因为 \(H(x-y)=1\) 当且仅当 \(y\le x\)，所以</p>
+
+\[
+H_\varepsilon(x)=\int_{-\infty}^{x}\phi_\varepsilon(y)\,dy.
+\]
+
+<p>于是 \(H_\varepsilon\) 是一条从 0 平滑爬到 1 的 S 形曲线。更进一步，对 \(x\) 求导：</p>
+
+\[
+H_\varepsilon'(x)=\phi_\varepsilon(x).
+\]
+
+<p>也就是说，原来阶跃函数那个“瞬间跳 1”的导数，在软化以后被摊成了一团总质量为 1、宽度约为 \(\varepsilon\) 的小鼓包。这是分布导数里 \(\delta_0\) 的最基本近似图像；到了第 17.7 节，它会变成一句非常有力量的话。</p>
+
+\[
+\boxed{
+(\mathbf 1_{[0,\infty)}*\phi_\varepsilon)'=\phi_\varepsilon.
+}
+\]
+
+<p>你最好把这张图牢牢记住：卷积会把“垂直断崖”变成“陡但连续的斜坡”，而它的导数正是一团越来越尖的近似 delta 质量。</p>
+
+<h2 id="sec17-5">17.5 为什么 \(f*\phi_\varepsilon\to f\)：近似恒等式与 Lebesgue 点</h2>
+
+<p>现在进入软化器真正值钱的结论。设 \(\{\phi_\varepsilon\}\) 是上节那样的标准软化器。直觉上，当 \(\varepsilon\) 很小时，\(\phi_\varepsilon\) 几乎把全部质量都压在原点附近，因此 \(f*\phi_\varepsilon(x)\) 应该只是 \(f\) 在 \(x\) 附近的局部平均。既然第 16 章的 Lebesgue 微分定理已经告诉你这种局部平均在 Lebesgue 点上会回到原函数，那么就应该期待</p>
+
+\[
+f*\phi_\varepsilon(x)\to f(x)\quad\text{a.e.}
+\]
+
+<p>事实确实如此，而且还能升级成 \(L^p\) 收敛。</p>
+
+\[
+\boxed{
+1\le p&lt;\infty,\ f\in L^p(\mathbb R^d)
+\Longrightarrow
+\|f*\phi_\varepsilon-f\|_p\to 0.
+}
+\]
+
+<p>证明特别漂亮，只用到平移在 \(L^p\) 里的连续性。先写差：</p>
+
+\[
+f*\phi_\varepsilon(x)-f(x)
+=\int_{\mathbb R^d}\phi_\varepsilon(y)\bigl(f(x-y)-f(x)\bigr)\,dy.
+\]
+
+<p>对 \(L^p\) 范数用 Minkowski 积分不等式：</p>
+
+\[
+\|f*\phi_\varepsilon-f\|_p
+\le
+\int_{\mathbb R^d}\phi_\varepsilon(y)\,\|\tau_y f-f\|_p\,dy,
+\]
+
+<p>其中 \(\tau_yf(x)=f(x-y)\)。由于 \(\operatorname{supp}\phi_\varepsilon\subset B(0,\varepsilon)\)，上式进一步给出</p>
+
+\[
+\|f*\phi_\varepsilon-f\|_p
+\le
+\sup_{|y|\le \varepsilon}\|\tau_y f-f\|_p.
+\]
+
+<p>而 \(L^p\) 中平移连续：</p>
+
+\[
+\|\tau_y f-f\|_p\to 0\qquad (y\to 0).
+\]
+
+<p>于是立刻推出 \(L^p\) 收敛。</p>
+
+<p>这条证明比你想象的更有力量。它说明：软化器收敛不是靠某个很微妙的特殊结构，而是靠“质量集中到 0”加“平移在 \(L^p\) 连续”这两件非常稳的事情。所有近似恒等式，本质上都是这一招。</p>
+
+<p><strong>例题 5.</strong> 令 \(f=\mathbf 1_{[0,1]}\)，\(\phi_\varepsilon\) 为一维偶软化器。描述 \(f_\varepsilon=f*\phi_\varepsilon\) 的形状，并说明 \(f_\varepsilon\to f\) 在 \(L^1(\mathbb R)\) 成立。</p>
+
+<p>由于 \(\phi_\varepsilon\) 支撑在 \([-\varepsilon,\varepsilon]\)，当 \(x\in[\varepsilon,1-\varepsilon]\) 时，整个 \(x-y\) 都落在 \([0,1]\) 内，所以</p>
+
+\[
+f_\varepsilon(x)=\int \phi_\varepsilon(y)\,dy=1.
+\]
+
+<p>当 \(x\le -\varepsilon\) 或 \(x\ge 1+\varepsilon\) 时，卷积值为 0。只在两个边界层 \([-\varepsilon,\varepsilon]\) 与 \([1-\varepsilon,1+\varepsilon]\) 上，函数从 0 平滑爬到 1 再平滑落回 0。于是 \(f_\varepsilon\) 看起来像“边角被磨圆的指标函数”。</p>
+
+<p>至于 \(L^1\) 收敛，直接用上面的定理，取 \(p=1\) 即得：</p>
+
+\[
+\|f_\varepsilon-f\|_1\to 0.
+\]
+
+<p>如果你愿意再多看一步，还能从图像上理解：两者只在总长度约 \(4\varepsilon\) 的边界层里不一样，而函数值差最多为 1，所以</p>
+
+\[
+\|f_\varepsilon-f\|_1\le 4\varepsilon\to 0.
+\]
+
+<p>这题很像第 16 章的指标函数平均值例子，只不过现在平均核是任意光滑核，而不是硬生生的区间平均。</p>
+
+<h2 id="sec17-6">17.6 \(C_c^\infty\) 在 \(L^p\) 中稠密：先截断，再平滑</h2>
+
+<p>上一节已经说明：只要函数本身有紧支撑，软化以后就能用 \(C_c^\infty\) 函数逼近它。真正剩下的问题，是一般 \(L^p(\mathbb R^d)\) 函数可能没有紧支撑。解决办法很朴素：先把远处尾巴砍掉，再把局部粗糙处磨平。</p>
+
+<p>对 \(1\le p&lt;\infty\)，给定 \(f\in L^p(\mathbb R^d)\)。先定义截断</p>
+
+\[
+f_R=f\,\mathbf 1_{B(0,R)}.
+\]
+
+<p>因为 \(f\in L^p\)，由单调收敛或支配收敛可得</p>
+
+\[
+\|f-f_R\|_p\to 0\qquad (R\to\infty).
+\]
+
+<p>接着对固定 \(R\)，取软化</p>
+
+\[
+f_{R,\varepsilon}=f_R*\phi_\varepsilon.
+\]
+
+<p>由第 17.5 节，</p>
+
+\[
+\|f_{R,\varepsilon}-f_R\|_p\to 0\qquad (\varepsilon\to 0).
+\]
+
+<p>而且 \(f_{R,\varepsilon}\in C^\infty\)，支撑落在 \(B(0,R+\varepsilon)\) 内，所以</p>
+
+\[
+f_{R,\varepsilon}\in C_c^\infty(\mathbb R^d).
+\]
+
+<p>于是先取 \(R\) 大，再取 \(\varepsilon\) 小，就能把 \(f\) 用紧支撑光滑函数逼近。结论是：</p>
+
+\[
+\boxed{
+C_c^\infty(\mathbb R^d)\ \text{在}\ L^p(\mathbb R^d)\ \text{中稠密},\qquad 1\le p&lt;\infty.
+}
+\]
+
+<p>这个结论看起来像一句“基础性质”，但它实际上是无数分析论证的起点。因为很多积分恒等式、分部积分、微分交换、Fourier 计算，最容易先对 \(C_c^\infty\) 函数证明；一旦知道它在 \(L^p\) 里稠密，你就可以把结果延拓到整个空间。你在<a href="../偏微分方程/ch21.html">《偏微分方程读本》第 21 章</a>看到的测试函数语言，背后的技术地板正是这里。</p>
+
+<p>顺手说一句：\(L^\infty\) 里事情就没这么美。\(C_c^\infty(\mathbb R^d)\) 在 \(L^\infty\) 范数下并不稠密。比如常数函数 1 不可能被紧支撑函数在 sup 范数下逼近，因为任何紧支撑函数在远处都等于 0，于是</p>
+
+\[
+\|1-\varphi\|_\infty\ge 1\qquad (\varphi\in C_c^\infty).
+\]
+
+<p>这个小反例再次提醒你：\(L^p\) 世界里，\(p&lt;\infty\) 和 \(p=\infty\) 的性格常常是分家的。</p>
+
+<h2 id="sec17-7">17.7 分布的逼近：弱导数为什么喜欢软化器</h2>
+
+<p>最后把这章和分布、弱导数接上。设 \(T\) 是一个分布，即 \(T\in\mathcal D'(\mathbb R^d)\)。对光滑核 \(\phi\)，定义</p>
+
+\[
+(T*\phi)(x)=T\bigl(\check\phi(x-\cdot)\bigr),
+\qquad
+\check\phi(z)=\phi(-z).
+\]
+
+<p>这是一个普通光滑函数，而且任意阶导数都能拉到核上：</p>
+
+\[
+\partial^\alpha(T*\phi)=T*(\partial^\alpha\phi).
+\]
+
+<p>特别地，若 \(\phi_\varepsilon\) 是软化器，则</p>
+
+\[
+T_\varepsilon=T*\phi_\varepsilon\in C^\infty(\mathbb R^d),
+\]
+
+<p>并且当 \(\varepsilon\to 0\) 时，\(T_\varepsilon\to T\) 在分布意义下成立。也就是说，对每个测试函数 \(\psi\in C_c^\infty\)，都有</p>
+
+\[
+\langle T_\varepsilon,\psi\rangle \to \langle T,\psi\rangle.
+\]
+
+<p>这件事在弱导数里尤其重要。若 \(u\in L^1_{\mathrm{loc}}\) 有弱导数 \(\partial_j u\)，则</p>
+
+\[
+\partial_j(u*\phi_\varepsilon)=u*(\partial_j\phi_\varepsilon)=(\partial_j u)*\phi_\varepsilon.
+\]
+
+<p>也就是说，软化与弱微分完全兼容。于是你可以先把粗糙函数 \(u\) 磨成光滑函数 \(u_\varepsilon\)，在 \(u_\varepsilon\) 上合法地做所有经典微分运算，再把估计通过极限送回原来的弱对象。这几乎是现代 PDE 的标准工作流。</p>
+
+<p><strong>例题 6.</strong> 用软化器说明 Heaviside 函数的分布导数是 \(\delta_0\)。</p>
+
+<p>前面已经算过</p>
+
+\[
+H_\varepsilon=H*\phi_\varepsilon,\qquad H_\varepsilon'=\phi_\varepsilon.
+\]
+
+<p>对任意测试函数 \(\psi\in C_c^\infty(\mathbb R)\)，有</p>
+
+\[
+\int_{\mathbb R} H_\varepsilon'(x)\psi(x)\,dx
+=
+\int_{\mathbb R}\phi_\varepsilon(x)\psi(x)\,dx.
+\]
+
+<p>由于 \(\phi_\varepsilon\) 是近似恒等式，右边趋于 \(\psi(0)\)。也就是说</p>
+
+\[
+\lim_{\varepsilon\to 0}\int H_\varepsilon'(x)\psi(x)\,dx=\psi(0).
+\]
+
+<p>另一方面，\(H_\varepsilon\to H\) 在 \(L^1_{\mathrm{loc}}\) 中，所以分布意义下 \(H_\varepsilon'\to H'\)。于是</p>
+
+\[
+\langle H',\psi\rangle=\psi(0)=\langle \delta_0,\psi\rangle.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+H'=\delta_0\qquad\text{in }\mathcal D'(\mathbb R).
+}
+\]
+
+<p>这就是“跳跃的导数是一团集中质量”的最经典版本。它把第 16 章 BV 函数里“导数可以变成测度”的说法，第一次具体地画成了公式。</p>
+
+<p>到这里，这章的真正主线已经闭合了。卷积先给你一个局部平均操作；Young 不等式保证平均不会把范数炸坏；软化器把平均做成越来越尖的近似恒等式；于是光滑紧支撑函数在 \(L^p\) 中稠密，分布也能被光滑函数逼近。你会发现，这不是四个零散结论，而是一整套“把粗糙对象先磨光再极限回去”的统一技术。下一章傅里叶变换一上场，这整套技术的另一张脸就会立刻露出来：<strong>卷积在物理空间里是平均，在频率空间里则只是乘法。</strong></p>
+
+<h2 id="sec17-8">17.8 平移连续：为什么所有近似恒等式最后都落回这一件事</h2>
+
+<p>第 17.5 节证明 \(f*\phi_\varepsilon\to f\) 时，真正起决定作用的那一句是</p>
+
+\[
+\|\tau_y f-f\|_p\to 0\qquad (y\to 0).
+\]
+
+<p>也就是说，平移在 \(L^p\) 里连续。你最好不要把它当成技术注脚，因为几乎所有“近似恒等式”收敛、本地平均收敛、卷积逼近、Fourier 反演中的 Abel 和 Cesàro 求和，最后都要落回这件事。它是整条逼近理论的地板。</p>
+
+<p>对 \(C_c(\mathbb R^d)\) 函数，这条性质几乎肉眼可见。因为连续紧支撑函数在紧集上一致连续，若 \(f\in C_c\)，则</p>
+
+\[
+\sup_x|f(x-y)-f(x)|\to 0\qquad (y\to 0).
+\]
+
+<p>再乘上一个固定有限的支撑体积，就得到</p>
+
+\[
+\|\tau_y f-f\|_p\to 0.
+\]
+
+<p>对一般 \(f\in L^p\)，只需用第 17.6 节的稠密性。取 \(g\in C_c^\infty\) 使 \(\|f-g\|_p\) 很小，则</p>
+
+\[
+\|\tau_y f-f\|_p
+\le
+\|\tau_y(f-g)\|_p+\|\tau_y g-g\|_p+\|g-f\|_p.
+\]
+
+<p>因为平移不改变 \(L^p\) 范数，第一项等于 \(\|f-g\|_p\)，第三项也是 \(\|f-g\|_p\)，中间项则随 \(y\to 0\) 消失。于是任给 \(\varepsilon&gt;0\)，先取 \(g\) 使两端各小于 \(\varepsilon/3\)，再取 \(y\) 足够小使中间项小于 \(\varepsilon/3\)，就得到平移连续性。</p>
+
+\[
+\boxed{
+1\le p&lt;\infty,\ f\in L^p(\mathbb R^d)
+\Longrightarrow
+\|\tau_y f-f\|_p\to 0\quad (y\to 0).
+}
+\]
+
+<p>这条结论为什么在 \(L^\infty\) 里会坏？因为 sup 范数会死死盯住最坏点。对阶梯函数这样的对象，只要有一个跳点，任何再小的平移都会在那里制造高度约 1 的差值，于是 \(\|\tau_y f-f\|_\infty\) 根本下不去。这和第 17.6 节说 \(C_c^\infty\) 在 \(L^\infty\) 里不稠密，是完全同一类现象。</p>
+
+<p><strong>例题 7.</strong> 在 \(\mathbb R\) 上令 \(f=\mathbf 1_{[0,1]}\)。计算当 \(|h|&lt;1\) 时</p>
+
+\[
+\|\tau_h f-f\|_1
+\quad\text{与}\quad
+\|\tau_h f-f\|_\infty.
+\]
+
+<p>先看 \(L^1\)。函数 \(\tau_h f\) 就是 \(\mathbf 1_{[h,1+h]}\)。两个指标函数不同的地方，正是两区间的对称差，其长度为 \(2|h|\)。所以</p>
+
+\[
+\|\tau_h f-f\|_1=2|h|.
+\]
+
+<p>因此当 \(h\to 0\) 时，\(\|\tau_h f-f\|_1\to 0\)。</p>
+
+<p>再看 \(L^\infty\)。只要 \(h\neq 0\)，总能在一个小区间里出现“一个函数等于 1，另一个等于 0”的情况，于是</p>
+
+\[
+|\tau_h f(x)-f(x)|=1
+\]
+
+<p>在某些点上成立，所以</p>
+
+\[
+\|\tau_h f-f\|_\infty=1,\qquad h\neq 0.
+\]
+
+<p>因此</p>
+
+\[
+\boxed{
+\|\tau_h \mathbf 1_{[0,1]}-\mathbf 1_{[0,1]}\|_1=2|h|\to 0,
+\qquad
+\|\tau_h \mathbf 1_{[0,1]}-\mathbf 1_{[0,1]}\|_\infty=1.
+}
+\]
+
+<p>这题极其值得记住，因为它把 \(L^p\) 与 \(L^\infty\) 在逼近理论上的分水岭，一下子画得明明白白。第 16 章里说“几乎处处”比逐点更自然，这里则是在说“平均意义”比最坏点控制更适合做逼近。</p>
+
+<h2 id="sec17-9">17.9 现实里的软化：边界、延拓、局部化与单位分解</h2>
+
+<p>到目前为止，我们一直在整块 \(\mathbb R^d\) 上卷来卷去。但真实工作里，你常常只在某个开集 \(\Omega\subset\mathbb R^d\) 上有函数。此时直接做卷积会立刻遇到一个朴素麻烦：核会越界。也就是说，若 \(u\) 只定义在 \(\Omega\) 上，那么</p>
+
+\[
+(u*\phi_\varepsilon)(x)=\int_\Omega u(y)\phi_\varepsilon(x-y)\,dy
+\]
+
+<p>只有在 \(x\) 离边界至少 \(\varepsilon\) 远时，才真正像第 17.4 节那样利用到了完整核。靠近边界，球 \(B(x,\varepsilon)\) 会碰到 \(\Omega^c\)，卷积就不再是“完整平均”。</p>
+
+<p>这不是坏消息，它只是逼你多走一步。最常见的处理策略有三种。</p>
+
+<p>第一种是<strong>先延拓再卷</strong>。如果你只是想在 \(L^p(\Omega)\) 里逼近，不特别在意边界值，最简单的办法是把 \(u\) 零延拓到整个 \(\mathbb R^d\)，再和 \(\phi_\varepsilon\) 卷。这样得到的是整个空间上的光滑函数；如果最后只在 \(\Omega\) 内部看它，它会回到 \(u\)。</p>
+
+<p>第二种是<strong>按边界条件选择延拓方式</strong>。例如在半直线或区间上，Dirichlet 边界条件常配奇延拓，Neumann 边界条件常配偶延拓。这样一来，卷完以后对应的边界行为还能保留下来。这其实和<a href="../偏微分方程/ch12.html">《偏微分方程读本》第 12 章</a>镜像法的逻辑完全同型：边界条件不是卷积的敌人，只是要求你先把对称性选对。</p>
+
+<p>第三种是<strong>局部化再拼回去</strong>。先用 cutoff 函数 \(\chi\in C_c^\infty(\Omega)\) 把 \(u\) 截成 \(\chi u\)，这时 \(\chi u\) 有紧支撑，离边界有正距离；对它做卷积以后，支撑仍留在 \(\Omega\) 内。若要覆盖整个 \(\Omega\)，就用一组单位分解 \(\{\chi_j\}\)，分别软化 \(\chi_j u\)，最后再把所有块加起来。这正是流形、非平坦区域、局部坐标图上标准的平滑流程。</p>
+
+<p><strong>例题 8.</strong> 设 \(u\in L^p(0,\infty)\) 且满足 \(u(0)=0\)（把它先理解成连续函数即可）。定义奇延拓</p>
+
+\[
+\widetilde u(x)=
+\begin{cases}
+u(x),&x\ge 0,\\[4pt]
+-u(-x),&x&lt;0.
+\end{cases}
+\]
+
+<p>若 \(\phi\) 取偶软化器，证明 \((\widetilde u*\phi_\varepsilon)(0)=0\)。</p>
+
+<p>因为 \(\widetilde u\) 奇、\(\phi_\varepsilon\) 偶，所以被积函数</p>
+
+\[
+y\mapsto \widetilde u(-y)\phi_\varepsilon(y)
+\]
+
+<p>是奇函数。于是</p>
+
+\[
+(\widetilde u*\phi_\varepsilon)(0)
+=
+\int_{\mathbb R}\widetilde u(-y)\phi_\varepsilon(y)\,dy
+=0.
+\]
+
+<p>这说明奇延拓加偶核，会自动保住 0 处的零边界值。也就是说，若你想平滑一个满足 Dirichlet 条件的对象，直接零延拓固然能逼近，但奇延拓往往更尊重边界结构。</p>
+
+<p>在弱解理论里，第三种策略最常见。设 \(\Omega\subset\mathbb R^d\) 开，\(u\in L^p(\Omega)\)，取 \(\chi\in C_c^\infty(\Omega)\)。则 \(\chi u\) 零延拓到整个空间后，\((\chi u)*\phi_\varepsilon\in C_c^\infty(\Omega)\) 当 \(\varepsilon\) 足够小时成立，并且</p>
+
+\[
+(\chi u)*\phi_\varepsilon\to \chi u
+\quad\text{in }L^p(\Omega).
+\]
+
+<p>这就是为什么测试函数空间 \(C_c^\infty(\Omega)\) 在 PDE 里如此核心：不是因为它“看着干净”，而是因为任何局部 \(L^p\) 对象都能先被 cutoff 关进一个小盒子，再被软化成这种干净函数。</p>
+
+<p>你现在也该更能看懂第 17 章为什么必须和<a href="../偏微分方程/ch21.html">《偏微分方程读本》第 21 章</a>挨在一起读了。弱导数、弱解、分布逼近、测试函数、局部正则化，这些词背后并没有五套分开的技术；它们几乎都来自“先局部化，再用软化器卷一遍”这一条朴素流程。</p>
+
+<p>把这一节加进来后，你就可以把卷积当成一套真正可落地的工作法，而不是停留在整空间的抽象定义上：先判断你是在整空间还是在有边界区域；若有边界，决定零延拓、奇偶延拓还是 cutoff 局部化；再用软化器获得光滑近似；最后利用 Young 不等式、平移连续和分布收敛把估计送回原对象。分析里大量“把粗糙数据处理成可以微分的好数据”的步骤，本质上都不过如此。</p>
+
+<h2 id="sec17-10">17.10 稠密性真正怎么用：先在 \(C_c^\infty\) 上证明，再把结论延拓出去</h2>
+
+<p>第 17.6 节说 \(C_c^\infty\) 在 \(L^p\) 中稠密，这句话如果只当成“一个基础定理”放着，会非常浪费。它真正的用途，是把大量原本只对光滑函数显然成立的公式，系统地延拓到粗糙对象上去。你以后做分析证明时，最常见的套路之一就是：</p>
+
+\[
+\boxed{
+\text{先对 }C_c^\infty\text{ 证明；再用稠密性、范数估计或弱收敛把它推广。}
+}
+\]
+
+<p>为什么这招这么常见？因为光滑紧支撑函数有三项别人很难同时拥有的优点：</p>
+
+<ul>
+  <li>可以任意次分部积分；</li>
+  <li>支撑紧，所以边界项容易消失；</li>
+  <li>经过卷积、Fourier、微分后仍然保持非常可控。</li>
+</ul>
+
+<p>一旦某条恒等式、估计或极限交换规律已经在 \(C_c^\infty\) 上证明完毕，只要右边对 \(L^p\) 极限稳定，你就可以把结果送给整个空间。比如第 18 章的 Parseval 公式，最初就是先在 \(C_c^\infty\) 上证明，再借 \(L^2\) 稠密性延拓到所有 \(L^2\) 函数。</p>
+
+<p>弱导数也是同一个故事。设 \(u_n\in C_c^\infty(\Omega)\)，并且</p>
+
+\[
+u_n\to u\quad\text{in }L^p(\Omega),\qquad
+\partial_j u_n\to v_j\quad\text{in }L^p(\Omega).
+\]
+
+<p>那么对任意测试函数 \(\varphi\in C_c^\infty(\Omega)\)，有</p>
+
+\[
+\int_\Omega u_n\,\partial_j\varphi\,dx
+=
+-\int_\Omega \partial_j u_n\,\varphi\,dx.
+\]
+
+<p>令 \(n\to\infty\)，由于 \(L^p\)-\(L^q\) 配对连续，就得到</p>
+
+\[
+\int_\Omega u\,\partial_j\varphi\,dx
+=
+-\int_\Omega v_j\,\varphi\,dx.
+\]
+
+<p>所以 \(v_j\) 正是 \(u\) 的弱导数。你看，弱导数之所以是自然概念，并不是因为有人突然发明了一个抽象定义，而是因为“光滑函数上的分部积分公式对极限稳定”，于是逼近自动把它推给了粗糙函数。</p>
+
+<p><strong>例题 9.</strong> 设 \(\Omega\subset\mathbb R^d\) 开，\(u\in W^{1,p}(\Omega)\)。说明为什么可以取一列 \(u_n\in C_c^\infty(\Omega)\) 使</p>
+
+\[
+u_n\to u,\qquad \nabla u_n\to \nabla u
+\quad\text{在 }L^p(\Omega)\text{ 中成立}
+\]
+
+<p>这件事会立刻让很多公式从 \(u_n\) 传给 \(u\)。</p>
+
+<p>这不是对任意 \(\Omega\) 都无条件成立；严格地说，你通常需要 \(\Omega\) 具有足够好的边界，或者先把 \(u\) 乘上 cutoff 再在局部做。即便如此，思想非常简单：局部化、延拓、卷积、拼回去。然后一切在光滑层面显然成立的积分恒等式，比如</p>
+
+\[
+\int_\Omega u_n\,\partial_j\varphi=-\int_\Omega (\partial_j u_n)\varphi,
+\]
+
+<p>都可以把 \(n\to\infty\) 送过去，成为 \(u\) 的弱形式。也就是说，稠密性真正给你的不是“存在很多光滑函数”，而是“可以把分析定律从光滑世界稳定搬运到粗糙世界”。</p>
+
+<p>如果你现在回看<a href="../偏微分方程/ch21.html">《偏微分方程读本》第 21 章</a>，会发现那里的很多做法其实都在默认这套搬运机制：先对平滑解算，后对弱解取极限。第 17 章就是这套机制的技术来源。</p>
+
+<h2 id="sec17-11">17.11 反复卷积、半群与概率味道：平滑不只做一次</h2>
+
+<p>卷积还有一层很值得单独提的结构：它可以反复做，而且常常越做越像时间演化。因为卷积结合，所以如果你有一族核 \(\{K_t\}_{t&gt;0}\) 满足</p>
+
+\[
+K_t*K_s=K_{t+s},
+\]
+
+<p>那么</p>
+
+\[
+T_t f=f*K_t
+\]
+
+<p>就自动形成一个半群：</p>
+
+\[
+T_t(T_s f)=T_{t+s}f.
+\]
+
+<p>这时“平滑一次”就不再只是静态操作，而开始像“让数据沿时间流动 \(t\) 个单位”。热核和 Poisson 核都是最标准的例子。也正因为如此，卷积会同时出现在调和分析、概率论和 PDE 里：它既像平均，也像传播，也像加独立噪声。</p>
+
+<p>对概率论读者，这件事尤其自然。若 \(X,Y\) 独立，密度分别为 \(f,g\)，那么 \(X+Y\) 的密度正是 \(f*g\)。所以“卷积核反复卷自己”本质上就是“独立增量不断累加”。Gaussian 核之所以在中心极限定理、热方程和傅里叶分析里同时称王，原因就在这里。</p>
+
+<p><strong>例题 10.</strong> 设一维 Gaussian 核取为</p>
+
+\[
+G_t(x)=\frac1{\sqrt{4\pi t}}e^{-x^2/(4t)},\qquad t&gt;0.
+\]
+
+<p>证明</p>
+
+\[
+G_t*G_s=G_{t+s}.
+\]
+
+<p>直接在实空间里硬算并不短，但用第 18 章的傅里叶变换会立刻一行结束。由于</p>
+
+\[
+\widehat{G_t}(\xi)=e^{-4\pi^2 t\xi^2},
+\]
+
+<p>所以</p>
+
+\[
+\widehat{G_t*G_s}(\xi)=\widehat{G_t}(\xi)\widehat{G_s}(\xi)
+=e^{-4\pi^2 t\xi^2}e^{-4\pi^2 s\xi^2}
+=e^{-4\pi^2 (t+s)\xi^2}.
+\]
+
+<p>而右边正是 \(\widehat{G_{t+s}}(\xi)\)。由傅里叶反演唯一性，</p>
+
+\[
+\boxed{
+G_t*G_s=G_{t+s}.
+}
+\]
+
+<p>这条公式把三门课一下子扣在一起了：</p>
+
+<ul>
+  <li>在 PDE 里，它说热方程先流 \(s\) 秒再流 \(t\) 秒，等于一次流 \(t+s\) 秒；</li>
+  <li>在概率里，它说两个独立高斯增量相加，方差相加；</li>
+  <li>在调和分析里，它说 Gaussian 是最典型的卷积半群核。</li>
+</ul>
+
+<p>Poisson 核同样满足半群关系，只不过对应的频率乘子从 \(e^{-4\pi^2 t|\xi|^2}\) 换成了 \(e^{-2\pi t|\xi|}\)。你在第 18 章会看到，这类半群核的真正身份其实是“频率空间里的指数乘子”。但从第 17 章的视角看，它们首先只是“反复平滑仍闭合”的一族卷积核。</p>
+
+<p>这一节的意义，在于把卷积从“一个局部平均公式”进一步提升成“一个可组合的动态机制”。等你下一章切换到傅里叶视角，会发现半群、乘子、滤波器、热核和 Poisson 核会开始排成一条直线。而那条直线的起点，其实就是这里这句朴素的话：卷积不只做一次，而且反复做下去仍然自洽。</p>
+
+<h2 id="sec17-12">17.12 把本章压成一套工作流：粗糙对象怎样被安全地送进光滑世界</h2>
+
+<p>这一章学完以后，最该留下来的并不是某一条公式，而是一整套非常稳定的工作流。以后你碰到一个 \(L^p\) 函数、一个弱解、一个分布，想对它做微分、分部积分、Fourier 变换、能量估计时，脑子里应该自动亮起下面这条线：</p>
+
+\[
+\boxed{
+\text{截断/局部化}
+\Longrightarrow
+\text{延拓}
+\Longrightarrow
+\text{卷积软化}
+\Longrightarrow
+\text{在光滑层面计算}
+\Longrightarrow
+\text{用 }L^p\text{ 或分布极限送回去。}
+}
+\]
+
+<p>这条流程为什么稳？因为每一步都有明确信息不丢失。</p>
+
+<ul>
+  <li>截断靠 \(L^p\) 尾部可控，不会影响大部分质量；</li>
+  <li>延拓只是把定义域搬到整空间，方便卷积；</li>
+  <li>卷积靠 Young 不等式不炸范数；</li>
+  <li>软化靠 \(C^\infty\) 核制造任意高阶导数；</li>
+  <li>回极限靠平移连续与近似恒等式保证收敛。</li>
+</ul>
+
+<p>于是你真正要训练的，不是“会不会卷积”，而是“什么时候该先截断、什么时候该奇延拓、什么时候该乘 cutoff 再卷”。这就是为什么同样是一个 mollifier，放在不同语境里会有不同用法：做 \(L^p\) 稠密性时，你只要整体逼近；做 Dirichlet 边界问题时，你还得保边界；做分布时，你要关心导数是否交换；做 PDE 弱解时，你则要确保所有误差都能在能量范数里关住。</p>
+
+<p>举个最常见的模板。设 \(\Omega\subset\mathbb R^d\) 开，\(u\in L^p(\Omega)\)。要证明某条只对 \(C_c^\infty(\Omega)\) 显然成立的积分恒等式也对 \(u\) 成立，你通常会这样做：</p>
+
+<ol>
+  <li>取一列 cutoff \(\chi_n\in C_c^\infty(\Omega)\)，满足 \(0\le \chi_n\le 1\)、\(\chi_n\uparrow 1\) 于 \(\Omega\) 内部；</li>
+  <li>令 \(u_n=(\chi_n u)*\phi_{\varepsilon_n}\)，其中 \(\varepsilon_n\downarrow 0\) 选得足够慢，使得 \(u_n\to u\) 于 \(L^p\)；</li>
+  <li>在每个 \(u_n\) 上写出你想要的光滑公式；</li>
+  <li>最后利用 Hölder、Young、支配收敛或弱收敛，把 \(n\to\infty\) 送过去。</li>
+</ol>
+
+<p>这四步看起来机械，实际上价值极高。因为一旦你有了它，你在证明里就不必每次都重新发明“如何从粗糙对象过渡到光滑对象”的桥。第 18 章的 Plancherel 延拓、第 21 章的弱导数、很多 Sobolev 空间逼近、甚至有限元里把弱形式先写在光滑函数上再闭包到能量空间，骨架都完全一样。</p>
+
+<p>换句话说，卷积、软化和稠密性并不是第 17 章几个并排摆放的工具，而是一套把分析从“点态操作”升级成“函数空间操作”的工业流程。你以后真正经常做的，不会是手算某个具体卷积，而是不断地把对象送进这条流程，再安全地带回来。只要这件事变成熟练动作，后面很多看起来抽象的理论都会突然失去神秘感。</p>
+
+<h2 id="sec17-13">17.13 使用卷积前最好先过一遍的五个检查点</h2>
+
+<p>本章最后再给你一个非常实战的清单。以后只要你准备对某个对象做卷积，脑子里最好先过下面五个问题。</p>
+
+<ul>
+  <li>第一，卷积有没有定义？至少要确认一个因子在 \(L^1\) 里，或者你正工作在分布语境。</li>
+  <li>第二，你到底想保什么范数？如果想保 \(L^p\)，先把 Young 不等式对应的指数关系写出来。</li>
+  <li>第三，你是在整空间还是有边界区域？如果有边界，先决定延拓或 cutoff 的策略。</li>
+  <li>第四，你想得到的是点态收敛、\(L^p\) 收敛，还是分布收敛？三者触发条件并不完全一样。</li>
+  <li>第五，你最后还要不要把导数送进去？如果要，就尽量让核承担微分，而不是让原函数承担。</li>
+</ul>
+
+<p>这五个检查点看上去琐碎，其实正是卷积技术从“会算一道题”升级成“能在证明里稳定使用”的分水岭。第 17 章真正想交给你的，不是某一个具体核，而是这种在下手前先做结构检查的习惯。一旦这习惯形成，卷积、软化、稠密性和分布逼近就会从一堆零件，变成一套随时能调度的系统。</p>
+
+<h2 id="sec17-14">17.14 收束成一句话：卷积是把粗糙世界接进光滑世界的螺丝刀</h2>
+
+<p>如果你想把第 17 章压成一句最实用的话，那就是：卷积不是为了算某个漂亮公式，而是为了给粗糙对象临时装上一层光滑外壳。只要你手里有一个质量为 1 的好核，就能把 \(L^p\) 函数、弱导数、分布、边界数据先送到光滑层面做运算，再安全地极限回来。Young 不等式保证它不乱放大，近似恒等式保证它不会跑偏，稠密性保证你做完以后还能回到原空间。这就是它为什么在测度论、PDE、概率和数值分析里都会反复出现的原因。</p>
+
+<p>到这里你最好已经形成一种直觉：看见卷积，就别只想到积分号；要同时想到平均、平滑、逼近、核、半群和局部化。第 18 章一旦把频率空间那张脸翻出来，你会发现这把“螺丝刀”在另一个坐标系里其实只是乘法。也正因为如此，第 17 章不是傅里叶分析之前的一段预备操练，而是整条现代分析技术线真正开始发力的地方。</p>
+
+<p>所以以后碰到一个粗糙对象时，你完全可以把第 17 章当成操作手册来翻：先问能不能局部化，能不能延拓，有没有合适的核，范数该用哪条 Young 不等式控制，最后收敛是 \(L^p\) 还是分布意义。只要这串问题会自动跳出来，卷积就已经从“会做一道题”升级成了“会组织一段证明”。</p>
+
+<p>真正熟练以后，你会发现很多证明表面上在讲稠密性、正则化、测试函数、半群、核估计，其实都只是这套卷积工作流在不同坐标里的展开。这也是为什么第 17 章明明只讲一个操作，却会在整本现代分析里反复回响。</p>
+
+<p>从这个意义上说，卷积是现代分析里最像“基础设施”的对象之一：平时你也许不总盯着它看，可一旦把地板掀开，底下几乎到处都铺着同一种结构。</p>
+
+<p>特别要注意的是，第 17 章的价值并不只在“能把东西弄光滑”。更关键的是，它给了你一套可控的近似程序。近似若不可控，就只是形式操作；而卷积之所以可靠，正是因为支撑、范数、导数、极限方式都能被一并追踪。你知道核的质量是多少，知道它在多大尺度内平均，知道它是否保正，知道它会不会把边界外的信息卷进来，也知道它在 \(L^p\) 与分布意义下会收敛到什么。这种全链条可追踪性，才使卷积成为现代分析里真正能落地的标准工序。</p>
+
+<p>因此以后再看到“先取一个平滑近似 \(f_\varepsilon\)”这种一句话，你应该能立刻把背后的工程细节补全：先选核，再缩放，再决定是否需要截断或延拓，再检查近似是在全空间、局部还是边界条件兼容的意义下成立，最后再把极限送回原问题。很多教材把这些步骤写得很轻，好像只是技术性准备；其实正是这些步骤决定了一个近似论证到底是严密可用，还是只停留在直觉层面。</p>
+
+<p>这也正是本章与<a href="../偏微分方程/ch21.html">《偏微分方程读本》第 21 章</a>衔接最紧的地方。分布、弱导数、弱解之所以能被有效操控，不是因为它们“神秘而抽象”，而是因为总能先借卷积回到 \(C^\infty\) 世界里做计算，再用一致的范数控制把结论送回来。没有这一来一回，分布理论往往只剩定义；有了这一来一回，它才真正变成可以工作的语言。</p>
+
+<p>因此如果你想判断自己是否真的掌握了第 17 章，一个很直接的标准就是：面对粗糙数据时，你能不能自然地设计出一条“先软化、再估计、后极限”的证明路径。只会背卷积定义还远远不够；真正的熟练，是你能立刻分辨该保哪个范数、该选哪种核、该在全空间还是局部区域做近似，以及最后该在什么意义下把 \(\varepsilon\to 0\) 送回去。第 17 章的本领，本质上是一种组织证明的工艺感。</p>
+
+<p>你往后学得越深，就会越频繁地发现自己其实还在重复使用第 17 章的同一把工具。</p>
+
+<hr class="section-end">
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 微分与积分：FTC 的现代版本</a><a href="ch18.html">下一章 · 第 18 章 傅里叶变换在 \(L^1\) 与 \(L^2\) 上 →</a></nav>
+
+</main>
+</body>
+</html>

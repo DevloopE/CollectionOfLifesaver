@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>索引 — 普林斯顿测度论与高级实分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B　选择公理与不可测集</a><span class="nav-disabled">下一章 →</span></nav>
+<h1 id='subject-index'>索引</h1>
+
+<p>本索引按拼音字母分组，但条目尽量写成“你现在到底想解决什么问题”的样子，而不是只堆术语。括号里的数字指向本书章节或附录。若一个概念同时属于几条主线，优先放在你最可能开口提问的动作下面。</p>
+
+<h2 id="index-A">A</h2>
+
+<ul>
+<li><strong>AC / 绝对连续 / a.e. 究竟各管什么</strong>
+<ul>
+<li>想分清绝对连续函数、Radon-Nikodym 导数和“几乎处处”不是一回事（15.1-15.5，16.3-16.5，22.7）</li>
+<li>想知道选择公理怎样把不可测集和悖论带进来（4.6，22.2，appB.1-appB.4）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-B">B</h2>
+
+<ul>
+<li><strong>Banach-Alaoglu / Borel / Banach 空间到底怎么串起来</strong>
+<ul>
+<li>想知道对偶单位球为什么在弱*拓扑下不散掉（11.1，20.2-20.4）</li>
+<li>想看 Borel σ-代数怎样从开集生成，再升级到 Lebesgue 测度（2.3-2.4，4.1-4.5，appA.1-appA.5）</li>
+<li>想知道 \(L^p\) 为什么真是 Banach 空间（10.1-10.5，21.5-21.6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-C">C</h2>
+
+<ul>
+<li><strong>Carathéodory / Cantor / \(C_c\) 稠密</strong>
+<ul>
+<li>想看外测度怎样切出“可测集”这个概念（3.1-3.6）</li>
+<li>想看 Cantor 集、Cantor 函数和奇异测度如何反复出现（4.5，15.6，16.5，22.3）</li>
+<li>想把一般 \(L^p\) 函数逼近到连续紧支撑或光滑函数（17.3-17.5，21.3-21.7）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-D">D</h2>
+
+<ul>
+<li><strong>对偶 / 递增逼近 / DCT</strong>
+<ul>
+<li>想知道 \((L^p)^*=L^q\) 是怎么来的（11.1-11.6）</li>
+<li>想看简单函数、单调收敛和支配收敛怎样支撑整个积分理论（5.4-5.6，6.1-6.6，7.1-7.5）</li>
+<li>想知道为什么“点态收敛”不够交换积分（7.4-7.6，22.7）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-F">F</h2>
+
+<ul>
+<li><strong>Fubini / Fourier / 分解定理</strong>
+<ul>
+<li>想安全地交换多重积分顺序（9.1-9.6）</li>
+<li>想看卷积、Fourier 变换和 \(L^2\) 等距是怎么接起来的（17.1-17.5，18.1-18.6）</li>
+<li>想知道 Hahn-Jordan 分解与 Lebesgue 分解各在拆什么（14.1-14.6，15.1-15.6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-G">G</h2>
+
+<ul>
+<li><strong>概率空间该怎样用测度语言重写</strong>
+<ul>
+<li>随机变量为什么就是可测函数（13.1-13.4）</li>
+<li>期望为什么只是 Lebesgue 积分的另一个名字（6.4-6.6，13.2-13.6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-H">H</h2>
+
+<ul>
+<li><strong>Hölder / Hilbert / Hahn 分解</strong>
+<ul>
+<li>想看 \(L^p\) 估计的第一组基础不等式（10.1-10.4）</li>
+<li>想知道为什么只有 \(L^2\) 真正拥有内积几何（12.1-12.6）</li>
+<li>想把符号测度拆成正负两部分（14.1-14.5）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-J">J</h2>
+
+<ul>
+<li><strong>几乎处处 / 紧致性 / 绝对连续</strong>
+<ul>
+<li>想知道为什么零测例外能被允许，但只能按定理允许的方式被允许（5.6，7.2，16.3-16.5，22.7）</li>
+<li>想分清弱紧、弱*紧、tight 到底分别控制什么（20.1-20.8）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-K">K</h2>
+
+<ul>
+<li><strong>可测性到底从哪来</strong>
+<ul>
+<li>想从 σ-代数开始重新搭语言（2.1-2.6，appA.1-appA.5）</li>
+<li>想看可测函数在四则运算、上下极限和复合下为什么稳定（5.1-5.4）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-L">L</h2>
+
+<ul>
+<li><strong>Lebesgue 为什么不是 Riemann 的小修小补</strong>
+<ul>
+<li>想看从 Dirichlet、Thomae 到测度零的那条路（1.1-1.6，8.1-8.5，22.7）</li>
+<li>想知道 Lebesgue 积分定义真正改了哪里（6.1-6.6）</li>
+<li>想看 Lebesgue 微分定理、FTC 现代版与 BV/AC 的关系（16.1-16.6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-M">M</h2>
+
+<ul>
+<li><strong>MCT / Minkowski / 单调类</strong>
+<ul>
+<li>想看三个收敛定理到底谁在什么时候顶上去（7.1-7.6）</li>
+<li>想知道 Minkowski 怎样把 \(L^p\) 真的做成范数空间（10.2-10.5）</li>
+<li>想用最少的生成元把整个 σ-代数管起来（appA.2-appA.5）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-P">P</h2>
+
+<ul>
+<li><strong>Prokhorov / π-λ / Parseval</strong>
+<ul>
+<li>想知道概率质量怎样“不逃到无穷远”才足够抽极限（20.5-20.7）</li>
+<li>想在一个小生成族上验证独立性或测度相等，再推广到整套 σ-代数（13.4，appA.4-appA.5）</li>
+<li>想看 Fourier 系数平方和为什么就是能量（12.4-12.6，18.4-18.6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-Q">Q</h2>
+
+<ul>
+<li><strong>奇异测度 / 弱收敛 / 取代表元</strong>
+<ul>
+<li>想看绝对连续部分和奇异部分怎样拆开（15.1-15.6，22.3）</li>
+<li>想知道为什么弱收敛只保测试函数，不保范数（20.1-20.8）</li>
+<li>想分清 \(L^p\) 元素和具体函数代表不是一回事（10.5，22.7）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-R">R</h2>
+
+<ul>
+<li><strong>Radon-Nikodym / Riesz-Markov / Riemann 边界</strong>
+<ul>
+<li>想把“对一个测度求导”这句话变成严格定理（15.1-15.5）</li>
+<li>想看正线性泛函怎样等价于正则 Borel 测度（19.1-19.6）</li>
+<li>想知道 Riemann 可积和 Lebesgue 可积到底在哪条线上分手（8.1-8.5，16.5，22.3）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-S">S</h2>
+
+<ul>
+<li><strong>σ-代数 / 简单函数 / Sierpiński 集</strong>
+<ul>
+<li>想从“什么叫可测”这件事的最小封闭语言开始（2.1-2.6，appA.1-appA.5）</li>
+<li>想看一般可测函数如何从简单函数长出来（5.4-5.6，21.2）</li>
+<li>想看基数论和零测集怎样发生冲突（22.6，appB.1-appB.4）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-T">T</h2>
+
+<ul>
+<li><strong>Tonelli / tightness / 特征函数</strong>
+<ul>
+<li>非负积分换序先看 Tonelli，可积积分换序再看 Fubini（9.2-9.5）</li>
+<li>想知道概率测度何时能抽出弱收敛子列（20.6-20.7）</li>
+<li>想把分布收敛翻成傅里叶收敛（20.5-20.6）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-W">W</h2>
+
+<ul>
+<li><strong>外测度 / 弱* / 完备性</strong>
+<ul>
+<li>想看从区间长度怎样长成 Lebesgue 测度（3.1-3.6，4.1-4.4）</li>
+<li>想分清弱与弱*为什么不是同一个拓扑（20.1-20.4）</li>
+<li>想看 \(L^p\) 完备性的完整证明与算子延拓（21.1-21.7）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-X">X</h2>
+
+<ul>
+<li><strong>序列极限怎样不把理论撕开</strong>
+<ul>
+<li>想知道为什么要有 MCT、Fatou、DCT 这三层保险（7.1-7.6）</li>
+<li>想看弱收敛、tightness、Banach-Alaoglu 怎样给出“至少有子列极限”（20.1-20.8）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-Y">Y</h2>
+
+<ul>
+<li><strong>Young 不等式 / 稠密性 / 延拓算子</strong>
+<ul>
+<li>想看卷积估计怎样落在 \(L^p\) 上（17.1-17.4）</li>
+<li>想知道为什么阶梯函数、\(C_c\)、\(C_c^\infty\) 足够代表一般 \(L^p\) 函数（17.3-17.5，21.2-21.4）</li>
+<li>想把先在好函数上定义的算子推广到整个空间（21.7）</li>
+</ul></li>
+</ul>
+
+<h2 id="index-Z">Z</h2>
+
+<ul>
+<li><strong>正交 / 支配 / 选择公理</strong>
+<ul>
+<li>想看 \(L^2\) 里的投影、正交补和 Fourier 基（12.2-12.6）</li>
+<li>想知道支配为什么是交换积分与极限的硬门槛（7.3-7.6，22.7）</li>
+<li>想回头追问不可测集究竟是谁造出来的（22.2，appB.1-appB.4）</li>
+</ul></li>
+</ul>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 上一章 · 附录 B　选择公理与不可测集</a><span class="nav-disabled">下一章 →</span></nav>
+
+</main>
+</body>
+</html>

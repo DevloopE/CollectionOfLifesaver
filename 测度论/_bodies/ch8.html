@@ -1,0 +1,553 @@
+<h1 id="ch8">第 8 章 与 Riemann 的关系：何时一致何时分道</h1>
+
+<p>到这里，你已经有了 Lebesgue 测度、可测函数、Lebesgue 积分，以及单调收敛、Fatou、支配收敛这三件套。现在最自然的问题不是“Lebesgue 比 Riemann 新在哪里”，而是更尖一点的那句：<strong>它们到底在多大范围内讲的是同一件事，又从哪里开始彻底分家？</strong></p>
+
+<p>这个问题如果不说透，前面几章的很多新定义都会显得像一次大规模改名。毕竟在微积分课里，你已经会算连续函数、分段光滑函数、单调函数的积分；在 <a href="../实分析/ch15.html">《实分析读本》第 15 章</a> 里，你也已经看过“导数与积分其实是一回事”的 Riemann 版本。那么我们为什么还要改用 Lebesgue 语言？答案是：<strong>Riemann 在它该工作的地方工作得很好，但它的触发条件太几何、太局部、太依赖区间切割；Lebesgue 则把真正该被忽略的东西压缩成一句“零测集”</strong>。</p>
+
+<p>本章要做四件事。第一，我们完整证明：只要 \(f\) 在 \([a,b]\) 上 Riemann 可积，那么它一定 Lebesgue 可积，而且两种积分相等。第二，我们给出 Lebesgue 对 Riemann 可积性的精确判别：<strong>有界加上几乎处处连续</strong>。第三，我们把 <a href="../实分析/ch15.html">《实分析读本》第 15 章</a> 出现过的 Volterra 函数重新拉回来，看看它为什么正好卡在“两套理论分叉”的路口。第四，我们拿 \(\sin x/x\) 这个反常积分当试金石，说明“Lebesgue 可积”在无穷区间上其实对应的是<strong>绝对可积</strong>，而不是“条件抵消后还凑合能收敛”。</p>
+
+<p>你可以把这一章当成一次账目核对。前面学的 Riemann 理论并没有被推翻；恰恰相反，Lebesgue 理论会认真告诉你：哪些老结果原封不动保留，哪些地方只是表面相似，哪些地方则根本不是同一问题。</p>
+
+<h2 id="sec8-1">8.1 两套积分先别急着对立</h2>
+
+<p>Riemann 积分和 Lebesgue 积分在形式上都写成 \(\int f\)，可它们盯住的对象其实不同。Riemann 从定义域出发，把区间切细，再看取样和；Lebesgue 从值域出发，把函数按高度分层，再看每一层有多大。前者问的是“横着切够不够细”，后者问的是“竖着分以后每一块有多大”。</p>
+
+<p>如果 \(f\) 很规矩，比如连续、分段连续、单调，二者通常给出同一个答案。真正的冲突只会出现在那些“点上看着没什么，但坏点太多、太密、太会乱跑”的函数上。你在 <a href="../实分析/ch17.html">《实分析读本》第 17 章</a> 里已经见过这种现象：逐点收敛之所以危险，不是因为每个点都坏，而是因为坏点会随着 \(n\) 到处逃。Riemann 理论对这种坏点逃逸很敏感；Lebesgue 理论则更关心坏点究竟占多大。</p>
+
+<p>本章的总纲可以先压成两条公式：</p>
+
+\[
+\boxed{
+f\text{ 在 }[a,b]\text{ 上 Riemann 可积}
+\Longrightarrow
+f\in L^1([a,b]),\qquad
+\int_a^b f(x)\,dx=\int_{[a,b]} f\,d\lambda.
+}
+\]
+
+\[
+\boxed{
+f\text{ 在 }[a,b]\text{ 上 Riemann 可积}
+\iff
+f\text{ 有界，且其不连续点集是零测集。}
+}
+\]
+
+<p>第一条说的是“Riemann 理论没有和 Lebesgue 冲突”；第二条说的是“Riemann 理论真正怕的不是有坏点，而是坏点太大”。这两句话合起来，几乎已经把全章的精神说完了。</p>
+
+<p>不过它们不能只背结论。尤其第二条，值得你把证明真正走一遍，因为那正是“零测集”这个词第一次显出锋利的地方：它不是一个抽象尺寸概念，而是 Riemann 可积性背后的精确边界。</p>
+
+<h2 id="sec8-2">8.2 Lebesgue 对 Riemann 可积性的判别</h2>
+
+<p>我们先处理最关键的定理。为此先引入两个振荡量。对一个区间 \(I\subset[a,b]\)，定义</p>
+
+\[
+\omega(f;I)=\sup_{x\in I}f(x)-\inf_{x\in I}f(x).
+\]
+
+<p>它衡量的是 \(f\) 在整个小区间里抖得有多厉害。再对点 \(x\in[a,b]\)，定义点振荡</p>
+
+\[
+\omega_f(x)=\inf\{\omega(f;I): x\in I,\ I\text{ 为区间}\}.
+\]
+
+<p>直观上，\(\omega_f(x)=0\) 就表示：只要你把 \(x\) 附近的区间缩得够小，函数振荡就能被压得任意小。也就是说，\(\omega_f(x)=0\) 恰好等价于 \(f\) 在 \(x\) 连续。</p>
+
+<p>为了把“不连续点集”切成可估计的层，我们对每个 \(\varepsilon&gt;0\) 定义</p>
+
+\[
+D_\varepsilon=\{x\in[a,b]:\omega_f(x)\ge \varepsilon\}.
+\]
+
+<p>\(D_\varepsilon\) 是“振荡至少有 \(\varepsilon\)”的坏点集。只要把所有 \(\varepsilon=1/m\) 的坏点集都控制住，不连续点总集也就被控制住了，因为</p>
+
+\[
+D(f)=\{x:f\text{ 在 }x\text{ 不连续}\}
+=\bigcup_{m=1}^{\infty}D_{1/m}.
+\]
+
+<p>现在开始证明判别定理。</p>
+
+\[
+\boxed{
+f:[a,b]\to\mathbb R\text{ 在 }[a,b]\text{ 上 Riemann 可积}
+\iff
+f\text{ 有界且 }D(f)\text{ 是零测集。}
+}
+\]
+
+<p>先证必要性。设 \(f\) Riemann 可积。Riemann 可积首先自动推出 \(f\) 有界，这一点来自定义本身；若无界，上和或下和就根本压不住。关键是证明 \(D(f)\) 零测。</p>
+
+<p>给定 \(\varepsilon&gt;0\) 与任意 \(\eta&gt;0\)。因为 \(f\) Riemann 可积，存在一个分割</p>
+
+\[
+P:\ a=x_0&lt;x_1&lt;\cdots&lt;x_n=b
+\]
+
+<p>使得上和与下和之差满足</p>
+
+\[
+U(P,f)-L(P,f)&lt;\varepsilon\eta.
+\]
+
+<p>把每个小区间记成 \(I_k=[x_{k-1},x_k]\)。于是</p>
+
+\[
+U(P,f)-L(P,f)=\sum_{k=1}^n \omega(f;I_k)\,|I_k|.
+\]
+
+<p>现在只挑出那些振荡至少为 \(\varepsilon\) 的区间。记指标集</p>
+
+\[
+\mathcal B=\{k:\omega(f;I_k)\ge \varepsilon\}.
+\]
+
+<p>则有</p>
+
+\[
+\varepsilon \sum_{k\in\mathcal B}|I_k|
+\le
+\sum_{k\in\mathcal B}\omega(f;I_k)|I_k|
+\le
+U(P,f)-L(P,f)
+&lt;\varepsilon\eta.
+\]
+
+<p>所以</p>
+
+\[
+\sum_{k\in\mathcal B}|I_k|&lt;\eta.
+\]
+
+<p>而 \(D_\varepsilon\) 必须被这些坏区间覆盖。因为若某个点 \(x\) 落在某个好区间 \(I_k\) 里且 \(\omega(f;I_k)&lt;\varepsilon\)，那么点振荡 \(\omega_f(x)\le\omega(f;I_k)&lt;\varepsilon\)，就不可能属于 \(D_\varepsilon\)。于是</p>
+
+\[
+D_\varepsilon\subset \bigcup_{k\in\mathcal B}I_k,
+\qquad
+\sum_{k\in\mathcal B}|I_k|&lt\eta.
+\]
+
+<p>由于 \(\eta\) 任意，\(D_\varepsilon\) 是零测集。再利用</p>
+
+\[
+D(f)=\bigcup_{m=1}^\infty D_{1/m},
+\]
+
+<p>以及可数个零测集的并仍是零测集，便知 \(D(f)\) 零测。</p>
+
+<p>再证充分性。现在设 \(f\) 有界，\(|f|\le M\)，并且不连续点集 \(D(f)\) 零测。要证 \(f\) Riemann 可积，只需说明：对任意 \(\varepsilon&gt;0\)，我们能找出一个分割 \(P\) 使</p>
+
+\[
+U(P,f)-L(P,f)&lt\varepsilon.
+\]
+
+<p>因为 \(D(f)\) 零测，可取开集 \(O\supset D(f)\)，使 \(O\) 可以写成可数个互不相交开区间的并，且总长度满足</p>
+
+\[
+\lambda(O)&lt \frac{\varepsilon}{4M}.
+\]
+
+<p>把好点集合记成</p>
+
+\[
+K=[a,b]\setminus O.
+\]
+
+<p>\(K\) 是紧集，而且 \(K\) 上每一点都是连续点。于是对每个 \(x\in K\)，存在一个小区间 \(I_x\) 使得</p>
+
+\[
+\omega(f;I_x)&lt \frac{\varepsilon}{2(b-a)}.
+\]
+
+<p>这些 \(I_x\) 覆盖 \(K\)。由于 \(K\) 紧，可取有限子覆盖</p>
+
+\[
+K\subset I_{x_1}\cup\cdots\cup I_{x_N}.
+\]
+
+<p>现在把所有 \(I_{x_j}\) 的端点、再加上开集 \(O\) 的有限个主端点一起收进一个分割 \(P\)。这样分出来的小区间分成两类：</p>
+
+<ul>
+  <li>落在 \(K\) 里的好区间：其振荡都小于 \(\varepsilon/(2(b-a))\)；</li>
+  <li>落在 \(O\) 里的坏区间：总长度小于 \(\varepsilon/(4M)\)，但每段振荡至多为 \(2M\)。</li>
+</ul>
+
+<p>于是上、下和之差满足</p>
+
+\[
+\begin{aligned}
+U(P,f)-L(P,f)
+&=
+\sum_{\text{好区间}}\omega(f;I)|I|+\sum_{\text{坏区间}}\omega(f;I)|I|\\[4pt]
+&\le
+\frac{\varepsilon}{2(b-a)}\sum_{\text{好区间}}|I|
++2M\sum_{\text{坏区间}}|I|\\[4pt]
+&\le
+\frac{\varepsilon}{2(b-a)}(b-a)
++2M\cdot \frac{\varepsilon}{4M}
+=\varepsilon.
+\end{aligned}
+\]
+
+<p>这就证明了 \(f\) Riemann 可积。</p>
+
+<p>这个判别最值得你记住的不是技术细节，而是它的哲学：<strong>Riemann 理论并不要求函数处处连续；它只要求不连续点“总量上足够小”。</strong> 这种“坏点可以稠密，但只要零测仍然可以忍受”的态度，正是 Lebesgue 语言开始接管局面的地方。</p>
+
+<h2 id="sec8-3">8.3 Riemann 可积为什么自动 Lebesgue 可积，而且积分相等</h2>
+
+<p>有了上一节的判别，这一节就可以做得很干净。设 \(f\) 在 \([a,b]\) 上 Riemann 可积。上一节已经告诉我们：\(f\) 有界，且连续点几乎处处。于是 \(f\) 至少在“除了一个零测集之外”的地方行为很好。</p>
+
+<p>接下来我们用 Darboux 和式直接把 \(f\) 挤在两列简单函数之间。取一列嵌套分割</p>
+
+\[
+P_n:\ a=x_0^{(n)}&lt;x_1^{(n)}&lt;\cdots&lt;x_{N_n}^{(n)}=b,
+\]
+
+<p>满足两件事：</p>
+
+\[
+\|P_n\|:=\max_k\bigl(x_k^{(n)}-x_{k-1}^{(n)}\bigr)&lt \frac1n,
+\qquad
+U(P_n,f)-L(P_n,f)&lt \frac1n.
+\]
+
+<p>对每个小区间 \(I_k^{(n)}=[x_{k-1}^{(n)},x_k^{(n)}]\)，记</p>
+
+\[
+m_k^{(n)}=\inf_{I_k^{(n)}}f,\qquad M_k^{(n)}=\sup_{I_k^{(n)}}f.
+\]
+
+<p>构造上下两列阶梯函数</p>
+
+\[
+\ell_n=\sum_{k=1}^{N_n} m_k^{(n)}\,\mathbf 1_{I_k^{(n)}},
+\qquad
+u_n=\sum_{k=1}^{N_n} M_k^{(n)}\,\mathbf 1_{I_k^{(n)}}.
+\]
+
+<p>显然有</p>
+
+\[
+\ell_n(x)\le f(x)\le u_n(x)\qquad (x\in[a,b]).
+\]
+
+<p>而且</p>
+
+\[
+\int_{[a,b]} \ell_n\,d\lambda=L(P_n,f),
+\qquad
+\int_{[a,b]} u_n\,d\lambda=U(P_n,f).
+\]
+
+<p>关键在于：在每个连续点 \(x\)，这两列阶梯函数都会收敛到 \(f(x)\)。理由很直白。记 \(I_n(x)\) 是分割 \(P_n\) 里包含 \(x\) 的那段小区间。由于 \(\|P_n\|\to 0\)，这些区间长度趋于零；若 \(x\) 是连续点，则</p>
+
+\[
+u_n(x)-\ell_n(x)
+\le
+\omega(f;I_n(x))\longrightarrow 0.
+\]
+
+<p>再加上 \(\ell_n(x)\le f(x)\le u_n(x)\)，便知</p>
+
+\[
+\ell_n(x)\to f(x),\qquad u_n(x)\to f(x)
+\quad\text{对几乎处处的 }x.
+\]
+
+<p>于是 \(f\) 是几乎处处的简单函数极限，所以是可测函数。再由于 \(|f|\le M\) 且 \([a,b]\) 具有有限测度，\(f\in L^1([a,b])\)。现在可以对 \(\ell_n\) 和 \(u_n\) 用支配收敛：</p>
+
+\[
+\int_{[a,b]} \ell_n\,d\lambda \to \int_{[a,b]} f\,d\lambda,
+\qquad
+\int_{[a,b]} u_n\,d\lambda \to \int_{[a,b]} f\,d\lambda.
+\]
+
+<p>但左边正是 Darboux 下和与上和，而它们都收敛到 Riemann 积分 \(I_R\)。因此</p>
+
+\[
+\boxed{
+\int_a^b f(x)\,dx
+=
+\int_{[a,b]} f\,d\lambda.
+}
+\]
+
+<p>这就是我们要的完整结论：Riemann 可积函数不仅 Lebesgue 可积，而且两种积分没有任何数值差异。你可以把它理解成一句更口语的判断：<strong>Lebesgue 理论不是去改写“好函数”的答案，而是去扩展“什么函数算得上好”。</strong></p>
+
+<p><strong>例题 1.</strong> 设 \(C\subset[0,1]\) 是三分 Cantor 集，考虑 \(f=\mathbf 1_C\)。判断它是否 Riemann 可积，并求出 Riemann 与 Lebesgue 积分。</p>
+
+<p>先看连续性。若 \(x\notin C\)，由于 \(C\) 闭，补集 \([0,1]\setminus C\) 在 \(x\) 附近包含一个小开区间，于是 \(f\) 在该邻域恒等于 0，所以在 \(x\) 连续。若 \(x\in C\)，任何邻域既碰到 \(C\) 里的点，也碰到删掉后的空档，因此 \(f\) 在这个邻域里既取 1 也取 0，故在 \(x\) 不连续。于是</p>
+
+\[
+D(f)=C.
+\]
+
+<p>而 \(C\) 的 Lebesgue 测度为 0，这在 <a href="../实分析/ch23.html">《实分析读本》第 23 章</a> 已经讲过。由上一节判别，\(f\) Riemann 可积。又因为 \(f\ge0\) 且只在零测集 \(C\) 上取 1，所以</p>
+
+\[
+\int_{[0,1]} f\,d\lambda = \lambda(C)=0.
+\]
+
+<p>因此两种积分都等于 0：</p>
+
+\[
+\int_0^1 \mathbf 1_C(x)\,dx
+=
+\int_{[0,1]}\mathbf 1_C\,d\lambda
+=0.
+\]
+
+<p>这道题很能提醒你：Riemann 可积并不要求图像“好看”，它只要求坏点最后缩到零测集里。</p>
+
+<p><strong>例题 2.</strong> 设 \(f=\mathbf 1_{\mathbb Q\cap[0,1]}\)。求它的 Lebesgue 积分，并判断它是否 Riemann 可积。</p>
+
+<p>Lebesgue 积分这一半很快。由于 \(\mathbb Q\cap[0,1]\) 可数，故是零测集，所以</p>
+
+\[
+\int_{[0,1]} \mathbf 1_{\mathbb Q}\,d\lambda
+=\lambda(\mathbb Q\cap[0,1])=0.
+\]
+
+<p>但它不是 Riemann 可积。因为在任意小区间里既有有理数也有无理数，所以区间上确界是 1，下确界是 0；于是每个分割都满足</p>
+
+\[
+U(P,f)=1,\qquad L(P,f)=0.
+\]
+
+<p>上、下和永远不可能靠拢，因此 Riemann 积分不存在。换句话说，\(\mathbf 1_{\mathbb Q}\) 恰好说明：<strong>零测集本身在 Lebesgue 理论里几乎可以忽略，可若它在每个小区间里都密密麻麻地冒出来，Riemann 理论就会被彻底卡死。</strong></p>
+
+<h2 id="sec8-4">8.4 你真正该记住的分界线：有界加上几乎处处连续</h2>
+
+<p>上一节得到的判别，可以重新翻译成一句更适合做题的话：在闭区间上，Riemann 可积性唯一真正要检查的，是坏点集有没有正测度。连续当然够，分段连续当然够，单调函数当然够，甚至像 \(\mathbf 1_C\) 这种在 Cantor 集上处处跳一下的函数也够；因为这些坏点总量都还是零测。</p>
+
+<p>这也解释了为什么 <a href="../实分析/ch14.html">《实分析读本》第 14 章</a> 那些例子当时看起来杂，现在却突然被一句话统一了：</p>
+
+<ul>
+  <li>连续函数的坏点集为空，当然零测；</li>
+  <li>单调函数至多有可数个跳点，可数集零测；</li>
+  <li>分段连续函数只有有限个断点，有限集零测；</li>
+  <li>Dirichlet 函数处处不连续，坏点集就是整个区间，当然不是零测。</li>
+</ul>
+
+<p>所以 Riemann 理论真正敏感的不是“有没有间断”，而是“间断集到底大不大”。这和 Lebesgue 理论的口味完全一致。只不过 Lebesgue 进一步说：既然零测集本来就该忽略，那我们不如一开始就把“几乎处处相等”当作同一个函数来对待。于是 \(L^1\)、\(L^2\)、\(L^p\) 这些空间自然就长出来了。</p>
+
+<p>你在 <a href="../实分析/ch17.html">《实分析读本》第 17 章</a> 里见过尖峰函数</p>
+
+\[
+f_n(x)=n\,\mathbf 1_{(0,1/n]}(x).
+\]
+
+<p>它在每个 \(x&gt;0\) 处都趋于 0，但积分始终等于 1。Riemann 语言会把这个现象记成“逐点收敛太弱”；Lebesgue 语言则更进一步：你必须追问有没有支配、有没有 \(L^1\) 控制、有没有零测集之外的统一行为。两种语言并不冲突，Lebesgue 只是把问题问得更到位。</p>
+
+<p>如果只从“可积函数名单”看，Riemann 和 Lebesgue 在有限区间上差的只是一些额外函数；但如果从“你可以怎样对极限、逼近、空间结构做稳定操作”来看，差别就远不止一张名单那么简单了。这也是为什么本书要单独开一卷，而不是把 Lebesgue 当作 Riemann 的附录。</p>
+
+<h2 id="sec8-5">8.5 Volterra 函数：分水岭不是会不会可导，而是导数长什么样</h2>
+
+<p>现在把 <a href="../实分析/ch15.html">《实分析读本》第 15 章</a> 里那位关键角色请回来：Volterra 函数。那一章已经构造过一个处处可导函数 \(V\)，使得它的导数 \(V'\) 有界，却在一个正测度集合上处处不连续。那时它的作用，是提醒你 Riemann 版微积分基本定理不能偷换成“只要有导数就总能直接积分”。现在我们终于可以把这件事放到更大的地图上看。</p>
+
+<p>由本章判别，若一个有界函数要 Riemann 可积，就必须几乎处处连续。Volterra 构造恰恰给出一个反面例子：\(V'\) 虽然来自某个处处可导函数，却在正测度集合上处处不连续，因此</p>
+
+\[
+\boxed{
+V'\text{ 有界，但不是 Riemann 可积函数。}
+}
+\]
+
+<p>可另一方面，\(V'\) 既然有界，又是导函数，自然是可测函数；在有限区间上有界可测就自动属于 \(L^1\)。所以</p>
+
+\[
+V'\in L^1([0,1]).
+\]
+
+<p>这就是分水岭真正的位置：<strong>不是“可导”和“不可导”之间，而是“导数的坏点集只有零测”与“导数的坏点集已经长到正测度”之间。</strong></p>
+
+<p><strong>例题 3.</strong> 设 \(V\) 是 Volterra 函数。说明 \(V'\) 为什么一定 Lebesgue 可积，却不可能 Riemann 可积。</p>
+
+<p>不可能 Riemann 可积这半边，上一段已经解释：\(V'\) 有界，但不连续点集具有正测度，违背了本章判别。</p>
+
+<p>Lebesgue 可积这半边则更直接。因为 \(|V'|\le M\) 对某个常数 \(M\) 成立，所以</p>
+
+\[
+\int_{[0,1]} |V'|\,d\lambda \le M\lambda([0,1])=M&lt;\infty.
+\]
+
+<p>于是 \(V'\in L^1([0,1])\)。也就是说，<strong>Lebesgue 理论可以接住“有界但坏点太多”的导数，而 Riemann 理论接不住。</strong></p>
+
+<p>这时再回头看 <a href="../实分析/ch15.html">《实分析读本》第 15 章</a> 那句提醒，就会更清楚：Riemann 版微积分基本定理之所以要附加“导数本身 Riemann 可积”，根本不是技术洁癖，而是因为确实存在 \(V'\) 这样来自导数、却仍然被 Riemann 理论拒之门外的对象。</p>
+
+<p>从 Lebesgue 视角看，Volterra 函数的意义尤其深。它逼着你承认：如果想要一个真正稳定的“导数可积”理论，你迟早要把积分从 Riemann 升级出去。否则你会反复撞在同一块玻璃上：导数存在，函数也很规矩，可导数的坏点集偏偏太大。</p>
+
+<h2 id="sec8-6">8.6 反常 Riemann 与 Lebesgue：\(\sin x/x\) 为什么故意把两种“收敛”撕开</h2>
+
+<p>到目前为止，我们都在有限区间上说话。可一旦区间变成 \((0,\infty)\)，另一个差别会立刻冒出来：Riemann 理论谈的是<strong>反常积分能否通过极限收敛</strong>，而 Lebesgue 理论谈的是<strong>绝对值是否仍然可积</strong>。这两件事在有限区间上常常重合，在无穷区间上却会彻底分家。</p>
+
+<p>最经典的例子就是</p>
+
+\[
+f(x)=\frac{\sin x}{x},\qquad x&gt;0.
+\]
+
+<p>你在 <a href="../实分析/ch16.html">《实分析读本》第 16 章</a> 已经见过：作为反常 Riemann 积分，</p>
+
+\[
+\int_0^\infty \frac{\sin x}{x}\,dx
+\]
+
+<p>是收敛的。它依赖的是振荡抵消，属于 Dirichlet 型收敛；若再借助 <a href="../复分析/ch15.html">《复分析读本》第 15 章</a> 的围道积分，甚至还能算出精确值 \(\pi/2\)。</p>
+
+<p>但 Lebesgue 的问题不是“正负项会不会抵消”，而是</p>
+
+\[
+\int_0^\infty \left|\frac{\sin x}{x}\right|\,dx
+\]
+
+<p>是否有限。答案是否定的。我们完整算一遍这个发散。</p>
+
+<p><strong>例题 4.</strong> 说明 \(\sin x/x\) 在 \((0,\infty)\) 上不是 Lebesgue 可积，尽管它的反常 Riemann 积分收敛。</p>
+
+<p>只需证明绝对值积分发散。对每个整数 \(n\ge0\)，考察区间</p>
+
+\[
+I_n=\left[n\pi+\frac{\pi}{6},\,n\pi+\frac{5\pi}{6}\right].
+\]
+
+<p>在这个区间里，\(|\sin x|\ge \frac12\) 当然已经够用；若你想估得更整齐，也可以直接积分。由于 \(x\le n\pi+5\pi/6\) 当 \(x\in I_n\) 时，我们有</p>
+
+\[
+\int_{I_n}\frac{|\sin x|}{x}\,dx
+\ge
+\frac{1}{n\pi+5\pi/6}\int_{I_n}|\sin x|\,dx.
+\]
+
+<p>而 \(|\sin x|\) 在 \(I_n\) 上与 \(\sin t\) 在 \([\pi/6,5\pi/6]\) 上只是平移关系，所以</p>
+
+\[
+\int_{I_n}|\sin x|\,dx
+=
+\int_{\pi/6}^{5\pi/6}\sin t\,dt
+=
+\bigl[-\cos t\bigr]_{\pi/6}^{5\pi/6}
+=\sqrt3.
+\]
+
+<p>因此</p>
+
+\[
+\int_{I_n}\frac{|\sin x|}{x}\,dx
+\ge
+\frac{\sqrt3}{n\pi+5\pi/6}.
+\]
+
+<p>把这些不交区间加起来：</p>
+
+\[
+\int_0^\infty\frac{|\sin x|}{x}\,dx
+\ge
+\sum_{n=0}^{\infty}\int_{I_n}\frac{|\sin x|}{x}\,dx
+\ge
+\sum_{n=0}^{\infty}\frac{\sqrt3}{n\pi+5\pi/6}.
+\]
+
+<p>右边与调和级数同阶，因此发散。故</p>
+
+\[
+\boxed{
+\int_0^\infty \left|\frac{\sin x}{x}\right|\,dx=\infty,
+\qquad
+\frac{\sin x}{x}\notin L^1(0,\infty).
+}
+\]
+
+<p>但反常 Riemann 积分</p>
+
+\[
+\int_0^\infty \frac{\sin x}{x}\,dx
+\]
+
+<p>依然收敛，因为正负振荡会抵消。于是我们得到一个极重要的区别：</p>
+
+\[
+\boxed{
+\text{反常 Riemann 可积}
+\centernot\Longrightarrow
+\text{Lebesgue 可积。}
+}
+\]
+
+<p>准确地说，Lebesgue 可积对应的是“绝对可积”；而许多反常 Riemann 积分只不过是“条件可积”。这也是为什么 Fourier 分析、概率论、泛函分析后来几乎一律改用 \(L^1\)、\(L^2\)、\(L^p\) 语言：在这些空间里，积分是一个真正稳定的范数型对象，而不是寄希望于幸运的抵消。</p>
+
+<h2 id="sec8-7">8.7 一张详细对比表：它们何时重合，何时分家</h2>
+
+<p>最后把本章压成一张表。你以后做题时，脑子里最好一直带着这张表的轮廓。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>问题</th>
+      <th>Riemann 语言</th>
+      <th>Lebesgue 语言</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>基本切法</td>
+      <td>切定义域：把区间分小段，再做取样和</td>
+      <td>切值域：按函数高度分层，再乘上测度</td>
+    </tr>
+    <tr>
+      <td>最自然的舞台</td>
+      <td>闭区间、分段规则函数</td>
+      <td>一般测度空间、函数空间 \(L^p\)</td>
+    </tr>
+    <tr>
+      <td>可积性的精确边界</td>
+      <td>有界且不连续点集零测</td>
+      <td>\(\int |f|\,d\mu&lt;\infty\)</td>
+    </tr>
+    <tr>
+      <td>对零测集的态度</td>
+      <td>不能直接忽略；坏点若在每个小区间里都冒头就会出事</td>
+      <td>天然忽略；a.e. 相等视为同一个 \(L^1\) 元素</td>
+    </tr>
+    <tr>
+      <td>极限交换</td>
+      <td>通常需要一致收敛或额外估计</td>
+      <td>MCT / Fatou / DCT 直接提供工具</td>
+    </tr>
+    <tr>
+      <td>无穷区间上的“可积”</td>
+      <td>反常积分可能靠抵消条件收敛</td>
+      <td>要求绝对可积；\(\sin x/x\) 因此被排除</td>
+    </tr>
+    <tr>
+      <td>导数是否自动可积</td>
+      <td>不自动；Volterra 导数是边界反例</td>
+      <td>有界可测导数自动属于 \(L^1\)</td>
+    </tr>
+    <tr>
+      <td>多元积分</td>
+      <td>交换积分次序很依赖具体条件</td>
+      <td>Tonelli / Fubini 给出系统判准</td>
+    </tr>
+    <tr>
+      <td>空间结构</td>
+      <td>不自然产生完备函数空间</td>
+      <td>\(L^p\) 空间直接成为 Banach / Hilbert 世界的入口</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>如果只问“连续函数的积分算出来是不是一样”，那答案当然是一样。但一旦你开始问下面这些更现代的问题：</p>
+
+<ul>
+  <li>坏点集到底可以大到什么程度？</li>
+  <li>极限和积分什么时候能交换？</li>
+  <li>无穷区间上的条件收敛到底算不算“可积”？</li>
+  <li>函数本身能不能当成一个完备空间里的点来研究？</li>
+</ul>
+
+<p>那么 Lebesgue 语言就不再是可有可无的升级包，而是唯一稳定的工作平台。</p>
+
+<p>这一章最该带走的第一句话是：在有限区间上，Riemann 可积函数全都被 Lebesgue 接住，而且答案不变。第二句话是：Riemann 真正怕的不是有坏点，而是坏点集有正测度。第三句话是：一旦你开始关心极限、函数空间、多元积分和无穷区间，Lebesgue 不是“更高级的同义改写”，而是问题本身真正该被放置的语言。</p>
+
+<hr class="section-end">

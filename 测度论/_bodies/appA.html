@@ -1,0 +1,210 @@
+<h1 id="appA">附录 A　σ-代数与单调类定理</h1>
+
+<p>正文里我们已经频繁使用 σ-代数、生成 σ-代数、π-λ 定理和单调类定理，但这些工具很容易在第一次阅读时只留下“技术引理”的印象。其实它们一点都不边缘。测度论从一开始就在回答一个非常具体的问题：你到底想让哪些集合可测？而你一旦要求补集、可数并、极限操作都能安全落地，最自然的封闭语言就会自动逼出 σ-代数与单调类。</p>
+
+<p>这一份附录的任务，就是把这套语言的骨架单独摆出来。你可以把它看成“生成元工具箱”：当你想证明两个测度相等、想从半开区间推广到全部 Borel 集、想说明独立性只要在一个生成族上验证就够时，真正替你省力的，几乎总是这几条定理。</p>
+
+<h2 id="secA-1">A.1 代数和 σ-代数到底差在哪</h2>
+
+<p>设 \(X\) 是一个集合。一个集合族 \(\mathcal A\subset\mathcal P(X)\) 称为代数，如果满足：</p>
+
+\[
+X\in\mathcal A,
+\qquad
+A\in\mathcal A\Rightarrow A^c\in\mathcal A,
+\qquad
+A,B\in\mathcal A\Rightarrow A\cup B\in\mathcal A.
+\]
+
+<p>由 De Morgan 律，代数也自动对有限交、有限差封闭。所以“代数”的正确直觉是：它能处理有限次逻辑运算。</p>
+
+<p>而 σ-代数则多加了一层可数性：</p>
+
+\[
+\boxed{\mathcal F\text{ 是 σ-代数 }
+\iff
+X\in\mathcal F,\ 
+A\in\mathcal F\Rightarrow A^c\in\mathcal F,\ 
+A_n\in\mathcal F\Rightarrow \bigcup_{n=1}^\infty A_n\in\mathcal F.}
+\]
+
+<p>于是它也自动对可数交封闭。这一条升级看似只多了一个“σ”，实际上整个测度论的灵魂就在这里：极限过程天然会制造可数并和可数交，所以若你想让“极限后的集合”也仍然可测，代数就不够，必须上升到 σ-代数。</p>
+
+<p>最简单的例子是：\(\mathbb R\) 上有限个半开区间有限并组成一个代数，但不是 σ-代数。因为</p>
+
+\[
+\bigcup_{n=1}^{\infty}\left(1-\frac1n,1\right]
+=(0,1]
+\]
+
+<p>这次还没出问题，可一旦你拿更复杂的可数并，有限并结构马上会破。正是这种“有限封闭不够托住极限”的现象，逼着我们把生成语言从代数升级到 σ-代数。</p>
+
+<h2 id="secA-2">A.2 单调类：只看递增并与递减交</h2>
+
+<p>如果 σ-代数处理的是“任意可数并交”，那单调类处理的则是更节制的极限：递增并与递减交。集合族 \(\mathcal M\subset\mathcal P(X)\) 称为单调类，如果满足：</p>
+
+\[
+A_1\subset A_2\subset\cdots,\ A_n\in\mathcal M
+\Longrightarrow
+\bigcup_{n=1}^{\infty}A_n\in\mathcal M,
+\]
+
+\[
+A_1\supset A_2\supset\cdots,\ A_n\in\mathcal M
+\Longrightarrow
+\bigcap_{n=1}^{\infty}A_n\in\mathcal M.
+\]
+
+<p>注意这里没有要求补集，也没有要求任意可数并。它只抓住了极限操作里最常出现的那一部分：单调逼近。这恰好对应测度论里最常见的三件事：从下逼近、从上逼近、极限交换。</p>
+
+<p>现在给定一个集合族 \(\mathcal C\)，可以定义“由 \(\mathcal C\) 生成的最小单调类”，记作 \(\mathcal M(\mathcal C)\)。单调类定理说：如果起点已经是个代数，那么单调类和 σ-代数生成出来的东西其实一样大。</p>
+
+\[
+\boxed{\text{若 }\mathcal A\text{ 是代数，则 }\mathcal M(\mathcal A)=\sigma(\mathcal A).}
+\]
+
+<p>这条定理的威力极大，因为很多时候要验证某个性质对“单调极限”稳定，比验证它对任意可数并稳定容易得多。于是你可以先在一个代数上验证，再靠单调类定理一把推到整个 σ-代数。</p>
+
+<h2 id="secA-3">A.3 单调类定理的证明骨架</h2>
+
+<p>设 \(\mathcal A\) 是代数，令 \(\mathcal M=\mathcal M(\mathcal A)\) 为包含 \(\mathcal A\) 的最小单调类。显然有</p>
+
+\[
+\mathcal M\subset \sigma(\mathcal A),
+\]
+
+<p>因为任意 σ-代数都是单调类。真正要证明的是反向包含，也就是说明 \(\mathcal M\) 本身已经是 σ-代数。</p>
+
+<p>而要把一个单调类升级成 σ-代数，一个很自然的办法是先证明它其实还是个代数。因为“代数 + 单调类”就足够推出“σ-代数”：补集已有；任意可数并可先改写成不交并，再由部分和形成递增列处理。</p>
+
+<p>所以关键只剩：证明 \(\mathcal M\) 对有限交和差封闭。分两步做。</p>
+
+<p>第一步，固定 \(E\in\mathcal A\)，考虑</p>
+
+\[
+\mathcal M_E=\{B\in\mathcal M: E\cap B\in\mathcal M,\ E\setminus B\in\mathcal M\}.
+\]
+
+<p>因为 \(\mathcal A\) 是代数，对每个 \(B\in\mathcal A\) 都有 \(E\cap B\in\mathcal A\subset\mathcal M\) 且 \(E\setminus B\in\mathcal A\subset\mathcal M\)，所以</p>
+
+\[
+\mathcal A\subset\mathcal M_E.
+\]
+
+<p>再检查 \(\mathcal M_E\) 是单调类：若 \(B_n\uparrow B\) 且 \(B_n\in\mathcal M_E\)，则</p>
+
+\[
+E\cap B_n \uparrow E\cap B,
+\qquad
+E\setminus B_n \downarrow E\setminus B,
+\]
+
+<p>由 \(\mathcal M\) 的单调类性质得 \(E\cap B,E\setminus B\in\mathcal M\)，故 \(B\in\mathcal M_E\)。递减情形同理。于是 \(\mathcal M_E\) 是包含 \(\mathcal A\) 的单调类。由 \(\mathcal M\) 的最小性，</p>
+
+\[
+\mathcal M_E=\mathcal M.
+\]
+
+<p>也就是说，对任意 \(E\in\mathcal A\) 与任意 \(B\in\mathcal M\)，都有</p>
+
+\[
+E\cap B\in\mathcal M,\qquad E\setminus B\in\mathcal M.
+\]
+
+<p>第二步，固定任意 \(B\in\mathcal M\)，再定义</p>
+
+\[
+\mathcal N_B=\{E\in\mathcal M: E\cap B\in\mathcal M,\ E\setminus B\in\mathcal M\}.
+\]
+
+<p>刚才第一步已经说明 \(\mathcal A\subset\mathcal N_B\)。同样检查可知 \(\mathcal N_B\) 仍是单调类，于是再由最小性得到</p>
+
+\[
+\mathcal N_B=\mathcal M.
+\]
+
+<p>因此对任意 \(E,B\in\mathcal M\)，总有 \(E\cap B\in\mathcal M\) 且 \(E\setminus B\in\mathcal M\)。所以 \(\mathcal M\) 是代数。</p>
+
+<p>最后把“代数 + 单调类 \(\Rightarrow\) σ-代数”补完。若 \(E_n\in\mathcal M\)，先定义不交化</p>
+
+\[
+F_1=E_1,\qquad
+F_n=E_n\setminus\bigcup_{k=1}^{n-1}E_k\quad(n\ge2).
+\]
+
+<p>则 \(F_n\in\mathcal M\)，两两不交，且</p>
+
+\[
+\bigcup_{n=1}^{N}F_n\uparrow \bigcup_{n=1}^{\infty}E_n.
+\]
+
+<p>由单调类性质，右端属于 \(\mathcal M\)。所以 \(\mathcal M\) 对可数并封闭，从而是 σ-代数。证明完成。</p>
+
+<h2 id="secA-4">A.4 π-λ（Dynkin）定理：从有限交生成到 σ-代数</h2>
+
+<p>另一条更常用的生成定理是 π-λ 定理。这里要先定义两种集合族：</p>
+
+\[
+\mathcal P\text{ 是 }\pi\text{-系统}
+\iff
+A,B\in\mathcal P\Rightarrow A\cap B\in\mathcal P;
+\]
+
+\[
+\mathcal D\text{ 是 }\lambda\text{-系统}
+\iff
+X\in\mathcal D,\ 
+A\in\mathcal D\Rightarrow A^c\in\mathcal D,\ 
+A_n\in\mathcal D\text{ 两两不交 }\Rightarrow \bigsqcup_{n=1}^{\infty}A_n\in\mathcal D.
+\]
+
+<p>λ-系统又常叫 Dynkin 系统。和 σ-代数相比，它少了“任意有限交封闭”；和单调类相比，它多了补集与不交可数并。π-λ 定理说：只要一个 λ-系统已经包含了一个 π-系统，那么它其实自动包含由这个 π-系统生成的全部 σ-代数。</p>
+
+\[
+\boxed{\text{若 }\mathcal P\text{ 是 }\pi\text{-系统， }\mathcal D\text{ 是包含 }\mathcal P\text{ 的 }\lambda\text{-系统，
+则 }\sigma(\mathcal P)\subset\mathcal D.}
+\]
+
+<p>证明也走“好集合”路线。先固定 \(B\in\mathcal P\)，定义</p>
+
+\[
+\mathcal D_B=\{A\in\mathcal D:A\cap B\in\mathcal D\}.
+\]
+
+<p>可验证 \(\mathcal D_B\) 是 λ-系统，而由于 \(\mathcal P\) 是 π-系统，若 \(A\in\mathcal P\) 则 \(A\cap B\in\mathcal P\subset\mathcal D\)，故 \(\mathcal P\subset\mathcal D_B\)。由最小性得 \(\mathcal D_B=\mathcal D\)。因此对每个 \(B\in\mathcal P\)，\(\mathcal D\) 对与 \(B\) 的交稳定。</p>
+
+<p>再固定任意 \(A\in\mathcal D\)，定义</p>
+
+\[
+\mathcal E=\{B\in\mathcal D:A\cap B\in\mathcal D\}.
+\]
+
+<p>利用上一步可知 \(\mathcal P\subset\mathcal E\)，又能验证 \(\mathcal E\) 是 λ-系统，所以 \(\mathcal E=\mathcal D\)。这说明 \(\mathcal D\) 对任意有限交都封闭。一个同时是 λ-系统又对有限交封闭的集合族，其实就是 σ-代数。于是 \(\mathcal D\) 包含 \(\sigma(\mathcal P)\)。证毕。</p>
+
+<p>这条定理为什么常比单调类定理更顺手？因为很多自然生成族本身就对有限交稳定，比如半开区间、矩形、柱集。于是你只要把要验证的性质包装成一个 λ-系统，就能一把推广到整个生成的 σ-代数。</p>
+
+<h2 id="secA-5">A.5 两个最常用的应用：测度唯一性与独立性推广</h2>
+
+<p>π-λ 定理最常见的应用之一，是证明测度在生成族上一致就全局一致。设 \(\mu,\nu\) 是 \(X\) 上两个有限测度，\(\mathcal P\) 是一个 π-系统，且 \(\sigma(\mathcal P)=\mathcal F\)。如果</p>
+
+\[
+\mu(P)=\nu(P)\qquad \text{对每个 }P\in\mathcal P,
+\]
+
+<p>则令</p>
+
+\[
+\mathcal D=\{A\in\mathcal F:\mu(A)=\nu(A)\}.
+\]
+
+<p>容易验证 \(\mathcal D\) 是 λ-系统，而且包含 \(\mathcal P\)。由 π-λ 定理，\(\sigma(\mathcal P)\subset\mathcal D\)，所以 \(\mu=\nu\) 在整个 \(\mathcal F\) 上一致。这正是我们在<a href="ch3.html">第 3 章</a>谈 Carathéodory 延拓唯一性、在<a href="ch9.html">第 9 章</a>谈乘积测度唯一性时真正依赖的后台。</p>
+
+<p>另一个经典应用是独立性推广。若 \(\mathcal P_1,\mathcal P_2\) 是两个 π-系统，并且对任意 \(A\in\mathcal P_1\)、\(B\in\mathcal P_2\) 都有</p>
+
+\[
+\mathbb P(A\cap B)=\mathbb P(A)\mathbb P(B),
+\]
+
+<p>那么由 π-λ 定理可以推出 \(\sigma(\mathcal P_1)\) 与 \(\sigma(\mathcal P_2)\) 独立。也就是说，独立性不必在整个 σ-代数上逐个验证，只要在一个生成 π-系统上验证就够。你在<a href="ch13.html">第 13 章</a>和概率空间章节里会不断碰到这个节省力量的套路。</p>
+
+<p>如果把整份附录压成一句话，那就是：σ-代数、单调类和 π-λ 定理并不是技术外设，而是“从少量生成元推广到整个可测世界”的统一语法。它们保证我们不必在无限复杂的 σ-代数上从零开始验证每一件事。</p>

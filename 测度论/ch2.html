@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 2 章 \(\sigma\)-代数：可测性的语言 — 普林斯顿测度论与高级实分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 为什么 Riemann 不够：从 Dirichlet 到 \(L^2\) 完备性</a><a href="ch3.html">下一章 · 第 3 章 外测度与 Carathéodory 延拓 →</a></nav>
+<h1 id="ch2">第 2 章 \(\sigma\)-代数：可测性的语言</h1>
+
+<p>上一章我们反复碰到同一件事：只要问题里真的出现“无限”这两个字，有限次并、有限次交、有限次切分就开始不够用。Dirichlet 函数之所以麻烦，是因为有理数和无理数在每个区间里都混着出现；尖峰函数列之所以麻烦，是因为质量可以沿着一串越来越窄的集合迁移；无穷次掷硬币之所以麻烦，是因为“出现无限多个正面”这种事件根本不是前面几次试验能决定的。</p>
+
+<p>所以测度论第一步不是先定义积分，而是先问：<strong>哪些集合应该被允许谈“大小”？</strong> 这听起来像语法问题，实际上是整个理论的底盘。如果集合类太小，很多自然事件不在里面；如果集合类太大，又会在后面撞上不可测集这堵墙。于是我们需要一个恰到好处的集合语言：既足够大，能容纳可数极限；又足够稳，能支撑测度和积分。</p>
+
+<p>这一章就是这门语言的语法课。我们会先比较“代数”和“\(\sigma\)-代数”的差别，看看有限闭包和可数闭包之间究竟隔着多远；接着定义生成 \(\sigma\)-代数 \(\sigma(\mathcal C)\)，把“从一小批基本集合长出整个可测世界”这件事说清楚；然后把 Borel \(\sigma\)-代数、\(\mathbb R^n\) 上的乘积 \(\sigma\)-代数、\(\{0,1\}^{\mathbb N}\) 上的 cylinder \(\sigma\)-代数都串起来；最后用 Borel-Cantelli 引理做一次检验，看看这套语言到底替概率论解决了什么。</p>
+
+<h2 id="sec2-1">2.1 有限闭包和可数闭包之间，差的不是一点点</h2>
+
+<p>先从最朴素的定义开始。给定样本空间或底集 \(\Omega\)。所谓一个“可允许的集合类”，最基本的要求当然是：你对它做补、并、交这些自然操作以后，它最好别跳出类外。只是这里有两种强度：有限次操作的闭包，以及可数次操作的闭包。它们看起来只差两个字，实际差得极大。</p>
+
+<p>我们先把“代数”和“\(\sigma\)-代数”都写成四条检查表。</p>
+
+\[
+\boxed{\begin{array}{l}
+\mathcal A\subset\mathcal P(\Omega)\ \text{是代数，若：}\\[4pt]
+(1)\ \Omega\in\mathcal A,\\
+(2)\ \varnothing\in\mathcal A,\\
+(3)\ E\in\mathcal A\Rightarrow E^c\in\mathcal A,\\
+(4)\ E,F\in\mathcal A\Rightarrow E\cup F\in\mathcal A.
+\end{array}}
+\]
+
+\[
+\boxed{\begin{array}{l}
+\mathcal F\subset\mathcal P(\Omega)\ \text{是}\sigma\text{-代数，若：}\\[4pt]
+(1)\ \Omega\in\mathcal F,\\
+(2)\ \varnothing\in\mathcal F,\\
+(3)\ E\in\mathcal F\Rightarrow E^c\in\mathcal F,\\
+(4)\ E_1,E_2,\dots\in\mathcal F\Rightarrow \bigcup_{n=1}^{\infty}E_n\in\mathcal F.
+\end{array}}
+\]
+
+<p>这里 \(\varnothing\in\mathcal A\) 和 \(\varnothing\in\mathcal F\) 其实都能由 \(\Omega\in\mathcal A\) 配合补运算推出，但把它单独列出来反而更能提醒你：空集必须是可测的。更重要的是，\(\sigma\)-代数比代数只多了一处强化：把“有限并封闭”升级成了“可数并封闭”。也就是这一步，让整套理论开始能够处理极限。</p>
+
+<p>有了补和并，有限交、有限差都自动闭合。比如 De Morgan 律给出</p>
+
+\[
+\bigcap_{k=1}^m E_k=\left(\bigcup_{k=1}^m E_k^c\right)^c,
+\]
+
+<p>而在 \(\sigma\)-代数里，可数交也自动闭合：</p>
+
+\[
+\bigcap_{n=1}^\infty E_n=\left(\bigcup_{n=1}^\infty E_n^c\right)^c.
+\]
+
+<p>所以真正值钱的不是记住有多少条闭包性质，而是意识到：只要有可数并和补，你就同时拥有可数交、单调极限、上极限下极限这些无限过程。</p>
+
+<h3 id="sec2-1-1">算例 1：有限余有限集构成代数，但不是 \(\sigma\)-代数</h3>
+
+<p>取 \(\Omega=\mathbb N\)，定义</p>
+
+\[
+\mathcal A=\{E\subset\mathbb N:\ E\text{ 有限，或 }E^c\text{ 有限}\}.
+\]
+
+<p>也就是“有限集或余有限集”的全体。</p>
+
+<p>先验算它是代数。</p>
+
+<p>\(\Omega\in\mathcal A\)，因为 \(\Omega^c=\varnothing\) 是有限集；\(\varnothing\in\mathcal A\) 因为空集本身有限。若 \(E\) 有限，则 \(E^c\) 余有限；若 \(E^c\) 有限，则 \(E\) 余有限，所以补封闭。再看有限并：有限集并有限集仍有限；有限集并余有限集是余有限集；余有限集并余有限集仍余有限。于是 \(\mathcal A\) 是代数。</p>
+
+<p>可它不是 \(\sigma\)-代数。考虑单点集</p>
+
+\[
+E_n=\{2n\},\qquad n=1,2,3,\dots
+\]
+
+<p>每个 \(E_n\) 都是有限集，所以都属于 \(\mathcal A\)。但它们的可数并是偶数集</p>
+
+\[
+\bigcup_{n=1}^\infty E_n=\{2,4,6,\dots\}.
+\]
+
+<p>这个集合既不是有限集，也不是余有限集，因为它的补集 \(\{1,3,5,\dots\}\) 也是无限的。于是</p>
+
+\[
+\bigcup_{n=1}^\infty E_n\notin\mathcal A.
+\]
+
+<p>所以 \(\mathcal A\) 不是 \(\sigma\)-代数。</p>
+
+<p>这道题的价值不只在于举了个反例，而在于它精确说明了“可数并”新带来的力量。每个单点都在类里，可数多个单点拼出来的集合却可能已经跳出去。到了概率论里，这正对应着“每个时刻的事件我会写，但无限次之后的极限事件我写不出来”。</p>
+
+<h2 id="sec2-2">2.2 生成 \(\sigma\)-代数 \(\sigma(\mathcal C)\)：从少量基本集合长出整个世界</h2>
+
+<p>既然 \(\sigma\)-代数要求这么强，我们当然不想每次都从头发明一个。更自然的做法是：先给一批你真正关心的基本集合 \(\mathcal C\)，然后把“包含它们的最小 \(\sigma\)-代数”取出来。这个过程就叫生成。</p>
+
+\[
+\boxed{\sigma(\mathcal C)=\bigcap\{\mathcal F:\ \mathcal F\text{ 是 }\sigma\text{-代数且 }\mathcal C\subset\mathcal F\}.}
+\]
+
+<p>这个定义非常像线性代数里的“张成”。你先给一些向量，再取包含它们的最小子空间；这里则是先给一些集合，再取包含它们的最小 \(\sigma\)-代数。唯一的差别是：线性代数靠有限线性组合闭合，这里靠可数次并交补闭合。</p>
+
+<p>为什么这个交集还是 \(\sigma\)-代数？因为任意族 \(\sigma\)-代数的交仍是 \(\sigma\)-代数。验证很直接：\(\Omega\) 在每一个里面，所以在交里；若 \(E\) 在交里，则 \(E\) 在每一个里面，所以 \(E^c\) 也在每一个里面，因此 \(E^c\) 在交里；可数并也同理。于是这个交集确实存在，而且正是最小者。</p>
+
+<h3 id="sec2-2-1">算例 2：在 \(\mathbb N\) 上，由单点集生成的 \(\sigma\)-代数就是全体子集</h3>
+
+<p>令</p>
+
+\[
+\mathcal C=\bigl\{\{1\},\{2\},\{3\},\dots\bigr\}.
+\]
+
+<p>我们来算 \(\sigma(\mathcal C)\)。先注意：既然每个单点都在 \(\sigma(\mathcal C)\) 里，而 \(\sigma\)-代数对可数并封闭，所以对任意子集 \(E\subset\mathbb N\)，都有</p>
+
+\[
+E=\bigcup_{n\in E}\{n\}.
+\]
+
+<p>右边是可数并，因此 \(E\in\sigma(\mathcal C)\)。这说明</p>
+
+\[
+\mathcal P(\mathbb N)\subset \sigma(\mathcal C).
+\]
+
+<p>反过来 \(\sigma(\mathcal C)\) 本来就是 \(\mathbb N\) 的子集族，所以必然 \(\sigma(\mathcal C)\subset \mathcal P(\mathbb N)\)。两边合起来得到</p>
+
+\[
+\boxed{\sigma\bigl(\{\{n\}:n\in\mathbb N\}\bigr)=\mathcal P(\mathbb N).}
+\]
+
+<p>这个例子很重要，因为它说明在可数底集上，\(\sigma\)-代数完全可以大到“所有集合都可测”。问题的真正困难不是出现在可数世界，而是出现在 \(\mathbb R\) 这种不可数底集上。也正因为如此，测度论的难点始终不是单个点，而是不可数地拼出来的集合。</p>
+
+<p>一旦你把 \(\sigma(\mathcal C)\) 读成“由 \(\mathcal C\) 通过可数操作生成的全部集合”，很多以后看起来抽象的符号都会突然顺眼。Borel 集、乘积 \(\sigma\)-代数、cylinder \(\sigma\)-代数，本质上都只是不同的生成问题。</p>
+
+<h2 id="sec2-3">2.3 Borel \(\sigma\)-代数 \(\mathcal B(\mathbb R)\)：从开集生成的可测世界</h2>
+
+<p>在 \(\mathbb R\) 上，最自然的基本集合当然是开集。连续、极限、邻域、本地结构全都围着开集打转，所以如果要搭一套和分析本身兼容的可测语言，最合理的起点就是“让所有开集都可测”。这就导向 Borel \(\sigma\)-代数：</p>
+
+\[
+\mathcal B(\mathbb R)=\sigma(\{\text{\(\mathbb R\) 中的所有开集}\}).
+\]
+
+<p>也就是说，Borel 集就是从开集出发，经过可数次并、交、补以后所能得到的全部集合。</p>
+
+<p>这个定义看起来巨大，但很快就能压缩。因为 \(\mathbb R\) 的开集可由开区间组成，而开区间又可以用许多其他简单家族互相生成。常用的等价写法有</p>
+
+\[
+\boxed{\mathcal B(\mathbb R)=\sigma((a,b):a&lt;b)=\sigma((-\infty,a]:a\in\mathbb R)=\sigma([a,\infty):a\in\mathbb R).}
+\]
+
+<p>这些等价关系不是形式游戏，而是后面判断可测性时最常用的捷径。比如若你知道所有半直线 \((-\infty,a]\) 的原像都是可测的，就能推出函数可测；若你知道所有开区间都可测，就能立刻得到所有开集都可测。</p>
+
+<p>来把其中一条推导真正走一遍。先看半直线如何生成开区间。注意</p>
+
+\[
+(-\infty,b)=\bigcup_{m=1}^\infty (-\infty,b-1/m],
+\]
+
+<p>所以若所有 \((-\infty,a]\) 都在某个 \(\sigma\)-代数里，那么所有 \((-\infty,b)\) 也都在里面。接着</p>
+
+\[
+(a,b)=(-\infty,b)\cap (-\infty,a]^c.
+\]
+
+<p>右边只用到了补和有限交，因此开区间也都进去了。反过来，如果已知所有开区间都在类里，那么</p>
+
+\[
+(-\infty,a)=\bigcup_{n=1}^\infty (-n,a),
+\]
+
+\[
+(-\infty,a]=\bigcap_{m=1}^\infty (-\infty,a+1/m).
+\]
+
+<p>所以半直线又能从开区间生成回来。于是两种生成方式完全等价。</p>
+
+<p>还有一个很关键、但常被低估的事实：\(\mathbb R\) 上的开集虽然有不可数多个，可生成 \(\mathcal B(\mathbb R)\) 时其实只需要有理端点的开区间：</p>
+
+\[
+\mathcal B(\mathbb R)=\sigma\bigl((p,q):p,q\in\mathbb Q,\ p&lt;q\bigr).
+\]
+
+<p>因为每个开集都是可数个有理端点开区间的并。这正是 \(\mathbb R\) 可分性的影子：实数轴上的拓扑虽然丰富，但真正支撑整个 Borel 结构的基本砖块，其实是可数的。</p>
+
+<p>你在<a href="../实分析/ch20.html">《实分析读本》第 20 章</a>开始接触度量空间时，已经习惯了“开球生成拓扑”；Borel \(\sigma\)-代数只是把这件事进一步推进到集合可测性上。也就是说，可测性不是和拓扑平行的另一门语言，它是拓扑在“可数闭包方向”上的延伸。</p>
+
+<h2 id="sec2-4">2.4 \(\mathbb R^n\) 的 Borel 集与乘积 \(\sigma\)-代数</h2>
+
+<p>一维 Borel 语言当然不够。真正的分析、概率和 PDE 很快就会把你带到 \(\mathbb R^2\)、\(\mathbb R^3\) 乃至 \(\mathbb R^n\)。于是自然要问：多维 Borel 集该怎么定义？答案非常干净：直接用多维拓扑。</p>
+
+\[
+\mathcal B(\mathbb R^n)=\sigma(\{\mathbb R^n\text{ 中的开集}\}).
+\]
+
+<p>但更深的事实是，多维 Borel 结构正好和一维 Borel 结构的乘积吻合。先回忆乘积 \(\sigma\)-代数的定义：若 \((X,\mathcal A)\)、\((Y,\mathcal B)\) 是两个可测空间，则</p>
+
+\[
+\mathcal A\otimes\mathcal B=\sigma(\{A\times B:\ A\in\mathcal A,\ B\in\mathcal B\}).
+\]
+
+<p>也就是由矩形 \(A\times B\) 生成的最小 \(\sigma\)-代数。对欧氏空间来说，最重要的等式是</p>
+
+\[
+\boxed{\mathcal B(\mathbb R^m)\otimes\mathcal B(\mathbb R^n)=\mathcal B(\mathbb R^{m+n}).}
+\]
+
+<p>这个等式看上去像技术细节，其实是后面 Fubini-Tonelli、随机向量、联合分布、乘积测度一切故事的入口。</p>
+
+<p>为什么它成立？先证</p>
+
+\[
+\mathcal B(\mathbb R^m)\otimes\mathcal B(\mathbb R^n)\subset \mathcal B(\mathbb R^{m+n}).
+\]
+
+<p>因为对任意 Borel 集 \(A\subset\mathbb R^m\)、\(B\subset\mathbb R^n\)，坐标投影</p>
+
+\[
+\pi_1(x,y)=x,\qquad \pi_2(x,y)=y
+\]
+
+<p>都是连续函数，于是</p>
+
+\[
+A\times B=\pi_1^{-1}(A)\cap \pi_2^{-1}(B).
+\]
+
+<p>\(\pi_1^{-1}(A)\) 和 \(\pi_2^{-1}(B)\) 都是 \(\mathbb R^{m+n}\) 中的 Borel 集，所以矩形 \(A\times B\) 是 Borel 集。既然乘积 \(\sigma\)-代数是由这些矩形生成的，它当然包含在 \(\mathcal B(\mathbb R^{m+n})\) 里。</p>
+
+<p>再证反向包含。任取 \(\mathbb R^{m+n}\) 中的开集 \(U\)。因为欧氏空间有可数基，\(U\) 可写成可数个有理端点开矩形的并，而每个开矩形都形如</p>
+
+\[
+(a_1,b_1)\times\cdots\times(a_{m+n},b_{m+n}),
+\]
+
+<p>它显然属于 \(\mathcal B(\mathbb R^m)\otimes\mathcal B(\mathbb R^n)\)。于是 \(U\) 也属于这个乘积 \(\sigma\)-代数。既然所有开集都在里面，整个 \(\mathcal B(\mathbb R^{m+n})\) 就都在里面了。</p>
+
+<p>这样多维 Borel 结构和乘积结构就完全接上了。</p>
+
+<h3 id="sec2-4-1">算例 3：对角线 \(\Delta=\{(x,y):x=y\}\) 为什么是 \(\mathbb R^2\) 中的 Borel 集</h3>
+
+<p>定义连续函数</p>
+
+\[
+g:\mathbb R^2\to\mathbb R,\qquad g(x,y)=x-y.
+\]
+
+<p>则对角线正是</p>
+
+\[
+\Delta=g^{-1}(\{0\}).
+\]
+
+<p>因为 \(\{0\}\) 是闭集，从而是 Borel 集；连续函数的原像保持 Borel 性，所以</p>
+
+\[
+\Delta\in\mathcal B(\mathbb R^2).
+\]
+
+<p>这类判断以后会非常常见。它说明“Borel 集”并不只是一堆矩形的可数拼接，许多看起来斜着、弯着、被方程切出来的集合，也都能通过连续映射原像这条机制被纳入可测世界。</p>
+
+<p>你在<a href="../多元微积分/ch1.html">《多元微积分读本》</a>最早把 \(\mathbb R^n\) 中的对象看成图形；在测度论里，同样的几何对象开始需要被判定“可测”。而这件事能做得这么顺，背后正是 Borel 结构和乘积 \(\sigma\)-代数的兼容性。</p>
+
+<h2 id="sec2-5">2.5 cylinder \(\sigma\)-代数：\(\{0,1\}^{\mathbb N}\) 上真正可用的事件语言</h2>
+
+<p>现在回到无穷次掷硬币。上一章我们已经直观上看到，事件“出现无限多个正面”绝不是有限信息事件。这里把它正式纳入 \(\sigma\)-代数语言。</p>
+
+<p>对任意 \(k\in\mathbb N\) 与 \(\varepsilon_1,\dots,\varepsilon_k\in\{0,1\}\)，定义 cylinder 集</p>
+
+\[
+C(\varepsilon_1,\dots,\varepsilon_k)
+=\{\omega\in\{0,1\}^{\mathbb N}:\omega_1=\varepsilon_1,\dots,\omega_k=\varepsilon_k\}.
+\]
+
+<p>它就是“前 \(k\) 次掷硬币结果被固定”的事件。所有这类集合构成的家族记作 \(\mathcal C_0\)。\(\mathcal C_0\) 本身对有限并、有限交足够稳定，所以可以看成一个有限信息代数；但真正的 cylinder \(\sigma\)-代数是</p>
+
+\[
+\mathcal F_{\mathrm{coin}}=\sigma(\mathcal C_0).
+\]
+
+<p>也就是由全部有限柱状集生成的最小 \(\sigma\)-代数。它恰好是可数乘积空间 \(\{0,1\}^{\mathbb N}\) 上的自然可测结构。</p>
+
+<p>单次事件 \(A_n=\{\omega_n=1\}\) 显然在 \(\mathcal F_{\mathrm{coin}}\) 里，因为它本身就是一个 cylinder 集的平移版本。于是“最终总会再见到一个正面”的事件</p>
+
+\[
+\bigcup_{n\ge m}A_n
+\]
+
+<p>也在 \(\mathcal F_{\mathrm{coin}}\) 里；再做一次可数交，就得到</p>
+
+\[
+\{\omega_n=1\ \text{i.o.}\}\in\mathcal F_{\mathrm{coin}}.
+\]
+
+<p>这就是 \(\sigma\)-代数真正值钱的地方：它自动接住了这类尾事件。</p>
+
+<h3 id="sec2-5-1">算例 4：有限 cylinder 代数为什么接不住“无限多个正面”</h3>
+
+<p>把上一章的直观论证换成更正式的语言。设</p>
+
+\[
+B=\{\omega\in\{0,1\}^{\mathbb N}:\omega_n=1\ \text{i.o.}\}.
+\]
+
+<p>若 \(B\in\mathcal C_0\)，那就意味着存在某个 \(N\)，使 \(B\) 完全由前 \(N\) 个坐标决定。也就是说，只要两条序列前 \(N\) 项相同，它们就要么同时属于 \(B\)，要么同时不属于 \(B\)。</p>
+
+<p>现在固定任意前 \(N\) 项 \((\varepsilon_1,\dots,\varepsilon_N)\)。构造两条尾巴：</p>
+
+\[
+\omega^{(1)}=(\varepsilon_1,\dots,\varepsilon_N,1,1,1,\dots),
+\]
+
+\[
+\omega^{(2)}=(\varepsilon_1,\dots,\varepsilon_N,0,0,0,\dots).
+\]
+
+<p>两者前 \(N\) 项完全相同，所以若 \(B\) 真由前 \(N\) 项决定，就应有</p>
+
+\[
+\omega^{(1)}\in B \iff \omega^{(2)}\in B.
+\]
+
+<p>但这显然不成立。\(\omega^{(1)}\) 后面全是正面，所以属于 \(B\)；\(\omega^{(2)}\) 后面全是反面，只会出现有限个正面，所以不属于 \(B\)。矛盾。</p>
+
+<p>因此</p>
+
+\[
+\boxed{B\notin \mathcal C_0,\qquad B\in \sigma(\mathcal C_0).}
+\]
+
+<p>这就是“代数不够、\(\sigma\)-代数必须上场”的最干净证据之一。无穷试验里最自然的事件，往往正是在可数极限那一步长出来的。</p>
+
+<p>你会在<a href="../概率统计/ch12.html">《概率统计读本》第 12 章</a>和<a href="../概率统计/ch13.html">第 13 章</a>里不断看到这种尾事件：大数定律说的是某种极限行为，中心极限定理说的是分布在极限下的稳定形状。没有 \(\sigma\)-代数，这些结论连陈述都站不稳。</p>
+
+<h2 id="sec2-6">2.6 Borel-Cantelli：可数事件的极限为什么终于能被控制</h2>
+
+<p>有了 \(\sigma\)-代数以后，极限事件至少能被写下来。下一步当然是：它们的概率能不能被估计？Borel-Cantelli 引理就是最早、也最有代表性的答案之一。它研究的正是</p>
+
+\[
+\limsup_{n\to\infty}A_n:=\bigcap_{m=1}^\infty \bigcup_{n\ge m}A_n,
+\]
+
+<p>也就是“事件 \(A_n\) 发生无穷多次”的集合。</p>
+
+<p>先给第一部分。它几乎不需要任何独立性。</p>
+
+\[
+\boxed{\text{若 }\sum_{n=1}^\infty \mathbb P(A_n)&lt;\infty,\ \text{则 }\mathbb P(A_n\ \text{i.o.})=0.}
+\]
+
+<p>证明很短。对任意 \(m\)，有</p>
+
+\[
+\limsup_{n\to\infty}A_n\subset \bigcup_{n\ge m}A_n.
+\]
+
+<p>所以</p>
+
+\[
+\mathbb P(A_n\ \text{i.o.})
+\le \mathbb P\left(\bigcup_{n\ge m}A_n\right)
+\le \sum_{n\ge m}\mathbb P(A_n).
+\]
+
+<p>右边是收敛级数的尾和，令 \(m\to\infty\) 就趋于 \(0\)。于是上式左边也只能是 \(0\)。完。</p>
+
+<p>第二部分需要独立性：</p>
+
+\[
+\boxed{\text{若 }A_n\text{ 独立且 }\sum_{n=1}^\infty \mathbb P(A_n)=\infty,\ \text{则 }\mathbb P(A_n\ \text{i.o.})=1.}
+\]
+
+<p>证明思路也非常漂亮。固定 \(m\)。由独立性，</p>
+
+\[
+\mathbb P\left(\bigcap_{n\ge m}A_n^c\right)
+=\prod_{n\ge m}\bigl(1-\mathbb P(A_n)\bigr).
+\]
+
+<p>而对 \(0\le x&lt;1\)，有 \(\log(1-x)\le -x\)。因此</p>
+
+\[
+\log \prod_{n\ge m}(1-\mathbb P(A_n))
+=\sum_{n\ge m}\log(1-\mathbb P(A_n))
+\le -\sum_{n\ge m}\mathbb P(A_n).
+\]
+
+<p>由于右边发散到 \(-\infty\)，所以乘积只能趋于 \(0\)。这说明</p>
+
+\[
+\mathbb P\left(\bigcap_{n\ge m}A_n^c\right)=0,
+\qquad
+\mathbb P\left(\bigcup_{n\ge m}A_n\right)=1.
+\]
+
+<p>对所有 \(m\) 都成立，再取交，就得到</p>
+
+\[
+\mathbb P\left(\bigcap_{m=1}^\infty \bigcup_{n\ge m}A_n\right)=1,
+\]
+
+<p>也就是 \(\mathbb P(A_n\ \text{i.o.})=1\)。</p>
+
+<p>把它应用到公平抛硬币，取 \(A_n=\{\omega_n=1\}\)。因为各次抛掷独立，且</p>
+
+\[
+\sum_{n=1}^\infty \mathbb P(A_n)=\sum_{n=1}^\infty \frac12=\infty,
+\]
+
+<p>所以</p>
+
+\[
+\mathbb P(\text{正面出现无穷多次})=1.
+\]
+
+<p>这件事直觉上很像废话，但请注意：它不是有限经验的直接延伸，而是可数交并之后才变得可表达、可证明的极限事件。</p>
+
+<h3 id="sec2-6-1">反例：没有独立性时，\(\sum \mathbb P(A_n)=\infty\) 也完全不够</h3>
+
+<p>取概率空间 \(([0,1],\mathcal B([0,1]),m)\)，其中 \(m\) 是长度测度。定义</p>
+
+\[
+A_n=\left[0,\frac1n\right].
+\]
+
+<p>则</p>
+
+\[
+\sum_{n=1}^\infty m(A_n)=\sum_{n=1}^\infty \frac1n=\infty.
+\]
+
+<p>如果你把第二部分忘了“独立”二字，就很容易误以为 \(A_n\) 会无穷多次发生，概率应该是 \(1\)。其实完全不是。</p>
+
+<p>固定 \(x&gt;0\)。只要 \(n&gt;1/x\)，就有 \(1/n&lt;x\)，于是 \(x\notin A_n\)。所以每个 \(x&gt;0\) 只能落在有限多个 \(A_n\) 里。只有 \(x=0\) 会落在所有 \(A_n\) 中。因此</p>
+
+\[
+\limsup_{n\to\infty}A_n=\{0\}.
+\]
+
+<p>而单点集长度为 \(0\)，所以</p>
+
+\[
+m(A_n\ \text{i.o.})=m(\{0\})=0.
+\]
+
+<p>也就是说，哪怕</p>
+
+\[
+\sum m(A_n)=\infty,
+\]
+
+<p>没有独立性时，也完全可能“无穷多次发生”的概率等于 \(0\)。这个反例正好告诉你：Borel-Cantelli 第二部分不是级数发散就自动成立，而是发散 <em>加上独立性</em> 才有力量。</p>
+
+<p>你在<a href="../概率统计/ch10.html">《概率统计读本》第 10 章</a>开始习惯把随机变量和指示函数放进统一的期望语言里；Borel-Cantelli 则告诉你，一旦事件语言对可数极限封闭，极限行为也开始能够被系统控制。后面“大数定律几乎处处成立”这类话，本质上都是在这条线上继续前进。</p>
+
+<h2 id="sec2-7">2.7 这一章的真正收获：可测性不是附注，而是基础设施</h2>
+
+<p>现在把整章压缩成一句话：\(\sigma\)-代数的工作，不是给集合多贴一个标签，而是把“对可数极限稳定”这件事写进语言本身。没有这层稳定性，Borel 集、联合分布、无穷乘积空间、尾事件、收敛定理，全都只能停留在口头直觉上。</p>
+
+<p>第一，代数和 \(\sigma\)-代数只差“有限”与“可数”两个字，但无限过程真正需要的正是这两个字的升级。</p>
+
+<p>第二，Borel \(\sigma\)-代数、乘积 \(\sigma\)-代数和 cylinder \(\sigma\)-代数都不是彼此分散的定义，它们本质上都是“从一批自然基本集合出发，取最小可数闭包”的同一种 construction。</p>
+
+<p>第三，Borel-Cantelli 说明：一旦事件能以可数极限的方式被表达，它们的概率也开始能被严肃估计；这正是现代概率和测度论共同的呼吸节奏。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 为什么 Riemann 不够：从 Dirichlet 到 \(L^2\) 完备性</a><a href="ch3.html">下一章 · 第 3 章 外测度与 Carathéodory 延拓 →</a></nav>
+
+</main>
+</body>
+</html>
