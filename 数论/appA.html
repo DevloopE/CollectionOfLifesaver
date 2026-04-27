@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 群环域速查 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+<h1 id="appA">附录 A 群环域速查</h1>
+
+<p>本书第 5 章的"<em>\(\mathbb Z/n\) 是环</em>"、第 6 章的"<em>\((\mathbb Z/n)^\times\) 是阿贝尔群</em>"、第 13 章的"<em>\(\mathbb Z[i]\) 是 UFD</em>"、第 17 章的"<em>类群是有限阿贝尔群</em>"、第 22 章的"<em>Galois 群</em>"——本书从头到尾都在用代数对象。这个附录把这些代数<em>背景</em> 集中处理，<em>不</em> 替代<a href="../抽象代数/index.html">《抽象代数读本》</a>，但提供"<em>读本书需要而你可能不熟悉的概念</em>" 的快速参照。</p>
+
+<ul>
+  <li>群定义、子群、Lagrange 定理、同态。</li>
+  <li>环、理想、商环、UFD / PID / Dedekind 域。</li>
+  <li>域、域扩张、最小多项式。</li>
+  <li>有限域 \(\mathbb F_q\) 与 Frobenius。</li>
+  <li>Galois 扩张、Galois 群、Galois 主定理简版。</li>
+</ul>
+
+<p>本附录详细程度足以让你<em>读懂</em> 本书所有提及。深入证明请回<a href="../抽象代数/index.html">抽象代数</a>系列。</p>
+
+<h2 id="appA-1">A.1 群：定义 + 子群 + Lagrange 定理</h2>
+
+<p><strong>群的定义</strong>。一个集合 \(G\) 加上一个二元运算 \(\cdot : G \times G \to G\)（习惯上写 \(ab\) 而非 \(a \cdot b\)）使：</p>
+
+<ol>
+  <li><em>结合律</em>：\((ab)c = a(bc)\)。</li>
+  <li><em>单位元</em>：存在 \(e \in G\) 使 \(ea = ae = a\) 对所有 \(a\)。</li>
+  <li><em>逆元</em>：每个 \(a \in G\) 有 \(a^{-1} \in G\) 满足 \(a a^{-1} = a^{-1} a = e\)。</li>
+</ol>
+
+<p>如果还有 <em>交换律</em> \(ab = ba\)，群叫<em>阿贝尔</em>（abelian）。本书数论里大部分群都是阿贝尔的（例外：<a href="ch22.html">ch22</a>非阿贝尔 Galois 群）。</p>
+
+<p><em>例</em>：</p>
+
+<ul>
+  <li>\((\mathbb Z, +)\)：整数加法。无穷阶阿贝尔。</li>
+  <li>\((\mathbb Z/n, +)\)：模 \(n\) 加法。\(n\) 阶阿贝尔。</li>
+  <li>\(((\mathbb Z/n)^\times, \cdot)\)：模 \(n\) 互素元素的乘法。\(\varphi(n)\) 阶阿贝尔（链回<a href="ch6.html">ch6</a>）。</li>
+  <li>\(\mathrm{SL}_2(\mathbb Z)\)：行列式 1 的整数 \(2 \times 2\) 矩阵。无穷阶<em>非</em>阿贝尔（链 <a href="ch21.html">ch21</a>）。</li>
+  <li>\(\mathrm{Gal}(L/K)\)：Galois 群。可能阿贝尔（如 \(\mathrm{Gal}(\mathbb Q(\sqrt 2)/\mathbb Q) \cong \mathbb Z/2\)）也可能非阿贝尔。</li>
+  <li>\(E(K)\)：椭圆曲线 \(E\) 在域 \(K\) 上的有理点群（链 <a href="ch19.html">ch19</a>）。<em>总</em> 是阿贝尔。</li>
+</ul>
+
+<p><strong>子群</strong>。\(H \subseteq G\) 是子群 \(\iff\) \(H\) 在 \(G\) 的运算下自身是群（即关于运算封闭、含 \(e\)、闭合于逆）。记 \(H \le G\)。</p>
+
+<p>判别简化（"<em>子群准则</em>"）：\(H \ne \emptyset\)，且 \(\forall a, b \in H, \ a b^{-1} \in H\)。</p>
+
+<p>例：</p>
+
+<ul>
+  <li>\(2 \mathbb Z \le \mathbb Z\)（偶整数）。</li>
+  <li>\(\{1, p^k, p^{2k}, \ldots\} \le (\mathbb Z/n)^\times\) 当 \(p\) 是 \(\mathbb Z/n\) 单位、\(k\) 是 \(\mathrm{ord}(p)\) 的因子。</li>
+  <li>\(\mathrm{Gal}(L/M) \le \mathrm{Gal}(L/K)\) 对每个中间域 \(K \subseteq M \subseteq L\)。</li>
+</ul>
+
+<p><strong>陪集</strong>。设 \(H \le G\)、\(g \in G\)。<em>左陪集</em> \(gH = \{gh : h \in H\}\)；<em>右陪集</em> \(Hg\)。所有左陪集形成 \(G\) 的<em>分划</em>（不重叠地覆盖 \(G\)）。所有左陪集大小相同（=\(|H|\)）。左陪集的个数叫 \(H\) 在 \(G\) 中的<em>指数</em>，记 \([G : H]\)。</p>
+
+<p><strong>Lagrange 定理</strong>。设 \(G\) 是有限群、\(H \le G\)。则</p>
+
+<p>\[
+\boxed{\ |G| = [G : H] \cdot |H|.\ }
+\]</p>
+
+<p>特别<em>子群的阶整除群的阶</em>。这条简单的事实在<a href="ch6.html">ch6</a>用来证 Fermat 小定理（\(a^{p-1} \equiv 1 \pmod p\)）：取 \(G = (\mathbb Z/p)^\times\)（阶 \(p - 1\)），\(\langle a \rangle \le G\)（\(a\) 生成的循环子群），由 Lagrange \(\mathrm{ord}(a) \mid p - 1\)，所以 \(a^{p-1} = (a^{\mathrm{ord}(a)})^{(p-1)/\mathrm{ord}(a)} = 1\)。</p>
+
+<p><strong>正规子群与商群</strong>。\(H \le G\) 是<em>正规</em>（normal） \(\iff gHg^{-1} = H\) 对所有 \(g \in G\)；记 \(H \trianglelefteq G\)。阿贝尔群中所有子群都正规（因 \(g h g^{-1} = h\)）。</p>
+
+<p>正规子群可以做<em>商</em>：\(G/H = \{gH : g \in G\}\) 在运算 \((g_1 H)(g_2 H) = g_1 g_2 H\) 下是群（"<em>商群</em>"）。</p>
+
+<p><strong>同态</strong>。\(\varphi : G \to G'\) 是<em>群同态</em> \(\iff \varphi(ab) = \varphi(a)\varphi(b)\) 对所有 \(a, b\)。<em>核</em> \(\ker \varphi = \{g : \varphi(g) = e'\}\) <em>总</em> 是 \(G\) 的正规子群。<em>像</em> \(\mathrm{im}\,\varphi \le G'\)。</p>
+
+<p><strong>第一同构定理</strong>：\(G / \ker \varphi \cong \mathrm{im}\,\varphi\)。</p>
+
+<p>这条三段公式是抽象代数最重要的工具之一。<a href="ch5.html">ch5</a>"<em>商环 \(\mathbb Z/n\)</em>" 用它证：取 \(\varphi : \mathbb Z \to \mathbb Z/n\) 取模，\(\ker = n\mathbb Z\)，所以 \(\mathbb Z/n\mathbb Z \cong \mathbb Z/n\)（事实上后者是前者的命名）。</p>
+
+<h2 id="appA-2">A.2 环、理想、商环</h2>
+
+<p><strong>环的定义</strong>。\((R, +, \cdot)\) 满足：</p>
+
+<ol>
+  <li>\((R, +)\) 是阿贝尔群（加法的单位记 0）。</li>
+  <li>\(\cdot\) 结合（\((ab)c = a(bc)\)）。</li>
+  <li>分配律：\(a(b + c) = ab + ac\)、\((a + b)c = ac + bc\)。</li>
+</ol>
+
+<p>本书提到"<em>环</em>" 时<em>默认</em> 还含<em>乘法单位 1</em>（\(1 \cdot a = a \cdot 1 = a\)）且<em>交换</em>（\(ab = ba\)）。这种环叫<em>含 1 交换环</em>。下面所有讨论都假设这条。</p>
+
+<p><em>例</em>：\(\mathbb Z\)、\(\mathbb Z/n\)、\(\mathbb Q\)、\(\mathbb R\)、\(\mathbb C\)、\(\mathbb Z[i]\)（高斯整数）、\(\mathbb Z[\sqrt{-5}]\)、多项式环 \(R[x]\)、形式幂级数 \(R[[x]]\)。</p>
+
+<p><strong>整环 / 域</strong>。<em>整环</em>（integral domain）= 含 1 交换环 + 无零因子（\(ab = 0 \implies a = 0\) 或 \(b = 0\)）。<em>域</em>（field）= 含 1 交换环 + 每个非零元素可逆（\(a \ne 0 \implies \exists a^{-1}\)）。</p>
+
+<p>关系：每个域都是整环；不是每个整环都是域（\(\mathbb Z\) 是整环非域）。<em>有限</em> 整环都是域（要会证；<a href="ch6.html">ch6</a>用过）。</p>
+
+<p><strong>理想</strong>。\(I \subseteq R\) 是<em>理想</em>（ideal） \(\iff\)：</p>
+
+<ol>
+  <li>\(I\) 是 \((R, +)\) 的子群。</li>
+  <li>\(\forall r \in R, \ a \in I, \ ra \in I\)（"<em>吸收外部乘法</em>"）。</li>
+</ol>
+
+<p>记 \(I \trianglelefteq R\)。</p>
+
+<p><em>例</em>：\(n\mathbb Z \trianglelefteq \mathbb Z\)；\((x) \trianglelefteq \mathbb Q[x]\)；\((p, 1 + \sqrt{-5}) \trianglelefteq \mathbb Z[\sqrt{-5}]\)。</p>
+
+<p><em>主理想</em>（principal ideal）：由<em>一个</em> 元素生成的，\((a) = aR = \{ar : r \in R\}\)。</p>
+
+<p><em>素理想</em>（prime ideal）：\(\mathfrak p \subsetneq R\) 满足 \(ab \in \mathfrak p \implies a \in \mathfrak p\) 或 \(b \in \mathfrak p\)。例：\((p) \trianglelefteq \mathbb Z\) 当 \(p\) 素。素理想等价于"<em>商 \(R/\mathfrak p\) 是整环</em>"。</p>
+
+<p><em>极大理想</em>（maximal ideal）：\(\mathfrak m \subsetneq R\) 上没有更大的真理想。等价于"<em>商 \(R/\mathfrak m\) 是域</em>"。</p>
+
+<p>每个极大理想是素的（域 \(\Rightarrow\) 整环）；反之一般不成立。例：\((x) \subset \mathbb Z[x]\) 是素（商 \(= \mathbb Z\) 整环）但<em>不</em>极大（被 \((p, x)\) 真包含）。</p>
+
+<p><strong>商环</strong>。\(I \trianglelefteq R\)，定义 \(R/I = \{r + I : r \in R\}\) 在运算 \((r_1 + I)(r_2 + I) = r_1 r_2 + I\) 下是环。例：\(\mathbb Z/n\mathbb Z\) = \(\mathbb Z\) 模 \((n)\)。</p>
+
+<p><strong>UFD / PID / Dedekind 域</strong>（重要的特殊整环）：</p>
+
+<ul>
+  <li><em>UFD</em>（unique factorization domain）：每个非零非单位元素都唯一分解为不可约元乘积（除单元差与排序差）。例：\(\mathbb Z\)、\(\mathbb Z[i]\)、\(\mathbb Q[x]\)。<em>反例</em>：\(\mathbb Z[\sqrt{-5}]\)（链回<a href="ch17.html">ch17</a>）。</li>
+  <li><em>PID</em>（principal ideal domain）：每个理想都主。\(\mathbb Z\) 是 PID；\(\mathbb Q[x]\) 是 PID；\(\mathbb Z[x]\) <em>不</em> 是（\((2, x)\) 不是主）。</li>
+  <li><em>Dedekind 整环</em>：诺特 + 整闭 + 每个非零素理想都极大。等价于"<em>每个非零理想都唯一分解为素理想乘积</em>"——这是<a href="ch22.html">ch22</a> 数域整数环 \(\mathcal O_K\) 的定义性质。</li>
+</ul>
+
+<p>关系：PID \(\Rightarrow\) UFD \(\Rightarrow\) Dedekind 是<em>不</em> 必然的（Dedekind 不必 UFD，反之亦然）。但<em>PID = UFD + Dedekind</em>。</p>
+
+<h2 id="appA-3">A.3 域 + 域扩张</h2>
+
+<p><strong>域扩张</strong>。\(K \subseteq L\) 都是域、\(K\) 的运算限制是 \(L\) 的运算——记 \(L/K\) 是<em>域扩张</em>。\(L\) 是 \(K\)-向量空间，维数叫扩张的<em>次数</em>，记 \([L : K]\)。</p>
+
+<p>例：</p>
+
+<ul>
+  <li>\([\mathbb C : \mathbb R] = 2\)（基 \(\{1, i\}\)）。</li>
+  <li>\([\mathbb Q(\sqrt 2) : \mathbb Q] = 2\)。</li>
+  <li>\([\mathbb Q(\sqrt 2, \sqrt 3) : \mathbb Q] = 4\)（基 \(\{1, \sqrt 2, \sqrt 3, \sqrt 6\}\)）。</li>
+  <li>\([\mathbb R : \mathbb Q] = \infty\)（实际是不可数无穷）。</li>
+</ul>
+
+<p><strong>代数 vs 超越</strong>。元素 \(\alpha \in L\) 是<em>代数</em>（algebraic over \(K\)） \(\iff \alpha\) 是某个 \(K\) 上多项式的根。否则<em>超越</em>。\(\sqrt 2\) 代数（\(x^2 - 2 = 0\)）；\(\pi\) 超越（Lindemann 1882）。</p>
+
+<p>\(\alpha\) 代数时，\(\alpha\) 满足的<em>最小多项式</em>（minimal polynomial）—— 首一、不可约、最低次的 \(K\) 上多项式以 \(\alpha\) 为根——是唯一的。\(\sqrt 2\) 在 \(\mathbb Q\) 上的最小多项式是 \(x^2 - 2\)。</p>
+
+<p><strong>分裂域</strong>。设 \(f(x) \in K[x]\)。\(f\) 的<em>分裂域</em>（splitting field）= \(K\) 的最小扩张 \(L\) 使 \(f\) 在 \(L\) 上完全分裂为线性因子。</p>
+
+<p>例：\(f = x^2 - 2 \in \mathbb Q[x]\) 的分裂域是 \(\mathbb Q(\sqrt 2)\)（\(f = (x - \sqrt 2)(x + \sqrt 2)\)）。\(f = x^4 - 2\) 的分裂域是 \(\mathbb Q(\sqrt[4]{2}, i)\)（次数 8）。</p>
+
+<h2 id="appA-4">A.4 有限域 \(\mathbb F_q\)</h2>
+
+<p><strong>定理</strong>。每个素数 \(p\) 与每个正整数 \(n\)，<em>存在唯一</em>（同构意义下）的<em>\(p^n\) 阶</em>有限域，记 \(\mathbb F_{p^n}\)（或 \(\mathrm{GF}(p^n)\)）。</p>
+
+<p>所有有限域都是这种形式——\(|F| = p^n\) 某素 \(p\) 与 \(n \ge 1\)。\(p\) 叫域的<em>特征</em>（characteristic）—— \(p \cdot 1 = 0\) 在这个域中。</p>
+
+<p>具体构造：</p>
+
+<ul>
+  <li>\(\mathbb F_p = \mathbb Z/p\)（最小例）。</li>
+  <li>\(\mathbb F_{p^n}\) 不是 \(\mathbb Z/(p^n)\)（后者只是环不是域，因 \(p\) 不可逆）。<em>正确</em> 构造：取 \(\mathbb F_p\) 上某<em>不可约 \(n\) 次多项式</em> \(f(x)\)，定义</p>
+  <p>\[
+  \mathbb F_{p^n} := \mathbb F_p[x] / (f(x)).
+  \]</p>
+  <p>不同的 \(f\) 给同构的域（这是"<em>唯一性</em>" 的具体含义）。例：\(\mathbb F_4 = \mathbb F_2[x]/(x^2 + x + 1)\)，4 个元素 \(\{0, 1, x, x + 1\}\)。</li>
+</ul>
+
+<p><strong>性质</strong>：</p>
+
+<ul>
+  <li>\(\mathbb F_{p^n}^\times\) 是<em>循环</em>群（链回<a href="ch8.html">ch8</a>原根）。任何生成元叫<em>原根</em> 或<em>本原元素</em>（primitive element）。</li>
+  <li>\(\mathbb F_{p^n}\) 是 \(x^{p^n} - x\) 在 \(\mathbb F_p\) 上的分裂域——所有 \(p^n\) 个元素都是这个多项式的根。</li>
+  <li>\(\mathbb F_{p^m} \subseteq \mathbb F_{p^n}\) \(\iff\) \(m \mid n\)。所以 \(\mathbb F_p\) 的所有<em>有限</em> 扩张构成一个由 \(\mathbb N\)（带整除）参数化的<em>格</em>。</li>
+</ul>
+
+<p><strong>Frobenius 自同构</strong>。设 \(F = \mathbb F_{p^n}\)。映射</p>
+
+<p>\[
+\boxed{\ \mathrm{Frob}_p : F \to F, \quad x \mapsto x^p\ }
+\]</p>
+
+<p>是 \(F\) 的<em>域自同构</em>。它是从"<em>新生小学生公式</em>" \((a + b)^p = a^p + b^p\)（在特征 \(p\) 中真——所有中间项的二项系数 \(\binom p k\) 整除 \(p\)）来。</p>
+
+<p>关键性质：\(\mathrm{Frob}_p\) <em>固定</em> \(\mathbb F_p\)（即 \(\mathrm{Frob}_p(a) = a\) 对 \(a \in \mathbb F_p\)，由 Fermat 小定理 \(a^p = a\)），<em>不</em> 固定 \(F \setminus \mathbb F_p\) 的元素。它<em>生成</em> \(F\) 在 \(\mathbb F_p\) 上的全 Galois 群——\(\mathrm{Gal}(F/\mathbb F_p) = \langle \mathrm{Frob}_p \rangle \cong \mathbb Z/n\)（\(n\) 阶循环）。</p>
+
+<p>这是 Galois 理论里最干净的例子——有限域的所有 Galois 群都是 \(\mathbb Z/n\) 形式，由 Frobenius 元生成。</p>
+
+<h2 id="appA-5">A.5 Galois 扩张 + Galois 主定理</h2>
+
+<p><strong>Galois 扩张</strong>。\(L/K\) 是<em>Galois 扩张</em> \(\iff\) \(L\) 是某个<em>可分</em> 多项式的分裂域（在特征 0 中"<em>可分</em>" 自动成立）。</p>
+
+<p>等价：\(L/K\) Galois \(\iff\) "<em>固定 \(K\) 的 \(L\) 自同构群</em>" 的阶等于 \([L : K]\)。</p>
+
+<p><strong>Galois 群</strong>。设 \(L/K\) Galois。</p>
+
+<p>\[
+\mathrm{Gal}(L/K) := \{\sigma : L \to L \text{ 域自同构} \mid \sigma|_K = \mathrm{id}_K\}.
+\]</p>
+
+<p>这是有限群，阶 \(|\mathrm{Gal}(L/K)| = [L : K]\)。</p>
+
+<p>例：</p>
+
+<ul>
+  <li>\(L = \mathbb Q(\sqrt 2)\)，\(K = \mathbb Q\)。\(\mathrm{Gal}(L/K) = \{\mathrm{id}, \sigma\}\)，\(\sigma(\sqrt 2) = -\sqrt 2\)。\(\cong \mathbb Z/2\)。</li>
+  <li>\(L = \mathbb Q(\sqrt 2, \sqrt 3)\)，\(K = \mathbb Q\)。\(\mathrm{Gal}(L/K) \cong (\mathbb Z/2)^2\)（Klein 四群）。</li>
+  <li>\(L = \mathbb Q(\zeta_n)\)（圆分域），\(K = \mathbb Q\)。\(\mathrm{Gal}(L/K) \cong (\mathbb Z/n)^\times\)。这是<em>阿贝尔</em>。</li>
+  <li>\(L = \mathbb Q(\sqrt[3]{2}, \omega)\)（\(\omega\) 是三次单位根），\(K = \mathbb Q\)。\(\mathrm{Gal}(L/K) \cong S_3\)（对称群）。<em>非阿贝尔</em>。</li>
+</ul>
+
+<p><strong>Galois 主定理（FTGT）</strong>。设 \(L/K\) 是有限 Galois 扩张，\(G = \mathrm{Gal}(L/K)\)。有反向包含的<em>双射</em>：</p>
+
+<p>\[
+\boxed{\ \{K \subseteq M \subseteq L\} \xleftrightarrow{1:1} \{H \le G\}.\ }
+\]</p>
+
+<p>对应：\(M \mapsto \mathrm{Gal}(L/M)\)；\(H \mapsto L^H = \{a \in L : \sigma(a) = a, \forall \sigma \in H\}\)（\(H\) 的<em>不动域</em>）。精化：</p>
+
+<ul>
+  <li>\([L : M] = |H|\)、\([M : K] = [G : H]\)。</li>
+  <li>\(M/K\) Galois \(\iff H \trianglelefteq G\)；此时 \(\mathrm{Gal}(M/K) \cong G/H\)。</li>
+</ul>
+
+<p>这条定理（链回 <a href="ch22.html">ch22</a>）把"<em>中间域</em>" 这种连续对象转换成"<em>子群</em>" 这种离散对象——这是代数化中间数学结构的根本工具。</p>
+
+<p><em>无穷 Galois 扩张</em>。把上面推广到 \(L/K\) 无穷次（如 \(L = \overline{\mathbb Q}\) 是 \(\mathbb Q\) 的代数闭包）。\(\mathrm{Gal}(L/K)\) 不再是有限群，而是<em>profinite 群</em>（拓扑紧群，所有有限商的逆极限）。Galois 对应仍成立，但要求"<em>子群</em>" 是<em>闭子群</em>。这是<a href="ch22.html">ch22</a>类域论用的版本。</p>
+
+<h2 id="appA-6">A.6 几个本书反复用到的事实</h2>
+
+<p><strong>事实 1：\((\mathbb Z/n)^\times \cong \prod_p (\mathbb Z/p^{e_p})^\times\)</strong>（CRT 版本）。其中 \(n = \prod p^{e_p}\) 素分解。每个 \((\mathbb Z/p^{e_p})^\times\) 是循环（\(p\) 奇）或几乎循环（\(p = 2\)）。\(\varphi(n) = \prod (p^{e_p} - p^{e_p - 1})\)。链回<a href="ch6.html">ch6</a>、<a href="ch7.html">ch7</a>。</p>
+
+<p><strong>事实 2：有限阿贝尔群结构定理</strong>。每个有限阿贝尔群 \(G\) 同构于 \(\bigoplus_i \mathbb Z/n_i\)（"<em>不变因子</em>" 形式）或 \(\bigoplus_p \bigoplus_j \mathbb Z/p^{e_{p, j}}\)（"<em>素数幂</em>" 形式）。两种分解都<em>唯一</em>（除排序外）。<a href="ch17.html">ch17</a>类群、<a href="ch20.html">ch20</a>Mordell-Weil 都用这条结构。</p>
+
+<p><strong>事实 3：循环群的子群与商</strong>。\(\mathbb Z/n\) 的子群一一对应 \(n\) 的因子——每个 \(d \mid n\) 给一个唯一的 \(d\) 阶子群 \(\langle n/d \rangle\)。所有子群与商都是循环。这是<a href="ch8.html">ch8</a>"<em>原根 + 离散对数</em>" 的代数基础。</p>
+
+<p><strong>事实 4：UFD 上的不可约 = 素</strong>。在 UFD 中"<em>不可约元</em>"（irreducible）和"<em>素元</em>"（prime）等价。在一般整环里"<em>素 \(\Rightarrow\) 不可约</em>" 但反向<em>不</em> 必然——\(\mathbb Z[\sqrt{-5}]\) 中 \(2\) 不可约但<em>不</em> 素，这是 \(\mathbb Z[\sqrt{-5}]\) 不是 UFD 的具体表现（链回<a href="ch17.html">ch17</a>）。</p>
+
+<p><strong>事实 5：Hilbert 基定理</strong>。如果 \(R\) 诺特环（即每个理想有限生成），则 \(R[x]\) 也诺特。归纳得 \(R[x_1, \ldots, x_n]\) 诺特。这条让"<em>有限多变量多项式环</em>" 这个对象有干净的理想理论——是代数几何的基础事实。</p>
+
+<h2 id="appA-7">A.7 一句话指南</h2>
+
+<p>这本书的代数对象按"<em>抽象程度</em>" 排：</p>
+
+<ul>
+  <li>最具体：\(\mathbb Z\)（<a href="ch1.html">ch1</a> 起）、\(\mathbb Z/n\)（<a href="ch5.html">ch5</a> 起）、\((\mathbb Z/n)^\times\)（<a href="ch6.html">ch6</a> 起）。</li>
+  <li>第二层：\(\mathbb Z[i]\)、\(\mathbb Z[\sqrt{-D}]\) 等代数整数环（<a href="ch13.html">ch13</a>、<a href="ch17.html">ch17</a>）。它们的失败"<em>UFD 性质</em>" 是 19 世纪数论的核心问题。</li>
+  <li>第三层：数域 \(K = \mathbb Q(\alpha)\) 与整数环 \(\mathcal O_K\)（<a href="ch22.html">ch22</a>）。\(\mathcal O_K\) 总是 Dedekind 整环。</li>
+  <li>第四层：Galois 群 \(\mathrm{Gal}(L/K)\)、类群 \(\mathrm{Cl}(K)\)、idele 类群 \(C_K\)（<a href="ch22.html">ch22</a>）。这些是数论"<em>整数信息的提取</em>"——一个数域的所有阿贝尔扩张都可由 \(C_K\) 描述。</li>
+  <li>第五层：Galois 表示 \(\rho : \mathrm{Gal}(\overline K/K) \to \mathrm{GL}_n(\mathbb C)\)（<a href="ch24.html">ch24</a>）、模形式（<a href="ch21.html">ch21</a>）、自守表示（<a href="ch22.html">ch22</a>）。这些是 Langlands 程序的对象，21 世纪数论的核心。</li>
+</ul>
+
+<p>每升一层，<em>抽象程度</em> 高一点，<em>解决问题的能力</em> 强一截。这本书走过前四层，<em>暗示</em> 第五层。如果你想走第五层，下一步建议读 Diamond-Shurman <em>A First Course in Modular Forms</em>、Silverman <em>Arithmetic of Elliptic Curves</em>、Bump <em>Automorphic Forms and Representations</em>，再加一门研究生级<em>类域论</em> 课。</p>
+
+<p>代数 + 数论的关系一句话：<em>代数提供语言，数论提供问题</em>。两者互为推动力——20 世纪几乎所有抽象代数的发展（Galois 理论现代化、范畴论、同调代数、scheme 理论）都直接或间接源自数论的需求；反过来 21 世纪数论的几乎每一步都用最现代的代数工具。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+</main>
+</body>
+</html>

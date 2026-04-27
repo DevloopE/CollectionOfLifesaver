@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 6 章 Fermat 小定理与 Euler 定理 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 同余与 ℤ/n</a><a href="ch7.html">下一章 · 第 7 章 中国剩余定理 →</a></nav>
+<h1 id="ch6">第 6 章 Fermat 小定理与 Euler 定理</h1>
+
+<p><a href="ch1.html">第 1 章</a>里 \(7\) 的末位以周期 4 循环：\(7, 9, 3, 1, 7, 9, 3, 1, \ldots\)。<a href="ch5.html">第 5 章</a> §5.7 算 \(7^{100} \bmod 13\) 时，预计算表 \(7^4 \equiv 9, 7^8 \equiv 3, 7^{16} \equiv 9, 7^{32} \equiv 3, 7^{64} \equiv 9\) 也透出周期感。这两段都不是孤例——<em>幂在模 \(n\) 下总循环</em>，而循环的<em>长度</em> 由一条精确的群论事实决定。</p>
+
+<p>本章把这条规律命名并证明。素数情形叫<strong>Fermat 小定理</strong>，一般情形叫<strong>Euler 定理</strong>。两条定理形式相似——\(a^{\text{某指数}} \equiv 1 \pmod n\)——而那个指数恰好是 \((\mathbb{Z}/n)^*\) 的<em>群阶</em>。这是数论里第一个真正"<em>因为有群结构所以成立</em>"的深定理。</p>
+
+<h2 id="sec6-1">6.1 朴素观察：模 7 下所有非零元的 6 次幂都是 1</h2>
+
+<p>固定 \(p = 7\)。算 \(\bmod 7\) 下每个非零元的 6 次幂：</p>
+
+<p>\[
+\begin{aligned}
+1^6 &= 1 \equiv 1, \\
+2^6 &= 64 = 9 \cdot 7 + 1 \equiv 1, \\
+3^6 &= 729 = 104 \cdot 7 + 1 \equiv 1, \\
+4^6 &= (2^2)^6 = 2^{12} = 4096 = 585 \cdot 7 + 1 \equiv 1, \\
+5^6 &= 15625 = 2232 \cdot 7 + 1 \equiv 1, \\
+6^6 &= 46656 = 6665 \cdot 7 + 1 \equiv 1.
+\end{aligned}
+\]</p>
+
+<p>全是 1。一致到让人怀疑是巧合。</p>
+
+<p>换 \(p = 11\) 重做（部分）：\(2^{10} = 1024 = 93 \cdot 11 + 1 \equiv 1\)；\(3^{10} = 59049 = 5368 \cdot 11 + 1 \equiv 1\)。也是 1。</p>
+
+<p>换 \(p = 13\) 看 §5.7 的预计算：\(7^4 \equiv 9, 7^8 \equiv 3\)，所以 \(7^{12} = 7^8 \cdot 7^4 \equiv 3 \cdot 9 = 27 \equiv 1 \pmod{13}\)。又是 1。</p>
+
+<p>规律似乎是：<em>对任何素 \(p\)，任何与 \(p\) 互素的 \(a\)（在 \(\bmod p\) 下就是任何非零元），\(a^{p-1} \equiv 1 \pmod p\)</em>。</p>
+
+<p>这条规律是 Fermat 1640 年在一封写给 Frénicle de Bessy 的信里宣布的（没附证明，他的习惯）。后人补证。今天有好几条不同的证明路径——组合的、群论的、二项式展开的；我们走最简洁的群论证。</p>
+
+<h2 id="sec6-2">6.2 Fermat 小定理：陈述与群论证明</h2>
+
+<p>\[\boxed{\ \text{(Fermat 小定理)}\ \ p\ \text{素},\ \gcd(a, p) = 1\ \Longrightarrow\ a^{p-1} \equiv 1 \pmod p.\ }\]</p>
+
+<p>等价陈述：对任意整数 \(a\)，\(a^p \equiv a \pmod p\)（这条版本不需要"\(\gcd(a, p) = 1\)"，因为 \(p \mid a\) 时两边都 \(\equiv 0\)）。</p>
+
+<p><em>证明</em>。 我们用<a href="../抽象代数/ch3.html">抽象代数 ch3</a> 的<strong>Lagrange 定理</strong>：有限群 \(G\) 的任意元素 \(g\)，其<em>阶</em> \(\mathrm{ord}(g)\)（最小正整数 \(m\) 使 \(g^m = e\)）整除 \(|G|\)。推论：\(g^{|G|} = e\)。</p>
+
+<p>把这条用在 \(G = (\mathbb{Z}/p)^*\)。\(p\) 素时 \(\mathbb{Z}/p\) 是域（<a href="ch5.html">ch5</a> §5.4），其非零元集合恰是 \((\mathbb{Z}/p)^* = \{\bar 1, \bar 2, \ldots, \overline{p-1}\}\)，共 \(p - 1\) 个元素，在乘法下构成群（封闭因 \(\bar a \bar b \neq 0 \iff p \nmid ab\)，由 \(p\) 素保证；逆元由 \(\gcd(a, p) = 1\) 保证）。\(|(\mathbb{Z}/p)^*| = p - 1\)。</p>
+
+<p>对任何 \(\bar a \in (\mathbb{Z}/p)^*\)，Lagrange 给 \(\bar a^{p-1} = \bar 1\)，即 \(a^{p-1} \equiv 1 \pmod p\)。\(\checkmark\)</p>
+
+<p>请你停下来感受证明的<em>结构</em>：所有计算（如 6.1 节验证 \(2^6, 3^6, \ldots, 6^6\)）都被压缩成<em>一条群论事实 + 一句"应用到 \((\mathbb{Z}/p)^*\)"</em>。这不是省力——而是把"<em>规律</em>"<em>解释</em> 为"<em>结构</em>"。Fermat 小定理之所以成立，是因为模 \(p\) 非零元在乘法下<em>真的有 \(p - 1\) 元群</em>，而群里的元素被 Lagrange 强制满足 \(g^{|G|} = e\)。</p>
+
+<p>历史上还有一条更朴素的<em>组合证</em>——基于"\(\{a, 2a, 3a, \ldots, (p-1)a\}\) 在 \(\bmod p\) 下还是 \(\{1, 2, \ldots, p-1\}\) 的某个排列" 这一观察，乘起来得 \(a^{p-1} (p-1)! \equiv (p-1)! \pmod p\)，两边消 \((p-1)!\)（与 \(p\) 互素）即得。这条证不依赖 Lagrange，也很漂亮——是最早的证法之一。</p>
+
+<p>另一条<em>数论归纳</em>证：对 \(a \geq 1\) 归纳证 \(a^p \equiv a \pmod p\)。基础 \(a = 1\) 显然。归纳步用二项式 \((a + 1)^p = \sum_{k=0}^p \binom{p}{k} a^k\)；除 \(k = 0, p\) 外所有 \(\binom{p}{k}\) 都 \(\equiv 0 \pmod p\)（因分子有 \(p!\)、分母没有 \(p\)），所以 \((a + 1)^p \equiv a^p + 1 \equiv a + 1 \pmod p\)。这是 Euler 1736 年发表的证明。</p>
+
+<p>三条证法互不相同，从三个角度告诉你为什么 FLT 必然为真。</p>
+
+<h2 id="sec6-3">6.3 Euler \(\varphi\) 函数</h2>
+
+<p>FLT 只覆盖 \(n = p\) 素时的情形。一般 \(n\) 时呢？</p>
+
+<p>关键：把"\(p - 1\)" 这个数<em>正确推广</em>。\(p - 1\) 在素时恰是 \((\mathbb{Z}/p)^*\) 的元素数。一般 \(n\) 时 \((\mathbb{Z}/n)^*\) = "<em>与 \(n\) 互素的 \(\bmod n\) 等价类</em>"，这个集合的大小有名字：</p>
+
+<p>\[\boxed{\ \varphi(n) = \#\{k : 1 \leq k \leq n,\ \gcd(k, n) = 1\}.\ }\]</p>
+
+<p>(称为 <em>Euler totient 函数</em>，或 Euler \(\varphi\) 函数。Gauss 写法是 \(\phi\)；本书用 \(\varphi\)。)</p>
+
+<p>列几个具体值：</p>
+
+<ul>
+  <li>\(\varphi(1) = 1\)（按约定，\(1\) 与自己互素）。</li>
+  <li>\(\varphi(p) = p - 1\)（任意素 \(p\)；除 \(p\) 自身外所有 \(1, \ldots, p-1\) 都与 \(p\) 互素）。</li>
+  <li>\(\varphi(p^2) = p^2 - p = p(p-1)\)。\(\bmod p^2\) 共 \(p^2\) 个数，与 \(p^2\) 不互素的恰是 \(p\) 的倍数，共 \(p\) 个（即 \(p, 2p, \ldots, p \cdot p\)）。</li>
+  <li>\(\varphi(p^k) = p^k - p^{k-1} = p^{k-1}(p - 1)\)。同理：\(p\) 的倍数有 \(p^{k-1}\) 个。</li>
+  <li>\(\varphi(6) = 2\)（与 6 互素的：1, 5）。</li>
+  <li>\(\varphi(8) = 4\)（1, 3, 5, 7）。</li>
+  <li>\(\varphi(10) = 4\)（1, 3, 7, 9）。</li>
+  <li>\(\varphi(12) = 4\)（1, 5, 7, 11）。</li>
+  <li>\(\varphi(15) = 8\)（1, 2, 4, 7, 8, 11, 13, 14）。</li>
+</ul>
+
+<p>注意一个数据：\(\varphi(15) = 8 = \varphi(3) \cdot \varphi(5) = 2 \cdot 4\)；\(\varphi(12) = 4 = \varphi(4) \cdot \varphi(3) = 2 \cdot 2\)；\(\varphi(10) = 4 = \varphi(2) \cdot \varphi(5) = 1 \cdot 4\)。规律：\(\gcd(m, n) = 1\) 时 \(\varphi(m n) = \varphi(m) \varphi(n)\)（"<em>积性</em>"）。这条事实在 ch7 由 CRT 给出干净证明，本章先记住。</p>
+
+<p>结合 \(\varphi(p^k) = p^{k-1}(p - 1)\) 和积性，得到<em>显式公式</em>：若 \(n = p_1^{a_1} \cdots p_r^{a_r}\) 是素分解，则</p>
+
+<p>\[
+\varphi(n) = \prod_{i=1}^r p_i^{a_i - 1} (p_i - 1) = n \prod_{p \mid n} \left(1 - \frac{1}{p}\right).
+\]</p>
+
+<p>例：\(n = 360 = 2^3 \cdot 3^2 \cdot 5\)，\(\varphi(360) = 360 \cdot (1 - 1/2)(1 - 1/3)(1 - 1/5) = 360 \cdot \frac{1}{2} \cdot \frac{2}{3} \cdot \frac{4}{5} = 96\)。</p>
+
+<h2 id="sec6-4">6.4 Euler 定理：把 \(p - 1\) 换成 \(\varphi(n)\)</h2>
+
+<p>\[\boxed{\ \text{(Euler 定理)}\ \ \gcd(a, n) = 1\ \Longrightarrow\ a^{\varphi(n)} \equiv 1 \pmod n.\ }\]</p>
+
+<p><em>证明</em>。 完全和 FLT 一样，只是把群从 \((\mathbb{Z}/p)^*\) 换成 \((\mathbb{Z}/n)^*\)。后者由 ch5 §5.4 是有限交换群，阶 \(|(\mathbb{Z}/n)^*| = \varphi(n)\)。Lagrange 定理给：每个元素满足 \(\bar a^{\varphi(n)} = \bar 1\)，即 \(a^{\varphi(n)} \equiv 1 \pmod n\)。\(\checkmark\)</p>
+
+<p>FLT 是 Euler 定理在 \(n = p\)（此时 \(\varphi(p) = p - 1\)）的特殊情形。Euler 1763 年给出这条推广。</p>
+
+<p>验证 \(n = 12\)，\(\varphi(12) = 4\)。与 12 互素的有 1, 5, 7, 11。算：</p>
+
+<p>\[
+1^4 = 1, \quad 5^4 = 625 = 52 \cdot 12 + 1 \equiv 1, \quad 7^4 = 2401 = 200 \cdot 12 + 1 \equiv 1, \quad 11^4 = 14641 = 1220 \cdot 12 + 1 \equiv 1.
+\]</p>
+
+<p>全是 1。\(\checkmark\)</p>
+
+<p>验证 \(n = 10\)，\(\varphi(10) = 4\)：与 10 互素的 1, 3, 7, 9。\(3^4 = 81 \equiv 1\)；\(7^4 = 2401 \equiv 1\)；\(9^4 = 6561 \equiv 1\)。\(\checkmark\)</p>
+
+<p><strong>注意</strong>：Euler 定理给的指数 \(\varphi(n)\) 不一定是<em>最小</em> 的"使所有 \(a\) 都返回 1" 的指数。比如 \(n = 8\)，\(\varphi(8) = 4\)，但实际上 \(a^2 \equiv 1 \pmod 8\) 对所有奇 \(a\)（验证：\(1, 9, 25, 49 \equiv 1 \bmod 8\)）。最小的这种指数叫<em>Carmichael 函数</em> \(\lambda(n)\)，满足 \(\lambda(n) \mid \varphi(n)\)。RSA 实际上用 \(\lambda(n)\) 比 \(\varphi(n)\) 紧，但定理一般以 \(\varphi(n)\) 陈述。</p>
+
+<h2 id="sec6-5">6.5 应用：求 \(2^{1000} \bmod 7\)</h2>
+
+<p>用 FLT 立刻解决：\(\gcd(2, 7) = 1\)，故 \(2^6 \equiv 1 \pmod 7\)。所以 \(2^{1000} = 2^{6 \cdot 166 + 4} = (2^6)^{166} \cdot 2^4 \equiv 1^{166} \cdot 16 = 16 \equiv 2 \pmod 7\)。</p>
+
+<p>对照 ch5 §5.6 模平方法：\(1000 = 1111101000_2\)，得算 10 次平方 + 几次乘法。<em>FLT 一行解决</em>，因为它把指数<em>先压缩</em> 到 \(\bmod 6\) 内：\(1000 \bmod 6 = 4\)，所以 \(2^{1000} \equiv 2^4\)。</p>
+
+<p>更宏伟的例子：\(2^{1000} \bmod 1001\)。\(1001 = 7 \cdot 11 \cdot 13\)，\(\varphi(1001) = 6 \cdot 10 \cdot 12 = 720\)。Euler 定理给 \(2^{720} \equiv 1 \pmod{1001}\)。\(1000 = 720 + 280\)，所以 \(2^{1000} \equiv 2^{280} \pmod{1001}\)。再用模平方法跑 \(2^{280}\)——比起跑 \(2^{1000}\) 省一个量级。结合 ch7 的 CRT 还能拆成模 7、11、13 三步，每步指数 \(\bmod 6, 10, 12\) 进一步缩小。这套联合武器是<em>实际计算</em> 大幂的标准做法。</p>
+
+<p>请你停下来想：FLT / Euler 把"<em>大指数</em>" 直接<em>截短</em> 到"\(\bmod \varphi(n)\)" 这么一小段。\(\varphi(n) \leq n - 1\) 远小于原本可以是任意大的 \(k\)。这条截短<em>无需任何额外计算</em>——只要知道 \(\varphi(n)\) 即可。<em>有结构的对象自带快捷方式</em>。</p>
+
+<h2 id="sec6-6">6.6 Carmichael 数：让 Fermat 测试翻车的怪物</h2>
+
+<p>FLT 提供了一种"<em>素性测试</em>"思路：要判断 \(n\) 是不是素数，挑随机 \(a\) 算 \(a^{n-1} \bmod n\)。<em>如果不是 1</em>，那 \(n\) 一定不是素数（"合数证书")。<em>如果是 1</em>，那 \(n\) <em>很可能</em>是素，但不保证。</p>
+
+<p>这个想法叫<strong>Fermat 素性测试</strong>。它的"<em>不保证</em>" 来自一个尴尬事实：存在合数 \(n\)，使得对<em>所有</em> 与 \(n\) 互素的 \(a\) 都有 \(a^{n-1} \equiv 1 \pmod n\)——这种合数对 Fermat 测试完全不可分辨。它们叫<strong>Carmichael 数</strong>（也叫"<em>绝对伪素数</em>"）。</p>
+
+<p>最小的 Carmichael 数是 \(561 = 3 \cdot 11 \cdot 17\)。验证：要证对所有 \(\gcd(a, 561) = 1\)，\(a^{560} \equiv 1 \pmod{561}\)。由 CRT，等价于在 \(\bmod 3, 11, 17\) 三处同时 \(\equiv 1\)。</p>
+
+<ul>
+  <li>\(\bmod 3\)：\(a^2 \equiv 1\)（FLT，\(\gcd(a, 3) = 1\)）。\(560 = 2 \cdot 280\)，所以 \(a^{560} = (a^2)^{280} \equiv 1\)。\(\checkmark\)</li>
+  <li>\(\bmod 11\)：\(a^{10} \equiv 1\)。\(560 = 10 \cdot 56\)，\(a^{560} \equiv 1\)。\(\checkmark\)</li>
+  <li>\(\bmod 17\)：\(a^{16} \equiv 1\)。\(560 = 16 \cdot 35\)，\(a^{560} \equiv 1\)。\(\checkmark\)</li>
+</ul>
+
+<p>所以 \(a^{560} \equiv 1 \pmod{561}\) 对所有互素 \(a\)。可 \(561 = 3 \cdot 11 \cdot 17\)，明明合数。<em>561 完美骗过 Fermat 测试</em>。</p>
+
+<p>背后规律：\(n\) 是 Carmichael 数 \(\iff\) \(n\) 无平方因子（不重复素因子），且对每个素因子 \(p\)，\(p - 1 \mid n - 1\)。这条由 Korselt 1899 给出。\(561\) 的素因子 3, 11, 17，\(3 - 1 = 2\)、\(10\)、\(16\) 都整除 \(560 = 16 \cdot 35\)。验证。</p>
+
+<p>Carmichael 数无穷多（Alford-Granville-Pomerance 1994）。它们让 Fermat 测试不能作为<em>确定性</em> 素性证书。现实里用<em>Miller-Rabin 测试</em>——加强版，对 Carmichael 数也奏效。但 Carmichael 数本身仍是数论里有名的"<em>结构和巧合的边界对象</em>"。</p>
+
+<h2 id="sec6-7">6.7 Wilson 定理：另一条素性刻画</h2>
+
+<p>FLT 是素 \(p\) 的一种"<em>特征性质</em>"，但因 Carmichael 数存在不能反过来用。是否有<em>充要条件</em> 让"\(n\) 是素" 完全等价？</p>
+
+<p>有。<strong>Wilson 定理</strong>：</p>
+
+<p>\[\boxed{\ p\ \text{素}\ \iff\ (p - 1)! \equiv -1 \pmod p.\ }\]</p>
+
+<p>验证：</p>
+
+<ul>
+  <li>\(p = 2\)：\(1! = 1 \equiv -1 \pmod 2\)（因 \(-1 \equiv 1 \pmod 2\)）。\(\checkmark\)</li>
+  <li>\(p = 3\)：\(2! = 2 \equiv -1 \pmod 3\)。\(\checkmark\)</li>
+  <li>\(p = 5\)：\(4! = 24 = 4 \cdot 5 + 4 \equiv 4 \equiv -1 \pmod 5\)。\(\checkmark\)</li>
+  <li>\(p = 7\)：\(6! = 720 = 102 \cdot 7 + 6 \equiv 6 \equiv -1 \pmod 7\)。\(\checkmark\)</li>
+  <li>\(n = 4\)（合）：\(3! = 6 \equiv 2 \pmod 4 \neq -1 = 3\)。\(\checkmark\)</li>
+  <li>\(n = 6\)（合）：\(5! = 120 \equiv 0 \pmod 6\)。\(\neq -1 = 5\)。\(\checkmark\)</li>
+</ul>
+
+<p><em>证明</em>（素方向）。 设 \(p\) 素。在 \((\mathbb{Z}/p)^* = \{\bar 1, \bar 2, \ldots, \overline{p-1}\}\) 里，每个元素 \(\bar a\) 有唯一逆 \(\bar a^{-1}\)。把元素和它的逆<em>配对</em>。哪些 \(\bar a\) 等于自己的逆？\(\bar a^2 = \bar 1\)，即 \(a^2 \equiv 1 \pmod p\)，即 \((a - 1)(a + 1) \equiv 0\)。\(p\) 素时 \(p \mid (a - 1)\) 或 \(p \mid (a + 1)\)，即 \(\bar a = \bar 1\) 或 \(\bar a = \overline{-1}\)。</p>
+
+<p>所以 \(\{\bar 2, \bar 3, \ldots, \overline{p-2}\}\) 这 \(p - 3\) 个元素恰好两两配对（每个跟它的逆），乘起来得 \(\bar 1\)。剩 \(\bar 1\) 和 \(\overline{p-1} = \overline{-1}\) 没配对。所以</p>
+
+<p>\[
+(p-1)! = \bar 1 \cdot \bar 2 \cdot \bar 3 \cdots \overline{p-1} = \bar 1 \cdot \overline{-1} = \overline{-1}.
+\]</p>
+
+<p>\(\checkmark\)</p>
+
+<p>(合数方向更直接：\(n\) 合且 \(n > 4\) 时 \(n\) 有真因子 \(d\)，\(1 < d < n\)，则 \(d\) 出现在 \(2, 3, \ldots, n - 1\) 中，所以 \(d \mid (n-1)!\)，故 \((n-1)! \equiv 0 \pmod d\)；进一步可证 \(n \mid (n-1)!\)，所以 \((n-1)! \equiv 0 \not\equiv -1\)。\(n = 4\) 单独验：\(3! = 6 \equiv 2 \pmod 4 \neq 3\)。)</p>
+
+<p>Wilson 定理是<em>素性的充要条件</em>，但<em>实际</em>不能用作素性测试——\((p - 1)!\) 这个数对大 \(p\) 巨大无比，算它本身就比 trial division 还慢。它的价值是<em>理论性</em>的——它是"<em>素性</em>"这个表面定义在<em>代数对象</em>层面的精确翻译，告诉你"<em>素</em>" 这个概念深植于 \((\mathbb{Z}/p)^*\) 的群结构（"<em>每个非自逆元素和它的逆配对</em>"恰是<em>群结构</em> 的产物）。</p>
+
+<h2 id="sec6-8">6.8 应用预告：RSA 的代数核心</h2>
+
+<p>现代密码学最早大规模部署的公钥算法是<strong>RSA</strong>（Rivest-Shamir-Adleman 1977），它的可行性<em>完全</em>建在 Euler 定理上。这里只画轮廓，详细在 <a href="ch23.html">ch23</a>。</p>
+
+<p>设：选两个大素 \(p, q\)（每个 1024 位以上），令 \(n = p q\)，\(\varphi(n) = (p - 1)(q - 1)\)。选公开指数 \(e\)（常用 \(65537\)），与 \(\varphi(n)\) 互素。用 ch5 §5.4 的扩展 Euclid 算 \(d \equiv e^{-1} \pmod{\varphi(n)}\)，即 \(e d \equiv 1 \pmod{\varphi(n)}\)。<em>公钥</em>：\((n, e)\)。<em>私钥</em>：\(d\)（\(p, q, \varphi(n)\) 不公开）。</p>
+
+<p>加密消息 \(m\)（视为 \(\bmod n\) 一个数）：\(c = m^e \bmod n\)（用模平方法）。</p>
+
+<p>解密：\(m = c^d \bmod n\)。</p>
+
+<p><em>为什么解密对</em>？因 \(e d = 1 + k \varphi(n)\) 对某 \(k\)，所以</p>
+
+<p>\[
+c^d = m^{e d} = m^{1 + k \varphi(n)} = m \cdot (m^{\varphi(n)})^k \equiv m \cdot 1^k = m \pmod n,
+\]</p>
+
+<p>用了 Euler 定理 \(m^{\varphi(n)} \equiv 1 \pmod n\)（假设 \(\gcd(m, n) = 1\)；不互素的情形可以用 CRT 单独验证）。<em>RSA 的正确性就是 Euler 定理</em>。</p>
+
+<p><em>为什么 RSA 安全</em>？要由 \(c\) 还原 \(m\) 需知道 \(d\)。要算 \(d\) 需知道 \(\varphi(n) = (p - 1)(q - 1)\)。要知道 \(\varphi(n)\) 需知道 \(p, q\)——即要把 \(n\) 分解。<em>大整数分解是个被认为难的问题</em>（最快经典算法 GNFS 在 2048-bit 上需要远超人类计算能力的时间）。所以 RSA 的安全性等价于"<em>分解 \(n\) 难</em>"——而<em>分解难</em> 这件事至今没有数学证明，只是经验：50 年了没人破。</p>
+
+<p>请你看 RSA 的<em>结构</em>：它把"<em>加密</em>"和"<em>解密</em>" 都化简为"<em>大幂模 \(n\)</em>"——靠<a href="ch5.html">ch5</a> §5.6 的模平方法可行。把"<em>解密正确性</em>" 化简为"<em>Euler 定理</em>"——本章给。把"<em>安全性</em>" 化简为"<em>分解难</em>"——靠经验信任。<em>初等数论的三件武器</em>（同余、Euclid、Euler 定理）<em>联手</em>支撑着今天互联网的密钥交换。</p>
+
+<h2 id="sec6-9">6.9 临别话与下一步</h2>
+
+<p>本章可以记的两条主线：</p>
+
+<ul>
+  <li><em>结构</em>：\((\mathbb{Z}/n)^*\) 是有限交换群，阶 \(\varphi(n)\)。Lagrange 强迫每个元素满足 \(a^{\varphi(n)} \equiv 1\)（Euler 定理）。素时简化为 FLT \(a^{p-1} \equiv 1\)。</li>
+  <li><em>用法</em>：把"<em>大幂 \(\bmod n\)</em>" 立即化简为"<em>幂 \(\bmod \varphi(n)\)</em>"。这条截短让 RSA、DH 等密码学体制可行。</li>
+</ul>
+
+<p>下一章我们处理另一类同余问题——<em>多个</em> 同余条件<em>同时</em> 满足。<a href="ch5.html">ch5</a> 已经会解 \(a x \equiv b \pmod n\) 的<em>一条</em> 同余；如果同时要求</p>
+
+<p>\[
+x \equiv 2 \pmod 3, \quad x \equiv 3 \pmod 5, \quad x \equiv 2 \pmod 7,
+\]</p>
+
+<p>怎么办？答案是<strong>中国剩余定理</strong>——一条 2000 年前由《孙子算经》提出的算法，今天仍是 RSA 解密加速、并行计算、纠错码里的标准工具。它还会给我们 \(\varphi\) 函数的<em>积性</em> 证明（本章 6.3 用了未证）。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 同余与 ℤ/n</a><a href="ch7.html">下一章 · 第 7 章 中国剩余定理 →</a></nav>
+</main>
+</body>
+</html>

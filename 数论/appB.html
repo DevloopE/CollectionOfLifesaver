@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 复分析与解析数论速查 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+<h1 id="appB">附录 B 复分析与解析数论速查</h1>
+
+<p>本书第 16 章用 Riemann \(\zeta\) 函数证素数定理、第 15 章 Dirichlet \(L\)-级数、第 21 章模形式 \(L\)-函数——都用到<a href="../复分析/index.html">《复分析读本》</a>的几条关键事实。本附录把这些事实集中处理，让你不离开本书就能复习。</p>
+
+<ul>
+  <li>复函数解析（全纯）的定义与等价表征。</li>
+  <li>Cauchy 积分公式 + 留数定理。</li>
+  <li>解析延拓：唯一性、具体技术（函数方程、积分变换）。</li>
+  <li>全纯函数的零点：孤立、阶、计数公式。</li>
+  <li>Tauberian 定理（Wiener-Ikehara），素数定理证明的"<em>分析机</em>"。</li>
+  <li>Dirichlet 级数 \(\sum a_n/n^s\) 的收敛半平面。</li>
+</ul>
+
+<p>本附录详细程度足以让你<em>读懂</em> 本书所有提及。证明请回<a href="../复分析/index.html">复分析</a>系列。</p>
+
+<h2 id="appB-1">B.1 复函数解析（全纯）</h2>
+
+<p>设 \(U \subseteq \mathbb C\) 是开集、\(f : U \to \mathbb C\)。<em>\(f\) 在点 \(z_0 \in U\) 处全纯</em>（holomorphic at \(z_0\)） \(\iff\) <em>复导数</em></p>
+
+<p>\[
+f'(z_0) := \lim_{h \to 0, h \in \mathbb C} \frac{f(z_0 + h) - f(z_0)}{h}
+\]</p>
+
+<p>存在并<em>不依赖</em> \(h \to 0\) 的方向。这条"<em>不依赖方向</em>" 是<em>实可微</em> 与<em>复可微</em> 的关键差别——\(f(z) = \bar z\) 在每个点实可微但<em>不</em>复可微。</p>
+
+<p><em>\(f\) 在 \(U\) 上全纯</em> \(\iff\) \(f\) 在 \(U\) 每点全纯。本书<em>全纯</em>、<em>解析</em>、<em>complex differentiable</em> 这些词同义。</p>
+
+<p><strong>等价表征</strong>。\(f : U \to \mathbb C\) 全纯 \(\iff\) 满足以下任一（实际四个等价）：</p>
+
+<ol>
+  <li><em>复可微</em>。</li>
+  <li><em>满足 Cauchy-Riemann 方程</em>：\(f = u + iv\)，则 \(\partial u/\partial x = \partial v/\partial y\)、\(\partial u/\partial y = -\partial v/\partial x\)。</li>
+  <li><em>每点局部展开为收敛幂级数</em>：\(f(z) = \sum_{n=0}^\infty a_n (z - z_0)^n\) 在 \(z_0\) 的某邻域。</li>
+  <li><em>满足 Cauchy 积分公式</em>（B.2 节）：\(f(z_0) = \frac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z - z_0}\,dz\) 对包围 \(z_0\) 的简单闭曲线 \(\gamma\)。</li>
+</ol>
+
+<p>"<em>幂级数 = 全纯</em>" 是<em>实分析与复分析最深的差别之一</em>——实数上 \(f \in C^\infty\) <em>不</em> 蕴含 \(f\) 是解析（如 \(f(x) = e^{-1/x^2}\) for \(x \ne 0\) 是 \(C^\infty\) 但 Taylor 级数 \(0\)，不等于 \(f\)）。复数上"<em>一阶可微</em>" 自动给"<em>无穷阶可微</em>" + "<em>解析</em>"。</p>
+
+<h2 id="appB-2">B.2 Cauchy 积分公式 + 留数定理</h2>
+
+<p><strong>Cauchy 积分定理</strong>。设 \(f\) 在简单连通开集 \(U \subseteq \mathbb C\) 上全纯，\(\gamma\) 是 \(U\) 中分段光滑闭曲线。则</p>
+
+<p>\[
+\oint_\gamma f(z) \, dz = 0.
+\]</p>
+
+<p>这是复分析最基础的"<em>积分恒等于零</em>" 公式。直觉：全纯函数<em>没有奇点</em> 让闭路径环绕——所以闭路径积分回到原点。</p>
+
+<p><strong>Cauchy 积分公式</strong>。同上设 + \(z_0 \in U\) 在 \(\gamma\) 内部。则</p>
+
+<p>\[
+\boxed{\ f(z_0) = \frac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z - z_0} \, dz.\ }
+\]</p>
+
+<p>这条公式让你<em>从 \(\gamma\) 上的值</em> 算出<em>\(\gamma\) 内部任意点</em> 的值。复全纯函数有"<em>极强的全局刚性</em>"——边界数据完全决定内部数据。</p>
+
+<p><strong>留数</strong>。设 \(f\) 在 \(z_0\) 处有<em>孤立奇点</em>（即 \(z_0\) 周围去掉 \(z_0\) 的某邻域 \(f\) 全纯）。\(f\) 在 \(z_0\) 周围有 Laurent 展开：</p>
+
+<p>\[
+f(z) = \sum_{n = -\infty}^{\infty} c_n (z - z_0)^n.
+\]</p>
+
+<p>\(z_0\) 处的<em>留数</em>（residue）= Laurent 展开里 \((z - z_0)^{-1}\) 的系数：</p>
+
+<p>\[
+\boxed{\ \mathrm{Res}_{z_0} f := c_{-1}.\ }
+\]</p>
+
+<p>留数测量 \(f\) 在 \(z_0\) 处"<em>第一阶奇异性</em>" 的大小。</p>
+
+<p><strong>留数定理</strong>。设 \(f\) 在 \(U\) 上除有限个孤立奇点 \(z_1, \ldots, z_k\) 外全纯，\(\gamma\) 是 \(U\) 中分段光滑简单闭曲线，包围所有 \(z_j\)（按正向）。则</p>
+
+<p>\[
+\boxed{\ \oint_\gamma f(z) \, dz = 2\pi i \sum_{j = 1}^{k} \mathrm{Res}_{z_j} f.\ }
+\]</p>
+
+<p>留数定理是<em>整个解析数论</em> 的工程引擎——\(\zeta\) 函数与 \(L\)-函数的"<em>奇点贡献</em>" 通过这条公式翻译成数论信息。<a href="ch16.html">ch16</a>素数定理证明的核心是研究 \(\zeta(s)\) 在<em>临界线 \(\Re s = 1\)</em> 上的留数行为。</p>
+
+<p><em>计算简单极点的留数</em>：若 \(z_0\) 是 \(f\) 的<em>简单极点</em>（即 Laurent 展开 \(c_{-1}/(z - z_0) +\) 全纯部分），则</p>
+
+<p>\[
+\mathrm{Res}_{z_0} f = \lim_{z \to z_0} (z - z_0) f(z).
+\]</p>
+
+<p>例：\(f(z) = \zeta(s)/s\) 在 \(s = 1\) 有简单极点（\(\zeta\) 在 \(s = 1\) 极点），\(\mathrm{Res}_{s = 1} \zeta(s)/s = 1\)。这是素数定理证明的关键残留留数之一。</p>
+
+<h2 id="appB-3">B.3 解析延拓</h2>
+
+<p><strong>解析延拓的唯一性</strong>。设 \(f, g\) 在<em>连通开集</em> \(U\) 上都全纯，\(f = g\) 在 \(U\) 的某<em>有非孤立点的子集</em>（如某条曲线、某连通开集、或某带极限点的序列）。则 \(f \equiv g\) 在<em>整个 \(U\)</em>。</p>
+
+<p>这条"<em>唯一性</em>" 让"<em>解析延拓</em>" 的概念合法：如果你把 \(f\) 从某小区域延拓到大区域，<em>只要全纯</em>，<em>延拓就是唯一的</em>——不存在两个不同的延拓。</p>
+
+<p><strong>具体延拓技术</strong>。给定 \(f\) 在某区域 \(U\) 全纯，怎么把它延拓到更大区域 \(\tilde U \supset U\)？</p>
+
+<ul>
+  <li><em>幂级数延拓</em>：在 \(U\) 内取一点 \(z_0\)，把 \(f\) 在 \(z_0\) 展开为幂级数 \(\sum a_n (z - z_0)^n\)。这个级数的<em>收敛半径</em> \(R\) 给一个圆盘 \(|z - z_0| < R\)，可能<em>超出</em> \(U\)。在新圆盘内，幂级数定义 \(f\) 的延拓。</li>
+  <li><em>函数方程</em>：找一条等式 \(f(z) = G(f(\sigma(z)))\)，其中 \(\sigma\) 把 "<em>未定义区域</em>" 映到"<em>已定义区域</em>"。例：Riemann 函数方程 \(\zeta(s) = 2^s \pi^{s-1} \sin(\pi s/2) \Gamma(1-s) \zeta(1-s)\) 把 \(\Re s < 0\) 区域的 \(\zeta\) 用 \(\Re s > 1\) 区域的 \(\zeta\) 表达——延拓到所有 \(\mathbb C \setminus \{1\}\)。</li>
+  <li><em>积分变换</em>：用如 \(\Gamma(s) = \int_0^\infty t^{s-1} e^{-t} dt\) 这种积分定义函数。这种积分在某些 \(s\) 区域绝对收敛、定义全纯函数；用积分的代数恒等式（部分积分等）把定义延伸。</li>
+</ul>
+
+<p><strong>例 1：Riemann zeta 函数</strong>。最初定义：</p>
+
+<p>\[
+\zeta(s) := \sum_{n=1}^{\infty} \frac{1}{n^s}.
+\]</p>
+
+<p>右边在 \(\Re s > 1\) 绝对收敛、定义 \(\zeta(s)\) 为<em>全纯</em> 函数。但<em>真</em> \(\zeta\) 是延拓到<em>整个 \(\mathbb C\)</em>（除 \(s = 1\) 外，\(s = 1\) 是<em>简单极点</em>）的全纯函数。延拓技术：先用 Euler-Maclaurin 求和把 \(\zeta\) 的定义延拓到 \(\Re s > 0\)，再用 Riemann 函数方程延拓到 \(\Re s < 0\)。</p>
+
+<p><strong>例 2：Gamma 函数</strong>。最初定义：</p>
+
+<p>\[
+\Gamma(s) := \int_0^\infty t^{s-1} e^{-t} \, dt.
+\]</p>
+
+<p>右边在 \(\Re s > 0\) 绝对收敛。用部分积分得 \(\Gamma(s + 1) = s \Gamma(s)\)——这条函数方程用来延拓：\(\Gamma(s) = \Gamma(s + 1)/s\) 把 \(\Gamma\) 延拓到 \(\Re s > -1\)（除 \(s = 0\) 外），再迭代延拓到全 \(\mathbb C \setminus \{0, -1, -2, \ldots\}\)。在 \(s = 0, -1, -2, \ldots\) 处 \(\Gamma\) 有<em>简单极点</em>。</p>
+
+<p>这两个例子是解析数论里最重要的两个全纯函数——它们的延拓性质决定了"<em>素数分布</em>" 与"<em>L-函数零点</em>" 的精细结构。</p>
+
+<h2 id="appB-4">B.4 全纯函数的零点</h2>
+
+<p>设 \(f\) 在连通开集 \(U\) 全纯、不恒为零。则 \(f\) 的零点集是<em>离散</em> 的——每个零点 \(z_0 \in U\) 都有一个<em>邻域</em>，里面除 \(z_0\) 外没有其他零点。</p>
+
+<p>这条"<em>零点孤立</em>" 是 B.3 节"<em>延拓唯一性</em>" 的特殊情况——若 \(f\) 在某个有极限点的集上为零，则恒为零。</p>
+
+<p><strong>零点的阶</strong>。设 \(f(z_0) = 0\)、\(f \not\equiv 0\)。\(f\) 在 \(z_0\) 处的幂级数</p>
+
+<p>\[
+f(z) = \sum_{n \ge 0} a_n (z - z_0)^n
+\]</p>
+
+<p>有 \(a_0 = 0\)。<em>\(f\) 在 \(z_0\) 的零点阶</em>（order of zero） = 满足 \(a_m \ne 0\) 的最小 \(m \ge 1\)。零点阶 \(m \iff f(z) = (z - z_0)^m g(z)\)，\(g(z_0) \ne 0\) 全纯。</p>
+
+<p><strong>幅角原理</strong>。设 \(f\) 在 \(\overline{\Omega}\)（\(\Omega\) 是简单连通区域）全纯且无零点在边界 \(\partial \Omega\)。则</p>
+
+<p>\[
+\frac{1}{2\pi i} \oint_{\partial \Omega} \frac{f'(z)}{f(z)} \, dz = N,
+\]</p>
+
+<p>其中 \(N\) = \(f\) 在 \(\Omega\) 内零点的<em>带阶</em> 数（每个零点按它的阶计数）。</p>
+
+<p>这条"<em>积分计零点</em>" 公式是<a href="ch16.html">ch16</a>"<em>临界条带 \(0 < \Re s < 1\) 内 \(\zeta\) 的零点</em>" 计数与<a href="ch21.html">ch21</a>"<em>模形式空间维数</em>" 计数的工具。Riemann 假设的精确陈述："<em>\(\zeta\) 在临界条带的所有零点都在<em>临界线 \(\Re s = 1/2\) 上</em>。</em>"</p>
+
+<p><strong>Hadamard 因子分解</strong>。一个<em>有限阶</em> 整函数（即 \(|f(z)| \le C e^{|z|^\rho}\) 某 \(\rho < \infty\)）可以写成"<em>无穷乘积</em>" 形式：</p>
+
+<p>\[
+f(z) = z^m e^{P(z)} \prod_{n \ge 1} E_p\left(\frac{z}{a_n}\right),
+\]</p>
+
+<p>其中 \(\{a_n\}\) 是非零零点、\(P\) 是 \(\rho\) 次以下多项式、\(E_p\) 是收敛因子。</p>
+
+<p>这条把"<em>整函数</em>" 类似多项式那样分解成"<em>线性因子的乘积</em>"——只是有无穷多线性因子加上一个收敛修正。Riemann 用它表达 \(\xi(s) := \frac{1}{2} s(s-1) \pi^{-s/2} \Gamma(s/2) \zeta(s)\)（"<em>Riemann xi 函数</em>"，是 \(\zeta\) 的整函数补充），把 \(\zeta\) 的所有非平凡零点显式作为"<em>线性因子</em>" 列出。</p>
+
+<h2 id="appB-5">B.5 Tauberian 定理</h2>
+
+<p>"<em>Tauberian 定理</em>"（Tauberian theorem）= 一类把"<em>渐近 \(L\)-函数行为</em>" 翻译成"<em>渐近系数和</em>" 的定理。它们是<em>素数定理证明</em> 的"<em>分析机</em>"。</p>
+
+<p>简化的<em>Wiener-Ikehara Tauberian 定理</em>（1932）：</p>
+
+<p><strong>定理。</strong>设 \(F(s) = \sum_{n \ge 1} a_n n^{-s}\) 是<em>非负</em> 系数的 Dirichlet 级数，在 \(\Re s > 1\) 收敛，并且 \((s - 1) F(s)\) 在 \(\Re s \ge 1\) 上延拓为连续函数，且</p>
+
+<p>\[
+\lim_{s \to 1^+} (s - 1) F(s) = c.
+\]</p>
+
+<p>则</p>
+
+<p>\[
+\boxed{\ \sum_{n \le x} a_n \sim c x \quad \text{as} \quad x \to \infty.\ }
+\]</p>
+
+<p>翻译："<em>\(F(s)\) 在 \(s = 1\) 的<em>留数</em> 是 \(c\)</em>" \(\implies\) "<em>\(\sum a_n\) 增长是 \(\sim cx\)</em>"。</p>
+
+<p>这条定理把"<em>解析事实</em>"（\(F\) 在 \(s = 1\) 的留数）翻译成"<em>组合事实</em>"（系数和的渐近）。</p>
+
+<p><em>素数定理的证法</em>。取 \(F(s) = -\zeta'(s)/\zeta(s)\)（zeta 的对数导数）。它的 Dirichlet 展开</p>
+
+<p>\[
+-\frac{\zeta'(s)}{\zeta(s)} = \sum_{n \ge 1} \Lambda(n) n^{-s},
+\]</p>
+
+<p>其中 \(\Lambda(n) = \log p\) 当 \(n = p^k\)、否则 \(0\)（"<em>von Mangoldt 函数</em>"）。\(\zeta(s)\) 在 \(s = 1\) 简单极点 \(\Rightarrow\) \(F(s) = -\zeta'/\zeta\) 在 \(s = 1\) 简单极点，留数 \(1\)。</p>
+
+<p>关键事实——"<em>\(\zeta(1 + it) \ne 0\)</em> 对实 \(t \ne 0\)"（这是 1896 Hadamard 与 de la Vallée-Poussin 的核心证明步骤）——保证 Wiener-Ikehara 的"<em>\((s-1) F(s)\) 在 \(\Re s = 1\) 连续</em>" 假设满足。套定理得</p>
+
+<p>\[
+\sum_{n \le x} \Lambda(n) \sim x.
+\]</p>
+
+<p>由部分求和（Abel 求和）从 \(\Lambda\) 渐近推出 \(\pi(x) \sim x/\log x\)——素数定理。</p>
+
+<p>这条证法是<em>解析数论</em> 的基本范式：</p>
+
+<ol>
+  <li>把数论问题翻译成 Dirichlet 级数 \(F(s)\)。</li>
+  <li>研究 \(F(s)\) 的解析性质（极点、留数、零点）。</li>
+  <li>用 Tauberian 定理把解析行为翻译回数论渐近。</li>
+</ol>
+
+<p>本书<a href="ch16.html">ch16</a>整章在做这件事的具体细节。</p>
+
+<h2 id="appB-6">B.6 Dirichlet 级数收敛半平面</h2>
+
+<p><em>Dirichlet 级数</em>：</p>
+
+<p>\[
+F(s) = \sum_{n=1}^{\infty} \frac{a_n}{n^s}, \quad a_n \in \mathbb C, \ s \in \mathbb C.
+\]</p>
+
+<p>这与 \(\zeta\)（\(a_n \equiv 1\)）、L-级数 \(L(s, \chi) = \sum \chi(n)/n^s\)（\(\chi\) 是 Dirichlet 特征，链回 <a href="ch15.html">ch15</a>）、模形式 \(L\)-函数 \(L(f, s) = \sum a_n(f)/n^s\)（链回<a href="ch21.html">ch21</a>）—— 都是 Dirichlet 级数。</p>
+
+<p><strong>定理（绝对收敛半平面）</strong>。\(\sum |a_n|/n^s\) 收敛 \(\iff \Re s > \sigma_a\)（"<em>绝对收敛横坐标</em>"）。</p>
+
+<p>具体的：\(\sigma_a = \limsup_{N \to \infty} \log\left(\sum_{n=1}^N |a_n|\right)/\log N\)。</p>
+
+<p><strong>定理（条件收敛半平面）</strong>。\(\sum a_n/n^s\) 收敛 \(\iff \Re s > \sigma_c \le \sigma_a\)。</p>
+
+<p>例：\(\zeta(s) = \sum 1/n^s\)。\(\sigma_a = \sigma_c = 1\)。在 \(\Re s > 1\) 绝对收敛。</p>
+
+<p>例：交错 \(\eta(s) := \sum (-1)^{n-1}/n^s\)。\(\sigma_a = 1\)（\(|a_n| = 1\)），但 \(\sigma_c = 0\)（部分和有界）。所以 \(\eta\) 在 \(\Re s > 0\) 收敛但只 \(\Re s > 1\) 绝对收敛。\(\eta\) 与 \(\zeta\) 通过 \(\eta(s) = (1 - 2^{1-s}) \zeta(s)\) 相关——这给 \(\zeta\) 的<em>另一种延拓</em> 到 \(\Re s > 0\)。</p>
+
+<p>例：\(L(s, \chi)\)、\(\chi\) 非主特征。\(\sum_{n \le N} \chi(n)\) <em>有界</em>（"<em>Pólya-Vinogradov 不等式</em>"），所以 \(\sigma_c = 0\)——\(L(s, \chi)\) 在 \(\Re s > 0\) 收敛。这是<a href="ch15.html">ch15</a>"<em>Dirichlet 算术级数素定理</em>" 的关键事实。</p>
+
+<p><strong>Euler 乘积</strong>。如果 \(a_n\) 是<em>积性</em> 的（\(a_{mn} = a_m a_n\) 当 \(\gcd(m, n) = 1\)），则 \(F(s)\) 在绝对收敛区域有 Euler 乘积：</p>
+
+<p>\[
+F(s) = \prod_p \left(\sum_{k=0}^\infty \frac{a_{p^k}}{p^{ks}}\right).
+\]</p>
+
+<p>如果还<em>完全积性</em>（\(a_{mn} = a_m a_n\) 总成立），简化为</p>
+
+<p>\[
+F(s) = \prod_p \frac{1}{1 - a_p p^{-s}}.
+\]</p>
+
+<p>例：</p>
+
+<ul>
+  <li>\(\zeta(s) = \prod_p \frac{1}{1 - p^{-s}}\)（\(a_n \equiv 1\) 完全积性）。这是 Euler 1737 的发现——把"<em>素数</em>" 这种离散对象与"<em>解析函数</em>" 联系起来的桥。</li>
+  <li>\(L(s, \chi) = \prod_p \frac{1}{1 - \chi(p) p^{-s}}\)（Dirichlet 1837）。</li>
+  <li>\(L(E, s) = \prod_p \frac{1}{1 - a_p p^{-s} + p^{1-2s}}\)（椭圆曲线 \(L\)-函数，链回<a href="ch21.html">ch21</a>）。\(a_n\) 积性（这是 \(E\) 的<em>2 维 Galois 表示</em> 的反映）但<em>不</em> 完全积性，所以局部因子是 \(\frac{1}{1 - a_p p^{-s} + p^{1-2s}}\) 而非 \(\frac{1}{1 - a_p p^{-s}}\)——次数 2 而非 1。</li>
+  <li>\(L(f, s)\) 模形式：同上结构。这是模性定理 \(L(E, s) = L(f_E, s)\) 的解析侧。</li>
+</ul>
+
+<p><em>Euler 乘积是解析数论的核心工具</em>——它把"<em>所有正整数的求和</em>" 转换为"<em>所有素数的乘积</em>"，让<em>素数</em> 这种离散对象成为解析函数 \(F(s)\) 的"<em>基本构造单元</em>"。"<em>每个 Euler 乘积都是一种"<em>素数到分析函数</em>" 的字典</em>"——这是<a href="ch16.html">ch16</a>素数定理证明、<a href="ch21.html">ch21</a>模形式 \(L\)-函数、<a href="ch22.html">ch22</a>Langlands 函子性都依赖的根本机制。</p>
+
+<h2 id="appB-7">B.7 一句话指南</h2>
+
+<p>这本书用到的复分析按"<em>抽象程度</em>" 排：</p>
+
+<ul>
+  <li>最具体：<em>幂级数</em>、<em>简单极点</em>、<em>函数方程延拓</em>。<a href="ch16.html">ch16</a>素数定理证明里反复出现。</li>
+  <li>第二层：<em>留数定理</em>、<em>幅角原理</em>、<em>Tauberian 定理</em>。这些是把"<em>解析行为</em>" 翻译成"<em>组合渐近</em>" 的标准工具。</li>
+  <li>第三层：<em>解析延拓</em>、<em>Dirichlet 级数</em>、<em>Euler 乘积</em>、<em>函数方程</em>。这些是<em>L</em>-函数研究的语言。</li>
+  <li>第四层：<em>整函数的 Hadamard 因子分解</em>、<em>Selberg 类</em>（"<em>满足函数方程 + Euler 乘积 + 多项式增长</em>" 的 \(L\)-函数族）。这是 21 世纪 \(L\)-函数研究前沿，超出本书。</li>
+</ul>
+
+<p>解析数论与代数数论的<em>分工</em>：</p>
+
+<ul>
+  <li><em>代数数论</em>（<a href="../抽象代数/index.html">抽象代数</a> + <a href="appA.html">附录 A</a>）：研究<em>具体数域</em> \(K\) 的素分解、类群、Galois 群。回答"<em>哪些素分裂</em>" 的精确判别。</li>
+  <li><em>解析数论</em>（<a href="../复分析/index.html">复分析</a> + 本附录）：研究<em>所有素数的渐近</em> 行为。回答"<em>素数有多稠密</em>" 的统计结果。</li>
+  <li>两者通过<em>L-函数</em> 桥接——\(L\)-函数的<em>分析</em> 信息（极点、零点、解析延拓）来自<em>代数</em> 信息（Galois 表示、自守表示、群论数据）。</li>
+</ul>
+
+<p>21 世纪数论的核心问题（Riemann 假设、BSD、Langlands 函子性）<em>都</em> 在这条桥上——它们要求把代数侧的猜想性质翻译成分析侧的可验证陈述（或反之）。这本书前 24 章给的是这条桥的两个端口；走到桥的<em>中间</em> 需要研究生级训练 + 多年专门研究——这是本书读完后的下一段旅途。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+</main>
+</body>
+</html>

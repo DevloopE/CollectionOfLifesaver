@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 二次剩余与 Legendre 符号 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 原根与离散对数</a><a href="ch10.html">下一章 · 第 10 章 二次互反律 →</a></nav>
+<h1 id="ch9">第 9 章 二次剩余与 Legendre 符号</h1>
+
+<p>问你一个具体到不能再具体的问题：<em>\(3\) 是 \(\bmod 11\) 的"平方" 吗？</em></p>
+
+<p>翻译：存在整数 \(x\) 使 \(x^2 \equiv 3 \pmod{11}\) 吗？</p>
+
+<h2 id="sec9-1">9.1 一个让你撞见"二次剩余" 的小实验</h2>
+
+<p>朴素试。算 \(x^2 \bmod 11\) 对 \(x = 1, 2, \ldots, 10\)：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 0.7em;">\(x\)</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(x^2 \bmod 11\)</td><td>1</td><td>4</td><td>9</td><td>5</td><td>3</td><td>3</td><td>5</td><td>9</td><td>4</td><td>1</td></tr>
+</table>
+
+<p>\(3\) 出现了——\(x = 5\) 给 \(25 \equiv 3\)，\(x = 6\) 也给 \(36 \equiv 3\)。所以是。\(\checkmark\)</p>
+
+<p>请你停下来观察这表：</p>
+
+<ul>
+<li><em>对称性</em>：第 \(x\) 列与第 \(11 - x\) 列相同。这是因为 \((11 - x)^2 = 121 - 22 x + x^2 \equiv x^2 \pmod{11}\)。一般说 \((-x)^2 = x^2\)——所以平方表"<em>关于 \(x = 11/2\) 对称</em>"。</li>
+<li><em>恰好半数</em>不同值：\(\{1, 3, 4, 5, 9\}\)，5 个。一般 \((p - 1)/2\) 个。每个非零平方<em>恰有 2 个根</em>（\(x\) 和 \(-x\)）。</li>
+<li>\(\{2, 6, 7, 8, 10\}\)<em>没出现</em>——它们不是 \(\bmod 11\) 的平方。</li>
+</ul>
+
+<p>所以 \((\mathbb{Z}/11)^*\) 这个 10 元群被划成两半：5 个"<em>是平方</em>"（\(\{1, 3, 4, 5, 9\}\)）和 5 个"<em>不是平方</em>"（\(\{2, 6, 7, 8, 10\}\)）。两半都很整齐——能不能给个判别公式，省去算 \(x^2\) 表？</p>
+
+<p>对小 \(p\)（\(11\)）这表 1 秒就算完。对大 \(p\)（\(p \sim 10^{300}\)）就完全不行——你得算 \(10^{300}\) 个平方。我们要一个<em>不依赖于试根</em> 的判别工具。这就是 Legendre 符号 + Euler 准则要给的。</p>
+
+<h2 id="sec9-2">9.2 二次剩余 (QR)</h2>
+
+<p><strong>定义。</strong>设 \(p\) 奇素数，\(a \in (\mathbb{Z}/p)^*\)。\(a\) 叫<strong>二次剩余</strong>（quadratic residue, QR）mod \(p\)，如果存在 \(x\) 使 \(x^2 \equiv a \pmod p\)。否则叫<strong>二次非剩余</strong>（QNR）。</p>
+
+<p>（约定：\(0\) 单独看，不算 QR 也不算 QNR。本章一律假设 \(\gcd(a, p) = 1\)。）</p>
+
+<p><strong>命题。</strong>\((\mathbb{Z}/p)^*\) 中恰有 \((p - 1)/2\) 个 QR 和 \((p - 1)/2\) 个 QNR。</p>
+
+<p><em>证明。</em>考虑映射 \(\sigma \colon (\mathbb{Z}/p)^* \to (\mathbb{Z}/p)^*\)，\(\sigma(x) = x^2\)。象集 = QR 全体。每个 QR \(a\) 的原象 \(\sigma^{-1}(a) = \{x : x^2 = a\}\)——多项式 \(x^2 - a\) 在域 \(\mathbb{F}_p\) 中至多 2 根。事实上恰 2 根（如果 \(x_0\) 是一根，则 \(-x_0\) 也是；且 \(x_0 \neq -x_0\) 因 \(p > 2\)）。所以 \(\sigma\) 是 2-到-1：</p>
+
+<p>\[
+|\text{QR}| = \frac{|(\mathbb{Z}/p)^*|}{2} = \frac{p - 1}{2}.
+\]</p>
+
+<p>剩下 \((p - 1)/2\) 个是 QNR。\(\Box\)</p>
+
+<p>另一种看法（用 ch8 原根）：固定原根 \(g\)。每元素 \(a = g^k\)。\(a\) 是 QR \(\iff\) \(k\) 偶——因为 \((g^{k/2})^2 = g^k\) 当 \(k\) 偶；反之若 \(k\) 奇，\(a = g^k\) 不可能是某 \(g^j\) 的平方因 \(2j \equiv k \pmod{p - 1}\) 无解（\(p - 1\) 偶，\(k\) 奇）。所以 QR 恰是<em>偶数下标</em>那 \((p - 1)/2\) 个。</p>
+
+<p>从 ch8 \(p = 11, g = 2\) 表查：偶数下标的元素 \(g^2 = 4, g^4 = 5, g^6 = 9, g^8 = 3, g^{10} = 1\)——\(\{1, 3, 4, 5, 9\}\)，与 9.1 的 QR 集吻合。\(\checkmark\)</p>
+
+<h2 id="sec9-3">9.3 Legendre 符号</h2>
+
+<p>给"<em>是不是 QR</em>" 一个干净的记号。</p>
+
+<p><strong>定义（Legendre 符号）。</strong>设 \(p\) 奇素数，\(a \in \mathbb{Z}\) 满足 \(\gcd(a, p) = 1\)。</p>
+
+<p>\[
+\boxed{\ \left(\frac{a}{p}\right) := \begin{cases} +1 & a \text{ 是 QR mod } p, \\ -1 & a \text{ 是 QNR mod } p. \end{cases}\ }
+\]</p>
+
+<p>（约定 \(\left(\frac{0}{p}\right) = 0\)，但本章不用 0 情形。）</p>
+
+<p>例：\(\left(\frac{3}{11}\right) = +1\)（因 \(5^2 \equiv 3\)）。\(\left(\frac{2}{11}\right) = -1\)（因 \(2 \notin \{1, 3, 4, 5, 9\}\)）。</p>
+
+<p>这个记号长得像分数但<em>不是</em>分数——它是一个值在 \(\{+1, -1\}\) 的函数。Legendre 1798 年引入，至今仍是数论里最常用的记号之一。它的力量在于：<em>它是积性的</em>。</p>
+
+<p><strong>命题（积性）。</strong>对 \(\gcd(a, p) = \gcd(b, p) = 1\)，</p>
+
+<p>\[
+\boxed{\ \left(\frac{a b}{p}\right) = \left(\frac{a}{p}\right) \left(\frac{b}{p}\right).\ }
+\]</p>
+
+<p><em>证明。</em>用 9.2 末尾的"<em>偶/奇下标</em>" 看法。设 \(a = g^i, b = g^j\)，则 \(a b = g^{i + j}\)。\(\left(\frac{a}{p}\right) = (-1)^i\)、\(\left(\frac{b}{p}\right) = (-1)^j\)、\(\left(\frac{ab}{p}\right) = (-1)^{i + j} = (-1)^i (-1)^j\)。\(\Box\)</p>
+
+<p>翻译："<em>QR \(\times\) QR = QR</em>"、"<em>QR \(\times\) QNR = QNR</em>"、"<em>QNR \(\times\) QNR = QR</em>"。最后一条尤其反直觉——两个"非平方" 相乘竟然是平方。例：\(2, 6\) 都是 \(\bmod 11\) 的 QNR，但 \(2 \cdot 6 = 12 \equiv 1\)，是 QR。\(\checkmark\)</p>
+
+<p>这种积性把 Legendre 符号变成<em>同态</em></p>
+
+<p>\[
+\left(\frac{\cdot}{p}\right) \colon (\mathbb{Z}/p)^* \to \{+1, -1\}.
+\]</p>
+
+<p>核 = QR 子群（指数 2）。这是<a href="../抽象代数/ch9.html">抽象代数 ch9</a> 商群语言的具体例子——\((\mathbb{Z}/p)^* / \text{QR} \cong \{+1, -1\}\)。</p>
+
+<p>但这条定义和积性<em>不告诉我们怎么算</em> Legendre 符号——还得查"<em>是不是 QR</em>"。下一节给真正的算法。</p>
+
+<h2 id="sec9-4">9.4 Euler 准则</h2>
+
+<p>核心工具。</p>
+
+<p><strong>定理（Euler 准则，1750）。</strong>对奇素数 \(p\) 与 \(\gcd(a, p) = 1\)，</p>
+
+<p>\[
+\boxed{\ \left(\frac{a}{p}\right) \equiv a^{(p - 1)/2} \pmod p.\ }
+\]</p>
+
+<p>这条公式让"<em>判 QR</em>" 变成一次<em>快速幂</em>——\(O(\log p)\) 次模乘。对 \(p \sim 2^{2048}\)，这是几千次乘法，几毫秒搞定。</p>
+
+<p>验证 \(p = 11, a = 3\)：\((p - 1)/2 = 5\)，\(3^5 = 243 = 22 \cdot 11 + 1 \equiv 1\)。所以 \(\left(\frac{3}{11}\right) = +1\)。\(\checkmark\)</p>
+
+<p>验证 \(p = 11, a = 2\)：\(2^5 = 32 = 2 \cdot 11 + 10 \equiv 10 \equiv -1\)。所以 \(\left(\frac{2}{11}\right) = -1\)。\(\checkmark\)</p>
+
+<p><em>证明。</em>记 \(m = (p - 1)/2\)。</p>
+
+<p><strong>第一步：\(a^m \in \{+1, -1\}\) mod \(p\)。</strong>由 Fermat 小定理 \(a^{p - 1} \equiv 1\)，即 \((a^m)^2 \equiv 1\)。所以 \(a^m\) 满足 \(x^2 \equiv 1 \pmod p\)。在域 \(\mathbb{F}_p\) 中 \(x^2 - 1 = (x - 1)(x + 1)\) 只两根 \(\pm 1\)（因域无零因子）。所以 \(a^m \equiv \pm 1\)。</p>
+
+<p><strong>第二步：QR \(\Rightarrow\) \(a^m \equiv +1\)。</strong>设 \(a \equiv x^2\)，则 \(a^m = x^{2m} = x^{p - 1} \equiv 1\)（Fermat）。\(\checkmark\)</p>
+
+<p><strong>第三步：恰好半数 \(a\) 满足 \(a^m \equiv +1\)。</strong>多项式 \(x^m - 1\) 在 \(\mathbb{F}_p\) 中至多 \(m\) 根。但所有 QR 都满足（第二步），而 QR 有 \(m\) 个——所以满足 \(a^m \equiv +1\) 的<em>恰是</em> \(m\) 个 QR。</p>
+
+<p><strong>第四步：QNR \(\Rightarrow\) \(a^m \equiv -1\)。</strong>由第一步 \(a^m \in \{+1, -1\}\)。由第三步只 \(m\) 个 \(a\) 给 \(+1\)（即 QR）。剩下 \(m\) 个 QNR 必然给 \(-1\)。\(\Box\)</p>
+
+<p>这条证明短得让人意外——核心就两件事：(i) 域上 \(x^2 = 1\) 只两根；(ii) 域上 \(x^m - 1\) 至多 \(m\) 根。两条都是 ch8 用过的"<em>域上多项式根数</em>" 工具。代数地讲：Euler 准则等价于"<em>QR 子群是 \(a \mapsto a^2\) 的像，恰是 \(a \mapsto a^m\) 的核</em>"。在 \((\mathbb{Z}/p)^*\) 这个 \(p - 1\) 阶循环群里，"<em>平方映射的像</em>" 和 "<em>\((p - 1)/2\) 次幂的核</em>" 恰好是同一个 index-2 子群——这是循环群的基本结构事实。</p>
+
+<h2 id="sec9-5">9.5 用 Euler 准则算几个例子</h2>
+
+<p>感受快速幂的力量。</p>
+
+<p><strong>例 1：\(\left(\frac{7}{11}\right)\)。</strong>\(7^5 \bmod 11\)。\(7^2 = 49 \equiv 5, 7^4 = 25 \equiv 3, 7^5 = 7^4 \cdot 7 = 3 \cdot 7 = 21 \equiv 10 \equiv -1\)。所以 \(\left(\frac{7}{11}\right) = -1\)。\(7\) 是 QNR mod 11。看 9.1 表确认：QR 是 \(\{1, 3, 4, 5, 9\}\)，\(7 \notin\)。\(\checkmark\)</p>
+
+<p><strong>例 2：\(\left(\frac{3}{29}\right)\)。</strong>\(3^{14} \bmod 29\)。算 \(3^2 = 9, 3^4 = 81 = 2 \cdot 29 + 23 \equiv 23 \equiv -6, 3^8 \equiv 36 \equiv 7, 3^{14} = 3^8 \cdot 3^4 \cdot 3^2 = 7 \cdot (-6) \cdot 9 = -378 = -378 + 13 \cdot 29 = -378 + 377 = -1\)。所以 \(\left(\frac{3}{29}\right) = -1\)，QNR。</p>
+
+<p><strong>例 3：\(\left(\frac{5}{31}\right)\)。</strong>\(5^{15} \bmod 31\)。\(5^2 = 25, 5^4 = 625 = 20 \cdot 31 + 5 \equiv 5, 5^8 \equiv 25, 5^{15} = 5^8 \cdot 5^4 \cdot 5^2 \cdot 5 = 25 \cdot 5 \cdot 25 \cdot 5 = 15625\)。\(15625 / 31 = 504.03...\)，\(504 \cdot 31 = 15624\)，余 1。所以 \(\left(\frac{5}{31}\right) = 1\)，是 QR。验证：\(6^2 = 36 \equiv 5\)。\(\checkmark\)</p>
+
+<p>这就是 Euler 准则的实战：每次几行就能定一个 Legendre 符号。但有更<em>聪明</em> 的方法——下一章的<em>互反律</em> 让你直接看 \(p\) 的余数类，连快速幂都不用。</p>
+
+<h2 id="sec9-6">9.6 \(\left(\frac{-1}{p}\right)\)：哪些素数让 \(-1\) 是 QR</h2>
+
+<p>第一个具体的"<em>闭式</em>" 公式。代入 \(a = -1\) 到 Euler 准则：</p>
+
+<p>\[
+\left(\frac{-1}{p}\right) \equiv (-1)^{(p - 1)/2} \pmod p.
+\]</p>
+
+<p>右边只取 \(\pm 1\)，且 \(p > 2\) 时 \(\pm 1\) 不同余 mod \(p\)，所以全等可写真等：</p>
+
+<p>\[
+\boxed{\ \left(\frac{-1}{p}\right) = (-1)^{(p - 1)/2} = \begin{cases} +1 & p \equiv 1 \pmod 4, \\ -1 & p \equiv 3 \pmod 4. \end{cases}\ }
+\]</p>
+
+<p>翻译：<em>\(-1\) 是 mod \(p\) 的平方 \(\iff p \equiv 1 \pmod 4\)</em>。</p>
+
+<p>验证 \(p = 5\)（\(\equiv 1\)）：\(2^2 = 4 \equiv -1\)，是 QR。\(\checkmark\)<br>
+验证 \(p = 7\)（\(\equiv 3\)）：QR mod 7 是 \(\{1, 2, 4\}\)（算 \(1, 4, 9 \equiv 2, 16 \equiv 2, 25 \equiv 4, 36 \equiv 1\)），\(-1 \equiv 6 \notin\)，QNR。\(\checkmark\)<br>
+\(p = 13\)（\(\equiv 1\)）：\(5^2 = 25 \equiv 12 \equiv -1\)，是 QR。\(\checkmark\)</p>
+
+<p>这条结果将在<a href="ch6.html">ch6 二平方和定理</a>里复活：Fermat 说"\(p\) 写成两平方和 \(\iff p \equiv 1 \pmod 4\)"——和这里的 "\(-1\) 是 QR \(\iff p \equiv 1 \pmod 4\)" 是<em>同一</em>素数类！这不是巧合（见 9.8）。</p>
+
+<h2 id="sec9-7">9.7 \(\left(\frac{2}{p}\right)\)：哪些素数让 \(2\) 是 QR</h2>
+
+<p>第二个闭式。这个不能直接代 Euler 准则——\(2^{(p - 1)/2} \bmod p\) 没有明显规律。但答案<em>有</em>规律：</p>
+
+<p><strong>定理。</strong>对奇素数 \(p\)，</p>
+
+<p>\[
+\boxed{\ \left(\frac{2}{p}\right) = (-1)^{(p^2 - 1)/8} = \begin{cases} +1 & p \equiv \pm 1 \pmod 8, \\ -1 & p \equiv \pm 3 \pmod 8. \end{cases}\ }
+\]</p>
+
+<p>把指数 \((p^2 - 1)/8\) 验证一下：\(p\) 奇所以 \(p \equiv 1, 3, 5, 7 \pmod 8\)；分别 \(p^2 \equiv 1, 9, 25, 49 \equiv 1, 1, 1, 1 \pmod 8\)，所以 \(p^2 - 1 \equiv 0 \pmod 8\)，指数总整数。\(\checkmark\)</p>
+
+<p>对 \(p = 8 k \pm 1\)：\(p^2 = 64 k^2 \pm 16 k + 1\)，\((p^2 - 1)/8 = 8 k^2 \pm 2 k\)，偶数 → \(+1\)。<br>
+对 \(p = 8 k \pm 3\)：\(p^2 = 64 k^2 \pm 48 k + 9\)，\((p^2 - 1)/8 = 8 k^2 \pm 6 k + 1\)，奇 → \(-1\)。</p>
+
+<p>验证 \(p = 7\)（\(\equiv -1 \equiv 7 \pmod 8\)）：\(2\) 应是 QR。算 \(3^2 = 9 \equiv 2\)，是。\(\checkmark\)<br>
+\(p = 11\)（\(\equiv 3\)）：应 QNR。9.1 表确认 \(2 \notin\) QR 集。\(\checkmark\)<br>
+\(p = 17\)（\(\equiv 1\)）：应 QR。算 \(6^2 = 36 \equiv 2\)，是。\(\checkmark\)</p>
+
+<p>证明本节<em>不</em>给（标准证用"<em>Gauss 引理</em>"——对 \(p\) 是奇素数和 \(a\) 与 \(p\) 互素，记 \(\mu\) 为集合 \(\{a, 2a, \ldots, ((p-1)/2) a\} \bmod p\) 中落在 \((p/2, p)\) 内的元素个数；则 \(\left(\frac{a}{p}\right) = (-1)^\mu\)。把它用到 \(a = 2\) 数一下能算出 \((p^2 - 1)/8\)。Gauss 引理本身和它对 \(\left(\frac{2}{p}\right)\) 的应用我们留到下一章 10.6 完整给出，因为它是互反律证明的关键引理）。</p>
+
+<p>所以现在你有<em>三</em>条闭式：\(\left(\frac{-1}{p}\right)\) 看 \(p \bmod 4\)，\(\left(\frac{2}{p}\right)\) 看 \(p \bmod 8\)。\(\left(\frac{3}{p}\right)\)？\(\left(\frac{5}{p}\right)\)？一般 \(\left(\frac{q}{p}\right)\)？这就是下一章的 \(2^{1801}\) 美元的问题。</p>
+
+<h2 id="sec9-8">9.8 应用：哪些素数 \(p = a^2 + 1\)</h2>
+
+<p>把 9.6 的 "\(-1\) 是 QR \(\iff p \equiv 1 \pmod 4\)" 用到一个具体问题。</p>
+
+<p>问：哪些素数 \(p\) 形如 \(a^2 + 1\)？例：\(2 = 1^2 + 1, 5 = 2^2 + 1, 17 = 4^2 + 1, 37 = 6^2 + 1, 101 = 10^2 + 1, \ldots\) 全都 \(\equiv 1 \pmod 4\)（除 \(2\) 单独）。这是<em>必要</em>条件吗？</p>
+
+<p>设 \(p = a^2 + 1\) 即 \(a^2 \equiv -1 \pmod p\)。则 \(-1\) 是 QR mod \(p\)，由 9.6 得 \(p \equiv 1 \pmod 4\)（或 \(p = 2\)）。\(\checkmark\)</p>
+
+<p>反向<em>不</em>对——并非每个 \(p \equiv 1 \pmod 4\) 都形如 \(a^2 + 1\)。\(13 \equiv 1 \pmod 4\) 但 \(13 - 1 = 12, 13 - 4 = 9, 13 - 9 = 4\)——\(13\) 不是 \(a^2 + 1\)。但 \(13 = 2^2 + 3^2\) ——是<em>两平方和</em>。这是 Fermat 二平方和定理（ch6）的内容：</p>
+
+<p><strong>定理（Fermat 二平方和）。</strong>奇素数 \(p\) 形如 \(p = a^2 + b^2\)（\(a, b \in \mathbb{Z}_{\ge 0}\)）当且仅当 \(p \equiv 1 \pmod 4\)。</p>
+
+<p>必要性 \(\Rightarrow\)：\(a^2 + b^2 \equiv 0 \pmod p\)。若 \(b \not\equiv 0\)，则 \((a/b)^2 \equiv -1\)——\(-1\) 是 QR——\(p \equiv 1 \pmod 4\)。若 \(b \equiv 0\) 则 \(p \mid a\) 也得 \(p \mid b\)，但 \(a^2 + b^2 = p\) 强迫 \(a, b < \sqrt p\)，矛盾。</p>
+
+<p>充分性 \(\Leftarrow\)：要构造 \(a, b\)。这需要更多——经典证用<em>Thue 引理</em>（鸽笼）或<em>Gauss 整数</em> \(\mathbb{Z}[i]\) 唯一分解。本书 ch6 给鸽笼证明，ch13 给 \(\mathbb{Z}[i]\) 证明。</p>
+
+<p>所以"<em>\(-1\) 是 QR mod \(p\)</em>" 这条 Legendre 符号事实是<em>两平方和定理的一半</em>。Legendre 符号在这里不是被动判别工具——它是定理结构的<em>动力源</em>。</p>
+
+<h2 id="sec9-9">9.9 一句临别话</h2>
+
+<p>这一章把 \((\mathbb{Z}/p)^*\) 切成两半（QR / QNR）。Legendre 符号 \(\left(\frac{a}{p}\right)\) 是这刀切的标签；Euler 准则给一行算法（快速幂）；\(\left(\frac{-1}{p}\right)\) 和 \(\left(\frac{2}{p}\right)\) 是两个闭式——它们告诉我们"<em>判 QR</em>" 在某些 \(a\) 上可以归约成"<em>看 \(p \bmod m\)</em>" 这种<em>常数模</em>条件。</p>
+
+<p>下一章把这个"<em>常数模化</em>" 推到极致：对<em>任何</em> 奇素数 \(q\)，\(\left(\frac{q}{p}\right)\) 取决于<em>\(p \bmod 4 q\)</em>。这条事实——<em>二次互反律</em>——Gauss 称为"<em>算术宝石</em>"。它是数论真正第一条"<em>奇迹级</em>" 定理。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 原根与离散对数</a><a href="ch10.html">下一章 · 第 10 章 二次互反律 →</a></nav>
+</main>
+</body>
+</html>

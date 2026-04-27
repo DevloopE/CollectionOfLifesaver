@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 同余与 ℤ/n — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 算术基本定理</a><a href="ch6.html">下一章 · 第 6 章 Fermat 小定理与 Euler 定理 →</a></nav>
+<h1 id="ch5">第 5 章 同余与 \(\mathbb{Z}/n\)</h1>
+
+<p><a href="ch1.html">第 1 章</a>里我们心算了 \(7^{100}\) 的末位 = 1。当时用的是"末位序列 \(7, 9, 3, 1, 7, 9, \ldots\) 周期 4"这种朴素观察。它能解决这一道题，但作为方法很脆弱——换成 \(7^{100} \bmod 13\)，末位的循环结构就完全帮不上忙；换成 \(2^{1000} \bmod 1001\)，硬列幂表会列到天荒地老。</p>
+
+<p>我们需要一种<em>普适</em>的工具来处理"\(a^k \bmod n\)" 这类问题。要么找到结构（让循环显式可见），要么找到算法（让幂可以快速算）。本章干两件事：把 ch1 的"末位 = mod 10" 这个直觉<em>升级</em> 成完整的代数对象 \(\mathbb{Z}/n\)，并给出在它上面"快速算幂" 的算法——<strong>模平方法</strong>，它把 \(O(k)\) 的硬乘降到 \(O(\log k)\)。</p>
+
+<h2 id="sec5-1">5.1 同余的定义：把"差 \(n\) 的倍数" 当成相等</h2>
+
+<p>所有事情从一个简单约定开始。给定正整数 \(n\)，对两个整数 \(a, b\)，我们说</p>
+
+<p>\[
+a \equiv b \pmod n \quad \iff \quad n \mid (a - b),
+\]</p>
+
+<p>读作"\(a\) 与 \(b\) 模 \(n\) 同余"。这条定义把"<em>除以 \(n\) 余数相同</em>" 这件直觉的事写成了"差是 \(n\) 的倍数"——后者更适合证明。</p>
+
+<p>验证两种描述同义：若 \(a = q_1 n + r\)、\(b = q_2 n + r\)（同余数 \(r\)），则 \(a - b = (q_1 - q_2) n\)，是 \(n\) 倍数；反过来 \(a - b = k n\) 时，写 \(a = qn + r\) 后 \(b = a - kn = (q - k) n + r\) 也余 \(r\)。两个方向通。</p>
+
+<p>例子：\(17 \equiv 5 \pmod{12}\)，因为 \(17 - 5 = 12\)；\(43 \equiv 7 \pmod{12}\)，因为 \(43 - 7 = 36 = 3 \cdot 12\)；\(-3 \equiv 9 \pmod{12}\)，因为 \(-3 - 9 = -12\)。注意最后一个例子——同余允许负整数加入，对称地处理。</p>
+
+<p><strong>同余是等价关系。</strong>三件事要查：</p>
+
+<ul>
+  <li><em>自反</em>：\(a \equiv a \pmod n\)，因为 \(n \mid 0\)。</li>
+  <li><em>对称</em>：\(a \equiv b \Rightarrow b \equiv a\)，因为 \(n \mid (a - b)\) 蕴含 \(n \mid (b - a)\)。</li>
+  <li><em>传递</em>：\(a \equiv b\) 且 \(b \equiv c\)，则 \(a - c = (a - b) + (b - c)\) 是两个 \(n\) 倍数之和，仍是 \(n\) 倍数。</li>
+</ul>
+
+<p>"<em>等价关系</em>" 不只是术语，它带来一个具体动作——把整数集 \(\mathbb{Z}\) 按照"模 \(n\) 同余" 切成<em>等价类</em>。每一类长这样：</p>
+
+<p>\[
+[r]_n = \{ r, r \pm n, r \pm 2n, r \pm 3n, \ldots \} = \{ r + kn : k \in \mathbb{Z} \}.
+\]</p>
+
+<p>例如 \(n = 5\) 时，所有整数被分为 5 类：</p>
+
+<p>\[
+[0]_5 = \{\ldots, -10, -5, 0, 5, 10, \ldots\}, \quad [1]_5 = \{\ldots, -9, -4, 1, 6, 11, \ldots\}, \quad \ldots, \quad [4]_5.
+\]</p>
+
+<p>每个整数<em>恰好</em>属于一类（这是等价关系切分的标准事实）。所以"模 \(n\)" 把无限的 \(\mathbb{Z}\) 凝聚成 \(n\) 个对象——\(\{[0]_n, [1]_n, \ldots, [n-1]_n\}\)。</p>
+
+<h2 id="sec5-2">5.2 \(\mathbb{Z}/n\)：从集合到环</h2>
+
+<p>把这 \(n\) 个等价类看成一个新集合：</p>
+
+<p>\[
+\mathbb{Z}/n = \{[0]_n, [1]_n, [2]_n, \ldots, [n-1]_n\}.
+\]</p>
+
+<p>(为简洁，下文把 \([r]_n\) 写成 \(\bar r\) 或者直接写 \(r\)，靠上下文区分。)</p>
+
+<p>这个集合不只是 \(n\) 个孤立元素——它带<em>加法</em>和<em>乘法</em>。定义</p>
+
+<p>\[
+\bar a + \bar b = \overline{a + b}, \qquad \bar a \cdot \bar b = \overline{a b}.
+\]</p>
+
+<p>翻译：把两个类的<em>代表</em> 相加 / 相乘，结果落在哪一类，就是答案。</p>
+
+<p>这看起来很自然，但有个隐患——<em>代表选择</em> 会不会影响结果？比如在 \(\mathbb{Z}/5\) 里，\(\bar 2 = \bar 7\)（同一类），\(\bar 3 = \bar 8\)。算 \(\bar 2 \cdot \bar 3 = \bar 6 = \bar 1\)。换代表算 \(\bar 7 \cdot \bar 8 = \overline{56} = \bar 1\)。<em>同样落在 \(\bar 1\)</em>。这不是巧合——它是下一节要证的"同余的运算性"。</p>
+
+<p>有了加法和乘法，\(\mathbb{Z}/n\) 变成<a href="../抽象代数/ch11.html">《抽象代数读本》第 11 章</a>讲的<em>交换环</em>：加法构成 Abel 群（\(\bar 0\) 为零、\(-\bar a = \overline{-a}\) 为加法逆），乘法满足结合 + 交换 + \(\bar 1\) 为单位元、且乘对加分配。验证全是机械的，每一条都从 \(\mathbb{Z}\) 上的相应公理"<em>同余下来</em>"——比如分配律 \(\bar a (\bar b + \bar c) = \bar a \cdot \overline{b + c} = \overline{a (b + c)} = \overline{ab + ac} = \bar a \bar b + \bar a \bar c\)。</p>
+
+<p>请你停下来感受一件事：我们刚把"<em>整数集</em>" 这个无限的、原始的对象，浓缩成了"<em>\(n\) 元环</em>" 这个有限对象。\(\mathbb{Z}/n\) 是 \(\mathbb{Z}\) 的"<em>有限剪影</em>"——保留了加法 / 乘法 / 分配 / 0 / 1 这些代数结构，但丢掉了"无穷"。<em>这种"丢掉一些结构换来有限"</em> 是数论里反复出现的招数。后面 ch6 的 Fermat 小定理、ch9 的二次剩余、ch11 的原根，都是在 \(\mathbb{Z}/n\) 这个有限对象上做文章。</p>
+
+<h2 id="sec5-3">5.3 同余的运算性：先取模和后取模一致</h2>
+
+<p>5.2 节里我们用"换代表" 看到 \(\bar 7 \cdot \bar 8 = \bar 2 \cdot \bar 3\)。一般规律是：</p>
+
+<p>\[\boxed{\ a \equiv a' \pmod n,\ b \equiv b' \pmod n \ \Longrightarrow\ a + b \equiv a' + b' \pmod n,\ a b \equiv a' b' \pmod n.\ }\]</p>
+
+<p>证加法：假设 \(a - a' = k_1 n\)、\(b - b' = k_2 n\)。则 \((a + b) - (a' + b') = (k_1 + k_2) n\)，仍是 \(n\) 倍数。</p>
+
+<p>证乘法：</p>
+
+<p>\[
+a b - a' b' = a b - a' b + a' b - a' b' = (a - a') b + a'(b - b') = k_1 n \cdot b + a' \cdot k_2 n = (k_1 b + a' k_2) n.
+\]</p>
+
+<p>仍是 \(n\) 倍数。\(\checkmark\)</p>
+
+<p>这条性质是 ch1 §1.2 那个 \(\boxed{\ }\) 的精确版本——"先取模再加 / 乘 vs 先加 / 乘再取模" 结果相同。它有一个惊人的<em>实用</em>含义：算 \(a^k \bmod n\) 时，每一步乘完就可以马上取模——保持中间数字小，不会爆。这件事 5.6 节会用到。</p>
+
+<p>一个直接应用：算 \(123 \cdot 456 \bmod 7\)。朴素：\(123 \cdot 456 = 56088\)，\(56088 = 8012 \cdot 7 + 4\)，余 4。聪明：\(123 \equiv 4 \pmod 7\)（因 \(123 = 17 \cdot 7 + 4\)），\(456 \equiv 1 \pmod 7\)（因 \(456 = 65 \cdot 7 + 1\)），\(4 \cdot 1 = 4\)。<em>四个一位数运算</em> 替代了五位数乘法。</p>
+
+<p><strong>除法的小心。</strong>加 / 减 / 乘"模下兼容" 不蕴含除法兼容。在 \(\mathbb{Z}/6\) 里 \(2 \cdot 3 = 6 \equiv 0\)，但 \(2 \not\equiv 0\)、\(3 \not\equiv 0\)——<em>两个非零元素之积可以是零</em>。这种现象（"零因子"）让"两边除掉 \(2\)" 这种自然动作非法。下一节要解决：在什么条件下能除？</p>
+
+<h2 id="sec5-4">5.4 \((\mathbb{Z}/n)^*\)：可逆元构成的乘法群</h2>
+
+<p>"<em>除以 \(a\)</em>" 在 \(\mathbb{Z}/n\) 里要重新解释——既然没有自然的除法，唯一的做法是<em>乘以 \(a\) 的逆元</em>。</p>
+
+<p>定义：\(\bar a \in \mathbb{Z}/n\) 叫做<em>可逆元</em>（或<em>单位</em>），如果存在 \(\bar b\) 使 \(\bar a \bar b = \bar 1\)。这样的 \(\bar b\) 称为 \(\bar a\) 的<em>乘法逆元</em>，记作 \(\bar a^{-1}\)。</p>
+
+<p>例子（\(n = 7\)）：</p>
+
+<p>\[
+1 \cdot 1 = 1, \quad 2 \cdot 4 = 8 \equiv 1, \quad 3 \cdot 5 = 15 \equiv 1, \quad 6 \cdot 6 = 36 \equiv 1.
+\]</p>
+
+<p>每一个 \(\bar 1, \bar 2, \bar 3, \bar 4, \bar 5, \bar 6\) 都有逆。\(\bar 0\) 没有（任何 \(\bar 0 \cdot \bar b = \bar 0 \neq \bar 1\)）。所以 \(\mathbb{Z}/7\) 的可逆元就是非零元。</p>
+
+<p>例子（\(n = 6\)）：</p>
+
+<p>\[
+1 \cdot 1 = 1, \quad 5 \cdot 5 = 25 \equiv 1.
+\]</p>
+
+<p>列出所有：\(\bar 1\) 和 \(\bar 5\) 可逆。\(\bar 2, \bar 3, \bar 4\) 都不是——比如 \(\bar 2\) 乘任意 \(\bar k\) 总在偶数集 \(\{\bar 0, \bar 2, \bar 4\}\) 里，永远到不了 \(\bar 1\)。</p>
+
+<p>规律？请你看 \(n = 7\)（素）vs \(n = 6\)（合）：素时所有非零都可逆，合时只有"<em>与 \(n\) 互素</em>"的元素可逆。准确陈述：</p>
+
+<p>\[\boxed{\ \bar a \in \mathbb{Z}/n \text{ 可逆}\ \iff\ \gcd(a, n) = 1.\ }\]</p>
+
+<p><em>证明</em>。 (\(\Leftarrow\)) 若 \(\gcd(a, n) = 1\)，<a href="ch2.html">ch2</a> 的 Bezout 定理给出整数 \(s, t\) 使 \(s a + t n = 1\)。两边取模 \(n\)：\(s a \equiv 1 \pmod n\)，所以 \(\bar s\) 就是 \(\bar a\) 的逆。</p>
+
+<p>(\(\Rightarrow\)) 若 \(\bar a \bar b = \bar 1\)，则 \(a b - 1 = k n\)，即 \(a b - k n = 1\)。任何 \(a, n\) 的公因子必整除 \(1\)，所以 \(\gcd(a, n) = 1\)。\(\checkmark\)</p>
+
+<p>这条判别给我们一个<em>具体计算逆元</em> 的算法——跑 ch2 的扩展 Euclid 求 \(s, t\)，则 \(s \bmod n\) 就是 \(\bar a^{-1}\)。例：求 \(\bar 7\) 在 \(\mathbb{Z}/26\) 里的逆。\(\gcd(7, 26)\) 跑 Euclid：\(26 = 3 \cdot 7 + 5\)，\(7 = 1 \cdot 5 + 2\)，\(5 = 2 \cdot 2 + 1\)，\(2 = 2 \cdot 1 + 0\)。回代：\(1 = 5 - 2 \cdot 2 = 5 - 2(7 - 5) = 3 \cdot 5 - 2 \cdot 7 = 3 (26 - 3 \cdot 7) - 2 \cdot 7 = 3 \cdot 26 - 11 \cdot 7\)。所以 \(-11 \cdot 7 \equiv 1 \pmod {26}\)，即 \(\bar 7^{-1} = \overline{-11} = \bar{15}\)。验证：\(7 \cdot 15 = 105 = 4 \cdot 26 + 1\)。\(\checkmark\)</p>
+
+<p>把 \(\mathbb{Z}/n\) 的可逆元集合命名：</p>
+
+<p>\[
+(\mathbb{Z}/n)^* = \{\bar a \in \mathbb{Z}/n : \gcd(a, n) = 1\}.
+\]</p>
+
+<p>它在乘法下构成<em>群</em>（封闭、有 \(\bar 1\)、有逆、结合）。这个群的阶（元素个数）将在 ch6 命名为 \(\varphi(n)\)，是数论核心对象。简单算几个：\((\mathbb{Z}/7)^* = \{\bar 1, \bar 2, \ldots, \bar 6\}\)，6 个元素；\((\mathbb{Z}/6)^* = \{\bar 1, \bar 5\}\)，2 个；\((\mathbb{Z}/8)^* = \{\bar 1, \bar 3, \bar 5, \bar 7\}\)，4 个；\((\mathbb{Z}/10)^* = \{\bar 1, \bar 3, \bar 7, \bar 9\}\)，4 个。</p>
+
+<p>当 \(n = p\) 素时 \((\mathbb{Z}/p)^* = \{\bar 1, \ldots, \overline{p-1}\}\) 有 \(p - 1\) 个元素，且 \(\mathbb{Z}/p\) 中每个非零元可逆——所以 \(\mathbb{Z}/p\) 是<em>域</em>（环 + 每个非零可逆）。这件事链回<a href="../抽象代数/ch12.html">抽象代数 ch12</a> 的"<em>有限域</em>" 章节。素模带来的"<em>域</em>" 性质，是 ch6 Fermat 小定理证明的关键。</p>
+
+<h2 id="sec5-5">5.5 一次同余方程 \(a x \equiv b \pmod n\)</h2>
+
+<p>把 5.4 节的"<em>逆元 = 解 \(a x \equiv 1\)</em>" 推广。一般问题：给 \(a, b, n\)，\(a x \equiv b \pmod n\) 何时有解，怎么求？</p>
+
+<p>朴素试：\(3 x \equiv 4 \pmod 7\)。\(x = 0, 1, 2, \ldots, 6\) 代进左边得 \(0, 3, 6, 9 \equiv 2, 12 \equiv 5, 15 \equiv 1, 18 \equiv 4\)——\(x = 6\) 解。这种"<em>遍历 \(n\) 个值</em>" 朴素法对小 \(n\) 还行，对 \(n = 10^9\) 就崩。</p>
+
+<p>聪明法：</p>
+
+<p>\[\boxed{\ a x \equiv b \pmod n\ \text{有解}\ \iff\ \gcd(a, n) \mid b.\ }\]</p>
+
+<p>且解存在时，解 \(\bmod n\) <em>一共有 \(\gcd(a, n)\) 个</em>。</p>
+
+<p><em>证明</em>。 设 \(d = \gcd(a, n)\)。</p>
+
+<p>(\(\Rightarrow\)) 若 \(a x \equiv b\)，则 \(a x - n y = b\) 对某 \(y\)。任何 \(a, n\) 的公因子必整除右边，所以 \(d \mid b\)。</p>
+
+<p>(\(\Leftarrow\)) 若 \(d \mid b\)，写 \(b = d b'\)。Bezout 给 \(s a + t n = d\)。乘以 \(b'\)：\((s b') a + (t b') n = d b' = b\)，所以 \(x_0 = s b'\) 是一个解。</p>
+
+<p>所有解：若 \(x_0\) 是解，\(x_1\) 也是解，则 \(a (x_1 - x_0) \equiv 0 \pmod n\)，即 \(n \mid a (x_1 - x_0)\)。设 \(a = d a'\)、\(n = d n'\) 且 \(\gcd(a', n') = 1\)。则 \(d n' \mid d a' (x_1 - x_0)\)，即 \(n' \mid a' (x_1 - x_0)\)。\(\gcd(a', n') = 1\) 给 \(n' \mid (x_1 - x_0)\)。所以解集是 \(x_0, x_0 + n', x_0 + 2 n', \ldots, x_0 + (d - 1) n'\)（mod \(n\)）——共 \(d\) 个。\(\checkmark\)</p>
+
+<p>例 1：\(15 x \equiv 6 \pmod{21}\)。\(d = \gcd(15, 21) = 3\)，\(d \mid 6\)，有解，3 个。两边除 3：\(5 x \equiv 2 \pmod 7\)。\(\bar 5^{-1} = \bar 3\)（因 \(5 \cdot 3 = 15 \equiv 1\)），故 \(x \equiv 6 \pmod 7\)。在 \(\bmod 21\) 范围内三个解：\(x = 6, 13, 20\)。</p>
+
+<p>例 2：\(6 x \equiv 4 \pmod{10}\)。\(d = \gcd(6, 10) = 2\)，\(2 \mid 4\)，有解，2 个。除 2：\(3 x \equiv 2 \pmod 5\)。\(\bar 3^{-1} = \bar 2\)（\(3 \cdot 2 = 6 \equiv 1\)），故 \(x \equiv 4 \pmod 5\)。\(\bmod 10\) 范围：\(x = 4, 9\)。</p>
+
+<p>例 3：\(6 x \equiv 5 \pmod{10}\)。\(d = 2\)，但 \(2 \nmid 5\)。<em>无解</em>。</p>
+
+<p>这条定理 + 扩展 Euclid 算法 = 解一次同余方程的<em>完整工具</em>。后面 ch7 的 CRT 用它做基本块。</p>
+
+<h2 id="sec5-6">5.6 模平方求幂：把 \(O(k)\) 降到 \(O(\log k)\)</h2>
+
+<p>回到本章开头的问题：求 \(a^k \bmod n\)。朴素法是循环 \(k\) 次乘 \(a\)，每步 mod \(n\)。每次乘法 + 取模都很快，但<em>一共要 \(k\) 步</em>——对 \(k = 2^{50}\) 来说就是 \(10^{15}\) 步，永远算不完。</p>
+
+<p>聪明法：<strong>模平方法</strong>（square-and-multiply, repeated squaring）。基于一个朴素观察：如果你已经算出 \(a^m\)，那么 \(a^{2m} = (a^m)^2\) <em>一步</em>就出来。所以可以"翻倍式" 长上去：</p>
+
+<p>\[
+a^1, \quad a^2, \quad a^4, \quad a^8, \quad a^{16}, \quad a^{32}, \quad \ldots, \quad a^{2^t}.
+\]</p>
+
+<p>每一步只需<em>一次平方 + 一次取模</em>。\(t\) 步后达到 \(a^{2^t}\)——所以 \(2^t\) 量级的指数，只用 \(t\) 步。\(2^{50}\) 那个例子，\(t = 50\) 步完成。<em>速度提升 \(10^{13}\) 倍</em>。</p>
+
+<p>但任意 \(k\) 不一定是 \(2\) 的幂。怎么办？把 \(k\) 写成二进制：</p>
+
+<p>\[
+k = b_{t-1} 2^{t-1} + b_{t-2} 2^{t-2} + \cdots + b_1 \cdot 2 + b_0, \quad b_i \in \{0, 1\}.
+\]</p>
+
+<p>则</p>
+
+<p>\[
+a^k = \prod_{i: b_i = 1} a^{2^i}.
+\]</p>
+
+<p>所以算 \(a^k \bmod n\) 的算法：</p>
+
+<ol>
+  <li>把 \(k\) 写二进制，得到位数 \(t \approx \log_2 k\)。</li>
+  <li>反复平方，预计算 \(a, a^2, a^4, \ldots, a^{2^{t-1}}\)（每一步 mod \(n\)）。</li>
+  <li>把对应 \(b_i = 1\) 的项乘起来（每一步 mod \(n\)）。</li>
+</ol>
+
+<p>步数：\(t\) 次平方 + 至多 \(t\) 次乘法 = \(O(t) = O(\log k)\) 次模乘。每次模乘 \(O((\log n)^2)\) 位操作（把两个 \(\log n\) 位整数相乘）。<em>整体复杂度 \(O(\log k \cdot (\log n)^2)\)</em>。</p>
+
+<p>例：算 \(7^{13} \bmod 10\)。\(13 = 8 + 4 + 1 = 1101_2\)。预计算（mod 10）：</p>
+
+<p>\[
+7^1 = 7, \quad 7^2 = 49 \equiv 9, \quad 7^4 = 9^2 = 81 \equiv 1, \quad 7^8 = 1^2 = 1.
+\]</p>
+
+<p>组合：\(7^{13} = 7^8 \cdot 7^4 \cdot 7^1 \equiv 1 \cdot 1 \cdot 7 = 7 \pmod{10}\)。<em>4 次平方 + 2 次乘法 = 6 步</em>，替代了朴素的 13 步。优势在更大 \(k\) 时悬殊。</p>
+
+<p>这个算法是<em>所有现代密码学</em>的基本计算原语。RSA 加密一次要算 \(m^e \bmod n\)，其中 \(n\) 是 2048-bit、\(e\) 大小相当——朴素法要 \(2^{2048}\) 步，<em>宇宙寿命都不够</em>。模平方法只要 2048 步，<em>毫秒级完成</em>。没有这条算法，公钥密码学就不存在。</p>
+
+<p>请你停下来对照 ch1 §1.1 的循环法和现在这个算法。循环法是"<em>找规律</em>"——只对个别 \(a, n\) 显式可见。模平方法是"<em>逐位拆 \(k\)</em>"——对任意 \(a, n, k\) 都跑得动。<em>从"找规律"到"通用算法" 这一步</em>，就是初等数论变成实用数学的关键转折。</p>
+
+<h2 id="sec5-7">5.7 把全套用上：算 \(7^{100} \bmod 13\)</h2>
+
+<p>ch1 算的是 \(7^{100} \bmod 10\)（末位）；现在升级到模 13。这个数没有"<em>末位</em>" 的物理含义，但在 \(\mathbb{Z}/13\) 这个环上完全 well-defined。我们用本章建立的全套——\(\mathbb{Z}/n\) 环结构 + 模平方法——攻它。</p>
+
+<p>把 \(100\) 写二进制：\(100 = 64 + 32 + 4 = 1100100_2\)，所以 \(b_6 = 1, b_5 = 1, b_2 = 1\)，其余为 0。</p>
+
+<p>预计算 \(7^{2^i} \bmod 13\)：</p>
+
+<p>\[
+\begin{aligned}
+7^1 &= 7, \\
+7^2 &= 49 = 3 \cdot 13 + 10 \equiv 10, \\
+7^4 &= 10^2 = 100 = 7 \cdot 13 + 9 \equiv 9, \\
+7^8 &= 9^2 = 81 = 6 \cdot 13 + 3 \equiv 3, \\
+7^{16} &= 3^2 = 9, \\
+7^{32} &= 9^2 = 81 \equiv 3, \\
+7^{64} &= 3^2 = 9.
+\end{aligned}
+\]</p>
+
+<p>(注意 \(7^4 \equiv 9\)、\(7^{16} \equiv 9\)、\(7^{64} \equiv 9\)；\(7^8 \equiv 3\)、\(7^{32} \equiv 3\)。出现了周期性——这是 ch6 Fermat 小定理的影子，下一章就揭穿。)</p>
+
+<p>组合：</p>
+
+<p>\[
+7^{100} = 7^{64} \cdot 7^{32} \cdot 7^4 \equiv 9 \cdot 3 \cdot 9 \pmod{13}.
+\]</p>
+
+<p>\(9 \cdot 3 = 27 = 2 \cdot 13 + 1 \equiv 1\)。\(1 \cdot 9 = 9\)。所以</p>
+
+<p>\[\boxed{\ 7^{100} \equiv 9 \pmod{13}.\ }\]</p>
+
+<p>验证一种独立做法：注意 \(7^2 \equiv 10 \equiv -3 \pmod{13}\)，所以 \(7^{100} = (7^2)^{50} \equiv (-3)^{50} = 3^{50} \pmod{13}\)。\(3^3 = 27 \equiv 1 \pmod{13}\)，所以 \(3^{50} = 3^{48} \cdot 3^2 = (3^3)^{16} \cdot 9 \equiv 1^{16} \cdot 9 = 9 \pmod{13}\)。两条路殊途同归。\(\checkmark\)</p>
+
+<p>请你停下来想这件事的<em>分量</em>。\(7^{100}\) 是一个大约 85 位的数。我们用了不到 10 步纸笔运算就拿到了它的模 13 余数，而且<em>整个过程不接触任何超过两位数的中间结果</em>。这就是模算术 + 快速幂联手的力量。同样的思路扩展到 RSA——我们把 2048 位的指数算到几十毫秒——靠的就是同一对工具，只是规模更大。</p>
+
+<h2 id="sec5-8">5.8 临别话与下一步</h2>
+
+<p>本章把 ch1 的"<em>末位 = mod 10</em>" 这个直觉升级成了正式的代数对象 \(\mathbb{Z}/n\) + 配套的"<em>解一次方程</em>"和"<em>快速幂</em>" 算法。三件事可以记住：</p>
+
+<ul>
+  <li><em>结构</em>：\(\mathbb{Z}/n\) 是一个有 \(n\) 元的交换环。\(n\) 素时是域。可逆元集合 \((\mathbb{Z}/n)^* = \{\bar a : \gcd(a, n) = 1\}\) 在乘法下是有限群。</li>
+  <li><em>解方程</em>：\(a x \equiv b \pmod n\) 有解 \(\iff \gcd(a, n) \mid b\)；解存在时 \(\bmod n\) 共 \(\gcd(a, n)\) 个，由 ch2 扩展 Euclid 算出。</li>
+  <li><em>算幂</em>：\(a^k \bmod n\) 用模平方法 \(O(\log k)\) 次模乘搞定。</li>
+</ul>
+
+<p>下一章我们要解释 5.7 节末尾出现的<em>周期性</em>——\(7^{100} \equiv 9\) 不是巧合，背后是 \((\mathbb{Z}/13)^*\) 这个 12 元群的<em>Lagrange 定理</em>。这条定理的特殊形式——<strong>Fermat 小定理</strong>——告诉我们对任意素 \(p\) 和 \(\gcd(a, p) = 1\)：</p>
+
+<p>\[
+a^{p-1} \equiv 1 \pmod p.
+\]</p>
+
+<p>它的一般形式——<strong>Euler 定理</strong>——告诉我们对任意 \(n\)：</p>
+
+<p>\[
+a^{\varphi(n)} \equiv 1 \pmod n,
+\]</p>
+
+<p>其中 \(\varphi(n) = |(\mathbb{Z}/n)^*|\) 是<em>Euler 函数</em>。这两条定理把"<em>幂的周期</em>" 这件事一举说完——它们是<em>所有</em>"<em>模 \(n\)算大幂</em>" 计算的理论基础，也是 RSA 的代数核心。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 算术基本定理</a><a href="ch6.html">下一章 · 第 6 章 Fermat 小定理与 Euler 定理 →</a></nav>
+</main>
+</body>
+</html>

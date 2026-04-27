@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 22 章 类域论一瞥 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 模形式入门</a><a href="ch23.html">下一章 · 第 23 章 应用：现代密码学 →</a></nav>
+<h1 id="ch22">第 22 章 类域论一瞥</h1>
+
+<p><a href="../抽象代数/index.html">《抽象代数读本》</a>里 Galois 主定理对应"<em>子群 ↔ 中间域</em>"——给一个域 \(K\) 上的 Galois 扩张 \(L/K\)，\(L\) 与 \(K\) 之间的中间域和 \(\mathrm{Gal}(L/K)\) 的子群一一对应。这条定理把"<em>看不见的中间域</em>" 转化为"<em>看得见的有限子群</em>"——是代数里最优雅的对应之一。</p>
+
+<p><em>类域论</em>（class field theory，CFT）是这件事在数论上的<em>无穷</em> 推广。它问：<em>给一个数域 \(K\)，\(K\) 的所有阿贝尔扩张</em>（\(\mathrm{Gal}(L/K)\) 阿贝尔的 \(L \supset K\)）<em>能不能用 \(K\) 内部的某种"算术对象" 描述</em>？答案是<em>能</em>——并且那个算术对象就是 \(K\) 的<em>类群</em>（本章看到要精化为<em>idele 类群</em>）。这是 20 世纪上半叶数论最大的成就，由 Hilbert 1898 提出愿景，Takagi 1920、Artin 1927、Chevalley 1940 完成。</p>
+
+<p>本章不证细节——CFT 的完整证明一学期才能讲完。本章给的是<em>地图</em>：哪些对象在配对、配对的方式有多种等价表述、为什么这件事是 Langlands 程序的"<em>阿贝尔基础</em>"。</p>
+
+<h2 id="sec22-1">22.1 Galois 主定理回忆</h2>
+
+<p>先把基础对应做一遍，让你看到我们要推广的<em>是什么</em>。</p>
+
+<p>设 \(L/K\) 是一个有限 Galois 扩张（即 \(L\) 是 \(K\) 上某<em>可分</em> 多项式的全部根的最小扩张）。记 \(G = \mathrm{Gal}(L/K)\) 是它的 Galois 群——\(L\) 上固定 \(K\) 的所有自同构组成的群。</p>
+
+<p><strong>Galois 主定理。</strong>有反向包含的<em>双射</em>：</p>
+
+<p>\[
+\boxed{\ \{\text{中间域 } K \subseteq M \subseteq L\} \;\xleftrightarrow{1:1}\; \{\text{子群 } H \subseteq G\}.\ }
+\]</p>
+
+<p>对应：</p>
+
+<ul>
+  <li>从中间域 \(M\) 出发：\(M \mapsto \mathrm{Gal}(L/M)\)（固定 \(M\) 的子群）。</li>
+  <li>从子群 \(H\) 出发：\(H \mapsto L^H\)（\(H\) 不动的元素）。</li>
+</ul>
+
+<p>这条对应有几条精细化：</p>
+
+<ul>
+  <li>\([M : K] = [G : H]\)（指数 = 子群指数）。</li>
+  <li>\(M/K\) 是 Galois 扩张 \(\iff\) \(H \trianglelefteq G\)（正规子群）；此时 \(\mathrm{Gal}(M/K) \cong G/H\)。</li>
+  <li>对应是<em>反序的</em>：大中间域对应小子群，反之。</li>
+</ul>
+
+<p>这条对应让"<em>中间域</em>" 这种抽象不可数对象（\(M\) 本身有无穷多元素）变成"<em>子群</em>"——一个有限组合对象（如果 \(G\) 有限）。这是<em>代数化几何</em> 的范本。</p>
+
+<p><em>例</em>：\(L = \mathbb Q(\sqrt 2, \sqrt 3)\)，\(K = \mathbb Q\)，\(G = \mathbb Z/2 \times \mathbb Z/2\)（4 阶 Klein 四元群）。\(G\) 有 5 个子群（\(\{0\}\)、三个 \(\mathbb Z/2\)、\(G\)）↔ 5 个中间域：\(L\) 自身、\(\mathbb Q(\sqrt 2)\)、\(\mathbb Q(\sqrt 3)\)、\(\mathbb Q(\sqrt 6)\)、\(\mathbb Q\)。完美对应。</p>
+
+<p>类域论要做的：把这条对应的<em>右边</em>（"<em>子群</em>"）换成"<em>类群的子群</em>"，把<em>左边</em>（"<em>中间域</em>"）换成"<em>\(K\) 的某类阿贝尔扩张</em>"。具体怎么换，22.3 节看。</p>
+
+<h2 id="sec22-2">22.2 数域 + 整数环 + 类群（复习 ch17）</h2>
+
+<p>类域论的<em>研究对象</em> 是<em>数域</em>——\(\mathbb Q\) 的有限扩张。设 \(K\) 是数域，\(\mathcal O_K\) 是它的<em>整数环</em>（满足首一整系数多项式的元素全体）。例：</p>
+
+<ul>
+  <li>\(K = \mathbb Q\)，\(\mathcal O_K = \mathbb Z\)。</li>
+  <li>\(K = \mathbb Q(i)\)，\(\mathcal O_K = \mathbb Z[i]\)（高斯整数，链回<a href="ch13.html">ch13</a>）。</li>
+  <li>\(K = \mathbb Q(\sqrt{-5})\)，\(\mathcal O_K = \mathbb Z[\sqrt{-5}]\)。</li>
+</ul>
+
+<p>整数环 \(\mathcal O_K\) 的<em>素分解</em> 在一般情形下<em>不</em> 唯一——这是<a href="ch17.html">ch17</a>讲过的。例：在 \(\mathbb Z[\sqrt{-5}]\) 中</p>
+
+<p>\[
+6 = 2 \cdot 3 = (1 + \sqrt{-5})(1 - \sqrt{-5}),
+\]</p>
+
+<p>两边都是不可约元乘积，但<em>不能</em> 互相整理为单元差。所以 \(\mathcal O_K\) 不是 UFD。</p>
+
+<p>Dedekind 1871 的修复：放弃<em>元素</em> 的素分解，改用<em>理想</em> 的素分解。具体的，\(\mathcal O_K\) 的每个非零理想都唯一分解为<em>素理想</em> 乘积——这是 \(\mathcal O_K\) 是 <em>Dedekind 整环</em> 的精确含义。</p>
+
+<p>有了素理想分解，可定义<em>分式理想</em>（fractional ideals）= "<em>形如 \(a^{-1} I\) 的子集，\(I\) 是 \(\mathcal O_K\) 的理想，\(a \in K^\times\)</em>"。分式理想在乘法下构成<em>群</em>，记 \(\mathcal I_K\)。它的<em>主分式理想</em>（即 \((\alpha) = \alpha \mathcal O_K\) 形式的）构成子群 \(\mathcal P_K\)。</p>
+
+<p><strong>定义（理想类群）。</strong></p>
+
+<p>\[
+\boxed{\ \mathrm{Cl}(K) := \mathcal I_K / \mathcal P_K.\ }
+\]</p>
+
+<p>这是<em>分式理想群对主分式理想群的商</em>。它的元素叫<em>理想类</em>——一个理想类里的所有理想"差一个主理想因子"（即"<em>差一个 \(\alpha \cdot</em>"\)）。</p>
+
+<p>关键事实（Minkowski 1890）：<em>\(\mathrm{Cl}(K)\) 是有限阿贝尔群</em>。它的阶 \(h(K) = |\mathrm{Cl}(K)|\) 叫 \(K\) 的<em>类数</em>。</p>
+
+<p>类数测量"<em>\(\mathcal O_K\) 离 UFD 多远</em>"——\(h(K) = 1 \iff\) \(\mathcal O_K\) 是 UFD。例：</p>
+
+<ul>
+  <li>\(K = \mathbb Q\)：\(h = 1\)（\(\mathbb Z\) 是 UFD）。</li>
+  <li>\(K = \mathbb Q(i)\)：\(h = 1\)（\(\mathbb Z[i]\) 是 UFD）。</li>
+  <li>\(K = \mathbb Q(\sqrt{-5})\)：\(h = 2\)（不是 UFD，"差 2 个类")。</li>
+  <li>\(K = \mathbb Q(\sqrt{-23})\)：\(h = 3\)。</li>
+</ul>
+
+<p>\(\mathrm{Cl}(K)\) 是数论里最重要的<em>有限</em> 阿贝尔群之一。它"<em>记住</em>" 了 \(K\) 的素分解失败的多少。类域论将告诉你：\(\mathrm{Cl}(K)\) 还有<em>第二种</em> 解释——它是 \(K\) 的某个特殊扩张的<em>Galois 群</em>。</p>
+
+<h2 id="sec22-3">22.3 Hilbert 类域</h2>
+
+<p>类域论的第一个具体定理（"<em>初步形式</em>"）：</p>
+
+<p><strong>定理（Hilbert 1898 / Furtwängler 1907）。</strong>给数域 \(K\)。存在唯一的 \(K\) 的<em>有限阿贝尔扩张</em> \(H\) 满足：</p>
+
+<ol>
+  <li>\(H/K\) 是阿贝尔的（\(\mathrm{Gal}(H/K)\) 阿贝尔群）。</li>
+  <li>\(H/K\) 是<em>无分歧</em> 的（每个素理想 \(\mathfrak p \subset \mathcal O_K\) 在 \(\mathcal O_H\) 里分解时不带"重根")。</li>
+  <li>\(H\) 是<em>最大</em> 的满足前两条的扩张。</li>
+</ol>
+
+<p>这个 \(H\) 叫 \(K\) 的<em>Hilbert 类域</em>（HCF），通常记 \(H = K^{(1)}\) 或 \(H_K\)。</p>
+
+<p>关键定理：</p>
+
+<p>\[
+\boxed{\ \mathrm{Gal}(H_K / K) \cong \mathrm{Cl}(K).\ }
+\]</p>
+
+<p>左边是<em>Galois 群</em>——一个抽象的群论对象。右边是<em>理想类群</em>——一个数论的对象。两者<em>同构</em>。</p>
+
+<p>更精细：这个同构是<em>典则</em> 的，由 <em>Artin 互反映射</em> 实现（22.5 节）。它把素理想 \(\mathfrak p\) 在 \(\mathrm{Cl}(K)\) 里的类映为 \(\mathfrak p\) 在 \(H_K/K\) 中的<em>Frobenius 元</em>。</p>
+
+<p>请你停下来感受这条定理：</p>
+
+<ul>
+  <li>\(K\) 的<em>类群</em>（你算 \(\mathrm{Cl}(K)\) 时只看 \(\mathcal O_K\) 内部，不出 \(K\)）<em>预测</em> 了 \(K\) 之外的某个特殊域 \(H_K\) 的存在。</li>
+  <li>\(H_K\) 的 Galois 群<em>就是</em> 这个类群。</li>
+  <li>所以"<em>类群 = 一个隐藏的 Galois 群</em>"——内部数论数据 = 外部代数对象。</li>
+</ul>
+
+<p>这是<em>对应</em> 的雏形。一般类域论会把这条推广到"<em>所有阿贝尔扩张</em>"（不只是无分歧的，也包括分歧的）——见 22.5 节。</p>
+
+<h2 id="sec22-4">22.4 例：\(K = \mathbb Q(\sqrt{-5})\) 的 HCF</h2>
+
+<p>取 \(K = \mathbb Q(\sqrt{-5})\)。\(\mathcal O_K = \mathbb Z[\sqrt{-5}]\)，\(h(K) = 2\)。</p>
+
+<p>类群 \(\mathrm{Cl}(K) = \{[1], [\mathfrak p_2]\}\)（其中 \(\mathfrak p_2 = (2, 1 + \sqrt{-5})\) 是 \(2\) 上方的非主素理想，\([\mathfrak p_2]^2 = [1]\)）。所以 \(\mathrm{Cl}(K) \cong \mathbb Z/2\)。</p>
+
+<p>Hilbert 类域 \(H_K\) 应该是<em>2 次</em> 阿贝尔无分歧扩张。能不能猜出来？阿贝尔 2 次 = 添加一个平方根。无分歧 = 添加的元素的判别式与 \(K\) 的判别式没"<em>新坏素</em>"。</p>
+
+<p>答案：</p>
+
+<p>\[
+\boxed{\ H_K = K(\sqrt{-1}) = \mathbb Q(\sqrt{-5}, i) = \mathbb Q(\sqrt{-5}, \sqrt{-1}).\ }
+\]</p>
+
+<p>验证：</p>
+
+<ul>
+  <li>\([H_K : K] = 2\)。\(\checkmark\)</li>
+  <li>\(\mathrm{Gal}(H_K/K) \cong \mathbb Z/2 \cong \mathrm{Cl}(K)\)。\(\checkmark\)</li>
+  <li>\(H_K/K\) 无分歧需要具体验算（涉及判别式 \(\mathrm{disc}(\mathbb Q(i)) = -4\) 与 \(\mathrm{disc}(K) = -20\) 的关系），本章跳过。</li>
+</ul>
+
+<p>类域论的应用：HCF 给"<em>哪些素数能被表示为某个二次型</em>" 的判别。具体的，对 \(K = \mathbb Q(\sqrt{-D})\)（\(D > 0\)，\(D \equiv 3 \pmod 4\) 适当），<em>奇素数 \(p \nmid D\) 写成 \(x^2 + Dy^2\) 形式</em> \(\iff\) <em>\(p\) 在 \(H_K\) 中完全分裂</em>。</p>
+
+<p>例：\(K = \mathbb Q(\sqrt{-5})\)，\(H_K = K(i)\)。素数 \(p\) 写成 \(x^2 + 5 y^2\) 当且仅当 \(p\) 在 \(\mathbb Q(\sqrt{-5}, i)\) 中完全分裂。可计算这<em>等价于</em></p>
+
+<p>\[
+p \equiv 1, 9 \pmod{20}.
+\]</p>
+
+<p>这是个<em>具体</em> 的同余条件，可被快速判断。试算：\(p = 29\)，\(29 = 9 + 20 = 3^2 + 5 \cdot 2^2\)？\(3^2 + 5 \cdot 4 = 9 + 20 = 29\) ✓；\(29 \mod 20 = 9\) ✓。一致。</p>
+
+<p>这把"<em>抽象类群</em>" 转换成"<em>具体同余条件</em>"——这是<em>类域论作为数论计算工具</em> 的真威力。古典二次型理论（链回<a href="ch17.html">ch17</a>）里<em>每条</em> "哪些 \(p\) 表示哪种型" 的判别都是 HCF 的具体实例。</p>
+
+<h2 id="sec22-5">22.5 Artin 互反律</h2>
+
+<p>HCF 处理的是<em>无分歧</em> 阿贝尔扩张。一般类域论把这件事推广到<em>所有</em> 阿贝尔扩张。陈述需要一些新结构——<em>射类群</em>（ray class group）。</p>
+
+<p>简化版：取一个<em>模数</em> \(\mathfrak m\)（一个 \(\mathcal O_K\) 的非零理想加上一些"无穷处" 的数据）。射类群 \(\mathrm{Cl}_\mathfrak m(K)\) 是"<em>对 \(\mathfrak m\) 互素的分式理想模'与 \(\mathfrak m\) 同余于 \(1\) 的主理想'</em>" 的商群。HCF 对应 \(\mathfrak m = (1)\)（平凡模数）。</p>
+
+<p><strong>Artin 互反律（CFT 的核心，1927）。</strong>对每个有限阿贝尔扩张 \(L/K\)，存在一个模数 \(\mathfrak m\) 使</p>
+
+<p>\[
+\boxed{\ \mathrm{Cl}_\mathfrak m(K) \twoheadrightarrow \mathrm{Gal}(L/K) \quad (\text{满射 + 同构经过适当商}).\ }
+\]</p>
+
+<p>互反映射在素理想 \(\mathfrak p\)（不分 \(\mathfrak m\)）上的值是<em>Frobenius 元</em> \(\mathrm{Frob}_\mathfrak p \in \mathrm{Gal}(L/K)\)（"<em>\(L/K\) 在 \(\mathfrak p\) 上方的局部 Galois 元</em>"）。</p>
+
+<p>这条定理推广 HCF 到一般阿贝尔扩张。它有<em>两条</em> 等价表述：</p>
+
+<ol>
+  <li><em>"<em>射类群</em>"<em> 表述</em>：上面那条。</li>
+  <li><em>"<em>idele 类群</em>"<em> 表述</em>：22.6 节给。</li>
+</ol>
+
+<p>两条等价。后者是更现代、更对称的表达——也是 Chevalley 1940 给类域论一个不依赖<em>解析方法</em> 的纯代数证明的关键。</p>
+
+<p><em>Artin 互反作为"<em>互反律的总和</em>"</em>。Artin 互反律包含古典数论里所有"<em>互反律</em>" 的统一：</p>
+
+<ul>
+  <li>取 \(K = \mathbb Q\)、\(L = \mathbb Q(\zeta_n)\)（圆分域）：Artin 互反退化为<em>圆分域 Galois 群</em> \(\mathrm{Gal}(\mathbb Q(\zeta_n)/\mathbb Q) \cong (\mathbb Z/n)^\times\) 的描述——这条 19 世纪初由 Gauss 通过<em>圆分多项式</em> 给。</li>
+  <li>取 \(K = \mathbb Q\)、\(L = \mathbb Q(\sqrt p)\)（\(p\) 奇素）：Artin 互反退化为<em>二次互反律</em>（\(\left(\frac{p}{q}\right)\left(\frac{q}{p}\right) = (-1)^{(p-1)(q-1)/4}\)）。22.7 节具体看。</li>
+  <li>取 \(K\) 任意、\(L\) 任意阿贝尔：得"<em>三次互反律</em>"、"<em>双二次互反律</em>" 等等高次互反律。</li>
+</ul>
+
+<p>所以 Artin 互反<em>是</em> 互反律的最终形式——它把 19 世纪 Gauss、Eisenstein、Kummer 各自证的<em>不同</em> 互反律统一为一条 20 世纪定理。</p>
+
+<h2 id="sec22-6">22.6 Idele 与 idele 类群（现代陈述）</h2>
+
+<p>"<em>射类群对每个模数 \(\mathfrak m\) 不同</em>" 这件事让 22.5 的陈述<em>笨重</em>——你想说"<em>所有阿贝尔扩张</em>" 时不得不带一个 \(\mathfrak m\)。Chevalley 1940 引入<em>idele</em>，把所有 \(\mathfrak m\) 一次过处理。</p>
+
+<p>设 \(K\) 是数域。它有一族<em>完备化</em>：</p>
+
+<ul>
+  <li>对每个非零素理想 \(\mathfrak p \subset \mathcal O_K\)，\(K_\mathfrak p\) 是 \(K\) 关于 \(\mathfrak p\)-adic 度量的完备化（链回<a href="ch18.html">ch18</a>）。这些叫<em>有限位</em>。</li>
+  <li>对每个 \(K\) 的实嵌入或复嵌入，\(K\) 也有完备化 \(\mathbb R\) 或 \(\mathbb C\)。这些叫<em>无穷位</em>。</li>
+</ul>
+
+<p>所有"<em>位</em>"（places）记 \(M_K\)。</p>
+
+<p>定义<em>idele 群</em>：</p>
+
+<p>\[
+\boxed{\ \mathbb A_K^\times = \mathbb I_K = \prod_{v \in M_K}{}' K_v^\times,\ }
+\]</p>
+
+<p>其中 \(\prod'\) 是<em>限制乘积</em>：元素 \((x_v)_{v \in M_K}\) 满足 <em>除有限个外</em>，\(x_v\) 是局部整数环的单位 \(\mathcal O_v^\times\)。这个限制保证了 \(\mathbb I_K\) 是个<em>局部紧拓扑群</em>，可以做调和分析。</p>
+
+<p>\(K^\times\) 通过对角嵌入 \(\alpha \mapsto (\alpha, \alpha, \ldots, \alpha)\) 嵌入 \(\mathbb I_K\) 作为<em>主 idele</em>。商群</p>
+
+<p>\[
+C_K := \mathbb I_K / K^\times
+\]</p>
+
+<p>叫<em>idele 类群</em>。它是一个局部紧拓扑群，有丰富结构（连通分量 \(C_K^0\)、紧子群、特征理论）。</p>
+
+<p><strong>Artin 互反（idele 版）。</strong>有典则的连续同态</p>
+
+<p>\[
+\boxed{\ \theta_K : C_K \to \mathrm{Gal}(K^{\mathrm{ab}}/K),\ }
+\]</p>
+
+<p>其中 \(K^{\mathrm{ab}}\) 是 \(K\) 的<em>最大阿贝尔扩张</em>（所有阿贝尔扩张的并）。\(\theta_K\) <em>稠密像</em>，并且经过商 \(C_K \to C_K / D_K\)（\(D_K\) 是连通分量）变成<em>同构</em>。</p>
+
+<p>这条陈述把<em>所有</em> 阿贝尔扩张一次刻画——\(K^{\mathrm{ab}}\) 的<em>每个</em> 有限子扩张 \(L/K\) 对应 \(C_K\) 的<em>每个</em> 有限指数闭子群（即 \(N_L = \theta_K^{-1}(\mathrm{Gal}(K^{\mathrm{ab}}/L))\)）。这就是<em>类域论存在 + 唯一定理</em>——<em>有限阿贝尔扩张 \(L/K\) 一一对应 \(C_K\) 的有限指数开子群 \(N_L\)</em>。</p>
+
+<p>这是<em>无穷</em> 的 Galois 主定理类比：</p>
+
+<ul>
+  <li>有限 Galois 扩张：子群 \(\subseteq G\) ↔ 中间域。</li>
+  <li>无穷阿贝尔扩张：\(C_K\) 的开子群 ↔ 有限阿贝尔扩张。</li>
+</ul>
+
+<p>idele 类群 \(C_K\) <em>替代了</em> Galois 主定理里的"<em>子群格</em>"——它是数域 \(K\) 的"<em>所有阿贝尔信息</em>" 的承载者。</p>
+
+<h2 id="sec22-7">22.7 应用：用类域论证二次互反律</h2>
+
+<p>把上面的抽象具象化——用 Artin 互反推 Gauss 的<em>二次互反律</em>。这是 22.5 节"互反律的总和" 的最简单非平凡实例。</p>
+
+<p><strong>二次互反律（Gauss 1801）。</strong>对奇素数 \(p \ne q\)：</p>
+
+<p>\[
+\left(\frac{p}{q}\right) \cdot \left(\frac{q}{p}\right) = (-1)^{\frac{p-1}{2} \cdot \frac{q-1}{2}}.
+\]</p>
+
+<p>（\(\left(\frac{a}{p}\right)\) 是 Legendre 符号，链回<a href="ch9.html">ch9</a>。）</p>
+
+<p>类域论证明草图（取 \(p \equiv 1 \pmod 4\) 简化）：</p>
+
+<ol>
+  <li>设 \(L = \mathbb Q(\sqrt p)\)（这里 \(p \equiv 1 \pmod 4\)，\(\sqrt p\) 是 \(\mathbb Q\) 的真扩张）。\(L/\mathbb Q\) 是阿贝尔（次数 2）。</li>
+  <li>Artin 互反：\(\mathrm{Gal}(L/\mathbb Q) \cong \mathbb Z/2\) 对应 \(\mathrm{Cl}_\mathfrak m(\mathbb Q)\) 的某商群，其中 \(\mathfrak m = (4p)\cdot \infty\)（具体模数依赖于 \(L\) 的判别式）。</li>
+  <li>\(\mathrm{Cl}_\mathfrak m(\mathbb Q) \cong (\mathbb Z/(4p))^\times / \pm 1\)（粗略），所以 Artin 映射变成"<em>素 \(q\) 模 \(4p\) 的类</em>" \(\to\) "<em>\(q\) 在 \(L\) 中的 Frobenius</em>"。</li>
+  <li>"<em>\(q\) 在 \(L\) 中分裂</em>" \(\iff\) Frobenius 平凡 \(\iff\) \(q\) 模 \(4p\) 在某个特定子群里。具体的（用圆分域中嵌入 \(L\) 的事实）：\(q\) 分裂 \(\iff\) \(\left(\frac q p\right) = 1\)。</li>
+  <li>另一方面：标准事实——\(q\) 在 \(\mathbb Q(\sqrt p)\) 中分裂 \(\iff\) \(p\) 是 mod \(q\) 的平方 \(\iff\) \(\left(\frac{p}{q}\right) = 1\)。</li>
+  <li>由 4 + 5 得 \(\left(\frac{p}{q}\right) = \left(\frac{q}{p}\right)\)（在 \(p \equiv 1 \pmod 4\) 情况下）。这是二次互反律的简化版本。</li>
+</ol>
+
+<p>一般情况（\(p \equiv 3 \pmod 4\)）多带一个负号——具体由 Artin 互反的"<em>无穷位贡献</em>" 给。完整的"<em>二次互反 = Artin 互反在 \(\mathbb Q(\sqrt p)\) 上的特殊化</em>" 是 CFT 教科书里第一个验证的例子。</p>
+
+<p>请你停下来感受：你<a href="ch10.html">ch10</a>看到的"<em>Gauss 1801 用 8 种不同方法证</em>" 的二次互反律，在类域论里是<em>一行</em>——<em>取 \(L = \mathbb Q(\sqrt p)\) 然后套 Artin 互反</em>。这是 20 世纪数论的力量：把 19 世纪的"<em>定理 + 证明</em>" 变成"<em>大框架的特殊情况</em>"。每条单独看起来神奇的互反律，在 Artin 视角下都是同一个对应的具体实例。</p>
+
+<h2 id="sec22-8">22.8 Langlands 程序预告</h2>
+
+<p>类域论解决了<em>阿贝尔</em> 情况——\(\mathrm{Gal}(L/K)\) 阿贝尔时怎么用 \(K\) 的内部对象 \(C_K\) 描述 \(L\)。但<em>非阿贝尔</em> 时怎么办？</p>
+
+<p>非阿贝尔 Galois 群的"<em>对应物</em>" 不是一个简单的群，而是这个群<em>的表示</em>——具体的，<em>有限维表示 \(\rho : \mathrm{Gal}(\overline K/K) \to \mathrm{GL}_n(\mathbb C)\)</em>。当 \(n = 1\)（一维表示）时这退化为 Galois 群的<em>特征</em>，<em>等价于</em> 阿贝尔 CFT。当 \(n \ge 2\) 时是<em>非阿贝尔</em> 情况。</p>
+
+<p>Langlands 1967 的伟大猜想：<em>非阿贝尔 Galois 表示 \(\rho\) 一一对应"<em>自守表示</em>" \(\pi\)</em>——这是<em>群 \(\mathrm{GL}_n(\mathbb A_K)\) 上的某种表示</em>，由模形式（链回<a href="ch21.html">ch21</a>）和它们的高维推广构造。具体的对应方式：</p>
+
+<p>\[
+\boxed{\ L(\rho, s) = L(\pi, s).\ }
+\]</p>
+
+<p>两个 \(L\)-函数<em>同</em>。这条对应叫 <em>Langlands 函子性</em>（Langlands functoriality）。</p>
+
+<p>具体例子：</p>
+
+<ul>
+  <li><em>\(n = 1\)</em>：阿贝尔 CFT。Galois 特征 \(\rho : \mathrm{Gal}^{\mathrm{ab}} \to \mathbb C^\times\) 对应 idele 类群的特征 \(\chi : C_K \to \mathbb C^\times\)。\(L(\rho, s) = L(\chi, s)\)（Hecke \(L\)-函数）。完全由 22.6 给出。</li>
+  <li><em>\(n = 2\)</em>：模性定理（链 <a href="ch21.html">ch21</a>、<a href="ch24.html">ch24</a>）。Galois 表示 \(\rho_E : \mathrm{Gal}(\overline{\mathbb Q}/\mathbb Q) \to \mathrm{GL}_2(\mathbb C)\)（来自椭圆曲线 \(E\)）对应权 2 模形式 \(f_E\)。\(L(E, s) = L(f_E, s)\)。Wiles 1995。</li>
+  <li><em>\(n \ge 3\)</em>：<em>大部分还未证</em>。已有部分进展（Arthur 2013 对 \(\mathrm{GL}_n\) 的内禀稳定迹公式、对小 \(n\) 与小域的特殊情况）。</li>
+</ul>
+
+<p>Langlands 程序是 21 世纪数论与表示论的核心研究方向。它把"<em>Galois 表示</em>"（数论 / 算术几何）与"<em>自守表示</em>"（表示论 / 调和分析）配对，每一对都给一个 \(L\)-函数。这条对应的<em>每个具体实例</em> 都是一个深定理——证完一个就解决一大类经典问题。</p>
+
+<p>Langlands 与类域论的关系一目了然：</p>
+
+<ul>
+  <li>类域论 = 阿贝尔 Langlands（\(n = 1\)）= 已完成（20 世纪）。</li>
+  <li>非阿贝尔 Langlands（\(n \ge 2\)）= 研究前沿（21 世纪进行中）。</li>
+</ul>
+
+<p>请你最后停下来感受这件事的<em>地位</em>：</p>
+
+<ul>
+  <li>整数 \(\mathbb Z\) 是 19 世纪 Gauss 的"<em>女王</em>"。</li>
+  <li>\(\mathbb Z\) 的素分解需要类群 \(\mathrm{Cl}(K)\) 描述（Dedekind 1871）。</li>
+  <li>\(\mathrm{Cl}(K)\) 是一个 Galois 群（Hilbert 1898）。</li>
+  <li>所有阿贝尔 Galois 群被 idele 类群刻画（Artin / Chevalley 1927-1940）。</li>
+  <li>所有 Galois 群（非阿贝尔）被自守表示刻画——猜想，部分已证（Langlands 1967-）。</li>
+</ul>
+
+<p>每一步都<em>升一层</em>——把"<em>已知对象</em>" 重新理解为"<em>另一个范畴里的对象</em>"。这种"<em>升层</em>" 的能力是现代数论的灵魂。<a href="ch24.html">最后一章</a>把这条链子收尾，看它怎么解决三个半世纪的 Fermat 大定理。</p>
+
+<p>下一章<a href="ch23.html">ch23</a>暂时换轨——从抽象的类域论 / Langlands 转到<em>应用</em>：每天你访问 https 网站、付钱、登录账号，背后都是数论。RSA 用 Euler 定理（链回<a href="ch6.html">ch6</a>），Diffie-Hellman 用离散对数（链回<a href="ch8.html">ch8</a>），椭圆曲线密码用<a href="ch19.html">ch19</a>的群律。这一章把"<em>这本书前 22 章</em>" 变成"<em>每天 10 亿次的工程实践</em>"。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 模形式入门</a><a href="ch23.html">下一章 · 第 23 章 应用：现代密码学 →</a></nav>
+</main>
+</body>
+</html>

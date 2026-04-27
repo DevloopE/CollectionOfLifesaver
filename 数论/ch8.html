@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 原根与离散对数 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 Euler 函数与 Euler 定理</a><a href="ch9.html">下一章 · 第 9 章 二次剩余与 Legendre 符号 →</a></nav>
+<h1 id="ch8">第 8 章 原根与离散对数</h1>
+
+<p>请你拿张草稿纸，算这件事：\(2^k \bmod 11\)，\(k = 1, 2, \ldots, 10\)。</p>
+
+<p>不要跳。一边算一边把数写下。</p>
+
+<h2 id="sec8-1">8.1 一个让你撞见"循环群"的小实验</h2>
+
+<p>从 \(2^1 = 2\) 起手。每一步乘 2 再 mod 11——上一章的"<em>提前简化</em>" 让数永远不会大过 22。</p>
+
+<p>\[
+2^1 = 2, \quad 2^2 = 4, \quad 2^3 = 8, \quad 2^4 = 16 \equiv 5, \quad 2^5 \equiv 10, \quad 2^6 \equiv 20 \equiv 9, \quad 2^7 \equiv 18 \equiv 7, \quad 2^8 \equiv 14 \equiv 3, \quad 2^9 \equiv 6, \quad 2^{10} \equiv 12 \equiv 1.
+\]</p>
+
+<p>把幂值横排出来：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 0.7em;">\(k\)</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(2^k \bmod 11\)</td><td>2</td><td>4</td><td>8</td><td>5</td><td>10</td><td>9</td><td>7</td><td>3</td><td>6</td><td>1</td></tr>
+</table>
+
+<p>把第二行重排升序：\(\{1, 2, 3, 4, 5, 6, 7, 8, 9, 10\}\)——<em>恰好是 \((\mathbb{Z}/11)^* = \{1, 2, \ldots, 10\}\) 这 10 个元素的全部，每个出现且只出现一次</em>。</p>
+
+<p>请你停下来感受这件事。\(2\) 这一个元素，它的连续幂 \(2^1, 2^2, \ldots, 2^{10}\) 把<em>整个</em> \((\mathbb{Z}/11)^*\) 跑了一遍。换句话说，\((\mathbb{Z}/11)^*\) 这个有 10 个元素的群，<em>本质上就是</em> "\(2\) 的幂" 这一族——它有<em>一个</em>能"生成" 全部的元素。</p>
+
+<p>这种元素叫<strong>原根</strong>（primitive root）。\((\mathbb{Z}/11)^*\) 有原根，是这一章主定理的具体化身：<em>\((\mathbb{Z}/p)^*\) 总有原根，即它是<a href="../抽象代数/ch9.html">循环群</a></em>。</p>
+
+<p>朴素先问一句：换个底，会怎样？算 \(3^k \bmod 11\)：</p>
+
+<p>\[
+3, 9, 27 \equiv 5, 15 \equiv 4, 12 \equiv 1, 3, 9, 5, 4, 1, \ldots
+\]</p>
+
+<p>5 步就回到 \(1\)，然后开始重复——周期 5。\(3\) 的幂只跑出 \(\{1, 3, 4, 5, 9\}\) 这 5 个元素，<em>不是</em>原根。再算 \(4^k\)：\(4, 16 \equiv 5, 20 \equiv 9, 36 \equiv 3, 12 \equiv 1, \ldots\)——周期 5，也不是原根。</p>
+
+<p>所以"原根" 不是 \((\mathbb{Z}/p)^*\) 的所有元素都有的属性——是<em>某些特殊</em>元素的属性。哪些？多少个？必然存在吗？这就是本章要回答的事。</p>
+
+<h2 id="sec8-2">8.2 元素的"阶" 与 Lagrange</h2>
+
+<p>把上面看到的"周期" 命名一下。</p>
+
+<p><strong>定义。</strong>设 \(a \in (\mathbb{Z}/n)^*\)。使 \(a^k \equiv 1 \pmod n\) 的<em>最小正整数</em> \(k\) 叫做 \(a\) 的<strong>阶</strong>，记作 \(\operatorname{ord}_n(a)\)。</p>
+
+<p>由 Euler 定理（ch7）我们知道 \(a^{\varphi(n)} \equiv 1\)，所以"使 \(a^k \equiv 1\) 的正 \(k\)" 至少存在一个（即 \(\varphi(n)\)）。最小正者就是阶——它一定 \(\le \varphi(n)\)。</p>
+
+<p>例子（\(n = 11\)，\(\varphi(11) = 10\)）：\(\operatorname{ord}_{11}(2) = 10\)（看上面 \(2^{10}\) 才等于 1）；\(\operatorname{ord}_{11}(3) = 5\)；\(\operatorname{ord}_{11}(10) = ?\)——\(10 \equiv -1\)，所以 \(10^2 \equiv 1\)，阶 2。</p>
+
+<p>记下出现的阶：10, 5, 5, ... 2 ...。注意它们都<em>整除</em> 10。这不是巧合。</p>
+
+<p><strong>引理（阶整除 \(\varphi(n)\)）。</strong>对任何 \(a \in (\mathbb{Z}/n)^*\)，\(\operatorname{ord}_n(a) \mid \varphi(n)\)。更一般，\(a^m \equiv 1 \iff \operatorname{ord}_n(a) \mid m\)。</p>
+
+<p><em>证明。</em>设 \(d = \operatorname{ord}_n(a)\)。把 \(m\) 用 \(d\) 带余除：\(m = q d + r\)，\(0 \le r < d\)。则</p>
+
+<p>\[
+a^m = (a^d)^q \cdot a^r \equiv 1^q \cdot a^r = a^r \pmod n.
+\]</p>
+
+<p>所以 \(a^m \equiv 1 \iff a^r \equiv 1\)。但 \(0 \le r < d\) 而 \(d\) 是<em>最小</em>使 \(a^d \equiv 1\) 的正整数——只有 \(r = 0\) 才能 \(a^r \equiv 1\)。所以 \(d \mid m\)。代入 \(m = \varphi(n)\)（Euler 定理保证 \(a^{\varphi(n)} \equiv 1\)），得 \(d \mid \varphi(n)\)。\(\Box\)</p>
+
+<p>这条引理就是<a href="../抽象代数/ch9.html">抽象代数 ch9</a> Lagrange 定理在 \((\mathbb{Z}/n)^*\) 上的具体化身——子群（这里是 \(\langle a \rangle\)，\(a\) 生成的循环子群，大小恰为 \(\operatorname{ord}_n(a)\)）的阶整除大群的阶。</p>
+
+<p>把 \((\mathbb{Z}/11)^*\) 各元素的阶列出：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 0.7em;">\(a\)</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(\operatorname{ord}_{11}(a)\)</td><td>1</td><td>10</td><td>5</td><td>5</td><td>5</td><td>10</td><td>10</td><td>10</td><td>5</td><td>2</td></tr>
+</table>
+
+<p>所有阶都在 \(\{1, 2, 5, 10\}\) 之中——\(10 = \varphi(11)\) 的因子集恰是这些。\(\checkmark\)</p>
+
+<p>阶为 10 的元素有几个？数一下：\(2, 6, 7, 8\)——4 个。注意 \(\varphi(10) = 4\)。这又不是巧合（见 8.4）。</p>
+
+<h2 id="sec8-3">8.3 原根：阶恰为 \(\varphi(n)\) 的元素</h2>
+
+<p><strong>定义。</strong>\(g \in (\mathbb{Z}/n)^*\) 叫 \((\mathbb{Z}/n)^*\) 的<strong>原根</strong>，如果 \(\operatorname{ord}_n(g) = \varphi(n)\)。</p>
+
+<p>等价说法："\(g\) 的幂 \(g^1, g^2, \ldots, g^{\varphi(n)}\) 跑遍 \((\mathbb{Z}/n)^*\) 全部。" 因为这 \(\varphi(n)\) 个幂彼此不同（否则 \(g^{i} \equiv g^j\) 给出 \(g^{j - i} \equiv 1\) 即 \(\operatorname{ord}_n(g) \le j - i < \varphi(n)\)，矛盾），且都属于这个 \(\varphi(n)\) 元的群——所以填满。</p>
+
+<p>再等价的说法（用 ch9 抽象代数语言）：\(g\) 是原根 \(\iff\) \(\langle g \rangle = (\mathbb{Z}/n)^*\)，即 \((\mathbb{Z}/n)^*\) 是<em>循环群</em>且 \(g\) 是其生成元。</p>
+
+<p>对 \(n = 11\)：原根有 \(\{2, 6, 7, 8\}\) 共 4 个。</p>
+
+<p>对 \(n = 7\)：\(\varphi(7) = 6\)。算阶：\(2^1 = 2, 2^2 = 4, 2^3 = 8 \equiv 1\)——\(\operatorname{ord}_7(2) = 3\)，不是。\(3^1 = 3, 3^2 = 2, 3^3 = 6, 3^4 = 4, 3^5 = 5, 3^6 = 1\)——阶 6，是原根。</p>
+
+<p>对 \(n = 8\)：\(\varphi(8) = 4\)，\((\mathbb{Z}/8)^* = \{1, 3, 5, 7\}\)。算每个的阶：\(3^2 = 9 \equiv 1\)，阶 2；\(5^2 = 25 \equiv 1\)，阶 2；\(7^2 = 49 \equiv 1\)，阶 2。<em>没有元素的阶是 4</em>——\((\mathbb{Z}/8)^*\) 没有原根。</p>
+
+<p>所以原根<em>不是</em>对所有 \(n\) 都存在的。8.5 节会给出"哪些 \(n\) 让 \((\mathbb{Z}/n)^*\) 有原根" 的完整刻画。先去攻最重要的情形：\(n\) 是素数。</p>
+
+<h2 id="sec8-4">8.4 \((\mathbb{Z}/p)^*\) 是循环群</h2>
+
+<p>这一节是本章的核心结果。</p>
+
+<p><strong>定理（原根存在性）。</strong>对每个素数 \(p\)，\((\mathbb{Z}/p)^*\) 至少有一个原根。等价地，\((\mathbb{Z}/p)^*\) 是 \(p - 1\) 阶循环群。</p>
+
+<p>这条定理深得让人吃惊——它说 \(\mathbb{F}_p^*\)（素数模乘法群）不是任意 \(p - 1\) 阶 Abel 群，而是<em>特别简单</em>的循环群。如果你算过几个 \(p\) 的乘法表，会觉得它们看起来"混乱"——可循环结构藏在底下。这条事实是有限域理论的基础（更一般地 \(\mathbb{F}_q^*\) 都是循环的）。</p>
+
+<p><em>证明思路。</em>策略：证 \((\mathbb{Z}/p)^*\) 的<em>每个阶 \(d \mid p - 1\)</em> 上有元素，并精确数出"阶恰为 \(d\) 的元素个数"。</p>
+
+<p>关键引理（来自<a href="../抽象代数/ch12.html">域上多项式</a>）：在域 \(\mathbb{F}_p\) 上，\(d\) 次多项式至多 \(d\) 个根。证明用整除性归纳——若 \(\alpha\) 是根，则 \((x - \alpha)\) 整除多项式，商是 \(d - 1\) 次。</p>
+
+<p>把这条用到 \(x^d - 1\)：在 \(\mathbb{F}_p\) 中至多 \(d\) 个根。</p>
+
+<p>设 \(\psi(d) = \) "\((\mathbb{Z}/p)^*\) 中阶恰为 \(d\) 的元素数"。要证 \(\psi(p - 1) > 0\)。</p>
+
+<p>对 \(d \mid p - 1\)：若 \(\psi(d) > 0\)，取一个阶 \(d\) 的 \(a\)。则 \(a, a^2, \ldots, a^d\) 这 \(d\) 个元素满足 \(x^d \equiv 1\)（因 \((a^k)^d = (a^d)^k = 1\)），且它们彼此不同（否则 \(a\) 阶小于 \(d\)）。由"\(x^d - 1\) 至多 \(d\) 根"，<em>这 \(d\) 个就是全部</em>满足 \(x^d \equiv 1\) 的元素。</p>
+
+<p>而 \(a^k\) 中阶恰为 \(d\) 的，正是那些满足 \(\gcd(k, d) = 1\) 的 \(a^k\)（基本群论）——共 \(\varphi(d)\) 个。所以</p>
+
+<p>\[
+\psi(d) > 0 \implies \psi(d) = \varphi(d).
+\]</p>
+
+<p>另一面：每个元素阶都是 \(p - 1\) 的某个因子，所以</p>
+
+<p>\[
+\sum_{d \mid p - 1} \psi(d) = p - 1.
+\]</p>
+
+<p>而 Gauss 公式（ch7）告诉我们 \(\sum_{d \mid p - 1} \varphi(d) = p - 1\)。</p>
+
+<p>对每个 \(d\)，\(\psi(d)\) 要么 \(= 0\) 要么 \(= \varphi(d)\)。两个和都等于 \(p - 1\)——只有<em>每个</em> \(\psi(d) = \varphi(d)\) 才能让两边相等（因为 \(\psi(d) \le \varphi(d)\) 总成立，少一项就少一些值，凑不齐 \(p - 1\)）。</p>
+
+<p>特别 \(\psi(p - 1) = \varphi(p - 1) > 0\)。所以原根存在，且<em>恰有 \(\varphi(p - 1)\) 个</em>。\(\Box\)</p>
+
+<p>对 \(p = 11\)：原根数 = \(\varphi(10) = 4\)，与上面数到的 \(\{2, 6, 7, 8\}\) 吻合。\(\checkmark\)</p>
+
+<p>这条证明没有给"<em>怎么找到</em>" 原根的算法——只证存在。事实上找原根没有比"<em>挨个试，验阶</em>" 更快的<em>已证</em>算法（Artin 猜想说最小原根 \(O((\log p)^c)\) 但<em>未证</em>）。实践中随机试一下就找到。</p>
+
+<h2 id="sec8-5">8.5 哪些 \(n\) 让 \((\mathbb{Z}/n)^*\) 循环</h2>
+
+<p>8.4 解决了 \(n = p\) 素数。一般 \(n\) 呢？我们已看到 \(n = 8\) 没原根。完整答案 Gauss 给出：</p>
+
+<p><strong>定理（Gauss）。</strong>\((\mathbb{Z}/n)^*\) 是循环群（即 \(n\) 有原根）当且仅当</p>
+
+<p>\[
+\boxed{\ n = 1, 2, 4, p^k, \text{ 或 } 2 p^k\ }
+\]</p>
+
+<p>其中 \(p\) 是奇素数、\(k \ge 1\)。</p>
+
+<p>本书不证此定理（证明要把 8.4 的方法扩展到 \(p^k\)，再用 CRT 处理 \(2 p^k\)；标准代数书里有）。但<em>陈述</em>要记住——它告诉你：</p>
+
+<ul>
+  <li>\(n = 9 = 3^2\)：循环。\(\varphi(9) = 6\)，原根存在。试 \(2\)：\(2^1 = 2, 2^2 = 4, 2^3 = 8, 2^4 = 16 \equiv 7, 2^5 = 14 \equiv 5, 2^6 = 10 \equiv 1\)——阶 6，是原根。\(\checkmark\)</li>
+  <li>\(n = 10 = 2 \cdot 5\)：循环（\(2 p^k\) 形式，\(p = 5\)）。原根存在。\(\varphi(10) = 4\)。试 \(3\)：\(3, 9, 27 \equiv 7, 21 \equiv 1\)——阶 4，是原根。\(\checkmark\)</li>
+  <li>\(n = 12 = 4 \cdot 3\)：<em>不</em>循环（不在列表里）。\(\varphi(12) = 4\)，\((\mathbb{Z}/12)^* = \{1, 5, 7, 11\}\)，每个非 1 元素的平方：\(5^2 = 25 \equiv 1, 7^2 = 49 \equiv 1, 11^2 \equiv 1\)。所有阶 \(\le 2\)，没有阶 4 的——不循环。这个群同构于 \(\mathbb{Z}/2 \times \mathbb{Z}/2\)。</li>
+  <li>\(n = 16 = 2^4\)：<em>不</em>循环（\(n = 2^k\) 仅 \(k \le 2\) 循环）。\(\varphi(16) = 8\)，但最大阶只有 4。同构 \(\mathbb{Z}/2 \times \mathbb{Z}/4\)。</li>
+</ul>
+
+<p>这一节后续我们都<em>只</em>用 \(p\) 素数情形——它最重要，且 8.4 已证。</p>
+
+<h2 id="sec8-6">8.6 离散对数</h2>
+
+<p>固定原根 \(g \in (\mathbb{Z}/p)^*\)。对每个 \(a \in (\mathbb{Z}/p)^*\)，存在<em>唯一</em>的 \(k \in \{0, 1, \ldots, p - 2\}\) 使</p>
+
+<p>\[
+g^k \equiv a \pmod p.
+\]</p>
+
+<p>这个 \(k\) 叫 \(a\)（以 \(g\) 为底）的<strong>离散对数</strong>，记 \(\log_g a\) 或 \(\operatorname{ind}_g a\)（"<em>指数</em>"，indicator）。它的值在 \(\mathbb{Z}/(p - 1)\) 里。</p>
+
+<p>对 \(p = 11, g = 2\)，离散对数表：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 0.7em;">\(a\)</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(\log_2 a \bmod 10\)</td><td>10</td><td>1</td><td>8</td><td>2</td><td>4</td><td>9</td><td>7</td><td>3</td><td>6</td><td>5</td></tr>
+</table>
+
+<p>（\(\log_2 1\) 写 0 也行；这里写 10 因为我们让指数取 \(\{1, \ldots, 10\}\)。）从 8.1 表读：\(2^1 = 2 \implies \log 2 = 1\)；\(2^4 = 5 \implies \log 5 = 4\)；以此类推。</p>
+
+<p>离散对数把 \((\mathbb{Z}/p)^*\) 的<em>乘法</em>变成 \(\mathbb{Z}/(p - 1)\) 的<em>加法</em>：</p>
+
+<p>\[
+\boxed{\ \log_g(a b) \equiv \log_g a + \log_g b \pmod{p - 1}.\ }
+\]</p>
+
+<p>证明一行：\(g^{\log_g a + \log_g b} = g^{\log_g a} \cdot g^{\log_g b} = a \cdot b\)，所以两边的离散对数相等。</p>
+
+<p>这就是个<em>群同构</em></p>
+
+<p>\[
+\log_g \colon (\mathbb{Z}/p)^* \xrightarrow{\sim} \mathbb{Z}/(p - 1).
+\]</p>
+
+<p>左边是乘法群，右边是加法群——离散对数是 8.4 "循环群" 这一抽象事实的<em>显式坐标系</em>。</p>
+
+<p>用处：要算 \(7^{50} \bmod 11\)？查表 \(\log_2 7 = 7\)，所以 \(7 \equiv 2^7\)，\(7^{50} \equiv 2^{350} \equiv 2^{350 \bmod 10} = 2^0 = 1\)。一行得到。普通幂运算变成简单的指数算术。</p>
+
+<h2 id="sec8-7">8.7 离散对数<em>难</em>计算 → 密码学</h2>
+
+<p>关键观察："<em>已知 \(g, k, p\) 算 \(g^k \bmod p\)</em>"<em>容易</em>——快速幂 \(O(\log k)\) 次模乘。</p>
+
+<p>"<em>已知 \(g, a, p\) 算 \(\log_g a\) 即找 \(k\) 使 \(g^k \equiv a\)</em>"<em>难</em>——目前已知最快算法（数域筛法变种）对一般 \(p\) 是<em>亚指数</em> 时间 \(\exp(O((\log p)^{1/3} (\log \log p)^{2/3}))\)。\(p \sim 2^{2048}\) 在普通硬件上要数千核年才能破。</p>
+
+<p>这种"<em>正向容易、反向极难</em>" 的不对称性叫<strong>单向函数</strong>。它是现代密码学的灵魂。</p>
+
+<p>具体应用：<strong>Diffie-Hellman 密钥交换</strong>（1976）。Alice 和 Bob 想在<em>公开信道</em>上协商一个共享密钥（Eve 在窃听）。</p>
+
+<ol>
+<li>双方公开约定大素数 \(p\) 和原根 \(g \in (\mathbb{Z}/p)^*\)。</li>
+<li>Alice 私选 \(a\)，发 \(A = g^a \bmod p\)。</li>
+<li>Bob 私选 \(b\)，发 \(B = g^b \bmod p\)。</li>
+<li>Alice 算 \(K = B^a = g^{ba} \bmod p\)；Bob 算 \(K = A^b = g^{ab} \bmod p\)。两个 \(K\) 相同。</li>
+<li>Eve 看到 \(g, p, A = g^a, B = g^b\)，要算 \(K = g^{ab}\)。她需要从 \(A, g, p\) 反推 \(a\)（或从 \(B\) 反推 \(b\)）——这正是离散对数问题。</li>
+</ol>
+
+<p>整套协议的安全性建立在"<em>离散对数难</em>" 上。\(p\) 取 2048 位以上，今天<em>还</em>安全；Shor 算法（量子）能多项式时间解，所以未来还要换<em>后量子</em> 方案——但那是另一本书的事。</p>
+
+<p>更复杂的：<strong>ElGamal 加密</strong>、<strong>DSA 数字签名</strong>、<strong>椭圆曲线密码</strong>（用椭圆曲线点群代替 \((\mathbb{Z}/p)^*\)）——全部基于"<em>循环群里离散对数难</em>" 这一事实。下一次你打开网银、用 ssh 登服务器、签 PGP 邮件，你就在用一个原根 \(g\) 和它的离散对数难度保护你的信息。本书 ch23 会专门展开一遍密码学的几个核心协议，但底层的"<em>原根 + 离散对数</em>" 这个数学工件你已经在这一章握在手里了。</p>
+
+<p>请你停下来感受这件事的<em>分量</em>。Gauss 1801 年证 \((\mathbb{Z}/p)^*\) 循环时，没人想到 175 年后它会变成全球互联网安全的基石。Diffie 和 Hellman 1976 年的论文里，那个 "<em>循环群 + 难逆元素</em>" 的设置就是 8.4 这条定理的直接应用。<em>纯数学的"无用" 的东西，常常是几代之后整个社会运转的基础</em>——这是数论一个反复出现的故事。我们在<a href="../数值方法/ch23.html">数值方法 ch23</a> 里看大整数运算（让 \(p \sim 2^{2048}\) 的运算可行）也是同一故事的另一面。</p>
+
+<h2 id="sec8-8">8.8 一句临别话</h2>
+
+<p>这一章把 \((\mathbb{Z}/p)^*\) 的"<em>结构</em>" 钉死了：它是循环的。这件事在 ch7 之前看起来无所谓——那时候 \((\mathbb{Z}/p)^*\) 只是一个加法的"<em>剩余系</em>"。从 ch7 引入乘法群结构开始，到这里第一次看到它的<em>完整形状</em>——一根线（循环群），由原根那头牵出。</p>
+
+<p>下一章用同一根线问一个看似无关的问题：\((\mathbb{Z}/p)^*\) 里<em>哪些</em>元素是<em>平方数</em>？答案竟然恰好是<em>偶数下标</em>的那一半（在原根坐标系下）——这种几何上的简单告诉我们一个完全独立的强工具：<em>Legendre 符号</em>。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 Euler 函数与 Euler 定理</a><a href="ch9.html">下一章 · 第 9 章 二次剩余与 Legendre 符号 →</a></nav>
+</main>
+</body>
+</html>

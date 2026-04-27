@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 14 章 算术函数与 Möbius 反演 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 高斯整数</a><a href="ch15.html">下一章 · 第 15 章 Dirichlet 卷积与 L-级数引入 →</a></nav>
+<h1 id="ch14">第 14 章 算术函数与 Möbius 反演</h1>
+
+<p>请你算一道：\(\sigma(12) = ?\) 这里 \(\sigma(n)\) 是 \(n\) 的所有<em>正</em> 因子的和。</p>
+
+<p>你大概会这么做：列出 \(12\) 的因子\(\{1, 2, 3, 4, 6, 12\}\)，加起来 \(28\)。没毛病。</p>
+
+<p>现在请你算 \(\sigma(720)\)。\(720\) 的因子有 30 个——你愿意一个一个列吗？要是 \(\sigma(720000)\) 呢？</p>
+
+<p>本章要做的事是：找一条公式，让你不用列因子就能直接算 \(\sigma\)。同样的办法对 \(\varphi\)（Euler 函数，<a href="ch7.html">ch7</a> 介绍过）、\(d\)（因子个数）也奏效。背后那条结构性原理叫"<em>积性</em>"——一旦你知道它是积性的，整个函数被它在<em>素幂</em> 上的值完全决定，剩下的全靠素分解。</p>
+
+<p>本章末尾我们还会进入<em>Möbius 反演</em>——一种"<em>把求和颠倒过来</em>" 的代数技巧，让你能从"<em>$\sum_{d|n} f(d) = g(n)$</em>" 这种关系反推 \(f\)。它会成为下一章 Dirichlet 卷积的引子。</p>
+
+<h2 id="sec14-1">14.1 几个老熟人：\(\varphi, d, \sigma, \mu\)</h2>
+
+<p>所有从正整数到复数（或整数）的函数 \(f : \mathbb{Z}_{> 0} \to \mathbb{C}\) 都叫<em>算术函数</em>。这个定义宽得没什么内容——任何只在正整数上定义的东西都算。真正有意思的是几个跟整除性有关的算术函数。</p>
+
+<p>下面这四个是数论里出场频率最高的：</p>
+
+<p><strong>(1) Euler 函数 \(\varphi(n)\)</strong>：\(1 \le k \le n\) 中与 \(n\) 互素的 \(k\) 的个数。<a href="ch7.html">ch7</a> 已介绍过。</p>
+
+<p>\[
+\varphi(1) = 1,\ \varphi(2) = 1,\ \varphi(3) = 2,\ \varphi(4) = 2,\ \varphi(5) = 4,\ \varphi(6) = 2,\ \varphi(7) = 6,\ \varphi(8) = 4,\ \varphi(9) = 6,\ \varphi(10) = 4.
+\]</p>
+
+<p><strong>(2) 因子个数 \(d(n)\)</strong>（也写 \(\tau(n)\)）：\(n\) 的正因子个数。</p>
+
+<p>\[
+d(1) = 1,\ d(2) = 2,\ d(3) = 2,\ d(4) = 3,\ d(5) = 2,\ d(6) = 4,\ d(7) = 2,\ d(8) = 4,\ d(9) = 3,\ d(10) = 4.
+\]</p>
+
+<p><strong>(3) 因子和 \(\sigma(n)\)</strong>：\(n\) 的正因子之和（开篇那一个）。</p>
+
+<p>\[
+\sigma(1) = 1,\ \sigma(2) = 3,\ \sigma(3) = 4,\ \sigma(4) = 7,\ \sigma(5) = 6,\ \sigma(6) = 12,\ \sigma(7) = 8,\ \sigma(8) = 15,\ \sigma(9) = 13,\ \sigma(10) = 18.
+\]</p>
+
+<p><strong>(4) Möbius 函数 \(\mu(n)\)</strong>：</p>
+
+<p>\[
+\mu(n) = \begin{cases}
+1 & n = 1, \\
+(-1)^k & n \text{ 是 } k \text{ 个不同素数之积}, \\
+0 & n \text{ 含有平方因子（即某素数 } p \text{ 使 } p^2 \mid n\text{）}.
+\end{cases}
+\]</p>
+
+<p>例：\(\mu(1) = 1\)，\(\mu(2) = \mu(3) = \mu(5) = -1\)（一个素），\(\mu(6) = \mu(2 \cdot 3) = 1\)（两素），\(\mu(30) = \mu(2 \cdot 3 \cdot 5) = -1\)（三素），\(\mu(4) = 0\)（含 \(2^2\)），\(\mu(12) = 0\)（含 \(2^2\)）。</p>
+
+<p>\[
+\mu(1) = 1,\ \mu(2) = -1,\ \mu(3) = -1,\ \mu(4) = 0,\ \mu(5) = -1,\ \mu(6) = 1,\ \mu(7) = -1,\ \mu(8) = 0,\ \mu(9) = 0,\ \mu(10) = 1.
+\]</p>
+
+<p>这第四个看着古怪——为什么这么定义？请你先记住它，等到 14.5 节它会成为整章的锁眼。</p>
+
+<h2 id="sec14-2">14.2 一个意外巧合：积性</h2>
+
+<p>开篇我说 \(\sigma(12) = \sigma(4) \cdot \sigma(3)\)。检验：\(\sigma(4) = 7\)，\(\sigma(3) = 4\)，\(7 \cdot 4 = 28 = \sigma(12)\)。\(\checkmark\)</p>
+
+<p>巧合？再试 \(\sigma(15) = \sigma(3) \cdot \sigma(5)\)？\(\sigma(15) = 1 + 3 + 5 + 15 = 24\)；\(\sigma(3) \cdot \sigma(5) = 4 \cdot 6 = 24\)。\(\checkmark\)</p>
+
+<p>但 \(\sigma(8) = \sigma(4) \cdot \sigma(2)\) 吗？\(\sigma(8) = 1 + 2 + 4 + 8 = 15\)；\(\sigma(4) \cdot \sigma(2) = 7 \cdot 3 = 21\)。<em>不对</em>。</p>
+
+<p>为什么 \(\sigma(12) = \sigma(4) \sigma(3)\) 行、\(\sigma(8) = \sigma(4) \sigma(2)\) 不行？看 \(\gcd\)。\(\gcd(4, 3) = 1\)（互素），\(\gcd(4, 2) = 2 \ne 1\)（非互素）。</p>
+
+<p>所以猜测是：</p>
+
+<p>\[\boxed{\ f(mn) = f(m) f(n), \quad \text{whenever } \gcd(m, n) = 1.\ }\]</p>
+
+<p>满足这条性质的算术函数 \(f\) 叫<em>积性函数</em>。注意必须 \(f(1) = 1\)（取 \(m = n = 1\)），否则 \(f \equiv 0\) 也满足条件，没意思。</p>
+
+<p>积性函数为什么有用？因为整数都能写成<em>互素</em>素幂之积：\(n = p_1^{a_1} p_2^{a_2} \cdots p_r^{a_r}\)，每两个 \(p_i^{a_i}\) 之间互素。所以</p>
+
+<p>\[
+f(n) = f(p_1^{a_1}) f(p_2^{a_2}) \cdots f(p_r^{a_r}).
+\]</p>
+
+<p>知道 \(f\) 在所有素幂上的值，就完全知道 \(f\)。要算 \(f(720000) = f(2^7 \cdot 3^2 \cdot 5^4)\) 不需要列因子，只需要 \(f(2^7), f(3^2), f(5^4)\)。这是个巨大的简化。</p>
+
+<p>剩下两个问题：(a) 14.1 那四个 \(\varphi, d, \sigma, \mu\) 真都是积性的吗？(b) 它们在素幂 \(p^k\) 上的公式是什么？</p>
+
+<h2 id="sec14-3">14.3 \(\varphi, d, \sigma, \mu\) 都是积性的</h2>
+
+<p>我们一个一个验。</p>
+
+<p><strong>\(\mu\) 积性</strong>：直接验。设 \(\gcd(m, n) = 1\)。如果 \(m\) 或 \(n\) 含平方因子，那 \(mn\) 也含，三方都给 0，等式成立。如果 \(m, n\) 都无平方因子，写 \(m = p_1 \cdots p_a\)（\(a\) 个不同素数），\(n = q_1 \cdots q_b\)（\(b\) 个不同素数）；由互素，\(p_i\) 跟 \(q_j\) 都不重，所以 \(mn = p_1 \cdots p_a q_1 \cdots q_b\) 是 \(a + b\) 个不同素数之积。\(\mu(m) \mu(n) = (-1)^a (-1)^b = (-1)^{a + b} = \mu(mn)\)。\(\checkmark\)</p>
+
+<p><strong>\(d\) 积性</strong>：\(\gcd(m, n) = 1\) 时，\(mn\) 的每个因子能<em>唯一</em> 写成 \(d_m d_n\)，其中 \(d_m \mid m, d_n \mid n\)（这条用算术基本定理 + 互素，请你自己想一下为什么"唯一"——提示：把 \(m, n\) 的素分解写出来，对每个素 \(p\) 看 \(d_m d_n\) 里 \(p\) 的指数能怎么分）。所以 \(mn\) 的因子和 "\(m\) 的因子 \(\times\) \(n\) 的因子" 一一对应；个数相乘：\(d(mn) = d(m) d(n)\)。\(\checkmark\)</p>
+
+<p><strong>\(\sigma\) 积性</strong>：同样的对应。\(mn\) 的因子 \(d_m d_n\) 的和是</p>
+
+<p>\[
+\sigma(mn) = \sum_{d_m | m,\ d_n | n} d_m d_n = \Big(\sum_{d_m | m} d_m\Big) \Big(\sum_{d_n | n} d_n\Big) = \sigma(m) \sigma(n).
+\]</p>
+
+<p>第一步用一一对应（\(\gcd(m, n) = 1\) 必需），第二步是把求和"<em>分配</em>"——这是高中代数恒等式 \((\sum a_i)(\sum b_j) = \sum_{i, j} a_i b_j\) 的反向。\(\checkmark\)</p>
+
+<p><strong>\(\varphi\) 积性</strong>：这一条最深。设 \(\gcd(m, n) = 1\)。要证 \(\varphi(mn) = \varphi(m) \varphi(n)\)。</p>
+
+<p>方法：用<a href="ch9.html">中国剩余定理（ch9）</a>。CRT 给环同构 \(\mathbb{Z}/(mn) \cong \mathbb{Z}/m \times \mathbb{Z}/n\)。这个同构把可逆元映到可逆元（同构都这样）。所以 \((\mathbb{Z}/(mn))^\times \cong (\mathbb{Z}/m)^\times \times (\mathbb{Z}/n)^\times\)。两边数元素：左边 \(|(\mathbb{Z}/(mn))^\times| = \varphi(mn)\)，右边 \(\varphi(m) \cdot \varphi(n)\)。\(\checkmark\)</p>
+
+<p>请你停下来感受一件事。\(\varphi\) 的积性不是组合恒等式碰巧成立，是<em>代数同构的影子</em>。"<em>$\varphi(mn) = \varphi(m) \varphi(n)$ 当 $\gcd(m, n) = 1$</em>" 这条数论事实，等价于"<em>$(\mathbb{Z}/(mn))^\times$ 在两素互素时分裂成 $(\mathbb{Z}/m)^\times \times (\mathbb{Z}/n)^\times$</em>" 这条群论事实。同一个事实，两层意义。这种"<em>数论函数恒等式 = 某代数对象的结构事实</em>" 是本章接下去 ch15 的核心精神。</p>
+
+<h2 id="sec14-4">14.4 算积性函数：素幂公式</h2>
+
+<p>知道积性后，剩下的事就是算 \(f(p^k)\)。</p>
+
+<p><strong>\(d(p^k)\)</strong>：\(p^k\) 的因子是 \(1, p, p^2, \ldots, p^k\)，共 \(k + 1\) 个。\(d(p^k) = k + 1\)。</p>
+
+<p>对一般 \(n = p_1^{a_1} \cdots p_r^{a_r}\)：</p>
+
+<p>\[
+d(n) = (a_1 + 1)(a_2 + 1) \cdots (a_r + 1).
+\]</p>
+
+<p>例：\(d(720) = d(2^4 \cdot 3^2 \cdot 5) = 5 \cdot 3 \cdot 2 = 30\)。一秒算出。</p>
+
+<p><strong>\(\sigma(p^k)\)</strong>：</p>
+
+<p>\[
+\sigma(p^k) = 1 + p + p^2 + \cdots + p^k = \frac{p^{k + 1} - 1}{p - 1}.
+\]</p>
+
+<p>（等比级数公式。\(p \ne 1\) 永远成立因为 \(p\) 是素数 \(\ge 2\)。）</p>
+
+<p>例：\(\sigma(720) = \sigma(2^4) \sigma(3^2) \sigma(5) = \frac{31}{1} \cdot \frac{26}{2} \cdot \frac{24}{4} = 31 \cdot 13 \cdot 6 = 2418\)。</p>
+
+<p><strong>\(\varphi(p^k)\)</strong>：\(1, 2, \ldots, p^k\) 里跟 \(p^k\) 不互素的就是 \(p\) 的倍数：\(p, 2p, 3p, \ldots, p^{k - 1} \cdot p\)，共 \(p^{k - 1}\) 个。所以</p>
+
+<p>\[
+\varphi(p^k) = p^k - p^{k - 1} = p^{k - 1}(p - 1) = p^k (1 - 1/p).
+\]</p>
+
+<p>对一般 \(n\)：</p>
+
+<p>\[
+\varphi(n) = n \prod_{p | n} (1 - 1/p).
+\]</p>
+
+<p>例：\(\varphi(720) = 720 \cdot (1 - 1/2)(1 - 1/3)(1 - 1/5) = 720 \cdot \frac{1}{2} \cdot \frac{2}{3} \cdot \frac{4}{5} = 192\)。</p>
+
+<p><strong>\(\mu(p^k)\)</strong>：\(\mu(p) = -1\)，\(\mu(p^k) = 0\) 对 \(k \ge 2\)。所以 \(\mu(n) \ne 0\) 当且仅当 \(n\) 无平方因子，那时 \(\mu(n) = (-1)^{\omega(n)}\)，\(\omega(n)\) 是 \(n\) 的不同素因子个数。</p>
+
+<p>四个公式总结：</p>
+
+<p>\[
+\boxed{
+\begin{array}{l}
+d(p^k) = k + 1 \\
+\sigma(p^k) = (p^{k + 1} - 1)/(p - 1) \\
+\varphi(p^k) = p^{k - 1}(p - 1) \\
+\mu(p^k) = -1\ (k = 1),\ 0\ (k \ge 2)
+\end{array}
+}
+\]</p>
+
+<p>有了这四条 + 积性，你能在脑子里算几乎任何中等大小整数的 \(d, \sigma, \varphi, \mu\)。</p>
+
+<h2 id="sec14-5">14.5 \(\mu\) 的关键性质</h2>
+
+<p>\(\mu\) 长得最古怪——为什么这么定义？答案在下面这条恒等式：</p>
+
+<p>\[\boxed{\ \sum_{d | n} \mu(d) = \begin{cases} 1, & n = 1 \\ 0, & n > 1. \end{cases}\ }\]</p>
+
+<p>右边可以缩写成 \([n = 1]\)（Iverson 括号：条件成立返 1，否则 0）。</p>
+
+<p>这条恒等式叫 \(\mu\) 的<em>反演关系</em>，它是整章后半的引擎。先让我们验证再证明。</p>
+
+<p><strong>验证 \(n = 12\)</strong>：\(12\) 的因子 \(1, 2, 3, 4, 6, 12\)。\(\mu\) 值：\(1, -1, -1, 0, 1, 0\)。和：\(1 - 1 - 1 + 0 + 1 + 0 = 0\)。\(\checkmark\)</p>
+
+<p><strong>验证 \(n = 30\)</strong>：因子 \(1, 2, 3, 5, 6, 10, 15, 30\)。\(\mu\) 值 \(1, -1, -1, -1, 1, 1, 1, -1\)。和 \(0\)。\(\checkmark\)</p>
+
+<p><strong>证明</strong>：让 \(F(n) = \sum_{d | n} \mu(d)\)。\(F(1) = \mu(1) = 1\)，对。</p>
+
+<p>\(\mu\) 积性意味着 \(F\) 也积性（请你想一下：因子和在积性输入下保持积性——更细节见 14.6 节的引理）。所以 \(F(n) = \prod_{p^a \| n} F(p^a)\)（\(p^a \| n\) 表示 \(p^a \mid n\) 但 \(p^{a + 1} \nmid n\)，即"<em>$p$ 在 $n$ 里的最高幂</em>"）。</p>
+
+<p>算 \(F(p^a)\)（\(a \ge 1\)）：\(p^a\) 的因子 \(1, p, p^2, \ldots, p^a\)。\(\mu\) 值 \(1, -1, 0, 0, \ldots, 0\)。和 \(1 - 1 + 0 + \cdots + 0 = 0\)。</p>
+
+<p>所以 \(F(n) = \prod_p 0 = 0\) 一旦 \(n > 1\)（至少一个素因子，那个 \(F(p^a) = 0\) 把整个积压成 0）。\(\checkmark\)</p>
+
+<p>这条恒等式的意思是：\(\mu(d)\) 在因子上的<em>分布</em> 设计得"<em>大部分情况下加和为零</em>"——它是为了"<em>抵消</em>" 而设计的函数。它在反演公式里就是用这种抵消能力把和翻转过来。</p>
+
+<h2 id="sec14-6">14.6 Möbius 反演公式</h2>
+
+<p>这是本章中心结果。</p>
+
+<p><strong>定理（Möbius 反演）</strong>：设 \(f, g\) 是算术函数。下面两条等价：</p>
+
+<p>\[
+g(n) = \sum_{d | n} f(d) \quad \forall n \ge 1
+\quad \iff \quad
+f(n) = \sum_{d | n} \mu(d) g(n/d) \quad \forall n \ge 1.
+\]</p>
+
+<p>翻译：如果你能把 \(g\) 写成"\(f\) 在因子上的求和"，你能<em>反过来</em> 用 \(\mu\) 把 \(f\) 用 \(g\) 表达。</p>
+
+<p>这是<em>数论里的"求导 / 积分"</em> 类比——一对互逆的运算，反演公式是反函数。</p>
+
+<p><strong>证明 \((\Rightarrow)\)</strong>：假设 \(g(n) = \sum_{d | n} f(d)\)。代入右边：</p>
+
+<p>\[
+\sum_{d | n} \mu(d) g(n/d) = \sum_{d | n} \mu(d) \sum_{e | n/d} f(e).
+\]</p>
+
+<p>把内外两个求和换序。为此先看双重求和的范围：\(d \mid n\) 且 \(e \mid n/d\)。后者等价于 \(de \mid n\)。所以双重和是对所有满足 \(de \mid n\) 的 \((d, e)\) 对求。换序后让 \(e\) 走外、\(d\) 走内：</p>
+
+<p>\[
+\sum_{d | n} \mu(d) \sum_{e | n/d} f(e) = \sum_{e | n} f(e) \sum_{d | n/e} \mu(d).
+\]</p>
+
+<p>（外面让 \(e\) 跑 \(n\) 的因子；给定 \(e\)，内部 \(d\) 必须满足 \(de \mid n\) 即 \(d \mid n/e\)。）</p>
+
+<p>但 14.5 节告诉我们 \(\sum_{d | m} \mu(d) = [m = 1]\)。所以</p>
+
+<p>\[
+\sum_{d | n/e} \mu(d) = [n/e = 1] = [e = n].
+\]</p>
+
+<p>这条 Iverson 把外求和缩成只剩 \(e = n\) 一项：</p>
+
+<p>\[
+\sum_{e | n} f(e) [e = n] = f(n).
+\]</p>
+
+<p>所以 \(\sum_{d | n} \mu(d) g(n/d) = f(n)\)。\(\checkmark\)</p>
+
+<p><strong>证明 \((\Leftarrow)\)</strong>：假设 \(f(n) = \sum_{d | n} \mu(d) g(n/d)\)。要算 \(\sum_{d | n} f(d)\)。同样换序：</p>
+
+<p>\[
+\sum_{d | n} f(d) = \sum_{d | n} \sum_{e | d} \mu(e) g(d/e).
+\]</p>
+
+<p>令 \(d = ek\)（即 \(k = d/e\)），换序后 \((e, k)\) 满足 \(ek \mid n\)：</p>
+
+<p>\[
+\sum_{e, k:\ ek | n} \mu(e) g(k) = \sum_{k | n} g(k) \sum_{e | n/k} \mu(e) = \sum_{k | n} g(k) [n/k = 1] = g(n). \checkmark
+\]</p>
+
+<p>请你停下来欣赏一下这条证明的精神。两边的关键步骤都是<em>同一招</em>——把 \(\sum \mu\) 那一坨当成 Iverson \([\cdot = 1]\) 用，把双求和压成单和。\(\mu\) 这个看似古怪的函数，实际上就是为了在双求和换序后塌缩成单和而存在的。<em>"\(\mu\) 是反演公式的反函数核"</em>——这条话听上去抽象，14.5 + 14.6 这两节是它的具体内容。</p>
+
+<p><strong>14.6 附注：积性函数的因子求和</strong>。证明里隐含一条：如果 \(f\) 积性，那么 \(g(n) = \sum_{d | n} f(d)\) 也积性。证明：设 \(\gcd(m, n) = 1\)，</p>
+
+<p>\[
+g(mn) = \sum_{d | mn} f(d) = \sum_{d_m | m,\ d_n | n} f(d_m d_n) = \sum_{d_m | m} \sum_{d_n | n} f(d_m) f(d_n) = g(m) g(n).
+\]</p>
+
+<p>（用因子的一一对应 \(d \mapsto (d_m, d_n)\)、\(f\) 积性、求和分配三步。）这条配合 Möbius 反演让我们能在很多场合从 \(g\) 反推出 \(f\) 是积性，再用 14.4 节素幂公式秒杀。</p>
+
+<h2 id="sec14-7">14.7 应用一：从 \(\sum_{d | n} \varphi(d) = n\) 反推 \(\varphi\) 公式</h2>
+
+<p>有一条出名的恒等式：</p>
+
+<p>\[\boxed{\ \sum_{d | n} \varphi(d) = n.\ }\]</p>
+
+<p>意思：所有因子的 \(\varphi\) 值加起来正好等于 \(n\)。</p>
+
+<p>验证 \(n = 12\)：因子 \(1, 2, 3, 4, 6, 12\)；\(\varphi\) 值 \(1, 1, 2, 2, 2, 4\)；和 \(12\)。\(\checkmark\)</p>
+
+<p><strong>这条恒等式怎么证</strong>？组合证法：把 \(\{1, 2, \ldots, n\}\) 按"\(\gcd(k, n) = ?\)" 分类。每个 \(k\) 的 \(\gcd(k, n)\) 是某个因子 \(d \mid n\)。\(\gcd(k, n) = d\) 等价于 \(k = d \cdot k'\) 且 \(\gcd(k', n/d) = 1\)（请你想一下——把 \(d\) 提出来后剩下的部分必须跟 \(n/d\) 互素）。所以满足 \(\gcd(k, n) = d\) 的 \(k\) 的个数 = \(\varphi(n/d)\)。求和：</p>
+
+<p>\[
+n = \sum_{d | n} \varphi(n/d) = \sum_{d | n} \varphi(d).
+\]</p>
+
+<p>（最后一步用 \(d \mapsto n/d\) 是因子的对合——把 \(d\) 改名 \(n/d\)，求和不变。）\(\checkmark\)</p>
+
+<p><strong>用反演反推 \(\varphi\) 公式</strong>。把恒等式写成 \(g = \mathrm{id}\)（恒等函数 \(\mathrm{id}(n) = n\)）和 \(f = \varphi\)：</p>
+
+<p>\[
+g(n) = n = \sum_{d | n} \varphi(d) = \sum_{d | n} f(d).
+\]</p>
+
+<p>Möbius 反演：</p>
+
+<p>\[
+\varphi(n) = \sum_{d | n} \mu(d) \cdot \frac{n}{d} = n \sum_{d | n} \frac{\mu(d)}{d}.
+\]</p>
+
+<p>右边是个对因子的和。我们能用积性把它算出来。\(F(n) = \sum_{d | n} \mu(d)/d\) 是积性的（\(\mu\) 是、\(1/d\) 在卷积下也是——14.6 附注），所以</p>
+
+<p>\[
+F(n) = \prod_{p | n} F(p^a) = \prod_{p | n} \Big(1 + \frac{\mu(p)}{p} + \frac{\mu(p^2)}{p^2} + \cdots\Big) = \prod_{p | n} \Big(1 - \frac{1}{p}\Big).
+\]</p>
+
+<p>（中间项 \(\mu(p^k) = 0\) 都死掉，只剩 \(1\) 和 \(\mu(p)/p = -1/p\)。）</p>
+
+<p>所以</p>
+
+<p>\[
+\varphi(n) = n \prod_{p | n} (1 - 1/p).
+\]</p>
+
+<p>这跟 14.4 节给的公式一模一样——但<em>来路完全不同</em>。14.4 是用 \(\varphi\) 在素幂上的直接计数 + 积性；这里是从一条求和恒等式 + Möbius 反演反推。<em>同一个公式，两条独立路线，互相验证</em>。这种"<em>从不同方向得到同一结果</em>" 在数学里叫"<em>结构刚性</em>"——它告诉你这条公式不是偶然，是某种结构的必然影子。</p>
+
+<h2 id="sec14-8">14.8 应用二：模反演求其它和</h2>
+
+<p>反演的力量在于，只要你能把一个数论函数写成"<em>$\sum_{d | n} (\text{某东西})$</em>" 的形式，你就能反过来。再举一个例子。</p>
+
+<p><strong>问题</strong>：找一条公式，让 \(\sum_{d | n} \mu(d)/d = ?\)（已经在 14.7 节算过 = \(\prod (1 - 1/p)\)，但我们换一种角度看）。</p>
+
+<p>实际上，14.7 推出 \(\varphi(n)/n = \sum_{d | n} \mu(d)/d\)。这是一条独立有用的恒等式：</p>
+
+<p>\[
+\frac{\varphi(n)}{n} = \sum_{d | n} \frac{\mu(d)}{d}.
+\]</p>
+
+<p><strong>另一个例子</strong>：用反演推 \(\sigma\) 的公式。\(\sigma\) 是因子和：\(\sigma(n) = \sum_{d | n} d\)。这本身就是 \(g(n) = \sigma(n)\) 跟 \(f(n) = n\) 的关系 \(g(n) = \sum_{d | n} f(d)\)。Möbius 反演给</p>
+
+<p>\[
+n = \sum_{d | n} \mu(d) \sigma(n/d).
+\]</p>
+
+<p>这条恒等式一开始看上去没什么用——它表达的是"<em>恒等函数</em>" \(n\) 用 \(\sigma\) 表达。但它恰好是把"<em>因子和</em>" 关系颠倒——一个例子：</p>
+
+<p>\[
+n = 12: \quad \sum_{d | 12} \mu(d) \sigma(12/d) = \mu(1) \sigma(12) + \mu(2) \sigma(6) + \mu(3) \sigma(4) + \mu(4) \sigma(3) + \mu(6) \sigma(2) + \mu(12) \sigma(1).
+\]</p>
+
+<p>\[
+= 28 - 12 - 7 + 0 + 3 + 0 = 12.
+\]</p>
+
+<p>\(\checkmark\) 神奇地落回 12。</p>
+
+<p><strong>更深的例子（应用于素数计数）</strong>：定义 \(\Lambda(n) = \log p\) if \(n = p^k\)（\(k \ge 1\)），否则 \(0\)。这叫 von Mangoldt 函数。</p>
+
+<p>关键恒等式（请你接受，证明在 ch16 用）：</p>
+
+<p>\[
+\sum_{d | n} \Lambda(d) = \log n.
+\]</p>
+
+<p>Möbius 反演：</p>
+
+<p>\[
+\Lambda(n) = \sum_{d | n} \mu(d) \log(n/d) = -\sum_{d | n} \mu(d) \log d.
+\]</p>
+
+<p>（用 \(\log(n/d) = \log n - \log d\) 和 \(\sum_{d | n} \mu(d) = [n = 1]\) 让 \(\log n\) 项消失。）</p>
+
+<p>这条恒等式让 \(\Lambda\) 用 \(\mu, \log\) 写成显式公式，是 ch16 证素数定理的关键引子之一。<em>反演把"求和约束" 变成"显式公式"——这就是它的工作方式</em>。</p>
+
+<h2 id="sec14-9">14.9 一句临别话</h2>
+
+<p>本章做了两件事。</p>
+
+<p>第一件事：把 \(\varphi, d, \sigma, \mu\) 这四个常见算术函数收成一个家族，发现它们共享"<em>积性</em>" 这条结构。一旦积性，整个函数被它在素幂上的值决定，跟"算术基本定理" 配合让计算变 \(O(\log n)\) 而非 \(O(n)\)。</p>
+
+<p>第二件事：发现 \(\mu\) 是为了"<em>反演</em>" 而生的——\(\sum_{d | n} \mu(d) = [n = 1]\) 让任何"<em>$g(n) = \sum_{d | n} f(d)$</em>" 关系能反过来 "\(f(n) = \sum_{d | n} \mu(d) g(n/d)\)"。</p>
+
+<p>这两件事看上去是两个独立的故事——"积性" 是结构，"Möbius 反演" 是技巧。但下一章你会看到它们其实是<em>同一件事的两面</em>：把算术函数当成<em>代数对象</em>，"<em>因子求和</em>" 是它们之间的一个<em>乘积</em>（叫 Dirichlet 卷积），\(\mu\) 是某个特定函数的<em>逆元</em>，反演公式不过是"<em>用逆元解方程</em>"。整个 14 章会被装进一行代数：\(\mu * 1 = \delta\)。</p>
+
+<p>这种"<em>把一组数论事实重铸成一行代数</em>" 是 19-20 世纪数论最有特色的发明。下一章 (ch15) 它会让我们更进一步——把 Dirichlet 卷积变成 Dirichlet 级数的<em>乘法</em>，进而把数论问题翻译成<em>复函数问题</em>，铺好通往 Riemann \(\zeta\) 和 \(L\)-函数的路。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 高斯整数</a><a href="ch15.html">下一章 · 第 15 章 Dirichlet 卷积与 L-级数引入 →</a></nav>
+</main>
+</body>
+</html>

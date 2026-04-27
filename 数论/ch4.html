@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 算术基本定理 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 素数：定义、Euclid 无穷性、素数定理</a><a href="ch5.html">下一章 · 第 5 章 同余、Fermat 与 Euler →</a></nav>
+<h1 id="ch4">第 4 章 算术基本定理</h1>
+
+<p>请你做这道试验：把 60 写成素数的乘积。</p>
+
+<p>\(60 = 2 \cdot 30 = 2 \cdot 2 \cdot 15 = 2 \cdot 2 \cdot 3 \cdot 5 = 2^2 \cdot 3 \cdot 5\)。</p>
+
+<p>试着<em>找另一种</em> 素分解。</p>
+
+<p>\(60 = 4 \cdot 15 = 2^2 \cdot 15 = 2^2 \cdot 3 \cdot 5\)——同一个。</p>
+
+<p>\(60 = 6 \cdot 10 = (2 \cdot 3)(2 \cdot 5) = 2^2 \cdot 3 \cdot 5\)——同一个。</p>
+
+<p>\(60 = 12 \cdot 5 = 2^2 \cdot 3 \cdot 5\)——同一个。</p>
+
+<p>无论你<em>怎么</em> 拆，得到的素数集合都是 \(\{2, 2, 3, 5\}\)。这就是<em>算术基本定理</em>（Fundamental Theorem of Arithmetic, FTA）：每个 \(\ge 2\) 整数有<em>本质唯一</em> 的素分解。</p>
+
+<p>"<em>本质唯一</em>" 里的"<em>本质</em>" 是允许调整<em>因子顺序</em>。\(2 \cdot 2 \cdot 3 \cdot 5\) 和 \(5 \cdot 3 \cdot 2 \cdot 2\) 是"<em>同一个</em>" 分解。但<em>素因子集合（含重数）</em> 不能换。</p>
+
+<p>看似不证自明。"<em>当然唯一啊，60 就是 60</em>"。但请你停下来想：<em>"唯一" 这件事真不显然</em>。"<em>存在</em> 至少一种素分解" 容易（递归地把合数拆开）。但"<em>所有方式都给同一个结果</em>" 呢？这是个<em>结构性</em> 命题——它说"<em>整数环 \(\mathbb{Z}\) 在乘法层面有刚性结构</em>"。</p>
+
+<p>这一章我们要做两件事：(1) 证明 FTA。(2) 给出反例——某些"<em>看起来像整数</em>" 的环里，FTA <em>失效</em>。看了反例你才会真正相信 FTA 是<em>非平凡</em> 的事实。</p>
+
+<h2 id="sec4-1">4.1 朴素：60 找不到反例</h2>
+
+<p>从 60 这个具体例开始。我们已经看到所有"<em>把 60 拆成素数乘积</em>" 的方式都给同一集合 \(\{2, 2, 3, 5\}\)。让我们想一下<em>为什么</em>。</p>
+
+<p>假设有两种分解：\(60 = p_1 p_2 \cdots p_r = q_1 q_2 \cdots q_s\)。我要证 \(\{p_i\} = \{q_j\}\)（含重数集合）。</p>
+
+<p>从左边知 \(p_1 \mid 60\)。由右边 \(60 = q_1 q_2 \cdots q_s\)，<em>是不是必有某个 \(q_j\) = \(p_1\)</em>？</p>
+
+<p>这是关键步骤。如果是，把这个 \(q_j\) 抵消掉，对 \(60 / p_1 = 30\) 重复同一论证，归纳完成。</p>
+
+<p>所以问题归到："<em>若 \(p\) 是素数且 \(p \mid q_1 q_2 \cdots q_s\)（每个 \(q_j\) 也是素数），那么 \(p\) 必等于某个 \(q_j\)</em>"——这条事实叫<em>Euclid 引理</em>，是 FTA 的核心。</p>
+
+<p>更一般的版本：</p>
+
+<p><strong>Euclid 引理。</strong>若 \(p\) 素数且 \(p \mid ab\)（\(a, b \in \mathbb{Z}\)），则 \(p \mid a\) 或 \(p \mid b\)。</p>
+
+<p>"<em>素数能从乘积里穿出来</em>"。这条把 FTA 的唯一性化简成了一道关于"<em>整除穿越乘积</em>" 的问题。Euclid 引理本身怎么证？我们用 ch2 的 Bezout 等式。</p>
+
+<p>但<em>在</em> 证 Euclid 引理之前，让我先做一件更说服力的事——展示一个"<em>类似整数</em>" 的环，里面 Euclid 引理<em>失败</em>，唯一分解<em>失败</em>。这能让你看见 FTA 不是定义级的废话。</p>
+
+<h2 id="sec4-2">4.2 反例预演：\(\mathbb{Z}[\sqrt{-5}]\)</h2>
+
+<p>定义</p>
+
+<p>\[
+\mathbb{Z}[\sqrt{-5}] := \{a + b \sqrt{-5} : a, b \in \mathbb{Z}\}.
+\]</p>
+
+<p>这是一个<em>环</em>（链回<a href="../抽象代数/ch11.html">抽象代数 ch11</a>）——加法、减法、乘法都封闭。乘法规则：\((a + b\sqrt{-5})(c + d\sqrt{-5}) = (ac - 5bd) + (ad + bc) \sqrt{-5}\)。这是把 \(\mathbb{Z}\) 用 \(\sqrt{-5}\) "<em>扩</em>" 一层。</p>
+
+<p>在这个环里看 6 的分解：</p>
+
+<p>\[
+6 = 2 \cdot 3, \qquad 6 = (1 + \sqrt{-5})(1 - \sqrt{-5}).
+\]</p>
+
+<p>验证第二种：\((1 + \sqrt{-5})(1 - \sqrt{-5}) = 1 - 5 \cdot (-1) \cdot (-1) ...\) 让我重算：\(= 1 - (\sqrt{-5})^2 = 1 - (-5) = 6\)。\(\checkmark\)</p>
+
+<p>所以 \(\mathbb{Z}[\sqrt{-5}]\) 里 6 至少有<em>两种</em> 不同的分解。但等等——也许 \(2, 3, 1+\sqrt{-5}, 1-\sqrt{-5}\) 这四个数<em>能进一步分解</em>，把它们拆完后两边给同一个素分解？</p>
+
+<p>不能。要证<em>这四个数都"<em>不可分</em>"</em>（在 \(\mathbb{Z}[\sqrt{-5}]\) 里，"<em>不可分</em>" 元素叫<em>不可约</em>，对应于 \(\mathbb{Z}\) 的素数）。</p>
+
+<p>定义"<em>范</em>"（norm）：\(N(a + b\sqrt{-5}) := a^2 + 5 b^2\)。性质：\(N\) 取非负整数值；\(N(\alpha \beta) = N(\alpha) N(\beta)\)（这条用乘法规则展开验证，是正经性质）；\(N(\alpha) = 0 \iff \alpha = 0\)；\(N(\alpha) = 1 \iff \alpha \in \{\pm 1\}\)（\(\pm 1\) 是这环里的<em>单位</em>，对应 \(\mathbb{Z}\) 里的 \(\pm 1\)）。</p>
+
+<p>算这四个数的范：\(N(2) = 4\)，\(N(3) = 9\)，\(N(1 \pm \sqrt{-5}) = 1 + 5 = 6\)。</p>
+
+<p>假设 \(2 = \alpha \beta\) 是非平凡分解（\(\alpha, \beta\) 都非单位）。则 \(4 = N(\alpha) N(\beta)\)，且 \(N(\alpha), N(\beta) > 1\)。所以 \(N(\alpha) = N(\beta) = 2\)。但 \(a^2 + 5 b^2 = 2\) <em>没有</em> 整数解（\(b = 0\) 给 \(a^2 = 2\)，无解；\(b = \pm 1\) 给 \(a^2 = -3\)，无解）。所以 \(2\) <em>不能</em> 分。它是不可约的。同理 \(3\) 也不可约（要 \(N = 3\)，无解）。\(1 \pm \sqrt{-5}\) 不可约（\(N = 6\)，要分成 \(2 \cdot 3\) 但 \(N = 2\) 无解）。</p>
+
+<p>所以 \(6 = 2 \cdot 3 = (1 + \sqrt{-5})(1 - \sqrt{-5})\) 是<em>两种本质不同</em> 的"<em>不可约因子分解</em>"——<em>唯一性失效</em>。</p>
+
+<p>更直接看：\(2 \mid (1 + \sqrt{-5})(1 - \sqrt{-5}) = 6\)，但 \(2 \nmid (1 + \sqrt{-5})\)（要写 \(1 + \sqrt{-5} = 2 \cdot (a + b\sqrt{-5})\) 给 \(a = 1/2\)，非整数），\(2 \nmid (1 - \sqrt{-5})\) 同理。这说明<em>Euclid 引理在这环里失败</em>——\(2\) 是不可约元，整除乘积，却不整除任何因子。</p>
+
+<p>请你停下来想这件事的<em>分量</em>。\(\mathbb{Z}[\sqrt{-5}]\) 看起来跟 \(\mathbb{Z}\) 没差太多——也是个环，也有"<em>因子</em>" 概念，<em>不可约元</em> 也存在。但它<em>缺少</em> \(\mathbb{Z}\) 那条最朴素的"<em>分解唯一</em>" 性质。这种"<em>看起来像整数但不是整数</em>" 的环在<a href="ch13.html">ch13 高斯整数</a> 和<a href="ch17.html">ch17 二元二次型</a> 会反复出现——19 世纪 Kummer / Dedekind 发现这个现象后，<em>整个代数数论</em> 才真正开始（"<em>理想</em>" 这个概念是为修复唯一分解失败而发明的）。链回<a href="../抽象代数/ch14.html">抽象代数 ch14 UFD 概念</a>——<em>唯一分解整环</em>（UFD）正式定义了"<em>唯一分解</em>" 这条性质，并给出哪些环是 UFD、哪些不是的判别。</p>
+
+<p>而 \(\mathbb{Z}\) <em>是</em> UFD——这是 FTA。但要证它是 UFD 需要<em>真有</em> 论证，不是看一眼就行。</p>
+
+<h2 id="sec4-3">4.3 \(\mathbb{Z}\) 的算术基本定理</h2>
+
+<p><strong>算术基本定理 (FTA)。</strong>每个整数 \(n \ge 2\) 可以写成素数乘积</p>
+
+<p>\[
+n = p_1^{e_1} p_2^{e_2} \cdots p_k^{e_k}
+\]</p>
+
+<p>其中 \(p_1 < p_2 < \ldots < p_k\) 是不同素数，\(e_i \ge 1\)。这种表示<em>唯一</em>（在排列下）。</p>
+
+<p>证明分两步：<em>存在性</em> + <em>唯一性</em>。存在性容易；唯一性靠 Euclid 引理，Euclid 引理靠 Bezout 等式（ch2.5）。</p>
+
+<p><em>存在性</em>。强归纳。基础 \(n = 2\)：2 自己是素数，分解就是 \(2\)。归纳：设对所有 \(2 \le m < n\) 命题成立，证 \(n\)。若 \(n\) 素，分解就是 \(n\)。若 \(n\) 合，存在 \(2 \le a, b < n\) 使 \(n = a b\)。归纳假设给 \(a\) 和 \(b\) 各自的素分解；它们相乘就是 \(n\) 的素分解。\(\square_{\text{存在性}}\)</p>
+
+<p><em>唯一性</em>。设 \(n\) 有两种素分解</p>
+
+<p>\[
+n = p_1 p_2 \cdots p_r = q_1 q_2 \cdots q_s
+\]</p>
+
+<p>（这里允许重复——没用上指数形式，但等价）。要证 \(r = s\) 且两边的多重集 \(\{p_i\} = \{q_j\}\)。</p>
+
+<p>归纳于 \(\min(r, s)\)。设 \(r \le s\)。</p>
+
+<p>从 \(p_1 \mid p_1 \cdots p_r = q_1 \cdots q_s\)。用<em>下面就要证的</em> Euclid 引理 (4.3.1)，\(p_1 \mid q_j\) 对某 \(j\)。但 \(q_j\) 也素，\(q_j\) 的因子只有 1 和 \(q_j\)；\(p_1 > 1\) 所以 \(p_1 = q_j\)。</p>
+
+<p>把 \(p_1\) 和 \(q_j\) 各从两边消掉，得</p>
+
+<p>\[
+p_2 \cdots p_r = q_1 \cdots q_{j-1} q_{j+1} \cdots q_s.
+\]</p>
+
+<p>左右各少一个因子。归纳给 \(r - 1 = s - 1\) 即 \(r = s\)，且剩下因子集相同。把消掉的 \(p_1 = q_j\) 加回去——两边集合相同。\(\square_{\text{唯一性}}\)</p>
+
+<p>整套证明的<em>唯一</em> 非平凡步骤是 Euclid 引理：</p>
+
+<p><strong>引理 4.3.1（Euclid 引理）。</strong>若 \(p\) 素数且 \(p \mid ab\)，则 \(p \mid a\) 或 \(p \mid b\)。</p>
+
+<p>证明。假设 \(p \nmid a\)，证 \(p \mid b\)。\(p\) 素，因子只 1 和 \(p\)；\(p \nmid a\) 所以 \(\gcd(p, a) \in \{1, p\}\) 且不是 \(p\)（\(p \mid p\) 但 \(p \nmid a\)，所以 \(\gcd \neq p\)）。所以 \(\gcd(p, a) = 1\)。</p>
+
+<p>由 ch2.5 Bezout 等式，存在 \(x, y \in \mathbb{Z}\) 使 \(p x + a y = 1\)。两边乘 \(b\)：</p>
+
+<p>\[
+p (b x) + (a b) y = b.
+\]</p>
+
+<p>左边两项都被 \(p\) 整除（第一项有 \(p\) 因子；第二项 \(p \mid ab\) 由假设）。所以 \(p \mid b\)。\(\square\)</p>
+
+<p>这条证明的<em>美</em> 在于：Bezout 等式（一条看起来跟"<em>素性</em>" 无关的<em>线性</em> 命题）<em>直接</em> 给出"<em>素数能穿过乘积</em>" 这条关于<em>乘性</em> 的事实。线性 → 乘性的桥就在那一步"<em>两边乘 \(b\)</em>"。</p>
+
+<p>请你停下来回望路径：</p>
+
+<ul>
+  <li>ch2.3 带余除法 → 给"<em>取模</em>" 严格定义。</li>
+  <li>ch2.4 Euclid 算法 → 算 \(\gcd\)。</li>
+  <li>ch2.5 Bezout 等式 → \(\gcd = ax + by\)。</li>
+  <li>ch4.3 Euclid 引理 → \(p \mid ab \Rightarrow p \mid a\) 或 \(p \mid b\)（Bezout 一行推完）。</li>
+  <li>ch4.3 FTA → 唯一素分解（Euclid 引理 + 强归纳）。</li>
+</ul>
+
+<p>整条链每一环都是<em>朴素</em> 的，但合起来证出<em>整数环刚性结构</em>——\(\mathbb{Z}\) 是 UFD。<em>朴素工具叠出深刻定理</em> 是初等数论的标志。</p>
+
+<p>对比 \(\mathbb{Z}[\sqrt{-5}]\)：那环里我们没有 Bezout 等式（即"<em>\(\gcd\) 总能写成线性组合</em>" 失败），所以 Euclid 引理失败，所以 FTA 失败。"<em>哪些环是 UFD</em>" 等价于"<em>哪些环上 Bezout 类性质成立</em>"——这是抽象代数 ch14-15 的题目。</p>
+
+<h2 id="sec4-4">4.4 推论：用素分解算 \(\gcd\) 与 \(\mathrm{lcm}\)</h2>
+
+<p>FTA 让我们得到 \(\gcd, \mathrm{lcm}\) 的<em>非算法</em> 公式。</p>
+
+<p>设 \(a, b \ge 2\)，写</p>
+
+<p>\[
+a = \prod_p p^{a_p}, \qquad b = \prod_p p^{b_p}
+\]</p>
+
+<p>（无穷乘积，但只有有限个 \(a_p, b_p > 0\)）。则</p>
+
+<p>\[\boxed{\ \gcd(a, b) = \prod_p p^{\min(a_p, b_p)}, \qquad \mathrm{lcm}(a, b) = \prod_p p^{\max(a_p, b_p)}.\ }\]</p>
+
+<p>证明思路：FTA 让<em>整除</em> 等价于<em>每个素数指数比较</em>——\(d \mid n \iff\) 对每个素 \(p\)，\(d_p \le n_p\)。所以 \(d\) 整除 \(a\) 和 \(b\) \(\iff\) 对每 \(p\)，\(d_p \le \min(a_p, b_p)\)。最大这种 \(d\) 就是 \(\prod p^{\min(a_p, b_p)}\)。\(\mathrm{lcm}\) 类似。</p>
+
+<p>立刻推出</p>
+
+<p>\[
+\gcd(a, b) \cdot \mathrm{lcm}(a, b) = \prod_p p^{\min(a_p, b_p) + \max(a_p, b_p)} = \prod_p p^{a_p + b_p} = a b.
+\]</p>
+
+<p>这条公式</p>
+
+<p>\[\boxed{\ \gcd(a, b) \cdot \mathrm{lcm}(a, b) = a b\ }\]</p>
+
+<p>实战非常有用——给 \(\gcd\) 算 \(\mathrm{lcm}\) 用乘除即可，反之亦然。</p>
+
+<p>例：\(\gcd(252, 198) = 18\)（ch2.1 算过）。则 \(\mathrm{lcm}(252, 198) = 252 \cdot 198 / 18 = 49896 / 18 = 2772\)。验证：\(2772 / 252 = 11\)，\(2772 / 198 = 14\)，都整数。\(\checkmark\) 而且 252 和 198 的所有公倍数都是 2772 的倍数（这是 \(\mathrm{lcm}\) 的定义）。</p>
+
+<p>请你注意一点：FTA 给的<em>公式</em> 漂亮但<em>不</em> 实用（要先做素分解）。算 \(\gcd\) 实战用 Euclid 算法<em>更快</em>。FTA 给的是<em>结构性</em> 理解，让我们<em>看清楚</em> \(\gcd, \mathrm{lcm}\) 的本质——它们是"<em>逐素数</em>" 的 \(\min, \max\) 操作。</p>
+
+<h2 id="sec4-5">4.5 推论：完全平方数 + 整数解结构</h2>
+
+<p><strong>完全平方数判别。</strong>\(n \ge 1\) 是某整数的平方 \(\iff\) \(n\) 的每个素分解指数都是<em>偶</em>。</p>
+
+<p>证明。\(n = m^2\) 给 \(n_p = 2 m_p\) 偶。反过来，每个 \(n_p\) 偶给 \(n = (\prod p^{n_p / 2})^2\)。\(\square\)</p>
+
+<p>例：\(360 = 2^3 \cdot 3^2 \cdot 5\)。指数 \((3, 2, 1)\) 不全偶——非完全平方。要让它是平方需乘 \(2 \cdot 5 = 10\)：\(3600 = 2^4 \cdot 3^2 \cdot 5^2 = 60^2\)。一般地，"<em>能让 \(n\) 变平方的最小乘子</em>" \(= \prod_{p_i \text{ 指数奇}} p_i\)。</p>
+
+<p><strong>\(\sqrt 2\) 无理。</strong>这是 FTA 最经典的应用之一。</p>
+
+<p>反证。假设 \(\sqrt 2 = a/b\) 对某 \(a, b \in \mathbb{Z}_{\ge 1}\)。平方两边：\(2 b^2 = a^2\)。看素分解里 2 的指数：左边 2 的指数 = \(1 + 2 v_2(b)\) 是<em>奇</em>；右边 2 的指数 = \(2 v_2(a)\) 是<em>偶</em>。矛盾。\(\square\)</p>
+
+<p>（这里 \(v_2(n)\) 是 \(n\) 的素分解里 2 的指数，叫 <em>2-adic 赋值</em>。链回<a href="ch18.html">ch18 \(p\)-adic 数</a>。）</p>
+
+<p>这种"<em>看素分解里某素数的指数奇偶</em>" 是处理无理性 / 整数方程的标准技巧，叫<em>无穷下降</em> 的早期形式。Fermat 用它证 \(x^4 + y^4 = z^4\) 无非平凡整数解（这是<em>Fermat 大定理</em> \(n = 4\) 的情况；ch24 的引子）。</p>
+
+<p>更一般的<em>整数方程结构</em>。考虑</p>
+
+<p>\[
+x^2 + y^2 = z^2
+\]</p>
+
+<p>（毕达哥拉斯三元组）。互素本原解 \((x, y, z) = (m^2 - n^2, 2mn, m^2 + n^2)\) 对 \(m > n > 0\)，\(\gcd(m, n) = 1\)，\(m, n\) 一奇一偶。证明用 FTA + 一些"<em>互素积是平方 \(\Rightarrow\) 各因子是平方</em>" 的引理（链回 ch9 实际推这条）。</p>
+
+<p>FTA 的<em>结构性</em> 用法常见模式：</p>
+
+<ol>
+  <li>把方程整理为 \(\square = \square \cdot \square\) 形式（积等于积）。</li>
+  <li>用 \(\gcd = 1\) 条件加 FTA 推每个因子<em>是某种特定形状</em>（平方、立方等）。</li>
+  <li>把"<em>每个因子是某形状</em>" 当参数化，得到全部解。</li>
+</ol>
+
+<p>这种"<em>用素分解的<em>唯一性</em> 加 互素 推参数化</em>" 是 ch9 整数方程章节的核心套路。</p>
+
+<h2 id="sec4-6">4.6 一些应用：无穷下降 + 不可解方程</h2>
+
+<p>FTA 给我们一个具体工具：<em>看每个素数指数</em>。这套工具能证<em>不可解性</em>。</p>
+
+<p><strong>例。</strong>\(x^2 + y^2 = 3\) 无<em>整数</em> 解。</p>
+
+<p>证明。模 4 分析。\(x^2 \pmod 4 \in \{0, 1\}\)（\(x\) 偶 \(\to 0\); \(x\) 奇 \(\to 1\)）。\(y^2 \pmod 4 \in \{0, 1\}\)。和 \(\in \{0, 1, 2\}\)。但 \(3 \pmod 4 = 3\)。所以无解。\(\square\)</p>
+
+<p>这条没真用 FTA——只用模 4。但<em>"哪些数能写成两平方和"</em> 这个完整问题（Fermat 1640）的回答<em>需要</em> FTA：</p>
+
+<p><em>素数 \(p\) 能写成两平方和 \(\iff p = 2\) 或 \(p \equiv 1 \pmod 4\)</em>。</p>
+
+<p>更一般的"<em>正整数 \(n\) 能写成两平方和</em>" 由 \(n\) 的素分解决定：每个 \(p \equiv 3 \pmod 4\) 的素因子在 \(n\) 中的指数必须<em>偶</em>。这条用 FTA + 高斯整数（链回 ch13）证。</p>
+
+<p>请你停下来欣赏这个公式的<em>形状</em>。"<em>能写成两平方和</em>" 这种纯几何 / 数论性质完全由"<em>素分解的指数奇偶</em>" 决定——这就是 FTA 在数论里反复体现的"<em>素分解 = 整数的 DNA</em>" 思想。每个性质都先归约到素数级，然后归约到指数。</p>
+
+<p><strong>无穷下降。</strong>Fermat 发明的证<em>不可解</em> 方程的方法。要证某 Diophantine 方程无非零正整数解：</p>
+
+<ol>
+  <li>假设存在解 \((x, y, z, \ldots)\)。</li>
+  <li>用 FTA / 模算术 / 整除分析 构造一个<em>更小</em> 的解 \((x', y', z', \ldots)\) 满足同一方程。</li>
+  <li>无限下降——但正整数不能无限递减。矛盾。</li>
+</ol>
+
+<p>例：\(x^4 + y^4 = z^2\) 无正整数解。Fermat 用无穷下降证；这立即推出 \(x^4 + y^4 = z^4\) 无非平凡整数解（取 \(z' = z^2\)）——这是<em>Fermat 大定理</em> 的 \(n = 4\) 情况。整套技术依赖 FTA 提供的"<em>素分解指数</em>" 作为下降的<em>计量</em>。</p>
+
+<p>一般 \(n \ge 3\) 的 Fermat 大定理 \(x^n + y^n = z^n\) 直到 1995 年 Wiles 才证完——用了模形式 + 椭圆曲线 + Galois 表示，完全超出初等范围。但<em>启发式上</em>："<em>整数环 \(\mathbb{Z}\) 的 UFD 性质</em>" 是<em>所有</em> 这类问题的工具底——失败的环（如 \(\mathbb{Z}[\sqrt{-5}]\)，4.2 节）就是 Fermat 大定理早期攻击失败的原因（Kummer 1840 发现 \(\mathbb{Z}[\zeta_p]\) 对 \(p \ge 23\) 不是 UFD，但发明<em>理想</em> 概念修复）。链回<a href="ch24.html">ch24 Fermat 大定理一瞥</a>。</p>
+
+<h2 id="sec4-7">4.7 \(\mathbb{Z}\) 是 UFD：另一种陈述</h2>
+
+<p>用<a href="../抽象代数/ch14.html">抽象代数 ch14</a> 的语言重写本章主结果：</p>
+
+<p><strong>定义（UFD）。</strong>整环 \(R\) 是<em>唯一分解整环</em>（unique factorization domain），如果每个非零非单位元素 \(r \in R\) 可写成有限个不可约元素之积，且这种写法在<em>排列</em> 与<em>单位倍数</em> 下唯一。</p>
+
+<p>"<em>单位倍数下唯一</em>" 的意思：在 \(\mathbb{Z}\) 里 \(6 = 2 \cdot 3 = (-2) \cdot (-3)\)；这两个分解"<em>本质相同</em>"（差一个 \(-1\) 单位的重新分配）。</p>
+
+<p><strong>FTA 重述。</strong>\(\mathbb{Z}\) 是 UFD。</p>
+
+<p>这种重述把 FTA 放进更大的<em>分类</em> 框架。其他 UFD 例子：多项式环 \(\mathbb{Z}[x]\)（用类似论证证）、高斯整数 \(\mathbb{Z}[i] = \{a + bi : a, b \in \mathbb{Z}\}\)（ch13）、域上多项式环 \(K[x]\)。<em>不</em> 是 UFD：\(\mathbb{Z}[\sqrt{-5}]\)、\(\mathbb{Z}[\sqrt{-6}]\)、和大量"<em>类数</em> > 1" 的代数整数环（ch17）。</p>
+
+<p>UFD 的判别也有定理：每个<em>主理想环</em>（PID）是 UFD；每个<em>欧几里得域</em>（Euclidean domain）是 PID。\(\mathbb{Z}\) 是欧几里得域（带余除法），所以是 PID，所以是 UFD——一条三段式逻辑。<em>失败</em> 的环（\(\mathbb{Z}[\sqrt{-5}]\)）不是欧几里得域、不是 PID、不是 UFD——三个性质同时失败。</p>
+
+<p>请你看见这种"<em>分层定义</em>" 的力量：把"<em>\(\mathbb{Z}\) 有唯一分解</em>" 这条具体事实放进 UFD/PID/欧氏域 的<em>抽象阶梯</em>，得到一个<em>统一</em> 的工具——任何欧氏域都自动 UFD。证一次，到处用。这就是抽象代数对数论的贡献：把"<em>具体环上的具体定理</em>" 升级成"<em>满足某结构条件的<em>所有</em>环上的通用定理</em>"。</p>
+
+<h2 id="sec4-8">4.8 这一章的回看 + 下一步</h2>
+
+<p>我们做了：</p>
+
+<ul>
+  <li>钩子：60 拆怎么拆都给 \(\{2, 2, 3, 5\}\)——FTA 的具体内容。</li>
+  <li>反例 \(\mathbb{Z}[\sqrt{-5}]\)：\(6 = 2 \cdot 3 = (1+\sqrt{-5})(1-\sqrt{-5})\) 两种本质不同分解。这件事让你知道 FTA 不是定义级的废话。</li>
+  <li>FTA 的证明：存在性靠强归纳，唯一性靠 Euclid 引理；Euclid 引理靠 Bezout 等式（ch2.5）。整条链全部初等。</li>
+  <li>用 FTA 推 \(\gcd \cdot \mathrm{lcm} = ab\)、完全平方判别、\(\sqrt 2\) 无理。</li>
+  <li>无穷下降 + 不可解方程的 FTA 用法——Fermat 大定理 \(n = 4\) 的关键工具。</li>
+  <li>把 FTA 放进抽象代数 UFD/PID/欧氏域 的分层框架——一个具体定理升级为结构定理。</li>
+</ul>
+
+<p>核心思想：<em>素分解唯一</em> 是<em>整数环 \(\mathbb{Z}\) 的刚性结构</em>。它告诉你 \(\mathbb{Z}\) 的乘性结构完全由素数决定——所有"<em>整除</em>"" <em>互素</em>"" <em>\(\gcd\)</em>"" <em>\(\mathrm{lcm}\)</em>" 都是素数指数操作的<em>影子</em>。这条结构性事实是后面所有"<em>同余</em>"" <em>群论</em>" 类型定理的基底——例如下一章 ch5 我们要看模 \(n\) 整数环 \(\mathbb{Z}/n\) 的结构 (Fermat 小定理 / Euler 函数 / CRT)，这些定理的<em>陈述与证明</em> 都建立在 \(n\) 的素分解上。</p>
+
+<p>下一章我们正式开始<em>同余理论</em>。\(\mathbb{Z}/n\) 这个环的<em>群结构</em>——它的可逆元素群 \((\mathbb{Z}/n)^*\) 有多少元素？\(\varphi(n)\) 是多少？\(a^{\varphi(n)} \equiv 1 \pmod n\) 怎么证？这一切的工具是模算术 + FTA。Euler 函数 \(\varphi(n)\) 直接用 \(n\) 的素分解算；中国剩余定理 (CRT) 用 \(n\) 的素分解把 \(\mathbb{Z}/n\) 拆成更小的环——FTA 是这一切的语法。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 素数：定义、Euclid 无穷性、素数定理</a><a href="ch5.html">下一章 · 第 5 章 同余、Fermat 与 Euler →</a></nav>
+</main>
+</body>
+</html>

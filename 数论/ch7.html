@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 中国剩余定理 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 Fermat 小定理与 Euler 定理</a><a href="ch8.html">下一章 · 第 8 章 原根与离散对数 →</a></nav>
+<h1 id="ch7">第 7 章 中国剩余定理 (CRT)</h1>
+
+<p>找一个数 \(x\)，同时满足：</p>
+
+<p>\[
+x \equiv 2 \pmod 3, \qquad x \equiv 3 \pmod 5, \qquad x \equiv 2 \pmod 7.
+\]</p>
+
+<p>朴素法：从满足第一条的开始列——\(x = 2, 5, 8, 11, 14, 17, 20, 23, \ldots\)。挑出也满足第二条（\(\bmod 5\) 余 3）的——\(8, 23, 38, 53, \ldots\)（每隔 \(\mathrm{lcm}(3, 5) = 15\)）。再挑也满足第三条（\(\bmod 7\) 余 2）的——\(23, 128, \ldots\)。第一个解 \(x = 23\)。</p>
+
+<p>能行，但慢——三层筛法，要遍历至少 \(3 \cdot 5 = 15\) 个候选，再每个验证模 7。<em>更快</em> 的办法是<strong>中国剩余定理</strong>（CRT），它给一个<em>显式公式</em>，并且告诉你解 \(\bmod (3 \cdot 5 \cdot 7) = 105\) <em>唯一</em>。</p>
+
+<p>本章把 CRT 完整建立——古代起源、定理陈述、构造性证明、跑例子、推论（\(\varphi\) 的积性）、应用（RSA 加速、模算法拆分），最后看它在抽象代数里的环论形态。</p>
+
+<h2 id="sec7-1">7.1 韩信点兵</h2>
+
+<p>这条定理在中国出现得比 Euclid 还早。《孙子算经》（约公元 3-5 世纪，现存最古抄本可追到 4 世纪）卷下第 26 题：</p>
+
+<blockquote>"今有物不知其数，三三数之剩二，五五数之剩三，七七数之剩二。问物几何？答曰：二十三。"</blockquote>
+
+<p>翻译：一堆东西，3 个 3 个数余 2，5 个 5 个数余 3，7 个 7 个数余 2，问多少？答 23。</p>
+
+<p>《孙子算经》还给一段诀：</p>
+
+<blockquote>"三人同行七十稀，五树梅花廿一枝，七子团圆正半月，除百零五便得知。"</blockquote>
+
+<p>翻译——把"<em>余 2</em>"乘 70（"<em>三人同行</em>"的系数），"<em>余 3</em>" 乘 21（"<em>五树梅花</em>"），"<em>余 2</em>" 乘 15（"<em>七子团圆正半月</em>"），相加，再"<em>除百零五</em>"（取 \(\bmod 105\)）：</p>
+
+<p>\[
+x = (2 \cdot 70 + 3 \cdot 21 + 2 \cdot 15) \bmod 105 = (140 + 63 + 30) \bmod 105 = 233 \bmod 105 = 23.
+\]</p>
+
+<p>朴素而精准。这首口诀的"<em>70, 21, 15</em>" 看起来神秘，其实是 CRT 给的<em>逆元系数</em>——本章 7.3 节会从公式里直接生出来。</p>
+
+<p>这道题在中国民间也叫"<em>韩信点兵</em>"——传说韩信能让士兵列 3 列、5 列、7 列，分别报余数，他立即算出士兵总数。这是中国最早的应用算法之一，比西方系统化研究 CRT 早 1300 年（Gauss 1801 才在《算术研究》里给出现代陈述）。</p>
+
+<h2 id="sec7-2">7.2 CRT 的现代陈述</h2>
+
+<p>设 \(m_1, m_2, \ldots, m_k\) 是<em>两两互素</em> 的正整数（\(\gcd(m_i, m_j) = 1\) 对所有 \(i \neq j\)）。令 \(M = m_1 m_2 \cdots m_k\)。给任意整数 \(a_1, \ldots, a_k\)，方程组</p>
+
+<p>\[
+x \equiv a_1 \pmod{m_1}, \quad x \equiv a_2 \pmod{m_2}, \quad \ldots, \quad x \equiv a_k \pmod{m_k}
+\]</p>
+
+<p>有解，且解 \(\bmod M\) <em>唯一</em>。</p>
+
+<p>结构性的陈述（这是定理的<em>实质</em>）：环同构</p>
+
+<p>\[\boxed{\ \mathbb{Z}/M \;\cong\; \mathbb{Z}/m_1 \times \mathbb{Z}/m_2 \times \cdots \times \mathbb{Z}/m_k.\ }\]</p>
+
+<p>映射方向：</p>
+
+<p>\[
+\Phi: \mathbb{Z}/M \to \prod_{i=1}^k \mathbb{Z}/m_i, \qquad \bar x \mapsto (\bar x \bmod m_1, \ldots, \bar x \bmod m_k).
+\]</p>
+
+<p>这条 \(\Phi\) 显然 well-defined（如果 \(x \equiv x' \pmod M\)，则也 \(\equiv \pmod{m_i}\) 对每个 \(i\)，因 \(m_i \mid M\)）。它是环同态——加法和乘法都按分量分别取模，跟<a href="ch5.html">ch5</a> §5.3 的运算性兼容。</p>
+
+<p>定理实质是：<strong>\(\Phi\) 是双射</strong>（且因为是环同态，自动是环同构）。"<em>有解</em>"= 满射；"<em>解唯一</em>" = 单射。</p>
+
+<p>请你停下来欣赏这条陈述的<em>简洁</em>：原本"<em>解一组同余方程</em>" 这种零散的过程，变成了"<em>两个环同构</em>" 这一句结构性事实。这就是<a href="../抽象代数/ch11.html">抽象代数</a> 给数论带来的好处——把"<em>算法</em>"变成"<em>结构</em>"，把"<em>有多个解</em>"变成"<em>双射</em>"。</p>
+
+<h2 id="sec7-3">7.3 完整证明：构造逆映射</h2>
+
+<p>证 \(\Phi\) 双射。两条路径：</p>
+
+<p><em>(单射)</em>：若 \(\Phi(\bar x) = \Phi(\bar y)\)，即 \(x \equiv y \pmod{m_i}\) 对所有 \(i\)。这说 \(m_i \mid (x - y)\) 对每个 \(i\)。由"两两互素"，\(m_1 m_2 \cdots m_k = M \mid (x - y)\)（这是 ch4 的标准事实：互素的 \(m_i\) 共同整除一个数 \(\iff\) 它们的乘积整除）。所以 \(\bar x = \bar y\) 在 \(\mathbb{Z}/M\) 中。\(\checkmark\)</p>
+
+<p><em>(满射)</em>：定义域有 \(M\) 个元素，陪域 \(\prod \mathbb{Z}/m_i\) 也有 \(\prod m_i = M\) 个元素。单射 + 同基数 \(\Rightarrow\) 满射。\(\checkmark\)</p>
+
+<p>但满射这条<em>抽象论证</em>不告诉你<em>怎么求解</em>。我们补上构造性证明——给一个显式公式。</p>
+
+<p><strong>构造</strong>。 对每个 \(i\)，令 \(M_i = M / m_i\)。注意 \(M_i\) 是除了 \(m_i\) 外其他所有 \(m_j\) 之积；由互素，\(\gcd(M_i, m_i) = 1\)。所以 \(M_i\) 在 \(\mathbb{Z}/m_i\) 中可逆——令 \(N_i\) 是它的逆，即 \(M_i N_i \equiv 1 \pmod{m_i}\)。<em>用扩展 Euclid 算 \(N_i\)</em>。</p>
+
+<p>然后定义</p>
+
+<p>\[\boxed{\ x = \sum_{i=1}^k a_i M_i N_i.\ }\]</p>
+
+<p><em>验证</em>。 在 \(\bmod m_j\) 下：除了 \(i = j\) 那项外，其余 \(i \neq j\) 都有 \(m_j \mid M_i\)（因 \(M_i\) 含因子 \(m_j\)），所以那些项 \(\equiv 0\)。\(i = j\) 这项 = \(a_j M_j N_j \equiv a_j \cdot 1 = a_j \pmod{m_j}\)。<em>每条同余条件都对</em>。\(\checkmark\)</p>
+
+<p>把这个 \(x\) 取 \(\bmod M\)（因解 \(\bmod M\) 唯一），得唯一答案。</p>
+
+<p>请你看公式的结构：每个分量 \(a_i\) 配上自己的"<em>权重</em>" \(M_i N_i\)。这个权重是<em>第 \(i\) 个分量的特殊单位</em>——它在 \(\bmod m_i\) 下等于 1，在 \(\bmod m_j\)（\(j \neq i\)）下等于 0。<em>它是 \(\Phi^{-1}\) 在第 \(i\) 个标准基向量 \(e_i = (0, \ldots, 0, 1, 0, \ldots, 0)\) 上的取值</em>。整个公式就是按"<em>分量分解 + 各自加权 + 求和</em>" 的标准线性代数路径，只是在 \(\mathbb{Z}/M\) 这个有限环里跑。</p>
+
+<h2 id="sec7-4">7.4 用公式跑韩信例子</h2>
+
+<p>方程组：\(x \equiv 2 \pmod 3, x \equiv 3 \pmod 5, x \equiv 2 \pmod 7\)。\(M = 105\)。</p>
+
+<p>计算 \(M_i\) 和 \(N_i\)：</p>
+
+<ul>
+  <li>\(M_1 = 105 / 3 = 35\)。\(N_1 = 35^{-1} \pmod 3\)。\(35 \equiv 2 \pmod 3\)，\(2 \cdot 2 = 4 \equiv 1\)，故 \(N_1 = 2\)。所以 \(M_1 N_1 = 35 \cdot 2 = 70\)。</li>
+  <li>\(M_2 = 105 / 5 = 21\)。\(N_2 = 21^{-1} \pmod 5\)。\(21 \equiv 1 \pmod 5\)，\(N_2 = 1\)。所以 \(M_2 N_2 = 21 \cdot 1 = 21\)。</li>
+  <li>\(M_3 = 105 / 7 = 15\)。\(N_3 = 15^{-1} \pmod 7\)。\(15 \equiv 1 \pmod 7\)，\(N_3 = 1\)。所以 \(M_3 N_3 = 15\)。</li>
+</ul>
+
+<p>这正是孙子口诀里的 70, 21, 15！</p>
+
+<p>套公式：</p>
+
+<p>\[
+x = a_1 \cdot 70 + a_2 \cdot 21 + a_3 \cdot 15 = 2 \cdot 70 + 3 \cdot 21 + 2 \cdot 15 = 140 + 63 + 30 = 233.
+\]</p>
+
+<p>\(233 \bmod 105 = 233 - 2 \cdot 105 = 23\)。<em>就是 23</em>。</p>
+
+<p>解集：所有满足三条同余的 \(x\) = \(\{23, 23 + 105, 23 + 210, \ldots\}\)。</p>
+
+<p>这条计算几乎不依赖被解决的具体例子——只要知道 \(M_i N_i\)，任何不同 \(a_1, a_2, a_3\) 的方程组都<em>不需要重做</em>。比如换成 \(x \equiv 1 \pmod 3, x \equiv 4 \pmod 5, x \equiv 6 \pmod 7\)：\(x = 1 \cdot 70 + 4 \cdot 21 + 6 \cdot 15 = 70 + 84 + 90 = 244 \equiv 34 \pmod{105}\)。<em>一行</em>。</p>
+
+<h2 id="sec7-5">7.5 推论：\(\varphi\) 是积性的</h2>
+
+<p>把 CRT 用在 \(n = m_1 m_2\)（\(\gcd(m_1, m_2) = 1\)）。同构 \(\mathbb{Z}/(m_1 m_2) \cong \mathbb{Z}/m_1 \times \mathbb{Z}/m_2\) 把环结构搬过去——加法、乘法都对应。<em>特别地，可逆元也对应</em>——\(\bar x\) 在左边可逆 \(\iff\) 它在右边可逆 \(\iff\) 两个分量都可逆。所以</p>
+
+<p>\[
+(\mathbb{Z}/(m_1 m_2))^* \cong (\mathbb{Z}/m_1)^* \times (\mathbb{Z}/m_2)^*.
+\]</p>
+
+<p>取阶：</p>
+
+<p>\[\boxed{\ \gcd(m_1, m_2) = 1\ \Longrightarrow\ \varphi(m_1 m_2) = \varphi(m_1) \varphi(m_2).\ }\]</p>
+
+<p>这就证完了 <a href="ch6.html">ch6</a> §6.3 用过但未证的"\(\varphi\) 积性"。结合 \(\varphi(p^k) = p^{k - 1}(p - 1)\)，对任意 \(n = p_1^{a_1} \cdots p_r^{a_r}\)：</p>
+
+<p>\[
+\varphi(n) = \prod_{i=1}^r \varphi(p_i^{a_i}) = \prod_{i=1}^r p_i^{a_i - 1}(p_i - 1) = n \prod_{p \mid n} \left(1 - \frac{1}{p}\right).
+\]</p>
+
+<p>例：\(\varphi(105) = \varphi(3) \varphi(5) \varphi(7) = 2 \cdot 4 \cdot 6 = 48\)。</p>
+
+<p>这条积性还告诉我们更多事——\(\varphi\) 是<em>数论函数</em> 里"<em>积性函数</em>" 一族的基本成员，与 Möbius \(\mu\)、除数函数 \(d, \sigma\) 一起构成<a href="ch14.html">ch14</a> Dirichlet 卷积的核心。所有积性函数共享一种结构：<em>知道在素幂上的值就完全确定</em>。这是数论里一种重要的"<em>分解原理</em>"。</p>
+
+<h2 id="sec7-6">7.6 应用：模 \(n\) 的算法可以拆成模素幂</h2>
+
+<p>CRT 给一个<em>计算策略</em>：要在 \(\mathbb{Z}/n\)（\(n = p_1^{a_1} \cdots p_r^{a_r}\)）做某件事，<em>等价于</em> 在每个 \(\mathbb{Z}/p_i^{a_i}\) 单独做这件事，再用 CRT 合起来。这条原则在<em>计算复杂度</em> 上经常带来巨大节省。</p>
+
+<p>典型例：算 \(2^{1000} \bmod 1001\)。</p>
+
+<ul>
+  <li>分解 \(1001 = 7 \cdot 11 \cdot 13\)。\(\varphi(1001) = 6 \cdot 10 \cdot 12 = 720\)。</li>
+  <li>分别算：
+    <ul>
+      <li>\(2^{1000} \bmod 7\)：FLT 给 \(2^6 \equiv 1\)，\(1000 = 6 \cdot 166 + 4\)，\(2^{1000} \equiv 2^4 = 16 \equiv 2\)。</li>
+      <li>\(2^{1000} \bmod 11\)：\(2^{10} \equiv 1\)，\(1000 = 10 \cdot 100\)，\(2^{1000} \equiv 1\)。</li>
+      <li>\(2^{1000} \bmod 13\)：\(2^{12} \equiv 1\)，\(1000 = 12 \cdot 83 + 4\)，\(2^{1000} \equiv 2^4 = 16 \equiv 3\)。</li>
+    </ul>
+  </li>
+  <li>CRT 合：\(M_1 = 143, M_2 = 91, M_3 = 77\)。\(N_1 = 143^{-1} \bmod 7 = 3^{-1} \bmod 7 = 5\)（\(3 \cdot 5 = 15 \equiv 1\)）；\(N_2 = 91^{-1} \bmod 11 = 3^{-1} \bmod 11 = 4\)（\(3 \cdot 4 = 12 \equiv 1\)）；\(N_3 = 77^{-1} \bmod 13 = 12^{-1} \bmod 13 = 12\)（\(12 \cdot 12 = 144 \equiv 1\)）。所以
+  \[
+  x = 2 \cdot 143 \cdot 5 + 1 \cdot 91 \cdot 4 + 3 \cdot 77 \cdot 12 = 1430 + 364 + 2772 = 4566.
+  \]
+  \(4566 \bmod 1001 = 4566 - 4 \cdot 1001 = 562\)。所以 \(2^{1000} \equiv 562 \pmod{1001}\)。</li>
+</ul>
+
+<p>对比直接 \(2^{1000} \bmod 1001\)：模平方法要算约 10 次平方，每次都是 \(\bmod 1001\)（10 位左右数字），但中间 \(2^k\) 可以变化范围大。CRT 拆法每步在 \(\bmod 7, 11, 13\) 上做（一两位数），然后合起来——更快。</p>
+
+<p>这种"<em>分而治之</em>" 在数值线性代数（块矩阵）、Fourier 变换（FFT 把 \(N\) 点拆成素因子点）、并行计算（独立子任务）里都有同形机制。CRT 是<em>所有这些拆分原理的最早数论原型</em>。</p>
+
+<h2 id="sec7-7">7.7 应用：RSA 解密的 CRT 加速</h2>
+
+<p>回想 <a href="ch6.html">ch6</a> §6.8 RSA：解密要算 \(c^d \bmod n\)，其中 \(n = p q\)，\(d\) 大致 2048-bit。模平方法本身要 \(\sim 2048\) 次模乘，每次是 2048-bit \(\times\) 2048-bit \(\bmod\) 2048-bit。</p>
+
+<p>CRT 加速：私钥额外存 \(p, q\)，预计算</p>
+
+<p>\[
+d_p = d \bmod (p - 1), \qquad d_q = d \bmod (q - 1), \qquad q^{-1} \bmod p.
+\]</p>
+
+<p>解密时<em>分别</em> 算</p>
+
+<p>\[
+m_p = c^{d_p} \bmod p, \qquad m_q = c^{d_q} \bmod q.
+\]</p>
+
+<p>每步指数大概 1024-bit、模数 1024-bit，<em>算量是直接做的 \(1/4\) 到 \(1/8\)</em>（因为模乘代价大致是模数 bit 数的平方，\(2048^2 / (2 \cdot 1024^2) = 2\)；再加上指数减半，再省 2 倍）。</p>
+
+<p>用 CRT 重建 \(m\)：</p>
+
+<p>\[
+m = m_q + q \cdot ((m_p - m_q) \cdot q^{-1} \bmod p).
+\]</p>
+
+<p>(这是标准的"两素 CRT" 公式——可由 7.3 节通用公式专化得到。)</p>
+
+<p>验证形如 \(m \equiv m_p \pmod p\)（用 \(q \cdot q^{-1} \equiv 1 \pmod p\)）和 \(m \equiv m_q \pmod q\)（因为额外项含 \(q\)）。</p>
+
+<p>实测加速 \(3 \times \) 到 \(4 \times\)。开源 OpenSSL 默认这么做。<em>2025 年互联网上每一次 HTTPS 握手都用 CRT 加速 RSA 解密</em>——CRT 在两千年后仍是关键性能算法。</p>
+
+<h2 id="sec7-8">7.8 推广：环论形态的 CRT</h2>
+
+<p>CRT 的<em>本质</em>不依赖 \(\mathbb{Z}\)。它是关于<em>交换环 + 互素理想</em> 的一般事实，在<a href="../抽象代数/index.html">抽象代数</a> 里以这条形态出现：</p>
+
+<p><strong>(环论 CRT)</strong>。 设 \(R\) 是交换环（带单位 1），\(I_1, \ldots, I_k\) 是<em>两两互素</em> 的理想（\(I_i + I_j = R\) 对 \(i \neq j\)）。则映射</p>
+
+<p>\[
+R / (I_1 \cap \cdots \cap I_k) \to (R / I_1) \times \cdots \times (R / I_k), \qquad r + \bigcap I_j \mapsto (r + I_1, \ldots, r + I_k)
+\]</p>
+
+<p>是环同构。再者，\(I_1 \cap \cdots \cap I_k = I_1 I_2 \cdots I_k\)（在两两互素假设下）。</p>
+
+<p>把这条专化到 \(R = \mathbb{Z}\)、\(I_i = m_i \mathbb{Z}\)（\(m_i\) 两两互素 \(\iff\) \(I_i\) 两两互素）就回到 7.2 节的整数版 CRT。</p>
+
+<p>但环论形态适用范围更广。例：</p>
+
+<ul>
+  <li><em>\(R = K[X]\)（域 \(K\) 上的多项式环）</em>。CRT 给"<em>多项式插值</em>" 的代数基础——给一组互素的 \(f_1(X), \ldots, f_k(X)\)（典型 \(f_i(X) = X - x_i\)，互素当 \(x_i\) 两两不同），任何剩余规定 \(g(X) \equiv y_i \pmod{f_i}\) 都有唯一 \(\bmod \prod f_i\) 的解 \(g\)。这就是 Lagrange 插值！它和 \(\mathbb{Z}\) 上的 CRT 是<em>同一定理的不同实例</em>。</li>
+  <li><em>\(R = \mathbb{Z}[i]\)（高斯整数）</em>。CRT 对互素的高斯素数 \(\pi_1, \ldots, \pi_k\) 同样成立——这是<a href="ch13.html">ch13</a> 高斯整数算术的工具之一。</li>
+  <li><em>\(R\) = 任意 Dedekind 整环</em>。CRT 在<em>素理想</em>层面都成立，是代数数论里"<em>局部-全局</em>" 原则的雏形。</li>
+</ul>
+
+<p>请你停下来感受这件事的<em>分量</em>——一条孙子在《算经》里写的算法，在 1700 年后被升级为<em>所有交换代数</em> 的一条结构定理。"<em>互素的部分独立</em>" 这个直觉，原来是非常普适的代数原理，跨越整数、多项式、代数整数、几何对象。<em>这种"看似具体的算法藏着一条普适结构定律" 是数论让人着迷的地方</em>。</p>
+
+<h2 id="sec7-9">7.9 临别话与下一步</h2>
+
+<p>把本章三件事记在脑子里：</p>
+
+<ul>
+  <li><em>定理</em>：互素的 \(m_1, \ldots, m_k\) 给环同构 \(\mathbb{Z}/M \cong \prod \mathbb{Z}/m_i\)。一组同余方程总有唯一 \(\bmod M\) 解。</li>
+  <li><em>公式</em>：\(x = \sum a_i M_i N_i\)，其中 \(M_i = M/m_i\)、\(N_i = M_i^{-1} \bmod m_i\)（用扩展 Euclid 算）。</li>
+  <li><em>用法</em>：\(\varphi\) 积性（理论），算法拆分（实用），RSA 加速（密码学）。环论 CRT 是同一原理在更一般代数对象上的形态。</li>
+</ul>
+
+<p>到这里"<em>同余四件套</em>" 已经齐——同余定义（ch5）、Fermat / Euler（ch6）、CRT（ch7），加上即将的<em>原根 + 离散对数</em>（ch8）。前三件回答"<em>怎么算</em>" 和"<em>结构是什么</em>"，第四件要回答更细的问题：在 \((\mathbb{Z}/n)^*\) 这个有限群里，<em>每个元素的阶具体是什么</em>？特殊的 \(n\)（\(p\) 素时）能不能找到一个元素，把所有非零元都"<em>转一圈</em>"？</p>
+
+<p>下一章会发现：对每个素 \(p\)，\((\mathbb{Z}/p)^*\) 是<em>循环群</em>——存在<em>原根</em> \(g\)，使每个非零元都形如 \(g^k\) 某个 \(k\)。这是数论里又一个深定理（Gauss 第一证），它把"<em>乘法群结构</em>" 变成"<em>加法群结构</em>"（\(g^k\) 的指数 \(k\) 在 \(\mathbb{Z}/(p-1)\) 中加），打开了"<em>离散对数</em>" 这条通往现代密码学（Diffie-Hellman、椭圆曲线密码）的门。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 Fermat 小定理与 Euler 定理</a><a href="ch8.html">下一章 · 第 8 章 原根与离散对数 →</a></nav>
+</main>
+</body>
+</html>

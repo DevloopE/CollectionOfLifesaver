@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 模形式入门 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 Mordell-Weil 定理</a><a href="ch22.html">下一章 · 第 22 章 类域论一瞥 →</a></nav>
+<h1 id="ch21">第 21 章 模形式入门</h1>
+
+<p>研究上半平面 \(\mathcal{H} = \{\tau \in \mathbb{C} : \Im \tau > 0\}\) 上的<em>双周期</em> 函数——更准确地：在群 \(\mathrm{SL}_2(\mathbb{Z})\) 作用下"<em>有变换公式</em>" 的全纯函数。这种函数叫<em>模形式</em>。它们看起来与数论无关，可它们的 Fourier 系数<em>就是</em> 数论里的算术函数。最经典的三个例子：\(j\)-不变量给类数公式（数虚二次域的类数靠它）；模判别式 \(\Delta(\tau)\) 的 Fourier 系数定义出 Ramanujan 的 \(\tau\) 函数（一个充满未解谜团的算术函数）；权 \(2\) 模形式给椭圆曲线的 \(L\)-函数——也就是把<a href="ch19.html">第 19 章</a>那个几何对象翻译成解析对象。</p>
+
+<p>这一章的目标是<em>看见</em> 模形式怎么从一个朴素问题——"<em>上半平面上对 \(\mathrm{SL}_2(\mathbb{Z})\) 不变的函数</em>" ——自然长出来，再看它们的 Fourier 系数怎么把"<em>无关的代数对象</em>" 串成一张大网。本章不证细节，给框架；最后一节预告 Wiles 模性定理（链 <a href="ch24.html">ch24</a>）。</p>
+
+<h2 id="sec21-1">21.1 上半平面 + \(\mathrm{SL}_2(\mathbb{Z})\) 作用 + 基本域</h2>
+
+<p>记<em>上半平面</em>：</p>
+
+<p>\[
+\mathcal{H} = \{\tau \in \mathbb{C} : \Im \tau > 0\}.
+\]</p>
+
+<p>这是一片复平面的"<em>北半部</em>"——所有虚部正的复数。它在<a href="../复分析/index.html">复分析</a>里是 Riemann 面分类的基本对象（任何亏格 \(\ge 1\) 的 Riemann 面以 \(\mathcal H\) 作为万有覆盖）。本章我们只把它当作一个<em>带几何作用的二维空间</em>。</p>
+
+<p><em>哪个群作用</em>？记</p>
+
+<p>\[
+\mathrm{SL}_2(\mathbb{Z}) = \left\{\gamma = \begin{pmatrix} a & b \\ c & d \end{pmatrix} : a, b, c, d \in \mathbb{Z}, \ ad - bc = 1\right\}.
+\]</p>
+
+<p>这是<em>整数矩阵</em>组成的<em>行列式 1</em> 的 \(2 \times 2\) 矩阵群（链回<a href="../抽象代数/index.html">抽象代数</a>群论）。它在 \(\mathcal H\) 上的作用是著名的<em>分式线性变换</em>（Möbius 变换）：</p>
+
+<p>\[
+\boxed{\ \gamma \cdot \tau := \frac{a\tau + b}{c\tau + d}.\ }
+\]</p>
+
+<p>验证它把 \(\mathcal H\) 映进 \(\mathcal H\)：直接算虚部</p>
+
+<p>\[
+\Im\frac{a\tau + b}{c\tau + d} = \frac{\Im \tau}{|c\tau + d|^2}.
+\]</p>
+
+<p>分子 \(\Im \tau > 0\)，分母正——所以 \(\Im(\gamma \tau) > 0\)，仍在 \(\mathcal H\)。\(\checkmark\)</p>
+
+<p>\(\mathrm{SL}_2(\mathbb{Z})\) 由两个生成元生成，记它们为 \(S\)、\(T\)：</p>
+
+<p>\[
+S = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}, \quad T = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}.
+\]</p>
+
+<p>它们的作用：</p>
+
+<ul>
+  <li>\(T : \tau \mapsto \tau + 1\)（沿实轴<em>平移 1</em>）。</li>
+  <li>\(S : \tau \mapsto -1/\tau\)（关于<em>单位圆 + 虚轴</em> 的"反演"）。</li>
+</ul>
+
+<p>所以 \(\mathrm{SL}_2(\mathbb{Z})\) 的作用 = "<em>反复平移 + 反演</em>"。这两个生成元 + 关系 \(S^2 = (ST)^3 = -I\) 给出 \(\mathrm{SL}_2(\mathbb{Z})\) 的全部结构（这是<em>自由乘积</em> \(\mathbb{Z}/4 *_{\mathbb{Z}/2} \mathbb{Z}/6\) 的具体形式，本章不展开）。</p>
+
+<p><em>基本域</em>。任何 \(\tau \in \mathcal H\) 在 \(\mathrm{SL}_2(\mathbb{Z})\) 作用下都有一条<em>轨道</em>（无穷多个等价点）。能不能选出每条轨道里的一个"<em>代表</em>"，这些代表组成 \(\mathcal H\) 的一片<em>基本域</em> \(\mathcal F\)？答案是经典的：</p>
+
+<p>\[
+\boxed{\ \mathcal F = \left\{\tau \in \mathcal H : -\tfrac{1}{2} \le \Re \tau \le \tfrac{1}{2}, \ |\tau| \ge 1\right\}.\ }
+\]</p>
+
+<p>几何上：这是一片在 \(\Re \tau = \pm 1/2\) 之间、并且<em>在单位圆外</em> 的"<em>窄长楔形</em>"（带边界做了取舍以避免重复）。每个 \(\mathrm{SL}_2(\mathbb Z)\) 轨道与 \(\mathcal F\) 恰好交一个点（边界上的对应需要小心处理）。</p>
+
+<p>请你在脑子里画一遍：上半平面被 \(\mathrm{SL}_2(\mathbb Z)\) 切成无穷多块"<em>瓦片</em>"，每块都是 \(\mathcal F\) 的某个 \(\gamma\)-像。这些瓦片像艺术家 Escher 画的那种圆盘镶嵌——越靠近实轴的瓦片越小、越多（因为 \(c\tau + d\) 小时雅可比 \(1/|c\tau+d|^2\) 把瓦片压扁）。</p>
+
+<h2 id="sec21-2">21.2 模形式定义</h2>
+
+<p>有了基本域我们想问：哪些<em>函数</em> \(f : \mathcal H \to \mathbb C\) 对 \(\mathrm{SL}_2(\mathbb Z)\) 作用<em>有规律</em>？最朴素的要求是 \(f(\gamma \tau) = f(\tau)\)（"<em>不变</em>"）——这种函数叫<em>模函数</em>。但只要求"不变" 留下的好对象太少（21.4 节会看到——\(j\)-不变量基本是唯一的非平凡例子）。</p>
+
+<p>放宽要求：让 \(f\) 在 \(\mathrm{SL}_2(\mathbb Z)\) 作用下<em>带一个简单的因子</em>。具体的：固定整数 \(k \ge 0\)（叫<em>权</em>），要求</p>
+
+<p>\[
+\boxed{\ f(\gamma \tau) = (c\tau + d)^k f(\tau), \qquad \forall \gamma = \begin{pmatrix} a & b \\ c & d \end{pmatrix} \in \mathrm{SL}_2(\mathbb Z).\ }
+\]</p>
+
+<p>这条变换公式是"<em>在 \(\gamma\) 下不变到一个 \((c\tau+d)^k\) 因子</em>"。\(k = 0\) 退化成"<em>真不变</em>"（模函数）。\(k \ge 1\) 给"<em>带权变换</em>"。</p>
+
+<p>因子 \(j(\gamma, \tau) := c\tau + d\) 叫 \(\gamma\) 在 \(\tau\) 处的<em>自守因子</em>（automorphy factor）。一个直接验证：把 \(\gamma_1\)、\(\gamma_2\) 复合得 \(\gamma_1 \gamma_2\)，自守因子满足"<em>链式</em>" 关系</p>
+
+<p>\[
+j(\gamma_1 \gamma_2, \tau) = j(\gamma_1, \gamma_2 \tau) \cdot j(\gamma_2, \tau).
+\]</p>
+
+<p>这条让"<em>带权变换</em>" 的定义自洽——你先用 \(\gamma_2\) 变再用 \(\gamma_1\)，结果和直接用 \(\gamma_1 \gamma_2\) 变一致。</p>
+
+<p>正式定义：<em>权 \(k\) 模形式</em>（modular form of weight \(k\)）是函数 \(f : \mathcal H \to \mathbb C\) 满足：</p>
+
+<ol>
+  <li>\(f\) 在 \(\mathcal H\) 上<em>全纯</em>（holomorphic）；</li>
+  <li>\(f(\gamma \tau) = (c\tau + d)^k f(\tau)\)，对所有 \(\gamma \in \mathrm{SL}_2(\mathbb Z)\)；</li>
+  <li>\(f\) 在<em>无穷处</em>（即 \(\Im \tau \to \infty\)）<em>有限</em>（21.3 节给精确陈述）。</li>
+</ol>
+
+<p>把权 \(k\) 模形式全体记为 \(M_k\)。这是 \(\mathbb C\) 上一个向量空间——两个权 \(k\) 模形式的和、模形式乘常数仍是权 \(k\) 模形式。<em>不同权</em> 的模形式相乘，权<em>相加</em>：\(f \in M_k\)、\(g \in M_l\) 给 \(f g \in M_{k+l}\)。所以模形式构成一个<em>分次环</em>：</p>
+
+<p>\[
+M_* = \bigoplus_{k \ge 0} M_k.
+\]</p>
+
+<p><em>奇权 \(k\) 时 \(M_k = 0\)</em>。原因：取 \(\gamma = -I\)（\(c = 0, d = -1\)），变换公式给 \(f(\tau) = (-1)^k f(\tau)\)；\(k\) 奇时 \(f \equiv 0\)。所以只<em>偶</em> 权才有非平凡的模形式。</p>
+
+<h2 id="sec21-3">21.3 \(q\)-展开</h2>
+
+<p>条件 (2) 中取 \(\gamma = T\) 给</p>
+
+<p>\[
+f(\tau + 1) = f(\tau).
+\]</p>
+
+<p>所以<em>每个</em> 模形式都<em>周期为 1</em>。这件事至关重要——周期函数有 Fourier 展开。</p>
+
+<p>具体的，定义新变量</p>
+
+<p>\[
+q := e^{2\pi i \tau}.
+\]</p>
+
+<p>当 \(\tau \in \mathcal H\)（即 \(\Im \tau > 0\)）时 \(|q| = e^{-2\pi \Im \tau} < 1\)，所以 \(q\) 落在<em>单位开圆盘 \(\mathbb D^*\)</em>（去掉原点）里。\(\tau \to \tau + 1\) 对应 \(q \to q\)（同一个点），所以 \(f\) 通过 \(q\) 变量定义在 \(\mathbb D^*\) 上一个单值全纯函数 \(\tilde f(q)\)。</p>
+
+<p>\(\tilde f\) 在 \(\mathbb D^* = \{0 < |q| < 1\}\) 上全纯，所以有 Laurent 展开：</p>
+
+<p>\[
+\tilde f(q) = \sum_{n=-\infty}^{\infty} a_n q^n.
+\]</p>
+
+<p>条件 (3)（"无穷处有限"）翻译成 \(q\)-语言：\(\tau \to i\infty \iff q \to 0\)，所以"无穷处有限"<em>等价于</em> \(\tilde f\) 在 \(q = 0\) 不是极点——即所有 \(n < 0\) 的 \(a_n = 0\)。结论：</p>
+
+<p>\[
+\boxed{\ f(\tau) = \sum_{n = 0}^{\infty} a_n q^n, \qquad q = e^{2\pi i \tau}.\ }
+\]</p>
+
+<p>这就是模形式的<em>\(q\)-展开</em>（Fourier 展开）。它是模形式与算术函数<em>挂钩的桥</em> ——序列 \((a_n)\) 是<em>整数序列</em>（绝大多数情形），它们就是数论里的算术函数。</p>
+
+<p>额外的子定义：如果 \(a_0 = 0\)（即 \(f\) 在无穷处<em>消失</em>），\(f\) 叫<em>尖形式</em>（cusp form），全体记 \(S_k \subset M_k\)。尖形式是模形式空间里"更窄" 的子空间，21.5 节会看到它的维数。</p>
+
+<h2 id="sec21-4">21.4 经典例子：Eisenstein 级数、模判别式、\(j\)-不变量</h2>
+
+<p><strong>例 1：Eisenstein 级数 \(E_k\)。</strong>对偶 \(k \ge 4\)，定义</p>
+
+<p>\[
+E_k(\tau) := \frac{1}{2 \zeta(k)} \sum_{(m, n) \ne (0, 0)} \frac{1}{(m\tau + n)^k}.
+\]</p>
+
+<p>（求和遍 \((m, n) \in \mathbb Z^2 \setminus \{(0, 0)\}\)；分母不为零是因为 \(\Im \tau > 0\)。\(\zeta(k)\) 是 Riemann zeta 在偶数 \(k\) 的值——这里只是归一化。）</p>
+
+<p>验证它是权 \(k\) 模形式：变换</p>
+
+<p>\[
+E_k(\gamma \tau) = \frac{1}{2 \zeta(k)} \sum_{(m, n) \ne 0} \frac{1}{(m \gamma\tau + n)^k}.
+\]</p>
+
+<p>把 \(\gamma\tau = (a\tau+b)/(c\tau+d)\) 代入分母：\(m(a\tau+b)/(c\tau+d) + n = ((ma+nc)\tau + (mb+nd))/(c\tau+d)\)。所以</p>
+
+<p>\[
+E_k(\gamma\tau) = (c\tau+d)^k \cdot \frac{1}{2\zeta(k)} \sum_{(m, n) \ne 0} \frac{1}{((ma+nc)\tau + (mb+nd))^k}.
+\]</p>
+
+<p>映射 \((m, n) \mapsto (ma + nc, mb + nd)\) 是 \(\gamma^T\) 在 \(\mathbb Z^2 \setminus \{0\}\) 上的<em>置换</em>（因为 \(\gamma \in \mathrm{SL}_2(\mathbb Z)\) 可逆），所以求和<em>不变</em>。结论 \(E_k(\gamma\tau) = (c\tau+d)^k E_k(\tau)\)。\(\checkmark\)</p>
+
+<p>它的 \(q\)-展开是经典的：</p>
+
+<p>\[
+\boxed{\ E_k(\tau) = 1 - \frac{2k}{B_k} \sum_{n=1}^{\infty} \sigma_{k-1}(n) q^n,\ }
+\]</p>
+
+<p>其中 \(B_k\) 是 Bernoulli 数，\(\sigma_{k-1}(n) = \sum_{d \mid n} d^{k-1}\) 是<em>除数函数</em>（链回<a href="ch14.html">ch14</a>算术函数）。请你停下来感受：上面级数定义看起来纯粹是几何对象（"上半平面对 \(\mathrm{SL}_2(\mathbb Z)\) 的不变性"），可它的 Fourier 系数<em>恰好</em> 是<em>整数除数函数</em> \(\sigma_{k-1}\)。这是模形式与数论第一道明显的桥。</p>
+
+<p>具体的几个：</p>
+
+<p>\[
+E_4 = 1 + 240 \sum_{n \ge 1} \sigma_3(n) q^n, \qquad E_6 = 1 - 504 \sum_{n \ge 1} \sigma_5(n) q^n.
+\]</p>
+
+<p><strong>例 2：模判别式 \(\Delta\)。</strong>定义</p>
+
+<p>\[
+\Delta(\tau) := \frac{E_4(\tau)^3 - E_6(\tau)^2}{1728}.
+\]</p>
+
+<p>权 \(12\)（\(4 \cdot 3 = 12 = 6 \cdot 2\)）。它的 \(q\)-展开是 Jacobi 1829 的经典结果：</p>
+
+<p>\[
+\boxed{\ \Delta(\tau) = q \prod_{n=1}^{\infty} (1 - q^n)^{24} = \sum_{n=1}^{\infty} \tau(n) q^n.\ }
+\]</p>
+
+<p>\(\Delta\) 是<em>尖形式</em>——首项 \(a_0 = 0\)（系数从 \(q^1\) 开始）。整数序列 \(\tau(n) = 1, -24, 252, -1472, 4830, -6048, \ldots\) 叫 <em>Ramanujan \(\tau\) 函数</em>。它有 Ramanujan 1916 猜测的两条性质：</p>
+
+<ul>
+  <li>\(\tau\) 是<em>乘性</em>：\(\tau(mn) = \tau(m) \tau(n)\) 当 \(\gcd(m, n) = 1\)。Mordell 1917 用 Hecke 算子（21.6 节）证。</li>
+  <li>\(|\tau(p)| \le 2 p^{11/2}\) 对所有素 \(p\)。这是 <em>Ramanujan-Petersson 猜想</em>，对 \(\Delta\) 由 Deligne 1974 证（用 Weil 猜想，<em>Fields 奖</em> 工作）。</li>
+</ul>
+
+<p><strong>例 3：\(j\)-不变量。</strong>定义</p>
+
+<p>\[
+j(\tau) := 1728 \cdot \frac{E_4(\tau)^3}{\Delta(\tau)}.
+\]</p>
+
+<p>这是<em>权 \(0\)</em>——分子分母权同（12），相除权 0。也就是说 \(j\) 是真正的<em>模函数</em>（不带因子的不变函数）。\(q\)-展开</p>
+
+<p>\[
+j(\tau) = \frac{1}{q} + 744 + 196884 q + 21493760 q^2 + \cdots
+\]</p>
+
+<p>注意首项 \(1/q\)——\(j\) 在无穷处是<em>极点</em> 而不是有限值，所以 \(j\) <em>不是模形式</em>（它违反条件 (3)），而是<em>亚纯模函数</em>。</p>
+
+<p>\(j\) 的两条意外性质：</p>
+
+<ul>
+  <li><em>类数公式</em>。设 \(K = \mathbb Q(\sqrt{-D})\) 是虚二次域，\(\tau_K = (1 + \sqrt{-D})/2\)（适当时候）。则 \(j(\tau_K)\) 是<em>代数整数</em>，并且<em>它的极小多项式次数 = \(K\) 的类数</em> \(h(K)\)。这把"<em>抽象类群</em>"（链回<a href="ch17.html">ch17</a>）变成"<em>具体多项式根</em>"——21 世纪数论里这条公式仍是计算类数的主要工具。</li>
+  <li><em>Monstrous Moonshine</em>。\(j\) 的 \(q\)-展开系数 \(196884 = 1 + 196883\)；右边 196883 是<em>魔群 \(M\)</em>（最大散在单群）<em>不可约表示的次数</em>之一。这条意外巧合 1979 年由 McKay 注意到，1992 年由 Borcherds 证明（<em>Fields 奖</em>），叫"<em>Monstrous Moonshine</em>"——把模形式与代数有限单群通过物理学的<em>顶点算子代数</em> 联系起来。这是 20 世纪数学最神秘的现象之一。</li>
+</ul>
+
+<h2 id="sec21-5">21.5 维数公式：固定权 \(k\) 的模形式构成有限维空间</h2>
+
+<p>关键事实：\(M_k\) 是<em>有限</em> 维向量空间。具体维数：</p>
+
+<p>\[
+\boxed{\ \dim M_k = \begin{cases} \lfloor k/12 \rfloor + 1, & k \not\equiv 2 \pmod{12}, \\ \lfloor k/12 \rfloor, & k \equiv 2 \pmod{12}, \end{cases} \quad k \ge 4 \text{ 偶}.\ }
+\]</p>
+
+<p>更精细：尖形式空间 \(S_k\) 维数 = \(\dim M_k - 1\)（多减一维 \(E_k\)，因为 \(E_k\) 唯一首项 \(a_0 = 1\) 的"非尖" 方向）。</p>
+
+<p>例：</p>
+
+<ul>
+  <li>\(k = 4\)：\(\dim M_4 = 1\)。基：\(E_4\)。</li>
+  <li>\(k = 6\)：\(\dim M_6 = 1\)。基：\(E_6\)。</li>
+  <li>\(k = 8\)：\(\dim M_8 = 1\)。基：\(E_8\)（必然 \(= E_4^2\)，因为唯一）。</li>
+  <li>\(k = 10\)：\(\dim M_{10} = 1\)。基：\(E_{10}\)（\(= E_4 E_6\)）。</li>
+  <li>\(k = 12\)：\(\dim M_{12} = 2\)。基：\(E_{12}\)、\(\Delta\)（第一个尖形式出现）。</li>
+  <li>\(k = 14\)：\(\dim M_{14} = 1\)。基：\(E_4 E_{10}\)（亦 \(= E_6 E_8\)，必同因为唯一）。</li>
+</ul>
+
+<p>"<em>\(E_8 = E_4^2\)</em>" 这条等式给一个意外的恒等式——比较 \(q\)-展开两边的系数得</p>
+
+<p>\[
+\sigma_7(n) = \sigma_3(n) + 120 \sum_{m=1}^{n-1} \sigma_3(m) \sigma_3(n - m).
+\]</p>
+
+<p>左边是<em>整数除数函数</em>，右边是它自身的<em>卷积</em>。这种<em>"两个数论函数等同因为对应的模形式同</em>" 的恒等式叫<em>模恒等式</em>，用初等方法<em>很难</em> 直接证。模形式给一种"<em>用维数 1 推恒等式</em>" 的杠杆。</p>
+
+<p>整个模形式分次环 \(M_*\) 有干净的代数结构：</p>
+
+<p>\[
+\boxed{\ M_* = \mathbb C[E_4, E_6].\ }
+\]</p>
+
+<p>每个模形式都是 \(E_4\) 与 \(E_6\) 的<em>多项式</em>。这是 1900 年左右由 Hurwitz 证明的核心结果——它把"<em>无穷维全纯函数空间</em>" 压缩到"<em>两个生成元的多项式环</em>"。所有 21.4 的具体例子都在这条公式里：\(\Delta = (E_4^3 - E_6^2)/1728\)、\(j = 1728 E_4^3/\Delta\)，等等。</p>
+
+<h2 id="sec21-6">21.6 Hecke 算子 \(T_p\) 与联立特征向量</h2>
+
+<p>21.4 节提到 \(\tau(mn) = \tau(m) \tau(n)\)（互素时）——为什么 Ramanujan \(\tau\) 函数<em>是乘性</em> 的？这件事不显然——乘性是<em>算术函数</em>的性质，可 \(\Delta\) 是从几何对象（\(E_4^3 - E_6^2\)）算出来的。Mordell 1917 给的解释用<em>Hecke 算子</em>。这一节快速带你看这个工具。</p>
+
+<p>对每个素 \(p\)，定义<em>Hecke 算子</em> \(T_p : M_k \to M_k\)（线性）：</p>
+
+<p>\[
+\boxed{\ (T_p f)(\tau) := \frac{1}{p}\sum_{j=0}^{p-1} f\left(\frac{\tau + j}{p}\right) + p^{k-1} f(p \tau).\ }
+\]</p>
+
+<p>验证 \(T_p\) 把 \(M_k\) 映进 \(M_k\)（即把模形式变模形式）需要不少计算，本章不做。直接给两条关键性质：</p>
+
+<ul>
+  <li><em>\(T_p\) 在 \(q\)-展开上的作用</em>：如果 \(f = \sum a_n q^n\)，则 \(T_p f = \sum b_n q^n\) 满足
+  \[
+  b_n = a_{pn} + p^{k-1} a_{n/p},
+  \]
+  其中 \(a_{n/p} = 0\) 当 \(p \nmid n\)。所以 \(T_p\) 是对系数序列 \((a_n)\) 做"<em>把 \(n\) 换成 \(pn\) 然后加上 \(p^{k-1}\) 倍的 \(n/p\) 项</em>"。</li>
+  <li><em>\(T_p\) 与 \(T_q\) 交换</em>（对不同素 \(p \ne q\)）。所以 \(\{T_p\}\) 是<em>交换族</em>——它们有<em>共同特征向量</em>（线性代数事实，链回<a href="../线性代数/index.html">线性代数</a>）。</li>
+</ul>
+
+<p>Hecke 算子的<em>共同特征向量</em>（同时是所有 \(T_p\) 的特征向量）叫<em>Hecke 特征形式</em>（Hecke eigenform）。如果 \(f = \sum a_n q^n\) 是 Hecke 特征形式，<em>归一化</em> 使 \(a_1 = 1\)，则：</p>
+
+<p>\[
+\boxed{\ a_p \cdot a_n = a_{pn} + p^{k-1} a_{n/p}.\ }
+\]</p>
+
+<p>从这条递推可推出（具体的代数运算）：<em>\(a_{mn} = a_m a_n\)（互素时）+ \(a_{p^{r+1}} = a_p a_{p^r} - p^{k-1} a_{p^{r-1}}\)（同素幂的递推）</em>。第一条就是<em>乘性</em>。第二条是"<em>同素幂的递推</em>"——它精准对应 Euler 乘积的局部因子（21.7 节）。</p>
+
+<p>Mordell 的关键观察：\(\Delta\) 是 \(S_{12}\) 的唯一基（\(\dim S_{12} = 1\)）——所以 \(\Delta\) <em>必然</em> 是 \(T_p\) 的特征形式（一维空间里任何线性算子都把基映为基的常数倍）。直接套上面 \(\boxed{}\) 公式：\(\tau\) 函数自动乘性。<em>Ramanujan 猜测的乘性是模形式空间一维的代数后果</em>——这是数论里最优雅的"用结构推性质" 的例子之一。</p>
+
+<h2 id="sec21-7">21.7 模形式的 \(L\)-函数 + Euler 乘积</h2>
+
+<p>给一个模形式 \(f = \sum_{n=1}^\infty a_n q^n\)（假设 \(a_0 = 0\)，即尖形式），定义它的 \(L\)-函数：</p>
+
+<p>\[
+\boxed{\ L(f, s) := \sum_{n=1}^{\infty} \frac{a_n}{n^s}.\ }
+\]</p>
+
+<p>这是<em>Dirichlet 级数</em>（链回<a href="ch15.html">ch15</a> Dirichlet 卷积），对 \(\Re s\) 足够大收敛（具体 \(\Re s > k/2 + 1\)，由 Hecke 1937 证）。</p>
+
+<p>关键事实：如果 \(f\) 是 Hecke 特征形式，由 21.6 的乘性 + 同素幂递推，\(L(f, s)\) 有<em>Euler 乘积</em>：</p>
+
+<p>\[
+\boxed{\ L(f, s) = \prod_{p \text{ 素}} \frac{1}{1 - a_p p^{-s} + p^{k-1-2s}}.\ }
+\]</p>
+
+<p>每个素 \(p\) 的局部因子是<em>二次</em> 多项式的倒数（不是像 \(\zeta(s)\) 那样的<em>线性</em>）。这是模形式 \(L\)-函数的<em>特征</em>——指数 2。</p>
+
+<p>具体例：取 \(f = \Delta\)（权 12 的尖形式），\(L(\Delta, s) = \sum \tau(n)/n^s\)。Euler 乘积</p>
+
+<p>\[
+L(\Delta, s) = \prod_p \frac{1}{1 - \tau(p) p^{-s} + p^{11 - 2s}}.
+\]</p>
+
+<p>这个 \(L\)-函数有解析延拓到全 \(\mathbb C\)（Hecke 1937），有 functional equation \(\Lambda(s) = \Lambda(12 - s)\)（其中 \(\Lambda(s) = (2\pi)^{-s} \Gamma(s) L(\Delta, s)\)）——和 Riemann zeta 一模一样的"延拓 + 函数方程" 结构。这是为什么模形式是<em>解析数论</em> 的核心对象——它们生成一大族<em>带函数方程的 \(L\)-函数</em>，可以用<a href="ch16.html">ch16</a>素数定理那套技术研究。</p>
+
+<p><em>椭圆曲线 \(L\)-函数</em>。给一个有理椭圆曲线 \(E\)（链回<a href="ch19.html">ch19</a>），定义</p>
+
+<p>\[
+L(E, s) = \prod_p \frac{1}{1 - a_p(E) p^{-s} + p^{1 - 2s}},
+\]</p>
+
+<p>其中 \(a_p(E) = p + 1 - \#E(\mathbb F_p)\)（"模 \(p\) 解的个数偏差"）。这是椭圆曲线<em>权 2</em> 的 \(L\)-函数（指数 \(k - 1 = 1\)，所以 \(k = 2\)）。</p>
+
+<p>对 \(L(E, s)\) 的核心猜想（也是 Wiles 1995 证的核心）：<em>\(L(E, s) = L(f_E, s)\) 对某个权 2 模形式 \(f_E\)</em>。这就是<em>模性</em>——下节展开。</p>
+
+<h2 id="sec21-8">21.8 模性定理预告</h2>
+
+<p>1955 年 Taniyama 在东京数学会议提出（后由 Shimura、Weil 1967 精细化）：</p>
+
+<p><strong>Taniyama-Shimura-Weil 猜想（模性猜想）。</strong>每个有理椭圆曲线 \(E\) 都<em>是模的</em>——存在一个权 2 Hecke 特征形式 \(f_E \in S_2(\Gamma_0(N))\)（\(N\) 是 \(E\) 的导子，是个相关于 \(\mathrm{SL}_2(\mathbb Z)\) 的<em>子群</em>，本章不展开）使</p>
+
+<p>\[
+L(E, s) = L(f_E, s).
+\]</p>
+
+<p>等价说法：\(a_p(E) = a_p(f_E)\) 对所有素 \(p\)（不分歧时）——椭圆曲线的<em>几何</em> 数据 \(\#E(\mathbb F_p)\) 与模形式的<em>解析</em> 数据 \(a_p(f_E)\) 互相决定。</p>
+
+<p>这条猜想 1985 年由 Frey 与 Serre / Ribet 联系到 Fermat 大定理（FLT）：如果 FLT 有反例 \(a^n + b^n = c^n\)，构造的"<em>Frey 曲线</em>" \(y^2 = x(x - a^n)(x + b^n)\) <em>不</em> 模——但模性猜想说所有椭圆曲线<em>都</em> 模——矛盾——FLT 真。具体的链条放<a href="ch24.html">ch24</a>。</p>
+
+<p>Wiles 1994/95 证模性猜想对一类"<em>半稳定</em>" 椭圆曲线——足以包含 Frey 曲线类型——足以证 FLT。完整模性猜想（任意椭圆曲线）由 Breuil-Conrad-Diamond-Taylor 2001 完成。这是 20 世纪数论最大的成就。</p>
+
+<p>请你停下来感受这件事的<em>分量</em>：</p>
+
+<ul>
+  <li>椭圆曲线（<a href="ch19.html">ch19</a>）：纯<em>几何</em>对象——三次方程的有理点群。</li>
+  <li>模形式（本章）：纯<em>解析</em>对象——上半平面的对称全纯函数。</li>
+  <li>模性定理：<em>这两个对象一一对应</em>。每个椭圆曲线对应唯一一个权 2 模形式，反之亦然（<em>Eichler-Shimura</em>方向：每个权 2 模形式对应一个椭圆曲线）。</li>
+</ul>
+
+<p>"<em>几何 \(\leftrightarrow\) 解析</em>" 这条对应是<em>Langlands 程序</em> 的一个具体例子——这个 1967 年由 Langlands 提出的宏大猜想程序把"<em>所有 \(L\)-函数</em>"分类为"<em>来自 Galois 表示的 \(L\)-函数</em>" 与"<em>来自自守表示的 \(L\)-函数</em>"，断言两者一一对应。模性定理是这个程序最早被严格证明的<em>非阿贝尔</em> 实例。<a href="ch22.html">下一章</a>把这件事放在更大的<em>类域论</em> 框架里。</p>
+
+<p>临别一句：模形式是数论里最神秘也最强大的工具。它们的定义朴素（"<em>对群作用有变换公式的全纯函数</em>"），可它们的 Fourier 系数<em>是</em> 算术函数；它们的 \(L\)-函数<em>等于</em> 椭圆曲线 \(L\)-函数；它们的离散数据<em>等于</em> 散在群表示。每种"等于" 都意外、每种都深、每种都至今有未解谜（如 Ramanujan-Petersson 在更高维的推广、Langlands 函子性的具体实现）。下一章我们退一步看更宽的图景：类域论怎么把"<em>整数环的素分解</em>"用"<em>Galois 群</em>" 完整刻画，并把 Langlands 当作类域论的非阿贝尔推广。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 Mordell-Weil 定理</a><a href="ch22.html">下一章 · 第 22 章 类域论一瞥 →</a></nav>
+</main>
+</body>
+</html>

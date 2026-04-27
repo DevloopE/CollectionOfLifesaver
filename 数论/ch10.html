@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 二次互反律 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 二次剩余与 Legendre 符号</a><a href="ch11.html">下一章 · 第 11 章 连分数 →</a></nav>
+<h1 id="ch10">第 10 章 二次互反律</h1>
+
+<p>上一章末尾我说："对任何奇素数 \(q\)，\(\left(\frac{q}{p}\right)\) 取决于 \(p \bmod 4 q\)。" 这一章把它兑现并证完——这条事实是 Gauss 一生最得意的结果，他自称"<em>算术宝石</em>"，证了 8 遍。</p>
+
+<h2 id="sec10-1">10.1 朴素算 \(\left(\frac{3}{p}\right)\)</h2>
+
+<p>9.6 给了 \(\left(\frac{-1}{p}\right)\)，9.7 给了 \(\left(\frac{2}{p}\right)\)。下一个最朴素的问题：\(\left(\frac{3}{p}\right)\)？</p>
+
+<p>朴素方法——用 Euler 准则一个个算 \(3^{(p - 1)/2} \bmod p\)。对前 20 个奇素数 \(p \neq 3\) 列表：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 0.7em;">\(p\)</th><th>5</th><th>7</th><th>11</th><th>13</th><th>17</th><th>19</th><th>23</th><th>29</th><th>31</th><th>37</th><th>41</th><th>43</th><th>47</th><th>53</th><th>59</th><th>61</th><th>67</th><th>71</th><th>73</th><th>79</th></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(\left(\frac{3}{p}\right)\)</td><td>−</td><td>−</td><td>+</td><td>+</td><td>−</td><td>−</td><td>+</td><td>−</td><td>−</td><td>+</td><td>−</td><td>−</td><td>+</td><td>−</td><td>+</td><td>+</td><td>−</td><td>+</td><td>+</td><td>−</td></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(p \bmod 12\)</td><td>5</td><td>7</td><td>11</td><td>1</td><td>5</td><td>7</td><td>11</td><td>5</td><td>7</td><td>1</td><td>5</td><td>7</td><td>11</td><td>5</td><td>11</td><td>1</td><td>7</td><td>11</td><td>1</td><td>7</td></tr>
+</table>
+
+<p>每一项你都可以用 9.5 的快速幂方法手算确认（\(\left(\frac{3}{5}\right)\)：\(3^2 = 9 \equiv -1\)，所以 \(-\)；\(\left(\frac{3}{7}\right)\)：\(3^3 = 27 \equiv -1\)，所以 \(-\)；\(\left(\frac{3}{11}\right)\)：\(3^5 = 243 \equiv 1\)，所以 \(+\)；以此类推）。</p>
+
+<h2 id="sec10-2">10.2 模式涌现</h2>
+
+<p>把上表按 \(p \bmod 12\) 重排：</p>
+
+<ul>
+<li>\(p \equiv 1 \pmod{12}\)（即 13, 37, 61, 73, ...）：全部 \(+\)</li>
+<li>\(p \equiv 11 \equiv -1 \pmod{12}\)（即 11, 23, 47, 59, 71, ...）：全部 \(+\)</li>
+<li>\(p \equiv 5 \pmod{12}\)（即 5, 17, 29, 41, 53, ...）：全部 \(-\)</li>
+<li>\(p \equiv 7 \pmod{12}\)（即 7, 19, 31, 43, 67, 79, ...）：全部 \(-\)</li>
+</ul>
+
+<p>所以</p>
+
+<p>\[
+\boxed{\ \left(\frac{3}{p}\right) = +1 \iff p \equiv \pm 1 \pmod{12}.\ }
+\]</p>
+
+<p>请你停下来感受这件事。"<em>3 是 mod \(p\) 的平方</em>" 这个看起来要把<em>每个</em> \(p\) 单独检验的问题，结果只取决于 \(p \bmod 12\)。<em>从 \(p \bmod 12\) 看一眼就知道答案</em>。这种"<em>无穷多个 \(p\) 的二次性质归约成 12 个余数类</em>" 是数论里第一个真正<em>奇迹级</em> 现象。</p>
+
+<p>对 \(\left(\frac{5}{p}\right)\)：同样实验给出</p>
+
+<p>\[
+\left(\frac{5}{p}\right) = +1 \iff p \equiv \pm 1 \pmod 5.
+\]</p>
+
+<p>对 \(\left(\frac{7}{p}\right)\)：依赖 \(p \bmod 28\)。一般 \(\left(\frac{q}{p}\right)\)：依赖 \(p \bmod 4q\)。这条规律就是<em>二次互反律</em>。</p>
+
+<h2 id="sec10-3">10.3 二次互反律陈述</h2>
+
+<p><strong>定理（Gauss 二次互反律，1796）。</strong>对相异奇素数 \(p, q\)，</p>
+
+<p>\[
+\boxed{\ \left(\frac{p}{q}\right) \left(\frac{q}{p}\right) = (-1)^{\frac{p - 1}{2} \cdot \frac{q - 1}{2}}.\ }
+\]</p>
+
+<p>翻译：把指数算一下。\((p - 1)/2\) 偶 \(\iff p \equiv 1 \pmod 4\)；类似 \(q\)。乘积 \(\frac{p - 1}{2} \cdot \frac{q - 1}{2}\) 奇 \(\iff\) 两个都奇 \(\iff p \equiv q \equiv 3 \pmod 4\)。所以</p>
+
+<p>\[
+\left(\frac{p}{q}\right) \left(\frac{q}{p}\right) = \begin{cases} +1 & p \equiv 1 \text{ 或 } q \equiv 1 \pmod 4, \\ -1 & p \equiv q \equiv 3 \pmod 4. \end{cases}
+\]</p>
+
+<p>更短的人话："\(\left(\frac{p}{q}\right)\) 和 \(\left(\frac{q}{p}\right)\)<em>同号</em>，<em>除非</em> \(p, q\) 都 \(\equiv 3 \pmod 4\)（这时反号）。"</p>
+
+<p>加上 9.6 的"<em>第一补充律</em>"</p>
+
+<p>\[
+\left(\frac{-1}{p}\right) = (-1)^{(p - 1)/2}
+\]</p>
+
+<p>和 9.7 的"<em>第二补充律</em>"</p>
+
+<p>\[
+\left(\frac{2}{p}\right) = (-1)^{(p^2 - 1)/8},
+\]</p>
+
+<p>互反律 + 两条补充律是<em>完全的</em> 算法：任何 \(\left(\frac{a}{p}\right)\) 用积性把 \(a\) 分解为 \(\pm 2^{e_0} q_1 q_2 \cdots\)，再对每个奇素因子 \(q\) 用互反律把 \(\left(\frac{q}{p}\right)\) 翻成 \(\left(\frac{p}{q}\right)\)，再把 \(p \bmod q\) 简化（\(p \bmod q < q\)），递归。每次模数严格变小，几步就到底。这是<em>计算 Legendre 符号的标准算法</em>。</p>
+
+<h2 id="sec10-4">10.4 用互反律算 \(\left(\frac{3}{p}\right), \left(\frac{5}{p}\right)\) 显式</h2>
+
+<p><strong>例：\(\left(\frac{3}{p}\right)\)。</strong>由互反律</p>
+
+<p>\[
+\left(\frac{3}{p}\right) \left(\frac{p}{3}\right) = (-1)^{\frac{3 - 1}{2} \cdot \frac{p - 1}{2}} = (-1)^{(p - 1)/2}.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\left(\frac{3}{p}\right) = (-1)^{(p - 1)/2} \cdot \left(\frac{p}{3}\right).
+\]</p>
+
+<p>右边两项分别看 \(p \bmod 4\) 和 \(p \bmod 3\)：</p>
+
+<ul>
+<li>\((-1)^{(p - 1)/2} = +1 \iff p \equiv 1 \pmod 4\)。</li>
+<li>\(\left(\frac{p}{3}\right)\)：\(\bmod 3\)，QR 是 \(\{1\}\)（\(1^2 = 1, 2^2 = 1\)）。所以 \(\left(\frac{p}{3}\right) = +1 \iff p \equiv 1 \pmod 3\)，\(= -1 \iff p \equiv 2 \pmod 3\)。</li>
+</ul>
+
+<p>结合 CRT 把"<em>\(p \bmod 4\) 和 \(p \bmod 3\)</em>" 合成"<em>\(p \bmod 12\)</em>"：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 0.7em;">\(p \bmod 12\)</th><th>1</th><th>5</th><th>7</th><th>11</th></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(p \bmod 4\)</td><td>1</td><td>1</td><td>3</td><td>3</td></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(p \bmod 3\)</td><td>1</td><td>2</td><td>1</td><td>2</td></tr>
+<tr><td style="padding: 0.3em 0.7em;">\((-1)^{(p-1)/2}\)</td><td>+</td><td>+</td><td>−</td><td>−</td></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(\left(\frac{p}{3}\right)\)</td><td>+</td><td>−</td><td>+</td><td>−</td></tr>
+<tr><td style="padding: 0.3em 0.7em;">\(\left(\frac{3}{p}\right)\)</td><td>+</td><td>−</td><td>−</td><td>+</td></tr>
+</table>
+
+<p>\(\left(\frac{3}{p}\right) = +1 \iff p \equiv 1, 11 \equiv \pm 1 \pmod{12}\)。\(\checkmark\)（与 10.2 的实验数据吻合。）</p>
+
+<p><strong>例：\(\left(\frac{5}{p}\right)\)。</strong>\(5 \equiv 1 \pmod 4\)，所以互反律左边 \((-1)^{2 \cdot (p - 1)/2} = +1\)，得</p>
+
+<p>\[
+\left(\frac{5}{p}\right) = \left(\frac{p}{5}\right).
+\]</p>
+
+<p>\(\bmod 5\) 的 QR 是 \(\{1, 4\}\)（\(1^2 = 1, 2^2 = 4, 3^2 = 4, 4^2 = 1\)）。所以 \(\left(\frac{5}{p}\right) = +1 \iff p \equiv 1, 4 \equiv \pm 1 \pmod 5\)。\(\checkmark\)</p>
+
+<p><strong>例：\(\left(\frac{15}{31}\right)\)。</strong>用积性 \(\left(\frac{15}{31}\right) = \left(\frac{3}{31}\right) \left(\frac{5}{31}\right)\)。</p>
+
+<p>\(\left(\frac{3}{31}\right)\)：\(31 \equiv 7 \pmod{12}\)，所以 \(-1\)。</p>
+
+<p>\(\left(\frac{5}{31}\right)\)：\(31 \equiv 1 \pmod 5\)，所以 \(+1\)。</p>
+
+<p>积 \(= -1\)。所以 \(15\) 是 \(\bmod 31\) 的 QNR。验证 9.5 例 3：\(\left(\frac{5}{31}\right) = +1\) \(\checkmark\)，加上算 \(15^{15} \bmod 31 \stackrel{?}{=} -1\)（留给读者）。</p>
+
+<p><strong>例：\(\left(\frac{29}{43}\right)\)。</strong>\(29 \equiv 1 \pmod 4\)，所以互反律左边 \((-1)^{14 \cdot 21} = +1\)，得 \(\left(\frac{29}{43}\right) = \left(\frac{43}{29}\right) = \left(\frac{14}{29}\right) = \left(\frac{2}{29}\right) \left(\frac{7}{29}\right)\)。</p>
+
+<p>\(\left(\frac{2}{29}\right)\)：\(29 \equiv 5 \pmod 8\)（\(\equiv -3\)），所以 \(-1\)。</p>
+
+<p>\(\left(\frac{7}{29}\right)\)：\(7 \equiv 3, 29 \equiv 1 \pmod 4\)，左边 \(+1\)，得 \(\left(\frac{7}{29}\right) = \left(\frac{29}{7}\right) = \left(\frac{1}{7}\right) = +1\)。</p>
+
+<p>积 \(= -1\)。所以 \(\left(\frac{29}{43}\right) = -1\)。</p>
+
+<p>请数一数我们用了几步乘法——三四步，每步只算"<em>谁 mod 几</em>"。完全没碰快速幂。这就是互反律的<em>实战速度</em>——它把 Legendre 符号计算从"<em>对每个 \(p\) 算一次幂</em>"<em>降到</em> "<em>对每个 \(p\) 看几个余数</em>"。</p>
+
+<h2 id="sec10-5">10.5 互反律的"奇迹" 性</h2>
+
+<p>请你停下来想这件事到底有多惊人。</p>
+
+<p>9 章告诉我们："是不是 QR" 是一个<em>具体</em>问题——你要找 \(x\) 使 \(x^2 \equiv a\)，否则就是 QNR。这个问题<em>关于 \(p\) 没有先验的"<em>余数类</em>" 性质</em>——\(p\) 是个素数，模 \(p\) 的乘法结构看起来"<em>跟着 \(p\) 一起换</em>"。\(\bmod 11\) 的 QR 是 \(\{1, 3, 4, 5, 9\}\)，\(\bmod 13\) 的 QR 是 \(\{1, 3, 4, 9, 10, 12\}\)——两个不同 \(p\) 的 QR 集长得完全不同。</p>
+
+<p>互反律说："<em>不</em>。问'<em>3 是不是 mod \(p\) 的 QR</em>' 这件事，答案<em>只看 \(p \bmod 12\)</em>。" 这一刀把无穷多 \(p\) 切成 4 个余数类，每类<em>同进退</em>。</p>
+
+<p>把这个"<em>奇迹</em>" 翻译成现代语言：固定 \(q\)（比如 3），定义函数</p>
+
+<p>\[
+\chi_q \colon (\mathbb{Z}/4q)^* \to \{\pm 1\}, \quad \chi_q(p \bmod 4q) := \left(\frac{q}{p}\right).
+\]</p>
+
+<p>互反律说<em>这个函数定义良好</em>——它只依赖 \(p\) 的余数类。\(\chi_q\) 是一个 Dirichlet 特征——这条线最终通向 Dirichlet 关于"<em>等差数列中素数有无穷多</em>" 的证明（本书 ch15）和 \(L\)-函数（ch16）。</p>
+
+<p>更深一层：互反律是<em>类域论</em>（class field theory，20 世纪数论的中心定理之一）最古老的特例。一般类域论说："<em>数域 \(K\) 的某些 Galois 扩张</em>" 与"<em>\(K\) 的<em>理想群</em> 的某些子群</em>" 之间有自然的一一对应"——这是 Hilbert、Takagi、Artin 1900-30 年间发展的庞大结构。二次互反律是这套理论的"\(K = \mathbb{Q}\)，扩张为 \(\mathbb{Q}(\sqrt q)\)"<em>这一</em>个特例（本书 ch22 简介）。Gauss 1796 年证它的时候不知道这层意义，但他<em>感</em>到了——他一生证了 8 遍，因为他一直在试图理解这条事实<em>为什么</em> 真。</p>
+
+<h2 id="sec10-6">10.6 完整证明思路：Gauss 引理</h2>
+
+<p>互反律有 240+ 个已发表证明（在 100+ 数学家手里）。我们给最经典的一条：Gauss 自己 1808 年的第三证明，用"<em>Gauss 引理</em>"。</p>
+
+<p><strong>引理（Gauss 引理）。</strong>设 \(p\) 奇素数，\(\gcd(a, p) = 1\)。考虑集合</p>
+
+<p>\[
+S_a := \left\{ a, 2a, 3a, \ldots, \tfrac{p - 1}{2} a \right\} \bmod p,
+\]</p>
+
+<p>把每个元素取代表元 \(\in \{-(p - 1)/2, \ldots, -1, 1, \ldots, (p - 1)/2\}\)（即"<em>对称</em>" 表示，绝对值最小者）。设 \(\mu_a := \) "<em>\(S_a\) 中负代表元个数</em>"。则</p>
+
+<p>\[
+\boxed{\ \left(\frac{a}{p}\right) = (-1)^{\mu_a}.\ }
+\]</p>
+
+<p>请你先看个具体例子。\(p = 11, a = 3\)。\(S_3 = \{3, 6, 9, 12, 15\} \bmod 11 = \{3, 6, 9, 1, 4\}\)。对称表示（\(\{-5, \ldots, -1, 1, \ldots, 5\}\)）：\(3 \to 3, 6 \to -5, 9 \to -2, 1 \to 1, 4 \to 4\)。\(\{3, -5, -2, 1, 4\}\)，负代表 \(\{-5, -2\}\)，\(\mu_3 = 2\)。\((-1)^2 = +1\)。所以 \(\left(\frac{3}{11}\right) = +1\)——9 章已确认。\(\checkmark\)</p>
+
+<p><em>引理证明。</em>关键观察：\(S_a\) 这 \((p - 1)/2\) 个元素的<em>绝对代表元</em>恰是 \(\{1, 2, \ldots, (p - 1)/2\}\) 这 \((p - 1)/2\) 个数<em>的某个排列</em>。</p>
+
+<p>为什么？(i) 每个元素 \(k a\)（\(1 \le k \le (p - 1)/2\)）非零（因 \(p \nmid k a\)），所以代表元 \(\neq 0\)；(ii) 取绝对值后属于 \(\{1, \ldots, (p - 1)/2\}\)；(iii) 两个不同的 \(k a, j a\)（\(k \neq j, 1 \le k, j \le (p - 1)/2\)）不可能取同一绝对值——否则 \(k a \equiv \pm j a \pmod p\)，约去 \(a\) 得 \(k \equiv \pm j\)，但 \(k, j \in \{1, \ldots, (p - 1)/2\}\) 下 \(k \equiv j\) 给 \(k = j\) 矛盾，\(k \equiv -j\) 给 \(k + j \equiv 0 \pmod p\) 但 \(2 \le k + j \le p - 1\)，矛盾。所以 \((p - 1)/2\) 个绝对值彼此不同——填满。</p>
+
+<p>所以</p>
+
+<p>\[
+\prod_{k = 1}^{(p - 1)/2} (k a) \equiv (-1)^{\mu_a} \prod_{k = 1}^{(p - 1)/2} k \pmod p.
+\]</p>
+
+<p>左边 \(= a^{(p - 1)/2} \cdot ((p - 1)/2)!\)，右边 \(= (-1)^{\mu_a} \cdot ((p - 1)/2)!\)。约去 \(((p - 1)/2)!\)（与 \(p\) 互素）：</p>
+
+<p>\[
+a^{(p - 1)/2} \equiv (-1)^{\mu_a} \pmod p.
+\]</p>
+
+<p>由 Euler 准则 \(\left(\frac{a}{p}\right) \equiv a^{(p - 1)/2}\)。\(\Box\)</p>
+
+<p>这条引理把 Legendre 符号变成<em>计数问题</em>——数 \(\mu_a\) 个负数。证明互反律的策略：用 Gauss 引理把 \(\left(\frac{p}{q}\right)\) 和 \(\left(\frac{q}{p}\right)\) 都变成计数；证两个计数 mod 2 相加等于 \(\frac{p - 1}{2} \cdot \frac{q - 1}{2}\)。</p>
+
+<p><strong>证明二次互反律（Eisenstein 1844 改写 Gauss）。</strong>用 Gauss 引理，\(\mu_q\)（关于 \(p\)）= 集合 \(\{q, 2q, \ldots, ((p - 1)/2) q\} \bmod p\) 中负代表元个数。等价：</p>
+
+<p>\[
+\mu_q = \#\left\{ k \in \{1, \ldots, (p - 1)/2\} : \left\lfloor \frac{2 k q}{p} \right\rfloor \text{ 奇} \right\}.
+\]</p>
+
+<p>（因为 \(k q \bmod p \in (p/2, p) \iff k q\) 落在某 \([m p + p/2, (m + 1) p)\) 区间 \(\iff \lfloor 2 k q / p \rfloor\) 奇。）</p>
+
+<p>简化（细节略）得</p>
+
+<p>\[
+\mu_q \equiv \sum_{k = 1}^{(p - 1)/2} \left\lfloor \frac{k q}{p} \right\rfloor \pmod 2.
+\]</p>
+
+<p>对称：\(\mu_p \equiv \sum_{j = 1}^{(q - 1)/2} \lfloor j p / q \rfloor \pmod 2\)。</p>
+
+<p>互反律变成：要证</p>
+
+<p>\[
+\sum_{k = 1}^{(p - 1)/2} \left\lfloor \frac{k q}{p} \right\rfloor + \sum_{j = 1}^{(q - 1)/2} \left\lfloor \frac{j p}{q} \right\rfloor = \frac{p - 1}{2} \cdot \frac{q - 1}{2}.
+\]</p>
+
+<p><strong>几何论证。</strong>考虑矩形 \(R = \{(x, y) : 1 \le x \le (p - 1)/2, 1 \le y \le (q - 1)/2\}\) 中的整点。共 \(\frac{p - 1}{2} \cdot \frac{q - 1}{2}\) 个。把直线 \(L : q x - p y = 0\) 即 \(y = q x / p\) 画进矩形——因 \(\gcd(p, q) = 1\)，没有整点正好在 \(L\) 上（否则 \(p \mid q x\) 即 \(p \mid x\)，但 \(x < p\)）。所以 \(R\) 整点被 \(L\) 划成两半。</p>
+
+<p>"<em>\(L\) 下方</em>" 的整点：固定 \(x = k\)，整点 \(y\) 满足 \(1 \le y < k q / p\)，共 \(\lfloor k q / p \rfloor\) 个（注意 \(k q / p\) 不是整数）。求和 \(\sum_{k = 1}^{(p - 1)/2} \lfloor k q / p \rfloor\)。但还要确认 \(k q / p < (q - 1)/2 + 1 = (q + 1)/2\)——因为 \(k \le (p - 1)/2\)，\(k q / p \le (p - 1) q / (2 p) = q / 2 - q / (2 p) < q / 2 < (q + 1)/2\)，OK。</p>
+
+<p>"<em>\(L\) 上方</em>" 的整点：固定 \(y = j\)，整点 \(x\) 满足 \(1 \le x < j p / q\)，类似得 \(\sum \lfloor j p / q \rfloor\)。</p>
+
+<p>两个和加起来 = 矩形整点总数 = \(\frac{p - 1}{2} \cdot \frac{q - 1}{2}\)。\(\Box\)</p>
+
+<p>请你停下来回头看证明的<em>形状</em>。"<em>3 是不是 mod \(p\) 的平方</em>" 这个看起来纯算术的问题，证明的核心竟然是<em>数矩形里的整点</em>——一个几何/组合事实。这种"<em>问题在算术里、答案在几何里</em>" 的转译就是互反律之所以"<em>奇迹</em>" 的<em>结构性</em>原因。</p>
+
+<h2 id="sec10-7">10.7 推广：Jacobi 符号 + 高次互反律</h2>
+
+<p>互反律有几条直接推广。</p>
+
+<p><strong>Jacobi 符号。</strong>设 \(n\) 奇正整数，\(n = q_1 q_2 \cdots q_r\)（不要求各 \(q_i\) 不同）。定义</p>
+
+<p>\[
+\left(\frac{a}{n}\right)_J := \prod_{i = 1}^r \left(\frac{a}{q_i}\right).
+\]</p>
+
+<p>这<em>不</em>是"\(a\) 是 mod \(n\) 的 QR" 的判别（当 \(n\) 不是素数时）——\(\left(\frac{a}{n}\right)_J = +1\) 不蕴含 \(a\) 是 QR mod \(n\)。但它<em>满足</em>同样的互反律和补充律（计算时不必先把 \(n\) 分解！）：</p>
+
+<p>\[
+\left(\frac{m}{n}\right)_J \left(\frac{n}{m}\right)_J = (-1)^{\frac{m - 1}{2} \cdot \frac{n - 1}{2}}, \quad m, n \text{ 奇正互素}.
+\]</p>
+
+<p>用处：算 \(\left(\frac{a}{p}\right)\) 时不必把 \(a\) 的奇部分质分解——直接用 Jacobi 符号递归更快。这是<em>计算 Legendre 符号的现代算法</em>，用在 RSA 密钥生成、QR 加密等。</p>
+
+<p><strong>高次互反律。</strong>问"\(a\) 是 mod \(p\) 的<em>三次</em>幂吗" / "<em>四次</em>幂吗" / ...。这些有自己的"<em>符号</em>" 和互反律。</p>
+
+<ul>
+<li><em>三次互反律</em>（Eisenstein 1844）：在 \(\mathbb{Z}[\omega]\)（\(\omega = e^{2 \pi i / 3}\) 立方根）里成立。</li>
+<li><em>四次互反律</em>（Gauss 1828, 1832）：在 \(\mathbb{Z}[i]\)（高斯整数）里成立。</li>
+<li><em>一般 \(\ell\) 次互反律</em>（Hilbert, Furtwängler, Takagi, Artin）：需要进入<em>类域论</em> 的全套机器。Artin 互反律（1927）是"<em>所有这一类互反律的统一形式</em>"——它把"<em>素数在数域里如何分解</em>" 与"<em>Galois 群的结构</em>" 等同起来。这是 20 世纪数论的高峰之一。</li>
+</ul>
+
+<p>本书 ch22 会简短介绍这条线，但完整发展需要专门的"<em>类域论</em>" 课。</p>
+
+<p>更广远地，<em>Langlands 纲领</em>（20 世纪 60 年代提出，至今仍是数论中心方向）说："<em>所有的互反律是 Galois 表示与自守表示之间的对应</em>"——这是把"<em>Gauss 二次互反律</em>" 这条 1796 年的事实推到极限的<em>大统一框架</em>。Wiles 1995 证 Fermat 大定理用的"<em>谷山-志村猜想</em>"（椭圆曲线 \(\leftrightarrow\) 模形式）是 Langlands 纲领最著名的特例。本书 ch24 会介绍这条结尾。</p>
+
+<h2 id="sec10-8">10.8 一句临别话</h2>
+
+<p>1796 年 4 月 8 日，19 岁的 Gauss 在哥廷根第一次完整证出二次互反律。他后来在日记里写："<em>这条定理像一颗算术宝石——闪着不可思议的光</em>。" 他一生给出 8 个不同证明，每个都从不同的角度看同一条事实——他想<em>理解</em> 它，而不只是<em>知道</em> 它。</p>
+
+<p>这种"<em>同一事实从无数角度看</em>" 的执着是 Gauss 的标志，也是数论最深的工作方法。每个新证明都是一个新的<em>意义层</em>——而每个意义层最后都通向一个新的子学科。Gauss 第 5 证发展出二元二次型理论（本书 ch17）；第 6 证启发了"<em>高斯和</em>" 与解析数论；Eisenstein 几何证启发了类域论的"<em>整点几何</em>" 视角；Hilbert 的证明启发了局部-整体原理（adelic）。互反律是数论的"<em>第一颗珍珠</em>"——从它身上长出整个 19-20 世纪数论。</p>
+
+<p>下一章我们换跑道——从"<em>模 \(p\) 算术</em>" 切到"<em>整数的连分数表示</em>"。看似毫无关系，但它将给出 Pell 方程的完全解，并通向<em>实二次域</em>的算术——又是数论的另一片大陆。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 二次剩余与 Legendre 符号</a><a href="ch11.html">下一章 · 第 11 章 连分数 →</a></nav>
+</main>
+</body>
+</html>

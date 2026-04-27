@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 Mordell-Weil 定理 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 椭圆曲线引论</a><a href="ch21.html">下一章 · 第 21 章 模形式入门 →</a></nav>
+<h1 id="ch20">第 20 章 Mordell-Weil 定理</h1>
+
+<p>上一章让我们看见椭圆曲线 \(E\) 上的有理点 \(E(\mathbb{Q})\) 是个阿贝尔群。具体例子里出现两种极端：\(y^2 = x^3 - x\) 给 \(E(\mathbb{Q}) = (\mathbb{Z}/2)^2\)（4 个元，有限），\(y^2 = x^3 - 2\) 给 \(E(\mathbb{Q})\) 含 \((3, 5)\) 生成的无限循环子群（无限）。</p>
+
+<p>问题：\(E(\mathbb{Q})\) <em>有多大</em>？是否可能是<em>不可数</em>的？是否可能是<em>没有有限生成集</em> 的无限阿贝尔群？</p>
+
+<p>朴素担忧：椭圆曲线的有理点可以"<em>很多</em>"——上一章 \(E_2' : y^2 = x^3 - 2\) 上的 \(P = (3, 5)\) 加自己得到分母越来越大的点，无穷多个互不相同。这些"<em>大分母点</em>" 会不会"<em>密集</em>" 到没法用有限数据描述？</p>
+
+<p>答案是<em>不会</em>——这就是这一章的主定理：</p>
+
+<p><strong>定理（Mordell-Weil, 1922 / 1928）。</strong>\(E(\mathbb{Q})\) 是<em>有限生成</em>阿贝尔群。</p>
+
+<p>结合<a href="../抽象代数/ch8.html">抽象代数 ch8</a>有限生成阿贝尔群分类，</p>
+
+<p>\[
+\boxed{\ E(\mathbb{Q}) \cong \mathbb{Z}^r \oplus T,\ }
+\]</p>
+
+<p>其中 \(T\) 是有限<em>挠子群</em>，\(r \ge 0\) 是<em>秩</em>。</p>
+
+<p>这条定理是<em>椭圆曲线理论的奠基石</em>——它把"<em>找有理点</em>" 这个看似无限的问题<em>降维</em> 到"<em>找一个有限生成集 + 描述秩</em>"。这一章我们看证明骨架 + 挠子群 / 秩各自的故事。</p>
+
+<h2 id="sec20-1">20.1 定理陈述与朴素策略</h2>
+
+<p><strong>定理（Mordell-Weil, 1922 for \(\mathbb{Q}\); Weil, 1928 for 一般数域）。</strong>设 \(E\) 是 \(\mathbb{Q}\) 上的椭圆曲线（即 \(\Delta \neq 0\)）。则 \(E(\mathbb{Q})\) 是有限生成阿贝尔群。</p>
+
+<p>朴素策略：找一个<em>有限</em> 集合 \(S \subseteq E(\mathbb{Q})\) 使每个 \(P \in E(\mathbb{Q})\) 都可写为 \(P = n_1 Q_1 + \cdots + n_k Q_k\)（整数系数线性组合），\(Q_i \in S\)。</p>
+
+<p>怎么证存在这样的 \(S\)？最朴素想法："<em>从'小'点开始，反复'倍'+ '加'</em>"——可惜没法证这能穷尽 \(E(\mathbb{Q})\)。</p>
+
+<p>Mordell 的关键想法：用<em>无穷下降</em>——反过来，从一个"<em>大</em>" 点出发，反复<em>"减半"</em>，把它"<em>降</em>" 到一个有限集合里。这条思路源头是 Fermat 1640 年用<em>无穷下降</em> 证 \(x^4 + y^4 = z^4\) 无非平凡整数解。Mordell 把这套技术推广到一般椭圆曲线。</p>
+
+<p>具体三步：</p>
+
+<ol>
+  <li><strong>弱 Mordell-Weil：</strong>证 \(E(\mathbb{Q}) / 2 E(\mathbb{Q})\) 是<em>有限</em> 群。即"<em>除以 2 后</em>" 只剩有限<em>陪集</em>。</li>
+  <li><strong>高度函数：</strong>构造 \(h : E(\mathbb{Q}) \to \mathbb{R}_{\ge 0}\)，让"<em>高度大的点</em>" 对应"<em>分母 / 分子大的有理点</em>"，并满足若干代数性质（半双线性、控制平移）。</li>
+  <li><strong>无穷下降：</strong>用前两步合并——给出一个<em>有限</em> 生成集。</li>
+</ol>
+
+<p>下面三节展开三步。证明的整体气势：第 1 步是代数（Galois 上同调），第 2 步是分析 / 几何（高度），第 3 步是初等组合（下降）。三个领域工具合一才能把定理证完——这种"<em>多领域合作</em>" 是 20 世纪代数数论最典型的做法。</p>
+
+<h2 id="sec20-2">20.2 第 1 步：弱 Mordell-Weil（\(E(\mathbb{Q})/2 E(\mathbb{Q})\) 有限）</h2>
+
+<p>"<em>弱</em>" 的意思：先证一个比 Mordell-Weil 弱、但<em>关键</em> 的事——\(E(\mathbb{Q}) / 2 E(\mathbb{Q})\) 是有限群（即"<em>除以 2 倍数</em>" 只剩有限陪集）。</p>
+
+<p>注意——这句话本身<em>不够</em>给"\(E(\mathbb{Q})\) 有限生成"。例 \(\mathbb{Q}^*\)：\(\mathbb{Q}^* / (\mathbb{Q}^*)^2\) 是个无限维 \(\mathbb{F}_2\)-向量空间（一组基由素数给——每个素数贡献一个独立的 \(\bmod\) 2 平方的方向）。所以"<em>商有限</em>" 不蕴含"<em>原群有限生成</em>"。但椭圆曲线的情况不同——加上下面 20.4 的<em>高度</em> 控制后，才能从"<em>商有限</em>" 提到"<em>有限生成</em>"。</p>
+
+<p>弱 Mordell-Weil 的证法本身需要<em>Galois 上同调</em>。给思路：</p>
+
+<p>选一个素数 \(\ell\)（比如 \(\ell = 2\)）。考虑椭圆曲线的<em>\(\ell\)-挠点</em> \(E[\ell] := \{P \in E(\bar{\mathbb{Q}}) : \ell P = O\}\)——是个 \((\mathbb{Z}/\ell)^2\) 的有限阿贝尔群。Galois 群 \(G_\mathbb{Q} = \mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})\) 作用其上。</p>
+
+<p>有一个短正合列：\(0 \to E[\ell] \to E(\bar{\mathbb{Q}}) \xrightarrow{\ell} E(\bar{\mathbb{Q}}) \to 0\)。取 \(G_\mathbb{Q}\)-不变量 + 长正合列得：</p>
+
+<p>\[
+0 \to E(\mathbb{Q}) / \ell E(\mathbb{Q}) \to H^1(G_\mathbb{Q}, E[\ell]) \to H^1(G_\mathbb{Q}, E)[\ell] \to 0.
+\]</p>
+
+<p>左边正是我们想的"<em>商</em>"。把它嵌进 \(H^1(G_\mathbb{Q}, E[\ell])\)——是个 Galois 上同调群。</p>
+
+<p>关键：在<em>有限多个素数处不分歧</em> 这个约束下，\(H^1\) 群有<em>有限</em> 子群。"<em>不分歧</em>" 来自椭圆曲线只在 \(\Delta\) 的素因子处有 reduction 问题——其余素数处 \(E\) 在 \(\mathbb{F}_p\) 上仍是椭圆曲线，对应 Galois 表示在那些素处不分歧。</p>
+
+<p>把"<em>不分歧</em>" 作为限制 + Hermite-Minkowski（关于数域中"<em>有限多素数处不分歧的扩张</em>" 是有限的）→ 上同调子群有限。\(E(\mathbb{Q})/\ell E(\mathbb{Q})\) 嵌在这有限群里，所以有限。\(\checkmark\)</p>
+
+<p>这条证明用了相当深的代数工具（Galois 上同调 + Hermite-Minkowski），比 Mordell 1922 的原证（更初等，但只对 \(\mathbb{Q}\)；Weil 1928 推广到一般数域时才必须 Galois 上同调）现代化。两种证法等价。</p>
+
+<p>实际可计算性：弱 MW 的证明<em>原则上</em> 给"<em>找 \(E(\mathbb{Q})/\ell E(\mathbb{Q})\) 代表元</em>" 的算法——叫"<em>\(\ell\)-下降</em>"。具体做：用 Selmer 群（包含 \(E(\mathbb{Q})/\ell E(\mathbb{Q})\) + Tate-Shafarevich 群 Ш 的 \(\ell\)-部分）来计算。Selmer 群可<em>有效</em> 计算（对每个曲线 + 每个 \(\ell\)），但区分"<em>真有理 \(\ell\)-下降</em>" vs "<em>假 \(\ell\)-下降</em>"（即 Ш 元素）是难的——这正是<em>秩</em> 问题不可有效计算的根源。</p>
+
+<h2 id="sec20-3">20.3 第 2 步：高度函数</h2>
+
+<p>第二步引入"<em>高度</em>" 来度量有理点的"<em>大小</em>"。直观——分子分母大的有理点"<em>高</em>"；分子分母小的"<em>低</em>"。</p>
+
+<p><strong>定义（朴素高度）。</strong>对 \(P = (x, y) \in E(\mathbb{Q})\)，\(P \neq O\)，写 \(x = a / b\)（\(a, b \in \mathbb{Z}, \gcd(a, b) = 1\)）。定义</p>
+
+<p>\[
+H(P) := \max(|a|, |b|), \quad h(P) := \log H(P).
+\]</p>
+
+<p>另外约定 \(h(O) = 0\)。</p>
+
+<p>性质：</p>
+
+<ul>
+  <li>\(h(P) \ge 0\) 对所有 \(P\)。</li>
+  <li>\(h(P) = 0 \iff x = 0 / 1 = 0\) 或 \(P = O\)（即 \(P\) 是"<em>简单</em>" 点）。</li>
+  <li><em>有限性</em>：固定 \(B > 0\)，\(\#\{P \in E(\mathbb{Q}) : h(P) \le B\}\) <em>有限</em>。证明：高度 \(\le B\) 的 \(P\) 满足 \(\max(|a|, |b|) \le e^B\)——只有限多 \(\le e^B\) 的对 \((a, b)\)，每对最多给两个 \(y\)（\(\pm \sqrt{x^3 + ax + b}\)），所以总有限。</li>
+</ul>
+
+<p>这条<em>有限性</em>是无穷下降的关键。</p>
+
+<p>但朴素高度有缺陷——它<em>不</em>满足 \(h(P + Q) \le h(P) + h(Q) + C\) 这种<em>线性可加</em>性质。实际椭圆曲线运算 \(P + Q\) 涉及非线性公式，朴素高度的行为不规则。</p>
+
+<p>修复：定义<strong>规范高度</strong>（canonical / Néron-Tate height）</p>
+
+<p>\[
+\hat{h}(P) := \lim_{n \to \infty} \frac{h(2^n P)}{4^n}.
+\]</p>
+
+<p>这个极限存在（要证 \(h(2 P) = 4 h(P) + O(1)\)，所以 \(h(2^n P) / 4^n\) 是 Cauchy）。</p>
+
+<p>规范高度的关键性质：</p>
+
+<ol>
+  <li>\(\hat{h}(P) \ge 0\)，\(\hat{h}(P) = 0 \iff P\) 是挠点。</li>
+  <li>\(\hat{h}\) 是<em>二次型</em>：\(\hat{h}(P + Q) + \hat{h}(P - Q) = 2 \hat{h}(P) + 2 \hat{h}(Q)\)（"<em>平行四边形等式</em>"）。所以 \(\langle P, Q \rangle := \hat{h}(P + Q) - \hat{h}(P) - \hat{h}(Q)\) 是双线性对称形式。</li>
+  <li>\(\hat{h}\) 与朴素高度差有界：\(|\hat{h}(P) - h(P)| \le C(E)\) 对所有 \(P\)。所以"<em>规范高度有限的集合</em>" = "<em>朴素高度有限的集合</em>" 也有限。</li>
+</ol>
+
+<p>把 \(E(\mathbb{Q}) \otimes \mathbb{R}\) 想成欧氏空间 \(\mathbb{R}^r\)（\(r\) = 秩），\(\hat{h}\) 是这空间上的<em>正定二次型</em>。\(E(\mathbb{Q})/T\) 是这空间里的<em>格</em>。这个几何画面是 Mordell-Weil 证明的灵魂。</p>
+
+<p>对比<a href="../数值方法/ch4.html">数值方法 ch4</a>：那里"<em>条件数</em>" 是个度量"<em>问题先天难度</em>" 的二次型；这里规范高度也是二次型，但度量"<em>有理点的大小</em>"。两套二次型在不同领域起类似作用——把"<em>大小</em>" 变量化。</p>
+
+<h2 id="sec20-4">20.4 第 3 步：无穷下降合并</h2>
+
+<p>把第 1 步（\(E(\mathbb{Q})/2 E(\mathbb{Q})\) 有限）和第 2 步（高度有正定二次型 + 离散性）合起来。</p>
+
+<p><strong>无穷下降</strong>核心命题：从任何 \(P \in E(\mathbb{Q})\) 出发，存在<em>有限</em> 步内到达"<em>低高度集合</em>"。</p>
+
+<p>具体：选 \(\ell = 2\)。\(E(\mathbb{Q})/2 E(\mathbb{Q})\) 有限，记代表元 \(\{Q_1, \ldots, Q_m\}\)。任 \(P \in E(\mathbb{Q})\) 可写</p>
+
+<p>\[
+P = Q_{i_1} + 2 P_1
+\]</p>
+
+<p>对某 \(i_1 \in \{1, \ldots, m\}\) 和某 \(P_1 \in E(\mathbb{Q})\)。取高度：\(\hat{h}(2 P_1) = 4 \hat{h}(P_1)\)；\(\hat{h}(P) = \hat{h}(Q_{i_1} + 2 P_1) \ge \hat{h}(2 P_1) - \text{某常数} = 4 \hat{h}(P_1) - C\)。整理：\(\hat{h}(P_1) \le (\hat{h}(P) + C)/4\)。</p>
+
+<p>对 \(P_1\) 重复——\(P_1 = Q_{i_2} + 2 P_2\)，\(\hat{h}(P_2) \le (\hat{h}(P_1) + C)/4 \le (\hat{h}(P) + C(1 + 1/4))/16\)。继续。</p>
+
+<p>第 \(n\) 步：\(\hat{h}(P_n) \le \hat{h}(P) / 4^n + C \cdot \sum_{k=1}^n 4^{-k} \le \hat{h}(P) / 4^n + C/3\)。</p>
+
+<p>当 \(n\) 大，\(\hat{h}(P_n) \le C/3 + 1\)。\(P_n\) 落在"<em>规范高度 \(\le C/3 + 1\)</em>" 的<em>有限</em> 集合 \(S\) 里（性质 3 + 朴素高度有限性）。</p>
+
+<p>所以 \(P\) 由 \(\{Q_1, \ldots, Q_m\}\)（弱 MW 代表元）+ \(S\)（低高度有限集）<em>有限组合</em> 而成。\(\{Q_1, \ldots, Q_m\} \cup S\) 是 \(E(\mathbb{Q})\) 的<em>有限生成集</em>。\(\checkmark\)</p>
+
+<p>这就是 Mordell-Weil 的完整骨架。Wiles 在<em>多个有理点群</em>（比如某些模形式对应的椭圆曲线类） 上做的工作很大一部分是把这个骨架做<em>有效</em>——给出具体的算法 / 上界。</p>
+
+<p>请你停下来感受这条证明的<em>三层组合</em>。第 1 步是<em>代数</em>（Galois 上同调）—— 它告诉你"<em>除以 2 后陪集只有限多</em>"，这是个<em>群论结构</em>事实。第 2 步是<em>分析</em>（高度函数）—— 它度量点的"<em>大小</em>"，让"<em>下降</em>" 这操作有定量意义。第 3 步是<em>初等</em>（无穷下降）—— 把代数 + 分析合起来给出有限生成结论。三种数学工具不可替代地各自承担一份。这是现代代数数论的<em>定理范式</em>——它教你"<em>整数论问题</em> = <em>代数 + 分析 + 几何 三方面合作</em>"。</p>
+
+<h2 id="sec20-5">20.5 挠子群 \(T\)：Mazur 定理</h2>
+
+<p>Mordell-Weil 给 \(E(\mathbb{Q}) \cong \mathbb{Z}^r \oplus T\)。下面分两段研究 \(T\)（挠子群）和 \(r\)（秩）。\(T\) 容易；\(r\) 极难。</p>
+
+<p>定义 \(T = \{P \in E(\mathbb{Q}) : n P = O \text{ 对某 } n \ge 1\}\)。</p>
+
+<p>"<em>挠</em>" 即"<em>有限阶</em>"。\(T\) 显然是 \(E(\mathbb{Q})\) 的子群（有限阶元的集合在阿贝尔群里是子群）。Mordell-Weil 给 \(T\) 有限。</p>
+
+<p>具体能算 \(T\)。一个常用工具：</p>
+
+<p><strong>命题（Lutz-Nagell, 1937 / 1935）。</strong>设 \(E : y^2 = x^3 + a x + b\)（\(a, b \in \mathbb{Z}\)），\(P = (x, y) \in E(\mathbb{Q})\) 非平凡挠点。则</p>
+<ol>
+  <li>\(x, y \in \mathbb{Z}\)（即挠点的坐标是整数）。</li>
+  <li>\(y = 0\) 或 \(y^2 \mid \Delta\)（即 \(y^2\) 整除判别式）。</li>
+</ol>
+
+<p>这给一个有限算法——只需检查所有 \(y\) 满足 \(y^2 \mid \Delta\) 的整数 \((x, y)\)，看哪些在 \(E\) 上 + 是挠点。</p>
+
+<p>例：\(E_1 : y^2 = x^3 - x\)，\(\Delta = 64\)。\(y^2 \mid 64 \Rightarrow y \in \{0, \pm 1, \pm 2, \pm 4, \pm 8\}\)。\(y = 0\)：\(x \in \{0, 1, -1\}\)，挠点 \(\{(0, 0), (1, 0), (-1, 0)\}\)。\(y = \pm 1\)：\(x^3 - x = 1\)，无整数解。\(y = \pm 2\)：\(x^3 - x = 4\)，无。\(\ldots\) 没新挠点。所以 \(T = (\mathbb{Z}/2)^2\)，4 个挠点。</p>
+
+<p>这套算法实际工作，给所有曲线的挠子群。但<em>具体哪些挠子群可能出现</em> 这个问题很久没解决，直到——</p>
+
+<p><strong>定理（Mazur, 1977）。</strong>椭圆曲线 \(E / \mathbb{Q}\) 的挠子群 \(T\) 必同构于以下 15 种之一：</p>
+
+<p>\[
+\mathbb{Z}/n \quad (1 \le n \le 10, \ n = 12), \qquad \mathbb{Z}/2 \times \mathbb{Z}/2n \quad (1 \le n \le 4).
+\]</p>
+
+<p>具体 15 种：</p>
+<ul>
+  <li>\(\mathbb{Z}/1\)（即 \(\{O\}\)）。</li>
+  <li>\(\mathbb{Z}/n\) 对 \(n = 2, 3, 4, 5, 6, 7, 8, 9, 10, 12\)（10 种）。</li>
+  <li>\(\mathbb{Z}/2 \times \mathbb{Z}/2\)，\(\mathbb{Z}/2 \times \mathbb{Z}/4\)，\(\mathbb{Z}/2 \times \mathbb{Z}/6\)，\(\mathbb{Z}/2 \times \mathbb{Z}/8\)（4 种）。</li>
+</ul>
+
+<p>注意——\(n = 11\) 不出现（"<em>没有 \(\mathbb{Q}\)-椭圆曲线有 11 阶 \(\mathbb{Q}\)-挠点</em>"）。这是个完全非平凡的事实——\(\mathbb{Z}/11\) 这种简单结构<em>就是不会作为</em> 任何椭圆曲线 \(/\mathbb{Q}\) 的挠子群。</p>
+
+<p>Mazur 定理的证明<em>极</em> 深——它用到模曲线 \(X_0(N)\)、模形式、Eisenstein 理想（Mazur 自己开发的工具）等。这条定理成为现代算术几何技术的范本——很多后续结果（Faltings 的 Mordell 猜想证明、Wiles 的 Fermat 大定理）都用类似的"<em>用模曲线研究椭圆曲线</em>" 的思路。</p>
+
+<p>对每个具体椭圆曲线 \(E / \mathbb{Q}\)，挠子群<em>可有效计算</em>——Lutz-Nagell + Mazur 一起给完整算法 + 列表。SageMath 一行 <code>E.torsion_subgroup()</code> 算出。</p>
+
+<h2 id="sec20-6">20.6 秩 \(r\)：神秘的不变量</h2>
+
+<p>挠子群有定理 + 算法。<em>秩</em> 完全不同。</p>
+
+<p><strong>什么是秩？</strong>\(r := \mathrm{rank}_\mathbb{Z} E(\mathbb{Q}) = \dim_\mathbb{Q} (E(\mathbb{Q}) \otimes_\mathbb{Z} \mathbb{Q})\)——即"<em>独立无穷阶生成元个数</em>"。</p>
+
+<p>具体例子：</p>
+<ul>
+  <li>\(E_1 : y^2 = x^3 - x\)：\(r = 0\)（所有有理点都是挠点）。</li>
+  <li>\(y^2 = x^3 - 2\)：\(r = 1\)（一个独立无穷阶生成元，\((3, 5)\)）。</li>
+  <li>\(y^2 = x^3 - 26\)：\(r = 2\)。</li>
+  <li>\(y^2 + xy = x^3 - 6 x + 4\)（某选定曲线）：\(r = 28\)（已知最大记录之一）。</li>
+</ul>
+
+<p>截至 2024 年，已知最大的<em>具体</em> 椭圆曲线 \(\mathbb{Q}\)-秩是 28（Elkies 2006，这条曲线极复杂）。\(r \ge 29\) 的曲线<em>是否存在</em> 是开放问题。</p>
+
+<p>问题：<em>给一条具体的椭圆曲线，怎么算它的秩</em>？</p>
+
+<p>答：<em>没有已证终止的算法</em>。</p>
+
+<p>请你认真理解这句话。给具体 \(a, b\)，输入 \(E : y^2 = x^3 + a x + b\)；要求"<em>输出秩 \(r\)</em>" 的算法<em>不存在</em>（确切说，不存在已证<em>对所有曲线终止</em> 的算法）。这是 21 世纪数论最尴尬的<em>具体</em> 问题——一个能用七个字符 \(y^2 = x^3 + a x + b\) 描述的对象，最基本的不变量没法可靠计算。</p>
+
+<p>实际工作里有"<em>启发式算法</em>"：</p>
+<ol>
+  <li>计算 \(\ell\)-下降（\(\ell = 2, 3, 5, \ldots\)）求 Selmer 群上界。</li>
+  <li>搜索具体的有理点（不同高度上界）拿到秩下界。</li>
+  <li>如果上下界相等，秩确定；不等，下次升 \(\ell\) 试。</li>
+</ol>
+
+<p>大部分小判别式曲线（\(\Delta\) 不太大）用此方法可以算到秩。但理论上不保证<em>对所有曲线</em> 终止。失败的情况对应"<em>Tate-Shafarevich 群 Ш 的非平凡 \(\ell\)-部分</em>"——一种"<em>看不见的障碍</em>"，让 Selmer 上界比真秩大。要克服 Ш，需要更深的工具。</p>
+
+<h2 id="sec20-7">20.7 BSD 猜想</h2>
+
+<p>Birch-Swinnerton-Dyer 猜想（1965）给秩问题一个理论答案。它把秩 \(r\) 和椭圆曲线的<em>\(L\)-函数</em> 联系起来。</p>
+
+<p><strong>椭圆曲线的 \(L\)-函数。</strong>对每个素数 \(p\)（不整除 \(\Delta\)），定义</p>
+
+<p>\[
+a_p := p + 1 - |E(\mathbb{F}_p)|.
+\]</p>
+
+<p>即 \(a_p\) 度量 \(E\) 在模 \(p\) 下"<em>有理点比预期多 / 少</em>" 的量。Hasse 定理给 \(|a_p| \le 2 \sqrt p\)（链回 ch19 + Hasse-Weil 估计）。</p>
+
+<p>定义 \(E\) 的 \(L\)-函数：</p>
+
+<p>\[
+L(E, s) := \prod_p L_p(E, s)^{-1},
+\]</p>
+
+<p>其中 \(L_p(E, s) = 1 - a_p p^{-s} + p^{1 - 2s}\)（在不整除 \(\Delta\) 的 \(p\)；分歧素数另有约定）。这级数在 \(\Re(s) > 3/2\) 收敛。</p>
+
+<p>关键事实（Wiles 1995 + Breuil-Conrad-Diamond-Taylor 2001）：\(L(E, s)\) 可解析延拓到整 \(\mathbb{C}\)，满足函数方程 \(L(E, s) \leftrightarrow L(E, 2 - s)\)。所以可以谈"\(L(E, s)\) 在 \(s = 1\) 处的零阶"——即 \(\mathrm{ord}_{s=1} L(E, s)\)。</p>
+
+<p><strong>BSD 猜想（弱形式）。</strong></p>
+
+<p>\[
+\boxed{\ \mathrm{rank}_\mathbb{Z} E(\mathbb{Q}) = \mathrm{ord}_{s = 1} L(E, s).\ }
+\]</p>
+
+<p>左边是<em>代数秩</em>，右边是<em>分析秩</em>。它们应该相等。</p>
+
+<p><strong>BSD 猜想（强形式）。</strong>更进一步给 \(L(E, s)\) 在 \(s = 1\) 的<em>主值</em>（leading coefficient）的精确公式：</p>
+
+<p>\[
+\lim_{s \to 1} \frac{L(E, s)}{(s - 1)^r} = \frac{\Omega_E \cdot \mathrm{Reg}(E) \cdot |\text{Ш}(E)| \cdot \prod c_p}{|E(\mathbb{Q})_{\text{tors}}|^2}.
+\]</p>
+
+<p>右边各项：\(\Omega_E\)（实周期）、\(\mathrm{Reg}(E)\)（regulator，由 \(\hat{h}\) 在 \(E(\mathbb{Q})/T\) 上行列式给）、\(|\text{Ш}(E)|\)（Tate-Shafarevich 群的阶）、\(c_p\)（Tamagawa 数）、\(|E(\mathbb{Q})_{\text{tors}}|\)（挠子群阶）。每个量都是椭圆曲线的具体不变量。</p>
+
+<p>BSD 猜想是 Clay 数学研究所悬赏 100 万美元的<em>七大千禧年问题</em>之一（其他六个：\(P\) vs \(NP\)、Riemann 假设、Yang-Mills 质量缺口、Navier-Stokes 存在性 + 光滑性、Hodge 猜想、Poincaré 猜想；后者已被 Perelman 证）。BSD 至今未解。</p>
+
+<p>已知部分结果：</p>
+
+<ul>
+  <li><strong>Coates-Wiles 1977：</strong>对有 CM（复乘）的椭圆曲线，\(L(E, 1) \neq 0 \Rightarrow r = 0\)（即"<em>分析秩 0 \(\Rightarrow\) 代数秩 0</em>"）。这是 BSD 弱形式的<em>一个方向</em> 在 CM 情况。</li>
+  <li><strong>Gross-Zagier-Kolyvagin 1986-1990：</strong>对一般椭圆曲线，分析秩 \(\le 1\) 时 BSD 弱形式成立——即"<em>分析秩 0 \(\iff\) 代数秩 0</em>" + "<em>分析秩 1 \(\iff\) 代数秩 1</em>"。</li>
+  <li><strong>分析秩 \(\ge 2\) 的情况：</strong>完全开放。"<em>分析秩 = 代数秩</em>" 在<em>有限多</em> 具体例子上验证，但没有<em>一般结果</em>。</li>
+</ul>
+
+<p>BSD 的难度根源：它把"<em>有理点</em>"（一个<em>代数</em> 对象）和"<em>\(L\)-函数</em>"（一个<em>解析</em> 对象）联系起来。这种"<em>代数-解析桥</em>" 是数论中最深的现象——类似 \(\zeta\) 函数零点和素数分布的关系（链回 ch16）。理解这种桥需要的技术远超目前人类能力。</p>
+
+<p>Wiles 1995 证 Fermat 大定理用的"<em>模性定理</em>"（每条 \(\mathbb{Q}\)-椭圆曲线都对应一个模形式）是 BSD 的近邻——它建立了椭圆曲线的 \(L\)-函数 = 某模形式的 \(L\)-函数，让 \(L(E, s)\) 的解析延拓 + 函数方程成立。这套技术在 BSD 上还需要更多——目前还看不到"<em>分析秩 \(\ge 2\)</em>" 情况的攻法。</p>
+
+<h2 id="sec20-8">20.8 这一章的位置</h2>
+
+<p>请你回顾这本书走到这里的轨迹。</p>
+
+<p>ch1 我们从"<em>\(7^{100}\) 末位 = 1</em>" 这种心算把戏出发。</p>
+
+<p>ch2-12 我们建立初等数论的基础：Euclid 算法、素分解、模算术、二次互反、Pell 方程。这套工具<em>2300 年前</em>的 Euclid 已经知道大部分。</p>
+
+<p>ch13-16 我们引入<em>抽象代数 + 解析</em> 工具：高斯整数、Möbius 反演、\(L\)-函数、素数定理。整数现在被嵌进更大的代数 / 分析框架。</p>
+
+<p>ch17-20 我们用这套工具看更深的对象：二元二次型 + 类数、\(p\)-adic 数、椭圆曲线 + Mordell-Weil。这是<em>20 世纪数论</em> 的中心。</p>
+
+<p>下一章 ch21 我们看<em>模形式</em>——上半平面上的对称解析函数。它和椭圆曲线在 Wiles 路径里汇流（"<em>每条椭圆曲线对应一个模形式</em>"），让 ch24 的 Fermat 大定理证明成形。</p>
+
+<p>这一章的 take-away 三句话：</p>
+
+<ol>
+  <li><em>椭圆曲线的有理点群是有限生成阿贝尔群</em>（Mordell-Weil）——把无穷问题降维为有限。</li>
+  <li><em>挠子群只 15 种可能</em>（Mazur）——一个完全分类，靠模曲线技术。</li>
+  <li><em>秩没有可证终止的算法</em>——但 BSD 猜想给一个理论答案，由 \(L\)-函数零阶决定。这是 21 世纪数论第一神秘问题。</li>
+</ol>
+
+<p>这三句话画出当代算术几何的轮廓。一个看似简单的方程 \(y^2 = x^3 + a x + b\) 后面藏着我们这一代还没攻克的最深问题之一。整数表面平凡，骨子里复杂得超乎想象——这一章是这句话的最强证据。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 椭圆曲线引论</a><a href="ch21.html">下一章 · 第 21 章 模形式入门 →</a></nav>
+</main>
+</body>
+</html>

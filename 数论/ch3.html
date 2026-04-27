@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 素数：定义、Euclid 无穷性、素数定理 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 整除性、最大公约数、Euclid 算法</a><a href="ch4.html">下一章 · 第 4 章 算术基本定理 →</a></nav>
+<h1 id="ch3">第 3 章 素数：定义、Euclid 无穷性、素数定理</h1>
+
+<p>请你回答一个看似无聊的问题：<em>素数有多少</em>？</p>
+
+<p>第 1 章 1.3 节我们列了 100 以内的素数——25 个。1000 以内呢？答案是 168。10000 以内呢？1229。100000 以内？9592。一直数下去——会数完吗？</p>
+
+<p>"<em>会不会某个 \(N\) 之后，再没有新素数</em>" 听起来荒谬，但它是个<em>正经</em> 数学问题。如果素数有限，这门学科就崩塌一半——所有"<em>素数密度</em>" 类型的研究全部不存在。如果<em>无穷</em>，那就要进一步问"<em>多稠密地无穷</em>"——平方数也无穷，但稀；偶数也无穷，但密。素数在哪一档？</p>
+
+<p>这一章我们看：(1) Euclid 公元前 300 年的 5 行证明<em>素数无穷</em>——一条 2300 年屹立不倒的反证。(2) 想得更细——Dirichlet 1837 证<em>等差数列里也有无穷多素数</em>。(3) 想得更细更细——Gauss / Riemann / Hadamard 给出<em>素数密度</em> \(\pi(N) \sim N / \ln N\) 的精确渐近，这就是<em>素数定理</em>。(4) Riemann 假设——把误差项控到 \(O(\sqrt N \log N)\) 的<em>世纪难题</em>。每一层比上一层精细一个量级，每一层都用更深的工具。</p>
+
+<h2 id="sec3-1">3.1 素数：定义 + 朴素失败</h2>
+
+<p><strong>定义。</strong>整数 \(p > 1\) 称为<em>素数</em>（prime），如果它的正因子<em>仅有</em> 1 和 \(p\) 本身。否则（仍 \(> 1\)）叫<em>合数</em>（composite）。</p>
+
+<p>注意 1 本身<em>不是</em> 素数（按定义需 \(> 1\)）；这条约定不是任意的，是为了让<em>算术基本定理</em>（ch4）的"<em>唯一素分解</em>" 真正唯一——若 1 算素数，每个分解都能多塞几个 1 的因子，破坏唯一。</p>
+
+<p>头 30 个素数：</p>
+
+<p>\[
+2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113.
+\]</p>
+
+<p>请你停下来观察几件事。</p>
+
+<p>(a) <em>2 是唯一的偶素数</em>——其他偶数都被 2 整除，至少有 \(\{1, 2, 自己\}\) 三个因子。</p>
+
+<p>(b) 素数<em>越来越疏</em>：100 以内 25 个，900-1000 之间只有 \(\{907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997\} = 14\) 个。这种"<em>越大越疏</em>" 是稳定趋势——素数密度递减。</p>
+
+<p>(c) 但素数<em>没</em>消失。900-1000 还有 14 个，9900-10000 还有 9 个。哪怕到 \(10^{100}\)，每段长 100 的区间里平均也还有 \(100/\ln(10^{100}) \approx 100/230 \approx 0.43\) 个素数——稀但不灭。</p>
+
+<p>朴素思路："<em>列出所有素数</em>" 显然不行，因为列不完（如果它们无穷的话）。也许用筛法（<em>Eratosthenes 筛</em>，公元前 200 年）能<em>枚举</em> 到 \(N\)：写出 \(2, 3, \ldots, N\)；划掉 2 的倍数（除 2）；划掉 3 的倍数（除 3）；…… 划完所有 \(\le \sqrt N\) 的素数倍数后，没被划掉的就是 \(\le N\) 的全部素数。这个算法准、好用，是手算和编程的标准工具。但它<em>给不了</em>"<em>素数有无穷多个</em>" 这种关于<em>所有</em> \(N\) 的全局结论——筛法是<em>有限</em> 操作。</p>
+
+<p>要证"<em>无穷</em>" 需要不同的思路：<em>反证</em>。假设<em>有限</em>，导出矛盾。</p>
+
+<h2 id="sec3-2">3.2 Euclid 反证：素数无穷</h2>
+
+<p><strong>定理（Euclid，公元前约 300 年）。</strong>素数有无穷多个。</p>
+
+<p>这条命题的证明是<em>整个数学</em> 里最经典、最朴素也最完美的反证之一。我把它原汁原味写下来。</p>
+
+<p><em>证明。</em>反证法。假设素数<em>有限</em>，全部列为</p>
+
+<p>\[
+p_1 = 2, \ p_2 = 3, \ p_3 = 5, \ \ldots, \ p_n.
+\]</p>
+
+<p>我要构造一个数 \(N\)，证明 \(N\) 必定包含某个<em>不在</em> 上述列表里的素因子，从而和"<em>列表是全部</em>" 矛盾。</p>
+
+<p>取</p>
+
+<p>\[
+N = p_1 \cdot p_2 \cdot p_3 \cdots p_n + 1.
+\]</p>
+
+<p>—— 即所有素数乘起来<em>加 1</em>。</p>
+
+<p>\(N \ge 2\)（因 \(p_1 \cdot p_2 \cdots p_n \ge 2\) 加 1 至少是 3）。任何 \(\ge 2\) 的整数都<em>有</em> 素因子（最小的 \(\ge 2\) 因子必是素数——这是用良序原理 + 因子定义的小练习）。设 \(q\) 是 \(N\) 的某个素因子。</p>
+
+<p>断言 \(q \notin \{p_1, \ldots, p_n\}\)。假设相反，\(q = p_i\) 对某 \(i\)。则 \(q \mid p_1 p_2 \cdots p_n\)（\(q\) 是积里一个因子）。又 \(q \mid N\)（\(q\) 是 \(N\) 的素因子）。由 ch2 性质 5（线性组合），\(q \mid N - p_1 p_2 \cdots p_n = 1\)。但 \(q \ge 2\) 不整除 1。矛盾。</p>
+
+<p>所以 \(q\) 是<em>不在</em> 列表里的素数——和"<em>列表是全部素数</em>" 矛盾。\(\square\)</p>
+
+<p>这条证明请你停下来欣赏几个细节。</p>
+
+<p><em>它没真的"找到" 一个新素数</em>——它构造 \(N\) 的方式不能直接给你"下一个素数"。看具体例：取 \(\{2, 3, 5, 7, 11, 13\}\)，\(N = 30030 + 1 = 30031 = 59 \cdot 509\)。这里"<em>新素因子</em>" 是 59，不是 30031 自己（30031 不是素数）。也就是说，Euclid 构造的是<em>新素数<em>存在</em>的证据</em>，不是<em>新素数本身</em>。</p>
+
+<p><em>它本质上是一个"<em>不变量</em>" 论证</em>——\(N\) 模 \(p_i\) 余 1，所以任何 \(p_i\) 都不能整除 \(N\)。"<em>留下一个 1 的余数</em>" 是这条证明的灵魂。</p>
+
+<p><em>它<em>非常</em> 朴素</em>——只用整除性 + 反证。没用模算术、没用复分析、没用集合论。Euclid 时代<em>有</em> 这条；2300 年后我们仍用同样的话讲它。这种"<em>初等而完美</em>" 是 Euclid 风格的标志。</p>
+
+<p>有些证明是<em>这条证明的变形</em>，让你看到同一思路的灵活性。Euler 1737 给了一个<em>分析</em> 版本：</p>
+
+<p>\[
+\sum_{p \text{ 素}} \frac{1}{p} = \infty.
+\]</p>
+
+<p>调和级数 \(\sum 1/n\) 发散。Euler 把它"<em>分解</em>" 成素数因子的级数，证明<em>素数倒数和</em> 也发散——这比"<em>素数无穷</em>" 强得多（仅"<em>无穷</em>" 不蕴含倒数和发散，看 \(\sum 1/n^2 = \pi^2/6\) 是收敛的）。Euler 这条证明是<em>解析数论</em> 的诞生地，详见 ch15。</p>
+
+<h2 id="sec3-3">3.3 Dirichlet 定理：等差数列中的素数</h2>
+
+<p>3.2 节告诉你"<em>素数无穷</em>"。但素数怎么<em>分布</em>？看几个等差数列：</p>
+
+<ul>
+  <li>\(4n + 1\)：\(5, 13, 17, 29, 37, 41, 53, 61, 73, 89, 97, \ldots\)——素数频频出现。</li>
+  <li>\(4n + 3\)：\(3, 7, 11, 19, 23, 31, 43, 47, 59, 67, 71, 79, 83, \ldots\)——一样多。</li>
+  <li>\(6n + 1\)：\(7, 13, 19, 31, 37, 43, 61, 67, 73, 79, \ldots\)——常出现。</li>
+  <li>\(6n + 5\)：\(5, 11, 17, 23, 29, 41, 47, 53, 59, 71, 83, 89, \ldots\)——也常。</li>
+</ul>
+
+<p>看来等差数列里有素数。但<em>所有</em> 等差数列吗？</p>
+
+<p><em>反例</em>：\(4n\) 这串只能出现 4 = 2 · 2 的合数（\(n \ge 1\) 时）。\(6n + 2\) 只出现偶数。所以等差数列 \(an + b\) 必须满足某个<em>必要条件</em> 才能含素数：\(\gcd(a, b) = 1\)。否则 \(\gcd(a, b) > 1\) 整除每个 \(an + b\)，使它必为合数（除非 \(an + b = \gcd(a, b)\) 自身刚好是素数那一个——只一项，不算无穷）。</p>
+
+<p>Dirichlet 1837 证：这条<em>必要条件就是充分条件</em>。</p>
+
+<p><strong>定理（Dirichlet）。</strong>设 \(a, b \in \mathbb{Z}\)，\(a > 0\)，\(\gcd(a, b) = 1\)。则等差数列</p>
+
+<p>\[
+b, \ a + b, \ 2a + b, \ 3a + b, \ \ldots
+\]</p>
+
+<p>含<em>无穷多</em> 素数。</p>
+
+<p>这条定理的<em>陈述</em> 简洁——它说"<em>该有素数的地方都有</em>"。但<em>证明</em> 极其艰深，Dirichlet 用<em>\(L\)-级数</em></p>
+
+<p>\[
+L(s, \chi) = \sum_{n=1}^\infty \frac{\chi(n)}{n^s}
+\]</p>
+
+<p>（\(\chi\) 是模 \(a\) 的 Dirichlet 特征）证明它们在 \(s = 1\) 处都不消失，从而仿照 Euler 证素数无穷的思路推出 \(\sum_{p \equiv b \pmod a} 1/p = \infty\)。整套理论是<a href="ch15.html">ch15 解析数论入门</a> 的核心。</p>
+
+<p>请你看一件事：3.2 节的"<em>素数无穷</em>" 是<em>初等</em> 证的（Euclid，5 行）。3.3 节的"<em>等差数列里素数无穷</em>" 看起来是同一类问题，但<em>初等证不出</em>——必须用解析。这种"<em>结构稍微细化一层就把问题难度推上一档</em>" 是数论里反复出现的现象。我们看了"<em>素数有多少</em>" 是个例；"<em>等差数列里素数有多少</em>" 是它的细化；下一节看"<em>不超过 \(N\) 的素数有多少</em>"——又一层细化。</p>
+
+<h2 id="sec3-4">3.4 \(\pi(N)\) 与素数密度</h2>
+
+<p>定义</p>
+
+<p>\[
+\pi(N) := \#\{p \le N : p \text{ 素}\}.
+\]</p>
+
+<p>这是<em>素数计数函数</em>——经典数论里最重要的函数之一。手算几个：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(N\)</th><th style="padding: 0.3em 1em;">\(\pi(N)\)</th><th style="padding: 0.3em 1em;">\(N / \ln N\)</th><th style="padding: 0.3em 1em;">比值</th></tr>
+<tr><td>10</td><td>4</td><td>4.34</td><td>0.92</td></tr>
+<tr><td>100</td><td>25</td><td>21.71</td><td>1.15</td></tr>
+<tr><td>1 000</td><td>168</td><td>144.76</td><td>1.16</td></tr>
+<tr><td>10 000</td><td>1 229</td><td>1 085.74</td><td>1.13</td></tr>
+<tr><td>100 000</td><td>9 592</td><td>8 685.89</td><td>1.10</td></tr>
+<tr><td>\(10^6\)</td><td>78 498</td><td>72 382</td><td>1.084</td></tr>
+<tr><td>\(10^9\)</td><td>50 847 534</td><td>48 254 942</td><td>1.054</td></tr>
+<tr><td>\(10^{12}\)</td><td>37 607 912 018</td><td>36 191 206 825</td><td>1.039</td></tr>
+</table>
+
+<p>请你看比值那一栏——它<em>缓慢</em> 接近 1。意思是 \(\pi(N)\) 的<em>主项</em> 是 \(N / \ln N\)，比值随 \(N \to \infty\) 趋于 1。这就是素数定理（PNT）的具体内容。</p>
+
+<p>怎么<em>预测</em> 这个公式？让我们做一个粗糙的概率论估计。设 \(n\) 是个"<em>随机</em>" 大整数。\(n\) 是素数的"<em>概率</em>" 大概是多少？</p>
+
+<p>\(n\) 不被 2 整除的概率 1/2。不被 3 整除的概率 2/3。不被 5 整除的概率 4/5。一般地不被素数 \(p\) 整除的概率 \(1 - 1/p\)。如果这些事件"<em>独立</em>"（它们不真独立，但近似），\(n\) 不被任何 \(\le \sqrt n\) 的素数整除的概率</p>
+
+<p>\[
+\prod_{p \le \sqrt n} \left(1 - \frac 1 p\right).
+\]</p>
+
+<p>Mertens 1874 证</p>
+
+<p>\[
+\prod_{p \le x} \left(1 - \frac 1 p\right) \sim \frac{e^{-\gamma}}{\ln x}
+\]</p>
+
+<p>（\(\gamma\) 是 Euler-Mascheroni 常数）。代 \(x = \sqrt n\) 给概率 \(\sim e^{-\gamma} / \ln \sqrt n = 2 e^{-\gamma} / \ln n\)。这条概率论估计预测 \(\pi(N) \sim 2 e^{-\gamma} N / \ln N \approx 1.12 \cdot N / \ln N\)——常数错了，但<em>"\(N / \ln N\)" 这个<em>形状</em></em> 是对的。</p>
+
+<p>正确的常数是 1（不是 \(2 e^{-\gamma}\)）。我们的概率论估计在<em>独立性假设</em> 上系统偏差，但抓住了渐近形状。这是数论里常见的"<em>启发式预测对了形状但错了常数，需要更深的工具修正</em>" 的典型模式。</p>
+
+<h2 id="sec3-5">3.5 素数定理：陈述与历史</h2>
+
+<p><strong>素数定理（Hadamard / de la Vallée Poussin，1896）。</strong></p>
+
+<p>\[\boxed{\ \pi(N) \sim \frac{N}{\ln N}, \qquad N \to \infty.\ }\]</p>
+
+<p>这里 "\(\sim\)" 是<em>渐近等价</em>：\(\lim_{N \to \infty} \pi(N) / (N/\ln N) = 1\)。等价但<em>更</em> 准的版本用<em>对数积分</em></p>
+
+<p>\[
+\operatorname{Li}(N) := \int_2^N \frac{dt}{\ln t}.
+\]</p>
+
+<p>则 \(\pi(N) \sim \operatorname{Li}(N)\)，且 \(\operatorname{Li}(N)\) 比 \(N/\ln N\) <em>近得多</em>。看 \(N = 10^{12}\)：\(\pi(N) = 37607912018\)，\(\operatorname{Li}(N) \approx 37607950281\)，相差约 38000，比 \(N/\ln N\) 差 \(1.4 \times 10^9\) 准了 5 个数量级。</p>
+
+<p>素数定理的历史是 19 世纪数论的高潮戏。简单时间线：</p>
+
+<ul>
+  <li><em>Gauss 1792-93</em>（15 岁）。Gauss 在私人记事本里写下 \(\pi(N) \approx \operatorname{Li}(N)\)——他没证，是<em>猜测</em>。同年 Legendre 独立猜了一个稍弱的形式 \(\pi(N) \approx N / (\ln N - 1.08)\)。</li>
+  <li><em>Chebyshev 1850</em>。证 \(c_1 \cdot N / \ln N \le \pi(N) \le c_2 \cdot N / \ln N\) 对 \(c_1 \approx 0.92, c_2 \approx 1.10\)——离 1 还差 8%。又证 Bertrand 假设：\(N\) 与 \(2N\) 间总有素数。</li>
+  <li><em>Riemann 1859</em>。8 页论文 "<em>论小于给定数值的素数个数</em>"——把 \(\pi(N)\) 的研究重铸为 \(\zeta(s) = \sum 1/n^s\) 的复分析问题。给出"<em>显式公式</em>"</li>
+</ul>
+
+<p>\[
+\pi(N) = \operatorname{Li}(N) - \sum_\rho \operatorname{Li}(N^\rho) - \ln 2 + \int_N^\infty \frac{dt}{t(t^2 - 1) \ln t},
+\]</p>
+
+<p>其中 \(\rho\) 跑 \(\zeta(s)\) 的<em>非平凡零点</em>。"<em>显式</em>" 的意思是它不是渐近、不是估计——是<em>等式</em>。\(\zeta\) 的零点位置直接决定 \(\pi(N)\) 的所有波动。</p>
+
+<ul>
+  <li><em>Hadamard 与 de la Vallée Poussin 1896</em>。两人独立用 Riemann 的框架证：<em>\(\zeta(s)\) 在 \(\Re(s) = 1\) 那条线上不取零</em>——这件事足以推出 \(\pi(N) \sim N/\ln N\)。素数定理终于成立。</li>
+  <li><em>Erdős / Selberg 1949</em>。给一个<em>初等</em>（不用复分析）证明，化解了"<em>素数定理是否非要复分析才能证</em>" 的争论。但 Erdős-Selberg 证比 Hadamard 长得多，用了很巧的不等式技术。</li>
+</ul>
+
+<p>请你停下来感受这段历史的长度——<em>从 Gauss 猜到 Hadamard 证完，整整 100 年</em>。一个看起来如此朴素的命题（"<em>不超过 \(N\) 的素数大约 \(N/\ln N\) 个</em>"），需要几代数学家发明复分析、特殊函数、解析延拓、围道积分这一整套工具才能证明。<a href="ch1.html">第 1 章 1.4 节</a> 我说"<em>同一现象用越来越深的工具理解</em>"——素数定理是这种现象最完美的例子。</p>
+
+<h2 id="sec3-6">3.6 Riemann 假设</h2>
+
+<p>素数定理给主项 \(\pi(N) \sim \operatorname{Li}(N)\)。但<em>误差</em> \(\pi(N) - \operatorname{Li}(N)\) 多大？</p>
+
+<p>实测看 \(N = 10^{12}\) 误差约 \(38000\)。比例 \(38000 / \sqrt{10^{12}} = 38000 / 10^6 = 0.038\)——<em>误差量级看起来是 \(\sqrt N\)</em>。Riemann 1859 论文里的显式公式预测：</p>
+
+<p>\[\boxed{\ \pi(N) - \operatorname{Li}(N) = O(\sqrt N \log N), \quad \text{当且仅当 RH 成立}.\ }\]</p>
+
+<p><em>Riemann 假设</em>（Riemann Hypothesis, RH）的精确陈述：</p>
+
+<p><strong>(RH)</strong> \(\zeta(s)\) 的所有<em>非平凡零点</em> \(\rho\) 满足 \(\Re(\rho) = 1/2\)。</p>
+
+<p>"<em>非平凡</em>" 是排除负偶数 \(s = -2, -4, -6, \ldots\) 那些来自 \(\zeta\) 函数方程的"<em>琐碎</em>" 零点。"<em>临界线</em>" \(\Re(s) = 1/2\) 是<em>临界带</em> \(0 < \Re(s) < 1\) 的对称中线。零点只能在临界带里（这是 PNT 证明用到的事实）。RH 说它们<em>都恰好</em> 落在中线上。</p>
+
+<p>已知事实：</p>
+
+<ul>
+  <li>临界带里前 \(10^{13}\) 个零点都在 \(\Re(s) = 1/2\) 上（Gourdon 2004 等大型计算）。</li>
+  <li>无穷多个零点在临界线上（Hardy 1914）。</li>
+  <li>正比例（具体：至少 41%）零点在线上（Bui-Conrey-Young 2011 等）。</li>
+  <li>但<em>"全部都在线上"</em>——未证。</li>
+</ul>
+
+<p>RH 的<em>影响</em> 极广。它直接控制：</p>
+
+<ol>
+  <li>素数定理误差 \(\pi(N) - \operatorname{Li}(N) = O(\sqrt N \log N)\)。</li>
+  <li>素数缺口的最大值估计。</li>
+  <li>数论里几百条"<em>条件定理</em>"——形式都是"<em>设 RH 成立，则 ......</em>"。</li>
+  <li>密码学中某些算法的运行时间分析。</li>
+</ol>
+
+<p>如果 RH 错（即某零点偏离临界线哪怕一点），\(\pi(N) - \operatorname{Li}(N)\) 的误差量级会从 \(\sqrt N\) 跳到 \(N^\theta\) 对某 \(\theta > 1/2\)——所有"<em>素数分布很规则</em>" 的直觉部分破产。</p>
+
+<p>RH 是 Hilbert 1900 巴黎演讲提出的<em>23 个数学问题</em>第 8 条；又是 Clay 数学研究所 2000 年悬赏 100 万美元的<em>七大千禧年问题</em>之一。<em>2025 年它仍未解</em>。150 多年过去——很多人觉得 RH 比"<em>世界上最难的数学问题</em>" 这个描述还要强。</p>
+
+<p>请你停下来想：<em>整数</em> 这种东西，2、3、5、7 这种没有任何复杂结构的对象，它们的<em>分布规律</em> 居然由一个<em>复变函数</em> 在<em>临界线</em> 上的<em>零点位置</em> 决定。这种"<em>整数 \(\leftrightarrow\) 复函数零点</em>" 的桥是 19-20 世纪数学最深的发现之一，也是<a href="ch1.html">第 1 章 1.4 节</a> 我所说"<em>朴素表面 vs 深层结构</em>" 反差最戏剧化的体现。</p>
+
+<h2 id="sec3-7">3.7 应用：素数缺口、孪生素数猜想</h2>
+
+<p>"<em>素数有多稠密</em>" 这条问题的几个具体子问题：</p>
+
+<p><strong>(A) 素数缺口。</strong>定义 \(g_n = p_{n+1} - p_n\) 为第 \(n\) 个素数缺口。表里几个看：\(g_1 = 1\)（\(2 \to 3\)），\(g_2 = 2\)（\(3 \to 5\)），\(g_3 = 2\)（\(5 \to 7\)），\(g_4 = 4\)（\(7 \to 11\))，\(g_{30} = 14\)（\(113 \to 127\)）。</p>
+
+<p>从 PNT，缺口<em>平均</em> 是 \(\ln N\)（即第 \(N\) 附近的素数平均隔 \(\ln N\) 个数）。但<em>极端缺口</em>？</p>
+
+<ul>
+  <li><em>大缺口的存在</em>。可以构造任意大的缺口：\(N!+2, N!+3, \ldots, N!+N\) 这 \(N-1\) 个连续数都是合数（\(N!+k\) 被 \(k\) 整除）。所以两个素数间可以隔 \(N\) 数。这是<em>初等</em> 证。</li>
+  <li><em>大缺口的密度</em>。Maynard / Tao 等 2014 证：缺口可以达到 \(\frac{c \ln N \cdot \ln \ln N \cdot \ln \ln \ln \ln N}{\ln \ln \ln N}\) 量级，<em>无穷次</em> 出现。这条比 \(\ln N\) 平均值大 \(\log \log\) 因子，是经多年改进得到的。</li>
+  <li><em>小缺口</em>。\(\liminf g_n\) 多小？经典猜测 \(\liminf g_n = 2\)（即"<em>孪生素数</em>"——见 (B)）。Zhang 2013 突破证 \(\liminf g_n \le 7 \times 10^7\)；Maynard 2013 把它压到 \(\le 600\)；Polymath 进一步压到 \(\le 246\)。从 246 降到 2 还有差距。</li>
+</ul>
+
+<p><strong>(B) 孪生素数猜想。</strong>缺口 \(g_n = 2\) 的素数对 \((p, p+2)\) 叫<em>孪生素数</em>。已知前几对：\((3, 5), (5, 7), (11, 13), (17, 19), (29, 31), (41, 43), (59, 61), (71, 73), (101, 103), \ldots\)。</p>
+
+<p><em>猜想</em>：孪生素数<em>无穷多</em> 对。提出于 19 世纪（Polignac 1849），<em>2025 年仍未证</em>。Hardy-Littlewood 1923 进一步精确化：</p>
+
+<p>\[
+\#\{(p, p+2) : p \le N \text{ 都素}\} \sim 2 C_2 \cdot \frac{N}{(\ln N)^2}
+\]</p>
+
+<p>其中 \(C_2 = \prod_{p \ge 3} \frac{p(p-2)}{(p-1)^2} \approx 0.6601\) 叫<em>孪生素数常数</em>。这条更强的猜测（含常数）也未证。</p>
+
+<p>Polymath 项目 + Maynard 等进展把孪生素数猜想<em>推</em> 到了"<em>缺口 \(\le 246\) 无穷次</em>"——离 2 还有差距，但这是过去十年解析数论<em>最大</em> 突破之一。</p>
+
+<p><strong>(C) 其他未解。</strong></p>
+
+<ul>
+  <li>Goldbach 猜想（1742）：每个 \(\ge 4\) 偶数是两素数之和。<em>未证</em>。已知三素数之和的 Goldbach（弱版）由 Helfgott 2013 证。</li>
+  <li>\(p^2 + 1\) 形式的素数无穷？未证。</li>
+  <li>Mersenne 素数（\(2^p - 1\) 形式）无穷？未证。已知 52 个 Mersenne 素数（截至 2024）。</li>
+</ul>
+
+<p>请你停下来感受这一节列出的清单。"<em>素数有多少 / 怎么分布</em>" 这个看似简单的问题分裂成几十个子问题——大部分至今未解。每个子问题都跟某种<em>结构性</em> 直觉冲突（"<em>缺口为什么不大也不小</em>"、"<em>偶数为什么总能拆成两素数</em>"），却不能被现有工具证明。这就是数论的<em>当下</em>——表面看是中学问题，骨子里是数学最难的领域之一。</p>
+
+<h2 id="sec3-8">3.8 这一章的回看 + 下一步</h2>
+
+<p>我们做了：</p>
+
+<ul>
+  <li>素数定义 + 朴素观察（密度递减但不灭）。</li>
+  <li>Euclid 反证：5 行证完素数无穷。这是数学里最经典的反证。</li>
+  <li>Dirichlet 定理（陈述）：等差数列里素数无穷——条件 \(\gcd(a, b) = 1\)。</li>
+  <li>\(\pi(N)\) 的实测表 + 概率论启发——\(\pi(N) / (N/\ln N)\) 缓慢趋于 1。</li>
+  <li>素数定理 \(\pi(N) \sim N/\ln N\) 的陈述 + 100 年历史（Gauss → Hadamard）。</li>
+  <li>Riemann 假设：\(\zeta\) 零点都在 \(\Re(s) = 1/2\) ⟺ 素数定理误差是 \(O(\sqrt N \log N)\)。</li>
+  <li>素数缺口、孪生素数等未解问题清单。</li>
+</ul>
+
+<p>三层抽象。第 1 层（Euclid）：素数有无穷多——初等。第 2 层（Dirichlet / PNT）：素数分布有规律——解析。第 3 层（RH）：分布规律有<em>误差控制</em>——这个控制连接了一个看起来与素数无关的<em>复变函数</em>。每升一层，工具更深，结论更细，<em>未解的部分也越来越大</em>。</p>
+
+<p>下一章 ch4 我们回到第 1 层做一件迟到的事——证明<em>算术基本定理</em>（每个 \(\ge 2\) 整数有<em>本质唯一</em> 的素分解）。这条事实上一章我们隐式用了（"\(252 = 2^2 \cdot 3^2 \cdot 7\)"），但<em>"唯一性"</em> 并非显然——某些"<em>看起来像数</em>" 的环里它<em>失败</em>。我们会看一个反例（\(\mathbb{Z}[\sqrt{-5}]\) 里 \(6 = 2 \cdot 3 = (1+\sqrt{-5})(1 - \sqrt{-5})\)），让你领会"<em>唯一分解</em>" 是个真正的结构性事实，不是定义问题。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 整除性、最大公约数、Euclid 算法</a><a href="ch4.html">下一章 · 第 4 章 算术基本定理 →</a></nav>
+</main>
+</body>
+</html>

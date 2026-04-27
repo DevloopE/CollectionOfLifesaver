@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 24 章 Fermat 大定理与 Wiles 路径 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：现代密码学</a><a href="appA.html">下一节 · 附录 A 群环域速查 →</a></nav>
+<h1 id="ch24">第 24 章 Fermat 大定理与 Wiles 路径</h1>
+
+<p>这是这本书最后一章——给现代数论的最高峰一个轮廓。1637 年某天 Fermat 在他的 Diophantus 译本（II 卷 Q8 旁）写下：</p>
+
+<blockquote style="border-left:3px solid var(--ink-soft);padding-left:1em;margin:1em 0;color:var(--ink-soft);font-style:italic;">
+"<em>方程 \(x^n + y^n = z^n\) 对 \(n \ge 3\) 没有正整数解。我有一个奇妙的证明，可惜书边太窄写不下。</em>"
+</blockquote>
+
+<p>358 年后，1995 年 5 月，Andrew Wiles 在 <em>Annals of Mathematics</em> 发表 130 页论文 <em>Modular Elliptic Curves and Fermat's Last Theorem</em>，证完。证明动用了几乎 20 世纪整个现代数论：椭圆曲线、模形式、Galois 表示、类域论、变形理论（Mazur）、Hecke 代数。Fermat 那"<em>奇妙的证明</em>" 几乎可以肯定<em>不存在</em>——他可能想到的方法对小 \(n\) 有效但对一般 \(n\) 失败。</p>
+
+<p>这一章<em>不</em> 证细节——细节需要一年研究生课。这一章给<em>战略</em>：从 Fermat 的方程到 Wiles 的核心引理，整条逻辑链怎么扣起来，每一环用本书前几章哪一块的工具。</p>
+
+<h2 id="sec24-1">24.1 FLT 陈述 + 358 年部分进展</h2>
+
+<p><strong>定理（Fermat 大定理 / FLT）。</strong>方程</p>
+
+<p>\[
+\boxed{\ x^n + y^n = z^n\ }
+\]</p>
+
+<p>对整数 \(n \ge 3\) 没有正整数解 \((x, y, z)\)。</p>
+
+<p>显然 \(n = 1\) 平凡（任何 \(x + y = z\) 都解）；\(n = 2\) 是<em>毕达哥拉斯三元组</em>，有无穷解（\((3, 4, 5), (5, 12, 13), \ldots\)）。FLT 说<em>从 \(n = 3\) 起情况完全相反</em>。</p>
+
+<p>"<em>缩归一</em>" 观察：若 FLT 对某个 \(n\) 成立，则对所有 \(n\) 的倍数成立。原因——若 \(x^{kn} + y^{kn} = z^{kn}\) 即 \((x^k)^n + (y^k)^n = (z^k)^n\)，所以 \(n\) 上有解给 \(kn\) 上有解（取 \(k\) 次方）。所以只需证 FLT 对 \(n = 4\) 与<em>所有奇素数 \(n = p\)</em> 成立。</p>
+
+<p><strong>358 年部分进展（节选）。</strong></p>
+
+<ul>
+  <li><em>\(n = 4\)</em>：Fermat 自己证（用<em>无穷下降法</em>）。这是他<em>给出过证明</em> 的唯一情况。</li>
+  <li><em>\(n = 3\)</em>：Euler 1770 给。证明用<em>\(\mathbb Z[\sqrt{-3}]\)</em> 的算术——但 Euler 没意识到这个环不是 UFD，证明有一个<em>缝</em>，后由 Gauss 补上。这是<em>第一次</em> "<em>整数 + 一个新虚数</em>" 的代数数论手法应用——直接催生了<a href="ch13.html">ch13</a>的<em>高斯整数</em>研究。</li>
+  <li><em>\(n = 5\)</em>：Dirichlet + Legendre 1825 独立证。</li>
+  <li><em>\(n = 7\)</em>：Lamé 1839 证（极其复杂的初等手法）。</li>
+  <li><em>Sophie Germain 1820 年代</em>：证 FLT "<em>第一情形</em>" 对所有满足"<em>\(2p + 1\) 也素</em>" 的<em>Sophie Germain 素数</em> \(p\) 成立。第一情形 = 解中 \(p \nmid xyz\) 的情况。她是少数能在 19 世纪学术圈做出这种水平工作的女性数学家。</li>
+  <li><em>Kummer 1847 年</em>：证 FLT 对所有<em>正则素数</em>（regular primes）成立——\(p\) 是正则的 \(\iff p\) 不整除<em>圆分域 \(\mathbb Q(\zeta_p)\) 的类数</em>。这是<em>类域论</em> 的源头——Kummer 通过<em>研究分歧素的整数环结构</em> 引入<em>理想数</em>（ideal number），这是 Dedekind 后来"<em>理想</em>"的雏形。Kummer 估计有"<em>无穷多</em>"正则素数，但这条至今未证（是的，正则素数无穷性比 FLT 还难）。然而<em>所有 \(p < 100\)</em> 中除 \(37, 59, 67\) 都正则——所以 Kummer 的方法实际证 FLT 对几乎所有"中小" 素数。</li>
+  <li><em>1980 年代之前</em>：用计算机验证 FLT 对 \(n \le 4 \times 10^6\) 成立。但这只是"<em>大量验证</em>"，没有证明所有 \(n\)。</li>
+</ul>
+
+<p>到 1985 年，FLT 是数学最古老的<em>已陈述未解问题</em> 之一（仅次于 Goldbach 1742 与孪生素数猜想 1849）。它有"<em>每个十年都被声称证明，每次都被找出错</em>" 的悲剧史——19 世纪 Lamé 以为自己证完，半小时被 Liouville 指出"<em>你假设了 \(\mathbb Z[\zeta_p]\) 是 UFD</em>"。这个错正好是 Kummer 看到的<em>类数</em> 问题，反讽地推动了数论的现代化。</p>
+
+<h2 id="sec24-2">24.2 1985 Frey 关键想法</h2>
+
+<p>故事真正改变是 1985 年。Gerhard Frey 在德国 Saarbrücken 大学的会议上提出一个意外的<em>归约</em>：</p>
+
+<p><strong>Frey 的关键观察。</strong>假设 FLT 反例存在：有素数 \(p \ge 5\) 与互素的非零整数 \(a, b, c\) 使</p>
+
+<p>\[
+a^p + b^p + c^p = 0.
+\]</p>
+
+<p>（这里我把 \(z^p\) 移到左边，等价于原 FLT。）从这个反例构造<em>椭圆曲线</em>：</p>
+
+<p>\[
+\boxed{\ E_{a, b, c} : \ y^2 = x(x - a^p)(x + b^p).\ }
+\]</p>
+
+<p>这条曲线（基于 \(a, b, c\) 反例）叫<em>Frey 曲线</em>。</p>
+
+<p>它是普通的椭圆曲线（链回<a href="ch19.html">ch19</a>）——形式 \(y^2 = x^3 + Ax + B\) 经一次仿射变换后是 \(y^2 = x(x - a^p)(x + b^p)\)。具体的：右边是 \(x\) 的 3 次首一多项式，三个根 \(0, a^p, -b^p\) 互不相同（因 \(a, b \ne 0\)、\(p\) 奇、\(a, b\) 互素），所以是<em>非奇异</em> 椭圆曲线。</p>
+
+<p>Frey 的观察：<em>这条曲线"<em>太奇怪</em>" 以至于"<em>不能存在</em>"</em>——具体的"奇怪" 性质下节给。</p>
+
+<p>请你停下来感受这个跳：</p>
+
+<ul>
+  <li>FLT 是<em>关于整数</em>的陈述：\(x^p + y^p = z^p\) 没整数解。</li>
+  <li>Frey 把它<em>转换</em> 成<em>关于椭圆曲线</em>的陈述：某种特殊椭圆曲线<em>不能存在</em>。</li>
+</ul>
+
+<p>这条转换<em>没有解决</em> FLT；它把 FLT 重写成另一个等价问题。但<em>新形式</em> 可以用 20 世纪发达的<em>椭圆曲线理论</em> 工具攻击——这是 1985 年前不可能的。</p>
+
+<h2 id="sec24-3">24.3 Frey 曲线的"<em>奇怪</em>" 性质</h2>
+
+<p>椭圆曲线 \(E\) 的几个数论数据：</p>
+
+<ul>
+  <li><em>判别式</em> \(\Delta_E\)：从方程系数算的整数；它告诉你 \(E\) "<em>在哪些素 \(p\) 处有坏化简</em>"——\(p \mid \Delta\) 时 \(E\) 模 \(p\) 退化为奇异曲线。</li>
+  <li><em>导子</em> \(N_E\)：与 \(\Delta\) 同样素因子，但<em>每个素的指数减小</em>——准确测量"<em>坏化简的复杂程度</em>"。</li>
+</ul>
+
+<p>对 Frey 曲线 \(E_{a,b,c}\) 算判别式（这步是工程级技术，不展开）：</p>
+
+<p>\[
+\boxed{\ \Delta_{E_{a,b,c}} = 16 (abc)^{2p}.\ }
+\]</p>
+
+<p>"<em>2p 次完全幂</em>"——这是 Frey 曲线最奇特的性质。</p>
+
+<p>正常椭圆曲线的判别式不会是<em>整体的高次幂</em>——\(\Delta_E\) 一般是各种素的不同指数的乘积。对 Frey 曲线<em>每个素都恰好是 \(2p\) 次方</em>（除少数有 \(2\) 的额外因子）。Frey 称这是"<em>巨大的、不自然的对称性</em>"——它意味着 \(E_{a,b,c}\) 在<em>所有</em> 模 \(\ell\) 处的"<em>表示</em>" 都有<em>异常</em> 简化的结构。</p>
+
+<p>这件事的精确技术含义：椭圆曲线 \(E\) 有 \(\ell\)-adic Galois 表示 \(\rho_{E, \ell} : \mathrm{Gal}(\overline{\mathbb Q}/\mathbb Q) \to \mathrm{GL}_2(\mathbb Z_\ell)\)（即 Galois 群通过 \(E[\ell^\infty]\) "扭点" 的作用）。对一般椭圆曲线 \(E\)，\(\rho_{E, \ell}\) 在 \(\ell \nmid \Delta_E\) 的素 \(\ell\) 处<em>"无分歧"</em>（unramified），对 \(\ell \mid \Delta_E\) 处<em>有分歧</em>。</p>
+
+<p>对 Frey 曲线，<em>由判别式 \(2p\) 次幂的事实</em>，可证：\(\rho_{E_{a,b,c}, p}\)（\(\ell = p\) 的 Galois 表示）"<em>几乎不分歧</em>"——只在 \(\ell = 2\) 处分歧，<em>所有奇素处都无分歧</em>。这种 Galois 表示叫"<em>极小分歧</em>" 表示，它满足非常严格的代数约束。</p>
+
+<h2 id="sec24-4">24.4 Serre + Ribet 1986：Frey 曲线"<em>不模</em>"</h2>
+
+<p>1985-1986 年 Jean-Pierre Serre 在 Frey 的观察基础上提出更精确的猜想（叫"<em>\(\varepsilon\) 猜想</em>" 或<em>level lowering</em> 猜想）：<em>如果 Frey 曲线 \(E_{a,b,c}\) 是模的，则它对应的模形式必须是<em>权 2、level 2</em>——但 \(S_2(\Gamma_0(2)) = 0\) 是<em>零空间</em>，所以这种模形式<em>不存在</em></em>。</p>
+
+<p>翻译：</p>
+
+<ul>
+  <li>假设 Frey 曲线 \(E_{a,b,c}\) 模——即对应权 2 模形式 \(f_{E_{a,b,c}} \in S_2(\Gamma_0(N))\)，\(N = N_{E_{a,b,c}}\)。</li>
+  <li>由 24.3 的"<em>极小分歧</em>" 性质 + Serre 的 level lowering 思想：可以"<em>剥</em>" 掉 \(N\) 中所有奇素因子，把模形式 \(f\) 替换成 \(\Gamma_0(2)\)（即 \(N\) 缩到 2）的同阶模形式 \(g\)。</li>
+  <li>但 \(S_2(\Gamma_0(2))\) 是<em>零空间</em>（用<a href="ch21.html">ch21</a>的维数公式 + \(\Gamma_0(2)\) 的具体计算可验证）。所以 \(g = 0\)——矛盾。</li>
+</ul>
+
+<p>所以"<em>Frey 曲线模</em>" 是<em>不可能的</em>——结论：<em>Frey 曲线<em>不</em> 模</em>。</p>
+
+<p>这是 Ribet 1986 在 \(\varepsilon\) 猜想方向上的具体证明（用<em>Mazur 的模化曲线 / Hecke 代数</em> 工具）。这步本身已经是<em>极重</em> 的论文，但比 Wiles 的工作小一个数量级。Ribet 1986 完成后，逻辑链就被搭好：</p>
+
+<p>\[
+\boxed{\ \textbf{Taniyama-Shimura 真} \ \implies \ \textbf{所有椭圆曲线都模} \ \implies \ \textbf{Frey 曲线模} \ \implies \ \textbf{矛盾} \ \implies \ \textbf{FLT 真}.\ }
+\]</p>
+
+<p>所以 1986 年起，FLT 等价于 Taniyama-Shimura 猜想（至少对一类含 Frey 曲线的椭圆曲线类）。</p>
+
+<h2 id="sec24-5">24.5 Taniyama-Shimura 猜想</h2>
+
+<p><a href="ch21.html">ch21</a> 8 节做过预告：</p>
+
+<p><strong>Taniyama-Shimura-Weil 猜想（模性猜想）。</strong>每个有理椭圆曲线 \(E\) 都<em>模</em>——存在权 2 Hecke 特征形式 \(f_E \in S_2(\Gamma_0(N_E))\) 使 \(L(E, s) = L(f_E, s)\)。</p>
+
+<p>1955 年 Taniyama 在东京会议上以"<em>问题列表</em>" 形式提出。Shimura 1960 年代精细化。Weil 1967 证明了一些必要条件并推动了它在西方的接受。但<em>没有人</em> 知道怎么<em>证明</em> 它——1980 年代时它仍是一条几乎无人下手的猜想。</p>
+
+<p>直观上为什么它"<em>应该</em> 真"：</p>
+
+<ul>
+  <li>椭圆曲线给的 \(L(E, s) = \prod_p (1 - a_p p^{-s} + p^{1-2s})^{-1}\)（\(a_p = p + 1 - \#E(\mathbb F_p)\)）有<em>Euler 乘积</em>，结构上像模形式 \(L\) 函数。</li>
+  <li>椭圆曲线在 \(\mathbb F_p\) 上的"<em>表示论</em>"（即 Galois 群在 \(E[\ell^\infty]\) 上的作用）与模形式的 Hecke 代数有相同的<em>抽象代数结构</em>——两边都是某种<em>2 维 Galois 表示</em>。</li>
+  <li>实验：每条具体椭圆曲线都能找到对应的模形式——但只对<em>已计算的有限多条</em>，理论上仍需证。</li>
+</ul>
+
+<p>Taniyama-Shimura 是 Langlands 程序"<em>非阿贝尔类域论</em>"（链回<a href="ch22.html">ch22</a>）在 \(n = 2\) 时的具体实例。它说"<em>2 维 Galois 表示\(\leftrightarrow\) 模形式</em>"——这是 Langlands 函子性的一个 instance。</p>
+
+<h2 id="sec24-6">24.6 Wiles 1995：证 Taniyama-Shimura 对半稳定椭圆曲线</h2>
+
+<p>1986 年 Frey-Ribet 把 FLT 归约到 Taniyama-Shimura（对一类椭圆曲线）。同年，Andrew Wiles 在普林斯顿听到 Ribet 工作后<em>下决心</em> 证 Taniyama-Shimura——他<em>不</em> 公开做这件事，<em>独自</em> 在阁楼工作 7 年（1986-1993）。</p>
+
+<p>Wiles 的策略：不证完整 Taniyama-Shimura（太难），<em>只证它对"<em>半稳定</em>" 椭圆曲线</em>——这是包含 Frey 曲线的<em>子类</em>，足以证 FLT。具体的：</p>
+
+<p><em>半稳定椭圆曲线</em>（semistable elliptic curve）：导子 \(N_E\) 是<em>无平方</em> 的（每个素因子只出现 1 次）。Frey 曲线满足这条。Wiles 要证：所有半稳定椭圆曲线模。</p>
+
+<p>核心策略 — <em>R = T 定理</em>（Wiles 的发明）。这条定理是 Wiles 工作的代数核心。它的陈述：</p>
+
+<p>\[
+\boxed{\ R \cong T,\ }
+\]</p>
+
+<p>其中：</p>
+
+<ul>
+  <li>\(R\) 是<em>变形环</em>（deformation ring）—— Mazur 1989 引入：参数化某种"<em>满足约束的 Galois 表示族</em>"。\(R\) 的具体构造用 <em>变形理论</em>（deformation theory of Galois representations），是<a href="../抽象代数/index.html">抽象代数</a>里"<em>形式群方案</em>" 的工具。</li>
+  <li>\(T\) 是<em>Hecke 代数</em>（Hecke algebra）—— 由 Hecke 算子 \(T_p\)（链回<a href="ch21.html">ch21</a> 6 节）作用在某固定模形式空间上生成的代数。具体的：取权 2、level \(N\)、character 一致的模形式空间 \(S_2(\Gamma_0(N))\)，让所有 \(T_p\) 作用在它上面，所有这些算子的多项式组合构成 \(T\)。</li>
+</ul>
+
+<p>"<em>\(R \cong T\)</em>" 的<em>含义</em>：每个"<em>满足约束的 Galois 表示</em>" 都<em>来自</em> 一个模形式（Hecke 代数的元素 = 模形式特征值）。换句话说，<em>所有满足约束的 Galois 表示都模</em>——也就是 Taniyama-Shimura 的精化版本。</p>
+
+<p>Wiles 1993 年 6 月在剑桥 Newton 研究所宣布证明（"<em>这或许是最后一次发声了</em>"）。报告震动数学界——但接下来审稿过程发现一个<em>缝</em>：在论证 \(R \cong T\) 的某一步用到一条还没证完的引理。</p>
+
+<p>1993 年秋到 1994 年秋，Wiles 与他的学生 Richard Taylor 一起工作，发明了一种<em>不同的</em>"<em>欧拉系</em>"（Euler system）方法绕开缝。1994 年 9 月 Wiles 给 Taylor 看新的稿件——这次缝补好了。1995 年 5 月《Annals of Mathematics》发表两篇论文：Wiles 单独的 130 页《<em>Modular Elliptic Curves and Fermat's Last Theorem</em>》+ Wiles-Taylor 合作的 30 页《<em>Ring-Theoretic Properties of Certain Hecke Algebras</em>》（补缝部分）。</p>
+
+<p>FLT <em>358 年来悬案</em> 终于结束。Fermat 的 marginal note 至此被<em>证明</em>——但用的工具是 Fermat 1637 年完全无法想象的现代数论：椭圆曲线、模形式、Galois 表示、变形理论、Iwasawa 理论、Hecke 代数。</p>
+
+<p><em>完整 Taniyama-Shimura 猜想</em>（不限于半稳定椭圆曲线）由 <em>Breuil-Conrad-Diamond-Taylor</em>（BCDT）2001 年在 \(J. Amer. Math. Soc.\) 完成。从此每条有理椭圆曲线都<em>已知</em> 模——这条事实今天叫<em>模性定理</em>（不再是猜想）。</p>
+
+<h2 id="sec24-7">24.7 现代数论的全景：Galois 表示 + 自守形式 + Langlands</h2>
+
+<p>Wiles 工作之后 30 年（1995-2025），数论的核心研究问题有三大方向：</p>
+
+<p><strong>方向 1：扩展模性。</strong>Taniyama-Shimura 处理 \(\mathbb Q\) 上的椭圆曲线。把它推广到：</p>
+
+<ul>
+  <li><em>全实域</em>（totally real field）上的椭圆曲线。Khare-Wintenberger 2009 证 Serre 的"<em>模性猜想</em>" 完整版，作为这方向的基础。</li>
+  <li>更高维的<em>阿贝尔簇</em>（abelian variety）。这是 21 世纪研究最活跃的方向之一。</li>
+  <li>更广泛的"<em>motives</em>"（Grothendieck 1960 年代提出的 \(L\)-函数的"<em>动机</em>" 来源）。Fontaine-Mazur 猜想是这方向的纲领。</li>
+</ul>
+
+<p><strong>方向 2：Langlands 程序。</strong>把"<em>2 维 Galois 表示\(\leftrightarrow\) 模形式</em>" 推广到 \(n\) 维：</p>
+
+<ul>
+  <li><em>\(n\) 维 Galois 表示</em> \(\rho : \mathrm{Gal}(\overline{\mathbb Q}/\mathbb Q) \to \mathrm{GL}_n(\mathbb C)\) 应该对应<em>\(\mathrm{GL}_n\) 上的自守表示</em>——给出 \(L(\rho, s) = L(\pi, s)\) 的相同 \(L\)-函数。</li>
+  <li>Arthur 2013 完成<em>\(\mathrm{GL}_n\) 在数域上的内禀稳定迹公式</em>，把 \(\mathrm{GL}_n\) 范畴里 Langlands 函子性的"<em>主体</em>" 大体上证明了——但具体某些非阿贝尔扩张的对应仍未完成。</li>
+  <li>\(p\)-adic Langlands 程序（Breuil 2003 起）：<em>\(p\)-adic Galois 表示</em>↔<em>\(p\)-adic 自守表示</em>。这是 \(p\)-adic 解析（链回<a href="ch18.html">ch18</a>）与代数几何的现代综合。</li>
+</ul>
+
+<p><strong>方向 3：BSD 猜想。</strong>Birch-Swinnerton-Dyer 猜想（1965 提出，Clay 千禧年问题之一）：</p>
+
+<p>\[
+\mathrm{rank}\, E(\mathbb Q) = \mathrm{ord}_{s = 1} L(E, s).
+\]</p>
+
+<p>椭圆曲线的<em>有理点的秩</em>（链回<a href="ch20.html">ch20</a>Mordell-Weil）<em>等于</em> 它的 \(L\)-函数在 \(s = 1\) 的零点阶。这是连接<em>几何</em>（点的群结构）与<em>解析</em>（\(L\)-函数）的"<em>中央猜想</em>"。已知<em>部分</em>：Coates-Wiles 1977 对 \(\mathrm{ord} = 0\) 时的"<em>弱</em> BSD"、Gross-Zagier-Kolyvagin 1989 对 \(\mathrm{ord} \le 1\) 时。\(\mathrm{ord} \ge 2\) 仍未解。</p>
+
+<p>这三方向<em>互相交织</em>——每一个的进展推进其他两个。它们共同的工具：Galois 表示、自守形式、模形式空间的 Hecke 代数、变形理论、\(p\)-adic 分析、代数几何（motivic cohomology）。这些工具的<em>每一种</em> 都需要本科数学之外 2-3 年的研究生学习。它们是 21 世纪数论的<em>语言</em>。</p>
+
+<h2 id="sec24-8">24.8 这本书结束</h2>
+
+<p>这本书 24 章把"<em>整数</em>" 这个最朴素的数学对象从最初的"<em>\(7^{100}\) 末位是几</em>" 一路带到 Wiles 路径的全图景。中间走过：</p>
+
+<ul>
+  <li>初等数论（ch1-12）：模算术、素数、二次互反、Pell 方程。这一段你高中代数功底就能读，是其余所有内容的<em>地基</em>。</li>
+  <li>代数数论（ch13-17）：高斯整数、算术函数、Dirichlet 卷积、二元二次型、类数。这一段你需要<a href="../抽象代数/index.html">抽象代数</a>知识。它把"<em>整数</em>" 嵌入更大的代数结构里，让你看到<em>素分解</em> 在普通环里失败、又怎么用<em>理想</em> 与<em>类群</em> 修复。</li>
+  <li>解析数论（ch16, 18）：素数定理思路、Riemann zeta、\(p\)-adic 数。\(\zeta\) 函数把"<em>整数</em>" 联系到<em>复分析</em>——一个直到 19 世纪中叶都没人想到的桥。</li>
+  <li>椭圆曲线 + 模形式（ch19-21）：从"<em>三次方程</em>" 到"<em>群律</em>" 到"<em>有限生成群</em>" 到"<em>上半平面对称函数</em>"。每一步都是 19-20 世纪某位伟大数学家的发现。</li>
+  <li>类域论 + Langlands（ch22）：把<em>所有数论</em> 看作一个对应——"<em>Galois 群\(\leftrightarrow\) 自守表示</em>"。这条对应阿贝尔部分（即类域论）<em>已完成</em>；非阿贝尔部分（即一般 Langlands）是 21 世纪研究的核心。</li>
+  <li>应用 + 终章（ch23-24）：密码学是数论今天的<em>用途</em>；Wiles 路径是数论今天的<em>最高峰</em>。</li>
+</ul>
+
+<p>请你停下来感受"<em>整数</em>" 这个对象的<em>分量</em>。</p>
+
+<ul>
+  <li>它是你最早接触的数学对象——在你学加法之前你已经会数 1, 2, 3。</li>
+  <li>它有<em>三千年</em> 的研究史——从 Euclid（公元前 300 年）到 Wiles（公元 1995 年）。</li>
+  <li>它需要<em>20 世纪几乎所有现代数学</em>——抽象代数、复分析、\(p\)-adic 分析、代数几何、表示论——才能被深刻理解。</li>
+  <li>它的<em>21 世纪研究</em> 仍在进行——Langlands 程序、BSD、Riemann 假设——每一个都是数学最大问题之一。</li>
+</ul>
+
+<p>"<em>朴素表面 vs 深层结构</em>" 这条反差<a href="ch1.html">第 1 章</a>就讲了——20 多章后你应该看见它的真正分量。整数<em>不是</em>"初等" 数学；它是数学里最深的对象之一，因为它把<em>所有</em>现代数学工具吸引来描述自己。</p>
+
+<p>1801 年 Gauss 19 岁在日记本上写："<em>数学是科学的女王，数论是数学的女王。</em>"</p>
+
+<p>2025 年这条话还成立。</p>
+
+<p>3000 年来，每一代数学家都觉得"<em>整数终于被理解了</em>"，下一代又发现新一层。这条规律不会停——你今天读完这本书，几十年后某位学生会读一本"<em>普林斯顿数论读本 V20</em>"，把 Wiles 之后的 Langlands 完成、BSD 解决、Riemann 假设证完都讲清楚——而那本书的<em>第 25 章</em>仍会写"<em>这条线还在前进</em>"。整数的故事没有结束，因为<em>结束的从来不是数学</em>，结束的是<em>这一代人对数学的理解</em>。</p>
+
+<p>Wiles 1995 年关于 Fermat 大定理的访谈最后一句话："<em>有些问题陪伴你一辈子。它们不一定是最重要的；但它们是属于<em>你</em>的——你和它们之间有一种私人的关系。Fermat 大定理是这种问题之一。</em>"</p>
+
+<p>希望你读完这本书后，<em>"</em>整数<em>"</em> 在你心里也变成这样一个对象——你的一辈子的伙伴，永远比你想象深，永远比上一次理解的更深。</p>
+
+<p>这本书结束了。下面是<a href="appA.html">附录 A 群环域速查</a>与<a href="appB.html">附录 B 复分析与解析数论速查</a>，把全书用到的代数 + 复分析背景做一个集中的复习；最后是<a href="subject-index.html">主题索引</a>。如果你想深入哪一块，<em>《抽象代数读本》</em>、<em>《复分析读本》</em>、Silverman <em>The Arithmetic of Elliptic Curves</em>、Diamond-Shurman <em>A First Course in Modular Forms</em>、Cox <em>Primes of the Form \(x^2 + ny^2\)</em> 这几本书是最好的下一站。</p>
+
+<p>祝你下一段旅途——比这本书走得更远。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：现代密码学</a><a href="appA.html">下一节 · 附录 A 群环域速查 →</a></nav>
+</main>
+</body>
+</html>

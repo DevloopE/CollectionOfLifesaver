@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 章 高斯整数 \(\mathbb Z[i]\) 与二平方和 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 Pell 方程</a><a href="ch14.html">下一章 · 第 14 章 →</a></nav>
+<h1 id="ch13">第 13 章 高斯整数 \(\mathbb Z[i]\) 与二平方和</h1>
+
+<p>问题：哪些素数 \(p\) 能写成两个完全平方之和 \(p = a^2 + b^2\)？</p>
+
+<p>枚举一下，强迫自己<em>看</em> 而不是马上证：</p>
+
+<p>\[
+\begin{array}{c|c|c}
+p & a^2 + b^2 = p? & p \bmod 4 \\ \hline
+2 & 1^2 + 1^2 = 2 & 2 \\
+3 & ? & 3 \\
+5 & 1^2 + 2^2 = 5 & 1 \\
+7 & ? & 3 \\
+11 & ? & 3 \\
+13 & 2^2 + 3^2 = 13 & 1 \\
+17 & 1^2 + 4^2 = 17 & 1 \\
+19 & ? & 3 \\
+23 & ? & 3 \\
+29 & 2^2 + 5^2 = 29 & 1 \\
+31 & ? & 3 \\
+37 & 1^2 + 6^2 = 37 & 1 \\
+41 & 4^2 + 5^2 = 41 & 1 \\
+43 & ? & 3 \\
+47 & ? & 3 \\
+53 & 2^2 + 7^2 = 53 & 1 \\
+\end{array}
+\]</p>
+
+<p>清晰的规律：除了 \(2\)，<em>每个能写成 \(a^2 + b^2\) 的素数都 \(\equiv 1 \pmod 4\)</em>，反之亦然。</p>
+
+<p>这是 Fermat 1640 年圣诞节给 Mersenne 写信时声称的结果（所以叫"<em>圣诞定理</em>"）。Fermat 没给完整证明——他常这样。Euler 1747 年用<em>下降法</em>（infinite descent）给出了<em>初等证明</em>——长而精巧。</p>
+
+<p>本章要走的路<em>不是</em> Euler 的初等证明，而是 19 世纪的<em>代数</em> 证明：把整数升到环 \(\mathbb Z[i] = \{a + bi : a, b \in \mathbb Z\}\) 里去看。在这个环里，\(p = a^2 + b^2\) 的问题<em>立刻变形</em>——它变成"<em>素数 \(p\) 在 \(\mathbb Z[i]\) 里能不能分裂</em>"。这种"<em>升一层环看素数</em>" 是代数数论的开门一击，为后面的类域论（ch22）铺路。</p>
+
+<h2 id="sec13-1">13.1 数据：哪些 \(p\) 能 = \(a^2 + b^2\)</h2>
+
+<p>把数据再加大。100 以内的素数和它们模 4 的剩余：</p>
+
+<p>\[
+\begin{array}{c|c|c|c}
+p & p \bmod 4 & p = a^2 + b^2? & (a, b) \\ \hline
+2 & 2 & \checkmark & (1, 1) \\
+3 & 3 & \times & - \\
+5 & 1 & \checkmark & (1, 2) \\
+7 & 3 & \times & - \\
+11 & 3 & \times & - \\
+13 & 1 & \checkmark & (2, 3) \\
+17 & 1 & \checkmark & (1, 4) \\
+19 & 3 & \times & - \\
+23 & 3 & \times & - \\
+29 & 1 & \checkmark & (2, 5) \\
+31 & 3 & \times & - \\
+37 & 1 & \checkmark & (1, 6) \\
+41 & 1 & \checkmark & (4, 5) \\
+43 & 3 & \times & - \\
+47 & 3 & \times & - \\
+53 & 1 & \checkmark & (2, 7) \\
+59 & 3 & \times & - \\
+61 & 1 & \checkmark & (5, 6) \\
+67 & 3 & \times & - \\
+71 & 3 & \times & - \\
+73 & 1 & \checkmark & (3, 8) \\
+79 & 3 & \times & - \\
+83 & 3 & \times & - \\
+89 & 1 & \checkmark & (5, 8) \\
+97 & 1 & \checkmark & (4, 9)
+\end{array}
+\]</p>
+
+<p>看出两个观察：</p>
+
+<ol>
+  <li>\(p \equiv 3 \pmod 4\) 时，\(p\) <em>从不</em> 是两平方和。</li>
+  <li>\(p \equiv 1 \pmod 4\) 时（加上 \(p = 2\)），\(p\) <em>总是</em> 两平方和。</li>
+</ol>
+
+<p>第一观察容易证（13.2 节）。第二观察需要新工具（13.3 节起）。两件事合起来就是 Fermat 的圣诞定理。</p>
+
+<p>注意一件事：写法<em>本质唯一</em>。\(13 = 2^2 + 3^2\)，没有别的非平凡方式（除了 \(3^2 + 2^2\) 这种交换 + 符号变化）。同样 \(29 = 2^2 + 5^2\) 唯一。这种"<em>本质唯一性</em>" 是 \(\mathbb Z[i]\) 唯一分解性 (UFD) 的直接后果——13.4-13.5 节会看到。</p>
+
+<h2 id="sec13-2">13.2 模 4 朴素必要性</h2>
+
+<p>\(p \equiv 3 \pmod 4\) 时为什么不能 \(= a^2 + b^2\)？看模 4：</p>
+
+<p>\[
+a^2 \pmod 4 \in \{0, 1\}, \quad b^2 \pmod 4 \in \{0, 1\}.
+\]</p>
+
+<p>因为 \((2k)^2 = 4k^2 \equiv 0\)，\((2k + 1)^2 = 4k^2 + 4k + 1 \equiv 1\)。所以 \(a^2 + b^2 \pmod 4 \in \{0, 1, 2\}\)——绝不是 3。</p>
+
+<p>因此 \(p \equiv 3 \pmod 4\) 不能写成 \(a^2 + b^2\)。\(\square\)</p>
+
+<p>这一半证完了，几乎不用思考。<em>必要</em> 性朴素，<em>充分</em> 性才是真正的难题。</p>
+
+<p>试图朴素地证充分性：取 \(p \equiv 1 \pmod 4\)，要造 \(a, b\) 使 \(a^2 + b^2 = p\)。怎么造？没有显然的构造！\(p = 13\) 的 \((2, 3)\) 跟 \(p = 17\) 的 \((1, 4)\) 看不出共同模式——\(a, b\) 没有从 \(p\) 自然冒出来的公式。这就是<em>撞墙</em>：朴素套路解决不了。</p>
+
+<p>Euler 的 1747 证明用<em>无穷下降</em>：假设 \(p \equiv 1 \pmod 4\) 不可表，导出矛盾。这条路可走，但<em>不优雅</em>。19 世纪 Gauss 给出新视角——不是直接构造 \(a, b\)，而是<em>升到一个新环</em>，让"\(a^2 + b^2 = p\)" 变成"<em>\(p\) 可分解</em>"。</p>
+
+<h2 id="sec13-3">13.3 reframe：把 \(a^2 + b^2\) 因式分解</h2>
+
+<p>关键的代数观察：</p>
+
+<p>\[
+a^2 + b^2 = (a + bi)(a - bi),
+\]</p>
+
+<p>其中 \(i = \sqrt{-1}\)。在普通整数 \(\mathbb Z\) 里 \(a^2 + b^2\) 不分解（如果 \(a, b\) 互素），但在<em>添加 \(i\) 之后</em> 的扩张里它<em>分解了</em>。</p>
+
+<p>所以"\(p = a^2 + b^2\) 是否成立" 等价于"\(p\) 在 \(\{a + bi : a, b \in \mathbb Z\}\) 这个集合里能否分解为 \((a + bi)(a - bi)\)"。<em>素数 \(p\) 在新世界里<em>不再是素数</em></em>——它分裂成两个共轭因子。</p>
+
+<p>这个想法严谨化需要：</p>
+
+<ol>
+  <li>定义"<em>新世界</em>" \(\mathbb Z[i]\) 是个环。</li>
+  <li>在 \(\mathbb Z[i]\) 里有"<em>素元</em>" 的概念，且分解唯一（UFD 结构）。</li>
+  <li>判定哪些 \(p \in \mathbb Z\) 是 \(\mathbb Z[i]\) 的素元，哪些不是。</li>
+</ol>
+
+<p>这一节起把这三件事补完。</p>
+
+<p><strong>定义。</strong> <em>高斯整数环</em></p>
+
+<p>\[
+\mathbb Z[i] = \{a + bi : a, b \in \mathbb Z\} \subset \mathbb C.
+\]</p>
+
+<p>它在加减乘下封闭：\((a + bi) + (c + di) = (a + c) + (b + d)i\)，\((a + bi)(c + di) = (ac - bd) + (ad + bc)i\)。\(\mathbb Z[i]\) 是 \(\mathbb C\) 的子环。</p>
+
+<p><strong>定义（范数）。</strong></p>
+
+<p>\[
+N(a + bi) := a^2 + b^2 = (a + bi)(a - bi) = |a + bi|^2.
+\]</p>
+
+<p>范数等于复模平方。它把 \(\mathbb Z[i]\) 元素映到非负整数。</p>
+
+<p><strong>引理。</strong> \(N(\alpha\beta) = N(\alpha) N(\beta)\)（范数乘法性）。</p>
+
+<p><em>证明。</em> \(N(\alpha\beta) = |\alpha\beta|^2 = |\alpha|^2 |\beta|^2 = N(\alpha) N(\beta)\)。\(\square\)</p>
+
+<p>这条乘法性是整章引擎。它意味着任何分解 \(\pi \sigma = p\) 给出 \(N(\pi) N(\sigma) = N(p) = p^2\)。所以 \(N(\pi)\) 只能是 \(1, p, p^2\)——一个非常强的限制。</p>
+
+<p><strong>定义（单位）。</strong> \(\alpha \in \mathbb Z[i]\) 是<em>单位</em>（unit）\(\iff\) 在 \(\mathbb Z[i]\) 中可逆。等价于 \(N(\alpha) = 1\)。</p>
+
+<p>解 \(a^2 + b^2 = 1\)（整数）：\((a, b) \in \{(\pm 1, 0), (0, \pm 1)\}\)。所以单位是 \(\{1, -1, i, -i\}\)，共 4 个。</p>
+
+<p>这就是 \(\mathbb Z[i]\) 比 \(\mathbb Z\) 复杂的第一处。\(\mathbb Z\) 只有 2 个单位 \(\{\pm 1\}\)；\(\mathbb Z[i]\) 有 4 个 \(\{\pm 1, \pm i\}\)。任何"<em>分解</em>" 在 \(\mathbb Z[i]\) 里都会差一个单位因子——讨论唯一性时要小心。</p>
+
+<h2 id="sec13-4">13.4 \(\mathbb Z[i]\) 是 Euclidean、PID、UFD</h2>
+
+<p>要把 \(\mathbb Z[i]\) 当"<em>有素分解的环</em>" 用，需要它有<em>唯一分解性</em>（unique factorization domain，UFD）。怎么证？最快的路是证它是<em>Euclidean 环</em>——即有"<em>带余数除法</em>"——再由 Euclidean \(\Rightarrow\) PID \(\Rightarrow\) UFD（链回<a href="../抽象代数/ch14.html">抽象代数 ch14</a>）。</p>
+
+<p><strong>定理（\(\mathbb Z[i]\) 是 Euclidean）。</strong> 对任意 \(\alpha, \beta \in \mathbb Z[i]\)，\(\beta \ne 0\)，存在 \(q, r \in \mathbb Z[i]\) 使</p>
+
+<p>\[
+\alpha = q \beta + r, \quad N(r) < N(\beta).
+\]</p>
+
+<p><em>证明。</em> 在 \(\mathbb C\) 里做<em>正常</em> 除法：</p>
+
+<p>\[
+\frac{\alpha}{\beta} = u + v i, \quad u, v \in \mathbb R.
+\]</p>
+
+<p>取 \(\mathbb Z\) 中离 \(u, v\) <em>最近</em> 的整数 \(m, n\)：\(|u - m| \le 1/2\)，\(|v - n| \le 1/2\)。设 \(q = m + ni \in \mathbb Z[i]\)。定义 \(r = \alpha - q \beta\)。</p>
+
+<p>那么</p>
+
+<p>\[
+\frac{r}{\beta} = \frac{\alpha}{\beta} - q = (u - m) + (v - n) i,
+\]</p>
+
+<p>\[
+\left|\frac{r}{\beta}\right|^2 = (u - m)^2 + (v - n)^2 \le \frac 1 4 + \frac 1 4 = \frac 1 2.
+\]</p>
+
+<p>所以 \(N(r) = |r|^2 = |\beta|^2 \cdot |r/\beta|^2 \le \frac{N(\beta)}{2} < N(\beta)\)。\(\square\)</p>
+
+<p>这个证明<em>极</em> 直观——把 \(\mathbb Z[i]\) 当成复平面上的<em>整点格</em>，任意复数 \(\alpha/\beta\) 离最近的整点距离不超过 \(\sqrt{1/2}\)。"<em>整点格密集到任何点都有近邻</em>" \(\iff\) "<em>除法可带余数</em>"。这种几何直观是 \(\mathbb Z[i]\) 比一般环漂亮的原因。</p>
+
+<p>具体演示：算 \((10 + 3i) \div (2 + i)\) 在 \(\mathbb Z[i]\) 中。</p>
+
+<p>正常除：\(\dfrac{10 + 3i}{2 + i} = \dfrac{(10 + 3i)(2 - i)}{(2+i)(2-i)} = \dfrac{20 - 10i + 6i + 3}{5} = \dfrac{23 - 4i}{5} = 4.6 - 0.8 i\)。</p>
+
+<p>取最近整点：\(q = 5 - i\)（\(|4.6 - 5| = 0.4\)，\(|-0.8 + 1| = 0.2\)；都 \(\le 0.5\)）。</p>
+
+<p>余数 \(r = (10 + 3i) - (5 - i)(2 + i) = (10 + 3i) - (10 + 5i - 2i + 1) = (10 + 3i) - (11 + 3i) = -1\)。</p>
+
+<p>\(N(r) = 1 < N(2 + i) = 5\)。\(\checkmark\) 验证 \(q\beta + r = 11 + 3i - 1 = 10 + 3i = \alpha\)。\(\checkmark\)</p>
+
+<p><strong>推论。</strong> \(\mathbb Z[i]\) 是<em>主理想环</em>（PID），<em>唯一分解整环</em>（UFD）。</p>
+
+<p>证明思路：Euclidean 环必有 Euclid 算法 \(\Rightarrow\) 任何理想由"<em>最小</em>" 元生成（用范数比较），即 PID。PID 上有 Bezout 引理 + 算术基本定理 \(\Rightarrow\) UFD。这条逻辑链条在抽象代数里是标准的（链回<a href="../抽象代数/ch14.html">抽象代数 ch14</a>）。</p>
+
+<p>关键后果：\(\mathbb Z[i]\) 上的"<em>素元素</em>" 概念清晰，每个非零非单位元素<em>本质唯一</em> 分解为素元的乘积（差一个单位因子）。这给我们后面用得着的"<em>分解工具</em>"。</p>
+
+<h2 id="sec13-5">13.5 \(\mathbb Z[i]\) 的素元素分类</h2>
+
+<p>核心问题：给一个普通素数 \(p \in \mathbb Z\)，它在 \(\mathbb Z[i]\) 里是不是素元？如果不是，它分解成什么？</p>
+
+<p>用范数。设 \(p = \pi_1 \pi_2 \cdots\) 是 \(\mathbb Z[i]\) 中分解。范数乘积性给</p>
+
+<p>\[
+p^2 = N(p) = N(\pi_1) N(\pi_2) \cdots
+\]</p>
+
+<p>每个 \(N(\pi_k)\) 是<em>正整数</em>，乘起来 \(= p^2\)。可能性只有：</p>
+
+<ul>
+  <li>\(p^2 = p^2\)（不分解）：\(p\) 是 \(\mathbb Z[i]\) 素元，\(N(p) = p^2\)。</li>
+  <li>\(p^2 = p \cdot p\)（分解为两素元，每个范数 \(p\)）：\(p = \pi \cdot \pi'\)，\(N(\pi) = N(\pi') = p\)。</li>
+</ul>
+
+<p>"<em>不可能 \(p^2 = p \cdot 1\)</em>" 因为 \(N(\pi) = 1\) 蕴含 \(\pi\) 是单位（不是素元）。</p>
+
+<p>所以分类落到：<em>\(N(\pi) = p\) 是否有解</em>？这正是 \(p = a^2 + b^2\) 是否有整数解的问题！</p>
+
+<p>这是<em>圆形回归</em>。我们出发的问题是 \(p = a^2 + b^2\)，绕了一圈又回到同一个问题。但绕这一圈我们获得了<em>结构</em>——现在问题是"<em>素元 \(p\) 在 \(\mathbb Z[i]\) 中是否分裂</em>"，且我们有 UFD 工具帮我们决定。</p>
+
+<p>怎么决定 \(p\) 在 \(\mathbb Z[i]\) 中是否分裂？关键引理：</p>
+
+<p><strong>引理。</strong> \(p\) 在 \(\mathbb Z[i]\) 中分裂（即 \(p = \pi \bar\pi\) 范数 \(p\)）\(\iff\) \(\mathbb Z[i] / (p)\) 不是域。</p>
+
+<p>解释：\(p\) 在 PID \(\mathbb Z[i]\) 中是素元 \(\iff\) \((p)\) 是极大理想 \(\iff\) \(\mathbb Z[i]/(p)\) 是域。</p>
+
+<p>计算 \(\mathbb Z[i]/(p)\)：</p>
+
+<p>\[
+\mathbb Z[i]/(p) = \mathbb Z[i] / \mathbb Z[i] \cdot p \cong (\mathbb Z/p)[i] = \mathbb F_p[X] / (X^2 + 1).
+\]</p>
+
+<p>因为 \(\mathbb Z[i] = \mathbb Z[X]/(X^2 + 1)\)（把 \(i\) 看作变量 \(X\) 满足 \(X^2 + 1 = 0\)）；模 \(p\)，环变为 \((\mathbb Z/p)[X]/(X^2 + 1) = \mathbb F_p[X]/(X^2 + 1)\)。</p>
+
+<p>所以问题简化为：<em>\(X^2 + 1\) 在 \(\mathbb F_p[X]\) 中是否可约</em>？</p>
+
+<ul>
+  <li>\(X^2 + 1\) 可约 \(\iff\) \(-1\) 是 \(\mathbb F_p\) 中平方 \(\iff\) \(\exists s \in \mathbb F_p, s^2 = -1\)。</li>
+  <li>这时 \(X^2 + 1 = (X - s)(X + s)\)，环 \(\mathbb F_p[X]/(X^2 + 1)\) <em>不是域</em>（有零因子），所以 \(p\) 不是 \(\mathbb Z[i]\) 素元——分裂。</li>
+  <li>反之，\(-1\) 不是 \(\mathbb F_p\) 平方时，\(X^2 + 1\) 不可约，环是<em>域</em> \(\mathbb F_{p^2}\)，\(p\) 是 \(\mathbb Z[i]\) 素元。</li>
+</ul>
+
+<p>所以问题最终化为：<em>\(-1\) 何时是 \(\mathbb F_p\) 中的平方</em>？</p>
+
+<p>这是经典模 \(p\) 二次互反问题（链回 ch9）。答案：</p>
+
+<p>\[\boxed{\ -1 \text{ 是 } \mathbb F_p \text{ 平方} \iff p \equiv 1 \pmod 4 \ (\text{或 } p = 2).\ }\]</p>
+
+<p>证明（标准、值得记）：\(\mathbb F_p^* \) 是循环群，阶 \(p - 1\)。\(-1\) 是这个循环群的<em>2 阶元</em>。它是平方 \(\iff\) 群里有 4 阶元 \(\iff\) \(4 \mid p - 1\) \(\iff\) \(p \equiv 1 \pmod 4\)。\(\square\)</p>
+
+<p>这把所有线索串起来。结论：</p>
+
+<p><strong>定理（\(\mathbb Z[i]\) 中素元的分类）。</strong></p>
+
+<ul>
+  <li>\(p = 2\)：分裂为 \(2 = -i(1 + i)^2\)。称作<em>分歧</em>（ramified）——一个素元的平方。</li>
+  <li>\(p \equiv 1 \pmod 4\)：分裂为 \(p = \pi \bar\pi\)，\(\pi, \bar\pi\) 是 \(\mathbb Z[i]\) 的两个不同的（共轭）素元，每个范数 \(p\)。称作<em>分裂</em>（split）。</li>
+  <li>\(p \equiv 3 \pmod 4\)：仍为 \(\mathbb Z[i]\) 素元，\(N(p) = p^2\)。称作<em>惰性</em>（inert）。</li>
+</ul>
+
+<p>这是代数数论的标志性图像：<em>每个普通素数在扩张环里要么分裂、要么分歧、要么惰性</em>，三种行为对应 \(p\) 模某个数的剩余。一个素数的"<em>命运</em>" 由它的剩余类决定——这是<em>类域论</em>（ch22）的种子。</p>
+
+<h2 id="sec13-6">13.6 推论：Fermat 圣诞定理</h2>
+
+<p>把 13.5 的结论翻译回原问题。</p>
+
+<p><strong>定理（Fermat 1640）。</strong> 素数 \(p\) 可以写成两整数平方之和 \(p = a^2 + b^2\) \(\iff\) \(p = 2\) 或 \(p \equiv 1 \pmod 4\)。</p>
+
+<p><em>证明。</em> 用 13.5 节："\(p\) 在 \(\mathbb Z[i]\) 中分裂" 等价于 "存在 \(\pi \in \mathbb Z[i]\) 范数 \(p\)" 等价于 "存在 \(a, b \in \mathbb Z\) 使 \(a^2 + b^2 = p\)"。13.5 节告诉我们分裂 \(\iff\) \(p \equiv 1 \pmod 4\) 或 \(p = 2\)。\(\square\)</p>
+
+<p>证明再细一些（本质唯一性）：如果 \(p = a^2 + b^2\)，那 \(\pi = a + bi\) 是 \(\mathbb Z[i]\) 中范数 \(p\) 的素元。\(\mathbb Z[i]\) UFD 性蕴含这种素元在差一个单位因子下唯一。所以 \((a, b)\) 在交换 + 取反 + 配偶 \((a, b) \to (b, a) \to (-a, b)\) 等之下<em>唯一</em>。这就是 \(13 = 2^2 + 3^2\) 没有别的非平凡写法的原因。</p>
+
+<p>两段同一定理：13.6 是<em>结论形式</em>（"<em>可写成 \(a^2 + b^2\) 当且仅当 \(p \bmod 4\) 是这种这种</em>"）；13.5 是<em>结构形式</em>（"<em>素数 \(p\) 在 \(\mathbb Z[i]\) 里以这种方式分裂</em>"）。两者通过 \(N(\pi) = p\) 等价——但<em>结构形式更深</em>，因为它把"<em>整数表象</em>" 解释成"<em>新环里的素元行为</em>"。</p>
+
+<h2 id="sec13-7">13.7 完整演示：13、17、29</h2>
+
+<p>把上面的理论<em>具体跑通</em> 几个例子，让你看见每一步。</p>
+
+<p><strong>例 1：\(p = 13\)。</strong> \(13 \equiv 1 \pmod 4\)。在 \(\mathbb F_{13}\) 找 \(s^2 = -1 = 12\)：试 \(s = 5\)：\(25 = 13 + 12\)，\(s^2 = 12\)。\(\checkmark\)。所以 \(13 \mid 5^2 + 1 = 26\)，写 \(13 \cdot 2 = 5^2 + 1^2\)——但我们要 \(13 = a^2 + b^2\)，不是 \(13 \cdot 2\)。再算：</p>
+
+<p>关键：\(\gcd(5 + i, 13)\) 在 \(\mathbb Z[i]\) 中。Euclid 算法：</p>
+
+<p>\(13 = q \cdot (5 + i) + r\)，先算 \(13/(5 + i) = 13(5 - i)/((5+i)(5-i)) = 13(5-i)/26 = (65 - 13i)/26 = 2.5 - 0.5 i\)。最近整点 \(q = 2\)（也可取 \(3\)，对称）。\(r = 13 - 2(5 + i) = 13 - 10 - 2i = 3 - 2i\)。\(N(r) = 9 + 4 = 13\)，<em>等</em> \(N(13)\)，奇怪。</p>
+
+<p>取 \(q = 3 - i\)（更靠近）：\(r = 13 - (3 - i)(5 + i) = 13 - (15 + 3i - 5i + 1) = 13 - 16 + 2i = -3 + 2i\)。\(N(r) = 13\)。同样问题。</p>
+
+<p>这是因为 \((5 + i) \cdot (\bar{5 + i})/13 = 26/13 = 2\)。换另一条路。\(\gcd(5 + i, 13)\) 直接算：\(13 = (3 + 2i)(3 - 2i)\)？\(N(3 + 2i) = 13\)。\(\checkmark\)。所以 \(13 = (3 + 2i)(3 - 2i)\)，对应 \(13 = 3^2 + 2^2\)。\(\checkmark\)</p>
+
+<p>怎么从 \(s = 5\) 直接得到 \(\pi = 3 + 2i\)？\(s^2 + 1 = 26 = 13 \cdot 2\)，所以 \(13 \mid (s + i)(s - i) = 26\)。\(13\) 在 \(\mathbb Z[i]\) 中分解（已知 \(p \equiv 1 \pmod 4\)），所以 \(13 = \pi \bar\pi\)，要么 \(\pi \mid s + i\)，要么 \(\pi \mid s - i\)。算 \(\gcd(s + i, 13) = \gcd(5 + i, 13)\) 在 \(\mathbb Z[i]\) Euclidean 算法里：</p>
+
+<p>\(13 / (5 + i) = (65 - 13i)/26 = 2.5 - 0.5 i\)，取 \(q = 2 - i\)（就近舍）。\(r = 13 - (2 - i)(5 + i) = 13 - (10 + 2i - 5i + 1) = 13 - 11 + 3i = 2 + 3i\)。<em>这才是非平凡余数</em>，\(N(r) = 13\)，但等下<em>同样 \(=N(13)\)</em>，仍奇怪。</p>
+
+<p>让我重新思考。在 \(\mathbb Z[i]\) Euclidean 算法里，余数<em>必须严格</em> 范数小。我刚算 \(N(r) = 13 = N(13)\)，<em>不严格小</em>——错了。重检：\(N(13) = 169\)，不是 13！\(13\) 作为高斯整数，范数是 \(13^2 = 169\)。\(\checkmark\)。所以 \(N(r) = 13 < 169 = N(13)\)，正确，\(r = 2 + 3i\) 是合法余数。</p>
+
+<p>下一步 Euclid：\(\gcd((5 + i), 13) = \gcd((5 + i), (2 + 3i))\)。\((5 + i)/(2 + 3i) = (5 + i)(2 - 3i)/13 = (10 - 15i + 2i + 3)/13 = (13 - 13i)/13 = 1 - i\)。整！余数 0。所以 \(\gcd = 2 + 3i\)。即 \(\pi = 2 + 3i\)（或它的关联），范数 \(N(\pi) = 13\)。\(13 = (2 + 3i)(2 - 3i)\)，给 \(13 = 2^2 + 3^2\)。\(\checkmark\)</p>
+
+<p>这跑出来的 \((a, b) = (2, 3)\) 跟 13.1 节查表一致。</p>
+
+<p><strong>例 2：\(p = 17\)。</strong> 在 \(\mathbb F_{17}\) 找 \(s^2 = -1 = 16\)：\(s = 4\)（\(16 = 16\)）。\(\checkmark\)。算 \(\gcd(4 + i, 17)\) 在 \(\mathbb Z[i]\)：\(17/(4 + i) = 17(4 - i)/17 = 4 - i\)。整！余数 0。所以 \(\gcd = 4 + i\)，但等等——\(\gcd\) 应该是 \(p = 17\) 的因子，范数 17——\(N(4 + i) = 17\)。\(\checkmark\)。所以 \(\pi = 4 + i\)，\(17 = (4 + i)(4 - i) = 4^2 + 1^2\)。\(\checkmark\)</p>
+
+<p><strong>例 3：\(p = 29\)。</strong> \(\mathbb F_{29}\) 找 \(s^2 = 28\)：试 \(s = 12\)，\(144 = 4 \cdot 29 + 28\)。\(s = 12\)。算 \(\gcd(12 + i, 29)\)：\(29/(12 + i) = 29(12 - i)/(144 + 1) = 29(12 - i)/145 = (12 - i)/5 = 2.4 - 0.2 i\)。最近整点 \(q = 2\)。\(r = 29 - 2(12 + i) = 29 - 24 - 2i = 5 - 2i\)。\(N(r) = 29\)，<em>下个迭代</em>。</p>
+
+<p>\(\gcd((12 + i), (5 - 2i))\)：\((12 + i)/(5 - 2i) = (12 + i)(5 + 2i)/29 = (60 + 24i + 5i - 2)/29 = (58 + 29i)/29 = 2 + i\)。整！余数 0。\(\gcd = 5 - 2i\)。\(29 = (5 - 2i)(5 + 2i) = 25 + 4 = 29\)。\(\checkmark\) 给 \(29 = 5^2 + 2^2\)。\(\checkmark\)</p>
+
+<p>所以"<em>圣诞定理</em>" 不仅是<em>存在</em> 性结果，是<em>构造性</em>——给定 \(p \equiv 1 \pmod 4\)，先在 \(\mathbb F_p\) 找 \(s^2 = -1\)，再在 \(\mathbb Z[i]\) 跑 Euclid 算 \(\gcd(s + i, p)\)，结果就是 \(a + bi\)。这套算法是 RSA 类密码学的基本工具——你想"<em>给定 \(p\)，分解 \(p\) 为高斯整数</em>"，按此程序即可。</p>
+
+<h2 id="sec13-8">13.8 推广：艾森斯坦整数与 \(p = a^2 + 3 b^2\)</h2>
+
+<p>类比问：哪些素数 \(p\) 能写成 \(p = a^2 + 3 b^2\)？</p>
+
+<p>枚举：\(p = 7 = 2^2 + 3 \cdot 1^2\)，\(13 = 1^2 + 3 \cdot 2^2\)，\(19 = 4^2 + 3 \cdot 1^2\)，\(31 = 2^2 + 3 \cdot 3^2\)，\(37 = 5^2 + 3 \cdot 2^2\)，\(43 = 4^2 + 3 \cdot 3^2\)，\(61, 67, 73, 79, 97, \ldots\) 都行。规律？\(p \equiv 1 \pmod 3\)（除了 \(p = 3\)）。</p>
+
+<p>这定理的证明用<em>艾森斯坦整数</em>：</p>
+
+<p>\[
+\mathbb Z[\omega] = \{a + b\omega : a, b \in \mathbb Z\}, \quad \omega = e^{2\pi i / 3} = \frac{-1 + i\sqrt 3}{2}.
+\]</p>
+
+<p>\(\omega\) 是 \(x^2 + x + 1 = 0\) 的根（\(\omega^3 = 1, \omega \ne 1\)）。\(\mathbb Z[\omega]\) 是个环，复平面里看是个<em>三角格</em>（vs \(\mathbb Z[i]\) 的方格）。</p>
+
+<p>范数：\(N(a + b\omega) = (a + b\omega)(a + b\bar\omega) = a^2 + ab(\omega + \bar\omega) + b^2 \omega \bar\omega = a^2 - ab + b^2\)。哦，这是 \(a^2 - ab + b^2\)，不是直接的 \(a^2 + 3b^2\)——但代换 \(b \to 2b\) 后 \(a^2 - 2ab + 4b^2\)，跟 \(a^2 + 3b^2\) 经过线性变换相联系。</p>
+
+<p>同样的故事：</p>
+
+<ul>
+  <li>\(\mathbb Z[\omega]\) 也是 Euclidean、PID、UFD（用复模带余数除法，证法类似 13.4）。</li>
+  <li>\(p\) 在 \(\mathbb Z[\omega]\) 中的命运由 \(p \bmod 3\) 决定：</li>
+  <li>\(p = 3\)：分歧（\(3 = -\omega^2 (1 - \omega)^2\)）。</li>
+  <li>\(p \equiv 1 \pmod 3\)：分裂。</li>
+  <li>\(p \equiv 2 \pmod 3\)：惰性。</li>
+</ul>
+
+<p>分裂条件等价于"<em>\(\mathbb F_p\) 中 \(x^2 + x + 1\) 可约</em>" 等价于"<em>\(\mathbb F_p\) 中存在 3 次单位根</em>" 等价于"<em>\(3 \mid p - 1\)</em>"。所以<em>\(p\) 可写成 \(a^2 + 3 b^2\) （差一些细节）\(\iff\) \(p \equiv 1 \pmod 3\)</em>。这是 Gauss 三次互反的入门版。</p>
+
+<p>从 \(\mathbb Z[i]\) 到 \(\mathbb Z[\omega]\) 的概念转换，发生的事是：把判别式从 \(-4\)（对应方程 \(x^2 + 1\)）换成 \(-3\)（对应 \(x^2 + x + 1\)），整个剧本结构一样——Euclidean、UFD、按 \(p \bmod \text{(判别式相关数)}\) 分裂。</p>
+
+<p>更一般的版本：考虑 \(\mathbb Z[\sqrt{-d}]\) 或它的<em>整数环</em>（带可能的修正项）。每个 \(d\) 给一个二次域；二次域的"<em>哪些 \(p\) 分裂</em>" 模式是<em>类数</em> 理论的内容（ch17）。但有一个<em>陷阱</em>：<em>不是所有 \(\mathbb Z[\sqrt{-d}]\) 都是 UFD</em>。例如 \(\mathbb Z[\sqrt{-5}]\) 中：</p>
+
+<p>\[
+6 = 2 \cdot 3 = (1 + \sqrt{-5})(1 - \sqrt{-5}).
+\]</p>
+
+<p>两个看起来都"<em>不可分解</em>" 的分解，<em>不</em> 互相差单位因子。\(\mathbb Z[\sqrt{-5}]\) 唯一分解失败！</p>
+
+<p>这件事 19 世纪初被 Kummer 发现，引发整个<em>理想理论</em> 的发展——把"<em>元素的分解</em>" 替换成"<em>理想的分解</em>"，唯一性恢复。这就是<em>Dedekind 整数环</em> 理论的开端，是<a href="../抽象代数/ch15.html">抽象代数 ch15</a> 和我们 ch17 的故事。</p>
+
+<p>本章给的 \(\mathbb Z[i]\) UFD 性是个<em>幸运的特例</em>——它让"<em>素元 \(p\) 在扩张环里的命运</em>" 这套语言<em>立刻</em> 翻译成 Fermat 圣诞定理。一般情形要更小心，但精神不变：<em>把整数升一层环看，本质问题立刻浮现</em>。</p>
+
+<h2 id="sec13-9">13.9 一句临别话</h2>
+
+<p>这章我们走完了一条经典数论思想流：</p>
+
+<p>具体问题（哪些 \(p = a^2 + b^2\)）→ 朴素观察（\(p \bmod 4\) 必要）→ 撞墙（充分性朴素证不出来）→ reframe（\(a^2 + b^2 = (a + bi)(a - bi)\)）→ 命名（\(\mathbb Z[i]\) 高斯整数）→ 一般化（Euclidean \(\Rightarrow\) UFD \(\Rightarrow\) 素元分类按 \(p \bmod 4\)）→ 结论（圣诞定理）→ 推广（\(\mathbb Z[\omega]\) 给 \(p = a^2 + 3 b^2\)）。</p>
+
+<p>这条流是代数数论的<em>原型</em>。每个二次扩张 \(\mathbb Q(\sqrt d)\) 都重演这个故事：找它的<em>整数环</em>，研究普通素数在里面的<em>分裂行为</em>，用这种行为<em>解释 Diophantine 现象</em>。19 世纪 Gauss、Dirichlet、Kummer、Dedekind 把这条流推到极致——下一章及之后我们将看到这套机器的更多应用：</p>
+
+<ul>
+  <li>ch14 算术函数与 Möbius 反演——把 \(\mathbb Z\) 上的"<em>函数算术</em>" 当成新的代数对象。</li>
+  <li>ch15-16 Dirichlet \(L\)-级数 + 素数定理思路——用<em>分析</em> 工具看素数分布。</li>
+  <li>ch17 二元二次型与类数——上面那个"<em>\(\mathbb Z[\sqrt{-5}]\) 不是 UFD</em>" 的故事完整展开。</li>
+  <li>ch19 椭圆曲线 + Mordell-Weil——Pell 方程"<em>解集是群</em>" 的几何升级版。</li>
+</ul>
+
+<p>初学者听到"<em>代数数论</em>" 容易想成抽象空中楼阁。其实它每一步都是为<em>解决具体的整数问题</em> 而生。Fermat 1640 那个圣诞节夜里写信问 Mersenne 的话——"<em>哪些素数可以写成两平方和</em>"——直接催生了 200 年后高斯、Dedekind 整套理论。<em>具体问题</em> 长出<em>一般理论</em>——这是数学最优雅的运转方式。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 Pell 方程</a><a href="ch14.html">下一章 · 第 14 章 →</a></nav>
+</main>
+</body>
+</html>

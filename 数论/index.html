@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目录 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+<h1>普林斯顿数论读本</h1>
+
+<p style="margin-top:-0.5rem;color:var(--ink-soft);font-style:italic;">从整除到椭圆曲线 · 把"整数" 看到底</p>
+
+<h1 id="preface">前言</h1>
+
+<p>欢迎你翻开这本书。整数是你最早接触的数学对象——比加法、比方程、比函数都早。你以为你早就懂了。这本书要让你看见，整数背后藏着<em>三千年</em>都没挖完的结构——从 Euclid 证素数无穷，到 Gauss 的二次互反律，到 Riemann 的 \(\zeta\) 函数，到 Wiles 1995 年证 Fermat 大定理。每一代数学家都觉得"整数终于被理解了"，下一代又发现新一层。</p>
+
+<p>这本书要做的就是把这套结构的<em>第一层到第五层</em> 给你看清。从最朴素的"\(7^{100}\) 末位是几" 出发，逐步到模算术、二次互反、椭圆曲线、最后摸到现代数论（类域论 + 模形式 + Wiles 路径）的入口。中间每一步都尽量让你<em>看见为什么</em>——而不是被定理压倒。</p>
+
+<h2>这本书的角色</h2>
+
+<p>它是系列<em>第 11 卷</em>。最直接的前置是 <a href="../抽象代数/index.html">第 9 卷《抽象代数》</a>——本书 ch5 起反复用到环、域、群（特别是 \(\mathbb{Z}/n\) 的环结构、有限域 \(\mathbb{F}_p\)、单位群 \((\mathbb{Z}/n)^*\)、Galois 扩张）。其次是<a href="../复分析/index.html">第 4 卷《复分析》</a>——ch16 之后讨论解析数论时会用到（\(\zeta\) 函数、Dirichlet \(L\)-级数）。<a href="../数值方法/index.html">第 10 卷《数值方法》</a>第 23 章 RSA 在本书 ch23 会被往回挂——本书给那一节背后的<em>真</em>数学。</p>
+
+<p>但是<strong>大部分读者不需要这些前置</strong>——前 12 章基本都是"<em>整数 + 模 + 同余</em>"的基础数论，高中代数功底就能读。代数和复分析背景是后面 12 章的入场券。</p>
+
+<h2>这本书<em>不</em>是什么</h2>
+
+<p>它不是 Hardy &amp; Wright 那种"<em>定理大全</em>"。本书每章只挑 3-5 个核心结果讲透，配反例，配跨章引用，<em>不</em>追求覆盖。</p>
+
+<p>它不是数论奥林匹克训练。竞赛技巧（PNS / Lifting the Exponent / Schur 定理等）不在本书重点。</p>
+
+<p>它不是密码学专书。RSA / Diffie-Hellman / ECC 在 ch23 会讲，但只占一章——它们的<em>数学</em>背景是这本书的目标，不是<em>工程实现</em>。</p>
+
+<h2>"我下周就要考期中, 从哪里开始?"</h2>
+
+<p>看你课的重点。绝大多数本科<em>初等数论</em>课考这几块：</p>
+
+<ul>
+  <li>整除 + Euclid 算法 + 算术基本定理（ch2-4）</li>
+  <li>同余 + Fermat 小定理 + Euler 定理 + CRT（ch5-7）</li>
+  <li>原根 + 二次剩余 + 二次互反律（ch8-10）</li>
+</ul>
+
+<p>研究生级<em>代数 / 解析数论</em>课加上：</p>
+
+<ul>
+  <li>算术函数 + Dirichlet 卷积（ch14-15）</li>
+  <li>p-adic 数（ch18）</li>
+  <li>椭圆曲线 + Mordell-Weil（ch19-20）</li>
+  <li>类域论 / 模形式 / Wiles 路径（ch21-22）</li>
+</ul>
+
+<h2>例题, 计算, 严谨度</h2>
+
+<p>例题埋在正文里，没有"例 4.2.1" 标签。每个新概念引入前都给一个具体数 / 具体方程让你先算一遍，让概念<em>从计算里浮出</em>。</p>
+
+<p>证明从问题里自然长出，不堆"<em>定理 / 证明</em>" 三段套。少数关键的几个长证明（二次互反律、椭圆曲线 Mordell-Weil、p-adic 完备性）会专门展开。</p>
+
+<h2>致谢</h2>
+
+<p>本书向 Adrian Banner 的<em>《微积分读本》</em> 致敬。内容选材主要参考 Hardy &amp; Wright <em>An Introduction to the Theory of Numbers</em>、Davenport <em>Multiplicative Number Theory</em>、Ireland &amp; Rosen <em>A Classical Introduction to Modern Number Theory</em>、Silverman <em>The Arithmetic of Elliptic Curves</em>、Serre <em>A Course in Arithmetic</em>。Silverman 那本对椭圆曲线的"<em>从代数到几何</em>" 视角影响最深；Serre 的简洁是一种纯粹的美。</p>
+
+<h2>目录</h2>
+
+<ol>
+  <li><a href="ch1.html">第 1 章 引论：从计数到模算术</a> — 为什么 \(7^{100}\) 末位是 1。</li>
+  <li><a href="ch2.html">第 2 章 整除性、最大公约数、Euclid 算法</a> — 数论最古老的 algorithm。</li>
+  <li><a href="ch3.html">第 3 章 素数：Euclid 无穷性 + 素数定理</a> — 从初等到深层。</li>
+  <li><a href="ch4.html">第 4 章 算术基本定理</a> — 唯一分解，看似显然实则深刻。</li>
+  <li><a href="ch5.html">第 5 章 同余与 \(\mathbb{Z}/n\)</a> — 模算术的代数。</li>
+  <li><a href="ch6.html">第 6 章 Fermat 小定理与 Euler 定理</a> — \((\mathbb{Z}/n)^*\) 阶的故事。</li>
+  <li><a href="ch7.html">第 7 章 中国剩余定理</a> — 把"模 \(mn\)" 拆成"模 \(m\) + 模 \(n\)"。</li>
+  <li><a href="ch8.html">第 8 章 原根与离散对数</a> — \(\mathbb{F}_p^*\) 是循环群。</li>
+  <li><a href="ch9.html">第 9 章 二次剩余与 Legendre 符号</a> — "\(a\) 是 mod \(p\) 的平方吗"。</li>
+  <li><a href="ch10.html">第 10 章 二次互反律</a> — Gauss 的"算术宝石"。</li>
+  <li><a href="ch11.html">第 11 章 连分数与最佳有理逼近</a> — 用整数表示无理数。</li>
+  <li><a href="ch12.html">第 12 章 Pell 方程</a> — \(x^2 - D y^2 = 1\) 的整数解。</li>
+  <li><a href="ch13.html">第 13 章 高斯整数 \(\mathbb{Z}[i]\) 与二平方和</a> — 数论 + 抽象代数的第一座桥。</li>
+  <li><a href="ch14.html">第 14 章 算术函数与 Möbius 反演</a> — \(\varphi, \mu, \sigma, d\)。</li>
+  <li><a href="ch15.html">第 15 章 Dirichlet 卷积与 \(L\)-级数引入</a> — 把数论搬到生成函数。</li>
+  <li><a href="ch16.html">第 16 章 素数定理证明思路</a> — Riemann \(\zeta\) 与素数分布的桥。</li>
+  <li><a href="ch17.html">第 17 章 二元二次型与类数</a> — Gauss 的形式分类。</li>
+  <li><a href="ch18.html">第 18 章 \(p\)-adic 数入门</a> — 把"数" 换一种距离重新做完备化。</li>
+  <li><a href="ch19.html">第 19 章 椭圆曲线引论</a> — 三次方程的群律。</li>
+  <li><a href="ch20.html">第 20 章 Mordell-Weil 定理</a> — \(E(\mathbb{Q})\) 是有限生成阿贝尔群。</li>
+  <li><a href="ch21.html">第 21 章 模形式入门</a> — 上半平面上的对称函数。</li>
+  <li><a href="ch22.html">第 22 章 类域论一瞥</a> — 数论的"Galois 主定理"。</li>
+  <li><a href="ch23.html">第 23 章 应用：现代密码学</a> — RSA / Diffie-Hellman / 椭圆曲线密码。</li>
+  <li><a href="ch24.html">第 24 章 应用：Fermat 大定理与 Wiles 路径</a> — 现代数论的最高峰。</li>
+</ol>
+
+<ul>
+  <li><a href="appA.html">附录 A 群环域速查</a></li>
+  <li><a href="appB.html">附录 B 复分析与解析数论速查</a></li>
+  <li><a href="subject-index.html">主题索引</a></li>
+</ul>
+
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+</main>
+</body>
+</html>

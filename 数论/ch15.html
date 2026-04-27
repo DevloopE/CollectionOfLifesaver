@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 15 章 Dirichlet 卷积与 L-级数引入 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 算术函数与 Möbius 反演</a><a href="ch16.html">下一章 · 第 16 章 素数定理证明思路 →</a></nav>
+<h1 id="ch15">第 15 章 Dirichlet 卷积与 \(L\)-级数引入</h1>
+
+<p>上一章末尾留了一个悬念：<a href="ch14.html">ch14</a> 那一堆"积性 + Möbius 反演" 的内容能不能压成一行代数？答案是能。这一章把整个 ch14 装进一句话：</p>
+
+<p>\[
+\mu * \mathbf{1} = \delta.
+\]</p>
+
+<p>这里 \(*\) 是<em>Dirichlet 卷积</em>——把两个算术函数变成一个新算术函数的乘法。\(\mathbf{1}\) 是常值函数 1，\(\delta\) 是单位（只在 \(n = 1\) 取 1，其余取 0）。这一行就是说"<em>$\mu$ 在 $*$ 下是 $\mathbf{1}$ 的逆元</em>"——14 章那条复杂的反演公式被压成了"<em>解方程 $\mathbf{1} * f = g \Rightarrow f = \mu * g$</em>" 这种线性代数风格的一行话。</p>
+
+<p>本章再往前一步：把 Dirichlet 卷积变成<em>形式 Dirichlet 级数</em> 的<em>乘法</em>。也就是说，给定算术函数 \(f\)，定义 \(F(s) = \sum_{n \ge 1} f(n)/n^s\)；那么 \(F(s) G(s) = (f * g)\) 的级数。这条平淡看上去的事实把数论变成<em>解析问题</em>——如果 \(F(s)\) 是个能解析延拓的复函数，那 \(f\) 的整数论性质就被 \(F\) 在复平面上的零点、极点、增长率全方面控制。这条就是<em>解析数论</em> 的入门票。</p>
+
+<p>章末我们会到达 Riemann \(\zeta(s) = \sum 1/n^s\) 和 Dirichlet \(L\)-级数 \(L(s, \chi)\)，为 ch16 的素数定理铺路。</p>
+
+<h2 id="sec15-1">15.1 Dirichlet 卷积的定义</h2>
+
+<p>设 \(f, g\) 都是算术函数。它们的<em>Dirichlet 卷积</em> \(f * g\) 是新算术函数：</p>
+
+<p>\[\boxed{\ (f * g)(n) = \sum_{d | n} f(d)\, g(n/d).\ }\]</p>
+
+<p>右边对 \(n\) 的所有正因子 \(d\) 求和。等价写法：</p>
+
+<p>\[
+(f * g)(n) = \sum_{ab = n,\ a, b \ge 1} f(a) g(b).
+\]</p>
+
+<p>（让 \(a = d, b = n/d\)。这种"\(ab = n\)" 的对称写法在证恒等式时更顺手。）</p>
+
+<p><strong>小例子</strong>：</p>
+
+<p>(a) \(\mathbf{1} * \mathbf{1}\) 在 \(n\) 处 = \(\sum_{d | n} 1 \cdot 1 = d(n)\)（因子个数）。所以 \(\mathbf{1} * \mathbf{1} = d\)。</p>
+
+<p>(b) \(\mathbf{1} * \mathrm{id}\) 在 \(n\) 处 = \(\sum_{d | n} 1 \cdot (n/d) = \sum_{e | n} e = \sigma(n)\)。所以 \(\mathbf{1} * \mathrm{id} = \sigma\)。</p>
+
+<p>(c) \(\varphi * \mathbf{1}\) 在 \(n\) 处 = \(\sum_{d | n} \varphi(d) = n\)（14.7 那条恒等式）。所以 \(\varphi * \mathbf{1} = \mathrm{id}\)。</p>
+
+<p>这三条把 ch14 的"<em>因子求和恒等式</em>" 全部翻译成 \(*\) 算式。</p>
+
+<h2 id="sec15-2">15.2 \(*\) 是结合 + 交换的，单位是 \(\delta\)</h2>
+
+<p>定义 \(\delta(n) = [n = 1]\)（\(\delta(1) = 1\)，其余 0）。</p>
+
+<p><strong>命题</strong>：在算术函数集合上，\(*\) 是<em>交换 + 结合</em> 的，并以 \(\delta\) 为<em>乘法单位</em>。</p>
+
+<p><strong>交换性</strong>：</p>
+
+<p>\[
+(f * g)(n) = \sum_{ab = n} f(a) g(b) = \sum_{ab = n} g(b) f(a) = (g * f)(n).
+\]</p>
+
+<p>对称写法让交换性一目了然。\(\checkmark\)</p>
+
+<p><strong>结合性</strong>：</p>
+
+<p>\[
+((f * g) * h)(n) = \sum_{cb = n} (f * g)(c) h(b) = \sum_{cb = n} \Big(\sum_{ad = c} f(a) g(d)\Big) h(b) = \sum_{abd = n} f(a) g(d) h(b).
+\]</p>
+
+<p>右边是对所有 \(a, d, b\) 满足 \(adb = n\) 的三元组求和——<em>对称的</em>。同样把 \(f * (g * h)\) 展开也得这条公式。\(\checkmark\)</p>
+
+<p><strong>\(\delta\) 是单位</strong>：</p>
+
+<p>\[
+(f * \delta)(n) = \sum_{d | n} f(d) \delta(n/d) = f(n) \cdot \delta(1) = f(n).
+\]</p>
+
+<p>因为 \(\delta(n/d) = 0\) 除非 \(n/d = 1\) 即 \(d = n\)。\(\checkmark\)</p>
+
+<p>这意味着<em>所有算术函数在 $*$ 下成一个交换幺半群</em>——准确说，一个交换幺半群（半群 + 单位元），但还<em>不是群</em>，因为可能没有逆元。下一节看哪些有逆元。</p>
+
+<h2 id="sec15-3">15.3 卷积逆元 (\(\mu\) 的真正含义)</h2>
+
+<p>问题：给 \(f\)，何时有 \(g\) 满足 \(f * g = \delta\)？</p>
+
+<p><strong>命题</strong>：\(f\) 在 \(*\) 下可逆 \(\iff\) \(f(1) \ne 0\)。逆元 \(g\) 由递归</p>
+
+<p>\[
+g(1) = 1/f(1), \qquad g(n) = -\frac{1}{f(1)} \sum_{\substack{d | n \\ d < n}} f(n/d) g(d) \quad (n > 1)
+\]</p>
+
+<p>唯一确定。</p>
+
+<p><strong>证明</strong>：要 \((f * g)(n) = \delta(n)\)。\(n = 1\)：\((f * g)(1) = f(1) g(1) = 1\)，所以 \(g(1) = 1/f(1)\)（需 \(f(1) \ne 0\)）。</p>
+
+<p>\(n > 1\)：\((f * g)(n) = \sum_{d | n} f(n/d) g(d) = 0\)。把 \(d = n\) 项分出来：\(f(1) g(n) + \sum_{d | n, d < n} f(n/d) g(d) = 0\)。解出 \(g(n)\)。</p>
+
+<p>由归纳，\(g\) 在 \(n\) 处的值由 \(g\) 在 \(< n\) 因子上的值决定，所以唯一确定。\(\checkmark\)</p>
+
+<p><strong>关键例子</strong>：\(\mathbf{1}^{-1} = ?\) 我们想找 \(g\) 满足 \(\mathbf{1} * g = \delta\) 即 \(\sum_{d | n} g(d) = [n = 1]\)。</p>
+
+<p>这正是 14.5 节的 \(\mu\) 满足的恒等式！所以</p>
+
+<p>\[\boxed{\ \mathbf{1}^{-1} = \mu, \quad \text{即 } \mathbf{1} * \mu = \delta.\ }\]</p>
+
+<p><em>$\mu$ 不是某个偶然定义的函数，它是 $\mathbf{1}$ 在 Dirichlet 卷积下的逆元</em>。这条话把整个 ch14 一笔带过——\(\mu\) 的定义、性质、反演公式全都从这一条结构性事实里自然流出。</p>
+
+<p><strong>Möbius 反演重写</strong>：14.6 那条复杂的反演公式现在压成"<em>用逆元解方程</em>"：</p>
+
+<p>\[
+g = \mathbf{1} * f \quad \iff \quad f = \mu * g.
+\]</p>
+
+<p>"两边乘 \(\mu\)" 而已。证明：左 \(\Rightarrow\) 右：\(\mu * g = \mu * \mathbf{1} * f = \delta * f = f\)。右 \(\Rightarrow\) 左：\(\mathbf{1} * f = \mathbf{1} * \mu * g = \delta * g = g\)。\(\checkmark\)</p>
+
+<p>请你停下来感受一件事。整个 14.6 节那个换序求和 + Iverson 把戏 + 双向证明，<em>三行就完了</em>。这不是侥幸——这是把朴素的"双重求和论证" 重铸成"代数等式" 的本质性简化。<em>结构换语言，难度跌一个等级</em>。</p>
+
+<h2 id="sec15-4">15.4 几条标准等式</h2>
+
+<p>用 \(*\) 语言重写 ch14 几条主要恒等式：</p>
+
+<p>\[\boxed{
+\begin{array}{l}
+\mathbf{1} * \mathbf{1} = d \\
+\mathbf{1} * \mathrm{id} = \sigma \\
+\varphi * \mathbf{1} = \mathrm{id} \\
+\mu * \mathbf{1} = \delta \\
+\mu * \mathrm{id} = \varphi
+\end{array}
+}\]</p>
+
+<p>最后一条：从 \(\varphi * \mathbf{1} = \mathrm{id}\) 卷以 \(\mu\)：\(\mu * \varphi * \mathbf{1} = \mu * \mathrm{id}\)，左边 \(= \varphi * (\mu * \mathbf{1}) = \varphi * \delta = \varphi\)。所以 \(\varphi = \mu * \mathrm{id}\)。展开：</p>
+
+<p>\[
+\varphi(n) = \sum_{d | n} \mu(d) (n/d) = n \sum_{d | n} \mu(d)/d.
+\]</p>
+
+<p>跟 14.7 节最后那条一致。<em>用 $*$ 算两步出来</em>。</p>
+
+<p><strong>积性的代数化</strong>：上一章我们说"<em>积性函数 $f$ 的因子求和 $g(n) = \sum_{d | n} f(d)$ 也积性</em>"。\(*\) 语言：<em>两个积性函数的卷积也积性</em>。</p>
+
+<p>更准确：积性函数（作为子集）在 \(*\) 下封闭，构成一个子幺半群。</p>
+
+<p>证：设 \(f, g\) 积性，\(\gcd(m, n) = 1\)。</p>
+
+<p>\[
+(f * g)(mn) = \sum_{a | mn} f(a) g(mn/a) = \sum_{a_1 | m,\ a_2 | n} f(a_1 a_2) g((m/a_1)(n/a_2)).
+\]</p>
+
+<p>用因子的一一对应（\(a = a_1 a_2\)，\(\gcd(a_1, a_2) = 1\)）+ \(f, g\) 积性：\(f(a_1 a_2) = f(a_1) f(a_2)\)，\(g\) 同理。</p>
+
+<p>\[
+= \sum_{a_1 | m} f(a_1) g(m/a_1) \sum_{a_2 | n} f(a_2) g(n/a_2) = (f * g)(m)(f * g)(n). \checkmark
+\]</p>
+
+<p><strong>所有完全积性 + 积性函数的 \(*\) 关系</strong>：注意"<em>完全积性</em>"（\(f(mn) = f(m) f(n)\) 对所有 \(m, n\)，无需互素）比"积性" 强。\(\mathbf{1}, \mathrm{id}\) 都是完全积性；\(d, \sigma, \varphi\) 是积性但<em>不</em> 完全积性（\(d(4) = 3 \ne 4 = d(2) d(2)\) 等）。</p>
+
+<h2 id="sec15-5">15.5 形式 Dirichlet 级数</h2>
+
+<p>给算术函数 \(f\)，定义它的<em>(形式) Dirichlet 级数</em>：</p>
+
+<p>\[
+F(s) = \sum_{n \ge 1} \frac{f(n)}{n^s}.
+\]</p>
+
+<p>"形式" 意思是先不管收敛——把它当成算术函数的<em>另一种写法</em>，每个 \(f(n)\) 是 "\(n^{-s}\) 的系数"。两个算术函数相同 \(\iff\) 两个级数<em>每一项系数都相同</em>。</p>
+
+<p><strong>关键事实</strong>：</p>
+
+<p>\[\boxed{\ F(s) G(s) = \sum_n \frac{(f * g)(n)}{n^s}.\ }\]</p>
+
+<p>意思：算术函数的<em>Dirichlet 卷积</em>对应 Dirichlet 级数的<em>普通乘法</em>。</p>
+
+<p><strong>证明</strong>：</p>
+
+<p>\[
+F(s) G(s) = \Big(\sum_a \frac{f(a)}{a^s}\Big) \Big(\sum_b \frac{g(b)}{b^s}\Big) = \sum_{a, b} \frac{f(a) g(b)}{(ab)^s}.
+\]</p>
+
+<p>把双求和按 "\(n = ab\)" 分组：</p>
+
+<p>\[
+= \sum_n \frac{1}{n^s} \sum_{ab = n} f(a) g(b) = \sum_n \frac{(f * g)(n)}{n^s}.
+\]</p>
+
+<p>\(\checkmark\)</p>
+
+<p>这条小恒等式是<em>整个解析数论的入门定理</em>。请你停下来想一下它的份量。我们刚才把"<em>算术函数的卷积</em>"（对因子求和这种纯组合操作）翻译成"<em>形式级数的乘法</em>"（高中代数的乘法）。<em>所有 ch14 的恒等式现在都成了形式幂级数代数</em>——你可以用因式分解、级数展开、级数比较来证数论恒等式。</p>
+
+<p><strong>重写 \(\mathbf{1} * \mu = \delta\)</strong>：\(\mathbf{1}\) 的级数是 \(\sum 1/n^s = \zeta(s)\)；\(\delta\) 的级数是 \(1\)（因为 \(\delta(1) = 1\)，其它 0）。所以</p>
+
+<p>\[
+\zeta(s) \cdot \sum_n \mu(n)/n^s = 1 \quad \Rightarrow \quad \sum_n \frac{\mu(n)}{n^s} = \frac{1}{\zeta(s)}.
+\]</p>
+
+<p>这是个看上去神奇的恒等式：<em>$\mu$ 函数是 $\zeta$ 的倒数的展开系数</em>。这条把"<em>$\mu$ 函数</em>"（数论对象）和"<em>$\zeta$ 函数</em>"（解析对象）紧紧绑在一起。\(\zeta\) 任何零点都对 \(\mu\) 的统计行为有控制——这就是"<em>$\zeta$ 零点决定素数分布</em>" 这条 19 世纪奇迹的最朴素版本。</p>
+
+<h2 id="sec15-6">15.6 Riemann \(\zeta(s)\) 和 Euler 乘积</h2>
+
+<p>Riemann \(\zeta\) 函数是这本书里最重要的复函数：</p>
+
+<p>\[\boxed{\ \zeta(s) = \sum_{n \ge 1} \frac{1}{n^s}, \quad \Re(s) > 1.\ }\]</p>
+
+<p>当 \(\Re(s) > 1\) 时这个级数绝对收敛（用 \(p\) 级数比较）。\(\Re(s) \le 1\) 时它发散，但<em>解析延拓</em> 到几乎整个 \(\mathbb{C}\)（除了 \(s = 1\) 处的极点）——见 ch16。</p>
+
+<p><strong>Euler 乘积</strong>：1737 年 Euler 发现的惊人公式：</p>
+
+<p>\[\boxed{\ \zeta(s) = \prod_p \frac{1}{1 - p^{-s}}, \quad \Re(s) > 1.\ }\]</p>
+
+<p>左边是对所有正整数求和，右边是对所有素数求积。</p>
+
+<p><strong>证明</strong>：右边每个因子是个几何级数：</p>
+
+<p>\[
+\frac{1}{1 - p^{-s}} = 1 + p^{-s} + p^{-2s} + p^{-3s} + \cdots = \sum_{k \ge 0} p^{-ks}.
+\]</p>
+
+<p>把所有素数的几何级数<em>乘起来</em>，利用乘开后每一项是从每个素数选某个 \(k_p \ge 0\)、然后取 \(\prod_p p^{-k_p s} = (\prod_p p^{k_p})^{-s} = n^{-s}\)，其中 \(n = \prod_p p^{k_p}\)。</p>
+
+<p>关键：算术基本定理 (<a href="ch3.html">ch3</a>) 说<em>每个 $n \ge 1$ 唯一</em>对应一组指数序列 \((k_2, k_3, k_5, \ldots)\)。所以右边乘开后<em>每个 $n$ 出现一次且仅一次</em>，正好等于 \(\sum_n 1/n^s = \zeta(s)\)。\(\checkmark\)</p>
+
+<p>请你停下来感受这条公式的<em>分量</em>。Euler 乘积把"<em>所有素数</em>" 和"<em>所有正整数</em>" 用一行恒等式联起来。在右边，每个素数<em>独立</em> 提供一个因子；在左边，每个整数都是它素分解的"<em>反映像</em>"。<em>算术基本定理（每整数素分解唯一）就是 Euler 乘积成立的原因</em>——两条事实是<em>同一个</em>结构事实的两种说法。</p>
+
+<p><strong>推论</strong>：Euler 乘积给"<em>素数无穷多</em>"<em>第二个</em> 证明（Euclid <a href="ch3.html">ch3</a> 是第一个）。设素数有限，那右边是有限多有限因子之积——是个有限实数。但 \(\zeta(1) = \sum 1/n\) 调和级数发散——\(s \to 1^+\) 时左边 \(\to \infty\)。矛盾。\(\checkmark\)</p>
+
+<p>这个证法的好处：它告诉你<em>素数的密度</em>——\(\sum 1/p\) 也发散（也能从 Euler 乘积推），而且 \(\sum_{p \le x} 1/p \approx \log \log x\)。素数不仅无穷多，还<em>稠</em> 到调和和发散的程度。</p>
+
+<p><strong>几个具体值</strong>：</p>
+
+<p>\[
+\zeta(2) = \sum 1/n^2 = \pi^2/6 \approx 1.645,
+\]</p>
+
+<p>\[
+\zeta(4) = \pi^4/90,
+\]</p>
+
+<p>\[
+\zeta(6) = \pi^6/945.
+\]</p>
+
+<p>一般 Euler 给 \(\zeta(2k) = (-1)^{k + 1} B_{2k} (2\pi)^{2k} / (2 (2k)!)\)，\(B_{2k}\) 是 Bernoulli 数。<em>偶数处都是 \(\pi^{2k}\) 的有理倍数</em>。奇数处？\(\zeta(3) = 1.202\ldots\) 是无理数（Apéry 1979），但<em>是否</em> 是 \(\pi^3\) 的有理倍数仍未知。\(\zeta(5)\) 连"<em>是否无理</em>" 都未解。</p>
+
+<p>这些值跟<em>整数</em> 看起来风马牛不相及——为什么因子和的级数会蹦出 \(\pi\)？这条联系是 \(\zeta\) 和复分析、\(\Gamma\) 函数、Fourier 级数的深层结构性事实。我们这里只列结果。</p>
+
+<h2 id="sec15-7">15.7 Dirichlet \(L\)-级数与特征</h2>
+
+<p>\(\zeta\) 是"<em>把所有正整数算一遍</em>"。如果只想算"<em>$n \equiv a \pmod q$ 的那些 $n$</em>"——比如只想知道 "\(\sum 1/n^s\) 对 \(n \equiv 1 \pmod 4\) 的求和"——该怎么写？</p>
+
+<p>朴素方法：定义指示函数 \(\chi(n) = [n \equiv 1 \pmod 4]\)，写 \(L(s) = \sum_n \chi(n) / n^s\)。但这个 \(\chi\) 不太好——它<em>不是</em> 积性的（比如 \(\chi(3) = 0\), \(\chi(7) = 0\), \(\chi(21) = \chi(3 \cdot 7)\)；但 \(21 \equiv 1 \pmod 4\) 所以 \(\chi(21) = 1 \ne 0 \cdot 0\)），所以没法用 Euler 乘积，没法跟 \(\zeta\) 那样研究。</p>
+
+<p>怎么办？引入<em>Dirichlet 特征</em>。</p>
+
+<p><strong>定义</strong>：模 \(q\) 的<em>Dirichlet 特征</em> 是个函数 \(\chi : \mathbb{Z} \to \mathbb{C}\) 满足：</p>
+
+<ul>
+  <li>\(\chi(n + q) = \chi(n)\)（周期 \(q\)）</li>
+  <li>\(\chi\) 完全积性：\(\chi(mn) = \chi(m) \chi(n)\) 对所有 \(m, n\)</li>
+  <li>\(\chi(n) = 0\) 当 \(\gcd(n, q) > 1\)；\(|\chi(n)| = 1\) 当 \(\gcd(n, q) = 1\)</li>
+</ul>
+
+<p>等价描述：\(\chi\) 是群 \((\mathbb{Z}/q)^\times \to \mathbb{C}^\times\) 的<em>群同态</em>（再延拓到 \(\mathbb{Z}\) 上：\(\gcd > 1\) 处置 0）。</p>
+
+<p>因为 \((\mathbb{Z}/q)^\times\) 是有限交换群（阶 \(\varphi(q)\)），它的特征恰好有 \(\varphi(q)\) 个，构成一个对偶群。</p>
+
+<p><strong>例 \(q = 4\)</strong>：\((\mathbb{Z}/4)^\times = \{1, 3\}\)，阶 2。特征只有两个：</p>
+
+<ul>
+  <li>主特征 \(\chi_0\)：\(\chi_0(1) = \chi_0(3) = 1\)（即 \(\chi_0(n) = 1\) 当 \(n\) 奇）</li>
+  <li>非主特征 \(\chi_1\)：\(\chi_1(1) = 1, \chi_1(3) = -1\)（即 \(\chi_1(n) = +1\) if \(n \equiv 1\), \(-1\) if \(n \equiv 3\)）</li>
+</ul>
+
+<p>这个 \(\chi_1\) 看上去眼熟——它就是 <a href="ch11.html">ch11</a> 那个 Legendre 符号 \((\frac{-1}{n})\)（请你想一下 \(-1\) 是模 \(p\) 二次剩余 iff \(p \equiv 1 \pmod 4\) 这条 ch11 结果）。<em>Dirichlet 特征是 Legendre 符号的推广</em>。</p>
+
+<p><strong>定义 \(L\)-级数</strong>：</p>
+
+<p>\[
+L(s, \chi) = \sum_{n \ge 1} \frac{\chi(n)}{n^s}.
+\]</p>
+
+<p>因为 \(\chi\) 完全积性 + \(|\chi| \le 1\)，这级数在 \(\Re s > 1\) 收敛，且有 Euler 乘积：</p>
+
+<p>\[
+L(s, \chi) = \prod_p \frac{1}{1 - \chi(p) p^{-s}}.
+\]</p>
+
+<p>（同样的算术基本定理 + 几何级数证明，但 \(\chi(p)\) 而非 1。）</p>
+
+<p><strong>主特征下</strong>：\(L(s, \chi_0)\) 跟 \(\zeta(s)\) 几乎相同，差一个有限因子（去掉 \(p | q\) 那些素数）：</p>
+
+<p>\[
+L(s, \chi_0) = \prod_{p \nmid q} \frac{1}{1 - p^{-s}} = \zeta(s) \prod_{p | q} (1 - p^{-s}).
+\]</p>
+
+<p><strong>Dirichlet 用 \(L\)-级数证 ch3 等差数列素数定理</strong>。<a href="ch3.html">ch3</a> 给了一条话："任何 \(a, q\) 互素的等差数列 \(a, a + q, a + 2q, \ldots\) 含无穷多素数" (Dirichlet 1837)。我们当时没证。1837 年 Dirichlet 用的就是 \(L\)-级数。证明大意：</p>
+
+<p>(1) 对 \(L(s, \chi)\) 取对数：\(\log L(s, \chi) = \sum_p \sum_{k \ge 1} \chi(p^k)/(k p^{ks})\)。</p>
+
+<p>(2) 把对数对 \((\mathbb{Z}/q)^\times\) 所有特征求和（"<em>正交关系</em>" 让特定剩余类的素数被挑出来）：</p>
+
+<p>\[
+\sum_\chi \overline{\chi(a)} \log L(s, \chi) \sim \varphi(q) \sum_{p \equiv a \pmod q} \frac{1}{p^s}.
+\]</p>
+
+<p>（"\(\sim\)" 表示主项，加上一些"小"误差。）</p>
+
+<p>(3) \(s \to 1^+\) 时左边的行为：</p>
+
+<ul>
+  <li>主特征 \(\chi_0\)：\(L(s, \chi_0) \sim \zeta(s) \to \infty\)，对数 \(\to \infty\)。</li>
+  <li>非主特征 \(\chi\)：<em>关键是 $L(1, \chi) \ne 0$</em>。这条要单独证（Dirichlet 的核心难点）。一旦 \(L(1, \chi) \ne 0\)，\(\log L(s, \chi)\) 在 \(s = 1\) 处有限。</li>
+</ul>
+
+<p>(4) 主项 \(\to \infty\) 但其它特征贡献有限——所以 \(\sum_{p \equiv a \pmod q} 1/p \to \infty\) 即<em>那一类素数无穷多且 $\sum 1/p$ 发散</em>。</p>
+
+<p>这就是为什么 \(L\)-级数能解决等差数列素数问题：它是<em>把素数按剩余类分组</em> 的工具，正交关系把不同类挑开。</p>
+
+<p>这种"<em>用 $L$-函数的极点 + 零点行为推数论</em>" 是<em>解析数论</em> 的范式。下一章对 \(\zeta\) 用类似手法证素数定理。</p>
+
+<h2 id="sec15-8">15.8 ch16 怎么用 \(\zeta\) 攻击素数定理</h2>
+
+<p>素数定理：\(\pi(N) \sim N/\ln N\)。这条朴素的整数论结论用什么来证？</p>
+
+<p>路线图：</p>
+
+<p>(1) 用<em>von Mangoldt 函数</em> \(\Lambda\) 把 \(\pi\) 重写。\(\Lambda(n) = \log p\) 当 \(n = p^k\)，否则 0。让 \(\psi(N) = \sum_{n \le N} \Lambda(n)\)。素数定理 \(\iff \psi(N) \sim N\) (16.1)。</p>
+
+<p>(2) 把 \(\psi\) 跟 \(\zeta\) 联系。从 14.8 节：\(\Lambda = -\mu * \log\)（即 \(\Lambda * \mathbf{1} = \log\)）。在级数语言：</p>
+
+<p>\[
+\sum_n \frac{\Lambda(n)}{n^s} = -\frac{\zeta'(s)}{\zeta(s)}.
+\]</p>
+
+<p>（请你接受——15.5 节的"卷积变乘法" + 求导，标准 Dirichlet 级数运算。）</p>
+
+<p>这条公式把"<em>素数分布</em>" \(\Lambda\) 和"<em>$\zeta$ 的对数导数</em>" \(-\zeta'/\zeta\) 联起来。\(\zeta\) 在哪里有<em>零点</em> 或<em>极点</em>，\(\zeta'/\zeta\) 在那里有<em>极点</em>——这些极点的位置控制 \(\psi(N)\) 的渐近。</p>
+
+<p>(3) <em>$\zeta(s)$ 在 $\Re s = 1$ 上无零点</em> 是关键引理（ch16）。一旦证完，配合 Tauberian 定理推 \(\psi(N) \sim N\)。</p>
+
+<p>(4) Riemann 假设：\(\zeta\) 所有非平凡零点都在 \(\Re s = 1/2\) 上 \(\Rightarrow\) 强化误差到 \(O(\sqrt N \log^2 N)\)。</p>
+
+<p>这条路线 19 世纪 Riemann 想清楚了大体框架，1896 年 Hadamard 和 de la Vallée-Poussin 同年独立完成"<em>$\zeta$ 在 $\Re s = 1$ 无零点</em>" 的证明，把素数定理钉死。这是<em>解析数论</em>第一座大山。下一章我们看这条主线。</p>
+
+<h2 id="sec15-9">15.9 一句临别话</h2>
+
+<p>这一章把 ch14 的"积性 + Möbius 反演" 重铸成<em>代数</em>："<em>算术函数 = $\mathbb{C}^{\mathbb{Z}_{> 0}}$ 上的 Dirichlet 卷积代数</em>"。\(\mu\) 不再是古怪的定义，是 \(\mathbf{1}\) 的逆元。反演公式不再是双重求和换序，是"<em>两边乘 $\mu$</em>"。</p>
+
+<p>然后再走一步：把每个算术函数关联一个<em>形式 Dirichlet 级数</em>，卷积变乘法，整个数论翻译成形式级数代数。再走一步：让 \(s \in \mathbb{C}\)，让级数<em>真</em> 收敛——级数变成<em>复变函数</em>。整数论问题翻成"复函数在某些点的行为问题"。</p>
+
+<p>这条三步阶梯——朴素恒等式 → 卷积代数 → 复变函数——是<em>解析数论</em> 的基本动作。19-20 世纪几乎所有重大数论进展都在这条路径上完成：</p>
+
+<ul>
+  <li><strong>素数定理 (Hadamard, de la Vallée-Poussin 1896)</strong>：\(\zeta(s)\) 在 \(\Re s = 1\) 无零点 \(\Rightarrow \pi(N) \sim N/\log N\)。下一章。</li>
+  <li><strong>等差数列素数定理 (Dirichlet 1837)</strong>：用 \(L(s, \chi)\) 的特征展开，本章 15.7 已述。</li>
+  <li><strong>Riemann 假设 (Riemann 1859, 未解)</strong>：\(\zeta\) 所有非平凡零点在 \(\Re s = 1/2\)，等价于<em>强</em> 素数定理误差 \(O(\sqrt N \log^2 N)\)。</li>
+  <li><strong>Birch–Swinnerton-Dyer 猜想 (1965, 未解)</strong>：椭圆曲线 \(L\)-函数 \(L(E, s)\) 在 \(s = 1\) 处的零点阶数 = \(E(\mathbb{Q})\) 的秩。下书 ch19。</li>
+  <li><strong>Langlands 纲领</strong>：所有"自然" \(L\)-函数都来自<em>自守表示</em>，是 ch16 \(\zeta\) 故事的极致一般化。下书 ch24。</li>
+</ul>
+
+<p>每一条都是同一动作的不同实例：<em>定义合适的 $L$-函数 → 研究它的解析性质 → 翻译回数论结论</em>。下一章 ch16 我们走完这条动作的第一个完整例子——素数定理。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 算术函数与 Möbius 反演</a><a href="ch16.html">下一章 · 第 16 章 素数定理证明思路 →</a></nav>
+</main>
+</body>
+</html>

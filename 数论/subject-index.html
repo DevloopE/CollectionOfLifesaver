@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>主题索引 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+<h1 id="subject-index">主题索引</h1>
+
+<p>按拼音 A-Z 排列。每条给"<em>概念 / 名词</em> → <em>主要登场章节</em>"。末尾有一节"<em>按行为查找</em>"——按"<em>我现在要做什么</em>" 索引。</p>
+
+<h2>A</h2>
+<ul>
+  <li><strong>Abel 求和</strong> — <a href="appB.html#appB-5">附录 B.5</a>。</li>
+  <li><strong>阿贝尔群</strong> — <a href="appA.html#appA-1">附录 A.1</a>；类群 <a href="ch17.html">第 17 章</a>；Mordell-Weil <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>阿贝尔扩张</strong> — <a href="ch22.html#sec22-1">22.1</a>；Hilbert 类域 <a href="ch22.html#sec22-3">22.3</a>；最大阿贝尔扩张 \(K^{\mathrm{ab}}\) <a href="ch22.html#sec22-6">22.6</a>。</li>
+  <li><strong>Artin 互反律</strong> — <a href="ch22.html#sec22-5">22.5</a>;idele 版 <a href="ch22.html#sec22-6">22.6</a>;推二次互反 <a href="ch22.html#sec22-7">22.7</a>。</li>
+  <li><strong>AES（对称加密）</strong> — <a href="ch23.html#sec23-1">23.1</a>。</li>
+</ul>
+
+<h2>B</h2>
+<ul>
+  <li><strong>BCDT 定理（完整模性 2001）</strong> — <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Bezout 等式</strong> — <a href="ch2.html">第 2 章</a>；Euclid 算法的副产品 <a href="ch2.html">第 2 章</a>。</li>
+  <li><strong>BSD 猜想（Birch-Swinnerton-Dyer）</strong> — <a href="ch20.html">第 20 章</a>；现代数论方向 <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>Brent-Salamin 算法（Pell 解）</strong> — <a href="ch12.html">第 12 章</a>。</li>
+  <li><strong>不动点（Galois 群）</strong> — <a href="appA.html#appA-5">附录 A.5</a>。</li>
+</ul>
+
+<h2>C</h2>
+<ul>
+  <li><strong>Carmichael 数</strong> — <a href="ch6.html">第 6 章</a>；伪素数 <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>Cauchy 积分公式</strong> — <a href="appB.html#appB-2">附录 B.2</a>。</li>
+  <li><strong>差商（Newton 求根扩展）</strong> — 见<a href="../数值方法/ch7.html">数值方法 ch7</a>，本书不展开。</li>
+  <li><strong>陈述</strong>:<strong>FLT</strong> 见 F；<strong>BSD</strong> 见 B；<strong>Riemann</strong> 见 R。</li>
+  <li><strong>常分母（Euler 函数）</strong> — 见 E"Euler 函数"。</li>
+  <li><strong>Chevalley</strong>（idele 引入）— <a href="ch22.html#sec22-6">22.6</a>。</li>
+  <li><strong>CRT（中国剩余定理）</strong> — <a href="ch7.html">第 7 章</a>；RSA 用 <a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>类数（class number）</strong> — \(h(K)\) <a href="ch17.html">第 17 章</a>；定义 <a href="ch22.html#sec22-2">22.2</a>；通过 \(j\)-不变量算 <a href="ch21.html#sec21-4">21.4</a>。</li>
+  <li><strong>类群（class group）</strong> — \(\mathrm{Cl}(K)\) <a href="ch17.html">第 17 章</a>；定义 <a href="ch22.html#sec22-2">22.2</a>；Hilbert 类域同构 <a href="ch22.html#sec22-3">22.3</a>。</li>
+  <li><strong>类域论（CFT）</strong> — <a href="ch22.html">第 22 章</a>；Hilbert 类域 <a href="ch22.html#sec22-3">22.3</a>；Artin 互反 <a href="ch22.html#sec22-5">22.5</a>；idele 版 <a href="ch22.html#sec22-6">22.6</a>。</li>
+  <li><strong>Curve25519</strong>（X25519 / Ed25519）— <a href="ch23.html#sec23-4">23.4</a>。</li>
+</ul>
+
+<h2>D</h2>
+<ul>
+  <li><strong>Dedekind 整环</strong> — <a href="ch22.html#sec22-2">22.2</a>；定义 <a href="appA.html#appA-2">附录 A.2</a>。</li>
+  <li><strong>Deligne 1974</strong>（Ramanujan-Petersson \(\Delta\) 证明）— <a href="ch21.html#sec21-4">21.4</a>。</li>
+  <li><strong>Diffie-Hellman（DH）</strong> — <a href="ch23.html#sec23-3">23.3</a>；ECDH <a href="ch23.html#sec23-4">23.4</a>；前向安全性 <a href="ch23.html#sec23-3">23.3</a>。</li>
+  <li><strong>Diophantine 方程</strong> — Pell <a href="ch12.html">第 12 章</a>；FLT <a href="ch24.html">第 24 章</a>。</li>
+  <li><strong>Dirichlet 定理（算术级数素数）</strong> — <a href="ch15.html">第 15 章</a>；用 \(L(s, \chi)\) 证 <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>Dirichlet 卷积</strong> — <a href="ch14.html">第 14 章</a>、<a href="ch15.html">第 15 章</a>；积性函数环 <a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>Dirichlet \(L\)-级数</strong> — \(L(s, \chi) = \sum \chi(n) n^{-s}\) <a href="ch15.html">第 15 章</a>；Euler 乘积 <a href="appB.html#appB-6">附录 B.6</a>；解析延拓 <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>Dirichlet 特征</strong> — \(\chi : (\mathbb Z/n)^\times \to \mathbb C^\times\) <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>Dirichlet 级数收敛半平面</strong> — <a href="appB.html#appB-6">附录 B.6</a>。</li>
+  <li><strong>Dilithium（PQC 签名）</strong> — <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>多项式时间</strong> — RSA / DH 量子破 <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>对称密码学</strong> — <a href="ch23.html#sec23-1">23.1</a>。</li>
+  <li><strong>对应（Galois 主定理）</strong> — <a href="ch22.html#sec22-1">22.1</a>；类域论无穷推广 <a href="ch22.html">第 22 章</a>。</li>
+  <li><strong>Δ（模判别式）</strong> — \(\Delta(\tau) = q \prod (1 - q^n)^{24}\) <a href="ch21.html#sec21-4">21.4</a>。</li>
+</ul>
+
+<h2>E</h2>
+<ul>
+  <li><strong>Ed25519（签名）</strong> — <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>Eisenstein 级数 \(E_k\)</strong> — <a href="ch21.html#sec21-4">21.4</a>。</li>
+  <li><strong>椭圆曲线（elliptic curve）</strong> — <a href="ch19.html">第 19 章</a>；群律 <a href="ch19.html">第 19 章</a>；\(E(\mathbb F_p)\) <a href="ch19.html">第 19 章</a>；ECC <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>椭圆曲线 \(L\)-函数</strong> — \(L(E, s)\) <a href="ch21.html#sec21-7">21.7</a>；模性 <a href="ch21.html#sec21-8">21.8</a>、<a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>ECDH（椭圆曲线 Diffie-Hellman）</strong> — <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>ECDLP（椭圆曲线离散对数）</strong> — <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>Eratosthenes 筛法</strong> — <a href="ch3.html">第 3 章</a>。</li>
+  <li><strong>Euclid 算法</strong> — <a href="ch2.html">第 2 章</a>；Bezout <a href="ch2.html">第 2 章</a>；扩展 Euclid 算法（RSA 用）<a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>Euclid 无穷素数</strong> — <a href="ch3.html">第 3 章</a>。</li>
+  <li><strong>Euler 定理</strong> — \(a^{\varphi(n)} \equiv 1 \pmod n\) <a href="ch6.html">第 6 章</a>；RSA 正确性证明 <a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>Euler 函数 / Euler totient</strong> — \(\varphi(n)\) <a href="ch6.html">第 6 章</a>；积性 <a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>Euler 乘积</strong> — <a href="appB.html#appB-6">附录 B.6</a>；\(\zeta\) 的 <a href="ch15.html">第 15 章</a>；\(L(f, s)\) <a href="ch21.html#sec21-7">21.7</a>。</li>
+</ul>
+
+<h2>F</h2>
+<ul>
+  <li><strong>Fermat 大定理（FLT）</strong> — <a href="ch24.html">第 24 章</a>；陈述 <a href="ch24.html#sec24-1">24.1</a>；归约到 Frey 曲线 <a href="ch24.html#sec24-2">24.2</a>；归约到 Taniyama-Shimura <a href="ch24.html#sec24-4">24.4</a>；Wiles 1995 <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Fermat 小定理</strong> — \(a^p \equiv a \pmod p\) <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>Fermat 圣诞定理</strong> — \(p = a^2 + b^2 \iff p \equiv 1 \pmod 4\) <a href="ch13.html">第 13 章</a>。</li>
+  <li><strong>Fermat 测试 / Fermat 伪素数</strong> — <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>FFT（快速 Fourier 变换）</strong> — 用于量子 Shor 算法 <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>FHE（全同态加密）</strong> — <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>Frey 曲线</strong> — \(y^2 = x(x - a^p)(x + b^p)\) <a href="ch24.html#sec24-2">24.2</a>；判别式 \((abc)^{2p}\) <a href="ch24.html#sec24-3">24.3</a>；不模 <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>Frobenius 元 / Frobenius 自同构</strong> — \(\mathrm{Frob}_p\) <a href="appA.html#appA-4">附录 A.4</a>；\(\mathfrak p\) 上方的 <a href="ch22.html#sec22-3">22.3</a>。</li>
+</ul>
+
+<h2>G</h2>
+<ul>
+  <li><strong>Galois 表示</strong> — \(\rho_E\)（椭圆曲线）<a href="ch24.html#sec24-3">24.3</a>；Langlands 程序 <a href="ch22.html#sec22-8">22.8</a>。</li>
+  <li><strong>Galois 扩张</strong> — <a href="appA.html#appA-5">附录 A.5</a>。</li>
+  <li><strong>Galois 群</strong> — <a href="appA.html#appA-5">附录 A.5</a>；类域论 <a href="ch22.html">第 22 章</a>。</li>
+  <li><strong>Galois 主定理</strong> — <a href="ch22.html#sec22-1">22.1</a>；详 <a href="appA.html#appA-5">附录 A.5</a>。</li>
+  <li><strong>Gauss</strong> — 二次互反 <a href="ch10.html">第 10 章</a>；圆分域 <a href="ch22.html#sec22-5">22.5</a>；高斯整数 <a href="ch13.html">第 13 章</a>。</li>
+  <li><strong>高斯整数 \(\mathbb Z[i]\)</strong> — <a href="ch13.html">第 13 章</a>；UFD <a href="ch13.html">第 13 章</a>。</li>
+  <li><strong>Gauss 引理（二次剩余）</strong> — <a href="ch10.html">第 10 章</a>。</li>
+  <li><strong>GNFS（数域筛分解算法）</strong> — <a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>guarantor（陷门函数）</strong> — 见"陷门函数"。</li>
+</ul>
+
+<h2>H</h2>
+<ul>
+  <li><strong>Hadamard 因子分解</strong> — <a href="appB.html#appB-4">附录 B.4</a>。</li>
+  <li><strong>Hadamard / de la Vallée-Poussin</strong>（素数定理 1896）— <a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>Hasse-Minkowski 定理</strong> — \(\mathbb Q\) 上二次型有解 \(\iff\) 所有完备化上有解 <a href="ch18.html">第 18 章</a>。</li>
+  <li><strong>Hasse 原理</strong> — 见 H"Hasse-Minkowski"。</li>
+  <li><strong>Hasse 界</strong> — \(|\#E(\mathbb F_p) - (p + 1)| \le 2\sqrt p\) <a href="ch19.html">第 19 章</a>；ECC 用 <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>Hecke 算子</strong> — \(T_p\) <a href="ch21.html#sec21-6">21.6</a>。</li>
+  <li><strong>Hecke 代数</strong> — \(R \cong T\) 的 \(T\) <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Hecke 特征形式</strong> — <a href="ch21.html#sec21-6">21.6</a>。</li>
+  <li><strong>Hilbert 类域（HCF）</strong> — <a href="ch22.html#sec22-3">22.3</a>；\(\mathbb Q(\sqrt{-5})\) 的 <a href="ch22.html#sec22-4">22.4</a>。</li>
+  <li><strong>https / TLS</strong> — <a href="ch23.html#sec23-1">23.1</a>；现代 PQC 混合 <a href="ch23.html#sec23-6">23.6</a>。</li>
+</ul>
+
+<h2>I</h2>
+<ul>
+  <li><strong>Idele</strong> — \(\mathbb I_K = \prod' K_v^\times\) <a href="ch22.html#sec22-6">22.6</a>。</li>
+  <li><strong>Idele 类群</strong> — \(C_K = \mathbb I_K / K^\times\) <a href="ch22.html#sec22-6">22.6</a>。</li>
+  <li><strong>IBE（基于身份的加密）</strong> — <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>无穷下降法（Fermat）</strong> — <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>整除性</strong> — <a href="ch2.html">第 2 章</a>；同余 <a href="ch5.html">第 5 章</a>。</li>
+</ul>
+
+<h2>J</h2>
+<ul>
+  <li><strong>Jacobi 符号</strong> — \(\left(\frac{a}{n}\right)\) 推广 Legendre <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>\(j\)-不变量</strong> — \(j(\tau) = 1728 E_4^3/\Delta\) <a href="ch21.html#sec21-4">21.4</a>；类数公式 <a href="ch21.html#sec21-4">21.4</a>；Monstrous Moonshine <a href="ch21.html#sec21-4">21.4</a>。</li>
+  <li><strong>既约二次型</strong> — <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>积性函数</strong> — <a href="ch14.html">第 14 章</a>；Dirichlet 卷积 <a href="ch14.html">第 14 章</a>。</li>
+</ul>
+
+<h2>K</h2>
+<ul>
+  <li><strong>Kummer 1847</strong>（FLT 正则素数）— <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>Khare-Wintenberger 2009</strong>（Serre 模性猜想）— <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>Kyber（PQC 密钥协商）</strong> — <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>扩展 Euclid 算法</strong> — <a href="ch2.html">第 2 章</a>；RSA 私钥推导 <a href="ch23.html#sec23-2">23.2</a>。</li>
+</ul>
+
+<h2>L</h2>
+<ul>
+  <li><strong>Lagrange 定理（群论）</strong> — <a href="appA.html#appA-1">附录 A.1</a>。</li>
+  <li><strong>Lagrange 四平方和</strong> — <a href="ch13.html">第 13 章</a>。</li>
+  <li><strong>Lamé 1839</strong>（FLT \(n=7\)） — <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>Langlands 程序</strong> — <a href="ch22.html#sec22-8">22.8</a>；非阿贝尔类域论 <a href="ch22.html">第 22 章</a>；\(n = 2\) 即模性 <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>Legendre 符号</strong> — \(\left(\frac{a}{p}\right)\) <a href="ch9.html">第 9 章</a>；二次互反 <a href="ch10.html">第 10 章</a>。</li>
+  <li><strong>L-函数</strong> — \(L(s, \chi)\) <a href="ch15.html">第 15 章</a>；\(L(f, s)\) 模形式 <a href="ch21.html#sec21-7">21.7</a>；\(L(E, s)\) 椭圆曲线 <a href="ch21.html#sec21-7">21.7</a>。</li>
+  <li><strong>level lowering（\(\varepsilon\) 猜想）</strong> — Ribet 1986 <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>libsodium</strong> — <a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>离散对数</strong> — DLP <a href="ch8.html">第 8 章</a>；DH 用 <a href="ch23.html#sec23-3">23.3</a>；ECDLP <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>留数定理</strong> — <a href="appB.html#appB-2">附录 B.2</a>；素数定理证明 <a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>LWE（带误差学习）</strong> — <a href="ch23.html#sec23-6">23.6</a>。</li>
+</ul>
+
+<h2>M</h2>
+<ul>
+  <li><strong>Mazur 变形理论</strong> — <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Möbius 函数</strong> — \(\mu(n)\) <a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>Möbius 反演</strong> — <a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>Mordell-Weil 定理</strong> — <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>模算术</strong> — <a href="ch1.html">第 1 章</a>；\(\mathbb Z/n\) <a href="ch5.html">第 5 章</a>。</li>
+  <li><strong>模性定理</strong> — Wiles 1995（半稳定）<a href="ch24.html#sec24-6">24.6</a>；BCDT 2001（完整）<a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>模函数</strong> — \(j\)-不变量 <a href="ch21.html#sec21-4">21.4</a>。</li>
+  <li><strong>模形式</strong> — <a href="ch21.html">第 21 章</a>；权 \(k\) <a href="ch21.html#sec21-2">21.2</a>；\(q\)-展开 <a href="ch21.html#sec21-3">21.3</a>；维数公式 <a href="ch21.html#sec21-5">21.5</a>。</li>
+  <li><strong>Monstrous Moonshine</strong> — <a href="ch21.html#sec21-4">21.4</a>。</li>
+</ul>
+
+<h2>N</h2>
+<ul>
+  <li><strong>诺特环 / Hilbert 基定理</strong> — <a href="appA.html#appA-6">附录 A.6</a>。</li>
+  <li><strong>NIST PQC 标准</strong> — FIPS 203/204/205（2024）<a href="ch23.html#sec23-6">23.6</a>。</li>
+</ul>
+
+<h2>O</h2>
+<ul>
+  <li><strong>OpenSSL</strong> — <a href="ch23.html#sec23-7">23.7</a>。</li>
+</ul>
+
+<h2>P</h2>
+<ul>
+  <li><strong>p-adic 数</strong> — \(\mathbb Q_p\) <a href="ch18.html">第 18 章</a>；Hasse 原理 <a href="ch18.html">第 18 章</a>。</li>
+  <li><strong>Pell 方程</strong> — \(x^2 - D y^2 = 1\) <a href="ch12.html">第 12 章</a>；连分数解 <a href="ch11.html">第 11 章</a>+<a href="ch12.html">第 12 章</a>。</li>
+  <li><strong>Pollard rho</strong>（ECDLP 攻击）— <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>PQC（后量子密码学）</strong> — <a href="ch23.html#sec23-6">23.6</a>；NIST 标准 <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>PID（主理想整环）</strong> — <a href="appA.html#appA-2">附录 A.2</a>。</li>
+  <li><strong>普 / 主特征</strong> — <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>profinite 群</strong> — 无穷 Galois 群 <a href="appA.html#appA-5">附录 A.5</a>。</li>
+  <li><strong>判别式（椭圆曲线）</strong> — Frey 曲线 <a href="ch24.html#sec24-3">24.3</a>。</li>
+  <li><strong>Petersson 内积</strong> — <a href="ch21.html">第 21 章</a>提及。</li>
+</ul>
+
+<h2>Q</h2>
+<ul>
+  <li><strong>\(q\)-展开</strong> — \(q = e^{2\pi i \tau}\) <a href="ch21.html#sec21-3">21.3</a>。</li>
+  <li><strong>权（模形式）</strong> — \(k\) <a href="ch21.html#sec21-2">21.2</a>；维数公式 <a href="ch21.html#sec21-5">21.5</a>。</li>
+  <li><strong>圆分域 \(\mathbb Q(\zeta_n)\)</strong> — Galois 群 \(\cong (\mathbb Z/n)^\times\) <a href="ch22.html#sec22-5">22.5</a>；Kummer FLT 工具 <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>群</strong> — 定义 + 性质 <a href="appA.html#appA-1">附录 A.1</a>。</li>
+  <li><strong>群同态</strong> — <a href="appA.html#appA-1">附录 A.1</a>。</li>
+</ul>
+
+<h2>R</h2>
+<ul>
+  <li><strong>R = T 定理（Wiles）</strong> — <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Ramanujan \(\tau\) 函数</strong> — <a href="ch21.html#sec21-4">21.4</a>。</li>
+  <li><strong>Ramanujan-Petersson 猜想</strong> — Deligne 1974 证 \(\Delta\) 部分 <a href="ch21.html#sec21-4">21.4</a>。</li>
+  <li><strong>Regev 2005</strong>（LWE）— <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>Ribet 1986</strong>（Frey 曲线不模）— <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>Riemann zeta \(\zeta(s)\)</strong> — <a href="ch16.html">第 16 章</a>；定义 + 延拓 <a href="appB.html#appB-3">附录 B.3</a>。</li>
+  <li><strong>Riemann 假设（RH）</strong> — <a href="ch16.html">第 16 章</a>；现代数论 <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>RSA</strong> — <a href="ch23.html#sec23-2">23.2</a>；Euler 定理证明 <a href="ch23.html#sec23-2">23.2</a>；Shor 量子破 <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>射类群</strong> — \(\mathrm{Cl}_\mathfrak m(K)\) <a href="ch22.html#sec22-5">22.5</a>。</li>
+</ul>
+
+<h2>S</h2>
+<ul>
+  <li><strong>Serre</strong>（\(\varepsilon\) 猜想）— <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>Shor 算法（量子）</strong> — <a href="ch23.html#sec23-5">23.5</a>；破 RSA / DH / ECC <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>Sophie Germain 素数</strong> — \(p\) 与 \(2p + 1\) 都素 <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>素数定理（PNT）</strong> — \(\pi(x) \sim x/\log x\) <a href="ch16.html">第 16 章</a>；Tauberian 证明 <a href="appB.html#appB-5">附录 B.5</a>。</li>
+  <li><strong>素数计数函数 \(\pi(x)\)</strong> — <a href="ch3.html">第 3 章</a>；Gauss 估计 <a href="ch1.html">第 1 章</a>。</li>
+  <li><strong>素分解</strong>（算术基本定理）— <a href="ch4.html">第 4 章</a>；理想分解 <a href="ch22.html#sec22-2">22.2</a>。</li>
+  <li><strong>素理想</strong> — <a href="appA.html#appA-2">附录 A.2</a>；Dedekind 整环 <a href="ch22.html#sec22-2">22.2</a>。</li>
+  <li><strong>Stark-Heegner 定理</strong> — 类数 1 虚二次域只 9 个 <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>SVP（短向量问题）</strong> — <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>SPHINCS+（哈希签名）</strong> — <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>上半平面 \(\mathcal H\)</strong> — \(\mathrm{SL}_2(\mathbb Z)\) 作用 <a href="ch21.html#sec21-1">21.1</a>。</li>
+  <li><strong>\(\mathrm{SL}_2(\mathbb Z)\)</strong> — 生成元 \(S, T\) <a href="ch21.html#sec21-1">21.1</a>；基本域 <a href="ch21.html#sec21-1">21.1</a>。</li>
+</ul>
+
+<h2>T</h2>
+<ul>
+  <li><strong>Takagi（CFT 1920）</strong> — <a href="ch22.html">第 22 章</a>。</li>
+  <li><strong>Taniyama-Shimura-Weil 猜想</strong> — <a href="ch21.html#sec21-8">21.8</a>；FLT 归约 <a href="ch24.html#sec24-4">24.4</a>；Wiles 证半稳定 <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Tauberian 定理</strong> — Wiener-Ikehara <a href="appB.html#appB-5">附录 B.5</a>；素数定理证 <a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>Taylor 1995</strong>（与 Wiles 补缝）— <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>条件收敛半平面</strong> — <a href="appB.html#appB-6">附录 B.6</a>。</li>
+  <li><strong>陷门函数</strong> — <a href="ch23.html#sec23-1">23.1</a>。</li>
+  <li><strong>同余</strong> — <a href="ch5.html">第 5 章</a>；CRT <a href="ch7.html">第 7 章</a>。</li>
+  <li><strong>同源密码</strong>（SIDH/SIKE）— <a href="ch23.html#sec23-6">23.6</a>。</li>
+</ul>
+
+<h2>U</h2>
+<ul>
+  <li><strong>UFD（唯一分解整环）</strong> — <a href="appA.html#appA-2">附录 A.2</a>；高斯整数 <a href="ch13.html">第 13 章</a>；\(\mathbb Z[\sqrt{-5}]\) 反例 <a href="ch17.html">第 17 章</a>。</li>
+</ul>
+
+<h2>W</h2>
+<ul>
+  <li><strong>Wiles 1995</strong>（FLT 证完）— <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Wilson 定理</strong> — \((p-1)! \equiv -1 \pmod p\) <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>维数公式（模形式）</strong> — <a href="ch21.html#sec21-5">21.5</a>。</li>
+  <li><strong>无穷下降法</strong> — Fermat <a href="ch24.html#sec24-1">24.1</a>。</li>
+</ul>
+
+<h2>X</h2>
+<ul>
+  <li><strong>\(\xi(s)\)（Riemann xi 函数）</strong> — <a href="appB.html#appB-4">附录 B.4</a>。</li>
+  <li><strong>X25519</strong> — 见 C"Curve25519"。</li>
+</ul>
+
+<h2>Y</h2>
+<ul>
+  <li><strong>原根</strong> — <a href="ch8.html">第 8 章</a>；\((\mathbb Z/p)^\times\) 循环 <a href="ch8.html">第 8 章</a>；DH 用 <a href="ch23.html#sec23-3">23.3</a>。</li>
+  <li><strong>有限域 \(\mathbb F_q\)</strong> — <a href="appA.html#appA-4">附录 A.4</a>；Frobenius <a href="appA.html#appA-4">附录 A.4</a>。</li>
+  <li><strong>有限生成阿贝尔群</strong> — Mordell-Weil <a href="ch20.html">第 20 章</a>；结构定理 <a href="appA.html#appA-6">附录 A.6</a>。</li>
+  <li><strong>圆分域</strong> — 见 Q"圆分域"。</li>
+</ul>
+
+<h2>Z</h2>
+<ul>
+  <li><strong>\(\mathbb Z[i]\)</strong> — 见 G"高斯整数"。</li>
+  <li><strong>\(\zeta\) 函数</strong> — 见 R"Riemann zeta"。</li>
+  <li><strong>\(\zeta(2) = \pi^2/6\)（Basel 问题）</strong> — <a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>\(\mathbb Z/n\)（模 \(n\) 整数环）</strong> — <a href="ch5.html">第 5 章</a>；CRT 拆分 <a href="ch7.html">第 7 章</a>。</li>
+  <li><strong>\((\mathbb Z/n)^\times\)（模 \(n\) 单位群）</strong> — <a href="ch6.html">第 6 章</a>；结构 <a href="appA.html#appA-6">附录 A.6</a>。</li>
+  <li><strong>\(\mathbb Z[\sqrt{-D}]\)（虚二次域整数环）</strong> — <a href="ch17.html">第 17 章</a>；UFD 失败 <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>整除</strong> — <a href="ch2.html">第 2 章</a>。</li>
+  <li><strong>正则素数（Kummer）</strong> — <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>子群 / 陪集 / 商群</strong> — <a href="appA.html#appA-1">附录 A.1</a>。</li>
+  <li><strong>ZKP（零知识证明）</strong> — <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>组合恒等式</strong>（\(E_8 = E_4^2\) 推 \(\sigma_7\) 卷积）— <a href="ch21.html#sec21-5">21.5</a>。</li>
+</ul>
+
+<h2>查找：按"<em>我现在想做什么</em>"</h2>
+
+<ol>
+  <li><strong>算 \(7^{100} \bmod 10\) 这种"<em>大数取模</em>" 题：</strong>用<em>模算术 + Fermat 小 / Euler 定理</em>。\(\gcd(a, n) = 1\) 时 \(a^k \equiv a^{k \bmod \varphi(n)} \pmod n\)。具体见<a href="ch1.html">第 1 章</a>、<a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>判断"<em>\(p\) 是 \(n\) 的因子吗</em>"：</strong>试除到 \(\sqrt n\)（朴素）。或者用<em>Miller-Rabin 概率素性测试</em>（实战工程）；本书<a href="ch6.html">第 6 章</a>讲背景。</li>
+  <li><strong>解一道<em>\(\mathrm{ax} \equiv b \pmod n\)</em> 同余：</strong>用<em>Euclid 扩展算法</em>找 \(a^{-1} \bmod n\)，再 \(x \equiv a^{-1} b\)。<a href="ch2.html">第 2 章</a>+<a href="ch5.html">第 5 章</a>。</li>
+  <li><strong>解一组<em>同时模不同素数的同余</em>：</strong><em>中国剩余定理</em>。<a href="ch7.html">第 7 章</a>。</li>
+  <li><strong>判断 \(a\) 是 \(\bmod p\) 的平方剩余：</strong>算 <em>Legendre 符号</em> \(\left(\frac{a}{p}\right) = a^{(p-1)/2} \bmod p\)（Euler 准则）。判别多个 \(p\) 用<em>二次互反律</em>。<a href="ch9.html">第 9 章</a>+<a href="ch10.html">第 10 章</a>。</li>
+  <li><strong>解 Pell 方程 \(x^2 - D y^2 = 1\)：</strong>展开 \(\sqrt D\) 为<em>连分数</em>，找<em>周期</em>。<a href="ch11.html">第 11 章</a>+<a href="ch12.html">第 12 章</a>。</li>
+  <li><strong>判断<em>\(p\) 写成两平方和</em>：</strong>\(p = a^2 + b^2 \iff p = 2 \text{ 或 } p \equiv 1 \pmod 4\)（Fermat 圣诞定理）。<a href="ch13.html">第 13 章</a>。</li>
+  <li><strong>算<em>\(\sigma(n)\)、\(\varphi(n)\)、\(\mu(n)\)</em>：</strong>分解 \(n = \prod p^{e_p}\) + 套<em>积性</em>规则。<a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>估"<em>不超过 \(N\) 的素数有多少</em>"：</strong>素数定理 \(\pi(N) \sim N/\log N\)。精化 \(\mathrm{Li}(N)\)。<a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>找椭圆曲线的所有<em>有理点</em>：</strong>用<em>Mordell-Weil 定理</em> 把它<em>有限生成</em>，再用 descent + 高度论找生成元。本书<a href="ch20.html">第 20 章</a>给基础；实战用 SAGE 的 <code>EllipticCurve.gens()</code>。</li>
+  <li><strong>设置 RSA 密钥：</strong>选 1024+ 位素数 \(p, q\)、算 \(n = pq\)、\(\varphi(n)\)、\(d = e^{-1} \bmod \varphi(n)\)。<em>不要自己实现</em>——用 OpenSSL 或 libsodium。<a href="ch23.html#sec23-2">23.2 节</a>。</li>
+  <li><strong>建立<em>https / TLS 安全连接</em>：</strong>用 ECDHE-X25519 + Ed25519 + AES-GCM。代码层用 libsodium，TLS 层让浏览器 / Go 标准库自动处理。<a href="ch23.html#sec23-7">23.7 节</a>。</li>
+  <li><strong>担心<em>量子计算机</em>解密未来通信：</strong>启用 PQC 混合（NIST FIPS 203 Kyber + 经典 ECC）。<a href="ch23.html#sec23-6">23.6 节</a>。</li>
+  <li><strong>诊断"<em>我数论题不会做</em>"：</strong>步骤——（1）问问题<em>属于</em> 哪一层（初等 / 代数 / 解析）；（2）查相关章；（3）找一个<em>具体小例子</em> 试算；（4）把朴素直觉提到<em>抽象层次</em>（同余 → 群论 → Galois 表示）。这本书 24 章每一章都<em>从具体例子出发</em>，请你跟随这条思路反向追溯。</li>
+</ol>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 \(p\)-adic 数入门 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 二元二次型与类数</a><a href="ch19.html">下一章 · 第 19 章 椭圆曲线引论 →</a></nav>
+<h1 id="ch18">第 18 章 \(p\)-adic 数入门</h1>
+
+<p>请你先回想：实数 \(\mathbb{R}\) 怎么从有理数 \(\mathbb{Q}\) 造出来。一种标准做法——拿 \(\mathbb{Q}\) 里所有<em>Cauchy 序列</em>（关于普通距离 \(|a - b|\) 收敛意义上的"<em>越来越接近</em>"），把"<em>差趋于 0</em>" 的两个序列等同，得到 \(\mathbb{R}\)。这叫<em>完备化</em>。\(\sqrt{2}\) 不在 \(\mathbb{Q}\) 里，但有 Cauchy 序列 \(1, 1.4, 1.41, 1.414, \ldots\) 收敛到它——所以 \(\sqrt{2}\) 在 \(\mathbb{R}\) 里。这套构造你在<a href="../泛函分析/index.html">《泛函分析》</a>开头早见过。</p>
+
+<p>这一章问一个反直觉的问题：完备化用的"<em>距离</em>" \(|a - b|\) 是<em>唯一合理</em> 的吗？你可以换一种"<em>近</em>" 的定义——比如说"<em>两个数的差被 \(p\) 整除得越多，它们越近</em>"——再做完备化。结果不是 \(\mathbb{R}\)，是一个全新的数系 \(\mathbb{Q}_p\)，叫<strong>\(p\)-adic 数</strong>。它有 \(\mathbb{R}\) 没有的几何（"<em>球互相要么不交要么嵌套</em>"）、有 \(\mathbb{R}\) 没有的代数（很多在 \(\mathbb{R}\) 发散的级数在 \(\mathbb{Q}_p\) 收敛）、有 \(\mathbb{R}\) 没有的数论应用（"<em>局部-全局</em>" 原理）。这套对象是 20 世纪数论的支柱之一——现代代数几何 / Galois 表示 / 模形式 / Wiles 证明 Fermat 大定理都在 \(\mathbb{Q}_p\) 里发生。</p>
+
+<h2 id="sec18-1">18.1 一种新距离：\(p\)-adic 绝对值</h2>
+
+<p>固定一个素数 \(p\)（之后所有讨论都以这个 \(p\) 为基础）。对任何非零有理数 \(a \in \mathbb{Q}^*\)，写</p>
+
+<p>\[
+a = p^v \cdot \frac{m}{n}, \quad \gcd(m, p) = \gcd(n, p) = 1.
+\]</p>
+
+<p>即把 \(a\) 写成"\(p\) 的幂 \(\times\) 一个不含 \(p\) 因子的有理数"。这个 \(v \in \mathbb{Z}\) 是<em>唯一</em>的（来自 ch4 的算术基本定理推到有理数）。我们叫它 \(a\) 的 <strong>\(p\)-adic 赋值</strong>，记 \(v_p(a) = v\)。约定 \(v_p(0) = +\infty\)。</p>
+
+<p>例子（\(p = 5\)）：</p>
+<ul>
+  <li>\(v_5(75) = 2\)（\(75 = 5^2 \cdot 3\)）。</li>
+  <li>\(v_5(1/25) = -2\)。</li>
+  <li>\(v_5(7) = 0\)（\(7\) 没有 5 因子）。</li>
+  <li>\(v_5(0) = +\infty\)。</li>
+</ul>
+
+<p>由赋值定义 \(p\)-adic <strong>绝对值</strong>：</p>
+
+<p>\[
+\boxed{\ |a|_p := p^{-v_p(a)}, \quad |0|_p := 0.\ }
+\]</p>
+
+<p>关键观察：<em>\(p\) 整除 \(a\) 越多次，\(v_p(a)\) 越大，\(|a|_p\) 越小</em>。"\(p\) 整除得多" = "<em>小</em>"。这和直觉相反——\(125\) 在普通距离里"大"（\(|125| = 125\)），但在 5-adic 距离里"小"（\(|125|_5 = 5^{-3} = 1/125\)）。</p>
+
+<p>更多例子（\(p = 5\)）：</p>
+<ul>
+  <li>\(|1|_5 = 1\)，\(|7|_5 = 1\)（\(p\) 不整除 \(\Rightarrow\) "<em>普通大小</em>"）。</li>
+  <li>\(|5|_5 = 1/5\)，\(|25|_5 = 1/25\)，\(|125|_5 = 1/125\)（\(p\) 的幂越高 \(\Rightarrow\) "<em>越小</em>"）。</li>
+  <li>\(|1/5|_5 = 5\)（\(p\) 在分母 \(\Rightarrow\) "<em>大</em>"）。</li>
+</ul>
+
+<p>对应的<em>距离</em> \(d_p(a, b) := |a - b|_p\)。"<em>\(a \approx_p b\)</em>" 的意思是 \(p^k\) 整除 \(a - b\) 对很大的 \(k\)。比如 \(7 \approx_5 32\)（差 \(25 = 5^2\)，\(d_5(7, 32) = 1/25\)）；\(7 \approx_5 132\) 更接近（差 \(125 = 5^3\)，距离 \(1/125\)）；\(7 \approx_5 7 + 5^{10}\) 距离 \(5^{-10}\) 极小。"<em>同余意义下越接近，\(p\)-adic 距离越小</em>" 是这个赋值的核心。</p>
+
+<h2 id="sec18-2">18.2 \(|\cdot|_p\) 是绝对值（且是"超度量"）</h2>
+
+<p>验证 \(|\cdot|_p\) 满足绝对值四公理：</p>
+
+<ol>
+  <li>\(|a|_p \ge 0\)，\(|a|_p = 0 \iff a = 0\)。</li>
+  <li>\(|ab|_p = |a|_p \cdot |b|_p\)。</li>
+  <li>三角不等式 \(|a + b|_p \le |a|_p + |b|_p\)。</li>
+  <li>（关于乘法对偶）。</li>
+</ol>
+
+<p>第 (1)、(4) 显然。第 (2) 来自 \(v_p(ab) = v_p(a) + v_p(b)\)（如果 \(a = p^v u\)、\(b = p^w t\)（\(u, t\) 不含 \(p\)），则 \(ab = p^{v+w} ut\)，仍 \(ut\) 不含 \(p\)，所以 \(v_p(ab) = v + w\)）。所以 \(|ab|_p = p^{-(v+w)} = p^{-v} \cdot p^{-w} = |a|_p |b|_p\)。\(\checkmark\)</p>
+
+<p>第 (3) 三角不等式不仅<em>成立</em>，还有<em>更强</em>形式——</p>
+
+<p>\[
+\boxed{\ |a + b|_p \le \max(|a|_p, |b|_p).\ }
+\]</p>
+
+<p>这叫<strong>超度量</strong>不等式，比普通三角不等式 \(|a+b| \le |a| + |b|\) 强得多。证明：设 \(v_p(a) = v\)，\(v_p(b) = w\)，不妨 \(v \le w\)。则 \(a = p^v u\)，\(b = p^w t = p^v (p^{w-v} t)\)。所以 \(a + b = p^v (u + p^{w-v} t)\)。因子 \(u + p^{w-v} t\)：</p>
+
+<ul>
+  <li>如果 \(w > v\)，那么 \(p \nmid u\) 但 \(p \mid p^{w-v} t\)，所以 \(u + p^{w-v} t\) 仍不被 \(p\) 整除，\(v_p(a + b) = v = \min(v, w)\)。</li>
+  <li>如果 \(w = v\)，那么 \(u + t\) <em>可能</em> 被 \(p\) 整除（如果 \(u + t \equiv 0 \pmod p\)），所以 \(v_p(a + b) \ge v\)。</li>
+</ul>
+
+<p>两种情况都得 \(v_p(a + b) \ge \min(v_p(a), v_p(b))\)，即 \(|a + b|_p \le \max(|a|_p, |b|_p)\)。\(\checkmark\)</p>
+
+<p>请你停下来感受这个不等式的<em>奇</em>。普通距离里 \(|a + b| \le |a| + |b|\) 偶尔会"<em>取等号</em>"（比如 \(a, b\) 同号）。而 \(|a + b|_p \le \max(|a|_p, |b|_p)\) <em>几乎总是</em>取等——除非 \(|a|_p = |b|_p\)（即 \(v_p(a) = v_p(b)\)），这时新和可以严格变小（如 \(a = 5, b = -5\)，\(a + b = 0\)，\(|a + b|_p = 0\) 远小于 \(|a|_p = 1/5\)）。</p>
+
+<p>超度量带来一个怪结论："<em>每个三角形都是等腰三角形</em>"。具体说：对任三个点 \(a, b, c \in \mathbb{Q}\)，三个 \(p\)-adic 距离 \(d_p(a, b), d_p(b, c), d_p(a, c)\) 中<em>至少两个相等</em>，且这两个 \(\ge\) 第三个。证明：写 \(d_p(a, c) = d_p((a - b) + (b - c)) \le \max(d_p(a, b), d_p(b, c))\)；然后任两两都这样，凑等腰。这就是 \(p\)-adic 几何"<em>不像</em> 欧氏几何" 的第一面。</p>
+
+<h2 id="sec18-3">18.3 完备化得 \(\mathbb{Q}_p\)</h2>
+
+<p>有了 \(p\)-adic 距离，我们可以照搬实数完备化的构造。一个序列 \(\{a_n\} \subset \mathbb{Q}\) 叫 \(p\)-adic Cauchy 如果 \(\forall \varepsilon > 0\) \(\exists N\) 使 \(m, n \ge N \Rightarrow |a_m - a_n|_p < \varepsilon\)。等价（用超度量）：\(|a_{n+1} - a_n|_p \to 0\)。</p>
+
+<p>注意——这是个比"<em>实 Cauchy</em>" 更宽松的概念。比如 \(a_n = 5 + 5^2 + 5^3 + \ldots + 5^n\) 在 \(\mathbb{R}\) 里发散（增到无穷）；但在 5-adic 里 \(|a_{n+1} - a_n|_5 = |5^{n+1}|_5 = 5^{-(n+1)} \to 0\)。<em>5-adic Cauchy</em>，但<em>实非 Cauchy</em>。</p>
+
+<p>把 \(\mathbb{Q}\) 中所有 \(p\)-adic Cauchy 序列收集，模"\(\{a_n\} \sim \{b_n\} \iff |a_n - b_n|_p \to 0\)"，得</p>
+
+<p>\[
+\boxed{\ \mathbb{Q}_p := \{p\text{-adic Cauchy}\} / \sim.\ }
+\]</p>
+
+<p>每个等价类是 \(\mathbb{Q}_p\) 的一个元素。原 \(\mathbb{Q}\) 嵌入 \(\mathbb{Q}_p\) 通过常序列 \(a \mapsto (a, a, a, \ldots)\)。算术运算（加、乘）按序列分量定义，传到等价类上良定。</p>
+
+<p>这叫 <strong>\(p\)-adic 完备化</strong>。\(\mathbb{Q}_p\) 是个域（继承 \(\mathbb{Q}\) 的运算 + 完备化保留），完备化（每个 \(p\)-adic Cauchy 序列在 \(\mathbb{Q}_p\) 里收敛——这是 Cauchy 完备化的<em>定义性</em> 性质）。</p>
+
+<p>具体表示：每个 \(\alpha \in \mathbb{Q}_p\) 可以唯一写成"<em>\(p\)-adic 展开</em>"：</p>
+
+<p>\[
+\alpha = \sum_{n = N}^\infty a_n p^n, \quad a_n \in \{0, 1, \ldots, p - 1\}, \quad a_N \neq 0.
+\]</p>
+
+<p>这里 \(N = v_p(\alpha) \in \mathbb{Z}\)（可正可负）。前缀 \(\sum_{n = N}^{N+k} a_n p^n\) 是 \(\alpha\) 的"<em>有限近似</em>"（误差 \(\le p^{-(N+k+1)} \to 0\)）。</p>
+
+<p>请你比较：\(\mathbb{R}\) 的元素是"<em>十进制小数</em>"，从某位起向<em>右</em> 写无穷多位（对应取小越来越精）；\(\mathbb{Q}_p\) 的元素是"<em>\(p\) 进制小数</em>"，从某位起向<em>左</em> 写无穷多位（对应取大越来越精）。两种"<em>从某点出发的无穷展开</em>" 是反方向的。</p>
+
+<p>例（\(p = 7\)，\(\alpha = -1\)）：在 \(\mathbb{Q}_7\) 里 \(-1 = 6 + 6 \cdot 7 + 6 \cdot 7^2 + \cdots\)。验证（部分和）：\(6 = 6\)；\(6 + 42 = 48 \equiv -1 \pmod{49}\)；\(48 + 6 \cdot 49 = 342 \equiv -1 \pmod{343}\)。每加一项让对 \(p^k\) 的同余度更好。<em>无穷多个正数的和等于 \(-1\)</em>——这在 \(\mathbb{R}\) 里完全荒谬，在 \(\mathbb{Q}_p\) 里完全自然。</p>
+
+<h2 id="sec18-4">18.4 几何：\(\mathbb{Q}_p\) 中的"球" 互相要么不交要么嵌套</h2>
+
+<p>在 \(\mathbb{Q}_p\) 里，<em>开球</em> 定义为 \(B(a, r) := \{x : |x - a|_p < r\}\)。超度量给出几个反直觉性质：</p>
+
+<p><strong>性质 1：球的<em>每个内点</em> 都是中心。</strong>形式：若 \(b \in B(a, r)\)，则 \(B(b, r) = B(a, r)\)。</p>
+
+<p>证明：取 \(c \in B(b, r)\)，即 \(|c - b|_p < r\)。需证 \(c \in B(a, r)\)。\(|c - a|_p = |(c - b) + (b - a)|_p \le \max(|c - b|_p, |b - a|_p) < r\)。\(\checkmark\) 反向同理。</p>
+
+<p>请你在脑子里构造一下：在欧氏几何里两个不同中心的球大概率不重合。在 \(p\)-adic 里，球的"<em>中心</em>" 不唯一——任何<em>内点</em> 都可以拿来当中心，球本身没变。</p>
+
+<p><strong>性质 2：两个球要么不相交，要么一个含另一个。</strong>没"<em>部分重叠</em>" 的情况。</p>
+
+<p>证明：设 \(B_1 = B(a, r)\)，\(B_2 = B(b, s)\)，\(r \le s\)。如果 \(B_1 \cap B_2 \neq \emptyset\)，取 \(c\) 在交里。由性质 1，\(B_1 = B(c, r)\)，\(B_2 = B(c, s)\)。同心，\(r \le s\)，所以 \(B_1 \subseteq B_2\)。</p>
+
+<p>这意味着 \(\mathbb{Q}_p\) 的"<em>球</em>" 形成一个<em>树形</em>（forest）结构——每个层级要么完全包含下一层，要么完全分开。这种结构在欧氏几何里只在<em>分形</em>（Cantor 集等）中见到，在 \(p\)-adic 里是<em>每个</em>球的标配。</p>
+
+<p><strong>性质 3：每个球都既开又闭。</strong>欧氏球只是"开"或"闭"二选一，球壳 = 边界 = 既不开也不闭的部分。\(p\)-adic 球没有"边界"——开闭重合。</p>
+
+<p>这一切让 \(\mathbb{Q}_p\) 成为<em>完全不连通</em>的拓扑空间——任两点之间没有连续路径（每条"路径" 必经过某球边界，而球没有边界让你"跨过去"，所以连通分量退化为单点）。这点和 \(\mathbb{R}\) 的"<em>处处连通</em>" 是天差地别。</p>
+
+<h2 id="sec18-5">18.5 \(p\)-adic 整数 \(\mathbb{Z}_p\)：紧致环</h2>
+
+<p>定义</p>
+
+<p>\[
+\mathbb{Z}_p := \{\alpha \in \mathbb{Q}_p : |\alpha|_p \le 1\} = \{\alpha : v_p(\alpha) \ge 0\}.
+\]</p>
+
+<p>等价的：\(\mathbb{Z}_p\) 是 \(\mathbb{Q}_p\) 中"\(p\)-adic 展开里没有负幂项" 的元素。\(\mathbb{Z}_p = \{\sum_{n \ge 0} a_n p^n : a_n \in \{0, \ldots, p-1\}\}\)。</p>
+
+<p>它是个<em>环</em>（不仅是子集）——验证：\(|\alpha + \beta|_p \le \max(|\alpha|_p, |\beta|_p) \le 1\)，所以加法封闭；\(|\alpha \beta|_p = |\alpha|_p |\beta|_p \le 1 \cdot 1 = 1\)，乘法封闭。所以 \(\mathbb{Z}_p\) 是 \(\mathbb{Q}_p\) 的子环，叫 <strong>\(p\)-adic 整数环</strong>。</p>
+
+<p>\(\mathbb{Z}_p\) 包含原 \(\mathbb{Z}\)（每个普通整数都满足 \(v_p \ge 0\)），也包含像 \(1/7\) 这种（在 \(\mathbb{Q}_5\) 里，\(v_5(1/7) = 0\)，所以 \(1/7 \in \mathbb{Z}_5\)）。但<em>不</em>包含 \(1/5\)（\(v_5(1/5) = -1 < 0\)）。所以 \(\mathbb{Z}_p\) 比 \(\mathbb{Z}\) "<em>大</em>"，但不包含分母为 \(p\) 的有理数。</p>
+
+<p>\(\mathbb{Z}_p\) 一个非平凡的拓扑性质——<em>它是紧致的</em>。证明用"<em>每个序列有收敛子序列</em>" 的形式：</p>
+
+<p>把 \(\alpha_n = a_{n,0} + a_{n,1} p + a_{n,2} p^2 + \cdots\) 看作一序列，\(a_{n,j} \in \{0, \ldots, p-1\}\)。第 0 项 \(a_{n,0}\) 取值在有限集 \(\{0, \ldots, p-1\}\)，所以无穷多个 \(n\) 共享同一个 \(a_{n,0}\)。在这无穷子列里再看 \(a_{n,1}\)，仍有限选择，再缩——抽屉过程给一个对每个 \(j\) 都最终稳定的子列。这子列在 \(\mathbb{Z}_p\) 里收敛。\(\checkmark\)</p>
+
+<p>请你停下来对比这一点：\(\mathbb{Z}\)（普通整数集）<em>不</em>紧致——序列 \(1, 2, 3, \ldots\) 没有收敛子列。但 \(\mathbb{Z}_p\) 紧致。这种"<em>普通离散无穷集</em> + <em>紧致拓扑</em>" 的组合让 \(\mathbb{Z}_p\) 成为分析里的"<em>金标准对象</em>"——在它上面可以做积分（Haar 测度）、可以做 Fourier 分析、可以严格定义"<em>\(p\)-adic 函数</em>" 的概念。</p>
+
+<p>\(\mathbb{Z}_p\) 也是<em>局部环</em>——它有唯一极大理想 \(p \mathbb{Z}_p = \{|\alpha|_p \le 1/p\}\)，商 \(\mathbb{Z}_p / p \mathbb{Z}_p = \mathbb{F}_p\)（链回有限域，<a href="../抽象代数/ch12.html">抽象代数 ch12</a>）。这种"<em>有唯一极大理想 + 商成有限域</em>" 的环结构是代数几何里"<em>局部</em>" 的样板。</p>
+
+<h2 id="sec18-6">18.6 收敛性：\(\mathbb{R}\) 发散的级数在 \(\mathbb{Q}_p\) 收敛</h2>
+
+<p>\(p\)-adic 收敛比实收敛<em>容易</em>得多。形式：</p>
+
+<p><strong>命题。</strong>级数 \(\sum a_n\) 在 \(\mathbb{Q}_p\) 中收敛 \(\iff |a_n|_p \to 0\)。</p>
+
+<p>证明：用超度量。部分和 \(S_n = \sum_{k=0}^n a_k\) 是 Cauchy \(\iff \forall \varepsilon, \exists N, m > n \ge N \Rightarrow |S_m - S_n|_p = |\sum_{k=n+1}^m a_k|_p \le \max_{k > n} |a_k|_p < \varepsilon\)。这个 \(\max\) 趋于 0 等价于 \(|a_n|_p \to 0\)。\(\checkmark\)</p>
+
+<p>对比：在 \(\mathbb{R}\) 里 \(\sum a_n\) 收敛<em>需要</em> \(a_n \to 0\)，但<em>不够</em>——比如 \(\sum 1/n\) 发散。\(p\)-adic 里 "\(a_n \to 0\)" <em>就是</em> 收敛的全部条件。这种宽松性给我们一堆在实分析失败的级数：</p>
+
+<p><strong>例 1：</strong>\(\sum_{n=0}^\infty p^n = 1 + p + p^2 + \cdots\)。在 \(\mathbb{Q}_p\) 里，\(|p^n|_p = p^{-n} \to 0\)，收敛。极限是多少？等比公式 \(\sum p^n = 1 / (1 - p)\) 在<em>抽象</em> 意义下成立——\((1 - p) \sum p^n = 1\)（telescope），所以极限就是 \(1/(1-p) \in \mathbb{Q}_p\)。在 \(\mathbb{R}\) 里这求和发散；在 \(\mathbb{Q}_p\) 里它给一个具体有理数。</p>
+
+<p><strong>例 2：\(p\)-adic 指数函数。</strong>\(\exp(x) = \sum_{n=0}^\infty x^n / n!\)。这级数在 \(\mathbb{Q}_p\) 里需要 \(|x^n / n!|_p \to 0\)。\(v_p(n!)\) 由 Legendre 公式 \(v_p(n!) = (n - s_p(n)) / (p - 1)\) 给（\(s_p(n)\) 是 \(n\) 的 \(p\) 进制位数和）。最终条件：\(\exp\) 在 \(|x|_p < p^{-1/(p-1)}\) 收敛——比 \(\mathbb{R}\) 的全平面收敛<em>窄</em>得多。<em>普通 \(\exp\) 在 \(p\)-adic 里反而难收敛</em>——这是另一种反差。</p>
+
+<p><strong>例 3：Hensel 引理（多项式根的 \(p\)-adic 提升）。</strong>设 \(f(x) \in \mathbb{Z}_p[x]\)，且某 \(a_0 \in \mathbb{Z}_p\) 满足 \(f(a_0) \equiv 0 \pmod p\) 且 \(f'(a_0) \not\equiv 0 \pmod p\)。则<em>存在唯一</em> \(\alpha \in \mathbb{Z}_p\) 使 \(f(\alpha) = 0\) 且 \(\alpha \equiv a_0 \pmod p\)。</p>
+
+<p>证明思路：用 \(p\)-adic 牛顿迭代 \(a_{n+1} = a_n - f(a_n) / f'(a_n)\)。每步让"<em>已经满足的 \(p\) 幂数</em>" 至少翻倍——\(p^k\) 同余 \(\to\) \(p^{2k}\) 同余。\(p\)-adic 距离里这是"<em>距离平方变小</em>"——典型二次收敛（链回<a href="../数值方法/ch7.html">数值方法 ch7 牛顿法</a>，那里在 \(\mathbb{R}\) 里的二次收敛在这里精确成立）。</p>
+
+<p>Hensel 引理是 \(p\)-adic 数论的<em>瑞士军刀</em>——很多问题的证法是"<em>先在 \(\mathbb{F}_p\) 解 mod \(p\)，再用 Hensel 提升到 \(\mathbb{Q}_p\)</em>"。这套"<em>提升</em>" 思路用在<em>Galois 表示构造</em>、<em>椭圆曲线 reduction</em>、<em>形式群</em>，是现代数论 + 算术几何的常规工具。</p>
+
+<h2 id="sec18-7">18.7 局部-全局原理（Hasse 原理）</h2>
+
+<p>给一个数论问题"<em>方程 \(f(x_1, \ldots, x_n) = 0\) 在 \(\mathbb{Q}\) 中有解吗</em>"。直接攻击难。一种<em>策略</em>：先看简单一些的"<em>局部</em>" 版本——分别问</p>
+
+<ul>
+  <li>方程在 \(\mathbb{R}\) 中有解吗？（实局部）</li>
+  <li>方程在<em>每个</em> \(\mathbb{Q}_p\) 中有解吗？（每个素数 \(p\) 一个 \(p\)-adic 局部）</li>
+</ul>
+
+<p>这些"<em>局部</em>" 版本通常容易得多——\(\mathbb{R}\) 用微积分 / 实分析；\(\mathbb{Q}_p\) 用 Hensel + 模 \(p\) 计算。</p>
+
+<p><strong>局部-全局原理（Hasse 原理）：</strong>方程在 \(\mathbb{Q}\) 有解 \(\iff\) 在 \(\mathbb{R}\) 和每个 \(\mathbb{Q}_p\) 都有解。</p>
+
+<p>"\(\Rightarrow\)" 显然——\(\mathbb{Q}\) 的解直接给所有完备化的解。关键是"\(\Leftarrow\)"——<em>"局部都解" 是否蕴含 "全局解"</em>？</p>
+
+<p>对某些方程<em>是</em>。最重要的：</p>
+
+<p><strong>定理（Hasse-Minkowski, 1923）。</strong>对<em>非退化二次型</em> \(Q(x_1, \ldots, x_n) = 0\)，Hasse 原理成立。</p>
+
+<p>例：方程 \(x^2 + y^2 + z^2 = 7 w^2\) 在 \(\mathbb{Q}\) 有非平凡解 \(\iff\) 它在 \(\mathbb{R}\) 和每个 \(\mathbb{Q}_p\) 有非平凡解。\(\mathbb{R}\) 解显然（取 \(w \neq 0\) 然后从右边出发）；每个 \(\mathbb{Q}_p\) 的解可以通过 mod \(p\) 计算 + Hensel 验证；最后 Hasse-Minkowski 保证 \(\mathbb{Q}\) 解存在。这把"<em>二次型解的存在性</em>" 化归为"<em>有限多个局部检查</em>"——在算法上是可行的。</p>
+
+<p>对其他方程<em>不一定</em>。最早的反例 Selmer 1951：</p>
+
+<p>\[
+3 x^3 + 4 y^3 + 5 z^3 = 0
+\]</p>
+
+<p>在 \(\mathbb{R}\) 和每个 \(\mathbb{Q}_p\) 都有非平凡解，但<em>没有</em> \(\mathbb{Q}\) 中的非平凡解。Hasse 原理对三次型<em>失败</em>。</p>
+
+<p>Hasse 原理失败的<em>程度</em> 由<em>Tate-Shafarevich 群</em> Ш 度量。Ш 是椭圆曲线 / 阿贝尔簇的一个深刻不变量；BSD 猜想（<a href="ch20.html">ch20</a>）的精细形式涉及 Ш 的有限性 + 阶。这是现代数论里最神秘的群之一。</p>
+
+<p>请你停下来思考"<em>局部 vs 全局</em>" 这个范式的<em>分量</em>。20 世纪数论的整个语言都基于这个分割：把"<em>难题</em>" 拆成"<em>所有 \(p\) 的 \(p\)-adic 局部</em> + 实局部"，分头攻破，再用 Hasse 原理 / 类域论 / Tate 对偶 / Wiles 模性等工具<em>合回去</em>。\(\mathbb{Q}_p\) 是这套语言的字母表。没有它，现代数论根本不存在。</p>
+
+<h2 id="sec18-8">18.8 现代意义</h2>
+
+<p>本章只挖到入口。\(p\)-adic 数后续的故事够写一整本书。简短列举：</p>
+
+<p><strong>1. \(p\)-adic Galois 表示。</strong>椭圆曲线 \(E\) 的 \(p^n\) 阶挠点 \(E[p^n]\) 上有 Galois 群 \(\mathrm{Gal}(\bar{\mathbb{Q}}/\mathbb{Q})\) 作用。把所有 \(n\) 取极限得 \(p\)-adic <em>Tate 模</em> \(T_p E = \varprojlim E[p^n]\)，是个 \(\mathbb{Z}_p\)-模 + Galois 表示。这套对象是 Wiles 证明 Fermat 大定理（链回 ch24）的核心工具——他证的是"<em>椭圆曲线的 \(p\)-adic Galois 表示等同于某模形式的 \(p\)-adic Galois 表示</em>"。</p>
+
+<p><strong>2. \(p\)-adic 解析几何（Tate, Berkovich）。</strong>Tate 1962 年发现椭圆曲线在 \(\mathbb{Q}_p\) 上有"<em>\(p\)-adic 解析化</em>"——\(E(\mathbb{Q}_p) \cong \mathbb{Q}_p^* / q^{\mathbb{Z}}\)（\(q\) 是某 \(p\)-adic 数）。这把代数对象（曲线）和分析对象（商群）联系起来，开启了"<em>非阿基米德解析几何</em>" 这个学科。</p>
+
+<p><strong>3. \(p\)-adic \(L\)-函数。</strong>实 \(L\)-函数（链回 ch15）的 \(p\)-adic 类比。Iwasawa 1960 年代构造了 \(p\)-adic \(\zeta\) 函数 \(\zeta_p(s)\)，让 BSD 猜想有了"<em>\(p\)-adic 版本</em>"。这条路径是当代算术几何最活跃的方向之一。</p>
+
+<p><strong>4. \(p\)-adic Hodge 理论（Fontaine）。</strong>把 Hodge 分解（复几何里"\(H^n_{\mathrm{dR}} = \bigoplus H^{p,q}\)"）搬到 \(p\)-adic 域。这是 1980 年代 Fontaine 创立的庞大领域，现在是任何严肃研究 Galois 表示的人的必修课。Fields 奖得主 Scholze 的"<em>perfectoid 空间</em>" 是这套理论的现代化。</p>
+
+<p>从一个"<em>换一种距离</em>" 的小想法开始，长出整个现代数论 / 算术几何的庞大世界。这就是 Hensel 1897 年提出 \(p\)-adic 数时谁也没料到的事。</p>
+
+<p>下一章我们换主题——回到具体方程 \(y^2 = x^3 + ax + b\)，看它的<em>有理解</em> 集合怎么自然成为一个<em>群</em>。这就是椭圆曲线，是现代数论第二大支柱（\(p\)-adic 数和椭圆曲线在 ch24 Wiles 路径里会汇流）。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 二元二次型与类数</a><a href="ch19.html">下一章 · 第 19 章 椭圆曲线引论 →</a></nav>
+</main>
+</body>
+</html>

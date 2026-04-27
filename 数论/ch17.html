@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 二元二次型与类数 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 素数定理证明思路</a><a href="ch18.html">下一章 · 第 18 章 \(p\)-adic 数入门 →</a></nav>
+<h1 id="ch17">第 17 章 二元二次型与类数</h1>
+
+<p>请你先回想一个老问题：哪些整数能写成两个平方的和 \(n = a^2 + b^2\)？<a href="ch13.html">第 13 章</a>用高斯整数 \(\mathbb{Z}[i]\) 给了一个干净答案——\(n\) 能写成两平方和当且仅当 \(n\) 的每个 \(p \equiv 3 \pmod 4\) 类素因子都<em>偶次</em>出现。这条结果背后是 \(\mathbb{Z}[i]\) 是 UFD（唯一分解整环）。</p>
+
+<p>这一章我们换一道更刁的题：哪些整数能写成 \(n = a^2 + 5 b^2\)？这道看似只把 1 换成 5 的小改动会把"<em>唯一分解</em>" 这条工具直接打破——\(\mathbb{Z}[\sqrt{-5}]\) <em>不</em>是 UFD。整套表方法跟着崩。但崩的方式自己是一段非常深的故事——它催生了 Gauss 的<em>类数</em>理论，催生了 Dedekind 的<em>理想</em>概念，最终催生了整个代数数论。这一章我们沿这条 \(a^2 + 5 b^2\) 的窄路走进去。</p>
+
+<h2 id="sec17-1">17.1 三张表：\(a^2 + b^2\) vs \(a^2 + 2 b^2\) vs \(a^2 + 5 b^2\)</h2>
+
+<p>把小素数 \(p \le 50\) 都试一遍，看每个是否能写成下面三种形式之一。我们只看素数（合数会让规律糊掉）。</p>
+
+<p><strong>第 1 张表：\(p = a^2 + b^2\)。</strong></p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(p\)</th><th style="padding: 0.3em 1em;">\(a, b\)</th><th style="padding: 0.3em 1em;">\(p \bmod 4\)</th></tr>
+<tr><td>2</td><td>\(1, 1\)</td><td>2</td></tr>
+<tr><td>3</td><td>—</td><td>3</td></tr>
+<tr><td>5</td><td>\(1, 2\)</td><td>1</td></tr>
+<tr><td>7</td><td>—</td><td>3</td></tr>
+<tr><td>11</td><td>—</td><td>3</td></tr>
+<tr><td>13</td><td>\(2, 3\)</td><td>1</td></tr>
+<tr><td>17</td><td>\(1, 4\)</td><td>1</td></tr>
+<tr><td>19</td><td>—</td><td>3</td></tr>
+<tr><td>23</td><td>—</td><td>3</td></tr>
+<tr><td>29</td><td>\(2, 5\)</td><td>1</td></tr>
+<tr><td>31</td><td>—</td><td>3</td></tr>
+<tr><td>37</td><td>\(1, 6\)</td><td>1</td></tr>
+<tr><td>41</td><td>\(4, 5\)</td><td>1</td></tr>
+<tr><td>43</td><td>—</td><td>3</td></tr>
+<tr><td>47</td><td>—</td><td>3</td></tr>
+</table>
+
+<p>规律一眼看穿：<em>能写成两平方和的 \(p\) 恰好是 \(p \equiv 1 \pmod 4\) 的（加上 \(p = 2\)）</em>。这就是 ch13 的 Fermat-Euler 定理。</p>
+
+<p><strong>第 2 张表：\(p = a^2 + 2 b^2\)。</strong></p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(p\)</th><th style="padding: 0.3em 1em;">\(a, b\)</th><th style="padding: 0.3em 1em;">\(p \bmod 8\)</th></tr>
+<tr><td>2</td><td>\(0, 1\)</td><td>2</td></tr>
+<tr><td>3</td><td>\(1, 1\)</td><td>3</td></tr>
+<tr><td>5</td><td>—</td><td>5</td></tr>
+<tr><td>7</td><td>—</td><td>7</td></tr>
+<tr><td>11</td><td>\(3, 1\)</td><td>3</td></tr>
+<tr><td>13</td><td>—</td><td>5</td></tr>
+<tr><td>17</td><td>\(3, 2\)</td><td>1</td></tr>
+<tr><td>19</td><td>\(1, 3\)</td><td>3</td></tr>
+<tr><td>23</td><td>—</td><td>7</td></tr>
+<tr><td>29</td><td>—</td><td>5</td></tr>
+<tr><td>31</td><td>—</td><td>7</td></tr>
+<tr><td>37</td><td>—</td><td>5</td></tr>
+<tr><td>41</td><td>\(3, 4\)</td><td>1</td></tr>
+<tr><td>43</td><td>\(5, 3\)</td><td>3</td></tr>
+<tr><td>47</td><td>—</td><td>7</td></tr>
+</table>
+
+<p>规律：<em>能写成 \(a^2 + 2b^2\) 的 \(p\) 恰好是 \(p \equiv 1, 3 \pmod 8\) 的</em>。证明同样用类似 \(\mathbb{Z}[i]\) 的工具——\(\mathbb{Z}[\sqrt{-2}]\) 也是 UFD。规律虽换到 mod 8，但<em>仍然是某个模条件</em>。</p>
+
+<p><strong>第 3 张表：\(p = a^2 + 5 b^2\)。</strong>这一张是这一章的主角。</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(p\)</th><th style="padding: 0.3em 1em;">\(a, b\)</th><th style="padding: 0.3em 1em;">\(p \bmod 20\)</th></tr>
+<tr><td>2</td><td>—</td><td>2</td></tr>
+<tr><td>3</td><td>—</td><td>3</td></tr>
+<tr><td>5</td><td>\(0, 1\)</td><td>5</td></tr>
+<tr><td>7</td><td>—</td><td>7</td></tr>
+<tr><td>11</td><td>—</td><td>11</td></tr>
+<tr><td>13</td><td>—</td><td>13</td></tr>
+<tr><td>17</td><td>—</td><td>17</td></tr>
+<tr><td>19</td><td>—</td><td>19</td></tr>
+<tr><td>23</td><td>—</td><td>3</td></tr>
+<tr><td>29</td><td>\(3, 2\)</td><td>9</td></tr>
+<tr><td>31</td><td>—</td><td>11</td></tr>
+<tr><td>37</td><td>—</td><td>17</td></tr>
+<tr><td>41</td><td>\(6, 1\)</td><td>1</td></tr>
+<tr><td>43</td><td>—</td><td>3</td></tr>
+<tr><td>47</td><td>—</td><td>7</td></tr>
+<tr><td>61</td><td>\(4, 3\)</td><td>1</td></tr>
+<tr><td>89</td><td>\(3, 4\)</td><td>9</td></tr>
+</table>
+
+<p>规律——能表的 \(p\) 似乎集中在 \(p \equiv 1, 9 \pmod{20}\)。验证更多——\(p = 101 = 81 + 20 = 9^2 + 5 \cdot 2^2\)，\(101 \equiv 1\)；\(p = 109 = 4 + 105\) 不行，\(= 64 + 45 = 8^2 + 5 \cdot 3^2 \checkmark\)，\(109 \equiv 9\)。</p>
+
+<p>但停一下——\(p \equiv 3, 7 \pmod{20}\) 的素数（\(3, 7, 23, 43, 47, \ldots\)）<em>都</em>不能表。它们能不能用<em>另一个</em>形式表呢？试 \(2 a^2 + 2 ab + 3 b^2\)：</p>
+
+<ul>
+  <li>\(3 = 2 \cdot 0^2 + 2 \cdot 0 \cdot 1 + 3 \cdot 1^2\)。可以。</li>
+  <li>\(7 = 2 \cdot 1^2 + 2 \cdot 1 \cdot 1 + 3 \cdot 1^2\)。可以。</li>
+  <li>\(23 = 2 \cdot 1^2 + 2 \cdot 1 \cdot (-3) + 3 \cdot 3^2 = 2 - 6 + 27\)。可以。</li>
+  <li>\(43 = 2 \cdot 4^2 + 2 \cdot 4 \cdot 1 + 3 \cdot 1^2 = 32 + 8 + 3\)。可以。</li>
+</ul>
+
+<p>请你停下来感受这件事的<em>怪</em>。判别式相同（都是 \(-20\)）的两种"二次型" \(x^2 + 5 y^2\) 和 \(2 x^2 + 2 xy + 3 y^2\) 各自表示一<em>半</em>素数——按 \(p \bmod 20\) 分类：\(\{1, 9\}\) 那一半归第一型，\(\{3, 7\}\) 那一半归第二型。这种"<em>判别式给一族形式</em>" + "<em>每族里有几个不同的形式</em>" 正是这一章要建立的语言。</p>
+
+<p>而<em>有几个不同的形式</em> 这个数有名字——叫<strong>类数</strong> \(h(D)\)，是这章核心不变量。\(h(-4) = 1\)（只有 \(x^2 + y^2\)），\(h(-8) = 1\)（只有 \(x^2 + 2 y^2\)），但 \(h(-20) = 2\)（既要 \(x^2 + 5 y^2\) 又要 \(2 x^2 + 2 xy + 3 y^2\)）。</p>
+
+<p>这"<em>从 1 跳到 2</em>" 不是数据的偶然——它是 \(\mathbb{Z}[\sqrt{-5}]\) <em>不</em>是 UFD 的<em>定量</em>体现。我们慢慢挖。</p>
+
+<h2 id="sec17-2">17.2 二元二次型：定义与判别式</h2>
+
+<p>把上面遇到的对象正式命名。一个<strong>二元二次型</strong>是关于两个变量 \(x, y\) 的齐次二次多项式：</p>
+
+<p>\[
+f(x, y) = a x^2 + b xy + c y^2, \quad a, b, c \in \mathbb{Z}.
+\]</p>
+
+<p>它的<strong>判别式</strong>定义为</p>
+
+<p>\[
+\boxed{\ D := b^2 - 4 ac.\ }
+\]</p>
+
+<p>判别式来自配方的副产物——把 \(f\) 完成平方：</p>
+
+<p>\[
+4 a f(x, y) = (2 a x + b y)^2 - (b^2 - 4 ac) y^2 = (2 a x + b y)^2 - D y^2.
+\]</p>
+
+<p>所以 \(f\) 的<em>正负</em>性完全由 \(D\) 和 \(a\) 决定：</p>
+
+<ul>
+  <li>\(D < 0\) 且 \(a > 0\)：\(f(x, y) > 0\) 对所有 \((x, y) \neq (0, 0)\)。叫<em>正定</em>。本章只讨论这种。</li>
+  <li>\(D < 0\) 且 \(a < 0\)：负定，乘 \(-1\) 化归正定。</li>
+  <li>\(D > 0\)：\(f\) 既取正值又取负值，叫<em>不定</em>。处理方式不同（链回连分数 + Pell 方程，<a href="ch12.html">ch12</a>）。</li>
+  <li>\(D = 0\)：退化（\(f\) 是完全平方）。</li>
+</ul>
+
+<p>具体例子：</p>
+
+<ul>
+  <li>\(x^2 + y^2\)：\(a = c = 1, b = 0\)，\(D = -4\)。</li>
+  <li>\(x^2 + 2 y^2\)：\(D = -8\)。</li>
+  <li>\(x^2 + 5 y^2\)：\(D = -20\)。</li>
+  <li>\(2 x^2 + 2 xy + 3 y^2\)：\(a = 2, b = 2, c = 3\)，\(D = 4 - 24 = -20\)。</li>
+</ul>
+
+<p>注意：<em>\(D = -20\) 对应两个不同的形式</em>。这是 17.1 节看到的现象的代数表达。</p>
+
+<p>判别式还有一个重要约束——\(D = b^2 - 4 ac\) 总满足 \(D \equiv 0\) 或 \(1 \pmod 4\)（因为 \(b^2 \bmod 4 \in \{0, 1\}\)）。这条限制告诉你哪些 \(D\) 能成为二次型的判别式：\(D \equiv 0, 1 \pmod 4\)。其他 \(D\) 不出现。</p>
+
+<h2 id="sec17-3">17.3 等价性：把"换变量"算成同一型</h2>
+
+<p>问题：\(x^2 + y^2\) 和 \((x + y)^2 + y^2 = x^2 + 2 xy + 2 y^2\) 是不是"<em>同一</em>" 二次型？</p>
+
+<p>把 \((x, y)\) 换成 \((x + y, y)\) 是个可逆整数变量替换：</p>
+
+<p>\[
+\begin{pmatrix} x' \\ y' \end{pmatrix} = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix}.
+\]</p>
+
+<p>这个矩阵 \(M = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}\) 满足 \(\det M = 1\)，且 \(M^{-1} = \begin{pmatrix} 1 & -1 \\ 0 & 1 \end{pmatrix}\) 也是整数矩阵——所以替换是双向的。两个表达式表示的整数集合<em>完全一样</em>：\(n\) 能用 \(x^2 + y^2\) 表 \(\iff\) \(n\) 能用 \(x^2 + 2 xy + 2 y^2\) 表。这两个二次型应该被算成"<em>同一个</em>"。</p>
+
+<p>正式定义：两个二次型 \(f, g\) <strong>等价</strong>（写 \(f \sim g\)），如果存在 \(M = \begin{pmatrix} \alpha & \beta \\ \gamma & \delta \end{pmatrix} \in \mathrm{SL}_2(\mathbb{Z})\)（即整数矩阵，\(\det M = \alpha \delta - \beta \gamma = 1\)）使</p>
+
+<p>\[
+g(x, y) = f(\alpha x + \beta y, \ \gamma x + \delta y).
+\]</p>
+
+<p>选 \(\det = +1\)（不允许 \(-1\)）让等价类带"<em>方向</em>"，叫<em>狭义等价</em>。Gauss 用这个版本。也有<em>宽义等价</em>（\(\det = \pm 1\)，即 \(\mathrm{GL}_2(\mathbb{Z})\) 作用），后者把 \(f(x, y)\) 和 \(f(x, -y)\) 算同。本章用狭义。</p>
+
+<p>关键性质：<em>等价的二次型有相同的判别式 + 相同的"被表示集"</em>。判别式相同因为 \(D = -4 \det A_f\)，\(A_f\) 是 \(f\) 的对称矩阵 \(\begin{pmatrix} a & b/2 \\ b/2 & c \end{pmatrix}\)（容许半整数项是因为 \(b\) 不一定偶——但 \(2 A_f\) 是整数矩阵）；变换后矩阵变成 \(M^T A_f M\)，行列式不变（\(\det M = 1\)）。被表示集相同因为变量替换是双射。</p>
+
+<p>所以"<em>哪些 \(n\) 能被 \(f\) 表</em>" 这件事只依赖 \(f\) 的等价类，不依赖具体的 \((a, b, c)\)。我们要研究的是<em>等价类</em>，不是单个二次型。</p>
+
+<h2 id="sec17-4">17.4 既约形式：每个等价类里挑一个标准代表</h2>
+
+<p>一个等价类有无穷个二次型——\(\mathrm{SL}_2(\mathbb{Z})\) 是无穷群。我们想每类里挑<em>一个</em>"<em>最简</em>" 代表。这就是<strong>既约形式</strong>。</p>
+
+<p>对正定二次型 \(f = a x^2 + b xy + c y^2\)（\(D < 0\), \(a > 0\)），既约定义为：</p>
+
+<p>\[
+\boxed{\ |b| \le a \le c, \quad \text{且若 } |b| = a \text{ 或 } a = c \text{ 则 } b \ge 0.\ }
+\]</p>
+
+<p>第一个条件让<em>系数最小</em>，第二个解决边界处的二选一歧义（避免重复计数）。</p>
+
+<p><strong>定理（Gauss）。</strong>每个正定二次型等价于<em>恰好一个</em>既约形式。</p>
+
+<p>证明思路（不严格、给直觉）：用两个基本变换——</p>
+
+<ul>
+  <li>\(T = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}\)：把 \(f(x, y)\) 换成 \(f(-y, x) = c x^2 - b xy + a y^2\)。即<em>交换 \(a \leftrightarrow c\) 同时翻 \(b \to -b\)</em>。</li>
+  <li>\(S_n = \begin{pmatrix} 1 & n \\ 0 & 1 \end{pmatrix}\)：把 \(f(x, y)\) 换成 \(f(x + n y, y) = a x^2 + (b + 2 a n) x y + (\text{某个 } c')\)。即<em>把 \(b\) 加上 \(2 a n\)</em>（同时 \(c\) 跟着调）。</li>
+</ul>
+
+<p>策略：先用 \(S_n\) 把 \(b\) 调到 \(|b| \le a\)（即 \(b\) 落在 \([-a, a]\) 内）。如果此时 \(a > c\)，用 \(T\) 交换 \(a, c\)。重复直到稳定。每次 \(T\) 操作让 \(a\) 严格减小（因为 \(c < a\) 后交换让新 \(a\) 更小）；\(a\) 是正整数，不能无限减——必终止。</p>
+
+<p>这是个具体的<em>归约算法</em>，叫"<em>Gauss 归约</em>"。它在二次型里的作用类似 Euclid 算法在整数里的作用。</p>
+
+<p>例子：归约 \(f = 7 x^2 + 14 xy + 9 y^2\)，\(D = 196 - 252 = -56\)。</p>
+
+<p>第 1 步：\(|b| = 14 > a = 7\)，先用 \(S_n\) 调。\(b' = b + 2 a n = 14 + 14 n\)。取 \(n = -1\)：\(b' = 0\)，\(c' = c + b n + a n^2 = 9 - 14 + 7 = 2\)。新型 \(7 x^2 + 0 \cdot xy + 2 y^2 = 7 x^2 + 2 y^2\)。</p>
+
+<p>第 2 步：\(a = 7, c = 2\)，\(a > c\)。用 \(T\) 交换：新型 \(2 x^2 + 0 \cdot xy + 7 y^2 = 2 x^2 + 7 y^2\)。</p>
+
+<p>第 3 步：\(|b| = 0 \le a = 2 \le c = 7\)，且 \(b = 0 \ge 0\)。<em>既约</em>。</p>
+
+<p>所以 \(7 x^2 + 14 xy + 9 y^2 \sim 2 x^2 + 7 y^2\)。验证判别式：\(0 - 4 \cdot 2 \cdot 7 = -56\)。\(\checkmark\)</p>
+
+<p><strong>定理（既约形式的有限性）。</strong>对任何固定的 \(D < 0\)，判别式为 \(D\) 的既约正定二次型只<em>有限多</em>。</p>
+
+<p>证明：既约条件给 \(|b| \le a \le c\)。所以 \(|D| = 4 ac - b^2 \ge 4 a^2 - a^2 = 3 a^2\)，即 \(a \le \sqrt{|D|/3}\)。\(a\) 的可能值有限。对每个 \(a\)，\(b\) 满足 \(|b| \le a\)，可能值有限。\(c\) 由 \(a, b, D\) 唯一定（\(c = (b^2 - D) / (4 a)\)，且要求是正整数）。所以三元组 \((a, b, c)\) 有限。</p>
+
+<p>这个有限数有名字。</p>
+
+<h2 id="sec17-5">17.5 类数 \(h(D)\)</h2>
+
+<p><strong>定义。</strong>判别式为 \(D\) 的<em>既约正定二次型个数</em>叫<strong>类数</strong>，记 \(h(D)\)。</p>
+
+<p>等价地：\(h(D)\) 是判别式为 \(D\) 的正定二次型在 \(\mathrm{SL}_2(\mathbb{Z})\) 等价下的<em>等价类个数</em>。</p>
+
+<p>具体计算几个：</p>
+
+<p><strong>\(D = -4\)。</strong>\(a \le \sqrt{4/3} \approx 1.15\)，所以 \(a = 1\)。\(|b| \le 1\)，\(b \in \{-1, 0, 1\}\)。\(c = (b^2 + 4) / 4\) 要是正整数：</p>
+<ul>
+  <li>\(b = 0\)：\(c = 1\)。形式 \(x^2 + y^2\)。\(\checkmark\)</li>
+  <li>\(b = \pm 1\)：\(c = 5/4\)，非整数。\(\times\)</li>
+</ul>
+<p>所以 \(h(-4) = 1\)，唯一既约形式 \(x^2 + y^2\)。</p>
+
+<p><strong>\(D = -8\)。</strong>\(a \le \sqrt{8/3} \approx 1.63\)，所以 \(a = 1\)。\(b \in \{-1, 0, 1\}\)，\(c = (b^2 + 8)/4\)：</p>
+<ul>
+  <li>\(b = 0\)：\(c = 2\)。形式 \(x^2 + 2 y^2\)。\(\checkmark\)</li>
+  <li>\(b = \pm 1\)：\(c = 9/4\)，非整数。\(\times\)</li>
+</ul>
+<p>\(h(-8) = 1\)，唯一形式 \(x^2 + 2 y^2\)。</p>
+
+<p><strong>\(D = -20\)。</strong>\(a \le \sqrt{20/3} \approx 2.58\)，所以 \(a \in \{1, 2\}\)。</p>
+
+<p>\(a = 1\)：\(|b| \le 1\)，\(c = (b^2 + 20)/4\)。\(b = 0 \Rightarrow c = 5\)。形式 \(x^2 + 5 y^2\)。\(\checkmark\) \(b = \pm 1 \Rightarrow c = 21/4\)，不行。</p>
+
+<p>\(a = 2\)：\(|b| \le 2\)，\(c = (b^2 + 20)/8\)。\(b = 0 \Rightarrow c = 5/2\)，不行。\(b = \pm 1 \Rightarrow c = 21/8\)，不行。\(b = \pm 2 \Rightarrow c = 24/8 = 3\)。需要 \(a \le c\)（满足）+ 边界条件。\(|b| = a = 2\) 时要 \(b \ge 0\)，所以选 \(b = 2\)。形式 \(2 x^2 + 2 xy + 3 y^2\)。\(\checkmark\)</p>
+
+<p>所以 \(h(-20) = 2\)，两个既约形式 \(x^2 + 5 y^2\) 和 \(2 x^2 + 2 xy + 3 y^2\)——正是 17.1 节看到的两族。<em>类数 = 2 解释了为什么 \(p \equiv 1, 9 \pmod{20}\) 走第一型而 \(p \equiv 3, 7 \pmod{20}\) 走第二型</em>——一族不够用，必须两族分担。</p>
+
+<p>更多例子（不一一推导，结果记住即可）：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(D\)</th><th style="padding: 0.3em 1em;">\(h(D)\)</th><th style="padding: 0.3em 1em;">既约形式</th></tr>
+<tr><td>\(-3\)</td><td>1</td><td>\(x^2 + xy + y^2\)</td></tr>
+<tr><td>\(-4\)</td><td>1</td><td>\(x^2 + y^2\)</td></tr>
+<tr><td>\(-7\)</td><td>1</td><td>\(x^2 + xy + 2 y^2\)</td></tr>
+<tr><td>\(-8\)</td><td>1</td><td>\(x^2 + 2 y^2\)</td></tr>
+<tr><td>\(-11\)</td><td>1</td><td>\(x^2 + xy + 3 y^2\)</td></tr>
+<tr><td>\(-15\)</td><td>2</td><td>\(x^2 + xy + 4 y^2\), \(2 x^2 + xy + 2 y^2\)</td></tr>
+<tr><td>\(-19\)</td><td>1</td><td>\(x^2 + xy + 5 y^2\)</td></tr>
+<tr><td>\(-20\)</td><td>2</td><td>\(x^2 + 5 y^2\), \(2 x^2 + 2 xy + 3 y^2\)</td></tr>
+<tr><td>\(-23\)</td><td>3</td><td>\(x^2 + xy + 6 y^2\), \(2 x^2 \pm xy + 3 y^2\)</td></tr>
+<tr><td>\(-43\)</td><td>1</td><td>\(x^2 + xy + 11 y^2\)</td></tr>
+<tr><td>\(-67\)</td><td>1</td><td>\(x^2 + xy + 17 y^2\)</td></tr>
+<tr><td>\(-163\)</td><td>1</td><td>\(x^2 + xy + 41 y^2\)</td></tr>
+</table>
+
+<p>"<em>什么时候 \(h(D) = 1\)</em>" 这个问题特别神秘——后面 17.8 节单独讨论。</p>
+
+<h2 id="sec17-6">17.6 类数 = 类群的大小（链回抽象代数）</h2>
+
+<p>到这里"<em>类数</em>" 是个数。但它的<em>真</em>意义是它<em>在数</em>一个群的元素数——这个群叫<strong>类群</strong>，记 \(\mathrm{Cl}(D)\)。</p>
+
+<p>类群从哪儿来？回到 \(\mathbb{Z}[\sqrt{-5}]\)（更一般地：判别式 \(D\) 对应的<em>二次整数环</em> \(\mathcal{O}_D\)）。这环不是 UFD——典型例子</p>
+
+<p>\[
+6 = 2 \cdot 3 = (1 + \sqrt{-5})(1 - \sqrt{-5}).
+\]</p>
+
+<p>左右两种分解都不可再约（要严格证 \(2, 3, 1 \pm \sqrt{-5}\) 在 \(\mathbb{Z}[\sqrt{-5}]\) 里是不可约元，但容易），且<em>两边的因子互不相伴</em>（差一个单位倍）。所以 \(6\) 有<em>两种本质不同的不可约分解</em>——UFD 失败。</p>
+
+<p>Dedekind 的天才解决方案（1871）：把"<em>数</em>" 换成"<em>理想</em>"。在 \(\mathbb{Z}[\sqrt{-5}]\) 中：</p>
+
+<p>\[
+(2) = \mathfrak{p}_2^2, \quad (3) = \mathfrak{p}_3 \mathfrak{p}_3', \quad (1 + \sqrt{-5}) = \mathfrak{p}_2 \mathfrak{p}_3, \quad (1 - \sqrt{-5}) = \mathfrak{p}_2 \mathfrak{p}_3'.
+\]</p>
+
+<p>这里 \(\mathfrak{p}_2 = (2, 1 + \sqrt{-5})\)、\(\mathfrak{p}_3 = (3, 1 + \sqrt{-5})\)、\(\mathfrak{p}_3' = (3, 1 - \sqrt{-5})\) 是<em>素理想</em>（不一定主理想）。两边算 \((6) = \mathfrak{p}_2^2 \cdot \mathfrak{p}_3 \mathfrak{p}_3' = (2) \cdot (3)\)，也 \(= \mathfrak{p}_2 \mathfrak{p}_3 \cdot \mathfrak{p}_2 \mathfrak{p}_3' = (1 + \sqrt{-5})(1 - \sqrt{-5})\)。<em>理想分解唯一</em>（即使元素分解不唯一）。</p>
+
+<p>这个"<em>理想唯一分解</em>" 是 Dedekind 域的定义。代价是出现了"<em>非主理想</em>" \(\mathfrak{p}_2\)（不存在 \(\alpha \in \mathbb{Z}[\sqrt{-5}]\) 使 \(\mathfrak{p}_2 = (\alpha)\)）。</p>
+
+<p>把"<em>分式理想模主理想</em>" 商出来，得到的群就是<strong>类群</strong>：</p>
+
+<p>\[
+\mathrm{Cl}(\mathcal{O}_D) := \{\text{分式理想}\} / \{\text{主理想}\}.
+\]</p>
+
+<p>\(\mathrm{Cl}\) 的大小衡量"<em>有多少非主理想</em>" / "<em>UFD 失败的程度</em>"。</p>
+
+<ul>
+  <li>\(\mathrm{Cl} = \{1\}\)（平凡）⟺ 每个理想都是主理想 ⟺ \(\mathcal{O}_D\) 是 PID ⟺ \(\mathcal{O}_D\) 是 UFD（对 Dedekind 域两条等价，链回<a href="../抽象代数/ch14.html">抽象代数 ch14</a>）。</li>
+  <li>\(\mathrm{Cl}\) 越大，"<em>非主理想越多</em>"，UFD 越失败。</li>
+</ul>
+
+<p><strong>定理（Gauss / 后人现代化）。</strong>\(h(D) = |\mathrm{Cl}(\mathcal{O}_D)|\)。</p>
+
+<p>"<em>既约二次型个数</em>" = "<em>理想类群的大小</em>"。两个看起来八竿子打不着的对象（一个是配方系数的归约结果，一个是抽象代数里的商群）<em>是同一个数</em>。这是 Gauss-Dedekind-Dedekind 跨 70 年才完全建立的桥。</p>
+
+<p>这条对应不仅是数相等——它是<em>同一群结构</em>。两个二次型的"<em>合成</em>"（Gauss composition，技术细节略）对应两个理想类相乘——既约二次型的等价类<em>本身</em>构成一个群（同构于 \(\mathrm{Cl}(\mathcal{O}_D)\)）。这个发现让二次型理论从"<em>分类问题</em>" 升级为"<em>群论问题</em>"，是 19 世纪代数数论起飞的关键。</p>
+
+<h2 id="sec17-7">17.7 \(h = 1\)：唯一分解 + 简单表示准则</h2>
+
+<p>当 \(h(D) = 1\)，类群平凡，\(\mathcal{O}_D\) 是 UFD。这时"<em>哪些 \(p\) 能用 \(D\) 的（唯一）形式表</em>" 有简单准则——把"<em>能表</em>" 翻译为"<em>素数 \(p\) 在 \(\mathcal{O}_D\) 中分裂</em>"。</p>
+
+<p>对 \(D = -4\)（\(\mathcal{O} = \mathbb{Z}[i]\)，\(h = 1\)）：</p>
+
+<p>\[
+p = a^2 + b^2 \iff p \text{ 在 } \mathbb{Z}[i] \text{ 中分裂} \iff p \equiv 1 \pmod 4 \text{ 或 } p = 2.
+\]</p>
+
+<p>这是 ch13 已证。</p>
+
+<p>对 \(D = -8\)（\(\mathcal{O} = \mathbb{Z}[\sqrt{-2}]\)，\(h = 1\)）：</p>
+
+<p>\[
+p = a^2 + 2 b^2 \iff p \equiv 1, 3 \pmod 8 \text{ 或 } p = 2.
+\]</p>
+
+<p>对 \(D = -7\)（\(\mathcal{O} = \mathbb{Z}[(1 + \sqrt{-7})/2]\)，\(h = 1\)）：</p>
+
+<p>\[
+p = x^2 + xy + 2 y^2 \iff p \equiv 1, 2, 4 \pmod 7.
+\]</p>
+
+<p>统一模式：\(h = 1\) 时，"<em>哪些 \(p\) 能表</em>" 由 \(p\) 在 \((\mathbb{Z}/|D|)^*\) 里某个特定子群里决定——即<em>纯模条件</em>。这就是 ch13 那种"\(p \equiv 1 \pmod 4\)" 类规则的一般化。</p>
+
+<p>但当 \(h(D) > 1\)，模条件<em>不够</em>了。\(D = -20\) 时 \(p \equiv 1 \pmod{20}\) 和 \(p \equiv 9 \pmod{20}\) 走第一型，\(p \equiv 3, 7\) 走第二型——两类<em>都</em>满足"<em>是 mod 20 二次剩余</em>" 这个模条件，但只有一半属于 \(x^2 + 5 y^2\) 的范围。模条件能告诉你 \(p\) 是否被<em>某个</em>判别式 \(D\) 的二次型表，<em>但不能告诉你具体走哪一型</em>——这后者需要类群信息。</p>
+
+<p>用现代术语：判断"\(p\) 由哪一型表" 的完整规则需要<em>类域论</em>（<a href="ch22.html">ch22</a>）——\(p\) 在 \(D\) 的<em>Hilbert 类域</em> 里如何分裂决定它走哪一型。这是把"<em>二次型表示</em>" 推到极致的现代版本，也是 Gauss-Dedekind-Hilbert-Takagi 一百年发展的最终形态。</p>
+
+<h2 id="sec17-8">17.8 几个具体值 + Gauss 类数问题</h2>
+
+<p>所有判别式 \(D < 0\) 中 \(h(D) = 1\) 的有几个？</p>
+
+<p>Gauss 在《算术研究》（1801）里把虚二次域的类数表算到 \(D\) 几千，注意到一个奇特规律：<em>\(h(D) = 1\) 的 \(D\) 极少</em>。他列出了 9 个：</p>
+
+<p>\[
+D \in \{-3, -4, -7, -8, -11, -19, -43, -67, -163\}.
+\]</p>
+
+<p>（如果用"<em>基本判别式</em>" 这个稍精细的概念，列表正好 9 个；其他 \(h = 1\) 的形态都是这 9 个的"<em>非基本</em>" 版本。这个技术细节我们略。）</p>
+
+<p>Gauss 猜：<em>这 9 个就是全部</em>。他没法证。这是<strong>Gauss 类数 1 问题</strong>。</p>
+
+<p>整个 19 世纪没人能证。1934 年 Heilbronn 证明了"<em>除了上述 9 个之外至多还有有限多个</em>" + Heilbronn-Linfoot 把"<em>有限多</em>" 缩到"<em>至多 1 个</em>"。但这"<em>第 10 个</em>" 的存在性 / 不存在性还悬着。</p>
+
+<p>1952 年 Heegner（一个德国高中老师，业余数学家）发表论文宣称证明了"<em>第 10 个不存在</em>"。但他用了一些争议步骤，主流数学家不认可。</p>
+
+<p>1966 年 Stark 独立给了一个干净证明，1967 年发表。同年 Baker 用<em>线性形式对数下界</em>（这套理论让他获 Fields 奖）也独立给出证明。</p>
+
+<p>1968 年 Stark 重新审视 Heegner 的论文，<em>确认 Heegner 的证明本质正确</em>——只是当年的呈现方式让审稿人误判。Heegner 平反——他<em>真</em>是第一个证完的人，比公认证明早 14 年。这是数学史上"<em>圈外人被忽视</em>" 的著名案例。</p>
+
+<p>Stark-Heegner 定理最终陈述：<em>虚二次域 \(\mathbb{Q}(\sqrt{D})\)（\(D < 0\)）类数为 1 的恰好是 \(D \in \{-3, -4, -7, -8, -11, -19, -43, -67, -163\}\)</em>。Gauss 250 年的猜测被证。</p>
+
+<p>类数 \(h(D) = 2\) 的 \(D\) 同样有限多（Gauss 给 18 个，后人证完）。\(h = 3\) 也有限。一般地：</p>
+
+<p><strong>定理（Heilbronn, Siegel）。</strong>\(\lim_{D \to -\infty} h(D) = \infty\)。</p>
+
+<p>即"<em>判别式越大，类数趋向越大</em>"——所以每个固定的 \(h\) 只对应有限多 \(D\)。但 Siegel 的证明<em>不有效</em>——它告诉你"<em>有限多</em>" 但<em>不</em>告诉你"<em>具体哪些</em>"。每个固定 \(h\) 的完整列表需要单独的有效定理。\(h \le 100\) 的完整列表已经搞定（Watkins 2004），更高需要更多工作。</p>
+
+<p>这个问题为什么这么难？根本原因是<em>类数和椭圆曲线 / 模形式的零点紧密相关</em>——具体地，\(h(D)\) 由 Dirichlet 类数公式</p>
+
+<p>\[
+h(D) = \frac{w \sqrt{|D|}}{2 \pi} L(1, \chi_D)
+\]</p>
+
+<p>给出（\(w\) 是 \(\mathcal{O}_D\) 的单位根数，\(\chi_D\) 是 \(D\) 对应的<em>二次特征</em>，\(L(s, \chi)\) 是 Dirichlet \(L\)-函数）。所以"<em>类数 = 1</em>" 等价于"<em>\(L(1, \chi_D)\) 取特定小值</em>"——而 \(L\) 函数的零点 / 值估计是解析数论里最难的一类问题（链回 ch16 \(\zeta\) 函数 + Riemann 假设）。Stark/Heegner/Baker 的证明本质上都是"<em>用 \(L\) 函数性质排除 \(D\) 的可能</em>"。</p>
+
+<p>请你最后停下来想一件事。本章开头的钩子是"<em>哪些 \(p\) 能写成 \(a^2 + 5 b^2\)</em>"——一个看似中学水平的小问题。可它的完整解答（"<em>\(p \equiv 1, 9 \pmod{20}\)</em>"）背后是判别式 + 等价 + 类数 + 类群——一个完整的代数结构层。再问"<em>什么时候 \(h(D) = 1\)</em>"——这个问题让 Gauss 250 年没解，让 19 世纪整个代数数论发展，让 1967 年 Stark / Heegner 用 \(L\) 函数才证完。</p>
+
+<p>整数表面平凡，骨子里复杂得超乎想象——这是 ch1 里说过的话。这一章是这句话最具体的证据。下一章我们换工具——把"<em>距离</em>" 重新定义，让"<em>整数</em>" 在一种全新的几何里出现。这就是 \(p\)-adic 数。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 素数定理证明思路</a><a href="ch18.html">下一章 · 第 18 章 \(p\)-adic 数入门 →</a></nav>
+</main>
+</body>
+</html>

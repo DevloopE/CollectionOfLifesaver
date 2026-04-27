@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 16 章 素数定理证明思路 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 Dirichlet 卷积与 L-级数引入</a><a href="ch17.html">下一章 · 第 17 章 二元二次型与类数 →</a></nav>
+<h1 id="ch16">第 16 章 素数定理证明思路</h1>
+
+<p><a href="ch1.html">第 1 章</a>给了一句话："素数定理 \(\pi(N) \sim N/\ln N\)，1896 年 Hadamard 和 de la Vallée-Poussin 同年独立证完。" 当时我让你接受这条结果。这一章我兑现承诺——给出证明的<em>主线</em>。</p>
+
+<p>"<em>主线</em>" 意思是关键想法 + 关键引理，不是逐步的精确证明。完整证明（带所有解析估计）容易在哲学上把人迷晕。我们做的事是：<em>让你看到为什么"素数分布" 和"复函数 $\zeta$ 的零点位置" 这两件看似无关的事是一回事</em>。这条联系是 19 世纪数论最深的发现，也是<a href="ch15.html">上一章</a>"<em>解析数论</em>" 这条路线最早的胜利果实。</p>
+
+<p>大致路线图：</p>
+
+<ul>
+  <li>16.1：把 \(\pi(N)\) 重新写成两个等价的求和 \(\theta, \psi\)。</li>
+  <li>16.2：\(\zeta(s)\) 在 \(\Re s > 1\) 收敛、解析延拓到 \(\mathbb{C} \setminus \{1\}\)、在 \(s = 1\) 处单极点。</li>
+  <li>16.3：<em>核心引理</em>：\(\zeta(s)\) 在 \(\Re s = 1\) 上没有零点。</li>
+  <li>16.4–16.5：从 16.3 推 \(\psi(N) \sim N\)，再推 \(\pi(N) \sim N/\ln N\)。</li>
+  <li>16.6：Riemann 假设——零点位置如何决定误差项。</li>
+  <li>16.7：现代视角——\(\zeta\) 是 GL_1 的自守 \(L\)-函数；Langlands 哲学。</li>
+</ul>
+
+<h2 id="sec16-1">16.1 三个等价的素数定理</h2>
+
+<p>素数定理有三种等价陈述。以后我们证最方便的那种 (\(\psi\))，再翻译回 \(\pi\)。</p>
+
+<p><strong>原始版（Gauss）</strong>：</p>
+
+<p>\[
+\pi(N) = \#\{p \le N : p \text{ 素}\} \sim \frac{N}{\log N}, \quad N \to \infty.
+\]</p>
+
+<p>"\(\sim\)" 表示 \(\lim_{N \to \infty} \pi(N) / (N / \log N) = 1\)。</p>
+
+<p><strong>Chebyshev \(\theta\) 版</strong>：</p>
+
+<p>\[
+\theta(N) = \sum_{p \le N} \log p \sim N.
+\]</p>
+
+<p>每个素数贡献 \(\log p\) 而非 1。</p>
+
+<p><strong>von Mangoldt \(\psi\) 版</strong>：</p>
+
+<p>\[
+\psi(N) = \sum_{p^k \le N} \log p = \sum_{n \le N} \Lambda(n) \sim N.
+\]</p>
+
+<p>这里 \(\Lambda(n) = \log p\) if \(n = p^k\) for some \(k \ge 1\)，否则 0（<a href="ch14.html">14.8 节</a>引入）。\(\psi\) 把素数和素幂一起算。</p>
+
+<p>三者等价：</p>
+
+<p><strong>\(\theta \sim N \Leftrightarrow \psi \sim N\)</strong>：\(\psi(N) - \theta(N) = \sum_{p^k \le N, k \ge 2} \log p\)。素方根贡献 \(\sum_{p \le \sqrt N} \log p \le \theta(\sqrt N) \le \sqrt N \cdot \log N\)（用粗估），更高次幂贡献更少。所以 \(\psi(N) - \theta(N) = O(\sqrt N \log N) = o(N)\)。<em>差是次主项</em>，所以两者主项一致。</p>
+
+<p><strong>\(\psi \sim N \Rightarrow \pi \sim N/\log N\)</strong>：用 Abel 求和把 \(\theta(N) = \sum_{p \le N} \log p\) 变换成 \(\pi\)：</p>
+
+<p>\[
+\theta(N) = \sum_{p \le N} \log p = \pi(N) \log N - \int_2^N \frac{\pi(t)}{t} dt.
+\]</p>
+
+<p>（标准 Abel 求和。）反过来 \(\pi(N) = \theta(N)/\log N + (\text{次项})\)，所以 \(\theta(N) \sim N \Rightarrow \pi(N) \sim N/\log N\)。</p>
+
+<p>三种陈述等价。我们之后只需证 <strong>\(\psi(N) \sim N\)</strong>。</p>
+
+<p><em>为什么 \(\psi\) 最方便</em>？因为 \(\psi\) 直接通过 \(\zeta\) 表达——14.8 节证明 \(\Lambda * \mathbf{1} = \log\)，等价 \(\sum_n \Lambda(n)/n^s = -\zeta'(s)/\zeta(s)\)（<a href="ch15.html">15.8 节</a>）。这条公式让 "\(\psi\) 的渐近" 直接映到 "\(\zeta\) 的解析性质"。</p>
+
+<h2 id="sec16-2">16.2 \(\zeta(s)\) 的解析延拓</h2>
+
+<p>本节列出 \(\zeta\) 必需的复变事实，不证。完整证明属于<a href="../复分析/index.html">复分析</a>课程。</p>
+
+<p><strong>事实 1（收敛）</strong>：\(\zeta(s) = \sum_{n \ge 1} 1/n^s\) 在半平面 \(\Re s > 1\) 绝对收敛，是个全纯函数。</p>
+
+<p>证：\(|1/n^s| = 1/n^{\Re s}\)；\(\sum 1/n^{\Re s}\) 在 \(\Re s > 1\) 收敛（\(p\) 级数）。所以原级数绝对收敛，每个分量是 \(s\) 的全纯函数（\(1/n^s = e^{-s \log n}\)），一致收敛保住全纯。</p>
+
+<p><strong>事实 2（解析延拓）</strong>：\(\zeta(s)\) 能延拓到整个 \(\mathbb{C} \setminus \{1\}\)，是亚纯函数。</p>
+
+<p>构造方法之一：函数方程 + 反射。Riemann 1859 给的恒等式</p>
+
+<p>\[
+\zeta(s) = 2^s \pi^{s - 1} \sin(\pi s / 2) \Gamma(1 - s) \zeta(1 - s).
+\]</p>
+
+<p>右边在 \(\Re s < 0\) 时由 \(\zeta(1 - s)\)（在 \(\Re(1 - s) > 1\) 即 \(\Re s < 0\) 时收敛）+ 已知 \(\Gamma\) 给出。这条函数方程让 \(\zeta\) 从 \(\Re s > 1\) 延到 \(\Re s < 0\)，中间的"<em>临界带</em>" \(0 \le \Re s \le 1\) 用其它方法（积分表示）填上。</p>
+
+<p><strong>事实 3（极点）</strong>：\(\zeta(s)\) 在 \(s = 1\) 处有<em>单极点</em>，留数 = 1。即 \(\zeta(s) \sim 1/(s - 1)\) 当 \(s \to 1\)。</p>
+
+<p>这跟调和级数 \(\sum 1/n\) 在 \(s = 1\) 处的发散对应——延拓后这个发散被装成"极点"。具体：</p>
+
+<p>\[
+\zeta(s) = \frac{1}{s - 1} + \gamma + O(s - 1),
+\]</p>
+
+<p>其中 \(\gamma \approx 0.5772\) 是 Euler-Mascheroni 常数。这个极点是<em>$\zeta$ 整个故事的引擎</em>——它对应"<em>素数无穷多</em>" 这条最朴素事实。</p>
+
+<p><strong>事实 4（平凡零点）</strong>：函数方程让 \(\zeta(s) = 0\) 在 \(s = -2, -4, -6, \ldots\) 处——这些叫"<em>平凡零点</em>"。它们由 \(\sin(\pi s / 2)\) 因子带来：\(s = -2k\) (\(k \ge 1\)) 处 \(\sin(\pi s / 2) = 0\)。</p>
+
+<p><strong>事实 5（非平凡零点）</strong>：除平凡零点外，\(\zeta\) 的所有零点都在<em>临界带</em> \(0 < \Re s < 1\) 内。这些叫"<em>非平凡零点</em>"。</p>
+
+<p>函数方程让非平凡零点关于 \(\Re s = 1/2\) 对称：\(\zeta(\rho) = 0 \Rightarrow \zeta(1 - \rho) = 0\)。</p>
+
+<p>已知前几个非平凡零点：\(s = 1/2 + 14.134\ldots i\)，\(s = 1/2 + 21.022\ldots i\)，\(s = 1/2 + 25.011\ldots i\)，等等。<em>它们已知都在临界线 $\Re s = 1/2$ 上</em>——但<em>"全部</em>非平凡零点都在 \(\Re s = 1/2\) 上"<em>未证</em>，那是 Riemann 假设。</p>
+
+<p>本章只用<em>临界带</em>这件事，加上下一节的"<em>$\Re s = 1$ 上无零点</em>"。后者是素数定理的关键。</p>
+
+<h2 id="sec16-3">16.3 关键引理：\(\zeta(s)\) 在 \(\Re s = 1\) 上无零点</h2>
+
+<p>这是整章的<em>钉子</em>。1896 年 Hadamard 和 de la Vallée-Poussin 同年独立给的——<em>素数定理</em> 的核心证明步骤。</p>
+
+<p><strong>定理</strong>：对所有实数 \(t \ne 0\)，\(\zeta(1 + it) \ne 0\)。</p>
+
+<p>等价：临界带的<em>右边界</em> \(\Re s = 1\) 上 \(\zeta\) 无零点（除了 \(s = 1\) 那个极点）。</p>
+
+<p><strong>证明思路（朴素三步）</strong>。</p>
+
+<p><strong>步 1</strong>：考虑 \(\Re s > 1\) 时</p>
+
+<p>\[
+\log \zeta(s) = -\sum_p \log(1 - p^{-s}) = \sum_p \sum_{k \ge 1} \frac{p^{-ks}}{k}.
+\]</p>
+
+<p>（用 Euler 乘积 + \(-\log(1 - x) = \sum_{k \ge 1} x^k / k\)。）</p>
+
+<p>所以</p>
+
+<p>\[
+\Re \log \zeta(s) = \log |\zeta(s)| = \sum_p \sum_k \frac{\cos(k t \log p)}{k p^{k \sigma}}
+\]</p>
+
+<p>当 \(s = \sigma + it\) (\(\sigma > 1\))。<em>$\log |\zeta|$ 是关于 cos 的求和</em>。</p>
+
+<p><strong>步 2</strong>：神奇不等式 \(3 + 4 \cos \theta + \cos 2\theta \ge 0\)。</p>
+
+<p>验证：\(3 + 4 \cos \theta + \cos 2\theta = 3 + 4 \cos \theta + 2 \cos^2 \theta - 1 = 2(1 + \cos \theta)^2 \ge 0\)。\(\checkmark\)</p>
+
+<p>这条恒等式来自一个完全平方。它的关键是<em>系数 $3, 4, 1$ 让组合成完全平方</em>。其它系数比如 \(1, 4, 1\) 不行。</p>
+
+<p><strong>步 3</strong>：把不等式套到 \(\zeta\) 上。设 \(s = \sigma + it\)，\(\theta = -t \log p\)：</p>
+
+<p>\[
+3 \log |\zeta(\sigma)| + 4 \log |\zeta(\sigma + it)| + \log |\zeta(\sigma + 2it)| = \sum_p \sum_k \frac{3 + 4 \cos(k t \log p) + \cos(2 k t \log p)}{k p^{k \sigma}} \ge 0.
+\]</p>
+
+<p>取指数：</p>
+
+<p>\[\boxed{\ |\zeta(\sigma)|^3 \cdot |\zeta(\sigma + it)|^4 \cdot |\zeta(\sigma + 2it)| \ge 1, \quad \sigma > 1, t \in \mathbb{R}.\ }\]</p>
+
+<p>这就是那条<em>神奇不等式</em>——是整段证明的钥匙。</p>
+
+<p><strong>反证假设 \(\zeta(1 + it_0) = 0\)</strong> 对某 \(t_0 \ne 0\)。由 \(\zeta\) 全纯，靠近 \(1 + it_0\) 时 \(\zeta(s)\) 像 \((s - (1 + it_0))^m\) 衰减到 0（\(m\) 是零点阶 \(\ge 1\)）。</p>
+
+<p>用 \(s = \sigma + it_0\) (\(\sigma \to 1^+\))：\(|\zeta(\sigma + it_0)|^4 \to 0\) 像 \((\sigma - 1)^{4m}\)。</p>
+
+<p>同时 \(|\zeta(\sigma)|^3 \to \infty\) 像 \(1/(\sigma - 1)^3\)（极点 \(s = 1\)）。</p>
+
+<p>\(|\zeta(\sigma + 2it_0)|\) 在 \(\sigma = 1\) 处<em>有限</em>（不在零点 / 极点处）。</p>
+
+<p>组合：左边 \(\to (\sigma - 1)^{4m - 3} \cdot \text{有限}\)。如果 \(m \ge 1\)，\(4m - 3 \ge 1 > 0\)，左边 \(\to 0\)，矛盾下界 \(\ge 1\)。\(\checkmark\)</p>
+
+<p>请你停下来感受一下这条证明的精神。它<em>把"$\zeta$ 在 $\Re s = 1$ 无零点" 这个深刻事实压成一个三角恒等式 + 一条朴素 cos 不等式</em>。"\(2(1 + \cos \theta)^2 \ge 0\)" 听起来像高中题——但它就是 19 世纪解析数论第一座大山的钥匙。</p>
+
+<p>这个证法叫<em>Mertens 不等式</em>（虽然 Mertens 用不同形式，Hadamard 整理成现代形）。它的<em>稳健性</em> 让相同手法对一般 \(L(s, \chi)\) 也奏效——为 Dirichlet 等差数列素数定理 + 非主特征 \(L(1, \chi) \ne 0\) 提供一致框架。</p>
+
+<h2 id="sec16-4">16.4 从 16.3 推 \(\psi(N) \sim N\)</h2>
+
+<p>这一步是<em>Tauberian 定理</em> 的应用。完整证明技术性强，我们给主线。</p>
+
+<p><strong>关键工具</strong>：Wiener-Ikehara Tauberian 定理（1932）。陈述：</p>
+
+<p><em>设 $f(t)$ 是 $[0, \infty)$ 上非负不减函数，</em></p>
+
+<p>\[
+F(s) = \int_0^\infty f(t) e^{-st} dt
+\]</p>
+
+<p><em>在 $\Re s > 1$ 收敛。如果 $F(s) - 1/(s - 1)$ 在 $\Re s = 1$ 上有连续延拓（即 $\zeta$-类型函数减掉极点剩有限），那 $f(t) \sim e^t$。</em></p>
+
+<p>把它套到我们的设置。</p>
+
+<p><strong>步 1（Mellin 变换）</strong>：</p>
+
+<p>\[
+-\frac{\zeta'(s)}{\zeta(s)} = \sum_n \frac{\Lambda(n)}{n^s} = s \int_1^\infty \frac{\psi(x)}{x^{s + 1}} dx.
+\]</p>
+
+<p>（用 Abel 求和将 \(\sum \Lambda(n)/n^s\) 转成 \(\psi\) 的积分。）</p>
+
+<p>令 \(x = e^t\)，\(\sigma = s\)：</p>
+
+<p>\[
+-\frac{\zeta'(s)}{s \zeta(s)} = \int_0^\infty \frac{\psi(e^t)}{e^{st}} dt.
+\]</p>
+
+<p>这是 \(\psi(e^t) e^{-t}\) 的 Laplace 变换的某变种。</p>
+
+<p><strong>步 2（边界行为）</strong>：要 Tauberian 适用，得保证 "\(F(s) - 1/(s - 1)\) 在 \(\Re s = 1\) 连续延拓"。即 \(-\zeta'/\zeta \cdot 1/s\) 减掉它在 \(s = 1\) 的极点 (留数 1) 之后，其它处不能爆炸。</p>
+
+<p>"<em>其它处</em>" 意思是 \(\Re s = 1, s \ne 1\)。\(-\zeta'/\zeta\) 在哪里有极点？答：在 \(\zeta\) 零点处。所以要 \(\Re s = 1\) 上 \(\zeta\) 无零点（\(s = 1\) 极点除外）。<em>这就是 16.3 引理的角色</em>！</p>
+
+<p>有了 16.3，"<em>$F(s) - 1/(s - 1)$ 在 $\Re s = 1$ 连续</em>" 成立（细节略）。Wiener-Ikehara 给：</p>
+
+<p>\[
+\psi(e^t) e^{-t} \to 1 \quad (t \to \infty),
+\]</p>
+
+<p>即 \(\psi(x) \sim x\)，\(x \to \infty\)。换 \(x = N\)：\(\psi(N) \sim N\)。\(\checkmark\)</p>
+
+<p><strong>整段证明的精神</strong>：</p>
+
+<ul>
+  <li>"<em>素数分布</em>" 翻译成"<em>$\psi(N)$ 渐近</em>"（16.1）。</li>
+  <li>"<em>$\psi(N)$ 渐近</em>" 翻译成"<em>$-\zeta'(s)/\zeta(s)$ 在 $\Re s = 1$ 上无奇异点</em>"（Mellin 变换）。</li>
+  <li>"<em>$-\zeta'/\zeta$ 在 $\Re s = 1$ 无奇异（除 $s = 1$）</em>" 翻译成"<em>$\zeta$ 在 $\Re s = 1$ 无零点</em>"（16.3）。</li>
+  <li>"<em>$\zeta$ 无零点</em>" 用 \(2(1 + \cos\theta)^2 \ge 0\) 这条朴素不等式证。</li>
+</ul>
+
+<p>四步翻译，把"<em>素数分布</em>" 这个朴素的整数论问题，化简成一个朴素三角恒等式。这是 19 世纪解析数论奇迹的全部内容。</p>
+
+<h2 id="sec16-5">16.5 从 \(\psi(N) \sim N\) 推 \(\pi(N) \sim N/\log N\)</h2>
+
+<p>16.1 已经做了 \(\psi \to \theta \to \pi\) 的转换。重写要点：</p>
+
+<p><strong>\(\psi \sim N \Rightarrow \theta \sim N\)</strong>：\(\psi(N) - \theta(N) = O(\sqrt N \log N) = o(N)\)，所以 \(\theta(N) = \psi(N) + o(N) \sim N\)。</p>
+
+<p><strong>\(\theta \sim N \Rightarrow \pi \sim N/\log N\)</strong>：Abel 求和给</p>
+
+<p>\[
+\theta(N) = \sum_{p \le N} \log p = \pi(N) \log N - \int_2^N \frac{\pi(t)}{t} dt.
+\]</p>
+
+<p>反解：\(\pi(N) = \theta(N)/\log N + \frac{1}{\log N} \int_2^N \pi(t)/t\, dt\)。</p>
+
+<p>主项 \(\theta(N)/\log N \sim N/\log N\)。次项需估计 \(\int \pi(t)/t \, dt\)；用粗界 \(\pi(t) = O(t/\log t)\)，积分 \(\le \int_2^N \frac{1}{\log t} dt = O(N/\log N)\)（标准 Li(N) 估计）。所以次项 \(O(N/\log^2 N) = o(N/\log N)\)，主项支配，\(\pi(N) \sim N/\log N\)。\(\checkmark\)</p>
+
+<p><em>素数定理证完了</em>。</p>
+
+<p>请你停下来回顾整条证明的<em>朴素度</em>。最深的两步是：(1) 解析延拓 + 函数方程让 \(\zeta\) 成为 \(\mathbb{C}\) 上的复函数；(2) 那条 \(2(1 + \cos\theta)^2 \ge 0\) 神奇不等式压制零点。剩下的<em>都是技术翻译</em>——Tauberian 定理、Abel 求和、积分估计。</p>
+
+<p>这种"<em>深核心 + 一堆技术翻译</em>" 是 19 世纪解析数论的典型证明结构。你<em>能</em> 跳过技术细节、记住核心，就抓住了 80% 的精神。</p>
+
+<h2 id="sec16-6">16.6 Riemann 假设——零点位置决定误差</h2>
+
+<p>素数定理给 \(\pi(N) \sim N/\log N\)。但<em>误差项</em> 多大？也就是 \(\pi(N) - \mathrm{Li}(N)\)（\(\mathrm{Li}(N) = \int_2^N dt/\log t\) 是更准的主项）的大小？</p>
+
+<p>已知（用 16.3 引理 + de la Vallée-Poussin 1899 改进）：</p>
+
+<p>\[
+\pi(N) = \mathrm{Li}(N) + O(N e^{-c \sqrt{\log N}}),
+\]</p>
+
+<p>误差比 \(N\) 小但不像 \(\sqrt N\) 那么小。</p>
+
+<p><strong>Riemann 假设 (RH, 1859)</strong>：\(\zeta(s)\) 所有非平凡零点都在<em>临界线</em> \(\Re s = 1/2\) 上。</p>
+
+<p>等价表述（一种）：</p>
+
+<p>\[
+\pi(N) = \mathrm{Li}(N) + O(\sqrt N \log N).
+\]</p>
+
+<p>"<em>误差项 $O(\sqrt N \log N)$</em>" 跟 "<em>所有非平凡零点 $\Re s = 1/2$</em>" 是<em>同一件事</em>——这是 Riemann 1859 论文里的核心观察。</p>
+
+<p>为什么？粗略：\(\zeta\) 的对数导数 \(-\zeta'/\zeta\) 的极点在 \(\zeta\) 的零点处。零点位置控制 \(-\zeta'/\zeta\) 的"奇点谱"。Tauberian 定理（更精细版本）让奇点谱<em>直接</em> 翻译成 \(\psi(N)\) 的展开，进而 \(\pi(N)\) 的展开。零点 \(\rho = 1/2 + i \gamma\) 给 \(\psi(N)\) 一项 \(N^\rho / \rho \approx \sqrt N\) 量级。所有非平凡零点都在 \(\Re s = 1/2\) iff 误差被压到 \(O(\sqrt N \log N)\)。</p>
+
+<p>RH 已被验证到前 \(10^{13}\) 个非平凡零点（Gourdon 等大型计算）——全在 \(\Re s = 1/2\) 上。但<em>证</em> 仍然没有。</p>
+
+<p>RH 是<a href="ch1.html">ch1</a> 提到的 Clay 七大千禧年问题之一，悬赏 100 万美元。</p>
+
+<p>它的<em>蕴含</em> 之深：除了素数分布，几乎所有解析数论里的"<em>误差项最优</em>" 结果都依赖 RH。例：相邻素数间隙 \(p_{n + 1} - p_n = O(\sqrt{p_n} \log p_n)\)（条件 RH），最强无条件结果 \(O(p_n^{0.525})\)（Baker–Harman–Pintz 2001）。两者差距巨大，RH 的强度可见。</p>
+
+<h2 id="sec16-7">16.7 现代视角：\(\zeta\) 是 GL_1 自守 \(L\)-函数</h2>
+
+<p>20 世纪后半，\(\zeta\) 故事被极大推广。本节给一句话视角，不展开（属于<a href="ch24.html">ch24</a> 类域论 + 自守表示）。</p>
+
+<p><strong>视角</strong>：\(\zeta(s)\) 是<em>群 GL_1（即 $\mathbb{Q}^\times$）上的自守表示</em>关联的 \(L\)-函数。Dirichlet \(L(s, \chi)\) 也是 GL_1 自守。一般地，对任何代数群 GL_n，存在一类<em>自守表示</em>（Hecke、Maass、Selberg、Langlands 给的概念），每个自守表示关联一个 \(L\)-函数。</p>
+
+<p><strong>Langlands 哲学（1967，未证）</strong>：</p>
+
+<ul>
+  <li>所有"<em>自然出现</em>" 的 \(L\)-函数（来自 Galois 表示、椭圆曲线、模形式、Shimura 簇）都<em>是</em> 自守 \(L\)-函数。</li>
+  <li>反过来，自守 \(L\)-函数都满足 (a) 解析延拓 (b) 函数方程 (c) Euler 乘积 (d) 适当推广的 Riemann 假设。</li>
+</ul>
+
+<p>这条哲学把 \(\zeta\) 的"<em>解析延拓 + 函数方程 + 临界线</em>" 三个事实推广到<em>所有数论 $L$-函数</em>。它是 20 世纪后半数论的<em>主线</em>，跟<em>非交换调和分析</em>、<em>自守形式</em>、<em>$p$-adic 表示</em> 这些工具紧密咬合。</p>
+
+<p>已经证的部分：</p>
+
+<ul>
+  <li><strong>椭圆曲线模性 (Wiles 1995, Breuil–Conrad–Diamond–Taylor 2001)</strong>：每条 \(\mathbb{Q}\) 上椭圆曲线的 \(L\)-函数 = 某权 2 模形式的 \(L\)-函数。这条让<em>Fermat 大定理</em> 成立。下书 <a href="ch24.html">ch24</a>。</li>
+  <li><strong>Sato-Tate 猜想 (Clozel-Harris-Shepherd-Barron-Taylor 2008)</strong>：椭圆曲线 \(a_p / \sqrt p\) 的分布是 \([-2, 2]\) 上的 sin² 分布。</li>
+</ul>
+
+<p>未证：</p>
+
+<ul>
+  <li>BSD 猜想（椭圆曲线 \(L\)-函数零点 \(\Leftrightarrow\) Mordell-Weil 秩）——Clay 千禧年问题之一。</li>
+  <li>Riemann 假设 + 它的所有自守推广。</li>
+  <li>Langlands 函子性的大部分实例。</li>
+</ul>
+
+<p>简单来说：本章看到的 "<em>$\zeta$ 决定素数分布</em>"，在现代视角下是"<em>GL_1 自守 $L$-函数决定 $\mathbb{Q}^\times$ 上的算术</em>" 的最朴素特例。一般地，"<em>GL_n 自守 $L$-函数决定 GL_n 关联代数对象的算术</em>"。<em>$L$-函数零点 = 算术分布</em> 这种联系是数论现代框架的中心承诺。</p>
+
+<h2 id="sec16-8">16.8 一句临别话</h2>
+
+<p>这一章没给完整证明——给的是<em>骨架</em>。要点：</p>
+
+<p>(1) <em>素数定理 $\pi(N) \sim N/\log N$ = $\zeta$ 在 $\Re s = 1$ 上无零点</em>。这条等价是整段故事最深的事实。它把"朴素整数论问题" 翻译成"复函数零点位置问题"。</p>
+
+<p>(2) "<em>$\zeta$ 在 $\Re s = 1$ 无零点</em>" 用一条<em>初等</em> 不等式 \(2(1 + \cos\theta)^2 \ge 0\) 证。Hadamard、de la Vallée-Poussin 1896 同年独立完成。</p>
+
+<p>(3) RH（所有非平凡零点 \(\Re s = 1/2\)）是更深一层猜想——它给"<em>素数分布</em>" 的最优误差。已计算验证 \(10^{13}\) 个零点，未证。</p>
+
+<p>(4) 现代视角下，\(\zeta\) 只是 GL_1 自守 \(L\)-函数。Langlands 哲学把整套思路推广到所有自守 \(L\)-函数。</p>
+
+<p>请你停下来欣赏这条故事的<em>整体形态</em>。"<em>素数</em>" 是数学里最朴素的对象——只能被 1 和自己整除的数。"<em>素数定理</em>" 是关于素数最朴素的统计陈述。可这条陈述需要<em>整个复分析 + 函数论</em> 才能证。证明的核心步骤是个三角恒等式。证明的扩展（RH）是<em>未解</em> 的、被悬赏 100 万美元的<em>数学最难问题之一</em>。整套故事的现代延伸（Langlands）是 20-21 世纪数学最大的猜想框架。</p>
+
+<p>这种"<em>朴素表面 vs 深层结构</em>" 是数论的本质诱惑——\(\zeta\) 不过是其中最朴素的一个例子。下一章 <a href="ch17.html">ch17</a> 我们换条赛道，看 Gauss 在 1801 年<em>之前</em>已经搞出来的另一个深结构——<em>二元二次型</em> 和<em>类数</em>，那是代数数论的另一支线，不依赖复分析。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 Dirichlet 卷积与 L-级数引入</a><a href="ch17.html">下一章 · 第 17 章 二元二次型与类数 →</a></nav>
+</main>
+</body>
+</html>

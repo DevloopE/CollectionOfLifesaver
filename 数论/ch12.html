@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 Pell 方程：从一组解到无穷组解 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 连分数</a><a href="ch13.html">下一章 · 第 13 章 高斯整数 →</a></nav>
+<h1 id="ch12">第 12 章 Pell 方程：从一组解到无穷组解</h1>
+
+<p>请你陪我做一个具体的搜索。我想找方程</p>
+
+<p>\[
+x^2 - 2 y^2 = 1
+\]</p>
+
+<p>的<em>整数</em> 解 \((x, y)\)。</p>
+
+<p>\(y = 0\)：\(x^2 = 1\)，给 \((\pm 1, 0)\)。这是<em>平凡解</em>——两边都看不出什么。</p>
+
+<p>\(y = 1\)：\(x^2 = 3\)，无整数解。</p>
+
+<p>\(y = 2\)：\(x^2 = 9\)，给 \((\pm 3, \pm 2)\)。<em>非平凡</em>！\(9 - 8 = 1\)，\(\checkmark\)。</p>
+
+<p>\(y = 3, 4, 5, \ldots, 11\)：都不是整数 \(x\) 满足 \(x^2 = 2 y^2 + 1\)。</p>
+
+<p>\(y = 12\)：\(x^2 = 289 = 17^2\)。<em>又中</em>！\((\pm 17, \pm 12)\)，\(289 - 288 = 1\)，\(\checkmark\)。</p>
+
+<p>\(y = 13, \ldots, 69\)：都不行。</p>
+
+<p>\(y = 70\)：\(x^2 = 9801 = 99^2\)。<em>第三组</em>！\((\pm 99, \pm 70)\)，\(9801 - 9800 = 1\)，\(\checkmark\)。</p>
+
+<p>\(y = 408\)：\(x^2 = 332929 = 577^2\)。<em>第四组</em>。</p>
+
+<p>\(y = 2378\)：\(x^2 = 11309769 = 3363^2\)。<em>第五组</em>。</p>
+
+<p>明显有<em>无穷多</em> 解，且 \(y\) 值按一种神秘规律迅速增长：\(0, 2, 12, 70, 408, 2378, \ldots\)——后一个大约是前一个的 \(5.83\) 倍。这种增长率<em>不像随机</em>，更像某种几何级数。</p>
+
+<p>更妙：你应该在 ch11 末尾扫到过这串数字。\(\sqrt 2\) 的连分数渐近分数 \((p_n, q_n)\)：</p>
+
+<p>\[
+(1, 1), (3, 2), (7, 5), (17, 12), (41, 29), (99, 70), (239, 169), (577, 408), \ldots
+\]</p>
+
+<p>满足 \(x^2 - 2 y^2 = 1\) 的解的 \((x, y) = (1, 0), (3, 2), (17, 12), (99, 70), (577, 408), \ldots\)——<em>恰好是\(\sqrt 2\) 渐近分数列的偶数项！</em></p>
+
+<p>这章我们解释这两件事：（一）非平凡解为什么自动产生<em>无穷多</em> 解；（二）连分数为什么"<em>免费</em>" 给出 Pell 方程的解。中间会引入一个新代数对象 \(\mathbb Z[\sqrt 2]\)，把<em>整数</em> 问题升到一个有"<em>乘法</em>" 结构的环里——这件事是代数数论的入门一击。</p>
+
+<h2 id="sec12-1">12.1 几个具体解，几个观察</h2>
+
+<p>把方程 \(x^2 - 2 y^2 = 1\) 的正整数解列表（\(y \ge 0\)）：</p>
+
+<p>\[
+\begin{array}{c|cc|c}
+n & x_n & y_n & x_n + y_n \sqrt 2 \\ \hline
+0 & 1 & 0 & 1 \\
+1 & 3 & 2 & 3 + 2\sqrt 2 \approx 5.828 \\
+2 & 17 & 12 & 17 + 12\sqrt 2 \approx 33.971 \\
+3 & 99 & 70 & 99 + 70\sqrt 2 \approx 197.99 \\
+4 & 577 & 408 & 577 + 408\sqrt 2 \approx 1153.99 \\
+5 & 3363 & 2378 & 3363 + 2378\sqrt 2 \approx 6725.99
+\end{array}
+\]</p>
+
+<p>看右边 \(x_n + y_n \sqrt 2\) 这一列。它们是 \(1, 5.828, 33.97, 198, 1154, 6726, \ldots\)——明显的几何递增。试 \(5.828^2 = 33.97\)，\(\checkmark\)。\(5.828^3 = 197.99\)，\(\checkmark\)。\(5.828^4 = 1154\)，\(\checkmark\)！</p>
+
+<p>断言：</p>
+
+<p>\[\boxed{\ x_n + y_n \sqrt 2 = (3 + 2\sqrt 2)^n.\ }\]</p>
+
+<p>每个解都是"<em>第一个非平凡解 \(3 + 2\sqrt 2\) 的幂</em>"。验证 \(n = 2\)：</p>
+
+<p>\[
+(3 + 2\sqrt 2)^2 = 9 + 12 \sqrt 2 + 8 = 17 + 12 \sqrt 2. \quad \checkmark
+\]</p>
+
+<p>\(n = 3\)：</p>
+
+<p>\[
+(3 + 2\sqrt 2)^3 = (3 + 2\sqrt 2)(17 + 12 \sqrt 2) = 51 + 36 \sqrt 2 + 34 \sqrt 2 + 48 = 99 + 70 \sqrt 2. \quad \checkmark
+\]</p>
+
+<p>这是 Pell 方程整个理论的中心想法。<em>所有解</em> 都是<em>一个</em> 解的幂。要解释清楚为什么，先把"<em>\(3 + 2\sqrt 2\)</em>" 这种对象搞清楚。</p>
+
+<h2 id="sec12-2">12.2 Pell 方程的一般形</h2>
+
+<p><strong>定义。</strong> Pell 方程指</p>
+
+<p>\[\boxed{\ x^2 - D y^2 = 1, \qquad D \in \mathbb Z_{> 0},\ D \text{ 不是完全平方}.\ }\]</p>
+
+<p>条件 \(D\) 不是完全平方至关重要。如果 \(D = k^2\)，方程变成 \(x^2 - (ky)^2 = 1 = (x - ky)(x + ky)\)，整数因子分解 \(1 = 1 \cdot 1\)（或 \(-1 \cdot -1\)）给 \(x - ky = x + ky = \pm 1\)，唯一非平凡是 \(y = 0, x = \pm 1\)——只有平凡解。Pell 方程的乐趣全靠 \(D\) <em>无理</em> 的开方。</p>
+
+<p>看几个 \(D\) 的最小非平凡解（叫"<em>基本解</em>"）：</p>
+
+<p>\[
+\begin{array}{c|cc}
+D & x_1 & y_1 \\ \hline
+2 & 3 & 2 \\
+3 & 2 & 1 \\
+5 & 9 & 4 \\
+6 & 5 & 2 \\
+7 & 8 & 3 \\
+8 & 3 & 1 \\
+10 & 19 & 6 \\
+11 & 10 & 3 \\
+12 & 7 & 2 \\
+13 & 649 & 180 \\
+14 & 15 & 4 \\
+\ldots & & \\
+61 & 1766319049 & 226153980 \\
+109 & 158070671986249 & 15140424455100
+\end{array}
+\]</p>
+
+<p>请你看 \(D = 13\)：基本解是 \((649, 180)\)。\(D = 61\)：基本解 \((1766319049, 226153980)\)，10 位整数！\(D = 109\)：15 位整数！</p>
+
+<p>这种"<em>基本解可以爆炸大</em>" 的现象是 Pell 方程的另一个迷人特征。\(D = 60\) 基本解 \((31, 4)\) 很小；\(D = 61\) 突然跳到 18 亿。<em>没有简单公式</em> 预测基本解多大——但下一节我们会看到，连分数算法<em>总是</em> 能找到基本解，只是某些 \(D\) 时算法运行较久。</p>
+
+<p>历史上 Fermat 1657 给同行（Brouncker、Wallis）的挑战是"<em>给出 \(x^2 - 61 y^2 = 1\) 的最小整数解</em>"——他知道答案有 18 亿。Brouncker 和 Wallis 找到了，但都没给完整证明"<em>解一定存在</em>"。Lagrange 1768 才完成存在性证明（用连分数）。这门学科里的"<em>从问题到证明</em>" 中间隔了 110 年——挺典型的数论速度。</p>
+
+<h2 id="sec12-3">12.3 关键代数：环 \(\mathbb Z[\sqrt D]\)</h2>
+
+<p>把 \(x + y \sqrt D\) 这种数当成研究对象。集合</p>
+
+<p>\[
+\mathbb Z[\sqrt D] = \{a + b \sqrt D : a, b \in \mathbb Z\}
+\]</p>
+
+<p>显然在加法下封闭。乘法呢？</p>
+
+<p>\[
+(a + b \sqrt D)(c + d \sqrt D) = ac + ad \sqrt D + bc \sqrt D + bd D = (ac + bd D) + (ad + bc) \sqrt D.
+\]</p>
+
+<p>结果还是 \(a' + b' \sqrt D\) 形式。\(\mathbb Z[\sqrt D]\) 在加减乘下封闭——它是个<em>环</em>（链回<a href="../抽象代数/ch11.html">抽象代数 ch11</a>）。</p>
+
+<p>这个环上有个关键函数。<strong>定义（范数）。</strong></p>
+
+<p>\[
+N(a + b \sqrt D) := a^2 - D b^2.
+\]</p>
+
+<p>等价地：\(N(\alpha) = \alpha \cdot \bar \alpha\)，其中 \(\bar\alpha = a - b \sqrt D\) 是 \(\alpha\) 的"<em>共轭</em>"。验证：\((a + b\sqrt D)(a - b \sqrt D) = a^2 - b^2 D\)。\(\checkmark\)</p>
+
+<p><strong>引理（范数乘积性）。</strong> \(N(\alpha \beta) = N(\alpha) N(\beta)\)。</p>
+
+<p><em>证明。</em> 共轭运算保持加减乘——\(\overline{\alpha \beta} = \bar\alpha \bar\beta\) 直接展开验证（用 \(\sqrt D\) 项变号一致）。所以 \(N(\alpha\beta) = (\alpha\beta)(\overline{\alpha\beta}) = \alpha\beta \bar\alpha \bar\beta = (\alpha\bar\alpha)(\beta\bar\beta) = N(\alpha) N(\beta)\)。\(\square\)</p>
+
+<p>这条乘法性是整章的<em>引擎</em>。把 Pell 方程改写：</p>
+
+<p>\[
+x^2 - D y^2 = 1 \iff N(x + y \sqrt D) = 1.
+\]</p>
+
+<p>换句话说，<em>Pell 方程的解 \((x, y)\) 一一对应 \(\mathbb Z[\sqrt D]\) 中范数 1 的元素</em>。这种"<em>把数值方程换成代数对象的等式</em>" 是数论的一个常用招式：把外层算术问题升一层抽象，立刻有更多结构可以利用。</p>
+
+<p>结构是什么？乘法性！如果 \(\alpha, \beta\) 都是范数 1，那么 \(\alpha\beta\) 也是范数 1（\(N(\alpha\beta) = 1 \cdot 1 = 1\)）。所以：</p>
+
+<p>\[\boxed{\ \{ \alpha \in \mathbb Z[\sqrt D] : N(\alpha) = 1 \} \text{ 在乘法下封闭}.\ }\]</p>
+
+<p>这个集合包含 \(1\)（平凡解 \((1, 0)\)）。它有逆吗？\(\alpha = a + b\sqrt D\)，\(N(\alpha) = 1 \Rightarrow \alpha \cdot \bar\alpha = 1 \Rightarrow \alpha^{-1} = \bar\alpha = a - b\sqrt D\)。逆也在 \(\mathbb Z[\sqrt D]\) 里，对应解 \((a, -b)\)——也就是 Pell 方程的另一组解。所以这个集合在<em>乘法 + 求逆</em> 下封闭——它是<em>群</em>。</p>
+
+<p>这是革命性的转换。原本你看着方程 \(x^2 - 2y^2 = 1\)，想"<em>这是数论问题，找整数解</em>"。现在你说"<em>这是 \(\mathbb Z[\sqrt 2]\) 的范数 1 元素群的描述问题</em>"。问题没变难——反而<em>变易</em>，因为代数结构（群）告诉你答案的形状。</p>
+
+<h2 id="sec12-4">12.4 解的几何：基本解与全部解</h2>
+
+<p>设 \(D > 0\) 不是完全平方。我们<em>假设</em> Pell 方程 \(x^2 - D y^2 = 1\) 至少有一个非平凡正整数解（\(x, y > 0\)）——这件事我们 12.5 节用连分数证明。挑出 \(x_1 + y_1 \sqrt D\) <em>最小</em>（即 \(x_1\) 最小，等价于 \(y_1\) 最小）的非平凡正整数解，叫<em>基本解</em>（fundamental solution）。</p>
+
+<p><strong>定理（解的结构）。</strong> 所有正整数解 \((x_n, y_n)\) 由</p>
+
+<p>\[
+x_n + y_n \sqrt D = (x_1 + y_1 \sqrt D)^n, \quad n = 1, 2, 3, \ldots
+\]</p>
+
+<p>给出。</p>
+
+<p><em>证明。</em> 一半已经容易：每个 \((x_1 + y_1 \sqrt D)^n\) 范数等于 \(N(x_1 + y_1\sqrt D)^n = 1^n = 1\)，所以是解。反向："<em>每个正解都是这样的幂</em>"。</p>
+
+<p>反证。设 \(\beta = X + Y \sqrt D\) 范数 1 但不是 \((x_1 + y_1 \sqrt D)^n\) 任何幂。设 \(\alpha = x_1 + y_1 \sqrt D > 1\)（\(x_1, y_1 > 0\)），它的幂 \(\alpha, \alpha^2, \alpha^3, \ldots\) 严格递增。所以存在唯一 \(n \ge 1\) 使</p>
+
+<p>\[
+\alpha^n \le \beta < \alpha^{n+1}.
+\]</p>
+
+<p>两边除 \(\alpha^n\)：\(1 \le \beta \alpha^{-n} < \alpha\)。设 \(\gamma = \beta \alpha^{-n}\)。\(N(\gamma) = N(\beta) N(\alpha)^{-n} = 1\)。所以 \(\gamma\) 是范数 1 元素，且 \(1 \le \gamma < \alpha\)。如果 \(\gamma > 1\)，写 \(\gamma = X' + Y' \sqrt D\)。要证 \(\gamma\) 给出正解（\(X', Y' > 0\)）。\(\gamma > 1\) 给 \(X' + Y' \sqrt D > 1\)；\(N(\gamma) = X'^2 - D Y'^2 = 1\) 给 \(X' = \pm \sqrt{1 + D Y'^2}\)。如果 \(Y' \ne 0\)，\(X'\) 必有一选择使 \(\gamma\) 仍 > 1，且<em>共轭</em> \(\bar\gamma = X' - Y' \sqrt D = 1/\gamma \in (0, 1)\)。从这两不等式 \(X' > 0\) 且 \(Y' > 0\) 容易导出。</p>
+
+<p>那么 \(\gamma\) 是一个范数 1 的正解，且 \(\gamma < \alpha\)——<em>比基本解还小！</em>但 \(\alpha\) 是<em>最小</em> 非平凡正解。矛盾。所以 \(\gamma = 1\)，即 \(\beta = \alpha^n\)。\(\square\)</p>
+
+<p>这个证明的味道值得品。我们<em>没有</em> 直接说"<em>所有解长什么样</em>"。我们只是说：基本解 \(\alpha\) 的所有幂<em>都</em> 是解，而<em>没有任何缝隙</em> 让"<em>不是 \(\alpha\) 的幂的解</em>" 钻进去——任何这样的解都会通过除法回到一个比基本解还小的非平凡正解，而这与"<em>基本</em>" 矛盾。这是<em>极小性论证</em>，数论里反复出现。</p>
+
+<p>把符号选择 \(\pm\) 包括进来：所有<em>整数</em> 解（含负 \(x, y\) 和零）由</p>
+
+<p>\[
+x + y \sqrt D = \pm (x_1 + y_1 \sqrt D)^n, \quad n \in \mathbb Z
+\]</p>
+
+<p>给出（\(n = 0\) 给 \(\pm 1\)，平凡）。整解集合有<em>群结构</em>——同构于 \(\mathbb Z \times \{\pm 1\}\)——用 \(\alpha\) 和 \(-1\) 作为生成元。</p>
+
+<p>请你停下来感受这件事。\(x^2 - 2 y^2 = 1\) 看起来是个朴素 Diophantine 方程。它的整数解集不是离散无规律的——它是一个<em>无穷循环群</em> \(\mathbb Z\)（外加符号），由<em>一个</em> 元素 \((3, 2)\) 完全生成。一个二次曲线的"<em>整点结构</em>" 是<em>群</em>。这个想法在 ch19 椭圆曲线上爆炸——<em>椭圆曲线有理点构成有限生成 Abel 群</em>（Mordell-Weil 定理）。Pell 方程是这个伟大故事的"<em>第一个</em>" 例子。</p>
+
+<h2 id="sec12-5">12.5 怎么找基本解：连分数算法</h2>
+
+<p>定理给的"<em>基本解 \(\to\) 全部解</em>" 公式很美，但前提是<em>找到</em> 基本解。\(D = 2\) 还能猜，\(D = 13\) 基本解 \((649, 180)\) 你猜不出来，\(D = 61\) 更别提。怎么办？</p>
+
+<p>答案<em>极</em> 优雅：算 \(\sqrt D\) 的连分数。</p>
+
+<p><strong>定理（连分数 \(\to\) Pell）。</strong> 设 \(\sqrt D\) 的连分数为 \([a_0; \overline{a_1, a_2, \ldots, a_\ell}]\)，循环节长 \(\ell\)。设第 \(n\) 渐近分数 \(p_n/q_n\)。那么</p>
+
+<p>\[
+(p_n, q_n) \text{ 满足 } p_n^2 - D q_n^2 = (-1)^{n+1} \text{ ，对 } n = \ell - 1, 2\ell - 1, 3\ell - 1, \ldots
+\]</p>
+
+<p>具体：</p>
+
+<ul>
+  <li>若 \(\ell\) <em>偶</em>：\(p_{\ell - 1}^2 - D q_{\ell - 1}^2 = 1\)，<em>基本解</em> \((p_{\ell - 1}, q_{\ell - 1})\)。</li>
+  <li>若 \(\ell\) <em>奇</em>：\(p_{\ell - 1}^2 - D q_{\ell - 1}^2 = -1\)（"<em>负 Pell 方程</em>"），需要平方一次：\((p_{\ell - 1} + q_{\ell - 1} \sqrt D)^2\) 给 \(p_{2\ell - 1}^2 - D q_{2\ell - 1}^2 = 1\)，基本解 \((p_{2\ell - 1}, q_{2\ell - 1})\)。</li>
+</ul>
+
+<p>证明思路（不展开全细节）：渐近分数满足关键<em>对偶</em> 关系</p>
+
+<p>\[
+p_n^2 - D q_n^2 = (-1)^{n+1} (\sqrt D - \alpha_{n+1}/q_n) \cdot \text{某个因子},
+\]</p>
+
+<p>其中 \(\alpha_{n+1}\) 是 \(\sqrt D\) 连分数算法的第 \(n+1\) 个余数。\(\sqrt D\) 的连分数循环时，余数 \(\alpha_{\ell + 1}, \alpha_{2\ell + 1}, \ldots\) 都等于 \(\alpha_1\)，使式子化简为整数 \(\pm 1\)。这是 Lagrange 1768 完整证明的核心。</p>
+
+<p>跑算法在 \(D = 13\) 上看看。\(\sqrt{13} \approx 3.606\)。</p>
+
+<p>\(a_0 = 3\)。\(\alpha_1 = 1/(\sqrt{13} - 3) = (\sqrt{13} + 3)/4 \approx 1.651\)，\(a_1 = 1\)。\(\alpha_2 = 1/((\sqrt{13} + 3)/4 - 1) = 4/(\sqrt{13} - 1) = (\sqrt{13} + 1)/3 \approx 1.535\)，\(a_2 = 1\)。\(\alpha_3 = 1/((\sqrt{13} + 1)/3 - 1) = 3/(\sqrt{13} - 2) = (\sqrt{13} + 2)/3 \approx 1.869\)，\(a_3 = 1\)。\(\alpha_4 = 1/((\sqrt{13} + 2)/3 - 1) = 3/(\sqrt{13} - 1) = (\sqrt{13} + 1)/4 \approx 1.151\)，\(a_4 = 1\)。\(\alpha_5 = 1/((\sqrt{13} + 1)/4 - 1) = 4/(\sqrt{13} - 3) = \sqrt{13} + 3 \approx 6.606\)，\(a_5 = 6\)。\(\alpha_6 = 1/(\sqrt{13} - 3) = \alpha_1\)。循环！</p>
+
+<p>\[
+\sqrt{13} = [3; \overline{1, 1, 1, 1, 6}], \quad \ell = 5 \text{（奇）}.
+\]</p>
+
+<p>第 4 渐近分数：</p>
+
+<p>\[
+\begin{array}{c|cccccc}
+n & 0 & 1 & 2 & 3 & 4 \\ \hline
+a_n & 3 & 1 & 1 & 1 & 1 \\
+p_n & 3 & 4 & 7 & 11 & 18 \\
+q_n & 1 & 1 & 2 & 3 & 5
+\end{array}
+\]</p>
+
+<p>测 \(p_4^2 - 13 q_4^2 = 324 - 325 = -1\)。<em>负 Pell</em>，符合 \(\ell\) 奇情况。</p>
+
+<p>平方：\((18 + 5 \sqrt{13})^2 = 324 + 180 \sqrt{13} + 325 = 649 + 180 \sqrt{13}\)。基本解 \((649, 180)\)！\(\checkmark\)</p>
+
+<p>这就是 \(D = 13\) 基本解的来源——5 步连分数 + 一次平方。如果你只手算 \(x^2 - 13 y^2 = 1\) 的解，得算 \(y\) 从 1 到 180——枚举无望。连分数<em>免费</em> 把 \(y\) 跳到 180。</p>
+
+<h2 id="sec12-6">12.6 跑通 \(\sqrt 2\)：完整过程</h2>
+
+<p>把 12.4 + 12.5 应用到 \(D = 2\)。</p>
+
+<p>步骤 1（找基本解）。\(\sqrt 2 = [1; \overline 2]\)，\(\ell = 1\)（奇）。第 0 渐近分数 \(p_0/q_0 = 1/1\)。测 \(1 - 2 = -1\)。负 Pell。平方：\((1 + 1 \cdot \sqrt 2)^2 = 1 + 2\sqrt 2 + 2 = 3 + 2\sqrt 2\)。基本解 \((3, 2)\)。\(\checkmark\)</p>
+
+<p>步骤 2（生成全部）。设 \(\alpha = 3 + 2\sqrt 2\)。</p>
+
+<p>\(\alpha^1 = 3 + 2\sqrt 2 \to (3, 2)\)。</p>
+
+<p>\(\alpha^2 = 17 + 12 \sqrt 2 \to (17, 12)\)。</p>
+
+<p>\(\alpha^3 = (3 + 2\sqrt 2)(17 + 12\sqrt 2) = 51 + 36\sqrt 2 + 34 \sqrt 2 + 48 = 99 + 70\sqrt 2 \to (99, 70)\)。</p>
+
+<p>\(\alpha^4 = (3 + 2\sqrt 2)(99 + 70\sqrt 2) = 297 + 210\sqrt 2 + 198\sqrt 2 + 280 = 577 + 408\sqrt 2 \to (577, 408)\)。</p>
+
+<p>\(\alpha^5 = (3 + 2\sqrt 2)(577 + 408\sqrt 2) = 1731 + 1224\sqrt 2 + 1154\sqrt 2 + 1632 = 3363 + 2378\sqrt 2 \to (3363, 2378)\)。</p>
+
+<p>这<em>就是</em> 章首搜索得到的 \(y = 0, 2, 12, 70, 408, 2378, \ldots\)！</p>
+
+<p>步骤 3（递推关系）。从 \((x_{n+1} + y_{n+1} \sqrt 2) = (3 + 2\sqrt 2)(x_n + y_n \sqrt 2)\) 展开比较系数：</p>
+
+<p>\[\boxed{\ x_{n+1} = 3 x_n + 4 y_n, \quad y_{n+1} = 2 x_n + 3 y_n.\ }\]</p>
+
+<p>验证：从 \((3, 2)\) 推 \((17, 12)\)：\(x_2 = 3 \cdot 3 + 4 \cdot 2 = 17\)，\(y_2 = 2 \cdot 3 + 3 \cdot 2 = 12\)。\(\checkmark\)</p>
+
+<p>用线性代数语言：</p>
+
+<p>\[
+\begin{pmatrix} x_{n+1} \\ y_{n+1} \end{pmatrix} = \begin{pmatrix} 3 & 4 \\ 2 & 3 \end{pmatrix} \begin{pmatrix} x_n \\ y_n \end{pmatrix}, \quad \det \begin{pmatrix} 3 & 4 \\ 2 & 3 \end{pmatrix} = 9 - 8 = 1.
+\]</p>
+
+<p>这是个<em>\(SL_2(\mathbb Z)\)</em> 矩阵——它有<em>无穷阶</em>。Pell 方程的解就是它在向量 \((1, 0)\) 上反复作用的轨道。<em>Pell 方程的解集 = \(SL_2(\mathbb Z)\) 子群的轨道</em>，这是把数论嵌进群论的另一个角度。</p>
+
+<h2 id="sec12-7">12.7 历史：从 Brahmagupta 到 Lagrange</h2>
+
+<p>Pell 方程<em>命名极不公平</em>——John Pell（17 世纪英国数学家）跟方程几乎没关系，是 Euler 张冠李戴流传下来。下面是真实历史。</p>
+
+<p><strong>Brahmagupta（598-668，印度）。</strong> 公元 628 年的著作《Brahmasphuta-siddhanta》给出"<em>Bhavana 方法</em>"——一个把已知 \(x_a^2 - D y_a^2 = k_a\) 和 \(x_b^2 - D y_b^2 = k_b\) "<em>组合</em>" 成 \(x^2 - D y^2 = k_a k_b\) 的恒等式：</p>
+
+<p>\[
+(x_a x_b + D y_a y_b)^2 - D (x_a y_b + x_b y_a)^2 = (x_a^2 - D y_a^2)(x_b^2 - D y_b^2).
+\]</p>
+
+<p>验证（用 12.3 节范数乘积性，把这条等式翻译成 \(N(\alpha)N(\beta) = N(\alpha\beta)\)，立刻清楚）。这条恒等式让 Brahmagupta 能从"<em>近似解</em>" 凑出真解。他算出 \(D = 92\) 的基本解 \((1151, 120)\)——给出 \(\sqrt{92} \approx 1151/120 = 9.5916\ldots\)。</p>
+
+<p><strong>Bhaskara II（1114-1185，印度）。</strong> 12 世纪改进 Brahmagupta，发明<em>Chakravala 方法</em>（"<em>循环法</em>"）——一个高效算法，从任意起点收敛到基本解。Bhaskara 算出 \(D = 61\) 基本解 \((1766319049, 226153980)\)——18 亿——他在<em>没有连分数理论</em> 的情况下做到这件事，纯靠他的循环法收敛得很快。这是数学史上"<em>给定问题、强算法、无完整理论</em>" 的经典案例。</p>
+
+<p><strong>Fermat（1607-1665，法国）。</strong> 1657 年在给 Frenicle 和 Wallis 的信里挑战："<em>给出 \(x^2 - 61 y^2 = 1\) 的最小整数解</em>"。Fermat 自己有方法但没公开（典型 Fermat）。Brouncker（爱尔兰）和 Wallis（英国）算出来了，但用的是后人称为"<em>英国方法</em>" 的东西——本质上跟连分数等价。</p>
+
+<p><strong>Pell（1611-1685，英国）。</strong> 跟方程<em>没什么关系</em>——他编辑过一本含有这类方程的代数书，Euler 误读了某段笔记，给方程起了 Pell 的名。等 Euler 意识到错时（1730 年代）已经叫开了。"<em>Pell 方程</em>" 这个称呼是数学史最大的归名错误之一。</p>
+
+<p><strong>Euler（1707-1783，瑞士）。</strong> 1730 年代第一个用<em>连分数</em> 系统解 Pell。给出 \(\sqrt D\) 连分数和 Pell 解的对应（即 12.5 定理）。但他没证"<em>连分数总是给出解</em>"，只是验证了很多 \(D\) 的情况。</p>
+
+<p><strong>Lagrange（1736-1813，意大利-法国）。</strong> 1768 完成"<em>Pell 方程对所有非平方 \(D\) 都有解</em>" 的<em>存在性证明</em>，并证连分数算法<em>必</em> 找到基本解。这是 Pell 方程理论的<em>完成</em>。从 Brahmagupta 算起，1140 年。</p>
+
+<p>请停下来想这个时间尺度。从 7 世纪印度的算法，到 18 世纪欧洲的存在性证明——人类用了一千年才把"<em>这种方程一定有无穷多解</em>" 这件事彻底搞清楚。Diophantine 方程的难度<em>从不</em> 在于"<em>找解</em>"——找 1 个解可以靠运气；难度在<em>证明所有解长什么样</em>。Pell 方程是难度最低的 Diophantine 方程之一（结构最干净），都用了千年。后面的椭圆曲线（ch19）、Fermat 大定理（ch24）就更别提了。</p>
+
+<h2 id="sec12-8">12.8 哲学：Pell 教给数论的事</h2>
+
+<p>Pell 方程虽然只是<em>一个</em> 方程族，它的解结构教给数论几件普世道理。</p>
+
+<p><strong>道理 1：Diophantine 方程的解集<em>有结构</em>。</strong> "<em>找整数解</em>" 听起来像散落的孤立现象。Pell 方程告诉你：解集是<em>群</em>，由<em>有限多个</em> 生成元产生<em>无穷多</em> 解。这个图像在椭圆曲线上变成<em>Mordell-Weil 定理</em>：椭圆曲线的有理点是<em>有限生成 Abel 群</em>。"<em>有限生成</em>" 意味着我们可以用<em>有限</em> 数据描述<em>无穷</em> 解集——这是数论的中心承诺之一。</p>
+
+<p><strong>道理 2：升到代数结构看整数。</strong> 我们没有正面看 \(x^2 - 2 y^2 = 1\) 的整数解。我们升到 \(\mathbb Z[\sqrt 2]\) 这个环，把"<em>整数对</em>" 看成"<em>环元素</em>"，把"<em>方程</em>" 看成"<em>范数 = 1</em>"。环结构（乘法）立刻给出"<em>解的乘积仍是解</em>"——这是<em>群结构</em> 的来源。这种"<em>升一层抽象</em>" 是代数数论的全部要诀，下一章 ch13 我们用同样的招式（升到 \(\mathbb Z[i]\)）解决 Fermat 圣诞定理。</p>
+
+<p><strong>道理 3：实数与整数互相帮忙。</strong> Pell 方程是<em>整数</em> 问题；解它要用 \(\sqrt D\) 这个<em>实数</em> 的连分数。实数 \(\sqrt D\) 的"<em>有理逼近</em>" 结构（连分数）<em>一一对应</em> 整数方程 \(x^2 - D y^2 = 1\) 的解。这个"<em>实数无理逼近 \(\leftrightarrow\) 整数 Diophantine</em>" 桥梁是 Diophantine 几何的入口。</p>
+
+<p><strong>道理 4：证明<em>难度</em> 远超问题表象。</strong> "<em>有非平凡解</em>" 听起来弱——你只要找一个就好。但"<em>所有 \(D\) 都有非平凡解</em>" 却需要 Lagrange 1140 年才完成。原因是要构造性给出<em>解的存在</em>，必须知道连分数算法<em>必</em> 终止——这件事不是显然的，要 \(\sqrt D\) 二次无理性 + Lagrange 周期定理。Diophantine 方程<em>常常</em> 是这样：问题易说，解易猜，证明<em>无穷难</em>。</p>
+
+<p>下一章 ch13 我们换一个 Diophantine 方程：<em>哪些素数 \(p\) 能写成两个完全平方之和</em>？\(p = a^2 + b^2\)？答案 Fermat 1640 给出："<em>\(p = 2\) 或 \(p \equiv 1 \pmod 4\)</em>"。这条声明朴素，证明经典——又是用<em>升一层抽象</em>。这次的环不是 \(\mathbb Z[\sqrt 2]\) 而是<em>高斯整数</em> \(\mathbb Z[i]\)。同样的代数招式，不同的 Diophantine 问题——你会看到代数数论的一致美感。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 连分数</a><a href="ch13.html">下一章 · 第 13 章 高斯整数 →</a></nav>
+</main>
+</body>
+</html>

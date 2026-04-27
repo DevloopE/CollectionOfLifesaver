@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 23 章 应用：现代密码学 — 普林斯顿数论读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 类域论一瞥</a><a href="ch24.html">下一章 · 第 24 章 Fermat 大定理与 Wiles 路径 →</a></nav>
+<h1 id="ch23">第 23 章 应用：现代密码学</h1>
+
+<p>你每次访问 https 网站，浏览器和服务器之间会做一件事：先用<em>椭圆曲线 Diffie-Hellman</em>（ECDH）交换出一个临时密钥，然后用这个密钥加密后续通信（用 AES-GCM）。从你按下回车到看到网页这<em>百毫秒</em>里，浏览器在 \(E(\mathbb F_p)\) 上做了几次群运算，服务器同样做了几次——双方算出了同一个秘密。<em>没有一个旁观者在不解决离散对数的前提下能拿到这个秘密</em>。</p>
+
+<p>这一章把 RSA、Diffie-Hellman、ECC 这三个现代密码学的<em>基础协议</em> 摊开。它们每一个都基于<em>一道数论难题</em>——大数分解、离散对数、椭圆曲线离散对数。这一章<em>不</em>讲工程实现的所有细节（如那是<a href="../数值方法/index.html">数值方法</a>第 23 章会更细——那本是别的角度）。这一章讲<em>背后的数学</em>。</p>
+
+<h2 id="sec23-1">23.1 公钥密码学引论：陷门函数</h2>
+
+<p>古典密码学（对称密码学）：通信双方共享一个密钥 \(k\)，加密 \(c = E_k(m)\)、解密 \(m = D_k(c)\)。问题——双方<em>必须先以某种安全方式共享 \(k\)</em>。在互联网时代，"<em>先安全共享密钥</em>" 这件事本身就是核心难题。</p>
+
+<p>1976 年 Diffie 与 Hellman 提出<em>公钥密码学</em>（public-key cryptography）：每人有<em>两个</em> 密钥——<em>公钥 \(\mathrm{pk}\)</em>（公开）和<em>私钥 \(\mathrm{sk}\)</em>（保密）。任何人能用 Alice 的公钥<em>加密</em> 给 Alice 的消息；只有 Alice 用她的私钥能<em>解密</em>。</p>
+
+<p>这种"<em>用一把钥匙锁、另一把钥匙开</em>" 的不对称需要一种<em>数学结构</em>：</p>
+
+<p>\[
+\boxed{\ \textbf{陷门函数}：\ f \text{ 容易算}, \ f^{-1} \text{ 极难算}, \ \textbf{除非}\text{ 你知道一个秘密 \(t\) 使 \(f^{-1}\) 容易}.\ }
+\]</p>
+
+<p>三个具体的陷门函数（每个对应一个公钥密码体制）：</p>
+
+<ul>
+  <li><em>RSA</em>（Rivest-Shamir-Adleman 1977）：\(f(m) = m^e \bmod n\)，陷门 = "<em>知道 \(n\) 的素因子分解</em>"。</li>
+  <li><em>Diffie-Hellman</em>（1976，最古老）：实际是<em>密钥协商</em> 而非加密；基于"<em>离散对数</em>" 难。</li>
+  <li><em>椭圆曲线密码</em>（ECC，Koblitz / Miller 1985）：基于<em>椭圆曲线上的离散对数</em>难。</li>
+</ul>
+
+<p>下面三节具体看每一个。</p>
+
+<h2 id="sec23-2">23.2 RSA：基于"<em>大数分解难</em>"</h2>
+
+<p>RSA 是公钥密码学最经典的协议。设置如下：</p>
+
+<p><strong>密钥生成（Alice 一次性做）。</strong></p>
+
+<ol>
+  <li>选两个<em>大素数</em> \(p, q\)（实践中各 1024 位以上，所以 \(n = pq\) 是 2048 位）。</li>
+  <li>算 \(n = pq\) 与 \(\varphi(n) = (p-1)(q-1)\)（链回<a href="ch6.html">ch6</a> Euler 函数）。</li>
+  <li>选 \(e\) 满足 \(\gcd(e, \varphi(n)) = 1\)（实践中常用 \(e = 65537 = 2^{16} + 1\)，因 \(e\) 是素数且二进制只有两个 1，模幂运算快）。</li>
+  <li>算 \(d = e^{-1} \bmod \varphi(n)\)（用 Euclid 扩展算法，链回<a href="ch2.html">ch2</a>）。</li>
+  <li>公钥：\(\mathrm{pk} = (n, e)\)。私钥：\(\mathrm{sk} = (n, d)\)。<em>抛弃</em> \(p, q, \varphi(n)\)（它们的存在会泄露私钥）。</li>
+</ol>
+
+<p><strong>加密（Bob 给 Alice 发送 \(m\)，需 \(0 \le m < n\)）。</strong></p>
+
+<p>\[
+c = m^e \bmod n.
+\]</p>
+
+<p><strong>解密（Alice 拿到 \(c\)）。</strong></p>
+
+<p>\[
+m = c^d \bmod n.
+\]</p>
+
+<p><strong>正确性证明。</strong>需要证 \((m^e)^d \equiv m \pmod n\)。</p>
+
+<p>\(ed \equiv 1 \pmod{\varphi(n)}\)，所以 \(ed = 1 + k \varphi(n)\) 某 \(k \ge 1\)。所以</p>
+
+<p>\[
+m^{ed} = m^{1 + k \varphi(n)} = m \cdot (m^{\varphi(n)})^k.
+\]</p>
+
+<p>由 Euler 定理（链回<a href="ch6.html">ch6</a>）：当 \(\gcd(m, n) = 1\)，\(m^{\varphi(n)} \equiv 1 \pmod n\)。所以 \(m^{ed} \equiv m \pmod n\)。\(\checkmark\)</p>
+
+<p>边界情况 \(\gcd(m, n) > 1\)：此时 \(p \mid m\) 或 \(q \mid m\)。但 \(m < n = pq\)，所以不会同时 \(p \mid m\) 和 \(q \mid m\)。设 \(p \mid m\)，则 \(m \equiv 0 \pmod p\)，所以 \(m^{ed} \equiv 0 \equiv m \pmod p\)。另一方面 \(\gcd(m, q) = 1\)，所以 Euler 定理给 \(m^{ed} \equiv m \pmod q\)。CRT（链回<a href="ch7.html">ch7</a>）合并：\(m^{ed} \equiv m \pmod n\)。完整正确性 \(\checkmark\)</p>
+
+<p><strong>安全性。</strong>RSA 的安全建立在<em>分解 \(n\) 难</em>。若你能分解 \(n = pq\)，立即算出 \(\varphi(n) = (p-1)(q-1)\)，然后算 \(d = e^{-1} \bmod \varphi(n)\)——破解。反过来也大致正确：若你能<em>解密任何 RSA 密文</em>（即破解 RSA），则你能分解 \(n\)（这是<em>条件</em> 等价，1985 年由 Rabin 与 Coppersmith 证明的更精确版本）。</p>
+
+<p>分解 \(n\) 的最快经典算法（数域筛 GNFS，1990 年代）复杂度 \(\exp(O((\log n)^{1/3} (\log\log n)^{2/3}))\)——<em>次指数</em>。它比"<em>试除每个 \(p \le \sqrt n\)</em>" 的 \(O(\sqrt n)\) 快得多，但仍然<em>亚指数</em>——\(n\) 加倍位数，运行时间不是<em>翻倍</em> 而是<em>大约 \(2^{1/3}\) 倍</em>。所以 2048 位 RSA 在 2025 年仍安全（最佳已知分解记录是 829 位 \(n\)，2020 年由学术合作完成、用了 2700 CPU-年）。</p>
+
+<p><em>历史小注</em>。1973 年英国 GCHQ 的 Cocks 内部已经提出过本质相同的算法，但因为情报机密直到 1997 年才解密。RSA 三人独立发明并 1977 年公开发表——所以学术界称 "RSA"，密码学历史承认 Cocks 的优先权。</p>
+
+<h2 id="sec23-3">23.3 Diffie-Hellman 密钥交换</h2>
+
+<p>RSA 解决"<em>怎么从公钥推私钥难</em>"。Diffie-Hellman 解决一个不同的问题：<em>双方在公开信道上协商出一个共享密钥，使旁观者算不出</em>。</p>
+
+<p><strong>协议（Alice 与 Bob 协商）。</strong></p>
+
+<ol>
+  <li>双方公开同意一个<em>大素数 \(p\)</em> 与一个<em>原根 \(g \in (\mathbb Z/p)^\times\)</em>（链回<a href="ch8.html">ch8</a>原根）。</li>
+  <li>Alice 选私钥 \(a \in \{1, \ldots, p - 2\}\)，发送 \(A = g^a \bmod p\) 给 Bob。</li>
+  <li>Bob 选私钥 \(b\)，发送 \(B = g^b \bmod p\) 给 Alice。</li>
+  <li>双方计算<em>共享密钥</em>：
+  \[
+  K = A^b = B^a = g^{ab} \bmod p.
+  \]
+  Alice 用她的 \(a\) + Bob 发的 \(B\)；Bob 对称做。</li>
+</ol>
+
+<p>旁观者看到 \(p, g, A, B\) 但不知道 \(a, b\)。他要算 \(K\) 必须从 \(A = g^a\) 推出 \(a\)（或从 \(B\) 推 \(b\)）——这是<em>离散对数问题</em>（DLP）：</p>
+
+<p>\[
+\boxed{\ \text{DLP}：\ \text{给 } g, A = g^a \bmod p, \text{ 求 } a.\ }
+\]</p>
+
+<p>这是<a href="ch8.html">ch8</a>提到的"<em>原根难题</em>"——给一个原根 \(g\)，<em>计算 \(g^x \mod p\)</em> 是 \(O(\log p)\) 步快速幂；<em>反过来 \(g^x = A\) 求 \(x\)</em> 没有已知多项式时间算法。最好的经典算法（数域筛、index calculus）复杂度<em>亚指数</em>——和分解类似但有所不同。</p>
+
+<p><strong>例（玩具规模）。</strong>取 \(p = 23\)、\(g = 5\)（5 是 mod 23 的原根，因 \(\mathrm{ord}_{23}(5) = 22 = \varphi(23)\)）。Alice 选 \(a = 6\)，发 \(A = 5^6 \bmod 23 = 15625 \bmod 23 = 8\)。Bob 选 \(b = 15\)，发 \(B = 5^{15} \bmod 23\)；算 \(5^4 = 625 \equiv 4\)，\(5^8 \equiv 16\)，\(5^{15} = 5^8 \cdot 5^4 \cdot 5^2 \cdot 5 \equiv 16 \cdot 4 \cdot 2 \cdot 5 = 640 \equiv 640 - 27 \cdot 23 = 640 - 621 = 19\)。所以 \(B = 19\)。共享密钥 \(K = B^a = 19^6 \bmod 23\)（Alice 算）= \(A^b = 8^{15} \bmod 23\)（Bob 算）。两个应该相等。具体算 \(19^2 = 361 \equiv 361 - 15 \cdot 23 = 361 - 345 = 16\)；\(19^4 \equiv 16^2 = 256 \equiv 256 - 11 \cdot 23 = 256 - 253 = 3\)；\(19^6 \equiv 19^4 \cdot 19^2 \equiv 3 \cdot 16 = 48 \equiv 48 - 23 = 2\)。所以 \(K = 2\)。Bob 应该算出同样：\(8^{15} \bmod 23\)；\(8 = 5^6\)，所以 \(8^{15} = 5^{90} = 5^{90 \bmod 22} = 5^2 = 25 \equiv 2 \pmod{23}\)。\(\checkmark\)</p>
+
+<p>实战使用 2048 位 \(p\)（实际产品用 RFC 3526 给定的 2048-3072 位的"<em>safe primes</em>" \(p = 2q + 1\)，\(q\) 也素）。</p>
+
+<p><em>DH vs RSA</em>。RSA 既能加密也能签名；DH 只是<em>密钥协商</em>，协商完密钥后续仍要用对称密码（如 AES）。但 DH 有一个优点叫<em>前向安全性</em>（forward secrecy）：如果 Alice 每次会话生成新的临时 \(a\)（"<em>临时 DH</em>" / Ephemeral DH），即使将来 Alice 的长期私钥被攻破，<em>过去的会话密钥</em> 仍安全（因为它们只依赖于已经被销毁的临时 \(a\)）。这是为什么 https 现在<em>不</em>用 RSA 做密钥交换，而用 ECDHE（椭圆曲线临时 DH）。</p>
+
+<h2 id="sec23-4">23.4 椭圆曲线密码 ECC</h2>
+
+<p>DH 在 \((\mathbb Z/p)^\times\) 这个乘法群里做。<em>把这个群换成<a href="ch19.html">ch19</a>椭圆曲线 \(E(\mathbb F_p)\) 上的群</em>，得到<em>椭圆曲线 Diffie-Hellman</em>（ECDH）。</p>
+
+<p>记住<a href="ch19.html">ch19</a>的核心：椭圆曲线 \(E : y^2 = x^3 + ax + b\) 上的<em>有理点</em>构成阿贝尔群，群运算是几何的"<em>三点共线和为零</em>" 法则——但这个法则在 \(\mathbb F_p\) 上同样起作用。所以 \(E(\mathbb F_p)\) 是有限阿贝尔群。Hasse 界（链回<a href="ch19.html">ch19</a>）给 \(\#E(\mathbb F_p) \approx p\)（精确：\(|\#E(\mathbb F_p) - (p + 1)| \le 2\sqrt p\)）。</p>
+
+<p><strong>ECDH 协议。</strong></p>
+
+<ol>
+  <li>双方公开同意椭圆曲线 \(E\)、有限域 \(\mathbb F_p\)、与一个"<em>基点</em>" \(G \in E(\mathbb F_p)\)（高阶点，常 \(\mathrm{ord}(G) = n\) 是大素数）。</li>
+  <li>Alice 选私钥 \(a \in \{1, \ldots, n-1\}\)，发送公钥 \(A = a G \in E(\mathbb F_p)\)（"\(a\) 倍点"）。</li>
+  <li>Bob 选 \(b\)，发 \(B = b G\)。</li>
+  <li>共享密钥 \(K = a B = b A = (ab) G\)。</li>
+</ol>
+
+<p>旁观者面对的难题：从 \(G\)、\(A = aG\) 算 \(a\)。这是<em>椭圆曲线离散对数问题</em>（ECDLP）：</p>
+
+<p>\[
+\boxed{\ \text{ECDLP}：\ \text{给 } G, P = aG \in E(\mathbb F_p), \text{ 求 } a.\ }
+\]</p>
+
+<p><em>关键事实</em>：ECDLP <em>没有亚指数算法</em>（不像 DLP 与分解）。最佳已知算法是<em>Pollard rho</em>，复杂度 \(O(\sqrt n)\)（\(n\) 是基点的阶）。这是<em>真正的指数</em>——256 位的 \(n\)（即 \(\sqrt n \approx 2^{128}\) 步）足以抵抗量子前的所有攻击。</p>
+
+<p>对比：</p>
+
+<ul>
+  <li>RSA 2048 位 \(\approx\) ECDLP 224 位 \(\approx\) 112 位对称安全。</li>
+  <li>RSA 3072 位 \(\approx\) ECDLP 256 位 \(\approx\) 128 位对称安全。</li>
+</ul>
+
+<p>ECC 的<em>密钥短得多</em>——这是为什么移动设备、物联网、嵌入式系统几乎全用 ECC 而不是 RSA。具体的，TLS 1.3（2018+）默认用 X25519（一种特殊曲线 \(y^2 = x^3 + 486662 x^2 + x\) 在 \(\mathbb F_{2^{255} - 19}\) 上的形式，由 Bernstein 2005 设计）做密钥交换，签名用 Ed25519。</p>
+
+<p><em>具体曲线选择</em>。NIST 1999 推荐曲线 P-256（也叫 secp256r1）：</p>
+
+<p>\[
+y^2 = x^3 - 3x + b, \quad p = 2^{256} - 2^{224} + 2^{192} + 2^{96} - 1.
+\]</p>
+
+<p>这条曲线在 https / SSH / Bitcoin 之外的几乎所有<em>商业</em> 系统里使用。Bitcoin 用 secp256k1（\(b\) 不同）。Curve25519 / Ed25519 因 Bernstein 设计的"<em>常数时间安全实现</em>" 在学术界与新一代协议（Signal、WireGuard、SSH 默认）里更受推崇。</p>
+
+<p>所有这些曲线都满足"<em>阶 \(\#E(\mathbb F_p) = h \cdot n\)</em>" 的形式，\(n\) 是大素数（256 位以上），\(h \in \{1, 2, 4, 8\}\) 是<em>cofactor</em>。基点 \(G\) 选阶 \(n\)。这样 ECDLP 有 \(\sqrt n \approx 2^{128}\) 的安全度。</p>
+
+<h2 id="sec23-5">23.5 量子计算威胁与 Shor 算法</h2>
+
+<p>RSA、DH、ECC 三个体系的<em>共同基础</em>：分解或离散对数<em>对经典计算机难</em>。但它们对<em>量子计算机</em> 怎样？</p>
+
+<p>1994 年 Peter Shor 给出震动密码学界的算法：<em>量子计算机能在多项式时间内分解整数与算离散对数</em>。具体的：</p>
+
+<p>\[
+\boxed{\ \text{Shor 算法分解 \(n\)：复杂度 } O((\log n)^3) \text{（量子）}.\ }
+\]</p>
+
+<p>核心思想：分解 \(n\) 等价于"<em>找一个数 \(a\) 满足 \(\mathrm{ord}_n(a)\) 偶</em>" 然后从这个阶推出非平凡因子。Shor 用<em>量子 Fourier 变换</em>（QFT，链回<a href="../复分析/ch10.html">复分析中 Fourier</a>）在 \(\mathbb Z/N\) 上找<em>周期</em>——这是 QFT 在量子机上多项式时间能做的事，但经典机上没人知道怎么做到多项式时间。</p>
+
+<p>具体步骤：</p>
+
+<ol>
+  <li>选 \(a < n\) 与 \(n\) 互素，量子算 \(\mathrm{ord}_n(a)\)（QFT 找 \(f(x) = a^x \bmod n\) 的周期）。</li>
+  <li>若阶 \(r\) 偶且 \(a^{r/2} \not\equiv -1 \pmod n\)，则 \(\gcd(a^{r/2} - 1, n)\) 与 \(\gcd(a^{r/2} + 1, n)\) 给 \(n\) 的非平凡因子。</li>
+  <li>否则换 \(a\) 重试。</li>
+</ol>
+
+<p><em>所有公钥密码学都倒</em>。Shor 算法的简单变体也破 DLP（链回<a href="ch8.html">ch8</a>）和 ECDLP——同样是"<em>QFT 找周期</em>" 套路在合适的群上。</p>
+
+<p>2025 年的现状：能做 Shor 的量子计算机<em>原型</em> 已存在（IBM 2023 演示 433-qubit 处理器，Google 2024 演示 70-qubit Willow），但分解<em>有意义大小</em>（≥1024 位）的 \(n\) 需要数百万 qubit + 强容错纠错。<em>密码相关量子机</em>（CRQC）的预期到来时间是 2030-2040 年，但精确时间不可预知。</p>
+
+<p>这条威胁是真的——所有今天用 RSA / DH / ECC 加密的<em>历史数据</em>，被存档下来后将在 CRQC 来到时被解密。这条逻辑叫"<em>"采集"现在 / 解密未来</em>"（harvest now, decrypt later）——所以即使 CRQC 在 10-15 年才来，<em>今天的</em> 长期敏感数据（医疗、外交、商业秘密）已经处于威胁中。这就是<em>后量子密码学</em> 的紧迫性。</p>
+
+<h2 id="sec23-6">23.6 后量子密码学</h2>
+
+<p>"<em>后量子密码学</em>"（Post-Quantum Cryptography, PQC）= 设计<em>对量子也安全</em> 的密码协议。它的数学基础<em>不能</em> 是分解或离散对数（因为 Shor 破它们）。已知<em>对量子也难</em> 的问题：</p>
+
+<ul>
+  <li><em>格上短向量问题</em>（SVP）+ <em>带误差学习</em>（LWE）。这是 PQC 主流。</li>
+  <li><em>编码理论问题</em>（McEliece 1978，最古老的 PQC 候选，没人破过但密钥很大）。</li>
+  <li><em>多变量多项式系统</em>（基于解 \(n\) 元二次方程组难）。</li>
+  <li><em>哈希签名</em>（基于哈希函数的"<em>找碰撞</em>" 难，量子也只能 Grover 加速到 \(\sqrt n\)，不致命）。</li>
+  <li><em>同源椭圆曲线</em>（SIDH/SIKE，\(\to\) 2022 年被经典攻破，已废弃）。</li>
+</ul>
+
+<p>NIST 从 2016 起做"<em>PQC 标准化竞赛</em>"。2022 年 7 月公布第一轮选定的算法：</p>
+
+<ul>
+  <li><em>Kyber</em>（密钥协商 / KEM）—— 基于<em>模 LWE</em>。</li>
+  <li><em>Dilithium</em>（数字签名）—— 基于<em>模 LWE</em>。</li>
+  <li><em>SPHINCS+</em>（哈希签名）—— 基于哈希。</li>
+  <li><em>Falcon</em>（签名）—— 基于<em>NTRU 格</em>。</li>
+</ul>
+
+<p>2024 年 8 月 NIST 发布<em>正式标准</em> FIPS 203（Kyber）、FIPS 204（Dilithium）、FIPS 205（SPHINCS+）。</p>
+
+<p><em>带误差学习问题</em>（LWE，Regev 2005）的简化陈述：在 \(\mathbb Z/q\) 上选 secret \(s \in (\mathbb Z/q)^n\)。给攻击者一系列样本 \((a_i, b_i)\)，其中 \(a_i \in (\mathbb Z/q)^n\) 随机、\(b_i = \langle a_i, s \rangle + e_i \bmod q\)，\(e_i\) 是小的随机误差。问题：恢复 \(s\)。</p>
+
+<p>这等价于<em>解噪音线性方程组</em>。Regev 证明这条问题"<em>对量子也难</em>"——更精确：把 LWE 解到任意精度<em>归约到</em> 解格上的<em>最坏情形</em> 短向量问题，而后者没有已知量子算法（包括 Shor）能解。</p>
+
+<p>Kyber 与 Dilithium 都是 LWE 的<em>结构化</em> 版本（Module-LWE，把 \((\mathbb Z/q)^n\) 换成多项式环 \((\mathbb Z/q)[x]/(x^d + 1)\) 上的模），这样密钥短得多（千字节级而不是兆字节）。</p>
+
+<p><em>2025 年现状</em>：主要浏览器（Chrome / Firefox / Safari）已经支持<em>混合 TLS</em>——同时用 X25519（经典 ECC）+ Kyber（PQC），双重保护。Cloudflare、Google 服务器端已 100% 部署。整个互联网的"<em>大迁移到 PQC</em>" 预计 2025-2035 年完成。</p>
+
+<h2 id="sec23-7">23.7 实战：libsodium / OpenSSL 的具体使用</h2>
+
+<p>本节超快过一遍写代码时怎么调这些算法。这本书是数学书不是工程书——细节请查官方文档。但你应该知道<em>不要自己实现</em>：</p>
+
+<ul>
+  <li>密码学的工程实现极易写错（侧信道、随机数生成器、constant-time 操作）。<em>从不</em>自己写 RSA / ECC——总用经过审计的库。</li>
+  <li>"<em>roll your own crypto</em>" 是密码学最有名的反模式。学术界已经看过太多次"<em>新发明的密码协议</em>" 第二天被攻破的案例。</li>
+</ul>
+
+<p><em>libsodium</em>（基于 NaCl，Bernstein 设计）。最容易用的现代库：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+// Alice: 生成密钥对
+unsigned char pk[crypto_box_PUBLICKEYBYTES];
+unsigned char sk[crypto_box_SECRETKEYBYTES];
+crypto_box_keypair(pk, sk);   // Curve25519 + Salsa20 + Poly1305
+
+// Bob 用 Alice 的 pk 加密
+unsigned char ciphertext[CIPHERTEXT_LEN];
+crypto_box(ciphertext, message, message_len, nonce, alice_pk, bob_sk);
+
+// Alice 用她的 sk 解密
+crypto_box_open(plaintext, ciphertext, ciphertext_len, nonce, bob_pk, alice_sk);
+</pre>
+
+<p>这一段代码下面发生的是：Curve25519 ECDH + 派生对称密钥 + XSalsa20 加密 + Poly1305 认证。你<em>看不见</em> 这些数学细节——库都帮你做了，并且做得"<em>常数时间</em>" 不泄露侧信道。</p>
+
+<p><em>OpenSSL</em>。更老但用得最广。它的 API 复杂——上面 libsodium 的 4 行变成 OpenSSL 的 50 行。除非你必须兼容现有 PKI 否则建议用 libsodium 或 Go 的 <code>crypto/...</code> 系列。</p>
+
+<p>其它选择：Rust <code>ring</code>、<code>RustCrypto</code> 系列；Go <code>crypto/elliptic</code>、<code>crypto/ed25519</code>；Python <code>cryptography</code> 库。<em>不要</em>用 Python 标准库的 <code>secrets</code> 之外的密码学（标准库只有 <code>secrets</code> 是设计来给生产用的；<code>random</code>、\(\mathrm{md5}\) 等都是<em>不安全的</em>）。</p>
+
+<h2 id="sec23-8">23.8 数论 + 密码学的未来</h2>
+
+<p>密码学是数论应用最直接的领域。每个新的数论结构都<em>立刻</em> 引出新的密码协议尝试：</p>
+
+<ul>
+  <li><em>同源密码</em>（isogeny-based crypto）：基于"<em>椭圆曲线之间的同源映射</em>"。SIDH 2011 提出，2022 年由 Castryck-Decru 经典攻破——这是个大教训：<em>新的数论结构需要至少 10 年的同行审计</em> 才能被信任。</li>
+  <li><em>双线性配对</em>（bilinear pairings）：椭圆曲线上的 Weil / Tate 配对（链回<a href="ch19.html">ch19</a>）让"<em>身份基加密</em>"（identity-based encryption）成为可能——"<em>用 Alice 的电子邮件地址作为公钥</em>"。这是 Boneh-Franklin 2001 的发明。</li>
+  <li><em>零知识证明</em>（ZKP）+ <em>SNARKs / STARKs</em>：基于多项式承诺、椭圆曲线配对、哈希函数的复合结构。是 Web3 / 区块链可扩展性的核心工具（Ethereum 二层用大量 ZK Rollups）。</li>
+  <li><em>全同态加密</em>（FHE）：基于 LWE 的格密码。允许对加密数据直接做计算——"<em>云服务商在不解密的前提下处理你的数据</em>"。Gentry 2009 的发明，2025 年已经有了 IBM HElib、Microsoft SEAL 等可用库。</li>
+</ul>
+
+<p>所有这些方向<em>都</em> 是数论 + 代数几何 + 表示论的具体应用。你这本书的每一章都在某种程度上对应一种现代密码工具的数学基础——从最基础的 \(\mathbb Z/n\)（RSA、DH）到最尖端的椭圆曲线配对（IBE、ZKP）和格（FHE、PQC）。</p>
+
+<p>请你停下来感受这件事：</p>
+
+<ul>
+  <li>1801 年 Gauss 的<em>《算术研究》</em> 是一本"<em>纯数学</em>" 著作，没有任何应用动机。</li>
+  <li>1976 年 Diffie-Hellman 把 Gauss 的"<em>原根</em>" 变成密钥协商。</li>
+  <li>1985 年 Koblitz / Miller 把<em>椭圆曲线</em>（200 年前 Abel、Jacobi 的纯研究）变成短密钥密码。</li>
+  <li>2024 年 NIST FIPS 203 把 Regev 2005 的<em>纯数学</em> LWE 问题变成<em>互联网标准</em>。</li>
+</ul>
+
+<p>"<em>纯数学</em>" 与"<em>实用</em>" 之间的距离在数论里通常是 30-200 年——但每隔几十年总有一次令人惊讶的转化。这本书前 22 章那些看似"<em>没有应用</em>" 的结构（类群、模形式、Galois 表示、椭圆曲线 \(L\)-函数），它们的<em>未来</em>应用<em>可能</em>是下一个 30 年的密码学。Hardy 1940 写"<em>数论的纯粹是它的优点之一—— 它将永远没用</em>"——他错得彻底。</p>
+
+<p>下一章是这本书的最后一章。我们用<em>整本书前 23 章的工具</em> 拼出 Wiles 1995 证 Fermat 大定理的<em>全图景</em>——把"<em>整数 \(\mathbb Z\)</em>" 这个最朴素的对象，看到它复杂得需要 358 年人类最聪明的头脑 + 几乎所有 20 世纪现代数学的故事的尾声。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 类域论一瞥</a><a href="ch24.html">下一章 · 第 24 章 Fermat 大定理与 Wiles 路径 →</a></nav>
+</main>
+</body>
+</html>
