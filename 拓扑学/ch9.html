@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 有限积拓扑 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 子空间拓扑</a><a href="ch10.html">下一章 · 第 10 章 商拓扑 →</a></nav>
+<h1 id="ch9">第 9 章 有限积拓扑</h1>
+
+<p>请你回答一道<em>看似</em> 简单的题：\(\mathbb{R}^2\) 的开集长什么样？</p>
+
+<p>你的直觉答案：开圆盘 \(B((x_0, y_0), r) = \{(x, y) : (x - x_0)^2 + (y - y_0)^2 < r^2\}\) 是开集，开矩形 \((a, b) \times (c, d) = \{(x, y) : a < x < b, c < y < d\}\) 也是开集。任意开集是<em>开圆盘的并</em>，或者<em>开矩形的并</em>。</p>
+
+<p>但是请你停下来想一下——为什么<em>圆盘和矩形给出同一个</em> 开集族？\(\mathbb{R}^2\) 上"<em>开</em>" 这件事到底由什么决定？</p>
+
+<p>更<em>本质</em> 的问法：\(\mathbb{R}^2 = \mathbb{R} \times \mathbb{R}\) 是两份 \(\mathbb{R}\) 的<em>笛卡尔积</em>。<em>给定</em> \(\mathbb{R}\) 上的拓扑，\(\mathbb{R}^2\) 上的拓扑应该是<em>什么</em>？答案应该<em>只</em> 用 \(\mathbb{R}\) 的拓扑写出来——不该突然冒出"<em>距离 / 圆盘 / 范数</em>" 这些 \(\mathbb{R}^2\) 才有的概念。</p>
+
+<p>这一章把"<em>积空间应该带什么拓扑</em>" 这件事公理化。答案就是<em>积拓扑</em>——开集由"<em>开矩形 \(U \times V\)</em>" 当基生成。一旦定义清楚，"<em>圆盘也是开集</em>" 就<em>自动</em>跟着出来，不需要单独验。</p>
+
+<h2 id="sec9-1">9.1 \(\mathbb{R}^2\) 的标准拓扑：从开矩形开始</h2>
+
+<p>\(\mathbb{R}^2\) 上"<em>开矩形</em>"：\((a, b) \times (c, d)\)，其中 \((a, b), (c, d) \subseteq \mathbb{R}\) 是开区间。</p>
+
+<p>"<em>由开矩形生成的拓扑</em>"——开集 = 开矩形的任意并，也就是说</p>
+
+<p>\[
+U \subseteq \mathbb{R}^2 \text{ 开} \iff \forall (x, y) \in U, \exists \text{ 开矩形 } R, \ (x, y) \in R \subseteq U.
+\]</p>
+
+<p>请验证：这族开集满足三公理 (O1, O2, O3)（练习；与 ch5 基生成拓扑机制完全一致）。</p>
+
+<p>这族开集与"<em>由开圆盘生成</em>" 的开集族<em>相同</em>——为什么？因为：</p>
+
+<ul>
+  <li>每个开圆盘都是开矩形的并（每点周围找小开矩形塞进去）；</li>
+  <li>每个开矩形都是开圆盘的并（每点周围找小开圆盘塞进去）。</li>
+</ul>
+
+<p>具体：\((x_0, y_0) \in (a, b) \times (c, d)\)，取 \(r = \min(x_0 - a, b - x_0, y_0 - c, d - y_0) > 0\)，开圆盘 \(B((x_0, y_0), r)\) 落在矩形里。反方向：\((x_0, y_0) \in B(\cdot, r)\)，取 \(\delta = r/\sqrt{2}\)，开矩形 \((x_0 - \delta, x_0 + \delta) \times (y_0 - \delta, y_0 + \delta)\) 落在圆盘里。</p>
+
+<p>所以"<em>开矩形生成</em>" 与"<em>开圆盘生成</em>" 给同一个拓扑——\(\mathbb{R}^2\) 标准拓扑。两种描述取决于你<em>从哪个角度</em> 看：</p>
+
+<ul>
+  <li>开矩形：从"<em>笛卡尔积</em>" 角度（用每个分量的开区间相乘）。</li>
+  <li>开圆盘：从"<em>欧氏度量</em>" 角度（用 \(\|\cdot\|_2\) 范数）。</li>
+</ul>
+
+<p>这一章选<em>积</em> 视角推广——它<em>不</em>依赖度量，可以推到任何拓扑空间的乘积。</p>
+
+<h2 id="sec9-2">9.2 积拓扑的定义：用基</h2>
+
+<p>给两个拓扑空间 \((X, \tau_X)\) 与 \((Y, \tau_Y)\)。我们要给乘积集合 \(X \times Y = \{(x, y) : x \in X, y \in Y\}\) 配拓扑。</p>
+
+<p><strong>定义（积拓扑，基描述）：</strong>\(X \times Y\) 上的<em>积拓扑</em> \(\tau_{X \times Y}\) 由基</p>
+
+<p>\[
+\boxed{\ \mathcal{B} := \{U \times V : U \in \tau_X, V \in \tau_Y\}\ }
+\]</p>
+
+<p>生成。也就是开集 = 这种"<em>开矩形</em>" 的任意并。</p>
+
+<p><strong>验证 \(\mathcal{B}\) 是基（ch5 标准）：</strong></p>
+
+<ul>
+  <li>(B1) 覆盖 \(X \times Y\)：\(X \times Y \in \mathcal{B}\)（取 \(U = X, V = Y\)）。\(\checkmark\)</li>
+  <li>(B2) 两个基元素 \(U_1 \times V_1, U_2 \times V_2 \in \mathcal{B}\) 的交：\((U_1 \times V_1) \cap (U_2 \times V_2) = (U_1 \cap U_2) \times (V_1 \cap V_2)\)（点对验证）——还是基元素（开 × 开）。所以交本身<em>就是</em> 一个基元素，特殊地满足 (B2)。\(\checkmark\)</li>
+</ul>
+
+<p>所以 \(\mathcal{B}\) 是合法基，\(\tau_{X \times Y}\) 是合法拓扑。\((X \times Y, \tau_{X \times Y})\) 称为<em>积空间</em>。</p>
+
+<p>请停一下欣赏 (B2) 的<em>恒等式</em>：\((U_1 \times V_1) \cap (U_2 \times V_2) = (U_1 \cap U_2) \times (V_1 \cap V_2)\)。两个开矩形的交还是<em>同形状</em> 的开矩形——这就是几何上"<em>矩形交</em>" 的代数表达。这条让积拓扑的基<em>对交封闭</em>，比一般的基要"<em>整齐</em>" 一档。</p>
+
+<p><strong>子基描述（备用）：</strong>积拓扑也可以用<em>子基</em> 描述。考虑投影 \(\pi_X: X \times Y \to X\)、\(\pi_Y: X \times Y \to Y\)。子基</p>
+
+<p>\[
+\mathcal{S} := \{\pi_X^{-1}(U) : U \in \tau_X\} \cup \{\pi_Y^{-1}(V) : V \in \tau_Y\}
+\]</p>
+
+<p>生成的拓扑就是积拓扑。这是因为 \(\pi_X^{-1}(U) = U \times Y\)、\(\pi_Y^{-1}(V) = X \times V\)，它们的有限交是 \((U_1 \times Y) \cap (X \times V_1) = U_1 \times V_1\)——正是基元素。</p>
+
+<p>子基描述<em>更</em> 干净，因为它<em>明确</em> 用"<em>让投影连续</em>" 当出发点。下一节看为什么这件事重要。</p>
+
+<h2 id="sec9-3">9.3 投影连续</h2>
+
+<p>定义投影 \(\pi_X: X \times Y \to X\) 由 \(\pi_X(x, y) = x\)；\(\pi_Y\) 类似。</p>
+
+<p><strong>命题：</strong>\(\pi_X, \pi_Y\) 在积拓扑下都连续。</p>
+
+<p><em>证明（\(\pi_X\)）。</em>取 \(X\) 的任一开集 \(U\)。算 \(\pi_X^{-1}(U) = \{(x, y) : x \in U\} = U \times Y\)。\(U \times Y\) 是积拓扑的<em>基元素</em>（\(U \in \tau_X, Y \in \tau_Y\)），所以在 \(\tau_{X \times Y}\) 里开。\(\pi_X\) 连续。\(\square\)</p>
+
+<p>同理 \(\pi_Y\) 连续。</p>
+
+<p>这条命题与 ch8 的"<em>包含连续</em>" 平行——子空间拓扑<em>是为了让 \(i\) 连续</em> 而设计的；积拓扑<em>是为了让 \(\pi_X, \pi_Y\) 都连续</em> 而设计的。再加一条：</p>
+
+<p><strong>命题（最粗性）：</strong>积拓扑是 \(X \times Y\) 上让 \(\pi_X, \pi_Y\) 都连续的<em>最粗</em>（开集最少的）拓扑。</p>
+
+<p><em>证明思路。</em>设 \(\tau'\) 是 \(X \times Y\) 上让两投影都连续的拓扑。则对任意 \(U \in \tau_X\)，\(\pi_X^{-1}(U) = U \times Y \in \tau'\)；类似 \(X \times V \in \tau'\)。所以 \(\tau'\) 包含子基 \(\mathcal{S}\)，进而包含 \(\mathcal{S}\) 生成的整个拓扑——也就是积拓扑。\(\square\)</p>
+
+<p>这是<em>用普遍性质刻画拓扑</em> 的标准模板：</p>
+
+<ul>
+  <li>子空间拓扑：让<em>包含</em> 连续的最粗拓扑。</li>
+  <li>积拓扑：让所有<em>投影</em> 连续的最粗拓扑。</li>
+  <li>商拓扑（ch10）：让<em>商映射</em> 连续的最<em>细</em>（开集最多的）拓扑——方向反过来。</li>
+</ul>
+
+<p>记住"<em>哪个映射连续, 决定哪个拓扑</em>"——你看到一个新的拓扑构造，第一句话就该问"<em>它让什么映射连续？</em>"。</p>
+
+<h2 id="sec9-4">9.4 通用性质：从 Z 到积空间的连续映射</h2>
+
+<p>积拓扑<em>真正</em> 强的地方在它的"<em>通用性质</em>"——它把"<em>从外部到积空间的映射连续吗</em>" 这件事归约成"<em>分量连续吗</em>"。</p>
+
+<p><strong>定理（积空间的通用性质）：</strong>给映射 \(f: Z \to X \times Y\)。写 \(f(z) = (f_X(z), f_Y(z))\)（用 \(f_X = \pi_X \circ f\)、\(f_Y = \pi_Y \circ f\) 当成两个分量）。则</p>
+
+<p>\[
+\boxed{\ f \text{ 连续} \iff f_X \text{ 与 } f_Y \text{ 都连续}.\ }
+\]</p>
+
+<p><em>证明。</em>(\(\Rightarrow\)) 若 \(f\) 连续，因 \(\pi_X, \pi_Y\) 连续（9.3），所以 \(f_X = \pi_X \circ f\)、\(f_Y = \pi_Y \circ f\) 是连续函数的复合，连续。</p>
+
+<p>(\(\Leftarrow\)) 设 \(f_X, f_Y\) 都连续。要证 \(f\) 连续，只需检验在<em>子基</em> \(\mathcal{S}\) 上（ch5 结论：检验子基开集逆像开就够）。</p>
+
+<p>取子基元 \(\pi_X^{-1}(U) = U \times Y\)（\(U \in \tau_X\)）。算 \(f^{-1}(U \times Y) = \{z : f(z) \in U \times Y\} = \{z : f_X(z) \in U\} = f_X^{-1}(U)\)。\(f_X\) 连续，\(f_X^{-1}(U)\) 在 \(Z\) 中开。\(\checkmark\)</p>
+
+<p>同理另一族子基元 \(\pi_Y^{-1}(V) = X \times V\) 的逆像 \(= f_Y^{-1}(V)\)，开。所有子基元逆像都开 \(\Rightarrow f\) 连续。\(\square\)</p>
+
+<p>这条定理的<em>价值</em> 在于把"<em>验证一个 \(Z \to X \times Y\) 映射连续</em>" 这件难事拆成两件容易事——验证<em>每一分量</em> 连续。这条用法极广。例：</p>
+
+<p><strong>例：</strong>\(\gamma: \mathbb{R} \to \mathbb{R}^2\) 由 \(\gamma(t) = (\cos t, \sin t)\)（单位圆参数化）。要证 \(\gamma\) 连续？分量 \(\cos t, \sin t\) 都是 \(\mathbb{R} \to \mathbb{R}\) 连续函数（实分析），所以 \(\gamma\) 连续。完。<em>不</em> 需要写 \(\gamma\) 的 \(\varepsilon\)-\(\delta\)。</p>
+
+<p><strong>例：</strong>\(g: \mathbb{R}^2 \to \mathbb{R}^3\) 由 \(g(x, y) = (x + y, xy, e^x \sin y)\)。三个分量都连续——\(g\) 连续。"<em>多元映射连续 \(\iff\) 每分量连续</em>" 这条<a href="../多元微积分/index.html">多元微积分</a>结论<em>本质</em> 就是积空间的通用性质。</p>
+
+<p>这条性质<em>反过来</em> 说：积拓扑是<em>使这条命题成立</em> 的<em>唯一</em> 拓扑。若你把 \(X \times Y\) 配上一个<em>更细</em> 的拓扑（比如盒拓扑——见 ch11），通用性质<em>失败</em>：分量连续不再蕴含整体连续。这是 ch11 的核心反例。</p>
+
+<h2 id="sec9-5">9.5 紧致传递：Tube 引理 + 完整证明</h2>
+
+<p>积拓扑的<em>另一</em> 个核心结论是<em>性质传递</em>。我们从最重要的一条开始：</p>
+
+<p><strong>定理（紧致积传）：</strong>若 \(X, Y\) 都紧致，则 \(X \times Y\) 紧致。</p>
+
+<p>证明用一条引理：</p>
+
+<p><strong>Tube 引理：</strong>设 \(Y\) 紧致, \(x_0 \in X\)。若 \(N \subseteq X \times Y\) 是<em>开</em> 集且包含"<em>切片</em>" \(\{x_0\} \times Y\)，则存在 \(x_0\) 在 \(X\) 中的开邻域 \(W\) 使</p>
+
+<p>\[
+W \times Y \subseteq N.
+\]</p>
+
+<p>"<em>切片</em>" \(\{x_0\} \times Y\) 是 \(X \times Y\) 里"<em>过 \(x_0\) 的竖直直线</em>"（在 \(\mathbb{R}^2\) 想象）。Tube 引理说：含切片的开集一定含"<em>切片附近的整条 tube</em>" \(W \times Y\)。</p>
+
+<p><em>证明（Tube 引理）。</em>对每个 \(y \in Y\)，\((x_0, y) \in N\)。\(N\) 开 \(\Rightarrow\) 存在开矩形 \(U_y \times V_y \subseteq N\) 使 \((x_0, y) \in U_y \times V_y\)（基元素细化）。也就是 \(x_0 \in U_y\)、\(y \in V_y\)。</p>
+
+<p>\(\{V_y\}_{y \in Y}\) 是 \(Y\) 的开覆盖。\(Y\) 紧致 \(\Rightarrow\) 取有限子覆盖 \(V_{y_1}, \ldots, V_{y_n}\)：\(Y = V_{y_1} \cup \cdots \cup V_{y_n}\)。</p>
+
+<p>定义 \(W := U_{y_1} \cap \cdots \cap U_{y_n}\)——有限多个开集的交，仍开。\(x_0 \in W\)（每个 \(U_{y_i}\) 含 \(x_0\)）。</p>
+
+<p>验 \(W \times Y \subseteq N\)：取 \((w, y) \in W \times Y\)。\(y \in V_{y_i}\) 对某个 \(i\)。则 \((w, y) \in W \times V_{y_i} \subseteq U_{y_i} \times V_{y_i} \subseteq N\)。\(\checkmark\square\)</p>
+
+<p>请欣赏证明的<em>结构</em>：用 \(Y\) 的紧致性把"无限多个 \(V_y\)" 缩成"有限多个 \(V_{y_i}\)"，再用"<em>有限</em>多 \(U_{y_i}\) 的交还开" 造出 \(W\)。这正是<em>紧致性的本质用法</em>——把"局部" 拼成"全局" 时控制有限量。</p>
+
+<p>有了 Tube 引理，主定理证明几行：</p>
+
+<p><em>证明（紧致积传）。</em>设 \(\{N_\alpha\}_{\alpha \in I}\) 是 \(X \times Y\) 的开覆盖。要找有限子覆盖。</p>
+
+<p>对每个 \(x_0 \in X\)，"切片" \(\{x_0\} \times Y\) 与 \(Y\) 同胚（练习；\(y \mapsto (x_0, y)\) 是同胚）所以紧致。\(\{N_\alpha\}\) 覆盖切片 \(\Rightarrow\) 取有限子覆盖 \(N_{\alpha_1}, \ldots, N_{\alpha_k}\) 覆盖 \(\{x_0\} \times Y\)。</p>
+
+<p>令 \(N_{x_0} := N_{\alpha_1} \cup \cdots \cup N_{\alpha_k}\)——有限多个开集的并，仍开，且包含 \(\{x_0\} \times Y\)。</p>
+
+<p>用 Tube 引理：存在 \(x_0\) 在 \(X\) 中的开邻域 \(W_{x_0}\) 使 \(W_{x_0} \times Y \subseteq N_{x_0}\)。</p>
+
+<p>\(\{W_{x_0}\}_{x_0 \in X}\) 是 \(X\) 的开覆盖。\(X\) 紧致 \(\Rightarrow\) 有限子覆盖 \(W_{x_1}, \ldots, W_{x_m}\)：\(X = W_{x_1} \cup \cdots \cup W_{x_m}\)。则</p>
+
+<p>\[
+X \times Y = \bigcup_{j=1}^m (W_{x_j} \times Y) \subseteq \bigcup_{j=1}^m N_{x_j}.
+\]</p>
+
+<p>每个 \(N_{x_j}\) 是有限多个 \(N_\alpha\) 的并（按定义）。把它们摊开：\(X \times Y\) 被有限多个 \(N_\alpha\) 覆盖。\(\square\)</p>
+
+<p>请停下来读一遍这条证明。它<em>双重</em>使用紧致性——一次让"切片紧致" 给有限子覆盖，一次让"\(X\) 紧致" 给有限子覆盖。两次都把"无限" 拍成"有限"，最后总有限就够。</p>
+
+<p>这条定理用得<em>无所不在</em>。例：\([0, 1]\)（紧致，Heine-Borel）\(\Rightarrow [0, 1]^2 = [0, 1] \times [0, 1]\) 紧致 \(\Rightarrow [0, 1]^n\) 紧致（用归纳，下面 9.8）。这<em>就</em>是 \(\mathbb{R}^n\) 中"<em>有界闭集紧致</em>"（Heine-Borel \(n\) 维版）的拓扑学证明。</p>
+
+<h2 id="sec9-6">9.6 连通积传</h2>
+
+<p><strong>定理：</strong>若 \(X, Y\) 都连通，则 \(X \times Y\) 连通。</p>
+
+<p><em>证明。</em>固定一点 \((x_0, y_0) \in X \times Y\)。</p>
+
+<p>对每个 \(x \in X\)，<em>水平切片</em> \(X \times \{y_0\}\) 与 \(X\) 同胚，连通；<em>竖直切片</em> \(\{x\} \times Y\) 与 \(Y\) 同胚，连通。</p>
+
+<p>"<em>十字</em>" \(T_x := (X \times \{y_0\}) \cup (\{x\} \times Y)\) 是两个连通子集的并，且它们在交点 \((x, y_0)\) 处<em>有公共点</em>——<em>两个连通集若有公共点, 并集连通</em>（ch18 的标准结论；练习用反证）。所以 \(T_x\) 连通。</p>
+
+<p>每个 \(T_x\) 含 \((x_0, y_0)\)（在 \(X \times \{y_0\}\) 上）。</p>
+
+<p>整个 \(X \times Y = \bigcup_{x \in X} T_x\)——一族连通集，<em>都含公共点</em> \((x_0, y_0)\)——它们的并连通。\(\square\)</p>
+
+<p>这个证明的几何画面：每个点 \((x, y) \in X \times Y\) 通过"<em>L 形</em>" 路径与 \((x_0, y_0)\) 相连——先水平走到 \((x_0, y_0)\) 再或先竖直再水平。L 形路径作为两个连通段的并连通，再把所有 L 形并起来还连通。</p>
+
+<h2 id="sec9-7">9.7 Hausdorff 积传</h2>
+
+<p><strong>定理：</strong>若 \(X, Y\) 都 Hausdorff，则 \(X \times Y\) Hausdorff。</p>
+
+<p><em>证明。</em>取 \((x_1, y_1) \neq (x_2, y_2) \in X \times Y\)。则要么 \(x_1 \neq x_2\)，要么 \(y_1 \neq y_2\)。</p>
+
+<p>无失一般 \(x_1 \neq x_2\)。\(X\) Hausdorff \(\Rightarrow\) 取分离开集 \(U_1, U_2 \subseteq X\)：\(x_i \in U_i\)，\(U_1 \cap U_2 = \emptyset\)。</p>
+
+<p>则 \(U_1 \times Y\) 与 \(U_2 \times Y\) 是 \(X \times Y\) 的开集，分别含 \((x_1, y_1)\) 与 \((x_2, y_2)\)。它们的交：</p>
+
+<p>\[
+(U_1 \times Y) \cap (U_2 \times Y) = (U_1 \cap U_2) \times Y = \emptyset \times Y = \emptyset.
+\]</p>
+
+<p>分离了。\(\square\)</p>
+
+<p>这条证明<em>只</em> 用了一边的 Hausdorff——\(x_1 \neq x_2\) 时用 \(X\) Hausdorff 就够。所以严格说"<em>\(X\) Hausdorff（且 \(Y\) 任意）\(\Rightarrow X \times Y\) Hausdorff</em>" <em>不</em> 成立——若 \(Y\) 不 Hausdorff，可以让两点形如 \((x_0, y_1), (x_0, y_2)\) 这种<em>同 \(x\) 不同 \(y\)</em>，那时 \(X\) 帮不上忙，得用 \(Y\) Hausdorff。命题正确表述就是开头：<em>都</em> Hausdorff 才行。</p>
+
+<h2 id="sec9-8">9.8 推广到有限多个</h2>
+
+<p>给 \(n\) 个拓扑空间 \(X_1, \ldots, X_n\)，定义乘积</p>
+
+<p>\[
+X_1 \times \cdots \times X_n = \{(x_1, \ldots, x_n) : x_i \in X_i\}.
+\]</p>
+
+<p>积拓扑的基：</p>
+
+<p>\[
+\{U_1 \times \cdots \times U_n : U_i \in \tau_{X_i}\}.
+\]</p>
+
+<p>"<em>开 \(n\) 维盒</em>"。</p>
+
+<p>所有结论平行推广：</p>
+
+<ul>
+  <li>每个投影 \(\pi_i: \prod X_j \to X_i\) 连续；</li>
+  <li>积拓扑是让所有投影连续的最粗拓扑；</li>
+  <li>通用性质：\(f: Z \to \prod X_i\) 连续 \(\iff\) 每个 \(\pi_i \circ f\) 连续；</li>
+  <li>紧致 / 连通 / Hausdorff 都积传（\(n\) 个空间都满足 \(\Rightarrow\) 积满足）。</li>
+</ul>
+
+<p><em>证明思路</em>：归纳。\(X_1 \times X_2 \times X_3 = (X_1 \times X_2) \times X_3\)（练习证两种描述给同一拓扑——这是<em>结合律</em>）。所以从 \(n = 2\) 推 \(n = 3\) 用一次定理，\(n\) 任意有限用归纳。</p>
+
+<p><strong>例（\(\mathbb{R}^n\) 标准拓扑 = 积拓扑）：</strong>\(\mathbb{R}^n\) 上"<em>由开 \(n\) 维盒生成</em>" 的拓扑与"<em>由开欧氏球生成</em>" 的拓扑相同——同样的论证（开盒能塞进球, 球能塞进盒）。所以 \(\mathbb{R}^n\) 的<em>标准（欧氏）拓扑</em> 就是 \(n\) 份 \(\mathbb{R}\) 的积拓扑。</p>
+
+<p>用积传性质立得：</p>
+
+<ul>
+  <li>\([0, 1]^n\) 紧致——因为 \([0, 1]\) 紧致；</li>
+  <li>\(\mathbb{R}^n\) 连通——因为 \(\mathbb{R}\) 连通；</li>
+  <li>\(\mathbb{R}^n\) Hausdorff——因为 \(\mathbb{R}\) Hausdorff。</li>
+</ul>
+
+<p>这套结论<em>不需要</em> 重做任何证明。Heine-Borel \(n\) 维（"\(\mathbb{R}^n\) 中有界闭集紧致") 也化简为：有界闭集 \(\subseteq [-R, R]^n\)（紧致, by 积传）的闭子集——闭子集紧致（ch8 结论）。三步内拿下。</p>
+
+<p><strong>下一步预告：</strong>"<em>有限</em>" 这个限制能不能去掉？任意多（甚至不可数）个空间相乘 \(\prod_{i \in I} X_i\)，能不能照搬 9.2 的"<em>开盒</em>"基？答案是<em>不行</em>——朴素"盒拓扑" 让通用性质失败、让紧致积传（Tychonoff）失败。这是 ch11 的故事：先看朴素方案撞墙, 再看怎么 reframe 成正确的"<em>积拓扑</em>"。</p>
+
+<p>ch10 先转去<em>商拓扑</em>——把矩形粘成圆柱、环面、Möbius 带、Klein 瓶。这是另一类构造（不是"<em>由旧空间相乘</em>" 而是"<em>把旧空间粘合</em>"），下章见。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 子空间拓扑</a><a href="ch10.html">下一章 · 第 10 章 商拓扑 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 选择公理与 Zorn 引理 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+<h1 id="appB">附录 B 选择公理与 Zorn 引理</h1>
+
+<p>选择公理（Axiom of Choice, AC）是 20 世纪数学基础的<em>分水岭</em>。它无处不在——本书<a href="ch16.html">Tychonoff 定理</a>、<a href="ch11.html">任意积拓扑</a>、<a href="../泛函分析/index.html">泛函分析的 Hahn-Banach 定理</a>、<a href="../线性代数/index.html">"<em>任意向量空间有基</em>"</a>、<a href="../实分析/index.html">非可测集存在</a>——大量定理"<em>表面看似具体</em>"，但背后<em>需要</em> AC。</p>
+
+<p>这个附录把 AC 摊开：它的历史、它与<em>Zorn 引理</em> 与<em>良序定理</em> 三者等价、它在拓扑学之外（Hahn-Banach、Tychonoff、向量空间基）的核心应用、数学界对它的态度。读完你应该明白为什么"<em>ZFC = ZF + AC</em>" 是大多数现代数学的<em>实际</em>基础。</p>
+
+<ul>
+  <li>AC 的提出 + 最初争议（Zermelo 1904）。</li>
+  <li>三种等价表述：AC / Zorn 引理 / 良序定理。</li>
+  <li>三者等价的证明思路（不全细节）。</li>
+  <li>具体应用：Hahn-Banach、Tychonoff、向量空间有基、ultrafilter 存在。</li>
+  <li>数学界对 AC 的态度——历史 + 现代立场。</li>
+</ul>
+
+<h2 id="appB-1">B.1 历史：Zermelo 1904 与最初争议</h2>
+
+<p>1904 年 Hilbert 列出 23 个待解决问题, 其中第一个就是<em>连续统假设</em>（CH）。Cantor 1883 已问过 \(\mathbb{R}\) 是否可<em>良序</em>（即给出全序使每个非空子集有最小元）, 没解决。良序看起来对 \(\mathbb{R}\) 不可能——\(\mathbb{R}\) 自然 \(\le\) 不是良序（\((0, 1)\) 没最小元）。</p>
+
+<p>Ernst Zermelo 1904 给出震撼证明：<em>任何集合都能良序</em>。证明用了一条朴素得"<em>显然</em>" 的假设："<em>给非空集族, 能从每个集合里挑一个元素</em>"——这就是<em>选择公理</em>。Zermelo 1908 把它纳入他的公理系统（后来发展成 ZF）。</p>
+
+<p>但<em>"良序 \(\mathbb{R}\)"</em> 这个结论<em>反直觉到不行</em>——你怎么<em>具体</em> 良序 \(\mathbb{R}\)？没人能写下来。这种"<em>存在但写不出</em>" 让数学家警觉。</p>
+
+<p>主要批评者：Borel、Lebesgue、Baire（法国构造主义传统）。他们认为 AC 是"<em>非构造</em>" 公理——它断言对象存在却不给构造方法。Lebesgue 1907 写信批评："<em>定义对象</em> 与<em>选择对象</em> 是不同的事。"</p>
+
+<p>主要支持者：Hilbert、Hadamard、Russell、Hausdorff。他们指出 AC 在已被接受的数学（如 Cantor 集合论本身）里早就<em>偷偷</em> 用过, 只是没明言。Hilbert 名言："<em>没人能把我们逐出 Cantor 创造的乐园</em>"。</p>
+
+<p>这场争议持续到 1930 年代, 最后大致以"<em>承认 AC, 但区分用 AC 的定理</em>" 收场。直到 Gödel 1938 证 AC 与 ZF 一致（即 ZF + AC 不矛盾）, Cohen 1963 证 AC 独立于 ZF（即 ZF 不能证 AC 也不能证 \(\neg\)AC）, 它的<em>逻辑地位</em> 才完全清楚。AC 是<em>独立公理</em>——既非 ZF 定理, 也不与 ZF 矛盾, 你可加可不加。</p>
+
+<p>"<em>大部分人加</em>"。今日 99% 的数学论文工作在 <strong>ZFC = ZF + AC</strong> 里。但有不加的派别（构造主义、直觉主义, 用 ZF 或更弱）。</p>
+
+<h2 id="appB-2">B.2 三个等价表述</h2>
+
+<p>AC 有大约 30 种等价表述（Rubin-Rubin 1985 整本书列）。最有用的三个：</p>
+
+<p><strong>选择公理 (AC)</strong>：对任意非空集族 \(\{X_\alpha\}_{\alpha \in I}\), 存在<em>选择函数</em> \(f : I \to \bigcup_\alpha X_\alpha\) 使 \(f(\alpha) \in X_\alpha\) 对所有 \(\alpha\)。等价地, \(\prod_\alpha X_\alpha \neq \emptyset\)（当所有 \(X_\alpha\) 非空）。</p>
+
+<p><strong>Zorn 引理</strong>：偏序集 \((X, \le)\) 中, 若每条<em>链</em>（全序子集）都有<em>上界</em>, 则 \(X\) 有<em>极大元</em>。</p>
+
+<p><strong>良序定理</strong>：每个集合都能配上一个良序（即一个全序使每个非空子集有最小元）。</p>
+
+<p><strong>定理</strong>：AC \(\iff\) Zorn 引理 \(\iff\) 良序定理。</p>
+
+<p>这条等价被 Bertrand Russell 形容："<em>选择公理显然真, 良序定理显然假, Zorn 引理嘛——天知道</em>"——讽刺地点出三个表述<em>看起来直觉差异巨大</em>, 但它们等价。这恰说明数学家"<em>直觉</em>" 的局限——三个等价命题, 直觉打分天差地别。</p>
+
+<h2 id="appB-3">B.3 三者等价的证明思路</h2>
+
+<p>完整证明在 Halmos <em>Naive Set Theory</em> §16-17。这里给思路。</p>
+
+<p><strong>AC \(\Rightarrow\) Zorn 引理</strong>。给偏序集 \((X, \le)\) 满足"<em>每条链有上界</em>"。要证存在极大元。</p>
+
+<p>反证。假设没极大元——即每个 \(x \in X\) 都有 \(x' > x\)（严格大）。用 AC 选一个映射 \(F : X \to X\) 使 \(F(x) > x\) 对所有 \(x\)。</p>
+
+<p>现在迭代构造一条增链：固定 \(x_0\), 定义 \(x_1 = F(x_0), x_2 = F(x_1), \ldots\)。这是个可数链。它有上界 \(u_1\)。再 \(F(u_1) > u_1\), 继续构造增链 \(u_1 < F(u_1) < \ldots\), 上界 \(u_2\)。无限做下去, 用<em>序数</em> 索引, 构造一条<em>跨越所有序数</em> 的严格增链。但 \(X\) 是个集合（"集合大小有限"），不能装下"所有序数"那么大的链——序数全体是<em>真类</em> 不是集合。矛盾。\(\square\)</p>
+
+<p>此证明用到<em>超穷归纳</em>（transfinite induction）跨序数, 不是初等。但思路简单："<em>没极大 \(\Rightarrow\) 能不停往上 \(\Rightarrow\) 链超过任意大势 \(\Rightarrow\) 矛盾</em>"。</p>
+
+<p><strong>Zorn \(\Rightarrow\) 良序定理</strong>。给集合 \(X\)。要构造一个良序。</p>
+
+<p>考虑所有 \((A, \le_A)\) 对其中 \(A \subseteq X\), \(\le_A\) 是 \(A\) 上的良序。在这族对上定义偏序：\((A, \le_A) \preceq (B, \le_B)\) 当 \(A \subseteq B\) 且 \(\le_B\) 限制到 \(A\) 等于 \(\le_A\) 且 \(A\) 是 \(B\) 关于 \(\le_B\) 的"<em>初始段</em>"。</p>
+
+<p>验证每条链有上界（取并）。Zorn 给极大元 \((M, \le_M)\)。证明 \(M = X\)（否则取 \(x \in X \setminus M\), 把 \(x\) 加到 \(M\) 末尾构造严格大的良序对, 矛盾极大性）。所以 \(X\) 上有良序 \(\le_M\)。\(\square\)</p>
+
+<p><strong>良序定理 \(\Rightarrow\) AC</strong>。给非空集族 \(\{X_\alpha\}\)。良序 \(\bigcup_\alpha X_\alpha\)。定义选择函数 \(f(\alpha) = \min(X_\alpha)\)（在该良序下）。\(\checkmark\)。\(\square\)</p>
+
+<p>三步关闭等价循环。\(\square\)</p>
+
+<p>注意 Zorn 引理是"<em>实战形式</em>"——大多数 AC 的应用直接用 Zorn 引理, 不直接用 AC 或良序定理。原因：偏序结构在数学里到处出现, "<em>找极大元</em>" 是自然问题。</p>
+
+<h2 id="appB-4">B.4 应用 1：Hahn-Banach 定理</h2>
+
+<p>泛函分析的核心定理。陈述（实数版）：</p>
+
+<p><strong>Hahn-Banach</strong>：给实向量空间 \(V\), 子空间 \(U \subseteq V\), 一个次线性函数 \(p : V \to \mathbb{R}\)（满足 \(p(\lambda v) = \lambda p(v)\) 对 \(\lambda \ge 0\), \(p(v + w) \le p(v) + p(w)\)）, 一个线性泛函 \(\ell : U \to \mathbb{R}\) 满足 \(\ell \le p\) 在 \(U\) 上。则 \(\ell\) 可延拓到 \(\tilde\ell : V \to \mathbb{R}\) 线性, 仍满足 \(\tilde\ell \le p\) 在 \(V\) 上。</p>
+
+<p>"<em>线性泛函的连续延拓</em>"——把 \(\ell\) 从子空间扩到全空间, 不增大。这是<em>拓扑向量空间</em>、<em>Banach 空间</em>、<em>对偶空间</em> 理论的奠基定理。</p>
+
+<p>证明（用 Zorn 引理）。考虑所有 \((W, \tilde\ell_W)\) 对其中 \(U \subseteq W \subseteq V\), \(\tilde\ell_W : W \to \mathbb{R}\) 线性延拓 \(\ell\) 且 \(\le p\)。配偏序"<em>延拓关系</em>"。</p>
+
+<p>每条链 \(\{(W_\alpha, \tilde\ell_\alpha)\}\) 有上界——取 \(W = \bigcup_\alpha W_\alpha\), \(\tilde\ell\) 由各 \(\tilde\ell_\alpha\) 拼起来。Zorn 给极大延拓 \((W^*, \tilde\ell^*)\)。</p>
+
+<p>证 \(W^* = V\)。反证：取 \(v_0 \in V \setminus W^*\), 把 \(v_0\) 加进 \(W^*\) 构造 \(W^{**} = W^* + \mathbb{R} v_0\), 选择 \(\tilde\ell^{**}(v_0)\) 一个特定值（用次线性 \(p\) 给出的关键不等式）保 \(\le p\)。这给严格更大的延拓, 矛盾。\(\square\)</p>
+
+<p>此证明 \(W^* = V\) 那一步是 Hahn-Banach 的<em>核心创意</em>——选 \(\tilde\ell^{**}(v_0)\) 的"<em>那个值</em>" 由 \(p\) 给的特定区间决定。但 Zorn 是把"<em>逐步延拓</em>" 推到顶端的工具。</p>
+
+<p>没 AC 能证弱版 Hahn-Banach（可分 Banach 空间的）, 但<em>一般版需要 AC</em>。</p>
+
+<h2 id="appB-5">B.5 应用 2：Tychonoff 定理</h2>
+
+<p>本书<a href="ch16.html">第 16 章</a>主定理。陈述：</p>
+
+<p><strong>Tychonoff 定理</strong>：任意紧拓扑空间族 \(\{X_\alpha\}_{\alpha \in I}\) 的笛卡尔积 \(\prod_\alpha X_\alpha\)（配 Tychonoff 拓扑）紧致。</p>
+
+<p>"<em>紧致性在任意积下保留</em>"——拓扑学最深定理之一, 因为紧致是<em>有限</em> 概念（有限子覆盖）, 任意（不可数）积保留它非平凡。</p>
+
+<p><em>Tychonoff 定理 \(\iff\) AC</em>（Kelley 1950 证明）。即用 Tychonoff 能反推 AC。所以 Tychonoff 不<em>仅仅</em> 用 AC——它<em>等同于</em> AC。这令"<em>是否接受 Tychonoff</em>" 与"<em>是否接受 AC</em>" 完全同等。</p>
+
+<p>本书 ch16 的证明用 ultrafilter（B.7 节）, 它本身需要 AC（Tarski 1930）。</p>
+
+<h2 id="appB-6">B.6 应用 3：任何向量空间有基</h2>
+
+<p>线性代数中"<em>每个有限维向量空间有基</em>" 是初等结果。无穷维呢？比如</p>
+
+<p>\[\mathbb{R}\text{ 作为 } \mathbb{Q}\text{-向量空间}\]</p>
+
+<p>有基吗？这种基（Hamel 基）是个映射 \(B : I \to \mathbb{R}\) 满足任意 \(r \in \mathbb{R}\) 唯一表为 \(B\) 元素的<em>有限</em> 有理系数线性组合。</p>
+
+<p><strong>定理</strong>：任何向量空间（任意维数, 任意域）有基。</p>
+
+<p>用 Zorn 引理：考虑所有线性独立子集, 偏序"<em>子集包含</em>"。每条链有上界（并）。极大线性独立子集是基。\(\square\)</p>
+
+<p>这定理需要 AC（事实上等价于 AC, Blass 1984）。所以你证 \(\mathbb{R}\) 作 \(\mathbb{Q}\)-空间有基, 偷偷在用 AC——你不能写下基, 但 AC 保证存在。</p>
+
+<p>这也<em>解释</em> 为什么 \(\mathbb{R}\) 上"<em>非可测集</em>" 存在（Vitali 1905, 用 \(\mathbb{R}/\mathbb{Q}\) 商的代表元）——这个构造需要 AC。<em>Solovay 1970 证明</em>：在不带 AC 的"<em>合理</em>" ZF 模型里, \(\mathbb{R}\) 所有子集都 Lebesgue 可测。"<em>非可测集存在</em>" 完全是 AC 的果。</p>
+
+<h2 id="appB-7">B.7 应用 4：Ultrafilter 存在</h2>
+
+<p>给集合 \(X\), 一个<em>滤子</em>（filter）\(\mathcal{F}\) 是 \(\mathcal{P}(X)\) 的子族满足：</p>
+
+<ul>
+  <li>\(X \in \mathcal{F}\), \(\emptyset \notin \mathcal{F}\)。</li>
+  <li>有限交：\(A, B \in \mathcal{F} \Rightarrow A \cap B \in \mathcal{F}\)。</li>
+  <li>上闭：\(A \in \mathcal{F}\) 且 \(A \subseteq B \Rightarrow B \in \mathcal{F}\)。</li>
+</ul>
+
+<p><em>Ultrafilter</em> = 极大滤子 = 对每个 \(A \subseteq X\), 要么 \(A \in \mathcal{F}\) 要么 \(X \setminus A \in \mathcal{F}\)。</p>
+
+<p>"<em>主</em>" ultrafilter: \(\mathcal{F}_x = \{A : x \in A\}\)（某固定 \(x\)）。这种很显然存在。<em>非主</em> ultrafilter（不是任何 \(\mathcal{F}_x\) 的）需要 AC 才能证存在——用 Zorn 引理对滤子族取极大。</p>
+
+<p>非主 ultrafilter 是<em>非标准分析</em>（hyperreal 数）、<em>Tychonoff 定理证明</em>（本书 ch16）、<em>Stone-Čech 紧致化</em>（ch17 后续话题）等的核心工具。</p>
+
+<p><em>Ultrafilter 引理</em>（"<em>任何滤子可扩到 ultrafilter</em>"）严格弱于 AC——它叫<em>布尔素理想定理</em>（BPI）, 在 ZF + BPI 中能证 Hahn-Banach、Tychonoff（紧 Hausdorff 版）、紧致定理（一阶逻辑）等大量"<em>用 AC 证</em>" 的结果。BPI 是数学界讨论的"<em>弱 AC</em>" 候选。</p>
+
+<h2 id="appB-8">B.8 数学界对 AC 的态度</h2>
+
+<p>20 世纪初的争议（B.1）已平息。今日<em>主流</em> 立场：</p>
+
+<ul>
+  <li><em>使用 AC</em>：99% 的现代数学（数论、几何、拓扑、泛函分析、代数）默认 ZFC。AC 是"<em>背景假设</em>"。论文里几乎不显式标明"<em>这里用了 AC</em>"——它隐式假设。</li>
+  <li><em>追踪 AC</em>：少数文献（"<em>反向数学</em>" reverse mathematics, Friedman / Simpson）系统记录每个定理需要 ZF 之上加多少。比如 Hahn-Banach 需要 BPI（< AC）, "<em>每向量空间有基</em>" 等价于 AC, Tychonoff 等价于 AC, 等等。这是<em>专业兴趣</em>, 不是日常工作。</li>
+  <li><em>不用 AC</em>：构造主义（Bishop 1967 学派）、直觉主义（Brouwer 后裔）、计算数学（program extraction）只承认能<em>构造</em> 的对象。他们的数学比 ZFC 弱, 但更"<em>计算性</em>", 与计算机证明 / 形式验证（Coq, Lean, Agda）密切相关。</li>
+</ul>
+
+<p>现代视角综合：AC 是<em>有用</em> 的工具公理, 让大量定理变得可证。但它<em>不</em> 是"<em>真理</em>"——它独立于 ZF, 你完全可以做不带 AC 的数学。"<em>用 AC</em>" 是个<em>选择</em>, 不是<em>必然</em>。</p>
+
+<p>本书选择默认用 AC。具体地：</p>
+
+<ul>
+  <li><a href="ch16.html">ch16</a> Tychonoff 定理直接调用。</li>
+  <li><a href="ch11.html">ch11</a> 任意笛卡尔积、Tychonoff 拓扑的<em>定义</em> 用任意 index 选择函数。</li>
+  <li><a href="ch20.html">ch20</a> Urysohn 引理的某些证法。</li>
+</ul>
+
+<p>读其他书时, 留意：Munkres 默认 AC; Engelking 也; Willard 标注得稍细; Jech <em>The Axiom of Choice</em> 是关于 AC 本身的专著。</p>
+
+<p>到这本书结束你已经把<em>点集拓扑</em> 走了一遍, 看见过 AC 在它<em>该出现的地方</em> 出现（Tychonoff）。下一步走代数拓扑 / 微分拓扑时, AC 还会反复出现, 但通常是在背景里。本附录的目的是让你"<em>认得它</em>"——以后你看到一个证明里突然蹦出 Zorn 引理, 你会知道："<em>这里悄悄用了选择公理</em>"。</p>
+
+<p>这就是<em>ZFC = ZF + AC</em> 作为现代数学背景的全部故事。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+</main>
+</body>
+</html>

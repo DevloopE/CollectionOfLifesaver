@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 商拓扑 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 有限积拓扑</a><a href="ch11.html">下一章 · 第 11 章 任意积拓扑（Tychonoff 拓扑） →</a></nav>
+<h1 id="ch10">第 10 章 商拓扑</h1>
+
+<p>请你拿一张纸做一个小实验。</p>
+
+<p>裁一个长方形纸条 \([0, 1] \times [0, 1]\)。把<em>左边</em> 那条 \(\{0\} \times [0, 1]\) 与<em>右边</em> 那条 \(\{1\} \times [0, 1]\) 粘起来——按"<em>同样的 \(y\) 粘到一起</em>" 的规则——\((0, y)\) 与 \((1, y)\) 现在是<em>同一</em> 个点。你得到一个圆柱面 \(S^1 \times [0, 1]\)。再把<em>上下</em> 两条 \([0, 1] \times \{0\}\) 与 \([0, 1] \times \{1\}\) 也按"<em>同样的 \(x\)</em>" 粘起来——你得到一个环面（甜甜圈表面）\(T^2\)。</p>
+
+<p>另外的玩法：左右粘的时候<em>翻转一下</em>——\((0, y)\) 与 \((1, 1 - y)\) 粘起来——你得到一条 Möbius 带（莫比乌斯环）。所有四边都按某种方向粘起来：左右照常 \((0, y) \sim (1, y)\)，上下翻转 \((x, 0) \sim (1 - x, 1)\)——你得到 Klein 瓶。把对边按<em>对径</em> 粘起来 \((0, y) \sim (1, 1 - y)\) 与 \((x, 0) \sim (1 - x, 1)\)——得到实射影平面 \(\mathbb{R}P^2\)。</p>
+
+<p>这些"<em>把若干点视为同一点</em>" 的几何粘合，在拓扑学里有正式名字——<em>商拓扑</em>。这一章把"<em>粘合</em>" 形式化，再具体跑几个例子让你看到：从 \(\mathbb{R}^n\) 的子空间出发，<em>纯靠粘合</em>，可以造出环面、Möbius 带、Klein 瓶、射影空间这些<em>新的</em> 拓扑空间——其中很多<em>不能</em> 嵌进 \(\mathbb{R}^3\)（如 Klein 瓶, \(\mathbb{R}P^2\)）。</p>
+
+<h2 id="sec10-1">10.1 用正方形粘成圆柱 / 环面 / Klein 瓶 / 实射影面</h2>
+
+<p>形式化之前先把图画清楚。基础对象：单位正方形 \(I^2 := [0, 1] \times [0, 1]\)。下面四个粘合规则（\(\sim\) 表示"<em>视为同一点</em>"）：</p>
+
+<p><strong>(1) 圆柱 \(S^1 \times [0, 1]\)：</strong>仅左右边按 \(y\) 一致：</p>
+<p>\[(0, y) \sim (1, y), \quad y \in [0, 1].\]</p>
+<p>左右两条边的 \((0, y)\) 与 \((1, y)\) 视为同一点。其他点不动。结果——把纸条卷起来形成的开口圆柱面。</p>
+
+<p><strong>(2) 环面 \(T^2 = S^1 \times S^1\)：</strong>左右<em>与</em> 上下都"<em>正粘</em>"：</p>
+<p>\[(0, y) \sim (1, y), \quad (x, 0) \sim (x, 1).\]</p>
+<p>先卷成圆柱（左右粘），再把圆柱两端按上下圈对应粘——把圆柱"<em>弯过来</em>" 接成甜甜圈表面。这是 \(\mathbb{R}^3\) 中可见的标准甜甜圈。</p>
+
+<p><strong>(3) Möbius 带：</strong>左右"<em>翻转粘</em>"：</p>
+<p>\[(0, y) \sim (1, 1 - y).\]</p>
+<p>左边 \((0, y)\) 与右边的<em>颠倒</em> 位置 \((1, 1 - y)\) 粘——粘之前把右边那条上下倒一下。结果是一条<em>不可定向</em> 的带——你顺着它走一圈会回到起点的"<em>背面</em>"。这是 1858 年 Möbius 与 Listing 独立发现的著名空间。</p>
+
+<p><strong>(4) Klein 瓶：</strong>左右正粘 + 上下翻转粘：</p>
+<p>\[(0, y) \sim (1, y), \quad (x, 0) \sim (1 - x, 1).\]</p>
+<p>左右先卷成圆柱，再把上下两端按"<em>翻转</em>" 粘——这一步在 \(\mathbb{R}^3\) 里<em>做不到</em>（它"<em>必须</em>" 自交）。所以 Klein 瓶<em>不能嵌入</em> \(\mathbb{R}^3\) 不自交，只能嵌入 \(\mathbb{R}^4\) 里。它是闭曲面、不可定向、无边界——独立完整的空间。</p>
+
+<p><strong>(5) 实射影平面 \(\mathbb{R}P^2\)：</strong>所有对边都"<em>对径</em>" 粘：</p>
+<p>\[(0, y) \sim (1, 1 - y), \quad (x, 0) \sim (1 - x, 1).\]</p>
+<p>更紧凑的描述：取单位圆盘 \(D^2\)，把边界圆 \(S^1\) 上对径点 \(p\) 与 \(-p\) 粘——也得到 \(\mathbb{R}P^2\)。这是最简单的非平凡<em>射影空间</em>，在代数几何 / 同伦论 / 物理（如自旋 \(SO(3) \cong \mathbb{R}P^3\) 的模型）里反复出现。\(\mathbb{R}P^2\) 也<em>不能</em> 嵌入 \(\mathbb{R}^3\) 不自交。</p>
+
+<p>请停下来盯着这五个例子。它们都从<em>同一</em> 起点（单位正方形）出发，<em>粘合规则</em> 不同就给出截然不同的<em>新空间</em>——其中有的不可定向、有的不能嵌入 \(\mathbb{R}^3\)、有的与 \(\mathbb{R}^n\) 中的几何模型完全不同。这种"<em>粘合</em>" 是拓扑学独有的造物方法。</p>
+
+<p>问题来了——"<em>粘合后的新空间</em>" 上的<em>开集</em> 应该是什么？这就是商拓扑要回答的。</p>
+
+<h2 id="sec10-2">10.2 商映射 \(p: X \to X / \sim\)</h2>
+
+<p>给拓扑空间 \(X\) 与 \(X\) 上的<em>等价关系</em> \(\sim\)（满足自反、对称、传递）。等价关系把 \(X\) 划分成<em>等价类</em>——每个等价类是 \(X\) 的一个非空子集 \([x] := \{x' \in X : x' \sim x\}\)。商集合：</p>
+
+<p>\[
+X / \sim := \{[x] : x \in X\}.
+\]</p>
+
+<p>注意：\(X / \sim\) 的"点" 是 \(X\) 的<em>子集</em>（等价类），而不是 \(X\) 的点。不过我们把每个等价类抽象当成"<em>新</em>空间的点" 来看。</p>
+
+<p><em>商映射</em>：</p>
+
+<p>\[
+p: X \to X / \sim, \quad p(x) := [x].
+\]</p>
+
+<p>"<em>送一个点到它所在的等价类</em>"。这个 \(p\) 显然是<em>满射</em>（每个等价类至少含一个点）。它一般<em>不是</em> 单射——同一等价类里的不同点都映到同一处。</p>
+
+<p>例（圆柱）：\(X = I^2 = [0, 1]^2\)。等价关系 \((x, y) \sim (x', y')\) \(\iff\) "<em>(x, y) = (x', y')</em>" 或 "<em>{x, x'} = {0, 1} 且 \(y = y'\)</em>"。每个等价类大多是单点 \(\{(x, y)\}\)，但若 \(x \in \{0, 1\}\) 类含两点 \(\{(0, y), (1, y)\}\)。商集合 \(I^2 / \sim\) 形象上就是<em>把左右边粘起来后的圆柱面上的点的集合</em>。</p>
+
+<h2 id="sec10-3">10.3 商拓扑：开集由 \(p\) 反推</h2>
+
+<p>现在到关键设计——\(X / \sim\) 上"<em>开集</em>" 是什么？</p>
+
+<p>策略：让商映射 \(p: X \to X / \sim\) 连续——<em>同时</em> 让它"<em>尽可能传递</em>" \(X\) 的开集结构。</p>
+
+<p><strong>定义（商拓扑）：</strong>\(X / \sim\) 上的子集 \(V\) <em>开</em> \(\iff p^{-1}(V) \subseteq X\) 开。</p>
+
+<p>形式：</p>
+
+<p>\[
+\boxed{\ \tau_{X/\sim} := \{V \subseteq X/\sim : p^{-1}(V) \in \tau_X\}.\ }
+\]</p>
+
+<p><strong>验证三公理：</strong></p>
+<ul>
+  <li>(O1) \(p^{-1}(\emptyset) = \emptyset \in \tau_X\)，\(p^{-1}(X/\sim) = X \in \tau_X\)。\(\checkmark\)</li>
+  <li>(O2) 任意并：\(p^{-1}\left(\bigcup V_\alpha\right) = \bigcup p^{-1}(V_\alpha)\)（逆像与并交换）。每个 \(p^{-1}(V_\alpha)\) 开 \(\Rightarrow\) 并开。\(\checkmark\)</li>
+  <li>(O3) 有限交：\(p^{-1}\left(\bigcap_i V_i\right) = \bigcap_i p^{-1}(V_i)\)。有限多个开集的交开。\(\checkmark\)</li>
+</ul>
+
+<p>所以 \(\tau_{X/\sim}\) 合法。</p>
+
+<p>\(p\) 在这个拓扑下连续——证明<em>就是</em>定义：\(V\) 开 \(\iff p^{-1}(V)\) 开。</p>
+
+<p><strong>关键观察（最细性）：</strong>商拓扑是 \(X/\sim\) 上让 \(p\) 连续的<em>最细</em>（开集最多的）拓扑。</p>
+
+<p><em>证明：</em>设 \(\tau'\) 是 \(X/\sim\) 的另一个拓扑使 \(p\) 连续。则任意 \(V \in \tau'\)，\(p^{-1}(V) \in \tau_X\)，按定义 \(V \in \tau_{X/\sim}\)。所以 \(\tau' \subseteq \tau_{X/\sim}\)——\(\tau_{X/\sim}\) 包含所有"<em>让 \(p\) 连续</em>" 的拓扑，是它们的<em>上界</em>，最细。\(\square\)</p>
+
+<p>请停下来对比 ch8、ch9：</p>
+<ul>
+  <li>子空间拓扑：让<em>包含 \(i\)</em> 连续的<em>最粗</em> 拓扑（开集最少）；</li>
+  <li>积拓扑：让<em>投影 \(\pi_i\)</em> 都连续的<em>最粗</em> 拓扑；</li>
+  <li>商拓扑：让<em>商映射 \(p\)</em> 连续的<em>最细</em> 拓扑（开集最多）。</li>
+</ul>
+
+<p>方向不同，原因在<em>映射的方向</em>：子空间和积里"<em>箭头朝外</em>"（从子空间到大空间, 从积到分量），所以要让箭头连续就要"<em>给出发地少开集</em>" → 最粗。商映射"<em>箭头朝内</em>"（从大空间到商空间），所以要让箭头连续就要"<em>给目的地少开集 = 给出发地多开集</em>" → 商空间侧最细。这是一种<em>对偶</em>。</p>
+
+<h2 id="sec10-4">10.4 商映射的通用性质</h2>
+
+<p>积拓扑的通用性质（9.4）告诉我们"<em>从外部到积空间</em>" 的映射连续 \(\iff\) 分量连续。商拓扑的通用性质方向相反——"<em>从商空间到外部</em>" 的映射连续怎么验证？</p>
+
+<p><strong>定理（商空间的通用性质）：</strong>设 \(p: X \to X/\sim\) 是商映射，\(f: X/\sim \to Y\) 是任一映射。则</p>
+
+<p>\[
+\boxed{\ f \text{ 连续} \iff f \circ p: X \to Y \text{ 连续}.\ }
+\]</p>
+
+<p><em>证明。</em>(\(\Rightarrow\)) \(p\) 连续, \(f\) 连续 \(\Rightarrow f \circ p\) 连续——连续函数的复合连续。</p>
+
+<p>(\(\Leftarrow\)) 设 \(f \circ p\) 连续。要证 \(f\) 连续——取 \(Y\) 中开集 \(V\)，证 \(f^{-1}(V)\) 在 \(X/\sim\) 中开。</p>
+
+<p>按商拓扑定义：\(f^{-1}(V) \in \tau_{X/\sim} \iff p^{-1}(f^{-1}(V)) \in \tau_X\)。但 \(p^{-1}(f^{-1}(V)) = (f \circ p)^{-1}(V)\)（这是逆像复合的代数）。\(f \circ p\) 连续 \(\Rightarrow (f \circ p)^{-1}(V) \in \tau_X\)。\(\checkmark\square\)</p>
+
+<p>这条性质<em>极其</em> 实用——它让"<em>定义商空间上的映射并验证连续</em>" 这件抽象事归约成"<em>定义 \(X\) 上的映射, 验证它在等价类上一致, 验证它连续</em>" 这件具体事。</p>
+
+<p><strong>一个细节：</strong>"<em>定义 \(X\) 上的映射, 验证它在等价类上一致</em>"——具体指：要给出 \(\bar{f}: X/\sim \to Y\)，最直接的办法是先有 \(g: X \to Y\)，<em>验证</em> 当 \(x \sim x'\) 时 \(g(x) = g(x')\)（这叫"<em>well-defined on classes</em>"），然后把 \(\bar{f}([x]) := g(x)\)。这条 \(\bar{f}\) 显然满足 \(\bar{f} \circ p = g\)。所以"<em>\(\bar{f}\) 连续 \(\iff g\) 连续</em>" 由通用性质给出。</p>
+
+<p>下面跑例子。</p>
+
+<h2 id="sec10-5">10.5 跑环面例子：\(I^2 / \sim \cong S^1 \times S^1\)</h2>
+
+<p>取 \(X = I^2 = [0, 1] \times [0, 1]\)（标准子空间拓扑），等价关系 \(\sim\) 为环面规则（10.1 第 (2) 例）：</p>
+
+<p>\[
+(x, 0) \sim (x, 1), \quad (0, y) \sim (1, y).
+\]</p>
+
+<p>具体一点。把所有"四个角" 的点 \((0, 0), (0, 1), (1, 0), (1, 1)\) 都视为同一点（按规则它们两两相通）。所有"上下边对应点" 视为同点。所有"左右边对应点" 视为同点。其他点孤立。</p>
+
+<p>商空间 \(I^2 / \sim\) 形式上是个抽象集合，但我们要证它<em>同胚</em> 于具体的环面 \(S^1 \times S^1\)，其中</p>
+
+<p>\[
+S^1 = \{(\cos \theta, \sin \theta) : \theta \in \mathbb{R}\} \subseteq \mathbb{R}^2.
+\]</p>
+
+<p>构造同胚：定义 \(g: I^2 \to S^1 \times S^1\) 由</p>
+
+<p>\[
+g(x, y) := \big((\cos 2\pi x, \sin 2\pi x), (\cos 2\pi y, \sin 2\pi y)\big).
+\]</p>
+
+<p>\(g\) 连续：每分量是 \(\cos 2\pi x\) 等连续函数（实分析）。</p>
+
+<p>\(g\) 在等价类上一致：若 \((x, 0) \sim (x, 1)\)，算 \(g(x, 0) = (\ldots, (1, 0))\) 与 \(g(x, 1) = (\ldots, (\cos 2\pi, \sin 2\pi)) = (\ldots, (1, 0))\)——相等！同理 \(g(0, y) = ((1, 0), \ldots) = g(1, y)\)。一致。\(\checkmark\)</p>
+
+<p>由通用性质 \(g\) 诱导出连续映射 \(\bar{g}: I^2 / \sim \to S^1 \times S^1\)。</p>
+
+<p>\(\bar{g}\) 是双射：满 \(g\) 给出（\(g\) 满, 因为 \((\cos 2\pi x, \sin 2\pi x)\) 横扫 \(S^1\) 当 \(x \in [0, 1)\)）；单——若 \(g(x, y) = g(x', y')\)，按 \(\cos / \sin\) 周期 \(x \equiv x' \pmod{1}\)、\(y \equiv y' \pmod{1}\)，在 \([0, 1]\) 内这<em>恰好</em> 给出 \((x, y) \sim (x', y')\)。\(\checkmark\)</p>
+
+<p>\(\bar{g}\) 是同胚——还要证逆连续。这一步用到<em>"紧致空间到 Hausdorff 空间的连续双射是同胚"</em>（ch15 标准结论）：</p>
+<ul>
+  <li>\(I^2\) 紧致（\([0, 1]\) 紧 + 积传, ch9）；</li>
+  <li>商映射是连续满射, 像还是 \(I^2 / \sim\) 紧致（ch15: 紧致空间的连续像紧致）；</li>
+  <li>\(S^1 \times S^1 \subseteq \mathbb{R}^2 \times \mathbb{R}^2\) Hausdorff（子空间继承）；</li>
+  <li>所以 \(\bar{g}: I^2 / \sim \to S^1 \times S^1\) 是紧 \(\to\) Hausdorff 的连续双射 \(\Rightarrow\) 同胚。</li>
+</ul>
+
+<p>\(\boxed{\ I^2 / \sim \cong S^1 \times S^1.\ }\) 抽象的"<em>把矩形对边粘起来</em>" 与具体的"<em>两个圆相乘</em>" 是<em>同一</em> 拓扑空间——这就是环面。</p>
+
+<p>请停一下欣赏：粘合（商拓扑）与积（乘积拓扑）<em>两条独立路径</em> 给同一个空间。这种"<em>构造路径殊途同归</em>" 是拓扑学很美的一面。</p>
+
+<h2 id="sec10-6">10.6 跑 Möbius 带、Klein 瓶、\(\mathbb{R}P^2\)</h2>
+
+<p><strong>(a) Möbius 带 \(M\)。</strong>取 \(I^2\) 与 \((0, y) \sim (1, 1-y)\)。</p>
+
+<p>商集合 \(M := I^2 / \sim\)。它有边界——上下边 \([0, 1] \times \{0, 1\}\) 上的点不被粘合，构成<em>一条</em> 闭曲线（不是两条）。这是 Möbius 带的著名性质："<em>只有一条边</em>"。</p>
+
+<p>验证："<em>边界</em>" 由 \([0, 1] \times \{0\}\) 与 \([0, 1] \times \{1\}\) 组成。在原矩形里它们是两段。但因为 \((0, 0) \sim (1, 1)\) 与 \((1, 0) \sim (0, 1)\)（按 \(\sim\) 规则），两段在<em>端点</em> 上接起来——\((0, 0)\) 接 \((1, 1)\)，\((0, 1)\) 接 \((1, 0)\)——形成一条连通的闭曲线。所以 \(M\) 的边只有一条。</p>
+
+<p>同样 \(M\) 是<em>不可定向</em> 的：你顺着中线走一圈，回到起点你的"<em>左右</em>" 反了。这条性质留 ch24 流形章正式证明。</p>
+
+<p>\(M\) 可以嵌入 \(\mathbb{R}^3\)（你拿张纸条扭一下粘起来就是它），所以这个商空间是有具体几何模型的。</p>
+
+<p><strong>(b) Klein 瓶 \(K\)。</strong>取 \(I^2\) 与 \((0, y) \sim (1, y)\) 加 \((x, 0) \sim (1 - x, 1)\)。</p>
+
+<p>左右<em>正粘</em>（先卷成圆柱），上下<em>翻转</em>。后一步在 \(\mathbb{R}^3\) 里没法不自交完成，所以 \(K\) 在 \(\mathbb{R}^3\) 里只有"<em>自交模型</em>"（你看到的 Klein 瓶图通常都有一处自交穿过自身），但作为<em>抽象</em> 拓扑空间它<em>没有</em> 自交。</p>
+
+<p>事实：\(K\) 嵌入 \(\mathbb{R}^4\) 不自交。证明思路：在 \(\mathbb{R}^4\) 里上下粘合时可以"<em>多用一维躲开</em>" 而不必交穿。</p>
+
+<p>\(K\) 是无边界、闭、不可定向曲面——与<em>球面 \(S^2\)</em>（无边、闭、可定向）、<em>环面 \(T^2\)</em>（无边、闭、可定向）、<em>\(\mathbb{R}P^2\)</em>（无边、闭、不可定向）一起构成<em>"闭曲面分类定理"</em> 的基本砖（ch24 综述）。</p>
+
+<p><strong>(c) \(\mathbb{R}P^2\) 的两种描述。</strong></p>
+
+<p>第一种（正方形）：取 \(I^2\) 与 \((0, y) \sim (1, 1-y)\)、\((x, 0) \sim (1-x, 1)\)。</p>
+
+<p>第二种（圆盘对径）：取 \(D^2 := \{(x, y) : x^2 + y^2 \leq 1\}\)，等价关系：边界点 \(p \in S^1\) 与对径点 \(-p\) 视为同一。</p>
+
+<p>第三种（球面对径）：取 \(S^2 := \{(x, y, z) : x^2 + y^2 + z^2 = 1\}\)，等价关系：每对对径点 \(p \sim -p\) 视为同一。这是<em>射影空间</em> 的通用定义：\(\mathbb{R}P^n := S^n / \{p \sim -p\}\)。</p>
+
+<p>三种描述同胚（练习；用通用性质 + 紧到 Hausdorff 的方法）。</p>
+
+<p>\(\mathbb{R}P^2\) 用处广："<em>所有过原点的直线</em>" 这件事在线性代数里是 \(\mathbb{R}^3 \setminus \{0\}\) 模 \(\sim\)（\(v \sim \lambda v, \lambda \neq 0\)），结果<em>就</em>是 \(\mathbb{R}P^2\)。这就是为什么它叫"<em>射影</em>"——它参数化了 \(\mathbb{R}^3\) 的<em>方向</em>（不分前后）。</p>
+
+<p>更一般 \(\mathbb{R}P^n\)：\(\mathbb{R}^{n+1} \setminus \{0\} / (v \sim \lambda v) \cong S^n / (p \sim -p)\)——\(n\) 维<em>实射影空间</em>。\(\mathbb{R}P^3\) 同胚于 \(SO(3)\) 旋转群（这是物理"<em>角动量代数</em>" 的几何根源）。\(\mathbb{R}P^n\) 在代数拓扑、代数几何、规范场论里是核心对象。</p>
+
+<h2 id="sec10-7">10.7 商空间陷阱：商一般<em>不</em> Hausdorff</h2>
+
+<p>子空间继承 Hausdorff（ch8.5）、积传 Hausdorff（ch9.7）。可惜<em>商不传</em>——即使 \(X\) Hausdorff, \(X / \sim\) 一般<em>不</em> Hausdorff。看反例：</p>
+
+<p><strong>反例 1（行带双原点）：</strong>取 \(X = \mathbb{R} \sqcup \mathbb{R}\)（两份实数线的<em>不交并</em>）。每份带标准拓扑, \(X\) 是<em>两条平行线</em>，Hausdorff。</p>
+
+<p>定义等价关系：第一条线的 \(x\) 与第二条线的 \(x\) 粘起来——<em>除了 \(x = 0\) 外</em>。也就是 \(x_1 \sim x_2\) iff \(x_1 = x_2 \neq 0\)。其他单点孤立。</p>
+
+<p>商空间 \(X / \sim\) 是什么？除 0 外两条线粘成一条 \(\mathbb{R}\)；而 \(0\) 处<em>有两个点</em>（"<em>第一条的 0</em>" 与"<em>第二条的 0</em>" 没被粘）。这就是"<em>带双原点的实数线</em>"——一条 \(\mathbb{R}\) 上有<em>两个</em> 点占据"<em>原点</em>" 位置。</p>
+
+<p>验证<em>不</em> Hausdorff：取这两个"<em>原点</em>" \(0_1, 0_2\)。任何含 \(0_1\) 的开集 \(V_1\) 必含 \(0_1\) 的某个开邻域 \((-\varepsilon, \varepsilon)_1\)（带下标 1 表示"<em>第一条线</em>"）。同样 \(V_2\) 必含 \((-\varepsilon, \varepsilon)_2\)。但 \((-\varepsilon, \varepsilon)_1 \setminus \{0_1\}\) 与 \((-\varepsilon, \varepsilon)_2 \setminus \{0_2\}\) 在商空间里是<em>同一个</em> 集合（都被粘合到 \((-\varepsilon, \varepsilon) \setminus \{0\}\)）。所以 \(V_1 \cap V_2 \supseteq (-\varepsilon, \varepsilon) \setminus \{0\} \neq \emptyset\)——分不开。</p>
+
+<p>这个空间叫"<em>带双点的直线</em>"（line with two origins），是教科书最经典的"<em>商打破 Hausdorff</em>" 例子。</p>
+
+<p><strong>反例 2（粗化等价）：</strong>取 \(X = \mathbb{R}\)，等价关系定义：所有 \(x \neq 0\) 互相等价（粘成一类），\(0\) 自成一类。</p>
+
+<p>商空间 \(X / \sim = \{[0], [\text{else}]\}\)——两个点。商拓扑下：\(p^{-1}(\{[\text{else}]\}) = \mathbb{R} \setminus \{0\}\) 开 \(\Rightarrow \{[\text{else}]\}\) 开。\(p^{-1}(\{[0]\}) = \{0\}\) <em>不</em> 开 \(\Rightarrow \{[0]\}\) <em>不</em> 开。</p>
+
+<p>所以商空间拓扑 \(\tau = \{\emptyset, \{[\text{else}]\}, \{[0], [\text{else}]\}\}\)——这正是 ch1.3 的 Sierpiński 空间！它<em>不</em> Hausdorff（一个点在另一点的"<em>每个邻域</em>" 里）。</p>
+
+<p>所以"<em>商空间是不是 Hausdorff</em>" 真的不能从 \(X\) 导出——要单独算。下一节给一条<em>充分</em>条件。</p>
+
+<h2 id="sec10-8">10.8 良态商：等价关系是闭子集时商 Hausdorff</h2>
+
+<p>要让商空间 Hausdorff，等价关系必须"<em>足够规则</em>"。一条最常用的充分条件：</p>
+
+<p><strong>定理：</strong>设 \(X\) 是 Hausdorff 空间，商映射 \(p: X \to X/\sim\) 是<em>开</em> 映射（即 \(U\) 开 \(\Rightarrow p(U)\) 开）。若等价关系图</p>
+
+<p>\[
+R := \{(x, x') \in X \times X : x \sim x'\}
+\]</p>
+
+<p>是 \(X \times X\) 的<em>闭</em> 子集（积拓扑），则 \(X/\sim\) Hausdorff。</p>
+
+<p><em>证明思路。</em>取 \([x_1] \neq [x_2] \in X/\sim\)。则 \(x_1 \not\sim x_2\)，即 \((x_1, x_2) \notin R\)。\(R\) 闭 \(\Rightarrow X \times X \setminus R\) 开，含 \((x_1, x_2)\)。按积拓扑基存在开矩形 \(U_1 \times U_2 \subseteq X \times X \setminus R\) 使 \((x_1, x_2) \in U_1 \times U_2\)。也就是 \(x_i \in U_i\)，且<em>没有</em> \((u_1, u_2) \in U_1 \times U_2\) 满足 \(u_1 \sim u_2\)（否则 \((u_1, u_2) \in R\)）。</p>
+
+<p>\(p\) 开 \(\Rightarrow p(U_1), p(U_2)\) 是 \(X/\sim\) 中开集，分别含 \([x_1], [x_2]\)。验它们不相交：若 \([y] \in p(U_1) \cap p(U_2)\)，存在 \(u_1 \in U_1, u_2 \in U_2\) 使 \(p(u_1) = [y] = p(u_2)\)，即 \(u_1 \sim u_2\)——但我们排除了。\(\checkmark\square\)</p>
+
+<p>这条定理给一个<em>验证商 Hausdorff</em> 的具体路径：(1) 验商映射开（这步对很多自然商成立, 如群作用商）, (2) 验关系图 \(R\) 在 \(X \times X\) 中闭。</p>
+
+<p><strong>例（环面）：</strong>\(I^2 / \sim \to S^1 \times S^1\)。<em>正向</em> 已经知道环面 Hausdorff（嵌入 \(\mathbb{R}^4\)）。逆推：商映射 \(p: I^2 \to T^2\) 开（点在内部时显然, 边界点处用粘合规则验）；关系图 \(R\) 由有限多条粘合规则给出, 闭。两条都满足, 商 Hausdorff——核对一致。</p>
+
+<p><strong>例（射影空间 \(\mathbb{R}P^n\)）：</strong>\(S^n / (p \sim -p)\)。商映射开（\(p\) 与 \(-p\) 周围的小球各自开, 粘起来仍开）。关系图 \(R = \{(p, p) : p \in S^n\} \cup \{(p, -p) : p \in S^n\}\)，由两条对角线（\(\Delta = \{(p, p)\}\) 与 \(\Delta' = \{(p, -p)\}\)）的并组成。\(\Delta\) 在 \(S^n \times S^n\) 中闭（Hausdorff 空间的对角线总闭, 这是 Hausdorff 的等价刻画——见 ch12）；\(\Delta'\) 也闭（用 \((p, q) \mapsto p + q\) 连续, 它是该映射的零点集）。两个闭集的并闭 \(\Rightarrow R\) 闭。所以 \(\mathbb{R}P^n\) Hausdorff。\(\checkmark\)</p>
+
+<p><strong>反例 1 套用：</strong>带双原点的直线。它的关系图 \(R\) 在 \((\mathbb{R} \sqcup \mathbb{R})^2\) 里<em>不</em> 闭——按定义 \(R\) 含所有 \((x_1, x_2)\) 使 \(x_1 = x_2 \neq 0\)，加对角线点 \((x_1, x_1), (x_2, x_2)\)。但<em>不</em> 含 \((0_1, 0_2)\)（这两个 \(0\) 没被粘）。然而 \((0_1, 0_2)\) 是一族 \((x_1, x_2)\) 当 \(x \to 0\) 的极限点，也<em>不</em>在 \(R\) 里——所以 \(R\) 不闭，定理失效，商不 Hausdorff。<em>诊断准确。</em></p>
+
+<p>所以你看：商空间 Hausdorff 与否，可以由"<em>关系图闭不闭</em>" 这条几何条件直接读出。这是一条非常清亮的判据，配 ch12 分离公理章会反复用。</p>
+
+<p><strong>下一步预告：</strong>ch9 + ch10 把"<em>有限</em>" 的<em>积</em> 与<em>商</em> 都讲清楚了。ch11 把积推广到<em>任意多个</em>——这一步看似自然，实际撞上一道墙：朴素的"<em>盒拓扑</em>" 让连续性的通用性质失败。下章看墙、看 reframe，看 Tychonoff 1930 年怎么把"<em>正确</em> 的积拓扑" 找出来。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 有限积拓扑</a><a href="ch11.html">下一章 · 第 11 章 任意积拓扑（Tychonoff 拓扑） →</a></nav>
+</main>
+</body>
+</html>

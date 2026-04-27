@@ -19,6 +19,7 @@ A growing series of Chinese-language math textbooks in the **Adrian Banner / *Ca
 | 第九卷 | 普林斯顿抽象代数读本 | 24 章 + 2 附录 |
 | 第十卷 | 普林斯顿数值方法读本 | 24 章 + 2 附录 |
 | 第十一卷 | 普林斯顿数论读本 | 24 章 + 2 附录 |
+| 第十二卷 | 普林斯顿拓扑学读本 | 24 章 + 2 附录 |
 
 每章一个独立 HTML 文件（13–50 KB），数学符号用 MathJax 渲染（自动从 CDN 加载）。每本书都有共享的 `styles.css` 和上下章导航。
 

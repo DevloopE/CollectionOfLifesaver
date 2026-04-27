@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 1 章 引论：从距离到开集 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><span class="nav-disabled">← 上一章</span><a href="ch2.html">下一章 · 第 2 章 度量空间复习 →</a></nav>
+<h1 id="ch1">第 1 章 引论：从距离到开集</h1>
+
+<p>请你回答一道你<em>以为</em> 自己知道答案的题：</p>
+
+<p>函数 \(f(x) = x^2\) 在 \(\mathbb{R}\) 上连续吗？</p>
+
+<p>当然连续。怎么<em>证明</em> 它连续？</p>
+
+<p>教科书答案——\(\varepsilon\)-\(\delta\)：给任意 \(\varepsilon > 0\) 与任意 \(x_0 \in \mathbb{R}\)，找 \(\delta > 0\) 使 \(|x - x_0| < \delta \Rightarrow |x^2 - x_0^2| < \varepsilon\)。具体计算 \(|x^2 - x_0^2| = |x - x_0| \cdot |x + x_0|\)，取 \(\delta = \min(1, \varepsilon / (1 + 2|x_0|))\)，验证完。\(\checkmark\)</p>
+
+<p>但是<em>停下来想一下</em>——你<em>真</em> 是这样验证 \(x^2\) 连续的吗？很可能不是。你"<em>看见</em>" 抛物线是条没有断点的曲线，"<em>显然</em>" 连续。\(\varepsilon\)-\(\delta\) 是用来<em>万一被问起</em> 的形式答案，不是你<em>真正</em> 用来理解连续的工具。</p>
+
+<p>这一章要做的就是把这种"<em>看见连续</em>" 的直觉<em>形式化</em>——并且形式化得<em>不依赖距离</em>。形式化完了你会发现：连续<em>真正</em> 需要的是"<em>开集</em>" 这个概念，<em>不</em>需要"距离"。一旦你接受这件事，整个拓扑学就在你眼前打开。</p>
+
+<h2 id="sec1-1">1.1 连续的另一种说法："<em>开集的逆像是开集</em>"</h2>
+
+<p>给一个映射 \(f : X \to Y\) 在度量空间之间。<a href="../实分析/ch5.html">实分析读本第 5 章</a>给过这条<em>等价</em>：</p>
+
+<p>\[
+\boxed{\ f \text{ 连续} \iff \forall V \text{ 开} \subseteq Y, \ f^{-1}(V) = \{x : f(x) \in V\} \text{ 开} \subseteq X.\ }
+\]</p>
+
+<p>用人话：<em>每个开集的逆像还是开集</em>。这条等价的证明就一段——用 \(\varepsilon\)-\(\delta\) 翻译"开" 为"<em>对每个点都有一个含它的开球</em>" 即可。</p>
+
+<p>验证 \(f(x) = x^2\)。取 \(V \subseteq \mathbb{R}\) 开，比如 \(V = (1, 4)\)。那 \(f^{-1}(V) = \{x : 1 < x^2 < 4\} = (-2, -1) \cup (1, 2)\)。两个开区间的并——开集。\(\checkmark\)</p>
+
+<p>取 \(V = (-1, 1)\)：\(f^{-1}(V) = \{x : x^2 < 1\} = (-1, 1)\)，开。再取 \(V = (4, \infty)\)：\(f^{-1}(V) = (-\infty, -2) \cup (2, \infty)\)，开。每个开集的逆像都开——\(f\) 连续。</p>
+
+<p>请你停下来盯住这条等价仔细看一下。它说"<em>连续</em>" 这件事，可以<em>完全</em> 用"<em>开集</em>" 描述——<em>没</em> 出现 \(\varepsilon, \delta\)、<em>没</em> 出现"距离"、<em>没</em> 出现 \(\mathbb{R}\) 的算术结构。<em>只</em> 出现集合 + 函数 + "开集" 这个原始概念。</p>
+
+<p>这就是关键。如果一个空间上有"<em>开集</em>" 概念（不一定来自距离），就<em>能</em> 谈连续。问题是——什么样的空间有"开集"？</p>
+
+<h2 id="sec1-2">1.2 "<em>开集</em>" 满足三条公理</h2>
+
+<p>在度量空间 \((X, d)\) 里，"开集" 由距离定义：\(U\) 开 \(\iff\) 每个 \(x \in U\) 都有半径 \(r > 0\) 使开球 \(B(x, r) \subseteq U\)。这是一种<em>构造</em>。</p>
+
+<p>但"<em>哪些集合是开的</em>" 这件事满足三条<em>抽象</em> 性质——你完全可以<em>不通过距离</em> 直接列出来：</p>
+
+<ul>
+  <li><strong>(O1)</strong> \(\emptyset\) 开，\(X\) 开。</li>
+  <li><strong>(O2)</strong> 任意多开集的并仍开。\(\{U_\alpha\} \text{ 开} \Rightarrow \bigcup_\alpha U_\alpha\) 开。</li>
+  <li><strong>(O3)</strong> <em>有限</em>多开集的交仍开。\(U_1, \ldots, U_n \text{ 开} \Rightarrow \bigcap_{i=1}^n U_i\) 开。</li>
+</ul>
+
+<p>验证（度量空间情形）：(O1) 显然。(O2) 任意并：每个 \(x \in \bigcup U_\alpha\) 在某个 \(U_{\alpha_0}\) 里，那个开球工作。(O3) 有限交：每个 \(x\) 在每个 \(U_i\) 里都有球 \(B(x, r_i) \subseteq U_i\)，取 \(r = \min r_i > 0\)，球 \(B(x, r)\) 同时落在所有 \(U_i\) 里。<em>有限</em>性必要——\(\inf\) 无穷多个正数可能 \(= 0\)。事实上 \(\bigcap_n (-1/n, 1/n) = \{0\}\)<em>不</em> 开。</p>
+
+<p>反过来——给一个<em>任意</em> 集合 \(X\)，再给一族 \(X\) 的子集 \(\tau\)，如果 \(\tau\) 满足上面三条公理，我们就说 \(\tau\) 是 \(X\) 上的<em>拓扑</em>，\((X, \tau)\) 是<em>拓扑空间</em>。<em>不需要距离</em>——只需要满足公理的"开集" 集族。</p>
+
+<p>这就是<em>拓扑空间</em> 的诞生。<a href="ch3.html">第 3 章</a>正式定义。这一章只让你看到这条思路怎么<em>从连续这件具体事</em> 长出来。</p>
+
+<h2 id="sec1-3">1.3 几个具体的"<em>没距离</em>" 拓扑</h2>
+
+<p>看几个例子让"<em>开集独立于距离</em>" 这件事变成具体：</p>
+
+<p><strong>例 1：Sierpiński 空间。</strong>取 \(X = \{0, 1\}\)，定义</p>
+
+<p>\[
+\tau = \{\emptyset, \{1\}, \{0, 1\}\}.
+\]</p>
+
+<p>验证三条公理：(O1) \(\emptyset, X \in \tau\)，\(\checkmark\)。(O2) 并：\(\emptyset \cup \{1\} = \{1\}\)，\(\{1\} \cup X = X\)，全在 \(\tau\) 里。(O3) 交：\(\emptyset \cap \{1\} = \emptyset\)，\(\{1\} \cap X = \{1\}\)，全在 \(\tau\) 里。所以 \(\tau\) 是 \(X\) 上的拓扑。</p>
+
+<p>这个拓扑<em>不</em> 来自任何距离。原因——任何度量给出的拓扑都满足"\(\{x_0\}\) 开 \(\iff x_0\) 是<em>孤立点</em>"。在 Sierpiński 里 \(\{1\}\) 开但 \(\{0\}\) 不开——非对称。但任何度量自动给出对称："\(\{0\}\) 与 \(\{1\}\) 都<em>同等程度</em> 是孤立点或不是"，得到的拓扑里 \(\{0\}\) 与 \(\{1\}\) 要么都开要么都不开。所以 Sierpiński 拓扑<em>不可</em> 来自度量。</p>
+
+<p>这个 2 元素小空间在<em>计算机科学</em>(domain theory) 里反复出现——它是"<em>未终止 / 终止</em>" 二值的拓扑模型。</p>
+
+<p><strong>例 2：余有限拓扑。</strong>取 \(X = \mathbb{R}\)（或<em>任意</em>无穷集），定义</p>
+
+<p>\[
+\tau = \{\emptyset\} \cup \{U \subseteq X : X \setminus U \text{ 有限}\}.
+\]</p>
+
+<p>"开集 = 空集 + 余集有限的集合"。验证三条公理用 De Morgan + "<em>有限并仍有限 / 任意交里有限</em>" 即可。</p>
+
+<p>这个拓扑也<em>不</em> 来自距离——它<em>太粗</em>（开集太少）。具体：\(\mathbb{R}\) 上任何度量给出的拓扑里，\((-1, 1)\) 是开集；但在余有限拓扑里 \((-1, 1)\) <em>不</em> 开（其余集 \((-\infty, -1] \cup [1, \infty)\) 不有限）。</p>
+
+<p>余有限拓扑虽然"<em>怪</em>"，但在<em>代数几何</em> 里至关重要——\(\mathbb{A}^1_k\) (仿射直线代数簇) 上的 Zariski 拓扑就是它。代数几何里"<em>开集 = 多项式不为零的集合</em>"，余集是多项式零点（有限多个），正好对应余有限。</p>
+
+<p><strong>例 3：离散拓扑 vs 平凡拓扑。</strong>给任意集合 \(X\)：</p>
+
+<ul>
+  <li><em>离散</em> \(\tau_d = \mathcal{P}(X)\) (所有子集都开) — "<em>什么都开</em>"</li>
+  <li><em>平凡</em> \(\tau_0 = \{\emptyset, X\}\) — "<em>只有空集和全集开</em>"</li>
+</ul>
+
+<p>两个极端，都满足公理，都是合法拓扑。任何 \(X\) 上的"中间" 拓扑都被夹在这两者之间。它们是探索拓扑性质边界的好工具。</p>
+
+<h2 id="sec1-4">1.4 同胚：拓扑等价</h2>
+
+<p>有了"<em>拓扑空间</em>" 概念，"<em>什么算同一个空间</em>" 也变了。在度量空间里"<em>同</em>" 是<em>等距同构</em>——保距离的双射。在拓扑空间里"<em>同</em>" 是<em>同胚</em>——保<em>开集结构</em> 的双射。</p>
+
+<p>形式上：双射 \(f : X \to Y\) 是同胚，如果 \(f\) 与 \(f^{-1}\) 都连续（都把开集映成开集）。</p>
+
+<p>同胚比等距同构<em>宽松得多</em>。看几个例子：</p>
+
+<p><strong>圆 \(S^1 \subset \mathbb{R}^2\) 与椭圆。</strong>它们度量上完全不同（圆周长 \(2\pi r\)，椭圆周长是椭圆积分），但<em>拓扑上同胚</em>——一个连续可逆的"<em>压扁</em>" 映射就行。所以"<em>圆</em>" 与"<em>椭圆</em>" 在拓扑学眼里是<em>同一个</em> 对象。</p>
+
+<p><strong>开区间 \((0, 1)\) 与 \(\mathbb{R}\)。</strong>同胚！同胚映射 \(f(x) = \tan(\pi x - \pi/2)\) 把 \((0, 1)\) 双向连续地拉成整个 \(\mathbb{R}\)。所以"<em>有界开区间</em>" 与"<em>整条实数线</em>" 拓扑同。这件事让"<em>有界</em>" 不是拓扑性质——它依赖度量。</p>
+
+<p><strong>咖啡杯与甜甜圈。</strong>这是流传最广的例子。两者都是"<em>带一个洞的实心 3D 物体</em>"，可以连续变形相互转化。拓扑学家"<em>分不清咖啡杯和甜甜圈</em>" 就是这个意思——它们在拓扑下同。事实上"<em>洞数</em>"（亏格 \(g\)）是<em>拓扑不变量</em>：球面 \(g = 0\)、甜甜圈 \(g = 1\)、双甜甜圈 \(g = 2\)。这是<a href="ch23.html">第 23 章</a>基本群与<em>代数拓扑</em> 的最基本观察。</p>
+
+<p><strong>圆 \(S^1\) 与 8 字 \(\infty\)。</strong>这两个<em>不</em> 同胚！"8 字" 中间有个交点 \(p\)——拿掉它剩下两个连通片；圆的任意点拿掉后剩下还是连通的（一段开弧）。"<em>连通片个数</em>" 是拓扑不变量（<a href="ch18.html">第 18 章</a>）——拿掉一点后连通片数不变。所以圆与 8 字拓扑<em>不</em>同。</p>
+
+<p>请你停下来欣赏这件事的<em>分量</em>：通过"<em>拿一个点拓扑变化怎样</em>" 这种纯组合操作，我们能<em>区分</em> 不同的拓扑空间。这种"<em>拓扑不变量</em>" 是整本书的主线之一。</p>
+
+<h2 id="sec1-5">1.5 拓扑学要研究什么</h2>
+
+<p>把上面四节合一起，拓扑学的主题清晰了：</p>
+
+<p><strong>对象</strong>：拓扑空间——集合 + 满足三公理的开集族。</p>
+
+<p><strong>等价</strong>：同胚——保开集结构的双射。</p>
+
+<p><strong>核心问题</strong>：</p>
+
+<ul>
+  <li>什么是<em>拓扑性质</em>（同胚下不变）？给一个清单：紧致、连通、Hausdorff、可数、度量化、紧致化等。</li>
+  <li>什么样的空间能配距离（"<em>度量化</em>"）？什么样不能？这是 Urysohn 度量化定理（<a href="ch21.html">ch21</a>）回答的。</li>
+  <li>怎么"<em>组合</em>" 拓扑空间（积、商、子空间）？这套<em>构造</em> 是 ch8-11 内容。</li>
+  <li>怎么<em>区分</em> 拓扑空间？需要<em>不变量</em>——基本群（<a href="ch23.html">ch23</a>）、同调群（代数拓扑, 超出本书）等。</li>
+</ul>
+
+<p>把这些问题一层一层回答，就是这本书 24 章的全部。</p>
+
+<h2 id="sec1-6">1.6 这本书的路线</h2>
+
+<p>24 章五段式：</p>
+
+<ul>
+  <li><strong>地基（ch2-7）</strong>：度量空间复习 → 拓扑空间公理 → 基与子基 → 闭集等几何词汇 → 连续 + 同胚。读完这 7 章你能用拓扑语言。</li>
+  <li><strong>构造（ch8-11）</strong>：子空间 + 积 + 商 + 任意积（Tychonoff 拓扑）。这 4 章把"<em>从已知拓扑造新拓扑</em>" 的所有标准方法学完。</li>
+  <li><strong>性质（ch12-19）</strong>：分离公理（T0-T4 + Hausdorff）+ 可数性 + 紧致性 + 连通性。每个性质都是"<em>同胚下不变</em>" 的不变量。</li>
+  <li><strong>高级（ch20-22）</strong>：Urysohn 引理 + Tietze 延拓 + 度量化定理 + Baire 范畴。这 3 章是"<em>正规空间能干什么</em>" 的高峰。</li>
+  <li><strong>应用 + 桥梁（ch23-24）</strong>：基本群 → 通向<em>代数拓扑</em>；流形 → 通向<em>微分几何</em>。这两章给本书的<em>下一步</em> 入口。</li>
+</ul>
+
+<h2 id="sec1-7">1.7 临别话</h2>
+
+<p>拓扑学的"<em>奇怪</em>" 在于它<em>故意</em> 把数学里最直观的东西（距离）抽掉。一开始这种抽离让人不舒服——咖啡杯怎么能和甜甜圈"<em>相同</em>"？\(\mathbb{R}\) 怎么能和 \((0, 1)\) "<em>相同</em>"？</p>
+
+<p>但是抽离一段时间后你会发现：<em>这种抽离让"形状" 第一次成为可数学化的概念</em>。"<em>有几个洞</em>""<em>能不能撕开</em>""<em>能不能压扁到一点</em>"——这些直观的几何问题，在拓扑学里<em>有精确答案</em>。基本群、同调群、Euler 示性数等不变量，把"<em>形状</em>" 翻译成代数对象，让我们能<em>计算</em> 它。</p>
+
+<p>20 世纪几何 / 物理 / 生物 / 数据科学的几大革命都直接或间接靠拓扑：广义相对论的时空流形、规范场论的纤维丛、DNA 拓扑学、TDA（拓扑数据分析）、Künsken-Ribet-Wiles 路径上 Galois 表示、Lurie 的高阶范畴论。每一个背后都有"<em>把距离抽掉, 留下结构</em>" 的拓扑学。</p>
+
+<p>下一章我们先回度量空间收尾——把<a href="../实分析/index.html">实分析</a>里学过的紧致 / 连通 / 完备等概念用<em>面向拓扑</em> 的视角重新组织一遍。然后<a href="ch3.html">ch3</a> 起正式跳到抽象拓扑空间。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><span class="nav-disabled">← 上一章</span><a href="ch2.html">下一章 · 第 2 章 度量空间复习 →</a></nav>
+</main>
+</body>
+</html>

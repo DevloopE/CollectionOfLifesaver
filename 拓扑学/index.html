@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目录 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+<h1>普林斯顿拓扑学读本</h1>
+
+<p style="margin-top:-0.5rem;color:var(--ink-soft);font-style:italic;">把"距离" 抽掉, 留下"形状" · 点集拓扑 + 通向代数拓扑的桥</p>
+
+<h1 id="preface">前言</h1>
+
+<p>欢迎你翻开这本书。拓扑学是数学里最<em>奇怪</em> 的一门——它把"<em>距离</em>" 这个最基本的几何概念抽掉, 只研究"<em>开集</em>"。听起来像放弃了几何, 实际上是把几何提炼到本质。"<em>连续</em>""<em>紧致</em>""<em>连通</em>" 这些你以前用<a href="../多元微积分/index.html">多元微积分</a>和<a href="../实分析/index.html">实分析</a>反复用过的词, 在这本书里<em>第一次</em> 摆脱距离的依赖, 成为<em>纯粹</em> 的几何概念。</p>
+
+<p>这种抽离让"<em>什么算同一个空间</em>" 这件事变了。一个咖啡杯和一个甜甜圈, 在度量上完全不同, 但拓扑上"相同"——你能把杯子连续变形成甜甜圈, 不撕不粘。这种"<em>同</em>" 叫<em>同胚</em>。整本书很大块在研究"<em>什么是拓扑性质</em>"——即在同胚下保持不变的性质。</p>
+
+<h2>这本书的角色</h2>
+
+<p>系列<em>第 12 卷</em>。它填的是一个明确的<em>缺口</em>——你前面读过<a href="../多元微积分/index.html">多元微积分</a>(用 \(\mathbb{R}^n\) 距离)、<a href="../实分析/index.html">实分析</a>(把度量空间公理化)、<a href="../泛函分析/index.html">泛函分析</a>(无穷维空间), 都用过"<em>开集</em>""<em>紧致</em>""<em>连续</em>" 这些词, 但<em>没人</em> 正面问"<em>没有距离的开集是什么</em>"。本书正面攻击。</p>
+
+<p>它也是<em>代数拓扑</em>(归档在 archive/tier4/, 待重写) 的<em>前置</em>。基本群、同调、覆盖空间这些东西需要拓扑空间作为对象——本书最后两章 ch23-24 把基本群和流形的入口给你, 让你能<em>开始</em> 读 Hatcher 那种代数拓扑书。</p>
+
+<h2>这本书<em>不</em> 是什么</h2>
+
+<p>它<em>不</em> 是 Hatcher 那种代数拓扑——同伦群 / 同调 / 上同调 / 覆盖空间 / 谱序列等不是本书话题。本书止于<em>点集</em>(general topology) + 一点代数拓扑入口。</p>
+
+<p>它<em>不</em> 是微分拓扑——流形、切丛、微分形式、Sard 定理等也不是本书话题。本书 ch24 简介流形概念但不做微分结构。</p>
+
+<p>它<em>不</em> 是 Munkres 那种"<em>所有点集结果列表</em>"。本书每章只挑核心的 4-6 个结果讲透。</p>
+
+<h2>读这本书之前你需要什么</h2>
+
+<p>你需要<a href="../实分析/index.html">实分析第 4-9 章</a>——度量空间、收敛、紧致、连通在 \(\mathbb{R}^n\) 的版本。本书 ch2 简短复习, 但背景不能完全空。</p>
+
+<p>你<em>不</em> 需要<a href="../泛函分析/index.html">泛函分析</a>——不过如果读过, ch11 Tychonoff、ch22 Baire 你会更熟。</p>
+
+<p>你需要<em>集合论基本素养</em>——等价关系、商集、笛卡尔积(任意 index 集)、选择公理。<a href="appA.html">附录 A</a> 速查。</p>
+
+<h2>"我下周就要考期中, 从哪里开始?"</h2>
+
+<p>看你课重点。本科<em>点集拓扑</em> 标准考试看：</p>
+
+<ul>
+  <li>拓扑空间 + 基 + 子基（ch3-4）</li>
+  <li>连续 + 同胚（ch6-7）</li>
+  <li>子空间 / 积 / 商拓扑（ch8-11）</li>
+  <li>分离公理 + Hausdorff（ch12）</li>
+  <li>紧致 + Tychonoff（ch14-16）</li>
+  <li>连通（ch18-19）</li>
+</ul>
+
+<p>研究生<em>点集 + 入门代数拓扑</em> 加上：</p>
+
+<ul>
+  <li>Urysohn 引理 + Tietze + 度量化（ch20-21）</li>
+  <li>Baire 范畴定理 + 应用（ch22）</li>
+  <li>基本群（ch23）</li>
+</ul>
+
+<h2>例题 + 反例 + 严格度</h2>
+
+<p>例题埋在正文, 没"例 4.2.1" 标签。每个新概念都有<em>反例伴随</em>——拓扑学反例特别重要, 因为很多"看似显然" 的事其实需要额外假设(Hausdorff、可分、第二可数等)。</p>
+
+<p>关键反例库：Sierpiński 空间、双箭头空间、Sorgenfrey 直线、长直线、Cantor 集、范例数 \(\omega_1\) 上的序拓扑。<a href="appA.html">附录 A</a> 索引常用反例。</p>
+
+<h2>致谢</h2>
+
+<p>本书向 Adrian Banner 的<em>《微积分读本》</em> 致敬。内容选材主要参考 Munkres <em>Topology</em>(经典首选)、Engelking <em>General Topology</em>(深一些)、Willard <em>General Topology</em>、Bredon <em>Topology and Geometry</em>(代数拓扑入口) + Lee <em>Introduction to Topological Manifolds</em>(流形入门)。</p>
+
+<h2>目录</h2>
+
+<ol>
+  <li><a href="ch1.html">第 1 章 引论：从距离到开集</a> — 为什么连续不需要距离。</li>
+  <li><a href="ch2.html">第 2 章 度量空间复习</a> — 在跳到抽象拓扑前的最后一站。</li>
+  <li><a href="ch3.html">第 3 章 拓扑空间</a> — 公理化"开集"。</li>
+  <li><a href="ch4.html">第 4 章 基与子基</a> — 用少数集合"<em>生成</em>" 整个拓扑。</li>
+  <li><a href="ch5.html">第 5 章 闭集、内部、闭包、边界</a> — 拓扑的"几何词汇"。</li>
+  <li><a href="ch6.html">第 6 章 连续映射</a> — "<em>开集的逆像还是开集</em>"。</li>
+  <li><a href="ch7.html">第 7 章 同胚与拓扑性质</a> — "<em>拓扑等价</em>" 是什么。</li>
+  <li><a href="ch8.html">第 8 章 子空间拓扑</a> — 子集自动有拓扑。</li>
+  <li><a href="ch9.html">第 9 章 有限积拓扑</a> — \(X \times Y\) 的最自然拓扑。</li>
+  <li><a href="ch10.html">第 10 章 商拓扑</a> — 把空间"<em>粘起来</em>"。</li>
+  <li><a href="ch11.html">第 11 章 任意积拓扑（Tychonoff 拓扑）</a> — 无穷积的微妙。</li>
+  <li><a href="ch12.html">第 12 章 分离公理（T0-T4）</a> — Hausdorff + 一族强度递增条件。</li>
+  <li><a href="ch13.html">第 13 章 可数性公理</a> — 第一可数 / 第二可数 / 可分。</li>
+  <li><a href="ch14.html">第 14 章 紧致性</a> — "<em>每个开覆盖有有限子覆盖</em>"。</li>
+  <li><a href="ch15.html">第 15 章 紧致性的等价：有限交性质</a> — 与序列紧的关系。</li>
+  <li><a href="ch16.html">第 16 章 Tychonoff 定理</a> — 任意紧空间的积仍紧。</li>
+  <li><a href="ch17.html">第 17 章 局部紧 + 单点紧致化</a> — 给非紧空间加一个"<em>无穷远点</em>"。</li>
+  <li><a href="ch18.html">第 18 章 连通性</a> — "<em>不能拆成两块开集</em>"。</li>
+  <li><a href="ch19.html">第 19 章 道路连通 + 局部连通</a> — 三种连通的等价与不等价。</li>
+  <li><a href="ch20.html">第 20 章 Urysohn 引理 + Tietze 延拓</a> — "<em>正规空间上有足够多连续函数</em>"。</li>
+  <li><a href="ch21.html">第 21 章 Urysohn 度量化定理</a> — 哪些拓扑空间能配距离。</li>
+  <li><a href="ch22.html">第 22 章 完备度量空间 + Baire 范畴定理</a> — 完备性的拓扑后果。</li>
+  <li><a href="ch23.html">第 23 章 应用：基本群入门</a> — 代数拓扑的桥梁。</li>
+  <li><a href="ch24.html">第 24 章 应用：流形入门 + 拓扑学的下一步</a> — 通向几何 / 物理 / 数据科学。</li>
+</ol>
+
+<ul>
+  <li><a href="appA.html">附录 A 集合论与等价类速查</a></li>
+  <li><a href="appB.html">附录 B 选择公理与 Zorn 引理</a></li>
+  <li><a href="subject-index.html">主题索引</a></li>
+</ul>
+
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+</main>
+</body>
+</html>

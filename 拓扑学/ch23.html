@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 23 章 应用：基本群入门 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 Baire 范畴定理</a><a href="ch24.html">下一章 · 第 24 章 流形入门 →</a></nav>
+<h1 id="ch23">第 23 章 应用：基本群入门</h1>
+
+<p>本章是本书与<em>代数拓扑</em> 的桥梁。前 22 章我们建立了一整套点集拓扑的语言——开集、连续、紧致、连通、Hausdorff、度量化等。我现在要给你看：这套语言<em>不够用</em>。具体的，下面这道题它解不了。</p>
+
+<p>问题：怎么<em>区分</em> 圆 \(S^1\) 与圆盘 \(D^2\)？</p>
+
+<p>请你停下来想一下你的工具箱。\(S^1 = \{(x, y) : x^2 + y^2 = 1\}\) 是平面里的一个圆周；\(D^2 = \{(x, y) : x^2 + y^2 \le 1\}\) 是闭圆盘。它们直觉上完全不一样——一个是"<em>边界</em>"，一个是"<em>实心</em>"。但你怎么用<em>拓扑</em> 工具<em>证明</em> 它们不同胚？</p>
+
+<p>挨个查：两者都<em>连通</em>（<a href="ch18.html">ch18</a>）；都<em>道路连通</em>（<a href="ch19.html">ch19</a>）；都<em>紧致</em>（<a href="ch14.html">ch14</a>）；都<em>Hausdorff</em>（<a href="ch12.html">ch12</a>）；都是<em>第二可数</em>（<a href="ch13.html">ch13</a>）；都<em>度量化</em>（<a href="ch21.html">ch21</a>）。<em>本书前 22 章学到的所有同胚不变量都<em>分不开</em> \(S^1\) 和 \(D^2\)</em>。但它们<em>显然</em> 不同胚。</p>
+
+<p>需要<em>新工具</em>——<em>基本群</em> \(\pi_1\)。它把"<em>空间里的环路</em>" 翻译成<em>群</em>，再用群论区分空间。它给 \(S^1\) 一个非平凡群（\(\mathbb{Z}\)），给 \(D^2\) 平凡群（\(0\)）——一刀分开。</p>
+
+<p>本章把这条路从头长出来：先看<em>为什么</em> 旧工具不够，再朴素地试构造一个新不变量，撞墙、reframe、命名，最后给出 \(\pi_1\) 与几个标志性应用。</p>
+
+<h2 id="sec23-1">23.1 撞墙：\(S^1\) 与 \(D^2\) 用前 22 章工具不能区分</h2>
+
+<p>把"<em>同胚不变量</em>" 这个清单一条条对：</p>
+
+<ul>
+  <li><em>基数</em>：\(|S^1| = |D^2| = \mathfrak{c}\)（连续统）。\(\checkmark\) 不分。</li>
+  <li><em>连通</em>：两者都连通（任何 \(\mathbb{R}^n\) 凸子集连通；\(S^1\) 也是从一段闭区间映过去的连续像，连通）。\(\checkmark\) 不分。</li>
+  <li><em>道路连通</em>：两者都道路连通——任何两点之间都能画一条参数曲线。\(\checkmark\) 不分。</li>
+  <li><em>紧致</em>：两者都是 \(\mathbb{R}^2\) 的有界闭集，按 Heine-Borel 都紧致。\(\checkmark\) 不分。</li>
+  <li><em>Hausdorff、可分、第二可数、度量化、正规、Lindelöf</em>：作为 \(\mathbb{R}^2\) 的子空间继承所有这些性质。\(\checkmark\) 全不分。</li>
+</ul>
+
+<p>最后一招——"<em>拿掉一个点连通性变化</em>"——这个我们在<a href="ch1.html">ch1</a> 用来分圆 \(S^1\) 和 8 字 \(\infty\) 时奏效过。试一下：</p>
+
+<ul>
+  <li>\(S^1 \setminus \{p\}\)：去掉圆周上一点 \(p\)，剩下一段开弧——连通（一段开弧道路连通）。</li>
+  <li>\(D^2 \setminus \{p\}\)：去掉圆盘里一点 \(p\)（不论 \(p\) 在内部还是边界）——还是道路连通（绕开 \(p\) 走仍能连任何两点）。</li>
+</ul>
+
+<p>"<em>拿一点</em>" 的连通性还是不分。拿两点呢？\(S^1 \setminus \{p, q\}\) 拆成两段开弧——<em>不</em>连通。\(D^2 \setminus \{p, q\}\) 仍连通（绕开两点走）。\(\checkmark\) 这条<em>分开</em> 了！</p>
+
+<p>但你停一下。"<em>拿掉两点是否连通</em>" 这条标准能用，但它太<em>具体</em>——它只对 \(S^1\) 与 \(D^2\) 这一道题有效，换成"<em>区分球面 \(S^2\) 和环面 \(T^2\)</em>" 怎么办？拿掉若干点 \(S^2 \setminus \{p_1, \ldots, p_k\}\) 与 \(T^2 \setminus \{p_1, \ldots, p_k\}\) 都连通——这条标准失效。我们需要的是<em>系统性的</em> 不变量，对一大族空间都能算的，不是一道题想一个 trick。</p>
+
+<p>朴素的思路是："<em>洞数</em>"。\(S^1\) 有 1 个洞，\(D^2\) 没洞；\(S^2\) 没洞，\(T^2\) 有 2 个洞（一个"<em>纵向</em>" 一个"<em>横向</em>"）。但"<em>洞数</em>" 怎么<em>形式化</em>？这一形式化就是基本群。</p>
+
+<h2 id="sec23-2">23.2 道路、环路、同伦</h2>
+
+<p>从最朴素的对象开始——<em>道路</em>。</p>
+
+<p>给拓扑空间 \(X\)。\(X\) 中一条<em>道路</em> 是连续映射</p>
+
+<p>\[\gamma : [0, 1] \to X.\]</p>
+
+<p>\(\gamma(0)\) 叫<em>起点</em>，\(\gamma(1)\) 叫<em>终点</em>。如果 \(\gamma(0) = \gamma(1) = x_0\)，叫<em>以 \(x_0\) 为基点的环路</em>（loop based at \(x_0\)）。</p>
+
+<p>怎么用环路"<em>看见洞</em>"？想象 \(X = S^1\)，基点 \(x_0\) 是圆上某固定点。一条沿圆周转<em>一圈</em> 回到 \(x_0\) 的环路<em>不能</em>"<em>缩</em>" 到点 \(x_0\)——你要怎么连续地把这个圆形环路收缩到一点？必须穿过圆心，但圆心不在 \(S^1\) 里。"<em>缩不到点的环路</em>" 探测到了"<em>洞</em>"。</p>
+
+<p>对比 \(X = D^2\)，基点 \(x_0\) 是圆盘里某固定点。任何环路都能<em>线性</em>地缩到 \(x_0\)：用同伦 \(H(s, t) = (1 - t) \gamma(s) + t x_0\)（直线段从 \(\gamma(s)\) 到 \(x_0\)，全在 \(D^2\) 里因为凸）。每条环路都缩得到点。\(D^2\) <em>没洞</em>。</p>
+
+<p>把"<em>缩</em>" 形式化叫<em>同伦</em>。两条道路 \(\gamma_0, \gamma_1 : [0, 1] \to X\) <em>同起终点</em>（即 \(\gamma_0(0) = \gamma_1(0)\) 且 \(\gamma_0(1) = \gamma_1(1)\)），如果存在<em>连续</em> 映射</p>
+
+<p>\[H : [0, 1] \times [0, 1] \to X\]</p>
+
+<p>满足</p>
+
+<ul>
+  <li>\(H(s, 0) = \gamma_0(s)\) 对所有 \(s\)（"\(t = 0\) 一片是 \(\gamma_0\)"）；</li>
+  <li>\(H(s, 1) = \gamma_1(s)\) 对所有 \(s\)（"\(t = 1\) 一片是 \(\gamma_1\)"）；</li>
+  <li>\(H(0, t) = \gamma_0(0) = \gamma_1(0)\) 对所有 \(t\)（起点固定）；</li>
+  <li>\(H(1, t) = \gamma_0(1) = \gamma_1(1)\) 对所有 \(t\)（终点固定）。</li>
+</ul>
+
+<p>就说 \(\gamma_0\) <em>道路同伦</em> 于 \(\gamma_1\)，记 \(\gamma_0 \simeq \gamma_1\)。</p>
+
+<p>几何画面：把 \(H\) 想成一片"<em>动画</em>"——参数 \(t\) 是时间，\(t = 0\) 看到 \(\gamma_0\)，\(t = 1\) 看到 \(\gamma_1\)，中间是连续的"<em>变形过程</em>"，并且变形过程中起点终点不动。</p>
+
+<p>"<em>缩到点</em>" 是同伦的特殊情况：取 \(\gamma_0 = \gamma\)（你的环路），\(\gamma_1 = c_{x_0}\)（常值环路 \(c_{x_0}(s) \equiv x_0\)）。这种 \(\gamma\) 叫<em>零伦</em>（null-homotopic）。</p>
+
+<h2 id="sec23-3">23.3 同伦是等价关系</h2>
+
+<p>把所有以 \(x_0\) 为基点的环路记为 \(\Omega(X, x_0)\)。在它上面"<em>道路同伦</em>" 是等价关系——验证三条：</p>
+
+<ul>
+  <li><em>反身性</em>：\(\gamma \simeq \gamma\)。取 \(H(s, t) = \gamma(s)\)（不变形）。\(\checkmark\)</li>
+  <li><em>对称性</em>：\(\gamma_0 \simeq \gamma_1 \Rightarrow \gamma_1 \simeq \gamma_0\)。如果 \(H\) 把 \(\gamma_0\) 变到 \(\gamma_1\)，反向 \(H'(s, t) = H(s, 1 - t)\) 把 \(\gamma_1\) 变回 \(\gamma_0\)。\(\checkmark\)</li>
+  <li><em>传递性</em>：\(\gamma_0 \simeq \gamma_1\) 且 \(\gamma_1 \simeq \gamma_2\) \(\Rightarrow \gamma_0 \simeq \gamma_2\)。给 \(H_1, H_2\)，定义 \(H(s, t) = H_1(s, 2t)\) 当 \(t \le 1/2\)、\(H_2(s, 2t - 1)\) 当 \(t \ge 1/2\)。两段在 \(t = 1/2\) 处对接（值都是 \(\gamma_1(s)\)），由<em>粘接引理</em>（<a href="ch6.html">ch6</a>：两个闭子集上各自连续 + 接缝处一致 \(\Rightarrow\) 整体连续）连续。\(\checkmark\)</li>
+</ul>
+
+<p>所以 \(\Omega(X, x_0)\) 上同伦关系给出<em>等价类</em> 划分。一个等价类记 \([\gamma]\)——它代表"<em>所有能连续变到 \(\gamma\) 的环路</em>"。</p>
+
+<p>商集 \(\Omega(X, x_0) / \simeq\) 是这一章的主角。但它现在还只是个<em>集合</em>——我们要把它变成<em>群</em>。</p>
+
+<h2 id="sec23-4">23.4 道路同伦给"<em>带基点空间</em>" 的群结构</h2>
+
+<p>朴素地想：两条以 \(x_0\) 为基点的环路 \(\gamma_1, \gamma_2\) 可以"<em>接</em>" 在一起——先走 \(\gamma_1\) 一圈，再走 \(\gamma_2\) 一圈，得到一条新环路 \(\gamma_1 * \gamma_2\)。形式上：</p>
+
+<p>\[
+(\gamma_1 * \gamma_2)(s) = \begin{cases} \gamma_1(2 s) & s \in [0, 1/2] \\ \gamma_2(2 s - 1) & s \in [1/2, 1] \end{cases}.
+\]</p>
+
+<p>"<em>把时间压缩一倍, 把两条环路串起来</em>"。验证连续——粘接引理（在 \(s = 1/2\) 处两段都给值 \(\gamma_1(1) = \gamma_2(0) = x_0\)）。</p>
+
+<p>这看起来像群运算："<em>乘法</em>" \(*\)。但它<em>不</em> 满足结合律——\((\gamma_1 * \gamma_2) * \gamma_3\) 走法是"前 \(1/4\) 走 \(\gamma_1\)，中 \(1/4\) 走 \(\gamma_2\)，后 \(1/2\) 走 \(\gamma_3\)"，而 \(\gamma_1 * (\gamma_2 * \gamma_3)\) 是"前 \(1/2\) 走 \(\gamma_1\)，中 \(1/4\) 走 \(\gamma_2\)，后 \(1/4\) 走 \(\gamma_3\)"。两条<em>不</em> 完全相等——速度分配不同。</p>
+
+<p>同样，常值环路 \(c_{x_0}\) <em>不</em> 是"<em>真单位元</em>"——\(\gamma * c_{x_0}\) 是"前 \(1/2\) 走完 \(\gamma\)，后 \(1/2\) 不动"，跟 \(\gamma\) 不同（速度差一倍）。逆 \(\gamma^{-1}(s) = \gamma(1 - s)\)，但 \(\gamma * \gamma^{-1}\) 是一条"<em>来回</em>" 环路而不是 \(c_{x_0}\)。</p>
+
+<p>朴素 \(*\) 不是群运算。但请注意——上述"<em>不等</em>" 都只是<em>速度分配不同</em>，<em>形状</em> 一样。两条形状一样的环路应该<em>同伦</em>。</p>
+
+<p>关键观察：<em>同伦把这些"<em>速度差异</em>" 抹掉了</em>。在等价类 \([\gamma_1] [\gamma_2] := [\gamma_1 * \gamma_2]\) 这一层：</p>
+
+<ul>
+  <li>结合律：\(([\gamma_1][\gamma_2])[\gamma_3] = [\gamma_1]([\gamma_2][\gamma_3])\)。同伦把"<em>速度重分配</em>" 看作同一类——线性参数化变换 \(\varphi : [0, 1] \to [0, 1]\) 给一个同伦 \(\gamma \simeq \gamma \circ \varphi\)。\(\checkmark\)</li>
+  <li>单位元：\([c_{x_0}]\) 是"<em>同伦意义下的单位</em>"——\([\gamma][c_{x_0}] = [\gamma]\)。同样靠"<em>速度分配同伦</em>"。\(\checkmark\)</li>
+  <li>逆元：\([\gamma^{-1}]\) 是 \([\gamma]\) 的逆——\([\gamma][\gamma^{-1}] = [c_{x_0}]\)。即"<em>来回环路同伦于不动</em>"，因为来回路径线性收缩到起点（\(H(s, t) = \gamma(s(1 - t))\) 当 \(s \le 1/2\) 类似处理）。\(\checkmark\)</li>
+</ul>
+
+<p>三条群公理在<em>同伦意义下</em> 全部成立。<em>商集 \(\Omega(X, x_0) / \simeq\) 是个群</em>。</p>
+
+<p>请你停下来欣赏：朴素的"<em>环路接环路</em>" 给一个有缺陷的运算（不结合、无单位、无逆）。这些缺陷<em>不</em> 是结构本质——它们都是"<em>参数化的速度怎么分</em>" 这种次要细节。<em>同伦把次要细节抹平, 主要结构（"<em>形状</em>"）保留</em>，得到一个真正的群。这正是"<em>从问题朴素 → 撞墙 → reframe</em>" 的典型流程——朴素方案有缺陷, 但缺陷恰好被一个抽象操作（同伦）治愈, 留下纯净的代数对象。</p>
+
+<h2 id="sec23-5">23.5 \(\pi_1(X, x_0)\) 的定义</h2>
+
+<p>把上面这件事正式命名：</p>
+
+<p>\[
+\boxed{\ \pi_1(X, x_0) := \{[\gamma] : \gamma \text{ 是 } X \text{ 中以 } x_0 \text{ 为基点的环路}\}\ }
+\]</p>
+
+<p>配运算 \([\gamma_1][\gamma_2] = [\gamma_1 * \gamma_2]\)，单位 \([c_{x_0}]\)，逆 \([\gamma]^{-1} = [\gamma^{-1}]\)。这是一个群——称作 \(X\) 在基点 \(x_0\) 处的<em>基本群</em>（fundamental group）。</p>
+
+<p>名字怎么来：\(\pi\) 是"<em>路径</em>"（path）的希腊字母 \(\pi\)；下标 \(1\) 因为这是<em>一维</em>同伦群（用一维区间 \([0, 1]\) 的连续映射定义）。后来人们定义<em>高阶同伦群</em> \(\pi_n(X, x_0)\)（用 \(n\) 维球面 \(S^n\) 到 \(X\) 的连续映射），\(\pi_1\) 因此成了"<em>第一个</em>"。</p>
+
+<p>几个直接事实：</p>
+
+<ul>
+  <li><em>同胚不变</em>：若 \(f : X \to Y\) 是同胚且 \(f(x_0) = y_0\)，那 \(\pi_1(X, x_0) \cong \pi_1(Y, y_0)\)（作为群同构）。证明：\(f\) 把环路送到环路、把同伦送到同伦, 给一个群同构 \(f_* : \pi_1(X, x_0) \to \pi_1(Y, y_0)\)，逆由 \(f^{-1}\) 给。所以 \(\pi_1\) 是<em>同胚不变量</em>——区分基本群<em>不同</em>的两个空间，它们<em>必</em> 不同胚。</li>
+  <li><em>道路连通空间里 \(x_0\) 不重要</em>：若 \(X\) 道路连通，\(\pi_1(X, x_0) \cong \pi_1(X, x_1)\) 对任意两点。证明：取一条从 \(x_0\) 到 \(x_1\) 的道路 \(\alpha\)，定义同构 \([\gamma] \mapsto [\alpha^{-1} * \gamma * \alpha]\)（"<em>共轭</em>"）。所以道路连通空间常常省去基点写 \(\pi_1(X)\)。</li>
+  <li><em>更强：\(\pi_1\) 也是同伦等价不变量</em>，连"<em>同胚</em>" 都不需要——"<em>能连续变形互相</em>" 的两个空间基本群同。这一点本章只提一下，不展开（要 Borsuk 定理）。</li>
+</ul>
+
+<p>剩下的问题：怎么<em>具体算</em> \(\pi_1(X)\)？</p>
+
+<h2 id="sec23-6">23.6 \(\pi_1(\mathbb{R}^n) = 0\) 与 \(\pi_1(S^1) = \mathbb{Z}\)</h2>
+
+<p><strong>例 1</strong>：\(\pi_1(\mathbb{R}^n) = 0\)（平凡群）。</p>
+
+<p>固定基点 \(x_0\)。任何环路 \(\gamma : [0, 1] \to \mathbb{R}^n\) 通过<em>线性同伦</em></p>
+
+<p>\[H(s, t) = (1 - t) \gamma(s) + t x_0\]</p>
+
+<p>缩到 \(x_0\)。验证：\(H\) 连续（两个连续函数线性组合）；\(H(s, 0) = \gamma(s)\)，\(H(s, 1) = x_0\)；起终点固定（\(\gamma(0) = \gamma(1) = x_0\) 给两端 \(H(0, t) = H(1, t) = x_0\)）。\(\checkmark\)</p>
+
+<p>同样的"<em>线性收缩</em>" 论证适用于 \(\mathbb{R}^n\) 任何<em>凸</em> 子集——\(D^n\)、半空间、超平面等都给 \(\pi_1 = 0\)。这种"<em>每条环路同伦于常环路</em>" 的空间叫<em>单连通</em>（simply connected）。</p>
+
+<p><strong>例 2</strong>：\(\pi_1(S^1) = \mathbb{Z}\)。</p>
+
+<p>这是基本群理论的<em>标志性计算</em>。陈述：环路 \(\gamma : [0, 1] \to S^1\) 的同伦类完全由它"<em>转了几圈</em>"（缠绕数 / winding number）决定。两条环路同伦 \(\iff\) 它们缠绕同样多次。群同构</p>
+
+<p>\[\pi_1(S^1) \xrightarrow{\sim} \mathbb{Z}, \quad [\gamma] \mapsto \deg(\gamma).\]</p>
+
+<p>证明思路（不完整，但传神）。</p>
+
+<p><em>步骤 1：覆盖映射</em>。把 \(S^1\) 看作 \(\{e^{2\pi i s} : s \in \mathbb{R}\}\)。指数映射 \(p : \mathbb{R} \to S^1\)，\(p(t) = e^{2\pi i t}\)。这是一个<em>覆盖映射</em>——每个 \(z \in S^1\) 的邻域 \(U_z\) 在 \(p\) 下的逆像是 \(\mathbb{R}\) 中可数无穷多个开区间的并，每个区间被 \(p\) 同胚地映到 \(U_z\)。直观：把 \(\mathbb{R}\) 想成"<em>无穷长的螺旋</em>" 投到 \(S^1\) 上的投影；每圈对应 \(\mathbb{R}\) 中一段长 1 的区间。</p>
+
+<p><em>步骤 2：道路提升引理</em>。给 \(S^1\) 中以 \(1\) 为基点的环路 \(\gamma : [0, 1] \to S^1\)。存在<em>唯一</em> 的连续 \(\tilde\gamma : [0, 1] \to \mathbb{R}\) 满足 \(\tilde\gamma(0) = 0\) 且 \(p \circ \tilde\gamma = \gamma\)。直观：把 \(\gamma\) 在 \(S^1\) 上的轨迹"<em>展开</em>" 到 \(\mathbb{R}\)，每过一圈 \(\tilde\gamma\) 增加 1（或减 1）。证明用 \([0, 1]\) 紧致 + Lebesgue 数引理（<a href="ch14.html">ch14</a>）做小段拼接。</p>
+
+<p><em>步骤 3：缠绕数</em>。\(\tilde\gamma(1)\) 是个整数（因为 \(p(\tilde\gamma(1)) = \gamma(1) = 1\) 而 \(p^{-1}(1) = \mathbb{Z}\)）。这个整数叫 \(\gamma\) 的<em>缠绕数</em>（degree, 记 \(\deg(\gamma)\)）。</p>
+
+<p><em>步骤 4：同伦不变</em>。同伦 \(H : [0, 1]^2 \to S^1\) 也能提升 \(\tilde H : [0, 1]^2 \to \mathbb{R}\)（同伦提升引理，类似步骤 2）。提升后 \(\tilde H(s, 0)\) 给 \(\tilde\gamma_0\)，\(\tilde H(s, 1)\) 给 \(\tilde\gamma_1\)，\(\tilde H(1, t)\) 是连续的整数值函数（因为 \(p(\tilde H(1, t)) = 1\)）所以<em>常数</em>。即 \(\tilde\gamma_0(1) = \tilde\gamma_1(1)\)。<em>同伦的环路有同样的缠绕数</em>。</p>
+
+<p><em>步骤 5：群同态</em>。\(\deg(\gamma_1 * \gamma_2) = \deg(\gamma_1) + \deg(\gamma_2)\)（叠在一起转两段, 总缠绕数相加）；\(\deg(c_{x_0}) = 0\)；\(\deg(\gamma^{-1}) = -\deg(\gamma)\)。<em>\(\deg\) 是群同态 \(\pi_1(S^1) \to \mathbb{Z}\)</em>。</p>
+
+<p><em>步骤 6：满 + 单</em>。满：环路 \(\gamma_n(s) = e^{2\pi i n s}\) 缠绕数 \(n\) 给任意整数。单：\(\deg(\gamma) = 0\) \(\Rightarrow\) 提升 \(\tilde\gamma\) 是 \([0, 1] \to \mathbb{R}\) 的环路 \(\Rightarrow\) 在 \(\mathbb{R}\) 中线性收缩到 0 \(\Rightarrow\) \(p\) 投下来给 \(\gamma\) 在 \(S^1\) 中的零伦。</p>
+
+<p>结论：\(\pi_1(S^1) \cong \mathbb{Z}\)。\(\square\)</p>
+
+<p>这是一个<em>极美</em> 的计算——拓扑空间的"<em>洞数</em>" 通过覆盖空间的"<em>缠绕数</em>" 翻译成代数。覆盖空间理论是后续<em>代数拓扑</em> 的核心工具之一，本书止步于此；Hatcher <em>Algebraic Topology</em> §1.3 全展开。</p>
+
+<h2 id="sec23-7">23.7 \(S^1 \not\cong D^2\)：基本群分开它们</h2>
+
+<p>把 23.6 的结果用回开篇的问题：</p>
+
+<ul>
+  <li>\(\pi_1(D^2) = 0\)（凸, 单连通）。</li>
+  <li>\(\pi_1(S^1) = \mathbb{Z}\)（非平凡）。</li>
+</ul>
+
+<p>两者基本群<em>不同构</em>（\(\mathbb{Z}\) 不是平凡群）。但同胚 \(\Rightarrow\) 基本群同构（23.5 节"<em>同胚不变</em>"）。所以<em>\(S^1\) 与 \(D^2\) 不同胚</em>。\(\square\)</p>
+
+<p>请你停下来欣赏这条论证的<em>结构</em>：</p>
+
+<ol>
+  <li>定义一个对每个空间都<em>能算</em> 的群 \(\pi_1\)；</li>
+  <li>证明同胚 \(\Rightarrow \pi_1\) 同构（"<em>函子性</em>"）；</li>
+  <li>具体算两个空间的 \(\pi_1\)；</li>
+  <li>对比两个群——不同 \(\Rightarrow\) 空间不同胚。</li>
+</ol>
+
+<p>这是<em>代数拓扑</em> 的<em>统一招式</em>——把拓扑问题翻译成代数问题，用代数工具（群、环、模）做计算。基本群只是这套机器最朴素的版本；后续<em>同调群</em>、<em>上同调环</em>、<em>K-理论</em>、<em>谱序列</em> 等都遵循这个模式。每一种新代数不变量能区分一族新的拓扑现象。</p>
+
+<h2 id="sec23-8">23.8 应用：Brouwer 不动点定理</h2>
+
+<p>基本群一旦建立，许多看起来"<em>纯几何</em>" 的定理变得可证。最经典是 <em>Brouwer 不动点定理</em>（二维版）：</p>
+
+<p><strong>定理（Brouwer 1912）</strong>：每个连续映射 \(f : D^2 \to D^2\) 都有<em>不动点</em>——存在 \(x \in D^2\) 使 \(f(x) = x\)。</p>
+
+<p>这定理的物理直觉：你拿一张纸（\(D^2\)），把它揉皱、压扁、变形（连续映射 \(f\)），再放回原来圆盘的位置；那么<em>必</em> 有至少一点"<em>没动</em>"。或者：搅咖啡，搅完之后必有至少一点液体回到了它出发的位置。</p>
+
+<p>证明（用 \(\pi_1\)）。反证。假设 \(f\) 没有不动点，即 \(f(x) \neq x\) 对所有 \(x \in D^2\)。构造<em>收缩</em>（retraction） \(r : D^2 \to S^1\) 如下：对每个 \(x \in D^2\)，从 \(f(x)\) 出发指向 \(x\) 的射线（因为 \(f(x) \neq x\) 这条射线良定）和 \(S^1\) 交于唯一一点 \(r(x)\)；定义 \(r(x)\) 为这个交点。请画一下图：圆盘内一点 \(x\)，从 \(f(x)\) 拉一条线穿过 \(x\) 撞到圆周。</p>
+
+<p>验证：</p>
+
+<ul>
+  <li>\(r\) 连续——\(x, f(x)\) 都连续依赖 \(x\)，射线随之连续，与 \(S^1\) 的交点也连续。</li>
+  <li>\(r|_{S^1} = \mathrm{id}_{S^1}\)——若 \(x \in S^1\) 已在边界上，从 \(f(x)\) 穿过 \(x\) 的射线撞圆周时第一个交点就是 \(x\)（射线先离开圆盘再进圆盘？要更小心选"<em>从 \(f(x)\) 起经过 \(x\) 后撞到的下一个 \(S^1\) 点</em>"）。</li>
+</ul>
+
+<p>这种 \(r\) 叫"<em>从 \(D^2\) 到 \(S^1\) 的收缩</em>"——\(S^1 \subset D^2\) 是子空间, \(r : D^2 \to S^1\) 连续且在 \(S^1\) 上是恒等。</p>
+
+<p>但<em>这种收缩不存在</em>。证明：若 \(r : D^2 \to S^1\) 是收缩，复合 \(\pi_1\)：</p>
+
+<p>\[\mathbb{Z} = \pi_1(S^1) \xrightarrow{i_*} \pi_1(D^2) = 0 \xrightarrow{r_*} \pi_1(S^1) = \mathbb{Z},\]</p>
+
+<p>其中 \(i : S^1 \hookrightarrow D^2\) 是包含。复合 \(r \circ i = \mathrm{id}_{S^1}\)，所以 \((r \circ i)_* = \mathrm{id}_\mathbb{Z}\)。但中间过 \(0\)——任何映射穿过 \(0\) 必为 \(0\)。\(\mathrm{id}_\mathbb{Z} = 0\)？\(\mathbb{Z}\) 的恒等映射不是零。矛盾。\(\square\)</p>
+
+<p>这个证明<em>抓住了</em> 基本群的全部威力——它把"<em>不动点存在</em>" 这个看起来<em>纯几何</em> 的命题，转化成"<em>整数群非零</em>" 这件<em>代数</em> 事实。请你停下来想一下：Brouwer 自己 1912 年证它用复杂的几何构造（单纯逼近、度数）；用基本群 + 函子性，整个证明缩成 5 行群论。<em>找对不变量, 拓扑变代数, 难题变"<em>显然</em>"</em>。这就是代数拓扑的口号。</p>
+
+<p>Brouwer 不动点定理高维推广（\(D^n \to D^n\) 的连续映射有不动点）需要更强的不变量——同调群 \(H_n\)，本书不展开。</p>
+
+<h2 id="sec23-9">23.9 代数拓扑下一步预告</h2>
+
+<p>这一章只是一根<em>钥匙</em>。它打开的门后面有大量精细的代数拓扑机器，主要分四条线：</p>
+
+<p><strong>1. 高阶同伦群 \(\pi_n\)</strong>。\(\pi_n(X, x_0) = \{[f] : f : (S^n, *) \to (X, x_0)\}\)——把 \(n\) 维球面到 \(X\) 的连续映射模同伦。\(\pi_1\) 是 \(n = 1\) 的特例。\(n \ge 2\) 时 \(\pi_n\) 是<em>阿贝尔</em>（不像 \(\pi_1\) 一般非阿贝尔）。\(\pi_n(S^k)\) 的计算极困难（"<em>球面同伦群</em>"），是 20 世纪同伦论的核心问题；至今<em>不</em> 完全已知。Serre 1951 用谱序列做出大量计算，得 Fields 奖；Kervaire-Milnor、Hopkins、Ravenel 后续推进。</p>
+
+<p><strong>2. 同调群 \(H_n\) 与上同调群 \(H^n\)</strong>。\(\pi_1\) 难计算（一般非阿贝尔, 复杂），<em>同调</em> 是它的"<em>阿贝尔化简化</em>"。\(H_0(X) = \mathbb{Z}^{\text{连通分支数}}\)；\(H_1(X) = \pi_1(X)^{ab}\)（基本群的阿贝尔化）；\(H_n\) 高维"洞数"。同调比 \(\pi_n\) <em>容易计算</em>（有 Mayer-Vietoris 序列、长精确序列、谱序列等系统工具），但区分能力<em>弱</em> 一些。<em>上同调环</em> \(H^*(X)\) 加上 cup 积变成一个<em>环</em>，区分能力比同调强。代数拓扑入门书（Hatcher、Vick、Massey）大块讲这些。</p>
+
+<p><strong>3. 覆盖空间理论</strong>。\(p : \tilde X \to X\) "<em>多对一</em>" 的连续映射（每个 \(x \in X\) 邻域均匀地被覆盖）。我们用 \(\mathbb{R} \to S^1\) 算 \(\pi_1(S^1) = \mathbb{Z}\) 时已经偷偷用过。一般理论：覆盖空间与基本群子群一一对应（<em>Galois 对应</em> 模拟数论 Galois 理论）；万有覆盖（universal cover）= "<em>把 \(\pi_1\) 完全展开</em>" 的最大覆盖；万有覆盖单连通。这是<em>双曲几何</em>、<em>Riemann 面</em>、<em>3-流形理论</em> 的基础语言。</p>
+
+<p><strong>4. 纤维丛 + 谱序列 + 同伦理论</strong>。这是研究生级代数拓扑——纤维丛是"<em>带局部 \(F\) 纤维的总空间 \(E \to B\)</em>"（如 Mobius 带 \(\to S^1\) 是 \([-1, 1]\) 纤维丛）；谱序列是计算同调 / 同伦的代数工具，把"<em>从局部到全局</em>" 的信息层层组装。这一族工具是<em>规范场论</em>（物理）、<em>K-理论</em>（数论 / 算术几何）、<em>稳定同伦论</em>（chromatic 视角）的语言。</p>
+
+<p>读完本书 + 学过群论 / 范畴论基础，你的下一站建议：</p>
+
+<ul>
+  <li>Hatcher <em>Algebraic Topology</em>——免费 PDF, 从 \(\pi_1\) 展开到同调 / 上同调 / 同伦群 / 谱序列, 一本书走完代数拓扑入门。</li>
+  <li>Bredon <em>Topology and Geometry</em>——更紧凑, 也更代数化。</li>
+  <li>Vick <em>Homology Theory</em>——专攻同调, 简洁。</li>
+  <li>Massey <em>A Basic Course in Algebraic Topology</em>——基本群与覆盖空间这一段做得极细。</li>
+</ul>
+
+<p>下一章我们走另一条路——把"<em>局部像 \(\mathbb{R}^n\)</em>" 的拓扑空间（流形）作入门，看拓扑学怎么连到几何 / 物理 / 数据科学。那是本书最后一章, 也是大部分读者拓扑学之旅的下一个起点。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 Baire 范畴定理</a><a href="ch24.html">下一章 · 第 24 章 流形入门 →</a></nav>
+</main>
+</body>
+</html>

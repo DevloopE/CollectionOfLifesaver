@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 Urysohn 引理与 Tietze 延拓 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 道路连通</a><a href="ch21.html">下一章 · 第 21 章 Urysohn 度量化定理 →</a></nav>
+<h1 id="ch20">第 20 章 Urysohn 引理与 Tietze 延拓</h1>
+
+<p>请你先在脑子里端起一道<em>具体</em> 的题：</p>
+
+<p>在<em>正规</em>空间 \(X\) 里（即 T4，<a href="ch12.html">ch12</a> 那种"<em>任两个不交闭集都能用不交开邻域分开</em>"的空间），任挑两个不交闭集 \(A\) 与 \(B\)。能不能找到一个连续函数 \(f : X \to [0, 1]\)，使得它在 \(A\) 上恒为 \(0\)，在 \(B\) 上恒为 \(1\)？</p>
+
+<p>答案——能。这件事叫 <strong>Urysohn 引理</strong>，由 Pavel Urysohn 在 1925 年发表。陈述短得可以写在一行，可证明里藏着拓扑学最漂亮的一段构造。</p>
+
+<p>这条引理为什么重要？因为它告诉你一件出乎意料的事：<em>"\(X\) 上有足够多连续实值函数"是 \(X\) 的一条纯拓扑性质</em>。具体地——只要 \(X\) 满足分离公理 T4，你<em>不</em>需要任何度量、任何代数结构、任何坐标系，就<em>能</em>从拓扑公理本身造出一大批 \([0, 1]\) 值的连续函数。这件事是 T4 拓扑通向<em>分析</em>（度量化定理 <a href="ch21.html">ch21</a>、Stone–Čech 紧致化）的关键桥梁——没有它，"抽象拓扑"和"实分析"之间就完全没有通道。</p>
+
+<h2 id="sec20-1">20.1 引子：在度量空间里这件事是<em>显然</em>的</h2>
+
+<p>先看一种特殊情形——<em>度量空间</em>。</p>
+
+<p>假设 \((X, d)\) 是度量空间，\(A, B \subseteq X\) 是不交闭集。回忆 <a href="ch2.html">ch2</a> 里到一个集合的距离：</p>
+
+<p>\[
+d(x, A) := \inf_{a \in A} d(x, a).
+\]</p>
+
+<p>这个函数关于 \(x\) 是 \(1\)-Lipschitz（用三角不等式一行验证），所以连续。还有一条关键性质——<em>\(A\) 闭</em> 时</p>
+
+<p>\[
+d(x, A) = 0 \iff x \in A.
+\]</p>
+
+<p>"\(\Leftarrow\)"显然；"\(\Rightarrow\)"用闭：若 \(d(x, A) = 0\)，存在 \(a_n \in A\) 使 \(d(x, a_n) \to 0\)，即 \(a_n \to x\)，由 \(A\) 闭知 \(x \in A\)。</p>
+
+<p>现在 Urysohn 函数<em>立刻</em>出来了。设 \(A, B\) 是不交闭集，定义</p>
+
+<p>\[
+\boxed{\ f(x) := \frac{d(x, A)}{d(x, A) + d(x, B)}.\ }
+\]</p>
+
+<p>分母对每个 \(x \in X\) 都<em>非零</em>——若 \(d(x, A) + d(x, B) = 0\)，则 \(d(x, A) = d(x, B) = 0\)，由上面的等价 \(x \in A \cap B = \emptyset\)，矛盾。所以 \(f\) 良定义且连续，取值在 \([0, 1]\) 里。验证两端：\(x \in A \Rightarrow d(x, A) = 0 \Rightarrow f(x) = 0\)；\(x \in B \Rightarrow d(x, B) = 0 \Rightarrow f(x) = d(x, A)/(d(x, A) + 0) = 1\)。\(\checkmark\)</p>
+
+<p><em>结束</em>。在度量空间里这是一道两行题。</p>
+
+<p>请你停下来盯住这条公式想一想：它<em>用了什么</em>？它用了"<em>距离</em>"——具体是用 \(d(\cdot, A)\) 与 \(d(\cdot, B)\) 这两个连续函数。它们是<em>显式</em>的，而且非负、连续、对应 \(0\) 当且仅当落在闭集里——所有这些性质<em>合在一起</em>正好造出 Urysohn 函数。</p>
+
+<h2 id="sec20-2">20.2 撞墙：一般正规空间里没有距离</h2>
+
+<p>把度量拿走。\(X\) 现在只是个 T4 空间——只有"开集"，没有"距离"。\(d(x, A)\) 这种式子<em>无意义</em>。</p>
+
+<p>怎么办？我们想要的连续函数 \(f : X \to [0, 1]\) 至少必须满足</p>
+
+<p>\[
+A \subseteq f^{-1}(\{0\}), \qquad B \subseteq f^{-1}(\{1\}).
+\]</p>
+
+<p>把它再写一下——对每个 \(t \in (0, 1)\)，集合 \(f^{-1}([0, t)) = \{x : f(x) < t\}\) 应当是<em>开集</em>（因为 \([0, t)\) 在 \([0, 1]\) 里开），并且应该<em>包含 \(A\)</em>（\(f|_A = 0 < t\)），<em>不交于 \(B\)</em>（\(f|_B = 1 \geq t\)）。</p>
+
+<p>反过来——如果我们能<em>先</em>给出这样一族开集 \(\{U_t\}_{t \in (0, 1)}\)：</p>
+
+<ul>
+  <li>每个 \(U_t\) 开，</li>
+  <li>\(A \subseteq U_t \subseteq U_t \cup B^c\)（即 \(U_t \cap B = \emptyset\)），</li>
+  <li>\(t < t' \Rightarrow \overline{U_t} \subseteq U_{t'}\)（"<em>嵌套且每一层有缓冲</em>"），</li>
+</ul>
+
+<p>那么我们就能<em>定义</em> \(f(x) := \inf\{t : x \in U_t\}\)（取 \(\inf \emptyset = 1\)），并证它连续。这是整个 Urysohn 证明的<em>策略</em>。</p>
+
+<p>问题就变成：T4 公理够不够构造出这样一族 \(U_t\)？答案是<em>够</em>，但要小心选择 \(t\) 的取值集合——选成<em>所有</em>的 \(t \in (0, 1)\) 直接构造不出（你需要"从 \(U_t\) 找一个稍大的 \(U_{t'}\)"，但 \((0, 1)\) 里 \(t\) 没有"下一个"），选<em>有限</em>个又不够稠密给出连续函数。Urysohn 的关键想法——选 <em>dyadic 有理数</em> \(\mathbb{Z}[1/2] \cap (0, 1)\)，这一族<em>可数</em> 又<em>稠密</em>，并且<em>每两个之间总有第三个</em>，正好支撑归纳构造。</p>
+
+<h2 id="sec20-3">20.3 Reframe：把构造翻译成"嵌套开集族"</h2>
+
+<p>先把"构造嵌套开集族"这件事用一条引理孤立出来。</p>
+
+<p><strong>引理（T4 的等价表述）。</strong>\(X\) 是 T4 \(\iff\) 对每个闭集 \(C\) 与每个含 \(C\) 的开集 \(W\)，存在开集 \(V\) 使</p>
+
+<p>\[
+C \subseteq V \subseteq \overline{V} \subseteq W.
+\]</p>
+
+<p><em>证明</em>。"\(\Rightarrow\)" 设 \(X\) 是 T4。\(C\) 闭，\(W^c\) 闭，二者不交（因 \(C \subseteq W\)）。T4 给两个不交开集 \(V, V'\) 使 \(C \subseteq V\)，\(W^c \subseteq V'\)。\(V \cap V' = \emptyset\) 即 \(V \subseteq (V')^c\)。后者闭，所以 \(\overline{V} \subseteq (V')^c \subseteq W\)。\(\checkmark\)</p>
+
+<p>"\(\Leftarrow\)" 设条件成立。给两个不交闭集 \(A, B\)。\(B^c\) 是含 \(A\) 的开集；条件给开集 \(V\) 使 \(A \subseteq V \subseteq \overline{V} \subseteq B^c\)。再令 \(V' := (\overline{V})^c\) 也是开集，\(B \subseteq V'\)，且 \(V \cap V' = V \cap (\overline{V})^c \subseteq \overline{V} \cap (\overline{V})^c = \emptyset\)。\(\checkmark\)</p>
+
+<p>这条引理把 T4 表述成"<em>一闭一开夹层</em>"——任何"闭 \(\subset\) 开"的对子之间都能塞一层开集，这层开集的<em>闭包</em>仍夹在中间。这正是我们要反复用的"插空"操作。</p>
+
+<h2 id="sec20-4">20.4 命名：dyadic 有理数族 + Urysohn 函数</h2>
+
+<p>设 \(D := \{k/2^n : n \geq 0, 0 \leq k \leq 2^n\} = \mathbb{Z}[1/2] \cap [0, 1]\)。把 \(D\) 写出来：</p>
+
+<p>\[
+D = \{0, 1\} \cup \{1/2\} \cup \{1/4, 3/4\} \cup \{1/8, 3/8, 5/8, 7/8\} \cup \cdots.
+\]</p>
+
+<p>这一族<em>可数</em> 且<em>在 \([0, 1]\) 里稠密</em>，并且<em>对每个 \(d \in D \setminus \{0, 1\}\)，存在 \(d_-, d_+ \in D\) 使 \(d_- < d < d_+\)</em>（取 \(d\) 的二进制邻居即可——这一步是 Urysohn 论证能"<em>归纳进行</em>"的关键）。</p>
+
+<p><strong>Urysohn 引理。</strong>设 \(X\) 是 T4 空间，\(A, B \subseteq X\) 是不交闭集。则存在连续函数 \(f : X \to [0, 1]\) 使 \(f|_A \equiv 0\)，\(f|_B \equiv 1\)。</p>
+
+<p><em>证明</em>。分三步：构造 \(U_d\)；定义 \(f\)；证 \(f\) 连续。</p>
+
+<p><strong>第一步——构造 \(\{U_d\}_{d \in D}\)。</strong>我们要造一族开集 \(\{U_d : d \in D\}\) 满足</p>
+
+<p>\[
+A \subseteq U_d \subseteq B^c, \qquad d < d' \Rightarrow \overline{U_d} \subseteq U_{d'}.
+\]</p>
+
+<p><em>初始</em>：\(U_1 := B^c\)（开），由 20.3 的引理（\(A \subseteq B^c\) 是"闭 \(\subset\) 开"）取 \(U_0\) 开，使 \(A \subseteq U_0 \subseteq \overline{U_0} \subseteq B^c = U_1\)。</p>
+
+<p><em>归纳</em>：设已造好 \(\{U_d : d \in D_n\}\)，其中 \(D_n := \{k/2^n\}_{0 \leq k \leq 2^n}\)。要把 \(\{U_d\}\) 扩展到 \(D_{n+1}\) 上——\(D_{n+1} \setminus D_n\) 里的新点是 \((2k+1)/2^{n+1}\) 形式，每个夹在两个已有的 \(d_- = k/2^n\) 与 \(d_+ = (k+1)/2^n\) 之间。</p>
+
+<p>对每个新点 \(d = (2k+1)/2^{n+1}\)，由归纳假设 \(\overline{U_{d_-}} \subseteq U_{d_+}\)。\(\overline{U_{d_-}}\) 闭，\(U_{d_+}\) 开。再用 20.3 的引理插一层——存在开集 \(U_d\) 使</p>
+
+<p>\[
+\overline{U_{d_-}} \subseteq U_d \subseteq \overline{U_d} \subseteq U_{d_+}.
+\]</p>
+
+<p>这样我们就把 \(\{U_d\}\) 扩展到 \(D_{n+1}\) 上，且嵌套关系保持。归纳完成，\(\{U_d : d \in D\}\) 造好。</p>
+
+<p>请你停下来欣赏这一步——T4 公理本身只能"<em>插一次</em>"，但通过 dyadic 数把它<em>反复迭代</em>，就得到了一族稠密的"分层"开集，每两层之间都有缓冲（闭包仍嵌入下一层）。这是拓扑构造里典型的"<em>把一次性的存在性扩展成无穷多次的并行存在性</em>"。</p>
+
+<p><strong>第二步——定义 \(f\)。</strong>令</p>
+
+<p>\[
+\boxed{\ f(x) := \inf\{d \in D : x \in U_d\}, \quad \inf \emptyset := 1.\ }
+\]</p>
+
+<p>注意：若 \(x \in A\) 则 \(x \in U_0\)（因 \(A \subseteq U_0\)），所以 \(f(x) \leq 0\)，结合 \(f(x) \in [0, 1]\) 得 \(f(x) = 0\)。若 \(x \in B\) 则 \(x \notin U_1 = B^c\) 的<em>否</em>——抱歉，我们要的是 \(x \in B\)，那么 \(x \notin B^c = U_1\)，所以也 \(x \notin U_d\) 对所有 \(d \in D\)（\(U_d \subseteq U_1\) 嵌套），所以 \(\{d : x \in U_d\} = \emptyset\)，\(f(x) = 1\)。\(\checkmark\)</p>
+
+<p><strong>第三步——证 \(f\) 连续。</strong>我们要证 \(f^{-1}([0, t))\) 与 \(f^{-1}((t, 1])\) 对每个 \(t \in (0, 1)\) 都是开集——这两族构成 \([0, 1]\) 的子基，所以足以保证连续。</p>
+
+<p>关键观察一——</p>
+
+<p>\[
+f(x) < t \iff \exists d \in D, \ d < t, \ x \in U_d.
+\]</p>
+
+<p>"\(\Rightarrow\)" 若 \(f(x) < t\)，由 \(\inf\) 定义存在 \(d \in D\) 使 \(x \in U_d\) 且 \(d < t\)。"\(\Leftarrow\)" 显然。所以</p>
+
+<p>\[
+f^{-1}([0, t)) = \bigcup_{d \in D, \ d < t} U_d
+\]</p>
+
+<p>是开集（开集任意并）。\(\checkmark\)</p>
+
+<p>关键观察二——</p>
+
+<p>\[
+f(x) > t \iff \exists d \in D, \ d > t, \ x \notin \overline{U_d}.
+\]</p>
+
+<p>"\(\Leftarrow\)" 若存在 \(d > t\) 与 \(x \notin \overline{U_d}\)，则 \(x \notin U_d\)（\(U_d \subseteq \overline{U_d}\)）。但是更强：对所有 \(d' \leq d\) 也有 \(x \notin U_{d'}\)？不对——我们要 \(f(x) > t\) 不是 \(f(x) > d\)。重新论证：因为 \(d > t\)，要证 \(f(x) > t\) 即证 \(f(x) \geq d' > t\) 对某个 \(d'\)。取 \(d' \in D\) 使 \(t < d' < d\)（dyadic 稠密）。我们证 \(x \notin U_{d'}\)：由嵌套 \(\overline{U_{d'}} \subseteq U_d\)（因 \(d' < d\)），即 \(U_{d'} \subseteq \overline{U_{d'}} \subseteq U_d \subseteq \overline{U_d}\)。\(x \notin \overline{U_d}\) 故 \(x \notin U_{d'}\)，所以对一切 \(d'' \leq d'\) 在 \(D\) 里也 \(x \notin U_{d''}\)（嵌套）。所以 \(f(x) \geq d' > t\)。\(\checkmark\)</p>
+
+<p>"\(\Rightarrow\)" 若 \(f(x) > t\)，取 \(d \in D\) 使 \(t < d < f(x)\)（dyadic 稠密）。由 \(d < f(x)\)，\(x \notin U_d\)。再取 \(d' \in D\) 使 \(d < d' < f(x)\)；由嵌套 \(\overline{U_d} \subseteq U_{d'}\)。\(x \notin U_{d'}\)（因 \(d' < f(x)\)），更<em>不</em>在 \(U_{d'}\) 的子集 \(\overline{U_d}\) 里——<em>等</em>等，\(\overline{U_d} \subseteq U_{d'}\) 是<em>正向</em> 包含，不能从 \(x \notin U_{d'}\) 推出 \(x \notin \overline{U_d}\)。让我重新走。</p>
+
+<p>正确论证："\(\Rightarrow\)" 设 \(f(x) > t\)。取 \(d_1, d_2 \in D\) 使 \(t < d_1 < d_2 < f(x)\)。\(f(x) > d_2\) 蕴含 \(x \notin U_{d_2}\)（否则 \(f(x) \leq d_2\)）。由嵌套 \(\overline{U_{d_1}} \subseteq U_{d_2}\)。所以 \((U_{d_2})^c \subseteq (\overline{U_{d_1}})^c\)，从 \(x \in (U_{d_2})^c\) 得 \(x \in (\overline{U_{d_1}})^c\)，即 \(x \notin \overline{U_{d_1}}\)。取 \(d := d_1 > t\) 即得所求。\(\checkmark\)</p>
+
+<p>合起来</p>
+
+<p>\[
+f^{-1}((t, 1]) = \bigcup_{d \in D, \ d > t} (\overline{U_d})^c
+\]</p>
+
+<p>是开集（开集任意并）。\(\checkmark\) 所以 \(f\) 连续。\(\blacksquare\)</p>
+
+<p>请你停下来看清这条证明的<em>结构</em>：（1）T4 给"插一层"的能力；（2）dyadic 数族让"插一层"无穷迭代，得到稠密的分层开集；（3）\(\inf\) 定义把"<em>分层</em>"翻译成<em>实数值函数</em>；（4）连续性的两个不等式 \(f < t\) 与 \(f > t\) 分别由"<em>嵌套并</em>"与"<em>闭包外的并</em>"实现，正好对上 \([0, 1]\) 的子基。整条证明的每一步都<em>朴素而不可绕过</em>。</p>
+
+<h2 id="sec20-5">20.5 一般化：Tietze 延拓定理</h2>
+
+<p>Urysohn 引理是一种"<em>延拓</em>"——把 \(A\) 上的常数函数 \(0\)、\(B\) 上的常数函数 \(1\) 延拓到整个 \(X\)。换种说法：\(A \cup B\) 上有一个连续函数（取值 \(\{0, 1\}\)），延拓到 \(X\) 上。</p>
+
+<p>能不能<em>一般化</em>——\(A\) 是闭子集，\(f : A \to \mathbb{R}\) 连续，能不能延拓为连续 \(\tilde f : X \to \mathbb{R}\)？答案——能。这条定理叫 <strong>Tietze 延拓定理</strong>，也是 1925 年前后由 Tietze、Urysohn 等人发展的。</p>
+
+<p><strong>Tietze 延拓定理。</strong>设 \(X\) 是 T4 空间，\(A \subseteq X\) 是闭子集，\(f : A \to \mathbb{R}\) 是连续函数。</p>
+
+<ol>
+  <li>若 \(f\) 有界（\(|f| \leq M\)），则存在连续延拓 \(\tilde f : X \to \mathbb{R}\) 使 \(\tilde f|_A = f\) 且 \(|\tilde f| \leq M\)。</li>
+  <li>一般情况（\(f\) 不必有界），存在连续延拓 \(\tilde f : X \to \mathbb{R}\)。</li>
+</ol>
+
+<p><em>证明思路</em>。先证有界情形（这是核心），再处理无界。</p>
+
+<p><strong>有界情形。</strong>WLOG \(M = 1\)，即 \(f : A \to [-1, 1]\)。我们要造 \(\tilde f : X \to [-1, 1]\) 延拓。</p>
+
+<p>策略——<em>逐次逼近</em>。我们一步一步造一列 \(g_n : X \to \mathbb{R}\) 使</p>
+
+<p>\[
+|f - g_n|_A \leq (2/3)^n \cdot 1, \qquad |g_n|_X \leq 1 - (2/3)^n,
+\]</p>
+
+<p>每步用 Urysohn 引理修一个 \((1/3) \cdot (2/3)^{n-1}\) 量级的"补丁"，最后让 \(\tilde f := \sum g_n\) 收敛。</p>
+
+<p>具体——第一步。把 \(A\) 切成两块：</p>
+
+<p>\[
+A_1 := \{x \in A : f(x) \leq -1/3\}, \qquad B_1 := \{x \in A : f(x) \geq 1/3\}.
+\]</p>
+
+<p>这两个集合在 \(A\) 上闭（连续函数原像闭集），又因为 \(A\) 在 \(X\) 上闭，它们在 \(X\) 上也闭，且<em>不交</em>。Urysohn 给连续 \(g_1 : X \to [-1/3, 1/3]\) 使 \(g_1|_{A_1} = -1/3\)，\(g_1|_{B_1} = 1/3\)（把 Urysohn 的 \([0, 1]\) 缩放成 \([-1/3, 1/3]\) 即可）。</p>
+
+<p>验算 \(|f - g_1|\) 在 \(A\) 上的界——三种情形分类：\(f(x) \leq -1/3\) 时 \(g_1(x) = -1/3\)，\(f(x) - g_1(x) \in [-1, -1/3] - (-1/3) = [-2/3, 0]\)；\(f(x) \in [-1/3, 1/3]\) 时 \(g_1(x) \in [-1/3, 1/3]\)，差在 \([-2/3, 2/3]\) 里；\(f(x) \geq 1/3\) 时 \(g_1(x) = 1/3\)，差在 \([0, 2/3]\) 里。三种都满足 \(|f - g_1| \leq 2/3\)。\(\checkmark\)</p>
+
+<p>同时 \(|g_1| \leq 1/3\) 显然。</p>
+
+<p>第二步——用 \(f - g_1 : A \to [-2/3, 2/3]\) 重复上面的论证（缩放因子 \(2/3\)）。得到 \(g_2 : X \to [-1/3 \cdot 2/3, 1/3 \cdot 2/3]\) 使 \(|f - g_1 - g_2|_A \leq (2/3)^2\)，\(|g_2| \leq (1/3)(2/3)\)。</p>
+
+<p>归纳——第 \(n\) 步得 \(g_n : X \to \mathbb{R}\) 使 \(|g_n| \leq (1/3)(2/3)^{n-1}\)，\(|f - \sum_{k=1}^n g_k|_A \leq (2/3)^n\)。</p>
+
+<p><em>收敛</em>——\(\sum |g_n| \leq \sum (1/3)(2/3)^{n-1} = (1/3) \cdot \frac{1}{1 - 2/3} = 1\)。所以 \(\tilde f := \sum_{n=1}^\infty g_n\) 在 \(X\) 上一致收敛（用 Weierstrass M 判别法——取 \(M_n = (1/3)(2/3)^{n-1}\)），由一致收敛保连续（这是 T4 上一致极限保连续的标准论证，等价于度量收敛——等等，\(X\) 不是度量空间。但一致收敛的定义只需值域是度量空间，\(\mathbb{R}\) 是；论证依然成立——给 \(\varepsilon\)，取 \(N\) 使 \(|\tilde f - \sum_{k=1}^N g_k| < \varepsilon/3\) 整体；再用 \(\sum_{k=1}^N g_k\) 的连续给开邻域），\(\tilde f\) 连续。\(|\tilde f| \leq \sum |g_n| \leq 1\)。在 \(A\) 上 \(|\tilde f - f| \leq |\tilde f - \sum_{k=1}^n g_k| + |f - \sum_{k=1}^n g_k| \to 0\)，所以 \(\tilde f|_A = f\)。\(\checkmark\)</p>
+
+<p><strong>无界情形。</strong>用同胚 \(\varphi : \mathbb{R} \to (-1, 1)\)（如 \(\varphi(t) = t/(1 + |t|)\)）把 \(f : A \to \mathbb{R}\) 转成 \(\varphi \circ f : A \to (-1, 1) \subseteq [-1, 1]\)，由有界情形延拓为 \(g : X \to [-1, 1]\)。问题——\(g\) 可能取到 \(\pm 1\)（落在像外），那就不能直接 \(\varphi^{-1} \circ g\) 反回去。</p>
+
+<p>修正——令 \(C := g^{-1}(\{-1, 1\}) \subseteq X\)，闭。\(C \cap A = \emptyset\)（因 \(g|_A = \varphi \circ f \in (-1, 1)\)）。\(A\) 闭。Urysohn 给 \(h : X \to [0, 1]\) 使 \(h|_A = 1\)，\(h|_C = 0\)。令 \(g'(x) := h(x) g(x)\)，则 \(g'|_A = g|_A = \varphi \circ f\)（因 \(h|_A = 1\)），\(g'|_C = 0\)（因 \(h|_C = 0\)）。所以 \(|g'| < 1\) 处处（\(C\) 上 \(= 0\)，\(C^c\) 上 \(|g| < 1\)）。\(\tilde f := \varphi^{-1} \circ g' : X \to \mathbb{R}\) 是所求延拓。\(\blacksquare\)</p>
+
+<p>请你欣赏 Tietze 证明里那种<em>"用 Urysohn 引理一砖一砖盖延拓"</em> 的技巧——每一步用一次 Urysohn（或 Urysohn 缩放），把误差减小一个固定比例 \(2/3\)。这种"<em>逐次逼近 + 几何收敛</em>"的套路在分析里反复出现（Banach 不动点、Cauchy 序列构造等），Tietze 把它<em>第一次</em>用进了纯拓扑环境。</p>
+
+<h2 id="sec20-6">20.6 推论："<em>正规空间上有足够多连续函数</em>"</h2>
+
+<p>Urysohn + Tietze 合在一起的<em>哲学</em>意义——T4 空间上"<em>足够多</em>"连续实值函数：</p>
+
+<ul>
+  <li><strong>分离闭集：</strong>任两个不交闭集都能被 \([0, 1]\) 上的某个连续函数严格分开（\(0\) 与 \(1\) 处）。</li>
+  <li><strong>分离点与闭集：</strong>取 \(A = \{p\}\)（点是闭集，因 T1 \(\subseteq\) T4）与不交闭集 \(B\)，得到 \(f\) 在 \(p\) 取 \(0\)、\(B\) 取 \(1\)。</li>
+  <li><strong>分离两点：</strong>取 \(A = \{p\}\)，\(B = \{q\}\)，得 \(f(p) = 0\)，\(f(q) = 1\)。这意味着<em>连续函数族能区分 \(X\) 的点</em>——这是 T4 比 Hausdorff 强得多的体现（Hausdorff 只保证开集分点，不保证连续函数分点）。</li>
+  <li><strong>延拓任意连续函数：</strong>闭子集上的<em>任何</em>连续 \(\mathbb{R}\) 值函数都可延拓到全空间。</li>
+</ul>
+
+<p>"<em>足够多连续函数</em>" 这件事是<em>分析学</em> 在拓扑空间上立足的根本。例如——\(C(X, \mathbb{R})\) 这个 Banach 代数（连续有界实函数）在 T4 \(X\) 上"<em>区分</em> \(X\) 的点"，这件事是 Stone–Gelfand 二元对偶（紧致 Hausdorff 空间 \(\leftrightarrow\) 交换 C* 代数）的<em>核心</em>。没有 Urysohn，这种对偶不可能存在。</p>
+
+<h2 id="sec20-7">20.7 应用：partition of unity 草图</h2>
+
+<p>Urysohn 在<em>流形</em> 上的一个核心应用——构造 <strong>partition of unity</strong>（单位分解，<a href="ch24.html">链 ch24</a>）。</p>
+
+<p>设 \(M\) 是流形，覆盖 \(\{U_\alpha\}\)。"单位分解"是一族连续函数 \(\{\rho_\alpha : M \to [0, 1]\}\) 使</p>
+
+<ol>
+  <li>每个 \(\rho_\alpha\) 在 \(U_\alpha\) 外为 \(0\)（紧支撑，subordinate to 覆盖），</li>
+  <li>每点 \(p\) 只有有限多 \(\rho_\alpha(p) \neq 0\)（局部有限），</li>
+  <li>\(\sum_\alpha \rho_\alpha(p) = 1\) 处处。</li>
+</ol>
+
+<p>它的用处——把<em>局部</em>定义的对象（如 \(U_\alpha\) 上的微分形式、向量场）<em>粘成全局</em>对象，方法是 \(\omega := \sum_\alpha \rho_\alpha \omega_\alpha\)。这是流形上"<em>从局部到全局</em>"的标准粘合工具。</p>
+
+<p>构造 partition of unity 的核心一步——给闭集 \(K\)（一个 \(U_\alpha\) 内的紧支集候选）与开集 \(U_\alpha\)（含 \(K\)），用 Urysohn 造 \(\rho_\alpha\) 使 \(\rho_\alpha|_K = 1\)，\(\rho_\alpha|_{U_\alpha^c} = 0\)。这正是 Urysohn 引理的"<em>分离闭集</em>"应用——\(K\) 与 \(U_\alpha^c\) 不交闭。</p>
+
+<p>所以 Urysohn 引理是流形微积分（积分、Stokes、de Rham）<em>底层</em> 的拓扑工具——没有它，"<em>把局部积分粘成全局积分</em>"做不到。</p>
+
+<h2 id="sec20-8">20.8 注意：Urysohn 仅对 T4，不能弱化</h2>
+
+<p>请你别误以为 Hausdorff 就够。<em>Hausdorff 不蕴含</em> Urysohn 引理。</p>
+
+<p>反例——<em>Niemytzki 平面</em>。取上半平面 \(\{(x, y) : y \geq 0\}\)，\(y > 0\) 处用通常欧氏拓扑，\(y = 0\) 处的点 \(p = (x, 0)\) 的邻域基取"<em>开圆盘 + \(p\) 自己</em>"——具体是与 \(x\) 轴相切于 \(p\) 的开圆盘。这空间是 Hausdorff（甚至 T3）但<em>不</em>是 T4。在它里能找到两个不交闭集，被 Urysohn 风格的连续函数分不开。</p>
+
+<p>所以 Urysohn 引理与 T4 是<em>等价</em> 的——更准确地：对 T1 空间，T4 \(\iff\) Urysohn 性（任两不交闭集能被连续函数分开 \(0/1\)）。"\(\Leftarrow\)" 容易：若 \(f\) 给出分离，取开集 \(f^{-1}([0, 1/2))\) 与 \(f^{-1}((1/2, 1])\) 是不交开集分别含 \(A, B\)。</p>
+
+<h2 id="sec20-9">20.9 临别话</h2>
+
+<p>Urysohn 引理的证明也许是<em>初等拓扑学</em>里最美的一段——它把 T4 这条看起来很弱的几何分离公理，<em>放大</em> 成了"任意稠密分层 + 实值连续函数存在"这种<em>分析</em> 级别的结论。机制就是 dyadic 数的可数稠密 + 拓扑公理的反复迭代。这种"<em>用可数族把存在性定理迭代成实值函数</em>"的策略，在拓扑学、测度论、泛函分析里反复出现。</p>
+
+<p>Tietze 延拓更进一步——把"<em>常值函数</em>" 延拓变成<em>任意连续函数</em> 延拓，证明用 Urysohn 一砖一砖盖。两条定理合起来给出"<em>T4 = 有足够多连续函数</em>"这一<em>哲学</em> 等式，是后续<a href="ch21.html">度量化定理</a>与 Stone–Čech 紧致化的<em>地基</em>。</p>
+
+<p>下一章——既然 T4 + Urysohn 给出"<em>足够多 \([0, 1]\) 值连续函数</em>"，能不能<em>嵌入</em> \(X\) 进 \([0, 1]^\mathbb{N}\) 这种"<em>所有连续函数的乘积空间</em>"？答案——能，且嵌入后能从<em>积空间</em> 的度量拉回度量到 \(X\) 上。这正是 <strong>Urysohn 度量化定理</strong> 的内容：第二可数 + T4 \(\Rightarrow\) 度量化。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 道路连通</a><a href="ch21.html">下一章 · 第 21 章 Urysohn 度量化定理 →</a></nav>
+</main>
+</body>
+</html>

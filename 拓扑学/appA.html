@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 集合论与等价类速查 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+<h1 id="appA">附录 A 集合论与等价类速查</h1>
+
+<p>本书反复用到的<em>集合语言</em>——并 / 交 / 笛卡尔积 / 函数 / 等价关系 / 商集 / 偏序——这个附录集中处理。它们是<em>实分析</em>、<em>代数</em>、<em>拓扑</em> 共同的最基础工具, 但每本书的口径稍有不同。这里只摆本书<em>实际用到</em> 的版本——尤其是<a href="ch10.html">商拓扑</a> 与<a href="ch11.html">任意积</a> 用到的那几条。</p>
+
+<ul>
+  <li>集合运算 + De Morgan。</li>
+  <li>函数（单 / 满 / 双 / 像 / 逆像）。</li>
+  <li>等价关系 + 划分 + 商集——商拓扑的代数前置。</li>
+  <li>偏序 + 全序——Zorn 引理（<a href="appB.html">附录 B</a>）的语言。</li>
+  <li>Cantor 对角法 + \(\mathbb{R}\) 不可数。</li>
+  <li>任意 index 集的笛卡尔积——选择公理引入。</li>
+</ul>
+
+<h2 id="appA-1">A.1 集合运算</h2>
+
+<p>给集合 \(A, B\)（同一全集 \(X\) 子集）：</p>
+
+<ul>
+  <li><em>并</em> \(A \cup B = \{x : x \in A \text{ 或 } x \in B\}\)。</li>
+  <li><em>交</em> \(A \cap B = \{x : x \in A \text{ 且 } x \in B\}\)。</li>
+  <li><em>差</em> \(A \setminus B = \{x : x \in A \text{ 且 } x \notin B\}\)。</li>
+  <li><em>对称差</em> \(A \triangle B = (A \setminus B) \cup (B \setminus A)\)。</li>
+  <li><em>余集</em>（在全集 \(X\) 内）\(A^c = X \setminus A\)。</li>
+</ul>
+
+<p>任意 index 族 \(\{A_\alpha\}_{\alpha \in I}\)（\(I\) 是 index 集, 可有限可无穷, 可可数可不可数）：</p>
+
+<p>\[\bigcup_{\alpha \in I} A_\alpha = \{x : \exists \alpha, x \in A_\alpha\}, \qquad \bigcap_{\alpha \in I} A_\alpha = \{x : \forall \alpha, x \in A_\alpha\}.\]</p>
+
+<p><strong>De Morgan 律</strong>（任意 index）：</p>
+
+<p>\[\boxed{\ \Big(\bigcup_\alpha A_\alpha\Big)^c = \bigcap_\alpha A_\alpha^c, \qquad \Big(\bigcap_\alpha A_\alpha\Big)^c = \bigcup_\alpha A_\alpha^c.\ }\]</p>
+
+<p>这是拓扑学反复用的工具——"<em>开集</em>" 和"<em>闭集</em>" 通过 De Morgan 互译："任意开集并" \(\leftrightarrow\) "任意闭集交"，"有限开集交" \(\leftrightarrow\) "有限闭集并"。<a href="ch5.html">第 5 章</a>闭集公理就是开集公理通过 De Morgan 翻过去的。</p>
+
+<p><strong>笛卡尔积（两个集合）</strong>：\(A \times B = \{(a, b) : a \in A, b \in B\}\), 元素是<em>有序对</em>。</p>
+
+<p>多个集合：\(A_1 \times A_2 \times \cdots \times A_n = \{(a_1, \ldots, a_n) : a_i \in A_i\}\), 元素是<em>有序 \(n\)-元组</em>。</p>
+
+<p><em>任意</em> index 笛卡尔积——A.7 节专门讲（这是选择公理的所在）。</p>
+
+<h2 id="appA-2">A.2 函数：单射 / 满射 / 双射, 像 / 逆像</h2>
+
+<p>函数 \(f : A \to B\) 给每个 \(a \in A\) 配唯一 \(f(a) \in B\)。</p>
+
+<ul>
+  <li><em>单射</em>（injective）：\(f(a_1) = f(a_2) \Rightarrow a_1 = a_2\)。</li>
+  <li><em>满射</em>（surjective）：每个 \(b \in B\) 都有原像 \(a\) 使 \(f(a) = b\)。</li>
+  <li><em>双射</em>（bijective）：单 + 满。等价于<em>有逆</em>: 存在 \(g : B \to A\) 使 \(g \circ f = \mathrm{id}_A\)、\(f \circ g = \mathrm{id}_B\)。</li>
+</ul>
+
+<p>给 \(S \subseteq A\), <em>像</em> \(f(S) = \{f(a) : a \in S\} \subseteq B\)。给 \(T \subseteq B\), <em>逆像</em>（preimage）\(f^{-1}(T) = \{a \in A : f(a) \in T\} \subseteq A\)。注意：<em>逆像即使 \(f\) 不可逆也良定</em>——它<em>不</em>需要 \(f\) 有逆函数。</p>
+
+<p><strong>逆像和集合运算交换</strong>：</p>
+
+<p>\[f^{-1}\Big(\bigcup_\alpha T_\alpha\Big) = \bigcup_\alpha f^{-1}(T_\alpha), \qquad f^{-1}\Big(\bigcap_\alpha T_\alpha\Big) = \bigcap_\alpha f^{-1}(T_\alpha), \qquad f^{-1}(B \setminus T) = A \setminus f^{-1}(T).\]</p>
+
+<p>这一族<em>"逆像保运算"</em> 是<a href="ch6.html">第 6 章</a>"<em>连续 = 开集逆像开</em>" 这条等价定义能成立的代数原因。逆像让"<em>开集闭集系统</em>" 在映射下表现良好。</p>
+
+<p>注意"<em>正像</em>" \(f(\cdot)\) <em>不</em>这么干净——\(f(A \cap B) \subseteq f(A) \cap f(B)\) 但<em>未必相等</em>（反例：\(f(x) = x^2\), \(A = \{1\}, B = \{-1\}\), \(f(A \cap B) = f(\emptyset) = \emptyset\) 但 \(f(A) \cap f(B) = \{1\}\)）。<em>正像保并不保交不保余</em>。</p>
+
+<h2 id="appA-3">A.3 等价关系 + 划分 + 商集</h2>
+
+<p>给集合 \(X\), 一个<em>等价关系</em> \(\sim\) 是 \(X \times X\) 的子集（即一个二元关系）满足：</p>
+
+<ul>
+  <li><em>(R)</em> 反身：\(x \sim x\)。</li>
+  <li><em>(S)</em> 对称：\(x \sim y \Rightarrow y \sim x\)。</li>
+  <li><em>(T)</em> 传递：\(x \sim y\) 且 \(y \sim z \Rightarrow x \sim z\)。</li>
+</ul>
+
+<p>给 \(x \in X\), 它的<em>等价类</em> \([x] = \{y \in X : y \sim x\}\)。</p>
+
+<p><strong>定理（等价类划分）</strong>：等价类 \(\{[x] : x \in X\}\) 给 \(X\) 的<em>划分</em>——即两两不交且并 = \(X\)。等价的, 给一个划分 \(\{P_\alpha\}\) 也定义一个等价关系（\(x \sim y \iff\) 同属一块）。</p>
+
+<p>"<em>等价关系 \(\leftrightarrow\) 划分</em>" 这一对应是基础。证明（\(\Rightarrow\) 方向）：(R) 给 \(x \in [x]\), 所以并 = \(X\)。两个等价类要么相同要么不交：若 \(z \in [x] \cap [y]\), 则 \(z \sim x\) 且 \(z \sim y\), 由 (S) (T) 得 \(x \sim y\), 所以 \([x] = [y]\)。\(\square\)</p>
+
+<p><strong>商集</strong> \(X / \sim\) = 等价类全体 = \(\{[x] : x \in X\}\)。配<em>商映射</em> \(q : X \to X/\sim\), \(q(x) = [x]\) ——把每个元素送到其等价类。</p>
+
+<p>例 1：\(X = \mathbb{Z}\), \(x \sim y \iff x - y\) 偶。等价类两个：\([0] = \) 偶数, \([1] = \) 奇数。\(\mathbb{Z}/\sim = \{[0], [1]\} \cong \mathbb{Z}/2\mathbb{Z}\)。</p>
+
+<p>例 2：\(X = \mathbb{R}\), \(x \sim y \iff x - y \in \mathbb{Z}\)。等价类是 \(\mathbb{R}\) 模 \(\mathbb{Z}\), 每类挑代表元在 \([0, 1)\) 中。\(\mathbb{R}/\mathbb{Z} \leftrightarrow [0, 1)\) 作为集合, 配上"<em>0 与 1 等同</em>" 给一个圆 \(S^1\)（这正是<a href="ch10.html">第 10 章</a>商拓扑的核心例子）。</p>
+
+<p>例 3：\(X = S^n\)（\(n\) 维球面）, \(x \sim y \iff y = \pm x\)（对径点等同）。商 \(S^n / \pm = \mathbb{R}P^n\)（实射影空间, <a href="ch24.html">ch24</a>）。</p>
+
+<p>商集是<em>商拓扑</em>（<a href="ch10.html">ch10</a>）的代数底层——商拓扑就是给商集配上一个由商映射诱导的<em>最大</em> 拓扑。</p>
+
+<h2 id="appA-4">A.4 偏序 + 全序</h2>
+
+<p>给集合 \(X\), 一个<em>偏序</em>（partial order）\(\le\) 是二元关系满足：</p>
+
+<ul>
+  <li><em>(R)</em> 反身：\(x \le x\)。</li>
+  <li><em>(A)</em> 反对称：\(x \le y\) 且 \(y \le x \Rightarrow x = y\)。</li>
+  <li><em>(T)</em> 传递：\(x \le y\) 且 \(y \le z \Rightarrow x \le z\)。</li>
+</ul>
+
+<p>"<em>偏</em>" 因为<em>不</em> 要求任意两元素可比——可能存在 \(x, y\) 使 \(x \not\le y\) 且 \(y \not\le x\), 这种 \(x, y\) 叫"<em>不可比</em>"。</p>
+
+<p>若加一条 \((TR)\) <em>三歧</em>：\(\forall x, y, x \le y \text{ 或 } y \le x\), 那 \(\le\) 叫<em>全序</em>（total order, 或 linear order）。</p>
+
+<p>例：</p>
+
+<ul>
+  <li>\(\mathbb{R}\) 上自然 \(\le\) 是全序。</li>
+  <li>给 \(X\) 的子集族 \(\mathcal{P}(X)\), 关系"<em>子集</em>" \(\subseteq\) 是偏序——\(A, B \subseteq X\) 不一定有 \(A \subseteq B\) 或 \(B \subseteq A\)。</li>
+  <li>\(\mathbb{Z}_{>0}\) 上"<em>整除</em>" \(a \mid b\) 是偏序——\(2 \nmid 3\) 且 \(3 \nmid 2\), 不可比。</li>
+</ul>
+
+<p>偏序集（poset）\((X, \le)\) 的<em>链</em>（chain）：一个全序子集 \(C \subseteq X\)（即 \(C\) 中任两元素可比）。</p>
+
+<p><em>上界</em>：\(u \in X\) 是 \(S \subseteq X\) 的上界, 当 \(\forall s \in S, s \le u\)。</p>
+
+<p><em>极大元</em>：\(m \in X\) 极大, 当 \(\forall x \in X, m \le x \Rightarrow x = m\)（即"<em>没有比 \(m\) 严格大的</em>"）。注意"<em>极大</em>" 不等于"<em>最大</em>"——偏序里可能没有最大元（要求 \(\forall x, x \le \text{最大}\)）但有极大元（不可比的元素一起当极大）。</p>
+
+<p>这套语言为<em>Zorn 引理</em>（<a href="appB.html">附录 B</a>）服务：</p>
+
+<p><strong>Zorn 引理</strong>：偏序集 \(X\) 中如果每条链都有上界, 则 \(X\) 有极大元。</p>
+
+<p>它是选择公理的等价表述, 是<em>线性代数证明任何向量空间有基</em>、<em>泛函分析 Hahn-Banach</em>、<em>代数证明每个非零环有极大理想</em>、<em>本书 Tychonoff 定理（<a href="ch16.html">ch16</a>）</em> 等的工具。</p>
+
+<h2 id="appA-5">A.5 Cantor 对角法 + \(\mathbb{R}\) 不可数</h2>
+
+<p>两个集合<em>等势</em>（equinumerous）当存在双射。"<em>有相同元素个数</em>" 的精确版本（即使两边都无穷）。</p>
+
+<p>\(\mathbb{N}\) 等势的集合叫<em>可数无穷</em>（countably infinite）：\(\mathbb{Z}, \mathbb{Q}\) 都可数无穷。</p>
+
+<p>可数无穷比有限大、比连续统小。\(\mathbb{R}\) <em>不</em> 可数——比 \(\mathbb{N}\) 严格大。这是 Cantor 1874 的著名结果, 给了"<em>不同大小的无穷</em>" 概念。</p>
+
+<p><strong>定理（Cantor）</strong>：\(\mathbb{R}\) 不可数。等价地：\([0, 1]\) 不可数。</p>
+
+<p>证明（对角法）。反证。设 \([0, 1]\) 可数, 列成序列 \(x_1, x_2, x_3, \ldots\)。每个 \(x_n\) 写成 10 进小数：</p>
+
+<p>\[x_n = 0.x_{n,1} x_{n,2} x_{n,3} \cdots\]</p>
+
+<p>构造一个新数 \(y = 0.y_1 y_2 y_3 \ldots\)，规则：</p>
+
+<p>\[y_n = \begin{cases} 5 & x_{n,n} \neq 5 \\ 6 & x_{n,n} = 5 \end{cases}.\]</p>
+
+<p>那 \(y \in [0, 1]\), 但 \(y \neq x_n\) 对所有 \(n\)（在第 \(n\) 位与 \(x_n\) 不一样）。可序列<em>遍历了所有</em> \([0, 1]\) 元素。矛盾。\(\square\)</p>
+
+<p>"<em>对角化</em>" 是非常通用的反证模式。Russell 悖论（"<em>所有不属于自身的集合的集合</em>"）、Gödel 不完全性、停机问题不可判定都用对角化。本书<a href="ch11.html">ch11</a> Tychonoff 拓扑里偶尔间接用到。</p>
+
+<p>\(\mathbb{R}\) 的势记 \(\mathfrak{c}\)（"<em>continuum</em>"）, \(\mathbb{N}\) 的势记 \(\aleph_0\)。Cantor 证明 \(\mathfrak{c} = 2^{\aleph_0}\)。"<em>是否存在介于二者之间的势</em>" 是<em>连续统假设</em>（CH）, Gödel + Cohen 证明它独立于 ZFC（既不能证又不能反证）。这是数学基础的名场面。</p>
+
+<h2 id="appA-6">A.6 任意笛卡尔积</h2>
+
+<p>两个集合的笛卡尔积 \(A \times B\) 你熟。\(n\) 个的也熟。<em>无穷多</em> 集合的呢？</p>
+
+<p>设 \(\{X_\alpha\}_{\alpha \in I}\) 是 index 族（\(I\) 任意 index 集, 可不可数）。<em>任意笛卡尔积</em> 形式定义：</p>
+
+<p>\[
+\boxed{\ \prod_{\alpha \in I} X_\alpha = \Big\{f : I \to \bigcup_\alpha X_\alpha \ \Big| \ f(\alpha) \in X_\alpha \text{ 对所有 } \alpha \in I\Big\}.\ }
+\]</p>
+
+<p>"<em>任意 index 笛卡尔积 = 选择函数族</em>"。即一个元素是一个映射 \(f\), 给每个 index \(\alpha\) 选一个 \(f(\alpha) \in X_\alpha\)。</p>
+
+<p>当 \(I = \{1, 2, \ldots, n\}\), 这等价于 \(n\)-元组 \((f(1), f(2), \ldots, f(n)) = (a_1, \ldots, a_n)\)。两个定义一致。</p>
+
+<p>当 \(I = \mathbb{N}\), 元素是序列 \((a_1, a_2, \ldots)\)。</p>
+
+<p>当 \(I = \mathbb{R}\) 或更大, 这是个<em>巨大</em> 的集合。"<em>函数视角</em>" 的好处是不依赖某种"<em>列表</em>" 结构, 适应任意 index。</p>
+
+<p>关键问题：<em>任意笛卡尔积非空吗</em>？即如果每个 \(X_\alpha\) 非空, 是否一定存在选择函数 \(f\)？</p>
+
+<p>对<em>有限</em> \(I\) 答案是显然<em>是</em>——挨个选, 一定成。</p>
+
+<p>对<em>可数</em> \(I\)（如 \(\mathbb{N}\)）答案<em>仍然是</em>（用归纳）。</p>
+
+<p>对<em>不可数</em> \(I\) 答案<em>不能从 ZF 公理推出</em>——这正是<em>选择公理</em>（Axiom of Choice, AC）所断言：</p>
+
+<p><strong>选择公理（AC）</strong>：对任意非空集族 \(\{X_\alpha\}_{\alpha \in I}\), 存在选择函数 \(f \in \prod_{\alpha} X_\alpha\)。</p>
+
+<p>等价地：任意非空集族的笛卡尔积非空。</p>
+
+<p>这是数学最有争议（也最有用）的公理之一——下一个附录 B 专门讲它。</p>
+
+<h2 id="appA-7">A.7 选择公理引入</h2>
+
+<p>选择公理在本书具体出现的几个地方：</p>
+
+<ul>
+  <li><a href="ch11.html">ch11</a> 任意积拓扑（Tychonoff topology）的<em>定义</em> 用任意笛卡尔积。</li>
+  <li><a href="ch16.html">ch16</a> Tychonoff 定理"<em>任意紧空间的积仍紧</em>"——证明本质需要 AC（事实上 Tychonoff 定理与 AC 等价！）。</li>
+  <li><a href="ch20.html">ch20</a> Urysohn 引理某种证法。</li>
+  <li><a href="ch21.html">ch21</a> Urysohn 度量化定理的某些步骤。</li>
+  <li><a href="ch11.html">ch11</a> "<em>任意度量空间积有可数基</em>" 等技术结果。</li>
+</ul>
+
+<p>对大多数<em>具体</em> 拓扑学问题（\(\mathbb{R}^n\) 上的、可数空间上的）AC 不需要——可数族的选择由"<em>可数选择公理</em>"（AC\(_\omega\), 是 ZF 定理）解决。AC 真正介入的是<em>不可数 index</em> 的情形——Tychonoff 定理是最经典例。</p>
+
+<p>请你把 A.6 节的"<em>任意笛卡尔积非空 \(\iff\) 选择公理</em>" 这条对应记住——它是看穿"<em>哪些证明本质上需要 AC</em>" 的最简单标志。任何时候你看到"<em>对每个 \(\alpha \in I\)（\(I\) 不可数）选一个 \(x_\alpha \in X_\alpha\)</em>" 的步骤, 你就在用 AC。</p>
+
+<p>下一附录把 AC 系统讲——历史 / 等价表述 / 应用 / 数学界态度。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+</main>
+</body>
+</html>

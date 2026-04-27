@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 道路连通与局部连通 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 连通性</a><a href="ch20.html">下一章 · 第 20 章 Urysohn 引理 →</a></nav>
+<h1 id="ch19">第 19 章 道路连通与局部连通</h1>
+
+<p><a href="ch18.html">上一章</a>给"<em>连通</em>" 的定义——<em>不能拆成两个不交非空开集的并</em>。这条定义形式上完美, 但请你停下来反省: 你<em>真</em> 是这样理解"<em>连通</em>" 的吗?</p>
+
+<p>更可能, 你脑子里"<em>连通</em>" 的画面是:</p>
+
+<p><em>能用一条连续路径从 \(A\) 走到 \(B\)。</em></p>
+
+<p>这种"<em>能走到</em>" 的直观才是几何里"<em>同一块</em>" 的真正含义——你站在空间里某点, 想走到另一点, 中途<em>不需要跳跃</em>。这件事在数学里叫"<em>道路连通</em>" (path-connected, 或 arcwise connected)。</p>
+
+<p>道路连通 \(\Rightarrow\) 连通 (一行证, 19.2 看)。所以道路连通是<em>更强</em>的性质。问题——<em>反过来</em>呢? 连通 \(\Rightarrow\) 道路连通吗?</p>
+
+<p>答<em>不</em>。著名反例叫"<em>拓扑学家的正弦曲线</em>" (topologist's sine curve), 它<em>连通</em>但<em>不道路连通</em>——它是"<em>看起来一块但走不过去</em>" 的经典空间。这一章详细分析它。</p>
+
+<p>除连通 / 道路连通外, 还有<em>局部</em>版本——"<em>每个点附近连通</em>" (局部连通)、"<em>每个点附近道路连通</em>" (局部道路连通)。这<em>四</em> 种连通性互相区分需要不同反例, 是拓扑学最经典的训练。</p>
+
+<h2 id="sec19-1">19.1 道路连通的定义</h2>
+
+<p>定义: 拓扑空间 \(X\) 称为<em>道路连通</em> (path-connected), 如果对任何两点 \(x, y \in X\), 存在连续映射</p>
+
+<p>\[
+\gamma : [0, 1] \to X, \qquad \gamma(0) = x, \quad \gamma(1) = y.
+\]</p>
+
+<p>这样的 \(\gamma\) 叫从 \(x\) 到 \(y\) 的<em>道路</em> (path)。</p>
+
+<p>请停一下注意: \([0, 1]\) 是<em>固定</em> 的——它是单位区间。任何"道路" 都参数化在 \([0, 1]\) 上。这是个约定, 不是限制——任何 \([a, b]\) (\(a < b\)) 上的连续映射 \(\alpha\) 都能<em>重新参数化</em>到 \([0, 1]\) 上 (用 \(\gamma(t) = \alpha(a + t(b - a))\))。所以选 \([0, 1]\) 没失一般性, 又给定义统一形式。</p>
+
+<p>道路<em>不</em>要求是单射——它可以"<em>来回走</em>", 甚至"<em>停在一点</em>" (常值道路 \(\gamma(t) = x\) 是从 \(x\) 到 \(x\) 的合法道路)。所以道路是个比直觉"<em>线段</em>" 更广义的对象。</p>
+
+<p>具体例子:</p>
+
+<ul>
+  <li><strong>\(\mathbb{R}^n\) 道路连通。</strong>给 \(x, y \in \mathbb{R}^n\), 直线 \(\gamma(t) = (1 - t)x + ty\) 是从 \(x\) 到 \(y\) 的道路, 连续。</li>
+  <li><strong>\(\mathbb{R}^n\) 中凸子集道路连通。</strong>同上, 凸 \(\Rightarrow\) 直线段含在子集中。</li>
+  <li><strong>\(\mathbb{R}^n\) 中"<em>星形</em>" 子集 (存在中心 \(c\), 任何点 \(x\) 与 \(c\) 直线段在子集里) 道路连通。</strong>中转点 \(c\): 从 \(x\) 到 \(c\) 直线 + 从 \(c\) 到 \(y\) 直线, 拼起来。</li>
+  <li><strong>球面 \(S^n\) (\(n \geq 1\)) 道路连通。</strong>给 \(x, y \in S^n\), 取 \(\mathbb{R}^{n+1}\) 中含 \(0, x, y\) 的二维平面 (一般位置 \(x \neq -y\) 时存在), 平面与 \(S^n\) 交是大圆, 沿大圆走从 \(x\) 到 \(y\)。\(x = -y\) 时取任何含 \(x\) 的二维平面, 沿其大圆走半圈。所有 \(S^n\) (\(n \geq 1\)) 道路连通。</li>
+</ul>
+
+<p>道路连通在<em>几何对象</em> 上几乎总是成立——\(\mathbb{R}^n\) 中开连通子集都道路连通 (后面 19.7 看), 流形道路连通 (假设连通), CW 复形道路连通 (假设连通)。所以日常几何分析里"<em>连通</em>" 与"<em>道路连通</em>" 不区分。</p>
+
+<h2 id="sec19-2">19.2 道路连通 \(\Rightarrow\) 连通</h2>
+
+<p><strong>命题。</strong>道路连通空间连通。</p>
+
+<p><strong>证明。</strong>设 \(X\) 道路连通。假设 \(X = U \cup V\) 是分离 (\(U, V\) 不交非空开)。取 \(x \in U, y \in V\), 道路连通给 \(\gamma : [0, 1] \to X\) with \(\gamma(0) = x, \gamma(1) = y\)。</p>
+
+<p>考虑 \([0, 1] = \gamma^{-1}(U) \cup \gamma^{-1}(V)\)。\(\gamma\) 连续 \(\Rightarrow \gamma^{-1}(U), \gamma^{-1}(V)\) 在 \([0, 1]\) 中开。\(U \cap V = \emptyset \Rightarrow \gamma^{-1}(U) \cap \gamma^{-1}(V) = \emptyset\)。\(0 \in \gamma^{-1}(U), 1 \in \gamma^{-1}(V)\), 都非空。所以这是 \([0, 1]\) 的分离, 与 \([0, 1]\) 连通 (<a href="ch18.html">ch18 §3</a>) 矛盾。</p>
+
+<p>所以 \(X\) 没分离, 连通。\(\square\)</p>
+
+<p>请停一下感受这条证明的<em>简洁</em>: 整证明就<em>一行</em>——把分离<em>拉回</em> \([0, 1]\), 用 \([0, 1]\) 连通推矛盾。"<em>连续映射保连通</em>" (ch18 §7) 在这里反向使用——如果像不连通, 反推原像不连通。</p>
+
+<h2 id="sec19-3">19.3 反例: 拓扑学家的正弦曲线 (连通但不道路连通)</h2>
+
+<p>这是拓扑学最经典的反例之一。它的<em>构造</em>简单, <em>分析</em> 微妙。</p>
+
+<p><strong>定义。</strong>令</p>
+
+<p>\[
+S = \{(x, \sin(1/x)) : x \in (0, 1]\} \cup (\{0\} \times [-1, 1]) \subseteq \mathbb{R}^2.
+\]</p>
+
+<p>第一部分是 \(\sin(1/x)\) 的图——\(x\) 从 \(1\) 减到 \(0^+\) 时函数值在 \(-1, 1\) 之间剧烈震荡 (周期 \(\to 0\))。第二部分是 \(y\)-轴上 \([-1, 1]\) 段。</p>
+
+<p>叫"<em>拓扑学家的正弦曲线</em>" 是因为它和"<em>普通</em>" 正弦曲线 \(\{(x, \sin x) : x \in \mathbb{R}\}\) 不一样——后者光滑且没奇异行为。"<em>拓扑学家的</em>" 加了 \(\{0\} \times [-1, 1]\), 这一段是震荡部分的"<em>极限</em>"。</p>
+
+<p><strong>断言。</strong>\(S\) 连通但不道路连通。</p>
+
+<p><strong>(a) \(S\) 连通。</strong></p>
+
+<p>令 \(A = \{(x, \sin(1/x)) : x \in (0, 1]\}\) (右半震荡部分), \(B = \{0\} \times [-1, 1]\) (左半线段)。\(S = A \cup B\)。</p>
+
+<p>\(A\) 连通: \(A\) 是 \((0, 1]\) 在连续映射 \(x \mapsto (x, \sin(1/x))\) 下的像, \((0, 1]\) 是 \(\mathbb{R}\) 区间, 连通 (ch18); 连续映射保连通 (ch18 §7), 所以 \(A\) 连通。</p>
+
+<p>\(B\) 连通: \(B \cong [-1, 1]\) 区间, 连通。</p>
+
+<p>关键——证 \(\overline{A} \supseteq B\) (即 \(B\) 中每点是 \(A\) 的极限点)。给 \((0, y_0) \in B\), \(y_0 \in [-1, 1]\)。要找 \(A\) 中序列 \((x_n, \sin(1/x_n)) \to (0, y_0)\)。即 \(x_n \to 0^+\) 且 \(\sin(1/x_n) \to y_0\)。设 \(\theta_0\) 满足 \(\sin \theta_0 = y_0\), 取 \(\theta_n = \theta_0 + 2\pi n\), 那 \(\sin \theta_n = y_0\) 恒等。令 \(x_n = 1/\theta_n \to 0^+\), 则 \((x_n, \sin(1/x_n)) = (1/\theta_n, y_0) \to (0, y_0)\)。\(\checkmark\)</p>
+
+<p>所以 \(B \subseteq \overline{A}\), 即 \(A \cup B \subseteq \overline{A}\), 即 \(\overline{A} \supseteq A \cup B = S\)。但 \(\overline{A} \subseteq \overline{S}\), 而 \(\overline{A} \supseteq S\) 加 \(\overline{A} \subseteq S\) (因 \(A \subseteq S\), 闭包在子空间中) 给 \(\overline{A} = S\)。事实上更准确: \(B \subseteq \overline{A}\) 在 \(\mathbb{R}^2\) 中。所以 \(S\) 是 \(A\) 在 \(\mathbb{R}^2\) 中的<em>闭包</em>: \(S = \overline{A}\) (右半的闭包正好得到加上左半线段)。</p>
+
+<p>\(A\) 连通 + \(\overline{A}\) 连通 (<a href="ch18.html">ch18 §5</a>(a)) \(\Rightarrow S = \overline{A}\) 连通。\(\checkmark\)</p>
+
+<p><strong>(b) \(S\) 不道路连通。</strong></p>
+
+<p>这是核心。要证: 不存在连续 \(\gamma : [0, 1] \to S\) with \(\gamma(0) = (0, 0) \in B\), \(\gamma(1) = (1, \sin 1) \in A\)。</p>
+
+<p>反证。假设这样的 \(\gamma\) 存在。</p>
+
+<p>记 \(\gamma(t) = (\gamma_1(t), \gamma_2(t))\)。\(\gamma_1, \gamma_2\) 都是 \([0, 1] \to \mathbb{R}\) 的连续函数。</p>
+
+<p>\(\gamma_1(0) = 0, \gamma_1(1) = 1\)。考虑 \(T = \{t \in [0, 1] : \gamma_1(t) = 0\} = \gamma_1^{-1}(\{0\})\)。\(\gamma_1\) 连续, \(\{0\}\) 闭 \(\Rightarrow T\) 闭。\(0 \in T\) 非空, \(T \subseteq [0, 1]\) 有界, 取 \(t^* = \sup T \in T\) (\(T\) 闭含上确界)。</p>
+
+<p>\(t^* < 1\) 因为 \(\gamma_1(1) = 1 \neq 0\), 所以 \(1 \notin T\)。所以存在 \(t \in (t^*, 1]\) with \(\gamma_1(t) > 0\) (事实上对所有 \(t \in (t^*, 1]\), \(\gamma_1(t) \neq 0\) 由 \(t^* = \sup T\), 而 \(\gamma_1\) 连续给 \(\gamma_1(t) > 0\) on \((t^*, 1]\) 由介值——若有 \(t \in (t^*, 1]\) with \(\gamma_1(t) < 0\), \(\gamma_1\) 连续在 \([t^*, t]\) 上从 \(0\) 到 \(\gamma_1(t) < 0\) 又跳到 \(\gamma_1(1) = 1 > 0\), 中间须再过 \(0\), 与 \(t^*\) 的最大性矛盾——这条要小心因 \(\gamma_1\) 取值不一定单调; 最干净的论证用<em>分量保 \(S\) 内</em>: 后面看)。</p>
+
+<p>更稳的论证: 重新定义 \(\gamma\) 限制到 \([t^*, 1]\)——这仍是 \(S\) 中的道路, \(\gamma(t^*) \in B\) (因 \(\gamma_1(t^*) = 0\)), \(\gamma(1) = (1, \sin 1) \in A\)。重参数化到 \([0, 1]\)。所以 WLOG 假设 \(\gamma : [0, 1] \to S\), \(\gamma(0) \in B\), \(\gamma(t) \in A\) for all \(t > 0\) (即<em>只有</em> \(t = 0\) 落在 \(B\) 上, 其余落在 \(A\) 上——若不是, 取最后一个落 \(B\) 的时刻 \(t^*\), 重参数化)。</p>
+
+<p>现在考虑 \(\gamma_2 : [0, 1] \to \mathbb{R}\) 连续。我们要找 \(t \to 0^+\) 时 \(\gamma_2(t)\) 的怪异行为, 与 \(\gamma_2(0)\) 的有限性矛盾。</p>
+
+<p>\(\gamma(0) = (0, y_0)\) for some \(y_0 \in [-1, 1]\)。\(\gamma_2\) 连续在 \(0\): 给 \(\varepsilon = 1/2\), 存在 \(\delta > 0\) 使 \(|t| < \delta \Rightarrow |\gamma_2(t) - y_0| < 1/2\)。即 \(\gamma_2(t) \in (y_0 - 1/2, y_0 + 1/2)\) 长度 \(1\) 在 \([-1, 1]\) 中。</p>
+
+<p>\(y_0 \in [-1, 1]\), 所以 \((y_0 - 1/2, y_0 + 1/2) \subseteq [-3/2, 3/2]\)。但区间长度 \(1\), <em>不可能覆盖</em> \([-1, 1]\)——存在 \(z_0 \in [-1, 1] \setminus (y_0 - 1/2, y_0 + 1/2)\)。事实上<em>两个</em> \(z_0, z_0' \in \{-1, 1\}\) 至少一个不在那区间 (\(\{-1, 1\}\) 之间距离 \(2\) 大于 \(1\))。所以存在 \(z_0 \in \{-1, 1\}\) with \(|z_0 - y_0| \geq 1/2\), 即 \(z_0 \notin (y_0 - 1/2, y_0 + 1/2)\)。</p>
+
+<p>要构造 \(t_n \to 0^+\) with \(\gamma_2(t_n) = z_0\) (即震荡到 \(\pm 1\) 无穷多次)。</p>
+
+<p>\(\gamma_1(t_n) > 0\) for \(t_n > 0\), \(\gamma_1\) 连续 + \(\gamma_1(0) = 0\) + \(\gamma_1(\delta) > 0\) (some specific value), 介值定理给 \(\gamma_1\) 在 \([0, \delta]\) 上取所有值在 \([0, \gamma_1(\delta)]\)。特别<em>取所有充分小的正值</em>。\(\sin(1/x) = z_0\) (\(z_0 = \pm 1\)) 的解 \(x\) 是 \(1/((\pi/2 + 2 \pi k)) z_0\)—— positive 的 \(x_k = 2/(\pi (4k + 1))\) for \(z_0 = 1\), \(x_k = 2/(\pi (4k + 3))\) for \(z_0 = -1\)。这些 \(x_k \to 0^+\) as \(k \to \infty\)。</p>
+
+<p>取 \(k\) 充分大使 \(x_k < \min(\gamma_1(\delta), \delta)\)——存在 (\(x_k \to 0\))。介值定理给 \(t_k \in [0, \delta]\) with \(\gamma_1(t_k) = x_k\)。注意 \(t_k > 0\) 因 \(x_k > 0 = \gamma_1(0)\)。\(\gamma(t_k) \in A\) (因 \(t_k > 0\)), 所以 \(\gamma_2(t_k) = \sin(1/\gamma_1(t_k)) = \sin(1/x_k) = z_0\)。</p>
+
+<p>所以 \(t_k > 0\), \(t_k < \delta\), \(\gamma_2(t_k) = z_0\)。但 \(|\gamma_2(t_k) - y_0| = |z_0 - y_0| \geq 1/2\), 与 "<em>\(|t_k| < \delta \Rightarrow |\gamma_2(t_k) - y_0| < 1/2\)</em>" 矛盾。</p>
+
+<p>矛盾——\(\gamma\) 不存在。\(S\) 不道路连通。\(\blacksquare\)</p>
+
+<p>请你停下来欣赏这条证明的<em>结构</em>: 它<em>必须</em> 用 \(\sin(1/x)\) 在 \(0\) 附近无穷震荡——任何"<em>不震荡到 \(\pm 1\)</em>" 的曲线都不能造出反例。震荡让"<em>从右边走到左边</em>" 必然要跨越所有 \(y \in [-1, 1]\) 的值, 而这些值<em>在 \(B\) 上排成一段</em>, 道路 \(\gamma_2\) 在终点 \(y_0\) 附近的连续性要求只取 \(y_0\) 附近的值, 两者冲突。</p>
+
+<h2 id="sec19-4">19.4 局部连通的定义</h2>
+
+<p>定义: 拓扑空间 \(X\) <em>局部连通</em> (locally connected), 如果每个点 \(x \in X\) 有<em>连通邻域基</em>——即对每个 \(x\) 与每个 \(x\) 的开邻域 \(U\), 存在 \(x\) 的<em>连通</em>开邻域 \(V \subseteq U\)。</p>
+
+<p>等价: \(X\) 局部连通 \(\iff\) 每个开集的<em>连通分量</em> 都开 (作为 \(X\) 的子集)。</p>
+
+<p>理解: 局部连通是"<em>每个点附近都能找到连通的开集</em>" 这种局部性。它<em>独立</em>于<em>整体</em> 连通——\(X\) 可以局部连通而不连通 (例: \([0, 1] \cup [2, 3]\) 局部连通但不连通; 两块各自局部连通)。也可以连通而不局部连通 (例: 拓扑学家的正弦曲线 \(S\), 后面看)。</p>
+
+<h2 id="sec19-5">19.5 例: \(\mathbb{R}\) 局部连通; \(\mathbb{Q}\) 不局部连通</h2>
+
+<p><strong>\(\mathbb{R}\) 局部连通。</strong>每点 \(x \in \mathbb{R}\), 任何开邻域 \(U \ni x\) 含开区间 \((x - \delta, x + \delta) \subseteq U\) for some \(\delta > 0\), 而开区间是<em>连通</em>开邻域。</p>
+
+<p>同样, \(\mathbb{R}^n\) 局部连通: 任何开邻域含开球 \(B(x, \delta) \subseteq U\), 开球是连通 (凸 \(\Rightarrow\) 道路连通 \(\Rightarrow\) 连通)。</p>
+
+<p>事实上<em>任何流形局部连通</em>——每点附近同胚于 \(\mathbb{R}^n\) 开集, 后者局部连通。</p>
+
+<p><strong>\(\mathbb{Q}\) 不局部连通。</strong>取 \(0 \in \mathbb{Q}\)。任何 \(\mathbb{Q}\) 中含 \(0\) 的开邻域 \(W\) 是 \(W = U \cap \mathbb{Q}\) for \(U \subseteq \mathbb{R}\) 开。\(U\) 含 \((-\delta, \delta)\) for some \(\delta > 0\), 所以 \(W \supseteq (-\delta, \delta) \cap \mathbb{Q}\)。但 \((-\delta, \delta) \cap \mathbb{Q}\) 是 \(\mathbb{Q}\) 的开集, 含至少两点 (任何小区间含至少两个有理数)。这个集合<em>不</em>连通——取无理数 \(\alpha \in (-\delta, \delta), \alpha \neq 0\) (存在), 用 \(\alpha\) 切成 \((-\delta, \alpha) \cap \mathbb{Q}\) 与 \((\alpha, \delta) \cap \mathbb{Q}\), 是分离 (注意 \(0\) 在哪片要看 \(\alpha\) 的符号; 反正把 \((-\delta, \delta) \cap \mathbb{Q}\) 拆成两块)。</p>
+
+<p>所以任何 \(\mathbb{Q}\) 中 \(0\) 的开邻域<em>都不连通</em>, \(\mathbb{Q}\) 在 \(0\) 附近不局部连通。事实上 \(\mathbb{Q}\) 在<em>任何点</em> 都不局部连通——同样论证。</p>
+
+<p>这件事再次显示 \(\mathbb{Q}\) "<em>到处漏</em>" 的性质——既不局部紧 (ch17), 既不连通也不局部连通 (ch18, 19)。</p>
+
+<p><strong>拓扑学家的正弦曲线 \(S\) 不局部连通。</strong>取 \(p = (0, 0) \in B \subseteq S\)。任何含 \(p\) 的 \(S\) 开邻域 \(W\) 包含 \(B\) 中的一段 (\(\{0\} \times (-\delta, \delta)\) 与 \(S\) 的交) 加上 \(A\) 中接近 \(p\) 的部分。\(A\) 中靠近 \(p\) 的部分是无穷多个不相交的"<em>正弦弧</em>"——对每个大整数 \(k\), \(\sin(1/x)\) 在 \(x_k = 1/(\pi/2 + k\pi)\) 附近的一段弧。这些弧<em>分开</em>, 让 \(W\) 的"<em>右半</em>" \(W \cap A\) 是<em>无穷多个不交弧的并</em>, 不连通。</p>
+
+<p>具体证明 \(W\) 不连通: \(W \cap B\) 是连通的 (区间), \(W \cap A\) 是不连通的 (无穷多弧)。但<em>合起来</em> \(W = (W \cap A) \cup (W \cap B)\) 是否连通取决于 \(B\) 是不是 \(A\) 部分的极限点——是 (19.3 (a) 已证)——所以 \(W\) 至少把 \(B\) 与某些弧"<em>胶</em>"。事实上证 \(W\) 不连通需要小心, 因 \(W\) 含 \(B\) 并被 \(A\) 部分点逼近, 整体可能仍连通。我们要证的是 \(W\) <em>不可能取得任意小</em>。</p>
+
+<p>更具体: 取 \(W_\varepsilon = S \cap B((0, 0), \varepsilon)\) (开球与 \(S\) 的交), \(\varepsilon\) 充分小例如 \(< 1/(2\pi)\)。\(W_\varepsilon\) 含 \(B \cap B((0, 0), \varepsilon) = \{0\} \times (-\varepsilon, \varepsilon)\) (中间一段)。\(W_\varepsilon \cap A\) 是 \(A\) 的<em>分离</em>多个弧——这些弧<em>不与</em> \(B\) 在 \(W_\varepsilon\) 中"接触" (具体: \(A\) 与 \(B\) 不交, \(A\) 部分的弧"逼近" \(B\) 但不达到, 在 \(W_\varepsilon\) 中两者分离)。所以 \(W_\varepsilon\) 是 \(W_\varepsilon \cap B\) 与 \(W_\varepsilon \cap A\) 的不交并 (作为子集), 但<em>它们在 \(W_\varepsilon\) 中是否都开</em> 是关键。\(B\) 在 \(S\) 中闭 (\(B\) 是 \(\overline{A} \cap (\{0\} \times \mathbb{R})\) 在 \(S\) 中的子集; 实际上 \(B\) 是 \(S\) 的极限部分, 在 \(S\) 中闭也开? 不开——\(B\) 中点的任何邻域含 \(A\) 中的点)。</p>
+
+<p>留给读者: 这个细节不易, 但结论<em>正确</em>——\(S\) 不局部连通。教科书 (Munkres §25) 给完整证。</p>
+
+<h2 id="sec19-6">19.6 局部连通的好处: 连通分量自动开</h2>
+
+<p><strong>命题。</strong>\(X\) 局部连通 \(\iff\) \(X\) 的<em>每个开集的连通分量</em> 都是开的 (作为 \(X\) 的子集)。</p>
+
+<p>特别 \(X\) 自身的连通分量都开。</p>
+
+<p><strong>证明 (\(\Rightarrow\))。</strong>设 \(U \subseteq X\) 开, \(C \subseteq U\) 是 \(U\) 的某个连通分量。要证 \(C\) 在 \(X\) 中开 (即每点 \(x \in C\) 有 \(X\) 中开邻域 \(\subseteq C\))。</p>
+
+<p>给 \(x \in C\), 局部连通给连通开邻域 \(V \subseteq U\) (取 \(V \subseteq U\) 因 \(U\) 是 \(x\) 的开邻域)。\(V\) 连通 + \(V \cap C \ni x\) 非空, 所以 \(V \cup C\) 连通 (公共点 \(x\)) 且 \(\subseteq U\)。\(C\) 是 \(U\) 极大连通含 \(x\) 子集, 所以 \(V \cup C \subseteq C\), 即 \(V \subseteq C\)。\(V\) 是 \(x\) 的开邻域 \(\subseteq C\), \(C\) 在 \(x\) 处开。对所有 \(x \in C\) 都成立, \(C\) 开。\(\square\)</p>
+
+<p>(\(\Leftarrow\)) 设每个开集的连通分量开。给 \(x\) 与开邻域 \(U\), \(x\) 在 \(U\) 中的连通分量 \(C \ni x\) 开 (假设), \(C\) 连通, \(C \subseteq U\)。所以 \(C\) 是 \(x\) 的连通开邻域 \(\subseteq U\)。\(X\) 局部连通。\(\square\)</p>
+
+<p>这条等价的<em>用处</em>: 局部连通空间, 连通分量是"<em>真正的几何块</em>"——它们都开都闭, 把 \(X\) 划成 disjoint union of clopen pieces。例如 \([0, 1] \cup [2, 3]\) 局部连通, 两个连通分量 \([0, 1], [2, 3]\) 都 clopen in 整个空间——这反映了"<em>两块</em>" 的几何直觉。</p>
+
+<p>反过来 \(\mathbb{Q}\) 的连通分量是单点 \(\{q\}\), <em>不</em>开 (任何邻域含别的有理数), 这与 \(\mathbb{Q}\) 不局部连通对应。</p>
+
+<h2 id="sec19-7">19.7 道路分量与连通分量的关系</h2>
+
+<p>类比连通分量, 给 \(x \in X\), 定义 \(x\) 的<em>道路分量</em> \(P_x\):</p>
+
+<p>\[
+P_x = \{y \in X : \exists \text{ 道路从 } x \text{ 到 } y\}.
+\]</p>
+
+<p>把 \(X\) 划分成道路分量。事实上"<em>能道路连</em>" 是等价关系 (反: 常值道路; 对称: 反向参数化; 传递: 拼接两道路, 用 \(\gamma * \delta(t) = \gamma(2t)\) for \(t \leq 1/2\), \(\delta(2t - 1)\) for \(t \geq 1/2\), 连续由<a href="ch7.html">ch7 粘合引理</a>)。</p>
+
+<p><strong>关系</strong>: \(P_x \subseteq C_x\) (\(x\) 的道路分量 \(\subseteq\) 连通分量), 因 \(P_x\) 道路连通 \(\Rightarrow\) 连通, 且含 \(x\), 所以 \(P_x \subseteq C_x\) (后者是含 \(x\) 的极大连通)。</p>
+
+<p>反过来一般<em>不</em>等。例: 拓扑学家的正弦曲线 \(S\), 连通分量是<em>整个 \(S\)</em> (因 \(S\) 连通), 但道路分量是 \(A\) 与 \(B\) <em>分别</em> (因 \(A\) 与 \(B\) 之间没道路连; 但 \(A\) 自身道路连, \(B\) 自身道路连)。所以 \(C_x \supsetneq P_x\), 严格大。</p>
+
+<p><strong>定理 (局部道路连通让两者相等)。</strong>定义 \(X\) <em>局部道路连通</em>: 每点 \(x\) 有道路连通邻域基 (类比局部连通)。</p>
+
+<p>则 \(X\) 局部道路连通 \(\Rightarrow\) 每个连通分量等于道路分量。</p>
+
+<p><strong>证明梗概。</strong>设 \(C\) 连通分量, \(x \in C\), 看 \(P_x\)。\(P_x \subseteq C\) 已知。要证 \(P_x = C\)。</p>
+
+<p>\(P_x\) 在 \(C\) 中开: 给 \(y \in P_x\), 局部道路连通给 \(y\) 的道路连通邻域 \(V\), \(V\) 中每点能道路连到 \(y\), \(y\) 道路连到 \(x\), 所以 \(V \subseteq P_x\), \(P_x\) 开。</p>
+
+<p>\(P_x\) 在 \(C\) 中闭: 设 \(y \in C \setminus P_x\), 局部道路连通给 \(y\) 的道路连通邻域 \(V\)。\(V\) 中每点能道路连到 \(y\); 若 \(V \cap P_x \neq \emptyset\), 取 \(z \in V \cap P_x\), \(z\) 道路连 \(y\), 道路连 \(x\), 拼起来 \(y\) 道路连 \(x\), \(y \in P_x\), 矛盾。所以 \(V \cap P_x = \emptyset\), \(V \subseteq C \setminus P_x\), \(C \setminus P_x\) 开, 即 \(P_x\) 闭。</p>
+
+<p>\(P_x\) 在 \(C\) 中 clopen, \(C\) 连通, 所以 \(P_x = \emptyset\) 或 \(C\)。\(x \in P_x\) 非空, 所以 \(P_x = C\)。\(\square\)</p>
+
+<p>推论: <em>\(\mathbb{R}^n\) 中连通开集都道路连通</em>——因为 \(\mathbb{R}^n\) 局部道路连通 (开球凸 \(\Rightarrow\) 道路连通, 是道路连通邻域基), 局部道路连通的开子集仍局部道路连通, 连通 + 局部道路连通 \(\Rightarrow\) 道路连通 (整个空间是单一连通分量 = 道路分量)。这是为什么"<em>普通</em>" 几何空间里连通与道路连通无区别。</p>
+
+<h2 id="sec19-8">19.8 三种连通性对照表 + 区分例</h2>
+
+<p>四种性质：</p>
+
+<ul>
+  <li><strong>(C)</strong> 连通 (没分离)。</li>
+  <li><strong>(PC)</strong> 道路连通 (任两点有道路)。</li>
+  <li><strong>(LC)</strong> 局部连通 (每点有连通邻域基)。</li>
+  <li><strong>(LPC)</strong> 局部道路连通 (每点有道路连通邻域基)。</li>
+</ul>
+
+<p><strong>蕴含关系:</strong></p>
+
+<ul>
+  <li>PC \(\Rightarrow\) C (19.2)。</li>
+  <li>LPC \(\Rightarrow\) LC (类似——道路连通 \(\Rightarrow\) 连通, 取每个道路连通邻域作为连通邻域)。</li>
+  <li>C + LPC \(\Rightarrow\) PC (19.7 推论)。</li>
+</ul>
+
+<p><strong>反向不蕴含的反例:</strong></p>
+
+<ul>
+  <li>C 不蕴含 PC: <em>拓扑学家的正弦曲线</em> \(S\) (19.3)。</li>
+  <li>C 不蕴含 LC: 同 \(S\)。</li>
+  <li>LC 不蕴含 C: \([0, 1] \cup [2, 3]\) (两个不交闭区间), 局部连通但不连通。</li>
+  <li>LC 不蕴含 PC: 同 \([0, 1] \cup [2, 3]\) (不连通所以不道路连通)。</li>
+  <li>LC 不蕴含 LPC: 一般情形相同, 但具体反例可以是某些怪异空间——\(\mathbb{R}\) 上某些怪拓扑, 大多数自然空间 LC + 局部紧 + 第二可数 \(\Rightarrow\) LPC, 反例需要构造性。简单的: <em>Warsaw 圆</em> (Warsaw circle) 是 \(S\) 加一段连接 \(B\) 终点和 \(A\) 终点的弧, 它连通 + 紧 + 不局部连通——是 \(C, \neg LC\) 的例。</li>
+</ul>
+
+<p><strong>关键反例: 拓扑学家的正弦曲线 \(S\)</strong> (\(C, \neg LC, \neg PC, \neg LPC\)) 一次性提供了 4 种"<em>不</em>" 性质中的多个反例, 这就是它在拓扑学课里持续被引用的原因——一个反例覆盖多条反向不蕴含。</p>
+
+<p><strong>对照表 (典型空间 vs 性质)</strong>:</p>
+
+<ul>
+  <li>\(\mathbb{R}^n\): C + PC + LC + LPC (全部满足)</li>
+  <li>\(\mathbb{Q}\): \(\neg\) C + \(\neg\) PC + \(\neg\) LC + \(\neg\) LPC (全部不满足, 完全不连通且处处分散)</li>
+  <li>\([0, 1] \cup [2, 3]\): \(\neg\) C + \(\neg\) PC + LC + LPC (整体不连通, 但局部良好)</li>
+  <li>拓扑学家的正弦曲线 \(S\): C + \(\neg\) PC + \(\neg\) LC + \(\neg\) LPC (整体连通但局部恶劣)</li>
+  <li>球面 \(S^n\) (\(n \geq 1\)): C + PC + LC + LPC</li>
+  <li>离散 \(\mathbb{Z}\): \(\neg\) C + \(\neg\) PC + LC + LPC (单点连通分量都开都连通)</li>
+</ul>
+
+<p>请你停下来对照表, 体会这<em>四</em>个性质的<em>独立</em>变化——它们不能任意组合 (有 PC \(\Rightarrow\) C 的限制), 但在限制下能各自独立反例。这种"<em>多维分类</em>" 是拓扑性质论的标志: 不能一刀切, 必须分层考察。</p>
+
+<h2 id="sec19-9">19.9 临别话</h2>
+
+<p>这一章把"<em>连通</em>" 单一概念分裂成<em>四</em> 种相关但独立的性质, 用拓扑学家的正弦曲线作为最经典反例区分它们。这种"<em>分裂</em>" 不是技术癖好, 它<em>反映几何</em>: "<em>能从 A 走到 B</em>" (PC) 与"<em>不能切开</em>" (C) 在<em>大多数自然空间</em> 重合 (流形、CW 复形、欧氏开集), 但在<em>怪异空间</em> 分裂 (拓扑学家的正弦曲线)。这种分裂提醒我们: <em>直觉里的"连通" 不止一种, 形式化要分别处理</em>。</p>
+
+<p>道路连通是<em>更几何</em> 的概念——它直接对应"<em>能用一条曲线连</em>"。这条对接代数拓扑里"<em>同伦</em>" (两条道路能连续变形互相得到, 链<a href="ch23.html">ch23</a>) 与"<em>基本群</em>" \(\pi_1(X, x_0)\) (以 \(x_0\) 为基点的<em>道路环</em> 模同伦), 这些是流形分类的基本工具。\(\pi_1(S^1) = \mathbb{Z}\), \(\pi_1(S^2) = 0\), \(\pi_1(\text{torus}) = \mathbb{Z}^2\), \(\pi_1(\text{Klein bottle})\) = 复杂——这些计算让我们能<em>区分</em> 不能直接看出区别的拓扑空间。</p>
+
+<p>下一章 (<a href="ch20.html">ch20</a>) 转向<em>分离公理</em> 高级阶段——Urysohn 引理。它说: 在<em>正规</em> 空间 (\(T_4\)) 中, 任何两个不交闭集 \(A, B\) 都可以用<em>连续函数</em> 分开——存在 \(f : X \to [0, 1]\) with \(f|_A = 0, f|_B = 1\)。这是<em>分离</em> 与<em>连续函数</em> 之间的桥梁, 是度量化定理 (ch21) 的关键步骤。从这里开始我们进入"<em>正规空间能干什么</em>" 的高峰。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 连通性</a><a href="ch20.html">下一章 · 第 20 章 Urysohn 引理 →</a></nav>
+</main>
+</body>
+</html>

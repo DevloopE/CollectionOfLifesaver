@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 子空间拓扑 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 同胚</a><a href="ch9.html">下一章 · 第 9 章 有限积拓扑 →</a></nav>
+<h1 id="ch8">第 8 章 子空间拓扑</h1>
+
+<p>请你回答一道你<em>已经</em> 知道答案的题：闭区间 \([0, 1] \subset \mathbb{R}\) 上的连续函数是什么？</p>
+
+<p>当然是"<em>把 \([0, 1]\) 这个集合上的点连续地映到某个空间</em>"。但请你严格一点——\([0, 1]\) 上"<em>开集</em>" 是什么？前 7 章讲拓扑都是讲<em>整个</em> \(\mathbb{R}\)，开集就是开区间的并。可一旦把"<em>整体</em>" 限制到一段子集 \([0, 1]\) 上，"<em>开</em>" 这个词重新变得可疑。</p>
+
+<p>具体一点。\([0, 1]\) 里集合 \([0, 1/2)\) 算不算开？在<em>大空间</em> \(\mathbb{R}\) 里它<em>不</em> 开（点 \(0\) 在边界）。可如果你把 \([0, 1]\) 当作<em>独立</em> 的拓扑空间——把 \(\mathbb{R}\) 之外的部分都忘掉——那 \([0, 1/2)\) 应该<em>算</em> 开吗？</p>
+
+<p>你的直觉大概是"<em>算</em>"——因为在 \([0, 1]\) 里走到点 \(0\)，你"<em>没法再往左走</em>"，已经到边界了；\([0, 1/2)\) 是 \(0\) 周围的一段"<em>开</em>" 的邻域。但这个直觉怎么形式化？</p>
+
+<p>这一章给一个干净的形式化——子空间拓扑——并且看它带来的两类后果：让继承"<em>免费</em>"（连续、紧致、连通、Hausdorff 都自动传给子空间），以及让"<em>开</em>" 这个词带上了语境（\([0, 1/2)\) 在 \([0, 1]\) 里开但在 \(\mathbb{R}\) 里不开）。这个语境是 ch10、ch11 后面"<em>新拓扑从老拓扑里造</em>" 的所有套路的<em>第一个</em> 例子。</p>
+
+<h2 id="sec8-1">8.1 最朴素的定义：与子集相交</h2>
+
+<p>给一个拓扑空间 \((X, \tau)\) 与子集 \(A \subseteq X\)。我们想让 \(A\) 自己也是拓扑空间。最自然的想法——\(X\) 里"<em>开</em>" 的集合限制到 \(A\) 上还是"<em>开</em>"。</p>
+
+<p>形式化：</p>
+
+<p>\[
+\boxed{\ \tau_A := \{U \cap A : U \in \tau\}.\ }
+\]</p>
+
+<p>"<em>\(A\) 中开集 = 整体开集与 \(A\) 的交</em>"。这就是 \(A\) 上的<em>子空间拓扑</em>（也叫<em>诱导拓扑</em>，relative / induced topology）。</p>
+
+<p>验证三公理：</p>
+
+<ul>
+  <li><strong>(O1)</strong> \(\emptyset = \emptyset \cap A \in \tau_A\)；\(A = X \cap A \in \tau_A\)。\(\checkmark\)</li>
+  <li><strong>(O2)</strong> 任意并：\(\bigcup_\alpha (U_\alpha \cap A) = \left(\bigcup_\alpha U_\alpha\right) \cap A\)。右括号里是 \(X\) 的开集（用 \(\tau\) 的 (O2)），整体在 \(\tau_A\) 里。\(\checkmark\)</li>
+  <li><strong>(O3)</strong> 有限交：\(\bigcap_{i=1}^n (U_i \cap A) = \left(\bigcap_i U_i\right) \cap A\)。同理。\(\checkmark\)</li>
+</ul>
+
+<p>三公理通过，\(\tau_A\) 确实是 \(A\) 上的<em>合法</em> 拓扑。从此以后看见 "<em>子集 \(A \subseteq X\)</em>" 就把它<em>自动</em> 当作拓扑空间，带的就是 \(\tau_A\)。</p>
+
+<p>请停一下盯着定义看：这条定义<em>没有</em> 用到任何关于距离或可数性的特殊结构。任何拓扑空间的任意子集都<em>立即</em> 是拓扑空间。这是拓扑学相对度量空间的<em>第一个</em> 工程便利——构造太轻。</p>
+
+<h2 id="sec8-2">8.2 例：\([0, 1] \subset \mathbb{R}\) 上的开集长什么样</h2>
+
+<p>取 \(X = \mathbb{R}\) 带标准拓扑，\(A = [0, 1]\)。\(A\) 上的子空间拓扑由"<em>\(\mathbb{R}\) 里的开集与 \([0, 1]\) 相交</em>" 生成。我们具体看几个：</p>
+
+<p><strong>开区间 \((1/4, 3/4)\)：</strong>它本身是 \(\mathbb{R}\) 的开集，\((1/4, 3/4) \cap [0, 1] = (1/4, 3/4)\)。所以 \((1/4, 3/4)\) 在 \([0, 1]\) 里是开的——一点不奇怪。</p>
+
+<p><strong>半开区间 \([0, 1/2)\)：</strong>\(\mathbb{R}\) 里 \((-1/4, 1/2)\) 是开集（开区间）。它与 \([0, 1]\) 的交是 \([0, 1/2)\)。所以 \([0, 1/2)\) 在 \([0, 1]\) 里<em>是</em> 开的！</p>
+
+<p><strong>半开区间 \((1/2, 1]\)：</strong>同理，\(\mathbb{R}\) 里 \((1/2, 5/4)\) 是开集，与 \([0, 1]\) 交得 \((1/2, 1]\)，所以这也是 \([0, 1]\) 里的开集。</p>
+
+<p><strong>整个 \([0, 1]\)：</strong>\(\mathbb{R}\) 与 \([0, 1]\) 的交是 \([0, 1]\)，整体作为子空间显然开（这是 (O1)）。</p>
+
+<p>请停一下消化：在 \(\mathbb{R}\) 里"<em>开集</em>" 不能含端点，但在 \([0, 1]\) 里"<em>开集</em>" <em>可以</em> 含端点 \(0, 1\)——只要它<em>到了端点就停</em>，不再越界。这就是子空间"<em>开</em>" 的几何画面：从 \([0, 1]\) 的内部观察，端点 \(0, 1\) 是<em>"边界点"</em>，它们成了"<em>外部不存在</em>" 意义下的开集元素。</p>
+
+<p>这件事正确反映了"<em>站在 \([0, 1]\) 上看世界</em>" 的视角。点 \(0\) 在 \([0, 1]\) 内部"<em>左边没有任何点了</em>"，所以 \([0, 1/2)\) 形如"<em>包含 \(0\) 的小邻域</em>"——子空间拓扑承认这是<em>开</em>，反映的就是这个视角。</p>
+
+<p>反过来：\([0, 1/2)\) 在<em>大</em>空间 \(\mathbb{R}\) 里<em>不</em> 开，因为站在 \(\mathbb{R}\) 上看 \(0\)，左边还有 \(-1, -2, \ldots\)，\([0, 1/2)\) 不是 \(0\) 的开邻域。"<em>开</em>" 这个词从此以后必须问"<em>在哪个空间里</em>"——这是一个语境敏感的概念。</p>
+
+<p><strong>例（含端点的开闭混合）：</strong>\([0, 1]\) 在 \([0, 1]\) 里既开又闭——它是整空间。\(\{0\}\) 在 \([0, 1]\) 里闭（\(\{0\} = \mathbb{R} \setminus \mathbb{R} \setminus \{0\}\) 转译）但<em>不</em> 开。</p>
+
+<h2 id="sec8-3">8.3 包含映射 \(i: A \hookrightarrow X\) 连续</h2>
+
+<p>给 \(A \subseteq X\) 与 \(A\) 上的子空间拓扑 \(\tau_A\)，定义<em>包含映射</em>：</p>
+
+<p>\[
+i: A \to X, \quad i(a) = a.
+\]</p>
+
+<p>这是把"\(A\) 视为 \(X\) 的子集" 这件事写成函数。</p>
+
+<p><strong>命题：</strong>\(i\) 在子空间拓扑下连续。</p>
+
+<p><em>证明。</em>取 \(X\) 的任一开集 \(U\)。算 \(i^{-1}(U) = \{a \in A : i(a) \in U\} = \{a \in A : a \in U\} = U \cap A\)。按子空间拓扑定义 \(U \cap A \in \tau_A\)，所以 \(i^{-1}(U)\) 在 \(A\) 中开。"<em>开集逆像开</em>"——\(i\) 连续。\(\square\)</p>
+
+<p>这个证明只用一行，但请欣赏它的<em>设计感</em>：子空间拓扑就是<em>为了让包含映射连续</em> 而构造的——而且它是<em>所有</em> 让 \(i\) 连续的拓扑里<em>最粗</em> 的（开集最少的）。</p>
+
+<p>什么意思？假设 \(\tau'\) 是 \(A\) 上<em>另一个</em> 拓扑，使 \(i: (A, \tau') \to (X, \tau)\) 连续。则 \(i\) 连续 \(\iff\) 对任意 \(U \in \tau\)，\(i^{-1}(U) = U \cap A \in \tau'\)。也就是说 \(\tau'\) <em>必须包含</em> 所有 \(U \cap A\)，即 \(\tau' \supseteq \tau_A\)。所以 \(\tau_A\) 是让 \(i\) 连续的<em>最小</em> 拓扑——<em>"最粗"（开集最少）</em>。</p>
+
+<p>这种"<em>由通用性质刻画的最粗拓扑</em>" 是 ch9（积拓扑）、ch10（商拓扑）、ch11（任意积拓扑）反复出现的设计模式。子空间拓扑是这套模式最简单的一例——你正在练手。</p>
+
+<h2 id="sec8-4">8.4 限制定理：连续函数限到子空间还是连续</h2>
+
+<p>给连续映射 \(f: X \to Y\) 与子集 \(A \subseteq X\)，定义<em>限制</em>：</p>
+
+<p>\[
+f|_A: A \to Y, \quad (f|_A)(a) := f(a).
+\]</p>
+
+<p><strong>定理（限制连续性）：</strong>如果 \(f\) 连续，那么在子空间拓扑下 \(f|_A\) 也连续。</p>
+
+<p><em>证明。</em>关键观察：\(f|_A = f \circ i\)。这是因为对 \(a \in A\)，\((f \circ i)(a) = f(i(a)) = f(a) = (f|_A)(a)\)。</p>
+
+<p>而 \(i\) 连续（8.3）、\(f\) 连续（假设）、连续函数的复合连续（<a href="ch6.html">ch6</a>）——所以 \(f|_A = f \circ i\) 连续。\(\square\)</p>
+
+<p>这个定理在实践里用法很多。举一个：</p>
+
+<p><strong>例：</strong>\(\sin: \mathbb{R} \to \mathbb{R}\) 连续（这是<a href="../实分析/index.html">实分析</a>结论），所以它的限制 \(\sin|_{[0, \pi]}: [0, \pi] \to \mathbb{R}\) 也连续——不需要重新做任何 \(\varepsilon\)-\(\delta\) 验算。子空间拓扑是为了让"<em>限制</em>" 自动有效而设计的。</p>
+
+<p>另一个用法是<em>反过来</em>——把限制当作"<em>开始</em>" 的工具：你想造一个 \([0, 1]\) 上的连续函数？最简单的办法之一是<em>从 \(\mathbb{R}\) 上一个连续函数限到 \([0, 1]\)</em>。这就是 \(\sin|_{[0, \pi]}\)、\(\cos|_{[0, 2\pi]}\)、\(e^x|_{[-1, 1]}\) 等等都<em>合法</em> 的原因。</p>
+
+<p><strong>注意（小陷阱）：</strong>\(f|_A\) 的<em>陪域</em> 还是 \(Y\)。如果你想把陪域也缩到 \(f(A)\)（值域）上看作 \(f|_A: A \to f(A)\)，那是<em>另一个</em> 工序——给 \(f(A)\) 配子空间拓扑（来自 \(Y\)），然后这条映射也连续（练习）。</p>
+
+<h2 id="sec8-5">8.5 子空间继承哪些性质</h2>
+
+<p>"<em>性质 P 是不是子空间继承</em>" 这件事不需要每次重新查表，可以直接<em>从定义算</em>。我们扫一遍主要性质：</p>
+
+<p><strong>(a) Hausdorff：是的。</strong>设 \((X, \tau)\) Hausdorff，\(A \subseteq X\)。取 \(a_1 \neq a_2 \in A\)。它们在 \(X\) 里也不等，由 Hausdorff 找开集 \(U_1, U_2 \in \tau\) 分离 \(a_1, a_2\)（\(a_i \in U_i\) 且 \(U_1 \cap U_2 = \emptyset\)）。</p>
+
+<p>那么 \(U_1 \cap A\) 与 \(U_2 \cap A\) 是 \(A\) 中开集，分别含 \(a_1, a_2\)，且 \((U_1 \cap A) \cap (U_2 \cap A) = U_1 \cap U_2 \cap A = \emptyset\)。\(A\) Hausdorff。\(\checkmark\)</p>
+
+<p>所以 Hausdorff 沿子集自动传递——选两个点用大空间分离，再交一下子集。</p>
+
+<p><strong>(b) 紧致：<em>不</em> 自动。</strong>\(\mathbb{R}\) <em>不</em>紧致，但开区间 \((0, 1) \subset \mathbb{R}\) 是子空间——它<em>也</em>不紧致（用开覆盖 \(\{(1/n, 1) : n = 2, 3, \ldots\}\) 没有有限子覆盖）。这是"<em>大空间不紧致, 子空间也不紧致</em>"——意料之中。</p>
+
+<p>反过来：\(\mathbb{R}\) 不紧致，但 \([0, 1] \subset \mathbb{R}\) 紧致（Heine-Borel）——大空间不紧致<em>不</em>排除子空间紧致。</p>
+
+<p>所以"紧致" 既<em>不</em>从大向子继承也不从子向大反推——它需要单独验证。可以叙述的<em>正向</em> 命题：</p>
+
+<p><strong>命题（闭子集紧致）：</strong>紧致空间的<em>闭</em> 子集紧致。</p>
+
+<p><em>证明。</em>设 \(X\) 紧致, \(A \subseteq X\) 闭。取 \(A\) 的一个开覆盖 \(\{V_\alpha\}\)（\(V_\alpha\) 是 \(A\) 中开集）。每个 \(V_\alpha = U_\alpha \cap A\) 来自 \(X\) 中开集 \(U_\alpha\)。考虑 \(X\) 的覆盖：</p>
+
+<p>\[
+X = \left(\bigcup_\alpha U_\alpha\right) \cup (X \setminus A).
+\]</p>
+
+<p>左边覆盖 \(A\)（因为 \(\{V_\alpha\}\) 覆盖 \(A\)），右边覆盖 \(X \setminus A\)。\(X \setminus A\) 在 \(X\) 中开（\(A\) 闭！这条性质刚刚被用上）。所以这是 \(X\) 的开覆盖，按 \(X\) 紧致取有限子覆盖 \(U_{\alpha_1}, \ldots, U_{\alpha_n}, X \setminus A\)。则 \(V_{\alpha_1}, \ldots, V_{\alpha_n}\) 已经覆盖 \(A\)（\(X \setminus A\) 不贡献于 \(A\)）——\(A\) 中的有限子覆盖。\(A\) 紧致。\(\square\)</p>
+
+<p>所以：在<em>紧致 Hausdorff</em> 空间里，"<em>紧致</em>" 与"<em>闭</em>" 等价（练习证 \(\Rightarrow\) 方向用 Hausdorff）。这条等价是 ch15 紧致性的核心结论之一。</p>
+
+<p><strong>(c) 连通：<em>不</em> 自动。</strong>\(\mathbb{R}\) 连通，但 \(\{-1, 1\} \subset \mathbb{R}\) 离散两点——<em>不</em>连通。所以连通也不沿子集继承。但有一条很好用的反向：</p>
+
+<p><strong>命题：</strong>连续映射的<em>像</em> 沿连通保持。即若 \(f: X \to Y\) 连续, \(X\) 连通，则 \(f(X) \subseteq Y\) 在子空间拓扑下连通。</p>
+
+<p>这条留 ch18。它直接给"<em>道路连通 \(\Rightarrow\) 连通</em>"——道路是 \([0, 1]\) 的连续像，\([0, 1]\) 连通。</p>
+
+<p><strong>(d) 离散 / 平凡：<em>大致传</em>，但有 nuance。</strong>离散空间的子集仍离散（每个单点 \(\{a\} = \{a\} \cap A\) 开）。平凡空间 \(\tau_0 = \{\emptyset, X\}\) 的子集 \(A \subset X\) 上子空间拓扑是 \(\{\emptyset, A\}\)——也平凡。两个极端都通过子集传给子集。</p>
+
+<p>这一节小结一句话：子空间继承"<em>需要在每个点局部检验的性质</em>"（Hausdorff、可数性等），<em>不</em>继承"<em>需要全局有限性的性质</em>"（紧致需要闭，连通完全不传）。</p>
+
+<h2 id="sec8-6">8.6 反例：子空间开集"<em>在大空间里</em>" 不一定开</h2>
+
+<p>我们已经在 8.2 看到一个例子——\([0, 1/2)\) 在 \([0, 1]\) 里开，但在 \(\mathbb{R}\) 里不开。这是<em>关键</em> 反例。我们再看几个让"<em>语境</em>" 这件事变成肌肉：</p>
+
+<p><strong>例 1（开区间内的"开"）：</strong>取 \(A = (0, 1) \subset \mathbb{R}\)，子集 \(B = (0, 1/2)\)。\(B\) 在 \(A\) 里开吗？是——\((0, 1/2) = (-1, 1/2) \cap A\)，\((-1, 1/2)\) 是 \(\mathbb{R}\) 的开集。\(B\) 在 \(\mathbb{R}\) 里也开。两层一致。</p>
+
+<p><strong>例 2（嵌套子空间）：</strong>取 \(\mathbb{R} \supset [0, 1] \supset (0, 1)\)。\((0, 1)\) 在 \([0, 1]\) 里开吗？\((0, 1) = (0, 1) \cap [0, 1]\)（\((0, 1)\) 是 \(\mathbb{R}\) 的开集），所以是开。在 \(\mathbb{R}\) 里 \((0, 1)\) 也开——两层一致，<em>没</em>反例。</p>
+
+<p><strong>例 3（含端点的"开"）：</strong>取 \(\mathbb{R} \supset [0, 2] \supset \{0\}\)。\(\{0\}\) 在 \([0, 2]\) 里开吗？我们要找 \(\mathbb{R}\) 的开集 \(U\) 使 \(U \cap [0, 2] = \{0\}\)。但 \(0\) 必须在 \(U\) 里，\(U\) 开，所以 \(U\) 含 \(0\) 的某个开邻域 \((-\varepsilon, \varepsilon)\)。它与 \([0, 2]\) 交是 \([0, \varepsilon)\)——<em>不</em> 等于 \(\{0\}\)。所以 \(\{0\}\) 在 \([0, 2]\) 里<em>不</em> 开。</p>
+
+<p>但是！换个空间：取 \(X = \{0\} \cup [1, 2] \subset \mathbb{R}\)。\(\{0\}\) 在 \(X\) 里开吗？\(\{0\} = (-1, 1/2) \cap X\)（\((-1, 1/2)\) 是 \(\mathbb{R}\) 开），所以在 \(X\) 中开。<em>"孤立点" 在子空间里是开的</em>，即使它在大空间里不是孤立点。</p>
+
+<p>这是子空间拓扑的根本现象：<em>"开" 是相对的, 看大空间 vs 子空间一样的位置可能开 / 不开</em>。</p>
+
+<p><strong>例 4（一族子集都"开" 的子空间）：</strong>整数集 \(\mathbb{Z} \subset \mathbb{R}\)。\(\mathbb{Z}\) 上的子空间拓扑是什么？取 \(n \in \mathbb{Z}\)，\(\{n\} = (n - 1/2, n + 1/2) \cap \mathbb{Z}\)——单点是开的！<em>每个</em> 单点都开，所以 \(\mathbb{Z}\) 上的子空间拓扑就是<em>离散</em> 拓扑。</p>
+
+<p>这条给一个直观的几何刻画：\(\mathbb{Z}\) 在 \(\mathbb{R}\) 里"<em>稀疏</em>"——任意两点间距 \(\geq 1\)——所以从 \(\mathbb{R}\) 的细致邻域结构里"<em>分得开</em>" 单点。任何在大空间里"<em>稀疏</em>" 的子集（专门点：所有点都是孤立点的子集），它的子空间拓扑都<em>离散</em>。</p>
+
+<h2 id="sec8-7">8.7 闭子空间 + 商空间预告</h2>
+
+<p>子空间拓扑的<em>对偶</em> 概念是<em>闭</em>子集的子空间拓扑。一句话：闭子集 \(A \subseteq X\) 上的子空间拓扑还可以这样描述：</p>
+
+<p>\[
+\boxed{\ A \text{ 中闭集} = X \text{ 中闭集与 } A \text{ 的交}.\ }
+\]</p>
+
+<p>这条等价的证明用 De Morgan：\(A \setminus (U \cap A) = (X \setminus U) \cap A\)，所以"<em>开集与 \(A\) 的交</em>" 与"<em>闭集与 \(A\) 的交</em>" 同时定义子空间。</p>
+
+<p>有了"开" "闭" 两个版本，下一章预告一下接下来 ch9-11 干什么——所有都是<em>从已知拓扑造新拓扑</em> 的<em>构造</em>：</p>
+
+<ul>
+  <li><strong>ch9 有限积：</strong>从 \(X, Y\) 造 \(X \times Y\)，开集由"<em>开矩形</em> \(U \times V\)" 生成。把 \(\mathbb{R}^2\) 等"<em>积空间</em>" 形式化。</li>
+  <li><strong>ch10 商空间：</strong>从 \(X\) 与等价关系 \(\sim\) 造 \(X / \sim\)，把矩形粘成圆柱、环面、Möbius 带、Klein 瓶。<em>"几何粘合" 的拓扑学正名</em>。</li>
+  <li><strong>ch11 任意积：</strong>从一族空间 \(\{X_i\}_{i \in I}\) 造 \(\prod_i X_i\)。"<em>有限积</em>" 推广到无穷——但要小心，朴素的"盒拓扑" 是错的，正确的"<em>积拓扑（Tychonoff 拓扑）</em>" 要技术性约束。</li>
+</ul>
+
+<p>这套构造完了，"<em>任何拓扑空间都能从已知出发组合而成</em>" 这件事就有了语言。后面 ch12-19 性质学，一上来就用：紧致是<em>积传</em> 的（Tychonoff 定理），连通也是；Hausdorff 既子空间传也积传；可数性比较挑剔。把构造工具备好，性质论讨论就只剩"<em>验证它在每种构造下行为</em>"——本质是组合学。</p>
+
+<p>下一章（ch9）从最简单的<em>有限积</em> 开始，先在 \(\mathbb{R}^2 = \mathbb{R} \times \mathbb{R}\) 这个例子里磨透"<em>积拓扑</em>" 是怎么回事。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 同胚</a><a href="ch9.html">下一章 · 第 9 章 有限积拓扑 →</a></nav>
+</main>
+</body>
+</html>

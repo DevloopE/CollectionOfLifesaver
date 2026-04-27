@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 分离公理：T0-T4 与 Hausdorff — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 任意积与 Tychonoff 拓扑</a><a href="ch13.html">下一章 · 第 13 章 可数性公理 →</a></nav>
+<h1 id="ch12">第 12 章 分离公理：T0-T4 与 Hausdorff</h1>
+
+<p>请你先回到<a href="ch1.html">第 1 章</a>那个 2 元素小空间——Sierpiński 空间</p>
+
+<p>\[
+X = \{0, 1\}, \qquad \tau = \{\emptyset, \{1\}, \{0, 1\}\}.
+\]</p>
+
+<p>三条公理我们已经验证过了。它<em>是</em> 拓扑空间，没有任何犯规之处。但请你停下来仔细问一句：在这个空间里，"<em>0 和 1 能不能分开</em>"？</p>
+
+<p>"分开" 在拓扑里有一个最朴素的意思——找两个<em>不交</em> 的开集 \(U, V\)，一个含 0、一个含 1。在度量空间里这是免费的：\(0\) 和 \(1\) 距离 1，取半径 \(1/2\) 的两个开球就行。但在 Sierpiński 拓扑里我们试一下。</p>
+
+<p>含 0 的开集只有一个——\(\{0, 1\}\) 自己（因为 \(\{0\}\) 不是开集，\(\{1\}\) 也不含 0）。它<em>包含</em> 1。所以"<em>能含 0 又不含 1</em>" 的开集<em>不存在</em>。0 与 1 在这个拓扑里<em>分不开</em>。</p>
+
+<p>这件事不是技术细节——它有<em>真</em> 后果。考虑常值序列 \(0, 0, 0, \ldots\) 在 Sierpiński 上。它收敛到 0 吗？当然——任何含 0 的开邻域都包含所有项 0。但它<em>同时</em> 收敛到 1：唯一含 1 的开邻域是 \(\{1\}\) 与 \(\{0, 1\}\)，前者不含 0 不需考虑（不是 1 的<em>邻域</em>？我们要看含 1 的邻域），等一下——\(\{1\}\) 是开集且含 1，是 1 的邻域；它<em>不</em>含 0，所以序列 \(0, 0, 0, \ldots\) 的项最终<em>不</em> 全在 \(\{1\}\) 里。所以 \(0, 0, \ldots\) <em>不</em> 收敛到 1。</p>
+
+<p>等一下重新算：含 1 的开邻域有 \(\{1\}\) 和 \(\{0, 1\}\)。要"<em>序列收敛到 1</em>" 意味着对<em>每个</em> 含 1 的开邻域，序列从某项起全在里面。\(\{1\}\) 不含 0——\(0, 0, \ldots\) 没有项落进去——所以<em>不</em> 收敛到 1。</p>
+
+<p>反方向：常值 \(1, 1, 1, \ldots\) 收敛到 1（显然），它收敛到 0 吗？含 0 的开邻域只有 \(\{0, 1\}\)，所有项 1 都在里面——满足条件——所以 \(1, 1, \ldots\) <em>同时</em> 收敛到 0 与 1！</p>
+
+<p>这就是<em>分不开</em> 的真正后果——<strong>序列极限不唯一</strong>。\(1, 1, 1, \ldots\) 同时收敛到两个不同点。这种空间里"<em>极限</em>" 这个词失去意义。</p>
+
+<p>这一章把"<em>能分开多少</em>" 系统化——T0、T1、T2 (Hausdorff)、T3、T4 五条<em>分离公理</em>。每条都说"<em>某种东西能用不交开集分开</em>"。它们组成一条阶梯，越往上要求越强、可用工具越多。<em>大部分实际研究的拓扑空间至少满足 Hausdorff (T2)</em>——所以你今后看到"<em>设 \(X\) 是 Hausdorff 空间</em>" 这种开头，要想起背后这件事：它在保证极限唯一、连续映射可由值决定。</p>
+
+<h2 id="sec12-1">12.1 Sierpiński 引子：分不开导致什么</h2>
+
+<p>把上面的观察整理成定理形式。</p>
+
+<p><strong>观察 12.1.</strong> 在 Sierpiński 空间 \((\{0, 1\}, \tau)\) 上，常值序列 \(1, 1, 1, \ldots\) 收敛到 \(0\) <em>也</em> 收敛到 \(1\)。所以"<em>序列极限</em>" 不唯一。</p>
+
+<p>证明已经在引子里给出。把它看作一面<em>警告</em>——任何不满足"<em>两点能分开</em>" 的拓扑空间都<em>会</em> 出现这种现象。</p>
+
+<p>更一般地：</p>
+
+<p><strong>观察 12.2.</strong> 设 \(X\) 是拓扑空间，\(x \neq y \in X\)。如果<em>每个</em> 含 \(x\) 的开邻域都含 \(y\)，那么任何收敛到 \(y\) 的序列也收敛到 \(x\)。</p>
+
+<p>证明一行：序列 \(x_n \to y\) 意味着对 \(y\) 的<em>每个</em> 开邻域 \(V\)，\(x_n\) 最终落入 \(V\)。但 \(x\) 的<em>每个</em> 开邻域 \(U\) 也是 \(y\) 的开邻域（因为 \(y \in U\) 由假设），所以 \(x_n\) 也最终落入 \(U\)，即 \(x_n \to x\)。\(\blacksquare\)</p>
+
+<p>这条观察告诉我们：分离公理的<em>最低</em> 起点必须是"<em>有某个开集区分 \(x\) 与 \(y\)</em>"。否则\(x\) 与 \(y\) 在拓扑里<em>看起来一样</em>——任何序列、任何收敛、任何连续函数都分不清它们。</p>
+
+<h2 id="sec12-2">12.2 T0：用一个开集区分两点</h2>
+
+<p>把"<em>最低</em> 区分要求" 写下来。</p>
+
+<p><strong>定义 12.3 (T0 / Kolmogorov)。</strong> 拓扑空间 \(X\) 称为 \(T_0\)，如果对任意两个不同的点 \(x \neq y\)，存在<em>某个</em> 开集 \(U\) 使</p>
+
+<p>\[
+(x \in U \text{ 且 } y \notin U) \quad \text{或} \quad (y \in U \text{ 且 } x \notin U).
+\]</p>
+
+<p>用人话：<em>至少有一个开集区分得开 \(x\) 和 \(y\)</em>——含其中一个不含另一个。注意这里的"或"——只要一边能区分就够了，<em>不</em> 要求两边都能。</p>
+
+<p>验证：</p>
+
+<ul>
+  <li>Sierpiński \(\{0, 1\}\) 配 \(\tau = \{\emptyset, \{1\}, \{0, 1\}\}\)：开集 \(\{1\}\) 含 1 不含 0——区分 0 与 1 这两点的<em>一边</em>。所以 Sierpiński <em>是</em> \(T_0\)。</li>
+  <li>平凡拓扑 \(\tau_0 = \{\emptyset, X\}\) 在 \(|X| \geq 2\) 时<em>不</em> \(T_0\)——唯一的非空开集是 \(X\)，无法区分任何两点。</li>
+  <li>度量空间永远 \(T_0\)：\(x \neq y \Rightarrow d(x, y) > 0\)，开球 \(B(x, d(x, y) / 2)\) 含 \(x\) 不含 \(y\)。\(\checkmark\)</li>
+</ul>
+
+<p>所以 \(T_0\) 是一条非常弱的条件——平凡拓扑都不满足，但只要"<em>开集多到能看出点的不同</em>"，就 \(T_0\)。</p>
+
+<p>等价说法：\(T_0 \iff\) <em>不同点有不同的开邻域族</em>。即映射 \(x \mapsto \mathcal{N}(x) := \{U \text{ 开} : x \in U\}\) 从 \(X\) 到 \(\mathcal{P}(\tau)\) 是<em>单射</em>。这条等价让"<em>\(T_0\) 表达点能被开集区分</em>" 变得直观——\(T_0\) 拓扑里"<em>点</em>" 与"<em>它的邻域族</em>" 一一对应。</p>
+
+<h2 id="sec12-3">12.3 T1：每个单点是闭集</h2>
+
+<p>T0 还允许"<em>一边能区分</em>"——一边不行没关系。下一级要求两边都行。</p>
+
+<p><strong>定义 12.4 (T1 / Fréchet)。</strong> 拓扑空间 \(X\) 称为 \(T_1\)，如果对任意 \(x \neq y\)，存在开集 \(U \ni x, y \notin U\) <em>并且</em> 开集 \(V \ni y, x \notin V\)。</p>
+
+<p>注意 \(U\) 与 \(V\) <em>不</em> 要求不交——只要各自能"<em>一边盯紧、另一边排除</em>"。</p>
+
+<p>Sierpiński <em>不</em> \(T_1\)：含 0 不含 1 的开集没有。</p>
+
+<p>余有限拓扑 \(\tau_{\text{cofin}}\) 在<em>无限</em>集 \(X\) 上<em>是</em> \(T_1\)：取 \(U = X \setminus \{y\}\)，余集 \(\{y\}\) 有限——\(U\) 是开集，含 \(x\) 不含 \(y\)。同理 \(V = X \setminus \{x\}\) 含 \(y\) 不含 \(x\)。\(\checkmark\)</p>
+
+<p><strong>定理 12.5 (T1 等价单点闭)。</strong> \(X\) 是 \(T_1 \iff\) 对每个 \(x \in X\)，\(\{x\}\) 是闭集。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>(\(\Rightarrow\))。假设 \(T_1\)。固定 \(x\)。要证 \(\{x\}\) 闭，等价于 \(X \setminus \{x\}\) 开。对每个 \(y \in X \setminus \{x\}\)（即 \(y \neq x\)），由 \(T_1\) 取开集 \(V_y \ni y, x \notin V_y\)。即 \(V_y \subseteq X \setminus \{x\}\)。所以 \(X \setminus \{x\} = \bigcup_{y \neq x} V_y\)——开集的并，开。</p>
+
+<p>(\(\Leftarrow\))。假设每个单点闭。对 \(x \neq y\)，\(\{y\}\) 闭，故 \(U := X \setminus \{y\}\) 开且含 \(x\)（因 \(x \neq y\)），不含 \(y\)。同理 \(V := X \setminus \{x\}\) 开含 \(y\) 不含 \(x\)。\(T_1\)。\(\blacksquare\)</p>
+
+<p>这条等价是 \(T_1\) 的<em>主刻画</em>。今后看到"<em>\(\{x\}\) 闭</em>" 就要想起 \(T_1\)。在<em>大多数</em> 你研究的空间里这件事自动成立——但代数几何里 Spec 的拓扑（"<em>素谱</em>"）就<em>不</em> \(T_1\)，因为非极大素理想的"点" 的闭包包含其它"点"。</p>
+
+<h2 id="sec12-4">12.4 T2 (Hausdorff)：两点有不交开邻域</h2>
+
+<p>到了拓扑学里出现频率最高的一条分离公理。</p>
+
+<p><strong>定义 12.6 (T2 / Hausdorff)。</strong> 拓扑空间 \(X\) 称为 \(T_2\) 或 <em>Hausdorff</em>，如果对任意 \(x \neq y\)，存在<em>不交</em> 开集 \(U \ni x, V \ni y\)。即 \(U \cap V = \emptyset\)。</p>
+
+<p>这就是引子里"<em>能分开</em>" 的精确说法——两个点不仅有"区分开集"（\(T_1\)），更有<em>互斥</em> 的开邻域。</p>
+
+<p>典型例子：</p>
+
+<ul>
+  <li>所有度量空间 Hausdorff——\(B(x, d(x,y)/2)\) 与 \(B(y, d(x,y)/2)\) 不交。\(\checkmark\)</li>
+  <li>\(\mathbb{R}^n\) 标准拓扑 Hausdorff（度量情形）。</li>
+  <li>离散拓扑 Hausdorff（取 \(U = \{x\}, V = \{y\}\)）。</li>
+</ul>
+
+<p>非例：</p>
+
+<ul>
+  <li>Sierpiński——已说，<em>不</em> Hausdorff。</li>
+  <li>余有限拓扑在无限集上——<em>不</em> Hausdorff。任何两个非空开集的余集都有限，所以两个非空开集的<em>余集之并</em> 有限，<em>交</em> 的余集 \(=\) 余集之并有限——意味交是"<em>余有限集</em>"，<em>非</em>空（因为 \(X\) 无限）。所以任何两个非空开集相交。无法分开。但它<em>是</em> \(T_1\)。</li>
+</ul>
+
+<p>这第二个例子很重要——它告诉我们 \(T_1 \not\Rightarrow T_2\)。两条公理<em>真</em> 不一样。</p>
+
+<p>"<em>Hausdorff</em>" 在大多数现代拓扑文献里是默认假设。一打开任何分析 / 几何 / 代数拓扑教材，你看到"<em>设 \(X\) 是拓扑空间</em>" 默认就是 Hausdorff——因为不 Hausdorff 时极限唯一性、紧致集闭等基本结论会失败，做不下去。</p>
+
+<h2 id="sec12-5">12.5 T3 (regular)：点 + 闭集分开</h2>
+
+<p>到这里"<em>分</em>" 的对象升级——从"<em>两个点</em>" 升级到"<em>一个点 + 一个不含它的闭集</em>"。</p>
+
+<p><strong>定义 12.7 (T3 / regular)。</strong> 拓扑空间 \(X\) 称为 <em>regular</em> 如果它是 \(T_1\)<em>并且</em> 对任意闭集 \(F\) 与点 \(x \notin F\)，存在<em>不交</em> 开集 \(U \ni x, V \supseteq F\)。称为 \(T_3\) 通常等同 regular。</p>
+
+<p>请你停下来想这条要求在说什么。它<em>比</em> Hausdorff 强：取 \(F = \{y\}\) 单点（在 \(T_1\) 下闭），就回到"<em>点 \(x\) 与点 \(y\) 用不交开集分开</em>"——即 Hausdorff。但 regular 要求<em>不止</em> 单点闭集——要求<em>所有</em> 闭集（可能非常大）都能与外部点分开。</p>
+
+<p>等价刻画（很常用）：</p>
+
+<p><strong>定理 12.8.</strong> \(X\) 是 \(T_1\)。则 \(X\) regular \(\iff\) 对每个点 \(x\) 与含 \(x\) 的每个开集 \(W\)，存在开集 \(U\) 使 \(x \in U \subseteq \overline{U} \subseteq W\)。</p>
+
+<p>用人话：每个开邻域里"<em>能塞进一个更小的开邻域且其闭包仍在里面</em>"。这条性质叫"<em>开邻域的闭包细化</em>"，在很多构造（比如 Urysohn 引理）里反复用。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>(\(\Rightarrow\))。给 \(x \in W\)，\(W\) 开。则 \(F := X \setminus W\) 闭且 \(x \notin F\)。由 regular 取不交开集 \(U \ni x, V \supseteq F\)。则 \(U \subseteq X \setminus V\) 闭集——所以 \(\overline{U} \subseteq X \setminus V \subseteq X \setminus F = W\)。即 \(x \in U \subseteq \overline{U} \subseteq W\)。\(\checkmark\)</p>
+
+<p>(\(\Leftarrow\))。给 \(F\) 闭、\(x \notin F\)。则 \(W := X \setminus F\) 开含 \(x\)。由假设取 \(U\) 使 \(x \in U \subseteq \overline{U} \subseteq W\)。则 \(V := X \setminus \overline{U}\) 开，含 \(F\)（因 \(\overline{U} \subseteq W = X \setminus F \Rightarrow F \subseteq X \setminus \overline{U}\)），且 \(U \cap V = U \cap (X \setminus \overline{U}) \subseteq U \cap (X \setminus U) = \emptyset\)。\(\blacksquare\)</p>
+
+<p>典型例子：所有度量空间 regular（事实上 normal，下一节）。\(\mathbb{R}^n\)、所有 \(\mathbb{R}^n\) 子空间、所有 Banach 空间——都 regular。</p>
+
+<p>历史小注：早期拓扑文献里 \(T_3 = \) "regular + \(T_1\)"，但有些作者把 regular 不要求 \(T_1\)。本书采取"<em>regular = \(T_3\) = (R<sub>0</sub>) + 点闭集分开 + \(T_1\)</em>" 的强约定，避免歧义。</p>
+
+<h2 id="sec12-6">12.6 T4 (normal)：两个闭集分开</h2>
+
+<p>把"<em>分</em>" 的对象再升级——两个不交闭集。</p>
+
+<p><strong>定义 12.9 (T4 / normal)。</strong> 拓扑空间 \(X\) 称为 <em>normal</em> 如果它是 \(T_1\)<em>并且</em> 对任意两个不交闭集 \(F, G\)，存在<em>不交</em> 开集 \(U \supseteq F, V \supseteq G\)。\(T_4\) 通常等同 normal。</p>
+
+<p>同样的"<em>用闭包细化邻域</em>" 等价：</p>
+
+<p><strong>定理 12.10.</strong> \(X\) 是 \(T_1\)。\(X\) normal \(\iff\) 对每个闭集 \(F\) 与含 \(F\) 的每个开集 \(W\)，存在开集 \(U\) 使 \(F \subseteq U \subseteq \overline{U} \subseteq W\)。</p>
+
+<p>证明完全类比 12.8——用 \(F\) 替换"<em>点</em>"。</p>
+
+<p>normal 是分离阶梯里<em>最强</em> 的一档。它强到允许构造非平凡的连续函数——这就是<em>Urysohn 引理</em>（<a href="ch20.html">第 20 章</a>）：</p>
+
+<p>\[
+\boxed{\ X \text{ normal} + F, G \text{ 不交闭} \Rightarrow \exists \text{ 连续 } f : X \to [0, 1], \ f|_F = 0, f|_G = 1.\ }
+\]</p>
+
+<p>这条引理把"<em>能用开集分</em>" 升级成"<em>能用连续函数分</em>"——是后续度量化定理（Urysohn 度量化）的关键工具。它<em>需要</em> normal——更弱的条件不够。</p>
+
+<p>典型例子：</p>
+
+<ul>
+  <li>所有度量空间 normal（详见 12.9 节）。</li>
+  <li>所有紧致 Hausdorff 空间 normal（<a href="ch15.html">第 15 章</a>详证）。</li>
+</ul>
+
+<p>非例：</p>
+
+<ul>
+  <li>Sorgenfrey 直线的<em>积</em> \(\mathbb{R}_\ell \times \mathbb{R}_\ell\)（"<em>Sorgenfrey 平面</em>"）是 regular Hausdorff 但<em>不</em> normal。这是经典反例 (Munkres §31)。说明 normal <em>不</em> 被任意积保持——比 regular 难得多。</li>
+</ul>
+
+<h2 id="sec12-7">12.7 阶梯：T4 ⟹ T3 ⟹ T2 ⟹ T1 ⟹ T0</h2>
+
+<p>把五条整理成阶梯。</p>
+
+<p><strong>定理 12.11.</strong> \(T_4 \Rightarrow T_3 \Rightarrow T_2 \Rightarrow T_1 \Rightarrow T_0\)。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>\(T_4 \Rightarrow T_3\)：normal 给"<em>两闭集分开</em>"。取 \(F = \{x\}\)（在 \(T_1\) 下闭），\(G\) 任意闭集不含 \(x\)，得到不交开集分开 \(\{x\}\) 与 \(G\)——即 regular。</p>
+
+<p>\(T_3 \Rightarrow T_2\)：取 \(F = \{y\}\)（在 \(T_1\) 下闭），\(x \neq y\)，得到不交开集分开 \(x\) 与 \(\{y\}\)——即 Hausdorff。</p>
+
+<p>\(T_2 \Rightarrow T_1\)：Hausdorff 给两个不交开邻域 \(U \ni x, V \ni y\)——分别能区分两点。\(T_1\) 满足。</p>
+
+<p>\(T_1 \Rightarrow T_0\)：\(T_1\) 的"<em>双向区分</em>" 显然蕴含 \(T_0\) 的"<em>单向区分</em>"。\(\blacksquare\)</p>
+
+<p>反向<em>不</em> 成立。我们已看过两个反例：</p>
+
+<ul>
+  <li>Sierpiński 是 \(T_0\) 但<em>不</em> \(T_1\)（不是单点闭：\(\{1\}\) 开但 \(\{0\}\) 不闭）。</li>
+  <li>余有限拓扑（无限集上）是 \(T_1\) 但<em>不</em> \(T_2\)。</li>
+</ul>
+
+<p>另两个标准反例：</p>
+
+<ul>
+  <li>"<em>含两点不能用开集分</em>" 的某些 Hausdorff 空间<em>不</em> regular（构造稍长）。Munkres §31 给具体例子。</li>
+  <li>Sorgenfrey 平面 regular Hausdorff 但<em>不</em> normal。</li>
+</ul>
+
+<p>这些反例的存在证明阶梯<em>真</em> 是阶梯——每一档都是真正多一份要求。</p>
+
+<h2 id="sec12-8">12.8 Hausdorff 的关键后果</h2>
+
+<p>Hausdorff 是阶梯里"<em>最常用</em>" 的一档。它给出三件本书反复用的事。</p>
+
+<p><strong>(1) 紧致集闭。</strong> 在 Hausdorff 空间 \(X\) 里，每个紧致子集 \(K \subseteq X\) 是闭集。</p>
+
+<p>证明（梗概，详见<a href="ch14.html">第 14 章</a>）：要证 \(X \setminus K\) 开。给 \(y \notin K\)，对每个 \(x \in K\) 由 Hausdorff 取不交开集 \(U_x \ni x, V_x \ni y\)。族 \(\{U_x\}_{x \in K}\) 覆盖 \(K\)，由紧致取有限子覆盖 \(U_{x_1}, \ldots, U_{x_n}\)。则 \(V := V_{x_1} \cap \cdots \cap V_{x_n}\) 是 \(y\) 的开邻域且与 \(\bigcup U_{x_i} \supseteq K\) 不交。\(V \subseteq X \setminus K\)。每个 \(y\) 都有这样的 \(V\)——\(X \setminus K\) 开。\(\checkmark\)</p>
+
+<p>这是 Hausdorff 的<em>第一</em> 个关键作用——它让"<em>紧致</em>" 这个性质在<em>组合</em>（取闭包、补集）下良好。在非 Hausdorff 空间里紧致集可能<em>不</em>闭——比如 Sierpiński 上 \(\{0\}\) 紧致（有限集自动紧致）但<em>不</em>闭（\(\{1\}\) 才是开集，\(\{0\}\) 的补 \(\{1\}\) 开 \(\Rightarrow \{0\}\) 闭——等等再想想）。Sierpiński 上单点 \(\{0\}\)：\(X \setminus \{0\} = \{1\}\) 是开集，所以 \(\{0\}\) 闭。\(\{1\}\) 的补 \(\{0\}\) 闭——\(\{1\}\) 开。所以 Sierpiński 上单点都有闭/开属性，但<em>不</em> Hausdorff。这说明"<em>紧致集闭</em>" 在非 Hausdorff 下可能仍成立——但<em>不能保证</em>。一般<em>非</em> Hausdorff 反例可见 \(\mathbb{R}\) 配余有限拓扑加一些技巧。</p>
+
+<p><strong>(2) 序列极限唯一。</strong> 在 Hausdorff 空间 \(X\) 里，如果序列 \((x_n) \to x\) <em>且</em> \((x_n) \to y\)，则 \(x = y\)。</p>
+
+<p>证明。反证：假设 \(x \neq y\)。由 Hausdorff 取不交开集 \(U \ni x, V \ni y\)。\(x_n \to x \Rightarrow x_n\) 最终 \(\in U\)；\(x_n \to y \Rightarrow x_n\) 最终 \(\in V\)。最终两边都满足意味着 \(x_n\) 最终 \(\in U \cap V = \emptyset\)，矛盾。\(\blacksquare\)</p>
+
+<p>这就是引子里 Sierpiński 现象在 Hausdorff 下被消除——分开两点保证序列不能"<em>同时</em> 收敛到两边"。</p>
+
+<p><strong>(3) 连续映射"等价于" 决定。</strong> 设 \(Y\) Hausdorff，\(f, g : X \to Y\) 连续，\(D \subseteq X\) 稠密。如果 \(f|_D = g|_D\)，则 \(f = g\)。</p>
+
+<p>证明。集合 \(E := \{x \in X : f(x) = g(x)\}\)。要证 \(E = X\)。已知 \(D \subseteq E\)，\(D\) 稠密——\(\overline{D} = X\)。要证 \(E\) 闭。</p>
+
+<p>等价证明 \(X \setminus E = \{x : f(x) \neq g(x)\}\) 开。给 \(x \in X \setminus E\)，\(f(x) \neq g(x)\)。由 Hausdorff（在 \(Y\) 里）取不交开集 \(U \ni f(x), V \ni g(x)\)。则 \(W := f^{-1}(U) \cap g^{-1}(V)\) 是 \(x\) 的开邻域（\(f, g\) 连续保证 \(f^{-1}(U), g^{-1}(V)\) 开）。对 \(z \in W\)：\(f(z) \in U, g(z) \in V\)，因 \(U \cap V = \emptyset\) 必 \(f(z) \neq g(z)\)，即 \(z \in X \setminus E\)。所以 \(W \subseteq X \setminus E\)。\(X \setminus E\) 开 \(\Rightarrow E\) 闭 \(\Rightarrow E \supseteq \overline{D} = X\) \(\Rightarrow E = X\)。\(\blacksquare\)</p>
+
+<p>这条结论叫"<em>连续映射在稠密子集上的值决定整体</em>"。在<em>泛函分析</em> 里这是"<em>有界算子由稠密定义域延拓唯一</em>" 的基础。<em>需要</em> 目标空间 Hausdorff——目标非 Hausdorff 时两个连续映射可在稠密集相同但全局不同。</p>
+
+<h2 id="sec12-9">12.9 度量空间自动 T4</h2>
+
+<p>最后看一件事：<em>度量空间永远 normal</em>。这条让我们不必担心阶梯——任何熟悉的实分析空间（\(\mathbb{R}^n\)、Banach、Hilbert）都自动满足所有分离公理。</p>
+
+<p><strong>定理 12.12.</strong> 度量空间 \((X, d)\) normal。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>显然 \(T_1\)：单点 \(\{x\}\) 闭。事实上 \(\{x\} = \bigcap_n \overline{B(x, 1/n)}\)（闭集的交闭），或更简单：\(X \setminus \{x\} = \bigcup_{y \neq x} B(y, d(x, y) / 2)\)，开集的并开。</p>
+
+<p>给两个不交闭集 \(F, G\)。要构造不交开集 \(U \supseteq F, V \supseteq G\)。</p>
+
+<p>关键工具——<em>距离到集合</em>。定义 \(d(x, A) := \inf_{a \in A} d(x, a)\) 对任意集合 \(A \neq \emptyset\)。这函数 \(d(\cdot, A) : X \to \mathbb{R}\) 连续（\(|d(x, A) - d(y, A)| \leq d(x, y)\)），且 \(d(x, A) = 0 \iff x \in \overline{A}\)。所以对闭集 \(A\)，\(d(x, A) = 0 \iff x \in A\)。</p>
+
+<p>对 \(x \in F\)：\(x \notin G\)（不交），\(G\) 闭，故 \(d(x, G) > 0\)。设 \(r_x := d(x, G) / 2 > 0\)。</p>
+
+<p>对 \(y \in G\)：\(y \notin F\)，故 \(d(y, F) > 0\)。设 \(s_y := d(y, F) / 2 > 0\)。</p>
+
+<p>定义 \(U := \bigcup_{x \in F} B(x, r_x)\)，\(V := \bigcup_{y \in G} B(y, s_y)\)。开（开球的并）。\(U \supseteq F\)，\(V \supseteq G\)（每个 \(x\) 在 \(B(x, r_x) \subseteq U\)）。</p>
+
+<p>剩下证 \(U \cap V = \emptyset\)。反证：取 \(z \in U \cap V\)。则有 \(x \in F, y \in G\) 使</p>
+
+<p>\[
+d(z, x) < r_x = d(x, G) / 2, \qquad d(z, y) < s_y = d(y, F) / 2.
+\]</p>
+
+<p>由三角不等式 \(d(x, y) \leq d(x, z) + d(z, y) < d(x, G) / 2 + d(y, F) / 2\)。</p>
+
+<p>但 \(d(x, G) \leq d(x, y)\)（因 \(y \in G\)）与 \(d(y, F) \leq d(x, y)\)（因 \(x \in F\)）。代入：\(d(x, y) < d(x, y) / 2 + d(x, y) / 2 = d(x, y)\)。矛盾。所以 \(U \cap V = \emptyset\)。\(\blacksquare\)</p>
+
+<p>这条定理一句话总结：<em>所有度量空间满足整条阶梯 T0 到 T4</em>。这就是为什么<a href="../实分析/index.html">实分析读本</a>从来不区分这些公理——它们在 \(\mathbb{R}^n\) 与 Banach 空间里同时为真。<em>抽象拓扑</em> 才需要分开它们：因为存在不来自度量的拓扑（Sierpiński、余有限、Sorgenfrey、Spec），这些场合阶梯之间真有差异。</p>
+
+<p>反过来——<em>不</em> 是每个 normal Hausdorff 空间都来自度量。能不能配度量是<em>度量化问题</em>。Urysohn 度量化定理（<a href="ch21.html">第 21 章</a>）回答："<em>第二可数 + normal + Hausdorff</em>" 的空间可度量化。这把分离公理与可数性公理（下一章）结合，给出可度量化的<em>充分</em> 条件。</p>
+
+<h2 id="sec12-10">12.10 临别话</h2>
+
+<p>分离公理把"<em>能分多开</em>" 这条直观感觉变成五档可计较的条件。在<em>实用</em> 上：</p>
+
+<ul>
+  <li><strong>Hausdorff</strong> 是几乎默认假设。除非你明确做<em>非 Hausdorff</em> 拓扑（代数几何 Spec、domain theory、descriptive set theory 的某些角落），都假设 Hausdorff。</li>
+  <li><strong>regular</strong> 在度量空间外有时缺失，但在<em>大多数</em> 流形 / 紧致 / 可数的标准空间里成立。</li>
+  <li><strong>normal</strong> 是<em>能造连续函数</em> 的门槛。Urysohn 引理 + Tietze 延拓需要它。但 normal 在<em>积</em> 下不保——所以构造上要小心。</li>
+</ul>
+
+<p>下一章我们换一类公理——<em>可数性公理</em>。它问的不是"<em>能分多开</em>"，而是"<em>开集族能不能被可数地控制</em>"。这条性质决定"<em>序列</em>" 这种可数对象在拓扑里够不够用——在第一可数空间里序列充分，否则得用<em>网</em> 或<em>滤子</em>。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 任意积与 Tychonoff 拓扑</a><a href="ch13.html">下一章 · 第 13 章 可数性公理 →</a></nav>
+</main>
+</body>
+</html>

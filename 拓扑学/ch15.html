@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 15 章 紧致的等价：有限交性质 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 紧致性</a><a href="ch16.html">下一章 · 第 16 章 Tychonoff 定理 →</a></nav>
+<h1 id="ch15">第 15 章 紧致的等价：有限交性质</h1>
+
+<p>请你回到<a href="ch14.html">上一章</a>紧致的定义：<em>每个开覆盖有有限子覆盖</em>。这条用<em>开集</em> 与<em>覆盖</em> 写。但每条开集背后有一个<em>闭集</em>（它的补），每条"<em>覆盖</em>" 背后有一句"<em>交集</em>" 的<em>对偶</em> 陈述。</p>
+
+<p>请你停下来手动算一次这个对偶。设 \(\{U_\alpha\}\) 是 \(X\) 的开覆盖：\(\bigcup_\alpha U_\alpha = X\)。取补：\(\bigcap_\alpha (X \setminus U_\alpha) = X \setminus \bigcup U_\alpha = \emptyset\)。即闭集族 \(\{F_\alpha := X \setminus U_\alpha\}\) 满足 \(\bigcap_\alpha F_\alpha = \emptyset\)。</p>
+
+<p>反过来，"<em>有限子覆盖</em>" 即 \(\bigcup_{i=1}^n U_{\alpha_i} = X\)，对应 \(\bigcap_{i=1}^n F_{\alpha_i} = \emptyset\)。</p>
+
+<p>所以"<em>每个开覆盖有有限子覆盖</em>" 的 De Morgan 对偶是：<em>每个闭集族 \(\{F_\alpha\}\) 满足 \(\bigcap F_\alpha = \emptyset\)，必有有限子族 \(\{F_{\alpha_1}, \ldots, F_{\alpha_n}\}\) 仍满足 \(\bigcap F_{\alpha_i} = \emptyset\)</em>。逆否：<em>如果每个有限子族 \(\bigcap_{i=1}^n F_{\alpha_i} \neq \emptyset\)，则总交 \(\bigcap_\alpha F_\alpha \neq \emptyset\)</em>。这条<em>逆否</em> 形式就叫<strong>有限交性质</strong>（finite intersection property, FIP）。</p>
+
+<p>FIP 的好处——它把"<em>开覆盖</em>" 这种"<em>跨集合的整体</em>" 描述，变成"<em>闭集间的交</em>" 这种<em>代数</em> 描述。代数语言下紧致性更易和"<em>极大滤子</em>""<em>素理想</em>""<em>极大族</em>" 等概念挂钩——为<em>Tychonoff 定理</em>（"<em>任意紧致空间的积仍紧致</em>"）的证明铺路。</p>
+
+<p>这一章把 FIP 表述讲透并演示几个直接应用——嵌套区间定理、滤子收敛、紧致 + Hausdorff ⟹ normal——同时为下一章 Tychonoff 准备好"<em>FIP + Zorn 引理</em>" 这套工具。</p>
+
+<h2 id="sec15-1">15.1 FIP 定义</h2>
+
+<p><strong>定义 15.1 (有限交性质).</strong> 设 \(X\) 是集合。集合族 \(\mathcal{F} = \{F_\alpha\}_{\alpha \in I} \subseteq \mathcal{P}(X)\) 称为有<em>有限交性质</em>（FIP）如果<em>每个</em> 有限子族 \(F_{\alpha_1}, \ldots, F_{\alpha_n}\) 满足</p>
+
+<p>\[
+\bigcap_{i=1}^n F_{\alpha_i} \neq \emptyset.
+\]</p>
+
+<p>注意 FIP 只要求<em>有限</em> 交非空，不要求<em>总交</em>。下面这例可分清。</p>
+
+<p><strong>例 15.2.</strong> 在 \(\mathbb{R}\) 上，闭集族 \(\{[n, \infty) : n = 1, 2, \ldots\}\)。每个有限子族 \([n_1, \infty), \ldots, [n_k, \infty)\) 的交 \(= [\max n_i, \infty) \neq \emptyset\)——FIP。但<em>总</em>交 \(\bigcap_n [n, \infty) = \emptyset\)（任何 \(x \in \mathbb{R}\) 不在 \([n, \infty)\) 当 \(n > x\)）。</p>
+
+<p>这条族 FIP 但总交空——这<em>不</em>会发生在紧致空间里。这就是下一节的主结论。</p>
+
+<p><strong>例 15.3.</strong> 嵌套闭集 \(F_1 \supseteq F_2 \supseteq F_3 \supseteq \cdots\)。任何有限子族的交 \(= F_{\max n_i} \neq \emptyset\)（如每 \(F_n\) 非空）——FIP 等价"<em>每个 \(F_n\) 非空</em>"。这种"<em>嵌套</em>" 是 FIP 最常见形态。</p>
+
+<h2 id="sec15-2">15.2 紧致 ⟺ FIP 总交非空</h2>
+
+<p>主等价定理。</p>
+
+<p><strong>定理 15.4 (紧致的 FIP 刻画).</strong> 拓扑空间 \(X\) 紧致 \(\iff\) <em>每个</em> 闭集族 \(\{F_\alpha\}\) 若有 FIP，则 \(\bigcap_\alpha F_\alpha \neq \emptyset\)。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>设 \(P\) 表"\(X\) 紧致"，\(Q\) 表"FIP 闭集族总交非空"。证 \(P \iff Q\)。</p>
+
+<p>(<em>直接 De Morgan 翻译</em>)。\(P\) 等价"<em>每个开覆盖有有限子覆盖</em>"，逆否"<em>如果开集族无有限子覆盖，则不是覆盖</em>"——即"<em>如果开集族 \(\{U_\alpha\}\) 满足: 每个有限子族不覆盖 \(X\)，则 \(\{U_\alpha\}\) 不覆盖 \(X\)</em>"。</p>
+
+<p>"<em>有限子族 \(\{U_{\alpha_i}\}_{i=1}^k\) 不覆盖 \(X\)</em>" \(\iff\) \(\bigcup_{i=1}^k U_{\alpha_i} \neq X\) \(\iff\) \(\bigcap_{i=1}^k (X \setminus U_{\alpha_i}) \neq \emptyset\) \(\iff\) 闭集族 \(\{X \setminus U_{\alpha_i}\}\) 的<em>有限</em>交非空——即 \(\{X \setminus U_\alpha\}\) FIP（任何有限子族有限交非空）。</p>
+
+<p>"<em>\(\{U_\alpha\}\) 不覆盖 \(X\)</em>" \(\iff\) \(\bigcup_\alpha U_\alpha \neq X\) \(\iff\) \(\bigcap_\alpha (X \setminus U_\alpha) \neq \emptyset\)——闭集族总交非空。</p>
+
+<p>所以 \(P\) \(\iff\) "<em>FIP 闭集族（来自开覆盖的补）总交非空</em>"。但<em>每个</em> 闭集族 \(\{F_\alpha\}\) 都对应开集族 \(\{X \setminus F_\alpha\}\)（一一对应）——所以条件能扩到"<em>每个</em> FIP 闭集族总交非空"，即 \(Q\)。\(\blacksquare\)</p>
+
+<p>这条定理在下一章证明 Tychonoff 时是<em>关键</em>——"<em>验证总交非空</em>" 比"<em>验证开覆盖有有限子覆盖</em>" 在<em>积空间</em> 里更易处理。</p>
+
+<h2 id="sec15-3">15.3 完整证明的拼接</h2>
+
+<p>把 15.2 的对偶论证写成"<em>正向 \(\Rightarrow\)</em>" 与"<em>反向 \(\Leftarrow\)</em>" 两段，让逻辑结构透明。</p>
+
+<p><strong>(\(\Rightarrow\)) 设 \(X\) 紧致，\(\{F_\alpha\}\) FIP 闭集族。证 \(\bigcap F_\alpha \neq \emptyset\)。</strong></p>
+
+<p>反证：假设 \(\bigcap_\alpha F_\alpha = \emptyset\)。取补：\(\bigcup_\alpha (X \setminus F_\alpha) = X\)，即开集族 \(\{X \setminus F_\alpha\}\) 是 \(X\) 的开覆盖。由 \(X\) 紧致取有限子覆盖 \((X \setminus F_{\alpha_1}), \ldots, (X \setminus F_{\alpha_n})\)，即 \(\bigcup_{i=1}^n (X \setminus F_{\alpha_i}) = X\)，取补 \(\bigcap_{i=1}^n F_{\alpha_i} = \emptyset\)。但 \(\{F_\alpha\}\) FIP——有限交非空。矛盾。所以 \(\bigcap F_\alpha \neq \emptyset\)。\(\checkmark\)</p>
+
+<p><strong>(\(\Leftarrow\)) 设 \(X\) 满足"<em>FIP 闭集族总交非空</em>"。证 \(X\) 紧致。</strong></p>
+
+<p>给 \(X\) 的任意开覆盖 \(\{U_\alpha\}\)。要找有限子覆盖。反证：假设无有限子覆盖。即对每个有限子族 \(U_{\alpha_1}, \ldots, U_{\alpha_n}\) 有 \(\bigcup_i U_{\alpha_i} \neq X\)，即 \(\bigcap_i (X \setminus U_{\alpha_i}) \neq \emptyset\)。所以 \(\{X \setminus U_\alpha\}\) 是 FIP 闭集族（有限交非空）。由假设总交 \(\bigcap_\alpha (X \setminus U_\alpha) \neq \emptyset\)。取补 \(\bigcup_\alpha U_\alpha \neq X\)——\(\{U_\alpha\}\) 不覆盖 \(X\)。矛盾。所以有限子覆盖存在。\(\checkmark\)\(\blacksquare\)</p>
+
+<p>把这两段并起来就是 15.2 的完整证明。结构上它就是 De Morgan + 反证。</p>
+
+<h2 id="sec15-4">15.4 应用一：嵌套闭区间定理</h2>
+
+<p>FIP 形式让"<em>嵌套闭集</em>" 总交非空成为<em>立刻</em>定理。</p>
+
+<p><strong>定理 15.5 (Cantor 嵌套区间定理).</strong> 设 \([a_1, b_1] \supseteq [a_2, b_2] \supseteq \cdots\) 是 \(\mathbb{R}\) 上嵌套闭区间。则</p>
+
+<p>\[
+\bigcap_{n=1}^\infty [a_n, b_n] \neq \emptyset.
+\]</p>
+
+<p>事实上，如果 \(b_n - a_n \to 0\)，则 \(\bigcap_n [a_n, b_n] = \{x_*\}\) 单点。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>所有 \([a_n, b_n] \subseteq [a_1, b_1]\)（嵌套）。\([a_1, b_1]\) 紧致（Heine-Borel, 14.3）。</p>
+
+<p>每个 \([a_n, b_n]\) 闭（在 \(\mathbb{R}\) 中, 也在 \([a_1, b_1]\) 子空间中）。族 \(\{[a_n, b_n] : n \geq 1\}\) 嵌套——任何有限子族的交 \(= [a_{\max n_i}, b_{\max n_i}] \neq \emptyset\)（每个区间非空 \(a_n \leq b_n\)）。FIP。</p>
+
+<p>由 15.2 (\(\Rightarrow\))，\(\bigcap_n [a_n, b_n] \neq \emptyset\)。\(\checkmark\)</p>
+
+<p>(单点情形)。若 \(b_n - a_n \to 0\) 与 \(x, y \in \bigcap [a_n, b_n]\)，则 \(|x - y| \leq b_n - a_n \to 0\) 即 \(x = y\)。\(\blacksquare\)</p>
+
+<p>这条定理在<em>实分析</em> 里是<em>实数完备性</em> 的另一种表述。也是数值方法里"<em>二分法</em>"（<a href="../数值方法/ch6.html">数值方法 ch6</a>）收敛的根据——\([a_n, b_n]\) 嵌套且长度 \(\to 0\)，故收敛到唯一的根。</p>
+
+<p>更广：在<em>任何紧致 Hausdorff</em> 空间里嵌套非空闭集的总交非空。这是 Hausdorff 假设让"<em>极限唯一</em>" 适用的场合。</p>
+
+<h2 id="sec15-5">15.5 应用二：紧致 Hausdorff 上每个滤子收敛</h2>
+
+<p>"<em>滤子</em>"（filter）是序列在抽象拓扑里的推广。它把"<em>趋近</em>" 的概念抽象成<em>集族单调性</em>。这一节用 FIP 给出紧致 + Hausdorff 下的滤子收敛性。</p>
+
+<p><strong>定义 15.6 (滤子).</strong> 集合 \(X\) 上的<em>滤子</em> \(\mathcal{F}\) 是 \(\mathcal{P}(X)\) 的子族满足：</p>
+
+<ul>
+  <li>\(\emptyset \notin \mathcal{F}\)；\(X \in \mathcal{F}\)。</li>
+  <li>\(A, B \in \mathcal{F} \Rightarrow A \cap B \in \mathcal{F}\)。</li>
+  <li>\(A \in \mathcal{F}, A \subseteq B \Rightarrow B \in \mathcal{F}\)。</li>
+</ul>
+
+<p><em>极大滤子</em>（ultrafilter）即在所有滤子中是包含序的<em>极大</em> 元（不能再扩大不破坏滤子公理）。Zorn 引理保证极大滤子存在。</p>
+
+<p>极大滤子的关键性质：对每个 \(A \subseteq X\)，要么 \(A \in \mathcal{F}\) 要么 \(X \setminus A \in \mathcal{F}\)。</p>
+
+<p><strong>定义 15.7 (滤子收敛).</strong> 在拓扑空间 \(X\) 上，滤子 \(\mathcal{F}\) <em>收敛</em> 到 \(x \in X\) 如果 \(x\) 的每个开邻域 \(U\) 在 \(\mathcal{F}\) 中。</p>
+
+<p><strong>定理 15.8 (紧致刻画).</strong> 拓扑空间 \(X\) 紧致 \(\iff\) 每个 \(X\) 上的极大滤子收敛到某点。</p>
+
+<p>(在 Hausdorff 下"<em>收敛到唯一点</em>"——任何收敛极限被 Hausdorff 强制唯一。)</p>
+
+<p><strong>证明。</strong></p>
+
+<p>(\(\Rightarrow\))。设 \(X\) 紧致, \(\mathcal{F}\) 极大滤子。考虑闭集族 \(\{\overline{A} : A \in \mathcal{F}\}\)。每个有限子族 \(\overline{A_1}, \ldots, \overline{A_n}\) 的交 \(\supseteq \overline{A_1 \cap \cdots \cap A_n}\)（因 \(A_1 \cap \cdots \cap A_n \in \mathcal{F}\) 由 \(\mathcal{F}\) 滤子, 而 \(A_i \cap \cdots\) 非空 \(\Rightarrow\) 闭包非空），是 FIP。由 15.2 总交 \(\bigcap_{A \in \mathcal{F}} \overline{A} \neq \emptyset\)，取 \(x\) 在其中。</p>
+
+<p>证 \(\mathcal{F}\) 收敛到 \(x\)。给 \(x\) 的开邻域 \(U\)。对每个 \(A \in \mathcal{F}\)，\(x \in \overline{A}\) 意味 \(U \cap A \neq \emptyset\)（开邻域定义闭包）——所以 \(U\) 与每个 \(A \in \mathcal{F}\) 相交。由<em>极大</em>性 \(U \in \mathcal{F}\)（极大滤子的"<em>与每个滤子元素相交即在滤子中</em>" 等价于极大）。所以 \(\mathcal{F}\) 收敛到 \(x\)。\(\checkmark\)</p>
+
+<p>(\(\Leftarrow\))。设每个极大滤子收敛。要证 \(X\) 紧致——给 FIP 闭集族 \(\{F_\alpha\}\)，证 \(\bigcap F_\alpha \neq \emptyset\)。</p>
+
+<p>族 \(\{F_\alpha\}\) 由 FIP 生成滤子（取所有"<em>含某有限交</em> \(\bigcap_{i \in J} F_{\alpha_i}\) <em>的子集</em>"）。由 Zorn 扩到极大滤子 \(\mathcal{F}\)，\(\mathcal{F}\) 仍含每个 \(F_\alpha\)。\(\mathcal{F}\) 收敛到某 \(x\)。则 \(x\) 的每个开邻域 \(U \in \mathcal{F}\)，特别 \(U \cap F_\alpha \neq \emptyset\)（两者都在 \(\mathcal{F}\) 不可空交），即 \(x \in \overline{F_\alpha} = F_\alpha\)（\(F_\alpha\) 闭）。所以 \(x \in \bigcap F_\alpha\)，非空。\(\checkmark\)\(\blacksquare\)</p>
+
+<p>这条等价是<em>极大滤子收敛</em> 与<em>紧致</em> 的核心连接，也是下一章 Tychonoff 定理的<em>主</em> 工具。</p>
+
+<h2 id="sec15-6">15.6 应用三：紧致 Hausdorff ⟹ Normal</h2>
+
+<p>把<a href="ch12.html">第 12 章</a>(12.7) 提到但未证的事补完。</p>
+
+<p><strong>定理 15.9.</strong> 设 \(X\) 紧致 + Hausdorff。则 \(X\) normal（即 \(T_4\)）。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>\(T_1\)：紧致 + Hausdorff \(\Rightarrow\) Hausdorff \(\Rightarrow T_1\)（12.7）。</p>
+
+<p>正规性："<em>两不交闭集 \(F, G\) 有不交开邻域</em>"。</p>
+
+<p><em>第一步：单点 vs 闭集分开</em>（regular）。固定 \(p \in X\)，\(C \subseteq X\) 闭、\(p \notin C\)。要找不交开 \(U \ni p, V \supseteq C\)。</p>
+
+<p>\(C\) 是紧致空间 \(X\) 的闭子集——紧致（14.5）。</p>
+
+<p>对每个 \(c \in C\)：由 Hausdorff 取不交开 \(U_c \ni p, V_c \ni c\)。\(\{V_c\}_{c \in C}\) 是 \(C\) 的开覆盖（在 \(X\) 中开族）。由 \(C\) 紧致取有限子覆盖 \(V_{c_1}, \ldots, V_{c_n}\)。则 \(V := V_{c_1} \cup \cdots \cup V_{c_n}\) 开 \(\supseteq C\)，且 \(U := U_{c_1} \cap \cdots \cap U_{c_n}\) 开含 \(p\) 不交于 \(V\)（每 \(U_{c_i} \cap V_{c_i} = \emptyset\) 且 \(U \subseteq U_{c_i}\)）。\(\checkmark\)</p>
+
+<p><em>第二步：两闭集分开</em>（normal）。给 \(F, G\) 不交闭。\(F, G\) 都紧致。</p>
+
+<p>对每个 \(p \in F\)：由第一步（\(p\) vs \(G\)）取不交开 \(U_p \ni p, V_p \supseteq G\)。\(\{U_p\}_{p \in F}\) 是 \(F\) 的开覆盖。由 \(F\) 紧致取有限子覆盖 \(U_{p_1}, \ldots, U_{p_m}\)。设 \(U := U_{p_1} \cup \cdots \cup U_{p_m}\) 开 \(\supseteq F\)，\(V := V_{p_1} \cap \cdots \cap V_{p_m}\) 开 \(\supseteq G\)。\(U \cap V = \emptyset\)（每 \(U_{p_j} \cap V_{p_j} = \emptyset\) 且 \(V \subseteq V_{p_j}\) 故 \(U_{p_j} \cap V \subseteq U_{p_j} \cap V_{p_j} = \emptyset\)，再取并 \(U \cap V = \bigcup_j (U_{p_j} \cap V) = \emptyset\)）。\(\checkmark\)\(\blacksquare\)</p>
+
+<p>这条定理把"<em>紧致 + Hausdorff</em>" 推到分离阶梯<em>顶端</em>。结合 \(T_4\) 的好处（Urysohn 引理 → 连续函数 → 度量化），它告诉我们：<em>紧致 Hausdorff 空间</em> 是拓扑学里的"<em>金牌</em>" 配置——所有标准工具都能在它上面作用。</p>
+
+<p>典型例子：</p>
+
+<ul>
+  <li>\([a, b]\) 在 \(\mathbb{R}\) 中——紧 + Hausdorff，故 normal。</li>
+  <li>\(S^n\) 球面、\(T^n\) 环面、\(\mathbb{RP}^n\) 实射影空间——紧 Hausdorff（有限维流形 + 紧）故 normal。</li>
+  <li>有限离散空间——紧 Hausdorff，自动 normal。</li>
+  <li>Stone-Čech 紧致化 \(\beta X\) of 任意 Tychonoff 空间——紧 Hausdorff。</li>
+</ul>
+
+<p>反例：紧致<em>非</em> Hausdorff 时不一定 normal。比如某些 Sierpiński 类小空间紧（有限）但不 Hausdorff，不一定 normal。</p>
+
+<h2 id="sec15-7">15.7 序列紧 vs 紧致再例：\(\omega_1 + 1\)</h2>
+
+<p>回到<a href="ch14.html">14.7</a> 的"<em>紧致 vs 序列紧</em>" 区分，看一个不需要 Tychonoff 的简洁反例。</p>
+
+<p>设 \(\omega_1\) 是第一不可数序数，\(\omega_1 + 1 = [0, \omega_1]\) 配序拓扑（开集由开区间 \((\alpha, \beta)\) 与端点开区间 \([0, \beta), (\alpha, \omega_1]\) 生成）。</p>
+
+<p><strong>性质 15.10.</strong> \(\omega_1 + 1\) 紧致 + 序列紧 + Hausdorff。</p>
+
+<p><em>序列紧</em>。任何序列 \((\alpha_n)\) 在 \([0, \omega_1]\)。如果某子列 \(\to \omega_1\)，搞定。否则 \(\sup \alpha_n < \omega_1\)（因 \(\{\alpha_n\}\) 可数集，可数序数在 \(\omega_1\) 中有可数上界），子列在 \([0, \sup \alpha_n]\) 中——序拓扑下闭集，紧致（任何 \([0, \beta]\) 紧致 by 序紧——具体见 Munkres §27）。子列有收敛子子列。</p>
+
+<p><em>紧致</em>。\(\omega_1 + 1 = [0, \omega_1]\) 是<em>序紧</em>（well-ordered + 上下确界）所以紧致。</p>
+
+<p>反过来：<em>开</em> 子区间 \(\omega_1 = [0, \omega_1)\) 不紧但<em>序列紧</em>。</p>
+
+<p><em>序列紧</em>（同上论证：序列在 \([0, \omega_1)\) 有可数上界 \(\sup \alpha_n < \omega_1\)，故子列在 \([0, \sup]\) 收敛）。</p>
+
+<p><em>不紧</em>。开覆盖 \(\{[0, \alpha) : \alpha < \omega_1\}\) 没有限子覆盖：有限多 \([0, \alpha_1), \ldots, [0, \alpha_k)\) 并 \(= [0, \max \alpha_i) \subsetneq \omega_1\)（\(\max \alpha_i\) 仍在 \(\omega_1\) 内）。</p>
+
+<p>所以 \(\omega_1\)（开端 \([0, \omega_1)\)）<em>序列紧但非紧致</em>。</p>
+
+<p>这给一般空间里"<em>序列紧 ≠ 紧致</em>" 的<em>具体</em> 反例。在<em>度量</em>空间下两者等价（14.8），但在<em>序拓扑</em> 等非度量场合两者真不同。</p>
+
+<h2 id="sec15-8">15.8 准备 Tychonoff 定理</h2>
+
+<p>本章是为下一章<em>Tychonoff 定理</em> 做的"<em>武器准备</em>"。Tychonoff 说：</p>
+
+<p>\[
+\boxed{\ \prod_{\alpha \in I} X_\alpha \text{ 紧致} \iff \text{每个 } X_\alpha \text{ 紧致}.\ }
+\]</p>
+
+<p>对<em>任意</em> 索引集 \(I\)（含不可数）。</p>
+
+<p>这条定理是<em>拓扑学</em> 最深的定理之一——它<em>等价</em> 于<em>选择公理</em>（Kelley 1950）。证明的标准工具：</p>
+
+<ol>
+  <li><em>FIP 表述</em>（本章 15.2）——把"<em>紧致</em>" 翻成"<em>FIP 闭集族总交非空</em>"。</li>
+  <li><em>极大滤子收敛</em>（本章 15.5）——"<em>紧致 \(\iff\) 每极大滤子收敛</em>"。</li>
+  <li><em>Zorn 引理</em>——保证极大滤子存在。</li>
+  <li><em>积空间的极大滤子投影</em>——\(\mathcal{F}\) 极大滤子 in \(\prod X_\alpha\)，则其投影 \(\pi_\alpha(\mathcal{F})\) 是 \(X_\alpha\) 上的极大滤子（这一步需要选择公理选择 \(\pi_\alpha(\mathcal{F})\) 的收敛点）。</li>
+</ol>
+
+<p>下一章把这套工具组合起来证 Tychonoff。本章的 FIP + 滤子构造是<em>关键基石</em>——你看到证明里"<em>取极大滤子</em>" 的瞬间就知道是谁在背后工作。</p>
+
+<h2 id="sec15-9">15.9 临别话</h2>
+
+<p>本章把紧致从"<em>开覆盖</em>" 翻成"<em>FIP 闭集族</em>"，看起来只是 De Morgan 重写——其实<em>翻译</em> 让证明工具升级。</p>
+
+<ul>
+  <li><em>嵌套闭集定理</em>——一行 FIP。</li>
+  <li><em>滤子收敛</em>——FIP + Zorn 给"<em>每极大滤子收敛</em>"。</li>
+  <li><em>紧致 + Hausdorff ⟹ normal</em>——用紧致<em>反复</em>"<em>有限化</em>"，把"<em>每点 vs 每点 vs 每点</em>" 这种不可数过程缩成有限。</li>
+</ul>
+
+<p>这个"<em>反复有限化</em>" 是紧致论证的<em>套路</em>。今后你每次看到"<em>由紧致取有限子覆盖</em>"，要意识到背后是 FIP + 选择某种"<em>极小</em>" 子集合的过程。</p>
+
+<p>下一章我们用本章工具证明 Tychonoff——"<em>任意紧致空间的积仍紧致</em>"。这是抽象拓扑里最具深度的定理之一，它的成立<em>等价于</em>选择公理。我们将看到 FIP + 极大滤子的力量在<em>不可数</em> 索引下完整展开。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 紧致性</a><a href="ch16.html">下一章 · 第 16 章 Tychonoff 定理 →</a></nav>
+</main>
+</body>
+</html>

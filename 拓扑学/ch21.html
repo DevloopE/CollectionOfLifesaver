@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 Urysohn 度量化定理 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 Urysohn 引理与 Tietze 延拓</a><a href="ch22.html">下一章 · 第 22 章 完备度量空间与 Baire 范畴 →</a></nav>
+<h1 id="ch21">第 21 章 Urysohn 度量化定理</h1>
+
+<p>请你回到本书<a href="ch1.html">第 1 章</a>那条核心观察——"<em>开集</em>"才是连续的本质，"<em>距离</em>"只是一种<em>构造</em> 开集的<em>实现</em>。这条观察打开了拓扑学，但也立刻引出一个反方向的问题：</p>
+
+<p><em>哪些拓扑空间能反过来配上一个距离</em>，使距离诱导的拓扑恰好等于<em>原来</em>的拓扑？</p>
+
+<p>这就是<em>度量化问题</em>（metrization problem）。它问的是"<em>抽象拓扑</em>" 与"<em>度量拓扑</em>" 之间的边界——什么样的拓扑空间被允许"<em>反向回到度量世界</em>"。</p>
+
+<p>Urysohn 在 1925 年给了一个<em>充分</em> 条件：第二可数（有可数基）+ T4（正规 + Hausdorff）\(\Rightarrow\) 可度量化。这条定理的证明<em>非常美</em>——它用 <a href="ch20.html">Urysohn 引理</a>造出一族<em>可数</em>多连续函数，把空间嵌入 <em>Hilbert 立方体</em> \([0, 1]^\mathbb{N}\)，再从那里拉回度量。完整的度量化刻画（必要 + 充分）由 Bing、Nagata、Smirnov 在 1950 年代独立完成，复杂得多，本章末仅陈述。</p>
+
+<h2 id="sec21-1">21.1 度量化问题</h2>
+
+<p>形式化地——拓扑空间 \((X, \tau)\) 称为<em>可度量化</em>（metrizable），如果存在 \(X\) 上一个度量 \(d\)，使 \(d\) 诱导的拓扑 \(\tau_d\) 恰好等于 \(\tau\)。</p>
+
+<p>这是一条<em>存在性</em>问题——<em>是否</em> 存在度量；不是构造性的——找<em>哪个</em> 度量不重要，能找到一个就行。</p>
+
+<p>典型已知可度量化空间：</p>
+
+<ul>
+  <li>\(\mathbb{R}^n\)：标准欧氏度量，</li>
+  <li>任何 Banach 空间：范数度量，</li>
+  <li>所有<em>有限</em>离散空间：离散度量 \(d(x, y) = 1\) for \(x \neq y\)，</li>
+  <li>有理数 \(\mathbb{Q}\)、Cantor 集 \(C\)：从 \(\mathbb{R}\) 子空间继承度量。</li>
+</ul>
+
+<p>典型已知<em>不</em>可度量化空间（本章 21.6, 21.7 讲）：</p>
+
+<ul>
+  <li>"<em>长直线</em>"\(L\)（虽 T4 + 局部欧氏，但<em>不</em>第二可数），</li>
+  <li>Sorgenfrey 直线 \(\mathbb{R}_\ell\)（虽 T5 + 第一可数 + 可分，但乘积 \(\mathbb{R}_\ell^2\) 病理），</li>
+  <li>余有限拓扑（不 Hausdorff，<a href="ch1.html">ch1</a>）。</li>
+</ul>
+
+<h2 id="sec21-2">21.2 必要条件——度量空间长什么样</h2>
+
+<p>要找充分条件，先盘点<em>必要</em> 条件——度量空间<em>必然</em> 满足什么拓扑性质？这帮我们对"<em>能度量化</em>" 有最低标准。</p>
+
+<p><strong>命题（度量空间的拓扑性质）。</strong>设 \((X, d)\) 是度量空间。则</p>
+
+<ol>
+  <li>\(X\) 是 Hausdorff（T2），事实上更强——T4（正规）+ T1。</li>
+  <li>\(X\) 是<em>第一可数</em>——每点 \(x\) 有可数邻域基（取 \(\{B(x, 1/n)\}_{n \geq 1}\)）。</li>
+  <li>\(X\) 是<em>完全正规</em>（T5）。</li>
+</ol>
+
+<p><em>证明（草图）</em>。(1) Hausdorff——\(x \neq y\)，取 \(r = d(x, y)/2\)，开球 \(B(x, r)\) 与 \(B(y, r)\) 不交。T4——给两个不交闭集 \(A, B\)，用 \(d(\cdot, A)\) 与 \(d(\cdot, B)\)（<a href="ch20.html">ch20.1</a>）定义</p>
+
+<p>\[
+U := \{x : d(x, A) < d(x, B)\}, \qquad V := \{x : d(x, B) < d(x, A)\},
+\]</p>
+
+<p>\(U, V\) 不交开集（连续函数严格不等的解集开），\(A \subseteq U\)（\(A\) 上 \(d(x, A) = 0 < d(x, B)\)，因 \(A \cap B = \emptyset\)），\(B \subseteq V\) 同理。\(\checkmark\)</p>
+
+<p>(2) 第一可数——\(\{B(x, 1/n)\}_n\) 是可数邻域基。\(\checkmark\)</p>
+
+<p>(3) T5（完全正规）即每对<em>分离子集</em>能被不交开集分开（"分离" 即互不<em>属于</em> 对方闭包）。度量空间满足，证明类似 T4 但用集距离。</p>
+
+<p>所以一个空间要可度量化，<em>至少</em>得 T4 + 第一可数。但这两条<em>不够</em>——下面 21.7 会看 Sorgenfrey 直线满足这两条但不可度量化。</p>
+
+<h2 id="sec21-3">21.3 Urysohn 度量化定理：陈述</h2>
+
+<p><strong>Urysohn 度量化定理。</strong>设拓扑空间 \(X\) 是<em>第二可数</em>（有可数拓扑基）+ T4 + Hausdorff。则 \(X\) 可度量化。</p>
+
+<p>请注意条件——<em>第二可数</em>（不是第一可数！）+ T4 + Hausdorff。第二可数是比第一可数<em>强</em> 得多的条件——它要求<em>整个</em> 拓扑只用可数多开集生成，而不只是每点局部可数。</p>
+
+<p>第二可数的常用例子：\(\mathbb{R}^n\)（用开有理球——可数多）；任何<em>可分</em> 度量空间（可分 + 度量 \(\Rightarrow\) 第二可数）；任何离散<em>可数</em> 集。</p>
+
+<p>反例：\(\ell^\infty\)（有界数列空间，标准范数）<em>不</em> 第二可数（虽然度量），所以"第二可数" 比"度量" 严格强一些。Urysohn 定理给出的是"<em>第二可数</em>" 这一<em>子类</em>的度量化。</p>
+
+<p>更精确——"<em>第二可数 + T4 + T1</em>" 等价于"<em>可分 + 可度量化</em>"。这是 Urysohn 定理的精确等价表述。</p>
+
+<h2 id="sec21-4">21.4 证明思路：嵌入 Hilbert 立方体</h2>
+
+<p>整个证明的<em>策略</em>——<em>嵌入</em>。如果能把 \(X\) 嵌入一个已知度量空间 \(Y\) 作为子空间，那 \(X\) 就<em>继承</em> 了 \(Y\) 的度量。</p>
+
+<p>选哪个 \(Y\)？候选——<em>Hilbert 立方体</em></p>
+
+<p>\[
+Q := [0, 1]^\mathbb{N} = \{(x_1, x_2, \ldots) : x_i \in [0, 1]\}
+\]</p>
+
+<p>带积拓扑（<a href="ch11.html">ch11 Tychonoff</a>）。这是一个紧致 Hausdorff 空间，并且<em>可度量化</em>——例如</p>
+
+<p>\[
+d_Q\big((x_i), (y_i)\big) := \sum_{i=1}^\infty \frac{|x_i - y_i|}{2^i}
+\]</p>
+
+<p>诱导的拓扑就是积拓扑（标准事实，用 \(\sum 2^{-i} = 1\) 收敛 + 逐项收敛 \(\iff\) 度量收敛验证）。</p>
+
+<p>嵌入方法——构造一族<em>可数</em> 多连续函数 \(\{f_n : X \to [0, 1]\}_{n \geq 1}\)，让</p>
+
+<p>\[
+F : X \to Q, \qquad F(x) := (f_1(x), f_2(x), \ldots)
+\]</p>
+
+<p>是<em>嵌入</em>（同胚到像）。这要求 \(\{f_n\}\) <em>分离点</em>（\(F\) 单）+ <em>分离点与闭集</em>（\(F^{-1}\) 在像上连续）。</p>
+
+<p>这一族 \(\{f_n\}\) 怎么造？用 <a href="ch20.html">Urysohn 引理</a>——T4 + 第二可数<em>合在一起</em>恰好提供"<em>可数多对不交闭集 + 用 Urysohn 各造一个连续函数</em>"的能力。</p>
+
+<h2 id="sec21-5">21.5 完整证明</h2>
+
+<p>设 \(X\) 是第二可数 + T4 + T1。可数基记 \(\mathcal{B} = \{B_1, B_2, \ldots\}\)。我们要造嵌入 \(F : X \to Q\)。</p>
+
+<p><strong>第一步——选可数对 \((B_n, B_m)\)。</strong>考虑可数族</p>
+
+<p>\[
+\mathcal{P} := \{(B_n, B_m) : n, m \in \mathbb{N}, \overline{B_n} \subseteq B_m\}.
+\]</p>
+
+<p>\(\mathcal{P}\) <em>可数</em>（\(\mathbb{N} \times \mathbb{N}\) 的子集）。把 \(\mathcal{P}\) 重新编号成 \(\{(B_{n_k}, B_{m_k})\}_{k = 1}^\infty\)。</p>
+
+<p><strong>第二步——用 Urysohn 引理造 \(\{f_k\}\)。</strong>对每对 \((B_{n_k}, B_{m_k}) \in \mathcal{P}\)，\(\overline{B_{n_k}}\) 闭，\(B_{m_k}^c\) 闭，二者<em>不交</em>（因 \(\overline{B_{n_k}} \subseteq B_{m_k}\)）。Urysohn 给连续 \(f_k : X \to [0, 1]\) 使</p>
+
+<p>\[
+f_k|_{\overline{B_{n_k}}} = 0, \qquad f_k|_{B_{m_k}^c} = 1.
+\]</p>
+
+<p>等价——在 \(B_{m_k}\) 之外，\(f_k = 1\)；在 \(\overline{B_{n_k}} \subseteq B_{m_k}\) 上 \(f_k = 0\)。</p>
+
+<p><strong>第三步——验证 \(\{f_k\}\) 分离点与闭集。</strong>断言：对每个 \(x \in X\) 与每个含 \(x\) 的开集 \(U\)，存在某个 \(f_k\) 使 \(f_k(x) = 0\) 且 \(f_k|_{U^c} = 1\)。</p>
+
+<p><em>证明</em>。\(\{x\}\) 闭（T1），\(U^c\) 闭，二者不交。T4 给开集 \(V\) 使 \(\{x\} \subseteq V \subseteq \overline{V} \subseteq U\)（用 <a href="ch20.html">ch20.3</a> 等价）。</p>
+
+<p>\(\mathcal{B}\) 是基，存在 \(B_m \in \mathcal{B}\) 使 \(x \in B_m \subseteq U\)。再由 T4 + \(\{x\}\) 闭 + \(B_m\) 开取 \(V'\) 开使 \(x \in V' \subseteq \overline{V'} \subseteq B_m\)。再用 \(\mathcal{B}\) 是基取 \(B_n \in \mathcal{B}\) 使 \(x \in B_n \subseteq V'\)，所以 \(\overline{B_n} \subseteq \overline{V'} \subseteq B_m\)。</p>
+
+<p>所以 \((B_n, B_m) \in \mathcal{P}\)。对应某个 \(k\) 给 \(f_k\) 使 \(f_k|_{\overline{B_n}} = 0\)（包含 \(x\)，所以 \(f_k(x) = 0\)）且 \(f_k|_{B_m^c} = 1\)。\(B_m \subseteq U\) 即 \(U^c \subseteq B_m^c\)，所以 \(f_k|_{U^c} = 1\)。\(\checkmark\)</p>
+
+<p><strong>第四步——定义嵌入 \(F\)。</strong>令</p>
+
+<p>\[
+F : X \to Q, \qquad F(x) := (f_1(x), f_2(x), \ldots).
+\]</p>
+
+<p><em>连续</em>——每个分量 \(f_k\) 连续，所以到积拓扑的映射连续（积拓扑的定义就是"每个分量连续即整体连续"）。\(\checkmark\)</p>
+
+<p><em>单</em>——给 \(x \neq y\)，取 \(U := X \setminus \{y\}\) 开（T1，\(\{y\}\) 闭）含 \(x\)。第三步给 \(f_k\) 使 \(f_k(x) = 0\) 且 \(f_k(y) = 1\)（\(y \in U^c\)）。所以 \(F(x)_k = 0 \neq 1 = F(y)_k\)，\(F(x) \neq F(y)\)。\(\checkmark\)</p>
+
+<p><em>\(F^{-1}\) 在像上连续</em>——这是嵌入的最难一步。等价说"\(F\) 是<em>开映射到像</em>"，即 \(U\) 在 \(X\) 上开 \(\Rightarrow F(U)\) 在 \(F(X) \subseteq Q\) 上（相对）开。</p>
+
+<p>取 \(U \subseteq X\) 开，\(x \in U\)。要找 \(F(x)\) 在 \(F(X)\) 中的（相对）开邻域 \(W \cap F(X) \subseteq F(U)\)。</p>
+
+<p>第三步给 \(f_k\) 使 \(f_k(x) = 0\) 且 \(f_k|_{U^c} = 1\)。考虑 \(Q\) 上的开集</p>
+
+<p>\[
+W := \{(z_1, z_2, \ldots) \in Q : z_k < 1/2\}.
+\]</p>
+
+<p>\(W\) 是 \(Q\) 上开（\([0, 1/2)\) 是 \([0, 1]\) 开，乘以其余 \([0, 1]\)，积拓扑）。\(F(x) \in W\)（\(f_k(x) = 0 < 1/2\)）。</p>
+
+<p>断言 \(W \cap F(X) \subseteq F(U)\)。设 \(F(y) \in W\)，即 \(f_k(y) < 1/2\)。若 \(y \in U^c\) 则 \(f_k(y) = 1 \geq 1/2\)，矛盾。所以 \(y \in U\)，\(F(y) \in F(U)\)。\(\checkmark\)</p>
+
+<p>所以 \(F\) 是嵌入。<em>\(F : X \to F(X) \subseteq Q\) 是同胚到像</em>。</p>
+
+<p><strong>第五步——拉回度量。</strong>\(Q\) 上的度量 \(d_Q\) 限制到 \(F(X)\) 上是度量。\(F : X \to F(X)\) 是同胚。定义</p>
+
+<p>\[
+\boxed{\ d(x, y) := d_Q(F(x), F(y)) = \sum_{k=1}^\infty \frac{|f_k(x) - f_k(y)|}{2^k}.\ }
+\]</p>
+
+<p>这是 \(X\) 上度量（直接验证三公理 + 同胚保 \(d(x, y) = 0 \iff x = y\)），并且诱导拓扑等于原拓扑（因 \(F\) 是同胚）。所以 \(X\) 可度量化。\(\blacksquare\)</p>
+
+<p>请你停下来欣赏证明的<em>整体形状</em>：</p>
+
+<ol>
+  <li><em>第二可数</em>——可数基 \(\mathcal{B}\) 给可数族 \(\mathcal{P}\) 给可数族 \(\{f_k\}\)。第二可数是"<em>把"任意多函数" 减少到"可数多函数"</em>" 的关键。</li>
+  <li><em>T4 + Hausdorff</em>——Urysohn 引理给"<em>每对不交闭集对应一个连续函数</em>"。T4 是"<em>制造连续函数</em>" 的引擎。</li>
+  <li><em>合在一起</em>——可数多连续函数<em>分离点 + 分离点和闭集</em>，给嵌入到 \(Q\)。\(Q\) 是已知度量空间，所以 \(X\) 继承度量。</li>
+</ol>
+
+<p>这是一种"<em>把抽象空间嵌入一个具体的"模型"空间</em>" 的策略，在拓扑学、表示论里反复出现——例如可数 Hausdorff 群嵌入 \(U(\ell^2)\)、紧致 Hausdorff 空间嵌入 Tychonoff 立方体 \([0, 1]^I\) 等。</p>
+
+<h2 id="sec21-6">21.6 反例一：长直线不可度量化</h2>
+
+<p>"长直线" \(L\) 是把<em>不可数</em> 多个 \([0, 1)\) 拼起来——具体取良序集 \(\omega_1\)（最小不可数序数），令</p>
+
+<p>\[
+L := \omega_1 \times [0, 1) \quad \text{字典序拓扑}.
+\]</p>
+
+<p>"\((\alpha, t) < (\beta, s) \iff \alpha < \beta\) 或 (\(\alpha = \beta\) 且 \(t < s\))"。这空间像是<em>不可数</em>多条 \([0, 1)\) 首尾相接。</p>
+
+<p>它的奇怪性质：</p>
+
+<ul>
+  <li><em>局部</em>欧氏——每点有邻域同胚于 \(\mathbb{R}\) 的开区间。</li>
+  <li>Hausdorff、T4。</li>
+  <li>第一可数。</li>
+  <li>道路连通。</li>
+  <li><em>不</em>第二可数（任何拓扑基至少 \(\aleph_1\) 多元素）。</li>
+  <li><em>不</em>可分（任意可数子集都"<em>太短</em>"——它在某个 \([0, \alpha) \times [0, 1)\) 内，\(\alpha < \omega_1\)）。</li>
+</ul>
+
+<p><strong>断言：长直线<em>不</em>可度量化。</strong></p>
+
+<p><em>证明思路</em>。可度量化 \(\Rightarrow\) 任何连续函数 \(L \to [0, 1]\) 在<em>某点</em>取严格中间值（中间值定理需道路连通——这步不是问题）。但更细地——</p>
+
+<p>关键事实：长直线上<em>任何</em>连续函数 \(g : L \to \mathbb{R}\) 都<em>最终常值</em>——存在 \(\alpha_0 < \omega_1\) 使 \(g\) 在 \([\alpha_0, \omega_1) \times [0, 1)\) 上常值。</p>
+
+<p>原因（草图）：用 \(\omega_1\) 是<em>正则</em> 序数 + \(g\) 连续——若 \(g\) 在序数序列 \(\alpha_n \to \omega_1\) 上变化，但 \(\sup\{\alpha_n\}\) 在 \(\omega_1\) 内（任何 \(\omega_1\) 内的可数 \(\sup\) 仍在 \(\omega_1\) 内），导致 \(g\) 在那里有<em>极限</em>，限制了变化。</p>
+
+<p>所以 \(L\) 上连续函数<em>不分离</em> \(L\) 的远端两点（它们都映到同一极限值）。如果 \(L\) 可度量化，距离函数 \(d(\cdot, p)\) 对每个 \(p\) 是连续函数 \(L \to \mathbb{R}\)，所以也最终常值——但<em>距离</em> 函数最终常值意味着远处所有点到 \(p\) 距离相同，与"度量分离" 矛盾。所以 \(L\) 不可度量化。\(\blacksquare\)</p>
+
+<p>请欣赏这例子的<em>本质</em>：长直线是 T4 + Hausdorff，但<em>不</em> 第二可数——所以 Urysohn 度量化定理<em>不</em>适用，事实上结论不成立。这告诉我们 Urysohn 定理里的"<em>第二可数</em>" <em>不能去掉</em>。</p>
+
+<h2 id="sec21-7">21.7 反例二：Sorgenfrey 直线不可度量化</h2>
+
+<p>Sorgenfrey 直线 \(\mathbb{R}_\ell\) 是 \(\mathbb{R}\) 配<em>下界半开区间拓扑</em>——基为 \(\{[a, b) : a < b\}\)。</p>
+
+<p>性质：</p>
+
+<ul>
+  <li>Hausdorff（更强 T5/完全正规），</li>
+  <li>第一可数（\(\{[x, x + 1/n)\}_n\) 是 \(x\) 的可数邻域基），</li>
+  <li>可分（\(\mathbb{Q}\) 稠密），</li>
+  <li><em>不</em> 第二可数（任何基至少 \(\mathfrak{c} = 2^{\aleph_0}\) 多——每个 \([x, x + 1)\) 必须在基中含某个含 \(x\) 的元素，而这迫使不同的 \(x\) 用不同的基元），</li>
+  <li>Lindelöf（每开覆盖有可数子覆盖——这条非平凡）。</li>
+</ul>
+
+<p>注意 \(\mathbb{R}_\ell\) 是<em>第一可数 + 可分</em> 但<em>不</em>第二可数。在<em>度量</em> 空间里，可分 \(\Leftrightarrow\) 第二可数 \(\Leftrightarrow\) Lindelöf——这三条等价。所以一旦看到"<em>可分但不第二可数</em>"，可立刻断言"<em>不可度量化</em>"。\(\mathbb{R}_\ell\) 正是。</p>
+
+<p>但这个反例真正的<em>力量</em>在<em>乘积</em>——<em>Sorgenfrey 平面</em> \(\mathbb{R}_\ell^2\)：</p>
+
+<ul>
+  <li>\(\mathbb{R}_\ell\) 是<em>正规</em>，</li>
+  <li>但 \(\mathbb{R}_\ell^2\) 是<em>正规失败</em>！</li>
+</ul>
+
+<p>具体——\(\mathbb{R}_\ell^2\) 上"<em>反对角线</em>" \(\Delta := \{(x, -x) : x \in \mathbb{R}\}\) 是闭子集（用 \(\mathbb{R}_\ell^2\) 的拓扑验证），且作为子空间是离散且<em>不可数</em> 的。这件事用 cardinality argument 推出 \(\mathbb{R}_\ell^2\) <em>不</em> 正规——大致："不可数闭离散子集 + Lindelöf 失败 + 集合论计数 \(\Rightarrow\) 找到不交闭集分不开"。</p>
+
+<p>这告诉我们：<em>正规性<strong>不</strong>对乘积封闭</em>。这正是 Bing-Nagata-Smirnov 度量化里强化"<em>正规</em>" 为"<em>完全正规</em>" 的动机。</p>
+
+<h2 id="sec21-8">21.8 完整刻画：Bing–Nagata–Smirnov 度量化定理</h2>
+
+<p>把 Urysohn 度量化定理推到<em>必要 + 充分</em>，需要把"第二可数" 替换成更精细的"<em>\(\sigma\)-局部有限基</em>"。结果：</p>
+
+<p><strong>Bing–Nagata–Smirnov 度量化定理（1950 年代）。</strong>拓扑空间 \(X\) 可度量化 \(\iff\) \(X\) 是 T3（正则 Hausdorff）且有<em>\(\sigma\)-局部有限基</em>。</p>
+
+<p>"<em>\(\sigma\)-局部有限基</em>"指——拓扑基 \(\mathcal{B} = \bigcup_{n=1}^\infty \mathcal{B}_n\)，其中每个 \(\mathcal{B}_n\) 是<em>局部有限</em>族（每点有邻域只交 \(\mathcal{B}_n\) 的有限多元素）。</p>
+
+<p>这条件比第二可数<em>弱得多</em>——任何度量空间都满足（不必可分，例如不可数离散度量空间），所以是<em>必要</em>。它<em>充分</em> 也用类似 Urysohn 的嵌入策略，但嵌入到的是<em>不</em> 可分的"<em>分层</em>" 度量乘积。</p>
+
+<p>本书<em>不</em>证明 Bing–Nagata–Smirnov，留给后续课。Urysohn 版（第二可数 + T4 \(\Rightarrow\) 度量化）已经覆盖了大量实际遇到的情形——所有可分的 Banach 空间、所有第二可数流形、所有可数 CW 复形等。</p>
+
+<h2 id="sec21-9">21.9 临别话</h2>
+
+<p>度量化定理是<em>抽象拓扑</em> 通向<em>分析</em> 的<em>桥梁</em>——它告诉你哪些抽象拓扑空间能<em>退化</em> 回度量空间，从而能用所有度量分析的工具（Cauchy 序列、完备性、Banach 不动点、Lebesgue 积分）。</p>
+
+<p>Urysohn 版的两条假设——第二可数 + T4——分别对应"<em>大小可控</em>"和"<em>分离公理足够强</em>"。前者保证嵌入到的是<em>可数</em> 维度的乘积空间（\([0, 1]^\mathbb{N}\)），后者保证有"<em>足够多</em>" 连续函数实施嵌入。两条合在一起<em>恰好够</em>。</p>
+
+<p>反例（长直线、Sorgenfrey）告诉你这两条都<em>不能去</em>。这种"<em>正反两面</em>" 的研究——给出充分条件 + 给出违反任一条件的反例——是拓扑学典型的<em>定理 + 反例</em> 风格。每个看似无聊的反例背后都对应一种"<em>这里出了什么意外</em>" 的可视化场景。</p>
+
+<p>下一章<a href="ch22.html">ch22</a> 我们换一个角度——既然<em>度量空间</em> 这么重要，"<em>完备度量空间</em>" 这一<em>子类</em> 还有更深的拓扑性质：<em>Baire 范畴定理</em>。这条定理把"完备性"翻译成"<em>开稠集的可数交仍稠</em>"，给"<em>大多数</em>" 这种存在性论证提供统一工具，并通向<a href="../泛函分析/ch10.html">泛函分析三大原理</a>。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 Urysohn 引理与 Tietze 延拓</a><a href="ch22.html">下一章 · 第 22 章 完备度量空间与 Baire 范畴 →</a></nav>
+</main>
+</body>
+</html>

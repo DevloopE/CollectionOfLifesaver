@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 6 章 连续映射 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 闭集、内部、闭包、边界</a><a href="ch7.html">下一章 · 第 7 章 同胚与拓扑性质 →</a></nav>
+<h1 id="ch6">第 6 章 连续映射</h1>
+
+<p>ch1 把"<em>连续</em>" 重新定义成"<em>开集逆像是开集</em>"。那是一行话，没证细节，没列等价。这一章把那一行话<em>完整建立</em>——给出三条等价刻画、证它们彼此等价、检查度量空间情形下与 \(\varepsilon\)-\(\delta\) 一致、列几个标准例（恒等映射、常映射、复合）、然后给"<em>分块拼接</em>" 这条工程性引理（pasting lemma），最后拿一个 Sorgenfrey 例子把"<em>连续不连续高度依赖拓扑</em>" 这件事钉死。</p>
+
+<p>开头先给一句这章的核心提醒——你将看到拓扑里"连续" 和你以前学的<em>感觉一样</em>，但<em>定义路径完全反过来</em>：</p>
+
+<ul>
+  <li>分析里：先有距离 → 定义 \(\varepsilon\)-\(\delta\) → 证开集逆像开（推论）；</li>
+  <li>拓扑里：先有开集 → 定义"<em>开集逆像开</em>" 为<em>连续的定义</em> → 没有距离也能谈连续。</li>
+</ul>
+
+<p>这种"<em>反过来</em>" 让连续从"<em>极限保持</em>" 这种动态语言，转成"<em>开集结构保持</em>" 这种静态代数语言。本章最后一节 Sorgenfrey 反例最能体现这种代数化的力道。</p>
+
+<h2 id="sec6-1">6.1 连续的三条等价定义</h2>
+
+<p>设 \((X, \tau_X)\)、\((Y, \tau_Y)\) 是拓扑空间，\(f : X \to Y\) 是函数。我们要给"<em>f 连续</em>" 一个定义。三条候选：</p>
+
+<p><strong>定义 A（开集逆像）：</strong>对每个 \(V \in \tau_Y\)，\(f^{-1}(V) \in \tau_X\)。</p>
+
+<p><strong>定义 B（闭集逆像）：</strong>对每个 \(F \subseteq Y\) 闭，\(f^{-1}(F) \subseteq X\) 闭。</p>
+
+<p><strong>定义 C（点连续 + 邻域）：</strong>对每个 \(x \in X\) 和每个含 \(f(x)\) 的开 \(V \subseteq Y\)，存在含 \(x\) 的开 \(U \subseteq X\) 使 \(f(U) \subseteq V\)。</p>
+
+<p>三条等价。证之前先把每条<em>读懂</em>。</p>
+
+<p>定义 A 把"<em>整个映射的连续性</em>" 用<em>所有目标空间开集</em> 一次性说清，是<em>全局</em> 的语言。</p>
+
+<p>定义 B 是 A 的<em>对偶</em>——把开集换成闭集。两者间的桥是 \(f^{-1}(Y \setminus F) = X \setminus f^{-1}(F)\) 这条恒等式，保证开 \(\Leftrightarrow\) 闭。</p>
+
+<p>定义 C 是<em>点</em> 上的——"<em>f 在 x 连续</em>" \(\iff\) 对 \(f(x)\) 的每个邻域有 \(x\) 的邻域映进去。整个 \(f\) 连续 \(=\) 在每个点都连续。这是分析里 \(\varepsilon\)-\(\delta\) 的拓扑翻版（"对 \(f(x)\) 的每个 \(\varepsilon\) 邻域 \(\rightsquigarrow V\)、\(x\) 的某 \(\delta\) 邻域 \(\rightsquigarrow U\)"）。</p>
+
+<p>选哪个当"<em>正式定义</em>"？惯例 A——开集逆像最简短、最对称（从"开集是基本对象" 这条路出发自然）。其他两条作"<em>等价刻画</em>"。</p>
+
+<h2 id="sec6-2">6.2 三条等价的完整证明</h2>
+
+<p>依次证 A \(\Rightarrow\) B、B \(\Rightarrow\) A、A \(\Rightarrow\) C、C \(\Rightarrow\) A。</p>
+
+<p><strong>A \(\Rightarrow\) B：</strong> 取 \(F \subseteq Y\) 闭。\(Y \setminus F\) 开，由 A，\(f^{-1}(Y \setminus F)\) 开。但</p>
+<p>\[ f^{-1}(Y \setminus F) = \{x : f(x) \in Y \setminus F\} = \{x : f(x) \notin F\} = X \setminus f^{-1}(F). \]</p>
+<p>所以 \(X \setminus f^{-1}(F)\) 开 \(\Rightarrow f^{-1}(F)\) 闭。\(\square\)</p>
+
+<p><strong>B \(\Rightarrow\) A：</strong> 完全对称。取 \(V \subseteq Y\) 开，\(Y \setminus V\) 闭，由 B \(f^{-1}(Y \setminus V) = X \setminus f^{-1}(V)\) 闭，故 \(f^{-1}(V)\) 开。\(\square\)</p>
+
+<p><strong>A \(\Rightarrow\) C：</strong> 取 \(x \in X\) 与开 \(V \ni f(x)\)。设 \(U = f^{-1}(V)\)。由 A，\(U\) 开。\(x \in U\)（因 \(f(x) \in V\)）。\(f(U) = f(f^{-1}(V)) \subseteq V\)（一般 \(f(f^{-1}(V)) \subseteq V\)，\(f\) 满射时等号）。\(\square\)</p>
+
+<p><strong>C \(\Rightarrow\) A：</strong> 取 \(V \subseteq Y\) 开，要证 \(f^{-1}(V)\) 开。要做的就是<em>对每个 \(x \in f^{-1}(V)\) 找一个含它的开 \(U_x \subseteq f^{-1}(V)\)</em>——然后 \(f^{-1}(V) = \bigcup_{x \in f^{-1}(V)} U_x\) 是开集的并，开。</p>
+
+<p>取 \(x \in f^{-1}(V)\)，那 \(f(x) \in V\)。\(V\) 开含 \(f(x)\)。由 C，存在含 \(x\) 的开 \(U_x \subseteq X\) 使 \(f(U_x) \subseteq V\)，即 \(U_x \subseteq f^{-1}(V)\)。\(\square\)</p>
+
+<p>请你停下盯一下 C \(\Rightarrow\) A 的"<em>取并</em>" 技巧。这是<em>从局部开集装出全局开集</em> 的标准操作——后面 ch8 子空间、ch9 积空间里反复出现。</p>
+
+<p>所以下面"<em>f 连续</em>" 可以指上面任意一条；按场合选最方便的。</p>
+
+<h2 id="sec6-3">6.3 度量空间情形：与 \(\varepsilon\)-\(\delta\) 等价</h2>
+
+<p>把上面三条放到度量空间里检查——第四条等价该出现：</p>
+
+<p><strong>定义 D（度量 \(\varepsilon\)-\(\delta\)）：</strong>\(f : (X, d_X) \to (Y, d_Y)\) 在 \(x_0\) 连续 \(\iff\) \(\forall \varepsilon > 0, \exists \delta > 0, \forall x, d_X(x, x_0) < \delta \Rightarrow d_Y(f(x), f(x_0)) < \varepsilon\)。\(f\) 全空间连续 \(\iff\) 在每个点连续。</p>
+
+<p>证 D \(\iff\) C（在度量空间情形）。</p>
+
+<p><strong>D \(\Rightarrow\) C：</strong> 给 \(x_0\) 与开 \(V \ni f(x_0)\)。开集判定：\(\exists \varepsilon > 0\) 使开球 \(B_Y(f(x_0), \varepsilon) \subseteq V\)。由 D，\(\exists \delta > 0\)，\(d(x, x_0) < \delta \Rightarrow d(f(x), f(x_0)) < \varepsilon\)。设 \(U = B_X(x_0, \delta)\) 开，含 \(x_0\)，且 \(f(U) \subseteq B_Y(f(x_0), \varepsilon) \subseteq V\)。\(\checkmark\)</p>
+
+<p><strong>C \(\Rightarrow\) D：</strong> 给 \(x_0\) 与 \(\varepsilon > 0\)。\(V = B_Y(f(x_0), \varepsilon)\) 开含 \(f(x_0)\)。由 C，\(\exists\) 开 \(U \ni x_0\)，\(f(U) \subseteq V\)。\(U\) 开 \(\Rightarrow \exists \delta > 0, B_X(x_0, \delta) \subseteq U\)。所以 \(d(x, x_0) < \delta \Rightarrow x \in U \Rightarrow f(x) \in V \Rightarrow d(f(x), f(x_0)) < \varepsilon\)。\(\checkmark\)</p>
+
+<p>四条 (A, B, C, D) 在度量空间里两两等价。换句话说"<em>拓扑里的连续</em>" 是"<em>分析里的 \(\varepsilon\)-\(\delta\) 连续</em>" 的<em>真正推广</em>——前者退到度量空间正好就是后者。</p>
+
+<p>这是为什么 ch1 那一条等价（开集逆像 \(\Leftrightarrow \varepsilon\)-\(\delta\)）能<em>合法</em> 充当"连续" 在抽象空间里的定义。它<em>不</em> 是新概念，是把分析里熟悉的概念<em>用没有距离的语言</em> 重写一遍。</p>
+
+<h2 id="sec6-4">6.4 标准例子</h2>
+
+<p>下面三个例子是连续映射的"<em>骨架</em>"——所有更复杂的连续映射都从它们造出来。</p>
+
+<p><strong>例 6.4.1（常映射）。</strong>\(f : X \to Y\)，\(f(x) = c\)（恒为某 \(c \in Y\)）。<em>连续</em>。证：取 \(V \subseteq Y\) 开。两情况：(i) \(c \in V\)，\(f^{-1}(V) = X\) 开；(ii) \(c \notin V\)，\(f^{-1}(V) = \emptyset\) 开。\(\square\)</p>
+
+<p>"<em>常映射连续</em>" 是<em>每个</em> 拓扑空间都有的事实——不管 \(X, Y\) 多怪。这条平凡看似没用，但在各种证明里反复当垫脚石（比如造同伦时 ch23 用）。</p>
+
+<p><strong>例 6.4.2（恒等映射）。</strong>\(\mathrm{id} : X \to X\)，\(\mathrm{id}(x) = x\)。<em>连续</em>。证：每个开集 \(V \subseteq X\) 满足 \(\mathrm{id}^{-1}(V) = V\) 开。\(\square\)</p>
+
+<p>但<em>注意</em>：恒等映射的连续性<em>依赖两端的拓扑</em>。如果<em>两端拓扑不同</em>，恒等映射不一定连续！具体：\(\mathrm{id} : (X, \tau_1) \to (X, \tau_2)\) 连续 \(\iff \tau_2 \subseteq \tau_1\)（"<em>源拓扑比目标拓扑细</em>"）。</p>
+
+<p>这是 6.8 节 Sorgenfrey 反例的核心。</p>
+
+<p><strong>例 6.4.3（包含映射）。</strong>给 \(A \subseteq X\) 配子空间拓扑（\(U\) 开 in \(A\) \(\iff U = A \cap V\)，\(V\) 开 in \(X\)），<em>包含映射</em> \(\iota : A \hookrightarrow X\)（\(\iota(a) = a\)）连续。证：\(V \subseteq X\) 开，\(\iota^{-1}(V) = A \cap V\) 这正是子空间拓扑里的开集。\(\square\)</p>
+
+<p>包含映射是<em>子空间拓扑</em> 的定义性特征——子空间拓扑是<em>使包含连续</em> 的<em>最粗</em> 拓扑。这件事在 <a href="ch8.html">ch8 子空间</a> 里展开。</p>
+
+<p><strong>例 6.4.4（投影）。</strong>\(\pi_1 : X \times Y \to X\)，\(\pi_1(x, y) = x\)（积空间到分量）。<em>连续</em>（\(X \times Y\) 配积拓扑）。证延后到 ch9——积拓扑的定义就是"<em>使所有投影连续</em>" 的最粗拓扑。</p>
+
+<h2 id="sec6-5">6.5 复合连续</h2>
+
+<p><strong>命题。</strong>\(f : X \to Y, g : Y \to Z\) 都连续 \(\Rightarrow g \circ f : X \to Z\) 连续。</p>
+
+<p>证。取 \(W \subseteq Z\) 开。</p>
+<p>\[ (g \circ f)^{-1}(W) = f^{-1}(g^{-1}(W)). \]</p>
+<p>由 \(g\) 连续，\(g^{-1}(W) \subseteq Y\) 开。由 \(f\) 连续，\(f^{-1}(g^{-1}(W)) \subseteq X\) 开。\(\square\)</p>
+
+<p>一行半证完。请你停下欣赏这个简洁——分析里证"<em>复合连续</em>" 用 \(\varepsilon\)-\(\delta\) 要写大半页（"给 \(\varepsilon\) → 由 \(g\) 找 \(\eta\) → 由 \(f\) 找 \(\delta\) → 验证"）。拓扑版本只是把"<em>开</em>" 这个属性沿 \(g^{-1}\) 然后 \(f^{-1}\) 拉回来，<em>结构性</em> 操作。</p>
+
+<p>这就是"<em>开集逆像</em>" 这个定义的<em>代数威力</em>——它把拓扑性质转成<em>逆像运算</em> 下的不变性，而<em>逆像</em> 本身有大量平凡的代数恒等式（\(f^{-1}(\bigcup) = \bigcup f^{-1}\)、\(f^{-1}(\bigcap) = \bigcap f^{-1}\)、\(f^{-1}(Y \setminus F) = X \setminus f^{-1}(F)\)、\((g \circ f)^{-1} = f^{-1} \circ g^{-1}\)）。所有的连续性证明都是这些恒等式 + "开集对某种集合操作封闭" 的组合。</p>
+
+<p><strong>推论。</strong>"<em>拓扑空间 + 连续映射</em>" 构成一个<em>范畴</em>（叫 \(\mathbf{Top}\)）——单位元（恒等映射）连续、复合（一对连续映射的复合）连续。这是<em>范畴论视角</em> 进入拓扑的入口（<a href="ch23.html">ch23</a>基本群、同调群都是从 \(\mathbf{Top}\) 到群范畴的<em>函子</em>）。我们这本书不全展开范畴论，但请你记住"\(\mathbf{Top}\) 是范畴" 这个事实——它指引很多思考方向。</p>
+
+<h2 id="sec6-6">6.6 限制连续</h2>
+
+<p><strong>命题。</strong>\(f : X \to Y\) 连续，\(A \subseteq X\) 配子空间拓扑。则<em>限制</em> \(f|_A : A \to Y\)（定义 \(f|_A(a) = f(a)\)）连续。</p>
+
+<p>证。取 \(V \subseteq Y\) 开。\((f|_A)^{-1}(V) = \{a \in A : f(a) \in V\} = A \cap f^{-1}(V)\)。\(f^{-1}(V) \subseteq X\) 开（\(f\) 连续），所以 \(A \cap f^{-1}(V)\) 是子空间拓扑里的开集。\(\square\)</p>
+
+<p>同样一行半。"<em>限制连续</em>" 是<em>每个</em> 子集 \(A\) 都成立的——不要求 \(A\) 开 / 闭 / 任何特殊性质。</p>
+
+<p>这条性质对<em>多变量</em> 分析极有用。比如把 \(f(x, y)\) 限制在某条曲线 \(\gamma\) 上得 \(f|_\gamma\) 还连续，常用来构造反例（"限制到不同方向得不同极限 \(\Rightarrow\) 在原点不连续"）。</p>
+
+<p>更有意思的是<em>换</em>方向——能否从"<em>所有限制 \(f|_A\) 连续</em>" 推回"<em>f 连续</em>"？答案：<em>不一定</em>，依赖怎么"分块"。下面 6.7 节的拼接引理给出充分条件。</p>
+
+<h2 id="sec6-7">6.7 拼接引理（pasting lemma）</h2>
+
+<p>实际工程里的连续映射往往<em>分段定义</em>：<em>这一段用一个公式、那一段用另一个公式</em>。要保证整个映射连续，分段相接处要"<em>对得上</em>" + 每段自身要连续。这件事的拓扑化表述：</p>
+
+<p><strong>定理（pasting lemma, 闭集版）。</strong>设 \(X = A \cup B\)，\(A\) 与 \(B\) 都<em>闭</em>（在 \(X\) 中）。\(f : X \to Y\) 是函数，且</p>
+<ul>
+  <li>\(f|_A : A \to Y\) 连续；</li>
+  <li>\(f|_B : B \to Y\) 连续。</li>
+</ul>
+<p>则 \(f : X \to Y\) 连续。</p>
+
+<p>证。用定义 B（闭集逆像）。取 \(F \subseteq Y\) 闭。</p>
+<p>\[ f^{-1}(F) = \{x \in X : f(x) \in F\} = \{x \in A \cup B : f(x) \in F\} \]</p>
+<p>\[ = (A \cap f^{-1}(F)) \cup (B \cap f^{-1}(F)) = (f|_A)^{-1}(F) \cup (f|_B)^{-1}(F). \]</p>
+
+<p>由两条限制连续，\((f|_A)^{-1}(F) \subseteq A\) 闭<em>在 A 中</em>。但 \(A\) <em>在 X 中闭</em>——根据"<em>闭子空间的闭子集仍是大空间的闭子集</em>"（练：\(C \subseteq A\) 闭在 \(A\) \(\iff C = A \cap F'\)，\(F'\) 闭在 \(X\)；\(A\) 闭在 \(X\) \(\Rightarrow A \cap F'\) 闭在 \(X\)）——所以 \((f|_A)^{-1}(F)\) 闭<em>在 X 中</em>。同理 \((f|_B)^{-1}(F)\) 闭在 \(X\) 中。两闭集的<em>有限并</em> 仍闭（C3）。\(\square\)</p>
+
+<p>"<em>闭</em>" 这个条件本质——若改为"\(A, B\) 任意" 反例立马有：\(X = \mathbb{R}\)，\(A = (-\infty, 0]\) 闭、\(B = (0, \infty)\) 开，\(f|_A = -1\)、\(f|_B = 1\)，每段连续，但整个 \(f\) 在 0 不连续（左极限 −1，右极限 1）。这里 \(A\) 闭、\(B\) 不闭——拼接条件失败，结论失败。</p>
+
+<p><strong>对偶（开集版）。</strong>同样定理在 \(A, B\) 都<em>开</em> 时也成立——证明换 (A) 而非 (B) 类似。但更进一步：</p>
+
+<p><strong>开集版（任意多块）。</strong>\(X = \bigcup_\alpha A_\alpha\)，每个 \(A_\alpha\) 开，\(f|_{A_\alpha}\) 连续 \(\Rightarrow f\) 连续。</p>
+
+<p>证。取 \(V \subseteq Y\) 开。\(f^{-1}(V) = \bigcup_\alpha (f|_{A_\alpha})^{-1}(V)\)。每个 \((f|_{A_\alpha})^{-1}(V)\) 在 \(A_\alpha\) 中开 + \(A_\alpha\) 在 \(X\) 中开 \(\Rightarrow\) 它在 \(X\) 中开。任意并仍开（O2）。\(\square\)</p>
+
+<p>请注意"<em>开集版可以任意多</em>" 而"<em>闭集版只能有限多</em>"——这又是 (O2) 任意 vs (C3) 有限 这条不对称的体现。如果你想拼接<em>无穷多块</em>，每块得是<em>开</em>（局部有限性也行，但闭情形需要"<em>局部有限闭覆盖</em>"，超出本章）。</p>
+
+<p><strong>应用：分段定义连续函数。</strong>\(\mathbb{R}\) 上 \(f(x) = \begin{cases} x & x \leq 0 \\ x^2 & x > 0 \end{cases}\)。\(A = (-\infty, 0]\) 闭、\(B = [0, \infty)\) 闭。\(A \cap B = \{0\}\)，两段在 \(x = 0\) 都给值 0——一致。\(f|_A(x) = x\) 连续，\(f|_B(x) = x^2\) 连续。pasting \(\Rightarrow f\) 连续。\(\checkmark\)</p>
+
+<p>注意我们<em>修</em> 了一下边界：原始 \(B = (0, \infty)\) 开——pasting 闭集版不适用。但取 \(B = [0, \infty)\) 闭，\(f|_B(0) = 0^2 = 0\) 与 \(f|_A(0) = 0\) 一致——能拼。这种"<em>分块时点要在两块共有</em>" 是工程上必查的小细节。</p>
+
+<h2 id="sec6-8">6.8 反例：Sorgenfrey 上恒等映射</h2>
+
+<p>把"<em>连续与否依赖拓扑</em>" 这件事钉死，最好的例子是 Sorgenfrey 直线。</p>
+
+<p>回忆 Sorgenfrey \(\mathbb{R}_\ell\)：以 \(\{[a, b) : a < b\}\) 为基的拓扑，每个 \([a, b)\) 是基本开集。这个拓扑<em>比欧氏拓扑细</em>——每个欧氏开集 \((a, b) = \bigcup_n [a + 1/n, b)\) 也在 Sorgenfrey 拓扑里开（基本开集的并），但 \([0, 1)\) 在 Sorgenfrey 开、欧氏不开。</p>
+
+<p>考虑两个恒等映射：</p>
+
+<p>\[ f : \mathbb{R}_\ell \to \mathbb{R}, \quad f(x) = x \quad (\text{Sorgenfrey 进, 欧氏出}). \]</p>
+
+<p>\[ g : \mathbb{R} \to \mathbb{R}_\ell, \quad g(x) = x \quad (\text{欧氏进, Sorgenfrey 出}). \]</p>
+
+<p>问 \(f, g\) 是否连续？</p>
+
+<p><strong>分析 f。</strong> 取欧氏开集 \(V \subseteq \mathbb{R}\)。\(f^{-1}(V) = V\)（恒等映射）。问：\(V\) 在 Sorgenfrey 里开吗？欧氏开集是<em>开区间的并</em>，每个 \((a, b) = \bigcup_n [a + 1/n, b)\) 是 Sorgenfrey 基本开集的并，故开。所以欧氏开集都是 Sorgenfrey 开集——\(V\) 在 Sorgenfrey 里开。<em>f 连续</em>。\(\checkmark\)</p>
+
+<p><strong>分析 g。</strong> 取 Sorgenfrey 开集 \(V\)，比如基本开集 \([0, 1)\)。\(g^{-1}(V) = [0, 1)\)。问：\([0, 1)\) 在欧氏 \(\mathbb{R}\) 里开吗？<em>不开</em>——左端点 0 没有 \(\varepsilon\) 邻域 \((-\varepsilon, \varepsilon)\) 完全落在 \([0, 1)\) 里。所以 \(g^{-1}([0, 1)) = [0, 1)\) 不开。<em>g 不连续</em>。\(\square\)</p>
+
+<p>同一个函数（恒等 \(x \mapsto x\)）作为两个不同方向的映射，<em>一向连续、反向不连续</em>。这把"<em>连续依赖拓扑</em>" 这件事钉得死死的。</p>
+
+<p>请你停下盯着这个不对称想一想——它给"<em>连续</em>" 这个直觉概念一个意外的几何含义：</p>
+
+<p>"<em>从拓扑 \(\tau_1\) 到拓扑 \(\tau_2\) 的恒等映射连续 \(\iff \tau_1 \supseteq \tau_2\)（源更细）</em>"。</p>
+
+<p>"<em>细 \(\to\) 粗</em>" 连续，"<em>粗 \(\to\) 细</em>" 一般不。这条几何画面让"<em>拓扑细化</em>" 与"<em>映射连续</em>" 有了对应关系，是 ch7 同胚 + ch8 子空间拓扑 + ch10 商拓扑的共同主题。</p>
+
+<p><strong>顺手得另一件事。</strong>"<em>连续</em>" <em>不</em> 蕴含"<em>有界</em>" 或"<em>一致连续</em>" 或别的度量性质——这些都依赖距离，纯拓扑里无意义。比如 \(f(x) = x\) 在 \(\mathbb{R} \to \mathbb{R}\) 连续但不有界——但这并没有"<em>违反连续</em>"，只是连续不蕴含有界。"<em>有界连续函数</em>" "<em>一致连续函数</em>" 这些类是<em>度量</em> 概念，需要 \((X, d)\) 而不是 \((X, \tau)\)。拓扑学里只有"<em>连续</em>" 这一个赤裸的属性。</p>
+
+<h2 id="sec6-9">6.9 几条收尾性质</h2>
+
+<p>下面三条是后面常用的。证明全短。</p>
+
+<p><strong>命题 6.9.1。</strong>\(f : X \to Y\) 连续 \(\iff\) 对每个 \(A \subseteq X\)，\(f(\bar A) \subseteq \overline{f(A)}\)。</p>
+
+<p>证。\((\Rightarrow)\) 取 \(x \in \bar A\)，要证 \(f(x) \in \overline{f(A)}\)。用闭包刻画 (I)（5.2 节）：取开 \(V \ni f(x)\)，要证 \(V \cap f(A) \neq \emptyset\)。\(f^{-1}(V)\) 开含 \(x \in \bar A\)，所以 \(f^{-1}(V) \cap A \neq \emptyset\)（再次 (I)）。取 \(a \in f^{-1}(V) \cap A\)，那 \(f(a) \in V\) 且 \(f(a) \in f(A)\)，故 \(V \cap f(A) \neq \emptyset\)。\(\square\)</p>
+
+<p>\((\Leftarrow)\) 给 \(F \subseteq Y\) 闭。设 \(A = f^{-1}(F)\)。要证 \(A\) 闭，即 \(\bar A \subseteq A\)。由假设 \(f(\bar A) \subseteq \overline{f(A)} = \overline{f(f^{-1}(F))} \subseteq \bar F = F\)（最后一步因 \(F\) 闭）。所以 \(\bar A \subseteq f^{-1}(F) = A\)。\(\square\)</p>
+
+<p>这条等价用"<em>闭包保持</em>" 描述连续——又一种刻画。在分析里它对应"<em>序列保持</em>"——但拓扑版本（闭包）是<em>真正</em> 的版本，序列版本只在度量 / 第一可数下成立。</p>
+
+<p><strong>命题 6.9.2。</strong>\(f : X \to Y\) 连续，\(A \subseteq Y\) 任意，则 \(f^{-1}(\mathrm{int}_Y(A)) \subseteq \mathrm{int}_X(f^{-1}(A))\) 与 \(f^{-1}(\bar A) \supseteq \overline{f^{-1}(A)}\)（一般非等号）。</p>
+
+<p>证。第一条：\(\mathrm{int}_Y(A)\) 是 \(Y\) 中含于 \(A\) 的开集，\(f\) 连续 \(\Rightarrow f^{-1}(\mathrm{int}_Y(A))\) 是 \(X\) 中含于 \(f^{-1}(A)\) 的开集，故含于 \(\mathrm{int}_X(f^{-1}(A))\)。第二条对偶。\(\square\)</p>
+
+<p>这两条<em>不等式</em> 本质——逆像操作把内部 / 闭包<em>压</em> 一些，不是<em>等式</em>。原因：\(f^{-1}\) 不一定保持"<em>极小 / 极大</em>" 结构。</p>
+
+<p><strong>命题 6.9.3。</strong>"<em>连续</em>" 在<em>同胚</em> 下保持。即设 \(h : X \to X'\)、\(k : Y \to Y'\) 是同胚，\(f : X \to Y\) 连续，则 \(k \circ f \circ h^{-1} : X' \to Y'\) 连续。</p>
+
+<p>证。复合 \(k \circ f \circ h^{-1}\)。\(h^{-1}\) 同胚 \(\Rightarrow\) 连续；\(f\) 连续；\(k\) 连续。三个连续的复合连续（6.5）。\(\square\)</p>
+
+<p>这条说明"<em>连续</em>" 是<em>拓扑性质</em>——不依赖具体表达，依赖拓扑结构。同胚把整个拓扑结构搬过去，连续性自动跟着搬过去。</p>
+
+<h2 id="sec6-10">6.10 临别话</h2>
+
+<p>这一章把"<em>连续</em>" 从分析里的 \(\varepsilon\)-\(\delta\) 翻译成拓扑里的"<em>开集逆像开</em>"。重点不只是"<em>新定义</em>"，而是这种翻译带来的<em>结构</em>：</p>
+
+<ul>
+  <li><em>三条等价</em>（开 / 闭 / 邻域）任选最方便那条；</li>
+  <li><em>复合连续</em> 用 \((g \circ f)^{-1} = f^{-1} \circ g^{-1}\) 一行证；</li>
+  <li><em>限制连续</em> 用 \((f|_A)^{-1}(V) = A \cap f^{-1}(V)\) 一行证；</li>
+  <li><em>拼接连续</em>（pasting）有闭集版（有限）+ 开集版（任意），底层是 (O2) vs (C3) 的非对称；</li>
+  <li><em>Sorgenfrey 反例</em> 把"连续依赖拓扑" 钉死——同一函数双向不对称。</li>
+</ul>
+
+<p>这五条加起来给你一个新的"<em>连续</em>" 直觉：连续不是"<em>函数图像没断点</em>"（这是度量直觉），而是"<em>把目标的开集结构沿 \(f^{-1}\) 拉回来时不破坏源的开集结构</em>"。它是<em>结构保持映射</em>——和"群同态"、"线性映射"、"环同态" 是同一类东西，只是结构换成"<em>开集族</em>"。</p>
+
+<p>下一章我们把"<em>结构保持的双射</em>" 这件事正式化——同胚。\(\mathbf{Top}\) 范畴里的"<em>同构</em>" 就是同胚，它定义"<em>什么算同一个拓扑空间</em>"。然后我们列"<em>什么是拓扑性质</em>"（同胚下不变的性质），并立刻给一个区分拓扑空间的标准方法。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 闭集、内部、闭包、边界</a><a href="ch7.html">下一章 · 第 7 章 同胚与拓扑性质 →</a></nav>
+</main>
+</body>
+</html>

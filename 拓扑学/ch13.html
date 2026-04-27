@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 章 可数性公理：第一与第二可数 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 分离公理</a><a href="ch14.html">下一章 · 第 14 章 紧致性 →</a></nav>
+<h1 id="ch13">第 13 章 可数性公理：第一与第二可数</h1>
+
+<p>请你回到<a href="../实分析/index.html">实分析</a>里你最熟的一句话：<em>序列收敛刻画了一切</em>。在 \(\mathbb{R}^n\) 里，"<em>\(f\) 连续</em>" 等价于"<em>\(x_n \to x \Rightarrow f(x_n) \to f(x)\)</em>"；"<em>\(A\) 闭</em>" 等价于"<em>每个收敛在 \(A\) 中的序列的极限仍在 \(A\) 中</em>"；"<em>\(p\) 是 \(A\) 的极限点</em>" 等价于"<em>有序列 \(x_n \in A \setminus \{p\}\) 使 \(x_n \to p\)</em>"。这套<em>序列刻画</em> 让分析问题被处理成"<em>找一个序列</em>"。</p>
+
+<p>但请你停下来问一句：这套刻画在<em>抽象拓扑空间</em> 里还成立吗？答案出乎意料——<em>不一定</em>。我们要看一个具体反例让你看到这件事的"<em>分量</em>"。</p>
+
+<p>取不可数集 \(X\)（比如 \(X = \mathbb{R}\)）配<em>余可数</em> 拓扑：开集 \(=\) 空集 \(\cup\) 余集可数的子集。验证三公理：(O1) \(\emptyset\) 开，\(X\) 是 \(\emptyset\) 的余集，开。(O2) 开集的并：余集 \(=\) 余集的交 \(\subseteq\) 任意一个余集（可数），所以并的余集可数。\(\checkmark\) (O3) 有限交：余集 \(=\) 余集的并（有限多个可数集的并仍可数）。\(\checkmark\)</p>
+
+<p>取 \(A := \mathbb{R} \setminus \{0\}\)。在<em>标准</em> 拓扑下 \(A\) 不闭（\(0\) 是极限点）。在<em>余可数</em> 拓扑下呢？\(A\) 闭等价 \(\{0\}\) 开。\(\{0\}\) 开等价其余集 \(\mathbb{R} \setminus \{0\}\) 余集可数——但 \(\mathbb{R} \setminus \{0\}\) 的余集 \(\{0\}\) 可数（它是单点）。等等——重读。\(\{0\}\) 开 \(\iff X \setminus \{0\}\) 余可数 \(\iff (X \setminus \{0\}) \) 的余集 \(\{0\}\) 可数 \(\iff\) 是。\(\{0\}\) 开！所以 \(\mathbb{R} \setminus \{0\}\) 闭。等一下——这意味着所有"<em>余集可数</em>" 的子集都开，特别是<em>单点的余集</em> \(X \setminus \{p\}\) 总是开（其余集 \(\{p\}\) 可数）。所以单点 \(\{p\}\) 总是闭。这告诉我们余可数拓扑 \(T_1\)。</p>
+
+<p>关键问题：在余可数拓扑下，<em>有序列 \(x_n \in A = \mathbb{R} \setminus \{0\}\) 使 \(x_n \to 0\)</em>吗？</p>
+
+<p>设有这样的序列。则集合 \(B := \{x_n : n \geq 1\}\) 至多可数，故 \(X \setminus B\) 余可数即开，且 \(0 \in X \setminus B\)（因 \(x_n \neq 0\)）。所以 \(X \setminus B\) 是 \(0\) 的开邻域。\(x_n \to 0\) 要求 \(x_n\) 最终全在 \(X \setminus B\) 里——但每个 \(x_n \in B\) 不在 \(X \setminus B\) 里。矛盾。<em>没有这样的序列</em>。</p>
+
+<p>结果：在余可数拓扑下 \(0\) 是 \(A\) 的"<em>邻域意义下的极限点</em>"（每个 \(0\) 的开邻域都与 \(A\) 相交——\(0\) 的开邻域必余可数，与 \(A = \mathbb{R} \setminus \{0\}\) 不可数集相交非空）；但<em>没有</em>序列从 \(A\) 收敛到 \(0\)。<em>序列刻画失败</em>——拓扑里"<em>邻域闭包</em>" 比"<em>序列闭包</em>" 大。</p>
+
+<p>这就是这一章的钩子。<em>什么样的拓扑空间序列足够用</em>？答案：<em>第一可数</em> 空间。它是 \(\mathbb{R}^n\) 那种"<em>每个点处局部基可数</em>" 性质的抽象。第二可数更强——<em>整个空间</em> 拓扑由可数族决定。</p>
+
+<p>这一章把这两条公理讲清楚，看它们各自蕴含什么、各自被反例严格区分。</p>
+
+<h2 id="sec13-1">13.1 第一可数：每点有可数局部基</h2>
+
+<p>先回想"<em>局部基</em>" 概念（<a href="ch6.html">ch6</a> 已学）。</p>
+
+<p><strong>定义 13.1.</strong> 设 \((X, \tau)\) 是拓扑空间，\(x \in X\)。一个<em>在 \(x\) 的局部基</em>（neighborhood base at \(x\)）是开集族 \(\mathcal{B}_x \subseteq \tau\) 满足：</p>
+
+<ul>
+  <li>每个 \(B \in \mathcal{B}_x\) 含 \(x\)；</li>
+  <li>对每个含 \(x\) 的开集 \(U\)，存在 \(B \in \mathcal{B}_x\) 使 \(B \subseteq U\)。</li>
+</ul>
+
+<p>用人话——\(\mathcal{B}_x\) 里的开集"<em>足够小</em>" 地围着 \(x\)：任何 \(x\) 的开邻域里都能塞进一个 \(\mathcal{B}_x\) 的成员。</p>
+
+<p><strong>定义 13.2 (第一可数, 1st countable)。</strong> 拓扑空间 \(X\) 称为<em>第一可数</em> 如果每个 \(x \in X\) 都有<em>可数</em> 局部基。</p>
+
+<p>典型例子——度量空间。在度量空间 \((X, d)\) 里，对每个 \(x\) 取</p>
+
+<p>\[
+\mathcal{B}_x = \{B(x, 1/n) : n = 1, 2, 3, \ldots\}.
+\]</p>
+
+<p>这是可数局部基。验证：每个 \(B(x, 1/n)\) 含 \(x\)；对任意 \(x\) 的开邻域 \(U\)，由开集定义存在 \(r > 0\) 使 \(B(x, r) \subseteq U\)，取 \(n\) 使 \(1/n < r\)，则 \(B(x, 1/n) \subseteq B(x, r) \subseteq U\)。\(\checkmark\)</p>
+
+<p>所以<em>所有度量空间第一可数</em>。这是这条公理被定义的<em>动机</em>——"<em>有可数收缩的开邻域族</em>" 这件度量空间的方便性，用一条<em>抽象</em> 公理把它独立出来。</p>
+
+<p>另一个例子——离散拓扑。在离散 \(X\) 上每个点 \(x\) 取 \(\mathcal{B}_x = \{\{x\}\}\)，单元素是局部基。所以离散空间永远第一可数（即使 \(X\) 不可数）。</p>
+
+<p>反例——余可数拓扑（在不可数 \(X\) 上）<em>不</em>第一可数。证明（梗概）：假设 \(x \in X\) 有可数局部基 \(\{B_n\}\)。每个 \(B_n\) 余集 \(C_n\) 可数。\(C := \bigcup_n C_n\) 仍可数。所以 \(X \setminus C\) 不可数（\(X\) 不可数），取 \(y \in X \setminus C\) 任意 \(\neq x\)。则 \(U := X \setminus \{y\}\) 是 \(x\) 的开邻域（\(\{y\}\) 余集可数即开——错，\(\{y\}\) 闭）。等一下：\(U = X \setminus \{y\}\) 余集 \(\{y\}\) 可数，所以 \(U\) 开，且含 \(x\)。需要某个 \(B_n \subseteq U\)。但 \(B_n\) 余集 \(C_n \subseteq C\)，\(y \notin C\)，所以 \(y \in B_n\)——但 \(y \notin U\)，矛盾 \(B_n \subseteq U\)。所以不存在 \(B_n \subseteq U\)——\(\{B_n\}\) 不是局部基。\(\blacksquare\)</p>
+
+<p>这正是上面引子里"<em>序列不充分</em>" 的<em>原因</em>——余可数拓扑不第一可数。</p>
+
+<h2 id="sec13-2">13.2 第一可数 ⟹ 序列刻画拓扑</h2>
+
+<p>把"<em>序列充分</em>" 这件事精确化。</p>
+
+<p><strong>定理 13.3.</strong> 设 \(X\) 第一可数，\(A \subseteq X\)，\(p \in X\)。则</p>
+
+<p>\[
+p \in \overline{A} \iff \exists \text{ 序列 } (x_n) \text{ 在 } A \text{ 中}, \ x_n \to p.
+\]</p>
+
+<p><strong>证明。</strong></p>
+
+<p>(\(\Leftarrow\))。任何拓扑空间里都成立。设 \(x_n \in A, x_n \to p\)。任何 \(p\) 的开邻域 \(U\) 含某个 \(x_n\)（实际上最终所有 \(x_n\)），\(x_n \in A\)，所以 \(U \cap A \neq \emptyset\)。即 \(p \in \overline{A}\)。</p>
+
+<p>(\(\Rightarrow\))（关键，需要第一可数）。设 \(p \in \overline{A}\)。取 \(p\) 的可数局部基 \(\{B_n\}_{n \geq 1}\)。可"<em>嵌套化</em>"：替换 \(B_n\) 为 \(B_1 \cap B_2 \cap \cdots \cap B_n\)（仍开，仍是局部基且单调递减——交起来还含 \(p\)，且任何更大开邻域 \(U\) 由原始局部基保证有 \(B_k \subseteq U\)，新版 \(B_n \subseteq B_k\) 当 \(n \geq k\)）。所以可设 \(B_1 \supseteq B_2 \supseteq \cdots\)。</p>
+
+<p>对每个 \(n\)：\(p \in \overline{A}\) 意味 \(B_n \cap A \neq \emptyset\)（\(B_n\) 是 \(p\) 的开邻域）。取 \(x_n \in B_n \cap A\)。证 \(x_n \to p\)：给 \(p\) 的任意开邻域 \(U\)，由局部基有 \(B_N \subseteq U\)。\(n \geq N \Rightarrow x_n \in B_n \subseteq B_N \subseteq U\)。\(\checkmark\)\(\blacksquare\)</p>
+
+<p>这条定理就是"<em>序列刻画闭包</em>" 在第一可数下成立。从这条派生：</p>
+
+<p><strong>推论 13.4.</strong> 设 \(X\) 第一可数。则</p>
+
+<ul>
+  <li>\(A\) 闭 \(\iff\) 每个 \(A\) 中收敛序列的极限仍在 \(A\) 中（"<em>序列闭</em>"）。</li>
+  <li>\(f : X \to Y\) 连续在 \(p\) \(\iff\) \(x_n \to p \Rightarrow f(x_n) \to f(p)\)（"<em>序列连续</em>"）。</li>
+</ul>
+
+<p>第一条直接由 13.3 + "<em>\(A\) 闭 \(\iff\) \(A = \overline{A}\)</em>"。</p>
+
+<p>第二条的证明：(\(\Rightarrow\)) 任何拓扑里成立——\(f\) 连续 + \(x_n \to p\) \(\Rightarrow\) 给 \(f(p)\) 的邻域 \(V\)，\(f^{-1}(V)\) 是 \(p\) 的邻域，\(x_n\) 最终落入 \(\Rightarrow f(x_n)\) 最终在 \(V\) 中。(\(\Leftarrow\)) 反证：假 \(f\) 不连续在 \(p\)，则有 \(f(p)\) 的邻域 \(V\) 使 \(f^{-1}(V)\) 不是 \(p\) 的邻域——存在 \(p\) 的可数局部基 \(\{B_n\}\) 使每个 \(B_n \not\subseteq f^{-1}(V)\)，即每个 \(B_n\) 含某 \(x_n\) 与 \(f(x_n) \notin V\)。\(x_n \to p\)（嵌套局部基）但 \(f(x_n) \not\to f(p)\)（\(f(x_n) \notin V\) 总成立）。矛盾。\(\blacksquare\)</p>
+
+<p>这条推论就是<em>实分析</em> 里那套"<em>序列连续 = 连续</em>" 的<em>合理化</em>——它在 \(\mathbb{R}^n\) 上成立<em>因为</em> \(\mathbb{R}^n\) 第一可数。在不第一可数的拓扑空间上需要换<em>网</em>（net）或<em>滤子</em>（filter）替代序列。</p>
+
+<h2 id="sec13-3">13.3 第二可数：整个空间有可数基</h2>
+
+<p>第一可数是<em>逐点</em> 性质。下一档把"<em>可数</em>" 推到全局。</p>
+
+<p><strong>定义 13.5 (第二可数, 2nd countable)。</strong> 拓扑空间 \(X\) 称为<em>第二可数</em> 如果存在<em>可数</em> 基 \(\mathcal{B}\) for \(\tau\)。即可数族 \(\mathcal{B} \subseteq \tau\) 使每个开集是 \(\mathcal{B}\) 成员的并。</p>
+
+<p>典型例子——\(\mathbb{R}\)。取 \(\mathcal{B} = \{(a, b) : a, b \in \mathbb{Q}, a < b\}\)。可数（\(\mathbb{Q} \times \mathbb{Q}\) 可数）。每个开集是开区间的并；每个开区间 \((c, d)\) 是有理端点开区间的并 \(\bigcup\{(a, b) \in \mathcal{B} : c \leq a < b \leq d\}\)（任意 \(x \in (c, d)\) 有 \(c < a < x < b < d\) 有理 \(a, b\)）。\(\checkmark\)</p>
+
+<p>所以 \(\mathbb{R}\) 第二可数。同理 \(\mathbb{R}^n\) 第二可数（取 \(\prod (a_i, b_i)\) 有理端点）。</p>
+
+<p>另一个：\(\mathbb{Q}\)（实数子空间）第二可数（子空间继承）。</p>
+
+<p>反例——不可数离散空间<em>不</em> 第二可数。设 \(X\) 不可数离散，\(\mathcal{B}\) 任意基。每个 \(\{x\} \subseteq X\) 是开集，必为 \(\mathcal{B}\) 中某些成员的并，但唯一含 \(x\) 的子集 \(\subseteq \{x\}\) 是 \(\{x\}\) 自身——所以 \(\{x\} \in \mathcal{B}\)。即 \(\mathcal{B} \supseteq \{\{x\} : x \in X\}\)，不可数。\(\mathcal{B}\) 不可数。所以无可数基。</p>
+
+<h2 id="sec13-4">13.4 第二可数 ⟹ 第一可数 + 可分</h2>
+
+<p>"<em>可分</em>" 是另一条相关性质。</p>
+
+<p><strong>定义 13.6 (可分, separable)。</strong> 拓扑空间 \(X\) 称为<em>可分</em> 如果存在可数稠密子集 \(D \subseteq X\)。"<em>稠密</em>" 即 \(\overline{D} = X\)。</p>
+
+<p>例子——\(\mathbb{Q} \subseteq \mathbb{R}\) 稠密可数，所以 \(\mathbb{R}\) 可分。\(\mathbb{Q}^n\) 稠于 \(\mathbb{R}^n\) 所以 \(\mathbb{R}^n\) 可分。</p>
+
+<p><strong>定理 13.7.</strong> 第二可数 \(\Rightarrow\) 第一可数 \(+\) 可分。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>设 \(\mathcal{B} = \{B_1, B_2, \ldots\}\) 可数基。</p>
+
+<p><em>第一可数</em>。对每个 \(x \in X\)，取 \(\mathcal{B}_x := \{B_n : x \in B_n\}\)。\(\mathcal{B}_x \subseteq \mathcal{B}\) 可数。是局部基：给 \(x\) 的开邻域 \(U\)，\(U\) 是基成员的并，故有 \(B_n\) 与 \(x \in B_n \subseteq U\)。\(\checkmark\)</p>
+
+<p><em>可分</em>。对每个非空 \(B_n\) 任取一点 \(x_n \in B_n\)（用<em>可数选择公理</em>）。集合 \(D := \{x_n : B_n \neq \emptyset\}\) 至多可数。\(D\) 稠密：任何非空开集 \(U\) 含某非空 \(B_n \subseteq U\)，则 \(x_n \in B_n \subseteq U\)，故 \(U \cap D \neq \emptyset\)。即 \(\overline{D} = X\)。\(\blacksquare\)</p>
+
+<p>反向<em>不</em> 成立——下面看反例。</p>
+
+<h2 id="sec13-5">13.5 度量空间：可分 ⟺ 第二可数</h2>
+
+<p>对一般拓扑空间"<em>可分</em>" 比"<em>第二可数</em>" 弱。但<em>度量空间</em> 里两者等价。这是度量空间的特殊性。</p>
+
+<p><strong>定理 13.8.</strong> 度量空间 \((X, d)\) 第二可数 \(\iff\) 可分。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>(\(\Rightarrow\))。已证（13.7）。</p>
+
+<p>(\(\Leftarrow\))。设 \(D = \{d_1, d_2, \ldots\}\) 可数稠密。考虑</p>
+
+<p>\[
+\mathcal{B} := \{B(d_n, 1/m) : n, m \geq 1\}.
+\]</p>
+
+<p>可数（\(\mathbb{N} \times \mathbb{N}\)）。证它是基——每个开集 \(U\) 是 \(\mathcal{B}\) 中成员的并。</p>
+
+<p>给 \(x \in U\)。\(U\) 开，故有 \(r > 0\) 使 \(B(x, r) \subseteq U\)。取 \(m\) 使 \(1/m < r/2\)。\(D\) 稠密——存在 \(d_n \in B(x, 1/m)\)，即 \(d(x, d_n) < 1/m < r/2\)。则 \(x \in B(d_n, 1/m)\)（\(d(x, d_n) < 1/m\)），且 \(B(d_n, 1/m) \subseteq B(x, r)\)（对 \(y \in B(d_n, 1/m)\)，\(d(y, x) \leq d(y, d_n) + d(d_n, x) < 1/m + 1/m < r\)）\(\subseteq U\)。</p>
+
+<p>所以每个 \(x \in U\) 有 \(B(d_n, 1/m) \in \mathcal{B}\) 含 \(x\) 且 \(\subseteq U\)。\(U\) 是这些 \(B(d_n, 1/m)\) 的并。\(\mathcal{B}\) 是基。\(\blacksquare\)</p>
+
+<p>"<em>可分 \(\Leftrightarrow\) 第二可数</em>" 的关键在度量结构——\(B(d_n, 1/m)\) 形式的开球可数族足以从可数稠密集"<em>充满</em>" 整个空间。在<em>非</em> 度量拓扑里这条可能失败——下一节看具体。</p>
+
+<h2 id="sec13-6">13.6 反例：Sorgenfrey 直线 \(\mathbb{R}_\ell\) 可分但非第二可数</h2>
+
+<p>来看一个让"<em>可分 ≠ 第二可数</em>" 在非度量情况下出现的标准反例。</p>
+
+<p><strong>Sorgenfrey 直线 \(\mathbb{R}_\ell\)</strong>：底集 \(\mathbb{R}\)，基 \(\{[a, b) : a < b\}\)（半开区间）。</p>
+
+<p>验证它是基（<a href="ch6.html">ch6</a> 工具）：(B1) 每个 \(x\) 在某 \([a, b)\)（取 \(a = x, b = x + 1\)）。(B2) \([a_1, b_1) \cap [a_2, b_2) = [\max a_i, \min b_i)\) 仍属于基（如非空）。\(\checkmark\)</p>
+
+<p><em>可分</em>。\(\mathbb{Q}\) 在 \(\mathbb{R}_\ell\) 中稠密：任何 \([a, b)\) 含有理数。\(\checkmark\)</p>
+
+<p><em>非第二可数</em>。设 \(\mathcal{B}\) 任意基。对每个 \(x \in \mathbb{R}\)，\([x, x+1)\) 是 \(x\) 的开邻域，故有 \(B_x \in \mathcal{B}\) 与 \(x \in B_x \subseteq [x, x+1)\)。注意 \(B_x \subseteq [x, x+1)\) 含 \(x\)——但 \(B_x\) 不能含 \(< x\) 的点（否则不在 \([x, x+1)\) 里）。所以 \(\inf B_x = x\)（事实上 \(x \in B_x\) 是 \(B_x\) 的最小元）。</p>
+
+<p>对 \(x \neq y\)，\(B_x\) 与 \(B_y\) 不可能同基元——因为 \(\inf B_x = x \neq y = \inf B_y\)。所以映射 \(x \mapsto B_x\) 单射 \(\mathbb{R} \to \mathcal{B}\)，故 \(|\mathcal{B}| \geq |\mathbb{R}|\)，不可数。\(\blacksquare\)</p>
+
+<p>所以 \(\mathbb{R}_\ell\) 可分（\(\mathbb{Q}\) 稠）但<em>非</em> 第二可数。这条空间在拓扑教材中是<em>反例库</em> 的核心成员——它出现在很多"<em>可分 vs 第二可数</em>""<em>regular vs normal</em>""<em>积保持</em>" 的考察里。</p>
+
+<p>顺带：\(\mathbb{R}_\ell\) <em>是</em> 第一可数（每点 \(x\) 取 \(\mathcal{B}_x = \{[x, x + 1/n) : n \geq 1\}\) 可数局部基），但<em>非</em>度量化（如果度量化，由可分 \(\Rightarrow\) 第二可数，矛盾）。所以 \(\mathbb{R}_\ell\) 也是"<em>第一可数 + 可分但不可度量化</em>" 的例子。</p>
+
+<h2 id="sec13-7">13.7 反例：不可数离散空间第一可数但非可分</h2>
+
+<p>另一个方向：第一可数且<em>非可分</em>。取 \(X\) 不可数集配离散拓扑。</p>
+
+<p>第一可数：每个 \(x\) 取 \(\mathcal{B}_x = \{\{x\}\}\)。\(\checkmark\)</p>
+
+<p>非可分：假设 \(D \subseteq X\) 可数。\(\{x\}\) 对任意 \(x \in X \setminus D\) 是开集（离散），不与 \(D\) 相交，所以 \(D\) 不稠密。\(D\) 任意可数都不稠密——非可分。\(\checkmark\)</p>
+
+<p>同理这空间<em>非</em> 第二可数（13.3 节末论证）。所以离散不可数空间是"<em>第一可数 + 既不可分也非第二可数</em>"。</p>
+
+<p>把 13.6 与 13.7 放一起：可分与第二可数<em>真</em> 不同（在非度量空间里）；但有度量时它们融合。</p>
+
+<h2 id="sec13-8">13.8 性质保持：子空间、积、商</h2>
+
+<p>检查可数性公理在标准构造下的行为。</p>
+
+<p><strong>定理 13.9 (子空间)。</strong></p>
+
+<ul>
+  <li>第一可数 \(\Rightarrow\) 子空间第一可数。</li>
+  <li>第二可数 \(\Rightarrow\) 子空间第二可数。</li>
+</ul>
+
+<p><strong>证明。</strong> 设 \(A \subseteq X\) 子空间。给 \(x \in A\)，\(\mathcal{B}_x\) 是 \(x\) 在 \(X\) 的可数局部基，则 \(\{B \cap A : B \in \mathcal{B}_x\}\) 是 \(x\) 在 \(A\) 中的可数局部基。第二可数同理 \(\{B \cap A\}\)。\(\blacksquare\)</p>
+
+<p>注意可分<em>不</em> 被子空间保持——一般 Sorgenfrey 平面 \(\mathbb{R}_\ell^2\) 可分，但其反对角线 \(\{(x, -x) : x \in \mathbb{R}\}\) 作为子空间是<em>不可数离散</em> 空间，非可分。子空间不保可分是个有名的"陷阱"。</p>
+
+<p><strong>定理 13.10 (有限积 / 可数积)。</strong></p>
+
+<ul>
+  <li>第一可数被有限积、<em>可数</em> 积保持。</li>
+  <li>第二可数被有限积、<em>可数</em> 积保持。</li>
+</ul>
+
+<p><strong>证明（梗概）。</strong></p>
+
+<p>第一可数 + 有限积：在 \(X \times Y\) 的点 \((x, y)\)，取 \(\mathcal{B}_{(x,y)} := \{B_n^X \times B_m^Y : n, m \geq 1\}\)，其中 \(\{B_n^X\}, \{B_m^Y\}\) 是 \(x, y\) 的可数局部基。这是 \(\mathbb{N} \times \mathbb{N}\) 索引——可数。是局部基（积拓扑基由 \(U \times V\) 形式给出）。可数积类似但需要"<em>大部分坐标取整空间</em>" 的限制。\(\checkmark\)</p>
+
+<p>第二可数 + 有限积：取 \(\mathcal{B}_X, \mathcal{B}_Y\) 可数基。则 \(\{U \times V : U \in \mathcal{B}_X, V \in \mathcal{B}_Y\}\) 是 \(X \times Y\) 积拓扑的可数基。可数积同理但要小心 Tychonoff 拓扑的限制（"<em>有限多坐标非全空间</em>"）。\(\checkmark\)</p>
+
+<p><em>不可数</em>积一般<em>不</em> 保。比如 \(\{0, 1\}^{\mathbb{R}}\)（不可数积）虽各因子第二可数，但积非第一可数（\((0, 0, \ldots)\) 在 Tychonoff 拓扑下没有可数局部基——任何可数邻域族的"<em>限制坐标</em>" 加起来还是可数，但 \(\mathbb{R}\) 有不可数坐标，必有未限制坐标，导致细化失败）。</p>
+
+<p><strong>定理 13.11 (商)。</strong> 第一 / 第二可数<em>不</em>被商保持（一般情形）。需要附加条件（如商映射是开映射 / 商映射保持局部基）。</p>
+
+<p>反例：\(\mathbb{R}\)（第二可数）/ \(\mathbb{Q}\) （把 \(\mathbb{Q}\) 缩成一点）的商空间通常不第一可数——稠密点的局部基刻画破坏。</p>
+
+<h2 id="sec13-9">13.9 临别话</h2>
+
+<p>可数性公理是<em>"序列够不够用"</em> 这件事的精确化：</p>
+
+<ul>
+  <li><strong>第一可数</strong>——逐点可数局部基。让<em>序列</em> 这种可数对象足以刻画拓扑。这是 \(\mathbb{R}^n\) 与<em>实分析</em> 套路（"<em>序列闭</em>""<em>序列连续</em>"）有效的本质条件。</li>
+  <li><strong>第二可数</strong>——全局可数基。比第一可数严格强。它带"<em>可分</em>" 一起来。</li>
+  <li><strong>可分</strong>——有可数稠密子集。在度量空间里 \(\Leftrightarrow\) 第二可数；非度量场合两者真不同。</li>
+</ul>
+
+<p>第二可数特别重要——它是 Urysohn 度量化定理的<em>核心</em> 假设："<em>第二可数 + normal Hausdorff</em>" \(\Rightarrow\) 可度量化（<a href="ch21.html">ch21</a>）。把分离公理（前一章）与可数性合体，给出"<em>什么样的拓扑空间能配距离</em>" 的答案。</p>
+
+<p>在<em>不</em> 第一可数的世界里序列被<em>网</em>（generalized sequence indexed by directed sets）或<em>滤子</em>（filter）替代——它们都"<em>可数</em>" 限制被抹去，能刻画任何拓扑空间的闭包 / 连续。这部分内容超出本书，但请你心里记一下：现代拓扑里"<em>用网代替序列</em>" 是处理非第一可数空间的标准手法。</p>
+
+<p>下一章我们换到本系列里<em>同胚下不变量</em> 中最重要的一条——<em>紧致性</em>。它把"<em>有界闭</em>" 这种距离依赖的概念抽象成"<em>每个开覆盖有有限子覆盖</em>" 的纯拓扑刻画，并且开启"<em>极值定理</em>""<em>聚点存在</em>" 等所有存在性论证的大门。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 分离公理</a><a href="ch14.html">下一章 · 第 14 章 紧致性 →</a></nav>
+</main>
+</body>
+</html>

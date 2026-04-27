@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 同胚与拓扑性质 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 连续映射</a><a href="ch8.html">下一章 · 第 8 章 子空间拓扑 →</a></nav>
+<h1 id="ch7">第 7 章 同胚与拓扑性质</h1>
+
+<p>ch1 的"<em>圆与椭圆同胚、圆与 8 字不同胚</em>" 这一对例子，是整本书<em>最早</em> 一次接触拓扑学的"<em>区分能力</em>"——拓扑能告诉你两个空间是不是<em>同一个</em>，而且不依赖距离这种细节。这种区分的<em>正式工具</em> 就是这一章：</p>
+
+<ul>
+  <li>"<em>同一个</em>" 的精确版本——同胚（homeomorphism）；</li>
+  <li>"<em>什么算拓扑学家眼里的属性</em>"——拓扑性质（topological invariants）；</li>
+  <li>"<em>怎么证两个空间不同胚</em>"——找一条拓扑性质让一边有、一边没。</li>
+</ul>
+
+<p>读完这一章你能<em>真正</em> 区分 \(\mathbb{R}\) 与 \(\mathbb{R}^2\)、圆 \(S^1\) 与 8 字 \(\infty\)、\([0, 1]\) 与 \([0, 1)\)。这些区分以后看像 trivial，但它们是拓扑学最早的<em>正面成果</em>——证明"<em>这两个空间是不同的</em>" 比想象难得多，因为你要排除<em>所有可能</em> 的双连续双射。</p>
+
+<h2 id="sec7-1">7.1 同胚定义</h2>
+
+<p>设 \((X, \tau_X)\)、\((Y, \tau_Y)\) 是拓扑空间。一个映射 \(h : X \to Y\) 是<em>同胚</em>，如果：</p>
+
+<ul>
+  <li>(i) \(h\) 是<em>双射</em>（既单又满）；</li>
+  <li>(ii) \(h\) 连续；</li>
+  <li>(iii) \(h^{-1}\) 连续。</li>
+</ul>
+
+<p>简记：<em>双连续双射</em>。当存在一个 \(X\) 到 \(Y\) 的同胚时，记 \(X \cong Y\)，读作"X 与 Y <em>同胚</em>"。</p>
+
+<p>这个定义把"<em>同一个</em>" 翻译成"<em>有一个能恢复整个拓扑结构的双射</em>"。具体——\(h\) 把 \(X\) 的开集与 \(Y\) 的开集<em>一一对应</em>：\(U \in \tau_X \iff h(U) \in \tau_Y\)（用 (ii) 与 (iii) 一起验证）。所以两个同胚的拓扑空间在<em>开集层面</em> 完全没区别——它们就是同一个抽象的"开集格"，只是给元素贴了不同标签。</p>
+
+<p><strong>等价表述。</strong>双射 \(h : X \to Y\) 是同胚 \(\iff\) \(h\) 是<em>开映射</em>（open map：\(U\) 开 \(\Rightarrow h(U)\) 开）且 \(h\) 连续。理由：对双射 \(h\)，\(h\) 是开映射 \(\iff h^{-1}\) 把开集拉回开集 \(\iff h^{-1}\) 连续。</p>
+
+<p>同样：双连续双射 \(\iff\) 双射 + 连续 + 闭映射（\(F\) 闭 \(\Rightarrow h(F)\) 闭），用 6.2 节 A \(\iff\) B 那条对偶。</p>
+
+<p>这些等价以后会反复用——比如证某双射是同胚时，<em>选最方便的那个版本</em> 检查（开映射、闭映射、\(h^{-1}\) 连续，三选一）。</p>
+
+<h2 id="sec7-2">7.2 注意陷阱：双射 + 连续 \(\nRightarrow\) 同胚</h2>
+
+<p>(iii) 这条"\(h^{-1}\) 连续" 在初学常被忽略——直觉上"<em>连续双射</em>" 听起来已经够了。错。</p>
+
+<p><strong>反例（再一次靠恒等映射）。</strong></p>
+
+<p>\(X = \mathbb{R}_d\)（离散拓扑）、\(Y = \mathbb{R}\)（欧氏）。考虑恒等映射 \(\mathrm{id} : \mathbb{R}_d \to \mathbb{R}\)。</p>
+
+<ul>
+  <li>双射？是。</li>
+  <li>连续？取欧氏开集 \(V \subseteq \mathbb{R}\)，\(\mathrm{id}^{-1}(V) = V \subseteq \mathbb{R}_d\)。\(\mathbb{R}_d\) 离散，<em>每个</em> 子集都开。所以 \(V\) 在 \(\mathbb{R}_d\) 中开。<em>是</em> 连续。</li>
+  <li>\(\mathrm{id}^{-1} : \mathbb{R} \to \mathbb{R}_d\) 连续？取 \(\mathbb{R}_d\) 开集 \(\{0\}\)（单点集，离散里开）。\(\mathrm{id}(\{0\}) = \{0\} \subseteq \mathbb{R}\)。问 \(\{0\}\) 在欧氏 \(\mathbb{R}\) 里开吗？<em>不开</em>。所以 \(\mathrm{id}^{-1}\) <em>不连续</em>。</li>
+</ul>
+
+<p>结论：恒等映射 \(\mathbb{R}_d \to \mathbb{R}\) 双射 + 连续，但<em>不</em> 是同胚。事实上 \(\mathbb{R}_d\) 与 \(\mathbb{R}\) <em>不同胚</em>——下面 7.6 节给一条拓扑性质区分它们。</p>
+
+<p>这个反例的几何含义：从"<em>更细</em>" 的拓扑（\(\mathbb{R}_d\)）到"<em>更粗</em>" 的拓扑（\(\mathbb{R}\)），恒等映射连续——因为粗拓扑的开集变多了，逆像（自身）总是细拓扑里的开集（细拓扑里<em>什么都开</em>）。<em>反方向</em> 不连续——从粗到细要把"<em>少的开集</em>" 拉成"<em>多的开集</em>"，做不到。</p>
+
+<p>同胚要求<em>双向</em> 都连续——意味着两端拓扑<em>同等丰富</em>。"<em>等同胚</em>" 是比"<em>等连续映射存在</em>" 严格强的等价关系。</p>
+
+<p>请你停下盯一下：双射 + 连续 + <em>满射</em> 也<em>不</em> 够。具体：\(\mathrm{id} : \mathbb{R}_d \to \mathbb{R}\) 是双射、连续、满（双射本来就满）——但<em>不</em>同胚。所以"<em>满</em>" 这个修饰也不能补救——必须是 \(h^{-1}\) 连续。</p>
+
+<p><strong>两个特例。</strong>下面两条充分条件让"<em>双射 + 连续 \(\Rightarrow\) 同胚</em>" 成立，但都需要额外的几何条件：</p>
+
+<ul>
+  <li>定理（<a href="ch16.html">ch16</a>）：\(X\) 紧致、\(Y\) Hausdorff、\(h : X \to Y\) 连续双射 \(\Rightarrow h\) 同胚。证明思路：闭子集 \(F \subseteq X\) → \(F\) 紧致（紧致空间的闭子集紧致）→ \(h(F)\) 紧致（连续映射保紧致）→ \(h(F)\) 闭（Hausdorff 里紧致 = 闭）→ \(h\) 闭映射 → 同胚。</li>
+  <li>定理（不变域定理 \(\mathbb{R}^n\) 内部不变性）：\(h : U \to V\) 连续双射，\(U \subseteq \mathbb{R}^n\) 开 \(\Rightarrow V \subseteq \mathbb{R}^n\) 开 + \(h\) 同胚（Brouwer 定理，深度结果，超出本书）。</li>
+</ul>
+
+<p>但这两条都<em>需要</em> 紧致或欧氏背景。一般情形下"<em>双连续双射</em>" 必须显式验证两侧。</p>
+
+<h2 id="sec7-3">7.3 同胚是等价关系</h2>
+
+<p><strong>命题。</strong> "\(\cong\)" 是拓扑空间集合上的等价关系。</p>
+
+<p>证。三条要查。</p>
+
+<p><em>反身。</em>\(\mathrm{id} : X \to X\) 双射、连续（6.4.2）、\(\mathrm{id}^{-1} = \mathrm{id}\) 也连续。\(X \cong X\)。</p>
+
+<p><em>对称。</em>若 \(h : X \to Y\) 同胚，则 \(h^{-1} : Y \to X\) 也是双射 + 连续（按定义）+ \((h^{-1})^{-1} = h\) 也连续（按定义）。\(Y \cong X\)。</p>
+
+<p><em>传递。</em>若 \(h : X \to Y\)、\(k : Y \to Z\) 同胚，则 \(k \circ h : X \to Z\) 是双射（双射的复合是双射）、连续（连续的复合连续，6.5）、\((k \circ h)^{-1} = h^{-1} \circ k^{-1}\) 是 \(k^{-1}\) 与 \(h^{-1}\) 的复合，仍连续。\(X \cong Z\)。\(\square\)</p>
+
+<p>这条让"同胚等价类" 成为<em>合法</em> 的概念——拓扑空间的全体在 \(\cong\) 下分成等价类，每类叫一个"<em>拓扑型</em>"（topology type 或 homeomorphism class）。"<em>圆型</em>" "<em>球型</em>" "<em>甜甜圈型</em>" "<em>双甜甜圈型</em>" 等等都是具体的等价类。</p>
+
+<p>拓扑学的<em>全部</em> 任务可以浓缩成一句话：<em>列出所有拓扑型，并给出区分它们的方法</em>。这件事在<em>低维</em>（曲面，2 维）已经完整做到（<a href="ch24.html">ch24 流形</a>讨论："闭曲面分类定理"），在<em>3 维</em> 是 Perelman 2003 年完成的（Geometrization 与 Poincaré 猜想），在<em>4 维</em> 至今仍未完全解决（4 维是个怪洞）。</p>
+
+<h2 id="sec7-4">7.4 拓扑性质</h2>
+
+<p>"<em>拓扑性质</em>"（topological property，或 topological invariant）的定义：</p>
+
+<p>\[
+\boxed{\ P \text{ 是拓扑性质} \iff X \text{ 满足 } P \text{ 且 } X \cong Y \Rightarrow Y \text{ 也满足 } P.\ }
+\]</p>
+
+<p>"<em>同胚下保持的性质</em>"。这是一个朴素到几乎没说什么的定义——但它的<em>意义</em> 全在反过来用：<em>若 X 满足 P 而 Y 不满足 P，则 X 与 Y 不同胚</em>。这是拓扑学<em>区分空间</em> 的标准武器。</p>
+
+<p>哪些性质是拓扑性质？粗略说——<em>用拓扑结构（开集 / 闭集 / 闭包 / 内部 / 边界 / 极限点 / 邻域 / 连续映射 / ...) 表述、不用度量 / 代数 / 测度等额外结构的性质</em> 都是拓扑性质。这是非正式判据，但实际上很有用。</p>
+
+<p><em>不</em> 是拓扑性质的例子：</p>
+
+<ul>
+  <li>"<em>有界</em>"——\((0, 1)\) 有界、\(\mathbb{R}\) 不有界，但两者同胚（\(f(x) = \tan(\pi x - \pi/2)\)）。"有界" 依赖度量。</li>
+  <li>"<em>完备</em>"（Cauchy 列收敛）——\((0, 1)\) 不完备（\(1/n\) Cauchy 不收敛在 \((0, 1)\) 内）、\(\mathbb{R}\) 完备，两者同胚。"完备" 依赖度量。</li>
+  <li>"<em>测度有限</em>"——同上，\((0, 1)\) 测度 1、\(\mathbb{R}\) 测度无穷，同胚。"测度" 依赖测度结构。</li>
+  <li>"<em>线性</em>"（向量空间结构）——\(\mathbb{R}\) 与圆 \(S^1\) 都是 1 维流形，但 \(S^1\) 没向量空间结构（事实上 \(\mathbb{R}\) 与 \(S^1\) <em>不同胚</em>——但仅仅因为 \(S^1\) "<em>是闭的</em>"，不是因为线性结构差别）。</li>
+</ul>
+
+<p>请你停下注意"<em>有界</em>"<em>不</em> 是拓扑性质这件事的分量——这意味着你不能用"<em>X 有界</em>" 区分 \(X\) 与 \(Y\)。\((0, 1)\) 与 \(\mathbb{R}\) 拓扑上"<em>同一个</em>"——拓扑学家眼里没区别。这件事让人不舒服很正常，因为日常几何里"有界 / 无界" 看起来截然不同。但拓扑就是把这种<em>距离上的差别</em> 抹掉，留下纯<em>结构</em> 上的差别。</p>
+
+<h2 id="sec7-5">7.5 拓扑性质清单（前瞻）</h2>
+
+<p>下面这张表列<em>这本书后面会专章讲</em> 的拓扑性质。每条都"<em>同胚下保持</em>"——"<em>X 满足 P 且 X \cong Y \Rightarrow Y 满足 P</em>"。</p>
+
+<table>
+<tr><th>性质</th><th>含义（粗略）</th><th>本书章</th></tr>
+<tr><td>紧致（compact）</td><td>每个开覆盖有有限子覆盖</td><td><a href="ch16.html">ch16</a></td></tr>
+<tr><td>连通（connected）</td><td>不能写成两非空开集的不交并</td><td><a href="ch18.html">ch18</a></td></tr>
+<tr><td>道路连通（path-connected）</td><td>任两点有连续路径相连</td><td><a href="ch18.html">ch18</a></td></tr>
+<tr><td>Hausdorff（T2）</td><td>任两不同点有不交开邻域</td><td><a href="ch12.html">ch12</a></td></tr>
+<tr><td>第一可数（first countable）</td><td>每点有可数邻域基</td><td><a href="ch15.html">ch15</a></td></tr>
+<tr><td>第二可数（second countable）</td><td>整个拓扑有可数基</td><td><a href="ch15.html">ch15</a></td></tr>
+<tr><td>可分（separable）</td><td>有可数稠密子集</td><td><a href="ch15.html">ch15</a></td></tr>
+<tr><td>正规（normal, T4）</td><td>任两不交闭集有不交开邻域分</td><td><a href="ch12.html">ch12</a></td></tr>
+<tr><td>度量化（metrizable）</td><td>存在度量诱导该拓扑</td><td><a href="ch21.html">ch21</a></td></tr>
+<tr><td>局部紧致（locally compact）</td><td>每点有紧致邻域</td><td><a href="ch16.html">ch16</a></td></tr>
+</table>
+
+<p>这十条几乎覆盖了"<em>拓扑空间分类</em>" 的所有粗略工具。具体证"<em>每条都是拓扑性质</em>" 是各章的主要任务之一——但<em>大部分</em> 证明是同一个套路：</p>
+
+<ol>
+  <li>把性质 P 用"<em>开集 / 连续映射</em>" 翻译；</li>
+  <li>注意同胚 \(h : X \to Y\) 把 \(X\) 的开集精确双射到 \(Y\) 的开集；</li>
+  <li>若 P 在 \(X\) 成立，沿 \(h\) 把见证（覆盖、稠密集、邻域基等）搬到 \(Y\)，得到 P 在 \(Y\) 的见证。</li>
+</ol>
+
+<p>这个套路普遍到没什么新意——但<em>每个性质都得验一遍</em>，因为"<em>用开集表述</em>" 这一步对每个性质长得不一样。</p>
+
+<p><strong>注意。</strong>有些性质是"<em>拓扑性质</em>" 但<em>不</em> "<em>遗传</em>"——不能传给子空间。比如"紧致" 不遗传到任意子空间（紧致空间的子集不一定紧致——不过<em>闭</em> 子集会）；"<em>连通</em>" 不遗传（圆连通，但拿掉一个开弧得两段不连通片）；"<em>第一 / 第二可数</em>" 遗传。"<em>可分</em>" 一般不遗传到任意子空间——但遗传到开子空间。这些细节是各章主题。</p>
+
+<h2 id="sec7-6">7.6 区分技巧</h2>
+
+<p>"<em>X 与 Y 不同胚</em>" 怎么证？最常用的策略：</p>
+
+<p>\[
+\boxed{\ \exists \text{ 拓扑性质 } P, \ X \text{ 满足 } P, \ Y \text{ 不满足 } P \ \Longrightarrow \ X \not\cong Y.\ }
+\]</p>
+
+<p>逆否命题——若 \(X \cong Y\)，由 P 是拓扑性质，X 满足 \(\Rightarrow Y\) 满足，矛盾。</p>
+
+<p>下面几个具体例。</p>
+
+<p><strong>例 7.6.1：\(\mathbb{R}_d\) 与 \(\mathbb{R}\) 不同胚。</strong>取 P = "<em>每个单点集开</em>"。\(\mathbb{R}_d\) 满足（离散）、\(\mathbb{R}\) 不满足（\(\{0\}\) 不开）。是不是拓扑性质？验证：若 \(X\) 每个单点集开、\(h : X \to Y\) 同胚，对 \(y \in Y\)，\(h^{-1}(y) = \{x\}\)（\(h\) 双射），那 \(\{x\}\) 在 \(X\) 中开，所以 \(h(\{x\}) = \{y\}\) 在 \(Y\) 中开（\(h\) 是开映射）。\(\checkmark\)</p>
+
+<p>更直接版的 P = "<em>X 是离散拓扑</em>"——也是拓扑性质（同胚保持<em>整个</em> 开集格）。\(\mathbb{R}_d\) 离散、\(\mathbb{R}\) 不离散。</p>
+
+<p>不过 P 不必这么强；任何能区分的性质都行。比如 P = "<em>X 不可数且每点都孤立</em>"——\(\mathbb{R}_d\) 满足、\(\mathbb{R}\) 不满足。也能区分。</p>
+
+<p><strong>例 7.6.2：\([0, 1]\) 与 \([0, 1)\) 不同胚。</strong>P = "<em>X 紧致</em>"（<a href="ch16.html">ch16</a>）。\([0, 1]\) 紧致（Heine-Borel）、\([0, 1)\) 不紧致（开覆盖 \(\{[0, 1 - 1/n) : n \geq 2\}\) 无有限子覆盖）。同胚保紧致 \(\Rightarrow\) 不同胚。</p>
+
+<p>另一种方法：拿掉一点看连通性变化。\([0, 1] \setminus \{0\} = (0, 1]\) 连通；\([0, 1) \setminus \{1/2\} = [0, 1/2) \cup (1/2, 1)\) 不连通。但 \([0, 1] \setminus \{1/2\} = [0, 1/2) \cup (1/2, 1]\) 也不连通。所以不能<em>简单</em> 用"<em>拿一点连通性</em>" 区分两者——得拿"<em>边界点</em>"。\([0, 1]\) 有两个边界点（0 与 1，每个拿掉后剩下连通），\([0, 1)\) 只有一个边界点（0，拿掉后剩下连通；但 \([0, 1)\) 中拿任意内点剩下不连通）。"边界点个数" 是拓扑不变量（属于"局部" 性质，<a href="ch24.html">ch24 流形带边</a>讨论）。</p>
+
+<p><strong>例 7.6.3：\(\mathbb{Q}\) 与 \(\mathbb{R}\) 不同胚。</strong>P = "<em>X 连通</em>"。\(\mathbb{R}\) 连通（实数线是单段）、\(\mathbb{Q}\) <em>不</em> 连通——任何 \(\mathbb{Q}\) 的子集 \(\{q < \pi\}\) 与 \(\{q > \pi\}\) 都开（\(\pi\) 不在 \(\mathbb{Q}\) 里），它俩不交、并起来 \(= \mathbb{Q}\)。同胚保连通 \(\Rightarrow\) 不同胚。</p>
+
+<p><strong>例 7.6.4：\(S^1\) 与 \(\infty\)（8 字）不同胚。</strong>P = "<em>X 拿掉某一点后剩下的连通片数 \(\leq 2\)</em>"。\(S^1\) 拿掉<em>任</em> 一点后剩下一段开弧 \(\cong (0, 1)\) 连通——1 片。\(\infty\) 8 字有<em>一个交点</em> \(p\)，拿掉它后剩下两个开弧——3 片（一个开弧"<em>双向</em>" 算一段；具体看几何模型——8 字 \(= S^1 \vee S^1\) 两个圆共点，拿掉共点后剩两个开弧）。3 \(>\) 2，矛盾。</p>
+
+<p>但<em>等等</em>。"<em>拿掉一点后</em>" 这条作为拓扑性质，正确表述是"<em>对任意 \(p\)，\(X \setminus \{p\}\) 的连通片数</em>"。这<em>不是</em> 一个简单数——是"<em>p 在 X 中的局部连通性见证</em>"。这<em>是</em> 拓扑不变量（同胚 \(h\) 把 \(p\) 送到 \(h(p)\)，\(X \setminus \{p\} \cong Y \setminus \{h(p)\}\)，连通片数同胚保持）。</p>
+
+<p>但作为<em>整空间</em> 的性质 P，要表述成"<em>存在点 \(p\) 使 \(X \setminus \{p\}\) 不连通</em>" 或类似。\(\infty\) 满足（取交点 \(p\)，\(\infty \setminus \{p\}\) 三段不连通）。\(S^1\) 不满足（拿任一点剩下都连通）。所以 \(\infty\) 与 \(S^1\) 不同胚。</p>
+
+<p>这种"<em>拿点看变化</em>" 的技巧叫 <em>cut points 论证</em>，是低维拓扑里常用的强工具。</p>
+
+<h2 id="sec7-7">7.7 \(\mathbb{R}\) 与 \(\mathbb{R}^2\) 不同胚</h2>
+
+<p>这是<em>最经典</em> 的"<em>不同胚</em>" 证明，用的是"<em>cut points</em>"。</p>
+
+<p><strong>断言。</strong>\(\mathbb{R} \not\cong \mathbb{R}^2\)。</p>
+
+<p>证。假设有同胚 \(h : \mathbb{R} \to \mathbb{R}^2\)。取 \(x = 0 \in \mathbb{R}\)。\(\mathbb{R} \setminus \{0\} = (-\infty, 0) \cup (0, \infty)\)<em>不</em> 连通。同胚把 \(\mathbb{R} \setminus \{0\}\) 双连续映到 \(\mathbb{R}^2 \setminus \{h(0)\}\)。但 \(\mathbb{R}^2 \setminus \{h(0)\}\) <em>连通</em>——任何两点 \(p, q \in \mathbb{R}^2 \setminus \{h(0)\}\) 可以用"<em>绕开 \(h(0)\)</em>" 的折线相连，故是道路连通故连通。</p>
+
+<p>"<em>连通</em>" 是拓扑性质（<a href="ch18.html">ch18</a>）——\(\mathbb{R} \setminus \{0\}\) 不连通而 \(\mathbb{R}^2 \setminus \{h(0)\}\) 连通，矛盾。\(\square\)</p>
+
+<p>请你停下盯一下这个证明的<em>简洁性</em>——只用"<em>拿掉一点连通性怎么变</em>" 就把"<em>1 维 vs 2 维</em>" 区分开了。这是拓扑学第一个真正"<em>反直觉地强</em>" 的成果——你<em>没用</em> 任何"<em>维数</em>" 的概念，但<em>给出了</em> 维数的拓扑刻画。</p>
+
+<p><strong>推广。</strong>同样思路证 \(\mathbb{R}^n \not\cong \mathbb{R}^m\)（\(n \neq m\)）<em>不</em>容易——"<em>拿掉一点</em>" 把 \(\mathbb{R}^n\) 变成 \(\mathbb{R}^n \setminus \{0\}\)，对 \(n \geq 2\) 都连通。区分 \(\mathbb{R}^n\) 与 \(\mathbb{R}^m\)（\(n, m \geq 2\)）需要更深的不变量——<em>同伦群</em>、<em>同调群</em>。</p>
+
+<p>具体：\(\pi_{n-1}(\mathbb{R}^n \setminus \{0\}) = \mathbb{Z}\)（"<em>n−1 维球面是 \(\mathbb{R}^n \setminus \{0\}\) 的形变收缩</em>"），所以 \(\pi_{n-1}\) 给"<em>维数</em>" 的真正拓扑刻画。这是<a href="ch23.html">ch23 基本群</a> + 代数拓扑的入口。</p>
+
+<p>一个重要历史脚注——"<em>\(\mathbb{R}^n \cong \mathbb{R}^m \Rightarrow n = m\)</em>" 这条最早由 Brouwer 1912 年证明（不变域定理 + 不变维度定理），其前 Cantor 已在 1877 年发现 \(\mathbb{R}\) 与 \(\mathbb{R}^2\) 之间存在<em>双射</em>（用 Hilbert 曲线 / 截位插入）——但<em>那个双射不连续</em>。Brouwer 的贡献正是证明<em>连续</em> 双射不存在。这是拓扑学早期最重要的定理之一。</p>
+
+<h2 id="sec7-8">7.8 嵌入与浸入</h2>
+
+<p>"<em>同胚到子空间</em>" 是同胚的近亲——但更宽松：</p>
+
+<p>\[
+\boxed{\ f : X \to Y \text{ 是嵌入（embedding）} \iff f(X) \subseteq Y \text{ 配子空间拓扑后, } f : X \to f(X) \text{ 是同胚.}\ }
+\]</p>
+
+<p>展开——\(f\) 单射、连续，且 \(f^{-1} : f(X) \to X\) 连续（在子空间拓扑下）。\(f\) 不必满，但限制到像 \(f(X)\) 后双连续。</p>
+
+<p>例：包含映射 \(\iota : A \hookrightarrow X\)（\(A\) 配子空间拓扑）总是嵌入——\(\iota : A \to A\)（恒等）平凡同胚。</p>
+
+<p>例：\(f : (0, 1) \to \mathbb{R}^2\)，\(f(t) = (t, 0)\)。把开区间嵌成 \(\mathbb{R}^2\) 中 x 轴的一段。是嵌入——\(f\) 单、连续，\(f^{-1}(x, 0) = x\) 在 \(f((0, 1)) = (0, 1) \times \{0\}\) 上连续。</p>
+
+<p><em>反</em>例：\(f : [0, 2\pi) \to S^1 \subseteq \mathbb{R}^2\)，\(f(t) = (\cos t, \sin t)\)。<em>双射</em>（每个圆上点对应唯一 \(t \in [0, 2\pi)\)）、<em>连续</em>，但 \(f^{-1}\) <em>不连续</em>——点 \((1, 0) = f(0)\) 的小邻域是圆上一段小开弧 \(\{(\cos t, \sin t) : t \in (-\delta, \delta) \cup (2\pi - \delta, 2\pi)\}\)，对应到 \([0, 2\pi)\) 上是 \([0, \delta) \cup (2\pi - \delta, 2\pi)\)——<em>不</em>连通的两段——而 \(f^{-1}((1, 0)) = 0\) 的<em>每个</em> \([0, 2\pi)\) 邻域 \([0, \epsilon)\) 是连通的<em>一段</em>。\(f^{-1}\) 把"<em>不连通邻域</em>" 拉回"<em>连通邻域</em>" ——不可能连续。</p>
+
+<p>这个反例说明：连续单射<em>不</em> 自动是嵌入。"<em>把 \([0, 2\pi)\) 卷成圆</em>" 这件事在<em>拓扑上</em> 不是<em>把 \([0, 2\pi)\) 嵌进 \(\mathbb{R}^2\)</em> ——因为<em>头尾被粘在了一起</em>，造成 \(f^{-1}\) 在粘点不连续。</p>
+
+<p>正确的"<em>圆作为 \([0, 2\pi]\) 的商</em>" 应该用<em>商拓扑</em>（<a href="ch10.html">ch10</a>），把端点粘起来——这样<em>可以</em> 给同胚 \(S^1 \cong [0, 2\pi] / (0 \sim 2\pi)\)。</p>
+
+<p><strong>浸入 vs 嵌入。</strong>在<em>微分拓扑</em>（<a href="ch24.html">ch24</a>）里还有"<em>浸入</em>"（immersion）——局部是嵌入，但全局不必。比如 \([0, 2\pi) \to S^1\) <em>是</em> 浸入但<em>不是</em> 嵌入。8 字曲线作为某条 \(\mathbb{R} \to \mathbb{R}^2\) 的像也是浸入但不是嵌入（自交点处违反单射）。"嵌入" 与"浸入" 的区别在低维拓扑里至关重要。</p>
+
+<h2 id="sec7-9">7.9 拓扑分类 vs 度量分类</h2>
+
+<p>把这一章和你以前学的<em>度量空间分类</em> 对比。两层等价关系：</p>
+
+<ul>
+  <li><em>等距同构</em>（isometry）：\(d_X(x, x') = d_Y(h(x), h(x'))\) 的双射。<em>保距离</em>。</li>
+  <li><em>同胚</em>（homeomorphism）：双连续双射。<em>保拓扑结构</em>。</li>
+</ul>
+
+<p>等距同构远比同胚<em>严格</em>。每对等距同构的空间都同胚（等距 \(\Rightarrow\) 双连续），但反过来错——同胚的两个度量空间往往<em>不</em> 等距。</p>
+
+<p>具体：圆 \(S^1\) 半径 1 与圆 \(S^1\) 半径 2 是<em>同胚</em>（双连续双射 \(x \mapsto 2x\)）但<em>不</em> 等距（一个周长 \(2\pi\)、一个 \(4\pi\)，距离不一样）。</p>
+
+<p>具体：\((0, 1)\) 与 \(\mathbb{R}\)（欧氏度量）<em>同胚</em>（\(\tan(\pi x - \pi/2)\)）但<em>不</em> 等距（一个有界、一个无界）。</p>
+
+<p>"<em>拓扑等价类</em>" 远比"<em>度量等价类</em>" <em>粗</em>——很多度量上不同的空间在拓扑上同胚。这是为什么"<em>拓扑学</em>" 才是<em>真正研究"形状"</em> 的学科——它把度量上的细节抹掉，留下纯结构。</p>
+
+<p>另一方面，"<em>拓扑等价类</em>" 也比"<em>同伦等价类</em>" 严格。同伦等价（homotopy equivalence）——存在 \(f : X \to Y\)、\(g : Y \to X\) 使 \(g \circ f \simeq \mathrm{id}_X\)、\(f \circ g \simeq \mathrm{id}_Y\)（\(\simeq\) 是同伦关系，<a href="ch23.html">ch23</a>）——是比同胚更<em>粗</em> 的等价。</p>
+
+<p>具体：\(\mathbb{R}^n\) 与一点 \(\{*\}\) <em>同伦等价</em>（\(\mathbb{R}^n\) 收缩到一点）但<em>不</em> 同胚（一个无限、一个有限）。圆环 \(D^2 \setminus \{0\} = \{x \in \mathbb{R}^2 : 0 < |x| \leq 1\}\) 与圆 \(S^1\) 同伦等价（圆环形变收缩到中心圆）但<em>不</em> 同胚（圆环是 2 维曲面，圆是 1 维曲线）。</p>
+
+<p>三层粗细递进：</p>
+
+<p>\[
+\text{等距} \quad \Rightarrow \quad \text{同胚} \quad \Rightarrow \quad \text{同伦等价}.
+\]</p>
+
+<p>每层放宽都让"<em>等价类</em>" 变大。<em>代数拓扑</em>（同伦群、同调群）研究<em>同伦等价类</em>，<em>点集拓扑</em>（这本书）研究<em>同胚类</em>，<em>度量几何</em> 研究<em>等距类</em>。三种几何观点，三种"<em>形状</em>"。</p>
+
+<h2 id="sec7-10">7.10 临别话</h2>
+
+<p>这一章给"<em>什么算同一个拓扑空间</em>" 一个精确答案：同胚。然后给"<em>怎么证两个空间不同胚</em>" 一个<em>武器库</em>：拓扑性质 + cut points + 后续章节的紧致 / 连通 / Hausdorff / 可数等。</p>
+
+<p>三件事请你带走：</p>
+
+<ul>
+  <li>"<em>双连续双射</em>" 中的"<em>双</em>" 不可省——\(\mathbb{R}_d \to \mathbb{R}\) 反例钉死。</li>
+  <li>"<em>拓扑性质</em>" 是同胚下不变的属性，区分空间的标准武器。</li>
+  <li>三层等价关系——等距 / 同胚 / 同伦等价——粗细递进。本书定位在"<em>同胚</em>" 这一层。</li>
+</ul>
+
+<p>下一章我们开始把"<em>从已知拓扑空间造新拓扑空间</em>" 这件事系统化——子空间、积空间、商空间、任意积空间。这四种构造（ch8-11）是后面所有几何讨论的基础工具。每一种构造都把"<em>拓扑学家做事的方式</em>" 推进一步：从<em>分析现有空间</em> 到<em>主动构造新空间</em>。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 连续映射</a><a href="ch8.html">下一章 · 第 8 章 子空间拓扑 →</a></nav>
+</main>
+</body>
+</html>

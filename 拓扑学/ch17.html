@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 局部紧致与单点紧致化 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 Tychonoff 定理</a><a href="ch18.html">下一章 · 第 18 章 连通性 →</a></nav>
+<h1 id="ch17">第 17 章 局部紧致与单点紧致化</h1>
+
+<p>请你回忆一下 \(\mathbb{R}^n\) 的紧致性状况。\(\mathbb{R}^n\) 自己<em>不紧</em>——它无界, Heine-Borel 给紧致 \(\iff\) 闭 + 有界 (<a href="ch15.html">ch15</a>), 而 \(\mathbb{R}^n\) 不有界。所以你不能直接对 \(\mathbb{R}^n\) 用任何"紧空间专用" 的定理。</p>
+
+<p>但请停下来观察 \(\mathbb{R}^n\) 一件具体的事: 拿任何一点 \(x \in \mathbb{R}^n\), 它的<em>邻域</em> \(\overline{B(x, 1)}\) (闭单位球) 紧 (闭 + 有界 + 在 \(\mathbb{R}^n\) 中, Heine-Borel)。所以"<em>每个点都有一个紧邻域</em>"——尽管整体不紧。</p>
+
+<p>这种"<em>局部有限性</em>" 是一种比紧致<em>弱</em>但仍非常有用的性质。它叫"<em>局部紧致</em>"。\(\mathbb{R}^n\) 是它最熟悉的例子, 但<em>许多</em>分析里出现的空间都局部紧——欧氏空间、流形 (光滑或拓扑)、CW 复形的紧支区域。<em>不</em>局部紧的空间也有: \(\mathbb{Q}\) 不局部紧 (后面看)、无穷维 Banach 空间不局部紧。这条分水岭决定哪些定理可用。</p>
+
+<p>这一章干两件事: <strong>(1)</strong> 把"局部紧" 形式化, 看看它给你什么。<strong>(2)</strong> 一个具体构造——给局部紧 Hausdorff 空间<em>加一个无穷远点</em>, 把它变成<em>真</em>紧空间。这叫"<em>单点紧致化</em>" (Alexandroff 1924), 经典例子是 \(\mathbb{R}^n \cup \{\infty\} \cong S^n\)——欧氏空间的单点紧致化是球面。</p>
+
+<h2 id="sec17-1">17.1 局部紧的定义</h2>
+
+<p>定义: 拓扑空间 \(X\) 称为<em>局部紧</em> (locally compact), 如果每个点 \(x \in X\) 有一个紧邻域——即存在紧集 \(K \subseteq X\) 与 \(x\) 的开邻域 \(U\), 使 \(x \in U \subseteq K\)。</p>
+
+<p>请你停下来读这条定义两遍。它说的是: 每个点都"<em>住在</em>" 某个紧集的内部 (内部即开邻域)。这<em>不</em>等同于"<em>每个点的某个开邻域紧</em>"——开集一般不紧 (\(\mathbb{R}^n\) 中开球不紧)。所以紧邻域要求"<em>含</em>" 开邻域而不是"<em>是</em>" 开邻域。</p>
+
+<p>在 Hausdorff 空间里有等价的更顺手的写法 (后面用): \(X\) 局部紧 Hausdorff \(\iff\) 每个点有<em>含</em> 紧闭包的开邻域——即 \(\forall x, \exists U\) 开 with \(x \in U\) 且 \(\overline{U}\) 紧。原因——Hausdorff 下紧集自动闭, 所以"<em>紧邻域</em>" \(K\) 含开 \(U\), 取 \(\overline{U} \subseteq K\) (闭子集 + 紧 \(\Rightarrow\) 紧)。反过来若 \(\overline{U}\) 紧, 它本身就是 \(x\) 的紧邻域。</p>
+
+<p>有些教科书要求空间<em>同时 Hausdorff</em> 才允许说"局部紧"。我们这里采用更宽松的定义 (允许任何拓扑空间局部紧), 但实际有用的几乎全是 Hausdorff 情形——下面的应用都假设 Hausdorff。</p>
+
+<h2 id="sec17-2">17.2 例与反例</h2>
+
+<p><strong>例 1: \(\mathbb{R}^n\) 局部紧。</strong>每点 \(x\) 取 \(\overline{B(x, 1)}\)——闭球, 紧 (Heine-Borel), 含开球 \(B(x, 1) \ni x\) 作内部。\(\checkmark\)</p>
+
+<p><strong>例 2: 任何离散空间局部紧。</strong>每点 \(x\) 自己 \(\{x\}\) 是紧 (有限) 邻域, 而且 \(\{x\}\) 在离散拓扑下是开的。所以紧邻域 = 开邻域 = \(\{x\}\)。</p>
+
+<p><strong>例 3: 任何紧空间局部紧。</strong>取 \(K = X\), \(U = X\), \(x \in X = K\) for any \(x\)。trivially。</p>
+
+<p><strong>例 4: \(\mathbb{R}^n\) 中开集局部紧。</strong>设 \(U \subseteq \mathbb{R}^n\) 开。给 \(x \in U\), 存在 \(r > 0\) 使 \(\overline{B(x, r)} \subseteq U\) (因 \(U\) 开)。\(\overline{B(x, r)}\) 紧, 是 \(x\) 的紧邻域 (在 \(U\) 中)。所以 \(U\) 局部紧。一般地: <em>局部紧 Hausdorff 空间的开子集仍局部紧</em>——这是后面要用的事实。</p>
+
+<p><strong>例 5 (反例): \(\mathbb{Q}\) 不局部紧。</strong>取 \(\mathbb{Q}\) 配子空间拓扑 \(\subseteq \mathbb{R}\)。我们证 \(\mathbb{Q}\) 中任何点 (例如 \(0\)) 都<em>不</em>有紧邻域。</p>
+
+<p>设 \(K \subseteq \mathbb{Q}\) 是 \(0\) 的紧邻域。那 \(K\) 包含 \(\mathbb{Q}\) 中 \(0\) 的某个开邻域 \(U \cap \mathbb{Q}\), 其中 \(U \subseteq \mathbb{R}\) 开。所以 \(U \cap \mathbb{Q} \subseteq K\), 所以 \((-r, r) \cap \mathbb{Q} \subseteq K\) for some \(r > 0\) (取 \(U \supseteq (-r, r)\))。</p>
+
+<p>取一个无理数 \(\alpha \in (0, r)\) (例如 \(\alpha = r / \sqrt{2}\) 或 \(\alpha = \sqrt{2} \cdot \min(r/2, 1)\) 等无理数)。考虑 \(\mathbb{Q}\) 中序列 \((q_n)\) 收敛到 \(\alpha\) (\(\mathbb{Q}\) 在 \(\mathbb{R}\) 中稠密)。可以取 \(q_n \in (0, r) \cap \mathbb{Q} \subseteq K\)。但 \((q_n)\) 在 \(\mathbb{Q}\) 中没有收敛子序列——它在 \(\mathbb{R}\) 中收敛到 \(\alpha \notin \mathbb{Q}\), 而<a href="ch15.html">ch15</a>给紧空间度量化情形下序列紧, 所以 \(K\) 不紧 (序列紧的反例)。</p>
+
+<p>所以 \(\mathbb{Q}\) 中 \(0\) <em>没有</em>紧邻域。\(\mathbb{Q}\) 不局部紧。</p>
+
+<p>这件事的直觉: \(\mathbb{Q}\) "<em>到处都漏</em>"——任何邻域里都有"<em>洞</em>" (无理数), 这些洞让序列收敛"<em>逃出去</em>", 所以邻域永远不能紧。局部紧要求"<em>邻域里没洞</em>", 完备性是它的精神实质。</p>
+
+<p><strong>例 6 (反例): 无穷维 Banach 空间不局部紧。</strong>设 \(X\) 为无穷维 Banach 空间。Riesz 引理: \(X\) 中闭单位球 \(\overline{B(0, 1)}\) <em>不</em>紧 (闭, 有界, 但不紧, 因维度无穷)。事实上 \(0\) 没有紧邻域——任何含 \(0\) 的开集都包含某个 \(\delta\)-球 \(B(0, \delta)\), 紧邻域必须含闭球 \(\overline{B(0, \delta')} \subseteq K\), 但闭球不紧矛盾。所以无穷维 Banach 空间不局部紧。</p>
+
+<p>这是<em>无穷维分析</em> 与<em>有限维分析</em> 的一条根本分水岭。许多有限维成立的紧致论 (例如 Bolzano-Weierstrass, Heine-Borel) 在无穷维全部失效, 因为局部紧失效。无穷维分析需要替代品: <em>弱拓扑</em>, <em>弱*拓扑</em>, <em>紧算子</em>——这些都是绕过"<em>非局部紧</em>" 困难的工具 (链<a href="../泛函分析/index.html">泛函分析</a>)。</p>
+
+<h2 id="sec17-3">17.3 局部紧 Hausdorff 的良态</h2>
+
+<p>"<em>局部紧 Hausdorff</em>" (locally compact Hausdorff, LCH) 是分析里出现频率最高的一类拓扑空间。原因——它<em>恰好</em>支持几条分析必需的标准构造:</p>
+
+<p><strong>(1) 连续函数空间 \(C(X)\) 良态。</strong>\(X\) LCH \(\Rightarrow\) \(C(X) = \{f : X \to \mathbb{R} \text{ 连续}\}\) 是合理的代数对象。配紧开拓扑 (compact-open topology), \(C(X)\) 是一个拓扑向量空间; \(X\) 紧时它是 Banach 空间 \((C(X), \|\cdot\|_\infty)\)。</p>
+
+<p><strong>(2) 紧支撑函数空间 \(C_c(X)\) 良态。</strong>定义</p>
+
+<p>\[
+C_c(X) = \{f \in C(X) : \mathrm{supp}(f) := \overline{\{x : f(x) \neq 0\}} \text{ 紧}\}.
+\]</p>
+
+<p>"<em>紧支撑</em>" 意为函数<em>除一个紧子集外</em>等于 \(0\)。LCH 上 \(C_c(X)\) 非平凡 (Urysohn 引理给非常多的紧支撑函数, ch20)。\(C_c(\mathbb{R}^n)\) 是 \(\mathbb{R}^n\) 上 bump function 的标准家庭, 在偏微分方程、分布论、和傅里叶分析里基础。</p>
+
+<p><strong>(3) Riesz 表示定理的舞台。</strong>Riesz 表示定理 (链<a href="../泛函分析/ch16.html">泛函分析 ch16</a>) 说: \(X\) LCH 时, \(C_c(X)\) 上的<em>正线性泛函</em> 一一对应 \(X\) 上的<em>正 Borel 测度</em> (Radon 测度)。这条对应是测度论的重要桥梁——它把"<em>积分</em>" 这种泛函刻画成"<em>测度</em>" 这种几何对象。LCH 假设是 Riesz 表示能成立的<em>核心</em>。</p>
+
+<p><strong>(4) 流形是 LCH。</strong>拓扑流形 (locally homeomorphic to \(\mathbb{R}^n\)) 自动 LCH——每点附近<em>同胚</em> 于 \(\mathbb{R}^n\) 开集, 而 \(\mathbb{R}^n\) 开集 LCH (例 4)。所以流形理论坐落在 LCH 框架中。</p>
+
+<p>这种"<em>能容纳分析</em>" 的良态正是 LCH 在数学里频繁出现的原因——它是"<em>足够紧到能积分</em> 但<em>足够大到能涵盖几何对象</em>" 的折中。</p>
+
+<h2 id="sec17-4">17.4 单点紧致化的构造 (Alexandroff)</h2>
+
+<p>现在我们解决核心问题: 给定 LCH 空间 \(X\) (不紧), 怎么<em>把 \(X\) 嵌入一个紧空间</em>?</p>
+
+<p>有一个非常简洁的构造——<em>加一个新点</em>, 叫"<em>无穷远点</em>" \(\infty\), 给 \(X^* = X \cup \{\infty\}\) 一个合适的拓扑使它紧。</p>
+
+<p>关键问题——\(\infty\) 的<em>开邻域</em> 应该是什么? 直觉: \(\infty\) "<em>无限远</em>", 它附近的点应该是 \(X\) 中"<em>很远</em>" 的点。"<em>很远</em>" 在拓扑里翻译成"<em>在某个紧子集之外</em>"——紧子集是<em>有限</em>的代名词, 紧子集之外就是无限。</p>
+
+<p>所以定义: \(\infty\) 的开邻域是 \(\{\infty\} \cup (X \setminus K)\), where \(K \subseteq X\) 紧。</p>
+
+<p><strong>定义 (Alexandroff 单点紧致化)。</strong>设 \(X\) 是拓扑空间, \(\infty \notin X\) 是新点。集合 \(X^* = X \cup \{\infty\}\)。\(X^*\) 上的拓扑 \(\tau^*\) 由开集族</p>
+
+<p>\[
+\tau^* = \{U : U \subseteq X \text{ 是 } X \text{ 中开集}\} \cup \{V \cup \{\infty\} : X \setminus V \text{ 是 } X \text{ 中紧闭集}\}
+\]</p>
+
+<p>定义。换言之, \(X^*\) 中的开集分两类:</p>
+
+<ul>
+  <li>(a) 完全在 \(X\) 中, 是 \(X\) 中的开集 (\(\infty\) 不在其中)。</li>
+  <li>(b) 含 \(\infty\), 形如 \(\{\infty\} \cup (X \setminus K)\), 其中 \(K \subseteq X\) 紧闭。</li>
+</ul>
+
+<p>"紧闭" 而不只是"紧" 是为了让 \(X \setminus K\) 在 \(X\) 中开 (闭集的余集开)。在 Hausdorff 空间紧 \(\Rightarrow\) 闭, 所以这条要求自动满足。但如果我们想让构造在非 Hausdorff 时也可行, 要求"紧闭" 显式。</p>
+
+<h2 id="sec17-5">17.5 验证 \(X^*\) 是紧拓扑空间</h2>
+
+<p>三件事要查: (i) \(\tau^*\) 是拓扑 (满足三公理)。(ii) \(X^*\) 紧。(iii) \(X\) 作为子空间嵌入 \(X^*\) (即 \(X^*\) 上限制 \(\tau^*\) 到 \(X\) 给回 \(X\) 的原拓扑)。</p>
+
+<p><strong>(i) 拓扑公理。</strong></p>
+
+<p>O1: \(\emptyset\) 在 (a) 类 (空集是 \(X\) 中开)。\(X^*\) 在 (b) 类——取 \(K = \emptyset\) (空集紧闭), \(\{\infty\} \cup (X \setminus \emptyset) = X^*\)。</p>
+
+<p>O2 (任意并): 任意多 (a) (b) 类开集的并。<em>分类讨论</em>:</p>
+
+<ul>
+  <li>全部 (a) 类: 并仍是 \(X\) 中开集, 在 (a) 类。</li>
+  <li>含至少一个 (b) 类: 设 \(\bigcup_\alpha U_\alpha = U \cup \{\infty\}\), 其中 \(U \subseteq X\)。\(U\) 是各 \(U_\alpha \cap X\) 的并, 每个都是 \(X\) 中开集 (无论原 \(U_\alpha\) 哪类)。所以 \(U\) 在 \(X\) 中开。设 (b) 类成员的对应 \(K_\beta\) (\(U_\beta = \{\infty\} \cup (X \setminus K_\beta)\)), 则 \(X \setminus U \subseteq X \setminus (X \setminus K_{\beta_0}) = K_{\beta_0}\) for any one \(\beta_0\)。\(X \setminus U\) 是 \(X\) 中闭集 (\(U\) 开) 且 \(\subseteq K_{\beta_0}\) 紧, 所以 \(X \setminus U\) 紧 (紧集闭子集仍紧)。\(\bigcup_\alpha U_\alpha\) 在 (b) 类。\(\checkmark\)</li>
+</ul>
+
+<p>O3 (有限交): 类似分类讨论。两个 (a) 类: 交在 (a) 类 (\(X\) 中开)。两个 (b) 类 \(\{\infty\} \cup (X \setminus K_1), \{\infty\} \cup (X \setminus K_2)\): 交 = \(\{\infty\} \cup (X \setminus (K_1 \cup K_2))\), \(K_1 \cup K_2\) 紧闭 (有限并), 在 (b) 类。一 (a) 一 (b): 交不含 \(\infty\), 是 \(X\) 中两开集的交, 在 (a) 类。\(\checkmark\)</p>
+
+<p><strong>(ii) \(X^*\) 紧。</strong></p>
+
+<p>给 \(X^*\) 的开覆盖 \(\{U_\alpha\}\)。某个 \(U_{\alpha_0}\) 必须含 \(\infty\) (\(\infty\) 要被覆盖), 所以 \(U_{\alpha_0}\) 在 (b) 类: \(U_{\alpha_0} = \{\infty\} \cup (X \setminus K)\) for some 紧闭 \(K \subseteq X\)。</p>
+
+<p>剩下要覆盖 \(K\) (\(X^* \setminus U_{\alpha_0} = K\))。\(\{U_\alpha \cap X\}_{\alpha \neq \alpha_0}\) 是 \(K\) 在 \(X\) 中的开覆盖 (每个 \(U_\alpha \cap X\) 在 \(X\) 中开)。\(K\) 紧, 抽有限子覆盖 \(U_{\alpha_1} \cap X, \ldots, U_{\alpha_n} \cap X\), 共 \(K\)。</p>
+
+<p>那 \(\{U_{\alpha_0}, U_{\alpha_1}, \ldots, U_{\alpha_n}\}\) 共 \(X^*\): \(U_{\alpha_0}\) 共了 \(\infty\) 与 \(X \setminus K\), 其余共了 \(K\)。<em>有限</em>子覆盖。</p>
+
+<p>所以 \(X^*\) 紧。\(\square\)</p>
+
+<p><strong>(iii) \(X \hookrightarrow X^*\) 嵌入。</strong></p>
+
+<p>\(X\) 在 \(X^*\) 中作为子空间的开集 = \(X^*\) 中开集与 \(X\) 的交。(a) 类成员与 \(X\) 交 = 自身, \(X\) 中开集。(b) 类成员 \(\{\infty\} \cup (X \setminus K)\) 与 \(X\) 交 = \(X \setminus K\), 也是 \(X\) 中开集 (\(K\) 闭)。所以 \(X\) 的子空间拓扑就是 \(X\) 原拓扑——嵌入是<em>同胚</em> 到子空间。\(\checkmark\)</p>
+
+<p>请你停下来欣赏构造的<em>简洁</em>: 一个新点 + 拓扑分两类 + 三公理验证一气呵成 + 紧致性证明<em>一段</em>。所有"<em>无穷远</em>" 的几何直觉都被"<em>紧子集补</em>" 这句话精确化了。</p>
+
+<h2 id="sec17-6">17.6 \(X^*\) Hausdorff \(\iff\) \(X\) 局部紧 Hausdorff</h2>
+
+<p>构造 17.4-17.5 对<em>任何</em>拓扑空间 \(X\) 都行——但得到的 \(X^*\) <em>不一定</em> Hausdorff。"<em>Hausdorff</em>" 是分析想要的最低分离公理 (链<a href="ch12.html">ch12</a>), 所以我们关心: \(X^*\) Hausdorff 需要什么?</p>
+
+<p><strong>定理。</strong>\(X^*\) Hausdorff \(\iff\) \(X\) 局部紧 Hausdorff。</p>
+
+<p><strong>(\(\Leftarrow\)) \(X\) LCH \(\Rightarrow X^*\) Hausdorff。</strong>需要分两点。设 \(p, q \in X^*\) 不同。</p>
+
+<p>(a) \(p, q \in X\): \(X\) Hausdorff, 取 \(X\) 中不交开邻域, 它们在 \(X^*\) 中也是不交开邻域。\(\checkmark\)</p>
+
+<p>(b) \(p \in X, q = \infty\): 由局部紧 \(p\) 有紧邻域 \(K \ni p\) (含开 \(U \ni p\), \(U \subseteq K\))。\(K\) 紧 + \(X\) Hausdorff \(\Rightarrow K\) 闭。所以 \(X \setminus K\) 在 \(X\) 中开, \(\{\infty\} \cup (X \setminus K)\) 是 \(\infty\) 的开邻域。\(U\) 是 \(p\) 的开邻域。\(U \subseteq K\) 与 \(X \setminus K\) 不交, 加上 \(U \not\ni \infty\), 两邻域不交。\(\checkmark\)</p>
+
+<p><strong>(\(\Rightarrow\)) \(X^*\) Hausdorff \(\Rightarrow\) \(X\) LCH。</strong>\(X\) Hausdorff 因为它是 Hausdorff 空间 \(X^*\) 的子空间, 子空间继承 Hausdorff。要证局部紧——给 \(p \in X\), \(p \neq \infty\), \(X^*\) Hausdorff 给不交开邻域 \(U \ni p, V \ni \infty\)。\(V\) 含 \(\infty\) 所以是 (b) 类: \(V = \{\infty\} \cup (X \setminus K)\), \(K \subseteq X\) 紧闭。\(U \cap V = \emptyset\) 且 \(U \subseteq X\), 所以 \(U \subseteq X \setminus (V \cap X) = X \setminus (X \setminus K) = K\)。\(U\) 是 \(p\) 的开邻域, \(U \subseteq K\) 紧, 所以 \(p\) 有紧邻域 (即 \(K\), 内部含 \(U \ni p\))。\(X\) 局部紧。\(\square\)</p>
+
+<p>这条等价是单点紧致化最重要的"良态条件": <em>构造 LCH 空间的紧致化, 给的是紧 Hausdorff 空间</em>。紧 Hausdorff 是分析的最佳舞台 (Tietze 延拓、Urysohn 引理、Riesz 表示等都在这上面成立)。</p>
+
+<h2 id="sec17-7">17.7 经典例: \(\mathbb{R}^n \cup \{\infty\} \cong S^n\)</h2>
+
+<p>最重要的具体例子——单点紧致化把 \(\mathbb{R}^n\) 变成球面。</p>
+
+<p><strong>定理。</strong>\((\mathbb{R}^n)^* \cong S^n = \{x \in \mathbb{R}^{n+1} : \|x\| = 1\}\) 同胚。</p>
+
+<p><strong>构造 (立体投影)。</strong>设 \(N = (0, \ldots, 0, 1) \in S^n\) "北极"。立体投影 \(\sigma : S^n \setminus \{N\} \to \mathbb{R}^n\):</p>
+
+<p>\[
+\sigma(x_1, \ldots, x_{n+1}) = \frac{1}{1 - x_{n+1}}(x_1, \ldots, x_n).
+\]</p>
+
+<p>几何上: 从北极 \(N\) 出发, 经过 \(S^n\) 上一点 \(x \neq N\) 画一条直线, 直线与"<em>赤道平面</em>" \(\{x_{n+1} = 0\} \cong \mathbb{R}^n\) 的交点就是 \(\sigma(x)\)。</p>
+
+<p>\(\sigma\) 是 \(S^n \setminus \{N\}\) 与 \(\mathbb{R}^n\) 之间的同胚——可以验证它是双射、连续, 它的逆 (从 \(\mathbb{R}^n\) 反向投回去) 也连续。这是经典的立体投影。</p>
+
+<p>现在拓展 \(\sigma\) 到 \(\bar{\sigma} : S^n \to (\mathbb{R}^n)^*\):</p>
+
+<p>\[
+\bar{\sigma}(x) = \begin{cases} \sigma(x) & x \neq N \\ \infty & x = N \end{cases}
+\]</p>
+
+<p>要证 \(\bar{\sigma}\) 是同胚 \(S^n \to (\mathbb{R}^n)^*\)。</p>
+
+<p>\(\bar{\sigma}\) 双射: \(\sigma\) 是 \(S^n \setminus \{N\}\) 与 \(\mathbb{R}^n\) 双射 + \(\bar{\sigma}(N) = \infty\), \(\infty \notin \mathbb{R}^n\)。\(\checkmark\)</p>
+
+<p>\(\bar{\sigma}\) 连续: 在 \(S^n \setminus \{N\}\) 上等于 \(\sigma\), 连续。在 \(N\) 处——给 \(\infty\) 的开邻域 \(\{\infty\} \cup (\mathbb{R}^n \setminus K)\) (\(K\) 紧 \(\subseteq \mathbb{R}^n\)), 要找 \(N\) 在 \(S^n\) 中的开邻域 \(W\) 使 \(\bar{\sigma}(W) \subseteq \{\infty\} \cup (\mathbb{R}^n \setminus K)\)。</p>
+
+<p>\(K\) 紧 \(\Rightarrow\) \(K\) 有界 \(\Rightarrow K \subseteq B(0, R)\) for some \(R\)。立体投影下 \(B(0, R) \subseteq \mathbb{R}^n\) 对应 \(S^n\) 上某个"<em>开下半</em>" 帽子状区域 \(C \subseteq S^n \setminus \{N\}\) (具体: \(\sigma^{-1}(B(0, R))\), 是 \(S^n\) 上不含 \(N\) 的紧子集, 因为 \(\sigma^{-1}\) 连续把紧 \(\overline{B(0, R)}\) 映成紧)。\(K \subseteq B(0, R) \subseteq \overline{B(0, R)}\), 所以 \(\sigma^{-1}(K) \subseteq \sigma^{-1}(\overline{B(0, R)})\) 是 \(S^n \setminus \{N\}\) 中的紧闭集 (闭因 \(K\) 闭, 紧因映射连续)。所以 \(W = S^n \setminus \sigma^{-1}(K)\) 是 \(N\) 在 \(S^n\) 中的开邻域 (\(\sigma^{-1}(K)\) 闭且 \(N \notin \sigma^{-1}(K)\))。\(\bar{\sigma}(W) = \{\infty\} \cup (\mathbb{R}^n \setminus K)\)。\(\checkmark\)</p>
+
+<p>\(\bar{\sigma}^{-1}\) 连续: \(S^n\) 紧, \((\mathbb{R}^n)^*\) Hausdorff (由 17.6——\(\mathbb{R}^n\) LCH), 紧 \(\to\) Hausdorff 的连续双射自动是同胚 (链<a href="ch15.html">ch15</a>结尾)。所以 \(\bar{\sigma}\) 是同胚。\(\square\)</p>
+
+<p>结论: \(\mathbb{R}^n\) 加一个无穷远点 = \(S^n\), 用立体投影作显式同胚。</p>
+
+<p>请你停下来欣赏这件事——欧氏空间的"<em>边界</em>" (无穷远) 是<em>一个点</em>, 它把 \(\mathbb{R}^n\) 卷起来成球面。1 维: \(\mathbb{R} \cup \{\infty\} = S^1\) (圆)。2 维: \(\mathbb{R}^2 \cup \{\infty\} = S^2\) (球面)。3 维: \(\mathbb{R}^3 \cup \{\infty\} = S^3\) (3-球, 在四维欧氏空间里)。</p>
+
+<h2 id="sec17-8">17.8 应用: 黎曼球面 \(\mathbb{C} \cup \{\infty\} = \mathbb{C}P^1 \cong S^2\)</h2>
+
+<p>把 17.7 的 \(n = 2\) 情形与<a href="../复分析/index.html">复分析</a>结合, 得到一个反复出现的对象: <em>黎曼球面</em>。</p>
+
+<p>\(\mathbb{C}\) 作为拓扑空间同胚于 \(\mathbb{R}^2\)。所以 \(\mathbb{C}^* := \mathbb{C} \cup \{\infty\}\) (单点紧致化) 同胚于 \((\mathbb{R}^2)^* \cong S^2\)。这个空间叫"<em>黎曼球面</em>" (Riemann sphere)。</p>
+
+<p>黎曼球面在复分析里几乎随处出现:</p>
+
+<ul>
+  <li><strong>亚纯函数</strong>: \(f : \mathbb{C} \to \mathbb{C}\) 亚纯 \(\iff\) \(f : \mathbb{C} \to \mathbb{C}^*\) 全纯 (允许极点取值 \(\infty\))。把 \(\infty\) 当成"<em>合法值</em>", 极点不再是奇点。</li>
+  <li><strong>Möbius 变换</strong>: \(\frac{az + b}{cz + d}\) 是 \(\mathbb{C}^* \to \mathbb{C}^*\) 的全纯自同构。它们构成 \(\mathrm{PGL}_2(\mathbb{C})\), 复分析中"<em>圆与直线</em>" 的对称群。</li>
+  <li><strong>射影直线</strong>: \(\mathbb{C}^*\) 同胚于复射影直线 \(\mathbb{C}P^1 = (\mathbb{C}^2 \setminus \{0\}) / \sim\), 其中 \((z_1, z_2) \sim (\lambda z_1, \lambda z_2)\) for \(\lambda \in \mathbb{C}^*\)。所以 \(S^2 \cong \mathbb{C}P^1 \cong \mathbb{C}^*\)——三个名字, 一个空间。</li>
+</ul>
+
+<p>这条同构链是几何学的奠基观察。它告诉你: 球面 \(S^2\) 不只是欧氏几何的"球", 它<em>同时</em> 是<em>复 1 维射影空间</em>——这背后还埋着代数几何里"\(\mathbb{C}P^1\) 是最简单的代数曲线 + 紧黎曼面" 的事实。许多深的故事 (Riemann-Roch, Belyi 定理, 模形式) 都从这个基本对象起步。</p>
+
+<h2 id="sec17-9">17.9 临别话</h2>
+
+<p>这一章把"<em>不紧</em> 但<em>每点附近紧</em>" 这种中间状态形式化为局部紧, 然后给一个具体方法 (单点紧致化) 把它升级到真紧。LCH \(\to\) 紧 Hausdorff 的这条升级是分析里反复使用的标准动作:</p>
+
+<ul>
+  <li>\(\mathbb{R}^n \to S^n\): 几何与拓扑。</li>
+  <li>\(\mathbb{C} \to \mathbb{C}P^1\): 复分析。</li>
+  <li>(下一章<a href="ch18.html">ch18</a> 之外的范围) Hausdorff 拓扑流形 \(M^n \to M^n \cup \{\infty\}\): 流形的紧化。</li>
+  <li>(更高级) 概型的紧化 (proper morphism): 代数几何。</li>
+</ul>
+
+<p>但单点紧致化<em>不是唯一</em> 的紧化方式。给同一个 LCH 空间 \(X\), 还有<em>更精细</em> 的紧化, 例如 Stone-Čech 紧致化 \(\beta X\) (链<a href="ch16.html">ch16</a> 提过, 完整在 ch22)。\(\beta X\) 比 \(X^*\) 大得多, 也精细得多——它是<em>所有</em> 紧 Hausdorff 紧化中"<em>最大的</em>"。单点紧致化反过来是"<em>最小的</em>": 只多一个点。两者形成紧致化的两个极端。中间还有其他紧致化 (例如 \(\mathbb{R}\) 的<em>双</em>点紧致化 \([-\infty, +\infty]\), 加两个无穷远端点)。</p>
+
+<p>下一章 (<a href="ch18.html">ch18</a>) 转向另一个完全不同的拓扑性质——<em>连通性</em>。它问的不是"<em>大小</em>" (紧致是关于"小"), 而是"<em>是否能拆开</em>"。\(\mathbb{R}\) 是"<em>一块</em>", 拿掉一点就变成"<em>两块</em>"——这是连通性的最朴素直觉。我们把它形式化, 看连通性是怎么和紧致性、Hausdorff 等性质共同织成拓扑的核心。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 Tychonoff 定理</a><a href="ch18.html">下一章 · 第 18 章 连通性 →</a></nav>
+</main>
+</body>
+</html>

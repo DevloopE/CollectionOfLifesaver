@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 2 章 度量空间复习 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论：从距离到开集</a><a href="ch3.html">下一章 · 第 3 章 拓扑空间 →</a></nav>
+<h1 id="ch2">第 2 章 度量空间复习</h1>
+
+<p>上一章承诺过：连续这件事，<em>真正</em>需要的是"开集"，不需要"距离"。下一章 ch3 起就把"开集" 抽象出来当原始概念。</p>
+
+<p>但在跳到抽象之前，我们要在这一章做最后一站准备：把你在<a href="../实分析/index.html">实分析</a>里学过的<em>度量空间</em> 按"<em>面向拓扑</em>" 的视角重新整理一遍。同样的概念——开球、收敛、连续、紧致、连通——你过去都用<em>距离</em> 描述。这一章每个概念都给两版：</p>
+
+<ul>
+  <li><em>用距离的版本</em>：你熟悉的 \(\varepsilon\)-\(\delta\) 风格定义。</li>
+  <li><em>用开集的等价版本</em>：抽掉距离, 只剩开集。</li>
+</ul>
+
+<p>这种"<em>双重写</em>" 让 ch3 跳到无距离时不撞墙——你会发现每个抽象拓扑定义都<em>是</em> 你熟悉的度量定义的等价改写。换言之，<em>抽象拓扑空间不是新对象, 是把度量空间里多余的部分（距离的具体数值）忘掉之后剩下的部分</em>。</p>
+
+<h2 id="sec2-1">2.1 度量公理 + 4 个例子</h2>
+
+<p>请你先复习度量的形式定义。<strong>度量空间</strong> 是一对 \((X, d)\)，其中 \(X\) 是集合，\(d : X \times X \to [0, \infty)\) 是<em>度量</em>，满足：</p>
+
+<ul>
+  <li><strong>(M1)</strong> \(d(x, y) = 0 \iff x = y\)（正定性）。</li>
+  <li><strong>(M2)</strong> \(d(x, y) = d(y, x)\)（对称性）。</li>
+  <li><strong>(M3)</strong> \(d(x, z) \le d(x, y) + d(y, z)\)（三角不等式）。</li>
+</ul>
+
+<p>看四个具体例子让"<em>度量</em>" 变成具体经验。</p>
+
+<p><strong>例 1：欧氏度量。</strong>\(X = \mathbb{R}^n\)，\(d_2(x, y) = \sqrt{\sum_i (x_i - y_i)^2}\)。这是几何课的"<em>距离</em>"。三角不等式 = Cauchy-Schwarz 的几何形式。验证略。</p>
+
+<p><strong>例 2：sup 度量。</strong>同样在 \(\mathbb{R}^n\) 上，定义 \(d_\infty(x, y) = \max_i |x_i - y_i|\)。验证三公理（M1-M3）：(M1) \(\max = 0\) iff 每项 \(= 0\) iff \(x = y\)。(M2) 对称显然。(M3) 三角：每项 \(|x_i - z_i| \le |x_i - y_i| + |y_i - z_i| \le d_\infty(x, y) + d_\infty(y, z)\)，对所有 \(i\) 取 max。\(\checkmark\)</p>
+
+<p>这个 sup 度量的"<em>球</em>" 是<em>正方体</em>（每条坐标轴方向 \(\le r\)），不是球。所以"<em>球</em>" 这个词的几何形状取决于度量。</p>
+
+<p><strong>例 3：离散度量。</strong>任意 \(X\)，定义</p>
+
+<p>\[
+d_{\text{disc}}(x, y) = \begin{cases} 0, & x = y, \\ 1, & x \neq y. \end{cases}
+\]</p>
+
+<p>验证：(M1)(M2) 显然。(M3) 三角：左边 \(\le 1\)，右边 \(\ge 0\)；如果左边 \(= 1\) 那 \(x \neq z\)，所以 \(y\) 不能同时等于 \(x\) 和 \(z\)，至少一个 \(d(x, y), d(y, z)\) 等于 1，右边 \(\ge 1\)。\(\checkmark\)</p>
+
+<p>这个度量"<em>蠢</em>"——它不区分远近, 只区分相同 / 不同。但它是个合法度量, 而且产生<em>极端</em> 的拓扑（每个单点集都开——见 2.7）。它在反例库里很有用。</p>
+
+<p><strong>例 4：\(L^p\) 度量（函数空间）。</strong>\(X = C([0, 1], \mathbb{R})\)（[0,1] 上连续函数全体），\(p \in [1, \infty)\)，</p>
+
+<p>\[
+d_p(f, g) = \left( \int_0^1 |f(x) - g(x)|^p \, dx \right)^{1/p}.
+</p>
+
+<p>三角不等式 = Minkowski 不等式（详见<a href="../实分析/ch11.html">实分析 ch11</a>）。当 \(p = \infty\), 改为 \(d_\infty(f, g) = \sup_{x \in [0,1]} |f(x) - g(x)|\)。</p>
+
+<p>这个例子<em>关键</em>——它告诉你"<em>度量空间</em>" 这个概念不限于几何里的 \(\mathbb{R}^n\)。函数也可以"<em>有距离</em>"，距离可以是<em>积分平均</em>（\(L^1\)）、<em>均方</em>（\(L^2\)）、<em>最大偏差</em>（\(L^\infty\)）。整个<a href="../泛函分析/index.html">泛函分析</a>就建在这种"<em>函数也有距离</em>" 的视角上。</p>
+
+<h2 id="sec2-2">2.2 开球 → 开集 → 度量拓扑</h2>
+
+<p>给度量空间 \((X, d)\)，<em>开球</em> 是</p>
+
+<p>\[
+B(x_0, r) = \{x \in X : d(x_0, x) < r\}, \quad r > 0.
+\]</p>
+
+<p>注意是<em>严格</em> 小于。"<em>球面上</em>" 的点不算。</p>
+
+<p><strong>开集定义。</strong>\(U \subseteq X\) <em>开</em> \(\iff\) 每个 \(x \in U\) 都有半径 \(r > 0\) 使 \(B(x, r) \subseteq U\)。</p>
+
+<p>也就是说"开" = "<em>每个点都被自己附近的一整个球包住</em>"——没有"<em>边缘</em>" 上的点。</p>
+
+<p>例子。\(\mathbb{R}\) 配欧氏度量：开区间 \((a, b)\) 开。验证：取 \(x \in (a, b)\)，\(r = \min(x - a, b - x) > 0\)，\(B(x, r) = (x - r, x + r) \subseteq (a, b)\)。\(\checkmark\)</p>
+
+<p>非例子。\([0, 1]\) <em>不</em> 开。验证：取 \(x = 0\)，任何 \(r > 0\) 给的 \(B(0, r) = (-r, r)\) 含负数，不在 \([0, 1]\) 里。0 是"<em>边</em>" 点。</p>
+
+<p><strong>关键事实。</strong>度量空间里"开集" 满足上一章 ch1.2 的三公理 (O1)(O2)(O3)。</p>
+
+<p>验证：(O1) \(\emptyset\) 没有点要检查（vacuously 真），\(X\) 显然每点配球。(O2) 任意并：每个 \(x \in \bigcup U_\alpha\) 在某 \(U_{\alpha_0}\) 里，\(U_{\alpha_0}\) 给的球 \(B(x, r) \subseteq U_{\alpha_0} \subseteq \bigcup U_\alpha\)。(O3) 有限交：每个 \(x \in \bigcap_{i=1}^n U_i\) 在每个 \(U_i\) 里都有球 \(B(x, r_i)\)，取 \(r = \min r_i > 0\)（这里要<em>有限</em>性！），球 \(B(x, r)\) 同时落在所有 \(U_i\) 里。</p>
+
+<p>所以度量给的"开集" 集族——记作 \(\tau_d\)——是 \(X\) 上的<em>拓扑</em>（满足三公理的开集族）。我们叫它<em>度量诱导的拓扑</em>，简称<em>度量拓扑</em>。</p>
+
+<p>请你停下来感受这个翻译：<em>度量空间</em> = <em>集合</em> + <em>距离</em>，自动产生 = <em>集合</em> + <em>开集族（满足三公理）</em>。<em>距离</em> 这一信息<em>编码</em> 进了"<em>哪些集合是开集</em>"。下一章 ch3 起我们干脆把距离扔掉, 只保留<em>开集族</em>——发现剩下的东西已经<em>足以谈连续</em>。</p>
+
+<p>但<em>注意</em>：从距离到开集这一步会丢掉<em>一些</em> 信息。两个不同的度量可以给同一个拓扑——见 2.7 节。</p>
+
+<h2 id="sec2-3">2.3 收敛：度量版 vs 开集版</h2>
+
+<p>序列 \(\{x_n\} \subseteq X\) <em>收敛</em> 到 \(x \in X\)，记 \(x_n \to x\)，<em>度量版定义</em>：</p>
+
+<p>\[
+\forall \varepsilon > 0, \exists N, \forall n \ge N : d(x_n, x) < \varepsilon.
+\]</p>
+
+<p>等价地，<em>实数序列</em> \(d(x_n, x) \to 0\)。</p>
+
+<p>请你把这条等价改写为"<em>用开集</em>"。"<em>\(d(x_n, x) < \varepsilon\)</em>" 翻成"<em>\(x_n \in B(x, \varepsilon)\)</em>"，所以条件 = "\(\forall \varepsilon > 0\), \(\exists N\), \(\forall n \ge N\)，\(x_n \in B(x, \varepsilon)\)"。</p>
+
+<p>但这里 \(B(x, \varepsilon)\) 是个"<em>含 \(x\) 的开集</em>"。事实上每个含 \(x\) 的开集 \(U\)，按开集定义，包含某个 \(B(x, \varepsilon) \subseteq U\)。所以"<em>球</em>" 可以替换为"<em>含 \(x\) 的任意开集</em>"，等价：</p>
+
+<p>\[
+\boxed{\ x_n \to x \iff \forall U \text{ 开}, x \in U, \exists N, \forall n \ge N : x_n \in U.\ }
+\]</p>
+
+<p>用人话：<em>每个含 \(x\) 的开集, 最终包含全部 \(x_n\)</em>。</p>
+
+<p>请你停下来盯住这条等价。它<em>没有</em> 提到 \(\varepsilon, \delta\), <em>没有</em> 提到距离——只用了"开集"。所以"收敛" 和"连续" 一样, <em>真正</em> 需要的是开集结构, 不是距离。这条等价<em>整个</em> 搬到 ch3 起的抽象拓扑空间——它是"<em>序列收敛</em>" 在抽象空间的定义。</p>
+
+<p>例。\(\mathbb{R}\) 上 \(x_n = 1/n\)。每个含 0 的开集 \(U\) 包含某 \((-\varepsilon, \varepsilon)\)；只要 \(n \ge 1/\varepsilon\) 就有 \(1/n < \varepsilon\)，\(x_n \in U\)。所以 \(x_n \to 0\)。</p>
+
+<p><em>警告</em>：在<em>一般</em> 拓扑空间里, "收敛" 不再控制连续——序列收敛<em>可能不够</em> 抓住拓扑结构。这是<a href="ch15.html">ch15 可数性</a>会处理的事——"<em>第一可数</em>" 空间里序列还够, 否则要用更广的"<em>网</em>" 或"<em>滤子</em>"。但在度量空间里序列<em>足够</em>。</p>
+
+<h2 id="sec2-4">2.4 连续：度量版 vs 开集版</h2>
+
+<p>这就是<a href="ch1.html">第 1 章 1.1 节</a>那条等价的细节版。给度量空间之间的映射 \(f : X \to Y\)。</p>
+
+<p><strong>度量版定义。</strong>\(f\) 在 \(x_0\) <em>连续</em> \(\iff\)</p>
+
+<p>\[
+\forall \varepsilon > 0, \exists \delta > 0, \forall x : d_X(x, x_0) < \delta \implies d_Y(f(x), f(x_0)) < \varepsilon.
+\]</p>
+
+<p>\(f\) <em>连续</em> \(\iff\) 在每点都连续。</p>
+
+<p><strong>开集版等价。</strong>\(f\) <em>连续</em> \(\iff\) 每个开集 \(V \subseteq Y\) 的逆像 \(f^{-1}(V) \subseteq X\) 开。</p>
+
+<p>这条等价的证明就一段, 我把上一章的承诺兑现。</p>
+
+<p><em>"度量版 \(\Rightarrow\) 开集版"</em>：取 \(V \subseteq Y\) 开, 要证 \(f^{-1}(V)\) 开。取 \(x_0 \in f^{-1}(V)\), 即 \(f(x_0) \in V\)。\(V\) 开意味着 \(\exists \varepsilon > 0\) 使 \(B(f(x_0), \varepsilon) \subseteq V\)。\(f\) 在 \(x_0\) 连续意味着 \(\exists \delta > 0\) 使 \(d_X(x, x_0) < \delta \Rightarrow d_Y(f(x), f(x_0)) < \varepsilon\)，即 \(f(x) \in B(f(x_0), \varepsilon) \subseteq V\)，即 \(x \in f^{-1}(V)\)。所以 \(B(x_0, \delta) \subseteq f^{-1}(V)\)，\(f^{-1}(V)\) 开。</p>
+
+<p><em>"开集版 \(\Rightarrow\) 度量版"</em>：固定 \(x_0 \in X\)，给任意 \(\varepsilon > 0\)，\(B(f(x_0), \varepsilon) \subseteq Y\) 开, 所以 \(f^{-1}(B(f(x_0), \varepsilon))\) 开, 含 \(x_0\)。所以 \(\exists \delta > 0\) 使 \(B(x_0, \delta) \subseteq f^{-1}(B(f(x_0), \varepsilon))\), 即 \(d_X(x, x_0) < \delta \Rightarrow d_Y(f(x), f(x_0)) < \varepsilon\)。\(f\) 在 \(x_0\) 连续。\(\square\)</p>
+
+<p>请你停下来欣赏这条等价的<em>无距离</em> 性质：右边"每个开集的逆像开" 完全是关于<em>开集</em> 的语句, 没有出现度量。所以"<em>连续</em>" 这个概念可以<em>移植</em> 到任何只有开集结构的空间——这就是 ch3 起的拓扑空间。</p>
+
+<p><strong>序列刻画。</strong>第三种等价（度量空间里）：\(f\) 在 \(x_0\) 连续 \(\iff\) 对任何 \(x_n \to x_0\) 有 \(f(x_n) \to f(x_0)\)。这条在度量空间里成立, 但在<em>一般</em> 拓扑空间里只是必要、不一定充分（除非空间是第一可数的）。所以"<em>开集版</em>" 是连续的<em>真正</em> 定义, "<em>序列版</em>" 只在好的空间里也对。</p>
+
+<h2 id="sec2-5">2.5 紧致：Heine-Borel 与序列紧</h2>
+
+<p><em>紧致</em> 是度量空间最重要的性质之一。它有<em>三种</em> 等价定义（在度量空间里, 不一定在一般拓扑里）。</p>
+
+<p><strong>定义 A（开覆盖紧致）。</strong>\(X\) <em>紧致</em> \(\iff\) 每个 \(X\) 的开覆盖 \(\{U_\alpha\}\) 都有<em>有限</em> 子覆盖。</p>
+
+<p>"<em>开覆盖</em>" = 一族开集 \(\{U_\alpha\}\) 满足 \(X = \bigcup_\alpha U_\alpha\)。"<em>有限子覆盖</em>" = 从中选有限多个 \(U_{\alpha_1}, \ldots, U_{\alpha_n}\) 仍覆盖 \(X\)。</p>
+
+<p>这条<em>纯开集</em> 定义 \(\Rightarrow\) 它直接搬到一般拓扑空间, 是 ch16 紧致性的<em>原始</em> 定义。</p>
+
+<p><strong>定义 B（序列紧）。</strong>\(X\) <em>序列紧</em> \(\iff\) 每个序列 \(\{x_n\} \subseteq X\) 有收敛子列。</p>
+
+<p>这是更几何的版本。Bolzano-Weierstrass 定理（实分析 ch3）说 \([a, b]\) 序列紧。</p>
+
+<p><strong>定义 C（Heine-Borel）。</strong>当 \(X = \mathbb{R}^n\), \(K \subseteq \mathbb{R}^n\) 紧致 \(\iff\) \(K\) <em>有界</em> 且<em>闭</em>。</p>
+
+<p>这是最常用的"<em>判紧致</em>" 工具——但<em>只</em> 对 \(\mathbb{R}^n\)（更一般的有限维赋范空间）成立。一般度量空间里"<em>有界 + 闭</em>" 不一定紧致（反例：\(\ell^2\) 中闭单位球不紧致, 因为它含一族正交点列 \(e_1, e_2, \ldots\) 没有收敛子列）。</p>
+
+<p><strong>等价性（度量空间里）。</strong>定义 A \(\iff\) 定义 B。证明用 Lebesgue 数引理 + 全有界性。\(\mathbb{R}^n\) 里再加 \(\iff\) 定义 C（Heine-Borel）。</p>
+
+<p>请你<em>记住</em>：<em>开覆盖紧致</em> 是<em>真正</em> 的紧致, 因为它<em>不依赖</em> 度量, 在抽象拓扑空间里仍有定义。<em>序列紧</em> 在度量空间里等价, 在一般拓扑空间里<em>不</em> 等价（一般空间里两个性质独立）。</p>
+
+<p>紧致性的<em>意义</em>：</p>
+
+<ul>
+  <li><em>有限性条件</em>——把"<em>无穷个</em>" 减为"<em>有限多个</em>"。这条让很多分析论证（找最大值、用一致连续）变得可行。</li>
+  <li><em>紧致空间上连续函数 → 有界、达到极值</em>——极值定理的拓扑根源。</li>
+  <li><em>紧致 + Hausdorff = "<em>近乎</em>" 度量化</em>（ch20 Urysohn）——紧致性强大到几乎逼出度量。</li>
+</ul>
+
+<p>这一切都在 ch16 详谈, 这里只是预告。</p>
+
+<h2 id="sec2-6">2.6 完备性</h2>
+
+<p><em>Cauchy 列</em>：\(\{x_n\}\) 是 Cauchy \(\iff\) \(\forall \varepsilon > 0, \exists N, \forall m, n \ge N : d(x_m, x_n) < \varepsilon\)。</p>
+
+<p><em>完备</em>：\((X, d)\) 完备 \(\iff\) 每个 Cauchy 列收敛。</p>
+
+<p>例。\(\mathbb{R}\) 完备（实分析 ch2 关键定理）。\(\mathbb{Q}\) <em>不</em> 完备（\(x_n = (1 + 1/n)^n \to e \notin \mathbb{Q}\)）。完备性是 \(\mathbb{R}\) 区别于 \(\mathbb{Q}\) 的<em>关键</em> 区分点。</p>
+
+<p>完备性的意义：</p>
+
+<ul>
+  <li><em>不动点定理</em>（Banach）——完备空间上压缩映射有唯一不动点。这是<a href="../实分析/ch9.html">实分析 ch9</a>证常微分方程解存在性的工具。</li>
+  <li><em>Baire 范畴</em>（ch22）——完备度量空间不是<em>可数多</em>"<em>瘦</em>" 集的并。这条让"<em>大多数函数不可微</em>" 这种反直觉事实成立。</li>
+  <li><em>函数空间分析</em>——\(L^p\)、\(C[a, b]\)（sup 度量）都完备, 是<a href="../泛函分析/index.html">泛函分析</a>的根基。</li>
+</ul>
+
+<p><strong>关键</strong>：完备性<em>不</em> 是拓扑性质——<em>它依赖度量</em>。同一个拓扑下, 一个度量完备、另一个不完备的事完全可能。</p>
+
+<p>反例：\(\mathbb{R}\) 与开区间 \((-1, 1)\) 是<em>同胚</em>（如 ch1.4 节例：\(f(x) = \tan(\pi x / 2)\) 把 \((-1,1)\) 双向连续打到 \(\mathbb{R}\)）。所以它们<em>拓扑同</em>。但 \(\mathbb{R}\) 配标准度量完备, \((-1, 1)\) 配限制度量<em>不</em> 完备（\(x_n = 1 - 1/n\) 是 Cauchy, 极限 \(1 \notin (-1, 1)\)）。</p>
+
+<p>请你停下来想：完备性<em>依赖</em> 度量的具体数值, 不只是开集族。所以它<em>不</em> 是同胚不变量, 不是拓扑性质。在抽象拓扑空间里"<em>完备</em>" 这个概念<em>没法直接定义</em>——你必须先有度量。</p>
+
+<p>这件事预告了"<em>度量化问题</em>"（ch21 Urysohn 度量化定理）：哪些拓扑空间<em>可以</em> 配上完备度量？这是个深入的问题。</p>
+
+<h2 id="sec2-7">2.7 度量等价：何时两个度量给同一个拓扑</h2>
+
+<p>同一个集合 \(X\) 上可以有<em>多</em> 个度量。比如 \(\mathbb{R}^n\) 上至少有 \(d_1, d_2, d_\infty\)：</p>
+
+<ul>
+  <li>\(d_1(x, y) = \sum_i |x_i - y_i|\)（曼哈顿 / 出租车）</li>
+  <li>\(d_2(x, y) = \sqrt{\sum_i (x_i - y_i)^2}\)（欧氏）</li>
+  <li>\(d_\infty(x, y) = \max_i |x_i - y_i|\)（sup）</li>
+</ul>
+
+<p>三个度量的<em>球</em> 形状不同：\(d_1\) 球是<em>菱形</em>、\(d_2\) 球是<em>圆</em>、\(d_\infty\) 球是<em>方</em>。距离也<em>数值</em> 不同：\(d_1((0, 0), (1, 1)) = 2\)、\(d_2 = \sqrt 2\)、\(d_\infty = 1\)。</p>
+
+<p>但<em>它们给同一个拓扑</em>——同一个开集族。验证用<em>不等式夹</em>：</p>
+
+<p>\[
+d_\infty(x, y) \le d_2(x, y) \le d_1(x, y) \le n \cdot d_\infty(x, y).
+\]</p>
+
+<p>具体, 每个 \(d_2\)-球套住某个 \(d_\infty\)-球, 反之亦然——所以 \(d_2\) 与 \(d_\infty\) 定义同样的"<em>开集</em>"。</p>
+
+<p><strong>定义。</strong>\(X\) 上两个度量 \(d_1, d_2\) <em>拓扑等价</em> \(\iff\) 它们给同一个开集族 \(\tau_{d_1} = \tau_{d_2}\)。</p>
+
+<p><strong>判别法。</strong>\(d_1 \sim d_2 \iff\) 每个 \(d_1\)-球内部含某个 \(d_2\)-球, 反之亦然。形式上: 对每个 \(x, r > 0\)，\(\exists r' > 0\) 使 \(B_{d_2}(x, r') \subseteq B_{d_1}(x, r)\), 反向同。</p>
+
+<p><em>更强</em> 的等价：<em>强等价</em>（\(\iff\) 存在常数 \(c, C > 0\) 使 \(c \cdot d_1 \le d_2 \le C \cdot d_1\)）。强等价 \(\Rightarrow\) 拓扑等价 \(\Rightarrow\) 但反之不一定。例如 \(d\) 与 \(\min(d, 1)\)（截断度量）拓扑等价但<em>不</em> 强等价（\(d\) 可以无界, 后者 \(\le 1\)）。</p>
+
+<p>请你停下来想这件事的<em>意义</em>：<em>度量空间里有很多冗余信息（具体距离数值）, 真正决定"拓扑结构" 的只是开集族</em>。同一个拓扑可以由多个度量给。所以从度量到拓扑这一步, 我们<em>故意</em> 把"具体距离" 这条多余信息丢掉。</p>
+
+<p>这种"<em>丢信息</em>" 听起来像是损失, 但其实是<em>抽象的力量</em>——只看本质, 不看细节。物理类比：温度计的<em>读数</em>（°C 还是 °F）依赖具体度量, 但"<em>水开</em>" 这件事不依赖度量——它是<em>拓扑</em>（开集结构）的事。</p>
+
+<p>同样的"<em>等价度量</em>" 故事在<a href="../泛函分析/index.html">泛函分析</a>里以"<em>等价范数</em>" 形式出现：有限维上所有范数等价, 无限维上不等价范数给完全不同的拓扑。这件事是泛函分析比有限维线性代数复杂的根源。</p>
+
+<h2 id="sec2-8">2.8 出发——把距离扔掉</h2>
+
+<p>这一章把度量空间的所有主要概念按"<em>面向拓扑</em>" 视角整理了。回顾这张地图：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em; text-align:left;">概念</th><th style="padding: 0.3em 1em; text-align:left;">度量版</th><th style="padding: 0.3em 1em; text-align:left;">开集等价版</th><th style="padding: 0.3em 1em; text-align:left;">是拓扑性质？</th></tr>
+<tr><td>开集</td><td>每点配球</td><td>开集族（公理给）</td><td>是 / 定义</td></tr>
+<tr><td>收敛 \(x_n \to x\)</td><td>\(d(x_n, x) \to 0\)</td><td>每个含 \(x\) 开集终含 \(x_n\)</td><td>是</td></tr>
+<tr><td>连续</td><td>\(\varepsilon\)-\(\delta\)</td><td>开集逆像开</td><td>是</td></tr>
+<tr><td>紧致</td><td>序列紧 / Heine-Borel</td><td>开覆盖有限子覆盖</td><td>是</td></tr>
+<tr><td>完备</td><td>Cauchy 列收敛</td><td>(<em>无对应</em>)</td><td><em>不是</em></td></tr>
+</table>
+
+<p>请你盯住<em>"是拓扑性质？"</em> 那一栏。除"完备" 外, 所有概念都<em>有</em> 纯开集等价版——意味着它们<em>不依赖度量</em>, 可以移植到抽象拓扑空间。"完备" 是唯一例外, 它<em>实质</em> 依赖具体距离, 不能移植。</p>
+
+<p>这就是为什么下一章 ch3 起的<em>拓扑空间</em> 不是无中生有——它是<em>把度量空间公共结构（开集 + 三公理）抽出来, 把度量丢掉</em> 之后剩下的东西。每个你以前在度量空间里熟悉的概念（除完备外）在抽象空间里都有对应。</p>
+
+<p>下一章我们正式给"<em>拓扑空间</em>" 定义, 看许多<em>不来自距离</em> 的拓扑例子, 让"<em>开集独立于距离</em>" 这件事变成具体经验。然后 ch4 给"<em>基</em>" 概念——告诉你<em>不</em> 用列出全部开集, 只列<em>一些</em>"生成元" 就行, 类比向量空间的基。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论：从距离到开集</a><a href="ch3.html">下一章 · 第 3 章 拓扑空间 →</a></nav>
+</main>
+</body>
+</html>

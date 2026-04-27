@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 闭集、内部、闭包、边界 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 基与子基</a><a href="ch6.html">下一章 · 第 6 章 连续映射 →</a></nav>
+<h1 id="ch5">第 5 章 闭集、内部、闭包、边界</h1>
+
+<p>把"<em>开集</em>" 当成拓扑学的官方词汇是 ch3 的事。可你哪怕只读过几篇分析的书都能注意到，日常几何讨论里"<em>闭</em>" "<em>边界</em>" "<em>内部</em>" 出现的次数<em>不比</em> "开" 少。"\(\bar A\) 表示 \(A\) 的闭包"、"\(\partial A\) 是 \(A\) 的边界"、"\(\mathrm{int}(A)\) 是 \(A\) 的内部"——这些写法在测度论、几何拓扑、PDE 里都是<em>背景常识</em>，不写出来都默认。</p>
+
+<p>问题是：如果"开集" 已经被公理选成基本对象，<em>闭集 / 内部 / 闭包 / 边界</em> 是不是<em>多余</em> 的？还是说它们其实就是"开集" 的不同重组方式？答案——后者。这一章把这些日常词汇从"开集" 出发<em>严格定义</em>，并且给一些朴素直觉里<em>容易错</em> 的事打几针预防针：</p>
+
+<ul>
+  <li>"<em>闭包 = 集合 \(\cup\) 边界</em>" 在每个空间都对吗？</li>
+  <li>"<em>边界</em>" 会不会包含原集合的内部？</li>
+  <li>\(\bar{\mathbb{Q}}\) 在 \(\mathbb{R}\) 里是什么？\(\mathrm{int}(\mathbb{Q})\) 又是什么？</li>
+  <li>"<em>稠密</em>" 这件事在不同拓扑下能多么离奇？</li>
+</ul>
+
+<p>每一个回答都会暴露你的几何直觉里某条<em>偷偷依赖度量</em> 的假设。读完这一章你的脑子里"闭包" 不再是"加上边界点"——而是"<em>含 A 的最小闭集</em>"，是从公理里长出来的代数操作。</p>
+
+<h2 id="sec5-1">5.1 闭集 = 开集补</h2>
+
+<p>设 \((X, \tau)\) 是拓扑空间。<em>闭集</em> 的定义朴素到没什么可说：</p>
+
+<p>\[
+\boxed{\ F \subseteq X \text{ 闭} \iff X \setminus F \in \tau \text{（即补集开）}.\ }
+\]</p>
+
+<p>就这一行。"闭" 是"开" 在补集运算下的影子；它<em>不是</em> 一个新公理，而是开集的<em>派生</em> 概念。</p>
+
+<p>这条定义直接<em>翻译</em> 开集公理 (O1)-(O3)。把 \(U_\alpha\) 换成 \(F_\alpha = X \setminus U_\alpha\)，并 \(\leftrightarrow\) 交（De Morgan：\(X \setminus \bigcup U_\alpha = \bigcap (X \setminus U_\alpha)\)）：</p>
+
+<ul>
+  <li><strong>(C1)</strong> \(\emptyset\) 闭，\(X\) 闭。（\(X \setminus \emptyset = X\) 开，\(X \setminus X = \emptyset\) 开。）</li>
+  <li><strong>(C2)</strong> 任意多闭集的<em>交</em> 仍闭。（\(\bigcap F_\alpha = X \setminus \bigcup (X \setminus F_\alpha)\)，并里面每个开 \(\Rightarrow\) 并开 \(\Rightarrow\) 补闭。）</li>
+  <li><strong>(C3)</strong> <em>有限</em>多闭集的<em>并</em> 仍闭。（与 (O3) 对偶。）</li>
+</ul>
+
+<p>请注意 (C2) 和 (C3) 的<em>不对称</em> 与 (O2)-(O3) 完全镜像：闭集对<em>任意交</em> 闭、对<em>有限并</em> 闭。这种"任意 vs 有限" 的不对称是拓扑结构的<em>根性质</em>，本章后面所有反例都和它脱不了干系。</p>
+
+<p><strong>对偶定义法。</strong>有些教科书<em>反过来</em>：先写 (C1)-(C3) 公理，把"<em>闭集族</em>" 当原始概念，然后定义"<em>开</em> = 闭的补"。两种方式数学上完全等价。我们选"开" 优先，因为<em>连续映射</em> 的定义（\(f^{-1}\) 把开集拉回开集）天然偏向开。</p>
+
+<p><strong>具体例子。</strong>欧氏 \(\mathbb{R}\) 上：\([a, b]\) 闭（补集 \((-\infty, a) \cup (b, \infty)\) 开）；\((a, b)\) <em>不</em> 闭；\([a, b)\) <em>既不开也不闭</em>（补集 \((-\infty, a) \cup [b, \infty)\) 含 \([b, \infty)\) 不开）。请你停下盯一会儿——"<em>非开即闭</em>" 这种二元思维是初学最容易犯的错。集合可以<em>既不开也不闭</em>（\([a, b)\) ）、可以<em>既开又闭</em>（\(\emptyset, X\) 在每个空间都既开又闭；离散拓扑里<em>每个</em> 子集都既开又闭）。开 / 闭是<em>两条独立</em> 的属性，可同时成立、可同时失败、可只有一条成立。</p>
+
+<p><strong>"既开又闭"叫</strong> <em>clopen</em> ——这词在英文里是 closed-open 的合体。一个空间里 clopen 集合多 \(\Leftrightarrow\) 它"<em>断成多块</em>"，这正是 <a href="ch18.html">ch18 连通性</a> 的几何刻画。在 \(\mathbb{R}\) 上 clopen 集只有 \(\emptyset\) 和 \(\mathbb{R}\)（连通），在 \(\mathbb{Q}\) 上 clopen 集多得是（不连通），在 Cantor 集上 clopen 是基（完全不连通）。</p>
+
+<h2 id="sec5-2">5.2 闭包 \(\bar A\)：含 A 的最小闭集</h2>
+
+<p>给一个集合 \(A \subseteq X\)，<em>闭包</em> 想抓住的几何画面是"<em>把 A 加上它的所有极限点</em>"。但这个朴素描述在抽象拓扑里要小心——"极限点" 本身得用拓扑定义。我们用一种<em>不依赖任何辅助概念</em> 的方式把闭包定义下来：</p>
+
+<p>\[
+\boxed{\ \bar A = \bigcap \{F : A \subseteq F, \ F \text{ 闭}\}.\ }
+\]</p>
+
+<p>"<em>所有含 A 的闭集的交</em>"。这个交<em>非空</em>——\(X\) 本身就是一个含 \(A\) 的闭集（(C1)）。这个交<em>是闭集</em>——任意多闭集的交是闭集（(C2)）。所以 \(\bar A\) 是<em>含 A 的最小闭集</em>：</p>
+
+<ul>
+  <li>(a) \(A \subseteq \bar A\)；</li>
+  <li>(b) \(\bar A\) 闭；</li>
+  <li>(c) 若 \(F\) 闭且 \(A \subseteq F\)，则 \(\bar A \subseteq F\)。</li>
+</ul>
+
+<p>这三条恰是"<em>极小</em>" 的代数刻画。把 \(\bar A\) 当作一个<em>算子</em> \(\bar{\,\cdot\,} : \mathcal{P}(X) \to \mathcal{P}(X)\)，它满足 <em>Kuratowski 闭包公理</em>：</p>
+
+<ul>
+  <li><strong>(K1)</strong> \(\overline{\emptyset} = \emptyset\)；</li>
+  <li><strong>(K2)</strong> \(A \subseteq \bar A\)；</li>
+  <li><strong>(K3)</strong> \(\overline{\bar A} = \bar A\)（幂等）；</li>
+  <li><strong>(K4)</strong> \(\overline{A \cup B} = \bar A \cup \bar B\)。</li>
+</ul>
+
+<p>(K1)：\(\emptyset\) 自身闭，所以含 \(\emptyset\) 的最小闭集是 \(\emptyset\)。(K2) 由定义。(K3)：\(\bar A\) 已经闭，含 \(\bar A\) 的最小闭集就是它自己。(K4) 一个方向 \(\supseteq\) 由 \(A \subseteq A \cup B \Rightarrow \bar A \subseteq \overline{A \cup B}\) 同理 \(\bar B \subseteq \overline{A \cup B}\)；另一方向 \(\bar A \cup \bar B\) 是<em>有限</em>个闭集的并，闭，含 \(A \cup B\)，故是含 \(A \cup B\) 的某闭集，最小那个 \(\overline{A \cup B}\) 含进它。</p>
+
+<p>事实上 (K1)-(K4) 是"<em>闭包</em>" 概念的<em>独立公理化</em>：给一个集合 \(X\) 和一个算子 \(c : \mathcal{P}(X) \to \mathcal{P}(X)\) 满足 (K1)-(K4)，定义"<em>闭集 = 算子的不动点</em>"，再定义"<em>开 = 闭的补</em>"，得到的开集族<em>恰好</em> 满足 (O1)-(O3)。所以"用闭包公理定义拓扑" 与"用开集公理定义拓扑" 严格等价——这是 Kuratowski 1922 年的一个漂亮观察。</p>
+
+<p><strong>三种刻画。</strong>除了"<em>极小闭集</em>"，闭包还有两种<em>更可计算</em> 的刻画。先列出来：</p>
+
+<p>(I) \(x \in \bar A \iff \) <em>每个</em> 含 \(x\) 的开集 \(U\) 都满足 \(U \cap A \neq \emptyset\)；</p>
+
+<p>(II) （度量空间情形）\(x \in \bar A \iff\) 存在 \(A\) 中点列 \(x_n \to x\)；</p>
+
+<p>(III) （定义）\(x \in \bar A \iff x\) 在所有含 \(A\) 的闭集里。</p>
+
+<p>(III) 是定义本身。证 (I) \(\iff\) (III)。</p>
+
+<p><em>(III) \(\Rightarrow\) (I)</em>：取 \(x \in \bar A\)，给开 \(U \ni x\)。假设 \(U \cap A = \emptyset\)，那 \(A \subseteq X \setminus U\) 且 \(X \setminus U\) 闭——\(\bar A \subseteq X \setminus U\)，与 \(x \in \bar A \cap U\) 矛盾。</p>
+
+<p><em>(I) \(\Rightarrow\) (III)</em>：设每个开 \(U \ni x\) 都交 \(A\) 非空。要证 \(x \in \bar A\)。反证，若 \(x \notin \bar A\)，那 \(x \in X \setminus \bar A\)，这是开集（\(\bar A\) 闭）。但 \(\bar A \cap A \supseteq A\)（由 (K2)），所以 \(X \setminus \bar A\) <em>不</em>交 \(A\)——与 (I) 矛盾。\(\square\)</p>
+
+<p>(I) 是闭包<em>最实用</em> 的刻画——从单点 \(x\) 检查"<em>它的每个开邻域是否都触到 A</em>" 即可，无需算闭集族的交。整本书里我们更常用 (I) 而不是 (III)。</p>
+
+<p>(II)<em>仅</em> 在度量空间（或第一可数空间，<a href="ch15.html">ch15</a>）里成立。证明：\((\Leftarrow)\)给 \(x_n \to x\) 与开 \(U \ni x\)，存在 \(N\) 使 \(n \geq N\) 时 \(x_n \in U\)，且 \(x_n \in A\)，故 \(U \cap A \neq \emptyset\)，由 (I) \(x \in \bar A\)。\((\Rightarrow)\)给 \(x \in \bar A\)（度量空间情形），开球 \(B(x, 1/n)\) 是 \(x\) 的开邻域，由 (I) 有 \(x_n \in B(x, 1/n) \cap A\)。这族 \(x_n\) 是 \(A\) 中点列，\(d(x_n, x) < 1/n \to 0\)。</p>
+
+<p>请注意 (II) 在<em>非</em> 第一可数空间会塌——<em>序列收敛抓不到拓扑闭包</em> 这件事我们在 ch15 谈"<em>序列 vs 网</em>" 时还要专门讲。简单说：你在 \(\mathbb{R}\) 上习惯的"闭 = 序列闭" 是<em>度量幸运</em>，不是拓扑普遍真理。</p>
+
+<h2 id="sec5-3">5.3 内部 \(\mathrm{int}(A)\) 与边界 \(\partial A\)</h2>
+
+<p>"内部" 与"闭包" 完全对偶——把所有"闭" 换成"开"、把"含 A 的最小闭集" 换成"在 A 里的最大开集"：</p>
+
+<p>\[
+\boxed{\ \mathrm{int}(A) = \bigcup \{U : U \subseteq A, \ U \text{ 开}\}.\ }
+\]</p>
+
+<p>"<em>所有含于 A 的开集的并</em>"。它的对偶刻画：</p>
+
+<ul>
+  <li>(a') \(\mathrm{int}(A) \subseteq A\)；</li>
+  <li>(b') \(\mathrm{int}(A)\) 开；</li>
+  <li>(c') 若 \(U\) 开且 \(U \subseteq A\)，则 \(U \subseteq \mathrm{int}(A)\)。</li>
+</ul>
+
+<p>"<em>含于 A 的最大开集</em>"。\(\mathrm{int}\) 也是个算子，满足"<em>开</em> 的 Kuratowski 公理"——\(\mathrm{int}(X) = X\)、\(\mathrm{int}(A) \subseteq A\)、\(\mathrm{int}(\mathrm{int}(A)) = \mathrm{int}(A)\)、\(\mathrm{int}(A \cap B) = \mathrm{int}(A) \cap \mathrm{int}(B)\)。这些和闭包公理完全对称（把 \(\bar{\cdot}\) 换 \(\mathrm{int}\)、\(\subseteq\) 换 \(\supseteq\)、\(\cup\) 换 \(\cap\)、\(\emptyset\) 换 \(X\)）。</p>
+
+<p>对偶关系：</p>
+
+<p>\[
+\boxed{\ \mathrm{int}(A) = X \setminus \overline{X \setminus A}, \qquad \bar A = X \setminus \mathrm{int}(X \setminus A).\ }
+\]</p>
+
+<p>验证：\(X \setminus \overline{X \setminus A}\) 是<em>所有</em> 含 \(X \setminus A\) 的闭集 \(F\) 的<em>补</em>——即所有<em>含于 \(A\)</em> 的开集 \(X \setminus F\) 的并，正是 \(\mathrm{int}(A)\)。</p>
+
+<p>有了内部 + 闭包，<em>边界</em> 自然定义：</p>
+
+<p>\[
+\boxed{\ \partial A = \bar A \setminus \mathrm{int}(A).\ }
+\]</p>
+
+<p>"<em>闭包减内部</em>"。几何画面：内部是"<em>稳稳在 A 里</em>" 的部分，闭包是"<em>稳稳贴着 A</em>" 的部分（A 加它的极限），两者之差正是"<em>夹在 A 边界上、可能在 A 里也可能不在</em>" 的一层皮。</p>
+
+<p>用 (I) 刻画：</p>
+
+<p>\[
+x \in \partial A \iff \text{每个含 } x \text{ 的开集 } U \text{ 同时交 } A \text{ 与 } X \setminus A \text{ 非空}.
+\]</p>
+
+<p>"<em>每个邻域里既有 A 的点又有 A 外的点</em>"。这条最朴素，画面也最清楚。证：\(\partial A = \bar A \cap \overline{X \setminus A}\)（因 \(\mathrm{int}(A) = X \setminus \overline{X \setminus A}\)，所以 \(X \setminus \mathrm{int}(A) = \overline{X \setminus A}\)，再交 \(\bar A\)）。\(x \in \bar A \cap \overline{X \setminus A}\)由 (I) 等价于"<em>每个开邻域 \(U \ni x\) 同时与 A 和 \(X \setminus A\) 相交</em>"。</p>
+
+<p>顺手得：\(\partial A = \bar A \cap \overline{X \setminus A}\) 是<em>两个闭集的交</em>，故 \(\partial A\) 总是<em>闭集</em>。请你记住这条——它是后面很多分析的起点。</p>
+
+<p><strong>分块画面。</strong>把 \(X\) 沿 \(A\) 切成三块：</p>
+
+<p>\[
+X = \mathrm{int}(A) \ \sqcup \ \partial A \ \sqcup \ \mathrm{int}(X \setminus A),
+\]</p>
+
+<p>其中 \(\sqcup\) 是<em>不交并</em>。这三块两两不交（按定义）且并起来是 \(X\)。\(\mathrm{int}(A)\)是"<em>稳在 A 内</em>"，\(\mathrm{int}(X \setminus A)\)是"<em>稳在 A 外</em>"，\(\partial A\)是"<em>骑在边界上</em>"。这是闭包 / 内部 / 边界三者关系最有用的画面，记住它。</p>
+
+<h2 id="sec5-4">5.4 \(\bar A = A \cup \partial A\)（恒成立）</h2>
+
+<p>本章钩子里抛了一句"<em>闭包 = 集合 \(\cup\) 边界</em> 在每个空间都对吗"——朴素直觉立刻喊"对"，但请你停下来真正<em>验证</em> 一下。</p>
+
+<p>用 (I) 证。\((\subseteq)\) 给 \(x \in \bar A\)。两情况：(i) \(x \in A\)，那 \(x \in A \cup \partial A\)。(ii) \(x \notin A\)，那 \(x \in X \setminus A\)，每个含 \(x\) 的开集 \(U\) 显然交 \(X \setminus A \ni x\) 非空；又 \(x \in \bar A\) 给出 \(U \cap A \neq \emptyset\)。两条合起来 \(x \in \partial A\)。</p>
+
+<p>\((\supseteq)\) \(A \subseteq \bar A\) 由 (K2)；\(\partial A = \bar A \cap \overline{X \setminus A} \subseteq \bar A\)。\(\square\)</p>
+
+<p>所以"<em>闭包 = 集合 \(\cup\) 边界</em>" 真是恒成立的——但<em>原因</em> 不是钩子里写的"集合加边界"。\(A\) 与 \(\partial A\) 可能<em>有重叠</em>：\(A\) 中的<em>边界点</em> 既在 \(A\) 里也在 \(\partial A\) 里。所以这条等式应该读作"<em>闭包是 A 和它边界的并</em>"，而不是"<em>闭包是 A 与边界这两块拼在一起</em>"——后者暗示不交并，但 \(A \cup \partial A\) 一般<em>不</em>是不交并。</p>
+
+<p>钩子里第二句问"<em>边界会不会包含原集合的内部</em>"。答案——不会，按定义 \(\partial A = \bar A \setminus \mathrm{int}(A)\)，已经把内部减掉了。</p>
+
+<p>但请你警惕另一件相关的事：<em>边界可能与原集合相交</em>。具体——\(A \cap \partial A\) 不一定空。例 \(A = [0, 1] \subseteq \mathbb{R}\)：\(\bar A = [0, 1]\)，\(\mathrm{int}(A) = (0, 1)\)，\(\partial A = \{0, 1\}\)。\(A \cap \partial A = \{0, 1\} \neq \emptyset\)——\(A\) 含<em>它自己的边界点</em>。这是因为 \(A\) 本身闭了。如果取 \(A = (0, 1)\)：\(\bar A = [0, 1]\)，\(\mathrm{int}(A) = (0, 1)\)，\(\partial A = \{0, 1\}\)，这次 \(A \cap \partial A = \emptyset\)——\(A\) <em>不</em>含边界点。</p>
+
+<p>从这两例你能看出："<em>A 含不含自己的边界</em>" 等价于"<em>A 闭不闭</em>"。具体：</p>
+
+<p>\[
+A \text{ 闭} \iff \bar A = A \iff \partial A \subseteq A.
+\]</p>
+
+<p>对偶：</p>
+
+<p>\[
+A \text{ 开} \iff \mathrm{int}(A) = A \iff \partial A \cap A = \emptyset.
+\]</p>
+
+<p>"<em>开</em> = 不含自己边界"，"<em>闭</em> = 含自己全部边界"。这是最简洁的几何刻画，请你装进脑子。</p>
+
+<h2 id="sec5-5">5.5 反例库：在四个非平凡拓扑里算具体集合</h2>
+
+<p>抽象算子吓人，具体计算才让概念落地。我们在四个标准空间里挑同一个集合 \(A\)，看 \(\bar A\)、\(\mathrm{int}(A)\)、\(\partial A\) 在每处长什么样。这一节<em>不</em> 学新概念——只反复练。</p>
+
+<h3 id="sec5-5-1">5.5.1 离散拓扑</h3>
+
+<p>\((X, \tau_d)\)，\(\tau_d = \mathcal{P}(X)\)。每个子集都开 \(\Rightarrow\) 每个子集都闭（补集也开）。所以对任意 \(A \subseteq X\)：</p>
+
+<p>\[
+\bar A = A, \quad \mathrm{int}(A) = A, \quad \partial A = \emptyset.
+\]</p>
+
+<p>"<em>边界永远空</em>"——离散空间里没有边界点。几何上：每个点都是孤立的，没有"夹在两侧" 的点。这是离散拓扑"<em>没有几何</em>" 的最干净表述。</p>
+
+<h3 id="sec5-5-2">5.5.2 余有限拓扑</h3>
+
+<p>\(X = \mathbb{R}\)，\(\tau = \{\emptyset\} \cup \{U : X \setminus U \text{ 有限}\}\)。闭集 \(=\) 空集 \(\cup\) 有限集 \(\cup\) 全集（按 De Morgan）。</p>
+
+<p>取 \(A = \mathbb{Z}\)。</p>
+
+<ul>
+  <li>\(\bar A\)：含 \(\mathbb{Z}\) 的最小闭集。\(\mathbb{Z}\) 无限，所以含 \(\mathbb{Z}\) 的"<em>有限闭集</em>" 不存在。"<em>空集</em>" 不含 \(\mathbb{Z}\)。<em>剩下唯一选项</em> \(\mathbb{R}\)——\(\bar{\mathbb{Z}} = \mathbb{R}\)！</li>
+  <li>\(\mathrm{int}(A)\)：含于 \(\mathbb{Z}\) 的最大开集。开集 \(\neq \emptyset\) 必余集有限——但 \(\mathbb{Z}\) 的余集 \(\mathbb{R} \setminus \mathbb{Z}\)<em>不有限</em>，故含于 \(\mathbb{Z}\) 的<em>非空</em> 开集不存在。\(\mathrm{int}(\mathbb{Z}) = \emptyset\)。</li>
+  <li>\(\partial A = \bar A \setminus \mathrm{int}(A) = \mathbb{R} \setminus \emptyset = \mathbb{R}\)。</li>
+</ul>
+
+<p>边界 \(=\) <em>整条实线</em>——全空间！这与欧氏 \(\mathbb{R}\) 上的 \(\partial \mathbb{Z} = \mathbb{Z}\) 完全不同。原因：余有限里"开" 极少，每个点的"<em>每个开邻域</em>" 都几乎是整个 \(\mathbb{R}\)，必交 \(\mathbb{Z}\) 与 \(\mathbb{R} \setminus \mathbb{Z}\) 都非空。</p>
+
+<p>把这件事多想一遍——在余有限拓扑下，\(\mathbb{Z}\) 在 \(\mathbb{R}\) 里"<em>稠密到塞满全空间</em>"。"稠密" 这件事强烈依赖拓扑（5.7 节专谈）。</p>
+
+<h3 id="sec5-5-3">5.5.3 Sierpiński 空间</h3>
+
+<p>\(X = \{0, 1\}\)，\(\tau = \{\emptyset, \{1\}, X\}\)。闭集 \(= \{\emptyset, \{0\}, X\}\)（取补）。注意 \(\{0\}\) 闭、\(\{1\}\) <em>不</em> 闭，且 \(\{1\}\) 开、\(\{0\}\) <em>不</em> 开——非对称的小空间。</p>
+
+<p>四个子集挨个算。</p>
+
+<p>\(A = \emptyset\)：\(\bar A = \emptyset\)、\(\mathrm{int}(A) = \emptyset\)、\(\partial A = \emptyset\)。无聊。</p>
+
+<p>\(A = \{0\}\)：\(\{0\}\) 已闭，\(\bar A = \{0\}\)。\(\mathrm{int}(A) = \) 含于 \(\{0\}\) 的最大开集 \(= \emptyset\)（因为 \(\{1\}\)、\(X\) 都不含于 \(\{0\}\)）。\(\partial A = \{0\}\)。</p>
+
+<p>\(A = \{1\}\)：\(\bar A = \) 含 \(\{1\}\) 的最小闭集 \(= X\)（\(\{0\}\) 不含 \(\{1\}\)，所以最小闭集只能是 \(X\)）！\(\mathrm{int}(A) = \{1\}\)（\(\{1\}\) 自身开）。\(\partial A = X \setminus \{1\} = \{0\}\)。</p>
+
+<p>\(A = X\)：闭包内部边界与 \(A = \emptyset\) 完全对偶——\(\bar X = X\)、\(\mathrm{int}(X) = X\)、\(\partial X = \emptyset\)。</p>
+
+<p>请你停下盯一下 \(A = \{1\}\) 这一栏：\(\bar{\{1\}} = X = \{0, 1\}\)！点 0 在 \(\{1\}\) 的闭包里——尽管 \(\{1\}\) 看起来一点也不"靠近" 0。原因：0 的<em>唯一非空</em> 开邻域是 \(X\)，它确实交 \(\{1\}\) 非空（按 (I)）。Sierpiński 拓扑里"<em>0 看得到 1，但 1 看不到 0</em>"——非对称的几何。</p>
+
+<h3 id="sec5-5-4">5.5.4 Sorgenfrey 直线</h3>
+
+<p>\(\mathbb{R}_\ell\)：以 \(\{[a, b) : a < b\}\) 为基的拓扑（这族基的合法性 ch4 验证）。每个 \([a, b)\) 是基本开集，其它开集是它们的并。</p>
+
+<p>注意 \([a, b)\) 同时<em>是闭集</em>——其补集 \((-\infty, a) \cup [b, \infty) = \bigcup_n [a - n, a) \cup \bigcup_n [b, b+n)\) 是基本开集的并，故开。所以 \([a, b)\) 在 Sorgenfrey 里<em>既开又闭</em>（clopen）。这与欧氏 \(\mathbb{R}\) 上 \([a, b)\) "<em>既不开也不闭</em>" 形成强烈对照——同一个集合，不同拓扑下命运完全不同。</p>
+
+<p>取 \(A = (0, 1] = \{x : 0 < x \leq 1\}\)。</p>
+
+<ul>
+  <li>\(\mathrm{int}(A)\)：找 \(A\) 内的开集。\([a, b) \subseteq (0, 1]\)需要 \(a > 0\) 且 \(b \leq 1\)。但 \(b\) 可以取 1 吗？\([a, 1) \subseteq (0, 1]\)对，\([a, 1)\)是 \(A\) 的子集且开。能否包含点 \(1\)？要含 1 的开集得是 \([1, c)\) 或它的并；\([1, c) \subseteq (0, 1]\)需 \(c \leq 1\)，但 \(c > 1\)（基本开集要求 \(a < b\)），矛盾。所以<em>不存在</em> 开集既含 1 又含于 \((0, 1]\)。结论：\(\mathrm{int}(A) = (0, 1)\)（\(=\) 所有 \([a, 1)\) 之并，\(0 < a < 1\)）。</li>
+  <li>\(\bar A\)：找 \(A\) 的闭包。点 0 在 \(\bar A\) 吗？0 的基本开邻域形如 \([0, c)\)，与 \((0, 1]\) 交得 \((0, c) \cap (0, 1]\)<em>非空</em>（取 \(c \leq 1\)），所以 0 \(\in \bar A\)？等等，按 (I)，0 \(\in \bar A \iff\) 0 的<em>每个</em> 开邻域都交 \(A\) 非空。\([0, c) \cap (0, 1] = (0, \min(c, 1)] \neq \emptyset\)（设 \(c > 0\)）——确实每个非空。但<em>等等</em> 0 \(\notin (0, 1]\)，会不会有反例邻域？没有——基本开邻域只能形如 \([0, c)\)（必须含 0 且形如 \([a, b)\) 给 \(a = 0\)）。所以 0 \(\in \bar A\)。</li>
+  <li><em>但</em> 等一下。请你把这件事跟欧氏 \(\mathbb{R}\) 上比一下——欧氏里 \(\overline{(0, 1]} = [0, 1]\)，把 0 加进来。Sorgenfrey 里 \(\overline{(0, 1]} = ?\) 我们刚证 0 \(\in \bar A\)。点 1 自然在 \(A\) 里（在 \(\bar A\) 里）。\((0, 1) \subseteq A \subseteq \bar A\)。点超过 1 的呢？取 \(x > 1\)，邻域 \([x, x + \epsilon)\) 与 \((0, 1]\) 交\(= \emptyset\)（因 \(x > 1\)），所以 \(x \notin \bar A\)。点小于 0 的，类似不在。结论：\(\bar A = [0, 1]\)。和欧氏一样的答案。</li>
+  <li>但<em>过程</em> 不一样。请你停下注意：Sorgenfrey 里点 0 的开邻域<em>都向右</em>（\([0, c)\)），不能向左。这就是为什么 \([0, c) \cap (0, 1]\) 非空——交集向右是 \((0, c)\)。如果换成 \(A = [0, 1)\)，问 \(-1 \in \bar A\) 吗？\(-1\) 的邻域是 \([-1, c)\)，与 \([0, 1)\) 交 \(= [0, \min(c, 1))\)，需 \(c > 0\) 才非空，所以 \([-1, 0) \cap [0, 1) = \emptyset\) 对应取 \(c = 0\) ——不行，\(c > -1\)。取 \(c = 0\)：\([-1, 0) \cap [0, 1) = \emptyset\)！所以存在邻域 \([-1, 0)\)<em>不</em>交 \(A\)，故 \(-1 \notin \bar{[0, 1)}\)。但欧氏里 \(-1\) 也不在 \(\overline{[0, 1)} = [0, 1]\) 里，所以这条没区别。</li>
+  <li>\(\partial A = \bar A \setminus \mathrm{int}(A) = [0, 1] \setminus (0, 1) = \{0, 1\}\)。</li>
+</ul>
+
+<p>这个例子里 Sorgenfrey 与欧氏给出<em>同样</em> 的 \(\bar A, \partial A\)，但 \(\mathrm{int}(A)\) <em>不同</em>——欧氏给 \((0, 1)\)，Sorgenfrey 也给 \((0, 1)\)，等等，这次内部相同！让我换个反例更清楚。</p>
+
+<p>取 \(A = [0, 1)\)。Sorgenfrey 里：\(A\) 自己就是基本开集，<em>是</em> 开集，所以 \(\mathrm{int}(A) = A = [0, 1)\)。\(\bar A\)：1 \(\in \bar A\) 吗？1 的邻域 \([1, c)\) 与 \([0, 1)\) 交 \(= \emptyset\)（因 \(c > 1\)，所以 \([1, c) \cap [0, 1) = \emptyset\)）。<em>存在</em> 邻域<em>不</em>交 \(A\)，故 1 \(\notin \bar A\)。\(\bar A = [0, 1)\)（不加点 1）。\(\partial A = \bar A \setminus \mathrm{int}(A) = \emptyset\)！</p>
+
+<p>对照欧氏 \(\mathbb{R}\) 上同一个 \(A = [0, 1)\)：\(\mathrm{int}(A) = (0, 1)\)、\(\bar A = [0, 1]\)、\(\partial A = \{0, 1\}\)。</p>
+
+<p>同一个集合 \([0, 1)\)，Sorgenfrey 上"<em>整个 A 都是内部</em>" "<em>无边界</em>"，欧氏上"<em>0 与 1 都是边界点</em>"。<em>边界这件事强烈依赖拓扑</em>——这是这一章最该带走的反直觉。</p>
+
+<h3 id="sec5-5-5">5.5.5 经典：\(\mathbb{Q}\) 在 \(\mathbb{R}\) 里</h3>
+
+<p>欧氏 \(\mathbb{R}\) 上取 \(A = \mathbb{Q}\)。算 \(\bar A\)、\(\mathrm{int}(A)\)、\(\partial A\)。</p>
+
+<ul>
+  <li>\(\bar{\mathbb{Q}}\)：每个 \(x \in \mathbb{R}\) 的开邻域 \(B(x, \epsilon) = (x - \epsilon, x + \epsilon)\) 都含有理数（有理数稠密）。所以每个 \(x\) 都满足 (I) \(\Rightarrow x \in \bar{\mathbb{Q}}\)。结论 \(\bar{\mathbb{Q}} = \mathbb{R}\)。</li>
+  <li>\(\mathrm{int}(\mathbb{Q})\)：含于 \(\mathbb{Q}\) 的开集。任何非空开集 \(U \subseteq \mathbb{R}\) 含某个 \((a, b)\)，里有<em>无理</em>数（无理数也稠密）——\(U \not\subseteq \mathbb{Q}\)。故含于 \(\mathbb{Q}\) 的开集只能是 \(\emptyset\)。\(\mathrm{int}(\mathbb{Q}) = \emptyset\)。</li>
+  <li>\(\partial \mathbb{Q} = \mathbb{R} \setminus \emptyset = \mathbb{R}\)。</li>
+</ul>
+
+<p>"<em>有理数的边界是整条实数线</em>"——经典的拓扑反直觉。每个实数 \(x\)（无论有理无理）都是 \(\mathbb{Q}\) 的边界点：每个邻域里既有有理数也有无理数。</p>
+
+<p>这也是为什么"<em>测度</em>" 与"<em>拓扑</em>" 是<em>两套独立</em> 的几何工具——\(\mathbb{Q}\) 拓扑上"满"（\(\bar{\mathbb{Q}} = \mathbb{R}\)、\(\partial \mathbb{Q} = \mathbb{R}\)），但<em>测度</em> 上"<em>零测</em>"（\(\lambda(\mathbb{Q}) = 0\)）。同一个集合的两种几何描述完全相反。这种反差在<a href="../实分析/index.html">实分析</a>里反复出现。</p>
+
+<h2 id="sec5-6">5.6 极限点、孤立点、完美集</h2>
+
+<p>"<em>极限点</em>" 的定义直接从闭包刻画 (I) 长出来——把"\(U \cap A\) 非空" 强化成"\(U \cap A\) 非空<em>且不只有 x</em>"：</p>
+
+<p>\[
+\boxed{\ x \text{ 是 } A \text{ 的极限点} \iff \forall \text{ 开 } U \ni x, \ (U \setminus \{x\}) \cap A \neq \emptyset.\ }
+\]</p>
+
+<p>"<em>x 的每个挖掉自身的邻域都还能碰到 A 的点</em>"。极限点集合记作 \(A'\)。</p>
+
+<p>请注意定义里没要求 \(x \in A\) ——\(x\) 可以在 \(A\) 里也可以不在。比较：</p>
+
+<ul>
+  <li>\(x \in \bar A\)：每个开邻域交 \(A\) 非空（可能只有 \(x\) 自己）；</li>
+  <li>\(x \in A'\)：每个开邻域<em>挖掉 x</em> 后还交 \(A\) 非空。</li>
+</ul>
+
+<p>差别——\(A'\) 比 \(\bar A\) 严格"<em>更强</em>"。事实：</p>
+
+<p>\[
+\bar A = A \cup A'.
+\]</p>
+
+<p>证：\(\supseteq\) 由 \(A \subseteq \bar A\) 与 \(A' \subseteq \bar A\)（极限点显然在闭包里）。\(\subseteq\) 给 \(x \in \bar A\)。若 \(x \in A\) 完。否则 \(x \notin A\)，则 \((U \setminus \{x\}) \cap A = U \cap A \neq \emptyset\)（因 \(x \notin A\)），故 \(x \in A'\)。\(\square\)</p>
+
+<p>对应的，<em>孤立点</em>：</p>
+
+<p>\[
+\boxed{\ x \in A \text{ 是 } A \text{ 的孤立点} \iff \exists \text{ 开 } U \ni x, \ U \cap A = \{x\}.\ }
+\]</p>
+
+<p>"<em>x 在 A 里，但有一个开邻域只在 A 里碰到 x 自己</em>"。孤立点<em>不是</em> 极限点（按定义）：孤立点的某个邻域<em>不</em> 包含 \(A \setminus \{x\}\) 的点。</p>
+
+<p>所以 \(A\) 的点恰分两类——孤立点 \(\sqcup\) 极限点（在 \(A\) 里的）。</p>
+
+<p><strong>例。</strong>\(A = \{0\} \cup \{1/n : n \geq 1\} \subseteq \mathbb{R}\)（欧氏）。</p>
+
+<ul>
+  <li>0 是<em>极限点</em>：每个 \((-\epsilon, \epsilon)\) 含无穷多 \(1/n\)，故挖掉 0 后非空。</li>
+  <li>每个 \(1/n\) 是<em>孤立点</em>：取小邻域 \((1/n - \delta, 1/n + \delta)\) 比 \(1/n\) 与 \(1/(n+1)\) 之间距离 \(\frac{1}{n(n+1)}\) 还小，邻域里只有 \(1/n\) 一点属于 A。</li>
+  <li>\(A' = \{0\}\)，\(\bar A = A \cup \{0\} = A\) ——\(A\) 闭。</li>
+</ul>
+
+<p><strong>完美集（perfect set）</strong>：</p>
+
+<p>\[
+\boxed{\ A \text{ 完美} \iff A \text{ 闭且每个 } x \in A \text{ 都是极限点（即 } A \subseteq A'\text{）}.\ }
+\]</p>
+
+<p>"<em>闭、且无孤立点</em>"。等价：\(A = A'\)（结合 \(A\) 闭得 \(\bar A = A = A \cup A'\) 即 \(A' \subseteq A\)；反向 \(A \subseteq A'\) 即定义）。</p>
+
+<p>例：\([0, 1] \subseteq \mathbb{R}\) 完美——闭，且每点 \(x\) 的邻域都含无穷多点。\(\mathbb{R}\) 完美。</p>
+
+<p><em>反</em>例：\(A = \{1/n : n \geq 1\}\)<em>不</em> 完美——每个 \(1/n\) 是孤立点。</p>
+
+<p><em>非平凡</em> 例：<a href="ch18.html">Cantor 集</a> \(C \subseteq [0, 1]\)（取 \([0, 1]\) 反复挖中间三分之一）。\(C\) 完美——每个 Cantor 点都是极限点（任何邻域含无穷多 Cantor 点），\(C\) 闭。Cantor 集还<em>不可数</em>，<em>测度零</em>，<em>完全不连通</em>——一个点集论里的怪兽。</p>
+
+<p>Cantor-Bendixson 定理（<a href="../实分析/ch6.html">实分析 ch6</a>）：每个非空完美集（在 Polish 空间里）都<em>不可数</em>，势 \(\geq 2^{\aleph_0}\)。这是连续统假设附近的核心事实。</p>
+
+<h2 id="sec5-7">5.7 稠密集：\(\bar A = X\)</h2>
+
+<p>稠密的定义朴素：</p>
+
+<p>\[
+\boxed{\ A \text{ 在 } X \text{ 中稠密} \iff \bar A = X.\ }
+\]</p>
+
+<p>等价（按 (I)）：每个非空开集 \(U \subseteq X\) 都满足 \(U \cap A \neq \emptyset\)——"<em>A 触到每个开集</em>"。</p>
+
+<p>经典例：\(\mathbb{Q}\) 在欧氏 \(\mathbb{R}\) 中稠密。我们刚算 \(\bar{\mathbb{Q}} = \mathbb{R}\)。同样 \(\mathbb{R} \setminus \mathbb{Q}\)（无理数）稠密、\(\mathbb{R} \setminus \mathbb{Q}\)（事实上比 \(\mathbb{Q}\) 还"稠密"——它不可数）。</p>
+
+<p>稠密 + 可数的集合特别有用——叫<em>可分</em>（separable）：</p>
+
+<p>\[
+X \text{ 可分} \iff \exists \text{ 可数稠密子集 } A \subseteq X.
+\]</p>
+
+<p>\(\mathbb{R}\) 可分（\(\mathbb{Q}\) 可数稠密）。\(\mathbb{R}^n\) 可分（\(\mathbb{Q}^n\) 可数稠密）。\(C([0,1])\) 可分（多项式可数稠密——由 Stone-Weierstrass，<a href="../实分析/ch11.html">实分析 ch11</a>）。\(L^p\) 可分（\(p < \infty\)）。<em>不可分</em> 例：\(\ell^\infty\)（实数有界序列空间，sup 范数）、\(L^\infty\)。</p>
+
+<p>可分这件事在分析里至关重要——许多构造（Riesz 表示、Hahn-Banach 应用）需要可分背景。我们在 ch15 谈"<em>第二可数 \(\Rightarrow\) 可分</em>" 时再展开。</p>
+
+<p><strong>稠密 vs 余有限。</strong>余有限拓扑下的 \(\mathbb{R}\) 里，<em>每</em>个无穷子集都稠密——上面已算 \(\mathbb{Z}\) 稠密。事实上任意 \(A\) 无穷 \(\Rightarrow \bar A = \mathbb{R}\)（含 \(A\) 的闭集不能有限，只能是 \(\mathbb{R}\)）。"稠密" 在余有限下变得几乎<em>琐碎</em>——每个无穷集都稠密，可分性也变得<em>免费</em>。这又一次说明拓扑越粗，几何性质越廉价。</p>
+
+<p><strong>无处稠密。</strong>对偶概念：\(A\) 在 \(X\) 中<em>无处稠密</em>（nowhere dense）\(\iff \mathrm{int}(\bar A) = \emptyset\) ——闭包的内部空。例：\(\mathbb{Z} \subseteq \mathbb{R}\)（欧氏）：\(\bar{\mathbb{Z}} = \mathbb{Z}\)，\(\mathrm{int}(\mathbb{Z}) = \emptyset\)，无处稠密。Cantor 集 \(C \subseteq [0, 1]\)：\(\bar C = C\)，\(\mathrm{int}(C) = \emptyset\)（C 在 \([0,1]\) 里"<em>含不了任何区间</em>"——每个区间被挖掉中间），无处稠密。</p>
+
+<p>"<em>稠密</em>" 与"<em>无处稠密</em>" 是两个极端。中间的"<em>第一范畴 / 第二范畴</em>" 集合，是 <a href="ch22.html">ch22 Baire 范畴定理</a> 的主题。</p>
+
+<h2 id="sec5-8">5.8 临别话</h2>
+
+<p>这一章把"<em>闭 / 内 / 边 / 闭包</em>" 这四个日常词全部从开集出发严格化了。重点不是定义本身——你大概早会写——而是几个反直觉：</p>
+
+<ul>
+  <li>"<em>开</em>" 与"<em>闭</em>" 不是二分；可以<em>既开又闭</em>（clopen）或<em>既不开也不闭</em>。</li>
+  <li>"<em>边界</em>" 强烈依赖拓扑——同一个集合 \(A = [0, 1)\) 在欧氏 \(\mathbb{R}\) 里有边界 \(\{0, 1\}\)、在 Sorgenfrey 里无边界。</li>
+  <li>"<em>稠密</em>" 也强烈依赖拓扑——\(\mathbb{Z}\) 在欧氏 \(\mathbb{R}\) 里"<em>处处不稠密</em>"，在余有限 \(\mathbb{R}\) 里"<em>稠密填满</em>"。</li>
+  <li>"<em>极限点</em>" 与"<em>序列极限</em>" 的关系——后者只在度量（或第一可数）情形管用，一般拓扑空间需要"网" 这种推广（ch15 谈）。</li>
+  <li>同一个 \(\mathbb{Q}\) 在 \(\mathbb{R}\) 里测度零、拓扑稠——拓扑与测度是<em>独立</em> 的几何观点。</li>
+</ul>
+
+<p>这五条加起来给你一个肌肉记忆：<em>看到任何关于"边界 / 闭包 / 稠密" 的论断，先问"在哪个拓扑下"</em>。这条问句是"用拓扑思考" 的入口。</p>
+
+<p>下一章我们把 ch1 提过的"<em>连续 \(=\) 开集逆像开集</em>" 完整建立——给出三条等价、几个标准例、合成 / 限制 / 拼接性质，以及 \(\varepsilon\)-\(\delta\) 在度量情形下与新定义的等价。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 基与子基</a><a href="ch6.html">下一章 · 第 6 章 连续映射 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 任意积拓扑（Tychonoff 拓扑） — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 商拓扑</a><a href="ch12.html">下一章 · 第 12 章 分离公理 →</a></nav>
+<h1 id="ch11">第 11 章 任意积拓扑（Tychonoff 拓扑）</h1>
+
+<p>ch9 给两个空间 \(X, Y\) 的积 \(X \times Y\) 配了拓扑——开集由"<em>开矩形</em> \(U \times V\)" 当基生成。一切顺利。\(n\) 个空间的有限积也照样推广。</p>
+
+<p>问题来了：<em>任意</em> 多个呢？</p>
+
+<p>给一族拓扑空间 \(\{X_i\}_{i \in I}\)，索引集 \(I\) 可以任意大——可数无穷、不可数、甚至连续基数。乘积集合：</p>
+
+<p>\[
+\prod_{i \in I} X_i := \left\{x = (x_i)_{i \in I} : x_i \in X_i \text{ 对每个 } i\right\}.
+\]</p>
+
+<p>"<em>每个 \(i\) 选一个 \(X_i\) 里的元素</em>"。这个集合可能巨大——若 \(I = \mathbb{N}\) 且每个 \(X_i = \{0, 1\}\)，乘积是所有 0/1 序列, 与 \([0, 1]\) 等势（不可数）。\(I\) 不可数则更大。</p>
+
+<p>问题：\(\prod X_i\) 该带<em>什么</em> 拓扑？</p>
+
+<p>最朴素的尝试——照搬 ch9——开集由"<em>开盒</em> \(\prod_i U_i\)"（每个 \(U_i\) 开 in \(X_i\)）当基。这就是<em>盒拓扑</em>（box topology）。</p>
+
+<p>这一章会证明：盒拓扑<em>是错的</em>。它"<em>太细</em>"——开集太多——让最关键的"<em>分量连续 \(\Rightarrow\) 整体连续</em>" 通用性质<em>失败</em>。撞墙之后, reframe：<em>积拓扑（Tychonoff 拓扑）</em>限制为只允许"<em>有限</em>多 \(i\) 之外 \(U_i = X_i\)" 的盒。这条限制是 1930 年 Tychonoff 写下著名"<em>积紧致定理</em>" 时第一次正式提出的。</p>
+
+<h2 id="sec11-1">11.1 朴素方案：盒拓扑</h2>
+
+<p><strong>定义（盒拓扑）：</strong>\(\prod_{i \in I} X_i\) 上的<em>盒拓扑</em> 由基</p>
+
+<p>\[
+\mathcal{B}_{\text{box}} := \left\{\prod_{i \in I} U_i : U_i \in \tau_{X_i} \text{ 对每个 } i \in I\right\}
+\]</p>
+
+<p>生成。</p>
+
+<p>验证 \(\mathcal{B}_{\text{box}}\) 是基（练习；与 ch9.2 的 (B1, B2) 平行——交还是同形状的盒）。所以盒拓扑是<em>合法</em> 的拓扑——三公理通过, 没问题。</p>
+
+<p>看起来很自然——\(I\) 不可数时也照写得出来。但请你停一下问：\(\prod_i U_i\) 在 \(I\) 不可数时<em>实际有多大</em>？比如 \(I = \mathbb{N}\)、\(X_i = \mathbb{R}\)、每个 \(U_i = (-1, 1)\)。则</p>
+
+<p>\[
+\prod_n U_n = (-1, 1)^\mathbb{N} = \left\{(x_n) : -1 < x_n < 1 \text{ 对每个 } n\right\}.
+\]</p>
+
+<p>这是一个<em>无穷多</em> 条件构成的集合。它在 \(\prod \mathbb{R}\) 里"<em>很小</em>"——任何序列 \((x_n)\) 只要有<em>一个</em> \(x_n \notin (-1, 1)\) 就被排除。</p>
+
+<p>"<em>任意多</em>" 个开条件相<em>交</em>，几何上是非常严苛的限制。这种"<em>太严</em>" 是盒拓扑致命问题的根源——下节看具体撞墙。</p>
+
+<h2 id="sec11-2">11.2 撞墙：对角线在盒拓扑下不连续</h2>
+
+<p>取 \(I = \mathbb{N}\), \(X_i = \mathbb{R}\)（标准）。乘积：\(\mathbb{R}^\mathbb{N} := \prod_{n \in \mathbb{N}} \mathbb{R}\) = "<em>所有实数序列</em>"。</p>
+
+<p>给盒拓扑。考虑<em>对角线映射</em>：</p>
+
+<p>\[
+\Delta: \mathbb{R} \to \mathbb{R}^\mathbb{N}, \quad \Delta(t) := (t, t, t, \ldots).
+\]</p>
+
+<p>"<em>送 \(t\) 到所有分量都 \(= t\) 的常序列</em>"。</p>
+
+<p>每个分量映射 \(\pi_n \circ \Delta: \mathbb{R} \to \mathbb{R}, t \mapsto t\) 是恒等映射, <em>显然</em> 连续。直觉告诉你 \(\Delta\) 应该连续——分量都连续, 整体应该连续（对吧, 这是 ch9.4 的通用性质）。</p>
+
+<p>但<em>在盒拓扑下 \(\Delta\) 不连续</em>。看反例：</p>
+
+<p>取盒</p>
+
+<p>\[
+B := \prod_{n \in \mathbb{N}} \left(-\frac{1}{n+1}, \frac{1}{n+1}\right) = (-1, 1) \times \left(-\frac{1}{2}, \frac{1}{2}\right) \times \left(-\frac{1}{3}, \frac{1}{3}\right) \times \cdots.
+\]</p>
+
+<p>每个 \(U_n = (-\frac{1}{n+1}, \frac{1}{n+1})\) 是 \(\mathbb{R}\) 的开集（开区间）。所以 \(B\) 在盒拓扑下开（基元素）。\(B\) 含 \(\Delta(0) = (0, 0, 0, \ldots)\)（每分量 0 都在区间里）。</p>
+
+<p>看 \(\Delta^{-1}(B) = \{t \in \mathbb{R} : (t, t, t, \ldots) \in B\} = \{t : |t| < \frac{1}{n+1} \text{ 对每个 } n\}\)。这要 \(t = 0\)（任何 \(t \neq 0\) 让 \(n\) 充分大时 \(|t| > \frac{1}{n+1}\) 失败）。</p>
+
+<p>所以 \(\Delta^{-1}(B) = \{0\}\)——单点集。\(\{0\}\) 在 \(\mathbb{R}\) 中<em>不</em> 开（\(\mathbb{R}\) 标准拓扑下单点集不开）。所以"<em>开集 \(B\) 的逆像 \(\{0\}\) 不开</em>"——\(\Delta\) 不连续。\(\square\)</p>
+
+<p>请停一下盯着这个反例。每个分量 \(\Delta_n = \pi_n \circ \Delta\) 都连续, 但整体 \(\Delta\) <em>不</em> 连续。<em>这破坏了通用性质</em>——而通用性质是 ch9 我们对积拓扑的核心要求。</p>
+
+<p>原因清楚了——盒拓扑的开集"<em>太多</em>"。它允许"<em>每个分量都被独立约束</em>" 的盒（每个 \(U_n\) 不一样、可以任意小）。这种盒在<em>有限</em>积里没问题（最小的 \(\delta\) 控制全部）, 但在<em>无穷</em>积里会让"<em>逐点收紧</em>" 失控——任何 \(t \neq 0\) 都能在某个足够小的 \(U_n\) 里被排除。</p>
+
+<p>结论：盒拓扑<em>不</em>是我们想要的。它打破了让积拓扑有用的最关键性质。我们必须 reframe。</p>
+
+<h2 id="sec11-3">11.3 reframe：积拓扑（Tychonoff 拓扑）= 子基生成</h2>
+
+<p>怎么修？答案藏在 ch9.2 的<em>子基</em> 描述里——积拓扑可以由"<em>投影逆像</em>" 当子基生成：\(\mathcal{S} = \{\pi_X^{-1}(U) : U \text{ 开 in } X\} \cup \{\pi_Y^{-1}(V) : V \text{ 开 in } Y\}\)。</p>
+
+<p>对<em>无穷多</em> 空间, 我们就<em>沿用这个子基定义</em>——别去搞什么"<em>盒</em>"。</p>
+
+<p><strong>定义（积拓扑 / Tychonoff 拓扑）：</strong>\(\prod_{i \in I} X_i\) 上的<em>积拓扑</em> 由子基</p>
+
+<p>\[
+\boxed{\ \mathcal{S} := \{\pi_i^{-1}(U) : i \in I, U \in \tau_{X_i}\}\ }
+\]</p>
+
+<p>生成。</p>
+
+<p>展开：\(\pi_i^{-1}(U) = \{x = (x_j) : x_i \in U\} = X_{j_1} \times X_{j_2} \times \cdots \times U \times \cdots\) 第 \(i\) 位是 \(U\), 其他位<em>都</em> 是<em>整空间</em> \(X_j\)。</p>
+
+<p>所以子基是"<em>只</em>限制一个分量, 其他分量随意" 的盒。这种盒比朴素盒<em>少得多</em>。</p>
+
+<p><strong>由子基到基：</strong>子基 \(\mathcal{S}\) 的<em>有限</em> 多个交：取 \(\pi_{i_1}^{-1}(U_1), \ldots, \pi_{i_n}^{-1}(U_n)\)，它们的交是</p>
+
+<p>\[
+\bigcap_{k=1}^n \pi_{i_k}^{-1}(U_k) = \prod_{i \in I} V_i,
+\]</p>
+
+<p>其中 \(V_{i_k} = U_k\)（对那有限多个 \(i_k\)）, \(V_i = X_i\)（对其他<em>所有</em> \(i\)）。</p>
+
+<p>所以基（=子基的有限交）由</p>
+
+<p>\[
+\mathcal{B}_{\text{prod}} := \left\{\prod_{i \in I} V_i : V_i \in \tau_{X_i}, \ V_i = X_i \text{ 对除有限多个 } i 之外\right\}
+\]</p>
+
+<p>组成。"<em>有限多 \(i\) 之外 \(V_i\) 必须等于整个 \(X_i\)</em>"——这就是积拓扑与盒拓扑的<em>本质差别</em>。</p>
+
+<p>对比：</p>
+<ul>
+  <li><em>盒拓扑</em>：基 = 任意 \(\prod U_i\)（每 \(U_i\) 任意开）；</li>
+  <li><em>积拓扑</em>：基 = \(\prod V_i\) 且 \(V_i = X_i\) 对除<em>有限</em>多 \(i\) 外。</li>
+</ul>
+
+<p>显然盒拓扑包含积拓扑（积基是盒基的子集）。两者<em>有限</em> 积时一致（"<em>除有限多 \(i\) 外</em>" 在 \(I\) 有限时是空话, 等于"<em>每个 \(V_i\) 任意</em>"）。无穷积时盒拓扑<em>严格更细</em>。</p>
+
+<h2 id="sec11-4">11.4 投影连续 + 最粗性</h2>
+
+<p>积拓扑沿用子基定义后, 投影<em>当然</em> 连续——子基里就是 \(\pi_i^{-1}(U)\), 它们都开。</p>
+
+<p><strong>命题：</strong>每个投影 \(\pi_i: \prod_j X_j \to X_i\) 在积拓扑下连续。</p>
+
+<p><em>证明。</em>取 \(X_i\) 中开集 \(U\)。\(\pi_i^{-1}(U) \in \mathcal{S} \subseteq \tau_{\text{prod}}\)（子基元素都开）。\(\square\)</p>
+
+<p><strong>命题（最粗性）：</strong>积拓扑是 \(\prod X_i\) 上让所有投影 \(\{\pi_i\}_{i \in I}\) 连续的<em>最粗</em> 拓扑。</p>
+
+<p><em>证明。</em>设 \(\tau'\) 是另一个让所有 \(\pi_i\) 连续的拓扑。则 \(\pi_i^{-1}(U) \in \tau'\) 对所有 \(i, U\)——即 \(\tau' \supseteq \mathcal{S}\)。子基生成的拓扑是<em>包含子基的最小</em> 拓扑（ch5）, 所以 \(\tau' \supseteq \tau_{\text{prod}}\)。\(\square\)</p>
+
+<p>这条让积拓扑成为<em>满足通用性质</em> 的<em>正确</em> 选择——下节验证。</p>
+
+<h2 id="sec11-5">11.5 通用性质：分量连续 \(\iff\) 整体连续</h2>
+
+<p><strong>定理（积拓扑通用性质）：</strong>给映射 \(f: Z \to \prod_{i \in I} X_i\)。则</p>
+
+<p>\[
+\boxed{\ f \text{ 连续（积拓扑下）} \iff \pi_i \circ f \text{ 连续, 对每个 } i \in I.\ }
+\]</p>
+
+<p><em>证明。</em>(\(\Rightarrow\)) \(f\) 连续 + \(\pi_i\) 连续 \(\Rightarrow \pi_i \circ f\) 连续。</p>
+
+<p>(\(\Leftarrow\)) 设每个 \(\pi_i \circ f\) 连续。要证 \(f\) 连续——只需子基元逆像开（ch5 结论）。子基元 \(\pi_i^{-1}(U)\)：</p>
+
+<p>\[
+f^{-1}(\pi_i^{-1}(U)) = (\pi_i \circ f)^{-1}(U).
+\]</p>
+
+<p>右边由 \(\pi_i \circ f\) 连续得开。\(\checkmark\square\)</p>
+
+<p>对比 ch9.4 这条证明<em>一字不变</em>——它在<em>任意</em> 多个分量时仍然有效。这正是积拓扑（而<em>不</em>是盒拓扑）的设计目的。</p>
+
+<h2 id="sec11-6">11.6 积拓扑下对角线 \(\Delta\) 是连续的</h2>
+
+<p>回到 11.2 的反例：\(\Delta: \mathbb{R} \to \mathbb{R}^\mathbb{N}, \Delta(t) = (t, t, t, \ldots)\)。</p>
+
+<p>每个分量 \(\pi_n \circ \Delta: t \mapsto t\) 是 \(\mathbb{R} \to \mathbb{R}\) 的恒等映射, 连续。</p>
+
+<p>由通用性质（11.5）—— \(\Delta\) 在<em>积拓扑</em> 下连续。\(\square\)</p>
+
+<p>请验证一下"<em>11.2 的具体反例</em>" 在积拓扑下不再是反例：</p>
+
+<p>取盒 \(B = \prod_n (-\frac{1}{n+1}, \frac{1}{n+1})\)。它在<em>盒拓扑</em> 下是基元素, 但在<em>积拓扑</em> 下<em>不</em> 是基元素——因为<em>每个</em> \(U_n\) 都<em>不</em> 等于 \(\mathbb{R}\)（除有限多 \(n\) 外的限制不满足）。所以 \(B\) <em>未必</em> 是积拓扑的开集。</p>
+
+<p>事实上 \(B\) 在积拓扑下<em>不</em>开。具体证明：若 \(B\) 开, 那点 \(0 = (0, 0, \ldots) \in B\) 应有积拓扑基邻域 \(\prod V_n \subseteq B\), 其中 \(V_n = \mathbb{R}\) 对除有限多 \(n\) 外。但 \(\prod V_n\) 含<em>无穷</em>多分量等于 \(\mathbb{R}\), 它绝<em>不</em>能装进 \(B\)（\(B\) 每个分量都被严格限制在 \((-\frac{1}{n+1}, \frac{1}{n+1})\) 里）。矛盾。所以 \(B\) 在积拓扑下不开。</p>
+
+<p>所以 \(\Delta^{-1}(B) = \{0\}\) 在积拓扑下"<em>不</em>是开集逆像"——它<em>不</em>是 \(\Delta\) 不连续的反证, 因为 \(B\) 本身就不开。</p>
+
+<p>这正是 reframe 的力量：<em>限制基 = 减少开集 = 让 \(\Delta\) 这种"自然" 映射连续</em>。</p>
+
+<h2 id="sec11-7">11.7 性质保持：Hausdorff 积传</h2>
+
+<p>积拓扑下, 性质保持的命题<em>大致</em> 与 ch9 平行, 但需要一些小注意。我们看 Hausdorff：</p>
+
+<p><strong>定理：</strong>设每个 \(X_i\) Hausdorff, 则 \(\prod_{i \in I} X_i\) Hausdorff（积拓扑下）。</p>
+
+<p><em>证明。</em>取 \(x = (x_i), y = (y_i) \in \prod X_i\), \(x \neq y\)。则<em>存在某个</em> \(i_0 \in I\) 使 \(x_{i_0} \neq y_{i_0}\)（否则 \(x = y\)）。</p>
+
+<p>由 \(X_{i_0}\) Hausdorff——找开集 \(U_1, U_2 \subseteq X_{i_0}\) 分离 \(x_{i_0}, y_{i_0}\)：\(x_{i_0} \in U_1, y_{i_0} \in U_2, U_1 \cap U_2 = \emptyset\)。</p>
+
+<p>令 \(W_1 := \pi_{i_0}^{-1}(U_1), W_2 := \pi_{i_0}^{-1}(U_2)\)。这是子基元素, 在 \(\prod X_i\) 中开。\(x \in W_1, y \in W_2\)。验交：</p>
+
+<p>\[
+W_1 \cap W_2 = \pi_{i_0}^{-1}(U_1) \cap \pi_{i_0}^{-1}(U_2) = \pi_{i_0}^{-1}(U_1 \cap U_2) = \pi_{i_0}^{-1}(\emptyset) = \emptyset.
+\]</p>
+
+<p>分离成功。\(\square\)</p>
+
+<p>这条证明在<em>任意</em> 多个空间下<em>都</em> 有效——只需一个分量 \(X_{i_0}\) 帮忙就够。所以 Hausdorff 性质沿任意积传——比 ch9.7 的"<em>有限版</em>" 更强。</p>
+
+<p>类似地, 其他<em>"在每点局部检验</em>" 的性质（如 \(T_1\), 正则）大多也<em>积传</em>——等到 ch12 分离公理章正式整理。</p>
+
+<p>另外有一条<em>积传</em> 但要小心：</p>
+
+<p><strong>命题（积拓扑下连通积传）：</strong>每个 \(X_i\) 连通 \(\Rightarrow \prod_{i \in I} X_i\) 连通。</p>
+
+<p>证明思路：用 ch9.6 的"<em>L 形路径</em>" 推广——把任意一点与"<em>基准点</em>" \(x^* = (x_i^*)\)（每 \(x_i^*\) 任选一固定点）通过<em>每次只改一个分量</em> 的"<em>有限多步</em>" L 形路径连起来, 再用<em>"两个连通集若有公共点, 并连通</em>" 推出整体连通。<em>详细证留 ch18 道路连通章后</em>正式做完。</p>
+
+<h2 id="sec11-8">11.8 紧致积传留 ch16：Tychonoff 定理</h2>
+
+<p>本章最重要的<em>历史性</em> 结论留到 ch16：</p>
+
+<p><strong>Tychonoff 定理（1930）：</strong>设每个 \(X_i\) 紧致, 则 \(\prod_{i \in I} X_i\) 紧致（积拓扑下, 任意大的 \(I\)）。</p>
+
+<p>这条定理是 20 世纪拓扑学最重要的定理之一。它的<em>证明</em>需要选择公理（事实上与选择公理<em>等价</em>, by Kelley 1950）, 涉及超滤子（ultrafilter）或 Alexander 子基定理。<em>盒拓扑</em>下这条定理失败——这就是为什么我们必须用积拓扑。</p>
+
+<p>Tychonoff 定理的应用<em>无所不在</em>：</p>
+
+<ul>
+  <li><strong>函数空间紧性。</strong>"<em>从任意集合 \(I\) 到 \([0, 1]\) 的所有函数</em>" \([0, 1]^I\) 在积拓扑下紧致——因为每个 \([0, 1]\) 紧。这条配 ch15 紧致性给出泛函分析里"<em>一致囿到一致紧致</em>"（Banach-Alaoglu 定理的拓扑版本）。</li>
+  <li><strong>Stone-Čech 紧致化。</strong>任何 Tychonoff 空间 \(X\) 嵌入某个 \([0, 1]^I\) 内, 取闭包得 \(X\) 的<em>极大</em> 紧致化 \(\beta X\)——这是 Stone-Čech 紧致化, 用 Tychonoff 定理保证 \([0, 1]^I\) 紧。</li>
+  <li><strong>逻辑学：紧致性定理。</strong>命题逻辑里"<em>一阶理论 \(T\) 满足 \(\iff T\) 的每个有限子集满足</em>" 这条紧致性定理, 通过把"<em>赋值</em>" 视为 \(\{0, 1\}^{\text{命题}}\) 的点, 紧致性 = Tychonoff（紧致积传）。</li>
+  <li><strong>博弈论：Nash 平衡存在。</strong>多人博弈策略空间的紧致性, 由 Tychonoff 给出, 进而给 Nash 平衡的存在性。</li>
+</ul>
+
+<p>这些都是 Tychonoff 定理的<em>下游</em>。我们到 ch16 时会:</p>
+<ol>
+  <li>给"<em>紧致性</em>" 用<em>"开覆盖" + "有限子覆盖</em>" 严格定义（你已经在 ch9 的紧致积传里见过这种风格的论证）；</li>
+  <li>引入<em>滤子 / 超滤子</em>语言（"<em>聚点</em>" 的高阶版本）, 这是"<em>什么叫无限多个开集挑出有限子覆盖</em>" 的统一语言；</li>
+  <li>用超滤子证 Tychonoff——证明结构与 ch9.5 的 Tube 引理截然不同。</li>
+</ol>
+
+<p>本章只是把"<em>积拓扑该长什么样</em>" 这一步打地基——<em>没有它后面的紧致性根本无从谈起</em>。</p>
+
+<h2 id="sec11-end">小结：构造完成</h2>
+
+<p>ch8（子空间）—— 9（有限积）—— 10（商）—— 11（任意积）这一段完了。"<em>从已知拓扑造新拓扑</em>" 的所有标准方法你都见过：</p>
+
+<ul>
+  <li><strong>子空间</strong>：从大空间挖一块, 自动带拓扑。开集 = 大开集与子集的交。让<em>包含连续</em> 的最粗拓扑。</li>
+  <li><strong>有限积</strong>：从两个空间组装。开集由开矩形生成。让<em>所有投影连续</em> 的最粗拓扑。通用性质让"<em>外部到积</em>" 的连续性归约到分量。</li>
+  <li><strong>商</strong>：粘合等价类。开集逆像逆推。让<em>商映射连续</em> 的最细拓扑。通用性质让"<em>商到外部</em>" 的连续性归约到大空间。</li>
+  <li><strong>任意积</strong>：朴素盒拓扑撞墙——\(\Delta\) 不连续。reframe 为子基生成的"<em>积拓扑</em>"——通用性质恢复。Hausdorff 积传, 紧致积传留 Tychonoff（ch16）。</li>
+</ul>
+
+<p>请你停下来欣赏这四条<em>同源</em> 的设计哲学：每一条都从"<em>哪些映射要连续</em>" 出发——给出一个<em>由那些映射的连续性逼出来的</em> 极端拓扑（最粗或最细）。这种"<em>用映射定义对象</em>" 的态度叫<em>范畴化思维</em>——下一段（ch12-19 性质论）会反复看到它。</p>
+
+<p>下一段从分离公理（ch12）入手, 把"<em>这个空间能不能用开集分离两个点 / 两个闭集</em>" 做<em>分类</em>——\(T_0, T_1, T_2 (\text{Hausdorff}), T_3, T_4\) 这几条层叠条件。然后是可数性、紧致性（含 Tychonoff）、连通性。每一条性质都<em>带着</em> 你刚学到的"<em>构造下行为如何</em>" 来检验：子空间继承吗？积传吗？商传吗？这种"<em>构造 + 性质</em>" 的二维表格就是后面 8 章的内容。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 商拓扑</a><a href="ch12.html">下一章 · 第 12 章 分离公理 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 连通性 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 局部紧致与单点紧致化</a><a href="ch19.html">下一章 · 第 19 章 道路连通与局部连通 →</a></nav>
+<h1 id="ch18">第 18 章 连通性</h1>
+
+<p>请你看 \(\mathbb{R}\), 然后看 \(\mathbb{R} \setminus \{0\} = (-\infty, 0) \cup (0, \infty)\)。</p>
+
+<p>\(\mathbb{R}\) <em>感觉</em>是<em>一条</em> 线——"一块"。\(\mathbb{R} \setminus \{0\}\) <em>感觉</em>是<em>两条</em> 线——"两块"。这种"<em>一块</em> / <em>两块</em>" 的直觉非常清晰, 但要怎么<em>数学地</em> 写下来? "<em>一块</em>" 是什么意思?</p>
+
+<p>第一反应——"<em>一条不间断的曲线</em>"。这不准: \(\mathbb{R}\) 是一维的可以画"<em>一条线</em>", 但 \(\mathbb{R}^2\) 是二维的, "<em>一块</em>" 怎么"<em>画一条线</em>"? 你<em>不能</em> 用一条 1 维曲线覆盖整个 \(\mathbb{R}^2\) (Cantor: \(\mathbb{R}\) 与 \(\mathbb{R}^2\) 等基数, 但拓扑不同)。所以"<em>不间断曲线</em>" 是<em>道路连通</em> 的直觉, 不是"<em>连通</em>" 一般定义。</p>
+
+<p>第二反应——"<em>不能拆成两块</em>"。这条更接近本质。"<em>拆</em>" 是什么意思? <em>拆成两个不交集合</em>。但任意集合都可以这样拆 (取任何子集与它的补)——所以要加条件。条件是: <em>两片都"自成一体"</em>——即<em>两片都开</em>。</p>
+
+<p>这就是连通的拓扑定义——<em>不能写成两个不交非空开集的并</em>。这条定义不依赖距离, 是纯拓扑性质, 和紧致性、Hausdorff 等并列, 是<em>拓扑学的四五条核心性质之一</em>。这一章把它从问题里长出来。</p>
+
+<h2 id="sec18-1">18.1 连通的定义</h2>
+
+<p><strong>定义。</strong>拓扑空间 \(X\) 称为<em>连通</em> (connected), 如果<em>不</em>存在 \(X = U \cup V\) 这样的分解, 其中</p>
+
+<ul>
+  <li>\(U, V\) 是 \(X\) 的<em>非空开集</em>;</li>
+  <li>\(U \cap V = \emptyset\) (不交)。</li>
+</ul>
+
+<p>满足上述分解的 \((U, V)\) 叫 \(X\) 的<em>分离</em> (separation)。所以 \(X\) 连通 \(\iff\) \(X\) 没有分离。</p>
+
+<p>请停一下。这条定义是个<em>否定</em>陈述——"<em>不存在分离</em>"。否定形式让"证明连通" 经常需要<em>反证法</em> (假设有分离, 推矛盾), 这是连通论的标志性证明风格。后面 18.3 \([a, b]\) 连通就是经典的<em>反证 + 上确界</em>。</p>
+
+<p>另一种说法: \(U \cup V = X\) 与 \(U \cap V = \emptyset\) 推出 \(V = X \setminus U\)。所以"\(U, V\) 都开" 等价于"\(U\) 开 + \(V = X \setminus U\) 开 \(\iff U\) 闭"。<em>\(U\) 既开又闭 (clopen)</em>, 而且 \(U\) 既不空也不全。</p>
+
+<p>这给连通的<em>第二种刻画</em> (18.2)。</p>
+
+<h2 id="sec18-2">18.2 等价刻画——既开又闭的子集</h2>
+
+<p><strong>命题。</strong>\(X\) 连通 \(\iff\) \(X\) 中唯一<em>既开又闭</em> (clopen) 的子集是 \(\emptyset\) 与 \(X\) 自身。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>(\(\Rightarrow\)) \(X\) 连通。设 \(U \subseteq X\) clopen 且 \(U \neq \emptyset\)。要证 \(U = X\)。考虑 \(V = X \setminus U\), 它也 clopen (\(U\) 既开又闭, 它的补也既闭又开)。\(U \cap V = \emptyset\), \(U \cup V = X\), \(U\) 非空。如果 \(V\) 也非空, \((U, V)\) 是一个分离, 与连通矛盾。所以 \(V = \emptyset\), \(U = X\)。\(\checkmark\)</p>
+
+<p>(\(\Leftarrow\)) \(X\) 中只有 \(\emptyset, X\) clopen。设 \(X = U \cup V\), \(U, V\) 不交非空开。\(V = X \setminus U\), \(V\) 开 \(\Rightarrow U = X \setminus V\) 闭, 加上 \(U\) 开, \(U\) clopen。\(U\) 非空, 由唯一 clopen 是 \(\emptyset, X\), \(U = X\)。但 \(V\) 非空与 \(U = X\) 不交矛盾。所以分离不存在, \(X\) 连通。\(\square\)</p>
+
+<p>这条等价非常有用——它把"<em>没分离</em>" 翻译成"<em>没非平凡 clopen 子集</em>"。许多连通性证明用 clopen 视角更顺手。后面 18.7 (连续保连通) 用 clopen 直接给最简洁证明。</p>
+
+<h2 id="sec18-3">18.3 \([a, b]\) 连通——经典证明</h2>
+
+<p>这是连通论的<em>奠基</em>定理。\(\mathbb{R}\) 上闭区间 \([a, b]\) 连通——这是介值定理 (IVT) 的拓扑灵魂 (后面 18.8 看见)。</p>
+
+<p><strong>定理。</strong>\([a, b] \subseteq \mathbb{R}\) (\(a < b\)) 配子空间拓扑连通。</p>
+
+<p><strong>证明 (反证 + 上确界)。</strong>设 \([a, b] = U \cup V\) 是分离, \(a \in U\) (without loss of generality, 不然换记号)。要推矛盾。</p>
+
+<p>定义</p>
+
+<p>\[
+S = \{x \in [a, b] : [a, x] \subseteq U\}.
+\]</p>
+
+<p>\(a \in S\) (取 \(x = a\), \([a, a] = \{a\} \subseteq U\)), 所以 \(S\) 非空。\(S \subseteq [a, b]\) 上有界 (\(\leq b\))。设 \(s = \sup S\), \(s \in [a, b]\)。我们看 \(s\) 在 \(U\) 还是 \(V\):</p>
+
+<p><strong>情形 1: \(s \in U\)。</strong>\(U\) 在 \([a, b]\) 中开, 所以 \(s\) 有 \([a, b]\) 中开邻域 \(\subseteq U\)。具体: 存在 \(\delta > 0\) 使 \([a, b] \cap (s - \delta, s + \delta) \subseteq U\)。</p>
+
+<p>子情形 1a: \(s = b\)。那 \(b \in U\), 且 \([a, b] \cap (b - \delta, b + \delta) = (b - \delta, b] \subseteq U\)。\(s = b = \sup S\), 所以存在 \(x \in S\) with \(x > b - \delta/2\) (上确界定义), \([a, x] \subseteq U\), 加上 \([x, b] \subseteq U\) (\(x \in (b - \delta, b)\) 让 \([x, b] \subseteq (b - \delta, b] \subseteq U\)), 得 \([a, b] \subseteq U\), \(V = \emptyset\), 与 \(V\) 非空矛盾。</p>
+
+<p>子情形 1b: \(s < b\)。考虑 \(s + \delta/2 < b\)。 \([a, s + \delta/2] = [a, s] \cup [s, s + \delta/2]\)。\([a, s] \subseteq U\) 因为存在 \(x \in S\) 任意接近 \(s\) (上确界), \([a, x] \subseteq U\), 取极限并加 \(s \in U\), 得 \([a, s] \subseteq U\) (注意: 严格论证用<em>每个</em> \(t \in [a, s]\) 是某个 \(x_n \to s, x_n \in S, t \leq x_n\) 时 \(t \in [a, x_n] \subseteq U\); 或更简单——\([a, s] = [a, s] \cap U \cup [a, s] \cap V\), 都开 in \([a, s]\), \(a \in U\), 由 \(s\) 选取 \(V \cap [a, s)\) 空, 但这要细究)。简明做法: 取 \(s' \in S\) with \(s - \delta/2 < s' \leq s\), 那 \([a, s'] \subseteq U\), 加上 \([s', s + \delta/2] \subseteq (s - \delta, s + \delta) \cap [a, b] \subseteq U\), 得 \([a, s + \delta/2] \subseteq U\), 即 \(s + \delta/2 \in S\)。但 \(s + \delta/2 > s = \sup S\), 矛盾。</p>
+
+<p><strong>情形 2: \(s \in V\)。</strong>\(V\) 在 \([a, b]\) 中开, 存在 \(\delta > 0\) 使 \([a, b] \cap (s - \delta, s + \delta) \subseteq V\)。\(s \neq a\) (\(a \in U\), \(U \cap V = \emptyset\)), 所以 \(s > a\)。取 \(\eta = \min(\delta/2, s - a) > 0\), 那 \([s - \eta, s] \subseteq V\) (子情形 \(s = b\) 仍然有 \([s - \eta, s] \subseteq V\))。</p>
+
+<p>但 \(s = \sup S\) 让存在 \(x \in S\) with \(s - \eta < x \leq s\)。\(x \in S \Rightarrow [a, x] \subseteq U\)。\(x \geq s - \eta\), 所以 \(x \in [s - \eta, s] \subseteq V\)。\(x \in U \cap V = \emptyset\), 矛盾。</p>
+
+<p>两种情形都矛盾, 所以分离不存在, \([a, b]\) 连通。\(\blacksquare\)</p>
+
+<p>请你停下来欣赏证明的<em>结构</em>。它用<em>上确界</em> (\(\mathbb{R}\) 的最深性质——完备性) 把 \([a, b]\) 不能分离的本质暴露出来。事实上 \(\mathbb{R}\) 任何子集 \(S \subseteq \mathbb{R}\) 连通 \(\iff\) \(S\) 是<em>区间</em> (闭、开、半开、单点、整条线), 这是一条更强的结果, 它的证明本质相同——上确界。</p>
+
+<h2 id="sec18-4">18.4 \(\mathbb{Q}\) 不连通</h2>
+
+<p><strong>命题。</strong>\(\mathbb{Q} \subseteq \mathbb{R}\) (子空间拓扑) 不连通。事实上 \(\mathbb{Q}\) 是<em>完全不连通</em> 的——任何含至少两点的子集都不连通。</p>
+
+<p><strong>证明。</strong>取任何无理数 \(\alpha \in \mathbb{R} \setminus \mathbb{Q}\) (例如 \(\sqrt{2}\))。定义</p>
+
+<p>\[
+U = \mathbb{Q} \cap (-\infty, \alpha), \qquad V = \mathbb{Q} \cap (\alpha, +\infty).
+\]</p>
+
+<p>\(U, V\) 在 \(\mathbb{Q}\) 中都开 (是 \(\mathbb{R}\) 中开集与 \(\mathbb{Q}\) 的交)。\(U \cap V = \emptyset\) (不重叠)。\(U \cup V = \mathbb{Q}\) 因为 \(\alpha \notin \mathbb{Q}\) (\(\alpha\) 不在 \(\mathbb{Q}\) 中要被讨论, 而它<em>不</em>在), 所以 \(\mathbb{Q}\) 中每个有理数 \(q\) 满足 \(q < \alpha\) 或 \(q > \alpha\) (\(q \neq \alpha\)), 落在 \(U\) 或 \(V\) 中。\(U, V\) 非空 (\(\mathbb{Q}\) 在 \(\mathbb{R}\) 中稠密, 任何区间都含有理数)。所以 \((U, V)\) 是 \(\mathbb{Q}\) 的分离, \(\mathbb{Q}\) 不连通。\(\square\)</p>
+
+<p>"<em>完全不连通</em>" 的强化版: 给 \(\mathbb{Q}\) 中任意两点 \(p < q\), 取无理数 \(\alpha \in (p, q)\), 同样构造分离, \(p \in U, q \in V\)。所以含 \(p, q\) 的任何子集都被这个分离分开, 不连通。</p>
+
+<p>请停一下感受这件事的<em>对比</em>: \(\mathbb{R}\) 连通, \(\mathbb{Q}\) 不连通。两个空间<em>等基数</em> (都不可数 \(\mathbb{R}\), 可数 \(\mathbb{Q}\), 等等不同), 但拓扑性质截然不同——\(\mathbb{Q}\) 中"无理数缝隙" 让它处处可分。这种"缝隙" 与 ch17 局部紧失败的"<em>有洞</em>" 是同一现象的两面。\(\mathbb{Q}\) 是非完备的代价: 既不局部紧, 也不连通。</p>
+
+<h2 id="sec18-5">18.5 连通子集 + 闭包 + 并交性质</h2>
+
+<p>连通性的几个组合工具:</p>
+
+<p><strong>性质 (a): 连通子集的闭包仍连通。</strong></p>
+
+<p>设 \(C \subseteq X\) 连通, 要证 \(\overline{C}\) 连通。设 \(\overline{C} = U \cup V\) 是 \(\overline{C}\) 中分离 (\(U, V\) 在 \(\overline{C}\) 中开, 不交非空)。那 \(C = (C \cap U) \cup (C \cap V)\), \(C \cap U\) 与 \(C \cap V\) 在 \(C\) 中开, 不交。如果都非空, 是 \(C\) 的分离, 矛盾。所以某一个空——例如 \(C \cap V = \emptyset\), 即 \(C \subseteq U\)。</p>
+
+<p>但 \(U\) 在 \(\overline{C}\) 中开, 即 \(U = U' \cap \overline{C}\) for some \(U'\) 在 \(X\) 中开 (子空间拓扑定义)。\(C \subseteq U \subseteq U'\)。\(U' \cap \overline{C}\) 是 \(\overline{C}\) 中开集, 且 \(\overline{C} \setminus U = V\) 闭 in \(\overline{C}\), 即 \(V\) 是 \(\overline{C}\) 中闭集 (它的补 \(U\) 开)。\(V \subseteq \overline{C}\)。如果 \(V\) 非空, 取 \(p \in V \subseteq \overline{C}\), \(p\) 是 \(C\) 的极限点 (或 \(p \in C\), 但 \(C \subseteq U\) 与 \(V \cap C = \emptyset\), 所以 \(p \in V\) 时 \(p \notin C\), 即 \(p\) 严格是极限点)。但 \(p\) 是 \(C\) 极限点 \(\Rightarrow\) \(p\) 的<em>每个</em>开邻域 \(\cap C \neq \emptyset\)。\(V\) 是 \(p\) 的开邻域 (\(\overline{C}\) 中)——但作为 \(\overline{C}\) 中开, 等于 \(V' \cap \overline{C}\) for \(V'\) 在 \(X\) 中开, \(p \in V'\). \(V' \cap C \subseteq V' \cap \overline{C} \cap C = V \cap C = \emptyset\), 所以 \(V'\) 不交 \(C\), 与 \(p\) 是 \(C\) 极限点矛盾。所以 \(V = \emptyset\), 与分离要求矛盾。\(\overline{C}\) 没有分离, 连通。\(\checkmark\)</p>
+
+<p>请你停下来理解: <em>闭包不会破坏连通性</em>。这条让"取闭包" 成为构造连通集的合法操作。</p>
+
+<p><strong>性质 (b): 连通子集族的并 (含公共点) 连通。</strong></p>
+
+<p>设 \(\{C_\alpha\}_{\alpha \in I}\) 一族连通子集 \(\subseteq X\), 且 \(\bigcap_\alpha C_\alpha \neq \emptyset\) (含公共点)。则 \(C = \bigcup_\alpha C_\alpha\) 连通。</p>
+
+<p><strong>证明。</strong>设 \(C = U \cup V\) 分离。取 \(p \in \bigcap_\alpha C_\alpha\), \(p\) 在 \(U\) 或 \(V\), 例如 \(p \in U\)。对每个 \(\alpha\), \(C_\alpha = (C_\alpha \cap U) \cup (C_\alpha \cap V)\) 是 \(C_\alpha\) 中可能的分离, \(C_\alpha\) 连通 \(\Rightarrow\) 一个空。\(p \in C_\alpha \cap U\) 非空, 所以 \(C_\alpha \cap V = \emptyset\), \(C_\alpha \subseteq U\)。对所有 \(\alpha\) 都成立: \(C = \bigcup C_\alpha \subseteq U\)。\(V = \emptyset\), 与分离要求矛盾。\(C\) 连通。\(\square\)</p>
+
+<p>更一般的版本——"<em>含公共点</em>" 可以弱化为"<em>两两相交非空</em>" 甚至"<em>可以用相交序列连起来</em>" (链式相连)。证明大同小异。</p>
+
+<p><strong>性质 (c): 连通子集之间的非空集合连通。</strong></p>
+
+<p>若 \(C\) 连通, \(C \subseteq A \subseteq \overline{C}\), 则 \(A\) 连通。证明同 (a)——\(A\) 中分离限制到 \(C\) 给 \(C\) 的分离 (除非平凡), 矛盾。</p>
+
+<p><strong>反例: 连通子集的子集不一定连通。</strong>\(\mathbb{R}\) 连通, 但 \(\mathbb{R} \supseteq \mathbb{Q}\) 不连通。所以"<em>子集</em>" 不保连通。这件事和"<em>子集</em> 不保紧致" 类似 (任何空间中开集子集不一定紧)——拓扑性质对子集一般不友好, 对连续映射更好 (下面 18.7)。</p>
+
+<h2 id="sec18-6">18.6 连通分量</h2>
+
+<p>给一个空间 \(X\), 它本身可能不连通, 但它能分解成<em>极大连通子集</em>——这些极大块叫"<em>连通分量</em>"。</p>
+
+<p>定义: 给 \(x \in X\), \(x\) 的<em>连通分量</em> \(C_x\) 是 \(X\) 中含 \(x\) 的最大连通子集。形式上:</p>
+
+<p>\[
+C_x = \bigcup \{C \subseteq X : x \in C, C \text{ 连通}\}.
+\]</p>
+
+<p>这是一族都含 \(x\) 的连通子集的并, 由 18.5 (b) 仍连通 (公共点 \(x\))。包含所有含 \(x\) 的连通子集, 所以确实是最大的。</p>
+
+<p><strong>性质</strong>:</p>
+
+<ul>
+  <li>(α) 任何 \(x \in X\) 都有连通分量 (\(\{x\}\) 自身是连通的, 在并里, 所以 \(C_x \supseteq \{x\}\) 非空)。</li>
+  <li>(β) 不同点的分量要么相等要么不交: \(C_x \cap C_y \neq \emptyset \Rightarrow C_x \cup C_y\) 连通 (公共点) \(\Rightarrow C_x \cup C_y\) 是含 \(x\) 的连通子集 \(\Rightarrow C_x \cup C_y \subseteq C_x\), 即 \(C_y \subseteq C_x\); 对称 \(C_x \subseteq C_y\); 故相等。</li>
+  <li>(γ) \(X\) 是它的连通分量的不交并。这是 (α)+(β) 的直接推论, 把 \(X\) 划分成"<em>大块</em>"。</li>
+  <li>(δ) <em>每个连通分量都闭。</em>原因: \(C_x\) 连通 \(\Rightarrow \overline{C_x}\) 连通 (18.5 (a)), \(\overline{C_x} \supseteq C_x \ni x\) 含 \(x\), 由极大 \(\overline{C_x} \subseteq C_x\), 即 \(C_x = \overline{C_x}\), 闭。</li>
+</ul>
+
+<p>注意: <em>连通分量一般不开</em>。例: \(\mathbb{Q}\) 的连通分量是单点 \(\{q\}\)——任何含两点的子集都不连通 (18.4)。\(\{q\} \subseteq \mathbb{Q}\) 不开 (任何开邻域含其它有理数)。所以 \(\mathbb{Q}\) 的连通分量都闭都不开。</p>
+
+<p>对比: \(\mathbb{R}\) 的连通分量只有一个—— \(\mathbb{R}\) 自身 (因 \(\mathbb{R}\) 连通)。\(\mathbb{R} \setminus \{0\}\) 的连通分量是 \((-\infty, 0)\) 与 \((0, \infty)\), 两者既开又闭 in \(\mathbb{R} \setminus \{0\}\)——这种"分量都开" 的性质叫"<em>局部连通</em>", 是<a href="ch19.html">下一章</a>主题。\(\mathbb{Q}\) 不局部连通, 所以分量不开。</p>
+
+<h2 id="sec18-7">18.7 连续映射保连通</h2>
+
+<p>这是连通性最重要的"<em>转移</em>" 定理——和"<em>连续保紧致</em>" (ch15) 平行。</p>
+
+<p><strong>定理。</strong>设 \(f : X \to Y\) 连续, \(X\) 连通。则 \(f(X) \subseteq Y\) (像) 连通。</p>
+
+<p><strong>证明 (用 clopen)。</strong>设 \(W \subseteq f(X)\) 是 \(f(X)\) 中 clopen 子集 (在子空间拓扑下), 要证 \(W = \emptyset\) 或 \(f(X)\) (即 \(f(X)\) 连通由 18.2)。</p>
+
+<p>\(W\) 在 \(f(X)\) 中开 \(\Rightarrow W = W' \cap f(X)\) for some \(W'\) 在 \(Y\) 中开。\(W\) 在 \(f(X)\) 中闭 \(\Rightarrow W = W'' \cap f(X)\) for some \(W''\) 在 \(Y\) 中闭, 即 \(Y \setminus W''\) 在 \(Y\) 中开。考虑 \(f^{-1}(W)\) (注意 \(f : X \to Y\), 但 \(f(X) \subseteq Y\)):</p>
+
+<p>\[
+f^{-1}(W) = f^{-1}(W' \cap f(X)) = f^{-1}(W') \cap f^{-1}(f(X)) = f^{-1}(W') \cap X = f^{-1}(W').
+\]</p>
+
+<p>\(f\) 连续 + \(W'\) 开 \(\Rightarrow f^{-1}(W')\) 在 \(X\) 中开, 即 \(f^{-1}(W)\) 开。同样 \(f^{-1}(W) = f^{-1}(W'')\), \(f\) 连续 + \(W''\) 闭 \(\Rightarrow f^{-1}(W'')\) 在 \(X\) 中闭。所以 \(f^{-1}(W)\) clopen in \(X\)。</p>
+
+<p>\(X\) 连通 \(\Rightarrow f^{-1}(W) = \emptyset\) 或 \(X\)。</p>
+
+<ul>
+  <li>\(f^{-1}(W) = \emptyset \Rightarrow W \cap f(X) = f(f^{-1}(W)) = f(\emptyset) = \emptyset\), 即 \(W = \emptyset\)。</li>
+  <li>\(f^{-1}(W) = X \Rightarrow f(X) \subseteq W\), 即 \(W = f(X)\)。</li>
+</ul>
+
+<p>两种情况都符合 \(W = \emptyset\) 或 \(f(X)\)。\(f(X)\) 连通。\(\square\)</p>
+
+<p>请你停下来欣赏 clopen 视角的<em>整洁</em>: 整条证明无非"<em>连续保 clopen, \(X\) 连通让 clopen 为 \(\emptyset / X\), 推出像连通</em>"。三步, 每一步一行。</p>
+
+<p><strong>推论 (连通性是同胚不变量)。</strong>同胚保连通——若 \(X \cong Y\) 同胚, 则 \(X\) 连通 \(\iff Y\) 连通。证明: 同胚是双向连续, 应用上面定理两次。所以连通是<em>纯拓扑性质</em>, 同 \(\mathbb{R}\) 与<em>不</em>同 \(\mathbb{Q}\) 这种"事实" 在拓扑下永久区分两个空间。</p>
+
+<h2 id="sec18-8">18.8 应用——介值定理</h2>
+
+<p>把 18.3 + 18.7 合起来直接得到经典的<em>介值定理</em> (intermediate value theorem, IVT)。</p>
+
+<p><strong>定理 (IVT)。</strong>\(f : [a, b] \to \mathbb{R}\) 连续, \(f(a) < c < f(b)\) (或 \(f(a) > c > f(b)\)), 则存在 \(x \in [a, b]\) 使 \(f(x) = c\)。</p>
+
+<p><strong>证明。</strong>由 18.3 + 18.7, \(f([a, b])\) 是 \(\mathbb{R}\) 的连通子集。\(\mathbb{R}\) 的连通子集都是<em>区间</em> (闭、开、半开、单点)——这条由"上确界 + 反证" 可证, 具体: 若 \(I \subseteq \mathbb{R}\) 连通, \(p, q \in I\), \(p < r < q\), 假设 \(r \notin I\), 那 \(I = (I \cap (-\infty, r)) \cup (I \cap (r, \infty))\) 是 \(I\) 的分离 (\(p \in\) 左, \(q \in\) 右, 都开 in \(I\), 不交), 矛盾。所以 \(r \in I\), \(I\) 是区间。</p>
+
+<p>\(f(a), f(b) \in f([a, b])\), \(f(a) < c < f(b)\), 区间性质给 \(c \in f([a, b])\)。所以存在 \(x \in [a, b]\) with \(f(x) = c\)。\(\square\)</p>
+
+<p>请你停下来想一下这件事。IVT 是微积分里最早学的"<em>感觉显然</em>" 的定理之一, 但它的真正本质<em>就是</em> "<em>连续保连通 + 区间是连通</em>"——两条纯拓扑事实。证明里没有任何分析具体计算 (没有 \(\varepsilon\)-\(\delta\), 没有微分)。这是拓扑视角的力量: <em>从最少假设给最多结果</em>。</p>
+
+<p>同样的论证给更多变体: \(f : S^1 \to \mathbb{R}\) 连续 \(\Rightarrow\) \(f(S^1)\) 连通, 是闭区间 (因 \(S^1\) 紧 + 18.7 + Heine-Borel 给闭有界); \(f : \mathbb{R}^n \to \mathbb{R}\) 连续 + \(\mathbb{R}^n\) 连通 \(\Rightarrow f\) 像连通是区间。</p>
+
+<h2 id="sec18-9">18.9 连通性是拓扑性质</h2>
+
+<p>我们已经在 18.7 推论里指出了。这里再强调几条具体应用:</p>
+
+<p><strong>(a) \(\mathbb{R}\) 与 \(\mathbb{R}^2\) 不同胚。</strong></p>
+
+<p>假设 \(f : \mathbb{R} \to \mathbb{R}^2\) 同胚。取任何点 \(p \in \mathbb{R}\), 那 \(\mathbb{R} \setminus \{p\}\) 与 \(\mathbb{R}^2 \setminus \{f(p)\}\) 同胚 (限制同胚)。但 \(\mathbb{R} \setminus \{p\}\) 是 \((-\infty, p) \cup (p, \infty)\) <em>不连通</em> (两连通分量)。\(\mathbb{R}^2 \setminus \{q\}\) <em>连通</em> (任何 \(q \in \mathbb{R}^2\)——可以从一点绕过 \(q\) 到另一点)。一连通 + 一不连通, 不能同胚。矛盾。\(\mathbb{R} \not\cong \mathbb{R}^2\)。\(\square\)</p>
+
+<p>这就是 ch1 提过的"<em>拿掉一点连通片数</em>" 拓扑不变量的实际用法。</p>
+
+<p><strong>(b) 圆 \(S^1\) 与开区间 \((0, 1)\) 不同胚。</strong></p>
+
+<p>取任何 \(p \in S^1\)。\(S^1 \setminus \{p\}\) 同胚于 \((0, 1)\) (开弧, 把圆"切开" 拉直), 连通。\((0, 1) \setminus \{q\}\) 是 \((0, q) \cup (q, 1)\) for any \(q \in (0, 1)\), 不连通。所以 \(S^1\) 与 \((0, 1)\) 不同胚——拿一点后连通性不同。\(\square\)</p>
+
+<p><strong>(c) 8 字 \(\infty\) 与 \(S^1\) 不同胚 (ch1 提过)。</strong>取 8 字交叉点 \(p\), 拿掉后 8 字变两个连通片 (上环 + 下环, 各开)。\(S^1\) 拿掉一点是开弧, 一连通片。所以"<em>拿一点连通片数</em>" 不同, 8 字与 \(S^1\) 不同胚。</p>
+
+<p>这种"<em>拿一点</em> 看连通性变化" 是早期拓扑学经典的不变量, 可以推广到"<em>拿一对点</em>""<em>拿一段曲线</em>" 等更精细的考察, 但很快就<em>不够强</em>——区分高维空间需要基本群、同调群等代数工具 (链<a href="ch23.html">ch23</a>)。</p>
+
+<h2 id="sec18-10">18.10 临别话</h2>
+
+<p>连通性把"<em>一块还是两块</em>" 这个最朴素的几何直觉做成了一条精确的拓扑性质。它的定义只用"<em>开集</em>", 不用任何距离 / 序 / 算术结构, 所以适用于任何拓扑空间。它的<em>力量</em> 体现在三个层次:</p>
+
+<ul>
+  <li>(微观) 区分具体空间: \(\mathbb{R}\) 与 \(\mathbb{R}^2\)、\(S^1\) 与 \([0, 1]\) 等用"拿点" 论证 (18.9)。</li>
+  <li>(中观) 给经典分析定理新基础: IVT (18.8) 是连续保连通 + 区间连通, 不再需要 \(\varepsilon\)-\(\delta\)。</li>
+  <li>(宏观) 拓扑空间结构论: 任何空间都唯一分解为连通分量 (18.6), 这是一种"<em>拓扑分类</em>" 的第一步——把空间拆成"块" 各自研究。</li>
+</ul>
+
+<p>但这一章定义的"<em>连通</em>" 比直觉"<em>能连成一条线</em>" <em>弱</em>。下一章 (<a href="ch19.html">ch19</a>) 给后一种直觉单独命名: <em>道路连通</em>——\(\forall x, y\) 存在连续路径 \(\gamma : [0, 1] \to X\) 从 \(x\) 走到 \(y\)。道路连通 \(\Rightarrow\) 连通 (一行证), 但反过来<em>不真</em>——著名反例是<em>拓扑学家的正弦曲线</em>, 它连通但不道路连通。这种区分让我们看到"连通性" 不是单一概念, 而是<em>谱</em>: 连通 \(\subset\) 道路连通 \(\subset\) (其它更强), 中间还有局部连通 / 局部道路连通等变体, 这些精细区分是拓扑学经典训练的内容。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 局部紧致与单点紧致化</a><a href="ch19.html">下一章 · 第 19 章 道路连通与局部连通 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 14 章 紧致性 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 可数性公理</a><a href="ch15.html">下一章 · 第 15 章 紧致的等价：有限交性质 →</a></nav>
+<h1 id="ch14">第 14 章 紧致性</h1>
+
+<p>请你回到<a href="../实分析/index.html">实分析</a>里你最熟的一条结论——<strong>Heine-Borel 定理</strong>：</p>
+
+<p>\[
+\boxed{\ A \subseteq \mathbb{R}^n \text{ 紧致} \iff A \text{ 有界且闭}.\ }
+\]</p>
+
+<p>这条定理在 \(\mathbb{R}^n\) 里几乎被当成"<em>紧致的定义</em>" 用——你想检查紧致就检查"<em>有界 + 闭</em>"。它支撑着实分析里几乎所有"<em>存在性</em>" 论证：连续函数在闭区间上取最值、序列有收敛子列、积分定义合理、隐函数定理 / 反函数定理 / 不动点定理的局部成立——背后都是某个集合紧致。</p>
+
+<p>但请你停下来仔细看 Heine-Borel 这条等价。它说"<em>紧致</em> \(\iff\) 有界 + 闭"。"<em>闭</em>" 是纯拓扑的概念（不依赖距离）。但"<em>有界</em>" 呢？"<em>有界</em>" 意思是"<em>存在 \(R > 0\) 使 \(A \subseteq B(0, R)\)</em>"——这<em>需要距离</em>。所以"<em>紧致 = 有界 + 闭</em>" 这条等价里有一半依赖距离结构。</p>
+
+<p>这就出问题了。如果<em>紧致</em> 要进入<em>抽象拓扑空间</em>（无距离），我们不能用"<em>有界</em>" 定义它。<em>更基本</em> 的紧致定义必须<em>不</em>依赖距离。</p>
+
+<p>幸运的是这条定义早已被 Borel-Lebesgue 等人找到——它叫<strong>开覆盖有限子覆盖</strong>。这条性质<em>纯拓扑</em>——只用"<em>开集</em>" 和"<em>有限</em>" 两个词。它在 \(\mathbb{R}^n\) 里<em>等价</em> 于 Heine-Borel（"<em>有界 + 闭</em>"），但它能被搬到<em>任何</em> 拓扑空间——成为<em>紧致</em> 的拓扑定义。</p>
+
+<p>请你记住这条钩子的形态：<em>实分析里"紧致 = 有界 + 闭" 是一个特殊事实；真正的紧致定义是"开覆盖有限子覆盖"，这条定义独立于距离</em>。</p>
+
+<p>这一章把这条定义讲透——动机、核心定理、应用——并把"<em>序列紧</em>" 与"<em>开覆盖紧</em>" 在度量与一般空间下的关系厘清。</p>
+
+<h2 id="sec14-1">14.1 开覆盖与子覆盖</h2>
+
+<p>先把语言准备好。</p>
+
+<p><strong>定义 14.1.</strong> 设 \(X\) 是拓扑空间，\(A \subseteq X\)。</p>
+
+<ul>
+  <li><em>开覆盖</em>（open cover）of \(A\) 是开集族 \(\{U_\alpha\}_{\alpha \in I}\)（\(I\) 可任意基数）满足 \(A \subseteq \bigcup_{\alpha \in I} U_\alpha\)。</li>
+  <li><em>子覆盖</em>（subcover）是子族 \(\{U_\alpha\}_{\alpha \in J}\)（\(J \subseteq I\)）仍覆盖 \(A\)。</li>
+  <li><em>有限子覆盖</em>（finite subcover）即 \(J\) 有限。</li>
+</ul>
+
+<p>注意这里 \(\{U_\alpha\}\) 是<em>族</em>——可重复，可有<em>不可数</em> 多个 \(\alpha\)。"<em>有限子覆盖</em>" 意思是<em>抽出有限多个</em> 仍能覆盖。</p>
+
+<p>例子。\(A = (0, 1) \subseteq \mathbb{R}\)。考虑开覆盖 \(\{(1/n, 1) : n \geq 2\}\)。每个 \((1/n, 1) \subseteq (0, 1)\)，并集 \(\bigcup_{n \geq 2} (1/n, 1) = (0, 1)\)（每个 \(x \in (0, 1)\) 有 \(n\) 大使 \(1/n < x\)）。所以这是 \((0, 1)\) 的开覆盖。</p>
+
+<p>但<em>没有</em> 有限子覆盖——任何有限子族 \(\{(1/n_1, 1), \ldots, (1/n_k, 1)\}\)，最大的那个 \(n_k\) 给出最小的左端 \(1/n_k > 0\)，并集 \((1/n_k, 1)\) 不覆盖 \(\{x \in (0, 1) : x \leq 1/n_k\}\)。</p>
+
+<p>所以 \((0, 1)\) 有<em>没有有限子覆盖的开覆盖</em>——这预告 \((0, 1)\) <em>不</em> 紧致。</p>
+
+<h2 id="sec14-2">14.2 紧致的定义</h2>
+
+<p><strong>定义 14.2 (紧致, compact)。</strong> 拓扑空间 \(X\) 称为<em>紧致</em> 如果 \(X\) 的<em>每个</em> 开覆盖都有有限子覆盖。</p>
+
+<p>子集情形：\(A \subseteq X\) 称为紧致如果 \(A\) 作为子空间（继承拓扑）紧致。等价定义：\(A \subseteq X\) 紧致 \(\iff\) \(A\) 在 \(X\) 中的每个开覆盖（开集族 \(\{U_\alpha\}\) 在 \(X\) 中开且 \(A \subseteq \bigcup U_\alpha\)）都有有限子覆盖。这两条等价由"<em>子空间开集 = 与子集相交得</em>" 直接验证。</p>
+
+<p>紧致的本质——<em>"<em>无限多开集" 的覆盖能被压成"<em>有限多个</em>"</em>。这个"<em>有限化</em>" 是后续所有应用的关键。</p>
+
+<p>先看几个简单例子。</p>
+
+<p><strong>例 1.</strong> 任何<em>有限</em> 拓扑空间紧致。证明：开覆盖 \(\{U_\alpha\}\)，对每个 \(x \in X\)（共有限多个）选 \(U_{\alpha(x)} \ni x\)，得到有限子覆盖 \(\{U_{\alpha(x)} : x \in X\}\)。\(\checkmark\)</p>
+
+<p><strong>例 2.</strong> 离散无限空间<em>不</em> 紧致。覆盖 \(\{\{x\} : x \in X\}\) 没有限子覆盖（每个有限子集只覆盖有限多点）。</p>
+
+<p><strong>例 3.</strong> 余有限拓扑（在任意集 \(X\) 上）紧致。开覆盖 \(\{U_\alpha\}\)，取任意 \(U_{\alpha_0}\) 非空（不能全空因覆盖 \(X\)）。\(X \setminus U_{\alpha_0}\) 余集有限。每个 \(x \in X \setminus U_{\alpha_0}\) 在某 \(U_{\alpha(x)}\) 里——选这有限多个加 \(U_{\alpha_0}\) 即有限子覆盖。\(\checkmark\)</p>
+
+<p>现在看<em>本章主角</em>。</p>
+
+<h2 id="sec14-3">14.3 \([0, 1]\) 紧致（Heine-Borel 一维）</h2>
+
+<p>这是经典定理——也是这一章最重要的<em>具体</em> 紧致结论。</p>
+
+<p><strong>定理 14.3 (Heine-Borel, 一维).</strong> \([0, 1] \subseteq \mathbb{R}\) 紧致。</p>
+
+<p><strong>证明。</strong></p>
+
+<p>设 \(\{U_\alpha\}_{\alpha \in I}\) 是 \([0, 1]\) 的开覆盖（每个 \(U_\alpha\) 开 \(\subseteq \mathbb{R}\)）。要证有有限子覆盖。</p>
+
+<p>定义</p>
+
+<p>\[
+S := \{x \in [0, 1] : [0, x] \text{ 能被有限多个 } U_\alpha \text{ 覆盖}\}.
+\]</p>
+
+<p>目标是证 \(1 \in S\)。</p>
+
+<p><em>步骤 1：\(0 \in S\)。</em> \(0 \in [0, 1]\)，故 \(0 \in U_{\alpha_0}\) 某个。\([0, 0] = \{0\} \subseteq U_{\alpha_0}\)，1 个开集就够。\(\checkmark\)</p>
+
+<p><em>步骤 2：\(S\) 非空有界，取 \(s := \sup S \leq 1\)。</em> 由 \(0 \in S\) 与 \(S \subseteq [0, 1]\)，\(s\) 良定义且 \(0 \leq s \leq 1\)。</p>
+
+<p><em>步骤 3：\(s \in S\)。</em> \(s \in [0, 1]\)，故 \(s \in U_\beta\) 某个。\(U_\beta\) 开 \(\Rightarrow\) 存在 \(\delta > 0\) 使 \((s - \delta, s + \delta) \cap [0, 1] \subseteq U_\beta\)。由 \(s = \sup S\)，存在 \(t \in S\) 与 \(s - \delta < t \leq s\)。\([0, t]\) 由有限多个 \(U_{\alpha_1}, \ldots, U_{\alpha_k}\) 覆盖。则 \([0, s] = [0, t] \cup [t, s] \subseteq U_{\alpha_1} \cup \cdots \cup U_{\alpha_k} \cup U_\beta\)（\([t, s] \subseteq (s - \delta, s + \delta) \subseteq U_\beta\)），有限子覆盖。所以 \(s \in S\)。</p>
+
+<p><em>步骤 4：\(s = 1\)。</em> 反证：假设 \(s < 1\)。\(s \in U_\beta\) 开，\(\delta > 0\) 使 \((s - \delta, s + \delta) \cap [0, 1] \subseteq U_\beta\)。可取 \(\delta\) 小到 \(s + \delta < 1\)（这是关键——\(s < 1\) 给出空间）。则 \([0, s + \delta/2] = [0, s] \cup [s, s + \delta/2]\)，前者由有限多个 + \(U_\beta\) 覆盖（含 \([s, s + \delta/2] \subseteq U_\beta\)），所以 \([0, s + \delta/2]\) 有限子覆盖——\(s + \delta/2 \in S\)。但 \(s + \delta/2 > s = \sup S\)，矛盾。所以 \(s \geq 1\) 即 \(s = 1\)。</p>
+
+<p>结合步骤 3 与 4：\(1 \in S\)，\([0, 1]\) 有有限子覆盖。\(\blacksquare\)</p>
+
+<p>这条证明的"<em>形状</em>" 是<em>归纳到 sup</em> ——把"<em>有限覆盖能不能扩展到 \(s\) 之外</em>" 转成"<em>实数完备性</em>" 的事。这正是 \(\mathbb{R}\) 的<em>完备性</em>（Dedekind / 上确界存在）在拓扑上的表现。</p>
+
+<p>从 14.3 容易推：<em>任何闭区间 \([a, b]\) 紧致</em>（线性变换 \([0, 1] \to [a, b]\) 同胚保紧致），\(\mathbb{R}^n\) 中<em>有界闭长方体</em> \(\prod [a_i, b_i]\) 紧致（Tychonoff 定理或直接证），\(\mathbb{R}^n\) 中<em>有界闭集</em> 紧致（闭子集嵌入紧致集仍紧）——即 Heine-Borel 完整版。</p>
+
+<h2 id="sec14-4">14.4 \(\mathbb{R}\) 不紧</h2>
+
+<p>对照——整个 \(\mathbb{R}\) 不紧。</p>
+
+<p>开覆盖 \(\{(-n, n) : n = 1, 2, 3, \ldots\}\)。每个 \((-n, n)\) 开 \(\subseteq \mathbb{R}\)，并集 \(\bigcup_n (-n, n) = \mathbb{R}\)（每个 \(x\) 有 \(n > |x|\)）。</p>
+
+<p>没有有限子覆盖：任何有限子族 \(\{(-n_1, n_1), \ldots, (-n_k, n_k)\}\)，最大的 \(N := \max n_i\) 给出 \((-N, N)\)，不覆盖 \(N\) 或 \(N+1\)。\(\blacksquare\)</p>
+
+<p>这就是 Heine-Borel 的<em>反向</em> 一例——\(\mathbb{R}\) 闭但<em>不</em> 有界（在自身的距离下还是有界的概念有问题，但作为度量空间它<em>无界</em>），不紧致。</p>
+
+<p>同样 \((0, 1)\) 不紧（14.1 节例），\(\mathbb{R}^n\) 不紧。</p>
+
+<h2 id="sec14-5">14.5 紧致的几条性质</h2>
+
+<p>把后续反复要用的几条性质聚一起。</p>
+
+<p><strong>性质 14.4 (紧致集闭, in Hausdorff).</strong> 设 \(X\) Hausdorff。则每个紧致 \(K \subseteq X\) 闭。</p>
+
+<p>这条已经在<a href="ch12.html">第 12 章</a>(12.8) 给过证明。要点：对 \(y \notin K\) 用 Hausdorff 给每个 \(x \in K\) 不交开集 \(U_x \ni x, V_x \ni y\)，由紧致取有限 \(U_{x_1}, \ldots, U_{x_n}\) 覆盖 \(K\)，则 \(V := \bigcap V_{x_i}\) 是 \(y\) 的开邻域 \(\subseteq X \setminus K\)。\(\blacksquare\)</p>
+
+<p>注意 Hausdorff 必要——非 Hausdorff 时紧致可能<em>不</em>闭。</p>
+
+<p><strong>性质 14.5 (闭子集紧致).</strong> 设 \(X\) 紧致，\(F \subseteq X\) 闭。则 \(F\) 紧致。</p>
+
+<p><strong>证明。</strong> 给 \(F\) 的开覆盖 \(\{U_\alpha\}\)（在 \(X\) 中开且覆盖 \(F\)）。加入开集 \(X \setminus F\)（\(F\) 闭故其补开），得到 \(X\) 的开覆盖。由 \(X\) 紧致取有限子覆盖 \(\{U_{\alpha_1}, \ldots, U_{\alpha_k}, X \setminus F\}\)（最后一项可选可不选，但加进去无妨）。则 \(\{U_{\alpha_1}, \ldots, U_{\alpha_k}\}\) 仍覆盖 \(F\)（因 \(X \setminus F\) 不覆盖 \(F\) 任何点）。\(\blacksquare\)</p>
+
+<p><strong>性质 14.6 (紧致连续像紧).</strong> 设 \(X\) 紧致，\(f : X \to Y\) 连续。则 \(f(X) \subseteq Y\) 紧致。</p>
+
+<p><strong>证明。</strong> 给 \(f(X)\) 的开覆盖 \(\{V_\alpha\}\)（在 \(Y\) 中开）。\(\{f^{-1}(V_\alpha)\}\) 是 \(X\) 的开覆盖（\(f\) 连续保证 \(f^{-1}(V_\alpha)\) 开）。由 \(X\) 紧致有有限子覆盖 \(f^{-1}(V_{\alpha_1}), \ldots, f^{-1}(V_{\alpha_k})\)。则 \(V_{\alpha_1}, \ldots, V_{\alpha_k}\) 覆盖 \(f(X)\)（任何 \(y = f(x), x \in f^{-1}(V_{\alpha_i})\) 某 \(i\)，则 \(y \in V_{\alpha_i}\)）。\(\blacksquare\)</p>
+
+<p>这条在<em>同胚</em> 角度的解读："<em>紧致是拓扑不变量</em>"——同胚 \(f : X \to Y\) 把紧致 \(X\) 映到紧致 \(Y\)。</p>
+
+<p><strong>性质 14.7 (紧致 + Hausdorff ⟹ normal).</strong> 设 \(X\) 紧致 + Hausdorff。则 \(X\) normal。</p>
+
+<p>证明详见<a href="ch15.html">第 15 章</a>。这条把分离公理升到 \(T_4\) ——紧致 + Hausdorff 的空间自动有最强分离性，能用 Urysohn 引理造连续函数。本书后续 \(C^*\)-代数 / Stone-Čech 紧致化的关键。</p>
+
+<h2 id="sec14-6">14.6 极值定理</h2>
+
+<p>紧致的<em>第一</em> 大应用。</p>
+
+<p><strong>定理 14.8 (极值定理).</strong> 设 \(X\) 紧致，\(f : X \to \mathbb{R}\) 连续。则 \(f\) 在 \(X\) 上有最大值与最小值——存在 \(x^*, x_* \in X\) 使</p>
+
+<p>\[
+f(x_*) \leq f(x) \leq f(x^*) \quad \forall x \in X.
+\]</p>
+
+<p><strong>证明。</strong></p>
+
+<p>由 14.6，\(f(X) \subseteq \mathbb{R}\) 紧致。\(\mathbb{R}\) Hausdorff——14.4 + 14.5 告诉紧致 \(\Leftrightarrow\) 有界闭。所以 \(f(X)\) 有界闭。</p>
+
+<p>有界——\(\sup f(X) =: M\) 与 \(\inf f(X) =: m\) 有限。闭——\(M, m \in f(X)\)（上下确界是闭集的<em>极限点</em>，闭集含极限点）。所以存在 \(x^*\) 与 \(x_*\) 使 \(f(x^*) = M, f(x_*) = m\)。\(\blacksquare\)</p>
+
+<p>这条定理是<em>实分析</em> 里"<em>连续函数在闭区间取最值</em>" 的<em>抽象</em> 版本——把"<em>闭区间</em>" 替换成"<em>任何紧致空间</em>"。优化理论 / 微积分变分法 / 数值方法（找最优解）等所有"<em>存在最优</em>" 论证都依赖它。</p>
+
+<p>它<em>需要</em> 紧致——\((0, 1)\) 上 \(f(x) = x\) 没有最大值（\(\sup = 1\) 不取到）。它<em>需要</em> 连续——紧致 \([0, 1]\) 上间断函数也可能无最值。两个条件缺一不可。</p>
+
+<h2 id="sec14-7">14.7 紧致 vs 序列紧 vs 极限点紧</h2>
+
+<p>"<em>紧致</em>" 一词在不同文献里有不同写法。把三种相关概念厘清。</p>
+
+<p><strong>定义 14.9.</strong> 拓扑空间 \(X\) 称为</p>
+
+<ul>
+  <li><em>紧致</em>（compact）—— 每个开覆盖有有限子覆盖。（即定义 14.2，也叫"<em>quasi-compact</em>" 在 Bourbaki 学派。）</li>
+  <li><em>序列紧</em>（sequentially compact）—— 每个序列有<em>收敛子列</em>。即 \((x_n) \subseteq X \Rightarrow \exists\) 子列 \((x_{n_k}) \to x \in X\)。</li>
+  <li><em>极限点紧</em>（limit point compact / Bolzano-Weierstrass property）—— 每个无限子集有<em>极限点</em>。即 \(A \subseteq X\) 无限 \(\Rightarrow \exists p \in X\) 是 \(A\) 的极限点。</li>
+</ul>
+
+<p>这三条<em>在一般拓扑空间里不等价</em>。看反例。</p>
+
+<p><strong>反例 14.10 (紧致 ≠ 序列紧).</strong> 在 \(\{0, 1\}^{[0, 1]}\)（不可数积，Tychonoff 拓扑）里——它紧致（Tychonoff 定理，<a href="ch16.html">ch16</a>）但<em>不</em> 序列紧（构造序列 \(x_n\)，使得对应每个坐标 \(t \in [0, 1]\) 给出 \(\{0, 1\}\) 的序列，挑选合适的 \(t\) 使<em>每个</em> 子列对应坐标都不收敛——可用 Cantor 对角线）。</p>
+
+<p><strong>反例 14.11 (序列紧 ≠ 紧致).</strong> 序数 \([0, \omega_1)\)（第一不可数序数）配序拓扑——它序列紧（每个序列在 \([0, \omega_1)\) 中有上确界，子列收敛）但<em>不</em>紧致（开覆盖 \(\{[0, \alpha) : \alpha < \omega_1\}\) 没有限子覆盖，有限多 \([0, \alpha_1) \cup \cdots \cup [0, \alpha_k) = [0, \max \alpha_i)\) 不覆盖 \(\max \alpha_i + 1\)）。</p>
+
+<p>所以一般空间里"<em>紧致</em>" 与"<em>序列紧</em>" 真不一样——它们是<em>独立</em> 性质。</p>
+
+<p>极限点紧介于两者之间："<em>序列紧 \(\Rightarrow\) 极限点紧</em>" 总成立（取序列在无限集 \(A\) 中无重复，子列收敛点是极限点）；"<em>紧致 \(\Rightarrow\) 极限点紧</em>" 也成立（详见<a href="ch15.html">ch15</a> 用 FIP 证）。但反向都失败。</p>
+
+<h2 id="sec14-8">14.8 度量空间：三者等价</h2>
+
+<p>关键事——在<em>度量</em> 空间里这三条<em>等价</em>。这就是为什么实分析里"<em>紧致</em>" 与"<em>每序列有收敛子列</em>" 总被混用——因为度量空间。</p>
+
+<p><strong>定理 14.12.</strong> 设 \((X, d)\) 度量空间。则</p>
+
+<p>\[
+\text{紧致} \iff \text{序列紧} \iff \text{极限点紧}.
+\]</p>
+
+<p><strong>证明（梗概）。</strong></p>
+
+<p>(<em>紧致 \(\Rightarrow\) 极限点紧</em>)。任何拓扑空间。设 \(X\) 紧致，\(A \subseteq X\) 无限无极限点。则每个 \(x \in X\) 有开邻域 \(U_x\) 与 \(U_x \cap A \subseteq \{x\}\)（"<em>无极限点</em>" 意味这）。\(\{U_x\}\) 是 \(X\) 的开覆盖，由紧致取有限子覆盖 \(U_{x_1}, \ldots, U_{x_n}\)。则 \(A = A \cap \bigcup U_{x_i} = \bigcup (A \cap U_{x_i}) \subseteq \bigcup \{x_i\}\)，有限。矛盾 \(A\) 无限。</p>
+
+<p>(<em>极限点紧 \(\Rightarrow\) 序列紧</em>)（度量空间专用）。设 \(X\) 度量极限点紧。给序列 \((x_n)\)。如果有重复值出现无穷多次，常值子列收敛。否则 \(\{x_n\}\) 无限，由极限点紧有极限点 \(p\)。在度量空间里"<em>极限点 \(p\)</em>" 等价于"<em>每个开球 \(B(p, 1/k)\) 含某 \(x_n \neq p\)</em>"，可逐次取 \(x_{n_k} \in B(p, 1/k)\) 与 \(n_k\) 严格递增——子列收敛 \(x_{n_k} \to p\)。</p>
+
+<p>(<em>序列紧 \(\Rightarrow\) 紧致</em>)（度量空间专用，Bolzano-Weierstrass-style）。这是较长的论证。两个关键步骤：</p>
+
+<ol>
+  <li><em>序列紧 \(\Rightarrow\) totally bounded</em>。"<em>totally bounded</em>" 即对每个 \(\varepsilon > 0\)，\(X\) 能被有限多个 \(\varepsilon\)-开球覆盖。反证：假设有 \(\varepsilon > 0\) 无法被有限多个 \(\varepsilon\)-球覆盖。归纳取 \(x_1, x_2, \ldots\) 使 \(x_{n+1} \notin B(x_1, \varepsilon) \cup \cdots \cup B(x_n, \varepsilon)\)（总存在因否则有限球覆盖）。则 \(d(x_i, x_j) \geq \varepsilon\) 对 \(i \neq j\)——这序列<em>没有</em> Cauchy 子列，故无收敛子列（度量空间收敛 \(\Rightarrow\) Cauchy）。矛盾序列紧。</li>
+  <li><em>序列紧 \(\Rightarrow\) Lebesgue 数引理</em>：每个开覆盖 \(\{U_\alpha\}\) 有 \(\delta > 0\) 使每个直径 \(< \delta\) 的子集在某 \(U_\alpha\) 里。证明类似反证。</li>
+  <li><em>组合</em>：给开覆盖 \(\{U_\alpha\}\)，由 Lebesgue 数引理取 \(\delta\)。由 totally bounded 取有限 \(\delta/2\)-球覆盖 \(B(x_1, \delta/2), \ldots, B(x_k, \delta/2)\)。每个 \(B(x_i, \delta/2)\) 直径 \(< \delta\) 故在某 \(U_{\alpha_i}\) 里。\(\{U_{\alpha_1}, \ldots, U_{\alpha_k}\}\) 是有限子覆盖。\(\blacksquare\)</li>
+</ol>
+
+<p>这条定理说在度量空间里"<em>三种紧致定义都行</em>"。所以<em>实分析</em> 里你看到的"<em>紧致 = Bolzano-Weierstrass 性质</em>" 是有理由的——它在 \(\mathbb{R}^n\) 上等价于"<em>开覆盖 + 子覆盖</em>" 定义。但<em>抽象</em> 拓扑里你必须用"<em>开覆盖</em>" 定义，因为序列紧不一定够。</p>
+
+<h2 id="sec14-9">14.9 临别话</h2>
+
+<p>紧致是<em>同胚下不变量</em> 中最重要的一条。它给出：</p>
+
+<ul>
+  <li><em>存在性结论</em>——极值定理、聚点存在、最优解存在。</li>
+  <li><em>有限化</em>——任何"<em>无限多个开集</em>" 的覆盖都能被压成有限多个，让"<em>逐点性质</em>" 升级到"<em>整体性质</em>"。</li>
+  <li><em>分析有效性</em>——紧致 + Hausdorff 自动 normal，开启 Urysohn 引理 / Tietze 延拓 / Stone-Weierstrass 等几乎全部经典分析工具。</li>
+</ul>
+
+<p>"<em>紧致</em>" 与"<em>有界闭</em>" 的对应（Heine-Borel）只在 \(\mathbb{R}^n\) 类的特殊空间里成立。在<em>无穷维</em>（Banach、Hilbert）里"<em>有界闭</em>" <em>不</em>蕴含紧致——闭单位球在无穷维 Banach 空间里<em>从来不</em> 紧致（这是 Riesz 定理）。这件事让<em>泛函分析</em> 的紧致性研究变成"<em>什么样的算子有紧致性</em>" 的复杂问题——紧算子、Fredholm 算子、谱定理都围绕这件事。</p>
+
+<p>下一章我们换<em>对偶</em> 表述——"<em>每个 FIP 闭集族总交非空</em>"。这条 FIP（finite intersection property）刻画把"<em>开覆盖</em>" 翻成"<em>闭集交</em>"，让紧致与"<em>滤子</em>""<em>极大理想</em>" 等代数结构挂钩，并准备 Tychonoff 定理"<em>任意紧致空间的积仍紧致</em>" 这条本书重头戏。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 可数性公理</a><a href="ch15.html">下一章 · 第 15 章 紧致的等价：有限交性质 →</a></nav>
+</main>
+</body>
+</html>

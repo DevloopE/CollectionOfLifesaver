@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 基与子基 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 拓扑空间</a><a href="ch5.html">下一章 · 第 5 章 闭集、内部与闭包 →</a></nav>
+<h1 id="ch4">第 4 章 基与子基</h1>
+
+<p>上一章给了"<em>拓扑空间</em>" 的形式定义：集合 + 满足三公理的开集族。这套定义抽象但清晰。</p>
+
+<p>麻烦在<em>具体描述</em>。\(\mathbb{R}\) 上的标准欧氏拓扑有多少开集？答案——<em>不可数无穷多个</em>。每个开集是"<em>开区间的某个并</em>", 而开区间可以选不同端点、不同覆盖方式产生不同开集; 加上有限交后开集的总数比<em>开区间的数目</em> 还多。</p>
+
+<p>所以"<em>给一个拓扑</em>" 不能"<em>把所有开集列出来</em>"。你需要更<em>经济</em> 的描述方式：<em>选少量"生成元", 用并 + 有限交规则生成所有开集</em>。这就是<em>基</em>。</p>
+
+<p>类比线性代数：\(\mathbb{R}^n\) 有不可数无穷多个向量, 但只需 \(n\) 个<em>基向量</em>（标准基 \(e_1, \ldots, e_n\)）, 通过线性组合生成全部。<em>基</em> 是线性代数的工程工具——拓扑学里也有完全平行的概念。</p>
+
+<p>这一章定义"<em>基</em>" 与更宽松的"<em>子基</em>", 看大量例子（\(\mathbb{R}\)、\(\mathbb{R}^n\)、积拓扑）, 并且给"<em>什么样的集族能成为基</em>" 的判别。读完你能用"<em>基</em>" 经济地描述任意拓扑——这是 ch9 积拓扑、ch10 商拓扑等"<em>构造拓扑</em>" 章节的工具基础。</p>
+
+<h2 id="sec4-1">4.1 基的定义</h2>
+
+<p>给拓扑空间 \((X, \tau)\), 一族子集 \(\mathcal{B} \subseteq \tau\) 是 \(\tau\) 的<strong>基</strong>（base / basis）\(\iff\) 每个开集 \(U \in \tau\) 都能写成 \(\mathcal{B}\) 中元素的<em>并</em>:</p>
+
+<p>\[
+\boxed{\ \forall U \in \tau, \ \exists \{B_\alpha\} \subseteq \mathcal{B}, \ U = \bigcup_\alpha B_\alpha.\ }
+\]</p>
+
+<p>等价的判别（对每点）：</p>
+
+<p>\[
+\forall U \in \tau, \forall x \in U, \exists B \in \mathcal{B} : x \in B \subseteq U.
+\]</p>
+
+<p>验证两条等价：第一条 \(\Rightarrow\) 第二条：\(U = \bigcup B_\alpha\), \(x \in U\) 在某 \(B_{\alpha_0}\) 里, 取它即可。第二条 \(\Rightarrow\) 第一条：每个 \(x \in U\) 找 \(B_x \in \mathcal{B}\) 使 \(x \in B_x \subseteq U\), 取 \(U = \bigcup_{x \in U} B_x\)（每个 \(B_x \subseteq U\), 同时 \(U \supseteq \bigcup B_x \supseteq \{x \in U\} = U\), 等号成立）。</p>
+
+<p>所以"<em>基</em>" 是一族开集, "粗到" 让<em>每个点</em>在<em>每个</em>含它的开集里都能<em>被基的某元素 "包住"</em>。这条"<em>每点的局部包住</em>" 条件就足以从基生成全拓扑——通过任意并。</p>
+
+<p><em>注意</em>：基里的元素<em>本身</em> 必须是开集（\(\mathcal{B} \subseteq \tau\)）。但反过来"<em>从一族集合出发能否生成拓扑使它们成为基</em>" 是个独立问题——4.3 节给充要条件。</p>
+
+<p>类比向量空间：基中向量<em>本身</em> 在向量空间里, "线性组合生成全部"——同样的<em>逻辑</em>, 只是把"线性组合" 换成"任意并", "向量" 换成"开集"。</p>
+
+<h2 id="sec4-2">4.2 例子：\(\mathbb{R}\)、\(\mathbb{R}^n\)、度量空间</h2>
+
+<p><strong>例 1：\(\mathbb{R}\) 上欧氏拓扑。</strong>取 \(\mathcal{B} = \{(a, b) : a < b, a, b \in \mathbb{R}\}\)（所有开区间）。这是欧氏拓扑的基。</p>
+
+<p>验证：每个欧氏开集 \(U\) 按定义"每点配球", 而 \(\mathbb{R}\) 上的"球" \(B(x, r) = (x - r, x + r)\) 就是开区间。所以 \(U = \bigcup_{x \in U} (x - r_x, x + r_x)\)——开区间的并。\(\checkmark\)</p>
+
+<p>更经济版本：\(\mathcal{B}' = \{(a, b) : a < b, a, b \in \mathbb{Q}\}\)（<em>有理</em> 端点的开区间）也是基。<em>这是个可数基</em>——\(\mathbb{Q} \times \mathbb{Q}\) 可数。这事实让 \(\mathbb{R}\) 是<em>第二可数</em> 的（ch15）。</p>
+
+<p>验证：每个 \(x \in U\) 与对应 \(r > 0\), 取有理 \(a, b\) 满足 \(x - r < a < x < b < x + r\), 那 \(x \in (a, b) \subseteq B(x, r) \subseteq U\)。\(\checkmark\)</p>
+
+<p><strong>例 2：\(\mathbb{R}^n\) 上欧氏拓扑。</strong>取 \(\mathcal{B} = \{B(x, r) : x \in \mathbb{R}^n, r > 0\}\)（所有开球）。这是基, 直接由开集定义给。</p>
+
+<p>更几何的基: \(\mathcal{B}' = \{(a_1, b_1) \times \cdots \times (a_n, b_n) : a_i < b_i\}\)（所有"<em>开盒子</em>"）。这也是基（用 \(d_\infty\) 度量给的"球" 就是这种盒子, 与 \(d_2\) 拓扑等价——ch2.7）。</p>
+
+<p>积拓扑视角下"<em>开盒子</em>" 基非常重要——见 4.5 节。</p>
+
+<p><strong>例 3：度量空间 \((X, d)\)。</strong>取 \(\mathcal{B} = \{B(x, r) : x \in X, r > 0\}\)。这<em>就是</em> 度量拓扑的基（按定义）。</p>
+
+<p>更经济: 如果 \(X\) <em>可分</em>（有可数稠密子集 \(D\)）, 取 \(\mathcal{B}' = \{B(x, r) : x \in D, r \in \mathbb{Q}^+\}\)——可数基。这条让"<em>可分度量空间是第二可数</em>" 这条定理直接给出。</p>
+
+<p>例 4：离散拓扑。\(\mathcal{B} = \{\{x\} : x \in X\}\)（所有单点集）是离散拓扑的基。每个开集（任意子集）是单点的并。这<em>是</em> 离散拓扑最经济的基。</p>
+
+<h2 id="sec4-3">4.3 何时一族 \(\mathcal{B}\) 能成为<em>某拓扑</em> 的基？</h2>
+
+<p>4.1-4.2 是"<em>已知拓扑, 找基</em>"。反向更有用：<em>给一族 \(\mathcal{B} \subseteq \mathcal{P}(X)\), 能否找到 \(X\) 上的拓扑 \(\tau\) 让 \(\mathcal{B}\) 是它的基</em>？</p>
+
+<p>显然: 如果 \(\tau\) 存在, 它<em>唯一</em>——\(\tau\) 必须是 \(\mathcal{B}\) 元素的所有可能并:</p>
+
+<p>\[
+\tau = \left\{ \bigcup_\alpha B_\alpha : \{B_\alpha\} \subseteq \mathcal{B} \right\} \cup \{\emptyset\}.
+\]</p>
+
+<p>问题是<em>这个 \(\tau\) 是不是合法拓扑</em>。它满足 (O1)(O2) 直接（\(\emptyset\) 是空并; 任意并族还是 \(\mathcal{B}\) 元素的更大并）。<em>(O3) 有限交</em> 是关键障碍。</p>
+
+<p><strong>定理（基的判别）。</strong>\(\mathcal{B} \subseteq \mathcal{P}(X)\) 是<em>某</em> 拓扑的基 \(\iff\) 满足两条:</p>
+
+<ul>
+  <li><strong>(B1)</strong> \(X = \bigcup_{B \in \mathcal{B}} B\)（\(\mathcal{B}\) 覆盖 \(X\)）。</li>
+  <li><strong>(B2)</strong> \(B_1, B_2 \in \mathcal{B}, x \in B_1 \cap B_2 \Rightarrow \exists B_3 \in \mathcal{B} : x \in B_3 \subseteq B_1 \cap B_2\)。</li>
+</ul>
+
+<p>(B1) 保证 \(X\) 自身是 \(\mathcal{B}\) 元素的并, 即 \(X\) 开。</p>
+
+<p>(B2) 保证两个基元素的交可以"<em>内部点点找小</em>" 基元素——这条让"<em>有限交还是开集</em>" 成立。</p>
+
+<p><strong>证明草图。</strong>设 \(\mathcal{B}\) 满足 (B1)(B2)。定义 \(\tau\) 为前面式子。验证它是拓扑：</p>
+
+<ul>
+  <li>(O1) \(\emptyset \in \tau\) 显然; \(X = \bigcup B \in \tau\) 由 (B1)。</li>
+  <li>(O2) 任意并：若 \(U_\alpha = \bigcup_{i \in I_\alpha} B_i^{(\alpha)}\) 都是 \(\mathcal{B}\) 元素的并, 那 \(\bigcup_\alpha U_\alpha = \bigcup_\alpha \bigcup_{i \in I_\alpha} B_i^{(\alpha)}\) 仍是 \(\mathcal{B}\) 元素的并。</li>
+  <li>(O3) 有限交: 设 \(U_1 = \bigcup B_i, U_2 = \bigcup B_j'\), 那 \(U_1 \cap U_2 = \bigcup_{i, j} (B_i \cap B_j')\)（分配律）。每个 \(B_i \cap B_j'\), 由 (B2), 是 \(\mathcal{B}\) 元素的并：每点 \(x \in B_i \cap B_j'\) 找 \(B_3(x)\) 使 \(x \in B_3(x) \subseteq B_i \cap B_j'\), 然后 \(B_i \cap B_j' = \bigcup_{x \in B_i \cap B_j'} B_3(x)\)。所以 \(U_1 \cap U_2 = \bigcup_{i,j} \bigcup_x B_3(x)\)，是 \(\mathcal{B}\) 元素的并, 在 \(\tau\) 中。归纳到有限交。</li>
+</ul>
+
+<p>反向（\(\tau\) 存在 \(\Rightarrow\) (B1)(B2)）：(B1) 因为 \(X \in \tau\) 是 \(\mathcal{B}\) 元素的并。(B2) 因为 \(B_1 \cap B_2 \in \tau\)（有限交）, 而 \(\mathcal{B}\) 是基, 所以每点 \(x \in B_1 \cap B_2\) 找 \(B_3 \in \mathcal{B}\) 使 \(x \in B_3 \subseteq B_1 \cap B_2\)。\(\square\)</p>
+
+<p>请你停下来欣赏这个判别。它把"<em>什么集族能生成拓扑</em>" 简化为<em>两条具体可检查的条件</em>——(B1) 覆盖、(B2) 交"<em>逐点</em>" 内含。这种"<em>验两条得整体</em>" 的判别在数学里很常见, 因为它把无穷多条件（验证 (O1)(O2)(O3) 对所有可能的开集族）压缩到两条。</p>
+
+<p>例 1（验证）。Sorgenfrey 直线（ch3.7）的 \(\mathcal{B} = \{[a, b) : a < b\}\)。(B1): \(\mathbb{R} = \bigcup [n, n+1)\), \(\checkmark\)。(B2): \([a, b) \cap [c, d) = [\max(a, c), \min(b, d))\), 仍是 \(\mathcal{B}\) 元素（如果非空, 取 \(B_3 = \) 这个交本身）。\(\checkmark\) 所以 \(\mathcal{B}\) 是合法基, 生成 Sorgenfrey 拓扑。</p>
+
+<p>例 2（不行的）。考虑 \(\mathbb{R}\) 上 \(\mathcal{B} = \{(a, b) : a, b \in \mathbb{R}\} \cup \{\{0\}\}\)（标准开区间加上单点 \(\{0\}\)）。(B1) \(\checkmark\)。(B2) 测试 \(B_1 = \{0\}\) 和 \(B_2 = (-1, 1)\)：交 \(= \{0\}\)。\(0 \in B_3 \subseteq \{0\}\) \(\Rightarrow B_3 = \{0\}\)——在 \(\mathcal{B}\) 里, \(\checkmark\)。但 (B2) 还要测 \(B_1 = \{0\}\) 与<em>每个</em> 含 0 的开区间——都给同样答案。看起来 (B2) 没问题。所以这<em>是</em> 合法基, 生成的拓扑使 \(\{0\}\) 开但其他单点不开——这是 \(\mathbb{R}\) 上的<em>另一个</em> 合法拓扑（"<em>0 孤立的欧氏</em>"）。</p>
+
+<p>这个例子给你看：(B1)(B2) 是<em>具体可验</em> 的, 不通过的集族真的不能生成拓扑。下面给一个不通过的：</p>
+
+<p>例 3（不行）。\(X = \{a, b, c\}\), \(\mathcal{B} = \{\{a, b\}, \{b, c\}\}\)。(B1) \(X = \{a, b\} \cup \{b, c\}\), \(\checkmark\)。(B2) 测 \(B_1 = \{a, b\}, B_2 = \{b, c\}\), 交 = \(\{b\}\)。要找 \(B_3 \in \mathcal{B}\) 使 \(b \in B_3 \subseteq \{b\}\), 即 \(B_3 = \{b\}\)。但 \(\{b\} \notin \mathcal{B}\)！ (B2) 失败。所以 \(\mathcal{B}\) 不是任何拓扑的基。</p>
+
+<p>但你可以"<em>修正</em>"——加入 \(\{b\}\), 让 \(\mathcal{B}' = \{\{a, b\}, \{b, c\}, \{b\}\}\)。再验 (B2)：所有可能交都<em>是</em> \(\mathcal{B}'\) 元素本身。\(\checkmark\) 这给一个合法拓扑——见 4.4 节子基的<em>修正</em> 思想。</p>
+
+<h2 id="sec4-4">4.4 子基</h2>
+
+<p>4.3 节末例子提示：如果一族 \(\mathcal{S}\) 不满足 (B2), 我们可以"<em>用它的有限交做基</em>" 来修正。这就是<em>子基</em>。</p>
+
+<p><strong>定义</strong>。\(\mathcal{S} \subseteq \mathcal{P}(X)\) 是某拓扑 \(\tau\) 的<strong>子基</strong>（subbase）\(\iff\) \(\mathcal{S}\) 元素的所有<em>有限交</em> 构成的集族 \(\mathcal{B}\) 是 \(\tau\) 的基。</p>
+
+<p>具体: \(\mathcal{B} := \{S_1 \cap S_2 \cap \cdots \cap S_n : S_i \in \mathcal{S}, n \in \mathbb{N}\}\)（含 \(n = 0\) 给 \(X\) 自身）, 这族 \(\mathcal{B}\) 应是基。</p>
+
+<p>"<em>子基</em>" 比"<em>基</em>" 宽松——你不用满足 (B2), 只用满足 (B1)（\(\mathcal{S}\) 覆盖 \(X\)）, 就<em>自动</em> 生成一个拓扑（用有限交先得基, 再任意并得拓扑）。</p>
+
+<p><strong>定理</strong>。任何 \(\mathcal{S} \subseteq \mathcal{P}(X)\) 满足 \(X = \bigcup_{S \in \mathcal{S}} S\)（更宽: 甚至这条都不需要——只要补一个空交"\(X\) 本身"）都是某<em>唯一</em> 拓扑的子基。这个拓扑是"<em>包含 \(\mathcal{S}\) 的最粗拓扑</em>"——记 \(\tau(\mathcal{S})\)。</p>
+
+<p>证明思路：把 \(\mathcal{S}\) 的有限交集合 \(\mathcal{B}\) 显然满足 (B1)(B2)（其中 (B2) 由"两个有限交还是有限交" 给）。然后 \(\mathcal{B}\) 生成的拓扑就是 \(\tau(\mathcal{S})\)。</p>
+
+<p>例 1。\(\mathbb{R}\) 上, \(\mathcal{S} = \{(a, \infty) : a \in \mathbb{R}\} \cup \{(-\infty, b) : b \in \mathbb{R}\}\)（"<em>射线</em>"）。验证：</p>
+
+<ul>
+  <li>有限交：\((a, \infty) \cap (-\infty, b) = (a, b)\)（开区间）。两个左射线交还是左射线; 右射线同。所以 \(\mathcal{B}\) = "<em>开区间 + 左 / 右射线 + \(\mathbb{R}\)</em>"。</li>
+  <li>这族 \(\mathcal{B}\) 是欧氏拓扑的基。</li>
+</ul>
+
+<p>所以"<em>射线族</em>" 是欧氏拓扑的<em>子基</em>。它比"<em>开区间族</em>" 这个基更"<em>原始</em>"——只用两种简单几何元素（左射线 + 右射线）就生成了全部欧氏拓扑。</p>
+
+<p>这个例子是<em>序拓扑</em>（ch3.6）的本来定义形式：偏序集上 \(\mathcal{S} = \{(-\infty, b)\} \cup \{(a, \infty)\}\) 总是子基, 生成的拓扑就是序拓扑。</p>
+
+<p>例 2。<em>积拓扑</em>（ch4.5 接下来讨论）的标准定义就是用<em>子基</em>："<em>每个坐标投影是连续的最粗拓扑</em>"——具体: 子基取所有 \(\pi_\alpha^{-1}(U_\alpha)\)（"<em>限制一个坐标在 \(U_\alpha\) 里, 其他坐标自由</em>"）。</p>
+
+<p>子基的实战意义：<em>你只需要给少量"原子" 集合, 拓扑会"自动生成"</em>。在构造复杂拓扑（积、商、滤子收敛拓扑）时这是<em>关键</em> 工具。</p>
+
+<h2 id="sec4-5">4.5 积拓扑：基的标志性应用</h2>
+
+<p>给两个拓扑空间 \((X, \tau_X), (Y, \tau_Y)\)。<em>积空间</em> \(X \times Y\) 上"<em>合理</em>" 的拓扑是什么？</p>
+
+<p>朴素答案：取"<em>开矩形</em>" \(U \times V\)（\(U \in \tau_X, V \in \tau_Y\)）作为<em>开集</em>。但这立刻撞墙——两个开矩形的<em>并</em> 一般<em>不是</em> 开矩形（如 \([(0, 1) \times (0, 1)] \cup [(1, 2) \times (1, 2)]\) 在 \(\mathbb{R}^2\) 里是个"<em>L 形</em>"）。所以"<em>开矩形</em>" 不构成拓扑——它<em>不</em> 闭于任意并。</p>
+
+<p>正确做法：把"<em>开矩形</em>" 当成<em>基</em>, 让任意并产生开集。</p>
+
+<p><strong>积拓扑定义</strong>。\(X \times Y\) 上<em>积拓扑</em> 由基 \(\mathcal{B} = \{U \times V : U \in \tau_X, V \in \tau_Y\}\) 给出。</p>
+
+<p>验证 \(\mathcal{B}\) 满足 (B1)(B2)：</p>
+
+<ul>
+  <li>(B1) \(X \times Y \in \mathcal{B}\), 显然覆盖。</li>
+  <li>(B2) \((U_1 \times V_1) \cap (U_2 \times V_2) = (U_1 \cap U_2) \times (V_1 \cap V_2)\)——又是开矩形, 在 \(\mathcal{B}\) 里。\(\checkmark\)</li>
+</ul>
+
+<p>所以 \(\mathcal{B}\) 合法, 生成 \(X \times Y\) 上的拓扑。</p>
+
+<p>例。\(\mathbb{R}^2 = \mathbb{R} \times \mathbb{R}\) 配积拓扑——基 = "<em>开矩形</em>" \((a, b) \times (c, d)\)。这与 \(\mathbb{R}^2\) 的标准欧氏拓扑<em>相同</em>（开矩形的并 = "<em>每点配开盒子</em>" 的开集 = 欧氏开集）。所以欧氏 \(\mathbb{R}^n\) 自然是积空间。</p>
+
+<p><strong>子基定义</strong>。等价的子基视角：\(X \times Y\) 上积拓扑 = "<em>使两个投影 \(\pi_X : X \times Y \to X\) 与 \(\pi_Y\) 都连续的最粗拓扑</em>"。子基取</p>
+
+<p>\[
+\mathcal{S} = \{\pi_X^{-1}(U) : U \in \tau_X\} \cup \{\pi_Y^{-1}(V) : V \in \tau_Y\} = \{U \times Y : U \in \tau_X\} \cup \{X \times V : V \in \tau_Y\}.
+\]</p>
+
+<p>"\(\pi_X^{-1}(U) = U \times Y\)" 是"<em>无限竖条</em>"（限制 \(x \in U\), \(y\) 自由）。同样 \(\pi_Y^{-1}(V) = X \times V\) 是"<em>无限横条</em>"。"<em>条</em>" 的有限交 = "<em>方块</em>" \((U \times Y) \cap (X \times V) = U \times V\), 正是基。</p>
+
+<p>这个子基视角的优点：在 ch11 任意积空间（无限多个因子）时<em>关键</em>——那里"<em>开矩形</em>" 这一直观失效（无限多个 \(U_i \times Y_i \times \cdots\) 的"矩形" 一般不应该是开集）, 而<em>子基定义"<em>限制有限多个坐标</em>" </em> 给出正确的<em>Tychonoff 拓扑</em>。</p>
+
+<p>预告：ch9 系统讨论积空间, ch11 推广到任意积。这一章只看双因子积作为基应用。</p>
+
+<h2 id="sec4-6">4.6 局部基</h2>
+
+<p>把"<em>基</em>" 概念<em>本地化</em>——只关心一个特定点 \(x\) 周围的开集。</p>
+
+<p><strong>定义</strong>。点 \(x \in X\) 处的<strong>局部基</strong>（neighborhood base 或 local base）是一族开集 \(\mathcal{B}_x\), 每个含 \(x\), 满足:</p>
+
+<p>\[
+\boxed{\ \forall U \in \tau, x \in U, \exists B \in \mathcal{B}_x : x \in B \subseteq U.\ }
+\]</p>
+
+<p>"<em>每个含 \(x\) 的开集都包含某个局部基元素</em>"。</p>
+
+<p>例 1。度量空间里, \(\mathcal{B}_x = \{B(x, 1/n) : n \in \mathbb{N}\}\) 是 \(x\) 处的<em>可数</em> 局部基（每个含 \(x\) 的开集 \(U\) 含某 \(B(x, r)\), 取 \(n > 1/r\) 即可）。</p>
+
+<p>这条性质——<em>每点有可数局部基</em>——叫<em>第一可数</em>（ch15）。<em>所有度量空间都第一可数</em>。这是个非常重要的性质——它让"<em>序列收敛足以刻画拓扑</em>" 这条直觉成立（在第一可数空间里, "\(x_n \to x\)" 完整刻画了"<em>含 \(x\) 的开集</em>" 这件事）。</p>
+
+<p>例 2。\(\mathbb{R}\) 上欧氏: \(\mathcal{B}_x = \{(x - 1/n, x + 1/n)\}\) 可数。</p>
+
+<p>例 3。Sorgenfrey 直线: \(\mathcal{B}_x = \{[x, x + 1/n)\}\) 可数。所以 Sorgenfrey 也是第一可数, 即使不度量化。</p>
+
+<p>例 4。<em>余有限拓扑（不可数 \(X\)）</em>。在 0 处, "<em>含 0 的开集</em>" = "<em>余集有限的集合</em>" = "<em>除有限多点外整个 \(X\)</em>"。要构造可数局部基, 即对任意 \(U\) 余集有限, 找可数多个固定的 \(B_n\) 使某 \(B_n \subseteq U\)。但 \(U\) 的余集可以是任何有限集合, \(B_n\) 的余集也只有限——<em>可数多个有限集的并仍可数</em>, 不可能"覆盖" 不可数 \(X\) 中所有可能的有限集合。所以余有限拓扑（不可数 \(X\)）<em>非</em> 第一可数——这是它<em>非度量化</em> 的另一个证据。</p>
+
+<p>请你停下来比较"<em>基</em>" 和"<em>局部基</em>" 的关系：基是<em>整体</em> 的, 一族开集足以生成全部开集; 局部基是<em>每点</em> 的, 每个 \(x\) 自己的"<em>含它开集的代表元</em>"。整体基限制到 \(x\) 的元素族<em>是</em> 局部基（取 \(\mathcal{B}\) 中含 \(x\) 的元素）。反过来, 把每点的局部基都收集起来 \(\bigcup_x \mathcal{B}_x\) <em>是</em> 整体基。所以两者本质等价, 只是"<em>视角</em>" 不同。</p>
+
+<p>第一可数 / 第二可数等"<em>可数性公理</em>" 是 ch15 的主题。这里只是预告。</p>
+
+<h2 id="sec4-7">4.7 邻域 + 邻域系公理</h2>
+
+<p>另一个等价的拓扑描述方式：用<em>邻域</em> 代替开集。</p>
+
+<p><strong>定义</strong>。\(N \subseteq X\) 是 \(x\) 的<strong>邻域</strong>（neighborhood）\(\iff\) \(\exists U \in \tau\) 使 \(x \in U \subseteq N\)。</p>
+
+<p>"<em>邻域</em>" 比"<em>开集</em>" 宽——它<em>不一定</em> 自身是开集, 只要"<em>包含某含 \(x\) 开集</em>"。例: 在 \(\mathbb{R}\) 上, \([-1, 1]\) 是 0 的邻域（含 \((-1, 1)\)）, 但<em>不</em> 是开集。</p>
+
+<p>有些教材定义邻域为"<em>含 \(x\) 的开集</em>"——"<em>开邻域</em>"。两种定义并存; 后者是前者的特殊情形。我们用宽义: 邻域不必开。</p>
+
+<p>记 \(\mathcal{N}(x) = \{x \text{ 的所有邻域}\}\)——\(x\) 的<em>邻域系</em>。</p>
+
+<p><strong>邻域系四公理</strong>。从开集定义可证 \(\mathcal{N}(x)\) 满足：</p>
+
+<ul>
+  <li><strong>(N1)</strong> \(N \in \mathcal{N}(x) \Rightarrow x \in N\)。（邻域含点本身）</li>
+  <li><strong>(N2)</strong> \(N \in \mathcal{N}(x), N \subseteq M \Rightarrow M \in \mathcal{N}(x)\)。（任何超集仍邻域）</li>
+  <li><strong>(N3)</strong> \(N_1, N_2 \in \mathcal{N}(x) \Rightarrow N_1 \cap N_2 \in \mathcal{N}(x)\)。（有限交仍邻域）</li>
+  <li><strong>(N4)</strong> \(N \in \mathcal{N}(x) \Rightarrow \exists M \in \mathcal{N}(x), M \subseteq N\) 使 \(\forall y \in M, N \in \mathcal{N}(y)\)。（"<em>核心邻域</em>" 公理：邻域 \(N\) 内有更小邻域 \(M\), \(M\) 上每点都把 \(N\) 当邻域）</li>
+</ul>
+
+<p>验证 (N1)-(N4)：(N1)(N2)(N3) 直接用定义。(N4) 是关键——取 \(M = U\)（开集 \(U\) 满足 \(x \in U \subseteq N\)）, 那 \(M\) 是 \(x\) 的邻域（自身是开集）, 且每个 \(y \in M = U\) 也满足 \(y \in U \subseteq N\), 所以 \(N\) 是 \(y\) 的邻域。\(\checkmark\)</p>
+
+<p>(N4) 的几何含义：邻域是个"<em>有内部空间</em>" 的东西——你能在邻域里再找到一个稍小的"<em>开</em>" 邻域, 这个开邻域<em>整体</em> 都在原邻域里, 让原邻域成为这个开区间里<em>每个</em> 点的邻域。这是邻域系区别于"<em>仅含 x 的集族</em>" 的关键性质。</p>
+
+<p>奇妙的是: <em>从邻域系出发反向定义拓扑</em> 也<em>等价</em>。</p>
+
+<p><strong>定理</strong>。给 \(X\) 与每点 \(x\) 一个 \(\mathcal{N}(x) \subseteq \mathcal{P}(X)\) 满足 (N1)-(N4), 定义</p>
+
+<p>\[
+\tau = \{U \subseteq X : \forall x \in U, U \in \mathcal{N}(x)\}.
+\]</p>
+
+<p>则 \(\tau\) 是 \(X\) 上的拓扑, 且诱导的邻域系正是给定的 \(\mathcal{N}(x)\)。</p>
+
+<p>这条定理告诉你：<em>"开集" 视角和"邻域" 视角是等价的描述拓扑空间的方式</em>。一些教科书（Bourbaki 系）用邻域作为<em>原始</em> 概念, 开集是"<em>每点都把它当邻域</em>" 的集合。我们的开集视角和它互通。</p>
+
+<p>邻域视角的好处：</p>
+
+<ul>
+  <li>"<em>连续</em>" 容易用邻域改写: \(f\) 在 \(x_0\) 连续 \(\iff\) \(f^{-1}(\) \(f(x_0)\) 的邻域\() \) 是 \(x_0\) 的邻域。</li>
+  <li>"<em>极限点</em>" 直接用邻域定义（ch5）：\(x\) 是 \(A\) 的极限点 \(\iff\) 每个 \(x\) 的邻域含 \(A \setminus \{x\}\) 的元素。</li>
+  <li>"<em>闭包</em>" 也直接：\(\bar A = \{x : \forall N \in \mathcal{N}(x), N \cap A \neq \emptyset\}\)。</li>
+</ul>
+
+<p>下一章 ch5 会全面用邻域视角处理"<em>闭集 / 闭包 / 内部 / 边界</em>" 这些拓扑几何词汇。</p>
+
+<h2 id="sec4-8">4.8 一个反射动作</h2>
+
+<p>读完这一章你应该有这些反射:</p>
+
+<ul>
+  <li><em>看到"拓扑空间", 别想"列出全部开集"——想"基是什么"</em>。基是一个拓扑的"<em>身份证</em>"——你不用看完全部开集, 看基就知道空间的几何。</li>
+  <li><em>给一族集合, 想生成拓扑——查 (B1)(B2) 或退一步用子基</em>（覆盖即可, 自动有限交得基）。</li>
+  <li><em>"<em>第一可数</em>" = "每点有可数局部基"</em>——所有度量空间满足, 所以序列论证在度量空间里完整。一旦离开度量, 第一可数性可能丢失（如不可数 \(X\) 上的余有限）。</li>
+  <li><em>积空间的开集 = "开矩形" 的并</em>——但<em>"开矩形" 本身不是合法拓扑</em>, 它是<em>基</em>。这是拓扑学常见的初学陷阱: 把基误当成开集族本身。</li>
+</ul>
+
+<p>这一章的工程主题——"<em>用少量生成元描述大量结构</em>"——会在后续 ch9 (积)、ch10 (商)、ch11 (Tychonoff 任意积)、ch15 (可数性) 反复使用。基与子基是<em>具体描述拓扑</em> 的<em>第一工具</em>。</p>
+
+<p>下一章 ch5 把主题从"<em>开</em>" 反过来——讨论<em>闭集 / 闭包 / 内部 / 边界</em>。它们和开集互对偶（开集的余集是闭集）, 但每个都有独立的几何含义。"<em>闭包</em>" 尤其关键——它是"<em>序列极限的集合化</em>", 在 ch7 同胚和 ch12 起的分离公理里都是基础工具。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 拓扑空间</a><a href="ch5.html">下一章 · 第 5 章 闭集、内部与闭包 →</a></nav>
+</main>
+</body>
+</html>

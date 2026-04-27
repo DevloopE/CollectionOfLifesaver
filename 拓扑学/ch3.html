@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 拓扑空间 — 普林斯顿拓扑学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 度量空间复习</a><a href="ch4.html">下一章 · 第 4 章 基与子基 →</a></nav>
+<h1 id="ch3">第 3 章 拓扑空间</h1>
+
+<p>ch1 已经预告了主角：<em>拓扑空间</em> = <em>集合</em> + <em>满足三公理的开集族</em>。ch2 在度量空间里验证了这条公理化是<em>对</em> 的——度量诱导的开集自动满足三公理, 而所有"<em>面向连续 / 收敛</em>" 的概念都<em>能</em> 用开集表达。</p>
+
+<p>这一章正式定义<em>拓扑空间</em> 并立即看大量例子。重点不在定义本身——它就一行——重点在<em>例子</em>。具体看到许多<em>不</em> 来自距离的拓扑、<em>同一集合上多个不同拓扑</em>, 才能让"<em>拓扑独立于距离</em>" 从口号变成肌肉记忆。</p>
+
+<p>这一章写完你应该能反射性地回答：</p>
+
+<ul>
+  <li>给一个奇怪空间, 它是不是<em>拓扑空间</em>？（验证三公理）</li>
+  <li>同一集合上有多种拓扑选择吗？（一定有, 至少离散和平凡）</li>
+  <li>哪些拓扑<em>不</em> 来自度量？（Sierpiński、余有限、Sorgenfrey 都不）</li>
+  <li>拓扑之间能<em>比较</em> 吗？（按"<em>开集多少</em>" 排——粗 / 细）</li>
+</ul>
+
+<h2 id="sec3-1">3.1 拓扑空间的形式定义</h2>
+
+<p>给一个集合 \(X\)。\(X\) 上的<strong>拓扑</strong> \(\tau\) 是 \(X\) 的子集族（\(\tau \subseteq \mathcal{P}(X)\)）, 满足：</p>
+
+<ul>
+  <li><strong>(O1)</strong> \(\emptyset \in \tau\), \(X \in \tau\)。</li>
+  <li><strong>(O2)</strong> 任意并：\(\{U_\alpha\}_{\alpha \in I} \subseteq \tau \Rightarrow \bigcup_{\alpha \in I} U_\alpha \in \tau\)。（指标集 \(I\) 可以是任意集合, 包括不可数。）</li>
+  <li><strong>(O3)</strong> <em>有限</em> 交：\(U_1, \ldots, U_n \in \tau \Rightarrow \bigcap_{i=1}^n U_i \in \tau\)。</li>
+</ul>
+
+<p>对 \(\tau\) 中的元素 \(U\)，我们称 \(U\) 是 <em>开集</em>。这对 \((X, \tau)\) 称为<strong>拓扑空间</strong>。</p>
+
+<p>请你盯住这个定义看一会儿——它<em>极简</em>。没有距离, 没有 \(\varepsilon\), 没有数字, 只有<em>集合</em> + <em>子集族</em> + <em>三条组合公理</em>。这是数学定义最简的形式之一。</p>
+
+<p><em>"X 上的拓扑" = X 上的"开集" 的选择</em>——而"开集" 这个词在抽象层级上就是一族满足三公理的子集, 不带任何先验意义。</p>
+
+<p><strong>(O3) 为什么只<em>有限</em> 交？</strong>这是上一章的关键观察的形式化。任意交不行——\(\bigcap_n (-1/n, 1/n) = \{0\}\) 在 \(\mathbb{R}\) 上不开。如果允许任意交, 那从开集出发能"<em>切</em>" 出任意单点, 拓扑会塌缩为离散——失去意义。所以三公理里 (O2) 用任意, (O3) 限有限——这是<em>非对称</em> 的, 故意的。</p>
+
+<p>注意：我们没说拓扑是<em>唯一</em> 的——同一个 \(X\) 可以有多个不同 \(\tau\)。下面 3.3 节起就看这种"<em>同一集合多种拓扑</em>" 的例子。</p>
+
+<h2 id="sec3-2">3.2 第一个例子：度量诱导拓扑</h2>
+
+<p>给度量空间 \((X, d)\)，<em>度量诱导拓扑</em>：</p>
+
+<p>\[
+\tau_d = \{U \subseteq X : \forall x \in U, \exists r > 0, B(x, r) \subseteq U\}.
+\]</p>
+
+<p>上一章 2.2 节已验证这是 \(X\) 上的拓扑（满足三公理）。</p>
+
+<p>所以<em>每个</em> 度量空间自动是拓扑空间。\(\mathbb{R}, \mathbb{R}^n, [0, 1]\)、欧氏球面、流形、函数空间, 全是拓扑空间。"拓扑空间" 这个范畴<em>包含</em> 度量空间作为子集。</p>
+
+<p>但<em>反过来不对</em>——有些拓扑空间<em>不</em> 来自任何度量。这是下面 3.3-3.7 节几个例子要展示的事。"<em>不来自度量的拓扑</em>" 是拓扑学这个学科存在的<em>理由</em>。如果所有拓扑都来自度量, 我们就只需要度量空间, 不需要"<em>拓扑空间</em>" 这个更一般的概念。</p>
+
+<p><strong>"<em>可度量化</em>" 拓扑</strong>：一个拓扑空间 \((X, \tau)\) 可度量化 \(\iff\) \(\exists\) 度量 \(d\) 使 \(\tau = \tau_d\)。"<em>哪些拓扑可度量化</em>" 是拓扑学的核心问题之一, ch21 Urysohn 度量化定理给一个最重要的回答。</p>
+
+<h2 id="sec3-3">3.3 极端例子：离散与平凡拓扑</h2>
+
+<p>给<em>任意</em> 集合 \(X\)。两个"<em>边界</em>" 拓扑总是合法的：</p>
+
+<p><strong>离散拓扑</strong> \(\tau_d = \mathcal{P}(X)\) — <em>所有</em> 子集都开。</p>
+
+<p>验证：(O1) \(\emptyset, X \in \mathcal{P}(X)\)。(O2)(O3) 任意子集族的并 / 交还是子集——都在 \(\mathcal{P}(X)\) 里。\(\checkmark\)</p>
+
+<p>"<em>离散</em>" 这个名字的来由：每个单点集 \(\{x\}\) 都开。这意味着每个点"<em>孤立</em>"——它周围有一个只含自己的开邻域。直观地, 空间是"<em>分裂</em>" 的——点之间没有"<em>连接</em>"。</p>
+
+<p>离散拓扑<em>来自</em> 度量——离散度量（ch2.1 例 3）正给离散拓扑：每个 \(\{x\} = B(x, 1/2)\)。</p>
+
+<p><strong>平凡拓扑</strong>（也叫 <em>不可分</em> 拓扑）\(\tau_0 = \{\emptyset, X\}\) — <em>只有</em> \(\emptyset\) 和 \(X\) 开。</p>
+
+<p>验证：(O1) 显然。(O2)(O3) 任意并 / 交两个 \(\{\emptyset, X\}\) 的元素仍在 \(\{\emptyset, X\}\) 里。\(\checkmark\)</p>
+
+<p>"<em>平凡</em>" 的几何含义：空间"<em>融合</em>" 在一起, 你<em>分</em> 不开任何子部分。每两个点都是"<em>同一邻域里的同伴</em>"。极端的"<em>糊在一起</em>" 状态。</p>
+
+<p>平凡拓扑（当 \(|X| \ge 2\) 时）<em>不</em> 来自度量。因为度量空间每个不同的两点 \(x \neq y\) 距离 \(d(x, y) > 0\), 球 \(B(x, d(x,y)/3)\) 与 \(B(y, d(x,y)/3)\) 不相交, 它们俩是不同开集（Hausdorff 性质）。但平凡拓扑里只有 \(\emptyset\) 和 \(X\) 两个开集——找不到分隔 \(x, y\) 的不相交开集。所以平凡拓扑非度量化。</p>
+
+<p><strong>极端比较。</strong>同一个 \(X\) 上离散和平凡是<em>两个极端</em>：</p>
+
+<ul>
+  <li>离散有 \(2^{|X|}\) 个开集（最多）。</li>
+  <li>平凡只有 2 个开集（最少）。</li>
+</ul>
+
+<p>任何 \(X\) 上的"<em>合法</em>" 拓扑都被夹在两者之间——\(\tau_0 \subseteq \tau \subseteq \tau_d\)（包含关系按集合）。这是 3.8 节"<em>拓扑比较</em>" 的预告。</p>
+
+<p>这两个极端是<em>反例机器</em>。每当你怀疑某个性质 P 是不是拓扑不变量、是不是必然成立, 第一反应——<em>测试 \(\tau_d\) 和 \(\tau_0\)</em>。它们极端到能<em>滤掉</em> 你考虑的大部分性质。</p>
+
+<h2 id="sec3-4">3.4 余有限拓扑 + 余可数拓扑</h2>
+
+<p>给无穷集 \(X\)（典型是 \(\mathbb{R}\) 或 \(\mathbb{N}\)）。<em>余有限拓扑</em>：</p>
+
+<p>\[
+\tau_{\text{cof}} = \{\emptyset\} \cup \{U \subseteq X : X \setminus U \text{ 有限}\}.
+\]</p>
+
+<p>"开集 = 空集 + 余集有限"。验证三公理：</p>
+
+<p>(O1) \(\emptyset\) 在定义里, \(X \setminus X = \emptyset\) 有限, \(X\) 也开。\(\checkmark\)</p>
+
+<p>(O2) 任意并：\(X \setminus \bigcup_\alpha U_\alpha = \bigcap_\alpha (X \setminus U_\alpha)\)。每个 \(X \setminus U_\alpha\) 有限, 所以它们的<em>任意</em> 交也有限（任意交一族有限集还是有限集——它是其中任何一个的子集）。所以 \(\bigcup U_\alpha\) 余集有限, 开。\(\checkmark\)</p>
+
+<p>(O3) <em>有限</em> 交：\(X \setminus \bigcap_{i=1}^n U_i = \bigcup_{i=1}^n (X \setminus U_i)\)。<em>有限多</em> 个有限集的并仍有限。\(\checkmark\)</p>
+
+<p>所以 \(\tau_{\text{cof}}\) 是 \(X\) 上的拓扑。</p>
+
+<p>这个拓扑<em>非常粗</em>。\(\mathbb{R}\) 上的开区间 \((0, 1)\)<em>不</em> 是余有限开集（其余集 \((-\infty, 0] \cup [1, \infty)\) 不有限）。所以欧氏开集<em>不是</em> 余有限开集——这两个拓扑<em>不同</em>。</p>
+
+<p>事实上, 余有限拓扑里开集<em>很少</em>——只有"<em>除去有限多个点的</em> \(X\)"。这种"<em>稀少</em>" 的开集结构产生了一些奇怪现象：</p>
+
+<ul>
+  <li>余有限拓扑下任意两个非空开集<em>必相交</em>（它们的余集是有限集, 它们的并集 = 余有限集的余集 = 有限集; 如果两者不交则 \(X\) 是有限并集 = 有限——矛盾, 假设 \(X\) 无穷）。</li>
+  <li>所以余有限拓扑<em>不</em> 是 Hausdorff（不能用不相交开集分离两点）。</li>
+  <li>所以它<em>不</em> 来自度量（度量必 Hausdorff）——又一个非度量化拓扑。</li>
+</ul>
+
+<p>余有限拓扑虽然"<em>怪</em>", 在<em>代数几何</em> 里至关重要——\(\mathbb{A}^1_k\) 上的 Zariski 拓扑就是它。代数几何的"开集" 是<em>多项式不为零的集合</em>, 余集是多项式零点（有限多个）。整个代数几何在拓扑上活在余有限（更高维：Zariski）拓扑里。</p>
+
+<p><strong>余可数拓扑</strong>: 同样思路, 把"<em>有限</em>" 替换成"<em>可数</em>"：</p>
+
+<p>\[
+\tau_{\text{cocount}} = \{\emptyset\} \cup \{U \subseteq X : X \setminus U \text{ 可数}\}.
+\]</p>
+
+<p>验证类似（可数并仍可数, 有限交可数仍可数）。在不可数集（如 \(\mathbb{R}\)）上, 这是<em>另一个</em> 不来自度量的拓扑——它的"<em>奇怪</em>" 性质（任意两个非空开集相交）和余有限类似。它在分析里偶尔用作反例。</p>
+
+<h2 id="sec3-5">3.5 Sierpiński 空间 + 计算机科学</h2>
+
+<p>取 \(X = \{0, 1\}\)（最小的有意思的两点空间）。考虑拓扑</p>
+
+<p>\[
+\tau_S = \{\emptyset, \{1\}, \{0, 1\}\}.
+\]</p>
+
+<p>验证：(O1) \(\emptyset, X \in \tau_S\)。(O2)(O3) 三个集合的所有可能并 / 交全在 \(\tau_S\) 里——容易枚举。\(\checkmark\)</p>
+
+<p>这就是<strong>Sierpiński 空间</strong>。两个点 0 与 1 在拓扑上<em>不平等</em>：\(\{1\}\) 开但 \(\{0\}\) 不开。</p>
+
+<p>这个不对称<em>排除了度量化</em>。原因（ch1.3 已说过, 这里展开）：度量空间里"\(\{x\}\) 开 \(\iff x\) 是孤立点 \(\iff\) 周围有一个邻域只含自己"——这是个对称概念, 任何度量自动让<em>所有</em> 满足条件的点都满足。如果在 Sierpiński 里 \(\{1\}\) 开, 度量结构会要求"\(\{0\}\) 同等程度也开"或"<em>都不开</em>", 不允许"<em>一个开一个不开</em>" 的不对称。所以 Sierpiński 拓扑<em>不可</em> 来自度量。</p>
+
+<p><strong>计算机科学含义</strong>。Sierpiński 在<em>域论</em>（domain theory，编程语言语义的数学理论）里反复出现。把 \(\{0, 1\}\) 看成"<em>是否终止</em>" 的状态：1 = "<em>终止</em>"，0 = "<em>未知 / 还在算 / 永不终止</em>"。</p>
+
+<p>从外部看一个程序——你只能<em>观察到</em> 它<em>已经终止</em>（开集 \(\{1\}\)）, 但<em>不能在有限时间确认</em> 它<em>不会终止</em>（\(\{0\}\) 不开——你需要等无穷长时间才能确认）。这就是<em>停机问题不可判定</em> 在拓扑层面的影像——\(\{0\}\) 的"<em>不开</em>" 编码了"<em>不可观测确认</em>" 的算法事实。</p>
+
+<p>请你停下来欣赏这件事：一个 2 元素小空间, 从纯数学公理出发是合法拓扑, 拒绝度量化, 在<em>计算理论</em> 里编码了停机问题。这种<em>"奇怪空间, 实际意义"</em> 的对应关系是拓扑学的<em>魔法时刻</em> 之一。</p>
+
+<p>更一般的：所有"<em>半决定问题</em>"（如递归可枚举集）都有这种"<em>开集 = 可证明</em>" 的拓扑结构, 这条思路把<em>计算复杂性</em> 翻译成<em>拓扑学</em>。Scott 域、可计算实数、概率程序的语义——背后都是 Sierpiński 风格的不对称拓扑。</p>
+
+<h2 id="sec3-6">3.6 序拓扑（在偏序集上）</h2>
+
+<p>给偏序集 \((X, \le)\)（自反 + 反对称 + 传递, 但不一定全序）。可以从<em>序结构</em> 自然定义一个拓扑。</p>
+
+<p>当 \(X\) 是<em>全序</em> 集（任两元素可比）, 标准做法用<em>开区间</em>：</p>
+
+<p>\[
+(a, b) := \{x \in X : a < x < b\}, \quad (-\infty, b) := \{x : x < b\}, \quad (a, \infty) := \{x : x > a\}.
+\]</p>
+
+<p>把这些"<em>开区间</em>"（含三种类型）作为<em>子基</em>（ch4 概念, 这里先用）, 它们的有限交构成<em>基</em>, 有限交的任意并构成<em>开集</em>——这就给出<em>序拓扑</em>。</p>
+
+<p>例 1。\(X = \mathbb{R}\) 配标准序 \(\le\)。序拓扑 = 标准欧氏拓扑（开区间作为基）。<em>序拓扑恢复欧氏拓扑</em>——这是个一致性验证。</p>
+
+<p>例 2。\(X = \mathbb{N}\) 配标准序。序拓扑：每个单点 \(\{n\}\) 开（取 \((n-1, n+1) = \{n\}\)）——所以这是离散拓扑。同样, 任何全序的<em>有限</em> 集或<em>离散</em> 排列的全序集（如 \(\mathbb{Z}\)）的序拓扑是离散的。</p>
+
+<p>例 3。\(X = [0, 1]\) 配标准序。序拓扑：开区间 \((a, b)\), 加上"<em>含端点</em>" 的<em>半开</em> 邻域 \([0, b)\) 和 \((a, 1]\)（这两个分别是 \((-\infty, b)\) 与 \((a, \infty)\) 限制到 \([0, 1]\)）。验证它们也是欧氏开集（\([0, b) = (- 1, b) \cap [0, 1]\)）。又是欧氏拓扑。</p>
+
+<p>例 4。<em>序数 \(\omega_1\)</em>（最小不可数序数）配标准序——给出"<em>长直线</em>" 类型的奇怪空间, 在反例库里有用。我们暂不展开。</p>
+
+<p>序拓扑的意义：让<em>纯</em> 序信息（没有距离、没有几何）<em>自动产生</em> 拓扑结构。这件事在<em>序理论</em>、<em>集合论拓扑</em>、<em>泛代数</em> 里至关重要。</p>
+
+<h2 id="sec3-7">3.7 Sorgenfrey 直线：可分但非度量化</h2>
+
+<p>这是个<em>非常重要</em> 的反例空间, 拓扑学家叫它<em>下极限拓扑直线</em> 或 <em>Sorgenfrey 直线</em>。</p>
+
+<p>取 \(X = \mathbb{R}\)。考虑用<em>半开区间 \([a, b)\)</em> 作为<em>基</em>：</p>
+
+<p>\[
+\mathcal{B} = \{[a, b) : a < b\}.
+\]</p>
+
+<p>"开集" = "<em>这种半开区间的任意并</em>"。这给一个拓扑 \(\tau_S\), Sorgenfrey 拓扑（也叫下极限拓扑, lower limit topology）。验证 \(\mathcal{B}\) 是基的两条充要条件 (ch4 会展开)：</p>
+
+<ul>
+  <li>\(\mathbb{R} = \bigcup_{n \in \mathbb{Z}} [n, n+1)\), 覆盖。</li>
+  <li>两个 \([a, b) \cap [c, d) = [\max(a, c), \min(b, d))\), 仍是 \([\cdot, \cdot)\) 形式。</li>
+</ul>
+
+<p>所以 \(\mathcal{B}\) 合法生成拓扑。\(\checkmark\)</p>
+
+<p><strong>Sorgenfrey 拓扑比标准欧氏拓扑严格更细</strong>。</p>
+
+<p>原因 1：每个标准开区间 \((a, b) = \bigcup_{n \ge 1} [a + 1/n, b)\), 是 Sorgenfrey 开集的并, 所以 \((a, b) \in \tau_S\)。意味着 \(\tau_{\text{euc}} \subseteq \tau_S\)（Sorgenfrey 比欧氏多）。</p>
+
+<p>原因 2：\([0, 1)\) 是 Sorgenfrey 开（按定义）但<em>不是</em> 欧氏开（左端点 0 没有欧氏邻域全在内部）。所以 \(\tau_{\text{euc}} \subsetneq \tau_S\)（严格更细）。</p>
+
+<p><strong>奇怪性质 1：可分。</strong>\(\mathbb{Q}\) 是可数稠密子集——每个 Sorgenfrey 开集 \([a, b)\) 包含某有理数。所以 Sorgenfrey 直线<em>可分</em>。</p>
+
+<p><strong>奇怪性质 2：非可分度量化（具体: 非<em>第二可数</em>）。</strong>欧氏直线"可分" + "<em>第二可数</em>"（有可数基, ch15）——所以是<em>可分度量化</em> 的典型。Sorgenfrey 直线<em>可分</em> 但<em>不</em> 第二可数（每个含 \(a\) 的开集必须含某 \([a, a + \varepsilon)\), 不同 \(a\) 给本质不同基元素, 不可数多个 \(a\) → 基不可数）。</p>
+
+<p>但有定理（Urysohn）：第二可数 + 正则 \(\Rightarrow\) 可度量化。Sorgenfrey 是正则但<em>不</em> 第二可数, 所以这条定理不直接给度量化。事实上 Sorgenfrey 直线<em>不</em> 度量化。证明用"<em>Sorgenfrey 平方</em>" \(\mathbb{R}_\ell \times \mathbb{R}_\ell\) 不正规——但度量空间必正规, 所以两端不能调和。详细论证留 ch20 后做。</p>
+
+<p>Sorgenfrey 直线的意义：</p>
+
+<ul>
+  <li>它是"<em>可分但非度量化</em>" 的标志性反例——告诉你"<em>可分</em>" 不蕴含"<em>度量化</em>"。</li>
+  <li>它"几乎" 像欧氏直线但又关键性质不同——是测试拓扑性质的"<em>分辨率</em>" 工具。</li>
+  <li>它<em>积</em> 起来产生更奇怪的反例（Sorgenfrey 平方非正规——反 Tychonoff 直觉）。</li>
+</ul>
+
+<p>请你停下来欣赏这件事：把 \(\mathbb{R}\) 上的"开集" 定义微微改一下（从 \((a, b)\) 到 \([a, b)\)）, 你就得到一个本质不同、不来自度量的拓扑。这种"<em>同一集合可以承载本质不同的拓扑</em>" 是拓扑学的核心现象——同一个 \(\mathbb{R}\), 装载不同的开集结构, 给出不同的"<em>几何</em>"。</p>
+
+<h2 id="sec3-8">3.8 比较拓扑：粗 vs 细</h2>
+
+<p>同一集合 \(X\) 上的两个拓扑 \(\tau_1, \tau_2\) 怎么比较？答案：按<em>开集多少</em>。</p>
+
+<p><strong>定义。</strong>\(\tau_1\) 比 \(\tau_2\) <em>粗</em>（coarser，也叫 weaker / smaller）\(\iff\) \(\tau_1 \subseteq \tau_2\)（\(\tau_1\) 的开集都是 \(\tau_2\) 的开集）。等价: \(\tau_2\) 比 \(\tau_1\) <em>细</em>（finer / stronger / larger）。</p>
+
+<p>所以"<em>粗</em>" = <em>开集少</em>, "<em>细</em>" = <em>开集多</em>。这条命名容易混淆——记住：</p>
+
+<p>\[
+\boxed{\ \tau_1 \subseteq \tau_2 \iff \tau_1 \text{ 比 } \tau_2 \text{ 粗 } \iff \tau_2 \text{ 比 } \tau_1 \text{ 细}.\ }
+\]</p>
+
+<p>记忆诀窍：<em>"开集多" 像"<em>筛子细</em>", 能"<em>筛</em>" 出更精细的结构</em>——所以"开集多" = "细"。</p>
+
+<p>例 1。任何 \(\tau\) 满足 \(\tau_0 \subseteq \tau \subseteq \tau_d\)。<em>平凡是最粗, 离散是最细</em>。</p>
+
+<p>例 2。\(\mathbb{R}\) 上：\(\tau_{\text{cof}}\)（余有限）<em>比</em> \(\tau_{\text{euc}}\)（欧氏）<em>粗</em>。验证：每个余有限开集 \(U\)（\(U \neq \emptyset\)）的余集 \(\mathbb{R} \setminus U\) 有限, 所以 \(U\) 是 \(\mathbb{R}\) 减去有限多个点——是欧氏开集（开集差去闭集 = 开集）。所以 \(\tau_{\text{cof}} \subseteq \tau_{\text{euc}}\)。</p>
+
+<p>例 3。\(\mathbb{R}\) 上：\(\tau_{\text{euc}}\)（欧氏）<em>比</em> \(\tau_S\)（Sorgenfrey）<em>粗</em>——已在 3.7 验证。</p>
+
+<p>所以 \(\mathbb{R}\) 上至少有这条<em>从粗到细</em> 的链：</p>
+
+<p>\[
+\tau_0 \subsetneq \tau_{\text{cof}} \subsetneq \tau_{\text{euc}} \subsetneq \tau_S \subsetneq \tau_d.
+\]</p>
+
+<p>这就是<em>同一个 \(\mathbb{R}\) 上的拓扑格</em> 的一条线索——实际拓扑空间<em>多得多</em>, 这只是其中很小一部分。</p>
+
+<p><strong>拓扑格</strong>：\(X\) 上所有拓扑构成一个<em>偏序集</em>（按 \(\subseteq\)）。任意一族拓扑 \(\{\tau_\alpha\}\) 的<em>交</em> \(\bigcap \tau_\alpha\) 仍是拓扑（验证三公理对每个 \(\tau_\alpha\) 都成立, 所以对它们的交也成立）。所以这个偏序集有<em>任意 inf</em>（交）, 它就是个<em>完备格</em>——任意拓扑族也有 sup（"<em>包含每个 \(\tau_\alpha\) 的最粗拓扑</em>", 由 \(\bigcup \tau_\alpha\) 生成的拓扑）。</p>
+
+<p>这个格结构的意义：当你说"<em>X 上的拓扑</em>" 时, 不是指<em>一个</em> 拓扑——而是从一个<em>大量选择</em> 中挑一个。每个选择给一个不同的"<em>拓扑空间</em>", 不同的连续函数集, 不同的紧致集, 不同的同伦类型。</p>
+
+<p>"<em>选哪个拓扑</em>" 取决于你想<em>研究什么</em>。研究分析 → 度量拓扑; 研究代数几何 → Zariski（粗如余有限）; 研究域论 → Sierpiński 风格（粗且不对称）; 研究反例 → 离散 / 平凡 / Sorgenfrey 等。<em>拓扑是工具, 不是给定</em>。</p>
+
+<h2 id="sec3-9">3.9 一个反射动作</h2>
+
+<p>读完这一章你应该养成这个反射：<em>看到"集合 X 上的拓扑" 这种字眼, 立即问"哪个拓扑？"</em></p>
+
+<p>"<em>\(\mathbb{R}\)</em>" 不<em>自动</em> 携带一个唯一拓扑——它是个集合, 你<em>选择</em> 在它上面装载什么拓扑。99% 的场合默认欧氏, 但其余 1% 场合（Zariski、Sorgenfrey、p-adic、Stone）拓扑选择决定了一切。<em>"R" 这个符号本身只指集合, 拓扑是额外结构</em>。</p>
+
+<p>这条反射在<a href="../数论/index.html">数论</a>、<a href="../代数几何/index.html">代数几何</a>、<a href="../泛函分析/index.html">泛函分析</a> 里都有用。比如同一个函数空间 \(C[0, 1]\) 配 \(L^p\) 范数和 sup 范数给本质不同的拓扑——一个完备一个不完备, 一个紧子集多一个少。"<em>哪个范数</em>" = "<em>哪个拓扑</em>"。</p>
+
+<p>下一章我们处理"<em>怎么具体描述一个拓扑</em>" 的工程问题。\(\mathbb{R}\) 上欧氏拓扑有<em>不可数无穷</em> 多个开集——你不可能"<em>列出全部</em>"。但好消息是你<em>不用</em>——只需列<em>一些</em>"<em>生成元</em>"（开区间）, 通过任意并 + 有限交"<em>生成</em>" 全部开集。这种"生成元" 叫<em>基</em>, 类比线性代数里向量空间的基。下一章定义并展示 \(\mathbb{R}^n\)、积空间、子空间等的标准基。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 度量空间复习</a><a href="ch4.html">下一章 · 第 4 章 基与子基 →</a></nav>
+</main>
+</body>
+</html>
