@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 最小二乘与正交多项式 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 分段多项式与样条</a><a href="ch13.html">下一章 · 第 13 章 数值微分 →</a></nav>
+<h1 id="ch12">第 12 章 最小二乘与正交多项式</h1>
+
+<p>前三章假设数据点<em>精确</em>——曲线必须穿过每一个。但现实里数据通常带噪声：实验测量、传感器读数、模拟数值结果都有误差。<em>强迫</em>曲线穿过噪声等于把噪声当真——曲线被噪声污染，预测能力下降。</p>
+
+<p>这一章换思路：放弃"穿过每一点"，改成"<em>总误差最小</em>"。具体来说——用一个简单的低维曲线族（比如直线、抛物线、低次多项式、若干个基函数的线性组合），找族里和数据"最匹配" 的那一个。"最匹配" 在<em>欧式平方距离</em>下定义——这就是<em>最小二乘</em>。</p>
+
+<p>最小二乘是数据科学里出现频率最高的优化问题之一。本章把它的数学（normal equations / QR / SVD）、稳定性、和正交多项式的联系讲清。</p>
+
+<h2 id="sec12-1">12.1 数据有噪声：插值不再合适</h2>
+
+<p>来一个具体场景。你做实验测了 10 个温度下某金属的电阻，理论上电阻是温度的线性函数 \(R = a + b T\)。但每次测量有 \(\pm 0.1 \Omega\) 的噪声。10 个数据点画在 \(T\)-\(R\) 平面上不严格共线，是有点散乱的"近直线" 点云。</p>
+
+<p>你<em>能</em>用 9 次多项式插值穿过 10 个点——但那曲线会剧烈震荡，<em>它的预测在数据点之间是垃圾</em>。原因：你假设了"真函数是 9 次多项式"，但其实"真函数是直线 + 噪声"。两者拟合出来的<em>插值</em>多项式只准确反映"噪声"，不反映"真信号"。</p>
+
+<p>正确做法：放弃"插值"，改用"<em>拟合</em>"——找一条最适合数据的<em>直线</em>，不要求穿过任何一点。让</p>
+
+<p>\[
+\sum_{i=1}^{n} (R_i - (a + b T_i))^2
+\]</p>
+
+<p>最小。这就是最简单的最小二乘问题。</p>
+
+<p>请你停下来感受这种范式转换：插值 = "<em>每点都准</em>"，拟合 = "<em>总体最准</em>"。前者把每个数据点当 100% 真，后者当作"<em>带不确定性的样本</em>"。<em>当你不确定数据是不是真值时，永远拟合，不要插值</em>。这条原则在工程里几乎万能。</p>
+
+<h2 id="sec12-2">12.2 一般最小二乘问题</h2>
+
+<p>把上面具体场景推广。设你有数据 \((x_i, y_i)\)，\(i = 1, \ldots, m\)，要找参数 \(\beta \in \mathbb{R}^p\) 使</p>
+
+<p>\[
+y_i \approx \sum_{j=1}^p \beta_j \phi_j(x_i)
+\]</p>
+
+<p>其中 \(\phi_1, \ldots, \phi_p\) 是你选的<em>基函数</em>。例：</p>
+
+<ul>
+  <li>直线拟合：\(\phi_1(x) = 1, \phi_2(x) = x\)，\(p = 2\)。</li>
+  <li>抛物线拟合：\(\phi_1 = 1, \phi_2 = x, \phi_3 = x^2\)，\(p = 3\)。</li>
+  <li>傅里叶拟合：\(\phi_k(x) = \cos(k x), \sin(k x)\)。</li>
+  <li>径向基函数拟合：\(\phi_k(x) = \exp(-(x - c_k)^2 / 2\sigma^2)\) 中心 \(c_k\)。</li>
+</ul>
+
+<p>定义残差 \(r_i = y_i - \sum_j \beta_j \phi_j(x_i)\)。最小二乘问题：</p>
+
+<p>\[
+\boxed{\ \min_{\beta \in \mathbb{R}^p} \sum_{i=1}^m r_i^2 = \min_\beta \|y - A\beta\|_2^2,\ }
+\]</p>
+
+<p>其中 \(A_{ij} = \phi_j(x_i)\) 是 \(m \times p\) 的<em>设计矩阵</em>，\(y \in \mathbb{R}^m\) 是数据向量。</p>
+
+<p>关键设定：\(m > p\)（数据点数 > 参数个数）。这叫<em>超定</em> 系统——方程多于未知数，<em>没有</em>能让所有残差为 0 的 \(\beta\)（除非数据本来就完美在子空间里）。最小二乘选"<em>误差平方和最小</em>" 的那个 \(\beta\)。</p>
+
+<h2 id="sec12-3">12.3 几何：投影到列空间</h2>
+
+<p>把 \(A \beta\) 看成 \(A\) 的<em>列空间</em>里的元素：\(A \beta = \beta_1 a_1 + \cdots + \beta_p a_p\)，其中 \(a_j\) 是 \(A\) 的第 \(j\) 列。所以问题是：在 \(A\) 的列空间 \(\text{Range}(A)\) 中找离 \(y\) 最近的点。</p>
+
+<p>由<a href="../泛函分析/ch6.html">《泛函分析读本》第 6 章</a>的 Hilbert 空间几何，最近点是 \(y\) 在 \(\text{Range}(A)\) 上的<em>正交投影</em>。这个投影 \(\hat y\) 唯一，残差 \(r = y - \hat y\) 垂直于 \(\text{Range}(A)\)：</p>
+
+<p>\[
+A^T r = 0 \implies A^T (y - A \beta) = 0 \implies A^T A \beta = A^T y.
+\]</p>
+
+<p>这是<em>正规方程</em>（normal equations）：</p>
+
+<p>\[
+\boxed{\ A^T A \beta = A^T y.\ }
+\]</p>
+
+<p>\(A^T A\) 是 \(p \times p\) 对称矩阵；正定如果 \(A\) 列满秩。所以原则上你可以解这个线性方程组得 \(\beta\)。</p>
+
+<p>例（直线拟合 \(R = a + b T\)）：\(A = \begin{pmatrix} 1 & T_1 \\ 1 & T_2 \\ \vdots & \vdots \\ 1 & T_n \end{pmatrix}\)，\(\beta = \begin{pmatrix} a \\ b \end{pmatrix}\)。</p>
+
+<p>\(A^T A = \begin{pmatrix} n & \sum T_i \\ \sum T_i & \sum T_i^2 \end{pmatrix}\)，\(A^T y = \begin{pmatrix} \sum R_i \\ \sum T_i R_i \end{pmatrix}\)。</p>
+
+<p>解出</p>
+
+<p>\[
+b = \frac{n \sum T_i R_i - \sum T_i \sum R_i}{n \sum T_i^2 - (\sum T_i)^2}, \quad a = \frac{\sum R_i - b \sum T_i}{n}.
+\]</p>
+
+<p>这条公式你可能在统计课见过——线性回归的 OLS 估计。它就是最小二乘正规方程的解。</p>
+
+<h2 id="sec12-4">12.4 为什么不用正规方程</h2>
+
+<p>正规方程数学上对，<em>数值上糟</em>。原因：\(A^T A\) 的条件数<em>是 \(A\) 条件数的平方</em>。</p>
+
+<p>具体：\(\kappa_2(A^T A) = \kappa_2(A)^2\)。所以如果 \(A\) 条件数 \(10^4\)（中等），\(A^T A\) 条件数 \(10^8\)——求解线性方程组的精度损失 8 位。如果 \(A\) 条件数 \(10^8\)，\(A^T A\) 条件数 \(10^{16}\)——双精度下 0 位有效精度。</p>
+
+<p>同样的最小二乘问题，<em>不</em>组装 \(A^T A\) 而是直接对 \(A\) 做<em>QR 分解</em>，能保留 \(A\) 的条件数（不平方），精度好得多。</p>
+
+<p>所以实战准则：<em>不要</em>用正规方程；用 <em>QR 分解</em> 解最小二乘。</p>
+
+<h2 id="sec12-5">12.5 QR 解最小二乘</h2>
+
+<p>把 \(A\) 写成 \(A = Q R\)，其中 \(Q\) 是 \(m \times p\) 列正交（\(Q^T Q = I\)）、\(R\) 是 \(p \times p\) 上三角。这种分解存在性与具体算法在<a href="ch17.html">第 17 章</a>详谈，本节直接用它。</p>
+
+<p>正规方程 \(A^T A \beta = A^T y\) 变成</p>
+
+<p>\[
+R^T Q^T Q R \beta = R^T Q^T y \implies R^T R \beta = R^T Q^T y.
+\]</p>
+
+<p>\(R\) 上三角且非奇（\(A\) 列满秩时），\(R^T\) 下三角非奇——可消去，得</p>
+
+<p>\[
+\boxed{\ R \beta = Q^T y.\ }
+\]</p>
+
+<p>\(R\) 上三角，反向回代 \(O(p^2)\) 解出 \(\beta\)。</p>
+
+<p>关键<em>不需要算 \(A^T A\)</em>——直接对 \(A\) 做 QR，然后回代。条件数损失从 \(\kappa(A)^2\) 降到 \(\kappa(A)\)——精度多保 8 位（在 \(\kappa = 10^4\) 时）。</p>
+
+<p>SciPy 的 <code>numpy.linalg.lstsq(A, y)</code> 就是这条路径（实际用 SVD 而非 QR，更稳但稍贵）。MATLAB 的 <code>A \ y</code> 也是。<em>从来不要</em>写 <code>inv(A.T @ A) @ (A.T @ y)</code>——那等价于正规方程加显式求逆，是数值灾难叠灾难。</p>
+
+<h2 id="sec12-6">12.6 正交多项式</h2>
+
+<p>当基函数是<em>多项式</em>时，最小二乘的稳定性还能更进一步。具体：用<em>正交多项式</em>作基。</p>
+
+<p>"正交" 是相对某个内积说的。比如在 \([-1, 1]\) 上配权 \(w(x) = 1\)：</p>
+
+<p>\[
+\langle p, q \rangle := \int_{-1}^1 p(x) q(x) \, dx.
+\]</p>
+
+<p>把单项式 \(\{1, x, x^2, \ldots\}\) 用 Gram–Schmidt 正交化，得到一族<em>Legendre 多项式</em>：</p>
+
+<p>\[
+P_0 = 1, \quad P_1 = x, \quad P_2 = \frac{1}{2}(3 x^2 - 1), \quad P_3 = \frac{1}{2}(5 x^3 - 3 x), \quad \ldots
+\]</p>
+
+<p>它们满足 \(\int_{-1}^1 P_i P_j \, dx = \frac{2}{2 i + 1} \delta_{ij}\)。两两正交，归一化为 \(2/(2i+1)\)。</p>
+
+<p>用 Legendre 多项式作基函数做最小二乘，设计矩阵 \(A\) 的列<em>近似</em>正交（在数据点足够密 + 等距时几乎严格正交）。所以 \(A^T A\) 接近对角矩阵——条件数<em>接近 1</em>，正规方程不再糟。</p>
+
+<p>更妙的：在<em>连续</em>意义下做最小二乘——找最佳多项式 \(p\) 使 \(\int |f - p|^2 dx\) 最小——答案是 \(f\) 在 Legendre 基上的投影 \(\sum_k \frac{\langle f, P_k \rangle}{\langle P_k, P_k \rangle} P_k\)。系数完全显式（一族积分）。这是一个<em>没有方程要解</em>的最小二乘——纯粹的"算系数"。</p>
+
+<p>常见正交多项式族（按权函数）：</p>
+
+<ul>
+  <li><strong>Legendre</strong>：\([-1, 1]\) 上 \(w = 1\)。</li>
+  <li><strong>Chebyshev (第一类)</strong>：\([-1, 1]\) 上 \(w = 1/\sqrt{1 - x^2}\)。Chebyshev 节点处插值的最佳逼近基。</li>
+  <li><strong>Hermite</strong>：\(\mathbb{R}\) 上 \(w = e^{-x^2}\)。<em>量子谐振子</em>本征函数（链回<a href="../泛函分析/ch24.html">《泛函分析读本》第 24 章</a>）。</li>
+  <li><strong>Laguerre</strong>：\([0, \infty)\) 上 \(w = e^{-x}\)。氢原子径向波函数。</li>
+</ul>
+
+<p>每族有它适合的"<em>权 + 区间</em>" 配对。选哪个看你问题在哪个区间、有什么权重。</p>
+
+<h2 id="sec12-7">12.7 实战：什么时候用最小二乘</h2>
+
+<p>三类典型场景：</p>
+
+<p><strong>场景 1：数据拟合（regression）。</strong>实验数据，假设的物理模型，用最小二乘估参数。这是<em>统计学</em>整门课的基础。SciPy 的 <code>scipy.optimize.curve_fit</code> 是非线性最小二乘的便利封装；<code>scipy.linalg.lstsq</code> 是线性的。</p>
+
+<p><strong>场景 2：函数逼近。</strong>给一个昂贵函数 \(f\)，找一个便宜的多项式 / 三角和等近似它。在性能关键代码（GPU 着色器、嵌入式控制系统、神经网络激活函数）里非常常用。这种情况下用<em>正交多项式</em>做最小二乘最稳。</p>
+
+<p><strong>场景 3：求解超定方程组。</strong>你有更多方程而不是未知数，方程互相不一致——最小二乘给"<em>最一致</em>" 的解。常见于：传感器融合（多个传感器测量同一状态）、地球物理反演、机器学习正则化最小二乘。</p>
+
+<p>一些"<em>陷阱</em>"：</p>
+
+<ul>
+  <li><em>用单项式 \(\{1, x, x^2, \ldots, x^{20}\}\) 做高次最小二乘 → \(A^T A\) 病态</em>。Vandermonde 矩阵的条件数 \(n = 20\) 时已经 \(10^{15}\)。改用 Chebyshev 或 Legendre 基。</li>
+  <li><em>等权最小二乘假设了"残差独立同方差"</em>——实际数据各点测量精度不同时该用<em>加权</em>最小二乘 \(\min \sum w_i r_i^2\)。\(w_i = 1/\sigma_i^2\) 是统计最优。</li>
+  <li><em>离群点（outliers）</em>会拉偏最小二乘——平方让大残差比例放大。修法：用 <em>L1 拟合</em>（最小化残差绝对值之和）或 <em>稳健回归</em>（如 Huber 损失）。这些不在本书范围。</li>
+  <li><em>共线性</em>：基函数之间近似线性相关 → \(A^T A\) 奇异 / 几乎奇异 → 解 \(\beta\) 不唯一或剧烈震荡。修法：<em>正则化</em>（Ridge / Tikhonov，加 \(\lambda \|\beta\|^2\) 惩罚）或<em>降维</em>（PCA + 回归）或换基函数。</li>
+</ul>
+
+<p>正则化值得多说一句。Tikhonov 正则化最小二乘</p>
+
+<p>\[
+\min_\beta \|A \beta - y\|_2^2 + \lambda \|\beta\|_2^2
+\]</p>
+
+<p>等价于解</p>
+
+<p>\[
+(A^T A + \lambda I) \beta = A^T y.
+\]</p>
+
+<p>\(\lambda I\) 把 \(A^T A\) "<em>抬</em>" 离奇异，让条件数变小。代价：\(\beta\) 被"压向 0" 的偏置。\(\lambda\) 选择是个艺术（交叉验证、L-曲线等）。这条<em>正则化最小二乘</em>是机器学习里 Ridge 回归、L2 正则化的本质。</p>
+
+<p>下一章我们换主题——从"<em>用数据拟合函数</em>" 到"<em>用函数算微分和积分</em>"。数值微分（下一章）是最难的之一——上一章末尾我们已看到它的 V 形误差曲线，下一章正面攻击。数值积分（之后两章）反而比数值微分容易得多——这是数值方法里反直觉但极重要的事实。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 分段多项式与样条</a><a href="ch13.html">下一章 · 第 13 章 数值微分 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 分段多项式与三次样条 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 插值误差与 Runge 现象</a><a href="ch12.html">下一章 · 第 12 章 最小二乘 →</a></nav>
+<h1 id="ch11">第 11 章 分段多项式与三次样条</h1>
+
+<p>上一章 Runge 现象的 lesson 是：<em>用一个高次多项式覆盖整个区间是个坏主意</em>。Chebyshev 节点修了一部分（在你能选节点时），但很多实际场景里你<em>不能</em>选节点——数据是按时间均匀采样的、是按物理传感器位置摆好的、是已经预存的等距网格。在这些情况下，修法不是"<em>更高次</em>"，是"<em>分段低次</em>"。</p>
+
+<p>这一章给最常用的"分段低次" 方法：<em>三次样条</em>。它在每段上是 3 次多项式，段与段在节点处光滑接合（值、一阶、二阶都连续）。三次样条几乎是工程实战里"<em>插值</em>" 这个词的默认含义——MATLAB、Mathematica、SciPy、各 CAD 软件、各动画软件，"插值" 的默认实现都是某种形式的三次样条。</p>
+
+<h2 id="sec11-1">11.1 分段思路</h2>
+
+<p>把 \([a, b]\) 切成 \(n\) 段：\(a = x_0 < x_1 < \cdots < x_n = b\)。在每段 \([x_i, x_{i+1}]\) 上用一个<em>低次</em>多项式 \(s_i(x)\)。整体函数 \(S(x)\) 由各段拼起来：\(S|_{[x_i, x_{i+1}]} = s_i\)。</p>
+
+<p>核心好处：</p>
+
+<ul>
+  <li>每段次数低（1 次、2 次或 3 次），<em>没有</em> Runge 现象的高次震荡。</li>
+  <li>"<em>局部行为</em>" 由局部多项式决定——一段的 \(s_i\) 不影响远处。</li>
+  <li>容易控制。</li>
+</ul>
+
+<p>核心权衡：节点 \(x_i\) 处段与段接合时<em>多光滑</em>。这是设计选择：</p>
+
+<ul>
+  <li><em>只值连续</em>：\(C^0\)，可能有"折角"。</li>
+  <li><em>值 + 一阶导连续</em>：\(C^1\)，平滑但二阶导可能跳。</li>
+  <li><em>值 + 一阶 + 二阶导连续</em>：\(C^2\)，看上去和"原函数" 没差别。三次样条就是这个。</li>
+</ul>
+
+<p>更高的光滑度（\(C^3\) 等）可以做但通常不需要——<em>三次样条已经满足绝大多数应用</em>。</p>
+
+<h2 id="sec11-2">11.2 分段线性插值</h2>
+
+<p>最朴素：每段是直线。点 \((x_i, y_i)\) 和 \((x_{i+1}, y_{i+1})\) 用线段连：</p>
+
+<p>\[
+s_i(x) = y_i + \frac{y_{i+1} - y_i}{x_{i+1} - x_i}(x - x_i), \quad x \in [x_i, x_{i+1}].
+\]</p>
+
+<p>整体 \(S\) 是<em>折线</em>——\(C^0\) 但不 \(C^1\)。</p>
+
+<p>误差：如果 \(f \in C^2\)，</p>
+
+<p>\[
+\max_{x \in [x_i, x_{i+1}]} |f(x) - s_i(x)| \le \frac{(x_{i+1} - x_i)^2}{8} \max_x |f''(x)|.
+\]</p>
+
+<p>所以全区间最大误差是 \(O(h^2)\)，其中 \(h = \max_i (x_{i+1} - x_i)\) 是<em>网格尺度</em>。</p>
+
+<p>"\(O(h^2)\)" 翻译成实用：把节点数加倍（\(h\) 减半），误差减小四倍。要 16 位精度（误差 \(10^{-15}\)），\(h \approx 10^{-8}\)——节点数得 \(10^8\)。<em>不可接受</em>。</p>
+
+<p>分段线性的<em>好处</em>是简单 + 局部，但收敛<em>太慢</em>。我们需要更高阶的分段方法——同时保留"分段" 的好处和"高阶" 的快收敛。三次样条是答案。</p>
+
+<h2 id="sec11-3">11.3 三次样条：定义</h2>
+
+<p>函数 \(S : [a, b] \to \mathbb{R}\) 叫<strong>三次样条</strong>，如果：</p>
+
+<ul>
+  <li>(a) 在每段 \([x_i, x_{i+1}]\) 上 \(S\) 是 3 次多项式；</li>
+  <li>(b) \(S(x_i) = y_i\) 对所有 \(i\)（插值条件）；</li>
+  <li>(c) \(S, S', S''\) 在所有内部节点 \(x_1, \ldots, x_{n-1}\) 处连续。</li>
+</ul>
+
+<p>"\(C^2\) 光滑" 是关键——\(S''\) 连续意味着曲率没跳变，看起来像"<em>真实</em>函数"。这是三次样条比折线显著好的原因之一。</p>
+
+<p>计数自由度。每段 4 个系数（\(a_i + b_i x + c_i x^2 + d_i x^3\)），\(n\) 段共 \(4n\) 个未知数。</p>
+
+<p>条件：</p>
+
+<ul>
+  <li>\(2n\) 个：每段两端值匹配数据 (\(s_i(x_i) = y_i, s_i(x_{i+1}) = y_{i+1}\))；</li>
+  <li>\(n - 1\) 个：内部节点 \(s_i'(x_{i+1}) = s_{i+1}'(x_{i+1})\)（一阶导连续）；</li>
+  <li>\(n - 1\) 个：内部节点 \(s_i''(x_{i+1}) = s_{i+1}''(x_{i+1})\)（二阶导连续）。</li>
+</ul>
+
+<p>合计 \(4n - 2\) 个方程。比未知数少 2 个——所以三次样条<em>不唯一</em>，需要补 2 个边界条件。</p>
+
+<h2 id="sec11-4">11.4 边界条件四选一</h2>
+
+<p>常见 4 种补法：</p>
+
+<p><strong>(BC1) 自然样条（natural）。</strong>\(S''(x_0) = S''(x_n) = 0\)。即两端"<em>无曲率</em>"，曲线在端点附近接近线性。物理直觉：钢条只在内部节点固定，两端自由——它会松弛到无曲率。这是数学上最"对称" 的选择。</p>
+
+<p><strong>(BC2) 夹紧样条（clamped）。</strong>\(S'(x_0) = y_0', S'(x_n) = y_n'\) 给定。即<em>已知</em>两端的斜率。需要额外信息（端点导数），但精度比自然样条高一阶。</p>
+
+<p><strong>(BC3) 周期样条（periodic）。</strong>\(S^{(k)}(x_0) = S^{(k)}(x_n)\) for \(k = 0, 1, 2\)。前提：\(y_0 = y_n\)。用于周期数据（信号、轨道）。</p>
+
+<p><strong>(BC4) 非节样条（not-a-knot）。</strong>\(S'''\) 在 \(x_1\) 和 \(x_{n-1}\) 处也连续。等价：\(s_0\) 和 \(s_1\) 是同一个 3 次多项式（"\(x_1\) 不再是真节点"），\(s_{n-2}\) 和 \(s_{n-1}\) 同理。这是 MATLAB / SciPy 的<em>默认</em>选择，因为它不需要额外信息又比自然样条精度高。</p>
+
+<p>实战经验：</p>
+
+<ul>
+  <li>不知道选哪个 → 用 not-a-knot（默认）。</li>
+  <li>明知端点导数 → 用 clamped（精度最高）。</li>
+  <li>数据是周期 → 用 periodic。</li>
+  <li>"自然样条" 听上去最简单，但精度<em>不</em>好（端点附近误差比内部高一阶）。日常工作里用得不多。</li>
+</ul>
+
+<h2 id="sec11-5">11.5 怎么算样条</h2>
+
+<p>常见的实现是<em>"二阶导版本"</em>——把节点处的二阶导 \(M_i = S''(x_i)\) 当未知数，导出一个三对角线性方程组。</p>
+
+<p>推导（草图）。在 \([x_i, x_{i+1}]\) 上 \(S''\) 是<em>线性</em>的（因为 \(S\) 是三次的），由两端值 \(M_i, M_{i+1}\) 决定。两次积分加上端点条件 \(S(x_i) = y_i, S(x_{i+1}) = y_{i+1}\) 给出 \(s_i\) 显式形式。</p>
+
+<p>用一阶导连续条件 \(s_i'(x_{i+1}) = s_{i+1}'(x_{i+1})\) 得到</p>
+
+<p>\[
+\frac{h_{i-1}}{6} M_{i-1} + \frac{h_{i-1} + h_i}{3} M_i + \frac{h_i}{6} M_{i+1} = \frac{y_{i+1} - y_i}{h_i} - \frac{y_i - y_{i-1}}{h_{i-1}},
+\]</p>
+
+<p>其中 \(h_i = x_{i+1} - x_i\)。这条方程对每个内部节点 \(i = 1, \ldots, n-1\) 成立——共 \(n - 1\) 个方程，\(n + 1\) 个未知数 \(M_0, M_1, \ldots, M_n\)。补两个边界条件给 \(M_0\) 和 \(M_n\)（自然样条直接给 \(M_0 = M_n = 0\)）。</p>
+
+<p>得到的线性方程组是<em>三对角</em>——每行只 3 个非零元素（\(M_{i-1}, M_i, M_{i+1}\)）。三对角系统用<em>Thomas 算法</em>（高斯消元的特殊化）\(O(n)\) 解出。所以整个三次样条构造是 \(O(n)\) 时间。</p>
+
+<p>有了 \(M_i\)，每段的 \(s_i\) 就有显式公式：</p>
+
+<p>\[
+s_i(x) = M_i \frac{(x_{i+1} - x)^3}{6 h_i} + M_{i+1} \frac{(x - x_i)^3}{6 h_i} + \left(\frac{y_i}{h_i} - \frac{M_i h_i}{6}\right)(x_{i+1} - x) + \left(\frac{y_{i+1}}{h_i} - \frac{M_{i+1} h_i}{6}\right)(x - x_i).
+\]</p>
+
+<p>看着复杂但都是直接展开。SciPy 的 <code>CubicSpline</code> 内部就是这条流程。</p>
+
+<h2 id="sec11-6">11.6 收敛、好处、局限</h2>
+
+<p><strong>收敛速率。</strong>对 \(f \in C^4\)，</p>
+
+<p>\[
+\boxed{\ \max_x |f(x) - S(x)| = O(h^4),\ }
+\]</p>
+
+<p>其中 \(h = \max_i h_i\) 是网格最大尺度。</p>
+
+<p>对比分段线性的 \(O(h^2)\)：节点数加倍，三次样条误差减小<em>16 倍</em>而不是 4 倍。要 16 位精度只需 \(h \approx 10^{-4}\)——节点数 \(\sim 10^4\)，远比线性的 \(10^8\) 实用。</p>
+
+<p>更妙的：<em>不</em>受 Runge 现象影响。无论你的节点等距还是不等距，无论 \(f\) 在哪个区域更"难"（变化快），三次样条都温和地拟合。</p>
+
+<p><strong>好处清单</strong>：</p>
+
+<ul>
+  <li>\(O(n)\) 构造，\(O(\log n)\) 求值（找正确段 + 评估）。</li>
+  <li>\(O(h^4)\) 收敛——比分段线性高两阶。</li>
+  <li>对节点不挑——等距、不等距、聚集都行。</li>
+  <li>对数据形状鲁棒——不出 Runge。</li>
+  <li>\(C^2\) 光滑——视觉和物理上都"自然"。</li>
+</ul>
+
+<p><strong>局限</strong>：</p>
+
+<ul>
+  <li><em>非局部</em>。三对角方程组的解 \(M_i\) 全局耦合——动一个 \(y_i\) 会改变远处所有 \(M_j\)（虽然影响指数衰减）。如果你需要"<em>真</em>局部" 修改（比如 CAD 里拖一个控制点只影响附近曲线），用 <em>B-spline</em>（<a href="ch12.html">下一章</a>末尾会提）。</li>
+  <li><em>边界条件影响</em>。端点附近精度依赖于边界条件选择。处理不当会有可见的端点伪影。</li>
+  <li><em>不能处理跳点 / 折角</em>。如果 \(f\) 真的有跳变，强迫 \(C^2\) 光滑会让样条在跳点附近过冲。</li>
+  <li><em>过冲（overshoot）</em>。即使 \(f\) 只是<em>陡峭</em>而非真跳变，三次样条可能在陡变区域产生轻微过冲（典型 5-10%）。修法用<em>单调</em>样条（如 PCHIP—— Piecewise Cubic Hermite Interpolating Polynomial），它牺牲一点光滑性换严格单调。</li>
+</ul>
+
+<h2 id="sec11-7">11.7 实战与生态</h2>
+
+<p>SciPy 的<em>插值族</em>：</p>
+
+<ul>
+  <li><code>scipy.interpolate.CubicSpline</code>：经典三次样条。</li>
+  <li><code>scipy.interpolate.PchipInterpolator</code>：单调样条，保形。</li>
+  <li><code>scipy.interpolate.Akima1DInterpolator</code>：Akima 样条，对离群点更稳健。</li>
+  <li><code>scipy.interpolate.UnivariateSpline</code>：带<em>平滑</em>参数的样条——可以在严格插值与平滑拟合之间调节，对噪声数据有用（连接到下一章的最小二乘思想）。</li>
+</ul>
+
+<p>对二维 / 高维数据：</p>
+
+<ul>
+  <li><code>scipy.interpolate.RectBivariateSpline</code>：规则二维网格。</li>
+  <li><code>scipy.interpolate.griddata</code>：散点数据。</li>
+  <li><code>scipy.interpolate.RBFInterpolator</code>：基于径向基函数的高维插值。</li>
+</ul>
+
+<p>实际工程里 99% 的插值任务直接用其中一个即可。<em>不</em>要从头实现样条（有大量边界 case 容易踩坑）；<em>要</em>理解它们的数学，知道哪里会出问题、如何诊断。</p>
+
+<p>下一章我们退一步问：<em>如果数据有噪声呢？</em>"插值" 强迫曲线穿过<em>每个</em>数据点——但如果数据点本来就是"<em>真值 + 噪声</em>"，强迫穿过它们意味着穿过噪声，曲线被噪声污染。这种情况要的是<em>拟合</em>，不是插值。最经典的拟合方法是<em>最小二乘</em>——找一个低维参数族里的"最佳" 曲线，不要求穿过每个点，只要求总平方误差最小。下一章把它和数值线性代数（QR 分解、正交多项式）结合，给一套既稳定又高效的算法。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 插值误差与 Runge 现象</a><a href="ch12.html">下一章 · 第 12 章 最小二乘 →</a></nav>
+</main>
+</body>
+</html>

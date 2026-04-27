@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 插值误差、Runge 现象、Chebyshev 节点 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 多项式插值</a><a href="ch11.html">下一章 · 第 11 章 分段多项式与样条 →</a></nav>
+<h1 id="ch10">第 10 章 插值误差、Runge 现象、Chebyshev 节点</h1>
+
+<p>上一章末尾我说了一件让人不安的事：在等距节点上对"<em>温和</em>" 的函数做高次多项式插值，可以<em>越插越烂</em>。这一章把这件事的<em>原因</em>看清楚，并给出修法。</p>
+
+<p>三件事：(1) 一个具体的灾难（Runge 函数）；(2) 误差公式告诉你灾难来自<em>节点几何</em>；(3) 把节点放到 Chebyshev 点上修复一切。</p>
+
+<h2 id="sec10-1">10.1 一个让你大吃一惊的实验</h2>
+
+<p>取 Runge 1901 年的著名例子：</p>
+
+<p>\[
+f(x) = \frac{1}{1 + 25 x^2}, \quad x \in [-1, 1].
+\]</p>
+
+<p>这是个钟形函数，最大值 1（在 \(x = 0\) 处），向两端递减到 \(1/26 \approx 0.038\)。光滑、有界、看起来非常温和。</p>
+
+<p>用 \(n + 1\) 个<em>等距</em>节点 \(x_i = -1 + 2i/n\) 做多项式插值。看不同 \(n\) 的最大误差 \(\max_x |f(x) - p_n(x)|\)：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(n\)</th><th style="padding: 0.3em 1em;">最大误差</th></tr>
+<tr><td>5</td><td>\(\sim 0.43\)</td></tr>
+<tr><td>10</td><td>\(\sim 1.92\)</td></tr>
+<tr><td>15</td><td>\(\sim 7.19\)</td></tr>
+<tr><td>20</td><td>\(\sim 59.8\)</td></tr>
+<tr><td>30</td><td>\(\sim 7.4 \times 10^4\)</td></tr>
+<tr><td>50</td><td>\(\sim 10^{12}\)</td></tr>
+</table>
+
+<p>等距节点数从 6 加到 51，最大误差从 0.43 涨到 \(10^{12}\)。<em>多用节点反而更不准</em>。</p>
+
+<p>误差长在哪里？画一下 \(p_{20}(x)\) 你会看到：在 \(x = 0\) 附近 \(p\) 和 \(f\) 几乎一样准；越往两端 \(p\) 震荡越厉害；在 \(x = \pm 1\) 附近 \(p\) 的振幅几十倍于 \(f\)。这种"<em>端点附近指数级震荡</em>" 就是 Runge 现象。</p>
+
+<p>请你停下来想：上一章定理保证了"多项式插值<em>存在唯一</em>"——可没保证它<em>逼近原函数</em>。多项式确确实实穿过了所有 21 个数据点。但它在数据点之间的行为——是不是温和地"连" 这些点——完全不受插值条件控制。在等距节点 + 不太好的 \(f\) 下，它选择了"剧烈震荡然后通过节点" 而不是"温和过渡通过节点"。</p>
+
+<h2 id="sec10-2">10.2 误差公式：节点位置决定一切</h2>
+
+<p>把<a href="ch9.html">上一章</a>提到的精确误差公式写出来：</p>
+
+<p>\[
+\boxed{\ f(x) - p_n(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!} \prod_{i=0}^n (x - x_i),\ }
+\]</p>
+
+<p>其中 \(\xi\) 在 \(\{x_0, \ldots, x_n, x\}\) 的最小区间内的某点。证明用 Rolle 定理 \(n + 1\) 次（或者 Newton 差商的极限版本）。</p>
+
+<p>这条公式把误差<em>分解成两块</em>：</p>
+
+<ul>
+  <li><em>函数项</em> \(f^{(n+1)}(\xi) / (n+1)!\)：和 \(f\) 多光滑有关，和节点位置无关。</li>
+  <li><em>节点项</em> \(\omega_n(x) := \prod_i (x - x_i)\)：和 \(f\) 无关，纯粹由节点位置决定。</li>
+</ul>
+
+<p>对 Runge 函数 \(f(x) = 1/(1 + 25 x^2)\)，\(f^{(n)}\) 增长很快——\(f\) 在<em>复平面</em> \(x = \pm i / 5\) 有奇点，奇点离实轴近就让 \(f^{(n)}\) 大。但这不是问题的全部——同样的 \(f\) 用<em>不同节点</em>结果会完全不同。问题的主要驱动是<em>节点项</em>。</p>
+
+<p>看等距节点的 \(\omega_n(x)\) 行为：</p>
+
+<ul>
+  <li>在区间中间，\(\omega_n\) 较小（节点环绕 \(x\)，正负因子部分抵消）。</li>
+  <li>在区间端点附近（比如 \(x \in [-1, -0.9]\) 与节点 \([-1, -0.8, -0.6, \ldots]\)），\(\omega_n\) 很大——所有因子<em>同号</em>且某些远，乘起来爆炸。</li>
+</ul>
+
+<p>具体：\(\max_x |\omega_n(x)|\) 在等距节点下随 \(n\) <em>指数</em>增长。这就是端点附近震荡的根。</p>
+
+<p>修法：<em>选不同节点让 \(\omega_n\) 更平均</em>。理想是<em>所有 \(x \in [-1, 1]\) 上 \(|\omega_n(x)|\) 大致相等</em>——这就是 Chebyshev 节点。</p>
+
+<h2 id="sec10-3">10.3 Chebyshev 节点</h2>
+
+<p>把节点放在</p>
+
+<p>\[
+\boxed{\ x_k = \cos\left( \frac{(2k + 1)\pi}{2(n + 1)} \right), \quad k = 0, 1, \ldots, n.\ }
+\]</p>
+
+<p>这些是<em>第一类 Chebyshev 多项式</em> \(T_{n+1}\) 的根。它们的几何特征：<em>两端密、中间疏</em>，不均匀分布在 \([-1, 1]\)。</p>
+
+<p>节点间距大约 \(O(1/n^2)\) 在端点处、\(O(1/n)\) 在中间。这种"<em>端点密集</em>" 是关键——它让 \(\omega_n(x)\) 在端点附近<em>不</em>爆炸。</p>
+
+<p>核心定理（Chebyshev 节点的最优性）：在所有"首一 \(n+1\) 次多项式" 中，\(T_{n+1}(x) / 2^n\) 是<em>使 \(\max_{x \in [-1, 1]} |\cdot|\) 最小</em>的那一个。这意味着 Chebyshev 节点选择让</p>
+
+<p>\[
+\max_{x \in [-1, 1]} |\omega_n(x)| = \frac{1}{2^n}.
+\]</p>
+
+<p>这是个<em>指数小</em>的量。和等距节点的指数<em>大</em>形成天壤之别。</p>
+
+<p>把这个代回误差公式：</p>
+
+<p>\[
+|f(x) - p_n(x)| \le \frac{\max_\xi |f^{(n+1)}(\xi)|}{(n+1)!} \cdot \frac{1}{2^n}.
+\]</p>
+
+<p>对足够光滑的 \(f\)（比如解析函数），\(|f^{(n+1)}|/(n+1)!\) 增长温和或衰减。乘上 \(2^{-n}\)，<em>整个误差指数衰减</em>。</p>
+
+<h2 id="sec10-4">10.4 Chebyshev 插值跑一遍</h2>
+
+<p>同样的 Runge 函数，用 Chebyshev 节点：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(n\)</th><th style="padding: 0.3em 1em;">等距最大误差</th><th style="padding: 0.3em 1em;">Chebyshev 最大误差</th></tr>
+<tr><td>10</td><td>1.92</td><td>0.11</td></tr>
+<tr><td>20</td><td>59.8</td><td>0.015</td></tr>
+<tr><td>30</td><td>\(7.4 \times 10^4\)</td><td>0.0011</td></tr>
+<tr><td>50</td><td>\(10^{12}\)</td><td>\(8 \times 10^{-6}\)</td></tr>
+<tr><td>100</td><td>(astronomical)</td><td>\(< 10^{-15}\)</td></tr>
+</table>
+
+<p>差别<em>不是</em>"好一点点"，是天壤。同一个 \(f\)、同一个插值算法（Lagrange 或 Newton）、同一个 \(n\)——只是<em>节点位置</em>不同——结果差 \(10^{20}\) 以上数量级。</p>
+
+<p>请你<em>真</em>跑一遍。SciPy 的 <code>numpy.polynomial.chebyshev.Chebyshev.interpolate</code> 可以一行做。看到那条曲线在 \([-1, 1]\) 上和 \(f\) 完美贴合，再换等距节点看到剧烈震荡——这种对比一次胜过看十遍证明。</p>
+
+<h2 id="sec10-5">10.5 收敛速率：解析函数 vs \(C^k\) 函数</h2>
+
+<p>Chebyshev 插值有几条很重要的"收敛速率"定理。</p>
+
+<p><strong>解析函数：几何收敛。</strong>如果 \(f\) 在 \([-1, 1]\) 上"<em>解析</em>"（在某个含 \([-1, 1]\) 的开复平面区域里复可微），则 Chebyshev 插值误差按 \(O(\rho^{-n})\) 衰减，其中 \(\rho > 1\) 是<em>Bernstein 椭圆</em>的"参数"，越大表示 \(f\) 在复平面里离 \([-1, 1]\) 的奇点越远。</p>
+
+<p>例：\(f(x) = e^x\) 整函数（处处解析），Chebyshev 插值收敛<em>超几何</em>——\(n = 10\) 已经到机器精度。</p>
+
+<p>例：Runge \(1/(1 + 25 x^2)\) 解析但奇点在 \(\pm i/5\) 离 \([-1, 1]\) 较近，所以 \(\rho\) 小，收敛慢但仍然几何。</p>
+
+<p><strong>\(C^k\) 函数：代数收敛 \(O(n^{-k})\)。</strong>如果 \(f\) 只 \(k\) 次连续可微（不解析），收敛是<em>代数</em>的——\(n\) 翻倍只让误差减小常数倍，远不如几何。</p>
+
+<p><strong>有跳点的函数：根本不收敛。</strong>如果 \(f\) 有跳跃不连续，多项式插值（无论节点）<em>不</em>收敛——会出现 Gibbs 现象（端点附近超调约 9%，类似 Fourier 级数）。修法是分段插值（下一章）。</p>
+
+<p>这套"<em>函数光滑性 ⟺ 收敛速率</em>" 的对应是数值逼近论的<em>核心</em>。Trefethen《Approximation Theory and Approximation Practice》整本书围绕这条转。本书我们止于"知道这条对应存在 + 知道在 Chebyshev 节点上它是<em>可达</em>的"。</p>
+
+<h2 id="sec10-6">10.6 实战与限度</h2>
+
+<p>什么时候用全局 Chebyshev 高次插值？</p>
+
+<ul>
+  <li>\(f\) 是个<em>光滑</em>函数（\(C^\infty\) 或解析）；</li>
+  <li>你能<em>选择</em>采样节点位置（不是数据预先给定的）；</li>
+  <li>定义在<em>有界</em>区间上（无界要换技巧，比如 mapping）。</li>
+</ul>
+
+<p>SciPy 的 <code>chebfit</code> 和 <code>chebval</code> 直接给你这套——<a href="https://www.chebfun.org/">Chebfun</a> 项目（Trefethen 团队）把整个 Chebyshev 插值打包成日常工具，"<em>整个区间上的函数被当成可计算对象</em>"。</p>
+
+<p>什么时候<em>不</em>用？</p>
+
+<ul>
+  <li>数据点位置预先给定（不是你选的）——你被卡在等距或不规则节点上，没办法用 Chebyshev。这时改用<a href="ch11.html">下一章</a>的样条。</li>
+  <li>函数有跳点 / 折角 / 奇点——任何高次多项式都失败。用样条或谱方法 + 自适应。</li>
+  <li>需要"局部" 修改——动一个数据点你不希望整条插值曲线变。Chebyshev 是全局的；要局部用 B-spline 或小波。</li>
+</ul>
+
+<p>实战经验：</p>
+
+<ul>
+  <li>实验数据 + 等距采样：分段三次样条（<a href="ch11.html">第 11 章</a>）。</li>
+  <li>解析函数（你能控制采样）：Chebyshev 插值。</li>
+  <li>"我有一个被噪声污染的函数采样" → <em>不</em>插值，<em>拟合</em>（最小二乘，<a href="ch12.html">第 12 章</a>）。</li>
+</ul>
+
+<p>最后一条值得强调：<em>插值和拟合是两件事</em>。插值<em>强迫</em>曲线穿过每个数据点；拟合<em>不</em>。如果数据有噪声，你不希望曲线穿过噪声——你希望它<em>平均</em>过去。这种"<em>不</em>过点的拟合" 由最小二乘提供，是下下章的内容。</p>
+
+<p>下一章我们退一步——不再追求"一个全局多项式"，改成"分段低次多项式"，每段次数低（比如 3 次），段与段在节点处光滑接合。这就是<em>样条</em>。它对节点位置不挑、不出 Runge 现象、对各种数据稳定——是工程实战里"插值" 默认的工具。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 多项式插值</a><a href="ch11.html">下一章 · 第 11 章 分段多项式与样条 →</a></nav>
+</main>
+</body>
+</html>
