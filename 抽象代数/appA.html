@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 集合、关系、等价类速查 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+<h1 id="appA">附录 A 集合、关系、等价类速查</h1>
+
+<p>这个附录把正文里默默假设的几条<em>纯集合论</em>事实集中起来——主要是等价关系 / 等价类 / 商集 / 偏序，以及选择公理与 Zorn 引理（在<a href="ch18.html">第 18 章</a>构造代数闭包、在<a href="ch12.html">第 12 章</a>证明极大理想存在时反复用到）。所有内容都属于一年级离散数学或集合论入门，但读这本书时手边能立刻查到会更顺手。</p>
+
+<ul>
+  <li>集合的基本运算：并、交、差、笛卡尔积、幂集。</li>
+  <li>函数：单射、满射、双射、复合、逆。</li>
+  <li>关系：定义；自反、对称、传递三条公理。</li>
+  <li>等价关系与等价类；划分；商集 \(X / \sim\)。</li>
+  <li>偏序与全序；上界、下界、极大元、最大元。</li>
+  <li>选择公理 (AC)、Zorn 引理 (ZL)、良序原理 (WO) 三者陈述与等价。</li>
+  <li>在抽象代数里典型用 Zorn 的几个场合。</li>
+</ul>
+
+<h2 id="appA-1">A.1 集合与函数基本术语</h2>
+
+<p>集合 \(X\) 由一组"元素"组成。\(x \in X\) 表示"x 属于 X"。基本运算：</p>
+
+<ul>
+  <li><strong>并 \(A \cup B = \{x : x \in A\ \text{或}\ x \in B\}\)；</strong></li>
+  <li><strong>交 \(A \cap B = \{x : x \in A\ \text{且}\ x \in B\}\)；</strong></li>
+  <li><strong>差 \(A \setminus B = \{x \in A : x \notin B\}\)；</strong></li>
+  <li><strong>笛卡尔积 \(A \times B = \{(a, b) : a \in A, b \in B\}\)；</strong></li>
+  <li><strong>幂集 \(\mathcal{P}(X) = 2^X = \{S : S \subset X\}\)。</strong></li>
+</ul>
+
+<p><strong>函数 \(f : X \to Y\)。</strong>对每个 \(x \in X\) 给唯一 \(f(x) \in Y\)。</p>
+
+<ul>
+  <li><strong>单射</strong>（injective）：\(f(x) = f(x') \Rightarrow x = x'\)。</li>
+  <li><strong>满射</strong>（surjective）：\(\forall y \in Y, \exists x: f(x) = y\)。</li>
+  <li><strong>双射</strong>（bijective）：单射 + 满射。\(f\) 双射 \(\Leftrightarrow\) 存在反函数 \(f^{-1} : Y \to X\)。</li>
+  <li><strong>复合 \((g \circ f)(x) = g(f(x))\)，\(f : X \to Y, g : Y \to Z\)。</strong></li>
+</ul>
+
+<p>函数语言贯穿整本抽象代数——群同态、环同态、域同态都是"额外保运算"的函数。"<em>同构</em>" \(=\) 双射 + 保运算。</p>
+
+<h2 id="appA-2">A.2 关系、等价关系、等价类</h2>
+
+<p>"<em>关系</em>" \(R \subset X \times X\) 就是某些有序对的集合。我们写 \(x R y\)（或 \(x \sim y\)）表示 \((x, y) \in R\)。常见公理：</p>
+
+<ul>
+  <li><strong>自反性</strong>：\(\forall x, x \sim x\)；</li>
+  <li><strong>对称性</strong>：\(x \sim y \Rightarrow y \sim x\)；</li>
+  <li><strong>传递性</strong>：\(x \sim y\)\(\ \&\ \)\(y \sim z\) \(\Rightarrow\) \(x \sim z\)。</li>
+</ul>
+
+<p>三者全有的关系叫<strong>等价关系</strong>。</p>
+
+<p><strong>等价类。</strong>设 \(\sim\) 是 \(X\) 上等价关系。元素 \(x\) 的<em>等价类</em>是</p>
+
+<p>\[
+[x] := \{y \in X : x \sim y\}.
+\]</p>
+
+<p>关键事实：等价类要么相等要么不交。证明：设 \(z \in [x] \cap [y]\)，则 \(x \sim z, y \sim z\)，由对称 + 传递得 \(x \sim y\)，所以 \([x] = [y]\)。所以全体等价类构成 \(X\) 的<em>划分</em>——一族不交、并起来等于 \(X\) 的子集。反过来 \(X\) 的任何划分也定义一个等价关系（"在同一块"），所以</p>
+
+<p>\[
+\boxed{\ \text{等价关系} \leftrightarrow X\ \text{的划分}.\ }
+\]</p>
+
+<p><strong>商集 \(X/\sim\)。</strong>是所有等价类的集合 \(\{[x] : x \in X\}\)。它是抽象代数最朴素的"<em>构造新对象</em>"工具——商群 \(G/N\)、商环 \(R/I\)、商域、商集 \(X/\sim\) 全都是这个套路。</p>
+
+<p>典型例子：</p>
+
+<ul>
+  <li><strong>整数模 \(n\) 同余。</strong>\(a \sim b \iff n \mid (a - b)\)。等价类 \([0], [1], \ldots, [n-1]\)；商集 \(\mathbb{Z}/n\mathbb{Z}\)。</li>
+  <li><strong>陪集等价。</strong>群 \(G\) 中固定子群 \(H\)；\(a \sim b \iff a^{-1} b \in H\)。等价类 \(=\) 左陪集 \(aH\)；商集 \(G/H\)。</li>
+  <li><strong>环里的同余。</strong>环 \(R\) 与理想 \(I \subset R\)；\(a \sim b \iff a - b \in I\)。等价类 \(=\) \(I\) 的陪集；商集 \(R/I\) 自带环结构。</li>
+</ul>
+
+<p>所有这些"商"都是同一个集合论模板加上"<em>等价关系兼容代数运算</em>" 的结构性条件。</p>
+
+<h2 id="appA-3">A.3 偏序、全序、极大元、上界</h2>
+
+<p>"<em>偏序关系</em>" \(\le\) 满足自反 + 反对称（\(x \le y \& y \le x \Rightarrow x = y\)）+ 传递。带偏序的集合 \((P, \le)\) 叫<em>偏序集</em> (poset)。</p>
+
+<p>"<em>全序关系</em>"是偏序加上"任意两元素可比"——\(\forall x, y, x \le y\) 或 \(y \le x\)。</p>
+
+<p>典型偏序：\((\mathbb{N}, \mid)\)（"\(a \mid b\) 即 a 整除 b"）；\((\mathcal{P}(X), \subset)\)；任何字母表的字典序（全序）。</p>
+
+<p>常用术语（在 Zorn 引理里反复出现）：</p>
+
+<ul>
+  <li><strong>链</strong>（chain）：偏序集中两两可比的子集；即用 \(\le\) 限制后是全序集。</li>
+  <li><strong>上界</strong>：子集 \(S \subset P\) 的<em>上界</em>是某 \(u \in P\) 使 \(\forall s \in S, s \le u\)。</li>
+  <li><strong>极大元</strong>：\(m \in P\) 极大 \(\iff\) 不存在 \(x \in P\) 使 \(m < x\)（即 \(m \le x\) 且 \(m \ne x\)）。注意这<em>不</em>等于"最大"——可能有别的元素与 \(m\) 不可比。</li>
+  <li><strong>最大元</strong>：\(M \in P\) 最大 \(\iff\) \(\forall x \in P, x \le M\)。</li>
+</ul>
+
+<p>(在全序集中"极大 = 最大"，但在一般偏序集中两者区分。)</p>
+
+<h2 id="appA-4">A.4 选择公理、Zorn 引理、良序原理</h2>
+
+<p>三条同等强大的"非构造性存在公理"，在任何不强调构造性的现代数学中都自由使用。</p>
+
+<p><strong>(AC) 选择公理。</strong>设 \(\{X_\alpha\}_{\alpha \in I}\) 是一族非空集合（\(I\) 任意指标集）。则存在<em>选择函数</em> \(f : I \to \bigcup X_\alpha\) 使 \(f(\alpha) \in X_\alpha\) 对每个 \(\alpha\)。</p>
+
+<p>"从每个非空集合中各<em>选</em>一个元素，能同时做"——听起来像废话，但当 \(|I|\) 不可数时 \(f\) 的存在不能由"挨个选"逻辑保证，需要这条公理。</p>
+
+<p><strong>(ZL) Zorn 引理。</strong>设 \((P, \le)\) 是非空偏序集。如果 \(P\) 中<em>每条链都有上界</em>（在 \(P\) 中），则 \(P\) 有<em>极大元</em>。</p>
+
+<p><strong>(WO) 良序原理。</strong>每个集合可以良序化——即存在某全序 \(\le\) 使每个非空子集都有最小元。</p>
+
+<p><strong>定理（Zermelo 1904）。</strong>三者两两等价：</p>
+
+<p>\[
+\boxed{\ \text{AC} \iff \text{ZL} \iff \text{WO}.\ }
+\]</p>
+
+<p>等价证明的标准链是 AC \(\Rightarrow\) ZL \(\Rightarrow\) WO \(\Rightarrow\) AC。AC \(\Rightarrow\) ZL 用<em>超限归纳</em>构造极大元。ZL \(\Rightarrow\) WO 把"\(X\) 的良序"看成偏序集 + 用 ZL 取极大良序。WO \(\Rightarrow\) AC：把每个 \(X_\alpha\) 良序后选最小元做选择函数。详见任何集合论入门书（Halmos, Jech）。</p>
+
+<p>这三个等价让你可以按<em>方便</em>选用——证存在性时一般用 ZL（最自然）；证可数构造时偶尔用 WO；证抽象命题时直接用 AC。</p>
+
+<h2 id="appA-5">A.5 抽象代数里 Zorn 引理的几个典型用场</h2>
+
+<p>抽象代数里"<em>极大某某存在</em>"的命题几乎都是用 Zorn 引理证的。三个标准用场：</p>
+
+<p><strong>(1) 极大理想存在性。</strong>设 \(R\) 是非零交换环。则 \(R\) 中存在<em>极大理想</em>。</p>
+
+<p>证明：取 \(P = \{I \subsetneq R : I\ \text{真理想}\}\)，按 \(\subset\) 偏序。\(P\) 非空（\(\{0\} \in P\) 当 \(R\) 非平凡）。设 \(\mathcal{C} \subset P\) 是链，令 \(J := \bigcup_{I \in \mathcal{C}} I\)。验证 \(J\) 是理想（链的并保理想性，因为加法和环乘法只用<em>有限</em>多元素）；\(J \ne R\)（\(1 \notin J\)，否则某 \(I \in \mathcal{C}\) 含 \(1\)，矛盾）。所以 \(J \in P\) 是 \(\mathcal{C}\) 的上界。Zorn 给极大元 \(M \in P\)，即<em>极大真理想</em>。</p>
+
+<p>这条事实是<a href="ch12.html">第 12 章</a>"商环 \(R/M\) 是域"应用的前提。没有 Zorn，连"非零环必有极大理想"都不能保证。</p>
+
+<p><strong>(2) 代数闭包存在性。</strong>设 \(K\) 是任意域。则 \(K\) 有<em>代数闭包</em> \(\bar K\)（即包含 \(K\) 的代数闭域，且是代数扩张）。</p>
+
+<p>构造（Artin 1930）：考虑 \(K[x_f : f \in K[x]\ \text{首一非常多项式}]\)（每个 \(f\) 一个变元 \(x_f\)）的某个理想 \(I\)（由所有 \(f(x_f)\) 生成）。证明 \(I \ne (1)\)（最难的一步）；用 Zorn 取极大理想 \(M \supset I\)；商环 \(R/M\) 是域，里面每个 \(f \in K[x]\) 都<em>有根</em>。重复或迭代得代数闭。</p>
+
+<p>这是<a href="ch20.html">第 20 章</a>分裂域 + 代数闭包构造的根本依据。</p>
+
+<p><strong>(3) Hilbert 基定理与 Noetherian 性。</strong>"Noetherian 环"= "理想升链终止"。许多结构性定理（Hilbert Nullstellensatz、Lasker–Noether 不可约分解）依赖 Noetherian 性。"理想升链终止"作为公理性条件本身不需 Zorn，但在<em>验证</em>某环 Noetherian 时有时绕道 Zorn。</p>
+
+<p>另外几个 Zorn 用场：每个向量空间有基（可能无限维）；每个域扩张可包入超越基 + 代数扩张；自由群作为最大无关集合扩张；模有极大子模等等。一旦你接受了 Zorn，整个抽象代数里"极大某某存在性" 几乎都<em>免费</em>得到。</p>
+
+<p>本附录到此。如果你对 ZF 公理体系或选择公理的独立性（Cohen 1963 强迫法）感兴趣，建议看 Jech《Set Theory》。本书的所有"存在性证明"在标准 ZFC 下都成立，不需要更深的逻辑工具。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+</main>
+</body>
+</html>

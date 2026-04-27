@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>主题索引 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+<h1 id="subject-index">主题索引</h1>
+
+<p>按拼音 A-Z 排列。每条给出"概念 / 名词 → 主要登场章节"。"行为导向"指引——比如要查"怎么用 Sylow 定理分类小阶群"，找末尾"按行为查找" 列表。</p>
+
+<h2>A</h2>
+<ul>
+  <li><strong>\(A_n\)（交错群）</strong> — <a href="ch9.html">第 9 章</a>；\(A_5\) 单纯 <a href="ch9.html#sec9-5">9.5</a>。</li>
+  <li><strong>Abel 群（交换群）</strong> — 定义 <a href="ch2.html#sec2-2">2.2</a>；有限交换群结构定理 <a href="ch8.html">第 8 章</a>。</li>
+  <li><strong>action（群作用）</strong> — <a href="ch6.html">第 6 章</a>；轨道-稳定子定理 <a href="ch6.html#sec6-3">6.3</a>。</li>
+  <li><strong>Artin（环、Galois 理论）</strong> — Galois 主定理 <a href="ch21.html">第 21 章</a>。</li>
+</ul>
+
+<h2>B</h2>
+<ul>
+  <li><strong>Bravais 格子</strong> — <a href="ch24.html#sec24-3">24.3</a>。</li>
+  <li><strong>Burnside 引理（轨道计数）</strong> — <a href="ch6.html#sec6-5">6.5</a>。</li>
+</ul>
+
+<h2>C</h2>
+<ul>
+  <li><strong>Cauchy 定理（\(p\) 阶元素存在）</strong> — <a href="ch7.html#sec7-1">7.1</a>。</li>
+  <li><strong>Cayley 定理（每个群嵌入 \(S_n\)）</strong> — <a href="ch6.html#sec6-1">6.1</a>。</li>
+  <li><strong>Cayley 图</strong> — <a href="ch10.html#sec10-3">10.3</a>。</li>
+  <li><strong>char（域的特征）</strong> — <a href="ch13.html#sec13-2">13.2</a>；有限域 <a href="ch23.html#sec23-1">23.1</a>。</li>
+  <li><strong>查找：Reed–Solomon 编码原理</strong> — <a href="ch23.html#sec23-6">23.6</a>。</li>
+</ul>
+
+<h2>D</h2>
+<ul>
+  <li><strong>\(D_n\)（二面体群）</strong> — 几何引入 <a href="ch1.html#sec1-1">1.1</a>；生成元-关系 <a href="ch10.html#sec10-2">10.2</a>。</li>
+  <li><strong>Dedekind（环论 / 域扩张）</strong> — Dedekind 整环（提）<a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>Diffie–Hellman 密钥交换</strong> — <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>单同态 / 满同态</strong> — <a href="ch4.html#sec4-2">4.2</a>。</li>
+</ul>
+
+<h2>E</h2>
+<ul>
+  <li><strong>Eisenstein 判别</strong> — <a href="ch15.html#sec15-4">15.4</a>。</li>
+  <li><strong>Euclid 整环（ED）</strong> — <a href="ch14.html#sec14-2">14.2</a>。</li>
+  <li><strong>Euler 函数 \(\varphi(n)\)</strong> — <a href="ch23.html#sec23-7">23.7</a>。</li>
+</ul>
+
+<h2>F</h2>
+<ul>
+  <li><strong>\(\mathbb{F}_p\)（素数阶有限域）</strong> — <a href="ch12.html#sec12-3">12.3</a>。</li>
+  <li><strong>\(\mathbb{F}_q\)（素数幂阶有限域）</strong> — <a href="ch23.html#sec23-2">23.2</a>；具体例子 \(\mathbb{F}_4, \mathbb{F}_8, \mathbb{F}_9\) <a href="ch23.html#sec23-3">23.3</a>。</li>
+  <li><strong>Fermat 小定理</strong> — \(a^p = a\) in \(\mathbb{F}_p\) <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>Frac（商域）</strong> — <a href="ch13.html#sec13-4">13.4</a>。</li>
+  <li><strong>Frobenius 自同构</strong> — <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>函子（functor）</strong> — <a href="appB.html#appB-2">附录 B.2</a>。</li>
+</ul>
+
+<h2>G</h2>
+<ul>
+  <li><strong>Galois 群</strong> — 定义 <a href="ch20.html#sec20-4">20.4</a>；\(\operatorname{Gal}(\mathbb{F}_q/\mathbb{F}_p)\) <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>Galois 主定理（Galois 对应）</strong> — <a href="ch21.html">第 21 章</a>。</li>
+  <li><strong>Gauss 引理</strong> — <a href="ch15.html#sec15-3">15.3</a>。</li>
+  <li><strong>\(\mathrm{GL}_n\)（一般线性群）</strong> — <a href="ch2.html#sec2-3">2.3</a>；表示论用法 <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>共轭类</strong> — <a href="ch6.html#sec6-4">6.4</a>；类方程 <a href="ch7.html#sec7-2">7.2</a>。</li>
+</ul>
+
+<h2>H</h2>
+<ul>
+  <li><strong>Hilbert 基定理</strong> — <a href="ch15.html#sec15-6">15.6</a>。</li>
+  <li><strong>环（Ring）</strong> — <a href="ch11.html">第 11 章</a>。</li>
+  <li><strong>同态（Homomorphism）</strong> — 群同态 <a href="ch4.html">第 4 章</a>；环同态 <a href="ch11.html#sec11-4">11.4</a>。</li>
+  <li><strong>核（Kernel）</strong> — 群同态核 <a href="ch4.html#sec4-3">4.3</a>；环同态核 = 理想 <a href="ch12.html#sec12-1">12.1</a>。</li>
+</ul>
+
+<h2>I</h2>
+<ul>
+  <li><strong>理想（主 / 极大 / 素）</strong> — 定义 <a href="ch12.html#sec12-1">12.1</a>；极大 vs 素 <a href="ch12.html#sec12-4">12.4</a>。</li>
+  <li><strong>整环（integral domain）</strong> — <a href="ch13.html#sec13-1">13.1</a>。</li>
+  <li><strong>同构定理（三大）</strong> — 群版本 <a href="ch5.html">第 5 章</a>；环版本 <a href="ch12.html#sec12-5">12.5</a>。</li>
+</ul>
+
+<h2>J</h2>
+<ul>
+  <li><strong>Jordan 标准形</strong> — 通过 PID 模结构定理推出 <a href="ch17.html#sec17-5">17.5</a>。</li>
+</ul>
+
+<h2>K</h2>
+<ul>
+  <li><strong>Klein 4-群 \(V_4\)</strong> — <a href="ch2.html#sec2-4">2.4</a>。</li>
+  <li><strong>核（Kernel）</strong> — 见"K - 核"。</li>
+</ul>
+
+<h2>L</h2>
+<ul>
+  <li><strong>Lagrange 定理</strong> — <a href="ch3.html#sec3-3">3.3</a>。</li>
+  <li><strong>Lie 群 / Lie 代数（提）</strong> — <a href="ch24.html#sec24-9">24.9</a>。</li>
+</ul>
+
+<h2>M</h2>
+<ul>
+  <li><strong>Maschke 定理</strong> — <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>模（Module）</strong> — <a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>最小多项式</strong> — <a href="ch19.html#sec19-2">19.2</a>。</li>
+  <li><strong>矩阵环 \(M_n(R)\)</strong> — <a href="ch11.html#sec11-3">11.3</a>。</li>
+</ul>
+
+<h2>N</h2>
+<ul>
+  <li><strong>正规子群</strong> — <a href="ch4.html#sec4-4">4.4</a>。</li>
+  <li><strong>正规扩张</strong> — <a href="ch20.html#sec20-3">20.3</a>。</li>
+</ul>
+
+<h2>O</h2>
+<ul>
+  <li><strong>轨道-稳定子定理</strong> — <a href="ch6.html#sec6-3">6.3</a>。</li>
+</ul>
+
+<h2>P</h2>
+<ul>
+  <li><strong>PID（主理想环）</strong> — <a href="ch14.html#sec14-3">14.3</a>；PID 上模结构定理 <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>\(p\)-子群 / \(p\)-群</strong> — <a href="ch7.html#sec7-3">7.3</a>。</li>
+  <li><strong>多项式环 \(R[x]\)</strong> — <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>平凡（trivial 群 / 子群 / 表示）</strong> — 平凡群 \(\{e\}\) <a href="ch2.html#sec2-1">2.1</a>；平凡表示 <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>偏序与全序</strong> — <a href="appA.html#appA-3">附录 A.3</a>。</li>
+</ul>
+
+<h2>Q</h2>
+<ul>
+  <li><strong>商群 \(G/N\)</strong> — <a href="ch5.html#sec5-1">5.1</a>。</li>
+  <li><strong>商环 \(R/I\)</strong> — <a href="ch12.html#sec12-2">12.2</a>。</li>
+  <li><strong>商域 Frac\((R)\)</strong> — <a href="ch13.html#sec13-4">13.4</a>。</li>
+  <li><strong>群表示（representation）</strong> — <a href="ch24.html#sec24-5">24.5</a>。</li>
+</ul>
+
+<h2>R</h2>
+<ul>
+  <li><strong>环（Ring）</strong> — 见"H - 环"。</li>
+  <li><strong>Reed–Solomon 纠错码</strong> — <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>RSA 公钥加密</strong> — <a href="ch23.html#sec23-7">23.7</a>。</li>
+</ul>
+
+<h2>S</h2>
+<ul>
+  <li><strong>Sylow 定理</strong> — <a href="ch7.html">第 7 章</a>；分类应用 <a href="ch7.html#sec7-5">7.5</a>。</li>
+  <li><strong>\(S_n\)（对称群）</strong> — <a href="ch9.html">第 9 章</a>；不可约表示 \(S_3\) <a href="ch24.html#sec24-8">24.8</a>。</li>
+  <li><strong>单纯群（simple group）</strong> — <a href="ch4.html#sec4-5">4.5</a>；\(A_5\) 单纯 <a href="ch9.html#sec9-5">9.5</a>。</li>
+  <li><strong>自由群 / 自由模</strong> — 自由群 <a href="ch10.html#sec10-1">10.1</a>；自由模 <a href="ch16.html#sec16-3">16.3</a>。</li>
+  <li><strong>子群</strong> — <a href="ch3.html#sec3-1">3.1</a>。</li>
+  <li><strong>选择公理 / Zorn 引理</strong> — <a href="appA.html#appA-4">附录 A.4</a>。</li>
+</ul>
+
+<h2>T</h2>
+<ul>
+  <li><strong>塔公式（扩张次数乘积）</strong> — \([L:K] = [L:F][F:K]\) <a href="ch18.html#sec18-3">18.3</a>。</li>
+  <li><strong>张量积（提）</strong> — <a href="ch16.html#sec16-5">16.5</a>；张量-Hom 伴随 <a href="appB.html#appB-4">附录 B.4</a>。</li>
+</ul>
+
+<h2>U</h2>
+<ul>
+  <li><strong>UFD（唯一分解整环）</strong> — <a href="ch14.html#sec14-4">14.4</a>。</li>
+  <li><strong>唯一分解</strong> — \(\mathbb{Z}\) 与 \(k[x]\) <a href="ch14.html">第 14 章</a>。</li>
+</ul>
+
+<h2>W</h2>
+<ul>
+  <li><strong>五次方程不可解</strong> — <a href="ch22.html#sec22-5">22.5</a>。</li>
+  <li><strong>壁纸群（17 种）</strong> — <a href="ch24.html#sec24-2">24.2</a>。</li>
+</ul>
+
+<h2>X</h2>
+<ul>
+  <li><strong>限制（Restriction）</strong> — 子群限制 <a href="ch3.html#sec3-2">3.2</a>；表示的限制（提）<a href="ch24.html#sec24-9">24.9</a>。</li>
+</ul>
+
+<h2>Y</h2>
+<ul>
+  <li><strong>域（Field）</strong> — <a href="ch13.html#sec13-2">13.2</a>。</li>
+  <li><strong>域扩张</strong> — <a href="ch18.html">第 18 章</a>。</li>
+  <li><strong>有限域 \(\mathbb{F}_q\)</strong> — 见"F - \(\mathbb{F}_q\)"。</li>
+  <li><strong>有限交换群结构定理</strong> — <a href="ch8.html">第 8 章</a>。</li>
+  <li><strong>Yoneda 引理</strong> — <a href="appB.html#appB-5">附录 B.5</a>。</li>
+</ul>
+
+<h2>Z</h2>
+<ul>
+  <li><strong>\(\mathbb{Z}_n\)（\(\mathbb{Z}/n\mathbb{Z}\)，模 \(n\) 整数）</strong> — <a href="ch2.html#sec2-2">2.2</a>；不可约表示 <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>中心 \(Z(G)\)</strong> — <a href="ch6.html#sec6-4">6.4</a>。</li>
+  <li><strong>整环</strong> — 见"I - 整环"。</li>
+  <li><strong>自由群</strong> — 见"S - 自由群"。</li>
+  <li><strong>自然变换（natural transformation）</strong> — <a href="appB.html#appB-3">附录 B.3</a>。</li>
+  <li><strong>自反 / 对称 / 传递</strong> — <a href="appA.html#appA-2">附录 A.2</a>。</li>
+</ul>
+
+<h2>按"我想做什么"查找</h2>
+
+<ul>
+  <li><strong>用 Lagrange 定理排除小阶子群：</strong>第 3 章。</li>
+  <li><strong>用 Sylow 定理分类小阶群（\(|G| = 12, 30, 56\) 等）：</strong>第 7 章。</li>
+  <li><strong>把一个群同态用商群分解：</strong>第 5 章三大同构定理模板。</li>
+  <li><strong>判别一个多项式不可约：</strong>第 15 章；Eisenstein <a href="ch15.html#sec15-4">15.4</a>。</li>
+  <li><strong>构造 \(\mathbb{F}_q\)（256 阶有限域等）：</strong><a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>把 Jordan 标准形看成模结构定理实例：</strong>第 17 章 Smith 标准形。</li>
+  <li><strong>证明一个域扩张是 Galois：</strong>第 20 章正规扩张 + 可分性。</li>
+  <li><strong>证明五次方程不可解：</strong>第 22 章 Galois 群非可解。</li>
+  <li><strong>设计一个 RSA 加密系统：</strong><a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>分类壁纸图案 / 晶体对称：</strong>第 24 章 24.2-24.4 节。</li>
+  <li><strong>找有限群的所有不可约表示：</strong>第 24 章 + Maschke + Schur 引理。</li>
+  <li><strong>用 Zorn 引理证"极大某某存在"：</strong><a href="appA.html#appA-5">附录 A.5</a>。</li>
+</ul>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+</main>
+</body>
+</html>

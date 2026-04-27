@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 有限交换群的结构定理 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 Sylow 定理</a><a href="ch9.html">下一章 · 第 9 章 对称群 \(S_n\) 与置换 →</a></nav>
+<h1 id="ch8">第 8 章 有限交换群的结构定理</h1>
+
+<p>在所有"分类大定理"的家谱里，有限交换群分类是最早完成的一棵——它把"任意一个有限交换群长什么样"的问题<em>彻底</em>解决，而且答案干净到可以背下来。简单说：<strong>每个有限交换群都唯一地写成若干个循环群的直积</strong>，而且这种写法有两种标准化形式（不变因子型与初等因子型）可以互推。</p>
+
+<p>本章我们先把定理陈述、两种形式的关系、以及它们的"操作意义"讲透——所谓操作意义，是指<em>给一个具体的阶 \(n\)，你能用纸笔列出所有阶 \(n\) 的非同构交换群</em>。证明留到<a href="ch17.html">第 17 章</a>，因为最干净的证明把它当成"PID（=主理想环）上有限生成模"的特例（取环 \(R = \mathbb{Z}\) 立得本章定理）。这种"模 + Smith 标准形"的统一证明在历史上要等到 1879 年 Frobenius 与 1907 年 Steinitz 才完成；本章先教你<em>用</em>这个定理。</p>
+
+<ul>
+  <li>8.1 不变因子型陈述：\(G \cong \mathbb{Z}_{n_1} \times \cdots \times \mathbb{Z}_{n_k}\)，\(n_1 \mid n_2 \mid \cdots \mid n_k\)。</li>
+  <li>8.2 初等因子型陈述：\(G \cong \bigoplus_i \mathbb{Z}_{p_i^{a_i}}\)，分解唯一。</li>
+  <li>8.3 中国剩余定理把两型互推。</li>
+  <li>8.4 例 1：阶 8 的所有交换群（3 种）。</li>
+  <li>8.5 例 2：阶 12 的所有交换群（2 种），与第 7 章非交换分类对照。</li>
+  <li>8.6 例 3：阶 36 的所有交换群（4 种）。</li>
+  <li>8.7 算法：给定 \(n\)，列出所有阶 \(n\) 交换群。</li>
+  <li>8.8 证明思路概览（PID 上模理论 \(\to\) Smith 标准形）。</li>
+</ul>
+
+<h2 id="sec8-1">8.1 不变因子型</h2>
+
+<p><strong>定理（有限交换群分类，不变因子型）。</strong>设 \(G\) 是有限交换群。则存在唯一的正整数序列 \(n_1, n_2, \ldots, n_k\)，满足</p>
+
+<p>\[
+n_1 \mid n_2 \mid n_3 \mid \cdots \mid n_k, \qquad n_i \ge 2,
+\]</p>
+
+<p>使得</p>
+
+<p>\[
+\boxed{\ G \cong \mathbb{Z}_{n_1} \times \mathbb{Z}_{n_2} \times \cdots \times \mathbb{Z}_{n_k}.\ }
+\]</p>
+
+<p>这些 \(n_i\) 称为 \(G\) 的<strong>不变因子</strong>（invariant factors）。\(k\) 称为 \(G\) 的<em>秩</em>（更严格点是"不变因子个数"），\(n_k\) 称为 \(G\) 的<em>指数</em>（exponent，即 \(G\) 中所有元素阶的最小公倍数）。</p>
+
+<p>关键的两个字是<em>唯一</em>。这意味着——给一个阶 8 的群，假如它写成 \(\mathbb{Z}_2 \times \mathbb{Z}_4\) 一种形式，那么这个 \((2, 4)\) 这一对是它的"指纹"，再换一种坐标也写不出别的不变因子序列。</p>
+
+<p>不变因子的整除链 \(n_1 \mid n_2 \mid \cdots \mid n_k\) 是为了<em>规范化</em>，避免重复表示。例如 \(\mathbb{Z}_2 \times \mathbb{Z}_3 \cong \mathbb{Z}_6\) 是同一个群的两种<em>看似</em>不同的写法——按不变因子型只有 \(\mathbb{Z}_6\) 一种（链 \(6\)），\(\mathbb{Z}_2 \times \mathbb{Z}_3\) 不符合 \(2 \mid 3\)，所以会被规范化。</p>
+
+<p>具体例子。阶 \(|G| = n\) 的循环群 \(\mathbb{Z}_n\) 不变因子 \((n)\)，单元素链。Klein 四元群 \(\mathbb{Z}_2 \times \mathbb{Z}_2\) 不变因子 \((2, 2)\)（满足 \(2 \mid 2\)）。\(\mathbb{Z}_2 \times \mathbb{Z}_6\) 不变因子 \((2, 6)\)。注意 \(\mathbb{Z}_2 \times \mathbb{Z}_6\) 和 \(\mathbb{Z}_6 \times \mathbb{Z}_2\) 同构，规范写法把小的不变因子放前面。</p>
+
+<h2 id="sec8-2">8.2 初等因子型</h2>
+
+<p>第二种规范化把每个不变因子按素数分解再分。</p>
+
+<p><strong>定理（有限交换群分类，初等因子型）。</strong>设 \(G\) 是有限交换群。则存在素数 \(p_1, \ldots, p_r\)（可重复）与正整数 \(a_1, \ldots, a_r\)，使得</p>
+
+<p>\[
+\boxed{\ G \cong \mathbb{Z}_{p_1^{a_1}} \times \mathbb{Z}_{p_2^{a_2}} \times \cdots \times \mathbb{Z}_{p_r^{a_r}}.\ }
+\]</p>
+
+<p>这些素幂 \(p_i^{a_i}\) 称为 \(G\) 的<strong>初等因子</strong>（elementary divisors）。它们按"乘积带重数"在 \(G\) 中也是唯一确定的。</p>
+
+<p>这型的好处：把同一个素数 \(p\) 的全部"贡献"独立看出来。设 \(p\) 是素数，\(G\) 中阶为 \(p\) 的某次幂的元素全体加上 \(\{e\}\) 构成 \(G\) 的<strong>\(p\)-Sylow 子群</strong> \(G_p\)（交换群里它正规且唯一）。则</p>
+
+<p>\[
+G \cong G_{p_1} \times G_{p_2} \times \cdots \times G_{p_s},
+\]</p>
+
+<p>每个 \(G_{p_i}\) 是阶 \(p_i\) 的幂的交换 \(p\)-群，按它单独再做"\(p\)-初等因子分解"得</p>
+
+<p>\[
+G_{p_i} \cong \mathbb{Z}_{p_i^{a_{i,1}}} \times \mathbb{Z}_{p_i^{a_{i,2}}} \times \cdots
+\]</p>
+
+<p>所以初等因子型可以理解成<em>"先按素数分流，每个素数内部再按素幂细分"</em>。</p>
+
+<p>具体例子。\(\mathbb{Z}_{12} = \mathbb{Z}_4 \times \mathbb{Z}_3\)（CRT）。初等因子：\(2^2, 3\)。\(\mathbb{Z}_6 \times \mathbb{Z}_2 = \mathbb{Z}_2 \times \mathbb{Z}_3 \times \mathbb{Z}_2 = \mathbb{Z}_2 \times \mathbb{Z}_2 \times \mathbb{Z}_3\)。初等因子：\(2, 2, 3\)。两者初等因子序列不同，所以不同构——这是不变因子型与初等因子型给的<em>同构判定</em>。</p>
+
+<h2 id="sec8-3">8.3 两种型互推：CRT</h2>
+
+<p>关键工具是<strong>中国剩余定理</strong>（在<a href="../数论/index.html">数论读本</a>讲过整数版，这里要群论版）。</p>
+
+<p><strong>引理（群论 CRT）。</strong>若 \(\gcd(m, n) = 1\)，则 \(\mathbb{Z}_{mn} \cong \mathbb{Z}_m \times \mathbb{Z}_n\)。</p>
+
+<p>证明。考虑映射 \(\varphi: \mathbb{Z}_{mn} \to \mathbb{Z}_m \times \mathbb{Z}_n\), \(\varphi(k) = (k \bmod m, k \bmod n)\)。线性、同态、目标群与源群基数同（都为 \(mn\)）。核 \(= \{k : m \mid k \text{ 且 } n \mid k\} = \{k : mn \mid k\} = \{0\}\)（用 \(\gcd = 1\)）。所以 \(\varphi\) 是同构。</p>
+
+<p><strong>从初等因子型 \(\to\) 不变因子型。</strong>把每个素数的幂列成"长方矩阵"，对每个素数 \(p\) 把它的指数从大到小排列，缺位补 0，再每行（按所有素数对应的幂）相乘。</p>
+
+<p>具体例：设 \(G = \mathbb{Z}_2 \times \mathbb{Z}_4 \times \mathbb{Z}_4 \times \mathbb{Z}_3 \times \mathbb{Z}_9\)。素数 2 部分指数 \((2, 2, 1)\)，素数 3 部分指数 \((2, 1)\)，写成矩阵（按从大到小，缺位补 0）：</p>
+
+<p>\[
+\begin{array}{c|ccc}
+& \text{第 1 列} & \text{第 2 列} & \text{第 3 列} \\
+\hline
+p = 2 & 2^2 & 2^2 & 2^1 \\
+p = 3 & 3^2 & 3^1 & 3^0
+\end{array}
+\]</p>
+
+<p>每列乘起来：\(4 \cdot 9 = 36\), \(4 \cdot 3 = 12\), \(2 \cdot 1 = 2\)。从右到左排列得不变因子 \(2 \mid 12 \mid 36\)。所以 \(G \cong \mathbb{Z}_2 \times \mathbb{Z}_{12} \times \mathbb{Z}_{36}\)。</p>
+
+<p><strong>从不变因子型 \(\to\) 初等因子型。</strong>把每个不变因子按素分解再用 CRT 拆。例 \(\mathbb{Z}_{12} = \mathbb{Z}_4 \times \mathbb{Z}_3\)，所以 \(\mathbb{Z}_2 \times \mathbb{Z}_{12} \times \mathbb{Z}_{36} = \mathbb{Z}_2 \times \mathbb{Z}_4 \times \mathbb{Z}_3 \times \mathbb{Z}_4 \times \mathbb{Z}_9\)。把素数同类合并：\(p = 2\): \(2, 4, 4 = 2, 2^2, 2^2\)；\(p = 3\): \(3, 9 = 3, 3^2\)。</p>
+
+<h2 id="sec8-4">8.4 阶 8 的所有交换群</h2>
+
+<p>把分类定理用到具体小阶上立刻就能产出结果。阶 8 \(= 2^3\)，只一个素数。问"\(2^3 = 8\) 有多少种写成 \(2^{a_1} \cdot 2^{a_2} \cdots\) 的方式"等于问"3 有多少种正整数<strong>无序分拆</strong>"——分拆数 \(p(3) = 3\)：</p>
+
+<ul>
+  <li>\(3 = 3\) \(\Rightarrow\) \(\mathbb{Z}_8\)（指数 8，循环）；</li>
+  <li>\(3 = 2 + 1\) \(\Rightarrow\) \(\mathbb{Z}_4 \times \mathbb{Z}_2\)（指数 4）；</li>
+  <li>\(3 = 1 + 1 + 1\) \(\Rightarrow\) \(\mathbb{Z}_2 \times \mathbb{Z}_2 \times \mathbb{Z}_2\)（指数 2，又称"基本交换 2-群"）。</li>
+</ul>
+
+<p>这三个群两两不同构。判别它们最简单的方式：看"\(G\) 中阶恰为 2 的元素个数"。</p>
+
+<ul>
+  <li>\(\mathbb{Z}_8\)：阶 2 元素只有 \(4\)，1 个。</li>
+  <li>\(\mathbb{Z}_4 \times \mathbb{Z}_2\)：\((2, 0), (0, 1), (2, 1)\)，3 个。</li>
+  <li>\(\mathbb{Z}_2^3\)：所有非零元都是阶 2，共 7 个。</li>
+</ul>
+
+<p>"阶 2 元素个数"是同构不变量——三个数互不相等就证明三群两两不同构。</p>
+
+<p>注意阶 8 的<em>非</em>交换群也有三个：\(D_4, Q_8, ...\)（详见<a href="../抽象代数/ch9.html">第 9 章习题</a>）。所以阶 8 总共 5 类群——3 类交换 + 2 类非交换。</p>
+
+<h2 id="sec8-5">8.5 阶 12：交换 vs 非交换</h2>
+
+<p>\(12 = 2^2 \cdot 3\)。两个素数。阶 12 的<em>交换</em>群按初等因子型穷举：</p>
+
+<ul>
+  <li>\(p = 2\) 部分：\(2^2\) 阶有 2 种分拆（\(2, 1+1\)），即 \(\mathbb{Z}_4\) 或 \(\mathbb{Z}_2 \times \mathbb{Z}_2\)；</li>
+  <li>\(p = 3\) 部分：\(3\) 阶只有 1 种，即 \(\mathbb{Z}_3\)。</li>
+</ul>
+
+<p>组合得 \(2 \times 1 = 2\) 种交换群：</p>
+
+<ul>
+  <li>\(\mathbb{Z}_4 \times \mathbb{Z}_3 \cong \mathbb{Z}_{12}\)（不变因子 \((12)\)）；</li>
+  <li>\(\mathbb{Z}_2 \times \mathbb{Z}_2 \times \mathbb{Z}_3 \cong \mathbb{Z}_2 \times \mathbb{Z}_6\)（不变因子 \((2, 6)\)）。</li>
+  </ul>
+
+<p>对照<a href="ch7.html">第 7 章</a>对阶 12 的完整分类：5 个群，其中 2 个交换（\(\mathbb{Z}_{12}, \mathbb{Z}_6 \times \mathbb{Z}_2\)），3 个非交换（\(A_4, D_6, Q_{12}\)）。本章给的只是交换部分。这种"分类定理把交换情形彻底解决，非交换需要 Sylow + 半直积逐阶讨论"的二分将贯穿群论后半部分。</p>
+
+<h2 id="sec8-6">8.6 阶 36 的所有交换群</h2>
+
+<p>\(36 = 2^2 \cdot 3^2\)。两个素数都到 2 次方。对每个素数考虑指数为 2 的分拆：</p>
+
+<ul>
+  <li>\(p = 2\)：\(2^2\) 部分有 \(p(2) = 2\) 种分拆——\(\mathbb{Z}_4\) 与 \(\mathbb{Z}_2 \times \mathbb{Z}_2\)；</li>
+  <li>\(p = 3\)：\(3^2\) 部分有 \(p(2) = 2\) 种分拆——\(\mathbb{Z}_9\) 与 \(\mathbb{Z}_3 \times \mathbb{Z}_3\)。</li>
+</ul>
+
+<p>组合 \(2 \times 2 = 4\) 种阶 36 交换群：</p>
+
+<ul>
+  <li>\(\mathbb{Z}_4 \times \mathbb{Z}_9 \cong \mathbb{Z}_{36}\)，不变因子 \((36)\)；</li>
+  <li>\(\mathbb{Z}_4 \times \mathbb{Z}_3 \times \mathbb{Z}_3 \cong \mathbb{Z}_3 \times \mathbb{Z}_{12}\)，不变因子 \((3, 12)\)；</li>
+  <li>\(\mathbb{Z}_2 \times \mathbb{Z}_2 \times \mathbb{Z}_9 \cong \mathbb{Z}_2 \times \mathbb{Z}_{18}\)，不变因子 \((2, 18)\)；</li>
+  <li>\(\mathbb{Z}_2 \times \mathbb{Z}_2 \times \mathbb{Z}_3 \times \mathbb{Z}_3 \cong \mathbb{Z}_6 \times \mathbb{Z}_6\)，不变因子 \((6, 6)\)。</li>
+</ul>
+
+<p>注意第三个"\(\mathbb{Z}_2 \times \mathbb{Z}_2 \times \mathbb{Z}_9\)"按 CRT 化简：把一个 \(\mathbb{Z}_2\) 与 \(\mathbb{Z}_9\) 合并得 \(\mathbb{Z}_{18}\)，剩下 \(\mathbb{Z}_2 \times \mathbb{Z}_{18}\)。</p>
+
+<h2 id="sec8-7">8.7 阶 \(n\) 交换群个数的算法</h2>
+
+<p>把上面的逻辑总结成一个清晰的算法：</p>
+
+<ol>
+  <li>把 \(n\) 写成素分解 \(n = p_1^{a_1} \cdots p_s^{a_s}\)。</li>
+  <li>对每个 \(i\)，求 \(a_i\) 的<strong>分拆数</strong> \(p(a_i)\)（即把正整数 \(a_i\) 写成无序正整数和的方式数）。</li>
+  <li>阶 \(n\) 交换群的总个数为 \(\prod_{i=1}^s p(a_i)\)。</li>
+</ol>
+
+<p>\[
+\boxed{\ \#\{\text{阶 } n \text{ 交换群}\} = \prod_{p^a \| n} p(a),\ }
+\]</p>
+
+<p>其中 \(p^a \| n\) 表示 \(p^a\) 是 \(n\) 中 \(p\) 的恰好次幂。</p>
+
+<p>分拆数前几项：\(p(1) = 1, p(2) = 2, p(3) = 3, p(4) = 5, p(5) = 7, p(6) = 11, p(7) = 15, \ldots\)。所以 \(\mathbb{Z}_{p^a}\) 类的群——即"基本 \(p\)-群"——有 \(p(a)\) 种。</p>
+
+<p>具体应用：</p>
+
+<ul>
+  <li>\(n = 200 = 2^3 \cdot 5^2\)：\(p(3) \cdot p(2) = 3 \cdot 2 = 6\) 种。</li>
+  <li>\(n = 1000 = 2^3 \cdot 5^3\)：\(p(3) \cdot p(3) = 3 \cdot 3 = 9\) 种。</li>
+  <li>\(n = 64 = 2^6\)：\(p(6) = 11\) 种交换群。</li>
+  <li>\(n = p\)（素数）：\(p(1) = 1\) 种——只能 \(\mathbb{Z}_p\)。</li>
+  <li>\(n = pq\)（不同素数）：\(p(1) \cdot p(1) = 1\) 种——只能 \(\mathbb{Z}_{pq}\)。</li>
+</ul>
+
+<p>这个算法漂亮的地方：它把"阶 \(n\) 交换群有几个"完全归约到"分拆数"——一个纯组合学概念。Hardy–Ramanujan 1918 年给出 \(p(n)\) 的渐近公式 \(p(n) \sim \frac{1}{4n\sqrt{3}} e^{\pi \sqrt{2n/3}}\)；这就让我们知道阶 \(2^k\) 的交换群个数随 \(k\) 是<em>亚指数</em>增长。</p>
+
+<h2 id="sec8-8">8.8 证明思路：PID 上的有限生成模</h2>
+
+<p>本章的两条分类定理这里只陈述。它们的最干净证明放到第 17 章。这里给一段"为什么留到那里"的预告。</p>
+
+<p>所有有限交换群可以看成 \(\mathbb{Z}\) 上的<strong>模</strong>——当群运算写成加法，"标量乘法" \(n \cdot g = g + g + \cdots + g\)（\(n\) 项）就是 \(\mathbb{Z}\) 在 \(G\) 上的作用。这种作用满足分配律 \((m + n) g = m g + n g\) 与结合律 \(m(n g) = (mn) g\)。模这种代数结构推广了"向量空间"——把"系数取在域"换成"系数取在环"。</p>
+
+<p>有限交换群 \(\Leftrightarrow\) 有限的 \(\mathbb{Z}\)-模 \(\Leftrightarrow\) 有限生成且每个元素被某个非零整数零化的 \(\mathbb{Z}\)-模（即"挠"\(\mathbb{Z}\)-模）。这种"含挠模"在<strong>主理想环（PID）</strong>上有非常漂亮的结构定理：</p>
+
+<p><strong>定理（PID 上有限生成模结构定理）。</strong>设 \(R\) 是 PID，\(M\) 是有限生成 \(R\)-模。则存在唯一的非零非单位元 \(d_1 \mid d_2 \mid \cdots \mid d_k \in R\) 与非负整数 \(r\) 使</p>
+
+<p>\[
+M \cong R^r \oplus R/(d_1) \oplus R/(d_2) \oplus \cdots \oplus R/(d_k).
+\]</p>
+
+<p>取 \(R = \mathbb{Z}\)，\(M\) 有限即 \(r = 0\)（无自由部分）；\(R/(d_i) = \mathbb{Z}/d_i \mathbb{Z} = \mathbb{Z}_{d_i}\)。立得本章不变因子型分类。</p>
+
+<p>这个定理的证明依赖<strong>Smith 标准形</strong>——任何 \(R\) 上的整数矩阵都可以通过初等行列变换化成对角形式（详细在第 17 章）。Smith 标准形把"有限交换群分类"与"线性代数"连成一线：本章定理可以理解为<em>"线性代数 over \(\mathbb{Z}\)"</em>——比域上的高斯消元稍麻烦（除法需小心），但结构定理的结论几乎一致。</p>
+
+<p>\[
+\boxed{\ \text{有限交换群分类} = \mathbb{Z}\text{ 上模的结构定理} = \text{Smith 标准形.}\ }
+\]</p>
+
+<p>下一章我们离开"任意有限群"和"任意有限交换群"，专注一类<em>具体且普遍</em>的群——对称群 \(S_n\)。它的循环表示、奇偶置换、共轭类计数会成为我们后续证明 \(A_5\) 单纯性、最终在<a href="ch22.html">第 22 章</a>证明五次方程不可解的核心工具。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 Sylow 定理</a><a href="ch9.html">下一章 · 第 9 章 对称群 \(S_n\) 与置换 →</a></nav>
+</main>
+</body>
+</html>

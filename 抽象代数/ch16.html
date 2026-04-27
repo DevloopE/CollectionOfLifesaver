@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 16 章 模的入门 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 多项式环</a><a href="ch17.html">下一章 · 第 17 章 PID 上有限生成模的结构定理 →</a></nav>
+<h1 id="ch16">第 16 章 模的入门</h1>
+
+<p>线性代数为什么那么干净？因为它的对象是<strong>向量空间</strong>——在某个域 \(k\) 上的加法群，配上一个 \(k\) 数乘。两条公理，几条规则，整个有限维理论就压缩成"基 + 维数"两个词。本章要做的是把这件事推广：把"域 \(k\)"换成"任意环 \(R\)"，得到的对象叫<strong>\(R\)-模</strong>。</p>
+
+<p>这个推广有两个不同的"父结构"汇合的味道。一边，群——更准确地说交换群——已经天然是 \(\mathbb{Z}\)-模（任何交换群都自动有一个 \(\mathbb{Z}\) 数乘 \(n \cdot a\)）。另一边，\(k\)-向量空间在 \(k\) 是域时就是 \(k\)-模。把"环 \(R\) 上的加法群 + \(R\) 数乘"统一起来就是模——它<em>同时</em>是"群论"与"线性代数"的真正一般化。</p>
+
+<p>但有一件事必须先打预防针：模没有"基"。\(\mathbb{Z}\)-模 \(\mathbb{Z}/2\mathbb{Z}\) 是个两元素的交换群，它<em>没有 \(\mathbb{Z}\)-基</em>——任何 \(a \in \mathbb{Z}/2\mathbb{Z}\) 都满足 \(2a = 0\)，所以 \(\{a\}\) 是 \(\mathbb{Z}\) 上线性<em>相关</em>的。这件事破坏了"维数"在模上的意义，是模理论与向量空间理论的根本分水岭。<a href="ch17.html">第 17 章</a>会把这件事处理掉——在 PID 上，每个有限生成模都能写成"自由部分 + torsion 部分"，而 torsion 部分还有完整的不变量分类。</p>
+
+<ul>
+  <li>正式给出 \(R\)-模的公理。</li>
+  <li>例 1：\(R = \mathbb{Z}\) 时 \(\mathbb{Z}\)-模就是交换群；\(R = k\) 域时 \(R\)-模就是 \(k\)-向量空间。</li>
+  <li>例 2：\(k[x]\)-模就是"\(k\)-向量空间 + 一个线性变换 \(T\)"——把整套线性代数嵌入模理论。</li>
+  <li>子模、商模、模同态、三大同构定理。</li>
+  <li>自由模 \(R^n\)：模上"最像向量空间"的特殊类。</li>
+  <li>直和、torsion、有限生成。</li>
+  <li>短正合列 \(0 \to A \to B \to C \to 0\) 与"分裂"。</li>
+  <li>"模没有基"的最干净反例 \(\mathbb{Z}/2\mathbb{Z}\)，导出第 17 章主定理动机。</li>
+</ul>
+
+<h2 id="sec16-1">16.1 \(R\)-模的公理</h2>
+
+<p>设 \(R\) 是带 1 的环（不必交换）。一个<strong>左 \(R\)-模</strong>是一个集合 \(M\)，配上：</p>
+
+<ul>
+  <li>加法 \(+: M \times M \to M\)，使 \((M, +)\) 是<em>交换群</em>；</li>
+  <li>数乘 \(\cdot : R \times M \to M\)，记作 \(r \cdot m\) 或 \(rm\)，</li>
+</ul>
+
+<p>满足：对所有 \(r, s \in R\)，\(m, n \in M\)，</p>
+
+<ol>
+  <li>\(r(m + n) = rm + rn\)（数乘对加法分配）；</li>
+  <li>\((r + s) m = rm + sm\)（加法对数乘分配）；</li>
+  <li>\((rs) m = r(s m)\)（数乘结合）；</li>
+  <li>\(1 \cdot m = m\)（单位律）。</li>
+</ol>
+
+<p>\[
+\boxed{\ R\text{-模} = (\text{交换群 } M,\ R \times M \to M)\ \text{满足分配 + 结合 + 单位}.\ }
+\]</p>
+
+<p>"右 \(R\)-模"的定义对称——数乘写成 \(m \cdot r\)，结合律变成 \((m \cdot r) \cdot s = m \cdot (rs)\)。\(R\) 交换时左模与右模没有实质区别，所以本章后面就只说"\(R\)-模"。我们这本书几乎只关心 \(R\) 交换的情形。</p>
+
+<p>这四条公理几乎和"\(k\)-向量空间"的公理一样——只是把"\(k\) 是域"换成"\(R\) 是环"。而正是"环 vs 域"的差距决定了模有许多与向量空间不同的现象——比如下面会看到的"非自由"。</p>
+
+<p>立刻给一些常用记号：\(R\)-模 \(M\) 中元素 \(0_M \in M\) 是加法单位；任意 \(m \in M\) 的加法逆 \(-m \in M\) 唯一存在（因为 \(M\) 是交换群）。从公理推导：\(0_R \cdot m = 0_M\)（因为 \(0_R \cdot m = (0 + 0) m = 0_R m + 0_R m\) 消一个），\((-1) m = -m\)，等等——和向量空间里完全一样。</p>
+
+<h2 id="sec16-2">16.2 例 1：\(\mathbb{Z}\)-模 = 交换群；\(k\)-模 = 向量空间</h2>
+
+<p>本章里两条最基本的对应：</p>
+
+<p><strong>(a) \(\mathbb{Z}\)-模就是交换群。</strong></p>
+
+<p>设 \(M\) 是任意交换群（加法记号）。定义 \(\mathbb{Z}\) 数乘 \(n \cdot m\)（\(n \in \mathbb{Z}, m \in M\)）为</p>
+
+<p>\[
+n \cdot m = \begin{cases} \underbrace{m + m + \cdots + m}_{n \text{ 个}}, & n > 0, \\ 0_M, & n = 0, \\ -((-n) \cdot m), & n < 0. \end{cases}
+\]</p>
+
+<p>这个数乘自动满足模公理（小练习——本质上是"加法群中的整数倍"的代数性质）。所以每个交换群<em>自动</em>是一个 \(\mathbb{Z}\)-模。</p>
+
+<p>反过来，每个 \(\mathbb{Z}\)-模 \(M\) 当然是交换群（公理直接要求）。\(\mathbb{Z}\) 数乘的"自由度"在哪？没有——给定 \(M\) 上的群结构，\(n \cdot m\) 就被前面那条递归公式唯一定出。</p>
+
+<p>\[
+\boxed{\ \mathbb{Z}\text{-模 } = \text{交换群（两者范畴等价）}.\ }
+\]</p>
+
+<p>这件事让"模"成为"群"概念的真正一般化的另一面：把 \(\mathbb{Z}\) 替成更一般的环 \(R\)，就得到比交换群更丰富的结构。<a href="ch17.html">第 17 章</a>讲 PID 上有限生成模的结构定理时，把 \(R = \mathbb{Z}\) 那一行单独读，恰好就是"有限生成交换群分类定理"——也就是<a href="ch8.html">第 8 章</a>的主结论。两件事是同一个定理的不同切面。</p>
+
+<p><strong>(b) \(k\)-模（\(k\) 是域）就是 \(k\)-向量空间。</strong></p>
+
+<p>\(k\)-向量空间的公理与 \(k\)-模公理逐字相同。所以"模"在 \(k\) 是域时<em>退化</em>成你熟悉的向量空间——基、维数、线性变换、行列式、特征值，整套线性代数。</p>
+
+<p>但只要 \(R\) 不再是域，模与向量空间之间的差距立刻显现。最简单的例子：\(M = \mathbb{Z}/2\mathbb{Z}\) 当 \(\mathbb{Z}\)-模——它没有 \(\mathbb{Z}\)-基（任何 \(a \in M\) 都满足 \(2a = 0\)）。这条事实在 16.8 节再深谈。</p>
+
+<h2 id="sec16-3">16.3 例 2：\(k[x]\)-模 = 向量空间 + 线性变换</h2>
+
+<p>这是模理论里最妙的一个例子，也是把整套线性代数嵌进模框架的钥匙。</p>
+
+<p>\(k\) 是域，\(V\) 是 \(k\)-向量空间，\(T : V \to V\) 是 \(k\)-线性变换。给 \(V\) 一个 \(k[x]\) 数乘：对 \(p(x) = \sum a_i x^i \in k[x]\) 与 \(v \in V\)，定义</p>
+
+<p>\[
+p(x) \cdot v := p(T) v = \sum a_i T^i v.
+\]</p>
+
+<p>（约定 \(T^0 = \mathrm{id}_V\)，\(T^i = T \circ T \circ \cdots \circ T\) 是 \(i\) 次复合。）</p>
+
+<p>检验这是 \(k[x]\)-模结构：</p>
+
+<ul>
+  <li>分配 + 结合 + 单位律——直接来自 \(p(T)\) 的代数性质（多项式代入算子是环同态 \(k[x] \to \mathrm{End}(V)\)）。</li>
+</ul>
+
+<p>所以一对 \((V, T)\) 给出一个 \(k[x]\)-模。反过来，给一个 \(k[x]\)-模 \(M\)：限制 \(k\) 数乘（\(k \subset k[x]\)）让 \(M\) 是 \(k\)-向量空间；定义 \(T : M \to M\) 为 \(T m = x \cdot m\)（"\(x\) 的作用"），\(T\) 是 \(k\)-线性的（由模公理）。这两条对应互为逆，所以</p>
+
+<p>\[
+\boxed{\ k[x]\text{-模} \longleftrightarrow (k\text{-向量空间 } V,\ k\text{-线性变换 } T : V \to V).\ }
+\]</p>
+
+<p>这条对应让"研究 \((V, T)\) 的内部结构"等价于"研究 \(k[x]\)-模 \(V\)"。一系列线性代数核心结论——子空间是否 \(T\)-不变、\(T\) 是否对角化、Jordan 标准型、Cayley–Hamilton 定理、最小多项式与特征多项式——都翻译为模论命题。<a href="ch17.html">第 17 章</a>的"PID 上有限生成模结构定理"里，\(R = k[x]\) 那一行<em>恰好就是</em> Jordan 标准型定理（注意 \(k[x]\) 是 PID 因为 \(k\) 是域）。</p>
+
+<p>这种"换环视角统一不同领域"的做法是抽象代数最让人佩服的工程。"群"那块，把 \(R = \mathbb{Z}\) 代入得到交换群分类；"算子"那块，把 \(R = k[x]\) 代入得到 Jordan 分类。同一定理两种应用，源头是同一种"PID 上的模结构"。</p>
+
+<p><strong>例。</strong>\(V = k^n\)，\(T = A\)（\(n \times n\) 矩阵）。\(p(x) \cdot v = p(A) v\)。这里"\(x\) 作用 = 乘以 \(A\)"。两个矩阵 \(A, B\) 相似 \(\iff\) 它们对应的 \(k[x]\)-模 \((k^n, A)\) 与 \((k^n, B)\) 同构。这是"相似"概念的模论刻画。</p>
+
+<h2 id="sec16-4">16.4 子模、商模、模同态、三大同构定理</h2>
+
+<p>把<a href="ch4.html">第 4 章</a>关于群与<a href="ch12.html">第 12 章</a>关于环的"同态、子结构、商、同构定理"全套搬到模上。</p>
+
+<p><strong>子模。</strong>\(N \subseteq M\) 是子模如果 \(N\) 在加法上是 \(M\) 的子群且对 \(R\) 数乘封闭（\(r \in R, n \in N \Rightarrow rn \in N\)）。例：\(R\) 自身作为 \(R\)-模时，\(R\) 的子模就是 \(R\) 的<em>左理想</em>。\(R\) 交换时左理想 = 理想。</p>
+
+<p><strong>商模。</strong>给定子模 \(N \subseteq M\)，定义 \(M / N = \{m + N : m \in M\}\)（陪集集合），加法与数乘按代表元定义；良定义性来自 \(N\) 是子模。\(M/N\) 自动是 \(R\)-模。</p>
+
+<p><strong>模同态。</strong>映射 \(\varphi : M \to N\)（\(M, N\) 都是 \(R\)-模）叫 \(R\)-模同态（也叫"\(R\)-线性映射"），如果</p>
+
+<p>\[
+\varphi(m_1 + m_2) = \varphi(m_1) + \varphi(m_2), \qquad \varphi(r m) = r \varphi(m), \qquad \forall m, m_1, m_2 \in M, r \in R.
+\]</p>
+
+<p>核 \(\ker \varphi = \{m \in M : \varphi(m) = 0\}\) 是 \(M\) 的子模；像 \(\operatorname{im} \varphi = \varphi(M)\) 是 \(N\) 的子模。</p>
+
+<p><strong>三大同构定理（模版本）。</strong></p>
+
+<ol>
+  <li><em>第一同构：</em>对模同态 \(\varphi : M \to N\)，\(M / \ker \varphi \cong \operatorname{im} \varphi\)。</li>
+  <li><em>第二同构（钻石）：</em>设 \(N, P\) 是 \(M\) 的子模，则 \((N + P) / P \cong N / (N \cap P)\)。</li>
+  <li><em>第三同构（双商）：</em>设 \(P \subseteq N \subseteq M\) 都是子模，则 \((M / P) / (N / P) \cong M / N\)。</li>
+</ol>
+
+<p>证明都是把<a href="ch5.html">第 5 章</a>的群同构定理逐字搬过来——所有验证都已在群层做过，模公理只是把 \(R\) 数乘那一行加上去。</p>
+
+<p>这套同构定理在<a href="ch17.html">第 17 章</a>做有限生成模分解时反复使用。它们是任何"分解结构"型论证的基本通货。</p>
+
+<h2 id="sec16-5">16.5 自由模 \(R^n\)</h2>
+
+<p>"\(R\)-模上最像向量空间"的一类是<strong>自由模</strong>。最简单的自由模是</p>
+
+<p>\[
+R^n := \underbrace{R \oplus R \oplus \cdots \oplus R}_{n \text{ 个}}, \qquad (r_1, \ldots, r_n) + (s_1, \ldots, s_n) = (r_1 + s_1, \ldots, r_n + s_n),
+\]</p>
+
+<p>数乘 \(r \cdot (r_1, \ldots, r_n) = (r r_1, \ldots, r r_n)\)。"标准基"是 \(e_1, \ldots, e_n\)（\(e_i\) 第 \(i\) 位为 1 其余 0）。每个 \((r_1, \ldots, r_n)\) 唯一写成 \(\sum r_i e_i\)。</p>
+
+<p>\[
+\boxed{\ R^n \text{ 是有限秩自由 \(R\)-模，标准基 } e_1, \ldots, e_n。\ }
+\]</p>
+
+<p>更一般地，集合 \(I\) 上的<strong>自由 \(R\)-模</strong>是 \(R^{(I)} := \bigoplus_{i \in I} R\)（"几乎处处为 0"的元素的直和），含基 \(\{e_i\}_{i \in I}\)。"自由"的本质特征：任何映射 \(\{e_i\} \to N\)（\(N\) 任意 \(R\)-模）唯一延拓为 \(R\)-模同态 \(R^{(I)} \to N\)（这是范畴论里"自由对象"的标准定义）。</p>
+
+<p>关键事实：在 \(R\) 是<em>交换</em>环时，自由模 \(R^n\) 的"秩 \(n\)"是良定义的——\(R^n \cong R^m\) 蕴含 \(n = m\)。证明思路：选 \(R\) 的极大理想 \(\mathfrak{m}\)，则 \(R/\mathfrak{m}\) 是域，张量得到 \((R/\mathfrak{m})^n \cong (R/\mathfrak{m})^m\)，作为向量空间维数比较得 \(n = m\)。这一步是为什么交换环上"模的秩"概念有意义。\(R\) 是非交换环时这条会出毛病，但本书不深入。</p>
+
+<p>注意"自由"是个比"有基"略强的同义概念——自由模 \(=\) 有基的模。绝大多数模<em>不</em>自由。例 \(\mathbb{Z}/2\mathbb{Z}\) 不是自由 \(\mathbb{Z}\)-模（无 \(\mathbb{Z}\)-基）。</p>
+
+<h2 id="sec16-6">16.6 直和、torsion、有限生成</h2>
+
+<p><strong>直和。</strong>给定 \(R\)-模族 \(\{M_i\}_{i \in I}\)，<em>直和</em> \(\bigoplus_i M_i\) 是"几乎所有分量为 0"的元组集合，加法与数乘逐分量定义。它满足"通用性"——对任意一族同态 \(\varphi_i : M_i \to N\) 唯一确定一个同态 \(\bigoplus M_i \to N\)。</p>
+
+<p>有限直和 \(M_1 \oplus \cdots \oplus M_n\) 与<em>直积</em> \(M_1 \times \cdots \times M_n\) 相同（无穷个时直和是直积的子模）。</p>
+
+<p><strong>Torsion。</strong>设 \(R\) 是整环，\(M\) 是 \(R\)-模。元素 \(m \in M\) 叫 <strong>torsion</strong>，如果存在非零 \(r \in R\) 使 \(rm = 0\)。所有 torsion 元素的集合 \(T(M)\) 是 \(M\) 的子模（用整环性证 \(r m_1 = 0, s m_2 = 0\) 蕴含 \((rs)(m_1 + m_2) = 0\) 而 \(rs \neq 0\)）。\(M\) 叫<strong>无 torsion</strong>，如果 \(T(M) = \{0\}\)。例：\(\mathbb{Z}/2\mathbb{Z}\) 整体是 torsion（\(2 \cdot a = 0\) 对所有 \(a\)）；\(\mathbb{Z}\) 自身无 torsion。</p>
+
+<p>无 torsion <em>不蕴含</em>自由！\(\mathbb{Q}\) 当 \(\mathbb{Z}\)-模无 torsion 但不自由（没有 \(\mathbb{Z}\)-基——\(\mathbb{Q}\) 中任何两个非零元素 \(p/q, r/s\) 线性相关 \(s p \cdot p/q = q r \cdot r/s \cdot \text{某些}\)，更细致地任何有限子集都满足非平凡 \(\mathbb{Z}\)-线性关系）。"无 torsion = 自由"只在<em>有限生成 + PID</em> 这个组合下成立——这是<a href="ch17.html">第 17 章</a>的核心结构定理之一。</p>
+
+<p><strong>有限生成。</strong>\(R\)-模 \(M\) 叫<strong>有限生成</strong>，如果存在有限多个 \(m_1, \ldots, m_n \in M\) 使 \(M = \{r_1 m_1 + \cdots + r_n m_n : r_i \in R\}\)。等价于：存在满射模同态 \(R^n \twoheadrightarrow M\)。</p>
+
+<p>例：\(\mathbb{Z}^n, \mathbb{Z}/n\mathbb{Z}, \mathbb{Z} \oplus \mathbb{Z}/2\mathbb{Z}\) 都有限生成。\(\mathbb{Q}\) 当 \(\mathbb{Z}\)-模<em>不</em>有限生成（任何有限子集 \(\{p_1/q_1, \ldots, p_n/q_n\}\) 生成的子模 \(\subseteq \mathbb{Z}\) 系数有理数集，不含 \(1/(q_1 q_2 \cdots q_n + 1)\)）。</p>
+
+<p>\[
+\boxed{\ M \text{ 有限生成} \iff \exists\, n,\ \exists\, R^n \twoheadrightarrow M \text{ 满射}.\ }
+\]</p>
+
+<p>"有限生成"是模理论里能进行<em>结构归纳</em>的最低要求。<a href="ch17.html">第 17 章</a>所有结构定理都假设有限生成。</p>
+
+<h2 id="sec16-7">16.7 短正合列与分裂</h2>
+
+<p>三个 \(R\)-模与两个同态的列</p>
+
+<p>\[
+0 \longrightarrow A \xrightarrow{\ f\ } B \xrightarrow{\ g\ } C \longrightarrow 0
+\]</p>
+
+<p>叫<strong>短正合列</strong>，如果</p>
+
+<ol>
+  <li>\(f\) 单射（即 \(\ker f = 0\)）；</li>
+  <li>\(\operatorname{im} f = \ker g\)；</li>
+  <li>\(g\) 满射（即 \(\operatorname{im} g = C\)）。</li>
+</ol>
+
+<p>"正合"\(=\)"在每一项处 像 = 核"。短正合列在每一项的正合分别等价于上面三条。</p>
+
+<p>\[
+\boxed{\ 0 \to A \xrightarrow{f} B \xrightarrow{g} C \to 0 \text{ 正合} \iff f \text{ 单}, \ g \text{ 满}, \ \operatorname{im} f = \ker g。\ }
+\]</p>
+
+<p>由第一同构定理 \(B / \operatorname{im} f \cong C\)，所以 \(C\) 就是 \(B\) 模掉子模 \(\operatorname{im} f \cong A\) 的商。一句话：短正合列描述"\(B\) 由 \(A\)（子模）和 \(C\)（商模）组装而成"。</p>
+
+<p><strong>分裂。</strong>短正合列 \(0 \to A \to B \to C \to 0\) 叫<strong>分裂</strong>，如果存在等价的下面三条之一：</p>
+
+<ul>
+  <li>存在 \(R\)-模同态 \(s : C \to B\) 使 \(g \circ s = \mathrm{id}_C\)（"右逆"）；</li>
+  <li>存在 \(R\)-模同态 \(p : B \to A\) 使 \(p \circ f = \mathrm{id}_A\)（"左逆"）；</li>
+  <li>\(B \cong A \oplus C\)（直和分解）。</li>
+</ul>
+
+<p>三条等价的证明：第一条 \(\Rightarrow\) 第三条 用 \(b \mapsto (f^{-1}(b - s g(b)), g(b))\) 给出同构 \(B \to A \oplus C\)；其他两条同理。一旦有任何一种分裂就有全部三种。</p>
+
+<p>不是所有短正合列都分裂。例：\(0 \to \mathbb{Z} \xrightarrow{\times 2} \mathbb{Z} \to \mathbb{Z}/2\mathbb{Z} \to 0\) 不分裂——若分裂则 \(\mathbb{Z} \cong \mathbb{Z} \oplus \mathbb{Z}/2\mathbb{Z}\)，但右边有 torsion 元素 \((0, 1)\) 而 \(\mathbb{Z}\) 无 torsion，矛盾。</p>
+
+<p>但只要 \(C\) 是<em>自由</em>模，短正合列总分裂——选 \(C\) 的基 \(\{c_i\}\)，由 \(g\) 满射取原像 \(b_i \in g^{-1}(c_i)\)，定义 \(s(c_i) = b_i\) 由自由性延拓为 \(s : C \to B\)，自动满足 \(g s = \mathrm{id}_C\)。这一现象是<a href="ch17.html">第 17 章</a>结构定理证明里的关键工具——把 PID 上有限生成模递归剥离自由商时，每一步分裂都自动给出。</p>
+
+<h2 id="sec16-8">16.8 模没有"基"——动机第 17 章</h2>
+
+<p>把 \(\mathbb{Z}/2\mathbb{Z}\) 当成 \(\mathbb{Z}\)-模看：它是有限生成（由单个 \(\bar 1\) 生成），但没有 \(\mathbb{Z}\)-基。</p>
+
+<p>论证：若 \(\{a_1, \ldots, a_k\} \subseteq \mathbb{Z}/2\mathbb{Z}\) 是基，则任何元素唯一写成 \(\sum n_i a_i\)（\(n_i \in \mathbb{Z}\)）。但 \(2 a_1 = 0 = 0 \cdot a_1 + 0 \cdot a_2 + \cdots\)，唯一性要求 \(2 = 0\)（系数对照），\(\mathbb{Z}\) 中不成立。所以 \(\mathbb{Z}/2\mathbb{Z}\) 无 \(\mathbb{Z}\)-基，即不自由。</p>
+
+<p>这件事粉碎了"任何模都有基"的希望——也就破坏了"维数"概念在模上的简单性。但全局来看：<em>有 torsion</em> 的元素是"无基"的元凶。如果把 torsion 部分隔离出来，剩下的"无 torsion 部分"就有希望恢复"自由 = 有基"的好性质。</p>
+
+<p>更精确地：在 PID 上，每个有限生成模 \(M\) 都能写成</p>
+
+<p>\[
+M \cong R^r \oplus R/(p_1^{a_1}) \oplus R/(p_2^{a_2}) \oplus \cdots \oplus R/(p_k^{a_k}),
+\]</p>
+
+<p>其中 \(R^r\) 是<em>自由部分</em>（秩 \(r\) 唯一），\(R/(p_i^{a_i})\) 是 torsion 部分的"素方幂分解"，\(p_i\) 是 \(R\) 的素元，\(a_i \ge 1\)。这就是<strong>PID 上有限生成模的结构定理</strong>，是下一章的主结论。</p>
+
+<p>把 \(R = \mathbb{Z}\) 代入，得到：每个有限生成交换群 \(M \cong \mathbb{Z}^r \oplus \mathbb{Z}/p_1^{a_1} \oplus \cdots\)——正是<a href="ch8.html">第 8 章</a>的有限交换群结构定理。把 \(R = k[x]\) 代入并取有限维 \(V\) 当作 \(k[x]\)-模 \((V, T)\)，得到 \((V, T) \cong\) 块对角矩阵 \(\bigoplus k[x]/(p_i^{a_i}(x))\)——这就是<em>有理标准型</em>，把 \(p_i(x)\) 取成 \(x - \lambda\)（\(k\) 代数闭时）就是<em>Jordan 标准型</em>。</p>
+
+<p>所以"模没有基"这件事，最终被一条统一的结构定理解释清楚：模有"自由部分 + 素 torsion 部分"两块拼起来，自由部分有维数，torsion 部分由一组 \((p_i, a_i)\) 完全分类。下一章我们把这件事正式说穿，并证明它。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 多项式环</a><a href="ch17.html">下一章 · 第 17 章 PID 上有限生成模的结构定理 →</a></nav>
+</main>
+</body>
+</html>

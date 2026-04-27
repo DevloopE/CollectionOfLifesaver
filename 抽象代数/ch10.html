@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 自由群、生成元与关系 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 对称群 \(S_n\) 与置换</a><a href="ch11.html">下一章 · 第 11 章 环：定义与基本例子 →</a></nav>
+<h1 id="ch10">第 10 章 自由群、生成元与关系</h1>
+
+<p>到这里我们已经看了大量"具体已存在"的群——\(\mathbb{Z}_n, S_n, A_n, D_n, \) 各种 Sylow 子群、有限交换群的分类。一个自然的反向问题：<em>能不能反过来"造"一个群？给我几个生成元，再加上几条关系，然后一切其它结构由这些生成元和关系自动决定</em>。这就是<strong>群表示</strong>（group presentation）的思想。</p>
+
+<p>极端情况下，"零关系"——只给生成元，不施加任何约束——得到的群叫<strong>自由群</strong>。它是这一组生成元能产生的"最大可能"群，所有其它带这一组生成元的群都是它的<em>商</em>。这个"自由"的意义和线性代数里"自由模 = 没有任何关系"的意义完全一致。</p>
+
+<p>本章我们把自由群、群表示、Cayley 图三件事讲清，最后简短提一下"判定问题"在群表示上的不可解性——这是 20 世纪计算群论与可计算性理论的交汇。</p>
+
+<ul>
+  <li>10.1 自由群 \(F_S\) 的字（reduced word）模型。</li>
+  <li>10.2 \(F_2\) 的几何：无限正则二叉树。</li>
+  <li>10.3 自由群的<em>普遍性质</em>——一切群论同态由生成元处的取值唯一决定。</li>
+  <li>10.4 群表示 \(\langle S \mid R \rangle = F_S / N(R)\)。</li>
+  <li>10.5 例：\(D_n\) 的标准 presentation。</li>
+  <li>10.6 例：\(\mathbb{Z}, \mathbb{Z}_n, \mathbb{Z}^2\) 的 presentation。</li>
+  <li>10.7 Cayley 图——把群表示画成几何图。</li>
+  <li>10.8 算法不可解性：判定两个 presentation 同构在一般情形不可判定。</li>
+</ul>
+
+<h2 id="sec10-1">10.1 自由群 \(F_S\)</h2>
+
+<p>设 \(S\) 是一个集合（可有限可无限）。我们要构造一个群 \(F_S\)，里面只含 \(S\) 的元素及其逆，乘法尽量"无约束"地拼接。</p>
+
+<p><strong>定义。</strong>对每个 \(s \in S\) 引入一个符号 \(s^{-1}\)。一个<strong>字</strong>是 \(\{s, s^{-1} : s \in S\}\) 中元素的有限序列 \(w = a_1 a_2 \cdots a_n\)（允许空字 \(\varepsilon\)）。</p>
+
+<p>字 \(w\) 称为<strong>约化的</strong>（reduced），如果没有相邻的"\(s s^{-1}\)"或"\(s^{-1} s\)"出现。</p>
+
+<p><strong>定义。</strong>\(F_S\) 是所有约化字组成的集合，乘法定义为<em>拼接然后约化</em>——把两字 \(w_1 w_2\) 拼接，反复消去出现的 \(s s^{-1}\) 或 \(s^{-1} s\) 直到约化为止。\(F_S\) 中单位元为空字 \(\varepsilon\)，逆元 \((a_1 \cdots a_n)^{-1} = a_n^{-1} \cdots a_1^{-1}\)。</p>
+
+<p>这是<strong>\(S\) 上的自由群</strong>。\(|S| = n\) 时记 \(F_n\)。</p>
+
+<p>需要论证：约化字模型给出群结构（结合律、单位、逆），且约化结果不依赖约化次序。这条<em>约化唯一性</em>是关键技术细节，标准证法是引入"形式幺半群 + 约化运算"或者用 van der Waerden 的"基础引理"。本章不证（书末习题）。</p>
+
+<p>例 \(S = \{a\}\) 单生成。\(F_1\) 中所有约化字 \(\{\ldots, a^{-2}, a^{-1}, \varepsilon, a, a^2, \ldots\} = \{a^k : k \in \mathbb{Z}\}\)。乘法 \(a^k \cdot a^l = a^{k+l}\)。所以 \(F_1 \cong \mathbb{Z}\)。</p>
+
+<p>例 \(S = \{a, b\}\) 两生成。\(F_2\) 中字像 \(a, b, a b, b a, a b a^{-1}, a^2 b^3 a^{-1} b^{-2}, \ldots\)，全是<em>约化字</em>。\(F_2\) 不可交换：\(a b \ne b a\)（它们都是约化字，不相等）。事实上 \(F_2\) 含<em>无限多</em>不同元素，比 \(\mathbb{Z}\) 大得多。</p>
+
+<h2 id="sec10-2">10.2 \(F_2\) 的几何：无限正则四叉树</h2>
+
+<p>\(F_2\) 的元素结构很难凭抽象文字感受。它的<strong>Cayley 图</strong>给出强烈的几何直观。</p>
+
+<p>\(F_2\) 的 Cayley 图：每个约化字是一个顶点，从顶点 \(w\) 引出 4 条带标号的边——分别向 \(wa, wa^{-1}, wb, wb^{-1}\)。</p>
+
+<p>结果是一棵<em>无限的正则 4-叉树</em>（每个顶点恰有 4 个邻居，无环路——为什么没有环？因为 \(F_2\) 中"约化字"本身没有非平凡关系，不存在 \(w_1 w_2 \cdots w_k = e\) 这种"回到原点"的非平凡循环）。</p>
+
+<p>这棵树有几个让人惊讶的几何性质：</p>
+
+<ul>
+  <li><em>双曲性</em>：它是 Gromov 意义下的"\(\delta\)-双曲空间"，曲率"无穷负"——这种几何让 \(F_2\) 在几何群论里是"最双曲"的群之一。</li>
+  <li><em>遵循 Banach–Tarski 悖论</em>：\(F_2\) 是 \(\mathrm{SO}(3)\) 的子群（事实），可以让"球面分解成有限块再重组成两个球"成为可能（详细在<a href="../实分析/index.html">实分析读本</a>关于不可测集的章节）。</li>
+</ul>
+
+<p>"自由群有非常大的子群空间"是 Nielsen–Schreier 定理：<em>自由群的任意子群都是自由群</em>。\(F_2\) 含<em>无穷秩</em>的自由子群——这点与有限维线性代数的"子空间维数小于等于全空间"形成强烈反差。</p>
+
+<h2 id="sec10-3">10.3 自由群的普遍性质</h2>
+
+<p>"自由"这两个字的精确数学含义是：</p>
+
+<p><strong>定理（自由群的普遍性质）。</strong>设 \(S\) 是集合，\(F_S\) 是 \(S\) 上的自由群（带嵌入 \(\iota : S \hookrightarrow F_S\)）。对任意群 \(G\) 与任意映射 \(f : S \to G\)，存在<em>唯一</em>群同态 \(\tilde f : F_S \to G\) 使得 \(\tilde f \circ \iota = f\)。</p>
+
+<p>\[
+\boxed{\ \forall f : S \to G,\ \exists ! \tilde f : F_S \to G \ \text{群同态}, \ \tilde f|_S = f.\ }
+\]</p>
+
+<p>证明。\(\tilde f\) 在生成元上必定 \(\tilde f(s) = f(s)\)。对一般约化字 \(w = s_1^{\epsilon_1} \cdots s_n^{\epsilon_n}\)，必定 \(\tilde f(w) = f(s_1)^{\epsilon_1} \cdots f(s_n)^{\epsilon_n}\)。所以唯一性立即得到。存在性：把上述公式当作定义；要验它是良定的群同态——这恰好需要 \(F_S\) 中"约化"操作的良定性，前节已说明。</p>
+
+<p>这个定理换种说法：<em>\(F_S\) 是"集合 \(\to\) 群"这个遗忘函子的左伴随的值</em>。任意群 \(G\) 的"\(S\) 索引子集"和"\(F_S \to G\) 的同态"一一对应。</p>
+
+<p>实用推论：每个群 \(G\) 都是某个自由群的<em>商</em>。证明：取 \(S = G\)，\(f : S \to G\) 是恒等。\(\tilde f : F_G \to G\) 由普遍性给。\(\tilde f\) 显然满射（每个 \(g \in G\) 是 \(\tilde f(g)\)），所以 \(G \cong F_G / \ker \tilde f\)。这把"任何群" \(=\) "自由群除以某个正规子群"这件事一举证明。</p>
+
+<h2 id="sec10-4">10.4 群表示 \(\langle S \mid R \rangle\)</h2>
+
+<p>有了上一节"任何群是自由群的商"作为后盾，<em>群表示</em>就有清晰意义了。</p>
+
+<p><strong>定义。</strong>设 \(S\) 是集合，\(R \subseteq F_S\) 是若干字（"关系子"）。<strong>\(R\) 在 \(F_S\) 中的正规闭包</strong> \(N(R)\) 定义为<em>包含 \(R\) 的最小正规子群</em>，即 \(R\) 中所有元素及其在 \(F_S\) 中所有共轭生成的子群。</p>
+
+<p>群</p>
+
+<p>\[
+\boxed{\ \langle S \mid R \rangle := F_S / N(R)\ }
+\]</p>
+
+<p>叫<strong>由 \(S\) 生成且关系为 \(R\) 的群</strong>，或称这是它的一个 <em>group presentation</em>。</p>
+
+<p>语言上，\(\langle S \mid R \rangle\) 描述的是"由 \(S\) 自由生成，并强制 \(R\) 中所有字等于 \(e\)"的群。在表达式里写 "\(r = e\)"（\(r \in R\)）通常省略 \(= e\)，直接写 \(r\)；或者写成方程 \(u = v\)（即 \(u v^{-1} \in R\)）。</p>
+
+<p>这个构造满足一个对应的<strong>带关系的普遍性质</strong>：</p>
+
+<p><strong>定理。</strong>对任意群 \(G\) 与映射 \(f : S \to G\) 满足"\(f\) 在每个 \(r \in R\) 上消失"（即 \(\tilde f(r) = e\) 对每个 \(r\)），存在唯一同态 \(\langle S \mid R \rangle \to G\) 把每个 \(s\) 送到 \(f(s)\)。</p>
+
+<p>意思是：\(\langle S \mid R \rangle\) 是<em>满足这些关系的最大群</em>。任何"满足这些关系"的群都从它产生。</p>
+
+<h2 id="sec10-5">10.5 例：\(D_n\) 的 presentation</h2>
+
+<p>\(D_n\) 是正 \(n\) 边形的对称群，阶 \(2n\)。它由两个元素生成：旋转 \(r\)（旋转角 \(2\pi/n\)）与反射 \(s\)。这两个元素满足：</p>
+
+<ul>
+  <li>\(r^n = e\)（旋转 \(n\) 次回到原点）；</li>
+  <li>\(s^2 = e\)（反射两次还原）；</li>
+  <li>\(s r s = r^{-1}\)（先旋转再反射 \(=\) 先反射再反向旋转）。</li>
+</ul>
+
+<p>所以 \(D_n\) 的 presentation：</p>
+
+<p>\[
+\boxed{\ D_n = \langle r, s \mid r^n = e,\ s^2 = e,\ s r s = r^{-1} \rangle.\ }
+\]</p>
+
+<p>这个 presentation 让你不用借助"正多边形几何"也能写下 \(D_n\)——纯代数。</p>
+
+<p>验证 \(|D_n| = 2n\)：用关系 \(s r s = r^{-1}\) 反复挪 \(s\)，每个字可以化为 \(r^i\) 或 \(r^i s\)（\(0 \le i < n\)）。所以最多 \(2n\) 个不同元素。每个字两两不等（自由部分剩 \(\mathbb{Z}_n \times \{e, s\}\)，关系不进一步合并），所以恰为 \(2n\)。</p>
+
+<p>类似的标准 presentation：</p>
+
+<ul>
+  <li>四元数群 \(Q_8 = \langle a, b \mid a^4 = e,\ b^2 = a^2,\ b a b^{-1} = a^{-1} \rangle\)；</li>
+  <li>对称群 \(S_n = \langle s_1, \ldots, s_{n-1} \mid s_i^2 = e,\ (s_i s_{i+1})^3 = e,\ s_i s_j = s_j s_i\ (|i - j| \ge 2) \rangle\)（Coxeter presentation）。</li>
+</ul>
+
+<p>Coxeter presentation 是\(S_n\) 在<a href="../线性代数/index.html">线性代数</a>"反射群"和后续<a href="ch24.html">第 24 章 表示论</a>里的标准入口。</p>
+
+<h2 id="sec10-6">10.6 例：\(\mathbb{Z}, \mathbb{Z}_n, \mathbb{Z}^2\)</h2>
+
+<p><strong>\(\mathbb{Z}\) 的 presentation。</strong>它是"一个生成元，无关系"的群：</p>
+
+<p>\[
+\mathbb{Z} = \langle x \mid \rangle.
+\]</p>
+
+<p>这就是 \(F_1\)，单生成自由群。</p>
+
+<p><strong>\(\mathbb{Z}_n\) 的 presentation。</strong>给一个生成元加一条关系 \(x^n = e\)：</p>
+
+<p>\[
+\mathbb{Z}_n = \langle x \mid x^n \rangle.
+\]</p>
+
+<p><strong>\(\mathbb{Z} \times \mathbb{Z}\) 的 presentation。</strong>两个生成元，加一条交换关系 \(x y = y x\)，等价地 \(x y x^{-1} y^{-1} = e\)（这个表达式叫<strong>换位子</strong>）：</p>
+
+<p>\[
+\mathbb{Z} \times \mathbb{Z} = \langle x, y \mid x y x^{-1} y^{-1} \rangle.
+\]</p>
+
+<p>这条 presentation 透露一个深刻事实——一旦在 \(F_2\) 中加上"\(x, y\) 交换"这一条关系，整个群从无穷维"自由"跌落到二维交换 \(\mathbb{Z}^2\)。这就是 group presentation 的强大：<em>极少几条关系可以剧烈改变群的大小</em>。</p>
+
+<p>更一般，<strong>\(\mathbb{Z}^n\)（\(n\) 元交换自由群）</strong>：</p>
+
+<p>\[
+\mathbb{Z}^n = \langle x_1, \ldots, x_n \mid x_i x_j = x_j x_i\ \forall i, j \rangle.
+\]</p>
+
+<p>把所有的换位子 \([x_i, x_j] = x_i x_j x_i^{-1} x_j^{-1}\) 都设为 \(e\) 就是"全部交换"。</p>
+
+<p>"自由群 + 全部换位子关系"得到的群叫 <strong>\(F_n\) 的交换化</strong> \(F_n^{\mathrm{ab}}\)，等于 \(\mathbb{Z}^n\)。这是从"非交换最大群"到"交换最大群"的标准约化。</p>
+
+<h2 id="sec10-7">10.7 Cayley 图与几何直观</h2>
+
+<p>group presentation 的另一种可视化方式是<strong>Cayley 图</strong>。</p>
+
+<p><strong>定义。</strong>设 \(G = \langle S \mid R \rangle\) 一个 presentation。\(G\) 的 Cayley 图是一个有向带标号图：</p>
+
+<ul>
+  <li>顶点 \(=\) \(G\) 的元素；</li>
+  <li>对每个 \(g \in G\) 与 \(s \in S\)，从 \(g\) 到 \(g s\) 引一条标号 \(s\) 的有向边。</li>
+</ul>
+
+<p>这个图把"群"变成"几何对象"，对很多群行为给出极强的视觉理解。</p>
+
+<p>例。\(\mathbb{Z}_6 = \langle x \mid x^6 \rangle\) 的 Cayley 图是一个 6-顶点圆环（每个顶点一条出边到下一个）。\(\mathbb{Z}^2 = \langle x, y \mid xy = yx \rangle\) 的 Cayley 图是平面无限方格。\(F_2 = \langle a, b \mid \rangle\) 的 Cayley 图是无限 4-正则树（10.2 节）。\(D_4 = \langle r, s \mid r^4, s^2, srsr \rangle\) 的 Cayley 图是 8-顶点的"双层环"（外环 \(r\)-边的 4-环，内环 \(r\)-边的 4-环，外内两层之间用 \(s\)-边连）。</p>
+
+<p>Cayley 图把"群乘积"变成"沿边走"——你想算 \(g h\)，就在 Cayley 图中从 \(g\) 出发，按 \(h\) 的字母逐字沿对应标号的边走，最后到达的顶点就是 \(gh\)。</p>
+
+<p>几何群论的整门学问基本上就是"研究 Cayley 图作为度量空间的几何"——曲率、增长率、双曲性、可设等距嵌入等。Gromov 1980 年代发展的<em>几何群论</em>用 Cayley 图把"群论"和"非欧几何"连成一线。这条线在<a href="../实分析/index.html">实分析读本</a>提到的 amenability 概念里也再出现。</p>
+
+<h2 id="sec10-8">10.8 不可解性：Boone–Novikov 定理</h2>
+
+<p>group presentation 给"什么群存在"一个非常一般的答案。但它带来一个尴尬的问题——给两个 presentation \(\langle S_1 \mid R_1 \rangle\) 与 \(\langle S_2 \mid R_2 \rangle\)，<em>判定它们同构</em>是否有<em>算法</em>？</p>
+
+<p>1955 年 Novikov 与 1958 年 Boone 各自独立给出震惊的答案：</p>
+
+<p><strong>定理（Boone–Novikov）。</strong>"判定两个有限呈现群是否同构"在一般情形是<em>算法不可解</em>的。事实上更基本的<strong>字问题</strong>——"给一个有限 presentation \(\langle S \mid R \rangle\) 与一个字 \(w\)，判定 \(w\) 是否等于 \(e\)"——也已经不可解。</p>
+
+<p>"不可解"在这里是 Turing 意义下：不存在任何 Turing 机能在有限时间内对任意输入正确判定字问题。</p>
+
+<p>这条定理的证明走的是计算性理论的路：把 Turing 机的"停机问题"嵌入到一个具体的群表示中。Markov 与 Adyan 接着证明<em>群同构问题、可解性、有限性、可数性</em>等几乎一切群论性质在 presentation 上都是不可判定的。</p>
+
+<p>"代数对象上的判定问题不可解"是 20 世纪可计算性理论与代数交汇的主线。它告诉你：尽管 group presentation 是描述群的"通用语言"，<em>这门语言本身就有不可逾越的算法极限</em>。具体某个群（如 \(\mathbb{Z}_n, S_n, F_n\)）的字问题可以高效解决；但"任意有限呈现群"作为一类对象，你<em>没有</em>统一的算法来全部处理它们。</p>
+
+<p>\[
+\boxed{\ \text{字问题（word problem）在一般有限呈现群上算法不可解.}\ }
+\]</p>
+
+<p>群论这一"上半部分"——纯群论——到这里告一段落。前 10 章我们从"对称的几何直觉"出发（第 1 章），建立了群、子群、商群、同构定理（2-5 章），引入了群作用与 Sylow（6-7 章），分类了有限交换群（8 章），分析了对称群与置换（9 章），最后给"群的普遍构造"一个完整框架（10 章）。</p>
+
+<p>下一章我们换一个完全不同的代数结构——<strong>环</strong>（ring）。一个环里同时有两种运算——加法（构成交换群）与乘法（结合，对加法分配）。整数 \(\mathbb{Z}\)、多项式 \(\mathbb{Z}[x]\)、矩阵环、连续函数环，都是环。环论比群论维度更高、结构更丰富，最终通向<a href="ch18.html">域论</a>与<a href="ch21.html">Galois 理论</a>，让我们能解决那些 19 世纪悬而未决的代数终极问题——尺规作图与多项式可解性。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 对称群 \(S_n\) 与置换</a><a href="ch11.html">下一章 · 第 11 章 环：定义与基本例子 →</a></nav>
+</main>
+</body>
+</html>

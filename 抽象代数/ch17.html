@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 PID 上有限生成模的结构定理 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 模的入门</a><a href="ch18.html">下一章 · 第 18 章 域的扩张 →</a></nav>
+<h1 id="ch17">第 17 章 PID 上有限生成模的结构定理</h1>
+
+<p>这一章是抽象代数最美的"分类定理"之一。它用一行话把一类看上去很大的对象——任何 PID 上有限生成的模——彻底列完。它的"美"不只在于结论本身，而在于<em>这一条结论同时统一了两件看上去完全不同的经典定理</em>：<a href="ch8.html">第 8 章</a>那条"有限生成 abelian 群分类"取 \(R = \mathbb{Z}\) 即得；线性代数里"线性变换的 Jordan 标准形"取 \(R = k[x]\) 即得。</p>
+
+<p>把上一章关于模的语言准备好之后，本章我们要做的事情其实很短：陈述<strong>结构定理</strong>，给一个能跑得动的<strong>证明思路</strong>（核心是"关系矩阵的 Smith 标准形"），然后把它套在 \(\mathbb{Z}\) 与 \(k[x]\) 上看几个具体应用。看完这一章你会有一种"代数突然清空了"的感觉——那些原来要分成两门课讲的有限 abelian 群分类、Jordan 形、有理标准形，全部是同一条定理的影子。</p>
+
+<ul>
+  <li>17.1 主定理的<strong>不变因子型</strong>陈述：每个有限生成模唯一写成 \(R^k \oplus R/(d_1) \oplus \cdots \oplus R/(d_s)\)，\(d_1 \mid d_2 \mid \cdots \mid d_s\)。</li>
+  <li>17.2 等价的<strong>初等因子型</strong>：把 \(R/(d_i)\) 用中国剩余定理拆成素幂模 \(R/(p^a)\) 的直和。</li>
+  <li>17.3 PID 上的<strong>Smith 标准形</strong>：任何矩阵都能用行列变换化成对角型 \(\operatorname{diag}(d_1, \ldots, d_n, 0, \ldots, 0)\)。</li>
+  <li>17.4 把"有限生成模"翻译成"\(R^n / \text{关系子模}\)"——用 Smith 标准形读出主定理。</li>
+  <li>17.5 应用 1：\(R = \mathbb{Z}\) 重新得到有限生成 abelian 群分类。</li>
+  <li>17.6 应用 2：\(R = k[x]\) 给出线性变换的<strong>有理标准形</strong>。</li>
+  <li>17.7 应用 3：\(R = k[x]\) 在代数闭域上给出<strong>Jordan 标准形</strong>。</li>
+  <li>17.8 应用 4：Frobenius 标准形与不变因子的几何意义。</li>
+</ul>
+
+<h2 id="sec17-1">17.1 主定理：不变因子型</h2>
+
+<p>设 \(R\) 是<strong>主理想环</strong>（PID）——交换、有 \(1\)、无零因子，每个理想都由单个元素生成。\(\mathbb{Z}\) 与 \(k[x]\)（\(k\) 是域）是两个最重要的例子，前一个在数论里无处不在，后一个在线性代数里无处不在。<a href="ch14.html">第 14 章</a>把"PID \(\Rightarrow\) UFD" 这条钉死过；本章会反复用 PID 上"两个元素必有最大公约数 \(\gcd\)、且 \(\gcd\) 能写成线性组合"这一性质（Bézout 等式）。</p>
+
+<p>主定理叫得朴素：</p>
+
+<p><strong>定理（PID 上有限生成模的结构定理 — 不变因子型）。</strong>设 \(R\) 是 PID，\(M\) 是有限生成 \(R\)-模。则存在唯一的非负整数 \(k\) 与（差一个单位的）非零非单位元 \(d_1, d_2, \ldots, d_s \in R\) 满足 \(d_1 \mid d_2 \mid \cdots \mid d_s\)，使得</p>
+
+<p>\[
+\boxed{\ M \;\cong\; R^k \;\oplus\; R/(d_1) \;\oplus\; R/(d_2) \;\oplus\; \cdots \;\oplus\; R/(d_s).\ }
+\]</p>
+
+<p>非负整数 \(k\) 叫 \(M\) 的<strong>自由秩</strong>，元素 \(d_i\)（差单位下唯一）叫 \(M\) 的<strong>不变因子</strong>。\(R/(d_i)\) 称为<strong>挠部</strong>分（torsion part）的循环分量；\(R^k\) 是<strong>自由部</strong>分。</p>
+
+<p>条件 \(d_1 \mid \cdots \mid d_s\) 是分解唯一的关键：如果不要求整除链，可以把同一个模写成无数种 \(R/(d_i)\) 直和（用中国剩余定理拆开重组）。"差一个单位"指 \(d_i\) 可乘 \(R\) 中可逆元（\(\mathbb{Z}\) 里 \(\pm 1\)、\(k[x]\) 里非零常数），分解同构类不变；通常约定 \(\mathbb{Z}\) 里取正、\(k[x]\) 里取首一。</p>
+
+<p>看这个公式时眼睛要先停在两件事上。第一，<strong>所有信息都装在 \((k; d_1, \ldots, d_s)\) 这一串数据里</strong>——给两个有限生成模，它们同构 \(\iff\) 这一串数据相同。第二，整个右边是有限多个非常熟悉的小积木拼起来——\(R\) 自身复制 \(k\) 次再拼上几个商环。哪怕 \(M\) 一开始的描述非常复杂，最终它"真正的形状"只是这一串积木。</p>
+
+<h2 id="sec17-2">17.2 等价陈述：初等因子型</h2>
+
+<p>主定理还有一种等价写法，把每个 \(R/(d_i)\) 进一步拆成"素幂模"。这一拆基于<a href="ch12.html">第 12 章</a>的中国剩余定理在 PID 上的版本：若 \(d = u \cdot p_1^{a_1} \cdots p_r^{a_r}\) 是 \(d\) 的素分解（\(p_i\) 两两不相伴的不可约元，\(u\) 是单位），则</p>
+
+<p>\[
+R/(d) \;\cong\; R/(p_1^{a_1}) \oplus \cdots \oplus R/(p_r^{a_r}).
+\]</p>
+
+<p>把这条对每个 \(d_i\) 用一遍，重新搜集所有出现过的素幂 \(p^a\)，得到等价的：</p>
+
+<p><strong>定理（结构定理 — 初等因子型）。</strong>设 \(R\) 是 PID，\(M\) 是有限生成 \(R\)-模。则</p>
+
+<p>\[
+\boxed{\ M \;\cong\; R^k \;\oplus\; \bigoplus_{i=1}^{t} R/(p_i^{a_i}),\ }
+\]</p>
+
+<p>其中 \(p_i\) 是 \(R\) 中的不可约元（允许重复），\(a_i \ge 1\)。素幂 \((p_i^{a_i})\)（差单位下唯一）的<em>多重集</em>——叫 \(M\) 的<strong>初等因子组</strong>——由 \(M\) 决定。</p>
+
+<p>两种型在内容上完全等价，但用法不同：不变因子型简短，初等因子型按"每个素 \(p\) 看一眼"分块更便于具体计算。在 \(R = \mathbb{Z}\) 上，初等因子就是 \(p^a\) 形的整数；在 \(R = k[x]\) 上，初等因子就是 \(p(x)^a\) 形的多项式幂。</p>
+
+<p>从初等因子反过来读不变因子：所有初等因子按出现的素 \(p\) 分组，每组按指数从大到小列；把每列的素幂相乘得 \(d_s, d_{s-1}, \ldots\)（从右到左），这样的 \(d_i\) 自动满足整除链。比如 \(R = \mathbb{Z}\)、初等因子组 \(\{2, 2, 4, 3, 9\}\)：</p>
+
+<p>\[
+\begin{array}{c|ccc}
+ & d_3 & d_2 & d_1 \\\hline
+2 & 4 & 2 & 2 \\
+3 & 9 & 3 & 1
+\end{array}
+\;\Longrightarrow\; d_3 = 36,\ d_2 = 6,\ d_1 = 2,
+\]</p>
+
+<p>所以 \(M \cong \mathbb{Z}/2 \oplus \mathbb{Z}/6 \oplus \mathbb{Z}/36\)。这种"列表对齐"的算法在<a href="ch8.html">第 8 章</a>讲有限 abelian 群分类时已经见过，本章把它合理化为一般 PID 的现象。</p>
+
+<h2 id="sec17-3">17.3 Smith 标准形：把矩阵化成对角形</h2>
+
+<p>主定理的证明走"矩阵论"的通道。准备工作是 PID 上的<strong>Smith 标准形定理</strong>——它是线性代数高斯消元在 PID 上的推广。</p>
+
+<p>设 \(A\) 是 PID \(R\) 上的 \(m \times n\) 矩阵。允许两种"基本变换"：</p>
+
+<ul>
+  <li><strong>行变换</strong>：在 \(A\) 的左边乘一个 \(\operatorname{GL}_m(R)\)（行列式是单位的可逆矩阵）的元素；具体可以由"把第 \(i\) 行加上第 \(j\) 行的 \(r\) 倍""交换两行""把第 \(i\) 行乘单位"组合而来。</li>
+  <li><strong>列变换</strong>：右乘 \(\operatorname{GL}_n(R)\) 的元素，类似。</li>
+</ul>
+
+<p>这两组变换扩到"广义"还要加一种关键操作：<strong>Bézout 旋转</strong>。给两个元素 \(a, b\)，在 PID 中取 \(d = \gcd(a, b) = ax + by\)，写出</p>
+
+<p>\[
+\begin{pmatrix} x & y \\ -b/d & a/d \end{pmatrix} \in \operatorname{GL}_2(R)
+\]</p>
+
+<p>（行列式 \((ax + by)/d = 1\)）。它把列向量 \((a, b)^T\) 送到 \((d, 0)^T\)。这是 PID 上的"广义初等行变换"——用它能把"两个生成元"压成一个 \(\gcd\) 加一个零。</p>
+
+<p><strong>定理（Smith 标准形）。</strong>设 \(R\) 是 PID，\(A\) 是 \(R\) 上的 \(m \times n\) 矩阵。则存在 \(P \in \operatorname{GL}_m(R)\)、\(Q \in \operatorname{GL}_n(R)\) 使得</p>
+
+<p>\[
+\boxed{\ P A Q \;=\; \operatorname{diag}(d_1, d_2, \ldots, d_r, 0, \ldots, 0),\ }
+\]</p>
+
+<p>其中 \(r \le \min(m, n)\)，\(d_1 \mid d_2 \mid \cdots \mid d_r\)，且 \(d_i\)（差单位下唯一）。这个对角型称为 \(A\) 的<strong>Smith 标准形</strong>，\(d_i\) 称为 \(A\) 的<strong>不变因子</strong>。</p>
+
+<p>构造算法思路：找 \(A\) 中"\(R\)-范数最小"的非零元（\(\mathbb{Z}\) 取绝对值最小，\(k[x]\) 取次数最低），通过行列交换搬到 \((1,1)\)；用 Bézout 旋转把第 1 行第 1 列其它元素压成 \(\gcd\) 加零；这可能让 \((1,1)\) 处范数严格变小，循环到 \((1,1)\) 整除该行该列所有元素。记此时 \((1,1) = d_1\)；清零得分块 \(\operatorname{diag}(d_1, A')\)，对 \(A'\) 递归。整除链 \(d_1 \mid d_2 \mid \cdots\) 由每轮最小元的选择自动保证。</p>
+
+<p>唯一性：\(d_1 \cdots d_k\) 等于 \(A\) 所有 \(k \times k\) 子式的最大公约数（这个量在可逆变换下不变），所以 \(d_k\) 由 \(A\) 唯一决定。这条定理对 \(R = \mathbb{Z}\) 是整数矩阵的 Smith 算法；对 \(R = k[x]\) 是多项式矩阵的初等因子算法——本章正要利用这个统一性。</p>
+
+<h2 id="sec17-4">17.4 主定理证明思路</h2>
+
+<p>把<a href="ch16.html">第 16 章</a>"模的呈现"（presentation）的语言串起来，证明就只剩"算 Smith 标准形"。</p>
+
+<p><strong>第 1 步：写成 \(M = R^n / N\)。</strong>\(M\) 由 \(m_1, \ldots, m_n\) 生成，考虑满射 \(\varphi : R^n \twoheadrightarrow M\)，\((r_1, \ldots, r_n) \mapsto \sum r_i m_i\)。令 \(N = \ker \varphi\)。第一同构定理给 \(M \cong R^n / N\)。</p>
+
+<p><strong>第 2 步：\(N\) 自由有限生成。</strong>关键引理：<strong>PID 上自由模的子模仍自由，秩不超过原秩</strong>。证明对秩归纳，投影到一个坐标轴——投影像是 \(R\) 中理想 \((d)\)，剩下的核仍自由。所以 \(N \cong R^m\)，\(m \le n\)。</p>
+
+<p><strong>第 3 步：写出关系矩阵。</strong>取 \(N\) 的基 \(n_1, \ldots, n_m\)，每个 \(n_j\) 写成列向量 \((a_{1j}, \ldots, a_{nj})^T\)，排成 \(n \times m\) 矩阵 \(A\)——\(M\) 关于生成元 \(\{m_i\}\) 与关系 \(\{n_j\}\) 的<strong>关系矩阵</strong>。\(M = R^n / (\text{关系矩阵的列空间})\)。</p>
+
+<p><strong>第 4 步：换基让关系矩阵 Smith 化。</strong>用 17.3 节，存在 \(P \in \operatorname{GL}_n(R)\)、\(Q \in \operatorname{GL}_m(R)\) 使</p>
+
+<p>\[
+P A Q = \operatorname{diag}(d_1, \ldots, d_r, 0, \ldots, 0).
+\]</p>
+
+<p>左乘 \(P\) 相当于在 \(R^n\) 里换基（"换 \(M\) 的生成元"）；右乘 \(Q\) 相当于在 \(R^m\) 里换基（"换关系的描述"）——两种换基都是同构变换，<em>不改变商模 \(R^n / N\) 的同构类</em>。所以可以假设关系矩阵已经是 Smith 形。</p>
+
+<p><strong>第 5 步：读出分解。</strong>关系矩阵已是 \(\operatorname{diag}(d_1, \ldots, d_r, 0, \ldots, 0)\)（\(n \times m\)）。这意味着 \(N\) 由 \(d_1 e_1, d_2 e_2, \ldots, d_r e_r\) 生成（其它 \(m - r\) 个零关系不贡献）。所以</p>
+
+<p>\[
+M \cong R^n / N = \frac{R \oplus R \oplus \cdots \oplus R}{(d_1 R) \oplus (d_2 R) \oplus \cdots \oplus (d_r R) \oplus 0 \oplus \cdots \oplus 0} \cong R/(d_1) \oplus \cdots \oplus R/(d_r) \oplus R^{n-r}.
+\]</p>
+
+<p>记 \(k = n - r\)（自由秩）；其中 \(d_i\) 是单位的那些项 \(R/(d_i) = 0\) 可丢掉，剩下的就是不变因子型。证毕。</p>
+
+<p>这个证明的灵魂是<strong>"Smith 标准形把模的结构解码"</strong>——关系矩阵的 Smith 形数据 \((d_1, \ldots, d_r)\) 直接就是 \(M\) 的不变因子。算一个具体模的结构等于算一个具体矩阵的 Smith 形，可以纯机械。</p>
+
+<h2 id="sec17-5">17.5 应用 1：\(R = \mathbb{Z}\) 与有限生成 abelian 群分类</h2>
+
+<p>取 \(R = \mathbb{Z}\)。\(\mathbb{Z}\)-模 = abelian 群——这个等价是<a href="ch16.html">第 16 章</a>开篇就建立的。所以主定理变成：</p>
+
+<p>\[
+\boxed{\ \text{每个有限生成 abelian 群}\;A \cong \mathbb{Z}^k \oplus \mathbb{Z}/d_1 \oplus \cdots \oplus \mathbb{Z}/d_s,\quad d_1 \mid d_2 \mid \cdots \mid d_s.\ }
+\]</p>
+
+<p>这就是<a href="ch8.html">第 8 章</a>的有限生成 abelian 群分类定理——但本章给了它一个真正的证明。第 8 章的证明走的是"\(p\)-分量分解 + 内部循环 \(\Rightarrow\) 主结论"的纯组合路线，技术细节较多；本章证明走"模 = 商自由模 + Smith 标准形"的代数路线，几何画面更清楚，并且<em>同一证明立刻覆盖 \(k[x]\) 情形</em>。</p>
+
+<p>具体地：取 \(A = \mathbb{Z}/4 \oplus \mathbb{Z}/6\)。生成元是 \((1, 0), (0, 1)\)；关系是 \(4 \cdot (1, 0) = 0\) 与 \(6 \cdot (0, 1) = 0\)。关系矩阵</p>
+
+<p>\[
+A = \begin{pmatrix} 4 & 0 \\ 0 & 6 \end{pmatrix}.
+\]</p>
+
+<p>它的 Smith 形：先做 \(\gcd(4, 6) = 2\) 等，最终化为 \(\operatorname{diag}(2, 12)\)。所以</p>
+
+<p>\[
+\mathbb{Z}/4 \oplus \mathbb{Z}/6 \cong \mathbb{Z}/2 \oplus \mathbb{Z}/12.
+\]</p>
+
+<p>不变因子是 \((d_1, d_2) = (2, 12)\)；初等因子是 \(\{2^2, 2, 3\}\)（\(4 = 4\)、\(6 = 2 \cdot 3\)、\(12 = 4 \cdot 3\)；初等因子组里 \(2^2, 2, 3\) 各出现一次）。</p>
+
+<p>有限 abelian 群（即自由秩 \(k = 0\)）的分类等价描述就是<a href="ch8.html">第 8 章</a>那条："给定阶 \(n\)，先把 \(n\) 做素分解 \(n = p_1^{a_1} \cdots p_r^{a_r}\)，每个 \(p_i^{a_i}\) 部分按整数分拆 \(a_i = b_{i,1} + b_{i,2} + \cdots\) 给出可能的初等因子组合"。每种分拆方案给一个不同构的 abelian 群。</p>
+
+<h2 id="sec17-6">17.6 应用 2：\(R = k[x]\) 与有理标准形</h2>
+
+<p>取 \(R = k[x]\)（\(k\) 任意域）。\(k[x]\)-模有一个非常具体的等价描述：<strong>\(k[x]\)-模 = 配上一个线性变换的 \(k\)-向量空间</strong>。给 \((V, T)\)，定义 \(\big(\sum c_i x^i\big) \cdot v := \sum c_i T^i(v)\)；反过来，标量 \(x\) 的作用就是 \(T\)。两个方向互逆。所以分类有限维 \(k\)-空间上的线性变换 \((V, T)\) 等于分类有限维 \(k[x]\)-模——主定理直接给。</p>
+
+<p><strong>初步约化：自由秩 = 0。</strong>\(V\) 有限维 \(\Rightarrow\) 每个 \(v\) 都被最小多项式 \(m_T(x)\) 杀死 \(\Rightarrow\) \(V\) 是挠 \(k[x]\)-模 \(\Rightarrow\) 主定理里 \(k[x]^k\) 部分为零。</p>
+
+<p>所以 \(V\) 作 \(k[x]\)-模时分解为</p>
+
+<p>\[
+V \cong k[x]/(d_1) \oplus \cdots \oplus k[x]/(d_s), \quad d_1 \mid d_2 \mid \cdots \mid d_s,
+\]</p>
+
+<p>每个 \(d_i\) 是首一多项式。这些 \(d_i\) 称为 \((V, T)\) 的<strong>不变因子</strong>，\(d_s\) 就是 \(T\) 的<strong>最小多项式</strong>，\(d_1 d_2 \cdots d_s\) 就是 \(T\) 的<strong>特征多项式</strong>。</p>
+
+<p>每个分量 \(k[x]/(d_i)\)（\(d_i\) 首一，次数 \(n_i\)）作为 \(k\)-空间有标准基 \(\{1, x, x^2, \ldots, x^{n_i - 1}\}\)；\(T\) 在这组基上的作用是"乘 \(x\)"——\(1 \mapsto x, x \mapsto x^2, \ldots, x^{n_i - 2} \mapsto x^{n_i - 1}\)，最后 \(x^{n_i - 1} \mapsto x^{n_i} = -c_0 - c_1 x - \cdots - c_{n_i - 1} x^{n_i - 1}\)（用 \(d_i(x) = x^{n_i} + c_{n_i - 1} x^{n_i - 1} + \cdots + c_0\) 化简）。所以 \(T|_{k[x]/(d_i)}\) 在这组基下的矩阵是 \(d_i\) 的<strong>陪伴矩阵</strong>（companion matrix）：</p>
+
+<p>\[
+C(d_i) = \begin{pmatrix} 0 & 0 & \cdots & 0 & -c_0 \\ 1 & 0 & \cdots & 0 & -c_1 \\ 0 & 1 & \cdots & 0 & -c_2 \\ \vdots & & \ddots & & \vdots \\ 0 & 0 & \cdots & 1 & -c_{n_i - 1} \end{pmatrix}.
+\]</p>
+
+<p>所以 \(T\) 在 \(V\) 的某组基下的整体矩阵是<strong>分块对角</strong>形 \(\operatorname{diag}(C(d_1), C(d_2), \ldots, C(d_s))\)，每块是某个不变因子的陪伴矩阵：</p>
+
+<p>\[
+\boxed{\ T \;\sim\; \operatorname{diag}(C(d_1), C(d_2), \ldots, C(d_s)),\quad d_1 \mid d_2 \mid \cdots \mid d_s.\ }
+\]</p>
+
+<p>这就是<strong>有理标准形</strong>（rational canonical form），也叫 <strong>Frobenius 标准形</strong>。它的"标准"之处在于：两个矩阵相似 \(\iff\) 不变因子组相同 \(\iff\) 有相同的有理标准形。<em>不需要扩张域</em>——任意域 \(k\) 上都能算。</p>
+
+<h2 id="sec17-7">17.7 应用 3：Jordan 标准形</h2>
+
+<p>仍取 \(R = k[x]\)，但额外假设 \(k\) 是<strong>代数闭域</strong>（如 \(k = \mathbb{C}\)）。这时 \(k[x]\) 上的不可约元只有线性多项式 \(x - \lambda\)。所以由初等因子型分解，每个有限维 \(k[x]\)-模分解成</p>
+
+<p>\[
+V \cong \bigoplus_{i} k[x]/((x - \lambda_i)^{a_i}).
+\]</p>
+
+<p>看 \(k[x]/((x - \lambda)^a)\) 上 "乘 \(x\)" 的矩阵。取基 \(\{(x - \lambda)^{a-1}, (x - \lambda)^{a-2}, \ldots, (x - \lambda), 1\}\)（按降幂列）。算 "乘 \(x\)" 在每个基元素上的作用：</p>
+
+<p>\[
+x \cdot (x - \lambda)^j = (\lambda + (x - \lambda)) (x - \lambda)^j = \lambda (x - \lambda)^j + (x - \lambda)^{j+1}.
+\]</p>
+
+<p>所以在这组基下，"乘 \(x\)" 对应矩阵</p>
+
+<p>\[
+J_a(\lambda) = \begin{pmatrix} \lambda & 1 & & & \\ & \lambda & 1 & & \\ & & \lambda & \ddots & \\ & & & \ddots & 1 \\ & & & & \lambda \end{pmatrix} \in M_a(k).
+\]</p>
+
+<p>这就是 <strong>\(\lambda\) 的 \(a\) 阶 Jordan 块</strong>。整个 \(V\) 上 \(T\) 的矩阵就是这些 Jordan 块拼起来：</p>
+
+<p>\[
+\boxed{\ T \;\sim\; \operatorname{diag}(J_{a_1}(\lambda_1), J_{a_2}(\lambda_2), \ldots),\ }
+\]</p>
+
+<p>这就是 <strong>Jordan 标准形</strong>。每个 Jordan 块对应一个初等因子 \((x - \lambda_i)^{a_i}\)；初等因子的多重集（即 Jordan 块的"\(\lambda\) + 大小"清单）由 \(T\) 唯一决定。</p>
+
+<p>两个矩阵相似 \(\iff\) Jordan 标准形相同（差 Jordan 块顺序）\(\iff\) 初等因子组相同。这是有限维线性代数最干净的相似分类——并且它<em>不靠任何特殊技巧</em>，纯粹是 PID 上有限生成模结构定理在 \(R = k[x]\)、\(k\) 代数闭这一特例的产物。</p>
+
+<p>具体例子：取 \(T : \mathbb{C}^4 \to \mathbb{C}^4\)，特征多项式 \((x-2)^3 (x-5)\)，最小多项式 \((x-2)^2 (x-5)\)。则 \(T\) 的 \(\mathbb{C}[x]\)-模结构里，初等因子组合必定包含 \((x-5)^1\)；\((x-2)\) 部分初等因子的指数集合 \(\{a_1, a_2, \ldots\}\) 满足 "和为 \(3\)、最大值为 \(2\)"，所以是 \(\{2, 1\}\)。Jordan 形是</p>
+
+<p>\[
+\operatorname{diag}(J_2(2), J_1(2), J_1(5)) = \begin{pmatrix} 2 & 1 & & \\ & 2 & & \\ & & 2 & \\ & & & 5 \end{pmatrix}.
+\]</p>
+
+<p>不变因子为 \((d_1, d_2) = (x - 2, (x - 2)^2(x - 5))\)。</p>
+
+<h2 id="sec17-8">17.8 Frobenius 形与不变因子的几何意义</h2>
+
+<p>有理标准形里那些不变因子 \(d_1 \mid \cdots \mid d_s\) 不只是抽象多项式列表，它们有具体几何含义。</p>
+
+<p>第一，\(d_s\) <strong>是 \(T\) 的最小多项式</strong>——它杀死最大循环子模 \(k[x]/(d_s)\)，其它分量的零化多项式都整除 \(d_s\)（由整除链），所以 \(d_s\) 是 \(V\) 整体零化子的生成元。</p>
+
+<p>第二，\(d_1 d_2 \cdots d_s\) <strong>是 \(T\) 的特征多项式</strong>——\(\dim_k k[x]/(d_i) = \deg d_i\)，陪伴矩阵 \(C(d_i)\) 的特征多项式恰是 \(d_i\)。</p>
+
+<p>第三，不变因子<em>个数</em> \(s\) 是 \(V\) 拆成最大循环子模的最小数。\(s = 1\) 当且仅当 \(V\) 是 \(T\)-循环的（存在 \(v\) 使 \(\{v, Tv, T^2 v, \ldots\}\) 张满 \(V\)），等价于最小多项式 = 特征多项式。这是 Cayley–Hamilton 的反向细化：最小多项式何时<em>等于</em>特征多项式？正是 \(V\) 单循环时。</p>
+
+<p>第四，初等因子是不变因子的不可约组件——合并算法就是 17.2 节"按素 \(p\) 排列、按指数取最大值"那张表，把 \(p\) 换成 \(p(x)\) 即可。具体计算时：给矩阵 \(A\) 算 \(xI - A\) 在 \(k[x]\) 上的 Smith 标准形 \(\Rightarrow\) 不变因子 \(\Rightarrow\) 有理标准形或 Jordan 形。这一整套是 Jordan 形计算的唯一靠谱机器，本章主定理把它奠基为"PID 上有限生成模"的特例。</p>
+
+<p>这一章把<a href="ch16.html">第 16 章</a>的模论与<a href="ch8.html">第 8 章</a>的有限 abelian 群、<a href="../线性代数/index.html">线性代数</a>里的 Jordan 形熔成同一个故事。从下一章开始，我们离开"环 / 模"这条线，转到第二大块——<strong>域论与 Galois 理论</strong>。第 18 章先从最朴素的 "一个域包含另一个域" 开始，把"域扩张次数 = 维数"这条核心等式钉死；接下来 19、20、21 章一步步搭起 Galois 理论这座大教堂；第 22 章把它用在尺规作图与五次方程不可解上。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 模的入门</a><a href="ch18.html">下一章 · 第 18 章 域的扩张 →</a></nav>
+</main>
+</body>
+</html>

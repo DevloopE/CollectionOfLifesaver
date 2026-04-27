@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 范畴论一瞥 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+<h1 id="appB">附录 B 范畴论一瞥</h1>
+
+<p>"范畴论" 1945 年由 Eilenberg 与 Mac Lane 为代数拓扑发明，今天已是抽象代数 / 代数几何 / 同调代数的<em>基本语言</em>——听不懂"函子""自然变换""伴随"这几个词，几乎读不进去任何一本现代代数研究文献。这个附录给最入门级的介绍，让你以后看到这些词不会觉得陌生。本书正文几乎不用范畴语言（是有意的——Banner 风格更喜欢具体例子），但抽象代数和范畴论是天作之合，你迟早会在 Lang、Aluffi、Mac Lane 等更高级的书里读到它们。</p>
+
+<ul>
+  <li>范畴的定义：对象 + 态射 + 复合，三条公理。</li>
+  <li>函子：把范畴送到范畴的"<em>结构保持映射</em>"。</li>
+  <li>自然变换：把函子送到函子的"映射"——范畴论里"二阶"对象。</li>
+  <li>例子：\(\mathbf{Grp}, \mathbf{Ring}, \mathbf{Mod}_R, \mathbf{Set}\) 都是范畴；忘掉函子与自由函子构成<em>伴随</em>。</li>
+  <li>Yoneda 引理（陈述）：每个对象由它"<em>被谁映射</em>"完全决定。</li>
+  <li>为什么范畴论对现代代数重要——三条理由。</li>
+</ul>
+
+<h2 id="appB-1">B.1 范畴的定义</h2>
+
+<p><strong>定义。</strong>一个<strong>范畴</strong> \(\mathcal{C}\) 由以下数据组成：</p>
+
+<ul>
+  <li>一类<strong>对象</strong> \(\operatorname{Ob}(\mathcal{C})\)；</li>
+  <li>对每对对象 \(A, B\)，一个<strong>态射集</strong> \(\operatorname{Hom}_{\mathcal{C}}(A, B)\)（也写 \(\mathcal{C}(A, B)\)）；</li>
+  <li>对每三个对象 \(A, B, C\)，一个<strong>复合映射</strong> \(\circ : \operatorname{Hom}(B, C) \times \operatorname{Hom}(A, B) \to \operatorname{Hom}(A, C)\)，\((g, f) \mapsto g \circ f\)；</li>
+  <li>对每个对象 \(A\)，一个<strong>恒等态射</strong> \(\text{id}_A \in \operatorname{Hom}(A, A)\)；</li>
+</ul>
+
+<p>满足两条公理：</p>
+
+<ol>
+  <li><strong>结合律</strong>：\(h \circ (g \circ f) = (h \circ g) \circ f\)；</li>
+  <li><strong>单位律</strong>：\(\text{id}_B \circ f = f = f \circ \text{id}_A\) 对 \(f : A \to B\)。</li>
+</ol>
+
+<p>注意：对象不必是"集合"，态射不必是"函数"——这只是抽象数据。但<em>所有标准例子</em>对象都是带某种结构的集合，态射都是保该结构的函数。</p>
+
+<p><strong>典型范畴。</strong></p>
+
+<ul>
+  <li>\(\mathbf{Set}\)：对象 = 集合，态射 = 函数。</li>
+  <li>\(\mathbf{Grp}\)：对象 = 群，态射 = 群同态。</li>
+  <li>\(\mathbf{Ab}\)：对象 = 交换群，态射 = 群同态。</li>
+  <li>\(\mathbf{Ring}\)：对象 = 环（有时强制带单位），态射 = 环同态。</li>
+  <li>\(\mathbf{Field}\)：对象 = 域，态射 = 域同态。</li>
+  <li>\(\mathbf{Vect}_k\)：对象 = \(k\)-向量空间，态射 = \(k\)-线性映射。</li>
+  <li>\(\mathbf{Mod}_R\)：对象 = 左 \(R\)-模，态射 = \(R\)-线性映射。</li>
+  <li>\(\mathbf{Top}\)：对象 = 拓扑空间，态射 = 连续映射。</li>
+</ul>
+
+<p>这本书前 22 章本质上就是在研究 \(\mathbf{Grp}, \mathbf{Ring}, \mathbf{Field}, \mathbf{Mod}_R\) 这几个范畴里"对象的内部结构"。范畴论换一种视角：把<em>整个范畴</em>当作研究对象，研究范畴间的映射、范畴自带的"通用结构"。</p>
+
+<h2 id="appB-2">B.2 函子</h2>
+
+<p>"<em>函子</em>"是范畴间的"<em>结构保持映射</em>"——把对象送到对象、把态射送到态射，且<em>保复合 + 保恒等</em>。</p>
+
+<p><strong>定义。</strong>从范畴 \(\mathcal{C}\) 到 \(\mathcal{D}\) 的<strong>函子</strong> \(F : \mathcal{C} \to \mathcal{D}\) 由两部分组成：</p>
+
+<ul>
+  <li>对每个 \(A \in \operatorname{Ob}(\mathcal{C})\) 给一个对象 \(F(A) \in \operatorname{Ob}(\mathcal{D})\)；</li>
+  <li>对每个态射 \(f : A \to B\) 给一个态射 \(F(f) : F(A) \to F(B)\)；</li>
+</ul>
+
+<p>满足 \(F(\text{id}_A) = \text{id}_{F(A)}\)、\(F(g \circ f) = F(g) \circ F(f)\)。</p>
+
+<p><strong>典型函子。</strong></p>
+
+<ul>
+  <li><strong>忘掉函子 \(U : \mathbf{Grp} \to \mathbf{Set}\)</strong>：把群 \(G\) 送到它的底层集合 \(|G|\)，群同态送到底层函数。"<em>忘掉了群结构</em>"。\(\mathbf{Ring} \to \mathbf{Ab}\)、\(\mathbf{Top} \to \mathbf{Set}\) 等也都有忘掉函子。</li>
+  <li><strong>自由群函子 \(F : \mathbf{Set} \to \mathbf{Grp}\)</strong>：把集合 \(X\) 送到由 \(X\) 自由生成的群 \(F(X)\)（<a href="ch10.html">第 10 章</a>），把函数 \(f : X \to Y\) 送到诱导的群同态 \(F(X) \to F(Y)\)。"<em>每个集合上加最自由的群结构</em>"。</li>
+  <li><strong>对偶函子 \((-)^* : \mathbf{Vect}_k \to \mathbf{Vect}_k^{\text{op}}\)</strong>：\(V \mapsto V^*\)（对偶空间），\(f : V \to W\) 送到 \(f^* : W^* \to V^*\)（注意箭头反转，这是<em>反变</em>函子）。</li>
+  <li><strong>群自动同构函子 \(\operatorname{Aut} : \mathbf{Grp} \to \mathbf{Grp}\)</strong>。</li>
+</ul>
+
+<p>"<em>反变</em>" \(=\) 把箭头方向反转的函子（用 \(\mathcal{C}^{\text{op}}\) 表示反向范畴）。"<em>共变</em>" \(=\) 不反转的标准函子。本书中"对偶"是反变；"自由""忘掉""泛函"是共变。</p>
+
+<h2 id="appB-3">B.3 自然变换</h2>
+
+<p>"<em>自然变换</em>"是函子间的"<em>映射</em>"——它把函子 \(F : \mathcal{C} \to \mathcal{D}\) 送到函子 \(G : \mathcal{C} \to \mathcal{D}\) 的"<em>统一</em>" 转换。</p>
+
+<p><strong>定义。</strong>设 \(F, G : \mathcal{C} \to \mathcal{D}\) 是两个共变函子。<strong>自然变换</strong> \(\eta : F \Rightarrow G\) 由对每个 \(A \in \operatorname{Ob}(\mathcal{C})\) 给一个 \(\mathcal{D}\)-态射 \(\eta_A : F(A) \to G(A)\) 构成，使得对每个 \(\mathcal{C}\)-态射 \(f : A \to B\)，下面的"<em>自然方块</em>"交换：</p>
+
+<p>\[
+\boxed{\ G(f) \circ \eta_A = \eta_B \circ F(f)\ \in\ \operatorname{Hom}_{\mathcal{D}}(F(A), G(B)).\ }
+\]</p>
+
+<p><strong>例（典范嵌入）。</strong>有自然变换</p>
+
+<p>\[
+\eta : \text{id}_{\mathbf{Vect}_k} \Rightarrow ((-)^*)^*,
+\]</p>
+
+<p>对每个有限维 \(V\) 给典范同构 \(\eta_V : V \to V^{**}\)，\(v \mapsto (\phi \mapsto \phi(v))\)。"<em>典范</em>"在范畴论里就是"<em>自然变换</em>"——它的存在性<em>不</em>依赖 \(V\) 的基的选择。"双对偶 \(=\) 自然同构 \(\text{id}\)" 这件事<em>无法</em>用基语言精确表述，但用自然变换语言只需一行。</p>
+
+<p><strong>例（行列式）。</strong>\(\det : \mathrm{GL}_n \to k^\times\) 是从函子 \(\mathrm{GL}_n(-) : \mathbf{CommRing} \to \mathbf{Grp}\) 到 \((-)^\times : \mathbf{CommRing} \to \mathbf{Grp}\) 的自然变换。这种"自然性"解释了为什么行列式与基的选择无关——它来自范畴层面的统一性。</p>
+
+<p>"<em>自然</em>"这个词在数学里 19 世纪就有用法（"自然同构""典范同构"），但<em>什么是真正的自然</em>直到 Eilenberg–Mac Lane 1945 才用范畴论严格化。这是范畴论诞生的最初动机。</p>
+
+<h2 id="appB-4">B.4 伴随：自由 ⊣ 忘掉</h2>
+
+<p>范畴论里最强大的概念之一是"<em>伴随对</em>"。</p>
+
+<p><strong>定义（粗略）。</strong>函子 \(L : \mathcal{C} \to \mathcal{D}\) 与 \(R : \mathcal{D} \to \mathcal{C}\) 互为<em>伴随</em>（\(L\) 左伴随、\(R\) 右伴随），记 \(L \dashv R\)，如果存在自然双射</p>
+
+<p>\[
+\operatorname{Hom}_{\mathcal{D}}(L(X), Y) \cong \operatorname{Hom}_{\mathcal{C}}(X, R(Y))
+\]</p>
+
+<p>对每对 \(X \in \mathcal{C}, Y \in \mathcal{D}\)。</p>
+
+<p>"<em>自然</em>" 在 \(X\) 和 \(Y\) 上同时——意味着上面这个双射构成两个 \(\mathcal{C}^{\text{op}} \times \mathcal{D} \to \mathbf{Set}\) 函子之间的自然同构。</p>
+
+<p><strong>原型例：自由 ⊣ 忘掉。</strong>\(F : \mathbf{Set} \to \mathbf{Grp}\)（自由群）与 \(U : \mathbf{Grp} \to \mathbf{Set}\)（忘掉）满足</p>
+
+<p>\[
+\boxed{\ \operatorname{Hom}_{\mathbf{Grp}}(F(X), G) \cong \operatorname{Hom}_{\mathbf{Set}}(X, U(G)).\ }
+\]</p>
+
+<p>"<em>从自由群 \(F(X)\) 到 \(G\) 的群同态</em>" 一一对应"<em>从集合 \(X\) 到 \(G\) 底层集合的函数</em>"——这就是<a href="ch10.html">第 10 章</a> 自由群的"<em>泛性质</em>"，重写成范畴语言就是 \(F \dashv U\)。</p>
+
+<p>许多熟悉的"<em>构造</em>" 都来自这种伴随：</p>
+
+<ul>
+  <li>自由群 \(\dashv\) 忘掉（\(\mathbf{Grp}\)）；</li>
+  <li>自由模 \(\dashv\) 忘掉（\(\mathbf{Mod}_R\)）；</li>
+  <li>张量积 \(- \otimes_R N \dashv \operatorname{Hom}_R(N, -)\)（"<em>张量-Hom 伴随</em>"，\(\mathbf{Mod}_R\)）；</li>
+  <li>积 \(- \times A \dashv \operatorname{Hom}(A, -)\)（"<em>柯里化</em>"，\(\mathbf{Set}\) 与 cartesian closed cat）；</li>
+  <li>群化 \(\dashv\) 忘掉（\(\mathbf{Grp} \to \mathbf{Mon}\) 反向）。</li>
+</ul>
+
+<p>"<em>每个泛性质都来自某个伴随</em>"——这是范畴论最重要的统一性观察之一。</p>
+
+<h2 id="appB-5">B.5 Yoneda 引理（陈述）</h2>
+
+<p>这是范畴论里最有名、又最让人吃惊的事实。</p>
+
+<p><strong>Yoneda 引理。</strong>设 \(\mathcal{C}\) 是范畴，\(A \in \operatorname{Ob}(\mathcal{C})\)。对任意函子 \(F : \mathcal{C} \to \mathbf{Set}\)，自然变换</p>
+
+<p>\[
+\operatorname{Hom}(\operatorname{Hom}_{\mathcal{C}}(A, -), F) \cong F(A)
+\]</p>
+
+<p>(双射，自然在 \(A\) 与 \(F\) 上)。</p>
+
+<p>取 \(F = \operatorname{Hom}_{\mathcal{C}}(B, -)\) 得<strong>Yoneda 嵌入</strong>：</p>
+
+<p>\[
+\boxed{\ \operatorname{Hom}_{\mathcal{C}}(A, B) \cong \operatorname{Hom}(\operatorname{Hom}(A, -), \operatorname{Hom}(B, -)).\ }
+\]</p>
+
+<p>"<em>对象 \(A\) 由它收到的所有态射完全决定（直到同构）</em>"——或者更哲学地说："<em>你是谁，由所有人怎么映射到你决定</em>"。</p>
+
+<p>这条引理是现代代数几何（Grothendieck 的"函子观点")、表示论（Tannaka 重构）、同调代数（导出函子）的基础工具。它表面上像同义反复，但深层意义是把"对象本身"完全转化为"它的态射模式"——一种"<em>关系即本体</em>"的极致版本。</p>
+
+<p>详细证明见 Mac Lane《Categories for the Working Mathematician》第 III 章，或 Aluffi《Algebra: Chapter 0》。</p>
+
+<h2 id="appB-6">B.6 为什么范畴论对现代代数重要</h2>
+
+<p>三条主要理由。</p>
+
+<p><strong>第一：统一表达"<em>泛性质</em>"。</strong>本书反复出现的"<em>泛性质</em>"——商群是"压垮 \(N\) 的最小群"、自由群是"由生成元最自由生成"、张量积是"<em>双线性</em> 化为<em>线性</em>"、代数闭包是"代数扩张的极大者"——都是范畴语言里的<em>左/右伴随</em>。一旦认识到这一统一，你<em>不</em>必为每个新概念发明新模板，"<em>这是某伴随</em>"就解释一切。</p>
+
+<p><strong>第二：把"<em>构造</em>" 提升为"<em>变换</em>"。</strong>当你研究"商群、商环、商模、商空间、商拓扑空间、商概型"等等，每个领域都有"商" 这个操作。范畴论把它们抽象成"<em>余等价化子</em>" (coequalizer)——一个统一的范畴构造，所有具体"商"都是它在不同范畴里的实例。同样"<em>积</em>" 涵盖直积、笛卡尔积、张量积、纤维积；"<em>余积</em>" 涵盖直和、自由积、泛余积。这种"<em>构造的元理论</em>"是现代代数的标准眼光。</p>
+
+<p><strong>第三：让"<em>跨范畴比较</em>" 严格化。</strong>"<em>群同 abel 群范畴等价吗</em>"——不等价。"<em>有限群范畴同有限置换群范畴有什么关系</em>"——Cayley 定理给一个嵌入，但不是范畴等价。"<em>有限维向量空间范畴自带怎样的对称结构</em>"——双对偶给一个自然同构，等等。所有这些"<em>X 范畴与 Y 范畴的关系</em>"问题，只有在范畴语言里才能精确表述。</p>
+
+<p>范畴论<em>不</em>取代抽象代数——它是抽象代数<em>之上</em>的一层组织语言。本书选择不在正文里推它，是因为对入门生来说先把"<em>具体</em> 群、环、域" 的直觉建好更重要；但你一旦对本书 22 章的内容有了感觉，再读 Mac Lane / Aluffi / Riehl《Category Theory in Context》会立刻看见——你之前学过的所有"巧合"，全都是范畴论的<em>同一</em>定理在不同范畴里的不同投影。</p>
+
+<p>这是为什么 21 世纪的代数研究文献几乎不可能绕开范畴论。本附录到此为止——希望它至少让你以后听到"函子""自然变换""伴随""Yoneda" 这几个词时不会脑子空白。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+</main>
+</body>
+</html>
