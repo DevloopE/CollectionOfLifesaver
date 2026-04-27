@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 23 章 应用：量子计算入门 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 量子纠缠 + Bell 不等式</a><a href="ch24.html">下一章 · 第 24 章 应用：量子化学 + 量子场论一瞥 →</a></nav>
+<h1 id="ch23">第 23 章 应用：量子计算入门</h1>
+
+<p>请你想象 2025 年某个加密银行系统。它用 RSA-2048 加密——一个 2048 位的合数 \(N = pq\), 安全性靠"<em>分解 \(N\) 困难</em>"。当前最快的经典算法（一般数域筛, GNFS）大致需要 \(\exp\big(c (\log N)^{1/3}(\log\log N)^{2/3}\big)\) 时间。RSA-2048 经典分解大约要 \(10^{30}\) 个 CPU 年——超出宇宙年龄。</p>
+
+<p>1994 年 Peter Shor 发表一篇 24 岁的论文, 给出量子算法在 \(O((\log N)^3)\) 时间内分解 \(N\)。如果有一台能跑这个算法的<em>量子计算机</em>, RSA-2048 在几小时内被破——全部互联网安全协议作废。这件事让<em>量子计算</em> 从学术好奇变成各国政府战略资源。</p>
+
+<p>请你停下来感受这件事——一个<em>新的计算模型</em> 把"<em>指数难</em>" 问题变成"<em>多项式可解</em>"。这种<em>计算复杂性的根本性扩展</em> 在历史上很少见。它的根源——<em>叠加态 + 纠缠</em> 让 \(n\) 个 qubit 同时存在 \(2^n\) 个经典态的相干叠加, "<em>所有计算路径同时演化</em>", 末端用<em>干涉</em> 让正确答案的振幅相长、错误答案相消。</p>
+
+<p>这一章我把量子计算从最基本的 qubit 一直建到 Shor 因数分解 + Grover 搜索, 最后看一眼当前硬件状况。</p>
+
+<h2 id="sec23-1">23.1 qubit: 量子比特</h2>
+
+<p>经典比特: 0 或 1, 两种状态。<em>qubit</em>（quantum bit）是量子版本——一个二维 Hilbert 空间 \(\mathbb C^2\) 里的态。基态 \(|0\rangle, |1\rangle\) 对应经典 0/1, 但<em>一般态</em> 是叠加</p>
+
+<p>\[
+\boxed{\ |\psi\rangle = \alpha |0\rangle + \beta |1\rangle, \quad |\alpha|^2 + |\beta|^2 = 1.\ }
+\]</p>
+
+<p>测量给经典结果——按 Born 规则, 得 0 概率 \(|\alpha|^2\), 得 1 概率 \(|\beta|^2\)。<em>测量后</em> 态塌缩到 \(|0\rangle\) 或 \(|1\rangle\)。</p>
+
+<p>请你停下来抓住"<em>叠加</em>" 的实际含义——\(|\psi\rangle\) <em>不是</em> "<em>有 50% 概率是 0, 50% 是 1</em>"（那是经典统计混合）。\(|\psi\rangle\) 是个<em>确定的 Hilbert 空间向量</em>, 可以经历相干演化（么正变换）, 不同分量可以<em>干涉</em>。这种"<em>同时是 0 和 1 直到测量</em>" 是 qubit 与经典比特的本质区别。</p>
+
+<p><em>Bloch 球可视化</em>: 单 qubit 态可以参数化为</p>
+
+<p>\[
+|\psi\rangle = \cos(\theta/2)|0\rangle + e^{i\varphi} \sin(\theta/2)|1\rangle.
+\]</p>
+
+<p>\((\theta, \varphi)\) 是单位球面上的点。\(|0\rangle\) 在北极, \(|1\rangle\) 在南极, \(|+\rangle = (|0\rangle + |1\rangle)/\sqrt 2\) 在赤道 \(+x\), 等等。整个 qubit 态空间是 Bloch 球面 \(S^2\)。这是个常用的视觉工具, 让 qubit 操作变成"<em>球面上的旋转</em>"。</p>
+
+<p>\(n\) qubit 系统: \(\mathbb C^{2^n} = (\mathbb C^2)^{\otimes n}\), 维数 \(2^n\)。一般态</p>
+
+<p>\[
+|\psi\rangle = \sum_{x \in \{0,1\}^n} \alpha_x |x\rangle, \quad \sum_x |\alpha_x|^2 = 1.
+\]</p>
+
+<p>有 \(2^n\) 个复振幅 \(\alpha_x\)（减去归一 + 整体相位是 \(2^{n+1} - 2\) 个实参数）。请你比较——经典 \(n\) 比特只有 \(n\) 比特信息, 量子 \(n\) qubit 携带 \(\sim 2^n\) 个复数。<em>这是量子计算的资源源头</em>: 维数指数级膨胀。</p>
+
+<h2 id="sec23-2">23.2 量子门</h2>
+
+<p>经典计算用 AND / OR / NOT 等逻辑门。量子计算用<em>幺正变换</em> \(U\) 作用在 qubit 上——"<em>量子门</em>"。所有量子门是<em>可逆</em> 的（么正变换 \(U^{-1} = U^\dagger\)）, 与经典 AND / OR 不可逆形成对照（信息无丢失）。</p>
+
+<p><strong>单 qubit 门</strong>(\(2 \times 2\) 么正矩阵):</p>
+
+<ul>
+  <li><em>X 门</em>(NOT): \(X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}\), \(X|0\rangle = |1\rangle, X|1\rangle = |0\rangle\)。Bloch 球上绕 \(\hat x\) 转 \(\pi\)。</li>
+  <li><em>Z 门</em>: \(Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}\), \(Z|1\rangle = -|1\rangle\)。绕 \(\hat z\) 转 \(\pi\)。</li>
+  <li><em>Y 门</em>: \(Y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix} = i X Z\)。</li>
+  <li><em>Hadamard 门 H</em>: \(H = \frac{1}{\sqrt 2}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}\). \(H|0\rangle = (|0\rangle + |1\rangle)/\sqrt 2 = |+\rangle\), \(H|1\rangle = |-\rangle\)。<em>把基态变叠加态</em>——所有量子算法的第一步几乎都用它。</li>
+  <li><em>相位门 \(S, T\)</em>: \(S = \mathrm{diag}(1, i), T = \mathrm{diag}(1, e^{i\pi/4})\). 在 \(|1\rangle\) 上加相位。</li>
+</ul>
+
+<p>这些门 \(\{H, T\}\) 加上下面的 CNOT 已经是<em>普适</em>——任何 \(n\) qubit 么正变换可以用它们近似到任意精度（Solovay-Kitaev 定理）。</p>
+
+<p><strong>双 qubit 门</strong>:</p>
+
+<ul>
+  <li><em>CNOT 门</em>(controlled-NOT): \(\mathrm{CNOT} = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix}\), 第一 qubit "<em>控制</em>"——若它是 \(|1\rangle\), 翻转第二 qubit; 否则不动。在基底 \(|c, t\rangle\) 上 \(\mathrm{CNOT}|c, t\rangle = |c, c \oplus t\rangle\)（\(\oplus\) 是 XOR）。</li>
+</ul>
+
+<p>CNOT 是<em>纠缠器</em>——把乘积态变纠缠态。例:</p>
+
+<p>\[
+\mathrm{CNOT}\big( H |0\rangle \otimes |0\rangle \big) = \mathrm{CNOT} \frac{|00\rangle + |10\rangle}{\sqrt 2} = \frac{|00\rangle + |11\rangle}{\sqrt 2} =: |\Phi^+\rangle,
+\]</p>
+
+<p>得到一个 Bell 态——纠缠的标志。这条电路（H 然后 CNOT）是<em>从 \(|00\rangle\) 制备 Bell 态</em> 的标准电路。</p>
+
+<h2 id="sec23-3">23.3 量子电路</h2>
+
+<p>量子算法表示为<em>电路</em>: 横线表示 qubit, 时间从左到右流动, 方框表示门。例如制备 Bell 态:</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;font-family:monospace;">
+qubit 0: |0⟩ ──[H]──•────
+                    │
+qubit 1: |0⟩ ───────⊕────
+</pre>
+
+<p>"<em>•</em>" 是控制位, "<em>⊕</em>" 是被控位。第一步 H 把 qubit 0 变叠加态; 第二步 CNOT 纠缠两 qubit。末态 \(|\Phi^+\rangle\)。</p>
+
+<p>电路结束后<em>测量</em>——把每条线接到经典寄存器, 读出 \(\{0, 1\}^n\) 串。整个量子算法的输出是<em>测量结果</em>, 通常需要重复多次取统计。</p>
+
+<p>普适电路定理（Barenco et al. 1995）: 任何 \(n\) qubit 么正可以分解为 \(O(n^2 4^n)\) 个 CNOT + 单 qubit 门。这是<em>构造性</em> 普适——理论上任何量子算法可以编译成 \(\{H, T, \text{CNOT}\}\) 序列。但实践中量子算法的设计往往依赖特殊结构（Fourier 变换、相位估计、Grover 反射等高级子例程）。</p>
+
+<h2 id="sec23-4">23.4 量子隐形传态 (teleportation)</h2>
+
+<p>量子计算第一个让人惊讶的协议——<strong>隐形传态</strong>（Bennett et al. 1993）。问题——Alice 想把一个未知 qubit 态 \(|\psi\rangle = \alpha|0\rangle + \beta|1\rangle\) 传给 Bob, 但<em>不能</em> 直接寄送 qubit（路上会退相干）。她能做什么?</p>
+
+<p>条件: Alice + Bob 事前共享一对纠缠 \(|\Phi^+\rangle = (|00\rangle + |11\rangle)/\sqrt 2\)（每人持一半）+ 一条经典通信通道。</p>
+
+<p>协议:</p>
+
+<ol>
+  <li>Alice 持有: 待传 \(|\psi\rangle\)（qubit 1）+ 纠缠对自己那半（qubit 2）。Bob 持有: 纠缠对另一半（qubit 3）。</li>
+  <li>Alice 对 (qubit 1, qubit 2) 做<em>Bell 基测量</em>(等价于 CNOT + H + 标准基测量)。结果是两个经典比特 \(\{m_1, m_2\}\)。</li>
+  <li>Alice 把 \(\{m_1, m_2\}\) 经典通道发给 Bob。</li>
+  <li>Bob 根据 \(\{m_1, m_2\}\) 在 qubit 3 上做对应修正门（\(I, X, Z, ZX\) 之一）。</li>
+  <li>结束: Bob 的 qubit 3 处于 \(|\psi\rangle\) 态。</li>
+</ol>
+
+<p>请你停下来感受这件事——<em>未知量子态从 Alice 完全传到 Bob</em>, 但 Alice 那边的 \(|\psi\rangle\) 在 Bell 测量后被毁掉（不可克隆定理保证）。整个过程<em>不需要</em> 物理传 qubit, 只需经典 2 比特 + 预共享纠缠。这是当前各种"<em>量子互联网</em>" 设计的核心原语。</p>
+
+<p>注意——隐形传态<em>不</em> 超光速。Bob 必须等 Alice 的 2 经典比特到达（光速限制）才能做修正; 在那之前 Bob 的 qubit 看似随机, 没有信息内容。再次<em>不可信号</em>。</p>
+
+<h2 id="sec23-5">23.5 Deutsch-Jozsa: 第一个量子加速</h2>
+
+<p>1992 Deutsch + Jozsa 给出量子计算<em>第一个</em> 比经典严格更快的算法——虽然问题人造, 但结构清晰, 入门最佳。</p>
+
+<p>问题: 给定函数 \(f: \{0, 1\}^n \to \{0, 1\}\), 承诺 \(f\) 是<em>常值</em>（恒 0 或恒 1）或<em>平衡</em>（一半输入给 0, 一半给 1）。判断 \(f\) 是哪一种, 用最少 \(f\) 调用次数。</p>
+
+<p>经典最坏: \(2^{n-1} + 1\) 次（要看一半多一个才能确定）。量子: <em>1 次</em>。</p>
+
+<p>算法（Deutsch-Jozsa）:</p>
+
+<ol>
+  <li>初始化 \(n\) qubit 在 \(|0\rangle^{\otimes n}\), 加 1 辅助 qubit 在 \(|1\rangle\)。</li>
+  <li>对所有 \(n + 1\) qubit 加 \(H\): 得 \(\frac{1}{\sqrt{2^n}} \sum_x |x\rangle \otimes \frac{|0\rangle - |1\rangle}{\sqrt 2}\)。</li>
+  <li>套<em>oracle</em> \(U_f: |x\rangle |y\rangle \mapsto |x\rangle |y \oplus f(x)\rangle\)。在我们的态上, 算出来 \(\frac{1}{\sqrt{2^n}} \sum_x (-1)^{f(x)} |x\rangle \otimes \frac{|0\rangle - |1\rangle}{\sqrt 2}\)（"<em>相位反弹</em>", phase kickback）。</li>
+  <li>对前 \(n\) qubit 再加 \(H^{\otimes n}\), 得 \(\sum_y \big(\frac{1}{2^n} \sum_x (-1)^{f(x) + x \cdot y}\big) |y\rangle \otimes \ldots\)。</li>
+  <li>测量 \(|y = 0\rangle\) 振幅 \(= \frac{1}{2^n} \sum_x (-1)^{f(x)}\)。常值 \(f\): \(= \pm 1\)（必测到 0）。平衡 \(f\): \(= 0\)（必测不到 0）。</li>
+</ol>
+
+<p>关键技巧——<em>所有 \(2^n\) 个 \(x\) 的 \(f\) 值同时被算出, 编码在相位里</em>; 末端 Hadamard 把不同 \(x\) 的相位<em>干涉</em>, 让答案集中到 \(|0\rangle\) 振幅上。这就是"<em>量子并行</em>" 的具体含义——<em>不</em> 是同时跑 \(2^n\) 份程序, 是利用叠加 + 干涉把指数信息压缩到几个测量结果。</p>
+
+<h2 id="sec23-6">23.6 Grover 搜索: \(O(\sqrt N)\)</h2>
+
+<p>1996 Grover 给出了第一个<em>实用</em> 量子算法。问题: 在 \(N\) 项无序数据库找一个标记项 \(x^*\)。经典: \(O(N)\)（最坏要全扫）。Grover: \(O(\sqrt N)\)。</p>
+
+<p>把数据编码为 oracle \(U_{x^*}: |x\rangle \mapsto (-1)^{[x = x^*]} |x\rangle\)（在标记项加个负号）。设 \(N = 2^n\)。算法:</p>
+
+<ol>
+  <li>初始化 \(|s\rangle = H^{\otimes n}|0\rangle = \frac{1}{\sqrt N}\sum_x |x\rangle\)（均匀叠加）。</li>
+  <li>反复套<em>Grover 迭代</em> \(G = (2|s\rangle\langle s| - I) U_{x^*}\) 共 \(\lceil \pi \sqrt N / 4 \rceil\) 次。</li>
+  <li>测量, 大概率得 \(x^*\)。</li>
+</ol>
+
+<p>几何直觉——把 \(|s\rangle\) 分解为 "\(|x^*\rangle\)" + "<em>非 \(x^*\) 的均匀叠加</em>"。两者夹角接近 \(\pi/2\)（\(|x^*\rangle\) 在 \(|s\rangle\) 中只占 \(1/\sqrt N\) 振幅）。每次 \(G\) 等价于把当前态在二维子空间内<em>旋转</em> \(2\theta\), \(\sin\theta = 1/\sqrt N\)。\(\sqrt N\) 步后转到接近 \(|x^*\rangle\), 测量必中。</p>
+
+<p>请你停下来欣赏: \(O(\sqrt N)\) 比 \(O(N)\) 是<em>多项式</em> 加速（不是指数）, 但还是显著。例: \(N = 10^{12}\), 经典 \(10^{12}\) 步, 量子 \(10^6\) 步。Grover 的优雅在于<em>普适性</em>——对任何"<em>给 oracle 找标记项</em>" 问题都适用, 不依赖问题结构。</p>
+
+<p>Grover 的<em>最优性</em>(Bennett-Bernstein-Brassard-Vazirani 1997): 任何量子搜索算法都至少需要 \(\Omega(\sqrt N)\) oracle 调用。所以 Grover 是<em>渐近最优</em>。</p>
+
+<h2 id="sec23-7">23.7 Shor 因数分解: 指数加速</h2>
+
+<p>1994 Shor 的算法把<em>因数分解</em> 从经典指数变成量子多项式。这是迄今<em>最</em> 让人震惊的量子算法, 因为它直接威胁现代密码学。</p>
+
+<p>核心想法——把因数分解归约到<em>找周期</em> 问题。要分解 \(N = pq\), 选随机 \(a < N\), 算 \(a^r \mod N\) 的<em>周期</em> \(r\)（最小正整数 \(r\) 使 \(a^r \equiv 1 \pmod N\)）。如果 \(r\) 偶数 + \(a^{r/2} \neq -1 \pmod N\), 那 \(\gcd(a^{r/2} \pm 1, N)\) 是 \(N\) 的非平凡因子。<em>整个难点</em> 在算 \(r\)——经典上找 \(r\) 是指数难。</p>
+
+<p>Shor 算法用<em>量子 Fourier 变换</em>（QFT）找周期。QFT 是 Hadamard 变换的高级版:</p>
+
+<p>\[
+\mathrm{QFT}: |x\rangle \mapsto \frac{1}{\sqrt N} \sum_{y = 0}^{N - 1} e^{2\pi i x y / N} |y\rangle.
+\]</p>
+
+<p>\(O(n^2)\) 量子门可实现（经典 FFT \(O(N \log N) = O(n 2^n)\), 量子超指数加速）。</p>
+
+<p>Shor 算法主体:</p>
+
+<ol>
+  <li>建两个寄存器, 第一寄存器放叠加 \(|x\rangle, x = 0, ..., N - 1\); 第二寄存器初始 \(|0\rangle\)。</li>
+  <li>套 \(U_a: |x\rangle |0\rangle \mapsto |x\rangle |a^x \mod N\rangle\)（<em>受控模幂</em>, 用快速幂 \(O(n^3)\) 实现）。第二寄存器现在编码 \(a^x \mod N\)。</li>
+  <li>测第二寄存器, 第一寄存器塌缩到周期 \(r\) 的等距 \(x\) 叠加。</li>
+  <li>对第一寄存器套 QFT, 测量, 大概率得到 \(\sim N/r\) 倍数的某个数, 用<em>连分数</em> 算 \(r\)。</li>
+  <li>用 \(r\) 算 \(\gcd(a^{r/2} \pm 1, N)\), 得到 \(N\) 的因子。</li>
+</ol>
+
+<p>整个量子部分 \(O((\log N)^3)\), 经典后处理 \(O((\log N)^3)\)。<em>RSA-2048 多项式时间被破</em>。</p>
+
+<p>2001 IBM 实验在 7 qubit 装置上分解 15 = 3 × 5。2012 中国实验分解 143 = 11 × 13。规模还远不及 RSA-2048（需要数千 qubit + 容错纠错）, 但<em>原理验证</em> 已完成。各国正紧急研发<em>后量子密码学</em>（基于格理论 NTRU、code-based McEliece 等不依赖因数分解的密码原语）。</p>
+
+<h2 id="sec23-8">23.8 量子纠错 + 容错阈值</h2>
+
+<p>真量子计算硬件被噪声困扰——qubit 与环境耦合<em>退相干</em>, 几微秒到几毫秒就丢失量子信息。需要<em>纠错</em>。</p>
+
+<p>经典纠错（重复码）: 把 1 比特复制 3 份 \(0 \to 000\), 多数投票纠 1 比特错。量子<em>不能</em> 直接复制（不可克隆定理）。Shor 1995 + Steane 1996 给出第一个<em>量子纠错码</em>: 用 9 qubit（Shor 码）或 7 qubit（Steane 码）编码 1 逻辑 qubit, 利用纠缠在不测主 qubit 的前提下"<em>测错误模式</em>"（syndrome measurement）然后纠正。</p>
+
+<p><strong>表面码</strong>(Kitaev 1997, 当前主流): 把 qubit 排在 2D 网格上, 用最近邻相互作用编码逻辑 qubit。表面码的<em>容错阈值</em>(每物理门错误率) 约 \(10^{-2}\)——这是相对宽松的阈值, 当前实验已能达到。</p>
+
+<p>容错阈值定理（Aharonov-Ben-Or, Knill-Laflamme-Zurek 1996-97）: 如果每物理门错误率 \(<\) 阈值 \(p_{\text{th}}\), 可以用<em>嵌套</em> 纠错码把<em>逻辑</em> qubit 错误率降到任意小, 代价是物理 qubit 数与门数都 \(\mathrm{polylog}(1/\varepsilon)\) 级膨胀。</p>
+
+<p>这个定理的物理意义巨大——它告诉你<em>真</em> 大型量子计算机原则上可以建。但代价: 实现 100 个逻辑 qubit 大致需要 \(10^4 - 10^6\) 个物理 qubit。Shor 算法分解 RSA-2048 大致需要 \(10^7\) 物理 qubit + \(10^{10}\) 量子门——远超当前能力（最大装置 \(\sim 10^3\) 物理 qubit）。</p>
+
+<h2 id="sec23-9">23.9 当前硬件: 超导 / 离子阱 / 中性原子 / photonic</h2>
+
+<p>2026 年快照——量子硬件主流四条技术路线:</p>
+
+<p><strong>超导 qubit</strong>(IBM, Google, 中国"<em>祖冲之</em>"): 把超导电路在毫开温度下做成<em>非线性 LC 振荡器</em>(transmon), 把最低两能级当 \(|0\rangle, |1\rangle\)。门时间纳秒级, 退相干 \(\sim 100\) μs, qubit 数 IBM "<em>Condor</em>" 1121 qubit (2023)。Google Sycamore 53 qubit 在 2019 年宣布<em>量子优势</em>——一个采样问题 200 秒, 经典超算 \(10^4\) 年（后被 IBM 反驳, 经典 2.5 天可做）。</p>
+
+<p><strong>离子阱</strong>(IonQ, Quantinuum, 中国清华): 把单个离子（如 \(^{171}\)Yb\(^+\)）困在电磁势中, 用激光驱动量子门。门时间微秒级, 退相干<em>秒级</em>(很长!), 全连通（任两 qubit 直接耦合）。当前最多 \(\sim 56\) qubit (Quantinuum H2)。<em>门保真度最高</em>(\(\geq 99.9\%\))。</p>
+
+<p><strong>中性原子阵列</strong>(QuEra, ColdQuanta, 中国清华+中科院): 用光镊把单原子困住, 排成可编程几何（任意 2D / 3D 阵列）。门通过 Rydberg 态相互作用。\(\sim 256-1000\) qubit 已实现。<em>scalable, 几何重构</em>。</p>
+
+<p><strong>光子量子</strong>(PsiQuantum, Xanadu, 中国"<em>九章</em>"): 用单光子作 qubit, 测量驱动。中国 2020 "<em>九章</em>" 在 Gaussian boson sampling 上 200 秒做完经典 \(10^9\) 年的事。</p>
+
+<p>2024-2026 重大里程碑——<strong>逻辑 qubit 出现</strong>: Quantinuum + Microsoft 团队 2024 年在 32 物理 qubit 上实现 12 个<em>逻辑</em> qubit（用 [[8, 3, 2]] 码), 错误率比物理低 800 倍。这是迈向真正容错量子计算的关键一步。Google 2024 年 Willow 芯片在表面码上演示了"<em>纠错越大、错误越低</em>" 的<em>scaling</em>——纠错可行性确认。</p>
+
+<p>现在还<em>没有</em> 能跑 Shor 分解 RSA-2048 的机器, 距离那个目标可能还需要 10-20 年。但已经有"<em>NISQ</em>"（noisy intermediate-scale quantum）应用——<em>量子化学模拟</em>(VQE 算法 ch24 简介)、量子模拟物质相变、组合优化（QAOA）等。这些是<em>当前</em> 量子计算机能做的有意义工作。</p>
+
+<h2 id="sec23-10">23.10 临别话</h2>
+
+<p>Banner 流程: 23.1 具体问题（RSA 加密 + 经典指数难）→ 23.2 朴素工具（qubit + Bloch 球）→ 23.3 命名（量子门 / 电路）→ 23.4 第一处应用（隐形传态）→ 23.5 简单算法（Deutsch-Jozsa）→ 23.6 Grover 搜索 → 23.7 Shor 因数分解 → 23.8 纠错容错 → 23.9 一般化（硬件全景）。</p>
+
+<p>这一章你学到一个不寻常的事——<em>计算的物理基础决定了什么是"<em>有效算法</em>"</em>。Church-Turing 论题（任何"<em>合理</em>" 计算模型与 Turing 机等价）在经典物理下成立, 但在量子物理下被<em>修正</em>: 量子计算机能在多项式时间解某些经典指数难问题。这是物理对计算理论的<em>内在</em> 影响, 与具体硬件实现无关。</p>
+
+<p>请你欣赏一下这件事的视野——<em>1925 量子力学诞生 → 1980 Feynman 提出"<em>用量子模拟量子</em>" → 1985 Deutsch 形式化量子图灵机 → 1994 Shor + 1996 Grover → 2019 量子优势 → 2024 逻辑 qubit</em>——99 年间从纯物理到正在改变全球安全格局的工程技术。</p>
+
+<p>下一章是本书最后一章——<em>量子化学 + 量子场论</em>。前者把 QM 用到分子层面（解决"<em>化学键怎么形成</em>"）, 当前 99% 的实用量子化学计算用密度泛函理论（DFT）。后者把 QM 与狭义相对论 + 多粒子结合, 是粒子物理标准模型的语言。两者都是 QM 的<em>下一步</em>, 24 章给入口。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 量子纠缠 + Bell 不等式</a><a href="ch24.html">下一章 · 第 24 章 应用：量子化学 + 量子场论一瞥 →</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

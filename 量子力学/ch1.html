@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 1 章 引论：经典物理被打败的三场仗 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><span class="nav-disabled">← 上一章</span><a href="ch2.html">下一章 · 第 2 章 波粒二象性 + de Broglie →</a></nav>
+<h1 id="ch1">第 1 章 引论：经典物理被打败的三场仗</h1>
+
+<p>请你想象一根铁棒。冷的时候它<em>看起来黑色</em>——表面对可见光不反射也不发射。把它放进炉子加热。500 K（炉子温度）—— 还是黑的（眼睛看, 但红外相机能看到它发热）。1000 K —— 它开始<em>暗红</em>。1500 K —— 鲜红。3000 K —— 黄白。6000 K（太阳表面）—— 纯白。再高一些, 比如 \(10000\) K —— 蓝白。</p>
+
+<p>你看到的"<em>颜色随温度变化</em>" 不是铁棒在反射环境光（炉子里黑漆漆的）。是铁棒<em>自己发出</em> 的<em>热辐射</em>——所有有温度的物体都辐射, 只是人眼能否接收看温度高低。这种"<em>纯热辐射</em>" 的频谱被称为<em>黑体辐射</em>, 是 1860-1900 年代物理学家集中研究的对象。</p>
+
+<p>这一章我用三个具体的"<em>经典物理失败</em>" 实验把量子力学的诞生背景画清楚。每个实验都在 1900 年前后让物理学家撞上经典物理的边界, 逼出新的物理框架——这就是量子力学。</p>
+
+<h2 id="sec1-1">1.1 第一场仗: 黑体辐射的紫外灾难</h2>
+
+<p>把铁棒"<em>颜色 vs 温度</em>" 量化——黑体在温度 \(T\) 下, 单位频率的辐射能量密度 \(u(\nu, T)\) 是什么？这是 19 世纪末物理学的中心实验问题。Wien、Lummer、Pringsheim 等人在柏林做了非常精确的实验, 得出一族"<em>钟形</em>"曲线——\(u(\nu, T)\) 在某个 \(\nu_{\max}(T)\) 达到峰值, 高频低频两端都掉到 0。</p>
+
+<p>经典物理（电磁学 + 统计力学）算出来什么？1900 年 Rayleigh + Jeans 给出"<em>Rayleigh-Jeans 公式</em>":</p>
+
+<p>\[
+u_{\text{RJ}}(\nu, T) = \frac{8 \pi \nu^2}{c^3} k_B T.
+\]</p>
+
+<p>请你停下来盯住这个公式看一会儿。它在<em>低频</em> 时与实验吻合（\(\nu^2\) 增长正确）。但<em>高频</em>呢？\(u_{\text{RJ}} \propto \nu^2\) <em>没有上限</em>——\(\nu \to \infty\) 时 \(u \to \infty\)。总辐射能量 \(\int_0^\infty u \, d\nu = \infty\)。</p>
+
+<p>这意味着<em>每一个有限温度的物体都应该瞬时辐射出无限能量</em>。任何一片纸、任何一杯咖啡、任何房间里的空气——都该立即变成无限能量爆炸。<em>显然</em> 不是这样。这种经典物理在高频处的发散叫<em>紫外灾难</em>（"<em>紫外</em>" 因为它在频率比可见光高的紫外波段就开始崩——实验给的钟形曲线在那里下降, 经典预测在那里仍然攀升）。</p>
+
+<p>1900 年 12 月 14 日, Max Planck 在德国物理学会上提出修正: 假设光振子的能量<em>不是</em> 连续的, <em>只能</em> 取离散值</p>
+
+<p>\[
+\boxed{\ E_n = n h \nu, \quad n = 0, 1, 2, \ldots\ }
+\]</p>
+
+<p>其中 \(h\) 是个新常数, 后人叫<em>Planck 常数</em>, 数值大约 \(6.626 \times 10^{-34}\) J·s。这条假设——把光振子能量"<em>量子化</em>"——加上统计力学计算, 得出</p>
+
+<p>\[
+u_{\text{Planck}}(\nu, T) = \frac{8 \pi \nu^2}{c^3} \cdot \frac{h \nu}{e^{h\nu / k_B T} - 1}.
+\]</p>
+
+<p>低频时 \(h\nu / k_B T \ll 1\), 分母里 \(e^x - 1 \approx x\), 公式退化为 Rayleigh-Jeans——好。高频时 \(e^{h\nu/k_B T}\) 指数大, 整个 \(u\) 指数衰减——拯救了紫外灾难。<em>完美匹配实验</em>。</p>
+
+<p>Planck 自己当时不太相信"<em>能量量子化</em>" 是物理真实——他把它当成数学技巧。但 5 年后 Einstein 用同样的"<em>能量量子化</em>" 解释另一件事, 让 Planck 假设不可避免地成为物理实在。</p>
+
+<h2 id="sec1-2">1.2 第二场仗: 光电效应</h2>
+
+<p>另一个 1900 年代实验。把一束光照到金属表面, 金属能<em>发出电子</em>（光电流）。这种"<em>光电效应</em>" 由 Hertz 1887 年发现。</p>
+
+<p>经典物理预测什么？光是电磁波, 波带能量 \(\propto\) 强度的平方。所以：</p>
+
+<ul>
+  <li>(经典预测 1) <em>强光 → 高能电子</em>（强光波给电子更多能量）</li>
+  <li>(经典预测 2) <em>低频光也能给电子积累足够能量</em>（只要照的时间够长）</li>
+  <li>(经典预测 3) 电子能量与<em>光强</em> 成正比, 与<em>光频</em> 无关</li>
+</ul>
+
+<p>实验给的<em>完全相反</em>:</p>
+
+<ul>
+  <li>(实验 1) <em>强光 → 多电子, 但每个电子能量与强度无关</em>。</li>
+  <li>(实验 2) <em>有截止频率 \(\nu_0\), 低于它<em>无</em> 电子, 无论照多久</em>。</li>
+  <li>(实验 3) 电子能量<em>线性</em> 增加随 \(\nu\): \(E_e = h\nu - W\)（\(W\) 是金属功函数）。</li>
+</ul>
+
+<p>1905 年 Einstein 在《Annalen der Physik》上发表一个想法（同一年发表狭义相对论 + 布朗运动）: 光<em>不</em> 是连续波, 是<em>粒子流</em>。每个粒子（"<em>光子</em>"）携带能量 \(E = h\nu\)。一个光子打到一个电子, 给它 \(h\nu\) 能量; 减去金属功函数 \(W\)（电子离开金属需要的最小能量）, 剩下的就是电子动能 \(h\nu - W\)。</p>
+
+<p>这条解释一行答完上面三个实验事实:</p>
+
+<ul>
+  <li>强光 = 多光子 → 多电子（数量与强度成正比）, 但单光子能量与强度无关 → 单电子能量与强度无关。</li>
+  <li>低频 \(\nu < W/h\) → 单光子能量不够, <em>无论多少光子叠加</em>（光子之间不相互作用）, 都<em>无</em> 电子。</li>
+  <li>高频电子能量 = \(h\nu - W\), 线性。</li>
+</ul>
+
+<p>Einstein 1921 年因此获 Nobel 奖（不是因相对论！）。这条工作把 Planck 1900 的"<em>振子能量量子化</em>" 升级为"<em>光本身是量子化的</em>"——光既是波（干涉、衍射）也是粒子（光电效应、Compton 散射）。<em>波粒二象性</em> 第一次出场, ch2 详谈。</p>
+
+<h2 id="sec1-3">1.3 第三场仗: 氢原子的离散光谱</h2>
+
+<p>第三场仗——原子的稳定性。</p>
+
+<p>1911 Rutherford 散射实验确立"<em>核 + 电子</em>" 行星模型: 原子由小而重的核 + 远处轨道电子组成。但经典电动力学说, 加速电荷应该<em>辐射</em>。绕核圆周运动的电子持续加速 → 持续辐射 → 持续损失能量 → 螺旋落入核。<em>电子寿命</em> 经典估算约 \(10^{-11}\) 秒。</p>
+
+<p>但是现实中原子<em>稳定</em>——氢原子寿命 \(>10^{17}\) 秒（宇宙年龄）。经典预测错了 28 个数量级。</p>
+
+<p>更进一步: 实验氢原子吸收 / 发射光只在<em>离散</em> 频率上。Balmer 1885 经验给可见光段:</p>
+
+<p>\[
+\frac{1}{\lambda} = R \left( \frac{1}{2^2} - \frac{1}{n^2} \right), \quad n = 3, 4, 5, \ldots
+\]</p>
+
+<p>\(R \approx 1.097 \times 10^7 \text{ m}^{-1}\) 是 Rydberg 常数。Balmer 完全是经验拟合, <em>没有</em> 理论解释。后来 Lyman、Paschen 等观察到其它系列, 都形如 \(R(1/m^2 - 1/n^2)\) for 各种 \((m, n)\)。</p>
+
+<p>1913 年 Niels Bohr 给出一个革命性假设——电子<em>只能</em> 在某些离散"<em>稳定轨道</em>" 上不辐射, 这些轨道的能级</p>
+
+<p>\[
+\boxed{\ E_n = -\frac{13.6 \text{ eV}}{n^2}, \quad n = 1, 2, 3, \ldots\ }
+\]</p>
+
+<p>电子从 \(n\) 跃迁到 \(m\)（\(m < n\)）时, 辐射一个光子, 能量 \(h \nu = E_n - E_m\)。代入 Bohr 公式:</p>
+
+<p>\[
+h \nu = 13.6 \text{ eV} \cdot \left( \frac{1}{m^2} - \frac{1}{n^2} \right).
+\]</p>
+
+<p>把 \(\nu = c/\lambda\) 代入, 完美匹配 Balmer / Lyman / Paschen 公式。<em>奇迹</em>。</p>
+
+<p>但 Bohr 1913 模型有个深刻问题——它<em>假设</em> 离散轨道, <em>没回答为什么</em>。Bohr 用了一个 ad hoc 量子化条件 \(\oint p \, dq = n h\)（角动量量子化）, 但这条本身没<em>动机</em>。<em>为什么</em> 电子轨道是离散的？</p>
+
+<p>这条问题的答案是 1925-1927 年量子力学完整版给出的。\(E_n = -13.6/n^2\) <em>不是</em> 假设——它是<em>解一个 PDE（Schrödinger 方程）的特征值</em>（链回<a href="../泛函分析/ch21.html">泛函分析 ch21</a> 谱定理）。本书<a href="ch16.html">ch16</a> 给出完整推导。</p>
+
+<h2 id="sec1-4">1.4 量子力学的诞生</h2>
+
+<p>三场仗都让经典物理认输, 但还<em>没有</em> 一个统一的理论。\(h\) 这个常数到处冒, 但谁是"<em>正确</em>" 物理框架？</p>
+
+<p>1925 年 Werner Heisenberg, 24 岁, 在北海一个海岛上养花粉过敏。无聊中他构造一种"<em>矩阵</em> 力学"——把可观测物理量当矩阵处理, 矩阵不交换 \(AB - BA \neq 0\) 是关键。Born + Jordan 后来正式化。</p>
+
+<p>1926 年 Erwin Schrödinger, 38 岁, 在 alps 山上度假（带着情人）, 灵感涌现——构造一种"<em>波动</em>" 力学。波函数 \(\psi(x, t)\) 演化遵从他自己写出的方程 \(i\hbar \partial \psi / \partial t = \hat H \psi\)（<em>Schrödinger 方程</em>）。</p>
+
+<p>两套理论看起来完全不同——Heisenberg 是矩阵, Schrödinger 是 PDE。但 1926 年 Schrödinger 自己证: <em>等价</em>。两种都是<em>同一种</em> 量子力学的两种表象。这就是<a href="ch13.html">ch13</a>"Schrödinger vs Heisenberg 表象" 的内容。</p>
+
+<p>Born 同年给出<em>概率诠释</em>: \(|\psi(x, t)|^2\) 是粒子在 \((x, x + dx)\) 范围内的<em>概率密度</em>。Bohr + Heisenberg + Born 在 Copenhagen 形成"<em>哥本哈根学派</em>", 这条诠释成为标准（虽然 Einstein / Schrödinger / de Broglie 一直反对）。</p>
+
+<p>1927 年 Paul Dirac, 25 岁, 把矩阵力学和波动力学统一到<em>抽象 Hilbert 空间</em> 框架（链回<a href="../泛函分析/index.html">泛函分析</a>第 3 章）。几乎所有现代教科书都用 Dirac 形式: \(|\psi\rangle \in H, \hat A | \psi \rangle\), 等等。<a href="ch9.html">ch9</a> 引入 Dirac 记号。</p>
+
+<p>1928 年 Dirac 把量子力学和狭义相对论结合, 写出<em>Dirac 方程</em>, 自动预测<em>电子自旋</em> 和<em>反物质</em>。1932 Anderson 实验找到正电子, Dirac 预测验证。这是量子场论的开端, 超出本书范围（ch24 简要预告）。</p>
+
+<p>请你停下来欣赏这件事——量子力学的核心结构（Hilbert 空间 + 自伴算子 + 谱 + 概率）在 1925-1928 短短四年间从无到有, 由 5-6 个人合作建立。它的<em>内蕴一致性</em> 直到今天没有被打破。</p>
+
+<h2 id="sec1-5">1.5 这本书的路线</h2>
+
+<p>24 章六段式：</p>
+
+<ul>
+  <li><strong>动机 (ch1-2)</strong>: 经典失败 + 波粒二象性 + de Broglie。</li>
+  <li><strong>波动力学入门 (ch3-8)</strong>: Schrödinger 方程 → 波函数 → 自由粒子 / 势阱 / 谐振子 / 势垒。这一段你能"<em>解</em>" 几个具体的量子系统。</li>
+  <li><strong>形式化 (ch9-13)</strong>: Hilbert 空间 + Dirac 记号 + 算子 + 期望 + 不确定性 + 测量 + 表象。本书的<em>数学骨架</em>。这一段链泛函分析。</li>
+  <li><strong>3D + 角动量 (ch14-17)</strong>: 角动量算子 → 球对称势 → 氢原子完整解析解 → 自旋。</li>
+  <li><strong>多体 + 微扰 (ch18-21)</strong>: 全同粒子 + 反对称化 + 时间无关 / 时间依赖微扰 + 散射理论。</li>
+  <li><strong>现代 (ch22-24)</strong>: 纠缠 + Bell 不等式 + 量子计算 + 量子化学 + 量子场论一瞥。</li>
+</ul>
+
+<h2 id="sec1-6">1.6 临别话</h2>
+
+<p>量子力学常被说成"<em>反直觉</em>"。这种说法部分对——薛定谔的猫、波粒二象性、纠缠都让经典直觉失败。但<em>不</em> 完全对——一旦你把"<em>状态 = Hilbert 空间向量</em>""<em>测量 = 自伴算子</em>""<em>概率 = 投影模平方</em>" 这三条公设当真, 量子现象<em>极</em> 自洽且可计算。所谓"<em>反直觉</em>" 是因为人脑的"<em>直觉</em>" 由经典物理塑造（行星轨道、台球碰撞）, 不是因为量子力学本身奇怪。</p>
+
+<p>这本书的目标——<em>把"经典直觉" 替换为"量子直觉"</em>。每一章都从一个具体物理问题进入, 用 Schrödinger / Hilbert 空间工具解出来, 让你看到答案<em>必然如此</em>。读完 24 章你会发现量子现象不再"<em>奇怪</em>"——它们就是 Hilbert 空间的几何本身。</p>
+
+<p>下一章我们正面看波粒二象性的另一面: <em>物质波</em>。光既是波也是粒子, 那物质（电子、原子）呢？1924 年 de Broglie 26 岁的博士论文给一个大胆假设——<em>所有</em> 物质都有"<em>波长</em>" \(\lambda = h/p\)。3 年后 Davisson + Germer 实验在电子上验证。这个想法直接通向 Schrödinger 方程的写法。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><span class="nav-disabled">← 上一章</span><a href="ch2.html">下一章 · 第 2 章 波粒二象性 + de Broglie →</a></nav>
+</main>
+</body>
+</html>

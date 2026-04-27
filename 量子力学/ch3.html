@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 Schrödinger 方程 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 波粒二象性 + de Broglie</a><a href="ch4.html">下一章 · 第 4 章 波函数与 Born 概率诠释 →</a></nav>
+<h1 id="ch3">第 3 章 Schrödinger 方程</h1>
+
+<p>1926 年圣诞节假期, 39 岁的 Erwin Schrödinger 在瑞士阿尔卑斯山的 Arosa 度假村住下来。陪他的是他的一位旧情人（妻子 Anny 留在苏黎世）, 还有他随身带的一沓 de Broglie 论文。半年前他在苏黎世大学一次讨论会上听 Peter Debye 讲 de Broglie 的物质波——\(\lambda = h/p\)。Debye 半开玩笑说: "<em>有了波长, 就该有个波动方程才对</em>。" 这句话戳中 Schrödinger 心思。在 Arosa 的几周, 他把这个方程写出来。</p>
+
+<p>这一章我把 Schrödinger 怎么"<em>猜</em>" 这个方程一步一步走给你看。请你抓住一个核心观念——<em>这个方程不是从经典力学严格推出来的</em>。它是<em>带类比的猜</em>——从经典 \(E = p^2/(2m) + V\) 出发, 用算子替换 \(E \to i\hbar \partial_t, \boldsymbol p \to -i\hbar \nabla\), 直接得到。猜出来后用平面波检验——它的色散关系恰好 = de Broglie 给的色散关系, 自洽。最后用实验（氢原子谱、势阱能级）验证, 完美匹配。这就是它的合法性来源。</p>
+
+<h2 id="sec3-1">3.1 朴素出发: 经典力学的总能量</h2>
+
+<p>Schrödinger 的"<em>猜</em>" 不是凭空乱猜。他从经典力学最基本的能量关系开始:</p>
+
+<p>\[
+E = \frac{p^2}{2m} + V(\boldsymbol x).
+\]</p>
+
+<p>左边 \(E\) 是粒子总能量, 右边 \(p^2/(2m)\) 是动能, \(V(\boldsymbol x)\) 是势能。这就是经典力学的<em>Hamiltonian</em>（Hamilton 1830 年代引入）。所有经典力学问题——抛物线、行星运动、谐振子——都可以从这个表达式 + Hamilton 方程 \(\dot{\boldsymbol q} = \partial H / \partial \boldsymbol p, \dot{\boldsymbol p} = -\partial H/\partial \boldsymbol q\) 得到。</p>
+
+<p>这条公式一切都是<em>数</em>: \(E, p, m, V\) 都是普通的实数。一个粒子在某时某地有<em>确定</em> 的位置 \(\boldsymbol x\)、确定动量 \(\boldsymbol p\)、确定能量 \(E\), 满足上面的方程。</p>
+
+<p>请你停下来盯一下这条经典图像——它非常具体: <em>粒子在每一时刻都有确切轨迹</em>。这就是 Schrödinger 即将把它打翻的图像。</p>
+
+<h2 id="sec3-2">3.2 撞墙: 物质波该满足什么方程</h2>
+
+<p>de Broglie 给我们 \(\lambda = h/p, \nu = E/h\)。如果电子是波, 它的波函数应该形如</p>
+
+<p>\[
+\psi(\boldsymbol x, t) = e^{i(\boldsymbol k \cdot \boldsymbol x - \omega t)},
+\]</p>
+
+<p>其中 \(\omega = 2\pi \nu = E/\hbar, \boldsymbol k = \boldsymbol p/\hbar\)（按 de Broglie）。这是一个平面波——单一频率 \(\omega\)、单一波矢 \(\boldsymbol k\)。</p>
+
+<p>问题: <em>这个 \(\psi\) 满足什么方程</em>？经典波（声波、水波、绳上的波）满足通常的波动方程</p>
+
+<p>\[
+\frac{\partial^2 \psi}{\partial t^2} - c^2 \nabla^2 \psi = 0,
+\]</p>
+
+<p>它的色散关系是 \(\omega^2 = c^2 k^2\), 即 \(\omega = c k\)（线性色散, 相速 = 群速 = \(c\)）。</p>
+
+<p>但物质波的色散关系是什么？\(\omega = E/\hbar = (p^2/2m)/\hbar = (\hbar k)^2/(2m\hbar) = \hbar k^2/(2m)\):</p>
+
+<p>\[
+\boxed{\ \omega = \frac{\hbar k^2}{2m}.\ }
+\]</p>
+
+<p>这是<em>非线性</em> 色散——\(\omega \propto k^2\), 不是 \(\omega \propto k\)。所以经典波动方程<em>不</em> 适合物质波。我们需要一种方程, 让 \(\psi = e^{i(\boldsymbol k \cdot \boldsymbol x - \omega t)}\) 满足它当且仅当 \(\omega = \hbar k^2/(2m)\)。</p>
+
+<p>请你停下来注意——这条 \(\omega \propto k^2\) 而非 \(\omega \propto k\) 的色散关系会给出一个<em>新型</em> 波动方程。我们需要某种"<em>一阶时间导数 = 二阶空间导数</em>" 的结构, 因为这样才能把 \(\omega^1\) 与 \(k^2\) 配对。这就是猜的方向。</p>
+
+<h2 id="sec3-3">3.3 Reframe: 算子替换</h2>
+
+<p>(关键步骤) Schrödinger 找到的"<em>把粒子的 \(E, p\) 翻译成波的 \(\omega, k\)</em>" 的形式化方法叫<em>算子替换</em>。我们看怎么进行。</p>
+
+<p>对平面波 \(\psi = e^{i(\boldsymbol k \cdot \boldsymbol x - \omega t)}\) 求时间偏导:</p>
+
+<p>\[
+\frac{\partial \psi}{\partial t} = -i \omega \psi = -\frac{i E}{\hbar} \psi
+\quad \Rightarrow \quad
+i \hbar \frac{\partial \psi}{\partial t} = E \psi.
+\]</p>
+
+<p>对空间求偏导:</p>
+
+<p>\[
+\nabla \psi = i \boldsymbol k \psi = \frac{i}{\hbar} \boldsymbol p \psi
+\quad \Rightarrow \quad
+-i \hbar \nabla \psi = \boldsymbol p \psi.
+\]</p>
+
+<p>请你停下来欣赏这两条关系。它们说: <em>对平面波 \(\psi\)</em>:</p>
+
+<ul>
+  <li>"<em>能量 \(E\)</em>" 对应"<em>对 \(\psi\) 作算子 \(i\hbar \partial_t\)</em>"。</li>
+  <li>"<em>动量 \(\boldsymbol p\)</em>" 对应"<em>对 \(\psi\) 作算子 \(-i\hbar \nabla\)</em>"。</li>
+</ul>
+
+<p>把这两条<em>当作算子定义</em> 提出来, 就是<em>算子替换规则</em>:</p>
+
+<p>\[
+\boxed{\ \hat E = i\hbar \frac{\partial}{\partial t}, \qquad \hat{\boldsymbol p} = -i\hbar \nabla.\ }
+\]</p>
+
+<p>这两个 \(\hat E, \hat{\boldsymbol p}\) 是<em>线性算子</em>——它们作用在波函数 \(\psi(\boldsymbol x, t)\) 上, 给出另一个函数。请你注意——它们不再是数, 是<em>对函数的操作</em>。这是从经典物理到量子物理思想上最大的一次跳跃: <em>物理量从数值变成算子</em>。</p>
+
+<h2 id="sec3-4">3.4 命名: Schrödinger 方程</h2>
+
+<p>把算子替换规则代入经典 Hamiltonian 关系 \(E = p^2/(2m) + V\)。两边对 \(\psi\) 作用:</p>
+
+<p>\[
+\hat E \psi = \frac{\hat{\boldsymbol p}^2}{2m} \psi + V(\boldsymbol x) \psi.
+\]</p>
+
+<p>左边 \(\hat E \psi = i\hbar \partial \psi/\partial t\)。右边 \(\hat{\boldsymbol p}^2 \psi = (-i\hbar \nabla)^2 \psi = -\hbar^2 \nabla^2 \psi\), 所以 \(\hat{\boldsymbol p}^2 \psi/(2m) = -(\hbar^2/2m) \nabla^2 \psi\)。代入合起来:</p>
+
+<p>\[
+\boxed{\ i\hbar \frac{\partial \psi}{\partial t} = -\frac{\hbar^2}{2m} \nabla^2 \psi + V(\boldsymbol x) \psi.\ }
+\]</p>
+
+<p>这就是<em>含时 Schrödinger 方程</em>（Time-Dependent Schrödinger Equation, TDSE）。它是关于波函数 \(\psi(\boldsymbol x, t)\) 的<em>偏微分方程</em>: 一阶时间导数, 二阶空间导数。系数全是已知常数 (\(\hbar, m\)) 加给定势 \(V(\boldsymbol x)\)。</p>
+
+<p>请你停下来欣赏这条方程的<em>美</em>。一行就把量子力学的核心动力学装下了。所有量子现象——氢原子谱、势阱能级、隧穿、纠缠、量子计算门——最终都来自这一行的解。它在量子力学里的地位等同于 \(F = ma\) 在经典力学里的地位, 等同于 Maxwell 方程在电动力学里的地位。Schrödinger 1926 春天写下它, 物理学从此分两段: <em>之前</em> 与<em>之后</em>。</p>
+
+<h2 id="sec3-5">3.5 验证: 平面波满足自由粒子 SE</h2>
+
+<p>新方程到手, 第一件该做的事是<em>验证它和我们出发的 de Broglie 假设自洽</em>。取自由粒子 (\(V \equiv 0\)), 检查平面波 \(\psi = e^{i(\boldsymbol k \cdot \boldsymbol x - \omega t)}\) 是否满足 SE。</p>
+
+<p>左边: \(i\hbar \partial \psi/\partial t = i\hbar \cdot (-i\omega) \psi = \hbar \omega \psi\)。</p>
+
+<p>右边 (\(V = 0\)): \(-(\hbar^2/2m) \nabla^2 \psi = -(\hbar^2/2m) \cdot (-k^2) \psi = (\hbar^2 k^2/2m) \psi\)。</p>
+
+<p>两边相等要求</p>
+
+<p>\[
+\hbar \omega = \frac{\hbar^2 k^2}{2m},
+\quad \text{即} \quad
+\omega = \frac{\hbar k^2}{2m}.
+\]</p>
+
+<p>这<em>正好</em> 是物质波的色散关系（3.2 节给的）。<em>自洽</em>。</p>
+
+<p>另一种检查方式: 把 \(\omega = E/\hbar, \boldsymbol k = \boldsymbol p/\hbar\) 代入 \(\omega = \hbar k^2/(2m)\), 得 \(E = p^2/(2m)\)。这是经典自由粒子动能关系——再次自洽。</p>
+
+<p>这条验证不是循环论证——我们出发是用 de Broglie 关系 + 算子替换<em>构造</em> SE, 然后<em>独立地</em> 检查它给出对的色散。两者一致是非平凡的——它说明 Schrödinger 的"<em>猜</em>" 没有内在矛盾。一致性是必要条件, 不是充分条件; 充分性最终由<em>实验</em> 给出。</p>
+
+<h2 id="sec3-6">3.6 时间依赖 vs 时间无关: 分离变量</h2>
+
+<p>含时 SE \(i\hbar \partial \psi/\partial t = \hat H \psi\) 是关于<em>时空</em> 的方程, 其中</p>
+
+<p>\[
+\hat H = -\frac{\hbar^2}{2m} \nabla^2 + V(\boldsymbol x)
+\]</p>
+
+<p>是<em>Hamiltonian 算子</em>（量子的能量算子, 见 3.8 节）。注意 \(\hat H\) <em>不含 \(t\)</em>（如果 \(V\) 不显含 \(t\)）, 这是大多数物理应用的情形（束缚态、稳态势阱、原子等）。</p>
+
+<p>当 \(\hat H\) 不显含 \(t\), 含时 SE 的一类特解可以<em>分离变量</em> 求出。试设</p>
+
+<p>\[
+\psi(\boldsymbol x, t) = \phi(\boldsymbol x) f(t).
+\]</p>
+
+<p>代入 SE:</p>
+
+<p>\[
+i\hbar \phi(\boldsymbol x) \frac{df}{dt} = f(t) \hat H \phi(\boldsymbol x).
+\]</p>
+
+<p>两边除以 \(\phi f\):</p>
+
+<p>\[
+i\hbar \frac{1}{f} \frac{df}{dt} = \frac{\hat H \phi}{\phi}.
+\]</p>
+
+<p>左边只含 \(t\), 右边只含 \(\boldsymbol x\)。这种"<em>左 t 右 x</em>" 等式只有在两边都<em>等于一个常数</em> 时才成立。把这个常数叫 \(E\)（暂时只是个记号, 我们会看到它就是能量）:</p>
+
+<p>\[
+i\hbar \frac{1}{f} \frac{df}{dt} = E, \qquad \frac{\hat H \phi}{\phi} = E.
+\]</p>
+
+<p>第一条 ODE 解出</p>
+
+<p>\[
+f(t) = e^{-iEt/\hbar}.
+\]</p>
+
+<p>第二条改写为<em>时间无关 Schrödinger 方程</em>（Time-Independent Schrödinger Equation, TISE）:</p>
+
+<p>\[
+\boxed{\ \hat H \phi(\boldsymbol x) = E \phi(\boldsymbol x), \quad \text{即} \quad -\frac{\hbar^2}{2m} \nabla^2 \phi + V(\boldsymbol x) \phi = E \phi.\ }
+\]</p>
+
+<p>请你停下来认真观察这条方程的形式。它说: <em>\(\phi\) 是 Hamiltonian 算子 \(\hat H\) 的本征函数, \(E\) 是对应的本征值</em>。也就是说,</p>
+
+<ul>
+  <li>\(\hat H\) 是个线性算子（作用在函数空间 \(L^2(\mathbb R^3)\) 上）。</li>
+  <li>\(\phi\) 是一个特定的函数, 对它作用 \(\hat H\) 得到原来的 \(\phi\) 乘以一个数 \(E\)。</li>
+  <li>这就是线性代数里的"<em>本征向量 / 本征值</em>" 概念, 推广到无穷维函数空间。</li>
+</ul>
+
+<p>解 TISE = 找 Hamiltonian 算子的<em>谱</em>（本征值 + 本征函数集合）。这是<em>泛函分析谱定理</em> 的物理实现（链回<a href="../泛函分析/ch21.html">泛函分析 ch21</a>）。本书 ch6-8 解几个具体势的 TISE: 无限深方阱、有限深方阱、谐振子、阶梯势、δ 势; ch15-16 解三维球对称势 + 氢原子。</p>
+
+<h2 id="sec3-7">3.7 SE 的合法性: 它是<em>新</em> 物理假设, 不是从经典推出来</h2>
+
+<p>请你回顾一下我们<em>怎么得到</em> Schrödinger 方程的:</p>
+
+<ol>
+  <li>从经典 \(E = p^2/(2m) + V\) 出发。</li>
+  <li>把 \(E, \boldsymbol p\) <em>替换</em> 为算子 \(\hat E = i\hbar \partial_t, \hat{\boldsymbol p} = -i\hbar \nabla\)。</li>
+  <li>对一个未知函数 \(\psi(\boldsymbol x, t)\) 作用, 得到 SE。</li>
+</ol>
+
+<p>这个推导的"<em>关键一跳</em>" 是第 2 步的<em>算子替换</em>。这一步<em>不是从经典力学严格推出来的</em>——它是<em>新物理假设</em>。</p>
+
+<p>请你停下来想为什么。经典力学里, \(E\) 和 \(\boldsymbol p\) 是<em>数</em>; 没有任何经典定理告诉你"<em>能量应该被替换为时间偏导算子, 动量应该被替换为空间偏导算子</em>"。这条替换规则是 Schrödinger（以及 1925 同期的 Heisenberg, 1926 的 Born + Jordan + Dirac）<em>新</em> 引入的物理结构, 它定义量子力学。它的合法性<em>不能</em> 从经典力学推出, 只能由实验事后验证。</p>
+
+<p>实验验证如何？最关键的几条:</p>
+
+<ul>
+  <li>(氢原子谱) 解 TISE 用库仑势 \(V = -e^2/(4\pi\epsilon_0 r)\), 本征值给 \(E_n = -13.6/n^2\) eV——精确匹配 Bohr-Balmer 公式（ch16 完整解析）。</li>
+  <li>(势阱能级) 一维无限深方阱解出 \(E_n = n^2 \pi^2 \hbar^2/(2 m L^2)\); 实验上量子点（人造原子）的能级随尺寸 \(L\) 平方反比定标——精确符合（ch6）。</li>
+  <li>(Compton 散射) 用 SE 处理光子-电子碰撞给出 \(\lambda' - \lambda = (h/m_e c)(1 - \cos\theta)\), 1923 实验值符合到精度 0.01%。</li>
+  <li>(谐振子) 解 TISE 用 \(V = m\omega^2 x^2/2\) 给本征值 \(E_n = (n + 1/2) \hbar \omega\); 红外光谱测量分子振动能级精确符合（ch7）。</li>
+  <li>(隧穿) SE 预测穿透率 \(T \sim e^{-2 \kappa L}\); STM（扫描隧道显微镜）日常使用这条结果工作（ch8）。</li>
+</ul>
+
+<p>每一条实验都把 SE 的预测和测量对照, <em>完美符合</em>。100 年来没有任何实验否定 SE（在非相对论 + 单粒子框架内）。这就是它的合法性来源——<em>它的预测全部对</em>。</p>
+
+<p>这种"<em>方程是猜的, 由实验验证</em>" 的逻辑结构和 Newton 第二定律 \(F = ma\) 一样。Newton 没法"<em>推出</em>" \(F = ma\)——这条公式本身是基本物理假设, 它的合法性来自苹果落地、行星轨道、潮汐, 等等所有实验的验证。Schrödinger 方程在量子力学里地位完全等同。</p>
+
+<p>请你接受一个心理定位——<em>SE 是公设, 不是定理</em>。学量子力学不要试图"<em>推</em>" SE; 应该<em>接受它</em>, 然后看它能解出什么、预测什么、和实验如何符合。这是科学方法在量子力学里的具体形态。</p>
+
+<h2 id="sec3-8">3.8 一般化: Hamiltonian 算子是能量算子</h2>
+
+<p>记号上, 把</p>
+
+<p>\[
+\hat H = -\frac{\hbar^2}{2m} \nabla^2 + V(\boldsymbol x) = \frac{\hat{\boldsymbol p}^2}{2m} + V(\hat{\boldsymbol x})
+\]</p>
+
+<p>叫<em>Hamiltonian 算子</em>。它是经典 Hamiltonian \(H = p^2/(2m) + V(\boldsymbol x)\) 的<em>量子版</em>——把数 \(p\) 替换为算子 \(\hat{\boldsymbol p}\)（数 \(\boldsymbol x\) 也可以看作算子, 见 ch9）。</p>
+
+<p>有了这个记号, SE 可以写得非常紧凑:</p>
+
+<p>\[
+\boxed{\ i\hbar \frac{\partial \psi}{\partial t} = \hat H \psi\ } \quad \text{(含时 SE)}, \qquad \boxed{\ \hat H \phi = E \phi\ } \quad \text{(时间无关 SE)}.
+\]</p>
+
+<p>含时 SE 说"<em>状态 \(\psi\) 的演化由 Hamiltonian 算子驱动</em>"; 时间无关 SE 说"<em>定态 \(\phi\) 是 Hamiltonian 算子的本征函数, 本征值 \(E\) 是定态能量</em>"。</p>
+
+<p>(为什么 \(\hat H\) 是"<em>能量算子</em>") 一个定态 \(\phi_n\) 的本征值 \(E_n\) 物理上正是该定态的能量。这条是<em>定义</em>——量子力学里, "<em>系统在态 \(\phi_n\) 的能量值</em>" 就是 \(E_n = \hat H \phi_n / \phi_n\) 这个本征值。对一般态 \(\psi = \sum c_n \phi_n\)（叠加多个能量本征态）, 测量能量得到 \(E_n\) 的概率是 \(|c_n|^2\), 期望值是 \(\langle E \rangle = \sum |c_n|^2 E_n = \langle \psi | \hat H | \psi \rangle\)（ch4 + ch9 详谈）。</p>
+
+<p>(更深: 任何物理量都对应一个算子) Hamiltonian 算子只是<em>能量</em> 这一个物理量对应的算子。一般地, 量子力学每个可观测物理量都对应一个<em>自伴算子</em>:</p>
+
+<ul>
+  <li>位置 → \(\hat{\boldsymbol x}\)（乘 \(\boldsymbol x\) 算子）</li>
+  <li>动量 → \(\hat{\boldsymbol p} = -i\hbar \nabla\)</li>
+  <li>能量 → \(\hat H\)</li>
+  <li>角动量 → \(\hat{\boldsymbol L} = \hat{\boldsymbol r} \times \hat{\boldsymbol p}\)（ch14）</li>
+  <li>自旋 → 几个 \(2 \times 2\) Pauli 矩阵 \(\hat{\boldsymbol S}\)（ch17）</li>
+</ul>
+
+<p>这条"<em>物理量 = 自伴算子</em>" 是量子力学的<em>第二条公设</em>（第一条是"<em>态 = Hilbert 空间向量</em>"）。这两条公设 + Born 概率诠释（ch4）就构成了量子力学的完整数学骨架。这套结构在 ch9-13 用 Hilbert 空间形式化。</p>
+
+<h2 id="sec3-9">3.9 关键画面合一: 一个例子</h2>
+
+<p>让我们用一个具体例子把这一章的所有概念串起来。考虑一维自由粒子 (\(V = 0\), 一维)。SE 是</p>
+
+<p>\[
+i\hbar \frac{\partial \psi}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \psi}{\partial x^2}.
+\]</p>
+
+<p>(平面波解) 试 \(\psi_k(x, t) = e^{i(kx - \omega(k) t)}\), 代入: \(i\hbar \cdot (-i\omega) = -(\hbar^2/2m) \cdot (-k^2)\), 即 \(\hbar \omega = \hbar^2 k^2/(2m)\), 即 \(\omega(k) = \hbar k^2/(2m)\)。每个 \(k\) 都对应一个解。</p>
+
+<p>(线性叠加) 由于 SE 是<em>线性</em> 方程, 解的线性组合也是解。最一般解</p>
+
+<p>\[
+\psi(x, t) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \tilde \psi(k) e^{i(kx - \omega(k) t)} \, dk,
+\]</p>
+
+<p>其中 \(\tilde \psi(k)\) 是初始时刻 \(\psi(x, 0)\) 的 Fourier 变换:</p>
+
+<p>\[
+\tilde \psi(k) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \psi(x, 0) e^{-ikx} \, dx.
+\]</p>
+
+<p>给定初值 \(\psi(x, 0)\), Fourier 变换得 \(\tilde \psi(k)\), 时间演化 = 给每个 \(k\) 模式乘 \(e^{-i\omega(k) t}\), 反 Fourier 变换得 \(\psi(x, t)\)。这就是自由粒子 SE 的"<em>解算子</em>"。</p>
+
+<p>(具体例: 高斯波包) 取 \(\psi(x, 0) = (\pi a^2)^{-1/4} e^{-x^2/(2 a^2)} e^{i k_0 x}\)（中心在 0、宽度 \(a\)、平均动量 \(\hbar k_0\) 的高斯波包）。Fourier 变换后是 \(\tilde \psi(k) \propto e^{-(k - k_0)^2 a^2/2}\)（窄带在 \(k_0\) 附近）。时间演化:</p>
+
+<p>\[
+\psi(x, t) \propto \frac{1}{\sqrt{a + i\hbar t/(m a)}} \exp\left( -\frac{(x - v_g t)^2}{2 (a^2 + (\hbar t/m a)^2)} + i k_0 (x - v_\phi t) \right),
+\]</p>
+
+<p>其中 \(v_g = \hbar k_0/m\) 是群速度（波包中心移动速度）, \(v_\phi = \hbar k_0/(2m)\) 是相速度。波包<em>中心以速度 \(v_g\) 移动</em>, <em>宽度随时间线性扩散</em>（\(a(t) \approx \sqrt{a^2 + (\hbar t/m a)^2}\)）。这就是<em>波包扩散</em>——量子粒子位置的不确定性随时间增长, 是 Heisenberg 不确定关系的直接表现。</p>
+
+<p>(物理解读) 这个高斯波包就是一个"<em>大致定位</em>" 的电子。中心 \(v_g\) 等于经典电子的速度（与上一章 2.8 节群速度结论一致）, 这条说自由粒子的"<em>经典极限</em>" 是合理的。但波包随时间扩散——经典电子的"<em>位置</em>" 是确定的, 量子电子的"<em>位置</em>" 越来越模糊。这就是 SE 给出的新物理: <em>波函数演化既保留经典直觉（中心运动）又添加量子特征（扩散）</em>。</p>
+
+<h2 id="sec3-10">3.10 临别话</h2>
+
+<p>1926 年 Schrödinger 在阿尔卑斯山写下他的方程, 物理学进入新纪元。这条方程的合法性不在于它能从更基本的原理"<em>推</em>" 出来——它本身就是基本原理。它的合法性来自实验, 来自它在<em>每一</em> 个被测试的情形下都给出对的预测。</p>
+
+<p>请你欣赏 Schrödinger 这次猜的<em>方法</em>。他的步骤——<em>从经典 Hamiltonian 出发, 用算子替换</em>——后来成为<em>量子化</em> 的标准模式。给一个经典系统, 把它"<em>量子化</em>" 就是把数变算子, 列出 SE。这条"<em>正则量子化</em>" 程序是量子场论的入门工具（ch24 简介）。</p>
+
+<p>下一章我们追问一个 Schrödinger 自己也没完全解决的问题: \(\psi(\boldsymbol x, t)\) <em>是什么</em>？经典波（声波）有明确解释——空气分子位移; 物质波 \(\psi\) 呢？Schrödinger 早期想说"<em>电子云</em>", 也就是电子在空间分布的物理密度。但这条解释与几个实验事实不符（散射后电子总是<em>整个</em> 出现在某一点, 不是分布在多个点）。1926 年 Max Born 给出现在的标准诠释——<em>\(|\psi(\boldsymbol x, t)|^2\) 是概率密度</em>: 在 \(\boldsymbol x\) 处找到粒子的概率密度。这条诠释让量子力学本质上成为<em>概率</em> 理论。我们下一章详谈 Born 概率诠释 + 归一化 + 期望值 + 哥本哈根诠释 vs 多世界 vs 隐变量。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 波粒二象性 + de Broglie</a><a href="ch4.html">下一章 · 第 4 章 波函数与 Born 概率诠释 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 散射理论入门 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 时间依赖微扰 + Fermi 金律</a><a href="ch22.html">下一章 · 第 22 章 量子纠缠 + Bell 不等式 →</a></nav>
+<h1 id="ch21">第 21 章 散射理论入门</h1>
+
+<p>请你想象一个粒子物理实验。LHC 把两束质子加速到 TeV 量级, 让它们在 CMS 探测器中心对撞。撞完了什么? <em>一片碎片</em>——光子、轻子、强子、喷注向四面八方飞出。探测器记下每一片碎片的方向、能量、电荷。物理学家要做的事——从这一堆"<em>飞出方向 + 能量分布</em>" 反推"<em>对撞那一刻发生了什么</em>"。</p>
+
+<p>把这件事缩小一万倍, 就是 1911 Rutherford 用 \(\alpha\) 粒子打金箔的实验——\(\alpha\) 大部分穿过、少数偏折大角度。他从"<em>偏折角分布</em>" 反推"<em>金原子内部有个小而重的核</em>"。再缩小一千倍, 就是中子散射实验——慢中子打晶体, 衍射图案告诉你晶格结构。</p>
+
+<p>请你停下来欣赏一件事: <em>原子核结构、粒子物理、化学反应、凝聚态结构</em>——大部分实验数据都是"<em>散射</em>": 一束粒子打到目标, 测出散射角分布。给散射数据怎么反推作用力? 这就是<em>散射理论</em>。</p>
+
+<p>这一章我建立散射理论的两个朴素工具——<strong>Born 近似</strong>（一阶微扰, 给"<em>弱势小角度</em>" 散射的快速答案）+ <strong>部分波分析</strong>（按角动量展开, 给"<em>低能任何强度</em>" 散射的精确答案）。两条路给的<em>实验可观测</em> 是同一个量——<em>微分截面</em> \(d\sigma/d\Omega\)。</p>
+
+<h2 id="sec21-1">21.1 散射设定 + 微分截面 \(d\sigma/d\Omega\)</h2>
+
+<p>具体设定: 一束粒子（动量 \(p = \hbar k\), 沿 \(+z\) 方向）从远处入射, 撞上位于原点的<em>固定靶</em>（一个势 \(V(\boldsymbol r)\), 假设短程或快速衰减）。粒子被散射后向各方向飞出, 远处的探测器测它们到达每个方向的<em>速率</em>。</p>
+
+<p>定义"<em>探测器在立体角 \(d\Omega\) 里每秒接到多少粒子</em>" 为 \(dN/dt\)。它显然依赖入射通量 \(F\)（每秒每单位面积的入射粒子数）。<em>归一化</em> 后定义</p>
+
+<p>\[
+\boxed{\ \frac{d\sigma}{d\Omega}(\theta, \varphi) = \frac{1}{F} \frac{dN/dt}{d\Omega}.\ }
+\]</p>
+
+<p>左边叫<strong>微分截面</strong>, 量纲是<em>面积 / 立体角</em>（常用单位 barn = \(10^{-28}\) m\(^2\) 或 fm\(^2\)）。它<em>不</em> 依赖入射通量, 只依赖 \(V\) 与入射能量——是<em>问题本身</em> 的属性。</p>
+
+<p>把它积全立体角得<em>总截面</em>:</p>
+
+<p>\[
+\sigma_{\text{tot}} = \int \frac{d\sigma}{d\Omega} d\Omega.
+\]</p>
+
+<p>物理含义: \(\sigma_{\text{tot}}\) 是"<em>有效靶面积</em>"——把靶想成一个不透明圆盘, 任何"<em>瞄准它</em>" 的入射粒子都被散射, 那个圆盘的面积就是 \(\sigma_{\text{tot}}\)。这是个直观但不精确的图像（量子散射不是"<em>砸盘子</em>", 但截面正是把它"<em>当作砸盘子</em>" 时的等效面积）。</p>
+
+<p>实验测的就是 \(d\sigma/d\Omega(\theta, \varphi)\) 作为 \(\theta, \varphi\) 的函数。理论要做的——<em>给定 \(V\), 算 \(d\sigma/d\Omega\)</em>。这一章给两条路。</p>
+
+<h2 id="sec21-2">21.2 渐近形式: \(\psi \sim e^{ikz} + f(\theta) e^{ikr}/r\)</h2>
+
+<p>请你把"<em>散射</em>" 翻译成 Schrödinger 方程的边值问题。设 \(V(\boldsymbol r)\) 在 \(r > a\) 区域<em>快速衰减为零</em>（短程势）。我们要解定态 SE</p>
+
+<p>\[
+\left[ -\frac{\hbar^2}{2m} \nabla^2 + V(\boldsymbol r) \right] \psi(\boldsymbol r) = E \psi(\boldsymbol r), \quad E = \frac{\hbar^2 k^2}{2m},
+\]</p>
+
+<p>边界条件: 在远场 \(r \to \infty\), \(\psi\) 应该是<em>入射平面波</em> + <em>从原点出发的散射球面波</em>:</p>
+
+<p>\[
+\boxed{\ \psi(\boldsymbol r) \xrightarrow{r \to \infty} e^{i k z} + f(\theta, \varphi) \frac{e^{i k r}}{r}.\ }
+\]</p>
+
+<p>请你停下来解读每一项:</p>
+
+<ul>
+  <li>\(e^{ikz}\)——入射平面波（沿 \(+z\), 动量 \(\hbar k \hat z\)）。这对应远处的稳定束流。如 ch5 所述, 平面波不归一, 但这里我们把它当成一个"<em>形式</em>" 的入射条件, 物理上代表"<em>束流密度</em>"。</li>
+  <li>\(f(\theta, \varphi) e^{ikr}/r\)——出射球面波。\(e^{ikr}/r\) 是从原点辐射的球面波（\(1/r\) 让概率密度 \(|...|^2 \propto 1/r^2\) 与立体角 \(d\Omega \propto r^2\) 抵消, 总散射粒子数与 \(r\) 无关——能量守恒）。\(f(\theta, \varphi)\) 是<em>散射振幅</em>, 编码"<em>哪个方向散射多少</em>"。它是<em>复</em> 函数, 量纲是<em>长度</em>。</li>
+</ul>
+
+<p>注意——这条边界条件不是 SE 自动给的, 是我们<em>选择</em> 的边界条件。"<em>入射 + 出射</em>" 对应实验场景; "<em>纯入射 + 纯出射</em>" 对应别的场景。这里选的形式叫<em>散射边界条件</em>, 它把 SE 从 PDE 求解问题转化为"<em>找 \(f(\theta, \varphi)\)</em>"——后者是个有限自由度的<em>函数</em>, 比"<em>整个 \(\psi\)</em>" 简单得多。</p>
+
+<h2 id="sec21-3">21.3 \(d\sigma/d\Omega = |f(\theta, \varphi)|^2\)</h2>
+
+<p>请你做一件事——把 21.1 的实验定义和 21.2 的散射振幅<em>对接</em>。</p>
+
+<p>入射通量 \(F\): 平面波 \(\psi_{\text{inc}} = e^{ikz}\) 的概率流密度（ch4 概率流公式 \(\boldsymbol j = (\hbar/m) \mathrm{Im}(\psi^* \nabla \psi)\)）, 算出 \(\boldsymbol j_{\text{inc}} = (\hbar k/m) \hat z\), 模 \(F = \hbar k / m\)（取 \(\psi_{\text{inc}}\) 归一为单位密度）。</p>
+
+<p>散射通量到立体角 \(d\Omega\) 的速率: 散射波 \(\psi_{\text{sc}} = f(\theta, \varphi) e^{ikr}/r\) 在远处 \(r\) 处的概率流径向分量 \(j_r = (\hbar k/m) |f|^2/r^2\)（细节: \(\nabla \psi_{\text{sc}} \approx (ik) f(\theta) e^{ikr}/r \cdot \hat r\) 至 \(O(1/r)\), 取虚部、内积径向）。乘 \(r^2 d\Omega\) 得到这个立体角里的速率:</p>
+
+<p>\[
+\frac{dN}{dt} = j_r \cdot r^2 d\Omega = \frac{\hbar k}{m} |f(\theta, \varphi)|^2 d\Omega.
+\]</p>
+
+<p>除以 \(F = \hbar k/m\):</p>
+
+<p>\[
+\boxed{\ \frac{d\sigma}{d\Omega} = |f(\theta, \varphi)|^2.\ }
+\]</p>
+
+<p>请你欣赏这个结果——<em>实验可观测的微分截面就是散射振幅的模平方</em>。这跟 ch4 "<em>\(|\psi|^2\) 是概率密度</em>" 是同一类公式: 量子振幅 → 模平方 → 实验概率。</p>
+
+<p>所以散射理论的核心任务可以一句话写完: <em>从 \(V(\boldsymbol r)\) 算 \(f(\theta, \varphi)\)</em>。下面 21.4-21.7 给两种算法。</p>
+
+<h2 id="sec21-4">21.4 Born 近似（一阶微扰）</h2>
+
+<p>第一招——把 SE 改写为<em>积分方程</em>, 用<em>微扰</em> 方法迭代解。</p>
+
+<p>SE \([(-\hbar^2/2m)\nabla^2 - E] \psi = -V \psi\), 即 \((\nabla^2 + k^2)\psi = (2m/\hbar^2) V \psi\)。算子 \(\nabla^2 + k^2\) 的<em>Green 函数</em>（满足 \((\nabla^2 + k^2) G = \delta^3(\boldsymbol r - \boldsymbol r')\) 加出射边界条件）是</p>
+
+<p>\[
+G(\boldsymbol r, \boldsymbol r') = -\frac{1}{4\pi} \frac{e^{ik|\boldsymbol r - \boldsymbol r'|}}{|\boldsymbol r - \boldsymbol r'|}.
+\]</p>
+
+<p>所以 SE 等价于<em>Lippmann-Schwinger 方程</em>:</p>
+
+<p>\[
+\psi(\boldsymbol r) = e^{ikz} + \int G(\boldsymbol r, \boldsymbol r') \cdot \frac{2m}{\hbar^2} V(\boldsymbol r') \psi(\boldsymbol r') d^3 r'.
+\]</p>
+
+<p>这是个<em>积分方程</em>——\(\psi\) 出现在两边。无法精确解, 但可以<em>迭代</em>: 第零阶 \(\psi^{(0)} = e^{ikz}\); 第一阶把 \(\psi^{(0)}\) 代右端 \(\psi\) 得 \(\psi^{(1)}\); 等等。</p>
+
+<p>取一阶, 在远场 \(r \to \infty\) 区: \(|\boldsymbol r - \boldsymbol r'| \approx r - \hat r \cdot \boldsymbol r'\), 所以 \(e^{ik|\boldsymbol r - \boldsymbol r'|}/|\boldsymbol r - \boldsymbol r'| \approx (e^{ikr}/r) e^{-ik \hat r \cdot \boldsymbol r'}\)。代入:</p>
+
+<p>\[
+\psi^{(1)}(\boldsymbol r) = e^{ikz} - \frac{m}{2\pi \hbar^2} \frac{e^{ikr}}{r} \int e^{-i \boldsymbol k_f \cdot \boldsymbol r'} V(\boldsymbol r') e^{i \boldsymbol k_i \cdot \boldsymbol r'} d^3 r',
+\]</p>
+
+<p>其中 \(\boldsymbol k_i = k \hat z\)（入射动量方向）, \(\boldsymbol k_f = k \hat r\)（出射动量方向, 沿观察点）。比较 21.2 的渐近形式:</p>
+
+<p>\[
+\boxed{\ f^{\text{Born}}(\theta, \varphi) = -\frac{m}{2\pi \hbar^2} \int e^{-i \boldsymbol q \cdot \boldsymbol r'} V(\boldsymbol r') d^3 r', \quad \boldsymbol q := \boldsymbol k_f - \boldsymbol k_i.\ }
+\]</p>
+
+<p>\(\boldsymbol q\) 是<em>动量转移</em>, 模 \(q = 2 k \sin(\theta/2)\)。请你停下来欣赏这个公式——<em>散射振幅 = 势 \(V\) 的 Fourier 变换</em>（在 \(\boldsymbol q\) 处取值）。这条话简洁得让人吃惊:</p>
+
+<ul>
+  <li>从散射数据 \(d\sigma/d\Omega(\theta)\) 反推 \(V(\boldsymbol r)\), 就是<em>反 Fourier</em>——理论上原则可行（实践复杂, 因为 \(d\sigma/d\Omega = |f|^2\) 丢相位）。</li>
+  <li>\(V\) 的<em>空间结构</em> 直接对应 \(f\) 在<em>动量转移空间</em> 的结构。短程势 ⟹ \(f\) 在大 \(q\) 缓变; 长程势 ⟹ \(f\) 集中在小 \(q\)。</li>
+</ul>
+
+<p>Born 近似的<em>有效条件</em>: 微扰条件 \(|V| \ll \hbar^2 k^2/(2m a^2)\)（势的"<em>能量尺度</em>" 比入射动能小 + 几何尺度 \(a\) 的修正）。在<em>高能</em>（\(k\) 大）或<em>弱势</em>（\(V\) 小）情形 Born 是准确的; 低能强势（如低能核力）就不准, 要更高阶或换部分波。</p>
+
+<h2 id="sec21-5">21.5 应用: 屏蔽库仑势 (Mott / Rutherford)</h2>
+
+<p>具体算一个——<em>Yukawa 势</em>:</p>
+
+<p>\[
+V(r) = \frac{V_0 e^{-\mu r}}{r}.
+\]</p>
+
+<p>\(\mu = 1/a\) 控制衰减长度。\(\mu \to 0\) 退化为纯库仑势 \(V_0/r\); 有限 \(\mu\) 是"<em>屏蔽</em>" 的库仑（电子云屏蔽核电荷; 或核力中介强子的有限质量给 \(\mu = m_\pi c/\hbar\)）。</p>
+
+<p>Born 振幅: 球对称势 \(V(r)\), 积分简化（球坐标 + \(\boldsymbol q\) 沿极轴）:</p>
+
+<p>\[
+f^{\text{Born}}(\theta) = -\frac{2m}{\hbar^2 q} \int_0^\infty r V(r) \sin(qr) dr.
+\]</p>
+
+<p>代入 Yukawa:</p>
+
+<p>\[
+\int_0^\infty r \cdot \frac{V_0 e^{-\mu r}}{r} \sin(qr) dr = V_0 \cdot \frac{q}{\mu^2 + q^2}.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+f^{\text{Born}}_{\text{Yukawa}}(\theta) = -\frac{2 m V_0}{\hbar^2} \cdot \frac{1}{\mu^2 + q^2}, \quad q = 2k \sin(\theta/2).
+\]</p>
+
+<p>微分截面 \(|f|^2\):</p>
+
+<p>\[
+\frac{d\sigma}{d\Omega} = \frac{4 m^2 V_0^2}{\hbar^4 (\mu^2 + 4 k^2 \sin^2(\theta/2))^2}.
+\]</p>
+
+<p><em>Rutherford 极限</em>: \(\mu \to 0\)（纯库仑）, \(V_0 = Z_1 Z_2 e^2/(4\pi\varepsilon_0)\), 得</p>
+
+<p>\[
+\boxed{\ \left(\frac{d\sigma}{d\Omega}\right)_{\text{Rutherford}} = \left( \frac{Z_1 Z_2 e^2}{16 \pi \varepsilon_0 E} \right)^2 \frac{1}{\sin^4(\theta/2)},\ }
+\]</p>
+
+<p>用 \(E = \hbar^2 k^2/(2m)\) 化简后正是 1911 Rutherford 经典力学算出来的公式（\(\alpha\) 粒子打金箔, \(\sin^{-4}(\theta/2)\) 在小 \(\theta\) 急剧增大, 解释了"<em>大部分穿过、少数大偏折</em>" 的实验）。</p>
+
+<p>请你欣赏一件巧合——<em>Rutherford 经典推导和 Born 量子推导给同样答案</em>。这是因为库仑势是个"<em>特殊</em>" 势, 经典与量子结果相同（与角度依赖的对称性有关）。但对短程核力或屏蔽库仑（有限 \(\mu\)）, 量子修正出现, 实验上可以区分（Mott 散射含自旋反对称化, 给额外修正——18.4 反对称化的应用）。</p>
+
+<h2 id="sec21-6">21.6 部分波分析</h2>
+
+<p>Born 近似在弱势 / 高能成立。但<em>低能强势</em>（典型: 核物理低能中子散射）Born 失效。第二招——<em>部分波分析</em>, 不依赖微扰小, 适合低能球对称势 \(V(r)\)。</p>
+
+<p>核心想法——按<em>角动量</em> 展开。球对称势对易于 \(\hat L^2, \hat L_z\), 所以 SE 解可以按 \(l, m\) 分解。入射方向 \(+z\) 让 \(m = 0\), 只剩 \(l\) 求和。具体的</p>
+
+<p>\[
+\psi(r, \theta) = \sum_{l = 0}^\infty (2l + 1) i^l \frac{R_l(r)}{kr} P_l(\cos\theta),
+\]</p>
+
+<p>每个 \(R_l(r)\) 是<em>径向方程</em>(15.3) 的解。</p>
+
+<p><em>关键事实</em>(展开平面波): \(e^{ikz} = \sum_l (2l + 1) i^l j_l(kr) P_l(\cos\theta)\), 其中 \(j_l\) 是球 Bessel 函数, 渐近 \(j_l(kr) \to \sin(kr - l\pi/2)/(kr)\)。</p>
+
+<p>对一般 \(V \neq 0\), 渐近 \(R_l(r) \to \sin(kr - l\pi/2 + \delta_l)/(kr)\)——多了一个<em>相移</em> \(\delta_l\)（21.7 详谈）。把渐近形式比较 21.2 \(\psi \sim e^{ikz} + f(\theta) e^{ikr}/r\), 整理（细节: 把 \(\sin\) 展为 \(e^{i...} - e^{-i...}\), 入射波贡献 \(e^{-ikr}\) 部分要匹配, 出射波就是 \(e^{ikr}\) 系数）, 得</p>
+
+<p>\[
+\boxed{\ f(\theta) = \sum_{l=0}^\infty (2l + 1) f_l P_l(\cos\theta), \quad f_l = \frac{e^{2 i \delta_l} - 1}{2 i k} = \frac{e^{i \delta_l} \sin\delta_l}{k}.\ }
+\]</p>
+
+<p>这条公式叫<em>部分波展开</em>。每一<em>部分波</em>（\(l\) 固定）的振幅 \(f_l\) 完全由<em>相移</em> \(\delta_l\) 决定——<em>所有散射信息编码在一族数 \(\{\delta_l\}_{l=0}^\infty\)</em>。</p>
+
+<p>总截面（光学定理 \(\sigma_{\text{tot}} = (4\pi/k) \mathrm{Im} f(0)\) 或直接积分）:</p>
+
+<p>\[
+\sigma_{\text{tot}} = \frac{4\pi}{k^2} \sum_{l = 0}^\infty (2l + 1) \sin^2 \delta_l.
+\]</p>
+
+<p>每个 \(l\) 贡献 \((4\pi/k^2)(2l+1) \sin^2\delta_l \le 4\pi (2l+1)/k^2\)（<em>么正性界</em>, "<em>每一个角动量通道最多吸收这么多</em>"）。</p>
+
+<p>请你停下来想<em>为什么有限项就够</em>。半经典直觉: 入射粒子动量 \(\hbar k\), 角动量 \(L = \hbar k b\)（\(b\) 是冲击参数）。如果 \(b > a\)（势的范围）, 粒子根本没"<em>碰到</em>" 势, \(\delta_l \approx 0\), 这一波不贡献。所以只有 \(l \lesssim ka\) 贡献——<em>低能（小 \(k\)）只需少数 \(l\), 高能需要多 \(l\)</em>。低能极限 \(ka \ll 1\)——只 \(l = 0\)（s 波）贡献, 整个散射由单一相移 \(\delta_0\) 描述。这是部分波法在<em>低能</em> 极强大的原因, Born 在<em>高能</em> 强大——两条路<em>互补</em>。</p>
+
+<h2 id="sec21-7">21.7 相移 \(\delta_l\) + 共振</h2>
+
+<p>怎么算 \(\delta_l\)? 解径向方程 \(R_l(r)\), 从原点正则解延到大 \(r\), 比较渐近形式与 \(\sin(kr - l\pi/2 + \delta_l)\) 提取 \(\delta_l\)。多数情况下数值。但定性图像很重要:</p>
+
+<ul>
+  <li><em>排斥势</em>（\(V > 0\)）⟹ \(\delta_l < 0\)（波被推出去, 相位"<em>退后</em>"）。</li>
+  <li><em>吸引势</em>（\(V < 0\)）⟹ \(\delta_l > 0\)（波被拉进去, 相位"<em>前进</em>"）。</li>
+</ul>
+
+<p>低能 s 波 (\(l = 0\)) 行为可以参数化: \(k \cot\delta_0 \approx -1/a_s + (1/2) r_e k^2 + \ldots\)。\(a_s\) 是<em>散射长度</em>, \(r_e\) 是<em>有效作用距离</em>——两个数刻画整个低能 s 波散射。\(a_s\) 在低温原子物理（Bose-Einstein 凝聚里的相互作用强度）和核物理（中子-质子散射）里是核心物理量。</p>
+
+<p><em>共振</em>（resonance）——某些能量 \(E_R\) 让 \(\delta_l\) 急剧穿过 \(\pi/2\)（"<em>相移跳一个 \(\pi\)</em>"）。这时 \(\sin^2\delta_l = 1\), 部分截面达<em>么正上限</em> \(4\pi(2l+1)/k^2\)。物理含义: 入射粒子在 \(E \approx E_R\) 时与势形成<em>准束缚态</em>, 短暂"<em>陷入</em>" 后再衰变出来——共振是个<em>有限寿命的中间态</em>。</p>
+
+<p>共振附近的 Breit-Wigner 公式:</p>
+
+<p>\[
+\sigma_l(E) \approx \frac{4\pi (2l + 1)}{k^2} \frac{(\Gamma/2)^2}{(E - E_R)^2 + (\Gamma/2)^2},
+\]</p>
+
+<p>\(\Gamma\) 是<em>共振宽度</em>, 与中间态寿命 \(\tau\) 互补 \(\Gamma = \hbar/\tau\)（不确定性原理 ch11）。这是粒子物理"<em>找新粒子</em>" 的标准方法——画 \(\sigma(E)\), 看到一个 Breit-Wigner 峰就声明发现一个粒子, 峰位 = 质量, 峰宽 = 寿命的倒数。Higgs 玻色子（2012）、\(J/\psi\)（1974）、\(Z\) 玻色子等都是这样发现的。</p>
+
+<h2 id="sec21-8">21.8 应用: 核物理 / 中子散射 / 高能粒子散射</h2>
+
+<p>把这一章工具应用到几个真实物理场景。</p>
+
+<p><strong>核物理</strong>: 低能核子-核子散射, 用部分波。np 散射的 \(a_s = -23.7\) fm（三重态）、\(5.4\) fm（单态）——大数, 表明核力强但接近不能形成 \(np\) 单态束缚态。从 \(a_s\) 反推核力的"<em>形状参数</em>"（汤川势的 \(V_0, \mu\)）。</p>
+
+<p><strong>慢中子散射</strong>: 中子探测晶体结构的标准方法。中子波长 \(\sim 1\) Å \(\sim\) 原子间距, 衍射图案给晶格 Fourier 变换, 反推位置。Brockhouse + Shull 1994 Nobel 奖。</p>
+
+<p><strong>电子-质子深度非弹散射 (DIS)</strong>: 高能电子打质子, Born 近似适用（电磁作用弱）。微分截面里出现"<em>结构函数</em>" \(F_1(x, Q^2), F_2(x, Q^2)\), 反映质子内部夸克分布。1968 SLAC 实验首次验证<em>夸克</em> 是质子内的实体粒子, Friedman + Kendall + Taylor 1990 Nobel 奖。</p>
+
+<p><strong>LHC 高能对撞</strong>: 在 \(\sqrt s \sim 13\) TeV 量级, 部分波极多（\(l_{\max} \gg 1\)）, 部分波分析无用。改用 Feynman 图微扰展开（QFT 工具, ch24 简介）+ 高能近似（partonic cross section + parton distribution function）。但截面、动量转移这些<em>概念</em> 来自这一章的散射理论。</p>
+
+<p><strong>低温原子里的散射长度</strong>: 冷原子云的相互作用由 s 波散射长度 \(a_s\) 描述。Feshbach 共振——通过外磁场调节 \(a_s\) 跨过 \(\pm\infty\), 让原子从弱吸引到强吸引到强排斥连续切换, 实现 BEC-BCS crossover 和量子模拟。这是当代冷原子物理最强大的工具之一。</p>
+
+<h2 id="sec21-9">21.9 临别话</h2>
+
+<p>请你回顾 Banner 流程: 21.1 具体问题（粒子打靶 → 角分布）→ 21.2 朴素工具（渐近形式 \(e^{ikz} + f(\theta) e^{ikr}/r\)）→ 21.3 命名（微分截面 = \(|f|^2\)）→ 21.4 第一种解法（Born = \(V\) 的 Fourier）→ 21.5 应用（Rutherford）→ 21.6-21.7 第二种解法（部分波 + 相移 + 共振）→ 21.8 一般化（核 / 中子 / DIS / LHC / 冷原子）。</p>
+
+<p>这一章你学到的<em>不是</em> 一两个公式, 是一种<em>思考实验</em> 的方式: <em>测散射 → 提截面 → 提振幅 → 提作用力</em>。这条链条贯穿粒子物理、核物理、原子物理、凝聚态物理。每个领域有它特有的能量尺度和势的形状, 但散射理论的基本概念<em>不变</em>。</p>
+
+<p>下一章我们换一个完全不同的话题——<em>量子纠缠</em>。EPR 1935 论文质疑量子力学不完备, 1964 Bell 给可<em>实验检验</em> 的不等式, 1972 起多个实验都判量子力学胜。这件事的物理含义——经典局域实在论<em>错</em>, 量子非局域<em>真</em>——是 20 世纪后半叶物理学最深刻的概念性发现, 也是当代量子信息与量子密钥的基础。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 时间依赖微扰 + Fermi 金律</a><a href="ch22.html">下一章 · 第 22 章 量子纠缠 + Bell 不等式 →</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

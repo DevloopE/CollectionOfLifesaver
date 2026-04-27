@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 线性代数 + 算子代数速查 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+<h1 id="appB">附录 B 线性代数 + 算子代数速查</h1>
+
+<p>量子力学的<em>语法</em>（如 <a href="ch24.html">ch24.10</a> 所述）= Hilbert 空间 + 自伴算子 + 概率诠释。这套语法的<em>词法</em> 全在线性代数里——内积、正交、自伴、谱定理、张量积、Pauli 矩阵、Dirac 记号——本书<a href="ch9.html">ch9</a> 起几乎每章都用。这个附录把分散在<a href="../线性代数/index.html">《线性代数》</a>第 6-20 章 + <a href="../泛函分析/index.html">《泛函分析》</a>第 1-7 + 21 章里的相关结果集中处理, 让你能用它当快速参考。</p>
+
+<ul>
+  <li>内积空间 + Hilbert 空间。</li>
+  <li>自伴算子 + 谱定理。</li>
+  <li>么正算子 + 投影算子。</li>
+  <li>张量积。</li>
+  <li>Pauli 矩阵 + 自旋代数。</li>
+  <li>Dirac 记号速查。</li>
+  <li>对易子代数 + 函数演算。</li>
+</ul>
+
+<h2 id="appB-1">B.1 内积空间 + Hilbert 空间</h2>
+
+<p>QM 状态 \(|\psi\rangle\) 住在<em>Hilbert 空间</em> \(\mathcal H\)——一个完备复内积空间。<em>内积</em> \(\langle \cdot | \cdot \rangle: \mathcal H \times \mathcal H \to \mathbb C\) 满足:</p>
+
+<ul>
+  <li><em>共轭对称</em>: \(\langle \phi | \psi \rangle = \overline{\langle \psi | \phi \rangle}\)。</li>
+  <li><em>对第二变量线性</em>(物理惯例): \(\langle \phi | \alpha \psi_1 + \beta \psi_2 \rangle = \alpha \langle \phi | \psi_1 \rangle + \beta \langle \phi | \psi_2 \rangle\)。</li>
+  <li><em>正定</em>: \(\langle \psi | \psi \rangle \geq 0\), 等号 ⟺ \(\psi = 0\)。</li>
+</ul>
+
+<p>对第一变量<em>反线性</em>: \(\langle \alpha \phi_1 + \beta \phi_2 | \psi \rangle = \bar\alpha \langle \phi_1 | \psi \rangle + \bar\beta \langle \phi_2 | \psi \rangle\)。这是物理惯例（与数学家的"<em>第一变量线性</em>" 习惯相反）。</p>
+
+<p><em>范数</em>: \(\|\psi\| := \sqrt{\langle \psi | \psi \rangle}\)。物理态归一化 \(\|\psi\| = 1\)。</p>
+
+<p><em>Cauchy-Schwarz 不等式</em>:</p>
+
+<p>\[
+\boxed{\ |\langle \phi | \psi \rangle| \le \|\phi\| \cdot \|\psi\|.\ }
+\]</p>
+
+<p>等号 ⟺ \(\phi, \psi\) 共线。证明: 设 \(\psi \neq 0\), \(c = \langle \psi | \phi \rangle / \|\psi\|^2\), 算 \(0 \le \|\phi - c\psi\|^2\) 展开得不等式。</p>
+
+<p>这条不等式是<a href="ch11.html">ch11</a>不确定性原理的代数源头——把 \(\phi = (\hat A - \langle A\rangle)|\psi\rangle, \chi = (\hat B - \langle B\rangle)|\psi\rangle\) 代入 Cauchy-Schwarz, 用 \(\langle \phi | \chi \rangle\) 的虚部 \(= (1/2i) \langle \psi | [\hat A, \hat B] | \psi \rangle\), 立得 \(\Delta A \cdot \Delta B \ge (1/2)|\langle [\hat A, \hat B]\rangle|\)。</p>
+
+<p><em>三角不等式</em>: \(\|\phi + \psi\| \le \|\phi\| + \|\psi\|\)。</p>
+
+<p>常见 Hilbert 空间例子:</p>
+
+<ul>
+  <li>有限维: \(\mathbb C^n\), 内积 \(\langle \boldsymbol u | \boldsymbol v \rangle = \sum_i \bar u_i v_i\). qubit \(\mathbb C^2\), 自旋 1 在 \(\mathbb C^3\), \(n\) qubit 在 \(\mathbb C^{2^n}\)。</li>
+  <li>无限维: \(L^2(\mathbb R) =\) 平方可积函数, 内积 \(\langle \phi | \psi \rangle = \int \bar\phi(x) \psi(x) dx\). 一维粒子波函数住这里。</li>
+  <li>\(L^2(\mathbb R^3)\): 3D 粒子。</li>
+  <li>张量积 \(L^2(\mathbb R^3) \otimes \mathbb C^2\): 含自旋的电子。</li>
+</ul>
+
+<p><em>正交基</em>: 一族 \(\{|n\rangle\}\) 满足 \(\langle m | n \rangle = \delta_{mn}\) + 张成整个 \(\mathcal H\)（完备）。任意 \(|\psi\rangle = \sum_n c_n |n\rangle\), \(c_n = \langle n | \psi \rangle\)。<em>Parseval</em>: \(\sum_n |c_n|^2 = \|\psi\|^2\)。</p>
+
+<h2 id="appB-2">B.2 自伴算子 + 谱定理</h2>
+
+<p>线性算子 \(\hat A: \mathcal H \to \mathcal H\) 满足 \(\hat A(\alpha |\psi\rangle + \beta |\phi\rangle) = \alpha \hat A |\psi\rangle + \beta \hat A |\phi\rangle\)。</p>
+
+<p><em>伴随算子</em> \(\hat A^\dagger\) 由 \(\langle \phi | \hat A \psi \rangle = \langle \hat A^\dagger \phi | \psi \rangle\) 定义（对所有 \(\phi, \psi\)）。在矩阵表示下 \(A^\dagger = (\bar A)^T\)（共轭转置）。</p>
+
+<p><em>自伴</em>(Hermitian, self-adjoint): \(\hat A = \hat A^\dagger\). 物理上: <em>所有可观测量都用自伴算子表示</em>。</p>
+
+<p>关键性质（自伴算子）:</p>
+
+<ul>
+  <li><em>本征值实数</em>: \(\hat A |a\rangle = a |a\rangle, a^* = a\). 证: \(a \langle a | a \rangle = \langle a | \hat A | a \rangle = \langle \hat A a | a \rangle = a^* \langle a | a \rangle\), 比较得 \(a = a^*\)。</li>
+  <li><em>不同本征值对应正交本征向量</em>: \(\hat A |a\rangle = a |a\rangle, \hat A |b\rangle = b |b\rangle, a \neq b \Rightarrow \langle a | b \rangle = 0\)。</li>
+</ul>
+
+<p><strong>谱定理</strong>(自伴算子, 紧情形或有限维): 自伴算子<em>可对角化</em>, 本征向量构成正交基。即存在正交基 \(\{|a_n\rangle\}\) + 实本征值 \(\{a_n\}\) 使</p>
+
+<p>\[
+\boxed{\ \hat A = \sum_n a_n |a_n\rangle\langle a_n|.\ }
+\]</p>
+
+<p>这是<em>谱分解</em>。无穷维 + 连续谱时（如 \(\hat x, \hat p\) 在 \(L^2(\mathbb R)\) 上）改写为 \(\hat A = \int a |a\rangle\langle a| da\), 但本征"<em>向量</em>" \(|a\rangle\) 不归一（\(\delta\) 函数归一化）, 严格说不在 \(\mathcal H\) 内（"<em>广义</em>" 本征向量, rigged Hilbert space 形式）。详见<a href="../泛函分析/index.html">泛函分析</a> ch21。</p>
+
+<p>谱分解的<em>QM 含义</em>: 测量 \(\hat A\), 可能结果 = 本征值 \(\{a_n\}\); 在态 \(|\psi\rangle\) 上得 \(a_n\) 的概率 = \(|\langle a_n | \psi \rangle|^2\); 测后态塌缩到 \(|a_n\rangle\)。<a href="ch12.html">ch12</a> 测量公设的具体形式。</p>
+
+<p><em>函数演算</em>: 给自伴 \(\hat A\) 与函数 \(f: \mathbb R \to \mathbb C\), 定义 \(f(\hat A) = \sum_n f(a_n) |a_n\rangle\langle a_n|\)。例: \(e^{-i\hat H t/\hbar} = \sum_n e^{-i E_n t/\hbar} |E_n\rangle\langle E_n|\) 是含时演化算子。</p>
+
+<h2 id="appB-3">B.3 么正算子 + 投影算子</h2>
+
+<p><em>么正算子</em>(unitary): \(\hat U^\dagger \hat U = \hat U \hat U^\dagger = \hat I\). 等价于"<em>保内积</em>": \(\langle \hat U \phi | \hat U \psi \rangle = \langle \phi | \psi \rangle\)。</p>
+
+<p>QM 中么正算子的两个重要场合:</p>
+
+<ul>
+  <li><em>时间演化</em>: \(\hat U(t) = e^{-i\hat H t/\hbar}\), 自动么正（因 \(\hat H\) 自伴）。波函数演化保归一化。</li>
+  <li><em>对称变换</em>: 旋转 / 平移 / 时间平移等连续对称都用么正表示（详见 ch14 角动量 + 表示论）。</li>
+</ul>
+
+<p><em>本征值</em>(么正): 模 1 复数, \(|u| = 1\). 写 \(u = e^{i\alpha}\), \(\alpha\) 实。</p>
+
+<p><em>投影算子</em>: \(\hat P\) 满足 \(\hat P^2 = \hat P\) + 自伴。本征值只有 0 或 1。形式 \(\hat P = \sum_{i \in S} |a_i\rangle\langle a_i|\), 把态投影到子空间 \(\mathrm{span}\{|a_i\rangle: i \in S\}\)。</p>
+
+<p>QM 测量后塌缩: 测 \(\hat A\) 得 \(a_n\), 态变 \(\hat P_n |\psi\rangle / \|\hat P_n |\psi\rangle\|\), \(\hat P_n = |a_n\rangle\langle a_n|\)（简谱情况）。</p>
+
+<p><em>正算子值测度</em>(POVM): 一族正算子 \(\{\hat E_i\}\) 满足 \(\sum_i \hat E_i = \hat I\). 推广投影测量, 量子信息论里的一般测量。本书没用, 但量子计算 / 量子通信里基本工具。</p>
+
+<h2 id="appB-4">B.4 张量积</h2>
+
+<p>多体系统 \(A + B\) 的 Hilbert 空间是<em>张量积</em>:</p>
+
+<p>\[
+\mathcal H_{AB} = \mathcal H_A \otimes \mathcal H_B.
+\]</p>
+
+<p>构造: 取 \(\mathcal H_A\) 基 \(\{|i\rangle_A\}\) 与 \(\mathcal H_B\) 基 \(\{|j\rangle_B\}\), 张量积基 \(\{|i\rangle_A \otimes |j\rangle_B\} = \{|i, j\rangle\}\) 维数 \(\dim\mathcal H_A \cdot \dim\mathcal H_B\). 一般态:</p>
+
+<p>\[
+|\Psi\rangle_{AB} = \sum_{i, j} c_{ij} |i, j\rangle.
+\]</p>
+
+<p>内积: \((\langle \alpha | \otimes \langle \beta |)(|\gamma\rangle \otimes |\delta\rangle) = \langle \alpha | \gamma \rangle \langle \beta | \delta \rangle\)。</p>
+
+<p><em>乘积态</em>: \(|\Psi\rangle = |\phi\rangle_A \otimes |\chi\rangle_B\). <em>纠缠态</em>: 不能写成乘积态的态, 如 Bell 态 \((|00\rangle + |11\rangle)/\sqrt 2\)。</p>
+
+<p>算子张量积: \((\hat A \otimes \hat B)(|\psi\rangle \otimes |\phi\rangle) = \hat A |\psi\rangle \otimes \hat B |\phi\rangle\). 矩阵表示用 Kronecker 积:</p>
+
+<p>\[
+A \otimes B = \begin{pmatrix} a_{11} B & a_{12} B & \cdots \\ a_{21} B & a_{22} B & \cdots \\ \vdots & \vdots & \ddots \end{pmatrix}.
+\]</p>
+
+<p><em>部分迹</em>: 对纠缠态, 单边的"<em>子系统态</em>" 用<em>约化密度矩阵</em>:</p>
+
+<p>\[
+\hat \rho_A = \mathrm{Tr}_B (|\Psi\rangle_{AB}\langle \Psi|).
+\]</p>
+
+<p>对乘积态 \(\hat \rho_A = |\phi\rangle_A\langle\phi|\)（纯态）。对纠缠态 \(\hat \rho_A\) 是<em>混合态</em>（\(\mathrm{Tr}\hat\rho_A^2 < 1\)）——纠缠让单边看起来"<em>有经典不确定性</em>"。这是<a href="ch22.html">ch22</a> 纠缠的代数表达。</p>
+
+<p>张量积是 ch18 全同粒子, ch22 纠缠, ch23 多 qubit 量子计算, ch24 多电子量子化学的基础结构。</p>
+
+<h2 id="appB-5">B.5 Pauli 矩阵 + 自旋 1/2 代数</h2>
+
+<p><a href="ch17.html">ch17</a> 的核心对象——三个 Pauli 矩阵:</p>
+
+<p>\[
+\boxed{\ \sigma_x = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \quad \sigma_y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \quad \sigma_z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.\ }
+\]</p>
+
+<p>性质:</p>
+
+<ul>
+  <li>都<em>自伴</em>且<em>么正</em>: \(\sigma_i^\dagger = \sigma_i, \sigma_i^2 = I\). 本征值都是 \(\pm 1\)。</li>
+  <li><em>对易子</em>: \([\sigma_i, \sigma_j] = 2 i \varepsilon_{ijk} \sigma_k\)（\(\varepsilon\) 是 Levi-Civita 反对称符号）。所以自旋角动量 \(\hat S_i = (\hbar/2) \sigma_i\) 满足 \([\hat S_i, \hat S_j] = i\hbar \varepsilon_{ijk} \hat S_k\)——和轨道角动量同样的对易关系（ch14）。</li>
+  <li><em>反对易子</em>: \(\{\sigma_i, \sigma_j\} = 2 \delta_{ij} I\). 所以 \(\sigma_i \sigma_j = \delta_{ij} I + i \varepsilon_{ijk} \sigma_k\)——一个紧凑的乘积公式。</li>
+  <li><em>迹</em>: \(\mathrm{Tr}\sigma_i = 0\); \(\mathrm{Tr}(\sigma_i \sigma_j) = 2\delta_{ij}\). \(\{I, \sigma_x, \sigma_y, \sigma_z\}\) 是 \(2 \times 2\) 自伴矩阵的<em>正交基</em>(在 Hilbert-Schmidt 内积下)。</li>
+</ul>
+
+<p>这条最后性质让任意 \(2 \times 2\) 自伴 \(M\) 写成 \(M = c_0 I + \boldsymbol c \cdot \boldsymbol \sigma\), \(c_0, \boldsymbol c\) 实。<em>所有 qubit 算子</em> 都用 \(\{I, \sigma_x, \sigma_y, \sigma_z\}\) 展开。</p>
+
+<p><em>本征向量</em> (\(\sigma_z\) 简单, \(|+\rangle = (1, 0)^T = |\uparrow\rangle\), \(|-\rangle = (0, 1)^T = |\downarrow\rangle\)):</p>
+
+<ul>
+  <li>\(\sigma_x\): \(|+_x\rangle = (|+\rangle + |-\rangle)/\sqrt 2\), \(|-_x\rangle = (|+\rangle - |-\rangle)/\sqrt 2\)。</li>
+  <li>\(\sigma_y\): \(|+_y\rangle = (|+\rangle + i|-\rangle)/\sqrt 2\), \(|-_y\rangle = (|+\rangle - i|-\rangle)/\sqrt 2\)。</li>
+</ul>
+
+<p><em>旋转算子</em>: \(\hat R_{\hat n}(\theta) = e^{-i\theta \boldsymbol \sigma \cdot \hat n/2} = \cos(\theta/2) I - i \sin(\theta/2) \boldsymbol \sigma \cdot \hat n\). 这是 SU(2) 群元的一般形式, 给 Bloch 球上的旋转。</p>
+
+<p>注意 \(\hat R(2\pi) = -I\) 而<em>不</em> \(I\)！自旋 1/2 在转 \(2\pi\) 后波函数变号——必须转 \(4\pi\) 才回到原态。这种"<em>双值</em>" 表示是 SU(2) 与 SO(3) 的关键差别（详见<a href="../抽象代数/index.html">抽象代数</a>表示论）。</p>
+
+<h2 id="appB-6">B.6 Dirac 记号速查</h2>
+
+<p>整本书的标准记号系统, 这里一处汇总。</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">记号</th><th style="padding: 0.3em 1em;">数学含义</th><th style="padding: 0.3em 1em;">物理含义</th></tr>
+<tr><td>\(|\psi\rangle\)</td><td>Hilbert 空间向量（"ket"）</td><td>量子态</td></tr>
+<tr><td>\(\langle \psi |\)</td><td>对偶空间元素（"bra"）</td><td>态的"<em>测量</em>" 视角</td></tr>
+<tr><td>\(\langle \phi | \psi \rangle\)</td><td>内积（复数）</td><td>"<em>转移振幅</em>"</td></tr>
+<tr><td>\(|\phi\rangle\langle\psi|\)</td><td>外积（算子, 秩 1）</td><td>子空间投影 / 算子构造</td></tr>
+<tr><td>\(\hat A |\psi\rangle\)</td><td>算子作用</td><td>新态</td></tr>
+<tr><td>\(\langle \phi | \hat A | \psi \rangle\)</td><td>矩阵元</td><td>"<em>\(\phi\) → \(\psi\) 之间 \(\hat A\) 的强度</em>"</td></tr>
+<tr><td>\(\langle \hat A \rangle = \langle \psi | \hat A | \psi \rangle\)</td><td>期望值</td><td>测 \(\hat A\) 的平均结果</td></tr>
+<tr><td>\(\hat I = \sum_n |n\rangle\langle n|\)</td><td>恒等算子（完备性）</td><td>"<em>插单位</em>" 在中间</td></tr>
+<tr><td>\(\sum_n c_n |n\rangle\)</td><td>态展开</td><td>叠加态</td></tr>
+<tr><td>\(c_n = \langle n | \psi \rangle\)</td><td>展开系数</td><td>振幅 (\(|c_n|^2\) 是概率)</td></tr>
+</table>
+
+<p><em>插单位</em> 是计算中最常用技巧: \(\langle \phi | \hat A | \psi \rangle = \sum_{m, n} \langle \phi | m \rangle \langle m | \hat A | n \rangle \langle n | \psi \rangle\)。把矩阵元改写在合适的基上, 让计算变简单。</p>
+
+<p><em>记号陷阱</em>:</p>
+
+<ul>
+  <li>\(\hat A |\psi\rangle\) 是 ket; \((\hat A |\psi\rangle)^\dagger = \langle \psi | \hat A^\dagger\) 是 bra。注意伴随出现。</li>
+  <li>\(\langle \alpha \psi | = \bar\alpha \langle \psi |\)（bra 反线性）, \(|\alpha \psi\rangle = \alpha |\psi\rangle\)（ket 线性）。所以"<em>常数提出 bra</em>" 要取共轭。</li>
+</ul>
+
+<h2 id="appB-7">B.7 对易子代数 + 函数演算</h2>
+
+<p>对易子: \([\hat A, \hat B] = \hat A \hat B - \hat B \hat A\)。反对易子: \(\{\hat A, \hat B\} = \hat A \hat B + \hat B \hat A\)。</p>
+
+<p>常用恒等:</p>
+
+<ul>
+  <li>\([\hat A, \hat B] = -[\hat B, \hat A]\)。</li>
+  <li>\([\hat A + \hat B, \hat C] = [\hat A, \hat C] + [\hat B, \hat C]\)。</li>
+  <li>\([\hat A, \hat B \hat C] = [\hat A, \hat B] \hat C + \hat B [\hat A, \hat C]\)（"<em>Leibniz</em>"）。</li>
+  <li><em>Jacobi 恒等</em>: \([\hat A, [\hat B, \hat C]] + [\hat B, [\hat C, \hat A]] + [\hat C, [\hat A, \hat B]] = 0\)。</li>
+</ul>
+
+<p>QM 中最重要的对易子:</p>
+
+<ul>
+  <li>\([\hat x, \hat p] = i\hbar\)（位置-动量, ch11 不确定性）。</li>
+  <li>\([\hat L_i, \hat L_j] = i\hbar \varepsilon_{ijk} \hat L_k\)（角动量, ch14）。</li>
+  <li>\([\hat S_i, \hat S_j] = i\hbar \varepsilon_{ijk} \hat S_k\)（自旋, ch17）。</li>
+  <li>\([\hat a, \hat a^\dagger] = 1\)（升降算子 / 产生湮灭, ch7 + ch24）。</li>
+</ul>
+
+<p><em>Heisenberg 方程</em>(ch13 算子表象的演化):</p>
+
+<p>\[
+\frac{d \hat A}{d t} = \frac{i}{\hbar} [\hat H, \hat A] + \left(\frac{\partial \hat A}{\partial t}\right)_{\text{显}}.
+\]</p>
+
+<p>对 \(\partial \hat A/\partial t = 0\) 的算子, "<em>守恒量</em>" ⟺ \([\hat H, \hat A] = 0\)。这是诺特定理的 QM 形式。</p>
+
+<p><em>BCH 公式</em>(Baker-Campbell-Hausdorff): \(e^{\hat A} e^{\hat B} = e^{\hat A + \hat B + (1/2)[\hat A, \hat B] + \ldots}\). 当 \([\hat A, \hat B] = 0\) 时退化 \(e^{\hat A + \hat B} = e^{\hat A} e^{\hat B}\)（普通指数律）; 一般情况要保留高阶嵌套对易子。</p>
+
+<p>简化版（实用）: 如果 \([\hat A, [\hat A, \hat B]] = 0\) 且 \([\hat B, [\hat A, \hat B]] = 0\)（"<em>Heisenberg 群</em>" 情况）, 则</p>
+
+<p>\[
+e^{\hat A} e^{\hat B} = e^{\hat A + \hat B} e^{(1/2)[\hat A, \hat B]}.
+\]</p>
+
+<p>这条让 \(\hat x, \hat p\) 的指数因式分解可控（如相干态构造）。</p>
+
+<h2 id="appB-8">B.8 实战准则</h2>
+
+<ul>
+  <li><em>记号</em>: 物理用 Dirac, 数学用 \(\langle \cdot, \cdot \rangle\) 函数。两者等价, 物理 Dirac 在长公式里更简洁。</li>
+  <li><em>无穷维要小心</em>: \(\hat x, \hat p\) 在 \(L^2(\mathbb R)\) 是<em>无界</em> 算子, 严格说"<em>定义域</em>" 是 \(\mathcal H\) 的稠密子集（链回<a href="../泛函分析/index.html">泛函分析</a>）。但物理计算几乎可以无视这层技术。</li>
+  <li><em>谱定理是 QM 的核心</em>: 几乎每个"<em>解 SE</em>" 问题都是"<em>对角化 \(\hat H\)</em>"。本征值就是能级, 本征态就是稳态。</li>
+  <li><em>Pauli 矩阵代数</em>: qubit 计算几乎所有事可以用 \(\sigma\) 代数推, 不需要展开矩阵。例: \((\boldsymbol \sigma \cdot \boldsymbol a)(\boldsymbol \sigma \cdot \boldsymbol b) = \boldsymbol a \cdot \boldsymbol b I + i (\boldsymbol a \times \boldsymbol b) \cdot \boldsymbol \sigma\)——一个公式概括所有 qubit 双算子积。</li>
+  <li><em>张量积维数指数膨胀</em>: \(n\) qubit 在 \(\mathbb C^{2^n}\), 这就是量子计算"<em>指数空间</em>" 的来源 (ch23)。</li>
+  <li><em>代码</em>: NumPy 用 <code>np.kron</code> 做张量积; SciPy <code>scipy.linalg.eigh</code> 给自伴矩阵谱分解; QuTiP 是专门的 QM Python 库, 含算子代数 / 主方程求解 / 量子电路模拟等。</li>
+</ul>
+
+<p>这条附录里的工具是本书<a href="ch9.html">ch9</a> 起所有<em>形式化</em> 章节的代数基础。如果你想严格学线性代数 + 算子谱理论, 请回去读<a href="../线性代数/index.html">《线性代数》</a>第 6-20 章 + <a href="../泛函分析/index.html">《泛函分析》</a>前 7 + 21 章。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

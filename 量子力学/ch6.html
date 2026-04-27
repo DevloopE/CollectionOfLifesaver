@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 6 章 一维无限深势阱 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 自由粒子 + 波包</a><a href="ch7.html">下一章 · 第 7 章 谐振子（升降算子 + Hermite）→</a></nav>
+<h1 id="ch6">第 6 章 一维无限深势阱</h1>
+
+<p>上一章的自由粒子, 经典上"<em>无聊</em>", QM 上撞墙——平面波不归一, 必须叠加成波包。这一章换一个完全相反的设定: 粒子<em>不</em> 自由, 而是被困在 \(0 \le x \le L\) 的一段直线里, 区间外不许去——势能在 \([0, L]\) 内为 0, 在外面是无穷大:</p>
+
+<p>\[
+V(x) = \begin{cases} 0, & 0 \le x \le L, \\ +\infty, & \text{其它}. \end{cases}
+\]</p>
+
+<p>这就是<em>一维无限深势阱</em>（也叫"<em>无限深方阱</em>"或"<em>盒中粒子</em>"）。物理图像: 想象一个粒子在长 \(L\) 的房间里, 墙绝对硬, 反射回来。这是 QM <em>第一个能完全解析解的具体系统</em>——SE 在 \([0, L]\) 内是简单的 \(\varphi'' = -k^2 \varphi\), 边界条件强加 \(\varphi(0) = \varphi(L) = 0\), 解出来给一族<em>离散能级</em> \(E_n = n^2 \pi^2 \hbar^2/(2 m L^2)\) 和对应波函数 \(\psi_n = \sqrt{2/L} \sin(n\pi x/L)\)。</p>
+
+<p>请你停下来——<em>能级离散</em> 在前几章是个口号（Bohr 假设 \(E_n = -13.6/n^2\)）, 这一章它<em>第一次</em> 从 SE 解里<em>自然</em> 长出来。这是 QM 真正"<em>解释</em>" 而不只是"<em>假设</em>" 量子化的第一处, 也是后面氢原子、谐振子等所有束缚态系统的样板。</p>
+
+<h2 id="sec6-1">6.1 设定: 在区间内 SE, 在区间外波函数为 0</h2>
+
+<p>区间外 \(V = \infty\)。SE \( -\frac{\hbar^2}{2m} \psi'' + V \psi = E \psi\)。如果 \(\psi \neq 0\) 在 \(V = \infty\) 处, \(V \psi = \infty \cdot \psi = \infty\), 而 \(E \psi\) 有限——方程不能成立。所以</p>
+
+<p>\[
+\psi(x) = 0 \quad \text{for } x \notin [0, L].
+\]</p>
+
+<p>区间内 \(V = 0\), SE 简化为</p>
+
+<p>\[
+-\frac{\hbar^2}{2m} \psi''(x) = E \psi(x), \quad x \in [0, L].
+\]</p>
+
+<p>这条 ODE 在 5.1 已经做过——令 \(k = \sqrt{2 m E}/\hbar\) (\(E > 0\)), 通解 \(\psi(x) = A \sin(k x) + B \cos(k x)\)。</p>
+
+<p>剩下的事: 用边界条件定 \(A, B, k\)。</p>
+
+<h2 id="sec6-2">6.2 边界条件: \(\psi(0) = \psi(L) = 0\)</h2>
+
+<p>波函数<em>连续</em>（这是 SE 二阶 ODE 的物理要求, 见 ch4）。区间外 \(\psi = 0\), 所以在端点 \(x = 0\) 和 \(x = L\) 处 \(\psi\) 必须等于 0:</p>
+
+<p>\[
+\psi(0) = 0, \qquad \psi(L) = 0.
+\]</p>
+
+<p>这是<em>边界条件</em>——它把"<em>所有满足 SE 的解</em>" 从一个二维空间（\((A, B)\) 任取）筛选到只剩"<em>满足边界</em>" 的特殊一族。这种"<em>SE + 边界条件</em>" 的组合数学上叫<em>本征值问题</em>: 找 \((E, \psi)\) 使 SE 成立<em>且</em> 边界满足。</p>
+
+<p>套边界:</p>
+
+<ul>
+  <li>\(\psi(0) = A \sin(0) + B \cos(0) = B = 0\)。所以<em>余弦项被踢掉</em>, \(\psi = A \sin(kx)\)。</li>
+  <li>\(\psi(L) = A \sin(k L) = 0\)。\(A = 0\) 给平凡解 \(\psi \equiv 0\)（不是物理态——总概率 0）, 所以必须 \(\sin(kL) = 0\)。</li>
+</ul>
+
+<p>\(\sin\) 在哪里为 0？</p>
+
+<p>\[
+\boxed{\ k L = n \pi, \quad n = 1, 2, 3, \ldots.\ }
+\]</p>
+
+<p>注意 \(n = 0\) 给 \(k = 0\), \(\psi = 0\), 平凡; \(n < 0\) 给的 \(\sin\) 与 \(n > 0\) 只差符号, 物理上同一个态（差全局相位）。所以 \(n \in \{1, 2, 3, \ldots\}\)——<em>正整数</em>。</p>
+
+<p>请你停下来欣赏: <em>边界条件把连续的 \(k\) 切成离散点 \(k_n = n\pi/L\)</em>。这是离散性的几何来源——"<em>波必须在两端为 0</em>" 限制波长 \(\lambda = 2\pi/k = 2L/n\) 必须是 \(2L\) 的因子的整数倍。和音乐里"<em>琴弦的驻波只有特定波长</em>" 同一原理（小提琴弦两端固定 ⟹ 只有 \(\lambda_n = 2L/n\) 的驻波）。</p>
+
+<h2 id="sec6-3">6.3 解: \(\psi_n(x) = A \sin(n \pi x/L)\)</h2>
+
+<p>把 \(k_n = n\pi/L\) 代回 \(\psi = A \sin(kx)\):</p>
+
+<p>\[
+\psi_n(x) = A_n \sin\!\left( \frac{n \pi x}{L} \right), \quad n = 1, 2, 3, \ldots.
+\]</p>
+
+<p>这是<em>无限深势阱</em> 的<em>定态波函数</em>（"<em>定态</em>" 因为它对应 SE 的能量本征态, 时间演化只多个相位 \(e^{-i E_n t/\hbar}\), 概率密度不变）。每个 \(n\) 给一个不同的态。</p>
+
+<h2 id="sec6-4">6.4 能级 \(E_n = n^2 \pi^2 \hbar^2/(2 m L^2)\)</h2>
+
+<p>把 \(k_n = n\pi/L\) 代回 \(E = \hbar^2 k^2/(2m)\):</p>
+
+<p>\[
+\boxed{\ E_n = \frac{\hbar^2 k_n^2}{2 m} = \frac{n^2 \pi^2 \hbar^2}{2 m L^2}, \quad n = 1, 2, 3, \ldots.\ }
+\]</p>
+
+<p>这就是<em>无限深势阱的能级</em>。请你认真停下来看几件事:</p>
+
+<p><strong>(a) 能级离散</strong>。允许的能量是 \(E_1, E_2 = 4 E_1, E_3 = 9 E_1, \ldots\)——<em>不连续</em>, 离散点。中间的能量值（如 \(2.5 E_1\)）<em>不存在</em>——经典物理可以, QM 不行。</p>
+
+<p><strong>(b) 基态非零</strong>。最低能量 \(E_1 = \pi^2 \hbar^2/(2 m L^2) > 0\), <em>不是 0</em>。经典上"<em>静止粒子</em>" 能量为 0, QM 不允许——\(E_1\) 是<em>零点能</em>, 物理上由不确定性原理逼出: 粒子被困在 \(L\) 内 ⟹ \(\Delta x \sim L\) ⟹ \(\Delta p \ge \hbar/(2L)\) ⟹ \(\langle p^2 \rangle \ge (\Delta p)^2 \sim \hbar^2/L^2\) ⟹ 动能 \(\langle p^2 \rangle/(2m) \sim \hbar^2/(m L^2)\)。和 \(E_1 = \pi^2 \hbar^2/(2 m L^2)\) 同数量级。</p>
+
+<p><strong>(c) 能级间距 \(\propto n\)</strong>。\(E_{n+1} - E_n = (2n+1) \pi^2 \hbar^2/(2mL^2)\)——线性增长。低 \(n\) 时能级密集, 高 \(n\) 时稀疏。</p>
+
+<p><strong>(d) \(L\) 的依赖</strong>。\(E_n \propto 1/L^2\)。<em>更小的盒子 ⟹ 更高的能量</em>。把粒子挤到更窄的空间, 它"<em>反抗</em>" 用更高的动能（这就是为什么把电子限在原子尺度后氢的束缚能级是 \(\sim 13.6\) eV——把原子拆掉需要的能量。同样, 把质子限在核子尺度 \(\sim 10^{-15}\) m 的能级是 MeV 量级——把核拆掉需要的能量）。</p>
+
+<p>这条 \(E_n \propto 1/L^2\) 的<em>定标律</em> 是束缚态 QM 的普适定律之一。再小的尺度 ⟹ 再高的能量。这就是为什么粒子物理用越来越大的加速器: 高能 ⟹ 短波长 ⟹ 探测越小尺度。</p>
+
+<h2 id="sec6-5">6.5 归一化常数 \(A_n = \sqrt{2/L}\)</h2>
+
+<p>归一化:</p>
+
+<p>\[
+\int_0^L |\psi_n|^2 dx = A_n^2 \int_0^L \sin^2\!\left( \frac{n \pi x}{L} \right) dx = 1.
+\]</p>
+
+<p>用 \(\sin^2(\theta) = (1 - \cos(2\theta))/2\):</p>
+
+<p>\[
+\int_0^L \sin^2\!\left( \frac{n\pi x}{L} \right) dx = \int_0^L \frac{1 - \cos(2 n \pi x/L)}{2} dx = \frac{L}{2} - \frac{L}{4 n\pi} [\sin(2n\pi) - 0] = \frac{L}{2}.
+\]</p>
+
+<p>所以 \(A_n^2 \cdot L/2 = 1 \Rightarrow A_n = \sqrt{2/L}\)（取正实数）。最终:</p>
+
+<p>\[
+\boxed{\ \psi_n(x) = \sqrt{\frac{2}{L}} \sin\!\left( \frac{n \pi x}{L} \right), \quad x \in [0, L], \quad n = 1, 2, 3, \ldots.\ }
+\]</p>
+
+<p>这是 QM 第一次给一个完整的、归一的、解析的波函数族。请你把它存进脑子——后面每次"<em>本征态展开</em>" 都能回头想一维势阱的情况。</p>
+
+<p>验证<em>正交</em> 性（不同 \(n, m\) 的 \(\psi\) 正交——这是 ch9 一般定理"<em>自伴算子的不同本征值的本征向量正交</em>" 在 \(\hat H\) 上的具体例子）:</p>
+
+<p>\[
+\int_0^L \psi_n \psi_m dx = \frac{2}{L} \int_0^L \sin\!\left( \frac{n\pi x}{L} \right) \sin\!\left( \frac{m\pi x}{L} \right) dx = \delta_{nm}.
+\]</p>
+
+<p>用积化和差 \(\sin(\alpha)\sin(\beta) = (\cos(\alpha - \beta) - \cos(\alpha + \beta))/2\), 两个 \(\cos\) 在 \([0, L]\) 上积分都是 0（除非 \(n = m\)）, 给 Kronecker \(\delta\)。这条正交性允许我们把<em>任意</em> \([0, L]\) 上的归一函数 \(\psi(x)\) 展开成</p>
+
+<p>\[
+\psi(x) = \sum_{n=1}^\infty c_n \psi_n(x), \quad c_n = \int_0^L \psi_n^*(x) \psi(x) dx,
+\]</p>
+
+<p>这就是<em>本征展开</em>——QM 中任意态都是定态的线性组合。</p>
+
+<h2 id="sec6-6">6.6 节点结构: \(n - 1\) 个内部节点</h2>
+
+<p>"<em>节点</em>" = 波函数为 0 的内部点（端点 0, L 不算, 它们是边界强制为 0）。\(\psi_n(x) = \sqrt{2/L} \sin(n\pi x/L)\) 在 \(x = m L/n\) (\(m = 1, 2, \ldots, n-1\)) 内为 0——共 \(n - 1\) 个节点。</p>
+
+<ul>
+  <li>\(n = 1\): 没有内部节点, \(\psi_1\) 在 \([0, L]\) 内全正, 像一个钟。</li>
+  <li>\(n = 2\): 1 个节点（在 \(x = L/2\)）, \(\psi_2\) 一半正一半负。</li>
+  <li>\(n = 3\): 2 个节点（\(L/3, 2L/3\)）, \(\psi_3\) 三段交替正负。</li>
+  <li>一般 \(n\): \(n - 1\) 个节点, \(\psi_n\) 在 \([0, L]\) 内有 \(n\) 个"<em>波腹</em>"（最大模值的位置）。</li>
+</ul>
+
+<p>请你停下来想——节点数 = 量子数 - 1 这件事在 QM 中是<em>普适</em> 的: 一维束缚态系统按能量从低到高排, 第 \(n\) 个能量本征态正好有 \(n - 1\) 个节点。这叫<em>节点定理</em>（一般证明用 Sturm-Liouville 理论, ch7 谐振子里再看到一次）。物理直觉: 高能态 ⟹ 短波长 ⟹ 在同样区间内多个"<em>波</em>" ⟹ 多个节点。</p>
+
+<p>节点结构有个有趣推论——\(|\psi_n|^2\) 在节点处<em>为 0</em>。\(n = 2\) 时粒子<em>不可能</em> 在 \(x = L/2\) 处被找到（概率密度 0）。这与经典直觉冲突: 经典粒子在 \([0, L]\) 来回反弹, 应该<em>每个</em> 位置都能到达, 怎么可能某些位置概率为 0？答案是 QM 干涉——\(\psi_2\) 在 \(x < L/2\) 部分以正相位、在 \(x > L/2\) 部分以负相位出现, 在 \(x = L/2\) 处恰好相消。粒子既"<em>来自</em>" 左边也"<em>来自</em>" 右边, 两条路在 \(x = L/2\) 干涉相消。这是双缝干涉同款的相干现象, 只是在束缚态形式出现。</p>
+
+<h2 id="sec6-7">6.7 期望值: \(\langle x \rangle, \langle x^2 \rangle, \Delta x\)</h2>
+
+<p>在 \(\psi_n\) 态下算几个期望值。</p>
+
+<p><em>\(\langle x \rangle_n\)</em>:</p>
+
+<p>\[
+\langle x \rangle_n = \int_0^L x |\psi_n|^2 dx = \frac{2}{L} \int_0^L x \sin^2\!\left( \frac{n\pi x}{L} \right) dx.
+\]</p>
+
+<p>用 \(\sin^2 = (1 - \cos(2 \cdot))/2\):</p>
+
+<p>\[
+\frac{2}{L} \int_0^L \frac{x}{2} dx - \frac{2}{L} \int_0^L \frac{x \cos(2 n \pi x/L)}{2} dx = \frac{2}{L} \cdot \frac{L^2}{4} - \frac{1}{L} \cdot 0 = \frac{L}{2}.
+\]</p>
+
+<p>（第二项 \(\int_0^L x \cos(2n\pi x/L) dx = 0\), 用分部积分查——边界项消, 积分项 \(\int \sin(2n\pi x/L) dx\) 在整数周期上为 0。）</p>
+
+<p>结果 \(\langle x \rangle_n = L/2\)——<em>盒子中心</em>。所有 \(n\) 都一样。物理直觉: \(|\psi_n|^2\) 关于 \(L/2\) 对称（\(\sin^2\) 在 \([0, L]\) 上的对称性）, 所以平均位置就是中心。</p>
+
+<p><em>\(\langle x^2 \rangle_n\)</em>:</p>
+
+<p>\[
+\langle x^2 \rangle_n = \frac{2}{L} \int_0^L x^2 \sin^2(n\pi x/L) dx = \frac{L^2}{3} - \frac{L^2}{2 n^2 \pi^2}.
+\]</p>
+
+<p>（积分技巧: \(\sin^2 = (1 - \cos(2\cdot))/2\), 第一段 \(\int x^2/2 dx = L^3/6\), 第二段 \(\int x^2 \cos(2n\pi x/L) dx\) 用两次分部积分给 \(L^3/(2n^2\pi^2)\)。乘 \(2/L\) 整理得上式。）</p>
+
+<p>大 \(n\) 时 \(\langle x^2 \rangle_n \to L^2/3\)——经典极限: 粒子均匀分布在 \([0, L]\), 经典 \(\langle x^2 \rangle_{\text{cl}} = (1/L) \int_0^L x^2 dx = L^2/3\)——一致。</p>
+
+<p><em>\(\Delta x_n\)</em>:</p>
+
+<p>\[
+(\Delta x_n)^2 = \langle x^2 \rangle_n - \langle x \rangle_n^2 = \frac{L^2}{3} - \frac{L^2}{2 n^2 \pi^2} - \frac{L^2}{4} = \frac{L^2}{12} - \frac{L^2}{2 n^2 \pi^2}.
+\]</p>
+
+<p>大 \(n\) 时 \(\Delta x_n \to L/\sqrt{12} \approx 0.289 L\)——也是均匀分布的标准差。低 \(n\) 时（\(n = 1\)）\(\Delta x_1 = L \sqrt{1/12 - 1/(2\pi^2)} \approx 0.181 L\), 比经典窄——基态比"<em>均匀</em>" 更集中在中心。</p>
+
+<p>动量 \(\langle p \rangle_n = 0\)（\(\psi_n\) 是实函数, 动量算子 \(\hat p = -i\hbar \partial_x\) 在实函数上的期望必为虚 + 共轭等于自己, 只能 0）。</p>
+
+<p>\(\langle p^2 \rangle_n = 2 m E_n = n^2 \pi^2 \hbar^2/L^2\)（动能 = \(\langle p^2 \rangle/(2m)\), 而对 \(\psi_n\) 这种能量本征态 \(\langle T \rangle = E_n\), \(V = 0\) 在内部）。所以</p>
+
+<p>\[
+\Delta p_n = \frac{n \pi \hbar}{L}.
+\]</p>
+
+<p>不确定性积:</p>
+
+<p>\[
+\Delta x_n \cdot \Delta p_n = \frac{n \pi \hbar}{L} \cdot L \sqrt{\frac{1}{12} - \frac{1}{2 n^2 \pi^2}} = \pi \hbar \sqrt{\frac{n^2}{12} - \frac{1}{2 \pi^2}} \approx \frac{n \pi \hbar}{2 \sqrt{3}}.
+\]</p>
+
+<p>\(n = 1\): \(\Delta x \Delta p \approx 0.568 \hbar\) > \(\hbar/2\)——不饱和（势阱基态不是高斯）。\(n\) 增大不确定性积线性增长。验证 \(\ge \hbar/2\) ✓。</p>
+
+<h2 id="sec6-8">6.8 物理直觉: 束缚 ⟹ 离散; 大 \(L\) 极限</h2>
+
+<p>把这一章的几条核心结论排成一句话: <em>束缚态系统的能级必然离散</em>。</p>
+
+<p>"<em>束缚</em>" = 粒子被某种势能困在有限区域。"<em>离散</em>" = 允许的能量是孤立点而非连续区间。这两件事的因果链在数学上很清楚——束缚 ⟹ 边界条件（\(\psi \to 0\) 在远处, 或这里 \(\psi(0) = \psi(L) = 0\)）⟹ \(k\) 取离散值 ⟹ \(E\) 取离散值。</p>
+
+<p>对比<em>非束缚</em>（散射）态——比如自由粒子 (ch5) 或势垒散射 (ch8)。这些没有"<em>远处 \(\psi \to 0\)</em>" 的边界条件, \(k\) 任取实数 ⟹ \(E\) 连续。所以束缚态有<em>离散谱</em>, 散射态有<em>连续谱</em>。一般势能 \(V(x)\) 同时有束缚态（\(E < V(\pm\infty)\)）和散射态（\(E > V(\pm\infty)\)）, 谱是<em>离散 + 连续</em>。氢原子（ch16）就是这样: 离散态 \(E_n = -13.6/n^2\)（束缚电子）+ 连续态 \(E > 0\)（电离的电子）。</p>
+
+<p><em>大 \(L\) 极限</em>。\(E_n = n^2 \pi^2 \hbar^2/(2 m L^2)\), 间距 \(E_{n+1} - E_n = (2n+1) \pi^2 \hbar^2/(2 m L^2) \to 0\) when \(L \to \infty\)。<em>盒子越大, 能级越密</em>。极限 \(L \to \infty\) 给自由粒子（\(V \equiv 0\) on whole line）, 能级<em>连续</em>——和 ch5 一致。</p>
+
+<p>这个"<em>大 \(L\) ⟹ 能级密</em>" 是<em>对应原理</em>（Bohr）的具体例子: 量子系统在尺度变大、量子数变高时连续到经典。具体地, 把宏观盒子 \(L = 1\) m, 电子 \(m = 9 \times 10^{-31}\) kg:</p>
+
+<p>\[
+E_1 = \frac{\pi^2 \cdot (10^{-34})^2}{2 \cdot 10^{-30} \cdot 1} \approx 5 \times 10^{-38} \text{ J} \approx 3 \times 10^{-19} \text{ eV}.
+\]</p>
+
+<p>这条能级<em>极小</em>, 也<em>极密</em>——任意热运动（室温 \(k_B T \approx 0.025\) eV）就能跨越亿万级。宏观看到的就是"<em>能量连续</em>"。但同样电子在原子内 \(L \sim 10^{-10}\) m:</p>
+
+<p>\[
+E_1 = \frac{\pi^2 \cdot (10^{-34})^2}{2 \cdot 10^{-30} \cdot (10^{-10})^2} \approx 5 \times 10^{-18} \text{ J} \approx 30 \text{ eV}.
+\]</p>
+
+<p>30 eV 量级——和氢原子能级 13.6 eV 同数量级。这就是为什么"<em>原子里电子的能级是 eV 量级</em>"——原子尺度 + 电子质量逼出这个数量级。</p>
+
+<p>请你停下来欣赏: 一个简单的"<em>盒子里粒子</em>" 模型, 用 \(L \sim 10^{-10}\) m + \(m_e\) 就预测氢原子能级量级。这种"<em>定标律</em>" 给的物理预测能力是 QM 最强的工具之一。</p>
+
+<h2 id="sec6-9">6.9 一般化: 节点定理 + 本征展开</h2>
+
+<p>一维势阱解出来的"<em>本征态 + 离散能级 + 节点结构</em>" 模板适用于<em>所有</em> 一维束缚态系统:</p>
+
+<ul>
+  <li><em>节点定理</em>: 能级从低到高排, 第 \(n\) 个能量本征态有 \(n - 1\) 个节点。基态无节点。</li>
+  <li><em>本征态正交</em>: \(\int \psi_n^* \psi_m dx = \delta_{nm}\)（自伴算子 \(\hat H\) 不同本征值的本征向量正交, 谱定理在 \(L^2[0, L]\) 上的具体化）。</li>
+  <li><em>本征展开</em>: 任意归一态 \(\psi = \sum c_n \psi_n\), 系数 \(c_n = \langle \psi_n | \psi \rangle\)。这就是 ch3 的"<em>线性叠加</em>" 在能量本征基上的具体形式。</li>
+  <li><em>时间演化</em>: \(\psi(x, t) = \sum c_n \psi_n(x) e^{-i E_n t/\hbar}\)。每个能量分量按各自频率独立振荡, 干涉结果给出含时态。</li>
+</ul>
+
+<p>下一章谐振子完全套同样模板, 但势能 \(V = m\omega^2 x^2/2\), 解出来给 \(E_n = (n + 1/2)\hbar\omega\) + Hermite 函数 \(\psi_n\)。再下一章势垒（ch8）破坏这个模板——\(V\) 不"<em>困住</em>" 粒子, 不再是束缚态, 谱连续, 但又出现新现象（隧穿）。</p>
+
+<h2 id="sec6-10">6.10 临别话</h2>
+
+<p>这一章是 QM 第一个真正"<em>解</em>" 出来的具体系统。请你把这条流程当成模板:</p>
+
+<ul>
+  <li><em>设势能</em>: \(V(x)\) 给出。</li>
+  <li><em>解 SE 区域内</em>: 给出通解形式（指数、三角、Hermite、Bessel 等）。</li>
+  <li><em>套边界条件</em>: 区域边界 \(\psi\) 为 0 / \(\psi\) 在无穷远衰减 / \(\psi, \psi'\) 跨界连续等。</li>
+  <li><em>边界条件挑出离散 \(k_n\)</em>: ⟹ 离散 \(E_n\)。</li>
+  <li><em>归一化</em>: 定常数。</li>
+  <li><em>验算节点 + 期望值 + 不确定性</em>: 物理感受。</li>
+</ul>
+
+<p>整个量子化学、凝聚态物理、核物理本质上都在做这件事——不同的势能, 同一套套路。从势阱到原子再到分子再到固体, "<em>能级离散</em>" 是 QM 的招牌。</p>
+
+<p>下一章我们做<em>谐振子</em>——QM 解析解最经典的系统。势能 \(V = m\omega^2 x^2/2\)。解 SE 给 Hermite 多项式 + Gaussian 包络。但更漂亮的是 Dirac 1925 给的<em>升降算子</em> 代数解——完全不解微分方程, 用算子代数 \([\hat a, \hat a^\dagger] = 1\) 直接得 \(E_n = (n + 1/2)\hbar\omega\)。这是本书第一次见到 algebraic 方法的力量, 也是 QFT 中"<em>粒子数</em>" 概念的起源。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 自由粒子 + 波包</a><a href="ch7.html">下一章 · 第 7 章 谐振子（升降算子 + Hermite）→</a></nav>
+</main>
+</body>
+</html>

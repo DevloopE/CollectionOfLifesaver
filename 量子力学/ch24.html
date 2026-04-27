@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 24 章 应用：量子化学 + 量子场论一瞥 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：量子计算入门</a><a href="appA.html">附录 A 复变函数速查 →</a></nav>
+<h1 id="ch24">第 24 章 应用：量子化学 + 量子场论一瞥</h1>
+
+<p>本书最后一章。前 23 章你建立了量子力学的<em>数学骨架</em>(Hilbert 空间 + 自伴算子 + 概率诠释) + <em>物理本能</em>(谐振子、氢原子、自旋、纠缠、散射、计算)。这套工具的两个最重要的<em>下一步</em>:</p>
+
+<ul>
+  <li><strong>量子化学</strong>: 把 QM 用到原子分子层面, 精确计算"<em>化学键怎么形成、反应如何进行</em>"。当前是材料科学、药物设计、催化研究的计算基础。</li>
+  <li><strong>量子场论 (QFT)</strong>: 把 QM + 狭义相对论 + 多粒子统一, 是粒子物理标准模型的语言。它是高能物理、凝聚态物理、宇宙学的<em>共同框架</em>。</li>
+</ul>
+
+<p>这两条路一个朝<em>原子尺度</em>(\(10^{-10}\) m, \(\sim\) eV) 走, 一个朝<em>普朗克尺度</em>(\(10^{-35}\) m, GeV-TeV) 走。本章给两者的入口——足够让你<em>开始</em> 读那些专业领域的书, 不够让你成为专家。</p>
+
+<p>章末再谈本书 24 章 + 整套从 1900 到 2026 的 126 年量子物理史。</p>
+
+<h2 id="sec24-1">24.1 量子化学: 从 \(H_2^+\) 起步</h2>
+
+<p>最简单的<em>分子</em>——\(H_2^+\), 两个质子 + 一个电子。Hamiltonian:</p>
+
+<p>\[
+\hat H = -\frac{\hbar^2}{2m_e} \nabla^2 - \frac{e^2}{4\pi\varepsilon_0} \left( \frac{1}{r_A} + \frac{1}{r_B} \right) + \frac{e^2}{4\pi\varepsilon_0 R},
+\]</p>
+
+<p>\(r_A, r_B\) 是电子到两质子距离, \(R\) 是核间距。<em>Born-Oppenheimer 近似</em>: 电子运动比核快 \(\sim\) \(\sqrt{m_p/m_e} \approx 43\) 倍, 所以先固定核位置, 解电子的 SE, 再把电子能量当作核间距的"<em>势能曲面</em>" \(E(R)\), 让核在 \(E(R)\) 上动。这是量子化学的<em>第一原则</em>近似。</p>
+
+<p>对 \(H_2^+\) 的解析解（在椭球坐标中, 19 世纪末就有人求过）相当复杂。<em>朴素</em> 方法——<em>线性组合原子轨道</em>(LCAO):</p>
+
+<p>\[
+\boxed{\ \psi_\pm(\boldsymbol r) = \frac{1}{\sqrt{2(1 \pm S)}} \big( \phi_A(\boldsymbol r) \pm \phi_B(\boldsymbol r) \big),\ }
+\]</p>
+
+<p>\(\phi_A, \phi_B\) 是各自质子上的 1s 氢原子轨道, \(S = \langle \phi_A | \phi_B \rangle\) 是<em>重叠积分</em>。\(\psi_+\) 是<em>成键</em>(bonding) 轨道——电子密度在两核间增强, 拉两核; \(\psi_-\) 是<em>反键</em>(antibonding)——两核间有节点, 电子密度推开。</p>
+
+<p>算 \(E_\pm(R)\) 作为 \(R\) 的函数, \(E_+(R)\) 在 \(R \approx 2.5\) 玻尔（1.32 Å）处有<em>极小</em>——这就是 \(H_2^+\) 的平衡键长。极小值 \(\approx -1.76\) Hartree, 比单独 H + p 的能量 \(-0.5\) Hartree 低 \(0.1\) Hartree（即 \(\sim 2.7\) eV）——这是<em>共价键能</em>。</p>
+
+<p>请你停下来欣赏: <em>化学键不是"<em>原子之间的胶水</em>"</em>, 是<em>电子叠加态的能量优势</em>。两个原子靠近, 它们的电子轨道线性叠加, 成键轨道能量比孤立原子低, 系统稳定——这就是化学键。LCAO-MO（molecular orbital）方法是量子化学的语言基础。</p>
+
+<h2 id="sec24-2">24.2 Hartree-Fock: 多电子的自洽场</h2>
+
+<p>真分子有<em>多</em> 电子。\(H_2\)（中性氢分子）2 电子; \(\mathrm{CH}_4\)（甲烷）10 电子; 一个酶分子可能 \(10^4\) 电子。多电子 SE 是 \(3N\) 维 PDE, \(N \geq 10\) 直接解不可能。需要<em>近似</em>。</p>
+
+<p><strong>Hartree-Fock 近似</strong>(HF, 1930s): 假设多电子波函数是<em>Slater 行列式</em>(18.4 反对称化)——单电子轨道 \(\{\phi_i\}\) 反对称化:</p>
+
+<p>\[
+\Psi(\boldsymbol r_1, \ldots, \boldsymbol r_N) = \frac{1}{\sqrt{N!}} \det[\phi_i(\boldsymbol r_j)].
+\]</p>
+
+<p>每个 \(\phi_i\) 在<em>其它电子产生的平均场</em> 中独立运动。变分原理给"<em>HF 方程</em>":</p>
+
+<p>\[
+\hat F \phi_i = \varepsilon_i \phi_i,
+\]</p>
+
+<p>\(\hat F = \hat h + \hat J - \hat K\), \(\hat h\) 是单电子部分（动能 + 核吸引）, \(\hat J\) 是 Coulomb 平均（其它电子的电荷云对 \(i\) 的排斥）, \(\hat K\) 是<em>交换</em> 项（来自反对称化, 没有经典对应）。</p>
+
+<p><em>自洽场</em>(self-consistent field, SCF) 求解——\(\hat F\) 依赖 \(\{\phi_i\}\), 所以从一组初始猜的 \(\{\phi_i^{(0)}\}\) 开始, 算 \(\hat F^{(0)}\), 解出新的 \(\{\phi_i^{(1)}\}\), 再算 \(\hat F^{(1)}\)... 直到收敛。这是个不动点迭代（链回数值方法 ch6 不动点）。</p>
+
+<p>HF 的精度: 给"<em>核心</em>" 能量准确度 \(\sim 99\%\), 但缺<em>电子相关</em>(electron correlation)——电子之间的<em>瞬时</em> 关联（不只是平均场）。剩 1% 就是<em>相关能</em>, 化学反应能差异往往就在这 1% 里, 重要。后续方法（CI、MP2、CCSD(T)）以更高精度补充相关能。CCSD(T)（"<em>金标准</em>"）在小分子上可达 \(\sim 0.1\) kcal/mol 精度——化学精度。但 CCSD(T) 是 \(O(N^7)\) 复杂度, 只能算到 \(\sim 30\) 原子。</p>
+
+<h2 id="sec24-3">24.3 密度泛函理论 (DFT)</h2>
+
+<p>1964 Hohenberg-Kohn 定理: 多电子系统的<em>所有</em> 性质完全由<em>电子密度</em> \(\rho(\boldsymbol r)\) 决定（一个 3 维标量场）, 不需要 \(3N\) 维波函数。这条定理证明性: 假设两个不同外势 \(V_1, V_2\) 给同样的 \(\rho\), 用变分原理矛盾。</p>
+
+<p>更具体——<em>能量是密度的泛函</em>:</p>
+
+<p>\[
+E[\rho] = T[\rho] + V_{\text{ext}}[\rho] + V_{\text{ee}}[\rho],
+\]</p>
+
+<p>\(T\) 动能, \(V_{\text{ext}}\) 与外势（核）的相互作用, \(V_{\text{ee}}\) 电子-电子。Hohenberg-Kohn 第二条: \(E[\rho]\) 在<em>真</em> \(\rho_0\) 处取极小, 极小值 = 真基态能。</p>
+
+<p>这定理的意义巨大——把 \(3N\) 维问题降到 3 维问题。理论上 DFT 可以算任何分子。<em>问题</em>: \(E[\rho]\) 的<em>具体形式</em> 不知道, 特别是动能 \(T[\rho]\) 不能简单写成 \(\rho\) 的局部函数。</p>
+
+<p><strong>Kohn-Sham 方案</strong>(1965): 引入辅助"<em>无相互作用</em>" 体系, 同样密度 \(\rho\), 用单粒子轨道 \(\{\psi_i\}\):</p>
+
+<p>\[
+\rho(\boldsymbol r) = \sum_i^{\text{occ}} |\psi_i(\boldsymbol r)|^2.
+\]</p>
+
+<p>动能 \(T_s = \sum_i \langle \psi_i | -\nabla^2/2 | \psi_i \rangle\)（无相互作用动能）。把"<em>真</em> 体系" 与"<em>辅助</em> 体系" 的差堆到一个<em>交换-相关泛函</em> \(E_{\text{xc}}[\rho]\):</p>
+
+<p>\[
+E[\rho] = T_s[\rho] + V_{\text{ext}}[\rho] + V_H[\rho] + E_{\text{xc}}[\rho],
+\]</p>
+
+<p>\(V_H = (1/2) \int \rho(\boldsymbol r) \rho(\boldsymbol r')/|\boldsymbol r - \boldsymbol r'| d^3 r d^3 r'\) 是 Hartree 静电能。<em>Kohn-Sham 方程</em>:</p>
+
+<p>\[
+\boxed{\ \left[ -\frac{\nabla^2}{2} + V_{\text{eff}}(\boldsymbol r) \right] \psi_i = \varepsilon_i \psi_i, \quad V_{\text{eff}} = V_{\text{ext}} + V_H + V_{\text{xc}}, \quad V_{\text{xc}} = \frac{\delta E_{\text{xc}}}{\delta \rho}.\ }
+\]</p>
+
+<p>形式上像 HF 方程, 但<em>原则上精确</em>——如果 \(E_{\text{xc}}\) 知道。问题——\(E_{\text{xc}}\) 的<em>真</em> 形式不知道, 必须近似。各种近似形式:</p>
+
+<ul>
+  <li><em>LDA</em>(local density approximation, 1965): \(E_{\text{xc}} \approx \int \rho \cdot \varepsilon_{\text{xc}}^{\text{HEG}}(\rho) d^3r\), 用<em>均匀电子气</em>的交换-相关能。简单、对金属物理好, 对化学键长偏短。</li>
+  <li><em>GGA</em>(generalized gradient, 1980s-90s): 加入 \(\nabla \rho\) 修正。PBE 函数（Perdew-Burke-Ernzerhof 1996）是当前最常用 GGA, 对一般固态体系性能均衡。</li>
+  <li><em>杂化函数</em>(hybrid, 1993 起): 混入一定比例的 HF 精确交换。B3LYP（Becke 1993）是有机化学的"<em>主力</em>", 大部分研究文章用它。</li>
+</ul>
+
+<h2 id="sec24-4">24.4 DFT 是当前 99% 量子化学计算的标配</h2>
+
+<p>2026 年事实——大约 99% 的"<em>实用</em>" 量子化学计算用 DFT。理由:</p>
+
+<ul>
+  <li>计算复杂度 \(O(N^3)\)（自洽场迭代 + 矩阵对角化主导）, 比 CCSD(T) 的 \(O(N^7)\) 友好得多。</li>
+  <li>精度: B3LYP / PBE0 / TPSS 等现代杂化 / meta-GGA 函数对<em>反应热</em> 平均误差 \(\sim 5\) kJ/mol, 对<em>键长</em> \(\sim 0.01\) Å, 对<em>振动频率</em> \(\sim 5\%\)——足够大部分化学问题。</li>
+  <li>标准软件: VASP、Gaussian、Q-Chem、ORCA、PySCF、Quantum ESPRESSO 等覆盖所有需要。Gaussian 论文引用 \(>30000\), 是化学领域被引最多的软件。</li>
+</ul>
+
+<p>DFT 应用例:</p>
+
+<ul>
+  <li><em>药物设计</em>: 计算候选药物分子与靶蛋白结合能, 排序候选。</li>
+  <li><em>电池材料</em>: 算锂离子在不同电极材料中的扩散能垒, 优化能量密度。</li>
+  <li><em>催化</em>: 算反应物 → 过渡态 → 产物的能量曲面, 设计催化剂降低过渡态能量。</li>
+  <li><em>太阳能电池</em>: 算半导体材料的电子能带, 优化吸光效率。</li>
+</ul>
+
+<p>1998 Walter Kohn + John Pople 因 DFT 与量子化学计算方法获 Nobel 化学奖——这是化学奖颁给数学方法的少数例子, 反映 DFT 对化学的深远影响。</p>
+
+<p>DFT 的<em>失败</em> 模式: 强相关体系（过渡金属、稀土、磁性材料、高温超导）DFT 给的精度差; 范德华相互作用（弱长程）需要专门校正（Grimme D3、D4 修正）; 激发态用<em>含时</em> DFT (TDDFT) 性能不均。这些是当前研究热点。</p>
+
+<p>近年量子计算与量子化学的接合——<em>VQE</em>(变分量子本征解算法): 把分子哈密顿量映射到 qubit, 用量子线路准备试探态, 经典优化变分参数。这是当前 NISQ 量子计算机的旗舰应用之一。2023 年已能在量子硬件上算 \(\sim 12\) 电子小分子, 但精度还不及 DFT。</p>
+
+<h2 id="sec24-5">24.5 量子场论简介: 场作为基本对象</h2>
+
+<p>切到完全不同的尺度——粒子物理。这里 QM 与狭义相对论必须结合。</p>
+
+<p>请你想一件事——QM 的 Hilbert 空间假设固定的<em>粒子数</em>。但相对论物理里粒子可以<em>产生 / 湮灭</em>: \(e^+ + e^- \to \gamma + \gamma\)（电子-正电子湮灭）, \(\gamma + \gamma \to e^+ + e^-\)（光子对产生）。任何高能过程都可能改变粒子数。<em>固定粒子数的 Hilbert 空间不够用</em>。</p>
+
+<p>解决方案——<em>量子场论</em>(quantum field theory, QFT): <em>场</em>(field) 是基本对象, <em>粒子</em> 是场的<em>激发</em>。</p>
+
+<p>具体的——把<em>电磁场</em> \(A^\mu(x)\)（\(x = (t, \boldsymbol x)\) 是时空点）当成一组无穷多耦合谐振子, 每个时空模式 \((\omega, \boldsymbol k)\) 是一个谐振子。基态 = 真空, 激发态 = 含光子的态。<em>每个光子是电磁场的一份能量量子</em>。同样, <em>电子</em> 是<em>电子场</em> \(\psi(x)\) 的激发, <em>夸克</em> 是夸克场的激发, etc。</p>
+
+<p>这种"<em>场为基本</em>" 的视角让粒子产生 / 湮灭<em>自然</em>——场的激发数随时间变。Hilbert 空间不再固定粒子数, 而是<em>Fock 空间</em> = 0 粒子 \(\oplus\) 1 粒子 \(\oplus\) 2 粒子 \(\oplus\) ...</p>
+
+<h2 id="sec24-6">24.6 二次量子化: 产生 / 湮灭算子</h2>
+
+<p>QFT 的数学工具——<em>二次量子化</em>(second quantization)。把场展开为模式 \(\boldsymbol k\) 的求和:</p>
+
+<p>\[
+\hat \phi(\boldsymbol x) = \sum_{\boldsymbol k} \frac{1}{\sqrt{2 V \omega_{\boldsymbol k}}} \big( \hat a_{\boldsymbol k} e^{i \boldsymbol k \cdot \boldsymbol x} + \hat a_{\boldsymbol k}^\dagger e^{-i \boldsymbol k \cdot \boldsymbol x} \big),
+\]</p>
+
+<p>\(\hat a_{\boldsymbol k}, \hat a_{\boldsymbol k}^\dagger\) 是模式 \(\boldsymbol k\) 的<em>湮灭 / 产生</em> 算子（推广 ch7 谐振子升降算子）, 满足玻色对易 \([\hat a_{\boldsymbol k}, \hat a_{\boldsymbol k'}^\dagger] = \delta_{\boldsymbol k, \boldsymbol k'}\); 对费米子改成反对易 \(\{\hat a_{\boldsymbol k}, \hat a_{\boldsymbol k'}^\dagger\} = \delta_{\boldsymbol k, \boldsymbol k'}\)（自动给 Pauli 不相容 ch18）。</p>
+
+<p>真空 \(|0\rangle\) 满足 \(\hat a_{\boldsymbol k} |0\rangle = 0\) 对所有 \(\boldsymbol k\)。多粒子态:</p>
+
+<p>\[
+|n_{\boldsymbol k_1}, n_{\boldsymbol k_2}, \ldots\rangle = \prod_i \frac{(\hat a_{\boldsymbol k_i}^\dagger)^{n_i}}{\sqrt{n_i!}} |0\rangle.
+\]</p>
+
+<p>请你欣赏这件事——<em>谐振子语言重新出现</em>! ch7 你学过 \(\hat a^\dagger\) 提升能级一格, \(\hat a\) 降低一格。在 QFT 里同一组算子被解读为<em>产生 / 湮灭一个粒子</em>。每个模式是一个谐振子, 一份激发就是一个粒子。这是一个让人感叹的<em>概念统一</em>: ch7 的谐振子代数原来是整个粒子物理的语言。</p>
+
+<p>相互作用——多个场之间的耦合, 写在 Lagrangian 里。例: 量子电动力学 (QED) 的相互作用 \(\mathcal L_{\text{int}} = -e \bar\psi \gamma^\mu \psi A_\mu\)（电子场 \(\psi\) 与光子场 \(A_\mu\) 耦合）。这条耦合产生<em>所有</em> QED 现象——Rutherford 散射、Compton 散射、Lamb shift、anomalous magnetic moment, 都是这条 Lagrangian 微扰展开的不同阶项。</p>
+
+<p>计算工具: <em>Feynman 图</em>——把微扰展开的每一项画成图, 节点 = 相互作用, 线 = 粒子传播。Feynman 1948 引入, 让原本繁琐的 QFT 计算变得可计算。Feynman 1965 因 QED 量子化获 Nobel（与 Schwinger + Tomonaga 共享）。</p>
+
+<h2 id="sec24-7">24.7 Dirac 方程 + 反物质</h2>
+
+<p>1928 年 Dirac, 26 岁, 想找一个"<em>相对论性</em>" Schrödinger 方程——\(E = \pm \sqrt{m^2 c^4 + p^2 c^2}\) 而不是非相对论 \(E = p^2/2m\)。直接平方根难处理。Dirac 想到——把 \(E\) 写成对 \(p\) <em>线性</em>:</p>
+
+<p>\[
+E = c \boldsymbol \alpha \cdot \boldsymbol p + \beta m c^2,
+\]</p>
+
+<p>要求平方后等于 \(p^2 c^2 + m^2 c^4\)。\(\boldsymbol \alpha, \beta\) 是<em>矩阵</em>(不是数), 满足某些对易关系——4 维 Dirac 矩阵就是答案。</p>
+
+<p>Dirac 方程:</p>
+
+<p>\[
+\boxed{\ i \hbar \frac{\partial \psi}{\partial t} = (c \boldsymbol \alpha \cdot \hat{\boldsymbol p} + \beta m c^2) \psi.\ }
+\]</p>
+
+<p>\(\psi\) 现在是 4 分量向量（"<em>spinor</em>"）, 不是标量。</p>
+
+<p>Dirac 方程的<em>奇迹</em>: 不假设自旋, 它<em>自动</em> 给出<em>电子有自旋 1/2</em>, <em>磁矩 \(g = 2\)</em>（实验值, 经典理论无法解释）。这是 1928 年最让人震惊的预测之一。</p>
+
+<p>更让人震惊——Dirac 方程的解有<em>正能</em> 与<em>负能</em> 两族。Dirac 起初困惑, 后来 1930 年提出: 真空是"<em>所有负能态都填满</em>" 的"<em>Dirac 海</em>", 一个负能电子被激发到正能态留下一个"<em>洞</em>"——洞表现为带<em>正</em> 电的粒子, 质量与电子相同。这就是<strong>反物质</strong>预测。</p>
+
+<p>1932 Carl Anderson 在云室里发现一个曲率与电子相反但其它一样的粒子——<em>正电子</em>(positron)。Dirac 1933 Nobel 奖（与 Schrödinger 共享）, Anderson 1936 Nobel 奖。<em>反物质</em> 从纯数学预测变成实验证实。</p>
+
+<p>当代——所有粒子都有反粒子（\(p \leftrightarrow \bar p\), \(n \leftrightarrow \bar n\), \(\nu \leftrightarrow \bar\nu\), 一些粒子是自己的反粒子如 \(\gamma\)）。<em>正反物质对称性</em> 是相对论 QFT 的内在属性, 由 CPT 定理保证。</p>
+
+<h2 id="sec24-8">24.8 标准模型: 电弱 + 强 + Higgs</h2>
+
+<p>QFT 在 20 世纪 60-70 年代结晶为<em>粒子物理标准模型</em>(Standard Model, SM)。它统一描述 17 种基本粒子 + 4 种基本相互作用中的 3 种（电磁 + 弱 + 强）。第 4 种<em>引力</em> 不在 SM 内, 是开放问题。</p>
+
+<p><em>SM 的对称群</em>: \(\mathrm{SU}(3)_C \times \mathrm{SU}(2)_L \times \mathrm{U}(1)_Y\). 链回<a href="../抽象代数/index.html">抽象代数</a>表示论 + 群论:</p>
+
+<ul>
+  <li>\(\mathrm{SU}(3)_C\)（color）: 强相互作用, 描述夸克通过<em>胶子</em>结合成质子 / 中子。理论叫量子色动力学 (QCD)。\(N = 3\) 个颜色（红 / 绿 / 蓝）。</li>
+  <li>\(\mathrm{SU}(2)_L\)（弱同位旋）+ \(\mathrm{U}(1)_Y\)（弱超荷）: 弱相互作用 + 电磁的统一, 1968 Glashow-Weinberg-Salam 给。这套理论叫电弱理论, 中介粒子是 \(W^\pm, Z^0, \gamma\)。</li>
+</ul>
+
+<p><em>Higgs 机制</em>(1964): 通过自发对称破缺给 \(W^\pm, Z^0\) 质量, 同时让 SU(2)×U(1) 破缺到电磁 U(1)。预测的<em>Higgs 玻色子</em> 在 2012 年 7 月 4 日 LHC ATLAS + CMS 实验同时宣布发现, 质量 \(125\) GeV。Higgs + Englert 2013 Nobel 奖。</p>
+
+<p>SM 17 种粒子全部已实验观测。SM 是 20 世纪物理最完美的理论之一——预测精度达到 \(10^{-12}\)（电子反常磁矩 \((g-2)/2\) 实验与理论相符 12 位有效数字）。</p>
+
+<p><em>SM 的开放问题</em>: 暗物质（占宇宙 27%）+ 暗能量（68%）+ 中微子质量起源 + 重子-反重子不对称（为什么宇宙是物质而不是反物质?）+ 引力量子化 + 强 CP 问题——这些还没答案。<em>超出 SM</em> 的物理是当前粒子物理研究的中心。</p>
+
+<h2 id="sec24-9">24.9 量子引力 + 弦论一句话提</h2>
+
+<p>SM 不含引力。引力的相对论描述是 Einstein 1915 广义相对论——时空几何是动力学场。把广义相对论<em>量子化</em> 是 20 世纪后半叶最难的问题, 至今<em>没有</em> 完整解决。</p>
+
+<p>朴素的"<em>把度规当场, 用 QFT 量子化</em>" 失败——引力相互作用<em>非</em> 可重整化, 微扰展开发散无法消除。</p>
+
+<p>最有名的候选——<strong>弦论</strong>(string theory): 基本对象不是点粒子而是<em>1 维弦</em>。弦的不同振动模式对应不同粒子, 包括引力子（spin-2）。弦论自动包含引力, 自动消除发散, 是当前最有前途的量子引力候选。但需要<em>额外维度</em>(超弦理论 10 维) + 没有实验验证。</p>
+
+<p>另一条路——<em>圈量子引力</em>(loop quantum gravity): 直接量子化广义相对论的几何, 给出"<em>面积量子化</em>" 与"<em>体积量子化</em>" 等具体预言。当前两条路都活跃, 但都未与实验对接。</p>
+
+<p>这是 21 世纪物理最大的开放问题之一。可能 50 年后才有答案。</p>
+
+<h2 id="sec24-10">24.10 收尾: 1900-2026, 126 年</h2>
+
+<p>本书最后一节, 让我把 24 章串起来, 也把整个量子物理的历史串起来。</p>
+
+<p><strong>1900-1925: 旧量子论时代</strong>。Planck 1900 黑体辐射 → Einstein 1905 光电效应 → Bohr 1913 氢原子能级 → de Broglie 1924 物质波。一系列"<em>能量量子化</em>" 假设解决了具体实验问题, 但没有统一框架。本书 ch1-2 涵盖。</p>
+
+<p><strong>1925-1928: 量子力学诞生</strong>。Heisenberg 1925 矩阵力学 → Schrödinger 1926 波动力学 → Born 1926 概率诠释 → Dirac 1927 抽象 Hilbert 空间 → Dirac 1928 相对论方程 + 反物质预测。3 年间从无到有, 由 5-6 个人合作建立完整理论。本书 ch3-13 给完整入门。</p>
+
+<p><strong>1928-1945: 应用 QM 到原子分子核</strong>。Pauli 1925 不相容 → 角动量 + 球对称势 + 氢原子完整解（ch14-16）→ 自旋 + Pauli 矩阵（ch17）→ 全同粒子 + 玻色 / 费米统计（ch18）→ 微扰论 + 散射（ch19-21）→ Hartree 1928 + Fock 1930 多电子计算（24.2）。</p>
+
+<p><strong>1945-1970: QFT + 标准模型</strong>。Feynman + Schwinger + Tomonaga 1948 QED → 1957 弱相互作用 V-A 理论 → 1964 Higgs 机制 → 1968 电弱统一 GWS → 1973 QCD（24.8）。</p>
+
+<p><strong>1970-2000: 实验验证 + 量子信息诞生</strong>。1979 \(W, Z\) 玻色子（CERN UA1）→ 1995 顶夸克（Fermilab）→ 1982 Aspect Bell 实验（22.5）→ 1985-1994 Deutsch / Shor / Grover 量子算法（23.5-23.7）。</p>
+
+<p><strong>2000-2026: 量子技术时代</strong>。2012 Higgs（LHC）→ 2015 引力波（LIGO）→ 2015 loophole-free Bell 实验（22.5）→ 2019 Google 量子优势 → 2022 Bell 实验 Nobel（22.5）→ 2024 逻辑 qubit 实现（23.9）→ 2026 我们正生活在中间。</p>
+
+<p>请你停下来思考一下——126 年间, 物理学家用 QM 工具解释了从光的本质到化学键到核反应到激光到半导体到核磁共振到 GPS 卫星精度到量子计算的几乎所有现代技术。<em>没有 QM 就没有现代世界</em>——CPU 里的晶体管、手机屏幕的液晶、医院的 MRI、超市的扫码激光、互联网的光纤——每一个都依赖 QM 的某条公式。</p>
+
+<h2 id="sec24-11">临别话</h2>
+
+<p>请你回顾本书 24 章——你学到的<em>不</em> 只是公式清单。是<em>看待物理</em> 的方式:</p>
+
+<p>\[
+\boxed{\ \text{Hilbert 空间} + \text{自伴算子} + \text{概率诠释} = \text{全部量子物理的语法}.\ }
+\]</p>
+
+<p>状态是 Hilbert 空间向量, 可观测是自伴算子, 测量给本征值, 演化是么正变换, 概率是模平方。这套<em>语法</em> 在每一章重复出现, 只是<em>词汇</em>(具体的 Hilbert 空间、具体的算子) 不同。从一维势阱到氢原子到自旋到纠缠到 QFT 到弦论, 都是这套语法的不同实例。</p>
+
+<p>如果你掌握了这套语法, 你能去读 Sakurai 的《Modern Quantum Mechanics》（更深的形式 + 更多技术）、Griffiths 的<em>《量子场论简介》</em>(QFT 入门)、Peskin-Schroeder 的<em>《QFT 入门》</em>(粒子物理 QFT 标准教材)、Nielsen-Chuang 的<em>《量子计算 + 量子信息》</em>(量子信息技术圣经)、Szabo-Ostlund 的<em>《现代量子化学》</em>(量子化学计算入门)、Marder 的<em>《凝聚态物理》</em>(应用 QM 到固态)。本书是它们的<em>共同入口</em>。</p>
+
+<p>更重要的——你能开始<em>问</em> 量子力学的开放问题。测量问题真的解决了吗? 多世界 / 哥本哈根 / 客观塌缩谁对? 量子引力的正确语言是什么? 量子计算多久能解 RSA? 量子化学能不能模拟酶催化的精确机制? 这些都是当代物理的<em>活</em> 的问题, 等你这一代人接力。</p>
+
+<p>本书结束。希望你建立的不只是公式清单, 是<em>看待物理</em> 的方式——Hilbert 空间 + 自伴算子 + 概率诠释 = 全部量子物理的<em>语法</em>。请把这套语法当成工具, 去看 21 世纪物理的下一个 100 年。</p>
+
+<p>感谢你读到这里。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：量子计算入门</a><a href="appA.html">附录 A 复变函数速查 →</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

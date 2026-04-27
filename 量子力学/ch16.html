@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 16 章 氢原子 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 球对称势 + 球谐函数</a><a href="ch17.html">下一章 · 第 17 章 自旋与 Pauli 矩阵 →</a></nav>
+<h1 id="ch16">第 16 章 氢原子</h1>
+
+<p>请你想象 1925 年某个冬夜, Heisenberg 在哥本哈根 Bohr 的研究所, 或者 1926 年 Schrödinger 在阿尔卑斯山滑雪小屋。两人都<em>知道</em> Bohr 1913 年那个奇怪的、ad hoc 的氢原子模型——<em>电子只能在某些离散轨道</em>, 能级 \(E_n = -13.6 \text{ eV}/n^2\), 完美匹配 Balmer / Lyman / Paschen 实验, 但<em>没人知道为什么</em>。</p>
+
+<p>两人各自手里捏着一个新框架——Heisenberg 的矩阵力学, Schrödinger 的波动力学。两人都有一个<em>梦</em>: 用<em>全新</em> 的量子力学<em>从头</em> 推出 \(E_n = -13.6/n^2\), 把"<em>离散</em>" 变成<em>定理</em> 而不是<em>假设</em>。</p>
+
+<p>Schrödinger 1926 年初在 Annalen der Physik 上发表四篇连续的论文, 第二篇就解了氢原子。他的方法——把 Coulomb 势 \(V(r) = -e^2/(4\pi\epsilon_0 r)\) 代入 3D Schrödinger 方程, 球对称分离变量（<a href="ch15.html">ch15</a>）, 解径向方程, 得 Laguerre 多项式 \(L_n^l\) 当作径向波函数, 谱条件给 \(E_n = -13.6 \text{ eV}/n^2\)。<em>Bohr 1913 公式自然落出</em>。这是量子力学第一个<em>真正的</em> 胜利——不再是"<em>假设 + 实验吻合</em>", 而是"<em>解 PDE → 答案</em>"。</p>
+
+<p>本章把这个解析过程走完。它<em>是</em> 量子力学最重要的一题, 也是这本书 24 章里最长的一章。完整解析解给三件礼物：</p>
+
+<ol>
+<li>能级 \(E_n = -13.6 \text{ eV}/n^2\)（解释 ch1 Bohr 公式的来源）</li>
+<li>完整波函数 \(\psi_{n l m}(r, \theta, \phi) = R_{nl}(r) Y_l^m(\theta, \phi)\)（径向是 Laguerre × 指数, 角向是球谐）</li>
+<li>简并度 \(n^2\)（不计自旋, 含自旋是 \(2 n^2\)）——解释元素周期表壳层 2, 8, 18, 32, ...</li>
+</ol>
+
+<p>这一章读完你<em>真的</em> 理解为什么周期表长这样, 为什么氢光谱有 Balmer 系列, 为什么化学键能在 eV 量级——<em>一个完整解析解, 解开整个原子物理的第一原理</em>。</p>
+
+<h2 id="sec16-1">16.1 氢原子 Hamiltonian</h2>
+
+<p>氢原子: 一个质子（质量 \(m_p \approx 1836 m_e\), 电荷 \(+e\)）+ 一个电子（质量 \(m_e\), 电荷 \(-e\)）。两者相互吸引, Coulomb 势</p>
+
+<p>\[
+V(r) = -\frac{e^2}{4\pi\epsilon_0 r},
+\]</p>
+
+<p>\(r\) 是两者距离。这个势在<em>无穷远</em> 处规化为 0, 在<em>近</em> 处发散到 \(-\infty\)（吸引）。物理上: 电子若离质子无穷远（电离）, 能量 0; 若被束缚, 能量负。</p>
+
+<p>双粒子 Hamiltonian:</p>
+
+<p>\[
+\hat H = \frac{\hat p_p^2}{2 m_p} + \frac{\hat p_e^2}{2 m_e} + V(|\boldsymbol r_e - \boldsymbol r_p|).
+\]</p>
+
+<p>看起来要解六维 PDE（\(\boldsymbol r_p, \boldsymbol r_e\) 各三维）, 恶心。但下一节用经典力学的标准技巧分离掉<em>质心 + 相对</em>。</p>
+
+<h2 id="sec16-2">16.2 化简到约化质量 + 球对称</h2>
+
+<p>引入：</p>
+
+<ul>
+<li><em>质心坐标</em> \(\boldsymbol R := (m_p \boldsymbol r_p + m_e \boldsymbol r_e)/(m_p + m_e)\)</li>
+<li><em>相对坐标</em> \(\boldsymbol r := \boldsymbol r_e - \boldsymbol r_p\)</li>
+</ul>
+
+<p>反过来 \(\boldsymbol r_p = \boldsymbol R - (m_e/M) \boldsymbol r, \boldsymbol r_e = \boldsymbol R + (m_p/M) \boldsymbol r\), \(M = m_p + m_e\)。</p>
+
+<p>定义<em>约化质量</em></p>
+
+<p>\[
+\mu := \frac{m_p m_e}{m_p + m_e}.
+\]</p>
+
+<p>用链式法则把动能换到 \((\boldsymbol R, \boldsymbol r)\) 坐标（标准结果, 经典力学课讲过, 量子力学完全平行）：</p>
+
+<p>\[
+\frac{\hat p_p^2}{2 m_p} + \frac{\hat p_e^2}{2 m_e} = \frac{\hat P^2}{2 M} + \frac{\hat p^2}{2 \mu},
+\]</p>
+
+<p>\(\hat P\) 是质心动量, \(\hat p\) 是相对动量。势 \(V(|\boldsymbol r_e - \boldsymbol r_p|) = V(r)\) 只依赖相对坐标。所以</p>
+
+<p>\[
+\hat H = \underbrace{\frac{\hat P^2}{2 M}}_{\text{质心}} + \underbrace{\frac{\hat p^2}{2 \mu} + V(r)}_{\text{相对}}.
+\]</p>
+
+<p>两部分<em>分离</em>。质心 \(\boldsymbol R\) 是自由粒子（无势作用）, 解平面波。相对部分</p>
+
+<p>\[
+\hat H_{\text{rel}} = \frac{\hat p^2}{2 \mu} + V(r) = -\frac{\hbar^2}{2\mu} \nabla^2 + V(r)
+\]</p>
+
+<p>是<em>球对称势</em> 中"<em>一个</em> 质量 \(\mu\) 粒子" 的 SE。<em>这就是</em> ch15 的形式! 直接套上一章的分离变量。</p>
+
+<p>注意 \(\mu \approx m_e\)（因为 \(m_p \gg m_e\)）, 准确数 \(\mu / m_e \approx 1 - 1/1836 \approx 0.9995\)。本章后面把 \(\mu\) 当 \(m_e\) 处理, 严格起见可以保留 \(\mu\)。</p>
+
+<h2 id="sec16-3">16.3 径向 SE for Coulomb</h2>
+
+<p>把 \(V(r) = -e^2/(4\pi\epsilon_0 r)\) 代入 ch15 15.5 节的径向 SE:</p>
+
+<p>\[
+-\frac{\hbar^2}{2\mu} \frac{d^2 u}{dr^2} + \left[-\frac{e^2}{4\pi\epsilon_0 r} + \frac{\hbar^2 l(l+1)}{2 \mu r^2}\right] u = E u.
+\]</p>
+
+<p>束缚态 \(E < 0\)。引入<em>无量纲</em> 变量。Bohr 半径</p>
+
+<p>\[
+a_0 := \frac{4\pi\epsilon_0 \hbar^2}{\mu e^2} \approx 0.529 \text{ Å}.
+\]</p>
+
+<p>是氢原子的"<em>自然长度</em>" ——它是把 SE 里的所有常数组合出来的唯一长度量纲组合。能量自然单位是 Hartree</p>
+
+<p>\[
+E_h := \frac{e^2}{4\pi\epsilon_0 a_0} = \frac{\mu e^4}{(4\pi\epsilon_0)^2 \hbar^2} \approx 27.2 \text{ eV}.
+\]</p>
+
+<p>引入 \(\rho := r/a_0\)（无量纲半径）, \(\epsilon := E/(E_h/2) = 2 E/E_h\)（无量纲能量, 注意因子 2 让公式后面更简洁）。径向 SE 变</p>
+
+<p>\[
+\frac{d^2 u}{d\rho^2} + \left[\epsilon + \frac{2}{\rho} - \frac{l(l+1)}{\rho^2}\right] u = 0.
+\]</p>
+
+<p>束缚态 \(\epsilon < 0\), 写 \(\epsilon = -\kappa^2\)（\(\kappa > 0\)）。下面的工作: 先看 \(\rho \to 0\) 与 \(\rho \to \infty\) 的渐近行为, 找一个<em>合适的拼接形式</em>, 然后解中间。</p>
+
+<h2 id="sec16-4">16.4 渐近行为 → 拼接形式</h2>
+
+<p>\(\rho \to \infty\) 行为: \(2/\rho\) 与 \(l(l+1)/\rho^2\) 都趋 0, 方程退化为</p>
+
+<p>\[
+u'' = \kappa^2 u.
+\]</p>
+
+<p>解 \(u \sim e^{\pm \kappa \rho}\)。束缚态要 \(u \to 0\) 在 \(\rho \to \infty\), 取<em>衰减</em> 解 \(u \sim e^{-\kappa \rho}\)。</p>
+
+<p>\(\rho \to 0\) 行为: \(l(l+1)/\rho^2\) 主导（除非 \(l = 0\), 那时 \(2/\rho\) 主导）。对 \(l \ge 1\):</p>
+
+<p>\[
+u'' \approx \frac{l(l+1)}{\rho^2} u.
+\]</p>
+
+<p>解 \(u \sim \rho^{l+1}\)（已在 ch15 算过）。对 \(l = 0\), 略不同, 但<em>同一个</em> \(u \sim \rho^{l+1}\) 仍然成立（\(l = 0\) 时 \(u \sim \rho\)）。</p>
+
+<p>所以拼接形式</p>
+
+<p>\[
+u(\rho) = \rho^{l+1} \, e^{-\kappa \rho} \, v(\rho),
+\]</p>
+
+<p>把<em>渐近行为</em> 显式抽出, 留 \(v(\rho)\) 是中间"<em>多项式</em>" 部分。代入径向 SE, 经过一番<em>求导 + 整理</em>（推导烦琐但机械, 结果是经典的）：</p>
+
+<p>\[
+\rho v'' + 2(l + 1 - \kappa\rho) v' + 2[1 - \kappa(l + 1)] v = 0.
+\]</p>
+
+<p>换变量 \(x := 2\kappa\rho\):</p>
+
+<p>\[
+x v'' + (2l + 2 - x) v' + \left[\frac{1}{\kappa} - (l+1)\right] v = 0.
+\]</p>
+
+<p>这就是<em>缔合 Laguerre 方程</em>（标准形式 \(x v'' + (\alpha + 1 - x) v' + n_r v = 0\), \(\alpha = 2l + 1\), \(n_r = 1/\kappa - l - 1\)）。</p>
+
+<h2 id="sec16-5">16.5 解 Laguerre 方程 → 量子化条件</h2>
+
+<p>缔合 Laguerre 方程 \(x v'' + (\alpha + 1 - x) v' + n_r v = 0\) 的解：</p>
+
+<ul>
+<li>若 \(n_r\) 是<em>非负整数</em>, 解是<em>缔合 Laguerre 多项式</em> \(L_{n_r}^{\alpha}(x)\), \(n_r\) 次多项式。物理上 \(v\) 在 \(x \to \infty\) <em>不</em> 发散, 配合 \(e^{-\kappa\rho}\) 让 \(u\) 趋 0, 完美。</li>
+<li>若 \(n_r\) <em>不</em> 是非负整数, 解是无穷级数, 渐近 \(v \sim e^x\), 与 \(e^{-\kappa\rho}\) 抵消, 让 \(u \sim e^{+\kappa\rho}\) 发散——不允许（违反归一化）。</li>
+</ul>
+
+<p>所以<em>束缚态量子化条件</em>:</p>
+
+<p>\[
+n_r := \frac{1}{\kappa} - l - 1 = 0, 1, 2, \ldots
+\]</p>
+
+<p>定义<em>主量子数</em> \(n := n_r + l + 1 = 1/\kappa\)。所以 \(\kappa = 1/n\), 进而 \(\epsilon = -\kappa^2 = -1/n^2\)。回代 \(E = (E_h/2) \epsilon\):</p>
+
+<p>\[
+\boxed{\ E_n = -\frac{E_h}{2 n^2} = -\frac{\mu e^4}{2 (4\pi\epsilon_0)^2 \hbar^2 \, n^2} = -\frac{13.6 \text{ eV}}{n^2}.\ }
+\]</p>
+
+<p>这就是<em>Bohr 公式</em>! 不是<em>假设</em>, 是<em>解 PDE 的特征值</em>。请你停下来欣赏：</p>
+
+<ul>
+<li>1913 Bohr 假设 \(E_n = -13.6/n^2\), 用 ad hoc 量子化条件 \(\oint p \, dq = nh\) 推出。<em>对了, 但没解释</em>。</li>
+<li>1926 Schrödinger 解 PDE, 量子化条件 \(n = n_r + l + 1\) <em>从波函数有限性自动浮现</em>——若 \(n\) 不是正整数, 波函数发散; 若是正整数, 波函数是 Laguerre 多项式 × 指数, 物理可接受。<em>"离散" 是 PDE 谱的几何强制, 不是假设</em>。</li>
+</ul>
+
+<p>这是量子力学第一次"<em>真正解释</em>" 一个原子物理事实。整个 1926 之后的物理学都在这条胜利的余晖里展开。</p>
+
+<h2 id="sec16-6">16.6 量子数 \((n, l, m_l)\)</h2>
+
+<p>主量子数 \(n = 1, 2, 3, \ldots\) 标记<em>能级</em> \(E_n\)。</p>
+
+<p>角量子数 \(l\) 由 \(n_r \ge 0\) 强制: \(l = n - n_r - 1 \le n - 1\)。所以 \(l = 0, 1, 2, \ldots, n - 1\)。</p>
+
+<p>磁量子数 \(m_l = -l, -l + 1, \ldots, l\), 共 \(2l + 1\) 个值（ch14）。</p>
+
+<p>\((n, l, m_l)\) 三个量子数完整标记一个氢原子本征态（不计自旋）。化学家给 \(l\) 起字母名:</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(l\)</th><th style="padding: 0.3em 1em;">字母</th><th style="padding: 0.3em 1em;">来源</th></tr>
+<tr><td>0</td><td>s</td><td>sharp（光谱线锐利）</td></tr>
+<tr><td>1</td><td>p</td><td>principal（主线）</td></tr>
+<tr><td>2</td><td>d</td><td>diffuse（漫线）</td></tr>
+<tr><td>3</td><td>f</td><td>fundamental（基线）</td></tr>
+<tr><td>4+</td><td>g, h, i, ...</td><td>按字母</td></tr>
+</table>
+
+<p>态记号 \(n l\), 例如 1s 是 \(n = 1, l = 0\); 2p 是 \(n = 2, l = 1\)（3 个 \(m_l\) 子态）; 3d 是 \(n = 3, l = 2\)（5 个 \(m_l\)）。</p>
+
+<h2 id="sec16-7">16.7 完整波函数 \(\psi_{n l m}(r, \theta, \phi)\)</h2>
+
+<p>合起来:</p>
+
+<p>\[
+\boxed{\ \psi_{n l m}(r, \theta, \phi) = R_{nl}(r) \cdot Y_l^m(\theta, \phi),\ }
+\]</p>
+
+<p>径向部分</p>
+
+<p>\[
+R_{nl}(r) = N_{nl} \cdot \rho^l e^{-\rho/n} \cdot L_{n - l - 1}^{2l + 1}(2\rho/n), \qquad \rho = r/a_0,
+\]</p>
+
+<p>\(L_{n_r}^{2l+1}\) 是缔合 Laguerre 多项式（\(n_r = n - l - 1\) 次）, \(N_{nl}\) 归一化常数</p>
+
+<p>\[
+N_{nl} = \sqrt{\left(\frac{2}{n a_0}\right)^3 \frac{(n - l - 1)!}{2 n [(n + l)!]^3}}.
+\]</p>
+
+<p>角部分 \(Y_l^m(\theta, \phi)\) 是球谐函数（ch15）。</p>
+
+<p>列出前几个</p>
+
+<p>\(n = 1\)（仅 1s）:</p>
+
+<p>\[
+\psi_{100} = \frac{1}{\sqrt{\pi a_0^3}} e^{-r/a_0}.
+\]</p>
+
+<p>球对称, 在 \(r = 0\) 取最大值, 指数衰减。<em>没有节面</em>（球面）。</p>
+
+<p>\(n = 2\)（2s 1 个 + 2p 3 个, 共 4 个）:</p>
+
+<p>\[
+\psi_{200} = \frac{1}{\sqrt{32 \pi a_0^3}} \left(2 - \frac{r}{a_0}\right) e^{-r/(2 a_0)},
+\]</p>
+
+<p>2s 在 \(r = 2 a_0\) 处有<em>径向节面</em>（球壳）, 内外两瓣符号相反。</p>
+
+<p>\[
+\psi_{210} = \frac{1}{\sqrt{32 \pi a_0^3}} \frac{r}{a_0} e^{-r/(2 a_0)} \cos\theta,
+\]</p>
+
+<p>2p\(_z\), 沿 \(z\) 上下两瓣, \(\cos\theta\) 给角向"<em>双叶</em>"。</p>
+
+<p>\(n = 3\)（3s + 3p + 3d, 共 9 个）:</p>
+
+<p>\[
+\psi_{300} \propto \left(27 - 18 \frac{r}{a_0} + 2 \frac{r^2}{a_0^2}\right) e^{-r/(3 a_0)},
+\]</p>
+
+<p>3s 有<em>两个</em> 径向节面, 三瓣。</p>
+
+<p>规律: \(\psi_{nlm}\) 有<em>\(n - l - 1\) 个径向节面</em>（来自 Laguerre 多项式的 \(n_r\) 个零点）+ <em>\(l\) 个角向节面</em>（来自球谐 + 缔合 Legendre）。<em>总节面数 \(n - 1\)</em>——和 1D 的 \(n - 1\) 个节点完全平行。</p>
+
+<h2 id="sec16-8">16.8 简并度 \(2 n^2\)</h2>
+
+<p>对每个 \(n\):</p>
+
+<ul>
+<li>\(l\) 取 \(0, 1, \ldots, n - 1\): 共 \(n\) 个值</li>
+<li>每个 \(l\) 有 \(2l + 1\) 个 \(m_l\) 子态</li>
+<li>总数（不计自旋）= \(\sum_{l=0}^{n-1} (2l + 1) = n^2\)</li>
+</ul>
+
+<p>简并度 \(n^2\): \(n = 1\) 给 1, \(n = 2\) 给 4, \(n = 3\) 给 9, \(n = 4\) 给 16, ...</p>
+
+<p>\(l\) 不影响能量这件事是<em>非平凡</em>的——一般球对称势 \(V(r)\) 解径向 SE 时能量依赖 \((n, l)\)（参见 ch15 3D 球势阱里 \(E_{n, l}\)）。<em>仅</em> Coulomb 势 \(V \propto 1/r\) 让能量只依赖 \(n = n_r + l + 1\)（\(n_r\) 与 \(l\) 互换不变能量）。这种额外简并叫"<em>意外简并</em>"（accidental degeneracy）。1935 Pauli 用 Lenz-Runge 矢量证: 氢原子有<em>更大</em> 的对称群 \(SO(4) \supset SO(3)\), 这条额外对称强迫 \(l\) 简并。</p>
+
+<p>加上电子自旋（每个 \((n, l, m_l)\) 还有 \(m_s = \pm 1/2\) 两种自旋态, 链<a href="ch17.html">ch17</a>）, 简并度 \(2 n^2\)。</p>
+
+<p>\(2 n^2\) 序列 \(2, 8, 18, 32, 50, \ldots\)<em>就是</em> 元素周期表壳层容量! 1s 壳层 2 个电子（H, He）; 2s + 2p 壳层 8 个电子（Li-Ne）; 3s + 3p 壳层 8（Na-Ar）但 3d 出来后第三周期变 18; 4s + 4p + 3d 跨越复杂; 等等。整个化学周期性<em>从这个 \(2 n^2\) 公式来</em>——加上 Pauli 不相容（链<a href="ch18.html">ch18</a>）每态最多一个电子。</p>
+
+<h2 id="sec16-9">16.9 物理图像: 1s, 2s, 2p, 3s, 3p, 3d 轨道</h2>
+
+<p>请你心里画一遍最重要的几个氢轨道:</p>
+
+<p><em>1s</em>：球, 在原点最浓, 半径量级 \(a_0 \approx 0.5\) Å。最概率半径 \(\langle r \rangle = 1.5 a_0\), 最大概率密度在 \(r = a_0\)（径向概率分布 \(P(r) = 4\pi r^2 |R|^2\) 在 \(a_0\) 取最大）。</p>
+
+<p><em>2s</em>：两层球, 内层在 \(r < 2 a_0\) 一个符号, 外层 \(r > 2 a_0\) 反号, 在 \(r = 2 a_0\) 处波函数 0（径向节面）。整体半径量级 \(\sim 4 a_0\)（\(\langle r \rangle = 6 a_0\)）。</p>
+
+<p><em>2p</em>：3 个轨道, 每个像哑铃。\(p_z\)（\(m = 0\)）沿 \(z\) 双叶, \(p_x, p_y\)（\(m = \pm 1\) 的实组合）沿 \(x, y\) 双叶。半径量级 \(\sim 4 a_0\)（与 2s 同, 都是 \(n = 2\)）。</p>
+
+<p><em>3s</em>：三层球, 两个径向节面, 整体半径 \(\sim 9 a_0\)。</p>
+
+<p><em>3p</em>：3 个哑铃, 但每个哑铃在径向有一个节面（哑铃<em>内</em> 还分两部分）。</p>
+
+<p><em>3d</em>：5 个轨道, 形状复杂。\(d_{z^2}\) 像"<em>哑铃 + 甜甜圈</em>", \(d_{xy}, d_{xz}, d_{yz}, d_{x^2-y^2}\) 是四瓣。这五个组合是<em>实</em> 化学家轨道, 数学上是 \(Y_2^{m}\)（\(m = -2, -1, 0, 1, 2\)）的实组合。</p>
+
+<p>请你打开任何一本化学或量子力学书查这些轨道的<em>3D 渲染图</em>（Griffiths 第 4 章、Atkins 物理化学、各种网上 applet 都有）。看一遍图你会<em>立刻</em> 直觉化这些波函数, 比单看公式有效 100 倍。</p>
+
+<h2 id="sec16-10">16.10 应用: 跃迁、光谱、化学键合</h2>
+
+<p>氢原子从能级 \(n_i\) 到 \(n_f\) 跃迁（\(n_i > n_f\)）, 释放一个光子, 能量</p>
+
+<p>\[
+h\nu = E_{n_i} - E_{n_f} = 13.6 \text{ eV} \cdot \left(\frac{1}{n_f^2} - \frac{1}{n_i^2}\right).
+\]</p>
+
+<p>波长 \(\lambda = c/\nu\), 反波长</p>
+
+<p>\[
+\frac{1}{\lambda} = R_H \left(\frac{1}{n_f^2} - \frac{1}{n_i^2}\right), \quad R_H = \frac{13.6 \text{ eV}}{hc} = 1.097 \times 10^7 \text{ m}^{-1},
+\]</p>
+
+<p>这<em>就是</em> Rydberg 公式（ch1 1.3 节）。</p>
+
+<p>不同 \(n_f\) 给不同光谱系列:</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(n_f\)</th><th style="padding: 0.3em 1em;">系列</th><th style="padding: 0.3em 1em;">波长范围</th></tr>
+<tr><td>1</td><td>Lyman</td><td>紫外（\(91 - 122\) nm）</td></tr>
+<tr><td>2</td><td>Balmer</td><td>可见光（\(364 - 656\) nm）</td></tr>
+<tr><td>3</td><td>Paschen</td><td>红外（\(820 - 1875\) nm）</td></tr>
+<tr><td>4</td><td>Brackett</td><td>红外</td></tr>
+<tr><td>5</td><td>Pfund</td><td>远红外</td></tr>
+</table>
+
+<p>Balmer 系列在可见光段<em>正是</em> 1885 年 Balmer 实验拟合到的。Lyman 1906 在紫外拍到。Paschen 1908 在红外拍到。这些<em>所有</em> 系列都被 Schrödinger 一个公式 \(E_n = -13.6/n^2\) 完美预测。</p>
+
+<p>跃迁不是任意的——选择定则（链<a href="ch20.html">ch20</a> 时间依赖微扰 + Fermi 金律）强制 \(\Delta l = \pm 1, \Delta m = 0, \pm 1\)。所以 \(2p \to 1s\) 允许（Lyman \(\alpha\), 121.6 nm）, \(2s \to 1s\) <em>禁戒</em>（\(\Delta l = 0\)）。这条让 2s 在没扰动下寿命极长（约 0.1 秒, 比通常 \(10^{-8}\) 秒长 7 个量级）。</p>
+
+<p><em>化学键合</em> 的雏形: 两个氢原子靠近, 各自的 1s 波函数<em>重叠</em>, 形成<em>分子轨道</em></p>
+
+<p>\[
+\psi_\pm = \frac{1}{\sqrt{2 (1 \pm S)}} (\psi_A \pm \psi_B), \quad S = \int \psi_A^* \psi_B \, d^3 r.
+\]</p>
+
+<p>\(\psi_+\)（成键）能量比单原子<em>低</em>, \(\psi_-\)（反键）能量<em>高</em>。两个电子（自旋相反, Pauli 允许）填 \(\psi_+\), 形成 H\(_2\) 分子, 键能约 4.5 eV。<em>这是最简单的共价键</em>, 数学全在 \(\psi_{100}\) 一个公式上。链回 ch24 量子化学。</p>
+
+<h2 id="sec16-11">16.11 有什么没解</h2>
+
+<p>本章解的是<em>非相对论 + 单电子 + 无自旋 + 点核</em> 的氢原子。真实氢原子有更多细节：</p>
+
+<ul>
+<li><em>相对论修正</em>: 电子动能 \(p^2/2m\) 应该是 \(\sqrt{p^2 c^2 + m^2 c^4} - mc^2\), Taylor 展到 \(p^4\) 给修正 \(\sim \alpha^2 \cdot 13.6\) eV \(\sim 10^{-3}\) eV。</li>
+<li><em>自旋-轨道耦合</em>: 电子轨道运动产生磁场, 与电子自旋磁矩相互作用, 修正 \(\sim 10^{-3}\) eV。链<a href="ch17.html">ch17</a>。</li>
+<li><em>Lamb 移位</em>: 量子电动力学（QED）效应, 让 2s\(_{1/2}\) 与 2p\(_{1/2}\) 不再简并, 差约 \(1057\) MHz。1947 Lamb-Retherford 实验测出, 推动 QED 发展。</li>
+<li><em>超精细结构</em>: 电子自旋与质子自旋耦合, 给基态 1s 一个 \(1420\) MHz 跃迁——著名的<em>21 cm 氢线</em>, 射电天文学的主力工具。</li>
+</ul>
+
+<p>这些是<a href="ch19.html">ch19-20</a> 微扰论的舞台。本章解出的 \(E_n = -13.6/n^2\) 准到 \(\sim 10^{-4}\)（约化质量修正 \(\mu/m_e \approx 0.9995\) 是最大的修正）, 已经是<em>极</em> 好的近似。</p>
+
+<h2 id="sec16-12">16.12 临别话</h2>
+
+<p>这一章你解出了<em>量子力学最重要的一题</em>。氢原子完整解析解是 1926 年 Schrödinger 给量子力学的<em>第一份大礼物</em>——它把 1913 Bohr 模型的 ad hoc 假设变成<em>解 PDE 的定理</em>, 解释了 Balmer / Lyman / Paschen 全部光谱, 给出元素周期表 \(2 n^2\) 壳层的第一原理基础。</p>
+
+<p>解析解可贵, 但<em>极</em> 罕见——除了氢原子, 1D 谐振子（ch7）, 1D 势阱（ch6, ch8）, 还有几个<em>特殊系统</em> 之外, QM 的几乎所有问题都<em>没有</em> 解析解。氦原子（\(Z = 2\), 两个电子）已经<em>不可解析解</em>——两个电子之间的 Coulomb 相互作用让 SE 不可分离变量。锂、铍、所有更重元素更不行。所以本章之后的 QM 工作大部分用<em>近似方法</em>: 微扰论（ch19-20）、变分法、数值（密度泛函理论 DFT 等）。</p>
+
+<p>但氢原子作为<em>唯一可解析的真实原子</em>, 是 QM 教学中无可替代的——<em>所有</em> 微扰论用氢原子作为零阶, <em>所有</em> 化学概念（s, p, d 轨道, 节面, 角动量量子数）用氢原子作为基础, <em>所有</em> 谱学公式用 Rydberg 作为参照。一个 \(R_H = 13.6 \text{ eV} / hc\), 横跨整个原子物理。</p>
+
+<p>下一章我们引入一个<em>本章之外</em> 的角动量——电子<em>自旋</em>。它没经典对应, 不来自 \(\boldsymbol r \times \boldsymbol p\), 但满足同样的对易代数 \([\hat S_i, \hat S_j] = i\hbar \epsilon_{ijk} \hat S_k\)（链 ch14）, 自旋量子数 \(s = 1/2\) 是<em>半整数</em>——允许的, 因为 \(\hat S\) 不是 \(\boldsymbol r \times \boldsymbol p\) 的形式, 没有波函数单值约束。Pauli 矩阵将出场, 量子计算 qubit 也将从这里开始。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 球对称势 + 球谐函数</a><a href="ch17.html">下一章 · 第 17 章 自旋与 Pauli 矩阵 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 2 章 波粒二象性 + de Broglie — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论</a><a href="ch3.html">下一章 · 第 3 章 Schrödinger 方程 →</a></nav>
+<h1 id="ch2">第 2 章 波粒二象性 + de Broglie</h1>
+
+<p>上一章末尾我们停在 1923 年前后的局面: 光<em>既是波</em>（杨氏双缝、Maxwell 电磁波）<em>又是粒子</em>（光电效应里 Einstein 的 \(E = h\nu\)）。把这件事老老实实接受下来, 物理学家心里堵着一个不太敢问的问题: <em>反过来呢</em>？</p>
+
+<p>"<em>反过来</em>" 是什么意思？光本来按 Maxwell 算应该是波, 实验逼我们承认它也是粒子。那<em>电子</em>——本来按 Thomson、按 Millikan、按 Rutherford 算应该是<em>粒子</em>（带电小球, 有质量, 有动量, 有轨迹）, 它会不会反过来也是<em>波</em>？这条问题没人有勇气当真问。直到 1924 年, 巴黎一个 26 岁的博士生 Louis de Broglie 在他不算长的博士论文里, 把它当真问了一次, 给了一个惊人朴素的答案:</p>
+
+<p>\[
+\boxed{\ \lambda = \frac{h}{p}.\ }
+\]</p>
+
+<p>所有<em>有动量 \(p\) 的物质</em>都附带一个<em>波长 \(\lambda\)</em>, \(h\) 是 Planck 常数。短短一行公式, 26 岁的 de Broglie 就为后来的 Schrödinger 方程铺好了路。这一章我们一步一步走过他怎么"<em>猜</em>" 出这条公式, 数量级估算告诉我们为什么宏观世界看不见物质波动性, 然后看 1927 Davisson-Germer + Thomson 怎么用电子衍射实验把它确证。</p>
+
+<h2 id="sec2-1">2.1 复习: 光的波粒二象性</h2>
+
+<p>开始 de Broglie 的猜想之前, 先把光这边的"<em>两面账</em>" 摆清。</p>
+
+<p>(波这一面) Young 1801 年的双缝实验。把单色光通过两条窄缝, 在远处屏幕上看到<em>明暗相间的干涉条纹</em>。条纹间距由光的波长 \(\lambda\)、缝间距 \(d\)、缝到屏的距离 \(L\) 决定:</p>
+
+<p>\[
+\Delta x = \frac{\lambda L}{d}.
+\]</p>
+
+<p>这条公式只对"<em>波</em>" 才有意义——粒子穿过两条缝, 应该在屏上看到两条亮带（每条缝下面一条）, 不是一连串明暗。Young 的实验把光确凿地钉成"<em>波</em>"。Maxwell 1865 年再加一锤——他证明电磁场满足波动方程, 解的相速度恰好就是光速 \(c\), 完美。"<em>光是电磁波</em>" 在 1865-1900 年是物理学最坚固的共识。</p>
+
+<p>(粒子这一面) 但 ch1 我们看到了 Einstein 1905 的逆袭。光电效应里, <em>截止频率</em> \(\nu_0\) 的存在 + 电子动能 \(E_e = h\nu - W\) 线性依赖于<em>频率</em> 而不是<em>强度</em>——这两条只在"<em>光由能量为 \(h\nu\) 的离散粒子（光子）组成</em>" 的图像下才能解释。</p>
+
+<p>更直接的"<em>光子是粒子</em>" 证据是 1923 年 Compton 散射: 把高频 X 射线照射在电子上, 散射后的 X 射线波长<em>变长</em>, 变化量精确地由"<em>光子 + 电子按动量 + 能量守恒做弹性碰撞</em>" 给出:</p>
+
+<p>\[
+\lambda' - \lambda = \frac{h}{m_e c}(1 - \cos \theta).
+\]</p>
+
+<p>这条公式从"<em>光子动量 \(p_\gamma = h/\lambda\)</em>" 出发用相对论运动学算出来。注意——<em>光子的动量</em> 在这里出场了。一个粒子才有动量, 一个波动只有"<em>能流密度</em>"。可 Compton 实验明确告诉你<em>光子有动量, 数值是 \(h/\lambda\)</em>。光子也是粒子。</p>
+
+<p>把 Einstein 的 \(E = h\nu\) 和 Compton 的 \(p = h/\lambda\) 摆在一起:</p>
+
+<p>\[
+E_\gamma = h\nu, \qquad p_\gamma = \frac{h}{\lambda}.
+\]</p>
+
+<p>这两条公式同时把"<em>波的属性</em>"（频率 \(\nu\)、波长 \(\lambda\)）和"<em>粒子的属性</em>"（能量 \(E\)、动量 \(p\)）通过<em>同一个常数 \(h\)</em> 联起来。请你停下来盯它们看一会儿——它们说的是, <em>对于光这种东西, 波与粒子是同一件事的两种表观</em>, 一边的 \(\nu, \lambda\) 翻译到另一边就是 \(E, p\)。这不是说光"<em>有时是波, 有时是粒子</em>"; 是说光<em>同时</em> 是两者, 实验只是按照所问的问题不同而看到不同的一面。</p>
+
+<h2 id="sec2-2">2.2 朴素一问: 物质呢？</h2>
+
+<p>de Broglie 1923-1924 年的论文从一个非常朴素的对称性问题开始:</p>
+
+<blockquote>
+<p>光本来是波（Maxwell）, 我们后来发现它也是粒子（Einstein, Compton）。\
+那么<em>本来是粒子</em> 的物质（电子、质子、原子）, 会不会反过来也是波？</p>
+</blockquote>
+
+<p>这个问题的语气有点傻——但 26 岁的 de Broglie 当真问了。请注意他的<em>动机</em> 不是实验逼出来的（电子衍射 1927 才做出来）, 而是<em>对称性</em>。如果自然在"<em>光</em>" 上把波和粒子合二为一, 它没有理由不在"<em>电子</em>" 上也这样做。</p>
+
+<p>朴素假设: <em>把光那边的关系直接照搬</em>。</p>
+
+<ul>
+  <li>对光: \(E = h\nu\), \(p = h/\lambda\)。</li>
+  <li>对物质: 同样地, \(E = h\nu\), \(p = h/\lambda\)。</li>
+</ul>
+
+<p>第一条 \(E = h\nu\) 给出物质波的<em>频率</em>: \(\nu = E/h\)。第二条 \(p = h/\lambda\) 给出物质波的<em>波长</em>:</p>
+
+<p>\[
+\boxed{\ \lambda_{\text{de Broglie}} = \frac{h}{p}.\ }
+\]</p>
+
+<p>这就是<em>de Broglie 关系</em>。每个有动量 \(p\) 的粒子（电子、质子、整个原子, 甚至棒球、人）都附带一个波长 \(\lambda = h/p\)。</p>
+
+<p>de Broglie 1924 年答辩时这条想法太大胆, 评委 Paul Langevin 一时拿不准——他把论文寄给 Einstein 看。Einstein 回信说"<em>de Broglie 揭开了一块大幕的一角</em>"——大力支持。论文通过, 1929 年 de Broglie 凭此获 Nobel 奖。</p>
+
+<p>请你停下来想一遍这条假设的<em>胆量</em>。1924 年, 没有任何实验告诉你电子是波——所有实验（阴极射线管偏转、Millikan 油滴）都把电子当成<em>带电小球</em> 处理且非常成功。de Broglie 完全靠"<em>对称性应该如此</em>" 提出物质波——这是 20 世纪物理学最早一次"<em>对称性论证驱动新物理</em>" 的成功。</p>
+
+<h2 id="sec2-3">2.3 数量级估算: 电子 vs 棒球</h2>
+
+<p>新公式到手, 第一件该做的事是<em>代具体数算一下</em>。</p>
+
+<p>(例 1: 电子) 取一个能量为 \(E = 100\) eV 的电子（典型阴极射线管尺度）。它的动能 \(E = p^2/(2m_e)\), 解出 \(p = \sqrt{2 m_e E}\)。代数据:</p>
+
+<p>\[
+p = \sqrt{2 \cdot 9.11 \times 10^{-31} \text{ kg} \cdot 100 \cdot 1.6 \times 10^{-19} \text{ J}}
+\approx 5.4 \times 10^{-24} \text{ kg·m/s}.
+\]</p>
+
+<p>de Broglie 波长:</p>
+
+<p>\[
+\lambda = \frac{h}{p} = \frac{6.626 \times 10^{-34}}{5.4 \times 10^{-24}} \approx 1.2 \times 10^{-10} \text{ m} = 1.2 \text{ Å}.
+\]</p>
+
+<p>这个数值<em>恰好等于晶体里原子之间的间距</em>（典型晶格常数 \(\sim 1\)–\(5\) Å）。这个观察非常关键——它意味着如果我们让一束 100 eV 电子打在晶体上, 晶面应该<em>当作衍射光栅</em> 起作用, 给出衍射图样。这正是 1927 Davisson + Germer 实验做的事（下面 2.4 节）。请记住——<em>de Broglie 波长在 Å 量级 ⇔ 原子间距在 Å 量级 ⇔ 晶体衍射可见</em>。</p>
+
+<p>(例 2: 棒球) 取一颗 0.15 kg 的棒球, 速度 40 m/s（投手扔球）。动量 \(p = mv = 6 \text{ kg·m/s}\)。de Broglie 波长:</p>
+
+<p>\[
+\lambda = \frac{h}{p} = \frac{6.626 \times 10^{-34}}{6} \approx 1.1 \times 10^{-34} \text{ m}.
+\]</p>
+
+<p>请你欣赏这个数。\(10^{-34}\) 米。质子直径大约 \(10^{-15}\) 米, 也就是说<em>棒球的物质波长比质子直径还小 19 个数量级</em>。任何"<em>缝</em>" 都比它大太多——所以棒球不会展现出可观的衍射 / 干涉。<em>这就是为什么宏观世界看不见物质波动性</em>——\(h\) 太小, 宏观动量太大, \(\lambda\) 小到无法观测。</p>
+
+<p>这一点是经典物理在宏观尺度仍然适用的<em>定量</em> 解释——<em>量子效应在宏观尺度上不是不存在, 是被 \(h \approx 6.6 \times 10^{-34}\) J·s 这个极小数压到了不可见</em>。把 \(h\) 替换为 1, 棒球也会绕缝衍射。</p>
+
+<p>(例 3: 室温热电子) 看一眼热电子。\(k_B T\) 在室温 (300 K) 大约 \(1/40\) eV。一个热运动的电子动能 \(\sim k_B T\), de Broglie 波长 \(\lambda \approx h/\sqrt{2 m_e k_B T} \approx 60\) Å。这个尺度仍然可观, 是低温固体物理（比如 Bose-Einstein 凝聚, 超导）里量子效应显著的原因——粒子的 de Broglie 波长可以与粒子间距比拟, 量子重叠开始重要。</p>
+
+<h2 id="sec2-4">2.4 撞墙? 还是确认: Davisson-Germer 实验</h2>
+
+<p>1924 年 de Broglie 假设刚提出来, 没有人真的相信"<em>电子是波</em>"。直接的实验检验需要看到电子衍射——衍射是波的标志特征。</p>
+
+<p>1927 年, 美国 Bell 实验室的 Clinton Davisson 和 Lester Germer 做了一个原本完全不为找物质波而设计的实验。他们想研究镍金属表面对电子束的散射——简单地把低能电子（30-200 eV）打到镍片上, 测散射出来的电子角分布。一开始他们看到的角分布是<em>平滑</em> 的, 跟经典预测（电子被原子像台球碰撞那样散射）符合。</p>
+
+<p>实验中间发生意外: 真空泵漏气, 镍片被氧化。为了去掉氧化层, 他们把镍片在高温下退火。退火让<em>多晶</em> 的镍变成几个<em>大单晶</em>。再做散射实验时——突然出现<em>尖锐的衍射峰</em>。在某些特定的入射能量 + 散射角, 电子数量极大; 偏离这些角度则极小。</p>
+
+<p>这种"<em>尖锐峰 + 大量谷</em>" 的角分布<em>正是 X 射线打晶体时</em> 的 Bragg 衍射图样:</p>
+
+<p>\[
+n \lambda = 2 d \sin \theta_{\text{Bragg}},
+\]</p>
+
+<p>其中 \(d\) 是晶面间距, \(\theta_{\text{Bragg}}\) 是 Bragg 角, \(n\) 是衍射级。Davisson + Germer 量了几何（\(d, \theta\)）, 算出"<em>波长</em>" \(\lambda_{\text{measured}}\), 拿去和 de Broglie 公式 \(\lambda = h/p = h/\sqrt{2 m_e E}\)（用电子加速电压换算 \(E\)）比对——<em>完美一致</em>, 误差在百分之几。</p>
+
+<p>这一刻是 de Broglie 假设从"<em>大胆猜想</em>" 升级为"<em>实验事实</em>" 的瞬间。1929 de Broglie 因此获 Nobel 奖（之前 1924 论文还在审, 这条公式 1929 已经站稳）, 1937 Davisson + Thomson 也因电子衍射获 Nobel 奖。</p>
+
+<p>请你停下来注意一件事——Davisson 实验最初<em>不是为了找物质波</em>。是<em>意外的真空泵漏气</em>把一片多晶镍变成单晶, 让 de Broglie 的预测有机会暴露。物理学的实验史上, "<em>意外</em>" 是最常见的发现机制——X 射线、放射性、宇宙微波背景, 全部是这样发现的。Davisson-Germer 是 20 世纪上半叶又一个例子。</p>
+
+<h2 id="sec2-5">2.5 第二份证据: G.P. Thomson 电子衍射</h2>
+
+<p>同年（1927）, 英国剑桥的 George Paget Thomson 做了一个独立实验, 用更高能量（10-50 keV）的电子打<em>多晶</em> 金属薄膜（金、铝）。多晶意味着小晶粒朝向各方向都有, 类似于把许多小衍射光栅按各种角度堆叠在一起。结果是——电子穿过薄膜后, 在后面的胶片上留下<em>同心圆环</em>, 完全像 X 射线 Debye-Scherrer 粉末衍射图样。</p>
+
+<p>这条结果有一个很美的<em>家族讽刺</em>。G.P. Thomson 是 J.J. Thomson 的儿子。J.J. Thomson 1897 年因<em>发现电子是粒子</em>（阴极射线管中的偏转实验）获 Nobel 奖, 30 年后他儿子 G.P. Thomson 因<em>证明电子是波</em> 获 Nobel 奖。父子俩拿同一个东西用相反的实验各自获 Nobel——这正是波粒二象性最干净的注脚。<em>电子既是粒子（J.J.）又是波（G.P.）, 取决于你怎么问</em>。</p>
+
+<p>Davisson + G.P. Thomson 两个独立实验把 de Broglie 钉死。后来还有更精细的实验:</p>
+
+<ul>
+  <li>1930s: 中子衍射（中子也是 \(\lambda = h/p\)——de Broglie 公式不分粒子种类）。</li>
+  <li>1960s-1970s: 质子、原子核衍射。</li>
+  <li>1999 (Vienna): 富勒烯 \(\text{C}_{60}\)（60 个碳原子的足球分子, 质量 720 amu）也展现衍射。</li>
+  <li>2013: 810 个原子组成的有机分子（1 万倍质子质量）也展现衍射。</li>
+</ul>
+
+<p>de Broglie \(\lambda = h/p\) <em>不分质量、不分电荷、不分组成</em>。所有有动量的物体都有物质波。把分子做得越大, \(\lambda\) 越小, 衍射越难看到——但只要实验做得够精, 总能看到。这是迄今物理学测试过<em>最普适</em> 的关系之一。</p>
+
+<h2 id="sec2-6">2.6 一个更深的实验: 电子双缝</h2>
+
+<p>晶体衍射证明了"<em>电子有波长</em>"。但有一种更彻底、更让人不安的实验——<em>双缝</em>。把电子<em>一个一个</em> 发射, 让它穿过两条缝, 看屏上的图样。</p>
+
+<p>这个实验思想 de Broglie 时代就有人提过, 但当时电子源 + 探测器达不到"<em>一次一个</em>" 的水平。1961 年 Claus Jönsson 在德国第一次用光刻法做出几微米级的双缝, 看到电子双缝干涉条纹（与光的双缝条纹形状一致）。1989 年日立的 Tonomura 团队做了"<em>一次发一个电子</em>" 版本——每一个电子在屏上留下一个<em>点</em>（粒子的痕迹）, 但等几万个电子积累起来, 这些点的<em>分布</em> 是干涉条纹（波的模样）。</p>
+
+<p>请你认真想这件事。每个单一电子的<em>点</em> 出现在屏上某一个位置, 那个位置似乎不可预测——这个电子下一次出现在哪里, 是<em>随机</em> 的。但如果你重复几万次, 这些"<em>随机</em>" 落点累计成<em>干涉条纹</em>——也就是说, 单个电子虽然落点随机, 但<em>落点的概率分布</em> 受波动性主导, 是 \(|\psi(x)|^2\) 这个量（ch4 详谈 Born 概率诠释）。</p>
+
+<p>这一刻把"<em>波 vs 粒子</em>" 的张力推到了最尖锐:</p>
+
+<ul>
+  <li><em>每一个电子</em> 是粒子——它在屏上留下<em>一个点</em>, 不是模糊的波包。</li>
+  <li><em>多个电子的统计</em> 是波——点的分布构成干涉条纹。</li>
+</ul>
+
+<p>这两条同时为真。你不能说"<em>电子是波</em>" 也不能说"<em>电子是粒子</em>"——它<em>不是这二者中任一种</em> 经典对象, 它是一种新的东西, 行为既不像粒子也不像波, 但在合适的极限下退化为其中一种。Feynman 名言: "<em>I think I can safely say that nobody understands quantum mechanics.</em>" 这句话指的就是这种"<em>电子既不是经典波也不是经典粒子</em>" 的尴尬本质。</p>
+
+<h2 id="sec2-7">2.7 Reframe: 测"电子从哪个缝过"</h2>
+
+<p>电子双缝看到了干涉条纹。下一个朴素问题: <em>电子到底从哪条缝过的</em>？两条缝中只能选一条, 对吧？让我们在两条缝旁边各放一个探测器, 测一下到底是哪条。</p>
+
+<p>实验结果（这种"<em>哪条路</em>" 实验有许多变种, 但结论一致）: 一旦你装上探测器测电子从哪条缝过——<em>干涉条纹消失</em>。屏上看到的不再是明暗条纹, 而是两条亮带（一条对应每条缝）, 像粒子流应该呈现的那样。</p>
+
+<p>请把这件事和上一节并排放着:</p>
+
+<ul>
+  <li>(不测) 电子穿两缝 → 屏上是<em>干涉条纹</em>（波动行为）。</li>
+  <li>(测) 电子穿两缝 + 探测哪条缝 → 屏上是<em>两条亮带</em>（粒子行为）。</li>
+</ul>
+
+<p>仅仅是"<em>问</em>" 这个问题（即测量哪条缝）就改变了实验结果。<em>测量本身</em> 不是被动观察, 它是主动作用——它把电子从"<em>同时穿两缝的相干叠加</em>" 投影到"<em>穿了某一条特定缝的本征态</em>"。这就是后来 ch4 + ch12 详谈的<em>测量塌缩</em> 雏形。</p>
+
+<p>朴素物理直觉无法消化这件事——"<em>测一下而已, 怎么会改变结果</em>？" 但量子力学的回答是: 测量过程必然伴随能量交换（你要让光子打到电子上才能"<em>看见</em>" 它经过哪条缝）, 而光子的动量足以扰乱电子原本的波函数。这条扰乱的<em>下界</em> 由 Heisenberg 不确定关系给出: \(\Delta x \cdot \Delta p \geq \hbar/2\)（ch11 详谈）。要测得位置（哪条缝）就必然扰乱动量（即破坏干涉条纹的相位关系）。</p>
+
+<p>更微妙: 即使你"<em>测了但不读出结果</em>", 干涉条纹仍然消失。<em>不是观察者意识参与改变了实验</em>, 是<em>测量装置与电子发生纠缠</em> 这件事本身改变了实验。这是 ch22 量子纠缠 + 退相干的核心。</p>
+
+<p>这一节我想留你停下来感受一件事——<em>de Broglie 的 \(\lambda = h/p\) 不仅给电子一个波长, 它把整个测量观打翻了</em>。在经典物理里, 测量就是被动看一眼, 不影响被测物。在量子里, 测量是主动操作, 改变被测物的状态。这条话先记下, 后面 ch12 会有完整的"<em>测量公设</em>" 给出。</p>
+
+<h2 id="sec2-8">2.8 命名 + 一般化: 频率 \(\nu = E/h\) 与群速度</h2>
+
+<p>de Broglie 的两条关系合起来给物质波<em>完整</em> 的波动学描述:</p>
+
+<p>\[
+\boxed{\ \nu = \frac{E}{h}, \quad \lambda = \frac{h}{p}.\ }
+\]</p>
+
+<p>用约化 Planck 常数 \(\hbar = h/(2\pi)\) 改写更紧凑:</p>
+
+<p>\[
+\boxed{\ E = \hbar \omega, \quad \boldsymbol p = \hbar \boldsymbol k,\ }
+\]</p>
+
+<p>其中 \(\omega = 2\pi \nu\) 是角频率, \(\boldsymbol k\) 是<em>波矢</em>（\(|\boldsymbol k| = 2\pi/\lambda\), 方向沿波传播方向）。这两条关系——<em>把波动学量（\(\omega, \boldsymbol k\)）与粒子学量（\(E, \boldsymbol p\)）通过 \(\hbar\) 一一对应</em>——是量子力学的基石之一。它们在下一章会反复出场。</p>
+
+<p>那物质波长这样, 物质波的<em>速度</em> 是多少？请你想想, 如果电子是波, 它的"<em>波速</em>" 与电子作为<em>粒子</em> 的运动速度有什么关系？</p>
+
+<p>(朴素试算) 一个频率 \(\omega\) 波长 \(\lambda\) 的波, <em>相速度</em> 是 \(v_{\phi} = \omega/k\)。代物质波: \(\omega = E/\hbar = (p^2/2m)/\hbar\), \(k = p/\hbar\), 所以</p>
+
+<p>\[
+v_\phi = \frac{\omega}{k} = \frac{p^2/2m\hbar}{p/\hbar} = \frac{p}{2m} = \frac{v_{\text{粒子}}}{2}.
+\]</p>
+
+<p><em>相速度只是粒子速度的一半</em>。这看起来不对——波代表粒子, 应该和粒子一起跑才对。这条悖论是 de Broglie 时代真正困惑过物理学家的。</p>
+
+<p>(reframe) 答案: 单一波长的<em>纯正弦波</em>（\(e^{i(kx - \omega t)}\)）<em>不</em> 描述定位粒子——它在整个空间均匀散开, 没有"<em>位置</em>"。要描述一个有定位的粒子, 需要把许多不同 \(k\) 的正弦波叠加成<em>波包</em>:</p>
+
+<p>\[
+\psi(x, t) = \int A(k) e^{i(kx - \omega(k) t)} \, dk,
+\]</p>
+
+<p>其中 \(A(k)\) 是窄带分布（中心在某个 \(k_0\) 附近）。这种波包有一个确定的中心位置, 这个中心移动的速度叫<em>群速度</em>:</p>
+
+<p>\[
+v_g = \frac{d\omega}{dk} \bigg|_{k_0}.
+\]</p>
+
+<p>代物质波 \(\omega(k) = \hbar k^2/(2m)\):</p>
+
+<p>\[
+v_g = \frac{d\omega}{dk} = \frac{\hbar k}{m} = \frac{p}{m} = v_{\text{粒子}}.
+\]</p>
+
+<p><em>群速度 = 粒子速度</em>。这是说, <em>波包</em>（不是单一正弦波）的运动速度恰好等于粒子的经典速度。物质波与粒子运动一致——相速度 \(v_\phi\) 与粒子速度不同没问题, 因为相速度是无物理对象的"<em>相位移动速度</em>"; 群速度才是<em>能量 + 信息 + 概率密度</em> 实际移动的速度。</p>
+
+<p>(连接) 这条 \(v_g = v_{\text{粒子}}\) 的等式不是巧合——它是 de Broglie 关系 \(E = \hbar \omega, p = \hbar k\) 的<em>必然结果</em>: \(v_g = d\omega/dk = (dE/dp)/(\hbar/\hbar) = dE/dp\)。对于经典粒子 \(E = p^2/(2m)\), \(dE/dp = p/m = v\)。完全自洽。这条自洽性对 de Broglie 说"<em>对了, 物质波的频率 \(\nu = E/h\) 选得对</em>"。</p>
+
+<h2 id="sec2-9">2.9 这条公式的力量</h2>
+
+<p>把这一章的关键画面合到一起:</p>
+
+<ul>
+  <li><strong>朴素一问</strong>: 光既是波又是粒子, 物质呢？</li>
+  <li><strong>de Broglie 假设</strong>: \(\lambda = h/p\), \(\nu = E/h\)。所有有动量的物质都有波长。</li>
+  <li><strong>数量级</strong>: 100 eV 电子 \(\lambda \sim\) 1 Å, 棒球 \(\lambda \sim 10^{-34}\) m。宏观看不见量子。</li>
+  <li><strong>实验证据</strong>: Davisson-Germer (1927 单晶镍) + G.P. Thomson (1927 多晶薄膜) + 双缝 (1961 Jönsson, 1989 Tonomura)。</li>
+  <li><strong>测量塌缩</strong>: 测电子穿哪条缝 → 干涉消失。测量改变态。</li>
+  <li><strong>群速度</strong>: \(v_g = v_{\text{粒子}}\), 物质波包跟随粒子一起运动。</li>
+</ul>
+
+<p>这条 \(\lambda = h/p\) 公式有一个比"<em>电子衍射</em>" 更深的影响——它启发 1926 Schrödinger 写出他的方程。Schrödinger 当时听 Debye 在苏黎世讲 de Broglie 论文。Debye 半开玩笑地说"<em>有了波长, 应该有个波动方程才对</em>"。这句话戳中 Schrödinger 心思——他后来在阿尔卑斯山度假时把方程写出来:</p>
+
+<p>\[
+i\hbar \frac{\partial \psi}{\partial t} = -\frac{\hbar^2}{2m} \nabla^2 \psi + V \psi.
+\]</p>
+
+<p>这就是<em>Schrödinger 方程</em>, 物质波满足的运动方程。下一章我们详解他怎么"<em>猜</em>" 出这条方程——从经典 \(E = p^2/(2m) + V\) 出发, 用算子替换 \(E \to i\hbar \partial_t, \boldsymbol p \to -i\hbar \nabla\), 直接得到。请记住这条路径——它不是从经典力学严格<em>推</em> 出来, 是从经典力学+ de Broglie 关系<em>类比 + 猜出来</em>; 它的正确性最终由实验（氢原子谱、势阱能级、Compton 散射等）验证。</p>
+
+<h2 id="sec2-10">2.10 临别话</h2>
+
+<p>1924 年 26 岁的 de Broglie 在巴黎写下 \(\lambda = h/p\), 物理学的整个轨迹从此改向。这条公式简单到能写在邮票上, 但它说的事——<em>物质本质上是波</em>——把 200 多年牛顿粒子图像推翻。</p>
+
+<p>请你欣赏这条公式的<em>普适性</em>。它对电子成立, 对中子成立, 对原子成立, 对 \(\text{C}_{60}\) 富勒烯成立, 对 810 原子分子成立, 应该对你也成立——你的 de Broglie 波长大约 \(10^{-35}\) m, 远小于任何可能的"<em>缝</em>", 所以你不会衍射。但<em>原则上</em> 你也是波。</p>
+
+<p>这条普适性背后是<em>对称性</em>。光与物质的统一不是巧合, 是更深一层结构的表现。这层结构在 1925-1926 年由 Heisenberg + Schrödinger + Born 几个月内完整建立——量子力学。</p>
+
+<p>下一章我们走到这条故事的高潮。Schrödinger 1926 在阿尔卑斯山写出他的方程。我们一步一步走过他怎么"<em>猜</em>" 出这条方程: 从经典 \(E = p^2/(2m) + V(\boldsymbol x)\) 出发, 用算子替换 \(E \to i\hbar \partial_t, \boldsymbol p \to -i\hbar \nabla\), 验证平面波 \(e^{i(\boldsymbol k \cdot \boldsymbol x - \omega t)}\) 满足自由粒子情形当且仅当 \(\omega = \hbar k^2/(2m)\)（这正是 de Broglie 关系给的色散）, 分离变量得到时间无关 SE。这条方程是量子力学的"<em>F = ma</em>"——剩下的 22 章我们都在解它的各种特殊情形。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论</a><a href="ch3.html">下一章 · 第 3 章 Schrödinger 方程 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 Hilbert 空间形式 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 势垒与隧穿</a><a href="ch10.html">下一章 · 第 10 章 可观测量 + 期望 →</a></nav>
+<h1 id="ch9">第 9 章 Hilbert 空间形式</h1>
+
+<p>到目前为止, 我们都在用<em>波函数</em> \(\psi(x, t)\) 写 QM。Schrödinger 方程是个 PDE 关于 \(\psi(x, t)\); 概率密度是 \(|\psi(x)|^2\); 算子是 \(\hat x = x\) 和 \(\hat p = -i\hbar \partial_x\)。这套写法叫<em>位置表象</em>（position representation）, 因为所有东西用"<em>位置坐标 \(x\)</em>" 表达。</p>
+
+<p>但请你回想 ch3 的<em>de Broglie 关系</em>: 一个动量为 \(p\) 的自由粒子对应平面波 \(e^{ipx/\hbar}\)。如果我把波函数<em>分解</em> 为不同动量的平面波叠加（这是 Fourier 变换）:</p>
+
+<p>\[
+\psi(x) = \int \tilde\psi(p) \, e^{ipx/\hbar} \, \frac{dp}{\sqrt{2\pi\hbar}},
+\]</p>
+
+<p>那 \(\tilde\psi(p)\) 就是<em>动量表象</em> 的波函数。\(|\tilde\psi(p)|^2\) 给"<em>动量在 \(p\) 处的概率密度</em>", 完全合法地刻画同一个量子态。</p>
+
+<p>这说明<em>同一个量子态</em>能被两种不同函数刻画——\(\psi(x)\) 或 \(\tilde\psi(p)\)。它们关系是 Fourier 变换。两种都"<em>对</em>", 但都依赖一个<em>选择</em>（哪个变量当横轴）。</p>
+
+<p>这是个<em>不优雅</em> 的状态——我们的"<em>态</em>" 没法不依赖某个基去描述。类似线性代数里, 一个向量的"<em>分量列表</em>" 依赖你选什么基, 但向量本身不依赖。我们要找的是 QM 里那个"<em>向量本身</em>"。</p>
+
+<p>1930 Paul Dirac 在《Principles of Quantum Mechanics》里给出答案——QM 的态是<em>抽象 Hilbert 空间</em> 中的向量, 记作 \(|\psi\rangle\); 不依赖任何具体基。波函数 \(\psi(x), \tilde\psi(p)\) 只是这同一个向量在<em>位置基</em>、<em>动量基</em> 下的<em>分量</em>。这套语言今天在所有现代 QM 教科书里通用, 叫"<em>Dirac 记号</em>" 或"<em>bra-ket</em> 记号"。</p>
+
+<p>这一章把它建起来。链回<a href="../泛函分析/index.html">泛函分析</a> 第 3 章 Hilbert 空间 + 第 7 章正交基——你以前学的几乎每一条都直接搬过来用。</p>
+
+<h2 id="sec9-1">9.1 复习 \(L^2\) 是个 Hilbert 空间</h2>
+
+<p>泛函分析里, <em>Hilbert 空间</em> \(H\) 是: 一个复数域 \(\mathbb C\) 上的向量空间, 装备一个<em>内积</em> \(\langle \cdot, \cdot \rangle: H \times H \to \mathbb C\) 满足共轭对称 \(\langle \phi, \psi\rangle = \overline{\langle \psi, \phi \rangle}\)、第二位线性、正定 \(\langle \psi, \psi\rangle \geq 0\) 且 \(= 0 \Leftrightarrow \psi = 0\), 且<em>完备</em>（关于诱导范数 \(\|\psi\| = \sqrt{\langle \psi, \psi \rangle}\) 的 Cauchy 列收敛）。</p>
+
+<p>QM 用的是 \(L^2(\mathbb R)\)（一维粒子）或 \(L^2(\mathbb R^3)\)（三维粒子）, 即"<em>平方可积复值函数</em>" 的全集</p>
+
+<p>\[
+L^2(\mathbb R) = \left\{ \psi: \mathbb R \to \mathbb C \,\middle|\, \int_{-\infty}^{\infty} |\psi(x)|^2 \, dx < \infty \right\},
+\]</p>
+
+<p>内积</p>
+
+<p>\[
+\langle \phi, \psi \rangle = \int_{-\infty}^{\infty} \overline{\phi(x)} \, \psi(x) \, dx.
+\]</p>
+
+<p>泛函分析 ch3 证明了这是个 Hilbert 空间。可分（separable）——存在可数稠密子集——所以有可数<em>正交基</em>。</p>
+
+<p>QM 的"<em>波函数</em>" 就是 \(L^2\) 里的<em>单位向量</em>: \(\|\psi\| = 1\), 即 \(\int |\psi|^2 = 1\)（归一化条件——\(|\psi|^2\) 是概率密度, 总概率 = 1）。</p>
+
+<h2 id="sec9-2">9.2 状态 = Hilbert 空间里的<em>射线</em></h2>
+
+<p>请你停下来注意一个细节——QM 里两个差<em>整体相位</em> 的态, \(\psi\) 和 \(e^{i\theta} \psi\), 给的所有概率<em>完全相同</em>: \(|\psi|^2 = |e^{i\theta} \psi|^2\); 期望值也相同 \(\langle e^{i\theta}\psi | \hat A | e^{i\theta}\psi\rangle = \langle \psi | \hat A | \psi\rangle\)（共轭抵消）。所以 \(\psi\) 和 \(e^{i\theta} \psi\) 在物理上<em>等价</em>。</p>
+
+<p>严格说<em>状态</em>不是单位向量, 是"<em>等价类</em>"——所有"<em>差一个相位的单位向量</em>" 的等价类（叫"<em>射线</em>"）。Hilbert 空间里这些射线集合叫<em>射影 Hilbert 空间</em> \(\mathbb P(H)\)。</p>
+
+<p>不过实践中, 我们随便选射线里某个代表元, 当作"<em>态向量</em>"; 只要记得相位无物理意义就行。下面我用 \(|\psi\rangle\) 时既指射线又指它的代表, 上下文清楚。</p>
+
+<h2 id="sec9-3">9.3 命名: bra-ket 记号</h2>
+
+<p>Dirac 记号是<em>纯符号</em> 上的革新——把内积 \(\langle \phi, \psi\rangle\) 拆成两半: <em>bra</em> \(\langle \phi |\) 和 <em>ket</em> \(|\psi\rangle\)。<em>合起来</em> 写就是内积 \(\langle \phi | \psi \rangle\)。"<em>ket</em>" 是英文 brac<em>ket</em> 后半, "<em>bra</em>" 是前半。这名字 Dirac 自己起的。</p>
+
+<p><strong>Ket \(|\psi\rangle\).</strong> 表示 Hilbert 空间 \(H\) 里的一个向量。\(|\psi\rangle, |\phi\rangle, |0\rangle, |1\rangle, |n\rangle, |x\rangle, |p\rangle\) 都是 ket 写法。</p>
+
+<p><strong>Bra \(\langle \phi|\).</strong> 表示 \(H\) 的<em>对偶空间</em> \(H^*\) 里的一个元素——即从 \(H\) 到 \(\mathbb C\) 的连续线性映射。Riesz 表示定理（泛函分析 ch5）说 \(H \cong H^*\) 通过 \(\phi \mapsto \langle \phi, \cdot \rangle\)。所以 \(\langle \phi|\) 实质就是"<em>把 \(|\psi\rangle\) 映成 \(\langle \phi, \psi\rangle\)</em>" 这个线性泛函。</p>
+
+<p><strong>内积 \(\langle \phi | \psi \rangle\).</strong> 把 bra 作用到 ket 上, 得复数。即 \(\langle \phi, \psi\rangle\)（旧记号）= \(\langle \phi | \psi \rangle\)（Dirac 记号）。</p>
+
+<p><strong>外积 \(|\psi\rangle \langle \phi |\).</strong> 这是 Dirac 记号的真正力量——一个 ket 写在<em>左</em>、一个 bra 写在<em>右</em>, 表示一个<em>算子</em>:</p>
+
+<p>\[
+\big(|\psi\rangle \langle \phi|\big) |\chi\rangle = |\psi\rangle \cdot \langle \phi | \chi \rangle = \langle\phi|\chi\rangle \cdot |\psi\rangle.
+\]</p>
+
+<p>把 \(|\chi\rangle\) 投到 \(\phi\) 方向（标量 \(\langle\phi|\chi\rangle\)）, 然后乘 \(|\psi\rangle\)。这是 \(H\) 上的秩 1 算子。</p>
+
+<p><strong>共轭关系.</strong> 算子 \(\hat A\) 作用到 ket 上 \(\hat A |\psi\rangle\); 它的<em>伴随</em> \(\hat A^\dagger\) 作用到 bra 上 \(\langle\psi| \hat A^\dagger\)。这两件事满足</p>
+
+<p>\[
+\langle \phi | \hat A \psi\rangle = \langle \hat A^\dagger \phi | \psi\rangle.
+\]</p>
+
+<p>用 Dirac 记号写就是 \(\langle \phi | \hat A | \psi \rangle\)——把它读成"<em>bra \(\phi\) 与 ket \(\hat A\psi\) 的内积</em>"或"<em>bra \(\hat A^\dagger \phi\) 与 ket \(\psi\) 的内积</em>", 两种读法<em>等值</em>, 这就是为什么三明治记号<em>不需要</em>区分括号位置——两种意思一致。</p>
+
+<p>请你停下来感受这套记号的优雅. 经典向量代数里, 行向量乘列向量得标量（内积）; 列向量乘行向量得矩阵（外积）。Dirac bra-ket 是这套规则在<em>无穷维 Hilbert 空间</em> 上的直接推广。bra 是行, ket 是列; \(\langle\phi|\psi\rangle\) 是行 × 列 = 标量, \(|\psi\rangle\langle\phi|\) 是列 × 行 = 矩阵 / 算子。</p>
+
+<h2 id="sec9-4">9.4 完备基 + 恒等分解</h2>
+
+<p>泛函分析 ch7 教过——可分 Hilbert 空间有<em>正交归一基</em> \(\{|n\rangle\}_{n=1}^{\infty}\): \(\langle m | n \rangle = \delta_{mn}\), 任意 \(|\psi\rangle\) 可唯一展开</p>
+
+<p>\[
+|\psi\rangle = \sum_{n} c_n |n\rangle, \qquad c_n = \langle n | \psi \rangle.
+\]</p>
+
+<p>展开系数 \(c_n\) 直接由内积给出（这就是基的<em>正交归一</em> 的好处）。</p>
+
+<p>把 \(c_n\) 代回:</p>
+
+<p>\[
+|\psi\rangle = \sum_n \langle n | \psi \rangle \, |n\rangle = \sum_n |n\rangle \langle n | \psi \rangle = \left( \sum_n |n\rangle \langle n| \right) |\psi\rangle.
+\]</p>
+
+<p>因为这对<em>任意</em> \(|\psi\rangle\) 成立, 所以括号里的算子等于<em>恒等算子</em>:</p>
+
+<p>\[
+\boxed{\ \sum_n |n\rangle \langle n| = \hat I.\ }
+\]</p>
+
+<p>这条叫<em>恒等分解</em>（resolution of the identity）, 或<em>完备性关系</em>。它在 QM 里到处插入做"<em>插入恒等</em>" 技巧——比如想把内积 \(\langle \phi | \psi \rangle\) 变成基分量的形式:</p>
+
+<p>\[
+\langle \phi | \psi \rangle = \langle \phi | \hat I | \psi \rangle = \sum_n \langle \phi | n \rangle \langle n | \psi \rangle = \sum_n \overline{c_n^\phi} \, c_n^\psi.
+\]</p>
+
+<p>这是 Parseval 恒等式: 内积 = 分量复共轭乘积之和。</p>
+
+<p>类似地, 把任意算子 \(\hat A\) 写在基里:</p>
+
+<p>\[
+\hat A = \hat I \, \hat A \, \hat I = \sum_{m, n} |m\rangle \langle m| \hat A |n\rangle \langle n| = \sum_{m,n} A_{mn} |m\rangle\langle n|,
+\]</p>
+
+<p>其中 \(A_{mn} = \langle m | \hat A | n \rangle\) 是<em>矩阵元</em>。这把抽象算子化成具体矩阵, 矩阵元由"<em>三明治</em>" \(\langle m | \hat A | n \rangle\) 给。</p>
+
+<h2 id="sec9-5">9.5 谐振子例子</h2>
+
+<p>把 ch7 的谐振子拿出来用 Dirac 语言重写。谐振子 Hamiltonian \(\hat H = \hat p^2/(2m) + m\omega^2 \hat x^2 / 2\) 的本征态记为 \(|n\rangle, n = 0, 1, 2, \ldots\), 满足</p>
+
+<p>\[
+\hat H |n\rangle = E_n |n\rangle, \qquad E_n = \hbar \omega \left( n + \frac{1}{2} \right).
+\]</p>
+
+<p>它们正交归一 \(\langle m | n \rangle = \delta_{mn}\), 构成 \(L^2(\mathbb R)\) 的完备基（这是 Hermite 多项式的完备性, 泛函分析 ch9）。任一态</p>
+
+<p>\[
+|\psi\rangle = \sum_{n=0}^{\infty} c_n |n\rangle, \qquad c_n = \langle n | \psi \rangle.
+\]</p>
+
+<p>归一化 \(\|\psi\|^2 = \sum_n |c_n|^2 = 1\)。\(|c_n|^2\) 在测量能量时给"<em>得到 \(E_n\) 的概率</em>"（ch10 详谈）。</p>
+
+<p>升降算子（ch7）在 Dirac 记号里很简洁:</p>
+
+<p>\[
+\hat a^\dagger |n\rangle = \sqrt{n+1} \, |n+1\rangle, \qquad \hat a |n\rangle = \sqrt{n} \, |n-1\rangle, \qquad \hat a |0\rangle = 0.
+\]</p>
+
+<p>用<em>外积</em> 形式:</p>
+
+<p>\[
+\hat a^\dagger = \sum_{n=0}^{\infty} \sqrt{n+1} \, |n+1\rangle\langle n|.
+\]</p>
+
+<p>Hamiltonian 的<em>谱分解</em>:</p>
+
+<p>\[
+\hat H = \sum_{n=0}^{\infty} E_n |n\rangle\langle n| = \sum_n \hbar\omega \left(n + \frac{1}{2}\right) |n\rangle\langle n|.
+\]</p>
+
+<p>这是"<em>能量基</em> 下的算子矩阵</em>"——对角矩阵, 对角元就是能级。这就是 Heisenberg 1925 矩阵力学的"<em>矩阵</em>" 的来源——你<em>选了</em> 能量基, 然后把所有算子写成对角 / 非对角矩阵。Schrödinger 1926 波动力学是"<em>位置基</em>" 的写法。两者只是同一个抽象 Hilbert 空间结构在不同基下的<em>表象</em>, 是"<em>同一个</em> QM"。Schrödinger 1926 自己证了等价。</p>
+
+<h2 id="sec9-6">9.6 位置基: 连续基与广义本征态</h2>
+
+<p>谐振子能量基 \(\{|n\rangle\}\) 是<em>可数离散</em> 的——这是个干净 Hilbert 基。但 QM 还自然地用一个<em>连续</em> 基——<em>位置基</em> \(\{|x\rangle\}_{x \in \mathbb R}\)。</p>
+
+<p>设想 \(|x\rangle\) 是"<em>位置算子</em> \(\hat x\) 的本征值 \(x\) 对应的本征态</em>":</p>
+
+<p>\[
+\hat x |x\rangle = x |x\rangle.
+\]</p>
+
+<p>问题——这种 \(|x\rangle\) <em>不在 \(L^2\) 里</em>。位置完全确定的态对应"<em>全部概率密度集中在一个点</em>", 即 \(\delta(x' - x)\) 函数; 但 \(\delta\) 不是平方可积函数, 不是 \(L^2\) 元素。</p>
+
+<p>这是泛函分析处理"<em>连续谱</em>" 的标准困难。严格做法用<em>装备 Hilbert 空间</em>（Gelfand triple）<em>\(\Phi \subset H \subset \Phi'\)</em>——\(|x\rangle\) 住在比 \(H\) 大的<em>分布空间</em> \(\Phi'\) 里, 不是 \(H\) 本身。这是泛函分析 ch15 + ch21 谱定理连续谱版的内容。</p>
+
+<p>实践上 QM 教科书装作 \(|x\rangle\) 是"<em>无穷范数的本征向量</em>", 满足类似离散基的关系, 但用 \(\delta\) 替代 Kronecker:</p>
+
+<p>\[
+\langle x | x' \rangle = \delta(x - x'), \qquad \int |x\rangle\langle x| \, dx = \hat I.
+\]</p>
+
+<p>"<em>恒等分解</em>" 现在是<em>积分</em>, 不是求和。</p>
+
+<p>波函数和这个基的关系:</p>
+
+<p>\[
+\boxed{\ \psi(x) = \langle x | \psi \rangle.\ }
+\]</p>
+
+<p>波函数<em>就是</em> 抽象态向量 \(|\psi\rangle\) 在<em>位置基</em> 下的"<em>分量</em>"。它依赖 \(x\)（连续标号）, 不是 \(c_n\) 那种离散数列。</p>
+
+<p>验证: 用恒等分解</p>
+
+<p>\[
+|\psi\rangle = \int |x\rangle \langle x | \psi \rangle \, dx = \int \psi(x) \, |x\rangle \, dx,
+\]</p>
+
+<p>所以态向量是"<em>位置本征态</em> \(|x\rangle\) 加权 \(\psi(x)\) 的连续叠加"。这是 \(\psi(x)\) 的精确意义。</p>
+
+<p>同样, 内积:</p>
+
+<p>\[
+\langle \phi | \psi \rangle = \int \langle \phi | x \rangle \langle x | \psi \rangle \, dx = \int \overline{\phi(x)} \, \psi(x) \, dx.
+\]</p>
+
+<p>这<em>就是</em> 一开始 9.1 的 \(L^2\) 内积。Dirac 记号自动给出。</p>
+
+<p>位置算子在位置基下的"<em>矩阵元</em>":</p>
+
+<p>\[
+\langle x | \hat x | x' \rangle = x' \langle x | x' \rangle = x' \delta(x - x') = x \delta(x - x').
+\]</p>
+
+<p>对角"<em>矩阵</em>"。作用到波函数:</p>
+
+<p>\[
+\langle x | \hat x | \psi \rangle = \int \langle x | \hat x | x' \rangle \langle x' | \psi \rangle \, dx' = \int x \delta(x - x') \psi(x') \, dx' = x \psi(x).
+\]</p>
+
+<p>\(\hat x\) 在位置基下就是"<em>乘以 \(x\)</em>"——和我们前面用的一致。</p>
+
+<h2 id="sec9-7">9.7 动量基</h2>
+
+<p>动量算子 \(\hat p = -i\hbar \partial_x\) 的本征态——满足 \(\hat p |p\rangle = p |p\rangle\), 即 \(-i\hbar \partial_x \langle x|p\rangle = p \langle x|p\rangle\)。这是 ODE</p>
+
+<p>\[
+\frac{d}{dx} \langle x | p \rangle = \frac{ip}{\hbar} \langle x | p \rangle, \quad \Longrightarrow \quad \langle x | p \rangle = C e^{ipx/\hbar}.
+\]</p>
+
+<p>归一化常数 \(C\) 用 \(\delta\) 函数关系定:</p>
+
+<p>\[
+\langle p | p' \rangle = \int \langle p | x \rangle \langle x | p' \rangle \, dx = |C|^2 \int e^{i(p' - p)x/\hbar} \, dx = |C|^2 \cdot 2\pi\hbar \, \delta(p - p').
+\]</p>
+
+<p>要 \(\langle p | p' \rangle = \delta(p - p')\), 取 \(C = 1/\sqrt{2\pi\hbar}\):</p>
+
+<p>\[
+\boxed{\ \langle x | p \rangle = \frac{1}{\sqrt{2\pi\hbar}} e^{ipx/\hbar}.\ }
+\]</p>
+
+<p>这是连接位置基和动量基的<em>变换核</em>。</p>
+
+<p>动量基也是连续基:</p>
+
+<p>\[
+\langle p | p' \rangle = \delta(p - p'), \qquad \int |p\rangle\langle p| \, dp = \hat I.
+\]</p>
+
+<p>动量空间波函数 \(\tilde\psi(p) := \langle p | \psi \rangle\)。它和位置波函数关系:</p>
+
+<p>\[
+\tilde\psi(p) = \langle p | \psi \rangle = \int \langle p | x \rangle \langle x | \psi \rangle \, dx = \int \frac{e^{-ipx/\hbar}}{\sqrt{2\pi\hbar}} \psi(x) \, dx.
+\]</p>
+
+<p>这是<em>Fourier 变换</em>! 动量基波函数是位置基波函数的 Fourier 变换, 反之亦然</p>
+
+<p>\[
+\psi(x) = \int \frac{e^{ipx/\hbar}}{\sqrt{2\pi\hbar}} \tilde\psi(p) \, dp.
+\]</p>
+
+<p>请你停下来感受这件事——位置 vs 动量在 QM 里是<em>傅里叶对偶</em> 的关系。两个<em>同等地位</em> 的连续基, 波函数在它们之间互相 Fourier 变换。这条性质在 ch11 给出<em>不确定性关系</em>: 位置波函数窄 ⟺ 动量波函数宽（Fourier 不确定性）⟹ \(\Delta x \, \Delta p \geq \hbar/2\)。</p>
+
+<h2 id="sec9-8">9.8 表象变换 = Fourier 变换</h2>
+
+<p>把 9.6 + 9.7 合起来——同一个抽象态 \(|\psi\rangle\), 选位置基给 \(\psi(x)\), 选动量基给 \(\tilde\psi(p)\); 两者通过 Fourier 变换互相变换。这就是 QM 里"<em>表象变换</em>" 的最基本例子。</p>
+
+<p>更广义地, 选<em>任意</em> 算子 \(\hat A\) 的本征基都给一个表象。能量基 \(|n\rangle\)（\(\hat H\) 的本征基）给"<em>能量表象</em>"; 角动量本征基（ch14 起用）给"<em>角动量表象</em>"; 自旋基给"<em>自旋表象</em>"。在不同基里, 同一个态写作不同的"<em>分量</em>" 函数, 不同算子写作不同矩阵 / 微分算子。但<em>抽象</em> 内积、模、期望、概率<em>不变</em>。</p>
+
+<p>这件事在线性代数里你已经熟悉——同一个向量在不同基下分量不同, 但模、内积不变。Hilbert 空间是无穷维推广, 同样的话照搬。</p>
+
+<p>QM 计算的"<em>选一个好基</em>" 就像线代里"<em>选一个好基</em>"——可以把哈密顿对角化, 让动力学一目了然。能量基里 \(\hat H\) 是对角矩阵, 时间演化简单 \(|\psi(t)\rangle = \sum_n c_n e^{-iE_n t/\hbar} |n\rangle\)。位置基里波函数 \(\psi(x)\) 直观可视化, 但时间演化是 PDE。两种各有用途。</p>
+
+<h2 id="sec9-9">9.9 临别话</h2>
+
+<p>Dirac 记号是 1930 年代抽象化的产物——把 QM 从"<em>解 PDE</em>" 抽离到"<em>Hilbert 空间几何</em>"。这一抽象有三个直接好处:</p>
+
+<ol>
+  <li><em>统一</em>波动力学（Schrödinger）和矩阵力学（Heisenberg）。两者只是不同表象。</li>
+  <li><em>解放</em> 计算从某个特定基里跳出来。"<em>插入恒等</em>" 让你随时换基, 选最方便的。</li>
+  <li><em>把数学交给</em>泛函分析。所有内积、正交、谱分解、伴随都按 Hilbert 空间标准走, 而泛函分析已经把这些证完。</li>
+</ol>
+
+<p>方法论上, 这一章是 ch3-8 的<em>跨越</em>——前面我们都"<em>解 SE 取波函数</em>", 现在要把这件事看成"<em>计算抽象算子的谱</em>"。后面 ch10-13 都建在这个抽象上: 测量假设、不确定性、对易、表象变换。</p>
+
+<p>下一章我们用 Dirac 记号把 QM 的<em>测量假设</em> 写出来。可观测量（位置、动量、能量、角动量）都是<em>自伴算子</em>; 测量得的可能值是算子的<em>谱</em>; 概率由"<em>态投影到谱本征子空间</em> 的模平方" 给出; 期望值是 \(\langle\psi|\hat A|\psi\rangle\)。这条假设链回<a href="../泛函分析/ch21.html">泛函分析 ch21</a> 谱定理——QM 的"<em>测量</em>" 在数学层面就是谱定理本身。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 势垒与隧穿</a><a href="ch10.html">下一章 · 第 10 章 可观测量 + 期望 →</a></nav>
+</main>
+</body>
+</html>

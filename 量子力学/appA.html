@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 复变函数速查 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+<h1 id="appA">附录 A 复变函数速查</h1>
+
+<p>本书<a href="ch3.html">ch3</a> Schrödinger 方程的 \(i\hbar\)、<a href="ch5.html">ch5</a> 高斯波包 Fourier 变换、<a href="ch11.html">ch11</a> 不确定性原理 Cauchy-Schwarz、<a href="ch20.html">ch20</a> Fermi 金律的 \(\delta\) 函数极限、<a href="ch21.html">ch21</a> 散射 Green 函数 + 留数计算——每一处都暗中用了"<em>复变函数</em>" 工具。<em>复</em> 在 QM 不是装饰, 是结构: 波函数本质复值, 算子本征值实数 \(\Leftrightarrow\) 算子自伴; 演化算子 \(e^{-iHt/\hbar}\) 是 Hilbert 空间的旋转——所有这些都依赖复函数代数。这个附录把本书用到的具体复变工具集中处理。</p>
+
+<ul>
+  <li>复函数 + 解析性。</li>
+  <li>Cauchy-Riemann 方程。</li>
+  <li>Cauchy 积分定理 + 公式。</li>
+  <li>留数定理 + 几个积分实例。</li>
+  <li>Fourier 变换 + 复路径技巧（量子散射常用）。</li>
+</ul>
+
+<p>这里没有新概念, 只是把<a href="../复分析/index.html">《复分析》</a>读本里和量子力学相关的部分浓缩。要更深的请回去查那本。</p>
+
+<h2 id="appA-1">A.1 复函数 + 解析性</h2>
+
+<p><em>复数</em>: \(z = x + iy\), \(x, y \in \mathbb R\), \(i^2 = -1\). 复平面 \(\mathbb C\) 与 \(\mathbb R^2\) 等同。极坐标 \(z = r e^{i\theta}\), \(r = |z| = \sqrt{x^2 + y^2}\), \(\theta = \arg z\)。Euler 公式</p>
+
+<p>\[
+\boxed{\ e^{i\theta} = \cos\theta + i\sin\theta.\ }
+\]</p>
+
+<p>这条公式是 QM 演化的<em>核心</em>——\(e^{-iEt/\hbar}\) 是个旋转, 把模 1 的复数旋转。</p>
+
+<p><em>复函数</em>: \(f: \mathbb C \to \mathbb C\), 写 \(f(z) = u(x, y) + i v(x, y)\), \(u, v\) 是实值。</p>
+
+<p><em>复可微 (解析)</em>: \(f\) 在 \(z_0\) 处复可微 ⟺ 极限 \(\lim_{h \to 0} (f(z_0 + h) - f(z_0))/h\) 对<em>任何</em> 复路径 \(h \to 0\) 都存在且相等。这条比实可微强得多——实平面上 \(h\) 只能从 \(\pm\) 方向, 复平面上 \(h\) 可以从所有方向, 极限<em>都得相同</em>。</p>
+
+<p>"<em>解析</em>"（analytic, holomorphic）= 在某区域<em>每一点</em> 都复可微。</p>
+
+<p>例:</p>
+
+<ul>
+  <li>\(f(z) = z^2\): 解析（处处）。</li>
+  <li>\(f(z) = e^z = e^x(\cos y + i \sin y)\): 解析。</li>
+  <li>\(f(z) = \bar z = x - iy\): <em>不</em> 解析（沿 \(h\) 实正得 1, 沿 \(h\) 虚正得 \(-1\), 不一致）。所以"<em>取共轭</em>" 在复分析里是个非平凡操作。</li>
+  <li>\(f(z) = 1/z\): 解析（\(z \neq 0\)）。\(z = 0\) 是<em>极点</em>。</li>
+</ul>
+
+<h2 id="appA-2">A.2 Cauchy-Riemann 方程</h2>
+
+<p>\(f(z) = u(x, y) + i v(x, y)\) 解析<em>等价于</em>: 偏导存在 + 满足</p>
+
+<p>\[
+\boxed{\ \frac{\partial u}{\partial x} = \frac{\partial v}{\partial y}, \quad \frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x}.\ }
+\]</p>
+
+<p>这是<em>Cauchy-Riemann 方程</em>(CR 方程)。证明思路: 沿实方向 \(h \to 0\) 给 \(f' = u_x + i v_x\); 沿虚方向 \(h = i k, k \to 0\) 给 \(f' = -i u_y + v_y\)。两边等给 CR。</p>
+
+<p>推论 1（Laplace 方程）: 把 CR 第一式 \(u_x = v_y\) 对 \(x\) 求导 + 第二式 \(u_y = -v_x\) 对 \(y\) 求导, 加和得 \(u_{xx} + u_{yy} = 0\). 同样 \(v_{xx} + v_{yy} = 0\)。<em>解析函数的实虚部都是调和函数</em>。这条事实让复分析与 2D 静电学（Laplace 方程的解）紧密联系。</p>
+
+<p>推论 2（共轭调和）: 给一个调和 \(u\), 求 \(v\) 满足 CR——\(v\) 由 \(u\) 决定到一个常数。\(v\) 叫 \(u\) 的"<em>共轭调和</em>"。</p>
+
+<p>例验证: \(f(z) = z^2 = (x + iy)^2 = (x^2 - y^2) + i(2xy)\)。\(u = x^2 - y^2, v = 2xy\)。\(u_x = 2x, v_y = 2x\) ✓; \(u_y = -2y, v_x = 2y, -v_x = -2y\) ✓。Laplace: \(u_{xx} + u_{yy} = 2 + (-2) = 0\) ✓。</p>
+
+<h2 id="appA-3">A.3 Cauchy 积分定理 + 公式</h2>
+
+<p>核心定理 1: <em>Cauchy 积分定理</em>。设 \(f\) 在<em>简单封闭曲线</em> \(\gamma\) 内部及上面解析, 则</p>
+
+<p>\[
+\boxed{\ \oint_\gamma f(z) dz = 0.\ }
+\]</p>
+
+<p>证明思路: 用 Green 定理 + CR 方程, 把复积分翻译成实平面 2D 积分, CR 让两个 2D 积分项都为零。直观: 解析函数沿封闭路径"<em>没有累积</em>"——保守"力场"。</p>
+
+<p>推论: 不同从 \(z_0\) 到 \(z_1\) 的路径给同样积分（差是封闭路径 = 0）。所以 \(\int_{z_0}^{z_1} f dz\) 只与端点有关, 不与路径有关——只要 \(f\) 在路径间区域处处解析。</p>
+
+<p>核心定理 2: <em>Cauchy 积分公式</em>。设 \(f\) 在 \(\gamma\) 内及其上解析, \(z_0\) 在 \(\gamma\) 内, 则</p>
+
+<p>\[
+\boxed{\ f(z_0) = \frac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z - z_0} dz.\ }
+\]</p>
+
+<p>这条公式说——<em>解析函数在区域内任一点的值, 完全由它在边界上的值决定</em>。这种"<em>边界决定内部</em>" 是解析函数的极强性质, 实函数没有类似性质（\(C^\infty\) 函数可以在不同点完全独立, 解析函数不能）。</p>
+
+<p>推广（高阶 Cauchy 公式）: 解析函数<em>无穷可微</em>, 且</p>
+
+<p>\[
+f^{(n)}(z_0) = \frac{n!}{2\pi i} \oint_\gamma \frac{f(z)}{(z - z_0)^{n+1}} dz.
+\]</p>
+
+<p>所以"<em>解析</em> ⟹ <em>无穷可微</em>"——这又是复函数比实函数强的地方（实函数 \(C^1\) 不蕴含 \(C^2\)）。</p>
+
+<h2 id="appA-4">A.4 留数定理</h2>
+
+<p>函数 \(f\) 在 \(z_0\) 有<em>极点</em>(简单极点 = 1 阶极点) 如果 \(f(z) = a_{-1}/(z - z_0) + a_0 + a_1(z - z_0) + \ldots\)（在 \(z_0\) 附近 Laurent 展开）。<em>留数</em>:</p>
+
+<p>\[
+\mathrm{Res}(f, z_0) = a_{-1} = \lim_{z \to z_0} (z - z_0) f(z) \quad (\text{1 阶极点}).
+\]</p>
+
+<p>\(n\) 阶极点（\(f \sim a_{-n}/(z - z_0)^n + \ldots\)）的留数:</p>
+
+<p>\[
+\mathrm{Res}(f, z_0) = \frac{1}{(n-1)!} \lim_{z \to z_0} \frac{d^{n-1}}{dz^{n-1}} \big[(z - z_0)^n f(z)\big].
+\]</p>
+
+<p><strong>留数定理</strong>: 设 \(f\) 在 \(\gamma\) 内除有限个极点 \(\{z_k\}\) 处解析, 则</p>
+
+<p>\[
+\boxed{\ \oint_\gamma f(z) dz = 2\pi i \sum_k \mathrm{Res}(f, z_k).\ }
+\]</p>
+
+<p>这条定理是计算<em>实积分</em> 最强大的工具——许多形式难的实积分通过把它扩到复平面 + 找留数<em>瞬间</em> 算出来。</p>
+
+<p>例 1: \(\int_{-\infty}^\infty \frac{dx}{1 + x^2} = ?\)。把 \(1/(1 + z^2)\) 在复平面上闭合积分（实轴 + 上半圆 \(R \to \infty\), 上半圆贡献趋零）。极点 \(z = i\) 在上半平面, 留数 \(\lim_{z \to i}(z - i)/((z - i)(z + i)) = 1/(2i)\). 所以积分 \(= 2\pi i \cdot 1/(2i) = \pi\)。</p>
+
+<p>例 2（量子散射常用）: Green 函数</p>
+
+<p>\[
+G(\boldsymbol r) = -\frac{1}{(2\pi)^3} \int \frac{e^{i\boldsymbol k \cdot \boldsymbol r}}{k^2 - k_0^2 - i\varepsilon} d^3 k = -\frac{1}{4\pi r} e^{i k_0 r}.
+\]</p>
+
+<p>计算: 先做角度积分 → 留下 \(\int_0^\infty \frac{k \sin(kr)}{k^2 - k_0^2 - i\varepsilon} dk\). 把 \(\sin = (e^{ikr} - e^{-ikr})/(2i)\), 把积分扩到 \((-\infty, \infty)\), 用<em>Jordan 引理</em>(指数因子让大半圆贡献趋零)闭合上半 / 下半。\(-i\varepsilon\) 让极点 \(k = k_0 \pm i\varepsilon/(2k_0)\) 偏一点, 选取相应半平面给<em>出射</em> 边界条件 \(e^{ik_0 r}\)。这条 \(-i\varepsilon\) 处方就是<a href="ch21.html">21.4</a> Lippmann-Schwinger 方程里 Green 函数的"<em>选择出射波</em>" 边界条件的来源。</p>
+
+<h2 id="appA-5">A.5 Fourier 变换 + 复路径技巧</h2>
+
+<p>Fourier 变换在 QM 里到处出现——<a href="ch5.html">ch5</a> 高斯波包从 \(x\) 空间到 \(k\) 空间, <a href="ch21.html">ch21</a> Born 振幅是 \(V\) 的 Fourier 变换。基本定义:</p>
+
+<p>\[
+\tilde f(k) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^\infty f(x) e^{-ikx} dx, \quad f(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^\infty \tilde f(k) e^{ikx} dk.
+\]</p>
+
+<p>关键性质（QM 中常用）:</p>
+
+<ul>
+  <li><em>线性</em>: \(\widetilde{a f + b g} = a \tilde f + b \tilde g\).</li>
+  <li><em>导数 ↔ 乘 \(k\)</em>: \(\widetilde{f'}(k) = ik \tilde f(k)\). 这是 ch9 动量算子 \(\hat p = -i\hbar \partial/\partial x\) 在 \(k\) 表象成乘 \(\hbar k\) 的根源。</li>
+  <li><em>Parseval</em>: \(\int |f|^2 dx = \int |\tilde f|^2 dk\). 两表象归一化等价。</li>
+  <li><em>卷积 ↔ 乘积</em>: \(\widetilde{f * g} = \sqrt{2\pi} \tilde f \tilde g\). \(\delta\) 函数: \(\tilde \delta(k) = 1/\sqrt{2\pi}\)（常数）。</li>
+</ul>
+
+<p>具体例子（QM 用得多）:</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(f(x)\)</th><th style="padding: 0.3em 1em;">\(\tilde f(k)\)</th></tr>
+<tr><td>\(e^{-x^2/(2\sigma^2)}\)</td><td>\(\sigma e^{-\sigma^2 k^2/2}\)（差归一化）</td></tr>
+<tr><td>\(e^{-a|x|}\)</td><td>\(\sqrt{2/\pi} \cdot a/(a^2 + k^2)\)</td></tr>
+<tr><td>\(1/(x^2 + a^2)\)</td><td>\(\sqrt{\pi/2} e^{-a|k|}/a\)</td></tr>
+<tr><td>\(\delta(x)\)</td><td>\(1/\sqrt{2\pi}\)</td></tr>
+<tr><td>\(\theta(x) e^{-ax}\)（\(a > 0\)）</td><td>\(1/(\sqrt{2\pi}(a + ik))\)</td></tr>
+</table>
+
+<p>第二、三行用<em>留数定理</em> 算: \(\int e^{-ikx}/(x^2 + a^2) dx\), 极点 \(x = \pm ia\)。\(k > 0\) 时 \(e^{-ikx} = e^{-ik(\text{Re}x) + k \text{Im}x}\), 让<em>下半</em> 平面（\(\text{Im}x < 0\)）的指数趋零, 闭合下半圆, 极点 \(-ia\); \(k < 0\) 闭合上半, 极点 \(+ia\)。两情况合一得 \(\sqrt{\pi/2} e^{-a|k|}/a\)。</p>
+
+<p>第三行<em>Lorentzian → 指数</em> 是<a href="ch20.html">20 章 Fermi 金律</a>里 \(\delta\) 函数极限和指数衰减的连接——共振线宽 \(\Gamma\) ↔ 寿命 \(1/\Gamma\) 是这条 Fourier 配对的物理体现。</p>
+
+<h2 id="appA-6">A.6 实战准则</h2>
+
+<ul>
+  <li>遇到积分 \(\int_{-\infty}^\infty\) 形式的有理函数 / 三角 / 指数衰减——先试<em>把它扩到复平面</em>, 找极点, 用留数定理。</li>
+  <li>含 \(e^{ikx}\) 的积分用 Jordan 引理决定闭合上半还是下半圆——\(k > 0\) 闭合上半（让 \(\text{Im}z > 0\) 时 \(e^{ikz}\) 衰减）, \(k < 0\) 闭合下半。</li>
+  <li>含<em>奇异点在实轴上</em> 的积分（散射 Green 函数 \(1/(k^2 - k_0^2)\) 实根 \(k = \pm k_0\)）需要"<em>\(-i\varepsilon\) 处方</em>" 把极点偏到一侧——这种偏离选择决定边界条件（"<em>出射 vs 入射</em>" 散射波）。</li>
+  <li>Fourier 变换的<em>对称性</em>: \(f\) 实 ⟹ \(\tilde f^*(-k) = \tilde f(k)\); \(f\) 偶 ⟹ \(\tilde f\) 偶; \(f\) 奇 ⟹ \(\tilde f\) 奇。这条让你预知 \(\tilde f\) 的某些特征不必算。</li>
+  <li>波函数的<em>位置</em>(\(x\)) 与<em>动量</em>(\(p = \hbar k\)) 表象之间用 Fourier 变换链接 (ch9-11)——所以 \(\Delta x \Delta p \ge \hbar/2\) 本质是<em>Fourier 不确定性</em>: 函数在 \(x\) 空间窄 ⟺ 在 \(k\) 空间宽。</li>
+  <li>代码: NumPy <code>np.fft.fft</code> 给离散 Fourier 变换; <code>scipy.special</code> 含许多解析函数（Bessel、Hermite、Laguerre 等, 散射 + 谐振子 + 氢原子用）。</li>
+</ul>
+
+<p>这条附录里的工具足以让你跟上本书所有"<em>计算复积分</em>" / "<em>做 Fourier 变换</em>" 的步骤。如果你想严格学复变, 请回去读<a href="../复分析/index.html">《复分析》</a>读本前 8 章。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

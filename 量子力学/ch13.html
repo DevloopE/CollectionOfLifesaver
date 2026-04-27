@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 章 Schrödinger vs Heisenberg 表象 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 测量与塌缩</a><a href="ch14.html">下一章 · 第 14 章 角动量代数 →</a></nav>
+<h1 id="ch13">第 13 章 Schrödinger vs Heisenberg 表象</h1>
+
+<p>1925 年 Heisenberg 发明<em>矩阵力学</em>——可观测量是<em>矩阵</em>（无穷维, 一般不交换）, 状态是<em>定常</em> 的列向量, 矩阵随时间演化。同年（实际略晚, 1926）Schrödinger 发明<em>波动力学</em>——状态是<em>波函数</em> \(\psi(x, t)\) 随时间演化, 算子是<em>定常</em> 的微分算子（如 \(\hat p = -i\hbar d/dx\)）。</p>
+
+<p>两套理论看起来完全不同——一边是矩阵, 一边是 PDE。但 1926 年 Schrödinger 自己证: <em>等价</em>。两套是<em>同一种</em> 量子力学的两种<em>表象</em>。</p>
+
+<p>这一章我把两套表象的数学等价性兑现, 并展示<em>什么时候用哪种</em>。简短答案: Schrödinger 表象适合"<em>解</em>" 具体系统（具体的氢原子、谐振子、势阱）, 因为算子是定的, 你只需要解一个时间相关的 PDE。Heisenberg 表象适合<em>形式分析</em>（对易关系演化、量子场论、经典极限）, 因为算子的运动方程长得像经典 Hamilton 方程, 直观和经典理论的桥梁很短。</p>
+
+<p>这一章的钩子: <em>同一物理实在, 两种数学描述</em>。哪种"<em>对</em>"？两种都对, 它们差一个<em>幺正变换</em>, 物理预测（期望值、概率）<em>完全相同</em>。这种"<em>表象自由</em>" 是<a href="../泛函分析/ch24.html">泛函分析 ch24</a> Stone 定理的一个具体后果。</p>
+
+<h2 id="sec13-1">13.1 Schrödinger 表象: 状态演化, 算子定常</h2>
+
+<p>这是<a href="ch9.html">ch9</a> 之后我们一直在用的标准框架。</p>
+
+<p>状态 \(|\psi(t)\rangle\) 随时间按 Schrödinger 方程演化:</p>
+
+<p>\[
+i\hbar \frac{d|\psi(t)\rangle}{dt} = \hat H |\psi(t)\rangle.
+\]</p>
+
+<p>设 \(\hat H\) 不显式依赖时间, 解</p>
+
+<p>\[
+\boxed{\ |\psi(t)\rangle = U(t)|\psi(0)\rangle, \quad U(t) := e^{-i\hat H t/\hbar}.\ }
+\]</p>
+
+<p>\(U(t)\) 称<em>时间演化算子</em>。它有几个关键性质——下面列出, 都是 \(\hat H\) 自伴 + 算子指数的直接推论:</p>
+
+<ul>
+  <li>(P1) <em>初值</em>: \(U(0) = e^0 = \hat I\)。</li>
+  <li>(P2) <em>群结构</em>: \(U(t) U(s) = U(t + s)\)（指数律, 因为 \(\hat H\) 与自己交换）。</li>
+  <li>(P3) <em>幺正性</em>: \(U(t)^\dagger = e^{i\hat H t/\hbar} = U(-t) = U(t)^{-1}\)。所以 \(U^\dagger U = U U^\dagger = \hat I\)。</li>
+  <li>(P4) <em>SE 满足</em>: \(i\hbar \frac{dU}{dt} = \hat H U\)。直接对指数求导。</li>
+</ul>
+
+<p>幺正性 (P3) <em>非常</em> 重要——它保证 \(\langle\psi(t)|\psi(t)\rangle = \langle\psi(0)|U^\dagger U|\psi(0)\rangle = \langle\psi(0)|\psi(0)\rangle\), 概率始终归一。也保证内积保持 \(\langle\phi(t)|\psi(t)\rangle = \langle\phi(0)|\psi(0)\rangle\)。</p>
+
+<p>算子 \(\hat A\)（自伴, 代表可观测量）在 Schrödinger 表象里<em>不依赖时间</em>。\(\hat x\) 始终是"<em>乘以 \(x\)</em>", \(\hat p\) 始终是 \(-i\hbar d/dx\), \(\hat H\) 始终是某个固定的 Hamiltonian。</p>
+
+<p>期望值</p>
+
+<p>\[
+\langle \hat A\rangle_t = \langle \psi(t)|\hat A|\psi(t)\rangle.
+\]</p>
+
+<p>它随时间变化——通过 \(|\psi(t)\rangle\) 的演化。</p>
+
+<p>这条画面: <em>算子是固定的"测量装置", 状态是随时间走的"被测对象"</em>。世界图像是"<em>状态在 Hilbert 空间里转</em>"。</p>
+
+<h2 id="sec13-2">13.2 Heisenberg 表象: 算子演化, 状态定常</h2>
+
+<p>Heisenberg 1925 年（早于 Schrödinger 半年）的<em>矩阵力学</em> 给出一种<em>反向</em> 的画面——状态<em>不动</em>, 算子<em>动</em>。</p>
+
+<p>定义 Heisenberg 表象的状态和算子:</p>
+
+<p>\[
+|\psi\rangle_H := |\psi(0)\rangle, \qquad \hat A_H(t) := U^\dagger(t) \hat A_S U(t).
+\]</p>
+
+<p>下标 \(S\) 表示 Schrödinger 表象（算子定常）, 下标 \(H\) 表示 Heisenberg 表象。Heisenberg 表象的状态<em>就是</em> 初始状态, 不演化。算子 \(\hat A_H(t)\) 随时间按 \(U^\dagger \hat A U\) 演化。</p>
+
+<p>这条定义的<em>动机</em>: 我们想让物理预测（期望值）<em>不变</em>。验证</p>
+
+<p>\[
+\langle\hat A\rangle_t = \langle\psi(t)|\hat A_S|\psi(t)\rangle = \langle\psi(0)|U^\dagger \hat A_S U|\psi(0)\rangle = {}_H\langle\psi|\hat A_H(t)|\psi\rangle_H.
+\]</p>
+
+<p><em>同一个数</em>。两种表象给同样的期望值。</p>
+
+<p>更一般——两种表象的<em>所有</em> 物理预测都相同。任何被测的概率 \(|\langle\phi(t)|\psi(t)\rangle|^2 = |\langle\phi(0)|U^\dagger U|\psi(0)\rangle|^2 = |\langle\phi_H|\psi_H\rangle|^2\)（其中 \(\hat A\) 的本征向量在 Heisenberg 表象里是 \(|\phi_H(t)\rangle = U^\dagger|\phi(0)\rangle\), 也演化）。</p>
+
+<p>两种表象差一个<em>幺正变换</em> \(U(t)\), 物理上不可区分。这正是<em>表象等价</em>。</p>
+
+<p>请你停下来感受: 这种"<em>同物理两描述</em>" 在物理学里其实很常见。例如经典力学里"<em>主动变换</em>"（旋转物体）和"<em>被动变换</em>"（旋转坐标系）给同样的物理。Schrödinger / Heisenberg 表象正是<em>主动 vs 被动</em> 在量子力学上的版本——主动变换 = 状态走（Schrödinger）, 被动变换 = 算子走（Heisenberg）。</p>
+
+<h2 id="sec13-3">13.3 期望值演化的两种算法</h2>
+
+<p>用两种表象算同一物理量, 对照算法:</p>
+
+<p><strong>Schrödinger 算法</strong>:</p>
+<ol>
+  <li>解 SE 给 \(|\psi(t)\rangle\).</li>
+  <li>算 \(\langle\psi(t)|\hat A|\psi(t)\rangle\).</li>
+</ol>
+
+<p><strong>Heisenberg 算法</strong>:</p>
+<ol>
+  <li>状态固定 \(|\psi\rangle_H\).</li>
+  <li>解 Heisenberg 方程（13.4 节）给 \(\hat A_H(t)\).</li>
+  <li>算 \({}_H\langle\psi|\hat A_H(t)|\psi\rangle_H\).</li>
+</ol>
+
+<p>步数相同, 但<em>解的对象</em> 不同。Schrödinger 解一个 PDE 给波函数; Heisenberg 解一个算子 ODE 给算子。哪种容易, 看具体问题。</p>
+
+<ul>
+  <li>具体束缚态求能级 → Schrödinger 容易（解定态 SE 给 \(E_n\), 直接是答案）。</li>
+  <li>跟踪某个可观测量的<em>时间演化</em> → Heisenberg 容易（直接解 \(\hat A_H(t)\) 不必先解整个 \(|\psi(t)\rangle\)）。</li>
+  <li>对易关系怎么演化 → 必须用 Heisenberg（Schrödinger 表象算子定常, 对易关系恒为初值）。</li>
+  <li>形式 + 经典对应 → Heisenberg 更直观。</li>
+  <li>量子场论 → 标准用 Heisenberg（场算子 \(\hat\phi(x, t)\) 演化, 真空态 \(|0\rangle\) 不变）。</li>
+</ul>
+
+<h2 id="sec13-4">13.4 Heisenberg 运动方程</h2>
+
+<p>Schrödinger 表象给状态的运动方程 \(i\hbar d|\psi\rangle/dt = \hat H|\psi\rangle\)。Heisenberg 表象需要算子的运动方程。</p>
+
+<p>对 \(\hat A_H(t) = U^\dagger \hat A_S U\) 求时间导数。设 \(\hat A_S\) 不显式依赖时间（最常见情况）:</p>
+
+<p>\[
+\frac{d \hat A_H}{dt} = \frac{dU^\dagger}{dt}\hat A_S U + U^\dagger \hat A_S \frac{dU}{dt}.
+\]</p>
+
+<p>用 (P4) \(\frac{dU}{dt} = -\frac{i}{\hbar}\hat H U\), 取共轭 \(\frac{dU^\dagger}{dt} = +\frac{i}{\hbar}U^\dagger \hat H\):</p>
+
+<p>\[
+\frac{d\hat A_H}{dt} = \frac{i}{\hbar} U^\dagger \hat H \hat A_S U + U^\dagger \hat A_S \cdot \left(-\frac{i}{\hbar}\hat H U\right) = \frac{i}{\hbar}\big( U^\dagger \hat H \hat A_S U - U^\dagger \hat A_S \hat H U\big).
+\]</p>
+
+<p>插入 \(U U^\dagger = \hat I\) 之间:</p>
+
+<p>\[
+U^\dagger \hat H \hat A_S U = U^\dagger \hat H U \cdot U^\dagger \hat A_S U = \hat H_H \cdot \hat A_H,
+\]</p>
+
+<p>同样 \(U^\dagger \hat A_S \hat H U = \hat A_H \hat H_H\)。注意 \(\hat H_H = U^\dagger \hat H U = \hat H\)（\(\hat H\) 与 \(U = e^{-i\hat H t/\hbar}\) 交换）。所以</p>
+
+<p>\[
+\boxed{\ \frac{d\hat A_H}{dt} = \frac{i}{\hbar}[\hat H, \hat A_H] = -\frac{i}{\hbar}[\hat A_H, \hat H].\ }
+\]</p>
+
+<p>这是<em>Heisenberg 运动方程</em>。它告诉你算子在 Heisenberg 表象里如何随时间演化——由<em>对易子</em> \([\hat H, \hat A_H]\) 决定。</p>
+
+<p>请你比较 Heisenberg 方程和 Schrödinger 方程:</p>
+
+<p>\[
+i\hbar \frac{d|\psi\rangle}{dt} = \hat H |\psi\rangle \quad \text{(Schrödinger)}, \qquad i\hbar \frac{d\hat A_H}{dt} = [\hat A_H, \hat H] \quad \text{(Heisenberg)}.
+\]</p>
+
+<p>形式上对偶——一边是状态向量被 \(\hat H\) "<em>左乘</em>", 一边是算子被 \(\hat H\) "<em>对易</em>"。两条都是一阶常微分（在算子层面）, 解都涉及 \(e^{-i\hat H t/\hbar}\)。</p>
+
+<p>Heisenberg 方程有个直接的<em>守恒</em> 推论——如果 \(\hat A\) 与 \(\hat H\) 对易, \([\hat A, \hat H] = 0\), 那 \(d\hat A_H/dt = 0\)。算子<em>不演化</em>, 这意味着 \(\langle \hat A\rangle\) 在<em>任何</em> 态上都是常数——\(\hat A\) 是<em>守恒量</em>。这就是 Noether 定理在量子里的版本: <em>对易于 Hamiltonian 的算子是守恒量</em>。具体例子——\(\hat H\) 自身（能量守恒）、\(\hat L^2\) 在球对称势里（角动量平方守恒）、\(\hat L_z\) 在 \(z\) 对称势里。</p>
+
+<h2 id="sec13-5">13.5 经典对应: Heisenberg ↔ Poisson</h2>
+
+<p>Heisenberg 方程的形式</p>
+
+<p>\[
+\frac{d\hat A}{dt} = \frac{i}{\hbar}[\hat H, \hat A]
+\]</p>
+
+<p>请你和<em>经典</em> Hamilton 力学的方程比一下。经典里, 任何函数 \(A(q, p)\) 沿 Hamilton 流的演化</p>
+
+<p>\[
+\frac{dA}{dt} = \{H, A\},
+\]</p>
+
+<p>其中 \(\{\cdot, \cdot\}\) 是<em>Poisson 括号</em>:</p>
+
+<p>\[
+\{f, g\} := \sum_i \left( \frac{\partial f}{\partial q_i}\frac{\partial g}{\partial p_i} - \frac{\partial f}{\partial p_i}\frac{\partial g}{\partial q_i}\right).
+\]</p>
+
+<p>两条方程的<em>形式</em> 一模一样——只把对易子 / \(i\hbar\) 替换为 Poisson 括号。这条对应是 Dirac 1925 年看出来的, 称<em>正则量子化</em>:</p>
+
+<p>\[
+\boxed{\ \{f, g\}_{\text{经典}} \quad\longleftrightarrow\quad \frac{1}{i\hbar}[\hat f, \hat g]_{\text{量子}}.\ }
+\]</p>
+
+<p>具体核对: 经典 \(\{q, p\} = 1\), 量子 \([\hat q, \hat p]/(i\hbar) = i\hbar/(i\hbar) = 1\)。<em>对得上</em>。\(\{q, q\} = 0, [\hat q, \hat q] = 0\); \(\{p, p\} = 0, [\hat p, \hat p] = 0\)。</p>
+
+<p>这条对应给"<em>从经典力学得到量子力学</em>" 一个机械化方法: 把经典函数升级为算子, 把 Poisson 括号替换为 \(1/(i\hbar)\) 倍的对易子, 经典 Hamilton 方程自动变成 Heisenberg 方程。这是 Dirac 1930《量子力学原理》里给出的"<em>正则量子化处方</em>"。</p>
+
+<p>这条对应也给 Heisenberg 表象的"<em>经典直觉桥</em>" 一个数学解释——Heisenberg 表象里算子按看起来像经典函数的方程演化, 所以你可以把经典轨迹的图像（粒子动量随时间走）<em>大致</em> 搬过来理解算子动力学。Schrödinger 表象里的"<em>波函数演化</em>" 没有对应的经典图像（经典里没有"<em>波函数</em>"）, 所以 Schrödinger 表象的经典极限不那么直观。</p>
+
+<p>请你停下来感受—— Dirac 用一个对易子的<em>形式</em>类比, 把经典力学和量子力学缝在了一起。这是 20 世纪物理最优雅的形式发现之一。</p>
+
+<h2 id="sec13-6">13.6 Stone 定理: 自伴 \(\hat H\) ⟺ 强连续 unitary 群</h2>
+
+<p>到这里我们一直在用 \(U(t) = e^{-i\hat H t/\hbar}\), 但严格地, 在无穷维 Hilbert 空间上"<em>算子的指数</em>" 不是trivial 的事。\(\hat H\) 一般是<em>无界</em> 算子（\(\hat p, \hat x\) 都无界）, 所以 \(e^{-i\hat H t/\hbar}\) 不能简单当幂级数 \(\sum (-i\hat H t/\hbar)^n / n!\) 处理（级数可能不收敛）。</p>
+
+<p>正确的处理来自<em>Stone 定理</em>(Stone 1932), 这是<a href="../泛函分析/ch24.html">泛函分析 ch24</a> 谱定理的一个推广。让我陈述它（不证）并解释为什么它是 ch13 的<em>数学骨架</em>:</p>
+
+<p><strong>Stone 定理</strong>。Hilbert 空间 \(H\) 上, 下面两类对象一一对应:</p>
+
+<ul>
+  <li><em>自伴算子</em> \(\hat A\)（可能无界, 定义域稠密）。</li>
+  <li><em>强连续单参 unitary 群</em> \(U(t), t \in \mathbb{R}\), 即满足
+    <ol>
+      <li>每个 \(U(t)\) 是 unitary。</li>
+      <li>\(U(t + s) = U(t) U(s)\)（群律）。</li>
+      <li>对任意 \(|\psi\rangle \in H\), 函数 \(t \mapsto U(t)|\psi\rangle\) 是 \(t\) 的连续函数（"<em>强连续</em>"）。</li>
+    </ol></li>
+</ul>
+
+<p>对应是 \(U(t) = e^{-i\hat A t}\)（用谱定理定义）, 反之 \(\hat A = i \frac{d}{dt}\Big|_{t=0} U(t)\)（在合适定义域上）。</p>
+
+<p>这条定理的<em>物理含义</em>:</p>
+
+<ul>
+  <li>(方向 1) 给一个自伴 \(\hat H\), 自动生成一个 unitary 演化群 \(U(t)\)。这意味着 \(\hat H\) 自伴 \(\Rightarrow\) Schrödinger 演化是<em>幺正</em> 的, <em>自动</em> 保概率归一。"<em>\(\hat H\) 必须自伴</em>" 这条公设就是为了保证演化合法。</li>
+  <li>(方向 2) 给一个 unitary 演化群（任何"<em>对称性</em>" 的连续群作用都是 unitary 的, 由 Wigner 1931 定理）, 自动有个自伴 \(\hat H\) 作"<em>生成元</em>"。这意味着每一个对称性都对应一个守恒可观测量。具体例子——时间平移对称 → \(\hat H\)（能量守恒）、空间平移对称 → \(\hat p\)（动量守恒）、空间转动对称 → \(\hat L\)（角动量守恒）。这是<em>量子 Noether 定理</em>。</li>
+</ul>
+
+<p>Stone 定理是 ch9-ch13 的<em>数学合法性证书</em>。我们一直说"<em>解 \(i\hbar d/dt|\psi\rangle = \hat H|\psi\rangle\) 给 \(|\psi(t)\rangle = e^{-i\hat H t/\hbar}|\psi(0)\rangle\)</em>"——这件事在无穷维 + 无界 \(\hat H\) 下需要 Stone 定理保证。<a href="../泛函分析/ch24.html">泛函分析 ch24</a> 给出严格证明; 这里我引用结论。</p>
+
+<h2 id="sec13-7">13.7 第三种表象: 相互作用绘景</h2>
+
+<p>Schrödinger 和 Heisenberg 是两种<em>极端</em>——状态全演化 vs 算子全演化。中间还有一种"<em>混合</em>" 表象, 叫<em>相互作用绘景</em>(interaction picture, 也叫 Dirac 表象)。它在<a href="ch20.html">ch20</a> 微扰论里反复出现。</p>
+
+<p>设 Hamiltonian 拆成两部分</p>
+
+<p>\[
+\hat H = \hat H_0 + \hat V,
+\]</p>
+
+<p>其中 \(\hat H_0\) 是"<em>简单</em>" 部分（能精确解, 例如自由 Hamiltonian）, \(\hat V\) 是"<em>微扰</em>" 部分（相互作用, 一般小但难解）。</p>
+
+<p>定义相互作用绘景:</p>
+
+<p>\[
+|\psi(t)\rangle_I := U_0^\dagger(t) |\psi(t)\rangle_S, \qquad \hat A_I(t) := U_0^\dagger(t) \hat A_S U_0(t),
+\]</p>
+
+<p>其中 \(U_0(t) = e^{-i\hat H_0 t/\hbar}\)（用<em>未微扰</em> Hamiltonian 演化）。</p>
+
+<p>这种定义"<em>把 \(\hat H_0\) 的演化挪到算子那边, 让状态只承载 \(\hat V\) 引起的演化</em>"。具体——状态满足</p>
+
+<p>\[
+i\hbar \frac{d|\psi(t)\rangle_I}{dt} = \hat V_I(t) |\psi(t)\rangle_I,
+\]</p>
+
+<p>其中 \(\hat V_I(t) = U_0^\dagger \hat V U_0\)。算子按 \(\hat H_0\) 的 Heisenberg 演化:</p>
+
+<p>\[
+\frac{d \hat A_I}{dt} = \frac{i}{\hbar}[\hat H_0, \hat A_I].
+\]</p>
+
+<p>对照三种表象:</p>
+
+<table style="margin: 1em auto; border-collapse: collapse; border: 1px solid #888;">
+<tr><th style="padding: 0.4em 1em; border: 1px solid #888;">表象</th><th style="padding: 0.4em 1em; border: 1px solid #888;">状态由谁演化</th><th style="padding: 0.4em 1em; border: 1px solid #888;">算子由谁演化</th></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #888;">Schrödinger</td><td style="padding: 0.3em 1em; border: 1px solid #888;">\(\hat H = \hat H_0 + \hat V\)</td><td style="padding: 0.3em 1em; border: 1px solid #888;">不演化</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #888;">Heisenberg</td><td style="padding: 0.3em 1em; border: 1px solid #888;">不演化</td><td style="padding: 0.3em 1em; border: 1px solid #888;">\(\hat H\)</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #888;">Interaction</td><td style="padding: 0.3em 1em; border: 1px solid #888;">\(\hat V\)</td><td style="padding: 0.3em 1em; border: 1px solid #888;">\(\hat H_0\)</td></tr>
+</table>
+
+<p>相互作用绘景的好处——状态只携带<em>微扰</em> 的影响, 因此微扰展开自然在这个表象里写。<a href="ch20.html">ch20</a> 推导<em>Dyson 级数</em>, 是相互作用绘景里把 \(|\psi(t)\rangle_I\) 按 \(\hat V\) 阶展开:</p>
+
+<p>\[
+|\psi(t)\rangle_I = \left[ \hat I + \frac{1}{i\hbar}\int_0^t \hat V_I(t')\, dt' + \cdots\right]|\psi(0)\rangle_I.
+\]</p>
+
+<p>这条级数的<em>第一项就是一阶微扰</em>——它是费米黄金法则、跃迁概率、散射截面等等所有实用公式的来源。本章先记住相互作用绘景的<em>定义</em> + <em>动机</em>; 实际推导留<a href="ch20.html">ch20</a>。</p>
+
+<h2 id="sec13-8">13.8 三表象切换的具体例子: 谐振子</h2>
+
+<p>以一维谐振子 \(\hat H = \hat p^2/(2m) + (1/2)m\omega^2 \hat x^2\) 为例, 实算两种表象的"<em>位置</em>" 时间演化, 看它们怎么给同样答案。</p>
+
+<p><strong>Schrödinger 表象</strong>。设初态 \(|\psi(0)\rangle = |0\rangle\)（基态）。基态是 \(\hat H\) 本征态 \(E_0 = \hbar\omega/2\), 演化只加相位:</p>
+
+<p>\[
+|\psi(t)\rangle = e^{-i E_0 t/\hbar}|0\rangle = e^{-i\omega t/2}|0\rangle.
+\]</p>
+
+<p>位置期望</p>
+
+<p>\[
+\langle \hat x\rangle_t = \langle\psi(t)|\hat x|\psi(t)\rangle = \langle 0|\hat x|0\rangle = 0.
+\]</p>
+
+<p>对所有时间, \(\langle\hat x\rangle_t = 0\)（基态对称）。</p>
+
+<p><strong>Heisenberg 表象</strong>。算子 \(\hat x_H(t) = U^\dagger \hat x U\)。用 Heisenberg 方程</p>
+
+<p>\[
+\frac{d \hat x_H}{dt} = \frac{i}{\hbar}[\hat H, \hat x_H].
+\]</p>
+
+<p>算 \([\hat H, \hat x]\):</p>
+
+<p>\[
+[\hat H, \hat x] = \frac{1}{2m}[\hat p^2, \hat x] + \frac{m\omega^2}{2}[\hat x^2, \hat x] = \frac{1}{2m}[\hat p^2, \hat x],
+\]</p>
+
+<p>第二项 0（任何算子与自己交换）。\([\hat p^2, \hat x] = \hat p[\hat p, \hat x] + [\hat p, \hat x]\hat p = -2 i\hbar \hat p\)（用 \([\hat p, \hat x] = -i\hbar\)）。所以</p>
+
+<p>\[
+\frac{d \hat x_H}{dt} = \frac{i}{\hbar} \cdot \frac{-2 i\hbar \hat p_H}{2m} = \frac{\hat p_H}{m}.
+\]</p>
+
+<p>这<em>就是经典关系</em> \(dx/dt = p/m\)！同样算 \(d\hat p_H/dt\):</p>
+
+<p>\[
+\frac{d\hat p_H}{dt} = \frac{i}{\hbar}[\hat H, \hat p_H], \quad [\hat H, \hat p] = \frac{m\omega^2}{2}[\hat x^2, \hat p] = \frac{m\omega^2}{2}(2 i\hbar \hat x) = i\hbar m\omega^2 \hat x.
+\]</p>
+
+<p>\[
+\frac{d\hat p_H}{dt} = \frac{i}{\hbar} \cdot i\hbar m\omega^2 \hat x_H = -m\omega^2 \hat x_H.
+\]</p>
+
+<p>这<em>就是经典关系</em> \(dp/dt = -m\omega^2 x\)（Hooke 力）。</p>
+
+<p>合起来 \(\hat x_H, \hat p_H\) 满足耦合 ODE</p>
+
+<p>\[
+\dot{\hat x}_H = \hat p_H/m, \quad \dot{\hat p}_H = -m\omega^2 \hat x_H,
+\]</p>
+
+<p>形式与经典谐振子方程<em>一字不差</em>。解</p>
+
+<p>\[
+\hat x_H(t) = \hat x_S \cos(\omega t) + \frac{\hat p_S}{m\omega}\sin(\omega t),
+\]</p>
+
+<p>\[
+\hat p_H(t) = \hat p_S \cos(\omega t) - m\omega \hat x_S \sin(\omega t).
+\]</p>
+
+<p>这是个<em>算子等式</em>——\(\hat x_H(t)\) 在每个时刻是 \(\hat x_S\) 和 \(\hat p_S\) 的具体线性组合, 系数随 \(t\) 振荡。</p>
+
+<p>验证位置期望——基态有 \(\langle 0|\hat x_S|0\rangle = 0, \langle 0|\hat p_S|0\rangle = 0\)（基态对称）, 所以 \(\langle 0|\hat x_H(t)|0\rangle = 0 \cdot \cos\omega t + 0 \cdot \sin\omega t / (m\omega) = 0\)。<em>同 Schrödinger 答案</em>。</p>
+
+<p>但 Heisenberg 表象给出更<em>多</em> 信息。\(\hat x_H(t)\) 是<em>算子</em>, 不只期望; 例如</p>
+
+<p>\[
+\langle 0|\hat x_H(t) \hat x_H(0)|0\rangle
+\]</p>
+
+<p>是<em>位置-位置 关联函数</em>, 在响应理论 / Green 函数中关键。Heisenberg 表象里直接是</p>
+
+<p>\[
+\langle 0|\hat x_S \hat x_S|0\rangle\cos\omega t + \langle 0|\hat p_S \hat x_S|0\rangle \sin\omega t/(m\omega).
+\]</p>
+
+<p>用 \(\langle 0|\hat x^2|0\rangle = \hbar/(2 m\omega)\) 和 \(\langle 0|\hat p\hat x|0\rangle = -i\hbar/2\)（基态期望, 由对易关系算出）, 得</p>
+
+<p>\[
+\langle\hat x_H(t)\hat x_H(0)\rangle = \frac{\hbar}{2m\omega}\cos\omega t - \frac{i\hbar}{2 m\omega}\sin\omega t = \frac{\hbar}{2m\omega} e^{-i\omega t}.
+\]</p>
+
+<p>关联函数振荡 \(e^{-i\omega t}\), 频率正是谐振子频率——经典直觉吻合。Schrödinger 表象算同样的东西需要先给两个时刻的态再算内积, 步骤多。Heisenberg 直接.</p>
+
+<p>请你欣赏: 同一物理（基态谐振子的位置关联）用两种表象算, <em>同样答案</em>。两种表象选一个用, 看你方便。具体束缚态求能级 Schrödinger; 关联函数 / 经典对应 / 场论 Heisenberg。</p>
+
+<h2 id="sec13-9">13.9 命名 + 一般化</h2>
+
+<p>核心观念命名:</p>
+
+<ul>
+  <li><strong>表象</strong>: 同一物理, 不同的"<em>状态 vs 算子时间承载</em>" 分配方式。</li>
+  <li><strong>Schrödinger 表象</strong>: 状态演化按 SE, 算子定常。<em>解具体系统</em>, 求本征值用。</li>
+  <li><strong>Heisenberg 表象</strong>: 算子按对易子方程演化, 状态定常。<em>形式分析</em>, 经典对应, 场论用。</li>
+  <li><strong>Heisenberg 方程</strong> \(d\hat A_H/dt = (i/\hbar)[\hat H, \hat A_H]\): 算子运动方程, 形如经典 Hamilton 方程。</li>
+  <li><strong>Dirac 对应</strong> \(\{f, g\} \leftrightarrow [\hat f, \hat g]/(i\hbar)\): 经典 Poisson 括号 ↔ 量子对易子, 正则量子化的核心。</li>
+  <li><strong>Stone 定理</strong>: 自伴 \(\hat H\) ⟺ 强连续 unitary 群 \(U(t)\)——给"<em>SE 演化合法</em>" 一个严格的泛函分析根据。</li>
+  <li><strong>Interaction 表象</strong>: 状态由 \(\hat V\) 演化, 算子由 \(\hat H_0\) 演化, 微扰论自然写在这里。</li>
+</ul>
+
+<p>这一章 Banner 弧线: 朴素以为"<em>量子力学只有一种数学表达</em>"。撞墙——Heisenberg 1925 矩阵力学和 Schrödinger 1926 波动力学看起来完全不同, 哪种对？Reframe——两种是<em>同一</em> 物理的两种表象, 差幺正变换 \(U(t)\), 物理预测相同。命名: Schrödinger / Heisenberg 表象。一般化: interaction 表象 + 任何"<em>分裂</em>" \(\hat H = \hat H_0 + \hat V\) 给一个新表象, 用于微扰论 / 散射 / 量子场论。</p>
+
+<p>这一章是本书"<em>形式化</em>" 段（ch9-ch13）的<em>收官</em>——你已经把 Hilbert 空间 + 算子 + 不确定性 + 测量 + 表象这套数学骨架走完。<a href="ch14.html">ch14</a> 起进入第四段——3 维空间和角动量, 用本段建立的工具（特别是 ch11 的对易关系 + ch13 的 Heisenberg 形式分析）正面攻击实际三维问题: 角动量代数 → 球对称势 → 氢原子的完整解析解。这是量子力学的"<em>第一个真实物理胜利</em>"——\(E_n = -13.6/n^2\) 不再是 Bohr 1913 的猜测, 而是 Schrödinger 方程的严格解。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 测量与塌缩</a><a href="ch14.html">下一章 · 第 14 章 角动量代数 →</a></nav>
+</main>
+</body>
+</html>

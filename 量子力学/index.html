@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目录 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+<h1>普林斯顿量子力学读本</h1>
+
+<p style="margin-top:-0.5rem;color:var(--ink-soft);font-style:italic;">从黑体辐射到量子计算 · 物理 + Hilbert 空间数学的合奏</p>
+
+<h1 id="preface">前言</h1>
+
+<p>欢迎你翻开这本书。量子力学是<em>20 世纪初</em> 物理学被三件事情逼到墙角的产物——黑体辐射的紫外灾难、光电效应、氢原子离散光谱。经典物理对这三件事的预测都<em>错</em>。1900-1927 年间, Planck / Einstein / Bohr / de Broglie / Heisenberg / Schrödinger / Born / Dirac 等人一步步建立了一套全新的物理框架——量子力学。这套框架的<em>数学</em> 内核就是<a href="../泛函分析/index.html">泛函分析</a>: Hilbert 空间、自伴算子、谱定理、不等式、张量积——你在 V8 学的几乎每条都直接出现在量子力学里。</p>
+
+<p>这本书的目标——把量子力学的<em>物理动机</em>（这些公式从哪些实验里逼出来）和<em>数学结构</em>（这些公式背后的 Hilbert 空间与算子代数）合在一起讲清。你以前可能见过两种讲法："纯物理"（一上来 Schrödinger 方程, 不解释为什么）和"纯数学"（公理化, 看不到物理）。本书走中间路线——每个数学结构都从具体物理问题逼出来, 每个物理问题都用清晰数学表达。</p>
+
+<h2>这本书的角色</h2>
+
+<p>系列<em>第 14 卷</em>。前置最重要——<a href="../线性代数/index.html">第 2 卷《线性代数》</a>（特征值/对称矩阵/谱定理）+ <a href="../泛函分析/index.html">第 8 卷《泛函分析》</a>（Hilbert 空间/算子/谱）。<a href="../微分方程/index.html">第 3 卷《微分方程》</a> 也用到（Schrödinger 方程是 PDE）。<a href="../复分析/index.html">第 4 卷《复分析》</a>偶尔用（旋转积分、解析延拓）。<a href="../概率统计/index.html">第 5 卷《概率统计》</a>解释 Born 概率诠释。<a href="../抽象代数/index.html">第 9 卷《抽象代数》</a>+ 表示论用于角动量、自旋。</p>
+
+<p>读完这本书你能<em>开始</em> 读量子场论 / 凝聚态 / 量子信息论 / 量子化学。它不是 Sakurai 那种"<em>完整研究生 QM</em>", 是入门 + 物理动机充分的版本。</p>
+
+<h2>这本书<em>不</em>是什么</h2>
+
+<p>它<em>不</em>是量子场论——QFT 是下一步。本书 ch24 简要预告。</p>
+
+<p>它<em>不</em>是凝聚态物理 / 原子物理详尽——这些是<em>应用</em> QM 的具体专业, 各有专门书。本书提供的 QM 框架, 让你能去读那些书。</p>
+
+<p>它<em>不</em>是量子信息论——后者侧重熵 / 通信容量 / 纠错码。本书 ch22-23 给量子信息的入口（纠缠 + Bell + 量子计算入门）, 但不是专书。</p>
+
+<h2>读这本书之前你需要什么</h2>
+
+<p>你需要<a href="../线性代数/index.html">线性代数第 6-20 章</a>——内积、正交、特征值、对称矩阵谱定理。本书 ch9 起几乎每章都用。</p>
+
+<p>你最好读过<a href="../泛函分析/index.html">泛函分析第 1-7 章 + 第 21 章</a>——Hilbert 空间、自伴算子、紧自伴谱定理。本书<em>形式</em> 半段（ch9-13）就是泛函分析在 QM 上的具体化。</p>
+
+<p>你最好懂<a href="../微分方程/index.html">微分方程</a>到二阶 ODE 求解（齐次 / 非齐次 / 特征方程）。Schrödinger 方程很多解的技术基于此。</p>
+
+<p>你<em>不</em>需要先学过经典力学 (Lagrangian / Hamiltonian)。本书会在用到时复习。</p>
+
+<h2>"我下周就要考期中, 从哪里开始?"</h2>
+
+<p>本科 QM I 标准考试看：</p>
+
+<ul>
+  <li>Schrödinger 方程 + 一维问题（势阱、谐振子、势垒）（ch3-8）</li>
+  <li>Hilbert 空间形式 + 不确定性（ch9-12）</li>
+  <li>角动量 + 球对称势 + 氢原子（ch14-16）</li>
+  <li>自旋（ch17）</li>
+</ul>
+
+<p>QM II 加上：</p>
+
+<ul>
+  <li>全同粒子（ch18）</li>
+  <li>微扰论（ch19-20）</li>
+  <li>散射（ch21）</li>
+</ul>
+
+<h2>致谢</h2>
+
+<p>本书向 Adrian Banner 的<em>《微积分读本》</em> 致敬。内容主要参考 Griffiths <em>Introduction to Quantum Mechanics</em>（首选, 物理直觉）+ Sakurai <em>Modern Quantum Mechanics</em>（中级标准）+ Cohen-Tannoudji 三卷本（百科）+ Shankar <em>Principles of Quantum Mechanics</em>（数学严格）+ 量子信息：Nielsen &amp; Chuang <em>Quantum Computation and Quantum Information</em>。</p>
+
+<h2>目录</h2>
+
+<ol>
+  <li><a href="ch1.html">第 1 章 引论：经典物理被打败的三场仗</a> — 黑体辐射 / 光电效应 / 氢原子光谱。</li>
+  <li><a href="ch2.html">第 2 章 波粒二象性 + de Broglie</a> — 物质波长 \(\lambda = h/p\)。</li>
+  <li><a href="ch3.html">第 3 章 Schrödinger 方程</a> — 量子的"<em>F = ma</em>"。</li>
+  <li><a href="ch4.html">第 4 章 波函数与 Born 概率诠释</a> — \(|\psi|^2\) 是概率密度。</li>
+  <li><a href="ch5.html">第 5 章 自由粒子 + 波包</a> — 平面波叠加构造局域。</li>
+  <li><a href="ch6.html">第 6 章 一维无限深势阱</a> — 离散能级 + 节点。</li>
+  <li><a href="ch7.html">第 7 章 谐振子（升降算子 + Hermite）</a> — QM 第一个真正"<em>解</em>" 出来的系统。</li>
+  <li><a href="ch8.html">第 8 章 势垒与隧穿</a> — 经典禁区也能穿。</li>
+  <li><a href="ch9.html">第 9 章 Hilbert 空间形式</a> — Dirac 记号 + 完备基。</li>
+  <li><a href="ch10.html">第 10 章 可观测量 + 期望</a> — \(\langle A \rangle = \langle \psi | A | \psi \rangle\)。</li>
+  <li><a href="ch11.html">第 11 章 不确定性原理</a> — \([\hat x, \hat p] = i\hbar \Rightarrow \Delta x \Delta p \ge \hbar/2\)。</li>
+  <li><a href="ch12.html">第 12 章 测量与塌缩</a> — Born 规则 + 投影假设。</li>
+  <li><a href="ch13.html">第 13 章 Schrödinger vs Heisenberg 表象</a> — 时间依赖谁担。</li>
+  <li><a href="ch14.html">第 14 章 角动量算子与对易关系</a> — \([L_x, L_y] = i\hbar L_z\)。</li>
+  <li><a href="ch15.html">第 15 章 球对称势 + 球谐函数</a> — 把 3D Schrödinger 分离变量。</li>
+  <li><a href="ch16.html">第 16 章 氢原子</a> — 完整解析解, 离散能级 \(-13.6/n^2\) eV。</li>
+  <li><a href="ch17.html">第 17 章 自旋与 Pauli 矩阵</a> — 内部自由度, 没经典对应。</li>
+  <li><a href="ch18.html">第 18 章 全同粒子 + 反对称化</a> — Pauli 不相容 + 玻色-费米统计。</li>
+  <li><a href="ch19.html">第 19 章 时间无关微扰论</a> — 把"小扰动" 加到已知系统。</li>
+  <li><a href="ch20.html">第 20 章 时间依赖微扰 + Fermi 金律</a> — 跃迁速率公式。</li>
+  <li><a href="ch21.html">第 21 章 散射理论入门</a> — Born 近似 + 部分波。</li>
+  <li><a href="ch22.html">第 22 章 量子纠缠 + Bell 不等式</a> — 经典局域实在论的死刑。</li>
+  <li><a href="ch23.html">第 23 章 应用：量子计算入门</a> — qubit / 门 / Shor / Grover。</li>
+  <li><a href="ch24.html">第 24 章 应用：量子化学 + 量子场论一瞥</a> — 通向更高领域。</li>
+</ol>
+
+<ul>
+  <li><a href="appA.html">附录 A 复变函数速查</a></li>
+  <li><a href="appB.html">附录 B 线性代数 + 算子代数速查</a></li>
+  <li><a href="subject-index.html">主题索引</a></li>
+</ul>
+
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+</main>
+</body>
+</html>

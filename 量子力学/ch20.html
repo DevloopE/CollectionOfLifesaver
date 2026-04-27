@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 时间依赖微扰与 Fermi 金律 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 时间无关微扰论</a><a href="ch21.html">下一章 · 第 21 章 散射理论 →</a></nav>
+<h1 id="ch20">第 20 章 时间依赖微扰与 Fermi 金律</h1>
+
+<p>上一章微扰论处理<em>静态</em> 修正——电场恒定, 磁场不变, 加进 Hamiltonian 后能级位移。这条<em>不</em> 涉及"<em>时间</em>"——\(\hat H\) 与 \(t\) 无关, 系统总能量守恒, 粒子停在能量本征态里不动。</p>
+
+<p>但物理界的大部分有趣过程都<em>涉及</em> 时间。原子吸收一个光子, 从基态<em>跃迁</em> 到激发态; 激发态<em>自发</em> 发射光子回基态; 加速器把质子撞到靶上, 产生新粒子; 半导体里电子从价带<em>散射</em> 到导带; 核衰变 \({}^{14}\text{C} \to {}^{14}\text{N} + e^- + \bar\nu_e\); 化学反应 \(\text{H}_2 + \text{Cl} \to \text{HCl} + \text{H}\)——所有这些都是"<em>从一个态变成另一个态</em>" 的<em>动力学</em> 过程。</p>
+
+<p>本章的中心问题: 给一个时变扰动 \(\hat H(t) = \hat H_0 + \hat V(t)\), 系统初始在 \(\hat H_0\) 的本征态 \(|i\rangle\)（\(t = 0\)）, 问<em>过了时间 \(t\) 之后, 系统在另一个本征态 \(|f\rangle\) 的概率是多少</em>？特别地, 如果 \(\hat V(t)\) 是周期性的（比如电磁波 \(\hat V \propto e^{-i\omega t}\)）, <em>跃迁速率</em>（probability per unit time）是多少？</p>
+
+<p>1932 年 Fermi 在他的<em>核物理</em> 讲义里把这个问题的答案写成<em>金律</em>:</p>
+
+<p>\[
+\boxed{\ \Gamma_{i \to f} = \frac{2\pi}{\hbar}|\langle f|\hat V|i\rangle|^2 \rho(E_f).\ }
+\]</p>
+
+<p>跃迁速率 = (\(2\pi/\hbar\)) × (矩阵元模平方) × (末态密度)。Fermi 自己叫它<em>第二金律</em>（"<em>第一金律</em>" 是另一条相关公式, 现在不常用）。这条公式遍布原子物理 / 凝聚态物理 / 核物理 / 高能物理——是真的"<em>金</em>"。</p>
+
+<p>本章从时变 SE 出发, 一步步推到金律, 然后给三个应用: 原子吸收 + 自发发射 + 核衰变。</p>
+
+<h2 id="sec20-1">20.1 时变微扰: 设定</h2>
+
+<p>Hamiltonian</p>
+
+<p>\[
+\hat H(t) = \hat H_0 + \hat V(t).
+\]</p>
+
+<p>\(\hat H_0\) 时间无关, 已知本征态 \(\{|n\rangle\}\), 能级 \(\{E_n\}\): \(\hat H_0 |n\rangle = E_n |n\rangle\)。\(\hat V(t)\) 是<em>时间依赖</em> 的微扰, 假设"<em>小</em>"。</p>
+
+<p>系统状态 \(|\Psi(t)\rangle\) 满足时变 Schrödinger 方程</p>
+
+<p>\[
+i\hbar \frac{d}{dt}|\Psi(t)\rangle = [\hat H_0 + \hat V(t)]|\Psi(t)\rangle.
+\]</p>
+
+<p>把 \(|\Psi(t)\rangle\) 在 \(\hat H_0\) 本征基展开, 但<em>抽出</em> 自由演化相位</p>
+
+<p>\[
+|\Psi(t)\rangle = \sum_n c_n(t) e^{-i E_n t/\hbar}|n\rangle.
+\]</p>
+
+<p>这里 \(c_n(t)\) 是<em>时间依赖振幅</em>, 与 \(\hat V\) 演化挂钩; 没有 \(\hat V\) 时 \(c_n\) 是常数（系统停在一个本征态）。</p>
+
+<p>代入 SE:</p>
+
+<p>\[
+i\hbar \sum_n \dot c_n e^{-i E_n t/\hbar}|n\rangle + \sum_n c_n E_n e^{-i E_n t/\hbar}|n\rangle = \sum_n c_n e^{-i E_n t/\hbar}(\hat H_0 + \hat V)|n\rangle.
+\]</p>
+
+<p>右边 \(\hat H_0 |n\rangle = E_n |n\rangle\) 那部分与左边第二项消, 剩下</p>
+
+<p>\[
+i\hbar \sum_n \dot c_n e^{-i E_n t/\hbar}|n\rangle = \sum_n c_n e^{-i E_n t/\hbar} \hat V|n\rangle.
+\]</p>
+
+<p>左乘 \(\langle f|\):</p>
+
+<p>\[
+i\hbar \dot c_f e^{-i E_f t/\hbar} = \sum_n c_n e^{-i E_n t/\hbar}\langle f|\hat V|n\rangle.
+\]</p>
+
+<p>两边乘 \(e^{i E_f t/\hbar}\), 引入<em>跃迁频率</em> \(\omega_{fn} = (E_f - E_n)/\hbar\):</p>
+
+<p>\[
+\boxed{\ i\hbar \dot c_f(t) = \sum_n c_n(t) e^{i\omega_{fn} t}\langle f|\hat V(t)|n\rangle.\ }
+\]</p>
+
+<p>这是<em>精确</em> 方程组——把无限维 SE 写成 \(c_n(t)\) 的耦合 ODE。但它是<em>等价</em> 的, 没有简化。微扰来自下一步——把 \(c_n\) 按 \(\hat V\) 阶展开。</p>
+
+<h2 id="sec20-2">20.2 一阶概率振幅</h2>
+
+<p>设 \(t = 0\) 时系统在初态 \(|i\rangle\):</p>
+
+<p>\[
+c_n(0) = \delta_{ni}.
+\]</p>
+
+<p><em>零阶</em>: 假设 \(\hat V = 0\), 则 \(c_n(t) = \delta_{ni}\) 不变。</p>
+
+<p><em>一阶</em>: 把 \(c_n(t) \approx \delta_{ni}\) 代入 ODE 右边（"<em>一阶 Born 近似</em>"——右边只用零阶值）, 得</p>
+
+<p>\[
+i\hbar \dot c_f(t) \approx e^{i\omega_{fi} t}\langle f|\hat V(t)|i\rangle, \qquad f \neq i.
+\]</p>
+
+<p>积分</p>
+
+<p>\[
+\boxed{\ c_f^{(1)}(t) = -\frac{i}{\hbar}\int_0^t e^{i\omega_{fi}t'}\langle f|\hat V(t')|i\rangle\, dt'.\ }
+\]</p>
+
+<p>这条公式是时变微扰论的<em>核心</em>。从初态 \(|i\rangle\) 到末态 \(|f\rangle\) 的<em>概率振幅</em>; 模平方给概率</p>
+
+<p>\[
+P_{i \to f}(t) = |c_f^{(1)}(t)|^2.
+\]</p>
+
+<h2 id="sec20-3">20.3 周期微扰</h2>
+
+<p>最重要的特例——<em>周期性</em> 微扰</p>
+
+<p>\[
+\hat V(t) = \hat V_0 e^{-i\omega t} + \hat V_0^\dagger e^{+i\omega t}.
+\]</p>
+
+<p>（实数化: 通常物理微扰是<em>实</em> 函数, 比如 \(\hat V \propto \cos\omega t\), 把它写成两个共轭指数的和。\(\hat V_0\) 时间无关。）</p>
+
+<p>对 \(|i\rangle \to |f\rangle\) 跃迁, 取 \(E_f > E_i\)（吸收能量）, 关心 \(e^{-i\omega t}\) 项（"<em>吸收</em>"; \(e^{+i\omega t}\) 项对应"<em>受激发射</em>", 即末态比初态低）。代入 20.2:</p>
+
+<p>\[
+c_f^{(1)}(t) = -\frac{i}{\hbar}\langle f|\hat V_0|i\rangle \int_0^t e^{i(\omega_{fi} - \omega)t'}\, dt'
+= -\frac{i}{\hbar}\langle f|\hat V_0|i\rangle \cdot \frac{e^{i(\omega_{fi}-\omega)t} - 1}{i(\omega_{fi}-\omega)}.
+\]</p>
+
+<p>整理</p>
+
+<p>\[
+c_f^{(1)}(t) = -\frac{1}{\hbar}\langle f|\hat V_0|i\rangle \cdot e^{i(\omega_{fi}-\omega)t/2}\cdot \frac{2\sin[(\omega_{fi}-\omega)t/2]}{\omega_{fi}-\omega}.
+\]</p>
+
+<p>模平方</p>
+
+<p>\[
+\boxed{\ P_{i\to f}(t) = \frac{|\langle f|\hat V_0|i\rangle|^2}{\hbar^2}\cdot\frac{4 \sin^2[(\omega_{fi}-\omega)t/2]}{(\omega_{fi}-\omega)^2}.\ }
+\]</p>
+
+<p>分母 \((\omega_{fi}-\omega)^2\)——<em>共振峰</em>。当 \(\omega = \omega_{fi}\), 表面看分母 = 0 公式发散; 但分子 \(\sin^2[...]\) 也 = 0, 用 \(\lim_{x \to 0} \sin^2 x / x^2 = 1\), 得</p>
+
+<p>\[
+P_{i\to f}^{\text{res}}(t) = \frac{|\langle f|\hat V_0|i\rangle|^2}{\hbar^2}\cdot t^2.
+\]</p>
+
+<p><em>共振时概率随 \(t^2\) 增长</em>。非共振时概率<em>振荡</em>, 不增长。这条"<em>共振</em> 突出, <em>非共振</em> 振荡" 的形状是 NMR / 激光物理的核心。</p>
+
+<h2 id="sec20-4">20.4 共振峰: \(\sin^2(x)/x^2\) 的极限</h2>
+
+<p>把 \(P_{i\to f}(t)\) 看作 \((\omega_{fi}-\omega)\) 的函数。形状是</p>
+
+<p>\[
+\frac{\sin^2(\Delta\omega \cdot t/2)}{(\Delta\omega/2)^2}, \qquad \Delta\omega = \omega_{fi} - \omega.
+\]</p>
+
+<p>峰宽 \(\sim 2\pi/t\)（一阶零点位置）, 峰高 \(\sim t^2\)。<em>峰下面积</em> 与 \(t\) 成正比——这是 \(\delta\) 函数极限的雏形。</p>
+
+<p>具体: 用恒等式</p>
+
+<p>\[
+\lim_{t \to \infty} \frac{\sin^2(\alpha t)}{\alpha^2 t} = \pi \delta(\alpha),
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\lim_{t \to \infty}\frac{1}{t}\cdot\frac{4\sin^2[(\omega_{fi}-\omega)t/2]}{(\omega_{fi}-\omega)^2} = 2\pi \delta(\omega_{fi}-\omega).
+\]</p>
+
+<p>定义<em>跃迁速率</em>（概率每单位时间）</p>
+
+<p>\[
+W_{i\to f} \equiv \lim_{t\to\infty}\frac{P_{i\to f}(t)}{t},
+\]</p>
+
+<p>得</p>
+
+<p>\[
+W_{i\to f} = \frac{2\pi}{\hbar^2}|\langle f|\hat V_0|i\rangle|^2 \delta(\omega_{fi}-\omega) = \frac{2\pi}{\hbar}|\langle f|\hat V_0|i\rangle|^2 \delta(E_f - E_i - \hbar\omega).
+\]</p>
+
+<p>\(\delta\) 函数说明了<em>能量守恒</em>: 跃迁只在 \(E_f = E_i + \hbar\omega\)（吸收一个能量为 \(\hbar\omega\) 的"<em>量子</em>"）时发生。这条"<em>必须共振</em>" 的精确叙述。</p>
+
+<h2 id="sec20-5">20.5 连续末态: Fermi 金律</h2>
+
+<p>上面 \(\delta\) 函数对<em>离散</em> 末态有点尴尬——它要求<em>精确</em> 共振, 任何小失谐都给 0 概率。实际中末态<em>从不</em> 是绝对离散的——总有一些<em>连续谱</em>（比如自由出射粒子的连续动量）, 或者<em>带宽</em>（实际能级有自然宽度）。</p>
+
+<p>设末态在能量 \(E_f\) 附近<em>连续</em>, 用<em>态密度</em> \(\rho(E_f)\)（单位 1/能量）描述: 在 \([E_f, E_f + dE]\) 范围内有 \(\rho(E_f) dE\) 个末态。把对单一末态求 \(W_{i\to f}\), 乘以态密度积分:</p>
+
+<p>\[
+\Gamma_{i\to f} = \int W_{i\to f'}\, \rho(E_{f'})\, dE_{f'} = \frac{2\pi}{\hbar}|\langle f|\hat V_0|i\rangle|^2 \rho(E_f),
+\]</p>
+
+<p>用 \(\delta\) 函数把积分挑出 \(E_{f'} = E_i + \hbar\omega\) 处。这就是<em>Fermi 金律</em>:</p>
+
+<p>\[
+\boxed{\ \Gamma_{i\to f} = \frac{2\pi}{\hbar}|\langle f|\hat V|i\rangle|^2 \rho(E_f).\ }
+\]</p>
+
+<p>请你停下来理解这条公式的<em>结构</em>:</p>
+
+<ul>
+  <li>\(\Gamma_{i\to f}\) 是<em>跃迁速率</em>（概率每单位时间, 单位 \(1/\)秒）。</li>
+  <li>\(|\langle f|\hat V|i\rangle|^2\) 是<em>矩阵元模平方</em>——量子力学的"<em>耦合强度</em>"; 它由微扰 \(\hat V\) 与初末态的<em>重叠</em> 决定, 是动力学的 QM 部分。</li>
+  <li>\(\rho(E_f)\) 是<em>末态密度</em>——可达末态有多少。这是<em>统计</em> 部分; 自由粒子 \(\rho \propto p^2 \propto \sqrt E\)（3D 动量空间球壳）。</li>
+  <li>\(2\pi/\hbar\) 是定值因子。</li>
+</ul>
+
+<p>金律的应用范围极广——只要"<em>初态固定 + 末态可数（连续）+ 微扰小</em>" 三条满足。下面三个应用展示。</p>
+
+<h2 id="sec20-6">20.6 应用 1: 原子吸收 + 受激发射 + 自发发射 (Einstein A, B 系数)</h2>
+
+<p>原子在电磁场里。电磁波微扰 (电偶极近似)</p>
+
+<p>\[
+\hat V(t) = -\hat{\vec d}\cdot \vec E(t), \qquad \vec E(t) = E_0 \hat\varepsilon \cos\omega t,
+\]</p>
+
+<p>\(\hat{\vec d} = -e\hat{\vec r}\) 是电偶极算子, \(\hat\varepsilon\) 是偏振方向。</p>
+
+<p><strong>(a) 吸收</strong>: 原子从 \(|i\rangle\) 跃迁到 \(|f\rangle\), 吸收一个能量 \(\hbar\omega = E_f - E_i\) 的光子。Fermi 金律给</p>
+
+<p>\[
+\Gamma_{i\to f}^{\text{abs}} = \frac{\pi e^2 E_0^2}{2\hbar^2}|\langle f|\hat\varepsilon\cdot\hat{\vec r}|i\rangle|^2 \delta(\omega - \omega_{fi}).
+\]</p>
+
+<p>对辐射场<em>各向同性</em> 取平均, 用<em>能量密度</em> \(u(\omega) = \varepsilon_0 E_0^2/2\) 替换 \(E_0^2\), 得</p>
+
+<p>\[
+\Gamma_{i\to f}^{\text{abs}} = B_{if} \, u(\omega_{fi}),
+\]</p>
+
+<p>\(B_{if} = \pi e^2 |\langle f|\hat{\vec r}|i\rangle|^2 / (3\varepsilon_0 \hbar^2)\) 是<em>Einstein \(B\) 系数</em>（吸收）。</p>
+
+<p><strong>(b) 受激发射</strong>: 原子从 \(|f\rangle\) 受电磁场刺激跃迁回 \(|i\rangle\), 发射一个光子（与入射光<em>相干</em>, 同频同相同方向）。同样金律, 矩阵元模平方相同, 给同样的 \(B\) 系数 \(B_{fi} = B_{if}\) (Einstein 1916)。</p>
+
+<p>这条<em>对称性</em> 是激光（LASER = Light Amplification by Stimulated Emission of Radiation）的物理基础。如果某个能级 \(|f\rangle\) 比 \(|i\rangle\) 占据多（"<em>粒子数反转</em>"）, 入射光会被放大（受激发射 > 吸收）。1960 Maiman 第一台红宝石激光器实现; 现在激光在通信、医学、加工无处不在。</p>
+
+<p><strong>(c) 自发发射</strong>: 即使<em>没有</em> 入射光, 激发态原子也会自发发光跃迁到低态。这个<em>不能</em> 用半经典理论（电磁场为经典）解释——必须把电磁场<em>量子化</em>（QED）, 让真空中存在<em>零点涨落</em>, 起到"<em>诱发</em>" 跃迁的作用。Einstein 1916 用<em>统计平衡</em>（黑体辐射 + Boltzmann 分布）<em>逆推</em> 出</p>
+
+<p>\[
+\boxed{\ A_{fi} = \frac{\hbar\omega_{fi}^3}{\pi^2 c^3}B_{fi} = \frac{e^2 \omega_{fi}^3}{3\pi\varepsilon_0 \hbar c^3}|\langle i|\hat{\vec r}|f\rangle|^2.\ }
+\]</p>
+
+<p>\(A_{fi}\) 是<em>Einstein \(A\) 系数</em>（自发发射速率）。注意 \(A \propto \omega^3\)——高频跃迁<em>自发</em> 发射快得多。\(2p \to 1s\)（Lyman-\(\alpha\), 121.6 nm）寿命约 1.6 ns; 微波跃迁（21 cm 氢线）寿命 \(10^7\) 年（极慢, 让 21 cm 线在天文学里能"<em>跨越宇宙</em>" 不被淹没）。</p>
+
+<p>1948-49 QED 给出 \(A\) 的<em>第一原理</em> 推导, 不需要 Einstein 的统计配平。这条公式在原子物理 / 天体物理 / 激光物理无所不在。</p>
+
+<h2 id="sec20-7">20.7 应用 2: 选择规则</h2>
+
+<p>金律里的<em>矩阵元</em> \(\langle f|\hat{\vec d}|i\rangle\) 决定哪些跃迁<em>允许</em>（matrix element \(\neq 0\)）哪些<em>禁戒</em>（=0）。这给<em>选择规则</em>。</p>
+
+<p>电偶极矩阵元 \(\langle n'\ell' m'|\hat{\vec r}|n\ell m\rangle\) 由<em>角部分</em> 球谐函数 \(Y_{\ell}^m\) 的积分决定。利用球谐函数的乘法公式（Wigner-Eckart 定理）, 电偶极算子在角动量基下表现为 \(\ell = 1\) 张量, 给</p>
+
+<p>\[
+\boxed{\ \Delta\ell = \pm 1, \quad \Delta m = 0, \pm 1.\ }
+\]</p>
+
+<p>满足这两条的跃迁"<em>允许</em>"; 否则"<em>禁戒</em>"（电偶极矩阵元 = 0, 但更高阶——磁偶极、电四极——可能给非零, 但速率小很多）。</p>
+
+<p>例子: 氢原子 \(2p \to 1s\) (\(\Delta\ell = -1, \Delta m = 0\)) 允许, 速率正常。\(2s \to 1s\) (\(\Delta\ell = 0\)) <em>电偶极禁戒</em>; \(2s\) 寿命 \(\sim 0.12\) 秒（比 \(2p\) 长 8 个量级！）。这条"<em>亚稳</em>" \(2s\) 在天文 / 激光物理有重要应用。</p>
+
+<p>选择规则是金律的<em>立即</em> 推论, 一行公式扫除大量可能跃迁——大大简化原子光谱分析。</p>
+
+<h2 id="sec20-8">20.8 应用 3: 核衰变 + 半导体散射</h2>
+
+<p><strong>核 \(\beta\) 衰变</strong>: \({}^{14}\text{C} \to {}^{14}\text{N} + e^- + \bar\nu_e\)。Fermi 1934 把它用金律处理: 弱相互作用矩阵元 \(\langle f|\hat V_F|i\rangle = G_F \cdot M_{nuc}\), 其中 \(G_F\) 是 Fermi 常数（弱耦合强度）, \(M_{nuc}\) 是核矩阵元。末态有<em>三体</em>（核 + 电子 + 反中微子）, 末态密度由动量空间相空间体积给</p>
+
+<p>\[
+\rho(E) = \frac{V^2}{(2\pi\hbar)^6}\int p_e^2 \, dp_e \int p_\nu^2\, dp_\nu \, \delta(E - E_e - E_\nu).
+\]</p>
+
+<p>积分给"<em>Fermi 函数</em>", 形状决定 \(\beta\) 谱（电子能量分布）。这是 1934 Fermi 弱相互作用理论的<em>第一</em> 应用, 直接验证了中微子的存在（β 谱形状必须有第三粒子吸收能量, 不然为单能尖峰）。1956 Reines + Cowan 实验直接探测到反中微子。</p>
+
+<p>更广义: \(\alpha\) 衰变（链回<a href="ch8.html">ch8</a> 隧穿）的速率也用金律加 WKB 矩阵元算; 重核裂变 / 聚变速率同。整个<em>核反应理论</em> 是金律 + 相空间因子。</p>
+
+<p><strong>半导体载流子散射</strong>: 半导体里电子从一个 Bloch 态 \(|\vec k\rangle\) 散射到 \(|\vec k'\rangle\), 由声子（晶格振动）、杂质、电子-电子相互作用驱动。每条散射机制给金律</p>
+
+<p>\[
+\Gamma_{\vec k \to \vec k'} = \frac{2\pi}{\hbar}|\langle \vec k'|\hat V_{\text{scatt}}|\vec k\rangle|^2 \delta(E_{\vec k'} - E_{\vec k}).
+\]</p>
+
+<p>把对 \(\vec k'\) 积分（用末态密度），给<em>总散射率</em> \(1/\tau(\vec k)\)。这条<em>弛豫时间</em> \(\tau\) 进入 Boltzmann 输运方程, 决定半导体的<em>电导率</em> \(\sigma = n e^2 \tau / m^*\)（Drude 公式 + 量子修正）。</p>
+
+<p>简而言之: 你手机里 CPU 的速度限制, 最终被金律决定的电子-声子散射率所控制。</p>
+
+<p><strong>更多金律应用</strong>:</p>
+
+<ul>
+  <li>分子振动跃迁（红外光谱）速率。</li>
+  <li>核磁共振 NMR 在 RF 脉冲下的跃迁概率（链回 ch17.8）。</li>
+  <li>原子 / 分子<em>碰撞</em> 截面（Born 近似 → 微分散射截面）, 与<a href="ch21.html">ch21</a> 散射理论相通。</li>
+  <li>粒子物理中的衰变率: \(\mu^- \to e^- + \bar\nu_e + \nu_\mu\) 寿命 2.2 \(\mu\)s——金律 + 电弱矩阵元给。</li>
+</ul>
+
+<h2 id="sec20-9">20.9 临别话</h2>
+
+<p>Fermi 金律是 QM 给<em>动力学</em> 的最重要公式。它把"<em>跃迁速率</em>" 写成"<em>矩阵元 × 末态密度</em>"——一边纯量子（耦合强度）, 一边纯统计（可达末态计数）。这条简洁分解让它在物理学里几乎到处出现。</p>
+
+<p>本章主线:</p>
+
+<ul>
+  <li>时变 SE → 一阶振幅 \(c_f^{(1)}(t) = -i/\hbar \int \langle f|\hat V(t')|i\rangle e^{i\omega_{fi}t'} dt'\)。</li>
+  <li>周期微扰 → 共振峰 \(\sin^2(\Delta\omega t/2)/(\Delta\omega/2)^2\)。</li>
+  <li>长时极限 + 连续末态 → \(\Gamma = (2\pi/\hbar)|\langle f|\hat V|i\rangle|^2 \rho(E_f)\)。</li>
+  <li>应用: Einstein A/B 系数, 选择规则 \(\Delta\ell = \pm 1\), 核衰变, 半导体散射。</li>
+</ul>
+
+<p>使用警告:</p>
+
+<ul>
+  <li>金律是<em>一阶</em> Born 近似——\(\hat V\) 必须"<em>小</em>" + 跃迁概率 \(\ll 1\)。强光、强场需要更高阶或非微扰处理（数值解时变 SE）。</li>
+  <li>"<em>长时间</em>" 极限是关键——\(t\) 必须远大于 \(1/\omega_{fi}\) 但远小于 \(1/\Gamma\)（不然跃迁出去的概率反向影响初态, 单向假设失效）。</li>
+  <li>简并末态需要小心: 可能多条独立跃迁通道, 每条加金律然后求和。</li>
+</ul>
+
+<p>下一章<a href="ch21.html">ch21</a> 我们做<em>散射理论</em>——粒子从远处入射, 与靶相互作用, 散射出去。这是金律的"<em>空间</em>" 版本（碰撞 = 一种跃迁过程）, 给微分截面 \(d\sigma/d\Omega\), 是高能物理 + 凝聚态实验最直接的可观测量。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 时间无关微扰论</a><a href="ch21.html">下一章 · 第 21 章 散射理论 →</a></nav>
+</main>
+</body>
+</html>

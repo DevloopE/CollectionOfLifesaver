@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 波函数与 Born 概率诠释 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 Schrödinger 方程</a><a href="ch5.html">下一章 · 第 5 章 自由粒子 →</a></nav>
+<h1 id="ch4">第 4 章 波函数与 Born 概率诠释</h1>
+
+<p>上一章 Schrödinger 给我们一条方程, 解出来一个函数 \(\psi(\boldsymbol x, t)\), 叫"<em>波函数</em>"。这一章正面追问一个问题——<em>\(\psi\) 是什么</em>？</p>
+
+<p>这个问题听起来天真, 但 1926 年它让物理学家集体头疼了好几个月。Schrödinger 自己一开始有一个直观回答, 那个回答<em>错了</em>。1926 年中 Max Born 给出现在的标准答案——\(|\psi|^2\) 是概率密度。这条诠释把量子力学从"<em>关于物质波的方程</em>" 升级为"<em>关于概率波的方程</em>", 使整个量子力学成为<em>本质统计</em> 的理论。这一章我们走过这条路, 看 Born 怎么"<em>猜</em>" 出概率诠释、怎么用归一化把它做成自洽的数学结构、最后用几个具体例子算期望值。</p>
+
+<h2 id="sec4-1">4.1 朴素一问: \(\psi\) 直接是什么？</h2>
+
+<p>Schrödinger 方程解出 \(\psi(\boldsymbol x, t)\), 这是一个<em>复数值</em> 函数——每个时空点 \((\boldsymbol x, t)\) 对应一个复数 \(\psi \in \mathbb C\)。请你停下来注意"<em>复数值</em>" 这件事的奇怪。</p>
+
+<p>经典物理里所有可观测的物理量都是<em>实数</em>: 位置, 速度, 温度, 电场, 磁场, 应力, 等等。我们能写出复数（比如电场的复数表示 \(E(\boldsymbol x, t) = E_0 e^{i(\boldsymbol k \cdot \boldsymbol x - \omega t)}\)）, 但那只是<em>数学技巧</em>——物理上有意义的是它的实部, 复数只是为了简化代数。最终结果一定取实部。</p>
+
+<p>但 Schrödinger 方程的 \(\psi\) <em>本质</em> 是复值——方程里有个 \(i\), 没法绕开。即使你坚持用实部 \(\text{Re}(\psi)\), 它也<em>不</em> 满足 SE; SE 把实部 + 虚部混在一起演化, 你不能丢掉虚部。</p>
+
+<p>这就给"<em>\(\psi\) 是什么物理量</em>" 出了大问题。一个复数<em>本身</em> 没有直接物理对应——你不能用尺子量出"<em>电子在 \(\boldsymbol x\) 处的 \(\psi\) 是 \(0.3 + 0.4 i\)</em>", 这种话不对应任何实验。</p>
+
+<p>(Schrödinger 自己的早期猜想) 1926 年初 Schrödinger 提议: <em>\(|\psi|^2\) 是电荷密度</em>。也就是说, 电子不是一个点粒子, 而是<em>分布</em> 在空间中的<em>电荷云</em>, 密度由 \(|\psi|^2\) 给定。这种解释保留了经典物理的"<em>实在论</em>" 直觉——粒子是实有的物质分布, 没有概率, 没有随机。</p>
+
+<p>这条解释在静态原子（氢原子的束缚态）上看起来还行——氢原子的 \(|\psi_{1s}|^2\) 是个球对称分布, 说"<em>电子均匀地散布在 1s 轨道里</em>" 物理直觉上说得过去。但<em>动态</em> 实验立刻打翻它。</p>
+
+<p>(撞墙) 把电子打在屏上。如果 \(|\psi|^2\) 是电荷云, 那打到屏上的是<em>整个云</em>, 应该在屏上留下<em>分布</em> 的电荷痕迹（云形状的影子）。可实验上<em>每一个电子</em> 在屏上留下<em>一个点</em>——一个完整的电子, 出现在某一个特定位置, 不是云。波函数描述的"<em>分布</em>" <em>不</em> 对应"<em>同时存在的多处实物</em>"。Schrödinger 的电荷云图像在这里破产。</p>
+
+<p>这就是 Born 1926 年要解决的问题——\(\psi\) 描述什么<em>统计</em> 信息, 既能解释波动性（多次实验积累的干涉条纹）又能解释粒子性（单次实验的"<em>一点</em>" 击中）。</p>
+
+<h2 id="sec4-2">4.2 Reframe: Born 1926 概率诠释</h2>
+
+<p>1926 年 Max Born 在德国 Göttingen 大学（Heisenberg 的同事）研究散射问题——把粒子打到散射体上, 算出射粒子的角分布。他在论文里加了一个脚注（后来成为 20 世纪物理最有名的脚注之一）:</p>
+
+<blockquote>
+<p><em>\(|\psi|^2\) 是<em>概率密度</em>——粒子在 \(\boldsymbol x\) 处被找到的概率密度。</em></p>
+</blockquote>
+
+<p>更精确地, 在三维空间, 在小体积 \(d^3 x\) 内找到粒子的概率是</p>
+
+<p>\[
+\boxed{\ dP = |\psi(\boldsymbol x, t)|^2 \, d^3 x.\ }
+\]</p>
+
+<p>请你停下来认真看这一行。它说: <em>每个量子粒子的位置是<em>随机变量</em>, 它的概率分布由波函数模平方给定</em>。</p>
+
+<p>这条解释解决了上面所有矛盾:</p>
+
+<ul>
+  <li>(单次电子击中) 单个电子在屏上留下一点——<em>这一点的位置是随机的</em>, 服从分布 \(|\psi|^2\)。</li>
+  <li>(多次电子积累) 重复 \(N\) 次, 屏上出现 \(N\) 个点。\(N\) 大时这些点的<em>密度</em> 收敛到 \(|\psi|^2\) 这个分布——即<em>干涉条纹</em>。</li>
+  <li>(波函数复数性) \(\psi\) 是复数, 但 \(|\psi|^2 = \psi^* \psi\) 是<em>非负实数</em>, 完美对应概率密度（必须非负）。</li>
+</ul>
+
+<p>这条诠释 1926 年 Born 提出来时<em>很多人不接受</em>。Einstein、Schrödinger、de Broglie 都反对——"<em>上帝不掷骰子</em>" (Einstein 名言) 表达了他们对量子力学本质<em>随机</em> 的不满。但 90 年实验 + 应用反复证明 Born 诠释<em>对</em>, 现在它是<em>标准</em>。</p>
+
+<p>请你接受这条结论的<em>哲学冲击</em>——量子力学是<em>本质统计</em> 的理论。它不像经典统计力学（"<em>实际上每个粒子有确定位置, 只是我们不知道, 用统计描述</em>"）。量子力学的统计是<em>更深</em> 的——<em>电子本身没有确定位置, 只有概率分布</em>。这条说法有自由派回应（隐变量理论, 见 4.7）, 但 Bell 不等式 + 1980s Aspect 实验显示这些自由派理论与实验<em>不</em> 符（ch22 详谈）。</p>
+
+<p>Born 1954 年因这条解释获 Nobel 奖（推迟 28 年, 因争议）。Born 给量子力学的概率诠释 + Schrödinger 的方程 + Heisenberg 的不确定性 + Bohr 的对应原理 = "<em>哥本哈根诠释</em>", 是 1927 年量子力学的"<em>正统</em>" 解读。</p>
+
+<h2 id="sec4-3">4.3 命名: 归一化条件</h2>
+
+<p>如果 \(|\psi|^2\) 是概率密度, 那它必须满足"<em>总概率 = 1</em>" 的条件:</p>
+
+<p>\[
+\int_{\text{全空间}} |\psi(\boldsymbol x, t)|^2 \, d^3 x = 1.
+\]</p>
+
+<p>用一维记号:</p>
+
+<p>\[
+\boxed{\ \int_{-\infty}^{\infty} |\psi(x, t)|^2 \, dx = 1.\ }
+\]</p>
+
+<p>这条<em>归一化条件</em> 把波函数固定到一个可解释的尺度。Schrödinger 方程是线性方程, 解 \(\psi\) 乘以任意常数 \(c\) 还是解; 归一化挑出 \(|c|\)（相位 \(\arg(c)\) 不能由归一化定, 但物理上不重要——\(\psi\) 与 \(e^{i\theta} \psi\) 给同样的 \(|\psi|^2\), 所以同样的物理）。</p>
+
+<p>(具体例: 高斯波包) 取 \(\psi(x) = A e^{-x^2/(2 a^2)}\)。归一化:</p>
+
+<p>\[
+\int_{-\infty}^{\infty} |A|^2 e^{-x^2/a^2} \, dx = |A|^2 \sqrt{\pi a^2} = 1
+\quad \Rightarrow \quad
+|A| = \frac{1}{(\pi a^2)^{1/4}}.
+\]</p>
+
+<p>所以归一化的高斯波包是</p>
+
+<p>\[
+\psi(x) = \frac{1}{(\pi a^2)^{1/4}} e^{-x^2/(2 a^2)}.
+\]</p>
+
+<p>这条 \(\psi\) 在 \(x = 0\) 附近高度集中, 宽度大约 \(a\)。它代表一个"<em>位置不确定到 \(\sim a\) 的电子</em>"。\(a \to 0\) 极限是位置完全确定的电子（δ 函数）, \(a \to \infty\) 极限是位置完全不确定（接近常数, 但严格 \(a = \infty\) 不归一化）。</p>
+
+<p>(警告: 不归一化的解) 平面波 \(\psi = e^{i k x}\) 在全空间 \(|\psi|^2 = 1\), 积分 \(\int 1 \, dx = \infty\)——<em>无法归一化</em>。所以平面波不是物理上合法的<em>单粒子</em> 波函数。它是数学上有用的<em>极限对象</em>, 物理粒子总是用<em>波包</em>（局部化的 \(\psi\)）描述。\(L^2\) 空间的严格框架（ch9）把这件事说清楚: 物理态 = \(L^2\) 中的归一化向量, 平面波在 \(L^2\) 之外, 是"<em>广义本征函数</em>"。</p>
+
+<h2 id="sec4-4">4.4 SE 保归一化: 连续性方程 + 概率流</h2>
+
+<p>归一化条件 \(\int |\psi|^2 \, dx = 1\) 是<em>初始时刻</em> 加给 \(\psi\) 的。但波函数会随时间演化（满足 SE）, 我们必须验证<em>归一化在所有时间都成立</em>——否则总概率会自动改变, 概率诠释就不自洽。</p>
+
+<p>(关键命题) Schrödinger 方程<em>保</em> 归一化: 如果 \(\int |\psi(x, 0)|^2 \, dx = 1\), 那么 \(\int |\psi(x, t)|^2 \, dx = 1\) 对所有 \(t\) 成立。</p>
+
+<p>(证明) 计算总概率的时间导数:</p>
+
+<p>\[
+\frac{d}{dt} \int |\psi|^2 \, dx = \int \left( \frac{\partial \psi^*}{\partial t} \psi + \psi^* \frac{\partial \psi}{\partial t} \right) dx.
+\]</p>
+
+<p>从 SE \(i\hbar \partial_t \psi = \hat H \psi\) 解出 \(\partial_t \psi = (1/i\hbar) \hat H \psi\); 取共轭 \(\partial_t \psi^* = -(1/i\hbar) \hat H \psi^*\)（注意 \(\hat H\) 实算子）。代入:</p>
+
+<p>\[
+\frac{d}{dt} \int |\psi|^2 \, dx = \int \left( -\frac{1}{i\hbar} (\hat H \psi^*) \psi + \frac{1}{i\hbar} \psi^* (\hat H \psi) \right) dx = \frac{1}{i\hbar} \int \left( \psi^* \hat H \psi - (\hat H \psi^*) \psi \right) dx.
+\]</p>
+
+<p>用 \(\hat H = -(\hbar^2/2m) \partial_x^2 + V\); \(V\) 项贡献 \(V \psi^* \psi - V \psi^* \psi = 0\); 动能项贡献 \(-(\hbar^2/2m)(\psi^* \partial_x^2 \psi - (\partial_x^2 \psi^*) \psi)\)。注意</p>
+
+<p>\[
+\psi^* \partial_x^2 \psi - (\partial_x^2 \psi^*) \psi = \partial_x \left( \psi^* \partial_x \psi - (\partial_x \psi^*) \psi \right).
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\frac{d}{dt} \int |\psi|^2 \, dx = -\frac{\hbar}{2 m i} \int \partial_x \left( \psi^* \partial_x \psi - (\partial_x \psi^*) \psi \right) dx = -\frac{\hbar}{2 m i} \left[ \psi^* \partial_x \psi - (\partial_x \psi^*) \psi \right]_{-\infty}^{\infty}.
+\]</p>
+
+<p>对归一化的 \(\psi\)（在无穷远衰减到 0）, 边界项 = 0。所以 \(d/dt \int |\psi|^2 \, dx = 0\), 总概率<em>守恒</em>。Q.E.D.</p>
+
+<p>(局部形式: 连续性方程) 上面的推导其实给我们一个更细的局部守恒律。定义<em>概率密度</em></p>
+
+<p>\[
+\rho(x, t) = |\psi(x, t)|^2
+\]</p>
+
+<p>和<em>概率流</em></p>
+
+<p>\[
+j(x, t) = \frac{\hbar}{2 m i} \left( \psi^* \partial_x \psi - (\partial_x \psi^*) \psi \right) = \frac{\hbar}{m} \text{Im}(\psi^* \partial_x \psi).
+\]</p>
+
+<p>那么</p>
+
+<p>\[
+\boxed{\ \frac{\partial \rho}{\partial t} + \frac{\partial j}{\partial x} = 0.\ }
+\]</p>
+
+<p>这就是<em>连续性方程</em>, 形式上和流体力学的 \(\partial_t \rho + \nabla \cdot \boldsymbol j = 0\) 完全一样。它说概率密度<em>局部守恒</em>——概率不会凭空消失也不会凭空出现, 只能从一处<em>流</em> 到另一处, 流量由 \(j\) 给定。</p>
+
+<p>(物理意义) 连续性方程让"<em>概率</em>" 像"<em>质量</em>" 或"<em>电荷</em>" 一样, 是个守恒量。一个高斯波包随时间漂移、扩散, 但<em>积分总概率</em> 始终 = 1。这条性质保证 Born 诠释自洽。</p>
+
+<p>(三维一般化) \(\boxed{\partial_t \rho + \nabla \cdot \boldsymbol j = 0}\), 其中 \(\boldsymbol j = (\hbar/m) \text{Im}(\psi^* \nabla \psi)\)。物理上 \(\boldsymbol j\) 是<em>概率流密度向量</em>——它的方向 + 模告诉你概率在每点向哪里流、流多快。在散射理论里, \(\boldsymbol j\) 就是粒子流的密度（ch20 散射）。</p>
+
+<h2 id="sec4-5">4.5 命名: 期望值</h2>
+
+<p>有了概率密度 \(|\psi|^2\), 我们能算<em>位置的期望值</em>:</p>
+
+<p>\[
+\boxed{\ \langle x \rangle = \int_{-\infty}^{\infty} x \, |\psi(x, t)|^2 \, dx = \int \psi^* x \psi \, dx.\ }
+\]</p>
+
+<p>这是统计学里"<em>随机变量 \(x\) 的期望</em>" 在量子情形的具体形式。\(\langle x \rangle(t)\) 是个时间函数; 对一个高斯波包, \(\langle x \rangle(t) = v_g t\)（中心匀速移动）。</p>
+
+<p>(更深: 算子的期望值) 一般地, 任何物理量 \(A\) 对应一个算子 \(\hat A\)（ch3 末尾给的"<em>物理量 = 自伴算子</em>" 公设）。\(A\) 的期望值是</p>
+
+<p>\[
+\boxed{\ \langle A \rangle = \int \psi^* (\hat A \psi) \, dx.\ }
+\]</p>
+
+<p>对位置: \(\hat x \psi = x \psi\), 所以 \(\langle x \rangle = \int \psi^* x \psi \, dx\), 退化到上面公式。</p>
+
+<p>对动量: \(\hat p = -i\hbar \partial_x\)（ch3 给的算子替换）, 所以</p>
+
+<p>\[
+\boxed{\ \langle p \rangle = \int \psi^* \left(-i\hbar \frac{\partial \psi}{\partial x}\right) dx.\ }
+\]</p>
+
+<p>(具体例: 平面波) \(\psi = e^{i k x}\)（虽然不归一化, 但在某个有限区域归一化讨论）。\(\partial_x \psi = i k \psi\), \(\hat p \psi = -i\hbar \cdot i k \psi = \hbar k \psi\)。期望 \(\langle p \rangle = \int \psi^* \hbar k \psi \, dx / \int \psi^* \psi \, dx = \hbar k\)——平面波的动量等于 \(\hbar k\), 与 de Broglie 关系完全一致。</p>
+
+<p>(对能量) \(\hat H = -(\hbar^2/2m) \partial_x^2 + V\), 期望</p>
+
+<p>\[
+\langle H \rangle = \int \psi^* \hat H \psi \, dx = \int \left( \frac{\hbar^2}{2m} |\partial_x \psi|^2 + V |\psi|^2 \right) dx
+\]</p>
+
+<p>(用分部积分把动能项整理成 \(|\partial_x \psi|^2\) 的样子)。这就是<em>能量泛函</em>, 在变分法里非常重要——基态由"<em>使 \(\langle H \rangle\) 最小且归一化</em>" 的 \(\psi\) 给出（ch7 谐振子 + ch19 变分法）。</p>
+
+<h2 id="sec4-6">4.6 一个具体例: 高斯波包的 \(\langle x \rangle\), \(\langle p \rangle\), \(\Delta x\), \(\Delta p\)</h2>
+
+<p>取归一化高斯波包</p>
+
+<p>\[
+\psi(x) = \frac{1}{(\pi a^2)^{1/4}} e^{-x^2/(2 a^2)} e^{i k_0 x}.
+\]</p>
+
+<p>(\(\langle x \rangle\)) \(|\psi|^2 = (1/\sqrt{\pi a^2}) e^{-x^2/a^2}\), 偶函数。期望</p>
+
+<p>\[
+\langle x \rangle = \int x \cdot \frac{1}{\sqrt{\pi a^2}} e^{-x^2/a^2} dx = 0
+\]</p>
+
+<p>（积奇函数得 0）。</p>
+
+<p>(\(\langle x^2 \rangle\)) 高斯积分:</p>
+
+<p>\[
+\langle x^2 \rangle = \int x^2 \cdot \frac{1}{\sqrt{\pi a^2}} e^{-x^2/a^2} dx = \frac{a^2}{2}.
+\]</p>
+
+<p>所以位置的<em>方差</em></p>
+
+<p>\[
+(\Delta x)^2 = \langle x^2 \rangle - \langle x \rangle^2 = \frac{a^2}{2}, \quad \Delta x = \frac{a}{\sqrt 2}.
+\]</p>
+
+<p>(\(\langle p \rangle\)) 计算 \(\partial_x \psi = (-x/a^2 + i k_0) \psi\), 所以 \(-i\hbar \partial_x \psi = (i\hbar x/a^2 + \hbar k_0) \psi\)。期望:</p>
+
+<p>\[
+\langle p \rangle = \int \psi^* (-i\hbar \partial_x \psi) dx = \int \left( \frac{i\hbar x}{a^2} + \hbar k_0 \right) |\psi|^2 dx = \frac{i\hbar}{a^2} \langle x \rangle + \hbar k_0 = \hbar k_0
+\]</p>
+
+<p>（用 \(\langle x \rangle = 0\)）。粒子的<em>平均动量</em> = \(\hbar k_0\)——与构造高斯波包时引入的 \(k_0\) 一致。</p>
+
+<p>(\(\langle p^2 \rangle\)) 略计算（标准结果）:</p>
+
+<p>\[
+\langle p^2 \rangle = (\hbar k_0)^2 + \frac{\hbar^2}{2 a^2}, \quad (\Delta p)^2 = \langle p^2 \rangle - \langle p \rangle^2 = \frac{\hbar^2}{2 a^2}, \quad \Delta p = \frac{\hbar}{\sqrt 2 a}.
+\]</p>
+
+<p>(组合: 不确定关系) 计算 \(\Delta x \cdot \Delta p\):</p>
+
+<p>\[
+\Delta x \cdot \Delta p = \frac{a}{\sqrt 2} \cdot \frac{\hbar}{\sqrt 2 a} = \frac{\hbar}{2}.
+\]</p>
+
+<p>请你停下来盯一下这条。<em>位置不确定 × 动量不确定 = \(\hbar/2\)</em>, 与高斯波包的宽度 \(a\) <em>无关</em>。这就是 Heisenberg 不确定关系的<em>等号</em> 情形——高斯波包是"<em>最小不确定波包</em>", 一般态满足 \(\Delta x \cdot \Delta p \geq \hbar/2\)（ch11 完整证明）。</p>
+
+<p>这条结果的物理意义: <em>无法同时把电子的位置和动量都精确确定</em>。窄波包（\(a\) 小）位置准但动量散; 宽波包（\(a\) 大）位置散但动量准。两者乘积有下限。这是 SE + Born 诠释的<em>纯数学</em> 结论——不需要"<em>测量装置干扰</em>" 类经典论证, 它在<em>波函数本身</em> 的层面就成立。</p>
+
+<h2 id="sec4-7">4.7 哥本哈根诠释 vs 多世界 vs 隐变量</h2>
+
+<p>Born 概率诠释 + Heisenberg 不确定性 + Bohr 对应原理 = <em>哥本哈根诠释</em>, 是 1927 年量子力学的"<em>正统</em>" 解读。它的核心 5 条:</p>
+
+<ol>
+  <li>系统状态 = Hilbert 空间向量 \(|\psi\rangle\), 演化由 SE 给定。</li>
+  <li>每个物理量对应一个自伴算子 \(\hat A\); 测量结果 = \(\hat A\) 的某个本征值。</li>
+  <li>测量给出本征值 \(a_n\) 的概率 = \(|\langle \phi_n | \psi \rangle|^2\)（投影模平方）。</li>
+  <li>测量后, 系统态<em>塌缩</em> 到对应的本征态 \(|\phi_n\rangle\)（"<em>波函数塌缩</em>"）。</li>
+  <li>没有"<em>测量之前粒子在哪里</em>" 的提问意义——测量之前只有概率分布, 谈不上确定值。</li>
+</ol>
+
+<p>这 5 条<em>能算出所有量子实验的预测</em>, 100 年来无一例外。它的争议在第 4 + 5 条——"<em>塌缩</em>" 是个奇怪过程, 它<em>不</em> 由 SE 描述（SE 是连续 + 决定性的, 塌缩是瞬时 + 随机的）, 是对量子动力学的<em>额外</em> 假设。这条额外假设让人不安, 引出几种<em>替代诠释</em>:</p>
+
+<p>(多世界诠释, Many-Worlds) Hugh Everett 1957 年提出。它的核心想法: <em>测量时波函数<em>不</em> 塌缩</em>; 它继续按 SE 演化, 但"<em>测量装置</em>" 与"<em>系统</em>" 形成一个纠缠态, 表示<em>所有</em> 可能的测量结果。我们感受到的"<em>塌缩</em>" 是因为我们的意识只在<em>一个</em> 分支里, 无法访问其他分支。每次测量就让宇宙"<em>分支</em>"。这种诠释在数学上比哥本哈根更简单（去掉公设 4 + 5）, 但代价是接受"<em>无穷多个平行宇宙</em>" 的本体论。</p>
+
+<p>(隐变量, Hidden Variables) de Broglie 1927 提出, Bohm 1952 完善。它的核心想法: <em>电子始终有<em>确定的位置</em>, 我们只是不知道</em>（这个位置是"<em>隐变量</em>"）; 量子统计来自我们对隐变量的无知, 类似于经典统计力学。波函数 \(\psi\) 不是物理实在, 只是<em>引导</em> 粒子运动的"<em>导波</em>"。这种诠释保留经典实在论, 让 Einstein 们高兴。</p>
+
+<p>(Bell 1964 + Aspect 1980s 实验) 隐变量理论看起来很美, 但 1964 年 John Bell 证了一个不等式——任何<em>局域</em> 隐变量理论必然满足某个不等式, 而量子力学预测违反这个不等式。1980s Alain Aspect（巴黎）做实验, 显示<em>实验违反 Bell 不等式</em>, <em>支持量子力学预测</em>。</p>
+
+<p>这就是 ch22 我们要详谈的内容。结论是: <em>局域隐变量理论被实验排除</em>（Bohm 的隐变量是非局域的, 没被排除; 但非局域隐变量与狭义相对论张力大）。多世界诠释与哥本哈根诠释做完全相同的实验预测, <em>无法</em> 用实验区分——它们的差异是<em>形而上学</em> 的, 不是物理的。</p>
+
+<p>(实用主义) 大多数物理学家在日常工作中不深究诠释问题, 用"<em>哥本哈根</em>" 算就行——它给对的预测就是它的合法性。"<em>Shut up and calculate</em>" (Mermin) 是这种态度的口号。但在量子计算 + 量子信息时代, 诠释问题重新变得实用——理解纠缠 + 退相干 + 测量需要把这些哲学问题讲清。本书 ch22-23 给现代视角。</p>
+
+<p>请你接受一条: <em>对量子力学的诠释存在多种, 它们的实验预测一致, 数学结构一致</em>。你可以选你喜欢的诠释来组织自己的物理直觉, 但<em>计算结果</em> 不依赖于诠释选择。这一节我们用哥本哈根诠释（Born 概率 + 测量塌缩）作为标准框架, 后面 ch9-13 在 Hilbert 空间形式化这一切。</p>
+
+<h2 id="sec4-8">4.8 命名 + 一般化: 量子力学是统计理论</h2>
+
+<p>这一章给我们一个根本观念: <em>量子力学是<em>本质统计</em> 的物理理论</em>。它的所有预测都是<em>概率分布</em> 而不是<em>确定值</em>。具体表现:</p>
+
+<ul>
+  <li>波函数 \(\psi\) 本身<em>不可直接测量</em>——它是复值, 无对应物理量。</li>
+  <li>可测的是 \(|\psi|^2\)（概率密度）和各种期望值 \(\langle \hat A \rangle\)。</li>
+  <li>每次测量给一个数值（某个本征值）, 多次测量的统计才与理论预测对照。</li>
+</ul>
+
+<p>这种"<em>统计</em>" 与经典统计物理的"<em>统计</em>" 性质上不同:</p>
+
+<ul>
+  <li>(经典统计) 系统有<em>确定</em> 状态, 我们用统计描述是因为我们对状态信息不全（比如不知道每个气体分子的位置）。原则上"<em>真实</em>" 是确定的。</li>
+  <li>(量子统计) 系统<em>没有</em> 确定状态（位置, 动量, 等等）, 只有概率分布。统计是<em>本质</em> 的, 不是来自信息缺失（Bell 不等式实验表明）。</li>
+</ul>
+
+<p>这条区别困扰了 Einstein 一辈子——他写过"<em>God doesn't play dice</em>", "<em>I cannot believe that the moon is not there when I'm not looking</em>", 拒绝接受这种本质统计。但实验事实站在量子力学这边。</p>
+
+<p>(连接整个理论) 把这一章的关键画面合到一起:</p>
+
+<ul>
+  <li><strong>朴素一问</strong>: \(\psi\) 是什么？复值, 不直接可测。</li>
+  <li><strong>Schrödinger 早期错</strong>: 电荷云。被电子击中"<em>一点</em>" 实验否决。</li>
+  <li><strong>Born reframe</strong>: \(|\psi|^2\) 是概率密度。</li>
+  <li><strong>归一化</strong>: \(\int |\psi|^2 dx = 1\), SE 自动保归一化（连续性方程）。</li>
+  <li><strong>期望值</strong>: \(\langle \hat A \rangle = \int \psi^* \hat A \psi \, dx\), 物理量 = 自伴算子的统计预测。</li>
+  <li><strong>不确定关系</strong>: 高斯波包 \(\Delta x \cdot \Delta p = \hbar/2\), 一般态 \(\geq \hbar/2\)。</li>
+  <li><strong>诠释</strong>: 哥本哈根（标准）vs 多世界 vs 隐变量, 实验区分（Bell 1964 + Aspect 1980s）支持量子力学预测。</li>
+</ul>
+
+<p>这条结构在 ch9-13 用 Hilbert 空间 + Dirac 记号<em>形式化</em>:</p>
+
+<ul>
+  <li>\(\psi(x) \to |\psi\rangle \in \mathcal H\)（Hilbert 空间向量）</li>
+  <li>\(\int \psi^* \phi \, dx \to \langle \psi | \phi \rangle\)（内积）</li>
+  <li>\(|\psi|^2 \to |\langle x | \psi \rangle|^2\)（投影模平方）</li>
+  <li>\(\langle \hat A \rangle \to \langle \psi | \hat A | \psi \rangle\)</li>
+  <li>SE \(i\hbar \partial_t \psi = \hat H \psi \to i\hbar \partial_t |\psi\rangle = \hat H |\psi\rangle\)</li>
+</ul>
+
+<p>这套形式化让所有计算变得简洁、有几何意味, 但物理内容和这一章给的完全一致。</p>
+
+<h2 id="sec4-9">4.9 临别话</h2>
+
+<p>1926 年 Born 在 Göttingen 写下"<em>\(|\psi|^2\) = 概率密度</em>", 量子力学的诠释问题就此开始。这条诠释让物理学不再是"<em>经典实在论</em>" 的——它把"<em>电子在哪里</em>" 从一个有确定答案的问题, 变成一个只能给统计回答的问题。</p>
+
+<p>请你欣赏这条诠释的<em>普适性</em>。它对任何量子系统成立——电子位置、原子能级、自旋方向、光子偏振、量子比特——都用 \(|\psi|^2\) 给统计预测。100 年量子物理实验, 没有一个反例。</p>
+
+<p>请你接受这种"<em>本质统计</em>" 的世界观。Einstein 一辈子没接受, 但他赢不了这个争论——实验事实太硬。21 世纪量子计算 + 量子密码 + 量子传感的所有应用, 都依靠这条统计本性。如果电子有"<em>真实位置</em>", 量子计算就不可能 exponential 加速。</p>
+
+<p>这一章结束了"<em>量子力学的逻辑骨架</em>" 这一段（ch1-4: 经典失败 → de Broglie → SE → Born）。下一章我们把这条骨架应用到具体的物理系统, 从最简单的<em>自由粒子</em> 开始: 自由 SE 的解 = 平面波 + 高斯波包, 波包扩散, 群速度等。然后 ch6-8 解势阱、谐振子、势垒, 让你练就"<em>解 SE</em>" 的肌肉。这是量子力学这门课最具体的一段——把抽象方程变成可算的本征值问题, 给出与实验对照的具体预测。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 Schrödinger 方程</a><a href="ch5.html">下一章 · 第 5 章 自由粒子 →</a></nav>
+</main>
+</body>
+</html>

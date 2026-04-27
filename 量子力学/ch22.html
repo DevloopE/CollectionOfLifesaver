@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 22 章 量子纠缠 + Bell 不等式 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 散射理论入门</a><a href="ch23.html">下一章 · 第 23 章 应用：量子计算入门 →</a></nav>
+<h1 id="ch22">第 22 章 量子纠缠 + Bell 不等式</h1>
+
+<p>1935 年 5 月 15 日, 纽约时报第 11 版头条: "EINSTEIN ATTACKS QUANTUM THEORY"。前一周 Einstein + Podolsky + Rosen 三位作者在《Physical Review》发表一篇论文, 题目朴素到挑衅——<em>"Can Quantum-Mechanical Description of Physical Reality Be Considered Complete?"</em> 答案——他们说<em>不</em>。论文的核心思想实验后来叫"<em>EPR 论证</em>"。</p>
+
+<p>EPR 的攻击点: 量子力学预言两个粒子可以处于<em>纠缠</em> 态——两人分别带一个粒子飞到火星和地球。地球这边的人测一个量, 火星那边粒子的态<em>瞬间</em> 跟着改变。这看起来违反相对论的"<em>无瞬时作用</em>"。Einstein 称这种现象"<em>spooky action at a distance</em>"——<em>幽灵般的远距离作用</em>。他的结论: 量子力学的描述<em>不完备</em>, 一定有<em>隐变量</em>（hidden variables）补全它, 让粒子<em>本来就</em> 有确定属性, 测量只是揭示。</p>
+
+<p>这场争论持续 30 年只停留在哲学层面——双方都说"<em>我对</em>", 没人能用<em>实验</em> 判定谁对。直到 1964 年 John Bell 给出一条<em>可实验检验</em> 的不等式: <em>任何</em> 满足 Einstein"<em>局域 + 实在</em>" 三公设的隐变量理论, 必满足这条不等式; 但量子力学预言<em>违反</em> 这条不等式。<em>实验</em> 决定谁对。</p>
+
+<p>1972 年 Freedman + Clauser 第一个 Bell 实验、1982 Aspect 在 Orsay 严格实验、2015 Hensen Delft 实验补漏 loophole, 全部判量子力学胜。2022 年 Aspect + Zeilinger + Clauser 因此获 Nobel 物理学奖。结论——<em>经典局域实在论错; 量子非局域真</em>。</p>
+
+<p>这一章我把 EPR + Bell + 实验这条链一步步走完, 并展示它的现代应用——量子密钥分发的物理基础。</p>
+
+<h2 id="sec22-1">22.1 EPR 1935: 纠缠态的诞生</h2>
+
+<p>EPR 用的是连续变量（位置 vs 动量）, 后来 Bohm 1951 改用<em>自旋 1/2</em> 版本——更具体, 我们直接用 Bohm 版。</p>
+
+<p>设想两个自旋 1/2 粒子, 总自旋为零（singlet 态）。Hilbert 空间 \(\mathbb C^2 \otimes \mathbb C^2\)（17.4 自旋 + 18.5 张量积）。具体态:</p>
+
+<p>\[
+\boxed{\ |\Psi^-\rangle = \frac{1}{\sqrt 2} \big( |\uparrow\rangle_A |\downarrow\rangle_B - |\downarrow\rangle_A |\uparrow\rangle_B \big).\ }
+\]</p>
+
+<p>这是 4 维 Hilbert 空间里一个特定向量。请你停下来检查它的关键性质:</p>
+
+<ul>
+  <li><em>不能写成乘积态</em>: \(|\Psi^-\rangle \neq |\phi\rangle_A \otimes |\chi\rangle_B\) 对任何单粒子态 \(\phi, \chi\)。这种"<em>不能分解</em>" 就是<em>纠缠</em> 的定义。</li>
+  <li><em>反对称</em>: 交换 A ↔ B 给 \(-|\Psi^-\rangle\), 反映"<em>总自旋为零</em>" 是 SU(2) 单态。</li>
+  <li><em>各向同性</em>: 在任何坐标轴方向, 沿 \(\hat n\) 测两粒子, 结果<em>必定相反</em>（一个 +, 一个 −）。</li>
+</ul>
+
+<p>第三条是关键。把 A 沿 \(\hat z\) 测得 \(+\hbar/2\)（"<em>上</em>"）, 态塌缩到 \(|\uparrow\rangle_A |\downarrow\rangle_B\), 此时 B 测 \(\hat z\) <em>必定</em> 给 \(-\hbar/2\)（"<em>下</em>"）。反之亦然。两个测量<em>完美反相关</em>。</p>
+
+<p>请你想象 EPR 场景: 两个粒子在某个源（如正负电子湮灭、激发原子级联辐射）一起产生, 飞向相反方向。Alice 在地球, Bob 在火星, 各拿一个粒子。Alice 沿 \(\hat z\) 测得 \(+\). 这一瞬间<em>火星上</em> Bob 的粒子已经"<em>知道</em>" 自己应该是 \(-\). Bob 测 \(\hat z\) 必得 \(-\)。如果 Alice 沿 \(\hat x\) 测呢? 同样反相关——Alice \(+\) ⟹ Bob \(-\)。</p>
+
+<p>EPR 的论证: <em>无论</em> Alice 测哪个方向, Bob 的粒子<em>都</em> 知道相应方向的答案。所以 Bob 的粒子<em>必须本来就有</em> 所有方向的"<em>预定答案</em>"——一组隐变量决定。否则 Alice 的瞬时影响要超光速传到 Bob, 违反相对论。Einstein 三公设——</p>
+
+<ul>
+  <li><strong>局域</strong>: 一个事件不能瞬时影响远处事件。</li>
+  <li><strong>实在论</strong>: 物理量在测量前<em>已经有</em> 确定值。</li>
+  <li><strong>自由意志</strong>（隐含）: 实验者自由选择测量方向, 不受隐变量约束。</li>
+</ul>
+
+<p>三公设在经典物理里都"<em>显然</em>"。EPR 说: 如果你接受三公设, 量子力学的描述就<em>不完备</em>——必须补入隐变量。</p>
+
+<h2 id="sec22-2">22.2 哥本哈根 vs 隐变量: 30 年僵局</h2>
+
+<p>EPR 论证一出, Bohr 立即在同一刊物（1935 年 10 月）回应。Bohr 的反驳——<em>实在论</em> 公设在 QM 里不成立。粒子<em>没有</em> "<em>预定答案</em>"; 测量<em>创造</em> 答案。整个"<em>局域实在</em>" 的语言不适用于量子系统。</p>
+
+<p>哥本哈根学派（Bohr / Heisenberg / Born / Pauli）大势所趋——QM 工作得这么好, 谁还纠结哲学? Einstein 一直反对, 但他没能给出实验性判据。</p>
+
+<p>1952 David Bohm 改良 de Broglie 1927 的"<em>导向波</em>" 想法, 给出一个完整的<em>非局域隐变量</em> 理论——de Broglie-Bohm 力学。粒子有真实位置 + 真实轨迹, 由全局波函数引导。这套理论<em>等价</em> 于标准 QM 的所有可观测预测——但它<em>承认</em> 非局域（一个粒子的轨迹依赖整个宇宙的波函数）。</p>
+
+<p>这把问题改写成: <em>是否存在 局域 隐变量理论 与 QM 等价</em>? Einstein 三公设要求局域。30 年没人知道答案。</p>
+
+<p>请你停下来感受这个 30 年——物理的<em>哲学</em> 争论, 没有<em>实验</em> 工具去裁决。直到 1964 年。</p>
+
+<h2 id="sec22-3">22.3 Bell 1964: 把哲学翻译成不等式</h2>
+
+<p>John Bell, 在 CERN 工作的 30 多岁北爱尔兰理论物理学家, 1964 年发表论文 "<em>On the Einstein-Podolsky-Rosen paradox</em>" (在一本不太出名的 Physics 杂志上, 因为他怕主流刊物拒掉这种"<em>哲学</em>" 工作)。论文的革命性: <em>把 EPR 的三公设翻译成一条数学不等式, 让实验直接检验</em>。</p>
+
+<p>Bell 的思路: 如果 EPR 三公设对, 那么测量结果由<em>隐变量</em> \(\lambda\) 完全决定。Alice 沿方向 \(\boldsymbol a\) 测得结果 \(A(\boldsymbol a, \lambda) = \pm 1\), Bob 沿 \(\boldsymbol b\) 测得 \(B(\boldsymbol b, \lambda) = \pm 1\)。<em>局域性</em>: \(A\) 不依赖 \(\boldsymbol b\), \(B\) 不依赖 \(\boldsymbol a\)。设 \(\lambda\) 按某分布 \(\rho(\lambda)\) 出现, 关联</p>
+
+<p>\[
+E(\boldsymbol a, \boldsymbol b) := \int A(\boldsymbol a, \lambda) B(\boldsymbol b, \lambda) \rho(\lambda) d\lambda.
+\]</p>
+
+<p>"<em>反相关</em>" 假设给 \(B(\boldsymbol n, \lambda) = -A(\boldsymbol n, \lambda)\)（如果 Alice Bob 沿同方向必定反, 这要对每个 \(\lambda\) 个别成立）。所以</p>
+
+<p>\[
+E(\boldsymbol a, \boldsymbol b) = -\int A(\boldsymbol a, \lambda) A(\boldsymbol b, \lambda) \rho(\lambda) d\lambda.
+\]</p>
+
+<p>三个方向 \(\boldsymbol a, \boldsymbol b, \boldsymbol c\), 看 \(E(\boldsymbol a, \boldsymbol b) - E(\boldsymbol a, \boldsymbol c)\):</p>
+
+<p>\[
+E(\boldsymbol a, \boldsymbol b) - E(\boldsymbol a, \boldsymbol c) = -\int A(\boldsymbol a, \lambda)[A(\boldsymbol b, \lambda) - A(\boldsymbol c, \lambda)] \rho d\lambda.
+\]</p>
+
+<p>关键代数技巧: \(A(\boldsymbol b)^2 = 1\), 所以 \(A(\boldsymbol b) - A(\boldsymbol c) = A(\boldsymbol b)[1 - A(\boldsymbol b) A(\boldsymbol c)]\)。代入:</p>
+
+<p>\[
+|E(\boldsymbol a, \boldsymbol b) - E(\boldsymbol a, \boldsymbol c)| \le \int |1 - A(\boldsymbol b, \lambda) A(\boldsymbol c, \lambda)| \rho d\lambda = 1 + E(\boldsymbol b, \boldsymbol c).
+\]</p>
+
+<p>得到<strong>Bell 不等式</strong>:</p>
+
+<p>\[
+\boxed{\ |E(\boldsymbol a, \boldsymbol b) - E(\boldsymbol a, \boldsymbol c)| \le 1 + E(\boldsymbol b, \boldsymbol c).\ }
+\]</p>
+
+<p>这条不等式<em>对任何局域隐变量理论</em> 都成立——Bell 推导只用了局域 + 实在 + 反相关三件事, 没用任何具体物理模型。它是一个<em>普适</em> 约束。</p>
+
+<h2 id="sec22-4">22.4 量子力学预测违反 Bell 不等式</h2>
+
+<p>QM 预测 \(E(\boldsymbol a, \boldsymbol b)\) 是什么? 对 singlet 态 \(|\Psi^-\rangle\), 算 \(\langle (\hat \sigma \cdot \boldsymbol a) \otimes (\hat \sigma \cdot \boldsymbol b) \rangle\)（细节: 用 \(\hat\sigma \cdot \boldsymbol a\) 与 \(\hat\sigma \cdot \boldsymbol b\) 的对易关系, 加上 singlet 是 SU(2) 不变态）, 结果</p>
+
+<p>\[
+\boxed{\ E^{\text{QM}}(\boldsymbol a, \boldsymbol b) = -\boldsymbol a \cdot \boldsymbol b = -\cos\theta_{ab}.\ }
+\]</p>
+
+<p>负号反映反相关; \(\cos\theta_{ab}\) 反映"<em>同方向完美反相关</em>"（\(\theta = 0 \Rightarrow E = -1\), <em>必定相反</em>）。</p>
+
+<p>选三个方向 \(\boldsymbol a, \boldsymbol b, \boldsymbol c\) 让 Bell 不等式被违反。最简单选 \(\boldsymbol a, \boldsymbol b, \boldsymbol c\) 在同平面, 角度 \(0, 60°, 120°\):</p>
+
+<ul>
+  <li>\(E(\boldsymbol a, \boldsymbol b) = -\cos 60° = -1/2\).</li>
+  <li>\(E(\boldsymbol a, \boldsymbol c) = -\cos 120° = 1/2\).</li>
+  <li>\(E(\boldsymbol b, \boldsymbol c) = -\cos 60° = -1/2\).</li>
+</ul>
+
+<p>左边 \(|E(\boldsymbol a, \boldsymbol b) - E(\boldsymbol a, \boldsymbol c)| = |-1/2 - 1/2| = 1\)。右边 \(1 + E(\boldsymbol b, \boldsymbol c) = 1 - 1/2 = 1/2\). <em>左边 = 1 > 1/2 = 右边</em>。Bell 不等式违反。</p>
+
+<p>更对称的版本——CHSH 不等式（Clauser, Horne, Shimony, Holt 1969）, 用四个方向 \(\boldsymbol a, \boldsymbol a', \boldsymbol b, \boldsymbol b'\):</p>
+
+<p>\[
+S := E(\boldsymbol a, \boldsymbol b) - E(\boldsymbol a, \boldsymbol b') + E(\boldsymbol a', \boldsymbol b) + E(\boldsymbol a', \boldsymbol b').
+\]</p>
+
+<p>局域隐变量理论预言 \(|S| \le 2\)（Bell 类不等式）。QM 在 singlet + 合适方向 (\(\boldsymbol a = 0°, \boldsymbol a' = 90°, \boldsymbol b = 45°, \boldsymbol b' = 135°\)) 给</p>
+
+<p>\[
+\boxed{\ |S^{\text{QM}}| = 2\sqrt 2 \approx 2.828 > 2.\ }
+\]</p>
+
+<p>这条 \(2\sqrt 2\) 是<em>Tsirelson 界</em>——QM 的<em>最大</em> 违反量。CHSH 是大部分实验用的形式。</p>
+
+<p>请你停下来欣赏这件事——<em>哲学问题被翻译成数字不等式</em>。\(2\) vs \(2.828\) 是<em>实验可分辨</em> 的差距, 几个标准差就能判定。Bell 把 30 年的 Einstein-Bohr 争论从"<em>谁的世界观对</em>" 转化为"<em>实验上 \(S\) 是 2 还是 2.828</em>"。</p>
+
+<h2 id="sec22-5">22.5 实验验证: Aspect 1982, Hensen 2015</h2>
+
+<p><strong>1972 Freedman-Clauser</strong>(伯克利): 用钙原子级联辐射的两光子（线偏振相关）测 CHSH。结果 \(|S| \approx 2.4\), 违反 Bell, QM 胜。但实验有 loophole（光子不全被探到, 假设"<em>探到的代表全部</em>"）。</p>
+
+<p><strong>1982 Aspect</strong>（Orsay）: 改进光源 + 加入<em>快速切换偏振方向</em>（让 Alice 选方向的事件与 Bob 测量事件类时分离, 局域性 loophole 关闭）。\(|S| \approx 2.7\), 违反 Bell 5\(\sigma\) 以上。这是历史上"<em>正经</em>"的 Bell 测试。但<em>探测 loophole</em> 仍未关。</p>
+
+<p><strong>2015 Hensen et al.</strong>（Delft）: 第一个<em>同时关闭所有主要 loophole</em> 的实验。用 NV 中心的电子自旋纠缠 + 超快测量 + 高效探测。两 NV 间距 1.3 km, 信号要超光速才能影响——绝对不可能。\(|S| \approx 2.42 \pm 0.20\), 仍违反 Bell 2\(\sigma\)。同年 Giustina (Vienna) + Shalm (NIST) 用光子做了同样 loophole-free 实验。</p>
+
+<p><strong>2022 Nobel</strong>: Aspect + Clauser + Zeilinger 因量子纠缠基础实验获 Nobel 物理学奖。颁奖词强调"<em>开启量子信息时代</em>"。</p>
+
+<p>每一次实验都给同样答案——<em>QM 对, 局域隐变量理论错</em>。\(|S|\) 实测值范围 2.4-2.8, 与 \(2\sqrt 2\) 一致, 严格大于 2。</p>
+
+<h2 id="sec22-6">22.6 推论: 经典局域实在论错</h2>
+
+<p>把这件事的物理意义说清。Bell + 实验告诉你<em>至少</em> 一条三公设错:</p>
+
+<ul>
+  <li><strong>放弃局域</strong>: 接受"<em>瞬时远距离作用</em>" 真实存在（Bohm 隐变量走这条路）。但请注意——QM 的远距离作用<em>不</em> 能传递信息（"<em>不可信号原理</em>", no-signaling theorem——见下）, 所以与狭义相对论不矛盾。</li>
+  <li><strong>放弃实在论</strong>: 物理量在测量前没有"<em>预定答案</em>"。哥本哈根 / Bohr 选这条。</li>
+  <li><strong>放弃自由意志</strong>: 实验者的"<em>方向选择</em>" 其实由隐变量预先决定（"<em>超决定论</em>", superdeterminism, 't Hooft 力推）。这条非常激进, 大部分人不接受。</li>
+</ul>
+
+<p>主流物理界的态度——<em>放弃实在论</em>, 接受"<em>测量不只是揭示, 是创造</em>"。这就是哥本哈根传统。这看起来反直觉, 但它<em>不</em> 与相对论冲突, 也<em>不</em> 与任何已知物理冲突, 而且让 QM 形式 100% 自洽。</p>
+
+<p><em>不可信号原理</em>: 即使量子非局域真, Alice 也<em>不能</em> 利用纠缠向 Bob 发信息。原因——Alice 的测量结果是<em>随机</em> 的, 她无法控制自己测到 \(+\) 还是 \(-\); Bob 单独看自己的统计分布, <em>看不出</em> Alice 是否测过、测什么方向。只有把双方记录<em>事后比对</em>（需经典通信）才看到关联。所以<em>非局域</em> + <em>不可信号</em> 兼容相对论——非局域是关联, 不是因果。</p>
+
+<h2 id="sec22-7">22.7 应用: 量子密钥分发 (BB84 / E91)</h2>
+
+<p>纠缠不只是哲学, 是<em>资源</em>——可以做经典做不到的事。最早实用的应用——<em>量子密钥分发</em>（QKD）, 让 Alice + Bob 共享一个秘密密钥, 任何窃听都<em>必然</em> 被发现。</p>
+
+<p><strong>BB84 协议</strong>（Bennett + Brassard 1984）: Alice 用单光子, 随机选两套基（直角 \(\{|H\rangle, |V\rangle\}\) 或对角 \(\{|+\rangle, |-\rangle\}\)）发 0/1 比特给 Bob。Bob 也随机选基测。事后双方公开"<em>各自用了哪个基</em>"（不公开比特值）, 保留基匹配的那些。如果窃听者 Eve 中间测一下, 她不知道 Alice 用的基, 50% 概率选错基, 把光子态扰乱——Alice / Bob 比对一小段密钥就发现错误率异常, 知道有人窃听, 弃用密钥。</p>
+
+<p>BB84 的安全<em>不</em> 来自纠缠, 来自<em>不可克隆定理</em>（no-cloning theorem, Wootters-Zurek 1982）——任何对未知量子态的"<em>测量 + 重发</em>" 操作必然引入扰动, 无法完美复制。这是 QM 形式的硬定理（线性 + 么正性）, 不能违反。</p>
+
+<p><strong>E91 协议</strong>（Ekert 1991）: 用纠缠 EPR 对替代单光子。Alice + Bob 各拿一光子, 各自随机选三方向中之一测。事后比对——基匹配的密钥对反相关; 不匹配的用来测<em>CHSH \(S\) 值</em>。如果 \(|S| \approx 2\sqrt 2\), 没人窃听; 如果 \(|S|\) 接近 2, 有窃听。Bell 不等式直接成为安全检测器。</p>
+
+<p>2017 中国"<em>墨子号</em>" 卫星实现了星-地 1200 km 量子密钥分发——E91 协议变成可工作的工程。2022 年中国和奥地利的洲际量子加密视频通话用的是同类技术。</p>
+
+<h2 id="sec22-8">22.8 临别话</h2>
+
+<p>Banner 流程: 22.1 具体问题（EPR 设置 + 反相关）→ 22.2 哥本哈根 vs 隐变量僵局 → 22.3 撞墙（30 年没实验工具）→ 22.4 reframe（Bell 把哲学翻译成不等式）→ 22.5 命名（CHSH \(S\), Tsirelson 界）→ 22.6 实验判定 → 22.7 应用（QKD）。</p>
+
+<p>这一章你看到的<em>不是</em> 一个新算法, 是<em>物理本身的边界被推进</em> 的一个具体例子。1935-2015 八十年, 物理学家用一系列概念创新（EPR + Bell + Aspect + Hensen）把"<em>局域实在论 vs 量子非局域</em>" 从哲学问题变成实验问题再变成已结案问题。结案结论——<em>经典局域实在论错</em>。</p>
+
+<p>这件事的余波至今未平。<em>测量问题</em>（测量怎么发生? 何时塌缩?）还没真正解决, 多世界、退相干、QBism、客观塌缩等多种诠释并存。但<em>关于纠缠是真实物理资源</em> 这一点没争议——它已经被用于密钥分发、量子隐形传态（ch23）、量子计算的纠缠门。</p>
+
+<p>下一章我们正面看纠缠的<em>计算</em> 应用——<em>量子计算</em>。\(n\) 个 qubit 同时处于 \(2^n\) 个基态叠加, "<em>指数级并行</em>" 让某些经典指数难问题（因数分解、搜索）变成量子多项式问题。Shor 1994 + Grover 1996 是这场革命的开端。当前 IBM / Google / 中国"<em>九章</em>" 等实验装置已经做到 50-1000 qubit, 量子优势开始可论证。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 散射理论入门</a><a href="ch23.html">下一章 · 第 23 章 应用：量子计算入门 →</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

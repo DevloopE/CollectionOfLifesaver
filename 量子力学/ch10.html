@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 可观测量 + 期望 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 Hilbert 空间形式</a><a href="ch11.html">下一章 · 第 11 章 不确定性原理 →</a></nav>
+<h1 id="ch10">第 10 章 可观测量 + 期望</h1>
+
+<p>请你想象一个具体实验。一台 Stern-Gerlach 装置（ch17 详谈, 现在你只需要知道它能"<em>测一个银原子的自旋 \(z\) 分量</em>"）。我把同一种"<em>制备方式</em>" 准备出来的银原子, 一个一个送进装置, 每个原子都给一个测量结果——只可能是 \(+\hbar/2\) 或 \(-\hbar/2\) 两种值之一, 没有中间值。</p>
+
+<p>第一颗: \(+\hbar/2\)。第二颗: \(-\hbar/2\)。第三颗: \(+\hbar/2\)。第四颗: \(+\hbar/2\)。第五颗: \(-\hbar/2\)。……</p>
+
+<p>请你停下来——<em>同样的制备方式, 同样的装置, 不同的结果</em>。这件事在经典物理里<em>不允许</em>——经典系统状态完全决定测量结果, 同样初值同样结果。但量子里, 它是普遍现象: 制备完全相同的<em>态</em>, 测量给出<em>概率分布</em> 而不是确定值。</p>
+
+<p>更怪——如果我送 1000 颗, 大约会得 500 颗 \(+\hbar/2\), 500 颗 \(-\hbar/2\)（如果初态是某种"<em>对称</em>" 制备）; 或者 800/200, 或 100/900, 取决于初态。<em>各结果的频率</em> 由初态确定, 但<em>单次结果</em> 不是。</p>
+
+<p>这就引出 QM 的<em>测量假设</em>——这一章的主题。我们要把这件事用 Dirac 记号 + 谱定理写出严格形式: <em>可观测量</em> 由<em>自伴算子</em> 表示, <em>可能测量值</em> 是算子的<em>谱</em>, <em>概率分布</em> 由"<em>态投影到本征子空间</em> 的模平方" 给, <em>期望值</em> 是三明治 \(\langle\psi|\hat A|\psi\rangle\)。这个假设链回<a href="../泛函分析/ch21.html">泛函分析 ch21</a> 谱定理——QM 测量在数学层面<em>就是</em> 谱定理本身的物理诠释。</p>
+
+<h2 id="sec10-1">10.1 经典测量 vs 量子测量</h2>
+
+<p>把对比写得更具体。一个经典粒子的状态由相空间一点 \((x_0, p_0)\) 完全描述。任何"<em>可观测量</em>" \(A(x, p)\)（位置、动量、能量、角动量）都是相空间上的函数, 在状态点取值 \(A(x_0, p_0)\) 是<em>确定数</em>。同样初态, 同样可观测量, 同样答案。</p>
+
+<p>更, 经典里"<em>测量</em>" 是<em>读取</em>——观察者去看这个本来就有的值。理想测量不扰动系统; 不理想测量给读取误差, 但误差<em>原则上</em> 可以减少到 0。</p>
+
+<p>量子里这两条都不成立:</p>
+
+<ol>
+  <li><em>同态不同果</em>: 同一个 \(|\psi\rangle\) 制备, 同一个可观测量 \(\hat A\), 不同实验给不同结果。结果的<em>分布</em>由 \(|\psi\rangle\) 决定, <em>单次值</em> 不决定。</li>
+  <li><em>测量必扰</em>: 测得 \(\hat A\) 的某个本征值 \(a_n\) 后, 系统态<em>立刻</em> 变成 \(\hat A\) 在 \(a_n\) 上的本征态（"<em>波函数坍缩</em>"）。原 \(|\psi\rangle\) 信息部分被覆盖。</li>
+</ol>
+
+<p>这两条不是"<em>实验技术不够好</em>" 的暂时缺陷, 是 QM 内在物理（哥本哈根诠释）。它们带来的哲学讨论（"<em>什么是测量</em>?", "<em>什么决定一次结果</em>?", "<em>多世界 vs 坍缩</em>" 等）这本书 ch22-23 简短涉及; 这章我们只关心<em>如何计算</em> 那个分布。</p>
+
+<h2 id="sec10-2">10.2 命名: 可观测量 = 自伴算子</h2>
+
+<p>QM 第一条公设——<em>每个物理可观测量对应 Hilbert 空间上一个自伴算子</em>。位置 ⟶ \(\hat x\), 动量 ⟶ \(\hat p\), 能量 ⟶ \(\hat H\), 角动量 ⟶ \(\hat L_z\) 等等。</p>
+
+<p>为什么是<em>自伴</em>（self-adjoint, \(\hat A^\dagger = \hat A\)）, 而不是任意算子？答案纯数学——<em>自伴算子的特征值是实数</em>。因为测量结果是物理量（实数, 比如能量、动量、自旋分量都是实数）, 算子必须保证特征值实数。</p>
+
+<p>证: 如果 \(\hat A |a\rangle = a |a\rangle\), 在两边同 \(\langle a|\) 内积:</p>
+
+<p>\[
+a \langle a | a \rangle = \langle a | \hat A | a \rangle.
+\]</p>
+
+<p>取共轭: \(\bar a \langle a | a \rangle = \overline{\langle a | \hat A | a \rangle} = \langle \hat A a | a \rangle = \langle a | \hat A^\dagger | a \rangle\)。如果 \(\hat A^\dagger = \hat A\), 这等于 \(\langle a | \hat A | a \rangle = a \langle a | a \rangle\)。所以 \(\bar a \langle a|a\rangle = a \langle a|a\rangle\), 得 \(\bar a = a\), 即 \(a \in \mathbb R\)。</p>
+
+<p>另一个性质: <em>自伴算子的不同特征值对应的本征向量正交</em>。证: \(\hat A |a\rangle = a |a\rangle\) 和 \(\hat A |b\rangle = b |b\rangle\), \(a \neq b\) 实数。则</p>
+
+<p>\[
+a \langle b | a \rangle = \langle b | \hat A | a \rangle = \langle \hat A b | a \rangle = b \langle b | a \rangle.
+\]</p>
+
+<p>所以 \((a - b) \langle b | a \rangle = 0\), 但 \(a \neq b\), 故 \(\langle b | a \rangle = 0\)。</p>
+
+<p>实数特征值 + 正交本征向量——这就是<em>谱定理</em>（泛函分析 ch21）的两个基本性质, 直接保证了"<em>测量值实数</em>" 和"<em>不同结果可分辨</em>" 这两条物理要求。QM 的"<em>可观测量 = 自伴算子</em>" 不是任意公设, 是<em>"实数测量值 + 概率诠释" 的</em>数学等价。</p>
+
+<h2 id="sec10-3">10.3 谱分解</h2>
+
+<p>谱定理（在<em>紧自伴算子</em> 情形）说: 任何紧自伴算子 \(\hat A: H \to H\) 有一组完备正交本征向量 \(\{|a_n\rangle\}\), 实特征值 \(\{a_n\}\), 且</p>
+
+<p>\[
+\boxed{\ \hat A = \sum_n a_n |a_n\rangle \langle a_n |.\ }
+\]</p>
+
+<p>这就是<em>谱分解</em>（或叫"<em>本征展开</em>"）。把 \(\hat A\) 写成"<em>各特征值乘以对应投影算子</em>" 的求和。投影算子 \(\hat P_n = |a_n\rangle\langle a_n|\) 是"<em>投到第 \(n\) 个本征向量上</em>" 的秩 1 投影。</p>
+
+<p>对<em>无界自伴算子</em>（如 \(\hat x, \hat p\)）情况复杂——谱可能<em>连续</em>, 求和换成积分:</p>
+
+<p>\[
+\hat A = \int a \, d\hat P_a,
+\]</p>
+
+<p>其中 \(d\hat P_a\) 是<em>谱投影测度</em>。这是泛函分析 ch21 的内容, 这一章我们主要用紧情形的求和形式; 连续情形 10.8 单独处理。</p>
+
+<p>有<em>简并</em>（同一个特征值有多个本征向量）时, 把那个本征值的本征子空间投影一起写: \(\hat P_n = \sum_k |a_n, k\rangle\langle a_n, k|\), 求和遍历该本征子空间的基。</p>
+
+<h2 id="sec10-4">10.4 测量假设</h2>
+
+<p>QM 第二条公设——测量可观测量 \(\hat A\) 在态 \(|\psi\rangle\) 上, 给出:</p>
+
+<ul>
+  <li><strong>可能值</strong>: \(\hat A\) 的本征值 \(\{a_n\}\)（即谱）。<em>除此之外不可能</em> 出现别的值。</li>
+  <li><strong>概率</strong>: 得到 \(a_n\) 的概率 = "<em>态投到 \(a_n\) 本征子空间</em> 的模平方":
+  \[
+  \boxed{\ \mathbb P(\text{得 } a_n) = |\langle a_n | \psi \rangle|^2.\ }
+  \]
+  （简并情形: \(\mathbb P(a_n) = \sum_k |\langle a_n, k | \psi \rangle|^2 = \langle \psi | \hat P_n | \psi \rangle\)。）</li>
+  <li><strong>测后态</strong>: 测得 \(a_n\) 后, 系统态<em>瞬时坍缩</em> 到 \(\hat A\) 在 \(a_n\) 上的本征子空间, 归一化:
+  \[
+  |\psi\rangle \to \frac{\hat P_n |\psi\rangle}{\sqrt{\langle \psi | \hat P_n | \psi \rangle}}.
+  \]</li>
+</ul>
+
+<p>这条公设叫"<em>Born 法则</em>"（concentration probability rule, Born 1926 提出）。它是 QM 与现实接触的<em>桥</em>: 抽象 Hilbert 空间向量 + 算子<em>怎么变成实验数</em>, 全靠这条。</p>
+
+<p><strong>归一化检查</strong>: 概率总和 = 1?</p>
+
+<p>\[
+\sum_n \mathbb P(a_n) = \sum_n |\langle a_n | \psi \rangle|^2 = \sum_n \langle\psi|a_n\rangle\langle a_n|\psi\rangle = \langle\psi| \left( \sum_n |a_n\rangle\langle a_n| \right) |\psi\rangle = \langle\psi|\hat I|\psi\rangle = \langle\psi|\psi\rangle = 1.
+\]</p>
+
+<p>用了恒等分解 \(\sum_n |a_n\rangle\langle a_n| = \hat I\)（要求 \(\{|a_n\rangle\}\) 是<em>完备</em> 正交基, 谱定理保证）以及态归一化 \(\langle\psi|\psi\rangle = 1\)。<em>正好</em>等 1。Born 法则是自洽的概率分布。</p>
+
+<p>请你停下来——这条计算<em>太</em> 漂亮。Hilbert 空间向量长度 = 1 自动保证概率求和 = 1。两条公设（"<em>态是单位向量</em>" + "<em>概率 = 投影模平方</em>"）<em>自动相容</em>, 不需要外加。这是 QM 数学结构的关键内蕴一致性。</p>
+
+<h2 id="sec10-5">10.5 期望值</h2>
+
+<p>知道了概率分布, 期望值（"<em>多次测量结果的算术平均</em>"）按概率论标准定义:</p>
+
+<p>\[
+\langle \hat A \rangle_\psi := \sum_n a_n \, \mathbb P(a_n) = \sum_n a_n |\langle a_n | \psi \rangle|^2.
+\]</p>
+
+<p>用 Dirac 记号化简:</p>
+
+<p>\[
+\langle \hat A \rangle_\psi = \sum_n a_n \langle\psi|a_n\rangle\langle a_n|\psi\rangle = \langle\psi| \left( \sum_n a_n |a_n\rangle\langle a_n| \right) |\psi\rangle = \langle\psi|\hat A|\psi\rangle.
+\]</p>
+
+<p>用了谱分解 \(\hat A = \sum_n a_n |a_n\rangle\langle a_n|\)。结果:</p>
+
+<p>\[
+\boxed{\ \langle \hat A \rangle_\psi = \langle \psi | \hat A | \psi \rangle.\ }
+\]</p>
+
+<p>"<em>三明治公式</em>"——夹算子的三明治给期望。这是 QM 计算最常用的一行。</p>
+
+<p>请你欣赏这件事——计算"<em>测量值的平均</em>" 不需要先<em>解</em> 谱分解（找出所有 \(a_n, |a_n\rangle\)）再求和。直接用 \(\langle\psi|\hat A|\psi\rangle\) 一步到位, 在<em>任何</em> 表象（位置 / 动量 / 能量基）下都行。这是 Dirac 记号 + 抽象算子化的具体好处。</p>
+
+<p>位置基里 \(\langle \hat A \rangle = \int \overline{\psi(x)} (\hat A \psi)(x) \, dx\)。比如<em>位置期望</em>:</p>
+
+<p>\[
+\langle \hat x \rangle_\psi = \int_{-\infty}^{\infty} \overline{\psi(x)} \cdot x \cdot \psi(x) \, dx = \int x |\psi(x)|^2 \, dx.
+\]</p>
+
+<p>这<em>就是</em> 用 \(|\psi(x)|^2\) 当概率密度的位置加权平均——和你在概率论里"<em>连续随机变量的期望</em>" 公式一致。<em>动量期望</em>:</p>
+
+<p>\[
+\langle \hat p \rangle_\psi = \int \overline{\psi(x)} \, (-i\hbar \partial_x) \, \psi(x) \, dx.
+\]</p>
+
+<p>这就比经典直觉远——动量期望不是"<em>位置概率密度乘以速度</em>", 是<em>波函数和它的导数的内积</em>。这反映动量在 QM 里"<em>来自波函数的相位变化率</em>" 这一深刻事实, ch11 不确定性原理会回到。</p>
+
+<h2 id="sec10-6">10.6 方差与不确定性</h2>
+
+<p>期望刻画"<em>平均</em>", 但同样态不同测量给不同值——这种<em>分散度</em> 由<em>方差</em> 刻画:</p>
+
+<p>\[
+\text{Var}(\hat A)_\psi := \langle (\hat A - \langle\hat A\rangle)^2 \rangle = \langle \hat A^2 \rangle - \langle \hat A \rangle^2.
+\]</p>
+
+<p>第二步用了 \(\langle \hat A - c \rangle = \langle \hat A\rangle - c\) (其中 \(c\) 是常数 \(= \langle\hat A\rangle\))。所以方差 = "<em>平方的期望</em>" 减"<em>期望的平方</em>", 经典概率论标准恒等式。</p>
+
+<p>开方得<em>标准差</em>, QM 里习惯叫<em>不确定度</em> 或<em>涨落</em>:</p>
+
+<p>\[
+\Delta A := \sqrt{\langle \hat A^2 \rangle - \langle \hat A \rangle^2}.
+\]</p>
+
+<p>它的物理意义——多次测量 \(\hat A\) 的结果分布的"<em>典型偏离</em>" 大小。</p>
+
+<p>注意: 如果 \(|\psi\rangle\) 恰好是 \(\hat A\) 的本征态 \(|a_n\rangle\), 那 \(\langle \hat A\rangle = a_n\), \(\langle \hat A^2\rangle = a_n^2\), \(\Delta A = 0\)——测量<em>无</em> 涨落, 必得 \(a_n\)。这种态叫"<em>\(\hat A\) 的本征态</em>", 是测 \(\hat A\) 时唯一"<em>无随机性</em>" 的态。</p>
+
+<p>对<em>非本征态</em> \(\Delta A > 0\), 测量给概率分布。\(\Delta A\) 是这个分布的散度。</p>
+
+<p>ch11 给<em>不确定性原理</em>: 对两个不对易算子（如 \(\hat x, \hat p\)）, \(\Delta A \cdot \Delta B \geq \frac{1}{2}|\langle [\hat A, \hat B]\rangle|\)。<em>同时</em>把 \(\hat x, \hat p\) 都测得无涨落是不可能的——这是 QM 内在的几何限制, 不是测量技术不够。这条就是这一章方差概念的直接推论, 加上对易关系。</p>
+
+<h2 id="sec10-7">10.7 例子: 谐振子的位置 / 动量期望与方差</h2>
+
+<p>把 ch7 + ch9 的谐振子拿出来当具体例子。基态 \(|0\rangle\) 在位置基</p>
+
+<p>\[
+\psi_0(x) = \langle x | 0 \rangle = \left( \frac{m\omega}{\pi\hbar} \right)^{1/4} e^{-m\omega x^2 / (2\hbar)}.
+\]</p>
+
+<p>这是<em>对称</em> 高斯。位置期望:</p>
+
+<p>\[
+\langle \hat x \rangle_0 = \int x |\psi_0(x)|^2 \, dx = 0
+\]</p>
+
+<p>(对称积分)。动量期望同样 = 0（高斯实, 导数虚, 内积 = 0）。<em>位置方差</em>:</p>
+
+<p>\[
+\langle \hat x^2 \rangle_0 = \int x^2 |\psi_0(x)|^2 \, dx = \frac{\hbar}{2m\omega}
+\]</p>
+
+<p>(高斯的二阶矩, 用 \(\sigma^2 = \hbar/(2m\omega)\) 直接读)。所以 \(\Delta x = \sqrt{\hbar/(2m\omega)}\)。</p>
+
+<p>对动量, 用<em>升降算子</em>（ch7）省事: \(\hat x = \sqrt{\hbar/(2m\omega)} (\hat a + \hat a^\dagger)\), \(\hat p = i \sqrt{m\omega\hbar/2} (\hat a^\dagger - \hat a)\)。则</p>
+
+<p>\[
+\hat p^2 = -\frac{m\omega\hbar}{2} (\hat a^\dagger - \hat a)^2 = -\frac{m\omega\hbar}{2} \big( (\hat a^\dagger)^2 - \hat a^\dagger \hat a - \hat a \hat a^\dagger + \hat a^2 \big).
+\]</p>
+
+<p>对 \(|0\rangle\) 取期望——\(\hat a |0\rangle = 0\), \(\hat a^\dagger |0\rangle = |1\rangle\), 所以 \(\langle 0|(\hat a^\dagger)^2|0\rangle = 0\) (跨态), \(\langle 0|\hat a^\dagger \hat a|0\rangle = 0\), \(\langle 0|\hat a \hat a^\dagger|0\rangle = \langle 0 | (\hat a \hat a^\dagger - \hat a^\dagger \hat a + \hat a^\dagger \hat a) |0\rangle = \langle 0|[\hat a, \hat a^\dagger]|0\rangle + 0 = 1\), \(\langle 0|\hat a^2|0\rangle = 0\)。所以</p>
+
+<p>\[
+\langle \hat p^2 \rangle_0 = -\frac{m\omega\hbar}{2} \cdot (-1) = \frac{m\omega\hbar}{2}, \quad \Delta p = \sqrt{\frac{m\omega\hbar}{2}}.
+\]</p>
+
+<p><em>不确定度乘积</em>:</p>
+
+<p>\[
+\Delta x \cdot \Delta p = \sqrt{\frac{\hbar}{2m\omega}} \cdot \sqrt{\frac{m\omega\hbar}{2}} = \frac{\hbar}{2}.
+\]</p>
+
+<p>等于 \(\hbar/2\)——<em>正好是不确定性原理的下界</em>! 谐振子基态是<em>最小不确定态</em>（minimum uncertainty state）, 高斯把 Heisenberg 不等式饱和。这件事不是巧合——\(\hat x, \hat p\) 的对易关系 \([\hat x, \hat p] = i\hbar\) 加 Cauchy-Schwarz 给 \(\Delta x \Delta p \geq \hbar/2\), 高斯<em>恰好</em> 取等。ch11 详证。</p>
+
+<p><em>能量期望</em>:</p>
+
+<p>\[
+\langle \hat H \rangle_0 = \langle 0 | \hat H | 0 \rangle = \langle 0 | E_0 | 0 \rangle = E_0 = \frac{1}{2}\hbar\omega.
+\]</p>
+
+<p>这就是<em>零点能</em>。\(|0\rangle\) 是 \(\hat H\) 本征态, \(\Delta H = 0\)——能量测量必给 \(\hbar\omega/2\), 无涨落。但<em>位置 + 动量</em>都<em>有</em>涨落, 因为 \(|0\rangle\) 不是 \(\hat x\) 或 \(\hat p\) 的本征态。</p>
+
+<p>请你停下来——这件事的物理意义。在最低能量态, 粒子<em>没有</em> 一个"<em>静止位置</em>"（位置不确定 \(\sim \sqrt{\hbar/m\omega}\)）, 也<em>没有</em> 一个"<em>静止动量</em>"（\(\sim \sqrt{m\omega\hbar}\)）。它在某种意义上<em>永远</em> 在涨落。这是经典极限完全没有的现象——经典低能态是"<em>静止在最低点</em>", 量子基态是"<em>分布在最低点附近的最佳折中</em>"。</p>
+
+<h2 id="sec10-8">10.8 连续谱: 位置 / 动量</h2>
+
+<p>位置算子 \(\hat x\) 和动量算子 \(\hat p\) 的谱是<em>连续</em> 的——\(\sigma(\hat x) = \mathbb R\), \(\sigma(\hat p) = \mathbb R\)。这种情形 10.4 的离散公式要修改。</p>
+
+<p>"<em>本征态</em>" \(|x\rangle\) 不在 \(L^2\) 里（9.6 讨论过）, 但仍然能形式地写谱分解</p>
+
+<p>\[
+\hat x = \int x |x\rangle\langle x| \, dx.
+\]</p>
+
+<p>测量假设的<em>连续版</em>: 测 \(\hat x\) 在 \(|\psi\rangle\) 上, 得结果在 \([x, x + dx]\) 区间的概率</p>
+
+<p>\[
+dP(x) = |\langle x | \psi \rangle|^2 \, dx = |\psi(x)|^2 \, dx.
+\]</p>
+
+<p>这<em>就是</em> Born 概率诠释——\(|\psi(x)|^2\) 是位置概率密度。我们在 ch3 当作公设接受的, 现在看到它是"<em>Born 法则在连续谱上的特例</em>"。</p>
+
+<p>同样动量: 测 \(\hat p\) 得结果在 \([p, p+dp]\) 的概率</p>
+
+<p>\[
+dP(p) = |\langle p | \psi \rangle|^2 \, dp = |\tilde\psi(p)|^2 \, dp.
+\]</p>
+
+<p>所以<em>动量分布</em> 由位置波函数的 Fourier 变换的模平方给。</p>
+
+<p>期望值同样自然:</p>
+
+<p>\[
+\langle \hat x \rangle = \int x |\psi(x)|^2 \, dx = \int x \, dP(x), \quad \langle \hat p \rangle = \int p |\tilde\psi(p)|^2 \, dp = \int p \, dP(p).
+\]</p>
+
+<p>"<em>把 \(x\)（或 \(p\)） 按概率密度加权积分</em>"——和经典概率论同样形式。</p>
+
+<p>对算子<em>函数</em> 也有类似规则。比如能量算子 \(\hat H\) 在束缚态系统（如氢原子, ch16）有<em>离散</em> 谱 \(\{E_n\}\); 在自由粒子有<em>连续</em> 谱 \([0, \infty)\); 在势阱外延伸的情形有<em>混合</em> 谱（部分离散 + 部分连续）。所有情形都被泛函分析 ch21 的<em>谱定理一般版</em> 涵盖, QM 测量假设直接应用。</p>
+
+<p>请你停下来——这件事的统一性令人惊讶。无论 \(\hat A\) 谱是离散、连续、还是混合, "<em>测量给谱中某值, 概率由 Born 法则给</em>" 这条话<em>不变</em>。具体形式（求和 / 积分 / 谱测度）随谱形态调整, 但物理内容统一。这就是为什么 QM 即使在数学上的"<em>无界算子</em>" "<em>分布意义本征态</em>" 等技术困难下, 物理框架仍然清晰——困难在严格化, 不在物理。</p>
+
+<h2 id="sec10-9">10.9 临别话</h2>
+
+<p>这一章把"<em>QM 测量</em>" 完整数学化:</p>
+
+<ul>
+  <li>可观测量 \(\hat A\) ⟶ 自伴算子。</li>
+  <li>可能值 ⟶ 谱 \(\sigma(\hat A)\)。</li>
+  <li>概率 ⟶ Born 法则 \(|\langle a_n|\psi\rangle|^2\)。</li>
+  <li>期望 ⟶ \(\langle\psi|\hat A|\psi\rangle\)。</li>
+  <li>方差 ⟶ \(\langle \hat A^2\rangle - \langle\hat A\rangle^2\), 给"<em>不确定度</em>"。</li>
+</ul>
+
+<p>这套规则是 QM 的<em>第二条公设</em>（第一条是"<em>态是单位向量, 演化由 SE</em>"）。它直接基于<em>泛函分析谱定理</em>——QM 的物理深度与数学深度在这里完全等价。</p>
+
+<p>下一章 ch11 把"<em>方差</em>" 的概念推到极致——任何两个<em>不对易</em> 算子 \(\hat A, \hat B\) 都满足 \(\Delta A \cdot \Delta B \geq \frac{1}{2}|\langle [\hat A, \hat B]\rangle|\), 即 Heisenberg 不确定性原理。它说"<em>两个不可同时确定的物理量</em>"——位置 / 动量、能量 / 时间、自旋的不同分量。这条不是技术性误差, 是 Hilbert 空间几何的强制定理。然后 ch12-13 给时间演化（Schrödinger 表象 vs Heisenberg 表象）, 完整把 QM 形式化收尾。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 Hilbert 空间形式</a><a href="ch11.html">下一章 · 第 11 章 不确定性原理 →</a></nav>
+</main>
+</body>
+</html>

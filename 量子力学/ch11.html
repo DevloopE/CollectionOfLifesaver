@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 不确定性原理 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 算子与可观测量</a><a href="ch12.html">下一章 · 第 12 章 测量与塌缩 →</a></nav>
+<h1 id="ch11">第 11 章 不确定性原理</h1>
+
+<p>1927 年 Werner Heisenberg, 26 岁, 在哥本哈根的 Bohr 研究所写下一份手稿。手稿里有一句话——"<em>位置和动量, 这两者无法被同时精确测量</em>"。具体地, 任何被你制备的量子态都满足</p>
+
+<p>\[
+\Delta x \cdot \Delta p \ge \frac{\hbar}{2}.
+\]</p>
+
+<p>请你停下来想象 Heisenberg 当时心里的画面: 把电子放在显微镜下, 用<em>越短波长</em> 的光看就<em>越精确</em> 知道它在哪——但短波长光子动量大, 一打到电子就把电子的动量乱踢。这个"<em>看 → 干扰</em>" 的图像很直观, 它是 Heisenberg 自己 1927 年论文里给的"<em>显微镜</em>" 启发式论证。</p>
+
+<p>但这个直观<em>不是</em> 不确定性原理的真正来源。这一章我要让你看到——\(\Delta x \Delta p \ge \hbar/2\) <em>不是</em> 测量精度的物理限制, <em>不是</em> "<em>测得越准就扰得越多</em>", <em>不是</em> 海森堡显微镜里的光子反冲。它是<em>纯</em> Hilbert 空间几何的一条<em>代数定理</em>。源头只一个: 位置算子和动量算子的<em>对易关系</em></p>
+
+<p>\[
+[\hat x, \hat p] = i \hbar.
+\]</p>
+
+<p>这条对易关系一旦写下, \(\Delta x \Delta p \ge \hbar/2\) 是 Cauchy-Schwarz 不等式的两行推论。任何<em>没有</em> 测量、<em>没有</em> 观察者、<em>没有</em> 物理过程进入的"<em>纯态</em>" \(|\psi\rangle\) 都自动满足。它是状态空间几何的属性, 不是测量动作的属性。</p>
+
+<p>这一章的任务: <em>把"测量精度限制"这种朴素图像撞墙, 把不确定性 reframe 为"对易子的代数推论", 然后一般化到任意一对不相容观测</em>。</p>
+
+<h2 id="sec11-1">11.1 复习: 位置 + 动量算子和它们的对易关系</h2>
+
+<p>在<a href="ch9.html">ch9</a>-<a href="ch10.html">ch10</a> 我们已经把"<em>可观测量</em>" 数学化为<em>自伴算子</em>。最关键的两个——位置 \(\hat x\) 和动量 \(\hat p\)。在波函数表象（也叫"<em>位置表象</em>"）里, 它们写成</p>
+
+<p>\[
+\hat x \, \psi(x) = x \, \psi(x), \qquad \hat p \, \psi(x) = -i\hbar \frac{d \psi}{d x}.
+\]</p>
+
+<p>第一条说"<em>位置算子作用 = 乘以 \(x\)</em>"; 第二条来自 de Broglie 关系 \(p = \hbar k\) 加上平面波 \(e^{ikx}\) 的微分（<a href="ch3.html">ch3</a> 推导过）, 它说"<em>动量算子作用 = \(-i\hbar\) 乘以 \(d/dx\)</em>"。</p>
+
+<p>我现在要算它们的<em>对易子</em>:</p>
+
+<p>\[
+[\hat x, \hat p] := \hat x \hat p - \hat p \hat x.
+\]</p>
+
+<p>对易子是个新算子, 它衡量"<em>先做 \(\hat p\) 再做 \(\hat x\)</em>" 与"<em>先做 \(\hat x\) 再做 \(\hat p\)</em>" 差多少。如果两个算子能交换 \(\hat x \hat p = \hat p \hat x\), 对易子是 0。如果不能, 对易子非零, 衡量"<em>不交换的程度</em>"。</p>
+
+<p>对一个测试波函数 \(\psi(x)\) 算 \([\hat x, \hat p] \psi\)。先算 \(\hat x \hat p \psi\):</p>
+
+<p>\[
+\hat x \hat p \psi = \hat x \cdot \left( -i\hbar \frac{d \psi}{dx} \right) = -i\hbar \, x \frac{d \psi}{dx}.
+\]</p>
+
+<p>再算 \(\hat p \hat x \psi\)。先 \(\hat x \psi = x \psi\), 再 \(\hat p\) 作用:</p>
+
+<p>\[
+\hat p \hat x \psi = -i\hbar \frac{d}{dx}(x \psi) = -i\hbar \left( \psi + x \frac{d\psi}{dx} \right).
+\]</p>
+
+<p>这里我用了乘积求导规则 \((x\psi)' = \psi + x\psi'\)——一个被很多人写错的小步骤, 请你看清。</p>
+
+<p>两式相减:</p>
+
+<p>\[
+[\hat x, \hat p] \psi = \hat x \hat p \psi - \hat p \hat x \psi = -i\hbar \, x \psi' - (-i\hbar)(\psi + x\psi') = i\hbar \, \psi.
+\]</p>
+
+<p>对<em>任意</em> \(\psi\) 都成立——所以作为算子等式</p>
+
+<p>\[
+\boxed{\ [\hat x, \hat p] = i\hbar \, \hat I.\ }
+\]</p>
+
+<p>右边是 \(i\hbar\) 乘以恒等算子。这是量子力学最重要的<em>正则对易关系</em>（canonical commutation relation, CCR）。它是 Heisenberg 1925 矩阵力学的出发点, 也是 ch11 整章故事的种子。</p>
+
+<p>请你停下来感受: 经典力学里 \(x p\) 和 \(p x\) 都是数, 当然相等, 差是 0。一旦把 \(x, p\) 提升为算子（<a href="ch10.html">ch10</a> 的"<em>正则量子化</em>"）, 它们差出一个 \(i\hbar\)——这个 \(\hbar\) 就是经典与量子分家的"<em>缝</em>"。\(\hbar \to 0\) 的极限下, 对易子变 0, 量子退回经典。</p>
+
+<h2 id="sec11-2">11.2 朴素想法: "<em>测得准就扰得多</em>" 撞墙</h2>
+
+<p>Heisenberg 1927 的"<em>显微镜</em>" 论证大约是这样: 用波长 \(\lambda\) 的光看电子, 显微镜分辨极限给位置精度 \(\Delta x \sim \lambda\); 但单光子动量 \(p_\gamma = h/\lambda\), 它打到电子上把电子动量踢一下, 给电子动量不确定 \(\Delta p \sim h/\lambda\)。乘起来 \(\Delta x \Delta p \sim h\)——和 \(\hbar/2\) 同量级。</p>
+
+<p>这条论证有<em>启发性</em>, 但它<em>不是</em> 不确定性原理的来源。理由有三:</p>
+
+<ul>
+  <li>它把 \(\Delta x, \Delta p\) 解释为"<em>测量误差</em>"。但 \(\Delta x\) 在量子力学里有<em>明确</em> 数学定义——\(\Delta x = \sqrt{\langle \hat x^2 \rangle - \langle \hat x \rangle^2}\), 是<em>状态本身</em> 在位置算子下的<em>标准差</em>, 与是否测量无关。</li>
+  <li>它需要"<em>光子</em>" 进入论证, 但不确定性对一个孤立的、未被任何东西测量的波函数也成立——你完全可以在纸上算 \(\Delta x \Delta p\) 给一个高斯波包, 不引入任何光子。</li>
+  <li>它<em>不</em> 一般化。把 \((\hat x, \hat p)\) 换成 \((\hat L_x, \hat L_y)\)（角动量分量, ch14）, "<em>显微镜</em>" 论证完全失效, 但不确定性照样成立。</li>
+</ul>
+
+<p>所以<em>朴素</em> 的"<em>测扰</em>" 图像撞墙了。我们需要 reframe。</p>
+
+<p>正确的 reframe: \(\Delta x \Delta p \ge \hbar/2\) <em>不是</em> 测量过程的物理限制, 它是"<em>给定状态 \(|\psi\rangle\)</em>", 两个标准差 \(\Delta x, \Delta p\) 满足的<em>代数不等式</em>。证明只用 Cauchy-Schwarz 加上对易关系。下一节给出。</p>
+
+<h2 id="sec11-3">11.3 一般 Heisenberg 不等式</h2>
+
+<p>设 \(\hat A, \hat B\) 是任意两个自伴算子, \(|\psi\rangle\) 是任意归一态。定义</p>
+
+<p>\[
+\Delta A := \sqrt{\langle (\hat A - \langle \hat A \rangle)^2 \rangle}, \qquad \Delta B := \sqrt{\langle (\hat B - \langle \hat B \rangle)^2 \rangle},
+\]</p>
+
+<p>其中 \(\langle \cdot \rangle = \langle \psi | \cdot | \psi\rangle\) 是态 \(|\psi\rangle\) 上的期望。</p>
+
+<p><strong>定理 (一般 Heisenberg 不等式)</strong>:</p>
+
+<p>\[
+\boxed{\ \Delta A \cdot \Delta B \ge \frac{1}{2} \big| \langle [\hat A, \hat B] \rangle \big|.\ }
+\]</p>
+
+<p>右边是对易子在 \(|\psi\rangle\) 上的期望的<em>模</em> 的一半。注意这是一条对<em>任何</em> 自伴算子对、<em>任何</em> 态都成立的几何事实。</p>
+
+<p><strong>证明</strong>。引入"<em>去均值</em>" 的算子</p>
+
+<p>\[
+\hat a := \hat A - \langle \hat A \rangle \hat I, \qquad \hat b := \hat B - \langle \hat B \rangle \hat I.
+\]</p>
+
+<p>它们仍然自伴（自伴算子减去实数倍的恒等仍自伴, 因为 \(\langle \hat A \rangle\) 是实数）。它们的方差就是</p>
+
+<p>\[
+(\Delta A)^2 = \langle \psi | \hat a^2 | \psi \rangle = \|\hat a |\psi\rangle\|^2,
+\]</p>
+
+<p>第二个等号用了 \(\hat a\) 自伴 \(\Rightarrow \langle \psi | \hat a \hat a | \psi\rangle = \langle \hat a \psi | \hat a \psi\rangle\)。同样 \((\Delta B)^2 = \|\hat b |\psi\rangle\|^2\)。</p>
+
+<p>对两个向量 \(|\alpha\rangle = \hat a|\psi\rangle\) 和 \(|\beta\rangle = \hat b|\psi\rangle\) 用 <em>Cauchy-Schwarz</em>（<a href="../泛函分析/ch3.html">泛函分析 ch3</a>）:</p>
+
+<p>\[
+\|\alpha\|^2 \cdot \|\beta\|^2 \ge |\langle \alpha | \beta \rangle|^2.
+\]</p>
+
+<p>左边就是 \((\Delta A)^2 (\Delta B)^2\)。右边</p>
+
+<p>\[
+\langle \alpha | \beta \rangle = \langle \psi | \hat a \hat b | \psi\rangle.
+\]</p>
+
+<p>关键的小技巧——把 \(\hat a \hat b\) 拆成对称和反对称两部分:</p>
+
+<p>\[
+\hat a \hat b = \frac{1}{2}\{\hat a, \hat b\} + \frac{1}{2}[\hat a, \hat b],
+\]</p>
+
+<p>其中 \(\{\hat a, \hat b\} = \hat a\hat b + \hat b\hat a\) 是<em>反对易子</em>, \([\hat a, \hat b] = \hat a\hat b - \hat b\hat a\) 是对易子。</p>
+
+<p>注意两件事:</p>
+
+<ul>
+  <li>反对易子 \(\{\hat a, \hat b\}\) 是<em>自伴</em> 的（两个自伴算子的反对易子自伴, 因为 \((\hat a\hat b + \hat b\hat a)^\dagger = \hat b\hat a + \hat a\hat b\)）。所以它的期望是<em>实数</em>。</li>
+  <li>对易子 \([\hat a, \hat b]\) 是<em>反自伴</em>（即 \([\hat a, \hat b]^\dagger = -[\hat a, \hat b]\)）。所以它的期望是<em>纯虚数</em>。</li>
+</ul>
+
+<p>于是</p>
+
+<p>\[
+\langle \hat a \hat b \rangle = \underbrace{\frac{1}{2}\langle\{\hat a, \hat b\}\rangle}_{\text{实}} + \underbrace{\frac{1}{2}\langle[\hat a, \hat b]\rangle}_{\text{虚}}.
+\]</p>
+
+<p>取模平方——实部平方加虚部平方:</p>
+
+<p>\[
+|\langle \hat a \hat b\rangle|^2 = \frac{1}{4}|\langle\{\hat a, \hat b\}\rangle|^2 + \frac{1}{4}|\langle[\hat a, \hat b]\rangle|^2.
+\]</p>
+
+<p>第一项 \(\ge 0\), 所以</p>
+
+<p>\[
+|\langle \hat a \hat b\rangle|^2 \ge \frac{1}{4}|\langle [\hat a, \hat b]\rangle|^2.
+\]</p>
+
+<p>最后注意 \([\hat a, \hat b] = [\hat A - \langle A\rangle, \hat B - \langle B\rangle] = [\hat A, \hat B]\)（常数与算子对易, 不贡献）。综合:</p>
+
+<p>\[
+(\Delta A)^2 (\Delta B)^2 \ge |\langle \hat a\hat b\rangle|^2 \ge \frac{1}{4} |\langle [\hat A, \hat B]\rangle|^2.
+\]</p>
+
+<p>开方</p>
+
+<p>\[
+\Delta A \cdot \Delta B \ge \frac{1}{2} |\langle [\hat A, \hat B]\rangle|. \qquad \blacksquare
+\]</p>
+
+<p>请你停下来感受: 这个证明<em>从头到尾</em> 没有"<em>测量</em>"<em>没有</em> "<em>观察者</em>"<em>没有</em> "<em>光子</em>"。它只用了三件事——Cauchy-Schwarz（向量几何）、自伴性（实期望）、对易子的反自伴性（虚期望）。<em>纯几何</em>。</p>
+
+<h2 id="sec11-4">11.4 应用到位置 + 动量</h2>
+
+<p>把 \(\hat A = \hat x, \hat B = \hat p\) 代入。\([\hat x, \hat p] = i\hbar\), 所以 \(\langle [\hat x, \hat p]\rangle = i\hbar \langle\psi|\psi\rangle = i\hbar\)（用归一性）。模 \(|i\hbar| = \hbar\)。</p>
+
+<p>\[
+\boxed{\ \Delta x \cdot \Delta p \ge \frac{\hbar}{2}.\ }
+\]</p>
+
+<p><em>这就是 Heisenberg 不确定性原理</em>。它<em>不是</em> 实验定律, 它<em>是</em> 算子框架的两行代数推论。它对<em>任何</em> 量子态成立——基态、激发态、自由粒子、束缚粒子、刚做完测量后的态——一律满足。</p>
+
+<h2 id="sec11-5">11.5 谁达到等号？高斯波包</h2>
+
+<p>看了下界, 自然问: <em>哪些态恰好达到 \(\Delta x \Delta p = \hbar/2\)</em>？这是个"<em>极小不确定态</em>" 的问题——量子力学里"最经典"的状态。</p>
+
+<p>回到证明。等号成立的条件——Cauchy-Schwarz 取等加上反对易期望为零。Cauchy-Schwarz 取等 \(\Leftrightarrow\) 两个向量<em>线性相关</em>:</p>
+
+<p>\[
+\hat b |\psi\rangle = \lambda \, \hat a |\psi\rangle, \quad \lambda \in \mathbb{C}.
+\]</p>
+
+<p>反对易期望为零的条件——把这条代回算一下, 给 \(\lambda\) 必须<em>纯虚</em>。设 \(\lambda = i \mu, \mu \in \mathbb{R}\), 条件成</p>
+
+<p>\[
+(\hat p - \langle p\rangle) \psi = i \mu (\hat x - \langle x\rangle) \psi.
+\]</p>
+
+<p>设 \(\langle x\rangle = x_0, \langle p\rangle = p_0\), 用 \(\hat p = -i\hbar d/dx\):</p>
+
+<p>\[
+-i\hbar \frac{d\psi}{dx} - p_0 \psi = i\mu (x - x_0) \psi.
+\]</p>
+
+<p>整理为</p>
+
+<p>\[
+\frac{d\psi}{dx} = \left( \frac{i p_0}{\hbar} - \frac{\mu}{\hbar}(x - x_0) \right) \psi.
+\]</p>
+
+<p>这是个一阶 ODE, 解</p>
+
+<p>\[
+\psi(x) = N \exp\left( -\frac{\mu}{2\hbar}(x - x_0)^2 + \frac{i p_0}{\hbar}(x - x_0) \right).
+\]</p>
+
+<p>\(\mu > 0\) 才能归一（否则积分发散）。\(N\) 是归一常数。这是个<em>高斯波包</em>——中心在 \(x_0\), 平均动量 \(p_0\), 宽度由 \(\mu\) 决定。具体地</p>
+
+<p>\[
+(\Delta x)^2 = \frac{\hbar}{2\mu}, \qquad (\Delta p)^2 = \frac{\hbar \mu}{2},
+\]</p>
+
+<p>乘起来 \((\Delta x)^2 (\Delta p)^2 = \hbar^2/4\), 即 \(\Delta x \Delta p = \hbar/2\)。<em>等号成立</em>。</p>
+
+<p>结论: <em>极小不确定态恰好就是高斯波包</em>。把 \(\mu\) 调小, 波包"<em>胖</em>", \(\Delta x\) 大 \(\Delta p\) 小; 调大, 波包"<em>瘦</em>", \(\Delta x\) 小 \(\Delta p\) 大。乘积始终钉在 \(\hbar/2\) 上。</p>
+
+<p>这条结果在<a href="ch8.html">ch8</a> 谐振子那一章已经现身——谐振子基态正是个高斯, 因此谐振子基态<em>同时</em> 是极小不确定态, 它的 \(\Delta x \Delta p = \hbar/2\) 严格饱和下界。这在 ch11 用一般框架解释了。</p>
+
+<h2 id="sec11-6">11.6 物理含义: 零点能</h2>
+
+<p>不确定性原理给一个朴素但深刻的推论: <em>粒子不能"静止在原点"</em>。"<em>静止在原点</em>" 意思 \(\Delta x = 0\)（确切位置 0）<em>且</em> \(\Delta p = 0\)（确切动量 0）。乘积为 0 < \(\hbar/2\), 违反不等式。所以这种态<em>不存在</em>。</p>
+
+<p>具体到束缚态。考虑一维谐振子 \(\hat H = \hat p^2/(2m) + (1/2) m\omega^2 \hat x^2\)。能量期望</p>
+
+<p>\[
+\langle E\rangle = \frac{\langle p^2\rangle}{2m} + \frac{m\omega^2}{2}\langle x^2\rangle.
+\]</p>
+
+<p>对基态（\(\langle x\rangle = \langle p\rangle = 0\) 由对称性）, \(\langle x^2\rangle = (\Delta x)^2, \langle p^2\rangle = (\Delta p)^2\)。设 \(a := (\Delta x)^2\), 不确定性给 \((\Delta p)^2 \ge \hbar^2/(4a)\)。代入</p>
+
+<p>\[
+\langle E\rangle \ge \frac{\hbar^2}{8 m a} + \frac{m\omega^2 a}{2}.
+\]</p>
+
+<p>对 \(a\) 求最小: \(d/da(\cdots) = -\hbar^2/(8 m a^2) + m\omega^2/2 = 0 \Rightarrow a = \hbar/(2 m\omega)\)。代回</p>
+
+<p>\[
+\langle E\rangle_{\min} = \frac{\hbar^2}{8 m} \cdot \frac{2m\omega}{\hbar} + \frac{m\omega^2}{2} \cdot \frac{\hbar}{2 m\omega} = \frac{\hbar\omega}{4} + \frac{\hbar\omega}{4} = \frac{\hbar\omega}{2}.
+\]</p>
+
+<p>这就是<em>零点能</em>——谐振子基态能量 \(E_0 = \hbar\omega/2\), 不能更小。<em>不</em> 假设解 Schrödinger 方程, <em>纯</em> 用不确定性就估出。<a href="ch8.html">ch8</a> 解 SE 给精确同样答案——这里只用一个不等式得到<em>真</em> 基态能（不只是上界）。</p>
+
+<p>请你欣赏: 经典谐振子最低能态——粒子停在原点 \(x = 0, p = 0\), 能量 0。量子谐振子做不到——不确定性<em>禁止</em> 这种态, 强制粒子一直"<em>抖动</em>", 能量至少 \(\hbar\omega/2\)。这条"<em>零点抖动</em>" 在物理学里有诸多观测后果——液氦在 0 K 不结晶、Casimir 力（两块平行金属板之间的真空"<em>吸引</em>"）、Lamb 移动（氢原子能级精细结构）——全都是真空 / 基态的零点能在表演。</p>
+
+<h2 id="sec11-7">11.7 应用: 估算氢原子基态尺寸</h2>
+
+<p>同样的策略用到氢原子, 不解 Schrödinger 方程也能估出基态能。Hamiltonian</p>
+
+<p>\[
+\hat H = \frac{\hat p^2}{2 m_e} - \frac{e^2}{4\pi\epsilon_0 \hat r}.
+\]</p>
+
+<p>设基态典型尺寸 \(r \sim \Delta r\), 不确定性给 \(\Delta p \sim \hbar/r\)（粗略, 维数对）。代入</p>
+
+<p>\[
+E(r) \sim \frac{\hbar^2}{2 m_e r^2} - \frac{e^2}{4\pi\epsilon_0 r}.
+\]</p>
+
+<p>对 \(r\) 求最小: \(dE/dr = -\hbar^2/(m_e r^3) + e^2/(4\pi\epsilon_0 r^2) = 0\), 给</p>
+
+<p>\[
+r_0 = \frac{4\pi\epsilon_0 \hbar^2}{m_e e^2} = a_0,
+\]</p>
+
+<p>这就是<em>Bohr 半径</em> \(a_0 \approx 5.29 \times 10^{-11}\) m。代回</p>
+
+<p>\[
+E_0 \sim -\frac{m_e e^4}{2 \hbar^2 (4\pi\epsilon_0)^2} = -13.6 \text{ eV}.
+\]</p>
+
+<p><em>不解一个 PDE</em>, 只用 \(\Delta x \Delta p \sim \hbar\) + 维度分析, 就还原了氢原子基态能。</p>
+
+<p>更深一层——这个估算回答了"<em>电子为什么不掉进核里</em>" 的经典之问。经典论证里 \(r \to 0\) 时电势能 \(-e^2/r \to -\infty\), 系统为了能量更低应该塌缩。但量子里 \(r\) 减小 \(\Rightarrow \Delta p\) 增大 \(\Rightarrow\) 动能 \(\hat p^2/2m\) 增大。两者竞争——动能增长 \(\propto 1/r^2\), 电势降低 \(\propto -1/r\), 在小 \(r\) 时<em>动能赢</em>。最低总能在 \(r = a_0\) 处, <em>稳定</em>。</p>
+
+<p>不确定性原理直接救了原子的<em>稳定性</em>——这是 ch1 第三场仗给的物理之谜的根本解释。Bohr 1913 的 ad hoc"<em>稳定轨道</em>" 假设, 在量子力学正式版里被替换成了<em>不确定性强制要求</em>。</p>
+
+<h2 id="sec11-8">11.8 时间-能量不确定性: 微妙之处</h2>
+
+<p>常听说还有一条"<em>时间-能量不确定性</em>"</p>
+
+<p>\[
+\Delta E \cdot \Delta t \ge \frac{\hbar}{2}.
+\]</p>
+
+<p>它形式上漂亮地对偶 \(\Delta x \Delta p \ge \hbar/2\)。但<em>它不能用 11.3 的方法证</em>——因为<em>时间不是算子</em>。在标准量子力学里, \(t\) 是个外部参数（演化的"<em>钟</em>"）, 不是 Hilbert 空间上的算子。所以 \([\hat E, \hat t]\) 这种式子<em>没有意义</em>。</p>
+
+<p>那这条不等式怎么理解？用 <em>Mandelstam-Tamm</em> 1945 的解释。设 \(\hat A\) 是任意自伴算子, 它的期望随时间演化:</p>
+
+<p>\[
+\frac{d \langle \hat A\rangle}{dt} = \frac{i}{\hbar} \langle [\hat H, \hat A]\rangle
+\]</p>
+
+<p>（这是<a href="ch13.html">ch13</a> 要详证的 Heisenberg 运动方程的期望版）。用一般 Heisenberg 不等式 11.3 给 \(\hat A, \hat H\):</p>
+
+<p>\[
+\Delta A \cdot \Delta E \ge \frac{1}{2}|\langle [\hat H, \hat A]\rangle| = \frac{\hbar}{2} \left| \frac{d\langle \hat A\rangle}{dt}\right|.
+\]</p>
+
+<p>定义"<em>系统让 \(\hat A\) 改变一个 \(\Delta A\) 的特征时间</em>"</p>
+
+<p>\[
+\tau_A := \frac{\Delta A}{|d\langle \hat A\rangle / dt|}.
+\]</p>
+
+<p>这是"<em>\(\hat A\) 期望值显著变化所需的时间</em>"——一种自然的"<em>系统时间尺度</em>"。代入上式</p>
+
+<p>\[
+\Delta E \cdot \tau_A \ge \frac{\hbar}{2}.
+\]</p>
+
+<p>这就是<em>真正</em> 意义上的时间-能量不确定性。它说: <em>能量越确定（\(\Delta E\) 小）, 系统的可观测量演化越慢（\(\tau_A\) 大）</em>。能量本征态 \(\Delta E = 0\), 那 \(\tau_A = \infty\)——任何观测量的期望都<em>不变</em>。这正是<a href="ch10.html">ch10</a> 里"<em>定态</em>" 的定义。</p>
+
+<p>常见物理应用: <em>不稳定粒子的寿命与能宽对偶</em>。粒子寿命 \(\tau\), 它的能量分布有一定宽度 \(\Gamma\), 关系 \(\Gamma \tau \sim \hbar\)。寿命越短, 能量越"<em>糊</em>"——这是为什么短寿命粒子在能谱上是宽峰, 长寿命的是窄线。</p>
+
+<h2 id="sec11-9">11.9 角动量分量两两不相容</h2>
+
+<p>11.3 给的是<em>一般</em> 框架。它对任何一对算子都成立, 不只 \((\hat x, \hat p)\)。下面看一组重要的不相容观测——三维空间中的角动量算子分量。</p>
+
+<p>角动量在经典里 \(\vec L = \vec r \times \vec p\), 三个分量</p>
+
+<p>\[
+L_x = y p_z - z p_y, \quad L_y = z p_x - x p_z, \quad L_z = x p_y - y p_x.
+\]</p>
+
+<p>正则量子化把 \(x, y, z, p_x, p_y, p_z\) 提为算子（\([\hat x, \hat p_x] = i\hbar\) 等, 不同坐标 / 不同动量两两对易）。算 \([\hat L_x, \hat L_y]\):</p>
+
+<p>\[
+[\hat L_x, \hat L_y] = [\hat y \hat p_z - \hat z \hat p_y, \hat z \hat p_x - \hat x \hat p_z].
+\]</p>
+
+<p>展开成 4 个对易子, 用<em>对易子的展开规则</em> \([AB, C] = A[B, C] + [A, C]B\):</p>
+
+<p>\[
+[\hat y\hat p_z, \hat z\hat p_x] = \hat y[\hat p_z, \hat z]\hat p_x = \hat y(-i\hbar)\hat p_x = -i\hbar \hat y\hat p_x,
+\]</p>
+
+<p>\[
+[\hat y\hat p_z, -\hat x\hat p_z] = 0 \quad (\text{两个 } \hat p_z \text{ 自然交换, } \hat y, \hat x \text{ 也交换}),
+\]</p>
+
+<p>\[
+[-\hat z\hat p_y, \hat z\hat p_x] = 0,
+\]</p>
+
+<p>\[
+[-\hat z\hat p_y, -\hat x\hat p_z] = \hat x[\hat p_y \hat z, \hat p_z]\cdots = \hat x \hat p_y [\hat z, \hat p_z] = i\hbar \hat x\hat p_y.
+\]</p>
+
+<p>（中间两步对易因为不同坐标 / 不同动量都对易, 这里需要小心展开。）合起来</p>
+
+<p>\[
+[\hat L_x, \hat L_y] = -i\hbar \hat y\hat p_x + i\hbar \hat x\hat p_y = i\hbar(\hat x\hat p_y - \hat y\hat p_x) = i\hbar \hat L_z.
+\]</p>
+
+<p>同理 \([\hat L_y, \hat L_z] = i\hbar \hat L_x, [\hat L_z, \hat L_x] = i\hbar \hat L_y\)。这是 SO(3) 的<em>角动量代数</em>, <a href="ch14.html">ch14</a> 详谈。</p>
+
+<p>一般 Heisenberg 不等式给</p>
+
+<p>\[
+\Delta L_x \cdot \Delta L_y \ge \frac{1}{2}|\langle [\hat L_x, \hat L_y]\rangle| = \frac{\hbar}{2}|\langle \hat L_z\rangle|.
+\]</p>
+
+<p>这条不等式有个<em>有意思的特征</em>: 右边不是个常数, 而依赖于<em>当前态的 \(\hat L_z\) 期望</em>。如果系统在 \(\hat L_z\) 的本征态, \(\langle \hat L_z\rangle\) 一般非 0, 所以 \(\Delta L_x, \Delta L_y\) 都 \(\ne 0\)——三个分量不能同时被精确指定。这正是为什么角动量在量子里"<em>只能指一个轴的方向</em>"——你能同时知道 \(L^2\) 和 \(L_z\)（它们对易, ch14 证）, 但 \(L_x, L_y\) 仍然<em>不</em> 确定。</p>
+
+<p>预告: <a href="ch14.html">ch14</a> 用这条对易代数完整推出角动量谱<em>纯代数</em>——不解任何微分方程, 只用 \([\hat L_x, \hat L_y] = i\hbar \hat L_z\) 和升降算子 \(\hat L_\pm = \hat L_x \pm i\hat L_y\), 就给出 \(L^2\) 本征值 \(\hbar^2 \ell(\ell+1)\) 和 \(L_z\) 本征值 \(\hbar m\)。这是 Pauli 1927 矩阵力学的杰作之一。</p>
+
+<h2 id="sec11-10">11.10 命名与一般化</h2>
+
+<p>把这一章的关键观念命名一下:</p>
+
+<ul>
+  <li><strong>对易子</strong> \([\hat A, \hat B]\): 衡量两个观测<em>不相容</em> 的程度。</li>
+  <li><strong>正则对易关系</strong> \([\hat x, \hat p] = i\hbar\): 量子力学的"<em>种子</em>" 关系, 区分量子与经典。</li>
+  <li><strong>不确定性</strong> \(\Delta A \Delta B \ge \frac{1}{2}|\langle [\hat A, \hat B]\rangle|\): Hilbert 空间几何的<em>代数</em> 推论, 不是"<em>测扰</em>"。</li>
+  <li><strong>极小不确定态</strong>: 在 \((\hat x, \hat p)\) 情形是高斯波包; 一般是满足 \(\hat b\psi = i\mu \hat a\psi\) 的"<em>相干态</em>"（<a href="ch24.html">ch24</a> 量子光学的主角）。</li>
+  <li><strong>零点能 / 不可塌缩性</strong>: 不确定性强制束缚系统能量<em>有正下界</em>, 阻止经典塌缩。氢原子的稳定来源。</li>
+</ul>
+
+<p>这一章的<em>真正定理</em> 是 11.3 的两行 Cauchy-Schwarz 推论。其它东西全是它的应用——\((\hat x, \hat p)\) 给位置-动量, \((\hat L_x, \hat L_y)\) 给角动量, \((\hat E, \hat A)\) 加运动方程给时间-能量。一个不等式管所有"<em>不相容观测</em>" 的几何。</p>
+
+<p>请你最后想一遍这章的 reframe 弧线: 朴素的"<em>测得越准就扰得越多</em>" 是个错误的物理隐喻——它把不确定性归咎于"<em>测量</em>" 这个动作。撞墙之处: 它没法解释一个<em>未被测量</em> 的孤立波函数为什么也满足 \(\Delta x \Delta p \ge \hbar/2\), 也没法一般化到角动量。Reframe: \(\Delta A \Delta B\) 是状态<em>本身</em> 在两个算子下的几何性质, 由对易子代数决定。命名: 一般 Heisenberg 不等式。一般化: 任意算子对 + Mandelstam-Tamm 推广到时间-能量。</p>
+
+<p>下一章我们直面量子力学最哲学的问题——"<em>测量</em>" 到底是什么？11.3 假设了"<em>态 \(|\psi\rangle\) 给定</em>", 算 \(\Delta A\) 是统计量。但实际<em>测量</em> 一个量子系统会怎样？测量瞬间波函数<em>怎么变</em>？这是<a href="ch12.html">ch12</a> 的"<em>测量与塌缩</em>"——量子力学最大的诠释之谜。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 算子与可观测量</a><a href="ch12.html">下一章 · 第 12 章 测量与塌缩 →</a></nav>
+</main>
+</body>
+</html>

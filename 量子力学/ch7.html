@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 谐振子（升降算子 + Hermite）— 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 一维无限深势阱</a><a href="ch8.html">下一章 · 第 8 章 势垒与隧穿 →</a></nav>
+<h1 id="ch7">第 7 章 谐振子（升降算子 + Hermite）</h1>
+
+<p>上一章势阱的"<em>边界条件 ⟹ 离散能级</em>" 模板, 这一章再走一次, 但势能换成<em>谐振子</em></p>
+
+<p>\[
+V(x) = \frac{1}{2} m \omega^2 x^2.
+\]</p>
+
+<p>这条势能为什么这么重要——任何<em>有极小</em> 的势能 \(V(x)\), 在极小附近 Taylor 展开到二阶</p>
+
+<p>\[
+V(x) \approx V(x_0) + \frac{1}{2} V''(x_0) (x - x_0)^2 + O((x - x_0)^3),
+\]</p>
+
+<p>就是个谐振子（一阶项消, 因为 \(x_0\) 是极小, \(V'(x_0) = 0\)）。所以<em>分子振动、晶格声子、光子量子化、电磁场量子化、几乎所有"<em>小振动</em>" 物理</em> 在第一近似都是谐振子。掌握这一章 = 掌握 QM 一半的实际应用。</p>
+
+<p>这一章我给两套解法。第一套——直接解 SE, 给<em>Hermite 多项式</em>。第二套——Dirac 1925 的<em>升降算子</em>, 完全不解微分方程, 用算子代数得同一答案。两套都漂亮, 但 Dirac 的代数法更深——它是<em>本书第一次</em> 看到"<em>algebraic 方法</em>" 的威力, 也是 QFT 中"<em>粒子数</em>" 概念的雏形。我把代数法放主线, Hermite 放次线。</p>
+
+<h2 id="sec7-1">7.1 谐振子 Hamiltonian</h2>
+
+<p>带电荷的弹簧系统 \(F = -k x\), 经典 Hamiltonian \(H = p^2/(2m) + (1/2) k x^2 = p^2/(2m) + (1/2) m \omega^2 x^2\), 其中 \(\omega = \sqrt{k/m}\)。</p>
+
+<p>QM 化——把 \(p, x\) 换成算子 \(\hat p = -i\hbar \partial_x, \hat x = x\):</p>
+
+<p>\[
+\boxed{\ \hat H = \frac{\hat p^2}{2 m} + \frac{1}{2} m \omega^2 \hat x^2.\ }
+\]</p>
+
+<p>对易子（基本公设, ch11 详谈）:</p>
+
+<p>\[
+[\hat x, \hat p] = i\hbar.
+\]</p>
+
+<p>能量本征问题: 找 \((E_n, \psi_n)\) 使 \(\hat H \psi_n = E_n \psi_n\)。直接解的 SE</p>
+
+<p>\[
+-\frac{\hbar^2}{2 m} \psi'' + \frac{1}{2} m \omega^2 x^2 \psi = E \psi.
+\]</p>
+
+<p>这条 ODE 没初等解。用<em>幂级数法</em>能解出来——把 \(\psi(x) = e^{-\xi^2/2} H(\xi)\)（\(\xi = x \sqrt{m\omega/\hbar}\)）代入, 得 Hermite 方程; 要求级数截止使 \(\psi\) 在 \(\pm\infty\) 衰减, 强加截止条件给 \(E_n = (n + 1/2)\hbar\omega\) 与 \(H(\xi)\) 是 \(n\) 次 Hermite 多项式。这是 7.7 的内容。</p>
+
+<p>但 Dirac 给出一个完全不解 ODE 的方法——更漂亮、更深、把 \(E_n = (n + 1/2)\hbar\omega\) 从纯<em>对易子</em> 代数推出来。</p>
+
+<h2 id="sec7-2">7.2 升降算子: 一个看似无聊的代数游戏</h2>
+
+<p>定义两个新算子（无量纲化 + 复线性组合 \(\hat x, \hat p\)）:</p>
+
+<p>\[
+\boxed{\ \hat a := \sqrt{\frac{m \omega}{2 \hbar}} \left( \hat x + \frac{i \hat p}{m \omega} \right), \quad \hat a^\dagger := \sqrt{\frac{m \omega}{2 \hbar}} \left( \hat x - \frac{i \hat p}{m \omega} \right).\ }\]</p>
+
+<p>名字: \(\hat a\) 叫<em>湮灭算子</em>（或<em>下降算子</em>), \(\hat a^\dagger\) 叫<em>产生算子</em>（或<em>上升算子</em>）。注意 \(\hat a^\dagger\) 真的是 \(\hat a\) 的厄米共轭——\(\hat x, \hat p\) 都自伴, 复共轭就是替换 \(i \to -i\)。</p>
+
+<p>反解 \(\hat x, \hat p\):</p>
+
+<p>\[
+\hat x = \sqrt{\frac{\hbar}{2 m \omega}} (\hat a + \hat a^\dagger), \quad \hat p = -i \sqrt{\frac{m \omega \hbar}{2}} (\hat a - \hat a^\dagger).
+\]</p>
+
+<p>这两条把 \(\hat x, \hat p\) 写成 \((\hat a, \hat a^\dagger)\) 的线性组合, 是后面所有计算的入口。</p>
+
+<p>请你停下来——这看起来像个无聊的代数变换。"<em>把两个实算子组合成一个复算子</em>"——为什么有用？答案在下一节: 这条变换让 Hamiltonian 变成<em>极简形式</em>, 而对易子 \([\hat x, \hat p] = i\hbar\) 翻译成<em>简单一条 \([\hat a, \hat a^\dagger] = 1\)</em>。然后所有谱信息都可以纯代数推出。</p>
+
+<h2 id="sec7-3">7.3 \([\hat a, \hat a^\dagger] = 1\) 与 \(\hat H = \hbar\omega(\hat a^\dagger \hat a + 1/2)\)</h2>
+
+<p>算 \([\hat a, \hat a^\dagger]\):</p>
+
+<p>\[
+[\hat a, \hat a^\dagger] = \frac{m\omega}{2\hbar} \left[ \hat x + \frac{i \hat p}{m\omega}, \hat x - \frac{i \hat p}{m\omega} \right] = \frac{m\omega}{2\hbar} \cdot \left( -\frac{i}{m\omega} [\hat x, \hat p] + \frac{i}{m\omega}[\hat p, \hat x] \right) = \frac{1}{2\hbar} (-i \cdot i\hbar + i \cdot (-i\hbar)) = \frac{1}{2\hbar} \cdot 2 \hbar = 1.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\boxed{\ [\hat a, \hat a^\dagger] = 1.\ }
+\]</p>
+
+<p>这一条对易子是后面一切的种子。</p>
+
+<p>接下来算 \(\hat a^\dagger \hat a\):</p>
+
+<p>\[
+\hat a^\dagger \hat a = \frac{m \omega}{2 \hbar} \left( \hat x - \frac{i \hat p}{m\omega} \right) \left( \hat x + \frac{i \hat p}{m\omega} \right) = \frac{m\omega}{2\hbar} \left( \hat x^2 + \frac{\hat p^2}{m^2 \omega^2} + \frac{i}{m\omega} [\hat x, \hat p] \right) = \frac{m\omega}{2\hbar} \hat x^2 + \frac{\hat p^2}{2 m \hbar \omega} + \frac{i^2 \hbar}{2 \hbar} = \frac{m\omega \hat x^2}{2\hbar} + \frac{\hat p^2}{2 m \hbar \omega} - \frac{1}{2}.
+\]</p>
+
+<p>除以 \(\hbar \omega\) 倒过来——</p>
+
+<p>\[
+\hbar \omega \left( \hat a^\dagger \hat a + \frac{1}{2} \right) = \frac{1}{2} m \omega^2 \hat x^2 + \frac{\hat p^2}{2 m} = \hat H.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\boxed{\ \hat H = \hbar \omega \left( \hat a^\dagger \hat a + \frac{1}{2} \right).\ }
+\]</p>
+
+<p>请你欣赏这件事——Hamiltonian 从"<em>动能 + 势能</em>" 这种二次 ODE 形式, 化成"<em>\(\hbar\omega \cdot N + \hbar\omega/2\)</em>" 这种<em>线性</em> 形式, 其中 \(N := \hat a^\dagger \hat a\) 是个新算子（数算子, 7.4 详谈）。求 \(\hat H\) 谱 ⟺ 求 \(N\) 谱——后者用 \([\hat a, \hat a^\dagger] = 1\) 一条就能完全解出。</p>
+
+<h2 id="sec7-4">7.4 数算子 \(\hat N = \hat a^\dagger \hat a\) 谱</h2>
+
+<p>定义</p>
+
+<p>\[
+\hat N := \hat a^\dagger \hat a.
+\]</p>
+
+<p>性质:</p>
+
+<p><strong>(a) \(\hat N\) 自伴</strong>: \((\hat a^\dagger \hat a)^\dagger = \hat a^\dagger (\hat a^\dagger)^\dagger = \hat a^\dagger \hat a = \hat N\) ✓。</p>
+
+<p><strong>(b) \(\hat N\) 半正定</strong>: \(\langle \psi | \hat N | \psi \rangle = \langle \psi | \hat a^\dagger \hat a | \psi \rangle = \|\hat a \psi\|^2 \ge 0\) ✓。所以 \(\hat N\) 的所有本征值 \(\ge 0\)。</p>
+
+<p><strong>(c) 关键对易子</strong>:</p>
+
+<p>\[
+[\hat N, \hat a] = [\hat a^\dagger \hat a, \hat a] = \hat a^\dagger [\hat a, \hat a] + [\hat a^\dagger, \hat a] \hat a = -\hat a.
+\]</p>
+
+<p>\[
+[\hat N, \hat a^\dagger] = [\hat a^\dagger \hat a, \hat a^\dagger] = \hat a^\dagger [\hat a, \hat a^\dagger] = \hat a^\dagger.
+\]</p>
+
+<p>翻译: \(\hat N \hat a = \hat a (\hat N - 1)\), \(\hat N \hat a^\dagger = \hat a^\dagger (\hat N + 1)\)。</p>
+
+<p>这两条<em>移位关系</em> 是关键。设 \(|n\rangle\) 是 \(\hat N\) 的本征向量（数, 不是 \(\hat H\) 的, 但 \(\hat H = \hbar\omega(\hat N + 1/2)\), 所以同时也是 \(\hat H\) 的）, 本征值 \(n\):</p>
+
+<p>\[
+\hat N |n\rangle = n |n\rangle.
+\]</p>
+
+<p>看 \(\hat a |n\rangle\):</p>
+
+<p>\[
+\hat N (\hat a |n\rangle) = (\hat a \hat N - \hat a) |n\rangle = (\hat a n - \hat a) |n\rangle = (n - 1) (\hat a |n\rangle).
+\]</p>
+
+<p>所以 \(\hat a |n\rangle\) 也是 \(\hat N\) 的本征向量, 但本征值降了 1, 是 \(n - 1\)。<em>\(\hat a\) 把状态降一级</em>——这就是它叫"<em>下降算子</em>" 的原因。</p>
+
+<p>同理 \(\hat a^\dagger |n\rangle\) 是本征值 \(n + 1\) 的本征向量——<em>上升算子</em>。</p>
+
+<p>请你停下来欣赏这条<em>阶梯结构</em>: \(\hat a\) 把谱"<em>往下挪 1</em>", \(\hat a^\dagger\) 往上挪 1。如果存在某个 \(|n_0\rangle\), 那么 \(|n_0 - 1\rangle, |n_0 - 2\rangle, \ldots\) 都存在——但 (b) 说本征值 \(\ge 0\), 不能负无穷下降——必有某个最低 \(|n_*\rangle\) 使 \(\hat a |n_*\rangle = 0\), 否则下一步本征值 \(n_* - 1 < 0\) 矛盾。</p>
+
+<h2 id="sec7-5">7.5 基态 \(\hat a |0\rangle = 0\) + \(E_n = (n + 1/2)\hbar\omega\)</h2>
+
+<p>设 \(|0\rangle\) 是这个最低态——\(\hat a |0\rangle = 0\)。它的本征值多少？算 \(\hat N |0\rangle = \hat a^\dagger \hat a |0\rangle = \hat a^\dagger \cdot 0 = 0\)。所以最低本征值<em>正好是 0</em>。</p>
+
+<p>由 7.4 (c) 的阶梯结构, 把 \(\hat a^\dagger\) 反复作用得</p>
+
+<p>\[
+|1\rangle, |2\rangle, |3\rangle, \ldots
+\]</p>
+
+<p>本征值依次 \(1, 2, 3, \ldots\)。所以 \(\hat N\) 的谱<em>正好是非负整数</em>:</p>
+
+<p>\[
+\boxed{\ \hat N \text{ 谱} = \{0, 1, 2, 3, \ldots\}.\ }
+\]</p>
+
+<p>对应 \(\hat H = \hbar\omega(\hat N + 1/2)\) 谱:</p>
+
+<p>\[
+\boxed{\ E_n = \left( n + \frac{1}{2} \right) \hbar \omega, \quad n = 0, 1, 2, \ldots.\ }
+\]</p>
+
+<p>请你停下来想这件事的力量——我们<em>没解任何微分方程</em>。整个推导只用了 \([\hat x, \hat p] = i\hbar\) 这一条公设, 加上 Hamiltonian 的形式, 加上"<em>本征值非负</em>" 这条来自正定性。代数游戏给出 QM 谐振子的全部能级。</p>
+
+<p>能级:</p>
+
+<ul>
+  <li>\(E_0 = \hbar\omega/2\)——基态<em>非零</em>。这就是<em>零点能</em>, 物理由不确定性逼出: \(\Delta x \Delta p \ge \hbar/2\), 且 \(\langle E \rangle = \langle p^2 \rangle/(2m) + (1/2) m \omega^2 \langle x^2 \rangle \ge \hbar\omega/2\)（用 AM-GM 等。下一节算清）。</li>
+  <li>\(E_n - E_{n-1} = \hbar\omega\)——<em>等间距</em> 能级！这是谐振子独有特征（势阱 \(E_n \propto n^2\), 氢原子 \(E_n \propto -1/n^2\), 都不等间距）。这条等间距让谐振子的辐射谱是<em>单频</em>——只有一个频率 \(\omega\), 对应一种"<em>振动模</em>"。原子里的振动光谱（红外）就是这个原理。</li>
+</ul>
+
+<h2 id="sec7-6">7.6 \(|n+1\rangle = \hat a^\dagger |n\rangle/\sqrt{n+1}\)</h2>
+
+<p>上面说"<em>\(\hat a^\dagger\) 把 \(|n\rangle\) 升到 \(|n+1\rangle\)</em>", 但<em>归一化</em> 系数是多少？</p>
+
+<p>\(\|\hat a^\dagger |n\rangle\|^2 = \langle n | \hat a \hat a^\dagger | n \rangle\)。用 \([\hat a, \hat a^\dagger] = 1 \Rightarrow \hat a \hat a^\dagger = \hat a^\dagger \hat a + 1 = \hat N + 1\), 代入</p>
+
+<p>\[
+\|\hat a^\dagger |n\rangle\|^2 = \langle n | \hat N + 1 | n \rangle = n + 1.
+\]</p>
+
+<p>所以归一的态:</p>
+
+<p>\[
+\boxed{\ \hat a^\dagger |n\rangle = \sqrt{n + 1} \, |n+1\rangle.\ }
+\]</p>
+
+<p>同理</p>
+
+<p>\[
+\boxed{\ \hat a |n\rangle = \sqrt{n} \, |n - 1\rangle, \quad n \ge 1.\ }
+\]</p>
+
+<p>（基态 \(\hat a |0\rangle = 0\) 是 \(n = 0\) 时这条公式的退化。）</p>
+
+<p>反复作用 \(\hat a^\dagger\):</p>
+
+<p>\[
+|n\rangle = \frac{(\hat a^\dagger)^n}{\sqrt{n!}} |0\rangle.
+\]</p>
+
+<p><em>所有</em> 本征态都从基态用 \(\hat a^\dagger\) 阶梯爬上去。这是<em>本书第一次</em> 看到"<em>整个谱由一个真空态 + 一个升算子重复作用生成</em>"——一种 algebraic 构造。QFT 把这条思想极致化: 真空 + 各种粒子的产生算子 ⟹ 整个 Fock 空间。每一个粒子物理过程都是"<em>把粒子从真空中抽出</em>" 或"<em>把粒子塞回真空</em>"。本章的谐振子是这条逻辑的最简模型。</p>
+
+<h2 id="sec7-7">7.7 位置基波函数 \(\psi_n(x)\) = Hermite × Gaussian</h2>
+
+<p>代数法给了 \(E_n\) 和 \(|n\rangle\) 的抽象形式, 但<em>位置波函数</em> \(\psi_n(x) = \langle x | n \rangle\) 长什么样？我们用代数法推出。</p>
+
+<p>从基态开始: \(\hat a |0\rangle = 0\) 在位置基里写成</p>
+
+<p>\[
+\sqrt{\frac{m \omega}{2 \hbar}} \left( x + \frac{i}{m\omega} \cdot (-i\hbar) \partial_x \right) \psi_0(x) = 0,
+\]</p>
+
+<p>即 \((x + (\hbar/(m\omega)) \partial_x) \psi_0 = 0\), 一阶 ODE</p>
+
+<p>\[
+\psi_0'(x) = -\frac{m\omega x}{\hbar} \psi_0(x).
+\]</p>
+
+<p>分离变量 \(d\psi_0/\psi_0 = -(m\omega/\hbar) x \, dx \Rightarrow \ln \psi_0 = -m\omega x^2/(2\hbar) + C\), 解</p>
+
+<p>\[
+\psi_0(x) = C \exp\!\left( -\frac{m\omega x^2}{2 \hbar} \right).
+\]</p>
+
+<p>归一化 \(\int |\psi_0|^2 dx = 1\): 高斯积分给</p>
+
+<p>\[
+\boxed{\ \psi_0(x) = \left( \frac{m\omega}{\pi \hbar} \right)^{1/4} \exp\!\left( -\frac{m\omega x^2}{2\hbar} \right).\ }
+\]</p>
+
+<p>这是个<em>Gaussian</em>, 宽度 \(\sigma_0 = \sqrt{\hbar/(2 m \omega)}\)。注意基态<em>没有节点</em>——和势阱 \(\psi_1\) 一样, 节点定理给出基态无节点。</p>
+
+<p>更高态用 \(\hat a^\dagger\) 作用:</p>
+
+<p>\[
+\psi_n(x) = \frac{1}{\sqrt{n!}} (\hat a^\dagger)^n \psi_0(x) = \frac{1}{\sqrt{n!}} \left[ \sqrt{\frac{m\omega}{2\hbar}} \left( x - \frac{\hbar}{m\omega} \partial_x \right) \right]^n \psi_0(x).
+\]</p>
+
+<p>把 \(\xi = x \sqrt{m\omega/\hbar}\) 无量纲化, \(\hat a^\dagger = (\xi - \partial_\xi)/\sqrt{2}\), 给</p>
+
+<p>\[
+\psi_n(\xi) = \frac{1}{\sqrt{2^n n! \sqrt{\pi}}} (\xi - \partial_\xi)^n e^{-\xi^2/2}.
+\]</p>
+
+<p>定义 Hermite 多项式（Rodrigues 公式）</p>
+
+<p>\[
+H_n(\xi) := (-1)^n e^{\xi^2} \frac{d^n}{d\xi^n} e^{-\xi^2}.
+\]</p>
+
+<p>可以证（练习——用算子推 \(d/d\xi\) 与 \(\xi\) 的对易关系）:</p>
+
+<p>\[
+(\xi - \partial_\xi)^n e^{-\xi^2/2} = e^{-\xi^2/2} H_n(\xi).
+\]</p>
+
+<p>所以最终</p>
+
+<p>\[
+\boxed{\ \psi_n(x) = \left( \frac{m\omega}{\pi \hbar} \right)^{1/4} \frac{1}{\sqrt{2^n n!}} H_n(\xi) e^{-\xi^2/2}, \quad \xi = x\sqrt{m\omega/\hbar}.\ }
+\]</p>
+
+<p>头几个 Hermite:</p>
+
+<ul>
+  <li>\(H_0(\xi) = 1\) ⟹ \(\psi_0\) 是 Gaussian, 0 个节点。</li>
+  <li>\(H_1(\xi) = 2\xi\) ⟹ \(\psi_1\) 在 \(\xi = 0\) 有 1 个节点。</li>
+  <li>\(H_2(\xi) = 4\xi^2 - 2\) ⟹ \(\psi_2\) 在 \(\xi = \pm 1/\sqrt{2}\) 有 2 个节点。</li>
+  <li>一般 \(H_n\) 是 \(n\) 次多项式, 在 \(\mathbb{R}\) 上有 \(n\) 个零点 ⟹ \(\psi_n\) 有 \(n\) 个节点。和势阱 \(\psi_n\) 有 \(n - 1\) 内部节点对比——这里的"<em>0 算第 \(n=0\) 个</em>" 和势阱的"<em>1 算第 \(n=1\) 个</em>" 起点不同, 节点定理"<em>第 \(n\) 个能级有 \(n\) 个节点</em>"（从 \(n = 0\) 开始数）。</li>
+</ul>
+
+<p>验算正交 \(\int \psi_n \psi_m dx = \delta_{nm}\)——Hermite 多项式经典正交性: \(\int_{-\infty}^\infty H_n(\xi) H_m(\xi) e^{-\xi^2} d\xi = \sqrt{\pi} 2^n n! \delta_{nm}\)。</p>
+
+<p>这就是<em>"<em>解 ODE 路线</em>" 与"<em>代数路线</em>" 在 \(\psi_n\) 上汇合</em>: 直接解 SE 给 Hermite × Gaussian, 代数法用 \(\hat a^\dagger\) 反复作用<em>恰好</em> 在位置基上构造出 Hermite × Gaussian——两条路殊途同归。</p>
+
+<h2 id="sec7-8">7.8 物理意义: 零点能 + 谐振子的普适</h2>
+
+<p><strong>(a) 零点能 \(E_0 = \hbar\omega/2\)</strong>。</p>
+
+<p>从不确定性看——基态有 \(\langle x \rangle = 0, \langle p \rangle = 0\)（高斯对称）, 所以</p>
+
+<p>\[
+\langle E \rangle_0 = \frac{\langle p^2 \rangle}{2m} + \frac{1}{2} m \omega^2 \langle x^2 \rangle = \frac{(\Delta p)^2}{2 m} + \frac{1}{2} m \omega^2 (\Delta x)^2.
+\]</p>
+
+<p>用 AM-GM \((a + b)/2 \ge \sqrt{ab}\):</p>
+
+<p>\[
+\langle E \rangle \ge 2 \sqrt{\frac{(\Delta p)^2}{2 m} \cdot \frac{m \omega^2 (\Delta x)^2}{2}} = \omega \Delta x \Delta p \ge \omega \cdot \hbar/2 = \hbar\omega/2.
+\]</p>
+
+<p>等号要求 \(\Delta x \Delta p = \hbar/2\)（高斯, 5.7 给的最小不确定性态——正是基态 \(\psi_0\)）和 AM-GM 等 \(\langle p^2 \rangle/(2m) = m\omega^2 \langle x^2 \rangle/2\)（动能 = 势能, 经典等分定理在基态的体现）。所以基态<em>恰好</em> 取到下界 \(\hbar\omega/2\)。</p>
+
+<p>请你停下来——零点能不是"<em>选错坐标系</em>" 给出的常数, 它是<em>不确定性原理 + 谐振子势</em> 的直接逻辑后果。粒子<em>不能</em> 静止在 \(x = 0\), 因为那要求 \(\Delta x = 0 \Rightarrow \Delta p = \infty \Rightarrow \langle p^2 \rangle = \infty \Rightarrow\) 动能无穷。代价: 必须散开 ⟹ 有限动能 ⟹ \(E_0 = \hbar\omega/2 > 0\)。</p>
+
+<p><em>零点能的物理后果</em>:</p>
+
+<ul>
+  <li><em>液氦不固化</em>。氦原子在固化所需的低温下零点振动能 > 晶格束缚, 所以即使在 0 K 液氦也保持液态（必须高压才固化）。</li>
+  <li><em>Casimir 效应</em>。两块平行金属板之间, 电磁场零点能因边界条件不同而不同——板靠近时零点能差给出可观测的吸引力 \(F \propto \hbar c/L^4\)。已 1948 提出, 1997 实验验证。</li>
+  <li><em>真空能问题</em>。所有量子场的零点能加起来给宇宙学常数 \(\Lambda \sim \hbar\omega_{\max}/V\)——理论预测和观测差 120 数量级, 至今未解。"<em>宇宙学常数问题</em>" 是当代物理最大未解之谜之一。</li>
+</ul>
+
+<p><strong>(b) 谐振子的普适</strong>。</p>
+
+<p>把势能 \(V(x)\) 在极小 \(x_0\) 附近 Taylor 展:</p>
+
+<p>\[
+V(x) = V(x_0) + \frac{1}{2} V''(x_0) (x - x_0)^2 + \frac{1}{6} V'''(x_0) (x - x_0)^3 + \ldots
+\]</p>
+
+<p>\(V'(x_0) = 0\) 因为极小。低能时 \((x - x_0)\) 小, 高阶项可忽略, 系统就是<em>谐振子</em>, 其中 \(\omega = \sqrt{V''(x_0)/m}\)。所以:</p>
+
+<ul>
+  <li><em>分子振动</em>。\(\text{HCl}\) 等双原子分子, 化学键势能在平衡键长附近是谐振子, 频率 \(\omega \sim 10^{14}\) Hz, 对应红外光谱 \(\hbar\omega \sim 0.1\) eV。这就是为什么红外吸收谱可以"<em>指纹识别</em>" 化学物质——每种分子有特定的 \(\omega\)。</li>
+  <li><em>晶格振动 (声子)</em>。原子在晶格中围绕平衡位置振动, 集体模式叫<em>声子</em>。每一种声子模都是一个量子谐振子, \(E_n = (n + 1/2)\hbar\omega_{\vec k}\)。低温下声子是固体热容、热导、超导等的核心。</li>
+  <li><em>电磁场量子化</em>。把电磁场分解成 Fourier 模, 每一个模 \((\vec k, \text{偏振})\) 等价于一个量子谐振子, 能量量子化 \(E_n = (n + 1/2)\hbar\omega_{\vec k}\)。"<em>第 \(n\) 个能级</em>" \(\Leftrightarrow\) "<em>有 \(n\) 个光子</em>"。这就是 ch1 Planck 假设 \(E_n = n h\nu\) 的现代解释——光子是电磁场谐振子的能量量子。\(\hat a^\dagger, \hat a\) 在这里直接变成"<em>光子产生 / 湮灭</em>" 算子。</li>
+  <li><em>QFT 的基础</em>。所有量子场都是无穷多个谐振子（每个空间点 + 每个 Fourier 模）。"<em>粒子</em>" = 场的激发态 = "<em>\(\hat a^\dagger\) 作用在真空</em>"。本书 ch24 简要预告。</li>
+</ul>
+
+<p>这就是为什么这一章必须掌握——谐振子是"<em>QM 一切都从这里出发</em>" 的零点。请你把 7.2-7.6 的代数推导反复练熟, 直到 \([\hat a, \hat a^\dagger] = 1, \hat H = \hbar\omega(\hat N + 1/2), E_n = (n+1/2)\hbar\omega\) 这条链能闭眼写出。这套代数法在 ch14（角动量）会再出现一次, 在 QFT 中无处不在。</p>
+
+<h2 id="sec7-9">7.9 临别话</h2>
+
+<p>这一章你看到 QM 第一次"<em>algebraic 的力量</em>": 不解微分方程, 只用对易关系 + 正定性, 就推出整个谱与本征态构造。这条思想——<em>用代数结构刻画物理系统</em>——在 ch11（不确定性）、ch14（角动量阶梯）、ch16（氢原子用代数法解）、ch24（QFT）都会再出现。</p>
+
+<p>更深的——升降算子提示一种<em>新视角</em>: 量子态空间不只是"<em>函数空间</em>", 它是一种<em>阶梯结构</em>, 每一级用一个产生算子从底层生成。这个视角到 QFT 完全发挥——真空 + 各种粒子产生算子 = 物理世界。本章的谐振子是这条思想的最简版本。</p>
+
+<p>下一章——<em>势垒与隧穿</em>。把粒子放到一段有限高 + 有限宽的"<em>墙</em>" 一边, 经典上能量低于墙就过不去; QM 中波函数能<em>穿透</em> 墙, 在墙另一边出现非零概率——<em>隧穿</em>。这条现象有<em>具体可观测后果</em>: 放射性衰变（\(\alpha\) 粒子从核里隧穿出来）, 扫描隧道显微镜（电子在金属表面隧穿, 逐原子成像）, 半导体二极管, ……。隧穿是 QM 与"<em>经典禁区</em>" 的最强对比之一, 也是 QM 历史上第一个有明确实验证据的"<em>非经典现象</em>"（Gamow 1928 解释 \(\alpha\) 衰变）。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 一维无限深势阱</a><a href="ch8.html">下一章 · 第 8 章 势垒与隧穿 →</a></nav>
+</main>
+</body>
+</html>

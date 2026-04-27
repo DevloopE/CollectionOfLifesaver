@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>主题索引 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+<h1 id="subject-index">主题索引</h1>
+
+<p>按拼音 A-Z 排列。每条给"<em>概念 / 名词 → 主要登场章节</em>"。末尾有一节"<em>按行为查找</em>"——按"<em>我现在要做什么</em>" 索引。</p>
+
+<h2>A</h2>
+<ul>
+  <li><strong>Anderson, Carl</strong> — 1932 实验发现正电子, 验证 Dirac 反物质预测 <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>Aspect, Alain</strong> — 1982 Bell 实验关闭局域性 loophole, 2022 Nobel <a href="ch22.html#sec22-5">22.5</a>。</li>
+  <li><strong>反对称化（费米子）</strong> — 第 18 章; Slater 行列式 <a href="ch24.html#sec24-2">24.2</a>。</li>
+  <li><strong>反物质（antimatter）</strong> — Dirac 1928 预测 <a href="ch24.html#sec24-7">24.7</a>; 正电子 = 电子的反粒子。</li>
+</ul>
+
+<h2>B</h2>
+<ul>
+  <li><strong>Balmer 系列</strong> — 氢原子可见光光谱 <a href="ch1.html#sec1-3">1.3</a>; 完整解 ch16。</li>
+  <li><strong>BB84 协议（量子密钥分发）</strong> — Bennett-Brassard 1984 <a href="ch22.html#sec22-7">22.7</a>。</li>
+  <li><strong>Bell, John</strong> — 1964 把 EPR 哲学翻译成不等式 <a href="ch22.html#sec22-3">22.3</a>。</li>
+  <li><strong>Bell 不等式</strong> — 推导 <a href="ch22.html#sec22-3">22.3</a>; QM 违反 <a href="ch22.html#sec22-4">22.4</a>; 实验验证 <a href="ch22.html#sec22-5">22.5</a>; CHSH 形式 \(|S| \le 2\) vs \(2\sqrt 2\) <a href="ch22.html#sec22-4">22.4</a>。</li>
+  <li><strong>Bell 态</strong> — 量子隐形传态 <a href="ch23.html#sec23-4">23.4</a>; 制备电路 \(H + \text{CNOT}\) <a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>BFGS / VQE</strong> — 量子化学 + 量子计算交叉 <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>Bloch 球</strong> — 单 qubit 几何可视化 <a href="ch23.html#sec23-1">23.1</a>。</li>
+  <li><strong>Bohm, David</strong> — 1952 隐变量 (de Broglie-Bohm) 理论, 非局域 <a href="ch22.html#sec22-2">22.2</a>; 1951 Bohm 形式 EPR <a href="ch22.html#sec22-1">22.1</a>。</li>
+  <li><strong>Bohr, Niels</strong> — 1913 氢原子能级 \(E_n = -13.6/n^2\) eV <a href="ch1.html#sec1-3">1.3</a>; 哥本哈根诠释 <a href="ch22.html#sec22-2">22.2</a>。</li>
+  <li><strong>Born, Max</strong> — 1926 概率诠释 \(|\psi|^2\) 是概率密度 ch4。</li>
+  <li><strong>Born 近似（散射）</strong> — 散射振幅 = \(V\) 的 Fourier 变换 <a href="ch21.html#sec21-4">21.4</a>; Yukawa / Rutherford 应用 <a href="ch21.html#sec21-5">21.5</a>。</li>
+  <li><strong>Born-Oppenheimer 近似</strong> — 量子化学 <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>Bose-Einstein 统计</strong> — 玻色子第 18 章; 散射长度调节 BEC <a href="ch21.html#sec21-7">21.7</a>。</li>
+</ul>
+
+<h2>C</h2>
+<ul>
+  <li><strong>Cauchy-Riemann 方程</strong> — 复函数解析性 <a href="appA.html#appA-2">附录 A.2</a>。</li>
+  <li><strong>Cauchy-Schwarz 不等式</strong> — Hilbert 空间内积 <a href="appB.html#appB-1">附录 B.1</a>; 不确定性原理代数源头 ch11。</li>
+  <li><strong>Cauchy 积分公式 / 定理</strong> — <a href="appA.html#appA-3">附录 A.3</a>。</li>
+  <li><strong>测量公设（QM）</strong> — 第 12 章; 投影 + 塌缩 <a href="appB.html#appB-3">附录 B.3</a>。</li>
+  <li><strong>朝代克（color, QCD）</strong> — SU(3) 强相互作用 <a href="ch24.html#sec24-8">24.8</a>。</li>
+  <li><strong>CHSH 不等式</strong> — Bell 不等式实验形式 <a href="ch22.html#sec22-4">22.4</a>; \(|S| = 2\sqrt 2\) Tsirelson 界。</li>
+  <li><strong>Clauser, John</strong> — 1972 第一个 Bell 实验, 2022 Nobel <a href="ch22.html#sec22-5">22.5</a>。</li>
+  <li><strong>CNOT 门</strong> — 双 qubit 纠缠器 <a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>Compton 散射</strong> — 光子-电子散射, 验证光子是粒子 ch1; QED 微扰 <a href="ch24.html#sec24-6">24.6</a>。</li>
+</ul>
+
+<h2>D</h2>
+<ul>
+  <li><strong>Davisson-Germer 实验</strong> — 1927 电子衍射, 验证 de Broglie 物质波 ch2。</li>
+  <li><strong>de Broglie, Louis</strong> — 1924 物质波 \(\lambda = h/p\) ch2。</li>
+  <li><strong>Deutsch-Jozsa 算法</strong> — 第一个量子加速 <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>DFT（密度泛函理论）</strong> — Hohenberg-Kohn 定理 + Kohn-Sham 方程 <a href="ch24.html#sec24-3">24.3</a>; 99% 量子化学计算用 <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>Dirac, Paul</strong> — 1927 抽象 Hilbert 空间形式 ch9; 1928 相对论方程 <a href="ch24.html#sec24-7">24.7</a>; 1933 Nobel。</li>
+  <li><strong>Dirac 方程</strong> — 相对论 + 自旋 + 反物质 <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>Dirac 记号（bra-ket）</strong> — ch9 引入; 速查表 <a href="appB.html#appB-6">附录 B.6</a>。</li>
+  <li><strong>对易子代数</strong> — \([\hat A, \hat B] = \hat A \hat B - \hat B \hat A\) ch11; 函数演算 + BCH 公式 <a href="appB.html#appB-7">附录 B.7</a>。</li>
+</ul>
+
+<h2>E</h2>
+<ul>
+  <li><strong>Ehrenfest 定理</strong> — QM 期望按经典轨迹走 <a href="ch5.html#sec5-8">5.8</a>; 一般形式 ch10。</li>
+  <li><strong>Einstein, Albert</strong> — 1905 光电效应 + 光子 <a href="ch1.html#sec1-2">1.2</a>; 1935 EPR <a href="ch22.html#sec22-1">22.1</a>; 反对哥本哈根 <a href="ch22.html#sec22-2">22.2</a>。</li>
+  <li><strong>EPR 论证</strong> — 1935 Einstein-Podolsky-Rosen <a href="ch22.html#sec22-1">22.1</a>; 三公设（局域 + 实在 + 自由意志） <a href="ch22.html#sec22-1">22.1</a>。</li>
+  <li><strong>二次量子化（second quantization）</strong> — 产生 / 湮灭算子 <a href="ch24.html#sec24-6">24.6</a>。</li>
+</ul>
+
+<h2>F</h2>
+<ul>
+  <li><strong>Fermi-Dirac 统计</strong> — 费米子第 18 章; Pauli 不相容 ch18; 二次量子化 <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Fermi 金律（Fermi's Golden Rule）</strong> — 跃迁速率公式 ch20; 共振线宽 <a href="ch21.html#sec21-7">21.7</a>。</li>
+  <li><strong>费米子（fermion）</strong> — 半整数自旋 ch18; Slater 行列式 <a href="ch24.html#sec24-2">24.2</a>。</li>
+  <li><strong>Feynman, Richard</strong> — 1948 QED + Feynman 图 <a href="ch24.html#sec24-6">24.6</a>; 1965 Nobel; 1980 量子计算思想。</li>
+  <li><strong>Feynman 图</strong> — QFT 微扰展开图形化 <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>反对称化 / 反物质</strong> — 见上面 F-反 节。</li>
+  <li><strong>Fourier 变换</strong> — ch5 高斯波包; 散射 Born <a href="ch21.html#sec21-4">21.4</a>; 速查 <a href="appA.html#appA-5">附录 A.5</a>。</li>
+  <li><strong>Frobenius 范数</strong> — 见数值方法附录 A; 本书少用。</li>
+</ul>
+
+<h2>G</h2>
+<ul>
+  <li><strong>干涉（interference）</strong> — ch2 双缝实验; 量子算法的核心机制 ch23。</li>
+  <li><strong>高斯波包</strong> — \(t = 0\) 与时间演化 <a href="ch5.html#sec5-3">5.3-5.4</a>; 最小不确定性态 <a href="ch5.html#sec5-7">5.7</a>。</li>
+  <li><strong>Green 函数</strong> — 散射 Lippmann-Schwinger <a href="ch21.html#sec21-4">21.4</a>; 复路径计算 <a href="appA.html#appA-4">附录 A.4</a>。</li>
+  <li><strong>Grover 搜索算法</strong> — \(O(\sqrt N)\) 量子搜索 <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>哥本哈根学派 / 诠释</strong> — Bohr / Heisenberg / Born <a href="ch22.html#sec22-2">22.2</a>; ch1。</li>
+  <li><strong>共轭对称（内积）</strong> — <a href="appB.html#appB-1">附录 B.1</a>。</li>
+  <li><strong>共振（resonance）</strong> — 散射相移跳 \(\pi/2\) <a href="ch21.html#sec21-7">21.7</a>; Breit-Wigner 公式; Higgs / \(J/\psi\) 等。</li>
+  <li><strong>群速度（group velocity）</strong> — \(v_g = d\omega/dk\) <a href="ch5.html#sec5-5">5.5</a>。</li>
+</ul>
+
+<h2>H</h2>
+<ul>
+  <li><strong>哈密顿算子（Hamiltonian）</strong> — \(\hat H = -(\hbar^2/2m) \nabla^2 + V\) ch3; 自伴 + 谱定理给能级。</li>
+  <li><strong>Hartree-Fock 方法</strong> — 多电子自洽场 <a href="ch24.html#sec24-2">24.2</a>。</li>
+  <li><strong>黑体辐射</strong> — 紫外灾难 + Planck 解 <a href="ch1.html#sec1-1">1.1</a>。</li>
+  <li><strong>Heisenberg, Werner</strong> — 1925 矩阵力学 ch1; 不确定性原理 ch11。</li>
+  <li><strong>Heisenberg 表象 / 方程</strong> — ch13; 算子演化方程 <a href="appB.html#appB-7">附录 B.7</a>。</li>
+  <li><strong>Hensen 实验（Delft 2015）</strong> — Loophole-free Bell <a href="ch22.html#sec22-5">22.5</a>。</li>
+  <li><strong>Hermite 多项式</strong> — 谐振子本征函数 ch7。</li>
+  <li><strong>谐振子</strong> — 第 7 章; 升降算子 \(\hat a, \hat a^\dagger\) ch7; 二次量子化的 archetype <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Higgs 玻色子</strong> — 2012 LHC 发现 <a href="ch24.html#sec24-8">24.8</a>; 共振峰发现法 <a href="ch21.html#sec21-7">21.7</a>。</li>
+  <li><strong>Hilbert 空间</strong> — 第 9 章 + <a href="appB.html#appB-1">附录 B.1</a>; 是 QM 的状态空间。</li>
+</ul>
+
+<h2>J</h2>
+<ul>
+  <li><strong>角动量（angular momentum）</strong> — 第 14 章; 对易关系 \([\hat L_i, \hat L_j] = i\hbar \varepsilon_{ijk} \hat L_k\); 球谐函数 ch15。</li>
+  <li><strong>简并（degeneracy）</strong> — 同一本征值多个本征态 ch16; 微扰对简并的处理 ch19。</li>
+  <li><strong>跃迁（transition）</strong> — 时间依赖微扰 ch20; Fermi 金律给速率。</li>
+</ul>
+
+<h2>K</h2>
+<ul>
+  <li><strong>Kohn-Sham 方程</strong> — DFT 计算工具 <a href="ch24.html#sec24-3">24.3</a>。</li>
+</ul>
+
+<h2>L</h2>
+<ul>
+  <li><strong>LCAO-MO（线性组合原子轨道）</strong> — 量子化学 \(H_2^+\) <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>Lippmann-Schwinger 方程</strong> — 散射积分方程 <a href="ch21.html#sec21-4">21.4</a>。</li>
+  <li><strong>留数定理</strong> — 复积分计算 <a href="appA.html#appA-4">附录 A.4</a>; 散射 Green 函数 <a href="appA.html#appA-4">A.4</a>。</li>
+  <li><strong>Lyman / Paschen 系列</strong> — 氢原子紫外 / 红外光谱 <a href="ch1.html#sec1-3">1.3</a>。</li>
+</ul>
+
+<h2>M</h2>
+<ul>
+  <li><strong>密度泛函理论</strong> — 见 D-DFT。</li>
+  <li><strong>么正算子</strong> — 时间演化 + 对称变换 <a href="appB.html#appB-3">附录 B.3</a>; 量子门 ch23。</li>
+  <li><strong>Mott 散射</strong> — 屏蔽库仑 + 反对称化 <a href="ch21.html#sec21-5">21.5</a>。</li>
+</ul>
+
+<h2>P</h2>
+<ul>
+  <li><strong>Pauli, Wolfgang</strong> — 1925 不相容原理 ch18; Pauli 矩阵 ch17。</li>
+  <li><strong>Pauli 不相容原理</strong> — 费米子反对称化 ch18。</li>
+  <li><strong>Pauli 矩阵</strong> — \(\sigma_x, \sigma_y, \sigma_z\) ch17 + <a href="appB.html#appB-5">附录 B.5</a>; qubit 算子代数基础。</li>
+  <li><strong>Planck, Max</strong> — 1900 量子假设 + 黑体 <a href="ch1.html#sec1-1">1.1</a>。</li>
+  <li><strong>Planck 常数 \(h\)</strong> — \(6.626 \times 10^{-34}\) J·s ch1。</li>
+  <li><strong>POVM（正算子值测度）</strong> — 一般测量 <a href="appB.html#appB-3">附录 B.3</a>。</li>
+  <li><strong>谱定理（自伴算子）</strong> — \(\hat A = \sum a_n |a_n\rangle\langle a_n|\) <a href="appB.html#appB-2">附录 B.2</a>; QM 测量公设的代数基础。</li>
+  <li><strong>期望值（expectation）</strong> — \(\langle \hat A \rangle = \langle \psi | \hat A | \psi \rangle\) ch10。</li>
+</ul>
+
+<h2>Q</h2>
+<ul>
+  <li><strong>QFT（量子场论）</strong> — <a href="ch24.html#sec24-5">24.5-24.8</a>; 场为基本对象, 粒子是激发。</li>
+  <li><strong>qubit（量子比特）</strong> — \(\alpha|0\rangle + \beta|1\rangle\) <a href="ch23.html#sec23-1">23.1</a>; Bloch 球。</li>
+  <li><strong>球谐函数</strong> — 第 15 章; 角动量 \(\hat L^2, \hat L_z\) 共同本征。</li>
+  <li><strong>球对称势</strong> — 第 15 章; SE 分离变量。</li>
+  <li><strong>全同粒子</strong> — 第 18 章; 玻色 + 费米统计。</li>
+  <li><strong>QED（量子电动力学）</strong> — Feynman + Schwinger + Tomonaga 1948 <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>QCD（量子色动力学）</strong> — SU(3) 强相互作用 <a href="ch24.html#sec24-8">24.8</a>。</li>
+</ul>
+
+<h2>R</h2>
+<ul>
+  <li><strong>Raman 散射</strong> — 非弹性光-分子散射, 振动光谱学; 见量子化学应用。</li>
+  <li><strong>Rutherford, Ernest</strong> — 1911 \(\alpha\) 散射, 发现核 ch1; Rutherford 散射截面 <a href="ch21.html#sec21-5">21.5</a>。</li>
+  <li><strong>Rydberg 常数</strong> — \(R \approx 1.097 \times 10^7\) m\(^{-1}\) ch1。</li>
+</ul>
+
+<h2>S</h2>
+<ul>
+  <li><strong>散射（scattering）</strong> — 第 21 章; 微分截面 \(d\sigma/d\Omega = |f|^2\); Born + 部分波两条路。</li>
+  <li><strong>散射长度（scattering length）</strong> — 低能 s 波 <a href="ch21.html#sec21-7">21.7</a>; 冷原子 BEC-BCS。</li>
+  <li><strong>Schrödinger, Erwin</strong> — 1926 波动力学 + Schrödinger 方程 ch1; 1933 Nobel。</li>
+  <li><strong>Schrödinger 方程</strong> — \(i\hbar \partial_t \psi = \hat H \psi\) 第 3 章; 含时 + 定态。</li>
+  <li><strong>Schrödinger 表象</strong> — 态演化, 算子不动 ch13。</li>
+  <li><strong>Schwarz 不等式</strong> — 见 C-Cauchy-Schwarz。</li>
+  <li><strong>神奇（"<em>spooky action at a distance</em>"）</strong> — Einstein 对纠缠的批评 <a href="ch22.html#sec22-1">22.1</a>。</li>
+  <li><strong>Shor 算法（因数分解）</strong> — 1994 量子多项式时间分解 <a href="ch23.html#sec23-7">23.7</a>; QFT 子例程。</li>
+  <li><strong>升降算子（ladder operators）</strong> — \(\hat a, \hat a^\dagger\) 谐振子 ch7; 二次量子化 <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Slater 行列式</strong> — 反对称多电子波函数 ch18 + <a href="ch24.html#sec24-2">24.2</a>。</li>
+  <li><strong>数算子（number operator）</strong> — \(\hat N = \hat a^\dagger \hat a\) ch7; QFT 中粒子计数。</li>
+  <li><strong>Stern-Gerlach 实验</strong> — 1922 自旋实验, ch17。</li>
+  <li><strong>算符 / 算子（operator）</strong> — Hilbert 空间线性变换 ch9 + <a href="appB.html#appB-2">附录 B.2</a>; 自伴 = 可观测。</li>
+  <li><strong>隧穿（tunneling）</strong> — 经典禁区波函数指数衰减穿越 ch8; \(\alpha\) 衰变 / STM 应用。</li>
+  <li><strong>SVD（奇异值分解）</strong> — 见线性代数 ch20; 量子信息中的 Schmidt 分解。</li>
+</ul>
+
+<h2>T</h2>
+<ul>
+  <li><strong>Tsirelson 界</strong> — \(|S| \le 2\sqrt 2\) QM 最大违反 Bell <a href="ch22.html#sec22-4">22.4</a>。</li>
+  <li><strong>Teleportation（量子隐形传态）</strong> — Bell 测量 + 经典通信 <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>态（state）</strong> — Hilbert 空间向量 ch9; 见 Z-状态。</li>
+  <li><strong>态密度（density of states）</strong> — Fermi 金律里的 \(\rho(E_f)\) ch20。</li>
+</ul>
+
+<h2>W</h2>
+<ul>
+  <li><strong>Wootters-Zurek 定理（不可克隆）</strong> — 1982 任何未知态不能完美复制 <a href="ch23.html#sec23-4">23.4</a> + <a href="ch22.html#sec22-7">22.7</a>。</li>
+  <li><strong>波函数（wave function）</strong> — \(\psi(x)\) ch3-4; \(|\psi|^2\) 概率密度 ch4。</li>
+  <li><strong>波包（wave packet）</strong> — 局域叠加平面波 ch5; 群速度 / 扩散。</li>
+  <li><strong>波粒二象性</strong> — ch1-2; \(E = h\nu, \lambda = h/p\)。</li>
+  <li><strong>微扰论</strong> — 时间无关 ch19; 时间依赖 + Fermi 金律 ch20。</li>
+</ul>
+
+<h2>X</h2>
+<ul>
+  <li><strong>相位门 \(S, T\)</strong> — qubit 单门 <a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>相速度（phase velocity）</strong> — \(v_p = \omega/k\) <a href="ch5.html#sec5-5">5.5</a>; 一般 \(\neq v_g\)。</li>
+  <li><strong>相移（phase shift, 散射）</strong> — \(\delta_l\) 部分波 <a href="ch21.html#sec21-6">21.6-21.7</a>; 共振 \(\delta_l\) 跳 \(\pi/2\)。</li>
+  <li><strong>纠缠（entanglement）</strong> — 第 22 章; 不能分解为乘积态。</li>
+</ul>
+
+<h2>Y</h2>
+<ul>
+  <li><strong>Yukawa 势</strong> — 屏蔽库仑 / 核力中介, 散射应用 <a href="ch21.html#sec21-5">21.5</a>。</li>
+  <li><strong>有效范围（effective range, 散射）</strong> — 低能展开 <a href="ch21.html#sec21-7">21.7</a>。</li>
+</ul>
+
+<h2>Z</h2>
+<ul>
+  <li><strong>张量积</strong> — \(\mathcal H_A \otimes \mathcal H_B\) 多体系统 ch18 + <a href="appB.html#appB-4">附录 B.4</a>; \(n\) qubit 维数 \(2^n\) ch23。</li>
+  <li><strong>主量子数 \(n\)</strong> — 氢原子 \(E_n = -13.6/n^2\) eV ch16。</li>
+  <li><strong>状态（state）</strong> — Hilbert 空间向量, 通常归一 \(\|\psi\| = 1\); 见 T-态。</li>
+  <li><strong>自旋（spin）</strong> — ch17; 内部自由度, 没经典对应; Stern-Gerlach 验证。</li>
+  <li><strong>自伴算子（Hermitian）</strong> — \(\hat A = \hat A^\dagger\) <a href="appB.html#appB-2">附录 B.2</a>; 物理可观测的代数刻画。</li>
+  <li><strong>Zeilinger, Anton</strong> — 量子隐形传态实验, 2022 Nobel <a href="ch22.html#sec22-5">22.5</a>。</li>
+  <li><strong>紫外灾难（ultraviolet catastrophe）</strong> — 经典 Rayleigh-Jeans 公式高频发散 <a href="ch1.html#sec1-1">1.1</a>。</li>
+</ul>
+
+<h2>查找：按"<em>我现在想做什么</em>"</h2>
+
+<ol>
+  <li><strong>解一个一维 SE</strong>: 自由 ch5、势阱 ch6、谐振子 ch7、势垒 ch8。先看势的形式选合适章节。</li>
+  <li><strong>算氢原子能级 / 波函数</strong>: 第 16 章给完整解析解; 球谐 ch15 + 径向 ch16。</li>
+  <li><strong>处理含自旋系统</strong>: ch17 Pauli 矩阵; 多自旋用张量积 ch18 + <a href="appB.html#appB-4">附录 B.4</a>。</li>
+  <li><strong>多电子分子 / 原子计算</strong>: HF <a href="ch24.html#sec24-2">24.2</a>, 高精度 CCSD(T) <a href="ch24.html#sec24-2">24.2</a>, 实用 DFT <a href="ch24.html#sec24-3">24.3-24.4</a>。</li>
+  <li><strong>"<em>小扰动</em>" 修正能级</strong>: 时间无关微扰 ch19; 时间依赖 + 跃迁速率 ch20 (Fermi 金律)。</li>
+  <li><strong>给散射数据反推作用力</strong>: 高能 / 弱势 用 Born <a href="ch21.html#sec21-4">21.4</a>; 低能 / 强势 用部分波 + 相移 <a href="ch21.html#sec21-6">21.6-21.7</a>。共振找新粒子 <a href="ch21.html#sec21-7">21.7</a>。</li>
+  <li><strong>判断"<em>这个态是否纠缠</em>"</strong>: 看能否分解为乘积态 ch22; 算约化密度矩阵 <a href="appB.html#appB-4">附录 B.4</a>, \(\mathrm{Tr}\rho^2 < 1\) 即纠缠。</li>
+  <li><strong>设计量子算法</strong>: 子例程库——Hadamard 制备叠加 → oracle 编码问题 → 干涉提取答案。Deutsch-Jozsa / Grover / Shor 是模板 <a href="ch23.html#sec23-5">23.5-23.7</a>。</li>
+  <li><strong>验证 Bell 不等式</strong>: CHSH \(|S| \le 2\) vs QM 预言 \(2\sqrt 2\) <a href="ch22.html#sec22-4">22.4</a>; 选 0°/45°/90°/135° 方向。</li>
+  <li><strong>计算复积分（量子散射 Green 函数等）</strong>: 留数定理 <a href="appA.html#appA-4">A.4</a>; 含 \(e^{ikx}\) 用 Jordan 引理选半圆; 实轴极点用 \(\pm i\varepsilon\) 处方决定边界条件。</li>
+  <li><strong>诊断"<em>我的 QM 计算结果不对</em>"</strong>: 检查（1）波函数归一化; （2）算子是否自伴（本征值实数）; （3）对易关系是否一致; （4）数值上调用对角化 <code>scipy.linalg.eigh</code> 而不是普通 <code>eig</code>; （5）多体问题张量积维数是否正确。</li>
+  <li><strong>开始读 QFT / 量子化学 / 量子信息</strong>: 见 <a href="ch24.html#sec24-11">ch24 临别话</a> 推荐书单。本书是它们的共同入口。</li>
+</ol>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

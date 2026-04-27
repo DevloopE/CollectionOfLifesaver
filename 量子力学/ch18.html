@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 全同粒子与反对称化 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 自旋与 Pauli 矩阵</a><a href="ch19.html">下一章 · 第 19 章 时间无关微扰论 →</a></nav>
+<h1 id="ch18">第 18 章 全同粒子与反对称化</h1>
+
+<p>请你想象两个电子。具体一点: 想象氦原子里那两个电子, 都在 \(1s\) 轨道附近转。我现在问你一个看似平常的问题——如果给电子<em>编号</em>, 那么"<em>电子 1 在 \((x_1, y_1, z_1)\), 电子 2 在 \((x_2, y_2, z_2)\)</em>" 这个状态, 与"<em>电子 1 在 \((x_2, y_2, z_2)\), 电子 2 在 \((x_1, y_1, z_1)\)</em>" 这个状态——是<em>同一个</em> 物理状态, 还是<em>两个不同的</em> 物理状态？</p>
+
+<p>经典物理回答"<em>两个不同</em>"。每个粒子都有<em>身份</em>, 编号 1 是真实的, 即便它们看起来一样, 你<em>可以</em>（原则上）跟踪每一个的轨迹, 区分它们。台球桌上两个白球, 即使长得一样, 你也能"<em>盯着第一个</em>" 跟它一路。</p>
+
+<p>量子物理回答<em>不一样</em>——"<em>同一个</em>"。两个电子<em>没有</em> 任何内部标签可以区分（电荷、质量、自旋大小都完全相同）, 而且它们的波函数<em>互相重叠</em>（不像台球被空间锁定到一处）, 你<em>无法</em> 跟踪谁是谁。"<em>电子 1 在 A, 电子 2 在 B</em>" 与"<em>电子 1 在 B, 电子 2 在 A</em>" <em>不是</em> 两个不同的状态——是<em>同一个</em> 物理状态的两种<em>同义</em> 描述。</p>
+
+<p>请你停下来想一会儿这件事的分量。它不是数学技术或者形式细节; 这是 QM 的<em>第四</em> 条公设（前面三条: 状态 / 测量 / 时间演化）。<em>全同粒子不可区分</em> 是一条物理原则, 强迫多粒子波函数有特殊对称性——要么交换两个粒子<em>波函数不变</em>（<em>玻色子</em>）, 要么交换<em>变号</em>（<em>费米子</em>）。<em>没有别的选择</em>（在 3 维空间里）。</p>
+
+<p>这条简单的原则会推出令人震惊的物理: <em>Pauli 不相容原理</em>（两电子不能在同一态）<em>不</em> 是独立公设, 它<em>是</em> 反对称化的<em>推论</em>; 化学元素周期表的结构、白矮星的稳定、玻色凝聚的存在——全部一脉相承。本章追这条线索。</p>
+
+<h2 id="sec18-1">18.1 全同粒子不可区分原则</h2>
+
+<p>形式化"<em>不可区分</em>"。考虑两粒子系统, 状态空间是单粒子空间的张量积 \(\mathcal H = \mathcal H_1 \otimes \mathcal H_2\)。一个一般状态写</p>
+
+<p>\[
+|\Psi\rangle = \sum_{ij} c_{ij} |\alpha_i\rangle_1 \otimes |\beta_j\rangle_2,
+\]</p>
+
+<p>下标 1, 2 标"<em>第一个粒子</em>" "<em>第二个粒子</em>"。引入<em>交换算子</em> \(\hat P_{12}\), 定义</p>
+
+<p>\[
+\hat P_{12} |\alpha\rangle_1 \otimes |\beta\rangle_2 = |\beta\rangle_1 \otimes |\alpha\rangle_2.
+\]</p>
+
+<p>它把"<em>第一个粒子在 \(\alpha\), 第二个在 \(\beta\)</em>" 换成"<em>第一个在 \(\beta\), 第二个在 \(\alpha\)</em>"。</p>
+
+<p><em>不可区分</em> 原则的形式化: <em>所有可观测量与 \(\hat P_{12}\) 对易</em>:</p>
+
+<p>\[
+[\hat A, \hat P_{12}] = 0 \quad \forall \hat A \text{ 对全同粒子可测}.
+\]</p>
+
+<p>因为<em>没有任何实验</em> 能区分"<em>1 在 \(\alpha\), 2 在 \(\beta\)</em>" 和"<em>1 在 \(\beta\), 2 在 \(\alpha\)</em>"——所以任何可观测量在两种描述下结果相同, 即 \(\hat A\) 与 \(\hat P_{12}\) 对易。</p>
+
+<p>这条对易关系暗示: 如果 \(|\Psi\rangle\) 是某可观测量本征态, 那么 \(\hat P_{12}|\Psi\rangle\) <em>也是</em> 同一本征态（同一本征值）。所以物理状态对应的是 \(\hat P_{12}\) 本征态——再加上 \(\hat P_{12}^2 = I\)（连交换两次回到原来）, \(\hat P_{12}\) 本征值只能是 \(\pm 1\)。</p>
+
+<h2 id="sec18-2">18.2 对称态与反对称态</h2>
+
+<p>所以<em>所有</em> 物理多粒子态分两类:</p>
+
+<p>\[
+\hat P_{12} |\Psi\rangle = +|\Psi\rangle \quad \Rightarrow \quad \text{对称态 (S)},
+\]</p>
+
+<p>\[
+\hat P_{12} |\Psi\rangle = -|\Psi\rangle \quad \Rightarrow \quad \text{反对称态 (A)}.
+\]</p>
+
+<p>用波函数语言: 写 \(\Psi(x_1, x_2)\)（坐标 \(x_i\) 包含位置 + 自旋）, 则</p>
+
+<p>\[
+\boxed{\ \Psi_{\text{S}}(x_1, x_2) = +\Psi_{\text{S}}(x_2, x_1), \qquad \Psi_{\text{A}}(x_1, x_2) = -\Psi_{\text{A}}(x_2, x_1).\ }
+\]</p>
+
+<p>具体例子: 两粒子, 一个在单粒子态 \(\phi_a\) 一个在 \(\phi_b\)。"<em>朴素</em>" 写法</p>
+
+<p>\[
+\Psi_{\text{naive}}(x_1, x_2) = \phi_a(x_1)\phi_b(x_2)
+\]</p>
+
+<p><em>不</em> 满足对称 / 反对称——因为 \(\phi_a(x_2)\phi_b(x_1) \neq \pm \phi_a(x_1)\phi_b(x_2)\)（除非 \(\phi_a = \phi_b\)）。<em>这条朴素表达不是合法的多粒子态</em>。</p>
+
+<p>合法的"<em>对称化</em>" 和"<em>反对称化</em>" 写法</p>
+
+<p>\[
+\Psi_{\text{S}}(x_1, x_2) = \frac{1}{\sqrt 2}\left[\phi_a(x_1)\phi_b(x_2) + \phi_a(x_2)\phi_b(x_1)\right],
+\]</p>
+
+<p>\[
+\Psi_{\text{A}}(x_1, x_2) = \frac{1}{\sqrt 2}\left[\phi_a(x_1)\phi_b(x_2) - \phi_a(x_2)\phi_b(x_1)\right].
+\]</p>
+
+<p>请你验证这两个分别在 \(x_1 \leftrightarrow x_2\) 下不变 / 变号。</p>
+
+<p>因子 \(1/\sqrt 2\) 是归一化（假设 \(\phi_a, \phi_b\) 正交归一）。</p>
+
+<h2 id="sec18-3">18.3 玻色子 vs 费米子: 自旋统计定理</h2>
+
+<p>哪些粒子取 S, 哪些取 A？这是<em>自旋统计定理</em>（spin-statistics theorem）的内容:</p>
+
+<p>\[
+\boxed{\ \text{整自旋 } (s = 0, 1, 2, \ldots) \Rightarrow \text{玻色子, 对称}; \quad \text{半整自旋 } (s = 1/2, 3/2, \ldots) \Rightarrow \text{费米子, 反对称}.\ }
+\]</p>
+
+<p>具体例子:</p>
+
+<ul>
+  <li><strong>玻色子</strong>: 光子 (\(s = 1\)), 胶子 (\(s = 1\)), \(W^\pm, Z^0\) (\(s = 1\)), Higgs (\(s = 0\)), \(\pi\) 介子 (\(s = 0\)), 氦-4 原子 (\(s = 0\), 由 2 质子 + 2 中子 + 2 电子复合, 总自旋 0)。</li>
+  <li><strong>费米子</strong>: 电子 (\(s = 1/2\)), 质子 (\(s = 1/2\)), 中子 (\(s = 1/2\)), 夸克 (\(s = 1/2\)), 中微子 (\(s = 1/2\)), 氦-3 原子 (\(s = 1/2\), 由 2 质子 + 1 中子 + 2 电子, 总自旋 1/2)。</li>
+</ul>
+
+<p>自旋统计定理的<em>证明</em> 需要相对论性量子场论（Pauli 1940）, 大致论证: 若整自旋粒子取反对称化, 或半整自旋取对称化, 量子场论里能量会变得没下界（场不稳定）。这条要 ch24 / 量子场论才能展开, 本书取定理为<em>陈述</em>。</p>
+
+<p><em>非相对论</em> QM 里, 自旋统计是<em>额外公设</em>; <em>相对论</em> QM 里它是<em>定理</em>。这是相对论性 QM 比非相对论性 QM <em>更紧</em> 的一个例子。</p>
+
+<h2 id="sec18-4">18.4 Pauli 不相容原理</h2>
+
+<p>看费米子反对称化的一个简单后果。考虑两个费米子<em>都</em> 在<em>同一个</em> 单粒子态 \(\phi_a\)。把 \(b = a\) 代入 \(\Psi_{\text{A}}\):</p>
+
+<p>\[
+\Psi_{\text{A}}(x_1, x_2) = \frac{1}{\sqrt 2}\left[\phi_a(x_1)\phi_a(x_2) - \phi_a(x_2)\phi_a(x_1)\right] = 0.
+\]</p>
+
+<p><em>恒等于零</em>——这个状态<em>不存在</em>。</p>
+
+<p>这就是<em>Pauli 不相容原理</em>: <em>两个全同费米子不能在同一单粒子态</em>。</p>
+
+<p>请你停下来欣赏这条结果——Pauli 不相容<em>不</em> 是 QM 的独立公设, 它<em>是</em> 反对称化的<em>推论</em>。Pauli 1925 提出"<em>同一原子里两个电子不能有相同的四量子数 \((n, \ell, m_\ell, m_s)\)</em>" 是个经验公设; 1926 Heisenberg + Dirac 把它正式化为反对称化, 然后 Pauli 不相容自动跟出。</p>
+
+<p>注意"<em>不能在同一态</em>" 中的"<em>态</em>" 指<em>所有</em> 单粒子量子数都相同——位置 + 自旋的<em>完整</em> 集合。两个电子可以在同一个空间轨道（比如氢的 \(1s\)）, 只要自旋一个 \(\uparrow\) 一个 \(\downarrow\)（自旋部分把它们区分开）。它们<em>不</em> 能同时在 \(1s\uparrow\) 上——这就是化学里"<em>每个轨道最多 2 电子</em>" 的源头。</p>
+
+<h2 id="sec18-5">18.5 Slater 行列式</h2>
+
+<p>把反对称化推广到 \(N\) 个费米子。设有 \(N\) 个单粒子态 \(\phi_1, \phi_2, \ldots, \phi_N\)（互相正交归一）, \(N\) 个费米子分别"<em>占</em>" 这些态。最自然的反对称多粒子波函数</p>
+
+<p>\[
+\Psi_{\text{A}}(x_1, \ldots, x_N) = \frac{1}{\sqrt{N!}} \det \begin{pmatrix} \phi_1(x_1) & \phi_1(x_2) & \cdots & \phi_1(x_N) \\ \phi_2(x_1) & \phi_2(x_2) & \cdots & \phi_2(x_N) \\ \vdots & & & \vdots \\ \phi_N(x_1) & \phi_N(x_2) & \cdots & \phi_N(x_N) \end{pmatrix}.
+\]</p>
+
+<p>这就是<em>Slater 行列式</em>。它<em>自动</em> 满足反对称——因为行列式在<em>列交换</em>（即 \(x_i \leftrightarrow x_j\)）下变号。它<em>自动</em> 体现 Pauli 不相容——若任两 \(\phi_i = \phi_j\), 行列式两行相同, 等于 0。</p>
+
+<p>验证 \(N = 2\) 退化: \(\det \begin{pmatrix} \phi_1(x_1) & \phi_1(x_2) \\ \phi_2(x_1) & \phi_2(x_2) \end{pmatrix} = \phi_1(x_1)\phi_2(x_2) - \phi_1(x_2)\phi_2(x_1)\), 与 18.2 节的 \(\Psi_{\text{A}}\) 一致（除以 \(\sqrt 2 = \sqrt{N!}\)）。</p>
+
+<p>Slater 行列式是<em>多电子原子 / 分子</em> 量子化学的基本对象。Hartree-Fock 方法（量子化学最基础的近似）就是<em>把多电子波函数取为单个 Slater 行列式</em>, 然后变分优化每个 \(\phi_i\)。更精细的方法（CI, CC）是<em>多个</em> Slater 行列式的叠加。这些超出本书范围, 但本章给的反对称化是它们的起点。</p>
+
+<h2 id="sec18-6">18.6 应用 1: 原子电子壳层与周期表</h2>
+
+<p>用 Pauli 不相容理解元素周期表。</p>
+
+<p>氢原子单电子能级（<a href="ch16.html">ch16</a>）按 \(n\) 量子数排, \(E_n = -13.6/n^2\) eV。<em>简并度</em>: 对每个 \(n\), \(\ell = 0, 1, \ldots, n-1\), 每个 \(\ell\) 对应 \(2\ell+1\) 个 \(m_\ell\), 每个 \((n,\ell, m_\ell)\) 又有 2 个自旋, 总共 \(2 n^2\) 个态。</p>
+
+<p>多电子原子里电子互相排斥, 严格能级要数值算（HF + 修正）, 但<em>定性</em> 顺序（Aufbau 原则）大致按</p>
+
+<p>\[
+1s, \, 2s, \, 2p, \, 3s, \, 3p, \, 4s, \, 3d, \, 4p, \, 5s, \, 4d, \, 5p, \, \ldots
+\]</p>
+
+<p>每个轨道（\((n,\ell, m_\ell)\)）容纳 2 电子（自旋 \(\uparrow\downarrow\)）, 由 Pauli 不相容。</p>
+
+<p>具体填: \(1s\) 容 2; \(2s\) 容 2; \(2p\) 三个 \(m_\ell\) 容 6 ……</p>
+
+<ul>
+  <li>H (\(Z = 1\)): \(1s^1\)。</li>
+  <li>He (\(Z = 2\)): \(1s^2\)。\(1s\) <em>满</em>, 化学惰性。</li>
+  <li>Li (\(Z = 3\)): \(1s^2 2s^1\)。最外一个电子, 容易失去, 强金属性。</li>
+  <li>...继续到 Ne (\(Z = 10\)): \(1s^2 2s^2 2p^6\)。\(n=2\) 满, 又惰性。</li>
+  <li>...到 Ar (\(Z = 18\)): \(1s^2 2s^2 2p^6 3s^2 3p^6\), 同上。</li>
+</ul>
+
+<p>请你看到<em>周期</em> 出现——第一周期 2 元素 (\(1s\)), 第二、第三周期各 8 (\(s + p\) 满, \(2 + 6\)), 第四、第五各 18 (\(s + p + d\), \(2+6+10\)), 等等。这条"<em>2, 8, 8, 18, 18, 32, 32</em>" 周期由"<em>每壳容纳 \(2(2\ell+1)\) 电子, Pauli 限制</em>" 推出。</p>
+
+<p>Mendeleev 1869 把元素按化学性质排周期表时<em>不</em> 知道电子, <em>不</em> 知道 Pauli 不相容; 他靠经验。1925-1928 量子力学告诉他<em>为什么</em> 周期表长那样。Bohr 1922 Nobel 奖讲座："<em>原子结构由量子条件决定</em>" 是这条线的开端。</p>
+
+<h2 id="sec18-7">18.7 应用 2: 白矮星与中子星</h2>
+
+<p>Pauli 不相容在天体物理给一个壮丽现象——<em>简并压力</em>。</p>
+
+<p>恒星正常时靠核聚变（氢→氦）抗衡引力。聚变能耗尽后, 恒星塌缩。如果质量 \(< 1.4 M_\odot\)（Chandrasekhar 极限）, 塌缩在<em>电子简并压力</em> 处停下——这就是<em>白矮星</em>。</p>
+
+<p>电子简并压力的来源: 电子是费米子。把恒星压紧, 体积 \(V\) 缩小, 电子被迫填到越来越多 \(\vec p\) 态（每个动量空间体元 \((2\pi\hbar)^3/V\) 容 2 电子, Pauli 限制）。Fermi 动量</p>
+
+<p>\[
+p_F = \hbar (3\pi^2 n)^{1/3},
+\]</p>
+
+<p>\(n = N/V\) 是电子数密度。Fermi 能 \(E_F = p_F^2/(2 m_e) \propto n^{2/3}\)。总电子动能 \(\propto N \cdot E_F \propto V^{-2/3}\)。</p>
+
+<p>这个<em>动能与体积反相关</em>——压缩恒星增加电子动能, 给一个<em>抗压力</em>:</p>
+
+<p>\[
+P_{\text{deg}} = \frac{\hbar^2}{5 m_e}(3\pi^2)^{2/3} n^{5/3} \quad (\text{非相对论极限}).
+\]</p>
+
+<p>这条压力<em>与温度无关</em>——它是<em>纯量子</em> 来源的, 即便恒星冷到 0 K, 简并压力<em>不消失</em>。Pauli 不相容<em>禁止</em> 电子全部塌进基态, 让恒星稳定。</p>
+
+<p>Chandrasekhar 1931 算出: 当电子动能达到 \(m_e c^2\)（电子变相对论性）时, 压力指数从 \(n^{5/3}\) 降为 \(n^{4/3}\), 这条<em>不足以</em> 抵抗引力（引力按 \(n^{4/3}\) 也涨, 系数胜出）。所以白矮星有上限质量 \(M_{Ch} \approx 1.4 M_\odot\)。超过的恒星继续塌缩。</p>
+
+<p>下一步停在<em>中子简并压力</em>——电子被压进质子形成中子（逆 \(\beta\) 衰变 \(p + e^- \to n + \nu_e\)）, 整个恒星变成<em>中子星</em>（密度 \(\sim 10^{17}\) kg/m\(^3\)）。中子也是费米子, 同样的简并压力分析, 给中子星上限约 \(2-3 M_\odot\)（TOV 极限）。再大就塌成<em>黑洞</em>。</p>
+
+<p>所以白矮星 + 中子星 + 黑洞分类<em>本质上</em> 是 Pauli 不相容的应用。Chandrasekhar 1983 因此获 Nobel 物理奖。</p>
+
+<h2 id="sec18-8">18.8 应用 3: 玻色-爱因斯坦凝聚</h2>
+
+<p>反过来看玻色子。玻色子<em>不</em> 受 Pauli 限制——任意多玻色子可以挤进<em>同一</em> 单粒子态。</p>
+
+<p>1924 年 S. N. Bose（印度物理学家）给 Einstein 寄了一篇文稿, 用统计力学推导黑体辐射。Einstein 把它推广到<em>有质量</em> 玻色子, 1925 预测: 把<em>玻色子气体</em> 冷却到极低温度, 大量粒子会"<em>凝聚</em>" 到<em>同一</em> 单粒子基态——这就是<em>玻色-爱因斯坦凝聚</em>（BEC）。</p>
+
+<p>定量: 自由玻色子气体, 化学势 \(\mu \to 0^-\) 时, 粒子在激发态的最大数密度</p>
+
+<p>\[
+n_{\text{exc}}^{\max}(T) = \zeta(3/2)\left(\frac{m k_B T}{2\pi\hbar^2}\right)^{3/2}.
+\]</p>
+
+<p>当总粒子密度 \(n\) 超过这个上限, 多余的粒子<em>必须</em> 进基态。临界温度</p>
+
+<p>\[
+T_c = \frac{2\pi\hbar^2}{m k_B}\left(\frac{n}{\zeta(3/2)}\right)^{2/3}.
+\]</p>
+
+<p>对原子密度 \(n \sim 10^{14}\) cm\(^{-3}\) 和 \({}^{87}\)Rb 原子质量, 给 \(T_c \sim 100\) nK——<em>百纳开尔文</em>, 极冷。</p>
+
+<p>实验等了 70 年。1995 年 6 月, Cornell + Wieman 在 Boulder（NIST/JILA）用<em>激光冷却</em>（Doppler cooling 把 Rb 气体冷到 mK）+ <em>蒸发冷却</em>（trap 里让最热原子蒸发, 剩下的冷下去, 到 nK）, <em>第一次</em> 实现 BEC。同年 11 月 Ketterle 在 MIT 用 \({}^{23}\)Na 也实现。三人共享 2001 Nobel 物理奖。</p>
+
+<p>BEC 显示了<em>宏观量子相干性</em>——成千上万原子<em>共享</em> 同一波函数, 干涉图样可见。它打开了一个新研究领域："<em>超冷原子</em>", 后来用来研究超流性（液态 He-4 也是 BEC 现象之一, 1937 Kapitsa）、超导（Cooper 对是复合玻色子）、量子模拟（用光晶格里的冷原子模拟 Hubbard 模型）等等。</p>
+
+<p>请你停下来对比 18.7 和 18.8: <em>同一条</em> "粒子统计" 公设, 给费米子简并压力撑起白矮星, 给玻色子凝聚成新物态。这条对称性 / 反对称性的<em>选择</em>——由自旋统计定理决定——是宇宙微观与宏观物理的分水岭之一。</p>
+
+<h2 id="sec18-9">18.9 临别话</h2>
+
+<p>"<em>全同粒子不可区分</em>" 是 QM 最反经典直觉的原则之一。台球桌上两白球可区分; 两电子<em>不可</em>。这不是"<em>测量精度不够</em>" 或者"<em>哲学问题</em>"——是物理可观测后果（周期表、白矮星、BEC）。</p>
+
+<p>本章主线:</p>
+
+<ul>
+  <li>不可区分 \(\Rightarrow\) 所有可观测与 \(\hat P_{12}\) 对易 \(\Rightarrow\) 物理态是 \(\hat P_{12}\) 本征态 \(\Rightarrow\) 对称（玻色）或反对称（费米）。</li>
+  <li>自旋统计定理: 整自旋玻色, 半整自旋费米。</li>
+  <li>费米反对称 \(\Rightarrow\) Pauli 不相容 \(\Rightarrow\) 周期表 + 白矮星。</li>
+  <li>玻色对称 + 低温 \(\Rightarrow\) BEC。</li>
+</ul>
+
+<p>下一章我们离开"<em>精确解</em>" 阶段（氢原子是少有的精确可解; 氦原子已经不可解）, 进入<em>近似</em> 方法——<em>微扰论</em>。把 Hamiltonian 写成 \(\hat H_0 + \lambda \hat V\), 假设 \(\lambda\) 小, 把能级 + 波函数<em>展开</em> 为 \(\lambda\) 的级数。这是真实原子物理 / 化学最常用的工具。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 自旋与 Pauli 矩阵</a><a href="ch19.html">下一章 · 第 19 章 时间无关微扰论 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 自由粒子 + 波包 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 波函数与 Born 概率诠释</a><a href="ch6.html">下一章 · 第 6 章 一维无限深势阱 →</a></nav>
+<h1 id="ch5">第 5 章 自由粒子 + 波包</h1>
+
+<p>前面四章我们建好了量子力学的语言: 波函数 \(\psi(x, t)\)、Schrödinger 方程 \(i\hbar \partial_t \psi = \hat H \psi\)、Born 规则 \(|\psi|^2\) 是概率密度。现在到了"<em>真去解一个具体系统</em>" 的时刻。最简单的具体系统是<em>什么外力都没有</em>——自由粒子, \(V(x) \equiv 0\)。请你停下来想一秒：经典上自由粒子最无聊（直线匀速运动）, QM 上呢？</p>
+
+<p>答案——QM 自由粒子是<em>本书第一处真正撞墙</em> 的地方。最朴素的解（平面波）<em>不归一</em>, 不是合法波函数。修补它逼出一整套新工具——<em>Fourier 叠加</em>构造<em>波包</em>。这一章我把这条路从撞墙到修补到命名（"<em>波包</em>""<em>群速度</em>""<em>波包扩散</em>"）一步步走完。结果是 QM 一维粒子的第一个完整动力学场景, 也是后面所有"<em>位置 vs 动量</em>" 直觉的源头。</p>
+
+<h2 id="sec5-1">5.1 第一招: 套 SE, 解平面波——但不归一</h2>
+
+<p>设 \(V(x) \equiv 0\)。一维含时 Schrödinger 方程:</p>
+
+<p>\[
+i \hbar \frac{\partial \psi}{\partial t} = -\frac{\hbar^2}{2m} \frac{\partial^2 \psi}{\partial x^2}.
+\]</p>
+
+<p>这条 PDE 长得像扩散方程（多了 \(i\)）。请你回想 ch3 的"<em>分离变量</em>" 招——令 \(\psi(x, t) = \varphi(x) T(t)\), 代入两边除以 \(\varphi T\):</p>
+
+<p>\[
+\frac{i \hbar \dot T}{T} = -\frac{\hbar^2}{2m} \frac{\varphi''}{\varphi}.
+\]</p>
+
+<p>左边只与 \(t\) 有关, 右边只与 \(x\) 有关。两边都得是常数, 记作 \(E\)（量纲是能量, 物理上就是能量本征值）。两条 ODE:</p>
+
+<p>\[
+i\hbar \dot T = E T \quad \Rightarrow \quad T(t) = e^{-i E t / \hbar}.
+\]</p>
+
+<p>\[
+-\frac{\hbar^2}{2m} \varphi'' = E \varphi \quad \Rightarrow \quad \varphi'' = -\frac{2 m E}{\hbar^2} \varphi.
+\]</p>
+
+<p>设 \(E > 0\), 令 \(k = \sqrt{2 m E}/\hbar\), 则 \(\varphi'' = -k^2 \varphi\), 解为 \(\varphi(x) = A e^{i k x} + B e^{-i k x}\)。每一项都是<em>平面波</em>。取 \(B = 0, A = 1\), 整个解写成</p>
+
+<p>\[
+\boxed{\ \psi_k(x, t) = e^{i k x} e^{-i E t / \hbar} = e^{i (k x - \omega t)}, \quad \omega = E/\hbar = \frac{\hbar k^2}{2 m}.\ }
+\]</p>
+
+<p>这条函数在<em>每一点</em> 模平方都等于 \(|\psi_k|^2 = 1\)。看起来不错——但请你停下来检查归一化:</p>
+
+<p>\[
+\int_{-\infty}^{\infty} |\psi_k(x, t)|^2 \, dx = \int_{-\infty}^\infty 1 \, dx = \infty.
+\]</p>
+
+<p>归一化积分发散。Born 规则要求 \(|\psi|^2\) 是概率密度, 总概率得是 1。<em>平面波违反归一化</em>。这是数学上的硬伤——平面波<em>不</em>是合法的物理波函数。</p>
+
+<p>更糟的物理含义: \(|\psi_k|^2 = 1\) 在所有 \(x\) 都一样大, 意味着粒子<em>同等概率</em> 出现在宇宙任何位置。一个"<em>位置完全不确定</em>" 的态。这跟"<em>有动量 \(p = \hbar k\) 的粒子</em>" 这种直觉完全不像——经典上粒子是个点, 应该<em>有</em> 位置。</p>
+
+<h2 id="sec5-2">5.2 撞墙后的 reframe: 叠加</h2>
+
+<p>请你停下来仔细想——平面波 \(\psi_k\) 不归一, <em>但</em> 它满足 SE。SE 是<em>线性</em> 方程: 任两个解 \(\psi_1, \psi_2\) 的<em>线性组合</em> \(c_1 \psi_1 + c_2 \psi_2\) 也是解。而且 \(k\) 取<em>任何</em> 实数都给一个解 \(\psi_k\)。</p>
+
+<p>所以"<em>叠加无穷多个不同 \(k\) 的平面波</em>" 是个允许操作。具体地——把<em>离散</em> 求和换成 \(k\) 上的<em>积分</em>:</p>
+
+<p>\[
+\psi(x, t) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^\infty \tilde\psi(k) \, e^{i (k x - \omega(k) t)} \, dk, \qquad \omega(k) = \frac{\hbar k^2}{2 m}.
+\]</p>
+
+<p>权重 \(\tilde\psi(k)\) 决定每个 \(k\) 的"<em>多少份</em>"。如果 \(\tilde\psi(k)\) 在某个中心 \(k_0\) 附近窄峰（高斯之类）, 那这个积分就把不同 \(k\) 的平面波<em>相干叠加</em>——干涉相消使得 \(\psi(x, t)\) 在大部分位置接近 0, 只在某个区间内大——一个<em>局域</em> 的波。这种局域的波叫<strong>波包</strong>。</p>
+
+<p>这条 reframe 改变了游戏规则: 不再问"<em>动量精确为 \(p\) 的态长什么样</em>"（答案: 不归一的平面波, 不存在）, 改问"<em>动量在 \(p_0 \pm \Delta p\) 范围、位置在 \(x_0 \pm \Delta x\) 范围的态长什么样</em>"——答案: 波包, 完全合法的归一波函数。</p>
+
+<p>请你欣赏这件事——QM 第一次<em>逼</em> 你接受"<em>位置和动量不能同时精确</em>"。这不是哲学姿态, 是数学事实——动量精确 ⟹ 平面波 ⟹ 不归一 ⟹ 不合法; 位置精确 ⟹ \(\delta\) 函数 ⟹ 也是 \(\tilde\psi(k)\) 上的常数 ⟹ 同样不归一。<em>合法</em> 的物理态必然在两边都"<em>有点不确定</em>"。这是不确定性原理的雏形, ch11 完整化。</p>
+
+<h2 id="sec5-3">5.3 高斯波包: 一个能算清的例子</h2>
+
+<p>选最容易的一种 \(\tilde\psi(k)\)——<em>高斯</em>。理由: (1) 高斯的 Fourier 变换还是高斯, 算得动; (2) 高斯在物理直觉上是"<em>典型</em>" 的局域分布。</p>
+
+<p>\(t = 0\) 时设</p>
+
+<p>\[
+\boxed{\ \psi(x, 0) = \left( \frac{1}{2\pi \sigma^2} \right)^{1/4} \exp\!\left( -\frac{x^2}{4 \sigma^2} \right) e^{i k_0 x}.\ }
+\]</p>
+
+<p>三块: (a) 归一化常数 \((2\pi\sigma^2)^{-1/4}\); (b) 高斯包络 \(e^{-x^2/(4\sigma^2)}\) 让 \(|\psi|^2\) 在 \(x = 0\) 附近宽 \(\sigma\) 的钟形; (c) 平面波因子 \(e^{i k_0 x}\) 给波包"<em>携带</em>" 中心动量 \(p_0 = \hbar k_0\)。</p>
+
+<p>验证归一化:</p>
+
+<p>\[
+|\psi(x, 0)|^2 = \frac{1}{\sqrt{2\pi \sigma^2}} e^{-x^2 / (2\sigma^2)},
+\]</p>
+
+<p>这是均值 0、方差 \(\sigma^2\) 的标准高斯密度——\(\int |\psi|^2 dx = 1\)。</p>
+
+<p>位置期望、不确定性:</p>
+
+<p>\[
+\langle x \rangle (0) = \int x |\psi|^2 dx = 0, \quad \langle x^2 \rangle(0) = \sigma^2, \quad \Delta x(0) = \sigma.
+\]</p>
+
+<p>动量空间表示——做 Fourier 变换:</p>
+
+<p>\[
+\tilde\psi(k) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^\infty \psi(x, 0) e^{-i k x} dx.
+\]</p>
+
+<p>把 \(\psi(x, 0)\) 代入, 凑指数完全平方（标准技巧, 微积分册做过——把 \(-x^2/(4\sigma^2) - i(k - k_0) x\) 写成 \(-(x + 2i\sigma^2 (k - k_0))^2/(4\sigma^2) - \sigma^2 (k - k_0)^2\)）, 得</p>
+
+<p>\[
+\tilde\psi(k) = \left( \frac{2 \sigma^2}{\pi} \right)^{1/4} \exp\!\left( -\sigma^2 (k - k_0)^2 \right).
+\]</p>
+
+<p>请你比较: 位置空间宽 \(\sigma\), 动量空间宽 \(1/(2\sigma)\)（因为高斯方差 \(1/(2\sigma^2)\) 对应标准差 \(1/(\sqrt{2}\cdot \sqrt{2}\sigma)\), 先不严格, 5.6 算清）。一边窄 ⟹ 另一边宽——这就是 Fourier 不确定性, 在物理上变成<em>位置-动量不确定性</em>。</p>
+
+<h2 id="sec5-4">5.4 时间演化: Fourier 解</h2>
+
+<p>把高斯波包推到一般 \(t\)。SE 在 Fourier 表示里很简单——每个 \(k\) 模式独立按 \(e^{-i\omega(k) t}\) 演化。所以</p>
+
+<p>\[
+\psi(x, t) = \frac{1}{\sqrt{2\pi}} \int \tilde\psi(k) e^{i(kx - \omega(k) t)} dk
+\]</p>
+
+<p>把 \(\tilde\psi(k) = (2\sigma^2/\pi)^{1/4} e^{-\sigma^2 (k - k_0)^2}\) 与 \(\omega(k) = \hbar k^2/(2m)\) 代入。指数:</p>
+
+<p>\[
+-\sigma^2 (k - k_0)^2 + i k x - \frac{i \hbar k^2 t}{2 m}.
+\]</p>
+
+<p>这是 \(k\) 的二次, 完全平方再积分（细节是高斯积分 \(\int e^{-a k^2 + b k} dk = \sqrt{\pi/a} e^{b^2/(4a)}\)）。结果繁但解析:</p>
+
+<p>\[
+\psi(x, t) = \left( \frac{1}{2\pi \sigma_t^2} \right)^{1/4} \frac{1}{\sqrt{1 + i\hbar t/(2 m \sigma^2)}} \exp\!\left( -\frac{(x - v_g t)^2}{4 \sigma^2 (1 + i\hbar t/(2m\sigma^2))} + i k_0 (x - v_g t/2) - i\omega_0 t \right),
+\]</p>
+
+<p>其中 \(v_g = \hbar k_0/m\)（下面命名）, \(\omega_0 = \hbar k_0^2/(2m)\)。先不要被这堆指数吓到——重要的不是这条公式的全貌, 是<em>模平方</em>:</p>
+
+<p>\[
+\boxed{\ |\psi(x, t)|^2 = \frac{1}{\sqrt{2\pi \sigma_t^2}} \exp\!\left( -\frac{(x - v_g t)^2}{2 \sigma_t^2} \right), \quad \sigma_t^2 = \sigma^2 + \frac{\hbar^2 t^2}{4 m^2 \sigma^2}.\ }
+\]</p>
+
+<p>这就是含时间高斯波包的概率密度——仍是高斯, 但<em>中心</em> 平移到 \(x = v_g t\)（以速度 \(v_g\) 漂移）, <em>宽度</em> 从 \(\sigma\) 涨到 \(\sigma_t\)（随时间变宽）。两件事——漂移 + 扩散——分别是 5.5 和 5.6 的主题。</p>
+
+<h2 id="sec5-5">5.5 群速度 vs 相速度</h2>
+
+<p>波包<em>中心</em> 以什么速度漂移？从上面 \(|\psi|^2\) 看, 中心 \(x_c(t) = v_g t\), 所以速度 \(\dot x_c = v_g = \hbar k_0/m\)。代入 \(p_0 = \hbar k_0\):</p>
+
+<p>\[
+v_g = \frac{p_0}{m}.
+\]</p>
+
+<p>请你停下来——这正是经典力学里"<em>动量 \(p_0\) 的粒子的速度</em>"。<em>波包以经典速度漂移</em>。这是 QM 与经典物理的第一处真正接合点。</p>
+
+<p>这个速度有个名字——<strong>群速度</strong>:</p>
+
+<p>\[
+\boxed{\ v_g := \frac{d\omega}{dk} \bigg|_{k_0}.\ }
+\]</p>
+
+<p>验证: \(\omega(k) = \hbar k^2/(2m)\), \(d\omega/dk = \hbar k/m\), 代 \(k = k_0\) 得 \(v_g = \hbar k_0/m\)——和上面一致。"<em>群</em>" 来自"<em>波群</em>" = 波包: 一群相近 \(k\) 的平面波相干叠加, 它们的"<em>包</em>" 以 \(d\omega/dk\) 速度移动。</p>
+
+<p>对比<em>相速度</em>——单个平面波 \(e^{i(kx - \omega t)}\) 的相位 \(kx - \omega t\) 等值线沿 \(x = (\omega/k) t\) 移动, 所以</p>
+
+<p>\[
+v_p := \frac{\omega}{k} = \frac{\hbar k}{2 m} = \frac{p}{2m}.
+\]</p>
+
+<p>注意 \(v_p = v_g/2\)——相速度是<em>群</em>速度的一半！这看起来矛盾——粒子不是按 \(p/m\) 跑吗？答案: 粒子的<em>位置概率密度</em> 跟着<em>波包</em> 走（群速度）, 跟<em>相位</em> 没关系（相速度）。相速度只描述每一根平面波的相位演化, 不是物理可观测。</p>
+
+<p>请你欣赏这一点——"<em>粒子速度 = 群速度</em>" 是 QM 与经典力学的 Ehrenfest 定理（ch10 给一般版本）的第一个具体例子: <em>波函数中心按经典轨迹走</em>。这把"<em>粒子</em>" 这个经典直觉嵌入 QM——粒子不是点, 是波包; 波包不是死的, 它的中心遵守经典动量公式。</p>
+
+<h2 id="sec5-6">5.6 波包扩散: 位置不确定性变大</h2>
+
+<p>5.4 给的 \(|\psi|^2\) 宽度</p>
+
+<p>\[
+\sigma_t^2 = \sigma^2 + \frac{\hbar^2 t^2}{4 m^2 \sigma^2}.
+\]</p>
+
+<p>大 \(t\) 时, \(\sigma_t \approx \hbar t/(2 m \sigma)\)——<em>线性</em> 增长。所以 \(\Delta x(t) = \sigma_t \to \infty\)。<em>自由粒子的位置不确定性随时间无限增大</em>。</p>
+
+<p>这是个让人停下来的现象。经典上 \(t = 0\) 时位置 \(x = 0 \pm \sigma\)、动量 \(p = p_0 \pm \Delta p\) 的粒子集合, \(t\) 时刻位置在 \(x = (p_0/m) t \pm (\Delta p/m) t \pm \sigma\), 也线性扩散——但<em>因为</em> 初始动量本来就有不确定。QM 里同样: 高斯波包里有一族 \(k\), 速度 \(\hbar k/m\), 不同 \(k\) 速度不同 ⟹ 跑得快慢不同 ⟹ 越往后位置越分散。</p>
+
+<p>但 QM 多了一层——<em>初始时位置 \(\sigma\) 越小, 后期扩散反而越快</em>。看公式: \(\sigma_t^2\) 对小 \(\sigma\) 来说第二项 \(\hbar^2 t^2/(4 m^2 \sigma^2)\) 反比 \(\sigma^2\) 增大。物理直觉: 初始位置越准 ⟹ Fourier 变换的动量越宽 ⟹ 不同 \(k\) 散得越开 ⟹ 跑得越散。<em>这就是不确定性原理的动力学后果</em>。</p>
+
+<p>这一现象的"<em>守恒量</em>" 是动量分布——\(|\tilde\psi(k, t)|^2 = |\tilde\psi(k, 0)|^2\)（只多了一个相位 \(e^{-i\omega(k) t}\), 模平方不变）。所以 \(\Delta p\) <em>不</em> 随时间变。变的只是 \(\Delta x\), 而且总是变大。</p>
+
+<p>对比<em>束缚态</em>（下一章无限深势阱）——束缚态的概率密度<em>不</em> 扩散, 因为势阱壁挡住。自由粒子才有这种"<em>无限扩散</em>"。</p>
+
+<h2 id="sec5-7">5.7 \(\Delta x \, \Delta p \ge \hbar/2\) 在波包上具体验证</h2>
+
+<p>算 \(\Delta x \cdot \Delta p\) 看它能多小。</p>
+
+<p><em>位置标准差</em>。\(t = 0\) 时高斯密度 \(|\psi|^2 = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-x^2/(2\sigma^2)}\), 标准差 \(\Delta x(0) = \sigma\)。</p>
+
+<p><em>动量标准差</em>。\(|\tilde\psi(k)|^2 = \sqrt{2\sigma^2/\pi} e^{-2\sigma^2 (k - k_0)^2}\), 这是 \(k\) 的高斯, 标准差 \(\Delta k = 1/(2\sigma)\)。代 \(p = \hbar k\), \(\Delta p = \hbar \Delta k = \hbar/(2\sigma)\)。</p>
+
+<p>积:</p>
+
+<p>\[
+\Delta x \cdot \Delta p = \sigma \cdot \frac{\hbar}{2 \sigma} = \frac{\hbar}{2}.
+\]</p>
+
+<p>请你停下来欣赏: <em>恰好 \(\hbar/2\)</em>。高斯波包<em>饱和</em> 不确定性下界。<em>没有</em> 任何归一波函数能让 \(\Delta x \Delta p\) 严格小于 \(\hbar/2\)（ch11 证一般情形——Cauchy-Schwarz + \([\hat x, \hat p] = i\hbar\)）, 高斯是唯一能取等的。这件事让高斯波包成为"<em>最经典的</em>" 量子态——它在 \((x, p)\) 相空间占的面积最小。物理学家叫它<em>最小不确定性态</em>。</p>
+
+<p>大 \(t\) 时:</p>
+
+<p>\[
+\Delta x(t) = \sigma_t = \sigma \sqrt{1 + \hbar^2 t^2/(4 m^2 \sigma^4)}, \quad \Delta p = \hbar/(2\sigma) \text{ (不变)}.
+\]</p>
+
+<p>积 \(\Delta x(t) \Delta p = (\hbar/2) \sqrt{1 + \hbar^2 t^2/(4 m^2 \sigma^4)} \ge \hbar/2\), 等号只在 \(t = 0\) 取。<em>波包随时间从最小不确定性走开</em>——位置变模糊, 动量保持不变, 积往上走。</p>
+
+<h2 id="sec5-8">5.8 物理含义 + 经典极限</h2>
+
+<p>把 5.1-5.7 串起来。一句话总结自由粒子 QM:</p>
+
+<ul>
+  <li>不存在"<em>动量精确的粒子</em>"——平面波不归一。合法物理态是<em>波包</em>。</li>
+  <li>波包<em>中心</em> 按经典动量公式漂移（\(v_g = p_0/m\)）。<em>这就是经典粒子轨迹的 QM 起源</em>。</li>
+  <li>波包<em>宽度</em> 随时间增大（\(\sigma_t\) 线性增长）——位置不确定性单调增加。</li>
+  <li>动量分布<em>不变</em>——\(\Delta p\) 是常数。</li>
+  <li>高斯波包初始<em>饱和</em> 不确定性 \(\Delta x \Delta p = \hbar/2\), 之后向上走。</li>
+</ul>
+
+<p>那经典极限呢——为什么我们看不到桌球扩散？算个数。1 g 的小球 \(m = 10^{-3}\) kg, 初始 \(\sigma = 1\) mm\(= 10^{-3}\) m。1 秒后扩散</p>
+
+<p>\[
+\Delta x(1) \approx \frac{\hbar t}{2 m \sigma} = \frac{10^{-34}}{2 \cdot 10^{-3} \cdot 10^{-3}} = 5 \times 10^{-29} \text{ m}.
+\]</p>
+
+<p>\(10^{-29}\) 米——比一个原子还小 18 个数量级。<em>完全不可观测</em>。所以宏观物体看不到波包扩散——\(\hbar\) 太小, 大质量更压缩这个效应。</p>
+
+<p>电子呢？\(m = 9 \times 10^{-31}\) kg, 同样 \(\sigma = 10^{-9}\) m（1 nm, 原子尺度）, 1 ps 后:</p>
+
+<p>\[
+\Delta x \approx \frac{10^{-34} \cdot 10^{-12}}{2 \cdot 10^{-30} \cdot 10^{-9}} = 5 \times 10^{-8} \text{ m},
+\]</p>
+
+<p>50 nm——已经远远超出原始 1 nm。电子在 ps 尺度<em>必然</em> 扩散到看不见的程度。这就是为什么电子显微镜的电子要"<em>聚焦</em>"——不聚焦它就散开。</p>
+
+<p>更深的——上面的"<em>群速度 = 经典速度</em>" 是<strong>Ehrenfest 定理</strong>的特例: 算符 \(\hat x\) 的期望按"<em>经典 \(\dot x = p/m\)</em>" 演化。一般形式（ch10）:</p>
+
+<p>\[
+\frac{d}{dt} \langle \hat x \rangle = \frac{\langle \hat p \rangle}{m}, \quad \frac{d}{dt} \langle \hat p \rangle = -\langle \nabla V \rangle.
+\]</p>
+
+<p>对自由粒子 \(V = 0\), 第二式给 \(\langle \hat p \rangle\) 守恒, 第一式给 \(\langle \hat x \rangle\) 线性增长——和波包中心轨迹完全一致。Ehrenfest 把"<em>QM 期望按经典轨迹走</em>" 一般化, 自由粒子是它最干净的例子。</p>
+
+<h2 id="sec5-9">5.9 一般化: 任何 \(\omega(k)\) 都给波包</h2>
+
+<p>这一章用的所有工具——Fourier 叠加、群速度 \(d\omega/dk\)、波包扩散——并<em>不</em> 局限于 SE 自由粒子 \(\omega = \hbar k^2/(2m)\)。它对任何"<em>色散关系</em>" \(\omega = \omega(k)\) 都成立。</p>
+
+<p>例子:</p>
+
+<ul>
+  <li><em>电磁波在真空</em>: \(\omega = c k\) ⟹ \(v_p = v_g = c\), 不扩散——光波包以光速传播且形状保持。</li>
+  <li><em>电磁波在介质</em>: \(\omega = c k/n(\omega)\), \(n\) 频率依赖 ⟹ \(v_g \neq v_p\), 还有扩散——这就是棱镜分光的原理（也叫"<em>色散</em>" 由此得名）。</li>
+  <li><em>水波</em>: \(\omega = \sqrt{g k}\) ⟹ \(v_g = (1/2)\sqrt{g/k}\), 比相速度小, 不同 \(k\) 散得开——海面上看到一群水波"<em>展开</em>" 就是这个。</li>
+</ul>
+
+<p>"<em>波包扩散</em>" 是<em>所有色散波</em> 的普适现象。SE 自由粒子（\(\omega = \hbar k^2/2m\)）只是其中一个具体例子——但它的物理意义最大: 把"<em>粒子</em>" 这个经典概念<em>嵌入</em> 量子波动力学。</p>
+
+<p>本书后续每一章, 每一次你看到"<em>位置分布</em>"或"<em>动量分布</em>", 都可以回头想这一章——QM 里没有"<em>同时精确的位置和动量</em>", 只有<em>分布</em>; 分布的中心按经典走, 分布的宽随时间动。这是 QM 的基本运动学画面。</p>
+
+<h2 id="sec5-10">5.10 临别话</h2>
+
+<p>这一章你看到 QM 的第一次"<em>具体动力学</em>": 自由粒子怎么在时间里演化。撞墙在 5.1（平面波不归一）, reframe 在 5.2（叠加成波包）, 命名在 5.5、5.7（群速度、波包扩散、最小不确定性态）, 一般化在 5.9（任何色散关系）。请你把这条路当成一个模板——后面 ch6（势阱）、ch7（谐振子）、ch8（势垒）每一个都会重走类似流程: 朴素 SE 解 → 撞某种墙 → reframe → 命名新对象。</p>
+
+<p>下一章我们换一个完全不同的物理设定——粒子<em>不</em> 自由, 而是被困在一段长度 \(L\) 的"<em>盒子</em>" 里, 边界外势能无穷大。这种<em>束缚态</em> 第一次给出<em>离散能级</em>——QM 的招牌特征。Bohr 1913 用 ad hoc 假设硬塞的"<em>能级离散</em>", 在这里会从 SE 解的边界条件<em>自然</em> 长出来。这就是 QM 真正"<em>解释</em>" 而不只是"<em>假设</em>" 离散能级的第一处。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 波函数与 Born 概率诠释</a><a href="ch6.html">下一章 · 第 6 章 一维无限深势阱 →</a></nav>
+</main>
+</body>
+</html>

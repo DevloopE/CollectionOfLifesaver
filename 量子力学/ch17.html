@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 自旋与 Pauli 矩阵 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 氢原子完整解</a><a href="ch18.html">下一章 · 第 18 章 全同粒子与反对称化 →</a></nav>
+<h1 id="ch17">第 17 章 自旋与 Pauli 矩阵</h1>
+
+<p>1922 年 2 月, 法兰克福。Otto Stern 和 Walther Gerlach 设计一个看上去很普通的实验: 把一束银原子蒸发成原子束（炉子里加热银, 让它从小孔射出）, 让原子束通过一对<em>非均匀</em> 磁场（两块特殊形状的磁极, 让磁场强度沿 \(z\) 方向变化）, 然后打到照相板上看分布。</p>
+
+<p>这个实验的<em>设计意图</em> 是测原子的磁矩。一个有磁矩 \(\vec\mu\) 的物体在<em>非均匀</em> 磁场里受力 \(\vec F = \nabla(\vec\mu \cdot \vec B)\)。如果磁场沿 \(z\) 方向有梯度 \(\partial B_z / \partial z\), 那么力的 \(z\) 分量 \(F_z = \mu_z \partial B_z / \partial z\)。原子被偏转的距离正比于 \(\mu_z\)——磁矩在 \(z\) 方向的投影。</p>
+
+<p>经典物理预测什么？银原子从炉子出来时, 磁矩取向是<em>随机各向同性</em> 的（热运动）。所以 \(\mu_z = |\vec\mu| \cos\theta\) 取从 \(-|\vec\mu|\) 到 \(+|\vec\mu|\) 的<em>连续分布</em>。照相板上应该看到一片连续的偏转分布——一个抹开的<em>条带</em>。</p>
+
+<p>实验<em>看到</em> 的: 两条<em>分离</em> 的亮线, 一条向上偏 \(+d\), 一条向下偏 \(-d\), 中间什么都没有。<em>没有</em> 连续分布, <em>没有</em> 任何中间值。\(\mu_z\) 只能取<em>两个</em> 值, 大小相等符号相反。</p>
+
+<p>请你停下来想想这有多奇怪。经典物理给"<em>磁矩可以指向任意方向</em>", 量化测量在 \(z\) 方向, 应该看到 \(\cos\theta\) 的连续值。实验告诉你"<em>磁矩在 \(z\) 上只有两种可能</em>"——而且, 如果你换一个方向（比如 \(x\) 轴）做实验, 还是只有两种可能。任何方向都两种可能。这暗示银原子有一个<em>额外的</em> 角动量自由度——它的<em>每一个分量</em> 测量值都是离散的<em>两个</em>。</p>
+
+<p>这条额外的角动量在 1925 年被 Goudsmit + Uhlenbeck 命名为<em>电子自旋</em>。银原子的总磁矩主要由它最外层那个未成对电子贡献; 电子有"<em>自旋</em>" 角动量, 大小固定, 但它的任何方向投影<em>只能</em> 取 \(\pm \hbar/2\) 两个值。这是<a href="ch14.html">ch14</a> 角动量代数的<em>半整数</em> 表示——数学上完全合法（\(j = 1/2\) 让 \(2j+1 = 2\) 个态）, 但<em>没有经典对应</em>。Pauli 1927 年给出一个简洁的 2D Hilbert 空间 + 三个 2×2 矩阵描述, 这就是本章主角——<em>Pauli 矩阵</em>。</p>
+
+<h2 id="sec17-1">17.1 Stern-Gerlach 实验的解读</h2>
+
+<p>把上面实验仔细分析一下。银原子电子配置是 \([\text{Kr}] 4d^{10} 5s^1\)——前面的电子壳层都是<em>全填满</em> 的（轨道角动量和自旋角动量两两抵消, 总磁矩为 0）, 只有最外层一个 \(5s\) 电子。\(5s\) 是 \(\ell = 0\) 态, <em>轨道</em> 角动量为 0; 所以银原子的总磁矩<em>完全</em> 来自这<em>一个</em> 电子的"<em>自旋</em>" 磁矩。</p>
+
+<p>电子自旋磁矩的<em>大小</em> 等于 \(g_s \mu_B / 2\), 其中 \(\mu_B = e\hbar/(2m_e)\) 是<em>玻尔磁子</em>, \(g_s \approx 2\) 是电子<em>自旋 \(g\) 因子</em>（QED 给的精确值是 \(2.0023\ldots\)）。具体数值不重要; 关键是 \(\mu_z\) 测量值<em>只有两个</em>, 对应"<em>自旋向上</em>" 和"<em>自旋向下</em>"。</p>
+
+<p>这暗示什么？暗示电子（或更一般地, 任何"<em>自旋 1/2</em>" 粒子）的<em>状态空间</em> 比"<em>位置波函数</em> \(\psi(\vec r)\)" 要大——除了空间自由度, 还有一个<em>2 维内部自由度</em>, 在 SG 实验里只能测出"<em>↑ 还是 ↓</em>" 两种结果。</p>
+
+<p>Pauli 1927 写下: 电子的<em>完整</em> 量子态由"<em>空间波函数</em> + 一个二分量列向量</p>
+
+<p>\[
+\chi = \begin{pmatrix} a \\ b \end{pmatrix}, \qquad |a|^2 + |b|^2 = 1
+\]</p>
+
+<p>" 联合描述。\(|a|^2\) 是测 \(S_z\) 得 \(+\hbar/2\) 的概率, \(|b|^2\) 是得 \(-\hbar/2\) 的概率。这条二分量对象叫<em>旋量</em>（spinor）。</p>
+
+<h2 id="sec17-2">17.2 自旋角动量算子 \(\hat S\)</h2>
+
+<p>自旋是<em>角动量</em>。<a href="ch14.html">ch14</a> 我们从一般角动量代数</p>
+
+<p>\[
+[\hat J_x, \hat J_y] = i\hbar \hat J_z, \qquad [\hat J_y, \hat J_z] = i\hbar \hat J_x, \qquad [\hat J_z, \hat J_x] = i\hbar \hat J_y
+\]</p>
+
+<p>出发, 用<em>升降算子</em> \(\hat J_\pm = \hat J_x \pm i \hat J_y\) 推出: 任何满足这条代数的算子, 其本征值 \((j, m)\) 满足 \(j = 0, 1/2, 1, 3/2, 2, \ldots\) 和 \(m = -j, -j+1, \ldots, j\), 共 \(2j+1\) 个 \(m\) 值。</p>
+
+<p>对<em>轨道</em> 角动量 \(\hat L = \hat r \times \hat p\), 由于波函数 \(\psi(\theta, \varphi)\) 在球坐标下是<em>单值</em> 的（绕 \(2\pi\) 必须复原）, 强迫 \(\ell\) 必须是<em>整数</em>。半整数被排除。</p>
+
+<p>但<em>自旋</em> 不是从 \(\hat r \times \hat p\) 来的——它<em>不</em> 与坐标空间挂钩, 是一个<em>纯内部</em> 自由度。代数允许的<em>所有</em> \(j\) 都开放, 包括<em>半整数</em> \(1/2, 3/2, \ldots\)。具体取哪个由"<em>什么粒子</em>" 决定: 电子、质子、中子都是 \(s = 1/2\); 光子是 \(s = 1\); \(\pi\) 介子是 \(s = 0\); \(\Omega^-\) 重子是 \(s = 3/2\); 等等。</p>
+
+<p>自旋算子记 \(\hat S_x, \hat S_y, \hat S_z\), 满足同样的代数:</p>
+
+<p>\[
+\boxed{\ [\hat S_x, \hat S_y] = i\hbar \hat S_z \ \text{(及循环)}, \qquad \hat S^2 = \hat S_x^2 + \hat S_y^2 + \hat S_z^2.\ }
+\]</p>
+
+<p>共同本征态 \(|s, m\rangle\) 满足</p>
+
+<p>\[
+\hat S^2 |s, m\rangle = s(s+1)\hbar^2 |s, m\rangle, \qquad \hat S_z |s, m\rangle = m\hbar |s, m\rangle.
+\]</p>
+
+<p>电子是 \(s = 1/2\), 所以 \(m = \pm 1/2\), 状态空间 2 维。\(\hat S^2\) 本征值 \((1/2)(3/2)\hbar^2 = (3/4)\hbar^2\), 是个常数, 在 2D 上等于 \((3/4)\hbar^2 \cdot I\)。</p>
+
+<h2 id="sec17-3">17.3 spin-1/2 的矩阵表示</h2>
+
+<p>把 2D Hilbert 空间的基取为 \(|\uparrow\rangle = |1/2, +1/2\rangle\) 和 \(|\downarrow\rangle = |1/2, -1/2\rangle\), 用列向量表示:</p>
+
+<p>\[
+|\uparrow\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \qquad |\downarrow\rangle = \begin{pmatrix} 0 \\ 1 \end{pmatrix}.
+\]</p>
+
+<p>\(\hat S_z\) 在这组基下对角:</p>
+
+<p>\[
+\hat S_z = \frac{\hbar}{2}\begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.
+\]</p>
+
+<p>\(\hat S_x, \hat S_y\) 怎么写？用升降算子。在 \(s = 1/2\) 下</p>
+
+<p>\[
+\hat S_+ |\downarrow\rangle = \hbar |\uparrow\rangle, \qquad \hat S_+ |\uparrow\rangle = 0,
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\hat S_+ = \hbar \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}, \qquad \hat S_- = \hbar \begin{pmatrix} 0 & 0 \\ 1 & 0 \end{pmatrix}.
+\]</p>
+
+<p>由 \(\hat S_x = (\hat S_+ + \hat S_-)/2\), \(\hat S_y = (\hat S_+ - \hat S_-)/(2i)\), 得</p>
+
+<p>\[
+\hat S_x = \frac{\hbar}{2}\begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \qquad \hat S_y = \frac{\hbar}{2}\begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}.
+\]</p>
+
+<p>把 \(\hbar/2\) 提出来命名剩下那个矩阵——三个<em>Pauli 矩阵</em>:</p>
+
+<p>\[
+\boxed{\ \hat S_i = \frac{\hbar}{2} \sigma_i, \qquad \sigma_x = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \quad \sigma_y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \quad \sigma_z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.\ }
+\]</p>
+
+<p>这三个矩阵是 spin-1/2 量子力学的<em>全部</em> 内容。下面我们梳理它们的代数性质。</p>
+
+<h2 id="sec17-4">17.4 Pauli 矩阵的代数</h2>
+
+<p>请你停下来手算一遍下面这些性质——它们很重要, 也很容易记。</p>
+
+<p><strong>性质 1（平方）</strong>: \(\sigma_i^2 = I\) (\(i = x, y, z\))。</p>
+
+<p>验证 \(\sigma_x^2 = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}\begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} = I\)。其余同理。</p>
+
+<p><strong>性质 2（厄米 + 幺正）</strong>: \(\sigma_i^\dagger = \sigma_i\)（自伴, 因此本征值实数）, 且由性质 1 \(\sigma_i^{-1} = \sigma_i\), 所以 \(\sigma_i^\dagger \sigma_i = I\)（幺正）。三个矩阵<em>同时</em> 厄米又幺正, 这在更高维很罕见。</p>
+
+<p><strong>性质 3（迹）</strong>: \(\text{tr}(\sigma_i) = 0\)。直接读对角线。</p>
+
+<p><strong>性质 4（行列式）</strong>: \(\det \sigma_i = -1\)。</p>
+
+<p><strong>性质 5（反对易）</strong>: \(\sigma_i \sigma_j + \sigma_j \sigma_i = 2 \delta_{ij} I\)（\(i \neq j\) 时反对易, \(i = j\) 时给 2I）。</p>
+
+<p><strong>性质 6（对易 = 角动量代数）</strong>: \([\sigma_i, \sigma_j] = 2 i \, \varepsilon_{ijk} \sigma_k\)（\(\varepsilon\) 是 Levi-Civita 符号）。等价于</p>
+
+<p>\[
+\sigma_x \sigma_y = i \sigma_z, \qquad \sigma_y \sigma_z = i \sigma_x, \qquad \sigma_z \sigma_x = i \sigma_y \qquad \text{(循环)}.
+\]</p>
+
+<p>验证 \(\sigma_x \sigma_y\):</p>
+
+<p>\[
+\begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}\begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix} = \begin{pmatrix} i & 0 \\ 0 & -i \end{pmatrix} = i \sigma_z. \checkmark
+\]</p>
+
+<p><strong>性质 7（合并对易 + 反对易）</strong>: \(\sigma_i \sigma_j = \delta_{ij} I + i \, \varepsilon_{ijk} \sigma_k\)。这条把"<em>同号 → I</em>" 和"<em>异号 → 第三个</em>" 一行总结。它非常便于算 spin 的复合运算（比如 \((\vec\sigma \cdot \vec a)(\vec\sigma \cdot \vec b) = (\vec a \cdot \vec b) I + i \vec\sigma \cdot (\vec a \times \vec b)\)——一行展开, 见习题）。</p>
+
+<p><strong>性质 8（\(\hat S^2\) 在 2D 上是 \(I\) 的倍数）</strong>: \(\hat S^2 = (\hbar^2/4)(\sigma_x^2 + \sigma_y^2 + \sigma_z^2) = (3\hbar^2/4) I\), 与 \(s(s+1)\hbar^2 = (3/4)\hbar^2\) 一致。</p>
+
+<h2 id="sec17-5">17.5 自旋本征态: \(|\uparrow\rangle, |\downarrow\rangle\) 与任意方向</h2>
+
+<p>\(\sigma_z\) 已对角, 本征态就是基</p>
+
+<p>\[
+|\uparrow_z\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix} \text{(本征值 } +1\text{)}, \qquad |\downarrow_z\rangle = \begin{pmatrix} 0 \\ 1 \end{pmatrix} \text{(本征值 } -1\text{)}.
+\]</p>
+
+<p>\(\sigma_x\) 的本征态？解 \(\sigma_x v = \lambda v\):</p>
+
+<p>\[
+\begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}\begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} b \\ a \end{pmatrix} = \lambda \begin{pmatrix} a \\ b \end{pmatrix}.
+\]</p>
+
+<p>得 \(\lambda = \pm 1\), 对应 \(b = \pm a\)。归一化:</p>
+
+<p>\[
+|\uparrow_x\rangle = \frac{1}{\sqrt 2}\begin{pmatrix} 1 \\ 1 \end{pmatrix}, \qquad |\downarrow_x\rangle = \frac{1}{\sqrt 2}\begin{pmatrix} 1 \\ -1 \end{pmatrix}.
+\]</p>
+
+<p>\(\sigma_y\) 同理</p>
+
+<p>\[
+|\uparrow_y\rangle = \frac{1}{\sqrt 2}\begin{pmatrix} 1 \\ i \end{pmatrix}, \qquad |\downarrow_y\rangle = \frac{1}{\sqrt 2}\begin{pmatrix} 1 \\ -i \end{pmatrix}.
+\]</p>
+
+<p>请你看一件事——\(|\uparrow_x\rangle\) <em>不</em> 等于 \(|\uparrow_z\rangle\), 也<em>不</em> 等于它的简单旋转。在 Bloch 球图像里（自旋方向 \(\hat n = (\sin\theta\cos\varphi, \sin\theta\sin\varphi, \cos\theta)\)）, \(|\uparrow_{\hat n}\rangle\) 一般是</p>
+
+<p>\[
+|\uparrow_{\hat n}\rangle = \begin{pmatrix} \cos(\theta/2) \\ e^{i\varphi}\sin(\theta/2) \end{pmatrix}.
+\]</p>
+
+<p>这条公式里出现 \(\theta/2\) ——空间方向转 \(\theta\), 自旋态转 \(\theta/2\)。<em>自旋是 SU(2) 表示, 不是 SO(3)</em>。这条"<em>转 360 度态变号</em>" 是 spin-1/2 最神秘的特征——经典物体转 360° 回到自身, spin-1/2 旋量转 360° 得到 \(-1\), 必须转 720° 才回到原始。1975 Werner 等人用中子干涉仪<em>实验</em> 验证了 \(\theta/2\)（中子转 360° 让干涉条纹反相位）, 是 spin 几何最直接的物理证据。</p>
+
+<h2 id="sec17-6">17.6 顺序 SG 实验: 不可对易性的可视化</h2>
+
+<p>这一节用一个简单实验把"<em>自旋分量不对易</em>" 直观化。设想三台依次的 SG 装置:</p>
+
+<p><strong>(a) SG-z 选 \(\uparrow\)</strong>: 把银原子束通过沿 \(z\) 方向的 SG, 阻挡 \(\downarrow\) 那一束, 只放 \(\uparrow_z\) 通过。出来的态 \(|\uparrow_z\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix}\)。100% 纯 \(\uparrow_z\)。</p>
+
+<p><strong>(b) 接一台 SG-z</strong>: 再来一次 \(z\) 测量。结果 100% \(\uparrow_z\), 无 \(\downarrow_z\)——意料之中, 因为已经在 \(\uparrow_z\) 本征态。</p>
+
+<p><strong>(c) 把第二台换成 SG-x</strong>: 把 \(|\uparrow_z\rangle\) 通过沿 \(x\) 方向的 SG。结果会怎样？</p>
+
+<p>展开 \(|\uparrow_z\rangle\) 在 \(\sigma_x\) 本征态基下:</p>
+
+<p>\[
+|\uparrow_z\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix} = \frac{1}{\sqrt 2}\left(\frac{1}{\sqrt 2}\begin{pmatrix}1 \\ 1\end{pmatrix} + \frac{1}{\sqrt 2}\begin{pmatrix}1 \\ -1\end{pmatrix}\right) = \frac{1}{\sqrt 2}|\uparrow_x\rangle + \frac{1}{\sqrt 2}|\downarrow_x\rangle.
+\]</p>
+
+<p>测 \(S_x\) 得 \(+\hbar/2\) 的概率 \(|1/\sqrt 2|^2 = 1/2\); 得 \(-\hbar/2\) 概率 \(1/2\)。<em>50/50</em>。</p>
+
+<p><strong>(d) 进一步: SG-x 选 \(\uparrow_x\), 再 SG-z</strong>: 把第三台再换回 SG-z。\(|\uparrow_x\rangle\) 在 \(z\) 基下分解</p>
+
+<p>\[
+|\uparrow_x\rangle = \frac{1}{\sqrt 2}\begin{pmatrix} 1 \\ 1 \end{pmatrix} = \frac{1}{\sqrt 2}|\uparrow_z\rangle + \frac{1}{\sqrt 2}|\downarrow_z\rangle.
+\]</p>
+
+<p>测 \(S_z\) 又是 50/50。<em>第二次 SG-z 测量"<em>忘掉</em>" 了第一次 SG-z 的选择</em>——中间那台 SG-x 把"\(z\) 信息" 完全擦除。</p>
+
+<p>这条现象是"<em>不对易测量不能同时锐定</em>" 的最干净示范。\(\hat S_z\) 本征态<em>不</em> 是 \(\hat S_x\) 本征态。测 \(S_x\) 投影到 \(S_x\) 本征态——破坏 \(S_z\) 信息。这是<a href="ch11.html">ch11</a> 不确定原理在 spin 系统的具体实现, 也是<a href="ch12.html">ch12</a> 测量公设的最简单例子。</p>
+
+<p>从历史角度: 1922 SG 实验本身只测了一次 \(z\)。1927 年代以后人们才真做了 SG-z + SG-x + SG-z 顺序实验（中子束、银原子束都做过）, 验证了 50/50 + 信息擦除。</p>
+
+<h2 id="sec17-7">17.7 自旋-轨道耦合 \(\hat L \cdot \hat S\)</h2>
+
+<p>电子在原子里同时有<em>轨道</em> 角动量 \(\hat L\)（绕核运动）和<em>自旋</em> 角动量 \(\hat S\)。两者在原子内部不独立——存在<em>自旋-轨道耦合</em>:</p>
+
+<p>\[
+\hat H_{\text{SO}} = \xi(r) \, \hat L \cdot \hat S,
+\]</p>
+
+<p>\(\xi(r)\) 是某个径向函数（半经典推导给 \(\xi(r) = \frac{1}{2 m_e^2 c^2 r}\frac{dV}{dr}\), 来自电子在自身参考系里看到的<em>磁场</em>; 完整推导需要 Dirac 方程, 见<a href="ch24.html">ch24</a>）。</p>
+
+<p>\(\hat L \cdot \hat S\) 这个算子有一个深刻后果: 它<em>不与</em> \(\hat L_z\) 或 \(\hat S_z\) 单独对易, 但<em>与</em> 总角动量 \(\hat J = \hat L + \hat S\) 的 \(\hat J^2, \hat J_z\) 对易。所以"<em>好量子数</em>" 从 \((\ell, m_\ell, s, m_s)\) 变成 \((\ell, s, j, m_j)\), 其中 \(j = \ell \pm 1/2\)（自旋 1/2 与 \(\ell\) 耦合）。</p>
+
+<p>请你停下来注意——这正是<a href="ch14.html">ch14</a> 角动量加法（Clebsch-Gordan 系数）的物理用武之地。</p>
+
+<p>用恒等式</p>
+
+<p>\[
+\hat J^2 = \hat L^2 + \hat S^2 + 2 \hat L \cdot \hat S \implies \hat L \cdot \hat S = \frac{1}{2}(\hat J^2 - \hat L^2 - \hat S^2),
+\]</p>
+
+<p>立刻得 \(\hat L \cdot \hat S\) 在 \((\ell, s, j, m_j)\) 基的<em>对角</em> 元:</p>
+
+<p>\[
+\langle \hat L \cdot \hat S\rangle = \frac{\hbar^2}{2}\left[j(j+1) - \ell(\ell+1) - s(s+1)\right].
+\]</p>
+
+<p>对 \(s = 1/2\): \(j = \ell + 1/2\) 时给 \(+\ell\hbar^2/2\); \(j = \ell - 1/2\) 时给 \(-(\ell+1)\hbar^2/2\)。差值 \((2\ell+1)\hbar^2/2\)。</p>
+
+<p>这个差值是<em>氢原子精细结构</em>（fine structure）的主要来源。\(n = 2\) 能级原本是简并的; SO 耦合把 \(2P_{1/2}\) 和 \(2P_{3/2}\) 分开（差约 \(4.5 \times 10^{-5}\) eV）。这条分裂在光谱上看到, 1916 Sommerfeld 用半经典量子化"<em>解释</em>", 1928 Dirac 方程<em>导出</em>。</p>
+
+<p>更精细的修正——相对论动能修正 + Darwin 项——见<a href="ch19.html">ch19</a> 微扰论的应用。</p>
+
+<h2 id="sec17-8">17.8 应用: 核磁共振 NMR / 磁共振成像 MRI</h2>
+
+<p>spin-1/2 不只是教科书概念。它是<em>核磁共振</em>（NMR）和<em>磁共振成像</em>（MRI）的物理基础——两种在化学、医学里每天用的技术。</p>
+
+<p>原理: 质子（氢原子核）是 \(s = 1/2\) 粒子, 有磁矩。把样本放进强静态磁场 \(\vec B_0 = B_0 \hat z\)（典型 1-7 T）, 质子 spin 在磁场里能量</p>
+
+<p>\[
+\hat H_0 = -\vec\mu \cdot \vec B_0 = -\gamma B_0 \hat S_z = -\frac{\gamma\hbar B_0}{2}\sigma_z,
+\]</p>
+
+<p>其中 \(\gamma\) 是<em>旋磁比</em>（gyromagnetic ratio, 质子约 \(2.675 \times 10^8\) rad/s/T）。两个能级</p>
+
+<p>\[
+E_\uparrow = -\gamma\hbar B_0/2, \qquad E_\downarrow = +\gamma\hbar B_0/2,
+\]</p>
+
+<p>分裂 \(\Delta E = \gamma\hbar B_0\)。对应跃迁频率 \(\omega_0 = \gamma B_0\)（Larmor 频率, 对 1.5 T 约 64 MHz, 在无线电频段）。</p>
+
+<p>NMR 做法: 在 \(\vec B_0\) 之上叠加一个<em>振荡</em> 横向磁场 \(\vec B_1(t) = B_1 \cos(\omega t) \hat x\)（远小于 \(B_0\)）。当 \(\omega = \omega_0\) <em>共振</em> 时, spin 在 \(\uparrow\) 和 \(\downarrow\) 之间反复跃迁——Rabi 振荡。详细的时间依赖处理见<a href="ch20.html">ch20</a> 时变微扰。</p>
+
+<p>关键发现: 不同<em>分子环境</em> 里的质子有微弱不同的<em>化学位移</em>（chemical shift, 因为电子云屏蔽核磁场）。比如水里的氢和脂肪里的氢 Larmor 频率差几个 ppm。NMR 通过精确扫频, 能<em>区分</em> 不同化学环境的氢——化学家用它做分子结构分析（"<em>NMR 谱</em>"）。</p>
+
+<p>MRI 在 NMR 之上加一个<em>空间梯度</em> 磁场 \(B_z(\vec r) = B_0 + \vec G \cdot \vec r\)。这让 Larmor 频率 \(\omega_0(\vec r) = \gamma(B_0 + \vec G \cdot \vec r)\) 变成<em>位置的函数</em>; 不同位置的质子在不同频率响应。配合 Fourier 重建, 把人体三维氢密度分布<em>成像</em>——这就是医院里看到的 MRI。无 X 射线, 软组织对比好, 已是医学影像主力。</p>
+
+<p>2003 年 Lauterbur + Mansfield 因 MRI 获 Nobel 医学奖。背后的物理就是 spin-1/2 在磁场里的两个能级 + 共振跃迁——本章的全部内容。</p>
+
+<h2 id="sec17-9">17.9 临别话</h2>
+
+<p>自旋是量子力学最纯粹的特征之一——它<em>没有</em> 经典对应, <em>不能</em> 被诠释为"小球绕轴自转"（电子如果真自转, 表面线速度会超光速）。它是<em>纯量子内蕴自由度</em>, 由代数 \([\hat S_x, \hat S_y] = i\hbar \hat S_z\) + 半整数表示完全定义。</p>
+
+<p>你这一章学到三件事:</p>
+
+<ul>
+  <li><em>2 维 Hilbert 空间</em> 是描述 spin-1/2 的最小空间——任何 2×2 厄米算子都是 \(c_0 I + \vec c \cdot \vec\sigma\) 的线性组合, Pauli 矩阵 \(\sigma_x, \sigma_y, \sigma_z\) 加上单位矩阵<em>张成</em> 所有 2×2 厄米算子（在线性代数意义下）。这个观察让 spin-1/2 成为量子计算"<em>qubit</em>" 的标准模型——一个 qubit = 一个 spin-1/2, 量子门 = 2×2 幺正矩阵。<a href="ch23.html">ch23</a> 把它们重新拣起。</li>
+  <li><em>Pauli 矩阵代数</em> \(\sigma_i \sigma_j = \delta_{ij} I + i \varepsilon_{ijk} \sigma_k\) 是后续所有 spin 算的工具。要熟练。</li>
+  <li><em>Stern-Gerlach 三步实验</em> 把测量公设的"<em>不可对易 → 信息擦除</em>" 做成具体可验证的实验。这是物理学家<em>不</em> 怀疑 QM 的一个原因——它的预测百年实验从未失手。</li>
+</ul>
+
+<p>下一章我们看一种<em>新原则</em>——同种粒子<em>不可区分</em>。两个电子互换<em>不</em> 是新态, 是<em>同一个</em> 态; 这条物理事实强迫多粒子波函数对称（玻色子）或反对称（费米子）。\(\sigma_z\) 是 spin 的"<em>方向标签</em>"; 反对称化是粒子的"<em>统计标签</em>"。两条标签合起来给出原子壳层、白矮星支撑、玻色凝聚——下一章细谈。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 氢原子完整解</a><a href="ch18.html">下一章 · 第 18 章 全同粒子与反对称化 →</a></nav>
+</main>
+</body>
+</html>

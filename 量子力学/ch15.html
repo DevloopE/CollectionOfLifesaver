@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 15 章 球对称势 + 球谐函数 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 角动量算子与对易关系</a><a href="ch16.html">下一章 · 第 16 章 氢原子 →</a></nav>
+<h1 id="ch15">第 15 章 球对称势 + 球谐函数</h1>
+
+<p>请你想一个具体问题。一个粒子在 3D 空间, 受到一个力。力的<em>大小</em>只跟距离原点的远近 \(r\) 有关——离得越近力越强（或越弱）, 与方向<em>无关</em>。这种势叫<em>球对称势</em> \(V = V(r)\)。</p>
+
+<p>例子充满物理学：地球绕太阳——\(V = -GMm/r\)（Newton 引力）, 球对称。氢原子电子绕质子——\(V = -e^2/(4\pi\epsilon_0 r)\)（Coulomb 引力）, 球对称。3D 谐振子 \(V = \frac{1}{2} k r^2\), 球对称。3D 无限球势阱 \(V = 0\) for \(r < a\), \(\infty\) for \(r > a\), 球对称。<em>整个</em> 原子物理 + 行星天文都建立在球对称势上——因为粒子之间的基本相互作用（引力、Coulomb 力）都是球对称的。</p>
+
+<p>3D Schrödinger 方程</p>
+
+<p>\[
+-\frac{\hbar^2}{2m} \nabla^2 \psi + V(\boldsymbol r) \psi = E \psi
+\]</p>
+
+<p>对一般 \(V(\boldsymbol r)\) 是 PDE in 三个变量 (\(x, y, z\)), 解起来恶心。但当 \(V = V(r)\) 球对称时, 我们能<em>分离变量</em>: 假设 \(\psi(r, \theta, \phi) = R(r) Y(\theta, \phi)\), Schrödinger 方程<em>裂成</em> 一个径向常微分方程 + 一个角向"<em>球谐</em>" 方程。<em>3D 问题归约到 1D</em>。</p>
+
+<p>而且角向部分<em>已经被解过了</em>——就是<a href="ch14.html">ch14</a> 的 \(Y_l^m(\theta, \phi)\), 与势 \(V(r)\) <em>无关</em>。所以解球对称势的 SE 永远先把球谐函数"<em>套上</em>", 剩下径向 \(R(r)\) 满足一个看起来像 1D SE 的方程, 多了一个<em>离心势项</em> \(\hbar^2 l(l+1)/(2 m r^2)\)。本章要走完这条分离变量, 把球谐函数显式写出来, 然后用两个例子（无限球势阱 + 3D 谐振子）兑现"<em>归约到 1D</em>"。</p>
+
+<h2 id="sec15-1">15.1 球坐标下的 \(\nabla^2\)</h2>
+
+<p>3D Laplacian 在直角坐标 \(\nabla^2 = \partial_x^2 + \partial_y^2 + \partial_z^2\)。换到球坐标 \((r, \theta, \phi)\):</p>
+
+<ul>
+<li>\(r\)：到原点距离, \(r \ge 0\)</li>
+<li>\(\theta\)：与 \(z\) 轴夹角, \(0 \le \theta \le \pi\)</li>
+<li>\(\phi\)：在 \(xy\) 平面绕 \(z\) 轴方位角, \(0 \le \phi < 2\pi\)</li>
+</ul>
+
+<p>变换关系 \(x = r\sin\theta\cos\phi, y = r\sin\theta\sin\phi, z = r\cos\theta\)。</p>
+
+<p>用链式法则把 \(\nabla^2\) 化到 \((r, \theta, \phi)\)（推导烦琐, 此处<em>引用</em> 多元微积分课的标准结果）：</p>
+
+<p>\[
+\boxed{\ \nabla^2 = \frac{1}{r^2} \frac{\partial}{\partial r}\left( r^2 \frac{\partial}{\partial r}\right) + \frac{1}{r^2 \sin\theta} \frac{\partial}{\partial \theta}\left( \sin\theta \frac{\partial}{\partial \theta}\right) + \frac{1}{r^2 \sin^2\theta} \frac{\partial^2}{\partial \phi^2}.\ }
+\]</p>
+
+<p>请你停下来盯住这个表达式的<em>结构</em>。径向部分 \(r^{-2} \partial_r (r^2 \partial_r)\) 只含 \(r\)。角向部分（中间 + 后面两项）只含 \(\theta, \phi\), 而且<em>都带 \(1/r^2\)</em>。把角向部分括起来写</p>
+
+<p>\[
+\nabla^2 = \frac{1}{r^2} \frac{\partial}{\partial r}\left( r^2 \frac{\partial}{\partial r}\right) - \frac{1}{r^2 \hbar^2} \hat L^2,
+\]</p>
+
+<p>其中 \(\hat L^2\) 是<a href="ch14.html">ch14</a> 14.8 节给出的角动量平方算子的微分形式</p>
+
+<p>\[
+\hat L^2 = -\hbar^2 \left[ \frac{1}{\sin\theta} \frac{\partial}{\partial \theta}\left( \sin\theta \frac{\partial}{\partial \theta}\right) + \frac{1}{\sin^2\theta} \frac{\partial^2}{\partial \phi^2}\right].
+\]</p>
+
+<p>这条等式不是巧合——\(\hat L^2\) 本来就是位置空间的 "<em>角动量大小平方</em>" 算子, 它<em>就是</em> \(\nabla^2\) 的角向部分（乘个 \(-\hbar^2\)）。这说明 3D 动能算子 \(-\frac{\hbar^2}{2m} \nabla^2\) 自然分成"<em>径向动能</em> + 离心势"两部分, 其中离心势就是 \(\hat L^2/(2 m r^2)\)。</p>
+
+<h2 id="sec15-2">15.2 分离变量假设</h2>
+
+<p>3D 时间无关 SE</p>
+
+<p>\[
+\hat H \psi = \left[-\frac{\hbar^2}{2m} \nabla^2 + V(r)\right] \psi = E \psi.
+\]</p>
+
+<p>代入分离形式 \(\psi(r, \theta, \phi) = R(r) Y(\theta, \phi)\):</p>
+
+<p>\[
+-\frac{\hbar^2}{2m} \left[\frac{Y}{r^2} \frac{d}{dr}\left(r^2 \frac{dR}{dr}\right) - \frac{R}{r^2 \hbar^2} \hat L^2 Y\right] + V(r) R Y = E R Y.
+\]</p>
+
+<p>两边除以 \(R Y / r^2\), 并乘 \(-2m/\hbar^2\):</p>
+
+<p>\[
+\frac{1}{R} \frac{d}{dr}\left(r^2 \frac{dR}{dr}\right) - \frac{2 m r^2}{\hbar^2} [V(r) - E] = \frac{1}{\hbar^2 Y} \hat L^2 Y.
+\]</p>
+
+<p>左边只含 \(r\), 右边只含 \(\theta, \phi\)。两边相等只能<em>都等于一个常数</em>。约定写这常数为 \(l(l+1)\)（事先知道答案——14.6 节的 \(l\)）。所以分成两条:</p>
+
+<p>角向方程：</p>
+
+<p>\[
+\hat L^2 Y(\theta, \phi) = \hbar^2 l(l+1) Y(\theta, \phi).
+\]</p>
+
+<p>径向方程：</p>
+
+<p>\[
+\frac{1}{r^2} \frac{d}{dr}\left(r^2 \frac{dR}{dr}\right) + \left[\frac{2m}{\hbar^2} (E - V(r)) - \frac{l(l+1)}{r^2}\right] R = 0.
+\]</p>
+
+<p><em>两条方程互相独立</em>: 角向方程<em>不</em> 含 \(V\)（与势无关）, 径向方程<em>不</em> 含 \(\theta, \phi\)（与方向无关）。这是球对称势的<em>结构性礼物</em>——一旦 \(V\) 球对称, 角向部分永远长一样。</p>
+
+<h2 id="sec15-3">15.3 角向解 = 球谐函数 \(Y_l^m\)</h2>
+
+<p>角向方程 \(\hat L^2 Y = \hbar^2 l(l+1) Y\) 已经在<a href="ch14.html">ch14</a> 用<em>对易代数</em> 解过——本征值 \(\hbar^2 l(l+1)\) for \(l = 0, 1, 2, \ldots\), 每个 \(l\) 对应 \(2l+1\) 个本征态, 标记 \(m = -l, \ldots, l\)。</p>
+
+<p>本章告诉你这些<em>本征函数的显式形式</em>。继续分离 \(Y(\theta, \phi) = \Theta(\theta) \Phi(\phi)\), 代入 \(\hat L^2 Y = \hbar^2 l(l+1) Y\), 类似拆开得：</p>
+
+<p>\(\Phi\) 满足 \(\Phi'' = -m^2 \Phi\), 解 \(\Phi(\phi) = e^{i m \phi}\)。\(2\pi\)-周期性强迫 \(m\) 整数。</p>
+
+<p>\(\Theta\) 满足缔合 Legendre 方程 \(\sin\theta (\sin\theta \Theta')' + [l(l+1) \sin^2\theta - m^2] \Theta = 0\)。换 \(u = \cos\theta\), 标准缔合 Legendre 方程, 解是缔合 Legendre 函数 \(P_l^m(u)\)（链<a href="../微分方程/index.html">微分方程</a>第 13 章特殊函数）。\(P_l^m\) 是 \((1 - u^2)^{m/2}\) 乘以 \(l\) 次多项式, 在 \(u = \pm 1\) （即 \(\theta = 0, \pi\)）有限。</p>
+
+<p>合起来:</p>
+
+<p>\[
+\boxed{\ Y_l^m(\theta, \phi) = N_{lm} \, P_l^m(\cos\theta) \, e^{i m \phi},\ }
+\]</p>
+
+<p>其中 \(N_{lm}\) 是归一化常数</p>
+
+<p>\[
+N_{lm} = (-1)^m \sqrt{\frac{(2l + 1)}{4\pi} \cdot \frac{(l - m)!}{(l + m)!}},
+\]</p>
+
+<p>使得 \(\int_0^{2\pi} \int_0^\pi |Y_l^m|^2 \sin\theta \, d\theta \, d\phi = 1\)。</p>
+
+<p>这是<em>球谐函数</em>。它们在 \(L^2(S^2)\) 上构成正交完备基:</p>
+
+<p>\[
+\int Y_l^{m \, *} Y_{l'}^{m'} \, d\Omega = \delta_{ll'} \delta_{mm'},
+\]</p>
+
+<p>\(d\Omega = \sin\theta \, d\theta \, d\phi\) 是球面立体角元素。</p>
+
+<h2 id="sec15-4">15.4 球谐函数前几个 + 物理可视化</h2>
+
+<p>\(l = 0\)（s 轨道）：</p>
+
+<p>\[
+Y_0^0 = \frac{1}{\sqrt{4\pi}}.
+\]</p>
+
+<p>常数, 球对称——s 轨道<em>没有</em> 角向偏好, 像一个均匀球。氢原子 1s, 2s, 3s 轨道角向部分都是它。</p>
+
+<p>\(l = 1\)（p 轨道）：</p>
+
+<p>\[
+Y_1^0 = \sqrt{\frac{3}{4\pi}} \cos\theta, \quad Y_1^{\pm 1} = \mp \sqrt{\frac{3}{8\pi}} \sin\theta \, e^{\pm i\phi}.
+\]</p>
+
+<p>\(Y_1^0\) 沿 \(z\) 轴有"<em>双瓣</em>"——上半 \(\cos\theta > 0\), 下半 \(\cos\theta < 0\), 在赤道是节面。化学家叫它 \(p_z\) 轨道。</p>
+
+<p>\(Y_1^{\pm 1}\) 是复值。化学里常把它们组合成实值:</p>
+
+<p>\[
+p_x = \frac{1}{\sqrt 2}(Y_1^{-1} - Y_1^1) \propto \sin\theta \cos\phi = \frac{x}{r}, \quad p_y = \frac{i}{\sqrt 2}(Y_1^{-1} + Y_1^1) \propto \sin\theta \sin\phi = \frac{y}{r}.
+\]</p>
+
+<p>\(p_x, p_y, p_z\) 在 x, y, z 轴上分别有"<em>双瓣</em>"，三两正交。<em>三个 \(l = 1\) 状态</em> = 三个互相垂直的 p 轨道。</p>
+
+<p>\(l = 2\)（d 轨道）：5 个状态, 标准化学化为 \(d_{z^2}, d_{xz}, d_{yz}, d_{x^2-y^2}, d_{xy}\)。形状更复杂——四瓣（\(d_{xy}, d_{x^2-y^2}\) 等）或者"<em>甜甜圈 + 哑铃</em>"（\(d_{z^2}\)）。这些是过渡金属化学的核心。</p>
+
+<p>请你画一遍这些图（任何 QM 教材都有）。\(l\) 越大, 角向越复杂——\(l\) 表示"<em>有多少节面</em>"（\(l\) 个）。物理直觉: \(l\) 越大, 离心势 \(\hbar^2 l(l+1)/(2 m r^2)\) 越强, 粒子被推离原点更厉害, 角向"<em>波纹</em>" 越多。</p>
+
+<h2 id="sec15-5">15.5 径向 SE</h2>
+
+<p>回到分离出来的径向方程:</p>
+
+<p>\[
+\frac{1}{r^2} \frac{d}{dr}\left(r^2 \frac{dR}{dr}\right) + \left[\frac{2m}{\hbar^2} (E - V(r)) - \frac{l(l+1)}{r^2}\right] R = 0.
+\]</p>
+
+<p>这看起来还不像 1D SE。技巧——换变量 \(u(r) := r R(r)\), 即 \(R = u/r\)。算 \((1/r^2)(r^2 R')' = (R + r R')'/r = (R + r R')'/r\), 慢慢推一推（或者直接验证）:</p>
+
+<p>\[
+\frac{1}{r^2} \frac{d}{dr}\left(r^2 \frac{dR}{dr}\right) = \frac{1}{r} \frac{d^2 (rR)}{d r^2} = \frac{1}{r} \frac{d^2 u}{dr^2}.
+\]</p>
+
+<p>代回, 两边乘 \(r\):</p>
+
+<p>\[
+\frac{d^2 u}{dr^2} + \left[\frac{2m}{\hbar^2}(E - V(r)) - \frac{l(l+1)}{r^2}\right] u = 0.
+\]</p>
+
+<p>整理</p>
+
+<p>\[
+\boxed{\ -\frac{\hbar^2}{2 m} \frac{d^2 u}{dr^2} + V_{\text{eff}}(r) \, u = E u, \quad V_{\text{eff}}(r) := V(r) + \frac{\hbar^2 l(l+1)}{2 m r^2}.\ }
+\]</p>
+
+<p>这<em>就是</em> 1D 时间无关 Schrödinger 方程! 形式与<a href="ch6.html">ch6</a>-<a href="ch8.html">8</a> 完全一样, 只是势变成<em>有效势</em> \(V_{\text{eff}}\)。径向问题归约到熟悉的 1D 谱问题。</p>
+
+<p>归一化条件: \(\int |\psi|^2 d^3 r = \int_0^\infty |R|^2 r^2 \, dr \cdot \int |Y|^2 d\Omega = \int_0^\infty |R|^2 r^2 \, dr = \int_0^\infty |u|^2 \, dr = 1\)。所以在 \(u\) 这一面上归一化和 1D SE 完全一样。</p>
+
+<p>边界条件:</p>
+
+<ul>
+<li>\(r \to \infty\): \(u \to 0\)（束缚态）</li>
+<li>\(r \to 0\): \(u(0) = 0\)（否则 \(R = u/r \to \infty\), 物理上波函数发散; 严格来说 \(\nabla^2 (1/r) = -4\pi \delta^3(\boldsymbol r)\), 在原点产生 \(\delta\) 源, 除非 \(V\) 也有 \(\delta\), 否则 SE 在原点不成立）</li>
+</ul>
+
+<p>\(u(0) = 0\) 这条边界条件让径向问题<em>等价于</em> 一个"<em>定义在 \(r > 0\) 的 1D SE, 在 \(r = 0\) 处反射壁</em>"。<a href="ch6.html">ch6</a> 1D 无限深势阱的所有技术直接搬过来。</p>
+
+<h2 id="sec15-6">15.6 离心势的物理意义</h2>
+
+<p>有效势</p>
+
+<p>\[
+V_{\text{eff}} = V(r) + \frac{\hbar^2 l(l+1)}{2 m r^2}.
+\]</p>
+
+<p>多出来的项 \(\hbar^2 l(l+1)/(2 m r^2)\) 叫<em>离心势</em>（centrifugal barrier）。它<em>正</em>, 在 \(r \to 0\) 时发散到 \(+\infty\), 在 \(r \to \infty\) 时趋 0。</p>
+
+<p>经典对应: 一颗有角动量 \(L\) 的粒子绕中心运动, 角动量守恒强迫粒子<em>不能径直撞向中心</em>——它必须保持一个最小距离（"<em>近心点</em>"）。在径向问题里这表现为有效势 \(L^2 / (2 m r^2)\)（写过经典力学的人马上就认出来——这就是<em>有效势能</em> 法处理中心力问题的标准技术）。量子里 \(L^2 \to \hbar^2 l(l+1)\), 完全平行。</p>
+
+<p>物理后果：</p>
+
+<ul>
+<li><em>\(l = 0\)（s 态）</em>: 没有离心势, 波函数<em>可以</em> 在原点取非零值（事实上 \(R(0) \neq 0\), \(u(0) = 0\) 但 \(u'(0) \neq 0\)）。\(|\psi|^2\) 在 \(r = 0\) 处<em>有限非零</em>——电子有一定概率"<em>在</em> 核里"。这条对超精细分裂、Mössbauer 效应都重要。</li>
+<li><em>\(l \ge 1\)（p, d, ... 态）</em>: 离心势把波函数<em>推离</em> 原点。在小 \(r\) 处 \(V_{\text{eff}} \approx \hbar^2 l(l+1)/(2 m r^2)\) 主导, 解 \(u \sim r^{l+1}\)（推导：把 \(u = r^\alpha\) 代进, 平衡 \(u'' \sim \alpha(\alpha-1) r^{\alpha-2}\) 与 \(l(l+1) u/r^2 \sim l(l+1) r^{\alpha-2}\), 得 \(\alpha(\alpha-1) = l(l+1)\), 即 \(\alpha = l+1\) 或 \(\alpha = -l\)；后者发散舍去）。</li>
+</ul>
+
+<p>所以 \(R(r) = u/r \sim r^l\) 在原点附近——\(l\) 越大, 波函数被"<em>挤走</em>" 越厉害。p 电子在原点附近有 \(R \sim r\), d 电子有 \(R \sim r^2\), 等等。</p>
+
+<h2 id="sec15-7">15.7 应用一: 3D 无限球势阱</h2>
+
+<p>具体物理问题——粒子被困在半径 \(a\) 的球内</p>
+
+<p>\[
+V(r) = \begin{cases} 0, & r < a, \\ +\infty, & r \ge a. \end{cases}
+\]</p>
+
+<p>这就像<a href="ch6.html">ch6</a> 的 1D 无限深势阱的 3D 版。</p>
+
+<p>径向方程在 \(r < a\): \(V = 0\), 所以</p>
+
+<p>\[
+\frac{d^2 u}{dr^2} + \left[k^2 - \frac{l(l+1)}{r^2}\right] u = 0, \qquad k = \sqrt{2 m E}/\hbar.
+\]</p>
+
+<p>这是球 Bessel 方程。解 \(u(r) = A r j_l(kr) + B r y_l(kr)\), \(j_l, y_l\) 是球 Bessel 函数。\(y_l\) 在 \(r = 0\) 处发散, 边界 \(u(0) = 0\) 强迫 \(B = 0\)。所以</p>
+
+<p>\[
+u(r) = A r j_l(kr), \quad R(r) = A j_l(kr).
+\]</p>
+
+<p>边界 \(R(a) = 0\)（壁外波函数 0, 连续性）：\(j_l(ka) = 0\)。设 \(\beta_{nl}\) 是 \(j_l\) 的第 \(n\) 个正零点（\(n = 1, 2, 3, \ldots\)）, 则 \(k a = \beta_{nl}\), 即</p>
+
+<p>\[
+\boxed{\ E_{nl} = \frac{\hbar^2 \beta_{nl}^2}{2 m a^2}.\ }
+\]</p>
+
+<p>具体数：</p>
+
+<ul>
+<li>\(l = 0\): \(j_0(x) = \sin x / x\), 零点 \(\beta_{n0} = n\pi\), 所以 \(E_{n0} = \hbar^2 n^2 \pi^2 / (2 m a^2)\)。这<em>就是</em> 1D 无限深势阱的能级——意外吗？不意外: \(j_0\) 是 \(\sin/x\), 径向 \(R = \sin(k r)/r\), 等价于 1D 上一个反射壁的 \(\sin\)。</li>
+<li>\(l = 1\): \(j_1(x) = \sin x / x^2 - \cos x / x\), 第一个零点 \(\beta_{11} \approx 4.49\)。\(E_{11} \approx 4.49^2/\pi^2 \approx 2.05\) 倍 \(l = 0\) 基态能量。</li>
+<li>\(l = 2\): \(\beta_{12} \approx 5.76\), \(E_{12}/E_{10} \approx 5.76^2/\pi^2 \approx 3.36\)。</li>
+</ul>
+
+<p>这给出的能级谱不是简单的 \(n^2\)（不像 1D 势阱）, 也不是简单的 \(n + l\)（不像 3D 谐振子）, 而是不规则的——每个 \(l\) 一组零点, 互相穿插。</p>
+
+<p>简并度: 每个 \((n, l)\) 能级有 \(2l + 1\) 个 \(m\) 子态——简并度 \(2l + 1\)（不计自旋）。</p>
+
+<h2 id="sec15-8">15.8 应用二: 3D 各向同性谐振子</h2>
+
+<p>\(V(r) = \frac{1}{2} m\omega^2 r^2 = \frac{1}{2} m\omega^2 (x^2 + y^2 + z^2)\)。球对称, 所以本章方法可以做。但<em>同样</em> 这个势在直角坐标下<em>分离变量</em> 也很简单——\(\hat H = \hat H_x + \hat H_y + \hat H_z\), 三个独立 1D 谐振子（链<a href="ch7.html">ch7</a>）, 能级</p>
+
+<p>\[
+E_{n_x n_y n_z} = \hbar\omega(n_x + n_y + n_z + 3/2), \quad n_x, n_y, n_z = 0, 1, 2, \ldots
+\]</p>
+
+<p>记 \(N := n_x + n_y + n_z\), 总能 \(E_N = \hbar\omega(N + 3/2)\), \(N = 0, 1, 2, \ldots\)。</p>
+
+<p>简并度（多少种 \((n_x, n_y, n_z)\) 让 \(n_x + n_y + n_z = N\)）= \(\binom{N+2}{2} = (N+1)(N+2)/2\)。</p>
+
+<p>用球对称分离: 径向方程</p>
+
+<p>\[
+-\frac{\hbar^2}{2 m} \frac{d^2 u}{dr^2} + \left[\frac{1}{2} m \omega^2 r^2 + \frac{\hbar^2 l(l+1)}{2 m r^2}\right] u = E u.
+\]</p>
+
+<p>解（用 Hermite + Laguerre 多项式技术, 类似 ch7）：</p>
+
+<p>\[
+E_{n_r, l} = \hbar \omega (2 n_r + l + 3/2), \quad n_r = 0, 1, 2, \ldots
+\]</p>
+
+<p>\(n_r\) 是径向量子数（径向波函数节点数）。设 \(N := 2 n_r + l\), 则 \(E = \hbar\omega(N + 3/2)\)——和直角坐标的 \(N = n_x + n_y + n_z\) 完全吻合! 但<em>\(N\) 的分解方式不同</em>：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(N\)</th><th style="padding: 0.3em 1em;">直角分解 \((n_x, n_y, n_z)\)</th><th style="padding: 0.3em 1em;">球分解 \((n_r, l)\)</th><th style="padding: 0.3em 1em;">简并</th></tr>
+<tr><td>0</td><td>(0,0,0): 1 种</td><td>(0,0): 1×(2·0+1)=1</td><td>1</td></tr>
+<tr><td>1</td><td>(1,0,0)+排列: 3 种</td><td>(0,1): 1×(2·1+1)=3</td><td>3</td></tr>
+<tr><td>2</td><td>(2,0,0)+(1,1,0)+排列: 6 种</td><td>(0,2)+(1,0): 5+1=6</td><td>6</td></tr>
+<tr><td>3</td><td>(3,0,0)+(2,1,0)+(1,1,1)+...: 10 种</td><td>(0,3)+(1,1): 7+3=10</td><td>10</td></tr>
+</table>
+
+<p>两套基都张成同一个 \(N\) 能级的本征空间, 但用不同的对易算子集。直角坐标用 \(\{\hat H_x, \hat H_y, \hat H_z\}\)（互相对易）, 球坐标用 \(\{\hat H, \hat L^2, \hat L_z\}\)（互相对易）。<em>同一个空间的两组正交基</em>。</p>
+
+<p>请你停下来欣赏一下这件事。3D 谐振子<em>同时</em> 有直角对称（\(SO(3)\) 之外还有更多对称——实际上是 \(SU(3)\)）和球对称。这种"<em>意外</em>" 简并是 \(SO(3)\) 之上还有更大对称群的标志。氢原子也有类似的<em>意外</em> 简并（链<a href="ch16.html">ch16</a>）, 那里是 \(SO(4)\) 对称。这条话题超出本书范围, 但它告诉你: <em>简并度的"意外多" 永远暗示一个更大的隐藏对称群</em>。</p>
+
+<h2 id="sec15-9">15.9 临别话</h2>
+
+<p>这一章你看到三件事的合奏:</p>
+
+<ol>
+<li><em>球对称势的 SE 自动分离变量</em>——\(\psi = R(r) Y(\theta, \phi)\)。</li>
+<li><em>角向部分与势无关</em>——永远是球谐函数 \(Y_l^m\)。这条让所有"<em>原子物理</em>" 共享同一组角向波函数。</li>
+<li><em>径向问题归约到 1D SE</em>——加了一个有效离心势 \(\hbar^2 l(l+1)/(2 m r^2)\)。1D 的全部技术（势阱、谐振子、Schrödinger 解析技巧）直接搬过来。</li>
+</ol>
+
+<p>下一章把这套机器开到<em>最重要的</em> 球对称势—— Coulomb \(V = -e^2/(4\pi\epsilon_0 r)\), 即<em>氢原子</em>。径向方程会变成 Laguerre 方程, 解给 Laguerre 多项式 \(L_n^l\), 离散能级 \(E_n = -13.6 \text{ eV}/n^2\)（解释 ch1 Bohr 公式的<em>来源</em>）, 简并度 \(2 n^2\)。这是 QM 最漂亮的解析结果, 也是元素周期表的第一原理基础。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 角动量算子与对易关系</a><a href="ch16.html">下一章 · 第 16 章 氢原子 →</a></nav>
+</main>
+</body>
+</html>

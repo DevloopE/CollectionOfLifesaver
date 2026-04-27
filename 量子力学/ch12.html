@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 测量与塌缩 — 普林斯顿量子力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 不确定性原理</a><a href="ch13.html">下一章 · 第 13 章 Schrödinger vs Heisenberg 表象 →</a></nav>
+<h1 id="ch12">第 12 章 测量与塌缩</h1>
+
+<p>请你想象做下面这个实验。准备一个自旋-1/2 粒子（电子）在状态 \(|\psi\rangle = (|\uparrow\rangle + |\downarrow\rangle)/\sqrt 2\)——"<em>上自旋和下自旋的等权叠加</em>"。让它通过一个 Stern-Gerlach 磁铁（沿 \(z\) 轴方向梯度场）。</p>
+
+<p>磁铁会把"<em>上</em>" 自旋偏向上方, "<em>下</em>" 自旋偏向下方。理论预测——经典物理说粒子带某种角动量沿 \(z\) 的某个方向, 通过磁场会被偏到某个固定角度。一束在 \(|\psi\rangle\) 状态的粒子进入磁场, 你预期看到什么？</p>
+
+<p>实验结果: 屏幕上恰好两个亮点——一个上方, 一个下方, 各占一半粒子, <em>没有任何粒子落在中间</em>。换句话说, 每个粒子<em>要么</em> 完全"<em>上</em>" <em>要么</em> 完全"<em>下</em>", 没有"<em>半上半下</em>"。</p>
+
+<p>但我们准备的态<em>明明是</em> \(|\uparrow\rangle\) 和 \(|\downarrow\rangle\) 的叠加。叠加去哪了？——它"<em>塌缩</em>" 了。每个粒子在通过磁铁的瞬间, 被强制选择"<em>上</em>" 或"<em>下</em>", 概率各 1/2。叠加态的<em>叠加</em> 性质消失。</p>
+
+<p>这就是<em>量子测量</em> 的基本现象。它之所以是量子力学最哲学的问题, 是因为它和<a href="ch4.html">ch4</a> 学过的 Schrödinger 演化看起来<em>完全冲突</em>:</p>
+
+<ul>
+  <li>SE 演化 \(i\hbar \partial_t |\psi\rangle = \hat H |\psi\rangle\)——<em>确定性</em>（同样初态给同样末态）+ <em>可逆</em>（\(U(t)\) 是 unitary, \(U^{-1} = U^\dagger\)）+ <em>线性</em>（叠加保留: \(U(t)(\alpha|\psi_1\rangle + \beta|\psi_2\rangle) = \alpha U|\psi_1\rangle + \beta U|\psi_2\rangle\)）。</li>
+  <li>测量 \(|\psi\rangle \to |\uparrow\rangle\) 或 \(|\downarrow\rangle\)——<em>随机</em>（同样初态给不同末态, 概率分布）+ <em>不可逆</em>（你不能从 \(|\uparrow\rangle\) 反推回原叠加）+ <em>非线性</em>（叠加被破坏）。</li>
+</ul>
+
+<p>这两条动力学怎么共存？这就是<em>测量问题</em>(measurement problem), 量子力学最大的诠释难题。这一章我把测量的标准框架（Born + 投影假设）讲完, 然后看测量问题的几种回答（哥本哈根 / 多世界 / 隐变量 / decoherence), 不过分深入但要让你看见它的轮廓。</p>
+
+<h2 id="sec12-1">12.1 两种动力学: SE 演化 vs 测量</h2>
+
+<p>把上面的对照写得更细。</p>
+
+<p>SE 演化是<a href="ch9.html">ch9</a>-<a href="ch10.html">ch10</a> 我们写过的:</p>
+
+<p>\[
+i\hbar \frac{d|\psi\rangle}{dt} = \hat H |\psi\rangle.
+\]</p>
+
+<p>解形式 \(|\psi(t)\rangle = U(t) |\psi(0)\rangle\) where \(U(t) = e^{-i\hat H t/\hbar}\)。\(U(t)\) 是 unitary（保模、保内积）, 因此<em>可逆</em>。同一初态在两次同样的实验里给同一末态, <em>确定</em>。两个初态的叠加给两个末态的叠加, <em>线性</em>。</p>
+
+<p>这条动力学在你"<em>不看</em>" 系统的时候<em>一直</em> 在跑。粒子在磁铁里走, 波函数按 SE 演化, 整个过程都<em>没有</em> "<em>塌缩</em>" 出现。</p>
+
+<p>然后你<em>看</em>。具体说: 在屏幕上看粒子落在哪。瞬间<em>结果</em> 是个具体值——某个确定的位置——而<em>不</em> 是个概率分布。这个"<em>看 → 得到具体结果</em>" 的瞬间, 波函数被假设<em>塌缩</em> 到与那个结果对应的本征态。</p>
+
+<p>请你看这两条动力学的"<em>性格冲突</em>":</p>
+
+<table style="margin: 1em auto; border-collapse: collapse; border: 1px solid #888;">
+<tr><th style="padding: 0.4em 1em; border: 1px solid #888;">性质</th><th style="padding: 0.4em 1em; border: 1px solid #888;">SE 演化</th><th style="padding: 0.4em 1em; border: 1px solid #888;">测量</th></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #888;">确定性</td><td style="padding: 0.3em 1em; border: 1px solid #888;">是</td><td style="padding: 0.3em 1em; border: 1px solid #888;">否（随机）</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #888;">可逆</td><td style="padding: 0.3em 1em; border: 1px solid #888;">是 (\(U^{-1}=U^\dagger\))</td><td style="padding: 0.3em 1em; border: 1px solid #888;">否（信息丢失）</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #888;">线性</td><td style="padding: 0.3em 1em; border: 1px solid #888;">是</td><td style="padding: 0.3em 1em; border: 1px solid #888;">否（投影非线性）</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #888;">连续</td><td style="padding: 0.3em 1em; border: 1px solid #888;">是 (\(U(t)\) 强连续)</td><td style="padding: 0.3em 1em; border: 1px solid #888;">否（瞬时跳）</td></tr>
+</table>
+
+<p>每一条对照都<em>反</em>。但实验明明告诉我们两种行为都存在。<em>怎么调和</em>？</p>
+
+<p>这条问题的<em>哲学含义</em>——它问"<em>什么是测量</em>"。如果"<em>测量</em>" 就是粒子和某个仪器的相互作用, 那仪器本身也是个量子系统（仪器是原子组成的）, 它和粒子应该按 SE 演化(unitary, 保叠加), 不应该出现"<em>塌缩</em>"。但宏观仪器读数<em>实际上</em> 给出确定结果, <em>不</em> 是叠加。这条"<em>从微观叠加到宏观确定</em>" 的转折在哪发生？这是测量问题的真正硬核。</p>
+
+<p>下面几节先把"<em>标准</em>" 框架写完, 12.6 后再看几种诠释。</p>
+
+<h2 id="sec12-2">12.2 哥本哈根诠释 + Born 概率</h2>
+
+<p>1927 年 Bohr + Heisenberg + Born 在哥本哈根形成的"<em>哥本哈根诠释</em>" 是量子力学的<em>标准</em> 操作手册。它有三条:</p>
+
+<ul>
+  <li><strong>(C1) 状态</strong>。系统由 Hilbert 空间向量 \(|\psi\rangle\) 描述（归一化, \(\langle \psi|\psi\rangle = 1\)）。两条动力学并存:
+    <ul>
+      <li>"<em>不看</em>" 时, \(|\psi\rangle\) 按 SE 演化。</li>
+      <li>"<em>看</em>"（测量）时, \(|\psi\rangle\) 按下面 (C3) 塌缩。</li>
+    </ul></li>
+  <li><strong>(C2) Born 概率</strong>。测量自伴算子 \(\hat A\)（带本征值 \(a_n\), 本征态 \(|n\rangle\)）, 得到结果 \(a_n\) 的概率
+    \[
+    P(a_n) = |\langle n | \psi\rangle|^2.
+    \]</li>
+  <li><strong>(C3) 投影假设</strong>。测得 \(a_n\) 后, 系统瞬时塌缩到对应本征态 \(|n\rangle\):
+    \[
+    |\psi\rangle \xrightarrow{\text{测得 } a_n} |n\rangle.
+    \]</li>
+</ul>
+
+<p>这三条加上 SE 演化, 量子力学就<em>完全</em> 操作可计算了。它告诉你:</p>
+
+<ul>
+  <li>(怎么算) 给定初态 \(|\psi(0)\rangle\), 用 SE 演化到测量时刻 \(|\psi(t)\rangle\); 用 Born 给出测量结果的概率分布; 测得某个结果后用投影假设给出新态。</li>
+  <li>(不告诉你) "<em>塌缩</em>" 在物理上<em>是什么</em>; 哪种相互作用算"<em>测量</em>"; 宏观仪器为什么"<em>选边</em>"。</li>
+</ul>
+
+<p>哥本哈根诠释的态度——"<em>闭嘴算就行</em>"（"<em>shut up and calculate</em>"）。它把测量当作一条<em>原始公设</em>, 不问它的内部机制。这条态度让量子力学在 1930 年代<em>立即</em> 可用; 但它把哲学问题<em>推迟</em> 到 1960 年代之后才被认真对待。</p>
+
+<p>请你先接受 (C1)-(C3) 当工作框架, 后面 12.6 起再看其它诠释怎么不同。</p>
+
+<h2 id="sec12-3">12.3 投影算子和投影假设的几何</h2>
+
+<p>投影假设 (C3) 用<em>投影算子</em> 写得更整洁。设 \(\hat A\) 有谱分解</p>
+
+<p>\[
+\hat A = \sum_n a_n \hat P_n, \qquad \hat P_n = |n\rangle\langle n|,
+\]</p>
+
+<p>其中 \(\hat P_n\) 是到第 \(n\) 个本征子空间的<em>投影算子</em>（\(\hat P_n^2 = \hat P_n\), \(\hat P_n^\dagger = \hat P_n\), \(\sum_n \hat P_n = \hat I\)）。</p>
+
+<p>投影假设可以写成</p>
+
+<p>\[
+\boxed{\ |\psi\rangle \xrightarrow{\text{测得 } a_n} \frac{\hat P_n |\psi\rangle}{\|\hat P_n |\psi\rangle\|}.\ }
+\]</p>
+
+<p>分子是 \(|\psi\rangle\) 投到第 \(n\) 个本征子空间的部分; 分母重新归一。Born 概率自然给</p>
+
+<p>\[
+P(a_n) = \|\hat P_n |\psi\rangle\|^2 = \langle\psi | \hat P_n | \psi\rangle.
+\]</p>
+
+<p>这条公式更<em>一般</em>——它对<em>退化</em> 谱（多个本征向量对应同一本征值, 即 \(\hat P_n\) 投到一个 \(>1\) 维子空间）也对。退化情形下塌缩后的态不一定是单本征向量, 而是子空间里的某个具体向量, 由 \(\hat P_n |\psi\rangle\) 自然挑出。</p>
+
+<p>几何上请你画一画——\(|\psi\rangle\) 是 Hilbert 空间里的单位向量。本征子空间 \(\{n\}\) 给一组互相正交的"<em>方向</em>" / "<em>子空间</em>"。投影到第 \(n\) 个就是把 \(|\psi\rangle\) 在那个方向 / 子空间上的<em>分量</em> 抽出来。Born 概率就是这个分量长度的平方。<em>勾股定理</em> 给 \(\sum_n P(a_n) = \sum_n \|\hat P_n\psi\|^2 = \|\psi\|^2 = 1\)——概率自动归一。</p>
+
+<p>这种"<em>测量 = 投影 + 归一 + Born 概率</em>" 的几何描述常被称为 <em>von Neumann 投影测量</em>(projective measurement, 1932 年 von Neumann 在《量子力学的数学基础》里给出)。它是测量公设的最常见形式。</p>
+
+<h2 id="sec12-4">12.4 顺序测量 (i): 重复性</h2>
+
+<p>测量假设有个<em>立即</em> 推论——"<em>同一观测连测两次给同样结果</em>"。具体地: 测 \(\hat A\) 得 \(a_n\), <em>立刻</em> 再测 \(\hat A\), 必得 \(a_n\)。</p>
+
+<p>证明: 第一次测后, 态变 \(|n\rangle = \hat P_n|\psi\rangle / \|\cdot\|\)（设非退化, 是 \(\hat A\) 的第 \(n\) 个本征向量）。"<em>立刻</em>" 表示中间没经过 SE 演化, 态仍是 \(|n\rangle\)。第二次测 \(\hat A\) 得 \(a_m\) 的概率</p>
+
+<p>\[
+P(a_m | \text{首测得 } a_n) = |\langle m|n\rangle|^2 = \delta_{mn}.
+\]</p>
+
+<p>所以必得 \(a_n\), 概率 1。\(\blacksquare\)</p>
+
+<p>这条"<em>重复性</em>" 听起来朴素但<em>非常</em> 重要。它是<em>测量结果在物理上有意义</em> 的基础——如果你测出"<em>电子动量是 \(p_0\)</em>", 你立刻测一次还是 \(p_0\), 这个值就是电子动量, 不是个偶然抽签。这条性质把 \(a_n\) 这个数字称为"<em>电子在测后状态下的动量</em>" 是合理的。</p>
+
+<p>请你想象——如果<em>没有</em> 重复性, 量子力学的"<em>测量</em>" 这个概念就基本没意义了。每次测都给个随机数, 你完全不能说"<em>这个粒子的动量是某某</em>"。重复性赋予测量<em>语义</em>。</p>
+
+<h2 id="sec12-5">12.5 顺序测量 (ii): 不相容观测的互补性</h2>
+
+<p>对照——测两个<em>不相容</em> 观测会怎样？</p>
+
+<p>设 \([\hat A, \hat B] \ne 0\), 它们没有共同的完整本征基。本征态 \(|n\rangle_A, |m\rangle_B\) 之间一般 \(\langle m_B | n_A\rangle \ne 0\) 但 \(\ne \delta_{mn}\)。</p>
+
+<p>从初态 \(|\psi\rangle\) 出发——</p>
+
+<ul>
+  <li>测 \(\hat A\), 概率 \(P(a_n) = |\langle n_A|\psi\rangle|^2\) 得 \(a_n\), 态变 \(|n_A\rangle\)。</li>
+  <li>立刻测 \(\hat B\), 概率 \(P(b_m | a_n) = |\langle m_B|n_A\rangle|^2\) 得 \(b_m\), 态变 \(|m_B\rangle\)。</li>
+  <li>立刻再测 \(\hat A\), 概率 \(P(a_k | b_m) = |\langle k_A|m_B\rangle|^2\) 得 \(a_k\)。</li>
+</ul>
+
+<p>关键: 第三次测 \(\hat A\) 的结果<em>不一定</em> 是 \(a_n\)。第二次测 \(\hat B\) 把态从 \(|n_A\rangle\) 推到 \(|m_B\rangle\), 后者一般<em>不是</em> \(\hat A\) 的本征态, 所以再测 \(\hat A\) 的结果是个<em>新</em> 概率分布。第一次测 \(\hat A\) 的"<em>记忆</em>" 被擦了。</p>
+
+<p>这就是 Bohr 强调的<em>互补性</em>(complementarity)——位置和动量是"<em>互补</em>" 的, 知道一个就不能同时知道另一个; 知道得越准越互相干扰。<em>测量动作</em> 改变状态, 不仅仅"<em>读取</em>" 它。</p>
+
+<p>用 Stern-Gerlach 链具体看。粒子在 \(|\uparrow_z\rangle\) 通过 \(S_x\) 磁铁——\(|\uparrow_z\rangle = (|\uparrow_x\rangle + |\downarrow_x\rangle)/\sqrt 2\), 测 \(S_x\) 给 \(\pm \hbar/2\) 各 1/2。设得 \(+\hbar/2\), 态变 \(|\uparrow_x\rangle = (|\uparrow_z\rangle + |\downarrow_z\rangle)/\sqrt 2\)。再测 \(S_z\)——给 \(\pm \hbar/2\) 各 1/2。<em>原本知道的"沿 \(z\) 是上"完全丢了</em>。中间夹一个 \(S_x\) 测量, 把 \(z\) 信息抹掉。</p>
+
+<p>这条互补性的实验在 Stern-Gerlach 链里反复演示, 是量子测量"<em>非被动</em>" 的清楚证据。"<em>测量改变态</em>" 不是哲学修辞, 是可重复的实验事实。</p>
+
+<h2 id="sec12-6">12.6 Schrödinger 的猫</h2>
+
+<p>1935 年 Schrödinger 在一封批评哥本哈根诠释的信里给出"<em>猫</em>" 的思想实验:</p>
+
+<p>把一只猫关在密封盒子里, 配上: 一个原子（半衰期 1 小时）+ 一个 Geiger 计数器 + 一个毒气瓶。原子衰变 → 计数器响 → 毒气放出 → 猫死。1 小时后原子有 50% 概率衰变。</p>
+
+<p>按哥本哈根诠释——你不打开盒子时, 没有"<em>测量</em>", 整个系统按 SE 演化。原子 + 计数器 + 毒气 + 猫合在一起的波函数</p>
+
+<p>\[
+|\Psi\rangle = \frac{1}{\sqrt 2}\big( |\text{未衰}\rangle|\text{无毒}\rangle|\text{活猫}\rangle + |\text{已衰}\rangle|\text{有毒}\rangle|\text{死猫}\rangle\big).
+\]</p>
+
+<p>叠加。<em>猫处于"半活半死" 的叠加态</em>。</p>
+
+<p>这<em>显然</em> 反直觉。猫这个宏观物体怎么可能"<em>叠加</em>"？打开盒子瞬间塌缩到"<em>活</em>" 或"<em>死</em>", 这条"<em>测量</em>" 的瞬间 / 边界在哪？打开盒子的人是不是"<em>观察者</em>"？如果观察者也是个量子系统, 谁来观察观察者？</p>
+
+<p>这条思想实验把"<em>测量问题</em>" 从微观（电子叠加）放大到宏观（猫叠加）。哥本哈根诠释回答得不彻底——它<em>承认</em> 微观叠加, 但说宏观仪器 / 观察者"<em>不</em>" 处于叠加, 边界在哪没说。这条边界问题——"<em>Heisenberg cut</em>" / "<em>von Neumann 切口</em>"——是测量问题的核心。</p>
+
+<p>请你停下来想: 这<em>不</em> 是 Schrödinger 在反对量子力学算法（他自己写的方程）。他在指出哥本哈根诠释把测量当原始公设的<em>哲学不彻底</em>。70 年后这条困惑仍然没有完全解决。</p>
+
+<h2 id="sec12-7">12.7 退相干: 实际中"看起来塌缩"</h2>
+
+<p>20 世纪 70-80 年代 Zurek、Joos、Zeh 等人发展了<em>退相干</em>(decoherence) 理论, 给"<em>测量问题</em>" 一个<em>部分</em> 答案——不是诠释问题的彻底解决, 但是在"<em>为什么宏观看不到叠加</em>" 这个具体问题上很有说服力。</p>
+
+<p>核心想法: <em>没有完全孤立的量子系统</em>。任何"<em>系统</em>" \(S\) 都和"<em>环境</em>" \(E\)（空气分子、热辐射、宇宙背景辐射、…）相互作用。系统 + 环境合起来按 SE 演化（unitary, 保叠加）。但你只能观测系统 \(S\), 看不到环境 \(E\)——所以你算的是<em>约化密度矩阵</em>(reduced density matrix)</p>
+
+<p>\[
+\rho_S = \text{Tr}_E |\Psi_{SE}\rangle\langle \Psi_{SE}|.
+\]</p>
+
+<p>(<em>密度矩阵</em> 是 \(|\psi\rangle\langle\psi|\) 的推广, 用于描述混合态; <a href="ch22.html">ch22</a> 详谈纠缠时正式引入。)</p>
+
+<p>关键计算: 当系统和环境相互作用足够长时间, \(\rho_S\) 的<em>非对角</em> 矩阵元（"<em>相干性</em>"）<em>指数衰减到 0</em>:</p>
+
+<p>\[
+\rho_S = \sum_n |c_n|^2 |n\rangle\langle n| + \underbrace{\sum_{n\ne m} c_n c_m^* |n\rangle\langle m| \cdot e^{-t/\tau_d}}_{\to 0}.
+\]</p>
+
+<p>对宏观系统, \(\tau_d\) 极小（猫和空气相互作用的退相干时间 \(\sim 10^{-23}\) 秒）。剩下的 \(\rho_S\) 是<em>对角</em> 形式——经典概率分布的样子。<em>实际看起来</em> 系统已"<em>选定</em>" 某个本征态, 概率 \(|c_n|^2\)（恰好就是 Born）。</p>
+
+<p>这个结果<em>不需要</em> 测量公设, 它<em>纯</em> 是 SE + "<em>不看环境</em>" 的推论。它<em>解释</em> 了为什么宏观叠加在实验上看不到——退相干太快, 你来不及看到 \(\rho_S\) 还有非对角元。</p>
+
+<p>但请你注意——退相干<em>不</em> 完全解决测量问题。它给了"<em>看起来塌缩</em>"（\(\rho_S\) 对角化, 像经典概率混合）, <em>但</em> 没解释"<em>为什么实际只观察到某一个特定结果</em>"（"<em>为什么是猫死了, 不是猫活着</em>"）。后者是<em>选择问题</em>(definite outcome problem), 退相干无能为力。</p>
+
+<p>退相干是哥本哈根诠释的<em>动力学化</em>——它把"<em>塌缩</em>" 这条非动力学公设替换为"<em>系统 + 环境的快速纠缠</em>"。但选择哪个结果, 仍需要别的诠释来回答。</p>
+
+<h2 id="sec12-8">12.8 别的诠释一句话</h2>
+
+<p>测量问题催生了几种<em>非</em> 哥本哈根诠释。每种试图把"<em>塌缩</em>" 这个非动力学公设要么消除要么解释。我各给一句话, 不深入:</p>
+
+<ul>
+  <li><strong>多世界诠释</strong>(Everett 1957)。<em>没有塌缩</em>。整个宇宙波函数按 SE 演化。每次"<em>测量</em>" 时, 宇宙"<em>分支</em>" 成多个世界, 每个世界对应一个可能结果。"<em>你</em>" 也分支——在一个分支里看到猫死, 在另一个分支里看到猫活, 两个分支都<em>同时存在</em> 但互不通信。Born 概率被解释为"<em>分支权重</em>"（这条解释技术上仍有争议）。</li>
+  <li><strong>隐变量诠释</strong>(de Broglie 1927 / Bohm 1952)。<em>有塌缩, 但塌缩只是"无知"</em>。粒子有<em>真实</em> 位置和动量, 我们只是不知道。波函数是个"<em>导航波</em>" 引导粒子走, Born 概率反映我们对真实变量的统计无知, 不是物理本身的随机。Bell 1964 证明<em>非定域</em> 隐变量可以兼容量子预测, <em>定域</em> 隐变量不行（<a href="ch22.html">ch22</a> Bell 不等式详谈）。</li>
+  <li><strong>退相干 + 一致历史</strong>(Griffiths / Omnès / Gell-Mann-Hartle)。在"<em>退相干已发生</em>" 的语境里, 经典逻辑近似有效, 概率论按经典方式应用。哥本哈根诠释的精细化版。</li>
+  <li><strong>客观塌缩理论</strong>(GRW 1986 / Penrose 1996)。修改 Schrödinger 方程, 加一项<em>真随机</em> 塌缩项, 使宏观系统自发塌缩, 微观不变。<em>实验可证伪</em>。目前最严格实验仍兼容标准 QM, 但 GRW 给的塌缩率上限被压缩。</li>
+</ul>
+
+<p>哪种正确？目前<em>没有共识</em>。所有诠释都给出相同的实验预测（这是它们被认真对待的前提）。区别在<em>哲学</em>——什么是真实、什么是观察者、什么是测量。</p>
+
+<p>请你保持开放——别让任何诠释把"<em>这就是真相</em>" 卖给你。当代物理学家大多<em>务实</em>: 算的时候用哥本哈根（最简单 + 操作明确）, 哲学反思时用多世界 / Bohm / 退相干（看个人偏好）。<em>不</em> 信任何一种诠释是说自己"<em>是物理上正确</em>" 的。</p>
+
+<h2 id="sec12-9">12.9 这一章的命名 + reframe</h2>
+
+<p>把核心观念命名:</p>
+
+<ul>
+  <li><strong>测量问题</strong>: SE 演化（unitary, 线性, 可逆）vs 测量塌缩（随机, 非线性, 不可逆）的不一致。</li>
+  <li><strong>Born 概率</strong> \(P(a_n) = |\langle n|\psi\rangle|^2\): 测量结果的统计预测。</li>
+  <li><strong>投影假设</strong> \(|\psi\rangle \to \hat P_n|\psi\rangle/\|\cdot\|\): 测量后状态的更新规则。</li>
+  <li><strong>重复性</strong>: 同观测连测两次给同结果, 测量赋予<em>语义</em>。</li>
+  <li><strong>互补性</strong>: 不相容观测的测量顺序<em>不可</em> 交换, 后测会擦前测的"<em>记忆</em>"。</li>
+  <li><strong>退相干</strong>: 系统 + 环境纠缠 → 约化密度矩阵对角化 → "<em>看起来</em>" 塌缩。</li>
+</ul>
+
+<p>这一章的 Banner 弧线: 朴素想法——"<em>测量就是看一下, 不会动到系统</em>"——撞墙于 Stern-Gerlach 链 + 不相容观测的实验。Reframe: 测量是个<em>主动</em> 的、把状态推到本征子空间的<em>投影</em> 操作, 概率服从 Born。一般化: 投影测量推广到 POVM（正算子值测量, <a href="ch22.html">ch22</a>）, 退相干理论给"<em>测量</em>" 一个动力学解释, 多种诠释回答"<em>塌缩本质</em>"。</p>
+
+<p>测量问题<em>没有</em> 在这一章被解决——它没有在 90 年的物理学里被完全解决。但你已经把它的<em>形状</em> 看清楚了——它不是一个"<em>哥本哈根诠释错了</em>" 的简单问题, 它是"<em>从微观叠加到宏观确定的过渡机制</em>" 这个深刻的物理 / 哲学问题。本书<a href="ch22.html">ch22</a> 引入纠缠和 Bell 不等式后, 我们会再回来这条话题——Bell 实验把"<em>定域隐变量</em>" 这条诠释路径切死, 但仍未把测量问题彻底解决。</p>
+
+<p>下一章我们换回数学骨架——量子力学有两种等价但风格不同的"<em>表象</em>"——Schrödinger（波函数随时间, 算子不变）vs Heisenberg（算子随时间, 状态不变）。理解两种表象的等价性 + 切换方法是<a href="ch20.html">ch20</a> 微扰论的入场券。<a href="ch13.html">ch13</a> 详谈。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 不确定性原理</a><a href="ch13.html">下一章 · 第 13 章 Schrödinger vs Heisenberg 表象 →</a></nav>
+</main>
+</body>
+</html>
