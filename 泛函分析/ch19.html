@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 自反空间与一致凸 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 Banach–Alaoglu 紧致性</a><a href="ch20.html">下一章 · 第 20 章 紧算子 →</a></nav>
+<h1 id="ch19">第 19 章 自反空间与一致凸</h1>
+
+<p>第 15 章的典范嵌入 \(J : X \hookrightarrow X^{**}\) 把 \(X\) 看成 \(X^{**}\) 的一个等距子空间。如果 \(J\) <em>满</em>射（即 \(J(X) = X^{**}\)），\(X\) 叫<strong>自反</strong>（reflexive）。本章讲清楚自反性的内涵——为什么它"好用"、哪些空间自反、哪些不自反、以及一个常用的"自反充分条件"——一致凸。</p>
+
+<ul>
+  <li>自反性的等价刻画：\(J\) 满射 \(\iff\) 单位球弱紧 \(\iff\) 单位球弱*紧（在自身上）。</li>
+  <li>自反空间分类：Hilbert 永远自反；\(L^p\)（\(1 < p < \infty\)）自反；\(L^1, L^\infty, c_0, C(K)\) 不自反。</li>
+  <li>一致凸（uniform convexity）的定义与几何含义。</li>
+  <li>Milman–Pettis 定理：一致凸 \(\Rightarrow\) 自反。这给出最常用的"自反性判据"。</li>
+  <li>\(L^p\) 一致凸的 Clarkson 不等式（陈述）。</li>
+  <li>非自反空间的"不便"：弱紧致失败的具体反例。</li>
+</ul>
+
+<h2 id="sec19-1">19.1 自反性的等价刻画</h2>
+
+<p>设 \(X\) 是 Banach 空间。<strong>自反</strong>: 典范嵌入 \(J : X \to X^{**}\) 是满射。由 \(J\) 永远等距（<a href="ch15.html">第 15 章 15.2 节</a>），自反 \(\iff\) \(X \cong X^{**}\) 等距同构由 \(J\) 给出。</p>
+
+<p><em>注意</em>："\(X\) 与 \(X^{**}\) 等距同构"<em>不一定</em>蕴含自反——同构必须由<em>典范</em>嵌入 \(J\) 给出，不能是别的。James 1950 给过一个 Banach 空间，与 \(X^{**}\) 等距同构，但<em>不</em>自反——它有"非典范"同构。这种病态情形本书不深入。</p>
+
+<p><strong>定理（自反性的等价刻画）。</strong>下列等价：</p>
+
+<ul>
+  <li>(R1) \(X\) 自反；</li>
+  <li>(R2) 闭单位球 \(B_X\) 在弱拓扑下紧致；</li>
+  <li>(R3) 任意 \(X\) 中范数有界序列有<em>弱</em>收敛子序列。</li>
+</ul>
+
+<p>(R1) \(\Leftrightarrow\) (R2) 用 Banach–Alaoglu：\(B_{X^{**}}\) 永远在弱*紧。在 \(J(X) = X^{**}\) 下，\(B_X\) 弱紧 \(\iff\) \(J(B_X) = B_{X^{**}}\) 弱*紧。这给出自反 \(\Rightarrow\) \(B_X\) 弱紧。反向需要 Goldstine 定理（\(J(B_X)\) 在 \(B_{X^{**}}\) 中弱*稠），它进一步给 \(B_X\) 弱紧 \(\Rightarrow\) \(B_X\) 弱*稠 + 弱*紧 \(\Rightarrow\) \(B_X = B_{X^{**}}\) \(\Rightarrow\) 自反。</p>
+
+<p>(R2) \(\Leftrightarrow\) (R3) 是 Eberlein–Šmulian 定理：在 Banach 空间上，弱拓扑紧 \(\iff\) 弱序列紧。这是个非平凡的定理（详细证明在 Conway 或 Brezis 的教材里）。</p>
+
+<p>这条等价是<strong>所有"自反 \(\Rightarrow\) 弱紧致"应用的根</strong>。第 17、18 章变分法的"<em>自反 + 强制 \(\Rightarrow\) 极小元存在</em>"模板就靠 (R3)。</p>
+
+<h2 id="sec19-2">19.2 自反空间的分类</h2>
+
+<p><strong>(F1) Hilbert 空间永远自反。</strong>由 Riesz 表示 \(H^* \cong H\)（共轭线性等距）+ \(H^{**} \cong H^* \cong H\)（再 Riesz 一次）+ 验证典范嵌入和这两次 Riesz 同构的复合就是 \(\operatorname{id}\)（不是仅同构，而恰好是 \(J\)）。</p>
+
+<p><strong>(F2) \(L^p(\Omega)\)，\(1 < p < \infty\) 自反。</strong>由 \((L^p)^* \cong L^q\) + \((L^q)^* \cong L^p\) + 验证典范嵌入是恒等。</p>
+
+<p><strong>(F3) \(\ell^p\)，\(1 < p < \infty\) 自反。</strong>同 \(L^p\) 论证。</p>
+
+<p><strong>(F4) Sobolev \(H^k(\Omega) = W^{k,2}(\Omega)\) 自反（它是 Hilbert）。</strong>\(W^{k,p}\) 也自反对 \(1 < p < \infty\)。</p>
+
+<p><strong>(N1) \(L^1\) 不自反。</strong>因为 \((L^1)^* = L^\infty\) 但 \((L^\infty)^* \supsetneq L^1\)（包含奇异线性泛函）。</p>
+
+<p><strong>(N2) \(L^\infty\) 不自反。</strong>同 \(L^1\)。</p>
+
+<p><strong>(N3) \(c_0\) 不自反。</strong>\(c_0^{**} = (\ell^1)^* = \ell^\infty \neq c_0\)。</p>
+
+<p><strong>(N4) \(C(K)\)（\(K\) 紧致 Hausdorff，\(C(K)\) 无穷维）不自反。</strong>\(C(K)^* = M(K)\)，\(M(K)^*\) 比 \(C(K)\) 大很多。</p>
+
+<p><strong>(N5) \(\ell^1\) 不自反。</strong>\((\ell^1)^* = \ell^\infty\)，\((\ell^\infty)^*\) 比 \(\ell^1\) 大。</p>
+
+<p>这条分类清单值得熟记。"自反 vs 不自反" 几乎决定了你能不能在某个空间上做"标准变分法"。在不自反空间上做变分需要额外技巧——这就是为什么 \(L^1\)-PDE（如<em>BV</em>函数 与"几乎处处"分析）比 \(L^p\)-PDE（\(p > 1\)）困难得多。</p>
+
+<h2 id="sec19-3">19.3 一致凸：几何性质</h2>
+
+<p>判断自反性的最常用<em>充分</em>条件是<strong>一致凸</strong>。它是个几何条件，比"自反"看起来更直观。</p>
+
+<p>Banach 空间 \(X\) 称为<strong>一致凸</strong>（uniformly convex），如果对每个 \(\varepsilon > 0\) 存在 \(\delta(\varepsilon) > 0\) 使</p>
+
+<p>\[
+\boxed{\ \|x\|, \|y\| \le 1, \|x - y\| \ge \varepsilon \quad \Rightarrow \quad \left\| \frac{x + y}{2} \right\| \le 1 - \delta(\varepsilon).\ }
+\]</p>
+
+<p>几何含义：单位球的"中点"被收缩——如果 \(x, y\) 在单位球边界附近且距离 \(\ge \varepsilon\)，它们的中点严格落在 \(1 - \delta\) 半径里。换言之单位球"圆滚滚"，没有"平的边"。</p>
+
+<p>例子：</p>
+
+<ul>
+  <li><strong>Hilbert 空间一致凸。</strong>由平行四边形恒等式：\(\|x - y\|^2 + \|x + y\|^2 = 2(\|x\|^2 + \|y\|^2) \le 4\)，给 \(\|(x+y)/2\| \le \sqrt{1 - \varepsilon^2/4}\)。</li>
+  <li><strong>\(\mathbb{R}^2\) 配 \(\ell^p\) 范数（\(1 < p < \infty\) 但 \(p \neq 2\)）一致凸。</strong>由 Clarkson 不等式（下面 19.4 节）。</li>
+  <li><strong>\(\mathbb{R}^2\) 配 \(\ell^1\) 或 \(\ell^\infty\) 范数<em>不</em>一致凸。</strong>单位球是菱形 / 正方形，有"平边"。比如 \(\ell^\infty\) 上 \(x = (1, 0), y = (1, 1)\) 都在单位球边界，距离 \(1\)，但中点 \((1, 1/2)\) 范数仍 \(= 1\)。</li>
+</ul>
+
+<h2 id="sec19-4">19.4 Milman–Pettis 定理</h2>
+
+<p><strong>定理（Milman 1938 / Pettis 1939）。</strong>一致凸 Banach 空间自反。</p>
+
+<p>这是判别自反性的最常用工具。证明思路：用 (R3)，要证有界序列有弱收敛子序列。取 \(x_n\) 范数有界 \(\le M\)。考虑 \(J(x_n) \in X^{**}\)，由 Banach–Alaoglu 有弱*收敛子序列 \(J(x_{n_k}) \overset{*}{\rightharpoonup} \Phi \in X^{**}\)。要证 \(\Phi = J(x^*)\) 某个 \(x^* \in X\)（这就是 \(J\) 的"满射性"在这个特殊弱*极限处的验证）。</p>
+
+<p>关键步骤是：一致凸让 \(\{x_n\}\) 自身成为弱 Cauchy（在某个子序列上），因为否则中点会"收缩"产生矛盾。这条技术细节涉及 Day 对偶引理或 Šmulian 引理，详细在 Megginson《An Introduction to Banach Space Theory》。</p>
+
+<p>实用价值：如果你能验证某个空间一致凸（例如用 Clarkson 不等式），自反性自动有。这就是<em>\(L^p\)（\(1 < p < \infty\)）自反</em>的最常用证法——证它一致凸，然后 Milman–Pettis 给自反。</p>
+
+<h2 id="sec19-5">19.5 Clarkson 不等式与 \(L^p\) 一致凸</h2>
+
+<p><strong>Clarkson 第一不等式。</strong>对 \(2 \le p < \infty\)，\(f, g \in L^p\)：</p>
+
+<p>\[
+\left\| \frac{f + g}{2} \right\|_p^p + \left\| \frac{f - g}{2} \right\|_p^p \le \frac{1}{2} \left( \|f\|_p^p + \|g\|_p^p \right).
+\]</p>
+
+<p><strong>Clarkson 第二不等式。</strong>对 \(1 < p \le 2\)，\(1/p + 1/q = 1\)：</p>
+
+<p>\[
+\left\| \frac{f + g}{2} \right\|_p^q + \left\| \frac{f - g}{2} \right\|_p^q \le \left( \frac{1}{2} \|f\|_p^p + \frac{1}{2} \|g\|_p^p \right)^{q/p}.
+\]</p>
+
+<p>证明用<em>逐点</em> Clarkson 不等式 \(|a + b|^p + |a - b|^p \le 2^{p-1}(|a|^p + |b|^p)\)（\(p \ge 2\)）然后积分。完整论证可见 Adams《Sobolev Spaces》或 Folland《Real Analysis》。</p>
+
+<p>核心后果：</p>
+
+<p>\[
+\boxed{\ L^p \text{ 一致凸，对 } 1 < p < \infty.\ }
+\]</p>
+
+<p>结合 Milman–Pettis 给 \(L^p\) 自反。</p>
+
+<p>注意 \(p = 1\) 与 \(p = \infty\) 不一致凸，所以 Clarkson 不适用——它们也<em>不</em>自反，前面已说。</p>
+
+<h2 id="sec19-6">19.6 非自反空间的"不便"</h2>
+
+<p>不自反空间在分析里常出现各种"反直觉"现象。下面列三条最重要的，提醒你<em>什么时候不能套自反空间的标准模板</em>。</p>
+
+<p><strong>(P1) \(L^1\) 中有界序列<em>不一定</em>有弱收敛子序列。</strong>典型例子：\(f_n = n \chi_{[0, 1/n]}\) 在 \(L^1[0,1]\) 中。\(\|f_n\|_1 = 1\) 有界。但 \(f_n\) 在弱意义下"质量集中到原点"\(\Rightarrow\) 弱极限应该是 Dirac \(\delta_0\)，但 \(\delta_0 \notin L^1\)（它是测度，不是函数）。所以没有弱极限<em>在 \(L^1\) 内</em>。</p>
+
+<p>这是 \(L^1\) 不自反的具体表现：弱紧致失败。补救工具是<strong>等可积性</strong>（Dunford–Pettis 定理）：在 \(L^1\) 中"等可积 + 紧支撑"才能保证有弱收敛子序列。</p>
+
+<p><strong>(P2) \(C[0,1]\) 中"逐点收敛 + 范数有界"序列不一定有强收敛子序列。</strong>典型例子：\(f_n(x) = \sin(n x)\) 在 \(C[0,1]\) 中。\(\|f_n\|_\infty = 1\) 有界，逐点收敛在某些点不存在（\(\sin(n x)\) 在大多数 \(x\) 处发散）。Arzelà–Ascoli 定理（紧致连续函数族需要等度连续 + 逐点紧）告诉你"等度连续"是缺少的关键。</p>
+
+<p><strong>(P3) \(C[0,1]^*\) 上的弱收敛<em>严格弱</em>于弱*收敛。</strong>因为 \(C[0,1]^{**}\) 比 \(M[0,1] = C[0,1]^*\) 的对偶 \(M[0,1]^*\) 大很多。这种"弱 \(\neq\) 弱*"在不自反空间上是常态。</p>
+
+<p>这三条提醒你：<em>"在自反空间上的标准变分法 / 紧致论证不能盲目搬到非自反空间"</em>。每次到 \(L^1, L^\infty, c_0, C(K)\) 上，你需要专门的"修补"工具。</p>
+
+<p>本章把"自反 vs 不自反"这个泛函分析的"基本分水岭" 讲清。下一章我们要切到一个新主题——<strong>紧算子</strong>。它是最接近"无穷维矩阵"的算子类——其谱论几乎是有限维谱定理的直接推广。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 Banach–Alaoglu 紧致性</a><a href="ch20.html">下一章 · 第 20 章 紧算子 →</a></nav>
+</main>
+</body>
+</html>
