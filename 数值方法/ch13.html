@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 章 数值微分 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 最小二乘与正交多项式</a><a href="ch14.html">下一章 · 第 14 章 数值积分：Newton-Cotes →</a></nav>
+<h1 id="ch13">第 13 章 数值微分</h1>
+
+<p><a href="ch3.html">第 3 章 3.2 节</a>我们已经看过那条 V 形误差曲线：朴素的前向差商 \((f(a + h) - f(a)) / h\)，截断误差 \(O(h)\)、舍入误差 \(O(\varepsilon_{\text{mach}} / h)\)，两者撞出最优 \(h^* \approx \sqrt{\varepsilon_{\text{mach}}} \approx 10^{-8}\)，那里能拿到的最佳精度大约 \(\sqrt{\varepsilon_{\text{mach}}} \approx 10^{-8}\)——也就是 double 精度的<em>一半位数</em>。</p>
+
+<p>16 位精度的浮点，最后只能给你 8 位的导数。一半位数被有限精度自带的"减法 + 除以小数" 吃掉了。你看着那条 V 形曲线第一反应应该是不甘心：<em>就只能这样了吗？</em>我有 double 的 16 位预算，凭什么取导数只能拿到 8 位？</p>
+
+<p>这章的全部内容就是一句话：<em>能更好</em>。换一个差商公式（中心差商）精度上限就涨到 \(10^{-11}\)；再换一个（五点 stencil）涨到 \(10^{-13}\)；用 Richardson 外推几乎能逼到 \(10^{-15}\)；如果你愿意放弃"\(f\) 是黑盒" 的设定、允许翻它的源代码，<em>自动微分</em>能把精度还原到机器精度本身。每一档代价都是更多次 \(f\) 求值或更深的工程介入。</p>
+
+<h2 id="sec13-1">13.1 复习 V 形：前向差商的天花板</h2>
+
+<p>先把第 3 章那条公式重新放出来一次。前向差商总误差：</p>
+
+<p>\[
+E_{\text{fwd}}(h) \;\approx\; \frac{|f''(a)|}{2} \cdot h \;+\; \frac{2 \varepsilon_{\text{mach}} |f(a)|}{h}.
+\]</p>
+
+<p>第一项是<em>截断</em>（你用一阶 Taylor 近似 \(f\) 时丢掉的二阶尾巴），第二项是<em>舍入</em>（分子是两个相近浮点数相减，丢精度——这就是<a href="ch1.html">第 1 章 1.2 节</a>那个灾难性抵消，只不过现在它<em>必然</em>发生，不是 bug 是物理）。</p>
+
+<p>对 \(h\) 求导，最优 \(h^* \approx \sqrt{\varepsilon_{\text{mach}}}\)，那一点的总误差 \(E^* \approx \sqrt{\varepsilon_{\text{mach}}}\)。两者都是 \(\sqrt{\varepsilon_{\text{mach}}}\)。<em>这不是巧合</em>——V 形曲线两支都按 \(\sqrt{\varepsilon_{\text{mach}}}\) 平衡，最低点的高度也是 \(\sqrt{\varepsilon_{\text{mach}}}\)。</p>
+
+<p>具体一点。\(f(x) = e^x\)，\(a = 1\)，真值 \(f'(1) = e\)。double 下取 \(h = 10^{-1}, 10^{-2}, \ldots, 10^{-15}\) 各算一次前向差商，记下与 \(e\) 的绝对差。如果你真去跑一遍，得到的曲线大致这样：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(h\)</th><th style="padding: 0.3em 1em;">前向差商误差</th></tr>
+<tr><td>\(10^{-1}\)</td><td>\(1.4 \times 10^{-1}\)</td></tr>
+<tr><td>\(10^{-2}\)</td><td>\(1.4 \times 10^{-2}\)</td></tr>
+<tr><td>\(10^{-4}\)</td><td>\(1.4 \times 10^{-4}\)</td></tr>
+<tr><td>\(10^{-6}\)</td><td>\(1.4 \times 10^{-6}\)</td></tr>
+<tr><td>\(10^{-8}\)</td><td>\(\mathbf{6 \times 10^{-9}}\) ← 最优</td></tr>
+<tr><td>\(10^{-10}\)</td><td>\(8 \times 10^{-8}\)</td></tr>
+<tr><td>\(10^{-12}\)</td><td>\(2 \times 10^{-4}\)</td></tr>
+<tr><td>\(10^{-15}\)</td><td>\(\sim 1\)（彻底崩）</td></tr>
+</table>
+
+<p>左半边按 \(O(h)\) 线性下降——每缩 10 倍 \(h\)，误差缩 10 倍。截断主导。到 \(h = 10^{-8}\) 是谷底——8 位准。再往下舍入接管，每缩 10 倍 \(h\)，误差<em>涨</em> 10 倍。\(h = 10^{-15}\) 时几乎什么都不剩。</p>
+
+<p>请你停下来盯着这张表 30 秒：在 \(h = 10^{-8}\) 那一行能拿到 8 位精度，恰好是 16 位 double 的一半。我们手里的预算是 16 位、只用上了一半——那剩下的 8 位锁在哪里？锁在<em>截断误差和舍入误差被设置成 1:1 平衡</em>。如果我们能让截断项跑得<em>更快</em>（比如 \(O(h^2)\) 而不是 \(O(h)\)），那么同一个舍入项的 \(O(\varepsilon_{\text{mach}} / h)\) 能容忍<em>更大</em>的 \(h\)；更大的 \(h\) 让舍入项<em>更小</em>；最低点就掉得更深。这是这一整章的内核。</p>
+
+<h2 id="sec13-2">13.2 中心差商：奇阶项消掉，精度翻倍</h2>
+
+<p>不要在 \(a\) 一侧探一步，<em>两侧各探一步</em>：</p>
+
+<p>\[
+\boxed{\ D_c f(a) := \frac{f(a + h) - f(a - h)}{2 h}.\ }
+\]</p>
+
+<p>看起来只是把分子里的 \(f(a)\) 换成 \(f(a - h)\)、分母多个 2。直觉上"差不多嘛"。展开来看就不是了。</p>
+
+<p>Taylor：</p>
+
+<p>\[
+f(a + h) = f(a) + h f'(a) + \frac{h^2}{2} f''(a) + \frac{h^3}{6} f'''(a) + \frac{h^4}{24} f^{(4)}(a) + \cdots
+\]</p>
+
+<p>\[
+f(a - h) = f(a) - h f'(a) + \frac{h^2}{2} f''(a) - \frac{h^3}{6} f'''(a) + \frac{h^4}{24} f^{(4)}(a) - \cdots
+\]</p>
+
+<p>相减：</p>
+
+<p>\[
+f(a + h) - f(a - h) = 2 h f'(a) + \frac{h^3}{3} f'''(a) + O(h^5).
+\]</p>
+
+<p>请你看清楚<em>哪些项不见了</em>。\(f(a)\) 项在两式里同号，相减消掉——本来就要的。\(f''(a)\) 项也同号，<em>也消掉</em>——这是赚到的。\(f^{(4)}\) 项同样消掉。<em>所有偶阶 Taylor 项都消掉了</em>，只留奇阶。</p>
+
+<p>这事的结构原因极朴素：\((f(a + h) - f(a - h))\) 关于 \(h\) 是<em>奇</em>函数，所以它的 Taylor 展开只能有奇次项。两侧对称取点，让对称性自动帮你消项。</p>
+
+<p>除以 \(2h\)：</p>
+
+<p>\[
+D_c f(a) = f'(a) + \frac{h^2}{6} f'''(a) + O(h^4).
+\]</p>
+
+<p>截断误差从 \(O(h)\) 升到 \(O(h^2)\)。<em>截断阶提了一阶，免费</em>——你只多算了一次 \(f\)。</p>
+
+<p>把舍入误差也算一遍。分子 \(f(a + h) - f(a - h)\)，绝对舍入误差 \(\sim 2 \varepsilon_{\text{mach}} |f|\)，除以 \(2h\) 给 \(\varepsilon_{\text{mach}} |f| / h\)——和前向差商<em>同阶</em>。所以总误差</p>
+
+<p>\[
+E_c(h) \;\approx\; \frac{|f'''(a)|}{6} h^2 \;+\; \frac{\varepsilon_{\text{mach}} |f(a)|}{h}.
+\]</p>
+
+<p>对 \(h\) 求导找最低点：\(\frac{d}{dh} E_c = \frac{|f'''|}{3} h - \frac{\varepsilon_{\text{mach}} |f|}{h^2} = 0\)，给</p>
+
+<p>\[
+\boxed{\ h^*_c \;\approx\; \left( \frac{3 \varepsilon_{\text{mach}} |f|}{|f'''|} \right)^{1/3} \;\approx\; \varepsilon_{\text{mach}}^{1/3} \;\approx\; 6 \times 10^{-6}.\ }
+\]</p>
+
+<p>最优 \(h\) 从 \(10^{-8}\) 涨到 \(6 \times 10^{-6}\)——<em>更宽容了</em>。最低点高度</p>
+
+<p>\[
+E^*_c \;\approx\; \varepsilon_{\text{mach}}^{2/3} \;\approx\; 4 \times 10^{-11}.
+\]</p>
+
+<p>从 \(\sqrt{\varepsilon_{\text{mach}}} \approx 10^{-8}\) 升到 \(\varepsilon_{\text{mach}}^{2/3} \approx 10^{-11}\)。<em>多 3 位有效数字</em>。代价：每点 2 次 \(f\) 求值（不是 1 次）。</p>
+
+<p>用同样的 \(f(x) = e^x\)，\(a = 1\) 实验：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(h\)</th><th style="padding: 0.3em 1em;">前向差商误差</th><th style="padding: 0.3em 1em;">中心差商误差</th></tr>
+<tr><td>\(10^{-2}\)</td><td>\(1.4 \times 10^{-2}\)</td><td>\(4.5 \times 10^{-5}\)</td></tr>
+<tr><td>\(10^{-4}\)</td><td>\(1.4 \times 10^{-4}\)</td><td>\(4.5 \times 10^{-9}\)</td></tr>
+<tr><td>\(10^{-5}\)</td><td>\(1.4 \times 10^{-5}\)</td><td>\(\mathbf{3 \times 10^{-11}}\) ← 最优附近</td></tr>
+<tr><td>\(10^{-6}\)</td><td>\(1.4 \times 10^{-6}\)</td><td>\(8 \times 10^{-11}\)</td></tr>
+<tr><td>\(10^{-8}\)</td><td>\(\mathbf{6 \times 10^{-9}}\)</td><td>\(7 \times 10^{-9}\)</td></tr>
+<tr><td>\(10^{-12}\)</td><td>\(2 \times 10^{-4}\)</td><td>\(1.5 \times 10^{-4}\)</td></tr>
+</table>
+
+<p>\(h \approx 10^{-5}\) 时中心差商达到 \(3 \times 10^{-11}\) 精度——比前向差商的最佳成绩好了 1000 倍。<em>同一道题、同一个 \(f\)、几乎同一段代码</em>。差别只是分子里把 \(f(a)\) 换成 \(f(a - h)\)。</p>
+
+<p>这是个关键的"<em>用对称性换精度</em>" 的例子。后面你会反复看到：偶序 / 奇序的项在某种对称下自动消掉，让你拿到一阶的精度提升。Simpson 法（下一章）也是同样的结构——对称取点让奇阶误差消掉。Runge-Kutta 4 阶法的"4 阶" 也来自对称采样消去奇阶项。<em>对称性是数值方法里最便宜的精度来源</em>。</p>
+
+<h2 id="sec13-3">13.3 二阶差商：离散 Laplacian 的根</h2>
+
+<p>把 \(f(a + h)\) 和 \(f(a - h)\) 这两个 Taylor 展开<em>相加</em>而不是相减：</p>
+
+<p>\[
+f(a + h) + f(a - h) = 2 f(a) + h^2 f''(a) + \frac{h^4}{12} f^{(4)}(a) + O(h^6).
+\]</p>
+
+<p>奇阶项消掉，留偶阶。整理：</p>
+
+<p>\[
+\boxed{\ D^2_c f(a) := \frac{f(a + h) - 2 f(a) + f(a - h)}{h^2} \;=\; f''(a) + \frac{h^2}{12} f^{(4)}(a) + O(h^4).\ }
+\]</p>
+
+<p>三个 \(f\) 求值，\(O(h^2)\) 截断误差，得二阶导数的近似。</p>
+
+<p>它是数值方法里出现频率第二高的差商公式（第一是中心一阶差商）。原因：它是<em>离散 Laplacian</em> 的核心。一维 Laplace 算子 \(\Delta = d^2 / dx^2\) 离散到等距网格 \(x_i = a + i h\)，每个节点的 \(\Delta u\) 近似为</p>
+
+<p>\[
+(\Delta u)_i \;\approx\; \frac{u_{i+1} - 2 u_i + u_{i-1}}{h^2}.
+\]</p>
+
+<p>这是有限差分法解 PDE 的入口。<a href="ch24.html">第 24 章</a>解一维热方程 \(u_t = u_{xx}\) 时，每步显式格式就是把右边的 \(u_{xx}\) 换成上面这个差商。多维 Laplacian 类似——二维 \((\Delta u)_{ij} \approx (u_{i+1, j} + u_{i-1, j} + u_{i, j+1} + u_{i, j-1} - 4 u_{ij}) / h^2\)，"五点 stencil"。整个 PDE 数值学的<em>第一招</em>是这个差商。</p>
+
+<p>来个具体例子。\(f(x) = \sin x\)，\(a = 1\)，真值 \(f''(1) = -\sin 1 \approx -0.8415\)。\(h = 0.01\)：</p>
+
+<p>\[
+D^2_c f(1) = \frac{\sin(1.01) - 2 \sin(1) + \sin(0.99)}{0.01^2}.
+\]</p>
+
+<p>分子三个数：\(\sin(1.01) \approx 0.84683\)，\(\sin(1) \approx 0.84147\)，\(\sin(0.99) \approx 0.83603\)。代入：分子 \(= 0.84683 - 2 (0.84147) + 0.83603 = -0.00008\)。除以 \(0.0001\) 给 \(-0.84\)。和真值 \(-0.8415\) 比，差大约 \(10^{-5}\)——\(O(h^2) \approx 10^{-4}\) 级别，正常。</p>
+
+<p>但请你盯一眼分子：\(0.84683\) 和 \(0.84147\) 几乎相等；它们的差是 \(0.00536\)；这个差还要再和 \(0.83603 - 0.84147 = -0.00544\) 相加，结果 \(-0.00008\)——<em>5 位有效数字消掉了</em>。这是双重灾难性抵消。然后还要除以 \(h^2 = 10^{-4}\)，相当于把那个微小的差再乘 10000。</p>
+
+<p>结论：二阶差商比一阶差商<em>更</em>怕舍入。最优 \(h\) 大致 \(\varepsilon_{\text{mach}}^{1/4} \approx 10^{-4}\)，最优精度 \(\varepsilon_{\text{mach}}^{1/2} \approx 10^{-8}\)——只有 8 位准。<em>二阶导数从 16 位预算里只能拿出 8 位</em>。每多求一阶导数，精度上限就掉一截。</p>
+
+<p>这条规律一般化：求 \(k\) 阶导数的差商，最优精度大约 \(\varepsilon_{\text{mach}}^{2/(k+2)}\)。\(k = 1\)（中心差商）给 \(\varepsilon_{\text{mach}}^{2/3}\)；\(k = 2\) 给 \(\varepsilon_{\text{mach}}^{1/2}\)；\(k = 3\) 给 \(\varepsilon_{\text{mach}}^{2/5}\)；\(k = 4\) 给 \(\varepsilon_{\text{mach}}^{1/3}\)。<em>四阶导数你最多只能指望 5 位精度</em>。这是为什么 PDE 里"超过二阶导数" 的格式很罕见——不是写不出，是写出来也没有精度可拿。</p>
+
+<h2 id="sec13-4">13.4 五点 stencil：再爬一阶</h2>
+
+<p>中心差商把截断从 \(O(h)\) 提到 \(O(h^2)\)。能不能再爬一阶到 \(O(h^4)\)？</p>
+
+<p>能。把中心差商的余项 \(\frac{h^2}{6} f'''(a)\) 用<em>另一个</em>差商显式写出来，然后从中心差商里减掉。设</p>
+
+<p>\[
+D_h := \frac{f(a + h) - f(a - h)}{2 h}, \qquad D_{2h} := \frac{f(a + 2h) - f(a - 2h)}{4 h}.
+\]</p>
+
+<p>两个都是中心差商，步长不同。展开：</p>
+
+<p>\[
+D_h = f'(a) + \frac{h^2}{6} f'''(a) + \frac{h^4}{120} f^{(5)}(a) + \cdots
+\]</p>
+
+<p>\[
+D_{2h} = f'(a) + \frac{(2h)^2}{6} f'''(a) + \frac{(2h)^4}{120} f^{(5)}(a) + \cdots = f'(a) + \frac{2 h^2}{3} f'''(a) + \frac{2 h^4}{15} f^{(5)}(a) + \cdots
+\]</p>
+
+<p>第一项相同。第二项 \(D_{2h}\) 是 \(D_h\) 的<em>4 倍</em>（\((2h)^2 = 4 h^2\)）。<em>消掉 \(h^2\) 项</em> 的组合：\(\frac{4 D_h - D_{2h}}{3}\)。代入：</p>
+
+<p>\[
+\frac{4 D_h - D_{2h}}{3} = f'(a) + \underbrace{\frac{4 \cdot h^4 / 120 - 2 h^4 / 15}{3}}_{= -h^4/30} f^{(5)}(a) + O(h^6).
+\]</p>
+
+<p>截断从 \(O(h^2)\) 跳到 \(O(h^4)\)。展开 \(D_h\) 和 \(D_{2h}\) 写成对 \(f\) 的线性组合：</p>
+
+<p>\[
+\boxed{\ D^{(4)} f(a) := \frac{-f(a + 2h) + 8 f(a + h) - 8 f(a - h) + f(a - 2h)}{12 h} \;=\; f'(a) - \frac{h^4}{30} f^{(5)}(a) + O(h^6).\ }
+\]</p>
+
+<p>这就是<em>五点 stencil</em>。它用 4 个 \(f\) 求值（中心点 \(f(a)\) 系数为 0，所以不需要算），换 \(O(h^4)\) 精度。最优 \(h \sim \varepsilon_{\text{mach}}^{1/5}\)，最优精度 \(\sim \varepsilon_{\text{mach}}^{4/5} \approx 10^{-13}\)。<em>13 位精度</em>。</p>
+
+<p>用 \(f(x) = e^x\)，\(a = 1\) 验证。\(h = 10^{-3}\)：</p>
+
+<p>\[
+D^{(4)} f(1) = \frac{-e^{1.002} + 8 e^{1.001} - 8 e^{0.999} + e^{0.998}}{0.012}.
+\]</p>
+
+<p>算出来约 \(2.7182818284590\)，真值 \(e \approx 2.7182818284591\)，差 \(10^{-13}\)——和理论符合。</p>
+
+<p>把三档放在一起对比 \(f(x) = e^x\)，\(a = 1\)：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">公式</th><th style="padding: 0.3em 1em;">截断阶</th><th style="padding: 0.3em 1em;">最优 \(h\)</th><th style="padding: 0.3em 1em;">最优精度</th><th style="padding: 0.3em 1em;">f 求值数</th></tr>
+<tr><td>前向 \((f_+ - f_0)/h\)</td><td>\(O(h)\)</td><td>\(\sim 10^{-8}\)</td><td>\(\sim 10^{-8}\)</td><td>2</td></tr>
+<tr><td>中心 \((f_+ - f_-)/(2h)\)</td><td>\(O(h^2)\)</td><td>\(\sim 10^{-5}\)</td><td>\(\sim 10^{-11}\)</td><td>2</td></tr>
+<tr><td>五点 stencil</td><td>\(O(h^4)\)</td><td>\(\sim 10^{-3}\)</td><td>\(\sim 10^{-13}\)</td><td>4</td></tr>
+</table>
+
+<p>每提一阶截断阶，最优 \(h\) 涨一个数量级（更宽容），最优精度好两到三个数量级，代价是双倍 \(f\) 求值。这是个非常划算的交易——你每多算一次 \(f\) 大约换两位有效数字。</p>
+
+<h2 id="sec13-5">13.5 Richardson 外推：把它做到任意阶</h2>
+
+<p>5 阶 stencil 的推导本质上是<em>把两个不同步长的中心差商组合，让 \(h^2\) 误差项消掉</em>。能不能再来一遍——拿 5 阶和 5 阶用更小的 \(h\) 算，再消掉 \(h^4\) 项，得到 \(O(h^6)\)？</p>
+
+<p>能。这是一个完全一般的把戏，叫<strong>Richardson 外推</strong>。</p>
+
+<p>设你有一个误差展开</p>
+
+<p>\[
+\hat A(h) = A + c_1 h^p + c_2 h^{2p} + c_3 h^{3p} + \cdots,
+\]</p>
+
+<p>其中 \(A\) 是真值，\(\hat A(h)\) 是步长为 \(h\) 的近似，\(p\) 是已知的截断阶（前向差商 \(p = 1\)，中心差商 \(p = 2\)，五点 stencil \(p = 4\)），\(c_i\) 是依赖 \(f\) 的高阶导数的常数（你不需要知道具体值，只需要知道<em>这个展开存在</em>）。</p>
+
+<p>用<em>两个</em>步长 \(h\) 和 \(h / 2\) 算两次：</p>
+
+<p>\[
+\hat A(h) = A + c_1 h^p + c_2 h^{2p} + \cdots
+\]</p>
+
+<p>\[
+\hat A(h / 2) = A + c_1 (h / 2)^p + c_2 (h / 2)^{2p} + \cdots = A + c_1 h^p / 2^p + c_2 h^{2p} / 2^{2p} + \cdots
+\]</p>
+
+<p>组合 \(\frac{2^p \hat A(h/2) - \hat A(h)}{2^p - 1}\)。第一项消掉 \(h^p\)：</p>
+
+<p>\[
+\frac{2^p \hat A(h/2) - \hat A(h)}{2^p - 1} = A + O(h^{2p}).
+\]</p>
+
+<p><em>截断阶从 \(p\) 翻到 \(2p\)</em>。重复这把戏：用<em>四个</em>步长 \(h, h/2, h/4, h/8\)，先消 \(h^p\) 得三个 \(O(h^{2p})\) 估值，再消 \(h^{2p}\) 得两个 \(O(h^{3p})\) 估值，再消一次得 \(O(h^{4p})\)。</p>
+
+<p>这是个三角形的递推。Romberg 求积（<a href="ch15.html">第 15 章</a>）就是 Richardson 外推应用在梯形求积上的产物——梯形 \(p = 2\)，外推一次给 Simpson \(p = 4\)，再外推给 \(p = 6\)，再外推给 \(p = 8\)，递推到任意阶。</p>
+
+<p>外推算微分有一个名字：<strong>Ridders 法</strong>。给定 \(f\) 和 \(a\)，从中等大的 \(h\)（比如 \(h = 0.1\)）出发，反复缩半建外推表，直到表里两行差别小于容忍度。结果通常 12-15 位准——<em>几乎榨光 double 的所有精度</em>，全靠纯黑盒 \(f\) 求值，不需要 \(f'\) 的解析形式。代价是每次需要 \(O(\log_2(1/\sqrt{\varepsilon_{\text{mach}}})) \approx 20\) 次 \(f\) 求值，比五点 stencil 贵一个数量级，但仍是实战可接受的。</p>
+
+<p>Ridders 法是数值微分"<em>最高质量</em>" 那一档。<code>scipy.misc.derivative</code> 历史版本默认用它（已弃用，迁到 <code>scipy.differentiate.derivative</code>）；Numerical Recipes 第 5 章给的"通用数值导数" 也是 Ridders。如果你要在生产代码里"<em>给我 \(f'(a)\)，无论 \(f\) 是什么</em>"，用它。</p>
+
+<p>请你停下来欣赏一下 Richardson 外推的结构。它<em>不</em>用知道 \(c_1, c_2, \ldots\) 的具体值——只用知道误差展开<em>是 \(h^p\) 的幂级数</em>。这种"<em>知道误差形状但不知道误差系数</em>" 就足够把误差消掉的能力，是一个非常有 leverage 的数学工具。后面 ODE 数值法的 Bulirsch-Stoer 法、PDE 的 Aitken 加速、统计里的 jackknife——全部是 Richardson 外推的不同打扮。</p>
+
+<h2 id="sec13-6">13.6 自动微分一瞥：彻底跳出 V 形</h2>
+
+<p>到目前为止我们一直假设 \(f\) 是<em>黑盒</em>——你只能调它，不能看它怎么实现。这个假设一旦放开，世界就变了。如果 \(f\) 是<em>你写的代码</em>——比如几行 Python 操作 + numpy 函数——那么<em>编译器 / 解释器知道 \(f\) 的每一步操作是什么</em>。它能用链式法则把每一步的导数计算出来、组合起来，得到 \(f'(a)\)<em>到机器精度的精度</em>，<em>不</em>用任何差商、<em>不</em>受 V 形限制。</p>
+
+<p>这就是<strong>自动微分</strong>（automatic differentiation, AD）。它<em>不</em>是符号微分（不会给你 \(f'\) 的代数表达式），<em>也不</em>是数值微分（不取差商）。它是介于两者之间的"<em>程序变换</em>"——把计算 \(f(x)\) 的代码，自动改写成计算 \(\langle f(x), f'(x) \rangle\) 的代码。</p>
+
+<p><strong>前向 AD（forward mode）</strong>。基本想法：每个变量除了存它的"值"，还存它的"导数"——一对 \((v, \dot v)\) 称为<em>对偶数</em>。基本算术规则按链式法则改写：</p>
+
+<ul>
+  <li>\((u, \dot u) + (v, \dot v) = (u + v, \dot u + \dot v)\)。</li>
+  <li>\((u, \dot u) \cdot (v, \dot v) = (u v, \dot u v + u \dot v)\)（莱布尼茨积分则）。</li>
+  <li>\(\sin(u, \dot u) = (\sin u, \cos u \cdot \dot u)\)。</li>
+  <li>\(\exp(u, \dot u) = (\exp u, \exp u \cdot \dot u)\)。</li>
+  <li>……每个基本函数都有一条链式法则。</li>
+</ul>
+
+<p>初始化 \(x = (a, 1)\)（值 \(a\)，导数 \(\frac{dx}{dx} = 1\)）。让代码原样跑一遍——它在普通算法的每个加 / 乘 / 函数调用上自动做了导数累积。最终输出 \((f(a), f'(a))\)。<em>没有任何近似</em>——全是精确链式法则；唯一的误差是浮点本身的舍入，是 \(\varepsilon_{\text{mach}}\) 量级。</p>
+
+<p>例子。\(f(x) = x^2 \sin x\)，求 \(f'(2)\)。手算：\(f'(x) = 2 x \sin x + x^2 \cos x\)，\(f'(2) = 4 \sin 2 + 4 \cos 2 \approx 4 (0.9093) + 4 (-0.4161) \approx 1.973\)。用前向 AD：从 \(x = (2, 1)\) 开始；</p>
+
+<ul>
+  <li>\(x^2\)：值 \(4\)，导数 \(2 \cdot 2 \cdot 1 = 4\)，得 \((4, 4)\)。</li>
+  <li>\(\sin x\)：值 \(\sin 2 \approx 0.9093\)，导数 \(\cos 2 \cdot 1 \approx -0.4161\)，得 \((0.9093, -0.4161)\)。</li>
+  <li>两者相乘 \(x^2 \cdot \sin x\)：值 \(4 \cdot 0.9093 = 3.637\)，导数 \(4 \cdot 0.9093 + 4 \cdot (-0.4161) = 3.637 - 1.664 = 1.973\)，得 \((3.637, 1.973)\)。</li>
+</ul>
+
+<p>第二个分量就是 \(f'(2) = 1.973\)——<em>精确到机器精度</em>。零差商、零截断、零 V 形。</p>
+
+<p><strong>反向 AD（reverse mode）</strong>。前向 AD 算 \(f : \mathbb{R}^n \to \mathbb{R}^m\) 的 Jacobian 时，每个输入变量需要单独跑一遍前向，开销 \(O(n)\) 次函数求值。当 \(n\) 大、\(m\) 小（比如机器学习中的损失函数 \(L(\theta)\)，\(\theta\) 有数十亿维，\(L\) 是标量），这非常贵。</p>
+
+<p>反向 AD 反过来——它先<em>记录</em>整个计算的 forward pass（建立"计算图"），然后从输出往回<em>回溯</em>导数。开销 \(O(m)\) 次"反向遍历"。对 \(m = 1\)（标量损失）只需一次回溯，就拿到所有 \(\partial L / \partial \theta_i\)。</p>
+
+<p>这就是深度学习里的<em>反向传播</em>（backpropagation）——<em>反向传播 = 反向模式自动微分 + 神经网络计算图</em>。Yann LeCun 1985 的早期反向传播论文、Hinton 1986 的论文，本质都是把反向 AD 应用到神经网络。PyTorch、JAX、TensorFlow 的核心引擎就是反向 AD：你写出 \(L(\theta)\) 的前向计算，框架自动帮你算 \(\nabla_\theta L\)。<em>整个深度学习</em>的可训性都坐在反向 AD 这条桩上。</p>
+
+<p>两种 AD 的选择：</p>
+
+<ul>
+  <li>\(n \ll m\)：用前向 AD。常见于 ODE 灵敏度分析（少数参数、多个时间点的解）、流体仿真的设计灵敏度。</li>
+  <li>\(n \gg m\)：用反向 AD。机器学习训练（百万参数、标量损失）、控制理论的伴随方法。</li>
+  <li>\(n \approx m\)：两边差不多，看数据流模式选。</li>
+</ul>
+
+<p>JAX 的 <code>jax.grad</code>、PyTorch 的 <code>.backward()</code>、Autograd 的 <code>grad()</code>——背后都是反向 AD。你写 Python 代码，它给你导数，机器精度，比有限差分快很多倍。这是过去十年科学计算最大的工程红利之一。</p>
+
+<h2 id="sec13-7">13.7 决策树：什么时候用什么</h2>
+
+<p>把这一章六种工具放进一棵决策树。</p>
+
+<ol>
+  <li>问 1：<em>\(f\) 是不是你能修改的代码</em>？
+    <ul>
+      <li>是（Python / Julia / Jax 等可微编程环境里）→ <strong>用自动微分</strong>。机器精度，最快，无 V 形。</li>
+      <li>否（黑盒：第三方编译库、外部仿真器、物理实验测量）→ 进问 2。</li>
+    </ul>
+  </li>
+  <li>问 2：<em>\(f\) 求值多贵</em>？
+    <ul>
+      <li>很便宜（每次几微秒）→ <strong>用 Richardson 外推（Ridders）</strong>。12-15 位精度，需要 ~20 次 \(f\) 求值。</li>
+      <li>中等贵（每次几毫秒）→ <strong>五点 stencil</strong>。13 位精度，4 次 \(f\) 求值。</li>
+      <li>很贵（每次几秒以上）→ <strong>中心差商</strong>。11 位精度，2 次 \(f\) 求值。</li>
+      <li>极贵（每次几分钟，物理实验等）→ <strong>前向差商 + 一次性数据</strong>。8 位精度，1 次额外 \(f\) 求值。常见于实验科学。</li>
+    </ul>
+  </li>
+  <li>问 3：要算<em>多少阶</em>导数？
+    <ul>
+      <li>一阶 → 上面就行。</li>
+      <li>二阶 → \(D^2_c\)，但精度上限只有 \(\sqrt{\varepsilon_{\text{mach}}} \approx 10^{-8}\)。</li>
+      <li>三阶以上 → 数值方法基本崩溃，要么用 AD，要么<em>避免求高阶导</em>（数学重写问题）。</li>
+    </ul>
+  </li>
+  <li>问 4：要算<em>多少个</em>导数（梯度向量、Hessian 矩阵）？
+    <ul>
+      <li>少量 → 任意方法都行。</li>
+      <li>大量（比如机器学习里数百万维梯度）→ <em>必须</em>用反向 AD，否则数值微分要 \(O(n)\) 次函数求值，不可行。</li>
+    </ul>
+  </li>
+</ol>
+
+<p>实战经验：科学计算中"<em>需要数值导数</em>" 的场景越来越少——几乎所有现代库都已经把 AD 集成进去（SciPy 的优化器、Stan、PyMC、JAX、PyTorch）。你直接用它的 AD 接口就好。"裸算差商" 主要发生在两种地方：(1) 接口性 / 历史代码（旧的 Fortran 库、商业仿真软件）；(2) 检查 AD 实现对不对——AD 给的导数和差商对得上，是 AD 代码无 bug 的常用 sanity check。</p>
+
+<p>下一章我们换方向：<em>积分</em>。同样是用差商 / 求和近似一个连续操作，积分却是<em>条件数好</em>的问题——\(\kappa \approx 1\)（<a href="ch4.html">第 4 章 4.6 节</a>已预告）。所以同样的 \(h\)，积分给比微分高几个数量级的精度。微分是把误差<em>放大</em>，积分是把误差<em>平均掉</em>。两个数学上互逆的操作，数值难度天差地别——上一章 4.6 节我那句"<em>数值微分总比数值积分难</em>" 的具体兑现就在下一章。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 最小二乘与正交多项式</a><a href="ch14.html">下一章 · 第 14 章 数值积分：Newton-Cotes →</a></nav>
+</main>
+</body>
+</html>

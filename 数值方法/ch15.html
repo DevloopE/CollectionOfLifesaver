@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 15 章 Gauss 求积、Romberg、自适应 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 数值积分：Newton-Cotes</a><a href="ch16.html">下一章 · 第 16 章 直接法解线性系统 →</a></nav>
+<h1 id="ch15">第 15 章 Gauss 求积、Romberg、自适应</h1>
+
+<p>上一章我们看完了 Newton-Cotes 这一族——梯形、Simpson、Simpson 3/8、Boole 等等——它们的共同模板是：<em>把节点等距摆，在节点上对 \(f\) 求值，加权求和</em>。Simpson 用 3 个等距节点精确积分 3 次多项式（实际还多一阶，是 4 阶精度的"幸运"），Boole 用 5 个节点积到 5 次。<em>n 个等距节点的 Newton-Cotes 公式可以精确积分到 n 次或 n+1 次多项式（看奇偶）</em>，这就是它的精度上限。</p>
+
+<p>而且不止是上限——上一章末尾你已经看到了，<em>n 大到 8 以上时 Newton-Cotes 的权重开始有正有负</em>，公式开始不稳定，再继续增 n 反而精度下降（这是 Runge 现象在求积里的化身，链回<a href="ch10.html">第 10 章</a>）。所以 Newton-Cotes 实际可用的阶<em>不超过 8 左右</em>。要更高精度，要换思路。</p>
+
+<p>这一章给三个换思路：</p>
+
+<ul>
+  <li><em>Gauss 求积</em>——把节点位置自己当成参数，让 n 个节点给 2n−1 次精度。</li>
+  <li><em>Romberg 积分</em>——复合梯形 + Richardson 外推，几乎免费拔高阶数。</li>
+  <li><em>自适应求积</em>——根据 \(f\) 局部行为动态调整子区间，把计算资源花在该花的地方。</li>
+</ul>
+
+<p>这三件加起来就是 SciPy <code>quad</code> 背后的全部主力技术。读完这一章你应该明白工业级数值积分库为什么是<em>那个样子</em>。</p>
+
+<h2 id="sec15-1">15.1 Newton-Cotes 的局限 vs Gauss 的免费午餐</h2>
+
+<p>梯形公式是个再朴素不过的想法：用一条<em>直线</em>连接两端点，算梯形面积。具体在 \([-1, 1]\) 上：</p>
+
+<p>\[
+\int_{-1}^1 f(x) \, dx \approx f(-1) \cdot 1 + f(1) \cdot 1 = f(-1) + f(1).
+\]</p>
+
+<p>两个节点 \(\{-1, 1\}\)，两个权重 \(\{1, 1\}\)。两个节点 + 两个权重 = <em>4 个自由度</em>。</p>
+
+<p>请你停下来想一下：4 个自由度<em>本来</em>能精确确定一个 4 参数的多项式族——比如 3 次多项式 \(a + bx + cx^2 + dx^3\) 有 4 个系数。所以"4 个自由度的求积公式" <em>原则上</em> 应该能精确积分到 3 次多项式。</p>
+
+<p>梯形公式只精确到 1 次。<em>它浪费了一半的自由度</em>。为什么？因为它把 2 个节点位置<em>固定</em>在端点上——只剩 2 个自由的权重，所以只能匹配 2 个条件（精确积分常数和一次项）。</p>
+
+<p>这就是 Gauss 的洞察：<em>节点位置自己也是参数</em>。如果不固定 \(\{-1, 1\}\)，让节点 \(\{x_1, x_2\}\) 也跟着调，4 个自由度全部能用上——可以让 2 个节点的求积公式精确积分到 3 次多项式。</p>
+
+<p>更一般地：<em>n 个节点 + n 个权重 = 2n 个自由度，最多能精确积分 2n−1 次多项式</em>。Newton-Cotes 只能 n 次，Gauss 能 2n−1 次——<em>免费的 2 倍精度</em>，代价只是节点不再等距。</p>
+
+<p>"代价只是节点不再等距" 听起来像没什么——你本来就要算 \(f\) 在 n 个点的值，等距还是不等距对 \(f\) 来说没区别（除非你有现成的等距数据，比如均匀采样的实验数据）。所以对"<em>能任意求 \(f\)</em>" 的场景（数学函数、数值仿真输出），Gauss 几乎严格优于 Newton-Cotes。</p>
+
+<h2 id="sec15-2">15.2 一道动机题：n=2 时的最佳节点是 ±1/√3</h2>
+
+<p>具体把 n=2 做一遍。我们要找 \(\{x_1, x_2\}\) 和 \(\{w_1, w_2\}\)，让</p>
+
+<p>\[
+\int_{-1}^1 f(x) \, dx \approx w_1 f(x_1) + w_2 f(x_2)
+\]</p>
+
+<p>对所有不超过 3 次的多项式精确成立。"对所有 3 次以下精确" 等价于对 \(\{1, x, x^2, x^3\}\) 这 4 个基函数分别精确——给出 4 个方程：</p>
+
+<p>\[
+\begin{aligned}
+& w_1 + w_2 = \int_{-1}^1 1 \, dx = 2, \\
+& w_1 x_1 + w_2 x_2 = \int_{-1}^1 x \, dx = 0, \\
+& w_1 x_1^2 + w_2 x_2^2 = \int_{-1}^1 x^2 \, dx = 2/3, \\
+& w_1 x_1^3 + w_2 x_2^3 = \int_{-1}^1 x^3 \, dx = 0.
+\end{aligned}
+\]</p>
+
+<p>4 个方程 4 个未知数。但方程是<em>非线性</em>的（\(x_i\) 出现在乘法里）——直接代数解会有点拧。</p>
+
+<p>对称地猜一下：被积区间 \([-1, 1]\) 关于 0 对称，被积函数里 \(\{x, x^3\}\) 是奇函数（积分为 0）。如果节点对称——\(x_2 = -x_1\)，权重相等 \(w_1 = w_2 = w\)——那么</p>
+
+<ul>
+  <li>奇函数条件 \(w_1 x_1 + w_2 x_2 = w(x_1 - x_1) = 0\) 自动成立。</li>
+  <li>奇函数条件 \(w_1 x_1^3 + w_2 x_2^3 = 0\) 也自动成立。</li>
+  <li>偶函数条件 \(w_1 + w_2 = 2w = 2 \Rightarrow w = 1\)。</li>
+  <li>偶函数条件 \(w_1 x_1^2 + w_2 x_2^2 = 2 x_1^2 = 2/3 \Rightarrow x_1^2 = 1/3 \Rightarrow x_1 = 1/\sqrt 3\)。</li>
+</ul>
+
+<p>得到</p>
+
+<p>\[
+\boxed{\ \int_{-1}^1 f(x) \, dx \approx f\!\left(-\tfrac{1}{\sqrt 3}\right) + f\!\left(\tfrac{1}{\sqrt 3}\right).\ }
+\]</p>
+
+<p>这就是<em>2 节点 Gauss-Legendre 公式</em>。它精确积分所有 3 次以下多项式，只用 2 次 \(f\) 求值。</p>
+
+<p>试一下 \(f(x) = x^3\)：左边 \(\int_{-1}^1 x^3 dx = 0\)，右边 \((-1/\sqrt 3)^3 + (1/\sqrt 3)^3 = 0\)。准。</p>
+
+<p>试 \(f(x) = x^4\)：左边 \(\int_{-1}^1 x^4 dx = 2/5 = 0.4\)，右边 \(2 \cdot (1/\sqrt 3)^4 = 2/9 \approx 0.222\)。<em>不准</em>——4 次多项式开始失灵了，正好印证 "精确到 3 次" 的边界。</p>
+
+<p>对比梯形（也是 2 个节点）：\(f(x) = x^2\) 上梯形给 \((-1)^2 + 1^2 = 2\)，但真值 2/3。<em>2 次多项式就已经错了</em>。Gauss 用同样的 2 次求值，多算对了 2 个数量级的多项式。这就是免费午餐。</p>
+
+<h2 id="sec15-3">15.3 一般 Gauss-Legendre：节点 = Legendre 多项式根</h2>
+
+<p>把 n=2 的故事推到一般 n。我们要 \(\{x_i, w_i\}_{i=1}^n\) 使</p>
+
+<p>\[
+\int_{-1}^1 f(x) \, dx = \sum_{i=1}^n w_i f(x_i)
+\]</p>
+
+<p>对所有 \(\deg f \le 2n - 1\) 精确。这是 \(2n\) 个方程（基 \(\{1, x, \ldots, x^{2n-1}\}\)）配 \(2n\) 个未知数。直接解非线性方程组在 n=2 还能手算，n=10 就崩了。</p>
+
+<p>更高明的做法是<em>用正交多项式</em>。回忆<a href="ch12.html#sec12-6">第 12.6 节</a>：在 \([-1, 1]\) 上配权 \(w(x) = 1\) 的正交多项式族叫 <em>Legendre 多项式</em> \(\{P_n\}\)，前几个</p>
+
+<p>\[
+P_0 = 1, \quad P_1 = x, \quad P_2 = \tfrac12 (3x^2 - 1), \quad P_3 = \tfrac12 (5x^3 - 3x), \quad \ldots
+\]</p>
+
+<p>它们满足 \(\int_{-1}^1 P_i P_j \, dx = 0\) 当 \(i \ne j\)。而且 \(P_n\) 在 \((-1, 1)\) 上有<em>恰好 n 个</em>实零点。</p>
+
+<p><strong>定理（Gauss-Legendre 求积）。</strong>取 \(\{x_i\}_{i=1}^n\) 为 \(P_n\) 的 n 个零点。配以权重</p>
+
+<p>\[
+w_i = \int_{-1}^1 \prod_{j \ne i} \frac{x - x_j}{x_i - x_j} \, dx
+\]</p>
+
+<p>（即第 \(i\) 个 Lagrange 基函数 \(\ell_i(x)\) 的积分）。则 \(\sum w_i f(x_i)\) 对所有 \(\deg f \le 2n - 1\) 精确。</p>
+
+<p>n=2 时 \(P_2(x) = \tfrac12(3x^2 - 1)\)，零点 \(x = \pm 1/\sqrt 3\)——和我们手算结果一致。n=3 时 \(P_3\) 零点 \(\{0, \pm \sqrt{3/5}\}\)，权重 \(\{8/9, 5/9, 5/9\}\)。再高 n 的节点 / 权重表在 Abramowitz-Stegun 一类手册里早就列好，或者库一行直接拿到（Python: <code>numpy.polynomial.legendre.leggauss(n)</code>）。</p>
+
+<p>这条定理把"<em>找节点</em>" 这道非线性 4n×4n 方程组问题，化简成了"<em>求 \(P_n\) 的根</em>"——一个一维多项式求根问题。这是数学结构帮你做了大半工作。</p>
+
+<h2 id="sec15-4">15.4 Gauss 的最优性证明</h2>
+
+<p>上节定理我直接给了——"Gauss-Legendre 节点是 \(P_n\) 的根"——但没解释为什么<em>必须</em>是 \(P_n\) 的根。这一节给出来。证明很短，但需要正交多项式的一个关键性质，在<a href="ch12.html#sec12-6">第 12.6 节</a>已经埋下：<em>\(P_n\) 与所有次数 &lt; n 的多项式正交</em>。</p>
+
+<p>记节点多项式 \(\pi(x) = \prod_{i=1}^n (x - x_i)\)，次数恰好 n。我们要证：<em>选 \(\{x_i\}\) 使求积公式精确积分到 \(2n - 1\) 次 ⟺ \(\pi\) 与所有次数 \(\le n - 1\) 的多项式 \(L^2\) 正交</em>（即 \(\int_{-1}^1 \pi(x) q(x) \, dx = 0\) 对所有 \(\deg q \le n - 1\)）。</p>
+
+<p><strong>"⇐" 方向（这套节点够好）。</strong>设 \(\pi\) 与所有次数 \(\le n-1\) 多项式正交。任取一个次数 \(\le 2n - 1\) 的多项式 \(f\)，做带余除法：</p>
+
+<p>\[
+f(x) = \pi(x) q(x) + r(x), \qquad \deg q \le n - 1, \quad \deg r \le n - 1.
+\]</p>
+
+<p>积分两边：</p>
+
+<p>\[
+\int_{-1}^1 f = \underbrace{\int_{-1}^1 \pi q}_{= 0 \text{ by 正交}} + \int_{-1}^1 r = \int_{-1}^1 r.
+\]</p>
+
+<p>另一边，求积公式 \(\sum w_i f(x_i)\) 在节点 \(x_i\) 上算 \(f\)。但 \(\pi(x_i) = 0\) 按定义，所以 \(f(x_i) = r(x_i)\)。求积公式给</p>
+
+<p>\[
+\sum w_i f(x_i) = \sum w_i r(x_i).
+\]</p>
+
+<p>而 \(r\) 是次数 \(\le n - 1\) 的多项式——只要权重 \(\{w_i\}\) 让求积公式对 \(\le n - 1\) 次精确（这是 Lagrange 基函数 \(\ell_i\) 积分所自动保证的，证明见上节），就有 \(\sum w_i r(x_i) = \int_{-1}^1 r\)。两边相等，证完。</p>
+
+<p><strong>"⇒" 方向（更好的节点不存在）。</strong>反过来，若求积公式精确到 \(2n - 1\) 次，取 \(f(x) = \pi(x) q(x)\)，\(\deg q \le n - 1\)，则 \(\deg f \le 2n - 1\)：</p>
+
+<p>\[
+\int_{-1}^1 \pi q = \sum w_i \pi(x_i) q(x_i) = 0
+\]</p>
+
+<p>因为 \(\pi(x_i) = 0\)。所以 \(\pi \perp q\) 对所有 \(\deg q \le n - 1\)。这恰是 \(\pi\) 是 Legendre 多项式 \(P_n\) 的（差一个常数因子）。</p>
+
+<p>你看到了：<em>Gauss 的最优性根本上是 "多项式整除性 + 正交性" 的代数结果</em>。不依赖任何分析、任何极限。这条证明的每一步在脑子里都该是清楚的——它解释了为什么"Legendre 多项式" 这个看起来很特殊的对象，会自然出现在求积理论里。</p>
+
+<p>顺便能证一件事：<em>所有 Gauss 权重 \(w_i\) 都正</em>。取 \(f(x) = \ell_i(x)^2\)（\(\ell_i\) 是第 i 个 Lagrange 基函数），\(\deg f = 2n - 2 \le 2n - 1\) 所以求积精确：</p>
+
+<p>\[
+0 < \int_{-1}^1 \ell_i^2 = \sum_j w_j \ell_i(x_j)^2 = w_i \cdot 1^2 = w_i.
+\]</p>
+
+<p>权重全正——这意味着 Gauss 求积<em>不会有 Newton-Cotes 那种"权重正负相消" 导致的灾难性抵消</em>（链回<a href="ch1.html#sec1-2">第 1.2 节</a>）。Gauss 是<em>无条件向后稳定</em>的求积公式。这是它的另一个免费午餐。</p>
+
+<h2 id="sec15-5">15.5 其他权重族的 Gauss</h2>
+
+<p>上面整套故事用了 Legendre 多项式——它们对应权 \(w(x) = 1\) 在 \([-1, 1]\) 上。但<em>同样的代数</em>对任何权函数 \(w\) 和任何区间都成立。改换权和区间，得到不同的 Gauss 求积族：</p>
+
+<ul>
+  <li><strong>Gauss-Chebyshev</strong>：\([-1, 1]\) 上 \(w(x) = 1/\sqrt{1 - x^2}\)。专门积形如 \(\int_{-1}^1 f(x) / \sqrt{1 - x^2} \, dx\) 的奇异积分。节点是 Chebyshev 多项式根 \(x_k = \cos((2k-1)\pi / (2n))\)，权重<em>恒等于</em> \(\pi/n\)——是闭式的，超漂亮。</li>
+  <li><strong>Gauss-Hermite</strong>：\(\mathbb{R}\) 上 \(w(x) = e^{-x^2}\)。专门积形如 \(\int_{-\infty}^\infty f(x) e^{-x^2} \, dx\)——出现在统计学（高斯分布期望）、量子力学（谐振子）、随机偏微分方程数值解。</li>
+  <li><strong>Gauss-Laguerre</strong>：\([0, \infty)\) 上 \(w(x) = e^{-x}\)。专门积形如 \(\int_0^\infty f(x) e^{-x} \, dx\)——出现在电磁场散射截面、寿命分布、Laplace 变换数值反演。</li>
+</ul>
+
+<p>这三族的核心好处：被积函数<em>带</em>权 \(w\) 时——比如本来要积 \(\int_{-\infty}^\infty g(x) e^{-x^2} dx\)，你<em>不</em>需要把 \(e^{-x^2}\) 当成 \(f\) 的一部分代到 Gauss-Legendre 里（那样要先把 \(\mathbb{R}\) 截断到有限区间，再忍受 \(e^{-x^2}\) 在端点近似为 0 的低效）。直接用 Gauss-Hermite，权 \(e^{-x^2}\) <em>已经吸收进权重</em>，你只算 \(g(x_i)\) 然后加权。\(\mathbb{R}\) 不需要截断、衰减不再是难处理的特征。</p>
+
+<p>请你停下来感受这种"<em>挑对工具</em>" 的美：被积函数有什么"先天结构"——区间 \(\mathbb{R}\)、衰减 \(e^{-x^2}\)、奇异 \(1/\sqrt{1-x^2}\)——就配什么对应的 Gauss 族。每族节点 / 权重表都早就列好了。<em>把数学结构搬到求积公式里</em>，剩下的工作是查表 + 加权和。</p>
+
+<h2 id="sec15-6">15.6 Romberg 积分：复合梯形 + Richardson 外推</h2>
+
+<p>Gauss 求积要查表 / 算特殊节点。如果你只想用最朴素的复合梯形，能不能"<em>事后</em>" 把它的精度拔上去？答案：能，几乎免费——这就是 <em>Romberg 积分</em>。</p>
+
+<p>核心观察：复合梯形在 \(n\) 个等距子区间上的近似 \(T(h)\)（步长 \(h = (b-a)/n\)）有渐近展开</p>
+
+<p>\[
+T(h) = I + c_1 h^2 + c_2 h^4 + c_3 h^6 + \cdots
+\]</p>
+
+<p>其中 \(I\) 是真积分，\(c_k\) 不依赖 \(h\)。<em>误差展开里只有偶数次幂</em>——这是 Euler-Maclaurin 公式的结论（用<a href="ch14.html">上一章</a>梯形公式 + 周期性技巧推得，证明这里跳过）。</p>
+
+<p>偶数次幂展开太重要了。它让 Richardson 外推（<a href="ch13.html">第 13 章</a>"<em>用两个步长消主项</em>" 的把戏）一次能消两阶。具体：算 \(T(h)\) 和 \(T(h/2)\)，做组合</p>
+
+<p>\[
+T_2(h) = \frac{4 T(h/2) - T(h)}{3}.
+\]</p>
+
+<p>展开一下：</p>
+
+<p>\[
+T_2(h) = I + 0 \cdot h^2 + (\text{某常数}) \cdot h^4 + \cdots
+\]</p>
+
+<p>主项 \(c_1 h^2\) 被消掉。<em>从 \(O(h^2)\) 直接跳到 \(O(h^4)\)</em>。</p>
+
+<p>有趣的是，化简一下你会发现 \(T_2(h)\) 公式和 Simpson 公式一字不差——Simpson 就是"梯形 + Richardson 一次外推" 的另一面。</p>
+
+<p>但 Romberg 的真正威力是<em>反复外推</em>。算梯形 \(T(h), T(h/2), T(h/4), T(h/8), \ldots\)，建一张表：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">阶</th><th style="padding: 0.3em 1em;">\(O(h^2)\)</th><th style="padding: 0.3em 1em;">\(O(h^4)\)</th><th style="padding: 0.3em 1em;">\(O(h^6)\)</th><th style="padding: 0.3em 1em;">\(O(h^8)\)</th></tr>
+<tr><td>1</td><td>\(T(h)\)</td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td>\(T(h/2)\)</td><td>\(R_{2,2}\)</td><td></td><td></td></tr>
+<tr><td>3</td><td>\(T(h/4)\)</td><td>\(R_{3,2}\)</td><td>\(R_{3,3}\)</td><td></td></tr>
+<tr><td>4</td><td>\(T(h/8)\)</td><td>\(R_{4,2}\)</td><td>\(R_{4,3}\)</td><td>\(R_{4,4}\)</td></tr>
+</table>
+
+<p>每往右一列消一阶。第 \(k\) 列的递推</p>
+
+<p>\[
+R_{i, k} = \frac{4^{k-1} R_{i, k-1} - R_{i-1, k-1}}{4^{k-1} - 1}.
+\]</p>
+
+<p>对角元 \(R_{k, k}\) 是 \(O(h^{2k})\) 精度的近似。算 \(k = 5\) 一行 Romberg 你已经有 10 阶精度——而总共只算了 \(2^5 = 32\) 个梯形子区间——<em>不到 33 次 \(f\) 求值给 10 阶精度</em>。</p>
+
+<p>更妙的：<em>每次步长减半，原来算的 \(f\) 值全部能重用</em>——\(T(h/2)\) 的所有等距点里，一半是 \(T(h)\) 已经算过的。所以增加一行 Romberg 表只多算一倍 \(f\) 值。复合梯形在这里的"<em>等距</em>" 反而是优点（Gauss 改步长就要重算所有节点）。</p>
+
+<p>什么时候 Romberg 失灵？当 Euler-Maclaurin 展开<em>不</em>是纯偶数次时——也就是 \(f\) 在端点不光滑（一阶导跳变、有奇异）。这时你能看到 Romberg 表的对角元收敛阶数<em>慢得多</em>，甚至完全停止。这是个非常好的<em>自动诊断</em>：Romberg 收敛慢就是被积函数有问题，该上自适应了（下一节）。</p>
+
+<h2 id="sec15-7">15.7 自适应：根据局部 \(f''\) / \(f^{(4)}\) 动态调整子区间</h2>
+
+<p>到这里我们的工具都是<em>全局</em> 的——把 \([a, b]\) 切成等长子区间，每段一视同仁。但被积函数往往不一视同仁：</p>
+
+<ul>
+  <li>\(f(x) = e^{-100 x^2}\) 在 \(x = 0\) 附近变化剧烈，远离 0 几乎为 0。在 \([-10, 10]\) 等距取 1000 个点会浪费 99% 的算力在"算 \(f \approx 0\)"。</li>
+  <li>\(f(x) = \sqrt{x}\) 在 \(x = 0\) 处导数无穷。等距 Simpson 在 \(x = 0\) 附近误差爆炸。</li>
+  <li>分段函数、不光滑点、共振峰——所有"局部困难" 都让全局等距策略低效。</li>
+</ul>
+
+<p>修法是<em>自适应求积</em>：<em>把计算资源花在 \(f\) 难积的地方</em>。算法骨架（递归形式）：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+def adaptive(f, a, b, tol):
+    # 用两种公式估积分（如 Simpson 与复合 Simpson）
+    S_whole  = simpson(f, a, b)
+    mid      = (a + b) / 2
+    S_left   = simpson(f, a, mid)
+    S_right  = simpson(f, mid, b)
+    # 误差估计：两次细分的差
+    err = abs((S_left + S_right) - S_whole) / 15
+    if err < tol:
+        return S_left + S_right + (S_left + S_right - S_whole) / 15
+    else:
+        return adaptive(f, a, mid, tol/2) + adaptive(f, mid, b, tol/2)
+</pre>
+
+<p>核心是这一行 <code>err = abs((S_left + S_right) - S_whole) / 15</code>——<em>用同一个区间上"粗" 与"细" 两次估计的差，作为局部误差的代理</em>。除以 15 来自 Simpson 的 \(O(h^4)\) 误差展开（细一倍误差除以 16，差和真误差比是 15:1）。</p>
+
+<p>这条"<em>差等于误差代理</em>" 是自适应算法整族的灵魂。它给你一个<em>不需要知道真值</em>就能估当前误差的方法。看到 err 大就细分，看到 err 小就停手——递归会自动把细分集中在 \(f''\)（或更高阶导数）大的地方，因为那里"粗 vs 细" 差得多。</p>
+
+<p>对 \(e^{-100 x^2}\) 这种"局部尖峰" 的函数，自适应 Simpson 可能在 \([-10, -0.5]\) 用 5 个子区间、在 \([-0.5, 0.5]\) 用 100 个子区间、在 \([0.5, 10]\) 又只用 5 个。<em>总计算量比等距少 1-2 个数量级，且精度不降反升</em>。</p>
+
+<p>请你停下来想：自适应不是"<em>更聪明的公式</em>"，而是"<em>更聪明的把简单公式用在哪里</em>"。它和"快算法 + 慢回退" 的 Brent（<a href="ch7.html#sec7-6">第 7.6 节</a>）、和 ODE 数值解里的自适应步长（<a href="ch23.html">第 23 章</a>）、和 PDE 的自适应网格细化是同一种工程哲学。<em>"在哪里花算力" 比"用什么公式" 更有杠杆</em>。</p>
+
+<h2 id="sec15-8">15.8 SciPy 的 <code>scipy.integrate.quad</code></h2>
+
+<p>把上面三件——Gauss 求积 + Richardson 外推 + 自适应——拼起来，就是工业级数值积分库。SciPy 的 <code>scipy.integrate.quad(f, a, b)</code> 用的是 QUADPACK（Fortran 老库的 Python 封装），底层是<em>自适应 Gauss-Kronrod 求积</em>。</p>
+
+<p>Gauss-Kronrod 是 Gauss 求积的一个变体。Gauss-Legendre 给 n 个节点 + 2n−1 阶精度。<em>Kronrod 扩展</em> 在已有 n 个节点之上<em>再加 n+1 个节点</em>，组成一个 2n+1 个节点的更高阶公式。妙处：Kronrod 节点和 Gauss 节点共用——所以你算一次 \(f\) 在所有 2n+1 个节点上的值，<em>同时</em>得到 Gauss 估计 (n 节点) 和 Kronrod 估计 (2n+1 节点)。两者之差是免费的误差代理，喂给上一节的自适应算法。</p>
+
+<p>常见配对：(7, 15) 节点对（QUADPACK 默认）、(10, 21) 等。每个区间算 15 次 \(f\)，得到 14 阶精度的近似 + 自动误差估计。如果误差超阈值，递归细分子区间；如果不超，接受。</p>
+
+<p>实际用法一行：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+from scipy.integrate import quad
+result, abs_err = quad(lambda x: np.exp(-x**2), -np.inf, np.inf)
+# result ≈ 1.7724538509055159  (= sqrt(pi))
+# abs_err ≈ 1.4e-08  (估计的绝对误差)
+</pre>
+
+<p><code>quad</code> 还<em>自动</em> 处理无穷区间——把 \([a, \infty)\) 通过变量代换 \(t = 1/(1 + x - a)\) 映到有限区间。你不需要自己截断。它<em>同时</em> 返回估计误差——这一点是 Romberg + Gauss-Kronrod 的免费副产品，让你<em>事后</em>知道答案精度（绝大多数 Newton-Cotes 实现没有这个特性）。</p>
+
+<p>什么时候 <code>quad</code> 不行：</p>
+
+<ul>
+  <li>被积函数有<em>振荡</em>（像 \(\int_0^\infty \sin(100 x) f(x) dx\)）——QUADPACK 有专门的 <code>quad(..., weight='sin', wvar=100)</code> 用 Filon-Levin 求积。</li>
+  <li>被积函数有可定位<em>奇异</em>（像 \(\int_0^1 \log x \cdot f(x) dx\)）——可以提示位置，<code>quad(..., points=[0])</code>。</li>
+  <li>极高维（\(\int_{\mathbb{R}^{100}}\))——任何确定性求积都崩，要换 <em>蒙特卡洛</em>（不在本书范围）。</li>
+</ul>
+
+<p>但对一维 + 适度光滑的常规问题，<code>quad</code> 是默认答案。<em>不要</em> 自己手写 Simpson 复合循环——它的精度 / 速度 / 自适应能力都不如 <code>quad</code>，唯一让你写它的理由是教学。</p>
+
+<p>这一章和上一章合起来覆盖了"<em>一维数值积分</em>" 这个工程任务的全部主要技术。求根、插值、积分这三个一维任务我们到此告一段落——下一章开始 8 章规模的"<em>数值线性代数</em>"，本书最长的一段。它的入口任务和这一章恰好对偶：上面我们学了"<em>把连续积分压成有限求和</em>"，下面我们学的是"<em>把高维线性方程组解出来</em>"。两件事看起来风马牛不相及，但都共享同一组核心思路：用结构化分解 + 误差控制 + 自适应。你会一路看到这些主题的回声。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 数值积分：Newton-Cotes</a><a href="ch16.html">下一章 · 第 16 章 直接法解线性系统 →</a></nav>
+</main>
+</body>
+</html>

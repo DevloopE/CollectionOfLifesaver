@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 23 章 ODE：多步法、稳定性、刚性方程 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 ODE 数值解：Euler 与 Runge-Kutta</a><a href="ch24.html">下一章 · 第 24 章 PDE 有限差分入门 + FFT 一瞥 →</a></nav>
+<h1 id="ch23">第 23 章 ODE：多步法、稳定性、刚性方程</h1>
+
+<p>上一章我说"RK4 是工程默认值——大部分非奇怪 ODE 你扔进 RK4 都能行"。这一章我要把"非奇怪"这条限定挑明。有一类 ODE 让 RK4 几乎彻底瘫痪：你必须把步长 \(h\) 调到比"<em>精度需要</em>"小几个数量级，否则解整个炸掉。这类问题叫<em>刚性方程</em>，是 ODE 数值分析里最有教学价值也最容易让人当场怀疑人生的一类。</p>
+
+<p>本章先用一道具体的两行 ODE 让你亲眼看见 RK4 爆炸；然后逐步把"为什么爆"翻译成一个具体的数学概念——<em>稳定性区域</em>；再看怎么修——<em>隐式</em>方法。最后给一类工业上对刚性问题的标配——BDF 多步法——和实战里 SciPy 怎么调它。</p>
+
+<h2 id="sec23-1">23.1 让 RK4 翻车的 ODE</h2>
+
+<p>考虑这道初值问题：</p>
+
+<p>\[
+y'(t) = -1000\, y(t) + 999 \cos t, \qquad y(0) = 1.
+\]</p>
+
+<p>它的解析解长这样：分一阶线性 ODE 标准做法解，得</p>
+
+<p>\[
+y(t) = \frac{1000^2}{1000^2 + 1} e^{-1000 t} + \frac{999\cdot 1000}{1000^2 + 1} \cos t + \frac{999}{1000^2 + 1} \sin t.
+\]</p>
+
+<p>抛开常数细节看形状：第一项 \(e^{-1000 t}\) 在 \(t = 0.01\) 时已经衰减到 \(e^{-10} \approx 5 \times 10^{-5}\)，几乎不见了；剩下的是个 \(\sim \cos t\) 的<em>慢</em>函数。所以从大局看，\(y(t)\) 在 \(t > 0.01\) 之后基本就是 \(\cos t\)——温和、光滑、远离震荡。把它画在 \(t \in [0, 10]\) 上，就是一条慢慢摆动的 cos 曲线。</p>
+
+<p>这样的真解，<em>积分起来应该极容易</em>。RK4 在它身上肯定行——你心里这么想。我们用 RK4 试一下，步长 \(h = 0.01\)（粗一点，但比起 cos 的周期 \(2\pi\) 已经够细了）。</p>
+
+<p>结果出来：第一步 \(y_1 \approx 1.0\)（看起来对）；第二步 \(y_2 \approx 0.99\)（也对）；……到第几十步左右，\(y_n\) 突然开始震荡，振幅每步翻倍：\(\pm 10\)、\(\pm 100\)、\(\pm 10^4\)、\(\pm 10^9\)、最后浮点溢出 NaN。<em>RK4 在一道解明显光滑的 ODE 上爆掉了</em>。</p>
+
+<p>把 \(h\) 减到 \(0.001\)：还是爆。减到 \(0.0001\)：终于不爆了，结果和真解吻合。</p>
+
+<p>请你停下来想一想这件事的怪异：真解在 \(t = 0.01\) 之后<em>已经</em>是慢函数，按精度讲 \(h = 0.1\) 都够了（一个 cos 周期内 60 步）。可数值方法<em>必须</em> \(h \le 10^{-3}\) 才稳。<em>稳定性需要的步长比精度需要的步长小 100 倍</em>。这种"步长被稳定性而非精度卡住"的现象就是<strong>刚性</strong>。</p>
+
+<h2 id="sec23-2">23.2 稳定性区域：把方法用到测试方程</h2>
+
+<p>为了把"<em>方法稳不稳</em>"变成一个数学问题，我们用一道最简单的线性 ODE 来探针每个数值方法：</p>
+
+<p>\[
+y'(t) = \lambda\, y(t), \qquad y(0) = 1.
+\]</p>
+
+<p>真解 \(y(t) = e^{\lambda t}\)。当 \(\operatorname{Re} \lambda < 0\) 时真解衰减到 0；当 \(\operatorname{Re} \lambda > 0\) 时发散。<em>我们关心的是 \(\operatorname{Re} \lambda < 0\) 的情形——真解衰减，数值解也应该衰减</em>。</p>
+
+<p>把任何"一步法"的迭代写出来，套到这道方程上，会给出一条递推 \(y_{n+1} = R(h\lambda)\, y_n\)，其中 \(R\) 是一个只取决于方法本身的有理函数。它叫这个方法的<em>稳定函数</em>。</p>
+
+<p>判据：数值解衰减 \(\iff |y_{n+1}/y_n| = |R(h\lambda)| \le 1\)。所以方法在<em>复 \(z = h\lambda\) 平面</em>上有一块"<em>稳定的区域</em>"</p>
+
+<p>\[
+\boxed{\ S = \{z \in \mathbb{C} : |R(z)| \le 1\}.\ }
+\]</p>
+
+<p>稳定性区域 \(S\) 是这个方法的<em>身份证</em>。\(h\lambda\) 落在 \(S\) 里方法稳；落在外面方法发散。这是把"<em>步长选多大</em>" 这个工程问题翻译成"<em>\(z = h\lambda\) 在 \(S\) 里吗</em>" 的几何问题。</p>
+
+<h2 id="sec23-3">23.3 几个常见方法的稳定性区域</h2>
+
+<p><strong>显式 Euler。</strong>\(y_{n+1} = y_n + h f(t_n, y_n)\)。套到 \(f = \lambda y\)：\(y_{n+1} = (1 + h\lambda) y_n\)。所以 \(R(z) = 1 + z\)，</p>
+
+<p>\[
+S_{\text{欧}}^{\text{显}} = \{z : |1 + z| \le 1\}.
+\]</p>
+
+<p>这是<em>圆心 \(-1\)、半径 \(1\) 的闭圆盘</em>。它在复平面上的一块——左半平面的一小块。</p>
+
+<p>对实负 \(\lambda\)：\(\lambda < 0\)，要 \(|1 + h\lambda| \le 1\) 即 \(-2 \le h\lambda \le 0\)，得 \(h \le 2/|\lambda|\)。这是<em>显式 Euler 的稳定步长上限</em>。</p>
+
+<p>套回 23.1 那道方程：方程的"快特征值"是 \(\lambda = -1000\)（线性化矩阵的特征值），所以显式 Euler 要 \(h \le 2/1000 = 0.002\)——和我们看见的 \(h = 0.01\) 爆、\(h = 0.001\) 不爆完全吻合。</p>
+
+<p><strong>RK4。</strong>RK4 的稳定函数是 \(R(z) = 1 + z + z^2/2 + z^3/6 + z^4/24\)（这正是 \(e^z\) 的前 5 项 Taylor，是几何意义上"四阶逼近 \(e^z\)" 的体现）。它的稳定区域比 Euler 大——左半平面方向上 \(z\) 沿实轴稳到约 \(z = -2.78\)。</p>
+
+<p>所以 RK4 对实负 \(\lambda\) 要 \(h \le 2.78/|\lambda|\)。比 Euler 略宽，但<em>同一个数量级</em>。\(\lambda = -1000\) 时 RK4 仍然要 \(h \le 0.00278\)——这就是为什么 23.1 那道方程对 RK4 也是难题。</p>
+
+<p>请你停下来看一眼这件事：所有<em>显式</em> Runge-Kutta 方法的稳定性区域都是<em>有界的</em>——是包含原点的某个有限区域。它们的边界距离原点最多几个单位。<em>对 \(|\lambda|\) 大的 ODE，显式方法都要把 \(h\) 摁得很小</em>。这是显式方法的<em>结构性</em> 局限，不是某个具体算法的瑕疵。</p>
+
+<h2 id="sec23-4">23.4 刚性的本质：快慢两套时间尺度</h2>
+
+<p>把 23.1 那道方程的稳定性问题翻译过来：方程的快尺度（\(\lambda = -1000\) 对应的 \(e^{-1000 t}\) 项）<em>真解里在 \(t > 0.01\) 之后已经无所谓了</em>——可以完全忽略，剩下慢尺度 \(\cos t\)。但<em>显式数值方法不知道</em>"快尺度可以忽略"——它的稳定性还是被快特征值 \(-1000\) 拖着，要求 \(h \le 2/1000\)。</p>
+
+<p>所以刚性的<em>定义</em>有点微妙——不是简单的"\(\lambda\) 大"，而是"<em>系统里同时有快慢两套时间尺度，快的对解的最终形状无所谓但对显式方法的稳定性致命</em>"。</p>
+
+<p>更一般的、向量值的描述：考虑 \(\mathbf y' = \mathbf f(t, \mathbf y)\)，把 \(\mathbf f\) 在某个解附近线性化，得 Jacobian \(J = \partial \mathbf f / \partial \mathbf y\)。\(J\) 的特征值 \(\lambda_1, \ldots, \lambda_n\)（设都有负实部）刻画系统在该处的局部"衰减时间尺度"——\(|\lambda_i|\) 大对应快衰减，小对应慢衰减。</p>
+
+<p>定义<strong>刚性比</strong></p>
+
+<p>\[
+\boxed{\ \text{stiffness ratio} = \frac{\max_i |\operatorname{Re} \lambda_i|}{\min_i |\operatorname{Re} \lambda_i|}.\ }
+\]</p>
+
+<p>刚性比 \(\sim 1\)：一致的时间尺度，显式方法没问题。刚性比 \(\sim 10^k\)：跨 \(k\) 个数量级，<em>显式方法的步长要被最大特征值卡住，但实际感兴趣的时间尺度由最小特征值决定</em>——你要用比"实际感兴趣分辨率"小 \(10^k\) 倍的步长。</p>
+
+<p>典型刚性来源：</p>
+
+<ul>
+  <li>化学反应动力学：快反应（\(\sim 10^{-9}\) 秒）和慢反应（\(\sim 10^3\) 秒）共存于同一个反应器。</li>
+  <li>电路仿真：寄生电容（皮法级 → 纳秒）和系统响应（毫秒级）共存。</li>
+  <li>燃烧：火焰前缘的快化学和气流的慢对流。</li>
+  <li><em>所有</em>由 PDE 经空间离散化得到的大型 ODE 系统（method of lines，下章）：网格越细，最大特征值越大，问题越刚性。</li>
+</ul>
+
+<p>修法很显然——<em>不要让稳定性卡步长</em>。换句话说，找一类<em>稳定性区域无限大（或至少覆盖整个左半平面）</em> 的方法。这种方法的步长只受精度限制，不受稳定性限制。下一节就构造这种方法。</p>
+
+<h2 id="sec23-5">23.5 backward Euler：第一招隐式方法</h2>
+
+<p>显式 Euler 用的是\(t_n\) 时刻的 \(f\)：\(y_{n+1} = y_n + h f(t_n, y_n)\)。<em>backward</em> Euler（隐式 Euler）改用 \(t_{n+1}\) 时刻的 \(f\)：</p>
+
+<p>\[
+\boxed{\ y_{n+1} = y_n + h\, f(t_{n+1}, y_{n+1}).\ }
+\]</p>
+
+<p>注意右边自己出现了 \(y_{n+1}\)——这是个隐式方程。每一步要解一道（一般是非线性的）方程才能得到 \(y_{n+1}\)。</p>
+
+<p>对线性测试方程 \(f = \lambda y\) 这道方程是线性的：\(y_{n+1} = y_n + h \lambda y_{n+1}\)，解出</p>
+
+<p>\[
+y_{n+1} = \frac{1}{1 - h\lambda} y_n.
+\]</p>
+
+<p>所以稳定函数 \(R(z) = 1/(1 - z)\)。看 \(|R(z)| \le 1\)：</p>
+
+<p>\[
+|1 - z| \ge 1.
+\]</p>
+
+<p>这是<em>以 \(z = 1\) 为圆心、半径 \(1\) 的圆盘外部</em>。包含<em>整个左半平面</em>——任何 \(\operatorname{Re} z \le 0\) 都满足 \(|1 - z| \ge 1\)。</p>
+
+<p>所以对任何 \(\operatorname{Re} \lambda \le 0\)、任何 \(h > 0\)，backward Euler 都稳。<em>没有稳定性步长限制</em>。它的步长只受精度限制——你想要多准，h 多小。</p>
+
+<p>这种"<em>整个左半平面在稳定性区域里</em>" 的性质有个专门名字：<strong>A-稳定</strong>（A-stable）。Backward Euler 是 A-stable 的最简单例子。所有 A-stable 方法都<em>必然是隐式的</em>——这是 Dahlquist 1963 的著名定理（"Dahlquist 第二壁障"）。</p>
+
+<h2 id="sec23-6">23.6 代价：每步要解一道非线性方程</h2>
+
+<p>对一般非线性 \(f\)，backward Euler 每步要解</p>
+
+<p>\[
+G(\mathbf y) := \mathbf y - \mathbf y_n - h\, \mathbf f(t_{n+1}, \mathbf y) = 0
+\]</p>
+
+<p>关于 \(\mathbf y\)。这是个 \(n\) 维非线性方程组。怎么解？<em>牛顿法</em>——你已经在<a href="ch7.html">第 7 章</a>和<a href="ch8.html">第 8 章</a>建好了工具。</p>
+
+<p>牛顿迭代要算 \(G\) 的 Jacobian \(\partial G / \partial \mathbf y = I - h\, \partial \mathbf f / \partial \mathbf y\)。每步牛顿要解一个线性系统（用<a href="ch16.html">第 16 章</a> LU 或<a href="ch19.html">第 19 章</a> CG）。所以一步 backward Euler 的<em>真实</em>开销 = 一次 Jacobian 计算 + 几次 LU 或 CG。比一步显式 Euler 贵<em>10-100 倍</em>。</p>
+
+<p>但——对刚性问题，你<em>能</em>用大得多的步长。如果你能用 \(h = 0.1\) 而不是 \(h = 10^{-4}\)，每步贵 100 倍换<em>步数</em>少 1000 倍，总赚 10 倍。这就是隐式方法的整个交易：每步贵，但能跨过显式方法不能跨的步长。</p>
+
+<p>实战工程上，你通常并不<em>每一步</em>都重新算 Jacobian——上一步算的 Jacobian 在下一步还能用（解附近 \(\partial \mathbf f / \partial \mathbf y\) 变化慢）。这种"懒更新 Jacobian + 修正牛顿" 是隐式 ODE 解算器内部的标准优化，让真实开销远低于"每步全套牛顿"。</p>
+
+<p>请你停下来想一件事：本章 23.5 节的稳定性 + 本节的牛顿迭代，把<em>从未学过 ODE 数值解的人</em>从来不认为有联系的两个部分缝起来了。"<em>解一道 ODE</em>" 在隐式方法下变成"<em>每个时间步解一道非线性方程</em>"——非线性方程的求解工具（牛顿）成了 ODE 解算器的子例程。这种"<em>把数值方法相互调用</em>" 的模式是这本书后面所有大型算法的常态。</p>
+
+<h2 id="sec23-7">23.7 多步法：复用历史信息</h2>
+
+<p>到目前为止讨论的都是<em>一步法</em>：\(y_{n+1}\) 只依赖 \(y_n\)（和当步求 \(f\) 的几次取值，对 RK 那样的方法）。每步把过去的 \(y_{n-1}, y_{n-2}, \ldots\) 全扔了。这有点浪费——上一步刚算过的 \(f(t_{n-1}, y_{n-1})\) 信息你已经免费有了，<em>不</em>用就可惜。</p>
+
+<p><strong>多步法</strong>就是利用过去几步的 \(f\) 值算下一步。最经典的两族：</p>
+
+<p><strong>Adams-Bashforth（显式多步）。</strong>k 步 AB 公式形如</p>
+
+<p>\[
+y_{n+1} = y_n + h \sum_{j=0}^{k-1} \beta_j\, f(t_{n-j}, y_{n-j}).
+\]</p>
+
+<p>系数 \(\beta_j\) 选得让方法在 \(f\) 是 \(k - 1\) 次多项式时<em>精确</em>——这等价于用过去 \(k\) 个点的 \(f\) 值做插值，再积分这条插值多项式从 \(t_n\) 到 \(t_{n+1}\)。例：AB2 \(y_{n+1} = y_n + h(\frac{3}{2} f_n - \frac{1}{2} f_{n-1})\)，AB4 类似但 4 项。</p>
+
+<p>每步只需算一次 \(f\)（用上一步存的旧值）——比 RK4 的"每步算 4 次 \(f\)"<em>便宜 4 倍</em>。但稳定性区域比对应阶数 RK 的小（区域随阶数缩小）。</p>
+
+<p><strong>Adams-Moulton（隐式多步）。</strong>类似，但右边包括 \(f(t_{n+1}, y_{n+1})\)，于是隐式：</p>
+
+<p>\[
+y_{n+1} = y_n + h \Big[ \beta_{-1} f(t_{n+1}, y_{n+1}) + \sum_{j=0}^{k-1} \beta_j f(t_{n-j}, y_{n-j}) \Big].
+\]</p>
+
+<p>稳定性区域比 AB 大、精度比 AB 高。常见组合："<em>predictor-corrector</em>" 模式：用 AB 算个粗 \(y_{n+1}\) 当预测，再代入 AM 当一次校正。这种 PECE 模式既显式（每步固定开销）又稳定性接近隐式——是上世纪标准 ODE 库的工作马。</p>
+
+<p><strong>BDF（backward differentiation formula）。</strong>专为刚性问题设计的隐式多步：用过去 \(k\) 个 \(y\) 值（不是 \(f\) 值）做插值多项式，要求其<em>导数</em>在 \(t_{n+1}\) 等于 \(f(t_{n+1}, y_{n+1})\)。</p>
+
+<p>BDF1 = backward Euler。BDF2：\(\frac{3}{2} y_{n+1} - 2 y_n + \frac{1}{2} y_{n-1} = h f(t_{n+1}, y_{n+1})\)。一直到 BDF6 都还有用。</p>
+
+<p>BDF1、2 是 A-stable；BDF3-6 不再是 A-stable，但它们是<em>"几乎"A-stable</em>（叫 A(α)-stable，左半平面里偏离实轴 \(\le \alpha\) 度的扇形都稳）。这个稍弱的性质对实际刚性问题（特征值大致沿负实轴）足够用，换来更高阶精度。</p>
+
+<p>BDF6 之后的多步 BDF<em>不存在 zero-stable 的</em>——这是 Dahlquist 第一壁障的结果。所以现成 BDF 库一般做到 5 阶或 6 阶为止。</p>
+
+<p>历史上 BDF 是 Gear 在 1971 提出来专门处理化学反应动力学的刚性问题，所以这族方法常被叫 "Gear method"。</p>
+
+<h2 id="sec23-8">23.8 实战：SciPy 的 solve_ivp</h2>
+
+<p>SciPy 的 <code>scipy.integrate.solve_ivp</code> 是 Python 里 ODE 求解的标配。它接收 <code>method=...</code> 参数选积分器：</p>
+
+<ul>
+  <li><code>'RK45'</code>（默认）：Dormand-Prince 的 5(4) 嵌入对，自适应步长。<em>非刚性</em> 的工程默认。</li>
+  <li><code>'RK23'</code>：Bogacki-Shampine 的 3(2) 对，比 RK45 简单。低精度场合。</li>
+  <li><code>'DOP853'</code>：8 阶 Dormand-Prince，需要高精度时用。仍然显式，仍然怕刚性。</li>
+  <li><code>'Radau'</code>：5 阶隐式 Runge-Kutta（Radau IIA）。<em>刚性问题的高精度选择</em>。A-stable + L-stable。</li>
+  <li><code>'BDF'</code>：变阶（1 到 5）BDF。<em>刚性问题的工业标配</em>。</li>
+  <li><code>'LSODA'</code>：在非刚性（Adams）和刚性（BDF）间<em>自动切换</em>。如果你不知道你的问题刚不刚，用这个。</li>
+</ul>
+
+<p>典型用法：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+from scipy.integrate import solve_ivp
+import numpy as np
+
+def rhs(t, y):
+    return [-1000 * y[0] + 999 * np.cos(t)]
+
+# 非刚性求解器(RK45)在这个刚性问题上会要极小步长
+sol_stiff = solve_ivp(rhs, [0, 10], [1.0], method='BDF', dense_output=True)
+print(f"BDF 步数: {len(sol_stiff.t)}")  # ~50-100 步
+
+sol_explicit = solve_ivp(rhs, [0, 10], [1.0], method='RK45')
+print(f"RK45 步数: {len(sol_explicit.t)}")  # ~10000+ 步
+</pre>
+
+<p>BDF 用 50-100 步、RK45 用 10000+ 步算同一道方程。<em>步数差 100 倍</em>。每步 BDF 贵几倍，但总账上 BDF 仍然快得多。这就是 23.6 节"隐式贵步省"那笔账的实际数字。</p>
+
+<p>判断刚性的实战方法：跑一次 RK45，看返回的 <code>sol.t</code> 步数和最终 <code>sol.status</code>。如果步数<em>远</em>大于"\(t\) 区间长度 / 解的特征时间尺度"，或者求解器报"<em>too many steps</em>"，几乎一定刚性——切到 BDF 或 LSODA。</p>
+
+<p>另一种诊断：让求解器返回 Jacobian 估计（<code>solve_ivp(..., jac=...)</code> 提供解析 Jacobian 时），检查 \(J\) 的特征值。最大特征值 / 最小特征值跨几个数量级 → 刚性。</p>
+
+<p>更工程化的注意点：</p>
+
+<ul>
+  <li><em>解析提供 Jacobian</em> 比让求解器有限差分估计 Jacobian 又快又稳。如果你的 \(\mathbf f\) 不太复杂，写出 \(\partial \mathbf f / \partial \mathbf y\) 的成本低、回报大。</li>
+  <li><em>\(\mathbf f\) 极贵</em>（如调一个昂贵的物理仿真）时，多步法的"复用历史 \(f\) 值" 优势放大——AB / Adams 单步只算一次 \(f\)，比 RK4 单步算 4 次省 4 倍。</li>
+  <li><em>需要在指定时刻拿到解</em>（不只是积分器自选的时间点）：用 <code>dense_output=True</code> + <code>sol.sol(t)</code>，求解器内部存了局部多项式插值，能 \(O(1)\) 给出任何 \(t\) 的解。</li>
+  <li><em>解里有事件</em>（如"<em>什么时候 \(y_3 = 0\)</em>"）：用 <code>events=...</code>，求解器自动用根求解（链回<a href="ch7.html">第 7 章</a> Brent）找事件时刻。</li>
+</ul>
+
+<p>到这一步你应该能看出本书的累积力量——<em>解一道 ODE</em> 这件事现在对你不是单一算法，而是一整套工具的协同：自适应步长（步长控制是个反馈 PID 问题）、隐式步求解（牛顿调用 LU/CG）、连续输出（多项式插值）、事件检测（一维求根）。每一块你都在前面章节学过。</p>
+
+<p>下一章我们把工具进一步合体——把<em>偏微分方程</em>用空间差分变成大型 ODE 系统，再用本章的 ODE 求解器解它。同时<em>顺便</em>看一眼 FFT——一个把卷积 / 谱方法加速到 \(O(n \log n)\) 的算法奇迹。那是这本书的最后一章，也是把前面所有数值工具串到一个真实 PDE 流水线里的地方。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 ODE 数值解：Euler 与 Runge-Kutta</a><a href="ch24.html">下一章 · 第 24 章 PDE 有限差分入门 + FFT 一瞥 →</a></nav>
+</main>
+</body>
+</html>

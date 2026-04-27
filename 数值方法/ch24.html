@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 24 章 PDE 有限差分入门 + FFT 一瞥 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 ODE：多步法、稳定性、刚性方程</a><a href="appA.html">附录 A →</a></nav>
+<h1 id="ch24">第 24 章 PDE 有限差分入门 + FFT 一瞥</h1>
+
+<p>这是这本书的最后一章。我会做两件事：第一，把<em>偏微分方程</em> 用最朴素的有限差分变成一个大型 ODE / 线性代数问题——这一步把前面 23 章几乎所有工具都串起来用一遍。第二，看一眼<em>快速 Fourier 变换</em>（FFT）——一个把"\(O(n^2)\) 的笨办法变 \(O(n\log n)\) 的聪明办法" 的算法奇迹，本身值一本书，本章只能给你一个具体的窥见。</p>
+
+<p>这一章不奢望覆盖 PDE 数值方法（光这一题就够再写一本书）。目标更朴素：让你看到本书前面的求根、插值、积分、线性系统、ODE 是怎么<em>合体</em>解决一个真实科学计算任务的；让你<em>不害怕</em>下次见到 PDE 时去打开 SciPy 或 PETSc。</p>
+
+<h2 id="sec24-1">24.1 三种经典 PDE</h2>
+
+<p>整个 PDE 数值方法的训练，95% 的力气花在三种"原型"方程上。它们不是因为简单——是因为<em>所有</em>更复杂的物理模型在数值算法的层面都还原成它们的某种组合：</p>
+
+<p><strong>抛物型——热方程：</strong></p>
+
+<p>\[
+\frac{\partial u}{\partial t} = \alpha\, \Delta u, \qquad u(\mathbf x, 0) = u_0(\mathbf x).
+\]</p>
+
+<p>\(\alpha > 0\) 扩散系数。物理：温度分布、化学浓度扩散、Black-Scholes 期权定价（本质也是扩散）。<em>时间是单向的</em>——解越来越光滑，朝平衡态扩散。</p>
+
+<p><strong>双曲型——波动方程：</strong></p>
+
+<p>\[
+\frac{\partial^2 u}{\partial t^2} = c^2 \Delta u.
+\]</p>
+
+<p>\(c > 0\) 波速。物理：声波、电磁波、弹性振动。<em>时间是可逆的</em>——能量守恒，解中的高频结构永远在传播，不会"<em>抹平</em>"。</p>
+
+<p><strong>椭圆型——Laplace / Poisson 方程：</strong></p>
+
+<p>\[
+-\Delta u = f(\mathbf x).
+\]</p>
+
+<p><em>没有时间</em>。物理：稳态温度分布、静电势、流体的稳态压力。本质是边值问题——给区域边界值，求内部分布。</p>
+
+<p>这三类 PDE 数值上的"<em>味道</em>" 完全不同：抛物型刚性强（用隐式 + BDF），双曲型不刚性但要小心数值耗散（CFL 条件 + 高阶迎风），椭圆型是大型稀疏线性方程组（CG / 多重网格 / FFT 各显神通）。这一章主要看抛物型和椭圆型，双曲型留给 PDE 专门教材。</p>
+
+<h2 id="sec24-2">24.2 离散化：把连续问题变成离散问题</h2>
+
+<p>"<em>有限差分</em>" 的核心思想就一行：用<a href="ch13.html">第 13 章</a>的差商代替导数。</p>
+
+<p>选定一组离散点——在空间上 \(x_j = j \cdot \Delta x\)（\(j = 0, 1, \ldots, M\)），在时间上 \(t_n = n \cdot \Delta t\)（\(n = 0, 1, \ldots, N\)）——把<em>真解</em> \(u(x_j, t_n)\) 用<em>近似</em> \(U_j^n\) 代替。每个 \(U_j^n\) 是一个<em>数</em>。整个解就是一张 \((M+1) \times (N+1)\) 的数表。</p>
+
+<p>对一阶导数最常见的差商：</p>
+
+<p>\[
+\partial_t u(x_j, t_n) \approx \frac{U_j^{n+1} - U_j^n}{\Delta t} \quad (\text{前向，}\, O(\Delta t)).
+\]</p>
+
+<p>对二阶空间导数（中心差分）：</p>
+
+<p>\[
+\partial_x^2 u(x_j, t_n) \approx \frac{U_{j+1}^n - 2 U_j^n + U_{j-1}^n}{\Delta x^2} \quad (O(\Delta x^2)).
+\]</p>
+
+<p>把这些代到 PDE 里，就把 PDE 变成了一组关于 \(\{U_j^n\}\) 的代数 / 递推方程。下面看具体例子。</p>
+
+<h2 id="sec24-3">24.3 1D 热方程的显式格式</h2>
+
+<p>取 1D 热方程 \(u_t = \alpha u_{xx}\) 在 \(x \in [0, 1], t \in [0, T]\)，边界 \(u(0, t) = u(1, t) = 0\)，初值 \(u(x, 0) = u_0(x)\)。</p>
+
+<p>把 \(\partial_t\) 用前向差分、\(\partial_x^2\) 用中心差分代入：</p>
+
+<p>\[
+\frac{U_j^{n+1} - U_j^n}{\Delta t} = \alpha \cdot \frac{U_{j+1}^n - 2 U_j^n + U_{j-1}^n}{\Delta x^2}.
+\]</p>
+
+<p>整理（记 \(r := \alpha \Delta t / \Delta x^2\)）：</p>
+
+<p>\[
+\boxed{\ U_j^{n+1} = U_j^n + r\, (U_{j+1}^n - 2 U_j^n + U_{j-1}^n).\ }
+\]</p>
+
+<p>这是一条<em>显式</em> 递推：右边只依赖第 \(n\) 层的 \(U\)；可以从 \(U^0\)（初值）一层一层推到 \(U^N\)。每个时间步 \(O(M)\) 个加法乘法——便宜。</p>
+
+<p>试一下。取 \(\alpha = 1\), \(M = 50\), \(\Delta x = 0.02\), \(\Delta t = 10^{-4}\)（所以 \(r = 0.25\)），初值 \(u_0(x) = \sin(\pi x)\)。</p>
+
+<p>真解 \(u(x, t) = e^{-\pi^2 t} \sin(\pi x)\)（这道方程的本征函数解）。在 \(t = 0.1\) 时 \(u \approx e^{-0.987} \sin(\pi x) \approx 0.373 \sin(\pi x)\)。</p>
+
+<p>跑显式格式，\(t = 0.1\) 时 \(U_{25}^{1000} \approx 0.373\)——几乎和真值一致。<em>这事行</em>。</p>
+
+<p>现在把 \(\Delta t\) 加大到 \(2 \times 10^{-4}\)（\(r = 0.5\)）：仍然行。再加大到 \(3 \times 10^{-4}\)（\(r = 0.75\)）：第几十步开始，\(U_j^n\) 出现高频锯齿震荡，振幅每步翻倍，迅速 NaN。<em>显式格式爆了</em>。</p>
+
+<h2 id="sec24-4">24.4 CFL 条件：热方程版</h2>
+
+<p>"<em>r = 0.5 行、r = 0.75 不行</em>" 这件事不是巧合——它有一个具体的边界。把上面的递推视为离散傅里叶模式上的递推（每个空间频率独立演化），可以严格证明：</p>
+
+<p>\[
+\boxed{\ \text{显式 1D 热方程稳定} \iff r = \frac{\alpha \Delta t}{\Delta x^2} \le \frac{1}{2}.\ }
+\]</p>
+
+<p>这是热方程的<em>CFL 条件</em>（Courant-Friedrichs-Lewy，1928）。CFL 是 PDE 数值方法的"<em>代际</em>" 概念，所有显式格式都有它的某个版本。</p>
+
+<p>CFL 在热方程下读起来令人绝望：\(\Delta t \le \Delta x^2 / (2\alpha)\)。<em>时间步必须随空间步的平方</em> 缩小。把 \(\Delta x\) 减半（让空间分辨率翻倍），\(\Delta t\) 必须缩到 \(1/4\)；总工作量 = 时间步数 × 每步空间运算 = \(4 \times 2 = 8\) 倍。把 \(\Delta x\) 缩 10 倍 → 工作量 1000 倍。<em>显式热方程在细网格上几乎不可用</em>。</p>
+
+<p>把这件事翻译回上一章语言：1D 热方程的有限差分把 PDE 变成了大型 ODE 系统 \(\dot{\mathbf U} = A \mathbf U\)，其中 \(A\) 是三对角矩阵（每行 \(\frac{\alpha}{\Delta x^2}(1, -2, 1)\)）。\(A\) 的特征值范围 \([-4\alpha/\Delta x^2, 0]\)——最大 \(|\lambda| \sim 4\alpha/\Delta x^2\)，这<em>就是</em>显式 Euler 的稳定性步长被 \(\Delta x^{-2}\) 拖死的源头。</p>
+
+<p>"<em>把 PDE 变成 ODE 然后套显式 Euler</em>" 等于把<a href="ch23.html">上一章</a>的"<em>刚性问题</em>" 自动召唤出来。CFL 条件其实就是<em>刚性 ODE 对显式方法步长上限</em> 的一个版本——只是这次刚性是<em>由空间离散化制造出来的</em>，而不是物理本来有的。</p>
+
+<p>修法：<em>用隐式</em>。和<a href="ch23.html">上一章</a>完全一样的思路。</p>
+
+<h2 id="sec24-5">24.5 Crank-Nicolson：每步解三对角系统</h2>
+
+<p><em>Crank-Nicolson 格式</em>（1947）把空间二阶差分在 \(t_n\) 和 \(t_{n+1}\) 上各占一半权重：</p>
+
+<p>\[
+\frac{U_j^{n+1} - U_j^n}{\Delta t} = \frac{\alpha}{2 \Delta x^2}\Big[(U_{j+1}^{n+1} - 2 U_j^{n+1} + U_{j-1}^{n+1}) + (U_{j+1}^n - 2 U_j^n + U_{j-1}^n)\Big].
+\]</p>
+
+<p>整理出隐式格式：左边只剩 \(U^{n+1}\)，右边只剩 \(U^n\)：</p>
+
+<p>\[
+- \tfrac{r}{2} U_{j-1}^{n+1} + (1 + r) U_j^{n+1} - \tfrac{r}{2} U_{j+1}^{n+1} = \tfrac{r}{2} U_{j-1}^n + (1 - r) U_j^n + \tfrac{r}{2} U_{j+1}^n.
+\]</p>
+
+<p>每个时间步要解一个三对角线性方程组——左边的系数矩阵是固定的三对角。这<em>正好</em>是<a href="ch16.html">第 16 章</a> 16.3 节末尾提到的"三对角系统专用算法"（Thomas 算法）能 \(O(M)\) 解的情形。</p>
+
+<p>Crank-Nicolson 是<em>无条件稳定</em>的——任何 \(r > 0\) 都行。\(\Delta t\) 不再被 \(\Delta x^2\) 卡死。它还是<em>二阶</em>时间精度（比 backward Euler 的一阶强）。<em>对扩散方程几乎是默认选择</em>。</p>
+
+<p>请你停下来回头看：本章 24.3 → 24.4 → 24.5 重演了上一章 23.1 → 23.4 → 23.5 的剧情——<em>显式 → CFL/刚性卡死 → 隐式 + 解线性系统脱困</em>。这是<em>所有</em>时间相关 PDE 数值方法的同一首歌。每次只换乐器（不同的空间离散化、不同的隐式算子）。</p>
+
+<h2 id="sec24-6">24.6 FFT：一个算法奇迹</h2>
+
+<p>切换主题。<em>离散 Fourier 变换</em>（DFT）把长度 \(n\) 序列 \(\{x_0, x_1, \ldots, x_{n-1}\}\) 映成另一长度 \(n\) 序列：</p>
+
+<p>\[
+X_k = \sum_{j=0}^{n-1} x_j\, \omega^{jk}, \qquad \omega = e^{-2\pi i / n}, \quad k = 0, 1, \ldots, n-1.
+\]</p>
+
+<p>这是一个 \(n \times n\) 的矩阵-向量乘——朴素直接做 \(O(n^2)\) 次乘法。\(n = 10^6\) 时是 \(10^{12}\) 操作——几小时。</p>
+
+<p>1965 年 Cooley 和 Tukey 发表的<em>快速 Fourier 变换</em>（FFT）把这件事降到 \(O(n\log n)\)。\(n = 10^6\) 时变成 \(2 \times 10^7\) 操作——半秒。<em>同样的数学结果，速度差 50000 倍</em>。</p>
+
+<p>核心想法（"分治" 在傅里叶上）：把长度 \(n\) 的 DFT 分成两个长度 \(n/2\) 的 DFT——一个对偶下标 \(\{x_0, x_2, x_4, \ldots\}\)，一个对奇下标 \(\{x_1, x_3, x_5, \ldots\}\)。具体推导：</p>
+
+<p>\[
+X_k = \sum_{\text{偶 } j} x_j \omega^{jk} + \sum_{\text{奇 } j} x_j \omega^{jk}.
+\]</p>
+
+<p>设 \(j = 2m\) 和 \(j = 2m + 1\)，注意 \(\omega^{2mk} = (\omega^2)^{mk} = e^{-2\pi i \cdot mk / (n/2)}\)——这是<em>长度 \(n/2\) 的根</em>！</p>
+
+<p>所以</p>
+
+<p>\[
+X_k = \underbrace{\sum_{m=0}^{n/2 - 1} x_{2m} (\omega^2)^{mk}}_{=: E_k} + \omega^k \cdot \underbrace{\sum_{m=0}^{n/2 - 1} x_{2m+1} (\omega^2)^{mk}}_{=: O_k}.
+\]</p>
+
+<p>\(E_k\) 和 \(O_k\) 各自是<em>长度 \(n/2\) 的 DFT</em>。所以一个长度 \(n\) DFT = 两个长度 \(n/2\) DFT + \(n\) 次合并乘加。</p>
+
+<p>设 \(T(n)\) 是长度 \(n\) DFT 的乘法次数。递推 \(T(n) = 2 T(n/2) + O(n)\)。Master 定理给 \(T(n) = O(n \log n)\)。</p>
+
+<p>这个分治算法本身从 Gauss 1805 的笔记里就有（解决另一个具体计算问题），但被忽略了 160 年——因为 1805 年没有计算机，没人在乎"<em>同一计算的效率差</em>"。直到电子计算机普及，"<em>同一答案的两种算法在硬件上速度差 5 万倍</em>" 才成了能改变世界的事。Cooley-Tukey 1965 的论文被认为是 20 世纪十大算法之一。</p>
+
+<h2 id="sec24-7">24.7 FFT 应用一：周期 Laplace 在频域是除法</h2>
+
+<p>现在 FFT 怎么解 PDE？最干净的例子：<em>周期边界条件</em>下的 1D Poisson 方程</p>
+
+<p>\[
+-u''(x) = f(x), \quad x \in [0, 2\pi], \quad u(0) = u(2\pi),\ u'(0) = u'(2\pi).
+\]</p>
+
+<p>把 \(u, f\) 都展成 Fourier 级数 \(u(x) = \sum_k \hat u_k e^{i k x}\)、\(f(x) = \sum_k \hat f_k e^{i k x}\)。代到方程：\(-(ik)^2 \hat u_k = \hat f_k\)，即</p>
+
+<p>\[
+\hat u_k = \frac{\hat f_k}{k^2} \quad (k \ne 0).
+\]</p>
+
+<p>\(k = 0\) 模式（常数项）需要相容性条件 \(\hat f_0 = 0\)（积分平均为 0），且 \(\hat u_0\) 由附加条件确定。</p>
+
+<p>翻译成离散：在 \(M\) 个均匀网格点采样 \(f_j = f(x_j)\)；FFT 算 \(\hat f_k\)；逐点除以 \(k^2\) 得 \(\hat u_k\)；逆 FFT 算回 \(u_j\)。<em>整道 Poisson 方程的求解</em> = 一次 FFT + 一次除法 + 一次逆 FFT，\(O(M \log M)\)。</p>
+
+<p>对比：用<a href="ch16.html">第 16 章</a> LU 直接解\(M \times M\) 三对角系统是 \(O(M)\)（看似更快）；但<em>2D Poisson</em> 在 \(M \times M\) 网格用 LU 是 \(O(M^4)\)（带状）甚至更糟，FFT 解法是 \(O(M^2 \log M)\)——后者快得多。</p>
+
+<p>更进一步：FFT 方法对<em>常系数 + 周期边界</em> 的椭圆问题是<em>最快</em> 已知方法。代价是<em>对边界条件挑食</em>——非周期边界要换成离散余弦 / 正弦变换（DCT / DST），仍然 \(O(n \log n)\) 但要小心。一般边界条件（Dirichlet / Neumann 混合）就只能回到 LU 或迭代法。</p>
+
+<h2 id="sec24-8">24.8 FFT 应用二：卷积的 O(n log n) 算法</h2>
+
+<p>更广为人知的 FFT 应用是<em>卷积加速</em>。两个长度 \(n\) 序列的卷积</p>
+
+<p>\[
+(x * y)_k = \sum_j x_j\, y_{k-j}
+\]</p>
+
+<p>朴素算 \(O(n^2)\)。但<em>卷积定理</em> 说：</p>
+
+<p>\[
+\widehat{x * y} = \hat x \cdot \hat y \quad (\text{逐点乘法}).
+\]</p>
+
+<p>所以 \(x * y\) = 逆 FFT(FFT \(x\) 逐点乘 FFT \(y\))。三次 FFT + \(n\) 次乘 = \(O(n \log n)\)。</p>
+
+<p>实战意义：</p>
+
+<ul>
+  <li><em>大整数乘法</em>：把整数当系数序列，乘法 = 卷积 → FFT。这是 GMP 等大数库背后的算法。</li>
+  <li><em>多项式乘法</em>：同上，多项式 ≡ 系数序列。</li>
+  <li><em>卷积神经网络</em>里大卷积核：用 FFT 比直接滑窗快。</li>
+  <li><em>信号处理</em>：滤波器 = 输入 \(*\) 滤波核——大滤波器用 FFT。</li>
+  <li><em>偏微分方程的谱方法</em>：用 FFT 在频域算非线性项的乘积。</li>
+</ul>
+
+<p>这种"<em>把卷积变乘法</em>" 的能力是为什么 FFT 渗透到几乎所有计算密集应用。NumPy 的 <code>np.fft.fft</code>、SciPy 的 <code>scipy.fft</code>、专业库 FFTW 都给你高度优化的实现——你只管调用。理解 24.6 节的分治原理是为了让你知道<em>它能这么快不是黑魔法</em>，而是个具体的代数恒等式。</p>
+
+<h2 id="sec24-9">24.9 终章：你现在能做什么</h2>
+
+<p>这本书到此结束。回头看你走过的路：</p>
+
+<ul>
+  <li>第 1-5 章：浮点数、误差、条件数、稳定性。基础语法。</li>
+  <li>第 6-8 章：求根。一维 + 多维，二分 + 牛顿 + 拟牛顿。</li>
+  <li>第 9-11 章：插值。Lagrange、Chebyshev 节点、样条。</li>
+  <li>第 12 章：最小二乘 + 正交多项式。</li>
+  <li>第 13-15 章：数值微分 + 积分（Newton-Cotes、Gauss、Romberg、自适应）。</li>
+  <li>第 16-21 章：数值线性代数。LU / QR / 迭代 / Krylov / 特征值 / SVD。</li>
+  <li>第 22-23 章：ODE。Euler、RK4、多步法、刚性、隐式。</li>
+  <li>第 24 章（你正在读的）：PDE 入门 + FFT。</li>
+</ul>
+
+<p>每一块单独看都不大——一个具体算法，一个稳定性分析，一两道实例。但合起来你学的是<em>一种姿势</em>：把<em>连续</em>数学翻译成<em>离散</em>计算的姿势。这种姿势在每个数学领域里都换形式重现：求根 = 把"\(f(x) = 0\) 这道连续方程的解"翻译成"一个迭代序列的极限"；积分 = 把"\(\int f\) 这个连续量"翻译成"有限个 \(f\) 取值的加权和"；ODE = 把"\(y(t)\) 这条连续曲线"翻译成"离散时刻的数表"；PDE = 同上，再加上空间离散化。</p>
+
+<p>每次翻译都伴随两个问题：<em>这道翻译有多准</em>（精度、收敛阶），<em>这道翻译有多稳</em>（对扰动放大多少、对舍入放大多少）。这两个问题就是数值方法的整个智力工作。</p>
+
+<p>你已经看过很多次"<em>同一道数学题，两个代数等价的算法，结果天差地别</em>"的演示。第 1 章求根公式抵消、第 4 章病态线性系统、第 12 章正规方程 vs QR、第 23 章显式 vs 隐式 ODE——这些反复出现的对比不是个别例子，是<em>规律</em>：<strong>代数等价不蕴含数值等价</strong>。这条话是这本书最重要的一句。</p>
+
+<p>你下一步该做什么？这本书是<em>地图</em>，不是<em>使用手册</em>。要让它真正变成你的工具，你需要：</p>
+
+<ul>
+  <li><em>动手做一个真问题</em>。挑一个你自己感兴趣的：拟合一组实验数据；解你专业里某个微分方程；分析一段音频；训练一个简单回归模型。把本书的工具用到那个问题上，碰真壁，再回来查相应章节。这本书的章节都是<em>可以独立读</em>的，每次复习一节就够。</li>
+  <li><em>看一两本进阶专著</em>。Trefethen-Bau《Numerical Linear Algebra》是数值线性代数最好的入门；Trefethen《Approximation Theory and Approximation Practice》把插值/逼近讲到艺术品级；Hairer-Norsett-Wanner《Solving ODEs I/II》是 ODE 的圣经；LeVeque《Finite Difference Methods for ODEs and PDEs》是 PDE 入门首选。</li>
+  <li><em>读真实的库源码</em>。LAPACK / SciPy / SUNDIALS / FFTW 都是开源的。打开 <code>scipy/integrate/_ivp/bdf.py</code> 一类文件，你会看到本书第 23 章讲的多步法 + 牛顿 + 步长控制全在那里——但被工程化打磨过几十年。读这种代码会教你"<em>书上的算法</em>" 和"<em>能在 GitHub 上跑的代码</em>" 之间的距离。</li>
+</ul>
+
+<p>最后一段话留给我自己想说的：数值方法常被当成"工程师才学的东西"——纯数学家不屑，应用领域学生当成必经之恶。这两种态度都让人错过它的真价值。<em>数值方法是连续数学的具身</em>：是把抽象概念按到一台真物理机器上的过程。在这个过程中，连续数学的每个定理都被重新审问"<em>它到底意味着什么、能算到什么程度</em>"。这种审问会让你对数学的理解比单纯证明定理更深一层——你会知道<em>为什么</em> 这条定理重要，因为你看见过没有它时算法怎么爆炸。</p>
+
+<p>这就是"<em>把数学翻译成能跑</em>"——副标题的意思。希望这本书让你具备了那种翻译能力，也希望它让你对数学的看法变得更<em>具身</em> 一点。</p>
+
+<p>下一步在你手上。去做一个真问题。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 ODE：多步法、稳定性、刚性方程</a><a href="appA.html">附录 A →</a></nav>
+</main>
+</body>
+</html>

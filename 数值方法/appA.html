@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 矩阵与向量范数速查 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+<h1 id="appA">附录 A 矩阵与向量范数速查</h1>
+
+<p>本书第 4 章的"<em>条件数</em>" 公式 \(\kappa(A) = \|A\| \|A^{-1}\|\) 里、第 5 章的"<em>向后误差</em>" 公式里、第 17 章的"QR 稳定性" 估计里、第 19 章的"<em>共轭梯度收敛</em>" 估计里都默默用了"范数"——但每次的范数到底是哪一种、不同范数下结论怎么变，正文里跳过了。这个附录把这些事实集中处理。这里没有新概念，只有把正文用到的<em>所有</em>具体范数与不等式整齐摆开来。</p>
+
+<ul>
+  <li>向量范数 \(\|\cdot\|_1, \|\cdot\|_2, \|\cdot\|_\infty\) 与几何。</li>
+  <li>Frobenius 范数（一种"代数" 矩阵范数）。</li>
+  <li>诱导范数（operator norm）。</li>
+  <li>三种诱导范数的封闭公式：\(\|A\|_1 = \) 最大列和、\(\|A\|_\infty = \) 最大行和、\(\|A\|_2 = \sigma_{\max}\)。</li>
+  <li>范数等价性 + 等价常数随维数 \(n\) 的变化。</li>
+  <li>子乘性 \(\|AB\| \le \|A\| \|B\|\)。</li>
+  <li>常用例子的具体计算。</li>
+</ul>
+
+<h2 id="appA-1">A.1 向量范数：三个主角</h2>
+
+<p>给 \(\mathbf x = (x_1, \ldots, x_n)^T \in \mathbb R^n\)，三种最常用的范数：</p>
+
+<p>\[
+\|\mathbf x\|_1 = \sum_{i=1}^n |x_i|, \quad
+\|\mathbf x\|_2 = \Big(\sum_{i=1}^n x_i^2\Big)^{1/2}, \quad
+\|\mathbf x\|_\infty = \max_{1 \le i \le n} |x_i|.
+\]</p>
+
+<p>它们都是<a href="../线性代数/index.html">《线性代数读本》</a>里"范数公理"的实例：正定、齐次、三角不等式。</p>
+
+<p><em>几何画面</em>：让 \(\mathbf x \in \mathbb R^2\)，画各自范数下的"<em>单位球</em>" \(\{\mathbf x : \|\mathbf x\| = 1\}\)：</p>
+
+<ul>
+  <li>\(\|\cdot\|_2\) 球 = 标准的圆。</li>
+  <li>\(\|\cdot\|_1\) 球 = 顶点 \((\pm 1, 0), (0, \pm 1)\) 的<em>菱形</em>。</li>
+  <li>\(\|\cdot\|_\infty\) 球 = 顶点 \((\pm 1, \pm 1)\) 的<em>正方形</em>。</li>
+</ul>
+
+<p>三个球嵌套：\(\|\cdot\|_1\) 球 \(\subset\) \(\|\cdot\|_2\) 球 \(\subset\) \(\|\cdot\|_\infty\) 球（每个 \(\mathbf x\) 都满足 \(\|\mathbf x\|_\infty \le \|\mathbf x\|_2 \le \|\mathbf x\|_1\)）。</p>
+
+<p>更一般的<strong>\(p\)-范数</strong>（\(1 \le p \le \infty\)）：</p>
+
+<p>\[
+\|\mathbf x\|_p = \Big(\sum_i |x_i|^p\Big)^{1/p}.
+\]</p>
+
+<p>\(p = 1, 2, \infty\) 是上面三个；其他 \(p\) 偶尔出现（如最小化 \(\|\cdot\|_{1.5}\) 用于稳健回归），但本书几乎只用 1、2、∞。</p>
+
+<h2 id="appA-2">A.2 Frobenius 范数：把矩阵当向量</h2>
+
+<p>给 \(A \in \mathbb R^{m \times n}\)。最朴素的"<em>把矩阵当 \(mn\) 维向量</em>" 的范数：</p>
+
+<p>\[
+\boxed{\ \|A\|_F = \Big(\sum_{i,j} A_{ij}^2\Big)^{1/2} = \sqrt{\operatorname{tr}(A^T A)}.\ }
+\]</p>
+
+<p>这是 Frobenius 范数。等价表达：</p>
+
+<ul>
+  <li>把 \(A\) 看成 \(\mathbb R^{mn}\) 向量，2-范数。</li>
+  <li>\(A\) 的奇异值的平方和的根：\(\|A\|_F = \sqrt{\sigma_1^2 + \cdots + \sigma_r^2}\)。</li>
+</ul>
+
+<p>它是矩阵范数中<em>计算最便宜</em> 的：\(O(mn)\) 算法，不用任何分解。</p>
+
+<p>但 Frobenius 范数<em>不是诱导范数</em>（下节定义）——它对单位矩阵给 \(\|I_n\|_F = \sqrt n\)，不是 1。所以它不能直接做"<em>放大倍数</em>" 解释；做条件数公式时通常不用 Frobenius，而用诱导的 2-范数。</p>
+
+<h2 id="appA-3">A.3 诱导范数（operator norm）</h2>
+
+<p>从向量范数 \(\|\cdot\|_p\) <em>诱导</em> 出的矩阵范数：</p>
+
+<p>\[
+\boxed{\ \|A\|_p = \sup_{\mathbf x \ne 0} \frac{\|A\mathbf x\|_p}{\|\mathbf x\|_p} = \sup_{\|\mathbf x\|_p = 1} \|A\mathbf x\|_p.\ }
+\]</p>
+
+<p>解释：\(\|A\|_p\) 是 \(A\) 在 \(p\)-范数意义下"<em>最大可能放大倍数</em>"。也就是单位球被 \(A\) 拉成的形状里"<em>离原点最远的点</em>" 的范数。</p>
+
+<p>诱导范数自动满足 \(\|I\| = 1\)（单位矩阵不放大谁）和<em>子乘性</em> \(\|AB\| \le \|A\| \|B\|\)（A.6 节）。</p>
+
+<p>三种最常用诱导范数有<em>封闭公式</em>，下节给。</p>
+
+<h2 id="appA-4">A.4 三种诱导范数的封闭公式</h2>
+
+<p>给 \(A \in \mathbb R^{m \times n}\)。</p>
+
+<p><strong>1-范数（最大列和）：</strong></p>
+
+<p>\[
+\boxed{\ \|A\|_1 = \max_{1 \le j \le n} \sum_{i=1}^m |A_{ij}|.\ }
+\]</p>
+
+<p>"<em>最大列绝对和</em>"。证明思路：\(\|A \mathbf x\|_1 = \sum_i |\sum_j A_{ij} x_j| \le \sum_j |x_j| \sum_i |A_{ij}| \le (\max_j \sum_i |A_{ij}|) \cdot \|\mathbf x\|_1\)；下界由取 \(\mathbf x = \mathbf e_{j^*}\)（最大列对应的标准基向量）实现。</p>
+
+<p><strong>∞-范数（最大行和）：</strong></p>
+
+<p>\[
+\boxed{\ \|A\|_\infty = \max_{1 \le i \le m} \sum_{j=1}^n |A_{ij}|.\ }
+\]</p>
+
+<p>"<em>最大行绝对和</em>"。证明类似，用 \(\|\cdot\|_\infty\) 替 \(\|\cdot\|_1\)。</p>
+
+<p><strong>2-范数（谱范数 / 最大奇异值）：</strong></p>
+
+<p>\[
+\boxed{\ \|A\|_2 = \sigma_{\max}(A) = \sqrt{\lambda_{\max}(A^T A)}.\ }
+\]</p>
+
+<p>"<em>最大奇异值</em>"。这是<a href="ch21.html">第 21 章</a> SVD 的几何含义——\(\|A\|_2\) 是 \(A\) 把单位 \(\ell_2\)-球拉成的椭球的<em>最长半轴</em>。</p>
+
+<p>三个公式中前两个 \(O(mn)\) 算法（直接扫一遍）；2-范数要算最大奇异值，\(O(mn^2)\)（迭代法 \(O(mn)\) 单步、几十步收敛，所以实践 \(O(mn)\) 量级）。<em>2-范数贵但最有几何含义</em>。</p>
+
+<h2 id="appA-5">A.5 范数等价性</h2>
+
+<p>有限维空间里所有范数<em>等价</em>——存在常数 \(c, C > 0\) 使 \(c \|\mathbf x\|_a \le \|\mathbf x\|_b \le C \|\mathbf x\|_a\) 对所有 \(\mathbf x\) 成立。但<em>常数随维数 \(n\) 变</em>。具体的，对 \(\mathbb R^n\) 的标准 \(p\)-范数：</p>
+
+<p>\[
+\|\mathbf x\|_\infty \le \|\mathbf x\|_2 \le \sqrt n \cdot \|\mathbf x\|_\infty,
+\]</p>
+
+<p>\[
+\|\mathbf x\|_2 \le \|\mathbf x\|_1 \le \sqrt n \cdot \|\mathbf x\|_2,
+\]</p>
+
+<p>\[
+\|\mathbf x\|_\infty \le \|\mathbf x\|_1 \le n \cdot \|\mathbf x\|_\infty.
+\]</p>
+
+<p>等价系数随 \(n\) <em>多项式增长</em>——所以"<em>误差小</em>" 在不同范数下意义稍有差异。具体的：用 \(\|\cdot\|_\infty\) 给 \(10^{-8}\) 误差的向量，\(\|\cdot\|_2\) 下可能是 \(10^{-8} \sqrt n\)。在 \(n = 10^4\) 时这是 \(10^{-6}\)——慢一点点，但不离谱。</p>
+
+<p>对矩阵的诱导范数，类似的等价：</p>
+
+<p>\[
+\frac{1}{\sqrt n} \|A\|_\infty \le \|A\|_2 \le \sqrt m \cdot \|A\|_\infty,
+\]</p>
+
+<p>\[
+\frac{1}{\sqrt m} \|A\|_1 \le \|A\|_2 \le \sqrt n \cdot \|A\|_1.
+\]</p>
+
+<p>这也是为什么<em>条件数</em> 在不同范数下会有不同数值，但量级一样。本书在第 4 章用 2-范数定义 \(\kappa_2(A) = \sigma_{\max}/\sigma_{\min}\)，最直观；实际工程库（LAPACK <code>condest</code>）常用 1-范数版本，因为算 \(\|A^{-1}\|_1\) 比 \(\|A^{-1}\|_2\) 便宜。</p>
+
+<h2 id="appA-6">A.6 子乘性 ‖AB‖ ≤ ‖A‖ ‖B‖</h2>
+
+<p>对任何<em>诱导</em> 范数（也对 Frobenius）：</p>
+
+<p>\[
+\boxed{\ \|A B\| \le \|A\| \cdot \|B\|.\ }
+\]</p>
+
+<p>证明（诱导范数版）：</p>
+
+<p>\[
+\|A B \mathbf x\| \le \|A\| \cdot \|B \mathbf x\| \le \|A\| \cdot \|B\| \cdot \|\mathbf x\|.
+\]</p>
+
+<p>取 sup 给结论。</p>
+
+<p>这条不等式让"<em>多次乘法的范数</em>" 受控。例：\(\|A^k\| \le \|A\|^k\)。所以如果 \(\|A\| < 1\)，幂迭代 \(A^k\) 衰减到零。<a href="ch18.html">第 18 章</a>迭代法的收敛分析就是这条机制——求解 \(A \mathbf x = \mathbf b\) 的固定点迭代 \(\mathbf x_{n+1} = M \mathbf x_n + \mathbf c\) 收敛 ⟺ \(\rho(M) < 1\)（谱半径 < 1），充分条件 \(\|M\| < 1\)（任何诱导范数）。</p>
+
+<p>对 Frobenius 也成立（可由 \(\|A B\|_F \le \|A\|_2 \|B\|_F \le \|A\|_F \|B\|_F\) 验证；第二个不等式由 \(\|\cdot\|_2 \le \|\cdot\|_F\)）。</p>
+
+<p><em>反例</em>：<em>非诱导</em>、<em>非子乘</em> 的"范数" 也存在。比如<em>最大单元范数</em> \(\|A\|_{\max} = \max_{ij} |A_{ij}|\)——满足正定、齐次、三角，但<em>不</em>满足 \(\|AB\|_{\max} \le \|A\|_{\max} \|B\|_{\max}\)。例：\(A = \begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}\)，\(\|A\|_{\max} = 1\)，但 \(\|A^2\|_{\max} = 2\)。所以<em>谈"范数" 时一定要说清是哪种</em>。</p>
+
+<h2 id="appA-7">A.7 几个常用例子</h2>
+
+<p><strong>例 1：</strong>\(A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}\)。</p>
+
+<ul>
+  <li>列和：第 1 列 \(|1| + |3| = 4\)，第 2 列 \(|2| + |4| = 6\)。\(\|A\|_1 = 6\)。</li>
+  <li>行和：第 1 行 \(1 + 2 = 3\)，第 2 行 \(3 + 4 = 7\)。\(\|A\|_\infty = 7\)。</li>
+  <li>Frobenius：\(\sqrt{1 + 4 + 9 + 16} = \sqrt{30} \approx 5.477\)。</li>
+  <li>2-范数：算 \(A^T A = \begin{pmatrix} 10 & 14 \\ 14 & 20 \end{pmatrix}\)，特征值满足 \(\lambda^2 - 30\lambda + (200 - 196) = 0\)，\(\lambda = 15 \pm \sqrt{221}\)。\(\sigma_{\max}^2 = 15 + \sqrt{221} \approx 29.866\)，\(\|A\|_2 \approx 5.465\)。</li>
+</ul>
+
+<p>验证 A.5 节的等价：\(\|A\|_2 \approx 5.465\)，\(\|A\|_\infty = 7\)，比值 \(7/5.465 \approx 1.28 \le \sqrt 2 = 1.414\)。<em>等价</em>。</p>
+
+<p><strong>例 2：</strong>对角矩阵 \(D = \operatorname{diag}(d_1, \ldots, d_n)\)。</p>
+
+<ul>
+  <li>\(\|D\|_1 = \|D\|_\infty = \|D\|_2 = \max_i |d_i|\)。所有诱导范数相等。</li>
+  <li>\(\|D\|_F = \sqrt{\sum d_i^2}\)。</li>
+  <li>\(\|D^{-1}\|_2 = 1/\min_i |d_i|\)（如果 \(d_i \ne 0\)）。</li>
+  <li>\(\kappa_2(D) = \max|d_i|/\min|d_i|\)——直接读出。</li>
+</ul>
+
+<p>对角矩阵是观察条件数的最干净的例子。</p>
+
+<p><strong>例 3：</strong>正交矩阵 \(Q\)（\(Q^T Q = I\)）。</p>
+
+<ul>
+  <li>所有奇异值 = 1，所以 \(\|Q\|_2 = 1\)。</li>
+  <li>\(\|Q\|_F = \sqrt n\)。</li>
+  <li>\(\kappa_2(Q) = 1\)——<em>正交矩阵是最良态的</em>。</li>
+  <li>这就是为什么<a href="ch17.html">第 17 章</a> QR 分解能稳定解最小二乘——\(Q^T\) 的乘法不放大误差。</li>
+</ul>
+
+<p><strong>例 4：</strong>Hilbert 矩阵 \(H_{ij} = 1/(i + j - 1)\)，\(n = 5\)：</p>
+
+<p>\[
+H_5 = \begin{pmatrix} 1 & 1/2 & 1/3 & 1/4 & 1/5 \\ 1/2 & 1/3 & 1/4 & 1/5 & 1/6 \\ \vdots & & & & \vdots \\ 1/5 & 1/6 & 1/7 & 1/8 & 1/9 \end{pmatrix}.
+\]</p>
+
+<p>\(\|H_5\|_\infty = 1 + 1/2 + 1/3 + 1/4 + 1/5 \approx 2.283\)（第 1 行和）；但 \(\kappa_2(H_5) \approx 4.77 \times 10^5\)——<em>看起来温和的小矩阵条件数极大</em>。\(n = 10\) 时 \(\kappa_2(H_{10}) \approx 1.6 \times 10^{13}\)。这是数值测试里的标准"病态" 例子；用 double 精度根本不能可靠解 \(H_{10} \mathbf x = \mathbf b\)。</p>
+
+<p><strong>例 5：</strong>验证子乘性。\(A = B = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}\)。\(\|A\|_2 = 1\)。\(AB = \begin{pmatrix} 0 & 0 \\ 0 & 0 \end{pmatrix}\)，\(\|AB\|_2 = 0\)。\(\|AB\|_2 = 0 \le 1 = \|A\|_2 \|B\|_2\) 严格小于。这表明子乘性常常远不被达到——它是个<em>上界</em>。</p>
+
+<h2 id="appA-8">A.8 实战准则</h2>
+
+<ul>
+  <li>没说哪种范数时，本书默认 2-范数（最有几何意义、也最常见）。</li>
+  <li>需要快速估计而不在意常数倍：用 1 或 ∞-范数（封闭公式 \(O(mn)\)）。</li>
+  <li>Frobenius 用在两种场合：（a）总能量 / 整体大小的度量，（b）矩阵之间的"<em>距离</em>"（如低秩近似 \(\|A - A_k\|_F\) 在 SVD 截断时是 Eckart-Young 定理的自然范数）。</li>
+  <li>条件数估计：LAPACK <code>dgecon</code> 用 1-范数，因为可以从 LU 分解结果\(O(n^2)\) 顺便算。需要严格的 \(\kappa_2\) 用 SVD（\(O(n^3)\)，分析阶段才用）。</li>
+  <li>代码里用 NumPy：<code>np.linalg.norm(A)</code> 默认 Frobenius；<code>np.linalg.norm(A, 2)</code> 是 2-范数；<code>np.linalg.norm(A, np.inf)</code> 是 ∞-范数；<code>np.linalg.cond(A)</code> 给条件数（可指定范数）。</li>
+</ul>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+</main>
+</body>
+</html>

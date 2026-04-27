@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 经典迭代法：Jacobi、Gauss-Seidel、SOR — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 QR 分解 + Householder 反射</a><a href="ch19.html">下一章 · 第 19 章 Krylov 子空间方法 →</a></nav>
+<h1 id="ch18">第 18 章 经典迭代法：Jacobi、Gauss-Seidel、SOR</h1>
+
+<p>第 16 章把 LU 分解称作"解线性方程组的标准方法"。第 17 章 QR 加上来作为更稳的备选。这两章里我没说出口的隐含假设是：<em>\(n\) 不太大</em>。具体是多大？用桌上一台普通笔记本跑双精度 LU，\(n = 10^4\)（一亿次操作）大约 1 秒，\(n = 10^5\)（一千亿次）十几分钟，\(n = 10^6\) 完全跑不动——\(10^{18}\) 操作以现代芯片每秒 \(10^{10}\) 次浮点算，要算十年。</p>
+
+<p>问题在于<em>这种规模的方程组真实存在</em>。把一个 PDE（比如温度场、流体、电磁场）离散到一个 \(1000 \times 1000 \times 1000\) 的三维网格上——立刻 \(n = 10^9\) 个未知量。哪怕二维网格 \(1000 \times 1000\) 也有 \(n = 10^6\)。这种规模下 LU 的 \(O(n^3)\) 不仅算不动；存储一个稠密 \(10^6 \times 10^6\) 的矩阵就要 \(8 \cdot 10^{12}\) 字节 = <em>8 TB</em>，单机塞不下。</p>
+
+<p>但有一个救命点：<em>这些大矩阵几乎全是 0</em>。PDE 离散化每个未知量只和它的几个邻居相互作用——典型的"<em>5-point stencil</em>" 二维网格里每行只有 5 个非零元素，\(10^6\) 行总共 \(5 \times 10^6\) 个非零，存得下、做矩阵-向量乘 \(O(n)\) 而不是 \(O(n^2)\)。</p>
+
+<p>所以你想：<em>那做稀疏 LU 不行吗？只把那 \(5 \times 10^6\) 个非零搞定？</em> 这是这一章登场的根本动机。我们先看为什么这个想法<em>不</em>行——稀疏 LU 会破坏稀疏结构。再从这个失败重新设计：不分解、迭代逼近。</p>
+
+<h2 id="sec18-1">18.1 直接法的瓶颈：稠密代价 + 稀疏被破坏</h2>
+
+<p>看一个具体小例子。考虑 1 维网格离散化的<em>三对角</em> 矩阵</p>
+
+<p>\[
+A = \begin{pmatrix} 2 & -1 & 0 & 0 & 0 \\ -1 & 2 & -1 & 0 & 0 \\ 0 & -1 & 2 & -1 & 0 \\ 0 & 0 & -1 & 2 & -1 \\ 0 & 0 & 0 & -1 & 2 \end{pmatrix}.
+\]</p>
+
+<p>\(5 \times 5\)，每行至多 3 个非零，总共 13 个非零（稀疏度 52%——这个例子小所以"稀疏" 不明显，但放到 \(n = 10^6\) 上每行还是 3 个非零，稀疏度 \(3/n \to 0\)）。</p>
+
+<p>对它做高斯消元（不需要主元，矩阵对称正定）。第一步：用第一行消去第二行的 \(-1\)。第二行变成 \((0, 2 - 1/2, -1, 0, 0) = (0, 3/2, -1, 0, 0)\)。<em>没有产生新非零</em>。第三、四、五行第一列本来就是 0，不动。继续往下，每一步只影响"<em>该行 + 下一行</em>"，只在已经非零的位置做加减。最终 \(L\) 和 \(U\) 都还是<em>三对角</em>——稀疏被保住了。</p>
+
+<p>这是一维网格的好运气。现在换成<em>二维 5-point stencil</em>。把 \(N \times N\) 网格上的离散 Poisson 方程展平成 \(n = N^2\) 维向量，矩阵长这样（\(N = 4\)，\(n = 16\) 的玩具例子）：</p>
+
+<p>\[
+A = \begin{pmatrix} T & -I \\ -I & T & -I \\ & -I & T & -I \\ & & -I & T \end{pmatrix}, \quad T = \begin{pmatrix} 4 & -1 \\ -1 & 4 & -1 \\ & -1 & 4 & -1 \\ & & -1 & 4 \end{pmatrix}.
+\]</p>
+
+<p>每行 5 个非零（中心 4、上下左右四个 \(-1\)），但<em>非零位置不再是三对角</em>——除了对角线 ±1 之外还有距离 \(N = 4\) 的 ±4 偏对角。整个 \(16 \times 16\) 矩阵看起来像一个"<em>带状</em>" 矩阵，半带宽 \(N = 4\)。</p>
+
+<p>现在做高斯消元。第一行用来消第二、第五行（这两行第一列非零）。消第二行没事，但消<em>第五行</em> 时会发生<em>填入</em>：第一行第二列有非零、第五行第二列原本是 0，消元后<em>变成非零</em>。这个新非零在第五行第二列。</p>
+
+<p>这只是开始。继续往下消，每一步都可能在<em>带宽内</em> 的 0 位置填入新非零。最终 \(L\) 和 \(U\) 在带宽 \(N\) 内全部填满。\(L\) 和 \(U\) 的非零数 \(\sim N \cdot N^2 = N^3\) 而不是原来的 \(5 N^2\)——对 \(N = 1000\) 即 \(n = 10^6\)，原矩阵 \(5 \times 10^6\) 非零，\(L + U\) 有 \(10^9\) 非零。<em>200 倍膨胀</em>。然后开销也跟着膨胀：稀疏 LU 是 \(O(n N) = O(n^{3/2})\) 的（不是 \(O(n^3)\) 但仍然太多）。</p>
+
+<p>三维 7-point stencil 更糟：稀疏 LU 是 \(O(n^2)\)，\(n = 10^9\) 时 \(10^{18}\) 操作，跑不动。</p>
+
+<p>请你停下来认这件事的形状：<em>稀疏矩阵不一定有稀疏的 LU 分解</em>。"消元" 这个动作天然会在带宽内填入新非零。有专门的"<em>稀疏直接法</em>"（用 nested dissection 重排行列降低填入），但即使最优，三维问题也撑不到 \(n = 10^9\)。我们必须换路。</p>
+
+<h2 id="sec18-2">18.2 简单想法：分裂矩阵</h2>
+
+<p>抛开"分解" 思路，从另一头想。我们要解 \(A x = b\)。能不能<em>不</em>动 \(A\)、不算 \(L U\)、不显式存任何分解，只反复做"<em>矩阵 × 向量</em>" 这种<em>不破坏稀疏</em> 的动作？</p>
+
+<p>这就是迭代法的灵魂。先把 \(A\) 拆成"<em>容易求逆的部分 \(M\)</em>" 和"<em>剩下的 \(N\)</em>"：</p>
+
+<p>\[
+A = M - N.
+\]</p>
+
+<p>把 \(A x = b\) 改写为 \(M x = N x + b\)。如果我们已经有 \(x\)，\(M x = N x + b\) 是恒等式；但如果手上只有近似 \(x_k\)，等号会有差。我们让 \(x_{k+1}\) 满足左边的形式：</p>
+
+<p>\[
+\boxed{\ M x_{k+1} = N x_k + b. \ }
+\]</p>
+
+<p>这给出迭代格式 \(x_{k+1} = M^{-1} (N x_k + b) = M^{-1} N x_k + M^{-1} b\)。</p>
+
+<p>关键设计抉择：<em>\(M\) 选什么</em>？</p>
+
+<ul>
+  <li>\(M = A\)：每步要解 \(M x_{k+1} = b\)（因为 \(N = 0\)），等于直接解，回到原问题。</li>
+  <li>\(M = I\)：\(x_{k+1} = (I - A) x_k + b\)。每步只要矩阵-向量乘，便宜。但收敛性差（要 \(\|I - A\|\) 小，A 必须"<em>很接近</em>" 单位矩阵才行）。</li>
+  <li>\(M\) 选某个"<em>容易解</em>" 的子结构——比如<em>对角</em>、<em>下三角</em> 这种用回代就能解的形式。</li>
+</ul>
+
+<p>第三个选择是经典迭代法的入口。把 \(A\) 写成</p>
+
+<p>\[
+A = D + L + U,
+\]</p>
+
+<p>其中 \(D\) 是 \(A\) 的对角部分，\(L\) 是<em>严格下三角</em>，\(U\) 是<em>严格上三角</em>（这里的 \(L, U\) 是 \(A\) 的元素直接拿出来，<em>不</em>是 LU 分解里的那两个！记号撞车，但传统就这么用）。</p>
+
+<p>三种经典选择，对应三个算法。</p>
+
+<h2 id="sec18-3">18.3 Jacobi 迭代</h2>
+
+<p>选 \(M = D\)、\(N = -(L + U)\)。迭代式：</p>
+
+<p>\[
+D x_{k+1} = -(L + U) x_k + b,
+\]</p>
+
+<p>即</p>
+
+<p>\[
+\boxed{\ x_{k+1} = D^{-1} (b - (L + U) x_k). \ }
+\]</p>
+
+<p>逐分量写出来：</p>
+
+<p>\[
+x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij} x_j^{(k)} \right).
+\]</p>
+
+<p>翻译成人话：<em>第 \(i\) 个未知量的新值，等于 把方程第 \(i\) 行 \(\sum_j a_{ij} x_j = b_i\) 对 \(x_i\) 解出来——其它 \(x_j\) 用上一步的旧值</em>。</p>
+
+<p>跑一个最小例子。解</p>
+
+<p>\[
+\begin{pmatrix} 4 & -1 \\ -1 & 4 \end{pmatrix} \begin{pmatrix} x_1 \\ x_2 \end{pmatrix} = \begin{pmatrix} 3 \\ 3 \end{pmatrix},
+\]</p>
+
+<p>真解 \(x = (1, 1)\)。从 \(x^{(0)} = (0, 0)\) 出发：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(k\)</th><th style="padding: 0.3em 1em;">\(x_1^{(k)}\)</th><th style="padding: 0.3em 1em;">\(x_2^{(k)}\)</th><th style="padding: 0.3em 1em;">误差 \(\|x^{(k)} - x^*\|\)</th></tr>
+<tr><td>0</td><td>0.0000</td><td>0.0000</td><td>1.41</td></tr>
+<tr><td>1</td><td>0.7500</td><td>0.7500</td><td>0.354</td></tr>
+<tr><td>2</td><td>0.9375</td><td>0.9375</td><td>0.0884</td></tr>
+<tr><td>3</td><td>0.9844</td><td>0.9844</td><td>0.0221</td></tr>
+<tr><td>4</td><td>0.9961</td><td>0.9961</td><td>0.00553</td></tr>
+<tr><td>5</td><td>0.9990</td><td>0.9990</td><td>0.00138</td></tr>
+</table>
+
+<p>每步误差<em>大约除以 4</em>——<em>线性收敛</em>，每步把误差缩 1/4。比起牛顿法（<a href="ch7.html">第 7 章</a>）的二次收敛，这慢得多——线性意味着每步固定砍一个常数因子，要砍到 \(10^{-12}\) 需要 \(\log_4(10^{12}) \approx 20\) 步。看起来不算太多，但记住每步要做<em>一次矩阵-向量乘</em>——\(n = 10^6\) 时每步 \(O(n) = 10^6\) 操作，20 步是 \(2 \times 10^7\) 操作。比 LU 的 \(10^{18}\) 少了 11 个数量级。<em>这就是迭代法在这种规模下能赢的关键</em>。</p>
+
+<p>Jacobi 的<em>并行性</em>：注意上面分量公式 \(x_i^{(k+1)} = \ldots x_j^{(k)}\) 里，<em>所有</em> \(x_j^{(k+1)}\) 只依赖 \(x_j^{(k)}\)、彼此<em>互不依赖</em>。所以一步 Jacobi 迭代可以<em>所有 \(n\) 个分量并行算</em>——拿 1000 个 GPU 核心来分工，每个核心算一千个分量，并行度满满。这是 Jacobi 在 GPU / 分布式计算里仍然有人用的原因，尽管它的串行收敛速度被下面的 Gauss-Seidel 打败。</p>
+
+<h2 id="sec18-4">18.4 Gauss-Seidel：用最新的</h2>
+
+<p>看 Jacobi 的分量公式：算 \(x_3^{(k+1)}\) 时用 \(x_1^{(k)}\) 和 \(x_2^{(k)}\)——那两个旧值。但<em>我们刚才已经算出 \(x_1^{(k+1)}\) 和 \(x_2^{(k+1)}\) 了！</em>它们应该比旧值更接近真解。何不直接用？</p>
+
+<p>这就是 Gauss-Seidel：</p>
+
+<p>\[
+\boxed{\ x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j < i} a_{ij} x_j^{(k+1)} - \sum_{j > i} a_{ij} x_j^{(k)} \right). \ }
+\]</p>
+
+<p>下三角 \(j < i\) 用<em>新</em>值，上三角 \(j > i\) 用<em>旧</em>值。矩阵形式：选 \(M = D + L\)、\(N = -U\)：</p>
+
+<p>\[
+(D + L) x_{k+1} = -U x_k + b.
+\]</p>
+
+<p>左边 \(D + L\) 是<em>下三角</em>（包含对角），用<em>前向回代</em> 求解：从 \(i = 1\) 开始一个一个算 \(x_i^{(k+1)}\)，每个新分量算出来后立刻可用于后面。所以"<em>用最新的</em>" 不需要额外存储——同一个 \(x\) 数组就地更新。</p>
+
+<p>同样的小例子用 Gauss-Seidel：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(k\)</th><th style="padding: 0.3em 1em;">\(x_1^{(k)}\)</th><th style="padding: 0.3em 1em;">\(x_2^{(k)}\)</th><th style="padding: 0.3em 1em;">误差</th></tr>
+<tr><td>0</td><td>0.0000</td><td>0.0000</td><td>1.41</td></tr>
+<tr><td>1</td><td>0.7500</td><td>0.9375</td><td>0.265</td></tr>
+<tr><td>2</td><td>0.9844</td><td>0.9961</td><td>0.0166</td></tr>
+<tr><td>3</td><td>0.9990</td><td>0.9998</td><td>0.00104</td></tr>
+<tr><td>4</td><td>0.99994</td><td>0.99998</td><td>\(6.5 \times 10^{-5}\)</td></tr>
+</table>
+
+<p>每步误差除以 \(\approx 16\)——<em>比 Jacobi 收敛快一倍</em>（每步多砍一倍因子）。这个"<em>2 倍</em>" 的关系不是巧合——对很多典型矩阵（包括 PDE 离散化得到的），Gauss-Seidel 的渐近收敛因子是 Jacobi 的<em>平方</em>，所以等效"<em>2 倍速度</em>"。</p>
+
+<p>代价：失去并行性。Gauss-Seidel 的第 \(i\) 个分量依赖 \(x_1^{(k+1)}, \ldots, x_{i-1}^{(k+1)}\)——必须按顺序算，<em>不能</em>同时算多个。在串行机上是赢家，在并行机上要做"<em>红黑排序</em>" 或者其它技巧才能获得部分并行性（思路是把网格点染色，同色点彼此不相邻，可以并行更新；不同色顺序更新）。</p>
+
+<p>到这里你应该看见两个迭代法的<em>权衡</em>：Jacobi 慢但并行、GS 快一倍但串行。哪个赢看你的硬件。1980 年代之前 GS 是首选；GPU 时代两者都不是顶尖（被 Krylov 方法打败，<a href="ch19.html">下章</a>讲），但 Jacobi 因为并行友好<em>仍然</em>常作为预处理子模块使用。</p>
+
+<h2 id="sec18-5">18.5 收敛性：谱半径决定一切</h2>
+
+<p>什么时候这些迭代法收敛？怎样才算收敛"快"？</p>
+
+<p>把迭代写成抽象形式 \(x_{k+1} = G x_k + c\)，其中 \(G = M^{-1} N\) 叫<em>iteration matrix</em>（迭代矩阵）、\(c = M^{-1} b\) 是常数项。真解 \(x^*\) 满足 \(x^* = G x^* + c\)（因为 \(A x^* = b \iff M x^* = N x^* + b \iff x^* = M^{-1} N x^* + M^{-1} b\)）。两式相减：</p>
+
+<p>\[
+x_{k+1} - x^* = G (x_k - x^*).
+\]</p>
+
+<p>令 \(e_k = x_k - x^*\) 是误差向量：\(e_{k+1} = G e_k\)，所以 \(e_k = G^k e_0\)。</p>
+
+<p>收敛 \(\iff e_k \to 0\) for all \(e_0 \iff G^k \to 0\) (zero matrix) \(\iff\) <em>\(G\) 的所有特征值绝对值 \(< 1\)</em>。这个最大绝对值叫<em>谱半径</em>：</p>
+
+<p>\[
+\rho(G) := \max_i |\lambda_i(G)|.
+\]</p>
+
+<p>结论：</p>
+
+<p>\[
+\boxed{\ \text{迭代收敛} \iff \rho(G) < 1.\ }
+\]</p>
+
+<p>而且收敛速率<em>由 \(\rho\) 决定</em>：渐近上 \(\|e_k\| \sim \rho(G)^k \|e_0\|\)。<em>每步误差缩 \(\rho\) 倍</em>。要把误差从 \(\|e_0\|\) 缩到 \(\varepsilon\)，需要</p>
+
+<p>\[
+k \approx \frac{\ln(\|e_0\| / \varepsilon)}{- \ln \rho(G)}
+\]</p>
+
+<p>步。\(\rho\) 越接近 1，收敛越慢（\(-\ln \rho \to 0\)）；\(\rho\) 越小，每步进步越多。</p>
+
+<p>什么样的 \(A\) 让经典方法收敛？最常用的<em>充分条件</em>：</p>
+
+<ul>
+  <li><strong>对角占优</strong> \(|a_{ii}| > \sum_{j \neq i} |a_{ij}|\)：Jacobi、Gauss-Seidel 都收敛。</li>
+  <li><strong>对称正定</strong>：Gauss-Seidel 和 SOR（下节）收敛。Jacobi <em>不一定</em> 收敛（可能 \(\rho > 1\)）。</li>
+</ul>
+
+<p>幸运的是，PDE 离散化得到的矩阵几乎总是对称正定的（来自椭圆方程，比如 Poisson、Helmholtz）——所以 GS 总能跑、并且<em>渐近</em> 比 Jacobi 快一倍。</p>
+
+<p>问题是：对 PDE 离散化矩阵，\(\rho\) 是<em>多少</em>？答案让人沮丧。<em>5-point Poisson 离散化</em> 在 \(N \times N\) 网格上，Jacobi 的 \(\rho_J = \cos(\pi / (N+1)) \approx 1 - \pi^2 / (2 N^2)\)。\(N = 100\) 时 \(\rho_J \approx 0.9995\)，每步误差只缩 0.05%——要把误差缩到 \(10^{-6}\) 需要</p>
+
+<p>\[
+k \approx \frac{\ln(10^6)}{- \ln(0.9995)} = \frac{13.8}{0.0005} \approx 28000
+\]</p>
+
+<p>步！每步 \(O(N^2) = 10^4\) 操作，总共 \(3 \times 10^8\)——比稀疏 LU 还多。Gauss-Seidel \(\rho_{GS} = \rho_J^2 \approx 0.999\)——还是慢。</p>
+
+<p>这就是经典迭代法的根本局限：<em>收敛慢</em>，慢到比稀疏直接法还差。我们需要加速。</p>
+
+<h2 id="sec18-6">18.6 SOR：加权松弛</h2>
+
+<p>看 GS 的更新公式：\(x_i^{(k+1)} = x_i^{(k)} + \Delta_i\)，其中 \(\Delta_i = \) "<em>本步该走的方向</em>"。如果每步 \(x_i\) 都<em>朝着真解的方向</em> 走（即 GS 是收敛的），那也许我们应该<em>多走一些</em>——走 \(\omega \Delta_i\) 而不是 \(\Delta_i\)，\(\omega > 1\) 提速。这就是<em>successive over-relaxation (SOR)</em>。</p>
+
+<p>具体公式：先按 GS 算一个<em>"试探"</em> 值</p>
+
+<p>\[
+x_i^{\text{GS}} = \frac{1}{a_{ii}} \left( b_i - \sum_{j < i} a_{ij} x_j^{(k+1)} - \sum_{j > i} a_{ij} x_j^{(k)} \right),
+\]</p>
+
+<p>然后</p>
+
+<p>\[
+\boxed{\ x_i^{(k+1)} = (1 - \omega) x_i^{(k)} + \omega \cdot x_i^{\text{GS}}. \ }
+\]</p>
+
+<p>\(\omega = 1\) 退化为 GS。\(\omega > 1\) 是 over-relaxation（用得最多）；\(\omega < 1\) 是 under-relaxation（某些非线性问题里有用，让收敛<em>慢</em>但更稳）。\(\omega \in (0, 2)\) 是收敛的必要条件（对对称正定 \(A\) 也是充分的，叫 Kahan 条件）。</p>
+
+<p>对二维 Poisson \(N \times N\) 离散化，<em>最优</em> \(\omega\) 是</p>
+
+<p>\[
+\omega^* = \frac{2}{1 + \sin(\pi / (N+1))}.
+\]</p>
+
+<p>\(N = 100\) 时 \(\omega^* \approx 1.94\)（接近上限 2）。最优 SOR 的谱半径 \(\rho_{\text{SOR}}^* = \omega^* - 1 \approx 0.94\)——比 Jacobi 的 \(0.9995\) 小得多。</p>
+
+<p>把上面 \(N = 100\) Poisson 重算：SOR 把误差缩到 \(10^{-6}\) 需要 \(\ln(10^6) / |\ln 0.94| \approx 220\) 步。<em>从 28000 降到 220</em>——SOR 加速 100 倍。</p>
+
+<p>更壮观的是<em>渐近增长率</em>。Jacobi/GS 在 \(N \times N\) 网格上需要 \(O(N^2)\) 步收敛，<em>SOR 只需要 \(O(N)\) 步</em>——少一个数量级。</p>
+
+<p>但 SOR 有一个让人头痛的问题：<em>\(\omega^*\) 极难选</em>。上面公式只对二维 Poisson 等少数有解析最优 \(\omega\) 的问题成立。一般的 \(A\)，最优 \(\omega\) 没有公式。如果你猜的 \(\omega\) 偏离 \(\omega^*\) 哪怕 5%，收敛速度会显著变差；偏离太多甚至发散。这种"<em>有最优参数但不知道它是什么</em>" 的处境工程上很尴尬。</p>
+
+<p>实际中 SOR 的用法是：<em>试几个 \(\omega\) 值</em>，画"<em>收敛速度对 \(\omega\) 的依赖曲线</em>"，找最快的；或用自适应算法在迭代过程中调整 \(\omega\)。这种<em>调参</em> 工作让 SOR 在 1980 年代之前是 PDE 求解的标准，但现在被<em>不需要调参</em> 的 Krylov 方法（共轭梯度、GMRES）替代了。</p>
+
+<p>SOR 仍然出现在两个场合：</p>
+<ul>
+  <li>作为<em>预处理子</em>（preconditioner）嵌入到 Krylov 方法里——SOR 一步加速 Krylov 一步。</li>
+  <li>作为某些特殊结构问题的"<em>傻快</em>" 选择——比如已知是 Poisson 类问题、\(\omega^*\) 公式可用，SOR 简单且没有 Krylov 的存储开销。</li>
+</ul>
+
+<h2 id="sec18-7">18.7 一个具体例子：解 Poisson 方程</h2>
+
+<p>把上面所有动作绑到一个真问题上。考虑二维 Poisson 方程</p>
+
+<p>\[
+- \Delta u = f, \quad u|_{\partial \Omega} = 0,
+\]</p>
+
+<p>在单位正方形 \(\Omega = [0, 1]^2\) 上。物理上：稳态温度场（\(u\) 是温度、\(f\) 是热源）；电场（\(u\) 是电势、\(f\) 是电荷密度）；薄膜变形（\(u\) 是位移、\(f\) 是法向力）。它在数学物理里无处不在。</p>
+
+<p>把 \(\Omega\) 分成 \((N+1) \times (N+1)\) 等距网格，节点 \(u_{ij} \approx u(i h, j h)\)，\(h = 1/(N+1)\)。Laplacian 用<em>5-point 中心差分</em> 近似（来自 <a href="ch15.html">第 15 章</a>）：</p>
+
+<p>\[
+- \Delta u (i h, j h) \approx \frac{4 u_{ij} - u_{i-1,j} - u_{i+1,j} - u_{i,j-1} - u_{i,j+1}}{h^2}.
+\]</p>
+
+<p>方程 \(- \Delta u = f\) 在每个内部节点离散为</p>
+
+<p>\[
+4 u_{ij} - u_{i-1,j} - u_{i+1,j} - u_{i,j-1} - u_{i,j+1} = h^2 f_{ij}.
+\]</p>
+
+<p>共 \(N^2\) 个方程、\(N^2\) 个未知量。把所有 \(u_{ij}\) 拉成一个长度 \(n = N^2\) 的向量 \(x\)，矩阵 \(A\) 就是 18.1 节那个块三对角形式。</p>
+
+<p>用 Jacobi 解：每步</p>
+
+<p>\[
+u_{ij}^{(k+1)} = \frac{1}{4} \left( u_{i-1,j}^{(k)} + u_{i+1,j}^{(k)} + u_{i,j-1}^{(k)} + u_{i,j+1}^{(k)} + h^2 f_{ij} \right).
+\]</p>
+
+<p>翻译：<em>新值 = 四个邻居旧值的平均，再加一点源项贡献</em>。直觉得不能更直觉——Laplacian 的离散版本在每个网格点上"<em>求邻居的平均</em>"。这是为什么 Jacobi 迭代有时被叫做"<em>平均化迭代</em>"，它和"<em>热扩散</em>" 物理过程是同一个动作的离散表达：每步把每个点的值往邻居平均靠拢，最终达到"<em>处处不被偏离</em>" 的稳态——那个稳态就是 Poisson 方程的解。</p>
+
+<p>用 GS 解：同样公式，但<em>左、上邻居用新值</em>（已经在本步算好），<em>右、下邻居用旧值</em>（还没算到）：</p>
+
+<p>\[
+u_{ij}^{(k+1)} = \frac{1}{4} \left( u_{i-1,j}^{(k+1)} + u_{i+1,j}^{(k)} + u_{i,j-1}^{(k+1)} + u_{i,j+1}^{(k)} + h^2 f_{ij} \right),
+\]</p>
+
+<p>顺序是 \((i, j)\) 按字典序遍历。</p>
+
+<p>SOR 把 GS 的结果再松弛：</p>
+
+<p>\[
+u_{ij}^{(k+1)} = (1 - \omega) u_{ij}^{(k)} + \omega \cdot u_{ij}^{\text{GS}}.
+\]</p>
+
+<p>\(\omega^* = 2 / (1 + \sin(\pi h))\)。\(N = 100\)（\(h = 1/101\)）时 \(\omega^* \approx 1.939\)。</p>
+
+<p>三种方法跑同一个问题（\(N = 100\)，从 \(u^{(0)} = 0\) 出发，迭代到 \(\|r_k\|/\|b\| < 10^{-6}\)）的迭代次数：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">方法</th><th style="padding: 0.3em 1em;">迭代次数</th><th style="padding: 0.3em 1em;">总操作 \(\sim\)</th></tr>
+<tr><td>Jacobi</td><td>\(\sim 27000\)</td><td>\(2.7 \times 10^8\)</td></tr>
+<tr><td>Gauss-Seidel</td><td>\(\sim 13500\)</td><td>\(1.3 \times 10^8\)</td></tr>
+<tr><td>SOR (\(\omega^* = 1.94\))</td><td>\(\sim 220\)</td><td>\(2.2 \times 10^6\)</td></tr>
+<tr><td>稀疏 LU（参考）</td><td>—</td><td>\(\sim 10^7\)</td></tr>
+<tr><td>共轭梯度（<a href="ch19.html">下章</a>）</td><td>\(\sim 200\)</td><td>\(2 \times 10^6\)</td></tr>
+</table>
+
+<p>SOR 和共轭梯度同量级，都远胜 Jacobi/GS。但 SOR 要选 \(\omega\)，CG <em>不要</em>选任何参数——<em>这就是为什么现代 PDE 求解器默认用 CG / GMRES，不是 SOR</em>。</p>
+
+<p>最后注意：上表里"<em>稀疏 LU 仍然能在 \(N = 100\) 玩具问题上跑</em>"——\(n = 10^4\)，稀疏 LU 用 \(O(n^{3/2})\) 是 \(10^6\) 操作，确实能跑。SOR 和 CG 在<em>这个规模</em> 上没有压倒性优势。但放到 \(N = 1000\)（\(n = 10^6\)）：</p>
+
+<ul>
+  <li>稀疏 LU \(\sim 10^9\) 操作 + 大量内存（填入后 \(10^9\) 非零，占 8 GB）。</li>
+  <li>SOR/CG \(\sim 10^9 \cdot N \cdot k_{\text{iter}}\)，但<em>不需要额外内存</em>，每步 \(O(n)\)。</li>
+</ul>
+
+<p>到 \(N = 10000\)（\(n = 10^8\)）就只有迭代法能跑了。</p>
+
+<h2 id="sec18-8">18.8 局限：迭代次数随条件数增长</h2>
+
+<p>把这一章的故事一句话总结：<em>迭代法用 \(O(\text{每步矩阵-向量乘}) \times O(\text{迭代次数})\) 解线性方程组，不需要分解</em>。每步乘 \(O(n)\)（稀疏矩阵），<em>不破坏稀疏</em>。</p>
+
+<p>但还有第二个因素——<em>迭代次数</em>。我们看到 Jacobi/GS 是 \(O(N^2) = O(n)\) 步、SOR 是 \(O(N) = O(\sqrt n)\) 步——这些都跟<em>问题规模</em> 有关。更深一点说，迭代次数大致正比于条件数 \(\kappa(A)\)（在合适意义下）。Poisson 离散化的 \(\kappa \sim 1/h^2 = O(N^2)\)——网格越细越病。所以收敛速度<em>不是</em> 算法的固有性质，而是<em>问题</em> 的固有性质。</p>
+
+<p>这条<em>"迭代次数 \(\propto \kappa\)"</em> 的事实把我们引向两条出路：</p>
+
+<ul>
+  <li><em>预处理</em>（preconditioning）。把 \(A x = b\) 变形为 \(M^{-1} A x = M^{-1} b\)，其中 \(M\) 是某个"<em>近似 \(A\)</em>" 但<em>容易求逆</em> 的矩阵。希望 \(\kappa(M^{-1} A) \ll \kappa(A)\)——预处理后的方程组好求。Jacobi、GS、SOR 自己都可以用作 \(M\)。</li>
+  <li><em>更聪明的迭代</em>。<a href="ch19.html">下一章</a> Krylov 子空间方法（共轭梯度、GMRES）每步收集"<em>历史信息</em>"——不只用上一步迭代值，而是用<em>所有历史迭代值</em> 张成一个子空间，在那个子空间里找最优近似。这种"<em>记忆</em>" 让收敛快很多——共轭梯度在<em>对称正定</em> 矩阵上每步误差缩 \((\sqrt{\kappa} - 1)/(\sqrt{\kappa} + 1)\)，是 SOR 的 \((\kappa - 1)/(\kappa + 1)\) 的<em>开方</em>，对大 \(\kappa\) 快一个数量级。</li>
+</ul>
+
+<p>这两条路结合起来——<em>预处理共轭梯度（PCG）</em> 和<em>预处理 GMRES</em> 加上多重网格、ILU 等预处理子——构成现代大规模 PDE 求解的核心工具。Jacobi、GS、SOR 在这套工具链里降级成<em>组件</em>（充当预处理子或者多重网格的 smoother），不再单独使用。</p>
+
+<p>但你必须先理解经典迭代法才能理解这套工具链的设计。下一章的共轭梯度本质就是"<em>把上一步的搜索方向和这一步的残差正交化</em>"——它的几何只有在你已经看过 Jacobi"<em>盲目跟随残差</em>" 这种朴素动作之后，才能理解为什么它是改进。</p>
+
+<p>这一章的最后请你停下来想这件事的形状：<em>每个朴素算法都有一个具体的失效模式（这里：迭代次数随 \(\kappa\) 增长）</em>。修复失效模式的一般思路有两条：要么<em>降低 \(\kappa\)</em>（预处理）、要么<em>改进每步利用信息的效率</em>（Krylov）。两条路并不互斥——现代解算器同时用。这种"<em>改进朴素算法的两个独立维度</em>" 的视角，在数值方法里是一个反复出现的设计模式：第 7 章把二分（稳）和牛顿（快）<em>融合</em>成 Brent，第 17 章把 CGS（不稳）的两个失效（"用旧 \(a_k\)" 和"非正交结构") 分别用 MGS 和 Householder 修复，这一章把"<em>慢迭代</em>" 的两个原因（条件数 + 利用率）分别用预处理和 Krylov 修复。<em>这是数值人的工作方式</em>。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 QR 分解 + Householder 反射</a><a href="ch19.html">下一章 · 第 19 章 Krylov 子空间方法 →</a></nav>
+</main>
+</body>
+</html>

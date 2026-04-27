@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B IEEE 754 浮点格式速查 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+<h1 id="appB">附录 B IEEE 754 浮点格式速查</h1>
+
+<p>第 2 章把"浮点数大致是什么样子" 的故事讲清楚了。这个附录把<em>具体位排布</em>、各精度的具体常数、特殊值、以及实用 Python / NumPy 函数集中处理。这里的内容你<em>不</em>需要背——但当你有一天需要 hand-decode 一个浮点数（调试一段反序列化代码、读硬件 dump、检查某个奇怪的 NaN），这一节是你的查阅表。</p>
+
+<ul>
+  <li>single / double / quad 的字段宽度对照。</li>
+  <li>指数偏置、normalized vs subnormal。</li>
+  <li>各精度的 \(\varepsilon_{\text{mach}}\)、最大正常值、最小正常 / 次正常值。</li>
+  <li>特殊位模式：\(\pm 0\)、\(\pm \infty\)、NaN、subnormal。</li>
+  <li>hand-decode：\(0.1\) 在 double 下的 64 位完整 bit 串。</li>
+  <li>实用函数：<code>np.finfo</code>、<code>math.nextafter</code>、<code>struct.pack</code> + <code>hex</code>。</li>
+  <li>bfloat16 / fp16 / fp8 与机器学习趋势的一句话。</li>
+</ul>
+
+<h2 id="appB-1">B.1 字段宽度对照</h2>
+
+<p>IEEE 754-2008 指定的几种二进制浮点格式：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse; border: 1px solid #888;">
+<tr><th style="padding: 0.3em 1em; border: 1px solid #888;">名称</th><th style="padding: 0.3em 1em; border: 1px solid #888;">总位</th><th style="padding: 0.3em 1em; border: 1px solid #888;">符号</th><th style="padding: 0.3em 1em; border: 1px solid #888;">指数</th><th style="padding: 0.3em 1em; border: 1px solid #888;">尾数</th><th style="padding: 0.3em 1em; border: 1px solid #888;">指数偏置</th><th style="padding: 0.3em 1em; border: 1px solid #888;">十进制位</th></tr>
+<tr><td style="padding: 0.2em 1em; border: 1px solid #888;">half (fp16)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">16</td><td style="padding: 0.2em 1em; border: 1px solid #888;">1</td><td style="padding: 0.2em 1em; border: 1px solid #888;">5</td><td style="padding: 0.2em 1em; border: 1px solid #888;">10</td><td style="padding: 0.2em 1em; border: 1px solid #888;">15</td><td style="padding: 0.2em 1em; border: 1px solid #888;">~3.3</td></tr>
+<tr><td style="padding: 0.2em 1em; border: 1px solid #888;">single (fp32)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">32</td><td style="padding: 0.2em 1em; border: 1px solid #888;">1</td><td style="padding: 0.2em 1em; border: 1px solid #888;">8</td><td style="padding: 0.2em 1em; border: 1px solid #888;">23</td><td style="padding: 0.2em 1em; border: 1px solid #888;">127</td><td style="padding: 0.2em 1em; border: 1px solid #888;">~7.2</td></tr>
+<tr><td style="padding: 0.2em 1em; border: 1px solid #888;">double (fp64)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">64</td><td style="padding: 0.2em 1em; border: 1px solid #888;">1</td><td style="padding: 0.2em 1em; border: 1px solid #888;">11</td><td style="padding: 0.2em 1em; border: 1px solid #888;">52</td><td style="padding: 0.2em 1em; border: 1px solid #888;">1023</td><td style="padding: 0.2em 1em; border: 1px solid #888;">~15.95</td></tr>
+<tr><td style="padding: 0.2em 1em; border: 1px solid #888;">quad (fp128)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">128</td><td style="padding: 0.2em 1em; border: 1px solid #888;">1</td><td style="padding: 0.2em 1em; border: 1px solid #888;">15</td><td style="padding: 0.2em 1em; border: 1px solid #888;">112</td><td style="padding: 0.2em 1em; border: 1px solid #888;">16383</td><td style="padding: 0.2em 1em; border: 1px solid #888;">~34.0</td></tr>
+</table>
+
+<p>位排列从高位到低位：<code>[符号位 s | 指数 e | 尾数 m]</code>。比如 double 的 64 位排列：第 63 位 = s，第 62-52 位 = e（11 位），第 51-0 位 = m（52 位）。</p>
+
+<h2 id="appB-2">B.2 一个浮点数的解释规则</h2>
+
+<p>设位串解码出 \(s \in \{0, 1\}\), \(e \in \{0, 1, \ldots, 2^E - 1\}\), \(m \in \{0, 1, \ldots, 2^M - 1\}\)（\(E\) 是指数位数，\(M\) 是尾数位数）。设 \(\text{bias} = 2^{E-1} - 1\)。<em>真实数值</em> 由 \((s, e, m)\) 决定，分四种情形：</p>
+
+<p><strong>情形 1（normalized，最常见）：\(1 \le e \le 2^E - 2\)。</strong></p>
+
+<p>\[
+\text{value} = (-1)^s \cdot 2^{e - \text{bias}} \cdot \big(1 + m / 2^M\big).
+\]</p>
+
+<p>"<em>1 加</em>" 部分是<em>隐藏位</em>——尾数前其实有一位"1"，标准里不存（因为<em>所有</em> 正常浮点数的尾数都以 1 开头，所以省下来）。这就是为什么一个 double 能存 \(53\) 位有效尾数（52 显式 + 1 隐藏）而不是 52 位。</p>
+
+<p><strong>情形 2（zero）：\(e = 0, m = 0\)。</strong>表示 \(\pm 0\)（取决于 \(s\)）。注意 \(+0\) 和 \(-0\) 是<em>不同</em> bit 模式但比较时相等（<code>+0.0 == -0.0</code> 为 True）。</p>
+
+<p><strong>情形 3（subnormal / denormal）：\(e = 0, m \ne 0\)。</strong></p>
+
+<p>\[
+\text{value} = (-1)^s \cdot 2^{1 - \text{bias}} \cdot (m / 2^M).
+\]</p>
+
+<p>注意没有"1 加" 隐藏位——尾数就是 \(0.\text{mmm...m}\)。这让浮点数能填满"<em>0 与最小正常数之间的间隙</em>"。代价是这些数<em>精度比正常数低</em>（前导 0 占用尾数位）。</p>
+
+<p><strong>情形 4（无穷与 NaN）：\(e = 2^E - 1\)（全 1）。</strong></p>
+
+<ul>
+  <li>\(m = 0\)：\(\pm \infty\)。</li>
+  <li>\(m \ne 0\)：NaN（Not a Number）。所有 \(m \ne 0\) 的位模式都是 NaN——所以 NaN 有<em>多种</em>。其中又分 quiet NaN（默认）与 signaling NaN（很少用）。</li>
+</ul>
+
+<h2 id="appB-3">B.3 各精度的具体常数</h2>
+
+<p>套上面规则，把每个精度的关键常数算出来：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse; border: 1px solid #888;">
+<tr><th style="padding: 0.3em 1em; border: 1px solid #888;"></th><th style="padding: 0.3em 1em; border: 1px solid #888;">fp16</th><th style="padding: 0.3em 1em; border: 1px solid #888;">fp32</th><th style="padding: 0.3em 1em; border: 1px solid #888;">fp64</th><th style="padding: 0.3em 1em; border: 1px solid #888;">fp128</th></tr>
+<tr><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\varepsilon_{\text{mach}}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(2^{-10} \approx 9.77 \times 10^{-4}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(2^{-23} \approx 1.19 \times 10^{-7}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(2^{-52} \approx 2.22 \times 10^{-16}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(2^{-112} \approx 1.93 \times 10^{-34}\)</td></tr>
+<tr><td style="padding: 0.2em 1em; border: 1px solid #888;">最大正常值</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\approx 65504\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\approx 3.40 \times 10^{38}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\approx 1.80 \times 10^{308}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\approx 1.19 \times 10^{4932}\)</td></tr>
+<tr><td style="padding: 0.2em 1em; border: 1px solid #888;">最小正常正数</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(2^{-14} \approx 6.10 \times 10^{-5}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(2^{-126} \approx 1.18 \times 10^{-38}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(2^{-1022} \approx 2.23 \times 10^{-308}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\approx 3.36 \times 10^{-4932}\)</td></tr>
+<tr><td style="padding: 0.2em 1em; border: 1px solid #888;">最小次正常数</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\approx 5.96 \times 10^{-8}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\approx 1.40 \times 10^{-45}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\approx 4.94 \times 10^{-324}\)</td><td style="padding: 0.2em 1em; border: 1px solid #888;">\(\approx 6.48 \times 10^{-4966}\)</td></tr>
+</table>
+
+<p>"\(\varepsilon_{\text{mach}}\)" 这里是<em>1 之后下一个浮点数与 1 的距离</em>——精确为 \(2^{-M}\)。它<em>近似</em> 等于"<em>相对舍入误差的上界</em>"，但严格定义有不同流派（有的取 \(2^{-M}\)、有的取 \(2^{-M-1}\)）。本书用 \(2^{-M}\)。</p>
+
+<p>本书几乎只关心 fp32 / fp64：fp32 给约 7 位十进制精度，fp64 给约 16 位。在用 fp32 时 \(\kappa = 10^4\) 的问题就只剩 3 位准；用 fp64 时 \(\kappa = 10^{12}\) 的问题还剩 4 位准。第 4 章"<em>每多一个数量级 \(\kappa\) 损失一位精度</em>" 这条经验规律的具体数字源头就是 \(\varepsilon_{\text{mach}}\)。</p>
+
+<h2 id="appB-4">B.4 hand-decode 例子：0.1 在 double 下的 64 位</h2>
+
+<p>把 \(0.1\) 写成二进制：先将 \(0.1\) 乘 2 反复取整，得到</p>
+
+<p>\[
+0.1 = 0.0\overline{0011}_2 = 0.00011001100110011\ldots_2
+\]</p>
+
+<p>(无穷循环 \(0011\))。规范化为 \(1.something \times 2^e\)：</p>
+
+<p>\[
+0.1 = 1.\overline{1001}_2 \cdot 2^{-4} = 1.10011001100110011\ldots_2 \times 2^{-4}.
+\]</p>
+
+<p>所以：</p>
+
+<ul>
+  <li>符号位 \(s = 0\)（正）。</li>
+  <li>实际指数 \(-4\)，加偏置 \(1023\)：\(e = 1019 = (01111111011)_2\)（11 位）。</li>
+  <li>尾数 = 隐藏 1 之后的 52 位 \((10011001100110011\ldots)_2\)，需要四舍五入到 52 位。</li>
+</ul>
+
+<p>具体的 52 位尾数（取最近偶数舍入）：</p>
+
+<p><code>1001 1001 1001 1001 1001 1001 1001 1001 1001 1001 1001 1001 1010</code></p>
+
+<p>(注意末尾 4 位 \(1010\)——本来该是 \(\ldots 1001 1001\) 的截断，但因下一位是 \(1\)，舍入向上让最后一组从 \(1001\) 变 \(1010\)。)</p>
+
+<p>把 \(s, e, m\) 拼起来 64 位：</p>
+
+<p><code>0 01111111011 1001100110011001100110011001100110011001100110011010</code></p>
+
+<p>用十六进制：<code>3FB999999999999A</code>。</p>
+
+<p>读回去这个 64 位串对应的<em>真实</em> 数值：</p>
+
+<p>\[
+2^{-4} \cdot \big(1 + (m \text{ 的整数值}) / 2^{52}\big)
+\]</p>
+
+<p>\(\approx 0.1000000000000000055511151231257827021181583404541015625\)。</p>
+
+<p>这正是 0.1 的双精度表示——比 0.1 大约 \(5.55 \times 10^{-18}\)。两个 0.1 加起来是这个稍大值的 2 倍：约 \(0.2 + 1.11 \times 10^{-17}\)，规范化后<em>稍微</em> 落在 0.2 的浮点表示之上一格——这就是 <code>0.1 + 0.2 = 0.30000000000000004</code> 的<em>具体</em> 来源。</p>
+
+<p>验证（Python）：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+import struct
+print(struct.pack('&gt;d', 0.1).hex())  # '3fb999999999999a'
+</pre>
+
+<p>这就是 0.1 在双精度下的 64 位实际位模式。</p>
+
+<h2 id="appB-5">B.5 实用函数</h2>
+
+<p><strong>numpy.finfo。</strong>查询给定浮点类型的所有关键常数：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+import numpy as np
+info = np.finfo(np.float64)
+print(info.eps)    # 2.220446049250313e-16
+print(info.tiny)   # 2.2250738585072014e-308 (最小正常数)
+print(info.max)    # 1.7976931348623157e+308
+print(info.min)    # -1.7976931348623157e+308
+print(info.precision)  # 15 (十进制有效数字)
+</pre>
+
+<p>这是查 \(\varepsilon_{\text{mach}}\) 等常数最干净的方式——比硬编码上节的表更可靠（不同平台可能有微小差异）。</p>
+
+<p><strong>math.nextafter。</strong>给一个浮点数 \(x\)，返回它"<em>向 \(y\) 方向走一步</em>" 的下一个浮点数：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+import math
+x = 1.0
+print(math.nextafter(x, math.inf))  # 1.0000000000000002 (= 1 + ε_mach)
+print(math.nextafter(x, -math.inf)) # 0.9999999999999999
+
+# x 附近的"局部精度"
+spacing = math.nextafter(x, math.inf) - x
+print(spacing)  # 2.220446049250313e-16
+</pre>
+
+<p>用处：精确计算<em>浮点间距</em>（<code>numpy.spacing(x)</code> 也行），写"<em>容差</em>" 时校准到合适的尺度（"距离当前值不超过 \(k\) 个 ULP" 比"绝对差 \(< \delta\)" 更鲁棒）。</p>
+
+<p><strong>struct + hex 读位模式。</strong>需要看某浮点的具体 bit 排列：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+import struct
+def double_to_hex(x):
+    return struct.pack('&gt;d', x).hex()
+def hex_to_double(h):
+    return struct.unpack('&gt;d', bytes.fromhex(h))[0]
+
+print(double_to_hex(0.1))           # '3fb999999999999a'
+print(double_to_hex(float('inf')))  # '7ff0000000000000'
+print(double_to_hex(float('nan')))  # '7ff8000000000000'
+print(double_to_hex(-0.0))          # '8000000000000000'
+print(hex_to_double('3ff0000000000000'))  # 1.0
+</pre>
+
+<p>调试浮点行为时这是必备工具。"<em>这两个数到底是不是同一个浮点数</em>" 用 hex 比较没歧义。</p>
+
+<h2 id="appB-6">B.6 机器学习趋势：fp16 / bfloat16 / fp8</h2>
+
+<p>本书内容默认 fp64（约 16 位精度）——这是科学计算的事实标准。但<em>机器学习</em> 给浮点世界带来了新的精度需求：</p>
+
+<p><strong>fp16</strong>（IEEE half precision）：5 位指数 + 10 位尾数。约 3.3 位精度。问题：动态范围窄（最大值 65504），训练时梯度容易溢出。</p>
+
+<p><strong>bfloat16</strong>（Google Brain 设计的 16 位格式）：8 位指数 + 7 位尾数。<em>指数和 fp32 同宽</em>——动态范围和 fp32 一样大；尾数只有 7 位，精度低（~2 位十进制）。这种"<em>大动态范围 + 低精度</em>" 的设计哲学非常适合神经网络训练——梯度可以横跨多个数量级，但每个梯度本身不需要 16 位精度。bfloat16 现在是 TPU 和 NVIDIA H100 之后 GPU 的训练标准。</p>
+
+<p><strong>fp8</strong>（NVIDIA Hopper 架构提出的 8 位浮点）：分两个变体——E4M3（4 位指数 + 3 位尾数，重精度）和 E5M2（5 位指数 + 2 位尾数，重范围）。同时使用，前者用于权重 / 激活，后者用于梯度。fp8 训练能把内存与算力需求再降一半，是 LLM 训练的最新趋势。</p>
+
+<p><strong>趋势的结构性观察</strong>：传统科学计算的"精度饥饿" 需求给了 fp64；图形学发现 fp32 够用；机器学习发现 fp16/bfloat16 够用；现在 fp8 / int4 / int2 / 二值化在试探"<em>对神经网络精度可以多低</em>"。<em>不同应用对精度的需求差几个数量级</em>——这是浮点世界的多样性。本书的所有讨论以 fp64 为基准，但你应该养成一种感觉：当你看到"训练在 bfloat16" 这种描述时，知道<em>有效精度只有 2-3 位十进制</em>，第 4 章那条"\(\kappa\) 上限" 直接乘到这个低精度上——大量传统数值算法在这种精度下要重新审视。这是<em>下一个十年</em> 数值方法领域里活跃的研究方向。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+</main>
+</body>
+</html>

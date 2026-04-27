@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 16 章 直接法解线性系统：LU 与 Cholesky — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 Gauss 求积、Romberg、自适应</a><a href="ch17.html">下一章 · 第 17 章 QR 分解与最小二乘 →</a></nav>
+<h1 id="ch16">第 16 章 直接法解线性系统：LU 与 Cholesky</h1>
+
+<p>一个 PDE 离散化、一个最小二乘拟合、一个 ODE 隐式格式、一个图像去噪、一个机器学习模型——它们运行时绝大部分时间在做<em>同一件事</em>：解 \(A x = b\)。这是数值线性代数的中心问题，也是这本书<em>占篇幅最大</em>的一段（接下来 6 章都围着它转）。</p>
+
+<p>这一章给最经典的<em>直接法</em>——高斯消元的工程化版本：<em>LU 分解</em>。"直接法" 意思是有限步内（按机器精度算）给出准确答案；和后面几章的"迭代法"（一步步逼近，每步都还差一点）相对。直接法在中等规模、稠密矩阵上是不二选择；过了某个规模或矩阵变稀疏，迭代法接管——这条边界是<a href="ch18.html">第 18 章</a>的开始。</p>
+
+<p>这一章的核心思路非常具体。高斯消元你高中学过——把 \([A | b]\) 消成上三角再回代。我们要做的是：<em>把消元过程"记账" 成两个矩阵的乘积</em> \(A = LU\)。这个改写让你能<em>一次分解、多次求解</em>（同样 \(A\) 不同 \(b\) 时省工），<em>还</em>能严格分析向后稳定（链回<a href="ch5.html">第 5 章</a>）。</p>
+
+<h2 id="sec16-1">16.1 高斯消元复习：把 \([A | b]\) 化成上三角</h2>
+
+<p>看个 3×3 具体例子：</p>
+
+<p>\[
+\begin{pmatrix} 2 & 1 & 1 \\ 4 & 3 & 3 \\ 8 & 7 & 9 \end{pmatrix} \begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \begin{pmatrix} 4 \\ 10 \\ 30 \end{pmatrix}.
+\]</p>
+
+<p>第一步：把第一行用作"枢轴行"，把第一列下面的 \(\{4, 8\}\) 消成 0。</p>
+
+<ul>
+  <li>第二行减 (4/2)·第一行 = 第二行 减 2·第一行 → \((4, 3, 3 | 10) - 2 \cdot (2, 1, 1 | 4) = (0, 1, 1 | 2)\)。</li>
+  <li>第三行减 (8/2)·第一行 = 第三行 减 4·第一行 → \((8, 7, 9 | 30) - 4 \cdot (2, 1, 1 | 4) = (0, 3, 5 | 14)\)。</li>
+</ul>
+
+<p>得到</p>
+
+<p>\[
+\begin{pmatrix} 2 & 1 & 1 \\ 0 & 1 & 1 \\ 0 & 3 & 5 \end{pmatrix} \begin{pmatrix} x_1 \\ x_2 \\ x_3 \end{pmatrix} = \begin{pmatrix} 4 \\ 2 \\ 14 \end{pmatrix}.
+\]</p>
+
+<p>第二步：用现在的第二行做枢轴，把第二列下面的 3 消成 0。</p>
+
+<ul>
+  <li>第三行减 (3/1)·第二行 → \((0, 3, 5 | 14) - 3 \cdot (0, 1, 1 | 2) = (0, 0, 2 | 8)\)。</li>
+</ul>
+
+<p>得到上三角：</p>
+
+<p>\[
+U = \begin{pmatrix} 2 & 1 & 1 \\ 0 & 1 & 1 \\ 0 & 0 & 2 \end{pmatrix}, \quad U x = \begin{pmatrix} 4 \\ 2 \\ 8 \end{pmatrix}.
+\]</p>
+
+<p><em>回代</em>：从最后一行往上读。\(2 x_3 = 8 \Rightarrow x_3 = 4\)。\(x_2 + x_3 = 2 \Rightarrow x_2 = -2\)。\(2 x_1 + x_2 + x_3 = 4 \Rightarrow x_1 = 1\)。解 \((1, -2, 4)\)。</p>
+
+<p>整个过程两阶段：<em>消元</em>（化上三角）+ <em>回代</em>（解上三角）。消元主导计算量 \(O(n^3 / 3)\)，回代只 \(O(n^2)\)。</p>
+
+<h2 id="sec16-2">16.2 LU 分解 = 高斯消元的"记账"</h2>
+
+<p>看上面的消元——每一步都是"<em>第 i 行减 \(\ell_{ij}\) 倍的第 j 行</em>"。把所有用过的乘子 \(\ell_{ij}\) 摆在一个矩阵里：</p>
+
+<p>\[
+L = \begin{pmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ 4 & 3 & 1 \end{pmatrix}.
+\]</p>
+
+<p>(对角线放 1，下面放消元乘子；上面是 0。具体来源：第二行减 2 倍第一行 → \(L_{21} = 2\)；第三行减 4 倍第一行 → \(L_{31} = 4\)；第三行减 3 倍第二行 → \(L_{32} = 3\)。)</p>
+
+<p>验证一下：</p>
+
+<p>\[
+L U = \begin{pmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ 4 & 3 & 1 \end{pmatrix} \begin{pmatrix} 2 & 1 & 1 \\ 0 & 1 & 1 \\ 0 & 0 & 2 \end{pmatrix} = \begin{pmatrix} 2 & 1 & 1 \\ 4 & 3 & 3 \\ 8 & 7 & 9 \end{pmatrix} = A.
+\]</p>
+
+<p>果然 \(A = LU\)。这不是巧合——这是<em>消元过程的代数本质</em>。</p>
+
+<p>请你停下来想：消元的<em>每一步</em> 都是左乘一个"<em>初等下三角</em>" 矩阵 \(M_k\)（在第 k 列下面塞乘子）。整个消元 \(M_{n-1} \cdots M_2 M_1 A = U\)。所以 \(A = (M_{n-1} \cdots M_1)^{-1} U = L U\)，其中 \(L = M_1^{-1} M_2^{-1} \cdots M_{n-1}^{-1}\)。把这族下三角阵相乘——奇迹般地——结果就是"<em>把所有乘子摆下去的下三角</em>" 那个 \(L\)。</p>
+
+<p>这个奇迹的证明是简单的：乘子在不同列（每个 \(M_k\) 只动第 \(k\) 列）所以"<em>不互相干扰</em>"，最终 \(L\) 的位置 \((i, j)\) 就是第 \(j\) 步消第 \(i\) 行用的乘子。</p>
+
+<p>有了 \(A = LU\) 之后，解 \(A x = b\) 变成解</p>
+
+<p>\[
+L \underbrace{(U x)}_{=: y} = b.
+\]</p>
+
+<p>分两步：</p>
+
+<ol>
+  <li>解 \(L y = b\)（下三角 → <em>前代</em>，\(O(n^2)\)）。</li>
+  <li>解 \(U x = y\)（上三角 → <em>回代</em>，\(O(n^2)\)）。</li>
+</ol>
+
+<p>总共两次三角求解 = \(O(n^2)\)。<em>消元代价 \(O(n^3 / 3)\) 只付一次</em>——之后<em>同样的 \(A\) 配不同的 \(b\)</em>，每次只 \(O(n^2)\)。这是 LU 分解相对于"裸高斯消元 + 回代" 的工程优势：<em>把昂贵的"分解" 与廉价的"求解" 分开</em>。</p>
+
+<p>实际中这个优势随时显现。比如解 ODE 的隐式 Euler 方法，每个时间步要解 \((I - h A) x = b_t\)——\(A, h\) 不变，\(b_t\) 每步换。先 LU 分解 \((I - h A)\) 一次，之后 1000 个时间步每步只 \(O(n^2)\)，总成本 \(O(n^3) + O(1000 \cdot n^2)\) 而不是 \(O(1000 \cdot n^3)\)。<em>1000 倍的差距</em>。</p>
+
+<h2 id="sec16-3">16.3 LU 算法 + 复杂度</h2>
+
+<p>正式的算法（Doolittle 形式，对角放 1 在 \(L\)）：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+for k = 1 to n-1:
+    for i = k+1 to n:
+        L[i, k] = A[i, k] / A[k, k]   # 算乘子
+        for j = k+1 to n:
+            A[i, j] -= L[i, k] * A[k, j]   # 消元
+</pre>
+
+<p>循环结束后，\(A\) 的上三角部分是 \(U\)，下三角部分是 \(L\)（对角隐含为 1）。<em>原地</em>执行——不需要额外存 \(L, U\)，覆盖在 \(A\) 上。</p>
+
+<p>复杂度：三层循环，每层大约 \(n\) 次。具体计数浮点乘加是</p>
+
+<p>\[
+\sum_{k=1}^{n-1} (n - k) \cdot \big[1 + (n - k)\big] \approx \sum_{k=1}^n k^2 = \frac{n^3}{3} + O(n^2).
+\]</p>
+
+<p>所以 LU 分解 \(\sim n^3 / 3\) 浮点运算。回代加前代各 \(\sim n^2\)。<em>分解占总成本的 99%（n 大时）</em>。</p>
+
+<p>对比来感受一下：n = 1000 的稠密 LU 大约 \(3 \times 10^8\) 浮点运算，现代 CPU 单核 1 GFlop 大约 0.3 秒、用上 BLAS 优化（缓存友好的分块算法）可以到 0.05 秒。n = 10000 是 \(10^{12}\) 浮点运算，单机几十秒。n = \(10^5\) 是 \(10^{15}\)——按现代单机这要好几小时，超过这就要稀疏 / 迭代 / 并行算法（后续章节）。</p>
+
+<p>这条 \(O(n^3)\) 是<em>稠密直接法</em> 的天花板。它<em>不</em>能再低（信息论意义上你至少要看完所有 \(n^2\) 项 \(A\) 一次，每项至少做 \(O(1)\) 操作；但实际算法的下界 \(O(n^{2.37})\)（Strassen 等快速矩阵乘）只在理论上有意义，实际数值线性代数库都用 \(O(n^3)\) 的算法因为常数小且向后稳定）。</p>
+
+<h2 id="sec16-4">16.4 部分主元（partial pivoting）：什么时候必要</h2>
+
+<p>上面的算法有一个偷偷藏起来的假设：<em>每一步 \(A[k, k]\) 不为 0</em>。如果某个 pivot 是 0，除以 0 就崩了。更糟的是<em>很小但不为 0</em> 的 pivot——除以小数把<em>误差放大</em>，灾难。</p>
+
+<p>具体例子：</p>
+
+<p>\[
+A = \begin{pmatrix} 10^{-20} & 1 \\ 1 & 1 \end{pmatrix}, \quad b = \begin{pmatrix} 1 \\ 2 \end{pmatrix}.
+\]</p>
+
+<p>真解：从第二行减第一行得 \(x_2 \approx 1, x_1 \approx 1\)（具体：\(x_2 = (2 - 10^{20}) / (1 - 10^{20}) \approx 1\)，\(x_1 \approx 1\)）。</p>
+
+<p>用裸高斯消元：第一步 \(L_{21} = 1 / 10^{-20} = 10^{20}\)。第二行 \((1, 1 | 2)\) 减 \(10^{20}\) 倍第一行 \((10^{-20}, 1 | 1)\) 得</p>
+
+<p>\[
+(1 - 10^{20} \cdot 10^{-20}, 1 - 10^{20} \cdot 1 | 2 - 10^{20} \cdot 1) = (0, 1 - 10^{20} | 2 - 10^{20}).
+\]</p>
+
+<p>在 double 浮点下，\(1 - 10^{20}\) 和 \(2 - 10^{20}\) 算出来都是 \(-10^{20}\)（1 和 2 在 \(10^{20}\) 量级下被吃掉了——典型的灾难性抵消，链回<a href="ch1.html#sec1-2">第 1.2 节</a>）。</p>
+
+<p>所以浮点计算下消元结果是</p>
+
+<p>\[
+\begin{pmatrix} 10^{-20} & 1 \\ 0 & -10^{20} \end{pmatrix} x = \begin{pmatrix} 1 \\ -10^{20} \end{pmatrix}.
+\]</p>
+
+<p>回代：\(x_2 = (-10^{20}) / (-10^{20}) = 1\)（准）。\(x_1\)：\(10^{-20} x_1 + 1 = 1 \Rightarrow x_1 = 0\)（<em>错</em>，应该是 1）。</p>
+
+<p>问题不出在矩阵——这个 \(A\) 的条件数 \(\kappa(A) \approx 1\)（基本良态）。问题出在算法：<em>用一个超小 pivot 引入了天文级乘子 \(10^{20}\)，让有效信息被淹没</em>。</p>
+
+<p>修法朴素：<em>选大的 pivot</em>。具体的<em>部分主元</em>（partial pivoting）每步：</p>
+
+<ul>
+  <li>看当前列 \(A[k:n, k]\)，找<em>绝对值最大</em> 的那一行 \(p\)。</li>
+  <li>把第 \(p\) 行和第 \(k\) 行交换。</li>
+  <li>用新的第 \(k\) 行做 pivot 继续消元。</li>
+</ul>
+
+<p>对上面的例子：第一步看 \((10^{-20}, 1)\)，最大是 1（第二行）。交换两行：</p>
+
+<p>\[
+\begin{pmatrix} 1 & 1 & | & 2 \\ 10^{-20} & 1 & | & 1 \end{pmatrix}.
+\]</p>
+
+<p>现在 pivot 是 1，乘子 \(L_{21} = 10^{-20}\)（小数！）。第二行减小数倍第一行——基本不动：\((10^{-20} - 10^{-20} \cdot 1, 1 - 10^{-20} \cdot 1 | 1 - 10^{-20} \cdot 2) = (0, 1 - 10^{-20} | 1 - 2 \cdot 10^{-20})\)。在浮点下 \(\approx (0, 1 | 1)\)。</p>
+
+<p>回代：\(x_2 = 1\)，\(x_1 = 2 - 1 = 1\)。<em>都准</em>。</p>
+
+<p>记账上，行交换可以记成左乘一个置换矩阵 \(P\)。所以"<em>带部分主元的 LU</em>" 实际是分解 \(P A = L U\)——\(P\) 记下所有行交换，\(L\) 严格下三角带 1 对角且<em>所有元素 \(|L_{ij}| \le 1\)</em>（部分主元保证乘子绝对值不超过 1，因为我们总用最大者做分母）。</p>
+
+<p>"<em>所有 \(|L_{ij}| \le 1\)</em>" 是部分主元的关键保护——它阻止了上面那种"乘子 = 天文数" 的灾难。</p>
+
+<h2 id="sec16-5">16.5 部分主元 LU 的向后稳定</h2>
+
+<p>有了部分主元，能不能<em>证明</em> 算法向后稳定？这是<a href="ch5.html">第 5 章</a>"算法稳定性" 的具体应用。</p>
+
+<p>Wilkinson 1961 的经典定理：带部分主元的 LU 解线性方程组 \(A x = b\)，得到的浮点解 \(\hat x\) 满足</p>
+
+<p>\[
+(A + \Delta A) \hat x = b, \qquad \frac{\|\Delta A\|}{\|A\|} \le c \cdot n^3 \cdot \rho \cdot \varepsilon_{\text{mach}},
+\]</p>
+
+<p>其中 \(c\) 是小常数（< 10 通常），\(\rho\) 是<em>增长因子</em>（growth factor）：</p>
+
+<p>\[
+\rho = \frac{\max_{i, j, k} |A^{(k)}_{ij}|}{\max_{i, j} |A_{ij}|}
+\]</p>
+
+<p>(消元中间结果与原矩阵元素绝对值最大比)。</p>
+
+<p>定理告诉你：算法是向后稳定的<em>当且仅当</em> \(\rho\) 不爆炸。\(\rho\) 大时定理给的是个糟糕的上界——理论上 \(\rho\) 可以达到 \(2^{n-1}\) （存在病态例子），<em>但这种例子在自然出现的矩阵里几乎遇不到</em>。</p>
+
+<p>实际经验：随机 / 物理 / 工程中产生的矩阵，\(\rho \approx O(n^{2/3})\)——非常温和。所以"<em>带部分主元的 LU 实践上向后稳定</em>" 这条结论是个<em>经验</em>定理，不是数学定理。但 60 年的工业使用没出过反例，所以业界把它当公理用。</p>
+
+<p>结合<a href="ch4.html#sec4-4">第 4.4 节</a>"<em>向前 = 向后 × 条件</em>"：</p>
+
+<p>\[
+\frac{\|\hat x - x\|}{\|x\|} \lesssim \kappa(A) \cdot \varepsilon_{\text{mach}}.
+\]</p>
+
+<p>所以 LU + 部分主元在"<em>问题良态</em>" 时给到机器精度，"<em>问题病态</em>" 时给到 \(\kappa \cdot \varepsilon_{\text{mach}}\)——<em>就是问题本身能给的最好精度</em>。算法不是瓶颈，问题才是。这正是<a href="ch4.html">第 4 章</a>结尾说的"<em>算法稳，剩下看条件</em>"。</p>
+
+<p>所以业界的标准回答是：<em>解中等规模稠密线性方程组，用 LU + 部分主元，没有更好选项</em>。LAPACK 的 <code>dgesv</code>、NumPy 的 <code>numpy.linalg.solve</code>、MATLAB 的 <code>A\b</code>——背后全是它。</p>
+
+<h2 id="sec16-6">16.6 Cholesky：对称正定 A 时的 LU 简化</h2>
+
+<p>很多实际矩阵<em>不仅仅是稠密的方阵</em>——它们有更多结构。最重要的一类：<em>对称正定</em>（symmetric positive definite，SPD），即 \(A = A^T\) 且 \(x^T A x > 0\) 对所有 \(x \ne 0\)。SPD 矩阵在哪里出现？</p>
+
+<ul>
+  <li>最小二乘的<em>正规方程</em> \(A^T A x = A^T b\)——\(A^T A\) 总是对称半正定，\(A\) 列满秩时严格正定。</li>
+  <li>椭圆 PDE 的有限元 / 有限差分离散化——<em>刚度矩阵</em> 通常 SPD（对应能量泛函的 Hessian）。</li>
+  <li>核方法（kernel methods）和高斯过程的<em>协方差矩阵</em>——按定义对称半正定。</li>
+  <li>多元统计的<em>样本协方差矩阵</em>——同样。</li>
+</ul>
+
+<p>SPD 矩阵的 LU 分解可以做<em>对称化简</em>。具体定理：<em>SPD 矩阵 \(A\) 存在唯一的下三角矩阵 \(L\)（对角元为正）使</em></p>
+
+<p>\[
+\boxed{\ A = L L^T.\ }
+\]</p>
+
+<p>这就是 <em>Cholesky 分解</em>。注意：不是 \(LU\)，是 \(L L^T\)——<em>同一个 L 出现两次</em>。它把"分解需要存两个三角阵" 变成"<em>一个</em> 三角阵"。</p>
+
+<p>算法（按列计算）：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+for j = 1 to n:
+    L[j, j] = sqrt(A[j, j] - sum(L[j, k]^2 for k < j))
+    for i = j+1 to n:
+        L[i, j] = (A[i, j] - sum(L[i, k] * L[j, k] for k < j)) / L[j, j]
+</pre>
+
+<p>关键步骤：每个对角元算法的 \(\sqrt{\cdot}\) 里面那个量必须 <em>正</em>。如果它<em>不</em>正——\(\sqrt{}\) 里的数是负数或零——那就<em>证明</em> \(A\) 不是 SPD（开根号失败是 SPD 的最简单数值检测）。</p>
+
+<p>复杂度：\(O(n^3 / 6)\)——<em>恰好是 LU 的一半</em>。这反映了"<em>对称矩阵只有 n(n+1)/2 个独立元素</em>"——一半信息一半工作量。</p>
+
+<p>稳定性：Cholesky <em>不需要部分主元</em>。Wilkinson 同时代的经典结果证明 SPD 矩阵的 Cholesky 自动向后稳定，增长因子 \(\rho \le 1\)（!）——<em>结构本身保证稳定</em>，不需要任何外加保护。这又是 SPD 的免费午餐。</p>
+
+<p>所以遇到 SPD 矩阵：用 Cholesky，<em>不要</em>用一般 LU。一半工作量、不需要主元、自动稳定。NumPy 是 <code>numpy.linalg.cholesky(A)</code>；SciPy 解 SPD 系统是 <code>scipy.linalg.cho_solve(scipy.linalg.cho_factor(A), b)</code>。</p>
+
+<p>请你停下来感受这种"<em>结构 → 算法 → 性能</em>" 的链条。线性代数<em>就是</em> 一连串这种链条：每发现矩阵的一种特殊结构（对称、对称正定、Toeplitz、稀疏、带状、循环、酉……）都能给出更快、更稳的专用算法。后续 5 章你会反复遇到这种主题——<em>算法的形状跟着矩阵的结构走</em>。</p>
+
+<h2 id="sec16-7">16.7 稠密 vs 稀疏：填入与下一章的动机</h2>
+
+<p>到现在我们假设了 \(A\) 是<em>稠密</em>的——\(n \times n\) 个数都被存储、都被 LU 处理。但实际工程中很多 \(A\) 是<em>稀疏</em> 的：绝大多数元素是 0。</p>
+
+<p>典型来源：</p>
+
+<ul>
+  <li>PDE 离散化：每个网格点只和邻居耦合 → 矩阵<em>带状</em> 或<em>类带状</em>，每行只 \(O(1)\) 非零。\(n = 10^6\) 个网格点的矩阵存满要 \(10^{12}\) 个数（8 TB）；存稀疏只要 \(\sim 10^7\) 个数（80 MB）。</li>
+  <li>图（图论 / 社交网络）：邻接矩阵每行非零数 = 该点的度，通常远 < n。</li>
+  <li>有限元：基函数局部支撑 → 刚度矩阵稀疏。</li>
+</ul>
+
+<p>问题：<em>对稀疏 A 直接做 LU，结果 L 和 U 通常<strong>不</strong>稀疏</em>。</p>
+
+<p>具体例子：考虑"箭头矩阵"（最后一行 / 最后一列 / 对角线非零，其余全 0）。它有 \(O(n)\) 个非零。但 LU 之后 \(L\) 和 \(U\) 通常<em>稠密</em>——因为消元每步会让上一步消过的列再"<em>填入</em>"（fill-in）非零。</p>
+
+<p>反过来，如果"箭头" 倒过来摆——第一行 / 第一列 / 对角线非零——LU 的填入是 0，分解之后还是稀疏。<em>同一个矩阵换个排序，分解的稀疏度天差地别</em>。这就是<em>填入排序</em>（fill-in reordering）问题——选一个置换 \(P\) 让 \(P A P^T\) 的 LU 分解填入最少。AMD（approximate minimum degree）和 METIS 是两个工业标准排序算法。</p>
+
+<p>但即使最聪明的排序，对一般的稀疏矩阵 LU 填入仍然不可避免——稀疏直接法的实际成本介于 \(O(n^{1.5})\)（2D PDE）和 \(O(n^2)\)（3D PDE）之间，远低于稠密 \(O(n^3)\) 但仍然增长不慢。当 \(n\) 大到\(10^7\) 以上，<em>填入的存储成本本身就放不下</em>。</p>
+
+<p>这就是<em>迭代法</em> 的动机：不做分解，<em>只用矩阵-向量乘</em> \(v \mapsto A v\)（稀疏 A 上一次乘法 \(O(\text{nnz})\) = 非零数）。每次乘把当前近似往真解推一步，几十 / 几百步之内收敛。整个过程<em>不存中间矩阵</em>——只存原始 \(A\) 和几个向量。这就是<a href="ch18.html">第 18 章</a> Jacobi / Gauss-Seidel / SOR、和<a href="ch19.html">第 19 章</a> 共轭梯度的故事。</p>
+
+<p>"<em>稠密直接法</em>" vs "<em>稀疏迭代法</em>" 是数值线性代数的<em>大分水岭</em>。中等规模稠密 → LU。大规模稀疏 → 迭代。这是工程界的肌肉反应。</p>
+
+<h2 id="sec16-8">16.8 SciPy / NumPy 的实战入口</h2>
+
+<p>实际怎么用？最常见的几个 API：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+import numpy as np
+import scipy.linalg as la
+
+# 1. 一次性解 Ax = b（背后是 LU + partial pivoting）
+x = np.linalg.solve(A, b)
+
+# 2. 显式 LU 分解（同样的 A 不同 b 多次解时用）
+lu, piv = la.lu_factor(A)
+x1 = la.lu_solve((lu, piv), b1)
+x2 = la.lu_solve((lu, piv), b2)
+
+# 3. SPD 用 Cholesky
+c, low = la.cho_factor(A)   # A 必须 SPD，否则报错
+x = la.cho_solve((c, low), b)
+</pre>
+
+<p>几个常见<em>陷阱</em>：</p>
+
+<ul>
+  <li><em>不要用 <code>np.linalg.inv(A) @ b</code></em>——又慢（多算了 \(n^2\) 个根本不需要的 \(A^{-1}\) 元素）又不稳（\(A^{-1}\) 显式计算的向后误差比直接 LU 解高一个数量级）。<em>"求 \(A^{-1}\)" 在数值线性代数里几乎从来不是答案</em>——你想要的总是"<em>解 \(A x = b\)</em>"，那不是同一回事。</li>
+  <li><em>对 SPD 矩阵不要用 <code>solve</code>，要用 <code>cho_solve</code></em>——前者半倍工作量、不利用对称、可能违背 SPD 结构（部分主元会破坏对称）。</li>
+  <li><em>解最小二乘 \(\min \|A x - b\|\) 不要"<em>形成 \(A^T A\) 再 LU</em>"</em>——\(A^T A\) 的条件数是 \(A\) 的<em>平方</em>，可能把 \(\kappa = 10^4\) 变成 \(10^8\)。改用 QR 分解（<a href="ch17.html">下一章</a>）或 SVD（<a href="ch21.html">第 21 章</a>）——它们在原始 \(A\) 上工作，<em>不平方条件数</em>。</li>
+  <li><em>解稀疏系统不要 <code>np.linalg.solve</code>（它会先把稀疏转稠密然后崩内存）</em>——用 <code>scipy.sparse.linalg.spsolve</code>（稀疏直接法）或 <code>scipy.sparse.linalg.cg / gmres</code>（迭代法）。</li>
+</ul>
+
+<p>这些陷阱<em>每一个</em> 我后续章节都会展开——它们是工业代码里最常见的性能 / 精度 bug。理解 LU 分解的内部行为是诊断这些 bug 的前提。</p>
+
+<p>下一章我们换一个矩阵分解：<em>QR</em>。LU 是"消元的记账"，QR 是"<em>正交化的记账</em>"——把 \(A\) 写成 \(Q R\)，其中 \(Q\) 列正交、\(R\) 上三角。QR 在解最小二乘问题（上面陷阱里说过）和算特征值（<a href="ch20.html">第 20 章</a>）里是核心工具。它的稳定性更好（条件数不平方），代价是计算量多一倍。两者一起构成"稠密直接法" 的双壁。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 Gauss 求积、Romberg、自适应</a><a href="ch17.html">下一章 · 第 17 章 QR 分解与最小二乘 →</a></nav>
+</main>
+</body>
+</html>

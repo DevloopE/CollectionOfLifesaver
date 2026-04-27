@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 14 章 数值积分：Newton-Cotes — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 数值微分</a><a href="ch15.html">下一章 · 第 15 章 Gauss 求积、Romberg、自适应 →</a></nav>
+<h1 id="ch14">第 14 章 数值积分：Newton-Cotes</h1>
+
+<p>上一章末尾我兑现了那句"<em>数值微分总比数值积分难</em>" 的<em>一半</em>——把数值微分讲完，看到它的天花板（前向差商 8 位、中心 11 位、五点 stencil 13 位、Ridders 15 位、AD 16 位）。这一章兑现另一半：同一个 \(h\)，积分能给比微分高几个数量级的精度。</p>
+
+<p>原因是<em>结构性</em> 的，不是哪个公式聪明。微分是<em>差商</em>——分子两个相近浮点数相减（灾难性抵消），分母小数（放大）；舍入误差按 \(O(\varepsilon_{\text{mach}} / h^k)\) 走，越精细越差。积分是<em>求和</em>——所有项同号相加，舍入误差是 \(O(\sqrt{n} \varepsilon_{\text{mach}})\) 这种"独立累积" 量级（<a href="ch3.html">第 3 章 3.4 节</a>），<em>不</em>随网格细化爆炸。条件数也站在积分这一边：<a href="ch4.html">第 4 章 4.6 节</a>说过 \(\kappa(\int) \approx 1\)，积分把高频扰动光滑掉，不放大输入误差。</p>
+
+<p>这一章看一组叫<strong>Newton-Cotes 公式</strong>的求积法。它们的核心思想极朴素，可以一句话概括："<em>用插值多项式替换被积函数，然后积它</em>"——这是 19 世纪以来几乎所有积分公式的共同骨架。我们从最简单（用常数代替）走到 Simpson 法（用二次代替），再讨论复合公式、误差估计，最后看为什么<em>高阶</em> Newton-Cotes 反而是个坏主意。</p>
+
+<h2 id="sec14-1">14.1 把积分变离散：核心思想</h2>
+
+<p>问题：算 \(I = \int_a^b f(x) dx\)。已知 \(f\) 但 \(\int f\) 没有解析式，或解析式有也太贵。</p>
+
+<p>核心想法分两步：</p>
+
+<ol>
+  <li>选一组节点 \(a = x_0 < x_1 < \cdots < x_n = b\)，算 \(f(x_i)\)。</li>
+  <li>找一个简单函数 \(p(x)\)（多项式、分段多项式、三角多项式）使 \(p(x_i) = f(x_i)\)，<em>积它</em>：\(\int_a^b p(x) dx \approx \int_a^b f(x) dx\)。</li>
+</ol>
+
+<p>第二步靠插值（<a href="ch9.html">第 9 章</a>讲过）：插值多项式 \(p\) 满足 \(p(x_i) = f(x_i)\) for \(i = 0, \ldots, n\)。如果 \(p\) 用<em>积分</em>容易的形式（多项式、样条都行），\(\int_a^b p(x) dx\) 是封闭式可算的。</p>
+
+<p>请你停下来想一秒：积分本来是个无限维操作（依赖 \(f\) 在每一点的值）。这一步把它压成一个有限维操作（只依赖 \(f\) 在 \(n + 1\) 个节点的值）。<em>插值多项式承担了"在节点之间填空" 的责任</em>。这一压缩当然要付精度代价——\(p\) 不等于 \(f\)，差距就是积分误差。</p>
+
+<p>积分误差的形式可以一次性写出来。设 \(p\) 是 \(f\) 在 \(\{x_i\}\) 上的 \(n\) 次插值多项式，<a href="ch10.html">第 10 章</a>给出</p>
+
+<p>\[
+f(x) - p(x) = \frac{f^{(n+1)}(\xi(x))}{(n + 1)!} \prod_{i = 0}^n (x - x_i),
+\]</p>
+
+<p>其中 \(\xi(x)\) 是某个依赖 \(x\) 的中间点。两边对 \(x\) 积分：</p>
+
+<p>\[
+\int_a^b f(x) dx - \int_a^b p(x) dx = \int_a^b \frac{f^{(n+1)}(\xi(x))}{(n + 1)!} \prod_{i = 0}^n (x - x_i) \, dx.
+\]</p>
+
+<p>右边的 \(\xi\) 让积分难以解析，但<em>形状</em>已经全部告诉你了：误差正比于 \(f^{(n+1)}\)（被积函数 \(n + 1\) 阶光滑性），正比于"<em>节点多项式</em>" 的积分。前者是 \(f\) 自己的属性，后者完全由<em>节点位置</em>决定。和数值微分一样——选好节点 = 拿到精度。</p>
+
+<p>不同选择 → 不同公式：</p>
+
+<ul>
+  <li>1 个节点（取中点 \(x_0 = (a + b)/2\)），\(p\) 是常数 → <em>中点法</em>。</li>
+  <li>2 个节点（端点 \(x_0 = a, x_1 = b\)），\(p\) 是线性 → <em>梯形法</em>。</li>
+  <li>3 个节点（端点 + 中点），\(p\) 是二次 → <em>Simpson 法</em>。</li>
+  <li>\(n + 1\) 个等距节点 → <em>n 次 Newton-Cotes</em>。</li>
+</ul>
+
+<p>下面我们一档一档跑。</p>
+
+<h2 id="sec14-2">14.2 中点法：用常数代替 \(f\)</h2>
+
+<p>最朴素的版本。在子区间 \([a, b]\) 上用一个常数 \(p(x) = f(c)\)（其中 \(c = (a + b)/2\) 是中点）代替 \(f\)。<em>常数</em>积分容易：\(\int_a^b f(c) dx = (b - a) f(c)\)。</p>
+
+<p>\[
+\boxed{\ M_{[a, b]} := (b - a) \cdot f\!\left( \frac{a + b}{2} \right).\ }
+\]</p>
+
+<p>几何画面：在 \([a, b]\) 上用一个高 \(f(c)\) 的<em>矩形</em>近似曲线下的面积。</p>
+
+<p>来看误差。展开 \(f\) 在 \(c\) 处的 Taylor：\(f(x) = f(c) + (x - c) f'(c) + \frac{(x - c)^2}{2} f''(c) + \frac{(x - c)^3}{6} f'''(c) + \cdots\)。积 \([a, b]\)，记 \(h = (b - a) / 2\) 是半宽：</p>
+
+<p>\[
+\int_a^b f(x) dx = \int_{-h}^h f(c + t) dt = 2 h f(c) + \int_{-h}^h \frac{t^2}{2} f''(c) dt + O(h^5).
+\]</p>
+
+<p>第一项 \(2 h f(c) = (b - a) f(c)\)，<em>就是 \(M\) 自己</em>。看哪些项不见了：\(\int_{-h}^h t \cdot f'(c) dt = 0\) 因为 \(t\) 是奇函数。<em>关于中点的对称取点让一阶 Taylor 项免费消掉</em>——和上一章中心差商同样的对称性原理。第三项 \(\int_{-h}^h \frac{t^3}{6} f'''(c) dt = 0\) 同理。所有奇阶 Taylor 项都消掉。</p>
+
+<p>第二项 \(\int_{-h}^h \frac{t^2}{2} f''(c) dt = f''(c) \cdot \frac{h^3}{3}\)。所以</p>
+
+<p>\[
+\int_a^b f - M = \frac{(b - a)^3}{24} f''(\xi) \quad \text{某 } \xi \in [a, b].
+\]</p>
+
+<p>子区间局部误差 \(O((b - a)^3) = O(h^3)\)。注意——一<em>个</em>节点的方法竟然给 \(O(h^3)\) 局部精度，比 \(O(h^2)\) 的"<em>用插值多项式 \(=\) \(f\) 的常数近似</em>" 朴素估计要好一阶。<em>对称性又一次帮你赚了一阶</em>。</p>
+
+<p>请你把这一点放在心里。中点法的好处<em>不</em>来自"常数函数能多准多准"，来自"取在中点这一<em>对称</em>位置使一阶项自动归零"。如果你把节点改到 \([a, b]\) 内任何<em>非中</em>位置，对称性丢了，回到 \(O(h^2)\)。中点的位置不是凑数，是有原因的。</p>
+
+<p>一个具体例子。\(f(x) = e^x\)，\([0, 1]\)，真值 \(e - 1 \approx 1.71828\)。中点 \(c = 0.5\)，\(M = 1 \cdot e^{0.5} \approx 1.64872\)。误差 \(\approx 0.07\)——大约 4% 相对。差了一截。</p>
+
+<p>显然 \([0, 1]\) 一个区间太粗。下一节看怎么细化。</p>
+
+<h2 id="sec14-3">14.3 梯形法：用线性代替 \(f\)</h2>
+
+<p>下一档：用 \(f\) 在端点 \(a, b\) 的两个值连一根直线代替 \(f\)。直线 \(p(x) = f(a) + \frac{f(b) - f(a)}{b - a}(x - a)\)，积起来得到一个梯形面积：</p>
+
+<p>\[
+\boxed{\ T_{[a, b]} := \frac{b - a}{2} \cdot \big( f(a) + f(b) \big).\ }
+\]</p>
+
+<p>几何画面就是梯形——上底 \(f(a)\)、下底 \(f(b)\)、高 \(b - a\)、面积 \(\frac{1}{2} (f(a) + f(b))(b - a)\)。</p>
+
+<p>误差展开类似前节。\(p\) 是一次插值，\(p(x) - f(x) = -\frac{f''(\xi)}{2} (x - a)(x - b)\)。积分</p>
+
+<p>\[
+\int_a^b f - T = -\int_a^b \frac{f''(\xi)}{2} (x - a)(x - b) dx = -\frac{(b - a)^3}{12} f''(\eta).
+\]</p>
+
+<p>子区间局部误差 \(O((b - a)^3)\)。<em>和中点法同阶</em>，但符号相反——梯形法对凸函数<em>高估</em>积分（弦高于函数），中点法对凸函数<em>低估</em>（中点矩形低于平均高度）。误差系数 \(1/12\) 比中点法的 \(1/24\) 大一倍——<em>梯形法精度比中点法<strong>差</strong>一倍</em>，<em>而且贵一倍</em>（每子区间 2 个 \(f\) 求值 vs 中点 1 个）。</p>
+
+<p>这件事看起来有点反直觉——"用一阶多项式" 应该比"用常数" 好啊？但实情是：中点的<em>对称性</em> 加成让它和梯形法同阶，反而省了一个 \(f\) 求值。<em>选好节点位置 比 选高阶多项式 更划算</em>。这是 Gauss 求积（<a href="ch15.html">下一章</a>）的根源——把节点位置完全自由化，每个 \(f\) 求值能给 2 倍 \(O(h^k)\) 提升。</p>
+
+<p>那为什么还要梯形法？两个原因：</p>
+
+<ul>
+  <li>梯形法有<em>端点</em> 性质——\(f(a)\) 和 \(f(b)\) 出现在公式里，做<em>复合</em>（下一节）时相邻区间的端点共享，每个内部节点只算一次 \(f\)。中点法每个子区间用<em>不同的</em> 中点，节点不共享。</li>
+  <li>梯形法是<em>Romberg 外推</em> 的起点——它的 Euler-Maclaurin 误差展开有非常好的解析形式，让 Richardson 外推（<a href="ch13.html">上一章 13.5 节</a>）能反复消项，构造出 \(O(h^4), O(h^6), O(h^8), \ldots\) 的序列。这就是<a href="ch15.html">第 15 章</a> Romberg 算法的内核。</li>
+</ul>
+
+<p>同样的 \(f(x) = e^x\)，\([0, 1]\)，\(T = \frac{1}{2}(1 + e) \approx 1.85914\)。误差 \(\approx 0.14\)——大约 8% 相对，差中点法一倍，符号相反。</p>
+
+<h2 id="sec14-4">14.4 Simpson 法：用二次代替 \(f\)</h2>
+
+<p>用三个节点（端点 + 中点）做二次插值。\(c = (a + b)/2\)，\(p\) 是过 \((a, f(a)), (c, f(c)), (b, f(b))\) 的二次多项式。一段稍长的代数（用 Lagrange 形式或直接积二次）给出</p>
+
+<p>\[
+\boxed{\ S_{[a, b]} := \frac{b - a}{6} \cdot \big( f(a) + 4 f(c) + f(b) \big).\ }
+\]</p>
+
+<p>系数 \(1, 4, 1\) 加起来是 6——和分母配。直觉上中间点权重最大（4），是因为二次抛物线在中点附近"占面积" 多。</p>
+
+<p>误差展开值得仔细看。直觉说"<em>用二次插值</em>" 应该给 \(O(h^4)\) 局部精度（差 \(O(h^3)\)，积出来 \(O(h^4)\)）。但实际上：</p>
+
+<p>\[
+\int_a^b f - S = -\frac{(b - a)^5}{2880} f^{(4)}(\eta).
+\]</p>
+
+<p>子区间局部误差<em>\(O((b - a)^5)\)</em>。<em>比朴素估计高一阶</em>。</p>
+
+<p>这又是对称性的福利。Simpson 公式可以重新解释为"<em>中点法 + 梯形法的加权平均</em>"：</p>
+
+<p>\[
+S_{[a, b]} = \frac{2}{3} M_{[a, b]} + \frac{1}{3} T_{[a, b]}.
+\]</p>
+
+<p>验证：\(\frac{2}{3} (b - a) f(c) + \frac{1}{3} \cdot \frac{b - a}{2} (f(a) + f(b)) = \frac{b - a}{6} (4 f(c) + f(a) + f(b))\)。对。</p>
+
+<p>但<em>关键</em>：中点法的误差 \(\frac{(b - a)^3}{24} f''(\eta_M)\)、梯形法的误差 \(-\frac{(b - a)^3}{12} f''(\eta_T)\)。如果两个 \(\eta\) 接近，组合 \(\frac{2}{3} \cdot \frac{1}{24} - \frac{1}{3} \cdot \frac{1}{12} = \frac{2}{72} - \frac{1}{36} = 0\)——<em>\(O(h^3)\) 的误差项相互抵消</em>。剩下的是 \(O(h^5)\) 的高阶项。</p>
+
+<p>这是 Simpson 法的<em>本质</em>——它不只是"用二次插值"，它是<em>把中点的"低估" 和梯形的"高估" 用 2:1 比例配平</em>。这个 2:1 是被 \(f''\) 的系数 \(1/24\) 和 \(1/12\) 决定的，不是凑出来的。</p>
+
+<p>请你停下来欣赏这件事。Simpson 公式已经被使用 270 年（Thomas Simpson 1743 年的著作），但它<em>不是</em>"更高阶多项式插值" 的暴力推广，是一个非常微妙的对称组合。后面 Gauss 求积、Clenshaw-Curtis、Romberg 外推都遵循同一种"<em>用结构换精度</em>" 的设计哲学。</p>
+
+<p>同样的 \(f(x) = e^x\)，\([0, 1]\)：\(S = \frac{1}{6} (1 + 4 e^{0.5} + e) \approx 1.71886\)。误差 \(\approx 5.8 \times 10^{-4}\)——比梯形 / 中点好<em>200 倍</em>。<em>同样的预算（3 个 \(f\) 求值）拿到 200 倍精度</em>。这就是 Simpson 在工业里被默认采用的原因。</p>
+
+<h2 id="sec14-5">14.5 复合公式 + 误差估计</h2>
+
+<p>到目前为止三个公式都用<em>整个</em> \([a, b]\) 当一个区间。如果 \([a, b]\) 长，单段精度有限。<em>复合</em>策略：把 \([a, b]\) 切成 \(N\) 个等长子区间 \(h = (b - a) / N\)，每个子区间套一遍公式，求和。</p>
+
+<p><strong>复合中点法</strong>。子区间 \([x_i, x_{i+1}]\)，中点 \(c_i = x_i + h/2\)：</p>
+
+<p>\[
+M^{(N)} := h \sum_{i = 0}^{N - 1} f(c_i).
+\]</p>
+
+<p><strong>复合梯形法</strong>。注意相邻子区间的端点共享：</p>
+
+<p>\[
+T^{(N)} := h \left[ \frac{f(a)}{2} + f(x_1) + f(x_2) + \cdots + f(x_{N - 1}) + \frac{f(b)}{2} \right].
+\]</p>
+
+<p><em>每个内部节点只算一次 \(f\)</em>，端点权重半。\(N + 1\) 次 \(f\) 求值。</p>
+
+<p><strong>复合 Simpson 法</strong>。要求 \(N\) 偶数。每两个子区间合成一段 Simpson：</p>
+
+<p>\[
+S^{(N)} := \frac{h}{3} \left[ f(x_0) + 4 f(x_1) + 2 f(x_2) + 4 f(x_3) + 2 f(x_4) + \cdots + 4 f(x_{N - 1}) + f(x_N) \right].
+\]</p>
+
+<p>权重交替 \(1, 4, 2, 4, 2, \ldots, 4, 1\)。\(N + 1\) 次 \(f\) 求值。</p>
+
+<p><strong>复合误差</strong>。每子区间局部误差求和：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">公式</th><th style="padding: 0.3em 1em;">单段局部误差</th><th style="padding: 0.3em 1em;">复合误差</th></tr>
+<tr><td>中点</td><td>\(\frac{h^3}{24} f''(\xi)\)</td><td>\(\frac{(b - a) h^2}{24} f''(\bar\xi)\) = \(O(h^2)\)</td></tr>
+<tr><td>梯形</td><td>\(-\frac{h^3}{12} f''(\xi)\)</td><td>\(-\frac{(b - a) h^2}{12} f''(\bar\xi)\) = \(O(h^2)\)</td></tr>
+<tr><td>Simpson</td><td>\(-\frac{h^5}{2880} f^{(4)}(\xi)\)</td><td>\(-\frac{(b - a) h^4}{180} f^{(4)}(\bar\xi)\) = \(O(h^4)\)</td></tr>
+</table>
+
+<p>复合误差总比单段误差降一阶——多一个 \(N\) 倍求和，每段 \(O(h^{k+1})\) 求和成 \(O(N h^{k+1}) = O(h^k)\)。中点 / 梯形复合 \(O(h^2)\)，Simpson 复合 \(O(h^4)\)。</p>
+
+<p>验证。\(f(x) = e^x\)，\([0, 1]\)，真值 \(e - 1 = 1.71828182\)。表里每行细化一倍：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th>\(N\)</th><th>梯形误差</th><th>梯形比</th><th>Simpson 误差</th><th>Simpson 比</th></tr>
+<tr><td>1</td><td>\(1.4 \times 10^{-1}\)</td><td>—</td><td>\(5.8 \times 10^{-4}\)</td><td>—</td></tr>
+<tr><td>2</td><td>\(3.6 \times 10^{-2}\)</td><td>3.9</td><td>\(3.6 \times 10^{-5}\)</td><td>16</td></tr>
+<tr><td>4</td><td>\(8.9 \times 10^{-3}\)</td><td>4.0</td><td>\(2.2 \times 10^{-6}\)</td><td>16</td></tr>
+<tr><td>8</td><td>\(2.2 \times 10^{-3}\)</td><td>4.0</td><td>\(1.4 \times 10^{-7}\)</td><td>16</td></tr>
+<tr><td>16</td><td>\(5.6 \times 10^{-4}\)</td><td>4.0</td><td>\(8.6 \times 10^{-9}\)</td><td>16</td></tr>
+<tr><td>32</td><td>\(1.4 \times 10^{-4}\)</td><td>4.0</td><td>\(5.4 \times 10^{-10}\)</td><td>16</td></tr>
+</table>
+
+<p>梯形每细化一倍误差缩 4 倍——\(O(h^2)\) 的标志（\(h\) 减半，\(h^2\) 减 1/4）。Simpson 每细化一倍误差缩 16 倍——\(O(h^4)\) 的标志。<em>误差缩比是阶数的实证</em>。</p>
+
+<p>请你看一眼最后一行：复合 Simpson 用 33 个 \(f\) 求值就到 \(5 \times 10^{-10}\) 精度——10 位准。<em>同样 33 次 \(f\) 求值用上一章的中心差商，精度上限只有 11 位</em>，但这是 1 个点的导数；积分用相同次数得到的是<em>整个 \([0, 1]\) 上的积分值</em>，10 位准。"<em>积分把误差均掉</em>" 这句话的具体兑现就在这张表。</p>
+
+<p><strong>怎么估算误差（事后）</strong>。理论公式 \(-\frac{(b - a) h^4}{180} f^{(4)}\) 漂亮但要求你知道 \(f^{(4)}\)，黑盒情况下不行。实战常用<em>步长减半比较</em>：</p>
+
+<ul>
+  <li>用 \(h\) 算一次得 \(I_h\)。</li>
+  <li>用 \(h / 2\) 算一次得 \(I_{h/2}\)。</li>
+  <li>对 \(O(h^4)\) 方法（Simpson），\(I_h - I_{\text{真}} \approx 16 (I_{h/2} - I_{\text{真}})\)，所以 \(I_{\text{真}} - I_{h/2} \approx (I_{h/2} - I_h) / 15\)。</li>
+</ul>
+
+<p>"差两个相邻细化估值" 给你一个事后误差估计——不需要知道 \(f^{(4)}\)，<em>免费</em>。这就是<a href="ch15.html">下一章</a>自适应求积的核心：算两个估值，看差距，差距小就接受，差距大就细化。</p>
+
+<h2 id="sec14-6">14.6 高阶 Newton-Cotes 为什么不实用</h2>
+
+<p>到这里你的下一步直觉应该是："如果二次（Simpson）给 \(O(h^4)\)，那用三次（Newton-Cotes 4 点）给 \(O(h^5)\)，四次（Boole 法 5 点）给 \(O(h^6)\)，更高次给更高阶——一路堆上去多好"。</p>
+
+<p>这是个完全合理的想法。它<em>不</em>对。原因和<a href="ch10.html">第 10 章</a>讲的 Runge 现象同源：等距节点上的高次插值多项式在端点附近剧烈震荡。把这个震荡多项式拿去积分，得到的求积公式在某些 \(f\) 上<em>误差不收敛</em>，更糟糕地——<em>权重出现负数</em>。</p>
+
+<p>具体看几条 Newton-Cotes 公式（\([0, 1]\) 区间，\(n + 1\) 个等距节点，求积权重 \(w_i\) 满足 \(\sum w_i = 1\)）：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th>\(n\)</th><th>名称</th><th>权重</th><th>所有正？</th></tr>
+<tr><td>1</td><td>梯形</td><td>1/2, 1/2</td><td>是</td></tr>
+<tr><td>2</td><td>Simpson</td><td>1/6, 4/6, 1/6</td><td>是</td></tr>
+<tr><td>3</td><td>Simpson 3/8</td><td>1/8, 3/8, 3/8, 1/8</td><td>是</td></tr>
+<tr><td>4</td><td>Boole</td><td>7/90, 32/90, 12/90, 32/90, 7/90</td><td>是</td></tr>
+<tr><td>5</td><td>—</td><td>19/288, 75/288, 50/288, 50/288, 75/288, 19/288</td><td>是</td></tr>
+<tr><td>6</td><td>—</td><td>41/840, 216/840, 27/840, 272/840, 27/840, 216/840, 41/840</td><td>是</td></tr>
+<tr><td>7</td><td>—</td><td>正</td><td>是</td></tr>
+<tr><td>8</td><td>—</td><td>含 \(-\)</td><td><strong>否</strong></td></tr>
+<tr><td>10</td><td>—</td><td>多个负权</td><td><strong>否</strong></td></tr>
+</table>
+
+<p>从 \(n = 8\) 起 Newton-Cotes 公式开始出现<em>负权重</em>。这是个数值大问题：</p>
+
+<ol>
+  <li><em>稳定性差</em>。求积公式 \(\sum w_i f(x_i)\)，舍入误差 \(\sim \sum |w_i| \cdot \varepsilon_{\text{mach}} |f|\)。如果 \(\sum |w_i| \gg 1\)（负权与正权可以分别很大），舍入误差被放大。</li>
+  <li><em>不一定收敛</em>。对所有 \(n\) 同时让 Newton-Cotes 公式应用到固定的 \(f\) 上——存在 \(f\) 使误差<em>不</em>收敛到 0，甚至发散。Runge 函数 \(1/(1 + 25 x^2)\) 是典型例子（同样的现象造成 Runge 在多项式插值里的不收敛）。</li>
+  <li><em>取消现象</em>。负权 \(w_i f(x_i)\) 和正权 \(w_j f(x_j)\) 有效抵消，求积公式失去单调性 / 物理意义（比如积分一个永正函数可能给负数）。</li>
+</ol>
+
+<p>修法：</p>
+
+<ul>
+  <li><em>不用高阶 Newton-Cotes</em>。停在 Simpson（\(n = 2\)）或 Boole（\(n = 4\)）。</li>
+  <li><em>用复合公式</em>把更高精度需求转成"<em>更细的 \(h\)</em>"，不是"<em>更高的 \(n\)</em>"。复合 Simpson 已经能给 \(O(h^4)\) 全局精度，足够大多数场合。</li>
+  <li><em>真要高阶</em>就放弃等距节点，用<em>非等距</em>的 Gauss 节点（<a href="ch15.html">下一章</a>）。Gauss 节点像 Chebyshev 节点一样两端密、中间疏，权重永远正，避开 Runge。</li>
+  <li><em>可微编程环境</em>下也可以用<em>谱方法</em>——把 \(f\) 用 Chebyshev 多项式展开，逐项积分，精度按 \(\rho^{-n}\) 几何收敛。Chebfun（<a href="ch10.html">第 10 章末</a>提过）就是这套。</li>
+</ul>
+
+<p>请你停下来感受这条规律：在数值方法里"<em>朴素地把好东西堆得更高</em>" 几乎总会撞墙。一阶到二阶到 Simpson 看起来"越高越好"，但接着就崩。修法不是"放弃高阶"，是"换<em>一种</em>结构来获得高阶"——非等距节点、自适应、外推。这是数值人和工程师共同的反射动作：<em>先用最简单的工具，撞墙之后再换专用工具</em>。</p>
+
+<h2 id="sec14-7">14.7 实战：复合 Simpson 是默认</h2>
+
+<p>把这一章的工具放进决策树。</p>
+
+<ol>
+  <li>问 1：<em>\(f\) 平滑（高阶导数有界）</em>？
+    <ul>
+      <li>是 → 走问 2。</li>
+      <li>有跳点、折角、奇点 → <em>分段处理</em>（在间断点切开 \([a, b]\)，对每段单独求积），或用<em>奇点专用</em>的算法（双指数变换、Gauss-Jacobi 之类）。</li>
+    </ul>
+  </li>
+  <li>问 2：<em>需要多高精度</em>？
+    <ul>
+      <li>低（4-5 位）→ <strong>复合梯形</strong> 已够。<em>简单、不需要 \(N\) 偶数、可以增量细化</em>（已算的不丢）。</li>
+      <li>中等（6-10 位）→ <strong>复合 Simpson</strong>。<em>这是工业默认</em>。</li>
+      <li>高（12-15 位）→ 进问 3。</li>
+    </ul>
+  </li>
+  <li>问 3：<em>\(f\) 求值贵不贵</em>？
+    <ul>
+      <li>便宜 → <strong>复合 Simpson + 步长减半到收敛</strong>，或 <strong>Romberg 外推</strong>（<a href="ch15.html">下一章</a>）。</li>
+      <li>贵 → <strong>Gauss 求积</strong>（<a href="ch15.html">下一章</a>）。同样 \(n\) 个 \(f\) 求值，Gauss 给 \(2n - 1\) 次精确度，Newton-Cotes 给 \(n - 1\) 次精确度——<em>每次 \(f\) 求值的"信息量" 翻倍</em>。</li>
+    </ul>
+  </li>
+  <li>问 4：<em>\(f\) 在不同区域光滑性不同</em>（比如有个尖刺，其他地方平滑）？
+    <ul>
+      <li>是 → <strong>自适应求积</strong>（<a href="ch15.html">下一章</a>）。在尖刺处自动加密、平滑处保持稀疏。</li>
+    </ul>
+  </li>
+</ol>
+
+<p>SciPy 的 <code>scipy.integrate.simpson(y, x)</code> 就是复合 Simpson。<code>scipy.integrate.quad(f, a, b)</code> 是基于 QUADPACK 的自适应 Gauss-Kronrod——<em>99% 的"<em>给我 \(\int f\)</em>" 任务用 quad 就好</em>。理解 Newton-Cotes 是为了让你知道<em>quad 的内部第一招是什么</em>，<em>什么时候它会快 / 慢</em>，<em>失败时怎么诊断</em>。</p>
+
+<p>下一章我们走两步：(1) 用 Gauss 求积把"<em>每个 \(f\) 求值的信息密度</em>" 翻倍——把节点位置完全自由化，让节点本身去优化精度；(2) 用 Romberg 外推 + 自适应让算法"<em>自己决定加多少节点</em>"，不需要用户预先指定 \(N\)。这两件事加起来构成现代积分库的工业核心。</p>
+
+<p>我们也会碰到一个有意思的回旋：复合梯形法在<em>周期函数</em>上突然变成<em>谱精度</em>——按 \(O(\rho^{-N})\) 几何收敛，比 Simpson 的 \(O(N^{-4})\) 快无穷倍。这是 Euler-Maclaurin 公式的奇迹：周期函数让所有奇阶端点修正项自动消掉，留下指数级小的余项。这个奇迹是 FFT（<a href="ch24.html">第 24 章</a>）能"<em>积分等于求平均</em>" 的根源——周期 + 等距 + 梯形 = 谱方法。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 数值微分</a><a href="ch15.html">下一章 · 第 15 章 Gauss 求积、Romberg、自适应 →</a></nav>
+</main>
+</body>
+</html>

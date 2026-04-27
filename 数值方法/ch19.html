@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 Krylov 子空间与共轭梯度 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 迭代法：Jacobi、Gauss-Seidel、SOR</a><a href="ch20.html">下一章 · 第 20 章 特征值数值算法 →</a></nav>
+<h1 id="ch19">第 19 章 Krylov 子空间与共轭梯度</h1>
+
+<p>上一章末尾我们留下了一个尴尬的事实。Jacobi、Gauss-Seidel、SOR 都收敛——但收敛速度的依赖关系是<em>每步误差缩 \((1 - c/\kappa)\) 倍</em>。要把误差从 1 降到 \(10^{-10}\)，需要的迭代步数大致是 \(\kappa(A) \cdot \ln(10^{10}) \approx 23 \kappa\) 步。\(\kappa\) 大就完蛋。</p>
+
+<p>而 PDE 离散化里 \(\kappa\) 总是大。最经典的例子：把 \(-\Delta u = f\) 在 \(n \times n\) 网格上五点差分离散，得到的矩阵 \(A\) 的条件数是 \(\kappa(A) \sim 1/h^2 = n^2\)。如果你想要 \(n = 1000\) 的网格分辨率（在 PDE 里这都还算粗），\(\kappa \sim 10^6\)，Jacobi 要 \(\sim 10^7\) 次迭代。每次迭代是矩阵-向量乘 \(O(n_{\text{nnz}})\)。算下来你比直接 LU 还慢——这就是上一章末说的"经典迭代法对真实大问题不够用"的具体含义。</p>
+
+<p>这一章给出现代大规模线性求解的工作马：<strong>Krylov 子空间方法</strong>。核心想法朴素得让人意外——<em>每步多看一个 Krylov 子空间维度，并在子空间里找最优解</em>。这个"找最优"让收敛速率从 \(\kappa\) 加速到 \(\sqrt{\kappa}\)，对 PDE 来说就是从 \(n^2\) 加速到 \(n\)，几个数量级的差距。</p>
+
+<p>共轭梯度（CG，Hestenes &amp; Stiefel 1952）是这族算法里最美的一个——只对对称正定矩阵成立，但代码短到 10 行，每步只要 \(O(n_{\text{nnz}})\) 工作 + \(O(n)\) 存储。GMRES（Saad &amp; Schultz 1986）把这套推广到一般矩阵。两个加上预条件就是今天 PETSc、scipy.sparse.linalg、Trilinos 等大型科学计算库的核心。</p>
+
+<h2 id="sec19-1">19.1 上一章瓶颈具体化</h2>
+
+<p>把上面的论断做出来。考虑二维 Poisson 方程</p>
+
+<p>\[
+-u_{xx} - u_{yy} = f(x, y), \quad (x, y) \in [0, 1]^2,
+\]</p>
+
+<p>带零边界。用 \(N \times N\) 均匀网格，步长 \(h = 1/(N+1)\)，五点差分得到</p>
+
+<p>\[
+\frac{4 u_{ij} - u_{i-1,j} - u_{i+1,j} - u_{i,j-1} - u_{i,j+1}}{h^2} = f_{ij},
+\]</p>
+
+<p>把内部 \(N^2\) 个未知数堆成一个长度 \(n = N^2\) 的向量 \(\mathbf{u}\)，得线性系统 \(A \mathbf{u} = h^2 \mathbf{f}\)。\(A\) 是 \(n \times n\) 矩阵，每行最多 5 个非零（中心 4，4 个邻居各 -1），稀疏度 \(\sim 5/n\)。</p>
+
+<p>三个事实：</p>
+
+<ul>
+  <li>\(A\) <em>对称正定</em>（这是 Laplacian 离散的标准性质）。</li>
+  <li>\(A\) <em>稀疏</em>，矩阵-向量乘 \(A v\) 只要 \(O(n)\) 工作。</li>
+  <li>\(\kappa_2(A) = \sigma_{\max}/\sigma_{\min}\)。Laplacian 的特征值显式可算：\(\lambda_{ij} = (4/h^2)(\sin^2(i\pi h /2) + \sin^2(j \pi h / 2))\)，\(i, j = 1, \ldots, N\)。最小是 \(i = j = 1\)，\(\lambda_{\min} \approx 2 \pi^2\)。最大是 \(i = j = N\)，\(\lambda_{\max} \approx 8/h^2\)。所以 \(\kappa = \lambda_{\max}/\lambda_{\min} \approx 4/(\pi^2 h^2) \sim n\)（因为 \(n = N^2\)，\(h^2 = 1/N^2 = 1/\sqrt{n}\) 嗯等等——\(h = 1/N\)，所以 \(h^2 = 1/N^2 = 1/n\)，所以 \(\kappa \sim n\)）。</li>
+</ul>
+
+<p>取 \(n = 10^6\)（即 \(N = 1000\)，已经是 PDE 入门级问题）：\(\kappa \approx 10^6\)。Jacobi 收敛因子约 \(1 - 2/\kappa \approx 1 - 2 \times 10^{-6}\)，要把误差降十位精度需要 \(\sim 10 \cdot \kappa / 2 \approx 5 \times 10^6\) 次迭代。每次 \(O(n) = 10^6\) 操作，<em>总开销 \(\sim 5 \times 10^{12}\) flop</em>——一台中等服务器要小时级运行。</p>
+
+<p>对比直接稀疏 LU：稀疏 Cholesky 的复杂度对二维 PDE 是 \(O(n^{3/2})\)（嵌套剖分排序下）= \(10^9\) flop。直接法<em>赢</em>了 Jacobi 三个数量级。Jacobi 在这里彻底不能用。</p>
+
+<p>请你停下来感受这一刻：上一章我们花了一整章学 Jacobi/GS/SOR，结果在 PDE 这个最重要的应用上根本没用。<em>这就是为什么 Krylov 方法是必修课</em>——不是"也可以这样做"，是"<em>真要做大问题就只能这样做</em>"。CG 把 Jacobi 的 \(\kappa\) 收敛换成 \(\sqrt{\kappa}\)，对上面的问题变成 \(\sqrt{10^6} \cdot \ln 10^{10} \approx 2.3 \times 10^4\) 次迭代——总开销 \(2.3 \times 10^{10}\) flop，比直接 LU 慢 23 倍但<em>内存只要 \(O(n)\)</em>（CG 只存几个长度 \(n\) 向量）。在 \(n = 10^9\) 时直接 LU 内存爆炸，CG 还能跑——这是 Krylov 真正的价值。</p>
+
+<h2 id="sec19-2">19.2 Krylov 子空间是什么</h2>
+
+<p>给定矩阵 \(A\) 和初始向量 \(b\)，定义 \(m\) 维 Krylov 子空间</p>
+
+<p>\[
+\boxed{\ \mathcal{K}_m(A, b) := \mathrm{span}\{ b, A b, A^2 b, \ldots, A^{m-1} b\}.\ }
+\]</p>
+
+<p>这个子空间为什么有用？要理解，先想一件简单的事。Cayley-Hamilton 告诉我们 \(A\) 满足它自己的特征多项式 \(p_A(A) = 0\)，即 \(A^n = c_{n-1} A^{n-1} + \ldots + c_0 I\) 对 \(n \times n\) 矩阵成立。两边乘 \(b\)：</p>
+
+<p>\[
+A^n b = c_{n-1} A^{n-1} b + \ldots + c_0 b.
+\]</p>
+
+<p>所以 \(A^n b \in \mathrm{span}\{b, A b, \ldots, A^{n-1} b\} = \mathcal{K}_n(A, b)\)。继续乘 \(A\)，\(A^{n+1} b\) 也在里面。归纳：<em>所有的 \(A^k b\) 都在 \(\mathcal{K}_n(A, b)\)</em>。所以 Krylov 子空间在 \(m = n\) 处<em>停止增长</em>——再加 \(A^n b\) 不增加维度。</p>
+
+<p>更妙的事：\(A x = b\) 的解 \(x = A^{-1} b\) 也是 \(b, A b, \ldots\) 的多项式。事实上，把 Cayley-Hamilton \(A^n + c_{n-1} A^{n-1} + \ldots + c_0 I = 0\) 整理成</p>
+
+<p>\[
+A \cdot \left( -\frac{1}{c_0} (A^{n-1} + c_{n-1} A^{n-2} + \ldots + c_1 I) \right) = I
+\]</p>
+
+<p>（假设 \(c_0 = (-1)^n \det A \neq 0\)，即 \(A\) 非奇异）。所以 \(A^{-1} = -\frac{1}{c_0}(A^{n-1} + \ldots + c_1 I)\)，即 \(A^{-1}\) 是 \(A\) 的<em>不超过 \(n-1\) 次</em>的多项式。两边乘 \(b\)：</p>
+
+<p>\[
+\boxed{\ A^{-1} b \in \mathcal{K}_n(A, b).\ }
+\]</p>
+
+<p>这是 Krylov 子空间方法的灵魂。<em>解 \(x^* = A^{-1} b\) 一定坐落在 \(\mathcal{K}_n(A, b)\) 里</em>。如果我们能在<em>更小</em>的 Krylov 子空间 \(\mathcal{K}_m(A, b)\)（\(m \ll n\)）里找到 \(x^*\) 的好近似，就赢了。</p>
+
+<p>几何画面。从 \(b\) 出发，反复乘 \(A\) 得到一串向量 \(b, Ab, A^2 b, \ldots\)。这串向量在 \(\mathbb{R}^n\) 里张成一个上升的子空间链 \(\mathcal{K}_1 \subset \mathcal{K}_2 \subset \ldots \subset \mathcal{K}_n = \mathbb{R}^n\)（一般情况下；退化情况后说）。Krylov 方法的策略：第 \(m\) 步从 \(\mathcal{K}_m\) 里挑一个"最优"向量 \(x_m\) 作为对 \(x^*\) 的近似。"最优"的具体定义不同算法不同——CG 用一种、GMRES 用另一种。但<em>子空间链是同一条</em>。</p>
+
+<p>请你想清楚这件事的便宜之处：每步只要做一次 \(A v\)（一次稀疏矩阵-向量乘，\(O(n_{\text{nnz}})\)），就把可用的搜索空间维度增加一。\(m\) 步之后，搜索空间是 \(m\) 维。如果近似收敛到 \(x^*\) 只要 \(m\) 不太大（比如 \(\sqrt{\kappa}\) 量级），总开销就是 \(m \cdot O(n_{\text{nnz}})\)。这套策略<em>不要求矩阵 \(A\) 显式存储</em>——你只要能告诉算法"给我一个 \(v\)，我返回 \(A v\)"，算法就能跑。这种"只要矩阵-向量积" 的接口在物理仿真里至关重要：很多大型问题里 \(A\) 是隐式定义的（比如 \(A v\) 表示"做一遍 PDE 的离散算子"），永远不显式存。</p>
+
+<h2 id="sec19-3">19.3 在 \(\mathcal{K}_m\) 里找"最优"</h2>
+
+<p>"最优"怎么定？最直接的想法：找 \(x_m \in \mathcal{K}_m\) 让 \(\| x_m - x^*\| \) 最小。但 \(x^*\) 是未知的——你正是在求它，没法用它定义"最优"。</p>
+
+<p>替代：用<em>残差</em> \(r_m = b - A x_m\) 代替。残差能算，越小说明越接近解。两条路：</p>
+
+<ul>
+  <li><strong>残差 2-范数最小</strong>：\(\min_{x_m \in \mathcal{K}_m} \|b - A x_m\|_2\)。这就是 GMRES 的目标。对一般 \(A\) 都能用。</li>
+  <li><strong>误差的 \(A\)-范数最小</strong>：当 \(A\) 对称正定，定义 \(\|y\|_A := \sqrt{y^T A y}\)（这是个真范数因为 \(A\) 正定）。求 \(\min_{x_m \in \mathcal{K}_m} \|x_m - x^*\|_A\)。这就是 CG 的目标。乍看奇怪——\(x^*\) 仍然未知。但代数上 \(\|x_m - x^*\|_A^2 = (x_m - x^*)^T A (x_m - x^*)\) 展开后等于 \(x_m^T A x_m - 2 x_m^T b + x^{*T} A x^*\)（用 \(A x^* = b\)）。最后那项不依赖 \(x_m\)——所以 \(\min \| \cdot\|_A\) 等价于 \(\min \big(x_m^T A x_m - 2 x_m^T b\big)\)。这是个能算的二次函数！</li>
+</ul>
+
+<p>第二个目标的几何意义美得让人停一下。定义二次形式 \(\phi(x) := \tfrac12 x^T A x - x^T b\)。它的梯度是 \(\nabla \phi = A x - b\)，所以 \(\phi\) 的最小值点恰是 \(A x = b\) 的解 \(x^*\)。<em>解线性系统 = 求一个二次函数的最小值</em>——只要 \(A\) 对称正定，这两个问题等价。CG 是<em>子空间内的最速下降</em>。</p>
+
+<p>展开 \(\phi(x_m) = \tfrac12 \|x_m - x^*\|_A^2 + \mathrm{const}\)（用 \(A x^* = b\) 验证）。所以 CG 的"\(A\)-范数误差最小"就是"\(\phi\) 函数最小"。两个等价说法。</p>
+
+<p>这一节的关键不是公式，是范式：<em>Krylov 方法把"解 \(Ax = b\)" 变成"在子空间 \(\mathcal{K}_m\) 里找一个准则的最优"</em>。准则是残差 2-范数（GMRES）或误差 \(A\)-范数（CG），看 \(A\) 的结构选。下一节我们具体把 CG 写出来。</p>
+
+<h2 id="sec19-4">19.4 共轭梯度算法</h2>
+
+<p>设 \(A\) 对称正定。我们要做的是：在 \(\mathcal{K}_m\) 里最小化 \(\phi(x) = \tfrac12 x^T A x - x^T b\)，同时<em>每一步只要 \(O(n)\) 工作</em>。第二个要求是关键——朴素地"在子空间内做最小化"要解一个 \(m \times m\) 投影问题，\(m\) 大时开销爆炸。CG 用一个聪明的<em>方向选择</em>把这个开销摊到每一步 \(O(n)\)。</p>
+
+<p>朴素尝试：最速下降。在 \(x_k\) 沿 \(-\nabla \phi(x_k) = b - A x_k = r_k\)（残差！）方向走最佳步长：</p>
+
+<p>\[
+x_{k+1} = x_k + \alpha_k r_k, \quad \alpha_k = \arg\min_\alpha \phi(x_k + \alpha r_k) = \frac{r_k^T r_k}{r_k^T A r_k}.
+\]</p>
+
+<p>这是<em>梯度下降</em>。对 \(\kappa \gg 1\) 的二次函数（拉长椭球），梯度下降会"<em>之字形</em>"在椭球长轴方向反复来回，收敛极慢——精确分析给出收敛因子 \((\kappa - 1)/(\kappa + 1) \approx 1 - 2/\kappa\)，和 Jacobi 一个量级。<em>梯度下降不够好</em>。</p>
+
+<p>原因：每步选了"<em>当前最陡</em>"方向 \(r_k\)，但<em>后续</em>沿那条方向走的进步常会被下一步拐回来。如果方向之间能<em>互相不干扰</em>——选 \(p_0, p_1, p_2, \ldots\) 让每一步沿 \(p_k\) 的优化不影响后续——那 \(m\) 步后就把 \(\mathrm{span}\{p_0, \ldots, p_{m-1}\}\) 内的最优解一次拿到。"互相不干扰"的精确条件是<em>\(A\)-共轭</em>：</p>
+
+<p>\[
+\boxed{\ p_i^T A p_j = 0 \quad \text{对所有 } i \neq j.\ }
+\]</p>
+
+<p>为什么这正是不干扰的条件？设 \(x = \sum \alpha_k p_k\)，\(\phi(x) = \tfrac12 \sum_{i,j} \alpha_i \alpha_j p_i^T A p_j - \sum \alpha_k p_k^T b\)。如果 \(p_i^T A p_j = \delta_{ij}\)（共轭 + 归一化），二次项变成 \(\tfrac12 \sum \alpha_k^2\)，<em>每个 \(\alpha_k\) 互不干扰</em>，逐项最小化 = 一起最小化。换句话说，<em>\(A\)-共轭方向是 \(A\) 诱导的椭球度规下的"正交方向"</em>——在那套度规里梯度下降不会之字形。</p>
+
+<p>CG 的核心招数：<em>边算边构造 \(A\)-共轭方向</em>。从 \(p_0 = r_0 = b - A x_0\) 起，每次新方向用当前残差 \(r_k\) 减去对 \(p_{k-1}\) 的<em>\(A\)-投影</em>，让它和 \(p_{k-1}\) 共轭：</p>
+
+<p>\[
+p_k = r_k - \frac{p_{k-1}^T A r_k}{p_{k-1}^T A p_{k-1}} p_{k-1}.
+\]</p>
+
+<p>奇迹般地（这是 CG 算法的核心定理），<em>新构造的 \(p_k\) 自动和所有更早的 \(p_0, \ldots, p_{k-2}\) 共轭</em>——你只需要显式减掉 \(p_{k-1}\) 那一项。证明用归纳和 Krylov 子空间结构，标准结果。</p>
+
+<p>把上面凑成可执行算法：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+def cg(A, b, x0, tol=1e-10, max_iter=None):
+    x = x0.copy()
+    r = b - A @ x          # 当前残差
+    p = r.copy()           # 当前共轭方向，初始 = 残差
+    rsold = r @ r
+    if max_iter is None: max_iter = len(b)
+    for k in range(max_iter):
+        Ap = A @ p
+        alpha = rsold / (p @ Ap)   # 沿 p 的最佳步长
+        x = x + alpha * p          # 更新解
+        r = r - alpha * Ap         # 更新残差（避开重新算 b - A x）
+        rsnew = r @ r
+        if rsnew < tol**2: return x
+        beta = rsnew / rsold       # 共轭方向更新系数
+        p = r + beta * p           # 新方向
+        rsold = rsnew
+    return x
+</pre>
+
+<p>每步：一次矩阵-向量乘 \(A p\)（最贵的，\(O(n_{\text{nnz}})\)）+ 几个内积和 daxpy（\(O(n)\)）。存储：\(x, r, p, Ap\) 四个长度 \(n\) 向量——<em>就这些</em>。对 \(n = 10^9\) 的问题，CG 只要 \(4 \times 8 \, \text{GB} = 32 \, \text{GB}\) 存储；直接 LU 要 \(O(n^2)\) bytes，根本放不下。</p>
+
+<p>CG 的代码短、内存紧、每步便宜。它是科学计算里最有名的"<em>10 行代码改变世界</em>"之一。但它能做这么多的<em>原因</em>——\(A\)-共轭方向 + Krylov 子空间——藏在每行代码后面。下一节把这个原因看清。</p>
+
+<h2 id="sec19-5">19.5 CG 的几何与有限收敛</h2>
+
+<p>设搜索方向 \(p_0, p_1, \ldots, p_{n-1}\) 是 \(A\)-共轭的，且不全为零（线性独立）。它们构成 \(\mathbb{R}^n\) 的 \(A\)-正交基。因此<em>任何</em> \(x \in \mathbb{R}^n\) 都能写成 \(x = \sum_{k=0}^{n-1} \alpha_k p_k\)。特别地真解 \(x^* = \sum \alpha_k^* p_k\)。</p>
+
+<p>\(\phi(x) = \tfrac12 x^T A x - x^T b\) 在 \(p_k\) 基下分解为</p>
+
+<p>\[
+\phi\Big(\sum \alpha_k p_k\Big) = \sum_k \Big( \tfrac12 \alpha_k^2 p_k^T A p_k - \alpha_k p_k^T b \Big).
+\]</p>
+
+<p>每项<em>独立</em>含一个 \(\alpha_k\)。逐项最小化给 \(\alpha_k = p_k^T b / (p_k^T A p_k)\)。<em>同样</em>是 CG 那一步的步长公式（用 \(b = A x^* + r\)，因为初始 \(x_0\) 一般不是 0，记号要带 \(r_k\)，但结构相同）。</p>
+
+<p>关键结论：\(n\) 个 \(A\)-共轭方向 \(\Rightarrow\) 任意 \(x^*\) 在 \(n\) 步内被精确恢复。<em>CG 在精确算术下最多 \(n\) 步给出精确解</em>。这是有限步收敛的保证——某种意义上 CG 是直接法，不是迭代法。</p>
+
+<p>但 \(n = 10^9\) 时"\(n\) 步收敛"没意义——每步还是 \(O(n)\)，总 \(O(n^2)\) 顶不下来。CG 真正的力量在<em>提前停止</em>：<em>大多数情况 CG 在 \(\sqrt{\kappa} \ln(1/\varepsilon)\) 步达到精度 \(\varepsilon\)</em>，远小于 \(n\)。下一节讲为什么。</p>
+
+<p>另一个几何画面。把 CG 看成<em>子空间内的精确最小化</em>：第 \(k\) 步给出的 \(x_k\) 是 \(\mathcal{K}_k\) 内 \(\phi\) 的全局最小点。这条性质是 CG 的核心定理：</p>
+
+<p>\[
+x_k = \arg\min_{x \in x_0 + \mathcal{K}_k(A, r_0)} \phi(x).
+\]</p>
+
+<p>每加一维，最小值<em>只能下降</em>——所以 CG 单调收敛。证明这个不是平凡的（要用 Krylov 子空间和 \(A\)-共轭方向之间的细致关系），但结论一旦接受，CG 的性质就一目了然。</p>
+
+<h2 id="sec19-6">19.6 收敛速率：\(\sqrt{\kappa}\) 加速</h2>
+
+<p>CG 的精确收敛速率定理：</p>
+
+<p>\[
+\boxed{\ \|x_k - x^*\|_A \le 2 \left( \frac{\sqrt{\kappa(A)} - 1}{\sqrt{\kappa(A)} + 1} \right)^k \|x_0 - x^*\|_A.\ }
+\]</p>
+
+<p>对比 Jacobi 收敛因子 \(1 - 2/\kappa = (\kappa - 1)/(\kappa + 1) \cdot (1 + O(1/\kappa))\)。CG 的收敛因子 \((\sqrt\kappa - 1)/(\sqrt\kappa + 1) \approx 1 - 2/\sqrt\kappa\)。<em>Jacobi 收敛速率的 \(\kappa\) 被 CG 替换为 \(\sqrt\kappa\)</em>。</p>
+
+<p>翻译成步数：要降误差到 \(\varepsilon\)，CG 需要</p>
+
+<p>\[
+k \approx \tfrac12 \sqrt\kappa \cdot \ln(2/\varepsilon)
+\]</p>
+
+<p>步。Jacobi 需要 \(\sim \tfrac12 \kappa \cdot \ln(1/\varepsilon)\) 步。<em>CG 比 Jacobi 快 \(\sqrt\kappa\) 倍</em>。</p>
+
+<p>回到 19.1 节的 PDE 例子：\(\kappa = 10^6\)，\(\varepsilon = 10^{-10}\)。Jacobi 要 \(\sim 10^7\) 步；CG 要 \(\sim 0.5 \cdot 10^3 \cdot 23 \approx 1.2 \times 10^4\) 步。<em>三个数量级的差距</em>。每步开销一样（一次稀疏矩阵-向量乘），所以 CG 直接快了 \(800\) 倍。</p>
+
+<p>这条 \(\sqrt\kappa\) 收敛的证明要用到一个关于 Chebyshev 多项式的优美事实。\(x_k - x^*\) 是 \(\mathcal{K}_k\) 内的<em>残差多项式</em>：\(x_k - x^* = q_k(A) (x_0 - x^*)\)，其中 \(q_k\) 是次数 \(\le k\)、满足 \(q_k(0) = 1\) 的多项式（约束来自 \(x_k - x^* = 0\) 当 \(x_0 = x^*\)）。CG 的"最小化 \(A\)-范数"等价于<em>找次数 \(k\) 的多项式 \(q_k\) 满足 \(q_k(0) = 1\)，让 \(\max_{\lambda \in \sigma(A)} |q_k(\lambda)|\) 最小</em>。这是著名的 Chebyshev 优化问题。把 \(A\) 谱包进 \([\lambda_{\min}, \lambda_{\max}]\)，最优 \(q_k\) 是平移 + 缩放后的 Chebyshev 多项式 \(T_k\)，给出上面的因子。</p>
+
+<p>更深的事：<em>CG 的实际收敛常常比定理快</em>。如果 \(A\) 的特征值聚成几个簇，CG 在每簇用一步就把那簇消掉——<em>一旦簇数 = 已用步数</em>，CG 把那部分误差归零。所以"特征值分布" 比"\(\kappa\) 大小" 更精细地决定 CG 速度。这条洞察是预条件设计的指导原则——下面 19.8 节会回来。</p>
+
+<h2 id="sec19-7">19.7 GMRES：一般 \(A\) 的版本</h2>
+
+<p>CG 漂亮但只对对称正定 \(A\) 成立（共轭方向的归纳依赖对称性，正定保证 \(A\)-范数是真范数）。对一般非对称 \(A\)（流体仿真里典型的对流-扩散方程离散），需要别的算法。最重要的是 <strong>GMRES</strong>（Generalized Minimal RESidual，Saad &amp; Schultz 1986）。</p>
+
+<p>GMRES 的目标更直接：每步在 \(x_0 + \mathcal{K}_k\) 里找让<em>残差 2-范数</em>最小的 \(x_k\)：</p>
+
+<p>\[
+x_k = \arg\min_{x \in x_0 + \mathcal{K}_k(A, r_0)} \|b - A x\|_2.
+\]</p>
+
+<p>实现细节：先用 <strong>Arnoldi 过程</strong>（Gram-Schmidt 在 Krylov 子空间内）造一组 \(\mathcal{K}_k\) 的正交基 \(Q_k = [q_1, q_2, \ldots, q_k]\)。Arnoldi 满足三项关系</p>
+
+<p>\[
+A Q_k = Q_{k+1} \tilde H_k,
+\]</p>
+
+<p>其中 \(\tilde H_k\) 是 \((k+1) \times k\) 上 Hessenberg 矩阵（除了次对角和上三角全零）。代入 \(\min \|b - A x\|\)：把 \(x = x_0 + Q_k y\)，残差变成 \(\|r_0 - A Q_k y\| = \|r_0 - Q_{k+1} \tilde H_k y\| = \big\|\, \|r_0\| e_1 - \tilde H_k y \,\big\|\)（最后用 \(Q_{k+1}\) 是正交）。这是个 \((k+1) \times k\) 的最小二乘问题，可以用 \(k\) 个 Givens 旋转 \(O(k)\) 解。</p>
+
+<p>整体每步开销：一次 \(A v\)（\(O(n_{\text{nnz}})\)），一次 Arnoldi 正交化对所有之前的 \(q_i\)（\(O(kn)\)），一次最小二乘（\(O(k)\)）。<em>问题</em>：开销随 \(k\) 增长——第 \(k\) 步 \(O(kn)\)，存储要 \(k\) 个长度 \(n\) 向量。比 CG 贵得多。</p>
+
+<p>实战：用 <strong>重启 GMRES</strong>（restarted GMRES，记作 GMRES(\(m\))）。固定 \(m\)（比如 30 或 50），跑 \(m\) 步，把当前结果当新 \(x_0\) 重启。这样存储固定为 \(m\) 个向量，开销固定。代价是收敛性可能<em>停滞</em>——重启切断了 Krylov 子空间的累积，CG 那种"\(\sqrt\kappa\) 收敛"的分析不再适用。GMRES(\(m\)) 调参（选哪个 \(m\)）是个工程问题，实战上常配预条件解决。</p>
+
+<p>对称正定时，GMRES = CG（计算上）——因为 Arnoldi 在对称下退化为 Lanczos 三项递推（每个新基向量只要和前两个正交化），开销变 \(O(n)\)/步。CG 算法正是这条特殊化的最直接表达。</p>
+
+<h2 id="sec19-8">19.8 预条件：把困难矩阵变容易</h2>
+
+<p>CG 的速率是 \(\sqrt\kappa\)，所以要更快只能<em>降低 \(\kappa\)</em>。但 \(\kappa\) 是问题本身的属性，不能改。</p>
+
+<p>真能改的：用一个<em>等价</em>问题代替。找一个矩阵 \(M\)（叫<em>预条件子</em>，preconditioner）满足两个矛盾的要求：</p>
+
+<ul>
+  <li>\(M \approx A\)（让 \(M^{-1} A \approx I\)，所以 \(\kappa(M^{-1} A) \ll \kappa(A)\)）；</li>
+  <li>\(M\) <em>容易求逆</em>（每次算 \(M^{-1} v\) 便宜）。</li>
+</ul>
+
+<p>这两个要求在拉锯——\(M\) 越接近 \(A\)，越难求逆；\(M\) 越简单（如 \(M = I\) 就是不预条件），越没用。预条件子的设计就是在这条折中线上找甜蜜点。</p>
+
+<p>有了 \(M\)，把 \(A x = b\) 转成 \(M^{-1} A x = M^{-1} b\)，对<em>新</em>系统跑 CG / GMRES。如果 \(\kappa(M^{-1} A) \ll \kappa(A)\)，新系统收敛快得多。CG 的预条件版本（PCG）每步多一次 \(M^{-1} v\)（解一个用 \(M\) 的小线性系统），其余结构不变。</p>
+
+<p>常见预条件子，按"复杂 → 强力" 排序：</p>
+
+<ul>
+  <li><strong>Jacobi 预条件</strong>：\(M = \mathrm{diag}(A)\)。\(M^{-1}\) 平凡。对刚硬度变化大的问题（不同位置 \(A_{ii}\) 量级差几个数量级）很有效，否则平庸。</li>
+  <li><strong>不完全 Cholesky / LU（IC / ILU）</strong>：做 Cholesky 或 LU，但<em>丢掉</em>所有不在 \(A\) 稀疏模式上的填充元素。结果 \(M = \tilde L \tilde L^T\)（IC）或 \(M = \tilde L \tilde U\)（ILU），稀疏度和 \(A\) 同阶。求 \(M^{-1} v\) 是两个稀疏三角解，\(O(n_{\text{nnz}})\)。这是工业上最常用的通用预条件子。</li>
+  <li><strong>多重网格（multigrid）</strong>：对 PDE 问题，构造一系列粗网格上的近似解再插回细网格。理论上对椭圆 PDE 给 \(\kappa(M^{-1} A) = O(1)\)——<em>独立于网格尺寸</em>。每步 \(O(n)\) 工作。这是 PDE 数值最强工具，但实现复杂。</li>
+  <li><strong>域分解（domain decomposition）</strong>：把空间域分成若干子域，每个子域上独立解小问题，子域间用 Schur 补耦合。天然并行化，超算上是主流。</li>
+</ul>
+
+<p>预条件的设计是<em>问题相关</em>的——通用工具（Jacobi、ILU）总能给点加速，但要把 PDE 求解推到极致需要多重网格那种"<em>知道问题来源</em>"的算法。这一点和 CG 算法本身的"<em>问题无关</em>"形成对照——CG 是通用工具，预条件是问题特定的"<em>领域知识接口</em>"。</p>
+
+<p>请你停一下感受这种分工：CG 提供"<em>给你一个矩阵-向量乘 + 一个预条件，我把方程解出来</em>"的合同；预条件提供"<em>这个问题的物理结构是什么</em>"的合同。两边接起来，就是大型科学计算的工业模板。PETSc、Trilinos、deal.II 这些大型 C++ 库就是按这个分工组织的。</p>
+
+<h2 id="sec19-9">19.9 实战</h2>
+
+<p>SciPy 把整套搬好了：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+import numpy as np
+from scipy.sparse import diags, eye, kron
+from scipy.sparse.linalg import cg, gmres, spilu, LinearOperator
+
+# 构造 2D Poisson 矩阵 (5-point stencil)
+def poisson_2d(N):
+    e = np.ones(N)
+    T = diags([-e, 2*e, -e], [-1, 0, 1], shape=(N, N))
+    I = eye(N)
+    return (kron(I, T) + kron(T, I)).tocsr()  # n = N*N
+
+N = 100
+A = poisson_2d(N)              # n = 10000, 五点稀疏
+b = np.random.rand(N*N)
+
+# 不预条件 CG
+x, info = cg(A, b, rtol=1e-10)
+print(f"CG iterations: ~ sqrt(n) = {int(np.sqrt(N*N))}")
+
+# ILU 预条件
+ilu = spilu(A.tocsc(), drop_tol=1e-4)
+M = LinearOperator(A.shape, matvec=ilu.solve)
+x, info = cg(A, b, M=M, rtol=1e-10)
+# 通常 5-10 倍加速
+</pre>
+
+<p>几个实战注意：</p>
+
+<ul>
+  <li><code>rtol</code> 是<em>残差相对容忍度</em>（\(\|r\|/\|b\| < \mathrm{rtol}\)），不是误差容忍度。残差小不一定误差小（除以 \(\kappa\) 才是）。要绝对的误差控制需要单独估计。</li>
+  <li>SciPy 的 <code>cg</code> 对非对称 \(A\) 不报错但<em>结果错</em>。检查矩阵对称性是用户的责任。</li>
+  <li>GMRES 的 <code>restart</code> 参数是 GMRES(\(m\)) 里的 \(m\)；默认 20。问题难时调大（30-100）有助于收敛。</li>
+  <li>ILU 的 <code>drop_tol</code> 是质量-密度平衡：小（\(10^{-4}\)）→ 接近完整 LU，预条件强但占内存；大（\(10^{-2}\)）→ 接近对角，便宜但弱。</li>
+</ul>
+
+<p>更大的工具链：PETSc（C / Fortran，超算上跑万核标准）、Trilinos（C++，大型工程仿真）、HYPRE（专攻多重网格）。这些库实现了上面所有算法 + 几十种预条件子 + 并行通讯。学术做小规模研究用 SciPy 够；工业仿真上 PETSc 是基线。</p>
+
+<p>这一章把"大规模线性系统怎么解"的现代答案讲清。一句话总结：<em>稀疏矩阵 + Krylov 子空间方法 + 问题相关预条件</em>。每个零件都不可缺——稀疏让矩阵-向量乘便宜，Krylov 让解只在低维子空间里找，预条件把条件数压下来。三者合一，今天的 PDE 仿真才能跑出有用的网格分辨率。</p>
+
+<p>下一章我们换话题：<em>特征值数值算法</em>。这是数值线性代数的另一座大山——为什么不能直接求特征多项式的根（第 4 章给过线索）、幂法、QR 算法、它们怎么靠 Hessenberg 形式 + Wilkinson 位移变成立方收敛的工业标准。LAPACK 的 <code>geev</code> / <code>syev</code> 就藏着这些算法。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 迭代法：Jacobi、Gauss-Seidel、SOR</a><a href="ch20.html">下一章 · 第 20 章 特征值数值算法 →</a></nav>
+</main>
+</body>
+</html>

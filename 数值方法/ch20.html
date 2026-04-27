@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 特征值数值算法 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 Krylov 子空间与共轭梯度</a><a href="ch21.html">下一章 · 第 21 章 奇异值分解 →</a></nav>
+<h1 id="ch20">第 20 章 特征值数值算法</h1>
+
+<p>线性代数课你被告知特征值是<em>特征多项式</em> \(\det(A - \lambda I) = 0\) 的根。<em>千万不要这样求特征值</em>。</p>
+
+<p>这条警告不是修辞。<a href="ch4.html">第 4 章 4.2 节</a>的 Wilkinson 例子给过预演——多项式 \(p(x) = (x - 1)(x - 2)\cdots(x - 20)\)，把 \(x^{19}\) 系数动 \(10^{-7}\)，根<em>跑到复平面 1 单位远</em>。多项式根问题的条件数对系数极敏感，是数值最病态的问题之一。</p>
+
+<p>而<em>特征值问题本身</em>条件数其实<em>不大</em>——对正规矩阵 \(\kappa = 1\)（每个特征值的扰动正比于矩阵扰动）。特征值天生是良态问题。但你<em>把它翻译成多项式根</em>的瞬间，引入了一个本来不存在的天文级条件数。这是数值分析里"<em>问题良、算法烂</em>" 的教科书例子。</p>
+
+<p>这一章给真能用的特征值算法。从最朴素的幂法（power iteration）开始，逐步加配件——反幂法、Rayleigh 商、Hessenberg 简化、QR 算法、Wilkinson 位移——最后到工业标准 QR 算法。SciPy / LAPACK 的 <code>eig</code> 背后是这条路径的产物。</p>
+
+<h2 id="sec20-1">20.1 复习禁忌</h2>
+
+<p>把上面的警告做出来。考虑 \(2 \times 2\) 矩阵</p>
+
+<p>\[
+A = \begin{pmatrix} 1 & 0 \\ 0 & 1.0001 \end{pmatrix}.
+\]</p>
+
+<p>真特征值 \(\{1, 1.0001\}\)。问题良态——任何对 \(A\) 的小扰动只让特征值动相同量级（这是对称矩阵的 Bauer-Fike 定理）。</p>
+
+<p>现在走"特征多项式" 路线。\(\det(A - \lambda I) = (1 - \lambda)(1.0001 - \lambda) = \lambda^2 - 2.0001 \lambda + 1.0001\)。要算这两个系数，浮点上 \(2.0001\) 准确表示，\(1.0001\) 也准确。求两根：</p>
+
+<p>\[
+\lambda = \frac{2.0001 \pm \sqrt{2.0001^2 - 4 \cdot 1.0001}}{2} = \frac{2.0001 \pm \sqrt{4.00040001 - 4.0004}}{2} = \frac{2.0001 \pm \sqrt{10^{-8}}}{2}.
+\]</p>
+
+<p>判别式 \(2.0001^2 - 4 \cdot 1.0001 = 10^{-8}\)。但浮点算 \(2.0001^2\) 时——\(2.0001\) 是 5 位有效数字（约 13 位 binary，远在 double 16 位精度内），平方得 \(4.00040001\)。减 \(4.0004\)——<em>灾难性抵消</em>。剩下的 \(10^{-8}\) 大约只剩 8 位精度，即 \(\sim 10^{-16}\) 的绝对误差。开方再除以 2 给 \(\sqrt{10^{-8}}/2 = 5 \times 10^{-5}\)，<em>带 \(\pm 10^{-8}\) 的相对误差</em>。所以"小特征值差"\((1.0001 - 1) = 10^{-4}\) 在最后一位都不准——整个分裂结构丢了。</p>
+
+<p>对比：QR 算法直接给两个特征值各到机器精度。<em>同样的双精度算术、同样的输入</em>，两条路线给出精度差 8 位的答案。这就是"问题良、算法不稳"的具体含义。</p>
+
+<p>更严重的：你只看到答案差 8 位时还感觉得到——更病态的例子（高次特征多项式 + 紧密谱），多项式路线给的答案<em>完全错</em>，但你看不出来。Wilkinson 多项式就是这样——根值都是 1 到 20 的整数，"看起来" 干净，但只要系数动 \(10^{-7}\)，根<em>跳到复平面</em>，已经面目全非。</p>
+
+<p>一句话钉住：<em>不要把特征值问题翻译成多项式根问题</em>。从这条禁忌出发，下面我们正面构造能用的算法。</p>
+
+<h2 id="sec20-2">20.2 幂法</h2>
+
+<p>朴素到不能再朴素的算法：<em>反复乘 \(A\)</em>。</p>
+
+<p>设 \(A\) 是 \(n \times n\) 矩阵，特征值 \(|\lambda_1| > |\lambda_2| \ge \ldots \ge |\lambda_n|\)（最大的<em>严格</em>大于次大的——这叫"主特征值"），对应特征向量 \(v_1, \ldots, v_n\) 是 \(\mathbb{R}^n\) 的基。任意初始 \(x_0\) 展开</p>
+
+<p>\[
+x_0 = c_1 v_1 + c_2 v_2 + \ldots + c_n v_n.
+\]</p>
+
+<p>反复用 \(A\)：</p>
+
+<p>\[
+A^k x_0 = c_1 \lambda_1^k v_1 + c_2 \lambda_2^k v_2 + \ldots + c_n \lambda_n^k v_n.
+\]</p>
+
+<p>把 \(\lambda_1^k\) 提出来：</p>
+
+<p>\[
+A^k x_0 = \lambda_1^k \Big( c_1 v_1 + c_2 (\lambda_2/\lambda_1)^k v_2 + \ldots + c_n (\lambda_n/\lambda_1)^k v_n \Big).
+\]</p>
+
+<p>每个 \((\lambda_j/\lambda_1)^k\)（\(j \ge 2\)）的绝对值小于 1，\(k \to \infty\) 时<em>指数衰减到 0</em>。所以 \(A^k x_0\) 渐近变成 \(\lambda_1^k c_1 v_1\)——<em>方向收敛到 \(v_1\)</em>。</p>
+
+<p>但 \(\lambda_1^k\) 可能爆炸（\(|\lambda_1| > 1\)）或消失（\(|\lambda_1| < 1\))。所以每步要<em>归一化</em>：</p>
+
+<p>\[
+\boxed{\ x_{k+1} = \frac{A x_k}{\|A x_k\|}.\ }
+\]</p>
+
+<p>这是<strong>幂法</strong>。\(x_k\) 收敛到主特征向量 \(v_1\)（或 \(-v_1\)，号不定），相应特征值用 Rayleigh 商 \(\lambda_1 \approx x_k^T A x_k / (x_k^T x_k)\) 估出。</p>
+
+<p>具体跑一例。\(A = \begin{pmatrix} 4 & 1 \\ 2 & 3 \end{pmatrix}\)，特征值 \(\{5, 2\}\)，主特征向量 \(v_1 = (1, 1)^T / \sqrt 2\)。从 \(x_0 = (1, 0)^T\) 开始：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(k\)</th><th style="padding: 0.3em 1em;">\(x_k\)（归一化）</th><th style="padding: 0.3em 1em;">\(\lambda_1\) 估值</th><th style="padding: 0.3em 1em;">误差</th></tr>
+<tr><td>0</td><td>(1, 0)</td><td>4</td><td>1</td></tr>
+<tr><td>1</td><td>(0.894, 0.447)</td><td>4.4</td><td>0.6</td></tr>
+<tr><td>2</td><td>(0.766, 0.643)</td><td>4.85</td><td>0.15</td></tr>
+<tr><td>3</td><td>(0.726, 0.688)</td><td>4.961</td><td>0.039</td></tr>
+<tr><td>5</td><td>(0.713, 0.701)</td><td>4.997</td><td>0.003</td></tr>
+<tr><td>10</td><td>(0.7072, 0.7071)</td><td>5.000</td><td>\(3 \times 10^{-5}\)</td></tr>
+<tr><td>20</td><td>(0.7071, 0.7071)</td><td>5.0000</td><td>\(3 \times 10^{-9}\)</td></tr>
+</table>
+
+<p>每步误差缩 \(\lambda_2/\lambda_1 = 2/5 = 0.4\) 倍。20 步降 9 位精度——线性收敛。</p>
+
+<p>请你停下来想一件事：这个算法每步只要一次矩阵-向量乘 \(A x\) 和一次归一化（除一个范数）。<em>就这些</em>。它能在 10 行代码内跑万亿元素的稀疏矩阵——只要你能算 \(A x\)。Google 的 PageRank 算法本质就是幂法（对一个 \(\sim 10^{10}\) 维的网页转移矩阵跑），这个朴素递推把 21 世纪互联网搜索的核心算法实现了。</p>
+
+<h2 id="sec20-3">20.3 收敛速率</h2>
+
+<p>从上面推导直接读出：幂法的<em>线性收敛因子</em>是</p>
+
+<p>\[
+\boxed{\ \rho := |\lambda_2| / |\lambda_1|.\ }
+\]</p>
+
+<p>每步特征向量误差缩 \(\rho\) 倍。\(\rho \ll 1\)（主特征值远比其他大）→ 收敛快。\(\rho \approx 1\)（有两个绝对值接近的最大特征值）→ 收敛慢甚至不收敛。</p>
+
+<p>"<em>谱间隙</em>" \(|\lambda_1| - |\lambda_2|\) 大小决定了幂法的可用性。这个弱点很要命：很多有意思的矩阵（对称矩阵的最大对偶特征值、几乎退化的物理系统、Markov 链的多平稳分布）就有 \(\rho \to 1\) 的特征。</p>
+
+<p>另一个弱点：<em>幂法只给一个特征值</em>——主的那个。要全部特征值得另想办法（QR 算法，20.6 节）。要"<em>第二大</em>" 也另想办法（投影到 \(v_1\) 的正交补，然后再幂法——这叫 deflation）。</p>
+
+<p>但幂法不死。它有两个变种把它救活，是后续算法的基础：反幂法（找<em>最接近某 \(\sigma\)</em> 的特征值）和 Rayleigh 商加速（让收敛变三次而不是线性）。下两节讲这两个。</p>
+
+<h2 id="sec20-4">20.4 反幂法</h2>
+
+<p>幂法收敛到<em>绝对值最大</em>的特征值。如果你想要<em>最接近某个目标 \(\sigma\)</em> 的特征值，怎么办？</p>
+
+<p>用一个聪明的代换。考虑矩阵 \(B := (A - \sigma I)^{-1}\)。它的特征值是 \(1/(\lambda_i - \sigma)\)（\(A v_i = \lambda_i v_i\) 对 \(v_i\) 应用 \((A - \sigma I)^{-1}\) 即得）。<em>\(B\) 的最大特征值对应 \(A\) 最接近 \(\sigma\) 的特征值</em>。</p>
+
+<p>对 \(B\) 跑幂法 = 对 \(A\) 跑<strong>反幂法</strong>：</p>
+
+<p>\[
+\boxed{\ x_{k+1} = \frac{(A - \sigma I)^{-1} x_k}{\|(A - \sigma I)^{-1} x_k\|}.\ }
+\]</p>
+
+<p>每步要算 \((A - \sigma I)^{-1} x_k\)。<em>不要显式求逆</em>——这是数值新手最常踩的雷。"求逆然后乘"在浮点上既贵又不稳。正确做法：把 \((A - \sigma I)\) 一次 LU 分解（\(O(n^3)\) 一次性开销），每步用 LU 解一个三角系统（\(O(n^2)\) 每步）。或者对稀疏 \(A\) 用稀疏 LU。</p>
+
+<p>收敛因子变成 \(|\lambda_2'/\lambda_1'| = |\lambda_{\text{2nd closest}} - \sigma| / |\lambda_{\text{closest}} - \sigma|\)。如果 \(\sigma\) 选得离某个 \(\lambda_i\) <em>非常</em>近，分母小、分子相对大，收敛因子<em>非常小</em>——超快。</p>
+
+<p>具体例子。同样 \(A = \begin{pmatrix} 4 & 1 \\ 2 & 3 \end{pmatrix}\)，特征值 \(\{5, 2\}\)。取 \(\sigma = 1.9\)，离 \(\lambda = 2\) 很近，离 \(\lambda = 5\) 远。\(B = (A - 1.9 I)^{-1}\) 的特征值 \(\{1/(5 - 1.9), 1/(2 - 1.9)\} = \{0.32, 10\}\)。主特征值 10 对应 \(A\) 的特征值 2——反幂法把它找出来。收敛因子 \(0.32/10 = 0.032\)，每步降 1.5 位精度，比正幂法（因子 0.4）快 10 倍。</p>
+
+<p>反幂法的实战价值：<em>你只要给一个粗略估计 \(\sigma\)（哪怕不准），算法就能锁定附近的特征值</em>。物理问题里你常常知道特征值大致范围（结构的振动模式频率、量子系统的能级），反幂法把粗估计变成精确特征值。</p>
+
+<p>但反幂法仍然只给<em>一个</em>特征值。要全部特征值的算法在 20.6 节。</p>
+
+<h2 id="sec20-5">20.5 Rayleigh 商加速</h2>
+
+<p>反幂法的 \(\sigma\) 取得越接近真特征值越快。怎么<em>动态</em>调 \(\sigma\)？</p>
+
+<p>用<strong>Rayleigh 商</strong>。给当前估计 \(x_k\)，定义</p>
+
+<p>\[
+\rho(x_k) := \frac{x_k^T A x_k}{x_k^T x_k}.
+\]</p>
+
+<p>对 \(x_k\) 接近某个特征向量 \(v_i\)，\(\rho(x_k) \approx \lambda_i\)。Rayleigh 商是<em>当前最佳</em>的特征值估计。</p>
+
+<p>把它当下一步的 \(\sigma\)：</p>
+
+<p>\[
+\boxed{\ \sigma_k = \rho(x_k), \quad x_{k+1} = \frac{(A - \sigma_k I)^{-1} x_k}{\|(A - \sigma_k I)^{-1} x_k\|}.\ }
+\]</p>
+
+<p>这是<strong>Rayleigh 商迭代（RQI）</strong>。每步要重新做一次 LU 分解（因为 \(\sigma_k\) 变）——每步 \(O(n^3)\) 工作。</p>
+
+<p>回报：<em>三次收敛</em>。对对称 \(A\)，</p>
+
+<p>\[
+|\sigma_{k+1} - \lambda^*| \le C |\sigma_k - \lambda^*|^3.
+\]</p>
+
+<p>翻译：<em>正确数字位数每步乘 3</em>。从 1 位准 → 3 位 → 9 位 → 27 位（早就超过双精度极限）。<em>三步</em>到机器精度。</p>
+
+<p>三次收敛是个奇迹般的速率——比牛顿法（二次）还快。直观上，Rayleigh 商对 \(v_i\) 是<em>二阶</em>稳定的（\(\nabla \rho |_{v_i} = 0\)），所以 \(\rho(x_k) - \lambda_i \sim |x_k - v_i|^2\)；反幂法把误差 \(|x_k - v_i|\) 变 \(|\sigma_k - \lambda_i| / \mathrm{gap}\)；两边合一给立方。</p>
+
+<p>RQI 是工业 QR 算法（20.8 节）的灵魂——QR 算法的 Wilkinson 位移本质上是 Rayleigh 商在矩阵层面的一次迭代。三次收敛让 QR 算法以总开销 \(O(n^3)\) 给出全部 \(n\) 个特征值——<em>每个特征值平均 \(O(n^2)\)</em>，和直接解一个 \(n\) 维线性系统同阶。这是为什么"算特征值" 在工业上和"解线性方程" 同样廉价。</p>
+
+<h2 id="sec20-6">20.6 QR 算法</h2>
+
+<p>幂法和反幂法都只给一个特征值。怎么把<em>所有</em>特征值一起算出来？</p>
+
+<p>QR 算法（Francis 1961，Kublanovskaya 1961）是答案。算法本身一行：</p>
+
+<p>\[
+\boxed{\ A_k = Q_k R_k \text{（QR 分解）}, \quad A_{k+1} = R_k Q_k.\ }
+\]</p>
+
+<p>从 \(A_0 = A\) 出发，反复做 QR 分解然后<em>把因子顺序反过来乘回去</em>。结果：\(A_k\) <em>渐近收敛到上三角矩阵</em>（实矩阵情况下是块上三角，每个块是 1×1 给实特征值或 2×2 给一对共轭复特征值）。<em>对角线上是特征值</em>。</p>
+
+<p>为什么？三件事一起看。第一，每一步是相似变换：</p>
+
+<p>\[
+A_{k+1} = R_k Q_k = Q_k^T (Q_k R_k) Q_k = Q_k^T A_k Q_k.
+\]</p>
+
+<p>所以 \(A_{k+1}\) 和 \(A_k\) 谱相同——QR 算法<em>不改变特征值</em>，只改变表示。</p>
+
+<p>第二，QR 算法<em>等价于</em>对单位矩阵的列做幂法。把 \(I = [e_1, e_2, \ldots, e_n]\) 当 \(n\) 个初始向量平行跑幂法——每步乘 \(A\) 得 \(A^k I\)，然后<em>QR 正交化</em>列以保持线性独立。这条等价是 QR 算法收敛的核心证明思路（不展开，标准结果）。</p>
+
+<p>第三，所有列<em>同时</em>幂法收敛到所有特征向量——按特征值绝对值排序，第一列收敛到 \(v_1\)，第二列收敛到 \(v_1, v_2\) 张成的子空间内的 \(v_2\) 分量，等等。这就是为什么 \(A_k\) 变上三角：第 \(j\) 列在 \(j > i\) 处的元素是"<em>\(v_i\) 在第 \(j\) 个 Schur 向量上的投影</em>"，按 \(|\lambda_i/\lambda_j|^k\) 衰减。</p>
+
+<p>收敛速率：每个对角下方元素 \((A_k)_{ij}\)（\(i > j\)）按 \(|\lambda_i/\lambda_j|^k\) 衰减。所有"小特征值除以大特征值"的比值都决定收敛——<em>谱越分散收敛越快，谱越聚集越慢</em>。</p>
+
+<p>朴素 QR 算法每步 \(O(n^3)\)（一次 QR 分解 + 一次乘）。要 \(O(\log)\) 步降几位精度，所以总开销 \(O(n^3 \log)\)——不可接受。下面三节展示工业 QR 怎么把每步 \(O(n^3)\) 降到 \(O(n^2)\) 并把 \(O(\log)\) 步降到 \(O(1)\) 步/特征值，达到总 \(O(n^3)\)。</p>
+
+<h2 id="sec20-7">20.7 Hessenberg 形式作为预处理</h2>
+
+<p>QR 分解一个稠密 \(n \times n\) 矩阵要 \(O(n^3)\) 操作。如果矩阵已经"几乎三角"——只有<em>次对角</em>非零——QR 分解只要 \(O(n^2)\)。</p>
+
+<p><strong>上 Hessenberg 矩阵</strong>定义：除主对角、上三角、第一次对角外全为 0。形如</p>
+
+<p>\[
+H = \begin{pmatrix} h_{11} & h_{12} & h_{13} & h_{14} \\ h_{21} & h_{22} & h_{23} & h_{24} \\ 0 & h_{32} & h_{33} & h_{34} \\ 0 & 0 & h_{43} & h_{44} \end{pmatrix}.
+\]</p>
+
+<p>"上 Hessenberg + 对称" = 三对角矩阵。所以对称矩阵的 Hessenberg 形式是<em>三对角的</em>，非常稀疏。</p>
+
+<p>关键事实：<em>任何矩阵都可以用 \(O(n^3)\) 的相似变换约化为上 Hessenberg</em>。具体方法是 Householder 反射的链——和<a href="ch17.html">第 17 章</a> QR 分解里同样的工具，但应用方式不同（这里要做 \(Q^T A Q\) 而不是 \(Q^T A\)，所以是相似变换、不破坏特征值）。约化是<em>一次性</em> \(O(n^3)\) 投资。</p>
+
+<p>有了 Hessenberg 形式 \(H\) 之后，QR 算法每步 \(O(n^2)\)（QR 分解上 Hessenberg 矩阵）。<em>关键奇迹</em>：QR 步保持 Hessenberg 结构——\(R_k Q_k\) 仍是上 Hessenberg。证明用 Givens 旋转的几何，几行代数，标准结果。</p>
+
+<p>所以工业 QR 算法分两阶段：</p>
+
+<ol>
+  <li><em>预处理</em>：\(A \to H\) 上 Hessenberg，一次 \(O(n^3)\)。</li>
+  <li><em>QR 迭代</em>：在 Hessenberg 上跑 QR 算法，每步 \(O(n^2)\)。需要 \(O(n)\) 次迭代收敛全部 \(n\) 个特征值（带位移加速后），总 \(O(n^3)\)。</li>
+</ol>
+
+<p>总开销 \(O(n^3)\)。和直接 LU 同阶——这是为什么 LAPACK 的 <code>geev</code>（一般特征值）和 <code>syev</code>（对称特征值）都是 \(O(n^3)\) 算法，对实际 \(n \le 10^4\) 的稠密问题秒级出结果。</p>
+
+<p>对称情况额外便宜：Hessenberg 形式是三对角，QR 步保持三对角，每步 \(O(n)\)。总 \(O(n^2)\) 对称特征值算法——<code>syev</code> 比 <code>geev</code> 快约 5-10 倍。所以<em>知道矩阵对称就一定要用 <code>syev</code></em>，不要懒得分类。</p>
+
+<h2 id="sec20-8">20.8 Wilkinson 位移让 QR 立方收敛</h2>
+
+<p>朴素 QR 每步线性收敛因子 \(|\lambda_i/\lambda_j|\)，慢。借用反幂法的招——<em>位移</em>。</p>
+
+<p>带位移 QR：</p>
+
+<p>\[
+A_k - \mu_k I = Q_k R_k, \quad A_{k+1} = R_k Q_k + \mu_k I.
+\]</p>
+
+<p>检查相似性：\(A_{k+1} = Q_k^T (A_k - \mu_k I) Q_k + \mu_k I = Q_k^T A_k Q_k\)——还是相似变换，特征值不变。但每一步 \(R_k Q_k\) 收敛因子变成 \(|\lambda_i - \mu_k|/|\lambda_j - \mu_k|\)——如果 \(\mu_k\) 选得接近某个 \(\lambda_i\)，那个特征值<em>飞快</em>收敛。</p>
+
+<p>怎么选 \(\mu_k\)？最简单的招——用 \(A_k\) 右下角的元素 \((A_k)_{nn}\)：那是当前对最后一个特征值的最佳估计（QR 收敛过程中最后那一行最先稳定）。这叫<em>Rayleigh 商位移</em>，因为对对称矩阵 \((A_k)_{nn} = e_n^T A_k e_n\) 正好是 \(e_n\) 方向的 Rayleigh 商。</p>
+
+<p>更聪明的：<strong>Wilkinson 位移</strong>。看右下 \(2 \times 2\) 块</p>
+
+<p>\[
+\begin{pmatrix} (A_k)_{n-1,n-1} & (A_k)_{n-1,n} \\ (A_k)_{n,n-1} & (A_k)_{n,n} \end{pmatrix},
+\]</p>
+
+<p>算它的两个特征值，取<em>更接近 \((A_k)_{nn}\)</em> 的那个作为 \(\mu_k\)。</p>
+
+<p>定理（Wilkinson）：对实对称矩阵，带 Wilkinson 位移的 QR 算法<em>三次收敛</em>到最右下角的特征值。一旦那个特征值收敛（\((A_k)_{n,n-1} \to 0\)），把它"<em>剥离</em>"（deflation），对剩下的 \((n-1) \times (n-1)\) 子矩阵继续 QR + Wilkinson 位移，再剥离下一个，等等。<em>每个特征值平均 \(O(1)\) 次 QR 迭代</em>就收敛。总 QR 迭代数 \(O(n)\)，每步 \(O(n^2)\) → 总 \(O(n^3)\)。</p>
+
+<p>对一般非对称矩阵，标准做法是<em>双位移</em>（取右下 \(2 \times 2\) 块的<em>两个</em>特征值同时做位移），保证算法在实算术下处理共轭复特征值不出问题。这叫 <em>Francis 双位移 QR</em>，是 LAPACK 的实际实现。</p>
+
+<p>请你把这条放在心里看一下：<em>QR 算法 + Hessenberg + Wilkinson 位移 + deflation</em>，这四块拼起来给现代特征值数值算法。每一块单独看都不复杂——QR 是相似变换、Hessenberg 是稀疏化预处理、Wilkinson 是 Rayleigh 商位移、deflation 是剥已收敛的特征值。但合在一起，构成了人类计算特征值最实用的算法。LAPACK 里 <code>dgeev</code> 几千行代码就是这套流水线的工业实现，过去 60 年支撑了无数科学计算。</p>
+
+<h2 id="sec20-9">20.9 实战</h2>
+
+<p>SciPy 接口：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+import numpy as np
+from scipy.linalg import eig, eigh, eigvals, eigvalsh
+
+# 一般矩阵 (LAPACK *geev, Francis QR)
+A = np.random.randn(500, 500)
+eigenvalues, eigenvectors = eig(A)
+# eigenvalues 是复数数组（一般 A 有共轭复对）
+
+# 对称 / Hermitian (LAPACK *syev / *heev, 三对角 QR)
+S = A + A.T  # 对称
+eigenvalues, eigenvectors = eigh(S)
+# eigh 返回实特征值，按升序排列
+
+# 只要特征值，不要特征向量
+vals = eigvals(A)        # 一般
+vals = eigvalsh(S)       # 对称——快 5x
+
+# 大稀疏矩阵：要少数特征值用 ARPACK (Arnoldi/Lanczos + restart)
+from scipy.sparse.linalg import eigs, eigsh
+# 主 6 个特征值
+vals, vecs = eigs(A_sparse, k=6, which='LM')  # 'LM' = Largest Magnitude
+# 接近 sigma 的 6 个 (反幂法 + Lanczos)
+vals, vecs = eigsh(S_sparse, k=6, sigma=2.5, which='LM')
+</pre>
+
+<p>几条实战经验：</p>
+
+<ul>
+  <li><em>对称就用 <code>eigh</code></em>。<code>eig</code> 对对称矩阵也能跑，但慢 5-10 倍且数值不如 <code>eigh</code> 稳——后者用专门的对称 QR，避免引入虚部噪声。</li>
+  <li><em>只要几个特征值用 ARPACK</em>（<code>scipy.sparse.linalg.eigs/eigsh</code>）。它是 Lanczos / Arnoldi + 隐式重启，对稀疏 \(A\) 给少数极端特征值，开销 \(O(n_{\text{nnz}} \cdot k^2)\) 而不是 \(O(n^3)\)。物理问题里你通常只关心最低几个能级 / 最强几个共振模式，ARPACK 是正确选择。</li>
+  <li><em>避免显式构造特征多项式</em>。20.1 节那条禁忌不是修辞——任何让特征值经过多项式根的算法都不可信。</li>
+  <li><em>检查复数</em>。一般矩阵 <code>eig</code> 返回的特征值类型 <code>complex128</code>，即使理论上全是实数。如果你<em>知道</em>矩阵对称，用 <code>eigh</code> 拿实数；如果不知道，检查 <code>np.abs(eigenvalues.imag) &lt; 1e-10</code> 再取 <code>.real</code>。</li>
+  <li><em>条件数与扰动</em>。即使特征值<em>问题</em>条件数小，<em>个别</em>特征值在缺陷矩阵（Jordan 块）附近条件数可大。<code>eig</code> 对几乎缺陷的矩阵会给警告或 NaN——这是数值警告你"<em>问题本身病</em>"，不是算法烂。</li>
+</ul>
+
+<p>更大的工具链：LAPACK 是 50 年来数值线性代数的事实标准，被几乎所有科学计算软件（NumPy、SciPy、MATLAB、Julia、R）调用。它的 <code>geev</code>（一般非对称）、<code>syev</code>（对称稠密）、<code>stev</code>（对称三对角）、<code>arpack</code>（稀疏）覆盖几乎所有特征值场景。理解了这一章，你看到 LAPACK 文档时不会再陌生——每个例程对应一个具体算法变种。</p>
+
+<p>这一章把"特征值怎么算" 答完。下一章我们做 SVD——奇异值分解。它在算法上是 \(A^T A\) 的特征值问题（但<em>不直接</em> 算 \(A^T A\) 因为条件数平方），技术上是这一章 QR 算法的近亲（实际上是 Golub-Kahan 变种）。SVD 在数据科学里地位特殊——主成分分析、低秩近似、稳定的最小二乘、隐含语义索引、推荐系统底层全是 SVD。下一章把它讲清。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 Krylov 子空间与共轭梯度</a><a href="ch21.html">下一章 · 第 21 章 奇异值分解 →</a></nav>
+</main>
+</body>
+</html>

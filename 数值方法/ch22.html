@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 22 章 ODE 数值解：Euler 与 Runge-Kutta — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 奇异值分解（SVD）</a><a href="ch23.html">下一章 · 第 23 章 刚性方程与隐式方法 →</a></nav>
+<h1 id="ch22">第 22 章 ODE 数值解：Euler 与 Runge-Kutta</h1>
+
+<p>翻开物理 / 化学 / 生物 / 经济任意一本教科书，模型十有八九是<em>常微分方程（ODE）</em>：</p>
+
+<p>\[
+y'(t) = f(t, y(t)), \quad y(t_0) = y_0.
+\]</p>
+
+<p>"已知初始状态和变化率，求未来状态。" 行星轨道、化学反应、流行病传播、电路电流、金融期权定价、神经元发放——全是这个形式。但请你统计一下："你这辈子学过的 ODE 里，有几个能写出闭式解？" 数得过来：线性常系数、可分离变量、几个特殊的可积形式——加起来不到所有 ODE 的 1%。<em>剩下 99% 必须靠数值积分</em>。</p>
+
+<p>这一章讲怎么数值积分一个 ODE。从最朴素的 Euler 方法起步——一行公式一目了然，但精度差。然后看为什么差、怎么改，一步步建立到 RK4——工程实战的<em>默认</em>。这条路不长，但每一步都给你"为什么这么改" 的具体理由。</p>
+
+<h2 id="sec22-1">22.1 一道具体的 ODE</h2>
+
+<p>挑一道<em>有闭式解</em> 的简单 ODE 当试金石——后面所有方法的精度都拿它检验。</p>
+
+<p>\[
+y'(t) = -y(t), \quad y(0) = 1.
+\]</p>
+
+<p>这道你高中就解过：分离变量得 \(y(t) = e^{-t}\)。在 \(t = 1\) 处真值 \(y(1) = e^{-1} \approx 0.36788\)。</p>
+
+<p>这条 ODE 的<em>物理意义</em>：放射性衰变、电容放电、新闻热度衰退——任何"<em>自身比例衰减</em>" 的过程。物理直觉：\(y\) 越大，衰减越快；\(y\) 越接近 0，衰减越慢——指数衰减。</p>
+
+<p>问题：<em>假设你不知道闭式解</em>，怎么从初始条件 \(y(0) = 1\) 数值算出 \(y(1)\)？最朴素的思路是什么？这是下一节。</p>
+
+<h2 id="sec22-2">22.2 Forward Euler：最朴素的尝试</h2>
+
+<p>你有初始点 \((0, 1)\)，知道在那一点斜率 \(y'(0) = -y(0) = -1\)。<em>最朴素的猜测</em>：在初始点附近，\(y\) 沿斜率走的是直线，那就<em>沿直线走一小步</em>。</p>
+
+<p>取一个小步长 \(h\)，在 \(t = h\) 处，</p>
+
+<p>\[
+y(h) \approx y(0) + h \cdot y'(0) = 1 - h.
+\]</p>
+
+<p>到 \(t = h\) 后，再算<em>新点</em> 的斜率 \(y'(h) = -y(h) \approx -(1 - h) = h - 1\)；再走一小步</p>
+
+<p>\[
+y(2h) \approx y(h) + h \cdot y'(h) = (1 - h) + h(h - 1) = (1 - h)^2.
+\]</p>
+
+<p>看出规律了：\(y(nh) \approx (1 - h)^n\)。</p>
+
+<p>把这件事推到一般 ODE：在当前点 \((t_n, y_n)\)，斜率 \(f(t_n, y_n)\) 已知，沿斜率走 \(h\) 步：</p>
+
+<p>\[
+\boxed{\ y_{n+1} = y_n + h \cdot f(t_n, y_n).\ }
+\]</p>
+
+<p>这是 <em>Forward Euler 方法</em>，1768 年欧拉本人提出。<em>朴素到不能再朴素</em>——它就是一阶 Taylor 展开的"截断"。但它<em>能工作</em>，而且是所有更复杂方法的基础。</p>
+
+<p>几何画面：在 \((t_n, y_n)\) 处画一根斜率为 \(f(t_n, y_n)\) 的小直线段，长 \(h\)；端点就是 \((t_{n+1}, y_{n+1})\)。整条数值解就是把这些小线段首尾相连——一条<em>折线</em>，逼近真解曲线。</p>
+
+<p>请你停下来意识到：这和<a href="ch7.html">第 7 章</a>牛顿法的几何<em>是同一种</em>——都是"用切线代替函数走一步"。牛顿法的切线沿 \(x\) 轴方向跳，找根；Euler 沿 \(t\) 轴方向跳，逼近曲线。背后是同一个核心：<em>"局部线性近似" 是数值方法的基本原子</em>。这条精神在后面所有方法里反复出现。</p>
+
+<h2 id="sec22-3">22.3 跑一遍 Euler：误差按 \(O(h)\) 衰减</h2>
+
+<p>真去算一遍。\(y' = -y\)，\(y(0) = 1\)，目标 \(y(1)\)。Euler 推导给 \(y(1) \approx (1 - h)^{1/h}\)。极限 \(\lim_{h \to 0} (1 - h)^{1/h} = e^{-1}\)——好，<em>极限对</em>。但 \(h\) 有限时差多少？</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(h\)</th><th style="padding: 0.3em 1em;">步数 \(N\)</th><th style="padding: 0.3em 1em;">\(y_N\)</th><th style="padding: 0.3em 1em;">误差 \(|y_N - e^{-1}|\)</th></tr>
+<tr><td>0.5</td><td>2</td><td>0.25000</td><td>\(1.18 \times 10^{-1}\)</td></tr>
+<tr><td>0.1</td><td>10</td><td>0.34868</td><td>\(1.92 \times 10^{-2}\)</td></tr>
+<tr><td>0.01</td><td>100</td><td>0.36603</td><td>\(1.86 \times 10^{-3}\)</td></tr>
+<tr><td>0.001</td><td>1000</td><td>0.36769</td><td>\(1.86 \times 10^{-4}\)</td></tr>
+<tr><td>0.0001</td><td>10000</td><td>0.36786</td><td>\(1.86 \times 10^{-5}\)</td></tr>
+</table>
+
+<p>看清楚误差栏：\(0.118, 0.0192, 0.00186, 0.000186, 0.0000186\)——<em>步长缩 10 倍，误差缩 10 倍</em>。<em>线性</em> 关系。Euler 是<strong>一阶</strong>方法：误差 \(\sim O(h)\)。</p>
+
+<p>这意味着想要<em>精度提升 10 倍</em>，要做<em>10 倍多</em> 的工作。想从 \(10^{-4}\) 精度到 \(10^{-12}\)，要 \(10^8\) 倍工作——<em>不可行</em>。Euler 太慢了。所以工程上几乎<em>从不</em>用纯 Euler——除非作为快速原型 / 教学例子。下一节先把"为什么是一阶" 讲清楚，再去找更高阶的方法。</p>
+
+<h2 id="sec22-4">22.4 局部截断误差 vs 全局误差</h2>
+
+<p>"为什么 Euler 是一阶" 看似简单，藏了一个微妙之处：<em>每一步</em> 的误差和<em>累积</em> 的误差不是一回事。</p>
+
+<p><strong>局部截断误差（local truncation error，LTE）</strong>：从精确点 \(y(t_n)\) 出发走<em>一步</em> Euler，到达 \(y_{n+1}\)，与真值 \(y(t_{n+1})\) 之差。设 \(y\) 二阶连续可微，Taylor 展开</p>
+
+<p>\[
+y(t_{n+1}) = y(t_n) + h y'(t_n) + \frac{h^2}{2} y''(\xi).
+\]</p>
+
+<p>Euler 给 \(y_{n+1} = y(t_n) + h y'(t_n)\)（这里假设我们<em>从精确点</em>出发）。差是</p>
+
+<p>\[
+y(t_{n+1}) - y_{n+1} = \frac{h^2}{2} y''(\xi) = O(h^2).
+\]</p>
+
+<p><em>每步</em> 误差 \(O(h^2)\)。</p>
+
+<p><strong>全局误差（global error）</strong>：从 \(t_0\) 到 \(t_n = T\)（固定终点）累计误差。走 \(N = T/h\) 步。如果误差<em>不</em> 互相放大，每步 \(O(h^2)\) 累 \(N\) 次得 \(O(N h^2) = O((T/h) h^2) = O(h)\)。<em>降一阶</em>。</p>
+
+<p>"<em>为什么降一阶</em>"是 ODE 数值分析最重要的精神之一。每多走一步，引入新误差 \(O(h^2)\)；同时上一步的误差被传过来，可能放大、可能衰减——稳定 ODE 里它们衰减或保持，所以累计 \(N\) 个 \(O(h^2)\) 误差给 \(O(h)\)；不稳定 ODE 里它们指数放大，全局误差爆掉（这是<a href="ch23.html">第 23 章</a>的话题）。</p>
+
+<p>这里有个一般规律：<em>方法的"全局阶" = 局部阶 \(- 1\)</em>。Euler 局部 \(O(h^2)\)、全局 \(O(h)\)；下面要看的 RK2 局部 \(O(h^3)\)、全局 \(O(h^2)\)；RK4 局部 \(O(h^5)\)、全局 \(O(h^4)\)。要提高全局阶，必须把<em>局部</em>截断阶推得更高——做法就是<em>更精细地用一步 Taylor 展开</em>。下一节具体看。</p>
+
+<h2 id="sec22-5">22.5 中点法（RK2）：用一步内的"更好" 斜率</h2>
+
+<p>Euler 用<em>初始点</em> 的斜率 \(f(t_n, y_n)\) 走全步。这条选择的问题在哪？画图看：真解在一个步长内是曲线；Euler 用初始切线代替——切线和曲线在初始点对，但走到 \(t_{n+1}\) 时已经偏了。如果 \(f\) 在区间内变化大，偏得多。</p>
+
+<p>朴素改进：与其用<em>初始</em> 斜率，不如用<em>中间</em> 斜率——这样走一步对"平均" 误差更小。具体：</p>
+
+<p>\[
+\begin{aligned}
+k_1 &= f(t_n, y_n) \quad \text{(初始斜率)} \\
+k_2 &= f\!\left(t_n + \frac{h}{2}, \ y_n + \frac{h}{2} k_1\right) \quad \text{(用 } k_1 \text{ 走半步到中点处的斜率)} \\
+y_{n+1} &= y_n + h \cdot k_2.
+\end{aligned}
+\]</p>
+
+<p>这就是<strong>中点法（midpoint method）</strong>，亦即"Runge-Kutta 二阶（RK2）" 之一。每步要算<em>两次</em> \(f\)（\(k_1\) 和 \(k_2\)），开销翻倍。但精度<em>从 \(O(h)\) 跳到 \(O(h^2)\)</em>——拿同样的<em>计算量</em> 比，比 Euler 准多了。</p>
+
+<p>用上一节的例子检验。\(y' = -y\)，\(y_0 = 1\)。一步 RK2：\(k_1 = -1\)；\(k_2 = -(1 + h/2 \cdot (-1)) = -(1 - h/2) = h/2 - 1\)；\(y_1 = 1 + h(h/2 - 1) = 1 - h + h^2/2\)。这正是真解 \(e^{-h}\) 的 Taylor 展到 \(h^2\) 项！<em>所以局部误差是 \(O(h^3)\)</em>——和上一节预测的一致。</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(h\)</th><th style="padding: 0.3em 1em;">RK2 \(y_N\)</th><th style="padding: 0.3em 1em;">误差</th></tr>
+<tr><td>0.5</td><td>0.39062</td><td>\(2.27 \times 10^{-2}\)</td></tr>
+<tr><td>0.1</td><td>0.36854</td><td>\(6.69 \times 10^{-4}\)</td></tr>
+<tr><td>0.01</td><td>0.36789</td><td>\(6.71 \times 10^{-6}\)</td></tr>
+<tr><td>0.001</td><td>0.36788</td><td>\(6.71 \times 10^{-8}\)</td></tr>
+</table>
+
+<p>步长缩 10 倍，误差缩 100 倍——<em>二次</em> 衰减。RK2 是二阶方法。同样到 \(10^{-12}\) 精度，需要 \(h \sim 10^{-6}\)，<em>10^6</em> 步——比 Euler 的 \(10^{12}\) 步好得多但还是太多。继续提高阶。</p>
+
+<p>这里的精神和<a href="ch7.html#sec7-3">第 7 章 7.3 节</a>那条原则呼应："<em>用 \(k\) 阶展开近似 → 自动给 \(k+1\) 阶收敛</em>"。Euler 用 0 阶展开（\(f\) 在区间内常值取初值）→ 全局 1 阶。RK2 用 1 阶展开（线性逼近 \(f\) 在区间内变化）→ 全局 2 阶。下一节我们用更精细的 4 阶展开 → 全局 4 阶。</p>
+
+<h2 id="sec22-6">22.6 RK4：工程默认</h2>
+
+<p>同样的精神往上推。在一步内，能不能用<em>更多</em>个 \(f\) 求值，把局部 Taylor 展开推到更高阶？</p>
+
+<p>1895-1905 年 Runge 和 Kutta 给出了一个漂亮的答案——<strong>四阶 Runge-Kutta（RK4）</strong>：</p>
+
+<p>\[
+\boxed{\
+\begin{aligned}
+k_1 &= f(t_n, y_n) \\
+k_2 &= f\!\left(t_n + \tfrac{h}{2}, \ y_n + \tfrac{h}{2} k_1\right) \\
+k_3 &= f\!\left(t_n + \tfrac{h}{2}, \ y_n + \tfrac{h}{2} k_2\right) \\
+k_4 &= f\!\left(t_n + h, \ y_n + h k_3\right) \\
+y_{n+1} &= y_n + \tfrac{h}{6} (k_1 + 2 k_2 + 2 k_3 + k_4)
+\end{aligned}
+\ }
+\]</p>
+
+<p>每步算<em>四次</em> \(f\)。\(k_1\) 是初点斜率（像 Euler）；\(k_2\) 是用 \(k_1\) 走半步后的中点斜率（像 RK2）；\(k_3\) 是用 \(k_2\) 走半步后的<em>另一个</em>中点斜率（精化）；\(k_4\) 是用 \(k_3\) 走全步到端点的斜率。最终更新是这四个斜率的加权平均，权重 \(1:2:2:1\)（中间两次权重大，是因为它们在区间中部，对积分贡献最大——这正是 Simpson 法则的权重）。</p>
+
+<p><em>精度</em>：局部 \(O(h^5)\)，全局 \(O(h^4)\)——<em>四阶</em>方法。</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(h\)</th><th style="padding: 0.3em 1em;">RK4 \(y_N\)</th><th style="padding: 0.3em 1em;">误差</th></tr>
+<tr><td>0.5</td><td>0.36789</td><td>\(7.43 \times 10^{-6}\)</td></tr>
+<tr><td>0.1</td><td>0.36788</td><td>\(1.42 \times 10^{-9}\)</td></tr>
+<tr><td>0.01</td><td>0.36788</td><td>\(1.43 \times 10^{-13}\)</td></tr>
+</table>
+
+<p>看 \(h = 0.5\) 一行：<em>步长粗到走 2 步</em> 就到目标，已经 \(10^{-6}\) 精度——比 Euler \(h = 0.0001\) 的 10000 步还准。\(h = 0.01\) 时已经接近<em>机器精度</em>，再缩 \(h\) 反而让浮点误差占上风。</p>
+
+<p>这就是 RK4 之所以是<em>工程默认</em> 的原因：每步算 4 次 \(f\) 的代价，换<em>四阶</em>精度收敛——这个 trade-off 对绝大多数 ODE 最划算。在 Fehlberg / Dormand-Prince 之前，RK4 是教科书 + 实战的事实标准。</p>
+
+<p>"为什么是 4 阶？为什么不 5 阶、6 阶？" 是个好问题。Butcher 在 1960s 系统研究 RK 方法的阶条件，发现<em>五阶 RK 至少要 6 次 \(f\) 求值</em>（Butcher 障碍）；六阶要 7 次；七阶要 9 次。"每多一阶代价不再翻倍"——5 阶不是 5 次而是 6 次，性价比下降。RK4 处在<em>"代价 vs 阶"</em> 的<em>拐点</em>——再上一步要为半阶付出过多代价。所以 RK4 一直是教学和实战的中心。</p>
+
+<p>实际"高精度"现代方法用 Dormand-Prince 5(4) 嵌入对——一组系数同时给出 4 阶和 5 阶估计，下一节细说。</p>
+
+<h2 id="sec22-7">22.7 自适应步长：Fehlberg 嵌入对</h2>
+
+<p>到此你都用<em>固定步长</em> \(h\)。这有个明显的问题：<em>同一个 ODE 的不同区域可能需要完全不同的步长</em>。比如行星轨道，远日点变化慢可以大 \(h\)，近日点变化快得用小 \(h\)；又比如有"激发" 的化学反应，反应初期快、平衡期慢——固定 \(h\) 要么浪费要么不够。</p>
+
+<p>解法：让算法<em>自己估计当前误差</em>，按需要调整 \(h\)。怎么估？最便宜的办法是<em>嵌入对（embedded pair）</em>：</p>
+
+<p>用一组特别设计的 \(k_1, \ldots, k_s\)（\(s\) 次 \(f\) 求值），<em>同一组</em> 系数能<em>同时</em> 算出两个不同阶的估计 \(y^{(p)}_{n+1}\)（\(p\) 阶）和 \(y^{(p+1)}_{n+1}\)（\(p+1\) 阶）。它们的<em>差</em> 就是 \(p\) 阶估计的<em>误差估计</em>：</p>
+
+<p>\[
+\mathrm{err} \approx |y^{(p+1)}_{n+1} - y^{(p)}_{n+1}|.
+\]</p>
+
+<p>得到 \(\mathrm{err}\) 后：</p>
+
+<ul>
+  <li>如果 \(\mathrm{err} < \) 容忍度，接受这一步；按公式</li>
+</ul>
+<p>\[
+h_{\text{new}} = h \cdot \min\!\left(2, \ 0.9 \cdot \left(\frac{\mathrm{tol}}{\mathrm{err}}\right)^{1/(p+1)}\right)
+\]</p>
+<p>放大 \(h\) 准备下一步（\(0.9\) 是安全因子，<em>2</em> 是不让步长一次跳太大）。</p>
+<ul>
+  <li>如果 \(\mathrm{err} > \) 容忍度，<em>拒绝</em> 这一步；按相同公式（指数会缩小 \(h\)）减小 \(h\) <em>重做</em>。</li>
+</ul>
+
+<p>历史上 Fehlberg（1969）给的是 RK4(5) 对——5 次 \(f\) 估 4 阶值，6 次估 5 阶值；现代标准 Dormand-Prince（1980）的 RK5(4) 用 7 次 \(f\) 但有 FSAL（first same as last）性质，下一步可以重用上一步最后一次 \(f\)，<em>实际</em> 平摊成 6 次/步。</p>
+
+<p>整个自适应循环：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+def adaptive_step(t, y, h, f, tol):
+    while True:
+        # 算嵌入对，得 y_low (4 阶) 和 y_high (5 阶)
+        y_low, y_high = embedded_RK45(t, y, h, f)
+        err = abs(y_high - y_low)
+        if err < tol:
+            # 接受
+            t_new, y_new = t + h, y_high   # 用高阶值
+            h_new = h * min(2, 0.9 * (tol / err) ** 0.2)
+            return t_new, y_new, h_new
+        else:
+            # 拒绝，缩 h 重做
+            h = h * 0.9 * (tol / err) ** 0.2
+</pre>
+
+<p>这个循环让算法<em>自适应</em> ODE 的局部行为——平稳段大步长跑得快、剧变段自动小步长保精度。<em>一行用户代码</em>给一个错误容忍度，剩下的算法自管。这是现代 ODE 求解器的<em>标准</em>设计。</p>
+
+<p>请你停下来感受这个设计哲学：和 <a href="ch7.html#sec7-6">第 7 章 7.6 节</a>的 Brent 方法（牛顿 + 二分混合）、<a href="ch4.html">第 4 章</a>引出的"先估条件数再选算法" 是同一个思想——<em>"算法对自己的状态有自我感知"</em>。这种"<em>能快就快，要慢得慢得有据</em>" 是工程级数值方法的标志。</p>
+
+<h2 id="sec22-8">22.8 Backward Euler：一句话提</h2>
+
+<p>到目前所有方法都<em>显式（explicit）</em>——\(y_{n+1}\) 用<em>已知</em> 的 \((t_n, y_n)\) 直接算出。还有一类<em>隐式（implicit）</em>方法，最简单的是 <strong>Backward Euler</strong>：</p>
+
+<p>\[
+y_{n+1} = y_n + h \cdot f(t_{n+1}, y_{n+1}).
+\]</p>
+
+<p>注意右边 \(f\) 的参数是<em>新</em> 点 \(y_{n+1}\)——这是个关于 \(y_{n+1}\) 的<em>方程</em>，每步要解一次（一般非线性，要用牛顿）。<em>每步开销大</em>。</p>
+
+<p>那为什么有人用？因为有些 ODE——叫<em>刚性（stiff）</em>——上面所有显式方法（包括 RK4）<em>必须</em>取极小 \(h\) 才稳定，慢得无法接受。隐式方法即使大 \(h\) 也稳。这是个<em>稳定性</em> 故事，不是精度故事——下一章<a href="ch23.html">第 23 章</a>专门讲。这里你只需记住：<em>显式方法对 stiff ODE 失效，要换隐式</em>。"刚性" 不是 ODE 难解的所有原因，但是最常见的一种。</p>
+
+<h2 id="sec22-9">22.9 实战</h2>
+
+<p>SciPy 给现代 ODE 求解器：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+from scipy.integrate import solve_ivp
+
+# y' = -y, y(0) = 1, 求 y(0..1)
+def f(t, y): return -y
+
+sol = solve_ivp(f, [0, 1], [1.0], method="RK45", rtol=1e-8, atol=1e-10)
+
+print(sol.t)   # 自适应选的时间点
+print(sol.y)   # 对应的解
+</pre>
+
+<p>几个要点：</p>
+
+<ul>
+  <li><code>method="RK45"</code>（默认）= Dormand-Prince 5(4)，自适应，适用绝大多数<em>非刚性</em> ODE。</li>
+  <li><code>rtol</code>（相对误差容忍度）和 <code>atol</code>（绝对误差容忍度）控制精度——求解器会保持每步局部误差 \(\lesssim\) <code>atol + rtol·|y|</code>。<em>不要</em> 一上来就 \(10^{-15}\)——浮点精度搞不到，浪费工作；典型值 <code>rtol=1e-6, atol=1e-9</code>。</li>
+  <li>多维 ODE：\(y\) 是向量，\(f\) 返回向量，调用一致。Lorenz 系统、N 体问题、化学反应网络都这样写。</li>
+  <li>需要在<em>固定</em> 时间点取值（绘图 / 后处理）：传 <code>t_eval=np.linspace(0, 10, 1000)</code>，求解器用插值（不是真在那些点积分）给值，开销忽略不计。</li>
+  <li>遇 stiff ODE（解一次后发现求解很慢、步长不停被压小），换 <code>method="BDF"</code> 或 <code>"Radau"</code>——隐式方法，下一章<a href="ch23.html">第 23 章</a>详述。</li>
+  <li>需要追踪事件（"<em>找解第一次穿过 \(y = 0\) 的时刻</em>"）：用 <code>events=</code> 参数；求解器内部会精确定位事件时刻。这是工程仿真里非常有用的特性。</li>
+</ul>
+
+<p>到此 ODE 数值方法的<em>正常</em>故事讲完了——Euler 朴素、RK 系列高阶、自适应嵌入对工程标准。下一章<a href="ch23.html">第 23 章</a>处理那 1% 的<em>刚性</em>麻烦：当显式方法因为<em>稳定性</em>（不是精度）必须取极小步长时，怎么办——这是隐式方法的舞台，也是数值 ODE 最深刻的稳定性理论的入口。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 奇异值分解（SVD）</a><a href="ch23.html">下一章 · 第 23 章 刚性方程与隐式方法 →</a></nav>
+</main>
+</body>
+</html>

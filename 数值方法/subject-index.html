@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>主题索引 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+<h1 id="subject-index">主题索引</h1>
+
+<p>按拼音 A-Z 排列。每条给"概念 / 名词 → 主要登场章节"。末尾有一节"按行为查找"——按"<em>我现在要做什么</em>" 索引。</p>
+
+<h2>A</h2>
+<ul>
+  <li><strong>Adams-Bashforth 方法（显式多步）</strong> — <a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>Adams-Moulton 方法（隐式多步 / predictor-corrector）</strong> — <a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>A-稳定（A-stability）</strong> — <a href="ch23.html#sec23-5">23.5</a>；Dahlquist 第二壁障 <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>自适应积分</strong> — <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>自适应步长（ODE）</strong> — <a href="ch22.html">第 22 章</a>；Dormand-Prince 嵌入对 <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>自动微分（AD）</strong> — <a href="ch13.html">第 13 章</a>。</li>
+</ul>
+
+<h2>B</h2>
+<ul>
+  <li><strong>backward error（向后误差）</strong> — <a href="ch3.html">第 3 章</a>；和条件数合 <a href="ch4.html#sec4-4">4.4</a>。</li>
+  <li><strong>backward Euler 方法</strong> — <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>BDF（backward differentiation formula）</strong> — <a href="ch23.html#sec23-7">23.7</a>；SciPy 用法 <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>BFGS（拟牛顿）</strong> — <a href="ch8.html">第 8 章</a>。</li>
+  <li><strong>L-BFGS（限内存 BFGS）</strong> — <a href="ch8.html">第 8 章</a>。</li>
+  <li><strong>Brent 方法（混合求根）</strong> — <a href="ch7.html#sec7-6">7.6</a>。</li>
+  <li><strong>B-spline（B-样条）</strong> — <a href="ch11.html">第 11 章</a>。</li>
+  <li><strong>二分法（bisection）</strong> — <a href="ch6.html">第 6 章</a>。</li>
+</ul>
+
+<h2>C</h2>
+<ul>
+  <li><strong>Chebyshev 节点</strong> — <a href="ch10.html">第 10 章</a>；最佳逼近基 <a href="ch12.html#sec12-6">12.6</a>。</li>
+  <li><strong>Chebyshev 多项式</strong> — <a href="ch12.html#sec12-6">12.6</a>。</li>
+  <li><strong>Cholesky 分解</strong> — <a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>条件数（condition number）</strong> — 一般定义 <a href="ch4.html#sec4-2">4.2</a>；矩阵 \(\kappa(A)\) <a href="ch4.html#sec4-3">4.3</a>；上限定理 <a href="ch4.html#sec4-4">4.4</a>；估计算法 <a href="ch4.html#sec4-5">4.5</a>。</li>
+  <li><strong>共轭梯度（CG）</strong> — <a href="ch19.html">第 19 章</a>。</li>
+  <li><strong>CFL 条件</strong> — 热方程版 <a href="ch24.html#sec24-4">24.4</a>；一般定义 <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>Cooley-Tukey 算法</strong> — <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Cramer 法则</strong> — <em>本书禁用</em>：行列式展开是 \(O(n!)\) 笨办法；用 <a href="ch16.html">第 16 章</a> LU 替代。</li>
+  <li><strong>Crank-Nicolson 格式</strong> — <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>查找：怎么解线性方程组</strong> — 中小型直接 LU <a href="ch16.html">第 16 章</a>；最小二乘用 QR <a href="ch17.html">第 17 章</a>；大型稀疏对称正定用 CG <a href="ch19.html">第 19 章</a>。</li>
+</ul>
+
+<h2>D</h2>
+<ul>
+  <li><strong>Dahlquist 壁障（第一 / 第二）</strong> — <a href="ch23.html#sec23-5">23.5</a>；多步法限 <a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>Dormand-Prince（DOPRI 5(4) / DOP853）</strong> — <a href="ch22.html">第 22 章</a>；SciPy 默认 <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>多步法（multistep methods）</strong> — <a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>对角占优（diagonal dominance）</strong> — <a href="ch18.html">第 18 章</a>。</li>
+  <li><strong>DFT（离散 Fourier 变换）</strong> — <a href="ch24.html#sec24-6">24.6</a>。</li>
+</ul>
+
+<h2>E</h2>
+<ul>
+  <li><strong>Eckart-Young 定理（最佳低秩近似）</strong> — <a href="ch21.html">第 21 章</a>。</li>
+  <li><strong>Euler 方法（显式 / forward）</strong> — <a href="ch22.html">第 22 章</a>；稳定性区域 <a href="ch23.html#sec23-3">23.3</a>。</li>
+  <li><strong>Euler 方法（隐式 / backward）</strong> — <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>误差（截断 / 舍入）</strong> — 截断 <a href="ch3.html">第 3 章</a>；舍入 <a href="ch2.html">第 2 章</a>；总误差权衡（V 形曲线） <a href="ch13.html">第 13 章</a>。</li>
+  <li><strong>\(\varepsilon_{\text{mach}}\)（机器精度）</strong> — 见"机器精度"。</li>
+</ul>
+
+<h2>F</h2>
+<ul>
+  <li><strong>FFT（快速 Fourier 变换）</strong> — Cooley-Tukey 分治 <a href="ch24.html#sec24-6">24.6</a>；解 Poisson <a href="ch24.html#sec24-7">24.7</a>；卷积加速 <a href="ch24.html#sec24-8">24.8</a>。</li>
+  <li><strong>浮点数（floating-point）</strong> — <a href="ch2.html">第 2 章</a>；IEEE 754 详表 <a href="appB.html">附录 B</a>。</li>
+  <li><strong>不动点迭代（fixed-point iteration）</strong> — <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>Frobenius 范数</strong> — <a href="appA.html#appA-2">附录 A.2</a>。</li>
+</ul>
+
+<h2>G</h2>
+<ul>
+  <li><strong>Gauss 求积（Gauss-Legendre / Gauss-Hermite）</strong> — <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>Gauss-Seidel 迭代</strong> — <a href="ch18.html">第 18 章</a>。</li>
+  <li><strong>Givens 旋转</strong> — <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>GMRES</strong> — <a href="ch19.html">第 19 章</a>。</li>
+  <li><strong>高斯消元</strong> — 见"LU 分解"。</li>
+  <li><strong>Gram-Schmidt 正交化</strong> — 见"Modified Gram-Schmidt"。</li>
+</ul>
+
+<h2>H</h2>
+<ul>
+  <li><strong>Hermite 插值</strong> — <a href="ch11.html">第 11 章</a>。</li>
+  <li><strong>Hermite 多项式</strong> — <a href="ch12.html#sec12-6">12.6</a>。</li>
+  <li><strong>Hessenberg 形式</strong> — <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>Horner 算法（多项式求值）</strong> — <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>Householder 反射</strong> — <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>Hilbert 矩阵（病态测试）</strong> — <a href="appA.html#appA-7">附录 A.7</a>。</li>
+</ul>
+
+<h2>I</h2>
+<ul>
+  <li><strong>IEEE 754</strong> — <a href="ch2.html">第 2 章</a>；详表 <a href="appB.html">附录 B</a>。</li>
+  <li><strong>隐式方法（implicit method）</strong> — backward Euler <a href="ch23.html#sec23-5">23.5</a>；Adams-Moulton <a href="ch23.html#sec23-7">23.7</a>；Crank-Nicolson <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>插值（interpolation）</strong> — Lagrange / Newton <a href="ch9.html">第 9 章</a>；Runge 现象 <a href="ch10.html">第 10 章</a>；样条 <a href="ch11.html">第 11 章</a>。</li>
+</ul>
+
+<h2>J</h2>
+<ul>
+  <li><strong>Jacobian 矩阵</strong> — <a href="ch8.html">第 8 章</a>；隐式 ODE 里 <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>Jacobi 迭代</strong> — <a href="ch18.html">第 18 章</a>。</li>
+  <li><strong>截断误差</strong> — 见"误差"。</li>
+  <li><strong>机器精度（\(\varepsilon_{\text{mach}}\)）</strong> — 定义 <a href="ch2.html">第 2 章</a>；各精度具体值 <a href="appB.html#appB-3">附录 B.3</a>。</li>
+</ul>
+
+<h2>K</h2>
+<ul>
+  <li><strong>Kahan 求和（compensated summation）</strong> — <a href="ch3.html">第 3 章</a>。</li>
+  <li><strong>Krylov 子空间</strong> — <a href="ch19.html">第 19 章</a>。</li>
+</ul>
+
+<h2>L</h2>
+<ul>
+  <li><strong>Lagrange 插值</strong> — <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>Laguerre 多项式</strong> — <a href="ch12.html#sec12-6">12.6</a>。</li>
+  <li><strong>Lebesgue 常数</strong> — <a href="ch10.html">第 10 章</a>。</li>
+  <li><strong>Legendre 多项式</strong> — <a href="ch12.html#sec12-6">12.6</a>；Gauss 求积节点 <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>LU 分解（含部分主元）</strong> — <a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>L-BFGS</strong> — 见"BFGS"。</li>
+  <li><strong>灾难性抵消（catastrophic cancellation）</strong> — <a href="ch1.html#sec1-2">1.2</a>；条件数解释 <a href="ch4.html#sec4-6">4.6</a>。</li>
+  <li><strong>LSODA</strong> — <a href="ch23.html#sec23-8">23.8</a>。</li>
+</ul>
+
+<h2>M</h2>
+<ul>
+  <li><strong>机器精度</strong> — 见 K-J 节"机器精度"。</li>
+  <li><strong>Modified Gram-Schmidt</strong> — <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>幂法（power method）</strong> — <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>蒙特卡洛积分</strong> — <a href="ch15.html">第 15 章</a>。</li>
+</ul>
+
+<h2>N</h2>
+<ul>
+  <li><strong>牛顿法（一维）</strong> — <a href="ch7.html">第 7 章</a>；二次收敛 <a href="ch7.html#sec7-3">7.3</a>；失效模式 <a href="ch7.html#sec7-4">7.4</a>。</li>
+  <li><strong>牛顿法（多维）</strong> — <a href="ch8.html">第 8 章</a>。</li>
+  <li><strong>Newton-Cotes 公式</strong> — <a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>Newton 差商</strong> — <a href="ch9.html">第 9 章</a>。</li>
+</ul>
+
+<h2>O</h2>
+<ul>
+  <li><strong>operator norm（诱导范数）</strong> — <a href="appA.html#appA-3">附录 A.3</a>。</li>
+  <li><strong>OLS（普通最小二乘）</strong> — 见"最小二乘"。</li>
+  <li><strong>正交多项式</strong> — <a href="ch12.html#sec12-6">12.6</a>。</li>
+</ul>
+
+<h2>P</h2>
+<ul>
+  <li><strong>部分主元（partial pivoting）</strong> — <a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>Power method（幂法）</strong> — 见"幂法"。</li>
+  <li><strong>预处理（preconditioning）</strong> — <a href="ch19.html">第 19 章</a>。</li>
+  <li><strong>predictor-corrector</strong> — <a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>偏微分方程（PDE）数值</strong> — <a href="ch24.html">第 24 章</a>。</li>
+</ul>
+
+<h2>Q</h2>
+<ul>
+  <li><strong>QR 分解</strong> — Gram-Schmidt 与 Householder <a href="ch17.html">第 17 章</a>；最小二乘解 <a href="ch12.html#sec12-5">12.5</a>。</li>
+  <li><strong>QR 算法（特征值）</strong> — <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>Quasi-Newton（拟牛顿）</strong> — <a href="ch8.html">第 8 章</a>。</li>
+</ul>
+
+<h2>R</h2>
+<ul>
+  <li><strong>Radau 方法（隐式 RK，刚性问题）</strong> — <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>Richardson 外推</strong> — <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>Romberg 积分</strong> — <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>Runge 现象</strong> — <a href="ch10.html">第 10 章</a>。</li>
+  <li><strong>Runge-Kutta 方法（RK4）</strong> — <a href="ch22.html">第 22 章</a>；稳定性区域 <a href="ch23.html#sec23-3">23.3</a>。</li>
+  <li><strong>Ridge 回归 / Tikhonov 正则化</strong> — <a href="ch12.html#sec12-7">12.7</a>。</li>
+  <li><strong>残差（residual）</strong> — <a href="ch3.html">第 3 章</a>；事后检查 <a href="ch4.html#sec4-5">4.5</a>。</li>
+</ul>
+
+<h2>S</h2>
+<ul>
+  <li><strong>样条（spline，三次）</strong> — <a href="ch11.html">第 11 章</a>。</li>
+  <li><strong>舍入误差</strong> — 见"误差"。</li>
+  <li><strong>Simpson 公式</strong> — <a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>SOR（连续过松弛）</strong> — <a href="ch18.html">第 18 章</a>。</li>
+  <li><strong>SVD（奇异值分解）</strong> — <a href="ch21.html">第 21 章</a>；Eckart-Young 低秩近似 <a href="ch21.html">第 21 章</a>；条件数解释 <a href="ch4.html#sec4-3">4.3</a>。</li>
+  <li><strong>稳定性（数值算法）</strong> — <a href="ch5.html">第 5 章</a>；ODE 稳定性区域 <a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>刚性方程（stiff ODE）</strong> — <a href="ch23.html#sec23-1">23.1</a>；定义 / 刚性比 <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>Schur 分解</strong> — <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>set 容差（步长控制）</strong> — <a href="ch22.html">第 22 章</a>。</li>
+</ul>
+
+<h2>T</h2>
+<ul>
+  <li><strong>Taylor 展开 / Taylor 方法</strong> — 牛顿法证明 <a href="ch7.html#sec7-3">7.3</a>；ODE Taylor 方法 <a href="ch22.html">第 22 章</a>；FD 一致性 <a href="ch24.html#sec24-2">24.2</a>。</li>
+  <li><strong>Trust region（信赖域）</strong> — <a href="ch8.html">第 8 章</a>。</li>
+  <li><strong>三对角系统（Thomas 算法）</strong> — <a href="ch16.html">第 16 章</a>；Crank-Nicolson 用 <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>梯形法则</strong> — <a href="ch14.html">第 14 章</a>。</li>
+</ul>
+
+<h2>V</h2>
+<ul>
+  <li><strong>Vandermonde 矩阵（病态）</strong> — <a href="ch9.html">第 9 章</a>；条件数 \(10^{15}\) at \(n = 20\) <a href="ch12.html#sec12-7">12.7</a>。</li>
+  <li><strong>向后误差</strong> — 见 B 节"backward error"。</li>
+  <li><strong>向前误差</strong> — <a href="ch3.html">第 3 章</a>。</li>
+</ul>
+
+<h2>W</h2>
+<ul>
+  <li><strong>Wilkinson 多项式</strong> — <a href="ch4.html#sec4-2">4.2</a>。</li>
+  <li><strong>Wolfe 条件（线搜索）</strong> — <a href="ch8.html">第 8 章</a>。</li>
+</ul>
+
+<h2>X</h2>
+<ul>
+  <li><strong>线性方程组 — 见"LU 分解"、"CG"、"GMRES"。</strong></li>
+  <li><strong>Krylov — 见 K 节。</strong></li>
+</ul>
+
+<h2>Y</h2>
+<ul>
+  <li><strong>有限差分（PDE）</strong> — <a href="ch24.html">第 24 章</a>。</li>
+  <li><strong>有效数字（significant digits）</strong> — <a href="ch1.html">第 1 章</a>；和 \(\kappa\) 关系 <a href="ch4.html#sec4-4">4.4</a>。</li>
+  <li><strong>诱导范数</strong> — <a href="appA.html#appA-3">附录 A.3</a>。</li>
+</ul>
+
+<h2>Z</h2>
+<ul>
+  <li><strong>正交矩阵</strong> — <a href="appA.html#appA-7">附录 A.7</a>；QR 用 <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>正规方程（normal equations）</strong> — <a href="ch12.html#sec12-3">12.3</a>；条件数平方问题 <a href="ch12.html#sec12-4">12.4</a>。</li>
+  <li><strong>正则化（Tikhonov / Ridge）</strong> — <a href="ch12.html#sec12-7">12.7</a>。</li>
+  <li><strong>转置（transpose）操作的稳定性</strong> — <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>主元（pivot）— 见 P 节"部分主元"。</strong></li>
+  <li><strong>最小二乘（least squares）</strong> — <a href="ch12.html">第 12 章</a>；QR 解法 <a href="ch12.html#sec12-5">12.5</a>。</li>
+</ul>
+
+<h2>查找：按"我现在想做什么"</h2>
+
+<ol>
+  <li><strong>解一道一维方程 \(f(x) = 0\)：</strong>朴素用<a href="ch6.html">第 6 章</a>二分；快用<a href="ch7.html">第 7 章</a>牛顿；工程默认<a href="ch7.html#sec7-6">7.6 节</a> Brent / SciPy <code>brentq</code>。</li>
+  <li><strong>给一些点找一条经过它们的曲线（精确）：</strong>低次用<a href="ch9.html">第 9 章</a> Lagrange；中高次切到<a href="ch10.html">第 10 章</a> Chebyshev 节点；工程上几乎都用<a href="ch11.html">第 11 章</a>三次样条 / SciPy <code>CubicSpline</code>。</li>
+  <li><strong>给带噪数据找一条最匹配的曲线（拟合）：</strong><a href="ch12.html">第 12 章</a>最小二乘；<em>不要</em> 用正规方程，用<a href="ch12.html#sec12-5">12.5 节</a> QR 或 SciPy <code>lstsq</code>。</li>
+  <li><strong>算 \(\int_a^b f(x) dx\)：</strong>低精度用<a href="ch14.html">第 14 章</a> Simpson；高精度用<a href="ch15.html">第 15 章</a> Gauss-Legendre 或 Romberg；通用用 SciPy <code>quad</code>（自适应 Gauss-Kronrod）。</li>
+  <li><strong>解 \(A \mathbf x = \mathbf b\)：</strong>密 + 中小用<a href="ch16.html">第 16 章</a> LU + 部分主元；对称正定切<a href="ch16.html">Cholesky</a>；稀疏 + 大用<a href="ch19.html">第 19 章</a> CG（对称正定）或 GMRES（一般）；超定（最小二乘）用<a href="ch17.html">第 17 章</a> QR。</li>
+  <li><strong>找矩阵的特征值 / 特征向量：</strong><em>不要</em> 求特征多项式根；用<a href="ch20.html">第 20 章</a> QR 算法（中小）或幂法（最大几个）。</li>
+  <li><strong>用低秩近似一个矩阵 / 做 PCA：</strong><a href="ch21.html">第 21 章</a> SVD；保留最大 \(k\) 个奇异值即 Eckart-Young 最优。</li>
+  <li><strong>解一道 ODE 初值问题：</strong>不刚性用<a href="ch22.html">第 22 章</a> RK4 / SciPy <code>solve_ivp(method='RK45')</code>；刚性用<a href="ch23.html#sec23-8">23.8 节</a> BDF / Radau；不知道刚不刚性用 LSODA。</li>
+  <li><strong>解一道 PDE：</strong>本书<a href="ch24.html">第 24 章</a>给入门；常系数 + 周期 / Dirichlet 边界用 FFT 解 Poisson；扩散方程用 Crank-Nicolson + 三对角解；进阶请转 LeVeque 教材。</li>
+  <li><strong>诊断"我的数值结果不准"：</strong>步骤——（1）算条件数 \(\kappa(A)\) <a href="ch4.html#sec4-5">4.5 节</a>；（2）若 \(\kappa\) 太大，问题<em>本身</em> 病，需要重新参数化或加正则化；（3）若 \(\kappa\) 适中，看算法是否稳定（向后误差 ≈ \(\varepsilon_{\text{mach}}\)？） <a href="ch5.html">第 5 章</a>；（4）若两者都好但仍不准，检查灾难性抵消 <a href="ch1.html#sec1-2">1.2</a>。</li>
+</ol>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+</main>
+</body>
+</html>

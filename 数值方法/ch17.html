@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 QR 分解 + Householder 反射 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 LU 分解与部分主元</a><a href="ch18.html">下一章 · 第 18 章 经典迭代法 →</a></nav>
+<h1 id="ch17">第 17 章 QR 分解 + Householder 反射</h1>
+
+<p>第 12 章讲最小二乘的时候我用了一个动作叫"<em>QR 分解</em>"，并说"用 QR 解 \(A^T A x = A^T b\) 比直接形成法方程稳得多"。当时我没说<em>QR 怎么算</em>。我让你先接受存在性、把节奏推进到正题。这一章把这个洞填上。</p>
+
+<p>先看一下我们要算什么。给一个 \(m \times n\) 矩阵 \(A\)（\(m \ge n\)），找出一个 \(m \times n\) 列正交矩阵 \(Q\)（\(Q^T Q = I_n\)）和一个 \(n \times n\) 上三角矩阵 \(R\)，使得</p>
+
+<p>\[
+A = Q R.
+\]</p>
+
+<p>"列正交" 是说 \(Q\) 的每一列都是单位向量、彼此两两正交。"上三角" 是说 \(R\) 的对角线下面全是 0。</p>
+
+<p>这件事数学上的方法你<em>已经知道</em>——线性代数里教过的<em>Gram-Schmidt 正交化</em>。把 \(A\) 的列向量一个一个拿来，每次减掉它在已有正交向量上的投影，剩下的部分归一化，就是新的正交向量。这叫"经典 Gram-Schmidt"（CGS）。算法上一目了然，5 行能写完。</p>
+
+<p>问题是：<em>CGS 在数值上是灾难</em>。我们做一个小实验你就明白。</p>
+
+<h2 id="sec17-1">17.1 复习：为什么我们要 QR</h2>
+
+<p>先快速回顾一下 QR 出场的两个主要场合。</p>
+
+<p><strong>场合 1：最小二乘。</strong>给 \(m \times n\) 的 \(A\)（\(m > n\)，<em>过定</em>方程），要找 \(x \in \mathbb{R}^n\) 使 \(\|A x - b\|_2\) 最小。<a href="ch12.html">第 12 章</a>给的两条路：</p>
+
+<ul>
+  <li>法方程 \(A^T A x = A^T b\)。<em>缺点</em>：\(\kappa(A^T A) = \kappa(A)^2\)。如果 \(A\) 已经病态（\(\kappa = 10^6\)），\(A^T A\) 病到 \(10^{12}\)——双精度下只剩 4 位有效精度。</li>
+  <li>QR 路：\(A = QR\)，则 \(\|A x - b\|_2 = \|Q R x - b\|_2 = \|R x - Q^T b\|_2\)（用了 \(Q\) 列正交保模长）。后者是 \(R\) 上三角，回代直接解。<em>条件数仍然是 \(\kappa(A)\)，没有平方</em>。</li>
+</ul>
+
+<p><strong>场合 2：特征值算法。</strong><a href="ch20.html">第 20 章</a>会讲<em>QR 迭代</em>——求一般矩阵特征值的现代标准方法。一句话剧透：反复做 \(A_k = Q_k R_k\)、\(A_{k+1} = R_k Q_k\)，序列 \(A_k\) 收敛到一个上三角矩阵，对角线就是特征值。这件事每一步都要 QR，所以 QR 必须算得又快又稳。</p>
+
+<p>这两个场合一对比就明白：QR 不是个偶尔用的工具，它是数值线性代数里和 LU 平起平坐的两大基础分解之一。LU 用部分主元做出来够稳了（<a href="ch16.html">第 16 章</a>），那 QR 怎么做？</p>
+
+<h2 id="sec17-2">17.2 朴素：经典 Gram-Schmidt</h2>
+
+<p>把 \(A\) 按列写成 \(A = [a_1 | a_2 | \cdots | a_n]\)。我们要构造正交列 \(q_1, \ldots, q_n\)，使</p>
+
+<p>\[
+\text{span}(q_1, \ldots, q_k) = \text{span}(a_1, \ldots, a_k), \qquad k = 1, \ldots, n.
+\]</p>
+
+<p>构造方式就是 Gram-Schmidt。一步一步来：</p>
+
+<ul>
+  <li>\(q_1 = a_1 / \|a_1\|\)。</li>
+  <li>\(q_2 = (a_2 - (q_1^T a_2) q_1) / \|\cdots\|\)。把 \(a_2\) 在 \(q_1\) 方向的分量减掉，剩下的就垂直于 \(q_1\)；归一化。</li>
+  <li>\(q_3 = (a_3 - (q_1^T a_3) q_1 - (q_2^T a_3) q_2) / \|\cdots\|\)。</li>
+  <li>一般地，第 \(k\) 步：</li>
+</ul>
+
+<p>\[
+\tilde q_k = a_k - \sum_{j=1}^{k-1} (q_j^T a_k) q_j, \qquad q_k = \tilde q_k / \|\tilde q_k\|.
+\]</p>
+
+<p>把每个 \(a_k\) 用 \(q_1, \ldots, q_k\) 反向写出来：</p>
+
+<p>\[
+a_k = \sum_{j=1}^{k-1} (q_j^T a_k) q_j + \|\tilde q_k\| q_k.
+\]</p>
+
+<p>令 \(R_{jk} = q_j^T a_k\)（\(j < k\)）、\(R_{kk} = \|\tilde q_k\|\)、\(R_{jk} = 0\)（\(j > k\)），就有 \(A = QR\)，\(R\) 上三角。<em>存在性证完了，构造算法也写出来了</em>。</p>
+
+<p>伪代码 5 行：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+def CGS(A):  # A is m×n
+    m, n = A.shape
+    Q = zeros(m, n); R = zeros(n, n)
+    for k in range(n):
+        v = A[:, k].copy()
+        for j in range(k):
+            R[j, k] = Q[:, j] @ A[:, k]    # 注意：内积用原始 a_k
+            v = v - R[j, k] * Q[:, j]
+        R[k, k] = norm(v)
+        Q[:, k] = v / R[k, k]
+    return Q, R
+</pre>
+
+<p>看起来人畜无害。我们跑一下。</p>
+
+<h2 id="sec17-3">17.3 数值实验：CGS 的"正交向量" 不正交</h2>
+
+<p>取一个出名的病态矩阵——<em>Hilbert 矩阵</em> 的前几列。\(H_{ij} = 1/(i + j - 1)\)，比如 \(8 \times 8\) 的：</p>
+
+<p>\[
+H_8 = \begin{pmatrix} 1 & 1/2 & 1/3 & \cdots & 1/8 \\ 1/2 & 1/3 & 1/4 & \cdots & 1/9 \\ \vdots & & & & \vdots \\ 1/8 & 1/9 & 1/10 & \cdots & 1/15 \end{pmatrix}.
+\]</p>
+
+<p>\(\kappa_2(H_8) \approx 1.5 \times 10^{10}\)——很病但还没到完全奇异。我们用 CGS 算它的 QR，然后检查 \(Q^T Q\) 是不是单位矩阵。理论上应该是 \(I_8\)；实际呢？</p>
+
+<p>用双精度跑 CGS 得到 \(Q\)，算 \(\|Q^T Q - I\|_2\)：得到大约 \(0.13\)。<em>0.13</em>。<em>不是 \(10^{-16}\)、不是 \(10^{-10}\)、是十分之一三</em>。这个 \(Q\) 的列彼此投影量级和它们自己的模长可比——它们根本不正交。</p>
+
+<p>请你停下来想这意味着什么。我们手上的"\(Q\)" 看起来对——8 个列向量、每列接近单位长——但拿任何两列做内积，可能不是 0 而是 0.05。然后我们把这个伪正交的 \(Q\) 送进最小二乘公式 \(R x = Q^T b\)，结果<em>错</em>。错的方式还很隐蔽，因为 \(Q\) 局部上看起来挺正常。</p>
+
+<p>原因在哪？看 CGS 的内层循环：算 \(R_{jk} = q_j^T a_k\) 时用的是<em>原始</em>的 \(a_k\)，<em>不是</em>已经减去前 \(j-1\) 个分量后的部分。这意味着每个 \(R_{jk}\) 用的是"当前还残留多少 \(a_k\) 在 \(q_j\) 方向" 的<em>第一次估计</em>。如果 \(a_k\) 和某些 \(q_j\) 几乎共线（\(A\) 病态时一定如此），\(\tilde q_k\) 是<em>许多大量相减得到的小余项</em>——又是<em>灾难性抵消</em>，<a href="ch1.html">第 1 章</a>那一幕在新场景里重演。\(\tilde q_k\) 里残留的相对误差被放大到 \(O(1)\)，得到的 \(q_k\) 实际上偏了 5 度、10 度，再把它当正交向量用，下一步内积计算还是错——错越来越多。</p>
+
+<p>诊断：<em>问题良态吗</em>？看 \(\kappa\)。\(\kappa(H_8) = 10^{10}\)，按"<a href="ch4.html">第 4 章 4.4 节</a>每多一个数量级 \(\kappa\) 就丢一位精度" 的经验，最多丢 10 位、剩 6 位精度。可 CGS 给我们的<em>正交性</em>误差是 \(10^{-1}\)，丢了 15 位，远远多于条件数能解释的。<em>所以是算法烂、不是问题烂</em>。</p>
+
+<h2 id="sec17-4">17.4 修正 Gram-Schmidt：一行差别</h2>
+
+<p>修法是把内层循环改成<em>用当前正在缩短的 \(v\) 做内积</em>，不是用原始 \(a_k\)：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+def MGS(A):
+    m, n = A.shape
+    Q = zeros(m, n); R = zeros(n, n)
+    for k in range(n):
+        v = A[:, k].copy()
+        for j in range(k):
+            R[j, k] = Q[:, j] @ v          # 注意：内积用<em>当前</em> v
+            v = v - R[j, k] * Q[:, j]
+        R[k, k] = norm(v)
+        Q[:, k] = v / R[k, k]
+    return Q, R
+</pre>
+
+<p>比 CGS 改了<em>一处</em>：内积用 <code>v</code>（已经被前面减过一些了）而不是 <code>A[:, k]</code>（原始的）。数学上完全等价——\(v\) 减掉 \(q_j\) 上的分量后，\(q_l^T v = q_l^T a_k\) 对 \(l > j\) 仍然成立（因为 \(q_l \perp q_j\)）。所以两个算法<em>在精确算术下输出相同</em>。但在浮点下不同：CGS 的 \(q_j\) 已经偏了，\(q_j^T v\) 和 \(q_j^T a_k\) 不再精确相等。MGS 用<em>当前</em>的 \(v\) 去掉<em>实际</em>的分量，少积累一层错误。</p>
+
+<p>跑同样的 \(H_8\)：MGS 的 \(\|Q^T Q - I\|_2 \approx 8 \times 10^{-7}\)。<em>从 \(0.13\) 缩到 \(10^{-7}\)</em>，改善了 6 个数量级。一行代码差别。</p>
+
+<p>但 \(10^{-7}\) 还不是<em>满足</em> 的——它仍然比 \(\kappa \cdot \varepsilon_{\text{mach}} \approx 10^{10} \cdot 10^{-16} = 10^{-6}\) 这个<em>条件数允许的最小值</em> 略好但同数量级。MGS 的<em>正交性</em> 误差大致随 \(\kappa\) 线性增长——不是 backward stable in the strict sense（严格意义上的向后稳定），但已经"和条件数容许的范围一致"，工程上够用。</p>
+
+<p>有没有<em>真</em>backward stable 的 QR？有。Householder。</p>
+
+<h2 id="sec17-5">17.5 Householder 反射的几何</h2>
+
+<p>把 Gram-Schmidt 的思路彻底放下，换一个完全不同的视角。</p>
+
+<p>给一个 \(m\) 维向量 \(x\)。我能不能找到一个<em>正交矩阵</em> \(H\)（即 \(H^T H = I\)），把 \(x\) 变成只有第一个分量不为零的形式：</p>
+
+<p>\[
+H x = \pm \|x\| \, e_1 = (\pm \|x\|, 0, 0, \ldots, 0)^T?
+\]</p>
+
+<p>"正交矩阵" 必须保模长——所以右边只能是 \(\pm \|x\| e_1\)，模长一致。问题是怎么<em>构造</em> 这个 \(H\)。</p>
+
+<p>几何上想：\(x\) 和 \(\pm \|x\| e_1\) 是同一个圆上的两点（"圆" = 模长为 \(\|x\|\) 的球面）。把 \(x\) 变到 \(\|x\| e_1\) 的最简单<em>正交</em>动作，是<em>关于这两点的中垂面做反射</em>。这就是 Householder 反射。</p>
+
+<p>具体一点。设 \(v = x - \|x\| e_1\)（这个向量从目标点指向起点，正比于"中垂面的法向量"）。把任何向量 \(y\) 关于<em>垂直于 \(v\)</em> 的超平面反射，做法是：</p>
+
+<p>\[
+y \mapsto y - 2 \frac{v^T y}{v^T v} v.
+\]</p>
+
+<p>第二项把 \(y\) 在 \(v\) 方向的分量取出来，乘 2 减掉——等于沿 \(v\) 翻折。验一下：把 \(y = v\) 代入，得到 \(v - 2 v = -v\)；把 \(y \perp v\) 代入，得到 \(y\) 不变。两者合起来正是反射。</p>
+
+<p>把这个动作写成矩阵：</p>
+
+<p>\[
+\boxed{\ H = I - 2 \frac{v v^T}{v^T v}.\ }
+\]</p>
+
+<p>\(v v^T\) 是<em>外积</em>，给出一个 \(m \times m\) 秩 1 矩阵。这就是<em>Householder 矩阵</em>。它有几个让人愉快的性质：</p>
+
+<ul>
+  <li>\(H = H^T\)（对称——反射动作的代数表现）。</li>
+  <li>\(H^2 = I\)（反射两次回到原点）。</li>
+  <li>\(H^T H = H^2 = I\)（所以 \(H\) <em>是</em>正交矩阵——保模长）。</li>
+</ul>
+
+<p>把 \(v = x - \|x\| e_1\) 代入，对 \(y = x\) 算：</p>
+
+<p>\[
+H x = x - 2 \frac{v^T x}{v^T v} v.
+\]</p>
+
+<p>展开 \(v^T x = (x - \|x\| e_1)^T x = \|x\|^2 - \|x\| x_1\) 和 \(v^T v = \|x\|^2 - 2 \|x\| x_1 + \|x\|^2 = 2 \|x\|^2 - 2 \|x\| x_1 = 2 (v^T x)\)。所以 \(2 (v^T x)/(v^T v) = 1\)，于是 \(H x = x - v = \|x\| e_1\)。<em>正中目标</em>。</p>
+
+<p>请你停下来感受一下这个动作。我们没有"<em>调整 \(x\) 的几个坐标</em>"——那种动作需要小心维持正交性、维持模长、容易出错。我们是<em>整体反射</em>——反射本来就是正交动作，正交性是<em>结构性</em>保证的、不靠浮点凑出来。这是 Householder 数值稳定的根本原因。</p>
+
+<p>一个工程小坑。\(v = x - \|x\| e_1\) 用了 + 号会怎样？我们有自由：\(\pm \|x\| e_1\) 都行。如果 \(x_1 > 0\)，\(v\) 的第一个分量 \(x_1 - \|x\|\) 是<em>两个几乎相等的正数相减</em>——又又又是灾难性抵消！把它改成 \(v = x + \text{sign}(x_1) \|x\| e_1\)：让 \(v_1 = x_1 + \text{sign}(x_1) \|x\|\) 是<em>同号相加</em>，没有抵消。这个细节决定了实现是否稳定。</p>
+
+<h2 id="sec17-6">17.6 Householder QR 算法</h2>
+
+<p>有了"<em>把任意向量反射成 \(\|x\| e_1\)</em>" 这个原子动作，我们逐列把 \(A\) 变成上三角。</p>
+
+<p>第一步：取 \(A\) 的第 1 列 \(a_1\)，构造 Householder 矩阵 \(H_1\) 使得 \(H_1 a_1 = \pm \|a_1\| e_1\)。把 \(H_1\) 乘到整个 \(A\) 左边：</p>
+
+<p>\[
+H_1 A = \begin{pmatrix} \pm\|a_1\| & * & * & \cdots \\ 0 & * & * & \cdots \\ 0 & * & * & \cdots \\ \vdots & & & \end{pmatrix}.
+\]</p>
+
+<p>第 1 列下三角全 0 了。其他列都被 \(H_1\) 作用了一遍——什么都变了，但<em>能做的局部正交动作我们做了</em>。</p>
+
+<p>第二步：现在看 \(H_1 A\) 的第 2 列<em>从第 2 行往下</em> 那段，叫它 \(\tilde a_2 \in \mathbb{R}^{m-1}\)。构造 \((m-1) \times (m-1)\) 的 Householder 矩阵 \(\tilde H_2\) 把 \(\tilde a_2\) 反射到 \(\|\tilde a_2\| e_1\)。把它扩成 \(m \times m\) 矩阵：</p>
+
+<p>\[
+H_2 = \begin{pmatrix} 1 & 0 \\ 0 & \tilde H_2 \end{pmatrix}.
+\]</p>
+
+<p>这个 \(H_2\) 显然还是对称正交矩阵（直接验：左上 1 不动，右下是已知的反射）。乘到 \(H_1 A\) 左边：第一行不变，第二行往下全部按 \(\tilde H_2\) 反射。结果：</p>
+
+<p>\[
+H_2 H_1 A = \begin{pmatrix} * & * & * & \cdots \\ 0 & * & * & \cdots \\ 0 & 0 & * & \cdots \\ 0 & 0 & * & \cdots \\ \vdots & & & \end{pmatrix}.
+\]</p>
+
+<p>第 2 列在<em>对角线下面</em> 也清零了，第 1 列没被破坏（第 \(H_2\) 的左上单位块保护它）。</p>
+
+<p>重复 \(n\) 次。最终 \(H_n H_{n-1} \cdots H_1 A = R\) 是上三角。把所有 \(H_i\) 转到右边——它们各自正交，乘积也正交：</p>
+
+<p>\[
+A = (H_1 H_2 \cdots H_n) R = Q R, \qquad Q := H_1 H_2 \cdots H_n.
+\]</p>
+
+<p>QR 分解完成。</p>
+
+<p>实现细节里有一条非常重要：<em>\(Q\) 不显式存储</em>。注意 \(Q\) 是 \(m \times m\) 矩阵——\(m\) 可以很大（比如最小二乘里 \(m = 10^6\)、\(n = 100\)）。显式存 \(Q\) 是 \(m^2 = 10^{12}\) 个数，存不下。但我们<em>不需要</em>它。我们只要会计算 \(Q^T b\) 和 \(Q y\) 这两种动作。</p>
+
+<p>\(Q^T b = H_n \cdots H_1 b\)：把 \(n\) 个反射按顺序作用在 \(b\) 上。每个 \(H_i\) 由它的 \(v_i\) 向量唯一决定（\(v_i\) 长度从 \(m\) 减到 \(m-i+1\)）。算 \(H_i b = b - 2 (v_i^T b)/(v_i^T v_i) v_i\) 只要一个内积、一个标量乘加——<em>不</em>形成矩阵 \(H_i\)。总开销 \(O(mn)\) 而不是 \(O(m^2)\)。</p>
+
+<p>所以一个高质量的 Householder QR 实现，存储是<em>把每个 \(v_i\) 紧紧地塞在 \(A\) 的下三角空位里</em>（那些位置经过 \(H_i\) 后变成了 0，不需要存 0），加上 \(R\) 的对角线和上三角。总存储 \(O(mn)\)，和原矩阵同量级。</p>
+
+<h2 id="sec17-7">17.7 复杂度与稳定性</h2>
+
+<p>算一下浮点操作数。第 \(k\) 步要把 \(A\) 第 \(k\) 列<em>下面 \(m - k + 1\) 个</em> 元素清零。每个 Householder 反射作用到剩余 \(n - k\) 列上，每列要做 \(O(m - k)\) 次乘加。所以第 \(k\) 步开销 \(\sim 4 (m-k)(n-k)\)。求和：</p>
+
+<p>\[
+\sum_{k=1}^{n} 4 (m-k)(n-k) \approx 2 m n^2 - \frac{2 n^3}{3}.
+\]</p>
+
+<p>对比 LU 是 \(\frac{2 n^3}{3}\)（方阵 \(m = n\)），方阵情形下 Householder QR 是 \(\frac{4 n^3}{3}\)——<em>2 倍 LU</em>。这个常数因子是付给"稳定性 + 处理过定方程" 的额外代价。</p>
+
+<p>但是对 \(m \gg n\) 的<em>瘦长矩阵</em>（最小二乘最常见的形状），主导项是 \(2 m n^2\)，关于 \(m\) <em>线性</em>。比起"先形成 \(A^T A\)"（\(m n^2\) 操作）然后做 \(A^T A\) 的 Cholesky（\(n^3 / 3\)）只多一个常数因子，但<em>条件数没有平方</em>。所以最小二乘<em>必用 QR 不用法方程</em> 是无脑选择。</p>
+
+<p>稳定性。Householder QR 是<em>backward stable</em> 的：算出的 \((\hat Q, \hat R)\) 满足 \(\hat Q \hat R = A + \Delta A\) 且 \(\|\Delta A\|/\|A\| = O(\varepsilon_{\text{mach}})\)，并且 \(\|\hat Q^T \hat Q - I\|\) 也 \(= O(\varepsilon_{\text{mach}})\)。<em>这是数值线性代数能给出的最高质量保证</em>。重做 17.3 节的 \(H_8\) 实验：Householder QR 给 \(\|\hat Q^T \hat Q - I\|_2 \approx 5 \times 10^{-16}\)——<em>满精度</em>。</p>
+
+<p>三种 QR 方法的对比表：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em; border-bottom: 1px solid #999;">算法</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #999;">复杂度</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #999;">\(\|Q^T Q - I\|\)（典型）</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #999;">backward stable</th></tr>
+<tr><td>CGS</td><td>\(\sim 2 m n^2\)</td><td>\(O(\kappa^2 \varepsilon_{\text{mach}})\)</td><td>否</td></tr>
+<tr><td>MGS</td><td>\(\sim 2 m n^2\)</td><td>\(O(\kappa \varepsilon_{\text{mach}})\)</td><td>"几乎"是</td></tr>
+<tr><td>Householder</td><td>\(\sim 2 m n^2 - 2 n^3/3\)</td><td>\(O(\varepsilon_{\text{mach}})\)</td><td>是</td></tr>
+</table>
+
+<p>看到这个表请你停下来想：<em>三种算法做的是同一件事</em>（QR 分解），<em>复杂度同阶</em>，但稳定性差几个数量级。<a href="ch1.html">第 1 章</a>"代数等价不蕴含数值等价" 这条话在这里又一次体现——这次具象成"<em>同一个分解，三种算法，给出三种不同质量的 \(Q\)</em>"。生产代码（LAPACK 的 <code>geqrf</code>、SciPy 的 <code>linalg.qr</code>）<em>无一例外</em>用 Householder。</p>
+
+<p>有人问：MGS 既然 \(O(\kappa \varepsilon)\) 已经是条件数不可逾越下限，为什么还说"非严格 backward stable"？区别在于 <em>误差是不是被吸收成 \(\Delta A\) 形式</em>。MGS 的输出 \(\hat Q, \hat R\) 满足 \(\hat Q \hat R = A + O(\varepsilon) \|A\|\)（这部分还是 backward stable 的），但 \(\hat Q^T \hat Q - I = O(\kappa \varepsilon)\)——<em>正交性</em> 不能用"输入小扰动" 来解释。Householder 把这两件事都做到 \(O(\varepsilon)\)。这个区别在大多数应用里看不出来（最小二乘里 MGS 算出的解和 Householder 一样准），但在某些后续算法（比如 Krylov 子空间方法的 Arnoldi 迭代）里 \(Q\) 自身的正交性很关键，Householder 还是更安全。</p>
+
+<h2 id="sec17-8">17.8 Givens 旋转：稀疏 QR 的工具</h2>
+
+<p>Householder 一次清零<em>一整列</em>——非常高效。但有时你只想清零<em>几个</em>元素，不想动其它的。比如 \(A\) 是稀疏矩阵，大部分元素已经是 0，你只想把<em>恰好那几个非零的下三角元素</em> 干掉，不想让 Householder 反射顺手破坏掉别的 0。这时用<em>Givens 旋转</em>。</p>
+
+<p>Givens 旋转是<em>2 维平面里的旋转</em> 嵌入到 \(m\) 维。给两个分量 \((x_i, x_j)\)，找 \(c = \cos\theta\)、\(s = \sin\theta\) 让</p>
+
+<p>\[
+\begin{pmatrix} c & s \\ -s & c \end{pmatrix} \begin{pmatrix} x_i \\ x_j \end{pmatrix} = \begin{pmatrix} \sqrt{x_i^2 + x_j^2} \\ 0 \end{pmatrix}.
+\]</p>
+
+<p>具体 \(c = x_i / r\)，\(s = x_j / r\)，\(r = \sqrt{x_i^2 + x_j^2}\)。把这个 \(2 \times 2\) 旋转嵌入 \(m \times m\) 单位矩阵的第 \((i, j)\) 行 / 列位置，得到 Givens 矩阵 \(G_{ij}(\theta)\)。它正交（旋转矩阵都正交）、和单位矩阵只差<em>4 个</em>元素。</p>
+
+<p>\(G_{ij}(\theta) A\) 只动 \(A\) 的第 \(i\) 行和第 \(j\) 行——其他行不变。所以<em>稀疏结构</em>得以保持：那些已经是 0 的行/列上的零元素不会被搅动。</p>
+
+<p>用 Givens 做 QR：把 \(A\) 下三角上每一个非零元素一个一个旋转掉。每个旋转开销 \(O(n)\)（影响两行的所有列）。如果 \(A\) 下三角有 \(N\) 个非零元素，总开销 \(O(N n)\)——对稀疏 \(A\)（\(N \ll mn\)）远比 Householder 的 \(O(mn^2)\) 快。</p>
+
+<p>稠密矩阵情形 Givens 慢于 Householder（一次只清一个 vs. 一次清一列），所以稠密 QR 不用 Givens。它的主战场是：</p>
+
+<ul>
+  <li><em>稀疏 QR 分解</em>：上面说过。</li>
+  <li><em>QR 分解的"更新"</em>：已知 \(A = QR\)，往 \(A\) 加一行得到 \(A'\)，要更新到 \(A' = Q' R'\)。Givens 旋转能在 \(O(n^2)\) 内做到，比从头 QR（\(O(mn^2)\)）快得多。这在 Kalman 滤波、流式回归里很常用。</li>
+  <li><em>Hessenberg 形式 → 上三角的 QR 步</em>：<a href="ch20.html">第 20 章</a> QR 迭代里要反复对 \((n-1)\) 个次对角线元素做 Givens 旋转，是 QR 算法最里层的循环。</li>
+</ul>
+
+<h2 id="sec17-9">17.9 应用回链</h2>
+
+<p>把 QR 在哪些地方出场理一遍。</p>
+
+<p><strong>最小二乘（链回 <a href="ch12.html">12.5 节</a>）。</strong>给过定方程 \(A x = b\)，求 \(\min \|A x - b\|\)。算法：</p>
+
+<ul>
+  <li>\(A = Q R\)（Householder，\(O(mn^2)\)）。</li>
+  <li>\(c = Q^T b\)（不形成 \(Q\)，按 17.6 节末尾说的方法用 \(v_i\) 一个个反射，\(O(mn)\)）。</li>
+  <li>\(R x = c_{1:n}\)，回代解（\(O(n^2)\)）。</li>
+</ul>
+
+<p>总开销 \(\sim 2 m n^2\)。条件数 \(\kappa(R) = \kappa(A)\)（不像法方程那样平方）。SciPy 的 <code>linalg.lstsq</code>、Numpy 的 <code>numpy.linalg.lstsq</code>、MATLAB 的 <code>A \ b</code>（对过定方程）背后都是这一套。</p>
+
+<p><strong>正交基。</strong>给一组线性无关向量 \(\{a_1, \ldots, a_n\}\)，要 \(\text{span}\) 的标准正交基。直接 \(A = QR\)，\(Q\) 的列就是。Gram-Schmidt 是经典方法，但实际上 Householder 更稳——这是为什么科学计算软件给"<em>正交化一组向量</em>" 这种动作时通常默认用 QR 子程序而不是直接 Gram-Schmidt。</p>
+
+<p><strong>特征值（链到 <a href="ch20.html">第 20 章</a>）。</strong>QR 迭代——求一般矩阵特征值的 standard。主循环每步做 \(A_k = Q_k R_k\)、\(A_{k+1} = R_k Q_k\)，序列收敛到块上三角（实数 Schur 形式），对角块给特征值。这套方法是 1960 年代 Francis 和 Kublanovskaya 独立发现的，和 LAPACK 的 <code>geev</code>、<code>syev</code> 等同义。它是 <em>"算特征值不算特征多项式"</em> 这条铁律的实现路径。</p>
+
+<p><strong>SVD（链到 <a href="ch21.html">第 21 章</a>）。</strong>奇异值分解 \(A = U \Sigma V^T\) 是一种"<em>双侧 QR</em>"——它的标准算法（Golub-Reinsch）先用 Householder 反射把 \(A\) 化为<em>双对角</em>形式，再迭代消除非对角线元素。Householder 是它的核心动作。</p>
+
+<p><strong>QR 在统计 / 机器学习。</strong>线性回归求系数 = 最小二乘。多元统计里"<em>正交化协变量</em>" 是一个常见预处理（避免共线性导致系数估计不稳定）。神经网络的<em>正交初始化</em>（Saxe-McClelland 2013）让权重矩阵初始化为正交，避免梯度爆炸 / 消失——背后用 QR 把随机矩阵正交化。</p>
+
+<p>把 QR 摆在数值线性代数的位置：它和 LU 一样基础，但<em>更稳</em>、<em>对过定方程更自然</em>、<em>是迭代特征值算法的内核</em>。LU 在解方阵线性系统时更便宜（一半开销），所以方阵首选 LU；其它一切场合 QR 更合适。</p>
+
+<p>下一章我们离开"<em>直接分解</em>" 的世界，去看<em>迭代法</em>。当 \(A\) 是 \(10^6 \times 10^6\) 的稀疏矩阵——比如来自 PDE 离散化——LU 和 QR 都不能用：太贵，而且会"<em>填入</em>"破坏稀疏结构。Jacobi、Gauss-Seidel、SOR 这些经典迭代法登场。它们慢，但可扩展、保稀疏。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 LU 分解与部分主元</a><a href="ch18.html">下一章 · 第 18 章 经典迭代法 →</a></nav>
+</main>
+</body>
+</html>

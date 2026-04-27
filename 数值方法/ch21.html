@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 奇异值分解（SVD） — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 特征值算法</a><a href="ch22.html">下一章 · 第 22 章 ODE 数值解：Euler 与 Runge-Kutta →</a></nav>
+<h1 id="ch21">第 21 章 奇异值分解（SVD）</h1>
+
+<p>上一章给了你特征值算法——QR 迭代是数值线性代数公认最深刻的发明之一。但它有两个限制你可能没意识到：第一，它<em>只对方阵</em>定义；第二，对一般非对称方阵 \(A\)，特征向量不一定正交，甚至不一定存在 \(n\) 个线性无关的（想想 Jordan 块）。这两件事让特征值分解在很多实际问题里<em>不够用</em>——你的数据矩阵可能是 1000×3 的（用户 × 评分维度），或者 100×100 但近乎奇异。</p>
+
+<p>这一章给你一个更广义、更强大的分解：<strong>奇异值分解（Singular Value Decomposition，SVD）</strong>。它<em>对任意 m×n 矩阵都存在</em>，三个因子都是"漂亮"的——两个正交矩阵夹一个对角矩阵。它像一把瑞士军刀：rank、范数、条件数、最小二乘、降维、压缩、推荐系统——全用它。我没夸张。如果你只能从这本书里记住一个分解，<em>记 SVD</em>。</p>
+
+<h2 id="sec21-1">21.1 一个具体矩阵看起来什么样</h2>
+
+<p>不绕弯子，直接拿一个 \(2 \times 2\) 的矩阵看 SVD 长什么样。</p>
+
+<p>\[
+A = \begin{pmatrix} 3 & 0 \\ 4 & 5 \end{pmatrix}.
+\]</p>
+
+<p>我先告诉你 SVD 的结论是这样的：存在</p>
+
+<p>\[
+U = \begin{pmatrix} u_{11} & u_{12} \\ u_{21} & u_{22} \end{pmatrix}, \quad
+\Sigma = \begin{pmatrix} \sigma_1 & 0 \\ 0 & \sigma_2 \end{pmatrix}, \quad
+V = \begin{pmatrix} v_{11} & v_{12} \\ v_{21} & v_{22} \end{pmatrix},
+\]</p>
+
+<p>使得 \(A = U \Sigma V^T\)，其中 \(U, V\) 都是<em>正交矩阵</em>（\(U^T U = V^T V = I\)），\(\Sigma\) 是<em>对角</em>且<em>对角元非负</em>。具体地，对上面这个 \(A\) 算出来：</p>
+
+<p>\[
+\sigma_1 \approx 6.708, \quad \sigma_2 \approx 2.236.
+\]</p>
+
+<p>（怎么算的下一节说，这里先看几何。）</p>
+
+<p>SVD 的几何画面是这样的：把 \(A\) 当成一个把 \(\mathbb{R}^2\) 映到 \(\mathbb{R}^2\) 的线性变换。在原空间画<em>单位圆</em> \(\{x : \|x\|_2 = 1\}\)，把它送过 \(A\)。圆<em>变成什么</em>？</p>
+
+<p>结果一定是<em>椭圆</em>（或退化为线段、点）。这是初等线性代数：线性变换把球映成椭球。SVD 告诉你这个椭圆的精确形状：</p>
+
+<ul>
+  <li>椭圆的<em>长半轴长度 \(= \sigma_1\)</em>，方向是 \(U\) 的第一列 \(u_1\)；</li>
+  <li>椭圆的<em>短半轴长度 \(= \sigma_2\)</em>，方向是 \(U\) 的第二列 \(u_2\)。</li>
+  <li>原空间中那两根<em>预象</em>方向（"\(A\) 把哪根单位向量映到了 \(\sigma_1 u_1\)"）是 \(V\) 的两列 \(v_1, v_2\)，它们也正交。</li>
+</ul>
+
+<p>用更精炼的方式：\(A v_i = \sigma_i u_i\)。"\(V\) 给原空间一组正交基 \(v_1, \ldots, v_n\)，\(A\) 把它们送到 \(U\) 给的另一组正交基 \(u_1, \ldots, u_n\) 上，每根放缩 \(\sigma_i\)。"</p>
+
+<p>请你停下来在脑子里画这幅画：原空间一个圆、一组正交方向 \(v_i\)；\(A\) 拉伸 \(v_i\) 倍数 \(\sigma_i\) 之后变成 \(u_i\) 方向上的椭圆。<em>整个 SVD 故事就这一幅画</em>。后面所有应用都是这幅画的不同切片。</p>
+
+<h2 id="sec21-2">21.2 为什么这件事一般成立</h2>
+
+<p>上一节我直接拍了结论。这一节我说为什么对<em>任意</em> m×n 矩阵 SVD 都存在。证明短得可以放在这里。</p>
+
+<p><strong>定理（SVD 存在）</strong>。设 \(A \in \mathbb{R}^{m \times n}\)。则存在正交矩阵 \(U \in \mathbb{R}^{m \times m}\)、\(V \in \mathbb{R}^{n \times n}\) 与<em>对角</em> \(\Sigma \in \mathbb{R}^{m \times n}\)，使</p>
+
+<p>\[
+A = U \Sigma V^T,
+\]</p>
+
+<p>其中 \(\Sigma\) 的"对角元" \(\sigma_1 \ge \sigma_2 \ge \ldots \ge \sigma_{\min(m,n)} \ge 0\)，称<em>奇异值</em>。</p>
+
+<p>证明（草图）。考虑对称半正定矩阵 \(A^T A \in \mathbb{R}^{n \times n}\)。它有特征分解 \(A^T A = V \Lambda V^T\)，\(V\) 正交，\(\Lambda = \mathrm{diag}(\lambda_1 \ge \ldots \ge \lambda_n \ge 0)\)（半正定 ⟹ 非负特征值）。定义 \(\sigma_i = \sqrt{\lambda_i}\)。设 \(r\) 为非零 \(\sigma\) 的个数。对 \(i \le r\) 定义</p>
+
+<p>\[
+u_i = \frac{1}{\sigma_i} A v_i.
+\]</p>
+
+<p>验证 \(u_i\) 正交：\(u_i^T u_j = \frac{1}{\sigma_i \sigma_j} v_i^T A^T A v_j = \frac{\lambda_j}{\sigma_i \sigma_j} v_i^T v_j = \delta_{ij}\)。把 \(u_1, \ldots, u_r\) 扩展到 \(\mathbb{R}^m\) 的正交基（任何 Gram-Schmidt），得 \(U\)。代入验证 \(A = U \Sigma V^T\)。证毕。</p>
+
+<p>关键点：<em>SVD 的存在性归结于 \(A^T A\) 的特征分解</em>——而 \(A^T A\) 是对称半正定的，它的特征分解一定干净（实特征值、正交特征向量）。这就是为什么 SVD 比一般特征分解"听话"——它把"非对称"问题转化为"对称半正定"问题再分解。</p>
+
+<p>实际计算时<em>不</em>真去构造 \(A^T A\)（条件数会被平方，下一节细说），但这个证明告诉你 SVD 和特征分解的逻辑关系：<em>SVD 是把 \(A^T A\) 与 \(A A^T\) 的特征分解"绑在一起"的统一表达</em>。\(V\) 是 \(A^T A\) 的特征向量，\(U\) 是 \(A A^T\) 的特征向量，奇异值的平方就是它们共同的非零特征值。</p>
+
+<h2 id="sec21-3">21.3 \(A\) 的关键不变量都从 SVD 读出</h2>
+
+<p>这一节是 SVD"无所不能"的第一个证据。我列五个关于 \(A\) 你想知道的量，每个都<em>一行</em>从 SVD 读出。</p>
+
+<p><strong>1. 秩</strong>。\(\mathrm{rank}(A) =\) 非零奇异值的个数。</p>
+
+<p>原因：\(A = U \Sigma V^T\)，\(U, V\) 满秩不影响秩，所以 \(\mathrm{rank}(A) = \mathrm{rank}(\Sigma)\)，而对角矩阵的秩就是非零对角元个数。</p>
+
+<p>这一条看起来平凡，实则惊人。<em>判断一个矩阵是否奇异、近乎奇异</em>——传统方法是算行列式或做 LU 看主元退化。两者在数值上都不可靠：行列式可以指数级地大或小（10×10 矩阵的行列式可能是 \(10^{50}\) 也可能 \(10^{-50}\)），主元退化判断对扰动敏感。<em>SVD 告诉你"\(A\) 离奇异有多远"是一个连续、稳定的量</em>——\(\sigma_n\) 直接给"距离最近的奇异矩阵"的量度。</p>
+
+<p><strong>2. 2-范数</strong>。\(\|A\|_2 = \sigma_1\)。</p>
+
+<p>原因：\(\|A\|_2 = \sup_{\|x\|=1} \|Ax\|_2\)。在 SVD 视角下 \(\|Ax\| = \|U \Sigma V^T x\| = \|\Sigma V^T x\|\)（正交变换保范数），而 \(\|V^T x\| = 1\)，所以问题归结为 \(\sup_{\|y\|=1} \|\Sigma y\|\)，对角矩阵这个 sup 就是最大对角元 \(\sigma_1\)。</p>
+
+<p><strong>3. Frobenius 范数</strong>。\(\|A\|_F = \sqrt{\sum_i \sigma_i^2}\)。</p>
+
+<p>原因：\(\|A\|_F^2 = \mathrm{tr}(A^T A) = \mathrm{tr}(V \Sigma^T \Sigma V^T) = \mathrm{tr}(\Sigma^T \Sigma) = \sum \sigma_i^2\)。</p>
+
+<p><strong>4. 条件数</strong>。\(\kappa_2(A) = \sigma_1 / \sigma_n\)（设 \(A\) 方阵满秩）。</p>
+
+<p>原因：\(\|A\|_2 = \sigma_1\)，\(\|A^{-1}\|_2 = 1/\sigma_n\)（因为 \(A^{-1} = V \Sigma^{-1} U^T\)，最大奇异值是 \(1/\sigma_n\)）。</p>
+
+<p>这条把<a href="ch4.html">第 4 章</a>那个抽象的 \(\kappa(A)\) 定义彻底落地——条件数<em>就是椭球的最长半轴比最短半轴</em>。\(\kappa\) 大意味着椭球被压扁得很厉害。一个被压扁成接近线段的椭球，反映了 \(A\) 在某个方向上"几乎没影响"——而你想从输出反推输入，那个方向上的小扰动会被 \(A^{-1}\) 拉成大扰动。这就是<a href="ch4.html#sec4-3">第 4 章 4.3 节</a>那个"几何画面"的精确兑现。</p>
+
+<p><strong>5. 四个基本子空间</strong>。\(A\) 的四个子空间——列空间、零空间、行空间、左零空间——都从 SVD 直接读：</p>
+
+<ul>
+  <li>列空间 \(= \mathrm{span}(u_1, \ldots, u_r)\)，\(r = \mathrm{rank}(A)\)；</li>
+  <li>左零空间 \(= \mathrm{span}(u_{r+1}, \ldots, u_m)\)；</li>
+  <li>行空间 \(= \mathrm{span}(v_1, \ldots, v_r)\)；</li>
+  <li>零空间 \(= \mathrm{span}(v_{r+1}, \ldots, v_n)\)。</li>
+</ul>
+
+<p>这一条把线性代数<em>所有结构信息</em>压缩在一组数 \((U, \Sigma, V)\) 里。SVD 之后你不再需要分别算秩、求零空间、求列空间——<em>一次算完，全部读出</em>。</p>
+
+<h2 id="sec21-4">21.4 怎么算 SVD</h2>
+
+<p>知道 SVD 存在是一回事，<em>稳定算出来</em>又是一回事。这一节给标准算法的轮廓。它和上一章 QR 迭代算特征值很像——这不是巧合，因为 SVD 和对称特征分解是表亲。</p>
+
+<p><strong>第一反射：算 \(A^T A\) 然后特征分解</strong>。从存在性证明看，这条路<em>逻辑上</em>对。但数值上灾难：</p>
+
+<p>\[
+\kappa_2(A^T A) = \kappa_2(A)^2.
+\]</p>
+
+<p>条件数被<em>平方</em>。如果 \(\kappa_2(A) = 10^7\)（一个挺正常的值），\(\kappa_2(A^T A) = 10^{14}\)——在 double 下你只剩 2 位精度。这是数值人最常重复的禁忌之一：<em>能避免就不要显式算 \(A^T A\)</em>。\(A\) 的精度被它平方掉。</p>
+
+<p><strong>正确做法：两阶段算法</strong>。和 QR 迭代类似，分两步：</p>
+
+<p><em>阶段 1：bidiagonalization</em>。用 Householder 反射从两侧把 \(A\) 化成<em>双对角</em>形式：</p>
+
+<p>\[
+A = U_1 B V_1^T, \quad B = \begin{pmatrix} \alpha_1 & \beta_1 & & \\ & \alpha_2 & \beta_2 & \\ & & \ddots & \ddots \\ & & & \alpha_n \end{pmatrix}.
+\]</p>
+
+<p>这一步 \(O(m n^2)\)（设 \(m \ge n\)），是<em>有限步</em>的——和"先 Householder 化成上 Hessenberg" 是 QR 迭代的预处理一样。\(B\) 已经"<em>很稀疏</em>"——只有主对角和上次对角非零。</p>
+
+<p><em>阶段 2：bidiagonal SVD</em>。对双对角矩阵 \(B\) 用迭代算法求 SVD。最常用的是<em>隐式 QR 算法的双对角变种</em>（Demmel-Kahan，1990），它本质是对 \(B^T B\)（对称三对角）做隐式 QR 迭代——但<em>不显式</em>构造 \(B^T B\)，避免精度损失。每次迭代 \(O(n)\)，总共 \(O(n^2)\) 次迭代，所以这阶段 \(O(n^2)\)，对 \(n\) 不大可以忽略；总开销 \(O(m n^2)\)。</p>
+
+<p>关键的稳定性结论：标准 SVD 算法是<em>向后稳定</em>的——算出的 \(\hat U, \hat \Sigma, \hat V\) 满足 \(\hat U \hat \Sigma \hat V^T = A + E\)，\(\|E\| / \|A\| \sim \varepsilon_{\text{mach}}\)。所以即使 \(A\) 病态（\(\kappa\) 大），算出来的奇异值仍然准——只不过你能知道哪些 \(\sigma_i\) 接近零（这正是你需要的"病态诊断"）。</p>
+
+<p>对 \(m \gg n\)（"高瘦矩阵"）的特殊情况，先做 \(A = QR\)（QR 分解，\(O(m n^2)\)），再对 \(R\)（小 \(n \times n\)）做 SVD（\(O(n^3)\)）。总开销 \(O(m n^2 + n^3)\)，比直接 \(O(m n^2)\) 略大但<em>常数小</em>。NumPy 的 <code>linalg.svd</code> 内部就用这个 trick。</p>
+
+<h2 id="sec21-5">21.5 截断 SVD 与最佳低秩近似</h2>
+
+<p>这一节是 SVD"无所不能"的第二个证据，也是它进入数据科学 / 机器学习 / 信号处理核心地位的原因。</p>
+
+<p>记 \(A = U \Sigma V^T = \sum_{i=1}^{r} \sigma_i u_i v_i^T\)（最右是把 \(\Sigma\) 的对角元和 \(U, V\) 的列展开成<em>秩 1 矩阵之和</em>）。每一项 \(\sigma_i u_i v_i^T\) 是一个秩 1 矩阵，"重要性" 由 \(\sigma_i\) 决定。</p>
+
+<p>定义<em>截断 SVD（rank-k truncation）</em>：</p>
+
+<p>\[
+A_k := \sum_{i=1}^{k} \sigma_i u_i v_i^T,
+\]</p>
+
+<p>只保留<em>最大的 \(k\) 个</em>奇异值与对应的奇异向量。\(A_k\) 显然是秩 \(\le k\) 的。它有一个惊人的最优性质：</p>
+
+<p><strong>定理（Eckart-Young-Mirsky，1936/1960）</strong>。在所有秩 \(\le k\) 的矩阵 \(B\) 中，\(A_k\) 是 \(A\) 的最佳低秩近似（在 2-范数和 Frobenius 范数下都成立）：</p>
+
+<p>\[
+\boxed{\ \min_{\mathrm{rank}(B) \le k} \|A - B\|_2 = \|A - A_k\|_2 = \sigma_{k+1},\ }
+\]</p>
+
+<p>\[
+\min_{\mathrm{rank}(B) \le k} \|A - B\|_F = \|A - A_k\|_F = \sqrt{\sum_{i=k+1}^{r} \sigma_i^2}.
+\]</p>
+
+<p>这是数值线性代数最深刻的定理之一。它说："想用秩 \(k\) 矩阵代表 \(A\)，<em>没人做得比 \(A_k\) 更好</em>。" 误差恰好就是被丢弃的奇异值之和（按相应范数）。</p>
+
+<p>请你停下来想这件事的分量。任何"压缩、降维、去噪"的任务，都可以表述成"用低秩矩阵近似原矩阵"。Eckart-Young 给出<em>显式</em>的最优解——不是迭代算法、不是优化求解，是<em>一行公式</em>：截断 SVD。整个数据科学有半个工具箱是这条定理的应用。</p>
+
+<p>证明草图：把任何秩 \(\le k\) 的 \(B\) 写成 \(B = X Y^T\)，其中 \(X \in \mathbb{R}^{m \times k}\)。对任意 \(z\) 在 \(V\) 的前 \(k+1\) 列张成的子空间内，\(B z\) 落在 \(X\) 的列空间，<em>那是个 \(k\) 维空间</em>——所以存在 \(z\)（\(\|z\| = 1\)）使 \(Bz = 0\)（一个 \(k+1\) 维空间到 \(k\) 维空间的映射必有非平凡核）。这样的 \(z\) 是 \(v_1, \ldots, v_{k+1}\) 的某线性组合，于是 \(\|Az\|^2 = \sum_{i=1}^{k+1} \sigma_i^2 |v_i^T z|^2 \ge \sigma_{k+1}^2 \|z\|^2 = \sigma_{k+1}^2\)。所以 \(\|A - B\|_2 \ge \|(A - B) z\| = \|Az\| \ge \sigma_{k+1}\)。这下界就是 \(\|A - A_k\|_2\)（直接算可见 \(A - A_k = \sum_{i > k} \sigma_i u_i v_i^T\)，2-范数等于 \(\sigma_{k+1}\)）。证毕。</p>
+
+<p>核心几何：\(A\) 的"重要" 信息集中在前 \(k\) 个奇异值的<em>子空间</em>里——正交于这个子空间的方向上 \(A\) 的作用 \(\le \sigma_{k+1}\)。如果奇异值<em>急剧下降</em>（\(\sigma_{k+1} \ll \sigma_1\)），那 \(A\) 几乎"<em>就在</em>" 一个 \(k\) 维子空间上——它<em>本质上</em>是低秩的，丢掉残余几乎不损失信息。</p>
+
+<h2 id="sec21-6">21.6 应用：图像压缩</h2>
+
+<p>把上一节的抽象兑现成你能上手做的实验。</p>
+
+<p>一张灰度图像 = 一个 \(m \times n\) 矩阵 \(A\)，每个元素是 0-255 的灰度值。一张 1000×1000 的灰度图占 \(10^6\) 字节（1 MB 不算压缩）。</p>
+
+<p>对它做 SVD，得到 1000 个奇异值。绝大部分自然图像的奇异值<em>急剧下降</em>——前 50 个奇异值能捕捉图像的主要"形状结构"，后面 950 个只是细节噪声。截断到 \(k = 50\)：</p>
+
+<p>\[
+A_{50} = \sum_{i=1}^{50} \sigma_i u_i v_i^T.
+\]</p>
+
+<p>存储 \(A_{50}\) 需要存 \(50\) 个 \(\sigma_i\) + 50 列 \(u_i\)（每列 1000 元素）+ 50 列 \(v_i\)（每列 1000 元素）= \(50 + 50 \times 1000 + 50 \times 1000 = 100050\) 个数。和原来 \(10^6\) 比，<em>压缩约 10×</em>。视觉上 \(A_{50}\) 的图像和原图像几乎看不出区别——主要边缘、形状、明暗都在；丢的是高频纹理细节。</p>
+
+<p>提高 \(k\) 到 100，质量更好但压缩比降到 5×。降到 \(k = 20\)，看到明显"块状感"——但你<em>还</em>能认出图里的人 / 物。</p>
+
+<p>请你真去跑一遍。NumPy 几行就能做：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+import numpy as np
+from PIL import Image
+
+img = np.array(Image.open("photo.jpg").convert("L"), dtype=float)
+U, s, Vt = np.linalg.svd(img, full_matrices=False)
+
+for k in [5, 20, 50, 100, 200]:
+    approx = U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+    Image.fromarray(np.clip(approx, 0, 255).astype(np.uint8)).save(f"k_{k}.jpg")
+</pre>
+
+<p>看 5 张图像并排——你看到的是<em>"信息按重要性排序" 的可视化</em>。这种实验比任何讲解更让你"信" SVD。</p>
+
+<p>实际工业图像压缩（JPEG）<em>不</em>用 SVD 而用 DCT（离散余弦变换） + 量化——原因是 DCT 有<em>固定基</em>（不依赖图像内容），可以硬件加速；SVD 每张图都要重算分解，不适合实时。但 SVD 给出"<em>最佳</em>线性低秩近似"这个理论上限——任何固定基的方法都在和它比。</p>
+
+<h2 id="sec21-7">21.7 应用：最小二乘的伪逆</h2>
+
+<p>回到<a href="ch18.html">第 18 章</a>"<em>解超定方程组</em>" 的话题。\(A x = b\) 当 \(A\) 是 \(m \times n\)、\(m > n\)（方程多过未知数）时通常无解；最小二乘问题是</p>
+
+<p>\[
+\min_{x} \|A x - b\|_2.
+\]</p>
+
+<p>第 18 章给的方法是 normal equation \(A^T A x = A^T b\)（条件数被平方，差）或 QR 分解（稳定，标准）。但这两条路<em>都假设</em> \(A\) 列满秩（\(\mathrm{rank}(A) = n\)）。如果 \(A\) 列<em>不满秩</em>——某些列线性相关——normal equation 矩阵 \(A^T A\) 奇异，QR 给的 \(R\) 也奇异，最小二乘<em>不唯一</em>（解集是个仿射子空间）。这种情况怎么办？</p>
+
+<p>SVD 给一个干净的答案。定义 <em>Moore-Penrose 伪逆</em>：</p>
+
+<p>\[
+\boxed{\ A^{+} := V \Sigma^{+} U^T, \quad \Sigma^{+}_{ii} = \begin{cases} 1/\sigma_i & \sigma_i > 0 \\ 0 & \sigma_i = 0 \end{cases}.\ }
+\]</p>
+
+<p>"对非零奇异值取倒数，对零奇异值<em>留 0</em>"。这是个"广义逆"——\(A\) 方阵满秩时 \(A^+ = A^{-1}\)；否则 \(A^+\) 仍然存在且唯一。</p>
+
+<p>定理：\(x^* = A^+ b\) 是最小二乘问题的<em>最小范数解</em>——所有最小化 \(\|Ax - b\|\) 的 \(x\) 中，\(\|x^*\|_2\) 最小。</p>
+
+<p>证明（草图）。把 \(b\) 在 \(U\) 的列基下写：\(b = \sum c_i u_i\)。把 \(x\) 在 \(V\) 列基下写：\(x = \sum d_i v_i\)。则 \(Ax = \sum \sigma_i d_i u_i\)，\(\|Ax - b\|^2 = \sum (\sigma_i d_i - c_i)^2\)（\(i \le m\)）。最小化：对 \(\sigma_i > 0\) 取 \(d_i = c_i / \sigma_i\)；对 \(\sigma_i = 0\)，\(d_i\) 任意（不影响 \(\|Ax - b\|\)）；选 \(d_i = 0\) 让 \(\|x\|\) 最小。这正是 \(x^* = V \Sigma^+ U^T b\)。证毕。</p>
+
+<p>几何解读：\(A\) 把 \(\mathbb{R}^n\) 映到列空间（一个 \(\mathbb{R}^m\) 中的子空间）。\(b\) 一般不在列空间里，最小二乘是把 \(b\) <em>正交投影</em>到列空间得到 \(\hat b\)，再"反过来"找 \(x\) 满足 \(Ax = \hat b\)。这种 \(x\) 在 \(A\) 不满秩时<em>不唯一</em>——你可以加任意零空间向量。\(A^+\) 选的是<em>正交于零空间</em>那个，等价于范数最小的那个。</p>
+
+<p>实战意义：当你做线性回归而<em>预测变量</em>之间近乎共线（多重共线性，multicollinearity），\(A\) 的奇异值有几个非常接近零。直接 normal equation 会给天文级的回归系数（\(1/\sigma_n\) 巨大）。<em>截断伪逆</em>——把那些 \(\sigma < \) 阈值的当成 0——给一个稳定的、范数适度的解，这正是 ridge regression 的几何对应。SVD 让你<em>看到</em> 这件事的 inner workings。</p>
+
+<h2 id="sec21-8">21.8 应用：PCA</h2>
+
+<p>统计学 / 机器学习里最常用的降维算法叫 <strong>主成分分析（PCA）</strong>。它的标准描述是："找数据方差最大的几个正交方向"。这描述很对，但藏了一个事实：<em>PCA 就是数据矩阵的 SVD</em>。</p>
+
+<p>设 \(X \in \mathbb{R}^{n \times d}\) 是数据矩阵，每行一个样本，每列一个特征。先<em>中心化</em>：每列减去它的均值，得 \(X_c\)。协方差矩阵</p>
+
+<p>\[
+C = \frac{1}{n-1} X_c^T X_c \in \mathbb{R}^{d \times d}.
+\]</p>
+
+<p>PCA 找 \(C\) 的特征向量——按特征值降序。</p>
+
+<p>对 \(X_c = U \Sigma V^T\) 做 SVD：\(C = \frac{1}{n-1} V \Sigma^T \Sigma V^T = V \cdot \mathrm{diag}(\sigma_i^2 / (n-1)) \cdot V^T\)。\(C\) 的特征向量<em>就是</em> \(V\) 的列；特征值 \(= \sigma_i^2 / (n-1)\)。</p>
+
+<p>所以"PCA 的第 \(k\) 主成分"就是 SVD 的第 \(k\) 右奇异向量 \(v_k\)。把数据投到前 \(k\) 主成分上 = 数据的截断 SVD 的右因子部分。整个 PCA 算法：<em>对中心化数据矩阵做 SVD，取前 \(k\) 列 \(V\)</em>。三行代码。</p>
+
+<p>而且这里有一个关键的<em>数值优势</em>：直接对 \(X_c\) 做 SVD，<em>不</em>构造 \(C\)——避免条件数被平方。<a href="ch4.html">第 4 章</a>那条铁律"\(\kappa(A^T A) = \kappa(A)^2\)" 在这里又一次救场。</p>
+
+<p>另一个角度：PCA 等价于"<em>把数据矩阵用最优 \(k\) 维子空间近似</em>"——这正是 Eckart-Young 定理。所以 PCA 不是某种统计推断，是 SVD 的几何应用。Pearson 1901 年发明 PCA 时还没有 SVD（Beltrami 1873 年提出但没流行）；现代视角下两者完全一致。</p>
+
+<h2 id="sec21-9">21.9 应用：推荐系统</h2>
+
+<p>2006-2009 年 Netflix 公司悬赏 100 万美元做电影推荐——给定用户历史评分，预测未评分电影的喜好。获胜方案<em>核心都用 SVD</em>。</p>
+
+<p>建模：\(A \in \mathbb{R}^{u \times m}\)，\(u\) 用户、\(m\) 电影、\(A_{ij}\) = 用户 \(i\) 对电影 \(j\) 的 1-5 评分。但 \(A\) 是<em>极度稀疏</em>的——一个用户只评过几十部电影，95% 以上的位置是<em>缺失</em>的。任务是把缺失位置填上。</p>
+
+<p>核心假设：用户喜好可以用<em>少数几个潜在因子</em>解释——比如"喜欢动作片程度"、"喜欢有名导演程度"、"喜欢科幻程度"。如果你有 \(k\) 个潜在因子，那就有：</p>
+
+<p>\[
+A \approx U_k \Sigma_k V_k^T, \quad k \ll \min(u, m).
+\]</p>
+
+<p>每个用户由 \(k\) 个因子的得分描述（\(U_k\) 的一行）；每部电影由 \(k\) 个因子的"含量"描述（\(V_k\) 的一行）。预测 \(A_{ij}\) = \((U_k)_i \cdot \Sigma_k \cdot (V_k)_j^T\)。</p>
+
+<p>问题：如何在<em>有缺失值</em>的情况下做 SVD？经典 SVD 要求矩阵<em>完全已知</em>。Netflix 时期发展出几条路：</p>
+
+<ol>
+  <li><em>填均值再 SVD</em>。最朴素：缺失位置填用户均分或电影均分，再做完整 SVD。<em>不太准</em>，因为填进去的"假数据" 影响奇异向量。</li>
+  <li><em>矩阵分解 (Funk SVD, Simon Funk 2006)</em>。直接优化 \(\min_{U_k, V_k} \sum_{(i,j) \in \Omega} (A_{ij} - (U_k V_k^T)_{ij})^2 + \lambda (\|U_k\|_F^2 + \|V_k\|_F^2)\)，\(\Omega\) 是已知项集合，\(\lambda\) 是正则。SGD 求解，<em>只看已知项</em>，加 ridge 正则防过拟合。这条思路赢了 Netflix Prize 的早期阶段。</li>
+  <li><em>核范数最小化</em>。后来发展为 \(\min \|X\|_*\) s.t. \(X_{ij} = A_{ij}, (i,j) \in \Omega\)，其中 \(\|\cdot\|_*\) 是核范数（奇异值之和），是 rank 的凸放松。理论保证：在某些条件下能精确恢复低秩矩阵——这就是 2009 年代后火的 <em>matrix completion</em> 理论。</li>
+</ol>
+
+<p>所有这些方法的<em>共同前提</em>都是"\(A\) 本质上低秩"——SVD 给的几何结构。理解 SVD 是理解整个推荐系统设计的入门票。</p>
+
+<h2 id="sec21-10">21.10 实战</h2>
+
+<p>SciPy / NumPy 都有 SVD：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+import numpy as np
+
+# 完全 SVD（dense，O(min(m,n)^3 + max(m,n)·min(m,n)^2)）
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
+
+# 重构
+reconstructed = U @ np.diag(s) @ Vt
+
+# 截断到秩 k
+k = 50
+A_k = U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+
+# 伪逆
+A_pinv = np.linalg.pinv(A)  # 默认用 SVD 算
+
+# 大稀疏矩阵的 top-k SVD（Krylov 方法）
+from scipy.sparse.linalg import svds
+U, s, Vt = svds(A_sparse, k=50)  # 只算前 50 个奇异值
+</pre>
+
+<p>几个实战经验：</p>
+
+<ul>
+  <li><code>full_matrices=True</code>（默认）给 \(U\) 是 \(m \times m\)、\(V\) 是 \(n \times n\)；如果 \(m \ne n\) 这浪费内存。<em>几乎总用</em> <code>full_matrices=False</code>，给 \(U\) 是 \(m \times r\)、\(V\) 是 \(n \times r\)，\(r = \min(m, n)\)。</li>
+  <li>稠密 SVD 是 \(O(\min(m,n)^2 \max(m,n))\)，对 1000×1000 矩阵几秒；对 10000×10000 矩阵几十分钟。<em>大矩阵</em>用 randomized SVD（<code>sklearn.decomposition.TruncatedSVD</code>）或 Krylov 方法（<code>scipy.sparse.linalg.svds</code>），只算 top-\(k\)，开销 \(O(m n k)\)。</li>
+  <li>稀疏矩阵<em>不要</em>用 <code>np.linalg.svd</code>——它会先转稠密，内存爆。用 <code>svds</code>。</li>
+  <li>奇异值<em>很少正好为 0</em>——浮点下"近乎奇异"显示为 \(\sigma_n \sim \varepsilon_{\text{mach}} \cdot \sigma_1\)。判断 rank 时用相对阈值：把 \(\sigma_i / \sigma_1 < 10^{-12}\) 的当作 0。</li>
+</ul>
+
+<p>SVD 是数值线性代数收尾的高峰。它把<a href="ch16.html">第 16 章</a>开始的"线性方程组" 故事推到极致——不只是解 \(Ax = b\)，而是<em>理解 \(A\) 是什么</em>。下一章我们换跑道，进入<em>微分方程</em>的数值世界——大半个工程 / 物理 / 金融模型本质都是 ODE，必须数值积分；那里的核心问题——稳定性、精度、自适应步长——是另一片广阔地。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 特征值算法</a><a href="ch22.html">下一章 · 第 22 章 ODE 数值解：Euler 与 Runge-Kutta →</a></nav>
+</main>
+</body>
+</html>
