@@ -15,6 +15,7 @@ A growing series of Chinese-language math textbooks in the **Adrian Banner / *Ca
 | 第五卷 | 普林斯顿概率统计读本 | 25 章 + 2 附录 |
 | 第六卷 | 普林斯顿偏微分方程读本 | 23 章 + 2 附录 |
 | 第七卷 | 普林斯顿实分析读本 | 24 章 + 2 附录 |
+| 第八卷 | 普林斯顿泛函分析读本 | 24 章 + 2 附录 |
 
 每章一个独立 HTML 文件（13–50 KB），数学符号用 MathJax 渲染（自动从 CDN 加载）。每本书都有共享的 `styles.css` 和上下章导航。
 
