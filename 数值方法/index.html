@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目录 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+<h1>普林斯顿数值方法读本</h1>
+
+<p style="margin-top:-0.5rem;color:var(--ink-soft);font-style:italic;">浮点、误差、解方程、插值、数值线性代数、ODE 与 PDE · 把"数学"翻译成"能跑"</p>
+
+<h1 id="preface">前言</h1>
+
+<p>欢迎你翻开这本书。和系列前面九本不同，这一本要讲的不是<em>"数学是什么"</em>，是<em>"当你拿一台真实的电脑去做数学时，世界变成什么样"</em>。两边的差距没你以为的小。第 1 章你会看到三个例子，让你立即感受到这种差距是<em>结构性</em>的，不是工程瑕疵。</p>
+
+<p>这本书有一个很简单的主张：<strong>每一个连续数学定理背后，都站着一个数值算法；而那个数值算法常常比定理本身更需要思考。</strong>纯数学家说"\(\int_0^1 e^{-x^2} \, dx\) 的值存在"——这是真的。数值人要做的是：把它算到 16 位精度，在 1 微秒内，并且能证明这 16 位都是对的。这件事不容易；这件事就是这本书。</p>
+
+<h2>这本书的角色</h2>
+
+<p>系列前面九本（<a href="../多元微积分/index.html">多元微积分</a>、<a href="../线性代数/index.html">线性代数</a>、<a href="../微分方程/index.html">微分方程</a>、<a href="../复分析/index.html">复分析</a>、<a href="../概率统计/index.html">概率统计</a>、<a href="../偏微分方程/index.html">偏微分方程</a>、<a href="../实分析/index.html">实分析</a>、<a href="../泛函分析/index.html">泛函分析</a>、<a href="../抽象代数/index.html">抽象代数</a>）讲的是连续数学。它们都假定你能"算"——梯度、积分、矩阵逆、解 ODE——但从不正面问"算"是什么意思。这本书把"算"打开。</p>
+
+<p>核心命题：算 ≠ 写公式。给一个数学对象（一个积分、一个方程、一个矩阵），有许多种<em>算法</em>能把它变成一个数。这些算法在<em>纸上</em>常常等价；在<em>电脑上</em>不等价。它们各有各的速度、稳定性、存储代价、并行度。挑哪个不是品味问题——是技术问题，有诊断、有定理。</p>
+
+<h2>这本书<em>不</em>是什么</h2>
+
+<p>它不是编程书。我会用 Python / MATLAB / NumPy 的语义说话，但不会教你"怎么用 NumPy 的 API"。你想学具体语言，去看官方文档或专门的库教程。</p>
+
+<p>它不是软件工程书。我不讲版本管理、性能调优、GPU 编程。这些都重要，但不是本书的范围。</p>
+
+<p>它不是数值分析的研究专著。本书覆盖的是本科 + 研究生预备阶段的标准数值方法——求根、插值、积分、线性代数、ODE、入门级 PDE 与 FFT。深一点的话题（自适应网格、辛积分、谱方法、稀疏直接法）只一句话提及。</p>
+
+<h2>读这本书之前你需要什么</h2>
+
+<p>你需要<a href="../多元微积分/index.html">多元微积分</a>的基本词汇——梯度、雅可比、Taylor 展开。第 7、8、20 章会大量用。</p>
+
+<p>你需要<a href="../线性代数/index.html">线性代数</a>，特别是矩阵分解、特征值、范数。第 16-21 章基本就是"线性代数的数值版"。</p>
+
+<p>你最好读过<a href="../微分方程/index.html">微分方程</a>的初阶部分（Euler 方法、解曲线的稳定性）。第 22-23 章会接着讲。</p>
+
+<p>你<em>不</em>需要先学过实分析或泛函分析。本书会在用到的地方说清。如果你后面想深入误差分析的"为什么"——比如 backward error 的几何刻画——可以回头看<a href="../泛函分析/index.html">泛函分析</a>第 8-9、第 17-18 章。</p>
+
+<p>你需要的更像一种态度：<em>愿意开一个解释器一边读一边动手</em>。这本书的几乎每一节都有可以五行代码验证的例子。把这些例子真敲一遍，比读十遍证明都管用。数值方法是一门<em>实验科学</em>——你看到的每一个结论，都可以也<em>应当</em>被你自己跑一次。</p>
+
+<h2>"我下周就要考期中，从哪里开始？"</h2>
+
+<p>看你考什么。绝大多数本科数值课考的是这几块：</p>
+
+<ul>
+  <li>误差分析与条件数（第 3-5 章）；</li>
+  <li>求根：二分 + 牛顿（第 6-7 章）；</li>
+  <li>插值与最小二乘（第 9-12 章）；</li>
+  <li>数值积分：梯形 + Simpson + Gauss（第 14-15 章）；</li>
+  <li>数值线性代数：LU、QR、迭代法（第 16-19 章）；</li>
+  <li>ODE 数值解：RK4 + 稳定性（第 22-23 章）。</li>
+</ul>
+
+<p>挑你课重的那几块直接看，每节里的例子都自己敲一遍，绝大多数考试 80% 的题型就稳了。</p>
+
+<h2>例题与代码片段</h2>
+
+<p>例题埋在正文里，没有"例 4.2.1"这种标签。每个例题都先于一般化结论出现——你先看到一个具体数会怎么爆炸，然后才看到"我们把这种现象叫做 X"。</p>
+
+<p>代码片段用伪代码 + Python-like 语法。我会偶尔写真实的 Python 一行（特别在前几章演示浮点行为），但本书不依赖任何具体语言。你能写出 for 循环 + if 判断 + 函数调用就够了。</p>
+
+<h2>致谢</h2>
+
+<p>本书向 Adrian Banner 的<em>《微积分读本》</em>致敬，沿用那本书的"内心独白"教学法。内容选材主要参考：Lloyd N. Trefethen &amp; David Bau <em>Numerical Linear Algebra</em>、Trefethen <em>Approximation Theory and Approximation Practice</em>、Burden &amp; Faires <em>Numerical Analysis</em>、Quarteroni / Sacco / Saleri <em>Numerical Mathematics</em>、Higham <em>Accuracy and Stability of Numerical Algorithms</em>。Higham 那本对"算法稳定性"的形式化最深，本书第 4-5 章的视角主要受它影响。</p>
+
+<h2>目录</h2>
+
+<ol>
+  <li><a href="ch1.html">第 1 章 引论：连续数学与计算的鸿沟</a> — 三个例子让你立即看见差距。</li>
+  <li><a href="ch2.html">第 2 章 浮点数：计算机里的"实数"</a> — IEEE 754 标准与机器精度 \(\varepsilon_{\text{mach}}\)。</li>
+  <li><a href="ch3.html">第 3 章 误差怎么传：截断、舍入、向前向后</a> — 一次操作的误差，与一连串操作的误差。</li>
+  <li><a href="ch4.html">第 4 章 条件数：问题的"先天好坏"</a> — 不依赖算法的、问题本身的难度。</li>
+  <li><a href="ch5.html">第 5 章 算法稳定性：实现的"后天好坏"</a> — 同一个问题，算法可以稳或不稳。</li>
+  <li><a href="ch6.html">第 6 章 一维方程求根：二分与不动点</a> — 最朴素的求根算法。</li>
+  <li><a href="ch7.html">第 7 章 牛顿法与割线法</a> — 二次收敛的代价与好处。</li>
+  <li><a href="ch8.html">第 8 章 多变量牛顿与拟牛顿法</a> — 把 1D 牛顿推到 \(\mathbb{R}^n\)。</li>
+  <li><a href="ch9.html">第 9 章 多项式插值：Lagrange 与 Newton 差商</a> — 给点求函数。</li>
+  <li><a href="ch10.html">第 10 章 插值误差、Runge 现象、Chebyshev 节点</a> — 高次插值为什么爆炸。</li>
+  <li><a href="ch11.html">第 11 章 分段多项式与三次样条</a> — 工程上"真用"的插值。</li>
+  <li><a href="ch12.html">第 12 章 最小二乘与正交多项式</a> — 当数据多于参数时怎么办。</li>
+  <li><a href="ch13.html">第 13 章 数值微分</a> — 为什么数值导数总比数值积分难。</li>
+  <li><a href="ch14.html">第 14 章 数值积分：Newton-Cotes</a> — 梯形、Simpson、误差估计。</li>
+  <li><a href="ch15.html">第 15 章 Gauss 求积、Romberg、自适应</a> — 高精度积分的工业标准。</li>
+  <li><a href="ch16.html">第 16 章 直接法解线性系统：LU 与 Cholesky</a> — 高斯消元的工程化。</li>
+  <li><a href="ch17.html">第 17 章 QR 分解与最小二乘的稳定算法</a> — Householder 反射。</li>
+  <li><a href="ch18.html">第 18 章 迭代法：Jacobi、Gauss-Seidel、SOR</a> — 当矩阵太大不能直接解。</li>
+  <li><a href="ch19.html">第 19 章 Krylov 子空间与共轭梯度</a> — 现代大规模求解的工作马。</li>
+  <li><a href="ch20.html">第 20 章 特征值数值计算：幂法与 QR 算法</a> — 不用解特征多项式怎么找特征值。</li>
+  <li><a href="ch21.html">第 21 章 奇异值分解</a> — 为什么 SVD 是数值线性代数最有用的工具。</li>
+  <li><a href="ch22.html">第 22 章 ODE 数值解：Euler 与 Runge-Kutta</a> — 离散化时间的入门。</li>
+  <li><a href="ch23.html">第 23 章 ODE：多步法、稳定性、刚性方程</a> — 为什么 RK4 不总能用。</li>
+  <li><a href="ch24.html">第 24 章 PDE 有限差分入门 + FFT 一瞥</a> — 把工具汇合。</li>
+</ol>
+
+<ul>
+  <li><a href="appA.html">附录 A 矩阵与向量范数速查</a></li>
+  <li><a href="appB.html">附录 B IEEE 754 浮点格式速查</a></li>
+  <li><a href="subject-index.html">主题索引</a></li>
+</ul>
+
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+</main>
+</body>
+</html>

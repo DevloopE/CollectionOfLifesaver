@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 误差怎么传：截断、舍入、向前向后 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 浮点数</a><a href="ch4.html">下一章 · 第 4 章 条件数 →</a></nav>
+<h1 id="ch3">第 3 章 误差怎么传：截断、舍入、向前向后</h1>
+
+<p>第 2 章告诉你"每次浮点 op 的相对误差不超过 \(\varepsilon_{\text{mach}}\)"。这一章问下一个问题：<em>把成千上万次这种 op 串在一起做一段计算之后，最终答案离真答案多远？</em></p>
+
+<p>这件事比表面看复杂。误差有<em>两种</em>不同来源（截断 vs 舍入），它们彼此可以互换交易；它有<em>两种</em>不同测法（向前 vs 向后），同一个算法在两种测法下可以一稳一不稳。这套语言是 Wilkinson 在 1950-60 年代锻造的，至今是数值分析理解算法质量的标准工具。这一章是这套语言的安装。</p>
+
+<h2 id="sec3-1">3.1 两种误差：截断 vs 舍入</h2>
+
+<p>来一道朴素任务：算 \(\sin(0.5)\)。</p>
+
+<p>你大概想"用 Taylor 展开"。\(\sin(x) = x - x^3/6 + x^5/120 - x^7/5040 + \ldots\)。但你不能加无穷多项——计算机时间有限。所以你截到某一项停下来。比如截到 \(x^5/120\)：</p>
+
+<p>\[
+\hat S(x) = x - \frac{x^3}{6} + \frac{x^5}{120}.
+\]</p>
+
+<p>代入 \(x = 0.5\)：\(\hat S(0.5) = 0.5 - 0.020833\ldots + 0.000260\ldots = 0.479427\ldots\)，真值 \(\sin(0.5) = 0.479425538\ldots\)。差大约 \(2 \times 10^{-6}\)。</p>
+
+<p>这个 \(2 \times 10^{-6}\) 不是来自浮点——它是 Taylor 展开里<em>被你扔掉的 \(x^7/5040\) 那一项及之后</em>。这种"用有限项近似无穷过程"产生的误差叫</p>
+
+<p>\[\boxed{\ \text{截断误差（truncation error）}: \text{把无限过程截到有限。}\ }\]</p>
+
+<p>它的特征：和有限精度无关——你<em>用纸笔</em>算这个截断 Taylor 也会得到同样的 \(2 \times 10^{-6}\)。它是<em>方法</em>的误差，不是机器的误差。</p>
+
+<p>现在如果你<em>实际</em>把 \(\hat S(0.5)\) 在 double 里算一遍，你又多了一层误差——\(0.5\) 存进浮点没问题（恰好可表达），但 \(0.5^3 = 0.125\) 也精确，除以 6 给出 \(0.020833\overline{3}\)（不可精确表达，舍入），等等。每次乘除都加一点 \(\varepsilon_{\text{mach}}\) 量级的相对误差。这叫</p>
+
+<p>\[\boxed{\ \text{舍入误差（roundoff error）}: \text{有限位浮点带来的每 op 微小修改。}\ }\]</p>
+
+<p>它的特征：和方法无关——你换<em>同样的算法</em>到 single precision，舍入误差就更大；换到任意精度库 mpmath 用 1000 位浮点，舍入误差就小到几乎为零。</p>
+
+<p>两种误差的<em>总和</em>是你看到的总误差。但更有趣的是它们之间的<em>互换</em>。下一节给一个非常清晰的反差。</p>
+
+<h2 id="sec3-2">3.2 数值微分：两种误差互打架</h2>
+
+<p>给定 \(f(x)\)，要数值近似 \(f'(a)\)。最朴素的方法用差商：</p>
+
+<p>\[
+f'(a) \approx \frac{f(a + h) - f(a)}{h}.
+\]</p>
+
+<p>问 \(h\) 取多小最好。直觉说"\(h\) 越小越准"。让我们看真不真。</p>
+
+<p><strong>截断误差。</strong>由 Taylor，\(f(a + h) = f(a) + h f'(a) + \frac{h^2}{2} f''(a) + O(h^3)\)。所以</p>
+
+<p>\[
+\frac{f(a + h) - f(a)}{h} = f'(a) + \frac{h}{2} f''(a) + O(h^2).
+\]</p>
+
+<p>截断误差大约是 \(\frac{h}{2} |f''(a)|\)，按 \(O(h)\) 走。<em>\(h\) 越小，截断误差越小</em>。直觉对。</p>
+
+<p><strong>舍入误差。</strong>\(f(a + h)\) 和 \(f(a)\) 都被存为浮点，每个有 \(\sim \varepsilon_{\text{mach}} \cdot |f|\) 的绝对误差。两者相减，绝对误差不超过 \(2 \varepsilon_{\text{mach}} |f|\)。再除以 \(h\)：</p>
+
+<p>\[
+\text{舍入误差} \sim \frac{2 \varepsilon_{\text{mach}} |f(a)|}{h}.
+\]</p>
+
+<p><em>\(h\) 越小，舍入误差越大</em>。直觉错。</p>
+
+<p>把两块加起来——总误差大约</p>
+
+<p>\[
+E(h) \approx \frac{|f''(a)|}{2} h + \frac{2 \varepsilon_{\text{mach}} |f(a)|}{h}.
+\]</p>
+
+<p>这是个 V 形函数：\(h\) 太大，第一项主导；\(h\) 太小，第二项炸；中间有个最优。求导找 \(h^*\)：</p>
+
+<p>\[
+\boxed{\ h^* \approx \sqrt{\frac{4 \varepsilon_{\text{mach}} |f(a)|}{|f''(a)|}} \approx \sqrt{\varepsilon_{\text{mach}}} \approx 10^{-8}.\ }
+\]</p>
+
+<p>对 double，\(h^* \approx 10^{-8}\)。比这小或比这大，<em>都</em>会让总误差变大。</p>
+
+<p>请你停下来体会一下这件事。\(h = 10^{-8}\) 在数学上明明<em>不</em>是"极限的最佳近似"——数学上 \(h \to 0\) 时差商收敛到 \(f'(a)\)。但在浮点世界里，\(h\) 有个最佳尺度，下了那道线就开始倒退。<em>"理论上越小越好"在数值上就是错的</em>。</p>
+
+<p>这条 \(h^* \approx \sqrt{\varepsilon_{\text{mach}}}\) 是数值微分的"工程公约"。你以后看科学计算里"取 step size 1e-8" 这种神秘选择——出处就在这里。也是为什么本书<a href="ch13.html">第 13 章</a>专门讨论数值微分时会强调"<em>数值微分总是比数值积分难</em>"——积分把误差均掉，微分把误差放大。</p>
+
+<h2 id="sec3-3">3.3 向前误差 vs 向后误差</h2>
+
+<p>到现在我们说"误差"指的都是同一种东西：算出来的答案 \(\hat y\) 离真答案 \(y\) 多远。这种最朴素的测法叫</p>
+
+<p>\[
+\text{向前误差（forward error）} := |\hat y - y|, \quad \text{或相对版本} \frac{|\hat y - y|}{|y|}.
+\]</p>
+
+<p>它直接、好懂、是你"想要"的那种误差。但它有个常常做不下去的痛点——<em>"真答案" \(y\) 通常你不知道</em>。如果你都知道真答案了，你算它干什么？</p>
+
+<p>Wilkinson 1950 年代提出一个换角度的看法：与其问"我算出的答案离真答案多远"，不如问<em>"我算出的答案是<strong>哪一道题</strong>的真答案"</em>。</p>
+
+<p>具体一点。设你在解 \(f(x) = 0\)，输入是某个函数 \(f\)，输出是某个数 \(y = 0\) 的根。算法给你 \(\hat y\)。<em>向前误差</em>问：\(|\hat y - y|\) 多大？<em>向后误差</em>问：是否存在一个被微微扰动的函数 \(\tilde f\)，使 \(\hat y\) 是<em>它</em>的真根？如果存在，扰动 \(\|\tilde f - f\|\) 多小？</p>
+
+<p>形式化：</p>
+
+<p>\[
+\boxed{\ \text{向后误差（backward error）} := \min\{\|\Delta\| : \hat y = \text{exact answer to perturbed input } x + \Delta\}.\ }
+\]</p>
+
+<p>这一句话听起来像换汤不换药。但它实际上极有威力。原因是：</p>
+
+<ul>
+  <li>你<em>能</em>算向后误差——只需把 \(\hat y\) 代回原方程看残差，不用知道真答案。</li>
+  <li>向后误差小，意味着你的算法"<em>给出了某道附近问题的精确答案</em>"。这是"算法尽职"的一种很自然的标准——你不能要求算法把无解决精度的问题解出来，但你可以要求算法不引入额外误差。</li>
+  <li>向前误差 = 向后误差 × <em>问题</em>的某种"敏感度"。这个"敏感度"叫<strong>条件数</strong>，是<a href="ch4.html">下一章</a>的主角。把这两块解耦让人能<em>分开</em>讨论"问题难"和"算法烂"。</li>
+</ul>
+
+<p>用数值线性代数里最熟的例子说一下。要解 \(A x = b\)，算法给 \(\hat x\)。</p>
+
+<ul>
+  <li><em>向前误差</em>：\(\|\hat x - x_{\text{true}}\|\)。</li>
+  <li><em>向后误差</em>：\(\|A \hat x - b\| = \|r\|\)，称<em>残差</em>。</li>
+</ul>
+
+<p>残差告诉你"\(\hat x\) 是不是<em>某个</em>右端略不同的方程组的精确解"——是的，它是 \(A \hat x = b - r\) 的精确解，扰动量是 \(\|r\|\)。残差小 ⟺ 向后误差小。</p>
+
+<p>关键事实（<a href="ch16.html">第 16 章</a>会证）：高斯消元 + 部分主元的 LU 分解<em>向后稳定</em>，意思是产出的 \(\hat x\) 满足 \(\|r\| / \|b\| \lesssim n \varepsilon_{\text{mach}}\)，无论 \(A\) 多病态。所以高斯消元"<em>把它能做的都做对了</em>"——剩下的不准是问题本身的过错。这就是为什么 LU 即使在 \(A\) 几乎奇异时也是数值线性代数的工业标准。</p>
+
+<h2 id="sec3-4">3.4 误差怎么累积：不是简单求和</h2>
+
+<p>朴素的想法：做 \(n\) 次浮点 op，每次 \(\varepsilon_{\text{mach}}\) 误差，累积起来 \(n \cdot \varepsilon_{\text{mach}}\)。常见但<em>不准确</em>。</p>
+
+<p>这种线性累积只在"误差永远同号"时成立。实际中浮点舍入是"四舍五入"——舍上和舍下大致一半一半，舍入误差像随机变量。如果误差独立同分布、零均值，累积之后<em>方差</em>线性增长，<em>标准差</em>按 \(\sqrt{n}\) 走。这是为什么实践中长求和的舍入误差经常是 \(\sqrt{n} \cdot \varepsilon_{\text{mach}}\)，比 \(n \cdot \varepsilon_{\text{mach}}\) 好得多。</p>
+
+<p>另一极端：误差<em>不</em>独立、被算法<em>系统性放大</em>——这是灾难性抵消的来源。比如算 \(\sum_{i=1}^n x_i\) 用从大到小排序的输入，反复地"大数 + 小数 = 大数"，小数被吃掉。这种误差不是随机的，是<em>结构性</em>的。</p>
+
+<p>三个层级：</p>
+
+<ul>
+  <li><em>最坏</em>情况上界：\(n \cdot \varepsilon_{\text{mach}}\)。永远成立但常常很悲观。</li>
+  <li><em>统计</em>典型情况：\(\sqrt{n} \cdot \varepsilon_{\text{mach}}\)。如果误差近似独立、零均值。</li>
+  <li><em>结构性</em>放大：可以远超 \(n \cdot \varepsilon_{\text{mach}}\)，比如灾难性抵消让单 op 的误差膨胀几个数量级。</li>
+</ul>
+
+<p>分析一个具体算法时你要判断它属于哪一类。判断方法不是套公式，是逐 op 追踪——这就是<em>误差分析</em>本身（多年来发展成专门技术，Higham 那本<em>《Accuracy and Stability of Numerical Algorithms》</em>是这门艺术的圣经）。</p>
+
+<p>本书后面遇到的算法，我会告诉你它的误差等级；但我也希望你养成<em>自己看一眼算法、就能猜出它属于哪一类</em>的肌肉。线性累积是默认猜测；如果你看到"长链同号加" 或 "几乎相等的数相减"，把猜测调高。</p>
+
+<h2 id="sec3-5">3.5 一个非常实用的求和算法：Kahan 求和</h2>
+
+<p>给一个具体例子。算 \(\sum_{i=1}^{10^7} x_i\)，所有 \(x_i\) 都是 1。真答案 \(10^7\)。</p>
+
+<p>朴素算法（从左到右加）：每步 \(s \leftarrow s + x_i\)。当 \(s\) 足够大（比如到 \(10^6\)），\(s + 1\) 在 double 下还是精确的（因为 \(10^6\) 的相对精度还有 \(10^{-10}\) 余裕）；但如果 \(x_i\) 是更小的数（比如 \(10^{-10}\)），\(s + x_i\) 在 \(s = 10^6\) 时就开始丢精度。</p>
+
+<p>这种"小被大吃" 是浮点求和的根本问题。<strong>Kahan 求和</strong>的小聪明：用一个"补偿变量" \(c\) 记录上一步丢失的低位。</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+sum = 0
+c = 0           # 补偿（compensation）
+for x in xs:
+    y = x - c           # 把上一步丢的低位"还给" x
+    t = sum + y         # 这里 t 的低位还会丢
+    c = (t - sum) - y   # 那部分丢的低位 = 这次没加进去的
+    sum = t
+</pre>
+
+<p>这个算法的正确性是个简洁的代数验证（写出每步浮点近似 \(\text{fl}(\cdot) = (\cdot)(1 + \delta_i)\)，把所有 \(\delta\) 项追踪一遍）。结论：Kahan 求和的误差<em>不依赖 \(n\)</em>，只依赖输入的最大幅值，是 \(O(\varepsilon_{\text{mach}})\) 而不是 \(O(n \varepsilon_{\text{mach}})\) 或 \(O(\sqrt n \varepsilon_{\text{mach}})\)。</p>
+
+<p>你可能想"这是个魔术"。其实不是——它就是把"每次浮点加法丢掉的低位" 用一个变量记下来，下一次加进去。直觉上像在记账：不平账，加一笔补正。这种"补偿" 思路在浮点算法里反复出现（Dekker、Veltkamp、TwoSum 等同一族算法都用类似技巧）。</p>
+
+<p>Kahan 求和的代价是 4 倍 op，但误差量级低几个数量级。你做大量小数求和（统计、机器学习、信号处理）时几乎总应该用它。</p>
+
+<h2 id="sec3-6">3.6 一个让你以后受用的小工具：相对 vs 绝对误差</h2>
+
+<p>读完这一章，你应该养成一个反射：<em>谈误差时先问"这是相对的还是绝对的"</em>。</p>
+
+<ul>
+  <li><strong>相对误差</strong>：\(|\hat y - y| / |y|\)。无量纲，跨问题可比。</li>
+  <li><strong>绝对误差</strong>：\(|\hat y - y|\)。有量纲，跟 \(y\) 的尺度走。</li>
+</ul>
+
+<p>浮点的"\(\varepsilon_{\text{mach}} = 2 \times 10^{-16}\)" 是<em>相对</em>精度。double 算 \(10^{20}\) 量级的数，绝对精度只有 \(10^4\)；算 \(10^{-20}\) 量级的数，绝对精度 \(10^{-36}\)。<em>同样的相对精度，绝对精度按数量级伸缩</em>。这就是<a href="ch2.html">第 2 章 2.4 节</a>反复说的"相对精度均匀，绝对精度伸缩"。</p>
+
+<p>例外：<em>当真值接近 0 时，相对误差爆掉</em>，这时绝对误差更有意义。比如算 \(\sin(\pi)\)（真值 0），双精度结果大约 \(1.2 \times 10^{-16}\)。绝对误差 \(1.2 \times 10^{-16}\) 是合理的"接近 0"；相对误差却是 100%（除以 0 的极限）。所以"相对误差"在真值附近 0 时不是好的衡量。</p>
+
+<p>实际工作中：<em>用混合标准</em>，例如</p>
+
+<p>\[
+|\hat y - y| < \tau_{\text{abs}} + \tau_{\text{rel}} \cdot |y|.
+\]</p>
+
+<p>当 \(|y|\) 小，\(\tau_{\text{abs}}\) 主导；当 \(|y|\) 大，\(\tau_{\text{rel}} \cdot |y|\) 主导。这是 SciPy / MATLAB 等库的默认收敛判据格式。</p>
+
+<p>下一章我们正式定义<strong>条件数</strong>——一个不依赖算法、只依赖问题<em>本身</em>的"先天难度"。条件数大的问题，再好的算法也救不回来；条件数小的问题，再烂的算法也错不到哪去。理解了条件数你就理解了"算法没问题，是问题本身病" 这种困境。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 浮点数</a><a href="ch4.html">下一章 · 第 4 章 条件数 →</a></nav>
+</main>
+</body>
+</html>
