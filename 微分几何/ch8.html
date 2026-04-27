@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 Gauss 映射：法向量场 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 第一基本形式</a><a href="ch9.html">下一章 · 第 9 章 第二基本形式 →</a></nav>
+<h1 id="ch8">第 8 章 Gauss 映射：法向量场</h1>
+
+<p>上一章讲<em>内蕴</em> 几何——第一基本形式只看曲面"<em>自身</em>" 的距离 / 角度 / 面积, 不管曲面在 \(\mathbb{R}^3\) 里怎么放。</p>
+
+<p>这一章和下一章换视角, 看<em>外蕴</em> 几何——曲面在 \(\mathbb{R}^3\) 中"<em>怎么弯</em>"。最关键的工具是<em>法向量</em>: 每个 \(p \in S\) 上有一个垂直于 \(T_p S\) 的单位向量 \(N(p) \in \mathbb{R}^3\)（其实 \(N(p) \in S^2\), 因为 \(|N(p)| = 1\)）. 把这些法向量当成一个映射 \(N: S \to S^2\), 这就是<em>Gauss 映射</em>。</p>
+
+<p>Gauss 1827 的天才洞察: 法向量<em>怎么变</em>（即 \(dN_p\)）就是曲面"<em>怎么弯</em>" 的形式表达。\(dN_p\) 是 \(T_p S \to T_p S\) 的<em>线性算子</em>（下面解释为什么是这个映射, 而不是 \(T_p S \to T_{N(p)} S^2\)）, 它的特征值 \(-\kappa_1, -\kappa_2\)（取负号惯例）就是<em>主曲率</em>, 特征方向就是<em>主方向</em>。这是后面 ch9 第二基本形式 + ch10 Gauss 曲率公式 + ch11 Theorema Egregium 的工具底座。</p>
+
+<h2 id="sec8-1">8.1 单位法向量</h2>
+
+<p>从最具体的开始。\(p \in S\), 切空间 \(T_p S \subset \mathbb{R}^3\) 是 2 维子空间, 它的<em>正交补</em>（在 \(\mathbb{R}^3\) 中）是 1 维。所以正交补里有<em>恰好两个</em> 单位向量, 它们互为相反数。任选一个叫 \(N(p)\), 另一个就是 \(-N(p)\).</p>
+
+<p>具体怎么算：用一张参数化 \(X(u, v)\), 切空间基 \((X_u, X_v)\), 法向量是它们的叉积:</p>
+
+<p>\[
+N(p) = \frac{X_u(q) \times X_v(q)}{|X_u(q) \times X_v(q)|}, \quad p = X(q).
+\]</p>
+
+<p>叉积自动垂直于两个因子, 除以模长得单位向量。</p>
+
+<p><strong>例（球面）.</strong> \(X(\theta, \varphi) = (r \sin \theta \cos \varphi, r \sin \theta \sin \varphi, r \cos \theta)\). \(X_\theta \times X_\varphi\) 直接算（用 ch7.4 的偏导）, 答案是</p>
+
+<p>\[
+X_\theta \times X_\varphi = r^2 \sin \theta \cdot (\sin \theta \cos \varphi, \sin \theta \sin \varphi, \cos \theta) = r \sin \theta \cdot X(\theta, \varphi).
+\]</p>
+
+<p>归一化, \(N = X / r = (\sin \theta \cos \varphi, \sin \theta \sin \varphi, \cos \theta)\). 几何上, <em>球面在每点的法向量就是从球心指向那点的径向单位向量</em>。这是常识, 现在有公式。</p>
+
+<p><strong>例（圆柱）.</strong> \(X(u, v) = (r \cos u, r \sin u, v)\). \(X_u = (-r \sin u, r \cos u, 0), X_v = (0, 0, 1)\). \(X_u \times X_v = (r \cos u, r \sin u, 0)\), 模长 \(r\). \(N = (\cos u, \sin u, 0)\). 几何上, <em>圆柱面法向量从轴心指向曲面点的径向方向</em>（投影到 \(xy\) 平面）, \(z\) 分量为零（因为圆柱"<em>不向上向下弯</em>"）.</p>
+
+<p><strong>注意：法向量的方向是约定.</strong> 我们选 \(X_u \times X_v\) 而不是 \(X_v \times X_u\)（差一个符号）, 这是参数化下的"<em>正向</em>"。换一张参数化, 法向量可能反向。</p>
+
+<p>这引出一个微妙的整体问题: 一个曲面能不能选出<em>处处一致</em> 的 \(N\), 即一个<em>连续</em> 的 \(N: S \to S^2\)？</p>
+
+<p>答案是: <em>不一定</em>。这就是<em>可定向性</em>。一个曲面叫<em>可定向</em> 的, 如果存在连续的单位法向量场 \(N: S \to S^2\). 否则叫<em>不可定向</em>。</p>
+
+<p>大部分熟悉的曲面（球、椭球、圆柱、环面、平面）都<em>可定向</em>。最著名的不可定向例子: <em>Möbius 带</em>——一张纸条扭半圈黏起来, 沿曲面走一圈, 法向量从"<em>朝上</em>" 变成"<em>朝下</em>", 没办法处处一致。这种曲面没全局法向量。</p>
+
+<p>本章后面默认曲面可定向, 选定一个 \(N\)。</p>
+
+<h2 id="sec8-2">8.2 Gauss 映射 \(N: S \to S^2\)</h2>
+
+<p>把单位法向量看成<em>映射</em>:</p>
+
+<p><strong>定义 8.1.</strong> 设 \(S \subset \mathbb{R}^3\) 是可定向正则曲面, 选定一个连续单位法向量场 \(N: S \to S^2\). 这个映射 \(N\) 叫做曲面 \(S\) 的<em>Gauss 映射</em>。</p>
+
+<p>"映射" 这个词是关键的视角转换。以前我们把 \(N(p)\) 看成"<em>p 处那个法向量</em>"——一个 \(\mathbb{R}^3\) 中的向量。现在我们把 \(N(p)\) 看成"<em>单位球面 \(S^2\) 中的一点</em>"——\(N(p) \in S^2\). 同一个对象, 两种解读。第二种解读让我们能问 \(N\) 这个映射的<em>微分</em> 是什么——这就是后面所有曲率论的钥匙。</p>
+
+<h2 id="sec8-3">8.3 三个例子的 Gauss 映射图</h2>
+
+<p>把 \(N\) 当映射 \(N: S \to S^2\), 可以问"<em>它的像是什么</em>"。三个例子让你看清楚。</p>
+
+<p><strong>球面 \(S^2_r\).</strong> 上面算了 \(N(p) = p / r\). 把球面每点除以 \(r\), 得到单位球面 \(S^2\). 所以 \(N: S^2_r \to S^2\), \(p \mapsto p/r\), 是一个<em>同胚</em>（是个缩放）。</p>
+
+<p>请你注意: 球面的 Gauss 映射本质就是<em>恒等</em>（差一个 \(1/r\) 缩放）. \(N\) 是 1-1 满的, 像是整个 \(S^2\). 直觉上球面"<em>每个方向都被某点的法向量指到</em>", 因为球面"<em>各方向都凸</em>"。</p>
+
+<p><strong>圆柱面.</strong> \(N(p) = (\cos u, \sin u, 0)\), 即 \(N\) 的像总落在 \(xy\) 平面 \(z = 0\) 上, 即<em>赤道圆</em> \(S^1 \subset S^2\). 把整个圆柱面（无穷长一个二维曲面）映到 \(S^2\) 上的<em>一个圆</em>（一维）！这是个剧烈降维。</p>
+
+<p>原因: 圆柱沿轴方向"<em>不弯</em>", 所以法向量在轴方向<em>不变化</em>。圆柱上 \(z\) 不同但 \((x, y)\) 同的两点（同一条母线上）有<em>同一个</em> 法向量。所以整条母线被映到同一点 \((\cos u, \sin u, 0) \in S^2\). 这个"<em>整条母线压成一点</em>" 反映出圆柱"<em>沿轴方向曲率为零</em>"。</p>
+
+<p><strong>平面.</strong> 平面 \(z = 0\) 上每点法向量都是 \((0, 0, 1)\). 所以 \(N: \text{平面} \to S^2\) 是<em>常映射</em>, 像是一<em>个</em> 点 \((0, 0, 1) \in S^2\)。整个平面（二维）被压到一<em>点</em>（零维）！</p>
+
+<p>把三例并排:</p>
+
+<ul>
+  <li>球面: 二维 → 二维（<em>同胚到 \(S^2\)</em>）.</li>
+  <li>圆柱: 二维 → 一维（<em>降一维</em>）.</li>
+  <li>平面: 二维 → 零维（<em>降两维</em>）.</li>
+</ul>
+
+<p>"<em>Gauss 映射的像维数</em>" 反映"<em>曲面在多少独立方向上弯</em>". 这给我们一个朴素直觉的形式版本: 球面"<em>各向都弯</em>"（满秩）, 圆柱"<em>一向弯一向直</em>"（秩 1）, 平面"<em>哪都不弯</em>"（秩 0）。下一节我们形式化这个"<em>弯多少</em>" 的概念——\(dN_p\) 的秩就是它。</p>
+
+<h2 id="sec8-4">8.4 \(dN_p\) 是 \(T_p S \to T_p S\) 的自伴算子</h2>
+
+<p>这一节是本章核心。\(N: S \to S^2\) 是光滑映射（光滑性: \(N\) 在参数化下表达为 \((X_u \times X_v)/|X_u \times X_v|\), 这是光滑函数）, 所以有微分</p>
+
+<p>\[
+dN_p: T_p S \to T_{N(p)} S^2.
+\]</p>
+
+<p>具体来说, \(dN_p(v)\) 这样定义: 取 \(\gamma: (-\varepsilon, \varepsilon) \to S\), \(\gamma(0) = p, \gamma'(0) = v\). 复合 \(N \circ \gamma: (-\varepsilon, \varepsilon) \to S^2\) 是 \(S^2\) 上一条曲线, 它在 \(t = 0\) 的速度</p>
+
+<p>\[
+dN_p(v) := \frac{d}{dt}\bigg|_{t = 0} N(\gamma(t)) \in T_{N(p)} S^2.
+\]</p>
+
+<p>所以 \(dN_p(v)\) 是"<em>沿 \(v\) 方向走时, 法向量变化的速度</em>". 这就是"<em>曲面在 \(v\) 方向弯多少</em>" 的形式版本。</p>
+
+<p><strong>关键观察.</strong> \(T_{N(p)} S^2\) 是 \(\mathbb{R}^3\) 中的什么？\(S^2\) 在 \(N(p)\) 处的切平面 = 与 \(N(p)\) 垂直的 2 维子空间. 而 \(T_p S\) = 与 \(N(p)\) 垂直的 2 维子空间（因为 \(N(p)\) 是 \(T_p S\) 的法向量）. <em>它俩是同一个子空间</em>！</p>
+
+<p>所以 \(dN_p\) 自动有定义域 \(T_p S\)、像在 \(T_{N(p)} S^2 = T_p S\) 中, 我们可以把它<em>看成 \(T_p S\) 上的线性算子</em>:</p>
+
+<p>\[
+dN_p: T_p S \to T_p S.
+\]</p>
+
+<p>这是一个微妙但重要的"<em>记号合并</em>"。把目标和源看成同一个空间, 我们就可以问 \(dN_p\) 的特征值、特征向量、自伴性等线性代数问题。</p>
+
+<p><strong>定理 8.1（\(dN_p\) 自伴）.</strong> \(dN_p: T_p S \to T_p S\) 是自伴算子（关于 \(I_p\) 内积）, 即对所有 \(v, w \in T_p S\),</p>
+
+<p>\[
+\langle dN_p(v), w \rangle = \langle v, dN_p(w) \rangle.
+\]</p>
+
+<p><em>证明.</em> 取一张参数化 \(X(u, v)\), \(p = X(q_0)\). 自伴性等价于在基 \((X_u, X_v)\) 下证两件事:</p>
+
+<p>\[
+\langle dN(X_u), X_v \rangle = \langle X_u, dN(X_v) \rangle. \tag{*}
+\]</p>
+
+<p>（自伴性只需在<em>基向量对</em> 上验证, 双线性自动延拓.）</p>
+
+<p>注意 \(dN(X_u) = N_u\)（\(N\) 沿 \(u\) 方向的偏导, 因为 \(X_u\) 是 \(u\) 方向的"<em>基向量化</em>" 速度）. 同理 \(dN(X_v) = N_v\).</p>
+
+<p>所以 (*) 等价于 \(\langle N_u, X_v \rangle = \langle X_u, N_v \rangle\).</p>
+
+<p>关键事实: \(N\) 处处垂直于 \(X_u, X_v\), 即 \(\langle N, X_u \rangle = 0, \langle N, X_v \rangle = 0\). 对 \(\langle N, X_v \rangle = 0\) 关于 \(u\) 求偏导:</p>
+
+<p>\[
+\langle N_u, X_v \rangle + \langle N, X_{vu} \rangle = 0.
+\]</p>
+
+<p>所以 \(\langle N_u, X_v \rangle = -\langle N, X_{vu} \rangle\).</p>
+
+<p>同样, 对 \(\langle N, X_u \rangle = 0\) 关于 \(v\) 求偏导得</p>
+
+<p>\[
+\langle N_v, X_u \rangle = -\langle N, X_{uv} \rangle.
+\]</p>
+
+<p>用<em>混合二阶导对称</em>: \(X_{uv} = X_{vu}\)（\(X\) 是 \(C^\infty\)）. 所以 \(\langle N, X_{uv} \rangle = \langle N, X_{vu} \rangle\). 因此</p>
+
+<p>\[
+\langle N_u, X_v \rangle = -\langle N, X_{vu} \rangle = -\langle N, X_{uv} \rangle = \langle N_v, X_u \rangle.
+\]</p>
+
+<p>这正是 (*). \(\square\)</p>
+
+<p>请你停下来感受这个证明。最关键的一步是<em>混合偏导对称</em>——一个关于 \(C^\infty\) 函数的极朴素事实, 在这里给我们送出了 \(dN_p\) 的自伴性。这种"<em>用平凡的微积分事实推出深刻的几何事实</em>" 是微分几何的常态。</p>
+
+<p>"自伴" 这件事在线性代数里有立刻可用的推论: 自伴算子可<em>正交对角化</em>——存在一组正交基使矩阵对角。这是下一节的事。</p>
+
+<h2 id="sec8-5">8.5 \(dN_p\) 自伴 ⟹ 正交对角化</h2>
+
+<p><strong>定理 8.2.</strong> 设 \(A: V \to V\) 是有限维内积空间 \(V\) 上的自伴算子. 则存在一组<em>正交</em> 基 \((e_1, \ldots, e_n)\) 由 \(A\) 的特征向量组成, 对应特征值 \(\lambda_1, \ldots, \lambda_n\) 都是<em>实数</em>, 在这组基下 \(A\) 矩阵对角:</p>
+
+<p>\[
+[A] = \mathrm{diag}(\lambda_1, \ldots, \lambda_n).
+\]</p>
+
+<p>这是线性代数的<em>谱定理</em>——不是这本书的内容, 我们假定你熟。具体到我们的情况, \(V = T_p S\) 是 2 维, \(A = -dN_p\)（取负号是惯例, 下一节解释）, 特征值是 \(\kappa_1, \kappa_2\), 特征向量 \(e_1, e_2\) 是<em>正交</em> 的（在 \(I_p\) 下）单位向量.</p>
+
+<p>注意 \(dN_p\) 自伴在 \(T_p S\) 的<em>每个点</em> 都成立, 所以每个 \(p\) 都有自己的 \(\kappa_1(p), \kappa_2(p)\) 和正交主方向。这些数和方向是<em>逐点</em> 的曲面几何信息。</p>
+
+<h2 id="sec8-6">8.6 主曲率（取负号惯例）</h2>
+
+<p><strong>定义 8.2.</strong> 设 \(p \in S\), \(dN_p: T_p S \to T_p S\) 是 Gauss 映射的微分. <em>主曲率</em></p>
+
+<p>\[
+\kappa_1(p), \kappa_2(p) := -dN_p \text{ 的特征值}.
+\]</p>
+
+<p>"<em>取负号</em>" 这件事来自直觉。我们希望"<em>球面 Gauss 曲率</em> \(\kappa = 1/r\)" 是<em>正</em> 的, 不是负的。算一下球面: 上面 8.1 算 \(N(p) = p/r\), 所以 \(N(\gamma(t)) = \gamma(t) / r\), \(dN(v) = v/r\). \(dN_p\) 是<em>同位映射的 \(1/r\) 倍</em>. 它的特征值都是 \(1/r\)（任何向量都是特征向量）. 取负号, \(-dN_p\) 的特征值都是 \(-1/r\)。这给 \(\kappa = -1/r < 0\)？</p>
+
+<p>不对——我们要 \(\kappa > 0\). 问题在 <em>\(N\) 的方向</em>。我们选 \(N(p) = p/r\), 法向量<em>从球心向外指</em>（球面<em>外</em> 法）. 这选择下, 当向量沿曲面运动, 法向量"<em>跟着外侧</em>" 转, \(dN\) 与 \(I\) 同向, 所以"<em>取负号</em>" 让特征值还是 \(1/r > 0\)？</p>
+
+<p>更仔细: \(dN(v) = (1/r) v\), 所以 \(-dN(v) = -(1/r) v\), 特征值是 \(-1/r\). 这<em>不</em> 给我们想要的 \(+1/r\)。</p>
+
+<p>问题在<em>法向量约定</em>。如果选<em>内</em> 法 \(N = -p/r\)（向球心指）, 则 \(dN(v) = -(1/r) v\), \(-dN(v) = (1/r) v\), 特征值 \(1/r\)。这给我们想要的 \(\kappa_1 = \kappa_2 = 1/r > 0\)。</p>
+
+<p>所以"<em>取负号</em>" 加上"<em>选合适的法向量方向</em>" 一起让 \(\kappa\) 在球面上 \(> 0\)。</p>
+
+<p>正式说: <em>主曲率的符号</em> 依赖法向量约定。换 \(N \to -N\), \(dN \to -dN\), \(\kappa \to -\kappa\). 但<em>主曲率的乘积</em> \(K = \kappa_1 \kappa_2\)（Gauss 曲率, ch10）<em>不</em> 依赖法向量方向（两个 \(\kappa\) 都换符号, 乘积不变）. 这是为什么 Gauss 曲率"<em>客观</em>" 而主曲率"<em>有约定成分</em>"。</p>
+
+<p>本书统一约定: 选<em>外</em> 法（"指向凸侧"——球面指外、凸的圆柱外侧指外, 等等）。在这个约定下大部分熟悉曲面的主曲率为正（球面 \(1/r\)、圆柱凸方向 \(1/r\) 等）。<em>但这只是约定</em>; 后面具体公式不区分符号约定时会按上下文重选。</p>
+
+<p>正式定义重述, 取约定 \(N\) 的方向使球面主曲率 \(> 0\):</p>
+
+<p><strong>定义 8.2'.</strong> <em>主曲率</em> \(\kappa_1, \kappa_2\) 是 \(-dN_p\) 的两个实特征值（按惯例, \(\kappa_1 \geq \kappa_2\)）。</p>
+
+<h2 id="sec8-7">8.7 主方向</h2>
+
+<p>主曲率 \(\kappa_1, \kappa_2\) 各自对应一个特征空间。它们分别是 \(T_p S\) 中的<em>主方向</em> \(e_1, e_2\). 由谱定理它们正交。</p>
+
+<p>主方向的几何意义: 沿 \(e_i\) 方向走, 法向量变化最"<em>极端</em>"——\(\kappa_i\) 是法向量变化率的极值之一（最大或最小）. 后面 ch9 给法向曲率的精确版本: 沿任何方向 \(v\) 的"<em>法向曲率</em>" \(\kappa_n(v) = II(v, v) / I(v, v)\), 它的最大 = \(\kappa_1\), 最小 = \(\kappa_2\), 极值在 \(e_1, e_2\) 方向取到。</p>
+
+<p>主方向的<em>非唯一性</em> 出现在 \(\kappa_1 = \kappa_2\) 的点（叫<em>脐点</em>）. 此时 \(-dN_p\) 是常数倍恒等, 所有方向都是特征向量. 球面的每个点都是脐点（因为 \(\kappa_1 = \kappa_2 = 1/r\)）. 平面也每点脐（\(\kappa_1 = \kappa_2 = 0\)）. 椭球面（非球）只有 4 个脐点（一对长轴端 + 一对短轴端... 实际上椭球的脐点定理是一个有趣的整体结果）.</p>
+
+<h2 id="sec8-8">8.8 几个例子的主曲率</h2>
+
+<p><strong>例 1（球面 \(S^2_r\)）.</strong> 算过 \(dN(v) = (1/r) v\)（约定外法）, 取负号得 \(-dN(v) = -(1/r) v\). 特征值 \(-1/r\). 但我们要"<em>球面 \(\kappa > 0\)</em>", 所以正确约定是<em>内法</em> \(N = -p/r\). 此时</p>
+
+<p>\[
+\kappa_1 = \kappa_2 = \frac{1}{r}.
+\]</p>
+
+<p>所有方向都是主方向（脐点）。Gauss 曲率 \(K = \kappa_1 \kappa_2 = 1/r^2\). 平均曲率 \(H = (\kappa_1 + \kappa_2)/2 = 1/r\). ✓ 与 ch1 一致。</p>
+
+<p><strong>例 2（圆柱面 \(x^2 + y^2 = r^2\)）.</strong> 法向量 \(N(u, v) = (\cos u, \sin u, 0)\). 算 \(dN\):</p>
+
+<ul>
+  <li>沿 \(u\) 方向: \(N_u = (-\sin u, \cos u, 0)\). 同时 \(X_u = (-r \sin u, r \cos u, 0)\). 所以 \(N_u = X_u / r\), 即 \(dN(X_u) = N_u = (1/r) X_u\). 主方向 \(X_u\)（圆周方向）, 主值 \(1/r\), 取负号得 \(-1/r\). 但我们想 \(\kappa > 0\), 这又是法向量约定问题——选合适方向给 \(\kappa = 1/r > 0\).</li>
+  <li>沿 \(v\) 方向: \(N_v = (0, 0, 0) = 0\). 所以 \(dN(X_v) = 0\). 主方向 \(X_v\)（轴方向）, 主值 \(0\).</li>
+</ul>
+
+<p>所以圆柱面在每点的主曲率是</p>
+
+<p>\[
+\kappa_1 = \frac{1}{r}, \quad \kappa_2 = 0.
+\]</p>
+
+<p>主方向: \(\kappa_1\) 方向是<em>圆周</em>（\(X_u\) 方向）, \(\kappa_2 = 0\) 方向是<em>母线</em>（\(X_v\) 方向）. 几何上完全直觉: 沿圆周走"<em>看见弯</em>" 程度 \(1/r\), 沿轴走"<em>看见弯</em>" 程度 \(0\)（直线）.</p>
+
+<p>Gauss 曲率 \(K = (1/r) \cdot 0 = 0\). 圆柱"<em>有平面的内蕴几何</em>"——这就是 ch1 + ch7 反复说的"<em>纸卷成圆柱</em>" 的形式背景。</p>
+
+<p>平均曲率 \(H = (1/r + 0) / 2 = 1/(2r)\). 不为零. 圆柱不是极小曲面（极小曲面 \(H \equiv 0\), 见 ch19）.</p>
+
+<p><strong>例 3（鞍面 \(z = x^2 - y^2\)）.</strong> 这个例子完整算需要 ch9 的第二基本形式, 这里给出结果, 算具体细节留到 ch9.5.</p>
+
+<p>原点 \((0, 0, 0)\) 处:</p>
+
+<p>\[
+\kappa_1 = 2 \text{（沿 \(x\) 方向）}, \quad \kappa_2 = -2 \text{（沿 \(y\) 方向）}.
+\]</p>
+
+<p>沿 \(x\) 方向 \(z = x^2\), 凸（\(\kappa > 0\)）; 沿 \(y\) 方向 \(z = -y^2\), 凹（\(\kappa < 0\)）. 两数<em>异号</em>, Gauss 曲率 \(K = -4 < 0\). 这是 ch1 说的"<em>双曲型</em>" 局部形状的鼻祖。</p>
+
+<p>请你停下来比较三例的"<em>主曲率组合</em>":</p>
+
+<ul>
+  <li>球面: \((1/r, 1/r)\), <em>同号同值</em>. 两方向都凸, "<em>各向同性正弯</em>"。</li>
+  <li>圆柱: \((1/r, 0)\), <em>一正一零</em>. 一向弯一向直, "<em>各向异性</em>"。</li>
+  <li>鞍面: \((+, -)\), <em>异号</em>. 两方向异向弯, "<em>双曲型</em>"。</li>
+</ul>
+
+<p>这三例正好对应 \(K > 0, K = 0, K < 0\) 三种局部形状（ch1.3 介绍, ch9.8 形式化）。</p>
+
+<h2 id="sec8-9">8.9 临别话</h2>
+
+<p>这一章建立了三件事:</p>
+
+<ol>
+  <li><em>Gauss 映射</em> \(N: S \to S^2\)——把每个曲面点映到它的单位法向量.</li>
+  <li><em>\(dN_p\)</em> 是 \(T_p S\) 上的自伴算子（关键证明用混合二阶导对称）.</li>
+  <li><em>主曲率</em> \(\kappa_1, \kappa_2\) 是 \(-dN_p\) 的特征值, 主方向是它们的特征方向, 在 \(I_p\) 下正交.</li>
+</ol>
+
+<p>球面 / 圆柱 / 鞍面三例的主曲率分别 \((1/r, 1/r), (1/r, 0), (+, -)\), 完美对应 ch1 的"<em>三类</em>"。</p>
+
+<p>但 \(dN_p\) 是个抽象算子, 用它直接算曲率有点别扭。下一章我们把 \(dN_p\) 通过双线性形式表达——这就是<em>第二基本形式</em> \(II_p(v, w) = -\langle dN_p(v), w \rangle\). 用它和第一基本形式 \(I_p\) 一起, 主曲率会变成<em>广义特征值问题</em> \(\det(II - \kappa I) = 0\), 计算上特别可操作。这一对 \((I, II)\) 之后会成为曲面几何的"<em>一对眼睛</em>"——\(I\) 看内蕴, \(II\) 看外蕴。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 第一基本形式</a><a href="ch9.html">下一章 · 第 9 章 第二基本形式 →</a></nav>
+</main>
+</body>
+</html>

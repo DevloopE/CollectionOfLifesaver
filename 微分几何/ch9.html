@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 第二基本形式与主曲率 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 Gauss 映射</a><a href="ch10.html">下一章 · 第 10 章 Gauss 与平均曲率 →</a></nav>
+<h1 id="ch9">第 9 章 第二基本形式与主曲率</h1>
+
+<p>上一章的关键事实是: \(dN_p: T_p S \to T_p S\) 是<em>自伴</em> 算子, 它的特征值（取负号）是<em>主曲率</em> \(\kappa_1, \kappa_2\)。但 \(dN_p\) 是个算子, 直接算它的特征值要先把它的矩阵在某组基下写出来——而那组基往往不是正交的（参数化基 \((X_u, X_v)\) 一般不正交）, 标准特征值算法用起来不直接。</p>
+
+<p>这一章把 \(dN_p\) 转化为<em>双线性形式</em>——叫<em>第二基本形式</em>:</p>
+
+<p>\[
+II_p(v, w) := -\langle dN_p(v), w \rangle.
+\]</p>
+
+<p>"<em>双线性形式</em>" 这种描述特别匹配第一基本形式 \(I_p(v, w) = \langle v, w \rangle\)——两个对称双线性形式并排, \((I, II)\) 成为"<em>曲面的一对眼睛</em>"。主曲率从这对形式的<em>广义特征值问题</em> \(\det(II - \kappa I) = 0\) 算出。</p>
+
+<p>这一章把"<em>曲面 \(p\) 处的局部形状</em>" 完整公式化, 给出 \(K > 0\) 椭圆 / \(K = 0\) 抛物 / \(K < 0\) 双曲三种局部分类。</p>
+
+<h2 id="sec9-1">9.1 第二基本形式的定义</h2>
+
+<p><strong>定义 9.1.</strong> 设 \(p \in S\). <em>第二基本形式</em></p>
+
+<p>\[
+II_p(v, w) := -\langle dN_p(v), w \rangle, \quad v, w \in T_p S.
+\]</p>
+
+<p>这里 \(\langle \cdot, \cdot \rangle\) 是 \(\mathbb{R}^3\) 内积（即 \(I_p\)）.</p>
+
+<p>它的性质:</p>
+
+<ul>
+  <li><em>对称</em>: \(II_p(v, w) = II_p(w, v)\) 因为 \(dN_p\) 自伴. 验: \(II(v, w) = -\langle dN(v), w \rangle = -\langle v, dN(w) \rangle = -\langle dN(w), v \rangle = II(w, v)\). ✓</li>
+  <li><em>双线性</em>: \(dN_p\) 线性, \(\langle \cdot, \cdot \rangle\) 双线性, 所以 \(II_p\) 双线性。</li>
+  <li><em>不</em> 一定正定: 这是与 \(I_p\) 的关键区别. 鞍面 \(II\) 既能是正也能是负值, 不限定号.</li>
+</ul>
+
+<p>所以 \(II_p\) 是 \(T_p S\) 上的<em>对称双线性形式</em>（不一定正定）。它有自己的矩阵, 它的"<em>定号性</em>" 决定了曲面在 \(p\) 处的局部形状（9.8）.</p>
+
+<h2 id="sec9-2">9.2 几何含义：法向曲率</h2>
+
+<p>纯抽象地写出 \(II = -\langle dN, \cdot \rangle\) 不显然有几何意义. 这一节给它一个"<em>看得见</em>" 的解释。</p>
+
+<p>取曲面 \(S\) 上一条曲线 \(\gamma\), 它<em>过 \(p\)</em>, 切向量 \(\gamma'(0) = v\). 看 \(\gamma\) 的<em>第二导数</em> \(\gamma''(0) \in \mathbb{R}^3\). 这个二阶向量描述 \(\gamma\) 在 \(p\) 处<em>怎么弯</em>。把它正交分解为<em>切分量 + 法分量</em>:</p>
+
+<p>\[
+\gamma''(0) = \underbrace{(\gamma''(0))^{\top}}_{\in T_p S} + \underbrace{(\gamma''(0))^{\bot}}_{\parallel N(p)}.
+\]</p>
+
+<p>切分量与曲面在 \(p\) 处<em>"沿 \(v\) 走时切空间转动"</em> 有关, 其实是<em>测地曲率</em>（ch13）。法分量与曲面"<em>沿 \(v\) 弯多少</em>" 有关, 叫<em>法向曲率</em>。</p>
+
+<p><strong>定义 9.2.</strong> 设 \(\gamma: I \to S\) 是<em>弧长参数化</em>（\(|\gamma'| \equiv 1\)）, \(\gamma(0) = p, \gamma'(0) = v\)（\(|v| = 1\)）. <em>法向曲率</em></p>
+
+<p>\[
+\kappa_n(v) := \langle \gamma''(0), N(p) \rangle.
+\]</p>
+
+<p>意思: \(\gamma''(0)\) 在法方向上的<em>分量长度</em>。它<em>有符号</em>: 如果 \(\gamma\) 在 \(p\) 处"<em>弯向 \(N\) 同侧</em>" \(\kappa_n > 0\), "<em>弯向 \(-N\) 那侧</em>" \(\kappa_n < 0\).</p>
+
+<p><strong>定理 9.1（核心几何含义）.</strong> 设 \(v \in T_p S\), \(|v|\) 任意. 则</p>
+
+<p>\[
+II_p(v, v) = \kappa_n(v) \cdot |v|^2,
+\]</p>
+
+<p>即 \(\kappa_n(v) = II_p(v, v) / I_p(v, v)\). 特别 \(\kappa_n\) 只<em>依赖切方向 \(v\)</em>（不依赖具体曲线 \(\gamma\)）.</p>
+
+<p><em>证明.</em> 取 \(\gamma\) 是任意过 \(p\) 切向量 \(v\) 的曲面上曲线（不必弧长）, \(\gamma(0) = p, \gamma'(0) = v\). 因为 \(\gamma\) 在曲面上, \(\gamma'(t) \in T_{\gamma(t)} S\), 与 \(N(\gamma(t))\) 垂直. 即恒等式</p>
+
+<p>\[
+\langle \gamma'(t), N(\gamma(t)) \rangle \equiv 0.
+\]</p>
+
+<p>对 \(t\) 求导:</p>
+
+<p>\[
+\langle \gamma''(t), N(\gamma(t)) \rangle + \langle \gamma'(t), \frac{d}{dt} N(\gamma(t)) \rangle = 0.
+\]</p>
+
+<p>取 \(t = 0\):</p>
+
+<p>\[
+\langle \gamma''(0), N(p) \rangle = -\langle \gamma'(0), dN_p(\gamma'(0)) \rangle = -\langle v, dN_p(v) \rangle = II_p(v, v).
+\]</p>
+
+<p>所以 \(II_p(v, v) = \langle \gamma''(0), N(p) \rangle\). 当 \(\gamma\) 是弧长参数化, 这正是 \(\kappa_n(v)\). 一般情况, \(\langle \gamma''(0), N(p) \rangle = \kappa_n(\hat v) \cdot |v|^2\)（这里 \(\hat v = v / |v|\)）, 因为<em>法向曲率只依赖单位切方向</em>（具体二阶展开告诉你前面有 \(|v|^2\) 因子, 略验）. \(\square\)</p>
+
+<p>请你停下来感受这件事: \(II_p(v, v)\) 看似抽象的双线性形式自值, <em>等于</em> 沿 \(v\) 方向"<em>曲面弯多少</em>" 的几何量。任何过 \(p\) 沿 \(v\) 的曲面曲线, \(\gamma''\) 在 \(N\) 方向的分量都<em>一样</em>——这分量只看曲面 + 切方向, 不看具体曲线。这种"<em>不同曲线给同一答案</em>" 是 \(II_p\) 是良定义几何对象的证据。</p>
+
+<h2 id="sec9-3">9.3 矩阵表示</h2>
+
+<p>取参数化 \(X(u, v)\), \(p = X(q)\). \(T_p S\) 基 \((X_u, X_v)\). 第二基本形式矩阵元素:</p>
+
+<p>\[
+L := II(X_u, X_u) = -\langle dN(X_u), X_u \rangle = -\langle N_u, X_u \rangle.
+\]</p>
+
+<p>\(\langle N, X_u \rangle = 0\) 求 \(u\) 偏导得 \(\langle N_u, X_u \rangle + \langle N, X_{uu} \rangle = 0\), 所以</p>
+
+<p>\[
+L = \langle N, X_{uu} \rangle.
+\]</p>
+
+<p>同理</p>
+
+<p>\[
+M := II(X_u, X_v) = \langle N, X_{uv} \rangle, \quad N := II(X_v, X_v) = \langle N, X_{vv} \rangle.
+\]</p>
+
+<p>(<em>注意符号冲突</em>: 字母 \(N\) 既用作法向量 \(N\) 又用作矩阵元素 \(N = II(X_v, X_v)\). 这是经典记号——上下文区分. 一些书用 \(e, f, g\) 替代 \(L, M, N\) 避免混淆; 我们这里跟 do Carmo 的传统用 \(L, M, N\), 注意从字体辨别.)</p>
+
+<p>所以第二基本形式矩阵</p>
+
+<p>\[
+\boxed{\ [II] = \begin{pmatrix} L & M \\ M & N \end{pmatrix}, \quad L = \langle X_{uu}, \mathbf{N} \rangle, M = \langle X_{uv}, \mathbf{N} \rangle, N = \langle X_{vv}, \mathbf{N} \rangle.\ }
+\]</p>
+
+<p>（\(\mathbf{N}\) 加粗代表法向量, 区分矩阵元素 \(N\)）.</p>
+
+<p>第二基本形式有<em>两种</em> 等价计算法:</p>
+
+<ol>
+  <li><em>用法向量偏导</em>: \(L = -\langle N_u, X_u \rangle\), 等等。</li>
+  <li><em>用参数化二阶偏导</em>: \(L = \langle X_{uu}, \mathbf{N} \rangle\), 等等。</li>
+</ol>
+
+<p>第二种实践中常用——你只需要算 \(X\) 的二阶偏导（容易）和 \(\mathbf{N}\)（叉积归一化, 也容易）, 不需要算 \(N\) 的偏导. 后面例题用第二种.</p>
+
+<h2 id="sec9-4">9.4 主曲率从 \((I, II)\) 算: 广义特征值问题</h2>
+
+<p>主曲率 = \(-dN_p\) 的特征值. \(dN_p\) 在基 \((X_u, X_v)\) 下的矩阵 \([dN]\) 满足: 对任意 \(v, w \in T_p S\),</p>
+
+<p>\[
+\langle dN(v), w \rangle = -II(v, w).
+\]</p>
+
+<p>用矩阵: \(v = (a, b)^T, w = (c, d)^T\), \(I\) 矩阵 \([I], II\) 矩阵 \([II]\), \(dN\) 矩阵 \([dN]\). 则 \(\langle dN(v), w \rangle\) 在 \(I\) 下表示为 \(([I][dN]v)^T \cdot \text{...}\)... 让我们更小心些.</p>
+
+<p>注意 \(\langle dN(v), w \rangle = (dN(v))^T [I] w\)（因为内积矩阵就是 \([I]\)）. 这等于 \(([dN] v)^T [I] w = v^T [dN]^T [I] w\). 而 \(II(v, w) = v^T [II] w\). 等式 \(\langle dN(v), w \rangle = -II(v, w)\) 给</p>
+
+<p>\[
+[dN]^T [I] = -[II], \quad \text{即} \quad [dN] = -[I]^{-1} [II].
+\]</p>
+
+<p>（用了 \([I]\) 对称, \([II]\) 对称, \([dN]\) 在自伴下满足 \([I][dN] = [dN]^T [I]\), 即 \([I][dN]\) 对称——这对应 \(dN\) 自伴的"<em>矩阵版</em>"。这里我们写的形式是 \([dN] = -[I]^{-1}[II]\), 注意它<em>不一定</em> 自身对称, 只是它<em>关于 \(I\) 加权的版本</em> 对称. 这是参数化基非正交时的现象——当 \(I = \mathrm{Id}\), 即基正交且单位时, \([dN] = -[II]\) 直接对称.）</p>
+
+<p>主曲率 \(\kappa\) 是 \(-[dN]\) 的特征值. \(-[dN] = [I]^{-1}[II]\). 所以 \(\kappa\) 满足 \([I]^{-1}[II] v = \kappa v\), 即</p>
+
+<p>\[
+[II] v = \kappa [I] v \quad \Longleftrightarrow \quad \det([II] - \kappa [I]) = 0.
+\]</p>
+
+<p>这是<em>广义特征值问题</em>! 跟标准特征值（\(\det(A - \lambda I) = 0\)）不同, 这里 \(I\) 不是单位阵, 而是第一基本形式矩阵.</p>
+
+<p>具体写出 2×2 行列式:</p>
+
+<p>\[
+\det \begin{pmatrix} L - \kappa E & M - \kappa F \\ M - \kappa F & N - \kappa G \end{pmatrix} = 0.
+\]</p>
+
+<p>展开:</p>
+
+<p>\[
+(L - \kappa E)(N - \kappa G) - (M - \kappa F)^2 = 0,
+\]</p>
+
+<p>\[
+LN - \kappa(LG + EN) + \kappa^2 EG - M^2 + 2 \kappa MF - \kappa^2 F^2 = 0,
+\]</p>
+
+<p>\[
+\boxed{\ (EG - F^2) \kappa^2 - (EN + GL - 2 FM) \kappa + (LN - M^2) = 0.\ }
+\]</p>
+
+<p>这是 \(\kappa\) 的二次方程, 两根就是 \(\kappa_1, \kappa_2\). Vieta 公式:</p>
+
+<p>\[
+\kappa_1 + \kappa_2 = \frac{EN + GL - 2FM}{EG - F^2}, \quad \kappa_1 \kappa_2 = \frac{LN - M^2}{EG - F^2}.
+\]</p>
+
+<p>第一个除以 2 是<em>平均曲率</em> \(H\), 第二个就是<em>Gauss 曲率</em> \(K\)（ch10 的事）:</p>
+
+<p>\[
+H = \frac{EN + GL - 2FM}{2(EG - F^2)}, \quad K = \frac{LN - M^2}{EG - F^2}.
+\]</p>
+
+<p>这些公式让你<em>不</em> 需要先算特征向量, 直接从 \([I], [II]\) 矩阵元素得到 \(K, H\). 计算特别可操作。</p>
+
+<h2 id="sec9-5">9.5 例子: 球面 / 圆柱 / 鞍面</h2>
+
+<p>现在把 ch7 算过的 \([I]\) 配上算 \([II]\), 解出主曲率, 得到完整曲率信息。</p>
+
+<p><strong>例 1（球面 \(S^2_r\)）.</strong> 参数化 \(X(\theta, \varphi) = (r \sin \theta \cos \varphi, r \sin \theta \sin \varphi, r \cos \theta)\). 法向量 \(\mathbf{N} = -X/r = -(\sin \theta \cos \varphi, \sin \theta \sin \varphi, \cos \theta)\)（取内法约定使 \(\kappa > 0\)）.</p>
+
+<p>二阶偏导:</p>
+
+<p>\[
+X_{\theta\theta} = -r (\sin \theta \cos \varphi, \sin \theta \sin \varphi, \cos \theta) = -X,
+\]
+\[
+X_{\theta \varphi} = r (-\cos \theta \sin \varphi, \cos \theta \cos \varphi, 0),
+\]
+\[
+X_{\varphi\varphi} = -r (\sin \theta \cos \varphi, \sin \theta \sin \varphi, 0) = (-X_x, -X_y, 0).
+\]</p>
+
+<p>算:</p>
+
+<p>\(L = \langle X_{\theta\theta}, \mathbf{N} \rangle = \langle -X, -X/r \rangle = |X|^2 / r = r^2 / r = r\).</p>
+
+<p>\(M = \langle X_{\theta\varphi}, \mathbf{N} \rangle\). 内积是 \(-r \cdot 1/r \cdot (\text{两项乘积})\), 算下来零（因为 \(X_{\theta\varphi}\) 与 \(X\) 正交项相消）. 具体: \(X_{\theta\varphi} \cdot X = r(-\cos \theta \sin \varphi)(r \sin \theta \cos \varphi) + r(\cos \theta \cos \varphi)(r \sin \theta \sin \varphi) + 0 = r^2 \cos \theta \sin \theta(-\sin \varphi \cos \varphi + \cos \varphi \sin \varphi) = 0\). 所以 \(M = 0\).</p>
+
+<p>\(N = \langle X_{\varphi\varphi}, \mathbf{N} \rangle = -r \langle (\sin \theta \cos \varphi, \sin \theta \sin \varphi, 0), -1/r (\sin \theta \cos \varphi, \sin \theta \sin \varphi, \cos \theta) \rangle\). 内积 \(= -r \cdot (-1/r) \cdot (\sin^2 \theta \cos^2 \varphi + \sin^2 \theta \sin^2 \varphi + 0) = \sin^2 \theta\). 所以 \(N = r \sin^2 \theta\).</p>
+
+<p>等等, 让我重做。\(\mathbf{N} = -(1/r) X\). \(\langle X_{\varphi\varphi}, \mathbf{N} \rangle = -(1/r) \langle X_{\varphi\varphi}, X \rangle\). \(\langle X_{\varphi\varphi}, X \rangle = r \cdot (-r \sin^2 \theta) (\cos^2 \varphi + \sin^2 \varphi) + 0 = -r^2 \sin^2 \theta\). 所以 \(N = -(1/r)(-r^2 \sin^2 \theta) = r \sin^2 \theta\). ✓</p>
+
+<p>所以</p>
+
+<p>\[
+[II] = \begin{pmatrix} r & 0 \\ 0 & r \sin^2 \theta \end{pmatrix}, \quad [I] = \begin{pmatrix} r^2 & 0 \\ 0 & r^2 \sin^2 \theta \end{pmatrix}.
+\]</p>
+
+<p>很美的关系: \([II] = (1/r) [I]\). 即 \([II] - \kappa [I] = ((1/r) - \kappa)[I]\), 行列式零 ⟺ \(\kappa = 1/r\)（重根）. 所以 \(\kappa_1 = \kappa_2 = 1/r\). ✓ 与 ch8 一致, 与 ch1 一致。</p>
+
+<p>\(K = \kappa_1 \kappa_2 = 1/r^2\), \(H = (\kappa_1 + \kappa_2)/2 = 1/r\). 球面是处处脐点的曲面.</p>
+
+<p><strong>例 2（圆柱面）.</strong> 参数化 \(X(u, v) = (r \cos u, r \sin u, v)\). 法向量约定 \(\mathbf{N} = -(\cos u, \sin u, 0)\)（内法）.</p>
+
+<p>二阶偏导:</p>
+
+<p>\[
+X_{uu} = (-r \cos u, -r \sin u, 0), \quad X_{uv} = (0, 0, 0), \quad X_{vv} = (0, 0, 0).
+\]</p>
+
+<p>\(L = \langle X_{uu}, \mathbf{N} \rangle = \langle (-r \cos u, -r \sin u, 0), -(\cos u, \sin u, 0) \rangle = r \cos^2 u + r \sin^2 u = r\).</p>
+
+<p>\(M = 0, N = 0\). 所以</p>
+
+<p>\[
+[II] = \begin{pmatrix} r & 0 \\ 0 & 0 \end{pmatrix}, \quad [I] = \begin{pmatrix} r^2 & 0 \\ 0 & 1 \end{pmatrix}.
+\]</p>
+
+<p>广义特征值问题: \(\det([II] - \kappa [I]) = (r - \kappa r^2)(0 - \kappa) - 0 = \kappa(\kappa r^2 - r) = 0\). 解 \(\kappa = 0\) 或 \(\kappa = 1/r\). 所以</p>
+
+<p>\[
+\kappa_1 = 1/r, \quad \kappa_2 = 0.
+\]</p>
+
+<p>主方向: \(\kappa_1 = 1/r\) 对应 \(X_u\) 方向（圆周）, \(\kappa_2 = 0\) 对应 \(X_v\) 方向（轴）. ✓ 与 ch1, ch8 一致。</p>
+
+<p>\(K = 0, H = 1/(2r)\).</p>
+
+<p><strong>例 3（鞍面 \(z = x^2 - y^2\)）.</strong> 参数化 \(X(u, v) = (u, v, u^2 - v^2)\). 一阶偏导: \(X_u = (1, 0, 2u), X_v = (0, 1, -2v)\). \(X_u \times X_v = (-2u, 2v, 1)\). 模长 \(\sqrt{4u^2 + 4v^2 + 1}\).</p>
+
+<p>取<em>原点</em> \(p = (0, 0, 0)\) 处算（即 \(u = v = 0\)）. 那里 \(X_u = (1, 0, 0), X_v = (0, 1, 0)\), \(X_u \times X_v = (0, 0, 1)\), \(\mathbf{N} = (0, 0, 1)\)（在原点向上指）. 这选 \(\mathbf{N}\) 是<em>外法</em>（向凸侧, 但鞍面没"凸侧", 这里就当算下来的方向）.</p>
+
+<p>第一基本形式（原点）: \(E = 1, F = 0, G = 1\), \([I] = I_{2\times 2}\)（单位阵）.</p>
+
+<p>二阶偏导: \(X_{uu} = (0, 0, 2), X_{uv} = (0, 0, 0), X_{vv} = (0, 0, -2)\). 在原点:</p>
+
+<p>\(L = \langle X_{uu}, \mathbf{N} \rangle = \langle (0, 0, 2), (0, 0, 1) \rangle = 2\).</p>
+
+<p>\(M = 0, N = -2\). 所以</p>
+
+<p>\[
+[II](\text{原点}) = \begin{pmatrix} 2 & 0 \\ 0 & -2 \end{pmatrix}.
+\]</p>
+
+<p>广义特征值: \([I]\) 是单位, 退化成标准特征值. \([II]\) 的特征值就是对角元 \(2, -2\)（已经对角）.</p>
+
+<p>\[
+\kappa_1 = 2, \quad \kappa_2 = -2.
+\]</p>
+
+<p>主方向: \(\kappa_1 = 2\) 沿 \(x\) 轴（即 \(X_u\)）, \(\kappa_2 = -2\) 沿 \(y\) 轴（即 \(X_v\)）. ✓ 与 ch1, ch8 一致。</p>
+
+<p>\(K = -4 < 0\)（双曲）, \(H = 0\)（鞍面在原点是<em>极小</em>!——更广地, \(z = x^2 - y^2\) 是<em>处处</em> 极小的, ch19 会算）。</p>
+
+<p>三个例子都给完整曲率信息, 与前面的预期一致。</p>
+
+<h2 id="sec9-6">9.6 法向曲率公式 + Euler 公式</h2>
+
+<p>法向曲率 \(\kappa_n(v) = II(v, v) / I(v, v)\)（9.2 + 9.3）. 在主方向基 \(e_1, e_2\) 下展开 \(v = \cos \theta \cdot e_1 + \sin \theta \cdot e_2\)（\(|v| = 1\)）, \(II\) 在主方向基下对角（因为主方向是 \(II\) 与 \(I\) 同时对角化的方向, 或者说 \(II\) 在 \(e_i\) 上的特征值是 \(\kappa_i\)）, 矩阵 \(\mathrm{diag}(\kappa_1, \kappa_2)\). \(I\) 在主方向单位正交基下也是单位阵. 所以</p>
+
+<p>\[
+\kappa_n(v) = II(v, v) = \kappa_1 \cos^2 \theta + \kappa_2 \sin^2 \theta.
+\]</p>
+
+<p>这就是<em>Euler 公式</em>:</p>
+
+<p>\[
+\boxed{\ \kappa_n(\theta) = \kappa_1 \cos^2 \theta + \kappa_2 \sin^2 \theta.\ }
+\]</p>
+
+<p>它告诉你: 任意方向的法向曲率是<em>主曲率的凸组合</em>（系数 \(\cos^2, \sin^2\) 都 \(\in [0, 1]\), 加起来 1）。所以</p>
+
+<ul>
+  <li>\(\kappa_n\) 的<em>最大值</em> 是 \(\kappa_1\)（在 \(\theta = 0\) 即 \(e_1\) 方向取到）.</li>
+  <li>\(\kappa_n\) 的<em>最小值</em> 是 \(\kappa_2\)（在 \(\theta = \pi/2\) 即 \(e_2\) 方向取到）.</li>
+  <li>主方向是 \(\kappa_n(\theta)\) 的极值方向。这是"<em>主</em> 曲率" 的"<em>主</em>" 字的来源。</li>
+</ul>
+
+<p>验证: 球面 \(\kappa_1 = \kappa_2 = 1/r\), Euler 公式 \(\kappa_n = (1/r) \cos^2 \theta + (1/r) \sin^2 \theta = 1/r\). 所有方向 \(\kappa_n = 1/r\), 各向同性。✓</p>
+
+<p>圆柱 \(\kappa_1 = 1/r, \kappa_2 = 0\), Euler: \(\kappa_n(\theta) = (1/r) \cos^2 \theta\). 沿 \(\theta = 0\)（圆周）\(\kappa_n = 1/r\); 沿 \(\theta = \pi/2\)（轴）\(\kappa_n = 0\); 中间斜方向（如 \(\theta = \pi/4\)）\(\kappa_n = 1/(2r)\)。</p>
+
+<p>鞍面 \(\kappa_1 = 2, \kappa_2 = -2\), Euler: \(\kappa_n(\theta) = 2 \cos^2 \theta - 2 \sin^2 \theta = 2 \cos(2\theta)\). 沿 \(\theta = 0\) \(\kappa_n = 2\); 沿 \(\pi/2\) \(\kappa_n = -2\); 沿 \(\pi/4\) \(\kappa_n = 0\). 这给出鞍面的"<em>渐近方向</em>" (下一节)。</p>
+
+<h2 id="sec9-7">9.7 渐近方向 + 共轭方向</h2>
+
+<p><strong>定义 9.3.</strong> 切向量 \(v \in T_p S\), \(v \neq 0\), 叫<em>渐近方向</em> 如果 \(\kappa_n(v) = 0\), 即 \(II(v, v) = 0\).</p>
+
+<p>几何上, 沿渐近方向走的曲面曲线 \(\gamma\) 满足 \(\gamma''(0) \perp N(p)\), 即<em>二阶向量在切平面内</em>, 没有"<em>沿法方向弯</em>"。直觉上, 这是曲面在该方向"<em>最直</em>" 的方向。</p>
+
+<p>什么时候曲面有渐近方向？\(II(v, v) = 0\) 是 \(v = a e_1 + b e_2\) 满足 \(\kappa_1 a^2 + \kappa_2 b^2 = 0\). 这要求 \(\kappa_1, \kappa_2\) <em>异号</em>（或都为零）。所以:</p>
+
+<ul>
+  <li>\(K > 0\)（\(\kappa_1, \kappa_2\) 同号同号）: <em>没有</em> 渐近方向。</li>
+  <li>\(K = 0, \kappa_1 \neq 0, \kappa_2 = 0\)（圆柱型）: 渐近方向<em>唯一</em>, 即 \(e_2\) 方向（\(\kappa_2 = 0\)）.</li>
+  <li>\(K < 0\): 渐近方向<em>两条</em>, 对称分布在主方向之间。鞍面（\(\kappa_1 = 2, \kappa_2 = -2\)）的渐近方向: \(2 a^2 - 2 b^2 = 0\) ⟺ \(a = \pm b\), 即 \(\theta = \pm \pi / 4\)。</li>
+</ul>
+
+<p><strong>共轭方向.</strong> 一对方向 \(v, w \in T_p S\) 叫<em>共轭</em> 如果 \(II_p(v, w) = 0\). 主方向<em>互</em> 共轭（因为 \(II\) 在主方向基下对角, 非对角元 \(M = 0\)）. 渐近方向<em>自</em> 共轭（\(II(v, v) = 0\)）.</p>
+
+<p>共轭方向出现在 ch10 末尾的"<em>椭圆/双曲分类</em>", 也是 ch12 微分形式与曲率结构的桥梁。这一节先建立概念, 后面用。</p>
+
+<h2 id="sec9-8">9.8 应用: 曲面在 \(p\) 处的局部形状</h2>
+
+<p>把 \(K = \kappa_1 \kappa_2\) 的符号当成"<em>局部形状分类器</em>":</p>
+
+<p><strong>\(K(p) > 0\)（椭圆点）.</strong> \(\kappa_1, \kappa_2\) 同号. 由 Euler 公式 \(\kappa_n(\theta) = \kappa_1 \cos^2 \theta + \kappa_2 \sin^2 \theta\) 总是同号（同 \(\kappa_1\)）. 所以<em>所有方向</em> 法向曲率同号——曲面在 \(p\) 处<em>位于切平面同一侧</em>（一个小邻域内）. 几何上, 曲面"<em>像椭球</em>"——光滑凸（或光滑凹）。</p>
+
+<p><em>例</em>: 球面、椭球（处处）、环面外侧。</p>
+
+<p><strong>\(K(p) = 0\)（抛物点）.</strong> \(\kappa_1 \neq 0, \kappa_2 = 0\)（或反过来）. 沿 \(\kappa_1\) 方向曲面弯, 沿 \(\kappa_2\) 方向直. 这种点曲面"<em>像圆柱</em>"——一个方向有曲率, 另一个方向是直线方向。</p>
+
+<p><em>例</em>: 圆柱（处处）、平面（处处, \(\kappa_1 = \kappa_2 = 0\)）、环面顶 / 底圈（\(\cos t = 0\) 处）.</p>
+
+<p><strong>\(K(p) < 0\)（双曲点）.</strong> \(\kappa_1 > 0 > \kappa_2\). 沿 \(\kappa_1\) 方向曲面"<em>向 \(N\) 同侧弯</em>", 沿 \(\kappa_2\) 方向"<em>向 \(-N\) 那侧弯</em>"。曲面在 \(p\) 处<em>切平面两侧都有曲面</em>——切平面"<em>穿过</em>" 曲面。几何上"<em>像鞍</em>"——双曲抛物面 \(z = x^2 - y^2\) 是经典代表。</p>
+
+<p><em>例</em>: 鞍面（处处）、环面内侧、单叶双曲面.</p>
+
+<p>这种"<em>逐点分类</em>" 是 ch1 引论里"<em>三类曲面</em>" 直觉的形式版。同一个曲面可以在不同点是不同类型——环面是经典例: 外侧 \(K > 0\)（椭圆）, 内侧 \(K < 0\)（双曲）, 顶 / 底圈 \(K = 0\)（抛物）, 三种点齐全。</p>
+
+<p>请你停下来想环面的曲率分布。环面是平面的"<em>双闭圈</em>"（一个圆绕轴转）, 它的几何:</p>
+
+<ul>
+  <li>外赤道（最远离 \(z\) 轴的圆周）: 两方向都<em>向内弯</em>, 都<em>正</em> 法曲率, \(K > 0\), 椭圆。</li>
+  <li>内赤道（最贴近 \(z\) 轴的圆周）: 一方向（沿小圆）<em>向内弯</em>（\(\kappa > 0\)）, 另一方向（沿大圆）<em>向外弯</em>（\(\kappa < 0\), 因为内圈周长比外圈短, 整体曲面"<em>凹陷</em>" 在内侧）, 异号, \(K < 0\), 双曲。</li>
+  <li>顶圈 / 底圈（\(\cos t = 0\)）: 沿小圆方向 \(\kappa = 1/r\), 沿大圆方向<em>瞬时</em> 切于<em>水平</em>, \(\kappa = 0\)（这条圆周本身是平面圆, 但在这点切平面与水平面相切, 第一阶贡献为零）, \(K = 0\), 抛物。</li>
+</ul>
+
+<p>这种"<em>同一曲面三种点</em>" 的混合图景, 是 ch16 Gauss-Bonnet 那条美丽公式 \(\int_M K \, dA = 2 \pi \chi(M)\) 的预演——环面的 Euler 示性数 \(\chi = 0\), 所以 \(\int K \, dA = 0\)（外侧正贡献和内侧负贡献严格抵消）.</p>
+
+<h2 id="sec9-9">9.9 临别话</h2>
+
+<p>这一章建立第二基本形式 \(II_p(v, w) = -\langle dN_p(v), w \rangle\), 它和第一基本形式 \(I_p\) 一起是"<em>曲面的一对眼睛</em>":</p>
+
+<ul>
+  <li>\(I\) 看<em>内蕴</em>: 长度、角度、面积。</li>
+  <li>\(II\) 看<em>外蕴</em>: 曲面在 \(\mathbb{R}^3\) 中弯多少, 通过法向曲率 \(\kappa_n(v) = II(v, v)/I(v, v)\) 体现。</li>
+</ul>
+
+<p>主曲率 \(\kappa_1, \kappa_2\) 是广义特征值问题 \(\det([II] - \kappa [I]) = 0\) 的根. Vieta 给:</p>
+
+<p>\[
+H = \frac{EN + GL - 2FM}{2(EG - F^2)}, \quad K = \frac{LN - M^2}{EG - F^2}.
+\]</p>
+
+<p>Euler 公式 \(\kappa_n = \kappa_1 \cos^2 \theta + \kappa_2 \sin^2 \theta\) 让任意方向曲率从主曲率算出。</p>
+
+<p>\(K\) 的符号给曲面在 \(p\) 处<em>三类局部形状</em>: 椭圆 \(K > 0\)、抛物 \(K = 0\)、双曲 \(K < 0\)。这是 ch1 直觉的形式终点。</p>
+
+<p>下一章我们把 \(K\) 和 \(H\) 当作主角, 看它们作为<em>曲面上函数</em>（\(K, H : S \to \mathbb{R}\)）的几何意义, 看几个曲面 \(K = \) 常 / \(H = 0\) 的特殊曲面（球面、极小曲面）, 准备 ch11 的主菜——Theorema Egregium 把 \(K\) 用 \(E, F, G\) 改写, 揭示 \(K\) 实际是<em>内蕴</em> 的。这是 ch7-11 这条故事弧线的高潮。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 Gauss 映射</a><a href="ch10.html">下一章 · 第 10 章 Gauss 与平均曲率 →</a></nav>
+</main>
+</body>
+</html>

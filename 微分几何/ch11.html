@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 Theorema Egregium (Gauss 1827) — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 Gauss 曲率与平均曲率</a><a href="ch12.html">下一章 · 第 12 章 微分形式入门 →</a></nav>
+<h1 id="ch11">第 11 章 Theorema Egregium (Gauss 1827)</h1>
+
+<p>这是本书第一座大山。</p>
+
+<p>上一章我们建出 Gauss 曲率 \(K = \kappa_1 \kappa_2\)。它是怎么定义的？通过<em>主曲率</em>; 主曲率怎么定义？通过<em>形状算子 \(I^{-1} II\)</em>; 第二基本形式 \(II\) 怎么定义？通过<em>单位法向量 \(\boldsymbol{N}\)</em>。<em>法向量需要 3D 嵌入</em>——你必须知道曲面"<em>外面</em>" 是什么样, 才能定义"<em>垂直于切平面</em>"。</p>
+
+<p>所以从定义上看, \(K\) 看起来彻底是<em>外蕴</em> 量——它<em>本质上</em> 依赖曲面"<em>泡在</em>" \(\mathbb{R}^3\) 里这件事。你把同一张曲面以不同方式嵌入 \(\mathbb{R}^3\), 主曲率会变, \(II\) 会变, 看上去 \(K\) 也该变。</p>
+
+<p>1827 年 Gauss 发表了一篇 35 页的拉丁文论文, 标题《Disquisitiones generales circa superficies curvas》（关于曲面的一般研究）, 里面证明了一件让他自己用拉丁文写下"<strong>Theorema Egregium</strong>"（"卓越定理")的事:</p>
+
+<p style="text-align:center;font-style:italic;color:var(--accent);"><em>Gauss 曲率 \(K\) 是<strong>内蕴</strong> 量——只依赖第一基本形式 \(I\) 及其偏导。</em></p>
+
+<p>请你停下来三秒感受这件事的不可思议。\(I\) 只用<em>切向量内积</em>（不需要法向量）。它能由"<em>2D 生物在曲面上量距离</em>" 完全恢复。Gauss 说: 你只要给我曲面上的<em>距离信息</em>, 我能<em>不需要看曲面在 \(\mathbb{R}^3\) 哪</em>, 算出每点的 \(K\)。</p>
+
+<p>这件事是经典微分几何的<em>定理之王</em>。它直接解释为什么<em>球面摊不平</em>（地图必失真）, 为什么<em>纸卷得了圆柱</em>, 为什么<em>测地三角形内角和与平面不同</em>; 它是 Gauss-Bonnet（<a href="ch16.html">ch16</a>）能成立的前提; 它通向 Riemann 1854 的<em>抽象流形</em> 概念——一个可以"<em>不嵌入任何外部空间</em>" 的弯曲空间。</p>
+
+<p>这一章的工作分三段: (1) 把"<em>K 看起来外蕴</em>" 的直觉感受清楚。(2) 朴素地试着证 \(K\) 内蕴, <em>撞墙</em>——直接计算 \(K\) 总冒出 \(L, M, N\) 这种外蕴量。(3) Reframe——引入 Christoffel 符号 \(\Gamma_{ij}^k\)（纯内蕴）, 把 \(K\) 改写成<em>只</em> 含 \(E, F, G\) 及其偏导的<em>Brioschi 公式</em>。</p>
+
+<h2 id="sec11-1">11.1 朴素直觉: \(K\) 看起来外蕴</h2>
+
+<p>把 \(K\) 的定义链子摆出来:</p>
+
+<p>\[
+K \xleftarrow{\text{乘积}} \kappa_1, \kappa_2 \xleftarrow{\text{特征值}} S_p = I^{-1} II \xleftarrow{\text{二阶偏导} \cdot \boldsymbol{N}} II \xleftarrow{\text{要求}} \boldsymbol{N} \xleftarrow{\text{嵌入}} S \subset \mathbb{R}^3.
+\]</p>
+
+<p>每一步都<em>需要</em> 单位法向量。\(\boldsymbol{N} = \boldsymbol{x}_u \times \boldsymbol{x}_v / |\boldsymbol{x}_u \times \boldsymbol{x}_v|\) 是个<em>外蕴</em> 概念——叉积只在 \(\mathbb{R}^3\) 中有定义, 而且"<em>垂直</em>" 这件事预设了一个外部空间。</p>
+
+<p>所以一个<em>抽象</em> 2D 空间, 不嵌入任何 \(\mathbb{R}^n\) 的, 似乎根本无法定义 \(K\)。这种感受让 \(K = \text{内蕴}\) 这条声明听起来荒谬——就像说"<em>圆的半径不需要圆心</em>" 一样。</p>
+
+<p>这种感受让 Theorema Egregium 当年震惊了整个数学界。Gauss 自己写道（拉丁文翻译）: "<em>这定理的卓越之处在于, 一个曲面的曲率, 看似如此本质地依赖于它的 3D 形状, 居然可以从仅凭曲面内的度量信息中恢复出来</em>。"</p>
+
+<p>请你<em>不要</em> 就此接受这件事——而是带着怀疑往下读。我们要先朴素地试一次"<em>把 \(K\) 写成内蕴量</em>", 撞墙, 再给出 Gauss 的天才招法。</p>
+
+<h2 id="sec11-2">11.2 Theorema Egregium 陈述</h2>
+
+<p><strong>定理（Theorema Egregium, Gauss 1827）。</strong>设 \(S \subset \mathbb{R}^3\) 是光滑正则曲面, \(p \in S\)。则 Gauss 曲率 \(K(p)\) <em>只</em> 依赖第一基本形式 \(I\) 及其在 \(p\) 附近的偏导（最多二阶）。具体, 存在一个普适公式</p>
+
+<p>\[
+K = \mathcal{F}(E, F, G, E_u, E_v, F_u, F_v, G_u, G_v, E_{uu}, \ldots),
+\]</p>
+
+<p>其中 \(\mathcal{F}\) 是仅由 \(E, F, G\) 及其至多二阶偏导构成的代数表达式。<em>不出现</em> \(L, M, N\) 或 \(\boldsymbol{N}\)。</p>
+
+<p>等价说法（更几何）: 设两曲面 \(S_1, S_2\) 之间存在<em>等距</em>（保距离）双射 \(\varphi: S_1 \to S_2\)。则 \(\varphi\) <em>保 Gauss 曲率</em>: \(K_{S_2}(\varphi(p)) = K_{S_1}(p)\)。</p>
+
+<p>"<em>等距</em>" 是说 \(\varphi\) 把 \(S_1\) 上任两点的距离映到 \(S_2\) 上对应两点的距离, <em>距离不变</em>。等价地, \(\varphi\) <em>保第一基本形式</em>——\(I_{S_2} \circ d\varphi = I_{S_1}\)。</p>
+
+<p>第二陈述是第一陈述的直接推论: \(K\) 只依赖 \(I\), 而 \(\varphi\) 保 \(I\), 所以 \(\varphi\) 保 \(K\)。我们花后面五节证第一陈述。</p>
+
+<h2 id="sec11-3">11.3 朴素试证: 直接用 \(L, M, N\) 算 \(K\) 撞墙</h2>
+
+<p>先看朴素策略。我们已经有公式</p>
+
+<p>\[
+K = \frac{LN - M^2}{EG - F^2}.
+\]</p>
+
+<p>分母 \(EG - F^2\) <em>纯</em> 用 \(I\) 系数表达——内蕴。问题在分子 \(LN - M^2\)——三个 \(II\) 系数全都通过 \(\boldsymbol{N}\) 定义, 看起来外蕴。</p>
+
+<p>直觉策略: 把 \(L, M, N\) 用<em>更基础的</em> 量表达, 看能不能消掉 \(\boldsymbol{N}\)。</p>
+
+<p>\(L = \boldsymbol{x}_{uu} \cdot \boldsymbol{N}\)。展开 \(\boldsymbol{N} = (\boldsymbol{x}_u \times \boldsymbol{x}_v) / |\boldsymbol{x}_u \times \boldsymbol{x}_v|\), 用混合积:</p>
+
+<p>\[
+L = \frac{\boldsymbol{x}_{uu} \cdot (\boldsymbol{x}_u \times \boldsymbol{x}_v)}{\sqrt{EG - F^2}} = \frac{[\boldsymbol{x}_{uu}, \boldsymbol{x}_u, \boldsymbol{x}_v]}{\sqrt{EG - F^2}}.
+\]</p>
+
+<p>同理 \(M = [\boldsymbol{x}_{uv}, \boldsymbol{x}_u, \boldsymbol{x}_v] / \sqrt{EG - F^2}\), \(N = [\boldsymbol{x}_{vv}, \boldsymbol{x}_u, \boldsymbol{x}_v] / \sqrt{EG - F^2}\)。所以</p>
+
+<p>\[
+LN - M^2 = \frac{[\boldsymbol{x}_{uu}, \boldsymbol{x}_u, \boldsymbol{x}_v] [\boldsymbol{x}_{vv}, \boldsymbol{x}_u, \boldsymbol{x}_v] - [\boldsymbol{x}_{uv}, \boldsymbol{x}_u, \boldsymbol{x}_v]^2}{EG - F^2}.
+\]</p>
+
+<p>分子是三个混合积的组合, 每个都包含<em>外蕴</em> 信息（\(\mathbb{R}^3\) 中的叉积、混合积）。看起来<em>没救</em>——不可能从<em>外蕴</em> 表达式拼出<em>内蕴</em> 表达式。</p>
+
+<p>但 Gauss 说<em>可以</em>。他用了一个聪明的恒等式——任何混合积的平方可以用 Gram 行列式表达:</p>
+
+<p>\[
+[\boldsymbol{a}, \boldsymbol{b}, \boldsymbol{c}]^2 = \det \begin{pmatrix} \boldsymbol{a} \cdot \boldsymbol{a} & \boldsymbol{a} \cdot \boldsymbol{b} & \boldsymbol{a} \cdot \boldsymbol{c} \\ \boldsymbol{b} \cdot \boldsymbol{a} & \boldsymbol{b} \cdot \boldsymbol{b} & \boldsymbol{b} \cdot \boldsymbol{c} \\ \boldsymbol{c} \cdot \boldsymbol{a} & \boldsymbol{c} \cdot \boldsymbol{b} & \boldsymbol{c} \cdot \boldsymbol{c} \end{pmatrix}.
+\]</p>
+
+<p>把它<em>两个</em>混合积的乘积也写成内积形式:</p>
+
+<p>\[
+[\boldsymbol{a}, \boldsymbol{b}, \boldsymbol{c}][\boldsymbol{d}, \boldsymbol{b}, \boldsymbol{c}] = \det \begin{pmatrix} \boldsymbol{a} \cdot \boldsymbol{d} & \boldsymbol{a} \cdot \boldsymbol{b} & \boldsymbol{a} \cdot \boldsymbol{c} \\ \boldsymbol{b} \cdot \boldsymbol{d} & \boldsymbol{b} \cdot \boldsymbol{b} & \boldsymbol{b} \cdot \boldsymbol{c} \\ \boldsymbol{c} \cdot \boldsymbol{d} & \boldsymbol{c} \cdot \boldsymbol{b} & \boldsymbol{c} \cdot \boldsymbol{c} \end{pmatrix}.
+\]</p>
+
+<p>这个恒等式<em>把混合积换成内积行列式</em>。内积是切向量长度信息——<em>内蕴</em>！这就是关键: <em>外蕴的混合积可以通过 Gram 行列式翻译为内积</em>, 一旦翻译完成就<em>没有</em> 法向量了。</p>
+
+<p>所以撞墙的朴素策略其实<em>有救</em>——只是要用 Gram 恒等式这个桥梁。但即使用了恒等式, 直接算还是冒出二阶混合内积 \(\boldsymbol{x}_{uu} \cdot \boldsymbol{x}_v\) 这种<em>不属于</em> \(I\) 表达式的项。我们要把这种二阶内积也用 \(E, F, G\) 偏导<em>表达</em>。这就需要 Christoffel 符号。</p>
+
+<h2 id="sec11-4">11.4 Reframe: Christoffel 符号</h2>
+
+<p>三个二阶偏导 \(\boldsymbol{x}_{uu}, \boldsymbol{x}_{uv}, \boldsymbol{x}_{vv}\) 是 \(\mathbb{R}^3\) 中向量, 但<em>未必</em> 在切平面里。它们一般有切分量 + 法分量。把它们按基 \(\{\boldsymbol{x}_u, \boldsymbol{x}_v, \boldsymbol{N}\}\) 展开:</p>
+
+<p>\[
+\boldsymbol{x}_{uu} = \Gamma_{11}^1 \boldsymbol{x}_u + \Gamma_{11}^2 \boldsymbol{x}_v + L \boldsymbol{N},
+\]</p>
+
+<p>\[
+\boldsymbol{x}_{uv} = \Gamma_{12}^1 \boldsymbol{x}_u + \Gamma_{12}^2 \boldsymbol{x}_v + M \boldsymbol{N},
+\]</p>
+
+<p>\[
+\boldsymbol{x}_{vv} = \Gamma_{22}^1 \boldsymbol{x}_u + \Gamma_{22}^2 \boldsymbol{x}_v + N \boldsymbol{N}.
+\]</p>
+
+<p>(法分量正好是 \(II\) 系数 \(L, M, N\), 因为 \(\boldsymbol{x}_{ij} \cdot \boldsymbol{N}\) 就是定义。)</p>
+
+<p>切分量系数 \(\Gamma_{ij}^k\)（\(i, j, k \in \{1, 2\}\), \(1 \leftrightarrow u, 2 \leftrightarrow v\)）叫<strong>Christoffel 符号</strong>。它们是 8 个数（实际上 6 个, 因为 \(\Gamma_{ij}^k = \Gamma_{ji}^k\) 对称）, 每个都是 \(p\) 的函数。</p>
+
+<p>关键事实: <em>Christoffel 符号是内蕴的</em>。它们可以由 \(E, F, G\) 及其偏导显式表达。证明用<em>对前面那三个展式做内积</em>。</p>
+
+<p>例如取 \(\boldsymbol{x}_{uu} \cdot \boldsymbol{x}_u\):</p>
+
+<p>\[
+\boldsymbol{x}_{uu} \cdot \boldsymbol{x}_u = \Gamma_{11}^1 (\boldsymbol{x}_u \cdot \boldsymbol{x}_u) + \Gamma_{11}^2 (\boldsymbol{x}_v \cdot \boldsymbol{x}_u) = \Gamma_{11}^1 E + \Gamma_{11}^2 F.
+\]</p>
+
+<p>而 \(\boldsymbol{x}_{uu} \cdot \boldsymbol{x}_u = \frac{1}{2} \partial_u (\boldsymbol{x}_u \cdot \boldsymbol{x}_u) = \frac{1}{2} E_u\)（链式法则 + 内积）。所以</p>
+
+<p>\[
+\Gamma_{11}^1 E + \Gamma_{11}^2 F = \frac{1}{2} E_u.
+\]</p>
+
+<p>同理取 \(\boldsymbol{x}_{uu} \cdot \boldsymbol{x}_v\):</p>
+
+<p>\[
+\Gamma_{11}^1 F + \Gamma_{11}^2 G = \boldsymbol{x}_{uu} \cdot \boldsymbol{x}_v = \partial_u (\boldsymbol{x}_u \cdot \boldsymbol{x}_v) - \boldsymbol{x}_u \cdot \boldsymbol{x}_{uv} = F_u - \frac{1}{2} E_v.
+\]</p>
+
+<p>(用了 \(\boldsymbol{x}_u \cdot \boldsymbol{x}_{uv} = \frac{1}{2} \partial_v (\boldsymbol{x}_u \cdot \boldsymbol{x}_u) = \frac{1}{2} E_v\)。)</p>
+
+<p>这是关于 \(\Gamma_{11}^1, \Gamma_{11}^2\) 的 2×2 线性方程组, 矩阵 \(\begin{pmatrix} E & F \\ F & G \end{pmatrix} = I\) 可逆, 解得</p>
+
+<p>\[
+\begin{pmatrix} \Gamma_{11}^1 \\ \Gamma_{11}^2 \end{pmatrix} = I^{-1} \begin{pmatrix} \tfrac{1}{2} E_u \\ F_u - \tfrac{1}{2} E_v \end{pmatrix}.
+\]</p>
+
+<p>\(I^{-1}\) 由 \(E, F, G\) 表达, 右边由 \(E, F, G\) 偏导表达。所以 \(\Gamma_{11}^1, \Gamma_{11}^2\) 都是 \(I\) 的函数——<em>内蕴</em>。</p>
+
+<p>类似地解出全部 \(\Gamma_{ij}^k\) (i, j, k = 1, 2)。<em>都内蕴</em>。Christoffel 符号有个统一公式（用爱因斯坦求和约定 + \(g_{ij}\) 表示 \(I\) 矩阵, \(g^{ij}\) 表示 \(I^{-1}\)）:</p>
+
+<p>\[
+\Gamma_{ij}^k = \frac{1}{2} g^{kl} (\partial_i g_{jl} + \partial_j g_{il} - \partial_l g_{ij}).
+\]</p>
+
+<p>这是标准黎曼几何的 Christoffel 公式; 在我们 2D 情形, \(g_{ij}\) 就是 \(E, F, G\) 的索引化, 对应所有偏导都是 \(\partial_u\) 或 \(\partial_v\)。展开有 8 项, 不必硬记。</p>
+
+<p>意义: <em>Christoffel 符号是 \(I\) 的"<em>一阶导数信息</em>" 的打包</em>——把 \(E, F, G\) 在该点的偏导组合成一组系数, 描述切空间在曲面上"<em>怎么转</em>"。它们将出现在<em>测地线方程</em>（<a href="ch13.html">ch13</a>）、<em>协变导数</em>（<a href="ch22.html">ch22</a>）、<em>曲率张量</em>（<a href="ch22.html">ch22</a>）所有内蕴几何对象中。</p>
+
+<h2 id="sec11-5">11.5 Brioschi 公式: \(K\) 用 \(E, F, G\) 表达</h2>
+
+<p>下一步把 \(LN - M^2\) 用 \(\Gamma_{ij}^k\) + 偏导表达, 然后得到 \(K\) 完全用 \(E, F, G\) 偏导的公式。</p>
+
+<p>策略: 把<em>三阶偏导</em> \(\boldsymbol{x}_{uuv}, \boldsymbol{x}_{uvv}\) 用两种方式展开, 然后<em>对照</em> 切分量。</p>
+
+<p>方式一: \(\boldsymbol{x}_{uuv} = \partial_v (\boldsymbol{x}_{uu}) = \partial_v (\Gamma_{11}^1 \boldsymbol{x}_u + \Gamma_{11}^2 \boldsymbol{x}_v + L \boldsymbol{N})\)。展开:</p>
+
+<p>\[
+\boldsymbol{x}_{uuv} = (\Gamma_{11}^1)_v \boldsymbol{x}_u + \Gamma_{11}^1 \boldsymbol{x}_{uv} + (\Gamma_{11}^2)_v \boldsymbol{x}_v + \Gamma_{11}^2 \boldsymbol{x}_{vv} + L_v \boldsymbol{N} + L \boldsymbol{N}_v.
+\]</p>
+
+<p>每个 \(\boldsymbol{x}_{ij}\) 用 11.4 节展开为 \(\Gamma\) 组合 + 法分量, \(\boldsymbol{N}_v\) 也按基 \(\{\boldsymbol{x}_u, \boldsymbol{x}_v\}\) 展开（Weingarten 公式, ch9 给出）。整理出 \(\boldsymbol{x}_{uuv}\) 的<em>切 \(\boldsymbol{x}_u\)</em>分量、<em>切 \(\boldsymbol{x}_v\)</em>分量、<em>法 \(\boldsymbol{N}\)</em>分量。</p>
+
+<p>方式二: \(\boldsymbol{x}_{uuv} = \boldsymbol{x}_{uvu} = \partial_u (\boldsymbol{x}_{uv}) = \partial_u (\Gamma_{12}^1 \boldsymbol{x}_u + \Gamma_{12}^2 \boldsymbol{x}_v + M \boldsymbol{N})\)。同样展开。</p>
+
+<p>两种方式得到的三个分量必须相等——这是因为偏导可交换。<em>对照切 \(\boldsymbol{x}_u\) 分量</em> 给一个等式; 对照切 \(\boldsymbol{x}_v\) 分量给一个等式; 对照法 \(\boldsymbol{N}\) 分量给一个等式（这就是 Codazzi 方程）。</p>
+
+<p>切 \(\boldsymbol{x}_v\) 分量等式整理后正好得到</p>
+
+<p>\[
+\boxed{\ K = \frac{LN - M^2}{EG - F^2} = \frac{1}{(EG-F^2)} \cdot R(E, F, G, \text{偏导})\ }
+\]</p>
+
+<p>其中 \(R(\cdot)\) 是只含 \(E, F, G\) 及偏导的代数表达式（Brioschi 给出）。完整 Brioschi 公式（1854）:</p>
+
+<p>\[
+K = \frac{1}{(EG - F^2)^2} \left\{ \det \begin{pmatrix} -\tfrac{1}{2} E_{vv} + F_{uv} - \tfrac{1}{2} G_{uu} & \tfrac{1}{2} E_u & F_u - \tfrac{1}{2} E_v \\ F_v - \tfrac{1}{2} G_u & E & F \\ \tfrac{1}{2} G_v & F & G \end{pmatrix} - \det \begin{pmatrix} 0 & \tfrac{1}{2} E_v & \tfrac{1}{2} G_u \\ \tfrac{1}{2} E_v & E & F \\ \tfrac{1}{2} G_u & F & G \end{pmatrix} \right\}.
+\]</p>
+
+<p>一长串。但<em>关键不是公式具体形状</em>, 而是公式<em>只</em> 用 \(E, F, G\) 及其至多二阶偏导。<em>没有</em> \(L, M, N, \boldsymbol{N}\) 出现。</p>
+
+<p>这就完成 Theorema Egregium 的证明: 给定 \(I\)（即 \(E, F, G\)）, 计算它们的偏导, 套 Brioschi 公式, 得到 \(K\)。<em>不需要</em> 知道曲面如何嵌入 \(\mathbb{R}^3\)。</p>
+
+<p>注：完整推导大约要展开 5-7 个等式, 整理四五十项, 这里不写完。但结构如此:</p>
+
+<ol>
+  <li>把 \(\boldsymbol{x}_{ij}\) 按 \(\{\boldsymbol{x}_u, \boldsymbol{x}_v, \boldsymbol{N}\}\) 展开（11.4 节）。</li>
+  <li>用 \(\boldsymbol{x}_{uuv} = \boldsymbol{x}_{uvu}\) 对照切分量, 得到 Gauss 方程, 其切 \(\boldsymbol{x}_v\) 分量蕴含 \(LN - M^2 = \) 内蕴量。</li>
+  <li>除以 \(EG - F^2\) 得 \(K = \) 内蕴量。</li>
+</ol>
+
+<p>等价的<em>更对称</em> 版本（与黎曼几何衔接）: 定义 Riemann 曲率张量 \(R^l_{ijk} = \partial_i \Gamma_{jk}^l - \partial_j \Gamma_{ik}^l + \Gamma_{im}^l \Gamma_{jk}^m - \Gamma_{jm}^l \Gamma_{ik}^m\), 则</p>
+
+<p>\[
+K = \frac{R_{1212}}{EG - F^2}, \quad R_{1212} = g_{1l} R^l_{212}.
+\]</p>
+
+<p>这种张量化书写在 <a href="ch22.html">ch22</a> 详谈。这里只要记住<em>一句话</em>: \(K\) 由 \(I\) 的二阶偏导信息决定, 是<em>纯内蕴</em> 的。</p>
+
+<h2 id="sec11-6">11.6 推论: 等距保 \(K\), 球面摊不平</h2>
+
+<p>等距 \(\varphi: S_1 \to S_2\) 保 \(I\)。Theorema Egregium 说 \(K\) 由 \(I\) 决定。所以等距保 \(K\):</p>
+
+<p>\[
+K_{S_2}(\varphi(p)) = K_{S_1}(p) \quad \forall p \in S_1.
+\]</p>
+
+<p><strong>推论 1（球面摊不平）。</strong>设 \(S_1 \subset S^2\) 是球面 \(S^2_R\) 上一块, \(S_2 \subset \mathbb{R}^2\) 是平面上一块。\(K_{S_1} = 1/R^2 \neq 0\), \(K_{S_2} = 0\)。所以<em>不存在</em> 等距 \(\varphi: S_1 \to S_2\)。</p>
+
+<p>翻译: <em>地球不能不失真摊到纸上</em>。任何世界地图必有距离 / 角度 / 面积之一失真——通常是面积（Mercator）或形状（Gall-Peters）。<em>没办法</em> 全保——这是 Gauss 不让的。</p>
+
+<p>这条推论是航海 / 飞行 / 制图学的<em>数学基础</em>。Mercator 投影（保角度, 失面积）适合航海（保方向）, Gall-Peters（保面积, 失形状）适合统计学。<em>等距投影根本不存在</em>。</p>
+
+<p><strong>推论 2（圆柱可展）。</strong>圆柱 \(K = 0\), 平面 \(K = 0\)。Theorema Egregium <em>不</em> 排除两者等距。事实上存在等距——把圆柱沿一条母线"<em>剪开</em>" 摊平就得到平面（或一条带）。这是为什么 A4 纸能<em>不撕不揉</em> 卷成圆柱。</p>
+
+<p>更一般的<em>可展曲面</em>: 一个曲面能不撕不揉摊到平面 ⟺ \(K \equiv 0\)。除平面外, 可展曲面是<em>圆柱面 / 圆锥面 / 切线曲面</em>（沿空间曲线切线扫出）三大类。</p>
+
+<p><strong>推论 3（伪球面与双曲几何）。</strong>设伪球面（tractricoid, 由 tractrix 旋转得到）在每点 \(K = -1/R^2\) 常负。在伪球面上"<em>用第一基本形式量距离</em>" 得到的几何是 Lobachevsky 的双曲几何（局部）的模型——平行公设不成立, 三角形内角和 \(< \pi\)。</p>
+
+<p>这件事让 Gauss 同时（隐秘地）发现了非欧几何; 后来 Bolyai 与 Lobachevsky 独立完成。Beltrami 1868 用伪球面给非欧几何<em>第一个</em> 模型, 直接基于 Theorema Egregium——常负 \(K\) 的曲面"<em>就是</em>" 双曲几何。</p>
+
+<h2 id="sec11-7">11.7 测地线 + 内蕴 ⟹ 测地线由 \(I\) 决定</h2>
+
+<p>测地线是<em>曲面上的"直线"</em>——局部最短路径。<a href="ch13.html">ch13</a> 详谈。这里只说一件: 测地线方程</p>
+
+<p>\[
+\frac{d^2 u^k}{ds^2} + \Gamma_{ij}^k \frac{du^i}{ds} \frac{du^j}{ds} = 0
+\]</p>
+
+<p>用 Christoffel 符号 \(\Gamma_{ij}^k\) 表达。而 \(\Gamma_{ij}^k\) 是 \(I\) 的偏导组合（11.4 节）, <em>纯内蕴</em>。所以<em>测地线方程也是内蕴的</em>——它<em>只</em> 依赖 \(I\), 不依赖嵌入。</p>
+
+<p>翻译: 等距 \(\varphi: S_1 \to S_2\) <em>保测地线</em>。如果你能<em>不拉伸</em> 把曲面 \(S_1\) 摊到 \(S_2\), 那么 \(S_1\) 上的测地线（最短路径）映到 \(S_2\) 上的测地线。</p>
+
+<p>例子: 圆柱面摊平到带状平面。圆柱上的测地线 \(\to\) 平面带上的直线。<em>这就是</em> 为什么蚂蚁在圆柱上爬"<em>对角线</em>"（螺线）, 因为该螺线在<em>摊平后</em> 是直线——蚂蚁感觉自己一直走"<em>直</em>"。</p>
+
+<p>更深的: 测地线 + Gauss 曲率 + Gauss-Bonnet 定理（<a href="ch16.html">ch16</a>）共同构成"<em>2D 生物的内蕴几何</em>" 的完整工具。Gauss-Bonnet \(\int K \, dA + \oint \kappa_g \, ds + \sum \alpha_i = 2\pi\) <em>整体</em> 都是内蕴量——一个 2D 生物在曲面上爬, 量它的测地三角形内角和, 就<em>能</em> 算 \(\int K\)。</p>
+
+<h2 id="sec11-8">11.8 通向 Riemann 1854: 抽象流形的诞生</h2>
+
+<p>请你停下来感受 Theorema Egregium 的全部含义。在它出现之前, "<em>曲面</em>" 等价于"<em>嵌入 \(\mathbb{R}^3\) 的曲面</em>"——曲率被理解为"<em>曲面在 3D 空间里弯多少</em>"。Theorema Egregium 说: <em>不需要 3D 空间, 曲面"自身" 就有曲率</em>。</p>
+
+<p>这件事打开了一个革命性的想法: <em>抽象</em> 曲面——一个 2D 空间, 自带"<em>距离</em>" 概念（即第一基本形式）, <em>不需要</em> 嵌入任何外部 \(\mathbb{R}^n\)。这种空间也有 Gauss 曲率（用 Brioschi 公式从 \(I\) 算出来）, 也有测地线, 也有 Gauss-Bonnet。</p>
+
+<p>1854 年 Riemann 在哥廷根做就职演讲<em>《Über die Hypothesen, welche der Geometrie zu Grunde liegen》</em>（论几何学之基础假设）, 把这个想法推广到任意维数: <em>n 维流形 + 黎曼度量 \(g_{ij}(x)\)</em>, 不嵌入任何外部空间。这就是<em>黎曼几何</em>的诞生。Riemann 沿用 Gauss 的内蕴思想, 把 Gauss 曲率的高维推广（截面曲率、Ricci 曲率、标量曲率）建立起来。</p>
+
+<p>这一思想直接通向 1915 年的<em>广义相对论</em>: 时空是个 4 维洛伦兹流形, 它的曲率（Einstein 张量）由物质分布（应力-能量张量）决定。整个理论<em>不需要</em> 把时空"<em>嵌入</em>" 任何"<em>更大的空间</em>"——时空<em>本身</em> 就是几何的全部。</p>
+
+<p>请你回想: 这一切从一个简单事实出发——<em>纸卷得了圆柱, 卷不了球面</em>。Gauss 把这种朴素观察问到底, 得到 Theorema Egregium; Theorema Egregium 启发了内蕴几何的整个范畴; 这一范畴几十年后给了爱因斯坦描述引力的语言。一条直线从 1827 拉到 1915, 跨 88 年, 全部由"<em>K 是内蕴的</em>" 这一条不可思议的事实驱动。</p>
+
+<p>本书 <a href="ch21.html">ch21</a> 给抽象流形的入门, <a href="ch22.html">ch22</a> 给黎曼度量。读者真正进入 Riemann 时空 / 黎曼几何后, 会反复回看这一章——Theorema Egregium 不只是<em>一个</em> 定理, 而是<em>整个内蕴几何范式</em> 的奠基石。</p>
+
+<p>下一章我们换一种语言看几何——<em>微分形式</em>。它是"<em>积分友好</em>" 的现代语言, 让 Stokes 定理变成<em>一行字</em>: \(\int_{\partial M} \omega = \int_M d\omega\)。这个工具是 ch16-18 Gauss-Bonnet 整体定理的必备——把"<em>测地三角形内角和</em>" 放大到"<em>整个紧致曲面 K 的总积分</em>"。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 Gauss 曲率与平均曲率</a><a href="ch12.html">下一章 · 第 12 章 微分形式入门 →</a></nav>
+</main>
+</body>
+</html>

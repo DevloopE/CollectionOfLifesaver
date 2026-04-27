@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 14 章 测地坐标与指数映射 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 测地线</a><a href="ch15.html">下一章 · 第 15 章 完备性与 Hopf-Rinow →</a></nav>
+<h1 id="ch14">第 14 章 测地坐标与指数映射</h1>
+
+<p>上一章末尾我们看到: 给定曲面上一点 \(p\) 和一个切向量 \(v \in T_p S\), 存在<em>唯一</em> 一条测地线 \(\gamma_v(t)\) 从 \(p\) 出发以 \(v\) 为初速度。这件事让人想做一道更大胆的事——<em>能不能用切平面 \(T_p S\) 给曲面 \(S\) 在 \(p\) 附近<em>编个坐标</em>?</em></p>
+
+<p>具体的想法。\(T_p S\) 是一个平的 2 维向量空间——它有线性结构, 可以用极坐标、笛卡尔坐标随便参数化。它<em>没有</em> 曲面的"<em>弯曲</em>" 信息。但每个 \(v \in T_p S\) 又<em>对应</em> 一条曲面上的测地线 \(\gamma_v\)——所以每个切向量"<em>指</em>" 出曲面上一个具体的点 \(\gamma_v(1)\)（沿 \(v\) 方向走单位时间到达的位置）。</p>
+
+<p>这个对应 \(v \mapsto \gamma_v(1)\) 是个映射 \(T_p S \to S\)。它叫<em>指数映射</em> \(\exp_p\)。它把<em>线性结构</em>（切平面里的向量加法、伸缩）映到<em>曲面上的几何结构</em>。把切平面"<em>卷</em>" 到曲面上——切平面在 \(p\) 处与曲面相切, 然后顺着所有方向"<em>滚</em>" 出去。这条卷法保证：径向（沿原向量方向）<em>是测地线</em>。</p>
+
+<p>这一章把指数映射严格定义, 证它在 \(0 \in T_p S\) 处是<em>局部微分同胚</em>, 用它构造<em>测地坐标</em>（normal coordinates / geodesic polar coordinates）, 并在测地坐标下计算 Gauss 曲率, 得到漂亮的内蕴公式 \(K = -\partial_r^2 \sqrt{G} / \sqrt{G}\)。这个公式让你用<em>测地圆周长</em>（一个完全可观测的内蕴量）测量曲率, 是从理论到实测的桥梁。</p>
+
+<h2 id="sec14-1">14.1 测地线 \(\gamma_v(t)\) 沿初速度 \(v\)</h2>
+
+<p>固定一点 \(p \in S\) 和一个切向量 \(v \in T_p S\)。设 \(\gamma_v : I \to S\) 是初值问题</p>
+
+<p>\[
+\gamma_v(0) = p, \quad \gamma_v'(0) = v, \quad \frac{D \gamma_v'}{dt} = 0
+\]</p>
+
+<p>的唯一解（<a href="ch13.html">ch13</a> 8 节）。这里 \(I = (-\varepsilon, \varepsilon)\) 是某极大区间。</p>
+
+<p>关键性质（重参数化）: <em>沿同一方向但不同速度的测地线, 互为重参数化</em>。具体: 对任何常数 \(c > 0\),</p>
+
+<p>\[
+\gamma_{cv}(t) = \gamma_v(c t).
+\]</p>
+
+<p>证明: 验证 \(\gamma_v(ct)\) 满足初值问题 (i) \(\gamma_v(0) = p\) ✓; (ii) \(\frac{d}{dt} \gamma_v(ct) \big|_{t = 0} = c \gamma_v'(0) = c v\) ✓; (iii) \(\frac{D}{dt} \frac{d}{dt} \gamma_v(ct) = c^2 \frac{D}{dt}|_{ct} \gamma_v'(ct) = 0\) ✓（用测地线方程对 \(\gamma_v\) 在 \(ct\) 处成立）。所以 \(\gamma_v(ct)\) 与 \(\gamma_{cv}(t)\) 是同一初值问题的解, 由唯一性相等。</p>
+
+<p>这条性质的意义: <em>"沿 \(v\) 方向走时间 \(c\)" 与 "沿 \(cv\) 方向走时间 1" 是同一件事</em>。它让我们可以"<em>把时间吸收到向量大小里</em>"——不必同时记录"<em>方向 + 速度 + 时间</em>", 只需记录"<em>方向 + 时间</em>", 或者"<em>位移向量</em>" \(t v\)。</p>
+
+<h2 id="sec14-2">14.2 指数映射 \(\exp_p(v) = \gamma_v(1)\)</h2>
+
+<p><strong>定义（指数映射）。</strong>设 \(p \in S\), \(v \in T_p S\) 满足 \(\gamma_v\) 在时间 1 处有定义。则</p>
+
+<p>\[
+\boxed{\ \exp_p(v) := \gamma_v(1) \in S.\ }
+\]</p>
+
+<p>用上节性质 \(\gamma_v(1) = \gamma_{tv}(1/t)\)（取 \(c = 1/t\)）等价地写</p>
+
+<p>\[
+\exp_p(t v) = \gamma_v(t).
+\]</p>
+
+<p>这是个非常自然的解读: <em>\(\exp_p\) 沿径向方向 \(v\) 输出"<em>沿 \(v\) 走 \(|v|\) 单位</em>" 的位置</em>。径向曲线 \(t \mapsto \exp_p(t v)\) <em>就是</em> 测地线 \(\gamma_v\)。</p>
+
+<p>"<em>指数映射</em>" 这个名字来自<em>李群</em> 上的类似构造。在李群 \(G\) 上, 给定李代数元素 \(X \in \mathfrak{g}\), 单参数子群 \(t \mapsto e^{tX}\) 是 \(G\) 上的"<em>测地线</em>"（关于双不变度量）, 取 \(t = 1\) 给指数映射 \(\exp(X) = e^X \in G\)——这就是矩阵指数 \(e^X\) 的几何起源。本书<a href="ch22.html">ch22</a> 讲抽象黎曼流形时会重新见到这件事。</p>
+
+<p>定义域问题。\(\exp_p\) 在哪些 \(v\) 上有定义? 答: 在那些 \(v\) 使 \(\gamma_v\) 能延伸到 \(t = 1\)。这通常包含 \(0\) 的一个开邻域 \(U \subset T_p S\)（由 ODE 解对初值的连续依赖给出）。如果 \(U = T_p S\)（即<em>所有</em> \(v\) 都使 \(\gamma_v\) 能延伸到所有时间）, 我们说 \(p\) 处的曲面"<em>测地完备</em>"——这是<a href="ch15.html">ch15</a> 主题。</p>
+
+<p>本章默认在某足够小的 \(U\) 上工作, 不操心"<em>多大</em>"。</p>
+
+<h2 id="sec14-3">14.3 \(\exp_p\) 在 0 处是局部微分同胚</h2>
+
+<p>关键定理:</p>
+
+<p><strong>定理。</strong>\(\exp_p : U \subset T_p S \to S\) 在 \(0 \in T_p S\) 的某开邻域上是<em>微分同胚</em>（即光滑双射, 逆也光滑）。其切线性化 \((d \exp_p)_0 : T_0(T_p S) \to T_p S\) 是恒等映射（在 \(T_p S\) 与 \(T_0(T_p S)\) 自然等同下）。</p>
+
+<p>证明思路。微分同胚由<em>反函数定理</em> 给出——只需证 \((d \exp_p)_0\) 是同构。计算 \((d \exp_p)_0\):</p>
+
+<p>取 \(v \in T_p S\), 看曲线 \(s \mapsto \exp_p(s v) = \gamma_v(s)\)。它是测地线, 所以</p>
+
+<p>\[
+(d \exp_p)_0(v) = \frac{d}{ds} \exp_p(s v) \bigg|_{s = 0} = \gamma_v'(0) = v.
+\]</p>
+
+<p>即 \((d \exp_p)_0\) 是<em>恒等</em>。它是同构, 反函数定理给微分同胚, \(\square\)。</p>
+
+<p>这条定理说: 在 \(p\) 附近, 切平面 \(T_p S\) 与曲面 \(S\) <em>局部同构</em>——通过 \(\exp_p\)。这件事直觉上的画面: 你在 \(p\) 站着, 切平面 \(T_p S\) 像一个"<em>展开的纸片</em>" 紧贴曲面在 \(p\) 处。\(\exp_p\) 把这片纸"<em>包到</em>" 曲面上——非常贴近 \(p\)（因为切平面在 \(p\) 与曲面切方向一致）, 远离 \(p\) 时纸开始与曲面分开。</p>
+
+<p>这件事跟<a href="ch1.html">ch1</a> "<em>纸贴橘子</em>" 有点像但不同。"<em>贴橘子</em>" 是我们想<em>等距</em> 把纸贴到球面上——做不到（因 Gauss 曲率不同）。"<em>指数映射</em>" 不是等距, 它只<em>沿径向</em> 是等距（径向就是测地线, 长度保持）, 角向<em>不</em> 等距。它更像是"<em>沿径向擀</em>" 把纸卷上曲面, 而不是平铺。</p>
+
+<p>"<em>局部</em>" 这个词同样关键——\(\exp_p\) 只在 \(0\) 的某邻域是微分同胚。远离 \(0\) 时它可能<em>失败</em>: 比如球面上 \(\exp_p\) 在切平面里半径为 \(\pi\) 的圆<em>退化</em>到南极一个点（所有方向走 \(\pi\) 都到达对极点）。这种"<em>退化点</em>" 叫<em>共轭点</em>, 是高级测地线理论的研究对象（ch15 - ch16 之间）。</p>
+
+<h2 id="sec14-4">14.4 测地坐标 (normal coordinates)</h2>
+
+<p>有了 \(\exp_p\), 我们可以反过来用它<em>定义曲面坐标</em>。</p>
+
+<p>选 \(T_p S\) 中一组正交基 \(\{e_1, e_2\}\)（关于第一基本形式 \(I\)）。\(T_p S\) 上有自然的笛卡尔坐标 \((x^1, x^2)\): 切向量 \(v = x^1 e_1 + x^2 e_2\)。</p>
+
+<p>用 \(\exp_p\) 把这套笛卡尔坐标"<em>拉</em>" 回到 \(S\): 定义</p>
+
+<p>\[
+(x^1, x^2) \in U \subset T_p S \mapsto \exp_p(x^1 e_1 + x^2 e_2) \in S.
+\]</p>
+
+<p>因为 \(\exp_p\) 是局部微分同胚, 这给出 \(p\) 附近曲面的<em>坐标系</em>, 叫<em>测地法坐标</em>（geodesic normal coordinates）。简称<em>测地坐标</em>。</p>
+
+<p>更常用的是<em>测地极坐标</em>（geodesic polar coordinates）: 在 \(T_p S\) 用极坐标 \((r, \theta)\)（\(r \ge 0\), \(\theta \in [0, 2\pi)\)）, \(v = r(\cos\theta \, e_1 + \sin\theta \, e_2)\)。把这套极坐标拉回曲面: \((r, \theta) \mapsto \exp_p(v)\)。</p>
+
+<p>测地极坐标的几何意义:</p>
+
+<ul>
+  <li><em>径向曲线 \(\theta = \text{const}\)</em>: 是测地线 \(\gamma_v\), 从 \(p\) 沿方向 \(\theta\) 出发。</li>
+  <li><em>径向参数 \(r\)</em>: 弧长——\(r = \exp_p\) 输入向量长度 = \(\gamma_v\) 走过的弧长。</li>
+  <li><em>圆周 \(r = \text{const}\)</em>: 由 \(p\) 测地距离为 \(r\) 的所有点构成, 叫<em>测地圆</em>。</li>
+</ul>
+
+<p>请你画个图: 在 \(S\) 上 \(p\) 周围, 画一组放射状的"<em>射线</em>"（每条都是测地线）和一组同心"<em>圈</em>"（每个都是测地圆）。这就是测地极坐标"<em>蜘蛛网</em>"。它<em>看起来</em> 像平面上的极坐标, 但<em>圈与圈之间的距离</em>（径向）是<em>等距</em> 的——这是因为径向是测地线, 弧长 = 参数 \(r\)。</p>
+
+<h2 id="sec14-5">14.5 测地极坐标下度量简化</h2>
+
+<p>在测地极坐标 \((r, \theta)\) 下, 第一基本形式 \(I\) 长什么样?</p>
+
+<p>定理: <em>在测地极坐标下, \(I\) 总有形式</em></p>
+
+<p>\[
+\boxed{\ I = dr^2 + G(r, \theta) \, d\theta^2,\ }
+\]</p>
+
+<p>其中 \(G\) 是某正函数, 满足边界条件</p>
+
+<p>\[
+G(0, \theta) = 0, \quad \partial_r \sqrt{G(r, \theta)} \big|_{r = 0} = 1.
+\]</p>
+
+<p>这条形式有三个关键性质:</p>
+
+<ol>
+  <li><em>\(g_{rr} = 1\)</em>: 径向是单位速度参数化, 因为径向就是测地线 + \(r\) 是弧长。</li>
+  <li><em>\(g_{r\theta} = 0\)</em>: 径向与角向<em>正交</em>。这是 14.6 节 Gauss 引理的内容。</li>
+  <li><em>\(g_{\theta\theta} = G(r, \theta)\)</em>: 角向的"<em>真实长度</em>" 由 \(G\) 决定, 它编码所有曲率信息。</li>
+</ol>
+
+<p>具体看: 在 \(p\) 处（\(r = 0\)）所有"<em>方向</em>" 都退化到一个点, 所以 \(d\theta\) 在 \(r = 0\) 处的"<em>真实长度</em>" 为 0——这就是 \(G(0, \theta) = 0\)。</p>
+
+<p>\(\partial_r \sqrt{G}|_{r = 0} = 1\) 这条边界条件是说: 在 \(r\) 很小的一阶近似下, \(\sqrt{G(r, \theta)} \approx r\)——即很小的测地圆周长 \(\approx 2\pi r\)（与平面极坐标 \(I = dr^2 + r^2 d\theta^2\) 在 \(r = 0\) 一致）。这反映了"<em>切平面与曲面在 \(p\) 处一阶吻合</em>"。</p>
+
+<p>例子让你看见 \(G\) 的样子:</p>
+
+<ul>
+  <li><em>平面 \(\mathbb{R}^2\)</em>: \(I = dr^2 + r^2 d\theta^2\), 即 \(G = r^2\), \(\sqrt G = r\)。</li>
+  <li><em>球面 \(S^2\)（半径 1）</em>: 选 \(p\) 为北极, 测地极坐标的 \(r\) 是从北极沿子午圈走的弧长 = 余纬 \(\theta_{\text{球}}\)。\(I = dr^2 + \sin^2 r \, d\theta^2\), 即 \(G = \sin^2 r\), \(\sqrt G = \sin r\)。在 \(r = 0\) 处 \(\sqrt G \approx r\)（\(\sin r = r - r^3/6 + ...\)） ✓。</li>
+  <li><em>双曲平面 \(\mathbb{H}^2\)</em>: \(I = dr^2 + \sinh^2 r \, d\theta^2\), \(G = \sinh^2 r\), \(\sqrt G = \sinh r\)。在 \(r = 0\) 处 \(\sqrt G \approx r\) ✓。</li>
+</ul>
+
+<p>这三个例子里 \(\sqrt G\) 分别是 \(r, \sin r, \sinh r\)——它们是<em>常曲率</em> 曲面的代表。\(\sin\) 与 \(\sinh\) 的<em>区别</em> 来自 Gauss 曲率的<em>正负</em>。这件事 14.7 节漂亮公式化。</p>
+
+<h2 id="sec14-6">14.6 Gauss 引理: 测地圆与测地射线正交</h2>
+
+<p>14.5 节里"<em>\(g_{r\theta} = 0\)</em>" 这条不是显然——它说测地圆（\(r = \text{const}\)）与测地射线（\(\theta = \text{const}\)）<em>正交</em>。这件事叫 <strong>Gauss 引理</strong>。</p>
+
+<p><strong>Gauss 引理。</strong>在测地极坐标下, \(I(\partial_r, \partial_\theta) = 0\)（径向与角向切向量正交）。</p>
+
+<p>这件事直觉上不显然——测地射线是"<em>直走</em>" 的曲线, 测地圆是"<em>同距离</em>" 的曲线, 它们为什么必然正交? 在平面上是的（\(d r \cdot r d\theta\) 笛卡尔形式正交）, 但平面太特殊。在球面上呢? 在双曲平面呢? 在<em>任何</em> 弯曲面上, 这件事必然成立——这是 Gauss 引理的内容。</p>
+
+<p>证明（标准变分法）。固定 \(\theta_0\), 看径向测地线 \(\gamma(r) = \exp_p(r v_0)\), 其中 \(v_0\) 是方向 \(\theta_0\) 的单位向量。所以 \(\gamma'(r) = \partial_r\) (在测地极坐标下)。</p>
+
+<p>另一边, 取一个角向变化 \(\theta_0 \to \theta_0 + s\): 看曲线族 \(\gamma_s(r) = \exp_p(r v(\theta_0 + s))\), 其中 \(v(\theta) = \cos\theta \, e_1 + \sin\theta \, e_2\)。变分向量场</p>
+
+<p>\[
+V(r) := \frac{\partial \gamma_s(r)}{\partial s} \bigg|_{s = 0} = (d \exp_p)_{r v_0}(r v'(\theta_0)) = r \cdot \frac{\partial}{\partial \theta} \bigg|_{\text{at } (r, \theta_0)},
+\]</p>
+
+<p>即 \(V = r \partial_\theta\)（用 \(\partial_\theta\) 在 \((r, \theta)\) 坐标下的定义）。注意 \(V(0) = 0\)（在 \(p\) 处所有 \(s\) 给同一个点 \(p\)）。</p>
+
+<p>关键计算: 我们要算 \(I(\gamma'(r), V(r)) = r \cdot I(\partial_r, \partial_\theta)\)。如果它<em>恒为零</em>, 则 \(I(\partial_r, \partial_\theta) = 0\), Gauss 引理证毕。</p>
+
+<p>用变分法: \(\gamma_s\) 全是测地线（\(\exp_p\) 沿径向给测地线）, 它们都是<em>同等弧长</em>（都长度 \(r\)）。所以 \(L[\gamma_s] = r\) 与 \(s\) 无关, \(\frac{d}{ds} L[\gamma_s] = 0\)。</p>
+
+<p>用 13.4 节的变分法公式 + \(\gamma\) 是测地线（\(D \gamma' / dr = 0\)）, 得</p>
+
+<p>\[
+0 = \frac{d}{ds} L[\gamma_s] \bigg|_{s = 0} = \int_0^r I(\gamma''(r), V(r)) dr - I(\gamma'(r), V(r)) \big|_0^r + \ldots
+\]</p>
+
+<p>(这里我跳一些技术细节, 主要是分部积分边界项的处理。完整推导见 do Carmo "<em>Differential Geometry of Curves and Surfaces</em>" §4-6)。</p>
+
+<p>关键结论: \(I(\gamma'(r), V(r)) = 0\) 在端点 \(r\), 即 \(I(\partial_r, r \partial_\theta) = r I(\partial_r, \partial_\theta) = 0\), 所以 \(I(\partial_r, \partial_\theta) = 0\)（对 \(r > 0\)）。\(\square\)</p>
+
+<p>Gauss 引理的<em>几何意义</em>: 切平面上的"<em>圆与放射线正交</em>" 这件平面几何事实, 通过 \(\exp_p\) 拉回到曲面上仍然成立——曲面虽然弯, 但"<em>径向 ⊥ 角向</em>" 这件正交性<em>被指数映射保留</em>。这是<em>径向方向</em> 在测地坐标下的<em>特权地位</em> 的体现。</p>
+
+<h2 id="sec14-7">14.7 测地坐标下 \(K = -\partial_r^2 \sqrt{G} / \sqrt{G}\)</h2>
+
+<p>有了 \(I = dr^2 + G d\theta^2\) 这个简化形式, 我们可以算 Gauss 曲率 \(K\)。结果惊人地<em>漂亮</em>:</p>
+
+<p><strong>定理。</strong>在测地极坐标下,</p>
+
+<p>\[
+\boxed{\ K = -\frac{\partial_r^2 \sqrt{G(r, \theta)}}{\sqrt{G(r, \theta)}}.\ }
+\]</p>
+
+<p>这条公式是个<em>纯内蕴</em> 表达——只用 \(G\)（第一基本形式系数）和它对 \(r\) 的二阶导。它把抽象的 \(K\)（"<em>主曲率乘积</em>"）变成可以<em>直接算</em> 的量, 一旦你能写下测地极坐标下的 \(I\)。</p>
+
+<p>验证三个例子:</p>
+
+<ul>
+  <li><em>平面</em>: \(\sqrt G = r\), \(\partial_r^2 \sqrt G = 0\), \(K = -0 / r = 0\) ✓。</li>
+  <li><em>球面（半径 1）</em>: \(\sqrt G = \sin r\), \(\partial_r^2 \sin r = -\sin r\), \(K = -(-\sin r) / \sin r = 1\) ✓（球面 \(K = 1/R^2 = 1\) 在单位球面）。</li>
+  <li><em>双曲平面</em>: \(\sqrt G = \sinh r\), \(\partial_r^2 \sinh r = \sinh r\), \(K = -\sinh r / \sinh r = -1\) ✓（双曲平面 \(K = -1\)）。</li>
+</ul>
+
+<p>三个例子里 \(\sin, \sinh, r\) 满足同一类 ODE \(f'' = -K f\)（取 \(K = 1, -1, 0\)）, 这正是公式 \(K = -\partial_r^2 \sqrt G / \sqrt G\) 改写。</p>
+
+<p>这条公式的<em>哲学</em> 重要——它说<em>Gauss 曲率 \(K\) 由测地极坐标下度量的"<em>角向放大率</em>" \(\sqrt G(r, \theta)\) 完全决定</em>。\(\sqrt G\) 比 \(r\) 长 → \(K < 0\)（双曲, 角向比平面"<em>更长</em>"）; \(\sqrt G\) 比 \(r\) 短 → \(K > 0\)（球面, 角向比平面"<em>更短</em>"）; \(\sqrt G = r\) → \(K = 0\)（平面）。</p>
+
+<p>证明思路（草图）。把 \(I = dr^2 + G d\theta^2\) 代入 Gauss 曲率的内蕴公式（<a href="ch11.html">ch11</a> 推导）:</p>
+
+<p>\[
+K = \frac{1}{\sqrt{g}} \left[ \frac{\partial}{\partial u^1} \left( \frac{\sqrt{g}}{g_{11}} \Gamma^2_{11} \right) - \ldots \right]
+\]</p>
+
+<p>(完整公式较长, 用度量行列式 \(g = g_{11} g_{22} - g_{12}^2\) 与 Christoffel 符号)。代入 \(g_{11} = 1, g_{22} = G, g_{12} = 0\), \(g = G\), 大量化简后剩下 \(K = -\partial_r^2 \sqrt G / \sqrt G\)。\(\square\)</p>
+
+<p>详细推导建议你跟一本标准教材（do Carmo §4-3）走一遍——它是测地坐标方法的"<em>主菜</em>"。</p>
+
+<h2 id="sec14-8">14.8 应用: 测地圆周长</h2>
+
+<p>14.7 节的公式让我们能<em>用测地圆周长测曲率</em>——一个完全可观测的实验。</p>
+
+<p>设小测地圆 \(r = r_0\) 的周长</p>
+
+<p>\[
+C(r_0) = \int_0^{2\pi} \sqrt{G(r_0, \theta)} \, d\theta.
+\]</p>
+
+<p>把 \(\sqrt{G}\) 在 \(r = 0\) 附近 Taylor 展开 (用 \(\sqrt G(0) = 0, \partial_r \sqrt G(0) = 1\) 边界条件 + \(K = -\partial_r^2 \sqrt G / \sqrt G\)):</p>
+
+<p>\[
+\sqrt{G(r, \theta)} = r - \frac{K(p)}{6} r^3 + O(r^4).
+\]</p>
+
+<p>这里用了 \(\partial_r^2 \sqrt G|_{r = 0} = 0\)（因为 \(\sqrt G \to 0\) 像 \(r\), 二阶导初始为 0）, \(\partial_r^3 \sqrt G|_{r = 0} = -K \cdot \partial_r \sqrt G|_{r = 0} = -K\)。</p>
+
+<p>所以小测地圆周长</p>
+
+<p>\[
+\boxed{\ C(r) = 2\pi r - \frac{\pi K(p)}{3} r^3 + O(r^4).\ }
+\]</p>
+
+<p>请你停下来感受这条公式的力量:</p>
+
+<ul>
+  <li><em>\(K > 0\)（球面）</em>: \(C(r) < 2\pi r\)——测地圆周长比平面值<em>小</em>。直觉: 球面在 \(p\) 附近"<em>向内弯</em>", 圆<em>蜷缩</em>, 周长缩短。</li>
+  <li><em>\(K = 0\)（平面、圆柱）</em>: \(C(r) = 2\pi r + O(r^4)\)——和平面值<em>一样</em>（到三阶）。</li>
+  <li><em>\(K < 0\)（双曲、鞍面）</em>: \(C(r) > 2\pi r\)——测地圆周长比平面值<em>大</em>。直觉: 鞍面"<em>向外散</em>", 圆<em>展开</em>, 周长更长。</li>
+</ul>
+
+<p>反过来用: 实测某曲面上一系列小圆的周长 \(C(r)\), 对比 \(2\pi r\), 算 \((2\pi r - C(r)) / r^3 = \pi K(p) / 3 + O(r)\) 的极限——给出<em>Gauss 曲率 \(K(p)\) 的纯几何测量</em>, 不需要任何 3D 嵌入信息。</p>
+
+<p>类似地, 测地圆<em>面积</em>:</p>
+
+<p>\[
+A(r) = \int_0^r \int_0^{2\pi} \sqrt{G} \, d\theta \, ds = \pi r^2 - \frac{\pi K(p)}{12} r^4 + O(r^5).
+\]</p>
+
+<p>同样的趋势: \(K > 0\) 面积比 \(\pi r^2\) 小, \(K < 0\) 大, \(K = 0\) 相等。</p>
+
+<p>这些公式告诉我们: <em>Gauss 曲率不是抽象——它直接控制曲面上<em>几何量</em>（周长、面积、三角形内角和等）和它们在平面上的<em>偏差</em>。</em></p>
+
+<p>"<em>球面三角形内角和大于 \(\pi\)</em>" 这条经典事实也从这里出来。一个具体的可观测例子: 在地球表面（\(R = 6371\) km, \(K = 1/R^2 \approx 2.5 \times 10^{-14}\) m\(^{-2}\)）画一个边长 100 m 的"<em>测地三角形</em>"。它的内角和与 \(\pi\) 的偏差大约为 \(K \times A = 2.5 \times 10^{-14} \times 10^4 \approx 2.5 \times 10^{-10}\) 弧度——你测不出来。但在 1000 km 边长（A \(\approx 10^{12}\) m\(^2\)）的大三角形, 偏差 \(\approx 2.5 \times 10^{-2}\) 弧度 \(\approx 1.4°\)——<em>能测</em>。Gauss 1820s 在汉诺威王国测三角网时<em>真测过</em> 这件事（虽然结果不显著, 误差太大）。</p>
+
+<p>这种"<em>用周长 / 面积 / 三角形内角偏差测曲率</em>" 是<em>2D 生物</em> 检测自身宇宙曲率的方法——它<em>不需要</em> "<em>外部 3D 空间</em>" 的概念。这跟<a href="ch1.html">ch1</a> Theorema Egregium 主题完全一致, 但现在我们有了具体公式可以<em>实做</em>。</p>
+
+<p>下一章我们离开"<em>局部</em>" 的舒适区, 问"<em>测地线能延伸多远</em>"——即<em>完备性</em>。一个曲面是"<em>测地完备</em>" 当且仅当任何起点 + 任何方向的测地线能延伸到所有时间。这是<em>全局几何</em> 的入场券。Hopf-Rinow 1931 给三条等价条件, 把"<em>测地完备</em>" 与"<em>度量完备</em>" 与"<em>有界闭集紧</em>" 联系起来——是分析与几何的桥梁。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 测地线</a><a href="ch15.html">下一章 · 第 15 章 完备性与 Hopf-Rinow →</a></nav>
+</main>
+</body>
+</html>

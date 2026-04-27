@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 15 章 完备性与 Hopf-Rinow — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 测地坐标与指数映射</a><a href="ch16.html">下一章 · 第 16 章 Gauss-Bonnet →</a></nav>
+<h1 id="ch15">第 15 章 完备性与 Hopf-Rinow</h1>
+
+<p>上一章末尾我说<em>指数映射 \(\exp_p\) 是局部微分同胚</em>——只在 \(0 \in T_p S\) 的某邻域上工作。这里"<em>局部</em>" 这个词应该让你不安。我们想用 \(\exp_p\) 当作"<em>切平面到曲面的线性化工具</em>", 但它如果只能在<em>很小</em> 一片上用, 我们能做的几何就<em>很有限</em>。</p>
+
+<p>具体的: \(\exp_p\) 在 \(v\) 上有定义, 当且仅当测地线 \(\gamma_v\) 能延伸到 \(t = 1\)。它<em>失败</em> 的可能原因——\(\gamma_v\) 在某 \(t < 1\) "<em>跑出曲面</em>" 或"<em>遇到曲面边界</em>" 而无法继续。这种"<em>测地线半路被截断</em>" 是<em>不完备</em> 曲面的典型行为。</p>
+
+<p>请你看一个<em>不完备</em> 的具体例子: 单位圆盘 \(D = \{(x, y) : x^2 + y^2 < 1\}\)（用平面诱导度量）。从原点 \((0, 0)\) 沿正 \(x\) 方向走测地线——它是 \(t \mapsto (t, 0)\), 走到 \(t = 1\) 时<em>到达边界</em>, 但<em>边界不属于 \(D\)</em>（开圆盘）, 测地线<em>无处可去</em>, <em>无法</em> 延伸到 \(t \ge 1\)。所以 \(\exp_p((1, 0))\) <em>没定义</em>。</p>
+
+<p>这种"<em>测地线在有限时间内中断</em>" 让全局几何<em>没法做</em>。我们想要的是"<em>测地线能跑到所有时间</em>" 的曲面——这种曲面叫<em>测地完备</em>。Hopf-Rinow 1931 证明: <em>测地完备</em> 这件几何性质, 居然<em>等价</em> 于一些<em>分析性质</em>（度量完备）和<em>拓扑性质</em>（有界闭集紧致）。这种"<em>三种语言下同一件事</em>" 是 20 世纪几何分析最优雅的定理之一。</p>
+
+<p>这一章把这件事讲清楚, 给完整证明思路, 并看推论"<em>完备曲面里任两点必有最短测地线连接</em>"——这是测地线全局存在性的基本结果。</p>
+
+<h2 id="sec15-1">15.1 不完备例: 单位圆盘</h2>
+
+<p>把上面"<em>单位圆盘</em>" 的例子细化。\(D = \{(x, y) : x^2 + y^2 < 1\}\), 用 \(\mathbb{R}^2\) 诱导度量。这是 2 维曲面（开子集）, 第一基本形式 \(I = dx^2 + dy^2\) 与 \(\mathbb{R}^2\) 一样, Gauss 曲率 \(K = 0\) 与 \(\mathbb{R}^2\) 一样。</p>
+
+<p>测地线方程也与 \(\mathbb{R}^2\) 一样——是直线。但<em>直线能走多远</em>? 在 \(\mathbb{R}^2\) 里直线能走到所有时间; 在 \(D\) 里直线<em>走到边界就没了</em>。</p>
+
+<p>具体: 从 \(p = (0, 0)\) 沿方向 \(v = (1, 0)\) 走测地线 \(\gamma_v(t) = (t, 0)\)。它在 \(t \in [0, 1)\) 上是 \(D\) 的内点, 在 \(t = 1\) 处<em>到达 \(\partial D\)</em>——但 \(\partial D \not\subset D\), 所以 \(\gamma_v(1)\) <em>不在 \(D\) 中</em>, 测地线<em>不能</em> 延伸到 \(t = 1\)。最大区间 \([0, 1)\)。</p>
+
+<p>这种"<em>有限时间到达边界</em>" 给 \(D\) 带来不少<em>怪</em> 行为:</p>
+
+<ul>
+  <li>\(\exp_{(0,0)}\) 的定义域只有 \(\{v : |v| < 1\} \subset T_{(0,0)} D\)——是<em>开</em> 圆盘, 不是整个 \(T_p D = \mathbb{R}^2\)。</li>
+  <li>"<em>从 \(p\) 沿方向 \(\theta\) 走多远</em>" 这条函数被边界<em>有限截断</em>, 不能"<em>走到无穷远</em>"。</li>
+  <li>有些点对 \(p, q \in D\) <em>没</em> 测地线连接——比如 \(p = (-0.99, 0), q = (0.99, 0)\), 它们之间的"<em>直线</em>" 应该是 \([(-0.99, 0), (0.99, 0)]\) 那段——这段全在 \(D\) 内, 是个测地线段, 长度 1.98, OK。这个例子里有连接。</li>
+  <li>但稍微更极端的: 取 \(p = (0.99, 0)\) 和"<em>边界附近的点</em>" \(q\), 你能定义最短路径; 但是问"<em>从 \(p\) 出发能<em>必到</em> 哪里</em>?"——只能到 \(D\) 的<em>有限</em> 范围, 因为出发的"<em>射线</em>" 跑到边界就停。</li>
+</ul>
+
+<p>这里关键的<em>缺陷</em> 是: \(D\) 不<em>包含</em> 它的"<em>极限点</em>"——边界上的点<em>不属于</em> \(D\)。这跟实数 \((0, 1)\) 不完备（不含端点）类似。<em>开</em> 集合里的"<em>东西</em>" 总能"<em>溜到边界</em>" 而<em>消失</em>, 这是不完备的本质。</p>
+
+<p>修法: 把 \(D\) 替换为<em>闭</em> 圆盘 \(\bar D\)。但 \(\bar D\) <em>有边界</em>——它不再是一个<em>无边</em> 曲面, 它是<em>带边</em> 流形, 测地线碰到边界要"<em>反弹</em>" 或"<em>沿边走</em>", 行为复杂。所以"<em>加边界</em>" 不解决问题。</p>
+
+<p>另一种修法: 把 \(D\) 替换为<em>整个平面</em> \(\mathbb{R}^2\)。这是完备的, \(\exp\) 在所有 \(v\) 上有定义, 测地线能走到所有时间。但<em>几何</em> 改了——\(D\) 与 \(\mathbb{R}^2\) 不是同一个对象。</p>
+
+<p>这件事告诉我们: <em>"完备" 是个非平凡的全局条件</em>——不是所有曲面自动满足。我们想分清"<em>哪些满足</em>", 给个判据。</p>
+
+<h2 id="sec15-2">15.2 测地完备的定义</h2>
+
+<p><strong>定义。</strong>曲面 \(S\) 称<em>测地完备</em>（geodesically complete）, 若对任意 \(p \in S\) 与 \(v \in T_p S\), 测地线 \(\gamma_v(t)\) 能延伸到所有 \(t \in \mathbb{R}\)。等价地, 指数映射 \(\exp_p\) 在<em>整个</em> \(T_p S\) 上有定义。</p>
+
+<p>"<em>所有 \(t\)</em>" 既包括正方向又包括负方向——测地线两边都能无限延长。</p>
+
+<p>具体例子:</p>
+
+<ul>
+  <li><em>\(\mathbb{R}^2\)</em>: 测地线是直线 \(\gamma(t) = p + tv\), 显然对所有 \(t \in \mathbb{R}\) 有定义。完备。</li>
+  <li><em>球面 \(S^2\)</em>: 测地线是大圆, 周期延伸（走到 \(2\pi\) 回到出发点继续）, 对所有 \(t \in \mathbb{R}\) 有定义。完备。</li>
+  <li><em>圆环面 \(T^2\)</em>: 测地线（直线 / 螺旋）类似, 完备。</li>
+  <li><em>双曲平面 \(\mathbb{H}^2\)</em>: 完备（标准模型可验证）。</li>
+  <li><em>单位圆盘 \(D\)</em>: 不完备（上节）。</li>
+  <li><em>\(\mathbb{R}^2 \setminus \{0\}\)</em>: 从 \((1, 0)\) 沿 \((-1, 0)\) 方向走测地线 \(\gamma(t) = (1 - t, 0)\), 在 \(t = 1\) 处<em>遇到 \(\{0\}\)</em>——但 \(\{0\}\) 不在曲面里, 测地线无处可去。<em>不完备</em>。</li>
+</ul>
+
+<p>测地完备性<em>不</em> 等同于"<em>没边界</em>"——单位圆盘没边界（开集）但不完备。"<em>没洞</em>" 也不够——\(\mathbb{R}^2 \setminus \{0\}\) 有"<em>洞</em>" 是不完备, 但这跟"<em>洞的拓扑</em>" 没关系（圆环面 \(T^2\) 有<em>拓扑洞</em> 但完备）。完备性的本质<em>是 ODE 的整体延展性</em>, 而 ODE 延展性受"<em>测地线遇到几何边界 / 奇异点</em>" 影响。</p>
+
+<p>定义清晰但不<em>实用</em>——你不可能去检查"<em>对每个 \(p, v\) 测地线都能延伸</em>"。需要等价<em>有效</em> 判据。Hopf-Rinow 给的就是。</p>
+
+<h2 id="sec15-3">15.3 Hopf-Rinow 定理</h2>
+
+<p>设 \(S\) 是<em>连通</em> 的二维（或一般 \(n\) 维）<em>黎曼流形</em>。把"<em>曲面上的距离</em>" 定义为</p>
+
+<p>\[
+d(p, q) := \inf \{ L[\gamma] : \gamma \text{ 是连接 } p, q \text{ 的曲线} \}.
+\]</p>
+
+<p>这给 \(S\) 一个<em>度量空间</em> 结构 \((S, d)\)。我们可以问:</p>
+
+<ul>
+  <li>\((S, d)\) 是不是<em>度量完备</em>（每个 Cauchy 列都收敛）?</li>
+  <li>\(S\) 是不是<em>测地完备</em>?</li>
+  <li>\(S\) 中<em>有界闭</em> 集合是否<em>紧致</em>?（就是 Heine-Borel 性质）</li>
+</ul>
+
+<p>Hopf 与 Rinow 1931 的惊人结论:</p>
+
+<p><strong>Hopf-Rinow 定理。</strong>设 \(S\) 是连通黎曼流形。下列三条<em>等价</em>:</p>
+
+<ol>
+  <li><em>\(S\) 测地完备</em>: 任意起点 + 任意方向的测地线延伸到所有时间。</li>
+  <li><em>\((S, d)\) 度量完备</em>: 每个 Cauchy 列收敛到 \(S\) 的某点。</li>
+  <li><em>\(S\) 有 Heine-Borel</em>: 任何<em>有界 + 闭</em> 子集都<em>紧致</em>。</li>
+</ol>
+
+<p>且这三条任一<em>蕴含</em>:</p>
+
+<p>(4) \(S\) 中任意两点 \(p, q\), <em>存在</em> 一条最短测地线连接它们（即 \(d(p, q) = L[\gamma]\) 由某测地线 \(\gamma\) 实现）。</p>
+
+<p>请你停下来感受这条定理。它把<em>三种完全不同性质的"<em>完备性</em>"</em> 等同起来:</p>
+
+<ul>
+  <li><em>(1) 几何 / ODE 性质</em>——测地线"<em>能跑多远</em>"。</li>
+  <li><em>(2) 分析 / 度量空间性质</em>——Cauchy 列收不收敛, 跟<a href="../泛函分析/index.html">泛函分析</a> "<em>Banach 空间完备</em>" 同构思路。</li>
+  <li><em>(3) 拓扑性质</em>——"<em>有界闭</em>" 跟"<em>紧致</em>" 是不是同义, 跟 \(\mathbb{R}^n\) 上 Heine-Borel 同构思路。</li>
+</ul>
+
+<p>三件不同语言里"<em>完备</em>" 这个词指同一件事。这不是巧合, 是有<em>深刻原因</em> 的——证明里你会看见三者怎样互相蕴含。</p>
+
+<p>另外有一件 Hopf-Rinow <em>不</em> 蕴含的事要注意: <em>测地完备 ≠ 紧致</em>。\(\mathbb{R}^2\) 测地完备但不紧致。Heine-Borel 说"<em>有界闭 = 紧</em>"; 紧致是更强的"<em>整体紧</em>"。完备 + 不紧 → 一定有"<em>无界</em>" 部分。所以完备性是"<em>没洞</em>" 的几何版, 紧致性是"<em>有限</em>" 的几何版, 它们独立。</p>
+
+<h2 id="sec15-4">15.4 完整证明思路</h2>
+
+<p>Hopf-Rinow 完整证明跨 5-10 页。这里给主要思路, 让你看见三个等价条件怎样链起来。</p>
+
+<p><strong>(1) ⟹ (2): 测地完备 ⟹ 度量完备。</strong>设 \(\{p_n\}\) 是 \((S, d)\) 中 Cauchy 列。要证它收敛。</p>
+
+<p>关键观察: Cauchy 列<em>有界</em>（在 \((S, d)\) 中）——存在 \(R\) 使所有 \(p_n\) 在某球 \(B_R(p_0)\) 内。如果我们能证 \(B_R(p_0)\) <em>紧致</em>, 由 Bolzano-Weierstrass + Cauchy 性质, \(\{p_n\}\) 有收敛子列, 配合 Cauchy 性, 整个列收敛。</p>
+
+<p>所以核心步骤: <em>测地完备 ⟹ \(B_R(p_0)\) 紧致</em>。</p>
+
+<p>这一步用 \(\exp_{p_0}\): 测地完备让 \(\exp_{p_0}\) 在整个 \(T_{p_0} S\) 上有定义。又 \(B_R(p_0) \subset \exp_{p_0}(\bar B_R(0))\)（"<em>距离 \(p_0\) 不超过 \(R\) 的点</em>" 都能由"<em>长度不超过 \(R\) 的测地线</em>" 到达——这一步需要"<em>测地线全局最短性</em>"的局部版本, 见 (1) ⟹ (4) 部分）。\(\bar B_R(0) \subset T_{p_0} S\) 是<em>欧氏闭球</em>, 紧致; \(\exp_{p_0}\) 连续, 把紧集映到紧集。所以 \(\exp_{p_0}(\bar B_R(0))\) 紧致, \(B_R(p_0)\) 是它的闭子集, 也紧致。\(\square\)</p>
+
+<p><strong>(2) ⟹ (3): 度量完备 ⟹ Heine-Borel。</strong>设 \(F \subset S\) 有界闭。要证 \(F\) 紧致。</p>
+
+<p>取任意点列 \(\{x_n\} \subset F\)。要证它有收敛子列 (收敛到 \(F\) 中某点)。</p>
+
+<p>有界 + 度量完备这一对<em>不</em> 直接给"<em>有收敛子列</em>"——这一步需要更强的论证, 用<em>"球的紧致性"</em> 性质。在标准 Hopf-Rinow 证明里, 这步与 (1) ⟹ (2) 结合起来用: 度量完备 + (利用测地线工具) ⟹ 球紧 ⟹ 有界闭紧。完整论证比较技术性, 这里跳过细节。</p>
+
+<p><strong>(3) ⟹ (1): Heine-Borel ⟹ 测地完备。</strong>反证: 假设有测地线 \(\gamma_v\) 不能延伸到 \(t = T < \infty\), 即 \(\gamma_v\) 在 \([0, T)\) 上有定义但不能到 \(t = T\)。</p>
+
+<p>取 \(t_n \to T^-\), 看点列 \(\gamma_v(t_n) \in S\)。这个点列<em>有界</em>（在 \(B_T(\gamma_v(0))\) 内, 因为它们距离 \(\gamma_v(0)\) 都不超过 \(T\)）。所以它在某有界闭集中。由 Heine-Borel, 这集紧致, 点列有收敛子列, 收敛到某点 \(q \in S\)。</p>
+
+<p>关键: 由 ODE 局部解的延展性（<a href="ch13.html">ch13</a> 8 节）, 在 \(q\) 附近测地线方程的局部解存在, 我们可以"<em>把 \(\gamma_v\) 在 \(q\) 附近接上</em>", 让它延伸过 \(t = T\)——矛盾 (假设 \(\gamma_v\) 不能延伸过 \(t = T\))。所以 \(\gamma_v\) 必能延伸到所有 \(t\)。\(\square\)</p>
+
+<p><strong>(1) ⟹ (4): 测地完备 ⟹ 任两点有最短测地线。</strong>设 \(p, q \in S\), \(d(p, q) = D\)。要构造长度 \(D\) 的测地线连接它们。</p>
+
+<p>取一列曲线 \(\gamma_n\) 连接 \(p, q\), \(L[\gamma_n] \to D\)（按 inf 定义）。要从这列里"<em>抽出</em>" 一条测地线。</p>
+
+<p>关键工具: "<em>沿任意方向走最短测地线 \(R\) 单位</em>"——由测地完备 + Gauss 引理, 在 \(B_\varepsilon(p)\) 内每个点都被某<em>径向测地线</em> 从 \(p\) 出发到达, 且这条测地线<em>就是</em> \(p\) 到该点的最短路径。这是测地极坐标的基本性质（<a href="ch14.html">ch14</a>）。</p>
+
+<p>构造: 在 \(B_\varepsilon(p)\) 上找最优的"<em>第一步方向</em>" \(v_0\), 让 \(\gamma_{v_0}(\varepsilon)\) 是"<em>距 \(q\) 最近</em>" 的小球边界点。然后从 \(\gamma_{v_0}(\varepsilon)\) 重复, 找下一步最优方向。这给"<em>逐段最优</em>" 路径。要证它<em>整体最优</em> 且<em>极限是测地线</em>, 需要紧致性论证（用 (3)）+ 弧长函数下半连续。完整论证见 do Carmo §7-2。\(\square\)</p>
+
+<p>这条 (4) 的几何意义重要: <em>完备曲面里, 最短路径"<em>存在</em>"</em>。在<em>不</em> 完备曲面里, 最短路径可能<em>不存在</em>——\(d(p, q)\) 是个 inf 但<em>没人达到</em>。例: 平面去掉一段——从一边的点到另一边的点必须绕开缺口, "<em>最短路径</em>" 可能要"<em>贴边</em>" 走, 但贴不到（边不在集中）, 所以是 inf 而<em>不</em> 是 min。</p>
+
+<h2 id="sec15-5">15.5 推论: "<em>最短路径存在</em>"</h2>
+
+<p>15.4 (4) 是 Hopf-Rinow 最常被<em>用</em> 的推论。具体陈述:</p>
+
+<p><strong>推论。</strong>设 \(S\) 是测地完备的连通曲面。对任意 \(p, q \in S\), 存在测地线 \(\gamma : [0, L] \to S\) 满足 \(\gamma(0) = p, \gamma(L) = q\) 且 \(L = d(p, q)\)。</p>
+
+<p>这条推论让"<em>最短测地线</em>" 这个概念有意义——你不必担心"<em>最短不存在</em>" 的反常情况。在完备曲面上, "<em>从 \(p\) 到 \(q\) 的最短路径</em>" 是<em>真实存在</em> 的曲线, 你可以谈它的形状、长度、性质。</p>
+
+<p>注意"<em>最短测地线</em>" 不一定<em>唯一</em>:</p>
+
+<ul>
+  <li>球面: \(p, q\) 是<em>对极点</em>（南北极）时, <em>无穷多</em> 条最短测地线（任何子午圈都是, 全都长度 \(\pi R\)）。</li>
+  <li>圆环面: 一些点对有<em>多条</em> 最短测地线（"<em>从这边绕</em>" 与"<em>从那边绕</em>"）。</li>
+  <li>一般曲面: 一般唯一, 但可能有非典型对子（"<em>切割轨迹</em>" cut locus 上的对子）有多条。</li>
+</ul>
+
+<p>但<em>存在性</em> 是绝对的。这件事是测地线全局理论的基石——后面 Gauss-Bonnet（<a href="ch16.html">ch16</a>）用"<em>最短测地三角形</em>" 之类时, 全靠这个推论保证三角形<em>真存在</em>。</p>
+
+<h2 id="sec15-6">15.6 反例: 完备 ≠ 紧</h2>
+
+<p>请你画几个曲面, 标出"<em>完备 vs 不完备</em>" 与"<em>紧 vs 不紧</em>"。</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr>
+  <th style="padding: 0.3em 1em; border: 1px solid #999;">曲面</th>
+  <th style="padding: 0.3em 1em; border: 1px solid #999;">完备?</th>
+  <th style="padding: 0.3em 1em; border: 1px solid #999;">紧?</th>
+</tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #999;">\(\mathbb{R}^2\) (平面)</td><td style="padding: 0.3em 1em; border: 1px solid #999;">完备</td><td style="padding: 0.3em 1em; border: 1px solid #999;">不紧 (无界)</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #999;">单位开圆盘 \(D\)</td><td style="padding: 0.3em 1em; border: 1px solid #999;">不完备</td><td style="padding: 0.3em 1em; border: 1px solid #999;">不紧 (开集)</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #999;">单位<em>闭</em> 圆盘 \(\bar D\)</td><td style="padding: 0.3em 1em; border: 1px solid #999;">完备 (作带边曲面)</td><td style="padding: 0.3em 1em; border: 1px solid #999;">紧</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #999;">球面 \(S^2\)</td><td style="padding: 0.3em 1em; border: 1px solid #999;">完备</td><td style="padding: 0.3em 1em; border: 1px solid #999;">紧</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #999;">圆环面 \(T^2\)</td><td style="padding: 0.3em 1em; border: 1px solid #999;">完备</td><td style="padding: 0.3em 1em; border: 1px solid #999;">紧</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #999;">无穷长圆柱（\(\mathbb{R} \times S^1\)）</td><td style="padding: 0.3em 1em; border: 1px solid #999;">完备</td><td style="padding: 0.3em 1em; border: 1px solid #999;">不紧 (无界)</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #999;">\(\mathbb{R}^2 \setminus \{0\}\)</td><td style="padding: 0.3em 1em; border: 1px solid #999;">不完备 (洞)</td><td style="padding: 0.3em 1em; border: 1px solid #999;">不紧</td></tr>
+<tr><td style="padding: 0.3em 1em; border: 1px solid #999;">双曲平面 \(\mathbb{H}^2\)</td><td style="padding: 0.3em 1em; border: 1px solid #999;">完备</td><td style="padding: 0.3em 1em; border: 1px solid #999;">不紧</td></tr>
+</table>
+
+<p>看这张表的两条规律:</p>
+
+<ol>
+  <li><em>"完备" 不蕴含 "紧"</em>——\(\mathbb{R}^2, \mathbb{H}^2, \) 圆柱都是完备但不紧。</li>
+  <li><em>"紧" 蕴含 "完备"</em>——这是 Hopf-Rinow 推论: 紧 ⟹ Heine-Borel 平凡成立 ⟹ 完备。</li>
+</ol>
+
+<p>所以紧致曲面（球面、圆环面、所有有限封闭曲面）<em>自动</em> 完备, 不必单独证。这件事让我们后面 Gauss-Bonnet 处理"<em>紧致曲面</em>" 时不必为完备性操心。</p>
+
+<p>但要做"<em>非紧致</em>" 的几何（双曲平面、欧氏空间、Lobachevsky 几何）时, "<em>完备性</em>" 是单独要验证的条件。\(\mathbb{H}^2\) 是关键例子——它是<em>非紧致</em> 但<em>完备</em> 的常曲率曲面, 是非欧几何的标准模型。它的完备性让我们能在它上做"<em>全局</em>" 几何（测地线分类、面积公式、Gauss-Bonnet 等）。</p>
+
+<h2 id="sec15-7">15.7 球面 / 圆环 / 平面 / 双曲: 完备</h2>
+
+<p>简短验证四个标准例子的完备性。</p>
+
+<p><strong>\(\mathbb{R}^2\)</strong>: 测地线 \(\gamma(t) = p + tv\) 显然对所有 \(t \in \mathbb{R}\) 有定义。完备 ✓。</p>
+
+<p><strong>球面 \(S^2\)</strong>: 测地线是大圆, 用单位速度参数化是 \(\gamma(t) = \cos(t) e_1 + \sin(t) e_2\)（\(e_1 = p / |p|, e_2 = v / |v|\)）。对所有 \(t \in \mathbb{R}\) 有定义（周期 \(2\pi\)）。完备 ✓。</p>
+
+<p><strong>圆环面 \(T^2\)</strong>: 用 \(T^2 = \mathbb{R}^2 / \mathbb{Z}^2\), 测地线是 \(\mathbb{R}^2\) 直线投影到 \(T^2\)。\(\mathbb{R}^2\) 完备 ⟹ 投影完备。完备 ✓。</p>
+
+<p><strong>双曲平面 \(\mathbb{H}^2\)</strong>: 用 Poincaré 上半平面模型 \(\mathbb{H}^2 = \{(x, y) : y > 0\}\) 加双曲度量 \(I = (dx^2 + dy^2) / y^2\)。测地线是: 垂直于 \(x\) 轴的射线, 或圆心在 \(x\) 轴上的半圆弧。验证: 用单位速度参数化, 测地线参数 \(t \in (-\infty, \infty)\), 永不"<em>跑出</em>" \(\mathbb{H}^2\)（虽然在欧氏意义上"<em>接近 \(x\) 轴</em>", 但双曲距离 \(\to \infty\)）。完备 ✓。</p>
+
+<p>双曲平面的完备性比看起来微妙——欧氏意义上 \(\mathbb{H}^2\) "<em>有边界</em>"（\(x\) 轴）, 但双曲度量 \(1/y^2\) 在 \(y \to 0\) 时<em>爆炸</em>, 让"<em>到达 \(x\) 轴</em>" 的双曲距离<em>无穷</em>。所以 \(x\) 轴不是双曲意义上的"<em>边界</em>"——在双曲世界里, 它是"<em>无穷远</em>"。这件事让 \(\mathbb{H}^2\) 在双曲度量下完备, 哪怕它在欧氏度量下"<em>有边</em>"。</p>
+
+<p>这就是为什么"<em>完备性</em>" 要相对于<em>当前度量</em> 谈, 不能简单看曲面"<em>是否有边</em>" 的拓扑性质。</p>
+
+<h2 id="sec15-8">15.8 应用: 完备性是全局几何的入场券</h2>
+
+<p>为什么这一章重要? 因为后面所有"<em>全局</em>" 微分几何工作都<em>依赖</em> 完备性。</p>
+
+<p><strong>Gauss-Bonnet (<a href="ch16.html">ch16</a>)</strong>: \(\int_M K \, dA = 2\pi \chi(M)\) 对紧致曲面成立。紧致 ⟹ 完备, 所以 Gauss-Bonnet 隐含完备假设。如果 \(M\) 不紧, Gauss-Bonnet 有"<em>带边版</em>" 也需要完备性 + 边界控制。</p>
+
+<p><strong>测地线分类</strong>: 在完备曲面上, 测地线分两类——<em>闭</em> 测地线（如球面大圆, 圆环上某些方向的螺旋）vs <em>非闭</em> 测地线（如圆环上一般方向的螺旋, 在 \(T^2\) 上稠密）。这种分类需要测地线"<em>能跑到所有时间</em>" 才能定义。</p>
+
+<p><strong>覆盖空间</strong>: 双曲平面 \(\mathbb{H}^2\) 是<em>所有亏格 \(\ge 2\) 紧致曲面</em> 的<em>万有覆盖</em>——这是著名的 Uniformization 定理（\(\mathbb{R}^2 / \mathbb{Z}^2\) 的覆盖是 \(\mathbb{R}^2\); 球面的覆盖是它自己; 高亏格曲面的覆盖是 \(\mathbb{H}^2\)）。这些覆盖关系需要完备性。</p>
+
+<p><strong>Cartan-Hadamard 定理</strong>: 完备 + \(K \le 0\) 处处的曲面, \(\exp_p\) 是<em>全局</em> 微分同胚 \(T_p S \to S\)（不只是局部）。这是高级测地线理论中最重要的结构定理之一。</p>
+
+<p><strong>Bonnet-Myers 定理</strong>: 完备 + \(K \ge K_0 > 0\) 处处的曲面<em>必紧致</em>。这是"<em>正曲率自动给紧致</em>" 的著名结果, 反过来说: 完备 + 不紧 ⟹ 某处 \(K \le 0\)。</p>
+
+<p>这些定理把"<em>测地完备</em>" 这个看上去"<em>技术性</em>" 的条件变成<em>有几何后果</em> 的条件——它告诉你曲面的<em>整体形状</em> 受制于<em>局部曲率</em>。</p>
+
+<p>请你停下来感受: <em>完备性</em> 是<em>局部分析</em>（ODE 解延展）与<em>整体几何</em>（曲面形状、紧致性、覆盖）的<em>桥梁</em>。它单独看像个技术细节, 但没有它整个全局微分几何的"<em>语言</em>" 都<em>讲不通</em>。</p>
+
+<p>下一章我们终于走到本书"<em>第一座大山</em>"——<strong>Gauss-Bonnet 定理</strong>: \(\int_M K \, dA = 2\pi \chi(M)\)。它把<em>局部曲率</em>（\(K\)）和<em>整体拓扑</em>（Euler 示性数 \(\chi\)）<em>等同</em> 起来——是<em>几何决定拓扑</em> 的最美丽体现。这条定理用到我们前 15 章<em>所有</em> 工具: 测地三角形（ch13）+ 测地坐标（ch14）+ 完备性（ch15）+ \(K\) 的内蕴公式（ch11）。一切准备就绪, 让我们去爬第一座山。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 测地坐标与指数映射</a><a href="ch16.html">下一章 · 第 16 章 Gauss-Bonnet →</a></nav>
+</main>
+</body>
+</html>

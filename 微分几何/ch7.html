@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 第一基本形式：内蕴度量 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 正则曲面</a><a href="ch8.html">下一章 · 第 8 章 Gauss 映射 →</a></nav>
+<h1 id="ch7">第 7 章 第一基本形式：内蕴度量</h1>
+
+<p>上一章我们把曲面定义好了——一个集合 \(S \subset \mathbb{R}^3\), 每点附近有一张光滑参数化, 切空间 \(T_p S\) 是 \(\mathbb{R}^3\) 的 2 维子空间。但定义里<em>什么都没量</em>。这一章开始<em>量</em>。</p>
+
+<p><strong>具体问题.</strong> 给曲面 \(S\) 上一条曲线 \(\gamma\), 比如球面赤道、圆柱上一段螺旋, 它的<em>长度</em> 是多少？</p>
+
+<p>这个问题在 \(\mathbb{R}^3\) 中有标准答案——\(L = \int_a^b |\gamma'(t)| dt\)（ch2）。但用 \(\gamma\) 在 \(\mathbb{R}^3\) 中的<em>外部</em> 表示算长度感觉怪——曲线在曲面上, 我们好像应该能"<em>站在曲面上</em>" 量它, 不出曲面。</p>
+
+<p>这一章告诉你: 答案就是<em>第一基本形式</em>。它把欧氏内积限到切平面上, 给一个 2×2 对称矩阵, 这个矩阵<em>完全</em> 决定了曲面上所有<em>内蕴</em> 几何量——长度、角度、面积。Gauss 1827 给出的最大震撼是, 它甚至决定 \(K\)（看似外蕴的 Gauss 曲率）。这一章是后面五章共同的语法基础。</p>
+
+<h2 id="sec7-1">7.1 长度怎么算</h2>
+
+<p>从最基本的开始。\(\gamma: [a, b] \to \mathbb{R}^3\) 是一条光滑曲线, 它的长度</p>
+
+<p>\[
+L(\gamma) = \int_a^b |\gamma'(t)| \, dt = \int_a^b \sqrt{\langle \gamma'(t), \gamma'(t) \rangle} \, dt.
+\]</p>
+
+<p>这里 \(\langle \cdot, \cdot \rangle\) 是 \(\mathbb{R}^3\) 标准欧氏内积。这是 ch2 学过的事。</p>
+
+<p>现在 \(\gamma\) 不是 \(\mathbb{R}^3\) 中"自由" 的曲线, 而是<em>曲面 \(S\) 上</em> 的曲线。它的速度 \(\gamma'(t)\) 在每点都属于切空间 \(T_{\gamma(t)} S\)。所以 \(|\gamma'(t)|\) 算的就是<em>切向量</em> 的欧氏长度。</p>
+
+<p>用一张参数化 \(X(u, v)\) 把 \(\gamma\) 写成 \(\gamma(t) = X(u(t), v(t))\)（即 \(\gamma\) 在参数平面里对应一条 \((u(t), v(t))\)）。链式法则:</p>
+
+<p>\[
+\gamma'(t) = X_u \cdot u'(t) + X_v \cdot v'(t).
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\langle \gamma'(t), \gamma'(t) \rangle = \langle X_u u' + X_v v', X_u u' + X_v v' \rangle
+\]
+\[
+= \langle X_u, X_u \rangle (u')^2 + 2 \langle X_u, X_v \rangle u' v' + \langle X_v, X_v \rangle (v')^2.
+\]</p>
+
+<p>把这三个内积命名:</p>
+
+<p>\[
+E := \langle X_u, X_u \rangle, \quad F := \langle X_u, X_v \rangle, \quad G := \langle X_v, X_v \rangle.
+\]</p>
+
+<p>（"\(F\)" 这里是名字而非映射, 不要和后面的隐式方程函数 \(F\) 混。这是经典 Gauss 记号——\(E, F, G\) 是 19 世纪传下来的字母, 现在文献里都用。）</p>
+
+<p>那么</p>
+
+<p>\[
+L(\gamma) = \int_a^b \sqrt{E (u')^2 + 2 F u' v' + G (v')^2} \, dt.
+\]</p>
+
+<p>请你停下来看清这件事的意义。曲线在 \(\mathbb{R}^3\) 中, 长度公式用的是 \(\mathbb{R}^3\) 的内积。但<em>把它写成</em> 参数化下的形式之后, 公式只用到三个量 \(E, F, G\)——它们都是参数化偏导<em>之间</em> 的内积, <em>不</em> 直接出现 \(\mathbb{R}^3\) 的坐标。这暗示长度其实只<em>需要</em> 这三个数（在每点）。这就是第一基本形式想抓住的事。</p>
+
+<h2 id="sec7-2">7.2 第一基本形式的定义</h2>
+
+<p><strong>定义 7.1.</strong> 设 \(p \in S\), \(T_p S\) 是切空间。<em>第一基本形式</em> \(I_p\) 是 \(T_p S\) 上的对称双线性形式</p>
+
+<p>\[
+I_p(v, w) := \langle v, w \rangle_{\mathbb{R}^3}, \quad v, w \in T_p S.
+\]</p>
+
+<p>就是把 \(\mathbb{R}^3\) 标准内积<em>限制</em> 到 \(T_p S\) 上。完全没新内容——只是给"<em>切空间上的内积</em>" 起个名字。</p>
+
+<p>它有几条直接性质:</p>
+
+<ul>
+  <li>对称: \(I_p(v, w) = I_p(w, v)\)。</li>
+  <li>双线性: 在 \(v\) 和 \(w\) 上分别线性。</li>
+  <li>正定: \(I_p(v, v) = |v|^2 \geq 0\), 等号当且仅当 \(v = 0\)。</li>
+</ul>
+
+<p>所以它是 \(T_p S\) 上的内积。每个 \(p \in S\) 给一个不同的内积——但所有这些内积都是"<em>同一个 \(\mathbb{R}^3\) 内积的限制</em>"。</p>
+
+<p>"<em>限制</em>" 这件事是关键。\(\mathbb{R}^3\) 内积本身处处一样（不依赖位置）, 但限到不同点的切平面上, 因为切平面在 \(\mathbb{R}^3\) 中位置不同, 看起来是不同的内积。具体来说——\(T_p S\) 中两个向量内积虽然是 \(\mathbb{R}^3\) 内积, 但<em>用 \(T_p S\) 自己的基</em>（如 \(X_u, X_v\)）写出来的矩阵, 在不同 \(p\) 不同。这个矩阵就是下一节的 \(\begin{pmatrix} E & F \\ F & G \end{pmatrix}\)。</p>
+
+<h2 id="sec7-3">7.3 矩阵表示</h2>
+
+<p>选一张参数化 \(X(u, v)\), \(p = X(q)\)。\(T_p S\) 有自然基 \((X_u(q), X_v(q))\)。任意两个切向量 \(v = a X_u + b X_v\), \(w = c X_u + d X_v\) 的内积:</p>
+
+<p>\[
+I_p(v, w) = \langle a X_u + b X_v, c X_u + d X_v \rangle
+\]
+\[
+= ac \langle X_u, X_u \rangle + ad \langle X_u, X_v \rangle + bc \langle X_v, X_u \rangle + bd \langle X_v, X_v \rangle
+\]
+\[
+= ac \cdot E + (ad + bc) \cdot F + bd \cdot G.
+\]</p>
+
+<p>用矩阵写:</p>
+
+<p>\[
+I_p(v, w) = \begin{pmatrix} a & b \end{pmatrix} \begin{pmatrix} E & F \\ F & G \end{pmatrix} \begin{pmatrix} c \\ d \end{pmatrix}.
+\]</p>
+
+<p>所以第一基本形式在基 \((X_u, X_v)\) 下的矩阵是</p>
+
+<p>\[
+\boxed{\ [I_p] = \begin{pmatrix} E & F \\ F & G \end{pmatrix}, \quad E = \langle X_u, X_u \rangle, F = \langle X_u, X_v \rangle, G = \langle X_v, X_v \rangle.\ }
+\]</p>
+
+<p>这个矩阵<em>对称</em>（\(F\) 出现在两个非对角位置）, <em>正定</em>（因为是内积矩阵）。</p>
+
+<p>正定性意味着 \(\det = EG - F^2 > 0\)。这个量后面（7.7）出现在面积公式里。</p>
+
+<p>正定性还有个几何意思: \(EG - F^2 > 0\) 等价于 \(X_u \times X_v \neq 0\)（叉积非零）, 即<em>参数化正则</em>（ch6.4 的条件 3）。事实上 \(|X_u \times X_v|^2 = |X_u|^2 |X_v|^2 - (X_u \cdot X_v)^2 = EG - F^2\)（Lagrange 恒等式）。</p>
+
+<h2 id="sec7-4">7.4 五个例子的第一基本形式</h2>
+
+<p>把 ch6 的标准例都算一遍。这种"<em>具体算几个</em>" 是 Banner 风格的核心——别只盯定义, 看它在熟悉对象上长什么样。</p>
+
+<p><strong>例 1（平面）.</strong> 参数化 \(X(u, v) = (u, v, 0)\). \(X_u = (1, 0, 0), X_v = (0, 1, 0)\). \(E = 1, F = 0, G = 1\)。所以</p>
+
+<p>\[
+[I] = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}.
+\]</p>
+
+<p>就是单位矩阵——平面就是欧氏几何, 内积矩阵是 Identity。"<em>平面是平的</em>" 在第一基本形式上的形式表达就是: <em>处处</em> 都是单位矩阵。</p>
+
+<p><strong>例 2（球面 \(S^2_r\)）.</strong> 参数化 \(X(\theta, \varphi) = (r \sin \theta \cos \varphi, r \sin \theta \sin \varphi, r \cos \theta)\). 算偏导:</p>
+
+<p>\[
+X_\theta = r(\cos \theta \cos \varphi, \cos \theta \sin \varphi, -\sin \theta),
+\]
+\[
+X_\varphi = r(-\sin \theta \sin \varphi, \sin \theta \cos \varphi, 0).
+\]</p>
+
+<p>\(E = \langle X_\theta, X_\theta \rangle = r^2 (\cos^2 \theta \cos^2 \varphi + \cos^2 \theta \sin^2 \varphi + \sin^2 \theta) = r^2 (\cos^2 \theta + \sin^2 \theta) = r^2\).</p>
+
+<p>\(F = \langle X_\theta, X_\varphi \rangle = r^2 (-\cos \theta \cos \varphi \sin \theta \sin \varphi + \cos \theta \sin \varphi \sin \theta \cos \varphi + 0) = 0\).</p>
+
+<p>\(G = \langle X_\varphi, X_\varphi \rangle = r^2 (\sin^2 \theta \sin^2 \varphi + \sin^2 \theta \cos^2 \varphi) = r^2 \sin^2 \theta\).</p>
+
+<p>所以</p>
+
+<p>\[
+[I] = \begin{pmatrix} r^2 & 0 \\ 0 & r^2 \sin^2 \theta \end{pmatrix}.
+\]</p>
+
+<p>请你解读这个矩阵: \(F = 0\) 意味着 \(X_\theta\) 和 \(X_\varphi\) 在球面上<em>处处正交</em>——纬线和经线垂直, 这是常识。\(E = r^2\) 是常数, \(G = r^2 \sin^2 \theta\) 依 \(\theta\) 变, 极点附近（\(\theta \to 0\) 或 \(\pi\)）\(G \to 0\), 反映"<em>极点附近经线方向退化</em>"。</p>
+
+<p><strong>例 3（圆柱面）.</strong> \(X(u, v) = (r \cos u, r \sin u, v)\). \(X_u = (-r \sin u, r \cos u, 0), X_v = (0, 0, 1)\).</p>
+
+<p>\(E = r^2, F = 0, G = 1\). 即</p>
+
+<p>\[
+[I] = \begin{pmatrix} r^2 & 0 \\ 0 & 1 \end{pmatrix}.
+\]</p>
+
+<p>常数矩阵。\(F = 0\) 说圆周方向和轴方向正交。"<em>常数</em>" 这件事很重要——它意味着圆柱的内蕴度量在每个点都"<em>一样</em>"。下面 7.8 我们会看到, 这是圆柱与平面<em>等距</em> 的形式背景。</p>
+
+<p><strong>例 4（圆锥面, 半角 \(\alpha\)）.</strong> 参数化 \(X(t, \varphi) = (t \sin \alpha \cos \varphi, t \sin \alpha \sin \varphi, t \cos \alpha)\) （\(t > 0\)）. 算:</p>
+
+<p>\(X_t = (\sin \alpha \cos \varphi, \sin \alpha \sin \varphi, \cos \alpha)\), \(|X_t|^2 = \sin^2 \alpha + \cos^2 \alpha = 1\). 即 \(E = 1\).</p>
+
+<p>\(X_\varphi = (-t \sin \alpha \sin \varphi, t \sin \alpha \cos \varphi, 0)\), \(|X_\varphi|^2 = t^2 \sin^2 \alpha\). 即 \(G = t^2 \sin^2 \alpha\).</p>
+
+<p>\(F = X_t \cdot X_\varphi = -t \sin^2 \alpha \cos \varphi \sin \varphi + t \sin^2 \alpha \sin \varphi \cos \varphi = 0\).</p>
+
+<p>\[
+[I] = \begin{pmatrix} 1 & 0 \\ 0 & t^2 \sin^2 \alpha \end{pmatrix}.
+\]</p>
+
+<p>这个跟<em>平面的极坐标</em> 长得几乎一模一样（平面极坐标第一基本形式是 \(\begin{pmatrix} 1 & 0 \\ 0 & r^2 \end{pmatrix}\)）！只是 \(r\) 变成 \(t \sin \alpha\)。所以圆锥（去掉顶点）<em>等距</em> 于平面的一个扇形——"<em>圆锥可以剪开摊平</em>"。这是日常事实（雪糕筒纸壳剪开是平面扇形）, 现在它的形式背景显现: 第一基本形式形状一致, 所以等距。</p>
+
+<p><strong>例 5（旋转曲面）.</strong> \(X(t, \varphi) = (f(t) \cos \varphi, f(t) \sin \varphi, g(t))\). \(X_t = (f' \cos \varphi, f' \sin \varphi, g'), X_\varphi = (-f \sin \varphi, f \cos \varphi, 0)\).</p>
+
+<p>\(E = (f')^2 + (g')^2, F = 0, G = f^2\). 即</p>
+
+<p>\[
+[I] = \begin{pmatrix} (f')^2 + (g')^2 & 0 \\ 0 & f^2 \end{pmatrix}.
+\]</p>
+
+<p>\(F = 0\) 意味着<em>所有旋转曲面</em> 的纬线和母线都正交。这是几何常识——旋转出来的小圆与母线垂直。</p>
+
+<h2 id="sec7-5">7.5 长度公式</h2>
+
+<p>把 7.1 的结果重写一遍, 用第一基本形式语言:</p>
+
+<p><strong>定理 7.1.</strong> 设 \(\gamma(t) = X(u(t), v(t))\) 是参数化 \(X\) 下曲面 \(S\) 上的曲线, \(t \in [a, b]\). 则</p>
+
+<p>\[
+L(\gamma) = \int_a^b \sqrt{E(u')^2 + 2 F u' v' + G (v')^2} \, dt = \int_a^b \sqrt{I_{\gamma(t)}(\gamma'(t), \gamma'(t))} \, dt.
+\]</p>
+
+<p>具体例子让你看数字:</p>
+
+<p><strong>球面赤道 \(S^2_r\).</strong> 参数化 \(\theta = \pi/2\) 固定, \(\varphi: 0 \to 2\pi\). \(u(t) = \pi/2, v(t) = t\). \(u' = 0, v' = 1\). \(E (u')^2 + 2 F u' v' + G (v')^2 = G \cdot 1 = r^2 \sin^2(\pi/2) = r^2\). \(L = \int_0^{2\pi} \sqrt{r^2} \, dt = 2\pi r\). ✓ 和我们小学学的 \(C = 2\pi r\) 一致。</p>
+
+<p><strong>球面纬线 \(\theta = \theta_0\).</strong> 同样 \(u' = 0, v' = 1\). 长度 \(\int_0^{2\pi} \sqrt{r^2 \sin^2 \theta_0} dt = 2\pi r \sin \theta_0\). 极点附近 \(\sin \theta_0 \to 0\), 纬线长度 \(\to 0\), 直觉对。</p>
+
+<p><strong>圆柱上一段螺旋 \(u = \alpha t, v = \beta t\), \(t \in [0, T]\).</strong> 在圆柱 \(X(u, v) = (r \cos u, r \sin u, v)\) 上, 这条曲线 \(\gamma(t) = (r \cos(\alpha t), r \sin(\alpha t), \beta t)\) 是一段标准螺旋线。\(u' = \alpha, v' = \beta\). \(E = r^2, F = 0, G = 1\). \(L = \int_0^T \sqrt{r^2 \alpha^2 + \beta^2} \, dt = T \sqrt{r^2 \alpha^2 + \beta^2}\). 验证: 用 \(\mathbb{R}^3\) 直接公式 \(\gamma'(t) = (-r \alpha \sin(\alpha t), r \alpha \cos(\alpha t), \beta)\), \(|\gamma'| = \sqrt{r^2 \alpha^2 + \beta^2}\), 同样答案。✓</p>
+
+<p>第一基本形式给的长度公式与"<em>外部</em> \(\mathbb{R}^3\) 长度公式" 一致——这正是它<em>限制</em> \(\mathbb{R}^3\) 内积的本质。</p>
+
+<h2 id="sec7-6">7.6 角度公式</h2>
+
+<p>两曲线在交点处<em>夹角</em> 的余弦定义为它们切向量的内积除模长积:</p>
+
+<p>\[
+\cos \theta = \frac{\langle v, w \rangle}{|v| \cdot |w|} = \frac{I_p(v, w)}{\sqrt{I_p(v, v) \cdot I_p(w, w)}}.
+\]</p>
+
+<p>把 \(v = a X_u + b X_v, w = c X_u + d X_v\) 代入:</p>
+
+<p>\[
+\cos \theta = \frac{a c E + (ad + bc) F + bd G}{\sqrt{a^2 E + 2 ab F + b^2 G} \cdot \sqrt{c^2 E + 2 cd F + d^2 G}}.
+\]</p>
+
+<p><strong>具体推论.</strong> "<em>参数曲线 \(u\)-曲线和 \(v\)-曲线正交</em>" ⟺ 取 \(v = X_u\)（即 \(a = 1, b = 0\)）, \(w = X_v\)（\(c = 0, d = 1\)）, \(\cos \theta = F / \sqrt{EG}\). 所以正交 ⟺ \(F = 0\)。</p>
+
+<p>这就是 7.4 中我们反复看到 \(F = 0\) 的几何含义: <em>参数化的两族坐标曲线正交</em>。球面的（\(\theta\), \(\varphi\)）正交（经线和纬线垂直）, 圆柱的 \((u, v)\) 正交（圆周和母线垂直）, 圆锥的 \((t, \varphi)\) 正交, 旋转曲面的 \((t, \varphi)\) 正交。这些都不是巧合, 而是参数化"<em>选得自然</em>" 的反映。</p>
+
+<h2 id="sec7-7">7.7 面积公式</h2>
+
+<p>这是新东西。曲线没有面积, 但曲面有。怎么<em>站在曲面上</em> 算面积？</p>
+
+<p>朴素想法: 曲面 \(S\) 一小块的面积 \(\approx\) 它在 \(\mathbb{R}^3\) 中切向量张成的平行四边形面积。</p>
+
+<p>取参数化 \(X(u, v)\), 一个小矩形 \([u, u + du] \times [v, v + dv]\) 在曲面上对应的"<em>小补丁</em>" \(\approx\) 平行四边形, 两边为 \(X_u \cdot du\) 和 \(X_v \cdot dv\). 平行四边形面积 \(= |X_u \times X_v| \cdot du \, dv\). 而 \(|X_u \times X_v| = \sqrt{|X_u|^2 |X_v|^2 - (X_u \cdot X_v)^2} = \sqrt{EG - F^2}\) （Lagrange 恒等式）.</p>
+
+<p>所以曲面上一个区域 \(R\)（参数化里对应 \(D \subset U\)）面积:</p>
+
+<p>\[
+\boxed{\ A(R) = \iint_D \sqrt{EG - F^2} \, du \, dv.\ }
+\]</p>
+
+<p>一个量出现在不同地方说明它重要——\(EG - F^2\) 是 \([I]\) 的<em>行列式</em>, 在面积里出现, 在 ch10 Gauss 曲率公式里也会出现。</p>
+
+<p><strong>验证: 球面 \(S^2_r\) 总面积.</strong> \(D = (0, \pi) \times (0, 2\pi)\) （除两极一经线, 测度零, 不影响积分）. \([I] = \begin{pmatrix} r^2 & 0 \\ 0 & r^2 \sin^2 \theta \end{pmatrix}\), \(\det = r^4 \sin^2 \theta\), \(\sqrt{\det} = r^2 |\sin \theta| = r^2 \sin \theta\) （\(\theta \in (0, \pi)\) 中 \(\sin \theta > 0\)）.</p>
+
+<p>\[
+A = \int_0^{2\pi} \int_0^\pi r^2 \sin \theta \, d\theta \, d\varphi = 2\pi r^2 \cdot [-\cos \theta]_0^\pi = 2\pi r^2 \cdot 2 = 4\pi r^2. \checkmark
+\]</p>
+
+<p>课本经典答案: 半径 \(r\) 球面面积 \(= 4 \pi r^2\)。第一基本形式的机器自动给。</p>
+
+<p><strong>圆柱 \(0 \leq v \leq h\) 一段（高 \(h\)）.</strong> \([I] = \begin{pmatrix} r^2 & 0 \\ 0 & 1 \end{pmatrix}\), \(\det = r^2, \sqrt{\det} = r\). \(A = \int_0^{2\pi} \int_0^h r \, dv \, du = 2\pi r h\). 经典答案 \(C \cdot h = 2 \pi r \cdot h\)。✓</p>
+
+<h2 id="sec7-8">7.8 等距与"<em>球面摊不平</em>"</h2>
+
+<p>到此我们已经看到第一基本形式决定<em>长度</em>、<em>角度</em>、<em>面积</em>。它还决定一切只用这三件事推出来的几何性质——比如"<em>三角形内角和</em>"（用角度算）、"<em>测地线</em>"（"局部最短" 的曲线, 用长度算, ch13）, 等等。这些东西统称<em>内蕴几何</em>。</p>
+
+<p>下面这个定义把"<em>第一基本形式相同</em>" 抽象成两曲面之间的关系:</p>
+
+<p><strong>定义 7.2.</strong> 两个正则曲面 \(S_1, S_2\) 之间的<em>等距</em> 是一个微分同胚 \(\Phi: S_1 \to S_2\), 使得对每个 \(p \in S_1\) 和切向量 \(v, w \in T_p S_1\),</p>
+
+<p>\[
+I_p^{S_1}(v, w) = I_{\Phi(p)}^{S_2}(d\Phi_p(v), d\Phi_p(w)).
+\]</p>
+
+<p>用人话说, \(\Phi\) 把切向量映成切向量, <em>保持内积</em>。</p>
+
+<p><strong>定理 7.2（朴素）.</strong> 等距 \(\Phi: S_1 \to S_2\) 把 \(S_1\) 上每条曲线映到 \(S_2\) 上等长曲线, 把每对相交曲线映到等夹角曲线对, 把每个区域映到等面积区域。也就是说, <em>所有内蕴几何量</em> 在等距下不变。</p>
+
+<p><em>论证.</em> 长度: 设 \(\gamma\) 在 \(S_1\) 上, \(\Phi \circ \gamma\) 在 \(S_2\) 上, 它们的长度公式都是 \(\int \sqrt{I(\gamma', \gamma')}\, dt\), 而 \(I^{S_2}(d\Phi(\gamma'), d\Phi(\gamma')) = I^{S_1}(\gamma', \gamma')\) 由等距定义。所以两条曲线长度同。其他类似。\(\square\)</p>
+
+<p><strong>例（圆柱与平面等距）.</strong> 取一片平面带 \(P = \{(x, y, 0) : 0 < x < 2\pi r, y \in \mathbb{R}\}\), 一片圆柱 \(C = \{(r \cos u, r \sin u, v) : 0 < u < 2\pi, v \in \mathbb{R}\}\). 映射 \(\Phi(x, y, 0) = (r \cos(x/r), r \sin(x/r), y)\)（"<em>把平面带卷成圆柱</em>"）.</p>
+
+<p>\(\Phi\) 的微分: 取 \(P\) 上参数化 \(X^P(x, y) = (x, y, 0)\), 复合 \(\Phi \circ X^P(x, y) = (r \cos(x/r), r \sin(x/r), y)\). 这正是圆柱参数化（\(u = x/r, v = y\)）. 算第一基本形式:</p>
+
+<ul>
+  <li>\(P\) 上: \([I] = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}\)（平面）.</li>
+  <li>\(C\) 上, 用 \((x, y)\) 当参数: \((\Phi \circ X^P)_x = (-\sin(x/r), \cos(x/r), 0), (\Phi \circ X^P)_y = (0, 0, 1)\). \(E = \sin^2 + \cos^2 = 1, G = 1, F = 0\). \([I^C \circ \Phi] = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}\). 同 \(P\) 一致。</li>
+</ul>
+
+<p>所以 \(\Phi\) 是等距。结论: 平面带 \(P\) 与圆柱 \(C\) 等距。这正是 ch1 开篇说的"<em>纸卷成圆筒不撕不裂</em>" 的形式背景——卷的过程不改变<em>第一基本形式</em>, 是等距的。</p>
+
+<p><strong>例（球面与平面<em>不</em> 等距）.</strong> 这就是 ch1 第二件事——纸贴不到球面。形式上: 假设存在等距 \(\Phi: P \to S^2_r\)（\(P \subset \mathbb{R}^2\) 平面开集）。等距保所有内蕴几何量。Gauss Theorema Egregium（ch11）说 Gauss 曲率 \(K\) 是内蕴的。所以 \(\Phi\) 保 \(K\). 但 \(K_P = 0, K_{S^2_r} = 1/r^2 \neq 0\). 矛盾。所以等距不存在。</p>
+
+<p>注意这里我们<em>引用了</em> Theorema Egregium（ch11 才证）。本章还<em>不</em> 能完全证"球面不能摊平"——只能给等距的形式定义和它保的内蕴量。"<em>有些内蕴量是球面摊不平的障碍</em>" 是 ch11 把 \(K\) 写成 \(E, F, G\) 的函数后才完成的。这就是 ch7-11 这一段的故事弧线: ch7 给 \(I\) 和它能算什么, ch8-9 把外蕴的 \(\kappa_1, \kappa_2\) 用 \(II\) 表达, ch10 得到 Gauss 曲率 \(K\) 的外蕴公式, ch11 把 \(K\) <em>奇迹般地</em> 改写成 \(E, F, G\) 的内蕴公式。</p>
+
+<p>请你停下来感受这条弧线的方向: 我们从一个完全外蕴看起来的量（曲面在 \(\mathbb{R}^3\) 中弯多少）, 走五章, 证明它<em>居然</em> 是<em>纯内蕴</em> 的。这件事在历史上是 Gauss 自己写下"<em>Theorema Egregium</em>"（卓越定理）的原因——它揭示了一个 2D 生物在曲面上爬行能"<em>看见</em>" 的不止距离和角度, 还能"<em>看见</em>" 曲率。这是 Riemann 1854 年抽象流形的种子。</p>
+
+<h2 id="sec7-9">7.9 临别话</h2>
+
+<p>这一章给了三件事:</p>
+
+<ol>
+  <li>第一基本形式 \(I_p\) 是 \(T_p S\) 上的内积——\(\mathbb{R}^3\) 内积的限制。</li>
+  <li>它的矩阵 \([I] = \begin{pmatrix} E & F \\ F & G \end{pmatrix}\) 完全决定长度（\(L = \int \sqrt{E (u')^2 + 2F u' v' + G (v')^2} dt\)）, 角度（\(\cos \theta = I(v, w)/\sqrt{I(v, v) I(w, w)}\)）, 面积（\(A = \iint \sqrt{EG - F^2} \, du \, dv\)）。</li>
+  <li>等距 = 保第一基本形式的微分同胚, 它保所有内蕴几何量。圆柱 \(\equiv\) 平面（局部）, 球面 \(\not\equiv\) 平面（任何局部都不行）。</li>
+</ol>
+
+<p>下一章我们换一个视角——不再关心曲面"<em>内部</em>" 几何, 转向关心曲面在 \(\mathbb{R}^3\) 中"<em>怎么弯</em>"。这就是<em>Gauss 映射</em>: 每点 \(p\) 配一个法向量 \(N(p) \in S^2\), 把 \(S\) 映到单位球面 \(S^2\)。法向量怎么变（\(dN_p\)）<em>就是</em> 曲面"<em>怎么弯</em>" 的形式表达, 主曲率 \(\kappa_1, \kappa_2\) 是它的特征值。下一章是后面 ch9-10 ch11 的入口。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 正则曲面</a><a href="ch8.html">下一章 · 第 8 章 Gauss 映射 →</a></nav>
+</main>
+</body>
+</html>

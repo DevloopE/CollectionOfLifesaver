@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 极小曲面：肥皂膜的几何 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 Gauss-Bonnet 应用</a><a href="ch20.html">下一章 · 第 20 章 可定向曲面分类 →</a></nav>
+<h1 id="ch19">第 19 章 极小曲面：肥皂膜的几何</h1>
+
+<p>请你做一道你<em>看得见</em> 的事。把一根铁丝弯成一个闭合的环——可以是圆圈，可以是个心形，也可以扭成立体的"\(\infty\)" 字。把这根铁丝浸到肥皂水里, 拉出来。铁丝上张着一片肥皂膜。</p>
+
+<p>这片膜是哪个曲面？</p>
+
+<p>你可能下意识觉得"<em>就是某种弯曲的面嘛</em>"。但请你停一秒, 把"<em>哪个曲面</em>" 这个问题<em>当真</em>。给定一根空间闭曲线 \(\Gamma\) 作为边界, 数学上有<em>无穷多</em> 张曲面以 \(\Gamma\) 为边界——你可以让膜往上拱、往下凹、扭出几个褶子, 都满足"<em>边界是 \(\Gamma\)</em>" 这个条件。可肥皂膜偏偏选了<em>那一张</em>。哪一张？</p>
+
+<p>答案是<em>极小曲面</em>——在所有以 \(\Gamma\) 为边界的曲面中, <em>面积最小</em> 的那张。物理原因是肥皂膜的表面张力——膜想缩小自己的面积, 静态平衡时面积取局部极小。从几何角度看, 这片膜满足一个干净的微分方程: 平均曲率 \(H\) 处处等于 \(0\)。这件事 1762 年 Lagrange 用变分法第一次提出来; 50 年后 Plateau 在比利时实验室里把它<em>玩</em> 出名——他用各种铁丝框测出无数张极小曲面, 让"<em>找以 \(\Gamma\) 为边界的极小曲面</em>" 成了著名的<em>Plateau 问题</em>。</p>
+
+<p>这一章我们沿"<em>具体肥皂膜实验 → 朴素定义 → 撞墙 → 重新表述（变分原理）→ Euler-Lagrange 方程 → 例子 → 一般化</em>" 的路线, 把极小曲面理论从可视的物理现象建到 Bernstein 定理这样的整体定理。</p>
+
+<h2 id="sec19-1">19.1 肥皂膜实验：一根铁丝, 一片膜</h2>
+
+<p>具体三个常见铁丝框 + 你看到的膜:</p>
+
+<p><strong>圆圈。</strong>把一个平面上的圆圈浸进肥皂水, 拉出来——膜是<em>圆盘</em>。这是最朴素的例子: 平面圆盘当然以圆为边界, 而且它是平的, 显然<em>面积最小</em>（任何拱起或凹下都会让面积增加）。</p>
+
+<p><strong>两个平行圆圈（共轴, 距离 \(d\)）。</strong>把两个共轴的圆圈一起浸进肥皂水, 慢慢拉开。当 \(d\) 不太大时, 膜不是两个分开的平面圆盘, 而是一片<em>悬链面</em>（catenoid）——你侧视看是双曲线绕中轴旋转出的"<em>沙漏腰</em>" 形状。当 \(d\) 超过一个临界值, 悬链面突然<em>断裂</em>, 变成两个平面圆盘 + 一根细丝（实际就是膜的拓扑改变, 失去稳定性）。</p>
+
+<p><strong>立体扭框（如莫比乌斯带的边界曲线）。</strong>这种铁丝框拉出的膜是<em>非平凡</em> 的曲面——可能就是莫比乌斯带本身（如果你把铁丝弯成莫比乌斯边界的特定形状）。这是 Plateau 问题最丰富的来源。</p>
+
+<p>请你停下来想: 这些膜的共同特征是什么？物理上, 它们都是表面张力的平衡态——膜上每一点, 表面张力把膜往两个方向"<em>拉</em>", 这两个拉力必须互相抵消。几何上这转化为一句精确的话: <em>平均曲率 \(H\) 处处等于 \(0\)</em>。我们下面把它讲清楚。</p>
+
+<h2 id="sec19-2">19.2 极小曲面的定义: \(H \equiv 0\)</h2>
+
+<p>回顾<a href="ch10.html">ch10</a>: 曲面在每点 \(p\) 有两个<em>主曲率</em> \(\kappa_1, \kappa_2\)（最大与最小方向曲率）。<em>平均曲率</em> 定义为</p>
+
+<p>\[
+H = \frac{\kappa_1 + \kappa_2}{2}.
+\]</p>
+
+<p>定义 (极小曲面)。曲面 \(M \subset \mathbb{R}^3\) 称为<em>极小曲面</em>, 如果它每一点都满足</p>
+
+<p>\[
+\boxed{\ H \equiv 0 \quad \Longleftrightarrow \quad \kappa_1 = -\kappa_2 \text{ 处处}.\ }
+\]</p>
+
+<p>注意 \(\kappa_1 = -\kappa_2\) 意味着<em>主曲率异号且等大</em>——曲面在每点像鞍面: 一个方向上凹, 垂直方向同样幅度地下凹。直觉上极小曲面"<em>处处都是鞍</em>", 没有任何"<em>纯凸起</em>" 的部分。这也解释了为什么平面（\(\kappa_1 = \kappa_2 = 0\)）是极小曲面——平凡情形, 也算 \(H = 0\)。</p>
+
+<p>另一个直接推论: 极小曲面的 Gauss 曲率</p>
+
+<p>\[
+K = \kappa_1 \kappa_2 = -\kappa_1^2 \le 0.
+\]</p>
+
+<p>处处<em>非正</em>。除非曲面是平的（\(\kappa_1 = 0\)）, 否则 \(K < 0\)（严格负）。这件事在<a href="ch16.html">ch16-17</a> Gauss-Bonnet 那里有立竿见影的影响——非平的极小曲面紧致时, \(\int_M K \, dA < 0\), 由 Gauss-Bonnet 它的 Euler 示性数 \(\chi(M) < 0\), 即<em>亏格 \(\ge 2\)</em>。所以紧致<em>无边界</em> 的非平极小曲面亏格至少 2——但其实在 \(\mathbb{R}^3\) 中, <em>没有</em> 紧致无边界极小曲面（19.7 节会看到这是 maximum principle 的一个推论）。所以肥皂膜必须有边界。</p>
+
+<p>这个定义看起来很<em>外蕴</em>——\(H\) 是用法向量定义的, 涉及曲面如何嵌入 \(\mathbb{R}^3\)。下一节我们看到一个等价的<em>变分</em> 定义, 它把"<em>极小</em>" 这个词的来源讲清楚。</p>
+
+<h2 id="sec19-3">19.3 等价定义: 面积是变分临界点</h2>
+
+<p>"极小曲面" 这个名字直觉上应该意味着"<em>面积取极小值的曲面</em>"。但严格意义上, "<em>极小</em>" 这个词是<em>临界点</em>（critical point）的意思, 不一定是<em>极小值</em>（minimum）——就像 \(f'(x) = 0\) 的点可能是极大、极小或鞍点一样。一个 \(H = 0\) 的曲面是面积泛函的<em>临界点</em>, 它可能是极小（稳定）, 也可能是鞍点（不稳定）。</p>
+
+<p>把这件事数学化。设 \(M \subset \mathbb{R}^3\) 是一片紧致曲面, 边界 \(\partial M = \Gamma\) 固定。考虑一族<em>变分</em>: 让 \(M\) 在每一点沿法向量方向移动一个小量 \(\epsilon \cdot \phi(p)\), 其中 \(\phi\) 是定义在 \(M\) 上的标量函数, 满足 \(\phi|_{\Gamma} = 0\)（边界不动）。新曲面记为 \(M_\epsilon\)。</p>
+
+<p>定理 (面积的第一变分公式)。</p>
+
+<p>\[
+\boxed{\ \frac{d}{d\epsilon}\Big|_{\epsilon = 0} \mathrm{Area}(M_\epsilon) = -\int_M 2 H \cdot \phi \, dA.\ }
+\]</p>
+
+<p>证明在 19.4 节给。先看推论:</p>
+
+<p><em>推论</em>。\(M\) 是面积泛函的临界点（即对任何允许的 \(\phi\) 都有 \(\frac{d}{d\epsilon}\big|_0 \mathrm{Area}(M_\epsilon) = 0\)）当且仅当 \(H \equiv 0\)。</p>
+
+<p>"<em>当且仅当</em>" 的"<em>仅当</em>" 方向: 如果 \(H \equiv 0\), 则积分等于 0, 临界点条件满足。"<em>当</em>" 方向: 如果对所有 \(\phi\) 积分都为 0, 由变分法的基本引理, 被积函数 \(2 H \phi\) 必须处处为 0; 因为可以取 \(\phi\) 与 \(H\) 同号, 推出 \(H \equiv 0\)。</p>
+
+<p>所以"<em>极小曲面</em>" 的两个定义等价:</p>
+
+<ul>
+  <li>外蕴: \(H \equiv 0\)（用法向量、第二基本形式定义）。</li>
+  <li>变分: 面积泛函在 \(M\) 处临界（用面积的全局视角）。</li>
+</ul>
+
+<p>这种"<em>外蕴几何条件 ⟺ 变分原理临界点</em>" 的对偶在数学物理里反复出现——经典力学的最小作用量原理（Lagrangian 力学）、爱因斯坦场方程（爱因斯坦-Hilbert 作用量取极值）、调和映射（能量泛函取极值）, 都是同样的逻辑。极小曲面是这一族中最古老也最直观的例子。</p>
+
+<h2 id="sec19-4">19.4 完整推导: Euler-Lagrange = \(H = 0\)</h2>
+
+<p>给一个详细的第一变分公式推导, 让你看到 \(H\) 怎么从积分里冒出来。</p>
+
+<p>设 \(\mathbf{r}(u, v)\) 是 \(M\) 的参数化, \(\mathbf{n}(u, v)\) 是单位法向量。变分曲面</p>
+
+<p>\[
+\mathbf{r}_\epsilon(u, v) = \mathbf{r}(u, v) + \epsilon \cdot \phi(u, v) \cdot \mathbf{n}(u, v).
+\]</p>
+
+<p>面积泛函</p>
+
+<p>\[
+\mathrm{Area}(M_\epsilon) = \int \int \sqrt{E_\epsilon G_\epsilon - F_\epsilon^2} \, du \, dv,
+\]</p>
+
+<p>其中 \(E_\epsilon = \mathbf{r}_{\epsilon u} \cdot \mathbf{r}_{\epsilon u}\) 等是变分曲面的第一基本形式系数。</p>
+
+<p>计算 \(\mathbf{r}_{\epsilon u}\):</p>
+
+<p>\[
+\mathbf{r}_{\epsilon u} = \mathbf{r}_u + \epsilon (\phi_u \mathbf{n} + \phi \mathbf{n}_u).
+\]</p>
+
+<p>展开 \(E_\epsilon\) 到 \(\epsilon\) 一阶:</p>
+
+<p>\[
+E_\epsilon = \mathbf{r}_u \cdot \mathbf{r}_u + 2 \epsilon \phi (\mathbf{r}_u \cdot \mathbf{n}_u) + O(\epsilon^2).
+\]</p>
+
+<p>由 \(\mathbf{r}_u \cdot \mathbf{n} = 0\) 求微分得 \(\mathbf{r}_{uu} \cdot \mathbf{n} + \mathbf{r}_u \cdot \mathbf{n}_u = 0\), 所以 \(\mathbf{r}_u \cdot \mathbf{n}_u = -\mathbf{r}_{uu} \cdot \mathbf{n} = -L\), 这正是<em>第二基本形式</em> 的 \(L\) 系数（<a href="ch9.html">ch9</a>）。同理 \(\mathbf{r}_v \cdot \mathbf{n}_v = -N\), \(\mathbf{r}_u \cdot \mathbf{n}_v + \mathbf{r}_v \cdot \mathbf{n}_u = -2M\)。所以</p>
+
+<p>\[
+E_\epsilon = E - 2\epsilon \phi L + O(\epsilon^2),
+\]</p>
+
+<p>类似地 \(G_\epsilon = G - 2\epsilon \phi N + O(\epsilon^2)\), \(F_\epsilon = F - 2\epsilon \phi M + O(\epsilon^2)\)。</p>
+
+<p>\(EG - F^2\) 的一阶变化:</p>
+
+<p>\[
+E_\epsilon G_\epsilon - F_\epsilon^2 = (EG - F^2) - 2\epsilon\phi (EN + GL - 2FM) + O(\epsilon^2).
+\]</p>
+
+<p>对面积元 \(\sqrt{EG - F^2}\), 一阶变化</p>
+
+<p>\[
+\sqrt{E_\epsilon G_\epsilon - F_\epsilon^2} = \sqrt{EG - F^2} \cdot \left(1 - \epsilon \phi \cdot \frac{EN + GL - 2FM}{EG - F^2}\right) + O(\epsilon^2).
+\]</p>
+
+<p>关键事实（<a href="ch10.html">ch10</a>）: 平均曲率</p>
+
+<p>\[
+H = \frac{EN + GL - 2FM}{2(EG - F^2)}.
+\]</p>
+
+<p>所以面积一阶变化</p>
+
+<p>\[
+\frac{d}{d\epsilon}\Big|_{\epsilon = 0} \mathrm{Area}(M_\epsilon) = -\int_M 2H \cdot \phi \, dA.
+\]</p>
+
+<p>这正是 19.3 节那条公式。</p>
+
+<p>"<em>Euler-Lagrange 方程</em>" 这个词的来源: 在变分法里, 给定一个泛函 \(\mathcal{F}[u]\), 它的临界点 \(u\) 满足一个微分方程, 叫这个泛函的 Euler-Lagrange 方程。对面积泛函 \(\mathrm{Area}[M] = \int_M dA\), Euler-Lagrange 方程就是 \(H = 0\)。所以"<em>极小曲面</em>" 等价于"<em>面积泛函的 Euler-Lagrange 方程的解</em>"。</p>
+
+<p>对图形 \(z = f(x, y)\) 的曲面, 上述方程展开成关于 \(f\) 的二阶非线性 PDE:</p>
+
+<p>\[
+\boxed{\ (1 + f_y^2) f_{xx} - 2 f_x f_y f_{xy} + (1 + f_x^2) f_{yy} = 0.\ }
+\]</p>
+
+<p>这叫<em>极小曲面方程</em>。看似复杂, 但它的"<em>线性化</em>"（小斜率近似 \(f_x, f_y \ll 1\)）就是 \(f_{xx} + f_{yy} = 0\) ——著名的<em>Laplace 方程</em>。所以极小曲面方程是 Laplace 方程的非线性版本。这种"<em>非线性 PDE 的线性近似是 Laplace</em>" 的关系深刻——很多调和分析与势理论的工具能搬到极小曲面理论里。</p>
+
+<h2 id="sec19-5">19.5 五个例子</h2>
+
+<p>现在看具体的极小曲面。</p>
+
+<p><strong>例 1: 平面。</strong>\(z = 0\)（或任意仿射函数 \(z = ax + by + c\)）。\(\kappa_1 = \kappa_2 = 0\), 显然 \(H = 0\)。这是最平凡的极小曲面。</p>
+
+<p><strong>例 2: 悬链面（catenoid）。</strong>把曲线 \(x = \cosh(z)\)（悬链线, 一条悬挂的链子的形状）绕 \(z\)-轴旋转, 得到的曲面。参数化:</p>
+
+<p>\[
+\mathbf{r}(u, v) = (\cosh u \cos v, \cosh u \sin v, u), \quad u \in \mathbb{R}, \ v \in [0, 2\pi).
+\]</p>
+
+<p>计算: \(\kappa_1 = -\kappa_2 = 1/\cosh^2 u\), 处处 \(H = 0\)。这是<em>唯一</em> 不是平面的旋转极小曲面（Bonnet 1860）——任何"<em>把一条平面曲线绕轴转</em>" 出来的极小曲面只能是平面或悬链面。</p>
+
+<p>悬链面的几何意义: 它就是上面 19.1 节"<em>两个平行圆圈拉出来的肥皂膜</em>" 的形状。当两圈距离 \(d\) 不太大时, 悬链面是稳定极小曲面; 当 \(d\) 超过一个临界值, 悬链面失稳, 膜断裂回两个独立平面圆盘——这是数学上"<em>两个临界点比较, 谁面积更小</em>" 的具体物理体现。</p>
+
+<p><strong>例 3: 螺旋面（helicoid）。</strong>类似 DNA 双螺旋的"<em>螺旋斜坡</em>"。参数化:</p>
+
+<p>\[
+\mathbf{r}(u, v) = (v \cos u, v \sin u, c \cdot u), \quad u, v \in \mathbb{R}.
+\]</p>
+
+<p>固定 \(u\), \(v\) 变化得到一根从轴出发的水平射线; 固定 \(v\), \(u\) 变化得到一根螺旋线。整体形状像螺丝刀刻痕。验证 \(H = 0\)（给读者算）。</p>
+
+<p>螺旋面是<em>第二种</em> 不平凡的经典极小曲面——而且是<em>唯一</em> 的<em>直纹</em> 非平面极小曲面（Catalan 1842）, 即由一族直线扫过的非平面极小曲面只能是螺旋面。</p>
+
+<p><strong>例 4: Scherk 曲面。</strong>1834 年 Scherk 发现的, 是<em>第一个</em> 既不是悬链面也不是螺旋面的非平凡极小曲面。它的图形方程</p>
+
+<p>\[
+z = \log\left(\frac{\cos x}{\cos y}\right), \quad |x|, |y| < \pi/2.
+\]</p>
+
+<p>定义在正方形 \((-\pi/2, \pi/2)^2\) 内, 边界是无穷远（\(z \to \pm \infty\)）。它有"<em>双周期</em>" 性, 可以无限拼接成一张覆盖整个 \(xy\)-平面的极小曲面。Scherk 曲面是历史上极小曲面"<em>动物园</em>" 的开始——19 世纪后半叶发现了几十个新的极小曲面（Enneper、Henneberg 等等）, 每个都用复方法（Weierstrass 表示）构造。</p>
+
+<p><strong>例 5: Costa 曲面（1982）。</strong>20 世纪后半才发现的极小曲面: <em>整体（complete）、嵌入、亏格 1 + 三个端</em>。在 Costa 之前 100 多年, 已知的整体嵌入有限拓扑极小曲面只有平面、悬链面、螺旋面三种。Costa 用 Weierstrass 椭圆函数构造出第四种, 震动了几何界。Hoffman-Meeks 后续推广到任意亏格 \(g \ge 1\), 给出了一个无穷家族。</p>
+
+<p>这五个例子串起来, 你能感受到极小曲面理论从 18 世纪到 20 世纪的<em>发展弧</em>: Lagrange 提出问题 → Bonnet/Catalan 找到旋转和直纹分类 → Scherk/Enneper 找到非旋转例子 → Weierstrass 给出"<em>用全纯函数构造极小曲面</em>" 的一般框架 → 20 世纪 Bernstein 定理刻画整体结构 → 1980 年代 Costa/Hoffman-Meeks 找到新拓扑型 → 21 世纪极小曲面进入广义流形几何（如 Almgren-Pitts 理论解决<em>球面</em> 上的 Plateau 问题）。</p>
+
+<h2 id="sec19-6">19.6 共轭与等距同构: catenoid \(\to\) helicoid</h2>
+
+<p>悬链面和螺旋面看起来完全不同——一个是旋转面, 一个是螺旋面。但它们之间有一个<em>极其漂亮</em> 的关系: 它们彼此<em>等距同构</em>。即, 存在一个保距离的双射 \(\Phi: \text{Catenoid} \to \text{Helicoid}\)——一个生活在悬链面上的 2D 生物, 在它的视角里, 悬链面和螺旋面"<em>没有区别</em>"。</p>
+
+<p>更让人惊叹的是, 这个等距同构来自一个<em>连续</em> 的极小曲面族。考虑参数化（\(\theta \in [0, \pi/2]\)）:</p>
+
+<p>\[
+\mathbf{r}_\theta(u, v) = \cos\theta \cdot \mathbf{r}_{\text{cat}}(u, v) + \sin\theta \cdot \mathbf{r}_{\text{hel}}(u, v),
+\]</p>
+
+<p>其中 \(\mathbf{r}_{\text{cat}}\) 和 \(\mathbf{r}_{\text{hel}}\) 是悬链面和螺旋面的<em>合适</em> 参数化（要选对, 让"<em>共轭族</em>" 公式生效）。\(\theta = 0\) 是悬链面, \(\theta = \pi/2\) 是螺旋面。<em>所有</em> 中间的 \(\mathbf{r}_\theta\) 都是 \(\mathbb{R}^3\) 中的极小曲面, 而且它们之间互相等距。</p>
+
+<p>这种"<em>一参数极小曲面族, 互相等距</em>" 叫<em>共轭族</em>（associate family）, 或<em>Bonnet 变换</em>。它的存在是 Weierstrass 表示的一个直接推论——每个极小曲面对应一对全纯数据 \((g, dh)\), 而 Bonnet 变换就是把 \(dh \to e^{i\theta} dh\)。这是复变函数与极小曲面理论联结的核心。</p>
+
+<p>等距双射的具体形式: 如果你在悬链面上画一段曲线, 它的弧长等于螺旋面上"对应曲线" 的弧长——尽管两条曲线在 \(\mathbb{R}^3\) 中的形状完全不同。这种"<em>形状不同但内蕴几何相同</em>" 是 Gauss <em>Theorema Egregium</em>（<a href="ch11.html">ch11</a>）的最优雅化身: 内蕴几何 = 第一基本形式, 它不依赖嵌入。悬链面和螺旋面有相同的第一基本形式, 所以内蕴上一样。</p>
+
+<p>具体一些, 用经典的等距对应公式: catenoid 上的点 \((\cosh u \cos v, \cosh u \sin v, u)\) 对应到 helicoid 上的点 \((\sinh u \sin v, -\sinh u \cos v, v)\)（在合适的参数化选择下）。直接验证两边的第一基本形式都是 \(\cosh^2 u \cdot (du^2 + dv^2)\), 所以等距。这是微分几何里少见的能<em>显式写下来</em> 的非平凡等距双射。</p>
+
+<h2 id="sec19-7">19.7 Bernstein 定理: 整体极小图形必为平面</h2>
+
+<p>到此为止我们看的都是<em>局部</em> 极小曲面——肥皂膜在某根铁丝里。一个自然问题: 如果允许极小曲面无限大（<em>整体</em>, complete）, 它能长什么样？</p>
+
+<p>具体一点的版本: 设 \(f: \mathbb{R}^2 \to \mathbb{R}\) 是<em>定义在整个平面</em> 上的光滑函数, 它的图形 \(z = f(x, y)\) 是 \(\mathbb{R}^3\) 中的一个极小曲面（即 \(f\) 满足 19.4 节那个非线性 PDE）。\(f\) 能多复杂？</p>
+
+<p>定理 (Bernstein 1916)。</p>
+
+<p>\[
+\boxed{\ \text{若 } f: \mathbb{R}^2 \to \mathbb{R} \text{ 是整体定义的极小图形, 则 } f \text{ 是仿射函数 } f(x,y) = ax + by + c.\ }
+\]</p>
+
+<p>翻译: 整体极小图形<em>只有平面</em>。</p>
+
+<p>这个结果<em>令人惊讶</em>。在<em>有界</em> 区域上有大量非平面极小图形（取一个铁丝框就能造出来）。但是当区域扩大到整个 \(\mathbb{R}^2\) 时, "<em>极小</em>" 这个条件突然<em>把所有非平面解都排除了</em>。这种"<em>整体性强迫平凡性</em>" 是极小曲面理论的核心现象——它和 Liouville 定理（整体有界全纯函数必为常数）有相同的味道。</p>
+
+<p>证明思路（极简略）。Bernstein 原证明用复变方法; 后来 Fleming、Almgren、De Giorgi、Simons 给了几何测度论的证明。一个现代版的关键步骤:</p>
+
+<ul>
+  <li>整体极小图形的 Gauss 映射 \(N: M \to S^2\) 落在<em>开半球</em> 内（因为 \(z = f(x, y)\) 的法向量永远在"<em>z 分量为正</em>" 这一侧）。</li>
+  <li>极小曲面的 Gauss 映射是<em>共形</em> 的（更精确地, <em>反共形</em>——保角度反方向）, 这是 Weierstrass 表示的推论。</li>
+  <li>所以 \(N\) 给出 \(M\) 到 \(S^2\) 一个开半球的共形映射。\(M\) 整体, \(S^2\) 开半球同胚于 \(\mathbb{R}^2\)。</li>
+  <li>用复分析（Liouville 定理或 Picard 定理）证明: 这种共形映射只能是常值, 即 \(N\) 是常向量。</li>
+  <li>\(N\) 常向量意味着 \(M\) 是平面。</li>
+</ul>
+
+<p>Bernstein 定理在<em>高维</em> 有重要的推广: 设 \(f: \mathbb{R}^n \to \mathbb{R}\) 是整体极小超曲面（\(z = f(x_1, \ldots, x_n)\) 在 \(\mathbb{R}^{n+1}\) 中极小）。问 \(f\) 必为仿射的吗？</p>
+
+<ul>
+  <li>De Giorgi（1965）: \(n \le 3\) 时是。</li>
+  <li>Almgren（1966）: \(n \le 4\) 时是。</li>
+  <li>Simons（1968）: \(n \le 7\) 时是。</li>
+  <li>Bombieri-De Giorgi-Giusti（1969）: \(n \ge 8\) 时<em>反例存在</em>! 他们构造了 \(\mathbb{R}^8\) 中一个非平面整体极小超曲面。</li>
+</ul>
+
+<p>这种"<em>低维成立, 高维突然反例</em>" 的现象在几何测度论里反复出现, 暗示几何在高维有"<em>奇点</em>" 出现的根本性自由度。</p>
+
+<h2 id="sec19-8">19.8 通向高维 + 复几何</h2>
+
+<p>极小曲面只是更大故事的入口。把"<em>临界面积</em>" 换成不同的对象, 我们得到不同的几何分支。</p>
+
+<p><strong>极小子流形。</strong>\(\mathbb{R}^n\) 中 \(k\)-维子流形 \(\Sigma\), 如果它是 \(k\)-体积泛函的临界点, 叫极小子流形。\(k = 2, n = 3\) 是经典极小曲面; \(k = 2, n \ge 4\) 是更高余维数的极小曲面（Cartan、Chern、Calabi 研究）; \(k \ge 3\) 是高维极小子流形（Lawson、Hsiang）。一般理论由<em>第二基本形式的迹</em>（mean curvature vector）描述, \(\vec{H} \equiv 0\) 是定义。</p>
+
+<p><strong>常平均曲率（CMC）曲面。</strong>把 \(H = 0\) 弱化为 \(H \equiv \text{const}\)。物理上对应"<em>有压差的肥皂泡</em>"——两侧气压不等时, 表面张力平衡条件给出 \(H = \Delta P / (2\sigma)\), 一个常数。\(H = c\) 的曲面叫<em>CMC 曲面</em>。Alexandrov 1956 的著名定理: 紧致嵌入 CMC 曲面只有<em>球面</em>。这是球面"<em>各向同性</em>" 的另一种刻画。</p>
+
+<p><strong>极小化 vs 临界。</strong>"<em>面积泛函的临界点</em>" 不一定是<em>面积最小的</em>。研究"<em>第二变分</em>"（面积的二阶导数）可以判断稳定性。一个极小曲面如果第二变分<em>处处非负</em>, 叫<em>稳定</em>极小曲面（physically: 肥皂膜不会自发收缩）。Schoen-Yau 1979 用稳定极小曲面证明了广义相对论中的<em>正质量定理</em>（任何渐近平坦的物理时空, 总能量非负）——这是数学物理一个里程碑, 极小曲面在其中起核心作用。</p>
+
+<p><strong>复极小曲面 = 全纯曲线。</strong>在复流形（如 \(\mathbb{C}^n\) 或 Calabi-Yau）中, 全纯曲线 \(\Sigma \to M\) 自动是极小子流形。这是因为全纯映射在度量上是<em>共形</em> 的, 而共形 + 临界面积 ⟺ 极小。所以"<em>计算 Calabi-Yau 中的全纯曲线数</em>"（Gromov-Witten 不变量）实际上是"<em>计算极小曲面数</em>"。这个联结让极小曲面理论进入了弦理论与镜像对称的核心。</p>
+
+<p><strong>极小曲面流（mean curvature flow）。</strong>动态版本: 让曲面 \(M_t\) 沿着 \(-H \cdot \mathbf{n}\) 方向演化, 这样面积一直在减小。终态（如果存在）就是极小曲面。这个 PDE 是几何分析中和 Ricci 流（Perelman 解 Poincaré 猜想用的）平行的工具。Huisken、White、Brakke 等的工作让 mean curvature flow 成为研究曲面拓扑变化的强大工具——Brakke 流允许"<em>奇点</em>" 出现, 描述肥皂膜在临界距离断裂这种现象。</p>
+
+<p>请你停下来感受这一章在整本书里的位置。前 18 章我们建立了曲面的局部 + 整体几何（Gauss 曲率、Theorema Egregium、Gauss-Bonnet）。极小曲面是"<em>把这些工具<em>用</em> 出去</em>" 的第一个大题目——它把"<em>曲率</em>" 与"<em>变分</em>" 合起来, 通向 PDE、几何测度论、拓扑、复几何。下一章我们转向<em>整体拓扑</em>: 一个紧致曲面有多少种？答案干净——可数无穷多种, 用一个整数（亏格）完全刻画。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 Gauss-Bonnet 应用</a><a href="ch20.html">下一章 · 第 20 章 可定向曲面分类 →</a></nav>
+</main>
+</body>
+</html>

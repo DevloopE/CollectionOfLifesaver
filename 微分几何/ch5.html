@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 整体曲线：4-顶点定理 + 等周不等式 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 空间曲线：Frenet-Serret</a><a href="ch6.html">下一章 · 第 6 章 正则曲面：定义与标准例子 →</a></nav>
+<h1 id="ch5">第 5 章 整体曲线：4-顶点定理 + 等周不等式</h1>
+
+<p>前面三章是<em>局部</em>: 在曲线的每个点说话——切向量、曲率、扭率、密切圆。本章<em>转换视角</em>——看整条<em>闭合</em> 曲线<em>作为整体</em> 时, 有什么<em>不可避免</em> 的几何事实。</p>
+
+<p>这是 Banner 风格里反复出现的"<em>从点到整体</em>" 的跳跃。局部信息（每点曲率）累积起来, 不是简单线性求和——它们之间有<em>整体约束</em>。两个最经典的例子:</p>
+
+<ol>
+  <li><strong>4-顶点定理</strong>（Mukhopadhyaya 1909, Kneser 1912）: 任何简单闭凸平面曲线<em>至少</em> 有 4 个顶点（曲率函数的局部极值点）。<em>不能少于 4</em>——这是个<em>整体</em> 约束, 曲线<em>必须</em> 在曲率上"<em>波动够多次</em>"。</li>
+  <li><strong>等周不等式</strong>（Steiner / Hurwitz 1902）: 周长 \(L\) 固定的简单闭曲线围出面积 \(A \le L^2/(4\pi)\), 等号 \(\Leftrightarrow\) 圆。<em>圆是周长固定下围最大面积的形状</em>——一个<em>整体最优</em> 的命题。</li>
+</ol>
+
+<p>本章证这两条。技巧上, 4-顶点用极坐标 + 反证 + 对称性; 等周用 Fourier 展开 + Wirtinger 不等式（Hurwitz 1902 的优雅做法）。两个证明都展示了"<em>整体几何</em>" 怎么用<em>分析工具</em> 攻——这是后面 ch16-17 Gauss-Bonnet 的预备热身。</p>
+
+<h2 id="sec5-1">5.1 简单闭曲线 + 凸曲线</h2>
+
+<p>先要的一些基本概念。</p>
+
+<p><strong>定义.</strong> 一条平面曲线 \(\gamma: [a, b] \to \mathbb{R}^2\) 称为</p>
+
+<ul>
+  <li><em>闭合</em>（closed）: \(\gamma(a) = \gamma(b)\) 且各阶导数也在端点匹配（光滑闭合）。</li>
+  <li><em>简单</em>（simple）: 在 \([a, b)\) 上是单射, 即不自交。</li>
+  <li><em>简单闭曲线</em>: 同时是简单与闭合的, 即"<em>不自交的闭环</em>"。</li>
+</ul>
+
+<p>简单闭曲线的标准等价描述: 它是 \(\mathbb{R}^2\) 中一个嵌入圆周（拓扑圆周）的像。由<em>Jordan 曲线定理</em>, 它把平面分成<em>有界内部</em> + <em>无界外部</em>。"<em>围出</em>" 的面积是有界内部的面积。</p>
+
+<p><strong>凸性.</strong> 简单闭曲线 \(\gamma\) 称为<em>凸</em> 的, 如果它围出的内部区域是<em>凸集</em>（即区域中任两点连线段全在区域内）。等价地, 曲线在每点的<em>切线</em> 把平面分成两半, 整条曲线在<em>同一</em> 半平面内（除切点本身外）。</p>
+
+<p>用<em>带符号曲率</em> 的语言: 设 \(\gamma\) 是<em>逆时针</em> 描出的简单闭凸曲线, 那么 \(\kappa_s(s) \ge 0\) 处处。反之: 若 \(\gamma\) 简单闭合且 \(\kappa_s \ge 0\) 处处, 它必凸。所以<em>"凸" \(\Leftrightarrow\) "带符号曲率不变号"</em>（在适当方向描点下）。本书后面以<em>"凸"</em> 一词时默认这个等价。</p>
+
+<p>简单闭凸曲线的例子: 圆、椭圆、心形线（去掉尖点的光滑版本）、卵形线 (\(x^4 + y^4 = 1\)) 等。</p>
+
+<h2 id="sec5-2">5.2 顶点 (vertex) 的定义</h2>
+
+<p><strong>定义.</strong> 简单闭曲线 \(\gamma\) 的<em>顶点</em>（vertex）是<em>曲率函数 \(\kappa(s)\) 的局部极值点</em>——即 \(\kappa'(s) = 0\) 处 (并不只是临界点, 而是真正的极大或极小)。</p>
+
+<p>"<em>顶点</em>" 这个词来自椭圆——椭圆有四个顶点 \((\pm a, 0), (0, \pm b)\), 恰好对应曲率 \(\kappa(t) = ab/(a^2\sin^2 t + b^2\cos^2 t)^{3/2}\) 的<em>四个局部极值</em>: 在 \(t = 0, \pi\) 处（长轴端点）\(\kappa = a/b^2\) 是<em>极大</em>; 在 \(t = \pi/2, 3\pi/2\) 处（短轴端点）\(\kappa = b/a^2\) 是<em>极小</em>。所以椭圆<em>恰好</em> 4 个顶点。</p>
+
+<p>顶点在几何上对应"<em>密切圆半径变化的零点</em>"——即曲率最弯或最直的位置。沿椭圆走时, 你能<em>感觉到</em> 在长轴端点曲率最大（密切圆最小）, 然后渐缓到短轴端点（密切圆最大）, 又渐弯回来——这种"<em>缓 / 急 / 缓 / 急</em>" 的循环让椭圆有 4 个顶点。</p>
+
+<p>圆呢？圆的曲率是常数, 处处相等。这种情况一般约定<em>所有点都是顶点</em>（或说"<em>退化情形</em>"）。4-顶点定理对这种"<em>处处常数曲率</em>" 的情形需要单独说明: 圆是个<em>退化</em> 的例子, 4-顶点结论显然成立（甚至无穷多顶点）。</p>
+
+<h2 id="sec5-3">5.3 4-顶点定理</h2>
+
+<p><strong>定理（Mukhopadhyaya 1909, Kneser 1912 的扩展）.</strong> 任何简单闭凸平面 \(C^3\) 曲线<em>至少</em> 有 4 个顶点。</p>
+
+<p>这条定理在 1909 由 Mukhopadhyaya 证, 假设凸性。后来 Kneser (1912)、Bose (1932)、Osserman (1985) 等推广到非凸情形, 证明"<em>任何</em> 简单闭 \(C^2\) 平面曲线至少 4 个顶点"——更广。本书只证凸的版本, 它是最干净的。</p>
+
+<p><strong>朴素观察.</strong> \(\kappa(s)\) 是 \([0, L]\) 上的连续函数（\(L\) 是曲线周长）, 在<em>闭区间</em> 上必有<em>最大值</em> 与<em>最小值</em>——所以至少 2 个顶点（一极大 + 一极小）。所以"<em>至少 2 个</em>" 是平凡的。"<em>至少 4 个</em>" 才是本章的内容。</p>
+
+<p>难点: 直接用极值点数论证只能给 2; 需要更深的<em>整体</em> 论证才能从 2 提升到 4。</p>
+
+<p><strong>证明（凸的情形）.</strong> 反证。假设 \(\kappa(s)\) 只有<em>2 个</em> 极值点（一个极大 \(M\), 一个极小 \(m\), 且 \(M > m\)）。</p>
+
+<p>设 \(s_1\) 是极小点, \(s_2\) 是极大点（\(s_1 < s_2\), 把曲线 \([0, L]\) 分成两段 \([s_1, s_2]\) 与 \([s_2, s_1 + L]\)）。在 \([s_1, s_2]\) 上 \(\kappa\) 单调递增（从 \(m\) 到 \(M\)）; 在 \([s_2, s_1+L]\) 上单调递减（从 \(M\) 到 \(m\)）。所以 \(\kappa'(s)\) 在 \([s_1, s_2]\) 上 \(\ge 0\), 在 \([s_2, s_1+L]\) 上 \(\le 0\)。也就是说, <em>\(\kappa'(s)\) 在曲线上恰好换一次号</em>。</p>
+
+<p>取过 \(\gamma(s_1)\) 和 \(\gamma(s_2)\) 的<em>直线</em> \(\ell\)。由凸性, \(\ell\) 把曲线分成<em>两段</em>: 一段在 \(\ell\) 上方, 一段在下方。具体哪段在上方与 \(\kappa'\) 的符号有几何关联（下面会用）。</p>
+
+<p>选 \(\ell\) 的<em>法向量</em> \(n\)（垂直 \(\ell\), 长度 1, 方向取定）。考虑积分</p>
+
+<p>\[
+J := \oint_\gamma \kappa'(s) \, \langle \gamma(s), n \rangle \, ds.
+\]</p>
+
+<p>这里 \(\langle \gamma(s), n \rangle\) 是点 \(\gamma(s)\) 在 \(n\) 方向上的投影; 这个投影<em>从 \(\ell\) 起算</em>（即取 \(\ell\) 上的点投影为 0）。</p>
+
+<p>分两段算:</p>
+
+<p>段 \([s_1, s_2]\)（\(\kappa' \ge 0\)）, 假设这段在 \(\ell\) 的<em>正</em> 侧（\(\langle \gamma, n \rangle \ge 0\)）。则被积函数 \(\kappa' \cdot \langle \gamma, n \rangle \ge 0\)。</p>
+
+<p>段 \([s_2, s_1+L]\)（\(\kappa' \le 0\)）, 这段在<em>负</em> 侧（\(\langle \gamma, n \rangle \le 0\)）。则被积函数 \((\le 0) \cdot (\le 0) \ge 0\)。</p>
+
+<p>所以 \(J \ge 0\), 等号<em>仅</em> 在 \(\kappa\) 退化（处处常数）时取, 但凸非圆的曲线 \(\kappa\) 不常数, 所以 \(J > 0\)。</p>
+
+<p>另一方面, 用<em>分部积分</em> 算 \(J\):</p>
+
+<p>\[
+J = \oint \kappa'(s) \langle \gamma(s), n \rangle ds = \oint \frac{d \kappa}{ds} \langle \gamma, n \rangle ds.
+\]</p>
+
+<p>分部积分（注意 \(\kappa\) 与 \(\gamma\) 都<em>周期性</em>, 边界项消失）:</p>
+
+<p>\[
+J = - \oint \kappa(s) \frac{d}{ds}\langle \gamma(s), n \rangle ds = -\oint \kappa(s) \langle \gamma'(s), n \rangle ds.
+\]</p>
+
+<p>\(\gamma'(s) = T(s)\) 单位切。\(\langle T(s), n \rangle\) 是切向量在 \(n\) 上的分量。注意 \(T(s) = (\cos\theta(s), \sin\theta(s))\), 设 \(n = (\cos\alpha, \sin\alpha)\), 则 \(\langle T, n\rangle = \cos(\theta - \alpha)\)。</p>
+
+<p>用 ch3 §3.6 的 \(\theta'(s) = \kappa_s(s) = \kappa(s)\)（凸正向描出, 所以正号）。所以 \(\kappa(s) = \theta'(s)\), 代入:</p>
+
+<p>\[
+J = -\oint \theta'(s) \cos(\theta - \alpha) ds = -\oint d[\sin(\theta - \alpha)] = -[\sin(\theta - \alpha)]_0^L = 0
+\]</p>
+
+<p>因为 \(\theta(L) - \theta(0) = 2\pi\)（凸闭曲线绕一圈, 切方向角度增 \(2\pi\)）, \(\sin(\theta(L) - \alpha) = \sin(\theta(0) + 2\pi - \alpha) = \sin(\theta(0) - \alpha)\)。</p>
+
+<p>所以 \(J = 0\)。</p>
+
+<p>矛盾: 一边 \(J > 0\), 一边 \(J = 0\)。所以"<em>\(\kappa\) 只有 2 个极值点</em>" 不成立。</p>
+
+<p>由 \(\kappa\) 在 \([0, L]\) 上连续 + 周期, 极值点数<em>必为偶数</em>（极大与极小交替出现）。所以至少 2; 我们证了至少 4。</p>
+
+<p>得证。</p>
+
+<p>请你停下来感受这个证明的几何核心: 我们没有去"<em>数</em>" 顶点, 而是构造了一个<em>积分</em>, 用<em>两种不同方式</em> 算它——一种说它正, 一种说它零。这种"<em>同一物两种算法给矛盾</em>" 的反证, 是整体几何里反复出现的技巧。</p>
+
+<h2 id="sec5-4">5.4 4-顶点定理的下界紧致: 椭圆</h2>
+
+<p>椭圆 \(\gamma(t) = (a\cos t, b\sin t), a > b > 0\) 的曲率（ch3 §3.5）</p>
+
+<p>\[
+\kappa(t) = \frac{ab}{(a^2\sin^2 t + b^2 \cos^2 t)^{3/2}}.
+\]</p>
+
+<p>令 \(f(t) := a^2 \sin^2 t + b^2 \cos^2 t = b^2 + (a^2-b^2)\sin^2 t\)。\(\kappa\) 极值 \(\Leftrightarrow f\) 极值。\(f'(t) = (a^2-b^2) \cdot 2 \sin t \cos t = (a^2-b^2)\sin 2t\)。零点: \(t = 0, \pi/2, \pi, 3\pi/2\)——<em>恰好 4 个</em>。前两段（\(t = 0, \pi\)）\(f\) 取最小 \(b^2\), 对应 \(\kappa\) 最大 \(a/b^2\)（长轴端点）; 后两段 \(t = \pi/2, 3\pi/2\) \(f\) 最大 \(a^2\), \(\kappa\) 最小 \(b/a^2\)（短轴端点）。</p>
+
+<p>所以椭圆<em>恰好</em> 4 个顶点——<em>4-顶点定理的下界紧致</em>。</p>
+
+<p>这是 4-顶点定理的"<em>验证物</em>": 它告诉我们"<em>至少 4 个</em>" 不能改进到"<em>至少 5 个</em>"——椭圆已经达到下界。任何<em>不</em> 是椭圆的非圆光滑凸闭曲线一般有<em>更多</em> 顶点（如 \(x^4 + y^4 = 1\) 有 8 个, \(x^6 + y^6 = 1\) 有 12 个等）, 但永远不少于 4。</p>
+
+<p>请你<em>动手</em> 想想这件事的对称含义: 椭圆有 \(\mathbb{Z}_2 \times \mathbb{Z}_2\) 对称（关于两个轴对称）, 这种对称<em>恰好</em> 强制 4 个顶点。更高对称（如圆 \(O(2)\) 对称）给无穷顶点; 更低对称（如一般凸曲线无对称）给至少 4 个但通常更多。</p>
+
+<h2 id="sec5-5">5.5 等周不等式: 陈述</h2>
+
+<p>这是几何里<em>最古老</em> 的优化命题之一, 古希腊人就在问: <em>在固定周长下, 哪种平面图形围出最大面积</em>？</p>
+
+<p>古希腊朴素答案: 圆。证明却<em>等了 2000 多年</em>——最早严格证明（用变分法）出自 19 世纪。Hurwitz 1902 给出今天最优雅的<em>Fourier 证明</em>, 这是我们要看的。</p>
+
+<p><strong>定理（等周不等式）.</strong> 设 \(\gamma\) 是平面上 \(C^1\) 简单闭曲线, 周长 \(L\), 围出面积 \(A\)。则</p>
+
+<p>\[
+\boxed{\ A \le \frac{L^2}{4\pi}.\ }
+\]</p>
+
+<p>等号成立 \(\Longleftrightarrow\) \(\gamma\) 是圆。</p>
+
+<p>(对圆: 周长 \(L = 2\pi r\), 面积 \(A = \pi r^2 = (2\pi r)^2 / (4\pi) = L^2/(4\pi)\)——等号成立。)</p>
+
+<p><strong>等价形式.</strong> 把不等式改写: \(L^2 \ge 4\pi A\), 即<em>"周长平方至少 4π 倍面积"</em>。</p>
+
+<p>无量纲形式: 定义<em>等周比</em> \(I := L^2 / A\), 不等式说 \(I \ge 4\pi\)。圆 \(I = 4\pi\); 正方形 \(L = 4 a, A = a^2, I = 16\); 正六边形 \(L = 6a, A = (3\sqrt{3}/2) a^2, I = 36/(3\sqrt{3}/2) = 24/\sqrt{3} \approx 13.86\); 圆 \(I = 4\pi \approx 12.57\)——比正六边形还小, 是<em>最小等周比</em>。</p>
+
+<h2 id="sec5-6">5.6 等周不等式的 Hurwitz 证明（Fourier 法）</h2>
+
+<p>设 \(\gamma\) 弧长参数化, 周长 \(L\)。坐标 \(\gamma(s) = (x(s), y(s))\), 周期 \(L\):</p>
+
+<p>\[
+x(s + L) = x(s), \quad y(s + L) = y(s).
+\]</p>
+
+<p>归一化: 把 \(s\) 放缩到 \([0, 2\pi]\), 即设 \(s = L t / (2\pi)\), \(t \in [0, 2\pi]\)。这样 \(x(t), y(t)\) 是 \(2\pi\)-周期函数。新的弧长元 \(ds = (L/2\pi) dt\), 弧长参数化条件 \((dx/ds)^2 + (dy/ds)^2 = 1\) 变为</p>
+
+<p>\[
+(\dot x)^2 + (\dot y)^2 = (L/2\pi)^2
+\]</p>
+
+<p>(其中 \(\dot{} = d/dt\))。积一下:</p>
+
+<p>\[
+\int_0^{2\pi} (\dot x^2 + \dot y^2) dt = 2\pi \cdot (L/2\pi)^2 = L^2 / (2\pi).
+\]</p>
+
+<p>面积公式（Green）: \(A = \frac{1}{2}\oint (x \dot y - y \dot x) dt = \frac{1}{2}\int_0^{2\pi}(x \dot y - y \dot x) dt\)。</p>
+
+<p>把 \(x(t), y(t)\) 用 Fourier 级数展开:</p>
+
+<p>\[
+x(t) = \sum_{n \in \mathbb{Z}} a_n e^{int}, \quad y(t) = \sum_{n \in \mathbb{Z}} b_n e^{int}.
+\]</p>
+
+<p>由 \(x, y\) 实值, \(\overline{a_n} = a_{-n}, \overline{b_n} = b_{-n}\)。</p>
+
+<p>导数: \(\dot x = \sum in \, a_n e^{int}\), \(\dot y = \sum in \, b_n e^{int}\)。Parseval:</p>
+
+<p>\[
+\int_0^{2\pi} \dot x^2 dt = 2\pi \sum n^2 |a_n|^2, \quad \int_0^{2\pi} \dot y^2 dt = 2\pi \sum n^2 |b_n|^2.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\int (\dot x^2 + \dot y^2) dt = 2\pi \sum n^2 (|a_n|^2 + |b_n|^2) = L^2/(2\pi).
+\]</p>
+
+<p>即</p>
+
+<p>\[
+\sum_n n^2 (|a_n|^2 + |b_n|^2) = \frac{L^2}{(2\pi)^2}. \qquad (\star)
+\]</p>
+
+<p>面积:</p>
+
+<p>\[
+\int (x \dot y - y \dot x) dt = \int \big(\sum_m a_m e^{imt}\big)\big(\sum_n in \, b_n e^{int}\big) dt - \int \big(\sum_m b_m e^{imt}\big)\big(\sum_n in \, a_n e^{int}\big) dt.
+\]</p>
+
+<p>用正交性 \(\int e^{imt} e^{int} dt = 2\pi \delta_{m, -n}\) （即 \(m + n = 0\) 时 \(2\pi\), 否则 0）:</p>
+
+<p>\[
+\int x \dot y dt = 2\pi \sum_n in \, a_{-n} b_n = 2\pi \sum_n in \, \overline{a_n} b_n.
+\]</p>
+
+<p>\[
+\int y \dot x dt = 2\pi \sum_n in \, \overline{b_n} a_n.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\int (x \dot y - y \dot x) dt = 2\pi \sum_n in (\overline{a_n} b_n - \overline{b_n} a_n) = 2\pi \sum_n in \cdot 2i \, \text{Im}(\overline{a_n} b_n) = -4\pi \sum n \, \text{Im}(\overline{a_n} b_n).
+\]</p>
+
+<p>面积</p>
+
+<p>\[
+A = \frac{1}{2} \cdot (-4\pi) \sum n \, \text{Im}(\overline{a_n} b_n) = -2\pi \sum_n n \, \text{Im}(\overline{a_n} b_n).
+\]</p>
+
+<p>(由对称性 \(n\) 与 \(-n\) 项相消组合, 最后 \(A = 2\pi \sum_{n>0} n (\text{虚分量项})\), 这里我们直接处理整体。注意符号约定的方向选择, 下面改用绝对值估计避方向问题.)</p>
+
+<p>取绝对值估计:</p>
+
+<p>\[
+|A| \le 2\pi \sum_n |n| \, |\text{Im}(\overline{a_n} b_n)| \le 2\pi \sum_n |n| \cdot |a_n| |b_n|.
+\]</p>
+
+<p>用 AM-GM \(|a_n| |b_n| \le (|a_n|^2 + |b_n|^2)/2\):</p>
+
+<p>\[
+|A| \le \pi \sum_n |n| (|a_n|^2 + |b_n|^2).
+\]</p>
+
+<p>再用 \(|n| \le n^2\)（对 \(|n| \ge 1\); \(n = 0\) 项贡献为 0 因为有 \(|n|\) 系数）:</p>
+
+<p>\[
+|A| \le \pi \sum_n n^2 (|a_n|^2 + |b_n|^2) = \pi \cdot \frac{L^2}{(2\pi)^2} = \frac{L^2}{4\pi}.
+\]</p>
+
+<p>得证 \(A \le L^2/(4\pi)\)。</p>
+
+<p><strong>等号情形.</strong> 上面不等式 \(|n| \le n^2\) 等号当且仅当 \(|n| \in \{0, 1\}\), 即所有 \(|n| \ge 2\) 的 Fourier 系数为零。AM-GM 等号当 \(|a_n| = |b_n|\) 且 \(\overline{a_n} b_n\) 是<em>纯虚数</em>（即 \(b_n = \pm i a_n\)）。</p>
+
+<p>所以等号 \(\Leftrightarrow\) \(x, y\) 只有 \(n = 0, \pm 1\) 项, 且 \(b_1 = -i a_1\)（取右手定向时）。即</p>
+
+<p>\[
+x(t) = a_0 + a_1 e^{it} + \overline{a_1} e^{-it}, \quad y(t) = b_0 + b_1 e^{it} + \overline{b_1} e^{-it} = b_0 - i a_1 e^{it} + i \overline{a_1} e^{-it}.
+\]</p>
+
+<p>设 \(a_1 = (R/2) e^{i\phi}\):</p>
+
+<p>\[
+x(t) = a_0 + R \cos(t + \phi), \quad y(t) = b_0 + R \sin(t + \phi).
+\]</p>
+
+<p>这正是<em>圆</em>: 中心 \((a_0, b_0)\), 半径 \(R\)。等号成立 \(\Leftrightarrow\) \(\gamma\) 是圆。✓</p>
+
+<p>得证。</p>
+
+<p>请你停下来欣赏这个证明: 它把"<em>找最大面积</em>" 的<em>变分</em> 问题翻译成"<em>Fourier 系数估计</em>" 的<em>分析</em> 问题; 然后用<em>Parseval + Cauchy-Schwarz</em> 给一个<em>纯代数</em> 不等式。优美在<em>所有几何信息全压缩到 \(n^2\) vs \(|n|\) 这个单纯不等式上</em>。等号紧致地告诉你"<em>最优形状是圆</em>"——因为只有圆的 Fourier 谱<em>只有 \(\pm 1\) 阶项</em>。</p>
+
+<h2 id="sec5-7">5.7 应用: 物理 + 生物</h2>
+
+<p>等周不等式 + 4-顶点定理在<em>真实世界</em> 有大量应用——任何"<em>表面张力 + 体积约束</em>" 的系统都遵循它们。</p>
+
+<p><strong>(1) 肥皂泡.</strong> 表面张力<em>极小化</em> 表面积。给定包含的气体体积, 肥皂泡形状是<em>最小表面积</em> 形状——3D 中的等周不等式说: <em>球</em>。所以肥皂泡是球——<em>等周问题在 3D 的解</em>。本节是平面（2D）的版本; 3D 版本陈述: 体积 \(V\) 的封闭曲面表面积 \(S \ge \sqrt[3]{36\pi V^2}\), 等号 \(\Leftrightarrow\) 球。</p>
+
+<p><strong>(2) 细胞表面.</strong> 红细胞、上皮细胞等的形状受表面张力 + 细胞膜弹性能影响。"<em>最小面积下囊住固定体积</em>" 的偏好把细胞推向球形（小细胞或某些干细胞确实很圆）。但红细胞演化出双凹盘形是为优化<em>气体扩散表面 / 体积比</em>——一个<em>反方向</em> 的等周问题（最大化表面 / 体积）。生物形态学常常在这两类等周问题之间博弈。</p>
+
+<p><strong>(3) 水滴.</strong> 失重环境下水滴是球; 在重力下被压扁但仍接近球冠。这都是表面张力极小化<em>等周</em> 问题的体现。</p>
+
+<p><strong>(4) 4-顶点 + 翻滚物体.</strong> 4-顶点定理保证一个平面凸闭曲线<em>至少</em> 有 4 个曲率极值——4 个"<em>最尖</em>" 与"<em>最钝</em>" 处。一个均匀重 2D 物体在水平面上无摩擦翻滚时, <em>稳定平衡</em> 位置对应曲率极小（最钝）处, <em>不稳定平衡</em> 对应曲率极大处。所以 4-顶点定理在某种意义上保证<em>每个均匀凸 2D 物体</em> 至少有 2 个稳定 + 2 个不稳定平衡——共 4 个平衡。3D 类似: 著名的 Gömböc 物体（Várkonyi-Domokos 2007）证明<em>3D 中存在</em> 只有 1 个稳定 + 1 个不稳定平衡的均匀凸物体——这种"<em>2-顶点 3D 类比</em>" 的存在<em>极其反直觉</em>, 因为它告诉我们 4-顶点定理的<em>3D 类比不成立</em>。</p>
+
+<p><strong>(5) 等周谬误（实际世界中的"<em>最优形状</em>" 直觉）.</strong> 古希腊故事: 迦太基女王 Dido 被允许"<em>用一张牛皮围出一块土地</em>"。她把牛皮剪成细长条围成<em>圆形</em>——等周不等式的实际应用。如果换成正方形或多边形, 围出的面积都更小。</p>
+
+<h2 id="sec5-8">5.8 临别提示: 通向 ch6</h2>
+
+<p>这一章<em>结束了曲线段</em>（ch2-5）。我们建立了:</p>
+
+<ul>
+  <li>参数化与弧长（ch2）</li>
+  <li>平面曲线曲率（ch3）</li>
+  <li>空间曲线 Frenet-Serret + \(\kappa, \tau\) 复原定理（ch4）</li>
+  <li>整体闭曲线: 4-顶点 + 等周（ch5）</li>
+</ul>
+
+<p>下一章 ch6 起转向<em>曲面</em>。曲线是 1D, 曲面是 2D——多了一维带来本质上更丰富的几何。曲面在每点不只有一个切方向, 而是一整个<em>切平面</em>; "<em>弯</em>" 不再是一个数, 而是切平面上的<em>对称双线性形式</em>（第二基本形式）。本书核心工作（ch6-12）就是把这套 2D 曲率理论建起来, 直至 ch11 的 Theorema Egregium——本书的<em>第一个高潮</em>。</p>
+
+<p>请你回顾 ch1 那段开篇的"<em>纸卷得了圆筒, 卷不了球面</em>" 的实验。现在你已经有了曲线的曲率工具。曲面的曲率工具（主曲率、Gauss 曲率、平均曲率）是这套思想<em>升一维</em> 的产物。Theorema Egregium 说: <em>Gauss 曲率虽然定义看上去依赖 3D 嵌入, 实际上只依赖曲面内在的距离结构</em>。这条"<em>内蕴 vs 外蕴</em>" 的区分在曲线情形<em>不存在</em>（1D 曲线没有"<em>嵌入信息之外的几何</em>"——Frenet-Serret 完全描述了它的形状）。曲面里这条区分是核心的, 也是本书后面所有内容的根。</p>
+
+<p>请你<em>动手</em> 算一道收尾: 椭圆 \(x^2/4 + y^2 = 1\) (即 \(a = 2, b = 1\)) 的周长 \(L\) 与面积 \(A\)。面积容易: \(A = \pi a b = 2\pi\)。周长是椭圆积分, 数值上 \(L \approx 9.6884\)。验证 \(L^2/(4\pi) \approx 7.469 \cdot 4 / (4\pi) \approx 7.469 \approx \pi a^2 = 4\pi\)? 不对——重算: \(L^2/(4\pi) = 9.6884^2/(4\pi) \approx 93.86/12.57 \approx 7.47\); \(A = 2\pi \approx 6.28\)。所以 \(A \approx 6.28 < 7.47\)——等周不等式严格成立, 椭圆"<em>不如圆有效率</em>"。这种数值验证是把抽象不等式落到具体数。把它当成本章工具的一次小的<em>验收</em>。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 空间曲线：Frenet-Serret</a><a href="ch6.html">下一章 · 第 6 章 正则曲面：定义与标准例子 →</a></nav>
+</main>
+</body>
+</html>

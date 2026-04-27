@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 22 章 黎曼度量与黎曼几何雏形 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 抽象流形入门</a><a href="ch23.html">下一章 · 第 23 章 广义相对论引论 →</a></nav>
+<h1 id="ch22">第 22 章 黎曼度量与黎曼几何雏形</h1>
+
+<p>上一章我们建立了抽象流形 \((M, \mathcal{A})\)——一个"<em>局部上像 \(\mathbb{R}^n\) 的光滑空间</em>", 完全不依赖任何外部嵌入。我们能在它上面讲光滑函数、切空间、切丛、光滑映射。</p>
+
+<p>但这种<em>纯</em> 抽象流形上, 你<em>不能</em> 讲距离、长度、角度、面积。原因很简单: 切空间 \(T_p M\) 是<em>抽象</em> 的 \(n\) 维实向量空间, 它<em>没有</em> 自带的内积。两个切向量 \(u, v \in T_p M\) 之间的"<em>夹角</em>" 没意义, "<em>长度</em>" 也没意义——除非你<em>额外</em> 给一个内积。</p>
+
+<p>怎么办？给每个切空间<em>各自</em> 装一个内积, 而且要让这些内积"<em>光滑变化</em>"——这就是<em>黎曼度量</em>。配上黎曼度量的抽象流形 \((M, g)\) 叫<em>黎曼流形</em>, 是黎曼几何的研究对象。</p>
+
+<p>本书前 20 章的<em>第一基本形式</em>（<a href="ch7.html">ch7</a>）实际上就是黎曼度量的<em>嵌入版本</em>——曲面 \(M \subset \mathbb{R}^3\) 的第一基本形式继承自 \(\mathbb{R}^3\) 的内积。但<em>内蕴</em> 版本（黎曼度量）不需要这种继承, 它是<em>原生</em> 给的——你<em>选</em> 一个度量, 流形就有几何; 选不同度量, 同一个底下流形可以有完全不同的几何（比如 \(S^2\) 上有标准的"圆"度量, 也可以有椭球度量, 也可以有任意奇形怪状度量）。</p>
+
+<p>这一章我们走"<em>黎曼度量定义 → 标准例子 → 度量给长度 / 角度 / 面积 → 联络与 Christoffel 符号 → 曲率张量 → 截面 / Ricci / 标量曲率</em>" 的路线, 给黎曼几何的<em>入口</em>。22-23 章是本书最后两章, 把内蕴几何完整建立起来, 通向黎曼几何课程。</p>
+
+<h2 id="sec22-1">22.1 黎曼度量的定义</h2>
+
+<p>定义。\(n\) 维光滑流形 \(M\) 上的<em>黎曼度量</em> \(g\) 是: 对每个 \(p \in M\), 给一个切空间 \(T_p M\) 上的<em>对称正定双线性形式</em></p>
+
+<p>\[
+g_p: T_p M \times T_p M \to \mathbb{R},
+\]</p>
+
+<p>满足:</p>
+
+<ul>
+  <li><em>对称</em>: \(g_p(u, v) = g_p(v, u)\), \(\forall u, v \in T_p M\)。</li>
+  <li><em>双线性</em>: \(g_p(au + bw, v) = a g_p(u, v) + b g_p(w, v)\), 对 \(u, v, w \in T_p M, a, b \in \mathbb{R}\)（第二变量同理）。</li>
+  <li><em>正定</em>: \(g_p(v, v) \ge 0\), 等号 ⟺ \(v = 0\)。</li>
+  <li><em>光滑变化</em>: 在任一图 \((U, \varphi = (x^1, \ldots, x^n))\) 中, 把 \(g_p\) 写成矩阵 \(g_{ij}(p) := g_p(\partial_i|_p, \partial_j|_p)\), 这些 \(g_{ij}: U \to \mathbb{R}\) 是光滑函数。</li>
+</ul>
+
+<p>简记 \((M, g)\)。这个 \(g\) 叫<em>黎曼度量张量</em>, 或简称<em>度量</em>。在指标记号里它写成 \(g_{ij}\)（下两个指标）, 是<em>(0, 2) 型张量</em>。</p>
+
+<p>用经典符号, 给两个切向量 \(u = u^i \partial_i, v = v^j \partial_j\), 内积写</p>
+
+<p>\[
+g(u, v) = g_{ij} u^i v^j \quad (\text{Einstein 求和约定}).
+\]</p>
+
+<p>"<em>线元</em>" 写法</p>
+
+<p>\[
+ds^2 = g_{ij} dx^i dx^j,
+\]</p>
+
+<p>意思是: 沿曲线 \(\gamma(t)\), 弧长元 \(ds = \sqrt{g_{ij} \dot \gamma^i \dot \gamma^j} \cdot dt\)。这种"<em>\(ds^2\)</em>" 表达在物理里超流行（爱因斯坦的广义相对论几乎全用这种语言）。</p>
+
+<p>关键: 这个定义<em>不</em> 依赖任何外部空间——\(g\) 是流形<em>自身</em> 的数据, 不是从某个 \(\mathbb{R}^N\) 继承下来的。\((M, g)\) 是完全内蕴的几何对象。</p>
+
+<h2 id="sec22-2">22.2 三个标准例子</h2>
+
+<p>具体看几个最经典的黎曼流形。</p>
+
+<p><strong>例 1: 欧式空间 \((\mathbb{R}^n, \delta_{ij})\)。</strong>度量 \(g_{ij} = \delta_{ij}\)（Kronecker 符号, 单位矩阵）。线元</p>
+
+<p>\[
+ds^2 = (dx^1)^2 + (dx^2)^2 + \cdots + (dx^n)^2.
+\]</p>
+
+<p>这是欧几里得几何——平的, Pythagoras 定理成立, 平行公理成立, 三角形内角和等于 \(\pi\)。Gauss 曲率（\(n = 2\) 时）等于 0 处处, Riemann 曲率张量整个为零。</p>
+
+<p><strong>例 2: 球面 \((S^n, g_{\text{round}})\)。</strong>把 \(S^n \subset \mathbb{R}^{n+1}\) 嵌入欧式空间, 让 \(g_{\text{round}}\) 等于嵌入诱导的度量（\(\mathbb{R}^{n+1}\) 内积限制到切空间）。在球坐标下, 比如 \(S^2\):</p>
+
+<p>\[
+ds^2 = d\theta^2 + \sin^2 \theta \cdot d\phi^2,
+\]</p>
+
+<p>其中 \(\theta \in (0, \pi)\) 是<em>极角</em>, \(\phi \in [0, 2\pi)\) 是<em>方位角</em>。这是常曲率 \(K = +1\) 球面几何——三角形内角和大于 \(\pi\), 没有平行线（任两条<em>大圆</em> 都相交）, 整体面积有限（\(4\pi\)）。</p>
+
+<p>注意: 我们这里"<em>用嵌入诱导度量</em>" 只是构造它的<em>方便方法</em>; 一旦构造出来, 度量本身是<em>内蕴</em> 的——可以丢掉嵌入, 用 \((S^2, g_{\text{round}})\) 这对数据继续做几何。这种"<em>用嵌入构造, 然后内蕴使用</em>" 是黎曼几何的常见手法。</p>
+
+<p><strong>例 3: 双曲空间 \((\mathbb{H}^n, g_{\text{hyp}})\)。</strong>用<em>上半空间模型</em>: \(\mathbb{H}^n = \{(x^1, \ldots, x^n) \in \mathbb{R}^n : x^n > 0\}\), 度量</p>
+
+<p>\[
+ds^2 = \frac{(dx^1)^2 + \cdots + (dx^n)^2}{(x^n)^2}.
+\]</p>
+
+<p>注意分母 \((x^n)^2\)——它把欧式度量"<em>放大</em>" 在 \(x^n\) 接近 0 时, "<em>缩小</em>" 在 \(x^n\) 大时。这给出常曲率 \(K = -1\) 双曲几何——三角形内角和小于 \(\pi\), 平行线无穷多, "<em>边界</em>" \(x^n = 0\) 是无穷远（沿 \(x^n \to 0\) 走的距离<em>发散</em>）。</p>
+
+<p>这个例子的物理意义: \(K = -1\) 双曲几何是<em>非欧几何</em> 的典型——19 世纪 Lobachevsky 与 Bolyai 发现的, 颠覆了 2000 年欧几里得几何的霸权。它是 Poincaré 1880 年代研究的对象, 今天在数论（模形式）、低维拓扑（3-流形几何化）、计算机图形学（Escher 风格的"<em>圆盘里的鱼</em>"）都有重要应用。</p>
+
+<p>这三个例子: 平的（\(K = 0\)）、正弯（\(K = +1\)）、负弯（\(K = -1\)）。它们是黎曼几何的"<em>三种基本几何</em>", 局部上任何流形都"<em>类似</em>" 三种之一（这种"<em>类似</em>" 在 1 维 / 2 维 / 3 维上能精确化, 高维则不行）。</p>
+
+<h2 id="sec22-3">22.3 任何流形都能配黎曼度量</h2>
+
+<p>一个自然问题: 给定一个<em>裸</em> 抽象流形 \(M\)（只有光滑结构, 没有度量）, 能否给它配上黎曼度量？</p>
+
+<p>定理。每个第二可数光滑流形 \(M\) 上都<em>存在</em> 黎曼度量。</p>
+
+<p>证明（草图）。用<em>单位分解</em>（partition of unity）。</p>
+
+<ol>
+  <li>取 \(M\) 的一个图册 \(\{(U_\alpha, \varphi_\alpha)\}\)。</li>
+  <li>每个图 \((U_\alpha, \varphi_\alpha)\) 上, 用<em>欧式度量</em> 通过 \(\varphi_\alpha\) <em>拉回</em>: 定义 \(g^{\alpha}\) 为 \(U_\alpha\) 上的度量, 使得 \(\varphi_\alpha\) 是 \((U_\alpha, g^\alpha)\) 与 \((\varphi_\alpha(U_\alpha), \delta_{ij})\) 之间的等距映射。即 \(g^\alpha_{ij} = \delta_{ij}\) 在该图坐标下。</li>
+  <li>不同图上的 \(g^\alpha, g^\beta\) <em>不</em> 一致（它们在重叠区域上是不同的度量）。要拼起来, 用单位分解 \(\{\rho_\alpha\}\)（\(\rho_\alpha: M \to [0, 1]\) 光滑, \(\sum \rho_\alpha \equiv 1\), \(\mathrm{supp}(\rho_\alpha) \subset U_\alpha\)）。</li>
+  <li>定义 \(g := \sum_\alpha \rho_\alpha g^\alpha\)。</li>
+</ol>
+
+<p>验证 \(g\) 是黎曼度量: 各 \(g^\alpha\) 对称正定; 它们的非负线性组合（\(\sum \rho_\alpha g^\alpha\), \(\rho_\alpha \ge 0\), \(\sum \rho_\alpha = 1\)）也对称且非负——但<em>正定</em> 需要细节: 每点 \(p\), 至少一个 \(\rho_\alpha(p) > 0\), 而那一个 \(g^\alpha\) 是正定的, 所以总和正定。光滑性来自单位分解的光滑性。</p>
+
+<p>这个证明的精神: <em>整体几何对象由局部欧式块拼起来 + 单位分解粘合</em>。这种"<em>局部欧式 + 单位分解</em>" 是抽象流形理论的<em>万能工具</em>——证明很多"<em>整体存在性</em>" 时都用同一个套路（联络的存在、Riemannian 度量的存在、向量场的延拓等）。</p>
+
+<p>注意: 度量<em>不唯一</em>! 同一个流形可以有<em>无穷多种</em> 互不相容的度量。比如 \(\mathbb{R}^2\) 既能配上欧式度量（\(K = 0\)）, 也能配上"<em>双曲圆盘</em>" 度量（部分区域 \(K = -1\)）, 也能配上各种奇形怪状的度量。<em>选一个度量</em> 才有具体的几何; <em>选哪个度量</em> 是几何学家的研究对象（"<em>给定流形, 找有特殊性质的度量</em>"——比如<em>常曲率度量</em>、<em>爱因斯坦度量</em>、<em>极小化某泛函的度量</em>）。</p>
+
+<h2 id="sec22-4">22.4 度量给长度、角度、面积、体积</h2>
+
+<p>有了 \(g\), 微分几何里所有"<em>定量</em>" 的几何概念都立即可用。</p>
+
+<p><strong>切向量长度。</strong>\(|v|_g := \sqrt{g_p(v, v)}\)。这定义出 \(T_p M\) 上的范数。</p>
+
+<p><strong>切向量夹角。</strong></p>
+
+<p>\[
+\cos \theta(u, v) = \frac{g_p(u, v)}{|u|_g \cdot |v|_g}.
+\]</p>
+
+<p>"<em>正交</em>" \(u \perp v ⟺ g_p(u, v) = 0\)。</p>
+
+<p><strong>曲线长度。</strong>设 \(\gamma: [a, b] \to M\) 是光滑曲线。它的长度</p>
+
+<p>\[
+L(\gamma) = \int_a^b |\dot\gamma(t)|_g \, dt = \int_a^b \sqrt{g_{ij}(\gamma(t)) \dot\gamma^i \dot\gamma^j} \, dt.
+\]</p>
+
+<p>这把"<em>曲线长度</em>" 内蕴定义出来——不需要把 \(\gamma\) 看成 \(\mathbb{R}^N\) 中的曲线再算外蕴长度。</p>
+
+<p><strong>测地距离。</strong></p>
+
+<p>\[
+d_g(p, q) := \inf_{\gamma \text{ 从 } p \text{ 到 } q} L(\gamma).
+\]</p>
+
+<p>"<em>下确界</em>" 取所有从 \(p\) 到 \(q\) 的光滑曲线。这给 \(M\) 一个<em>距离函数</em>, 让它成为<em>度量空间</em>。Hopf-Rinow 定理（<a href="ch15.html">ch15</a>）说<em>完备</em> 黎曼流形上, 这个 \(\inf\) 总能取到, 即<em>测地线总存在</em>。</p>
+
+<p><strong>体积元。</strong>在图坐标下,</p>
+
+<p>\[
+dV_g = \sqrt{\det g_{ij}} \, dx^1 dx^2 \cdots dx^n.
+\]</p>
+
+<p>"<em>体积</em>"（\(n\) 维）= \(\int_M dV_g\)。"<em>面积</em>"（\(n = 2\)）= 体积。"<em>曲面 + 边界</em>" 上的<em>面积</em> 与<em>边界长度</em> 都从 \(g\) 算出来。</p>
+
+<p>这是"<em>第一基本形式</em>" 的内蕴版——前 20 章曲面的所有"<em>测距 / 测角 / 测面积</em>" 计算, 在抽象流形上完全没变, 只是不靠嵌入。</p>
+
+<h2 id="sec22-5">22.5 Levi-Civita 联络</h2>
+
+<p>黎曼几何的下一步是<em>求导</em>: 怎么对一个向量场<em>求方向导数</em>？这看似简单, 实则微妙——切向量场 \(X\) 在不同点的值<em>住在不同切空间里</em>, 不能直接相减。我们需要一种"<em>同步</em>" 不同点切空间的工具——<em>联络</em>（connection）。</p>
+
+<p>定义。\(M\) 上的<em>联络</em> \(\nabla\) 是一个映射</p>
+
+<p>\[
+\nabla: \mathfrak{X}(M) \times \mathfrak{X}(M) \to \mathfrak{X}(M), \quad (X, Y) \mapsto \nabla_X Y,
+\]</p>
+
+<p>其中 \(\mathfrak{X}(M)\) 是 \(M\) 上向量场的集合, 满足:</p>
+
+<ul>
+  <li>\(\nabla_X Y\) 关于 \(X\) 是 \(C^\infty(M)\)-线性: \(\nabla_{fX + gZ} Y = f \nabla_X Y + g \nabla_Z Y\)。</li>
+  <li>\(\nabla_X Y\) 关于 \(Y\) 是 \(\mathbb{R}\)-线性。</li>
+  <li>Leibniz 法则: \(\nabla_X (fY) = (Xf) Y + f \nabla_X Y\), \(f \in C^\infty(M)\)。</li>
+</ul>
+
+<p>"<em>\(\nabla_X Y\)</em>" 直觉是"<em>\(Y\) 沿 \(X\) 方向的协变导数</em>"。</p>
+
+<p>问题: 一个抽象流形上有<em>很多</em> 联络（无穷多, 形成无穷维仿射空间）。要让"<em>求导</em>" 唯一, 我们需要<em>额外</em> 限制条件。在黎曼流形 \((M, g)\) 上, 有两个自然的额外条件:</p>
+
+<ul>
+  <li><em>无挠</em>（torsion-free）: \(\nabla_X Y - \nabla_Y X = [X, Y]\), 其中 \([X, Y]\) 是向量场的 Lie 括号。</li>
+  <li><em>度量相容</em>（metric compatible）: \(X(g(Y, Z)) = g(\nabla_X Y, Z) + g(Y, \nabla_X Z)\)（即 \(\nabla\) 满足度量的"<em>分部积分</em>"）。</li>
+</ul>
+
+<p>定理 (黎曼几何基本定理, Levi-Civita 1917)。每个黎曼流形 \((M, g)\) 上存在唯一的<em>无挠 + 度量相容</em> 联络, 叫<em>Levi-Civita 联络</em>。</p>
+
+<p>这是黎曼几何的<em>基础定理</em>——它说"<em>有度量就有联络</em>", 让我们能够在黎曼流形上做"<em>协变求导</em>", 而且求导操作是度量决定的、唯一的。</p>
+
+<p>证明（草图）。用<em>Koszul 公式</em>:</p>
+
+<p>\[
+2 g(\nabla_X Y, Z) = X(g(Y, Z)) + Y(g(X, Z)) - Z(g(X, Y)) + g([X, Y], Z) - g([X, Z], Y) - g([Y, Z], X).
+\]</p>
+
+<p>右侧只用 \(g\) 与 Lie 括号（流形结构本身定义的）, 不用任何联络数据——所以 \(\nabla_X Y\) 由这个公式<em>显式确定</em>。验证它满足无挠 + 度量相容直接计算。</p>
+
+<p>这条公式不漂亮但<em>唯一</em>——它告诉你 Levi-Civita 联络是怎么从度量"<em>提取</em>" 出来的。整本黎曼几何教科书 90% 的"<em>求导</em>" 都用 Levi-Civita。</p>
+
+<h2 id="sec22-6">22.6 Christoffel 符号</h2>
+
+<p>把 Levi-Civita 联络在<em>图坐标</em> 下展开。设 \((U, \varphi)\) 是图, \(\partial_i = \partial / \partial x^i\) 是图坐标向量场。\(\nabla_{\partial_i} \partial_j\) 也是 \(U\) 上的向量场, 可写成</p>
+
+<p>\[
+\nabla_{\partial_i} \partial_j = \Gamma_{ij}^k \partial_k.
+\]</p>
+
+<p>系数 \(\Gamma_{ij}^k\) 叫<em>Christoffel 符号</em>（第二类）。它们<em>不</em> 是张量（在换图时不按张量规则变换), 但作为联络的局部表达足够有用。</p>
+
+<p>Koszul 公式翻译到坐标系给</p>
+
+<p>\[
+\boxed{\ \Gamma_{ij}^k = \frac{1}{2} g^{k\ell} (\partial_i g_{j\ell} + \partial_j g_{i\ell} - \partial_\ell g_{ij}).\ }
+\]</p>
+
+<p>其中 \(g^{ij}\) 是 \(g_{ij}\) 矩阵的逆（\(g^{ik} g_{kj} = \delta^i_j\)）。</p>
+
+<p>这条公式让 Christoffel 符号<em>完全</em> 由度量分量 \(g_{ij}\) 与它们的偏导数决定。物理学家 / 数学家做具体计算时, 第一步就是<em>算 \(\Gamma_{ij}^k\)</em>（机械工作, 大量偏导数 + 矩阵求逆）, 第二步从它们算曲率张量。</p>
+
+<p>具体例子. \(\mathbb{R}^n\) 标准坐标 \(g_{ij} = \delta_{ij}\), 偏导都为 0, 所以 \(\Gamma_{ij}^k \equiv 0\)。<em>欧式空间的 Christoffel 符号都是零</em>——这跟"<em>欧式空间是平的</em>" 直觉一致。</p>
+
+<p>球面 \(S^2\) 标准坐标 \((\theta, \phi)\), \(g_{\theta\theta} = 1, g_{\phi\phi} = \sin^2 \theta, g_{\theta\phi} = 0\)。算出来的 \(\Gamma\) 系数有几个非零的:</p>
+
+<p>\[
+\Gamma^\theta_{\phi\phi} = -\sin\theta \cos\theta, \quad \Gamma^\phi_{\theta\phi} = \Gamma^\phi_{\phi\theta} = \cot\theta.
+\]</p>
+
+<p>非零 \(\Gamma\) 反映了球面"<em>不平</em>" 的事实。</p>
+
+<p>用 Christoffel 符号, 协变导数的坐标表达</p>
+
+<p>\[
+\nabla_{\partial_i} (V^j \partial_j) = (\partial_i V^k + \Gamma_{ij}^k V^j) \partial_k.
+\]</p>
+
+<p>这就是物理课本里的"<em>协变导数</em>" 公式: \(\nabla_i V^k = \partial_i V^k + \Gamma_{ij}^k V^j\)。\(\Gamma\) 项是"<em>多出来的修正</em>", 修正的就是"<em>不同点切空间</em>" 这件事。</p>
+
+<h2 id="sec22-7">22.7 Riemann 曲率张量</h2>
+
+<p>有了联络 \(\nabla\), 我们能问<em>曲率</em> 是什么。直觉: <em>曲率度量"<em>沿一个小回路平行移动一个向量, 它转了多少</em>" 的量</em>。</p>
+
+<p>具体定义。<em>Riemann 曲率张量</em> \(R\) 是一个 (1, 3) 型张量, 在三个向量场上的作用</p>
+
+<p>\[
+\boxed{\ R(X, Y) Z := \nabla_X \nabla_Y Z - \nabla_Y \nabla_X Z - \nabla_{[X, Y]} Z.\ }
+\]</p>
+
+<p>验证 \(R\) 是张量: 它对三个变量都是 \(C^\infty(M)\)-线性（不是只是 \(\mathbb{R}\)-线性, 这是张量的要求）。直接计算（用 Levi-Civita 的两条性质）确认。</p>
+
+<p>几何含义: \(R(X, Y) Z\) 度量"<em>沿 \(X, Y\) 张成的平面绕一个小回路, 平行移动 \(Z\) 后它和原始 \(Z\) 的差</em>"。差异越大, 流形越弯。\(R \equiv 0 \) ⟺ 流形<em>局部</em> 等距于欧式空间。</p>
+
+<p>在坐标系下, \(R\) 写成 \(R^i_{jkl}\), 由</p>
+
+<p>\[
+R^i_{jkl} = \partial_k \Gamma^i_{lj} - \partial_l \Gamma^i_{kj} + \Gamma^i_{km} \Gamma^m_{lj} - \Gamma^i_{lm} \Gamma^m_{kj}.
+\]</p>
+
+<p>四个指标。可怕但机械。一旦算出 \(\Gamma\), 这条公式直接给 \(R\)。物理学家用计算机代数系统（Mathematica, SageMath）做这种计算很常见。</p>
+
+<p>对称性. \(R\) 满足很多对称关系:</p>
+
+<ul>
+  <li>\(R^i_{jkl} = -R^i_{jlk}\)（最后两个指标反对称）。</li>
+  <li>降一个指标 \(R_{ijkl} := g_{im} R^m_{jkl}\), 则 \(R_{ijkl} = -R_{jikl}\)（前两指标反对称）。</li>
+  <li>\(R_{ijkl} = R_{klij}\)（"<em>块对称</em>"）。</li>
+  <li>第一 Bianchi 恒等式: \(R_{ijkl} + R_{iklj} + R_{iljk} = 0\)。</li>
+  <li>第二 Bianchi 恒等式: \(\nabla_m R_{ijkl} + \nabla_k R_{ijlm} + \nabla_l R_{ijmk} = 0\)（爱因斯坦场方程的关键）。</li>
+</ul>
+
+<p>这些对称把 \(R\) 在 \(n\) 维上的独立分量数限制到 \(\frac{1}{12} n^2(n^2 - 1)\)。\(n = 2\): 1 个独立分量（就是 Gauss 曲率 \(K\)）。\(n = 3\): 6 个。\(n = 4\): 20 个。\(n = 4\) 时这 20 个里, "<em>Ricci 部分</em>" 占 10 个（受爱因斯坦场方程约束）, "<em>Weyl 部分</em>" 占 10 个（描述引力波的传播）。</p>
+
+<h2 id="sec22-8">22.8 截面曲率</h2>
+
+<p>Riemann 曲率张量 \(R\) 是一个 4 张量, 复杂。把它"<em>提炼</em>" 成数, 有几种方式。</p>
+
+<p>第一种: <em>截面曲率</em> \(K(\sigma)\)。</p>
+
+<p>定义。设 \(\sigma \subset T_p M\) 是切空间的一个 2 维子空间, \(u, v\) 是它的一组基。<em>沿 \(\sigma\) 的截面曲率</em></p>
+
+<p>\[
+K(\sigma) := \frac{g(R(u, v) v, u)}{g(u, u) g(v, v) - g(u, v)^2}.
+\]</p>
+
+<p>这是个不依赖 \(u, v\) 选择（只依赖 \(\sigma\) 本身）的标量。直觉上: 它是"<em>沿 \(\sigma\) 方向</em> 的 2 维"<em>切片</em>"在 \(p\) 处的 Gauss 曲率"——把流形沿 \(\sigma\) 切出一个 2 维曲面, 那个曲面在 \(p\) 处的 Gauss 曲率正是 \(K(\sigma)\)。</p>
+
+<p>对 2 维流形, 切空间已经是 2 维, 唯一的 \(\sigma\) 就是 \(T_p M\) 自己, 截面曲率退化成<em>Gauss 曲率</em> \(K\)。所以截面曲率是 Gauss 曲率到高维的<em>正确推广</em>。</p>
+
+<p>常截面曲率流形:</p>
+
+<ul>
+  <li>\(K \equiv 0\) 处处: <em>欧式空间</em>（\(\mathbb{R}^n\) 标准度量）+ 它的商（如平面环面）。</li>
+  <li>\(K \equiv +1\): <em>球面 \(S^n\)</em>（标准度量）+ 商（射影空间）。</li>
+  <li>\(K \equiv -1\): <em>双曲空间 \(\mathbb{H}^n\)</em>（上半空间度量）+ 商。</li>
+</ul>
+
+<p>这三类叫"<em>空间形式</em>"（space forms）, 是黎曼几何中"<em>最对称</em>" 的流形。Killing-Hopf 定理说<em>完备 + 单连通常截面曲率流形</em>(\(K\) 等于常数)<em>必为</em> 这三种之一（按 \(K\) 的正负）。这是<em>常曲率</em> 假设的强有力推论。</p>
+
+<h2 id="sec22-9">22.9 Ricci 与标量曲率</h2>
+
+<p>第二种"<em>提炼</em>": <em>Ricci 张量</em>。它是 \(R\) 的<em>迹</em>:</p>
+
+<p>\[
+\boxed{\ \mathrm{Ric}(X, Y) := \mathrm{tr}(Z \mapsto R(Z, X) Y).\ }
+\]</p>
+
+<p>坐标下 \(\mathrm{Ric}_{ij} = R^k_{ikj}\)（缩并第一与第三指标）。\(\mathrm{Ric}\) 是 (0, 2) 型张量, 对称。\(n\) 维流形上 Ricci 张量有 \(n(n+1)/2\) 个独立分量。</p>
+
+<p>几何含义: Ricci 描述"<em>沿一个方向 \(v\) 的<em>所有</em> 2 维平面截面曲率的<em>平均</em></em>"。即, 取所有包含 \(v\) 的 2 维子空间 \(\sigma\), 它们的截面曲率取平均, 结果正比于 \(\mathrm{Ric}(v, v) / g(v, v)\)。</p>
+
+<p>第三种"<em>提炼</em>": <em>标量曲率</em> \(R\)（不要与 Riemann 张量混淆, 名字不幸但传统）:</p>
+
+<p>\[
+\boxed{\ R := g^{ij} \mathrm{Ric}_{ij} = \mathrm{tr}_g \mathrm{Ric}.\ }
+\]</p>
+
+<p>它是个标量函数 \(R: M \to \mathbb{R}\)。在 \(n = 2\) 上 \(R = 2K\)（标量曲率 = 2 倍 Gauss 曲率）。一般 \(n\) 维, \(R\) 描述"<em>所有方向截面曲率的总平均</em>"。</p>
+
+<p>几何意义: \(R(p) > 0\) ⟺ 在 \(p\) 周围, 体积比欧式情况"<em>少</em>"; \(R(p) < 0\) ⟺ "<em>多</em>"。这是几何分析中"<em>正质量定理</em>" 与"<em>Yamabe 问题</em>" 这些大题目的核心量。</p>
+
+<h2 id="sec22-10">22.10 通向爱因斯坦 + 黎曼几何课程</h2>
+
+<p>有了 \(\mathrm{Ric}, R\), 我们能写出广义相对论的核心方程——<em>爱因斯坦场方程</em>。</p>
+
+<p>爱因斯坦在 1915 年提出: 时空 \((M^4, g)\) 中, 物质（用<em>能量动量张量</em> \(T_{\mu\nu}\) 描述）<em>决定</em> 几何（用 Ricci 张量与标量曲率描述）, 关系是</p>
+
+<p>\[
+\boxed{\ \mathrm{Ric}_{\mu\nu} - \tfrac{1}{2} R \cdot g_{\mu\nu} + \Lambda g_{\mu\nu} = \frac{8\pi G}{c^4} T_{\mu\nu}.\ }
+\]</p>
+
+<p>其中 \(\Lambda\) 是<em>宇宙学常数</em>, \(G\) 是牛顿引力常数, \(c\) 是光速。左侧叫<em>爱因斯坦张量</em>, 简记 \(G_{\mu\nu} := \mathrm{Ric}_{\mu\nu} - \tfrac{1}{2} R g_{\mu\nu}\)。</p>
+
+<p>这是一个关于度量 \(g_{\mu\nu}\) 的<em>非线性</em> 二阶偏微分方程组（\(\mathrm{Ric}\) 涉及 \(g\) 的二阶偏导数）, 物理上的求解极其困难——直到 1960 年代才有完整的精确解（Schwarzschild 1916 早期, Kerr 1963 旋转黑洞, FLRW 宇宙学等）。求解爱因斯坦方程是<em>数学物理</em> 的高峰课题。</p>
+
+<p>第二 Bianchi 恒等式 \(\nabla_\mu G^{\mu\nu} = 0\) 让爱因斯坦方程<em>自动</em> 蕴含<em>能量动量守恒</em> \(\nabla_\mu T^{\mu\nu} = 0\)。这是物理与几何最优雅的对偶——能量守恒不是额外公理, 而是几何<em>恒等式</em> 的推论。</p>
+
+<p>下一章 ch23 我们专门讲广义相对论, 把这条方程的物理意义与数学结构展开。这里是黎曼几何的<em>入口</em>, 23 章是它最大的应用之一。</p>
+
+<p>更广: 黎曼几何作为一门完整学科还有<em>很多</em> 内容超出本书:</p>
+
+<ul>
+  <li><em>测地线方程</em>: \(\ddot \gamma^k + \Gamma^k_{ij} \dot \gamma^i \dot \gamma^j = 0\)（变分法 \(L\) 取临界 ⟺ \(\gamma\) 满足这条二阶 ODE）。本书<a href="ch13.html">ch13-15</a> 给曲面情形, 一般流形版本是同样推广。</li>
+  <li><em>共轭点 + 截断轨迹 + 比较定理</em>（Rauch、Toponogov、Bishop-Gromov）: 这些定理把曲率符号与几何性质（直径、体积、第一特征值）联系起来。</li>
+  <li><em>Hodge 理论</em>: 黎曼流形上微分形式的拉普拉斯算子 + 调和形式 + 与同调群的关系。</li>
+  <li><em>谱几何</em>: 拉普拉斯算子的特征值, "<em>能听见鼓的形状吗?</em>"（Kac 1966 的著名问题）。</li>
+  <li><em>几何分析</em>: 用 PDE 工具研究黎曼几何。Yamabe 问题、Calabi 猜想（Yau）、Ricci 流（Hamilton-Perelman 解 Poincaré 猜想）。</li>
+  <li><em>凯勒几何 + 复几何</em>: 当流形也是复流形且度量满足额外条件, 进入更丰富的 Kähler / Calabi-Yau 世界, 与代数几何与弦理论紧密相连。</li>
+</ul>
+
+<p>这些是黎曼几何研究生课程的内容, 本书不展开。但我们已经给了入口——只要你掌握了"<em>抽象流形 + 黎曼度量</em>", 上述话题都是<em>下一步</em>, 不是另一个起点。</p>
+
+<p>请你停下来回看: 我们<em>从一张纸卷成圆筒</em> 的小学几何（<a href="ch1.html">ch1</a>）开始, 走过 22 章的曲线、曲面、Gauss 曲率、Theorema Egregium、测地线、Gauss-Bonnet、极小曲面、曲面分类、抽象流形, 最后站到<em>黎曼几何</em> 的入口。这条弧线把"<em>曲率</em>" 这个概念从最朴素的"<em>圆弯</em>" 一步步抽象到"<em>抽象流形上的对称张量</em>"——同一个核心概念在五种抽象层次上反复出现, 每一次都更深一层。这是数学的力量: <em>同一个直觉, 多种化身</em>。</p>
+
+<p>下一章 ch23 我们把黎曼几何<em>用</em> 到广义相对论, 最后一章 ch24 给计算几何与微分几何在工程中的现代应用。整本书在那里收尾。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 抽象流形入门</a><a href="ch23.html">下一章 · 第 23 章 广义相对论引论 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 平面曲线：曲率与切向量 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 曲线：参数化与弧长</a><a href="ch4.html">下一章 · 第 4 章 空间曲线：Frenet-Serret →</a></nav>
+<h1 id="ch3">第 3 章 平面曲线：曲率与切向量</h1>
+
+<p>第 1 章给了曲率的<em>直觉</em>: 大圆"<em>更直</em>", 小圆"<em>更弯</em>"; \(\kappa = 1/r\) 对圆。本章把这种直觉<em>形式化</em>——给任何（光滑、正则）平面曲线每点一个曲率值。</p>
+
+<p>关键工具来自上一章末尾埋下的那条事实: 在弧长参数化下 \(|\gamma'(s)| = 1\), 把这条等式两边求导得 \(\gamma''(s) \perp \gamma'(s)\)。所以在弧长参数化下, \(\gamma''(s)\) 是<em>垂直于切方向</em> 的向量——它度量切方向<em>转弯</em> 的速率。这就是曲率。</p>
+
+<p>本章结构: <strong>(1)</strong> 推 \(\gamma'' \perp \gamma'\), <strong>(2)</strong> 定义平面曲率 \(\kappa = |\gamma''|\) 验证圆 \(\kappa = 1/r\), <strong>(3)</strong> 一般参数化下的可计算公式, <strong>(4)</strong> 带符号曲率（左转 / 右转）, <strong>(5)</strong> 密切圆 + 抛物线 / 椭圆 / 心形线的曲率算, <strong>(6)</strong> 复原定理（给 \(\kappa(s)\) 复原 \(\gamma\)）, <strong>(7)</strong> 几何分类（\(\kappa = 0\) 直线, \(\kappa\) 常数 = 圆）。</p>
+
+<h2 id="sec3-1">3.1 弧长参数化下的关键正交关系</h2>
+
+<p>设 \(\gamma(s): I \to \mathbb{R}^2\) 是<em>弧长参数化</em> 的平面曲线, 即 \(|\gamma'(s)| = 1\) 处处。这等价于</p>
+
+<p>\[
+\gamma'(s) \cdot \gamma'(s) = 1.
+\]</p>
+
+<p>两边对 \(s\) 求导（用乘积法则）:</p>
+
+<p>\[
+\gamma''(s) \cdot \gamma'(s) + \gamma'(s) \cdot \gamma''(s) = 0,
+\]</p>
+
+<p>即 \(2 \gamma''(s) \cdot \gamma'(s) = 0\)。所以</p>
+
+<p>\[
+\boxed{\ \gamma''(s) \perp \gamma'(s).\ }
+\]</p>
+
+<p>这条<em>正交关系</em> 在弧长参数化下<em>恒成立</em>。它的几何含义: 切向量 \(\gamma'(s)\) 是单位向量, 沿曲线移动时只能<em>转方向</em>, 不能<em>变长度</em>; 它的导数 \(\gamma''(s)\) 度量<em>转方向的速率 + 方向</em>, 必然垂直于 \(\gamma'(s)\)。</p>
+
+<p>用直观语言: \(\gamma'(s)\) 是船头朝向, \(\gamma''(s)\) 是<em>船头转动的角速度向量</em>——它的<em>方向</em> 告诉你船在向哪边转, 它的<em>长度</em> 告诉你转得多快。后者就是曲率。</p>
+
+<h2 id="sec3-2">3.2 平面曲线曲率的定义</h2>
+
+<p><strong>定义（弧长参数化下的平面曲率）.</strong> 设 \(\gamma(s): I \to \mathbb{R}^2\) 是 \(C^2\) 弧长参数化曲线。在 \(s \in I\) 处的<em>曲率</em> 是</p>
+
+<p>\[
+\boxed{\ \kappa(s) := |\gamma''(s)|.\ }
+\]</p>
+
+<p>它是非负实数, 度量曲线在 \(s\) 处<em>转弯有多急</em>。\(\kappa = 0\) 表示曲线在该点<em>不转</em>（局部直）; \(\kappa\) 大表示<em>转得急</em>。</p>
+
+<p><strong>验证圆 \(\kappa = 1/r\).</strong> 半径 \(r\) 圆的弧长参数化是 \(\gamma(s) = (r \cos(s/r), r \sin(s/r))\)。求导:</p>
+
+<p>\[
+\gamma'(s) = (-\sin(s/r), \cos(s/r)), \quad |\gamma'(s)| = 1. \ \checkmark
+\]</p>
+
+<p>再求导:</p>
+
+<p>\[
+\gamma''(s) = \big(-\frac{1}{r}\cos(s/r), -\frac{1}{r}\sin(s/r)\big).
+\]</p>
+
+<p>长度:</p>
+
+<p>\[
+|\gamma''(s)| = \sqrt{\frac{1}{r^2}\cos^2(s/r) + \frac{1}{r^2}\sin^2(s/r)} = \frac{1}{r}.
+\]</p>
+
+<p>所以 \(\kappa = 1/r\) 处处。✓</p>
+
+<p>这一步是对 ch1 那条"<em>圆的曲率 \(1/r\)</em>" 朴素定义的<em>正式验证</em>: 我们的形式定义 \(\kappa = |\gamma''(s)|\) 在圆上吐回了那个朴素值。证明从 ch2 的"<em>弧长参数化让 \(|\gamma'| = 1\)</em>" + ch3 的正交关系自然长出。</p>
+
+<p>顺手还有两条:</p>
+
+<ul>
+  <li><em>直线</em> \(\gamma(s) = p + s v\)（\(|v| = 1\) 弧长参数化）。\(\gamma'(s) = v\), \(\gamma''(s) = 0\), \(\kappa = 0\) 处处。直线"<em>不弯</em>" 数学上对应 \(\kappa \equiv 0\)。</li>
+  <li><em>圆</em>: \(\kappa\) 是<em>常数</em>(\(1/r\))。</li>
+</ul>
+
+<p>所以 \(\kappa\) 的两个最简单值都对应熟悉的几何对象: \(\kappa \equiv 0\) 是直线, \(\kappa\) 是非零常数是圆。后面 §3.7 会形式陈述这种"<em>曲率决定形状</em>" 的命题。</p>
+
+<h2 id="sec3-3">3.3 一般参数化下的曲率公式</h2>
+
+<p>问题: ch2 强调<em>大多数曲线没有可写出来的弧长参数化</em>（抛物线、椭圆、心形线都没有）。那 \(\kappa = |\gamma''(s)|\) 这条定义对它们怎么算？</p>
+
+<p>答: 把曲率<em>转写</em> 成一般参数化下的表达式。它<em>恒等于</em> \(|\gamma''(s)|\)（因为 \(\kappa\) 是几何不变量）, 但用一般参数化 \(\gamma(t)\) 与它的导数表达。</p>
+
+<p><strong>命题（平面曲率的一般公式）.</strong> 设 \(\gamma(t) = (x(t), y(t))\) 是 \(C^2\) 正则平面曲线。则它在 \(t\) 处的曲率</p>
+
+<p>\[
+\boxed{\ \kappa(t) = \frac{|x'(t) y''(t) - y'(t) x''(t)|}{(x'(t)^2 + y'(t)^2)^{3/2}} = \frac{|\gamma'(t) \times \gamma''(t)|}{|\gamma'(t)|^3}.\ }
+\]</p>
+
+<p>这里 \(\gamma' \times \gamma''\) 在 2D 中视作一个标量（叉乘的 \(z\)-分量）: \(\gamma' \times \gamma'' = x' y'' - y' x''\)。</p>
+
+<p><strong>推导.</strong> 设 \(s(t)\) 是弧长函数, \(s'(t) = v(t) := |\gamma'(t)|\)。弧长参数化 \(\tilde \gamma(s) := \gamma(t(s))\)。链式法则:</p>
+
+<p>\[
+\tilde \gamma'(s) = \gamma'(t) \cdot \frac{1}{v(t)} = \frac{\gamma'(t)}{v(t)}.
+\]</p>
+
+<p>这是单位向量。再求导（对 \(s\)）:</p>
+
+<p>\[
+\tilde \gamma''(s) = \frac{d}{ds}\left(\frac{\gamma'(t)}{v(t)}\right) = \frac{1}{v(t)} \cdot \frac{d}{dt}\left(\frac{\gamma'(t)}{v(t)}\right) = \frac{1}{v} \cdot \frac{\gamma''(t) v(t) - \gamma'(t) v'(t)}{v(t)^2} = \frac{v \gamma'' - v' \gamma'}{v^3}.
+\]</p>
+
+<p>这个向量的<em>模平方</em>:</p>
+
+<p>\[
+|\tilde \gamma''(s)|^2 = \frac{|v \gamma'' - v' \gamma'|^2}{v^6}.
+\]</p>
+
+<p>展开分子:</p>
+
+<p>\[
+|v \gamma'' - v' \gamma'|^2 = v^2 |\gamma''|^2 - 2 v v' (\gamma' \cdot \gamma'') + (v')^2 |\gamma'|^2.
+\]</p>
+
+<p>注意 \(v^2 = |\gamma'|^2 = \gamma' \cdot \gamma'\), 求导得 \(2 v v' = 2 \gamma' \cdot \gamma''\), 即 \(v v' = \gamma' \cdot \gamma''\)。代入:</p>
+
+<p>\[
+= v^2 |\gamma''|^2 - 2 (\gamma' \cdot \gamma'')^2 / v^2 \cdot v^2 \cdot \ldots
+\]</p>
+
+<p>等等, 简化得更直接: 用恒等式 \(|a|^2 |b|^2 - (a \cdot b)^2 = |a \times b|^2\)（在 2D 中 \(a \times b\) 是标量, 在 3D 是向量, 模平方都对）:</p>
+
+<p>\[
+v^2 |\gamma''|^2 - (\gamma' \cdot \gamma'')^2 = |\gamma'|^2 |\gamma''|^2 - (\gamma' \cdot \gamma'')^2 = |\gamma' \times \gamma''|^2.
+\]</p>
+
+<p>所以分子 \(= v^2 |\gamma' \times \gamma''|^2 / v^2 \cdot \ldots\) 直接重做这步: 把上面 \(|v \gamma'' - v' \gamma'|^2\) 展开</p>
+
+<p>\[
+= v^2 (\gamma'' \cdot \gamma'') - 2 v v' (\gamma' \cdot \gamma'') + (v')^2 (\gamma' \cdot \gamma').
+\]</p>
+
+<p>用 \(v v' = \gamma' \cdot \gamma''\):</p>
+
+<p>\[
+= v^2 |\gamma''|^2 - 2 (v v')^2 + (v')^2 v^2 = v^2 |\gamma''|^2 - (v v')^2 = v^2 [|\gamma''|^2 v^2 - (v')^2 v^2]/v^2.
+\]</p>
+
+<p>更干净地: \(|v \gamma'' - v' \gamma'|^2 = v^2 |\gamma''|^2 + (v')^2 |\gamma'|^2 - 2 v v' (\gamma' \cdot \gamma'') = v^2 |\gamma''|^2 + (v v')^2 - 2 (vv')^2 = v^2 |\gamma''|^2 - (vv')^2 = v^2 |\gamma''|^2 - (\gamma' \cdot \gamma'')^2\)。最后用恒等式</p>
+
+<p>\[
+v^2 |\gamma''|^2 - (\gamma' \cdot \gamma'')^2 = |\gamma'|^2 |\gamma''|^2 - (\gamma' \cdot \gamma'')^2 = |\gamma' \times \gamma''|^2.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+|\tilde \gamma''(s)|^2 = \frac{|\gamma' \times \gamma''|^2}{v^6} = \frac{|\gamma' \times \gamma''|^2}{|\gamma'|^6}.
+\]</p>
+
+<p>开根号:</p>
+
+<p>\[
+\kappa(t) = |\tilde \gamma''(s)| = \frac{|\gamma' \times \gamma''|}{|\gamma'|^3}.
+\]</p>
+
+<p>得证。</p>
+
+<p><strong>注意.</strong> 这条公式<em>不</em> 需要先求弧长参数化（这点很重要——大多数曲线弧长参数化算不出）。你只要知道 \(\gamma'(t), \gamma''(t)\), 直接代公式。</p>
+
+<h2 id="sec3-4">3.4 带符号曲率: 左转还是右转</h2>
+
+<p>定义 \(\kappa = |\gamma''(s)|\) 给的是非负数。但平面曲线还有<em>转向</em> 信息: 沿曲线走时<em>向左转</em> 还是<em>向右转</em>。这个信息丢了。</p>
+
+<p>带符号版本: 在弧长参数化下令 \(T(s) := \gamma'(s)\)（单位切向量）, 设</p>
+
+<p>\[
+N(s) := T(s) \text{ 逆时针旋转 } 90°.
+\]</p>
+
+<p>具体: 若 \(T = (a, b)\), 则 \(N = (-b, a)\)。这是<em>左侧法向量</em>。\(\{T, N\}\) 是平面上每点一组正交基, 随 \(s\) 移动。</p>
+
+<p>由 \(\gamma''(s) \perp \gamma'(s) = T(s)\), \(\gamma''(s)\) 必沿 \(\pm N(s)\) 方向。定义</p>
+
+<p>\[
+\boxed{\ \gamma''(s) = \kappa_s(s) N(s).\ }
+\]</p>
+
+<p>这里 \(\kappa_s\) 是<em>带符号曲率</em>: 它是 \(\gamma''\) 在 \(N\) 方向上的<em>有符号分量</em>。\(|\kappa_s| = |\gamma''| = \kappa\) 即先前定义的非负曲率。</p>
+
+<p><strong>几何含义.</strong> \(\kappa_s > 0\) 表示曲线<em>向左</em> 弯（朝 \(N\) 方向）; \(\kappa_s < 0\) 表示<em>向右</em> 弯。</p>
+
+<p><strong>一般参数化下:</strong></p>
+
+<p>\[
+\boxed{\ \kappa_s(t) = \frac{x'(t) y''(t) - y'(t) x''(t)}{(x'(t)^2 + y'(t)^2)^{3/2}}.\ }
+\]</p>
+
+<p>这是 §3.3 公式去掉绝对值。</p>
+
+<p><strong>例子.</strong> 单位圆 \(\gamma(t) = (\cos t, \sin t)\) 逆时针描出。\(x' = -\sin t, y' = \cos t, x'' = -\cos t, y'' = -\sin t\)。\(x' y'' - y' x'' = (-\sin t)(-\sin t) - (\cos t)(-\cos t) = \sin^2 t + \cos^2 t = 1\)。\((x'^2 + y'^2)^{3/2} = 1\)。所以 \(\kappa_s = 1\) 处处, 正号——逆时针圆<em>向左</em> 弯, 符号为正。</p>
+
+<p>反之 \(\gamma(t) = (\cos t, -\sin t)\)（顺时针单位圆）: \(\kappa_s = -1\)——向右弯, 负号。</p>
+
+<p>请你停下来注意: 带符号曲率 \(\kappa_s\) 依赖于<em>定向</em>（哪边算"<em>左</em>"）+ <em>方向</em>（沿哪边描出曲线）。换方向描 \(\kappa_s \to -\kappa_s\)。但 \(|\kappa_s| = \kappa\) 与定向方向无关——它是几何对象本身的属性。本书后面 \(\kappa\) 默认指<em>非负曲率</em>; 需要符号信息时单独说"<em>带符号曲率</em>"。</p>
+
+<h2 id="sec3-5">3.5 密切圆 + 例子计算</h2>
+
+<p><em>密切圆</em>（osculating circle）的概念: 曲线 \(\gamma\) 在点 \(P = \gamma(t_0)\) 的密切圆是与 \(\gamma\) 在 \(P\) 处<em>到二阶</em> 重合的圆——它和 \(\gamma\) 共享同一个切向量与同一个曲率值。</p>
+
+<p>具体构造: 在 \(P\) 处取单位切 \(T\)、单位法 \(N\)（左法）。圆心在 \(P + (1/\kappa) N\)（沿曲线<em>弯向那一侧</em>距离 \(1/\kappa\)）, 半径 \(R = 1/\kappa\)。这个圆的曲率<em>恰好</em> \(\kappa\), 和 \(\gamma\) 在 \(P\) 处一致, 且共享切向量。</p>
+
+<p>所以密切圆是曲线在该点的<em>最佳圆形近似</em>。\(R = 1/\kappa\) 叫<em>曲率半径</em>。</p>
+
+<p>这是 ch1 §1.1 那个直观"<em>大圆更直, 小圆更弯</em>" 的最终形式: <em>曲线在每点贴一个圆, 圆的半径越小说明曲线在该点弯得越急</em>; \(\kappa = 1/R\) 把这件事变成数。</p>
+
+<p>下面跑三个具体计算, 让公式落地。</p>
+
+<p><strong>例 1（抛物线 \(y = x^2\)）.</strong> \(\gamma(t) = (t, t^2)\)。\(\gamma'(t) = (1, 2t), \gamma''(t) = (0, 2)\)。叉乘标量 \(x' y'' - y' x'' = 1 \cdot 2 - 2t \cdot 0 = 2\)。\(|\gamma'|^2 = 1 + 4t^2\)。所以</p>
+
+<p>\[
+\kappa(t) = \frac{2}{(1 + 4t^2)^{3/2}}.
+\]</p>
+
+<p>讨论: \(\kappa(0) = 2\)（最大）; \(\kappa(\pm \infty) \to 0\)（远端越来越像直线）。这与图像吻合——抛物线在原点附近最弯, 远端张开几乎像两条直线。</p>
+
+<p>\(t = 0\) 处 \(R = 1/2\), 密切圆半径 \(1/2\)。圆心？切向量 \(\gamma'(0) = (1, 0)\), 单位切 \(T = (1, 0)\), 左法 \(N = (0, 1)\)。圆心 \(P + R N = (0, 0) + (1/2)(0, 1) = (0, 1/2)\)。所以原点处密切圆是中心 \((0, 1/2)\) 半径 \(1/2\) 的圆: \(x^2 + (y - 1/2)^2 = 1/4\)。展开 \(x^2 + y^2 - y + 1/4 = 1/4\), 即 \(y = x^2 + y^2\)。把 \(y = x^2\) 抛物线上的点 \((x, x^2)\) 代入右边得 \(x^2 + x^4 = x^2 (1 + x^2)\), 比左边 \(x^2\) 多了 \(x^4\) 项——四阶差。所以密切圆<em>到三阶</em> 与抛物线吻合（四阶才出现差距）。这就是"<em>密切</em>"（osculating, 拉丁"<em>亲吻</em>" 之意）的具体含义。</p>
+
+<p><strong>例 2（椭圆 \(\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1\)）.</strong> \(\gamma(t) = (a \cos t, b \sin t)\)。\(\gamma' = (-a \sin t, b \cos t)\), \(\gamma'' = (-a \cos t, -b \sin t)\)。叉乘标量 \(x' y'' - y' x'' = (-a \sin t)(-b \sin t) - (b \cos t)(-a \cos t) = ab \sin^2 t + ab \cos^2 t = ab\)。模 \(|\gamma'|^2 = a^2 \sin^2 t + b^2 \cos^2 t\)。所以</p>
+
+<p>\[
+\kappa(t) = \frac{ab}{(a^2 \sin^2 t + b^2 \cos^2 t)^{3/2}}.
+\]</p>
+
+<p>讨论: 在 \(t = 0\)（点 \((a, 0)\), 椭圆<em>长轴端点</em>） \(\kappa = ab / b^3 = a/b^2\); 在 \(t = \pi/2\)（点 \((0, b)\), <em>短轴端点</em>） \(\kappa = ab / a^3 = b/a^2\)。设 \(a > b\), 则 \(a/b^2 > b/a^2\)（前者大后者小）。<em>长轴端点曲率最大, 短轴端点曲率最小</em>——对应几何: 椭圆在长轴端点最尖, 在短轴端点最平。</p>
+
+<p>这正是椭圆的"<em>四个顶点</em>"——曲率局部极值点。下一章 ch5 的 4-顶点定理会说这是<em>下界</em>: 任何简单闭凸平面曲线至少有 4 个顶点, 椭圆<em>恰好达到这个下界</em>。</p>
+
+<p><strong>例 3（心形线 \(r = 1 + \cos \theta\) 极坐标）.</strong> 转笛卡尔: \(\gamma(\theta) = ((1 + \cos\theta)\cos\theta, (1 + \cos\theta)\sin\theta)\)。这是常见的"<em>心形</em>" 闭曲线。曲率公式（极坐标 \(r(\theta)\) 形式）</p>
+
+<p>\[
+\kappa(\theta) = \frac{r^2 + 2(r')^2 - r r''}{(r^2 + (r')^2)^{3/2}}
+\]</p>
+
+<p>在这里 \(r = 1 + \cos\theta, r' = -\sin\theta, r'' = -\cos\theta\):</p>
+
+<p>\[
+r^2 = 1 + 2\cos\theta + \cos^2\theta, \quad (r')^2 = \sin^2\theta, \quad r r'' = -(1+\cos\theta)\cos\theta = -\cos\theta - \cos^2\theta.
+\]</p>
+
+<p>分子: \(r^2 + 2(r')^2 - r r'' = 1 + 2\cos\theta + \cos^2\theta + 2\sin^2\theta + \cos\theta + \cos^2\theta = 3 + 3\cos\theta + 2 + 0 = \ldots\) 让我重算: \(\cos^2 + 2\sin^2 = \cos^2 + 2(1-\cos^2) = 2 - \cos^2\)。所以分子 \(= 1 + 2\cos\theta + 2 - \cos^2\theta + \cos\theta + \cos^2\theta = 3 + 3\cos\theta = 3(1 + \cos\theta)\)。分母:</p>
+
+<p>\[
+r^2 + (r')^2 = (1+\cos\theta)^2 + \sin^2\theta = 1 + 2\cos\theta + \cos^2\theta + \sin^2\theta = 2 + 2\cos\theta = 2(1+\cos\theta).
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\kappa(\theta) = \frac{3(1+\cos\theta)}{[2(1+\cos\theta)]^{3/2}} = \frac{3}{2 \sqrt{2(1+\cos\theta)}} = \frac{3}{2 \sqrt{2} \sqrt{1+\cos\theta}}.
+\]</p>
+
+<p>用 \(1 + \cos\theta = 2\cos^2(\theta/2)\):</p>
+
+<p>\[
+\kappa(\theta) = \frac{3}{2\sqrt{2} \cdot \sqrt{2} |\cos(\theta/2)|} = \frac{3}{4 |\cos(\theta/2)|}.
+\]</p>
+
+<p>讨论: \(\theta = 0\) 处（心形线"<em>圆头</em>" 右端） \(\kappa = 3/4\); \(\theta = \pi\) 处（心形线<em>尖点</em>） \(\kappa \to \infty\)。这条公式精确捕捉了心形线尖点处的"<em>曲率发散</em>"——尖点处曲线无限弯, 弧长参数化在尖点不光滑（这是 \(\gamma'\) 在该点为零、奇异点的征兆——心形线尖点处 \(r = 0\) 同时 \(\gamma' = 0\)）。所以 §2.7 的"<em>正则曲线</em>" 假设在尖点处<em>不</em>满足, 这里的曲率定义本来要小心; 这个例子正好展示弯曲极端的几何后果。</p>
+
+<h2 id="sec3-6">3.6 曲率决定曲线（复原定理）</h2>
+
+<p>这一节给古典微分几何的<em>第一座小山</em>: <em>给曲率函数 \(\kappa(s)\), 复原曲线</em>。</p>
+
+<p><strong>复原定理（平面曲线）.</strong> 设 \(\kappa: I \to \mathbb{R}\) 是给定的连续函数（任意符号）。则存在<em>唯一</em>（至刚体变换 + 反射）的弧长参数化平面曲线 \(\gamma: I \to \mathbb{R}^2\) 使其带符号曲率 \(\kappa_s(s) = \kappa(s)\)。</p>
+
+<p>"<em>至刚体变换</em>" 意思是: 你能平移、旋转曲线得到不同的位置 / 朝向, 但形状唯一。</p>
+
+<p><strong>证明（构造性）.</strong> 设 \(\theta(s) := \int_0^s \kappa(\sigma) d\sigma\)（积一下曲率得"<em>切向角度</em>"）。定义</p>
+
+<p>\[
+T(s) := (\cos \theta(s), \sin \theta(s)), \quad N(s) := (-\sin\theta(s), \cos\theta(s)),
+\]</p>
+
+<p>\(T\) 是设想的单位切, \(N\) 是它的左法。注意 \(T'(s) = (-\sin\theta \cdot \kappa, \cos\theta \cdot \kappa) = \kappa(s) N(s)\)——满足曲率定义。</p>
+
+<p>设</p>
+
+<p>\[
+\gamma(s) := \gamma(0) + \int_0^s T(\sigma) d\sigma = \gamma(0) + \left(\int_0^s \cos\theta(\sigma) d\sigma, \int_0^s \sin\theta(\sigma) d\sigma\right).
+\]</p>
+
+<p>验证: \(\gamma'(s) = T(s) = (\cos\theta, \sin\theta)\), 模 1, 弧长参数化。\(\gamma''(s) = T'(s) = \kappa(s) N(s)\), 所以带符号曲率 \(\kappa_s(s) = \kappa(s)\)。✓</p>
+
+<p>唯一性（至刚体）: 起点 \(\gamma(0)\) 是平移自由度（2 个自由度）, 起始切方向 \(\theta(0)\) 是旋转自由度（1 个自由度）, 共 3 个自由度——平面刚体变换<em>恰好</em> 3 个参数（2 平移 + 1 旋转）。给定刚体规约（如固定 \(\gamma(0) = 0, \theta(0) = 0\)）, \(\gamma\) 由 \(\kappa\) <em>完全</em> 确定。</p>
+
+<p>这条定理是后面 ch4 空间曲线复原定理的<em>原型</em>。它是说: <strong>曲率函数是平面曲线（除去刚体变换）的完整不变量</strong>。两条平面曲线<em>形状相同</em>当且仅当<em>它们在弧长参数化下的曲率函数相同</em>。</p>
+
+<p><strong>例子.</strong></p>
+
+<p>\(\kappa(s) \equiv 0\): \(\theta(s) = 0\), \(T = (1, 0)\), \(\gamma(s) = (s, 0)\)——直线。✓</p>
+
+<p>\(\kappa(s) \equiv c > 0\) 常数: \(\theta(s) = cs\), \(T = (\cos cs, \sin cs)\), \(\gamma(s) = (\sin(cs)/c, -(\cos(cs) - 1)/c)\)——半径 \(1/c\) 圆。✓</p>
+
+<p>\(\kappa(s) = s\)（线性增长）: \(\theta(s) = s^2/2\), \(\gamma(s) = (\int \cos(\sigma^2/2) d\sigma, \int \sin(\sigma^2/2) d\sigma)\)——这就是<em>Cornu 螺线</em>（Euler 螺线）, 工程上铁路轨道过渡段的形状。它的曲率随弧长线性增长, 所以列车进入弯道时<em>曲率渐变</em>, 离心力不会突然出现。</p>
+
+<h2 id="sec3-7">3.7 几何分类: \(\kappa = 0\) 直线; \(\kappa\) 常数 = 圆</h2>
+
+<p>把上面例子凝结:</p>
+
+<p><strong>命题.</strong> 设 \(\gamma\) 是 \(C^2\) 正则平面曲线。则:</p>
+
+<ol>
+  <li>\(\gamma\) 是直线 \(\Longleftrightarrow\) \(\kappa(s) = 0\) 处处。</li>
+  <li>\(\gamma\) 是圆（或圆弧） \(\Longleftrightarrow\) \(\kappa(s)\) 是非零常数。</li>
+</ol>
+
+<p>证明（两方向都已包含在 §3.2 + §3.6 里）: \(\Leftarrow\) 用复原定理; \(\Rightarrow\) 用直线 / 圆的弧长参数化算 \(\kappa\)。</p>
+
+<p>这个命题是\(\kappa\) 这一概念的<em>验收</em>: 它把"<em>不弯</em>" 与"<em>弯得均匀</em>" 这两种几何最简单的形状<em>精确</em> 对应到曲率上, 分别是 \(\kappa \equiv 0\) 与 \(\kappa\) = 非零常数。其余情形对应"<em>弯得不均匀</em>"——抛物线、椭圆、心形线、Cornu 螺线等等。</p>
+
+<p>\(\kappa(s)\) 是非常数的曲线<em>形状无穷丰富</em>: 上一节告诉我们, 任意指定 \(\kappa(s)\) 都对应一个具体的（局部）曲线。所以平面曲线<em>形状</em> 与<em>曲率函数</em> 之间是一一对应（至刚体）。<em>曲率是平面曲线的完整 DNA</em>。</p>
+
+<h2 id="sec3-8">3.8 临别提示: 通向 ch4</h2>
+
+<p>本章建立了平面曲线的曲率。3D 空间曲线还需要一个新东西——<em>扭率</em>（torsion）。直觉: 平面曲线只能在<em>同一个平面</em> 内弯; 空间曲线可以"<em>偏离</em> 当前的弯曲平面"——这种偏离速率就是扭率 \(\tau\)。</p>
+
+<p>具体例子: 螺旋线 \(\gamma(t) = (\cos t, \sin t, t)\) 既绕 \(z\) 轴弯（曲率）又沿 \(z\) 上升（扭率）。它的曲率与扭率<em>都是非零常数</em>。本书 ch4 会看到一个空间曲线的形状由 \((\kappa, \tau)\) 一对函数完全决定（Frenet-Serret 复原定理）。</p>
+
+<p>请你<em>动手</em> 试一道: 半径 \(R\) 圆的弧长参数化是 \(\gamma(s) = (R\cos(s/R), R\sin(s/R))\)。算出 \(\gamma'\) 与 \(\gamma''\), 验证 \(|\gamma'| = 1, \kappa = |\gamma''| = 1/R\)。再用一般公式 \(\kappa = |x' y'' - y' x''| / (x'^2 + y'^2)^{3/2}\) 用<em>角度</em> 参数化 \(\gamma(t) = (R\cos t, R\sin t)\) 重算一遍, 答案应该一样（独立于参数化）。这个 60 秒手算把"<em>曲率是几何不变量</em>" 这一抽象命题落到具体计算。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 曲线：参数化与弧长</a><a href="ch4.html">下一章 · 第 4 章 空间曲线：Frenet-Serret →</a></nav>
+</main>
+</body>
+</html>

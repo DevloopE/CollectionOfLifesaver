@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 章 测地线：曲面上的"直线" — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 微分形式入门</a><a href="ch14.html">下一章 · 第 14 章 测地坐标与指数映射 →</a></nav>
+<h1 id="ch13">第 13 章 测地线：曲面上的"直线"</h1>
+
+<p>请你做一道你<em>能画</em> 的事。在桌上放一张 A4 纸, 画两个点, 用尺把它们连起来。这条线是<em>直线</em>——你不假思索就知道, 因为"<em>直线是两点间最短路径</em>" 这件事, 是平面几何最基本的事实。</p>
+
+<p>现在拿一个橘子放在桌上, 在橘皮上点两个点。"<em>它们之间的直线</em>" 在哪？</p>
+
+<p>请你停一秒。这个问句的<em>表面</em> 答案是"<em>橘子上没有直线</em>"——因为橘皮是弯的, 任何画在橘皮上的曲线都<em>不直</em>。但这是个不该满足的答案。一个 2D 生物住在橘皮上, 它<em>需要</em> 知道两点间最短路径。它需要"<em>直线</em>" 这个概念在橘皮上的<em>对应物</em>。它叫<em>测地线</em>。</p>
+
+<p>对球面（橘子近似球面）, 测地线是<em>大圆</em>——经过球心的平面截球面得到的圆。<a href="ch1.html">第 1 章</a> 提到的飞行航线就沿大圆走——纽约到东京的最短路径不是地图上的直线（Mercator 投影把它弄歪了）, 而是绕过北极附近的一段大圆。这件事每个长程国际航班乘客都<em>看过</em>——飞机座位前的小屏幕上那条弯弯的航线, 就是球面测地线。</p>
+
+<p>这一章的目标是把"<em>测地线</em>" 这个概念<em>定义清楚</em>、<em>方程写下来</em>、<em>例子算出来</em>。我们会发现一件让人惊讶的事：测地线有<em>两条看上去完全无关</em> 的等价定义, 一个用<em>变分</em>（最短路径）, 一个用<em>加速度</em>（直线"<em>不偏</em>"）。两条等价是测地线理论的核心, 也是<a href="ch16.html">下下章 Gauss-Bonnet</a> 的基础。</p>
+
+<h2 id="sec13-1">13.1 球面"<em>大圆</em>" 是飞行最短路径</h2>
+
+<p>先讲清楚"<em>大圆</em>" 是什么。球面 \(S^2 \subset \mathbb{R}^3\) 上的<em>大圆</em> 是<em>过球心的平面</em> 与 \(S^2\) 相交得到的圆——比如赤道（过球心的水平面截球）、子午圈（过球心的垂直面截球）、或任何一个"<em>过球心</em>" 的平面截球得到的圆。</p>
+
+<p>"<em>过球心</em>" 这条很关键——如果截球的平面<em>不</em> 过球心（比如纬度圈）, 截出来是个<em>小圆</em>, 它的半径比球小, 它<em>不是</em> 测地线。</p>
+
+<p>具体看：纽约（北纬 40 度, 西经 74 度）到东京（北纬 35 度, 东经 140 度）。这两个点都在北纬 35-40 度附近。一个朴素的想法是"<em>沿纬度走</em>"——保持纬度不变, 横穿太平洋。这条路在地图上看起来"<em>水平直线</em>"。但<em>它不是最短的</em>。</p>
+
+<p>真正最短的路径是<em>大圆航线</em>: 从纽约出发, 先<em>北上</em>（向阿拉斯加方向）, 然后越过白令海峡附近, 再<em>南下</em> 到东京。这条曲线在 Mercator 地图上看起来像个"<em>北弯的弧</em>"——但它<em>真的</em> 比沿纬度走要短约 2000 公里（占总航程 14%）。</p>
+
+<p>请你停下来想：直觉里"<em>沿纬度走</em>" 看起来直, "<em>北弯的弧</em>" 看起来弯。可<em>真实</em> 的最短路径是后者。这是因为我们的"<em>看起来直</em>" 直觉来自<em>地图</em>（Mercator 投影）, 而<a href="ch1.html">第 1 章</a> 说过, 地图本质失真——球面到平面的投影<em>不可能</em> 同时保面积、保角度、保距离。"<em>看起来直</em>" 在地图上, 不等于"<em>真的最短</em>"。</p>
+
+<p>这件事的几何原因是：球面没有"<em>普通直线</em>" 这种东西。球面上能画的曲线全部都<em>弯</em>——区别只是<em>弯多少</em>、<em>怎么弯</em>。其中"<em>弯得最少</em>" 的（即只为<em>遵守球面</em> 而弯, 不为别的而弯）的曲线就是大圆。它们在球面这个内蕴几何里, <em>扮演直线的角色</em>。</p>
+
+<p>这种思维转换是关键: <em>把"直线"从"绝对的"概念变为"相对于背景几何的"概念</em>。在平面几何里直线是绝对的; 在球面几何里"<em>直线的对应物</em>" 是大圆; 在双曲几何里是双曲圆弧; 在一般曲面里——是<em>测地线</em>。</p>
+
+<h2 id="sec13-2">13.2 测地线定义一: 弧长泛函的临界点</h2>
+
+<p>把"<em>两点间最短路径</em>" 这件事数学化。设 \(S\) 是个曲面, \(p, q \in S\) 是两点。考虑所有曲线 \(\gamma : [0, 1] \to S\) 满足 \(\gamma(0) = p, \gamma(1) = q\)。它们的<em>弧长</em></p>
+
+<p>\[
+L[\gamma] := \int_0^1 |\gamma'(t)| \, dt = \int_0^1 \sqrt{I(\gamma'(t), \gamma'(t))} \, dt
+\]</p>
+
+<p>是一个<em>泛函</em>——一个把"曲线" 输入、输出"实数" 的映射。这里 \(I\) 是<a href="ch7.html">第 7 章</a> 的第一基本形式。它告诉你在曲面 \(S\) 上, 切向量 \(v\) 的"<em>真实长度</em>" 是 \(\sqrt{I(v, v)}\)。</p>
+
+<p>"<em>最短路径</em>" 就是<em>使 \(L[\gamma]\) 最小</em> 的曲线。这是个<em>变分</em> 问题——在所有连接 \(p, q\) 的曲线中找出 \(L\) 最小的那条。</p>
+
+<p>但有件事要小心。"<em>最小化</em>" 这个要求强——可能<em>不存在</em> 最小化曲线（比如<a href="ch15.html">下下章</a> 会看到不完备曲面的反例）。变分法的标准做法是先弱化要求: 找<em>临界点</em>——\(L\) 的"<em>导数</em>" 为零的曲线。临界点不一定是最小, 但<em>所有</em> 最小都是临界点。</p>
+
+<p><strong>定义（测地线, 弧长版本）。</strong>曲线 \(\gamma : [0, 1] \to S\) 是<em>测地线</em>, 若它是弧长泛函 \(L\) 的<em>临界点</em>——即对任何"<em>变分</em>"（保持端点不动的微小扰动）, \(L\) 的一阶变化为零。</p>
+
+<p>具体: 取曲线族 \(\gamma_s(t)\), \(s \in (-\varepsilon, \varepsilon)\), \(\gamma_0 = \gamma\), \(\gamma_s(0) = p, \gamma_s(1) = q\)（端点固定）。\(\gamma\) 是测地线 ⟺</p>
+
+<p>\[
+\left. \frac{d}{ds} L[\gamma_s] \right|_{s = 0} = 0 \quad \text{对一切这样的变分}.
+\]</p>
+
+<p>这条定义抓住了"<em>最短路径</em>" 的本质。它<em>纯内蕴</em>——只用 \(I\) 不用 \(\mathbb{R}^3\) 嵌入。它把"<em>测地线</em>" 化为一个<em>变分问题</em>, 我们可以用变分法标准工具（Euler-Lagrange）求解, 13.4 节做。</p>
+
+<p>但它有<em>缺点</em>: 抽象, 不直接给方程; 而且"<em>临界点</em>" 不一定是<em>最短</em>——它可能是<em>极大</em>、<em>鞍点</em>、或<em>局部</em>（不是<em>全局</em>）最短。我们需要一条更<em>几何</em> 的定义来补足。这就是 13.3 节。</p>
+
+<h2 id="sec13-3">13.3 测地线定义二: 没法向加速度</h2>
+
+<p>换一个思路。"<em>直线</em>" 在平面上的另一个等价刻画是<em>没加速度</em>——一个粒子沿直线<em>匀速</em> 运动, 加速度恒为零（牛顿第一定律的几何版）。</p>
+
+<p>把这条搬到曲面上有个问题。曲面上沿曲线 \(\gamma(t)\) 走的粒子, 它的<em>加速度</em> \(\gamma''(t)\) 是 \(\mathbb{R}^3\) 里的向量——可能<em>不切于</em> \(S\)。比如赤道上跑的粒子（球面上的大圆）, 它的加速度<em>指向球心</em>——不切于球面, 而是沿球面<em>法向</em>。</p>
+
+<p>这种"<em>法向加速度</em>" 是粒子<em>被迫留在曲面上</em> 必需的——是球面"<em>把粒子拉向自己</em>" 的力。它<em>不</em> 是粒子"<em>主动转弯</em>" 的力, 是<em>外蕴</em> 限制。</p>
+
+<p>所以"<em>曲面上的直线</em>" 应该是<em>主动加速度为零</em> 的曲线——即<em>切向</em> 加速度为零、只剩<em>法向</em> 加速度（被曲面强迫的）。这就是几何意义上的"<em>不偏</em>"——粒子<em>没转弯</em>, 它沿"<em>当前方向</em>" 走得最远（在曲面允许的范围内）。</p>
+
+<p><strong>定义（测地线, 加速度版本）。</strong>曲线 \(\gamma : I \to S\)（按弧长参数化, \(|\gamma'| = 1\)）是<em>测地线</em>, 若它的加速度 \(\gamma''(t)\) 处处<em>沿曲面法向</em>——即</p>
+
+<p>\[
+\boxed{\ \gamma''(t) \perp T_{\gamma(t)} S \quad \text{对所有 } t.\ }
+\]</p>
+
+<p>等价地, 用<em>协变导数</em>（<a href="ch11.html">ch11</a> 概念）的语言: 测地线满足</p>
+
+<p>\[
+\frac{D \gamma'}{dt} = 0,
+\]</p>
+
+<p>其中 \(D / dt\) 是切平面方向的导数（即 \(\gamma''\) 投影到 \(T S\) 的部分）。</p>
+
+<p>用这条定义验证球面大圆: 大圆上跑的粒子加速度指向球心——而球心方向就是球面法向。所以加速度<em>纯法向</em>, 切向部分为 0。<em>大圆是测地线</em>, 验证。</p>
+
+<p>用这条定义看"<em>纬度圈</em>"（小圆）: 沿纬度跑的粒子, 加速度也指向<em>纬度圈的圆心</em>——但纬度圈的圆心不在球心, 而是在球的<em>对称轴</em> 上。所以加速度方向<em>不</em> 是球面法向, 它有切向分量（指向<em>赤道</em> 的方向）。所以纬度圈<em>不是</em> 测地线。</p>
+
+<p>这条定义的好处: <em>直接、几何</em>。给一条曲线, 算 \(\gamma''\), 看它有没有切向部分——立即知道是不是测地线。</p>
+
+<p>缺点: 它依赖 \(\mathbb{R}^3\) 嵌入（用 \(\gamma''\) 的向量含义）。我们说"<em>测地线是内蕴的</em>" 但这条定义看起来外蕴。修法: 用协变导数 \(D/dt\) 写, 它<em>纯内蕴</em>（只用 \(I\) 与 Christoffel 符号定义）。13.5 节给方程。</p>
+
+<h2 id="sec13-4">13.4 两条定义等价</h2>
+
+<p>关键定理: 13.2 与 13.3 的两条定义<em>等价</em>。</p>
+
+<p><strong>定理。</strong>曲线 \(\gamma\) 是 \(L[\gamma]\) 的临界点（13.2）⟺ 它满足 \(D \gamma' / dt = 0\)（13.3, 在弧长参数化下）。</p>
+
+<p>证明思路（标准变分法）。假设 \(\gamma\) 已弧长参数化, 即 \(|\gamma'| = 1\)。取变分 \(\gamma_s(t)\), 写</p>
+
+<p>\[
+\frac{\partial \gamma_s}{\partial s}\bigg|_{s = 0} =: V(t),
+\]</p>
+
+<p>这是<em>变分向量场</em>——告诉你<em>怎么</em> 扰动曲线。端点固定意味着 \(V(0) = V(1) = 0\)。</p>
+
+<p>用第一基本形式写 \(L[\gamma_s] = \int_0^1 \sqrt{I(\partial_t \gamma_s, \partial_t \gamma_s)} \, dt\)。求导（标准链式 + 分部积分）:</p>
+
+<p>\[
+\frac{d}{ds} L[\gamma_s] \bigg|_{s = 0} = \int_0^1 \frac{I(\partial_t \gamma_0, \partial_s \partial_t \gamma_0)}{|\partial_t \gamma_0|} dt = \int_0^1 I(\gamma', V') dt
+\]</p>
+
+<p>（用 \(|\gamma'| = 1\)）。分部积分（边界项 \(I(\gamma', V) \big|_0^1 = 0\) 因 \(V\) 在端点为零）:</p>
+
+<p>\[
+= -\int_0^1 I\left(\frac{D \gamma'}{dt}, V\right) dt.
+\]</p>
+
+<p>这条对一切允许 \(V\) 等于零, 当且仅当 \(D \gamma' / dt \equiv 0\)（变分法基本引理: 若 \(\int f \cdot V = 0\) 对一切 \(V\), 则 \(f = 0\)）。</p>
+
+<p>证毕。</p>
+
+<p>注意一件事: 上面证明里我们做了"<em>分部积分</em>"——这一步<em>需要</em> \(\gamma\) 二阶可微。我们整章默认 \(\gamma \in C^2\)。要严格化需更细的正则性讨论, 标准微分几何课程都会处理。</p>
+
+<p>这条等价定理告诉我们: <em>"局部最短" 与 "没法向加速度" 是同一件事</em>。这件事的物理直觉很自然——一个粒子如果沿最短路径走, 它没"<em>动机</em>" 转弯（任何转弯都让路径变长）, 所以加速度为零。反过来, 加速度为零的粒子<em>沿当前方向</em> 走, 这种"<em>不浪费</em>" 的运动自然给最短路径（局部）。</p>
+
+<p>"<em>局部</em>" 这个词重要——测地线是<em>局部</em> 最短, 不一定<em>全局</em>。例: 球面上从北极到赤道某点, 有<em>两条</em> 大圆弧——短的（顺着走）和长的（绕过南极反向走）。<em>两条都是测地线</em>, 但只有短的那条是<em>全局最短</em>。</p>
+
+<h2 id="sec13-5">13.5 测地线方程</h2>
+
+<p>把 \(D \gamma' / dt = 0\) 写成具体的 ODE。设曲面有局部参数化 \(\boldsymbol{x}(u^1, u^2)\), 第一基本形式系数 \(g_{ij} = I(\partial_i, \partial_j)\)（\(\partial_i = \partial \boldsymbol{x} / \partial u^i\)）。<a href="ch11.html">ch11</a> 定义了 Christoffel 符号</p>
+
+<p>\[
+\Gamma^k_{ij} = \frac{1}{2} g^{kl} \left( \frac{\partial g_{il}}{\partial u^j} + \frac{\partial g_{jl}}{\partial u^i} - \frac{\partial g_{ij}}{\partial u^l} \right),
+\]</p>
+
+<p>其中 \(g^{kl}\) 是 \(g_{ij}\) 的逆矩阵（隐含对 \(l\) 求和, Einstein 约定）。</p>
+
+<p>\(\Gamma^k_{ij}\) 是<em>纯内蕴</em>——只依赖 \(g_{ij}\) 与其偏导。它告诉你"<em>切向量沿坐标方向移动时, 它的分量变化</em>" 的修正项。</p>
+
+<p>测地线方程: 设 \(\gamma(t) = \boldsymbol{x}(u^1(t), u^2(t))\), 则 \(D \gamma' / dt = 0\) 化为</p>
+
+<p>\[
+\boxed{\ \ddot{u}^k + \Gamma^k_{ij}(\boldsymbol{u}) \, \dot{u}^i \dot{u}^j = 0, \quad k = 1, 2.\ }
+\]</p>
+
+<p>这是<em>测地线方程</em>——一组<em>二阶</em> 非线性 ODE, \(\Gamma^k_{ij}\) 作为系数（依赖位置 \(u\)）, 二次项 \(\dot{u}^i \dot{u}^j\) 反映"<em>测地线的弯曲</em>" 由"<em>当前速度方向</em>" 决定。</p>
+
+<p>具体推导（草图）。\(\gamma(t) = \boldsymbol{x}(\boldsymbol{u}(t))\) 求一阶: \(\gamma'(t) = \partial_i \boldsymbol{x} \cdot \dot{u}^i\)。求二阶:</p>
+
+<p>\[
+\gamma'' = \partial_i \boldsymbol{x} \cdot \ddot{u}^i + \partial_i \partial_j \boldsymbol{x} \cdot \dot{u}^i \dot{u}^j.
+\]</p>
+
+<p>关键步: 把 \(\partial_i \partial_j \boldsymbol{x}\) 分解为切平面分量与法向分量。Gauss 公式给</p>
+
+<p>\[
+\partial_i \partial_j \boldsymbol{x} = \Gamma^k_{ij} \partial_k \boldsymbol{x} + L_{ij} \boldsymbol{n},
+\]</p>
+
+<p>其中 \(L_{ij}\) 是第二基本形式系数, \(\boldsymbol{n}\) 是单位法向。所以</p>
+
+<p>\[
+\gamma'' = \underbrace{(\ddot{u}^k + \Gamma^k_{ij} \dot{u}^i \dot{u}^j) \partial_k \boldsymbol{x}}_{\text{切向}} + \underbrace{L_{ij} \dot{u}^i \dot{u}^j \boldsymbol{n}}_{\text{法向}}.
+\]</p>
+
+<p>测地线条件 \(\gamma''\) 切向分量 = 0 立即给出 \(\ddot{u}^k + \Gamma^k_{ij} \dot{u}^i \dot{u}^j = 0\)。</p>
+
+<p>这条方程的<em>形式</em> 重要——它出现在物理（爱因斯坦广义相对论<a href="ch23.html">ch23</a> 里"<em>自由下落粒子</em>" 沿时空测地线运动）、机器人（机械臂"<em>自然</em>" 运动是其位形空间的测地线）、计算机图形（曲面上"<em>笔直</em>" 路径绘制）等。</p>
+
+<h2 id="sec13-6">13.6 几个例子</h2>
+
+<p>具体算几个曲面的测地线, 把抽象方程变成可见曲线。</p>
+
+<p><strong>例 1: 平面 \(\mathbb{R}^2\)。</strong>用直角坐标 \((u^1, u^2) = (x, y)\), \(I = dx^2 + dy^2\), 即 \(g_{ij} = \delta_{ij}\) 是常数矩阵。Christoffel 符号涉及 \(g_{ij}\) 偏导数, 全部为<em>零</em>。测地线方程</p>
+
+<p>\[
+\ddot{x} = 0, \quad \ddot{y} = 0
+\]</p>
+
+<p>解 \(x(t) = x_0 + v_1 t, y(t) = y_0 + v_2 t\)——<em>直线</em>。预期。</p>
+
+<p><strong>例 2: 球面 \(S^2\)（半径 1）。</strong>用经纬度 \((\theta, \varphi)\)（\(\theta\) 是余纬, \(\varphi\) 是经度）, \(\boldsymbol{x}(\theta, \varphi) = (\sin\theta \cos\varphi, \sin\theta \sin\varphi, \cos\theta)\)。算第一基本形式</p>
+
+<p>\[
+I = d\theta^2 + \sin^2\theta \, d\varphi^2,
+\]</p>
+
+<p>即 \(g_{11} = 1, g_{22} = \sin^2 \theta, g_{12} = 0\)。Christoffel 符号:</p>
+
+<p>\[
+\Gamma^1_{22} = -\sin\theta \cos\theta, \quad \Gamma^2_{12} = \Gamma^2_{21} = \cot\theta,
+\]</p>
+
+<p>其余为零（细节省略, 是直接求 \(g_{ij}\) 偏导）。测地线方程</p>
+
+<p>\[
+\ddot{\theta} - \sin\theta\cos\theta \, \dot{\varphi}^2 = 0, \quad \ddot{\varphi} + 2\cot\theta \, \dot{\theta}\dot{\varphi} = 0.
+\]</p>
+
+<p>这组 ODE 不容易直接积分——但<em>用对称性</em> 可以猜出解。比如 \(\varphi = \text{const}\)（沿子午圈）、\(\theta = \dot{\theta}_0 t + \theta_0\)——这是子午圈, 是大圆。验证: \(\ddot{\theta} = 0\), \(\dot{\varphi} = 0\), 第一方程 \(0 - \sin\theta\cos\theta \cdot 0 = 0\) ✓; 第二方程 \(0 + 0 = 0\) ✓。</p>
+
+<p>更一般的——任何大圆, 用旋转对称性可证它满足方程。这给出: <em>球面测地线 = 大圆</em>, 验证。</p>
+
+<p><strong>例 3: 圆柱面 \(C\)（半径 1）。</strong>参数化 \(\boldsymbol{x}(u, v) = (\cos u, \sin u, v)\), \(I = du^2 + dv^2\)（!）即<em>平面度量</em>! 圆柱面是<em>可展曲面</em>（<a href="ch1.html">ch1</a> 提到, \(K = 0\), 能从平面卷出）, 在 \((u, v)\) 坐标下度量与平面相同。</p>
+
+<p>所以 \(\Gamma^k_{ij} = 0\), 测地线方程 \(\ddot{u} = \ddot{v} = 0\), 解 \(u(t) = u_0 + a t, v(t) = v_0 + b t\)——<em>在 \((u, v)\) 平面里的直线</em>。但 \(u\) 是<em>角度</em>, 周期 \(2\pi\)——所以圆柱面测地线在 3D 中是:</p>
+
+<ul>
+  <li>\(b = 0\)（纯角向）: <em>圆周</em>（沿圆柱周向走的圆）。</li>
+  <li>\(a = 0\)（纯轴向）: <em>直线</em>（沿圆柱轴线走）。</li>
+  <li>一般情况: <em>螺旋线</em>（"<em>螺纹</em>" 形状, 一边转一边升）。</li>
+</ul>
+
+<p>这件事可以更直观看: 把圆柱<em>沿一条母线剪开</em>, 摊成平面长方形。圆柱测地线对应剪开后<em>平面里的直线</em>——再把长方形卷回, 直线变螺旋线 / 圆周 / 直线。这种"<em>展开</em>" 视角对所有可展曲面（圆柱、圆锥、切平面构成的曲面）都成立。</p>
+
+<p><strong>例 4: 圆环面 \(T^2\)。</strong>圆环面参数化 \(\boldsymbol{x}(u, v) = ((R + r\cos v) \cos u, (R + r\cos v) \sin u, r \sin v)\), \(R\) 大半径, \(r\) 小半径。第一基本形式</p>
+
+<p>\[
+I = (R + r \cos v)^2 du^2 + r^2 dv^2.
+\]</p>
+
+<p>测地线种类多样:</p>
+
+<ul>
+  <li><em>外赤道</em>（\(v = 0\), 大圆周）: 测地线。这是圆环最外圈, 半径 \(R + r\)。</li>
+  <li><em>内赤道</em>（\(v = \pi\), 小圆周）: 测地线。这是圆环最内圈, 半径 \(R - r\)。</li>
+  <li><em>子午圈</em>（\(u = \text{const}\), 沿"<em>切片</em>" 的小圆）: 测地线。半径 \(r\)。</li>
+  <li><em>螺旋型测地线</em>: 一般测地线绕圆环面"<em>缠绕</em>"（既绕主圆又绕切片）。这些可能<em>永不闭合</em>（在 \(T^2\) 上稠密）。</li>
+</ul>
+
+<p>圆环测地线的丰富性反映了它<em>不是</em> 常曲率曲面（外侧 \(K > 0\), 内侧 \(K < 0\), 顶 / 底圈 \(K = 0\)）。混合的曲率让测地线行为多样, 是研究"<em>测地线流</em>"（曲面上的"<em>动力系统</em>"）经典模型。</p>
+
+<h2 id="sec13-7">13.7 测地线纯由 \(I\) 决定</h2>
+
+<p>请你看测地线方程</p>
+
+<p>\[
+\ddot{u}^k + \Gamma^k_{ij} \dot{u}^i \dot{u}^j = 0
+\]</p>
+
+<p>里出现的<em>东西</em>。\(u^k\) 是位置坐标; \(\Gamma^k_{ij}\) 是 Christoffel 符号——只用 \(g_{ij}\)（第一基本形式系数）+ 它们的偏导数。<em>没</em> 出现 \(L_{ij}\)（第二基本形式）, <em>没</em> 出现法向量 \(\boldsymbol{n}\), <em>没</em> 出现 \(\mathbb{R}^3\) 嵌入。</p>
+
+<p>这意味着: <strong>测地线纯<em>内蕴</em>——两个等距的曲面（即 \(I\) 一样的曲面）有完全相同的测地线（在等距对应下）。</strong></p>
+
+<p>这件事链回<a href="ch11.html">第 11 章</a> Theorema Egregium 主题——内蕴几何<em>独立于嵌入</em>。Gauss 曲率内蕴, 测地线也内蕴。这两件事从同一个"<em>第一基本形式决定一切</em>" 母题里长出。</p>
+
+<p>具体一个例子让你看见这件事的力量: 圆柱面 \(C\) 与平面 \(\mathbb{R}^2\) 的一片矩形<em>等距</em>（\(C\) 是 \(\mathbb{R}^2\) "卷起来")。所以 \(\mathbb{R}^2\) 里直线对应 \(C\) 上的<em>测地线</em>——这正是 13.6 例 3 看到的"<em>剪开圆柱看见直线</em>"。这个对应不是"<em>巧合</em>"——是<em>等距保测地线</em> 的具体化身。</p>
+
+<p>反过来, 球面 \(S^2\) 与 \(\mathbb{R}^2\) <em>不</em> 等距（Gauss 曲率不同）。所以 \(\mathbb{R}^2\) 里直线<em>没法</em> 通过等距对应到球面测地线——这就是为什么"<em>世界地图</em>" 里"<em>大圆航线</em>" 看起来不是直线: 球面与平面的"<em>近似嵌入</em>"（Mercator 投影）<em>不</em> 是等距, 它扭曲了"<em>直线</em>" 这个概念。</p>
+
+<h2 id="sec13-8">13.8 局部存在唯一性</h2>
+
+<p>测地线方程是二阶 ODE。ODE 标准定理（Picard-Lindelöf）给我们:</p>
+
+<p><strong>定理（测地线局部存在唯一性）。</strong>对任意 \(p \in S, v \in T_p S\), 存在唯一的测地线 \(\gamma : (-\varepsilon, \varepsilon) \to S\) 满足</p>
+
+<p>\[
+\gamma(0) = p, \quad \gamma'(0) = v.
+\]</p>
+
+<p>\(\varepsilon\) 是某正数, 依赖 \(p, v\)。</p>
+
+<p>证明思路。测地线方程 \(\ddot{u}^k = -\Gamma^k_{ij} \dot{u}^i \dot{u}^j\) 是<em>显式</em> 二阶 ODE。化为一阶系统（引入辅助变量 \(w^k = \dot{u}^k\)）:</p>
+
+<p>\[
+\dot{u}^k = w^k, \quad \dot{w}^k = -\Gamma^k_{ij}(\boldsymbol{u}) w^i w^j.
+\]</p>
+
+<p>右边是 \((u, w)\) 的<em>光滑</em> 函数（\(\Gamma^k_{ij}\) 光滑, \(w^i w^j\) 多项式）。Picard 定理给出: 给初值 \((u_0, w_0)\), 存在唯一光滑解, 至少在某小时间区间。\(\square\)</p>
+
+<p>"<em>初值 \(p, v\)</em>" 这两条信息——位置 + 速度——唯一确定测地线。这件事的几何直觉: 在曲面某点出发, 选定<em>方向</em> 和<em>速度</em>, 然后"<em>沿这个方向匀速走, 不转弯</em>"——这给你唯一的测地线。</p>
+
+<p>"<em>速度</em>" 这件事可换为"<em>方向</em>": 如果你只关心"<em>沿哪个方向走</em>", 不关心"<em>走多快</em>", 用单位向量 \(v / |v|\) 代替 \(v\), 同时调整时间参数 \(t \to |v| t\)。改速度只是<em>重参数化</em> 测地线, 不改它的<em>像</em>（轨迹）。所以对每个<em>方向</em>（\(T_p S\) 中单位向量）, 有<em>唯一一条</em> 测地线（作为像）。</p>
+
+<p>这条"<em>位置 + 方向 → 唯一测地线</em>" 是<a href="ch14.html">下一章 指数映射</a> 的基础。指数映射 \(\exp_p : T_p S \to S\) 把切向量 \(v\) 送到"<em>沿 \(v\) 方向走单位时间</em>" 终点——它把<em>切平面</em>（线性结构）和<em>曲面</em>（弯曲结构）连接起来, 是连接抽象的微分几何与具体曲面的关键工具。</p>
+
+<p>"<em>局部</em>" 这个词在定理里很关键——\(\varepsilon\) 可能很小, 测地线也许不能延伸到所有时间。一个测地线<em>能</em> 延伸多久, 是<em>完备性</em> 问题, <a href="ch15.html">ch15</a> 处理。我们会看到"<em>测地完备</em>" 是个深刻的几何条件, 等价于一些其它<em>看上去</em> 完全无关的条件（Hopf-Rinow 定理）。</p>
+
+<p>下一章我们把"<em>沿方向走测地线</em>" 这件事系统化, 引入<em>指数映射</em> 与<em>测地坐标</em>——这是把<em>切平面</em> 上的线性结构"<em>卷</em>" 到曲面上, 让我们能用线性代数工具研究曲面附近的几何。Gauss 引理和"<em>曲率公式 \(K = -\partial_r^2 \sqrt G / \sqrt G\)</em>" 都从那里出来。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 微分形式入门</a><a href="ch14.html">下一章 · 第 14 章 测地坐标与指数映射 →</a></nav>
+</main>
+</body>
+</html>

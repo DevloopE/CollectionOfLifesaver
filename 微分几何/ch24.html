@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 24 章 应用:计算机图形学与离散微分几何 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 广义相对论与几何物理</a><a href="appA.html">附录 A →</a></nav>
+<h1 id="ch24">第 24 章 应用:计算机图形学与离散微分几何</h1>
+
+<p>打开任何一个现代电影、游戏、CAD 软件、3D 打印程序: 屏幕上每一个曲面物体——人物的脸、汽车的外壳、衣服的褶皱、动画里的水——<em>都不是</em> 我们这本书前面 23 章讲的那种"<em>连续光滑曲面</em>"。计算机里曲面是<em>三角网格</em>(triangle mesh): 一堆顶点 + 一堆三角面, 离散到底。</p>
+
+<p>这就提出一个不安的问题: 我们前 23 章建立的所有概念——曲率、测地线、第一基本形式、Gauss-Bonnet——都依赖<em>光滑性</em>: 求导、积分、二阶 Taylor 展开。这些在<em>没有平滑结构</em> 的网格上还<em>成立</em> 吗？</p>
+
+<p>令人惊讶的回答: <em>大部分都成立, 但需要重新定义</em>。这就是过去 30 年发展起来的<em>离散微分几何</em>(discrete differential geometry, DDG): 把光滑微分几何的核心结构精确<em>翻译</em> 到三角网格上, 让它们在工程上可计算、又在数学上保留连续版本的对称性与守恒律。这一章用本书最后的篇幅展示这门学科——以及微分几何在 21 世纪如何反向流入数据科学、机器学习、TDA。</p>
+
+<h2 id="sec24-1">24.1 三角网格作为离散曲面</h2>
+<p>一个<em>三角网格</em>(triangle mesh) \(M = (V, E, F)\) 是:</p>
+
+<ul>
+  <li>顶点集 \(V = \{v_1, \ldots, v_n\}\), 每个 \(v_i \in \mathbb{R}^3\);</li>
+  <li>边集 \(E\), 每条边连两个顶点;</li>
+  <li>面集 \(F\), 每个面是 3 个顶点构成的三角形。</li>
+</ul>
+
+<p>要求满足"<em>流形条件</em>": 每条边恰好被 2 个三角面共享（边界除外, 那种边只属于 1 个面）, 每个顶点的<em>邻接面</em> 构成一个开盘（无折叠、无 X 形交叉）。这种网格才是合法的"<em>离散曲面</em>"。</p>
+
+<p>请你具体想一个例子: <em>正二十面体</em>(icosahedron)。20 个三角面、12 个顶点、30 条边。Euler 数 \(V - E + F = 12 - 30 + 20 = 2\)——和球面 \(S^2\) 的 Euler 数<em>一样</em>(<a href="ch17.html">ch17</a>)。这不是巧合, 是 24.3 节的主题。</p>
+
+<p>更复杂的网格: 一个人脸网格通常 \(\sim 50000\) 个顶点; Pixar 一部电影里的角色 \(\sim 10^6\) 个顶点; 一个全城市 3D 扫描可以达 \(10^9\) 顶点。<em>所有</em> 这些都是<em>同样</em> 的数学对象, 我们要在上面定义曲率、测地线等。</p>
+
+<p>核心思维转换: 在光滑曲面上"曲率" 是<em>处处定义</em> 的<em>函数</em>。在网格上"曲率" 应该是什么？三角形<em>内部</em> 是平的——曲率 0; 边上是两个面的"折线", 曲率不能用导数定义; 顶点处所有"<em>弯</em>" 都集中在一个奇点。所以离散曲率不能"<em>逐点</em>" 定义——它是<em>局部化</em> 在<em>顶点</em> 上的离散量。下一节给具体定义。</p>
+
+<h2 id="sec24-2">24.2 离散 Gauss 曲率:角度盈余</h2>
+<p>怎么在一个网格顶点 \(v\) 上定义"<em>Gauss 曲率</em>"？</p>
+
+<p>朴素试法: 找一个公式让它接近"<em>顶点附近曲面有多弯</em>"。回想光滑曲面: 一个小圆盘 \(D_r(p)\) 半径 \(r\), 周长 \(L(r)\) 的展开</p>
+
+<p>\[
+L(r) = 2\pi r \left(1 - \frac{K(p)}{6} r^2 + O(r^4)\right).
+\]</p>
+
+<p>这告诉我们 \(K > 0\)（球面）周长比平面短, \(K < 0\)（鞍面）周长比平面长。所以<em>Gauss 曲率 = 周长亏缺率</em>。</p>
+
+<p>把这个想法搬到网格顶点。\(v\) 的<em>邻接面</em> 在 \(v\) 处张开一些角度 \(\alpha_1, \alpha_2, \ldots, \alpha_k\)（每个三角面在 \(v\) 处的内角）。这些角的和是个数, 叫顶点处的<em>总角</em>:</p>
+
+<p>\[
+\theta(v) = \sum_{i=1}^k \alpha_i.
+\]</p>
+
+<p>如果 \(v\) 周围的 \(k\) 个三角面"<em>能展平到一个平面</em>"——即 \(v\) 是个平的顶点——那么 \(\theta(v) = 2\pi\) 整。如果 \(v\) 是个<em>凸</em> 顶点（像正多面体顶点）, \(\theta(v) < 2\pi\)（"<em>少了</em>" 一块）; 凹顶点 \(\theta(v) > 2\pi\)。</p>
+
+<p>定义</p>
+
+<p>\[
+\boxed{\ K(v) := 2\pi - \theta(v) = 2\pi - \sum_{i} \alpha_i.\ }
+\]</p>
+
+<p>叫<em>角度盈余</em>(angle deficit / angular defect)。这是<em>最自然</em> 的离散 Gauss 曲率。</p>
+
+<p><em>例 1</em>。立方体的一个顶点。3 个正方形相交, 每个角 \(90°\)。\(\theta = 3 \times \pi/2 = 3\pi/2\), \(K = 2\pi - 3\pi/2 = \pi/2\)。立方体 8 个顶点, 总曲率 \(8 \cdot \pi/2 = 4\pi\)。</p>
+
+<p><em>例 2</em>。正四面体的一个顶点。3 个正三角形, 每个角 \(\pi/3\)。\(\theta = \pi\), \(K = \pi\)。4 个顶点, 总 \(4\pi\)。</p>
+
+<p><em>例 3</em>。正二十面体的一个顶点。5 个正三角形, \(\theta = 5\pi/3\), \(K = 2\pi/3 - \pi/3 = \pi/3\)。12 个顶点, 总 \(12 \cdot \pi/3 = 4\pi\)。</p>
+
+<p>请你看出规律了: <em>无论</em> 哪种凸多面体, 总曲率都是 \(4\pi\)。这件事不是巧合——它是 24.3 节的<em>离散 Gauss-Bonnet 定理</em>。</p>
+
+<h2 id="sec24-3">24.3 离散 Gauss-Bonnet</h2>
+<p>定理:</p>
+
+<p>\[
+\boxed{\ \sum_{v \in V} K(v) \;=\; 2\pi \chi(M),\ }
+\]</p>
+
+<p>其中 \(\chi(M) = V - E + F\) 是 Euler 示性数。</p>
+
+<p>这条定理和<a href="ch17.html">ch17 整体 Gauss-Bonnet</a> \(\int_M K \, dA = 2\pi \chi(M)\) 是<em>一字不差</em> 的对应——只是积分换成顶点求和。它在<em>任何</em> 三角网格上都成立(不需要任何平滑性)。</p>
+
+<p>证明: 令 \(F_3\) 表示三角面数（即 \(F\)）。每个三角面三个内角和为 \(\pi\), 所以所有三角面的所有角的总和是 \(\pi F\)。</p>
+
+<p>另一方面, 把所有角按"在哪个顶点" 分组, 总和也是 \(\sum_v \theta(v)\)。所以</p>
+
+<p>\[
+\sum_v \theta(v) = \pi F.
+\]</p>
+
+<p>代入 \(K(v) = 2\pi - \theta(v)\):</p>
+
+<p>\[
+\sum_v K(v) = 2\pi V - \sum_v \theta(v) = 2\pi V - \pi F.
+\]</p>
+
+<p>用 Euler 公式 \(V - E + F = \chi\), 加上每条边被 2 个面共享所以 \(2E = 3F\)（每个面 3 条边, 每条边 2 个面）:</p>
+
+<p>\[
+2\pi V - \pi F = 2\pi V - \pi (2E - 2F + 2F)/(... )
+\]</p>
+
+<p>计算更直接: \(2E = 3F \Rightarrow F = 2E/3\)。所以 \(2\pi V - \pi F = 2\pi V - 2\pi E / 3 \cdot ...\)。让我们换一种代入。从 \(V - E + F = \chi\) 解 \(E = V + F - \chi\), 同时 \(2E = 3F\) 给 \(2(V + F - \chi) = 3F\), 即 \(F = 2V - 2\chi\)。代入:</p>
+
+<p>\[
+\sum_v K(v) = 2\pi V - \pi (2V - 2\chi) = 2\pi V - 2\pi V + 2\pi \chi = 2\pi \chi.
+\]</p>
+
+<p>定理证毕。</p>
+
+<p>请你回头看上节三个例子: 立方体 \(\chi = V - E + F = 8 - 12 + 6 = 2\), \(2\pi \chi = 4\pi\)——和 \(\sum K = 4\pi\) 一致。其他凸多面体同样 \(\chi = 2\)。所以"<em>所有凸多面体总曲率 \(4\pi\)</em>" 等价于"<em>所有凸多面体同胚于球面</em>"。</p>
+
+<p>这条定理的<em>美</em>: 离散 Gauss-Bonnet 完全独立于<a href="ch17.html">ch17</a>! 不需要任何积分、任何光滑结构, 只需要"角度和" + "Euler 公式" + 简单计数。它告诉我们: <em>Gauss-Bonnet 不是分析事实, 是组合事实</em>。光滑版本只是离散版本的极限。这件事是离散微分几何最深的洞察之一——本书前 23 章在追求的"<em>几何 ↔ 拓扑</em>" 在网格上变得<em>更</em> 清楚, 不是更模糊。</p>
+
+<h2 id="sec24-4">24.4 离散平均曲率与 cotangent Laplacian</h2>
+<p>有了离散 Gauss 曲率, 我们要离散<em>平均曲率</em> \(H\)。光滑曲面上 \(H\) 由<em>Laplacian</em> 给出: 嵌入映射 \(f : M \to \mathbb{R}^3\) 满足</p>
+
+<p>\[
+\Delta_M f = -2 H \mathbf{n},
+\]</p>
+
+<p>其中 \(\mathbf{n}\) 是单位法向量, \(\Delta_M\) 是<em>Laplace-Beltrami 算子</em>(<a href="ch22.html">ch22</a> 提到过)。所以"<em>离散 \(H\)</em>" 来自"<em>离散 Laplacian</em>"。</p>
+
+<p>怎么定义网格上的 Laplacian？经典选择是<em>cotangent Laplacian</em>(Pinkall-Polthier 1993):</p>
+
+<p>\[
+\boxed{\ (\Delta f)(v_i) = \frac{1}{2 A_i} \sum_{j \sim i} (\cot \alpha_{ij} + \cot \beta_{ij})(f(v_j) - f(v_i)),\ }
+\]</p>
+
+<p>其中:</p>
+
+<ul>
+  <li>\(j \sim i\) 表示 \(v_j\) 和 \(v_i\) 由一条边相连;</li>
+  <li>\(\alpha_{ij}, \beta_{ij}\) 是边 \((v_i, v_j)\) 的两个对角(每条边在两个三角面里, 各对一个顶点的角);</li>
+  <li>\(A_i\) 是 \(v_i\) 的"对偶面积" (一般取顶点周围 1/3 三角形面积之和)。</li>
+</ul>
+
+<p>这个公式来自<em>有限元方法</em>对 Laplace 算子的离散化, 但它满足很多<em>结构性质</em>: 对称、保常数（常数函数 \(\Delta = 0\)）、收敛到光滑 Laplacian（网格细化时）。它已经成为计算几何里<em>事实标准</em> 的离散 Laplacian。</p>
+
+<p>用它定义离散平均曲率向量:</p>
+
+<p>\[
+\mathbf{H}(v) := -\tfrac{1}{2} \Delta f(v),
+\]</p>
+
+<p>其中 \(f\) 是恒等嵌入 \(f(v) = v\)。这给每个顶点一个向量, 长度等于 \(|H|\), 方向是法向。</p>
+
+<h2 id="sec24-5">24.5 离散极小曲面:surface fairing</h2>
+<p>有了离散 \(H\), 我们能离散<em>极小曲面</em>(<a href="ch19.html">ch19</a>): \(H = 0\) 处处。</p>
+
+<p>实际工程问题: 给一个有噪的 3D 扫描网格, 怎么"<em>磨平</em>" 它？或者: 给一个洞, 怎么补上一个<em>看起来自然</em> 的曲面？</p>
+
+<p>方法: 求解 <em>平均曲率流</em>(mean curvature flow):</p>
+
+<p>\[
+\frac{\partial f}{\partial t} = \mathbf{H}(f).
+\]</p>
+
+<p>把每个顶点沿其平均曲率向量移动一小步, 重复。理论上这会让曲面的总面积下降——这是<em>面积梯度流</em>。停下时, \(\mathbf{H} = 0\), 即曲面变成局部极小。</p>
+
+<p>这个算法叫<em>surface fairing</em> (Desbrun-Meyer-Schröder-Barr 1999, 该文是 DDG 史上最被引用的论文之一)。它在 Maya / Blender / ZBrush 里都是基础工具。Pixar 的角色脸建模流程的核心步骤就是这个: 雕一个粗模, 然后做几步 fairing 得到光滑曲面, 再细节雕刻。</p>
+
+<p>实践中要小心: 朴素的显式时间步 \(f_{n+1} = f_n + \tau \mathbf{H}(f_n)\) 在大 \(\tau\) 时不稳定（顶点会跳乱）。修法是用<em>隐式</em> 步 \(f_{n+1} - f_n = \tau \mathbf{H}(f_{n+1})\)——这给一个稀疏线性方程组（cotangent Laplacian 是稀疏对称矩阵）, 解一次让所有顶点同时朝平均曲率方向走一步。这种<em>无条件稳定</em> 的隐式格式是大网格 fairing 的实战默认。</p>
+
+<p>请你看见: 物理仿真里"<em>解隐式格式</em>" 这个数值方法套路, 在<em>几何处理</em> 里完全适用。一个 \(10^6\) 顶点网格的 fairing 步 ≈ 一次稀疏线性求解 ≈ 几毫秒（用 Cholesky 预分解 + 反复回代）。这就是为什么现代图形学和数值线性代数<em>不能分家</em>。</p>
+
+<h2 id="sec24-6">24.6 离散测地线:Dijkstra 与快进波法</h2>
+<p>下一个离散化: <em>测地线</em>(<a href="ch13.html">ch13</a>)。在网格上从源点 \(s\) 出发到任意顶点 \(v\) 的"<em>最短路径</em>" 长度怎么算？</p>
+
+<p>朴素办法: <em>Dijkstra 算法</em>。把网格当成图（顶点 = 节点, 边 = 链接, 权 = 边长）, 跑 Dijkstra 给单源最短路。复杂度 \(O((V + E) \log V)\)。</p>
+
+<p>问题: Dijkstra 给的"<em>最短路</em>" 沿<em>边</em> 走, 不能"<em>切过</em>" 三角面。但真正的测地线在三角面内是<em>直线段</em>。所以朴素 Dijkstra 给的距离会<em>高估</em>——它走的是"折线",真测地线走的是"<em>三角面内直、过边时折</em>" 的路径。</p>
+
+<p>更精确的方法: <em>fast marching method</em>(Sethian 1996)。把测地距离 \(d(v)\) 看成偏微分方程</p>
+
+<p>\[
+|\nabla d| = 1
+\]</p>
+
+<p>(<em>eikonal 方程</em>) 的解。fast marching 用一种"<em>波从 \(s\) 向外传播</em>" 的离散化, 在每个顶点解一个二次方程算它的测地距离。复杂度 \(O(V \log V)\), 接近最优, 误差是<em>一阶</em>(随网格细化下降)。</p>
+
+<p>更新版本: <em>heat method</em>(Crane-Weischedel-Wardetzky 2013): 利用一个出人意料的事实——"<em>测地距离</em>" 可以从"<em>很短时间扩散方程的解</em>" 提取。具体:</p>
+
+<ol>
+  <li>解 \(\partial u / \partial t = \Delta u\) 一小步, 初值是 \(s\) 处的 delta;</li>
+  <li>归一化梯度 \(\mathbf{X} = -\nabla u / |\nabla u|\) (单位向量场, 指向 \(s\) 反方向);</li>
+  <li>解 Poisson 方程 \(\Delta d = \nabla \cdot \mathbf{X}\) 给测地距离。</li>
+</ol>
+
+<p>这个方法比 fast marching 更稳定, 而且每一步都是<em>稀疏线性求解</em>, 可以用 GPU 高度并行——大网格上比 fast marching 快 10 倍以上。<em>把"测地距离" 转化成"几个稀疏线性求解"</em>——这是 DDG 在 21 世纪带来的另一种思维转换。</p>
+
+<h2 id="sec24-7">24.7 拓扑数据分析(TDA)</h2>
+<p>跳出网格, 看更一般的几何数据。给你一堆<em>点云</em>(point cloud) \(\{p_1, \ldots, p_N\} \subset \mathbb{R}^d\)——例如蛋白质的原子坐标、社交网络的高维嵌入、显微图像的像素位置。<em>这些点采样自某个未知低维流形吗</em>？这个流形的<em>拓扑</em> 是什么——几个连通分量、几个"<em>洞</em>"、几个"<em>空腔</em>"？</p>
+
+<p>这是<em>拓扑数据分析</em>(topological data analysis, TDA) 的问题。核心工具是<em>persistent homology</em>(持续同调):</p>
+
+<ol>
+  <li>取参数 \(\varepsilon > 0\), 把每个点 \(p_i\) 用半径 \(\varepsilon\) 的球替换。</li>
+  <li>球之间相交则连一条边, 三个球两两相交则填一个三角面, etc——给一个抽象单纯复形 \(K_\varepsilon\)。</li>
+  <li>算 \(K_\varepsilon\) 的同调群 \(H_k(K_\varepsilon)\)——\(H_0\) 数连通分量, \(H_1\) 数"圈", \(H_2\) 数"空腔"...</li>
+  <li><em>变化 \(\varepsilon\)</em>: 当 \(\varepsilon\) 从 0 增到 \(\infty\), 各种拓扑特征"<em>诞生</em>" 又"<em>死亡</em>"。把每个特征的诞生时间和死亡时间画在图上, 得<em>persistence diagram</em>。</li>
+</ol>
+
+<p>核心想法: <em>"持续时间长" 的特征是真信号</em>(数据流形的拓扑); <em>"持续时间短" 的特征是噪声</em>。Persistence 图把"<em>这个数据集是什么形状</em>" 量化成一组(出生, 死亡) 点对——一种几乎完全独立于度量细节的拓扑指纹。</p>
+
+<p>应用:</p>
+
+<ul>
+  <li><em>蛋白质结构分析</em>: 蛋白质折叠产生的"<em>洞</em>" 的数量与形态决定它能结合什么分子, persistence diagram 是这种结构的简洁表示。</li>
+  <li><em>视觉皮层数据</em>: Carlsson 团队 2008 年发现 V1 皮层对自然图像的反应模式聚集在 Klein 瓶（!）周围——只有 TDA 能捕捉到这种非平凡拓扑。</li>
+  <li><em>时间序列异常检测</em>: 信号嵌入到延迟坐标空间, 持续同调能检测周期、混沌切换、相变。</li>
+</ul>
+
+<p>这一切的数学基础是<em>同调代数</em>(algebraic topology) 与<em>稳定性定理</em>: 数据扰动 \(\delta\) 引起 persistence diagram 的扰动 \(\le \delta\)（bottleneck distance 意义下）。这是 TDA 能用作"<em>形状指纹</em>" 的关键——它<em>抗噪</em>。</p>
+
+<h2 id="sec24-8">24.8 几何深度学习</h2>
+<p>机器学习里的<em>流形假设</em>(manifold hypothesis): 高维数据(图像、文本嵌入、基因表达)<em>实际</em> 集中在低维流形附近。一张 \(256 \times 256\) 灰度图是 \(\mathbb{R}^{65536}\) 中一个点, 但"<em>所有看起来像猫的图</em>" 构成的集合<em>远</em> 比 \(\mathbb{R}^{65536}\) 小——估计是个 \(\sim 100\) 维流形。深度学习模型的本质工作是<em>学习</em> 这个流形的几何。</p>
+
+<p>这个观察催生了<em>几何深度学习</em>(geometric deep learning, Bronstein-Bruna-LeCun-Szlam-Vandergheynst 2017):</p>
+
+<ul>
+  <li><em>图神经网络</em>(GNN): 把卷积神经网络从规则网格推广到任意图。每个节点的特征通过邻居的加权平均更新——本质是离散 Laplacian 的迭代。社交网络分析、分子性质预测、推荐系统都用 GNN。</li>
+  <li><em>等变神经网络</em>: 网络结构保证输入做某种几何变换（旋转、平移、置换）时输出有相应变换。Group equivariant CNNs（旋转等变）+ E(3)-equivariant networks（3D 旋转 + 平移等变, 用于分子结构预测如 AlphaFold）都是几何深度学习的实战明星。</li>
+  <li><em>neural ODE</em>(Chen-Rubanova-Bettencourt-Duvenaud 2018): 把神经网络层数 \(L \to \infty\), 每层变成连续时间的微分方程 \(dh/dt = f_\theta(h, t)\)。训练就是优化 ODE 的 \(\theta\)。这种"<em>连续</em> 神经网络" 的反向传播用<em>伴随方程</em>(adjoint equation, 来自最优控制), 内存比离散网络少很多。</li>
+</ul>
+
+<p>深一层的思想: <em>把网络看作流形上的算子</em>, 利用流形的几何结构（曲率、对称、测地线）做正则化或参数化。Riemann 优化（在流形上梯度下降, 用指数映射代替欧氏更新）已经是优化算法的一个分支。</p>
+
+<p>请你看见:<em>本书前 23 章建立的工具——指数映射、联络、曲率张量、测地线——在 21 世纪机器学习里反复出现</em>。微分几何不是过时的纯数学; 它是<em>21 世纪 AI 的基础语言之一</em>。</p>
+
+<h2 id="sec24-9">24.9 收尾:从 1827 到 2026</h2>
+<p>我们终于到了。</p>
+
+<p>1827 年, Gauss 在哥廷根写下"<em>Theorema Egregium</em>"——纸上的几何里第一次出现"<em>内蕴</em>" 的概念, 让"<em>几何</em>" 从"<em>嵌入空间的子集</em>" 解放为"<em>独立的数学对象</em>"。</p>
+
+<p>1854 年, Riemann 把 Gauss 内蕴几何推广到任意维, 给出"<em>抽象流形带度量</em>" 的概念——这个概念在 60 年后被爱因斯坦借去描述时空(<a href="ch23.html">ch23</a>)。</p>
+
+<p>1915 年, 爱因斯坦的广义相对论让<em>时空本身</em> 是一个洛伦兹流形, 引力 = 曲率。物理学第一次<em>几何化</em>。</p>
+
+<p>20 世纪 50-70 年代, 杨-Mills 把规范场论几何化, 标准模型成为纤维丛上的联络。21 世纪初, 弦论 / 圈量子引力 / 几何深度学习全部使用同一套微分几何语言。</p>
+
+<p>2010 年代, 三角网格 + 离散微分几何让 Pixar 的动画、Maya 的 CAD、Blender 的雕刻都用 Gauss 1827 年的<em>同样</em> 数学(以离散形式) 来工作。同时, persistent homology 让"<em>形状</em>" 成为可计算的统计量, 应用到蛋白质 / 神经科学 / 异常检测。</p>
+
+<p>这条线的<em>主题</em> 一直没变: "<em>能不能摊平?</em>" 这是 Gauss 1827 在 A4 纸 + 橘子之间问的, 也是 LIGO 在 2015 年探测引力波时问的, 也是 TDA 在 2008 年问"<em>视觉皮层数据是什么形状</em>" 时问的。<em>同样的曲率思想适配从纸卷曲面到深度学习</em>——这是微分几何作为一门数学的<em>核</em>: 把"<em>形状</em>" 形式化为<em>能计算、能证明、能预测</em> 的对象。</p>
+
+<p>本书结束。希望你建立的不是公式清单, 是<em>看待"形状" 的方式</em>——曲率、测地、Gauss-Bonnet 把"<em>能不能摊平</em>" 变成可计算可证明的命题。当你以后看一张地图、一段动画、一张大脑扫描、一段引力波信号、一团高维数据点云时, 你会比读这本书之前看出更多。</p>
+
+<p>请你把这本书合上, 拿起一张纸, 再卷一次。这次你不是 ch1 那个还没学过曲率的人——这次你<em>知道</em> 那张纸为什么能卷成圆筒, 以及为什么<em>永远</em> 卷不到橘子上。这个简单的、肉眼可见的事实, 背后是 200 年微分几何最深的故事。</p>
+
+<p><em>读完这本书的你, 已经走完了从 Gauss 到 21 世纪的整条主弧线。</em>下一步——黎曼几何、规范场论、几何分析、几何深度学习——任何一个方向, 你都有了入口的钥匙。</p>
+
+<p>祝你旅途愉快。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 广义相对论与几何物理</a><a href="appA.html">附录 A →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 Gauss 曲率与平均曲率 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 第二基本形式与主曲率</a><a href="ch11.html">下一章 · 第 11 章 Theorema Egregium →</a></nav>
+<h1 id="ch10">第 10 章 Gauss 曲率与平均曲率</h1>
+
+<p>上一章我们花了大力气建出主曲率 \(\kappa_1, \kappa_2\)。它们是形状算子（也即第一基本形式 \(I\) 与第二基本形式 \(II\) 的"商"）的两个特征值, 同时也是曲面在切平面所有方向中"<em>最大</em>" 与"<em>最小</em>" 的法曲率。</p>
+
+<p>问题来了。两个数比一个数烦。每点带<em>两个</em> 数走, 写公式、算积分、和别人交流, 都比每点带<em>一个</em> 数走累得多。能不能把 \(\kappa_1, \kappa_2\) 揉成一个标量？</p>
+
+<p>请你停下来想三秒。两个数怎么揉成一个？最自然的揉法只有少数几种——<em>相加</em>、<em>相乘</em>、取<em>极差</em>、取<em>较大</em>。这一章我们就把"相乘" 和"相加 / 2" 这两种揉法各自命名, 看它们各自的几何意义。结果——<em>两个</em> 标量比单一个 \(\kappa_1\) 或 \(\kappa_2\) 更有用：</p>
+
+<ul>
+  <li><em>Gauss 曲率</em> \(K = \kappa_1 \kappa_2\)——决定曲面"<em>形状类</em>"（椭圆 / 抛物 / 双曲）。</li>
+  <li><em>平均曲率</em> \(H = (\kappa_1 + \kappa_2) / 2\)——决定曲面是不是"<em>肥皂膜</em>"。</li>
+</ul>
+
+<p>这两个量是经典微分几何的两位主角。后面 14 章基本都围着它们转。</p>
+
+<h2 id="sec10-1">10.1 命名两个揉法</h2>
+
+<p>设曲面 \(S \subset \mathbb{R}^3\) 在点 \(p\) 处主曲率为 \(\kappa_1, \kappa_2\)。定义</p>
+
+<p>\[
+\boxed{\ K(p) := \kappa_1(p) \kappa_2(p), \qquad H(p) := \frac{\kappa_1(p) + \kappa_2(p)}{2}.\ }
+\]</p>
+
+<p>\(K\) 叫<strong>Gauss 曲率</strong>; \(H\) 叫<strong>平均曲率</strong>。两者都是 \(p\) 的<em>标量</em>函数。</p>
+
+<p>从线性代数角度看更清楚。形状算子 \(S_p: T_p S \to T_p S\)（ch9 给出, 是矩阵 \(I^{-1} II\) 在合适的基下的实现）的两个特征值就是 \(\kappa_1, \kappa_2\)。所以</p>
+
+<p>\[
+K = \det(S_p), \qquad H = \frac{1}{2} \operatorname{tr}(S_p).
+\]</p>
+
+<p>这件事不是巧合——一个 2×2 矩阵的两个不变量正是<em>行列式</em> 和<em>迹</em>。Gauss 用了行列式那个; 平均曲率用迹那个。两个都是<em>不依赖坐标基选择</em> 的——你换一组主方向标架, \(\det\) 和 \(\operatorname{tr}\) 不变。这种"<em>不依赖坐标</em>" 是几何量该有的样子。</p>
+
+<p>"为什么命名这两个, 不命名 \(\kappa_1 + \kappa_2\) 或 \(\kappa_1^2 + \kappa_2^2\)？" 答案：<em>命名了, 只是名字不一样</em>。\(\kappa_1 + \kappa_2 = 2H\)（两倍平均曲率, 也叫"<em>全曲率</em>"）。\(\kappa_1^2 + \kappa_2^2 = (2H)^2 - 2K\)（用 Newton 等式表达）。所以一旦有了 \(K, H\), 任何主曲率的对称多项式都能用它俩表达。\(K, H\) 是<em>基础对偶</em>。</p>
+
+<h2 id="sec10-2">10.2 用 \(I, II\) 矩阵显式算 \(K, H\)</h2>
+
+<p>上一章我们写过——参数化 \(\boldsymbol{x}(u, v)\) 给定后,</p>
+
+<p>\[
+I = \begin{pmatrix} E & F \\ F & G \end{pmatrix}, \qquad II = \begin{pmatrix} L & M \\ M & N \end{pmatrix},
+\]</p>
+
+<p>其中 \(E = \boldsymbol{x}_u \cdot \boldsymbol{x}_u, F = \boldsymbol{x}_u \cdot \boldsymbol{x}_v, G = \boldsymbol{x}_v \cdot \boldsymbol{x}_v\) 是切向量内积,  \(L = \boldsymbol{x}_{uu} \cdot \boldsymbol{N}, M = \boldsymbol{x}_{uv} \cdot \boldsymbol{N}, N = \boldsymbol{x}_{vv} \cdot \boldsymbol{N}\) 是二阶导和单位法向量的内积。形状算子用矩阵写就是 \(S = I^{-1} II\)。所以</p>
+
+<p>\[
+\boxed{\ K = \det(I^{-1} II) = \frac{\det(II)}{\det(I)} = \frac{LN - M^2}{EG - F^2}.\ }
+\]</p>
+
+<p>分母 \(EG - F^2 > 0\) 总成立（<a href="ch7.html">ch7</a>: 它是 \(\boldsymbol{x}_u \times \boldsymbol{x}_v\) 长度的平方, 正则参数化下严格正）。所以 \(K\) 的符号<em>由 \(LN - M^2\) 决定</em>。</p>
+
+<p>平均曲率稍麻烦, 因为 \(\operatorname{tr}(I^{-1} II)\) 不像 \(\det\) 那么干净。用伴随矩阵展开 \(I^{-1} = \frac{1}{EG - F^2} \begin{pmatrix} G & -F \\ -F & E \end{pmatrix}\), 得</p>
+
+<p>\[
+I^{-1} II = \frac{1}{EG - F^2} \begin{pmatrix} GL - FM & GM - FN \\ EM - FL & EN - FM \end{pmatrix}.
+\]</p>
+
+<p>取迹除以 2:</p>
+
+<p>\[
+\boxed{\ H = \frac{1}{2} \cdot \frac{EN - 2 FM + GL}{EG - F^2}.\ }
+\]</p>
+
+<p>记忆口诀：<em>"E N 减 2 F M 加 G L, 除以 2 倍 EG - F²"</em>。注意这是<em>对称双线性</em>组合——\(I\) 和 \(II\) 系数交错相乘。</p>
+
+<p>有了这两个公式, 任何参数化曲面的 \(K, H\) 就是<em>纯计算</em>——算 \(E, F, G, L, M, N\), 套公式。下面三个例子告诉你这件事不只是抽象——具体算下来很顺。</p>
+
+<h2 id="sec10-3">10.3 三个例子：球面、圆柱、圆环</h2>
+
+<h3 id="sec10-3-1">10.3.1 球面 \(S^2_r\)（半径 \(r\)）</h3>
+
+<p>用经纬度参数化 \(\boldsymbol{x}(u, v) = (r \cos u \cos v, r \cos u \sin v, r \sin u), u \in (-\pi/2, \pi/2), v \in [0, 2\pi)\)。其中 \(u\) 是<em>纬度</em>（赤道 \(u = 0\)）, \(v\) 是<em>经度</em>。</p>
+
+<p>偏导：</p>
+
+<p>\[
+\boldsymbol{x}_u = (-r \sin u \cos v, -r \sin u \sin v, r \cos u),
+\]</p>
+
+<p>\[
+\boldsymbol{x}_v = (-r \cos u \sin v, r \cos u \cos v, 0).
+\]</p>
+
+<p>第一基本形式：</p>
+
+<p>\[
+E = r^2, \quad F = 0, \quad G = r^2 \cos^2 u.
+\]</p>
+
+<p>所以 \(EG - F^2 = r^4 \cos^2 u\)。</p>
+
+<p>单位法向量在球面上是<em>径向单位向量</em> \(\boldsymbol{N} = -\boldsymbol{x}/|\boldsymbol{x}| = -(\cos u \cos v, \cos u \sin v, \sin u)\)（取外法向时反号）。这里我们取外法 \(\boldsymbol{N}_{\text{out}} = (\cos u \cos v, \cos u \sin v, \sin u)\)。</p>
+
+<p>二阶偏导：</p>
+
+<p>\[
+\boldsymbol{x}_{uu} = (-r \cos u \cos v, -r \cos u \sin v, -r \sin u),
+\]</p>
+
+<p>\[
+\boldsymbol{x}_{uv} = (r \sin u \sin v, -r \sin u \cos v, 0),
+\]</p>
+
+<p>\[
+\boldsymbol{x}_{vv} = (-r \cos u \cos v, -r \cos u \sin v, 0).
+\]</p>
+
+<p>第二基本形式系数：</p>
+
+<p>\[
+L = \boldsymbol{x}_{uu} \cdot \boldsymbol{N} = -r \cos^2 u \cos^2 v - r \cos^2 u \sin^2 v - r \sin^2 u = -r,
+\]</p>
+
+<p>\[
+M = \boldsymbol{x}_{uv} \cdot \boldsymbol{N} = 0,
+\]</p>
+
+<p>\[
+N = \boldsymbol{x}_{vv} \cdot \boldsymbol{N} = -r \cos^2 u \cos^2 v - r \cos^2 u \sin^2 v - 0 = -r \cos^2 u.
+\]</p>
+
+<p>套公式：</p>
+
+<p>\[
+K = \frac{LN - M^2}{EG - F^2} = \frac{(-r)(-r \cos^2 u) - 0}{r^4 \cos^2 u} = \frac{r^2 \cos^2 u}{r^4 \cos^2 u} = \frac{1}{r^2}.
+\]</p>
+
+<p>\[
+H = \frac{1}{2} \cdot \frac{EN - 2FM + GL}{EG - F^2} = \frac{1}{2} \cdot \frac{r^2 \cdot (-r \cos^2 u) + r^2 \cos^2 u \cdot (-r)}{r^4 \cos^2 u} = \frac{1}{2} \cdot \frac{-2 r^3 \cos^2 u}{r^4 \cos^2 u} = -\frac{1}{r}.
+\]</p>
+
+<p>（取内法向时 \(H = +1/r\); 符号由法向量约定决定。）</p>
+
+<p>所以球面<em>每点</em> \(K = 1/r^2, H = \pm 1/r\)。<em>常曲率正</em>。这件事和你的直觉吻合——球面"<em>各方向同弯</em>", 主曲率 \(\kappa_1 = \kappa_2 = 1/r\)（取外法时为 \(-1/r\); 主曲率本身的符号也随约定）, 乘积 \(K = 1/r^2\), 平均 \(H = \pm 1/r\), 完全独立于位置。</p>
+
+<h3 id="sec10-3-2">10.3.2 圆柱面 \(C_r\)（半径 \(r\)）</h3>
+
+<p>参数化 \(\boldsymbol{x}(u, v) = (r \cos u, r \sin u, v), u \in [0, 2\pi), v \in \mathbb{R}\)。\(u\) 是绕轴角度, \(v\) 是高度。</p>
+
+<p>\[
+\boldsymbol{x}_u = (-r \sin u, r \cos u, 0), \qquad \boldsymbol{x}_v = (0, 0, 1).
+\]</p>
+
+<p>\(E = r^2, F = 0, G = 1\)。\(EG - F^2 = r^2\)。</p>
+
+<p>外法向量 \(\boldsymbol{N} = (\cos u, \sin u, 0)\)（径向）。</p>
+
+<p>二阶导：</p>
+
+<p>\[
+\boldsymbol{x}_{uu} = (-r \cos u, -r \sin u, 0), \quad \boldsymbol{x}_{uv} = (0, 0, 0), \quad \boldsymbol{x}_{vv} = (0, 0, 0).
+\]</p>
+
+<p>\(L = -r, M = 0, N = 0\)。</p>
+
+<p>\[
+K = \frac{(-r)(0) - 0}{r^2} = 0, \qquad H = \frac{1}{2} \cdot \frac{r^2 \cdot 0 - 0 + 1 \cdot (-r)}{r^2} = -\frac{1}{2r}.
+\]</p>
+
+<p>所以圆柱面 \(K = 0\) 处处, \(H = \mp 1/(2r)\) 处处（同样 \(H\) 的符号取决于法向量约定）。</p>
+
+<p>这件事符合直觉。圆柱在<em>圆周方向</em> 弯（曲率 \(1/r\)）, 在<em>轴向</em> 直（曲率 \(0\)）。两者乘积 \(0\), 平均 \(1/(2r)\)。</p>
+
+<p>哲学意味：\(K = 0\) 让圆柱面与平面共享"<em>Gauss 曲率类</em>"。这正是为什么<em>纸能卷成圆柱</em>——两边内蕴几何（由 \(K\) 决定一大块）相同。<a href="ch11.html">下一章</a>把这件事说成定理——Theorema Egregium 的直接推论。</p>
+
+<h3 id="sec10-3-3">10.3.3 圆环面 \(T_{a, b}\)（环半径 \(a\), 管半径 \(b\), \(a > b\)）</h3>
+
+<p>圆环是把一个半径为 \(b\) 的小圆绕轴<em>距离 \(a\)</em> 旋转得到。参数化</p>
+
+<p>\[
+\boldsymbol{x}(u, v) = ((a + b \cos u) \cos v, (a + b \cos u) \sin v, b \sin u),
+\]</p>
+
+<p>\(u\) 是小圆参数, \(v\) 是大圆参数。</p>
+
+<p>偏导：</p>
+
+<p>\[
+\boldsymbol{x}_u = (-b \sin u \cos v, -b \sin u \sin v, b \cos u),
+\]</p>
+
+<p>\[
+\boldsymbol{x}_v = (-(a + b \cos u) \sin v, (a + b \cos u) \cos v, 0).
+\]</p>
+
+<p>\(E = b^2, F = 0, G = (a + b \cos u)^2\)。\(EG - F^2 = b^2 (a + b \cos u)^2\)。</p>
+
+<p>单位法向量 \(\boldsymbol{N} = (\cos u \cos v, \cos u \sin v, \sin u)\)（指向小圆外侧）。</p>
+
+<p>算 \(L, M, N\)（细节略, 你可以自己代入并查证）：</p>
+
+<p>\[
+L = -b, \qquad M = 0, \qquad N = -(a + b \cos u) \cos u.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+K = \frac{LN - M^2}{EG - F^2} = \frac{(-b)\bigl[-(a + b \cos u) \cos u\bigr]}{b^2 (a + b \cos u)^2} = \frac{\cos u}{b (a + b \cos u)}.
+\]</p>
+
+<p>这是一个<em>非常态</em> 的 \(K\)——它依赖 \(u\)！不同纬度上 \(K\) 不同。</p>
+
+<ul>
+  <li>\(u = 0\)（环面<em>外</em> 赤道）：\(\cos u = 1, K = \frac{1}{b(a + b)} > 0\)。</li>
+  <li>\(u = \pm \pi/2\)（顶 / 底圈）：\(\cos u = 0, K = 0\)。</li>
+  <li>\(u = \pi\)（环面<em>内</em> 赤道）：\(\cos u = -1, K = \frac{-1}{b(a - b)} < 0\)（注意 \(a > b\) 保证分母正）。</li>
+</ul>
+
+<p>所以圆环上<em>三种类型的点都有</em>——外侧 \(K > 0\)（椭圆点）、顶/底圈 \(K = 0\)（抛物点）、内侧 \(K < 0\)（双曲点）。这件事让圆环成为本书后面（<a href="ch16.html">ch16</a>, <a href="ch17.html">ch17</a> Gauss-Bonnet）的明星例子——它<em>同时</em> 包含三种几何, 是把三种类型的点合在一起测试任何积分公式的最佳曲面。</p>
+
+<p>平均曲率（直接套公式, 略细节）</p>
+
+<p>\[
+H = -\frac{a + 2 b \cos u}{2 b (a + b \cos u)}.
+\]</p>
+
+<p>外侧 \(u = 0\): \(H = -(a + 2b) / [2b(a + b)]\); 内侧 \(u = \pi\): \(H = -(a - 2b)/[2b(a - b)]\)（如果 \(a > 2b\) 这是负的, 否则正——形状决定）。</p>
+
+<h2 id="sec10-4">10.4 \(K\) 的符号决定几何类型</h2>
+
+<p>把 \(K\) 的符号当成<em>分类工具</em>。每点 \(p\) 有切平面 \(T_p S\); 在 \(p\) 附近曲面"<em>怎么离开</em>" 切平面这件事完全由 \(K\) 的符号决定（更精细地, 由 \(II\) 的二次型符号决定, 但 \(K = \det II / \det I\) 已经捕获该信息）。</p>
+
+<h3 id="sec10-4-1">10.4.1 椭圆点：\(K > 0\)</h3>
+
+<p>\(\kappa_1, \kappa_2\) <em>同号</em>。曲面在 \(p\) 附近"<em>所有方向都弯到切平面同一侧</em>"——它"<em>蜷</em>" 进切平面里。例子：球面（每点 \(K > 0\)）、椭球面（每点）、抛物面 \(z = x^2 + y^2\)（每点）。</p>
+
+<p>几何画面：站在椭圆点, 切平面是支撑超平面——曲面<em>整体局部</em> 在切平面同一侧。任意法平面切片都是凸曲线, 法曲率同号。</p>
+
+<h3 id="sec10-4-2">10.4.2 抛物点：\(K = 0\)（\(\kappa_1 = 0\) 或 \(\kappa_2 = 0\)）</h3>
+
+<p>至少一个主曲率为零, 即<em>至少一个方向平直</em>。例子：圆柱面（每点 \(\kappa_2 = 0\)）、圆锥面（沿母线方向 \(\kappa = 0\)）、平面（两个 \(\kappa\) 都 \(0\)）。</p>
+
+<p>几何画面：曲面在抛物点附近沿"<em>平直方向</em>" 走是直线; 沿垂直方向走是圆弧。这种"<em>一直一弯</em>" 的曲面叫<em>可展曲面</em>——它能通过<em>不拉伸不撕</em> 摊到平面（这件事 ch11 后面再讲）。</p>
+
+<h3 id="sec10-4-3">10.4.3 双曲点：\(K < 0\)</h3>
+
+<p>\(\kappa_1, \kappa_2\) <em>异号</em>。沿一方向凸, 沿垂直方向凹——<em>鞍状</em>。例子：鞍面 \(z = x^2 - y^2\)（每点）、单叶双曲面（每点）、伪球面（每点）。</p>
+
+<p>几何画面：站在双曲点, 切平面<em>不</em> 是支撑超平面——曲面<em>切过</em> 切平面。\(II\) 二次型不定符。沿主曲率方向之间还有两条<em>渐近方向</em>（10.7 节再说）, 沿渐近方向的法曲率<em>恰好为零</em>。</p>
+
+<h3 id="sec10-4-4">10.4.4 平凡点：\(K = 0\) 且 \(H = 0\)</h3>
+
+<p>更细一类——<em>平凡点</em>（flat point）, 此时 \(\kappa_1 = \kappa_2 = 0\), 曲面在该点"<em>极平</em>"。比如 \(z = x^4 + y^4\) 在原点。这种点是抛物点的退化情况, 在曲面分类中有特殊角色。</p>
+
+<h2 id="sec10-5">10.5 \(K\) 的几何意义：Gauss 映射的面积放大率</h2>
+
+<p>给 Gauss 曲率一个<em>独立的</em> 几何刻画——不依赖参数化或主曲率, 直接从 Gauss 映射看。</p>
+
+<p><a href="ch8.html">ch8</a> 给定 Gauss 映射 \(\boldsymbol{N}: S \to S^2\), 把曲面每点映到它的单位法向量（落在单位球面上）。\(\boldsymbol{N}\) 的微分 \(d\boldsymbol{N}_p: T_p S \to T_{\boldsymbol{N}(p)} S^2\)——但因为 \(T_{\boldsymbol{N}(p)} S^2\) 与 \(T_p S\) 都垂直于 \(\boldsymbol{N}(p)\), 它们<em>恒等</em>; \(d\boldsymbol{N}_p\) 就是切平面到自己的线性映射。这就是负的形状算子 \(-S_p\)（<a href="ch9.html">ch9</a>）。</p>
+
+<p>\(d\boldsymbol{N}_p\) 把 \(T_p S\) 中一块小区域映到 \(T_{\boldsymbol{N}(p)} S^2\) 中一块。<em>映射的雅可比行列式</em> 就是面积放大率。这件事正好是 \(\det(d\boldsymbol{N}_p) = \det(-S_p) = \det(S_p) = \kappa_1 \kappa_2 = K\)（注意行列式对负号取偶数维下不变）。</p>
+
+<p>所以</p>
+
+<p>\[
+\boxed{\ K(p) = \lim_{R \to p} \frac{\text{面积}(\boldsymbol{N}(R))}{\text{面积}(R)} \quad (\text{有符号}).\ }
+\]</p>
+
+<p>"<em>有符号</em>" 是说：如果 \(d\boldsymbol{N}_p\) 保持定向, 比值正; 反向定向, 比值负。这件事把 \(K\) 的符号<em>外蕴几何意义</em> 说清——\(K > 0\) 的点 Gauss 映射保定向（双方都"<em>球状</em>"）, \(K < 0\) 的点 Gauss 映射反定向（"<em>鞍状</em>" 把两个方向反置）。</p>
+
+<p>这件事是 Gauss 1827 年的<em>原始</em> 定义——他先用面积比定义 \(K\), 然后证明这就是 \(\kappa_1 \kappa_2\)。我们今天的次序反过来——先定义 \(K = \kappa_1 \kappa_2\), 再证它等于面积放大率。两条路通向同一个数。</p>
+
+<p>这个面积放大率视角让 Gauss-Bonnet 定理（<a href="ch16.html">ch16</a>, <a href="ch17.html">ch17</a>）"\(\int K\, dA = 2\pi \chi\)" 一下变得自然——左边是 Gauss 映射把曲面<em>覆盖</em> \(S^2\) 的"<em>带符号面积</em>", 右边是与拓扑相关的整数（除以 \(2\pi\) 得 Euler 示性数）。两者必须重合, 因为 \(N\) 把曲面"<em>缠</em>" 到 \(S^2\) 上的次数是<em>拓扑</em> 不变量。</p>
+
+<h2 id="sec10-6">10.6 \(H = 0\) 的曲面：极小曲面</h2>
+
+<p>平均曲率 \(H = 0\) 意味着 \(\kappa_1 + \kappa_2 = 0\), 即两主曲率<em>大小相等、符号相反</em>。这种曲面叫<strong>极小曲面</strong>——名字来自一个变分原理：它们是<em>给定边界曲线下面积最小</em> 的曲面（局部意义上）。</p>
+
+<p>物理具象：把铁丝弯成任意闭曲线, 浸入肥皂水, 拿出来后<em>肥皂膜</em> 张在铁丝上。肥皂膜<em>处处</em> \(H = 0\)——这件事是物理的（最小化界面张力）。所以"<em>极小曲面</em>" = "<em>肥皂膜</em>"。</p>
+
+<p>例子（<a href="ch19.html">ch19</a> 详谈）：</p>
+
+<ul>
+  <li>平面（\(\kappa_1 = \kappa_2 = 0, H = 0\) 显然）。</li>
+  <li><em>悬链面</em>（catenoid）\(\boldsymbol{x}(u, v) = (\cosh u \cos v, \cosh u \sin v, u)\)——把悬链线绕轴旋转。除平面之外<em>第一个</em> 被发现的极小曲面（Meusnier 1776）。</li>
+  <li><em>螺面</em>（helicoid）\(\boldsymbol{x}(u, v) = (u \cos v, u \sin v, v)\)——螺旋楼梯。</li>
+  <li><em>Scherk 曲面</em>、<em>Costa 曲面</em>等——更现代的极小曲面例子。</li>
+</ul>
+
+<p>极小曲面理论（Plateau 问题: 任意闭曲线都张极小曲面吗？）从 1860 年代到 1930 年代是重大研究领域; 现代变种（"<em>稳定</em>" 极小曲面、几何流）今天仍在前沿。<a href="ch19.html">ch19</a> 给入门。</p>
+
+<h2 id="sec10-7">10.7 几何应用：判断局部凹凸 + 渐近方向</h2>
+
+<h3 id="sec10-7-1">10.7.1 局部凹凸判断</h3>
+
+<p>给一张曲面图象 \(z = f(x, y)\), 在原点 \((0, 0, 0)\) 切平面是 \(xy\) 平面。曲面在原点附近"<em>怎么离开</em>" 切平面?</p>
+
+<p>用 Hessian \(\mathrm{Hess}(f)(0)\)。\(z = f(x, y) \approx \frac{1}{2}(f_{xx} x^2 + 2 f_{xy} xy + f_{yy} y^2) + O(\|(x, y)\|^3)\)（假设 \(f(0) = f_x(0) = f_y(0) = 0\)）。所以 \(z\) 的符号——曲面在切平面"<em>哪一侧</em>"——由二次型 \(\frac{1}{2} \begin{pmatrix} x & y \end{pmatrix} \mathrm{Hess}(f) \begin{pmatrix} x \\ y \end{pmatrix}\) 决定。</p>
+
+<p>这正是<em>第二基本形式</em>（在 \(z = f(x, y)\) 这种 Monge 参数化下, \(II\) 在原点等于 \(\mathrm{Hess}(f)\), 因为 \(\boldsymbol{N}\) 在原点是 \(\boldsymbol{e}_3\)）。</p>
+
+<p>\(K(0) = \det \mathrm{Hess}(f) = f_{xx} f_{yy} - f_{xy}^2\)。所以</p>
+
+<ul>
+  <li>\(K > 0\) ⟺ Hessian 同号 ⟺ <em>局部极值点</em>（极小或极大）⟺ 椭圆点。</li>
+  <li>\(K < 0\) ⟺ Hessian 异号 ⟺ <em>鞍点</em> ⟺ 双曲点。</li>
+  <li>\(K = 0\) ⟺ Hessian 退化 ⟺ <em>更高阶判断</em>。</li>
+</ul>
+
+<p>请你停一秒。<em>多元微积分里 Hessian 判定极值的法则</em>（高等微积分课二阶偏导测试）和<em>微分几何里 \(K\) 的符号判别椭圆 / 双曲</em>是<em>同一件事</em>！只不过同一个对象在两门课里换了名字。这种"<em>不同领域同一对象</em>" 的发现是数学的乐趣之一。</p>
+
+<h3 id="sec10-7-2">10.7.2 渐近方向</h3>
+
+<p>双曲点（\(K < 0\)）有<em>两条特殊方向</em>: 在这些方向上法曲率为零。它们叫<em>渐近方向</em>。具体, 渐近方向是 \(II\) 的<em>零方向</em>: 切向量 \(\boldsymbol{w}\) 满足 \(II(\boldsymbol{w}, \boldsymbol{w}) = 0\)。</p>
+
+<p>椭圆点处 \(II\) 是定符——没有非零零方向。抛物点处 \(II\) 半定——一条零方向（与 \(\kappa = 0\) 主方向相同）。双曲点处 \(II\) 不定——<em>两条</em> 零方向（在两主方向之间）。</p>
+
+<p>沿渐近方向走的曲面曲线叫<em>渐近曲线</em>。鞍面 \(z = x^2 - y^2\) 的渐近方向是 \(y = \pm x\), 因为代入 \(II = 2(dx^2 - dy^2)\) 等于 \(2(dx - dy)(dx + dy) = 0\) 当 \(dy = \pm dx\)。这正好是鞍面"<em>从平面切上去的两条直线</em>"——\(y = x\) 沿这条直线 \(z = 0\) 处处, 是真直线。鞍面上"<em>有直线</em>" 这件事是它的渐近曲线现象。</p>
+
+<p>渐近曲线在<em>建筑学</em> 中重要——双曲抛物面屋顶（飞机棚、教堂屋顶）由两条直线族扫出, 易施工。这两条直线族就是渐近曲线族, 所以工程师只用直钢梁就能搭一个曲面屋顶。</p>
+
+<h2 id="sec10-8">10.8 数学 + 物理意义</h2>
+
+<p><strong>数学意义。</strong>\(K\) 与 \(H\) 是曲面上两个最基本的<em>标量不变量</em>——独立于参数化, 独立于刚体运动。它们把曲面的"<em>弯曲信息</em>" 浓缩到两个函数 \(K, H: S \to \mathbb{R}\)。后续整本书的故事——Theorema Egregium、测地线、Gauss-Bonnet——围绕这两个量展开。</p>
+
+<p>更深一层, \(K\) 是<em>内蕴</em> 量（<a href="ch11.html">ch11</a>）——它<em>只</em>需要曲面"<em>自身</em>" 的几何（距离、角度）就能计算; 不需要嵌入空间的概念。这件事让我们能定义"<em>抽象曲面</em>"——不存在于任何 \(\mathbb{R}^n\) 中也有 Gauss 曲率。这是<a href="ch21.html">ch21-22</a> 抽象流形 / 黎曼度量的根。</p>
+
+<p>而 \(H\) 是<em>外蕴</em> 量——它<em>本质上</em> 依赖曲面在 \(\mathbb{R}^3\) 中怎么嵌入。一个常见错觉是把 \(H\) 也看成内蕴, 但这是错的: \(H = 0\) 的曲面（极小曲面）<em>不是</em> 一个内蕴几何概念, 而是<em>嵌入</em> 后才能问的问题（"<em>如何最小化嵌入面积</em>"）。</p>
+
+<p><strong>物理意义。</strong>\(H\) 主管"<em>表面张力</em>" 类问题。Young-Laplace 方程 \(\Delta p = 2 \sigma H\)（\(\sigma\) 是表面张力, \(\Delta p\) 是膜两侧压差）说: <em>压差 = 张力 × 平均曲率</em>。肥皂泡两侧没压差时（\(\Delta p = 0\)）, \(H = 0\)——肥皂膜是极小曲面。气泡内压力大于外, \(H \neq 0\)（球面 \(H = 1/r\), 半径越小压力越大——这是为什么小气泡先消失）。</p>
+
+<p>\(K\) 主管"<em>本征几何</em>" 类问题。地球曲面（\(K = 1/R^2\)）让大圆航线（最短路径）在 Mercator 地图上看起来弯, 因为地图把<em>有 \(K\)</em> 的地球摊到<em>无 \(K\)</em> 的纸面——必有失真。GPS 和飞行计划必须用 \(K \neq 0\) 的真实几何, 不能用纸地图的几何。</p>
+
+<p>另一物理处：广义相对论。爱因斯坦场方程的左边是<em>Ricci 曲率</em>——\(K\) 在高维的推广。Schwarzschild 黑洞解的"<em>事件视界</em>" 是个<em>常 Ricci 曲率</em> 的 2-球面, 类比于这一章的常曲率球面。<a href="ch23.html">ch23</a> 详谈。</p>
+
+<p>下一章我们攻本书第一座大山——证明 \(K\) <em>居然是内蕴的</em>（Theorema Egregium）。看上去 \(K = (LN - M^2)/(EG - F^2)\) 是外蕴公式（\(L, M, N\) 用法向量定义）, 但 Gauss 1827 证明它实际能用 \(E, F, G\) 及其偏导（纯内蕴）表达。这件事是经典微分几何的<em>核心定理</em>, 也是通向 Riemann 抽象几何的入口。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 第二基本形式与主曲率</a><a href="ch11.html">下一章 · 第 11 章 Theorema Egregium →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>主题索引 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+<h1 id="subject-index">主题索引</h1>
+
+<p>按拼音 A-Z 排列。每条给"概念 / 名词 → 主要登场章节"。末尾有一节"按行为查找"——按"<em>我现在要做什么</em>" 索引。</p>
+
+<h2>A</h2>
+<ul>
+  <li><strong>鞍面（saddle）</strong> — <a href="ch1.html#sec1-2">1.2</a>; \(K < 0\) 例子 <a href="ch10.html">第 10 章</a>。</li>
+</ul>
+
+<h2>B</h2>
+<ul>
+  <li><strong>Bernstein 定理（极小图为平面）</strong> — <a href="ch19.html">第 19 章</a>。</li>
+  <li><strong>Bonnet-Myers 定理（Ricci 曲率有正下界 ⟹ 紧致）</strong> — <a href="appB.html#appB-7">附录 B.7</a>。</li>
+  <li><strong>边界（带边流形）</strong> — <a href="ch16.html">第 16 章</a>; Stokes 定理 <a href="appA.html#appA-8">附录 A.8</a>。</li>
+  <li><strong>Bianchi 恒等式</strong> — <a href="ch22.html">第 22 章</a>; Einstein 张量守恒 <a href="ch23.html#sec23-6">23.6</a>。</li>
+</ul>
+
+<h2>C</h2>
+<ul>
+  <li><strong>Catenoid（悬链面）</strong> — 极小曲面例 <a href="ch19.html">第 19 章</a>; 旋转面例 <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>测地坐标（geodesic coordinates）</strong> — <a href="ch14.html">第 14 章</a>; Gauss 引理 <a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>测地线（geodesic）</strong> — 一般定义 <a href="ch13.html">第 13 章</a>; 测地方程 <a href="ch13.html">第 13 章</a>; 自由粒子轨迹 <a href="ch23.html#sec23-4">23.4</a>; 离散版 <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Christoffel 符号</strong> — 定义 <a href="ch13.html">第 13 章</a>; 公式 \(\Gamma^k_{ij} = \frac{1}{2} g^{kl}(\partial_i g_{lj} + \partial_j g_{il} - \partial_l g_{ij})\) <a href="ch22.html">第 22 章</a>; Levi-Civita 联络的分量 <a href="appB.html#appB-5">附录 B.5</a>。</li>
+  <li><strong>Cartan 结构方程</strong> — <a href="appB.html#appB-6">附录 B.6</a>。</li>
+  <li><strong>cotangent Laplacian</strong> — <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>纯曲面 / 处处正则</strong> — 见"正则曲面"。</li>
+</ul>
+
+<h2>D</h2>
+<ul>
+  <li><strong>第一基本形式（first fundamental form）</strong> — <a href="ch7.html">第 7 章</a>; 内蕴度量 <a href="ch7.html">第 7 章</a>; 矩阵公式 \(g = J_\mathbf{X}^T J_\mathbf{X}\) <a href="appA.html#appA-2">附录 A.2</a>。</li>
+  <li><strong>第二基本形式（second fundamental form）</strong> — <a href="ch9.html">第 9 章</a>; 法向曲率 <a href="ch9.html">第 9 章</a>; 主曲率 <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>等距（isometry）</strong> — 局部等距 <a href="ch7.html">第 7 章</a>; 保 \(K\) 性质 <a href="ch11.html">第 11 章</a>; 纸卷圆筒不能贴球面 <a href="ch1.html#sec1-4">1.4</a>。</li>
+  <li><strong>等周不等式</strong> — 平面 <a href="ch5.html">第 5 章</a>; 推广至曲面 <a href="ch5.html">第 5 章</a>。</li>
+  <li><strong>多面体（polyhedron）</strong> — Euler 公式 <a href="ch17.html">第 17 章</a>; 离散 Gauss-Bonnet <a href="ch24.html#sec24-3">24.3</a>。</li>
+  <li><strong>对偶面积（顶点）</strong> — <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>定向（orientation）</strong> — <a href="ch20.html">第 20 章</a>; Möbius 带是不可定向例 <a href="ch20.html">第 20 章</a>。</li>
+</ul>
+
+<h2>E</h2>
+<ul>
+  <li><strong>Einstein 方程</strong> — <a href="ch23.html#sec23-6">23.6</a>; Schwarzschild 解 <a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>Einstein 张量 \(G_{\mu\nu}\)</strong> — <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>Euler 示性数 \(\chi\)</strong> — 多面体 <a href="ch17.html">第 17 章</a>; 整体 Gauss-Bonnet <a href="ch17.html">第 17 章</a>; 亏格关系 \(\chi = 2 - 2g\) <a href="ch20.html">第 20 章</a>; 离散版 <a href="ch24.html#sec24-3">24.3</a>。</li>
+  <li><strong>等效原理（equivalence principle）</strong> — <a href="ch23.html#sec23-1">23.1</a>。</li>
+</ul>
+
+<h2>F</h2>
+<ul>
+  <li><strong>反函数定理</strong> — <a href="appA.html#appA-4">附录 A.4</a>; 正则曲面 <a href="ch6.html">第 6 章</a>; 指数映射 <a href="ch14.html">第 14 章</a>; 流形定义 <a href="ch21.html">第 21 章</a>。</li>
+  <li><strong>法向曲率（normal curvature）</strong> — <a href="ch9.html">第 9 章</a>; Euler 公式 <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>法向量（normal vector / 单位法）</strong> — 曲线 <a href="ch3.html">第 3 章</a>; Frenet 标架 \(N\) <a href="ch4.html">第 4 章</a>; 曲面 \(\mathbf{n}\) <a href="ch8.html">第 8 章</a>; Gauss 映射 <a href="ch8.html">第 8 章</a>。</li>
+  <li><strong>Frenet-Serret 公式</strong> — <a href="ch4.html">第 4 章</a>; 曲率 + 扭率 <a href="ch4.html">第 4 章</a>; 螺旋线例 <a href="ch4.html">第 4 章</a>。</li>
+  <li><strong>4-顶点定理</strong> — <a href="ch5.html">第 5 章</a>。</li>
+  <li><strong>fast marching method</strong> — <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>飞行（自由下落） = 测地线</strong> — <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>负曲率（双曲型）</strong> — <a href="ch1.html#sec1-3">1.3</a>; 双曲面 <a href="ch10.html">第 10 章</a>。</li>
+</ul>
+
+<h2>G</h2>
+<ul>
+  <li><strong>Gauss 曲率 \(K\)</strong> — 定义 \(K = \kappa_1 \kappa_2\) <a href="ch1.html#sec1-3">1.3</a>; 公式 <a href="ch10.html">第 10 章</a>; 内蕴 <a href="ch11.html">第 11 章</a>; 离散版 <a href="ch24.html#sec24-2">24.2</a>。</li>
+  <li><strong>Gauss 映射（Gauss map）</strong> — <a href="ch8.html">第 8 章</a>; 形状算子 <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>Gauss-Bonnet 定理</strong> — 局部 <a href="ch16.html">第 16 章</a>; 整体 \(\int_M K dA = 2\pi \chi\) <a href="ch17.html">第 17 章</a>; 推论 <a href="ch18.html">第 18 章</a>; 离散版 <a href="ch24.html#sec24-3">24.3</a>。</li>
+  <li><strong>共轭点（conjugate point）</strong> — <a href="ch15.html">第 15 章</a>; Jacobi 场 <a href="appB.html#appB-7">附录 B.7</a>。</li>
+  <li><strong>规范场论（gauge theory）</strong> — <a href="ch23.html#sec23-9">23.9</a>; Cartan 方程对应 <a href="appB.html#appB-6">附录 B.6</a>。</li>
+  <li><strong>\(GL_n\)（一般线性群）</strong> — <a href="appB.html#appB-2">附录 B.2</a>。</li>
+  <li><strong>Green 定理</strong> — Stokes 特例 <a href="appA.html#appA-8">附录 A.8</a>; 局部 Gauss-Bonnet 用 <a href="ch16.html">第 16 章</a>。</li>
+</ul>
+
+<h2>H</h2>
+<ul>
+  <li><strong>Helicoid（螺旋面）</strong> — 极小曲面例 <a href="ch19.html">第 19 章</a>; 旋转面 / 直纹面 <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>Hopf-Rinow 定理</strong> — <a href="ch15.html">第 15 章</a>; 完整证明 <a href="appB.html#appB-7">附录 B.7</a>。</li>
+  <li><strong>弧长（arc length）</strong> — 曲线弧长积分 <a href="ch2.html">第 2 章</a>; 弧长参数化 <a href="ch2.html">第 2 章</a>; 曲面上(测地距离) <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>恒等同胚（homeomorphism）</strong> — 见"同胚"。</li>
+</ul>
+
+<h2>J</h2>
+<ul>
+  <li><strong>极小曲面（minimal surface）</strong> — \(H = 0\) <a href="ch19.html">第 19 章</a>; Catenoid + Helicoid <a href="ch19.html">第 19 章</a>; 离散 / surface fairing <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>极坐标</strong> — 测地极坐标 <a href="ch14.html">第 14 章</a>; 雅可比 \(r\) <a href="appA.html#appA-6">附录 A.6</a>。</li>
+  <li><strong>几何深度学习</strong> — <a href="ch24.html#sec24-8">24.8</a>。</li>
+  <li><strong>计算机图形学</strong> — <a href="ch24.html">第 24 章</a>。</li>
+  <li><strong>剪裁点（cut locus）</strong> — <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>角度盈余（angle deficit）</strong> — <a href="ch24.html#sec24-2">24.2</a>。</li>
+  <li><strong>Jacobi 场</strong> — <a href="appB.html#appB-7">附录 B.7</a>。</li>
+  <li><strong>雅可比矩阵</strong> — <a href="appA.html#appA-2">附录 A.2</a>; 正则曲面满秩 <a href="ch6.html">第 6 章</a>。</li>
+</ul>
+
+<h2>K</h2>
+<ul>
+  <li><strong>Killing 形式</strong> — <a href="appB.html#appB-4">附录 B.4</a>。</li>
+  <li><strong>Klein 瓶</strong> — 不可定向闭曲面 <a href="ch20.html">第 20 章</a>; \(\chi(K) = 0\) <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>亏格 \(g\)（genus）</strong> — <a href="ch20.html">第 20 章</a>; \(\chi = 2 - 2g\) <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>可定向曲面分类</strong> — <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>快进波法（fast marching）</strong> — <a href="ch24.html#sec24-6">24.6</a>。</li>
+</ul>
+
+<h2>L</h2>
+<ul>
+  <li><strong>Lagrange 乘数（约束极值）</strong> — <a href="ch19.html">第 19 章</a>。</li>
+  <li><strong>Laplace-Beltrami 算子</strong> — <a href="ch22.html">第 22 章</a>; 离散版 cotangent Laplacian <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>Levi-Civita 联络</strong> — <a href="ch22.html">第 22 章</a>; 唯一性定理 <a href="appB.html#appB-5">附录 B.5</a>。</li>
+  <li><strong>Lie 代数</strong> — <a href="appB.html#appB-3">附录 B.3</a>。</li>
+  <li><strong>Lie 群</strong> — <a href="appB.html#appB-1">附录 B.1</a>; 矩阵 Lie 群 <a href="appB.html#appB-2">附录 B.2</a>。</li>
+  <li><strong>联络（connection）</strong> — <a href="ch22.html">第 22 章</a>; Levi-Civita <a href="appB.html#appB-5">附录 B.5</a>; Cartan 1-形式 <a href="appB.html#appB-6">附录 B.6</a>。</li>
+  <li><strong>链式法则（多元）</strong> — <a href="appA.html#appA-3">附录 A.3</a>; 张量变换律 <a href="ch22.html">第 22 章</a>。</li>
+  <li><strong>流形（manifold）</strong> — 抽象定义 <a href="ch21.html">第 21 章</a>; 黎曼流形 <a href="ch22.html">第 22 章</a>; 洛伦兹流形 <a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>洛伦兹流形（Lorentzian manifold）</strong> — <a href="ch23.html#sec23-2">23.2</a>。</li>
+  <li><strong>类时 / 类空 / 类光</strong> — 切向量分类 <a href="ch23.html#sec23-2">23.2</a>; 光锥 <a href="ch23.html#sec23-2">23.2</a>。</li>
+</ul>
+
+<h2>M</h2>
+<ul>
+  <li><strong>密切圆（osculating circle）</strong> — <a href="ch1.html#sec1-1">1.1</a>; <a href="ch3.html">第 3 章</a>。</li>
+  <li><strong>Möbius 带</strong> — 不可定向曲面例 <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>面积（曲面）</strong> — \(\iint \sqrt{\det g} du dv\) <a href="ch7.html">第 7 章</a>; 极小曲面面积变分 <a href="ch19.html">第 19 章</a>。</li>
+</ul>
+
+<h2>N</h2>
+<ul>
+  <li><strong>内蕴（intrinsic） vs 外蕴（extrinsic）</strong> — <a href="ch11.html">第 11 章</a>; Theorema Egregium <a href="ch11.html">第 11 章</a>。</li>
+</ul>
+
+<h2>P</h2>
+<ul>
+  <li><strong>平均曲率 \(H\)</strong> — \(H = (\kappa_1 + \kappa_2)/2\) <a href="ch1.html#sec1-3">1.3</a>; 公式 <a href="ch10.html">第 10 章</a>; 极小曲面 \(H = 0\) <a href="ch19.html">第 19 章</a>; 离散版 <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>偏导数</strong> — <a href="appA.html#appA-1">附录 A.1</a>。</li>
+</ul>
+
+<h2>Q</h2>
+<ul>
+  <li><strong>切丛（tangent bundle）</strong> — <a href="ch21.html">第 21 章</a>。</li>
+  <li><strong>切平面（tangent plane）</strong> — <a href="ch6.html">第 6 章</a>; 第二基本形式定义在切平面上 <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>切空间（tangent space）</strong> — <a href="ch6.html">第 6 章</a>; 抽象流形版 <a href="ch21.html">第 21 章</a>。</li>
+  <li><strong>切向量</strong> — 曲线 <a href="ch3.html">第 3 章</a>; Frenet \(T\) <a href="ch4.html">第 4 章</a>。</li>
+  <li><strong>球面（sphere）</strong> — \(K = 1/r^2\) <a href="ch1.html#sec1-3">1.3</a>; 标准例 <a href="ch6.html">第 6 章</a>; \(\chi = 2\) <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>球极投影（stereographic projection）</strong> — <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>曲率（curvature）</strong> — 一维 \(\kappa\) <a href="ch3.html">第 3 章</a>; Gauss \(K\) <a href="ch10.html">第 10 章</a>; 平均 \(H\) <a href="ch10.html">第 10 章</a>; Riemann 张量 <a href="ch22.html">第 22 章</a>; Ricci <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>曲率张量（Riemann curvature tensor）</strong> — <a href="ch22.html">第 22 章</a>; GR 中 <a href="ch23.html#sec23-5">23.5</a>; 联络换位定义 <a href="appB.html#appB-5">附录 B.5</a>。</li>
+  <li><strong>球状空间（球面分类）</strong> — 见"球面" / "可定向曲面分类"。</li>
+</ul>
+
+<h2>R</h2>
+<ul>
+  <li><strong>Ricci 张量</strong> — <a href="ch23.html#sec23-5">23.5</a>; Bonnet-Myers 定理 <a href="appB.html#appB-7">附录 B.7</a>。</li>
+  <li><strong>Riemann 张量</strong> — <a href="ch22.html">第 22 章</a>; GR <a href="ch23.html#sec23-5">23.5</a>; 联络版 <a href="appB.html#appB-5">附录 B.5</a>。</li>
+</ul>
+
+<h2>S</h2>
+<ul>
+  <li><strong>Schwarzschild 解</strong> — <a href="ch23.html#sec23-7">23.7</a>; 黑洞 / 视界 <a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>三角剖分（triangulation）</strong> — Euler 数计算 <a href="ch17.html">第 17 章</a>; 整体 Gauss-Bonnet <a href="ch17.html">第 17 章</a>; 离散网格 <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>三角网格（triangle mesh）</strong> — <a href="ch24.html#sec24-1">24.1</a>。</li>
+  <li><strong>身长参数化</strong> — 见"弧长参数化"。</li>
+  <li><strong>双曲型（hyperbolic）</strong> — \(K < 0\) <a href="ch1.html#sec1-3">1.3</a>。</li>
+  <li><strong>四元数 / SU(2) 与 SO(3)</strong> — <a href="appB.html#appB-2">附录 B.2</a>。</li>
+  <li><strong>Stokes 定理</strong> — <a href="appA.html#appA-8">附录 A.8</a>; Gauss-Bonnet 证明用 <a href="ch16.html">第 16 章</a>; 各种特例 <a href="appA.html#appA-8">附录 A.8</a>。</li>
+  <li><strong>\(SO(n)\)（特殊正交群）</strong> — <a href="appB.html#appB-2">附录 B.2</a>。</li>
+  <li><strong>\(SU(n)\)（特殊酉群）</strong> — <a href="appB.html#appB-2">附录 B.2</a>。</li>
+  <li><strong>surface fairing（曲面平滑）</strong> — <a href="ch24.html#sec24-5">24.5</a>。</li>
+</ul>
+
+<h2>T</h2>
+<ul>
+  <li><strong>Theorema Egregium（Gauss 1827）</strong> — 陈述 <a href="ch1.html#sec1-5">1.5</a>; 完整证明 <a href="ch11.html">第 11 章</a>; 离散类比 <a href="ch24.html#sec24-3">24.3</a>。</li>
+  <li><strong>体积放大率（雅可比）</strong> — <a href="appA.html#appA-2">附录 A.2</a>; 变量替换 <a href="appA.html#appA-6">附录 A.6</a>。</li>
+  <li><strong>椭圆型（elliptic）</strong> — \(K > 0\) <a href="ch1.html#sec1-3">1.3</a>。</li>
+  <li><strong>同胚（homeomorphism）</strong> — 拓扑等价 <a href="ch20.html">第 20 章</a>; 紧致曲面分类 <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>同伦类</strong> — <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>拓扑数据分析（TDA）</strong> — <a href="ch24.html#sec24-7">24.7</a>; persistent homology <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>挠率（torsion）</strong> — 空间曲线 \(\tau\) <a href="ch4.html">第 4 章</a>; 联络无挠 <a href="appB.html#appB-5">附录 B.5</a>。</li>
+  <li><strong>切平面与切空间</strong> — 见 Q 节。</li>
+</ul>
+
+<h2>W</h2>
+<ul>
+  <li><strong>弯曲（curving / bending）</strong> — 引论 <a href="ch1.html">第 1 章</a>。</li>
+  <li><strong>完备（complete）</strong> — 测地完备 <a href="ch15.html">第 15 章</a>; Hopf-Rinow <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>外微分（exterior derivative）</strong> — <a href="ch12.html">第 12 章</a>; \(d^2 = 0\) <a href="ch12.html">第 12 章</a>; Cartan 方程 <a href="appB.html#appB-6">附录 B.6</a>。</li>
+  <li><strong>微分同胚（diffeomorphism）</strong> — 流形定义 <a href="ch21.html">第 21 章</a>。</li>
+  <li><strong>微分形式</strong> — <a href="ch12.html">第 12 章</a>; Cartan 结构方程 <a href="appB.html#appB-6">附录 B.6</a>; Stokes 推广 <a href="appA.html#appA-8">附录 A.8</a>。</li>
+</ul>
+
+<h2>X</h2>
+<ul>
+  <li><strong>形状算子（shape operator / Weingarten）</strong> — <a href="ch9.html">第 9 章</a>。</li>
+</ul>
+
+<h2>Y</h2>
+<ul>
+  <li><strong>隐函数定理</strong> — <a href="appA.html#appA-5">附录 A.5</a>; 隐式正则曲面 <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>引力波</strong> — 陈述 <a href="ch23.html#sec23-8">23.8</a>; LIGO 2015 <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>引力红移 / 时间膨胀</strong> — <a href="ch23.html#sec23-3">23.3</a>; <a href="ch23.html#sec23-8">23.8</a>; GPS 应用 <a href="ch23.html#sec23-3">23.3</a>。</li>
+</ul>
+
+<h2>Z</h2>
+<ul>
+  <li><strong>张量场（tensor field）</strong> — 黎曼度量是 (0,2)-张量 <a href="ch22.html">第 22 章</a>; 变换律 <a href="ch22.html">第 22 章</a>。</li>
+  <li><strong>正交标架（orthonormal frame）</strong> — Frenet <a href="ch4.html">第 4 章</a>; 主曲率方向 <a href="ch9.html">第 9 章</a>; Cartan 标架 <a href="appB.html#appB-6">附录 B.6</a>。</li>
+  <li><strong>正则曲面（regular surface）</strong> — 三种等价定义 <a href="ch6.html">第 6 章</a>; 雅可比满秩 <a href="appA.html#appA-2">附录 A.2</a>。</li>
+  <li><strong>主曲率（principal curvature）</strong> — \(\kappa_1, \kappa_2\) <a href="ch1.html#sec1-2">1.2</a>; 第二基本形式特征值 <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>主方向（principal direction）</strong> — <a href="ch9.html">第 9 章</a>; 互相垂直定理 <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>指数映射 \(\exp_p\)</strong> — 黎曼版 <a href="ch14.html">第 14 章</a>; Lie 群版 <a href="appB.html#appB-3">附录 B.3</a>。</li>
+  <li><strong>自伴算子（self-adjoint）</strong> — 形状算子是自伴 <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>自由下落 = 测地线</strong> — <a href="ch23.html#sec23-1">23.1</a>; <a href="ch23.html#sec23-4">23.4</a>。</li>
+</ul>
+
+<h2>查找:按"我现在想做什么"</h2>
+
+<ol>
+  <li><strong>算一段曲线的弧长:</strong> \(L = \int_a^b |\gamma'(t)| dt\) <a href="ch2.html">第 2 章</a>。如果 \(\gamma\) 已弧长参数化(\(|\gamma'| \equiv 1\)), 直接 \(L = b - a\)。</li>
+  <li><strong>算一条曲线的曲率:</strong> 平面 \(\kappa = |\gamma' \times \gamma''| / |\gamma'|^3\) <a href="ch3.html">第 3 章</a>; 空间曲线还要扭率 \(\tau\) 用 Frenet-Serret <a href="ch4.html">第 4 章</a>。</li>
+  <li><strong>检查一个集合是不是正则曲面:</strong> 三种等价定义 <a href="ch6.html">第 6 章</a>; 实战常用<em>水平集 \(F^{-1}(c)\) + \(\nabla F \neq 0\)</em>(隐函数定理) <a href="ch6.html">第 6 章</a>。</li>
+  <li><strong>算曲面的第一基本形式:</strong> 给参数 \(\mathbf{X}(u, v)\), \(g_{ij} = \mathbf{X}_i \cdot \mathbf{X}_j\), 写矩阵 \(g\) <a href="ch7.html">第 7 章</a>。</li>
+  <li><strong>算曲面面积:</strong> \(A = \iint \sqrt{\det g} \, du dv = \iint |\mathbf{X}_u \times \mathbf{X}_v| du dv\) <a href="ch7.html">第 7 章</a>。</li>
+  <li><strong>算 Gauss 曲率 \(K\):</strong> 外蕴公式 \(K = \det(II) / \det(I) = (LN - M^2)/(EG - F^2)\) <a href="ch10.html">第 10 章</a>; 内蕴公式(只用 \(g\)) <a href="ch11.html">第 11 章</a>。</li>
+  <li><strong>验证两个曲面是否等距(局部):</strong> 比较 \(K\); 不等则 <em>不可能</em> 等距(Gauss Theorema Egregium) <a href="ch11.html">第 11 章</a>。</li>
+  <li><strong>找一条测地线:</strong> 解测地方程 \(\ddot x^k + \Gamma^k_{ij} \dot x^i \dot x^j = 0\) <a href="ch13.html">第 13 章</a>; 数值上常用 RK4 + 测地坐标 <a href="ch14.html">第 14 章</a>。</li>
+  <li><strong>用 Gauss-Bonnet 算一个三角形 / 区域:</strong> \(\iint_T K dA + \oint_{\partial T} \kappa_g ds + \sum (\pi - \alpha_i) = 2\pi\) <a href="ch16.html">第 16 章</a>; 整体闭曲面 \(\iint K dA = 2\pi \chi\) <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>判断曲面拓扑类型:</strong> 算 \(\chi(M)\)(三角剖分) → 可定向 \(\chi = 2 - 2g\) 给亏格 \(g\) <a href="ch20.html">第 20 章</a>; 不可定向用<em>交叉帽</em> 数。</li>
+  <li><strong>构造极小曲面 / 验证 \(H = 0\):</strong> Catenoid / Helicoid 是经典例 <a href="ch19.html">第 19 章</a>; 一般通过解 \(H = 0\) 偏微分方程。</li>
+  <li><strong>把多元微积分公式翻到曲面上:</strong> 见 <a href="appA.html">附录 A</a> 速查表。</li>
+</ol>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 抽象流形入门：摆脱嵌入 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 可定向曲面分类</a><a href="ch22.html">下一章 · 第 22 章 黎曼度量 →</a></nav>
+<h1 id="ch21">第 21 章 抽象流形入门：摆脱嵌入</h1>
+
+<p>请你回头数一下这本书前 20 章用了多少次"<em>曲面 \(M \subset \mathbb{R}^3\)</em>" 这种说法。<em>很多次</em>。我们一直在说"<em>3 维空间里的曲面</em>": 它有切平面, 有外法向量, 第二基本形式靠法向量定义, 主曲率 \(\kappa_1, \kappa_2\) 也靠法向量来算。前 20 章的整个机制看上去离不开"<em>外面那个 3 维空间</em>"。</p>
+
+<p>但<a href="ch11.html">ch11</a> Gauss <em>Theorema Egregium</em> 在我们脸上甩了一巴掌——\(K = \kappa_1 \kappa_2\) 这个看似<em>外蕴</em> 的量, 居然<em>只</em> 依赖第一基本形式。换句话说, 即使你拿掉外部 3 维空间, 一个生活在曲面上的 2D 生物只靠在曲面上量距离, 就能<em>恢复</em> Gauss 曲率这个看上去要"<em>从外面看</em>" 才能算的东西。</p>
+
+<p>这件事本应让你<em>不安</em>: 如果几何信息本质上是<em>内蕴</em> 的, 为什么我们一直执着于"<em>嵌入 \(\mathbb{R}^3\)</em>"？为什么不<em>直接</em> 研究"<em>带几何结构的拓扑空间</em>", 而<em>不</em> 假设它在某个外部空间里？</p>
+
+<p>这就是 Riemann 1854 年那篇著名就职论文《论几何学之基础》(Über die Hypothesen welche der Geometrie zu Grunde liegen) 提出的革命: <em>抽象流形</em>——不依赖任何外部空间的"<em>带光滑结构的空间</em>"。100 年后 Whitney 给出严格定义（1936）, Cartan 让微分几何在抽象流形上完整成立（1920 年代）, Einstein 让抽象流形成为物理学的核心语言（1915 年广义相对论）。</p>
+
+<p>这一章的目的: 给抽象流形<em>入口</em>。我们走"<em>朴素（必须嵌入）→ 撞墙（高维 / 物理需要不嵌入）→ reframe（局部欧式）→ 命名（光滑流形）→ 几何对象（切空间、切丛、光滑映射）</em>" 的路线, 在 22 章和 23 章把抽象流形上的几何（黎曼度量、广义相对论）继续展开。</p>
+
+<h2 id="sec21-1">21.1 朴素: 曲面 = 嵌入 \(\mathbb{R}^3\) 的物体</h2>
+
+<p>本书前 20 章的<em>正则曲面</em> 定义（<a href="ch6.html">ch6</a>）大致是: \(M \subset \mathbb{R}^3\) 是个子集, 局部上每点有邻域 \(U\) 与某个开集 \(V \subset \mathbb{R}^2\) 之间的光滑双射 \(\mathbf{r}: V \to U\), 且 \(\mathbf{r}\) 的微分处处秩 2。</p>
+
+<p>这个定义有两种"<em>外部依赖</em>":</p>
+
+<ul>
+  <li>\(M\) 是 \(\mathbb{R}^3\) 的子集——必须坐落在外部 3 维空间。</li>
+  <li>"<em>光滑</em>" 借助 \(\mathbb{R}^3\) 的微积分——\(\mathbf{r}\) 是 \(V \to \mathbb{R}^3\) 的光滑映射。</li>
+</ul>
+
+<p>对前 20 章的内容, 这种依赖<em>能用</em>——我们能算 Gauss 曲率, 能讨论极小曲面, 能用 Gauss-Bonnet。所以朴素来说"<em>曲面就是嵌入 \(\mathbb{R}^3\) 的物体</em>" 没什么不对。</p>
+
+<p>但仔细想想 \(\mathbb{R}^3\) 这件事的<em>角色</em>: 它是<em>背景</em>, 提供"<em>距离 / 光滑性 / 切向量</em>" 的<em>原始数据</em>; 但它又<em>不</em> 进入最终的几何结论（Theorema Egregium 说 \(K\) 不依赖嵌入）。这种"<em>背景必要但不进入结论</em>" 的局面有<em>不优雅</em> 的味道——要么背景必要, 要么不必要, 不应该是中间状态。这种不优雅是 Riemann 1854 年想要修补的。</p>
+
+<h2 id="sec21-2">21.2 撞墙: 高维 + 物理</h2>
+
+<p>"<em>嵌入</em>" 视角在三个场景下<em>明显</em> 不够用:</p>
+
+<p><strong>场景 1: 高维流形。</strong>3 维流形 \(M^3\) 嵌入到哪里？\(\mathbb{R}^4\) 不一定够（一些 3-流形需要 \(\mathbb{R}^5\) 或更高）。Whitney 嵌入定理（1936）说<em>任何</em> \(n\)-流形<em>能</em> 嵌入 \(\mathbb{R}^{2n}\), 但这个嵌入<em>不</em> 自然——同一个 3-流形有无穷多种嵌入到 \(\mathbb{R}^6\) 的方式, 每种长得不一样, 都不是<em>本质</em> 的。把 3-流形的几何研究绑定到任何<em>具体</em> 的嵌入上, 既人工, 也不便。</p>
+
+<p><strong>场景 2: 广义相对论。</strong>爱因斯坦 1915 年的广义相对论把<em>时空</em> 描述成 4 维洛伦兹流形——3 个空间维 + 1 个时间维, 配一个度量（不是正定的, 是 \((+, -, -, -)\) 或 \((-, +, +, +)\) 签名）。这个 4-流形<em>没有</em> "<em>嵌入到 \(\mathbb{R}^5\)</em>" 的物理意义——宇宙不"<em>坐落在</em>" 任何更大的空间里。爱因斯坦方程 \(R_{\mu\nu} - \tfrac{1}{2} R g_{\mu\nu} = 8\pi T_{\mu\nu}\) 完全用流形<em>内蕴</em> 的 Ricci 曲率 \(R_{\mu\nu}\)、标量曲率 \(R\)、度量 \(g_{\mu\nu}\), 与能量动量张量 \(T_{\mu\nu}\) 写, <em>从不</em> 提"<em>嵌入空间</em>"。如果你坚持嵌入视角, 整个理论无从开展。</p>
+
+<p><strong>场景 3: 抽象群与同伦。</strong>Lie 群 \(SO(n), SU(n), GL_n(\mathbb{R})\) 是<em>抽象</em> 的——它们是矩阵组成的群, 同时也是流形（因为局部有"<em>开集</em>" 结构）。把 \(GL_n(\mathbb{R})\)（\(n \times n\) 实矩阵, \(n^2\) 维）嵌入到某个 \(\mathbb{R}^N\) 当然能做（直接看作 \(\mathbb{R}^{n^2}\) 的开集), 但这种"<em>嵌入</em>" 没给你新信息——你研究 Lie 群的乘法、它的 Lie 代数、它的拓扑, 全都不需要嵌入。</p>
+
+<p>这三种场景共同指向一件事: <em>"嵌入" 是个偶然的描述方式, 不是几何的本质</em>。我们需要一个不依赖嵌入的"<em>流形</em>" 概念。</p>
+
+<h2 id="sec21-3">21.3 Reframe: 局部欧式 + 光滑结构</h2>
+
+<p>怎么不靠嵌入定义"<em>光滑空间</em>"？关键<em>抽象</em>: 把"<em>嵌入到 \(\mathbb{R}^N\) 的子集</em>" 换成"<em>局部上长得像 \(\mathbb{R}^n\) 的拓扑空间</em>"。</p>
+
+<p>具体的, 一个<em>拓扑流形</em>（topological manifold）是 Hausdorff 拓扑空间 \(M\), 满足:</p>
+
+<ul>
+  <li>每点 \(p \in M\) 有一个开邻域 \(U_p\), 与某个 \(\mathbb{R}^n\) 的开集 \(V\) 同胚——这种同胚 \(\varphi: U_p \to V\) 叫<em>局部坐标卡</em> 或<em>图</em>（chart）。</li>
+  <li>\(M\) 满足某些技术条件（如第二可数性）。</li>
+</ul>
+
+<p>这跟<a href="../拓扑学/ch24.html">拓扑学 ch24</a> 给的拓扑流形定义一致。维数 \(n\) 是流形<em>本身</em> 的属性, 不依赖任何嵌入。</p>
+
+<p>但只是"<em>局部欧式</em>" 不够——我们想做<em>微积分</em> (求导, Taylor 展开)。这要在不同图之间能"<em>翻译</em>"。</p>
+
+<p>具体的, 设 \((U_1, \varphi_1)\) 与 \((U_2, \varphi_2)\) 是两个图, 它们的重叠区域 \(U_1 \cap U_2 \neq \emptyset\) 上, <em>转换映射</em></p>
+
+<p>\[
+\varphi_2 \circ \varphi_1^{-1} : \varphi_1(U_1 \cap U_2) \to \varphi_2(U_1 \cap U_2)
+\]</p>
+
+<p>是 \(\mathbb{R}^n\) 中两个开集之间的同胚。我们要求这个转换映射是 \(C^\infty\)（光滑）的。这是<em>光滑流形</em> 的核心条件——不同图之间的"<em>翻译</em>" 是光滑的, 所以"<em>光滑函数</em>" 在 \(M\) 上有定义且不依赖具体图的选择。</p>
+
+<p>正式定义如下。</p>
+
+<h2 id="sec21-4">21.4 光滑流形的定义</h2>
+
+<p>定义。\(n\) 维<em>光滑流形</em> 是一个拓扑空间 \(M\), 配一个<em>光滑图册</em> \(\mathcal{A} = \{(U_\alpha, \varphi_\alpha)\}_{\alpha \in A}\), 满足:</p>
+
+<ol>
+  <li>\(M\) 是 Hausdorff、第二可数的拓扑空间。</li>
+  <li>\(\{U_\alpha\}\) 是 \(M\) 的开覆盖。</li>
+  <li>每个 \(\varphi_\alpha: U_\alpha \to \varphi_\alpha(U_\alpha) \subset \mathbb{R}^n\) 是同胚（\(\varphi_\alpha(U_\alpha)\) 是 \(\mathbb{R}^n\) 的开集）。</li>
+  <li>对任意 \(\alpha, \beta\), 转换映射 \(\varphi_\beta \circ \varphi_\alpha^{-1}\) 是 \(\mathbb{R}^n\) 开集间的<em>光滑（\(C^\infty\)）双射</em>, 它的逆也光滑。</li>
+  <li>图册<em>极大</em>: 任何与所有现有图相容的新图自动包含在 \(\mathcal{A}\) 中（这是一个技术性细节, 让"<em>光滑结构</em>" 唯一）。</li>
+</ol>
+
+<p>简记: \((M, \mathcal{A})\) 或者干脆 \(M\)（光滑结构默认存在）。</p>
+
+<p>关键点: 这个定义里<em>没有提任何外部空间</em>。\(M\) 自己就是流形, 不需要"<em>坐落在</em>" 任何更大的空间里。\(\mathbb{R}^n\) 出现在定义里, 但只<em>作为参数空间</em>——给图建立坐标的工具, 不是 \(M\) 本身的成员。</p>
+
+<p>同样地, "<em>光滑函数</em>" \(f: M \to \mathbb{R}\) 定义为: 对每个图 \((U_\alpha, \varphi_\alpha)\), 复合 \(f \circ \varphi_\alpha^{-1}: \varphi_\alpha(U_\alpha) \to \mathbb{R}\) 是 \(\mathbb{R}^n\) 开集上的光滑函数。光滑映射 \(F: M \to N\)（两个光滑流形之间）类似定义——用两边的图把 \(F\) "<em>翻译</em>" 到 \(\mathbb{R}^n \to \mathbb{R}^m\) 上, 要求翻译后是 \(C^\infty\)。</p>
+
+<p>这个抽象定义乍看不便（"<em>无穷多个图……图相容性……极大图册……</em>"）, 但它的<em>力量</em> 是: <em>所有微分几何概念都能在抽象流形上重建, 不依赖嵌入</em>。下面 21.5 节我们看最重要的: 切空间。</p>
+
+<p>请你停下来想这个定义的<em>哲学转变</em>。前 20 章我们的曲面是<em>具体的</em>——它在 \(\mathbb{R}^3\) 中有一个具体的"<em>形状</em>", 你能看到它弯成什么样。抽象流形<em>没有</em> 这种"<em>形状</em>"——它只有"<em>局部上像 \(\mathbb{R}^n\)</em>" 这条非常弱的条件。但在不同图之间的转换映射的<em>光滑性</em> 上, 已经足够支撑全部微分几何机制。这是<em>结构</em>（structure）抽象的胜利——你不需要知道一个对象"<em>具体长什么样</em>", 只需要知道它"<em>满足什么关系</em>"。</p>
+
+<h2 id="sec21-5">21.5 切空间: 不靠嵌入定义</h2>
+
+<p>嵌入视角下, 曲面 \(M \subset \mathbb{R}^3\) 在点 \(p\) 的切平面是一个具体的 \(\mathbb{R}^3\) 中的二维子空间——你能<em>画出来</em>。抽象流形没有外部空间, 切空间怎么定义？</p>
+
+<p>有几种等价定义。最广泛使用的是<em>用导子</em>。</p>
+
+<p>定义。\(M\) 在点 \(p\) 的<em>切空间</em> \(T_p M\) 是所有<em>导子</em> 的集合——即满足以下两条的线性映射 \(v: C^\infty(M) \to \mathbb{R}\):</p>
+
+<ul>
+  <li>\(\mathbb{R}\)-线性: \(v(af + bg) = a v(f) + b v(g)\), \(a, b \in \mathbb{R}\), \(f, g \in C^\infty(M)\)。</li>
+  <li>Leibniz 法则: \(v(fg) = v(f) g(p) + f(p) v(g)\)。</li>
+</ul>
+
+<p>"<em>导子</em>" 这名字提示它的几何意义: \(v\) 把光滑函数<em>映到一个数</em>, 满足 Leibniz 求导规则——它"<em>就是在 \(p\) 处沿某个方向求方向导数</em>" 的抽象化。</p>
+
+<p>具体一些. 在 \(\mathbb{R}^n\) 中, 一个切向量 \(\mathbf{v} = (v^1, \ldots, v^n)\) 给出方向导数</p>
+
+<p>\[
+\mathbf{v}(f) = \sum_i v^i \frac{\partial f}{\partial x^i}\bigg|_p.
+\]</p>
+
+<p>这是个导子（线性 + Leibniz）。反过来, 任何 \(\mathbb{R}^n\) 上 \(p\) 处的导子<em>必为</em> 这种形式（一个标准结果）。所以"<em>导子</em>" 与"<em>切向量</em>" 在 \(\mathbb{R}^n\) 上一一对应。</p>
+
+<p>抽象流形上, 同样的定义给出 \(T_p M\)。它是 \(n\) 维实向量空间。在任一图 \((U, \varphi = (x^1, \ldots, x^n))\) 中, \(T_p M\) 的标准基是 \(n\) 个偏导算子</p>
+
+<p>\[
+\frac{\partial}{\partial x^1}\bigg|_p, \quad \frac{\partial}{\partial x^2}\bigg|_p, \quad \ldots, \quad \frac{\partial}{\partial x^n}\bigg|_p,
+\]</p>
+
+<p>每个作用在 \(f \in C^\infty(M)\) 上为 \(\partial(f \circ \varphi^{-1}) / \partial x^i\) 在 \(\varphi(p)\) 处的值。任何切向量 \(v \in T_p M\) 写作</p>
+
+<p>\[
+v = \sum_i v^i \frac{\partial}{\partial x^i}\bigg|_p,
+\]</p>
+
+<p>系数 \(v^i \in \mathbb{R}\) 叫"<em>分量</em>"（在该图下）。换图时分量按链式法则变换:</p>
+
+<p>\[
+\tilde v^j = \sum_i v^i \frac{\partial \tilde x^j}{\partial x^i}.
+\]</p>
+
+<p>这就是"<em>切向量是逆变张量</em>" 一说的来源。物理学家爱这套指标记号。</p>
+
+<p>另一种等价定义（几何向量法）: \(T_p M\) 是 \(M\) 中过 \(p\) 的所有光滑曲线在 \(p\) 处的<em>速度向量</em>, 模掉等价关系（两条曲线<em>有相同 1 阶 Taylor 系数</em> 算同一个向量）。这个定义更几何, 但与导子定义等价。</p>
+
+<p>核心点: \(T_p M\) <em>不</em> 是 \(\mathbb{R}^N\) 的子空间, <em>不</em> 在外部空间里——它是一个<em>抽象</em> 的 \(n\) 维实向量空间, 内蕴地附属于 \(M\) 在点 \(p\)。</p>
+
+<h2 id="sec21-6">21.6 切丛: 把所有切空间装订起来</h2>
+
+<p>每点 \(p\) 一个切空间 \(T_p M\)。把所有这些切空间不相交并起来:</p>
+
+<p>\[
+T M := \bigsqcup_{p \in M} T_p M.
+\]</p>
+
+<p>\(TM\) 称为 \(M\) 的<em>切丛</em>（tangent bundle）。</p>
+
+<p>\(TM\) 自己是一个流形——维数 \(2n\)（\(p \in M\) 贡献 \(n\) 维, \(v \in T_p M\) 贡献 \(n\) 维）。它有自然的投影 \(\pi: TM \to M\), \(\pi(p, v) = p\)。</p>
+
+<p>切丛的几何: 它是<em>向量丛</em> 的典型例子——一个流形上每点装一个向量空间, 这些向量空间"<em>光滑地</em>" 拼起来。其它向量丛例子: 余切丛 \(T^* M\), 张量丛 \(T^{p,q} M\), 法丛（如果 \(M\) 嵌入到某更高维流形里）。</p>
+
+<p>\(TM\) 的一个<em>切向量场</em> 是光滑映射 \(X: M \to TM\) 满足 \(\pi \circ X = \text{id}_M\), 即每点 \(p\) 选一个 \(X(p) \in T_p M\)。在物理里这叫"<em>向量场</em>"——力场、速度场都是。</p>
+
+<p>切丛的拓扑很丰富。比如: \(T S^2\) <em>不</em> 是 trivial 丛——<em>毛球定理</em>（hairy ball theorem）说 \(S^2\) 上没有处处非零连续向量场（"<em>无法把毛球的毛全部梳平</em>"）, 因此 \(TS^2 \neq S^2 \times \mathbb{R}^2\)。但 \(T S^1, T T^2, T S^3\) 都是 trivial 丛（这跟"<em>哪些球面是 \(H\) 空间</em>" 这个深刻拓扑事实有关——只有 \(S^1, S^3, S^7\) 是, 由 Hopf 不变量 1 问题给出, Adams 1960 证）。</p>
+
+<h2 id="sec21-7">21.7 光滑映射 + 微分</h2>
+
+<p>设 \(F: M \to N\) 是两个光滑流形间的光滑映射。\(F\) 在每点 \(p \in M\) 自动诱导一个线性映射 \(dF_p: T_p M \to T_{F(p)} N\), 叫 \(F\) 在 \(p\) 处的<em>微分</em>（differential, push-forward, 或 \(F_*\) 也常见）。</p>
+
+<p>定义: 对 \(v \in T_p M\)（看作导子）, 定义 \(dF_p(v) \in T_{F(p)} N\) 为</p>
+
+<p>\[
+dF_p(v)(g) := v(g \circ F), \quad g \in C^\infty(N).
+\]</p>
+
+<p>右侧是先把 \(g\) 拉回到 \(M\) 上, 再用 \(v\) 求导。直接验证 \(dF_p(v)\) 是导子。线性映射 \(dF_p\) 在图上的矩阵就是 \(F\)（在两边图坐标下）的 Jacobian。</p>
+
+<p>这是<a href="../多元微积分/index.html">多元微积分</a> 中"<em>多元函数的导数 = Jacobian 矩阵</em>" 的抽象推广——抽象流形上, 光滑映射的"<em>导数</em>" 是切空间间的线性映射。</p>
+
+<p>关键性质 (chain rule): \(d(G \circ F)_p = dG_{F(p)} \circ dF_p\)。即<em>映射的复合的微分等于微分的复合</em>。这一条让"<em>切空间 \(T_p\) 是函子</em>" 在范畴论框架下成立——抽象流形构成范畴, 切空间 \(T\) 是个函子（功能, functor）。</p>
+
+<p><em>嵌入</em>（immersion）是 \(F\) 满足 \(dF_p\) 处处单射的光滑映射。<em>淹没</em>（submersion）是 \(dF_p\) 处处满射的光滑映射。<em>正则点</em>、<em>临界点</em>、<em>正则值</em> 等 Sard 定理的语言全部在抽象流形上成立。</p>
+
+<h2 id="sec21-8">21.8 例子动物园: 各种抽象流形</h2>
+
+<p>来看抽象流形的具体例子, 让你感受这套机制的多样性。</p>
+
+<p><strong>例 1: \(\mathbb{R}^n\), 开集。</strong>\(\mathbb{R}^n\) 是 \(n\) 维光滑流形（一个图覆盖整个）。它的开子集也是 \(n\) 维光滑流形（同样一个图够）。最简单。</p>
+
+<p><strong>例 2: \(S^n\)（球面）。</strong>用<em>立体投影</em>（stereographic projection）给两个图。北极投影: \(\varphi_N: S^n \setminus \{\text{北极}\} \to \mathbb{R}^n\), 把 \((x_1, \ldots, x_{n+1}) \in S^n\)（\(x_{n+1} \neq 1\)）投到 \(\mathbb{R}^n\) 中, 公式 \(y_i = x_i / (1 - x_{n+1})\)。南极投影类似。两图覆盖 \(S^n\), 转换映射在重叠区域上是 \(\mathbb{R}^n \setminus \{0\}\) 上的反演 \(y \mapsto y / |y|^2\)（光滑）。所以 \(S^n\) 是 \(n\) 维光滑流形。</p>
+
+<p><strong>例 3: \(T^n = S^1 \times \cdots \times S^1\)（\(n\) 维环面）。</strong>等价于 \(\mathbb{R}^n / \mathbb{Z}^n\)（\(n\) 维欧式空间模整数格）。是 \(n\) 维光滑流形。可定向, 紧致。</p>
+
+<p><strong>例 4: \(\mathbb{R}P^n\)（实射影空间）。</strong>\(\mathbb{R}^{n+1} \setminus \{0\}\) 中两点 \(x, y\) 等同 ⟺ 存在 \(\lambda \neq 0\) 使 \(y = \lambda x\)。商空间是 \(n\) 维光滑流形。\(n\) 偶数时<em>不可定向</em>（如 \(\mathbb{R}P^2\)）, \(n\) 奇数时可定向。<em>这是不能嵌入低维欧式空间的典型例子</em>——\(\mathbb{R}P^2\) 不能嵌入 \(\mathbb{R}^3\), 必须 \(\mathbb{R}^4\) 才能嵌入。但作为<em>抽象</em> 流形, 它完全合法、无歧义、有所有微分几何机制。</p>
+
+<p><strong>例 5: \(\mathbb{C}P^n\)（复射影空间）。</strong>类似 \(\mathbb{R}P^n\) 但用 \(\mathbb{C}\) 代 \(\mathbb{R}\)。是 \(2n\) 维实流形（也可以看作 \(n\) 维复流形）。\(\mathbb{C}P^1 \cong S^2\)（"<em>Riemann 球</em>", 复分析里很常见）。</p>
+
+<p><strong>例 6: Lie 群。</strong>\(GL_n(\mathbb{R})\)（\(n \times n\) 可逆实矩阵）是 \(n^2\) 维光滑流形（\(\mathbb{R}^{n^2}\) 中由 \(\det \neq 0\) 决定的开集）, 同时它有群结构（矩阵乘法）, 群运算光滑——所以它是 <em>Lie 群</em>。其它例子: \(SL_n(\mathbb{R})\)（行列式 1, 维数 \(n^2 - 1\)）, \(O(n)\)（正交矩阵, 维数 \(n(n-1)/2\)）, \(SO(n)\)（行列式 1 正交, 同维数, 是 \(O(n)\) 的连通分量）, \(U(n)\)（酉矩阵, 实维数 \(n^2\)）。</p>
+
+<p>Lie 群是 21 世纪几何 / 物理最核心的对象之一——粒子物理标准模型的对称群是 \(SU(3) \times SU(2) \times U(1)\); 广义相对论的局部对称群是 \(SO(3,1)\)（Lorentz 群）; 弦理论里出现 \(E_8\) 等例外 Lie 群。Lie 群理论本身是一门大课, 我们这里只点出它的存在, 让你知道抽象流形的一大应用领域是 Lie 群。</p>
+
+<p><strong>例 7: 时空 4-流形。</strong>广义相对论里, 一个<em>时空</em> 是 4 维光滑流形 \(M^4\) + 一个洛伦兹度量 \(g\)（签名 \((-, +, +, +)\)）。这种<em>时空</em> 完全用抽象流形语言描述, 不假设嵌入到任何更大空间。具体的时空例子: Schwarzschild 时空（黑洞外的引力场）、Kerr 时空（旋转黑洞）、FLRW 时空（宇宙学的标准模型）、de Sitter 时空（带正宇宙学常数）、anti-de Sitter 时空（弦理论里出现）。</p>
+
+<p>这些例子合起来揭示一件事: <em>抽象流形是现代几何与物理的统一语言</em>。从最纯的数学（黎曼曲面、代数几何）到应用物理（广义相对论、规范场论、弦理论）, 都坐落在抽象流形的框架内。Riemann 1854 年那篇 30 页的就职演讲, 给出的不是一个新对象, 而是一种新<em>视角</em>; 这种视角让数学物理在 20 世纪有了爆炸式的发展。</p>
+
+<p>下一章我们给抽象流形加上<em>距离</em>——黎曼度量。前 20 章曲面的"<em>第一基本形式</em>" 内蕴版本就是黎曼度量, 它让抽象流形能<em>做几何</em>: 测距离、测角度、测面积、定义曲率。这是<em>黎曼几何</em> 的入口, 也是连通向广义相对论与现代几何分析的桥梁。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 可定向曲面分类</a><a href="ch22.html">下一章 · 第 22 章 黎曼度量 →</a></nav>
+</main>
+</body>
+</html>

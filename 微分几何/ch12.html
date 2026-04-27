@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 微分形式入门 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 Theorema Egregium</a><a href="ch13.html">下一章 · 第 13 章 测地线 →</a></nav>
+<h1 id="ch12">第 12 章 微分形式入门</h1>
+
+<p>到目前为止本书都用<em>张量 / 矩阵</em> 语言: 第一基本形式是个 \(2 \times 2\) 矩阵, 第二基本形式是个 \(2 \times 2\) 矩阵, Christoffel 符号是个 \(2 \times 2 \times 2\) 张量。这些工具有效但<em>笨重</em>——每写一个公式都背一堆指标, 换坐标系就要重算。</p>
+
+<p>这一章引入<em>另一种</em> 语言——<em>微分形式</em>。它的优势:</p>
+
+<ul>
+  <li><em>积分友好</em>。\(dx \wedge dy\) 自带"<em>面积元素</em>" 解释, \(dx \wedge dy \wedge dz\) 自带"<em>体积元素</em>"; \(\int_M \omega\) 一目了然。</li>
+  <li><em>坐标无关</em>。微分形式的运算（楔积、外微分、拉回）<em>不</em> 需要选定坐标系——换坐标系自动正确。</li>
+  <li><em>Stokes 一行字</em>。古典的 Green / Stokes / Gauss 散度三大定理在微分形式语言中合并为<em>一行</em>: \(\int_{\partial M} \omega = \int_M d\omega\)。</li>
+</ul>
+
+<p>这章<em>不</em> 深入流形上微分形式（那是 <a href="ch21.html">ch21</a> + 黎曼几何课的事）, 只在 \(\mathbb{R}^n\)（与正则曲面）上给关键工具, 让 <a href="ch16.html">ch16-18</a> Gauss-Bonnet 章节能用。读完后你会有这套语言的基本读写能力, 看到 \(d\omega\) 不再陌生。</p>
+
+<h2 id="sec12-1">12.1 \(\mathbb{R}^n\) 上 \(k\)-形式: 多线性反对称</h2>
+
+<p>从动机开始。考虑 \(\mathbb{R}^2\) 中的两个向量 \(\boldsymbol{u}, \boldsymbol{v}\)。它们张出一个<em>平行四边形</em>, 面积为 \(\det(\boldsymbol{u}, \boldsymbol{v}) = u_1 v_2 - u_2 v_1\)。</p>
+
+<p>把这件事抽象为一个函数 \(\omega: \mathbb{R}^2 \times \mathbb{R}^2 \to \mathbb{R}\), \(\omega(\boldsymbol{u}, \boldsymbol{v}) = \det(\boldsymbol{u}, \boldsymbol{v})\)。这个 \(\omega\) 有两个性质:</p>
+
+<ul>
+  <li><em>多线性</em>: 对每个变量分别线性。\(\omega(c \boldsymbol{u}, \boldsymbol{v}) = c \omega(\boldsymbol{u}, \boldsymbol{v})\); \(\omega(\boldsymbol{u}_1 + \boldsymbol{u}_2, \boldsymbol{v}) = \omega(\boldsymbol{u}_1, \boldsymbol{v}) + \omega(\boldsymbol{u}_2, \boldsymbol{v})\)。</li>
+  <li><em>反对称</em>: \(\omega(\boldsymbol{u}, \boldsymbol{v}) = -\omega(\boldsymbol{v}, \boldsymbol{u})\)。</li>
+</ul>
+
+<p>这两个性质的"<em>反对称</em>" 反映带符号面积的本质——交换两条边定向反, 面积反号。</p>
+
+<p>把它推广: 在 \(\mathbb{R}^n\) 中, <strong>k-形式</strong> 是一个函数 \(\omega: \underbrace{\mathbb{R}^n \times \cdots \times \mathbb{R}^n}_{k \text{ 个}} \to \mathbb{R}\), 满足</p>
+
+<ul>
+  <li>对每个变量<em>线性</em>。</li>
+  <li>对任两个变量交换<em>反对称</em>: \(\omega(\ldots, \boldsymbol{v}_i, \ldots, \boldsymbol{v}_j, \ldots) = -\omega(\ldots, \boldsymbol{v}_j, \ldots, \boldsymbol{v}_i, \ldots)\)。</li>
+</ul>
+
+<p>反对称的一个直接后果: 如果两个变量相同, 整个表达式 = 0（自身 = -自身 ⟹ = 0）。所以对 \(k > n\) 的 \(k\)-形式必然恒为 0（你不可能在 \(n\) 维取出 \(k\) 个线性无关向量）。</p>
+
+<p>例子（在 \(\mathbb{R}^3\)）:</p>
+
+<ul>
+  <li>\(0\)-形式 = 函数 \(f: \mathbb{R}^3 \to \mathbb{R}\)（约定 \(0\)-形式 = 标量）。</li>
+  <li>\(1\)-形式: 在每点 \(p\) 给一个线性函数 \(\omega_p: \mathbb{R}^3 \to \mathbb{R}\)。例: \(dx, dy, dz\), 其中 \(dx_p(\boldsymbol{v}) = v_1\)（取 \(\boldsymbol{v}\) 的第一坐标）。一般 \(1\)-形式: \(\omega = P\, dx + Q\, dy + R\, dz\), \(P, Q, R\) 是函数。</li>
+  <li>\(2\)-形式: 双线性反对称。例: \(dx \wedge dy\)（带符号面积）。一般 \(2\)-形式: \(\omega = P\, dy \wedge dz + Q\, dz \wedge dx + R\, dx \wedge dy\)。</li>
+  <li>\(3\)-形式: 三线性反对称。\(\mathbb{R}^3\) 中只有<em>一个</em> 基础: \(dx \wedge dy \wedge dz\)（带符号体积）。一般 \(3\)-形式: \(\omega = f\, dx \wedge dy \wedge dz\)。</li>
+  <li>\(k\)-形式（\(k \geq 4\)）在 \(\mathbb{R}^3\) 上恒为 0。</li>
+</ul>
+
+<p>"在每点 \(p\) 给一个" 的语气是说: 一个微分形式不是一个数, 而是一个<em>场</em>——每点 \(p\) 给一个反对称多线性函数, 这些函数光滑变化。</p>
+
+<h2 id="sec12-2">12.2 楔积 \(\wedge\) + 反对称性</h2>
+
+<p>把<em>低阶</em> 形式拼成<em>高阶</em> 形式的运算叫<strong>楔积</strong>。\(\alpha \wedge \beta\): 一个 \(k\)-形式 + 一个 \(l\)-形式 = 一个 \((k+l)\)-形式。</p>
+
+<p>定义抽象:</p>
+
+<p>\[
+(\alpha \wedge \beta)(\boldsymbol{v}_1, \ldots, \boldsymbol{v}_{k+l}) = \frac{1}{k! \, l!} \sum_{\sigma} \operatorname{sgn}(\sigma) \alpha(\boldsymbol{v}_{\sigma(1)}, \ldots, \boldsymbol{v}_{\sigma(k)}) \beta(\boldsymbol{v}_{\sigma(k+1)}, \ldots, \boldsymbol{v}_{\sigma(k+l)}),
+\]</p>
+
+<p>其中 \(\sigma\) 跑遍所有置换。具体计算很少需要这条公式; 实际上记住几条<em>代数性质</em> 就够。</p>
+
+<p><strong>性质</strong>:</p>
+
+<ol>
+  <li><em>双线性</em>: \((c_1 \alpha_1 + c_2 \alpha_2) \wedge \beta = c_1 (\alpha_1 \wedge \beta) + c_2 (\alpha_2 \wedge \beta)\)。同样对 \(\beta\)。</li>
+  <li><em>结合律</em>: \((\alpha \wedge \beta) \wedge \gamma = \alpha \wedge (\beta \wedge \gamma)\)。所以 \(\alpha \wedge \beta \wedge \gamma\) 不需要括号。</li>
+  <li><em>反交换</em>: \(\alpha \wedge \beta = (-1)^{kl} \beta \wedge \alpha\), \(k, l\) 是阶数。</li>
+</ol>
+
+<p>第三条很关键。两个 \(1\)-形式之间 \(k = l = 1, (-1)^{kl} = -1\): \(\alpha \wedge \beta = -\beta \wedge \alpha\)。所以 \(dx \wedge dy = -dy \wedge dx\), \(dx \wedge dx = 0\)。一般地, <em>同一个</em> \(1\)-形式自身楔积 = 0。</p>
+
+<p>但 \(2\)-形式与 \(1\)-形式: \(k = 2, l = 1, (-1)^{kl} = -1\): \(\alpha \wedge \beta = -\beta \wedge \alpha\)。注意!</p>
+
+<p>而 \(2\)-形式与 \(2\)-形式: \(k = l = 2, (-1)^{kl} = 1\): <em>交换</em>。所以反交换性<em>看奇偶</em>。</p>
+
+<p><strong>实际计算示例（\(\mathbb{R}^3\)）。</strong>设 \(\alpha = x\, dy + y\, dz, \beta = z\, dx\)。算 \(\alpha \wedge \beta\):</p>
+
+<p>\[
+\alpha \wedge \beta = (x\, dy + y\, dz) \wedge z\, dx = xz\, dy \wedge dx + yz\, dz \wedge dx.
+\]</p>
+
+<p>用 \(dy \wedge dx = -dx \wedge dy\), \(dz \wedge dx = -dx \wedge dz\):</p>
+
+<p>\[
+\alpha \wedge \beta = -xz\, dx \wedge dy - yz\, dx \wedge dz.
+\]</p>
+
+<p>整理为标准基（\(dx \wedge dy, dy \wedge dz, dz \wedge dx\)）:</p>
+
+<p>\[
+\alpha \wedge \beta = yz\, dz \wedge dx - xz\, dx \wedge dy.
+\]</p>
+
+<p>(用 \(dx \wedge dz = -dz \wedge dx\)。)</p>
+
+<p>这种<em>形式上的代数运算</em> 看起来抽象, 但你做几个例子就熟。关键是<em>自动反对称</em>——你<em>不能</em> 让 \(dx \wedge dx\) 出现, 它必为 0。</p>
+
+<h2 id="sec12-3">12.3 外微分 \(d\) + 性质 \(d^2 = 0\)</h2>
+
+<p>外微分 \(d\) 把 \(k\)-形式映到 \((k+1)\)-形式: \(d: \Omega^k \to \Omega^{k+1}\)。它是微分形式语言中<em>导数</em> 的统一推广——把梯度、旋度、散度都包进去。</p>
+
+<p>定义在<em>函数</em>（\(0\)-形式）上是熟悉的全微分:</p>
+
+<p>\[
+df = \frac{\partial f}{\partial x} dx + \frac{\partial f}{\partial y} dy + \frac{\partial f}{\partial z} dz.
+\]</p>
+
+<p>在<em>一般 \(k\)-形式</em> 上:</p>
+
+<p>\[
+d(P\, dx_{i_1} \wedge \cdots \wedge dx_{i_k}) = dP \wedge dx_{i_1} \wedge \cdots \wedge dx_{i_k}.
+\]</p>
+
+<p>就是把"系数函数 \(P\)" 取全微分, 然后楔在前面。</p>
+
+<p><strong>例（\(\mathbb{R}^2\)）。</strong>设 \(\omega = P\, dx + Q\, dy\)（\(1\)-形式）。算 \(d\omega\):</p>
+
+<p>\[
+d\omega = dP \wedge dx + dQ \wedge dy = (P_x\, dx + P_y\, dy) \wedge dx + (Q_x\, dx + Q_y\, dy) \wedge dy.
+\]</p>
+
+<p>展开 \(dx \wedge dx = 0, dy \wedge dy = 0, dy \wedge dx = -dx \wedge dy\):</p>
+
+<p>\[
+d\omega = P_y\, dy \wedge dx + Q_x\, dx \wedge dy = (Q_x - P_y) dx \wedge dy.
+\]</p>
+
+<p>请你停一秒。\((Q_x - P_y)\) 这个表达式眼熟——它正是平面向量场 \((P, Q)\) 的<em>旋度</em>（\(\mathbb{R}^2\) 版本）。所以 <em>1-形式 \(\omega\) 的外微分 = 对应向量场的旋度 × 面积元素</em>。</p>
+
+<p><strong>例（\(\mathbb{R}^3\)）。</strong>设 \(\omega = P\, dx + Q\, dy + R\, dz\)。\(d\omega\) 类似展开, 得到</p>
+
+<p>\[
+d\omega = (R_y - Q_z) dy \wedge dz + (P_z - R_x) dz \wedge dx + (Q_x - P_y) dx \wedge dy.
+\]</p>
+
+<p>这正好是<em>三维旋度</em> \(\nabla \times (P, Q, R)\) 的三个分量, 配上 \(dy \wedge dz, dz \wedge dx, dx \wedge dy\)（对应 \(\boldsymbol{i}, \boldsymbol{j}, \boldsymbol{k}\) 的二维"<em>对偶</em>"）。所以 <em>1-形式的 \(d\) = 旋度</em>, 在 \(\mathbb{R}^3\) 中。</p>
+
+<p>类似, <em>0-形式 \(f\) 的 \(d\) = 梯度</em>; <em>2-形式 \(\omega = P\, dy \wedge dz + Q\, dz \wedge dx + R\, dx \wedge dy\) 的 \(d\) = 散度 × 体积元素</em>:</p>
+
+<p>\[
+d\omega = (P_x + Q_y + R_z) dx \wedge dy \wedge dz.
+\]</p>
+
+<p>所以微分形式 + 外微分 \(d\) <em>把梯度 / 旋度 / 散度统一为同一运算</em> \(d\)。这是它的<em>第一</em> 优势。</p>
+
+<p><strong>关键性质 \(d^2 = 0\)。</strong>对任何形式 \(\omega\), \(d(d\omega) = 0\)。</p>
+
+<p>证明用偏导可交换性。例: \(d^2 f = d\left(\sum_i f_{x_i} dx_i\right) = \sum_{i, j} f_{x_i x_j} dx_j \wedge dx_i\)。因为 \(f_{x_i x_j} = f_{x_j x_i}\), 而 \(dx_j \wedge dx_i = -dx_i \wedge dx_j\), 求和时<em>对 \((i, j)\) 与 \((j, i)\) 配对相消</em>, 得 0。一般 \(k\) 类似。</p>
+
+<p>翻译成古典语言: \(\nabla \times (\nabla f) = 0\)（梯度无旋）, \(\nabla \cdot (\nabla \times \boldsymbol{F}) = 0\)（旋度无散）。这两条恒等式在 <a href="../多元微积分/index.html">多元微积分</a> 是<em>独立</em> 证明的; 在微分形式语言中它们都是同一句话 \(d^2 = 0\) 的具体化身。</p>
+
+<p>\(d^2 = 0\) 是<em>德拉姆上同调</em>（de Rham cohomology）的起点——研究"<em>闭形式 \(/\) 恰当形式</em>" 的商空间, 得到的是流形的<em>拓扑不变量</em>。这件事在代数拓扑、几何分析、规范场论里都重要; 在本书 <a href="ch16.html">ch16-18</a> Gauss-Bonnet 也会用到（虽然不显式拉出 de Rham）。</p>
+
+<h2 id="sec12-4">12.4 例: \(\mathbb{R}^2\) 上各阶形式</h2>
+
+<p>把 \(\mathbb{R}^2\) 上的微分形式做一个完整清单:</p>
+
+<table>
+<thead><tr><th>阶</th><th>形式</th><th>例</th><th>外微分</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>函数</td><td>\(f(x, y)\)</td><td>\(df = f_x dx + f_y dy\)</td></tr>
+<tr><td>1</td><td>\(P dx + Q dy\)</td><td>\(x\, dx + y\, dy\)</td><td>\((Q_x - P_y) dx \wedge dy\)</td></tr>
+<tr><td>2</td><td>\(R\, dx \wedge dy\)</td><td>面积元素</td><td>0（已是最高阶）</td></tr>
+<tr><td>\(\geq 3\)</td><td>恒为 0</td><td>—</td><td>—</td></tr>
+</tbody>
+</table>
+
+<p>所以 \(\mathbb{R}^2\) 上微分形式的世界很简单——三类。重要的是<em>它们之间的运算</em>:</p>
+
+<ul>
+  <li>\(0\)-形式 + \(1\)-形式 楔积: 普通乘法 \(f \cdot (P dx + Q dy) = fP\, dx + fQ\, dy\), 仍是 \(1\)-形式。</li>
+  <li>\(1\)-形式 + \(1\)-形式 楔积: 给 \(2\)-形式。\((P dx + Q dy) \wedge (R dx + S dy) = (PS - QR) dx \wedge dy\)（行列式!）。</li>
+  <li>\(1\)-形式 + \(2\)-形式 楔积: 给 \(3\)-形式 = 0（在 \(\mathbb{R}^2\) 上）。</li>
+</ul>
+
+<p>第二条注意——两个 \(1\)-形式楔积自动给出<em>行列式</em>。这件事让"<em>面积 = 行列式</em>" 这条线性代数事实在微分形式里<em>自动出现</em>。</p>
+
+<h2 id="sec12-5">12.5 拉回 \(f^*\)</h2>
+
+<p>设 \(\varphi: M \to N\) 是光滑映射, \(\omega\) 是 \(N\) 上的 \(k\)-形式。<strong>拉回</strong> \(\varphi^* \omega\) 是 \(M\) 上的 \(k\)-形式, 定义为</p>
+
+<p>\[
+(\varphi^* \omega)_p (\boldsymbol{v}_1, \ldots, \boldsymbol{v}_k) := \omega_{\varphi(p)} (d\varphi_p(\boldsymbol{v}_1), \ldots, d\varphi_p(\boldsymbol{v}_k)).
+\]</p>
+
+<p>简单理解: 把 \(M\) 上点 \(p\) 处的向量 \(\boldsymbol{v}_i\), 用 \(d\varphi_p\) 推到 \(N\) 上 \(\varphi(p)\) 处的向量, 然后用 \(\omega\) 在 \(N\) 上算。</p>
+
+<p>具体计算上: 拉回<em>就是把变量代入</em>。设 \(\varphi: \mathbb{R}^2 \to \mathbb{R}^2\), \(\varphi(u, v) = (u + v, uv)\)。设 \(\omega = x\, dy\) 在目标 \(\mathbb{R}^2\) 上。则</p>
+
+<p>\[
+\varphi^* \omega = (u + v) \cdot d(uv) = (u + v)(v\, du + u\, dv) = (u + v) v\, du + (u + v) u\, dv.
+\]</p>
+
+<p>所以拉回 \(\varphi^* \omega = (uv + v^2) du + (u^2 + uv) dv\)。</p>
+
+<p>关键: <em>"代入 \(x = u + v, y = uv\), 然后把 \(dy\) 取微分得 \(d(uv) = v\, du + u\, dv\)"</em>。这就是机械操作。</p>
+
+<p><strong>性质</strong>:</p>
+
+<ul>
+  <li>线性: \(\varphi^*(\alpha + \beta) = \varphi^* \alpha + \varphi^* \beta\)。</li>
+  <li>保楔积: \(\varphi^*(\alpha \wedge \beta) = \varphi^* \alpha \wedge \varphi^* \beta\)。</li>
+  <li>与 \(d\) 交换: \(\varphi^*(d\omega) = d(\varphi^* \omega)\)。</li>
+</ul>
+
+<p>第三条是<em>关键</em>: 拉回与外微分<em>交换</em>。所以你可以先 \(d\) 后拉回, 也可以先拉回后 \(d\), 答案一样。这件事是为什么微分形式语言"<em>自然</em>"——所有运算之间都和谐。</p>
+
+<p>拉回让"<em>积分换变量</em>" 自动正确——参数化曲面上算积分本质就是拉回。下一节展开。</p>
+
+<h2 id="sec12-6">12.6 积分 \(\int_M \omega\) 与定向</h2>
+
+<p>设 \(M\) 是 \(k\) 维定向流形（如曲面 \(M = S\), \(k = 2\)）, \(\omega\) 是 \(M\) 上 \(k\)-形式。则 <strong>\(\omega\) 在 \(M\) 上的积分</strong> \(\int_M \omega\) 定义为:</p>
+
+<p>用参数化 \(\boldsymbol{x}: U \subset \mathbb{R}^k \to M\)（保定向）, 拉回 \(\boldsymbol{x}^* \omega\) 是 \(U\) 上的 \(k\)-形式 \(f(u_1, \ldots, u_k) du_1 \wedge \cdots \wedge du_k\)。然后</p>
+
+<p>\[
+\int_M \omega := \int_U f(u_1, \ldots, u_k) du_1 \cdots du_k,
+\]</p>
+
+<p>右边是普通的 Lebesgue 积分。</p>
+
+<p>关键事实: 这个积分<em>不依赖参数化选择</em>（前提保定向）。两个保定向参数化得同一个 \(\int_M \omega\)——这件事是拉回与变量替换公式的协调。</p>
+
+<p>"定向" 的含义: \(M\) 上选一种"<em>哪边是上</em>" 的约定（比如曲面上选一种法向量方向）。换定向积分变号。所以 \(\int_M \omega\) <em>带符号</em>——是有向积分。</p>
+
+<p><strong>例（\(\mathbb{R}^2\) 上 1-形式积分）。</strong>\(\omega = -y\, dx + x\, dy\) 在单位圆 \(C: \boldsymbol{x}(t) = (\cos t, \sin t), t \in [0, 2\pi]\) 上。拉回:</p>
+
+<p>\[
+\boldsymbol{x}^* \omega = -\sin t \cdot d(\cos t) + \cos t \cdot d(\sin t) = -\sin t \cdot (-\sin t) dt + \cos t \cdot \cos t\, dt = (\sin^2 t + \cos^2 t) dt = dt.
+\]</p>
+
+<p>所以 \(\oint_C \omega = \int_0^{2\pi} 1\, dt = 2\pi\)。</p>
+
+<p>对照——这就是闭曲线的 \(\oint -y\, dx + x\, dy\) 给出"<em>2 倍曲线包围的面积</em>"。微分形式语言下计算"<em>同样是计算</em>", 但更对称、坐标无关。</p>
+
+<h2 id="sec12-7">12.7 Stokes 定理（一般版）</h2>
+
+<p>这是这一章的<em>顶峰</em>。设 \(M\) 是 \(k\) 维定向有边流形, \(\partial M\) 是它的边界（\(k-1\) 维, 配诱导定向）, \(\omega\) 是 \(M\) 上 \((k-1)\)-形式。则</p>
+
+<p>\[
+\boxed{\ \int_{\partial M} \omega = \int_M d\omega.\ }
+\]</p>
+
+<p><em>一行字</em>。这就是<strong>Stokes 定理（一般版）</strong>。</p>
+
+<p>请你停下来再看一次这条公式。左边是<em>边界上</em> \((k-1)\) 维积分; 右边是<em>内部</em> \(k\) 维积分。两者通过<em>外微分 \(d\)</em> 联系。\(d\) 把"<em>从内部到边界</em>" 这件事编码进微分形式。</p>
+
+<p>"<em>本质</em>" 直觉: \(d\omega\) 在 \(p\) 处量\(\omega\) "<em>绕 \(p\) 处一个小回路</em>" 的环量密度。把所有小回路环量加起来, <em>内部相邻回路相邻边相消</em>, <em>剩下整个边界的环量</em>。这就是 Stokes 定理的物理直觉, 1850 年代 Kelvin 与 Stokes 在电磁学背景下发现。</p>
+
+<h2 id="sec12-8">12.8 经典 Stokes / Gauss / Green 都是它的特例</h2>
+
+<p>古典向量分析三大定理在微分形式语言下统统是 \(\int_{\partial M} \omega = \int_M d\omega\) 的不同维数实例:</p>
+
+<h3 id="sec12-8-1">12.8.1 \(k = 1\): 微积分基本定理</h3>
+
+<p>\(M = [a, b] \subset \mathbb{R}\)（一维流形）, \(\omega = f\)（\(0\)-形式 = 函数）, \(\partial M = \{a, b\}\)（取 \(b\) 为 \(+\), \(a\) 为 \(-\)）。则</p>
+
+<p>\[
+\int_{\partial M} f = f(b) - f(a), \qquad \int_M df = \int_a^b f'(x) dx.
+\]</p>
+
+<p>Stokes 给 \(f(b) - f(a) = \int_a^b f'(x) dx\)——<em>微积分基本定理</em>!</p>
+
+<h3 id="sec12-8-2">12.8.2 \(k = 2\): Green 定理（平面）</h3>
+
+<p>\(M \subset \mathbb{R}^2\) 是平面有界区域, \(\partial M\) 是边界曲线（按逆时针定向）, \(\omega = P\, dx + Q\, dy\)（\(1\)-形式）。则 \(d\omega = (Q_x - P_y) dx \wedge dy\), Stokes 给</p>
+
+<p>\[
+\oint_{\partial M} (P\, dx + Q\, dy) = \iint_M (Q_x - P_y) dx\, dy.
+\]</p>
+
+<p>这就是<em>Green 定理</em>（<a href="../多元微积分/ch26.html">多元微积分 ch26</a>）。</p>
+
+<h3 id="sec12-8-3">12.8.3 \(k = 2\): 经典 Stokes（曲面）</h3>
+
+<p>\(M = S \subset \mathbb{R}^3\) 是定向曲面, \(\partial S\) 是边界曲线, \(\omega = P\, dx + Q\, dy + R\, dz\)（\(1\)-形式）。则 \(d\omega\) 是 \(2\)-形式编码旋度, Stokes 给</p>
+
+<p>\[
+\oint_{\partial S} \boldsymbol{F} \cdot d\boldsymbol{r} = \iint_S (\nabla \times \boldsymbol{F}) \cdot d\boldsymbol{S},
+\]</p>
+
+<p>其中 \(\boldsymbol{F} = (P, Q, R)\)。这就是<em>经典 Stokes 定理</em>。</p>
+
+<h3 id="sec12-8-4">12.8.4 \(k = 3\): Gauss 散度定理</h3>
+
+<p>\(M = V \subset \mathbb{R}^3\) 是空间区域, \(\partial V\) 是边界曲面, \(\omega = P\, dy \wedge dz + Q\, dz \wedge dx + R\, dx \wedge dy\)（\(2\)-形式）。则 \(d\omega = (P_x + Q_y + R_z) dx \wedge dy \wedge dz\), Stokes 给</p>
+
+<p>\[
+\oiint_{\partial V} \boldsymbol{F} \cdot d\boldsymbol{S} = \iiint_V (\nabla \cdot \boldsymbol{F}) dV.
+\]</p>
+
+<p>这就是<em>Gauss 散度定理</em>。</p>
+
+<p>请你看四个公式被一行 \(\int_{\partial M} \omega = \int_M d\omega\) 全统一了。<em>四种定理 = 四种维数的 Stokes</em>。这种统一是微分形式语言的<em>第二</em> 优势——少记多用, 一条定理覆盖多元微积分整章内容。</p>
+
+<p>更深一层, Stokes 定理推广到任何 \(n\) 维定向有边流形, 与流形是否嵌入 \(\mathbb{R}^N\) 无关——这是<em>抽象流形微分形式</em> 的故事, <a href="ch21.html">ch21</a> 起头。</p>
+
+<h2 id="sec12-9">12.9 微分形式在曲面上: 联络形式、曲率形式</h2>
+
+<p>本章后半部分预告: 微分形式在曲面上能<em>把 Christoffel 符号、Riemann 曲率张量重新打包</em>, 得到更<em>对称</em> 的对象——<em>联络形式</em>与<em>曲率形式</em>。这些工具是<a href="ch16.html">ch16</a> Gauss-Bonnet 局部版的关键。</p>
+
+<p><strong>联络形式</strong> \(\omega^i_j\): 在曲面 \(S\) 上选定标架场 \(\{\boldsymbol{e}_1, \boldsymbol{e}_2\}\)（每点切平面的一个正交基）, 联络形式 \(\omega^i_j\) 是 \(S\) 上的 \(1\)-形式, 满足 \(d\boldsymbol{e}_i = \sum_j \omega^j_i \boldsymbol{e}_j\)（标架沿曲面"<em>怎么转</em>" 的描述）。在 2D 情形, 因为正交标架转动只有"<em>角速度</em>" 一个自由度, \(\omega^1_2 = -\omega^2_1\) 简化记为 \(\omega\)（一个 \(1\)-形式）。</p>
+
+<p><strong>曲率形式</strong> \(\Omega\): 定义为 \(\Omega = d\omega\)（\(2\)-形式）。<em>关键事实</em>: 在 2D 曲面,</p>
+
+<p>\[
+\boxed{\ \Omega = -K\, dA\ }
+\]</p>
+
+<p>其中 \(K\) 是 Gauss 曲率, \(dA\) 是曲面的面积形式。这件事 (E. Cartan 的方法) 把 Gauss 曲率<em>编码为外微分</em>——非常优雅。</p>
+
+<p>用 Stokes 定理对一个曲面区域 \(R \subset S\):</p>
+
+<p>\[
+-\int_R K\, dA = \int_R \Omega = \int_R d\omega = \oint_{\partial R} \omega.
+\]</p>
+
+<p>右边是边界上的<em>联络形式积分</em>——它和<em>测地曲率</em>（沿边界"<em>不直</em>" 的程度）相关。把这条等式与边界的"<em>转角</em>" 信息合在一起, 就得到 Gauss-Bonnet 局部公式 \(\int_R K\, dA + \oint_{\partial R} \kappa_g\, ds + \sum \alpha_i = 2\pi\)（<a href="ch16.html">ch16</a>）。</p>
+
+<p>这件事是微分形式语言的<em>第三</em> 优势——它让<em>本来繁的局部 Gauss-Bonnet 证明</em> 变成<em>Stokes 一行</em>。古典证法（按 Bonnet 1848 那种用三角形分解 + 累积转角）很啰嗦, 而微分形式 + Stokes 给一个<em>对称</em> 证明。<a href="ch16.html">下一章 ch13</a> 先建测地线, 然后 ch14 测地坐标, ch15 完备性, 到了 ch16 微分形式 + Stokes 终于派上用场。</p>
+
+<p>临别话: 微分形式像是<em>更高级的</em> 数学语言——刚学时觉得抽象, 但<em>会用之后</em> 你不愿再回到张量记号。它把"<em>梯度旋度散度</em>" 的混乱统一为一个 \(d\), 把"<em>Stokes / Green / Gauss</em>" 三大定理统一为一行。这种统一不是形式上的——它揭示了<em>微积分背后的几何</em>: 边界算子 \(\partial\) 和外微分算子 \(d\) 互为对偶, 这就是同调论的源头。</p>
+
+<p>下一章我们回到曲面几何的具体——<em>测地线</em>。曲面上的"<em>直线</em>" 是什么？答案是局部最短路径; 也是被加速度"<em>没有切分量</em>" 的曲线。这两个等价定义将给出测地线方程, 而测地线方程的 Christoffel 符号又把我们带回内蕴几何的范畴——形成 ch10 主曲率 → ch11 内蕴 → ch13 测地线的完整闭环。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 Theorema Egregium</a><a href="ch13.html">下一章 · 第 13 章 测地线 →</a></nav>
+</main>
+</body>
+</html>

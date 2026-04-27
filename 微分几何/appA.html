@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 A 多元微积分速查 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+<h1 id="appA">附录 A 多元微积分速查</h1>
+
+<p>本书几乎每一章都默默用了多元微积分: <a href="ch2.html">ch2</a> 弧长公式用一元 \(\int |\gamma'(t)| dt\); <a href="ch6.html">ch6</a> 正则曲面定义用<em>雅可比矩阵满秩</em>; <a href="ch7.html">ch7</a> 第一基本形式是参数曲面在两个偏导上的内积矩阵; <a href="ch11.html">ch11</a> Theorema Egregium 的证明用混合偏导对称; <a href="ch16.html">ch16</a> Gauss-Bonnet 局部版用<em>Stokes 定理</em>; <a href="ch21.html">ch21</a> 流形定义用<em>反函数定理 + 隐函数定理</em>。这个附录把这些事实集中处理——不是教科书, 是<em>速查表</em>: 每条公式给陈述、几何含义、本书中具体登场处。</p>
+
+<ul>
+  <li>偏导数与梯度。</li>
+  <li>雅可比矩阵与雅可比行列式。</li>
+  <li>多元链式法则。</li>
+  <li>反函数定理。</li>
+  <li>隐函数定理。</li>
+  <li>多重积分的变量替换。</li>
+  <li>梯度 / 散度 / 旋度。</li>
+  <li>Stokes 定理(推广形式)。</li>
+</ul>
+
+<h2 id="appA-1">A.1 偏导数与梯度</h2>
+<p>给 \(f : \mathbb{R}^n \to \mathbb{R}\) 在 \(\mathbf{x}_0\) 处可微。<em>偏导数</em></p>
+
+<p>\[
+\frac{\partial f}{\partial x_i}(\mathbf{x}_0) = \lim_{h \to 0} \frac{f(\mathbf{x}_0 + h \mathbf{e}_i) - f(\mathbf{x}_0)}{h}.
+\]</p>
+
+<p>把所有偏导组成行向量得<em>梯度</em>:</p>
+
+<p>\[
+\nabla f(\mathbf{x}_0) = \left(\frac{\partial f}{\partial x_1}, \ldots, \frac{\partial f}{\partial x_n}\right)(\mathbf{x}_0).
+\]</p>
+
+<p>几何含义:</p>
+
+<ul>
+  <li>\(\nabla f\) <em>指向</em> \(f\) 增长最快的方向。</li>
+  <li>\(|\nabla f|\) 是该方向上 \(f\) 的增长率。</li>
+  <li>\(\nabla f \perp \) \(f\) 的等值面。</li>
+</ul>
+
+<p>第三条是<a href="ch6.html">ch6</a> 把"<em>水平集 \(f^{-1}(c)\) 是曲面</em>" 形式化为<em>正则曲面</em> 的来源——\(\nabla f \neq 0\) 保证等值面"光滑"。</p>
+
+<p><em>方向导数</em> 沿单位向量 \(\mathbf{v}\):</p>
+
+<p>\[
+D_\mathbf{v} f = \nabla f \cdot \mathbf{v} = |\nabla f| \cos\theta,
+\]</p>
+
+<p>其中 \(\theta\) 是 \(\nabla f\) 与 \(\mathbf{v}\) 的夹角。这就是为什么\(\nabla f\) 方向是"<em>最快</em>" 的——\(\cos \theta\) 在 \(\theta = 0\) 时最大。</p>
+
+<p><em>登场</em>:</p>
+
+<ul>
+  <li><a href="ch6.html">ch6 6.3</a> 隐式定义曲面 \(f^{-1}(c)\), 法向量 \(= \nabla f / |\nabla f|\)。</li>
+  <li><a href="ch8.html">ch8 8.2</a> 法向量场 \(\mathbf{n}\) 由 \(\nabla F\) 给(图形 \(z = h(x,y)\) 写成 \(F(x,y,z) = z - h = 0\) 的水平集)。</li>
+</ul>
+
+<h2 id="appA-2">A.2 雅可比矩阵与雅可比行列式</h2>
+<p>给 \(\mathbf{f} : \mathbb{R}^n \to \mathbb{R}^m\), \(\mathbf{f} = (f_1, \ldots, f_m)\)。<em>雅可比矩阵</em>:</p>
+
+<p>\[
+\boxed{\ J_\mathbf{f}(\mathbf{x}) = \begin{pmatrix} \partial f_1 / \partial x_1 & \cdots & \partial f_1 / \partial x_n \\ \vdots & & \vdots \\ \partial f_m / \partial x_1 & \cdots & \partial f_m / \partial x_n \end{pmatrix} \in \mathbb{R}^{m \times n}.\ }
+\]</p>
+
+<p>它是 \(\mathbf{f}\) 在 \(\mathbf{x}\) 处的<em>线性近似</em>:</p>
+
+<p>\[
+\mathbf{f}(\mathbf{x} + \mathbf{h}) = \mathbf{f}(\mathbf{x}) + J_\mathbf{f}(\mathbf{x}) \mathbf{h} + o(|\mathbf{h}|).
+\]</p>
+
+<p><em>雅可比行列式</em>: \(m = n\) 时, \(\det J_\mathbf{f}\) 是个数, 它的<em>绝对值</em> 是 \(\mathbf{f}\) 在 \(\mathbf{x}\) 处的<em>体积放大率</em>: 一个无穷小 \(n\) 维方块经 \(\mathbf{f}\) 变换后体积乘以 \(|\det J_\mathbf{f}|\)。</p>
+
+<p>对参数曲面 \(\mathbf{X} : U \subset \mathbb{R}^2 \to \mathbb{R}^3\), 雅可比矩阵 \(J_\mathbf{X}\) 是 \(3 \times 2\)。<em>正则曲面</em>(<a href="ch6.html">ch6</a>)条件: \(J_\mathbf{X}\) 处处<em>满秩</em>(秩 = 2), 等价 \(\mathbf{X}_u \times \mathbf{X}_v \neq 0\)。这就是为什么本书每章都要"<em>检查正则性</em>" 的原因——它<em>就是</em> 雅可比满秩。</p>
+
+<p><em>登场</em>:</p>
+
+<ul>
+  <li><a href="ch6.html">ch6 6.2</a> 正则曲面 ⟺ 雅可比 \(J_\mathbf{X}\) 处处满秩。</li>
+  <li><a href="ch7.html">ch7 7.4</a> 第一基本形式矩阵 \(g = J_\mathbf{X}^T J_\mathbf{X}\) 是 \(2 \times 2\) Gram 矩阵。</li>
+  <li><a href="ch7.html">ch7 7.5</a> 曲面面积 \(\int \sqrt{\det g} \, du dv = \int |\mathbf{X}_u \times \mathbf{X}_v| du dv\)——通过 \(\det g = |\mathbf{X}_u|^2 |\mathbf{X}_v|^2 - (\mathbf{X}_u \cdot \mathbf{X}_v)^2 = |\mathbf{X}_u \times \mathbf{X}_v|^2\)。</li>
+</ul>
+
+<h2 id="appA-3">A.3 多元链式法则</h2>
+<p>给 \(\mathbf{g} : \mathbb{R}^k \to \mathbb{R}^n\) 和 \(\mathbf{f} : \mathbb{R}^n \to \mathbb{R}^m\) 都可微。复合 \(\mathbf{f} \circ \mathbf{g} : \mathbb{R}^k \to \mathbb{R}^m\) 可微, 且</p>
+
+<p>\[
+\boxed{\ J_{\mathbf{f} \circ \mathbf{g}}(\mathbf{x}) = J_\mathbf{f}(\mathbf{g}(\mathbf{x})) \cdot J_\mathbf{g}(\mathbf{x}).\ }
+\]</p>
+
+<p>是<em>矩阵乘法</em>。这是一元链式法则 \((f \circ g)' = f'(g) \cdot g'\) 的多元化身——本质上把"<em>导数 = 数</em>" 升级为"<em>导数 = 矩阵</em>"。</p>
+
+<p><em>分量形式</em>(Einstein 求和约定):</p>
+
+<p>\[
+\frac{\partial (\mathbf{f} \circ \mathbf{g})_i}{\partial x_a} = \sum_{j=1}^n \frac{\partial f_i}{\partial y_j} \cdot \frac{\partial g_j}{\partial x_a}.
+\]</p>
+
+<p><em>登场</em>:</p>
+
+<ul>
+  <li>本书每次"<em>换参数</em>" 都默默用链式法则。比如曲面参数 \((u, v) \to (\tilde u, \tilde v)\) 时, 第一基本形式分量按 \(\tilde g = J^T g J\) 变换, \(J\) 是参数变换的雅可比——这是张量场"<em>变换律</em>" 的源头。</li>
+  <li><a href="ch11.html">ch11</a> Theorema Egregium 证明里反复用链式法则把混合偏导按不同坐标顺序展开。</li>
+  <li><a href="ch22.html">ch22</a> Christoffel 符号在坐标变换下的"<em>非张量</em>" 行为, 来自链式法则里的<em>二阶</em> 项 \(\partial^2 \tilde x / \partial x \partial x\)。</li>
+</ul>
+
+<h2 id="appA-4">A.4 反函数定理</h2>
+<p>陈述: 给 \(\mathbf{f} : \mathbb{R}^n \to \mathbb{R}^n\), \(C^k\), 在 \(\mathbf{x}_0\) 处 \(\det J_\mathbf{f}(\mathbf{x}_0) \neq 0\)。则存在 \(\mathbf{x}_0\) 的开邻域 \(U\) 与 \(\mathbf{f}(\mathbf{x}_0)\) 的开邻域 \(V\), 使</p>
+
+<p>\[
+\mathbf{f} : U \to V \text{ 是 } C^k \text{ 双射},
+\]</p>
+
+<p>且 \(\mathbf{f}^{-1}\) 也 \(C^k\), 满足 \(J_{\mathbf{f}^{-1}}(\mathbf{f}(\mathbf{x})) = J_\mathbf{f}(\mathbf{x})^{-1}\)。</p>
+
+<p>用一句话: <em>非奇异线性近似 \(\Rightarrow\) 局部可逆</em>。</p>
+
+<p>这条定理是流形定义和正则曲面定义的<em>核心工具</em>。本书<a href="ch6.html">ch6</a> 把"<em>正则曲面</em>" 定义为"<em>局部上每个点附近, 曲面可写成 \(\mathbb{R}^2\) 开集到 \(\mathbb{R}^3\) 的可微同胚像</em>"——这种"<em>局部可微同胚</em>" 的存在性就来自反函数定理。</p>
+
+<p><em>例</em>。极坐标 \((r, \theta) \to (r\cos\theta, r\sin\theta)\)。雅可比 \(\det = r\)。\(r > 0\) 处反函数定理给出局部可逆——这就是为什么极坐标在 \(r = 0\) 之外是合法<em>坐标</em>。</p>
+
+<p><em>登场</em>:</p>
+
+<ul>
+  <li><a href="ch6.html">ch6 6.2</a> "正则曲面有局部参数化" 这一句话的合法性靠反函数定理。</li>
+  <li><a href="ch21.html">ch21 21.2</a> 抽象流形的"<em>转移函数 \(C^k\)</em>" 用反函数定理保证。</li>
+  <li><a href="ch14.html">ch14 14.3</a> <em>指数映射 \(\exp_p\)</em> 在 \(0 \in T_p M\) 附近是局部微分同胚——证明就是反函数定理(\(D \exp_p|_0 = \text{id}\))。</li>
+</ul>
+
+<h2 id="appA-5">A.5 隐函数定理</h2>
+<p>陈述: 给 \(\mathbf{F} : \mathbb{R}^{n+m} \to \mathbb{R}^m\), \(C^k\), 写 \((\mathbf{x}, \mathbf{y}) \in \mathbb{R}^n \times \mathbb{R}^m\)。设 \(\mathbf{F}(\mathbf{x}_0, \mathbf{y}_0) = \mathbf{0}\) 且</p>
+
+<p>\[
+\det \frac{\partial \mathbf{F}}{\partial \mathbf{y}}(\mathbf{x}_0, \mathbf{y}_0) \neq 0.
+\]</p>
+
+<p>则存在 \(\mathbf{x}_0\) 的开邻域 \(U \subset \mathbb{R}^n\) 与 \(C^k\) 函数 \(\mathbf{g} : U \to \mathbb{R}^m\) 使</p>
+
+<p>\[
+\mathbf{F}(\mathbf{x}, \mathbf{g}(\mathbf{x})) = \mathbf{0}, \quad \forall \mathbf{x} \in U,
+\]</p>
+
+<p>即<em>方程 \(\mathbf{F}(\mathbf{x}, \mathbf{y}) = \mathbf{0}\) 局部能解出 \(\mathbf{y} = \mathbf{g}(\mathbf{x})\)</em>。</p>
+
+<p>这条定理把"<em>水平集是图</em>" 形式化。本书最常用的特例: \(F : \mathbb{R}^3 \to \mathbb{R}\), 设 \(F(p) = 0\) 且 \(\nabla F(p) \neq 0\)(假设 \(\partial F / \partial z \neq 0\))。则曲面 \(F^{-1}(0)\) 在 \(p\) 附近是个图 \(z = h(x, y)\)。这是"<em>正则曲面 = 水平集</em>" 三种等价定义里第三种的合法性来源(<a href="ch6.html">ch6</a>)。</p>
+
+<p><em>例</em>。圆 \(x^2 + y^2 = 1\) 不是 \(y = h(x)\) 的图(\(x \in (-1, 1)\) 给两个 \(y\)), 但<em>局部</em> 是: 在 \(y \neq 0\) 处, \(\partial F / \partial y = 2y \neq 0\), 隐函数定理给 \(y = \pm \sqrt{1 - x^2}\)。这正符合直觉——除了水平切线点, 圆每点局部都是个 \(y\) 的函数。</p>
+
+<p><em>登场</em>:</p>
+
+<ul>
+  <li><a href="ch6.html">ch6 6.3</a> 隐式正则曲面定义全部基于隐函数定理。</li>
+  <li><a href="ch11.html">ch11</a> 主曲率方向(\(\det(II - \kappa I) = 0\) 的解 \(\kappa\)) 是关于第一第二基本形式的隐函数, 用隐函数定理保证主方向是<em>光滑</em> 的(主曲率不重复处)。</li>
+</ul>
+
+<h2 id="appA-6">A.6 多重积分与变量替换</h2>
+<p><em>多重积分</em> 把单变量黎曼积分推广。\(f : D \subset \mathbb{R}^n \to \mathbb{R}\) 在测度有限可测集 \(D\) 上有界可积:</p>
+
+<p>\[
+\int_D f \, dV = \lim_{\text{细化}} \sum_i f(\mathbf{x}_i^*) |B_i|,
+\]</p>
+
+<p>其中 \(\{B_i\}\) 是 \(D\) 的分割, \(|B_i|\) 是体积, \(\mathbf{x}_i^* \in B_i\) 是采样点。Fubini 定理把它<em>分维</em> 算成迭代积分: 对充分好的 \(D\) 和 \(f\),</p>
+
+<p>\[
+\iint_D f(x, y) \, dx dy = \int \left(\int f(x, y) \, dx\right) dy.
+\]</p>
+
+<p><em>变量替换公式</em>。给 \(\boldsymbol{\phi} : U \to D\) 是 \(C^1\) 双射, \(\det J_\boldsymbol{\phi} \neq 0\)。则</p>
+
+<p>\[
+\boxed{\ \int_D f(\mathbf{y}) \, dV_\mathbf{y} = \int_U f(\boldsymbol{\phi}(\mathbf{x})) \, |\det J_\boldsymbol{\phi}(\mathbf{x})| \, dV_\mathbf{x}.\ }
+\]</p>
+
+<p>这是单变量 \(\int f(y) dy = \int f(g(x)) g'(x) dx\) 的多元版——\(g'\) 升级为 \(|\det J|\)(<em>体积放大率</em>)。</p>
+
+<p><em>例 1</em>。极坐标 \(x = r\cos\theta, y = r\sin\theta\), \(|\det J| = r\)。所以 \(\iint f \, dx dy = \iint f \, r \, dr d\theta\)。</p>
+
+<p><em>例 2</em>。曲面面积公式: 参数 \(\mathbf{X}(u, v)\), 面积元 \(dA = |\mathbf{X}_u \times \mathbf{X}_v| \, du dv\) 是变量替换公式在 2 维曲面上嵌入到 \(\mathbb{R}^3\) 的版本。</p>
+
+<p><em>登场</em>:</p>
+
+<ul>
+  <li><a href="ch7.html">ch7 7.5</a> 曲面面积 \(\iint_D \sqrt{\det g} \, du dv\) 是变量替换的几何核心。</li>
+  <li><a href="ch17.html">ch17</a> 整体 Gauss-Bonnet \(\iint_M K \, dA = 2\pi \chi\), 积分把"<em>逐点曲率</em>" 加和成"<em>整体拓扑</em>"——这是变量替换的"<em>反向应用</em>"——它告诉我们积分值<em>不</em> 依赖参数化。</li>
+</ul>
+
+<h2 id="appA-7">A.7 梯度 / 散度 / 旋度</h2>
+<p>这三个算子是经典向量微积分的语言。本书用得不多, 但<a href="ch12.html">ch12 微分形式</a> 把它们统一成"<em>外微分</em>" 的不同维数化身。</p>
+
+<p>设 \(f : \mathbb{R}^3 \to \mathbb{R}\), \(\mathbf{F} : \mathbb{R}^3 \to \mathbb{R}^3\)。</p>
+
+<p>\[
+\boxed{\ \nabla f = \left(\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}, \frac{\partial f}{\partial z}\right).\ }
+\]</p>
+
+<p>\[
+\boxed{\ \nabla \cdot \mathbf{F} = \frac{\partial F_1}{\partial x} + \frac{\partial F_2}{\partial y} + \frac{\partial F_3}{\partial z}.\ }
+\]</p>
+
+<p>\[
+\boxed{\ \nabla \times \mathbf{F} = \left(\frac{\partial F_3}{\partial y} - \frac{\partial F_2}{\partial z}, \, \frac{\partial F_1}{\partial z} - \frac{\partial F_3}{\partial x}, \, \frac{\partial F_2}{\partial x} - \frac{\partial F_1}{\partial y}\right).\ }
+\]</p>
+
+<p>关键恒等式:</p>
+
+<ul>
+  <li>\(\nabla \times (\nabla f) = \mathbf{0}\): "<em>梯度场无旋</em>"。</li>
+  <li>\(\nabla \cdot (\nabla \times \mathbf{F}) = 0\): "<em>旋度场无散</em>"。</li>
+</ul>
+
+<p>这两条恒等式合起来就是"<em>\(d^2 = 0\)</em>" 的特例(<a href="ch12.html">ch12 12.4</a>): 外微分两次 = 0。</p>
+
+<p><em>Laplacian</em> \(\Delta f := \nabla \cdot \nabla f = \partial^2_x f + \partial^2_y f + \partial^2_z f\)。在曲面上推广为<em>Laplace-Beltrami 算子</em> \(\Delta_M\)(<a href="ch22.html">ch22</a>), 在<a href="ch24.html">ch24</a> 离散化为 cotangent Laplacian。</p>
+
+<h2 id="appA-8">A.8 Stokes 定理</h2>
+<p>这是单变量微积分基本定理 \(\int_a^b f' = f(b) - f(a)\) 的全维数推广。最一般的陈述用<em>微分形式</em>(<a href="ch12.html">ch12</a>):</p>
+
+<p>\[
+\boxed{\ \int_M d\omega = \int_{\partial M} \omega,\ }
+\]</p>
+
+<p>其中 \(M\) 是 \(n\) 维带边流形, \(\omega\) 是 \((n-1)\)-形式, \(d\omega\) 是它的外微分(\(n\)-形式), \(\partial M\) 是 \(M\) 的边界。</p>
+
+<p>这条公式的特例:</p>
+
+<ul>
+  <li><em>n=1</em>(微积分基本定理): \(\int_a^b f' \, dx = f(b) - f(a)\)。</li>
+  <li><em>n=2 在平面</em>(Green 定理): \(\iint_D (\partial Q/\partial x - \partial P/\partial y) \, dA = \oint_{\partial D} (P \, dx + Q \, dy)\)。</li>
+  <li><em>n=2 在曲面</em>(经典 Stokes): \(\iint_S (\nabla \times \mathbf{F}) \cdot d\mathbf{A} = \oint_{\partial S} \mathbf{F} \cdot d\boldsymbol{\ell}\)。</li>
+  <li><em>n=3</em>(散度定理 / Gauss): \(\iiint_V (\nabla \cdot \mathbf{F}) \, dV = \oiint_{\partial V} \mathbf{F} \cdot d\mathbf{A}\)。</li>
+</ul>
+
+<p>四条公式在<em>外微分</em> 语言下是一条。这就是为什么<a href="ch12.html">ch12</a> 把"<em>微分形式</em>" 引入——它让<em>所有</em> 维数的"<em>边界 vs 内部</em>" 关系统一。</p>
+
+<p><em>登场</em>:</p>
+
+<ul>
+  <li><a href="ch16.html">ch16 16.4</a> 局部 Gauss-Bonnet 证明: 在测地三角形 \(T\) 上, \(\iint_T K \, dA + \oint_{\partial T} \kappa_g \, ds + \sum_i (\pi - \alpha_i) = 2\pi\)——左边第一项是<em>面积分</em>, 第二项是<em>边界线积分</em>。这种"<em>面积分 = 线积分 + 边界角</em>" 结构是 Stokes 定理的几何化身。</li>
+  <li><a href="ch17.html">ch17 17.3</a> 整体 Gauss-Bonnet 证明: 把曲面 \(M\) 三角化, 在每个三角形上用局部版本, 把所有<em>线积分</em> 在内部消掉(每条边被两边共享, 反向积分相互抵消), 剩 \(2\pi \chi\) 来自顶点角和。这又是 Stokes 定理的"<em>边界抵消</em>" 应用。</li>
+</ul>
+
+<p>请你停下来想一秒: 整本书最深的定理(Theorema Egregium 是<em>恒等式</em>, Gauss-Bonnet 是<em>整体定理</em>) 的证明都<em>必须</em> 依赖某种 Stokes 类型的公式——把"<em>逐点几何信息</em>" 通过<em>边界</em> 或<em>积分</em> 联系到全局拓扑。这种"<em>局部 → 整体</em>" 的桥, 就是多元微积分给微分几何的核心礼物。</p>
+
+<h2 id="appA-9">A.9 实战速查表</h2>
+<p>本书具体公式按章节回查:</p>
+
+<ul>
+  <li><a href="ch2.html">ch2</a> 弧长 \(L = \int |\gamma'(t)| dt\): A.6 单变量积分。</li>
+  <li><a href="ch6.html">ch6</a> 正则曲面 ⟺ \(\mathbf{X}_u \times \mathbf{X}_v \neq 0\): A.2 雅可比满秩。</li>
+  <li><a href="ch6.html">ch6</a> 隐式曲面 \(F^{-1}(0)\) 是图: A.5 隐函数定理。</li>
+  <li><a href="ch7.html">ch7</a> 第一基本形式 \(g = J_\mathbf{X}^T J_\mathbf{X}\): A.2 雅可比矩阵。</li>
+  <li><a href="ch7.html">ch7</a> 曲面面积 \(\iint \sqrt{\det g} du dv\): A.6 变量替换。</li>
+  <li><a href="ch11.html">ch11</a> Theorema Egregium 证明: A.3 链式法则 + 混合偏导对称。</li>
+  <li><a href="ch14.html">ch14</a> 指数映射局部微分同胚: A.4 反函数定理。</li>
+  <li><a href="ch16.html">ch16-17</a> Gauss-Bonnet 局部 + 整体: A.8 Stokes 定理。</li>
+  <li><a href="ch21.html">ch21</a> 流形坐标卡转移函数: A.4 反函数定理。</li>
+  <li><a href="ch22.html">ch22</a> 黎曼度量分量变换 \(\tilde g = J^T g J\): A.3 链式法则。</li>
+  <li><a href="ch24.html">ch24</a> cotangent Laplacian: A.7 Laplacian 离散化。</li>
+</ul>
+
+<p>如果你对这些公式中任何一条不熟, 请回到系列<a href="../多元微积分/index.html">第 1 卷《多元微积分》</a> 第 6-15 章——本书所有<em>分析</em> 工具都来自那里。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
+</main>
+</body>
+</html>

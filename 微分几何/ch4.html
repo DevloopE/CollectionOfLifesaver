@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 空间曲线：Frenet-Serret — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 平面曲线：曲率与切向量</a><a href="ch5.html">下一章 · 第 5 章 整体曲线：4-顶点定理 + 等周不等式 →</a></nav>
+<h1 id="ch4">第 4 章 空间曲线：Frenet-Serret</h1>
+
+<p>请你拿一根弹簧或一段电话线（如果还能找到的话）。看着它。它在<em>弯</em>——绕一个隐形的轴转。但它<em>同时</em> 又在做另一件事——沿轴<em>上升</em>。如果你只看一个截面（比如把弹簧投影到桌面）你看见的是<em>圆</em>; 但完整的弹簧不在任何一个平面里。它<em>逃出了平面</em>。</p>
+
+<p>平面曲线只能"<em>弯</em>"——曲率 \(\kappa\) 描述弯多急。空间曲线<em>多一种</em> 弯——它能<em>偏离</em> 当前所在的<em>瞬时平面</em>。这种偏离速率叫<em>扭率</em>（torsion） \(\tau\)。</p>
+
+<p>本章问的事是: <em>怎么形式化"空间曲线在做什么"</em>？答案是 1847 年 Frenet 与 Serret 独立给出的<em>三标架方法</em>: 在曲线上每点构造三个互相正交的单位向量 \((T, N, B)\), 它们随曲线移动时按一组优雅的微分方程演化。这组方程<em>就是</em> Frenet-Serret 公式——古典微分几何最经典的一组公式之一。</p>
+
+<p>本章: <strong>(1)</strong> 构造 \((T, N, B)\), <strong>(2)</strong> 证它们正交, <strong>(3)</strong> 螺旋线作为标准例, <strong>(4-5)</strong> Frenet-Serret 方程组的完整推导, <strong>(6)</strong> 扭率几何意义, <strong>(7)</strong> 复原定理。</p>
+
+<h2 id="sec4-1">4.1 三标架: \(T, N, B\)</h2>
+
+<p>设 \(\gamma(s): I \to \mathbb{R}^3\) 是<em>弧长参数化</em> \(C^3\) 空间曲线, 满足正则性 \(|\gamma'(s)| = 1\) 处处。我们逐步构造三个单位正交向量。</p>
+
+<p><strong>(1) 单位切向量 \(T(s)\).</strong> 直接定义</p>
+
+<p>\[
+T(s) := \gamma'(s).
+\]</p>
+
+<p>由弧长参数化 \(|T(s)| = 1\) 处处。\(T\) 是<em>切线方向</em>, 沿曲线移动方向。</p>
+
+<p><strong>(2) 单位主法向量 \(N(s)\).</strong> 由 ch3 的论证 \(T \cdot T = 1 \Rightarrow T' \cdot T = 0\), 所以 \(T'(s) \perp T(s)\)。\(T'(s) = \gamma''(s)\)。</p>
+
+<p>定义<em>曲率</em> \(\kappa(s) := |T'(s)| = |\gamma''(s)|\) 与（在 \(\kappa(s) > 0\) 时）<em>单位主法向量</em></p>
+
+<p>\[
+N(s) := \frac{T'(s)}{\kappa(s)} = \frac{T'(s)}{|T'(s)|}.
+\]</p>
+
+<p>\(N\) 是<em>曲线弯向哪一侧</em> 的单位指向, 在<em>密切平面</em> 内（即 \(\{T, N\}\) 张成的平面）。注意 \(\kappa(s) > 0\) 是<em>定义需要</em>——\(\kappa = 0\) 处 \(N\) 不定义（曲线在该点局部直, 没有"<em>弯向哪一侧</em>"）。本章假设<em>处处</em> \(\kappa > 0\), 即<em>双正则</em> 曲线。</p>
+
+<p>由构造 \(N \perp T\) 与 \(|N| = 1\)。</p>
+
+<p><strong>(3) 单位副法向量 \(B(s)\).</strong> 在 3D 中, 给两个正交单位向量 \(T, N\), 第三个互相正交的单位向量由叉积给出（按右手定则）:</p>
+
+<p>\[
+B(s) := T(s) \times N(s).
+\]</p>
+
+<p>由叉积性质 \(B \perp T, B \perp N, |B| = |T| |N| \sin 90° = 1\)。所以 \(\{T, N, B\}\) 在每点构成 \(\mathbb{R}^3\) 的<em>正交规范基</em>（右手系）, 沿曲线移动。这叫<em>Frenet 三标架</em>。</p>
+
+<h2 id="sec4-2">4.2 三标架的几何意义</h2>
+
+<p>\(T(s), N(s), B(s)\) 三个向量在曲线每点构成一个<em>动框架</em>。沿曲线移动时, 这三个向量都<em>转动</em>（但保持互相正交、保持单位长）。Frenet-Serret 公式将描述它们怎么转。</p>
+
+<p>三个对应的<em>平面</em> 也有名字:</p>
+
+<ul>
+  <li><em>密切平面</em>（osculating plane） = \(\{T, N\}\) 张成 = 与曲线<em>到二阶</em> 重合的平面。曲线在该点弯的方向都在这里面。</li>
+  <li><em>法平面</em>（normal plane） = \(\{N, B\}\) 张成 = 在该点垂直于曲线的所有向量。</li>
+  <li><em>整流平面</em>（rectifying plane） = \(\{T, B\}\) 张成 = 不含 \(N\), 即曲线<em>不弯</em> 的方向构成的平面。</li>
+</ul>
+
+<p>这三个平面在每点都是 2D 子空间, 沿曲线<em>转动</em>。如果曲线是<em>平面曲线</em>, 密切平面<em>恒为</em> 同一个平面（曲线就在那里面）, \(B\) 也恒定; 这时扭率 \(\tau\) 为零（下面会算）。曲线"<em>逃出平面</em>" \(\Leftrightarrow\) 密切平面随 \(s\) 变 \(\Leftrightarrow\) \(B\) 随 \(s\) 变 \(\Leftrightarrow\) \(\tau \neq 0\)。</p>
+
+<h2 id="sec4-3">4.3 螺旋线: 标准例</h2>
+
+<p>把上述抽象具体化, 用螺旋线跑一遍。</p>
+
+<p><strong>螺旋线参数化.</strong> \(\gamma(t) = (a \cos t, a \sin t, b t)\), \(a > 0, b > 0, t \in \mathbb{R}\)。</p>
+
+<p><strong>步骤 1: 弧长参数化.</strong> 速度 \(\gamma'(t) = (-a\sin t, a\cos t, b)\), 长度 \(|\gamma'(t)| = \sqrt{a^2 + b^2}\) 常数。设 \(c := \sqrt{a^2 + b^2}\), 弧长 \(s = ct\), 反过来 \(t = s/c\)。弧长参数化:</p>
+
+<p>\[
+\gamma(s) = (a \cos(s/c), a \sin(s/c), b s/c).
+\]</p>
+
+<p><strong>步骤 2: 单位切.</strong></p>
+
+<p>\[
+T(s) = \gamma'(s) = (-\frac{a}{c} \sin(s/c), \frac{a}{c} \cos(s/c), \frac{b}{c}).
+\]</p>
+
+<p>验证 \(|T| = \sqrt{a^2/c^2 + b^2/c^2} = 1\)。✓</p>
+
+<p><strong>步骤 3: 曲率 + 主法.</strong></p>
+
+<p>\[
+T'(s) = \gamma''(s) = (-\frac{a}{c^2} \cos(s/c), -\frac{a}{c^2} \sin(s/c), 0).
+\]</p>
+
+<p>长度</p>
+
+<p>\[
+|T'(s)| = \frac{a}{c^2} = \frac{a}{a^2 + b^2}.
+\]</p>
+
+<p>所以螺旋线曲率 \(\boxed{\kappa = a/(a^2+b^2)}\) 是<em>常数</em>。</p>
+
+<p>主法</p>
+
+<p>\[
+N(s) = T'(s) / \kappa = (-\cos(s/c), -\sin(s/c), 0).
+\]</p>
+
+<p>注意 \(N(s)\) 总指向 \(z\)-轴（在 \(xy\)-平面内, 指向中心）。</p>
+
+<p><strong>步骤 4: 副法.</strong></p>
+
+<p>\[
+B(s) = T(s) \times N(s) = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ -\frac{a}{c}\sin(s/c) & \frac{a}{c}\cos(s/c) & \frac{b}{c} \\ -\cos(s/c) & -\sin(s/c) & 0 \end{vmatrix}.
+\]</p>
+
+<p>\(\mathbf{i}\)-分量: \(\frac{a}{c}\cos(s/c) \cdot 0 - \frac{b}{c} \cdot (-\sin(s/c)) = \frac{b}{c}\sin(s/c)\)。<br>
+\(\mathbf{j}\)-分量: \(-[(-\frac{a}{c}\sin(s/c)) \cdot 0 - \frac{b}{c}(-\cos(s/c))] = -\frac{b}{c}\cos(s/c)\)。<br>
+\(\mathbf{k}\)-分量: \((-\frac{a}{c}\sin(s/c))(-\sin(s/c)) - \frac{a}{c}\cos(s/c) \cdot (-\cos(s/c)) = \frac{a}{c}(\sin^2 + \cos^2) = \frac{a}{c}\)。</p>
+
+<p>\[
+B(s) = \big(\frac{b}{c}\sin(s/c), -\frac{b}{c}\cos(s/c), \frac{a}{c}\big).
+\]</p>
+
+<p>注意 \(B(s)\) 也<em>是常数 \(z\)-分量 \(a/c\) + 旋转的 \(xy\)-分量\)。它<em>不</em>常数（随 \(s\) 改变 \(xy\) 部分）。</p>
+
+<p><strong>步骤 5: 扭率（这里我们先算, 后面 §4.4-5 给定义）.</strong> 由 Frenet-Serret 第三式 \(B'(s) = -\tau(s) N(s)\):</p>
+
+<p>\[
+B'(s) = (\frac{b}{c^2}\cos(s/c), \frac{b}{c^2}\sin(s/c), 0).
+\]</p>
+
+<p>注意 \(B'(s) = -\frac{b}{c^2}(-\cos(s/c), -\sin(s/c), 0) = -\frac{b}{c^2} N(s)\)。所以</p>
+
+<p>\[
+\tau(s) = \frac{b}{c^2} = \frac{b}{a^2+b^2}.
+\]</p>
+
+<p>常数。</p>
+
+<p>所以螺旋线: <strong>曲率与扭率都是非零常数</strong>。后面复原定理 §4.7 会给出反向陈述: <em>任何曲率 + 扭率都是非零常数的空间曲线必是螺旋线（至刚体）</em>。这正是螺旋线的"<em>定义性几何</em>" 描述。</p>
+
+<p><strong>极限.</strong> \(b \to 0\)（螺旋"<em>压扁</em>"）: \(\kappa \to 1/a\)（半径 \(a\) 圆的曲率）, \(\tau \to 0\)（变成平面圆）。\(b \to \infty\)（螺旋"<em>拉直</em>"）: \(\kappa \to 0, \tau \to 0\)（趋于直线）。\(a = 0\)（螺旋退化为 \(z\) 轴）: \(\kappa = 0, \tau\) 不定义（不双正则）。</p>
+
+<h2 id="sec4-4">4.4 Frenet-Serret 公式（陈述）</h2>
+
+<p>把 \(T, N, B\) 沿 \(s\) 的导数<em>用 \(T, N, B\) 自身展开</em>, 得到<em>三个</em> 微分方程:</p>
+
+<p>\[
+\boxed{\
+\begin{aligned}
+T'(s) &= \kappa(s) N(s), \\
+N'(s) &= -\kappa(s) T(s) + \tau(s) B(s), \\
+B'(s) &= -\tau(s) N(s).
+\end{aligned}\
+}
+\]</p>
+
+<p>这是<em>Frenet-Serret 公式</em>（1847）。在每个点, 它告诉你 \(T, N, B\) 的瞬时变化率怎么用 \(T, N, B\) 自己的线性组合写出。其中 \(\kappa, \tau\) 是两个标量函数, 完全描述空间曲线的几何。</p>
+
+<p>请你看清楚结构: 把 \(\{T, N, B\}\) 视作一个矩阵 \(F = (T, N, B)\)（每列一个向量）, 它的导数 \(F'\) 等于 \(F\) 乘上一个矩阵</p>
+
+<p>\[
+F'(s) = F(s) \cdot \begin{pmatrix} 0 & -\kappa & 0 \\ \kappa & 0 & -\tau \\ 0 & \tau & 0 \end{pmatrix}.
+\]</p>
+
+<p>这个矩阵是<em>反对称</em> 的——这正是"<em>正交矩阵的导数 = 反对称矩阵</em>" 的具体化。下一节我们就是利用这一点系统推 Frenet-Serret 公式。</p>
+
+<h2 id="sec4-5">4.5 Frenet-Serret 公式的完整推导</h2>
+
+<p>策略: \(\{T(s), N(s), B(s)\}\) 在每点是<em>正交规范基</em>。任何向量都能用它展开。把 \(T'(s), N'(s), B'(s)\) 三个导数分别用 \(T, N, B\) 展开, 用<em>正交关系</em> 求各系数。</p>
+
+<p><strong>一般原理.</strong> 设 \(\{e_1, e_2, e_3\}\) 是单位正交基, 即 \(e_i \cdot e_j = \delta_{ij}\)。两边对 \(s\) 求导:</p>
+
+<p>\[
+e_i' \cdot e_j + e_i \cdot e_j' = 0.
+\]</p>
+
+<p>所以矩阵 \(A_{ij} := e_i' \cdot e_j\) 是<em>反对称</em>的: \(A_{ij} + A_{ji} = 0\)。即 \(A_{ii} = 0\)（每个向量的导数与自己正交, 因为 \(|e_i| = 1\)）, 且 \(A_{ij} = -A_{ji}\)（\(i \neq j\)）。在 3 维, \(A\) 由 3 个独立分量决定: \(A_{12}, A_{13}, A_{23}\)。</p>
+
+<p>把这套用到 \(\{T, N, B\}\) 上, 得</p>
+
+<p>\[
+\begin{pmatrix} T' \cdot T & T' \cdot N & T' \cdot B \\ N' \cdot T & N' \cdot N & N' \cdot B \\ B' \cdot T & B' \cdot N & B' \cdot B \end{pmatrix} = \begin{pmatrix} 0 & a & b \\ -a & 0 & c \\ -b & -c & 0 \end{pmatrix}
+\]</p>
+
+<p>其中 \(a, b, c\) 是三个待定函数。即</p>
+
+<p>\[
+T' = a N + b B, \quad N' = -a T + c B, \quad B' = -b T - c N.
+\]</p>
+
+<p>下面定 \(a, b, c\)。</p>
+
+<p><strong>定 \(a, b\): \(T' \cdot N\) 与 \(T' \cdot B\).</strong> 已知 \(T'(s) = \gamma''(s) = \kappa(s) N(s)\)（由曲率定义）。所以 \(T' \cdot N = \kappa, T' \cdot B = 0\)。于是 \(a = \kappa, b = 0\)。</p>
+
+<p>这给</p>
+
+<p>\[
+T' = \kappa N. \quad \text{✓ 第一式}
+\]</p>
+
+<p><strong>定 \(c\).</strong> 至此 \(N' = -\kappa T + c B, B' = -c N\)。把 \(c\) 命名为<em>扭率</em>:</p>
+
+<p>\[
+\tau(s) := c = N' \cdot B = -B' \cdot N.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+N' = -\kappa T + \tau B, \quad \text{✓ 第二式}
+\]</p>
+
+<p>\[
+B' = -\tau N. \quad \text{✓ 第三式}
+\]</p>
+
+<p>三个方程都得证。</p>
+
+<p>请你看这个推导的简洁: <em>所有结果都从"\(T, N, B\) 是动正交基" 推出, 不需要任何另外的几何输入</em>。曲率 \(\kappa\) 是 \(T'\) 在 \(N\) 上的分量; 扭率 \(\tau\) 是 \(N'\) 在 \(B\) 上的分量（也等于 \(-B'\) 在 \(N\) 上）。这两个数完全描述三标架的转动, 进而完全描述曲线的几何。</p>
+
+<h2 id="sec4-6">4.6 扭率的几何意义</h2>
+
+<p>扭率 \(\tau\) 度量"<em>密切平面随 \(s\) 转动有多快</em>"——即<em>曲线偏离当前密切平面的速率</em>。</p>
+
+<p>形式上: 密切平面由 \(\{T, N\}\) 张成, 它的法向量是 \(B\)。"<em>密切平面在转</em>" 等价于 "\(B\) 在转"。\(B' = -\tau N\) 给:</p>
+
+<ul>
+  <li>\(\tau = 0\) 处处 \(\Rightarrow B'(s) = 0\) 处处 \(\Rightarrow B\) 是常向量 \(\Rightarrow\) 密切平面<em>恒为</em> 同一个平面 \(\Rightarrow\) 曲线在该平面里 \(\Rightarrow\) <em>平面曲线</em>。</li>
+  <li>\(\tau \neq 0\) \(\Rightarrow B\) 转动 \(\Rightarrow\) 密切平面随 \(s\) 转 \(\Rightarrow\) 曲线<em>逃出</em> 当前密切平面 \(\Rightarrow\) <em>真正的空间曲线</em>。</li>
+</ul>
+
+<p>更精确的几何解释（可以看作"<em>螺旋上升速率</em>"）: 在 \(\gamma(s_0)\) 邻域用 Taylor 展开</p>
+
+<p>\[
+\gamma(s_0 + h) = \gamma(s_0) + h T(s_0) + \frac{h^2}{2} \kappa N(s_0) + \frac{h^3}{6} (-\kappa^2 T + \kappa' N + \kappa \tau B)|_{s_0} + O(h^4).
+\]</p>
+
+<p>\(B\) 方向首次出现在<em>三阶项</em>的系数 \(\frac{h^3}{6} \kappa(s_0) \tau(s_0)\)。这正是"<em>曲线偏离密切平面</em>" 的<em>三阶量</em>: 偏离量 \(\sim \kappa \tau h^3 / 6\)。所以扭率 \(\tau\) 是这种偏离的<em>系数</em>。</p>
+
+<p><strong>带符号.</strong> \(\tau > 0\) 表示曲线<em>右手螺旋</em> 上升（沿 \(T\) 方向看, 三标架向右旋转）; \(\tau < 0\) 是左手螺旋。这点用上面螺旋线例子可以验证: \(b > 0\) 螺旋线是右手的, 算出 \(\tau = b/(a^2+b^2) > 0\); \(b < 0\) 螺旋线是左手的, \(\tau < 0\)。</p>
+
+<p><strong>一般参数化下扭率公式.</strong> 类似 §3.3, 把 \(\tau\) 用 \(\gamma'(t), \gamma''(t), \gamma'''(t)\) 表达:</p>
+
+<p>\[
+\boxed{\ \tau(t) = \frac{(\gamma'(t) \times \gamma''(t)) \cdot \gamma'''(t)}{|\gamma'(t) \times \gamma''(t)|^2}.\ }
+\]</p>
+
+<p>分子是<em>三阶混合积</em>; 分母是 \(|\gamma' \times \gamma''|^2\)。推导思路同 \(\kappa\) 公式: 用链式法则把弧长参数化下的 \(B' = -\tau N\) 翻译到一般参数化, 然后取 \(B'\) 在 \(N\) 上的分量。完整推导留给附录或练习。</p>
+
+<p><strong>例（再算一次螺旋线）.</strong> \(\gamma(t) = (a\cos t, a\sin t, bt)\)。\(\gamma' = (-a\sin t, a\cos t, b)\), \(\gamma'' = (-a\cos t, -a\sin t, 0)\), \(\gamma''' = (a\sin t, -a\cos t, 0)\)。</p>
+
+<p>\(\gamma' \times \gamma''\) 算:</p>
+
+<p>\[
+\gamma' \times \gamma'' = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ -a\sin t & a\cos t & b \\ -a\cos t & -a\sin t & 0 \end{vmatrix} = (ab \sin t, -ab\cos t, a^2).
+\]</p>
+
+<p>\(|\gamma' \times \gamma''|^2 = a^2 b^2 \sin^2 + a^2 b^2 \cos^2 + a^4 = a^2 b^2 + a^4 = a^2(a^2 + b^2)\)。</p>
+
+<p>\((\gamma' \times \gamma'') \cdot \gamma''' = ab \sin t \cdot a\sin t - ab\cos t \cdot (-a\cos t) + 0 = a^2 b (\sin^2 + \cos^2) = a^2 b\)。</p>
+
+<p>所以</p>
+
+<p>\[
+\tau = \frac{a^2 b}{a^2 (a^2 + b^2)} = \frac{b}{a^2 + b^2}.
+\]</p>
+
+<p>与 §4.3 直接算的一致。✓</p>
+
+<p>顺手验曲率: \(|\gamma' \times \gamma''| = a\sqrt{a^2+b^2}\), \(|\gamma'|^3 = (a^2+b^2)^{3/2}\):</p>
+
+<p>\[
+\kappa = \frac{a\sqrt{a^2+b^2}}{(a^2+b^2)^{3/2}} = \frac{a}{a^2+b^2}.
+\]</p>
+
+<p>一致。✓</p>
+
+<h2 id="sec4-7">4.7 复原定理（Fundamental Theorem of Curves）</h2>
+
+<p>古典微分几何<em>第一座大山</em>:</p>
+
+<p><strong>定理（曲线的基本定理 / 复原定理）.</strong> 设 \(\kappa: I \to (0, \infty), \tau: I \to \mathbb{R}\) 是给定的连续函数（\(\kappa\) 严格正）。则存在<em>唯一</em>（至刚体变换）的弧长参数化 \(C^3\) 空间曲线 \(\gamma: I \to \mathbb{R}^3\) 使其曲率为 \(\kappa\), 扭率为 \(\tau\)。</p>
+
+<p><strong>证明思路.</strong> 把 \(T, N, B\) 当成未知向量函数, Frenet-Serret 公式是一阶线性 ODE 系统:</p>
+
+<p>\[
+\frac{d}{ds} \begin{pmatrix} T \\ N \\ B \end{pmatrix} = \begin{pmatrix} 0 & \kappa(s) & 0 \\ -\kappa(s) & 0 & \tau(s) \\ 0 & -\tau(s) & 0 \end{pmatrix} \begin{pmatrix} T \\ N \\ B \end{pmatrix}.
+\]</p>
+
+<p>这是 \(9 \times 9\) 线性 ODE（每个 \(T, N, B\) 是 3 维向量, 共 9 个标量未知）。给一组初始条件 \(T(0), N(0), B(0)\)（满足互相正交 + 单位长 + 右手系约束）, 由 ODE 存在唯一性定理（线性系数光滑, 全局解存在唯一）, 解 \(T(s), N(s), B(s)\) <em>唯一</em> 决定。</p>
+
+<p>验证 \(\{T, N, B\}\) 沿解保持正交规范: 设 \(g_{ij}(s) := e_i(s) \cdot e_j(s)\)（\(e_1 = T, e_2 = N, e_3 = B\)）。对 \(s\) 求导, 用 ODE 表达式, 一通计算得 \(g_{ij}'\) 是 \(g_{ij}\) 的线性函数, 且如果初始 \(g_{ij}(0) = \delta_{ij}\), 那么 \(g_{ij} \equiv \delta_{ij}\) 是 ODE 解。所以正交性<em>保持</em>。</p>
+
+<p>得到 \(T(s)\) 后, 积分给</p>
+
+<p>\[
+\gamma(s) := \gamma(0) + \int_0^s T(\sigma) d\sigma.
+\]</p>
+
+<p>验证: \(\gamma'(s) = T(s)\), 单位长, 弧长参数化。\(\gamma''(s) = T'(s) = \kappa N\), 模 \(\kappa\), 曲率正确。\(B = T \times N\) 由叉积求, 验 \(B' = -\tau N\) 给扭率正确。✓</p>
+
+<p>唯一性: \(\gamma(0) \in \mathbb{R}^3\)（3 自由度, 平移）, \(\{T(0), N(0), B(0)\}\) 是右手正交基（3 自由度, 旋转）。共 6 自由度——3D 刚体变换<em>恰好</em> 6 个参数（3 平移 + 3 旋转）。固定刚体规约（如 \(\gamma(0) = 0, T(0) = e_1, N(0) = e_2, B(0) = e_3\)）, \(\gamma\) 由 \(\kappa, \tau\) 完全确定。</p>
+
+<p><strong>意义.</strong> 这条定理是平面曲率复原（ch3 §3.6）的<em>升级</em>: 在 3D 中, <em>曲率函数 \(\kappa(s)\) 不够</em>——还要扭率 \(\tau(s)\)。两个标量函数 \((\kappa, \tau)\) 是空间曲线（除去刚体）的<em>完整不变量</em>。两条空间曲线<em>形状相同</em> \(\Leftrightarrow\) 它们的 \((\kappa(s), \tau(s))\) 函数相同。</p>
+
+<p><strong>例子.</strong> 给 \(\kappa, \tau\) 都是非零常数: 上面 §4.3 算螺旋线给 \(\kappa = a/(a^2+b^2), \tau = b/(a^2+b^2)\)。反解: 给 \(\kappa_0, \tau_0 > 0\), 解 \(a = \kappa_0/(\kappa_0^2 + \tau_0^2), b = \tau_0/(\kappa_0^2+\tau_0^2)\)。所以 <strong>"\(\kappa, \tau\) 都是非零常数" 的空间曲线 = 螺旋线</strong>（至刚体）。这是螺旋线的<em>定义性</em> 几何描述: 它是 3D 空间中"<em>弯得均匀 + 扭得均匀</em>" 的唯一形状。这与"<em>圆是平面上弯得均匀的唯一形状</em>" 完全平行。</p>
+
+<p>给 \(\tau \equiv 0\): 曲线在固定平面里, 是平面曲线, 形状由 \(\kappa(s)\) 决定（这正是 ch3 §3.6 的内容）。所以"<em>平面曲线</em>" \(\Leftrightarrow\) "<em>扭率恒零</em>"——空间曲线降维条件的形式描述。</p>
+
+<h2 id="sec4-8">4.8 临别提示: 通向 ch5</h2>
+
+<p>本章建立了空间曲线的局部理论——三标架 \((T, N, B)\) + 曲率扭率 \((\kappa, \tau)\) + Frenet-Serret 微分方程 + 复原定理。这套是古典微分几何最经典的局部工具, 也是<em>很多物理 / 工程应用</em> 的基础（DNA 双螺旋、机器人路径规划、光纤几何等）。</p>
+
+<p>下一章 ch5 转向<em>整体</em>: 整条闭合曲线<em>整体</em> 的几何性质。两个标志结果:</p>
+
+<ul>
+  <li><em>4-顶点定理</em>: 任何简单闭凸平面曲线至少有<em>4 个</em> 顶点（曲率局部极值点）。椭圆<em>恰好</em> 达到这个下界。</li>
+  <li><em>等周不等式</em>: 周长 \(L\) 的简单闭曲线围出的面积 \(A \le L^2 / (4\pi)\), 等号 \(\Leftrightarrow\) 圆。</li>
+</ul>
+
+<p>这两条都是<em>整体几何</em> 而非局部——它们对整个闭合曲线说话, 不只是在每个点说。Banner 风格上这种"<em>从局部到整体</em>" 的跳跃常常需要新的工具——5 章会用到 Fourier 分析和复变函数的小技巧来证等周不等式。</p>
+
+<p>请你<em>动手</em> 算一道: 让 \(\gamma(t) = (\cos t, \sin t, 0)\)（平面单位圆当成 3D 曲线）跑一遍 §4.5 的算法, 求 \(T, N, B, \kappa, \tau\)。预期 \(\kappa = 1, \tau = 0, B = (0, 0, 1)\) 常数。验证 Frenet-Serret 方程对它成立。这个手算把"<em>平面曲线 = 扭率零</em>" 这条命题落到具体计算。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 平面曲线：曲率与切向量</a><a href="ch5.html">下一章 · 第 5 章 整体曲线：4-顶点定理 + 等周不等式 →</a></nav>
+</main>
+</body>
+</html>

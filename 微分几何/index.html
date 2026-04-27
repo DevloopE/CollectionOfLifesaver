@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目录 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+<h1>普林斯顿微分几何读本</h1>
+
+<p style="margin-top:-0.5rem;color:var(--ink-soft);font-style:italic;">曲线 + 曲面 + Gauss-Bonnet · 经典微分几何, 通向流形 / 黎曼 / 物理的入口</p>
+
+<h1 id="preface">前言</h1>
+
+<p>欢迎你翻开这本书。这是数学里最直观、也最有几何味道的一门——研究曲线和曲面"<em>怎么弯</em>"。你能<em>看见</em> 一个圆比另一个圆"更弯"; <em>看见</em> 球面比平面"更弯"; <em>看见</em> 鞍面与球面"<em>弯的方式不同</em>"。这本书把这些直观感受形式化为<em>曲率</em>——一个能精确量化"弯多少" 的数。一旦曲率有了, 你能问深一层的问题：<em>能不能把球面摊平到纸上</em>？答案——<em>不能</em>。这就是为什么所有世界地图都失真; 这就是 Gauss 1827 年震惊学术界的<em>Theorema Egregium</em> 的内容。</p>
+
+<p>这本书走的是<em>古典</em> 路线——曲线和曲面在 \(\mathbb{R}^3\) 中, 用多元微积分 + 线性代数当工具。<em>不</em> 走更高级的"<em>抽象流形</em>" 路线（那是 archive/tier4/ 里黎曼几何的工作, 待用 Banner 重写）。古典路线的好处是<em>能画出来</em>——每个概念都对应一个可视图像。</p>
+
+<h2>这本书的角色</h2>
+
+<p>系列<em>第 13 卷</em>。前置最重要的两本——<a href="../多元微积分/index.html">第 1 卷《多元微积分》</a>（雅可比 / 链式 / 隐函数定理 / 表面积）和<a href="../线性代数/index.html">第 2 卷《线性代数》</a>（特征值 / 二次型 / 对称矩阵）。<a href="../拓扑学/index.html">第 12 卷《拓扑学》</a>不是必需但有助于 ch20-22 流形语言。其他卷（实分析 / 复分析 / 抽象代数 / 数值方法）都不是前置。</p>
+
+<p>它的<em>下一步</em>：archive/tier4/ 里归档的<em>黎曼几何</em>（待 Banner 重写）。本书 ch21-22 给抽象流形和度量张量的入门, 让读者能<em>开始</em> 读 do Carmo / Lee / Petersen 那种黎曼几何书。</p>
+
+<h2>这本书<em>不</em>是什么</h2>
+
+<p>它<em>不</em>是黎曼几何——本书止步于"<em>R³ 中的曲面</em>" + 抽象流形入门。\(\nabla\) 联络 / Riemann 张量 / Killing 形式等是下一步话题。</p>
+
+<p>它<em>不</em>是微分拓扑——切丛 / 余切丛 / 微分形式做了一些（ch12 入门）但 Sard 定理 / 横截相交 / 同伦/同调 等不是话题。</p>
+
+<p>它<em>不</em>是 Spivak 五卷本——Spivak 那种"<em>所有视角都讲一遍</em>" 的百科全书风格不是本书目标; 本书每章只挑核心讲透。</p>
+
+<h2>读这本书之前你需要什么</h2>
+
+<p>你需要<a href="../多元微积分/index.html">多元微积分</a>第 6-15 章——梯度 / 雅可比 / 链式法则 / 隐函数定理 / 多重积分 / Stokes 定理。本书几乎每章都用。</p>
+
+<p>你需要<a href="../线性代数/index.html">线性代数</a>第 6-20 章——内积 / 正交矩阵 / 特征值 / 对称矩阵正交对角化 / 二次型。第二基本形式（ch9）就是个对称双线性形式。</p>
+
+<p>你<em>不</em> 需要<a href="../实分析/index.html">实分析</a>——本书几乎所有事情都"<em>足够光滑</em>" 假设, 不纠缠 \(\varepsilon\)-\(\delta\)。</p>
+
+<p>你需要的更像一种态度：愿意接受"<em>把几何画面变成代数</em>" 的反复操作; 愿意自己<em>画几个例子</em> 而不是只看公式。本书每章都强烈推荐准备一张草稿纸。</p>
+
+<h2>"我下周就要考期中, 从哪里开始?"</h2>
+
+<p>看你课重点。本科<em>古典微分几何</em> 标准考试看：</p>
+
+<ul>
+  <li>曲线：弧长参数化 + Frenet-Serret + 曲率扭率（ch2-5）</li>
+  <li>曲面：第一 / 第二基本形式（ch7, 9）</li>
+  <li>主曲率 / Gauss / 平均曲率（ch10）</li>
+  <li>Theorema Egregium（ch11）</li>
+  <li>测地线（ch13-14）</li>
+  <li>Gauss-Bonnet（ch16-17）</li>
+</ul>
+
+<p>研究生<em>过渡到黎曼</em> 加上：</p>
+
+<ul>
+  <li>微分形式 / 整体几何（ch12, 18）</li>
+  <li>抽象流形（ch21-22）</li>
+  <li>极小曲面（ch19）</li>
+</ul>
+
+<h2>致谢</h2>
+
+<p>本书向 Adrian Banner 的<em>《微积分读本》</em> 致敬。内容主要参考 do Carmo <em>Differential Geometry of Curves and Surfaces</em>（首选, 古典最经典）+ Pressley <em>Elementary Differential Geometry</em>（更简单）+ Kühnel <em>Differential Geometry: Curves – Surfaces – Manifolds</em>（覆盖广）+ Lee <em>Introduction to Smooth Manifolds</em>（流形入门）+ O'Neill <em>Elementary Differential Geometry</em>（用微分形式）。</p>
+
+<h2>目录</h2>
+
+<ol>
+  <li><a href="ch1.html">第 1 章 引论：从弯曲到曲率</a> — 圆弯, 球面更弯, 但球面摊不平。</li>
+  <li><a href="ch2.html">第 2 章 曲线：参数化与弧长</a> — 同一个曲线无穷多种参数化。</li>
+  <li><a href="ch3.html">第 3 章 平面曲线：曲率与切向量</a> — 二维曲率最朴素。</li>
+  <li><a href="ch4.html">第 4 章 空间曲线：Frenet-Serret</a> — 三维加上扭率, \(T, N, B\) 三标架。</li>
+  <li><a href="ch5.html">第 5 章 整体曲线：4-顶点定理 + 等周不等式</a> — 全局结论。</li>
+  <li><a href="ch6.html">第 6 章 正则曲面：定义与标准例子</a> — 球面 / 环面 / 旋转面 / 图。</li>
+  <li><a href="ch7.html">第 7 章 第一基本形式：内蕴度量</a> — 在曲面上量长度 / 角度 / 面积。</li>
+  <li><a href="ch8.html">第 8 章 Gauss 映射：法向量场</a> — 把曲面映到单位球。</li>
+  <li><a href="ch9.html">第 9 章 第二基本形式与主曲率</a> — 切平面上的对称形式。</li>
+  <li><a href="ch10.html">第 10 章 Gauss 曲率与平均曲率</a> — 两个最重要不变量。</li>
+  <li><a href="ch11.html">第 11 章 Theorema Egregium (Gauss 1827)</a> — Gauss 曲率<em>内蕴</em>。</li>
+  <li><a href="ch12.html">第 12 章 微分形式入门</a> — 现代几何的语言。</li>
+  <li><a href="ch13.html">第 13 章 测地线：曲面上的"直线"</a> — 局部最短路径。</li>
+  <li><a href="ch14.html">第 14 章 测地坐标 + 指数映射</a> — 把切空间"卷" 上曲面。</li>
+  <li><a href="ch15.html">第 15 章 完备性与 Hopf-Rinow 类比</a> — 测地线全局存在性。</li>
+  <li><a href="ch16.html">第 16 章 Gauss-Bonnet 局部</a> — \(\int K + \oint \kappa_g + \sum \text{角} = 2\pi\)。</li>
+  <li><a href="ch17.html">第 17 章 Gauss-Bonnet 整体</a> — \(\int K = 2\pi \chi\)。</li>
+  <li><a href="ch18.html">第 18 章 拓扑分类与高斯-博内推论</a> — 几何决定拓扑。</li>
+  <li><a href="ch19.html">第 19 章 极小曲面</a> — 平均曲率 = 0 的曲面。</li>
+  <li><a href="ch20.html">第 20 章 可定向曲面分类</a> — \(\Sigma_g\) 与亏格。</li>
+  <li><a href="ch21.html">第 21 章 抽象流形入门</a> — 离开 \(\mathbb{R}^3\), 内蕴流形。</li>
+  <li><a href="ch22.html">第 22 章 黎曼度量与黎曼几何雏形</a> — 度量张量、Christoffel 符号、Riemann 张量。</li>
+  <li><a href="ch23.html">第 23 章 应用：广义相对论与几何物理</a> — 时空作为洛伦兹流形。</li>
+  <li><a href="ch24.html">第 24 章 应用：计算机图形学与离散微分几何</a> — 网格、离散曲率、TDA。</li>
+</ol>
+
+<ul>
+  <li><a href="appA.html">附录 A 多元微积分速查</a></li>
+  <li><a href="appB.html">附录 B Lie 群 + 黎曼几何预告</a></li>
+  <li><a href="subject-index.html">主题索引</a></li>
+</ul>
+
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+</main>
+</body>
+</html>

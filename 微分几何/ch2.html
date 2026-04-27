@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 2 章 曲线：参数化与弧长 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论：从弯曲到曲率</a><a href="ch3.html">下一章 · 第 3 章 平面曲线：曲率与切向量 →</a></nav>
+<h1 id="ch2">第 2 章 曲线：参数化与弧长</h1>
+
+<p>请你画一个单位圆。再画一遍。再一遍。请你<em>不要</em> 用同一种方式画三遍——三种<em>不同</em> 的画法。</p>
+
+<p>第一遍你大概是<em>从顶上开始</em>, 顺时针走一圈, 心里数"<em>0 度, 30 度, 60 度…</em>"——这是<em>按角度</em> 描点。第二遍你也许是先在 \(x\)-轴上从 \(-1\) 标到 \(1\), 再算每一处对应的 \(y = \pm\sqrt{1 - x^2}\)——<em>按 \(x\) 投影</em>。第三遍如果我让你"<em>每秒走 1 厘米</em>" 描这个圆, 你不再按角度, 不再按 \(x\), 而是<em>按真实走过的距离</em>——这就是<em>弧长参数化</em>。</p>
+
+<p>同一条曲线（一个圆）能被这三种方式描出来——三种<em>参数化</em>。一个曲线和它的参数化<em>不是同一个东西</em>: 曲线是一个几何对象（一团点）, 参数化是<em>一种描点的方式</em>。一个曲线有<em>无穷多种</em> 参数化。</p>
+
+<p>本章问的事是：所有这些参数化里, <em>有没有一种"最自然"的</em>？答案是<em>弧长参数化</em>。它最自然——因为它把"<em>曲线长度</em>" 这个内蕴信息直接编进了参数本身。代价是: 弧长参数化对绝大多数曲线<em>解析上算不出来</em>——你能写出弧长积分公式, 但反解出参数 \(s \mapsto \gamma(s)\) 通常做不到。但即便如此, 弧长参数化在<em>理论</em> 上仍然是无价的: 后面三章关于曲率 / Frenet-Serret / 复原定理的所有公式, 在弧长参数化下都变得最干净。</p>
+
+<p>这一章建立四件事: <strong>(a)</strong> 参数化曲线的形式定义, <strong>(b)</strong> 切向量与速度, <strong>(c)</strong> 弧长公式, <strong>(d)</strong> 弧长重新参数化的存在性（局部）。</p>
+
+<h2 id="sec2-1">2.1 朴素：参数化曲线是什么</h2>
+
+<p>一根曲线<em>在数学里</em> 怎么写下来？最朴素的想法——把它当成一个<em>动点轨迹</em>, 用时间 \(t\) 描点的位置。</p>
+
+<p><strong>定义.</strong> 一条 \(\mathbb{R}^n\) 中的<em>参数化曲线</em> 是一个映射</p>
+
+<p>\[
+\gamma: I \to \mathbb{R}^n, \qquad t \mapsto \gamma(t),
+\]</p>
+
+<p>其中 \(I \subset \mathbb{R}\) 是一个区间（开 / 闭 / 半开都行）, \(\gamma\) 至少是 \(C^1\) 的（即每个分量函数有连续导数）。</p>
+
+<p>这条定义朴素到几乎像不是数学——"<em>从一个区间到 \(\mathbb{R}^n\) 的光滑映射</em>"。但它把"<em>曲线</em>" 这种几何概念<em>变成了一个分析对象</em>: 你能对 \(\gamma\) 求导, 你能积分, 你能做估计。曲线变得<em>可算</em>。</p>
+
+<p>几个标准例子:</p>
+
+<p><strong>(1) 直线.</strong> \(\gamma(t) = p + t v\), \(p, v \in \mathbb{R}^n\) 固定, \(v \neq 0\)。这是过 \(p\) 沿方向 \(v\) 的直线。</p>
+
+<p><strong>(2) 单位圆.</strong> \(\gamma(t) = (\cos t, \sin t)\), \(t \in [0, 2\pi)\)。值域是平面上的单位圆。</p>
+
+<p><strong>(3) 椭圆.</strong> \(\gamma(t) = (a \cos t, b \sin t)\), \(a, b > 0\), \(a \neq b\)。半轴 \(a, b\)。</p>
+
+<p><strong>(4) 螺旋线.</strong> \(\gamma(t) = (a \cos t, a \sin t, b t)\), \(a, b > 0\), \(t \in \mathbb{R}\)。它绕 \(z\)-轴转, 同时沿 \(z\) 上升。</p>
+
+<p><strong>(5) 抛物线.</strong> \(\gamma(t) = (t, t^2)\), \(t \in \mathbb{R}\)。普通抛物线 \(y = x^2\) 用 \(x\) 当参数。</p>
+
+<p>请你停下来注意一件事: 例 (5) 抛物线的<em>形状</em> 和 \(y = x^2\) 没区别——它就是大家熟悉的抛物线。<em>什么变了</em>？我们给它配了一个映射, 把<em>形状</em> 变成了一个<em>带方向 + 速度</em> 的轨迹。这是参数化与"曲线作为几何对象" 的<em>区别</em>。同一个抛物线还能用 \(\gamma(t) = (t^3, t^6)\)——这也描出了 \(y = x^2\) 的形状, 但<em>速度变了</em>: 在 \(t = 0\) 处 \(\gamma'(0) = 0\), 速度归零。后面会看到这种<em>正则性</em> 退化是个麻烦。</p>
+
+<h2 id="sec2-2">2.2 同一个圆, 三种描法</h2>
+
+<p>把开头那个观察形式化。同一个单位圆 \(\{(x, y) : x^2 + y^2 = 1\}\) 可以这样参数化:</p>
+
+<p><strong>(a) 角度参数化.</strong></p>
+
+<p>\[
+\gamma_1(t) = (\cos t, \sin t), \quad t \in [0, 2\pi).
+\]</p>
+
+<p>\(t\) 是从 \(x\)-轴正方向逆时针转过的角度。这是最熟悉的写法。</p>
+
+<p><strong>(b) 倍速角度参数化.</strong></p>
+
+<p>\[
+\gamma_2(t) = (\cos 2t, \sin 2t), \quad t \in [0, \pi).
+\]</p>
+
+<p>同一个圆, 但<em>跑两倍快</em>——\(t\) 从 \(0\) 到 \(\pi\) 就走完一周。\(\gamma_1\) 与 \(\gamma_2\) 描出<em>同一个集合</em>, 但作为映射不同。</p>
+
+<p><strong>(c) \(x\)-投影参数化（半圆）.</strong></p>
+
+<p>\[
+\gamma_3(t) = \big(t, \sqrt{1 - t^2}\big), \quad t \in (-1, 1).
+\]</p>
+
+<p>这只描出上半圆。\(t\) 是 \(x\)-坐标本身。注意 \(t = \pm 1\) 处不能取——那里 \(\sqrt{1-t^2}\) 求导发散。这种参数化局限性大。</p>
+
+<p><strong>(d) 弧长参数化.</strong> 既然 \(\gamma_1\) 在每个 \(t\) 速度 \(|\gamma_1'(t)| = |(-\sin t, \cos t)| = 1\), 它<em>本来就是</em> 弧长参数化——\(t\) 同时是角度<em>和</em> 弧长（单位圆上恰好巧合）。改半径 \(R\) 的圆 \(\gamma(t) = (R \cos t, R \sin t)\), 速度 \(R\), 弧长参数化要把 \(t\) 缩成 \(s = R t\):</p>
+
+<p>\[
+\gamma_{\text{弧}}(s) = (R \cos(s/R), R \sin(s/R)), \quad s \in [0, 2\pi R).
+\]</p>
+
+<p>速度 \(|\gamma_{\text{弧}}'(s)| = 1\) 恒成立。</p>
+
+<p>请你看清楚这件事: <em>同一个几何对象</em> 在 (a)(b)(c)(d) 下被描出, 但描法千差万别——速度、定义域、起点、方向都可能不同。"<em>曲线</em>" 是模 (a)(b)(c)(d) 的等价类; "<em>参数化曲线</em>" 是这等价类里某个具体代表。本书后面"<em>曲线</em>" 一词常常指<em>参数化曲线</em>, 但你心里要记得这个区分——很多公式（比如曲率公式）需要的是几何对象的不变量, 不能依赖参数化的特定写法。</p>
+
+<h2 id="sec2-3">2.3 切向量 + 速度</h2>
+
+<p>对一个 \(C^1\) 参数化曲线 \(\gamma(t)\), 求导得</p>
+
+<p>\[
+\gamma'(t) = \big(\gamma_1'(t), \gamma_2'(t), \dots, \gamma_n'(t)\big) \in \mathbb{R}^n.
+\]</p>
+
+<p>这个向量叫<em>切向量</em>（tangent vector）。它的几何含义: \(\gamma(t)\) 在时刻 \(t\) 的<em>瞬时位移方向</em> 与<em>瞬时速度</em>。</p>
+
+<p>切向量的<em>长度</em></p>
+
+<p>\[
+|\gamma'(t)| = \sqrt{\gamma_1'(t)^2 + \cdots + \gamma_n'(t)^2}
+\]</p>
+
+<p>叫<em>速度</em>（speed）——它告诉你"<em>每单位 \(t\) 走多远的弧长</em>"。\(\gamma'\) 本身是带方向的速度向量; \(|\gamma'|\) 是它的模, 一个非负实数。</p>
+
+<p><strong>例子.</strong></p>
+
+<p>\(\gamma_1(t) = (\cos t, \sin t)\) 的切向量 \(\gamma_1'(t) = (-\sin t, \cos t)\)。速度 \(|\gamma_1'(t)| = 1\)——单位圆按角度参数化时, <em>本身就是</em> 单位速度。</p>
+
+<p>\(\gamma_2(t) = (\cos 2t, \sin 2t)\) 切向量 \(\gamma_2'(t) = (-2 \sin 2t, 2 \cos 2t)\), 速度 \(|\gamma_2'(t)| = 2\)——倍速角度参数化的速度恒为 2。</p>
+
+<p>\(\gamma_3(t) = (t, \sqrt{1-t^2})\)（上半圆 \(x\)-投影）切向量 \(\gamma_3'(t) = (1, -t/\sqrt{1-t^2})\)。速度</p>
+
+<p>\[
+|\gamma_3'(t)| = \sqrt{1 + \frac{t^2}{1-t^2}} = \frac{1}{\sqrt{1 - t^2}}.
+\]</p>
+
+<p>当 \(t \to \pm 1\) 速度爆炸——这是 \(x\)-投影参数化在端点处<em>退化</em> 的表现: \(x\)-坐标变化无限慢, 但点本身仍以有限速度沿圆移动, 所以<em>每单位 \(t\) 走过的弧长</em> 趋于无穷。</p>
+
+<p>螺旋线 \(\gamma(t) = (a \cos t, a \sin t, b t)\) 切向量 \(\gamma'(t) = (-a \sin t, a \cos t, b)\), 速度</p>
+
+<p>\[
+|\gamma'(t)| = \sqrt{a^2 \sin^2 t + a^2 \cos^2 t + b^2} = \sqrt{a^2 + b^2}.
+\]</p>
+
+<p>常数。每秒走 \(\sqrt{a^2 + b^2}\) 长。</p>
+
+<p>抛物线 \(\gamma(t) = (t, t^2)\) 切向量 \((1, 2t)\), 速度 \(\sqrt{1 + 4t^2}\)——速度<em>不</em> 常数: \(t = 0\) 处最慢（速度 1）, 越走越快。</p>
+
+<h2 id="sec2-4">2.4 弧长——曲线的"内蕴长度"</h2>
+
+<p>给一个参数化曲线 \(\gamma: [a, b] \to \mathbb{R}^n\), 它的<em>总长度</em> 怎么算？</p>
+
+<p>朴素想法（折线逼近）: 把 \([a, b]\) 划分成许多小段 \(a = t_0 < t_1 < \cdots < t_N = b\), 每段近似成<em>直线段</em>, 把这些直线段长度加起来:</p>
+
+<p>\[
+L \approx \sum_{i=1}^N |\gamma(t_i) - \gamma(t_{i-1})|.
+\]</p>
+
+<p>当划分加密 \(\max |t_i - t_{i-1}| \to 0\), 这些折线长度趋于一个极限——这极限就是曲线长度。</p>
+
+<p>把每段 \(|\gamma(t_i) - \gamma(t_{i-1})| \approx |\gamma'(t_{i-1})| \cdot (t_i - t_{i-1})\)（由 \(C^1\) 性质）, 上面的和趋于一个 Riemann 积分:</p>
+
+<p>\[
+\boxed{\ L = \int_a^b |\gamma'(t)| \, dt.\ }
+\]</p>
+
+<p>这是<em>曲线长度</em> 的标准公式。它是<em>内蕴量</em>——给一个几何对象（曲线）一个数, 这个数<em>不依赖具体参数化</em>。下面看看为什么。</p>
+
+<p><strong>不依赖参数化（重新参数化不变性）.</strong> 设 \(\phi: [a', b'] \to [a, b]\) 是 \(C^1\) 的、严格递增的、满射, 即一个"<em>重新参数化</em>" 函数。设 \(\tilde \gamma(u) := \gamma(\phi(u))\)。则</p>
+
+<p>\[
+\int_{a'}^{b'} |\tilde \gamma'(u)| \, du = \int_{a'}^{b'} |\gamma'(\phi(u)) \phi'(u)| \, du = \int_{a'}^{b'} |\gamma'(\phi(u))| \, \phi'(u) \, du.
+\]</p>
+
+<p>（最后一步用了 \(\phi' > 0\)。）做换元 \(t = \phi(u)\), \(dt = \phi'(u) du\):</p>
+
+<p>\[
+= \int_a^b |\gamma'(t)| \, dt.
+\]</p>
+
+<p>所以 \(L\) 在重新参数化下不变。它是曲线作为<em>几何对象</em> 的属性, 不是参数化的属性。</p>
+
+<p><strong>具体例子.</strong></p>
+
+<p><em>(1) 单位圆 \(\gamma(t) = (\cos t, \sin t), t \in [0, 2\pi]\)</em>。\(L = \int_0^{2\pi} 1 \, dt = 2\pi\)。预期。</p>
+
+<p><em>(2) 半径 \(R\) 圆.</em> \(L = \int_0^{2\pi} R \, dt = 2\pi R\)。</p>
+
+<p><em>(3) 螺旋线 \(\gamma(t) = (a \cos t, a \sin t, b t), t \in [0, 2\pi]\)（一圈）.</em> \(L = 2\pi \sqrt{a^2 + b^2}\)。</p>
+
+<p><em>(4) 抛物线段 \(\gamma(t) = (t, t^2), t \in [0, 1]\).</em></p>
+
+<p>\[
+L = \int_0^1 \sqrt{1 + 4t^2} \, dt.
+\]</p>
+
+<p>这个积分能算（用 \(u = 2t\) 化为标准形 \(\int \sqrt{1+u^2} du\)）, 结果是 \(\frac{\sqrt{5}}{2} + \frac{1}{4} \ln(2 + \sqrt{5})\), 一个<em>不能写成有理表达式</em> 的东西。这种"<em>弧长是无理函数</em>" 的现象很普遍——下一节我们把这件事变成关键观察。</p>
+
+<p><em>(5) 椭圆 \(\gamma(t) = (a \cos t, b \sin t), t \in [0, 2\pi], a \neq b\).</em></p>
+
+<p>\[
+L = \int_0^{2\pi} \sqrt{a^2 \sin^2 t + b^2 \cos^2 t} \, dt.
+\]</p>
+
+<p>这<em>不能</em> 写成初等函数——它叫<em>椭圆积分</em>, 一个特殊函数家族。这就是椭圆周长在初中没法给公式（只给 \(\pi (a + b)\) 之类近似）的真正原因: 弧长积分不能做。</p>
+
+<h2 id="sec2-5">2.5 弧长函数 \(s(t)\)</h2>
+
+<p>固定一个起点 \(t = a\), 定义</p>
+
+<p>\[
+\boxed{\ s(t) := \int_a^t |\gamma'(\tau)| \, d\tau.\ }
+\]</p>
+
+<p>这叫<em>弧长函数</em>——从起点 \(a\) 到 \(t\) 沿曲线走过的距离。它是 \(t\) 的<em>函数</em>: 给 \(t\) 你给一个非负数 \(s(t) \ge 0\)。</p>
+
+<p>由微积分基本定理 \(s'(t) = |\gamma'(t)|\)。如果 \(\gamma' \neq 0\) 处处（即<em>正则</em>, 后面 §2.7 详谈）, 那 \(s'(t) > 0\), \(s\) 严格递增, 是 \([a, b] \to [0, L]\) 的双射。</p>
+
+<p>所以 \(s\) 有反函数 \(s \mapsto t(s)\)。这就是<em>弧长重新参数化</em> 的核心。</p>
+
+<p><strong>例子.</strong></p>
+
+<p><em>(1) 半径 \(R\) 圆 \(\gamma(t) = (R \cos t, R \sin t)\)</em>: 速度 \(R\), 弧长函数 \(s(t) = \int_0^t R \, d\tau = R t\)。反函数 \(t(s) = s/R\)。所以弧长参数化:</p>
+
+<p>\[
+\gamma_{\text{弧}}(s) = \gamma(t(s)) = (R \cos(s/R), R \sin(s/R)).
+\]</p>
+
+<p>验证: \(\gamma_{\text{弧}}'(s) = (-\sin(s/R), \cos(s/R))\), 长度 1。✓</p>
+
+<p><em>(2) 螺旋线.</em> \(s(t) = \sqrt{a^2 + b^2} \cdot t\), \(t(s) = s/\sqrt{a^2+b^2}\)。设 \(c := \sqrt{a^2+b^2}\):</p>
+
+<p>\[
+\gamma_{\text{弧}}(s) = (a \cos(s/c), a \sin(s/c), b s/c).
+\]</p>
+
+<p>速度 \((-a/c \sin, a/c \cos, b/c)\), 长度 \(\sqrt{a^2/c^2 + b^2/c^2} = 1\)。✓</p>
+
+<p><em>(3) 抛物线 \(\gamma(t) = (t, t^2)\).</em> 速度 \(\sqrt{1+4t^2}\), 弧长 \(s(t) = \int_0^t \sqrt{1+4\tau^2} d\tau\) 是个无理函数, 反函数 \(t(s)\) <em>没有初等表达式</em>。所以抛物线的弧长参数化<em>存在</em>（理论上）但<em>写不出来</em>。这是常态而不是例外。</p>
+
+<p><em>(4) 椭圆.</em> 弧长函数 \(s(t)\) 是椭圆积分; 反函数 \(t(s)\) 涉及椭圆函数（Jacobi 椭圆函数家族）。一样写不成初等表达式。</p>
+
+<p>请你停下来感受这件事: 弧长参数化在<em>定义</em> 上简单（"<em>按真实距离描点</em>"）, 但在<em>解析</em> 上往往做不出来。这是为什么后面讨论曲率时, 我们经常分两套写: 一套<em>弧长参数化下的优雅公式</em>（\(\kappa = |\gamma''(s)|\)）; 另一套<em>一般参数化下的可计算公式</em>（\(\kappa = |\gamma' \times \gamma''| / |\gamma'|^3\)）。两套是<em>等价</em> 的, 但前者用于推理, 后者用于计算。</p>
+
+<h2 id="sec2-6">2.6 弧长参数化的特征: \(|\gamma'(s)| = 1\) 恒成立</h2>
+
+<p>把上面零碎的观察凝结成一条:</p>
+
+<p><strong>命题.</strong> 一个参数化曲线 \(\gamma(s)\) 是弧长参数化 \(\Longleftrightarrow\) 速度 \(|\gamma'(s)| = 1\) 恒成立。</p>
+
+<p>证明. (\(\Rightarrow\)) 由弧长函数定义, 弧长参数化 \(\gamma_{\text{弧}}(s) = \gamma(t(s))\), 链式法则给</p>
+
+<p>\[
+\gamma_{\text{弧}}'(s) = \gamma'(t(s)) \cdot t'(s) = \gamma'(t) \cdot \frac{1}{s'(t)} = \frac{\gamma'(t)}{|\gamma'(t)|}.
+\]</p>
+
+<p>这是单位向量。✓</p>
+
+<p>(\(\Leftarrow\)) 反之若 \(|\gamma'(s)| = 1\) 处处, 则弧长函数</p>
+
+<p>\[
+\int_a^s |\gamma'(\tau)| d\tau = \int_a^s 1 \, d\tau = s - a.
+\]</p>
+
+<p>所以参数 \(s\) 与从 \(a\) 起的弧长<em>线性同步</em>——这就是弧长参数化（差一个起点偏移）。</p>
+
+<p>这个等价是后面所有事情的<em>关键</em>。它说: <em>识别</em> 弧长参数化 = <em>验证</em> 速度恒为 1。后面 ch3 我们要用这条事实推 \(\gamma'' \perp \gamma'\)（在弧长参数化下）, 那是曲率的入口。</p>
+
+<h2 id="sec2-7">2.7 正则曲线</h2>
+
+<p>一切上述论证暗暗依赖一件事——\(\gamma' \neq 0\) 处处。这条性质有名字。</p>
+
+<p><strong>定义.</strong> 参数化曲线 \(\gamma: I \to \mathbb{R}^n\) 称为<em>正则</em>（regular）的, 如果 \(\gamma'(t) \neq 0\) 对所有 \(t \in I\)。</p>
+
+<p>正则性<em>不</em>是几何性质——它是<em>参数化的性质</em>。同一个几何对象有正则参数化也可能有非正则参数化。最明显的例子: 抛物线 \(y = x^2\) 用 \(\gamma(t) = (t, t^2)\) 是正则的（\(\gamma'(0) = (1, 0) \neq 0\)）, 但用 \(\tilde \gamma(t) = (t^3, t^6)\) 在 \(t = 0\) 处 \(\tilde \gamma'(0) = (0, 0)\)——非正则。</p>
+
+<p>正则性的几何意义: 曲线<em>在每点有明确的切方向</em>。\(\gamma'(t) = 0\) 的点叫<em>奇异点</em>; 这些点处切方向不定义。一个奇异点可以是几何尖（cusp）的征兆。例: \(\gamma(t) = (t^2, t^3)\), \(\gamma'(0) = 0\)。它的像是<em>半立方抛物线</em> \(y^2 = x^3\), 在原点有一个明显的<em>尖角</em>。这种几何上的"尖" 总伴随某个参数化下的 \(\gamma' = 0\)。</p>
+
+<p>本章 + 后面三章默认所有曲线<em>正则</em>。</p>
+
+<p><strong>定理（局部弧长参数化）.</strong> 设 \(\gamma: I \to \mathbb{R}^n\) 是 \(C^k\) 正则曲线（\(k \ge 1\)）。则对任一 \(t_0 \in I\), 存在 \(t_0\) 的开邻域 \(J \subset I\) 和 \(C^k\) 微分同胚 \(\phi: \tilde J \to J\) 使</p>
+
+<p>\[
+\tilde \gamma(s) := \gamma(\phi(s))
+\]</p>
+
+<p>是弧长参数化（即 \(|\tilde \gamma'(s)| = 1\) 处处）。</p>
+
+<p>证明. 取 \(J\) 是 \(t_0\) 的小邻域使 \(|\gamma'| > 0\)（由连续性）。在 \(J\) 上定义 \(s(t) = \int_{t_0}^t |\gamma'(\tau)| d\tau\)。由 \(s'(t) = |\gamma'(t)| > 0\), \(s\) 严格递增, 有反函数 \(\phi := s^{-1}\)。\(\phi\) 是 \(C^k\) 由反函数定理（注意 \(s \in C^k\) 因为 \(|\gamma'(t)| = (\gamma' \cdot \gamma')^{1/2}\) 在 \(\gamma' \neq 0\) 处是 \(C^k\) 的）。设 \(\tilde \gamma(s) = \gamma(\phi(s))\), 上节计算给 \(|\tilde \gamma'(s)| = 1\)。</p>
+
+<p>这条定理说: <em>正则曲线一定能被弧长参数化, 至少在局部</em>。这件事保证了我们后面"<em>不妨假设 \(\gamma\) 是弧长参数化</em>" 的论证<em>不损失一般性</em>——只是改个参数化的事, 几何对象没变。</p>
+
+<p><strong>注意.</strong> 定理给的是<em>局部</em> 存在性。<em>整体</em> 弧长参数化也存在（拼接局部即可）, 但定义域会从 \(I\) 变成 \([0, L]\) 或 \(\mathbb{R}\)（如果 \(L = \infty\)）。这种全局重参数化在<em>分析</em> 上没问题, 在<em>计算</em> 上常常不可行（如上例抛物线）。</p>
+
+<h2 id="sec2-8">2.8 一道临别提示</h2>
+
+<p>本章建立了:</p>
+
+<ul>
+  <li>参数化曲线 \(\gamma: I \to \mathbb{R}^n\), \(C^1\) 映射。</li>
+  <li>切向量 \(\gamma'(t)\), 速度 \(|\gamma'(t)|\)。</li>
+  <li>弧长 \(L = \int_a^b |\gamma'| dt\), 重新参数化不变。</li>
+  <li>弧长函数 \(s(t)\), 弧长重参数化 \(\tilde \gamma(s)\), 满足 \(|\tilde \gamma'(s)| = 1\)。</li>
+  <li>正则性（\(\gamma' \neq 0\)）保证局部弧长参数化存在。</li>
+</ul>
+
+<p>下一章我们用这套工具定义<em>曲率</em>。在弧长参数化下, \(|\gamma'(s)| = 1\) 给出 \(\gamma'(s) \cdot \gamma'(s) = 1\)。两边对 \(s\) 求导, \(2 \gamma''(s) \cdot \gamma'(s) = 0\)——所以 \(\gamma''(s) \perp \gamma'(s)\)。这条<em>正交关系</em> 是曲率几何意义的基础: \(\gamma''(s)\) 度量切向量"<em>转弯</em>" 的速率, 它必然垂直于切向量。\(\kappa(s) := |\gamma''(s)|\) 就是平面曲线的曲率。我们将看到这条定义和 ch1 的"<em>密切圆半径倒数</em>" 一致, 与 \(\gamma\) 的<em>形状</em> 一致, 而不依赖参数化的具体写法。</p>
+
+<p>请你<em>动手</em> 算一遍单位圆与半径 \(R\) 圆的弧长参数化, 把第三章的 \(\kappa = |\gamma''|\) 套上去看看是不是 \(1/R\)。这个手算 30 秒, 但它把 ch1 那个"\(\kappa = 1/r\)" 直观和 ch3 的形式定义<em>缝起来</em>——这种缝合就是 Banner 教学法的全部目的。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论：从弯曲到曲率</a><a href="ch3.html">下一章 · 第 3 章 平面曲线：曲率与切向量 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B Lie 群 + 黎曼几何预告 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+<h1 id="appB">附录 B Lie 群 + 黎曼几何预告</h1>
+
+<p>本书 24 章建立的微分几何工具——曲率张量、测地线、联络、流形——是<em>古典</em> 微分几何的入口。下一步——<em>黎曼几何</em>+<em>Lie 群</em>——把这些工具进一步抽象与丰富, 通向规范场论 / 几何分析 / 现代物理。</p>
+
+<p>这个附录给"<em>下一步看什么</em>" 的导览, 不是教科书。每节给陈述、为什么本书工具自然推广到那里、以及推荐的下一本书。</p>
+
+<ul>
+  <li>Lie 群:对称性的连续版。</li>
+  <li>Lie 代数:Lie 群在单位元处的"线性化"。</li>
+  <li>例子:\(SO(n), SU(n), GL_n\)。</li>
+  <li>不变度量与 Killing 形式。</li>
+  <li>联络与曲率张量(更细致版)。</li>
+  <li>Cartan 结构方程预告。</li>
+  <li>通向 Riemann 几何的桥。</li>
+</ul>
+
+<h2 id="appB-1">B.1 Lie 群:连续对称性</h2>
+<p>对称性在数学和物理里无处不在。<em>离散</em> 对称(置换、晶格、群)通常用<em>群论</em> 处理(本系列<a href="../抽象代数/index.html">抽象代数读本</a>)。<em>连续</em> 对称——平面绕原点旋转、空间平移、时空 Lorentz 变换——需要新工具: <em>Lie 群</em>。</p>
+
+<p>定义: 一个<em>Lie 群</em> \(G\) 是一个流形(<a href="ch21.html">ch21</a>) 同时也是一个群, 使乘法 \(\mu : G \times G \to G\) 与逆 \(\iota : G \to G\) 都<em>光滑</em>。</p>
+
+<p>"光滑流形" + "群结构" 这两套结构在 \(G\) 上必须<em>兼容</em>(乘法 + 逆是光滑映射)。Sophus Lie 1873 年引入这个概念时, 是为了对称性能<em>微分</em>——能问"<em>无穷小</em> 对称性是什么"。</p>
+
+<p>最朴素例子: \(\mathbb{R}^n\) 在加法下。流形 = \(\mathbb{R}^n\), 群结构 = 向量加法。光滑性显然。这是<em>阿贝尔</em>(交换) Lie 群——结构最简单。</p>
+
+<p>更有趣: \((\mathbb{R}^*, \cdot)\) 是非零实数在乘法下——一个 1 维 Lie 群。\((\mathbb{C}^*, \cdot)\) 是 2 维。</p>
+
+<p>下一节给真正"<em>非平凡</em>" 的——<em>矩阵 Lie 群</em>。</p>
+
+<h2 id="appB-2">B.2 矩阵 Lie 群:三个家族</h2>
+<p>大部分实战 Lie 群是<em>矩阵群</em>: 是 \(GL_n(\mathbb{R})\)(\(n \times n\) 实可逆矩阵)的子群, 同时也是子流形。它们由<em>线性方程或保某种结构</em> 来定义。</p>
+
+<p><strong>例 1: \(GL_n(\mathbb{R}) = \{A \in \mathbb{R}^{n \times n} : \det A \neq 0\}\)</strong>。开子集 \(\subset \mathbb{R}^{n^2}\), 维度 \(n^2\)。乘法 \(AB\) 显然光滑(分量是多项式), 逆 \(A^{-1}\) 由 Cramer 公式给, 在 \(\det \neq 0\) 处光滑。所以 \(GL_n\) 是 \(n^2\) 维 Lie 群。<em>不</em> 紧(\(\det\) 可任意大), <em>不</em> 连通(两个分量: \(\det > 0\) 和 \(\det < 0\))。</p>
+
+<p><strong>例 2: 特殊正交群 \(SO(n) = \{A : A^T A = I, \det A = 1\}\)</strong>。即 \(\mathbb{R}^n\) 中保内积 + 保定向的线性变换。维度 \(n(n-1)/2\)。\(n = 2\): \(SO(2) =\) 圆周(2D 旋转), 1 维。\(n = 3\): \(SO(3)\) 是 3D 旋转群, 3 维, 同胚于<em>实射影空间</em> \(\mathbb{RP}^3\) (一个非平凡的紧致 3 维流形)。\(n = 4\): \(SO(4)\) 是 6 维, 在物理学里和 \(SU(2) \times SU(2)\)<em>双重</em> 覆盖关系。</p>
+
+<p><em>为什么 \(SO(n)\) 是流形</em>? 用<a href="appA.html">附录 A.5</a> 隐函数定理。\(F : \mathbb{R}^{n^2} \to \mathbb{R}^{n(n+1)/2}\), \(F(A) = A^T A - I\)(对称矩阵, 有 \(n(n+1)/2\) 独立分量)。\(F^{-1}(0) = O(n)\) 加 \(\det = 1\) 切到 \(SO(n)\)。隐函数定理给 \(F^{-1}(0)\) 是 \(n^2 - n(n+1)/2 = n(n-1)/2\) 维子流形。</p>
+
+<p><strong>例 3: 特殊酉群 \(SU(n) = \{A \in \mathbb{C}^{n \times n} : A^* A = I, \det A = 1\}\)</strong>。即复 \(\mathbb{C}^n\) 中保 Hermite 内积 + 行列式 1 的变换。维度 \(n^2 - 1\)。\(n = 2\): \(SU(2)\) 是 3 维, 同胚于<em>3 球面</em> \(S^3\)——这件事极不显然但极重要(物理学里"<em>电子自旋</em>" 用 \(SU(2)\) 描述, 它和 \(SO(3)\)<em>双重覆盖</em> 给出"<em>自旋 1/2</em>" 现象)。\(n = 3\): \(SU(3)\) 是 8 维, 强相互作用的对称群(色 SU(3))。</p>
+
+<h2 id="appB-3">B.3 Lie 代数:Lie 群在单位元处的"线性化"</h2>
+<p>Lie 群是个流形, 它在单位元 \(e \in G\) 处有<em>切空间</em> \(T_e G\)。这个切空间叫<em>Lie 代数</em>, 通常记 \(\mathfrak{g}\)。</p>
+
+<p>关键事实: \(\mathfrak{g}\) 上有一个自然的"<em>括号</em>" 运算 \([\cdot, \cdot] : \mathfrak{g} \times \mathfrak{g} \to \mathfrak{g}\), 满足:</p>
+
+<ul>
+  <li>双线性。</li>
+  <li>反对称 \([X, Y] = -[Y, X]\)。</li>
+  <li>Jacobi 恒等式 \([X, [Y, Z]] + [Y, [Z, X]] + [Z, [X, Y]] = 0\)。</li>
+</ul>
+
+<p>这种带括号的向量空间叫<em>Lie 代数</em>。</p>
+
+<p>对矩阵 Lie 群, Lie 代数有<em>具体</em> 公式:</p>
+
+<ul>
+  <li>\(\mathfrak{gl}_n = \) 所有 \(n \times n\) 矩阵, \([X, Y] = XY - YX\)(矩阵换位)。</li>
+  <li>\(\mathfrak{so}(n) = \{X : X^T = -X\}\)(<em>反对称</em> 矩阵), 维度 \(n(n-1)/2\), \([X, Y] = XY - YX\)。</li>
+  <li>\(\mathfrak{su}(n) = \{X : X^* = -X, \mathrm{tr}\, X = 0\}\)(<em>反 Hermite</em>+迹零矩阵), 维度 \(n^2 - 1\)。</li>
+</ul>
+
+<p><em>为什么 \(\mathfrak{so}(n)\) 是反对称?</em> 取 \(SO(n)\) 中过 \(I\) 的曲线 \(A(t)\), \(A(0) = I\)。条件 \(A^T A = I\) 求导给 \(A'(0)^T + A'(0) = 0\)。所以 \(X = A'(0) \in T_I SO(n)\) 必反对称。这是"<em>群的限制 → 代数的限制</em>" 的最直接例子。</p>
+
+<p>Lie 群和 Lie 代数的关系靠<em>指数映射</em>:</p>
+
+<p>\[
+\boxed{\ \exp : \mathfrak{g} \to G, \quad \exp(X) = I + X + \frac{X^2}{2!} + \frac{X^3}{3!} + \cdots \ }
+\]</p>
+
+<p>(矩阵幂级数, 对所有 \(X\) 收敛)。这个指数映射和<a href="ch14.html">ch14</a> 黎曼几何里的指数映射<em>同名</em>——而且它们是同一概念在不同语境下的化身: 都是"<em>把切空间映回流形</em>"。在 Lie 群里, \(\exp\) 把 Lie 代数(切于单位元的)沿"<em>左不变向量场</em>" 流到 Lie 群上。</p>
+
+<p>Lie 第三定理: 任何抽象 Lie 代数都是<em>某个</em> Lie 群的代数。所以"<em>Lie 群的局部结构 = Lie 代数</em>"——这是一个<em>线性化</em>原理, 类似流形的"<em>切空间是流形的局部线性化</em>"。</p>
+
+<h2 id="appB-4">B.4 不变度量与 Killing 形式</h2>
+<p>给一个 Lie 群 \(G\), 我们能在它上面放一个<em>左不变</em>(或<em>双侧不变</em>) 的黎曼度量。具体: 在单位元的切空间 \(T_e G = \mathfrak{g}\) 上选一个内积 \(\langle \cdot, \cdot \rangle_e\), 然后用左乘 \(L_g\) 把它运到每个 \(g \in G\):</p>
+
+<p>\[
+\langle X, Y \rangle_g := \langle (L_{g^{-1}})_* X, (L_{g^{-1}})_* Y \rangle_e.
+\]</p>
+
+<p>这给整个 \(G\) 一个黎曼度量, 满足左乘是<em>等距</em>。这种度量自动让 \(G\) 是<em>齐性空间</em>(homogeneous)——任何两点几何上等价。</p>
+
+<p>对<em>紧</em> Lie 群(\(SO(n), SU(n)\) 等), 存在<em>双侧不变</em> 度量(同时也右不变)。这种度量更对称, 它的测地线就是<em>单参数子群</em> \(\{\exp(tX) : t \in \mathbb{R}\}\)——指数映射的像。</p>
+
+<p>对半单 Lie 代数(<em>simple</em> 或<em>semi-simple</em>), 有一种<em>典范</em> 的内积叫<em>Killing 形式</em>:</p>
+
+<p>\[
+\boxed{\ B(X, Y) := \mathrm{tr}(\mathrm{ad}_X \circ \mathrm{ad}_Y),\ }
+\]</p>
+
+<p>其中 \(\mathrm{ad}_X : \mathfrak{g} \to \mathfrak{g}\) 是 \(\mathrm{ad}_X(Y) = [X, Y]\)。这是个对称双线性形式。</p>
+
+<p>关键事实(Cartan 准则): \(\mathfrak{g}\) 半单 ⟺ \(B\) 非退化。</p>
+
+<p>对紧 Lie 代数, \(B\) 是<em>负定</em> 的, 所以 \(-B\) 是个内积——这给了紧 Lie 群一个典范的双侧不变度量。这就是物理学里"<em>规范场论的几何</em>"——杨-Mills 场强用的就是这种 Killing-诱导度量。</p>
+
+<p><em>例</em>。\(\mathfrak{so}(3)\) 中, 选基 \(\{E_1, E_2, E_3\}\)(三个标准生成元), \([E_i, E_j] = \epsilon_{ijk} E_k\)。算 \(B(E_i, E_j) = -2 \delta_{ij}\)(Levi-Civita 给的)。所以 Killing 形式让 \(\{E_i\}\) 是个负定正交基, \(SO(3)\) 上的标准度量(\(\sim\) 圆球度量)就是 \(-B/2\)。</p>
+
+<h2 id="appB-5">B.5 联络与曲率张量(更细致版)</h2>
+<p>本书<a href="ch22.html">ch22</a> 给了 Christoffel 符号 \(\Gamma^k_{ij}\) 与 Riemann 张量 \(R^l_{ijk}\) 的定义。这一节把它们提升到更现代的"<em>联络</em>" 语言, 这正是黎曼几何 / 规范场论用的。</p>
+
+<p>抽象定义: 黎曼流形 \((M, g)\) 上的<em>仿射联络</em> \(\nabla\) 是一种"<em>沿向量场求导</em>" 的算子: 给两个向量场 \(X, Y\), 给出新向量场 \(\nabla_X Y\), 满足:</p>
+
+<ul>
+  <li>对 \(X\) 是 \(C^\infty(M)\)-线性: \(\nabla_{fX + Y} Z = f \nabla_X Z + \nabla_Y Z\)。</li>
+  <li>对 \(Y\) 是 \(\mathbb{R}\)-线性 + Leibniz: \(\nabla_X (fY) = (Xf) Y + f \nabla_X Y\)。</li>
+</ul>
+
+<p><em>Levi-Civita 联络</em>: 在黎曼流形上, 存在<em>唯一</em> 的联络满足两个额外条件:</p>
+
+<ul>
+  <li><em>无挠</em>: \(\nabla_X Y - \nabla_Y X = [X, Y]\)。</li>
+  <li><em>度量相容</em>: \(X \langle Y, Z \rangle = \langle \nabla_X Y, Z \rangle + \langle Y, \nabla_X Z \rangle\)。</li>
+</ul>
+
+<p>这条唯一性叫"<em>黎曼几何基本定理</em>"。在坐标里, Levi-Civita 联络的分量就是 Christoffel 符号:</p>
+
+<p>\[
+\nabla_{\partial_i} \partial_j = \Gamma^k_{ij} \partial_k.
+\]</p>
+
+<p>具体公式 ch22 给过:</p>
+
+<p>\[
+\Gamma^k_{ij} = \frac{1}{2} g^{kl}(\partial_i g_{lj} + \partial_j g_{il} - \partial_l g_{ij}).
+\]</p>
+
+<p><em>曲率张量</em> 用联络换位定义:</p>
+
+<p>\[
+R(X, Y) Z := \nabla_X \nabla_Y Z - \nabla_Y \nabla_X Z - \nabla_{[X, Y]} Z.
+\]</p>
+
+<p>这是<em>三参数 \(\to\) 一参数</em> 的张量——告诉你"<em>沿不同顺序求导</em> 差多少"。这<em>就是</em> ch22 的 Riemann 张量, 但写成无坐标形式。</p>
+
+<p>从 \(R\) 缩并(contract)得 Ricci 张量 \(R_{ij}\), 再缩并得标量曲率 \(R\)——和<a href="ch23.html">ch23</a> 里 GR 用的完全同款。</p>
+
+<p>这就是为什么 Cartan / Lee / do Carmo 等黎曼几何教材一开始就用"<em>联络 + 张量</em>" 的语言——它<em>独立于</em> 坐标, 让证明结构清楚。</p>
+
+<h2 id="appB-6">B.6 Cartan 结构方程预告</h2>
+<p>把上面联络 + 曲率重新用<em>微分形式</em>(<a href="ch12.html">ch12</a>)写, 得到 Cartan 1899 年的"<em>结构方程</em>"。这是黎曼几何里最优雅的公式之一。</p>
+
+<p>设流形 \(M\) 上选一个<em>正交标架场</em> \(\{e_1, \ldots, e_n\}\)。对偶 1-形式 \(\{\theta^1, \ldots, \theta^n\}\) 满足 \(\theta^i(e_j) = \delta^i_j\)。<em>联络 1-形式</em> \(\omega^i_j\) 由</p>
+
+<p>\[
+\nabla e_j = \omega^i_j \otimes e_i
+\]</p>
+
+<p>给出。<em>曲率 2-形式</em> \(\Omega^i_j\) 由</p>
+
+<p>\[
+R(\cdot, \cdot) e_j = \Omega^i_j \otimes e_i
+\]</p>
+
+<p>给出。</p>
+
+<p>Cartan <em>第一</em> 结构方程(无挠):</p>
+
+<p>\[
+\boxed{\ d\theta^i + \omega^i_j \wedge \theta^j = 0.\ }
+\]</p>
+
+<p>Cartan <em>第二</em> 结构方程(曲率):</p>
+
+<p>\[
+\boxed{\ \Omega^i_j = d\omega^i_j + \omega^i_k \wedge \omega^k_j.\ }
+\]</p>
+
+<p>这两条公式让计算曲率变得<em>大幅</em> 简化——不用算 Christoffel 符号一个个偏导, 直接做 \(d\theta\) 和 \(\omega \wedge \omega\)。它在物理 / 工程实际计算 GR 时用得最多——一旦你有度量的好选择(标架不一定要是坐标基), 算曲率就是几行 Cartan 演算。</p>
+
+<p>更深一层: 这两条方程把"<em>挠</em>" 与"<em>曲率</em>" 都识别为"<em>外微分 + 楔积</em>" 的具体表达——这建立了"<em>规范场论</em>" 的几何框架。在规范场论里:</p>
+
+<ul>
+  <li>\(\omega\) = "<em>规范势</em>"(电磁场的 \(A_\mu\), Yang-Mills 的非阿贝尔推广)。</li>
+  <li>\(\Omega\) = "<em>场强</em>"(电磁场张量 \(F_{\mu\nu}\), Yang-Mills 场强)。</li>
+  <li>\(\Omega = d\omega + \omega \wedge \omega\) = 标准物理公式 \(F = dA + A \wedge A\)。</li>
+</ul>
+
+<p>所以本书<a href="ch12.html">ch12</a> 入门的微分形式 + 这一节的 Cartan 方程, 是物理学家描述基本相互作用的<em>同一种</em> 数学。爱因斯坦的引力 + Maxwell 的电磁 + 杨-Mills 的强弱核力, 都是这个公式的某种推广。</p>
+
+<h2 id="appB-7">B.7 通向 Riemann 几何</h2>
+<p>"<em>黎曼几何</em>" 这门学科的入口在哪?</p>
+
+<p><em>主要话题</em>:</p>
+
+<ul>
+  <li><em>测地线方程的整体理论</em>: Hopf-Rinow 定理(<a href="ch15.html">ch15</a>)的完整证明; Jacobi 场(测地线"<em>邻居</em>" 的演化, 由 Riemann 张量驱动); 共轭点 / 截断点。</li>
+  <li><em>比较几何</em>: 给曲率上下界, 推出体积、直径、谱的整体结论。Bonnet-Myers 定理(Ricci 曲率 \(\geq c > 0\) ⟹ 直径 \(\leq \pi/\sqrt c\))、Toponogov 比较定理。</li>
+  <li><em>整体定理</em>: 球定理(\(1/4 < K \leq 1\) ⟹ 流形同胚 \(S^n\))、Cheeger 有限性定理、几何分析里的 Ricci 流(Hamilton 1982, Perelman 2003 用它证明 Poincaré 猜想)。</li>
+  <li><em>对称空间</em>: 黎曼几何里"<em>最对称</em>" 的流形, 由 Lie 群作用分类(\(\mathbb{R}^n, S^n, \mathbb{H}^n\), 复 / 四元数射影空间, 等等)。</li>
+  <li><em>谱几何</em>: Laplace-Beltrami 算子的特征值序列编码流形的几何信息(Mark Kac "<em>Can one hear the shape of a drum?</em>"——一般不能, 但能听到很多)。</li>
+</ul>
+
+<p><em>推荐书目</em>:</p>
+
+<ul>
+  <li>do Carmo, <em>Riemannian Geometry</em>: 经典入门, 直接从本书 ch22 风格往下走。</li>
+  <li>Lee, <em>Introduction to Riemannian Manifolds</em>: 现代风格, 张量与联络优先。</li>
+  <li>Petersen, <em>Riemannian Geometry</em>: 偏比较几何与几何分析。</li>
+  <li>Jost, <em>Riemannian Geometry and Geometric Analysis</em>: 进阶, 偏分析视角。</li>
+</ul>
+
+<p>对<em>Lie 群 / 表示论</em>:</p>
+
+<ul>
+  <li>Hall, <em>Lie Groups, Lie Algebras, and Representations</em>: 矩阵 Lie 群入门, 不需要太多流形背景。</li>
+  <li>Fulton-Harris, <em>Representation Theory</em>: 标准研究生教材, 严整。</li>
+  <li>Knapp, <em>Lie Groups Beyond an Introduction</em>: 半单 Lie 群完整理论。</li>
+</ul>
+
+<p>对<em>规范场论 / 现代几何物理</em>:</p>
+
+<ul>
+  <li>Baez-Muniain, <em>Gauge Fields, Knots, and Gravity</em>: 物理优先, 快速通向 Yang-Mills + 量子拓扑。</li>
+  <li>Nakahara, <em>Geometry, Topology and Physics</em>: 百科风格, 物理学家用。</li>
+  <li>Frankel, <em>The Geometry of Physics</em>: 数学偏向, 微分形式 + 规范理论 + GR。</li>
+</ul>
+
+<h2 id="appB-8">B.8 总结:本书工具如何延伸</h2>
+<p>把本书 24 章的工具映射到下一步:</p>
+
+<ul>
+  <li><a href="ch6.html">ch6</a> 正则曲面 → \(SO(n), SU(n)\) 等矩阵 Lie 群是子流形(B.2)。</li>
+  <li><a href="ch7.html">ch7</a> 第一基本形式 → 黎曼度量 → 不变度量 / Killing 形式(B.4)。</li>
+  <li><a href="ch13.html">ch13</a> 测地线 → Lie 群的<em>单参数子群</em>(指数映射的像)。</li>
+  <li><a href="ch14.html">ch14</a> 指数映射 → Lie 群的指数映射 \(\exp : \mathfrak{g} \to G\)(B.3)。</li>
+  <li><a href="ch12.html">ch12</a> 微分形式 → Cartan 结构方程 + 规范场论(B.6)。</li>
+  <li><a href="ch22.html">ch22</a> Christoffel + Riemann 张量 → Levi-Civita 联络 + 曲率张量的现代表述(B.5)。</li>
+  <li><a href="ch23.html">ch23</a> GR → 弦理论 / 规范场论 / 几何分析(B.7)。</li>
+</ul>
+
+<p>请你看见: 本书是<em>古典</em> 微分几何, 但古典里每个工具都<em>已经</em> 是现代的种子。从 do Carmo 风格的"曲面在 \(\mathbb{R}^3\) 中" 到 Lee 风格的"<em>抽象流形 + 张量场</em>", 距离不远——只需把"嵌入到 \(\mathbb{R}^3\)" 这件事去掉, 用<em>抽象的</em> 流形 + 张量代替, 就到现代黎曼几何。</p>
+
+<p>这就是为什么我们在<a href="ch21.html">ch21</a> 引入抽象流形, 在<a href="ch22.html">ch22</a> 引入黎曼度量——它们是从"<em>古典曲面</em>" 通往"<em>抽象黎曼几何</em>" 的桥。本书结束在桥的一端; 你下一步要去的就是桥的另一端, 那里有<em>整个</em> 现代几何与物理在等你。</p>
+
+<p>祝你的下一段旅程顺利。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+</main>
+</body>
+</html>

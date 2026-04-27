@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 拓扑分类与高斯-博内推论 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 Gauss-Bonnet 整体</a><a href="ch19.html">下一章 · 第 19 章 极小曲面 →</a></nav>
+<h1 id="ch18">第 18 章 拓扑分类与高斯-博内推论</h1>
+
+<p>请你回想上一章的结论 \(\iint_S K \, dA = 2\pi \chi(S)\)。这条把<em>几何</em>（K 的总积分）和<em>拓扑</em>（\(\chi\)) 拉在一起。读完那一章你应该有一个直觉——<em>χ 的符号</em>（正 / 0 / 负）决定了曲面"<em>能不能</em>" 处处带某种符号的曲率。</p>
+
+<p>这一章把这条直觉推到极致。我们要看：</p>
+
+<ul>
+  <li><em>球面不能配处处负曲率度量</em>。试图给球面装一个 \(K \equiv -1\) 的度量, 数学上不可能——\(\chi(S^2) = 2 > 0\) 与 "<em>处处 \(K = -1\) ⟹ \(\iint K < 0\)</em>" 矛盾。</li>
+  <li><em>双环面 (亏格 2 曲面) 不能配处处正曲率度量</em>。同理。</li>
+  <li><em>更深</em>：每种亏格的<em>典型</em> 几何是哪种——球面型 / 欧氏型 / 双曲型。这给"<em>几何拓扑分类</em>"。</li>
+</ul>
+
+<p>这些结论都是一行 GB 给出的"<em>纯拓扑限制几何</em>" 推论。它们让我们看见拓扑这个看似 ainfo 的概念其实<em>统治</em> 几何——选一个曲面 (拓扑给定), 几何（曲率分布）就被严格约束在<em>某种符号</em> 上。这种约束最后导出 Thurston 1970s 的"<em>几何化猜想</em>"——任何 3 维流形可以分解为有<em>八种几何</em> 之一的块。Perelman 2003 用 Ricci 流证明了这个猜想, 解决了 Poincaré 猜想。这条线索的<em>2 维起点</em> 就是本章。</p>
+
+<h2 id="sec18-1">18.1 紧致可定向曲面分类</h2>
+
+<p>本节先回顾我们处理的对象——<em>紧致、可定向、无边界的二维流形</em>。<a href="ch20.html">ch20</a> 给完整证明; 这里只用结论。</p>
+
+<p><strong>分类定理 (Möbius 1865 + Dehn-Heegard 1907)。</strong>每个紧致可定向无边二维流形拓扑同胚于<em>恰好一个</em> 下面的曲面：</p>
+
+<ul>
+  <li>球面 \(S^2\) ("<em>0 个把手</em>", 亏格 \(g = 0\))。</li>
+  <li>环面 \(T^2 = \Sigma_1\) ("<em>1 个把手</em>", 亏格 \(g = 1\))。</li>
+  <li>亏格 \(g\) 曲面 \(\Sigma_g\) ("<em>g 个把手</em>", \(g \ge 2\))。</li>
+</ul>
+
+<p>所以紧致可定向曲面被一个非负整数 \(g\)（亏格）<em>完全</em> 分类。"<em>有几个洞</em>" 是<em>唯一</em> 的拓扑信息。任何这样的曲面, 不管它在 \(\mathbb{R}^3\) 中长什么样（是否光滑、是否对称）, 拓扑上等同于某个 \(\Sigma_g\)。</p>
+
+<p>每个 \(\Sigma_g\) 的 \(\chi\): \(\chi(\Sigma_g) = 2 - 2g\)。所以 \(\chi\) 也<em>完全</em> 分类——\(\chi = 2, 0, -2, -4, -6, \ldots\) 对应 \(g = 0, 1, 2, 3, 4, \ldots\)。</p>
+
+<p>请你接受这条分类作为本章起点。<em>所有</em> "<em>紧致可定向无边二维流形</em>" 的具体例子都在这一列里。本章 18.2-18.4 三节看 \(\chi > 0, = 0, < 0\) 三种情形分别会给曲率什么硬约束。</p>
+
+<h2 id="sec18-2">18.2 球面（χ &gt; 0）：必有 K &gt; 0 区域</h2>
+
+<p>取 \(S = S^2\), \(\chi = 2\)。GB 给</p>
+
+<p>\[
+\iint_{S^2} K \, dA = 4\pi > 0.
+\]</p>
+
+<p>由"<em>积分非负, 严格正</em>" 这条简单事实——<em>球面必有 \(K > 0\) 区域</em>。如果处处 \(K \le 0\), 积分非正, 与 \(4\pi > 0\) 矛盾。</p>
+
+<p>这条命题的<em>否定形式</em> 更有冲击力——<em>球面不能处处 \(K \le 0\)</em>。即<em>不能给球面配上"<em>处处非正曲率</em>" 的度量</em>。</p>
+
+<p>更尖锐——<em>球面不能配处处 \(K = -1\) (常负曲率) 的度量</em>。如果做得到, \(\iint K = -1 \cdot \text{area} < 0\), 与 \(4\pi > 0\) 直接矛盾。</p>
+
+<p>请你停下来想这件事。我们说"<em>给球面配度量</em>" 就是说：把球面想成一个抽象拓扑空间 \(S^2\), 然后<em>选一个</em> 黎曼度量 \(g\)（即在每个切平面上选一个内积, 光滑变化）, 这就是"<em>带度量的球面</em>"。我们能选标准球面度量 (\(K = 1\) 处处), 也能选椭球度量 (\(K\) 在长 / 短轴处不同), 也能选月球表面那种坑坑洼洼的度量, 也能选很多很多其他的度量。<em>但所有这些度量都满足 \(\iint K = 4\pi\)</em>。这是 GB 给的<em>必然</em>。</p>
+
+<p>所以我们<em>不能</em> 选"<em>处处 K = -1</em>" 这种度量。试一试就是矛盾。这件事的<em>哲学</em> 意义——<em>拓扑（球面）不允许某些几何（处处负曲率）</em>。"<em>球面 + 处处负曲率</em>" 这种组合在数学上<em>不存在</em>, 不是因为我们没找到, 是因为它逻辑上不可能。</p>
+
+<p>反过来——球面<em>能</em> 配"<em>处处 \(K = +1\) 度量</em>" 吗？能, 就是标准单位球面。\(K = 1\) 处处, area \(= 4\pi\), \(\iint K = 4\pi = 2\pi \chi\)。完美一致。</p>
+
+<p>所以球面有"<em>典型</em>" 几何——常正曲率, \(K = +1\)。这条几何叫"<em>球面几何</em>" 或"<em>椭圆几何</em>"。</p>
+
+<h2 id="sec18-3">18.3 圆环（χ = 0）：K 必有正负两区域</h2>
+
+<p>取 \(S = T^2\), \(\chi = 0\), \(\iint K = 0\)。这个我们上一章 17.6 已经处理过——圆环必有 \(K > 0\) 与 \(K < 0\) 两种区域 (除非处处 \(K = 0\))。</p>
+
+<p>新问题——<em>能不能给圆环配处处 \(K = 0\) 度量</em>？</p>
+
+<p>答案<em>能</em>, 但<em>不能在 \(\mathbb{R}^3\) 中</em>实现。这里有个非常微妙的区分。</p>
+
+<p>"<em>抽象圆环 + 处处 \(K = 0\) 度量</em>" 存在——拿一个矩形 \([0, a] \times [0, b]\), 把上下边粘合, 左右边粘合, 得到一个抽象的"<em>平环面</em>"（flat torus）。它的几何完全是欧氏几何 (一个矩形的几何), 但拓扑是圆环。\(K \equiv 0\) 处处, \(\iint K = 0 = 2\pi \chi\)。一致。这个抽象空间是合法的二维 Riemann 流形。</p>
+
+<p>但<em>这个平环面不能等距嵌入 \(\mathbb{R}^3\)</em>——你不可能在 \(\mathbb{R}^3\) 中找到一个曲面 \(S\), 使 \(S\) 拓扑同胚于 \(T^2\) 且 \(S\) 的诱导度量处处 \(K = 0\)。直觉解释——\(\mathbb{R}^3\) 中的紧致曲面必然在某些点"<em>朝外凸</em>" (那些点 \(K \ge 0\) 严格), 在某些点"<em>朝内凹</em>" (那些点 \(K\) 可能负 / 也可能正, 取决于另一方向)。这种凹凸不可能<em>处处</em> 相互抵消为 \(K = 0\)。严格证明用 do Carmo 5.10 的<em>Hilbert 定理</em> 风格论证。</p>
+
+<p>但<em>能在 \(\mathbb{R}^4\) 中</em> 等距嵌入——那是 Clifford 1873 给的"<em>Clifford 环面</em>" \(\{(\cos\theta, \sin\theta, \cos\varphi, \sin\varphi)/\sqrt{2}\}\) on \(S^3 \subset \mathbb{R}^4\)。它处处 \(K = 0\), 拓扑是圆环。所以"<em>平环面</em>" 是几何上合法的对象, 只是<em>嵌入维数</em> 高了一些。</p>
+
+<p>请你欣赏这件事的微妙——"<em>能不能存在某种几何</em>" 这条问题分两层:</p>
+
+<ol>
+  <li>"<em>抽象</em>" 层面（曲面是独立空间, 不在乎嵌入哪里）: 圆环可以配 \(K = 0\)。</li>
+  <li>"<em>嵌入到 \(\mathbb{R}^3\) 中作为光滑曲面</em>" 层面: 圆环在 \(\mathbb{R}^3\) 不可能处处 \(K = 0\)。</li>
+</ol>
+
+<p>这两层不同。拓扑分类是抽象层面的问题——只问"<em>能不能在某种 ambient space 中实现</em>", 答案"能"。GB 处理的也是抽象层面——只看曲面+度量+曲率, 不看嵌入。</p>
+
+<p>所以圆环有"<em>典型</em>" 几何——平环面, \(K = 0\) 处处。这条几何叫"<em>欧氏几何</em>" 或"<em>抛物几何</em>"。但它需要 \(\mathbb{R}^4\) 作为 ambient space。</p>
+
+<h2 id="sec18-4">18.4 亏格 ≥ 2（χ &lt; 0）：必有 K &lt; 0 区域</h2>
+
+<p>取 \(S = \Sigma_g\) for \(g \ge 2\), \(\chi = 2 - 2g \le -2\), \(\iint K = 2\pi \chi < 0\)。由"<em>积分严格负</em>" 立即——<em>亏格 \(\ge 2\) 曲面必有 \(K < 0\) 区域</em>。</p>
+
+<p>新问题——<em>能不能给亏格 \(g \ge 2\) 曲面配"<em>处处 \(K = -1\)</em>" (常负曲率) 度量</em>？</p>
+
+<p>答案<em>能</em>, 这次甚至<em>能在抽象层面</em> 完美实现。这是双曲几何的诞生。</p>
+
+<p>具体——双曲平面 \(\mathbb{H}^2\) (Poincaré 圆盘模型 \(\{|z| < 1\}\) 配度量 \(ds^2 = 4|dz|^2 / (1 - |z|^2)^2\)) 处处 \(K = -1\)。这是个无穷大的非紧致曲面。可以在它上面找一些"<em>等距变换</em>" 的群 \(\Gamma\) (双曲对称性, Möbius 变换的双曲子群), 商空间 \(\mathbb{H}^2 / \Gamma\) 是一个紧致曲面, 度量从 \(\mathbb{H}^2\) 诱导 (因为 \(\Gamma\) 是等距变换), 所以仍是 \(K = -1\) 处处。这个商空间的拓扑可以是任意亏格 \(g \ge 2\) 曲面 \(\Sigma_g\)。</p>
+
+<p>验证——\(\Sigma_g\) 的"<em>双曲度量</em>"（\(K = -1\)) 给</p>
+
+<p>\[
+\iint K = -1 \cdot \text{area}(\Sigma_g) = 2\pi (2 - 2g) = -4\pi(g - 1).
+\]</p>
+
+<p>所以 \(\text{area}(\Sigma_g) = 4\pi(g - 1)\) (双曲度量下)。亏格 2 曲面双曲度量下面积 \(= 4\pi\); 亏格 3 双曲度量下面积 \(= 8\pi\); 等等。这是双曲化亏格曲面的<em>正典</em> 面积。</p>
+
+<p>这条"<em>每个亏格 \(\ge 2\) 曲面有<em>唯一</em>（差等距）双曲度量</em>" 不完全对——一般还有 \(6g - 6\) 维"<em>moduli space</em>" of 双曲度量 (Teichmüller 空间)。但<em>存在</em> 双曲度量是关键事实, 出自单值化定理 (Riemann-Klein-Koebe-Poincaré, 1880-1907)。</p>
+
+<p>所以亏格 \(\ge 2\) 曲面有"<em>典型</em>" 几何——常负曲率, \(K = -1\)。这条几何叫"<em>双曲几何</em>"。</p>
+
+<h2 id="sec18-5">18.5 球面 + 处处负曲率？数学上不可能</h2>
+
+<p>把 18.2 节的命题正式陈述为一条独立结果——<em>球面不能配处处负曲率度量</em>。</p>
+
+<p>证明——直接由 GB。如果 \(S = S^2\) 配度量使 \(K(p) < 0\) 处处, 则 \(\iint K \, dA < 0\)。但 GB 给 \(\iint K = 2\pi \chi(S^2) = 4\pi > 0\)。矛盾。<em>QED</em>。</p>
+
+<p>请你停下来想这件事。我们没有用任何复杂的几何工具——只用了"<em>积分非负函数得非负数</em>"这种小学事实, 加 GB。但这条结论<em>极</em> 强——<em>不存在</em> 一种"<em>负曲率球面</em>", 不论你想怎么搓它。</p>
+
+<p>在数学之外这件事的有趣后果——<em>地球（近似球面）不能整体表现为双曲几何</em>。如果你试图在地球上做"<em>双曲三角形</em>"（内角和小于 π 的测地三角形), 你会发现局部行不通——大多数地球三角形是球面型, 内角和大于 π。这是球面拓扑给地球几何的硬约束, 是 GB 在物理上的化身。</p>
+
+<p>类似——<em>双环面（亏格 2）不能配处处正曲率</em>。证明同样: \(\iint K > 0\) 与 \(\chi = -2 < 0 \implies \iint K = -4\pi < 0\) 矛盾。</p>
+
+<p>这种"<em>禁止</em>" 命题是 GB 最强大的应用——它告诉你<em>什么样的几何在某拓扑上不可能</em>, 不是"<em>暂时找不到</em>" 而是"<em>逻辑不允许</em>"。</p>
+
+<h2 id="sec18-6">18.6 双曲化：每个亏格 ≥ 2 曲面恰能配 K = -1</h2>
+
+<p>反过来——<em>每个亏格 \(\ge 2\) 曲面<em>恰恰</em> 能配 \(K = -1\) 度量</em>。这条比"<em>球面不能负曲率</em>" 更深, 因为它是<em>存在</em> 命题, 不是<em>禁止</em>。</p>
+
+<p>具体怎么实现？一个最具体的构造——把 \(\Sigma_g\) (亏格 \(g \ge 2\)) 表示成一个"<em>4g 边形</em>" 的边粘合。例如亏格 2 是一个 8 边形的边按特定模式 \(a_1 b_1 a_1^{-1} b_1^{-1} a_2 b_2 a_2^{-1} b_2^{-1}\) 粘合（这是亏格 2 曲面的标准 fundamental polygon, 见 ch20）。在双曲平面 \(\mathbb{H}^2\) 中可以实现一个<em>规则双曲 8 边形</em>, 八个内角都是 \(\pi / 4\)（这样八个角合在中心顶点处就是 \(8 \cdot \pi/4 = 2\pi\), 切平面被填满, 没有"<em>角缺陷</em>"）。把这个双曲 8 边形按模式粘合, 得到的紧致曲面是亏格 2, 度量是双曲, \(K \equiv -1\) 处处。</p>
+
+<p>验证 \(\iint K\)——双曲 8 边形面积可以由 GB 算 (\(R\) 是双曲 8 边形, \(\partial R\) 是 8 条双曲测地线段, \(\sum \theta_i = 8 (\pi - \pi/4) = 6\pi\) 外角, \(\iint K = -1 \cdot \text{area}\)）：</p>
+
+<p>\[
+-\text{area} + 0 + 6\pi = 2\pi \implies \text{area} = 4\pi.
+\]</p>
+
+<p>所以双曲 8 边形面积 \(4\pi\)。粘合后的 \(\Sigma_2\) 面积也是 \(4\pi\) (粘合保面积)。\(\iint K = -4\pi = 2\pi (2 - 2 \cdot 2) = -4\pi\)。一致。</p>
+
+<p>更一般——亏格 \(g \ge 2\) 曲面能由一个<em>规则双曲 \(4g\) 边形</em>（每内角 \(\pi / (2g)\), 中心顶点角和恰为 \(2\pi\)）粘成, 给曲面一个 \(K = -1\) 度量。</p>
+
+<p>所以"<em>每个亏格 \(\ge 2\) 曲面有 \(K = -1\) 几何</em>" 通过这种构造性方式实现。这是 19 世纪末双曲几何的一个高峰——<em>双曲几何不仅<em>存在</em>, 而且天然栖息在所有亏格 \(\ge 2\) 曲面上</em>。</p>
+
+<p>请你停下来感受这件事。19 世纪上半叶, Lobachevsky 与 Bolyai 独立发现"<em>非欧几何</em>"（双曲几何）, 并被同时代数学家骂为荒诞。直到 Beltrami 1868 证明它能在 \(\mathbb{R}^3\) 上的<em>伪球面</em>（pseudosphere, 一种 \(K = -1\) 曲面但有 singular boundary）实现, 双曲几何才被接受。19 世纪下半叶 Klein 与 Poincaré 给出了完整的圆盘 / 半平面模型。然后 20 世纪初——<em>双曲几何居然是亏格 \(\ge 2\) 曲面的<em>典型</em> 几何</em>。一个曾被视为奇技淫巧的反直觉几何, 居然<em>无处不在</em>——在所有"<em>2 个洞或更多洞的封闭曲面</em>" 上都自然栖居。这件事让 19 世纪一开始把双曲几何当怪物的态度彻底翻转。</p>
+
+<h2 id="sec18-7">18.7 三类几何：曲面分类按 K 符号</h2>
+
+<p>把 18.2-18.4 总结：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr style="background: #f7f7f0;"><th style="padding: 0.4em 1em; border: 1px solid #ddd;">亏格 \(g\)</th><th style="padding: 0.4em 1em; border: 1px solid #ddd;">\(\chi\)</th><th style="padding: 0.4em 1em; border: 1px solid #ddd;">典型几何</th><th style="padding: 0.4em 1em; border: 1px solid #ddd;">\(K\)</th></tr>
+<tr><td style="padding: 0.4em 1em; border: 1px solid #ddd;">\(0\) (球面)</td><td style="padding: 0.4em 1em; border: 1px solid #ddd;">\(2\)</td><td style="padding: 0.4em 1em; border: 1px solid #ddd;">球面 / 椭圆</td><td style="padding: 0.4em 1em; border: 1px solid #ddd;">\(+1\)</td></tr>
+<tr><td style="padding: 0.4em 1em; border: 1px solid #ddd;">\(1\) (圆环)</td><td style="padding: 0.4em 1em; border: 1px solid #ddd;">\(0\)</td><td style="padding: 0.4em 1em; border: 1px solid #ddd;">欧氏 / 抛物</td><td style="padding: 0.4em 1em; border: 1px solid #ddd;">\(0\)</td></tr>
+<tr><td style="padding: 0.4em 1em; border: 1px solid #ddd;">\(\ge 2\) (多孔)</td><td style="padding: 0.4em 1em; border: 1px solid #ddd;">\(\le -2\)</td><td style="padding: 0.4em 1em; border: 1px solid #ddd;">双曲</td><td style="padding: 0.4em 1em; border: 1px solid #ddd;">\(-1\)</td></tr>
+</table>
+
+<p>这条对应是<em>2 维曲面的几何分类</em>——<em>每个紧致可定向曲面都有<em>唯一</em> 一种"<em>常曲率</em>" 几何</em>, 由其拓扑（亏格 \(g\)) 决定。</p>
+
+<p>这件事换一种说法——<em>2 维世界里只有三种"<em>常曲率几何</em>"</em>——球面, 欧氏, 双曲。每种栖息在<em>不同</em> 的曲面上。它们彼此<em>不能换</em>——你不能把球面"<em>装上欧氏度量</em>", 不能把圆环"<em>装上双曲度量</em>" 等等 (不容许)。</p>
+
+<p>这条三分对应正好是<em>Klein 1872 年的 Erlangen 纲领</em>: 把几何按"<em>对称变换群</em>" 分类——球面几何由 \(O(3)\) 控制, 欧氏由欧氏运动群 \(E(2)\) 控制, 双曲由 \(O(2, 1)\) 或 \(\text{PSL}(2, \mathbb{R})\) 控制。三种群对应三种<em>无穷大模型空间</em>: 球面 \(S^2\), 平面 \(\mathbb{R}^2\), 双曲平面 \(\mathbb{H}^2\)。每种紧致曲面是这些模型空间的一个<em>商空间</em>（用某离散等距子群除）。</p>
+
+<p>这条 Klein 视角——<em>几何 = 对称群 + 模型空间 + 商空间</em>——是现代几何最深的统一思路。它让"<em>三种几何</em>" 不仅是<em>看起来</em> 不同, 而是<em>本质</em> 不同 (有完全不同的等距群)。Gauss-Bonnet 在<em>2 维</em> 直接说出"<em>每种亏格只能配一种几何</em>", 给 Klein 视角一个具体的化身。</p>
+
+<h2 id="sec18-8">18.8 Thurston 几何化猜想：3 维 GB</h2>
+
+<p>把上面这件事推到<em>3 维流形</em> 是 20 世纪几何拓扑最深的故事。</p>
+
+<p>问题——3 维紧致流形（"<em>三维曲面</em>"）有怎样的"<em>典型几何</em>"？2 维有三种（球面 / 欧氏 / 双曲）, 3 维呢？</p>
+
+<p>Thurston 1970-80 年代提出<em>几何化猜想</em>：<em>每个 3 维紧致定向流形可以分解（用某种"<em>素分解</em>" 与 JSJ 分解）成多块, 每块带<em>八种几何</em> 之一</em>。八种几何分别为 \(\mathbb{R}^3, S^3, \mathbb{H}^3, S^2 \times \mathbb{R}, \mathbb{H}^2 \times \mathbb{R}, \widetilde{\text{SL}_2 \mathbb{R}}, \text{Nil}, \text{Sol}\)——其中三种是"<em>各向同性</em>" 的（\(\mathbb{R}^3, S^3, \mathbb{H}^3\), 类似 2 维的欧 / 球 / 双曲), 其余五种是更"<em>异质</em>" 的几何。</p>
+
+<p>这条猜想<em>蕴含</em> Poincaré 1904 猜想——<em>"<em>每个简单连通 3 维紧致流形都同胚于 \(S^3\)</em>"</em>——因为如果流形简单连通, 它的几何化分解必只剩 \(S^3\) 几何那一类。</p>
+
+<p>Perelman 2003 用 <em>Ricci 流</em>（一种沿"<em>负曲率梯度</em>" 演化度量的 PDE) + 一些极精巧的奇点分析, 证明了几何化猜想（也即 Poincaré 猜想）。这是 21 世纪初数学最大的成就之一, Perelman 被授予 Fields Medal （他<em>拒绝</em> 了）和 Clay Millennium Prize 一百万美元（他也<em>拒绝</em> 了）, 自此隐居。</p>
+
+<p>请你欣赏这条线索的<em>跨度</em>。Gauss 1827 年发现 \(K\) 内蕴, 1848 年 Bonnet 推广到 GB, 1907 年 Dehn-Heegard 完成曲面分类, 1872 年 Klein 提出 Erlangen 纲领, 1907 年单值化定理给"<em>2 维三种几何</em>", 1970s Thurston 提出 3 维几何化, 2003 Perelman 完成证明。<em>180 多年</em> 一条主线——"<em>几何 vs 拓扑</em>" 的关系——从 2 维曲面（GB）走到 3 维流形（Ricci 流 + 几何化）。本书 ch16-18 处理的是这条线最朴素的<em>开端</em>：2 维曲面的 Gauss-Bonnet。</p>
+
+<p>本章读完, 你能理解的事:</p>
+
+<ul>
+  <li>球面、圆环、亏格 \(\ge 2\) 曲面对应正、零、负 \(\chi\)。</li>
+  <li>GB 强制每种 \(\chi\) 配特定符号的 \(K\) 总积分。</li>
+  <li>这条强制 imply"<em>典型几何</em>"——球面型 / 欧氏型 / 双曲型, 三类完全分开。</li>
+  <li>"<em>球面不能负曲率, 双环面不能正曲率</em>" 是逻辑必然不是工程难题。</li>
+  <li>这条 2 维几何分类有 3 维（甚至更高维）的推广, 由 Thurston / Perelman 完成。</li>
+</ul>
+
+<p>下一章我们从 Gauss-Bonnet 转向另一个 classical 主题——<em>极小曲面</em>, 即 \(H = 0\) 的曲面。极小曲面是肥皂膜的形状——肥皂膜要在给定边界条件下让面积最小化, 这条变分条件 force \(H = 0\)。它们的几何完全不同于 GB 的世界——这里 \(K\) 没有特殊约束, 但<em>另一</em> 个曲率（平均曲率 \(H\)) 被 force 为零, 给出一类有<em>极</em> 多漂亮例子（catenoid, helicoid, Schwarz 曲面, ...) 的几何。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 Gauss-Bonnet 整体</a><a href="ch19.html">下一章 · 第 19 章 极小曲面 →</a></nav>
+</main>
+</body>
+</html>

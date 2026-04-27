@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 6 章 正则曲面：定义与标准例子 — 普林斯顿微分几何读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 整体曲线</a><a href="ch7.html">下一章 · 第 7 章 第一基本形式 →</a></nav>
+<h1 id="ch6">第 6 章 正则曲面：定义与标准例子</h1>
+
+<p>前面五章我们都在<em>曲线</em>。曲线是 \(\mathbb{R}^n\) 中的 1 维"<em>东西</em>"——一个参数 \(t\) 跑动, 描出一条线。从 ch6 开始我们升一维，进入<em>曲面</em>: \(\mathbb{R}^3\) 中的 2 维"<em>东西</em>"。</p>
+
+<p>但"2 维东西"这个朴素说法不够数学。曲线我们用<em>参数化</em> \(\gamma: I \to \mathbb{R}^n\), 一个一元向量值函数, 加上 \(\gamma'(t) \neq 0\) 的正则性条件就足够了。曲面要复杂一点——它有<em>两</em> 个独立方向, 而且更糟的是<em>很多曲面用单个参数化覆盖不下来</em>（球面就是头号例子）。</p>
+
+<p>这章的任务：把"<em>曲面</em>" 这个概念<em>形式</em> 化, 让球面、椭球面、圆柱面、环面这些我们直觉认识的对象都包括进来, 同时排除一些病态的东西（带尖点的、自相交的、不光滑的）。最后给出的定义叫<em>正则曲面</em>, 它会成为后面 6 章共同的舞台。</p>
+
+<h2 id="sec6-1">6.1 朴素：曲面就是函数图 \(z = f(x, y)\)</h2>
+
+<p>从最简单的开始。给一个二元光滑函数 \(f: U \to \mathbb{R}\), \(U \subset \mathbb{R}^2\) 开集。它的<em>图</em></p>
+
+<p>\[
+S = \{(x, y, f(x, y)) : (x, y) \in U\} \subset \mathbb{R}^3
+\]</p>
+
+<p>是 \(\mathbb{R}^3\) 中的一个二维"<em>东西</em>"。具体例子：</p>
+
+<ul>
+  <li>\(f(x, y) = 0\)——\(xy\)-平面（限于 \(U\) 上）。</li>
+  <li>\(f(x, y) = x^2 + y^2\)——抛物面。</li>
+  <li>\(f(x, y) = \sqrt{1 - x^2 - y^2}\)（\(x^2 + y^2 < 1\)）——单位上半球面。</li>
+  <li>\(f(x, y) = x^2 - y^2\)——鞍面。</li>
+</ul>
+
+<p>这种"<em>图</em>"曲面有几个好处：</p>
+
+<ol>
+  <li>它由<em>一个</em> 函数完全描述。</li>
+  <li>每个 \((x, y) \in U\) 对应曲面上恰好<em>一个</em> 点 \((x, y, f(x, y))\)。所以<em>没有自相交</em>。</li>
+  <li>"<em>切平面</em>" 容易写——在 \((x_0, y_0, f(x_0, y_0))\) 处, 切平面就是 \(z = f(x_0, y_0) + f_x(x_0, y_0)(x - x_0) + f_y(x_0, y_0)(y - y_0)\)。</li>
+</ol>
+
+<p>所以"图"是曲面最干净、最容易处理的形态。要是所有曲面都是图就好了。</p>
+
+<h2 id="sec6-2">6.2 撞墙：球面不是单图</h2>
+
+<p>试着把单位球面 \(S^2 = \{(x, y, z) : x^2 + y^2 + z^2 = 1\}\) 写成 \(z = f(x, y)\) 的形式。</p>
+
+<p>解 \(z\)——\(z = \pm \sqrt{1 - x^2 - y^2}\)。<em>两</em> 个值。"上半球" \(z = +\sqrt{1 - x^2 - y^2}\) 是个图; "下半球" \(z = -\sqrt{1 - x^2 - y^2}\) 是另一个图。两个图<em>各占一半</em>, 拼起来才是完整球面。</p>
+
+<p>更糟：在赤道上（\(z = 0\), \(x^2 + y^2 = 1\)）, 上下半球的<em>图函数</em> 都没定义（\(\sqrt{1 - x^2 - y^2}\) 在 \(x^2 + y^2 = 1\) 处导数无穷）。所以两个图各覆盖一个开半球, 赤道圆<em>没有</em> 被覆盖。</p>
+
+<p>请你停下来想：球面和"图"长得有点像（"图"曲面的本地局部都看着像球面的小一片）, 但全局上"球面 = 图" 这个等式<em>不成立</em>。我们需要更<em>柔软</em> 的定义——一种能允许"<em>不同地方用不同图</em>" 的定义。</p>
+
+<p>如果你执意要把球面写成图, 你需要至少<em>两个</em>: 上半球（\(z\) 是 \(x, y\) 的图）+ 下半球（\(z\) 是 \(x, y\) 的图）。但这俩仍漏赤道。把<em>水平方向</em> 的图（\(x\) 是 \(y, z\) 的图, 或 \(y\) 是 \(x, z\) 的图）加进来才能盖全。最少<em>六张图</em>（\(\pm x, \pm y, \pm z\) 各一张）能覆盖整个球面, 张张相交。</p>
+
+<p>所以"曲面 = 多张图拼起来" 这个想法是对的, 只是要把"<em>怎么拼</em>" 形式化。</p>
+
+<h2 id="sec6-3">6.3 reframe：用<em>局部参数化</em></h2>
+
+<p>把"<em>多张图</em>" 这个想法抽象一步。一张<em>图</em> \((x, y) \mapsto (x, y, f(x, y))\) 就是一个从 \(\mathbb{R}^2\) 开集到 \(\mathbb{R}^3\) 的<em>映射</em>, 像就是曲面的一小块。把"<em>图</em>" 推广到<em>更一般的</em> 映射:</p>
+
+<p><strong>定义（朴素版本）.</strong> 一个<em>参数化</em> 是一个光滑映射 \(X: U \to \mathbb{R}^3\), \(U \subset \mathbb{R}^2\) 开集。</p>
+
+<p>球面用一张参数化是可能的（如果允许"<em>退化</em>"）——经典的<em>球极坐标</em>:</p>
+
+<p>\[
+X(\theta, \varphi) = (\sin \theta \cos \varphi, \sin \theta \sin \varphi, \cos \theta), \quad \theta \in (0, \pi), \varphi \in (0, 2\pi).
+\]</p>
+
+<p>这个参数化覆盖球面<em>除了</em> 北极、南极、和经线 \(\varphi = 0\)。所以"一张参数化盖一切" 也是不够的——总有<em>奇点</em> 漏掉一块。</p>
+
+<p>所以正确的概念是<em>局部参数化</em>: 把曲面想成被一群"<em>小补丁</em>" 覆盖, 每个补丁是一张参数化的像。没有要求一张参数化盖全, 只要求<em>每点附近有一张</em>。</p>
+
+<p>这种"<em>局部</em>" 视角是后面整本书的视角——曲面的几何<em>不</em> 由全局公式给出, 而是由<em>每点局部</em> 的性质拼起来。这种局部 vs 全局的张力会贯穿测地线（ch13）、Gauss-Bonnet（ch16）、抽象流形（ch21）。</p>
+
+<h2 id="sec6-4">6.4 正则曲面的定义</h2>
+
+<p>把"<em>每点附近是 \(\mathbb{R}^2\) 开集</em>" 这件事正式化:</p>
+
+<p><strong>定义 6.1（正则曲面）.</strong> 一个子集 \(S \subset \mathbb{R}^3\) 叫做<em>正则曲面</em>, 如果对每个 \(p \in S\), 存在 \(p\) 在 \(\mathbb{R}^3\) 中的开邻域 \(V\), \(\mathbb{R}^2\) 中的开集 \(U\), 和一个映射 \(X: U \to V \cap S\) 使得:</p>
+
+<ol>
+  <li><strong>光滑</strong>: \(X\) 是 \(C^\infty\)（每个分量函数 \(x(u, v), y(u, v), z(u, v)\) 都是 \(C^\infty\)）。</li>
+  <li><strong>同胚</strong>: \(X: U \to V \cap S\) 是同胚（连续双射, 逆也连续, 这里 \(V \cap S\) 拓扑就是 \(\mathbb{R}^3\) 的子空间拓扑）。</li>
+  <li><strong>正则（浸入）</strong>: 微分 \(dX_q: \mathbb{R}^2 \to \mathbb{R}^3\) 在每个 \(q \in U\) 处<em>单射</em>, 等价地, 雅可比矩阵</p>
+
+  <p>\[
+  J X = \begin{pmatrix} \partial x / \partial u & \partial x / \partial v \\ \partial y / \partial u & \partial y / \partial v \\ \partial z / \partial u & \partial z / \partial v \end{pmatrix}
+  \]</p>
+
+  <p>的两列<em>线性无关</em>。</li>
+</ol>
+
+<p>这样的 \(X\) 叫一个<em>局部参数化</em>（或一张<em>坐标卡</em>, chart）。</p>
+
+<p>请你解开这三个条件:</p>
+
+<p><strong>条件 1（光滑）</strong> 让我们能做微积分——求偏导、Taylor 展开、积分。</p>
+
+<p><strong>条件 2（同胚）</strong> 排除"<em>自相交</em>" 和"<em>无穷压缩</em>"。比如映射 \(X(u, v) = (u, |u|, v)\) 给出 \(\mathbb{R}^3\) 里的一个折面, 但因为 \(|u|\) 不光滑, 条件 1 就排除它了。但条件 2 排除的是: 比如映射 \(X(u, v) = (\sin(2u), \sin(u), v)\) 把 \([0, 2\pi]\) 上的两个不同 \(u\) 值映到同点（\(u = 0\) 和 \(u = \pi\) 都给 \((0, 0, v)\)）, 像不是单射, 不是同胚。</p>
+
+<p><strong>条件 3（正则）</strong> 排除"<em>切平面退化</em>" 的奇点。比如锥面 \(X(u, v) = (u \cos v, u \sin v, u)\) 在 \(u = 0\) 处, \(\partial_u X = (\cos v, \sin v, 1), \partial_v X = (0, 0, 0)\)（因为 \(u = 0\)）。两列<em>线性相关</em>（\(\partial_v X = 0\)）。所以圆锥的<em>顶点</em> 不满足正则条件——一个真正的"<em>奇点</em>"。条件 3 把锥面的顶点排除在曲面外。</p>
+
+<p>三条合起来定义的"正则曲面" 是一个直觉上"光滑、二维、不自相交、没有尖点" 的几何对象。</p>
+
+<h2 id="sec6-5">6.5 等价描述：图 / 参数化 / 隐式</h2>
+
+<p>正则曲面有<em>三种</em> 等价的局部描述, 像三块同形异质的玉。每一种都有它擅长的场合——算切平面用图最快, 验证某个公式用参数化最方便, 验证某个集合是不是曲面用隐式最方便。</p>
+
+<p><strong>定理 6.1.</strong> \(S \subset \mathbb{R}^3\) 是正则曲面, 当且仅当对每个 \(p \in S\), 存在 \(p\) 的邻域 \(V \subset \mathbb{R}^3\), 使得 \(V \cap S\) 可<em>等价</em> 写成下面三种形式之一:</p>
+
+<ol>
+  <li><em>图描述</em>: 经过坐标重排后, \(V \cap S\) 是某个 \(C^\infty\) 函数的图 \(z = f(x, y)\) 或 \(y = f(x, z)\) 或 \(x = f(y, z)\).</li>
+  <li><em>参数描述</em>: \(V \cap S = X(U)\), 其中 \(X: U \to \mathbb{R}^3\) 是定义 6.1 中的局部参数化.</li>
+  <li><em>隐式描述</em>: \(V \cap S = F^{-1}(0)\), 其中 \(F: V \to \mathbb{R}\) 是 \(C^\infty\), \(0\) 是 \(F\) 的<em>正则值</em>（\(\nabla F \neq 0\) 在 \(V \cap S\) 上）.</li>
+</ol>
+
+<p>"<em>图</em>" 显然蕴含"<em>参数</em>"（取 \(X(u, v) = (u, v, f(u, v))\)）。</p>
+
+<p>"<em>参数</em>" 蕴含"<em>图</em>" 的关键就是<em>反函数定理</em>。设 \(X: U \to \mathbb{R}^3\) 是局部参数化, 在 \(q_0 \in U\) 处雅可比的两列线性无关, 那么这两列张成 \(\mathbb{R}^3\) 中一个 2 维子空间, 投影到某两个坐标轴（比如 \(x, y\)）非退化。所以 \((u, v) \mapsto (x(u, v), y(u, v))\) 是 \(\mathbb{R}^2 \to \mathbb{R}^2\) 的局部微分同胚（反函数定理）, 它的逆给出 \((u(x, y), v(x, y))\), 代入 \(z(u, v)\) 给出 \(z\) 是 \(x, y\) 的函数, 即图描述。</p>
+
+<p>"<em>隐式</em>" ⟺ "<em>图</em>" 是<em>隐函数定理</em>。设 \(F(x, y, z) = 0\), \(\partial F / \partial z \neq 0\) 在某点, 隐函数定理给 \(z = f(x, y)\) 在邻域内。反过来, \(z = f(x, y)\) 等于 \(F(x, y, z) := z - f(x, y) = 0\), 显然 \(\partial F / \partial z = 1 \neq 0\)。</p>
+
+<p>三个等价让我们在不同<em>问题</em> 中选最方便的描述:</p>
+
+<ul>
+  <li>"球面是正则曲面吗？" → 用<em>隐式</em>: \(F(x, y, z) = x^2 + y^2 + z^2 - 1\), \(\nabla F = 2(x, y, z) \neq 0\) 在 \(S^2\) 上（因为 \(x^2 + y^2 + z^2 = 1\) 时这向量长度 \(2\)）。✓</li>
+  <li>"球面上某点切平面是什么？" → 用<em>图</em>: 在赤道附近用 \(z = \pm \sqrt{1 - x^2 - y^2}\), 切平面公式直接抄。</li>
+  <li>"球面上某区域面积怎么算？" → 用<em>参数</em>: 球极坐标 \(X(\theta, \varphi)\), 在 \([\theta_1, \theta_2] \times [\varphi_1, \varphi_2]\) 上积分。</li>
+</ul>
+
+<p>三种语言, 同一对象。本书后面三种都会用。</p>
+
+<h2 id="sec6-6">6.6 五个标准例</h2>
+
+<p>下面五个是后面所有计算的"<em>标准测试</em>"。每个都给参数化、隐式方程、雅可比矩阵简评。</p>
+
+<p><strong>例 1（球面 \(S^2_r\), 半径 \(r\)）.</strong></p>
+
+<ul>
+  <li><em>隐式</em>: \(F(x, y, z) = x^2 + y^2 + z^2 - r^2 = 0\).</li>
+  <li><em>球极坐标参数化</em>: \(X(\theta, \varphi) = (r \sin \theta \cos \varphi, r \sin \theta \sin \varphi, r \cos \theta)\), \(\theta \in (0, \pi), \varphi \in (0, 2\pi)\).</li>
+  <li><em>雅可比</em>: \(X_\theta = r(\cos \theta \cos \varphi, \cos \theta \sin \varphi, -\sin \theta)\), \(X_\varphi = r(-\sin \theta \sin \varphi, \sin \theta \cos \varphi, 0)\). 两列线性无关当且仅当 \(\sin \theta \neq 0\)（即不在两极）。所以这张参数化覆盖球面除两极一条经线。</li>
+</ul>
+
+<p><strong>例 2（椭球面 \(\frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} = 1\)）.</strong></p>
+
+<ul>
+  <li><em>隐式</em>: \(F(x, y, z) = \frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} - 1 = 0\).</li>
+  <li><em>参数化</em>: \(X(\theta, \varphi) = (a \sin \theta \cos \varphi, b \sin \theta \sin \varphi, c \cos \theta)\). 球极坐标的"<em>拉伸</em>" 版本。</li>
+  <li><em>正则性</em>: \(\nabla F = (2x/a^2, 2y/b^2, 2z/c^2)\) 在椭球面上不为零（任一坐标不为零, 整向量就不零, 而 \(F = 0\) 时三坐标不能全零）。</li>
+</ul>
+
+<p><strong>例 3（圆柱面 \(x^2 + y^2 = r^2\)）.</strong></p>
+
+<ul>
+  <li><em>隐式</em>: \(F(x, y, z) = x^2 + y^2 - r^2 = 0\), \(\nabla F = 2(x, y, 0)\), 在圆柱上非零（\(x^2 + y^2 = r^2 \neq 0\)）.</li>
+  <li><em>参数化</em>: \(X(u, v) = (r \cos u, r \sin u, v)\), \(u \in (0, 2\pi), v \in \mathbb{R}\). 不是单覆盖（缺一条母线）, 需要第二张图（如 \(u \in (-\pi, \pi)\)）补上。</li>
+  <li><em>雅可比</em>: \(X_u = (-r \sin u, r \cos u, 0), X_v = (0, 0, 1)\). 两列总线性无关（\(\|X_u\| = r > 0, X_v\) 沿 \(z\) 轴, 与 \(X_u\) 正交）。</li>
+</ul>
+
+<p><strong>例 4（旋转曲面）.</strong> 取 \(xz\)-平面里一条<em>母线</em> \((f(t), 0, g(t))\)（\(f(t) > 0\), \(t \in I\), \((f', g') \neq (0, 0)\)）, 绕 \(z\) 轴旋转。参数化:</p>
+
+<p>\[
+X(t, \varphi) = (f(t) \cos \varphi, f(t) \sin \varphi, g(t)), \quad t \in I, \varphi \in (0, 2\pi).
+\]</p>
+
+<ul>
+  <li><em>雅可比</em>: \(X_t = (f' \cos \varphi, f' \sin \varphi, g'), X_\varphi = (-f \sin \varphi, f \cos \varphi, 0)\). 两列线性无关 ⟺ 它们的叉积 \(X_t \times X_\varphi\) 非零 ⟺ \(f \cdot \sqrt{(f')^2 + (g')^2} \neq 0\), 即<em>母线正则 + \(f > 0\)</em>。</li>
+  <li>具体例子: \(f(t) = R + r \cos t, g(t) = r \sin t\)（\(0 < r < R\)）给出环面（下例）。</li>
+  <li>具体例子: \(f(t) = t, g(t) = 0\) 给出 \(xy\)-平面。</li>
+  <li>具体例子: \(f(t) = e^t, g(t) = t\) 给出"<em>悬链旋转曲面</em>"（catenoid 的近亲, 见 ch19 极小曲面）。</li>
+</ul>
+
+<p><strong>例 5（环面 Torus, \(R > r > 0\)）.</strong> 圆心在 \(z\) 轴上半径 \(R\)、再绕 \(z\) 轴旋转一个半径 \(r\) 的小圆:</p>
+
+<p>\[
+X(t, \varphi) = ((R + r \cos t) \cos \varphi, (R + r \cos t) \sin \varphi, r \sin t), \quad (t, \varphi) \in (0, 2\pi)^2.
+\]</p>
+
+<ul>
+  <li><em>隐式</em>: \(F(x, y, z) = (\sqrt{x^2 + y^2} - R)^2 + z^2 - r^2 = 0\). 验证 \(\nabla F\) 不为零稍麻烦, 但 \(R > r > 0\) 时确实成立。</li>
+  <li>注意环面有"<em>外侧</em>"（远离 \(z\) 轴的半边, \(\cos t > 0\)）和"<em>内侧</em>"（贴近 \(z\) 轴的半边, \(\cos t < 0\)）。我们 ch1 讲过, 这两侧 Gauss 曲率<em>异号</em>: 外侧 \(K > 0\), 内侧 \(K < 0\), 顶 / 底圈（\(\cos t = 0\)）\(K = 0\)。这件事 ch10 验证。</li>
+</ul>
+
+<p>这五个例子覆盖了我们后面会反复用到的大部分曲面: 球面（\(K = \) 常 \(> 0\)）、椭球（\(K\) 不常但 \(> 0\)）、圆柱（\(K = 0\)）、平面（\(K = 0\), 是旋转曲面退化）、环面（\(K\) 变号）。请你在脑子里把这五个画一遍——后面引用时它们要像家具一样熟。</p>
+
+<h2 id="sec6-7">6.7 切空间 \(T_p S\)</h2>
+
+<p>曲线在每点有<em>切向量</em>, 是 \(\mathbb{R}^n\) 中的一条线。曲面在每点应该有什么？答: 一个<em>切平面</em>, 是 \(\mathbb{R}^3\) 中的一个 2 维子空间。形式化:</p>
+
+<p><strong>定义 6.2.</strong> \(p \in S\), <em>切空间</em></p>
+
+<p>\[
+T_p S := \{v \in \mathbb{R}^3 : \exists\, \gamma: (-\varepsilon, \varepsilon) \to S \text{ 光滑}, \gamma(0) = p, \gamma'(0) = v\}.
+\]</p>
+
+<p>用人话说: 切向量是某条<em>从 \(p\) 出发的曲面上曲线</em> 在 \(p\) 处的速度。"<em>曲面上曲线</em>" 指 \(\gamma\) 的像在 \(S\) 里, 不是 \(\mathbb{R}^3\) 里随便一条。</p>
+
+<p>这个定义"自然" 但有点模糊——它定义出来的 \(T_p S\) 是<em>集合</em>, 不显然是<em>线性子空间</em>。下一节用参数化给一个等价定义, 显然是子空间。</p>
+
+<h2 id="sec6-8">6.8 切空间的等价定义：参数化偏导张成</h2>
+
+<p>选一张局部参数化 \(X: U \to S\), \(X(q) = p\) 对某个 \(q \in U\)。考虑两个偏导:</p>
+
+<p>\[
+X_u(q) := \frac{\partial X}{\partial u}(q), \quad X_v(q) := \frac{\partial X}{\partial v}(q).
+\]</p>
+
+<p>它们是 \(\mathbb{R}^3\) 中的向量, 由参数化的正则性（条件 3）线性无关。它们张成一个 \(\mathbb{R}^3\) 中的 2 维子空间。</p>
+
+<p><strong>定理 6.2.</strong> \(T_p S = \mathrm{span}(X_u(q), X_v(q))\)。</p>
+
+<p><em>证明.</em> 两个方向。</p>
+
+<p>(\(\supseteq\)) 取 \(\gamma(t) := X(q + t \cdot e_1) = X(u_0 + t, v_0)\), 这是曲面上一条曲线, \(\gamma(0) = p\), \(\gamma'(0) = X_u(q)\)。所以 \(X_u(q) \in T_p S\)。同理 \(X_v(q) \in T_p S\)。线性子空间在线性组合下封闭（这个稍后证）, 所以 \(\mathrm{span}(X_u, X_v) \subseteq T_p S\)。</p>
+
+<p>(\(\subseteq\)) 取 \(v \in T_p S\), 即存在 \(\gamma: (-\varepsilon, \varepsilon) \to S\), \(\gamma(0) = p, \gamma'(0) = v\)。\(X^{-1}\) 在 \(p\) 附近有定义（因为 \(X\) 是同胚到一个开集上）, 设 \(\beta(t) := X^{-1}(\gamma(t))\), 是 \(\mathbb{R}^2\) 上一条曲线 \(\beta: (-\varepsilon', \varepsilon') \to U\), \(\beta(0) = q\)。链式法则:</p>
+
+<p>\[
+\gamma'(0) = (X \circ \beta)'(0) = dX_q(\beta'(0)) = X_u(q) \cdot \beta_1'(0) + X_v(q) \cdot \beta_2'(0).
+\]</p>
+
+<p>所以 \(v = \gamma'(0) \in \mathrm{span}(X_u, X_v)\). \(\square\)</p>
+
+<p>这个定理同时告诉我们:</p>
+
+<ul>
+  <li>\(T_p S\) 是 \(\mathbb{R}^3\) 的<em>2 维线性子空间</em>（由两个独立向量张成）。</li>
+  <li>它<em>不依赖</em> 参数化的选择——任何过 \(p\) 的局部参数化给的 \(T_p S\) 都一样。这是因为它们都等于"从 \(p\) 出发的曲面曲线速度的集合", 后者是<em>内蕴</em> 的。</li>
+</ul>
+
+<p>具体例子让你看清楚:</p>
+
+<p><strong>球面 \(S^2_r\) 在 \(p = (0, 0, r)\)（北极）.</strong> 参数化用图: \(X(u, v) = (u, v, \sqrt{r^2 - u^2 - v^2})\), 在 \((u, v) = (0, 0)\) 处。\(X_u = (1, 0, -u/\sqrt{...})|_{(0,0)} = (1, 0, 0)\), \(X_v = (0, 1, 0)\)。所以 \(T_p S = \mathrm{span}((1, 0, 0), (0, 1, 0)) = xy\) 平面 = "<em>北极的水平切面</em>"。✓</p>
+
+<p><strong>圆柱面 \(x^2 + y^2 = r^2\) 在 \(p = (r, 0, 0)\).</strong> 参数化 \(X(u, v) = (r \cos u, r \sin u, v)\), \(p\) 对应 \(u = 0, v = 0\)。\(X_u = (-r \sin u, r \cos u, 0)|_{u = 0} = (0, r, 0)\), \(X_v = (0, 0, 1)\). \(T_p S = \mathrm{span}((0, r, 0), (0, 0, 1)) = yz\) 平面。直觉对——圆柱在 \((r, 0, 0)\) 处的切平面是 \(yz\) 平面（\(y\) 是切到圆周, \(z\) 是沿轴方向）。✓</p>
+
+<p>切空间还有第三个等价定义——用<em>隐式描述</em>。设 \(S = F^{-1}(0)\) 在 \(p\) 附近, \(\nabla F(p) \neq 0\)。那么 \(T_p S = \mathrm{ker}(dF_p) = \{v \in \mathbb{R}^3 : \nabla F(p) \cdot v = 0\}\) = <em>法向量 \(\nabla F(p)\) 的正交补</em>。证明: 任一条 \(\gamma \subset S\) 满足 \(F(\gamma(t)) \equiv 0\), 求导得 \(\nabla F(\gamma(t)) \cdot \gamma'(t) = 0\), 取 \(t = 0\) 得 \(v = \gamma'(0) \perp \nabla F(p)\). 反过来用反函数定理（这里略）。</p>
+
+<p>所以三种语言对切空间也对应:</p>
+
+<ul>
+  <li>"曲线导数定义" 是<em>内蕴</em> 的描述（用曲面自身曲线）。</li>
+  <li>"参数化偏导张成" 是用<em>参数化</em> 计算的描述。</li>
+  <li>"\(\mathrm{ker}(dF_p)\)" 是用<em>隐式</em> 计算的描述, 即"<em>切平面 \(\perp\) 隐式方程梯度</em>"。这是几何上最有意义的——\(\nabla F\) 是法向量, 切空间是法向量的正交补。</li>
+</ul>
+
+<p>请你停下来感受这件事。曲面"<em>切平面</em>" 这个概念, 我们从中学就有图像——曲面"<em>贴上去的那一片</em>" 平面。今天我们给了它三种<em>等价的形式定义</em>, 证明了它是 2 维线性子空间, 不依赖参数化。这种"<em>把直觉一步步形式化</em>" 的过程是后面整本书的肌理——每一个直觉概念（切空间、长度、曲率、可定向性、地线、亏格）都会经历类似的形式化。</p>
+
+<h2 id="sec6-9">6.9 临别话</h2>
+
+<p>这一章我们把"<em>2 维东西</em>"形式化成<em>正则曲面</em>。三个等价描述（图、参数、隐式）每个都有它的用法。五个标准例（球、椭球、柱、旋转面、环面）会反复出现。切空间 \(T_p S\) 是后面所有"<em>线性化几何</em>" 的舞台。</p>
+
+<p>但目前我们还<em>什么几何都没做</em>——只是<em>定义了对象</em>。下一章开始<em>量</em>: 怎么在曲面上量长度、量角度、量面积。这是<em>第一基本形式</em> 的事——把欧氏内积限制到 \(T_p S\) 上, 得到一个 2×2 对称矩阵 \(\begin{pmatrix} E & F \\ F & G \end{pmatrix}\), 它完全决定了曲面的<em>内蕴</em> 几何。Gauss 1827 年的"<em>Theorema Egregium</em>" 就是说: 第一基本形式甚至决定 \(K\)（看起来外蕴的曲率, 其实是内蕴的）。这个"<em>看起来外蕴, 其实内蕴</em>" 的故事是接下来 5 章（ch7-11）的主线。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 整体曲线</a><a href="ch7.html">下一章 · 第 7 章 第一基本形式 →</a></nav>
+</main>
+</body>
+</html>
