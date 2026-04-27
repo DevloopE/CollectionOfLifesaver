@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 18 章 域的扩张 — 普林斯顿抽象代数读本</title>
+<title>第 18 章 域的扩张：把"扩多大"变成不变量 — 普林斯顿抽象代数读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -32,238 +32,204 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 PID 上有限生成模的结构定理</a><a href="ch19.html">下一章 · 第 19 章 代数扩张与最小多项式 →</a></nav>
-<h1 id="ch18">第 18 章 域的扩张</h1>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 PID 上有限生成模结构定理</a><a href="ch19.html">下一章 · 第 19 章 代数扩张与最小多项式 →</a></nav>
+<h1 id="ch18">第 18 章 域的扩张：把"扩多大"变成不变量</h1>
 
-<p>从这一章开始，我们离开"环 / 模"的故事，整本书的下半截换上一个新主题——<strong>域之间的关系</strong>。前面研究环时我们看的是"一个环"内部的乘法、理想、商；现在我们把镜头拉远，看两个域<em>嵌套</em>在一起时会发生什么。这种嵌套关系叫<strong>域扩张</strong>。它简单到看上去几乎不值得专门研究——直到你意识到一个干净到不可思议的事实：<em>当一个域包含另一个域时，大的那个自动是小的那个上的向量空间</em>。</p>
+<p>请你回想最熟悉的一对域：\(\mathbb{R} \subset \mathbb{C}\)。\(\mathbb{C}\) 是 \(\mathbb{R}\) 的"扩张"——它<em>包含</em> \(\mathbb{R}\)，加上一个新元素 \(i\)（满足 \(i^2 = -1\)）。任何复数都能唯一写成 \(a + bi\)，\(a, b \in \mathbb{R}\)。这种"唯一" 让我们说一句很物理的话：</p>
 
-<p>这一句话把"域论"瞬间拉到<a href="../线性代数/index.html">线性代数</a>的领地。"扩张次数"就是"维数"；"基"就是"在大域里把所有元素表示出来的最小数据"；"塔公式"就是<em>线性代数维数公式的环境版</em>。整个 Galois 理论在最底层就是这条"扩张 = 向量空间 + 一点点乘法结构"反复使用。这一章的目标就是把这件事从抽象命题变成手算反复跑得熟的几个具体例子——\(\mathbb{C}/\mathbb{R}\)、\(\mathbb{Q}(\sqrt 2)/\mathbb{Q}\)、\(\mathbb{Q}(\sqrt 2, \sqrt 3)/\mathbb{Q}\)、\(\mathbb{Q}(\sqrt[3] 2)/\mathbb{Q}\)。</p>
+<p><em>"\(\mathbb{C}\) 是 \(\mathbb{R}\) 上 2 维的"</em>——基是 \(\{1, i\}\)。</p>
+
+<p>"维数" 这个词突然出现在这里很自然——但请你停下来想一想：<em>这个维数到底是什么</em>？\(\mathbb{C}\) 不是向量空间——它是个域！可它<em>同时</em>是个 \(\mathbb{R}\)-向量空间——把 \(\mathbb{R}\) 当标量，\(\mathbb{C}\) 当向量。\(\{1, i\}\) 是它的基，所以它在<em>这种眼光</em>下 2 维。</p>
+
+<p>这种"<em>把扩域看作底域上向量空间</em>" 的视角是这一章打开的全部门户。它把"扩张" 这种<em>定性</em>的概念变成"扩张次数 \([K:F]\)" 这种<em>定量</em>的不变量。而不变量一旦有数字，就能比、能算、能证。</p>
+
+<h2 id="sec18-1">18.1 域扩张的定义和"自动" 向量空间结构</h2>
+
+<p><strong>定义。</strong>一个<strong>域扩张</strong> \(K/F\) 是两个域 \(F \subseteq K\)，且 \(F\) 是 \(K\) 的子域（也就是 \(F\) 用 \(K\) 的运算自身是域）。我们写 \(K/F\) 表示"\(K\) over \(F\)"，<em>不</em>是商，仅仅是表"扩张" 的记号。</p>
+
+<p>例：\(\mathbb{Q} \subset \mathbb{R}\), \(\mathbb{R} \subset \mathbb{C}\), \(\mathbb{Q} \subset \mathbb{Q}(\sqrt 2) := \{a + b\sqrt 2 : a, b \in \mathbb{Q}\}\)。每一对都是域扩张。</p>
+
+<p>关键观察：</p>
+
+<p><strong>命题。</strong>若 \(K/F\) 是域扩张，则 \(K\) 在 \(F\) 数乘下自动是个 \(F\)-向量空间。</p>
+
+<p>证明：把 \(K\) 当阿贝尔群（用它自身加法），把 \(F \subseteq K\) 当标量，标量乘法是 \(K\) 自身乘法限制到 \(F \times K\)。验证向量空间四条公理——它们都是 \(K\) 的域公理的特例。完。</p>
+
+<p>这条命题不显眼但<em>极</em>重要。它说：每个域扩张都<em>双重身份</em>——既是域，也是 \(F\)-向量空间。我们把这两个身份同时盯着，就能用<a href="../线性代数/index.html">线性代数</a>的工具研究域。</p>
+
+<h2 id="sec18-2">18.2 扩张次数 \([K:F]\)</h2>
+
+<p>既然 \(K\) 是 \(F\)-向量空间，它就有维数。</p>
+
+<p><strong>定义。</strong>\(K/F\) 的<strong>扩张次数</strong> \([K:F]\) 是 \(K\) 作为 \(F\)-向量空间的维数：</p>
+
+<p>\[
+[K:F] := \dim_F K.
+\]</p>
+
+<p>可能是有限正整数，可能是 \(\infty\)。</p>
+
+<p>当 \([K:F]\) 有限时叫<strong>有限扩张</strong>，否则叫<strong>无限扩张</strong>。本章主要兴趣在有限扩张——它们和"代数元" 紧密相关，是<a href="ch19.html">下一章</a>的主题。</p>
+
+<p>请你停下来体会名字。"次数" 这个词不是随便挑——它会和后面"最小多项式的<em>次数</em>"（<a href="ch19.html#sec19-3">19.3</a>）拉上关系，那不是巧合而是<em>同一个数</em>。这种同名是 19.5 节的命题。</p>
+
+<h2 id="sec18-3">18.3 例 1：\([\mathbb{C}:\mathbb{R}] = 2\)</h2>
+
+<p>主张：\(\{1, i\}\) 是 \(\mathbb{C}\) 作为 \(\mathbb{R}\)-向量空间的基。</p>
+
+<p><em>张成</em>：任何 \(z \in \mathbb{C}\) 可唯一写成 \(z = a + bi\)，\(a, b \in \mathbb{R}\)。这是复数的标准表达——<em>存在</em>来自 \(\mathbb{C}\) 的构造，<em>唯一</em>来自 \(1, i\) 在 \(\mathbb{C}\) 中的<em>线性无关</em>。</p>
+
+<p><em>线性无关</em>：设 \(a \cdot 1 + b \cdot i = 0\) 对 \(a, b \in \mathbb{R}\)。即 \(a + bi = 0\)。复数等于零意味着实部和虚部都为零，即 \(a = b = 0\)。所以 \(\{1, i\}\) 在 \(\mathbb{R}\) 上线性无关。</p>
+
+<p>所以 \([\mathbb{C}:\mathbb{R}] = 2\)。</p>
+
+<h2 id="sec18-4">18.4 例 2：\([\mathbb{Q}(\sqrt 2):\mathbb{Q}] = 2\)</h2>
+
+<p>定义 \(\mathbb{Q}(\sqrt 2) := \{a + b\sqrt 2 : a, b \in \mathbb{Q}\}\)。</p>
+
+<p>先验证它是<em>域</em>。加减明显封闭。乘法：\((a + b\sqrt 2)(c + d\sqrt 2) = (ac + 2bd) + (ad + bc)\sqrt 2 \in \mathbb{Q}(\sqrt 2)\)。逆元（对非零 \(a + b\sqrt 2\)）：</p>
+
+<p>\[
+\frac{1}{a + b\sqrt 2} = \frac{a - b\sqrt 2}{a^2 - 2b^2}.
+\]</p>
+
+<p>分母 \(a^2 - 2b^2\) 不是 \(0\)：如果 \(a^2 = 2b^2\) 而 \(a, b \in \mathbb{Q}\) 不全为零，则 \((a/b)^2 = 2\)——但 \(\sqrt 2\) 无理（高中证），矛盾。所以分母非零，逆元在 \(\mathbb{Q}(\sqrt 2)\) 里。</p>
+
+<p>这就是个域。\(\{1, \sqrt 2\}\) 是它在 \(\mathbb{Q}\) 上的基：</p>
+
+<p><em>张成</em>：定义里的元素直接是 \(a \cdot 1 + b \cdot \sqrt 2\)。</p>
+
+<p><em>线性无关</em>：设 \(a + b\sqrt 2 = 0\), \(a, b \in \mathbb{Q}\)。如果 \(b \neq 0\)，\(\sqrt 2 = -a/b \in \mathbb{Q}\)——和 \(\sqrt 2\) 无理矛盾。所以 \(b = 0\)，从而 \(a = 0\)。</p>
+
+<p>所以 \([\mathbb{Q}(\sqrt 2):\mathbb{Q}] = 2\)。和 \([\mathbb{C}:\mathbb{R}] = 2\) 同次数。这说明<em>"次数 2"</em> 不是 \(\mathbb{C}\) 独有——它是"加了一个二次代数元" 的标志。这种相似性在<a href="ch19.html#sec19-5">19 章</a>会被一般化为<em>"\([F(\alpha):F] = \deg m_\alpha\)"</em>。</p>
+
+<h2 id="sec18-5">18.5 例 3：\([\mathbb{Q}(\sqrt 2, \sqrt 3):\mathbb{Q}] = 4\)</h2>
+
+<p>这是个比前两个深一点的例子。\(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 定义为<em>同时</em>包含 \(\sqrt 2\) 和 \(\sqrt 3\) 的 \(\mathbb{Q}\) 上最小子域——具体长什么样？</p>
+
+<p>朴素尝试：先加 \(\sqrt 2\) 得 \(\mathbb{Q}(\sqrt 2)\)，再加 \(\sqrt 3\)。后者意味着把 \(\sqrt 3\) 加到 \(\mathbb{Q}(\sqrt 2)\) 里，得到 \(\mathbb{Q}(\sqrt 2)(\sqrt 3) = \{u + v\sqrt 3 : u, v \in \mathbb{Q}(\sqrt 2)\}\)。代入 \(u = a + b\sqrt 2\), \(v = c + d\sqrt 2\)（\(a, b, c, d \in \mathbb{Q}\)）：</p>
+
+<p>\[
+u + v\sqrt 3 = a + b\sqrt 2 + c\sqrt 3 + d\sqrt 2 \sqrt 3 = a + b\sqrt 2 + c\sqrt 3 + d\sqrt 6.
+\]</p>
+
+<p>所以猜测 \(\{1, \sqrt 2, \sqrt 3, \sqrt 6\}\) 是基，扩张次数 4。</p>
+
+<p><em>张成</em>已经显出（任何元素是上面那种四项形式）。剩下证<em>线性无关</em>。</p>
+
+<p>设 \(a + b\sqrt 2 + c\sqrt 3 + d\sqrt 6 = 0\), \(a, b, c, d \in \mathbb{Q}\)。要证全为零。</p>
+
+<p>把式子写成 \((a + c\sqrt 3) + (b + d\sqrt 3)\sqrt 2 = 0\)。这是 \(\mathbb{Q}(\sqrt 3)\) 上 \(\{1, \sqrt 2\}\) 的线性组合——如果 \(\sqrt 2 \notin \mathbb{Q}(\sqrt 3)\)，则 \(\{1, \sqrt 2\}\) 在 \(\mathbb{Q}(\sqrt 3)\) 上线性无关，所以 \(a + c\sqrt 3 = 0\) <em>和</em> \(b + d\sqrt 3 = 0\)。再用 \(\{1, \sqrt 3\}\) 在 \(\mathbb{Q}\) 上线性无关，得 \(a = b = c = d = 0\)。</p>
+
+<p>所以剩下的事就是证 \(\sqrt 2 \notin \mathbb{Q}(\sqrt 3)\)。反证：若 \(\sqrt 2 = u + v\sqrt 3\), \(u, v \in \mathbb{Q}\)。两边平方：\(2 = u^2 + 3v^2 + 2uv\sqrt 3\)。\(\sqrt 3\) 无理 ⟹ \(2uv = 0\)。要么 \(u = 0\)（则 \(2 = 3v^2\) ⟹ \(v^2 = 2/3\) ⟹ \(v\) 不有理），要么 \(v = 0\)（则 \(\sqrt 2 = u\) ⟹ 有理，假）。两边都失败，所以 \(\sqrt 2 \notin \mathbb{Q}(\sqrt 3)\)。</p>
+
+<p>所以 \([\mathbb{Q}(\sqrt 2, \sqrt 3):\mathbb{Q}] = 4\)，基 \(\{1, \sqrt 2, \sqrt 3, \sqrt 6\}\)。</p>
+
+<p>请你停下来注意这次<em>怎么</em>得到 4：把扩张分两步做。第一步 \(\mathbb{Q} \to \mathbb{Q}(\sqrt 2)\) 扩 2。第二步 \(\mathbb{Q}(\sqrt 2) \to \mathbb{Q}(\sqrt 2, \sqrt 3)\) 也扩 2（因为 \(\sqrt 3 \notin \mathbb{Q}(\sqrt 2)\)，论证类似）。两步合起来 \(2 \times 2 = 4\)。这种"次数相乘" 不是巧合，是下一节的<em>塔公式</em>。</p>
+
+<h2 id="sec18-6">18.6 塔公式：扩张次数会乘起来</h2>
+
+<p><strong>定理（塔公式）。</strong>设 \(F \subseteq M \subseteq K\) 是三层域扩张。则</p>
+
+<p>\[
+[K:F] \;=\; [K:M] \cdot [M:F].
+\]</p>
+
+<p>当左右某一边是 \(\infty\)，另一边相应地也是 \(\infty\)。</p>
+
+<p><strong>证明。</strong>假设两边都有限——记 \([K:M] = m\), \([M:F] = n\)。要证 \([K:F] = mn\)。</p>
+
+<p>选 \(M\) 的 \(F\)-基 \(\{u_1, \ldots, u_n\}\)，\(K\) 的 \(M\)-基 \(\{v_1, \ldots, v_m\}\)。我宣布：\(K\) 在 \(F\) 上的基是</p>
+
+<p>\[
+B := \{u_i v_j : 1 \leq i \leq n, 1 \leq j \leq m\}.
+\]</p>
+
+<p>这是个 \(mn\)-元素集合。证它是 \(K\) 的 \(F\)-基。</p>
+
+<p><em>张成</em>：取任意 \(k \in K\)。因为 \(\{v_j\}\) 是 \(K\) 的 \(M\)-基，可写</p>
+
+<p>\[
+k = \sum_{j=1}^m b_j v_j, \qquad b_j \in M.
+\]</p>
+
+<p>每个 \(b_j \in M\) 又可按 \(\{u_i\}\) 展开：</p>
+
+<p>\[
+b_j = \sum_{i=1}^n a_{ij} u_i, \qquad a_{ij} \in F.
+\]</p>
+
+<p>合起来：</p>
+
+<p>\[
+k = \sum_{j=1}^m \Big( \sum_{i=1}^n a_{ij} u_i \Big) v_j = \sum_{i,j} a_{ij} (u_i v_j).
+\]</p>
+
+<p>这是 \(B\) 在 \(F\) 上的线性组合。所以 \(B\) 张成 \(K\) over \(F\)。</p>
+
+<p><em>线性无关</em>：设 \(\sum_{i,j} a_{ij} u_i v_j = 0\), \(a_{ij} \in F\)。重新排列：</p>
+
+<p>\[
+\sum_{j=1}^m \Big( \sum_{i=1}^n a_{ij} u_i \Big) v_j = 0.
+\]</p>
+
+<p>内层括号 \(\sum_i a_{ij} u_i \in M\)（因为 \(a_{ij} \in F \subseteq M\), \(u_i \in M\)）。所以这是 \(\{v_j\}\) 在 \(M\) 上的线性组合等于零。\(\{v_j\}\) 是 \(K/M\) 的基 ⟹ 线性无关 over \(M\) ⟹ 每个 \(\sum_i a_{ij} u_i = 0\)（对每个 \(j\)）。</p>
+
+<p>每个 \(\sum_i a_{ij} u_i = 0\) 是 \(\{u_i\}\) 在 \(F\) 上的线性组合等于零。\(\{u_i\}\) 是 \(M/F\) 的基 ⟹ 每个 \(a_{ij} = 0\)。</p>
+
+<p>所以 \(B\) 在 \(F\) 上线性无关，且张成。\(B\) 是基，\([K:F] = |B| = mn\)。</p>
+
+<p>无限情况：如果某中间维数无限，构造同样地给出 \(K\) 上 \(F\) 不可数（或至少无限）多个线性无关元素，所以 \([K:F]\) 也无限。完。</p>
+
+<p>请你停下来欣赏这条公式的简洁。它说"<em>两步扩张的次数等于两步次数之积</em>"——比"两步加法的距离等于两段距离之和" 还要漂亮，因为乘比加更结构。它在<a href="ch22.html">22 章</a>证 Galois 主定理时是<em>每页都用</em>的工具。</p>
+
+<p>立即推论：</p>
+
+<p><strong>推论。</strong>若 \([K:F]\) 有限，则<em>任何</em>中间域 \(F \subseteq M \subseteq K\) 也使 \([M:F]\) 有限，且 \([M:F] | [K:F]\)。</p>
+
+<p>证明：塔公式 \([K:F] = [K:M][M:F]\)，左边有限 ⟹ 两个因子都有限；且 \([M:F]\) 整除 \([K:F]\)。</p>
+
+<p>这条推论非常实用。例如想找 \(\mathbb{Q}(\sqrt 2, \sqrt 3)\)（次数 4）的中间域，候选只能有次数 1 或 2——次数 1 是 \(\mathbb{Q}\) 自身，次数 2 是 \(\mathbb{Q}(\sqrt 2), \mathbb{Q}(\sqrt 3), \mathbb{Q}(\sqrt 6)\) 这三个（每个都对应一个 \(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 中的<em>二次元素</em>）。<em>"次数整除"</em> 限定了中间域可能的结构。Galois 主定理把这种"中间域 / 子群"对应做到极致。</p>
+
+<h2 id="sec18-7">18.7 单扩张 \(F(\alpha)\) 与 \([F(\alpha):F]\)</h2>
+
+<p>本章最后一个概念：把"加一个元素" 这件事正式命名。</p>
+
+<p><strong>定义。</strong>设 \(K/F\) 是域扩张，\(\alpha \in K\)。<strong>由 \(\alpha\) 生成的单扩张</strong> \(F(\alpha)\) 是 \(K\) 中包含 \(F\) 和 \(\alpha\) 的<em>最小</em>子域。</p>
+
+<p>"最小" 在集合包含意义下，等价于 \(F(\alpha) = \bigcap \{L : F \cup \{\alpha\} \subset L \subset K, L \text{ 是子域}\}\)。这种"最小子域" 叫"由 \(\alpha\) 生成"。</p>
+
+<p>例：</p>
 
 <ul>
-  <li>18.1 域扩张 \(K/F\) 的定义；扩张次数 \([K : F] = \dim_F K\)。</li>
-  <li>18.2 有限扩张 vs 无穷扩张；为什么有限扩张自动代数（预告 ch19）。</li>
-  <li>18.3 例子库 1：\(\mathbb{C}/\mathbb{R}\)，\([\mathbb{C} : \mathbb{R}] = 2\)，基 \(\{1, i\}\)。</li>
-  <li>18.4 例子库 2：\(\mathbb{Q}(\sqrt 2)/\mathbb{Q}\)，\([\mathbb{Q}(\sqrt 2) : \mathbb{Q}] = 2\)。</li>
-  <li>18.5 例子库 3：\(\mathbb{Q}(\sqrt 2, \sqrt 3)/\mathbb{Q}\)，\([\cdot : \mathbb{Q}] = 4\)。</li>
-  <li>18.6 塔公式 \([K : F] = [K : M][M : F]\)——完整证明。</li>
-  <li>18.7 单扩张 \(F(\alpha)\) 的构造。</li>
-  <li>18.8 例子库 4：\(\mathbb{Q}(\sqrt[3] 2)/\mathbb{Q}\)，\([\cdot : \mathbb{Q}] = 3\)。</li>
+  <li>\(\mathbb{R}(i) = \mathbb{C}\)，因为 \(\mathbb{R}\) 加 \(i\) 之后已经能造所有 \(a + bi\)。</li>
+  <li>\(\mathbb{Q}(\sqrt 2) = \{a + b\sqrt 2 : a, b \in \mathbb{Q}\}\)（前面验证过）。</li>
+  <li>\(\mathbb{Q}(\pi) = \{f(\pi)/g(\pi) : f, g \in \mathbb{Q}[x], g(\pi) \neq 0\}\)。这个看起来比 \(\mathbb{Q}(\sqrt 2)\) 大很多——下一章会看到这种"<em>大</em>" 不是错觉，它来自 \(\pi\) 是<em>超越</em>。</li>
 </ul>
 
-<h2 id="sec18-1">18.1 域扩张：定义与扩张次数</h2>
-
-<p>设 \(F\) 与 \(K\) 都是域。称 \(K\) 是 \(F\) 的一个<strong>扩张</strong>（extension），记 \(K/F\)（读作"\(K\) 上 \(F\)"，斜杠不是商，只是标记），如果 \(F \subset K\) 是一个子域——即 \(F\) 作为 \(K\) 的子集对 \(K\) 的加法乘法封闭、含单位、含逆，自身构成域。这时 \(F\) 叫<strong>底域</strong>，\(K\) 叫<strong>扩域</strong>。</p>
-
-<p>这个嵌套关系马上派生一件极重要的事：\(K\) 自动是 \(F\) 上的向量空间。理由非常直接——把 \(K\) 的加法当向量加法，把"\(F\) 中的元素乘 \(K\) 中的元素"（这本来就是 \(K\) 内部的乘法限制到 \(F \times K\)）当标量乘法，分配律、结合律、单位元在 \(K\) 内自动成立，所以八条向量空间公理一一兑现。<strong>这是域扩张和线性代数的桥</strong>。</p>
-
-<p>有了向量空间结构，立刻有维数。定义：</p>
-
-<p>\[
-\boxed{\ [K : F] \;:=\; \dim_F K \;=\; K \text{ 作为 } F\text{-向量空间的维数}.\ }
-\]</p>
-
-<p>这个数叫<strong>扩张次数</strong>（degree of the extension），简称次数。它可以是有限正整数，也可以是无穷（\(\dim_F K = \infty\)）。</p>
-
-<p>当 \([K : F]\) 有限时，\(K/F\) 叫<strong>有限扩张</strong>；当无穷时叫<strong>无穷扩张</strong>。</p>
-
-<p>一些朴素观察。第一，\([K : F] = 1\) 当且仅当 \(K = F\)（向量空间 1 维 + 含 \(F\) \(\Rightarrow\) 由 \(F\) 张满）。所以"次数 \(\ge 2\)" 已经是"真扩张"。第二，\([K : F]\) 是<em>纯线性代数</em>的不变量——不依赖任何域论的进一步结构，找一组基数一数即可。</p>
-
-<p>每个扩张 \(K/F\) 都给我们两件事：一个集合 \(K\)，与一个 \(F\)-向量空间结构。两件事缺一不可。看一个扩张主要先看"它的次数是多少"——这是它最粗糙也最重要的信息。</p>
-
-<h2 id="sec18-2">18.2 有限扩张与代数扩张的关系</h2>
-
-<p>本章的核心结论里有一条预告：<strong>有限扩张里每个元素都自动"代数"</strong>。下一章会精确定义"代数元素"——这里先写出大概意思以便理解。</p>
-
-<p>设 \(K/F\) 是扩张，\(\alpha \in K\)。称 \(\alpha\) 在 \(F\) 上<strong>代数</strong>（algebraic over \(F\)），如果存在非零多项式 \(f \in F[x]\) 满足 \(f(\alpha) = 0\)。否则称 \(\alpha\) 在 \(F\) 上<strong>超越</strong>（transcendental）。</p>
-
-<p>这个概念要紧的原因是：</p>
-
-<p><strong>命题。</strong>设 \(K/F\) 是有限扩张（\([K : F] = n < \infty\)），则 \(K\) 中每个元素都在 \(F\) 上代数。</p>
-
-<p>证明：取任意 \(\alpha \in K\)。考虑 \(K\) 中 \(n + 1\) 个元素 \(1, \alpha, \alpha^2, \ldots, \alpha^n\)。它们位于 \(n\) 维 \(F\)-向量空间 \(K\) 中——\(n + 1\) 个向量在 \(n\) 维空间里必定线性相关。所以存在不全为零的 \(c_0, c_1, \ldots, c_n \in F\) 使</p>
-
-<p>\[
-c_0 + c_1 \alpha + c_2 \alpha^2 + \cdots + c_n \alpha^n = 0.
-\]</p>
-
-<p>令 \(f(x) = c_0 + c_1 x + \cdots + c_n x^n \in F[x]\)，这是非零多项式（系数不全为零），且 \(f(\alpha) = 0\)——\(\alpha\) 代数。</p>
-
-<p>这个证明短得让人怀疑里面藏了什么。其实没有藏：核心就是<em>有限维向量空间里 \(n + 1\) 个向量必相关</em>，把"代数"这个看上去要靠多项式构造的概念，瞬间用线性代数解决。下一章会反过来证："每个 \(\alpha\) 代数 \(\Rightarrow\) \(F(\alpha)/F\) 有限"——所以"有限"与"代数 + 有限生成"是一体的两面。</p>
-
-<p>反例（证明"有限"是真要求）：\(\mathbb{R}/\mathbb{Q}\) 是无穷扩张（\(\mathbb{R}\) 不可数、\(\mathbb{Q}\) 可数 \(\Rightarrow\) \(\mathbb{R}\) 作 \(\mathbb{Q}\) 向量空间维数不可能可数）。\(\pi \in \mathbb{R}\) 在 \(\mathbb{Q}\) 上超越（Lindemann 1882）——和上面命题不冲突，因为 \(\mathbb{R}/\mathbb{Q}\) 不是有限扩张。</p>
-
-<h2 id="sec18-3">18.3 第一个例子：\(\mathbb{C}/\mathbb{R}\)</h2>
-
-<p>最熟悉的域扩张就是 \(\mathbb{C}/\mathbb{R}\)。\(\mathbb{C} = \{a + bi : a, b \in \mathbb{R}\}\)，包含 \(\mathbb{R}\)（取 \(b = 0\)）作为子域。</p>
-
-<p>看 \(\mathbb{C}\) 作 \(\mathbb{R}\)-向量空间。\(\{1, i\}\) 是基：</p>
+<p>\(F(\alpha)\) 的<em>具体</em>结构（含<em>多大</em>）取决于 \(\alpha\) 的性质：</p>
 
 <ul>
-  <li><strong>张满</strong>：每个 \(\mathbb{C}\) 元素 \(z = a + bi\) 是 \(a \cdot 1 + b \cdot i\)；</li>
-  <li><strong>线性无关</strong>：\(a \cdot 1 + b \cdot i = 0\) 与 \(a, b \in \mathbb{R}\) 给 \(a + bi = 0\)，由复数分实虚部得 \(a = b = 0\)。</li>
+  <li>若 \(\alpha\) 满足某个 \(F\) 上多项式（"代数"），\(F(\alpha)\) 是有限扩张，\([F(\alpha):F]\) 等于 \(\alpha\) 的"<em>最小多项式</em>" 次数（19.5）。</li>
+  <li>若 \(\alpha\) 不满足任何 \(F\) 上多项式（"超越"），\(F(\alpha)\) 是无限扩张，同构于<em>有理函数域</em> \(F(x)\)。</li>
 </ul>
 
-<p>所以</p>
+<p>这两种情况的对比是<a href="ch19.html">下一章</a>的主线：代数 vs 超越，以及怎么用<em>最小多项式</em> 完全把握代数情况。</p>
 
-<p>\[
-\boxed{\ [\mathbb{C} : \mathbb{R}] = 2.\ }
-\]</p>
+<h2 id="sec18-8">18.8 这一章你带走的</h2>
 
-<p>这是最小的非平凡扩张次数。"\(\mathbb{C}\) 是 \(\mathbb{R}\) 的 2 次扩张"这句话看上去无关紧要，其实是<a href="../复分析/index.html">复分析</a>的一切的源头：复函数论、Cauchy 积分、共形映射、Riemann 面——所有这些"复数特殊"的现象，本质都来自这条 "\(\dim_\mathbb{R} \mathbb{C} = 2\)、且乘法结构与 \(\mathbb{R}\) 兼容"的代数关系。</p>
-
-<p>顺便看 \(i\) 在 \(\mathbb{R}\) 上的"代数性"。\(i\) 满足 \(x^2 + 1 = 0\)，所以 \(i\) 在 \(\mathbb{R}\) 上代数；\(x^2 + 1\) 在 \(\mathbb{R}[x]\) 里不可约（无实根），所以它就是 \(i\) 的<strong>最小多项式</strong>（下章正式定义）；它的次数 \(2 = [\mathbb{C} : \mathbb{R}]\)——这不是巧合，下章 \([F(\alpha) : F] = \deg m_\alpha\) 那条会解释。</p>
-
-<h2 id="sec18-4">18.4 第二个例子：\(\mathbb{Q}(\sqrt 2)/\mathbb{Q}\)</h2>
-
-<p>这是数论与代数里最常用的"二次扩张"标准例子。\(\sqrt 2 \in \mathbb{R}\)（无理数），考虑包含 \(\mathbb{Q}\) 与 \(\sqrt 2\) 的最小子域，记 \(\mathbb{Q}(\sqrt 2)\)。</p>
-
-<p>断言：</p>
-
-<p>\[
-\mathbb{Q}(\sqrt 2) \;=\; \{a + b \sqrt 2 : a, b \in \mathbb{Q}\}.
-\]</p>
-
-<p>证明分两半。第一，右边那个集合显然包含 \(\mathbb{Q}\)（取 \(b = 0\)）与 \(\sqrt 2\)（取 \(a = 0, b = 1\)）；它对加法封闭直接。乘法：\((a_1 + b_1 \sqrt 2)(a_2 + b_2 \sqrt 2) = (a_1 a_2 + 2 b_1 b_2) + (a_1 b_2 + a_2 b_1) \sqrt 2\) 还在右边。"含逆"是关键：\(a + b \sqrt 2 \neq 0\) 时，</p>
-
-<p>\[
-\frac{1}{a + b \sqrt 2} = \frac{a - b \sqrt 2}{(a + b \sqrt 2)(a - b \sqrt 2)} = \frac{a - b \sqrt 2}{a^2 - 2 b^2}.
-\]</p>
-
-<p>分母 \(a^2 - 2 b^2\) 不可能是零（否则 \((a/b)^2 = 2\)，\(a/b \in \mathbb{Q}\) 矛盾于 \(\sqrt 2\) 无理），所以表达式合法且仍是 \(a' + b' \sqrt 2\) 形。所以右边是个域。第二，任何包含 \(\mathbb{Q}\) 与 \(\sqrt 2\) 的域必须包含所有 \(a + b \sqrt 2\) 形元素。所以右边等于左边。</p>
-
-<p>看 \(\mathbb{Q}(\sqrt 2)\) 作 \(\mathbb{Q}\)-向量空间，基 \(\{1, \sqrt 2\}\)：</p>
+<p>四件事：</p>
 
 <ul>
-  <li>张满：每个元素 \(a + b \sqrt 2\) 显式给出系数；</li>
-  <li>线性无关：\(a + b \sqrt 2 = 0\) 与 \(a, b \in \mathbb{Q}\) 给 \(a = -b \sqrt 2\)；若 \(b \neq 0\)，则 \(\sqrt 2 = -a/b \in \mathbb{Q}\) 矛盾。所以 \(b = 0\)，进而 \(a = 0\)。</li>
+  <li>"域扩张 \(K/F\)" 的关键观察：\(K\) 自动是 \(F\)-向量空间。这把"扩张" 从定性概念转成定量的<em>扩张次数</em> \([K:F] = \dim_F K\)。</li>
+  <li>三个标准例子的次数：\([\mathbb{C}:\mathbb{R}] = 2\), \([\mathbb{Q}(\sqrt 2):\mathbb{Q}] = 2\), \([\mathbb{Q}(\sqrt 2, \sqrt 3):\mathbb{Q}] = 4\)。每次都靠"造基 + 证线性无关"。</li>
+  <li>塔公式 \([K:F] = [K:M][M:F]\)：扩张次数是<em>乘</em>的。它告诉我们任何中间域的次数<em>整除</em>整体次数——这条整除是 Galois 理论的<em>核心算术</em>。</li>
+  <li>单扩张 \(F(\alpha)\)：把"加一个元素" 形式化。\(F(\alpha)\) 的具体大小取决于 \(\alpha\) 是<em>代数</em>还是<em>超越</em>——下一章的主题。</li>
 </ul>
 
-<p>所以 \([\mathbb{Q}(\sqrt 2) : \mathbb{Q}] = 2\)。\(\sqrt 2\) 满足 \(x^2 - 2 = 0\)，最小多项式 \(x^2 - 2\)（不可约：在 \(\mathbb{Q}\) 里无根），次数 2，与 \([\mathbb{Q}(\sqrt 2) : \mathbb{Q}]\) 相等。</p>
+<p>这一章只准备了语言。所有"扩张次数 = 多少 = 为什么" 的具体计算到下一章<em>最小多项式</em> 上场之后才有清爽答案。下一章你会看到：每个代数元 \(\alpha\) 都被它的<em>最小多项式</em> \(m_\alpha(x)\) 完全决定——\(F(\alpha) \cong F[x]/(m_\alpha)\)，\([F(\alpha):F] = \deg m_\alpha\)。这是非常具体可算的事，把 18 章的抽象立刻落地。</p>
 
-<p>这个例子的算法可以照搬给任何"开方根"扩张：\(\mathbb{Q}(\sqrt d)/\mathbb{Q}\)（\(d\) 不是 \(\mathbb{Q}\) 中平方）次数 2，基 \(\{1, \sqrt d\}\)，乘法 \((a + b \sqrt d)(c + e \sqrt d) = (ac + bed) + (ae + bc) \sqrt d\)，逆 \(1/(a + b\sqrt d) = (a - b\sqrt d)/(a^2 - d b^2)\)。</p>
-
-<h2 id="sec18-5">18.5 第三个例子：\(\mathbb{Q}(\sqrt 2, \sqrt 3)/\mathbb{Q}\)</h2>
-
-<p>把两个二次扩张"叠"起来。\(\mathbb{Q}(\sqrt 2, \sqrt 3)\) = 包含 \(\mathbb{Q}\)、\(\sqrt 2\) 与 \(\sqrt 3\) 的最小子域。</p>
-
-<p>断言：</p>
-
-<p>\[
-\mathbb{Q}(\sqrt 2, \sqrt 3) \;=\; \{a + b \sqrt 2 + c \sqrt 3 + d \sqrt 6 : a, b, c, d \in \mathbb{Q}\},
-\]</p>
-
-<p>且基为 \(\{1, \sqrt 2, \sqrt 3, \sqrt 6\}\)，所以 \([\mathbb{Q}(\sqrt 2, \sqrt 3) : \mathbb{Q}] = 4\)。</p>
-
-<p>"张满"由乘法直接：\(\sqrt 2 \cdot \sqrt 3 = \sqrt 6\) 自动出现；任何包含 \(\sqrt 2\) 与 \(\sqrt 3\) 的域必含 \(\sqrt 6\)，加上有理系数线性组合就给整个右边。"含逆"用上一节方法验证（更繁但同样可做）。</p>
-
-<p>"线性无关"是真要点。设 \(a + b \sqrt 2 + c \sqrt 3 + d \sqrt 6 = 0\)。组合成 \((a + b \sqrt 2) + (c + d \sqrt 2) \sqrt 3 = 0\)。如果 \(c + d \sqrt 2 \neq 0\)，可写 \(\sqrt 3 = -(a + b \sqrt 2)/(c + d \sqrt 2) \in \mathbb{Q}(\sqrt 2)\)；这要求 \(\sqrt 3 \in \mathbb{Q}(\sqrt 2)\)，但容易反证：\(\sqrt 3 = p + q \sqrt 2\)（\(p, q \in \mathbb{Q}\)）平方给 \(3 = p^2 + 2 q^2 + 2 p q \sqrt 2\)；\(\sqrt 2\) 是无理 \(\Rightarrow\) \(p q = 0\)；\(p = 0\) 给 \(\sqrt 3 = q \sqrt 2\)，\(q^2 = 3/2 \notin \mathbb{Q}^2\) 矛盾；\(q = 0\) 给 \(\sqrt 3 = p \in \mathbb{Q}\) 矛盾。所以 \(c + d \sqrt 2 = 0 \Rightarrow c = d = 0\)（\(\sqrt 2\) 在 \(\mathbb{Q}\) 上线性无关于 \(1\)），代回得 \(a + b \sqrt 2 = 0 \Rightarrow a = b = 0\)。</p>
-
-<p>所以四个元素线性无关，\([\mathbb{Q}(\sqrt 2, \sqrt 3) : \mathbb{Q}] = 4\)。</p>
-
-<p>这个 4 不是巧合。它等于 \(2 \times 2\)——两个相互"独立"的二次扩张叠加。下一节的塔公式会把这条机械化。</p>
-
-<h2 id="sec18-6">18.6 塔公式</h2>
-
-<p>设 \(F \subset M \subset K\) 是域扩张的塔（每一对都是子域关系）。最重要的结论：</p>
-
-<p>\[
-\boxed{\ [K : F] \;=\; [K : M] \cdot [M : F].\ }
-\]</p>
-
-<p>这条<strong>塔公式</strong>把"扩张次数"变成乘法运算——计算 \([K : F]\) 时可以分两步走。它是无穷扩张时也对，约定 \(\infty \cdot n = n \cdot \infty = \infty\)。</p>
-
-<p><strong>证明</strong>。先做有限情形，\([K : M] = m\)、\([M : F] = n\)。取 \(M\) 在 \(F\) 上的基 \(\{u_1, \ldots, u_n\}\)，\(K\) 在 \(M\) 上的基 \(\{v_1, \ldots, v_m\}\)。断言 \(\{u_i v_j\}_{i,j}\) 是 \(K\) 在 \(F\) 上的基（共 \(mn\) 个）。</p>
-
-<p><em>张满</em>：任 \(\alpha \in K\)，由 \(\{v_j\}\) 是 \(K/M\) 的基，\(\alpha = \sum_j m_j v_j\)，\(m_j \in M\)；每个 \(m_j\) 由 \(\{u_i\}\) 是 \(M/F\) 的基，\(m_j = \sum_i a_{ij} u_i\)，\(a_{ij} \in F\)；代回 \(\alpha = \sum_{i,j} a_{ij} u_i v_j\)。</p>
-
-<p><em>线性无关</em>：设 \(\sum_{i,j} a_{ij} u_i v_j = 0\)，\(a_{ij} \in F\)。重组为 \(\sum_j (\sum_i a_{ij} u_i) v_j = 0\)。令 \(m_j = \sum_i a_{ij} u_i \in M\)。\(\{v_j\}\) 在 \(M\) 上线性无关 \(\Rightarrow\) 每个 \(m_j = 0\)。再 \(\{u_i\}\) 在 \(F\) 上线性无关 \(\Rightarrow\) 每个 \(a_{ij} = 0\)。</p>
-
-<p>所以 \(\{u_i v_j\}\) 是基，\([K : F] = mn = [K : M] \cdot [M : F]\)。</p>
-
-<p>无穷情形：若 \([M : F] = \infty\)，\(K \supset M\) 含 \(M\) 的无穷线性无关集，\([K : F] = \infty\)。若 \([K : M] = \infty\)，\(K\) 在 \(M\) 上无穷生成 \(\Rightarrow\) 在 \(F\) 上也无穷生成（任何 \(M\)-基都是 \(F\)-生成集），\([K : F] = \infty\)。两种情形都对。</p>
-
-<p>用塔公式回头看 18.5 节的例子：\(\mathbb{Q} \subset \mathbb{Q}(\sqrt 2) \subset \mathbb{Q}(\sqrt 2, \sqrt 3)\)。\([\mathbb{Q}(\sqrt 2) : \mathbb{Q}] = 2\)；\([\mathbb{Q}(\sqrt 2, \sqrt 3) : \mathbb{Q}(\sqrt 2)] = 2\)（\(\sqrt 3\) 满足 \(x^2 - 3\)，需检查它在 \(\mathbb{Q}(\sqrt 2)\) 中仍不可约——上一节已证 \(\sqrt 3 \notin \mathbb{Q}(\sqrt 2)\)）。乘起来 \([\mathbb{Q}(\sqrt 2, \sqrt 3) : \mathbb{Q}] = 4\)，与 18.5 节直接算一致。</p>
-
-<p>塔公式还有一条立刻推论：</p>
-
-<p><strong>推论。</strong>若 \(K/F\) 有限，\(M\) 是 \(F \subset M \subset K\) 中间域，则 \([M : F]\) 与 \([K : M]\) 都是 \([K : F]\) 的因子。特别地，\([K : F]\) 是质数 \(\Rightarrow\) 中间域只有 \(F\) 与 \(K\) 自身。</p>
-
-<p>第二点对"次数 = 质数"的扩张特别有用——比如 \([\mathbb{Q}(\sqrt[3] 2) : \mathbb{Q}] = 3\)（下一节算），所以 \(\mathbb{Q}\) 与 \(\mathbb{Q}(\sqrt[3] 2)\) 之间没有真中间域。</p>
-
-<h2 id="sec18-7">18.7 单扩张：\(F(\alpha)\)</h2>
-
-<p>设 \(K/F\) 是扩张，\(\alpha \in K\)。<strong>由 \(\alpha\) 在 \(F\) 上生成的单扩张</strong>，记 \(F(\alpha)\)，是 \(K\) 中包含 \(F\) 与 \(\alpha\) 的最小子域。等价地：</p>
-
-<p>\[
-F(\alpha) \;=\; \bigcap \{L : F \subset L \subset K \text{ 子域，} \alpha \in L\}.
-\]</p>
-
-<p>子域族的交仍是子域，所以这定义合法。</p>
-
-<p>具体形态分两种情形（下章正式分类，这里给画面）：</p>
-
-<ul>
-  <li>若 \(\alpha\) 在 \(F\) 上代数（满足某非零 \(f \in F[x]\)），则 \(F(\alpha)\) 是有限维 \(F\)-向量空间，元素长成 "\(\alpha\) 的多项式表达式" \(c_0 + c_1 \alpha + \cdots + c_{n-1} \alpha^{n-1}\)（\(n = \deg m_\alpha\)）。</li>
-  <li>若 \(\alpha\) 超越，则 \(F(\alpha) \cong F(x)\)（有理函数域），是无穷维 \(F\)-向量空间。</li>
-</ul>
-
-<p>代数情形可显式描述。先看小子环 \(F[\alpha] = \{f(\alpha) : f \in F[x]\}\)——所有 "\(\alpha\) 的多项式" 集合。它是 \(K\) 的子环（含 \(F\)、含 \(\alpha\)、对加乘封闭、含 \(1\)）。如果 \(\alpha\) 代数、\(m_\alpha(x)\) 是 \(F[x]\) 中由 \(\alpha\) 决定的最小多项式（下章），则求值同态 \(\operatorname{ev}_\alpha : F[x] \to K\)（\(f \mapsto f(\alpha)\)）的核是 \((m_\alpha)\)，象是 \(F[\alpha]\)。第一同构定理给</p>
-
-<p>\[
-F[\alpha] \;\cong\; F[x] / (m_\alpha).
-\]</p>
-
-<p>由 \(m_\alpha\) 不可约（下章），\((m_\alpha)\) 是 \(F[x]\) 中极大理想（\(F[x]\) 是 PID），所以 \(F[x]/(m_\alpha)\) 是<em>域</em>——也就是说 \(F[\alpha]\) 已经是域，等于 \(F(\alpha)\)。换句话说：</p>
-
-<p>\[
-\boxed{\ \alpha \text{ 代数} \Longrightarrow F(\alpha) = F[\alpha] \cong F[x]/(m_\alpha).\ }
-\]</p>
-
-<p>这是一个非常有用的事实：代数情形下，"由 \(\alpha\) 生成的小子域"等于"由 \(\alpha\) 生成的小子环"——求逆元不需要分式运算，直接用 Bézout 在 \(F[x]\) 里求。第 19 章会把这条的证明完整展开。</p>
-
-<p>超越情形完全相反：\(F[\alpha] \cong F[x]\)（不是域，没有 \(1/\alpha\)），需要"取分式"才得 \(F(\alpha) \cong F(x)\)（有理函数）。本书几乎只关心代数情形——超越元素的扩张论是另一门学问（"超越次数"，本书不涉及）。</p>
-
-<h2 id="sec18-8">18.8 第四个例子：\(\mathbb{Q}(\sqrt[3] 2)/\mathbb{Q}\)</h2>
-
-<p>取 \(\alpha = \sqrt[3] 2\)（实立方根，\(\approx 1.2599\)）。它满足 \(x^3 - 2 = 0\)。</p>
-
-<p>\(x^3 - 2\) 在 \(\mathbb{Q}[x]\) 中不可约——由 Eisenstein 准则（取素数 \(p = 2\)，\(2 \mid 2\) 但 \(2 \nmid 1\)、\(4 \nmid 2\)）。所以这就是 \(\sqrt[3] 2\) 的<strong>最小多项式</strong>，次数 3。</p>
-
-<p>由 18.7 节框图，</p>
-
-<p>\[
-\mathbb{Q}(\sqrt[3] 2) \;\cong\; \mathbb{Q}[x] / (x^3 - 2),
-\]</p>
-
-<p>具体来说每个元素长成</p>
-
-<p>\[
-\boxed{\ a + b \cdot 2^{1/3} + c \cdot 2^{2/3}, \quad a, b, c \in \mathbb{Q},\ }
-\]</p>
-
-<p>所以基 \(\{1, 2^{1/3}, 2^{2/3}\}\)，</p>
-
-<p>\[
-[\mathbb{Q}(\sqrt[3] 2) : \mathbb{Q}] = 3 = \deg(x^3 - 2).
-\]</p>
-
-<p>"线性无关"由次数论证：\(\{1, \alpha, \alpha^2\}\) 不能在 \(\mathbb{Q}\) 上有非平凡关系（否则有次数 \(\le 2\) 的多项式杀 \(\alpha\)，与 \(m_\alpha\) 次数 3 矛盾）。"张满"由 \(F(\alpha) = F[\alpha]\)（代数）+ 多项式模 \(m_\alpha\)（"高次降阶"）：\(\alpha^3 = 2\)，\(\alpha^4 = 2 \alpha\)，\(\alpha^5 = 2 \alpha^2\)，\(\alpha^6 = 4\)，等等——每个高次幂都能写成 \(\{1, \alpha, \alpha^2\}\) 的有理系数线性组合。</p>
-
-<p>具体算一个例子：求 \(\alpha^2 + 1\) 在 \(\mathbb{Q}(\sqrt[3] 2)\) 里的逆。用 Bézout：求 \(\gcd(x^2 + 1, x^3 - 2)\) 与表达式 \(x^3 - 2 = (x^2 + 1) \cdot x + (-x - 2)\)；\(x^2 + 1 = (-x - 2)(-x + 2) + 5\)；所以 \(\gcd = 5\)，倒推回去 \(5 = (x^2 + 1)(\ldots) + (x^3 - 2)(\ldots)\)。具体倒推（留作算术）给出</p>
-
-<p>\[
-\frac{1}{\alpha^2 + 1} = \frac{1}{5}(2 + 2 \alpha - \alpha^2),
-\]</p>
-
-<p>验证：\((\alpha^2 + 1)(2 + 2\alpha - \alpha^2) = 2 \alpha^2 + 2 \alpha^3 - \alpha^4 + 2 + 2 \alpha - \alpha^2 = 2 + 2 \alpha + \alpha^2 + 2 \cdot 2 - 2 \alpha = 2 + 4 + \alpha^2 = 5 + (\alpha^2 - 1) \cdot 0\)... 嗯，让我重算：\(\alpha^3 = 2\)、\(\alpha^4 = 2 \alpha\)，所以 \(2 \alpha^3 = 4\)、\(\alpha^4 = 2 \alpha\)。展开 \((\alpha^2 + 1)(2 + 2\alpha - \alpha^2) = 2 \alpha^2 + 2 \alpha^3 - \alpha^4 + 2 + 2 \alpha - \alpha^2 = 2 \alpha^2 + 4 - 2\alpha + 2 + 2 \alpha - \alpha^2 = \alpha^2 + 6\)。"\(5\)" 不对——本算法演示意图是<em>方法</em>而非数字精确，留给读者完成 Bézout。</p>
-
-<p>本节真正想强调的是：<strong>\(\sqrt[3] 2\) 这种"开 \(n\) 次方"扩张的次数 = \(n\)</strong>——只要相应多项式 \(x^n - a\) 在 \(F\) 上不可约。Eisenstein 之类的判别可以快速判别这一点。</p>
-
-<p>一个有趣的对比：18.5 节 \(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 次数 4，但它是<em>两次"二次扩张"叠加</em>；18.8 节 \(\mathbb{Q}(\sqrt[3] 2)\) 次数 3，它是<em>一次"三次扩张"</em>。两者都不能"再细分"——前者中间域有 \(\mathbb{Q}(\sqrt 2)\)、\(\mathbb{Q}(\sqrt 3)\)、\(\mathbb{Q}(\sqrt 6)\) 三个，后者由"3 是质数 + 塔公式" 没有真中间域。这个差别在 Galois 理论里会变成"Galois 群结构差异"——\(\operatorname{Gal}(\mathbb{Q}(\sqrt 2, \sqrt 3)/\mathbb{Q}) \cong \mathbb{Z}/2 \times \mathbb{Z}/2\)（有三个 2 阶子群对应三个中间域），\(\operatorname{Gal}(\mathbb{Q}(\sqrt[3] 2, \zeta_3)/\mathbb{Q}) \cong S_3\) 等等。</p>
-
-<p>下一章把"代数 vs 超越"这条划分讲透，特别是<strong>最小多项式</strong>这个工具。它会让本章里几个计算（"\(F(\alpha)\) 长什么样""\([F(\alpha) : F] = ?\)"）从手算变成机械化操作；它也是 Galois 理论后面所有计算的核心。再后面 ch20 会讨论"分裂域 + 正规扩张"，ch21 把 Galois 群的对应关系定理证完。</p>
-
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 PID 上有限生成模的结构定理</a><a href="ch19.html">下一章 · 第 19 章 代数扩张与最小多项式 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 PID 上有限生成模结构定理</a><a href="ch19.html">下一章 · 第 19 章 代数扩张与最小多项式 →</a></nav>
 </main>
 </body>
 </html>

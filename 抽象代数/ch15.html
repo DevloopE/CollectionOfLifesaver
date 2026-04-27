@@ -32,197 +32,267 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 主理想环与唯一分解</a><a href="ch16.html">下一章 · 第 16 章 模的入门 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 PID 与 UFD</a><a href="ch16.html">下一章 · 第 16 章 模的定义与基本例子 →</a></nav>
 <h1 id="ch15">第 15 章 多项式环</h1>
 
-<p>\(k[x]\)（\(k\) 是域）是抽象代数里最常出现的非平凡 PID。它把 \(\mathbb{Z}\) 上的算术几乎逐字搬到"代数"侧——带余除法、最大公因子、Bézout 等式、唯一不可约分解，全部还在。同时它比 \(\mathbb{Z}\) 多了一种<em>几何</em>身份：\(k[x]\) 中的元素能被在 \(k\) 上代入求值，于是"根"这个概念自动出现，多项式与函数之间有了一道桥。</p>
+<p>请你做一个朴素的尝试。我们已经知道 \(k[x]\)（\(k\) 域）是 PID——每个理想都是某个单一多项式生成的。看来"多项式环" 是个好东西。那 \(k[x, y]\) ——两元多项式环——是不是也是 PID？</p>
 
-<p>本章把 \(k[x]\) 的内部结构讲透，再看看多元 \(k[x_1, \ldots, x_n]\) 如何与单变量分道扬镳——它仍然是 UFD 但不再是 PID，理想结构从"一维"跳进"高维"，需要诺特性才能继续控制。这条单 \(\to\) 多变量的过渡是从初等代数走向交换代数与代数几何的真正第一步。</p>
+<p>具体试一试。看 \(k[x, y]\) 中的理想</p>
+
+<p>\[
+I = (x, y) = \{x \cdot a(x, y) + y \cdot b(x, y) : a, b \in k[x, y]\}
+\]</p>
+
+<p>——所有"<em>没有常数项</em>" 的两元多项式（验证：在 \((x, y)\) 里的元素带入 \(x = y = 0\) 给 0，反之没常数项的 \(p\) 写成 \(p = x \cdot p_x(x, y) + y \cdot p_y(0, y)\) 等）。</p>
+
+<p>\(I\) 主吗？假设 \(I = (f)\) 对某 \(f(x, y) \in k[x, y]\)。则 \(x \in (f)\) 即 \(f | x\)；\(y \in (f)\) 即 \(f | y\)。</p>
+
+<p>\(f | x\) 想想 \(f\) 应该长什么样。在 \(k[x, y] = k[x][y]\) 中考虑 \(x\) 是<em>常数</em>（关于 \(y\)），所以 \(x\) 在 \(k[x, y]\) 中的因子是 \(k[x]\) 中 \(x\) 的因子（这条要细心：\(k[x][y]\) 中 \(x\) 的因子就是 \(k[x]\) 中 \(x\) 的因子，因为 \(x\) 关于 \(y\) 次数 0）。\(x\) 在 \(k[x]\) 中的因子是 \(c\) 或 \(c x\)（\(c \in k^\times\)）。所以 \(f \in \{c, cx\} \cup \text{含 }y\text{ 的}\)? 不——\(f | x\) 要求 \(f\) <em>不</em> 含 \(y\)（否则乘任何东西后 \(y\) 不会消失）。所以 \(f\) 是 \(c\) 或 \(cx\)。</p>
+
+<p>同理 \(f | y\) 给 \(f\) 是 \(c'\) 或 \(c' y\)。</p>
+
+<p>两条同时满足：\(f\) 既是 "\(c\) 或 \(cx\)"，又是 "\(c'\) 或 \(c'y\)"。"<em>含 \(x\) 但不含 \(y\)</em>" 与 "<em>含 \(y\) 但不含 \(x\)</em>" 不能同时（除非 \(f\) 是常数）。所以 \(f\) 是非零常数 \(c \in k^\times\)，即<em>单位</em>。\((f) = (c) = k[x, y]\)。</p>
+
+<p>但 \((x, y) \subsetneq k[x, y]\)（\(1 \notin (x, y)\)）。矛盾。<em>\((x, y)\) 不主——\(k[x, y]\) 不是 PID</em>。</p>
+
+<p>请你停下来感受一下：从一元到二元，<em>结构突然崩了</em>。\(k[x]\) 是 PID，行为像 \(\mathbb{Z}\) 一样规整；\(k[x, y]\) 突然就不是，理想可以"<em>多源生成</em>"，没法用单一元素压缩。这条断层不是表面差别——它有<em>几何</em> 含义：\(k[x, y]\) 的极大理想对应 \(k^2\) 平面上的<em>点</em>（\((x, y)\) 对应原点 \((0, 0)\)），平面上的点是<em>二维</em> 对象，所以理想需要<em>两条</em> 方程切定它，不能用<em>一条</em> 方程切（一条方程切出曲线，二维少一维）。这是<em>代数几何</em> 的入口。</p>
+
+<p>多元多项式环失去的<em>不只是</em> PID。它仍然是 UFD（每个非常数有唯一不可约分解）；它仍然是<em>诺特环</em>（理想升链终止），但这条要 Hilbert 基定理才证。本章把这些差别理清。</p>
+
+<h2 id="sec15-1">15.1 \(k[x]\) 上的除法算法 + PID 完整证明</h2>
+
+<p>先把 ch14 跳过的细节补上。</p>
+
+<p><strong>定理（带余除法）。</strong> 设 \(k\) 域、\(f, g \in k[x]\)、\(g \neq 0\)。存在唯一 \(q, r \in k[x]\) 使</p>
+
+<p>\[
+f = qg + r, \quad r = 0 \text{ 或 } \deg r < \deg g.
+\]</p>
+
+<p><strong>证明。</strong> 存在性用归纳 \(\deg f\)。基础：若 \(\deg f < \deg g\)，取 \(q = 0, r = f\)。归纳：若 \(\deg f \ge \deg g\)，写</p>
+
+<p>\[
+f = a_n x^n + \cdots, \quad g = b_m x^m + \cdots, \quad n \ge m.
+\]</p>
+
+<p>令 \(h = (a_n / b_m) x^{n-m} g\)。则 \(\deg h = n\) 且 \(h\) 与 \(f\) 首项相同。所以 \(\deg(f - h) < n\)。归纳得 \(f - h = q' g + r\)（\(\deg r < m\)）。代入：\(f = q' g + h + r = (q' + (a_n/b_m) x^{n-m}) g + r\)。完。</p>
+
+<p>(注意"\(a_n / b_m\)"<em>需要</em> \(b_m\) 在 \(k\) 中可逆——这是为什么 \(k\) 必须是<em>域</em>。在 \(\mathbb{Z}[x]\) 中 \(b_m = 2\) 不可逆，带余除法不一般成立。)</p>
+
+<p>唯一性：若 \(f = q_1 g + r_1 = q_2 g + r_2\)，则 \((q_1 - q_2) g = r_2 - r_1\)。若 \(q_1 \neq q_2\)，左侧次数 \(\ge \deg g\)，右侧 \(< \deg g\)，矛盾。所以 \(q_1 = q_2\)、\(r_1 = r_2\)。</p>
+
+<p>从带余除法立即得 PID 性，论证 ch14 已给。重复一次（这是核心论证，重述无害）：</p>
+
+<p><strong>定理。</strong> \(k[x]\)（\(k\) 域）是 PID。</p>
+
+<p><strong>证明。</strong> 设 \(I \subseteq k[x]\) 非零理想。取 \(I\) 中次数最小的非零 \(g\)。对任意 \(f \in I\)，带余 \(f = qg + r\)（\(\deg r < \deg g\)）；\(r = f - qg \in I\)；由 \(g\) 最小性 \(r = 0\)，即 \(f = qg \in (g)\)。所以 \(I = (g)\)。\(I = \{0\} = (0)\) 是平凡情况。</p>
+
+<p>所以 \(k[x]\) 是 PID。由 ch14 主定理，\(k[x]\) 是 UFD。</p>
+
+<p>这条 PID 性是<em>"\(k\) 是域"</em> 的直接后果。换成 \(\mathbb{Z}[x]\) 它就崩——\(\mathbb{Z}\) 不是域，带余除法在某些首项系数下不行。\(\mathbb{Z}[x]\) 是 UFD（下面 15.4 节）但不是 PID。</p>
+
+<h2 id="sec15-2">15.2 多项式根 + 因子定理</h2>
+
+<p>带余除法的最直接应用是<em>因子定理</em>——把"\(f\) 在 \(a\) 处取 0" 翻译成"<em>\(x - a\) 整除 \(f\)</em>"。</p>
+
+<p><strong>定理（因子定理）。</strong> 设 \(R\) 是交换环（含 1）、\(f \in R[x]\)、\(a \in R\)。则 \(f(a) = 0\) 当且仅当 \(x - a\) 在 \(R[x]\) 中整除 \(f\)。</p>
+
+<p><strong>证明。</strong> "\(\Leftarrow\)"：若 \(f = (x - a) g\)，则 \(f(a) = 0 \cdot g(a) = 0\)。</p>
+
+<p>"\(\Rightarrow\)"：用带余除 \(f\) 除以 \(x - a\)（注意 \(x - a\) 首项系数 1，可逆与否无所谓——余式带余总能做）：</p>
+
+<p>\[
+f(x) = (x - a) q(x) + r,
+\]</p>
+
+<p>其中 \(\deg r < 1\)，即 \(r \in R\)（常数）。代 \(x = a\)：\(f(a) = 0 + r = r\)。所以 \(r = 0\) 即 \(x - a | f\)。</p>
+
+<p><strong>推论。</strong> 域 \(k\) 上次数 \(n\) 的非零多项式 \(f \in k[x]\) 至多有 \(n\) 个根。</p>
+
+<p><strong>证明。</strong> 归纳 \(n\)。基础 \(n = 0\)：常数非零无根。归纳 \(n \ge 1\)：若 \(f\) 没根，0 个 \(\le n\)，完。否则取一根 \(a\)，\(f = (x - a) g\)，\(\deg g = n - 1\)；归纳 \(g\) 至多 \(n - 1\) 根；\(f\) 的其它根都是 \(g\) 的根（因为 \(k\) 是<em>域</em>，无零因子，\(f(b) = 0\) 与 \(b \neq a\) 蕴含 \(g(b) = 0\)）；总 \(\le n\)。</p>
+
+<p>这条结论需要 \(k\) 是<em>整环</em>（用了"无零因子" 推 \(g(b) = 0\)）；在<em>非整环</em> 上失败。例：在 \(\mathbb{Z}_8\) 中，\(x^2 \equiv 0 \pmod 8\) 的解有 \(0, 4\)（验：\(4^2 = 16 \equiv 0\)）——次数 2 多项式 \(x^2\) 有 2 个根，行；但 \(x^2 - 1\) 在 \(\mathbb{Z}_8\) 中有 4 个根（\(1, 3, 5, 7\)），<em>超过</em> 次数 2。\(\mathbb{Z}_8\) 有零因子 \(2 \cdot 4 = 0\)，让<em>因子定理的推论</em> 失效。</p>
+
+<p>"次数 \(n\) 多项式至多 \(n\) 根" 是整环上的<em>关键</em> 事实。它让"<em>多项式由它的足够多的根决定</em>" 这种插值成为可能（详见<a href="../数值方法/ch10.html">数值方法 ch10</a>）。</p>
+
+<h2 id="sec15-3">15.3 \(k[x]\) 中不可约多项式</h2>
+
+<p>UFD 性让我们关心"<em>不可约</em>" 多项式——它们是分解的"原子"。</p>
+
+<p><strong>定义。</strong> \(f \in k[x]\)（\(k\) 域）叫<em>不可约</em>，如果 \(f\) 非零非单位（即 \(\deg f \ge 1\)），且 \(f = gh\) 蕴含 \(g\) 或 \(h\) 是单位（即常数）。</p>
+
+<p><strong>低次的简单情况：</strong></p>
 
 <ul>
-  <li>正式陈述 \(k[x]\) 的<strong>除法算法</strong>：\(f = qg + r\)，\(\deg r < \deg g\)。</li>
-  <li>用除法算法证 \(k[x]\) 是 PID，每个理想由其最低次元素生成。</li>
-  <li>多项式的<strong>根</strong>与因子定理：\(a\) 是 \(f\) 的根 \(\iff\) \((x - a) \mid f\)；推论 \(\deg n\) 多项式至多 \(n\) 个根。</li>
-  <li>\(k[x]\) 中"不可约"等价于"素"，并给出实用的不可约判别工具。</li>
-  <li>多元 \(k[x_1, \ldots, x_n]\) 仍是 UFD（Gauss 引理 + 归纳），但理想 \((x_1, \ldots, x_n)\) 不主——告别 PID。</li>
-  <li>陈述 <strong>Hilbert 基定理</strong>：诺特环上的多项式环也诺特；推论 \(k[x_1, \ldots, x_n]\) 诺特。</li>
-  <li>证明 Gauss 引理（"\(R[x]\) UFD \(\iff R\) UFD"）；陈述并应用 Eisenstein 判别法在 \(R[x]\) 上的版本。</li>
-  <li>具体例子：\(x^4 + 1\) 在 \(\mathbb{Q}[x]\) 不可约（在 \(x \mapsto x + 1\) 替换后），\(x^p - x - 1\) 在 \(\mathbb{F}_p[x]\) 不可约（Artin–Schreier）。</li>
+  <li>1 次多项式 \(ax + b\)（\(a \neq 0\)）<em>总</em> 不可约——任何分解 \((c)(c'x + c'')\) 中常数因子 \(c\) 是单位。</li>
+  <li>2、3 次多项式：<em>不可约 \(\iff\) 没根</em>（在 \(k\) 中）。证明："有根 \(a\)" 给 \(x - a | f\) 即 \(f = (x - a) g\) 真分解；反过来若可约 \(f = gh\)、\(\deg g, \deg h \ge 1\) 而 \(\deg f \le 3\)，则一个因子次数 1，给一个根。</li>
+  <li>4 次以上：<em>没根 \(\not\Rightarrow\) 不可约</em>。例 \((x^2 + 1)^2 \in \mathbb{R}[x]\) 在 \(\mathbb{R}\) 中没根但<em>可约</em>（被 \(x^2 + 1\) 切）。</li>
 </ul>
 
-<h2 id="sec15-1">15.1 \(k[x]\) 的除法算法</h2>
-
-<p>设 \(k\) 是域，\(f, g \in k[x]\)，\(g \neq 0\)。<strong>除法算法</strong>：</p>
-
-<p>\[
-\boxed{\ \exists\, q, r \in k[x] \text{ 唯一}：\ f = q g + r,\ \ \deg r < \deg g.\ }
-\]</p>
-
-<p>（约定 \(\deg 0 = -\infty\)，使 \(r = 0\) 也满足 \(\deg r < \deg g\)。）</p>
-
-<p>证明（存在 + 唯一）：</p>
-
-<p><em>存在</em>：对 \(\deg f\) 归纳。若 \(\deg f < \deg g\)，取 \(q = 0, r = f\)。否则设 \(\deg f = n \ge \deg g = m\)，\(f = a_n x^n + \cdots\)，\(g = b_m x^m + \cdots\)。考虑</p>
-
-<p>\[
-f_1 := f - \frac{a_n}{b_m} x^{n - m} g.
-\]</p>
-
-<p>注意这里用了 \(b_m^{-1}\) 存在（\(k\) 是域！）。\(f_1\) 中 \(x^n\) 项系数被精心抵消，所以 \(\deg f_1 < n\)。归纳假设给 \(f_1 = q_1 g + r\)，\(\deg r < \deg g\)。则 \(f = (q_1 + \frac{a_n}{b_m} x^{n-m}) g + r\)。</p>
-
-<p><em>唯一</em>：若 \(f = q g + r = q' g + r'\)，则 \((q - q') g = r' - r\)。若 \(q \neq q'\)，左边次数 \(\ge \deg g\)，但右边 \(\deg(r' - r) < \deg g\)，矛盾。所以 \(q = q'\)，从而 \(r = r'\)。</p>
-
-<p>这条算法依赖 \(k\) 是域——需要把首项系数取倒数。换成 \(\mathbb{Z}[x]\)，比如 \(f = x, g = 2x\)，找不到 \(q \in \mathbb{Z}[x]\) 使 \(\deg(f - q g) < \deg g = 1\)（任何 \(q\) 是常数，\(f - qg = (1 - 2q) x\) 仍 1 次或为 0；\(1 - 2q = 0\) 在 \(\mathbb{Z}\) 中无解）。所以 \(\mathbb{Z}[x]\) 上没有"除法算法"，自然也不是 PID。</p>
-
-<p><strong>例。</strong>在 \(\mathbb{Q}[x]\) 中除 \(f = x^4 + 2 x^2 + 1\) 以 \(g = x^2 + x + 1\)。逐步消去：</p>
-
-<p>\(f - x^2 g = x^4 + 2 x^2 + 1 - (x^4 + x^3 + x^2) = -x^3 + x^2 + 1\)。</p>
-
-<p>\(-x^3 + x^2 + 1 + x g = -x^3 + x^2 + 1 + (x^3 + x^2 + x) = 2 x^2 + x + 1\)。</p>
-
-<p>\(2 x^2 + x + 1 - 2 g = 2 x^2 + x + 1 - (2 x^2 + 2 x + 2) = -x - 1\)。</p>
-
-<p>所以 \(q = x^2 - x + 2\)，\(r = -x - 1\)，\(\deg r = 1 < 2 = \deg g\)。</p>
-
-<h2 id="sec15-2">15.2 \(k[x]\) 是 PID</h2>
-
-<p>用除法算法证 \(k[x]\) 是 PID（已在<a href="ch14.html">第 14 章 14.3 节</a>给出，这里把<em>建设性</em>那一面再强调一次）。</p>
-
-<p>设 \(I \subseteq k[x]\) 非零理想。\(I\) 中所有非零元素的次数集合是 \(\mathbb{Z}_{\ge 0}\) 的非空子集，有最小元 \(d\)；取 \(g \in I\)，\(\deg g = d\)。对任意 \(f \in I\)，写 \(f = qg + r\)，\(\deg r < d\)。\(r = f - qg \in I\)；若 \(r \neq 0\) 则 \(\deg r \ge d\)（\(d\) 是 \(I\) 中非零元素最小次数），矛盾。所以 \(r = 0\)，\(f \in (g)\)。\(I = (g)\)。</p>
-
-<p>\[
-\boxed{\ k \text{ 是域} \Rightarrow k[x] \text{ 是 PID（每个理想由次数最低的元素生成）}.\ }
-\]</p>
-
-<p>由<a href="ch14.html">14.6 节</a>主定理 PID \(\Rightarrow\) UFD，立即得 \(k[x]\) 是 UFD。每个非零非常数 \(f \in k[x]\) 都能写成不可约多项式 \(p_1 p_2 \cdots p_k\) 的乘积，差一个非零常数倍以及顺序之外唯一。</p>
-
-<p>注意 \(k[x]\) 中的"单位"恰好是非零常数 \(k^\times = k \setminus \{0\}\)：如果 \(f g = 1\)，比较次数 \(\deg f + \deg g = 0\)，所以 \(\deg f = \deg g = 0\)，即 \(f, g\) 是非零常数。两个不可约分解 \(f = p_1 \cdots p_k = q_1 \cdots q_m\) 的"差一个单位倍"指的是每个 \(p_i\) 与对应的 \(q_{\sigma(i)}\) 差一个非零常数。约定首项系数为 1（叫"首一"）就把这点歧义彻底消掉——所以人们常把 \(k[x]\) 的不可约因子取首一形式。</p>
-
-<p>顺便也得到 Bézout：\(\gcd(f, g)\) 总能写成 \(a f + b g\)（\(a, b \in k[x]\)）。这条让 Euclid 算法在 \(k[x]\) 上完美运行——和整数中一样反复"除一回，余数变小"，至多 \(\min(\deg f, \deg g)\) 步收敛。</p>
-
-<h2 id="sec15-3">15.3 多项式的根与因子定理</h2>
-
-<p>设 \(f \in k[x]\)，\(a \in k\)。<strong>代入求值</strong>给出 \(f(a) \in k\)。这一动作的本质是"在 \(k[x]\) 中除 \(f\) 以 \(x - a\) 看余数"——下面的<em>因子定理</em>把这件事说穿。</p>
-
-<p><strong>因子定理。</strong>对 \(f \in k[x]\) 与 \(a \in k\)，\(a\) 是 \(f\) 的<strong>根</strong>（即 \(f(a) = 0\)）当且仅当 \((x - a) \mid f\)。</p>
-
-<p>\[
-\boxed{\ f(a) = 0 \iff f(x) = (x - a) g(x) \text{ 对某 } g \in k[x].\ }
-\]</p>
-
-<p>证明：用除法算法除 \(f\) 以 \(x - a\)：\(f = (x - a) q + r\)，\(\deg r < 1\)，所以 \(r\) 是常数。代入 \(x = a\)：\(f(a) = 0 \cdot q(a) + r = r\)。所以 \(f(a) = 0 \iff r = 0 \iff (x - a) \mid f\)。</p>
-
-<p><strong>推论：根的个数上界。</strong>非零 \(f \in k[x]\) 的根至多 \(\deg f\) 个。</p>
-
-<p>证明：归纳于 \(\deg f\)。\(\deg f = 0\) 时 \(f \neq 0\) 是非零常数，无根。一般 \(\deg f = n \ge 1\)，若 \(f\) 无根则结论成立；否则取一根 \(a_1\)，写 \(f = (x - a_1) g\)，\(\deg g = n - 1\)。\(f\) 的其他根都是 \(g\) 的根（由整环性，\(f(b) = (b - a_1) g(b) = 0\) 与 \(b \neq a_1\) 给 \(g(b) = 0\)）。归纳 \(g\) 至多 \(n - 1\) 个根，加上 \(a_1\) 共至多 \(n\) 个。</p>
-
-<p><strong>例。</strong>"\(f(x) = x^2 - 1\) 在 \(\mathbb{Z}/8\mathbb{Z}[x]\) 上有 4 个根（\(1, 3, 5, 7\)）"——这看起来违反了根上界。原因是 \(\mathbb{Z}/8\mathbb{Z}\) 不是整环（\(2 \cdot 4 = 0\)），上面的因子定理证明里"\(b \neq a_1\) 故 \(g(b) = 0\)"那一步用了无零因子。所以根上界依赖 \(k\) 是<em>域</em>（或至少整环）这件事。</p>
-
-<p><strong>推论：插值唯一性。</strong>给定 \(n + 1\) 个不同点 \(a_0, a_1, \ldots, a_n\) 与对应值 \(b_0, b_1, \ldots, b_n\)，至多有一个次数 \(\le n\) 的多项式 \(f \in k[x]\) 满足 \(f(a_i) = b_i\)。证明：若 \(f, g\) 都满足，则 \(f - g\) 有 \(n + 1\) 个根但次数 \(\le n\)，故 \(f - g = 0\)。Lagrange 插值公式给出该多项式的<em>存在</em>。两件事合起来即"插值多项式存在且唯一"。</p>
-
-<h2 id="sec15-4">15.4 \(k[x]\) 中不可约 = 素；常用判别工具</h2>
-
-<p>\(k[x]\) 是 PID，所以 14.5 节的等价立刻适用：</p>
-
-<p>\(p \in k[x]\) 不可约（非常数且不能写成两个非常数多项式的乘积）\(\iff\) \(p\) 素（\(p \mid fg\) 蕴含 \(p \mid f\) 或 \(p \mid g\)）。</p>
-
-<p>等价地，\(p\) 不可约 \(\iff\) 主理想 \((p)\) 是<em>极大</em>理想 \(\iff\) 商环 \(k[x]/(p)\) 是域。后两条等价是因为 \(k[x]\) 是 PID 且 \(p\) 不可约（详见<a href="ch12.html">第 12 章 12.5 节</a>）。这件事会在<a href="ch18.html">第 18 章</a>用来构造域扩张：若 \(p \in k[x]\) 不可约，则 \(L = k[x]/(p)\) 是包含 \(k\) 的域，其中 \(\bar x\) 是 \(p\) 的根。</p>
-
-<p>实用判别工具汇总：</p>
+<p><strong>对不同 \(k\) 的不可约多项式分类：</strong></p>
 
 <ul>
-  <li><strong>次数 1：</strong>所有 \(\deg = 1\) 的多项式 \(ax + b\)（\(a \neq 0\)）都不可约（次数原因）。</li>
-  <li><strong>次数 2 与 3：</strong>次数 \(\le 3\) 的非常数 \(f \in k[x]\) 不可约 \(\iff\) \(f\) 在 \(k\) 中无根。理由：可约 \(\iff\) 写成两个次数 \(\ge 1\) 多项式之积，至少有一个次数 1，对应一个根。注意：次数 \(\ge 4\) 时此判别<em>失效</em>——\(x^4 + x^2 + 1 = (x^2 + x + 1)(x^2 - x + 1)\) 在 \(\mathbb{Q}\) 中无根但可约。</li>
-  <li><strong>有理根定理：</strong>整系数多项式 \(a_n x^n + \cdots + a_0\) 的有理根 \(p/q\)（已约分）必满足 \(p \mid a_0, q \mid a_n\)。这是寻找有理根的算法。</li>
-  <li><strong>模 \(p\) 简化：</strong>\(f \in \mathbb{Z}[x]\) 首项系数不被素 \(p\) 整除，若 \(\bar f \in \mathbb{F}_p[x]\) 不可约，则 \(f\) 在 \(\mathbb{Q}[x]\) 不可约。理由：可约会传递到 \(\mathbb{F}_p[x]\)（同次数的因子分解模 \(p\)）。</li>
-  <li><strong>Eisenstein：</strong>14.8 节已陈述，下一节再放进 \(R[x]\)（\(R\) UFD）的一般框架。</li>
+  <li>\(\mathbb{C}[x]\)：<em>只有</em> 1 次不可约。这是<em>代数基本定理</em>——每个非常数复多项式有复根，所以高次都可分。\(\mathbb{C}\) 叫<em>代数闭</em>。</li>
+  <li>\(\mathbb{R}[x]\)：1 次和某些 2 次（\(ax^2 + bx + c\) 判别式 \(b^2 - 4ac < 0\)）不可约。3 次以上必约——每个奇次实多项式有实根，每个高次实多项式可被 1 次或 2 次切。</li>
+  <li>\(\mathbb{Q}[x]\)：<em>每个次数</em> 都有不可约的。比如 \(x^n - 2\) 不可约对所有 \(n \ge 1\)（Eisenstein, \(p = 2\)）。</li>
+  <li>\(\mathbb{F}_p[x]\)：每个次数都有不可约的。这是有限域理论的基础（<a href="ch23.html">第 23 章</a>）。</li>
 </ul>
 
-<p>这五条工具是日常判别的全部"招数"。后面的例子里我们会反复混用。</p>
+<p>"<em>哪些有理多项式不可约</em>" 一般是难问题。但有一族非常常用的判别工具，下面看。</p>
 
-<h2 id="sec15-5">15.5 多元多项式环：UFD 但不是 PID</h2>
+<h2 id="sec15-4">15.4 多元多项式：UFD 但非 PID（Gauss 引理）</h2>
 
-<p>\(k[x_1, \ldots, x_n]\)（\(n \ge 2\)）是<a href="ch11.html">第 11 章</a>定义的多变量多项式环。它包含 \(k[x_1]\) 作为子环，进一步可写成迭代结构 \(k[x_1, \ldots, x_n] = (k[x_1, \ldots, x_{n-1}])[x_n]\)（"先固定前 \(n-1\) 个变量再加第 \(n\) 个"）。</p>
+<p>本章开篇看到 \(k[x, y]\) 不是 PID。但它<em>是</em> UFD——每个非常数多项式可唯一分解成不可约因子。</p>
 
-<p>这个迭代视角是关键。结合下一节的 Gauss 引理 "\(R\) UFD \(\Rightarrow R[x]\) UFD"，归纳给出：</p>
+<p>怎么证？关键工具是<em>Gauss 引理</em>，它告诉你"\(R\) UFD \(\Rightarrow R[x]\) UFD"。</p>
+
+<p><strong>预备：内容（content）与原本（primitive）。</strong> 设 \(R\) 是 UFD、\(F = \mathrm{Frac}(R)\) 是 \(R\) 的商域。多项式 \(f = a_n x^n + \cdots + a_0 \in R[x]\) 的<em>内容</em> \(\mathrm{cont}(f) := \gcd(a_0, a_1, \ldots, a_n) \in R\)（在 UFD 中 gcd 良定义到单位）。\(f\) 叫<em>原本的</em>，如果 \(\mathrm{cont}(f) = 1\)（即各系数互素）。</p>
+
+<p>每个 \(f \in R[x]\) 都能写 \(f = \mathrm{cont}(f) \cdot \widetilde{f}\)，\(\widetilde{f}\) 原本。</p>
+
+<p><strong>Gauss 引理。</strong> 两个原本多项式的乘积仍然原本。</p>
+
+<p><strong>证明。</strong> 设 \(f, g \in R[x]\) 原本但 \(fg\) 不原本，则有素元 \(p \in R\) 整除 \(fg\) 全部系数。考虑模 \(p\) 的同态 \(R[x] \to (R/(p))[x]\)（按系数模 \(p\)），这是环同态。\(\overline{fg} = \overline{f} \cdot \overline{g} = 0\) 在 \((R/p)[x]\) 中。但 \(R/(p)\) 是<em>整环</em>（因 \(p\) 素），所以 \((R/p)[x]\) 也是整环（多项式环 over 整环），\(\overline{f} \cdot \overline{g} = 0\) 蕴含 \(\overline{f} = 0\) 或 \(\overline{g} = 0\)，即 \(p\) 整除 \(f\) 或 \(g\) 全部系数，矛盾原本性。</p>
+
+<p>(<em>关键利用</em>："素 \(\Rightarrow\) 整环模 \(p\) 是整环 \(\Rightarrow\) 多项式环也整环 \(\Rightarrow\) 无零因子"。这条逻辑链非常优雅。)</p>
+
+<p><strong>定理（Gauss）。</strong> 若 \(R\) 是 UFD，则 \(R[x]\) 也是 UFD。</p>
+
+<p><strong>证明思路。</strong> 关键步：</p>
+
+<ol>
+  <li>\(R[x]\) 中 \(f\) 不可约（且<em>原本</em>），等价于 \(f\) 在 \(F[x]\) 中不可约（其中 \(F = \mathrm{Frac}(R)\)）。这步用 Gauss 引理：若 \(f = gh\) 在 \(F[x]\) 中真分解，可以"<em>清分母</em>" 把 \(g, h\) 调成 \(R[x]\) 中原本多项式（差有理常数因子），由 Gauss 引理 \(g h\) 是原本的有理倍 \(= f\)，对应到 \(R[x]\) 中给 \(f\) 的真分解。</li>
+  <li>\(F[x]\) 是 PID（\(F\) 域），因此是 UFD——任何 \(f \in R[x]\) 在 \(F[x]\) 中有唯一不可约分解。</li>
+  <li>把 \(F[x]\) 中的分解通过 (1) 拉回 \(R[x]\)：每个 \(F[x]\) 不可约因子对应一个 \(R[x]\) 不可约（原本）因子，再加上 \(\mathrm{cont}(f)\) 在 \(R\) 中的素分解。</li>
+  <li>唯一性：\(F[x]\) 唯一分解 + \(R\) UFD 唯一分解，组合给 \(R[x]\) 唯一。</li>
+</ol>
+
+<p>详细证明牵扯到"清分母" 的精细计算，本章不展开。结论很简洁：<em>\(R\) UFD \(\Rightarrow R[x]\) UFD</em>。</p>
+
+<p><strong>推论。</strong> \(\mathbb{Z}[x]\) 是 UFD（\(\mathbb{Z}\) UFD），\(\mathbb{Z}[x, y]\) 是 UFD（\(\mathbb{Z}[x]\) UFD），递归 \(\mathbb{Z}[x_1, \ldots, x_n]\) 是 UFD。同样 \(k[x_1, \ldots, x_n]\) 对任意域 \(k\) 是 UFD。</p>
+
+<p>但<em>多元</em>（\(n \ge 2\)）<em>不</em> 是 PID——本章开篇已证 \((x_1, x_2)\) 不主。所以多元多项式环是 UFD 但非 PID 的<em>标准</em> 例子族。</p>
+
+<h2 id="sec15-5">15.5 Hilbert 基定理：多元多项式环诺特</h2>
+
+<p>多元多项式环失去 PID，但保住一个<em>较弱</em> 但仍非常有用的性质：<em>每个理想都<em>有限</em> 生成</em>。这条性质叫<em>诺特环</em>。</p>
+
+<p><strong>定义。</strong> 环 \(R\) 叫<em>诺特环</em>（Noetherian），如果以下三条等价条件之一（实际上都等价）成立：</p>
+
+<ul>
+  <li>(N1) 每个理想 \(I \subseteq R\) 由有限多元素生成。</li>
+  <li>(N2) 任何理想升链 \(I_1 \subseteq I_2 \subseteq \cdots\) 必稳定。</li>
+  <li>(N3) 任何非空理想族都有"极大元"。</li>
+</ul>
+
+<p>(三条等价的证明是标准的集合论 + Zorn 引理类操作，留给读者。)</p>
+
+<p>PID 是诺特的（每个理想由<em>一个</em> 元素生成 \(\subseteq\) "有限生成"）。但<em>诺特</em> 比<em>PID</em> 弱得多——\(k[x_1, \ldots, x_n]\) 是诺特，不一定 PID。</p>
+
+<p><strong>定理（Hilbert 基定理）。</strong> 若 \(R\) 是诺特环，则 \(R[x]\) 也是诺特环。</p>
+
+<p>(不证；证明是经典的 Hilbert "<em>非构造性</em>" 论证，是 19 世纪末 Hilbert 把代数几何系统化的关键工具。)</p>
+
+<p><strong>推论。</strong> 任何域 \(k\) 上 \(k[x_1, \ldots, x_n]\) 是诺特环。</p>
+
+<p><strong>证明。</strong> \(k\) 域 \(\Rightarrow\) \(k\) 诺特（理想只有 \((0)\) 和 \(k\)）。归纳 \(n\) 用 Hilbert 基定理：\(k[x_1]\) 诺特、\(k[x_1, x_2] = k[x_1][x_2]\) 诺特、......、\(k[x_1, \ldots, x_n]\) 诺特。</p>
+
+<p>这条结论的代数几何意义：\(k^n\) 中任何<em>代数集合</em>（一组多项式方程的公共零点集）<em>有限</em> 多个方程就够了。比如 \(k^3\) 中"满足 \(x^2 + y^2 + z^2 = 1\) 与 \(x + y + z = 0\)" 的曲线由<em>两条</em> 方程给出；不需要无穷多条方程。这条"<em>代数集合 = 有限方程组的零点</em>" 是代数几何的奠基观察。</p>
+
+<p>Hilbert 当年发表这条定理时，因证明非构造性，被同时代的 Gordan 评论"<em>这不是数学，是神学</em>"。但今天它已是标准内容，基于它的代数几何是 20 世纪数学最大成就之一。</p>
+
+<h2 id="sec15-6">15.6 Eisenstein 判别准则——完整证明</h2>
+
+<p>ch14 给出了 Eisenstein 判别的陈述与几个应用。现在给出完整证明。</p>
+
+<p><strong>定理（Eisenstein 判别准则）。</strong> 设 \(f(x) = a_n x^n + a_{n-1} x^{n-1} + \cdots + a_0 \in \mathbb{Z}[x]\)。若存在素数 \(p\) 使</p>
+
+<ul>
+  <li>(E1) \(p \nmid a_n\)；</li>
+  <li>(E2) \(p | a_i\) 对所有 \(0 \le i \le n - 1\)；</li>
+  <li>(E3) \(p^2 \nmid a_0\)。</li>
+</ul>
+
+<p>则 \(f\) 在 \(\mathbb{Q}[x]\) 中不可约。</p>
+
+<p><strong>证明。</strong> 反证。设 \(f = gh\) 是 \(\mathbb{Q}[x]\) 中的真分解（\(\deg g, \deg h \ge 1\)）。由 Gauss 引理（"<em>整数多项式在 \(\mathbb{Q}[x]\) 中分解 \(\Rightarrow\) 在 \(\mathbb{Z}[x]\) 中也分解</em>"），可以假设 \(g, h \in \mathbb{Z}[x]\)。</p>
+
+<p>写 \(g = b_r x^r + \cdots + b_0\)、\(h = c_s x^s + \cdots + c_0\)，\(r + s = n\)、\(r, s \ge 1\)。系数关系：</p>
 
 <p>\[
-\boxed{\ k \text{ 是域} \Rightarrow k[x_1, \ldots, x_n] \text{ 是 UFD}（任意 } n \ge 1）.\ }
+a_0 = b_0 c_0, \quad a_n = b_r c_s, \quad a_i = \sum_{j + k = i} b_j c_k.
 \]</p>
 
-<p>\(\mathbb{Z}\) UFD 同样给 \(\mathbb{Z}[x_1, \ldots, x_n]\) UFD。这条结果让我们能在多变量上继续讨论"互素""最大公因子""唯一分解"等概念。</p>
+<p>由 (E2)+(E3)：\(p | a_0 = b_0 c_0\) 但 \(p^2 \nmid a_0\)。所以 \(p\) 整除 \(b_0\) 与 \(c_0\) 中<em>恰</em> 一个，不整除另一个。设 \(p | b_0\)、\(p \nmid c_0\)（对称情况类似）。</p>
 
-<p>但 \(k[x_1, \ldots, x_n]\)（\(n \ge 2\)）不再是 PID。<a href="ch14.html">14.3 节</a>已给出最简单的反例：在 \(k[x, y]\) 中 \((x, y)\) 不主。一般地 \((x_1, \ldots, x_n)\) 在 \(k[x_1, \ldots, x_n]\) 中不主（同样论证：若 \((x_1, \ldots, x_n) = (h)\)，则 \(x_i \in (h)\) 给 \(\deg h \le 1\)，常数项 0，写 \(h = \sum \alpha_i x_i\)；但 \(x_1 = a h\) 比较各 \(x_j\) 系数得矛盾）。</p>
+<p>由 (E1)：\(p \nmid a_n = b_r c_s\)，所以 \(p \nmid b_r\) 与 \(p \nmid c_s\)。</p>
 
-<p>所以单变量到多变量的过渡里，"PID"这个性质<em>断了</em>。理想的复杂度从"一个生成元"跳到"许多生成元"。需要新的工具来控制理想——这就是诺特性。</p>
+<p>所以 \(g\) 的系数 \(b_0\) 被 \(p\) 整除、\(b_r\) 不被 \(p\) 整除。设 \(t\) 是<em>最小</em> 下标使 \(p \nmid b_t\)（这样的 \(t\) 存在因为 \(b_r\) 不被 \(p\) 整除；\(t \ge 1\) 因为 \(b_0\) 被）。注意 \(0 < t \le r < n\)。</p>
 
-<h2 id="sec15-6">15.6 Hilbert 基定理</h2>
-
-<p>设 \(R\) 是交换环。\(R\) 叫<strong>诺特</strong>（Noetherian），如果它的每个理想都<em>有限生成</em>——存在 \(a_1, \ldots, a_k \in R\) 使 \(I = (a_1, \ldots, a_k)\)。等价定义：每条升链 \(I_1 \subseteq I_2 \subseteq \cdots\) 必终止（升链条件，ACC）。这两条等价的证明在<a href="ch12.html">第 12 章 12.7 节</a>。</p>
-
-<p>所有 PID 都诺特（每个理想由<em>一个</em>元素生成是"有限生成"的极端情形）。但反向不成立——\(k[x_1, \ldots, x_n]\) 诺特但不是 PID（\(n \ge 2\)）。下面的 Hilbert 基定理（David Hilbert, 1890）正是给出这条诺特性的关键工具。</p>
-
-<p><strong>Hilbert 基定理。</strong>若 \(R\) 是诺特环，则 \(R[x]\) 也是诺特环。</p>
+<p>看 \(a_t\)：</p>
 
 <p>\[
-\boxed{\ R \text{ 诺特} \Rightarrow R[x] \text{ 诺特} \Rightarrow R[x_1, \ldots, x_n] \text{ 诺特}.\ }
+a_t = b_0 c_t + b_1 c_{t-1} + \cdots + b_{t-1} c_1 + b_t c_0.
 \]</p>
 
-<p>证明大意（不展开全部）：设 \(I \subseteq R[x]\) 是理想。在 \(I\) 中按次数从低到高挑：\(f_1\) 是 \(I\) 中次数最低的非零元，\(f_2\) 是 \(I \setminus (f_1)\) 中次数最低的，\(f_3\) 是 \(I \setminus (f_1, f_2)\) 中次数最低的……记 \(f_i\) 的首项系数为 \(a_i \in R\)。考虑 \(R\) 中的理想 \(J = (a_1, a_2, \ldots) \subseteq R\)。\(R\) 诺特给 \(J = (a_1, \ldots, a_n)\) 对某 \(n\)。可证 \(I = (f_1, \ldots, f_n)\)（如果反之 \(f_{n+1}\) 存在，则 \(a_{n+1} = \sum c_i a_i\)，构造 \(g = f_{n+1} - \sum c_i x^{\deg f_{n+1} - \deg f_i} f_i\) 在 \(I \setminus (f_1, \ldots, f_n)\) 中且次数低于 \(f_{n+1}\)，与 \(f_{n+1}\) 的最小次数选择矛盾）。所以 \(I\) 由有限多个 \(f_i\) 生成。\(R[x]\) 诺特。</p>
+<p>右侧前 \(t\) 项 \(b_0 c_t, b_1 c_{t-1}, \ldots, b_{t-1} c_1\) 中 \(b_0, b_1, \ldots, b_{t-1}\) 都被 \(p\) 整除（按 \(t\) 最小性），所以这些项都被 \(p\) 整除。最后一项 \(b_t c_0\)：\(b_t\) 不被 \(p\) 整除、\(c_0\) 不被 \(p\) 整除，所以 \(p \nmid b_t c_0\)。整理：\(a_t = (\text{被 } p \text{ 整除的几项}) + b_t c_0\)，所以 \(a_t \equiv b_t c_0 \not\equiv 0 \pmod p\)，即 \(p \nmid a_t\)。</p>
 
-<p>归纳即得 \(R[x_1, \ldots, x_n]\) 诺特。特别 \(k[x_1, \ldots, x_n]\)（\(k\) 域）诺特，\(\mathbb{Z}[x_1, \ldots, x_n]\) 诺特。</p>
+<p>但 \(t \le r < n\)，由 (E2) \(p | a_t\)。矛盾。完。</p>
 
-<p>Hilbert 基定理是<a href="../book/ch1.html">代数几何</a>的奠基石——它把"代数簇 \(V \subseteq k^n\) 由有限多个多项式方程定义"这件事从假设变成定理（这是 Hilbert 当年用这条定理终结了代数不变量理论里"基定理之争"的著名公案）。本书暂不展开代数几何的方向，但这条诺特性会在<a href="ch17.html">第 17 章</a>讲 PID 上模时反复出现——诺特性是"有限生成模上能做归纳"的根基。</p>
+<p>请你停下来欣赏这条证明的简洁。它把一个看上去复杂的"不可约性" 问题转化为一条<em>系数 mod \(p\) 的算术约束</em>——只要找到一个素数 \(p\) 让<em>常数项轻被</em> \(p\) 整除（一次而不是两次）<em>而其它中间系数都被</em> \(p\) 整除，多项式就<em>不可约</em>。这种"用<em>模 \(p\)</em> 把整数问题转成有限域问题" 的技巧在数论中无处不在。</p>
 
-<h2 id="sec15-7">15.7 Gauss 引理与 Eisenstein 在 \(R[x]\) 中</h2>
-
-<p>设 \(R\) 是 UFD，\(K\) 是它的商域。\(f \in R[x]\) 中所有系数的最大公因子（在 \(R\) 中）叫 \(f\) 的<strong>内容</strong> \(\operatorname{cont}(f)\)；\(f\) 叫<strong>本原</strong>，如果 \(\operatorname{cont}(f)\) 是单位（最大公因子为 1）。</p>
-
-<p><strong>Gauss 引理（关键步）。</strong>本原多项式的乘积是本原。即 \(f, g \in R[x]\) 本原 \(\Rightarrow fg\) 本原。</p>
-
-<p>证明（反证）：若 \(fg\) 不本原，存在素元 \(p \in R\) 整除 \(fg\) 的所有系数。模 \(p\) 看：\(\bar f \bar g = \overline{fg} = 0\) 在 \(R/(p)\)\([x]\) 中。但 \(R/(p)\) 是整环（\(p\) 素），所以 \(R/(p)\)\([x]\) 也是整环，故 \(\bar f = 0\) 或 \(\bar g = 0\)。这意味着 \(p\) 整除 \(f\) 或 \(g\) 的所有系数，与 \(f, g\) 本原矛盾。</p>
-
-<p><strong>Gauss 引理（主形式）。</strong>设 \(f \in R[x]\) 本原。则 \(f\) 在 \(R[x]\) 中可约 \(\iff\) \(f\) 在 \(K[x]\) 中可约。</p>
-
-<p>证明思路："\(\Rightarrow\)"：若 \(f = g h\) 在 \(R[x]\) 中且 \(g, h\) 都非单位，则在 \(K[x]\) 中也非单位（次数都 \(\ge 1\)）。"\(\Leftarrow\)"：设 \(f = g_K h_K\) 在 \(K[x]\) 中。把 \(g_K, h_K\) 各乘公分母清入 \(R[x]\)：\(c f = g h\)，\(g, h \in R[x]\)，\(c \in R\)。把 \(g, h\) 各拆"内容 + 本原部分"：\(g = \alpha g_0\)，\(h = \beta h_0\)，\(g_0, h_0\) 本原。则 \(c f = \alpha \beta g_0 h_0\)。两边比较内容：\(\operatorname{cont}(cf) = c \cdot \operatorname{cont}(f) = c \cdot 1 = c\)（\(f\) 本原）；\(\operatorname{cont}(\alpha \beta g_0 h_0) = \alpha \beta \operatorname{cont}(g_0 h_0) = \alpha \beta\)（关键步用了"本原 \(\times\) 本原 = 本原"）。所以 \(c = u \alpha \beta\)，\(u\) 单位。约掉给 \(f = u^{-1} g_0 h_0\)，\(g_0, h_0 \in R[x]\) 非常数（否则 \(g_K\) 或 \(h_K\) 是 \(K\) 中常数即单位），\(f\) 在 \(R[x]\) 中分解。</p>
-
-<p>从这条定理出发把"\(R[x]\) 中的不可约元"分类清楚：要么是 \(R\) 中的素元（视为常数多项式），要么是 \(R[x]\) 中本原且在 \(K[x]\) 中不可约的多项式。每个非零非单位 \(f \in R[x]\) 都能拆成内容 + 本原部分，前者用 \(R\) 中的唯一分解，后者用 \(K[x]\) 中的唯一分解再"提升"回 \(R[x]\)。整体唯一分解成立。</p>
+<p><strong>例 1：\(x^4 + 1\)。</strong> Eisenstein 直接对 \(x^4 + 1\) 不行（系数 \(1, 0, 0, 0, 1\)，没有素 \(p\) 整除中间系数<em>而且</em> 不整除常数项 1）。试变换 \(y = x + 1\)：</p>
 
 <p>\[
-\boxed{\ R \text{ UFD} \Rightarrow R[x] \text{ UFD}（"Gauss 引理推论"）.\ }
+(x + 1)^4 + 1 = x^4 + 4x^3 + 6x^2 + 4x + 2.
 \]</p>
 
-<p><strong>Eisenstein 在 \(R[x]\) 中（一般化）。</strong>设 \(R\) 是 UFD，\(p \in R\) 素，\(f = a_n x^n + \cdots + a_0 \in R[x]\)，\(p \nmid a_n\)，\(p \mid a_i\)（\(0 \le i < n\)），\(p^2 \nmid a_0\)。则 \(f\) 在 \(K[x]\) 中不可约（\(K\) 商域）；若 \(f\) 本原，也在 \(R[x]\) 不可约。证明同 14.8 节，把"\(\mathbb{Z}, \mathbb{Q}, \mathbb{F}_p\)"分别替换为"\(R, K, R/(p)\)"。</p>
+<p>系数 \(1, 4, 6, 4, 2\)。试 \(p = 2\)：首项 1 不被 2 整除；中间 \(4, 6, 4\) 都被 2 整除；常数项 2 不被 \(4\) 整除。Eisenstein 满足。所以 \((x + 1)^4 + 1\) 不可约，故 \(x^4 + 1\) 不可约（不可约性在线性变换下保持）。</p>
 
-<h2 id="sec15-8">15.8 两个具体例子</h2>
-
-<p><strong>例：\(f(x) = x^4 + 1\) 在 \(\mathbb{Q}[x]\) 不可约。</strong></p>
-
-<p>直接看 \(f\) 无有理根（\(\pm 1\) 代入得 2 \(\neq 0\)），但次数 4 时"无根"<em>不</em>蕴含不可约。直接 Eisenstein 也不行——所有非首项系数为 0，常数项 1 不被任何素数整除。</p>
-
-<p>窍门：替换 \(x \mapsto x + 1\)。计算 \(f(x + 1) = (x+1)^4 + 1\)：</p>
+<p>这一结论实在<em>意外</em>——\(x^4 + 1 = (x^2 + 1)^2 - 2x^2\)，在 \(\mathbb{R}\) 上可以分解为</p>
 
 <p>\[
-(x+1)^4 = x^4 + 4 x^3 + 6 x^2 + 4 x + 1,
+x^4 + 1 = (x^2 + \sqrt 2 x + 1)(x^2 - \sqrt 2 x + 1)
 \]</p>
 
-<p>所以 \(f(x + 1) = x^4 + 4 x^3 + 6 x^2 + 4 x + 2\)。取 \(p = 2\)：首项系数 1 不被 2 整除；其余系数 \(4, 6, 4, 2\) 都被 2 整除；常数项 2 不被 4 整除。Eisenstein 满足，\(f(x + 1)\) 在 \(\mathbb{Q}[x]\) 不可约。但 \(g(x) = f(x + 1)\) 与 \(f(x)\) 通过仿射变换 \(x \mapsto x - 1\) 互换，所以 \(f(x)\) 也在 \(\mathbb{Q}[x]\) 不可约。</p>
+<p>（验：乘开 \(= x^4 + (1 - 2 + 1) x^2 + 1 = x^4 + 1\)）。所以在 \(\mathbb{R}[x]\) 中可约，但<em>因子有 \(\sqrt 2\) 系数，不在 \(\mathbb{Q}[x]\) 中</em>。所以 \(x^4 + 1\) 在 \(\mathbb{Q}[x]\) 中确实不可约——和我们用 Eisenstein 得的一致。</p>
 
-<p>这条 \(x^4 + 1\) 的不可约性<em>是</em>圆分多项式 \(\Phi_8(x) = x^4 + 1\) 的不可约性。一般 \(\Phi_n(x)\) 在 \(\mathbb{Q}[x]\) 都不可约，但 \(\Phi_n\) 不在素数次时证明不能用 Eisenstein 直接搞定，需要 Galois 与代数数论的更深工具。</p>
+<p><strong>例 2：\(x^p - x - 1 \in \mathbb{F}_p[x]\)（Artin-Schreier 多项式，\(p\) 素）。</strong> 这条不能用 Eisenstein（在 \(\mathbb{F}_p[x]\) 上 Eisenstein 不直接适用）。它在 \(\mathbb{F}_p[x]\) 中不可约的证明用<em>Frobenius 自同构</em>：若 \(\alpha\) 是它的根，则 \(\alpha + 1, \alpha + 2, \ldots, \alpha + (p-1)\) 都是根（用 \((\alpha + k)^p - (\alpha + k) - 1 = \alpha^p + k^p - \alpha - k - 1 = (\alpha^p - \alpha - 1) + (k^p - k) = 0 + 0 = 0\)，用 Fermat 小定理 \(k^p \equiv k \pmod p\)）。所以根集 \(\{\alpha, \alpha + 1, \ldots, \alpha + (p-1)\}\)，\(p\) 个根；它们都在 \(\mathbb{F}_p(\alpha)\) 中；\(\mathbb{F}_p(\alpha)\) 是 \(\mathbb{F}_p\) 的扩张，扩张次数 \(\le p\)；要么次数 1（即 \(\alpha \in \mathbb{F}_p\)，但 \(x^p - x - 1\) 在 \(\mathbb{F}_p\) 中无根因 \(x^p - x = 0\) 对所有 \(x \in \mathbb{F}_p\)，故 \(x^p - x - 1 = -1 \neq 0\)）要么次数 \(p\)。所以次数 \(p\)，<em>不可约</em>。</p>
 
-<p><strong>例：Artin–Schreier 多项式 \(f(x) = x^p - x - 1\) 在 \(\mathbb{F}_p[x]\) 不可约（\(p\) 素）。</strong></p>
+<p>这例子重要因为它给"<em>\(\mathbb{F}_p\) 上 \(p\) 次不可约多项式</em>" 的标准来源——是 Galois 理论 / 有限域理论（<a href="ch23.html">第 23 章</a>）的核心构件。</p>
 
-<p>论证：先验证 \(f\) 在 \(\mathbb{F}_p\) 中无根。对任意 \(a \in \mathbb{F}_p\) 由 Fermat 小定理 \(a^p = a\)，所以 \(f(a) = a - a - 1 = -1 \neq 0\)。无有理根但次数 \(p \ge 2\)，仍不直接给不可约（\(p \ge 5\) 时 \(f\) 可能可约成两个次数 \(\ge 2\) 的因子）。</p>
+<h2 id="sec15-7">15.7 这一章给你的反射动作</h2>
 
-<p>换思路。在 \(\mathbb{F}_p\) 的代数闭包中取 \(f\) 的一根 \(\alpha\)：\(\alpha^p = \alpha + 1\)。则 \((\alpha + 1)^p = \alpha^p + 1 = \alpha + 1 + 1 = \alpha + 2\)（用 Frobenius \((a + b)^p = a^p + b^p\) 在特征 \(p\) 中）。归纳：\((\alpha + j)^p = \alpha + j + 1\) 对 \(j = 0, 1, \ldots, p - 1\)。所以 \(\alpha, \alpha + 1, \ldots, \alpha + p - 1\) 都是 \(f\) 的根（\(p\) 个根，全部）。</p>
+<p>读完这一章你应该有：</p>
 
-<p>设 \(g(x) \in \mathbb{F}_p[x]\) 是 \(\alpha\) 的最小多项式，\(\deg g = d\)。则 \(g \mid f\) 在 \(\mathbb{F}_p[x]\) 中。\(g\) 的根在 \(\overline{\mathbb{F}_p}\) 中是 Frobenius 轨道 \(\{\alpha, \alpha^p = \alpha + 1, (\alpha + 1)^p = \alpha + 2, \ldots\}\)，由前面计算 Frobenius 在这些根上的作用是"加 1"——这条加法的轨道<em>就是</em> \(\{\alpha + j : j \in \mathbb{F}_p\}\)，长度恰好 \(p\)（这是 \(\mathbb{F}_p\) 上加法的阶）。所以 \(d = p = \deg f\)，\(g = f\)，\(f\) 不可约。</p>
+<ul>
+  <li>看到 \(k[x]\)（\(k\) 域），立即想"PID + UFD"。它的每个理想都是 \((g)\) 形式；它的多项式有唯一不可约分解。</li>
+  <li>看到 \(k[x_1, \ldots, x_n]\)（\(n \ge 2\)），立即想"<em>UFD 但非 PID</em>"——\((x_1, \ldots, x_n)\) 这种"多源" 理想没法压成主理想。再想"<em>诺特</em>"——它仍然是诺特环（Hilbert）。</li>
+  <li>看到 \(\mathbb{Z}[x]\)，立即想"<em>UFD 但非 PID</em>"——和 \(k[x_1, x_2]\) 同类。</li>
+  <li>要证 \(\mathbb{Z}[x]\) 中不可约：第一招 Eisenstein。如果不直接适用，试线性变换 \(x \mapsto x + a\) 后再 Eisenstein。如果还不行，试模 \(p\) 看（\(\mathbb{Z}[x] \to \mathbb{F}_p[x]\) 中不可约 \(\Rightarrow \mathbb{Z}[x]\) 中不可约）。</li>
+  <li>看到"次数 \(n\) 多项式 vs 根的个数"，立即想"<em>整环上 \(\le n\) 根</em>"。这条让"<em>用根插值多项式</em>" 成为合法操作。</li>
+</ul>
 
-<p>这条 Artin–Schreier 例子告诉我们：特征 \(p\) 的世界里"\(x^p - x - c\)"这一族多项式自动给出 \(p\) 次不可约多项式（\(c \neq 0\) 时同理），是构造 \(\mathbb{F}_p\) 的次数 \(p\) 扩张的标准方式。这条构造在<a href="ch23.html">第 23 章</a>讲编码理论与有限域时会再出现。</p>
+<p><strong>多元 vs 一元的根本差别表：</strong></p>
 
-<p>把 \(k[x]\) 的算术与几何讲到这里，下一章我们要把视角换到"模"上——这是抽象代数里的"线性代数"，把"环 \(R\) 上的加法群 + 数乘"统一成单一概念。\(\mathbb{Z}\) 上的模就是交换群，\(k\) 上的模就是 \(k\)-向量空间，而 \(k[x]\) 上的模——令人惊讶——就是"\(k\)-向量空间 + 一个线性变换 \(T\)"的对子。这条 \(k[x]\)-模视角后面会把 Jordan 标准型和 Cayley–Hamilton 等等线性代数核心结论统统组织进同一个结构定理（<a href="ch17.html">第 17 章</a>）。</p>
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">性质</th><th style="padding: 0.3em 1em;">\(k[x]\)</th><th style="padding: 0.3em 1em;">\(k[x_1, \ldots, x_n]\)（\(n \ge 2\)）</th></tr>
+<tr><td>整环</td><td>是</td><td>是</td></tr>
+<tr><td>UFD</td><td>是</td><td>是（Gauss）</td></tr>
+<tr><td>诺特</td><td>是（PID）</td><td>是（Hilbert）</td></tr>
+<tr><td>PID</td><td>是</td><td><em>否</em>（\((x_1, x_2)\) 不主）</td></tr>
+<tr><td>欧氏</td><td>是（\(\delta = \deg\)）</td><td>否</td></tr>
+<tr><td>带余除法</td><td>是</td><td>否（一般无）</td></tr>
+<tr><td>"\(f(a) = 0 \Leftrightarrow x - a | f\)"</td><td>是（一元）</td><td>需多元版本</td></tr>
+</table>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 主理想环与唯一分解</a><a href="ch16.html">下一章 · 第 16 章 模的入门 →</a></nav>
+<p>这条差别决定了"<em>一元代数</em>" 与"<em>多元代数 / 代数几何</em>" 是两个气质不同的领域。一元能用因子定理 / Eisenstein / 不可约多项式判别，几乎所有问题靠"<em>分解</em>"；多元几乎没法靠分解，靠的是<em>理想 / 簇 / 维数</em> 等几何概念。<a href="ch16.html">第 16 章</a>之后我们会偏向模理论方向，但<a href="ch18.html">第 18 章</a>开始的 Galois 理论又把焦点拉回到一元 \(k[x]\) ——因为 Galois 理论的核心是"<em>添加根</em>"，而"添加一个数 \(\alpha\) 使 \(p(\alpha) = 0\)" 用的就是 \(k[x]/(p(x))\)。</p>
+
+<p>下一章我们正式离开"环本身"，进入<em>模理论</em>——把"线性代数 over 任意环" 的视角建起来。模是这样的对象：取一个环 \(R\)（不需要域），看 "\(R\) 上的<em>向量空间</em>"。当 \(R = k\) 域，模 = 向量空间；当 \(R = \mathbb{Z}\)，模 = 阿贝尔群。这种统一让"<em>群论</em>" 与"<em>线性代数</em>" 同时变成模论的特例。第 17 章的"PID 上有限生成模结构定理" 同时给"有限生成阿贝尔群分类" 与"线性代数 Jordan 标准形"——是抽象代数最优雅的统一性结论之一。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 PID 与 UFD</a><a href="ch16.html">下一章 · 第 16 章 模的定义与基本例子 →</a></nav>
 </main>
 </body>
 </html>
+</content>
+</invoke>

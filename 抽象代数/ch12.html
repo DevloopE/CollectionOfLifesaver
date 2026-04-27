@@ -32,259 +32,337 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 环：定义与基本例子</a><a href="ch13.html">下一章 · 第 13 章 整环、域、商域 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 环的定义</a><a href="ch13.html">下一章 · 第 13 章 整环、域、商域 →</a></nav>
 <h1 id="ch12">第 12 章 理想与商环</h1>
 
-<p>群论里我们花了整整<a href="ch5.html">第 5 章</a>把"正规子群 → 商群"这个故事讲完：正规子群恰好是那种能让"陪集集合配诱导运算"也成为群的子群。环论里有一个完全平行的故事——"<em>理想</em> → <em>商环</em>"。理想恰好是那种能让"陪集集合配诱导加法和乘法"也成为环的子集。</p>
+<p>在群论里你已经熟一条流程：<em>正规子群</em> 给<em>商群</em>。把群 \(G\) 按某个正规子群 \(N\) 的陪集分组，陪集之间能定义乘法，得到的 \(G/N\) 自己是个群。"正规" 这条额外要求是为了保证陪集乘法良定义。</p>
 
-<p>但环比群多一种运算，理想比正规子群多一条要求："吸收乘法"——理想里的元素乘上环里<em>任何</em>东西都还要落回理想里。这条多出来的"吸收"才是环的<em>商</em>能存在的真正原因。把这件事弄明白，整个环论的同构定理 / 极大理想 / 素理想 / 谱（spectrum）的语言就一气呵成。</p>
+<p>环论里有完全平行的故事——但要平行得彻底，"正规子群" 必须升级成<em>理想</em>。这升级不是装饰：环有<em>两种</em>运算（加法 + 乘法），陪集需要同时支持<em>加</em> 和<em>乘</em>。"加法良定义" 只要求子群正规——而环的加法子群<em>自动</em>正规（环的加法部分是阿贝尔群，所有子群都正规）；这条免费给。<em>乘法</em> 良定义却要一条新条件，比"正规" 强得多。这条新条件就是"理想"的灵魂。</p>
+
+<p>这一章的核心问题是：<em>陪集乘法 \((a + I)(b + I) = ab + I\) 要良定义，\(I\) 必须满足什么？</em> 答案会自然把"<em>理想</em>"这个名字从问题里逼出来。</p>
+
+<h2 id="sec12-1">12.1 一个你已经会的例子：\(\mathbb{Z}/n\mathbb{Z}\)</h2>
+
+<p>从你最熟悉的环 \(\mathbb{Z}\) 入手。固定 \(n = 5\)。看 \(\mathbb{Z}\) 中所有<em>5 的倍数</em>：</p>
+
+<p>\[
+(5) := 5\mathbb{Z} = \{\ldots, -10, -5, 0, 5, 10, 15, \ldots\}.
+\]</p>
+
+<p>记号 \((5)\) 表示"5 生成的"——所有 5 的整数倍。它是 \(\mathbb{Z}\) 的子集，<em>而且</em> 在加法下是子群（两个 5 的倍数相加还是 5 的倍数）。</p>
+
+<p>把 \(\mathbb{Z}\) 按这个子群分陪集。陪集 \(a + (5)\) 就是"和 \(a\) 模 5 同余的所有整数":</p>
+
+<p>\[
+0 + (5), \quad 1 + (5), \quad 2 + (5), \quad 3 + (5), \quad 4 + (5).
+\]</p>
+
+<p>这<em>5 个</em> 陪集是 \(\mathbb{Z}\) 模 5 的全部"剩余类"。集合记号 \(\mathbb{Z}/5\mathbb{Z}\)。</p>
+
+<p>这 5 个陪集自己有<em>加法</em>：\((1 + (5)) + (3 + (5)) = 4 + (5)\)；\((3 + (5)) + (4 + (5)) = 7 + (5) = 2 + (5)\)。这就是初等数论里学过的"模 5 加法"。</p>
+
+<p>它们也有<em>乘法</em>：\((2 + (5)) \cdot (3 + (5)) = 6 + (5) = 1 + (5)\)。"模 5 乘法"。你早就用过——只是当时没意识到这是<em>陪集乘法</em>。</p>
+
+<p>所以 \(\mathbb{Z}/5\mathbb{Z}\) 既是加法群，又有兼容的乘法——它是个<em>环</em>，5 元素的环。它<em>从 \(\mathbb{Z}\) 通过模 5</em> 制造出来。</p>
+
+<p>请你停下来想：我们刚才做了什么？把一个<em>无穷</em> 大的环 \(\mathbb{Z}\)，按某个特殊子集 \((5)\) 折叠，得到一个<em>5 元素</em> 的新环 \(\mathbb{Z}/5\mathbb{Z}\)。这种"折叠" 是环论核心的构造手段。这一章要做的，就是把"\((5) \subset \mathbb{Z}\) 起到的作用"抽象出来——任意环 \(R\) 里能起这种作用的子集叫<em>理想</em>，折叠出的新环叫<em>商环</em>。</p>
+
+<p>为什么 \((5)\) 能这么用？看清两条性质：</p>
 
 <ul>
-  <li>理想的定义（左、右、双侧）；交换环里三者一致。</li>
-  <li>第一组例子：\((n) \subset \mathbb{Z}\)、\((x) \subset R[x]\)、矩阵环里的"行 / 列零理想"。</li>
-  <li>主理想 \((a) = aR\)；理想的和、积、交。</li>
-  <li>商环 \(R/I\) 的构造：陪集 \(r + I\) 配良定义的加 / 乘。</li>
-  <li>第一同构定理（环版）；其它两个同构定理同样成立。</li>
-  <li>极大理想 \(\mathfrak{m}\)：\(R/\mathfrak{m}\) 是域 \(\iff \mathfrak{m}\) 极大。</li>
-  <li>素理想 \(\mathfrak{p}\)：\(R/\mathfrak{p}\) 是整环 \(\iff \mathfrak{p}\) 素。</li>
-  <li>实例：\(\mathbb{Z}\) 中 \((p)\) 极大；\(\mathbb{Z}[i]\) 中 \((2) = (1+i)^2\) 不素。</li>
+  <li>\((5)\) 在加法下封闭——5 的倍数加 5 的倍数还是 5 的倍数。它是加法子群。</li>
+  <li>\((5)\) "<em>吸收</em>" 乘法——5 的倍数乘<em>任何</em> 整数还是 5 的倍数。\(5k \cdot n = 5(kn)\)。</li>
 </ul>
 
-<h2 id="sec12-1">12.1 理想的定义</h2>
+<p>第二条是关键。它比"乘法子群" 强——我们没要求 \((5)\) 在乘法下自我封闭（其实是的，但那不是重点）；我们要求它能<em>吸收外面的乘法</em>。把<em>整个 \(\mathbb{Z}\)</em> 乘进 \((5)\)，结果还在 \((5)\) 里。</p>
 
-<p>设 \(R\) 是环。子集 \(I \subset R\) 称为<strong>左理想</strong>，如果：</p>
+<p>这条吸收性质是为<em>陪集乘法良定义</em> 准备的。下一节我们看到这一点。</p>
+
+<h2 id="sec12-2">12.2 理想：定义</h2>
+
+<p>把上面对 \((5) \subset \mathbb{Z}\) 看到的两条性质抽象到任意环。</p>
+
+<p><strong>定义。</strong> 设 \(R\) 是环。子集 \(I \subseteq R\) 叫 \(R\) 的<em>左理想</em>，如果：</p>
 
 <ul>
-  <li>(I1) \((I, +)\) 是 \((R, +)\) 的子群（即对加、减封闭、含 0）；</li>
-  <li>(I2L) <em>左吸收</em>：对任意 \(r \in R\) 与 \(a \in I\)，\(ra \in I\)。</li>
+  <li>(I1) \(I\) 在加法下是子群（\(0 \in I\)；\(a, b \in I \Rightarrow a - b \in I\)）；</li>
+  <li>(I2L) \(I\) 吸收<em>左</em> 乘——对任意 \(r \in R\) 与 \(a \in I\)，有 \(ra \in I\)。</li>
 </ul>
 
-<p>对称地，如果 (I2L) 替换为 \(ar \in I\)，就叫<strong>右理想</strong>。如果两条吸收同时成立，就叫<strong>双侧理想</strong>，简称<em>理想</em>。在交换环里左 = 右 = 双侧，三者完全是一回事——所以本书的核心场景里讲"理想"就是"双侧理想"，毫无歧义。</p>
+<p>类似地把 (I2L) 换成 \(ar \in I\) 得<em>右理想</em>。<em>双侧理想</em>（简称<em>理想</em>）就是同时左、右都是的。</p>
 
-<p>把这条写成一个 boxed 公式：</p>
+<p>本章里大部分时候我们在<em>交换环</em> 里工作（乘法 \(ab = ba\)），左 = 右 = 双侧，三个名字塌成一个。除非另说，"理想" 默认双侧 / 交换环里的版本。</p>
 
-<p>\[
-\boxed{\ I \text{ 是 } R \text{ 的理想} \iff I \le (R, +) \text{ 且 } RI \subset I, IR \subset I.\ }
-\]</p>
+<p>请注意 (I2) 的强度。它<em>不</em>只说"\(I\) 在自身的乘法下封闭"——\(I \cdot I \subseteq I\) 是自动的（因为 \(I\) 元素是 \(R\) 元素，乘积落进 \(I\) 因为 (I2) 把"任何 \(r \in R\)" 乘进去）。它说<em>整个 \(R\)</em> 乘进去都不会跑出来。这条比"乘法子环" 严格得多。</p>
 
-<p>第一条是"加法子结构封闭"，第二条是"乘法吸收"。两者缺一不可。注意这条 (I2) 比"对乘法封闭"<em>强</em>得多——一个子环只要求 \(I \cdot I \subset I\)，理想要求 \(R \cdot I \subset I\)（外面整个环都吃不动它）。这就是为什么大多数子环<em>不是</em>理想：比如 \(\mathbb{Z} \subset \mathbb{Q}\) 是子环，但 \(\mathbb{Z}\) 不是 \(\mathbb{Q}\) 的理想（\(\frac{1}{2} \cdot 1 = \frac{1}{2} \notin \mathbb{Z}\)）。</p>
+<p><strong>对比子环：</strong> 子环只需要"加 / 减 / 乘 在自身内封闭"——\(I \cdot I \subseteq I\)。理想要"<em>外面</em> 乘进来都不跑"——\(R \cdot I \subseteq I\)。理想<em>是</em> 子环（强一条），反过来一般不真。</p>
 
-<p>顺便：\(\{0\}\) 是任何环的理想，叫零理想；\(R\) 本身也是 \(R\) 的理想，叫单位理想。这两个叫"平凡理想"。</p>
+<p>例子：\(\mathbb{Z} \subset \mathbb{Q}\) 是子环但<em>不</em> 是理想——\(\mathbb{Q}\) 里的 \(1/2\) 乘 \(\mathbb{Z}\) 里的 \(1\) 等于 \(1/2 \notin \mathbb{Z}\)，吸收失败。</p>
 
-<p>关于"理想里有没有 1"——<em>从不</em>。因为如果 \(1 \in I\)，则对任意 \(r \in R\)，\(r = r \cdot 1 \in I\)，故 \(I = R\)。所以 "\(I\) 是真理想（\(I \neq R\)）" \(\iff 1 \notin I\) \(\iff I\) 不含任何单位（\(I\) 含单位 \(\Rightarrow I\) 含 1）。</p>
-
-<h2 id="sec12-2">12.2 第一组例子</h2>
-
-<p><strong>\((n) \subset \mathbb{Z}\)。</strong>对每个 \(n \ge 0\)，\(n \mathbb{Z} = \{0, \pm n, \pm 2n, \ldots\}\) 是 \(\mathbb{Z}\) 的理想：对加减封闭显然，吸收 \(\mathbb{Z} \cdot (n\mathbb{Z}) \subset n\mathbb{Z}\) 也直接。事实上<em>所有</em> \(\mathbb{Z}\) 的理想都长这样——这是 \(\mathbb{Z}\) 的"主理想环"性质，详见<a href="ch14.html">第 14 章</a>。具体证明：取 \(\mathbb{Z}\) 的非零理想 \(I\)，令 \(n = \min\{k > 0 : k \in I\}\)，欧几里得算法给 \(I = n\mathbb{Z}\)。所以 \(\mathbb{Z}\) 的理想全集是</p>
+<p>另例：固定 \(a \in R\)，集合</p>
 
 <p>\[
-\{(0)\} \cup \{(n) : n \ge 1\} = \{n\mathbb{Z} : n \ge 0\}.
+(a) := \{ra : r \in R\}
 \]</p>
 
-<p><strong>\((x) \subset R[x]\)。</strong>多项式环里"以 \(x\) 为系数因子"的多项式 \(\{x \cdot g(x) : g \in R[x]\} = \{f \in R[x] : f(0) = 0\}\) 构成理想。验证：吸收 \(R[x] \cdot (x g) = (x)(R[x] \cdot g) \subset (x)\)。这个理想也常写 \(xR[x]\) 或 \((x)\)，是<em>主理想</em>的另一个例子。</p>
+<p>是 \(R\) 的理想。验证：加法封闭（\(ra + sa = (r+s)a\)）；吸收（\(s(ra) = (sr)a\)）。这叫<em>主理想</em>——单一元素 \(a\) 生成的理想。\((5) \subset \mathbb{Z}\) 就是 \(a = 5\) 的主理想。</p>
 
-<p>更一般地，\((x_1, x_2, \ldots, x_n) \subset R[x_1, \ldots, x_n]\) 是"在原点取零"的多元多项式构成的理想。这是代数几何里"原点的理想"——当 \(R = k\) 是域时，这个理想极大（12.6 节会看到）。</p>
-
-<p><strong>\(M_n(R)\) 里的理想。</strong>有件事让初学者意外：\(M_n(R)\) 的双侧理想<em>和 \(R\) 的双侧理想一一对应</em>。具体来说，\(M_n(R)\) 的所有双侧理想恰好形如 \(M_n(I)\)（所有元素都在 \(I\) 内的矩阵），其中 \(I\) 跑遍 \(R\) 的双侧理想。当 \(R\) 是<em>域</em>时 \(R\) 的真理想只有 \(\{0\}\)，所以 \(M_n(R)\) 的真双侧理想只有 \(\{0\}\)——一个非平凡环却没有真双侧理想，这种环叫<em>单环</em>，是非交换代数的基本对象。</p>
-
-<p>这件事告诉你"非交换环里的理想数量比 \(R\) 上看起来少"。但<em>左</em>理想很多——\(M_n(R)\) 里"前 \(k\) 列固定为零"的矩阵就是大量左理想。所以做非交换代数时一定要分清左 / 右 / 双侧。</p>
-
-<h2 id="sec12-3">12.3 主理想；和、积、交</h2>
-
-<p>设 \(R\) 是交换环，\(a \in R\)。把</p>
+<p>更一般，对一组元素 \(a_1, \ldots, a_k \in R\)，</p>
 
 <p>\[
-(a) := aR = \{ar : r \in R\}
+(a_1, \ldots, a_k) := \{r_1 a_1 + \cdots + r_k a_k : r_i \in R\}
 \]</p>
 
-<p>叫做 \(a\) 生成的<strong>主理想</strong>。验证：对加封闭 \(ar_1 + ar_2 = a(r_1 + r_2)\)，吸收 \(s \cdot (ar) = a(sr) \in (a)\)。所以 \((a)\) 是理想。</p>
+<p>是<em>由 \(a_1, \ldots, a_k\) 生成的</em> 理想。它是包含 \(\{a_1, \ldots, a_k\}\) 的最小理想。</p>
 
-<p>更一般地，\(a_1, \ldots, a_n\) 生成的理想</p>
+<p>例：在 \(\mathbb{Z}\) 中 \((6, 9) = ?\) 答案是 \((3)\)——因为 \(6\) 与 \(9\) 的最大公约数是 3，由 Bézout \(3 = 2 \cdot 6 - 9\) 在 \((6, 9)\) 里；反过来 \(6, 9\) 都在 \((3)\) 里。一般在 \(\mathbb{Z}\) 中 \((a, b) = (\gcd(a, b))\)——所有有限生成理想都<em>主</em>。这一观察是下一章 PID 的伏笔。</p>
+
+<p><strong>"平凡" 理想：</strong> \(\{0\}\) 永远是理想（叫<em>零理想</em>，记 \((0)\)）；\(R\) 自身永远是理想（含 \(1\) 时）。如果 \(I\) 包含<em>任何一个单位</em>（可逆元 \(u\)），则 \(1 = u^{-1} u \in I\)，再由吸收 \(r = r \cdot 1 \in I\) 对所有 \(r\)——\(I = R\)。</p>
+
+<p>所以<em>含单位的理想 = 整个环</em>。这条在域里有戏剧性后果——下一章我们会看，<em>域只有两个理想：\((0)\) 和域自身</em>。理由：域中除 0 外全是单位。</p>
+
+<h2 id="sec12-3">12.3 商环 \(R/I\)：构造与陪集乘法</h2>
+
+<p>现在做"折叠"。给定环 \(R\) 与理想 \(I\)。考虑加法陪集</p>
 
 <p>\[
-(a_1, \ldots, a_n) := a_1 R + a_2 R + \cdots + a_n R = \left\{\sum_i a_i r_i : r_i \in R\right\}
+a + I := \{a + x : x \in I\}, \quad a \in R.
 \]</p>
 
-<p>是包含 \(\{a_1, \ldots, a_n\}\) 的最小理想。再一般一点，对任意子集 \(S \subset R\)，</p>
+<p>不同 \(a\) 可以给出同一陪集：\(a + I = b + I \iff a - b \in I\)。把所有不同陪集的集合记 \(R/I\)。</p>
+
+<p>\(R/I\) 上有<em>加法</em>——这是因为 \(I\) 是加法子群，标准群论给：</p>
 
 <p>\[
-(S) := \left\{\sum_{\text{有限}} s_i r_i : s_i \in S, r_i \in R\right\}
+(a + I) + (b + I) := (a + b) + I.
 \]</p>
 
-<p>是 \(S\) 生成的理想。</p>
+<p>验证良定义（不同代表给同一答案）的步骤你在群论学过：如果 \(a + I = a' + I\)、\(b + I = b' + I\)，则 \(a - a', b - b' \in I\)，所以 \((a + b) - (a' + b') = (a - a') + (b - b') \in I\)，即 \((a + b) + I = (a' + b') + I\)。</p>
 
-<p>有了"取理想"的方法，理想之间还有几个标准运算。</p>
-
-<p><strong>和。</strong> \(I + J := \{i + j : i \in I, j \in J\}\)。这是包含 \(I \cup J\) 的最小理想。比如 \(\mathbb{Z}\) 里 \((6) + (10) = (\gcd(6, 10)) = (2)\)（这是欧几里得算法的代数表述）。</p>
-
-<p><strong>交。</strong> \(I \cap J\) 是理想（直接验证）。比如 \(\mathbb{Z}\) 里 \((6) \cap (10) = (\text{lcm}(6, 10)) = (30)\)。</p>
-
-<p><strong>积。</strong> \(IJ := \{\text{有限和 } \sum i_k j_k : i_k \in I, j_k \in J\}\)。注意"积"<em>不是</em>"\(\{ij : i \in I, j \in J\}\)" —— 后者一般不对加封闭，所以要取有限和。比如 \(\mathbb{Z}\) 里 \((6)(10) = (60)\)。</p>
-
-<p>三者满足 \(IJ \subset I \cap J\)（每个 \(ij\) 在两个理想里都呆着），但反过来不一定相等。在 PID 里 \(I \cap J = (\text{lcm})\), \(IJ = (\text{乘积})\)，所以两者相等当且仅当 \(\gcd = 1\)（互素）。这句话是中国剩余定理的代数版核心。</p>
-
-<h2 id="sec12-4">12.4 商环 \(R/I\)</h2>
-
-<p>给定环 \(R\) 和理想 \(I\)。考虑加法陪集</p>
+<p>关键问题——<em>乘法</em>：</p>
 
 <p>\[
-r + I = \{r + i : i \in I\}, \quad r \in R.
+(a + I)(b + I) := ab + I.
 \]</p>
 
-<p>因为 \(I\) 是 \((R, +)\) 的子群（且 \((R, +)\) 交换，所以子群自动正规），所有陪集构成集合 \(R/I\)（这个商在<a href="ch5.html">第 5 章 5.2 节</a>已经做过——但那时只是加法商群）。在这上面已经有了诱导加法</p>
+<p>这条<em>定义</em> 写下来容易，但我们必须验证它<em>良定义</em>。也就是说：换 \(a \to a' = a + x\)（\(x \in I\)），换 \(b \to b' = b + y\)（\(y \in I\)），应该得到同一个陪集。</p>
+
+<p>算 \(a' b'\)：</p>
 
 <p>\[
-(r + I) + (s + I) := (r + s) + I.
+a' b' = (a + x)(b + y) = ab + ay + xb + xy.
 \]</p>
 
-<p>这给了 \(R/I\) 一个加法交换群结构。</p>
-
-<p>关键问题来了：能不能把<em>乘法</em>也按陪集定义</p>
+<p>所以 \(a' b' - ab = ay + xb + xy\)。要让这等于 \(I\) 中元素（即 \(a'b' + I = ab + I\)），我们需要</p>
 
 <p>\[
-(r + I) \cdot (s + I) := rs + I \quad ?
+ay + xb + xy \in I.
 \]</p>
 
-<p>这条要良定义——必须是说"代表元的不同选取给同一个结果"。设 \(r' + I = r + I\) 与 \(s' + I = s + I\)，即 \(r' - r \in I\) 与 \(s' - s \in I\)。那么</p>
-
-<p>\[
-r' s' - rs = r' s' - r s' + r s' - rs = (r' - r) s' + r (s' - s).
-\]</p>
-
-<p>第一项 \((r' - r) s' \in I\) 因为 \(I\) 吸收<em>右</em>乘 \(s'\)；第二项 \(r(s' - s) \in I\) 因为 \(I\) 吸收<em>左</em>乘 \(r\)。两项都在 \(I\) 内，所以 \(r's' - rs \in I\)，即 \(r's' + I = rs + I\)。乘法良定义。</p>
-
-<p>请你看一眼这段验证——它<em>正好</em>用了 \(I\) 的左吸收和右吸收。如果 \(I\) 只是子环没有吸收，乘法就不良定义；如果只是单侧理想，乘法在交换环外也可能不良定义。这件事就是为什么"理想"被定义成"加法子群 + 双侧吸收"——不为别的，<em>就为了让商环存在</em>。</p>
-
-<p>把这条写成核心 boxed 公式：</p>
-
-<p>\[
-\boxed{\ R/I \text{ 是环} \iff I \text{ 是 } R \text{ 的（双侧）理想}.\ }
-\]</p>
-
-<p>右推左是上面的良定义验证；左推右是反过来——如果 \(I\) 不吸收，可以构造代表元让乘法不良定义。</p>
-
-<p>具体例子：</p>
+<p>逐项看：</p>
 
 <ul>
-  <li>\(\mathbb{Z}/n\mathbb{Z} = \mathbb{Z}_n\) 就是<a href="ch11.html">第 11 章 11.3 节</a>的剩余环。</li>
-  <li>\(R[x]/(x) \cong R\) —— 商掉 \(x\) 等于"把 \(x\) 设为 0"，所以剩下的就是常多项式 \(R\)。</li>
-  <li>\(\mathbb{R}[x]/(x^2 + 1) \cong \mathbb{C}\) —— 商掉 \(x^2 + 1\) 等于"强制 \(x^2 = -1\)"，于是 \(x\) 就行为像 \(i\)，整个商环就是复数。这是把 \(\mathbb{C}\) 用"代数手段"建造出来的标准方法（见<a href="ch15.html">第 15 章</a>）。</li>
+  <li>\(xy\)：\(x, y \in I\)。\(xy \in I\) 因为 \(I\) 是子环（\(x \in I\)、\(y \in R\)，吸收给 \(xy \in I\)）。</li>
+  <li>\(xb\)：\(x \in I\)、\(b \in R\)——吸收给 \(xb \in I\)。需要<em>右</em> 吸收。</li>
+  <li>\(ay\)：\(a \in R\)、\(y \in I\)——吸收给 \(ay \in I\)。需要<em>左</em> 吸收。</li>
 </ul>
 
-<h2 id="sec12-5">12.5 三大同构定理（环版）</h2>
+<p>所以三项都进 \(I\)，和也进 \(I\)。<em>良定义成立</em>。</p>
 
-<p>群论里的三大同构定理（<a href="ch5.html">第 5 章</a>）在环论里有完全平行的版本。设 \(\varphi : R \to S\) 是<em>环同态</em>——即 \(\varphi\) 同时尊重加法、乘法、并且 \(\varphi(1_R) = 1_S\)。它的<em>核</em>定义为</p>
+<p>但这一推导<em>用</em> 了 \(I\) 的两侧吸收——左乘任何环元素进 \(I\) 还在 \(I\)，右乘也是。如果 \(I\) 只是子环（\(I \cdot I \subseteq I\)）而<em>不</em> 是理想，"\(ay\)" 这一项一般跑出 \(I\) 之外，乘法就不良定义。</p>
 
-<p>\[
-\ker \varphi = \{r \in R : \varphi(r) = 0\}.
-\]</p>
+<p>请你停下来欣赏一下："理想" 这个名字现在不再像随便起的——它<em>恰好</em> 是为了让陪集乘法良定义所需要的最小条件。把"乘法良定义" 拆开看，它逼出来"两侧吸收"——这就是理想。</p>
 
-<p>断言：\(\ker \varphi\) 是 \(R\) 的双侧理想。证明：加法子群是已知；吸收因为 \(\varphi(rk) = \varphi(r) \varphi(k) = \varphi(r) \cdot 0 = 0\)，故 \(rk \in \ker \varphi\)；右吸收对称。</p>
+<p><strong>商环。</strong> \(R/I\) 配上述加法 + 乘法，是个环——结合律 / 分配律从 \(R\) 继承下来（用代表元验证），加法零元 \(0 + I = I\)，乘法单位 \(1 + I\)（如果 \(R\) 有 \(1\)）。它叫 \(R\) <em>模 \(I\) 的商环</em>。</p>
 
-<p>反过来，每个理想 \(I \subset R\) 都是某个环同态 \(\pi : R \to R/I\) 的核，即<em>商映射</em> \(\pi(r) = r + I\)。验证 \(\pi\) 是环同态、\(\ker \pi = I\) 都直接。</p>
-
-<p>所以"<em>理想</em> = <em>环同态的核</em>"——这个对应是双向的、完美的。</p>
-
-<p><strong>第一同构定理。</strong>设 \(\varphi : R \to S\) 是环同态。则</p>
+<p><strong>典范投影。</strong> 映射</p>
 
 <p>\[
-\boxed{\ R / \ker \varphi \;\cong\; \mathrm{Im}\, \varphi.\ }
+\pi : R \to R/I, \quad a \mapsto a + I
 \]</p>
 
-<p>证：定义 \(\bar \varphi : R/\ker \varphi \to \mathrm{Im}\,\varphi\) by \(\bar \varphi(r + \ker \varphi) = \varphi(r)\)。良定义、单同态、满同态——和群论里完全一样。</p>
+<p>是环同态——保加保乘。它的核 \(\ker \pi = \{a \in R : a + I = I\} = I\)。</p>
 
-<p>这是最常用的环同态分解技术。比如要证 \(\mathbb{R}[x]/(x^2 + 1) \cong \mathbb{C}\)，就构造 \(\varphi : \mathbb{R}[x] \to \mathbb{C}\) by \(\varphi(f) = f(i)\)。这是环同态（求值映射总是同态）；像是整个 \(\mathbb{C}\)（任意 \(a + bi \in \mathbb{C}\) 是 \(\varphi(a + bx)\)）；核恰好是 \((x^2 + 1)\)（因为 \(f(i) = 0 \iff (x^2 + 1) \mid f\)，因 \(x^2 + 1\) 是 \(i\) 的最小多项式）。第一同构定理立刻给 \(\mathbb{R}[x]/(x^2 + 1) \cong \mathbb{C}\)。</p>
+<p>反过来：<em>任何环同态的核都是理想</em>。验证：若 \(\varphi : R \to S\) 是环同态，则 \(\ker \varphi = \{a \in R : \varphi(a) = 0\}\)。加法子群没问题（核是加法群同态的核）；吸收：若 \(a \in \ker \varphi\)、\(r \in R\)，则 \(\varphi(ra) = \varphi(r) \varphi(a) = \varphi(r) \cdot 0 = 0\)，所以 \(ra \in \ker \varphi\)。同理 \(ar \in \ker \varphi\)。<em>核是双侧理想</em>。</p>
 
-<p><strong>第二同构定理。</strong>设 \(S \subset R\) 是子环（含 1），\(I \subset R\) 是理想。则 \(S + I\) 是 \(R\) 的子环、\(S \cap I\) 是 \(S\) 的理想，且</p>
+<p>这给了"理想 ↔ 同态核" 的对应——和群论里"正规子群 ↔ 同态核" 完全平行。</p>
+
+<h2 id="sec12-4">12.4 第一同构定理（环版）</h2>
+
+<p>群论里你证过：群同态 \(\varphi : G \to H\) 总能因子化为 \(G \to G/\ker \varphi \to \mathrm{im}\, \varphi\)，其中第二箭头是同构。环同态有完全一样的版本。</p>
+
+<p><strong>定理（第一同构定理，环）。</strong> 设 \(\varphi : R \to S\) 是环同态。则 \(\ker \varphi\) 是 \(R\) 的理想，\(\mathrm{im}\, \varphi\) 是 \(S\) 的子环，并且</p>
 
 <p>\[
-(S + I)/I \;\cong\; S/(S \cap I).
+R / \ker \varphi \;\cong\; \mathrm{im}\, \varphi
 \]</p>
 
-<p><strong>第三同构定理。</strong>设 \(I \subset J\) 都是 \(R\) 的理想。则 \(J/I\) 是 \(R/I\) 的理想，并且</p>
+<p>（同构由 \(a + \ker \varphi \mapsto \varphi(a)\) 给出）。</p>
+
+<p>证明思路完全平行群版——验证映射良定义、保加保乘、双射。良定义因为 \(\ker \varphi\) 中元素被 \(\varphi\) 送到 0。保加保乘因为 \(\varphi\) 是同态。单射因为只有 \(\ker \varphi\) 被送到 0。满到 \(\mathrm{im}\, \varphi\) 是定义。</p>
+
+<p><strong>怎么用：</strong> 要证两个环 \(R/I\) 与某个具体环 \(T\) 同构，找一个满同态 \(\varphi : R \to T\) 使 \(\ker \varphi = I\)；然后调用第一同构定理。下面三个例子让你看清这一招。</p>
+
+<p><strong>例 1。</strong> \(\mathbb{Z}/n\mathbb{Z}\)。同态 \(\varphi : \mathbb{Z} \to \mathbb{Z}/n\mathbb{Z}\) 取 \(a \mapsto a \bmod n\)。满（每个剩余类都有原像）。核 \(= n\mathbb{Z} = (n)\)。所以 \(\mathbb{Z}/(n) \cong \mathbb{Z}/n\mathbb{Z}\)——这是<em>定义</em>，不算新结果。但它显示构造的统一性。</p>
+
+<p><strong>例 2。</strong> \(\mathbb{R}[x]/(x^2 + 1) \cong \mathbb{C}\)。考虑同态</p>
 
 <p>\[
-(R/I) / (J/I) \;\cong\; R/J.
+\varphi : \mathbb{R}[x] \to \mathbb{C}, \quad p(x) \mapsto p(i),
 \]</p>
 
-<p>这两条的证法和群论里完全平行，本节就不再重复——你只需要记住"理想 ↔ 正规子群" 这个对应让全部三条定理移植过来。</p>
+<p>"在 \(x = i\) 处求值"。验证：保加 \((p+q)(i) = p(i) + q(i)\)；保乘 \((pq)(i) = p(i) q(i)\)。满：任意 \(a + bi \in \mathbb{C}\) 是多项式 \(a + bx\) 在 \(i\) 处的值。</p>
 
-<h2 id="sec12-6">12.6 极大理想与域</h2>
+<p>核：\(\ker \varphi = \{p(x) \in \mathbb{R}[x] : p(i) = 0\}\)。哪些实系数多项式以 \(i\) 为根？由于 \(i\) 与 \(-i\) 共轭、实系数多项式根成共轭对，\(p(i) = 0 \Rightarrow p(-i) = 0\)。所以 \(p\) 至少有 \(x - i\) 和 \(x + i\) 两根，即 \((x - i)(x + i) = x^2 + 1\) 整除 \(p\)。即 \(p \in (x^2 + 1)\)。反之 \((x^2+1) \subset \ker \varphi\) 显然。所以 \(\ker \varphi = (x^2 + 1)\)。</p>
 
-<p>真理想 \(\mathfrak{m} \subset R\)（即 \(\mathfrak{m} \neq R\)）称为<strong>极大</strong>，如果不存在中间理想 \(\mathfrak{m} \subsetneq I \subsetneq R\)。也就是说"\(\mathfrak{m}\) 上面除了 \(R\) 没有别的真理想"。</p>
-
-<p>关键定理（本章最重要的结论之一）：</p>
+<p>第一同构定理给</p>
 
 <p>\[
-\boxed{\ R/\mathfrak{m} \text{ 是域} \iff \mathfrak{m} \text{ 是 } R \text{ 的极大理想}.\ }
+\mathbb{R}[x]/(x^2 + 1) \;\cong\; \mathbb{C}.
 \]</p>
 
-<p>这里假设 \(R\) 是<em>交换</em>环。证明大意：</p>
+<p>这是一个相当深的结论——它告诉你<em>复数 \(\mathbb{C}\) 不是上帝给的，是 \(\mathbb{R}\) 通过添加 \(x^2 + 1\) 的根代数地构造出来的</em>。"\(i\)" 这个符号在 \(\mathbb{R}[x]/(x^2 + 1)\) 里就是陪集 \(x + (x^2 + 1)\)——一个完全实数的对象。</p>
+
+<p>这种"通过 \(R[x]/(p(x))\) 添加根" 的构造是<a href="ch18.html">第 18 章</a>整个域扩张理论的种子。Galois 理论的全部技术都建立在这条之上。</p>
+
+<p><strong>例 3。</strong> \(\mathbb{Z}[x]/(x) \cong \mathbb{Z}\)。同态 \(\varphi : \mathbb{Z}[x] \to \mathbb{Z}\) 取 \(p(x) \mapsto p(0)\)（求常数项）。满（任意 \(n\) 是常数多项式 \(n\) 的值）。核：\(p(0) = 0\) 当且仅当 \(p\) 没常数项，即 \(p\) 被 \(x\) 整除，\(p \in (x)\)。所以 \(\mathbb{Z}[x]/(x) \cong \mathbb{Z}\)。</p>
+
+<p>类似 \(\mathbb{Z}[x]/(x - 5) \cong \mathbb{Z}\)（用 \(p \mapsto p(5)\)）。一般 \(R[x]/(x - a) \cong R\) 对任意 \(a \in R\)——"模掉 \(x - a\)" 等价于"把 \(x\) 设为 \(a\)"。</p>
+
+<p>第二、第三同构定理在环里也有平行版本，证明完全照搬群版，本章不再展开。重点看下面：商环结构告诉我们<em>原环</em> 的什么。</p>
+
+<h2 id="sec12-5">12.5 极大理想 \(\iff\) 商环是<em>域</em></h2>
+
+<p>给一个具体问题：什么样的理想 \(I\) 让商 \(R/I\) 是<em>域</em>？</p>
+
+<p>"域" 是<em>每个非零元都可逆</em> 的环（详见<a href="ch13.html">下一章</a>）。这等价于"<em>除 \((0)\) 外没有真理想</em>"——若 \(J \subsetneq F\) 是非零理想，取 \(0 \neq a \in J\)，由 \(F\) 是域 \(a\) 可逆，\(1 = a^{-1} a \in J\)，所以 \(J = F\)，矛盾。所以域只有 \((0)\) 和自身两个理想。</p>
+
+<p>所以 \(R/I\) 是域 \(\iff R/I\) 没有真理想 \(\iff R/I\) 中只有 \((0)\) 和 \(R/I\) 自身。</p>
+
+<p>把这条<em>翻译</em> 回 \(R\)：\(R/I\) 的理想<em>恰好</em> 对应<em>包含 \(I\)</em> 的 \(R\) 的理想（这是商环的"<em>对应定理</em>"——和群版一样，下一节我们会用到）。所以"\(R/I\) 没有真理想" \(\iff\) "<em>\(I\) 与 \(R\) 之间没有真理想</em>"。</p>
+
+<p>这正是<em>极大理想</em> 的定义。</p>
+
+<p><strong>定义。</strong> 理想 \(I \subsetneq R\) 叫<em>极大</em>，如果不存在理想 \(J\) 满足 \(I \subsetneq J \subsetneq R\)——\(I\) 已经"挤到了顶"，再大就只能是 \(R\) 自己。</p>
+
+<p><strong>定理。</strong> 在交换环 \(R\)（含 1）中，</p>
+
+<p>\[
+\boxed{\ I \text{ 极大} \iff R/I \text{ 是域}.\ }
+\]</p>
+
+<p>证明上面已经写出。</p>
+
+<p><strong>例 1。</strong> \((p) \subset \mathbb{Z}\)（\(p\) 素数）极大——商 \(\mathbb{Z}/(p) = \mathbb{Z}/p\mathbb{Z}\) 是域 \(\mathbb{F}_p\)。极大性也可直接验证：包含 \((p)\) 的理想形如 \((d)\)（\(d | p\)，\(d \in \{1, p\}\)）；要么 \((d) = (p)\)，要么 \((d) = (1) = \mathbb{Z}\)，没有真中间。</p>
+
+<p><strong>例 2。</strong> \((4) \subset \mathbb{Z}\) <em>不</em> 极大：\((4) \subsetneq (2) \subsetneq \mathbb{Z}\)。商 \(\mathbb{Z}/(4) = \mathbb{Z}/4\mathbb{Z}\) <em>不</em> 是域：\(2 \cdot 2 = 4 \equiv 0\)，\(2\) 不可逆（\(2 \cdot ? = 1\) 在 \(\mathbb{Z}/4\) 里无解）。</p>
+
+<p><strong>例 3。</strong> \((x^2 + 1) \subset \mathbb{R}[x]\) 极大——因为商 \(\cong \mathbb{C}\) 是域。极大性也可直接看：\(x^2 + 1\) 在 \(\mathbb{R}[x]\) 中<em>不可约</em>（无实根），所以包含 \((x^2 + 1)\) 的真理想就只能是 \((1) = \mathbb{R}[x]\)。</p>
+
+<p>这条经验在 \(k[x]\)（\(k\) 域）中一般化为：<em>\((p(x))\) 极大 \(\iff p(x)\) 不可约</em>。这是我们在 ch15、ch18 反复要用的事实。</p>
+
+<h2 id="sec12-6">12.6 素理想 \(\iff\) 商环是<em>整环</em></h2>
+
+<p>"域" 是个强条件。退一步问：什么样的 \(I\) 让 \(R/I\) <em>没零因子</em>（即<em>整环</em>，下一章详细定义）？</p>
+
+<p>"\(R/I\) 没零因子" 的意思是：\((a + I)(b + I) = 0 + I\) 蕴含 \(a + I = 0 + I\) 或 \(b + I = 0 + I\)。翻译：</p>
+
+<p>\[
+ab \in I \implies a \in I \text{ 或 } b \in I.
+\]</p>
+
+<p>这就是<em>素理想</em> 的定义。</p>
+
+<p><strong>定义。</strong> 理想 \(\mathfrak{p} \subsetneq R\) 叫<em>素</em>（prime），如果对所有 \(a, b \in R\)，</p>
+
+<p>\[
+ab \in \mathfrak{p} \implies a \in \mathfrak{p} \text{ 或 } b \in \mathfrak{p}.
+\]</p>
+
+<p><strong>定理。</strong> 在交换环 \(R\)（含 1）中，</p>
+
+<p>\[
+\boxed{\ \mathfrak{p} \text{ 素} \iff R/\mathfrak{p} \text{ 是整环}.\ }
+\]</p>
+
+<p>证明就是上面那段翻译。</p>
+
+<p>名字"素" 的由来：在 \(\mathbb{Z}\) 中 \((p)\) 素 \(\iff p\) 是素数（\(p | ab \Rightarrow p | a\) 或 \(p | b\) 是素数的核心性质）。所以"素理想" 是把"素数" 的乘法行为搬到任意环。</p>
+
+<p><strong>极大 vs 素：</strong></p>
 
 <ul>
-  <li>(\(\Rightarrow\)) 设 \(R/\mathfrak{m}\) 是域。要证 \(\mathfrak{m}\) 极大，反设有中间理想 \(\mathfrak{m} \subsetneq I \subsetneq R\)。取 \(a \in I \setminus \mathfrak{m}\)。则 \(a + \mathfrak{m} \neq 0\) 在 \(R/\mathfrak{m}\) 内，由域性质 \(a + \mathfrak{m}\) 可逆，存在 \(b\) 使 \((a + \mathfrak{m})(b + \mathfrak{m}) = 1 + \mathfrak{m}\)，即 \(ab - 1 \in \mathfrak{m} \subset I\)。又 \(ab \in I\) 由吸收，故 \(1 = ab - (ab - 1) \in I\)，与 \(I \neq R\) 矛盾。</li>
-  <li>(\(\Leftarrow\)) 设 \(\mathfrak{m}\) 极大。取 \(0 \neq \bar a \in R/\mathfrak{m}\)，要造逆。\(a \notin \mathfrak{m}\)，所以理想 \(\mathfrak{m} + (a) \supsetneq \mathfrak{m}\)，由极大性 \(\mathfrak{m} + (a) = R\)，故 \(1 = m + ab\) 对某 \(m \in \mathfrak{m}, b \in R\)，即 \(ab \equiv 1 \pmod \mathfrak{m}\)，\(\bar a \cdot \bar b = 1\)。</li>
+  <li><em>极大</em> \(\Rightarrow R/I\) 是域 \(\Rightarrow R/I\) 是整环（域是整环，下一章）\(\Rightarrow\) <em>素</em>。所以<em>极大蕴含素</em>。</li>
+  <li>反过来一般不真。例：\((0) \subset \mathbb{Z}\) 是素（\(\mathbb{Z}/(0) = \mathbb{Z}\) 是整环），但<em>不</em> 极大（\((0) \subsetneq (2) \subsetneq \mathbb{Z}\)）。</li>
 </ul>
 
-<p>具体：</p>
+<p>但有一类环里两者重合：<em>PID（主理想环）</em>——\((0)\) 之外的素理想恰好是极大理想。这条等价（"PID 中非零素理想 = 极大理想"）会在<a href="ch14.html">下一章</a> PID 理论里再回来。</p>
 
-<ul>
-  <li>\(\mathbb{Z}\) 中 \(p\mathbb{Z}\) 极大 \(\iff p\) 素，所以 \(\mathbb{Z}/p\mathbb{Z} = \mathbb{F}_p\) 是<em>有限域</em>。这就是 \(\mathbb{Z}_p\)（\(p\) 素）变成域的原因。</li>
-  <li>\(\mathbb{R}[x]\) 中 \((x^2 + 1)\) 极大（因为 \(x^2 + 1\) 在 \(\mathbb{R}[x]\) 上不可约），故 \(\mathbb{R}[x]/(x^2 + 1) = \mathbb{C}\) 是域。</li>
-  <li>\(\mathbb{C}[x_1, \ldots, x_n]\) 中 \((x_1 - a_1, \ldots, x_n - a_n)\) 极大，商等于 \(\mathbb{C}\)（求值在 \((a_1, \ldots, a_n)\)）。这是 Hilbert Nullstellensatz 的核心：\(\mathbb{C}^n\) 的点 \(\leftrightarrow\) \(\mathbb{C}[x_1, \ldots, x_n]\) 的极大理想。</li>
-</ul>
+<h2 id="sec12-7">12.7 \(\mathbb{Z}[i]\) 中一个让人意外的例子</h2>
 
-<h2 id="sec12-7">12.7 素理想与整环</h2>
+<p>用上面两条判别准则，看一个具体环。<em>高斯整数</em> \(\mathbb{Z}[i] = \{a + bi : a, b \in \mathbb{Z}\}\)——把 \(i\) 加进 \(\mathbb{Z}\) 得到的环（也可以看作 \(\mathbb{Z}[x]/(x^2 + 1)\)）。它在数论里出现频繁，尤其是在"哪些素数能写成两个平方和" 这类问题里。</p>
 
-<p>真理想 \(\mathfrak{p} \subset R\) 称为<strong>素</strong>，如果对任意 \(a, b \in R\)：\(ab \in \mathfrak{p} \Rightarrow a \in \mathfrak{p}\) 或 \(b \in \mathfrak{p}\)。这是把"素数性质" \(p \mid ab \Rightarrow p \mid a\) 或 \(p \mid b\) 抽象到一般环上。</p>
+<p>看理想 \((2) \subset \mathbb{Z}[i]\)。问：</p>
 
-<p>对应定理：</p>
+<ol>
+  <li>\((2) \subset \mathbb{Z}\) 是素的（\(2\) 是素数）。\((2) \subset \mathbb{Z}[i]\) 还素吗？</li>
+  <li>\((2) \subset \mathbb{Z}[i]\) 极大吗？</li>
+</ol>
+
+<p>看 (1)：在 \(\mathbb{Z}[i]\) 中，</p>
 
 <p>\[
-\boxed{\ R/\mathfrak{p} \text{ 是整环} \iff \mathfrak{p} \text{ 是 } R \text{ 的素理想}.\ }
+(1 + i)(1 - i) = 1 - i^2 = 1 + 1 = 2.
 \]</p>
 
-<p>证明：\(R/\mathfrak{p}\) 整环 \(\iff\) 无零因子 \(\iff (\bar a)(\bar b) = 0 \Rightarrow \bar a = 0\) 或 \(\bar b = 0\) \(\iff (ab \in \mathfrak{p} \Rightarrow a \in \mathfrak{p}\) 或 \(b \in \mathfrak{p})\) \(\iff \mathfrak{p}\) 素。直接的等价改写。</p>
+<p>所以 \(2 \in (2)\) 等于 \((1+i)(1-i)\)。问 \(1 + i \in (2)\) 吗？\((2)\) 是 \(\{2(a + bi) : a, b \in \mathbb{Z}\} = \{2a + 2bi : a, b \in \mathbb{Z}\}\)——所有"两个分量都偶" 的高斯整数。\(1 + i\) 两个分量都<em>奇</em>，<em>不</em> 在 \((2)\) 里。同样 \(1 - i\) 也不在 \((2)\) 里。但它们的乘积 \(2\) 在。<em>不素</em>。</p>
 
-<p>由于"域 \(\Rightarrow\) 整环"是显然的（域里非零都可逆，故无零因子），可以推出"<em>极大 \(\Rightarrow\) 素</em>"。在交换环里这是常用的层级关系：</p>
+<p>所以 \((2) \subset \mathbb{Z}[i]\) <em>不</em> 是素理想。它的商 \(\mathbb{Z}[i]/(2)\) 有零因子。事实上 \(\mathbb{Z}[i]/(2)\) 有 4 个元素 \(\{0, 1, i, 1 + i\}\)（mod 2 的实部 + 虚部），其中 \((1 + i)^2 = 2i \equiv 0\)——\(1 + i\) 是非零零因子。</p>
+
+<p>更进一步分解：\(2 = (1 + i)(1 - i)\)，但 \(1 - i = -i (1 + i)\)（验：\(-i(1 + i) = -i + 1 = 1 - i\)），且 \(-i\) 是 \(\mathbb{Z}[i]\) 的<em>单位</em>（\((-i)(i) = 1\)）。所以 \(1 - i\) 是 \(1 + i\) 乘单位——它们"等同"（associates）。</p>
+
+<p>翻译：在 \(\mathbb{Z}[i]\) 中</p>
 
 <p>\[
-\text{极大理想} \subset \text{素理想} \subset \text{真理想}.
+2 = -i (1 + i)^2.
 \]</p>
 
-<p>反过来"素 \(\Rightarrow\) 极大"<em>不</em>对。最小反例：\(\mathbb{Z}\) 里 \((0)\) 是素理想（\(\mathbb{Z}\) 是整环 \(\Leftrightarrow (0)\) 素），但 \((0)\) 不极大（\((0) \subsetneq (2) \subsetneq \mathbb{Z}\)）。一般地，主理想环里 \((0)\) 永远素但通常不极大；非零素理想 = 极大理想。</p>
+<p>把单位忽略不计，\(2 = (1+i)^2\)——<em>2 在 \(\mathbb{Z}[i]\) 里是某个数的平方</em>。这个"某个数" 是 \(1 + i\)，它在 \(\mathbb{Z}[i]\) 中<em>素</em>（理想 \((1 + i)\) 素）。</p>
 
-<p>"\(R\) 的所有素理想构成的集合"叫做 \(R\) 的<em>谱</em> \(\mathrm{Spec}\, R\)，配上合适的拓扑（Zariski 拓扑）就是代数几何里"概形" 的基本对象。本书不深入，但你应该知道这个名字以后看代数几何文献时不陌生。</p>
+<p>看 (2)：\((2) \subsetneq (1 + i) \subsetneq \mathbb{Z}[i]\)。包含关系：\(2 = (1+i)(1-i) \in (1+i)\) 给左边；\(1 \notin (1+i)\)（否则 \((1+i)\) 含单位，等于全环——但 \((1+i)\) 严真，比如 \(1 \notin (1+i)\) 因为 \(1 = (1+i)(a + bi)\) 解出 \(a + bi = 1/(1+i) = (1-i)/2 \notin \mathbb{Z}[i]\)）。所以 \((1 + i)\) 是 \((2)\) 与全环间的中间真理想——\((2)\) 不极大。</p>
 
-<h2 id="sec12-8">12.8 实例：\(\mathbb{Z}\) 与 \(\mathbb{Z}[i]\) 中的极大 / 素理想</h2>
+<p>但 \((1 + i)\) 极大！商 \(\mathbb{Z}[i]/(1+i)\) 有 2 个元素 \(\{0, 1\}\)，它就是 \(\mathbb{F}_2\)——是域。所以 \((1 + i)\) 极大。</p>
 
-<p>把上面两节的理论在 \(\mathbb{Z}\) 和高斯整数 \(\mathbb{Z}[i]\) 上跑一遍。</p>
+<p><strong>这个小练习教什么：</strong> 同一个数 2 在不同环里的<em>素分解</em> 不同。在 \(\mathbb{Z}\) 里 2 是素；在 \(\mathbb{Z}[i]\) 里 2 是 \((1+i)^2\) 乘个单位——它<em>分歧</em>（ramified）。这种"<em>素数在环扩展里的行为</em>" 是代数数论的核心，它的几何 / 数论后果延伸出整本代数数论的内容。</p>
 
-<p><strong>\(\mathbb{Z}\) 的所有理想分类。</strong>所有理想都是 \((n) = n\mathbb{Z}\)（\(n \ge 0\)）。</p>
-
-<ul>
-  <li>\((n)\) 极大 \(\iff \mathbb{Z}/n\mathbb{Z}\) 是域 \(\iff n\) 是素数。所以 \(\mathbb{Z}\) 的极大理想恰好是 \(\{(p) : p \text{ 素}\}\)。</li>
-  <li>\((n)\) 素 \(\iff \mathbb{Z}/n\mathbb{Z}\) 是整环 \(\iff n = 0\) 或 \(n\) 是素数。</li>
-  <li>所以 \(\mathrm{Spec}\, \mathbb{Z} = \{(0)\} \cup \{(p) : p \text{ 素}\}\)。</li>
-</ul>
-
-<p>这是数论里最干净的"理想 ↔ 素数"对应。</p>
-
-<p><strong>\(\mathbb{Z}[i]\) 中的素理想。</strong>对 \(\mathbb{Z}[i]\) 来说，"哪些理想素 / 极大"涉及"\(\mathbb{Z}\) 的素数 \(p\) 在 \(\mathbb{Z}[i]\) 中如何分解"。结论：</p>
+<p>对比一下其它素数：</p>
 
 <ul>
-  <li>\(p = 2\)：\((2) = (1 + i)^2\)（"分歧"）。所以 \((2)\) <em>不素</em>，因为 \((1+i)^2 \in (2)\) 但 \((1+i) \notin (2)\)（\(1 + i\) 不能写成 \(2 \cdot z\) 因 \(z\) 必非高斯整数）。</li>
-  <li>\(p \equiv 1 \pmod 4\)：\(p = a^2 + b^2 = (a + bi)(a - bi)\) 在 \(\mathbb{Z}[i]\) 中分裂为两个共轭素元的乘积。所以 \((p)\) 不素，但 \((a + bi)\) 与 \((a - bi)\) 都极大。</li>
-  <li>\(p \equiv 3 \pmod 4\)：\(p\) 在 \(\mathbb{Z}[i]\) 中仍然是素元（"惰性"）。所以 \((p)\) 在 \(\mathbb{Z}[i]\) 中仍是极大理想。</li>
+  <li>\(p = 5\) 在 \(\mathbb{Z}[i]\) 里 \(5 = (2 + i)(2 - i)\)——分裂成两个不等的素理想。</li>
+  <li>\(p = 3\) 在 \(\mathbb{Z}[i]\) 里仍然<em>素</em>——\((3) \subset \mathbb{Z}[i]\) 还是素 / 极大理想。</li>
+  <li>\(p = 2\) 像上面，\(2 = -i(1+i)^2\)——<em>分歧</em>。</li>
 </ul>
 
-<p>三种情况对应数论里素数的"分歧 / 分裂 / 惰性"。本书不展开（这是代数数论的入门内容），但你应该看到："<em>把 \(\mathbb{Z}\) 嵌入更大的整数环 \(\mathbb{Z}[i]\) 之后，原来的素理想要么分裂、要么不变、要么平方化</em>" —— 这种现象是经典数论里"二次互反律"和"类域论"的源头。</p>
+<p>这三种情况（分裂 / 不动 / 分歧）由 \(p \bmod 4\) 决定：\(p \equiv 1\) 分裂、\(p \equiv 3\) 不动、\(p = 2\) 分歧。这是 Fermat 关于"哪些素数 = 两平方和" 那条经典定理的代数版。</p>
 
-<p>验算 \((1 + i)^2 = 1 + 2i + i^2 = 1 + 2i - 1 = 2i\)，故 \((1+i)^2 = (2i) = (2)\)（因 \(i\) 是单位）。所以的确 \((2) = (1+i)^2\)。</p>
+<h2 id="sec12-8">12.8 这一章给你的反射动作</h2>
 
-<p>这一章的核心收获是把"群论里正规子群 → 商群"这个故事在环论里完整复制，并加上极大 / 素理想这两个环论独有的精细结构。下一章我们要把"商环什么时候是域 / 整环"这个问题反过来研究——直接定义域、整环、商域这三个标准对象，把整个环的"层级"从最干净的一端立起来。</p>
+<p>读完这一章你应该有以下几个反射：</p>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 环：定义与基本例子</a><a href="ch13.html">下一章 · 第 13 章 整环、域、商域 →</a></nav>
+<ul>
+  <li>看到"环 \(R\) 的理想 \(I\)"，立即想"商环 \(R/I\)"。两者是孪生概念——一来必带着另一。</li>
+  <li>看到"\(R/I\) 是域"，立即想"\(I\) 极大"。看到"\(R/I\) 是整环"，立即想"\(I\) 素"。</li>
+  <li>要研究环同态 \(\varphi : R \to S\)，第一同构定理几乎总是切入点：核 = 理想 \(I\)，像 \(\cong R/I\)，问题转成研究 \(R/I\) 与 \(S\) 的关系。</li>
+  <li>"添加一个新元素满足某个方程"（"<em>添加 \(\alpha\) 使 \(p(\alpha) = 0\)</em>"）的标准实现是 \(R[x]/(p(x))\)。\(\mathbb{R}\) 添加 \(i\) 得 \(\mathbb{R}[x]/(x^2 + 1) = \mathbb{C}\) 是这条路径的开端。</li>
+</ul>
+
+<p>第三条让<em>构造性代数</em> 进入视野。原本"\(\mathbb{C}\) 是包含 \(\sqrt{-1}\) 的什么神秘扩张" 的问题，被替换成"<em>在 \(\mathbb{R}[x]\) 上模掉 \(x^2 + 1\)</em>" 的纯代数操作。这种"用商环来构造扩张" 的眼光，是<a href="ch18.html">第 18 章</a> 之后<em>整个</em> 域扩张与 Galois 理论的方法论基础。</p>
+
+<p>下一章我们正面研究"<em>整环</em>" 这个概念：<em>没零因子</em> 的环。\(\mathbb{Z}, k[x], \mathbb{Z}[i]\) 都是整环——它们之所以"行为像数"，根本原因是没零因子。我们会看在整环里你能像 \(\mathbb{Z}\) 构造 \(\mathbb{Q}\) 那样构造一个<em>分式域</em>，把整环嵌入一个域。这一构造让"<em>整环 ⇄ 域</em>" 这条桥真正立起来。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 环的定义</a><a href="ch13.html">下一章 · 第 13 章 整环、域、商域 →</a></nav>
 </main>
 </body>
 </html>
+</content>
+</invoke>

@@ -32,223 +32,261 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：编码理论与有限域</a><span class="nav-disabled">下一章 →</span></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：编码理论与有限域</a><a href="appA.html">下一章 · 附录 A 集合、关系、等价类速查 →</a></nav>
 <h1 id="ch24">第 24 章 应用：晶体学与表示论入门</h1>
 
-<p>群在物理里反复以"<em>对称群</em>"的身份出现。晶体学家用群论分类晶体的几何结构（230 种空间群、14 种 Bravais 格子、32 种点群）；化学家用群表示分析分子振动模式；量子物理学家用群表示解释能级简并和选择规则；现代凝聚态物理用群表示给"准粒子""自旋"分类。所有这些"应用"背后的代数都是同一件事——<em>把抽象群作用到一个向量空间上</em>，研究这种作用的不可约组成部分。</p>
+<p>本书最后一章。我要带你做两件事——表面上不太相关，但底层是<em>同一</em> 个问题的两面。第一件：用群论<em>分类几何对称</em>，看晶体学为什么<em>恰好 230 种空间群</em>，不是 229 也不是 231。第二件：用群论<em>把抽象群拉回到线性代数</em>，看群表示论为什么是量子物理的语言。</p>
 
-<p>这一章把<em>晶体学</em>与<em>表示论</em>两个题材压在一起讲。晶体学侧重"具体的有限几何对称群"（壁纸群、点群），是群论本身的应用；表示论侧重"群作用到向量空间上"，是群论与线性代数的桥梁。表示论是一门大题材——单独可以写一本书——本章只给入门级介绍：定义、Maschke 定理、\(\mathbb{Z}/n\mathbb{Z}\) 与 \(S_3\) 的不可约表示。系列后续卷里会把它展开到 \(\mathrm{GL}_n\)、紧致群、Lie 代数表示等更深的方向。</p>
+<p>这两件事的共同根是：<em>对称必须满足代数约束</em>。第一件事里这个约束让某些"看起来可能" 的对称<em>不能存在</em>（比如雪花没有 5-fold）；第二件事里它让某些"看起来不同" 的物理量子态<em>必须等价</em>（这就是简并）。</p>
 
-<ul>
-  <li>晶体学背景：晶格、Bravais 格子、空间群的定义。</li>
-  <li>二维 17 种壁纸群——平移子群 + 点群的半直积结构。</li>
-  <li>三维 14 种 Bravais 格子；230 种空间群（提，不展开）。</li>
-  <li>点群：保留某一点的对称变换；32 种晶体点群分类。</li>
-  <li>群表示初步：\(\rho : G \to \mathrm{GL}(V)\) 与不可约表示。</li>
-  <li>Maschke 定理：char 0 域上有限群有限维表示完全可约。</li>
-  <li>\(\mathbb{Z}/n\mathbb{Z}\) 的不可约表示——全是一维，由 \(n\) 次单位根分类。</li>
-  <li>\(S_3\) 的不可约表示——平凡 + 符号 + 二维标准。</li>
-  <li>量子力学：哈密顿对称群的不可约对应能级简并。</li>
-</ul>
+<h2 id="sec24-1">24.1 钩子：雪花有 6-fold，为什么<em>没有</em> 5-fold？</h2>
 
-<h2 id="sec24-1">24.1 晶体学背景：晶格与对称</h2>
+<p>找一片雪花的图（或者百度"snowflake symmetry"）。它有<em>6 重旋转对称</em>——绕中心转 60° 看起来一样。也就是说雪花的对称群包含 \(D_6\)（<a href="ch1.html">第 1 章</a>那个 12 元素的二面体群——6 个旋转 + 6 个反射）。</p>
 
-<p>晶体的几何核心是<em>晶格</em>——空间里一组规则排列的点。形式上：</p>
+<p>问题：<em>为什么不是 5-fold</em>？也就是说，<em>有没有一种"雪花" 绕中心转 72° 看起来一样</em>？</p>
 
-<p><strong>定义。</strong>三维欧氏空间 \(\mathbb{R}^3\) 里，由三个线性无关向量 \(\mathbf{a}_1, \mathbf{a}_2, \mathbf{a}_3\) 张成的<strong>晶格</strong>是</p>
+<p>从纯<em>群论</em> 角度，5 个 72° 旋转加起来就是 360°——这没问题，旋转能合起来恢复原样。\(\mathbb{Z}/5\) 群本身存在，没人禁。<em>群论本身允许 5-fold 对称</em>。</p>
 
-<p>\[
-L = \{n_1 \mathbf{a}_1 + n_2 \mathbf{a}_2 + n_3 \mathbf{a}_3 : n_i \in \mathbb{Z}\}.
-\]</p>
+<p>但雪花<em>不存在</em> 5-fold——更准确说，<em>没有任何天然晶体能呈现 5-fold 对称</em>。1984 年 Shechtman 在某种合金里发现了"<em>准</em> 晶体"（quasicrystal）有 5-fold 衍射模式，颠覆了这条原则——但准晶<em>不是</em> 周期晶体，是另一类对象。在<em>周期</em> 晶体的范围内，5-fold 严格被禁。</p>
 
-<p>它就是加法群 \(L \cong \mathbb{Z}^3\)（自由 abelian rank 3）。</p>
+<p>为什么？答案要把"<em>对称</em>" + "<em>周期格子</em>" 两个约束<em>同时</em> 加上才看得见。这是几何 + 群论的<em>硬</em> 约束。</p>
 
-<p>真实晶体（食盐、金刚石、雪花）的原子位置是某个晶格 \(L\) 加上"基组"（晶格每个格点上对应的原子集合）。<em>晶体的对称群</em> = 所有保持原子位置的刚体变换（平移 + 旋转 + 反射）。</p>
+<p><strong>晶体学限制定理</strong>。设晶体是 2D 或 3D 平面 / 空间里一个<em>周期格子</em>（沿两个 / 三个独立方向重复的图案）。如果格子有 \(n\) 重旋转对称（绕某点转 \(360°/n\) 后图样不变），那么 \(n \in \{1, 2, 3, 4, 6\}\)。<em>5 重、7 重以上都不可能</em>。</p>
 
-<p>这个对称群是<a href="ch6.html">第 6 章</a>"群作用"在<em>无限</em>群里的最自然实例之一——平移子群 \(L\) 已是无限的（\(\mathbb{Z}^3\)），加上有限的"点对称"部分构成完整的<em>空间群</em>。</p>
+<p>证明（2D 草图）。设 \(R\) 是绕原点转角 \(\theta = 2\pi/n\) 的旋转。设格子的<em>最短</em> 平移向量长度 \(a\)。考虑两个相邻格点 \(\mathbf v\) 和 \(R \mathbf v\)（都是格点，因为 \(R\) 把格子映到自身）。它们的<em>差</em> \(R \mathbf v - \mathbf v\) 也必为格点（因为格子在加法下封闭）。这个差的长度是 \(2 a \sin(\theta/2)\)（用基本三角）。</p>
 
-<h2 id="sec24-2">24.2 二维 17 种壁纸群</h2>
+<p>如果 \(2 a \sin(\theta/2) < a\)，即 \(\sin(\theta/2) < 1/2\)，即 \(\theta < 2\pi/6\) 即 \(n > 6\)——则差比 \(a\) 短，但 \(a\) 是<em>最短</em> 平移，矛盾。同样如果 \(2 a \sin(\theta/2) > a\) 但和 \(a\) 比例<em>无理</em>——那一系列旋转就生成无穷多个不同长度的格点，违反"<em>有限格距</em>"。</p>
 
-<p>"<em>壁纸群</em>" (wallpaper group) 是 \(\mathbb{R}^2\) 平面上保持某个二维周期图案的所有刚体变换群。任何"重复的墙纸图案"都对应一个壁纸群。</p>
+<p>更精确的：可以证（用线性代数 + 整数性）旋转 \(R\) 在某个<em>整数</em> 基下的迹必为整数。\(R\) 是旋转矩阵 \(\begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}\)，迹 \(2\cos\theta\)。要 \(2\cos\theta \in \mathbb{Z}\)，得 \(\cos\theta \in \{-1, -1/2, 0, 1/2, 1\}\)，对应 \(\theta = \pi, 2\pi/3, \pi/2, \pi/3, 0\)，即 \(n = 2, 3, 4, 6, 1\)。<em>恰好五个值</em>。</p>
 
-<p><strong>结构。</strong>每个壁纸群 \(G\) 都包含一个<em>平移子群</em> \(T \cong \mathbb{Z}^2\)（由两个独立平移生成），且 \(T \triangleleft G\)。商群 \(G / T\) 是<em>有限</em>的<em>点群</em>，它必为下列十种之一：</p>
+<p>所以雪花有 6-fold 是因为<em>水分子六角格子允许它</em>——并且这是大自然<em>能选的最对称的格子</em> 之一。雪花<em>没有</em> 5-fold 是因为<em>5-fold 旋转和周期格子代数上不相容</em>。</p>
 
-<p>\[
-\{e\}, \mathbb{Z}/2, \mathbb{Z}/3, \mathbb{Z}/4, \mathbb{Z}/6, D_1, D_2, D_3, D_4, D_6.
-\]</p>
+<p>这条限制的影响巨大。下面几节我们看它怎么把"<em>所有可能晶体对称</em>" 限制到一个<em>有限的清单</em>。</p>
 
-<p>(\(D_n\) = \(2n\) 阶二面体群，<a href="ch10.html">第 10 章</a>用生成元 + 关系定义过。)</p>
+<h2 id="sec24-2">24.2 Bravais 格子（5 个 2D + 14 个 3D）</h2>
 
-<p>限制到这十种点群的原因是<strong>晶体学限制</strong>：在二维或三维有平移对称的图案里，旋转的阶只能是 1, 2, 3, 4, 6——五次或七次以上旋转不能与平移子群兼容（详证：考虑两个相邻格点处的两次旋转复合）。</p>
+<p>在 2D 平面上，<em>周期格子</em> 由两个独立平移向量 \(\mathbf a_1, \mathbf a_2\) 决定——格点是 \(\{m \mathbf a_1 + n \mathbf a_2 : m, n \in \mathbb{Z}\}\)。两个格子<em>等价</em> 当它们的<em>对称群</em>（保持格子的旋转 + 反射 + 平移群）一样。</p>
 
-<p>把这 10 个点群与各种"螺旋""滑移反射"的具体组合算清，得到</p>
+<p>不同等价类的"<em>纯格子结构</em>"（不考虑放在格点上的图案）数量是<em>有限</em> 的——叫 <strong>Bravais 格子</strong>。</p>
 
-<p>\[
-\boxed{\ \text{二维 17 种壁纸群}\ p1, p2, pm, pg, cm, pmm, pmg, pgg, cmm, p4, p4m, p4g, p3, p3m1, p31m, p6, p6m.\ }
-\]</p>
+<p><strong>2D 有 5 种 Bravais 格子：</strong></p>
 
-<p>这 17 种是 1891 年 Fedorov 与 Schoenflies 独立分类的。Escher 的镶嵌画几乎遍历了这 17 种——他没学过群论，只是经验地发现"再没有别的"。</p>
+<ol>
+  <li><em>斜方</em>（oblique，\(p1\)）：\(|\mathbf a_1| \neq |\mathbf a_2|\)，夹角任意 \(\neq 90°\)。最一般，2-fold 对称。</li>
+  <li><em>矩形</em>（rectangular）：\(|\mathbf a_1| \neq |\mathbf a_2|\)，夹角 \(= 90°\)。多了反射对称。</li>
+  <li><em>中心矩形</em>（centered rectangular，菱形）：矩形 + 中心点。</li>
+  <li><em>正方</em>（square）：\(|\mathbf a_1| = |\mathbf a_2|\)，夹角 \(= 90°\)。<em>4-fold</em> 对称。</li>
+  <li><em>六角</em>（hexagonal）：\(|\mathbf a_1| = |\mathbf a_2|\)，夹角 \(= 60°\)（或 120°）。<em>6-fold</em> 对称——雪花在这。</li>
+</ol>
 
-<h2 id="sec24-3">24.3 三维 14 种 Bravais 格子</h2>
+<p><em>恰好 5 种</em>。\(n\)-fold 限制（\(n \in \{1, 2, 3, 4, 6\}\)）让"<em>3-fold</em> 单独的格子" 不存在——要 3-fold 必须有六角，所以 3-fold 自动升级到 6-fold（六角 Bravais 格子）。</p>
 
-<p>三维比二维复杂得多。先看<em>平移子群</em>本身有多少种。</p>
-
-<p>三维平移晶格 \(L \cong \mathbb{Z}^3\) 在 \(\mathbb{R}^3\) 中的"几何形状"按晶胞的<em>对称类型</em>分类。Bravais 1848 年证明：恰好有 <strong>14 种</strong>不同的三维晶格类型（按几何对称等价归类）。它们按晶胞形状分七大族：</p>
+<p><strong>3D 有 14 种 Bravais 格子</strong>，分 7 个晶系（crystal systems）：</p>
 
 <ul>
-  <li><strong>立方</strong>（cubic）：3 种（简单、体心、面心）；</li>
-  <li><strong>正方</strong>（tetragonal）：2 种（简单、体心）；</li>
-  <li><strong>正交</strong>（orthorhombic）：4 种（简单、体心、面心、底心）；</li>
-  <li><strong>六方</strong>（hexagonal）：1 种；</li>
-  <li><strong>三方 / 菱形</strong>（trigonal/rhombohedral）：1 种；</li>
-  <li><strong>单斜</strong>（monoclinic）：2 种；</li>
-  <li><strong>三斜</strong>（triclinic）：1 种。</li>
+  <li><em>三斜</em>（triclinic）：1 种。</li>
+  <li><em>单斜</em>（monoclinic）：2 种（简单单斜、底心单斜）。</li>
+  <li><em>正交</em>（orthorhombic）：4 种（简单、底心、体心、面心）。</li>
+  <li><em>四方</em>（tetragonal）：2 种（简单、体心）。</li>
+  <li><em>三方</em>（trigonal/rhombohedral）：1 种。</li>
+  <li><em>六方</em>（hexagonal）：1 种。</li>
+  <li><em>立方</em>（cubic）：3 种（简单立方 SC、体心立方 BCC、面心立方 FCC）。</li>
 </ul>
 
-<p>把 14 种 Bravais 格子与 32 种"晶体点群"（24.4 节）配组合，再加上"螺旋轴""滑移面"等"非平凡的"运动，最后得到 <strong>230 种空间群</strong>（Schoenflies 1891 + Fedorov 1885 独立分类）。这 230 种就是真实晶体可能拥有的<em>所有</em>对称类型——固体物理里所有结构分类（"FCC""BCC""hexagonal close-packed"等）都是这 230 种里的某几种。</p>
+<p>共 \(1 + 2 + 4 + 2 + 1 + 1 + 3 = 14\)。这个分类 Auguste Bravais 1850 年完成——他证<em>恰好 14</em>，再多再少都被群论 + 几何排除。</p>
 
-<p>230 种空间群的完整分类是 19 世纪末群论的高峰应用之一。本书不展开（细节进入"晶体学群论"专题），只想强调一句：这 230 个数字<em>不是经验测出来的</em>——它是从群论代数推出来的<em>必然</em>清单。</p>
+<p>把 14 种 Bravais 格子记住对学固体物理基本足够——<em>每种已知晶体的 Bravais 类型必为这 14 种之一</em>，X 射线衍射图案直接告诉你是哪种。盐（NaCl）面心立方、铁（α-Fe）体心立方、铜面心立方、石墨六方、钻石面心立方加 2 原子基底——所有材料都能找到自己的 Bravais 标签。</p>
 
-<h2 id="sec24-4">24.4 点群与 32 种晶体点群</h2>
+<h2 id="sec24-3">24.3 17 壁纸群（2D 完整列表）</h2>
 
-<p><strong>定义。</strong>\(\mathbb{R}^n\) 上的<em>点群</em>是 \(\mathrm{O}(n)\)（正交群——保持原点的等距变换群）的<em>有限</em>子群。即，"保留某一固定点"的有限对称群。</p>
+<p>Bravais 格子只看<em>纯</em> 平移格子。如果还允许在格点上放图案——<em>带图案</em> 的 2D 周期对称有多少种？答案是 <strong>17 壁纸群</strong>（wallpaper groups），1891 年 Fedorov 完成的分类。</p>
 
-<p>三维所有有限点群的分类（Klein 1884）：每个有限 \(\mathrm{O}(3)\) 子群必为下列之一：</p>
+<p>"壁纸群" 是 \(\mathbb{R}^2\) 等距群（旋转 + 反射 + 平移 + 滑移反射）的一个离散子群，要求平移子群是 2D 格子。两个壁纸群<em>等价</em> 当它们抽象同构（作为群）。结果：<em>恰好 17 个</em>。</p>
+
+<p>17 个壁纸群按对称类型分组（用国际记号）：</p>
 
 <ul>
-  <li>循环 \(C_n = \mathbb{Z}/n\)；二面体 \(D_n\)（<em>n</em> 任意）；</li>
-  <li>正四面体群 \(T \cong A_4\)；</li>
-  <li>正八面体群 \(O \cong S_4\)；</li>
-  <li>正二十面体群 \(I \cong A_5\)；</li>
-  <li>以上每个的"含反射"扩张。</li>
+  <li>无旋转：p1（只有平移）、pg（平移 + 滑移反射）、pm（平移 + 反射）、cm（中心矩形 + 反射）。</li>
+  <li>2-fold 旋转：p2、pgg、pmg、pmm、cmm。</li>
+  <li>3-fold 旋转：p3、p3m1、p31m。</li>
+  <li>4-fold 旋转：p4、p4g、p4m。</li>
+  <li>6-fold 旋转：p6、p6m。</li>
 </ul>
 
-<p>然而<em>晶体</em>点群有额外限制——晶体学限制把 \(n\) 限到 \(\{1, 2, 3, 4, 6\}\)。结果<strong>只有 32 种晶体点群</strong>。这 32 种正是 230 种空间群"忘掉平移"后剩下的"点对称类"。</p>
+<p>共 4 + 5 + 3 + 3 + 2 = 17。</p>
 
-<p>为什么 5 次或 7 次旋转不行？设 \(R\) 是 \(\mathbb{R}^2\) 中绕某格点 \(O\) 的 \(\theta\) 旋转，\(O\) 是格点。任何格点 \(P\) 经 \(R\) 仍是格点；考虑格点 \(P\) 与 \(R(P)\) 的差向量——它必为格向量。算下来 \(2 \cos \theta \in \mathbb{Z}\)，即 \(\cos \theta \in \{-1, -1/2, 0, 1/2, 1\}\)，对应 \(\theta \in \{\pi, 2\pi/3, \pi/2, \pi/3, 0\}\)，即 \(n \in \{1, 2, 3, 4, 6\}\)。</p>
+<p>这个分类的应用极广——所有 Escher 的<em>周期</em> 镶嵌画、所有民族纹饰（Alhambra 阿尔罕布拉宫的瓷砖、伊斯兰几何、苏格兰格子布）、所有<em>2D 周期物理体系</em>（石墨烯、二维磁性材料）都属于这 17 种之一。</p>
 
-<p>(<em>题外话。</em>1984 年发现的"准晶体"打破了晶体学限制——它们有 5 次对称但<em>没有</em>平移周期；这种结构 30 多年里推动了"非周期镶嵌"理论与一整套新的群表示工具。)</p>
+<p>有意思的事实：Alhambra 的瓷砖工匠在 14 世纪<em>实际造出了所有 17 种</em>——比群论分类早 500 年。这是数学家从工匠的成果里反推证"分类" 的稀有例子。</p>
 
-<h2 id="sec24-5">24.5 群表示初步</h2>
+<p>3D 推广（带图案的周期晶体的对称）就是 230 种<strong>空间群</strong>（space groups），下一节展开。</p>
 
-<p>从这一节开始我们离开晶体几何，转到一种把"群"和"线性代数"配对的工具——<em>群表示论</em>。</p>
+<h2 id="sec24-4">24.4 32 晶体点群（3D）+ 230 空间群</h2>
 
-<p><strong>定义（表示）。</strong>设 \(G\) 是群，\(V\) 是某域 \(k\) 上的向量空间。\(G\) 的<strong>表示</strong>是群同态</p>
+<p>3D 里类似分类。在<em>固定一个格点</em> 不动的前提下（即不考虑平移，只看绕这点的旋转 / 反射 / 反演），所有可能的对称<em>恰好 32 种</em>——叫 <strong>32 晶体点群</strong>（crystallographic point groups）。这 32 种按 7 个晶系分布。每个晶系的"最高对称点群" 决定了晶系本身。</p>
 
-<p>\[
-\boxed{\ \rho : G \to \mathrm{GL}(V).\ }
-\]</p>
+<p>把<em>平移</em> 也加进来——允许"螺旋轴"（旋转 + 沿轴平移）和"滑移面"（反射 + 平面内平移）这两种<em>非</em> 平凡组合——分类数膨胀到 <strong>230 空间群</strong>。这个数 1891 年 Fedorov 和 Schoenflies 独立证出。</p>
 
-<p>即对每个 \(g \in G\) 给一个可逆线性变换 \(\rho(g) : V \to V\)，且 \(\rho(g_1 g_2) = \rho(g_1) \rho(g_2)\)，\(\rho(e) = \mathrm{id}_V\)。</p>
+<p>"230" 是个<em>精确</em> 数字——不是上界，不是下界，是<em>恰好</em>。证明的核心是结合上面所有约束：</p>
 
-<p>\(V\) 叫表示的<em>表示空间</em>，\(\dim V\) 叫表示的<em>维数</em>。如果有基，可写 \(\rho(g) \in \mathrm{GL}_n(k)\) 是矩阵——所以表示也常被称为"<em>矩阵表示</em>"。</p>
+<ul>
+  <li>晶体学限制（\(n \in \{1, 2, 3, 4, 6\}\)）；</li>
+  <li>14 Bravais 格子；</li>
+  <li>32 点群与 14 Bravais 的相容性；</li>
+  <li>螺旋轴 / 滑移面与点群相容性。</li>
+</ul>
 
-<p><strong>例。</strong>对任何群 \(G\)，<strong>平凡表示</strong> \(\rho(g) = 1 \in k^\times = \mathrm{GL}_1(k)\)（一维，所有元素送到 1）。</p>
+<p>把这些组合性约束的<em>所有可能解</em> 列出来，正好得 230 项。</p>
 
-<p><strong>例。</strong>\(S_n\) 在 \(\mathbb{R}^n\) 上的<strong>置换表示</strong>：\(\sigma\) 送到把基 \(e_1, \ldots, e_n\) 按 \(\sigma\) 置换的矩阵。\(n\) 维，但<em>不</em>不可约——常向量 \((1, 1, \ldots, 1)\) 张成 1 维不变子空间（平凡表示），其正交补给"标准表示"（\(n - 1\) 维，对 \(S_3\) 在 24.8 节展开）。</p>
+<p>这条结果的现实意义巨大。1912 年 von Laue 用 X 射线衍射验证晶体周期结构后，每发现一种新晶体——盐、铁、钻石、石墨、DNA（1953 年 Watson-Crick）、半导体硅、超导体——它的对称<em>必属于这 230 种</em> 之一。<em>没有例外</em>。这给材料科学一个干净的"<em>对称表</em>"：每种晶体在<em>国际晶体学表</em>（International Tables for Crystallography）里有一个 1-230 的编号。</p>
 
-<p><strong>定义（不可约表示）。</strong>\(\rho : G \to \mathrm{GL}(V)\) 称为<strong>不可约</strong>，如果 \(V\) 没有非平凡 \(G\)-不变子空间——即除 \(\{0\}\) 与 \(V\) 外，没有子空间 \(W\) 使 \(\rho(g) W \subset W\) 对所有 \(g\) 成立。</p>
+<p>请你欣赏这条结果有多厉害。它<em>不</em> 是说"我们考察的所有晶体都属于 230 种"——是<em>逻辑上</em>"<em>没有</em> 第 231 种空间群存在"。这是<em>纯群论</em>给出的<em>关于物质世界</em> 的<em>先验</em> 限制——和"任意有限阿贝尔群分解为循环群直和"（<a href="ch8.html">第 8 章</a>）一样的力度，但应用于<em>实在</em> 的水晶。</p>
 
-<p>\[\boxed{\ \text{不可约}\ \rho : G \to \mathrm{GL}(V)\ \Leftrightarrow\ V\ \text{的}\ G\text{-不变子空间只有}\ \{0\}, V.\ }\]</p>
+<p>这就是<a href="ch1.html">第 1 章 1.5 节</a>的"晶体学预告" 的全部内容。这一章前半段把它兑现了。下面我们换方向——不是用群<em>分类</em> 对称，而是把群<em>送进线性代数</em>，看群作用怎么变成矩阵作用。</p>
 
-<p>不可约表示是表示论的"原子"——目标是把<em>任何</em>表示分解成不可约的组合，这种分解的可能性正是 Maschke 定理保证的。</p>
+<h2 id="sec24-5">24.5 reframe：群表示是什么</h2>
 
-<h2 id="sec24-6">24.6 Maschke 定理</h2>
-
-<p><strong>定理（Maschke 1899）。</strong>设 \(G\) 是有限群，\(k\) 是特征 0（或特征不整除 \(|G|\)）的域。则 \(G\) 在 \(k\) 上的任何<em>有限维</em>表示 \(\rho : G \to \mathrm{GL}(V)\) 都是<em>完全可约</em>的——即 \(V\) 可写成不可约 \(G\)-子表示的直和：</p>
-
-<p>\[
-\boxed{\ V = V_1 \oplus V_2 \oplus \cdots \oplus V_k, \quad \text{每个}\ V_i\ \text{不可约}.\ }
-\]</p>
-
-<p>证明的核心是构造 "<em>平均化</em>"。设 \(W \subset V\) 是 \(G\)-不变子空间。要找一个 \(G\)-不变补 \(W'\)（即 \(W \oplus W' = V\) 且 \(W'\) 也 \(G\)-不变）。</p>
-
-<p>取任意线性投影 \(P_0 : V \to W\)（满足 \(P_0|_W = \mathrm{id}\)），它<em>未必</em> \(G\)-等变。<em>平均化</em>：</p>
+<p>把视角换一下。给一个抽象群 \(G\)（比如 \(\mathbb{Z}_6\) 或 \(D_3\) 或 \(S_5\)）和一个向量空间 \(V\)（通常 \(\mathbb{C}\) 上有限维）。一个 <strong>表示</strong>（representation）是个群同态</p>
 
 <p>\[
-P := \frac{1}{|G|} \sum_{g \in G} \rho(g) P_0 \rho(g^{-1}).
+\boxed{\ \rho : G \to GL(V).\ }
 \]</p>
 
-<p>验证：(i) \(P|_W = \mathrm{id}_W\)（\(P_0\) 在 \(W\) 上是 \(\mathrm{id}\)，\(W\) 是 \(G\)-不变所以平均后仍 \(\mathrm{id}\)）；(ii) \(P\) 像在 \(W\)（\(P_0\) 像在 \(W\)，\(W\) 不变）；(iii) \(P\) 是 \(G\)-等变（直接验证用群运算）。所以 \(P\) 是 \(G\)-等变的投影到 \(W\)，其核 \(W' = \ker P\) 即所求 \(G\)-不变补。归纳得整个 \(V\) 分解为不可约直和。</p>
+<p>这里 \(GL(V)\) 是 \(V\) 上可逆线性映射的群（同构于 \(GL_n(\mathbb{C})\) where \(n = \dim V\)，<a href="../线性代数/index.html">线性代数</a>的对象）。同态意味着 \(\rho(g_1 g_2) = \rho(g_1) \rho(g_2)\)（左边是群乘法，右边是矩阵乘法），\(\rho(e) = I\)。</p>
 
-<p>关键一步：除以 \(|G|\)。这一除要在 \(k\) 中可行——这就是<em>"\(\operatorname{char} k\) 不整除 \(|G|\)"</em>的来源。\(k = \mathbb{C}, \mathbb{R}, \mathbb{Q}\) 都满足（特征 0），\(k = \mathbb{F}_p\) 当 \(p \nmid |G|\) 也满足；如果 \(p \mid |G|\)，整个 Maschke 失败，进入"<em>模表示论</em>"——一个完全不同的题材。</p>
+<p>说人话：表示是把<em>抽象群元素</em> 翻译成<em>具体可逆矩阵</em> 的方法，<em>保持群运算</em>。</p>
 
-<p>Maschke 把"<em>分类有限群所有表示</em>"归约到"<em>分类不可约表示</em>"。下面两节看具体怎么算 \(\mathbb{Z}/n\mathbb{Z}\) 与 \(S_3\) 的全部不可约表示。</p>
+<p>"<em>维数</em>" \(\dim V\) 称为表示的<em>维度</em>。</p>
 
-<h2 id="sec24-7">24.7 例：\(\mathbb{Z}/n\mathbb{Z}\) 的不可约表示</h2>
+<p>为什么搞这件事？三条原因：</p>
 
-<p>取 \(G = \mathbb{Z}/n\mathbb{Z}\)（循环群），\(k = \mathbb{C}\)。</p>
+<ol>
+  <li><em>抽象群难直接看，矩阵好算</em>。把 \(G\) 表示成矩阵后，群论问题变成线性代数问题——可以算迹、特征值、特征向量、对角化。</li>
+  <li><em>很多物理量子态本来就活在向量空间里，群作用本来就是表示</em>。一个分子的对称群作用在它的电子波函数上——波函数是 \(L^2\) 函数，是个向量空间——这种作用<em>就是</em> 表示。</li>
+  <li><em>群可以有很多不同表示</em>，分类它的所有<em>不可约</em> 表示给群"<em>结构指纹</em>"——两个群同构 ⟺ 它们有"<em>相同的表示分类</em>"（在适当意义下）。</li>
+</ol>
 
-<p><strong>结论。</strong>\(\mathbb{Z}/n\mathbb{Z}\) 在 \(\mathbb{C}\) 上的<em>所有</em>不可约表示都是<em>一维</em>的，恰有 \(n\) 个，由 \(n\) 次单位根分类。</p>
+<p>具体例。\(\mathbb{Z}/3\) 的表示。\(\mathbb{Z}/3 = \{0, 1, 2\}\)（加法）。最简单的表示——把 \(1\) 送到一个矩阵 \(M\)，要求 \(M^3 = I\)（因为 3 是 \(1\) 在 \(\mathbb{Z}/3\) 里的阶）。</p>
 
-<p>具体：设 \(\zeta = e^{2\pi i / n}\)。对每个 \(k = 0, 1, \ldots, n - 1\)，定义</p>
+<p><em>1 维表示</em>：\(M\) 是 \(1 \times 1\) 矩阵 = 一个数 \(z\)，\(z^3 = 1\)，所以 \(z = 1, \omega, \omega^2\)（\(\omega = e^{2\pi i/3}\)）。三个 1 维表示。</p>
+
+<p><em>2 维表示</em>：\(M\) 是 \(2 \times 2\) 矩阵，\(M^3 = I\)。比如 \(M = \begin{pmatrix} \omega & 0 \\ 0 & \omega^2 \end{pmatrix}\)。但这个 2 维表示<em>不是新</em> 的——它是两个 1 维表示的<em>直和</em>。"<em>不可约</em>" 表示就是不能再拆。\(\mathbb{Z}/3\) 的全部不可约表示只有 3 个 1 维的，没别的。</p>
+
+<p>这条事实推广到一般阿贝尔群：<em>有限阿贝尔群的全部不可约表示都是 1 维的</em>。原因是 1 维表示等价于群同态 \(\rho : G \to \mathbb{C}^*\)，称为<em>特征</em>（character）。每个<em>有限阿贝尔群</em> \(G\) 有 \(|G|\) 个不同特征（详见<a href="ch8.html">第 8 章</a>）。</p>
+
+<p>非阿贝尔群更有趣——下面看 \(S_3\) 和 Maschke 定理。</p>
+
+<h2 id="sec24-6">24.6 Maschke 定理：完全可约性</h2>
+
+<p>设 \(G\) 是<em>有限</em> 群，\(V\) 是 \(\mathbb{C}\) 上<em>有限维</em> 向量空间，\(\rho : G \to GL(V)\) 是个表示。一个<em>子表示</em> 是 \(V\) 的子空间 \(W \subseteq V\) 满足 \(\rho(g) W \subseteq W\) 对所有 \(g \in G\)（\(W\) 在所有 \(\rho(g)\) 作用下封闭）。</p>
+
+<p><strong>定理（Maschke，1899）。</strong> 设 \(G\) 有限，\(\mathrm{char}(\mathbb{C}) = 0\)（或 \(\mathrm{char} \nmid |G|\)），\(\rho\) 是 \(G\) 在 \(V\) 上的有限维表示。则<em>每个子表示 \(W\) 都有补子表示</em>——存在另一个子表示 \(W'\) 使 \(V = W \oplus W'\)。</p>
+
+<p>推论：<em>每个有限维表示都是不可约表示的直和</em>。</p>
+
+<p>证明思路。给一个 \(G\)-不变内积 \(\langle \cdot, \cdot \rangle_G\) 在 \(V\) 上。具体地：先取<em>任何</em> 内积 \(\langle \cdot, \cdot \rangle_0\)；然后<em>平均</em>：</p>
 
 <p>\[
-\rho_k : \mathbb{Z}/n\mathbb{Z} \to \mathbb{C}^\times, \quad \rho_k(j) = \zeta^{jk}.
+\langle u, v \rangle_G := \frac{1}{|G|} \sum_{g \in G} \langle \rho(g) u, \rho(g) v \rangle_0.
 \]</p>
 
-<p>这是一维表示，且 \(\rho_k = \rho_l\) 当 \(k = l\)（mod \(n\)）。所以恰好 \(n\) 个不同的一维表示。</p>
+<p>这个新内积满足 \(\langle \rho(g) u, \rho(g) v \rangle_G = \langle u, v \rangle_G\)（用换 \(g \mapsto g g_0\) 在求和里）——即 \(G\) 通过<em>酉</em>（保内积）算子作用。</p>
 
-<p>"全是一维"的原因：对交换群，由 Maschke + Schur 引理（任何不可约表示空间上 \(G\)-等变线性映射只有标量倍）能推得不可约表示必为一维。</p>
+<p>取 \(W' = W^\perp\)（关于这个 \(G\)-不变内积的正交补）。\(W^\perp\) 自动是 \(G\)-子表示（因为 \(\rho(g)\) 保内积，\(W\) \(G\)-不变，所以 \(W^\perp\) 也 \(G\)-不变）。\(V = W \oplus W^\perp\)。\(\square\)</p>
 
-<p>"恰好 \(n\) 个"的原因：所有一维表示构成<em>对偶群</em> \(\widehat G = \operatorname{Hom}(G, \mathbb{C}^\times)\)，对有限交换群 \(\widehat G \cong G\)。</p>
+<p>"特征 0" 假设关键——平均时除以 \(|G|\)，需要 \(|G|\) 在域里可逆。在 \(\mathbb{F}_p\) 上若 \(p | |G|\)，Maschke 失效，理论变得复杂（叫"模表示论"）。但本节我们只在 \(\mathbb{C}\) 上工作，Maschke 总成立。</p>
 
-<p><strong>更直白看法。</strong>循环群 \(\mathbb{Z}/n\mathbb{Z}\) 的"对称作用在某向量空间"必由生成元 \(g\) 的作用唯一确定，且 \(g^n = 1\) 强制 \(\rho(g)\) 是 \(n\) 次单位根之一（如果 \(\rho(g)\) 不是标量，就能进一步对角化分解）。</p>
+<p>请你欣赏 Maschke 定理的力量：<em>有限群在 \(\mathbb{C}\) 上的所有表示都"分解为不可约表示的直和"</em>。这把"<em>研究所有表示</em>" 简化成"<em>研究<strong>不可约</strong> 表示</em>"——后者数目<em>有限</em>（事实上等于<a href="ch6.html">第 6 章</a>讲的<em>共轭类</em> 数）。</p>
 
-<p>这就是为什么<em>Fourier 级数</em>本质是"\(\mathbb{Z}/n\) 的不可约表示按 \(\zeta^{jk}\) 编码"——Fourier 分析是"交换群表示论"的几何化。</p>
+<p>所以"<em>分类 \(G\) 的所有表示</em>" = "<em>分类 \(G\) 的不可约表示</em>" = 一个<em>有限</em> 列表。这个列表叫 \(G\) 的<strong>字符表</strong>（character table），是 \(G\) 的"<em>身份证</em>"。</p>
+
+<h2 id="sec24-7">24.7 例：\(\mathbb{Z}_n\) 的不可约表示</h2>
+
+<p>把上一节用到具体的群上。先做最简单的 \(\mathbb{Z}_n\)。</p>
+
+<p>\(\mathbb{Z}_n\) 阿贝尔——所以由"<em>有限阿贝尔群所有不可约表示 1 维</em>" 这条事实，\(\mathbb{Z}_n\) 的不可约表示就是<em>群同态</em> \(\rho_k : \mathbb{Z}_n \to \mathbb{C}^*\)。要 \(\rho_k(1)^n = \rho_k(n) = \rho_k(0) = 1\)，所以 \(\rho_k(1)\) 是 \(n\) 次单位根，即 \(\zeta^k\) where \(\zeta = e^{2\pi i / n}\)，\(k = 0, 1, \ldots, n - 1\)。</p>
+
+<p>\(n\) 个不可约表示：\(\rho_k(j) = \zeta^{kj}\)。\(k = 0\) 是<em>平凡</em> 表示（所有元素映到 1）。\(k = 1, \ldots, n-1\) 是非平凡的。</p>
+
+<p>例 \(\mathbb{Z}_4\)：4 个不可约表示，由 \(\rho_k(1) \in \{1, i, -1, -i\}\) 给出。</p>
+
+<p>例 \(\mathbb{Z}_3\)：3 个不可约表示，由 \(\rho_k(1) \in \{1, \omega, \omega^2\}\) 给出（\(\omega = e^{2\pi i/3}\)）——上一节看过的。</p>
+
+<p>这个表是<em>离散 Fourier 变换</em> 的根——把函数 \(f : \mathbb{Z}_n \to \mathbb{C}\) 写成 \(\sum_k \hat f(k) \rho_k\)，系数 \(\hat f(k)\) 就是 DFT 系数（详见<a href="../数值方法/ch24.html">数值方法 ch24 FFT</a>）。FFT 的"<em>计算</em>" 视角和这里的"<em>表示分解</em>" 视角是同一回事——\(\mathbb{C}^{\mathbb{Z}_n}\)（\(n\) 维向量空间）按 \(\mathbb{Z}_n\)-不可约表示分解 = DFT 的"频率分解"。</p>
 
 <h2 id="sec24-8">24.8 例：\(S_3\) 的不可约表示</h2>
 
-<p>取 \(G = S_3\)（3 阶置换群，6 个元素），\(k = \mathbb{C}\)。</p>
+<p>非阿贝尔的最小例子：\(S_3 = D_3\)（3 元素的对称群 = 等边三角形的对称群），6 个元素。</p>
 
-<p>\(S_3\) 的不可约 \(\mathbb{C}\) 表示<em>恰好</em>有三个：</p>
+<p>\(S_3\) 的共轭类：\(\{e\}\)（1 个元素）、\(\{(12), (13), (23)\}\)（3 个 transpositions）、\(\{(123), (132)\}\)（2 个 3-cycles）。共 3 个共轭类。</p>
 
-<p>\[\boxed{\ \text{不可约}\ S_3\text{-表示}: \quad \text{平凡}\ (\dim 1) \oplus \text{符号}\ (\dim 1) \oplus \text{标准}\ (\dim 2).\ }\]</p>
+<p>事实（不证）：<em>共轭类数 = 不可约表示数</em>。所以 \(S_3\) 有 3 个不可约表示。</p>
 
-<p>具体写出：</p>
+<p>它们是哪些？</p>
 
-<p><strong>(1) 平凡表示 \(\rho_{\text{triv}}\)。</strong>所有 \(\sigma \in S_3\) 送到 \(1\)。维数 1。</p>
+<p><strong>1：平凡表示</strong>。\(\rho_{\text{triv}}(\sigma) = 1\) 对所有 \(\sigma\)。1 维。</p>
 
-<p><strong>(2) 符号表示 \(\rho_{\text{sgn}}\)。</strong>送 \(\sigma\) 到 \(\text{sgn}(\sigma) \in \{\pm 1\}\)（偶置换 \(+1\)、奇置换 \(-1\)）。维数 1。</p>
+<p><strong>2：符号表示</strong>。\(\rho_{\text{sgn}}(\sigma) = \mathrm{sgn}(\sigma) = \pm 1\)（偶置换 +1，奇置换 -1，<a href="ch9.html">第 9 章</a>讲过）。1 维。</p>
 
-<p><strong>(3) 标准表示 \(\rho_{\text{std}}\)（二维）。</strong>取 \(V_0 = \{(x, y, z) \in \mathbb{R}^3 : x + y + z = 0\}\)（2 维子空间）。\(S_3\) 在 \(\mathbb{R}^3\) 上的置换表示限制到 \(V_0\) 上不变（\(S_3\) 保持坐标和），且这个限制不可约。</p>
+<p><strong>3：标准表示</strong>。这个是<em>2 维</em>。把 \(S_3\) 看成等边三角形的对称群，作用在 2D 平面上（保持中心不动）。具体的，\(S_3\) 自然作用在 \(\mathbb{R}^3 = \{(x_1, x_2, x_3)\}\) 上（置换坐标）；这个 3 维表示<em>可约</em>——分解为 1 维"<em>所有坐标相等</em>" 子空间（\(\{(t, t, t)\}\)）+ 2 维"<em>坐标和为 0</em>" 子空间（\(\{(x_1, x_2, x_3) : \sum x_i = 0\}\)）。后者就是<em>2 维标准表示</em>。</p>
 
-<p>验证维数和正确：\(|S_3| = 6 = 1^2 + 1^2 + 2^2\)。这是<em>表示论的基本恒等式</em>"\(|G| = \sum (\dim \rho_i)^2\)" 对 \(S_3\) 的实例——它表明上面三个不可约就是<em>全部</em>。</p>
+<p>验证：\(1^2 + 1^2 + 2^2 = 6 = |S_3|\)——这是<em>不可约表示维数平方和等于群阶</em> 的一般规律（"<em>维数平方和定理</em>"）。\(S_3\) 的<em>整张分类</em>：</p>
 
-<p><em>另一种看法。</em>\(S_3 \cong D_3\)（正三角形对称群），所以 \(S_3\) 的二维标准表示<em>就是</em>正三角形上"旋转 + 反射"的几何作用——你可以看见 \(\rho_{\text{std}}(r) = \begin{pmatrix} \cos 2\pi/3 & -\sin 2\pi/3 \\ \sin 2\pi/3 & \cos 2\pi/3 \end{pmatrix}\)，\(\rho_{\text{std}}(s) = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}\)。</p>
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 0.8em; border: 1px solid #ccc;">\(S_3\) 不可约表示</th><th style="padding: 0.3em 0.8em; border: 1px solid #ccc;">维数</th><th style="padding: 0.3em 0.8em; border: 1px solid #ccc;">在 \(e\) 上字符</th><th style="padding: 0.3em 0.8em; border: 1px solid #ccc;">在 \((12)\) 上字符</th><th style="padding: 0.3em 0.8em; border: 1px solid #ccc;">在 \((123)\) 上字符</th></tr>
+<tr><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">平凡 \(\rho_{\text{triv}}\)</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">1</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">1</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">1</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">1</td></tr>
+<tr><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">符号 \(\rho_{\text{sgn}}\)</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">1</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">1</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">−1</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">1</td></tr>
+<tr><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">标准 \(\rho_{\text{std}}\)</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">2</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">2</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">0</td><td style="padding: 0.3em 0.8em; border: 1px solid #ccc;">−1</td></tr>
+</table>
 
-<p>这是<em>有限非交换群</em>表示论最简单的非平凡实例——一个非一维的不可约。\(S_n\)（\(n \ge 3\)）总有非一维不可约（因 \(S_n\) 非交换）；它们的完整分类（"Specht 模"理论）超出本书。</p>
+<p>每行的"<em>字符</em>"（character）= 矩阵的<em>迹</em>。字符<em>类函数</em>——只依赖共轭类，不依赖具体元素。这张表叫<em>\(S_3\) 的字符表</em>。它<em>完全</em> 决定了 \(S_3\) 的所有表示——任何 \(S_3\)-表示分解为这三个不可约的直和，每个出现的<em>重数</em> 由字符内积公式给出。</p>
 
-<h2 id="sec24-9">24.9 表示论在量子力学中：能级简并</h2>
+<p>这种"<em>字符表</em>" 是有限群的核心数据。\(S_n\) 的字符表 100 多年来研究透彻，与组合学（Young 表、对称函数）联系紧密。\(GL_n(\mathbb{F}_q)\) 的字符表是 20 世纪表示论的高峰之一（Deligne-Lusztig，1976）。</p>
 
-<p>表示论在物理里最直接的应用是<em>能级简并</em>分析。</p>
+<h2 id="sec24-9">24.9 物理：哈密顿对称群的不可约 ↔ 能级简并</h2>
 
-<p>设量子系统的哈密顿算子 \(\hat H\) 与某群 \(G\)（"系统的对称群"）<em>对易</em>——即每个 \(g \in G\) 给一个酉算子 \(U(g)\) 满足 \(U(g) \hat H = \hat H U(g)\)。则 \(\hat H\) 的<em>每个</em>特征空间</p>
+<p>表示论<em>不</em> 是数学家的玩具——它是<em>量子力学的语言</em>。这一节给一段简短的说明，让你看见这种联系。</p>
 
-<p>\[
-V_E = \{\psi : \hat H \psi = E \psi\}
-\]</p>
+<p>设一个量子系统的哈密顿算子（Hamiltonian）\(H\) 作用在 Hilbert 空间 \(\mathcal H\) 上。能级是 \(H\) 的特征值，每个特征值的特征空间是该能级的"<em>态</em>" 空间。</p>
 
-<p>在 \(G\) 的作用下不变（如果 \(\hat H \psi = E \psi\) 那么 \(\hat H (U(g) \psi) = U(g) \hat H \psi = E (U(g) \psi)\)），所以 \(V_E\) 自带一个 \(G\) 表示。</p>
+<p>设 \(G\) 是<em>哈密顿的对称群</em>——即所有对易于 \(H\) 的酉算子组成的群（\([U, H] = 0\)，即 \(U H U^{-1} = H\)）。\(G\) 自然作用在 \(\mathcal H\) 上——作用是表示。</p>
 
-<p><em>能级简并度</em> \(= \dim V_E\)，<em>恰好等于</em> \(V_E\) 上 \(G\)-表示作为不可约表示直和的总维数。如果 \(V_E\) 是<em>不可约</em> \(G\)-表示，简并度 \(= \dim\)（"<em>本质简并</em>"——由对称性强制）。如果 \(V_E\) 是若干不同不可约的直和或重复，那是"<em>偶然简并</em>"——需要别的解释（额外的隐藏对称）。</p>
+<p>关键观察：<em>每个能级特征空间是 \(G\) 的子表示</em>。理由：\(H \psi = E \psi \Rightarrow H (U \psi) = U H \psi = E (U \psi)\)，所以 \(U \psi\) 也是能级 \(E\) 的特征向量。\(U\) 把 \(E\)-特征空间映到自身。</p>
 
-<p>典型例子：</p>
+<p>结合 Maschke 类型分解：每个能级特征空间分解为<em>\(G\) 的不可约表示</em> 的直和。<em>"典型的"</em> 物理系统里，每个能级特征空间是<em>单一</em> 不可约表示——其维数就是<em>能级简并度</em>。</p>
+
+<p>翻译：</p>
 
 <ul>
-  <li><strong>氢原子</strong>对称群 \(\mathrm{SO}(3)\)（球对称）。\(\mathrm{SO}(3)\) 的不可约表示按角动量量子数 \(\ell = 0, 1, 2, \ldots\) 分类，维数 \(2\ell + 1\)。氢原子能级 \(E_n = -13.6/n^2\) eV，简并度 \(n^2 = \sum_{\ell=0}^{n-1} (2\ell + 1)\)——但这超出 \(\mathrm{SO}(3)\) 本质简并（\(2\ell + 1\)）。差距由"氢原子的隐藏 \(\mathrm{SO}(4)\) 对称"解释（Pauli 1926 的 Runge–Lenz 向量论证）。</li>
-  <li><strong>晶体里的电子能带</strong>：晶格的空间群对称强制 Bloch 波在<em>布里渊区高对称点</em>处的能级按空间群不可约表示分类。这是固体物理"能带理论"的群论根。</li>
+  <li><em>能级简并度 = 不可约表示维数</em>。</li>
+  <li><em>不同的不可约 = 不同的"对称类型"</em>，对应物理上不同的<em>量子数</em>（角动量、自旋、奇偶等）。</li>
+  <li><em>对称破缺</em>（\(G\) 减小到子群 \(G'\)）让大不可约分解成 \(G'\) 的几个小不可约——<em>能级"分裂"</em>（splitting）。这是 Stark 效应（电场分裂氢原子能级）和 Zeeman 效应（磁场分裂能级）的群论解释。</li>
 </ul>
 
-<p>这种"<em>对称 \(\Rightarrow\) 不可约表示分类 \(\Rightarrow\) 能级简并</em>"链条是 Wigner 1931 年开创的《群论及其在原子光谱量子力学的应用》的核心思路。它把抽象的群表示论变成<em>可观察的物理量</em>。</p>
+<p>具体例。氢原子在球对称势 \(V(r)\) 下的对称群是 \(SO(3)\)（3D 旋转）。\(SO(3)\) 的不可约表示用<em>角动量</em> \(\ell = 0, 1, 2, \ldots\) 标号，第 \(\ell\) 个不可约维数 \(2\ell + 1\)。所以氢原子能级简并度是 \(2\ell + 1\)（\(s, p, d, f\) 轨道分别 1, 3, 5, 7 重简并）——<em>这条事实 100% 由 \(SO(3)\) 的表示论决定，和具体势 \(V\) 无关</em>，只要球对称就这样。</p>
 
-<p>这本书到此结束。希望你建立起的不是若干公式的清单，而是一种<em>看待代数结构的方式</em>——把"对称""运算""分类"翻译成群、环、域、模这四个核心对象，意识到它们让 Galois 那种"用代数证明不可能"的成就变得可计算。把 Sylow 那种"分类小阶群"的工艺变得有套路。把 Maschke 那种"分解表示成不可约"的策略变得普适。</p>
+<p>加磁场后球对称破缺到 \(SO(2)\)（绕磁场轴旋转），原 \(2\ell + 1\) 重简并分裂成 \(2\ell + 1\) 个不同能级——Zeeman 效应。整套预测<em>不算薛定谔方程</em>，纯靠群论。这就是 Wigner、Weyl 1920 年代把表示论引入量子力学的<em>核心洞察</em>，至今是粒子物理"<em>标准模型</em>" 的基本工具——夸克的<em>味道</em>对称是 \(SU(3)\)、电弱<em>规范</em>对称是 \(SU(2) \times U(1)\)、整套粒子按这些群的不可约表示分类。</p>
 
-<p>更重要的，是让你<em>看见</em>代数对象在它们出现的每个新场合——线性代数的 Jordan 标准形（PID 模结构）、复分析的代数闭包（Galois 理论）、泛函分析的算子代数（环论）、密码学（有限域）、晶体学（有限群）、量子力学（表示论）——背后都是同一套抽象骨架在运作。这种"<em>抽象骨架</em>" 的统一性，是数学最美的部分；抽象代数的存在意义就是把它说清。</p>
+<h2 id="sec24-10">24.10 收尾</h2>
 
-<p>祝你以后遇到代数结构时，能脑子里立刻浮起这本书里的画面——那就是它存在的意义。</p>
+<p>本书结束了。让我把全书的<em>骨架</em> 在这里再串一遍，让你带走的不是一份"<em>定理清单</em>"，而是一种<em>看待数学结构的方式</em>。</p>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：编码理论与有限域</a><span class="nav-disabled">下一章 →</span></nav>
+<p>抽象代数<em>不</em> 是关于群、环、域、模这四个对象——这四个对象本身只是名词。它是关于<em>把"对称""运算""分类" 这三个想法翻译成可计算的代数对象</em>。</p>
+
+<ul>
+  <li><em>对称</em> 是<em>群</em>。从六边形 12 个对称（<a href="ch1.html">第 1 章</a>）到 \(SO(3)\)（这一章），群是"<em>保持结构的可逆变换</em>" 的统称。</li>
+  <li><em>运算</em>（加 + 乘）是<em>环</em>。从 \(\mathbb{Z}\) 和 \(k[x]\)（<a href="ch11.html">第 11 章</a>）到 \(\mathbb{F}_q\)（<a href="ch23.html">第 23 章</a>），环是"<em>有两种相容运算的代数对象</em>" 的统称。</li>
+  <li><em>线性结构</em> over 任意基础对象是<em>模</em>。从 \(\mathbb{Z}\)-模 = 阿贝尔群到 \(k\)-模 = 向量空间到 PID 上模结构定理（<a href="ch17.html">第 17 章</a>），模是"<em>把线性代数推广到任意环上</em>" 的语言。</li>
+  <li><em>分类</em> 是<em>域扩张 + Galois 理论</em>。从代数扩张 / 分裂域（<a href="ch18.html">第 18 章</a>到<a href="ch20.html">20 章</a>）到 Galois 主定理（<a href="ch21.html">第 21 章</a>）到尺规 / 五次方程（<a href="ch22.html">第 22 章</a>），Galois 理论给"<em>什么数学问题在某种意义下可解</em>" 一个精确答案。</li>
+</ul>
+
+<p>每升一层（群 → 环 → 域 → 模 → Galois），你能<em>分类</em> 的对象越精细。这就是抽象代数的目的——<em>不</em> 是教你算特定题目，<em>是</em>教你"<em>把所有可能的此类对象分成有限种</em>"。一旦分类到位，新对象出现时你立刻知道它"<em>必须长什么样</em>"。</p>
+
+<p>我希望读完这 24 章后，你不会觉得"群 / 环 / 域" 是被强加的抽象——它们应该感觉像<em>你前 23 章一直在数的东西</em>。<a href="ch1.html">第 1 章</a>那块六边形数 12 个对称，<a href="ch23.html">第 23 章</a>用 \(\mathbb{F}_8\) 做 Reed-Solomon，<a href="ch24.html">这一章</a>用 \(SO(3)\) 解释氢原子简并——这<em>都是同一件事</em>，只是规模和应用变。这是抽象代数最有力的地方：<em>同一套语言，跨数学和物理几乎所有领域</em>。</p>
+
+<p>感谢你陪这本书走完。下次你再听到"群论""有限域""Galois""表示"——这些词应该不再是吓人的术语，而是你已经认识的老朋友。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：编码理论与有限域</a><a href="appA.html">下一章 · 附录 A 集合、关系、等价类速查 →</a></nav>
 </main>
 </body>
 </html>

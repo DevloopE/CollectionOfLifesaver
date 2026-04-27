@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 23 章 应用：编码理论与有限域 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 应用 Galois：尺规作图与五次方程不可解</a><a href="ch24.html">下一章 · 第 24 章 应用：晶体学与表示论入门 →</a></nav>
+<h1 id="ch23">第 23 章 应用：编码理论与有限域</h1>
+
+<p>信息时代的密码学和纠错码都建立在<em>有限域</em>上。\(\mathbb{F}_p\) 我们已经在<a href="ch12.html">第 12 章</a>遇到过——\(\mathbb{Z}/p\mathbb{Z}\) 当 \(p\) 是素数时就是一个有 \(p\) 个元素的域。但很多实际应用——CD 上的 Reed–Solomon 纠错、AES 加密、QR 码——用的不是这种"小"有限域，而是元素个数为 \(2^8 = 256\) 或 \(2^{16}\) 这样的有限域。\(\mathbb{F}_{256}\) 不可能是 \(\mathbb{Z}/256\mathbb{Z}\)，因为后者根本不是域（\(2 \cdot 128 = 0\)）。它是另一种东西——\(\mathbb{F}_2\) 上一个 8 次不可约多项式的"根所在的域"。</p>
+
+<p>本章把这种"非素数阶有限域"具体地构造出来，看它的几条关键性质——存在唯一性、循环乘法群、Frobenius 自同构——然后应用到三个本科生应该知道的代数情境：Reed–Solomon 纠错码、RSA 公钥加密、Diffie–Hellman 密钥交换。这些都是 20 世纪后半叶最重要的几个"代数变成日常技术"的故事，而它们用到的代数恰好是前 22 章建立起来的。</p>
+
+<ul>
+  <li>有限域基本事实：\(|F| = p^n\) 必为素数幂，同阶有限域同构。</li>
+  <li>具体构造：\(\mathbb{F}_q = \mathbb{F}_p[x]/(g(x))\)，\(g\) 是 \(\mathbb{F}_p[x]\) 中 \(n\) 次不可约多项式。</li>
+  <li>小例子：\(\mathbb{F}_4, \mathbb{F}_8, \mathbb{F}_9\) 一行行算出来。</li>
+  <li>Frobenius 自同构 \(\sigma : x \mapsto x^p\)；Galois 群 \(\operatorname{Gal}(\mathbb{F}_{p^n}/\mathbb{F}_p) \cong \mathbb{Z}/n\mathbb{Z}\)。</li>
+  <li>\(\mathbb{F}_q^\times\) 是循环群——这是离散对数与公钥密码学的根。</li>
+  <li>Reed–Solomon 纠错码：用多项式求值给出最小距离 \(n - k + 1\) 的码。</li>
+  <li>RSA 加密原理：欧拉函数 + 模幂 + 素因子分解的难度。</li>
+  <li>Diffie–Hellman 密钥交换：基于 \(\mathbb{F}_p^\times\) 的离散对数难。</li>
+</ul>
+
+<h2 id="sec23-1">23.1 有限域的基本事实</h2>
+
+<p>我们之前知道 \(\mathbb{F}_p = \mathbb{Z}/p\mathbb{Z}\) 当 \(p\) 素数时是域，有 \(p\) 个元素。问题是：能不能有别的<em>有限</em>域？比方说有 4、8、9、256 个元素的域？答案是肯定的，但有<em>限制</em>——\(|F|\) 必须是某个素数 \(p\) 的方幂。</p>
+
+<p><strong>定理。</strong>设 \(F\) 是任意有限域。则 \(|F| = p^n\) 对某素数 \(p\) 与正整数 \(n\)。\(p\) 是 \(F\) 的<em>特征</em>（即满足 \(p \cdot 1 = 0\) 的最小正整数）。</p>
+
+<p>证明草图：\(F\) 含有素子域 \(\mathbb{F}_p\)（\(F\) 的"\(1\)"生成的加法子群必为 \(\mathbb{Z}/m\mathbb{Z}\) 某 \(m\)，\(F\) 是域强制 \(m\) 是素数，记 \(p\)）。\(F\) 是 \(\mathbb{F}_p\) 上的向量空间，必为有限维（\(F\) 有限），设 \(\dim_{\mathbb{F}_p} F = n\)，则 \(|F| = p^n\)。</p>
+
+<p>反过来——对每个素数幂 \(q = p^n\)，<em>存在</em>且<em>唯一</em>的 \(q\) 阶有限域，记作 \(\mathbb{F}_q\)（也写作 \(\mathrm{GF}(q)\)，"Galois Field"）。</p>
+
+<p>\[\boxed{\ |F| < \infty \ \Longleftrightarrow\ |F| = p^n,\quad p\ \text{素数};\ \mathbb{F}_q\ \text{在同构意义下唯一}.\ }\]</p>
+
+<p>同构唯一性是非平凡的事实——它意味着不管你<em>怎么</em>构造 256 阶有限域（用 \(x^8 + x^4 + x^3 + x + 1\) 还是别的不可约多项式），最后得到的域都"相同"。我们在 23.2 节看具体怎么构造，证明放到 23.4 节后。</p>
+
+<h2 id="sec23-2">23.2 \(\mathbb{F}_q\) 的具体构造</h2>
+
+<p>有限域的构造完全平行于 \(\mathbb{C} = \mathbb{R}[x] / (x^2 + 1)\)：</p>
+
+<p><strong>构造。</strong>设 \(p\) 素数，\(g(x) \in \mathbb{F}_p[x]\) 是<em>不可约</em>多项式，\(\deg g = n\)。则商环</p>
+
+<p>\[
+\mathbb{F}_q := \mathbb{F}_p[x] / (g(x))
+\]</p>
+
+<p>是有 \(q = p^n\) 个元素的域。</p>
+
+<p>验证：(i) \((g)\) 是 \(\mathbb{F}_p[x]\) 的<em>极大</em>理想（因为 \(\mathbb{F}_p[x]\) 是 PID 且 \(g\) 不可约——见<a href="ch14.html">第 14 章</a>）；(ii) 商环 \(\mathbb{F}_p[x]/(g)\) 是域（极大理想商即为域，<a href="ch12.html">第 12 章</a>）；(iii) 元素是 \(\mathbb{F}_p[x]\) 中模 \(g\) 的剩余类，每类有唯一代表 \(a_0 + a_1 x + \cdots + a_{n-1} x^{n-1}\)，\(a_i \in \mathbb{F}_p\)，共 \(p^n\) 个。</p>
+
+<p>关键：你需要存在<em>不可约</em> \(n\) 次多项式 \(g \in \mathbb{F}_p[x]\)。这非平凡但成立——对任意 \(p, n\) 都有。我们暂且接受。</p>
+
+<h2 id="sec23-3">23.3 例：\(\mathbb{F}_4, \mathbb{F}_8, \mathbb{F}_9\) 的具体写法</h2>
+
+<p><strong>例 \(\mathbb{F}_4\)。</strong>取 \(p = 2, n = 2\)。要找 \(\mathbb{F}_2[x]\) 中 2 次不可约多项式。\(\mathbb{F}_2[x]\) 中所有 2 次首一多项式是 \(x^2, x^2 + 1, x^2 + x, x^2 + x + 1\)。前三个有 0 或 1 当根（\(x^2 + 1 = (x+1)^2\) in char 2），所以可约。<em>\(x^2 + x + 1\) 没有 \(\mathbb{F}_2\) 中的根</em>（代入 0 得 1，代入 1 得 1），所以不可约。</p>
+
+<p>所以 \(\mathbb{F}_4 = \mathbb{F}_2[x]/(x^2 + x + 1)\)。设 \(\alpha = \bar x\)（\(x\) 在商中的像），则 \(\alpha^2 = \alpha + 1\)（在 char 2 下 \(-1 = 1\)）。\(\mathbb{F}_4\) 的四个元素：\(0, 1, \alpha, \alpha + 1\)。乘法表（用 \(\alpha^2 = \alpha + 1\) 化简）：</p>
+
+<p>\[
+\alpha \cdot \alpha = \alpha + 1, \quad \alpha (\alpha + 1) = \alpha^2 + \alpha = (\alpha + 1) + \alpha = 1, \quad (\alpha + 1)^2 = \alpha^2 + 1 = \alpha.
+\]</p>
+
+<p>注意 \(\alpha \cdot (\alpha + 1) = 1\)——所以 \(\alpha + 1 = \alpha^{-1}\)。</p>
+
+<p><strong>例 \(\mathbb{F}_8\)。</strong>取 \(p = 2, n = 3\)。需要 \(\mathbb{F}_2[x]\) 中 3 次不可约。一个标准选择 \(g(x) = x^3 + x + 1\)（验证：\(g(0) = 1, g(1) = 1\)，无 \(\mathbb{F}_2\) 根，3 次无根即不可约）。</p>
+
+<p>\(\mathbb{F}_8 = \mathbb{F}_2[x]/(x^3 + x + 1)\)，元素是 \(a_0 + a_1 \alpha + a_2 \alpha^2\)，\(a_i \in \mathbb{F}_2\)，共 8 个，\(\alpha^3 = \alpha + 1\)。</p>
+
+<p><strong>例 \(\mathbb{F}_9\)。</strong>取 \(p = 3, n = 2\)。需要 \(\mathbb{F}_3[x]\) 中 2 次不可约。最简单 \(g(x) = x^2 + 1\)（验证：\(g(0) = 1, g(1) = 2, g(2) = 2\)，无 \(\mathbb{F}_3\) 根）。所以</p>
+
+<p>\[
+\mathbb{F}_9 = \mathbb{F}_3[x]/(x^2 + 1) = \{a + bi : a, b \in \mathbb{F}_3\}, \quad i^2 = -1 = 2.
+\]</p>
+
+<p>注意这是 "\(\mathbb{F}_3\) 上的 \"复数\""——和 \(\mathbb{C} = \mathbb{R}[i]\) 完全平行。</p>
+
+<p>这里有个反差值得注意：\(\mathbb{Z}/4\mathbb{Z}\) <em>不是</em>域（\(2 \cdot 2 = 0\)），但 \(\mathbb{F}_4\) 是域；它们都有 4 个元素，但加法和乘法结构完全不同。一定要把"\(p^n\) 阶有限域"和"模 \(p^n\) 整数环"区分开。</p>
+
+<h2 id="sec23-4">23.4 Frobenius 自同构与 \(\operatorname{Gal}(\mathbb{F}_q/\mathbb{F}_p)\)</h2>
+
+<p>有限域 \(\mathbb{F}_q\)（\(q = p^n\)）有一个奇特的"自带"自同构。</p>
+
+<p><strong>定义（Frobenius 自同构）。</strong>映射</p>
+
+<p>\[
+\sigma : \mathbb{F}_q \to \mathbb{F}_q, \quad \sigma(x) = x^p
+\]</p>
+
+<p>是一个域自同构。</p>
+
+<p>验证：(乘法) \((xy)^p = x^p y^p\) 显然。(加法) \((x + y)^p = \sum_{k=0}^p \binom{p}{k} x^k y^{p-k}\)；二项系数 \(\binom{p}{k}\) 当 \(0 < k < p\) 时被 \(p\) 整除（因为 \(p\) 素数，分子 \(p!\) 含 \(p\) 而分母不含），所以这些项在 \(\mathbb{F}_q\)（特征 \(p\)）中为 0。剩下 \(x^p + y^p\)。</p>
+
+<p>这条 "\((x + y)^p = x^p + y^p\) in characteristic \(p\)" 被叫做<em>Frobenius 的小学生梦</em>（freshman's dream），是有限特征代数最基本的奇景。</p>
+
+<p><strong>定理。</strong>\(\mathbb{F}_q\) 在 \(\mathbb{F}_p\) 上是 Galois 扩张，</p>
+
+<p>\[
+\boxed{\ \operatorname{Gal}(\mathbb{F}_{p^n}/\mathbb{F}_p) = \langle \sigma \rangle \cong \mathbb{Z}/n\mathbb{Z},\ }
+\]</p>
+
+<p>由 Frobenius 生成，阶为 \(n\)。</p>
+
+<p>证明草图：\(\sigma\) 固定 \(\mathbb{F}_p\)（Fermat 小定理 \(a^p = a\) 对 \(a \in \mathbb{F}_p\)，详见 23.5 节）。\(\sigma\) 的不动点是 \(\{x : x^p = x\}\)，是多项式 \(x^p - x\) 的根集；这多项式 \(p\) 次最多 \(p\) 根，且 \(\mathbb{F}_p\) 已给出 \(p\) 个根，所以不动点恰好是 \(\mathbb{F}_p\)。\(\sigma^n(x) = x^{p^n} = x^q = x\)（任意 \(x \in \mathbb{F}_q\)，因 \(\mathbb{F}_q^\times\) 阶 \(q - 1\)，所以 \(x^{q-1} = 1\) 对非零 \(x\)，进而 \(x^q = x\) 对所有 \(x\)），所以 \(\sigma^n = \text{id}\)。\(\sigma\) 阶 \(n\)（如果 \(\sigma^k = \text{id}\) 对 \(k < n\) 则 \(x^{p^k} = x\) 对所有 \(\mathbb{F}_q\) 成员，但 \(x^{p^k} - x\) 只 \(p^k < p^n = q\) 根，矛盾）。再由 \(|\operatorname{Gal}| \le [\mathbb{F}_q : \mathbb{F}_p] = n\)（<a href="ch21.html">第 21 章</a>），等号成立。</p>
+
+<p>这给了一个最干净的 Galois 实例——Galois 群<em>循环</em>。子群对应中间域：\(\langle \sigma^d \rangle\)（\(d \mid n\)）的固定域是 \(\mathbb{F}_{p^d}\)，于是中间域恰好是 \(\mathbb{F}_q\) 的<em>所有</em>包含 \(\mathbb{F}_p\) 的子域，按 \(d \mid n\) 一一对应。中间域是 \(\mathbb{F}_q\) 中"\(x^{p^d} = x\)"的解集——你能直接<em>看</em>到 Galois 对应在算什么。</p>
+
+<h2 id="sec23-5">23.5 \(\mathbb{F}_q^\times\) 是循环群</h2>
+
+<p>\(\mathbb{F}_q\) 的非零元构成乘法群 \(\mathbb{F}_q^\times\)，阶 \(q - 1\)。一个深刻的事实是：</p>
+
+<p><strong>定理。</strong>\(\mathbb{F}_q^\times\) 是循环群。</p>
+
+<p>\[\boxed{\ \mathbb{F}_q^\times \cong \mathbb{Z}/(q-1)\mathbb{Z}.\ }\]</p>
+
+<p>它的生成元被叫做\(\mathbb{F}_q\) 的"<strong>原根</strong>"或"本原元"。</p>
+
+<p>证明：\(\mathbb{F}_q^\times\) 是有限交换群，由<a href="ch8.html">第 8 章</a>的结构定理它同构于 \(\mathbb{Z}/d_1 \times \cdots \times \mathbb{Z}/d_k\)（\(d_1 \mid d_2 \mid \cdots\)）。设 \(d := d_k\) 是最大不变因子；则<em>每个</em>元素 \(g \in \mathbb{F}_q^\times\) 满足 \(g^d = 1\)。即多项式 \(x^d - 1\) 在 \(\mathbb{F}_q\) 中有 \(q - 1\) 个根。但 \(x^d - 1\) 在域上至多 \(d\) 个根，所以 \(d \ge q - 1\)；又 \(d \le q - 1\)（每个 \(d_i \le d\)，\(\prod d_i = q - 1\) 强制 \(k = 1\)），得 \(d = q - 1\) 且 \(k = 1\)，即整体循环。</p>
+
+<p>顺便还得到 <strong>Fermat 小定理</strong>的有限域版：</p>
+
+<p>\[\boxed{\ \forall x \in \mathbb{F}_q^\times,\ x^{q-1} = 1; \quad \forall x \in \mathbb{F}_q,\ x^q = x.\ }\]</p>
+
+<p><strong>例。</strong>\(\mathbb{F}_7^\times\) 阶 6。\(g = 3\) 是原根：\(3^1 = 3, 3^2 = 2, 3^3 = 6, 3^4 = 4, 3^5 = 5, 3^6 = 1\)（mod 7）——遍历 \(\{1, 2, 3, 4, 5, 6\}\)。</p>
+
+<p><strong>例。</strong>\(\mathbb{F}_4^\times\) 阶 3，循环。任何非单位元都是生成元——\(\alpha\) 与 \(\alpha + 1 = \alpha^2\) 都是原根。</p>
+
+<p>这条循环性是密码学应用的基础——见 23.7、23.8 节。</p>
+
+<h2 id="sec23-6">23.6 Reed–Solomon 纠错码</h2>
+
+<p>"<em>纠错码</em>" 解决一个具体问题：你要在嘈杂信道（无线电、CD 划痕、卫星信号）上传输信息，传过去的若干位会被错改；你希望编码 + 解码能"自动修复"少量错误。最好的纠错码之一是 Reed 与 Solomon 1960 年提出的，其代数核心就是有限域多项式的求值。</p>
+
+<p>设 \(q\) 是有限域阶（实践中 \(q = 256\)），\(\alpha_1, \ldots, \alpha_n \in \mathbb{F}_q\) 是 \(n\) 个不同的元素（\(n \le q\)）。要发送的"<em>消息</em>"是一个长度 \(k\) 的向量 \((m_0, m_1, \ldots, m_{k-1}) \in \mathbb{F}_q^k\)（\(k \le n\)）。</p>
+
+<p><strong>编码。</strong>把消息打包成多项式</p>
+
+<p>\[
+m(x) = m_0 + m_1 x + \cdots + m_{k-1} x^{k-1} \in \mathbb{F}_q[x],
+\]</p>
+
+<p>把它在 \(\alpha_1, \ldots, \alpha_n\) 处求值，发送向量</p>
+
+<p>\[
+\mathbf{c} = (m(\alpha_1), m(\alpha_2), \ldots, m(\alpha_n)) \in \mathbb{F}_q^n.
+\]</p>
+
+<p>这就是<strong>Reed–Solomon 码字</strong>。</p>
+
+<p><strong>解码（理想情形）。</strong>接收到 \(\mathbf{c}\) 后，从 \(n\) 个值 \((m(\alpha_i))\) 通过插值还原 \(m(x)\)（\(k\) 个未知系数，\(n \ge k\) 个方程，有解唯一）。</p>
+
+<p><strong>关键性质（最小距离）。</strong>两个不同消息 \(m, m'\) 给出的码字 \(\mathbf{c}, \mathbf{c}'\) 在<em>最多</em> \(k - 1\) 个位置上相同——因为差 \(m - m'\) 是非零 \(\le k - 1\) 次多项式，最多 \(k - 1\) 个根。所以 \(\mathbf{c}\) 与 \(\mathbf{c}'\) 在<em>至少</em> \(n - (k-1) = n - k + 1\) 个位置上不同。</p>
+
+<p>\[\boxed{\ d_{\min}(\text{Reed–Solomon}) = n - k + 1.\ }\]</p>
+
+<p>这是 \([n, k]\) 线性码的<em>最大可能</em>最小距离（Singleton 上界 \(d \le n - k + 1\)），所以 RS 码达到上界，被称为"最优"码（"<em>MDS code</em>"）。</p>
+
+<p>纠错能力：能纠正 \(\lfloor (n - k)/2 \rfloor\) 个位置的错误（标准纠错半径论证）。具体的纠错算法（Berlekamp–Massey、Sudan、列表解码）超出本书。</p>
+
+<p><strong>实际例子。</strong>CD 上的标准 RS 码用 \(q = 256 = 2^8\)，\(n = 255\)，\(k = 223\)，纠正 \(\lfloor 32/2 \rfloor = 16\) 字节错误每帧。这就是为什么 CD 上小划痕不影响播放——音乐数据由 RS 码<em>预先冗余</em>过。</p>
+
+<h2 id="sec23-7">23.7 RSA 公钥加密</h2>
+
+<p>RSA（Rivest–Shamir–Adleman 1977）是世界上最广为部署的公钥加密协议。它的核心代数对象是 \(\mathbb{Z}/n\mathbb{Z}\)（\(n = pq\) 两个大素数的积）+ 欧拉函数。</p>
+
+<p><strong>欧拉函数 \(\varphi(n)\)。</strong>定义为 \(\{1 \le k \le n : \gcd(k, n) = 1\}\) 的元素个数。等价地，\(\varphi(n) = |(\mathbb{Z}/n\mathbb{Z})^\times|\)（模 \(n\) 单位群的阶）。当 \(n = pq\)，\(\varphi(n) = (p-1)(q-1)\)。</p>
+
+<p><strong>欧拉定理。</strong>对 \(\gcd(a, n) = 1\)，\(a^{\varphi(n)} \equiv 1 \pmod{n}\)。（推广<a href="ch3.html">Lagrange 定理</a>到乘法群 \((\mathbb{Z}/n\mathbb{Z})^\times\)。）</p>
+
+<p><strong>RSA 流程。</strong></p>
+
+<ol>
+  <li><strong>密钥生成（接收方做）：</strong>选两个大素数 \(p, q\)（实践中 1024 位以上），计算 \(n = pq\) 与 \(\varphi(n) = (p-1)(q-1)\)。选公钥指数 \(e\) 满足 \(\gcd(e, \varphi(n)) = 1\)（常用 \(e = 65537\)）。计算 \(d \equiv e^{-1} \pmod{\varphi(n)}\)（用 Euclid 算法）。<em>公钥</em> \((n, e)\)，<em>私钥</em> \(d\)。</li>
+  <li><strong>加密（发送方做）：</strong>把消息编码为 \(m \in \mathbb{Z}/n\mathbb{Z}\)，发送密文 \(c = m^e \bmod n\)。</li>
+  <li><strong>解密（接收方做）：</strong>计算 \(m \equiv c^d \pmod{n}\)。</li>
+</ol>
+
+<p><strong>正确性。</strong>\(c^d = m^{ed} = m^{1 + k\varphi(n)}\) 对某 \(k\)（因 \(ed \equiv 1 \pmod{\varphi(n)}\)）。由欧拉定理 \(m^{\varphi(n)} \equiv 1 \pmod n\)（当 \(\gcd(m, n) = 1\)，几乎所有 \(m\) 都满足），所以 \(c^d \equiv m \pmod n\)。</p>
+
+<p><strong>安全性假设。</strong>从公钥 \((n, e)\) 算出私钥 \(d\) 等价于知道 \(\varphi(n) = (p-1)(q-1)\)，进而等价于知道 \(p, q\)——即<em>大整数因子分解</em>。当 \(n\) 大到 2048 位以上，迄今没有已知的多项式时间因子分解算法（<em>除非</em>大规模量子计算机，那是 Shor 算法 1994 的事）。</p>
+
+<p>这条安全性<em>不</em>是被证明的——它只是"目前没人会"。如果哪天有人发明了多项式时间因子分解算法，全世界用 RSA 的服务（HTTPS、VPN、SSH、银行加密）一夜之间都失效。</p>
+
+<h2 id="sec23-8">23.8 Diffie–Hellman 密钥交换</h2>
+
+<p>Diffie–Hellman（1976）解决另一个问题：双方在<em>公开信道</em>上协商一个共同的"会话密钥"，让窃听者就算听到全部通信也算不出来。它的代数基础是 \(\mathbb{F}_p^\times\) 的离散对数。</p>
+
+<p><strong>离散对数问题（DLP）。</strong>给定大素数 \(p\)、原根 \(g \in \mathbb{F}_p^\times\)、与 \(h = g^x \bmod p\)，从 \(p, g, h\) 算出 \(x\)。</p>
+
+<p>"<em>计算</em> \(g^x\)" 容易（快速幂 \(O(\log x)\) 次乘法）；"<em>从 \(g^x\) 反推 \(x\)</em>" 却难——已知最好的离散对数算法（指数演算）是亚指数级，远比 \(O(\log p)\) 慢。这种<em>正向易反向难</em>的不对称性是密码学的根本工具。</p>
+
+<p><strong>Diffie–Hellman 协议。</strong>Alice 与 Bob 公开协议参数 \((p, g)\)。</p>
+
+<ol>
+  <li>Alice 私选 \(a \in \{1, \ldots, p-2\}\)，把 \(A := g^a \bmod p\) 公开发送 Bob。</li>
+  <li>Bob 私选 \(b \in \{1, \ldots, p-2\}\)，把 \(B := g^b \bmod p\) 公开发送 Alice。</li>
+  <li>Alice 计算共享密钥 \(K := B^a = g^{ab} \bmod p\)。</li>
+  <li>Bob 计算共享密钥 \(K := A^b = g^{ab} \bmod p\)。</li>
+</ol>
+
+<p>双方都得到 \(K = g^{ab}\)。窃听者听到 \((p, g, A = g^a, B = g^b)\)，要算 \(g^{ab}\) 必须解离散对数（DH 假设：DLP 难 \(\Rightarrow\) DH 难——这是稍弱的假设）。</p>
+
+<p>这条协议把<em>《抽象代数读本》</em>整本书凝结到一处：你需要"\(\mathbb{F}_p^\times\) 是循环群"才能选 \(g\)；需要"模幂的运算律"\(g^{ab} = (g^a)^b = (g^b)^a\) 让双方能各自算出同一密钥；需要"\(\mathbb{F}_p^\times\) 阶 \(p - 1\)" 来管理密钥空间大小；需要"代数复杂性的不对称"来保证安全。</p>
+
+<p>现代实践常用<em>椭圆曲线</em>上的离散对数（ECDH）替代 \(\mathbb{F}_p^\times\)——同等安全级下密钥更短。但代数原理完全一样：循环群 + 群运算正向易、离散对数反向难。椭圆曲线离散对数本身需要椭圆曲线代数（数论 + 代数几何），是抽象代数后续的自然延伸。</p>
+
+<p>从对称的视角看，本章把"群、环、域"三个核心概念<em>一次性</em>用到了它们各自最炫的应用上：群（\(\mathbb{F}_q^\times\) 循环 + 离散对数）、环（\(\mathbb{Z}/n\mathbb{Z}\) + 欧拉函数 + RSA）、域（\(\mathbb{F}_q\) 上的多项式插值 + Reed–Solomon）。下一章把视角拉到几何与物理——晶体学的<em>有限对称群</em>与量子力学的<em>表示论</em>是抽象代数另两条延伸的方向。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 应用 Galois：尺规作图与五次方程不可解</a><a href="ch24.html">下一章 · 第 24 章 应用：晶体学与表示论入门 →</a></nav>
+</main>
+</body>
+</html>

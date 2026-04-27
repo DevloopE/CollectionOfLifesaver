@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 商群与三大同构定理 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 同态与正规子群</a><a href="ch6.html">下一章 · 第 6 章 群作用、轨道、稳定子 →</a></nav>
+<h1 id="ch5">第 5 章 商群与三大同构定理</h1>
+
+<p>上一章我们看到：每个同态的核都是正规子群。本章把反向的承诺兑现：每个正规子群 \(N \triangleleft G\) 都给出一个真实存在的<em>商群</em> \(G/N\)，并且这个商群恰好是某个同态——商映射 \(\pi : G \to G/N\)——的像。这条"正规子群 \(\Leftrightarrow\) 同态的核 \(\Leftrightarrow\) 商群"的三位一体，把群论中"分解"与"重构"的工具备齐。</p>
+
+<p>三大同构定理是同态分解的<em>标准模板</em>。它们告诉你：每当你在群里写下一个同态，或写下一个子群与正规子群的组合，就立刻有一个对应的同构等式可以读出来。三大同构定理的一个常见用法是<em>不做任何具体计算</em>，仅靠"同构定理 + 阶数对比"，就能识别一个商群的具体面目。这是抽象代数最优雅的"杠杆"之一——你不必把陪集列出来、不必算群表，单凭同态结构就能写下结论。本章给三大定理的完整证明，并立刻演示几个具体应用。</p>
+
+<ul>
+  <li>5.1 节构造商群 \(G/N\)：在陪集集合上定义乘法 \(gN \cdot hN = (gh) N\)，并验证良定义需要 \(N\) 正规。</li>
+  <li>5.2 节验证商群的群公理，并给出第一个具体例子 \(\mathbb{Z}/n\mathbb{Z} = \mathbb{Z}_n\)。</li>
+  <li>5.3 节陈述并完整证明<strong>第一同构定理</strong> \(G / \operatorname{Ker} \varphi \cong \operatorname{Im} \varphi\)。</li>
+  <li>5.4 节用第一同构定理识别若干具体商群：\(GL_n / SL_n \cong \mathbb{R}^*\)、\(SO(3) \cong SU(2)/\{\pm I\}\) 等。</li>
+  <li>5.5 节陈述并完整证明<strong>第二同构定理</strong> \((HN)/N \cong H/(H \cap N)\)。</li>
+  <li>5.6 节陈述并完整证明<strong>第三同构定理</strong> \((G/N)/(M/N) \cong G/M\)。</li>
+  <li>5.7 节用三大同构定理"一行字"算几个具体商群，作为本章的实战演示。</li>
+</ul>
+
+<h2 id="sec5-1">5.1 商群的构造</h2>
+
+<p>设 \(N \triangleleft G\)。\(G\) 的全体（左 = 右）陪集构成集合</p>
+
+<p>\[
+G/N = \{gN : g \in G\}.
+\]</p>
+
+<p>由 Lagrange 定理（<a href="ch3.html">第 3 章 3.4 节</a>），当 \(G\) 有限时 \(|G/N| = |G|/|N|\)。我们想在 \(G/N\) 上定义群结构。最自然的尝试：</p>
+
+<p>\[
+\boxed{\ (gN) \cdot (hN) := (gh) N.\ }
+\]</p>
+
+<p>但这条定义有一个潜在的问题：<em>它依赖于代表元 \(g\) 与 \(h\) 的选择</em>。同一个陪集 \(gN\) 可以写成 \(g'N\)（如果 \(g^{-1} g' \in N\)）；要让 \((gh) N\) 与 \((g'h')N\) 相等，需要把"乘法不依赖代表元"验证一遍。这就是<strong>良定义性</strong>。</p>
+
+<p><strong>命题（陪集乘法良定义 \(\iff\) \(N\) 正规）。</strong>设 \(N \le G\)。陪集乘法 \((gN)(hN) = (gh)N\) 良定义当且仅当 \(N \triangleleft G\)。</p>
+
+<p>"\(\Rightarrow\)" 设乘法良定义。取任意 \(g \in G\) 与 \(n \in N\)。由 \(eN = nN\)（同一陪集），</p>
+
+<p>\[
+(g N)(e N) = (g e) N = g N \quad \text{且} \quad (g N)(n N) = (g n) N.
+\]</p>
+
+<p>但 \((gN)(eN)\) 与 \((gN)(nN)\) 必须相等（因为 \(eN = nN\)），所以 \(gN = (gn)N\)，即 \(g^{-1} g n = n \in N\)——这没用，回去重做。</p>
+
+<p>正确的方向：取 \(g, h \in G\)、\(n_1, n_2 \in N\)。\(gN = (g n_1) N\)、\(hN = (h n_2) N\)。良定义要求 \((gh)N = (g n_1 h n_2) N\)，即 \((gh)^{-1}(g n_1 h n_2) \in N\)，即 \(h^{-1} n_1 h \cdot n_2 \in N\)。\(n_2 \in N\)，所以等价于 \(h^{-1} n_1 h \in N\)，即 \(h^{-1} N h \subseteq N\)。这要对所有 \(h\) 与 \(n_1\) 成立——恰好就是正规性条件 (N2)。</p>
+
+<p>"\(\Leftarrow\)" 设 \(N \triangleleft G\)。取 \(g, g', h, h' \in G\) 使 \(gN = g'N\)（即 \(g^{-1}g' \in N\)）、\(hN = h'N\)（即 \(h^{-1}h' \in N\)）。要证 \((gh)N = (g'h')N\)，即 \((gh)^{-1}(g'h') \in N\)。算：</p>
+
+<p>\[
+(gh)^{-1}(g'h') = h^{-1} g^{-1} g' h' = h^{-1} (g^{-1} g') h \cdot h^{-1} h'.
+\]</p>
+
+<p>令 \(n = g^{-1} g' \in N\)、\(m = h^{-1} h' \in N\)。则上式 \(= (h^{-1} n h) \cdot m\)。由 \(N\) 正规，\(h^{-1} n h \in N\)，再乘 \(m \in N\) 仍在 \(N\)。所以 \((gh)^{-1}(g'h') \in N\)，即良定义。\(\blacksquare\)</p>
+
+<p>这条命题完美回答了"为什么要正规子群"——<em>因为只有正规子群才能让陪集集合上的自然乘法良定义</em>。"正规"不是装饰性的形容词，它就是"可以做商"的同义语。</p>
+
+<h2 id="sec5-2">5.2 商群的公理与第一个例子</h2>
+
+<p>有了良定义的乘法，验证 \(G/N\) 是群只剩三条机械事项：</p>
+
+<ul>
+  <li><strong>结合律：</strong> \([(gN)(hN)](kN) = (ghk)N = (gN)[(hN)(kN)]\)，由 \(G\) 中乘法的结合律继承。</li>
+  <li><strong>单位元：</strong> \(eN = N\) 是单位——\((eN)(gN) = (eg)N = gN = (ge)N = (gN)(eN)\)。</li>
+  <li><strong>逆元：</strong> \((gN)^{-1} = g^{-1} N\)——\((gN)(g^{-1}N) = (g g^{-1})N = eN\)。</li>
+</ul>
+
+<p>所以 \(G/N\) 确实是群，称<strong>商群</strong>（quotient group）。</p>
+
+<p>同时还有一个关键的同态——<strong>商映射</strong>（canonical projection）</p>
+
+<p>\[
+\pi : G \to G/N, \qquad g \mapsto gN.
+\]</p>
+
+<p>\(\pi\) 显然是同态（由陪集乘法的定义）。\(\pi\) 显然是满射（每个 \(gN\) 都在像里）。它的核呢？\(\pi(g) = N \iff gN = N \iff g \in N\)，所以 \(\operatorname{Ker} \pi = N\)。</p>
+
+<p>这就把上一章 4.2 节欠的另一笔账还清了：<em>每个正规子群都是某个同态的核</em>——具体地，是商映射 \(\pi : G \to G/N\) 的核。</p>
+
+<p><strong>例：\(\mathbb{Z}/n\mathbb{Z} = \mathbb{Z}_n\)。</strong>取 \(G = \mathbb{Z}\)（加法群），\(N = n\mathbb{Z} = \{nk : k \in \mathbb{Z}\}\)。\(\mathbb{Z}\) 交换，所以 \(n\mathbb{Z}\) 自动正规。陪集是 \(0 + n\mathbb{Z}, 1 + n\mathbb{Z}, \ldots, (n-1) + n\mathbb{Z}\)，共 \(n\) 个。陪集加法 \((a + n\mathbb{Z}) + (b + n\mathbb{Z}) = (a+b) + n\mathbb{Z}\)——这恰好就是模 \(n\) 加法。所以</p>
+
+<p>\[
+\boxed{\ \mathbb{Z}/n\mathbb{Z} \cong \mathbb{Z}_n.\ }
+\]</p>
+
+<p>这个等同非常基础，但值得停下来体会：在<a href="ch2.html">第 2 章</a>我们用"同余类"直接定义了 \(\mathbb{Z}_n\)，但更深层的原因是它就是 \(\mathbb{Z}\) 的一个商群。这个观点把整个数论里"模 \(n\) 算术"的合法性归结到群论的商构造。</p>
+
+<p>另一个例子：\(\mathbb{R}/\mathbb{Z}\)。陪集 \(x + \mathbb{Z}\) 有唯一代表 \(x \in [0,1)\)；商群同构于圆群 \(S^1\)，通过 \(x \mapsto e^{2\pi i x}\)。这条同构在<a href="../复分析/index.html">复分析</a>与 Fourier 分析里反复使用——它把"周期函数"翻译成"圆上的函数"。</p>
+
+<p>跨卷对照：在<a href="../线性代数/index.html">《线性代数读本》</a>中我们见过<em>商空间</em> \(V/W\)（\(W\) 是 \(V\) 的子空间），并算过 \(\dim(V/W) = \dim V - \dim W\)。商群的构造与商空间一字不差地平行——商陪集 \(v + W\) 即商群陪集 \(g N\)；维数公式即 Lagrange 定理 \(|G/N| = |G|/|N|\)。但群论里多了一条"必须正规"的限制——线性代数里没有这条，因为加法群里所有子群都正规（加法群交换）。</p>
+
+<h2 id="sec5-3">5.3 第一同构定理</h2>
+
+<p><strong>第一同构定理。</strong>设 \(\varphi : G \to H\) 是群同态。则</p>
+
+<p>\[
+\boxed{\ G / \operatorname{Ker} \varphi \;\cong\; \operatorname{Im} \varphi.\ }
+\]</p>
+
+<p>具体地，映射 \(\bar\varphi : G/\operatorname{Ker}\varphi \to \operatorname{Im}\varphi\)，\(g \cdot \operatorname{Ker}\varphi \mapsto \varphi(g)\)，是同构。</p>
+
+<p>这条定理是整个抽象代数的"母定理"。它说：<em>任何同态都可以分解为"先模掉核（投射），再嵌入像"</em>。三大原理里最常用、最核心的就是这一条。</p>
+
+<p><strong>证明。</strong>令 \(N = \operatorname{Ker} \varphi\)。定义</p>
+
+<p>\[
+\bar\varphi : G/N \to H, \qquad gN \mapsto \varphi(g).
+\]</p>
+
+<p><em>第一步：良定义。</em>设 \(gN = g'N\)，即 \(g^{-1} g' \in N = \operatorname{Ker} \varphi\)。则 \(\varphi(g^{-1} g') = e_H\)，即 \(\varphi(g)^{-1} \varphi(g') = e_H\)，即 \(\varphi(g) = \varphi(g')\)。所以 \(\bar\varphi(gN) = \bar\varphi(g'N)\)，定义不依赖代表元。</p>
+
+<p><em>第二步：同态。</em> \(\bar\varphi((gN)(hN)) = \bar\varphi((gh)N) = \varphi(gh) = \varphi(g) \varphi(h) = \bar\varphi(gN) \bar\varphi(hN)\)。</p>
+
+<p><em>第三步：单射。</em>设 \(\bar\varphi(gN) = e_H\)。则 \(\varphi(g) = e_H\)，即 \(g \in N\)，即 \(gN = N\)，即 \(gN\) 是 \(G/N\) 中的单位元。所以 \(\operatorname{Ker} \bar\varphi = \{N\}\)，由 4.3 节"核平凡 \(\iff\) 单射"得 \(\bar\varphi\) 单射。</p>
+
+<p><em>第四步：满射到 \(\operatorname{Im} \varphi\)。</em>对任意 \(\varphi(g) \in \operatorname{Im} \varphi\)，\(\bar\varphi(gN) = \varphi(g)\)。所以 \(\bar\varphi\) 满射到 \(\operatorname{Im} \varphi\)。\(\blacksquare\)</p>
+
+<p>把这条结果用图表写出来非常清晰：每个同态 \(\varphi\) 都有一个标准的"分解"</p>
+
+<p>\[
+G \;\xrightarrow{\;\pi\;}\; G/\operatorname{Ker}\varphi \;\xrightarrow{\;\bar\varphi\;}\; \operatorname{Im}\varphi \;\hookrightarrow\; H,
+\]</p>
+
+<p>其中 \(\pi\) 是满射（商映射）、\(\bar\varphi\) 是同构、\(\operatorname{Im}\varphi \hookrightarrow H\) 是嵌入。这就是同态的"标准形式"——每个同态本质上都是<em>满射 \(\circ\) 同构 \(\circ\) 嵌入</em>。</p>
+
+<p>这条分解在<a href="../线性代数/index.html">线性代数</a>里有完美对应：\(T : V \to W\) 线性，\(V/\ker T \cong \operatorname{Im} T\)，由此立得维数公式 \(\dim V = \dim \ker T + \dim \operatorname{Im} T\)。在群论里"维数"换成"阶"，于是有了<em>群论版维数公式</em>：当 \(G\) 有限时</p>
+
+<p>\[
+|G| = |\operatorname{Ker} \varphi| \cdot |\operatorname{Im} \varphi|.
+\]</p>
+
+<h2 id="sec5-4">5.4 第一同构定理的应用：识别商群</h2>
+
+<p>第一同构定理的最大威力在于：<em>它把"算商群"的繁重计算压缩成"找一个同态"</em>。下面三个例子展示这个技巧。</p>
+
+<p><strong>例 1：\(GL_n(\mathbb{R}) / SL_n(\mathbb{R}) \cong \mathbb{R}^*\)。</strong>取行列式同态 \(\det : GL_n(\mathbb{R}) \to \mathbb{R}^*\)。\(\det\) 是满射（\(\operatorname{diag}(t, 1, \ldots, 1)\) 的行列式是 \(t\)）。\(\det\) 的核是 \(SL_n(\mathbb{R})\)（行列式 \(=1\) 的矩阵）。第一同构定理直接给</p>
+
+<p>\[
+GL_n(\mathbb{R}) / SL_n(\mathbb{R}) \;\cong\; \mathbb{R}^*.
+\]</p>
+
+<p>这条等同把"非常复杂的矩阵商群"识别为"非常简单的非零实数乘法群"。如果不用同构定理，直接列陪集会非常困难——\(SL_n\) 是无限群，陪集集合也是无限的。同构定理把这件事用"一行字"完成。</p>
+
+<p><strong>例 2：\(SO(3) \cong SU(2) / \{\pm I\}\)。</strong>这条等同是物理里"自旋"的群论根。\(SU(2)\) 是 \(2 \times 2\) 复幺正特殊矩阵全体（\(U^* U = I\)、\(\det U = 1\)），\(SO(3)\) 是 \(3 \times 3\) 实正交特殊矩阵（即三维空间里的旋转）。存在一个标准满同态 \(\rho : SU(2) \to SO(3)\)，它把每个 \(2 \times 2\) 幺正矩阵翻译成一个三维旋转，方法是用 \(SU(2)\) 在 \(2 \times 2\) 厄米矩阵空间上的共轭作用。\(\rho\) 满射，核是 \(\{I, -I\}\)（恰好 \(I\) 与 \(-I\) 在共轭作用下都给恒等旋转）。第一同构定理：</p>
+
+<p>\[
+SU(2) / \{\pm I\} \;\cong\; SO(3).
+\]</p>
+
+<p>这条等同的物理含义是：自旋 \(1/2\) 的电子的"波函数对称性"由 \(SU(2)\) 描述，而经典三维旋转只能看到 \(SO(3)\)；两者的 "2:1 覆盖"恰好就是商映射 \(\rho\) 的"两片陪集"。这是<a href="ch24.html">第 24 章</a>表示论与物理应用里的关键例子。</p>
+
+<p><strong>例 3：\(\operatorname{Inn}(G) \cong G / Z(G)\)。</strong>定义共轭同态 \(c : G \to \operatorname{Aut}(G)\)，\(g \mapsto c_g\)（其中 \(c_g(x) = g x g^{-1}\)）。它的像是 \(\operatorname{Inn}(G)\)（内自同构群）。它的核呢？\(c_g = \operatorname{id} \iff g x g^{-1} = x\) 对所有 \(x \iff gx = xg\) 对所有 \(x \iff g \in Z(G)\)。所以 \(\operatorname{Ker} c = Z(G)\)。第一同构定理：</p>
+
+<p>\[
+G / Z(G) \;\cong\; \operatorname{Inn}(G).
+\]</p>
+
+<p>这条等同把"群的内自同构有多少"完全归结到"群在多大程度上非交换"——\(Z(G) = G \iff G\) 交换 \(\iff \operatorname{Inn}(G) = \{\operatorname{id}\}\)。</p>
+
+<p><strong>例 4：\(\mathbb{R}/2\pi\mathbb{Z} \cong S^1\)。</strong>取 \(\varphi : \mathbb{R} \to S^1\)，\(\theta \mapsto e^{i\theta}\)。满射、核 \(=2\pi\mathbb{Z}\)。第一同构定理立刻给 \(\mathbb{R}/2\pi\mathbb{Z} \cong S^1\)——"角度模 \(2\pi\)" 的群论解释。</p>
+
+<h2 id="sec5-5">5.5 第二同构定理</h2>
+
+<p><strong>第二同构定理。</strong>设 \(G\) 是群，\(H \le G\)、\(N \triangleleft G\)。则 \(HN := \{hn : h \in H, n \in N\}\) 是 \(G\) 的子群、\(H \cap N \triangleleft H\)，并且</p>
+
+<p>\[
+\boxed{\ (HN)/N \;\cong\; H/(H \cap N).\ }
+\]</p>
+
+<p>这条定理常被称作<em>菱形定理</em>（diamond theorem），因为它对应的子群格图像是一个菱形：顶点是 \(HN\)（顶端）、底端是 \(H \cap N\)、左侧是 \(H\)、右侧是 \(N\)。两条对边的"商"相等。</p>
+
+<p><strong>证明。</strong></p>
+
+<p><em>第一步：\(HN\) 是子群。</em>验证封闭。\(h_1 n_1 \cdot h_2 n_2 = h_1 (n_1 h_2) n_2 = h_1 h_2 (h_2^{-1} n_1 h_2) n_2\)。由 \(N \triangleleft G\)，\(h_2^{-1} n_1 h_2 \in N\)，所以 \(h_2^{-1} n_1 h_2 \cdot n_2 \in N\)，整个乘积形如 "\(h \cdot n\)" 仍在 \(HN\)。逆元类似。</p>
+
+<p><em>第二步：\(N \triangleleft HN\)。</em>因为 \(N \triangleleft G\)，对任意 \(g \in HN \subseteq G\) 都有 \(g N g^{-1} = N\)。</p>
+
+<p><em>第三步：\(H \cap N \triangleleft H\)。</em>取 \(h \in H\) 与 \(x \in H \cap N\)。\(h x h^{-1} \in H\)（因为 \(H\) 子群、\(h, x \in H\)）；\(h x h^{-1} \in N\)（因为 \(N \triangleleft G\)、\(x \in N\)、\(h \in G\)）。所以 \(h x h^{-1} \in H \cap N\)。</p>
+
+<p><em>第四步：构造同态。</em>定义 \(\psi : H \to (HN)/N\)，\(h \mapsto hN\)。\(\psi\) 是同态（限制 \(H \hookrightarrow HN\) 之后再合上商映射）。\(\psi\) 满射：\(HN/N\) 中任一陪集 \((hn)N = hN = \psi(h)\)。\(\psi\) 的核：\(\psi(h) = N \iff hN = N \iff h \in N \iff h \in H \cap N\)。</p>
+
+<p><em>第五步：用第一同构定理结束。</em>第一同构定理用到 \(\psi\) 上：</p>
+
+<p>\[
+H / \operatorname{Ker} \psi = H/(H \cap N) \cong \operatorname{Im} \psi = (HN)/N. \qquad \blacksquare
+\]</p>
+
+<p>第二同构定理的实战用法之一：把一个"复杂商" \((HN)/N\) 翻译成一个"简单商" \(H/(H \cap N)\)。一个具体例子。在 \(\mathbb{Z}\) 中取 \(H = m\mathbb{Z}\)、\(N = n\mathbb{Z}\)。则 \(HN = m\mathbb{Z} + n\mathbb{Z} = \gcd(m, n) \mathbb{Z}\)（这是数论里的 Bézout 等式），\(H \cap N = \operatorname{lcm}(m, n) \mathbb{Z}\)。第二同构定理给</p>
+
+<p>\[
+(m\mathbb{Z} + n\mathbb{Z}) / n\mathbb{Z} \;\cong\; m\mathbb{Z} / (m\mathbb{Z} \cap n\mathbb{Z}),
+\]</p>
+
+<p>即 \(\gcd(m,n)\mathbb{Z} / n\mathbb{Z} \;\cong\; m\mathbb{Z}/\operatorname{lcm}(m,n)\mathbb{Z}\)。两边阶数都是 \(\operatorname{lcm}(m,n)/n = m/\gcd(m,n)\)——验证一致。</p>
+
+<h2 id="sec5-6">5.6 第三同构定理</h2>
+
+<p><strong>第三同构定理。</strong>设 \(G\) 是群，\(N \triangleleft G\)、\(M \triangleleft G\)、\(N \subseteq M\)。则 \(M/N \triangleleft G/N\) 且</p>
+
+<p>\[
+\boxed{\ (G/N)/(M/N) \;\cong\; G/M.\ }
+\]</p>
+
+<p>这条定理常称<em>"商的商"定理</em>。它说：在做了一次商之后再做一次商，效果等于直接对最大的正规子群做一次商。这在归纳论证里反复使用——可以"分阶段"地剥层正规子群。</p>
+
+<p><strong>证明。</strong></p>
+
+<p><em>第一步：\(M/N\) 在 \(G/N\) 里有意义、且正规。</em>因为 \(N \subseteq M\) 且 \(N \triangleleft G\) 意味着 \(N \triangleleft M\)（限制条件），所以商 \(M/N\) 是有定义的群，是 \(G/N\) 的子群（\(M\) 的陪集都是 \(G\) 的陪集）。要证 \(M/N \triangleleft G/N\)：取 \((gN)(mN)(gN)^{-1} = (g m g^{-1}) N\)；由 \(M \triangleleft G\)，\(g m g^{-1} \in M\)，所以 \((gmg^{-1})N \in M/N\)。</p>
+
+<p><em>第二步：构造同态。</em>定义 \(\Phi : G/N \to G/M\)，\(gN \mapsto gM\)。良定义验证：若 \(gN = g'N\)，即 \(g^{-1} g' \in N \subseteq M\)，则 \(gM = g'M\)。所以 \(\Phi\) 良定义。</p>
+
+<p><em>第三步：\(\Phi\) 同态、满射。</em>同态：\(\Phi((gN)(hN)) = \Phi((gh)N) = (gh)M = (gM)(hM)\)。满射：每个 \(gM\) 都是 \(\Phi(gN)\) 的像。</p>
+
+<p><em>第四步：核是 \(M/N\)。</em>\(\Phi(gN) = M \iff gM = M \iff g \in M \iff gN \in M/N\)。</p>
+
+<p><em>第五步：第一同构定理。</em>把第一同构定理用到 \(\Phi\) 上：\((G/N)/(M/N) \cong G/M\)。\(\blacksquare\)</p>
+
+<p>具体例子。在 \(\mathbb{Z}\) 中取 \(N = 12\mathbb{Z}\)、\(M = 4\mathbb{Z}\)。\(N \subseteq M\)（因为 \(12\) 是 \(4\) 的倍数）。第三同构定理给</p>
+
+<p>\[
+(\mathbb{Z}/12\mathbb{Z}) / (4\mathbb{Z}/12\mathbb{Z}) \;\cong\; \mathbb{Z}/4\mathbb{Z}.
+\]</p>
+
+<p>左边是 "\(\mathbb{Z}_{12}\) 模掉它的子群 \(\{0, 4, 8\}\)"，右边是 \(\mathbb{Z}_4\)——两边阶数都是 \(4\)，验证一致。这条等同把"先模 12 再模 4 的子群"等同于"直接模 4"，恰好是数论里"分阶段化简"的群论解释。</p>
+
+<h2 id="sec5-7">5.7 用同构定理一行字算商群</h2>
+
+<p>现在我们把三大同构定理当成"工具箱"，演示几个一行字的商群计算。</p>
+
+<p><strong>计算 1：\(\mathbb{C}^* / S^1\)。</strong>这里 \(\mathbb{C}^* = \mathbb{C} \setminus \{0\}\) 是非零复数乘法群，\(S^1\) 是单位圆。取模长同态 \(|\cdot| : \mathbb{C}^* \to \mathbb{R}_{>0}\)，\(z \mapsto |z|\)。满射、核 \(= S^1\)。第一同构定理：\(\mathbb{C}^*/S^1 \cong \mathbb{R}_{>0} \cong \mathbb{R}\)（后者通过 \(\ln\)）。</p>
+
+<p><strong>计算 2：\(O(n) / SO(n) \cong \{\pm 1\}\)。</strong>取 \(\det : O(n) \to \{\pm 1\}\)（正交矩阵的行列式 \(= \pm 1\)）。满射、核 \(= SO(n)\)。第一同构定理：\(O(n)/SO(n) \cong \{\pm 1\} \cong \mathbb{Z}_2\)。这条事实把"正交群分成两片"（保定向 + 反定向）说穿。</p>
+
+<p><strong>计算 3：\(\mathbb{Z}_{mn} / \mathbb{Z}_m \cong \mathbb{Z}_n\)（当 \(\gcd(m, n) = 1\)）。</strong>这其实是 \((\mathbb{Z}/mn\mathbb{Z}) / (m\mathbb{Z}/mn\mathbb{Z}) \cong \mathbb{Z}/m\mathbb{Z}\) 的对偶；用第三同构定理可以"互换 \(m\) 与 \(n\)"。这条事实是<em>中国剩余定理</em>的群论根：\(\mathbb{Z}_{mn} \cong \mathbb{Z}_m \times \mathbb{Z}_n\)（当 \(\gcd(m,n)=1\)），因为在直积里两个因子是彼此的商。</p>
+
+<p><strong>计算 4：\(\mathbb{Z}^2 / \langle (a, b) \rangle\)。</strong>\(\mathbb{Z}^2\) 模掉一个由 \((a, b)\) 生成的循环子群。若 \(\gcd(a, b) = d\)，可验证商同构于 \(\mathbb{Z} \times \mathbb{Z}_d\)——<a href="ch8.html">第 8 章</a>有限交换群结构定理的雏形。</p>
+
+<p>这些一行字的商群计算只展示了同构定理的一小部分威力。<a href="ch11.html">第 11 章</a>开始的环论里，三条对应的环同构定理会在更广的舞台上重演——核换成理想、商换成商环，但定理的形式几乎一字不变。这是抽象代数的"标准模式"：群、环、模、Lie 代数里都有同形态的三大同构定理，证明永远是<em>"良定义 + 同态 + 用第一同构定理"</em>。</p>
+
+<p>下一章我们要换一种视角看群——不再关心群"内部"的子群与商群，而是关心群"在外部"的<em>作用</em>。群作用 \(G \times X \to X\) 把群与一个集合 \(X\) 联系起来，让"群"成为了"对称性"的具体化身。轨道-稳定子定理把陪集语言搬到作用上，使我们能用一行字算出"立方体可有多少种本质不同的染色"——这是 Burnside 引理的实战用法。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 同态与正规子群</a><a href="ch6.html">下一章 · 第 6 章 群作用、轨道、稳定子 →</a></nav>
+</main>
+</body>
+</html>

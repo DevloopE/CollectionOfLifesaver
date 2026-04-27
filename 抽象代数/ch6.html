@@ -35,289 +35,280 @@
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 商群与三大同构定理</a><a href="ch7.html">下一章 · 第 7 章 Sylow 定理 →</a></nav>
 <h1 id="ch6">第 6 章 群作用、轨道、稳定子</h1>
 
-<p>群论的"实用性"几乎全部来自一个观念：群是<em>对称性</em>的代数化身，而对称性永远是<em>对某个对象</em>的对称性。"群作用"就是这条观念的精确数学化——给定群 \(G\) 与集合 \(X\)，一个作用 \(G \times X \to X\) 把每个群元素 \(g \in G\) 翻译成 \(X\) 上的一个置换。这一步把"群"从"抽象的符号系统"变成"具体几何对象上的操作"。</p>
+<p>把六边形画出来，标号 6 个顶点 \(1, 2, 3, 4, 5, 6\)。\(D_6\) 的 12 个对称<em>每一个</em>都把这 6 个顶点重新排列——\(r\)（转 60°）把 \(1 \to 2, 2 \to 3, \ldots, 6 \to 1\)；\(s\)（某条反射）把某两对顶点对调。所以 \(D_6\) 不只是"12 个抽象元素"——它<em>动</em>在 6 个顶点上。</p>
 
-<p>本章的核心结果是<strong>轨道-稳定子定理</strong>，它把"群作用"分解成两件事：每个 \(x \in X\) 在群作用下能跑到的地方（轨道），与不动 \(x\) 的群元素全体（稳定子）。这两件事被一条简洁的等式联系起来 \(|\operatorname{Orb}(x)| = [G : \operatorname{Stab}(x)]\)——它把"几何上的轨道大小"翻译成"群论上的陪集指数"。这条等式有两条强有力的衍生：<em>类方程</em>（共轭作用的轨道-稳定子）与<em>Burnside 引理</em>（计数轨道）。Burnside 引理直接回答"立方体的本质不同染色有多少种"这一类组合问题——这是抽象代数最"接地气"的应用之一。</p>
+<p>固定一个顶点——比如顶点 1。问两件事。</p>
 
-<ul>
-  <li>6.1 节定义群作用 \(G \times X \to X\)，验证两条公理（单位、结合）。</li>
-  <li>6.2 节给两个最基本的例子：\(S_n\) 在 \(\{1, \ldots, n\}\) 上的标准作用、\(G\) 在自身上的左乘作用。</li>
-  <li>6.3 节给共轭作用 \(g \cdot x = g x g^{-1}\)，连接到第 4 章的共轭类。</li>
-  <li>6.4 节给陪集作用 \(g \cdot (xH) = (gx)H\)——"齐性空间" 的雏形。</li>
-  <li>6.5 节定义轨道与稳定子，验证"轨道是等价类"。</li>
-  <li>6.6 节证明<strong>轨道-稳定子定理</strong>。</li>
-  <li>6.7 节推出<strong>类方程</strong>，作为共轭作用的特例。</li>
-  <li>6.8 节证明<strong>Burnside 引理</strong>。</li>
-  <li>6.9 节用 Burnside 算项链与立方体染色的具体例子。</li>
-</ul>
+<p><em>第一件</em>：\(D_6\) 的 12 个对称把顶点 1 送到了多少个不同的地方？\(e\) 让它留在 1，\(r\) 送到 2，\(r^2\) 到 3，…，\(r^5\) 到 6。所以光"旋转部分" 已经把顶点 1 送遍了所有 6 个位置。反射部分会重复送（每个反射也把 1 送到某个 1 至 6 的位置）。所以"顶点 1 能被送到的所有位置"是 \(\{1, 2, 3, 4, 5, 6\}\)——<em>6 个</em>。</p>
 
-<h2 id="sec6-1">6.1 群作用的定义</h2>
+<p><em>第二件</em>：\(D_6\) 的 12 个对称里有多少个把顶点 1 留在 1 不动？\(e\) 当然算一个。还有过顶点 1 的那条反射轴对应的反射——记它为 \(s_1\)——它也把 1 留在 1。其它 10 个对称都把 1 移走。所以"固定 1 不动的对称"有<em>2 个</em>：\(\{e, s_1\}\)。</p>
 
-<p>设 \(G\) 是群，\(X\) 是集合。一个 \(G\) 在 \(X\) 上的<strong>作用</strong>（action）是一个映射</p>
+<p>把这两个数乘起来：\(6 \times 2 = 12 = |D_6|\)。<em>这是巧合吗</em>？再换个对象试。把 \(D_6\) 作用在<em>边</em>上（六边形有 6 条边）：固定一条边，能被送到几条边？6 条全部。固定它不动的对称有几个？\(e\) 加上"过这条边中点的反射轴"对应的反射——共 2 个。\(6 \times 2 = 12\)。再换。把 \(D_6\) 作用在<em>三对相对的顶点</em>上（3 对）：固定一对，能送到几对？3 对全部。固定它不动的对称有几个？\(\{e, r^3, s_1, s_4\}\) —— 4 个（旋转 180° 把 1 送到 4 但保持"1-4 这一对"；两条反射也保持这对）。\(3 \times 4 = 12\)。</p>
 
-<p>\[
-G \times X \to X, \qquad (g, x) \mapsto g \cdot x,
-\]</p>
+<p>三次实验都给同样的乘积 12。这<em>不是</em>巧合——这是<em>轨道-稳定子定理</em>，它说"轨道大小 × 稳定子大小 = 群大小"。本章把"群作用"这个语言立起来，证这条定理，然后用它做组合数学（数项链颜色）和数论（计数共轭类）的事。</p>
 
-<p>满足两条公理：</p>
+<h2 id="sec6-1">6.1 什么叫"群作用"</h2>
+
+<p>开头的描述——"\(D_6\) 的元素把 6 个顶点重新排列"——其实是一个映射 \(D_6 \times \{1, \ldots, 6\} \to \{1, \ldots, 6\}\)：给一对 \((g, x)\)（\(g\) 是群元素，\(x\) 是顶点），返回 \(g \cdot x\)（\(g\) 把 \(x\) 送到的位置）。这套数据要满足两条很自然的兼容性：</p>
 
 <ul>
-  <li><strong>(A1) 单位：</strong> \(e \cdot x = x\) 对所有 \(x \in X\)。</li>
-  <li><strong>(A2) 结合：</strong> \(g \cdot (h \cdot x) = (gh) \cdot x\) 对所有 \(g, h \in G\) 与 \(x \in X\)。</li>
+  <li>\(e \cdot x = x\)（"什么都不做"什么都不动）；</li>
+  <li>\(g \cdot (h \cdot x) = (gh) \cdot x\)（先做 \(h\) 再做 \(g\)，等同于做 \(gh\) 一次）。</li>
 </ul>
 
-<p>有一个等价的表述：作用 \(G \times X \to X\) <em>等价于</em>同态 \(\rho : G \to \operatorname{Sym}(X)\)（其中 \(\operatorname{Sym}(X)\) 是 \(X\) 的全体置换构成的群）。具体地，每个作用给出 \(\rho(g) : X \to X\)，\(x \mapsto g \cdot x\)；公理 (A2) 翻译成 "\(\rho\) 保乘法"，公理 (A1) 翻译成 "\(\rho(e) = \operatorname{id}\)"。反过来每个同态 \(\rho : G \to \operatorname{Sym}(X)\) 都给出一个作用。</p>
+<p>这两条就是<strong>群作用</strong>的定义。形式上：</p>
 
-<p>这条等价非常有用：它把"群作用"完全翻译成"同态"，从而把上一章关于同态的全套语言（核、像、第一同构定理）搬过来用。作用的<strong>核</strong>定义为</p>
-
-<p>\[
-\operatorname{Ker}(\rho) = \{g \in G : g \cdot x = x \text{ 对所有 } x \in X\},
-\]</p>
-
-<p>即"对每个 \(x\) 都没有动静"的群元素全体。当 \(\operatorname{Ker}(\rho) = \{e\}\) 时作用叫<em>忠实的</em>（faithful）——每个非单位元都至少动了一个 \(x\)。</p>
-
-<p>有了这个语言，下一节的几个标准例子就特别清楚了。</p>
-
-<h2 id="sec6-2">6.2 例 1-2：\(S_n\) 在 \(\{1, \ldots, n\}\) 与 \(G\) 在自身上的左乘</h2>
-
-<p><strong>例 1：\(S_n\) 在 \(\{1, \ldots, n\}\) 上的标准作用。</strong>这是最朴素的例子——置换就是动数字。\(\sigma \cdot i := \sigma(i)\)。验证 (A1)：\(e \cdot i = e(i) = i\)。验证 (A2)：\(\sigma \cdot (\tau \cdot i) = \sigma(\tau(i)) = (\sigma \tau)(i) = (\sigma\tau) \cdot i\)。同态 \(\rho : S_n \to \operatorname{Sym}(\{1, \ldots, n\}) = S_n\) 是恒等映射，忠实。</p>
-
-<p>这看上去是个废话级例子，但它的概念意义重大：<em>对称群 \(S_n\) 的"定义"就是 \(\{1, \ldots, n\}\) 的对称群</em>——它"本来"就是一个群作用，把它从这个特殊的载体抽象出来才得到群论的"群"。</p>
-
-<p><strong>例 2：\(G\) 在自身上的左乘作用。</strong>取 \(X = G\)（同一个集合，但忘掉群结构）。定义</p>
+<p><strong>定义。</strong>设 \(G\) 是群，\(X\) 是集合。\(G\) 在 \(X\) 上的<em>作用</em>是一个映射 \(G \times X \to X\)，记作 \((g, x) \mapsto g \cdot x\)，满足</p>
 
 <p>\[
-g \cdot x := g x \quad (\text{群中乘法}).
+e \cdot x = x, \qquad g \cdot (h \cdot x) = (gh) \cdot x
 \]</p>
 
-<p>(A1) \(e \cdot x = e x = x\)。(A2) \(g \cdot (h \cdot x) = g (h x) = (g h) x = (g h) \cdot x\)。这给出同态 \(\rho : G \to \operatorname{Sym}(G)\)。</p>
+<p>对所有 \(g, h \in G\)，\(x \in X\)。</p>
 
-<p>此作用<em>忠实</em>——若 \(g \cdot x = x\) 对所有 \(x\)，取 \(x = e\) 得 \(g = e\)。所以 \(\rho\) 是单同态，立刻推出：</p>
+<p>这有一个等价说法。每个 \(g \in G\) 给出一个映射 \(\sigma_g : X \to X\)，\(\sigma_g(x) := g \cdot x\)。第二条公理 \(\sigma_g \circ \sigma_h = \sigma_{gh}\) 加上 \(\sigma_e = \operatorname{id}\) 与逆元的存在，意味着每个 \(\sigma_g\) 是<em>双射</em>（\(\sigma_{g^{-1}}\) 是它的逆）。所以一个 \(G\) 作用<em>等同于</em>一个群同态</p>
 
-<p><strong>Cayley 定理。</strong>每个群 \(G\) 都同构于某个对称群 \(\operatorname{Sym}(G)\) 的子群。当 \(|G| = n\) 时，\(G\) 同构于 \(S_n\) 的某个子群。</p>
+<p>\[
+\sigma : G \to S_X = \{X \text{ 的双射}\}, \quad g \mapsto \sigma_g.
+\]</p>
 
-<p>证明：由左乘作用 \(\rho : G \to \operatorname{Sym}(G)\) 是单同态，第一同构定理给 \(G \cong \operatorname{Im} \rho \le \operatorname{Sym}(G) \cong S_n\)。\(\blacksquare\)</p>
+<p>"作用"和"同态到对称群"是同一回事的两种语言——前者更几何，后者更代数。</p>
 
-<p>Cayley 定理在历史上是群论"具体化"的关键——19 世纪它告诉数学家："抽象群"其实都是置换群的子群。这是为什么对称群 \(S_n\) 在群论里有如此中心的地位。</p>
+<p>开头 \(D_6\) 在 6 个顶点上的作用，对应同态 \(D_6 \to S_6\)（\(S_6\) 是 6 元置换群）。这个同态是单射（因为 \(D_6\) 的不同对称给出不同的顶点重排）——所以 \(D_6\) "嵌入"了 \(S_6\)。这件事下面还会看到一般版本（Cayley 定理）。</p>
 
-<h2 id="sec6-3">6.3 例 3：共轭作用</h2>
+<h2 id="sec6-2">6.2 一组标准例子，让你认识"作用"的全部脸</h2>
 
-<p>取 \(X = G\) 还是 \(G\) 自身，但作用方式换成<strong>共轭</strong>：</p>
+<p><strong>例 1：\(S_n\) 在 \(\{1, \ldots, n\}\) 上的自然作用。</strong>\(\sigma \in S_n\) 把 \(i\) 送到 \(\sigma(i)\)。这是最朴素的作用——它<em>就是 \(S_n\) 的定义</em>。</p>
+
+<p><strong>例 2：\(D_n\) 在正 \(n\) 边形顶点上。</strong>开头讲的就是 \(n = 6\) 这个特例。一般 \(D_n\)（\(2n\) 个元素）作用在 \(n\) 个顶点上。</p>
+
+<p><strong>例 3：\(GL_n(\mathbb{R})\) 在 \(\mathbb{R}^n\) 上。</strong>矩阵作用在向量上：\(A \cdot v := Av\)。验：\(I \cdot v = v\)；\(A \cdot (B \cdot v) = A(Bv) = (AB)v = (AB) \cdot v\)。✓ 这是<a href="../线性代数/index.html">线性代数</a>整本书都在做的事——只是没人指出"这是个群作用"。</p>
+
+<p><strong>例 4：\(G\) 在自身上的<em>左乘作用</em>。</strong>把 \(X = G\)，定义 \(g \cdot x := gx\)（群里的乘法）。验：\(e \cdot x = ex = x\) ✓；\(g \cdot (h \cdot x) = g(hx) = (gh)x = (gh) \cdot x\) ✓。这个作用对应同态 \(G \to S_G\)（\(G\) 自己作为集合的对称群）。这个同态<em>单射</em>——\(g \cdot x = x \forall x \Rightarrow g = e\)。所以 \(G\) 嵌入 \(S_G\)。这是<strong>Cayley 定理</strong>："任何 \(n\) 元群嵌入 \(S_n\)"——一句话证明。Cayley 定理告诉你<em>有限群从来不会比 \(S_n\) 复杂</em>，理论上 \(S_n\) 是"宇宙群"。</p>
+
+<p><strong>例 5：\(G\) 在自身上的<em>共轭作用</em>。</strong>同样 \(X = G\)，但定义</p>
 
 <p>\[
 g \cdot x := g x g^{-1}.
 \]</p>
 
-<p>验证 (A1)：\(e \cdot x = e x e^{-1} = x\)。验证 (A2)：\(g \cdot (h \cdot x) = g (h x h^{-1}) g^{-1} = (g h) x (gh)^{-1} = (gh) \cdot x\)。</p>
+<p>验：\(e \cdot x = x\) ✓；\(g \cdot (h \cdot x) = g(hxh^{-1})g^{-1} = (gh) x (gh)^{-1} = (gh) \cdot x\) ✓。这个作用的<em>轨道</em>叫<strong>共轭类</strong>——它分类"在群里行为一样"的元素。在 \(S_n\) 里，两个置换共轭当且仅当它们循环型相同——这条事实是组合数学的常用工具。</p>
 
-<p>这个作用的同态 \(\rho : G \to \operatorname{Sym}(G)\) 实际上落到 \(\operatorname{Aut}(G) \le \operatorname{Sym}(G)\) 中——因为共轭保乘法（已在第 4 章 4.6 节验证）。所以共轭作用其实是 \(G \to \operatorname{Aut}(G)\)，像是<em>内自同构群</em> \(\operatorname{Inn}(G)\)。它的<em>核</em>呢？\(g \cdot x = x\) 对所有 \(x\) 等价于 \(g x g^{-1} = x\) 对所有 \(x\) 等价于 \(g x = x g\) 对所有 \(x\) 等价于 \(g \in Z(G)\)。所以共轭作用的核是中心：</p>
+<p><strong>例 6：\(G\) 在 \(G/H\)（陪集集合）上的左乘作用。</strong>\(X = \{aH : a \in G\}\)（\(H\) 是任意子群，不必正规）。定义 \(g \cdot (aH) := (ga)H\)。验：\(e \cdot (aH) = aH\) ✓；\(g(h \cdot aH) = g((ha)H) = (gha)H = (gh) \cdot aH\) ✓。这个作用是<em>传递的</em>（任何陪集都能被送到任何陪集）。它对应一个同态 \(G \to S_{[G:H]}\)，是研究"\(G\) 怎么排列它的陪集"的标准工具。</p>
 
-<p>\[
-\operatorname{Ker}(\text{共轭作用}) = Z(G).
-\]</p>
+<p>请你停一下，把这 6 个例子并排放着看。它们来自完全不同的场景——置换、几何、矩阵、群自身。但<em>都满足同两条公理</em>。这正是<a href="ch1.html">第 1 章</a>讲的"抽象代数的统一力量"——一套定义同时管这么多现象。下面的所有定理（轨道-稳定子、类方程、Burnside）都对<em>所有</em>群作用同时成立。</p>
 
-<p>第一同构定理立刻给 \(G/Z(G) \cong \operatorname{Inn}(G)\)——这是上一章 5.4 节例 3 的来源。共轭作用的<em>轨道</em>就是<em>共轭类</em>（第 4 章 4.6 节），<em>稳定子</em>就是<em>中心化子</em> \(C_G(x) = \{g \in G : g x = x g\}\)。这两条命名约定我们将在 6.5 节正式给出。</p>
+<h2 id="sec6-3">6.3 轨道与稳定子</h2>
 
-<h2 id="sec6-4">6.4 例 4：陪集作用</h2>
+<p>开头我们对"顶点 1"问了两件事——"能被送到哪些位置" 和"哪些对称固定它不动"。这两件事一般化为<em>轨道</em>和<em>稳定子</em>。</p>
 
-<p>设 \(H \le G\)（不必正规！）。\(G\) 的左陪集集合 \(G/H = \{xH : x \in G\}\)（这里 \(G/H\) 仅仅是陪集集合，不是群——因为 \(H\) 可能不正规）。\(G\) 在 \(G/H\) 上有自然作用：</p>
-
-<p>\[
-g \cdot (xH) := (gx) H.
-\]</p>
-
-<p>验证良定义：若 \(xH = x'H\)，即 \(x^{-1} x' \in H\)，则 \((gx)^{-1}(gx') = x^{-1} g^{-1} g x' = x^{-1} x' \in H\)，所以 \((gx)H = (gx')H\)。验证公理 (A1)、(A2) 容易。</p>
-
-<p>这个作用极其重要——它是"齐性空间"的代数模型。"齐性空间"是几何里"具有传递作用的对象"的统称：球面 \(S^n = SO(n+1)/SO(n)\)、双曲空间 \(\mathbb{H}^n = SO(n,1)/SO(n)\)、复射影空间 \(\mathbb{CP}^n = SU(n+1)/U(n)\)——它们都是"群除以子群"的陪集集合。</p>
-
-<p>这个作用的<em>核</em>是什么？\(g \cdot (xH) = xH\) 对所有 \(x \in G\) 等价于 \((gx)H = xH\) 对所有 \(x\) 等价于 \(x^{-1} g x \in H\) 对所有 \(x\) 等价于 \(g \in \bigcap_{x \in G} x H x^{-1}\)。这个<em>核</em>叫做 \(H\) 在 \(G\) 中的<strong>正规核</strong>（normal core），记 \(\operatorname{Core}_G(H)\)，是<em>包含在 \(H\) 中的最大正规子群</em>。当 \(H\) 自己正规时 \(\operatorname{Core}_G(H) = H\)，但一般情形 \(\operatorname{Core}_G(H) \subsetneq H\)。</p>
-
-<p>陪集作用的同态 \(\rho : G \to \operatorname{Sym}(G/H)\) 给出一个非平凡的"嵌入"：当 \([G : H] = n\) 时，\(\rho\) 是 \(G \to S_n\) 的同态，核是 \(\operatorname{Core}_G(H)\)。这条结构在<a href="ch7.html">第 7 章</a> Sylow 定理的若干证明里反复使用。</p>
-
-<h2 id="sec6-5">6.5 轨道与稳定子</h2>
-
-<p>设 \(G\) 作用于 \(X\)。对每个 \(x \in X\)，定义</p>
+<p><strong>定义。</strong>设 \(G\) 作用在 \(X\) 上，\(x \in X\)。</p>
 
 <ul>
-  <li><strong>轨道</strong>（orbit）：\(\operatorname{Orb}(x) = G \cdot x = \{g \cdot x : g \in G\}\)——\(x\) 在群作用下能跑到的全部位置；</li>
-  <li><strong>稳定子</strong>（stabilizer）：\(\operatorname{Stab}(x) = G_x = \{g \in G : g \cdot x = x\}\)——把 \(x\) 留在原地的群元素全体。</li>
+  <li>\(x\) 的<em>轨道</em>是 \(\operatorname{Orb}(x) := \{g \cdot x : g \in G\} \subseteq X\)。</li>
+  <li>\(x\) 的<em>稳定子</em>是 \(\operatorname{Stab}(x) := \{g \in G : g \cdot x = x\} \subseteq G\)。</li>
 </ul>
 
-<p>\(\operatorname{Stab}(x)\) 是 \(G\) 的子群（验证三条公理：\(e \in \operatorname{Stab}(x)\) 由 (A1)；闭合 \(g, h \in \operatorname{Stab}(x) \Rightarrow gh \in \operatorname{Stab}(x)\) 由 (A2)；逆 \(g \in \operatorname{Stab}(x) \Rightarrow g^{-1} \cdot x = g^{-1} \cdot (g \cdot x) = (g^{-1} g) \cdot x = x\)）。</p>
+<p>稳定子<em>是 \(G\) 的子群</em>。验：\(e \in \operatorname{Stab}(x)\) ✓；\(g, h \in \operatorname{Stab}(x) \Rightarrow (gh)x = g(hx) = g \cdot x = x\) ✓；\(g \in \operatorname{Stab}(x) \Rightarrow x = g^{-1}(gx) = g^{-1} x\) ✓。</p>
 
-<p>另一方面 \(\operatorname{Orb}(x)\) 是 \(X\) 的子集，但<em>不是</em>子群（\(X\) 一般也没有群结构）。</p>
+<p>轨道<em>是 \(X\) 的子集</em>，不是群。但所有轨道<em>把 \(X\) 划分成不相交的块</em>——这是它最重要的性质。</p>
 
-<p><strong>命题（轨道是等价类）。</strong>定义 \(x \sim y \iff \exists g \in G, y = g \cdot x\)。则 \(\sim\) 是 \(X\) 上的等价关系，等价类恰好就是轨道。</p>
+<p><strong>命题。</strong>"\(x \sim y \iff \exists g \in G : y = g \cdot x\)"是 \(X\) 上的等价关系。等价类正是轨道。</p>
 
-<p>验证：自反 \(x = e \cdot x \Rightarrow x \sim x\)；对称 \(y = g \cdot x \Rightarrow x = g^{-1} \cdot y \Rightarrow y \sim x\)（这里用了"作用"等价于"\(\rho(g)\) 是双射"）；传递 \(y = g \cdot x, z = h \cdot y \Rightarrow z = (hg) \cdot x\)。\(\blacksquare\)</p>
+<p><em>验</em>：自反 \(x = e \cdot x\)；对称 \(y = g \cdot x \Rightarrow x = g^{-1} \cdot y\)；传递 \(y = g \cdot x, z = h \cdot y \Rightarrow z = (hg) \cdot x\)。等价类 \([x] = \{y : y \sim x\} = \{g \cdot x : g \in G\} = \operatorname{Orb}(x)\)。\(\square\)</p>
 
-<p>所以轨道把 \(X\) 分割成不相交并：\(X = \bigsqcup_{[x]} \operatorname{Orb}(x)\)。当只有一个轨道（即 \(\operatorname{Orb}(x) = X\) 对某个/所有 \(x\)）时，作用叫<em>传递的</em>（transitive）。</p>
+<p>所以轨道把 \(X\) 切成不相交的块——每块叫一个轨道。\(X = \bigsqcup_i \operatorname{Orb}(x_i)\)（取代表元 \(x_i\) 一个一个）。</p>
 
-<p><strong>具体例子。</strong>\(S_n\) 在 \(\{1, \ldots, n\}\) 上的标准作用：传递（任何 \(i\) 都能被某个置换搬到任何 \(j\)）。\(\operatorname{Stab}(1) = \{\sigma \in S_n : \sigma(1) = 1\} \cong S_{n-1}\)（"固定 1 的置换"就是剩下 \(n-1\) 个元素的全体置换）。</p>
+<p>开头 \(D_6\) 在 6 顶点上的作用<em>只有一个轨道</em>（任何顶点都能被送到任何顶点）——这种"只有一个轨道"的作用叫<em>传递的</em>。</p>
 
-<p><strong>共轭作用的轨道与稳定子。</strong>\(G\) 在自身上的共轭作用：轨道 \(\operatorname{Orb}(x) = \{gxg^{-1} : g \in G\}\) 就是共轭类 \(\operatorname{cl}(x)\)。稳定子 \(\operatorname{Stab}(x) = \{g \in G : gxg^{-1} = x\} = C_G(x)\) 是中心化子。所以下一节的轨道-稳定子定理对共轭作用的特例说："共轭类大小等于中心化子的指数"——这就是类方程的雏形。</p>
+<p>但有时不传递。例：\(D_6\) 在<em>所有 \(\binom{6}{2} = 15\) 对顶点</em>上的作用。轨道分两块：(a)"相邻顶点对"（共 6 对，比如 \(\{1,2\}, \{2,3\}, \ldots\)），(b)"间隔一个的顶点对"（6 对），(c)"对角顶点对"（3 对，\(\{1,4\}, \{2,5\}, \{3,6\}\)）。三个轨道，大小 6、6、3，加起来 \(15 = \binom{6}{2}\) ✓。</p>
 
-<h2 id="sec6-6">6.6 轨道-稳定子定理</h2>
+<h2 id="sec6-4">6.4 轨道-稳定子定理</h2>
 
-<p><strong>轨道-稳定子定理。</strong>设 \(G\) 作用于 \(X\)，\(x \in X\)。则存在双射</p>
+<p>开头观察到 \(|\operatorname{Orb}(x)| \cdot |\operatorname{Stab}(x)| = |G|\) 对 \(D_6\) 的几个作用都成立。下面证它对<em>任何</em>有限群作用都成立。</p>
 
-<p>\[
-\boxed{\ G/\operatorname{Stab}(x) \;\longleftrightarrow\; \operatorname{Orb}(x), \qquad g \cdot \operatorname{Stab}(x) \;\longmapsto\; g \cdot x.\ }
-\]</p>
-
-<p>当 \(G\) 有限时，</p>
+<p><strong>轨道-稳定子定理。</strong>设 \(G\) 是有限群作用在集合 \(X\) 上，\(x \in X\)。则</p>
 
 <p>\[
-|\operatorname{Orb}(x)| = [G : \operatorname{Stab}(x)] = \frac{|G|}{|\operatorname{Stab}(x)|}.
+\boxed{\ |\operatorname{Orb}(x)| \cdot |\operatorname{Stab}(x)| = |G|.\ }
 \]</p>
 
-<p>(注意：这里 \(G/\operatorname{Stab}(x)\) 仅仅是陪集集合——\(\operatorname{Stab}(x)\) 一般不正规。)</p>
-
-<p><strong>证明。</strong>定义 \(\Phi : G/\operatorname{Stab}(x) \to \operatorname{Orb}(x)\)，\(g \cdot \operatorname{Stab}(x) \mapsto g \cdot x\)。</p>
-
-<p><em>第一步：良定义。</em>设 \(g \cdot \operatorname{Stab}(x) = g' \cdot \operatorname{Stab}(x)\)，即 \(g^{-1} g' \in \operatorname{Stab}(x)\)，即 \((g^{-1} g') \cdot x = x\)，即 \(g' \cdot x = g \cdot x\)。所以 \(\Phi\) 良定义。</p>
-
-<p><em>第二步：单射。</em>设 \(\Phi(g \cdot \operatorname{Stab}(x)) = \Phi(g' \cdot \operatorname{Stab}(x))\)，即 \(g \cdot x = g' \cdot x\)。则 \((g^{-1} g') \cdot x = x\)，即 \(g^{-1} g' \in \operatorname{Stab}(x)\)，即 \(g \cdot \operatorname{Stab}(x) = g' \cdot \operatorname{Stab}(x)\)。</p>
-
-<p><em>第三步：满射。</em>对任意 \(y \in \operatorname{Orb}(x)\)，由定义存在 \(g \in G\) 使 \(y = g \cdot x = \Phi(g \cdot \operatorname{Stab}(x))\)。</p>
-
-<p>所以 \(\Phi\) 是双射。当 \(G\) 有限时由 Lagrange 定理 \(|G/\operatorname{Stab}(x)| = |G|/|\operatorname{Stab}(x)|\)。\(\blacksquare\)</p>
-
-<p>这条定理虽然简短，但它的应用范围广得惊人。它的"几何意义"是：<em>群在 \(X\) 上的每个轨道 \(\operatorname{Orb}(x)\) 都"长得像"陪集集合 \(G/\operatorname{Stab}(x)\)</em>。换句话说，从群论的视角看，\(\operatorname{Orb}(x)\) <em>就是</em> \(G/\operatorname{Stab}(x)\) 这个齐性空间。</p>
-
-<p><strong>具体应用 1：球面的对称。</strong>取 \(G = SO(3)\) 作用在 \(S^2 \subset \mathbb{R}^3\) 上（旋转作用在球面上）。任取 \(x \in S^2\)，\(\operatorname{Orb}(x) = S^2\)（旋转传递）。\(\operatorname{Stab}(x)\) 是绕过 \(x\) 的轴的旋转，同构于 \(SO(2) \cong S^1\)。轨道-稳定子定理给（在拓扑/几何意义下）：</p>
+<p>等价地</p>
 
 <p>\[
-S^2 \;\cong\; SO(3)/SO(2).
+|\operatorname{Orb}(x)| = [G : \operatorname{Stab}(x)],
 \]</p>
 
-<p>这是把"二维球面"等同于"三维旋转群除以二维旋转子群"——经典的齐性空间表示。这条等同在<a href="../微分方程/index.html">微分方程</a>里讲球函数、在物理里讲转动惯量都反复用。</p>
+<p>即<em>轨道大小等于稳定子的指标</em>。</p>
 
-<p><strong>具体应用 2：正二十面体。</strong>对称群 \(|G| = 60\)，作用在 12 个顶点上传递。取顶点 \(v\)，\(\operatorname{Stab}(v) = \{\)绕 \(v\) 与对面顶点轴的 5 个旋转\(\}\)。轨道-稳定子：\(12 = 60 / 5\)——与已知顶点数一致。这种"群阶 / 稳定子阶 = 几何量"的算法是<a href="ch24.html">第 24 章</a>晶体学的核心方法。</p>
-
-<h2 id="sec6-7">6.7 类方程</h2>
-
-<p>把轨道-稳定子定理用到 \(G\) 在自身上的<em>共轭作用</em>上。轨道是共轭类，稳定子是中心化子，所以</p>
+<p><em>证明的灵魂</em>是构造一个一一对应</p>
 
 <p>\[
-|\operatorname{cl}(x)| = [G : C_G(x)].
+G/\operatorname{Stab}(x) \;\longleftrightarrow\; \operatorname{Orb}(x).
 \]</p>
 
-<p>把 \(G\) 按共轭类分割：\(G = \bigsqcup_i \operatorname{cl}(x_i)\)（取每个共轭类一个代表 \(x_i\)）。注意中心 \(Z(G)\) 中的元素自身就是一个共轭类——\(z \in Z(G) \iff \operatorname{cl}(z) = \{z\} \iff |\operatorname{cl}(z)| = 1\)。把中心元素的共轭类（每个大小 1）与非中心元素的共轭类分开计数：</p>
+<p>把 \(\operatorname{Stab}(x)\) 简记 \(H\)。定义</p>
 
 <p>\[
-\boxed{\ |G| \;=\; |Z(G)| \;+\; \sum_{i} [G : C_G(x_i)],\ }
+\Phi : G/H \to \operatorname{Orb}(x), \quad gH \mapsto g \cdot x.
 \]</p>
 
-<p>其中求和遍及非中心共轭类的代表 \(x_i\)。每一项 \([G : C_G(x_i)] > 1\)（因为 \(C_G(x_i) \subsetneq G\) 当 \(x_i \notin Z(G)\)）。</p>
+<p><em>良定义</em>：\(g_1 H = g_2 H \iff g_2^{-1} g_1 \in H \iff (g_2^{-1} g_1) \cdot x = x \iff g_1 \cdot x = g_2 \cdot x\)。✓ 同时这条等价说明 \(\Phi\) <em>单射</em>。</p>
 
-<p>这条<strong>类方程</strong>（class equation）的应用在群论里数不胜数。最经典的例子：</p>
+<p><em>满射</em>：\(\operatorname{Orb}(x)\) 任意元 \(g \cdot x = \Phi(gH)\)。✓</p>
 
-<p><strong>定理。</strong>设 \(p\) 是素数，\(|G| = p^n\)（\(n \ge 1\)）。则 \(Z(G) \neq \{e\}\)。</p>
+<p>所以 \(\Phi\) 双射。两边同基数：\(|G/H| = |\operatorname{Orb}(x)|\)，即 \([G : \operatorname{Stab}(x)] = |\operatorname{Orb}(x)|\)。Lagrange 给 \([G : H] = |G|/|H|\)，所以 \(|\operatorname{Orb}(x)| \cdot |\operatorname{Stab}(x)| = |G|\)。\(\square\)</p>
 
-<p>证明：每个 \([G : C_G(x_i)]\) 在 \(|G| = p^n\) 的因数中且 \(> 1\)，所以是 \(p\) 的倍数。类方程对 \(p\) 取模给</p>
+<p><em>请你停下来欣赏证明的妙处</em>。轨道-稳定子定理把"轨道大小"（一个组合量）和"稳定子的指标"（一个代数量）<em>等同</em>起来——通过一个具体的一一对应。这条对应不是凭空——它是 5.6 节"商 \(G/H\) 是 \(G\) 在某轨道里的点"那句预告的兑现。<em>陪集 \(gH\) 就是把 \(x\) 送到 \(g \cdot x\) 的所有方式</em>——同一个 \(g \cdot x\) 对应同一个陪集。</p>
+
+<p><strong>例：\(D_6\) 在顶点上。</strong>\(|G| = 12\)，\(|\operatorname{Orb}(1)| = 6\)（6 个顶点都能到），所以 \(|\operatorname{Stab}(1)| = 12/6 = 2\)——不用一个一个数，定理直接给出。</p>
+
+<p><strong>例：\(GL_n(\mathbb{R})\) 在 \(\mathbb{R}^n\) 上。</strong>\(\operatorname{Orb}(0) = \{0\}\)（\(A \cdot 0 = 0\) 总成立），\(\operatorname{Stab}(0) = GL_n\)。\(\operatorname{Orb}(v) = \mathbb{R}^n \setminus \{0\}\)（\(v \neq 0\)；任何非零向量能用可逆矩阵送到任何另一个非零向量），\(\operatorname{Stab}(v) = \{A : Av = v\}\) = 把 \(v\) 当不动点的可逆矩阵——一个 \((n^2 - n)\) 维的子群。轨道-稳定子在<em>无穷</em>群上需要小心解释（"大小"换成测度或维数），但思想完全一样。</p>
+
+<p><strong>例：\(G\) 共轭作用在自身上的轨道。</strong>\(\operatorname{Orb}(x) = \{gxg^{-1} : g \in G\}\) 叫 \(x\) 的<em>共轭类</em>。\(\operatorname{Stab}(x) = \{g : gxg^{-1} = x\} = \{g : gx = xg\}\)——和 \(x\) <em>交换</em>的元素，这个子群叫 \(x\) 的<em>中心化子</em>，记 \(C_G(x)\)。轨道-稳定子给</p>
 
 <p>\[
-0 \equiv |Z(G)| + 0 \pmod p,
+|\text{conj class of } x| = [G : C_G(x)].
 \]</p>
 
-<p>即 \(p \mid |Z(G)|\)。但 \(|Z(G)| \ge 1\)（含 \(e\)），所以 \(|Z(G)| \ge p \ge 2\)。\(\blacksquare\)</p>
+<p>这条公式是下一节"类方程"的核心。</p>
 
-<p>这条小定理是<a href="ch7.html">第 7 章</a>论证 \(p\)-群结构的基石——"\(p\)-群有非平凡中心"让我们能对 \(p\)-群做归纳。</p>
+<h2 id="sec6-5">6.5 类方程</h2>
 
-<h2 id="sec6-8">6.8 Burnside 引理</h2>
-
-<p>"Burnside 引理"是计数原理里的瑰宝。它回答的问题是：<em>群作用下有多少个不同的轨道</em>？换句话说，"在对称变换下，有多少个本质不同的对象"？</p>
-
-<p><strong>Burnside 引理。</strong>设 \(G\) 是有限群，作用于有限集 \(X\)。对每个 \(g \in G\)，记</p>
+<p>把"\(G\) 共轭作用在自身上"的轨道分解写出来。\(G\) 是不相交的共轭类的并：</p>
 
 <p>\[
-\operatorname{Fix}(g) = \{x \in X : g \cdot x = x\}
+G = \bigsqcup_i C_i, \quad |G| = \sum_i |C_i|.
 \]</p>
 
-<p>为 \(g\) 的<em>不动点集</em>。则轨道总数</p>
+<p>把 \(|C_i| = [G : C_G(x_i)]\) 代进去（\(x_i \in C_i\) 任取代表元）：</p>
 
 <p>\[
-\boxed{\ |X/G| \;=\; \frac{1}{|G|} \sum_{g \in G} |\operatorname{Fix}(g)|.\ }
+\boxed{\ |G| = \sum_i [G : C_G(x_i)].\ }
 \]</p>
 
-<p>把这条等式翻译成语言："轨道数 = 不动点平均数"——把每个群元素的不动点数加起来取平均。</p>
+<p>这就是<strong>类方程</strong>。</p>
 
-<p><strong>证明。</strong>关键技巧：双重计数 \(\{(g, x) \in G \times X : g \cdot x = x\}\)。一边按 \(g\) 求和：</p>
+<p>有些项可以分出来。如果 \(x \in Z(G) := \{z : zg = gz \forall g\}\)（\(G\) 的中心），那 \(C_G(x) = G\)，所以 \([G : C_G(x)] = 1\)——\(x\) 自成一个共轭类。把所有中心元素分出来：</p>
 
 <p>\[
-\sum_{g \in G} |\operatorname{Fix}(g)| = |\{(g, x) : g \cdot x = x\}|.
+|G| = |Z(G)| + \sum_{\text{非中心}} [G : C_G(x_i)].
 \]</p>
 
-<p>另一边按 \(x\) 求和：</p>
+<p>右边每个非中心项 \([G : C_G(x_i)] \ge 2\)（因为 \(C_G(x_i) \neq G\)）。这条形式是<a href="ch7.html">第 7 章</a>证 Sylow 定理时的关键工具。</p>
 
-<p>\[
-\sum_{x \in X} |\operatorname{Stab}(x)| = |\{(g, x) : g \cdot x = x\}|.
-\]</p>
+<p><strong>例：\(S_3\) 的类方程。</strong>\(|S_3| = 6\)。共轭类——\(S_n\) 里两个置换共轭 \(\iff\) 循环型相同——所以 \(S_3\) 三类：\(\{e\}\)（型 \([1,1,1]\)，1 个），\(\{(12), (13), (23)\}\)（型 \([2,1]\)，3 个），\(\{(123), (132)\}\)（型 \([3]\)，2 个）。\(6 = 1 + 3 + 2\) ✓。中心 \(Z(S_3) = \{e\}\)（\(S_3\) 非交换，没有任何非恒等元和所有元素交换）。所以 \(6 = 1 + 3 + 2\) 中"\(1\) 是中心部分，\(3\)、\(2\) 是非中心的指标"。</p>
 
-<p>两边相等，所以</p>
-
-<p>\[
-\sum_{g \in G} |\operatorname{Fix}(g)| = \sum_{x \in X} |\operatorname{Stab}(x)|.
-\]</p>
-
-<p>由轨道-稳定子定理，对每个 \(x \in X\)，\(|\operatorname{Stab}(x)| = |G| / |\operatorname{Orb}(x)|\)。代入：</p>
-
-<p>\[
-\sum_{x \in X} |\operatorname{Stab}(x)| = \sum_{x \in X} \frac{|G|}{|\operatorname{Orb}(x)|} = |G| \sum_{x \in X} \frac{1}{|\operatorname{Orb}(x)|}.
-\]</p>
-
-<p>把右边按轨道分组：每个轨道 \(O\) 中所有 \(x\) 都有 \(|\operatorname{Orb}(x)| = |O|\)，所以</p>
-
-<p>\[
-\sum_{x \in X} \frac{1}{|\operatorname{Orb}(x)|} = \sum_{O \in X/G} \sum_{x \in O} \frac{1}{|O|} = \sum_{O \in X/G} 1 = |X/G|.
-\]</p>
-
-<p>合起来 \(\sum_{g \in G} |\operatorname{Fix}(g)| = |G| \cdot |X/G|\)。整理即得 Burnside 引理。\(\blacksquare\)</p>
-
-<p>这条证明的精髓是<em>双重计数</em>——一个对象集合，按两种不同方式数。这是组合数学最常用的论证模式之一。</p>
-
-<h2 id="sec6-9">6.9 应用：项链与立方体染色</h2>
-
-<p><strong>应用 1：项链涂色。</strong>用 \(c\) 种颜色涂一条 \(n\) 颗珠子的圆形项链。两条项链如果在旋转下重合，就算同一条——问本质不同的项链有多少种？</p>
-
-<p>设 \(X = \{n \text{ 颗珠子的全部染色}\}\)，\(|X| = c^n\)。\(G = \mathbb{Z}_n\)（旋转群），\(k\) 表示"转 \(k\) 颗珠子"。\(G\) 作用在 \(X\) 上，本质不同项链数 \(= |X/G|\)。</p>
-
-<p>对每个 \(k \in \mathbb{Z}_n\)，\(\operatorname{Fix}(k) = \{\text{在旋转 } k \text{ 下不变的染色}\}\)。这种染色必须满足"每 \(k\) 颗珠子重复一次"，即染色由 \(\gcd(n, k)\) 个独立颜色决定，所以 \(|\operatorname{Fix}(k)| = c^{\gcd(n, k)}\)。Burnside 引理：</p>
-
-<p>\[
-|X/G| = \frac{1}{n} \sum_{k=0}^{n-1} c^{\gcd(n, k)}.
-\]</p>
-
-<p>具体例子：\(n = 6, c = 2\)。\(\gcd(6, k)\) 取值：\(k = 0 \to 6\)、\(k=1 \to 1\)、\(k=2 \to 2\)、\(k=3 \to 3\)、\(k=4 \to 2\)、\(k=5 \to 1\)。代入：</p>
-
-<p>\[
-|X/G| = \frac{1}{6}(2^6 + 2^1 + 2^2 + 2^3 + 2^2 + 2^1) = \frac{1}{6}(64 + 2 + 4 + 8 + 4 + 2) = \frac{84}{6} = 14.
-\]</p>
-
-<p>即 6 颗珠子 2 种颜色的本质不同项链共 14 种。如果允许翻转（即用二面体群 \(D_6\) 而非循环群），结果会进一步减小。</p>
-
-<p><strong>应用 2：立方体面染色。</strong>用 \(c\) 种颜色涂一个立方体的 6 个面。两种染色如果在旋转下重合就算相同，问有多少种本质不同的染色？</p>
-
-<p>立方体的旋转对称群 \(G\) 阶 \(=24\)。它包含：</p>
+<p><strong>例：\(D_6\) 的类方程。</strong>\(|D_6| = 12\)。共轭类：</p>
 
 <ul>
-  <li>1 个恒等：固定 \(c^6\) 染色；</li>
-  <li>6 个 ±90° 面对面轴旋转（3 条轴 × 2）：固定 \(c^3\) 染色；</li>
-  <li>3 个 180° 面对面轴旋转：固定 \(c^4\) 染色；</li>
-  <li>8 个 ±120° 顶点对顶点轴旋转（4 条轴 × 2）：固定 \(c^2\) 染色；</li>
-  <li>6 个 180° 边对边轴旋转：固定 \(c^3\) 染色。</li>
+  <li>\(\{e\}\)（1 个）。</li>
+  <li>\(\{r, r^5\}\)（旋转 60° 和 -60° 共轭——画一下，180° 反射换它们俩）（2 个）。</li>
+  <li>\(\{r^2, r^4\}\)（2 个）。</li>
+  <li>\(\{r^3\}\)（1 个；180° 旋转和所有元素交换，因为 \(r^3 = -I\) 在矩阵实现下）。</li>
+  <li>3 条"过对顶点的反射轴"对应的反射 \(\{s, r^2 s, r^4 s\}\)（3 个）。</li>
+  <li>3 条"过对边中点的反射轴"对应的反射 \(\{rs, r^3 s, r^5 s\}\)（3 个）。</li>
 </ul>
 
-<p>验证：\(1 + 6 + 3 + 8 + 6 = 24 = |G|\)。Burnside 引理：</p>
+<p>\(12 = 1 + 2 + 2 + 1 + 3 + 3\) ✓。中心 \(Z(D_6) = \{e, r^3\}\)（恒等加 180° 旋转——\(r^3\) 与所有旋转交换显然，与反射也交换因为 \(s r^3 = r^{-3} s = r^3 s\)）。所以 \(12 = 2 + 2 + 2 + 3 + 3\) 中前 2 是中心。</p>
+
+<p>类方程<em>不</em>只是"分类元素的清单"——它强加给 \(|G|\) 的分解一个<em>非平凡</em>的算术约束。例：</p>
+
+<p><strong>命题（"\(p\)-群有非平凡中心"）。</strong>设 \(|G| = p^k\)（\(p\) 素数，\(k \ge 1\)）。则 \(|Z(G)| \ge p\)（特别地 \(Z(G) \neq \{e\}\)）。</p>
+
+<p><em>证</em>：类方程</p>
 
 <p>\[
-|X/G| = \frac{1}{24}(c^6 + 6 c^3 + 3 c^4 + 8 c^2 + 6 c^3) = \frac{1}{24}(c^6 + 3 c^4 + 12 c^3 + 8 c^2).
+p^k = |Z(G)| + \sum_{\text{非中心}} [G : C_G(x_i)].
 \]</p>
 
-<p>取 \(c = 2\)：\(\tfrac{1}{24}(64 + 48 + 96 + 32) = 10\)。即 2 种颜色涂立方体面共 10 种本质不同染色。取 \(c = 3\)：\(\tfrac{1}{24}(729 + 243 + 324 + 72) = 57\)。这种"不需手枚举即能立刻得数"的精确组合是 Burnside 引理的标志性威力。</p>
+<p>每个非中心 \([G : C_G(x_i)]\) 是 \(|G| = p^k\) 的真因子且 \(\neq 1\)，所以是 \(p\) 的某个 \(\ge 1\) 次幂——即 \(p \mid [G : C_G(x_i)]\)。所以右边求和被 \(p\) 整除。\(p \mid p^k\) 显然。所以 \(p \mid |Z(G)|\)。又 \(|Z(G)| \ge 1\)（\(e \in Z(G)\)），所以 \(|Z(G)| \ge p\)。\(\square\)</p>
 
-<p>把本章工具串起来：群作用是观念，轨道-稳定子定理把它代数化为陪集等式，类方程把它用到群自身（共轭作用），Burnside 引理把它升级为计数公式。下一章用<em>轨道-稳定子</em>证<strong>Sylow 定理</strong>——它告诉你"\(p\)-子群"永远存在、彼此共轭、个数有约束。Sylow 定理的全部三条都靠"群作用 + 类方程 + 轨道-稳定子"，是本章工具最优雅的应用。</p>
+<p>这条事实下一章会反复用到。它说"素数幂阶的群<em>必然</em>有非平凡中心"——一个完全用类方程证出的、不显然的事实。</p>
+
+<h2 id="sec6-6">6.6 Burnside 引理与项链着色</h2>
+
+<p>到现在为止我们都在数"<em>一个</em>元素的轨道"。最后看：怎么数<em>所有</em>轨道的<em>个数</em>。这是组合学里一类非常常见的问题——"考虑对称之后的本质不同的结构有多少种"。例：</p>
+
+<p>把 6 颗珠子串成一个项链，每颗珠子涂红或蓝。一共 \(2^6 = 64\) 种染色法。但项链可以<em>转</em>——把所有珠子绕一圈转 60°，染色"位置"变了，但"项链作为对象"还是原来那条。还可以<em>翻面</em>。算上 \(D_6\) 这套对称——本质不同的项链有多少种？</p>
+
+<p>"染色"是 \(X\) 中的元素，\(D_6\) 通过排列珠子作用在 \(X\) 上，"本质不同的项链" = 这个作用的<em>轨道数</em>。直接枚举 64 种然后两两看共不共轨道——做得了但麻烦。Burnside 引理给一个<em>计数轨道</em>的简洁公式。</p>
+
+<p><strong>Burnside 引理（轨道计数定理）。</strong>设有限群 \(G\) 作用在有限集 \(X\) 上。轨道数为</p>
+
+<p>\[
+\boxed{\ \#\text{轨道} = \frac{1}{|G|} \sum_{g \in G} |\operatorname{Fix}(g)|,\ }
+\]</p>
+
+<p>其中 \(\operatorname{Fix}(g) := \{x \in X : g \cdot x = x\}\) 是 \(g\) 在 \(X\) 上的<em>不动点集</em>。</p>
+
+<p><em>证明</em>是个非常聪明的"双重计数"。考虑集合</p>
+
+<p>\[
+S := \{(g, x) \in G \times X : g \cdot x = x\}.
+\]</p>
+
+<p>按 \(g\) 求和：\(|S| = \sum_g |\operatorname{Fix}(g)|\)。</p>
+
+<p>按 \(x\) 求和：\(|S| = \sum_x |\operatorname{Stab}(x)|\)。</p>
+
+<p>对 \(x\) 在轨道 \(\operatorname{Orb}(y)\) 内的所有元素，由轨道-稳定子定理 \(|\operatorname{Stab}(x)| = |G|/|\operatorname{Orb}(x)| = |G|/|\operatorname{Orb}(y)|\)（同一轨道里的稳定子<em>大小</em>相同；事实上不同 \(x\) 的稳定子是<em>共轭</em>的子群，但大小一样）。所以</p>
+
+<p>\[
+\sum_{x \in \operatorname{Orb}(y)} |\operatorname{Stab}(x)| = |\operatorname{Orb}(y)| \cdot \frac{|G|}{|\operatorname{Orb}(y)|} = |G|.
+\]</p>
+
+<p>对每个轨道贡献是 \(|G|\)。所以</p>
+
+<p>\[
+|S| = (\#\text{轨道}) \cdot |G|.
+\]</p>
+
+<p>两式相等：\(\sum_g |\operatorname{Fix}(g)| = (\#\text{轨道}) \cdot |G|\)。整理得引理。\(\square\)</p>
+
+<p><strong>跑一遍：6 颗珠子两色项链。</strong>\(G = D_6\)（12 个对称），\(X = \{0, 1\}^6\)（\(|X| = 64\)）。我们要算每个 \(g \in D_6\) 的 \(|\operatorname{Fix}(g)|\)——"被 \(g\) 不动的染色" = "经 \(g\) 排列后看起来一样的染色"——一个染色被 \(g\) 不动 \(\iff\) 任何 \(g\) 的循环里所有珠子同色。所以 \(|\operatorname{Fix}(g)| = 2^{c(g)}\)，\(c(g)\) 是 \(g\) 作为 \(\{1, \ldots, 6\}\) 上置换的<em>循环数</em>。</p>
+
+<p>把 \(D_6\) 的 12 个对称按循环型分类：</p>
+
+<ul>
+  <li>\(e\)：6 个固定点 → 6 个长度 1 的循环 → \(c = 6\) → \(2^6 = 64\)。共 1 个对称。</li>
+  <li>\(r, r^5\)（转 ±60°）：6-循环 → \(c = 1\) → \(2^1 = 2\)。共 2 个对称。</li>
+  <li>\(r^2, r^4\)（转 ±120°）：两个 3-循环 → \(c = 2\) → \(2^2 = 4\)。共 2 个对称。</li>
+  <li>\(r^3\)（转 180°）：三个 2-循环 → \(c = 3\) → \(2^3 = 8\)。共 1 个对称。</li>
+  <li>3 条"过对顶点轴"的反射：每条固定 2 顶点，其余 4 顶点配成 2 个 2-循环 → \(c = 2 + 2 = 4\) → \(2^4 = 16\)。共 3 个对称。</li>
+  <li>3 条"过对边中点轴"的反射：6 顶点配成 3 个 2-循环 → \(c = 3\) → \(2^3 = 8\)。共 3 个对称。</li>
+</ul>
+
+<p>求和</p>
+
+<p>\[
+\sum_g |\operatorname{Fix}(g)| = 1 \cdot 64 + 2 \cdot 2 + 2 \cdot 4 + 1 \cdot 8 + 3 \cdot 16 + 3 \cdot 8
+\]</p>
+
+<p>\[
+= 64 + 4 + 8 + 8 + 48 + 24 = 156.
+\]</p>
+
+<p>除以 \(|G| = 12\)：\(156 / 12 = 13\)。<em>本质不同的两色 6 珠项链有 13 种</em>。</p>
+
+<p>请你停下来欣赏：直接列举 64 种然后分组——做得到，但费劲；Burnside 引理给一个<em>系统</em>的计数程式。本质上它把"数轨道"（一个<em>整体</em>的事）化成"数每个 \(g\) 的不动点"（一个<em>逐元素</em>的事），每一项都简单。</p>
+
+<p>这种"用群作用做组合计数"叫<em>Pólya 计数理论</em>。它在化学（同分异构体）、晶体学（晶格点群分类）、密码学（攻击分组对称）、组合（多项式系数恒等式）里反复出现——所有"考虑某种对称之后还剩多少种"的问题，背后都是同一句 Burnside 引理。</p>
+
+<h2 id="sec6-7">6.7 这门技术接下来去哪</h2>
+
+<p>本章给的工具——群作用、轨道-稳定子、类方程、Burnside——是后面整个抽象代数<em>不停</em>用到的语言。预告几个高峰：</p>
+
+<ul>
+  <li><a href="ch7.html">第 7 章</a> Sylow 定理：核心工具就是<em>"\(G\) 自身共轭作用在它的子群集合上"</em>，再用类方程数轨道。Sylow 第二定理"所有 Sylow \(p\)-子群共轭"和第三定理"\(n_p \equiv 1 \pmod p\)" 都从这套作用直接推。</li>
+  <li><a href="ch10.html">第 10 章</a> 对称群 \(S_n\)：Cayley 定理（例 4 那条）告诉你 \(S_n\) 是"宇宙群"——研究 \(S_n\) 等于研究所有 \(\le n\) 阶群。然后 \(S_n\) 自身的共轭类（按循环型）+ \(A_n\) 的简单性都用类方程。</li>
+  <li><a href="ch24.html">第 24 章</a> 表示论：<em>群作用在向量空间上</em>就是"群表示"——把例 3 的标量域换成线性结构。表示论是 20 世纪到现在数学物理的中心工具，从粒子物理到机器学习的等变神经网络都靠它。</li>
+  <li><a href="../复分析/index.html">复分析 / 几何</a>：\(D_6\) 的故事在更广的"对称的几何对象"上继续——欧式几何、双曲几何、Riemann 曲面，每一个都有对应的"作用群"（运动群、模群等）。</li>
+</ul>
+
+<p>所以这一章不是孤立技巧，是整个代数与几何接口的<em>语法</em>。"群"自己是抽象对象；"群作用"是它在具体对象上的<em>表现</em>——而所有有意义的代数都最终落到"作用"上。</p>
+
+<p>下一章我们用本章的工具——尤其类方程——证 Sylow 三大定理。它们能让你<em>仅凭群的阶</em>就推断出群必须含有什么子群。这是有限群论第一段的最高峰。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 商群与三大同构定理</a><a href="ch7.html">下一章 · 第 7 章 Sylow 定理 →</a></nav>
 </main>

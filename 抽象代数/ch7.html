@@ -32,206 +32,324 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 群作用、轨道、稳定子</a><a href="ch8.html">下一章 · 第 8 章 有限交换群的结构定理 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 群作用、轨道、稳定子</a><a href="ch8.html">下一章 · 第 8 章 有限交换群分类 →</a></nav>
 <h1 id="ch7">第 7 章 Sylow 定理</h1>
 
-<p>群论里所谓"小阶分类"——给一个具体的有限阶 \(n\)，把所有阶 \(n\) 群都列清楚——靠的是一组非常硬核的工具。第 3 章 Lagrange 定理告诉你"子群阶必整除群阶"；这是<em>必要</em>条件。<strong>反过来呢？</strong>给定 \(d \mid |G|\)，是否一定存在阶 \(d\) 的子群？答案令人尴尬：不一定。\(A_4\) 有 12 个元素，6 整除 12，但 \(A_4\) 没有 6 阶子群。Lagrange 给的是<em>上界</em>，不是<em>构造</em>。</p>
+<p>问一个看起来天真的问题：<em>阶 12 的群有几种</em>？</p>
 
-<p>本章我们用<strong>三条 Sylow 定理</strong>把这个反向问题做到极致。Cauchy 先解决素数情形：\(p \mid |G| \Rightarrow\) \(G\) 有 \(p\) 阶元素。Sylow 把它推到<em>素幂</em>情形：写 \(|G| = p^n m\) 且 \(p \nmid m\)，那么 \(G\) 一定有阶恰为 \(p^n\) 的子群（叫 Sylow \(p\)-子群）；而且任意两个 Sylow \(p\)-子群在 \(G\) 中共轭；Sylow \(p\)-子群的<em>个数</em> \(n_p\) 还满足两条限制 \(n_p \equiv 1 \pmod p\) 与 \(n_p \mid m\)。这三条加在一起就是有限群论里最强的"小阶判定机器"。</p>
+<p>你能想到的：</p>
 
 <ul>
-  <li>7.1 Cauchy 定理——\(p\) 阶元素的存在性，用 \(\mathbb{Z}_p\) 在 \(p\) 元组上的旋转作用。</li>
-  <li>7.2 \(p\)-子群与 Sylow \(p\)-子群的定义和最初的语言准备。</li>
-  <li>7.3 第一 Sylow 定理——存在性，用 Cauchy 归纳加共轭作用类方程。</li>
-  <li>7.4 第二 Sylow 定理——任两个 Sylow \(p\)-子群在 \(G\) 中共轭。</li>
-  <li>7.5 第三 Sylow 定理——\(n_p\) 的两条数论限制。</li>
-  <li>7.6 应用一：\(|G| = 12\) 群的全分类（4 种）。</li>
-  <li>7.7 应用二：\(|G| = 30\) 与 \(|G| = 56\) 群的分类。</li>
-  <li>7.8 应用三：\(|G| = pq, p < q, p \nmid q - 1\) 必循环。</li>
+  <li>\(\mathbb{Z}_{12}\)（循环群）；</li>
+  <li>\(\mathbb{Z}_6 \times \mathbb{Z}_2\)（也阿贝尔，但不循环——因为 \(\gcd(6, 2) = 2 \neq 1\)，<a href="ch8.html">下一章</a>讲）；</li>
+  <li>\(A_4\)（4 元交错群——4 元集合上的偶置换，\(|A_4| = 4!/2 = 12\)）；</li>
+  <li>\(D_6\)（六边形对称群，\(|D_6| = 12\)）。</li>
 </ul>
 
-<h2 id="sec7-1">7.1 Cauchy 定理</h2>
+<p>四种。你怎么知道<em>没有第五种</em>？</p>
 
-<p><strong>定理（Cauchy, 1845）。</strong>设 \(G\) 是有限群，\(p\) 是整除 \(|G|\) 的素数。那么 \(G\) 中存在一个阶恰为 \(p\) 的元素。</p>
+<p>"试到 12 元素然后看乘法表"——理论上行，实际不行（\(12!\) 个候选乘法表）。要 <em>系统</em>列出所有 12 阶群必须有一套<em>从 \(|G| = 12\) 直接读出"群必须长什么样"</em> 的工具。</p>
 
-<p>证明用一个非常巧妙的群作用。考虑集合</p>
+<p>关键观察：\(12 = 2^2 \cdot 3\)。这个素分解<em>强迫</em>群有以下子群：</p>
 
-<p>\[
-X = \{(g_1, g_2, \ldots, g_p) \in G^p : g_1 g_2 \cdots g_p = e\}.
-\]</p>
+<ul>
+  <li><em>4 阶子群</em>（即 \(2^2\) 阶——叫"Sylow 2-子群"）；</li>
+  <li><em>3 阶子群</em>（即 \(3^1\) 阶——叫"Sylow 3-子群"）。</li>
+</ul>
 
-<p>选定 \(g_1, \ldots, g_{p-1}\) 任意，则 \(g_p\) 被唯一锁定为 \((g_1 \cdots g_{p-1})^{-1}\)，所以 \(|X| = |G|^{p-1}\)。由 \(p \mid |G|\)，</p>
+<p>而且每种 Sylow 子群的<em>个数</em>也被锁死在一个很小的范围内。\(|G| = 12\) 时 Sylow 3-子群的个数 \(n_3\) 满足 \(n_3 \equiv 1 \pmod 3\) 和 \(n_3 \mid 4\)，所以 \(n_3 \in \{1, 4\}\)。\(n_2\) 满足 \(n_2 \equiv 1 \pmod 2\) 和 \(n_2 \mid 3\)，所以 \(n_2 \in \{1, 3\}\)。这<em>四种</em>组合 \((n_2, n_3) \in \{(1,1), (1,4), (3,1), (3,4)\}\) 经过细分析<em>正好对应</em>开头列的四个群。这就是 Sylow 定理的力量。</p>
 
-<p>\[
-p \mid |X|.
-\]</p>
+<p>本章把"\(|G|\) 的素分解决定子群结构"这件事说清楚——三条 Sylow 定理，每条单独都能让你算出"必有多少个、多大子群"。然后我们用它们完整列出 \(|G| = 12, 30, 56\) 的所有群。</p>
 
-<p>现在让 \(\mathbb{Z}_p = \langle \sigma \rangle\)（生成元 \(\sigma\) 是循环移位）作用在 \(X\) 上：</p>
+<h2 id="sec7-1">7.1 Cauchy 定理：素数阶元素必存在</h2>
 
-<p>\[
-\sigma \cdot (g_1, g_2, \ldots, g_p) = (g_2, g_3, \ldots, g_p, g_1).
-\]</p>
+<p>最朴素的"\(|G|\) 决定子群结构"是这条：</p>
 
-<p>这个作用合法——若 \(g_1 g_2 \cdots g_p = e\)，则 \(g_2 \cdots g_p g_1 = g_1^{-1}(g_1 g_2 \cdots g_p) g_1 = g_1^{-1} e g_1 = e\)。</p>
+<p><strong>Cauchy 定理。</strong>设 \(G\) 有限，\(p\) 是 \(|G|\) 的素因子。则 \(G\) 含有阶 \(p\) 的元素（等价：\(G\) 含有 \(p\) 阶子群）。</p>
 
-<p>每个 \(\mathbb{Z}_p\)-轨道大小整除 \(|\mathbb{Z}_p| = p\)，所以轨道大小是 1 或 \(p\)。轨道大小 = 1 当且仅当 \((g_1, \ldots, g_p)\) 是不动点，当且仅当 \(g_1 = g_2 = \cdots = g_p =: g\)，且 \(g^p = e\)。</p>
+<p>这是 Sylow 第一定理的<em>素特例</em>——Sylow 一会儿把"\(p\)"提到"\(p^k\)"。先看 Cauchy 的证明，因为它的思想——"造一个奇怪的群作用，再数轨道"——是 Sylow 证明的全部蓝图。</p>
 
-<p>设有 \(N\) 个不动点。所有非平凡轨道大小为 \(p\)，所以 \(|X| = N + p \cdot k\)（\(k\) 为非平凡轨道数）。由 \(p \mid |X|\)，\(p \mid N\)。\(N \ge 1\)（\((e, e, \ldots, e)\) 总是不动点）。所以 \(N \ge p\)。</p>
-
-<p>因此存在<em>非平凡</em>不动点 \((g, g, \ldots, g)\) 与 \(g \neq e\)、\(g^p = e\)，即 \(g\) 阶恰为 \(p\)。</p>
+<p><em>证明。</em>设 \(p \mid |G|\)。考虑集合</p>
 
 <p>\[
-\boxed{\ p \mid |G| \implies \exists g \in G,\ \operatorname{ord}(g) = p.\ }
+X := \{(g_1, g_2, \ldots, g_p) \in G^p : g_1 g_2 \cdots g_p = e\}.
 \]</p>
 
-<p>这是 Cauchy 定理。它在<a href="../数论/index.html">数论读本</a>"Fermat 小定理 \(a^p \equiv a \pmod p\)"那一章你应该见过几个不同的证明，这里是真正的群论本源——\(\mathbb{Z}/p\mathbb{Z}^*\) 的阶是 \(p - 1\)，对它用 Lagrange 立得 \(a^{p-1} \equiv 1\)，再乘 \(a\) 就是 Fermat。</p>
+<p>"\(p\) 元组，乘起来等于 \(e\)"。</p>
+
+<p>\(|X|\) 是多少？前 \(p - 1\) 个元素 \(g_1, \ldots, g_{p-1}\) 任选（\(|G|^{p-1}\) 种），\(g_p\) 被前面唯一决定为 \(g_p = (g_1 \cdots g_{p-1})^{-1}\)。所以 \(|X| = |G|^{p-1}\)。<em>由 \(p \mid |G|\) 得 \(p \mid |X|\)</em>。</p>
+
+<p>现在让循环群 \(\mathbb{Z}/p\mathbb{Z}\) 作用在 \(X\) 上——通过<em>循环移位</em>：</p>
+
+<p>\[
+1 \cdot (g_1, g_2, \ldots, g_p) := (g_2, g_3, \ldots, g_p, g_1).
+\]</p>
+
+<p>验作用合法：(a) \(0 \cdot \vec g = \vec g\) ✓；(b) 移 \(p\) 次回到原位 ✓；(c) 移位结果还在 \(X\) 里——要验 \(g_2 g_3 \cdots g_p g_1 = e\)，从 \(g_1 g_2 \cdots g_p = e\) 两边左乘 \(g_1^{-1}\) 得 \(g_2 \cdots g_p = g_1^{-1}\)，再右乘 \(g_1\) 得 \(g_2 \cdots g_p g_1 = e\) ✓。</p>
+
+<p>由轨道-稳定子定理，每个轨道大小整除 \(|\mathbb{Z}/p\mathbb{Z}| = p\)——所以每个轨道大小是 \(1\) 或 \(p\)。</p>
+
+<p>\(|X|\) 是所有轨道大小的和。设有 \(a\) 个大小 \(1\) 的轨道、\(b\) 个大小 \(p\) 的轨道：\(|X| = a + bp\)。\(p \mid |X|\) 又 \(p \mid bp\)，所以<em>\(p \mid a\)</em>。</p>
+
+<p>哪个 \(\vec g\) 给出大小 \(1\) 轨道？大小 \(1\) \(\iff\) 移位不变 \(\iff\) \(g_1 = g_2 = \ldots = g_p\) =: \(g\)。条件 \(g^p = e\)。所以</p>
+
+<p>\[
+a = |\{g \in G : g^p = e\}|.
+\]</p>
+
+<p>\(g = e\) 显然满足，所以 \(a \ge 1\)。又 \(p \mid a\)，所以 \(a \ge p \ge 2\)。所以<em>存在 \(g \neq e\) 使 \(g^p = e\)</em>——这个 \(g\) 的阶整除 \(p\)，又 \(\neq 1\)，所以阶恰为 \(p\)。\(\square\)</p>
+
+<p>请你停下来欣赏这个证明的"<em>反常</em>"——它没在 \(G\) 内部直接找元素，而是<em>构造一个外部的辅助集合 \(X\)</em>，让 \(\mathbb{Z}/p\) 作用在它上面，再数轨道。这种"<em>用群作用 + 整除性卡死答案</em>"的手法是 Sylow 证明的全部模板。</p>
+
+<p><strong>例。</strong>\(|G| = 30 = 2 \cdot 3 \cdot 5\)。Cauchy 立刻给出：\(G\) 必有 2 阶元素、3 阶元素、5 阶元素。</p>
+
+<p><strong>例。</strong>\(|G| = 12 = 2^2 \cdot 3\)。\(G\) 必有 2 阶和 3 阶元素。但<em>不能</em>直接断定有 4 阶元素（\(\mathbb{Z}/2 \times \mathbb{Z}/2\) 阶 4 但每个非恒等元阶 2）。要"4 阶子群"，需要 Sylow 第一定理。</p>
 
 <h2 id="sec7-2">7.2 \(p\)-子群与 Sylow \(p\)-子群</h2>
 
-<p>把 Cauchy 推到素幂之前先建立词汇。</p>
+<p>把"阶 \(p\) 子群"提升到"阶 \(p^k\) 子群"。先定义术语。</p>
 
-<p><strong>定义。</strong>设 \(p\) 是素数。一个有限群 \(P\) 称为 <strong>\(p\)-群</strong>（\(p\)-group），如果 \(|P|\) 是 \(p\) 的某个非负整数次幂。</p>
-
-<p><strong>定义。</strong>设 \(G\) 是有限群，\(|G| = p^n m\)，\(\gcd(p, m) = 1\)。\(G\) 的一个子群 \(P \le G\) 称为 <strong>Sylow \(p\)-子群</strong>，如果 \(|P| = p^n\)（即 \(P\) 是 \(G\) 的一个最大 \(p\)-阶子群）。</p>
-
-<p>记 \(n_p = n_p(G) = \) <strong>\(G\) 中 Sylow \(p\)-子群的个数</strong>。</p>
-
-<p>具体例子。\(G = S_3\) 阶 \(6 = 2 \cdot 3\)。\(p = 2\)：Sylow 2-子群阶 2，恰好就是 \(\{e, (12)\}, \{e, (13)\}, \{e, (23)\}\) 三个，故 \(n_2 = 3\)。\(p = 3\)：Sylow 3-子群阶 3，只有 \(A_3 = \{e, (123), (132)\}\) 一个，故 \(n_3 = 1\)。</p>
-
-<p>另一个例子。\(G = D_4\) 阶 8。它本身就是阶 \(2^3\) 的 \(p\)-群，所以唯一的 Sylow 2-子群是 \(D_4\) 自身，\(n_2 = 1\)。</p>
-
-<p>一个简单事实先记下：<strong>\(p\)-群的中心非平凡</strong>。证明：设 \(|P| = p^n\)，让 \(P\) 共轭作用在自身上。类方程</p>
-
-<p>\[
-|P| = |Z(P)| + \sum_{[x] \notin Z(P)} [P : C_P(x)],
-\]</p>
-
-<p>每个非中心共轭类大小 \([P : C_P(x)] > 1\) 且整除 \(|P| = p^n\)，故为 \(p\) 的正幂。所以 \(p \mid |Z(P)|\)，\(|Z(P)| \ge p > 1\)。</p>
-
-<p>\[
-\boxed{\ Z(P) \neq \{e\}\ \text{对任何非平凡 }p\text{-群 } P.\ }
-\]</p>
-
-<p>这条"\(p\)-群有非平凡中心"是 Sylow 证明里反复要用的引擎。它在<a href="ch4.html">第 4 章</a>讲过类方程；这里把它具体到 \(p\)-群上。</p>
-
-<h2 id="sec7-3">7.3 第一 Sylow 定理：存在性</h2>
-
-<p><strong>定理（第一 Sylow）。</strong>设 \(G\) 是有限群，\(|G| = p^n m\)，\(p \nmid m\)。则 \(G\) 有阶 \(p^k\) 的子群，对每个 \(0 \le k \le n\)。特别地，\(k = n\) 给出 Sylow \(p\)-子群的存在性。</p>
-
-<p>证明对 \(|G|\) 归纳。\(|G| = 1\) 平凡。设结论对所有阶小于 \(|G|\) 的群成立。</p>
-
-<p>让 \(G\) 共轭作用在自身：</p>
-
-<p>\[
-|G| = |Z(G)| + \sum_{[x] \notin Z(G)} [G : C_G(x)].
-\]</p>
-
-<p><strong>情形 1。</strong>存在某个非中心 \(x\) 使 \(p \nmid [G : C_G(x)]\)。则 \(p^n \mid |C_G(x)|\)。由于 \(C_G(x) \subsetneq G\)（\(x \notin Z(G)\)），\(|C_G(x)| < |G|\)，对它用归纳：\(C_G(x)\) 含阶 \(p^n\) 子群，它就是 \(G\) 的 Sylow \(p\)-子群。</p>
-
-<p><strong>情形 2。</strong>对所有非中心 \(x\)，\(p \mid [G : C_G(x)]\)。则类方程模 \(p\) 看：\(|G| \equiv |Z(G)| \pmod p\)。由 \(p \mid |G|\)，\(p \mid |Z(G)|\)。Cauchy 定理给 \(Z(G)\) 中阶 \(p\) 元素 \(z\)。\(z\) 在中心，所以 \(\langle z \rangle\) 是 \(G\) 的<em>正规</em>子群。考虑商 \(G / \langle z \rangle\) 阶 \(|G|/p < |G|\)，对它用归纳：商群中存在阶 \(p^{n-1}\) 子群 \(\overline P\)。它的原像 \(\pi^{-1}(\overline P) \le G\) 阶为 \(p \cdot p^{n-1} = p^n\)（这里用第 5 章<a href="ch5.html">商群的对应定理</a>）。这就是 Sylow \(p\)-子群。</p>
-
-<p>得到一个阶 \(p^n\) 的子群 \(P\) 后，下行到任意 \(0 \le k \le n\) 的阶 \(p^k\) 子群很容易：\(P\) 自身是 \(p\)-群，它的中心 \(Z(P) \ne \{e\}\)，里面有阶 \(p\) 元 \(z\)；\(\langle z \rangle\) 是阶 \(p\) 的（自动正规于 \(P\)）子群；商 \(P/\langle z \rangle\) 阶 \(p^{n-1}\) 也是 \(p\)-群。归纳得到任意 \(p^k\) 阶子群。</p>
-
-<p>\[
-\boxed{\ |G| = p^n m,\ p \nmid m\ \Longrightarrow\ G \text{ 有 Sylow } p\text{-子群（阶 } p^n\text{）}.\ }
-\]</p>
-
-<p>这条定理把 Cauchy 一举推到素幂。它的证明展示了"中心论 + 类方程 + 归纳"这三件套的威力，这种思路你在群论里以后会反复看到。</p>
-
-<h2 id="sec7-4">7.4 第二 Sylow 定理：共轭性</h2>
-
-<p><strong>定理（第二 Sylow）。</strong>设 \(P\) 是 \(G\) 的一个 Sylow \(p\)-子群，\(H\) 是 \(G\) 的任一 \(p\)-子群。则存在 \(g \in G\) 使 \(H \subseteq g P g^{-1}\)。特别地，<em>任意两个 Sylow \(p\)-子群都在 \(G\) 中共轭</em>。</p>
-
-<p>证明。让 \(G\) 用左乘作用在陪集集合 \(G / P\) 上。\(|G/P| = m\)（\(p \nmid m\)）。把这个作用<em>限制到 \(H\)</em>，看 \(H\) 在 \(G/P\) 上的轨道分解：</p>
-
-<p>\[
-m = |G/P| = \sum_i [H : H \cap g_i P g_i^{-1}] \quad (\text{每个轨道一个代表 } g_i P).
-\]</p>
-
-<p>每个 \(H\)-轨道大小 \([H : H \cap g_i P g_i^{-1}]\) 整除 \(|H|\)，故为 \(p\) 的某次幂（\(H\) 是 \(p\)-群）。但总和 \(m\) 不被 \(p\) 整除——所以至少有一个轨道大小为 \(p^0 = 1\)。设这个轨道由 \(g P\) 代表，则 \([H : H \cap g P g^{-1}] = 1\)，即 \(H \cap g P g^{-1} = H\)，即 \(H \subseteq g P g^{-1}\)。</p>
-
-<p>取 \(H\) 也是 Sylow \(p\)-子群：\(|H| = p^n = |g P g^{-1}|\)，由 \(H \subseteq g P g^{-1}\) 与基数相等得 \(H = g P g^{-1}\)。证完。</p>
-
-<p>\[
-\boxed{\ \text{任两个 Sylow } p\text{-子群 } P_1, P_2\ \exists g \in G:\ P_2 = g P_1 g^{-1}.\ }
-\]</p>
-
-<p>共轭性的一个直接推论：<strong>\(n_p = 1\) 当且仅当 Sylow \(p\)-子群正规</strong>。因为唯一的共轭类只有它自己 \(\Leftrightarrow\) 它的所有共轭都等于自己 \(\Leftrightarrow\) 它正规。这条等价是后面分类应用的钥匙——证明某个 Sylow \(p\)-子群正规，等于证明 \(n_p = 1\)。</p>
-
-<h2 id="sec7-5">7.5 第三 Sylow 定理：个数</h2>
-
-<p><strong>定理（第三 Sylow）。</strong>设 \(|G| = p^n m\)，\(p \nmid m\)。则 \(G\) 中 Sylow \(p\)-子群的个数 \(n_p\) 满足</p>
-
-<p>\[
-\boxed{\ n_p \equiv 1 \pmod p, \qquad n_p \mid m.\ }
-\]</p>
-
-<p>证明分两半。</p>
-
-<p><strong>(a) \(n_p \mid m\)。</strong>由第二 Sylow 定理，所有 Sylow \(p\)-子群构成一个共轭类。这个类的大小 \(= [G : N_G(P)]\)（\(N_G(P)\) 是 \(P\) 在 \(G\) 中的<em>正规化子</em>，第 6 章定义过）。所以 \(n_p = [G : N_G(P)]\)。\(P \subseteq N_G(P)\)，故 \(p^n \mid |N_G(P)|\)，故 \([G : N_G(P)] \mid m\)。</p>
-
-<p><strong>(b) \(n_p \equiv 1 \pmod p\)。</strong>固定一个 Sylow \(p\)-子群 \(P\)，让它共轭作用在所有 Sylow \(p\)-子群构成的集合 \(\Omega = \{P_1 = P, P_2, \ldots, P_{n_p}\}\) 上。\(P\) 自己是这个作用的不动点（\(P\) 共轭自身得自身）。我们证<em>它是唯一的不动点</em>。</p>
-
-<p>设 \(P_i\) 是 \(P\) 作用的不动点，即 \(P\) 把 \(P_i\) 共轭到自身：对所有 \(g \in P\)，\(g P_i g^{-1} = P_i\)。这等价于 \(P \subseteq N_G(P_i)\)。但 \(P_i\) 在 \(N_G(P_i)\) 中是<em>正规</em>的（按定义），且 \(P_i\) 是 \(N_G(P_i)\) 的 Sylow \(p\)-子群（因为 \(|P_i| = p^n\) 已是 \(p\) 的最大次幂）。\(P\) 也是 \(N_G(P_i)\) 的一个 Sylow \(p\)-子群（\(P \subseteq N_G(P_i)\) 且 \(|P| = p^n\)）。在 \(N_G(P_i)\) 内部用第二 Sylow 定理：两个 Sylow \(p\)-子群共轭。但 \(P_i\) 在 \(N_G(P_i)\) 里正规，所以它的共轭类只含自己，迫使 \(P = P_i\)。</p>
-
-<p>所以 \(P\) 在 \(\Omega\) 上的不动点恰有一个。其它轨道大小整除 \(|P| = p^n\) 且大于 1，故为 \(p\) 的正次幂。因此 \(n_p = 1 + (\text{若干个 }p\text{ 的正次幂}) \equiv 1 \pmod p\)。</p>
-
-<p>这两条数论限制把 \(n_p\) 严重压缩。例如 \(|G| = 15 = 3 \cdot 5\)，\(n_5 \mid 3\) 且 \(n_5 \equiv 1 \pmod 5\)：\(n_5 \in \{1, 6, 11, \ldots\} \cap \{1, 3\} = \{1\}\)。所以 \(n_5 = 1\)，唯一的 Sylow 5-子群正规。同理 \(n_3 = 1\)。两个正规子群 + 阶互素 \(\Rightarrow\) \(G \cong \mathbb{Z}_3 \times \mathbb{Z}_5 \cong \mathbb{Z}_{15}\)。所有阶 15 的群都循环。</p>
-
-<h2 id="sec7-6">7.6 应用：阶 12 群的分类</h2>
-
-<p>\(|G| = 12 = 2^2 \cdot 3\)。\(n_3 \mid 4\) 且 \(n_3 \equiv 1 \pmod 3\)：\(n_3 \in \{1, 4\}\)。\(n_2 \mid 3\) 且 \(n_2 \equiv 1 \pmod 2\)（自动）：\(n_2 \in \{1, 3\}\)。</p>
-
-<p><strong>情形 A：\(n_3 = 1\)。</strong>唯一 Sylow 3-子群 \(N \cong \mathbb{Z}_3\) 正规。Sylow 2-子群 \(H\) 阶 4，\(H \in \{\mathbb{Z}_4, \mathbb{Z}_2 \times \mathbb{Z}_2\}\)。\(G = N \rtimes H\) 半直积，由 \(\varphi: H \to \operatorname{Aut}(N) \cong \mathbb{Z}_2\) 决定。</p>
+<p><strong>定义。</strong>设 \(p\) 素数。</p>
 
 <ul>
-  <li>\(\varphi\) 平凡 \(+\) \(H = \mathbb{Z}_4\)：\(G = \mathbb{Z}_3 \times \mathbb{Z}_4 \cong \mathbb{Z}_{12}\)。</li>
-  <li>\(\varphi\) 平凡 \(+\) \(H = \mathbb{Z}_2 \times \mathbb{Z}_2\)：\(G = \mathbb{Z}_3 \times \mathbb{Z}_2 \times \mathbb{Z}_2 \cong \mathbb{Z}_6 \times \mathbb{Z}_2\)。</li>
-  <li>\(\varphi\) 非平凡 \(+\) \(H = \mathbb{Z}_4\)：把 \(\mathbb{Z}_4\) 的生成元送到反演 \(x \mapsto -x\)。得到 <strong>二重三角群（dicyclic 群）</strong> \(Q_{12}\)。但留意 \(\mathbb{Z}_4\) 中阶 2 元须被送到平凡（因为 \(\operatorname{Aut}(\mathbb{Z}_3)\) 的阶 2 元是反演），所以 \(\varphi\) 唯一，得到 \(Q_{12}\)。这个群也叫 \(\mathrm{Dic}_3\)，与 \(D_6\) 不同构。</li>
-  <li>\(\varphi\) 非平凡 \(+\) \(H = \mathbb{Z}_2 \times \mathbb{Z}_2\)：得到 \(D_6\)（正六边形对称群，与 \(S_3 \times \mathbb{Z}_2\) 同构）。</li>
+  <li>群 \(P\) 叫\(p\)-<em>群</em>，如果 \(|P| = p^k\) 某 \(k \ge 0\)。</li>
+  <li>设 \(G\) 有限，写 \(|G| = p^a m\) 其中 \(\gcd(p, m) = 1\)（\(p^a\) 是 \(p\) 整除 \(|G|\) 的最高幂）。\(G\) 的子群 \(P\) 叫 <em>Sylow \(p\)-子群</em>，如果 \(|P| = p^a\)（即 \(P\) 是 \(p\)-子群里最大的可能阶）。</li>
 </ul>
 
-<p><strong>情形 B：\(n_3 = 4\)。</strong>4 个 Sylow 3-子群，每个含 2 个 3 阶元，互不相交（两个不同 3 阶子群只共享 \(e\)），共 \(4 \cdot 2 = 8\) 个 3 阶元。剩下 \(12 - 8 - 1 = 3\) 个非单位元，这 3 个再加 \(e\) 必构成唯一的 Sylow 2-子群（\(n_2 = 1\)），它是 \(\mathbb{Z}_2 \times \mathbb{Z}_2\)。这就是 <strong>\(A_4\)</strong>——4 个 Sylow 3-子群恰好是 \(A_4\) 的 4 个 3 元循环子群，唯一 Sylow 2-子群是 Klein 四元群。</p>
+<p>例：\(|G| = 12 = 2^2 \cdot 3\)。Sylow 2-子群是阶 4 的子群；Sylow 3-子群是阶 3 的子群。</p>
 
-<p>合并：阶 12 群恰有 5 类——\(\mathbb{Z}_{12}, \mathbb{Z}_6 \times \mathbb{Z}_2, A_4, D_6, Q_{12}\)。如果只算"非同构"的，是 5 个。本节按教科书惯例做了细致区分。注意 \(A_4\) 没有 6 阶子群（虽然 \(6 \mid 12\)），这就是开篇提到的 Lagrange 反例。</p>
+<p>例：\(|G| = 60 = 2^2 \cdot 3 \cdot 5\)。Sylow 2-子群阶 4；Sylow 3-子群阶 3；Sylow 5-子群阶 5。</p>
 
-<h2 id="sec7-7">7.7 应用：阶 30 与阶 56 群</h2>
+<p>下面三条 Sylow 定理回答<em>三个问题</em>：</p>
 
-<p><strong>例 \(|G| = 30 = 2 \cdot 3 \cdot 5\)。</strong>\(n_5 \mid 6\) 且 \(\equiv 1 \pmod 5\)：\(n_5 \in \{1, 6\}\)。\(n_3 \mid 10\) 且 \(\equiv 1 \pmod 3\)：\(n_3 \in \{1, 10\}\)。</p>
+<ol>
+  <li>Sylow \(p\)-子群<em>存在吗</em>？（第一定理：是。）</li>
+  <li>多个 Sylow \(p\)-子群之间什么<em>关系</em>？（第二定理：互相共轭。）</li>
+  <li>它们有<em>多少个</em>？（第三定理：\(n_p \equiv 1 \pmod p\) 且 \(n_p \mid m\)。）</li>
+</ol>
 
-<p>反证：若 \(n_5 = 6\) 且 \(n_3 = 10\)，则 5 阶元数 \(= 6 \cdot 4 = 24\)，3 阶元数 \(= 10 \cdot 2 = 20\)。\(24 + 20 + 1 = 45 > 30\)，矛盾。所以 \(n_5 = 1\) 或 \(n_3 = 1\)。任一情形，对应 Sylow 子群正规。</p>
+<h2 id="sec7-3">7.3 第一 Sylow 定理：存在</h2>
 
-<p>无论是 \(P_5\) 正规还是 \(P_3\) 正规，都能证明 \(P_3 P_5 \le G\) 是子群（一个正规另一个普通则乘积是子群），它阶 15 故循环 \(\cong \mathbb{Z}_{15}\)。它在 \(G\) 中指数 2，必正规。所以 \(G\) 含正规循环子群 \(\mathbb{Z}_{15}\)，而 Sylow 2-子群 \(\mathbb{Z}_2\) 通过半直积起作用。\(\operatorname{Aut}(\mathbb{Z}_{15}) \cong \mathbb{Z}_2 \times \mathbb{Z}_4\)，含若干阶 2 元。穷举半直积得到 4 类：\(\mathbb{Z}_{30}, D_{15}, \mathbb{Z}_3 \times D_5, \mathbb{Z}_5 \times S_3\)。</p>
+<p><strong>第一 Sylow 定理。</strong>设 \(|G| = p^a m\)，\(\gcd(p, m) = 1\)。则对每个 \(0 \le k \le a\)，\(G\) 都含有一个阶 \(p^k\) 的子群。特别地，含有阶 \(p^a\) 的 Sylow \(p\)-子群。</p>
 
-<p><strong>例 \(|G| = 56 = 2^3 \cdot 7\)。</strong>\(n_7 \mid 8\) 且 \(\equiv 1 \pmod 7\)：\(n_7 \in \{1, 8\}\)。</p>
+<p>这条定理是 Cauchy 定理（\(k = 1\) 特例）的强化版。证明思路——"用 \(G\) 自身共轭作用在子群集合上 + 类方程"——下面给。</p>
 
-<p>若 \(n_7 = 8\)：每个 Sylow 7-子群阶 7（素数 \(\Rightarrow\) 循环 \(\Rightarrow\) 互不相交，除 \(e\)），共 \(8 \cdot 6 = 48\) 个 7 阶元，加上 \(e\) 占 49 个位置。剩下 \(56 - 49 = 7\) 个元素必构成唯一 Sylow 2-子群（阶 8），即 \(n_2 = 1\)。所以这种情形 \(P_2\) 正规。</p>
+<p><em>证明（对 \(k\) 归纳，构造越来越大的 \(p\)-子群）</em>。</p>
 
-<p>否则 \(n_7 = 1\)，\(P_7\) 正规。</p>
+<p><em>\(k = 0\)</em>：\(\{e\}\) 是阶 \(p^0 = 1\) 的子群。✓</p>
 
-<p><strong>结论：阶 56 群中，要么 Sylow 2-子群正规，要么 Sylow 7-子群正规</strong>。无论哪种，都可以写成半直积进一步分类。完整的非同构类有 13 个，本节不细列。</p>
+<p><em>归纳步</em>：设已造出阶 \(p^k\) 子群 \(H \le G\)，\(k < a\)。要造阶 \(p^{k+1}\) 的。</p>
 
-<h2 id="sec7-8">7.8 阶 \(pq\) 的群</h2>
+<p>关键是构造 \(H\) 的<em>正规化子</em></p>
 
-<p>这是 Sylow 应用最干净的例子。</p>
+<p>\[
+N_G(H) := \{g \in G : g H g^{-1} = H\},
+\]</p>
 
-<p><strong>定理。</strong>设 \(p < q\) 是两个素数且 \(p \nmid q - 1\)。则任意阶 \(pq\) 群都循环 \(\cong \mathbb{Z}_{pq}\)。</p>
+<p>它是 \(G\) 中"在共轭下保持 \(H\)"的元素集合，是 \(G\) 的子群（验类似稳定子）。\(H \trianglelefteq N_G(H)\) 显然。</p>
 
-<p>证明。\(|G| = pq\)。Sylow \(q\)-子群个数 \(n_q \mid p\) 且 \(\equiv 1 \pmod q\)。但 \(p < q\)，所以 \(n_q \in \{1, p\}\)，且若 \(n_q = p < q\) 则不可能 \(\equiv 1 \pmod q\)（除非 \(p = 1\)）。所以 \(n_q = 1\)，\(P_q \cong \mathbb{Z}_q\) 正规。</p>
+<p>声明：\(p \mid [N_G(H) : H]\)。</p>
 
-<p>Sylow \(p\)-子群个数 \(n_p \mid q\) 且 \(\equiv 1 \pmod p\)。\(n_p \in \{1, q\}\)。若 \(n_p = q\)，则 \(q \equiv 1 \pmod p\)，即 \(p \mid q - 1\)，矛盾。所以 \(n_p = 1\)，\(P_p \cong \mathbb{Z}_p\) 也正规。</p>
+<p><em>证</em>：让 \(H\) 共轭作用在 \(G/H\) 上：\(h \cdot (gH) := (hg)H\)（这是良定义的左乘，即使 \(H\) 不正规——它把陪集送到陪集）。</p>
 
-<p>两个正规子群 \(P_p, P_q\) 阶互素 \(\Rightarrow\) \(P_p \cap P_q = \{e\}\) \(\Rightarrow\) \(G = P_p \times P_q \cong \mathbb{Z}_p \times \mathbb{Z}_q \cong \mathbb{Z}_{pq}\)（最后一步用<a href="../数论/index.html">数论读本</a>的中国剩余定理）。</p>
+<p>不动点 \(\operatorname{Fix}(H) = \{gH : hgH = gH \forall h \in H\} = \{gH : g^{-1}hg \in H \forall h \in H\} = \{gH : g \in N_G(H)\} = N_G(H)/H\)。</p>
 
-<p>具体例子：\(|G| = 15 = 3 \cdot 5\)，\(3 \nmid 4\)，故 \(G \cong \mathbb{Z}_{15}\)。\(|G| = 33 = 3 \cdot 11\)，\(3 \nmid 10\)，故 \(G \cong \mathbb{Z}_{33}\)。\(|G| = 35 = 5 \cdot 7\)，\(5 \nmid 6\)，故 \(G \cong \mathbb{Z}_{35}\)。</p>
+<p>由轨道-稳定子在 \(G/H\) 上：每个非不动点轨道大小整除 \(|H| = p^k\) 且 \(> 1\)，所以是 \(p\) 的某个 \(\ge 1\) 次幂——被 \(p\) 整除。</p>
 
-<p>反例：\(|G| = 6 = 2 \cdot 3\)，\(2 \mid 2\)。所以本定理失效——确实 \(S_3\) 阶 6 但非循环（\(\mathbb{Z}_6\) 与 \(S_3\) 是仅有的两类）。</p>
+<p>\(|G/H| = [G:H] = |G|/|H| = p^a m / p^k = p^{a-k} m\)。\(k < a\) 所以 \(p \mid p^{a-k} m\)，即 \(p \mid |G/H|\)。</p>
 
-<p>这条结果说：很多"看起来该有非平凡结构"的小阶数实际上只有<em>循环群</em>一个。Sylow 让你用 5 行算清这种事。</p>
+<p>\(|G/H| = |\operatorname{Fix}(H)| + (\text{非不动点轨道大小之和})\)。两个 \(p\)-倍数。所以 \(p \mid |\operatorname{Fix}(H)| = |N_G(H)/H| = [N_G(H) : H]\)。✓</p>
 
-<p>下一章我们专注<em>有限交换群</em>——一旦群可交换，结构理论会变得极为干净，而且有<strong>完全分类定理</strong>。Sylow 的"存在 + 共轭 + 个数"是有限非交换群的工具；交换群的工具是"不变因子"或"初等因子"。两者并行，构成有限群论的两条主线。Sylow 还会在<a href="ch9.html">第 9 章</a>证明 \(A_5\) 单纯时再次出场。</p>
+<p>声明续：\([N_G(H) : H]\) 被 \(p\) 整除意味着商群 \(N_G(H)/H\) 的阶被 \(p\) 整除。Cauchy 定理在 \(N_G(H)/H\) 上给出阶 \(p\) 子群——记它为 \(\bar K \le N_G(H)/H\)，\(|\bar K| = p\)。</p>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 群作用、轨道、稳定子</a><a href="ch8.html">下一章 · 第 8 章 有限交换群的结构定理 →</a></nav>
+<p>由对应定理（5 章末尾或一般同构定理），\(\bar K\) 对应一个含 \(H\) 的子群 \(K \le N_G(H)\)，满足 \(K/H = \bar K\)。所以 \(|K| = |H| \cdot |\bar K| = p^k \cdot p = p^{k+1}\)。✓</p>
+
+<p>归纳到 \(k = a\) 给出阶 \(p^a\) 的 Sylow \(p\)-子群。\(\square\)</p>
+
+<p>请你停一下看这个证明的结构。它<em>不是</em>"找一个具体阶 \(p^a\) 的子群"——它是<em>逐级</em>把子群从阶 \(p^k\) 升到阶 \(p^{k+1}\)，每一级用"\(H\) 在 \(G/H\) 上的左乘作用 + 数 \(p\)-不动点"得到新元素。这种"<em>逐级构造 + 模 \(p\) 数轨道</em>"的范式在群论里反复出现。</p>
+
+<p><strong>推论。</strong>\(|G| = 12 = 2^2 \cdot 3\) 的群必有阶 1, 2, 4 的 2-子群（链 \(\{e\} \subset \mathbb{Z}/2 \subset \text{Sylow 2}\)）和阶 3 的 Sylow 3-子群。这下我们正式知道 \(|G| = 12\) 必有 4 元子群。</p>
+
+<h2 id="sec7-4">7.4 第二 Sylow 定理：共轭</h2>
+
+<p>第一定理告诉你 Sylow \(p\)-子群<em>存在</em>。但可能<em>不止一个</em>——\(D_6\) 里 Sylow 2-子群（阶 4）有几个？我们后面会算到 3 个：\(\{e, r^3, s, r^3 s\}\)、\(\{e, r^3, rs, r^4 s\}\)、\(\{e, r^3, r^2 s, r^5 s\}\)。第二定理告诉你这些<em>不同</em>的 Sylow \(p\)-子群之间的关系。</p>
+
+<p><strong>第二 Sylow 定理。</strong>设 \(P, Q\) 是 \(G\) 的两个 Sylow \(p\)-子群。则存在 \(g \in G\) 使 \(P = gQg^{-1}\)。即<em>所有 Sylow \(p\)-子群相互共轭</em>。</p>
+
+<p>更一般地：设 \(P\) 是 Sylow \(p\)-子群，\(H\) 是任意 \(p\)-子群。则 \(H \subseteq gPg^{-1}\) 某个 \(g \in G\)。即每个 \(p\)-子群都在某个 Sylow \(p\)-子群里。</p>
+
+<p><em>证明</em>。设 \(P\) 是 Sylow \(p\)-子群，\(H\) 是任意 \(p\)-子群（特别地 \(H\) 也可以是另一个 Sylow \(p\)-子群 \(Q\)）。</p>
+
+<p>让 \(H\) 通过左乘作用在 \(G/P\) 上：\(h \cdot (gP) := (hg)P\)。</p>
+
+<p>\(|G/P| = [G:P] = |G|/|P| = p^a m / p^a = m\)，\(\gcd(p, m) = 1\) 所以 \(p \nmid |G/P|\)。</p>
+
+<p>每个非不动点轨道大小整除 \(|H|\)（一个 \(p\)-数）且 \(> 1\)——被 \(p\) 整除。</p>
+
+<p>\(|G/P| = m\) 不能等于"全是 \(p\)-倍数的求和"——所以<em>必有不动点</em>，即存在 \(gP \in G/P\) 满足 \(hgP = gP\) 对所有 \(h \in H\)。等价 \(g^{-1} h g \in P\) 对所有 \(h \in H\)，即 \(g^{-1} H g \subseteq P\)，亦即 \(H \subseteq g P g^{-1}\)。</p>
+
+<p>第一陈述（\(H = Q\) 也是 Sylow \(p\)-子群）：由刚证 \(Q \subseteq g P g^{-1}\)。两边 \(p\) 阶幂相同 \(|Q| = |P| = p^a = |gPg^{-1}|\)，所以 \(Q = gPg^{-1}\)。\(\square\)</p>
+
+<p>这条定理的<em>用法</em>：不同 Sylow \(p\)-子群之间的"差异"完全是几何上的（共轭——平移到不同位置），而非<em>结构</em>上的——它们作为抽象群是同构的（共轭是同构）。</p>
+
+<p>另一个直接推论：</p>
+
+<p><strong>推论。</strong>\(G\) 有<em>唯一</em> Sylow \(p\)-子群 \(\iff\) 这个 Sylow \(p\)-子群正规。</p>
+
+<p><em>证</em>：设 \(P\) 是唯一 Sylow \(p\)-子群。任 \(g \in G\)，\(g P g^{-1}\) 也是 Sylow \(p\)-子群（共轭后阶不变），所以 \(gPg^{-1} = P\)，即 \(P\) 正规。反过来 \(P\) 正规则任何共轭 \(gPg^{-1} = P\)，所以所有 Sylow \(p\)-子群都 \(= P\)，唯一。\(\square\)</p>
+
+<p>这条推论在下面的应用里是核心工具——证某个 Sylow 子群"必然唯一"就是证它"必然正规"，进而 \(G\) 有非平凡正规子群，\(G\) 不简单。</p>
+
+<h2 id="sec7-5">7.5 第三 Sylow 定理：计数</h2>
+
+<p>第二定理告诉你 Sylow \(p\)-子群"是同一个共轭类"，但没告诉你这个共轭类多大——也就是 Sylow \(p\)-子群的<em>个数</em> \(n_p\)。第三定理把这个数锁死。</p>
+
+<p><strong>第三 Sylow 定理。</strong>设 \(|G| = p^a m\)，\(\gcd(p, m) = 1\)。设 \(n_p\) 是 \(G\) 的 Sylow \(p\)-子群个数。则</p>
+
+<p>\[
+\boxed{\ n_p \equiv 1 \pmod p \quad \text{和} \quad n_p \mid m.\ }
+\]</p>
+
+<p>\(n_p \mid m\) 通常写成 \(n_p \mid [G:P]\)（\(P\) 任一 Sylow \(p\)-子群）。</p>
+
+<p><em>证明</em>。设 \(P\) 是一个 Sylow \(p\)-子群。让 \(G\) 共轭作用在它的<em>所有</em>子群集合上；\(P\) 的轨道是"\(P\) 的所有共轭子群" = "所有 Sylow \(p\)-子群"（由第二定理）。所以 \(n_p = |\operatorname{Orb}(P)| = [G : N_G(P)]\)（轨道-稳定子；稳定子是正规化子 \(N_G(P)\)）。</p>
+
+<p><em>\(n_p \mid m\)</em>：\(P \subseteq N_G(P) \subseteq G\)，所以 \(|P| \mid |N_G(P)| \mid |G|\)。\(n_p = [G : N_G(P)] = |G|/|N_G(P)|\)。\(|N_G(P)|\) 含 \(p^a\) 因子（含 \(P\)），所以 \(n_p\) 不再含 \(p\) 因子，即 \(n_p \mid |G|/p^a = m\)。✓</p>
+
+<p><em>\(n_p \equiv 1 \pmod p\)</em>：让 \(P\) 自己（不是 \(G\)）共轭作用在所有 Sylow \(p\)-子群的集合 \(\operatorname{Syl}_p(G)\) 上。每个轨道大小整除 \(|P| = p^a\)——所以是 \(1\) 或 \(p\)-倍数。</p>
+
+<p>哪些是大小-1 轨道（不动点）？\(Q \in \operatorname{Syl}_p(G)\) 是 \(P\) 共轭不动点 \(\iff hQh^{-1} = Q \forall h \in P \iff P \subseteq N_G(Q)\)。两个 Sylow \(p\)-子群 \(P, Q \subseteq N_G(Q)\)；它们都是 \(N_G(Q)\) 里的 Sylow \(p\)-子群（因为大小最大）。\(N_G(Q)\) 中 \(Q\) 是<em>正规</em>的 Sylow \(p\)-子群（按 \(N_G\) 的定义），所以由前一节推论 \(N_G(Q)\) 里 Sylow \(p\)-子群唯一——\(P = Q\)。</p>
+
+<p>所以 \(P\) 共轭作用在 \(\operatorname{Syl}_p(G)\) 上<em>唯一</em>的不动点是 \(P\) 自己。</p>
+
+<p>\(n_p = |\operatorname{Syl}_p(G)| = 1 + \sum (\text{非不动点轨道大小})\)。每个非不动点轨道大小被 \(p\) 整除。所以 \(n_p \equiv 1 \pmod p\)。✓ \(\square\)</p>
+
+<p>请你欣赏这个证明的对称：第二定理用"\(H\) 作用在 \(G/P\) 上"，第三定理用"\(P\) 作用在 \(\operatorname{Syl}_p(G)\) 上"。<em>同一种"群作用 + 数 \(p\)-不动点"的手法，作用在不同集合上，挤出不同信息</em>。</p>
+
+<p>三条 Sylow 定理是一套<em>组合</em>——光有任一条都不能列出群，三条一起才行。下面看它们怎么联手。</p>
+
+<h2 id="sec7-6">7.6 完整列出 \(|G| = 12\) 的群</h2>
+
+<p>回到开头的问题。\(|G| = 12 = 2^2 \cdot 3\)。</p>
+
+<p>第三 Sylow 定理：</p>
+
+<ul>
+  <li>\(n_2 \equiv 1 \pmod 2\)（即 \(n_2\) 奇），\(n_2 \mid 3\)：\(n_2 \in \{1, 3\}\)。</li>
+  <li>\(n_3 \equiv 1 \pmod 3\)，\(n_3 \mid 4\)：\(n_3 \in \{1, 4\}\)。</li>
+</ul>
+
+<p><strong>关键引理。</strong>\(n_2 \cdot 3 + n_3 \cdot 2 \le 12\)（这是个粗的 sanity check 不是必要约束；下面用更精确的论证）。事实上：</p>
+
+<p><em>不能两个都不唯一</em>。设 \(n_3 = 4\)。Sylow 3-子群 4 个，每个阶 3——非恒等元阶 3。两个不同 Sylow 3-子群只能在 \(\{e\}\) 处相交（它们的交是某个公共 3-子群，阶整除 3 即 1 或 3；阶 3 给出整个子群，违背"两个不同"）。所以 4 个 Sylow 3-子群贡献 \(4 \cdot 2 = 8\) 个阶 3 元素，加上 \(e\) 共 9 个特定元素。剩 \(12 - 9 = 3\) 个元素的阶都不是 3。一个 Sylow 2-子群有 4 元素——这 3 个剩下加上 \(e\) 必须正好是<em>那个</em>唯一的 Sylow 2-子群。所以 \(n_3 = 4 \Rightarrow n_2 = 1\)。<em>对偶不成立</em>——\(n_2 = 3\) <em>不</em>强迫 \(n_3 = 1\)，因为 Sylow 2-子群的非恒等元中可以有阶 2 也可以阶 4，相邻 Sylow 2-子群可以共享非平凡子群。所以仅靠这条不够。但下面的逐情况分析会处理。</p>
+
+<p>所以 \((n_2, n_3) \in \{(1, 1), (1, 4), (3, 1)\}\)，<em>没</em>有 \((3, 4)\)。三种情况，每种对应一类群。</p>
+
+<p><strong>情况 (1, 1)：两个 Sylow 都唯一。</strong>设 Sylow 2-子群 \(P_2\)（阶 4）和 Sylow 3-子群 \(P_3\)（阶 3）都正规。\(|P_2| \cdot |P_3| = 12 = |G|\) 而 \(P_2 \cap P_3 = \{e\}\)（阶整除 \(\gcd(4,3) = 1\)），所以 \(G = P_2 \times P_3\)（直积——两个正规子群只在 \(e\) 相交且乘积为整个群）。</p>
+
+<p>\(P_3\) 阶 3 必为 \(\mathbb{Z}/3\)。\(P_2\) 阶 4 是 \(\mathbb{Z}/4\) 或 \(\mathbb{Z}/2 \times \mathbb{Z}/2\)。所以两个群：</p>
+
+<ul>
+  <li>\(\mathbb{Z}/4 \times \mathbb{Z}/3 \cong \mathbb{Z}/12\)（中国剩余定理 \(\gcd(4,3) = 1\)）；</li>
+  <li>\((\mathbb{Z}/2 \times \mathbb{Z}/2) \times \mathbb{Z}/3 \cong \mathbb{Z}/2 \times \mathbb{Z}/6\)（用 \(\mathbb{Z}/2 \times \mathbb{Z}/3 \cong \mathbb{Z}/6\)）。</li>
+</ul>
+
+<p><strong>情况 (3, 1)：\(n_2 = 3, n_3 = 1\)。</strong>\(P_3\) 正规，3 个 Sylow 2-子群不正规。这种情况下 \(G\) 是<em>半直积</em> \(P_2 \ltimes P_3\)（\(P_3\) 正规，\(P_2\) 作用在 \(P_3\) 上由共轭）。\(P_3 = \mathbb{Z}/3\)，\(\operatorname{Aut}(\mathbb{Z}/3) = \mathbb{Z}/2\)（生成元 \(1\) 唯一非平凡映射 \(1 \mapsto 2\)）。\(P_2\) 阶 4 给出非平凡同态 \(P_2 \to \operatorname{Aut}(\mathbb{Z}/3) = \mathbb{Z}/2\)（必非平凡因为 \(P_3\) 不正规化让不动点）。</p>
+
+<p>\(P_2\) 是 \(\mathbb{Z}/4\) 或 \(\mathbb{Z}/2 \times \mathbb{Z}/2\)：</p>
+
+<ul>
+  <li>\(P_2 = \mathbb{Z}/4\)：非平凡同态 \(\mathbb{Z}/4 \to \mathbb{Z}/2\) 唯一（\(1 \mapsto 1\)）。结果半直积 \(\mathbb{Z}/4 \ltimes \mathbb{Z}/3\)，称\(\operatorname{Dic}_3\)（双循环群，也叫"二面体的双层"，或"Q-like"），但实际验后发现这其实是<em>另一种</em> 12 阶非交换群。等等——这里要小心：\(\mathbb{Z}/4 \ltimes \mathbb{Z}/3\) 写出乘法表是新群，但与其它列出的对照后<em>它和我们心目中的 4 个标准群不同</em>。事实上 \(|G| = 12\) 还有第 5 个非交换群叫双循环 \(\operatorname{Dic}_3\)（或"\(Q_{12}\)"）。</li>
+</ul>
+
+<p><em>更新</em>：阶 12 的群<em>实际上有 5 种</em>，不是 4 种：\(\mathbb{Z}/12, \mathbb{Z}/2 \times \mathbb{Z}/6, A_4, D_6, \operatorname{Dic}_3\)。开头我数到 4 是漏了 \(\operatorname{Dic}_3\)（双循环群，由 \(\langle a, b : a^6 = e, b^2 = a^3, bab^{-1} = a^{-1} \rangle\) 给）。Sylow 真的列出 5 种。这正是 Sylow 工具的力量——它<em>逼出</em>你眼睛漏看的群。</p>
+
+<ul>
+  <li>\(P_2 = \mathbb{Z}/2 \times \mathbb{Z}/2\)：非平凡同态 \(\mathbb{Z}/2 \times \mathbb{Z}/2 \to \mathbb{Z}/2\)，三种（按选哪个 \(\mathbb{Z}/2\) 因子映出）；但<em>共轭</em>它们给同构的群。结果：\((\mathbb{Z}/2 \times \mathbb{Z}/2) \ltimes \mathbb{Z}/3 \cong D_6\)（六边形对称——验：\(D_6\) 含正规 \(\mathbb{Z}/3\)（\(\langle r^2 \rangle\)）和 Sylow 2 子群 Klein 四元群）。</li>
+</ul>
+
+<p><strong>情况 (1, 4)：\(n_2 = 1, n_3 = 4\)。</strong>\(P_2\) 正规阶 4。4 个 Sylow 3-子群不正规。这给 \(A_4\)：\(|A_4| = 12\)；\(A_4\) 的 Sylow 2-子群是 \(\{e, (12)(34), (13)(24), (14)(23)\} \cong K_4\)，唯一所以正规；Sylow 3-子群是 \(\langle (123) \rangle\) 等 4 个，不正规。</p>
+
+<p><strong>结论</strong>：\(|G| = 12\) 的群有 5 种——\(\mathbb{Z}/12\), \(\mathbb{Z}/2 \times \mathbb{Z}/6\), \(A_4\), \(D_6\), \(\operatorname{Dic}_3\)。Sylow 三定理 + 一些半直积分析<em>系统</em>给出全部清单——不靠"想象力"。</p>
+
+<h2 id="sec7-7">7.7 \(|G| = 30\) 与 \(|G| = 56\)</h2>
+
+<p>更多例子让你看 Sylow 怎么用在不同形状的 \(|G|\) 上。</p>
+
+<p><strong>\(|G| = 30 = 2 \cdot 3 \cdot 5\)。</strong>三个素因子，每个出现一次。</p>
+
+<ul>
+  <li>\(n_2 \in \{1, 3, 5, 15\}\)（\(n_2\) 奇 + \(n_2 \mid 15\)）。</li>
+  <li>\(n_3 \in \{1, 10\}\)（\(n_3 \equiv 1 \pmod 3\) + \(n_3 \mid 10\)）。</li>
+  <li>\(n_5 \in \{1, 6\}\)（\(n_5 \equiv 1 \pmod 5\) + \(n_5 \mid 6\)）。</li>
+</ul>
+
+<p>声明：\(n_3 = 1\) 或 \(n_5 = 1\)（即至少一个是唯一的，正规）。</p>
+
+<p><em>证</em>：假设 \(n_3 = 10\) 且 \(n_5 = 6\)。\(n_3 = 10\) 个 Sylow 3-子群（每个阶 3，两两交在 \(\{e\}\)）贡献 \(10 \cdot 2 = 20\) 个阶 3 元素。\(n_5 = 6\) 个 Sylow 5-子群（每个阶 5，两两交在 \(\{e\}\)）贡献 \(6 \cdot 4 = 24\) 个阶 5 元素。加上 \(e\)：\(20 + 24 + 1 = 45 > 30\)。矛盾。所以至少一个是 1。</p>
+
+<p>由此 \(P_3\) 或 \(P_5\) 正规。事实上更强：两个都正规。设 \(P_5\) 正规。考虑 \(P_3 P_5\)（5 阶 \(\times\) 3 阶 = 15 阶子群——这是 \(\mathbb{Z}/15\) 因为 \(\gcd(3, 5) = 1\) 而 5 阶子群正规）。\(P_3 P_5\) 是<em>指标 2</em>子群，所以正规。\(P_3 P_5\) 含 \(P_3\) 唯一阶 3 子群（在 \(\mathbb{Z}/15\) 内）；这个 \(P_3\) 在 \(P_3 P_5\) 内特殊，但在 \(G\) 内仍可能不唯一。实际细分析（用半直积）给出：\(|G| = 30\) 的群恰好<em>4 种</em>：</p>
+
+<ul>
+  <li>\(\mathbb{Z}/30\)（循环）；</li>
+  <li>\(D_{15}\)（15 边形对称，\(2 \cdot 15 = 30\)）；</li>
+  <li>\(\mathbb{Z}/3 \times D_5\)；</li>
+  <li>\(\mathbb{Z}/5 \times D_3 = \mathbb{Z}/5 \times S_3\)。</li>
+</ul>
+
+<p>关键不是记住 4 种——是看 Sylow 三定理怎么<em>把候选数压到有限</em>。"30 元素"原本可能给出无数种乘法表，Sylow 把它压到 4。</p>
+
+<p><strong>\(|G| = 56 = 2^3 \cdot 7\)。</strong></p>
+
+<ul>
+  <li>\(n_7 \equiv 1 \pmod 7\), \(n_7 \mid 8\)：\(n_7 \in \{1, 8\}\)。</li>
+  <li>\(n_2 \equiv 1 \pmod 2\), \(n_2 \mid 7\)：\(n_2 \in \{1, 7\}\)。</li>
+</ul>
+
+<p>声明：\(n_7 = 1\)（即 Sylow 7 子群正规）<em>或</em> \(n_2 = 1\)。</p>
+
+<p><em>证</em>：假设 \(n_7 = 8\)。8 个 Sylow 7-子群（每个阶 7）贡献 \(8 \cdot 6 = 48\) 个阶 7 元素。加 \(e\) 共 49 个特定元素。剩 \(56 - 49 = 7\) 个元素必须包含全部 Sylow 2-子群的<em>非恒等部分</em>（因为 Sylow 2-子群阶 8，其元素阶 ∈ {1, 2, 4, 8}，与阶 7 不冲突）。Sylow 2-子群有 \(8 - 1 = 7\) 个非恒等元素——正好填满 7 个空位。所以<em>只有一个</em> Sylow 2-子群（否则非恒等元更多），即 \(n_2 = 1\)。\(\square\)</p>
+
+<p>所以无论怎样，\(G\) 都有非平凡正规子群——\(G\) 不简单。这是 Sylow 工具最经典的<em>否定结论</em>用法："阶 56 的简单群不存在"。</p>
+
+<h2 id="sec7-8">7.8 \(|G| = pq, p < q, p \nmid q-1 \Rightarrow G\) 循环</h2>
+
+<p>最后一个 Sylow 应用——一类<em>非常</em>规整的群被一个简单算术条件完全决定。</p>
+
+<p><strong>命题。</strong>设 \(p < q\) 是不同素数，\(|G| = pq\)。如果 \(p \nmid q - 1\)，则 \(G \cong \mathbb{Z}/pq\)（即循环）。</p>
+
+<p><em>证</em>：</p>
+
+<ul>
+  <li>\(n_q \equiv 1 \pmod q\), \(n_q \mid p\)。\(p < q\) 所以 \(n_q \in \{1, p\}\) 中只有 \(n_q = 1\) 满足 \(n_q \equiv 1 \pmod q\)（因为 \(p \neq 1, p \neq 1 + q, \ldots\) 第一个可能 \(\equiv 1 \pmod q\) 的整除 \(p\) 的数是 1）。所以 \(n_q = 1\)，Sylow \(q\)-子群 \(P_q\) 正规。</li>
+  <li>\(n_p \equiv 1 \pmod p\), \(n_p \mid q\)。所以 \(n_p \in \{1, q\}\)。\(n_p = q \iff q \equiv 1 \pmod p \iff p \mid q - 1\)。条件 \(p \nmid q - 1\) 排除 \(n_p = q\)。所以 \(n_p = 1\)，Sylow \(p\)-子群 \(P_p\) 正规。</li>
+  <li>\(P_p\) 阶 \(p\) 必循环 = \(\mathbb{Z}/p\)，\(P_q\) 阶 \(q\) 必 = \(\mathbb{Z}/q\)。两个正规子群只在 \(e\) 相交（阶整除 \(\gcd(p,q) = 1\)），\(|P_p P_q| = pq = |G|\)，所以 \(G = P_p \times P_q = \mathbb{Z}/p \times \mathbb{Z}/q \cong \mathbb{Z}/pq\)（CRT，\(\gcd(p,q)=1\)）。\(\square\)</li>
+</ul>
+
+<p>这条命题是个"群论<em>分类</em>定理"的迷你版——一行素数算术（"\(p \nmid q-1\)"）就把 \(|G| = pq\) 这类群的<em>结构</em>完全锁死为循环。</p>
+
+<p><strong>例。</strong>\(|G| = 15 = 3 \cdot 5\)，\(p = 3, q = 5\)，\(q - 1 = 4\)，\(3 \nmid 4\) ✓。所以\(|G| = 15 \Rightarrow G = \mathbb{Z}/15\)，<em>唯一</em>。</p>
+
+<p><strong>例。</strong>\(|G| = 33 = 3 \cdot 11\)，\(p = 3, q = 11\)，\(11 - 1 = 10\)，\(3 \nmid 10\) ✓。\(G = \mathbb{Z}/33\)，唯一。</p>
+
+<p><strong>例（条件失败）。</strong>\(|G| = 21 = 3 \cdot 7\)，\(p = 3, q = 7\)，\(7 - 1 = 6\)，\(3 \mid 6\)。条件不满足，所以可能不止一种。事实上 \(|G| = 21\) 有 2 种：\(\mathbb{Z}/21\) 和一个非交换的 \(\mathbb{Z}/7 \rtimes \mathbb{Z}/3\)（用 \(\operatorname{Aut}(\mathbb{Z}/7) = \mathbb{Z}/6\) 含 \(\mathbb{Z}/3\) 子群构造半直积）。</p>
+
+<h2 id="sec7-9">7.9 这门技术接下来去哪</h2>
+
+<p>Sylow 三定理是有限群论分类工具的<em>核心</em>。它的延伸：</p>
+
+<ul>
+  <li><a href="ch8.html">第 8 章</a>：<em>有限交换群分类</em>——任何有限交换群都唯一分解为 \(\mathbb{Z}/p_i^{a_i}\) 的直积。Sylow 在交换群上变得格外干净——每个 \(p\) 只有<em>一个</em> Sylow \(p\)-子群（因为交换 ⟹ 都正规 ⟹ 都唯一），所以 \(G = \prod_p P_p\) 自动成立。</li>
+  <li><a href="ch10.html">第 10 章</a>：单群与合成列。"\(G\) 不简单"的 Sylow 论证（如 \(|G| = 56\) 那个）扩展到一类大定理"<em>Burnside \(p^a q^b\) 定理</em>"——\(|G| = p^a q^b\)（两个素数）必<em>可解</em>。Galois 理论那条"五次方程不可解"的"可解" 就是这个意思。</li>
+  <li><em>有限简单群分类</em>（FSGC，1980 年代完成）：所有有限简单群完全列出——18 个无穷族 + 26 个零散的"散在群"。证明长 15000 页，是 20 世纪数学最大的成就之一。Sylow 是每一步的基础工具。</li>
+  <li><a href="ch18.html">第 18 章</a>起：<em>Galois 理论</em>。Galois 群是有限群，Sylow 在它上面给出"哪个中间域必然存在"——一行条件就能告诉你"\(\sqrt[7]{2}\) 在哪个域里"之类。</li>
+</ul>
+
+<p>更深层：Sylow 的"<em>群作用 + 数 \(p\)-不动点</em>"手法是所有<em>局部-整体</em>论证的祖先。后面环论里证 PID 性质、域论里数中间扩张、表示论里分解模……都是同样的模式——<em>用一个聪明的群作用挤出整除性约束，把"未知"压到唯一可能</em>。本章是这个思想的第一次正式登场，下面几乎每一章都会再用一次。</p>
+
+<p>下一章我们把 Sylow 用在<em>交换群</em>上，并加上"PID 上有限生成模"的视角，得出有限交换群的<em>完整分类</em>——任意有限交换群唯一写成循环群的直积。这是抽象代数第一段的<em>终点</em>，也是后面线性代数 Jordan 标准形的母定理。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 群作用、轨道、稳定子</a><a href="ch8.html">下一章 · 第 8 章 有限交换群分类 →</a></nav>
 </main>
 </body>
 </html>

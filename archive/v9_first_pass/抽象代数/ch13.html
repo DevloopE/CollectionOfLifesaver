@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 章 整环、域、商域 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 理想与商环</a><a href="ch14.html">下一章 · 第 14 章 主理想环与唯一分解 →</a></nav>
+<h1 id="ch13">第 13 章 整环、域、商域</h1>
+
+<p>第 11 章把"环"的定义立起来，第 12 章用理想做出了"商环"。但你应该已经感觉到——"环"这个范畴太宽了，里面什么奇怪东西都有：有零因子的、不交换的、单位群只有 \(\pm 1\) 的、单位群是整个非零集的。如果什么时候都用"任意环"作为讨论对象，定理只能弱到没意思。</p>
+
+<p>所以本章把环按"行为有多干净"分层：最一般的环 \(\supset\) 交换环 \(\supset\) 整环（无零因子）\(\supset\) PID（理想都是主理想）\(\supset\) UFD（唯一分解）\(\supset\) 域（每个非零都可逆）。每往里走一层都多一条好性质，定理的力量也更强。本章把这条层级里"<em>整环</em>"和"<em>域</em>"两端立稳；PID / UFD 留给<a href="ch14.html">第 14 章</a>。最后一节给"<em>商域</em>"——把整环嵌入域的标准操作，整个数论 / 代数几何的"取分式"工具就这一条。</p>
+
+<ul>
+  <li>整环：交换 + \(1 \neq 0\) + 无零因子。</li>
+  <li>例：\(\mathbb{Z}, \mathbb{Q}, k[x], \mathbb{Z}[i]\) 整；\(\mathbb{Z}_n\) 整 \(\iff n\) 素；\(\mathbb{Z} \times \mathbb{Z}\) 不整。</li>
+  <li>域：交换环 + 每个非零可逆。</li>
+  <li>例：\(\mathbb{Q}, \mathbb{R}, \mathbb{C}, \mathbb{F}_p\) 是域。</li>
+  <li>整环的特征 \(\mathrm{char}(R)\)：使 \(1 + \cdots + 1 = 0\) 的最小正整数（或 0）。</li>
+  <li>任何域的特征是 0 或某个素数 \(p\)。</li>
+  <li>商域 \(\mathrm{Frac}(D)\)：包含整环 \(D\) 的最小域。</li>
+  <li>例：\(\mathrm{Frac}(\mathbb{Z}) = \mathbb{Q}\)；\(\mathrm{Frac}(k[x]) = k(x)\)；\(\mathrm{Frac}(\mathbb{Z}[i]) = \mathbb{Q}(i)\)。</li>
+</ul>
+
+<h2 id="sec13-1">13.1 整环：无零因子的交换环</h2>
+
+<p>一个<strong>整环</strong>（integral domain）是一个交换环 \(D\)，满足：</p>
+
+<ul>
+  <li>(D1) \(1 \neq 0\)（即 \(D\) 不是平凡环）；</li>
+  <li>(D2) <em>无零因子</em>：\(ab = 0 \Rightarrow a = 0\) 或 \(b = 0\)。</li>
+</ul>
+
+<p>把这条"无零因子"等价改写：</p>
+
+<p>\[
+\boxed{\ D \text{ 整环} \iff D \text{ 交换}, 1 \neq 0, \text{ 且 } a, b \in D, ab = 0 \Rightarrow a = 0 \text{ 或 } b = 0.\ }
+\]</p>
+
+<p>"无零因子" 还有一条等价说法：<em>消去律成立</em>。即 \(c \neq 0\) 时 \(ca = cb \Rightarrow a = b\)。证：\(ca = cb \Rightarrow c(a - b) = 0\)，由 \(c \neq 0\) 与无零因子得 \(a - b = 0\)。这是为什么"整环"在直觉上和"\(\mathbb{Z}\) 一样可以做消去"——你可以两边除以同一个非零元素而不出岔。</p>
+
+<p>整环的英文 "domain" 来自 "integral domain"——历史上指"行为像整数 \(\mathbb{Z}\) 的环"。事实上 \(\mathbb{Z}\) 就是整环这个概念的<em>原型</em>。本章接下来的标准例子库都是围绕"它行为多像 \(\mathbb{Z}\)" 这条线索展开。</p>
+
+<h2 id="sec13-2">13.2 整环的例子</h2>
+
+<p><strong>(D-Ex1) \(\mathbb{Z}\)。</strong>整数集是整环：交换、\(1 \neq 0\)、\(ab = 0 \Rightarrow a = 0\) 或 \(b = 0\)（这是小学数学但有名字：实数的"非零积非零"）。原型例子。</p>
+
+<p><strong>(D-Ex2) \(\mathbb{Q}, \mathbb{R}, \mathbb{C}\)。</strong>这些都是整环——它们其实是<em>域</em>，13.3 节会说"域 \(\Rightarrow\) 整环"是免费的。</p>
+
+<p><strong>(D-Ex3) \(\mathbb{Z}[i]\)（高斯整数）。</strong>是整环：作为 \(\mathbb{C}\) 的子环，从 \(\mathbb{C}\) 继承"无零因子"。一般地，整环的子环（含 1）仍是整环。</p>
+
+<p><strong>(D-Ex4) \(k[x]\)（多项式环，\(k\) 是域）。</strong>是整环。证：用次数加性 \(\deg(fg) = \deg f + \deg g\)。如果 \(fg = 0\) 但 \(f, g \neq 0\)，则两边次数 \(-\infty = \deg f + \deg g\) 是有限非负数，矛盾。所以 \(f = 0\) 或 \(g = 0\)。这条论证更一般地适用：<em>整环上的多项式环还是整环</em>，所以 \(\mathbb{Z}[x], \mathbb{Z}[i][x], \mathbb{Z}[x_1, \ldots, x_n]\) 都是整环。</p>
+
+<p><strong>(D-Ex5) \(\mathbb{Z}_n\)。</strong>这是个分情况例子。</p>
+
+<ul>
+  <li>当 \(n\) 是<em>素数</em> \(p\) 时，\(\mathbb{Z}_p\) 是整环。事实上更强——它是<em>域</em>，详见 13.4 节。</li>
+  <li>当 \(n\) 是<em>合数</em> \(n = ab\)（\(1 < a, b < n\)）时，\([a][b] = [n] = [0]\) 但 \([a], [b] \neq [0]\)，所以 \(\mathbb{Z}_n\) 有零因子，不是整环。</li>
+</ul>
+
+<p>所以 \(\mathbb{Z}_n\) 整 \(\iff n\) 素。这件事非常重要——它把"哪些 \(\mathbb{Z}_n\) 适合做有限算术"这个问题完全归约到"哪些 \(n\) 是素数"。密码学里 RSA 用 \(\mathbb{Z}_n\)（\(n = pq\) 合数，故 \(\mathbb{Z}_n\) 不整环），但很多结构性论证又要在 \(\mathbb{Z}_p\) 上做（\(p\) 素，\(\mathbb{F}_p\) 是域），中国剩余定理在两者间架桥。</p>
+
+<p><strong>(D-Ex6) \(\mathbb{Z} \times \mathbb{Z}\)。</strong>这是个负面例子。考虑直积环——元素是 \((a, b)\)（\(a, b \in \mathbb{Z}\)），逐分量加 / 逐分量乘。它是交换环，\(1_R = (1, 1)\)，但有零因子：\((1, 0) \cdot (0, 1) = (0, 0) = 0\)，两边都非零。所以 \(\mathbb{Z} \times \mathbb{Z}\) <em>不是</em>整环。</p>
+
+<p>这个反例普遍化：<em>非平凡直积 \(R \times S\) 永远不是整环</em>（\(R, S\) 都非零时）。理由同上：\((1, 0)(0, 1) = 0\) 但两个因子都非零。</p>
+
+<p><strong>(D-Ex7) \(C[0,1]\)（连续函数环）。</strong>不是整环。取支撑互不相交的两个非零连续函数（比如一个支撑在 \([0, 1/3]\)、另一个在 \([2/3, 1]\)），它们的积恒等于 0。这就是<a href="ch11.html">第 11 章 11.8 节</a>讲的零因子。</p>
+
+<p>所以"<em>函数环</em>" 几乎从不是整环——除非定义域只有 1 点。这告诉你"整环"这个概念<em>不是</em>分析里函数空间的语言；它是数论 / 代数几何里"无重复结构"的语言。</p>
+
+<h2 id="sec13-3">13.3 域：每个非零都可逆</h2>
+
+<p>一个<strong>域</strong>（field）是一个交换环 \(F\)，满足：</p>
+
+<ul>
+  <li>(F1) \(1 \neq 0\)；</li>
+  <li>(F2) 每个非零元素都有乘法逆——对每个 \(0 \neq a \in F\)，存在 \(a^{-1} \in F\) 使 \(a a^{-1} = 1\)。</li>
+</ul>
+
+<p>等价说法：</p>
+
+<p>\[
+\boxed{\ F \text{ 域} \iff (F \setminus \{0\}, \cdot) \text{ 是阿贝尔群}.\ }
+\]</p>
+
+<p>把"非零元素 + 乘法"作为一个阿贝尔群——这个群叫 \(F^\times\) 或 \(F^*\)。"域"完整地说就是"加法是阿贝尔群、非零乘法也是阿贝尔群、两者由分配律绑住"。</p>
+
+<p>第二条 (F2) 意味着 \(F\) 的<em>单位群</em> \(F^\times = F \setminus \{0\}\)。这是它和整环的关键区别——整环里只要求"非零元素不被零吃掉"，域要求"非零元素全部可逆"。</p>
+
+<p>从 (F2) 立刻有"<em>域 \(\Rightarrow\) 整环</em>"。证：\(ab = 0\) 且 \(a \neq 0\)，两边乘 \(a^{-1}\) 得 \(b = 0\)。所以域里无零因子，是整环。</p>
+
+<p>反过来 "整环 \(\Rightarrow\) 域" <em>不</em>对。\(\mathbb{Z}\) 是整环但不是域（\(2\) 没逆 \(1/2 \notin \mathbb{Z}\)）。但有件事真：<em>有限</em>整环必是域。证（思路）：在有限整环 \(D\) 里固定 \(0 \neq a \in D\)，考虑映射 \(L_a : D \to D, x \mapsto ax\)。由消去律 \(L_a\) 单射；又 \(D\) 有限，单射蕴含满射；故有 \(b\) 使 \(ab = 1\)。由此 \(a\) 可逆。</p>
+
+<p>这条小定理威力巨大——它告诉你"<em>所有有限整环都是域</em>"，特别地 \(\mathbb{Z}_p\)（\(p\) 素）从"无零因子"立刻升级到"非零可逆"。</p>
+
+<h2 id="sec13-4">13.4 域的例子</h2>
+
+<p><strong>(F-Ex1) \(\mathbb{Q}\)。</strong>有理数域。每个非零 \(a/b\) 有逆 \(b/a\)。这是从 \(\mathbb{Z}\) 通过商域构造得到的（13.7 节）。</p>
+
+<p><strong>(F-Ex2) \(\mathbb{R}\)。</strong>实数域。</p>
+
+<p><strong>(F-Ex3) \(\mathbb{C}\)。</strong>复数域。\((a + bi)^{-1} = (a - bi)/(a^2 + b^2)\)（当 \(a + bi \neq 0\)）。</p>
+
+<p><strong>(F-Ex4) \(\mathbb{F}_p = \mathbb{Z}/p\mathbb{Z}\)（\(p\) 素）。</strong>有限域，有 \(p\) 个元素。每个非零元素 \([a]\)（\(\gcd(a, p) = 1\)）通过 Bezout \(au + pv = 1\) 给出 \([a][u] = [1]\)，故 \([a]^{-1} = [u]\)。这是计算 \(\mathbb{F}_p\) 中乘法逆的标准算法（扩展欧几里得）。</p>
+
+<p>有限域的完整分类是：每个有限域恰好有 \(p^n\) 个元素（\(p\) 素，\(n \ge 1\)），且任意两个 \(p^n\) 元的有限域同构，记作 \(\mathbb{F}_{p^n}\)。这是<a href="ch20.html">第 20 章</a>分裂域和<a href="ch23.html">第 23 章</a>有限域的核心结果。</p>
+
+<p><strong>(F-Ex5) 函数域 \(k(x)\)。</strong>取 \(k\) 是域，\(k[x]\) 是整环。它的商域 \(k(x) := \mathrm{Frac}(k[x]) = \{f/g : f, g \in k[x], g \neq 0\}\) 是<em>有理函数域</em>（13.7 节会精确构造）。这是代数几何里"曲线的函数域"的入门例子。</p>
+
+<p><strong>(F-Ex6) \(\mathbb{Z}\) <em>不是</em> 域。</strong>因为 \(2 \in \mathbb{Z}\) 没有逆元 \(1/2 \notin \mathbb{Z}\)。但 \(\mathbb{Z}\) 是整环。</p>
+
+<p><strong>(F-Ex7) \(\mathbb{Z}_n\)（\(n\) 合数）<em>不是</em>域。</strong>因为它甚至不是整环（13.2 节）。</p>
+
+<p>把这一组放在一起看，"<em>哪些标准对象是域</em>" 的答案是：(a) 数环里 \(\mathbb{Q}, \mathbb{R}, \mathbb{C}\) 是；(b) \(\mathbb{Z}_n\) 里 \(n\) 素时是 \(\mathbb{F}_p\)；(c) 整环的商域是；(d) 域上多项式的商域 \(k(x)\) 是。本书后面 18-22 章 Galois 理论里出现的"<em>域扩张</em>"指的也是从这些标准域开始往上加代数元素得到的更大的域。</p>
+
+<h2 id="sec13-5">13.5 整环的特征</h2>
+
+<p>设 \(D\) 是整环。考虑映射</p>
+
+<p>\[
+\mathbb{Z} \to D, \quad n \mapsto n \cdot 1_D := \underbrace{1_D + 1_D + \cdots + 1_D}_{n \text{ 项}} \quad (n > 0),
+\]</p>
+
+<p>负 \(n\) 取相反数、\(0\) 映 \(0\)。这是<em>唯一</em>从 \(\mathbb{Z}\) 出发的环同态（\(\mathbb{Z}\) 是<em>初对象</em>）。它的核 \(\ker = n_0 \mathbb{Z}\)（\(n_0 \ge 0\)） —— 因为 \(\mathbb{Z}\) 的所有理想都是主理想 \((n_0)\)。</p>
+
+<p>这个 \(n_0\) 就是 \(D\) 的<strong>特征</strong>，记作 \(\mathrm{char}(D)\)：</p>
+
+<p>\[
+\boxed{\ \mathrm{char}(D) = \min\{n > 0 : n \cdot 1_D = 0\}, \text{ 若不存在则 } \mathrm{char}(D) = 0.\ }
+\]</p>
+
+<p>具体：\(\mathrm{char}(\mathbb{Z}) = \mathrm{char}(\mathbb{Q}) = \mathrm{char}(\mathbb{R}) = \mathrm{char}(\mathbb{C}) = 0\)（在这些环里 \(n \cdot 1 = n \neq 0\) 对所有正 \(n\)）；\(\mathrm{char}(\mathbb{F}_p) = p\)（因 \(p \cdot 1 = p \equiv 0 \pmod p\) 且 \(p\) 是最小的）；\(\mathrm{char}(\mathbb{F}_{p^n}) = p\)（这是任意有限域的特征——它包含一个 \(\mathbb{F}_p\) 子域）。</p>
+
+<h2 id="sec13-6">13.6 域的特征是 0 或素数</h2>
+
+<p>关键事实：</p>
+
+<p>\[
+\boxed{\ \text{任何整环 } D \text{ 的特征是 } 0 \text{ 或一个素数 } p.\ }
+\]</p>
+
+<p>证：设 \(\mathrm{char}(D) = n > 0\)。要证 \(n\) 是素数。反设 \(n = ab\)（\(1 < a, b < n\)）。则在 \(D\) 内 \((a \cdot 1_D)(b \cdot 1_D) = ab \cdot 1_D = n \cdot 1_D = 0\)。由 \(D\) 整环，\(a \cdot 1_D = 0\) 或 \(b \cdot 1_D = 0\)。但 \(a, b < n\)，与 \(n\) 是<em>最小</em>这种正整数矛盾。故 \(n\) 不能分解，\(n\) 是素数。</p>
+
+<p>这条对域成立（域是整环），所以"<em>任何域的特征是 0 或素数 \(p\)</em>"。</p>
+
+<p>这件事的实用结论是：每个域 \(F\) 都包含一个<em>最小子域</em>，叫<em>素子域</em>（prime field）：</p>
+
+<ul>
+  <li>\(\mathrm{char}(F) = 0\)：素子域 \(\cong \mathbb{Q}\)（因为 \(\mathbb{Z} \hookrightarrow F\) 单射，故扩展为 \(\mathbb{Q} \hookrightarrow F\)）。</li>
+  <li>\(\mathrm{char}(F) = p\)：素子域 \(\cong \mathbb{F}_p\)（因为 \(\mathbb{Z} \to F\) 的核是 \((p)\)，由第一同构 \(\mathbb{Z}/p\mathbb{Z} = \mathbb{F}_p \hookrightarrow F\)）。</li>
+</ul>
+
+<p>所以"所有域要么坐在 \(\mathbb{Q}\) 上要么坐在某个 \(\mathbb{F}_p\) 上"。这条把"域"分成两大类——<em>特征 0</em> 和 <em>特征 \(p\)</em>。两类的代数行为差很多：特征 0 域的所有有限扩张都是<em>可分</em>的（这件事让 Galois 理论简单），特征 \(p\) 域里有 Frobenius 同态 \(x \mapsto x^p\) 这种神奇工具。本书<a href="ch18.html">第 18 章</a>开始系统讨论。</p>
+
+<p>顺便：特征 \(p\) 时，对任意 \(a, b \in F\)，</p>
+
+<p>\[
+(a + b)^p = a^p + b^p.
+\]</p>
+
+<p>这就是著名的"<em>新生美梦</em>"（freshman's dream）。证：用二项式定理 \((a+b)^p = \sum_{k=0}^p \binom{p}{k} a^{p-k} b^k\)，对 \(0 < k < p\) 有 \(p \mid \binom{p}{k}\)（因 \(\binom{p}{k}\) 分子有 \(p\)，分母没有），故这些项在特征 \(p\) 下为 0。剩下 \(a^p + b^p\)。这条让 Frobenius \(x \mapsto x^p\) 成为<em>环同态</em>，在 \(\mathbb{F}_q\) 理论里是核心工具（<a href="ch23.html">第 23 章</a>）。</p>
+
+<h2 id="sec13-7">13.7 商域 \(\mathrm{Frac}(D)\)</h2>
+
+<p>给一个整环 \(D\)（如 \(\mathbb{Z}\)），怎么把它"补成"包含它的最小域？答案是<strong>商域</strong>（field of fractions），构造方式正是从 \(\mathbb{Z}\) 造 \(\mathbb{Q}\) 的"分数模板"的代数化。</p>
+
+<p>设 \(D\) 是整环，考虑集合</p>
+
+<p>\[
+S = \{(a, b) : a \in D, b \in D \setminus \{0\}\}.
+\]</p>
+
+<p>把 \((a, b)\) 想成"形式分数 \(a/b\)"。在 \(S\) 上定等价关系</p>
+
+<p>\[
+\boxed{\ (a, b) \sim (c, d) \iff ad = bc \quad (\text{在 } D \text{ 内}).\ }
+\]</p>
+
+<p>验证 \(\sim\) 是等价关系：</p>
+
+<ul>
+  <li>反身：\((a, b) \sim (a, b) \iff ab = ba\)，由交换。</li>
+  <li>对称：显然由 \(=\) 对称。</li>
+  <li>传递：\((a, b) \sim (c, d) \sim (e, f)\)，即 \(ad = bc\) 与 \(cf = de\)。要证 \(af = be\)。从 \(ad = bc\) 乘 \(f\) 得 \(adf = bcf = bde\)（用 \(cf = de\)）。所以 \(d(af) = d(be)\)。由 \(D\) 整环、\(d \neq 0\)，消去 \(d\) 得 \(af = be\)。</li>
+</ul>
+
+<p>注意"<em>消去 \(d\)</em>" 这一步用到了 \(D\) 是整环（无零因子）—— 这是为什么商域对一般环不能做，必须 \(D\) 整。</p>
+
+<p>把等价类记作 \([(a, b)]\) 或 \(a/b\)，集合 \(\mathrm{Frac}(D) := S/\sim\)。在上面定义</p>
+
+<p>\[
+\frac{a}{b} + \frac{c}{d} := \frac{ad + bc}{bd}, \qquad \frac{a}{b} \cdot \frac{c}{d} := \frac{ac}{bd}.
+\]</p>
+
+<p>验证良定义（不依赖代表元）和环公理是直接的代数计算。零元是 \(0/1\)，单位元是 \(1/1\)。任何非零分数 \(a/b\)（\(a \neq 0\)）有逆 \(b/a\) —— 因为 \((a/b)(b/a) = ab/ba = 1/1\)。所以 \(\mathrm{Frac}(D)\) 是<em>域</em>。</p>
+
+<p>嵌入 \(D \hookrightarrow \mathrm{Frac}(D)\) 由 \(a \mapsto a/1\) 给出。验证它是单的环同态：单是因为 \(a/1 = 0/1 \iff a = 0\)；同态是直接计算。</p>
+
+<p>这个构造的<em>普遍性质</em>（universal property）说：\(\mathrm{Frac}(D)\) 是包含 \(D\) 的"<em>最小</em>" 域。具体来说，对任何把 \(D\) 嵌入域 \(F\) 的同态 \(\varphi : D \hookrightarrow F\)，存在唯一同态 \(\bar \varphi : \mathrm{Frac}(D) \to F\) 让 \(\bar \varphi(a/1) = \varphi(a)\)；显式公式 \(\bar \varphi(a/b) = \varphi(a)/\varphi(b)\)。这件事让"商域"在范畴论意义上是唯一的（最小的包含 \(D\) 的域）。</p>
+
+<h2 id="sec13-8">13.8 商域的标准例子</h2>
+
+<p><strong>\(\mathrm{Frac}(\mathbb{Z}) = \mathbb{Q}\)。</strong>构造里的"形式分数 \(a/b\)" 就是有理数。这是 \(\mathbb{Q}\) 第一次被<em>代数地</em>建造出来。在<a href="../实分析/ch1.html">实分析读本第 1 章</a>里 \(\mathbb{Q}\) 是从 \(\mathbb{Z}\) 通过"序对模等价" 同样的方式建造——那里的语言是"群论 / 集合论"，这里是"环论 / 商域"，但本质同一。</p>
+
+<p><strong>\(\mathrm{Frac}(k[x]) = k(x)\)。</strong>设 \(k\) 是域。\(k[x]\) 是整环，它的商域是<em>有理函数域</em></p>
+
+<p>\[
+k(x) = \left\{ \frac{f(x)}{g(x)} : f, g \in k[x], g \neq 0 \right\} \big/ \sim.
+\]</p>
+
+<p>元素是"分子分母都是多项式的形式分数"。这是代数几何里"仿射直线 \(\mathbb{A}^1_k\) 的函数域"——它编码了曲线 \(\mathbb{A}^1\) 上"全局有理函数"的全集。这件事推广到任意代数簇 \(V\) 上：\(V\) 的"坐标环" \(k[V]\)（整环时）的商域就是 \(V\) 的<em>函数域</em> \(k(V)\)。</p>
+
+<p>多元情形：\(\mathrm{Frac}(k[x_1, \ldots, x_n]) = k(x_1, \ldots, x_n)\)，<em>多元有理函数域</em>。这是 \(\mathbb{A}^n_k\) 的函数域。</p>
+
+<p><strong>\(\mathrm{Frac}(\mathbb{Z}[i]) = \mathbb{Q}(i)\)。</strong>高斯整数的商域。</p>
+
+<p>\[
+\mathbb{Q}(i) = \{a + bi : a, b \in \mathbb{Q}\} \subset \mathbb{C}.
+\]</p>
+
+<p>验证：构造里的形式分数 \((a + bi)/(c + di)\) 通过分母有理化 \((a + bi)(c - di) / ((c + di)(c - di)) = ((ac + bd) + (bc - ad)i)/(c^2 + d^2)\) 的确落在 \(\{p + qi : p, q \in \mathbb{Q}\}\) 内。所以 \(\mathrm{Frac}(\mathbb{Z}[i]) = \mathbb{Q}(i)\)。</p>
+
+<p>这是<em>代数数域</em>的原型——更一般地，对任何代数数 \(\alpha\)（满足某个 \(\mathbb{Z}\) 系数多项式的复数）的"环 \(\mathbb{Z}[\alpha]\)"，它的商域 \(\mathbb{Q}(\alpha)\) 是 \(\mathbb{Q}\) 的<em>有限扩张</em>。这就是<a href="ch18.html">第 18 章</a>域扩张的入门画面。</p>
+
+<p>把整章的"层级"在最后一句话里收一下：从最朴素的环 \(R\) 出发，去掉零因子得整环 \(D\)，再让每个非零元素可逆得域 \(F\)，或把整环嵌入到它的最小域 \(\mathrm{Frac}(D)\)。这条线是代数里"理想化对象"的标准爬升路径。</p>
+
+<p>下一章我们要在"整环 \(\to\) 域"之间插入两层关键结构——<em>主理想环</em>（PID）和<em>唯一分解整环</em>（UFD）。这两层让"算术基本定理"——"每个整数唯一分解为素因子" 推广到多项式环 \(k[x]\)、高斯整数 \(\mathbb{Z}[i]\) 等更一般的环。Eisenstein 判别法、Gauss 引理都会在那一章给出。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 理想与商环</a><a href="ch14.html">下一章 · 第 14 章 主理想环与唯一分解 →</a></nav>
+</main>
+</body>
+</html>

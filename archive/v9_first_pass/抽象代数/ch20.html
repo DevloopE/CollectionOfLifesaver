@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 分裂域与正规扩张 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 代数扩张与最小多项式</a><a href="ch21.html">下一章 · 第 21 章 Galois 理论基本定理 →</a></nav>
+<h1 id="ch20">第 20 章 分裂域与正规扩张</h1>
+
+<p>多项式的根天生倾向于"溢出"它所定义的域。给一个 \(f \in \mathbb{Q}[x]\)，它的根可能跑到 \(\mathbb{R}\) 里、可能跑到 \(\mathbb{C}\) 里、可能跑到某个我们还没见过的代数扩张里。如果你想<em>同时谈论</em>这些根——比如把它们的对称性收集起来，或讨论它们之间的代数关系——那么你必须先把它们装进<em>同一个</em>域。这个最小的"装得下 \(f\) 全部根"的扩张就是<strong>分裂域</strong>。</p>
+
+<p>分裂域是 Galois 理论的舞台。它有两个性质让整个故事得以展开：它<em>存在</em>（用<a href="ch19.html">第 19 章</a>的单代数扩张迭代构造出来），并且它<em>本质唯一</em>（任意两个分裂域之间存在固定基域 \(F\) 的同构）。这种"本质唯一性"很重要——它让我们能毫不含糊地说"\(f\) 的分裂域上的对称群"，而不必担心它依赖于某个具体的构造选择。</p>
+
+<p>这一章把分裂域的存在与唯一证清楚，再引入与之孪生的概念——<strong>正规扩张</strong>。我们会发现"\(K\) 是某个 \(F\) 上多项式的分裂域"和"\(K/F\) 是正规扩张"在有限情形下是同一回事。最后我们准备好<em>可分性</em>这个 Galois 理论的另一个必要条件——在特征 0 的域上它自动成立，这就是为什么 \(\mathbb{Q}\) 的扩张总是可分的。</p>
+
+<ul>
+  <li>分裂域的精确定义：\(f \in F[x]\) 在 \(K\) 中分裂为线性因子的最小扩张。</li>
+  <li>具体例子：\(x^2 - 2\)、\(x^4 - 2\) 在 \(\mathbb{Q}\) 上的分裂域，以及为什么后者必须包含 \(i\)。</li>
+  <li>分裂域的存在性——用单代数扩张一根一根地"接进来"。</li>
+  <li>分裂域的唯一性——同构意义下完整证明。</li>
+  <li>正规扩张的定义与一个手感判据。</li>
+  <li>"正规 \(\Leftrightarrow\) 分裂域"的等价定理（有限扩张情形）。</li>
+  <li>用例子区分正规与非正规：\(\mathbb{Q}(\sqrt 2)/\mathbb{Q}\) 正规、\(\mathbb{Q}(\sqrt[3] 2)/\mathbb{Q}\) 不正规。</li>
+  <li>可分多项式：用 \(\gcd(f, f')\) 判重根，特征 0 自动可分。</li>
+</ul>
+
+<h2 id="sec20-1">20.1 分裂域：把多项式的所有根装进一个域</h2>
+
+<p>给一个非常数多项式 \(f \in F[x]\)，"\(f\) 在某个扩张 \(K \supset F\) 中分裂"是指 \(f\) 在 \(K[x]\) 中可以写成线性因子的乘积：</p>
+
+<p>\[
+f(x) = c (x - \alpha_1)(x - \alpha_2) \cdots (x - \alpha_n) \in K[x],
+\]</p>
+
+<p>其中 \(c \in F\)（首项系数），\(\alpha_1, \ldots, \alpha_n \in K\) 是 \(f\) 在 \(K\) 里的全部根（按重数列出）。</p>
+
+<p>"\(f\) 在 \(K\) 中分裂"是一个关于 \(K\) 的最低要求——它说 \(f\) 把所有"根的份"都还给我们了，没有一个躲在更外层的扩张里。但它没有要求 \(K\) 不要太大；\(\mathbb{C}\) 当然让所有有理多项式分裂，可它远远超出我们想要的尺寸。</p>
+
+<p>所以正确的概念要再加一句"最小"：</p>
+
+<p>\[
+\boxed{\ K \text{ 是 } f \in F[x] \text{ 在 } F \text{ 上的}\textbf{分裂域}\ \Leftrightarrow\ f \text{ 在 } K \text{ 中分裂},\ K = F(\alpha_1, \ldots, \alpha_n).\ }
+\]</p>
+
+<p>第二个条件 \(K = F(\alpha_1, \ldots, \alpha_n)\) 强制 \(K\) 是 \(F\) 添加 \(f\) 全部根所得的最小域——再小一点就装不下所有根，再大一点又不"贴身"。</p>
+
+<p>注意这个定义依赖于<em>哪个</em> \(F\)。同一个多项式 \(f(x) = x^2 + 1 \in \mathbb{Z}[x]\) 在 \(\mathbb{Q}\) 上的分裂域是 \(\mathbb{Q}(i)\)，在 \(\mathbb{R}\) 上的分裂域是 \(\mathbb{C}\)（不是更大也不是更小），在 \(\mathbb{C}\) 上的分裂域就是 \(\mathbb{C}\) 自己（已经分裂了）。</p>
+
+<p>分裂域不是<a href="ch18.html">第 18 章</a>那种"扩张次数等于 \(\deg f\)" 的极简扩张——它通常更大，因为要装 \(f\) 的<em>全部</em>根。具体大多少由 \(f\) 的根之间的代数关系决定，这正是 Galois 理论将要回答的问题。</p>
+
+<h2 id="sec20-2">20.2 两个核心例子</h2>
+
+<p><strong>例子一：\(x^2 - 2\) 在 \(\mathbb{Q}\) 上的分裂域。</strong></p>
+
+<p>\(x^2 - 2\) 的两个根是 \(\sqrt 2\) 与 \(-\sqrt 2\)。把它们都加进 \(\mathbb{Q}\) 得到 \(\mathbb{Q}(\sqrt 2, -\sqrt 2) = \mathbb{Q}(\sqrt 2)\)（\(-\sqrt 2 = -1 \cdot \sqrt 2\) 已经在 \(\mathbb{Q}(\sqrt 2)\) 里）。所以分裂域 \(K = \mathbb{Q}(\sqrt 2)\)，\([K : \mathbb{Q}] = 2\)。</p>
+
+<p>这是一个"分裂域恰好等于单代数扩张"的例子。原因很简单：\(x^2 - 2\) 是二次的，加进一个根，另一个根（\(\pm\) 号那个）就自动被表示出来了。</p>
+
+<p><strong>例子二：\(x^4 - 2\) 在 \(\mathbb{Q}\) 上的分裂域。</strong></p>
+
+<p>\(x^4 - 2 = 0\) 的根是 \(\sqrt[4] 2 \cdot \zeta\)，其中 \(\zeta\) 跑遍四次单位根 \(\{1, i, -1, -i\}\)。具体说，四个根是</p>
+
+<p>\[
+\alpha_1 = \sqrt[4] 2, \qquad \alpha_2 = i \sqrt[4] 2, \qquad \alpha_3 = -\sqrt[4] 2, \qquad \alpha_4 = -i \sqrt[4] 2.
+\]</p>
+
+<p>注意 \(\alpha_3 = -\alpha_1\) 和 \(\alpha_4 = -\alpha_2\) 都可以从 \(\alpha_1, \alpha_2\) 算出来。所以分裂域 \(K = \mathbb{Q}(\alpha_1, \alpha_2) = \mathbb{Q}(\sqrt[4] 2, i \sqrt[4] 2) = \mathbb{Q}(\sqrt[4] 2, i)\)。</p>
+
+<p>这里出现了关键的现象：仅仅添加一个实根 \(\sqrt[4] 2\) 是<strong>不够的</strong>，因为另外两个根 \(\pm i \sqrt[4] 2\) 是<em>非实数</em>，绝对装不进 \(\mathbb{R}\) 内的扩张 \(\mathbb{Q}(\sqrt[4] 2) \subset \mathbb{R}\)。所以你必须额外把 \(i\) 也加进去。</p>
+
+<p>计算 \([K : \mathbb{Q}]\)。由<a href="ch19.html">第 19 章</a>塔定理，</p>
+
+<p>\[
+[\mathbb{Q}(\sqrt[4] 2, i) : \mathbb{Q}] = [\mathbb{Q}(\sqrt[4] 2, i) : \mathbb{Q}(\sqrt[4] 2)] \cdot [\mathbb{Q}(\sqrt[4] 2) : \mathbb{Q}].
+\]</p>
+
+<p>右因子 \(= 4\)（\(\sqrt[4] 2\) 的最小多项式 \(x^4 - 2\) 由 Eisenstein 不可约）。左因子 \(= 2\)（\(i\) 的最小多项式 \(x^2 + 1\) 在 \(\mathbb{Q}(\sqrt[4] 2) \subset \mathbb{R}\) 上仍不可约，因为 \(\mathbb{Q}(\sqrt[4] 2)\) 是实子域）。所以 \([K : \mathbb{Q}] = 8\)，远大于 \(\deg(x^4 - 2) = 4\)。这就是分裂域可以"超出最小多项式次数"的标志性例子。</p>
+
+<p>这个 8 维的扩张在<a href="ch21.html">第 21 章</a>会再次出现——它的 Galois 群是 8 阶的二面体群 \(D_4\)，由根的"轮换 + 共轭"两个对称生成。</p>
+
+<h2 id="sec20-3">20.3 分裂域的存在性</h2>
+
+<p>任何 \(F\) 上的非常数多项式都有分裂域。证明思路简单直接：用<a href="ch19.html">第 19 章</a>的单代数扩张构造，把 \(f\) 的根一根一根地"接进来"。</p>
+
+<p><strong>定理（分裂域存在）。</strong>对任意域 \(F\) 与非常数 \(f \in F[x]\)，存在 \(F\) 的一个有限扩张 \(K\)，使 \(f\) 在 \(K[x]\) 中分裂为线性因子，且 \(K\) 由 \(f\) 在 \(K\) 中的所有根 \(F\)-生成。可以保证 \([K : F] \le n!\)，其中 \(n = \deg f\)。</p>
+
+<p>证明（对 \(\deg f\) 归纳）。\(\deg f = 1\) 时 \(K = F\)。</p>
+
+<p>设 \(\deg f = n \ge 2\)。取 \(f\) 在 \(F[x]\) 中的一个不可约因子 \(p_1\)，由<a href="ch19.html">第 19 章</a> 19.3 节构造单代数扩张 \(F_1 = F[x]/(p_1) = F(\alpha_1)\)，\(p_1(\alpha_1) = 0\)。在 \(F_1[x]\) 中 \(f = (x - \alpha_1) g\)，\(\deg g = n - 1\)。对 \(g \in F_1[x]\) 用归纳假设得 \(F_1\) 的有限扩张 \(K\) 让 \(g\) 在 \(K\) 中分裂；\(f\) 也就在 \(K\) 中分裂。再取 \(K_0 = F(\alpha_1, \ldots, \alpha_n) \subset K\) 即分裂域。</p>
+
+<p>次数估计：\([F_1 : F] \le n\)，\([K : F_1] \le (n - 1)!\)，所以 \([K : F] \le n!\)。结束。</p>
+
+<p>这条证明的核心思想叫"<strong>Kronecker–Steinitz 添根法</strong>"——只要你能"凭空造出一个根"（这正是<a href="ch19.html">第 19 章</a>商域 \(F[x]/(p)\) 的本事），就可以一根接一根地造出整个分裂域。这是抽象代数典型的"用商环代替几何现实"的招数。</p>
+
+<h2 id="sec20-4">20.4 分裂域的唯一性</h2>
+
+<p>分裂域不只存在，而且<strong>本质唯一</strong>——任意两个分裂域之间存在保持基域 \(F\) 的同构。这件事让我们以后可以毫不含糊地说"\(f\) 的分裂域"，把"哪个具体构造"完全甩到后面。</p>
+
+<p><strong>定理（分裂域唯一）。</strong>设 \(K_1, K_2\) 都是 \(f \in F[x]\) 在 \(F\) 上的分裂域。则存在 \(F\)-同构 \(\sigma : K_1 \to K_2\)（即 \(\sigma\) 是域同构且 \(\sigma|_F = \text{id}_F\)）。</p>
+
+<p>\[
+\boxed{\ K_1, K_2 \text{ 都是 } f \text{ 的分裂域} \Rightarrow \exists\ \sigma : K_1 \xrightarrow{\sim} K_2,\ \sigma|_F = \text{id}.\ }
+\]</p>
+
+<p>证明用一个更一般的"同构延拓引理"——它本身在<a href="ch21.html">下一章</a>定义 Galois 群时也要用，所以单独提出来。</p>
+
+<p><strong>引理（同构延拓）。</strong>设 \(\varphi : F \to F'\) 是域同构。设 \(p \in F[x]\) 是不可约多项式，\(p' = \varphi(p) \in F'[x]\) 是它把系数对应过去得到的多项式（同样不可约）。设 \(\alpha\) 是 \(p\) 在某扩张中的根，\(\alpha'\) 是 \(p'\) 在某扩张中的根。那么 \(\varphi\) 可以唯一延拓为同构 \(\tilde\varphi : F(\alpha) \to F'(\alpha')\) 满足 \(\tilde\varphi(\alpha) = \alpha'\)。</p>
+
+<p>引理证明：\(F(\alpha) \cong F[x]/(p)\)，\(F'(\alpha') \cong F'[x]/(p')\)（<a href="ch19.html">第 19 章</a> 19.2 节）。\(\varphi\) 系数对应给出 \(F[x]/(p) \cong F'[x]/(p')\)，再让 \(\bar x \mapsto \alpha\)、\(\bar x' \mapsto \alpha'\) 即得 \(F(\alpha) \cong F'(\alpha')\)。\(\Box\)</p>
+
+<p>主定理证明（对 \([K_1 : F]\) 归纳）。</p>
+
+<p><strong>基础。</strong>\([K_1 : F] = 1\)：\(K_1 = F\)，\(f\) 在 \(F\) 中已经分裂；同样 \(K_2 = F\)，取 \(\sigma = \text{id}\)。</p>
+
+<p><strong>归纳。</strong>设 \([K_1 : F] > 1\)。\(f\) 在 \(F\) 上至少有一个不可约因子 \(p\) 满足 \(\deg p \ge 2\)（否则 \(f\) 已在 \(F\) 中分裂）。</p>
+
+<p>取 \(\alpha \in K_1\) 是 \(p\) 的一个根（\(K_1\) 中存在，因为 \(K_1\) 是分裂域）。同样取 \(\alpha' \in K_2\) 是 \(p\) 的一个根。</p>
+
+<p>由引理（取 \(\varphi = \text{id}_F\)），\(F(\alpha) \cong F(\alpha')\)，同构 \(\tau\) 满足 \(\tau(\alpha) = \alpha'\) 且 \(\tau|_F = \text{id}\)。</p>
+
+<p>现在 \(K_1\) 是 \(f\) 在 \(F(\alpha)\) 上的分裂域（明显——\(K_1 \supset F(\alpha)\)，\(f\) 在 \(K_1\) 中分裂，\(K_1\) 由 \(F\) 加全部根生成 \(\Rightarrow\) 也由 \(F(\alpha)\) 加全部根生成）。同样 \(K_2\) 是 \(f\) 在 \(F(\alpha')\) 上的分裂域，把 \(F(\alpha')\) 通过 \(\tau\) 与 \(F(\alpha)\) 等同。\([K_1 : F(\alpha)] = [K_1 : F]/[F(\alpha) : F] < [K_1 : F]\)。由归纳假设 \(\tau\) 可以延拓为同构 \(\sigma : K_1 \to K_2\)。结束。\(\Box\)</p>
+
+<p>这条证明不长但意义深远。它说"分裂域作为代数对象只取决于 \(f\)"——任何两次构造得到的"分裂域"都是同构的。从此以后我们可以记号上写"\(f\) 的分裂域"、"记作 \(\text{Splt}_F(f)\)"，而不必在乎具体怎么造出来的。</p>
+
+<p>更进一步，唯一性证明里出现的同构 \(\sigma\) 不一定唯一——同一个 \(K_1\) 到 \(K_2\) 可能有<em>多</em>个不同的 \(F\)-同构。这些"多余"的同构正是<a href="ch21.html">下一章</a> Galois 群的来源——它衡量了 \(K\) 中"根的对称性"有多丰富。</p>
+
+<h2 id="sec20-5">20.5 正规扩张</h2>
+
+<p>分裂域是从"具体多项式 \(f\)"出发定义的；现在我们要把"是某个多项式的分裂域"这件事抽象成扩张本身的一条性质——<strong>正规性</strong>。</p>
+
+<p><strong>定义。</strong>有限扩张 \(K/F\) 称为<strong>正规扩张</strong>，如果对每个不可约多项式 \(p \in F[x]\)，只要 \(p\) 在 \(K\) 中有<em>一个</em>根，它就在 \(K\) 中分裂为线性因子（即所有根都在 \(K\) 中）。</p>
+
+<p>"正规"这个词的直觉是：\(K\) 对 \(F\) 上的最小多项式"很厚道"——它从不只装一半的根，要么一个不收，要么一收就收齐。换句话说，\(K\) 中的代数元在 \(F\) 上的"共轭"（最小多项式的其它根）也都被装进了 \(K\)。</p>
+
+<p>这条性质看起来抽象，但它和分裂域是一回事：</p>
+
+<p><strong>定理（正规 \(\Leftrightarrow\) 分裂域，有限情形）。</strong>设 \(K/F\) 是有限扩张。则下面两条等价：</p>
+
+<p>\[
+\boxed{\ K/F \text{ 正规}\ \Leftrightarrow\ K \text{ 是某个 } f \in F[x] \text{ 在 } F \text{ 上的分裂域}.\ }
+\]</p>
+
+<p>证明（"\(\Rightarrow\)"）。设 \(K/F\) 正规有限。取 \(K\) 的有限 \(F\)-基底 \(\{\alpha_1, \ldots, \alpha_m\}\)。每个 \(\alpha_i\) 在 \(F\) 上有最小多项式 \(p_i\)；由正规性 \(p_i\) 在 \(K\) 中分裂。令 \(f = p_1 \cdots p_m\)，则 \(f\) 在 \(K\) 中分裂，\(K\) 由 \(\alpha_i \subset \{f \text{ 的根}\}\) 生成 \(\Rightarrow K\) 是 \(f\) 的分裂域。</p>
+
+<p>证明（"\(\Leftarrow\)"）。设 \(K\) 是 \(f \in F[x]\) 的分裂域。取任一不可约 \(p \in F[x]\) 在 \(K\) 中有根 \(\alpha\)。要证 \(p\) 的所有根都在 \(K\) 里。</p>
+
+<p>取 \(p\) 的另一根 \(\beta\)（在 \(K\) 所在的代数闭包 \(\bar F\) 中）。由 20.4 节同构延拓引理，存在 \(F\)-同构 \(\tau : F(\alpha) \to F(\beta)\)，\(\tau(\alpha) = \beta\)。在固定的 \(\bar F\) 内，\(K\) 是 \(f\) 在 \(F(\alpha)\) 上的分裂域，\(\tau\) 把它推到 \(f\) 在 \(F(\beta)\) 上的分裂域 \(K'\)；由 20.4 唯一性 \(\sigma : K \xrightarrow{\sim} K'\) 延拓 \(\tau\)。在 \(\bar F\) 内 \(K = K'\)，所以 \(\beta = \sigma(\alpha) \in K\)。结束。\(\Box\)</p>
+
+<p>这就是正规扩张的"具象化"——它告诉你，正规扩张实际上就是分裂域的<em>抽象描述</em>。两个角度，同一个东西。</p>
+
+<h2 id="sec20-6">20.6 例子辨析：哪些扩张是正规的</h2>
+
+<p><strong>例子一：\(\mathbb{Q}(\sqrt 2)/\mathbb{Q}\) 正规。</strong></p>
+
+<p>\(\sqrt 2\) 的最小多项式 \(x^2 - 2\) 的两个根 \(\pm \sqrt 2\) 都在 \(\mathbb{Q}(\sqrt 2)\) 里。所以 \(\mathbb{Q}(\sqrt 2)\) 是 \(x^2 - 2\) 的分裂域，正规。</p>
+
+<p>更具体：任何 \(\mathbb{Q}\) 上的二次扩张 \(\mathbb{Q}(\sqrt d)\)（\(d\) 不是平方数）都是 \(x^2 - d\) 的分裂域，所以都正规。这是为什么二次扩张永远不出问题——它们是正规扩张的"安全区"。</p>
+
+<p><strong>例子二：\(\mathbb{Q}(\sqrt[3] 2)/\mathbb{Q}\) <em>不</em>正规。</strong></p>
+
+<p>这是抽象代数的经典反例。\(\sqrt[3] 2\) 的最小多项式 \(x^3 - 2\) 在 \(\mathbb{Q}\) 上不可约（Eisenstein \(p = 2\)）。它的三个根是</p>
+
+<p>\[
+\sqrt[3] 2, \qquad \omega \sqrt[3] 2, \qquad \omega^2 \sqrt[3] 2,
+\]</p>
+
+<p>其中 \(\omega = e^{2\pi i / 3} = -1/2 + i\sqrt 3 / 2\) 是 \(\mathbb{C}\) 中的三次单位根。\(\mathbb{Q}(\sqrt[3] 2) \subset \mathbb{R}\) 是实子域，不能装下复数 \(\omega \sqrt[3] 2\)。所以 \(x^3 - 2\) 在 \(\mathbb{Q}(\sqrt[3] 2)\) 中只有<em>一</em>个根 \(\sqrt[3] 2\)，不分裂——\(\mathbb{Q}(\sqrt[3] 2)/\mathbb{Q}\) 不正规。</p>
+
+<p>它的"正规闭包"——添加 \(\omega\) 后的 \(\mathbb{Q}(\sqrt[3] 2, \omega)\)——次数是 \([\mathbb{Q}(\sqrt[3] 2, \omega) : \mathbb{Q}] = 6\)，恰好是 \(x^3 - 2\) 的分裂域，是正规扩张。这个 6 阶扩张的对称群是 \(S_3\)（"三个根的全置换"），是<a href="ch21.html">下一章</a>第一个非交换 Galois 群的例子。</p>
+
+<p><strong>例子三：\(\mathbb{C}/\mathbb{R}\) 正规。</strong></p>
+
+<p>\(\mathbb{C} = \mathbb{R}(i)\) 是 \(x^2 + 1\) 的分裂域（两个根 \(\pm i\) 都在 \(\mathbb{C}\)）。所以正规。这个例子虽然简单但代表性极强——\(\mathbb{C}/\mathbb{R}\) 的 Galois 群 \(\{\text{id}, \text{共轭}\} \cong \mathbb{Z}/2\) 是<a href="ch21.html">下一章</a>第一个完整算出的例子。</p>
+
+<h2 id="sec20-7">20.7 可分多项式与可分扩张</h2>
+
+<p>Galois 理论除了正规性之外，还需要另一个条件——可分性。它在<em>特征 0</em> 的域（如 \(\mathbb{Q}\)、\(\mathbb{R}\)、\(\mathbb{C}\)、它们的有限扩张）上自动满足，所以本科 Galois 理论里通常被悄悄掩盖；但它真正起作用是在特征 \(p\) 的域上。</p>
+
+<p><strong>定义。</strong>非常数 \(f \in F[x]\) 称为<strong>可分多项式</strong>，如果它在分裂域中没有重根（每个根都是单根）。代数元 \(\alpha\) 在 \(F\) 上称为<strong>可分</strong>，如果它的最小多项式 \(p_\alpha\) 是可分的。代数扩张 \(K/F\) 称为<strong>可分扩张</strong>，如果 \(K\) 中每个元素都在 \(F\) 上可分。</p>
+
+<p>判别一个多项式有没有重根，最方便的工具是<em>形式导数</em>。\(f(x) = a_n x^n + \cdots + a_1 x + a_0\) 的形式导数定义为</p>
+
+<p>\[
+f'(x) = n a_n x^{n - 1} + \cdots + 2 a_2 x + a_1.
+\]</p>
+
+<p>这只是按熟悉的"求导规则"形式定义，不依赖任何分析极限——在任何域上都有意义。</p>
+
+<p><strong>引理（可分性判据）。</strong>非常数 \(f \in F[x]\) 在分裂域中无重根 \(\Leftrightarrow \gcd(f, f') = 1 \in F[x]\)。</p>
+
+<p>\[
+\boxed{\ f \text{ 可分} \Leftrightarrow \gcd(f, f') = 1.\ }
+\]</p>
+
+<p>证明：\(\alpha\) 是 \(f\) 的重根 \(\Leftrightarrow (x - \alpha)^2 \mid f \Leftrightarrow (x - \alpha) \mid f \text{ 且 } (x - \alpha) \mid f'\)（求导规则 \(f = (x - \alpha)^2 g \Rightarrow f' = 2(x - \alpha) g + (x - \alpha)^2 g'\)，所以 \((x - \alpha) \mid f'\)）\(\Leftrightarrow (x - \alpha) \mid \gcd(f, f')\)。</p>
+
+<p>所以 \(f\) 有重根 \(\Leftrightarrow\) \(\gcd(f, f')\) 在某扩张中有零点 \(\Leftrightarrow \deg \gcd(f, f') \ge 1\)，即 \(\gcd(f, f') \neq 1\) （在 \(F[x]\) 中——\(\gcd\) 可在 \(F[x]\) 内用 Euclid 算法求出，不必跑到扩张里）。\(\Box\)</p>
+
+<p><strong>关键定理（特征 0 自动可分）。</strong>设 \(\text{char}(F) = 0\)。则 \(F[x]\) 中每个不可约多项式都可分。因此 \(F\) 上每个代数扩张都可分。</p>
+
+<p>\[
+\boxed{\ \text{char}(F) = 0\ \Rightarrow\ F \text{ 上的代数扩张全部可分}.\ }
+\]</p>
+
+<p>证明：取不可约 \(p \in F[x]\)，要证 \(\gcd(p, p') = 1\)。\(p\) 不可约 \(\Rightarrow\) 它的非零因子要么是常数要么是 \(c \cdot p\)。\(p'\) 是 \(\deg p - 1\) 次多项式（\(\text{char} = 0\) 让 \(\deg p \cdot a_{\deg p} \ne 0\)，所以 \(p'\) 的最高次项不消），\(p' \ne 0\) 且 \(\deg p' < \deg p\)。\(\gcd(p, p')\) 整除 \(p\)，所以 \(\gcd \in \{1, c \cdot p\}\)。但 \(\gcd \mid p'\)，\(\deg p' < \deg p\) 排除 \(c \cdot p\)。所以 \(\gcd = 1\)。\(\Box\)</p>
+
+<p>这条定理是 \(\mathbb{Q}\) 上 Galois 理论"忘掉可分性"的全部理由。在特征 \(p > 0\) 上情况就没那么干净——比如 \(\mathbb{F}_p(t)\) 上的 \(x^p - t\) 是不可分的（\(p' = p x^{p - 1} = 0\)）。所以可分性是 Galois 理论真正<em>独立</em>的一个条件，只是在特征 0 上"消失"了。</p>
+
+<p><strong>例子：\(\mathbb{Q}\) 上多项式 \(x^4 - 5 x^2 + 6\) 可分。</strong>它分解为 \((x^2 - 2)(x^2 - 3)\)。两个因子各有两个不同的根，且它们之间也不重叠（\(\pm \sqrt 2 \neq \pm \sqrt 3\)）。所以四个根都不同——可分。一般地，\(\mathbb{Q}\) 上任意多项式都可分（特征 0 自动）。</p>
+
+<p>有了正规性 + 可分性，下一章就可以正式定义 Galois 扩张：<em>有限正规可分</em>。这两个条件凑在一起恰好让"\(K/F\) 的自同构群"达到最大可能的大小 \([K : F]\)，使 Galois 主定理成为可能。</p>
+
+<p>下一章我们正式登场 Galois 群与 Galois 主定理——抽象代数最深的结构定理。它告诉你"Galois 扩张 \(K/F\) 的中间域"和"Galois 群 \(\text{Gal}(K/F)\) 的子群"<em>反向一一对应</em>，把整个域扩张的结构问题翻译成有限群的子群问题。这种"几何 / 代数对应"是 19 世纪数学的最高成就之一。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 代数扩张与最小多项式</a><a href="ch21.html">下一章 · 第 21 章 Galois 理论基本定理 →</a></nav>
+</main>
+</body>
+</html>

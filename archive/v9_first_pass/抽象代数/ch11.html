@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 环：定义与基本例子 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 自由群、生成元与关系</a><a href="ch12.html">下一章 · 第 12 章 理想与商环 →</a></nav>
+<h1 id="ch11">第 11 章 环：定义与基本例子</h1>
+
+<p>前十章我们只研究<em>一种</em>运算的对象——群。但日常数学里大多数对象自带<em>两种</em>运算：整数 \(\mathbb{Z}\) 既能加又能乘，矩阵 \(M_n(\mathbb{R})\) 既能加又能乘，多项式 \(\mathbb{R}[x]\) 既能加又能乘，闭区间上的连续函数 \(C[0,1]\) 既能加（逐点）又能乘（逐点）。如果只用群论的语言去说"\(\mathbb{Z}\) 是一个加法群"，你就丢掉了"它还能乘"这件事——而正是"加 + 乘"的搭配让 \(\mathbb{Z}\) 成为<em>数论</em>的舞台。</p>
+
+<p>环就是把这种"加 + 乘"的搭配抽象出来。本章先把环公理写清，然后用大半篇幅过一遍"环的标准例子库"——你以后看到 \(\mathbb{Z}\)、\(\mathbb{Z}_n\)、\(\mathbb{Z}[i]\)、\(M_n(R)\)、\(R[x]\)、\(C(X)\) 这些名字时，应该像看到 \(\mathbb{R}^n\) 一样自然。最后给三个所有环都该立刻分类的小元素：单位、零因子、幂等。这三个小概念以后会反复登场。</p>
+
+<ul>
+  <li>环公理：加法是交换群、乘法结合且分配、有乘法单位元 1。</li>
+  <li>第一组例子：\(\mathbb{Z}, \mathbb{Q}, \mathbb{R}, \mathbb{C}\) —— 数环。</li>
+  <li>第二组例子：剩余环 \(\mathbb{Z}_n\) 和高斯整数 \(\mathbb{Z}[i]\)。</li>
+  <li>第三组例子：矩阵环 \(M_n(R)\) 与上三角矩阵环 —— 第一类<em>非交换</em>环。</li>
+  <li>第四组例子：多项式环 \(R[x]\) 与多元多项式 \(R[x_1, \ldots, x_n]\)。</li>
+  <li>第五组例子：连续函数环 \(C(X)\) 与函数环 \(R^X\)。</li>
+  <li>单位、零因子、幂等：每个环里都该立刻分清的三类元素。</li>
+</ul>
+
+<h2 id="sec11-1">11.1 环公理</h2>
+
+<p>一个<strong>环</strong>是一个三元组 \((R, +, \cdot)\)，其中 \(R\) 是集合，\(+\) 与 \(\cdot\) 是 \(R\) 上的两个二元运算，满足：</p>
+
+<ul>
+  <li>(R1) \((R, +)\) 是一个<em>交换</em>群。它的零元记作 \(0\)，\(a\) 的加法逆记作 \(-a\)。</li>
+  <li>(R2) 乘法<em>结合</em>：\((ab)c = a(bc)\) 对所有 \(a, b, c \in R\)。</li>
+  <li>(R3) 乘法对加法<em>左右分配</em>：\(a(b + c) = ab + ac\) 与 \((b + c)a = ba + ca\)。</li>
+  <li>(R4) 存在<em>乘法单位元</em> \(1 \in R\)：\(1 \cdot a = a \cdot 1 = a\) 对所有 \(a \in R\)。</li>
+</ul>
+
+<p>注意我们<em>没有</em>要求乘法交换（环允许 \(ab \neq ba\)）。如果额外有 \(ab = ba\) 对所有 \(a, b\) 成立，就叫<strong>交换环</strong>。本书第 12-15 章里出现的环基本都是交换环；矩阵环是非交换的标志性例子。</p>
+
+<p>关于单位元 1 的约定要先说清：我们这本书<em>统一假设环带 1</em>。一些经典教材（如 Lang 早期版本）允许"无单位元的环"（rng，没有 i），但现代代数主流约定都带 1，本书随主流走。每次说"环"都默认有 1。</p>
+
+<p>把这四条放在一起看：</p>
+
+<p>\[
+\boxed{\ \text{环} = \text{加法交换群} + \text{乘法结合} + \text{分配律} + \text{乘法单位元 } 1.\ }
+\]</p>
+
+<p>"加法是交换群" 这一条很重——它意味着 \(\mathbb{Z}, \mathbb{Q}\) 这种"加起来谁先谁后无所谓"的对象天然是环的候选；而"乘法只要结合"——意味着<em>非交换</em>对象也能进环这个范畴。这种"加严 / 乘宽"的设计正是为了同时容纳数环与矩阵环。</p>
+
+<p>分配律本身值得单独写出来，因为它是把加法和乘法"绑住"的<em>唯一</em>公理——没有它，加法和乘法各干各的，环就退化成"两个独立结构搭在同一集合上"。</p>
+
+<p>\[
+\boxed{\ a(b + c) = ab + ac, \qquad (b + c) a = ba + ca \quad \text{对所有 } a, b, c \in R.\ }
+\]</p>
+
+<p>从公理立刻可以推出几条小结论，你以后会反复用：</p>
+
+<ul>
+  <li>\(0 \cdot a = a \cdot 0 = 0\) 对所有 \(a \in R\)。证：\(0 \cdot a = (0 + 0) a = 0 \cdot a + 0 \cdot a\)，两边减 \(0 \cdot a\) 得 \(0 = 0 \cdot a\)。</li>
+  <li>\((-a) b = a(-b) = -(ab)\)。证：\(0 = 0 \cdot b = (a + (-a)) b = ab + (-a)b\)，故 \((-a)b = -(ab)\)。</li>
+  <li>\((-a)(-b) = ab\)（"负负得正"在任何环里都对）。</li>
+  <li>如果 \(0 = 1\) 在某个环里成立，则 \(R = \{0\}\) —— 这种平凡环本书一般不感兴趣，但它确实满足所有公理。本书后面写到"环 \(R\)"默认 \(0 \neq 1\)。</li>
+</ul>
+
+<p>剩下的就是大量看例子。我先把"数环"这一组讲完。</p>
+
+<h2 id="sec11-2">11.2 第一组例子：\(\mathbb{Z}, \mathbb{Q}, \mathbb{R}, \mathbb{C}\)</h2>
+
+<p>整数集 \(\mathbb{Z} = \{\ldots, -2, -1, 0, 1, 2, \ldots\}\) 配通常的加法和乘法是一个交换环。它满足全部四条公理：加法交换群 \((\mathbb{Z}, +)\) 在<a href="ch2.html">第 2 章 2.2 节</a>已经反复用过；乘法结合、分配、有单位元 \(1\) 是小学数学。这是<em>最</em>原型的环。</p>
+
+<p>有理数 \(\mathbb{Q}\)、实数 \(\mathbb{R}\)、复数 \(\mathbb{C}\) 配通常加法和乘法都是交换环。它们比 \(\mathbb{Z}\) 多一条："每个非零元素都有乘法逆"——这条让它们升级成<em>域</em>，第 13 章会专门讲。本章里我们只把它们当环看。</p>
+
+<p>顺便提醒：自然数 \(\mathbb{N} = \{0, 1, 2, \ldots\}\) 不是环！它的加法不构成群——\(2\) 在 \(\mathbb{N}\) 内没有加法逆 \(-2\)。这是为什么把"整数"作为基础对象而不是"自然数"——加法逆是环的硬要求。</p>
+
+<p>这一组数环的几个常用嵌入关系：</p>
+
+<p>\[
+\mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R} \subset \mathbb{C}.
+\]</p>
+
+<p>每个嵌入都尊重加法和乘法（即每个嵌入都是<em>环同态</em>，第 12 章会正式定义）。这条"嵌入塔"是数论 / 复分析 / 代数数论里反复用到的标准布置。</p>
+
+<h2 id="sec11-3">11.3 剩余环 \(\mathbb{Z}_n\) 与高斯整数 \(\mathbb{Z}[i]\)</h2>
+
+<p><strong>剩余环 \(\mathbb{Z}_n\)。</strong>固定正整数 \(n\)，把 \(\mathbb{Z}\) 按模 \(n\) 分类：两个整数 \(a, b\) 等价当且仅当 \(n \mid (a - b)\)。等价类构成 \(n\) 元集合 \(\mathbb{Z}_n = \{[0], [1], \ldots, [n-1]\}\)（也常记 \(\mathbb{Z}/n\mathbb{Z}\)）。在这个集合上定义</p>
+
+<p>\[
+[a] + [b] = [a + b], \qquad [a] \cdot [b] = [ab].
+\]</p>
+
+<p>验算这两个运算良定义（不依赖代表元的选取）是直接的。然后四条环公理立刻从 \(\mathbb{Z}\) 上的对应公理继承下来。所以 \(\mathbb{Z}_n\) 是一个有 \(n\) 个元素的交换环。</p>
+
+<p>具体看一下 \(\mathbb{Z}_6\)。它有 6 个元素 \(\{0, 1, 2, 3, 4, 5\}\)。乘法表里有件事很奇怪：\(2 \cdot 3 = 6 = 0\) 在 \(\mathbb{Z}_6\) 里。也就是说，<em>两个非零元素相乘等于零</em>——这种现象在 \(\mathbb{Z}, \mathbb{Q}\) 里绝不可能发生。这就是 11.8 节要讨论的"零因子"。\(\mathbb{Z}_n\) 里有零因子 \(\iff n\) 不是素数；当 \(n = p\) 是素数时 \(\mathbb{Z}_p\) 是<em>域</em>（每个非零元有乘法逆），这是<a href="ch13.html">第 13 章</a>的主线之一。</p>
+
+<p><strong>高斯整数 \(\mathbb{Z}[i]\)。</strong>把<em>整数</em>这个概念向"复方向"扩张一步：</p>
+
+<p>\[
+\mathbb{Z}[i] = \{a + bi : a, b \in \mathbb{Z}\}.
+\]</p>
+
+<p>这是 \(\mathbb{C}\) 的子集。配通常的复加法和复乘法（验算它对加、乘封闭）：</p>
+
+<p>\[
+(a + bi) + (c + di) = (a+c) + (b+d) i, \qquad (a+bi)(c+di) = (ac - bd) + (ad + bc) i.
+\]</p>
+
+<p>注意第二式两边的 \(a, b, c, d\) 都是整数，所以 \((ac - bd), (ad + bc) \in \mathbb{Z}\)。由此 \(\mathbb{Z}[i]\) 对加、乘封闭。它是 \(\mathbb{C}\) 的子环（继承环结构），所以自动是个交换环。</p>
+
+<p>这个环在数论里非常重要：Gauss 用它给出了"哪些素数 \(p\) 能写成两个完全平方之和"这一经典问题的完整解答（\(p\) 能写成 \(p = a^2 + b^2 \iff p = 2\) 或 \(p \equiv 1 \pmod 4\)），核心工具就是把 \(p\) 在 \(\mathbb{Z}[i]\) 里分解 \(p = (a + bi)(a - bi)\)。这件事会在<a href="ch14.html">第 14 章</a> PID 框架下重新组织。</p>
+
+<h2 id="sec11-4">11.4 矩阵环 \(M_n(R)\) 与上三角矩阵环</h2>
+
+<p>设 \(R\) 是任意环（这里允许非交换）。把 \(R\) 上的 \(n \times n\) 矩阵全体记作 \(M_n(R)\)。配以矩阵加法和矩阵乘法，它构成一个环：四条公理验证如下。</p>
+
+<ul>
+  <li>(R1) 加法是逐项加，零矩阵作 \(0\)，矩阵 \(A\) 的加法逆是 \(-A\)。这显然构成交换群。</li>
+  <li>(R2) 矩阵乘法结合：\((AB)C = A(BC)\) —— 你在<a href="../线性代数/ch4.html">线性代数读本第 4 章</a>已经做过细心的下标验证。</li>
+  <li>(R3) 矩阵乘法对加法分配 —— 同样从下标定义直接验证。</li>
+  <li>(R4) 单位元是单位矩阵 \(I_n\)（对角全 1，非对角全 0），\(I_n A = A I_n = A\)。</li>
+</ul>
+
+<p>所以 \(M_n(R)\) 是一个环。当 \(n \ge 2\) 时它<em>不交换</em>。最简单的反例：在 \(M_2(\mathbb{R})\) 里取</p>
+
+<p>\[
+A = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}, \quad B = \begin{pmatrix} 0 & 0 \\ 1 & 0 \end{pmatrix}, \quad AB = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix} \neq \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix} = BA.
+\]</p>
+
+<p>这是非交换环最经典的小例子——你以后看任何"环到底交不交换"的反例几乎都能在 \(2 \times 2\) 矩阵里造出来。</p>
+
+<p>另外一个 \(M_n(R)\) 上的奇怪现象：\(A B = 0\) 时不必有 \(A = 0\) 或 \(B = 0\)。比如刚才同一个 \(A = \bigl(\begin{smallmatrix} 0 & 1 \\ 0 & 0 \end{smallmatrix}\bigr)\) 满足 \(A^2 = 0\)，但 \(A \neq 0\)。这种 \(A^k = 0\) 而 \(A \neq 0\) 的元素叫<em>幂零</em>（nilpotent），是矩阵环的特色。</p>
+
+<p><strong>上三角矩阵环。</strong>记 \(T_n(R) \subset M_n(R)\) 为所有<em>上三角</em>矩阵（对角线下方全 0）。验证 \(T_n(R)\) 对加法和乘法都封闭——上三角加上三角还是上三角，上三角乘上三角还是上三角（这是为什么"上三角"在线性代数里这么常用：它是 \(M_n\) 的子环）。包含单位矩阵 \(I_n\)。所以 \(T_n(R)\) 是 \(M_n(R)\) 的<em>子环</em>，本身也是一个环。</p>
+
+<p>这两个环把"代数 = 矩阵"这条线索绑紧。事实上更一般的"\(R\) 上的代数"（associative algebra）就是带 \(R\) 模结构的环，你在<a href="../泛函分析/ch4.html">泛函分析读本第 4 章</a>里见过的"算子代数 \(\mathcal{B}(X)\)"也属于这一族——它就是 Banach 空间 \(X\) 上有界线性算子构成的环（配复合作为乘法）。</p>
+
+<h2 id="sec11-5">11.5 多项式环 \(R[x]\) 与多元 \(R[x_1, \ldots, x_n]\)</h2>
+
+<p>设 \(R\) 是环。定义</p>
+
+<p>\[
+R[x] = \left\{ a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n : a_i \in R, n \ge 0 \right\}.
+\]</p>
+
+<p>每个元素是有限阶的形式表达式（"多项式"）。两个多项式的加法是逐项相加；乘法是 Cauchy 卷积——</p>
+
+<p>\[
+\left( \sum_i a_i x^i \right) \left( \sum_j b_j x^j \right) = \sum_k \left( \sum_{i + j = k} a_i b_j \right) x^k.
+\]</p>
+
+<p>四条环公理在直接验证下都成立。\(R[x]\) 是环；当 \(R\) 交换时 \(R[x]\) 也交换。单位元是常多项式 \(1\)。</p>
+
+<p>注意一句关键的话："\(x\) 不是 \(R\) 的元素，\(x\) 是一个新引入的<em>形式符号</em>"。\(R[x]\) 里的多项式不被求值，它<em>就是</em>系数序列 \((a_0, a_1, \ldots)\) 的另一种写法。这一点和你在<a href="../多元微积分/ch1.html">多元微积分读本</a>里把多项式当函数看不一样——在代数里，多项式首先是一个"形式对象"，求值是它的<em>一种用法</em>。这个区分会在<a href="ch15.html">第 15 章</a>里反复强调。</p>
+
+<p>多项式环里有件事很有用：每个<em>非零</em>多项式 \(f \in R[x]\) 有一个明确的<strong>次数</strong> \(\deg f\)（最高非零系数的指数）。当 \(R\) 是整环时（无零因子，详见<a href="ch13.html">第 13 章</a>），</p>
+
+<p>\[
+\boxed{\ \deg(fg) = \deg f + \deg g\ \text{（在整环 } R \text{ 上）}.\ }
+\]</p>
+
+<p>这条次数加性是后面 PID / Euclidean ring 论证的基础。注意它在一般环上不成立——比如在 \(\mathbb{Z}_4[x]\) 里 \(2x \cdot 2x = 4 x^2 = 0\)，次数 1 + 次数 1 不等于次数 \(-\infty\)。</p>
+
+<p><strong>多元多项式环。</strong>把上面的构造迭代：</p>
+
+<p>\[
+R[x_1, x_2, \ldots, x_n] := R[x_1][x_2] \cdots [x_n],
+\]</p>
+
+<p>即"先以 \(R\) 为系数环加变量 \(x_1\)，再以 \(R[x_1]\) 为系数环加变量 \(x_2\)"，依此类推。同样的构造。元素长这样：</p>
+
+<p>\[
+\sum_{(i_1, \ldots, i_n)} a_{i_1, \ldots, i_n} x_1^{i_1} \cdots x_n^{i_n}, \quad a_{i_1, \ldots, i_n} \in R, \text{ 有限项非零}.
+\]</p>
+
+<p>这是代数几何（Algebraic Geometry）的"基础舞台"——一个仿射代数簇 \(V \subset k^n\) 的"坐标环"就是 \(k[x_1, \ldots, x_n]/I(V)\)，详细见<a href="ch15.html">第 15 章</a>。</p>
+
+<h2 id="sec11-6">11.6 连续函数环 \(C(X)\)</h2>
+
+<p>设 \(X\) 是拓扑空间（最常见取 \(X\) 紧致 Hausdorff，比如闭区间 \([a,b]\)、紧致流形、紧致度量空间）。记</p>
+
+<p>\[
+C(X) = \{f : X \to \mathbb{R} \text{ 连续}\}.
+\]</p>
+
+<p>定义加法和乘法都是<em>逐点</em>：</p>
+
+<p>\[
+(f + g)(x) := f(x) + g(x), \qquad (f \cdot g)(x) := f(x) g(x).
+\]</p>
+
+<p>"两个连续函数的逐点和、逐点积仍连续"——这是连续函数最基本的性质（详见<a href="../实分析/ch5.html">实分析读本第 5 章</a>）。所以这两个运算良定义。零元是常零函数 \(0(x) \equiv 0\)，单位元是常一函数 \(1(x) \equiv 1\)。环公理逐条都从 \(\mathbb{R}\) 上的对应运算继承。</p>
+
+<p>所以 \(C(X)\) 是一个交换环——一个无限维的、装着函数的环。</p>
+
+<p>这个环和泛函分析关系极深。当 \(X = K\) 紧致 Hausdorff 时，\(C(K)\) 配 \(\sup\)-范数是 Banach 空间，加上逐点乘法之后它是一个<strong>Banach 代数</strong>——同时是 Banach 空间和带兼容的乘法的环。<a href="../泛函分析/ch4.html">泛函分析读本第 4 章</a>列出过 \(C(K)\) 的标准事实，第 16 章 Riesz–Markov 定理给了它的对偶。本书虽然不深入 Banach 代数本身，但你应该意识到："<em>分析里的 \(C(K)\) = 代数里的 \(C(X)\) 这个交换环 + 一层范数</em>"——本质对象是一个。</p>
+
+<h2 id="sec11-7">11.7 函数环 \(R^X\)</h2>
+
+<p>把 \(C(X)\) 里"连续"这个限制去掉，就是一切从集合 \(X\) 到环 \(R\) 的函数构成的<strong>函数环</strong></p>
+
+<p>\[
+R^X := \{f : X \to R\}.
+\]</p>
+
+<p>同样配以逐点加法和逐点乘法：</p>
+
+<p>\[
+(f \oplus g)(x) := f(x) + g(x), \qquad (f \otimes g)(x) := f(x) \cdot g(x).
+\]</p>
+
+<p>（这里我们暂时用 \(\oplus, \otimes\) 区分"环 \(R^X\) 的加 / 乘"和"\(R\) 自带的加 / 乘"，但实际写时混用没关系——上下文会区分。）四条环公理对每个 \(x\) 单独成立，所以对函数也成立。零元是常零函数，单位元是常 \(1_R\) 函数。所以 \(R^X\) 是一个环，并且当 \(R\) 交换时 \(R^X\) 也交换。</p>
+
+<p>这个例子有几件事值得记住：</p>
+
+<ul>
+  <li>当 \(X\) 是有限集 \(\{1, 2, \ldots, n\}\) 时，\(R^X\) 同构于 \(R \times R \times \cdots \times R\)（\(n\) 份），即<em>直积环</em>。比如 \(\mathbb{R}^{\{1,2\}} \cong \mathbb{R} \times \mathbb{R}\) 是 \(\mathbb{R}^2\) 配逐分量乘法（注意：这<em>不</em>是 \(\mathbb{C}\)！\(\mathbb{C}\) 配的是不同的乘法 \((a, b)(c, d) = (ac - bd, ad + bc)\)）。</li>
+  <li>\(R^X\) 几乎从不是整环——只要 \(|X| \ge 2\)，取两个非空互不相交子集 \(A, B \subset X\) 上的指示函数 \(\chi_A, \chi_B\)，就有 \(\chi_A \otimes \chi_B = \chi_{A \cap B} = 0\)，但 \(\chi_A, \chi_B\) 都非零。所以 \(R^X\) 里有大量零因子。</li>
+  <li>\(C(X) \subset R^X\) 是一个<em>子环</em>——所有连续函数之内的运算继承下来。</li>
+</ul>
+
+<p>如果你以后看到"<em>把代数对象看成函数环上的某个子环</em>"这种说法，多半就指这个 \(R^X\) 框架，比如 \(C(X), L^p, L^\infty\) 等等。</p>
+
+<h2 id="sec11-8">11.8 单位、零因子、幂等</h2>
+
+<p>每给一个环 \(R\)，第一件事就是把它的元素按"类型"分一下。最有用的三类是<em>单位</em>、<em>零因子</em>、<em>幂等</em>。</p>
+
+<p><strong>单位（unit）。</strong>\(u \in R\) 称为<em>单位</em>，如果存在 \(v \in R\) 使 \(uv = vu = 1\)。\(v\) 自动是 \(u\) 的乘法逆，记 \(u^{-1}\)。\(R\) 的所有单位的集合记作 \(R^\times\) 或 \(U(R)\)，它在乘法下构成一个群（叫"单位群"，回忆<a href="ch2.html">第 2 章</a>群的定义）。</p>
+
+<ul>
+  <li>\(\mathbb{Z}^\times = \{\pm 1\}\)；\(\mathbb{Q}^\times = \mathbb{Q} \setminus \{0\}\)。</li>
+  <li>\(\mathbb{Z}_n^\times = \{[k] : \gcd(k, n) = 1\}\)，这就是<em>欧拉 \(\varphi\) 函数</em>所计数的集合：\(|\mathbb{Z}_n^\times| = \varphi(n)\)。</li>
+  <li>\(M_n(R)^\times = GL_n(R)\)（一般线性群，可逆矩阵）。在 \(R\) 是域时 \(GL_n(R) = \{A : \det A \neq 0\}\)。</li>
+  <li>\(R[x]^\times\)（当 \(R\) 是整环时）= \(R^\times\)（即只有<em>常多项式</em>且常数是 \(R\) 的单位才是单位）。证：用次数加性 \(\deg(fg) = \deg f + \deg g = 0 \Rightarrow \deg f = \deg g = 0\)。</li>
+</ul>
+
+<p>"求一个环的单位群"是研究该环结构的入门动作。它告诉你"这个环里有多少元素能被'除'掉"。</p>
+
+<p><strong>零因子（zero divisor）。</strong>非零元 \(a \in R\) 称为<em>左零因子</em>，如果存在非零 \(b \in R\) 使 \(ab = 0\)。<em>右零因子</em>对称地定义。在交换环里左 / 右零因子是一回事，统称<em>零因子</em>。</p>
+
+<ul>
+  <li>\(\mathbb{Z}, \mathbb{Q}, \mathbb{R}, \mathbb{C}\) 都<em>没有</em>零因子（这正是它们成为整环的原因）。</li>
+  <li>\(\mathbb{Z}_6\) 里 \([2], [3]\) 是零因子，因为 \([2][3] = [0]\)。</li>
+  <li>\(M_n(R)\) 里幂零矩阵是零因子（\(A^k = 0 \Rightarrow A \cdot A^{k-1} = 0\)）。</li>
+  <li>\(C[0,1]\) 里"在某子区间上为零的函数"提供大量零因子——取支撑互不相交的两个非零函数，它们的积恒为 0。</li>
+</ul>
+
+<p>没有零因子的交换环就是<em>整环</em>，第 13 章主题。"有没有零因子" 是判断一个环"行为像 \(\mathbb{Z}\) 还是像 \(\mathbb{Z}_6\)" 最快的指标。</p>
+
+<p><strong>幂等（idempotent）。</strong>\(e \in R\) 称为<em>幂等</em>，如果</p>
+
+<p>\[
+\boxed{\ e^2 = e.\ }
+\]</p>
+
+<p>显然 \(0\) 和 \(1\) 总是幂等。这两个叫"平凡幂等"。<em>非</em>平凡幂等告诉你环可以"分解"。</p>
+
+<ul>
+  <li>\(\mathbb{Z}\) 里只有 \(0, 1\) 两个幂等（解 \(e^2 = e \iff e(e-1) = 0\)，\(\mathbb{Z}\) 无零因子，故 \(e \in \{0, 1\}\)）。</li>
+  <li>\(\mathbb{Z}_6\) 里 \(3^2 = 9 = 3\) 与 \(4^2 = 16 = 4\)，所以 \([3], [4]\) 是非平凡幂等。事实上 \(\mathbb{Z}_6 \cong \mathbb{Z}_2 \times \mathbb{Z}_3\) 这个分解就由这两个幂等给出（中国剩余定理的代数版本）。</li>
+  <li>\(M_2(\mathbb{R})\) 里投影矩阵 \(P = \bigl(\begin{smallmatrix} 1 & 0 \\ 0 & 0 \end{smallmatrix}\bigr)\) 是幂等：\(P^2 = P\)。它对应"投影到第一坐标轴"。</li>
+  <li>\(C(X)\) 里 \(f^2 = f \iff f(x) (f(x) - 1) = 0\) 处处，又 \(f\) 连续，所以 \(f \equiv 0\) 或 \(\equiv 1\) 在每个连通分量上——非平凡幂等数等于 \(X\) 的连通分量数减 1。这是"代数告诉你拓扑"的一个小奇迹。</li>
+</ul>
+
+<p>每当你拿到一个新环，先问三件事：单位有哪些（=单位群）、有没有零因子（= 是不是整环）、有没有非平凡幂等（= 能不能拆成直积）。这三个问题的答案就是该环的"画像"。</p>
+
+<p>下一章我们要把"环的子结构"系统化——子集要满足什么条件才能让"取陪集"得到一个新的环？群论里答案是"正规子群 → 商群"；环论里答案要严一档，叫做<em>理想</em>。把理想做明白以后，整个环论的同构定理 / 极大理想 / 素理想 / Spec 这套语言就一气呵成。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 自由群、生成元与关系</a><a href="ch12.html">下一章 · 第 12 章 理想与商环 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 子群、陪集、Lagrange 定理 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 群的定义与基本例子</a><a href="ch4.html">下一章 · 第 4 章 同态与正规子群 →</a></nav>
+<h1 id="ch3">第 3 章 子群、陪集、Lagrange 定理</h1>
+
+<p>到目前为止我们都在"<em>整体</em>"的层面看群——把整个 \(D_n\) 或整个 \(S_n\) 当成一个对象。现在要开始做相反的事：把视线伸到群的<em>内部</em>，问"群里有些什么样的小群"。这个问题听起来朴素，但它的回答会立刻给我们一条惊人的整除关系——<strong>Lagrange 定理</strong>：任何子群的阶必整除整个群的阶。这条短短一行的定理是有限群论的奠基性事实，本书后面 5 章里几乎每个论证都直接或间接依赖它。</p>
+
+<p>这一章的工具非常简洁——只需要"子群"、"陪集"、"陪集分解"三个概念。可是一旦把它们组合起来，立刻能看到<a href="../线性代数/index.html">线性代数</a>里"\(\dim V = \dim W + \dim V/W\)"那种"切片重组"的味道——子群把整个群分成等大小的"陪集片"，每片都是子群的某个"平移"，于是 \(|G| = |H| \cdot \text{(陪集数)}\) 自然冒出来。这种"分组数数"的思路在代数和组合学里都属于最强的工具之一。</p>
+
+<p>读这一章的时候我建议你随身带着第 2 章的八个标准例子。每讲一个新概念你都该停下来问："这条定义在 \(\mathbb{Z}_6\) 里长什么样？在 \(D_3\) 里长什么样？在 \(S_3\) 里长什么样？" 这种"在已知例子上跑一遍"的习惯是抽象代数中保持自己<em>不</em>陷入符号迷雾的关键。</p>
+
+<ul>
+  <li>子群的定义 + 一步法 / 两步法判别——以后用得最多的两个判据。</li>
+  <li>由元素生成的子群 \(\langle x \rangle\) 与<strong>循环群</strong>——所有循环群同构于 \(\mathbb{Z}\) 或 \(\mathbb{Z}_n\)。</li>
+  <li>陪集 \(gH\)（左 / 右）与陪集分解——核心观察是"陪集是一种等价类"。</li>
+  <li>Lagrange 定理：\(|H| \mid |G|\)，证明用陪集分解 + 配对计数。</li>
+  <li>Lagrange 的几条立刻有用的推论——素数阶群必循环、元素阶整除群阶、Fermat 小定理。</li>
+  <li>子群指数 \([G:H] = |G|/|H|\) 与双侧陪集分解——为<a href="ch4.html">第 4 章</a>正规子群和<a href="ch7.html">第 7 章</a>Sylow 做准备。</li>
+</ul>
+
+<h2 id="sec3-1">3.1 子群的定义与判别</h2>
+
+<p>设 \((G, \cdot)\) 是群。称 \(H \subseteq G\) 是 \(G\) 的<strong>子群</strong>（记作 \(H \le G\)），如果 \(H\) 在 \(G\) 的运算限制下自身是群。换句话说，必须满足：</p>
+
+<ul>
+  <li>\(H\) 非空。</li>
+  <li>对任意 \(a, b \in H\)，\(a \cdot b \in H\)（封闭）。</li>
+  <li>\(e \in H\)（单位）。</li>
+  <li>对任意 \(a \in H\)，\(a^{-1} \in H\)（逆）。</li>
+</ul>
+
+<p>结合律不需要单独验证——它是从 \(G\) 继承下来的。所以"子群"实质上只要核对"<em>封闭、含单位、含逆</em>"。</p>
+
+<p>每个群都有两个<strong>平凡子群</strong>：</p>
+
+<ul>
+  <li>整个 \(G\) 自己（最大子群）。</li>
+  <li>仅含单位元的 \(\{e\}\)（最小子群，又叫<em>平凡子群</em>）。</li>
+</ul>
+
+<p>真正有意思的子群是介于这两者之间的"<em>真子群</em>"。下面给出两条最常用的判别法。</p>
+
+<p><strong>两步法。</strong>非空子集 \(H \subseteq G\) 是子群 \(\iff\) 满足 (a) \(a, b \in H \Rightarrow ab \in H\)（封闭）且 (b) \(a \in H \Rightarrow a^{-1} \in H\)（含逆）。</p>
+
+<p>这是直接从子群定义里去掉"含单位"那条而来的——一旦 \(H\) 非空（取 \(a \in H\)），由 (b) 得 \(a^{-1} \in H\)，再由 (a) 得 \(a \cdot a^{-1} = e \in H\)，所以单位自动落入 \(H\)。两步法是最常用的判别工具。</p>
+
+<p><strong>一步法。</strong>非空子集 \(H \subseteq G\) 是子群 \(\iff\) 对任意 \(a, b \in H\)，\(a \cdot b^{-1} \in H\)。</p>
+
+<p>这个版本看起来更经济，把封闭和含逆"打包"成一条。证明如下。先取 \(a = b\)：\(a \cdot a^{-1} = e \in H\)。再取 \(a = e, b\) 任意：\(e \cdot b^{-1} = b^{-1} \in H\)，所以含逆。最后任取 \(a, b \in H\)，已知 \(b^{-1} \in H\)，再用一次 \(a \cdot (b^{-1})^{-1} = a b \in H\)，所以封闭。三件事都被"\(a b^{-1} \in H\)"这一条蕴含。一步法在写正式证明时常用，能省一行字。</p>
+
+<p>来跑几个例子。</p>
+
+<p><strong>例：偶数子群。</strong>\(2\mathbb{Z} = \{2k : k \in \mathbb{Z}\}\) 是 \(\mathbb{Z}\) 的子群（用一步法：两个偶数相加再取逆还是偶数）。更一般地 \(n \mathbb{Z}\) 是 \(\mathbb{Z}\) 的子群。事实上<em>所有</em>子群都是 \(n \mathbb{Z}\) 形式（包括 \(n=0\) 给出 \(\{0\}\)）——这是<a href="ch3.html#sec3-2">3.2 节</a>会顺带证明的小结论。</p>
+
+<p><strong>例：旋转子群。</strong>在 \(D_n\) 里所有旋转 \(\{e, r, r^2, \ldots, r^{n-1}\}\) 构成一个子群（同构于 \(\mathbb{Z}_n\)）——它就是 \(D_n\) 中"<em>不翻转</em>"的那一半，所以又叫<strong>旋转子群</strong>。它的阶 \(n\)，在 \(D_n\) 里指数 2（陪集只有两个：旋转和反射）。</p>
+
+<p><strong>例：交错群 \(A_n\)。</strong>\(S_n\) 中所有<em>偶置换</em>构成一个子群 \(A_n \le S_n\)（这里"偶"指写成<em>偶数</em>个对换的乘积；详细见<a href="ch9.html">第 9 章</a>）。它的阶 \(|A_n| = n!/2\)，指数 2。\(A_n\) 在<a href="ch9.html">第 9 章</a>会被证为<em>当 \(n \ge 5\) 时是单群</em>——这是 Galois 用来证明五次方程不可解的核心事实。</p>
+
+<p><strong>例：行列式为 1 的子群。</strong>\(\text{SL}_n(\mathbb{R}) = \{A \in \text{GL}_n(\mathbb{R}) : \det A = 1\}\) 是 \(\text{GL}_n(\mathbb{R})\) 的子群（因为 \(\det(AB^{-1}) = \det A / \det B = 1/1 = 1\)）。这是连续 Lie 群论里最常出现的子群，叫<em>特殊线性群</em>。</p>
+
+<h2 id="sec3-2">3.2 由元素生成的子群与循环群</h2>
+
+<p>给一个 \(g \in G\)，把它"自乘"出所有可能的元素：</p>
+
+<p>\[
+\langle g \rangle = \{g^k : k \in \mathbb{Z}\}
+\]</p>
+
+<p>这里 \(g^0 = e\)、\(g^k\)（\(k > 0\)）= \(g\) 自乘 \(k\) 次、\(g^{-k} = (g^{-1})^k\)。验证 \(\langle g \rangle\) 是子群（用一步法：\(g^k (g^l)^{-1} = g^{k-l} \in \langle g \rangle\)）。这个 \(\langle g \rangle\) 叫做<strong>由 \(g\) 生成的循环子群</strong>。它是 \(G\) 中"含 \(g\) 的最小子群"——任何含 \(g\) 的子群都必须含 \(g\) 的所有幂。</p>
+
+<p>如果 \(G\) 本身能写成 \(G = \langle g \rangle\) 对某个 \(g \in G\)，就称 \(G\) 是<strong>循环群</strong>，\(g\) 是它的<strong>生成元</strong>。</p>
+
+<p>循环群的结构非常容易摸清楚。来看两种情况。</p>
+
+<p><strong>情况 1：\(\text{ord}(g) = \infty\)。</strong>所有 \(g^k\)（\(k \in \mathbb{Z}\)）两两不同，\(\langle g \rangle\) 与 \(\mathbb{Z}\) 一一对应（通过 \(g^k \leftrightarrow k\)），运算也对应（\(g^k \cdot g^l = g^{k+l}\)），所以 \(\langle g \rangle \cong (\mathbb{Z}, +)\)。</p>
+
+<p><strong>情况 2：\(\text{ord}(g) = n < \infty\)。</strong>则 \(g^n = e\)，且 \(g^0, g^1, \ldots, g^{n-1}\) 两两不同（如果 \(g^i = g^j\) 对 \(0 \le i < j \le n-1\)，那么 \(g^{j-i} = e\) 与 \(0 < j-i < n\) 矛盾，与 \(\text{ord}(g) = n\) 不符）。所以 \(\langle g \rangle = \{e, g, g^2, \ldots, g^{n-1}\}\)，元素总数 \(n\)；通过 \(g^k \leftrightarrow k \pmod n\) 与 \(\mathbb{Z}_n\) 一一对应、运算对应。所以 \(\langle g \rangle \cong (\mathbb{Z}_n, +)\)。</p>
+
+<p>把这两种情况合起来就是：</p>
+
+<p>\[
+\boxed{\ \text{任何循环群 } \cong \mathbb{Z}\ \text{或}\ \mathbb{Z}_n.\ }
+\]</p>
+
+<p>这是抽象代数里第一条<em>分类定理</em>——它告诉你，所有循环群在同构意义下只有可数无穷多个（按阶分类），而每个阶的循环群只有<em>一个</em>。</p>
+
+<p>顺带证明刚才的承诺：\(\mathbb{Z}\) 的所有子群都是 \(n \mathbb{Z}\) 形式。设 \(H \le \mathbb{Z}\) 是非平凡子群。\(H\) 中含正整数（因为含某个非零 \(a\)，要么 \(a\) 要么 \(-a\) 是正的，且都在 \(H\) 里）。设 \(n\) 是 \(H\) 中最小的正整数。我们断言 \(H = n \mathbb{Z}\)。一方面 \(n \mathbb{Z} \subseteq H\) 是显然的（\(n\) 在 \(H\) 里所以它的所有整数倍都在）。反方向：取 \(m \in H\)，欧氏算法给 \(m = qn + r\) 其中 \(0 \le r < n\)。那么 \(r = m - qn \in H\)（差和倍都在子群里）。由 \(n\) 的最小性，\(r\) 不可能是正的（否则与最小性矛盾），所以 \(r = 0\)、\(m = qn \in n \mathbb{Z}\)。这就证完了 \(H = n \mathbb{Z}\)。这条小结论也告诉你：<em>循环群的子群仍是循环群</em>——这是个会反复用到的事实。</p>
+
+<p><strong>例：\(D_3\) 的子群清单。</strong>\(D_3 = \{e, r, r^2, s, sr, sr^2\}\)（6 个元素）。它的子群有：</p>
+
+<ul>
+  <li>\(\{e\}\) 阶 1（平凡）。</li>
+  <li>\(\{e, s\}, \{e, sr\}, \{e, sr^2\}\) 阶 2（每个反射加单位元构成的循环子群）。</li>
+  <li>\(\{e, r, r^2\}\) 阶 3（旋转子群，循环）。</li>
+  <li>\(D_3\) 自身阶 6。</li>
+</ul>
+
+<p>共 6 个子群。注意每个子群的阶（1, 2, 2, 2, 3, 6）都<em>整除</em> 6。这不是巧合——它正是即将出现的 Lagrange 定理。</p>
+
+<h2 id="sec3-3">3.3 陪集与陪集分解</h2>
+
+<p>设 \(H \le G\)，\(g \in G\)。定义 \(g\) 的<strong>左陪集</strong></p>
+
+<p>\[
+gH = \{g h : h \in H\},
+\]</p>
+
+<p><strong>右陪集</strong></p>
+
+<p>\[
+Hg = \{h g : h \in H\}.
+\]</p>
+
+<p>注意陪集<em>本身不是子群</em>（除非 \(g \in H\)，此时 \(gH = H\)）。它只是 \(H\) 在群里"<em>平移</em>"出来的一个子集。</p>
+
+<p>这里有一个非常关键的观察：所有左陪集要么<em>完全相同</em>，要么<em>不相交</em>。换句话说，"\(g_1 H\) 和 \(g_2 H\) 相同"是一个等价关系。具体地：</p>
+
+<p>\[
+g_1 H = g_2 H \iff g_1^{-1} g_2 \in H \iff g_2 \in g_1 H.
+\]</p>
+
+<p>证明也短。\((\Rightarrow)\)：若 \(g_1 H = g_2 H\)，那么 \(g_2 \in g_1 H\)，存在 \(h \in H\) 使 \(g_2 = g_1 h\)，因此 \(g_1^{-1} g_2 = h \in H\)。\((\Leftarrow)\)：若 \(g_1^{-1} g_2 = h_0 \in H\)，则 \(g_2 = g_1 h_0\)。任取 \(g_2 h \in g_2 H\)，有 \(g_2 h = g_1 h_0 h \in g_1 H\)。所以 \(g_2 H \subseteq g_1 H\)；对称地 \(g_1 H \subseteq g_2 H\)。两边相等。</p>
+
+<p>由这个等价关系，左陪集把 \(G\) 切成不相交的若干片。每片都形如 \(gH\)。<a href="appA.html">附录 A</a>会复习"等价关系 \(\Leftrightarrow\) 划分"这件事——你也可以现在停下来想想为什么"互不相同的左陪集"必然"完整覆盖 \(G\)"（提示：每个 \(g \in gH\)，因为 \(g = g \cdot e\)）。</p>
+
+<p>这里还有一个很容易忽略但非常重要的事实：<strong>所有左陪集大小相同</strong>。具体地，</p>
+
+<p>\[
+\boxed{\ |gH| = |H|\quad\text{对每个 }g \in G.\ }
+\]</p>
+
+<p>证明：函数 \(\varphi : H \to gH\)，\(\varphi(h) = gh\)，是双射——单射因为 \(gh_1 = gh_2 \Rightarrow h_1 = h_2\)（左乘 \(g^{-1}\)），满射因为 \(gH\) 的定义就是 \(\{gh : h \in H\}\)。所以 \(|gH| = |H|\)。这把"陪集"在尺寸上彻底搞定——所有陪集都是<em>同一尺寸</em>的"\(H\) 的副本"。</p>
+
+<p>把这两件事拼起来：左陪集划分 \(G\)，每个陪集大小 \(|H|\)。所以 \(G\) 的元素数等于"陪集数 \(\times\) \(|H|\)"——这正是 Lagrange 定理。</p>
+
+<p>具体看 \(D_3\) 与子群 \(H = \{e, s\}\)（阶 2）。左陪集：</p>
+
+<ul>
+  <li>\(eH = \{e, s\}\)。</li>
+  <li>\(rH = \{r, rs\} = \{r, sr^2\}\)（用 \(rs = sr^2\)，从 \(D_3\) 关系 \(srs = r^{-1} = r^2\) 得到 \(sr = r^2 s\)，从而 \(rs = (sr)^{-1} \cdot e \cdot e\)，详细推导可以做练习）。</li>
+  <li>\(r^2 H = \{r^2, r^2 s\} = \{r^2, sr\}\)。</li>
+</ul>
+
+<p>3 个陪集，每个 2 个元素，共 6 个元素——刚好是 \(|D_3| = 6\)。所以 \(|D_3|/|H| = 3\) 等于陪集数，确实印证了"陪集分解 + 等大小"。</p>
+
+<p>同样可以做<strong>右陪集</strong>。一般来说左陪集和右陪集<em>不</em>相同——\(gH \neq Hg\) 是普遍现象。但它们的"<em>个数</em>"是相同的（双射 \(gH \mapsto Hg^{-1}\) 给出对应）。"何时左右陪集相等"是<a href="ch4.html">第 4 章</a>正规子群的核心问题。</p>
+
+<h2 id="sec3-4">3.4 Lagrange 定理</h2>
+
+<p>把 3.3 节的两条事实——"左陪集划分 \(G\)"和"每个陪集大小 \(|H|\)"——直接拼起来，就是：</p>
+
+<p><strong>Lagrange 定理。</strong>设 \(G\) 是<em>有限</em>群、\(H \le G\) 是子群，那么</p>
+
+<p>\[
+\boxed{\ |H|\ \text{整除}\ |G|.\ }
+\]</p>
+
+<p>更精确地，</p>
+
+<p>\[
+|G| = |H| \cdot [G : H],
+\]</p>
+
+<p>其中 \([G : H]\) 是 \(H\) 在 \(G\) 中的<strong>指数</strong>，定义为不同左陪集的个数。</p>
+
+<p>证明完全在 3.3 节里。设左陪集是 \(g_1 H, g_2 H, \ldots, g_k H\)（共 \(k\) 个不相交陪集，\(k = [G:H]\)）。它们覆盖 \(G\)：</p>
+
+<p>\[
+G = g_1 H \sqcup g_2 H \sqcup \cdots \sqcup g_k H,
+\]</p>
+
+<p>且每片大小是 \(|H|\)。两边数元素：</p>
+
+<p>\[
+|G| = \sum_{i=1}^{k} |g_i H| = k \cdot |H| = [G : H] \cdot |H|.
+\]</p>
+
+<p>就这么短。整个证明的全部<em>困难</em>（如果可以叫困难的话）都已经被"陪集是等价类 + 陪集等大小"两条引理消化掉了。Lagrange 定理本身只剩下"<em>分组数数</em>"这一步。</p>
+
+<p>Lagrange 定理的逆<em>不</em>成立——并不是说 \(|G|\) 的每个除数 \(d\) 都对应一个 \(d\) 阶子群。最早的反例是 \(A_4\)：\(|A_4| = 12\)，但 \(A_4\) 没有 6 阶子群（练习题里会让你证）。"逆问题"非常微妙，是 Sylow 定理（<a href="ch7.html">第 7 章</a>）要回答的——它告诉你：当 \(d = p^k\) 是素数幂、且 \(p^k \mid |G|\) 时，\(G\) <em>必定</em>有一个 \(p^k\) 阶子群。所以 Sylow 是 Lagrange 的"<em>部分逆</em>"。</p>
+
+<h2 id="sec3-5">3.5 Lagrange 的几条立刻有用的推论</h2>
+
+<p>Lagrange 定理短，但推论极其丰富。下面列出三条最常用的，每一条以后都会反复出现。</p>
+
+<p><strong>推论 1：元素阶整除群阶。</strong>设 \(G\) 是有限群，\(g \in G\)。则 \(\text{ord}(g)\) 整除 \(|G|\)。</p>
+
+<p>\[
+\boxed{\ \text{ord}(g)\ \text{整除}\ |G|.\ }
+\]</p>
+
+<p>证明：\(\langle g \rangle\) 是 \(G\) 的子群（3.2 节），且 \(|\langle g \rangle| = \text{ord}(g)\)（情况 2 的清点）。由 Lagrange，\(|\langle g \rangle| \mid |G|\)，即 \(\text{ord}(g) \mid |G|\)。</p>
+
+<p>这条推论的实际用法是：你只要知道 \(|G|\) 的所有因数，就把"\(G\) 中所有元素的可能阶"框死了。比如 \(|G| = 6\) 时，元素阶只能是 \(1, 2, 3, 6\)。\(|G| = 8\) 时，元素阶只能是 \(1, 2, 4, 8\)。这条简单的整除关系经常一下子就能排除大量可能性。</p>
+
+<p><strong>推论 2：\(g^{|G|} = e\)。</strong>由推论 1，设 \(d = \text{ord}(g)\)，则 \(d \mid |G|\)，所以 \(|G| = d \cdot m\) 对某个整数 \(m\)。于是 \(g^{|G|} = g^{dm} = (g^d)^m = e^m = e\)。</p>
+
+<p>\[
+\boxed{\ g^{|G|} = e\ \text{对每个}\ g \in G.\ }
+\]</p>
+
+<p>这条简洁的等式经常出现——它说"<em>每个元素自乘 \(|G|\) 次都回到单位</em>"，相当于一种"群阶版本的 Fermat 小定理"。</p>
+
+<p><strong>推论 3：素数阶群必循环。</strong>设 \(|G| = p\) 是素数。由 Lagrange，\(G\) 的子群只能是 \(\{e\}\) 或 \(G\) 本身（因为子群阶必整除 \(p\)，而 \(p\) 是素数）。取任意 \(g \neq e\)，子群 \(\langle g \rangle\) 不是 \(\{e\}\)（它含 \(g\)），所以 \(\langle g \rangle = G\)。这说明 \(G\) 是循环群，由 3.2 节的分类，\(G \cong \mathbb{Z}_p\)。</p>
+
+<p>\[
+\boxed{\ |G| = p\ \text{素数}\ \Rightarrow\ G \cong \mathbb{Z}_p.\ }
+\]</p>
+
+<p>这是抽象代数里最早出现的"<em>分类完全</em>"的命题——在素数阶下，"群"只有一种可能。比如 \(p = 2, 3, 5, 7, 11, \ldots\) 阶的群都是各自的 \(\mathbb{Z}_p\)，没有别的可能。</p>
+
+<p><strong>推论 4：Fermat 小定理。</strong>这是 Lagrange 的一个数论应用，很漂亮。考虑模 \(p\) 的乘法群</p>
+
+<p>\[
+(\mathbb{Z}_p^*, \times) = \{1, 2, 3, \ldots, p-1\}\ \text{在模}\ p\ \text{乘法下},
+\]</p>
+
+<p>这里 \(p\) 是素数。它是 \((p-1)\) 阶群（详细见<a href="ch11.html">第 11 章</a>）。由推论 2，对任意 \(a \in \{1, \ldots, p-1\}\)：</p>
+
+<p>\[
+a^{p-1} \equiv 1 \pmod{p}.
+\]</p>
+
+<p>等价地（两边乘 \(a\)）：</p>
+
+<p>\[
+\boxed{\ a^p \equiv a \pmod{p}\ \text{对所有整数}\ a\ \text{(Fermat 小定理)}.\ }
+\]</p>
+
+<p>这条数论里的经典结论本来要专门用同余式证明，在群论框架下它<em>仅仅是</em> "群阶 \(\mid\) 元素阶"的一个特例。这是抽象代数第一次显示它的"<em>统一不同领域</em>"威力——同一条群论定理同时给出几何（\(D_3\) 的子群清单）、纯抽象（任何素阶群循环）和数论（Fermat 小定理）的结论。</p>
+
+<h2 id="sec3-6">3.6 子群指数 \([G:H]\) 与双侧陪集</h2>
+
+<p><strong>指数。</strong>定义 \([G : H]\) 为 \(H\) 的左陪集个数，由 Lagrange 定理</p>
+
+<p>\[
+[G : H] = \frac{|G|}{|H|}\quad (\text{当 } |G| < \infty).
+\]</p>
+
+<p>对无限群 \([G : H]\) 仍可定义（甚至可能是有限数）。比如 \([\mathbb{Z} : 2\mathbb{Z}] = 2\)（左陪集只有"偶数"和"奇数"两个），\([\mathbb{Z} : n\mathbb{Z}] = n\)。即便 \(\mathbb{Z}\) 无穷阶，它的子群指数仍然有限——这种现象在群论里很常见。</p>
+
+<p>指数有几条重要性质：</p>
+
+<ul>
+  <li><strong>乘法定律</strong>：若 \(K \le H \le G\) 都有有限指数，则 \([G:K] = [G:H][H:K]\)。这是"<em>陪集套陪集</em>"的直接计数：\(G\) 在 \(H\) 上的陪集分解，每片再被 \(H\) 在 \(K\) 上的陪集分解。乘法定律给出"<em>分级 Lagrange</em>"。</li>
+  <li><strong>指数 2 必正规</strong>：若 \([G:H] = 2\)，那么 \(H\) 的左陪集只有两个，必须是 \(\{H, G \setminus H\}\)；右陪集也是如此。所以 \(gH = Hg\) 对所有 \(g\)，即 \(H\) 是<em>正规</em>子群（<a href="ch4.html">第 4 章</a>）。这条小结论给出大量"自动正规"的子群（\(A_n \triangleleft S_n\)、旋转子群 \(\triangleleft D_n\)、\(\text{SL}_n \triangleleft \text{GL}_n\)）。</li>
+</ul>
+
+<p><strong>双侧陪集。</strong>一般情况下左陪集 \(gH\) 与右陪集 \(Hg\) 不相同。如果两个子群 \(H, K \le G\) 同时介入，可以谈"<strong>双侧陪集</strong>"</p>
+
+<p>\[
+HgK = \{h g k : h \in H, k \in K\}.
+\]</p>
+
+<p>双侧陪集仍然把 \(G\) 切成不相交的若干片，但<em>各片大小不一定相同</em>——和单侧陪集的均匀性不同。具体地</p>
+
+<p>\[
+|HgK| = \frac{|H| \cdot |K|}{|H \cap g K g^{-1}|}.
+\]</p>
+
+<p>这条公式推导用<em>轨道-稳定子定理</em>（<a href="ch6.html">第 6 章</a>）会自然得到，这里只先记住它。双侧陪集分解在<a href="ch6.html">第 6 章</a>的群作用、<a href="ch24.html">第 24 章</a>的表示论（特别是诱导表示）里反复出现，是连接"群结构"和"群作用"的重要桥梁。</p>
+
+<p>把这一章三件事——子群、陪集、Lagrange——浓缩成一句话：<em>子群把整个群切成等大小的陪集片，于是 \(|H|\) 必整除 \(|G|\)</em>。这条短短的整除关系是有限群论的奠基石——它支撑了素数阶群分类、元素阶整除群阶、Fermat 小定理，并为<a href="ch7.html">第 7 章</a> Sylow 定理（"\(p^k \mid |G|\) 蕴含存在 \(p^k\) 阶子群"）做好准备。</p>
+
+<p>下一章我们把焦点切换到<em>群之间</em>的关系——同态把一个群"翻译"到另一个群，正规子群对应"同态的核"。这两个概念合在一起会在<a href="ch5.html">第 5 章</a>给出商群的精确定义和三大同构定理——抽象代数里第一座完整的代数大厦。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 群的定义与基本例子</a><a href="ch4.html">下一章 · 第 4 章 同态与正规子群 →</a></nav>
+</main>
+</body>
+</html>

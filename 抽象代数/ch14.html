@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 14 章 主理想环与唯一分解 — 普林斯顿抽象代数读本</title>
+<title>第 14 章 PID 与 UFD — 普林斯顿抽象代数读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -33,228 +33,312 @@
 <body>
 <main>
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 整环、域、商域</a><a href="ch15.html">下一章 · 第 15 章 多项式环 →</a></nav>
-<h1 id="ch14">第 14 章 主理想环与唯一分解</h1>
+<h1 id="ch14">第 14 章 PID 与 UFD</h1>
 
-<p>整数有"唯一素分解"——任何 \(n \ge 2\) 都能写成 \(n = p_1^{a_1} \cdots p_k^{a_k}\)，因子排列与符号差异之外完全唯一。多项式也有一样的现象：\(\mathbb{Q}[x]\) 里任何非零非常数多项式都能写成不可约多项式的乘积，分解到"差一个常数倍"为止唯一。这两件事看起来分别住在算术与代数两侧，但只要把它们的证明摊开，支撑它们的论证<em>完全一样</em>。本章要把这条共同骨架抽出来。</p>
+<p>请你看一条你在初中就学过的事实：</p>
 
-<p>关键的分水岭是<strong>主理想环</strong>（principal ideal domain，PID）：每个理想都由<em>一个</em>元素生成。\(\mathbb{Z}\) 和 \(k[x]\)（\(k\) 是域）这两块代数最熟悉的土壤都是 PID。一旦你证明了这一点，"唯一分解"就免费跟着来——所有 PID 都是 UFD（unique factorization domain，唯一分解整环）。反过来，UFD 不一定是 PID：\(\mathbb{Z}[x]\) 与 \(k[x_1, \ldots, x_n]\)（\(n \ge 2\)）都是 UFD 但不是 PID。这条不对称提示我们 PID 是个比 UFD 更"一维"的条件，而 UFD 这个广一些的家族才是处理多元多项式的合适范围。</p>
+<p><em>每一个不为 \(\pm 1\)、不为 \(0\) 的整数都能被分解成几个素数的乘积，并且这种分解<em>本质唯一</em>（差一个符号 / 顺序）。</em></p>
+
+<p>例：\(60 = 2 \cdot 2 \cdot 3 \cdot 5 = 2^2 \cdot 3 \cdot 5\)。你不能把 60 分解成另一组完全不同的素数。</p>
+
+<p>这是<em>算术基本定理</em>。多数学生第一次见就接受了——好像它是关于整数的一条天然事实。可它<em>不是</em> 天然的。请你想想下面这件事：</p>
+
+<p>在 \(\mathbb{Z}[\sqrt{-5}] = \{a + b\sqrt{-5} : a, b \in \mathbb{Z}\}\) 这个整环里，</p>
+
+<p>\[
+6 = 2 \cdot 3 = (1 + \sqrt{-5})(1 - \sqrt{-5}).
+\]</p>
+
+<p>两边都<em>不能</em> 进一步分解（每个因子都<em>不可约</em>）。所以 6 在这个环里有<em>两种本质不同</em> 的分解，唯一性失败。</p>
+
+<p>所以"唯一分解" 不是<em>所有</em> 整环的性质——它<em>专属</em> 一类特殊的整环。\(\mathbb{Z}\) 是这类，\(\mathbb{Z}[\sqrt{-5}]\) 不是。问题是：<em>哪一类</em>？\(\mathbb{Z}\) 有什么"高级" 性质让唯一分解成立？</p>
+
+<p>这一章的答案：\(\mathbb{Z}\) 是<em>主理想环（PID）</em>——每个理想都是某个单一元素生成的主理想 \((a)\)。任何 PID 自动有唯一分解（叫<em>UFD</em>）。这条等价让"<em>素分解唯一</em>" 这件高中事实有了一个深刻的代数解释。</p>
+
+<p>但层级<em>不</em> 重合：<em>不是</em> 每个 UFD 都是 PID。\(\mathbb{Z}[x]\) 是 UFD（每个非常数多项式有唯一不可约分解），但<em>不</em> 是 PID（\((2, x)\) 不主）。所以 \(\text{PID} \subsetneq \text{UFD}\)，PID 比 UFD 更强。</p>
+
+<p>这一章理清这条层级，给完整证明，并给最常用的工具——Eisenstein 判别——让你能判断 \(\mathbb{Z}[x]\) 中具体多项式是否不可约。</p>
+
+<h2 id="sec14-1">14.1 \(\mathbb{Z}\) 唯一分解的"高级解释"</h2>
+
+<p>初中给你证明唯一分解用的是"反复用 Bézout / 素数性质"。代数版本更干净——它直接说"因为 \(\mathbb{Z}\) 的每个理想都是 \((n)\) 形状"。</p>
+
+<p>先看 \(\mathbb{Z}\) 这条性质。</p>
+
+<p><strong>声明。</strong> \(\mathbb{Z}\) 中每个理想都形如 \((n) = n\mathbb{Z}\)，对某个 \(n \ge 0\)。</p>
+
+<p>证明：设 \(I \subseteq \mathbb{Z}\) 是理想。若 \(I = \{0\}\)，\(I = (0)\)，完。否则取 \(I\) 中正的最小元 \(n\)（用 \(\mathbb{Z}\) 良序）。声明 \(I = (n)\)。\((n) \subseteq I\) 显然（\(n \in I\) 加吸收）。反方向：任意 \(m \in I\) 用带余除法 \(m = qn + r\)（\(0 \le r < n\)），则 \(r = m - qn \in I\)；由 \(n\) 最小性 \(r = 0\)，即 \(m = qn \in (n)\)。</p>
+
+<p>这一证明只用<em>带余除法</em>。带余除法在 \(\mathbb{Z}\) 中存在因为 \(\mathbb{Z}\) 有<em>绝对值</em>，可以谈"余数比除数小"。这条性质后面会推广。</p>
+
+<p>从"每个理想都主" 到"唯一分解" 的桥怎么搭？把它分两步：</p>
+
+<ol>
+  <li>每个理想都主 \(\Rightarrow\) "<em>素</em>" 与"<em>不可约</em>" 在 \(\mathbb{Z}\) 中重合。</li>
+  <li>"素 \(=\) 不可约" \(+\) "<em>升链终止</em>" \(\Rightarrow\) 唯一分解。</li>
+</ol>
+
+<p>下面我们把这条逻辑搬到一般 PID 上去。</p>
+
+<h2 id="sec14-2">14.2 PID：定义</h2>
+
+<p><strong>定义。</strong> <em>主理想环</em>（principal ideal domain，PID）是一个整环 \(R\)，使<em>每个理想都是主理想</em>——对每个 \(I \subseteq R\)，存在 \(a \in R\) 使 \(I = (a)\)。</p>
+
+<p>"主" 等于"由<em>一个</em> 元素生成"。</p>
+
+<p>例 / 反例：</p>
 
 <ul>
-  <li>正式定义主理想环：每个理想都形如 \((a)\)。</li>
-  <li>用最小正元素论证证 \(\mathbb{Z}\) 是 PID。</li>
-  <li>用除法算法证 \(k[x]\)（\(k\) 是域）是 PID；同时观察 \(k[x, y]\) 里理想 \((x, y)\) 不主，从而 \(k[x, y]\) 不是 PID。</li>
-  <li>把 \(\mathbb{Z}\) 和 \(k[x]\) 的共同结构抽象成 Euclid 整环，并指出 Euclid \(\Rightarrow\) PID。</li>
-  <li>区分"不可约元"与"素元"——一般环里 不可约 \(\Rightarrow\) 素 不一定，PID 里二者等价。</li>
-  <li>主定理：PID \(\Rightarrow\) UFD，每个非零非单位都有"本质唯一"的不可约分解。</li>
-  <li>独立陈述 UFD 定义并给出 \(\mathbb{Z}[x]\)、\(k[x_1, \ldots, x_n]\) 的例子（Gauss 引理）。</li>
-  <li>Eisenstein 判别法：判定 \(\mathbb{Z}[x]\) 中多项式不可约的最常用工具。</li>
+  <li>\(\mathbb{Z}\)：PID（上节证）。</li>
+  <li>\(k[x]\)（\(k\) 域）：PID。证明：用多项式带余除法，仿 \(\mathbb{Z}\)（详见 ch15）。</li>
+  <li>\(\mathbb{Z}[i]\)：PID。可以证它有"<em>欧氏算法</em>"——用范数 \(N(a + bi) = a^2 + b^2\) 当"绝对值" 做带余除法。</li>
+  <li>任何域 \(F\)：PID（理想只有 \((0)\) 和 \((1) = F\)）。</li>
+  <li>\(\mathbb{Z}[x]\)：<em>不</em> PID。理想 \((2, x)\) 不主。证明：若 \((2, x) = (f)\) 对某 \(f \in \mathbb{Z}[x]\)，则 \(f | 2\) 与 \(f | x\)。\(f | 2\) 给 \(f \in \{\pm 1, \pm 2\}\)（\(\mathbb{Z}\) 的因子）；\(f | x\) 排除 \(\pm 2\)（\(2 \nmid x\)）；\(f = \pm 1\) 给 \((f) = \mathbb{Z}[x]\)，但 \((2, x) \subsetneq \mathbb{Z}[x]\)（\(1 \notin (2, x)\)，因为 \((2, x)\) 中元素都形如 \(2 a(x) + x b(x)\) 常数项偶）。所以 \((2, x)\) 不主，\(\mathbb{Z}[x]\) 不 PID。</li>
+  <li>\(\mathbb{Z}[\sqrt{-5}]\)：<em>不</em> PID。理想 \((2, 1 + \sqrt{-5})\) 不主。这与"6 有两种分解" 是同一回事的两面。</li>
 </ul>
 
-<h2 id="sec14-1">14.1 主理想环的定义</h2>
+<p>请你停下来记一件事：<em>PID 是相当苛刻的条件</em>。\(\mathbb{Z}, k[x]\) 这两个最熟悉的环是 PID，但稍微一推广（\(\mathbb{Z}[x], \mathbb{Z}[\sqrt{-5}], k[x, y]\)）就跌出 PID 圈外。所以"PID" 是一个<em>挑出来的特殊好</em> 环类。</p>
 
-<p>设 \(R\) 是一个交换整环（无零因子的交换环，含单位 \(1 \neq 0\)）。回忆<a href="ch12.html">第 12 章</a>：\(R\) 的<strong>理想</strong> \(I\) 是一个加法子群，并且对 \(R\) 中元素做数乘吸收（\(r \in R, a \in I \Rightarrow ra \in I\)）。给一个 \(a \in R\)，用 \(a\) 生成的<strong>主理想</strong>是</p>
+<h2 id="sec14-3">14.3 \(k[x]\) 是 PID + Euclid 整环</h2>
 
-<p>\[
-(a) := Ra = \{r a : r \in R\}.
-\]</p>
+<p>\(k[x]\)（\(k\) 域）的 PID 性证明完全平行 \(\mathbb{Z}\) 的——只是把"绝对值" 换成"次数"。</p>
 
-<p>它的元素就是"\(a\) 的所有倍数"。</p>
-
-<p>定义：</p>
+<p><strong>定理（多项式带余除法）。</strong> 设 \(k\) 域、\(f, g \in k[x]\) 且 \(g \neq 0\)。存在唯一 \(q, r \in k[x]\) 使</p>
 
 <p>\[
-\boxed{\ R \text{ 是 \textbf{主理想环}（PID）} \iff R \text{ 是整环，且每个理想 } I \subseteq R \text{ 都是主理想 }(a). \ }
+f = qg + r, \quad r = 0 \text{ 或 } \deg r < \deg g.
 \]</p>
 
-<p>换言之，PID 不允许"用两个或更多生成元才能描述"的理想存在。这是非常强的限制——大多数环不满足。但当一个环满足时，几乎所有"算术性"问题都会变得简单：最大公因子总是存在并能写成线性组合（Bézout）；唯一分解自动成立；模理论变得几乎和向量空间一样干净（这是<a href="ch17.html">第 17 章</a>的话题）。</p>
+<p>证明用归纳——若 \(\deg f < \deg g\) 取 \(q = 0, r = f\)；否则用首项相除把 \(\deg f\) 降一，归纳。详见 ch15。</p>
 
-<p>注意我们要求 \(R\) 是<em>整环</em>——零因子会让"互素""不可约"等词失去清晰含义。下面两节用最熟悉的两个环把"PID"具体落地。它们的论证策略结构上完全相同：在理想里挑一个"最小"的元素，证明它生成整个理想。</p>
+<p>有了带余除法，\(k[x]\) 中"理想 \(I\) 由次数最小的非零元素 \(g\) 生成 \(I = (g)\)" 的论证<em>一字不差</em> 抄 \(\mathbb{Z}\) 的：</p>
 
-<h2 id="sec14-2">14.2 \(\mathbb{Z}\) 是 PID：最小正元素论证</h2>
+<ol>
+  <li>取 \(I\) 中次数最小的非零 \(g\)。</li>
+  <li>对任意 \(f \in I\)，带余 \(f = qg + r\)；\(r = f - qg \in I\)；\(\deg r < \deg g\) 由 \(g\) 最小性给 \(r = 0\)。</li>
+  <li>\(f = qg \in (g)\)。</li>
+</ol>
 
-<p><strong>定理。</strong>整数环 \(\mathbb{Z}\) 是主理想环。</p>
+<p>所以 \(k[x]\) 是 PID。</p>
 
-<p>证明。设 \(I \subseteq \mathbb{Z}\) 是任意一个理想。如果 \(I = \{0\}\)，则 \(I = (0)\)，主理想，结束。否则 \(I\) 含一个非零整数 \(a\)；因为 \(I\) 是加法子群，\(-a\) 也在 \(I\) 中。所以 \(I\) 含正整数。</p>
+<p>这条共同模式——"<em>有'大小函数' 的整环 \(\Rightarrow\) PID</em>" 抽象出 <em>欧氏整环</em>（Euclidean domain）。</p>
 
-<p>令 \(d\) 是 \(I\) 中最小的正整数。我们要证 \(I = (d)\)。</p>
-
-<p>"\((d) \subseteq I\)" 显然——\(d \in I\) 加上理想吸收性给出 \(rd \in I\) 对所有 \(r \in \mathbb{Z}\)。反向，对任意 \(b \in I\)，用<strong>带余除法</strong>写 \(b = qd + r\)，\(0 \le r < d\)。则 \(r = b - qd \in I\)（\(b\) 和 \(qd\) 都在 \(I\) 里）。但 \(d\) 是 \(I\) 中最小正整数，且 \(0 \le r < d\)，所以 \(r = 0\)。从而 \(b = qd \in (d)\)。结论 \(I = (d)\)。</p>
-
-<p>这条证明里有两件事在工作：自然数良序原理（正元素集合有最小元）与带余除法。两件事缺一不可——第二件正是 14.4 节会抽象为"Euclid 函数"的东西。</p>
-
-<p>立刻得到一条算术结果：任意两个非零整数 \(a, b\)，理想 \(I = (a) + (b)\) 是主理想 \((d)\)，这个 \(d\) 就是 \(a, b\) 的最大公因子，且 \(d \in I\) 给 \(d = ma + nb\)（<strong>Bézout 等式</strong>）。Bézout 不是 \(\mathbb{Z}\) 的奇技淫巧，而是"\(\mathbb{Z}\) 是 PID"的直接推论；任意 PID 上 Bézout 都成立。</p>
-
-<h2 id="sec14-3">14.3 \(k[x]\) 是 PID；\(k[x, y]\) 不是</h2>
-
-<p>设 \(k\) 是一个域。我们要证多项式环 \(k[x]\) 是 PID。论证策略和 \(\mathbb{Z}\) 一模一样，只把"最小正整数"换成"次数最小"。</p>
-
-<p><strong>定理。</strong>\(k[x]\)（\(k\) 是域）是主理想环。</p>
-
-<p>证明。设 \(I \subseteq k[x]\) 是非零理想（若 \(I = (0)\) 已是主理想）。在 \(I\) 中所有非零多项式里挑一个<em>次数最小</em>的，记作 \(g(x)\)。</p>
-
-<p>对任意 \(f(x) \in I\)，用<strong>多项式带余除法</strong>（详见<a href="ch15.html">第 15 章 15.1 节</a>）写 \(f = q g + r\)，\(\deg r < \deg g\)（约定 \(\deg 0 = -\infty\) 或不参与比较）。则 \(r = f - q g \in I\)。但 \(\deg r < \deg g\) 而 \(g\) 是 \(I\) 中次数最小的非零元素，所以 \(r = 0\)。从而 \(f = q g \in (g)\)。\(I = (g)\)。结束。</p>
-
-<p>带余除法在 \(k[x]\) 上能进行，关键依赖 \(k\) 是<em>域</em>——除以 \(g\) 的首项系数需要可逆。如果换成 \(\mathbb{Z}[x]\)（系数在整数环里），\(2x + 1\) 就不能"除"任意首项系数为奇数的多项式。这条细节决定了 \(\mathbb{Z}[x]\) 不是 PID（下面会讲）。</p>
-
-<p>现在看反例。把 \(k[x]\) 换成两个变量的 \(k[x, y]\)。考虑理想</p>
+<p><strong>定义。</strong> 整环 \(R\) 是<em>欧氏整环</em>，如果存在函数 \(\delta : R \setminus \{0\} \to \mathbb{Z}_{\ge 0}\)（"大小")，使对任意 \(a, b \in R\)、\(b \neq 0\)，存在 \(q, r \in R\) 使</p>
 
 <p>\[
-I = (x, y) := \{f(x, y) \in k[x, y] : f \text{ 的常数项 } = 0\}.
+a = qb + r, \quad r = 0 \text{ 或 } \delta(r) < \delta(b).
 \]</p>
 
-<p>它是把 \((x, y)\) 嵌进 \(k[x, y]\) 后由 \(x, y\) 生成的理想，元素恰为常数项为 0 的多项式。</p>
-
-<p>断言：\(I\) 不是主理想。</p>
-
-<p>反证。若 \(I = (h)\) 对某个 \(h \in k[x, y]\)，则 \(x \in (h)\) 与 \(y \in (h)\) 给出 \(x = a h, y = b h\)（\(a, b \in k[x, y]\)）。\(x = a h\) 中两边比较次数，\(\deg h \le 1\)；\(h\) 的常数项必须是 0（否则 \(h\) 不在 \(I\) 中）。所以 \(h\) 是次数 \(\le 1\) 且常数项为 0 的多项式，写成 \(h = \alpha x + \beta y\)（\(\alpha, \beta \in k\)）。但 \(x = a h = a (\alpha x + \beta y)\)——比较 \(y\) 的系数，\(0 = a \cdot \beta\)。同样 \(y = b h\) 给 \(0 = b \cdot \alpha\)。\(\alpha, \beta\) 不能都是 0（否则 \(h = 0\)，但 \(x \in (0) = \{0\}\) 矛盾）。设 \(\alpha \neq 0\)，则 \(b = 0\)，\(y = 0 \cdot h = 0\) 矛盾。所以不存在这样的 \(h\)。</p>
-
-<p>结论：\(k[x, y]\) 不是 PID。一般地 \(k[x_1, \ldots, x_n]\)（\(n \ge 2\)）也不是 PID。但下一章会看到它仍然是 UFD——这正是为什么 UFD 是比 PID 更宽阔、更普遍的家族。</p>
-
-<h2 id="sec14-4">14.4 Euclid 整环：把 \(\mathbb{Z}\) 与 \(k[x]\) 的共同骨架抽象出来</h2>
-
-<p>14.2 与 14.3 两节的论证结构完全一样：<em>带余除法</em> + <em>"余数小于除数"的良序</em>。把这条共同骨架抽出来，就是 Euclid 整环。</p>
-
-<p>定义。整环 \(R\) 叫<strong>Euclid 整环</strong>，如果存在一个函数 \(N : R \setminus \{0\} \to \mathbb{Z}_{\ge 0}\)（叫 <em>Euclid 范数</em>或<em>规度</em>），使得对任意 \(a \in R\) 与 \(b \in R \setminus \{0\}\)，存在 \(q, r \in R\) 满足</p>
-
-<p>\[
-a = q b + r, \qquad r = 0 \text{ 或 } N(r) < N(b).
-\]</p>
-
-<p>例：\(R = \mathbb{Z}\) 取 \(N(a) = |a|\)；\(R = k[x]\)（\(k\) 域）取 \(N(f) = \deg f\)；\(R = \mathbb{Z}[i]\)（高斯整数）取 \(N(a + bi) = a^2 + b^2\)（"在复平面上找最近的高斯整数"的几何论证）；\(\mathbb{Z}[\omega]\)（\(\omega = e^{2\pi i/3}\)，Eisenstein 整数）取 \(N(a + b\omega) = a^2 - ab + b^2\)。</p>
-
-<p><strong>定理。</strong>每个 Euclid 整环都是 PID。</p>
-
-<p>证明。把 14.2 的论证机械移植：取理想 \(I \neq (0)\)，挑 \(N\)-值最小的非零 \(d \in I\)；对任意 \(b \in I\)，写 \(b = q d + r\)，\(r = 0\) 或 \(N(r) < N(d)\)。\(r \in I\)；如果 \(r \neq 0\) 则 \(N(r) < N(d)\) 与 \(d\) 是 \(I\) 中 \(N\)-最小元素矛盾。所以 \(r = 0\)，\(b \in (d)\)，\(I = (d)\)。结束。</p>
-
-<p>这条定理把"\(\mathbb{Z}\) 是 PID""\(k[x]\) 是 PID""\(\mathbb{Z}[i]\) 是 PID"等等具体事实统一成一句话。</p>
-
-<p>反过来，PID \(\Rightarrow\) Euclid 不成立——存在 PID 不是 Euclid（典型反例 \(\mathbb{Z}[\frac{1 + \sqrt{-19}}{2}]\)）。这提示你"PID"是比"Euclid"更宽的概念。</p>
-
-<h2 id="sec14-5">14.5 不可约元 vs 素元</h2>
-
-<p>在 \(\mathbb{Z}\) 里"素数"有两种等价定义。教科书风格 1：\(p\) 素 \(\iff\) \(p\) 没有真因子（不能写成两个非单位的乘积）。教科书风格 2：\(p\) 素 \(\iff\) \(p \mid ab\) 蕴含 \(p \mid a\) 或 \(p \mid b\)。在 \(\mathbb{Z}\) 中这两条等价，所以"素数"这个词不会引起歧义。但在一般环里它们对应两个<em>不同</em>的概念——这件事必须说清楚，否则后面 PID \(\Rightarrow\) UFD 的证明会糊。</p>
-
-<p>设 \(R\) 是整环，\(a \in R\) 是非零非单位元。回忆：\(u\) 是<strong>单位</strong>当 \(u\) 在 \(R\) 中可逆。</p>
-
-<p><strong>不可约</strong>（irreducible）：\(a = bc\) 蕴含 \(b\) 是单位或 \(c\) 是单位。换言之 \(a\) 不能拆成两个非单位的乘积。</p>
-
-<p><strong>素</strong>（prime）：\(a \mid bc\) 蕴含 \(a \mid b\) 或 \(a \mid c\)。等价地，主理想 \((a)\) 是<a href="ch12.html">第 12 章</a>意义下的<em>素理想</em>。</p>
-
-<p>在一般整环中：</p>
-
-<p>\[
-\boxed{\ \text{素} \Rightarrow \text{不可约},\ }
-\]</p>
-
-<p>但反向不一定。证 素 \(\Rightarrow\) 不可约：设 \(a\) 素且 \(a = bc\)。则 \(a \mid bc\)，所以 \(a \mid b\) 或 \(a \mid c\)。若 \(a \mid b\)，写 \(b = a d\)，则 \(a = bc = a d c\)，由 \(R\) 整环消去 \(a\) 得 \(1 = dc\)，所以 \(c\) 是单位。同理另一情形。结论 \(a\) 不可约。</p>
-
-<p>反向 不可约 \(\Rightarrow\) 素 在一般整环中可<em>失败</em>。经典反例：\(R = \mathbb{Z}[\sqrt{-5}]\)，元素 \(2\) 是不可约（用范数 \(N(a + b\sqrt{-5}) = a^2 + 5 b^2\) 论证），但 \(2 \mid 6 = (1 + \sqrt{-5})(1 - \sqrt{-5})\)，而 \(2 \nmid 1 + \sqrt{-5}\)、\(2 \nmid 1 - \sqrt{-5}\)。所以 \(2\) 不可约但不素。这正是为什么 \(\mathbb{Z}[\sqrt{-5}]\) 唯一分解失败：</p>
-
-<p>\[
-6 = 2 \cdot 3 = (1 + \sqrt{-5})(1 - \sqrt{-5}),
-\]</p>
-
-<p>两边都是不可约分解，但<em>不本质相同</em>。</p>
-
-<p>关键的好消息是：在 PID 中，二者重合。</p>
-
-<p><strong>定理。</strong>设 \(R\) 是 PID，\(a \in R\) 非零非单位。则</p>
-
-<p>\[
-\boxed{\ a \text{ 不可约 } \iff a \text{ 素}.\ }
-\]</p>
-
-<p>证明。"\(\Leftarrow\)" 已在一般整环中证明。证 "\(\Rightarrow\)"：设 \(a\) 不可约且 \(a \mid bc\)。考虑理想 \(I = (a, b)\)，由 PID 假设 \(I = (d)\)，则 \(a = de\) 对某 \(e\)。由 \(a\) 不可约，\(d\) 或 \(e\) 是单位。</p>
+<p>"大小函数" 在不同环里取不同形式：</p>
 
 <ul>
-  <li>若 \(e\) 是单位，则 \((d) = (a)\)，所以 \(b \in (a)\)，即 \(a \mid b\)，结束。</li>
-  <li>若 \(d\) 是单位，则 \((d) = R\)，所以 \(1 \in (a, b)\)，写 \(1 = a x + b y\)。两边乘 \(c\)：\(c = a c x + b c y\)。\(a \mid bc\) 给 \(a \mid b c y\)，加上 \(a \mid a c x\)，得 \(a \mid c\)。结束。</li>
+  <li>\(\mathbb{Z}\)：\(\delta(n) = |n|\)。</li>
+  <li>\(k[x]\)：\(\delta(f) = \deg f\)。</li>
+  <li>\(\mathbb{Z}[i]\)：\(\delta(a + bi) = a^2 + b^2 = |a + bi|^2\)（高斯整数的范数）。</li>
 </ul>
 
-<p>这条等价是 PID 上整个分解理论的"灵魂步"。它让"不可约分解"和"素分解"等价，而后者立刻有<em>唯一性</em>（因为 \(a\) 素 \(\iff\) \((a)\) 素 \(\iff\) 商环 \(R/(a)\) 是整环——那种"乘进去能不能分裂"由 \(R/(a)\) 决定）。</p>
+<p><strong>定理。</strong> 任何欧氏整环都是 PID。</p>
 
-<h2 id="sec14-6">14.6 主定理：PID \(\Rightarrow\) UFD</h2>
+<p>证明：和 \(\mathbb{Z}\) / \(k[x]\) 中那条论证一字不差——理想 \(I\) 取 \(\delta\) 最小的非零元素 \(g\) 生成 \(I = (g)\)，用带余除法把任意 \(f \in I\) 表为 \(qg\)（余必为 0 因 \(g\) 最小）。</p>
 
-<p>把存在性与唯一性分别处理。</p>
+<p>所以"欧氏 \(\Rightarrow\) PID"。反过来一般不真——存在 PID 不是欧氏，但例子复杂（\(\mathbb{Z}[(1 + \sqrt{-19})/2]\) 是个有名例子）。本科课里通常忽略这层细微差别，把"欧氏" 当成"<em>容易证明的</em> PID"。</p>
 
-<p><strong>定理（PID 上不可约分解的存在性）。</strong>设 \(R\) 是 PID，\(a \in R\) 非零非单位。则 \(a\) 可写成有限个不可约元的乘积 \(a = p_1 p_2 \cdots p_k\)。</p>
-
-<p>证明思路（升链条件，又叫诺特性）：在 PID 中任何升链 \((a_1) \subsetneq (a_2) \subsetneq \cdots\) 必终止。理由：升链的并 \(\bigcup_n (a_n)\) 仍是理想（小练习），由 PID 它是某个 \((b)\)，则 \(b \in (a_N)\) 对某 \(N\)，故 \((a_N) = (b)\) 包含整条链——链终止。</p>
-
-<p>用这条性质做反证：假设 \(a\) 不能写成不可约元的有限乘积。\(a\) 自己可约，写 \(a = b_1 c_1\)，\(b_1, c_1\) 都非单位。\(b_1\) 与 \(c_1\) 中至少一个仍不可写成有限不可约乘积——选一个，记为 \(a_1\)。\((a) \subsetneq (a_1)\)（真包含因为 \(c_1\) 非单位）。继续：\(a_1\) 也可约，分解出 \(a_2\)，\((a_1) \subsetneq (a_2)\)，依此构造一条无限严格升链 \((a) \subsetneq (a_1) \subsetneq (a_2) \subsetneq \cdots\)。与升链条件矛盾。所以分解存在。</p>
-
-<p><strong>定理（PID 上不可约分解的唯一性）。</strong>设 \(a = p_1 p_2 \cdots p_k = q_1 q_2 \cdots q_m\) 是 \(a\) 的两个不可约分解。则 \(k = m\)，且重排 \(q\) 后存在单位 \(u_i\) 使 \(q_i = u_i p_i\)。</p>
-
-<p>证明（归纳）。\(p_1\) 整除左边乘积，故整除右边 \(q_1 \cdots q_m\)。在 PID 中 \(p_1\) 不可约 \(\Rightarrow\) \(p_1\) 素（14.5 节），所以 \(p_1\) 整除某个 \(q_j\)。重排把 \(q_j\) 写成 \(q_1\)。由 \(q_1\) 不可约，\(q_1 = u_1 p_1\)，\(u_1\) 是单位。两边消去 \(p_1\)（在整环中允许），得 \(p_2 \cdots p_k = u_1 q_2 \cdots q_m\)。对 \(k - 1\) 归纳。\(k = 0\) 情形是 \(a\) 是单位，矛盾，所以归纳起步合理。结束。</p>
-
-<p>把存在 + 唯一合并得到本章的主定理：</p>
+<p>层级到目前是：</p>
 
 <p>\[
-\boxed{\ R \text{ 是 PID} \Rightarrow R \text{ 是 UFD}：每个非零非单位都有"差单位倍后唯一"的不可约分解。\ }
+\text{域} \subsetneq \text{欧氏整环} \subsetneq \text{PID} \subsetneq \text{UFD} \subsetneq \text{整环}.
 \]</p>
 
-<p>这就是为什么 \(\mathbb{Z}\) 上唯一素分解、\(k[x]\) 上唯一不可约分解都是同一件事的两种说法——\(\mathbb{Z}\) 与 \(k[x]\) 都是 PID。</p>
+<p>下面要证 PID \(\Rightarrow\) UFD，把这条层级补上倒数第二步。</p>
 
-<h2 id="sec14-7">14.7 UFD 独立陈述：\(\mathbb{Z}[x]\) 与 \(k[x_1, \ldots, x_n]\) 是 UFD 但不是 PID</h2>
+<h2 id="sec14-4">14.4 不可约 vs 素：PID 中重合</h2>
 
-<p>独立给出 UFD 定义。整环 \(R\) 叫<strong>唯一分解整环</strong>（UFD），如果每个非零非单位 \(a \in R\) 满足：</p>
+<p>"唯一分解" 之前我们要先把"分解的原子是什么" 弄清楚。整环里有<em>两种</em> 候选概念。</p>
+
+<p><strong>定义。</strong> 设 \(R\) 是整环，\(p \in R\) 非零、非单位。</p>
 
 <ul>
-  <li><strong>存在：</strong>\(a = p_1 \cdots p_k\)，每个 \(p_i\) 不可约；</li>
-  <li><strong>唯一：</strong>另一不可约分解 \(a = q_1 \cdots q_m\) 蕴含 \(k = m\) 且重排后 \(q_i = u_i p_i\)（\(u_i\) 单位）。</li>
+  <li>\(p\) 叫<em>不可约</em>（irreducible），如果 \(p = ab\) 蕴含 \(a\) 或 \(b\) 是单位。即"不能<em>真</em> 分成两块"。</li>
+  <li>\(p\) 叫<em>素</em>（prime），如果 \(p | ab\) 蕴含 \(p | a\) 或 \(p | b\)。即<em>素数那条性质</em>。</li>
 </ul>
 
-<p>14.6 的主定理是 PID \(\Rightarrow\) UFD。反向不成立：</p>
+<p>(回忆 ch12.6：理想 \((p)\) 素 \(\iff p\) 是素元素。)</p>
 
-<p><strong>例 1.</strong> \(\mathbb{Z}[x]\) 是 UFD，但不是 PID——理想 \((2, x)\) 不主。论证：若 \((2, x) = (h)\)，则 \(h \mid 2\) 与 \(h \mid x\)，故 \(h = \pm 1\) 或 \(\pm 2\)；\(\pm 1\) 给 \((h) = \mathbb{Z}[x]\) 但 \(\mathbb{Z}[x]/(2, x) = \mathbb{F}_2 \neq 0\) 矛盾；\(\pm 2\) 给 \(x \in (2)\) 也矛盾。</p>
+<p>这两个概念<em>看起来</em> 很像，但一般整环里不重合。</p>
 
-<p><strong>例 2.</strong> \(k[x_1, \ldots, x_n]\)（\(n \ge 2\)）是 UFD，但不是 PID——14.3 节中 \((x, y)\) 不主。</p>
+<p><strong>定理。</strong> 在任何整环里，<em>素 \(\Rightarrow\) 不可约</em>。</p>
 
-<p><strong>Gauss 引理。</strong>设 \(R\) 是 UFD，\(K\) 是它的商域。令 \(f \in R[x]\) 是<em>本原</em>多项式（系数的最大公因子为单位）。则 \(f\) 在 \(R[x]\) 中可约 \(\iff\) \(f\) 在 \(K[x]\) 中可约。推论：</p>
+<p>证明：设 \(p\) 素、\(p = ab\)。则 \(p | ab = p\)（自取）；由素性 \(p | a\) 或 \(p | b\)。设 \(p | a\)，写 \(a = pc\)；代入 \(p = ab = pcb\)，约去 \(p\)（整环约去律）得 \(1 = cb\)，即 \(b\) 是单位。同理若 \(p | b\) 则 \(a\) 是单位。所以 \(p\) 不可约。</p>
+
+<p><strong>反例（不可约非素）。</strong> 在 \(\mathbb{Z}[\sqrt{-5}]\) 里，</p>
 
 <p>\[
-\boxed{\ R \text{ 是 UFD} \Rightarrow R[x] \text{ 是 UFD}.\ }
+2 \cdot 3 = 6 = (1 + \sqrt{-5})(1 - \sqrt{-5}).
 \]</p>
 
-<p>证明思路：把 \(f \in R[x]\) 在 \(K[x]\) 中分解成 \(f = g h\)，"清分母 + 分本原部分与内容"调整为 \(f = (\alpha g')(\beta h')\)，\(g', h' \in R[x]\) 本原；本原性给出 \(\alpha \beta\) 是单位。完整细节留到<a href="ch15.html">第 15 章 15.7 节</a>。</p>
+<p>2 在 \(\mathbb{Z}[\sqrt{-5}]\) 中<em>不可约</em>（用范数 \(N(a + b\sqrt{-5}) = a^2 + 5b^2\) 验证：若 \(2 = xy\) 则 \(N(2) = 4 = N(x) N(y)\)；若两边非单位，\(N(x), N(y) \in \{2\}\)，但 \(a^2 + 5b^2 = 2\) 无整数解，矛盾——所以 \(x\) 或 \(y\) 必有 \(N = 1\)，即单位）。但 2 <em>不</em> 素：\(2 | (1 + \sqrt{-5})(1 - \sqrt{-5}) = 6\) 但 \(2 \nmid (1 + \sqrt{-5})\) 也 \(\nmid (1 - \sqrt{-5})\)。</p>
 
-<p>由归纳：\(\mathbb{Z}[x_1, \ldots, x_n]\) 与 \(k[x_1, \ldots, x_n]\) 都是 UFD。UFD 不再保证 Bézout 等式（Bézout 是 PID 的特征）：一般 UFD 上 \((a, b)\) 不必主，所以 \(\gcd(a, b)\) 即使存在也未必能写成 \(a x + b y\)。这一条差距常常是问题难易的分水岭。</p>
+<p>这正是 \(\mathbb{Z}[\sqrt{-5}]\) 中唯一分解失败的<em>原因</em>——"不可约 \(\neq\) 素" 让"分解原子" 没单一意义。</p>
 
-<h2 id="sec14-8">14.8 Eisenstein 判别法</h2>
+<p><strong>定理。</strong> 在 PID 中，<em>不可约 \(\Leftrightarrow\) 素</em>。</p>
 
-<p>判定一个具体 \(\mathbb{Z}[x]\)（或更一般 \(R[x]\)，\(R\) 是 UFD）中的多项式是否不可约，是日常计算最常出现的问题之一。Eisenstein 判别法是<em>最常用</em>的工具。它形式干净、应用范围广，证明极短。</p>
+<p>证明：素 \(\Rightarrow\) 不可约已证，对任意整环。反方向：设 \(p\) 不可约，要证 \(p\) 素。</p>
 
-<p><strong>Eisenstein 判别法。</strong>设 \(f(x) = a_n x^n + a_{n-1} x^{n-1} + \cdots + a_1 x + a_0 \in \mathbb{Z}[x]\)。如果存在素数 \(p\) 满足</p>
+<p>设 \(p | ab\)。考虑理想 \((p, a)\)。由 PID，\((p, a) = (d)\) 对某 \(d\)。则 \(d | p\)（因 \(p \in (d)\)），不可约性给 \(d\) 单位或 \(d\) 与 \(p\) 相伴（即 \(d = up\) 对某单位 \(u\)）。</p>
+
+<p>情形 1：\(d\) 单位。\((p, a) = (1) = R\)；存在 \(s, t\) 使 \(sp + ta = 1\)。乘 \(b\)：\(spb + tab = b\)。由 \(p | ab\) 与 \(p | sp\)，\(p | (spb + tab) = b\)。完。</p>
+
+<p>情形 2：\(d = up\)。\((p, a) = (d) = (p)\)，所以 \(a \in (p)\) 即 \(p | a\)。完。</p>
+
+<p>所以 \(p | a\) 或 \(p | b\)，即 \(p\) 素。</p>
+
+<p>这条等价是 PID 走向唯一分解的关键中间步。它把"分解原子" 这件原本歧义的事在 PID 里收敛成单一概念。</p>
+
+<h2 id="sec14-5">14.5 PID \(\Rightarrow\) UFD：主定理</h2>
+
+<p>现在正面定义"唯一分解整环"。</p>
+
+<p><strong>定义。</strong> 整环 \(R\) 是<em>唯一分解整环</em>（unique factorization domain，UFD），如果对每个非零非单位 \(a \in R\)：</p>
 
 <ul>
-  <li>\(p \nmid a_n\)（首项系数不被 \(p\) 整除）；</li>
-  <li>\(p \mid a_i\) 对所有 \(0 \le i \le n - 1\)（其余所有系数被 \(p\) 整除）；</li>
-  <li>\(p^2 \nmid a_0\)（常数项不被 \(p^2\) 整除），</li>
+  <li>(存在性) \(a\) 能写成有限多个不可约元素的乘积 \(a = p_1 p_2 \cdots p_k\)；</li>
+  <li>(唯一性) 若 \(a = p_1 \cdots p_k = q_1 \cdots q_l\) 是两种这样的分解，则 \(k = l\)，且<em>重排</em> 后每个 \(p_i\) 与对应 \(q_i\) <em>相伴</em>（差一个单位倍数）。</li>
 </ul>
 
-<p>则 \(f\) 在 \(\mathbb{Q}[x]\) 中不可约（由 Gauss 引理也在 \(\mathbb{Z}[x]\) 中不可约，前提 \(f\) 本原）。</p>
+<p>"相伴" 指 \(p_i = u_i q_i\) 对某单位 \(u_i\)。这是必要的——\(\mathbb{Z}\) 中 \(6 = 2 \cdot 3 = (-2) \cdot (-3)\) 是两种"分解"，但 \(2, -2\) 相伴（差 \(-1\)，单位）、\(3, -3\) 相伴。所以"差单位" 不算实质不同。</p>
+
+<p><strong>定理（主定理）。</strong> <em>每个 PID 都是 UFD。</em></p>
+
+<p>证明分两段——存在性 + 唯一性。</p>
+
+<p><strong>第一段：存在性</strong> 用<em>升链终止</em>（ascending chain condition，ACC）。</p>
+
+<p><strong>引理。</strong> 在 PID 中，理想升链 \((a_1) \subseteq (a_2) \subseteq (a_3) \subseteq \cdots\) 必<em>稳定</em>——存在 \(N\) 使 \(n \ge N\) 时 \((a_n) = (a_N)\)。</p>
+
+<p>证明：考虑并集 \(I = \bigcup_n (a_n)\)。这是理想（升链并依然封闭）。由 PID，\(I = (a)\) 对某 \(a\)。\(a \in I\) 意味着 \(a \in (a_N)\) 对某 \(N\)，即 \((a) \subseteq (a_N)\)；又 \((a_N) \subseteq I = (a)\)，所以 \((a_N) = (a) = I\)。\(n \ge N\) 时 \((a_n) \subseteq I = (a_N) \subseteq (a_n)\)，所以 \((a_n) = (a_N)\)。</p>
+
+<p>(这条 ACC 是<em>诺特环</em> 的定义——任何 PID 都诺特。"诺特" 是"理想升链终止"的统一名字，下一章会再用。)</p>
+
+<p><strong>存在性证明。</strong> 设 \(a\) 非零非单位。若 \(a\) 不可约，完（一个因子的"乘积"）。否则 \(a = b_1 c_1\) 是真分解（\(b_1, c_1\) 都非单位）。对 \(b_1\)：要么不可约，要么 \(b_1 = b_2 c_2\) 真分解。如此递归。</p>
+
+<p>关键：这个过程<em>必停</em>。每次真分解给 \((a) \subsetneq (b_1) \subsetneq (b_2) \subsetneq \cdots\)（真包含因 \(c_i\) 非单位让 \(b_{i+1}\) 是 \(b_i\) 的真因子，即 \((b_i) \subsetneq (b_{i+1})\)）。由 ACC 这条升链有限，递归 \(\le N\) 步停。</p>
+
+<p>每个递归分支同样有限，所以总过程有限步终止，得 \(a = p_1 \cdots p_k\) 全是不可约。完。</p>
+
+<p><strong>第二段：唯一性</strong> 用 \(p\) 不可约 \(\iff p\) 素（PID 的关键性质）。</p>
+
+<p><strong>唯一性证明。</strong> 设</p>
 
 <p>\[
-\boxed{\ p \nmid a_n,\ p \mid a_i\,(i < n),\ p^2 \nmid a_0 \Rightarrow f \text{ 在 } \mathbb{Q}[x] \text{ 不可约}.\ }
+a = p_1 p_2 \cdots p_k = q_1 q_2 \cdots q_l, \quad k \le l,
 \]</p>
 
-<p>证明。反证：设 \(f = g h\) 在 \(\mathbb{Z}[x]\) 中分解（由 Gauss 引理 \(g, h \in \mathbb{Z}[x]\)），\(\deg g = s \ge 1, \deg h = t \ge 1, s + t = n\)。把这条等式模 \(p\)：在 \(\mathbb{F}_p[x]\) 中</p>
+<p>所有 \(p_i, q_j\) 不可约。归纳 \(k\)。</p>
+
+<p>\(k = 1\)：\(p_1 = q_1 \cdots q_l\)。\(p_1\) 不可约，所以右侧除了一个因子是单位，其余是单位。但 \(q_j\) 都不可约非单位——所以 \(l = 1\)，且 \(p_1 = q_1\)（相伴）。完。</p>
+
+<p>\(k \ge 2\)：\(p_1 | a = q_1 \cdots q_l\)。由 \(p_1\) 不可约 \(\Rightarrow\) \(p_1\) 素（PID 的关键性质），\(p_1 | q_j\) 对某 \(j\)。重排令 \(j = 1\)，\(p_1 | q_1\)。但 \(q_1\) 也不可约，所以 \(q_1 = u p_1\) 对某单位 \(u\)（即 \(p_1, q_1\) 相伴）。</p>
+
+<p>约去 \(p_1\)：\(p_2 \cdots p_k = u q_2 \cdots q_l\)。归纳得 \(k - 1 = l - 1\) 即 \(k = l\)，且重排后每个 \(p_i\)（\(i \ge 2\)）与对应 \(q_i\) 相伴。完。</p>
+
+<p>所以 PID \(\Rightarrow\) UFD。完。</p>
+
+<p>请你停下来欣赏证明的<em>结构</em>：存在性<em>不</em> 用素性，只用 ACC——这条性质把<em>分解过程</em> 终止；唯一性<em>用</em> 素性——它把<em>分解结果</em> 收敛。两者结合给唯一分解。这种"<em>存在性 + 唯一性 = 主定理</em>" 的二段式在代数里反复重现。</p>
+
+<h2 id="sec14-6">14.6 UFD 但非 PID 的例子：\(\mathbb{Z}[x]\) 与 \(k[x_1, x_2]\)</h2>
+
+<p>层级 \(\text{PID} \subsetneq \text{UFD}\) 是真严的——存在 UFD 不是 PID。两个最重要的例子：</p>
+
+<p><strong>例 1：\(\mathbb{Z}[x]\) 是 UFD 但非 PID。</strong></p>
+
+<p>非 PID 已经在 14.2 节证（\((2, x)\) 不主）。</p>
+
+<p>UFD 的证明用<em>Gauss 引理</em>——若 \(R\) 是 UFD，则 \(R[x]\) 也是 UFD。这是个一般定理，详细证明见 ch15。直观：\(\mathbb{Z}[x]\) 中多项式可以先在 \(\mathbb{Q}[x]\) 中分解（\(\mathbb{Q}[x]\) 是 PID 因 \(\mathbb{Q}\) 是域，故是 UFD），再用 Gauss 引理把 \(\mathbb{Q}[x]\) 上的分解"<em>清分母</em>" 拉回 \(\mathbb{Z}[x]\)，得 \(\mathbb{Z}[x]\) 上的分解。</p>
+
+<p><strong>例 2：\(k[x_1, x_2]\)（\(k\) 域）是 UFD 但非 PID。</strong></p>
+
+<p>非 PID：理想 \((x_1, x_2)\) 不主。证明：若 \((x_1, x_2) = (f)\)，则 \(f | x_1\) 与 \(f | x_2\)。\(k[x_1, x_2]\) 中 \(f | x_1\) 给 \(f\) 是 \(x_1\) 的因子（即 \(f \in k\) 或 \(f = c x_1\) 对某 \(c \in k^\times\)）。同样 \(f | x_2\) 给 \(f \in k\) 或 \(f = c' x_2\)。两条同时满足只能 \(f \in k^\times = k \setminus \{0\}\)（单位）；但 \((f) = k[x_1, x_2] \neq (x_1, x_2)\)（\(1 \notin (x_1, x_2)\)，因为后者中元素常数项必为 0）。矛盾。</p>
+
+<p>UFD：递归用 Gauss 引理——\(k[x_1, x_2] = k[x_1][x_2]\)；\(k[x_1]\) 是 UFD（PID）；故 \(k[x_1][x_2]\) 是 UFD。</p>
+
+<p>类似 \(k[x_1, \ldots, x_n]\) 对所有 \(n \ge 1\) 都是 UFD，但 \(n \ge 2\) 时<em>不</em> 是 PID。这是<em>多元多项式环</em> 与<em>一元多项式环</em> 的根本差别——下一章我们详细谈这条差别。</p>
+
+<p><strong>UFD 不是层级的尽头。</strong> 还有一些不可约元素行为正常但<em>不</em> UFD 的环，比如 \(\mathbb{Z}[\sqrt{-5}]\)——它是<em>诺特整环</em>（理想升链终止）但不是 UFD。这种环的研究催生了<em>Dedekind 整环</em> 与<em>理想类群</em>——代数数论的核心对象。这是<a href="ch16.html">第 16 章</a>之后的高级内容。</p>
+
+<h2 id="sec14-7">14.7 Eisenstein 判别：一个最有用的工具</h2>
+
+<p>UFD 让你<em>知道</em> 不可约分解唯一存在，但不告诉你<em>怎么找</em>。具体在 \(\mathbb{Z}[x]\) 中证明一个多项式不可约可能很难——你不能"试除每个低次因子"，因为低次因子有无穷多个。</p>
+
+<p>有一个非常实用的<em>判别准则</em>，能在不少标准场合一眼判定 \(\mathbb{Z}[x]\) 中的多项式不可约。</p>
+
+<p><strong>定理（Eisenstein 判别准则）。</strong> 设 \(f(x) = a_n x^n + a_{n-1} x^{n-1} + \cdots + a_0 \in \mathbb{Z}[x]\)。若存在素数 \(p\) 使</p>
+
+<ul>
+  <li>\(p \nmid a_n\)（首项系数）；</li>
+  <li>\(p | a_i\) 对所有 \(i = 0, 1, \ldots, n - 1\)（其它系数）；</li>
+  <li>\(p^2 \nmid a_0\)（常数项不被 \(p^2\) 整除）。</li>
+</ul>
+
+<p>则 \(f\) 在 \(\mathbb{Q}[x]\) 中<em>不可约</em>（因此在 \(\mathbb{Z}[x]\) 中也不可约）。</p>
+
+<p>(详细证明见 ch15。这里只用结论。)</p>
+
+<p><strong>例 1：</strong> \(f(x) = x^4 + 5x^3 - 10x + 15 \in \mathbb{Z}[x]\)。试 \(p = 5\)：首项 1 不被 5 整除，其它系数 \(5, 0, -10, 15\) 都被 5 整除（0 也算被任何整数整除），常数项 15 不被 25 整除。三条都满足，\(f\) 不可约。</p>
+
+<p><strong>例 2：分圆多项式。</strong> 对素数 \(p\)，</p>
 
 <p>\[
-\bar f = \bar a_n x^n = \bar g \cdot \bar h.
+\Phi_p(x) = x^{p-1} + x^{p-2} + \cdots + x + 1 = \frac{x^p - 1}{x - 1}
 \]</p>
 
-<p>\(\mathbb{F}_p[x]\) 是 PID（因此 UFD），\(x^n\) 的不可约分解是 \(x^n = x \cdot x \cdots x\)，所以 \(\bar g, \bar h\) 都是某个 \(x\) 的方幂乘以非零常数。具体地，\(\bar g = c_1 x^s\)，\(\bar h = c_2 x^t\)，且 \(c_1 c_2 = \bar a_n \neq 0\)。</p>
+<p>是<em>第 \(p\) 分圆多项式</em>。它的根是 \(p\) 次<em>本原</em> 单位根 \(\zeta_p, \zeta_p^2, \ldots, \zeta_p^{p-1}\)（其中 \(\zeta_p = e^{2\pi i/p}\)）。</p>
 
-<p>这告诉我们 \(g\) 的常数项 \(g(0)\) 模 \(p\) 为 0（因为 \(\bar g = c_1 x^s\)，\(s \ge 1\)），同理 \(h(0)\) 模 \(p\) 为 0。所以 \(p \mid g(0)\) 与 \(p \mid h(0)\)。从而 \(p^2 \mid g(0) h(0) = f(0) = a_0\)。与"\(p^2 \nmid a_0\)"矛盾。结束。</p>
+<p>\(\Phi_p(x)\) 直接用 Eisenstein 不行（看不出哪个素数适用）。但用一个变换 \(y = x + 1\)：</p>
 
-<p><strong>例。</strong>\(f(x) = x^5 + 6 x^3 - 12 x + 18\)。取 \(p = 3\)：首项 \(1\) 不被 3 整除；其余系数 \(6, -12, 18\) 都被 3 整除；常数项 \(18 = 2 \cdot 3^2\) 被 9 整除——失败！换 \(p = 2\)：首项 1 不被 2 整除；系数 \(6, -12, 18\) 都被 2 整除；常数项 18 不被 \(4\) 整除（\(18 = 2 \cdot 9\)）。Eisenstein 判别法成立，\(f\) 在 \(\mathbb{Q}[x]\) 不可约。</p>
+<p>\[
+\Phi_p(x + 1) = \frac{(x + 1)^p - 1}{x} = \frac{1}{x} \sum_{k=1}^p \binom{p}{k} x^k = \binom{p}{p} x^{p-1} + \binom{p}{p-1} x^{p-2} + \cdots + \binom{p}{1}.
+\]</p>
 
-<p><strong>例。</strong>圆分多项式 \(\Phi_p(x) = x^{p-1} + x^{p-2} + \cdots + 1\)（\(p\) 素）。所有系数为 1，直接看 Eisenstein 不适用。<em>替换</em> \(x \mapsto x + 1\)：\(\Phi_p(x + 1) = \frac{(x+1)^p - 1}{x} = x^{p-1} + \binom{p}{p-1} x^{p-2} + \cdots + \binom{p}{1}\)，各非首项系数为 \(\binom{p}{k}\)（\(1 \le k \le p-1\)），都被 \(p\) 整除；常数项 \(\binom{p}{1} = p\) 不被 \(p^2\) 整除。Eisenstein 成立，\(\Phi_p(x+1)\) 不可约，所以 \(\Phi_p(x)\) 也不可约——一条在<a href="ch20.html">第 20 章</a> Galois 理论中反复用到的关键事实。</p>
+<p>首项 \(\binom{p}{p} = 1\) 不被 \(p\) 整除；其它系数 \(\binom{p}{k}\)（\(1 \le k \le p-1\)）都被 \(p\) 整除（13.4 节"freshman's dream" 用过）；常数项 \(\binom{p}{1} = p\) 不被 \(p^2\) 整除。Eisenstein 适用——\(\Phi_p(x+1)\) 不可约，故 \(\Phi_p(x)\) 不可约。</p>
 
-<p>本章把"主理想环 \(\Rightarrow\) 唯一分解整环"这条主线讲完，并把 \(\mathbb{Z}\) 与 \(k[x]\) 的"算术"放进同一个抽象框架。下一章我们专攻 \(k[x]\) 这条最常用的 PID，把内部结构（除法算法、根的几何、不可约判别）讲透；然后看多元 \(k[x_1, \ldots, x_n]\) 为什么不再是 PID，但仍是 UFD。<a href="ch17.html">第 17 章</a>再把 PID 的力量推到模上——PID 上有限生成模的结构定理把"有限交换群分类"（<a href="ch8.html">第 8 章</a>）和"Jordan 标准型"作为同一定理的两面。</p>
+<p>这个不可约性是<em>Galois 理论</em> 中证"\(\mathbb{Q}(\zeta_p) / \mathbb{Q}\)" 这条扩张的次数等于 \(p - 1\) 的关键。这条事实让"Gauss 19 岁证正 17 边形可作图" 成为可能——它需要知道 \(\Phi_{17}\) 不可约，从而 \([\mathbb{Q}(\zeta_{17}) : \mathbb{Q}] = 16 = 2^4\)。</p>
+
+<p><strong>例 3：</strong> \(f(x) = x^p - 2\)（\(p\) 素）。Eisenstein 用 \(p = 2\)：首项 1 不被 2 整除，其它系数 0 都被 2 整除，常数项 \(-2\) 不被 \(4\) 整除。不可约。</p>
+
+<p>这条让你"<em>把 \(\sqrt[p]{2}\) 加到 \(\mathbb{Q}\) 上得到的扩张次数 = \(p\)</em>" 立即可见——是 Galois 理论中标准例子。</p>
+
+<h2 id="sec14-8">14.8 这一章给你的反射动作</h2>
+
+<p>读完这一章你应该有：</p>
+
+<ul>
+  <li>看到环要问"<em>是不是 PID？是不是 UFD？</em>"——这两条决定它能否做"唯一分解"，决定你能否谈"<em>素分解</em>"。</li>
+  <li>看到"<em>每个理想都主</em>"，立即想"PID \(\Rightarrow\) 唯一分解"——这是 \(\mathbb{Z}\) 的算术基本定理的高级解释。</li>
+  <li>看到"<em>不可约 vs 素</em>"，立即记得它们在 PID 里重合、一般环里不重合。</li>
+  <li>要证 \(\mathbb{Z}[x]\) 中多项式不可约，第一招试 Eisenstein。</li>
+</ul>
+
+<p>本章核心层级图（一定要刻在脑里）：</p>
+
+<p>\[
+\text{域} \subsetneq \text{欧氏整环} \subsetneq \text{PID} \subsetneq \text{UFD} \subsetneq \text{整环}.
+\]</p>
+
+<ul>
+  <li><em>域</em>：\(\mathbb{Q}, \mathbb{R}, \mathbb{C}, \mathbb{F}_p\)。</li>
+  <li><em>欧氏整环</em>：\(\mathbb{Z}, k[x], \mathbb{Z}[i]\)。它们都是 PID。</li>
+  <li><em>PID 但非欧氏</em>：\(\mathbb{Z}[(1 + \sqrt{-19})/2]\)（罕见）。</li>
+  <li><em>UFD 非 PID</em>：\(\mathbb{Z}[x], k[x_1, x_2], k[x_1, \ldots, x_n]\)（\(n \ge 2\)）。</li>
+  <li><em>整环非 UFD</em>：\(\mathbb{Z}[\sqrt{-5}]\)（"6 = 2·3 = (1+√-5)(1-√-5)"）。</li>
+</ul>
+
+<p>这五层每一层都有它的地标例子。考试碰到任何整环你应该能立即把它放进对应层。</p>
+
+<p>下一章我们正面研究<em>多项式环</em>——一元 \(k[x]\) 与多元 \(k[x_1, \ldots, x_n]\) 的差别从这一章已经看到，下一章把它说细：一元有除法算法 + PID + 因子定理 + 不可约多项式判别（Eisenstein 完整证明），多元只有 UFD（Gauss 引理）+ Hilbert 基定理。这条章节是<a href="ch18.html">域扩张</a> 的直接铺路——\(k(\alpha) = k[x]/(\text{minimal poly of } \alpha)\) 这条核心同构靠的就是 \(k[x]\) 的 PID 性质。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 整环、域、商域</a><a href="ch15.html">下一章 · 第 15 章 多项式环 →</a></nav>
 </main>
 </body>
 </html>
+</content>
+</invoke>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 21 章 Galois 理论基本定理 — 普林斯顿抽象代数读本</title>
+<title>第 21 章 Galois 主定理 — 普林斯顿抽象代数读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -33,249 +33,318 @@
 <body>
 <main>
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 分裂域与正规扩张</a><a href="ch22.html">下一章 · 第 22 章 应用 Galois →</a></nav>
-<h1 id="ch21">第 21 章 Galois 理论基本定理</h1>
+<h1 id="ch21">第 21 章 Galois 主定理</h1>
 
-<p>这是抽象代数最深的结构定理。它说："Galois 扩张 \(K/F\) 的中间域"和"Galois 群 \(\text{Gal}(K/F)\) 的子群"<em>反向一一对应</em>。具体说，给定 Galois 扩张 \(K/F\)，每个介于 \(F\) 与 \(K\) 之间的中间域 \(M\) 对应一个子群 \(\text{Gal}(K/M) \le \text{Gal}(K/F)\)；反之每个子群 \(H\) 对应一个不动域 \(\text{Fix}(H)\)；两者互为逆映射。</p>
+<p>请你拿铅笔，准备做一道数数题。下面会出现两份清单：一份关于<em>子域</em>，一份关于<em>子群</em>。我让你把两份都数一遍，得到的两个数<em>会相等</em>。然后你会问"为什么"——答案就是 Galois 主定理。</p>
 
-<p>这种"几何 / 代数对应"在 19 世纪让 Galois 把"五次以上方程没有求根公式"这个困扰了数学家三百年的难题<em>完整解决</em>。它的力量在于：把"找中间域"这种连续型几何问题翻译成"找子群"这种<em>有限离散</em>问题。一个 \(n\) 阶群的子群只有有限多个，可以用 Lagrange + Sylow 系统列出来——你立刻看到 \(K\) 与 \(F\) 之间所有中间域的完整图谱。</p>
+<h2 id="sec21-1">21.1 一个让你数到 5-5 的小实验</h2>
 
-<p>本章把 Galois 群的定义、计算、不动域、主定理及其证明思路统统讲清，并用三个核心例子让你看到对应是<em>怎么</em>具体工作的。<a href="ch22.html">下一章</a>会用这套机器解决尺规作图与五次方程不可解。</p>
-
-<ul>
-  <li>Galois 扩张：有限正规可分；自动 \([K:F] = |\text{Aut}(K/F)|\)。</li>
-  <li>Galois 群 \(\text{Gal}(K/F)\) 的定义与基本性质。</li>
-  <li>三个标志性例子：\(\mathbb{C}/\mathbb{R}\)、\(\mathbb{Q}(\sqrt 2)/\mathbb{Q}\)、\(\mathbb{Q}(\sqrt 2, \sqrt 3)/\mathbb{Q}\)。</li>
-  <li>分圆扩张：\(\text{Gal}(\mathbb{Q}(\zeta_p)/\mathbb{Q}) \cong (\mathbb{Z}/p)^*\)。</li>
-  <li>不动域 \(\text{Fix}(H)\) 的定义与基本事实。</li>
-  <li>Galois 主定理（完整陈述）。</li>
-  <li>主定理的证明结构——为什么 \(\text{Fix}\) 与 \(\text{Gal}\) 互为逆。</li>
-  <li>应用：用主定理列出 \(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 的所有中间域。</li>
-</ul>
-
-<h2 id="sec21-1">21.1 Galois 扩张与 \([K:F] = |\text{Aut}(K/F)|\)</h2>
-
-<p>把<a href="ch20.html">第 20 章</a>的两个条件——正规性与可分性——合在一起，就得到本章的核心对象。</p>
-
-<p><strong>定义。</strong>有限扩张 \(K/F\) 称为<strong>Galois 扩张</strong>，如果它既<em>正规</em>又<em>可分</em>。等价地（由<a href="ch20.html">第 20 章</a> 20.5 节）：\(K\) 是 \(F\) 上某个<em>可分</em>多项式的分裂域。</p>
-
-<p>在特征 0（如 \(\mathbb{Q}\)）上，"可分"自动满足，所以 Galois 扩张就是"分裂域扩张"。这是为什么本章的所有例子都来自 \(\mathbb{Q}\)。</p>
-
-<p>记 \(\text{Aut}(K/F) = \{\sigma : K \to K \mid \sigma \text{ 是域同构}, \sigma|_F = \text{id}\}\) 为 \(K\) 在合成下的"\(F\)-自同构群"。它是一个群（自同构合成 + 求逆）。</p>
-
-<p><strong>定理（基本恒等式）。</strong>设 \(K/F\) 是有限扩张。则</p>
+<p>看域扩张</p>
 
 <p>\[
-|\text{Aut}(K/F)| \le [K : F],
+K := \mathbb{Q}(\sqrt 2, \sqrt 3) = \{a + b \sqrt 2 + c \sqrt 3 + d \sqrt 6 : a, b, c, d \in \mathbb{Q}\}.
 \]</p>
 
-<p>等号成立 \(\Leftrightarrow K/F\) 是 Galois 扩张：</p>
+<p>这是 \(\mathbb{Q}\) 的 4 维扩张：\(\{1, \sqrt 2, \sqrt 3, \sqrt 6\}\) 是它在 \(\mathbb{Q}\) 上的一组基。\(\sqrt 6 = \sqrt 2 \cdot \sqrt 3\)，所以 4 维不奇怪——你也可以验证 \([\mathbb{Q}(\sqrt 2, \sqrt 3) : \mathbb{Q}] = [\mathbb{Q}(\sqrt 2, \sqrt 3) : \mathbb{Q}(\sqrt 2)] \cdot [\mathbb{Q}(\sqrt 2) : \mathbb{Q}] = 2 \cdot 2 = 4\)（因为 \(\sqrt 3\) 在 \(\mathbb{Q}(\sqrt 2)\) 上仍 2 次：\(\sqrt 3 \notin \mathbb{Q}(\sqrt 2)\) 因为 \(\mathbb{Q}(\sqrt 2) \cap \mathbb{R}^+\) 上正元素都是 \((a + b \sqrt 2)^2 = a^2 + 2 b^2 + 2 ab \sqrt 2\) 形式，等于 3 强迫 \(ab = 0\)，然后 \(a = 0\) 给 \(2 b^2 = 3\) 无理；\(b = 0\) 给 \(a^2 = 3\) 无理）。</p>
 
-<p>\[
-\boxed{\ K/F \text{ Galois}\ \Leftrightarrow\ |\text{Aut}(K/F)| = [K:F].\ }
-\]</p>
-
-<p>证明思路：上界来自<a href="ch20.html">第 20 章</a>同构延拓引理——任何 \(F\)-自同构 \(\sigma\) 完全由它在生成元 \(\alpha_i\) 上的取值决定，\(\sigma(\alpha_i)\) 必须是 \(\alpha_i\) 的最小多项式 \(p_i\) 在 \(K\) 中的另一个根，所以候选数最多是 \(\prod \deg p_i\) 受 \([K : F]\) 控制。等号当且仅当每个 \(p_i\) 在 \(K\) 中"满根分裂"（\(\Rightarrow\) 正规）且"无重根"（\(\Rightarrow\) 可分）。详细论证用 Artin 引理（21.7 节再回到这一点）。</p>
-
-<p>这条恒等式是 Galois 理论的入口——它把"扩张次数"这个<em>线性代数量</em>与"自同构数"这个<em>群论量</em>挂上了钩。一旦 \(K/F\) 是 Galois，整个故事就铺开了。</p>
-
-<h2 id="sec21-2">21.2 Galois 群的定义</h2>
-
-<p><strong>定义。</strong>设 \(K/F\) 是 Galois 扩张。它的<strong>Galois 群</strong>是</p>
-
-<p>\[
-\text{Gal}(K/F) := \text{Aut}(K/F) = \{\sigma : K \xrightarrow{\sim} K \mid \sigma|_F = \text{id}\}.
-\]</p>
-
-<p>群运算是函数合成。由 21.1 节，\(|\text{Gal}(K/F)| = [K : F]\)。</p>
-
-<p>"Galois 自同构 \(\sigma\) 怎么作用"的几何图景：\(K\) 是 \(F\) 上某分裂域，\(\sigma\) 把 \(F\) 留在原地、把 \(K\) 中的元素重新排列——但<em>必须把根送到根</em>。具体说，如果 \(\alpha \in K\) 是 \(F\) 上某不可约 \(p \in F[x]\) 的根，那 \(\sigma(\alpha)\) 必须也是 \(p\) 的根（因为 \(p(\sigma(\alpha)) = \sigma(p(\alpha)) = \sigma(0) = 0\)，第二步用了 \(\sigma\) 保 \(F\) 中系数）。</p>
-
-<p>\[
-\boxed{\ \sigma \in \text{Gal}(K/F)\ \Rightarrow\ \forall \alpha \in K,\ \sigma(\alpha) \text{ 与 } \alpha \text{ 同满足同一最小多项式}.\ }
-\]</p>
-
-<p>这条原理叫"<strong>Galois 自同构置换共轭根</strong>"——它把 \(K/F\) 上的对称完全归结为"\(F\) 上不可约多项式的根之间的置换"。这是为什么 Galois 群本质上是一个置换群。</p>
-
-<p>更精确：取 \(K\) 的某个 \(F\)-生成集 \(\{\alpha_1, \ldots, \alpha_n\}\)（可以是单一生成元——本原元定理保证 \(K = F(\theta)\) 对某 \(\theta\)，但暂不需要）。\(\sigma\) 由 \(\sigma(\alpha_i)\) 完全决定；每个 \(\sigma(\alpha_i)\) 必须是 \(\alpha_i\) 在 \(F\) 上的某个共轭根。所以 \(\text{Gal}(K/F)\) 嵌入到"根的置换"群里——具体怎么嵌入由这些根之间的代数关系决定。</p>
-
-<h2 id="sec21-3">21.3 例 1：\(\text{Gal}(\mathbb{C}/\mathbb{R}) \cong \mathbb{Z}/2\)</h2>
-
-<p>\(\mathbb{C}/\mathbb{R}\) 是 Galois 扩张：\(\mathbb{C} = \mathbb{R}(i)\) 是 \(x^2 + 1\) 的分裂域，特征 0 自动可分。次数 \([\mathbb{C} : \mathbb{R}] = 2\)，所以 \(|\text{Gal}(\mathbb{C}/\mathbb{R})| = 2\)。</p>
-
-<p>那两个自同构是什么？任何 \(\sigma \in \text{Gal}(\mathbb{C}/\mathbb{R})\) 必须把 \(i\) 送到 \(x^2 + 1\) 的某根，即 \(\pm i\)。两种选择：</p>
-
-<ul>
-  <li>\(\sigma(i) = i\)：\(\sigma\) 是恒等映射 \(\text{id}\)。</li>
-  <li>\(\sigma(i) = -i\)：\(\sigma\) 是<em>复共轭</em> \(z \mapsto \bar z\)。</li>
-</ul>
-
-<p>验证两者都是良定义的域自同构（线性 + 乘法保 + 保 \(\mathbb{R}\)）。所以</p>
-
-<p>\[
-\text{Gal}(\mathbb{C}/\mathbb{R}) = \{\text{id}, \text{共轭}\} \cong \mathbb{Z}/2.
-\]</p>
-
-<p>这个例子虽然小但极端重要——它说<em>复共轭就是 \(\mathbb{R}\) 上的全部 Galois 对称</em>。<a href="../复分析/index.html">复分析</a>里反复出现的"实部 = \((z + \bar z)/2\)"、"模平方 = \(z \bar z\)"、"实多项式的复根成对出现"，背后都是这个 2 阶 Galois 群在起作用。</p>
-
-<h2 id="sec21-4">21.4 例 2：\(\mathbb{Q}\) 上的二次扩张与双二次扩张</h2>
-
-<p><strong>例 2a：\(\text{Gal}(\mathbb{Q}(\sqrt 2)/\mathbb{Q}) \cong \mathbb{Z}/2\)。</strong></p>
-
-<p>\([\mathbb{Q}(\sqrt 2) : \mathbb{Q}] = 2\) 已计算。\(\sqrt 2\) 的最小多项式 \(x^2 - 2\) 两根 \(\pm \sqrt 2\) 都在 \(\mathbb{Q}(\sqrt 2)\) 里，所以正规——加上特征 0 可分，是 Galois。</p>
-
-<p>两个自同构：\(\text{id}\)；以及"实数共轭" \(\tau : a + b\sqrt 2 \mapsto a - b\sqrt 2\)。验证 \(\tau\) 是域自同构：\(\tau((a + b\sqrt 2)(c + d\sqrt 2)) = \tau(ac + 2bd + (ad + bc)\sqrt 2) = ac + 2bd - (ad + bc)\sqrt 2 = (a - b\sqrt 2)(c - d\sqrt 2) = \tau(a + b\sqrt 2) \tau(c + d\sqrt 2)\)。 \(\tau^2 = \text{id}\)。</p>
-
-<p>所以 \(\text{Gal}(\mathbb{Q}(\sqrt 2)/\mathbb{Q}) = \{\text{id}, \tau\} \cong \mathbb{Z}/2\)。和 21.3 节几乎一模一样的故事。</p>
-
-<p><strong>例 2b：\(\text{Gal}(\mathbb{Q}(\sqrt 2, \sqrt 3)/\mathbb{Q}) \cong \mathbb{Z}/2 \times \mathbb{Z}/2\)（Klein 4 群）。</strong></p>
-
-<p>这是 Galois 群第一次"具备结构"的例子。\([\mathbb{Q}(\sqrt 2, \sqrt 3) : \mathbb{Q}] = 4\)：\(\mathbb{Q}(\sqrt 2)\) 是 2 次扩张，再加 \(\sqrt 3\) 得到 \(\mathbb{Q}(\sqrt 2)(\sqrt 3)\)，\(\sqrt 3\) 在 \(\mathbb{Q}(\sqrt 2)\) 上的最小多项式仍是 \(x^2 - 3\)（要证 \(\sqrt 3 \notin \mathbb{Q}(\sqrt 2)\)：若 \(\sqrt 3 = a + b \sqrt 2\) 平方 \(\Rightarrow 3 = a^2 + 2b^2 + 2ab \sqrt 2\)，必 \(ab = 0\)；\(a = 0 \Rightarrow 2b^2 = 3\)、\(b = 0 \Rightarrow a^2 = 3\)，都不可能在 \(\mathbb{Q}\) 中）。所以 \([\mathbb{Q}(\sqrt 2, \sqrt 3) : \mathbb{Q}(\sqrt 2)] = 2\)，乘起来 \(= 4\)。</p>
-
-<p>\(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 是 \((x^2 - 2)(x^2 - 3)\) 的分裂域 \(\Rightarrow\) Galois。\(|\text{Gal}| = 4\)。</p>
-
-<p>4 个自同构由 \(\sigma(\sqrt 2), \sigma(\sqrt 3)\) 的取值决定。\(\sigma(\sqrt 2) \in \{\pm \sqrt 2\}\)、\(\sigma(\sqrt 3) \in \{\pm \sqrt 3\}\)，2 × 2 = 4 种组合，全部都是良定义的自同构。列表：</p>
-
-<ul>
-  <li>\(\text{id}\)：\(\sqrt 2 \mapsto \sqrt 2\), \(\sqrt 3 \mapsto \sqrt 3\)；</li>
-  <li>\(\sigma\)：\(\sqrt 2 \mapsto -\sqrt 2\), \(\sqrt 3 \mapsto \sqrt 3\)；</li>
-  <li>\(\tau\)：\(\sqrt 2 \mapsto \sqrt 2\), \(\sqrt 3 \mapsto -\sqrt 3\)；</li>
-  <li>\(\sigma \tau\)：\(\sqrt 2 \mapsto -\sqrt 2\), \(\sqrt 3 \mapsto -\sqrt 3\)。</li>
-</ul>
-
-<p>\(\sigma^2 = \tau^2 = (\sigma\tau)^2 = \text{id}\)，\(\sigma \tau = \tau \sigma\)。这是 Klein 4 群 \(V = \mathbb{Z}/2 \times \mathbb{Z}/2\)。</p>
-
-<p>这个 4 阶 Galois 群有<em>三</em>个 2 阶子群：\(\{\text{id}, \sigma\}\)、\(\{\text{id}, \tau\}\)、\(\{\text{id}, \sigma\tau\}\)，外加平凡子群 \(\{\text{id}\}\) 与全群本身——共 5 个子群。Galois 主定理预言这对应 5 个中间域。21.8 节会把它们一个个列出来。</p>
-
-<h2 id="sec21-5">21.5 例 3：分圆扩张 \(\text{Gal}(\mathbb{Q}(\zeta_p)/\mathbb{Q}) \cong (\mathbb{Z}/p)^*\)</h2>
-
-<p>取奇素数 \(p\)，\(\zeta_p = e^{2\pi i / p}\) 是 \(p\) 次本原单位根。多项式 \(x^p - 1 = (x - 1)(x^{p-1} + x^{p-2} + \cdots + 1)\)，第二因子叫<strong>第 \(p\) 个分圆多项式</strong>记作 \(\Phi_p(x)\)，它在 \(\mathbb{Q}\) 上不可约（用 Eisenstein 在 \(\Phi_p(x + 1)\) 上）。\(\zeta_p\) 是 \(\Phi_p\) 的根，所以 \([\mathbb{Q}(\zeta_p) : \mathbb{Q}] = \deg \Phi_p = p - 1\)。</p>
-
-<p>\(\Phi_p\) 的全部根是 \(\zeta_p, \zeta_p^2, \ldots, \zeta_p^{p-1}\)（即所有 \(p\) 次本原单位根），都是 \(\zeta_p\) 的幂，所以都在 \(\mathbb{Q}(\zeta_p)\) 里 \(\Rightarrow\) 正规 \(\Rightarrow\) Galois 扩张。\(|\text{Gal}| = p - 1\)。</p>
-
-<p>每个 \(\sigma \in \text{Gal}\) 由 \(\sigma(\zeta_p)\) 决定，且 \(\sigma(\zeta_p)\) 必须是 \(\Phi_p\) 的根 = 某 \(\zeta_p^k\)，\(k \in \{1, 2, \ldots, p - 1\}\)。记 \(\sigma_k(\zeta_p) = \zeta_p^k\)。验证 \(\sigma_k\) 是良定义自同构（\(\zeta_p\) 在 \(\mathbb{Q}\) 上由 \(\Phi_p = 0\) 完全决定，把它送到另一个根给出域同构）。</p>
-
-<p>合成法则：\(\sigma_k \circ \sigma_l(\zeta_p) = \sigma_k(\zeta_p^l) = (\sigma_k(\zeta_p))^l = \zeta_p^{kl}\)，所以 \(\sigma_k \sigma_l = \sigma_{kl}\)（指标乘法 mod \(p\)）。所以</p>
-
-<p>\[
-\text{Gal}(\mathbb{Q}(\zeta_p)/\mathbb{Q}) \cong (\mathbb{Z}/p)^* \cong \mathbb{Z}/(p - 1)
-\]</p>
-
-<p>（\((\mathbb{Z}/p)^*\) 是循环群——这是<a href="ch7.html">第 7 章</a>的结论：素数模乘法群循环）。</p>
-
-<p>这个例子结构最透——Galois 群<em>就是</em>\((\mathbb{Z}/p)^*\)，它的子群对应循环群的子群（每个 \(d \mid p - 1\) 一个），相应中间域恰好是<a href="ch22.html">下一章</a> 22.5 节"正多边形作图"问题的关键。</p>
-
-<h2 id="sec21-6">21.6 不动域</h2>
-
-<p>Galois 主定理需要"群 \(\to\) 域"方向的对应。这就是不动域。</p>
-
-<p><strong>定义。</strong>设 \(H \le \text{Aut}(K/F)\) 是子群（或更一般，\(K\) 的任意自同构子群）。它的<strong>不动域</strong>是</p>
-
-<p>\[
-\text{Fix}(H) := \{\alpha \in K : \sigma(\alpha) = \alpha,\ \forall \sigma \in H\}.
-\]</p>
-
-<p>这是 \(K\) 的子域（\(\text{id} \in H\) 让 \(\text{Fix}(H) \ne \emptyset\)；\(\sigma\) 是同构 \(\Rightarrow\) 闭于加减乘除）。它包含 \(F\)（因为 \(\sigma|_F = \text{id}\)）。</p>
-
-<p>关键事实（<strong>Artin 引理</strong>）：</p>
-
-<p>\[
-\boxed{\ H \text{ 有限子群} \Rightarrow [K : \text{Fix}(H)] = |H|.\ }
-\]</p>
-
-<p>这条引理是 Galois 主定理的<em>核心</em>引擎。它的意思是："不动域的'尺寸'恰好等于群的'尺寸'"——你不能有更多自同构去固定一个更大的子域。证明用线性代数 + 鸽笼原理（详见 Artin《Galois Theory》）。</p>
-
-<p>结合 21.1 节的恒等式 \(|\text{Gal}(K/L)| = [K : L]\) （\(L = \text{Fix}(H)\) 上 \(K\) 是 Galois——因为继承正规可分），我们得到</p>
-
-<p>\[
-|\text{Gal}(K/\text{Fix}(H))| = [K : \text{Fix}(H)] = |H|.
-\]</p>
-
-<p>而 \(H \subset \text{Gal}(K/\text{Fix}(H))\)（每个 \(H\) 中元素显然固定 \(\text{Fix}(H)\)），尺寸相等 \(\Rightarrow H = \text{Gal}(K/\text{Fix}(H))\)。这就是"\(H \mapsto \text{Fix}(H) \mapsto \text{Gal}(K/\text{Fix}(H))\) 复合 = \(H\)"的核心步骤。</p>
-
-<p>类似的"另一边"恒等式 \(\text{Fix}(\text{Gal}(K/M)) = M\)（对每个中间域 \(M\)）由 \(K/M\) Galois 直接给：\(|\text{Gal}(K/M)| = [K : M]\) \(\Rightarrow\) \(\text{Fix}(\text{Gal}(K/M))\) 也满足 \([K : \text{Fix}] = [K : M]\)，再加 \(\text{Fix} \supset M\) 给等。</p>
-
-<p>\[
-\boxed{\ \text{Fix}(\text{Gal}(K/F)) = F \quad \text{（} K/F \text{ Galois 时）}.\ }
-\]</p>
-
-<h2 id="sec21-7">21.7 Galois 主定理</h2>
-
-<p>把所有上述材料合起来。</p>
-
-<p><strong>定理（Galois 主定理）。</strong>设 \(K/F\) 是有限 Galois 扩张，\(G = \text{Gal}(K/F)\)。则下面是事实清单：</p>
-
-<p><strong>(GFT1) 反序对应。</strong>映射</p>
-
-<p>\[
-\begin{aligned}
-\Phi : \{F \subset M \subset K\} &\longrightarrow \{H \le G\}, \quad M \mapsto \text{Gal}(K/M); \\
-\Psi : \{H \le G\} &\longrightarrow \{F \subset M \subset K\}, \quad H \mapsto \text{Fix}(H);
-\end{aligned}
-\]</p>
-
-<p>互为反函数（\(\Phi \Psi = \text{id}\)，\(\Psi \Phi = \text{id}\)），且都是<em>反序</em>的：</p>
-
-<p>\[
-\boxed{\ M_1 \subset M_2\ \Leftrightarrow\ \text{Gal}(K/M_1) \supset \text{Gal}(K/M_2).\ }
-\]</p>
-
-<p><strong>(GFT2) 次数与指标。</strong>对每个中间域 \(M\)：</p>
-
-<p>\[
-[K : M] = |\text{Gal}(K/M)|, \qquad [M : F] = [G : \text{Gal}(K/M)].
-\]</p>
-
-<p><strong>(GFT3) 正规性 \(\Leftrightarrow\) 正规子群。</strong>中间域 \(M\) 满足 \(M/F\) 正规 \(\Leftrightarrow \text{Gal}(K/M) \trianglelefteq G\)（正规子群）。在这种情形：</p>
-
-<p>\[
-\boxed{\ \text{Gal}(M/F) \cong G / \text{Gal}(K/M).\ }
-\]</p>
-
-<p>这条主定理把"中间域的整个格子"和"Galois 群子群的整个格子"<em>反序同构</em>地对接起来。它是抽象代数最深的结构定理，没有之一。</p>
-
-<p>证明思路（不写每步严格证明，但要说清"为什么互为逆"）：</p>
+<p><strong>清单 1：\(K\) 与 \(\mathbb{Q}\) 之间的<em>所有</em>中间域。</strong>"中间域" 指域 \(L\) 满足 \(\mathbb{Q} \subseteq L \subseteq K\)。我数一遍：</p>
 
 <ol>
-  <li>(GFT1) 互为逆。\(\Phi \Psi(H) = \text{Gal}(K/\text{Fix}(H))\)，由 21.6 节 Artin 引理 \(= H\)。\(\Psi \Phi(M) = \text{Fix}(\text{Gal}(K/M))\)，由 \(K/M\) 是 Galois \(\Rightarrow\) \(\text{Fix}(\text{Gal}(K/M)) = M\)（21.6 节末尾）。反序性显然——更大子群固定更少元素。</li>
-  <li>(GFT2) 次数。\([K : M] = |\text{Gal}(K/M)|\) 是 21.1 节恒等式。\([M : F] = [K : F]/[K : M] = |G|/|\text{Gal}(K/M)| = [G : \text{Gal}(K/M)]\)（Lagrange 指标）。</li>
-  <li>(GFT3) 正规性 \(\Leftrightarrow\) 正规子群。\(M/F\) 正规 \(\Leftrightarrow\) 每个 \(\sigma \in G\) 把 \(M\) 映到自身（\(\sigma\) 在 \(M\) 中的像满足同样最小多项式，\(M/F\) 正规让根全在 \(M\) 里 \(\Rightarrow \sigma(M) \subset M\)；反之类似）\(\Leftrightarrow\) 对每个 \(\sigma \in G\)，\(\sigma \text{Gal}(K/M) \sigma^{-1} = \text{Gal}(K/\sigma(M)) = \text{Gal}(K/M) \Leftrightarrow \text{Gal}(K/M)\) 正规子群。商群同构通过限制映 \(G \to \text{Gal}(M/F)\)，\(\sigma \mapsto \sigma|_M\)（良定义于 \(M/F\) 正规）；核 = \(\text{Gal}(K/M)\)；满射由 21.1 让 \([G : \text{Gal}(K/M)] = [M : F] = |\text{Gal}(M/F)|\)。</li>
+  <li>\(\mathbb{Q}\) 自己（最小的中间域，1 维）；</li>
+  <li>\(\mathbb{Q}(\sqrt 2)\)（2 维，含 \(\sqrt 2\) 不含 \(\sqrt 3\)）；</li>
+  <li>\(\mathbb{Q}(\sqrt 3)\)（2 维，含 \(\sqrt 3\) 不含 \(\sqrt 2\)）；</li>
+  <li>\(\mathbb{Q}(\sqrt 6)\)（2 维，含 \(\sqrt 6\) 但<em>不</em> 含 \(\sqrt 2\) 或 \(\sqrt 3\)——因为 \((a + b \sqrt 6)^2 = a^2 + 6 b^2 + 2 ab \sqrt 6\) 等于 2 强迫 \(ab = 0\) 然后无解）；</li>
+  <li>\(K\) 自己（最大的中间域，4 维）。</li>
 </ol>
 
-<p>整个证明的"心脏"是 21.6 节 Artin 引理——"群尺寸 = 不动域指标"。一旦有了这条，所有别的都几乎自动。</p>
+<p>共 5 个。这是<em>全部</em>——你可能会试 \(\mathbb{Q}(\sqrt 2 + \sqrt 3)\)，但那个数的最小多项式 \(x^4 - 10 x^2 + 1\) 是 4 次（你可以算），所以 \([\mathbb{Q}(\sqrt 2 + \sqrt 3) : \mathbb{Q}] = 4\)，等于 \(K\) 全维——\(\mathbb{Q}(\sqrt 2 + \sqrt 3) = K\)。其它你能想的"<em>新</em>" 子域比如 \(\mathbb{Q}(\sqrt 2 + 2)\) 都和上面 5 个之一相同（这一个等于 \(\mathbb{Q}(\sqrt 2)\)）。</p>
 
-<h2 id="sec21-8">21.8 应用：列出 \(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 的所有中间域</h2>
+<p>所以中间域<em>恰好</em> 5 个。</p>
 
-<p>用 21.4 节的 Klein 4 群 Galois 群把这件事做透。\(G = \text{Gal}(\mathbb{Q}(\sqrt 2, \sqrt 3)/\mathbb{Q}) = \{e, \sigma, \tau, \sigma\tau\} \cong V_4\)。</p>
-
-<p>\(V_4\) 的子群一共 5 个：\(\{e\}, \{e, \sigma\}, \{e, \tau\}, \{e, \sigma\tau\}, V_4\)。由主定理，中间域也恰好 5 个，对应表：</p>
+<p><strong>清单 2：\(K\) 在 \(\mathbb{Q}\) 上的全部"自同构"。</strong>"自同构" 指域同构 \(\sigma : K \to K\) 满足 \(\sigma(q) = q\) 对所有 \(q \in \mathbb{Q}\)。这种 \(\sigma\) 由它在生成元 \(\sqrt 2, \sqrt 3\) 上的值完全决定。\(\sigma\) 必须保持 \(\sqrt 2\) 的最小多项式 \(x^2 - 2\) 的根集合 \(\{\pm \sqrt 2\}\)（因为 \(\sigma(\sqrt 2)^2 = \sigma(\sqrt 2 \cdot \sqrt 2) = \sigma(2) = 2\)），所以 \(\sigma(\sqrt 2) \in \{+\sqrt 2, -\sqrt 2\}\)；同理 \(\sigma(\sqrt 3) \in \{+\sqrt 3, -\sqrt 3\}\)。任意组合都可以——给出 \(2 \times 2 = 4\) 个候选自同构（且它们都确实是自同构，因为 \(\sqrt 2, \sqrt 3\) 的选择互不冲突）：</p>
 
 <ul>
-  <li>子群 \(\{e\}\) \(\leftrightarrow\) 中间域 \(K = \mathbb{Q}(\sqrt 2, \sqrt 3)\)（最大）；</li>
-  <li>子群 \(\{e, \sigma\}\) \(\leftrightarrow\) \(\text{Fix}(\{e, \sigma\}) = ?\)；</li>
-  <li>子群 \(\{e, \tau\}\) \(\leftrightarrow\) \(\text{Fix}(\{e, \tau\}) = ?\)；</li>
-  <li>子群 \(\{e, \sigma\tau\}\) \(\leftrightarrow\) \(\text{Fix}(\{e, \sigma\tau\}) = ?\)；</li>
-  <li>子群 \(V_4\) \(\leftrightarrow\) \(\text{Fix}(V_4) = \mathbb{Q}\)（最小）。</li>
+  <li>\(\text{id}\)：\(\sqrt 2 \mapsto \sqrt 2\)，\(\sqrt 3 \mapsto \sqrt 3\)；</li>
+  <li>\(\sigma_2\)：\(\sqrt 2 \mapsto -\sqrt 2\)，\(\sqrt 3 \mapsto \sqrt 3\)；</li>
+  <li>\(\sigma_3\)：\(\sqrt 2 \mapsto \sqrt 2\)，\(\sqrt 3 \mapsto -\sqrt 3\)；</li>
+  <li>\(\sigma_2 \sigma_3 = \sigma_{2,3}\)：\(\sqrt 2 \mapsto -\sqrt 2\)，\(\sqrt 3 \mapsto -\sqrt 3\)。</li>
 </ul>
 
-<p>计算三个不动域。回忆 \(\sigma : \sqrt 2 \mapsto -\sqrt 2, \sqrt 3 \mapsto \sqrt 3\)；\(\tau : \sqrt 2 \mapsto \sqrt 2, \sqrt 3 \mapsto -\sqrt 3\)；\(\sigma\tau\) 反两个号。</p>
+<p>4 个自同构，每个 2 阶（\(\sigma^2 = \text{id}\)），互相可换——这是<em>群</em> \(\mathbb{Z}_2 \times \mathbb{Z}_2\)。称它为 \(G := \text{Gal}(K/\mathbb{Q})\)。</p>
 
-<p><strong>(a) \(\text{Fix}(\{e, \sigma\}) = \mathbb{Q}(\sqrt 3)\)。</strong>\(\sigma\) 不动 \(\Leftrightarrow\) 系数中的 \(\sqrt 2\) 系数为 0 \(\Rightarrow\) 元素形如 \(a + b \sqrt 3\)。</p>
+<p>现在数 \(G\) 的<em>子群</em>。共多少个？</p>
 
-<p><strong>(b) \(\text{Fix}(\{e, \tau\}) = \mathbb{Q}(\sqrt 2)\)。</strong>同理。</p>
+<ol>
+  <li>\(\{e\}\)（平凡子群，1 阶）；</li>
+  <li>\(\langle \sigma_2 \rangle = \{e, \sigma_2\}\)（2 阶）；</li>
+  <li>\(\langle \sigma_3 \rangle = \{e, \sigma_3\}\)（2 阶）；</li>
+  <li>\(\langle \sigma_{2,3} \rangle = \{e, \sigma_{2,3}\}\)（2 阶）；</li>
+  <li>\(G\) 自己（4 阶）。</li>
+</ol>
 
-<p><strong>(c) \(\text{Fix}(\{e, \sigma\tau\}) = \mathbb{Q}(\sqrt 6)\)。</strong>\(\sigma\tau(\sqrt 6) = \sigma\tau(\sqrt 2 \cdot \sqrt 3) = (-\sqrt 2)(-\sqrt 3) = \sqrt 6\)（不动），所以 \(\sqrt 6 \in \text{Fix}\)。\([\text{Fix} : \mathbb{Q}] = [G : \{e, \sigma\tau\}] = 2\)，所以 \(\text{Fix} = \mathbb{Q}(\sqrt 6)\)。</p>
+<p>共 5 个子群。</p>
 
-<p>所以中间域格子完整图是：</p>
+<p>请你停下来比一下：</p>
+
+<ul>
+  <li>5 个中间域 \(\mathbb{Q} \subseteq L \subseteq K\)；</li>
+  <li>5 个子群 \(\{e\} \subseteq H \subseteq G\)。</li>
+</ul>
+
+<p>5 = 5——这<em>不</em>是巧合。它是同一对集合之间存在<em>双射</em> 的迹象。本节稍后我们会精确给出这双射；现在先让你直觉地匹配：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">中间域 \(L\)</th><th style="padding: 0.3em 1em;">维 \([L:\mathbb{Q}]\)</th><th style="padding: 0.3em 1em;">"对应的" 子群 \(H\)</th><th style="padding: 0.3em 1em;">阶 \(|H|\)</th></tr>
+<tr><td>\(K\)</td><td>4</td><td>\(\{e\}\)</td><td>1</td></tr>
+<tr><td>\(\mathbb{Q}(\sqrt 2)\)</td><td>2</td><td>\(\langle \sigma_3 \rangle\)（不动 \(\sqrt 2\)）</td><td>2</td></tr>
+<tr><td>\(\mathbb{Q}(\sqrt 3)\)</td><td>2</td><td>\(\langle \sigma_2 \rangle\)（不动 \(\sqrt 3\)）</td><td>2</td></tr>
+<tr><td>\(\mathbb{Q}(\sqrt 6)\)</td><td>2</td><td>\(\langle \sigma_{2,3} \rangle\)（不动 \(\sqrt 6\)）</td><td>2</td></tr>
+<tr><td>\(\mathbb{Q}\)</td><td>1</td><td>\(G\)</td><td>4</td></tr>
+</table>
+
+<p>注意：</p>
+
+<ul>
+  <li>对应是<em>反序</em> 的——大子域 \(\leftrightarrow\) 小子群，小子域 \(\leftrightarrow\) 大子群。</li>
+  <li>维数和阶满足 \([L:\mathbb{Q}] \cdot |H| = [K:\mathbb{Q}] = 4\)，即 \([L:\mathbb{Q}] = [G:H]\)（指数）。</li>
+  <li>"对应" 的具体规则似乎是：子群 \(H\) ↔ "<em>被 \(H\) 全部固定的元素组成的子域</em>"。比如 \(\langle \sigma_3 \rangle = \{e, \sigma_3\}\)：\(\sigma_3\) 把 \(\sqrt 3\) 翻号但保 \(\sqrt 2\)，所以被 \(\sigma_3\) 固定的元素是不含 \(\sqrt 3\) 项的，即形如 \(a + b \sqrt 2\)——正是 \(\mathbb{Q}(\sqrt 2)\)。</li>
+</ul>
+
+<p>这三个观察就是<em>Galois 主定理</em> 的内容。下面把整个故事一般化、严格化、证清楚。</p>
+
+<h2 id="sec21-2">21.2 Galois 扩张：把"双射存在" 的扩张挑出来</h2>
+
+<p>不是<em>所有</em> 有限扩张都有 21.1 那样的整齐对应。比如 \(\mathbb{Q}(\sqrt[3]{2})/\mathbb{Q}\) 不正规（ch20.8），它的中间域和"自同构群" 之间对应是<em>残缺</em> 的——自同构只有 \(\{e\}\)（\(\sqrt[3]{2}\) 必须送到自己，因为 \(K\) 是实子域，另两个根复，没地方去），但中间域有 \(\mathbb{Q}\) 与 \(K\) 两个。1 个子群 vs 2 个中间域——双射不存在。</p>
+
+<p>所以"主定理对哪类扩张成立" 是个关键问题。答案：<em>正规 + 可分 + 有限</em>。</p>
+
+<p><strong>定义。</strong>有限域扩张 \(K/F\) 称为<strong>Galois 扩张</strong>，如果它<em>正规</em> 且<em>可分</em>。</p>
+
+<p>在特征 0 域上"可分" 自动（ch20.9），所以"\(K/\mathbb{Q}\) Galois" = "\(K/\mathbb{Q}\) 有限正规"。本课主要在 \(\mathbb{Q}\) 上工作，所以 Galois 扩张实际上 = 某个 \(f \in \mathbb{Q}[x]\) 的分裂域。</p>
+
+<p>Galois 扩张的关键定量性质：</p>
+
+<p><strong>定理。</strong>\(K/F\) 是 Galois 扩张 ⟺ \(|\text{Aut}(K/F)| = [K:F]\)。这里 \(\text{Aut}(K/F)\) 是 \(K\) 在 \(F\) 上的自同构群（\(\sigma : K \to K\) 域同构且 \(\sigma|_F = \text{id}\)）。</p>
+
+<p>"自同构数 = 扩张次数" 是 Galois 扩张的<em>定量标志</em>。比如 21.1 中 \(K = \mathbb{Q}(\sqrt 2, \sqrt 3)\)：\([K:\mathbb{Q}] = 4\)，自同构数 \(|G| = 4\)，确实 Galois。反之 \(\mathbb{Q}(\sqrt[3]{2})/\mathbb{Q}\)：\([K:\mathbb{Q}] = 3\)，自同构数 1，<em>不</em> Galois。</p>
+
+<p>这个定理的证明用 ch20.5 同构延拓引理：把 \(F\)-自同态 \(\sigma : K \to K\) 看成"延拓 \(\text{id}_F : F \to F\) 到 \(K\)" 的方式。每用一次"延拓到下一根" 的一步，可选根数 \(\le\) 该最小多项式根数 \(\le\) 该最小多项式次数；把所有步乘起来 \(\le [K:F]\)。等号成立 ⟺ 每步可选数 = 该次数 ⟺ 每个最小多项式分裂且无重根 ⟺ 正规 + 可分。详细证明展开太长，留作 21.7 节主定理证明的副产物。</p>
+
+<p>可惜 21.1 节我们一开始就玩了"先数自同构再宣布 Galois"——其实 \(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 是 \((x^2 - 2)(x^2 - 3) \in \mathbb{Q}[x]\) 的分裂域，所以正规；特征 0 自然可分；故 Galois。</p>
+
+<h2 id="sec21-3">21.3 Galois 群与基本性质</h2>
+
+<p><strong>定义。</strong>Galois 扩张 \(K/F\) 的<strong>Galois 群</strong> \(\text{Gal}(K/F)\) 是 \(\text{Aut}(K/F)\) 配合<em>函数合成</em> 作运算。</p>
+
+<p>它是个有限群，阶 \([K:F]\)。具体的 \(\sigma \in \text{Gal}(K/F)\) 长这样：把 \(K\) 看作有限维 \(F\)-向量空间，\(\sigma\) 是 \(F\)-线性变换；同时它保乘法（\(\sigma(ab) = \sigma(a)\sigma(b)\)），保 1。这两条加在一起非常严格——不是任意 \(F\)-线性变换都满足。</p>
+
+<p>Galois 群的<em>关键作用方式</em>：它在<em>多项式根集</em> 上作用。设 \(p \in F[x]\) 是 \(F\)-不可约，\(\alpha_1, \ldots, \alpha_n \in K\) 是 \(p\) 的根。任何 \(\sigma \in \text{Gal}(K/F)\) 把 \(\alpha_i\) 送到某个 \(\alpha_j\)——因为 \(\sigma(\alpha_i)\) 满足同一个 \(p\)（系数被 \(\sigma\) 不动），且 \(\sigma\) 是双射所以"送到根" 是根集到根集的双射。所以 Galois 群嵌入根集的置换群。这个观察是 ch22 五次方程不可解的核心工具。</p>
+
+<p>具体例 21.1：\(\text{Gal}(K/\mathbb{Q})\) 作用在 \(\{\sqrt 2, -\sqrt 2\}\) 上由 \(\sigma_2\) 翻号，作用在 \(\{\sqrt 3, -\sqrt 3\}\) 上由 \(\sigma_3\) 翻号——两个独立的 \(\mathbb{Z}_2\) 作用，群是 \(\mathbb{Z}_2 \times \mathbb{Z}_2\)。</p>
+
+<h2 id="sec21-4">21.4 两个标准例子</h2>
+
+<p><strong>例 1：\(\text{Gal}(\mathbb{C}/\mathbb{R}) = \mathbb{Z}_2\)。</strong>\(\mathbb{C}\) 是 \(\mathbb{R}\) 的 2 维扩张，是 \(x^2 + 1\) 的分裂域，所以正规可分（特征 0），是 Galois 扩张。Galois 群 2 阶。两个元素是 \(\text{id}\) 与<em>复共轭</em> \(\sigma : a + bi \mapsto a - bi\)。这就是 ch1 节末提到的"\(\mathbb{C}\) 在 \(\mathbb{R}\) 上的 Galois 群是 2 元素群"——历史上 Galois 理论的最简单非平凡例子。</p>
+
+<p><strong>例 2：\(\text{Gal}(\mathbb{Q}(\zeta_p)/\mathbb{Q}) = (\mathbb{Z}/p)^*\)。</strong>设 \(p\) 素数，\(\zeta_p := e^{2\pi i / p}\) 是<em>本原 \(p\) 次单位根</em>。\(\zeta_p\) 的最小多项式是<em>分圆多项式</em></p>
 
 <p>\[
-\mathbb{Q} \subset \mathbb{Q}(\sqrt 2),\ \mathbb{Q}(\sqrt 3),\ \mathbb{Q}(\sqrt 6) \subset \mathbb{Q}(\sqrt 2, \sqrt 3).
+\Phi_p(x) = x^{p-1} + x^{p-2} + \cdots + x + 1 = \frac{x^p - 1}{x - 1},
 \]</p>
 
-<p>三个中间二次域不可遗漏，也<em>不可</em>多——主定理保证一一对应。这种"完整列表"的能力是 Galois 理论最实用的一面。</p>
+<p>\(p - 1\) 次不可约（用 Eisenstein 在 \(\Phi_p(x+1)\) 上验证；这是经典练习）。\(\Phi_p\) 的根<em>全部</em> 是 \(\zeta_p^k\)，\(k = 1, \ldots, p-1\)（也就是<em>所有非平凡 \(p\) 次单位根</em>）。所以 \(\mathbb{Q}(\zeta_p)\) 由 \(\zeta_p\) 一个生成<em>且</em> 含 \(\Phi_p\) 全部根（其它 \(\zeta_p^k\) 是 \(\zeta_p\) 的幂），所以 \(\mathbb{Q}(\zeta_p)\) 是 \(\Phi_p\) 的分裂域，正规——Galois。</p>
 
-<p>顺便 (GFT3)：\(V_4\) 是 Abel 群，所有子群正规 \(\Rightarrow\) 所有中间域 \(M/\mathbb{Q}\) 正规 (对 \(\mathbb{Q}\))，相应商群 \(V_4 / H \cong \mathbb{Z}/2\) 给 \(\text{Gal}(M/\mathbb{Q}) \cong \mathbb{Z}/2\) ——和"\(M\) 是 \(\mathbb{Q}\) 上二次扩张" 直接吻合。一切自洽。</p>
+<p>\(\text{Gal}(\mathbb{Q}(\zeta_p)/\mathbb{Q})\) 的元素 \(\sigma\) 必把 \(\zeta_p\) 送到 \(\Phi_p\) 的某根 \(\zeta_p^k\)，\(k \in \{1, \ldots, p-1\}\)。每个这样的 \(k\) 都给出一个合法 \(\sigma_k : \zeta_p \mapsto \zeta_p^k\)（要验证 \(\sigma_k\) 真是域同构——这是 ch19 单根扩张同构的应用）。所以 Galois 群同构于 \((\mathbb{Z}/p)^* = \{1, 2, \ldots, p-1\}\) 在乘法下——一个 \(p - 1\) 阶<em>循环</em> 群（这是费马小定理的著名推论）。</p>
 
-<p>下一章把 Galois 主定理用到两个 19 世纪经典难题：(1) 用尺规能不能三等分任意角 / 倍立方 / 化圆为方？(2) 五次以上多项式方程能不能有"求根公式"？两个答案<em>都是不</em>，工具都是 Galois。这是本书的真正最高潮——把整套抽象代数机器用在一个能让外行也理解的问题上，给出完整答案。</p>
+<p>具体 \(p = 7\)：\((\mathbb{Z}/7)^* = \{1, 2, 3, 4, 5, 6\}\) 6 阶循环（生成元 3 或 5）。\(\mathbb{Q}(\zeta_7)/\mathbb{Q}\) 6 维，6 个自同构，对应 \(\zeta_7^k\) 的 6 种"重新选生成元" 方式。这个例子在 ch22 里讨论正 17 边形作图时会再出现——\(p = 17\) 时 \((\mathbb{Z}/17)^*\) 16 阶循环 = \(2^4\)，是 2 的幂，导致正 17 边形可作图。</p>
+
+<h2 id="sec21-5">21.5 不动域 \(\text{Fix}(H)\)</h2>
+
+<p>21.1 节我们注意到：每个子群 \(H\) 对应"被 \(H\) 全部不动的子域"。把这件事一般化命名。</p>
+
+<p><strong>定义。</strong>设 \(K\) 是域，\(H\) 是 \(K\) 的某些自同构组成的子群。\(H\) 的<strong>不动域</strong> 是</p>
+
+<p>\[
+\text{Fix}(H) := \{x \in K : \sigma(x) = x \text{ 对所有 } \sigma \in H\}.
+\]</p>
+
+<p>容易验证 \(\text{Fix}(H)\) 是 \(K\) 的子域：</p>
+
+<ul>
+  <li>\(0, 1 \in \text{Fix}(H)\) 因为 \(\sigma(0) = 0, \sigma(1) = 1\) 对一切自同构；</li>
+  <li>\(x, y \in \text{Fix}(H) \Rightarrow x \pm y, xy \in \text{Fix}(H)\) 因为 \(\sigma(xy) = \sigma(x)\sigma(y) = xy\) 等；</li>
+  <li>\(x \in \text{Fix}(H), x \neq 0 \Rightarrow x^{-1} \in \text{Fix}(H)\) 因为 \(\sigma(x^{-1}) = \sigma(x)^{-1} = x^{-1}\)。</li>
+</ul>
+
+<p>而且 \(F \subseteq \text{Fix}(H)\) 对任何 \(H \subseteq \text{Gal}(K/F)\)，因为 \(F\) 的元素被<em>所有</em> \(F\)-自同构不动。所以 \(\text{Fix}(H)\) 是个<em>中间域</em>：\(F \subseteq \text{Fix}(H) \subseteq K\)。</p>
+
+<p>具体例 21.1：</p>
+
+<ul>
+  <li>\(\text{Fix}(\{e\}) = K\)（恒等不动一切）；</li>
+  <li>\(\text{Fix}(\langle \sigma_2 \rangle)\)：\(\sigma_2\) 不动的元素 = "\(\sqrt 2\) 翻号后还相等"  的元素 = "\(\sqrt 2\) 系数为 0" 的元素 = \(\{a + c \sqrt 3 + d \sqrt 6 \cdot 0 : \ldots\}\)——再细看，\(\sigma_2(a + b\sqrt 2 + c \sqrt 3 + d \sqrt 6) = a - b \sqrt 2 + c \sqrt 3 - d \sqrt 6\)（注意 \(\sqrt 6 = \sqrt 2 \cdot \sqrt 3\)，\(\sigma_2\) 把它送到 \(-\sqrt 2 \cdot \sqrt 3 = -\sqrt 6\)）。等于自身要求 \(b = d = 0\)。所以 \(\text{Fix}(\langle \sigma_2 \rangle) = \{a + c \sqrt 3 : a, c \in \mathbb{Q}\} = \mathbb{Q}(\sqrt 3)\)；</li>
+  <li>同理 \(\text{Fix}(\langle \sigma_3 \rangle) = \mathbb{Q}(\sqrt 2)\)；</li>
+  <li>\(\text{Fix}(\langle \sigma_{2,3} \rangle)\)：\(\sigma_{2,3}\) 把 \(\sqrt 2 \mapsto -\sqrt 2, \sqrt 3 \mapsto -\sqrt 3, \sqrt 6 \mapsto \sqrt 6\)（两个负号抵消）。等于自身要求 \(b = c = 0\)。所以 \(\text{Fix} = \{a + d \sqrt 6\} = \mathbb{Q}(\sqrt 6)\)；</li>
+  <li>\(\text{Fix}(G) = \mathbb{Q}\)（被全部 4 个自同构同时不动 = 同时 \(b = c = d = 0\)）。</li>
+</ul>
+
+<p>把 \(H\) 与 \(\text{Fix}(H)\) 排在一起，正是 21.1 节末表格里"对应" 的<em>反方向</em>——子群<em>大</em> 的不动域<em>小</em>。</p>
+
+<p>另一方向有个对称的映射：每个中间域 \(L\) 对应它的<em>固定者群</em></p>
+
+<p>\[
+\text{Gal}(K/L) := \{\sigma \in \text{Gal}(K/F) : \sigma|_L = \text{id}\}.
+\]</p>
+
+<p>这是 \(\text{Gal}(K/F)\) 的子群，且 \(\text{Gal}(K/L) \subseteq \text{Gal}(K/F)\)（条件更紧——固定 \(L\) 比固定 \(F\) 强，因为 \(L \supseteq F\)）。</p>
+
+<p>所以我们手头有<em>两个互逆候选</em> 的映射：</p>
+
+<p>\[
+\Phi : \{H \le G\} \to \{\text{中间域}\}, \quad H \mapsto \text{Fix}(H);
+\]
+\[
+\Psi : \{\text{中间域}\} \to \{H \le G\}, \quad L \mapsto \text{Gal}(K/L).
+\]</p>
+
+<p>主定理说：在 Galois 扩张的情形下，\(\Phi\) 与 \(\Psi\) 互逆——两个集合大小相等且结构对应整齐。</p>
+
+<h2 id="sec21-6">21.6 Galois 主定理：完整陈述</h2>
+
+<p><strong>定理（Galois 主定理）。</strong>设 \(K/F\) 是有限 Galois 扩张，\(G := \text{Gal}(K/F)\)。则：</p>
+
+<p><strong>(A) 双射对应。</strong>映射</p>
+
+<p>\[
+\Phi : H \mapsto \text{Fix}(H), \qquad \Psi : L \mapsto \text{Gal}(K/L)
+\]</p>
+
+<p>是<em>互逆</em> 的双射，<em>反序</em> 地对应 \(G\) 的子群与 \(F \subseteq L \subseteq K\) 中间域。即：</p>
+
+<ul>
+  <li>\(\Psi(\Phi(H)) = H\) 对一切 \(H \le G\)；</li>
+  <li>\(\Phi(\Psi(L)) = L\) 对一切中间域 \(L\)；</li>
+  <li>\(H_1 \subseteq H_2 \Leftrightarrow \text{Fix}(H_1) \supseteq \text{Fix}(H_2)\)；</li>
+  <li>\(L_1 \subseteq L_2 \Leftrightarrow \text{Gal}(K/L_1) \supseteq \text{Gal}(K/L_2)\)。</li>
+</ul>
+
+<p><strong>(B) 维数关系。</strong>对应的子群与中间域满足</p>
+
+<p>\[
+[L : F] = [G : H], \qquad [K : L] = |H|,
+\]</p>
+
+<p>其中 \(H = \text{Gal}(K/L)\)。</p>
+
+<p><strong>(C) 子扩张的 Galois 性。</strong>对任何中间域 \(L\)，扩张 \(K/L\) 也是 Galois 扩张，且 \(\text{Gal}(K/L) = \Psi(L) = H\)。</p>
+
+<p><strong>(D) 正规对应。</strong>中间扩张 \(L/F\) 是<em>正规</em>（即 Galois，因可分自动）⟺ \(H = \Psi(L)\) 是 \(G\) 的<em>正规子群</em>。这种情形下</p>
+
+<p>\[
+\text{Gal}(L/F) \cong G / H.
+\]</p>
+
+<p>请你停下来欣赏这条定理。它把"<em>域论问题</em>" 翻译成"<em>群论问题</em>"——这是 Galois 思想的真正威力。比如：</p>
+
+<ul>
+  <li>"中间域有几个？" → 等价于"\(G\) 子群有几个？"——后者是有限群组合问题，可数可算。</li>
+  <li>"哪个中间域 \(L\) 是 \(F\) 的正规扩张？" → 等价于"哪个子群 \(H\) 是 \(G\) 的正规子群？"——后者用 ch3 的中心、换位子等工具就能查。</li>
+  <li>"扩张 \(K/L\) 怎么样？" → \(\text{Gal}(K/L) = H\) 直接读出。</li>
+</ul>
+
+<p>本质上，<em>有限 Galois 扩张的<strong>全部</strong> 子结构由它的 Galois 群决定</em>。这是 19 世纪以来代数最深刻的发现之一。</p>
+
+<h2 id="sec21-7">21.7 主定理证明思路</h2>
+
+<p>完整证明分几步。我们把每步的主张写清，关键引理证明草图给到，技术细节略。</p>
+
+<p><strong>步 1（Artin 引理）。</strong>设 \(K\) 是域，\(H\) 是 \(K\) 的有限自同构子群（任意——不假设 \(K\) 是某个 Galois 扩张顶端）。设 \(F := \text{Fix}(H)\)。则 \(K/F\) 是有限 Galois 扩张，且 \(\text{Gal}(K/F) = H\)，\([K:F] = |H|\)。</p>
+
+<p>这条引理是主定理证明的<em>核心</em> 工具。它把"先选群 \(H\)，再造扩张" 的方向走通了。证明草图：</p>
+
+<p>(i) \(K/F\) 代数：对任 \(\alpha \in K\)，构造多项式 \(p_\alpha(x) := \prod_{\sigma \in H} (x - \sigma(\alpha)) \in K[x]\)。它的系数是 \(H\)-作用的对称函数（基本对称多项式 \(e_k(\sigma_1\alpha, \ldots, \sigma_n\alpha)\)），所以被 \(H\) 不动 \(\Rightarrow\) 在 \(F = \text{Fix}(H)\) 中。所以 \(p_\alpha \in F[x]\)，\(\alpha\) 满足它，\(\alpha\) 在 \(F\) 上代数。次数 \(\le |H|\)。</p>
+
+<p>(ii) \(K/F\) 有限：取 \(\alpha\) 使 \([F(\alpha):F]\) 最大；对任 \(\beta \in K\)，\(F(\alpha, \beta) = F(\gamma)\) 对某 \(\gamma\)（用本原元定理，特征 0 时由 \(\gamma = \alpha + c \beta\) 选合适 \(c\) 给出）。但 \([F(\gamma):F] \ge [F(\alpha):F]\)（左边含右边）；最大性给等号 \(\Rightarrow F(\gamma) = F(\alpha) \Rightarrow \beta \in F(\alpha)\)。所以 \(K = F(\alpha)\)，\([K:F] = \deg(\text{min poly of } \alpha) \le |H|\)。</p>
+
+<p>(iii) \(|\text{Gal}(K/F)| \ge |H|\)：\(H \subseteq \text{Gal}(K/F)\) 因为每个 \(\sigma \in H\) 是 \(K\) 的自同构且不动 \(F = \text{Fix}(H)\)。所以 \(|\text{Gal}(K/F)| \ge |H|\)。</p>
+
+<p>(iv) \([K:F] \ge |\text{Gal}(K/F)|\)：这是<em>Dedekind 字符独立性</em>（distinct field automorphisms are linearly independent over the field）的推论。\(\sigma_1, \ldots, \sigma_m \in \text{Gal}(K/F)\) 不同，看作 \(K \to K\) 的函数，则它们 \(K\)-线性独立；它们也是 \(F\)-线性独立；但它们都把 \(F\) 不动 \(\Rightarrow\) 它们决定于在 \(K\) 的某 \(F\)-基上的值；这把 \(m \le \dim_F K = [K:F]\) 给出。</p>
+
+<p>把 (i)-(iv) 串：\(|H| \ge [K:F]\)（从 (ii)）\(\ge |\text{Gal}(K/F)|\)（从 (iv)）\(\ge |H|\)（从 (iii)）。三个 \(\ge\) 形成环，全是等号。所以 \([K:F] = |\text{Gal}(K/F)| = |H|\)。再加上 \(H \subseteq \text{Gal}(K/F)\) 与等阶 \(\Rightarrow H = \text{Gal}(K/F)\)。最后 \([K:F] = |\text{Gal}(K/F)| \Rightarrow K/F\) 是 Galois（21.2 定理）。\(\square\)（草图）</p>
+
+<p><strong>步 2（主定理 (A)(B)(C)）。</strong>给定 Galois \(K/F\)，\(G = \text{Gal}(K/F)\)。</p>
+
+<p>\(\Psi \circ \Phi = \text{id}_{\{H\}}\)：取 \(H \le G\)。由 Artin 引理（\(K\) 上自同构群 \(H\) 给的不动域 \(\text{Fix}(H)\)），\(K/\text{Fix}(H)\) 是 Galois 且 \(\text{Gal}(K/\text{Fix}(H)) = H\)。但 \(\Psi(\Phi(H)) = \Psi(\text{Fix}(H)) = \text{Gal}(K/\text{Fix}(H)) = H\)。完成。</p>
+
+<p>\(\Phi \circ \Psi = \text{id}_{\{L\}}\)：取中间域 \(L\)。要证 \(\text{Fix}(\text{Gal}(K/L)) = L\)。一边 \(L \subseteq \text{Fix}(\text{Gal}(K/L))\) 显然（\(\text{Gal}(K/L)\) 元素不动 \(L\)）。另一边：在 \(L\) 上 \(K/L\) 是 Galois 扩张（这一点是 (C) 的内容；它的证明是：\(K/F\) 正规 \(\Rightarrow\) \(K\) 含 \(F\)-不可约多项式 \(f\) 全部根；同 \(f\) 看作 \(L\)-不可约因子的乘积，每个因子的根仍在 \(K\) 内；所以 \(K/L\) 也正规。可分性同样从 \(F\) 继承到 \(L\)）。由 Artin 应用于 \(K\) 与 \(\text{Gal}(K/L)\)：\(\text{Fix}(\text{Gal}(K/L)) = \text{ground field}\) 是某个域；这个域既包含 \(L\) 又被 \(\text{Gal}(K/L)\) 不动（按定义）；最关键是它的<em>维数</em>——\([K : \text{Fix}(\text{Gal}(K/L))] = |\text{Gal}(K/L)| = [K:L]\)（最后等号是 \(K/L\) Galois）。所以 \(\text{Fix}(\text{Gal}(K/L)) = L\) 因为它在 \(K\) 中含 \(L\) 且与 \(L\) 同维。完成。</p>
+
+<p>反序对应、维数关系都从这两个互逆 + Artin 引理直接读出。</p>
+
+<p><strong>步 3（主定理 (D)：正规对应）。</strong>设 \(L\) 中间域，\(H = \Psi(L) = \text{Gal}(K/L)\)。</p>
+
+<p>(\(\Rightarrow\)) 设 \(L/F\) 正规。对任意 \(\sigma \in G\) 与任意 \(\tau \in H\)，要证 \(\sigma \tau \sigma^{-1} \in H\)，即 \(\sigma \tau \sigma^{-1}|_L = \text{id}\)。取 \(\alpha \in L\)，要算 \(\sigma \tau \sigma^{-1}(\alpha)\)。设 \(\beta := \sigma^{-1}(\alpha)\)。问 \(\beta\) 在 \(L\) 里吗？\(\beta\) 满足 \(\alpha\) 的最小多项式 \(m_\alpha \in F[x]\)（因为 \(\sigma\) 把 \(\beta\) 送到 \(\alpha\)，而 \(m_\alpha \in F[x] \subseteq L[x]\) 在 \(\sigma\) 下不动），所以 \(\beta\) 是 \(m_\alpha\) 的某根。\(L/F\) 正规 \(\Rightarrow\) \(L\) 含 \(m_\alpha\) 全部根 \(\Rightarrow\) \(\beta \in L\)。因此 \(\tau(\beta) = \beta\)（\(\tau \in H\) 不动 \(L\)），所以 \(\sigma \tau \sigma^{-1}(\alpha) = \sigma \tau (\beta) = \sigma(\beta) = \alpha\)。所以 \(\sigma \tau \sigma^{-1}\) 不动 \(\alpha\)；对一切 \(\alpha \in L\) 有效 \(\Rightarrow \sigma \tau \sigma^{-1} \in H\)。所以 \(H \trianglelefteq G\)。</p>
+
+<p>(\(\Leftarrow\)) 设 \(H \trianglelefteq G\)。要证 \(L/F\) 正规：取 \(\alpha \in L\) 与它的 \(F\)-最小多项式 \(m_\alpha \in F[x]\)；要证 \(m_\alpha\) 全部根在 \(L\) 中。\(K/F\) 正规 \(\Rightarrow\) \(m_\alpha\) 全部根在 \(K\) 中（设为 \(\alpha = \alpha_1, \ldots, \alpha_r\)）。每个 \(\alpha_i\) 是 \(\sigma_i(\alpha)\) 对某 \(\sigma_i \in G\)（这是 ch20.5 同构延拓引理的应用——任何 \(F\)-同构 \(F(\alpha) \to F(\alpha_i)\) 延拓到 \(K\)）。要证 \(\alpha_i \in L\)，等价于 \(\sigma_i(\alpha)\) 被 \(H\) 全部不动（因 \(L = \text{Fix}(H)\)）。对任 \(\tau \in H\)：\(\tau(\sigma_i(\alpha)) = \sigma_i(\sigma_i^{-1} \tau \sigma_i)(\alpha)\)。括号里的 \(\sigma_i^{-1} \tau \sigma_i \in H\)（\(H\) 正规）。所以它不动 \(L \ni \alpha\)。所以 \(\sigma_i^{-1} \tau \sigma_i (\alpha) = \alpha\)，所以 \(\tau(\sigma_i(\alpha)) = \sigma_i(\alpha) = \alpha_i\)。\(\tau\) 任意 \(\Rightarrow \alpha_i \in \text{Fix}(H) = L\)。\(L/F\) 正规。</p>
+
+<p>商群同构 \(\text{Gal}(L/F) \cong G/H\) 是限制映射 \(G \to \text{Gal}(L/F)\)（\(\sigma \mapsto \sigma|_L\)）的诱导：核 = "限制到 \(L\) 是 id 的 \(\sigma\)" = \(H\)；像（满）由维数算 \(|G|/|H| = [L:F] = |\text{Gal}(L/F)|\)；第一同构定理给商。\(\square\)</p>
+
+<p>这条证明是抽象代数的标杆性证明之一——它<em>融合</em> 了向量空间维数（步 1 的 (iv)）、群作用（步 1 的 (i)）、商环（ch19 单根扩张、ch20.5 同构延拓引理）、同构定理（步 3 的最后）。学完它你算是<em>真懂</em> 了 ch1-20 所有工具的合奏。</p>
+
+<h2 id="sec21-8">21.8 把 21.1 例子完整跑通</h2>
+
+<p>回到 \(K = \mathbb{Q}(\sqrt 2, \sqrt 3)\) 与 \(G = \mathbb{Z}_2 \times \mathbb{Z}_2 = \{e, \sigma_2, \sigma_3, \sigma_{2,3}\}\)。把主定理的对应一字一句对完。</p>
+
+<p><strong>5 个子群 ↔ 5 个中间域：</strong></p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(H \le G\)</th><th style="padding: 0.3em 1em;">\(|H|\)</th><th style="padding: 0.3em 1em;">\(\text{Fix}(H) = L\)</th><th style="padding: 0.3em 1em;">\([L : \mathbb{Q}]\)</th><th style="padding: 0.3em 1em;">\([K : L]\)</th><th style="padding: 0.3em 1em;">正规？</th></tr>
+<tr><td>\(\{e\}\)</td><td>1</td><td>\(K = \mathbb{Q}(\sqrt 2, \sqrt 3)\)</td><td>4</td><td>1</td><td>是</td></tr>
+<tr><td>\(\langle \sigma_3 \rangle\)</td><td>2</td><td>\(\mathbb{Q}(\sqrt 2)\)</td><td>2</td><td>2</td><td>是</td></tr>
+<tr><td>\(\langle \sigma_2 \rangle\)</td><td>2</td><td>\(\mathbb{Q}(\sqrt 3)\)</td><td>2</td><td>2</td><td>是</td></tr>
+<tr><td>\(\langle \sigma_{2,3} \rangle\)</td><td>2</td><td>\(\mathbb{Q}(\sqrt 6)\)</td><td>2</td><td>2</td><td>是</td></tr>
+<tr><td>\(G\)</td><td>4</td><td>\(\mathbb{Q}\)</td><td>1</td><td>4</td><td>是</td></tr>
+</table>
+
+<p>验证：</p>
+
+<ul>
+  <li>反序：\(\{e\} \subset \langle \sigma_2 \rangle, \langle \sigma_3 \rangle, \langle \sigma_{2,3} \rangle \subset G\) ↔ \(K \supset \mathbb{Q}(\sqrt 2), \mathbb{Q}(\sqrt 3), \mathbb{Q}(\sqrt 6) \supset \mathbb{Q}\)。\(\checkmark\)</li>
+  <li>维数：每行 \([L:\mathbb{Q}] \cdot [K:L] = [K:\mathbb{Q}] = 4\)。\(\checkmark\)</li>
+  <li>所有中间扩张都正规：因为 \(G\) 阿贝尔 \(\Rightarrow\) 一切子群正规 \(\Rightarrow\) 一切中间扩张是 Galois 的。\(\checkmark\)</li>
+</ul>
+
+<p><strong>三个 2 阶子群对应的子扩张 \(L/\mathbb{Q}\) 都是 Galois，\(\text{Gal}(L/\mathbb{Q}) \cong G / H\)：</strong></p>
+
+<p>取 \(L = \mathbb{Q}(\sqrt 2)\)，\(H = \langle \sigma_3 \rangle = \{e, \sigma_3\}\)。\(G/H = \{H, \sigma_2 H\} \cong \mathbb{Z}_2\)。直接看：\(\text{Gal}(\mathbb{Q}(\sqrt 2)/\mathbb{Q}) = \{\text{id}, \sqrt 2 \mapsto -\sqrt 2\} = \mathbb{Z}_2\)。\(\checkmark\)</p>
+
+<p><strong>非平凡限制例：\(\mathbb{Q}(\sqrt 2 + \sqrt 3)\) 是哪个中间域？</strong></p>
+
+<p>设 \(\alpha := \sqrt 2 + \sqrt 3\)。\(\alpha \in K\)。\(\mathbb{Q}(\alpha)\) 是某个中间域；要确定哪个。用主定理：\(\mathbb{Q}(\alpha)\) 对应于 \(\text{Gal}(K / \mathbb{Q}(\alpha)) = \{\sigma \in G : \sigma(\alpha) = \alpha\}\)。算每个 \(\sigma\) 作用：</p>
+
+<ul>
+  <li>\(e(\alpha) = \sqrt 2 + \sqrt 3 = \alpha\)。\(\checkmark\)</li>
+  <li>\(\sigma_2(\alpha) = -\sqrt 2 + \sqrt 3 \neq \alpha\)。</li>
+  <li>\(\sigma_3(\alpha) = \sqrt 2 - \sqrt 3 \neq \alpha\)。</li>
+  <li>\(\sigma_{2,3}(\alpha) = -\sqrt 2 - \sqrt 3 = -\alpha \neq \alpha\)。</li>
+</ul>
+
+<p>只有 \(e\) 不动 \(\alpha\)，所以 \(\text{Gal}(K/\mathbb{Q}(\alpha)) = \{e\}\)，对应中间域 \(\mathbb{Q}(\alpha) = K\)。所以 \(\mathbb{Q}(\sqrt 2 + \sqrt 3) = K = \mathbb{Q}(\sqrt 2, \sqrt 3)\)——这是 21.1 节末提到的"<em>本原元</em>" 现象。一个看似只用一根的 \(\mathbb{Q}(\alpha)\) 等于一个用两根的 \(\mathbb{Q}(\sqrt 2, \sqrt 3)\)。</p>
+
+<p>主定理告诉你这件事是<em>系统的</em>——对任何有限 Galois \(K/F\) 在特征 0 上，<em>本原元定理</em>（Steinitz）保证 \(K = F(\alpha)\) 对某 \(\alpha\)（21.7 步 1 (ii) 顺手证了这个）。所以一切有限 Galois 扩张都是<em>单</em> 扩张——一个根就够了。</p>
+
+<h2 id="sec21-9">21.9 这一章我们做了什么</h2>
+
+<p>从一个数数题出发——\(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 有 5 个中间域，它的自同构群 \(\mathbb{Z}_2 \times \mathbb{Z}_2\) 有 5 个子群，整齐相等。把这件事一般化：</p>
+
+<ul>
+  <li>挑出"<em>这种好对应成立</em>" 的扩张——<em>Galois 扩张</em>（正规 + 可分 + 有限），用"自同构数 = 扩张次数" 作定量标志。</li>
+  <li>定义两个候选互逆映射：\(\Phi(H) = \text{Fix}(H)\) 与 \(\Psi(L) = \text{Gal}(K/L)\)。</li>
+  <li><em>Galois 主定理</em>：在 Galois 扩张上，\(\Phi\) 与 \(\Psi\) 互逆——子群与中间域反序双射，正规子群 ↔ 正规中间扩张，商群 = 中间扩张的 Galois 群。</li>
+  <li>证明的核心是<em>Artin 引理</em>——给定有限自同构群 \(H\)，它的不动域自动给一个 Galois 扩张。这条引理把"先群后域" 的方向走通。</li>
+  <li>把 \(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 例子完整对完，包括"\(\sqrt 2 + \sqrt 3\) 生成整个 \(K\)" 的本原元现象。</li>
+</ul>
+
+<p>这一章是本书的高峰之一。你掌握了"用群论控制域扩张" 的语言。下一章把这个语言用在两个<em>古典数学问题</em> 上——古希腊就有的尺规作图三大难题，与 19 世纪初困扰所有数学家的"五次方程根式解" 问题。两件事都靠 Galois 主定理给出最终判决。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 分裂域与正规扩张</a><a href="ch22.html">下一章 · 第 22 章 应用 Galois →</a></nav>
 </main>

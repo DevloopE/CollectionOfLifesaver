@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 代数扩张与最小多项式 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 域的扩张</a><a href="ch20.html">下一章 · 第 20 章 分裂域与正规扩张 →</a></nav>
+<h1 id="ch19">第 19 章 代数扩张与最小多项式</h1>
+
+<p>把<a href="ch18.html">第 18 章</a>引出的"代数 vs 超越"这条划分推到底，就是本章。结论非常干净：<strong>代数情形结构完全清晰，每个代数元素由它的"最小多项式"完全决定</strong>。这意味着研究代数扩张里"\(\alpha\) 长什么样"这件事可以彻底机械化——只要算出 \(\alpha\) 的最小多项式，立刻知道 \(F(\alpha)\) 是什么、维数是多少、上面的乘法怎么算。</p>
+
+<p>这一章是 Galois 理论的<em>第二级台阶</em>。第 18 章解决了"扩张次数"，本章解决"扩张里的元素究竟是什么"。两者合起来给出 Galois 理论起跑前的所有装备。后面 ch20-22 会把"分裂域""Galois 群""可解性"一层层叠到这两章上。</p>
+
+<ul>
+  <li>19.1 代数元 vs 超越元的精确定义；标志性的反例。</li>
+  <li>19.2 \(\sqrt 2, \sqrt[3] 2, \zeta_n\) 都代数；\(\pi, e\) 超越（Lindemann–Weierstrass 不证）。</li>
+  <li>19.3 最小多项式 \(m_\alpha\)：唯一首一次数最小多项式；不可约。</li>
+  <li>19.4 单代数扩张构造：\(F(\alpha) \cong F[x]/(m_\alpha)\)（含完整证明）。</li>
+  <li>19.5 \([F(\alpha) : F] = \deg m_\alpha\)；标准基 \(\{1, \alpha, \ldots, \alpha^{n-1}\}\)。</li>
+  <li>19.6 代数扩张的传递性：\(L/K\) + \(K/F\) 都代数 \(\Rightarrow\) \(L/F\) 代数。</li>
+  <li>19.7 代数闭包内的"代数元素全体"是中间域。</li>
+  <li>19.8 代数闭包的存在性：陈述 + 证明思路。</li>
+</ul>
+
+<h2 id="sec19-1">19.1 代数元 vs 超越元</h2>
+
+<p>设 \(K/F\) 是域扩张，\(\alpha \in K\)。回顾<a href="ch18.html">18.2 节</a>定义：</p>
+
+<ul>
+  <li>\(\alpha\) <strong>代数 over \(F\)</strong>：\(\exists\, f \in F[x]\) 非零，\(f(\alpha) = 0\)；</li>
+  <li>\(\alpha\) <strong>超越 over \(F\)</strong>：不存在这样的 \(f\)。</li>
+</ul>
+
+<p>"代数"是最朴素的可数据化条件——能写下一个有限多项式杀死 \(\alpha\)。这条划分是相对的：\(\pi \in \mathbb{R}\) 在 \(\mathbb{Q}\) 上超越（Lindemann 1882）但在 \(\mathbb{R}\) 上代数（满足 \(x - \pi\)）。"超越"只在 \(\alpha \in K \setminus F\) 时才有意思。</p>
+
+<p>把代数性 \(\iff\) 有限维这条等价讲清楚：</p>
+
+<p><strong>命题。</strong>设 \(K/F\) 扩张，\(\alpha \in K\)。则下面三条等价：</p>
+
+<ul>
+  <li>(a) \(\alpha\) 在 \(F\) 上代数；</li>
+  <li>(b) \(F(\alpha)\) 是 \(F\) 上的有限维向量空间；</li>
+  <li>(c) \(F[\alpha] = F(\alpha)\)（即由 \(\alpha\) 生成的子环已经是域）。</li>
+</ul>
+
+<p>"(a) \(\Rightarrow\) (b)"由 19.5 节给（取 \(m_\alpha\) 次数 \(n\)，则 \(\{1, \alpha, \ldots, \alpha^{n-1}\}\) 是基）。"(b) \(\Rightarrow\) (a)"由<a href="ch18.html">18.2 节</a>命题（\(n + 1\) 个 \(F\)-向量在 \(n\) 维空间中线性相关 \(\Rightarrow\) \(\alpha\) 满足某非零多项式）。"(a) \(\Leftrightarrow\) (c)"由 19.4 节（代数情形 \(F[\alpha] \cong F[x]/(m_\alpha)\) 是域；超越情形 \(F[\alpha] \cong F[x]\) 不是域）。</p>
+
+<p>这条三角等价非常实用——它让你能用"有限维"这个线性代数概念去检验"代数"这个域论概念。比如 ch18 的 \(\mathbb{Q}(\sqrt 2, \sqrt 3)/\mathbb{Q}\) 是 4 维的，所以里面每个元素都代数；具体到 \(\sqrt 2 + \sqrt 3\)，可以直接由代数性算它的最小多项式（验证它满足 \(x^4 - 10 x^2 + 1 = 0\)）。</p>
+
+<h2 id="sec19-2">19.2 例子：哪些数代数、哪些超越</h2>
+
+<p>"\(\alpha\) 代数 over \(\mathbb{Q}\)" 这种数叫<strong>代数数</strong>（algebraic number）；超越的叫<strong>超越数</strong>（transcendental number）。代数数全体记 \(\overline{\mathbb{Q}}\)（19.7 节会证它是 \(\mathbb{C}\) 的子域）。</p>
+
+<p><strong>代数数的例子。</strong></p>
+
+<ul>
+  <li>所有有理数（满足 \(x - p/q\)）；</li>
+  <li>所有"\(n\) 次根" \(\sqrt[n] m\)（满足 \(x^n - m\)）；</li>
+  <li>\(\sqrt 2 + \sqrt 3\)（满足 \(x^4 - 10 x^2 + 1\)）；</li>
+  <li>所有<strong>单位根</strong> \(\zeta_n = e^{2\pi i / n}\)（满足 \(x^n - 1\)）；</li>
+  <li>若干由代数运算和开方组合出的数，如 \(\sqrt{2 + \sqrt 3}\)（满足 \((x^2 - 2)^2 - 3 = x^4 - 4 x^2 + 1\)）。</li>
+</ul>
+
+<p>事实上 \(\overline{\mathbb{Q}}\) 还有更"封闭"的性质：代数数加、减、乘、除（非零）后仍是代数数；代数数取代数闭包仍是代数数（19.7 节）。这就为什么本卷大量讨论的"\(\mathbb{Q}\) 的扩张"几乎全部落在 \(\overline{\mathbb{Q}}\) 内部。</p>
+
+<p><strong>超越数的例子。</strong>最著名的两个：</p>
+
+<p>\[
+\boxed{\ \pi \text{ 与 } e \text{ 在 } \mathbb{Q} \text{ 上超越}.\ }
+\]</p>
+
+<p>\(e\) 的超越性由 Hermite 1873 年证明，\(\pi\) 的由 Lindemann 1882 年证明（用 \(e^{i\pi} = -1\) 配上 Hermite 的方法）。</p>
+
+<p>更一般的工具是 <strong>Lindemann–Weierstrass 定理</strong>：若 \(\alpha_1, \ldots, \alpha_n\) 是两两不同代数数，则 \(e^{\alpha_1}, \ldots, e^{\alpha_n}\) 在 \(\overline{\mathbb{Q}}\) 上线性无关。它立刻给 \(e\) 超越（\(\alpha = 0, 1\)：\(1, e\) 线性无关）、\(\pi\) 超越（若代数则 \(i\pi\) 代数，\(e^{i\pi} = -1\) 矛盾）、\(\sin 1, \log 2\) 超越。完整证明用积分估计 + 整数论证，本书<strong>用而不证</strong>。</p>
+
+<p>有意思的事实：\(\overline{\mathbb{Q}}\) 可数，\(\mathbb{R}\) 不可数 \(\Rightarrow\) "几乎所有"实数都超越。但具体证某个数超越几乎总很难——\(\pi + e\) 是否超越？\(2^{\sqrt 2}\) 是？至今未完全清楚。</p>
+
+<h2 id="sec19-3">19.3 最小多项式</h2>
+
+<p>设 \(\alpha\) 在 \(F\) 上代数。考虑 \(\alpha\) 在 \(F[x]\) 中的"零化子集合"：</p>
+
+<p>\[
+I_\alpha := \{f \in F[x] : f(\alpha) = 0\}.
+\]</p>
+
+<p>这是 \(F[x]\) 的一个<strong>理想</strong>（验证：含 \(0\)；闭于加法；任何 \(g \in F[x]\) 与 \(f \in I_\alpha\) 给 \(g f \in I_\alpha\)）。\(F[x]\) 是 PID（<a href="ch15.html">第 15 章</a>），所以 \(I_\alpha = (m)\) 由某个 \(m \in F[x]\) 生成。\(\alpha\) 代数 \(\Rightarrow\) \(I_\alpha \neq 0\) \(\Rightarrow\) \(m \neq 0\)。</p>
+
+<p>把 \(m\) 取首一（leading coefficient \(= 1\)），它由 \(\alpha\) 唯一决定（理想 \((m) = (cm)\) 任意非零 \(c \in F\)，但首一选定就唯一）。这就是<strong>最小多项式</strong>：</p>
+
+<p>\[
+\boxed{\ m_\alpha(x) \;:=\; \alpha \text{ 在 } F \text{ 上的首一最小多项式}.\ }
+\]</p>
+
+<p>它的几个直接性质：</p>
+
+<p><strong>(M1) \(m_\alpha\) 是 \(I_\alpha\) 中次数最小的非零多项式。</strong>由 PID 性质：理想生成元在首一约束下次数最小。</p>
+
+<p><strong>(M2) \(f \in F[x]\) 满足 \(f(\alpha) = 0\) \(\iff\) \(m_\alpha \mid f\)。</strong>由 \(I_\alpha = (m_\alpha)\) 即得。</p>
+
+<p><strong>(M3) \(m_\alpha\) 在 \(F[x]\) 中不可约。</strong></p>
+
+<p>证明：设 \(m_\alpha = g h\)，\(g, h \in F[x]\)，\(\deg g, \deg h < \deg m_\alpha\)。代入 \(\alpha\)：\(g(\alpha) h(\alpha) = m_\alpha(\alpha) = 0\)。\(K\) 是域 \(\Rightarrow\) 无零因子 \(\Rightarrow\) \(g(\alpha) = 0\) 或 \(h(\alpha) = 0\)。但 \(\deg g, \deg h < \deg m_\alpha\) 与 (M1) 矛盾。所以 \(m_\alpha\) 不能真分解。</p>
+
+<p>所以 \(m_\alpha\) 是<strong>首一不可约</strong> \(F\)-多项式。这条 (M3) 反过来用：要找 \(\alpha\) 的最小多项式，只要找一个首一不可约 \(f \in F[x]\) 满足 \(f(\alpha) = 0\)，它必定就是 \(m_\alpha\)。具体计算时这是关键策略——比如要求 \(\sqrt 2\) 在 \(\mathbb{Q}\) 上的最小多项式：\(x^2 - 2\) 满足 \(\sqrt 2\)，由 Eisenstein（\(p = 2\)）不可约；所以 \(m_{\sqrt 2} = x^2 - 2\)。</p>
+
+<p>具体例子。\(\alpha = \zeta_5 = e^{2\pi i / 5}\) 在 \(\mathbb{Q}\) 上的最小多项式。\(\zeta_5\) 满足 \(x^5 - 1 = 0\)；分解 \(x^5 - 1 = (x - 1)(x^4 + x^3 + x^2 + x + 1)\)；\(\zeta_5 \neq 1\) 故 \(\zeta_5\) 满足 \(\Phi_5(x) := x^4 + x^3 + x^2 + x + 1\)。这就是第 5 个<strong>分圆多项式</strong>。它在 \(\mathbb{Q}[x]\) 中不可约（替换 \(x \mapsto x + 1\) + Eisenstein \(p = 5\)，标准技巧）。所以 \(m_{\zeta_5} = \Phi_5\)，\([\mathbb{Q}(\zeta_5) : \mathbb{Q}] = 4\)。</p>
+
+<h2 id="sec19-4">19.4 单代数扩张的结构</h2>
+
+<p>本节给上一章 18.7 节那条"\(F(\alpha) \cong F[x]/(m_\alpha)\)"的完整证明。这是单代数扩张的核心定理。</p>
+
+<p><strong>定理（单代数扩张结构）。</strong>设 \(K/F\) 扩张，\(\alpha \in K\) 在 \(F\) 上代数，\(m_\alpha\) 是 \(\alpha\) 的最小多项式。则有 \(F\)-代数同构</p>
+
+<p>\[
+\boxed{\ F[x] / (m_\alpha) \;\xrightarrow{\;\sim\;}\; F(\alpha), \qquad \overline{f} \mapsto f(\alpha).\ }
+\]</p>
+
+<p>证明分四步。</p>
+
+<p><strong>第 1 步：求值同态。</strong>定义 \(\operatorname{ev}_\alpha : F[x] \to K\)，\(\operatorname{ev}_\alpha(f) = f(\alpha)\)。这是 \(F\)-代数同态（直接验证：保加法、保乘法、\(\operatorname{ev}_\alpha(c) = c\) 对 \(c \in F\)）。</p>
+
+<p><strong>第 2 步：核 = \((m_\alpha)\)。</strong>\(\ker \operatorname{ev}_\alpha = I_\alpha = (m_\alpha)\)（19.3 节）。</p>
+
+<p><strong>第 3 步：象 = \(F[\alpha]\)。</strong>\(\operatorname{ev}_\alpha\) 的象是所有 "\(\alpha\) 的多项式"，即子环 \(F[\alpha]\)。第一同构定理给</p>
+
+<p>\[
+F[x] / (m_\alpha) \;\cong\; F[\alpha].
+\]</p>
+
+<p><strong>第 4 步：\(F[\alpha]\) 是域。</strong>由 (M3)，\(m_\alpha\) 在 \(F[x]\) 中不可约。\(F[x]\) 是 PID，所以不可约元生成的理想 \((m_\alpha)\) 是<em>极大</em>理想（PID 中"不可约 \(\iff\) 素 \(\iff\) 极大非零"，详见<a href="ch14.html">第 14 章</a>）。商环 \(F[x]/(\text{极大理想})\) 是<em>域</em>。所以 \(F[\alpha] = F[x]/(m_\alpha)\) 是域。</p>
+
+<p><strong>第 5 步：\(F[\alpha] = F(\alpha)\)。</strong>\(F[\alpha]\) 是包含 \(F\) 与 \(\alpha\) 的子<em>域</em>；任何包含 \(F\) 与 \(\alpha\) 的子域都包含所有 "\(\alpha\) 的多项式" \(= F[\alpha]\)。所以 \(F[\alpha]\) 是包含 \(F, \alpha\) 的最小子域，即 \(F(\alpha)\)。</p>
+
+<p>合并一二：\(F(\alpha) \cong F[x]/(m_\alpha)\)，证毕。</p>
+
+<p>这条定理的<em>"反向"也对</em>且非常有用：给 \(F[x]\) 中任意首一不可约多项式 \(p(x)\)，可以"凭空构造"一个含 \(p\) 的根的扩域——就取 \(K := F[x]/(p)\)，让 \(\alpha := \overline{x} \in K\)，则 \(p(\alpha) = \overline{p(x)} = 0\)。这是<strong>Kronecker 构造</strong>，是 ch20 分裂域存在性的核心机器。</p>
+
+<h2 id="sec19-5">19.5 \([F(\alpha) : F]\) 与标准基</h2>
+
+<p><strong>推论。</strong>设 \(\alpha\) 在 \(F\) 上代数，\(\deg m_\alpha = n\)。则</p>
+
+<p>\[
+\boxed{\ [F(\alpha) : F] \;=\; n \;=\; \deg m_\alpha,\quad \text{基为 } \{1, \alpha, \alpha^2, \ldots, \alpha^{n-1}\}.\ }
+\]</p>
+
+<p>证明：由 19.4 节，\(F(\alpha) \cong F[x]/(m_\alpha)\)。\(F[x]/(m_\alpha)\) 作 \(F\)-向量空间的基是 \(\{1, \overline{x}, \overline{x}^2, \ldots, \overline{x}^{n-1}\}\)（因为每个 \(F[x]\) 中元素 \(f\) 用带余除法 \(f = q m_\alpha + r\)，\(\deg r < n\)，所以 \(\overline f = \overline r\)，\(r\) 是 \(\{1, x, \ldots, x^{n-1}\}\) 的 \(F\)-线性组合）。在同构下，\(\overline{x}^i\) 对应 \(\alpha^i\)，所以 \(\{1, \alpha, \ldots, \alpha^{n-1}\}\) 是 \(F(\alpha)\) 的 \(F\)-基。维数 \(= n\)。</p>
+
+<p>这条推论是<a href="ch18.html">第 18 章</a>所有维数计算的"统一引擎"：</p>
+
+<ul>
+  <li>\([\mathbb{C} : \mathbb{R}] = 2\)：\(m_i = x^2 + 1\)、次数 2；</li>
+  <li>\([\mathbb{Q}(\sqrt 2) : \mathbb{Q}] = 2\)：\(m_{\sqrt 2} = x^2 - 2\)、次数 2；</li>
+  <li>\([\mathbb{Q}(\sqrt[3] 2) : \mathbb{Q}] = 3\)：\(m_{\sqrt[3] 2} = x^3 - 2\)、次数 3；</li>
+  <li>\([\mathbb{Q}(\zeta_n) : \mathbb{Q}] = \varphi(n)\)：\(m_{\zeta_n} = \Phi_n\)、次数 \(\varphi(n)\)（Euler 函数；不可约性是经典定理）。</li>
+</ul>
+
+<p>反过来，要算 \([F(\alpha) : F]\)，永远分两步：找一个首一多项式杀 \(\alpha\)；验证它不可约。"找一个杀 \(\alpha\) 的多项式"通常是直接代入计算（如算 \(\alpha = \sqrt 2 + \sqrt 3\) 时 \(\alpha^2 = 5 + 2\sqrt 6\)、\((\alpha^2 - 5)^2 = 24\) 给出 \(x^4 - 10 x^2 + 1\)）；"不可约"用 Eisenstein、约化模 \(p\)、或者其它具体技巧。</p>
+
+<h2 id="sec19-6">19.6 代数扩张的传递性</h2>
+
+<p>"代数扩张"概念扩到一整个扩张：</p>
+
+<p><strong>定义。</strong>扩张 \(K/F\) 称为<strong>代数</strong>的（algebraic），如果 \(K\) 中每个元素都在 \(F\) 上代数。</p>
+
+<p>由<a href="ch18.html">18.2 节</a>命题，<em>有限扩张 \(\Rightarrow\) 代数扩张</em>。反向不成立——\(\overline{\mathbb{Q}}/\mathbb{Q}\) 是代数扩张但 \([\overline{\mathbb{Q}} : \mathbb{Q}] = \infty\)（\(\overline{\mathbb{Q}}\) 含每个 \(\sqrt[n] 2\)，无穷多个独立的有限扩张并出无穷次扩张）。</p>
+
+<p>核心结构性结果：</p>
+
+<p><strong>定理（代数扩张传递）。</strong>设 \(L/K\) 与 \(K/F\) 都是代数扩张，则 \(L/F\) 也是代数扩张。</p>
+
+<p>证明：取 \(\alpha \in L\)。要证 \(\alpha\) 在 \(F\) 上代数。由 \(L/K\) 代数，\(\alpha\) 在 \(K\) 上满足某非零 \(p(x) = c_0 + c_1 x + \cdots + c_n x^n\)，\(c_i \in K\)，\(c_n \neq 0\)。考虑由 \(F\)、\(c_0, c_1, \ldots, c_n\) 与 \(\alpha\) 共同生成的子域链</p>
+
+<p>\[
+F \;\subset\; F(c_0, c_1, \ldots, c_n) \;\subset\; F(c_0, \ldots, c_n, \alpha).
+\]</p>
+
+<p>由 \(K/F\) 代数，每个 \(c_i\) 在 \(F\) 上代数 \(\Rightarrow\) \(F(c_0, \ldots, c_n)/F\) 是有限扩张（用 19.5 节 + 塔公式逐个加生成元，每次加一个代数元素让次数有限增长）。\(\alpha\) 在 \(F(c_0, \ldots, c_n)\) 上由 \(p\) 杀，所以 \(F(c_0, \ldots, c_n, \alpha)/F(c_0, \ldots, c_n)\) 是有限扩张。塔公式给</p>
+
+<p>\[
+[F(c_0, \ldots, c_n, \alpha) : F] = [F(c_0, \ldots, c_n, \alpha) : F(c_0, \ldots, c_n)] \cdot [F(c_0, \ldots, c_n) : F] < \infty.
+\]</p>
+
+<p>所以 \(\alpha\) 在 \(F\) 上的"加 \(\alpha\) 之后的小有限扩张"内，由<a href="ch18.html">18.2 节</a>命题，\(\alpha\) 在 \(F\) 上代数。</p>
+
+<p>这条传递性看上去自然，但证明里"用塔公式 + 有限维"两步走是关键——它把"代数"这个看上去要靠多项式的概念，重新归约到"有限维"。这种"代数 \(\leftrightarrow\) 有限维"的来回转换是这一卷反复使用的逻辑。</p>
+
+<h2 id="sec19-7">19.7 代数闭包内的代数元素全体</h2>
+
+<p>设 \(\overline F\) 是 \(F\) 的某个固定代数闭域（19.8 节会讲它的存在性）。考虑</p>
+
+<p>\[
+F^{\mathrm{alg}} \;:=\; \{\alpha \in \overline F : \alpha \text{ 在 } F \text{ 上代数}\}.
+\]</p>
+
+<p>这是 \(\overline F\) 的子集。断言：</p>
+
+<p><strong>命题。</strong>\(F^{\mathrm{alg}}\) 是 \(\overline F\) 的子域，且 \(F^{\mathrm{alg}}/F\) 是代数扩张（即使是无穷次）。事实上 \(F^{\mathrm{alg}}\) 自身代数闭。</p>
+
+<p>证明：要证 \(F^{\mathrm{alg}}\) 子域，要证它对加减乘除封闭。取 \(\alpha, \beta \in F^{\mathrm{alg}}\)。\(\alpha, \beta\) 都在 \(F\) 上代数 \(\Rightarrow\) \(F(\alpha)/F\) 与 \(F(\alpha, \beta)/F(\alpha)\) 都有限扩张（后者：\(\beta\) 满足某 \(F[x]\) 多项式，亦满足该多项式视作 \(F(\alpha)[x]\) 中的多项式）\(\Rightarrow\) \(F(\alpha, \beta)/F\) 有限扩张（塔公式）\(\Rightarrow\) \(F(\alpha, \beta)\) 中每个元素都在 \(F\) 上代数。所以 \(\alpha + \beta, \alpha - \beta, \alpha\beta, \alpha/\beta\) 都在 \(F^{\mathrm{alg}}\) 中——子域成立。</p>
+
+<p>"\(F^{\mathrm{alg}}/F\) 代数"由定义直接（每个元素都在 \(F\) 上代数）。"无穷"由 \(F^{\mathrm{alg}}\) 含每个 \(\sqrt[n] a\)（\(a \in F\)），它们各贡献独立的有限扩张。</p>
+
+<p>"代数闭"：若 \(g \in F^{\mathrm{alg}}[x]\) 非零、有 \(\overline F\) 中根 \(\gamma\)，要证 \(\gamma \in F^{\mathrm{alg}}\)。\(g\) 系数 \(\in F^{\mathrm{alg}}\)（在 \(F\) 上代数），所以 \(\gamma\) 在 \(F^{\mathrm{alg}}\) 上代数 \(\Rightarrow\) 由 19.6 节传递性，\(\gamma\) 在 \(F\) 上代数 \(\Rightarrow\) \(\gamma \in F^{\mathrm{alg}}\)。所以 \(F^{\mathrm{alg}}\) 内每个非零多项式有根——\(F^{\mathrm{alg}}\) 自身代数闭。</p>
+
+<p>这给出一个干净的图景：在 \(\overline F\) 中，"代数元素全体" \(F^{\mathrm{alg}}\) 是 \(F\) 的"<strong>代数闭包</strong>"——它是包含 \(F\) 的最小代数闭域（同构意义下唯一）。具体地：</p>
+
+<ul>
+  <li>\(\mathbb{Q}^{\mathrm{alg}} = \overline{\mathbb{Q}}\) 是<em>代数数域</em>，\(\subsetneq \mathbb{C}\)（\(\pi \in \mathbb{C}\) 但 \(\pi \notin \overline{\mathbb{Q}}\)）；\(\overline{\mathbb{Q}}\) 是 \(\mathbb{Q}\) 的代数闭包，但 \(\overline{\mathbb{Q}} \neq \mathbb{C}\)。</li>
+  <li>\(\mathbb{R}^{\mathrm{alg}} = \mathbb{C}\)：\(\mathbb{R}\) 上每个有限扩张都嵌入 \(\mathbb{C}\)（由 \(\mathbb{C}\) 是 \(\mathbb{R}\) 的代数闭包）。</li>
+  <li>\(\mathbb{F}_p^{\mathrm{alg}} = \overline{\mathbb{F}_p}\)：有限域 \(\mathbb{F}_p\) 的代数闭包是无穷阶；它是所有 \(\mathbb{F}_{p^n}\) 的并，<a href="ch23.html">第 23 章</a>会详细展开。</li>
+</ul>
+
+<p>这条"代数闭包"的概念把 ch20 的<strong>分裂域</strong>提到一个统一框架——任何多项式分裂域都嵌入 \(\overline F\) 内部。</p>
+
+<h2 id="sec19-8">19.8 代数闭包的存在性</h2>
+
+<p>上一节假设 \(\overline F\) 已经存在并把 \(F\) 嵌进去——但 \(\overline F\) 真的对每个 \(F\) 都存在吗？答案是肯定的，由一条经典定理：</p>
+
+<p><strong>定理（Steinitz 1910）。</strong>每个域 \(F\) 都存在代数闭包 \(\overline F\)，且在 \(F\)-同构意义下唯一。</p>
+
+<p>证明思路（不展开全部细节）：</p>
+
+<p><strong>第 1 步：构造一个"够大"的代数闭域。</strong>这是 Zorn 引理的应用。考虑所有"\(F\) 的代数扩域"构成的偏序集 \(\mathcal P\)（\(K_1 \le K_2\) 当 \(K_1\) 嵌进 \(K_2\)）。每条链 \(\{K_\alpha\}\) 有上界 \(\bigcup K_\alpha\)（仍是 \(F\) 的代数扩域）。Zorn 引理给极大元 \(\overline F\)。要证 \(\overline F\) 代数闭：若 \(p \in \overline F[x]\) 非零无根，则 Kronecker 构造（19.4 节）给真正扩域 \(\overline F[x]/(p) \supsetneq \overline F\)，\(\overline F\) 不极大，矛盾。所以 \(\overline F\) 代数闭。</p>
+
+<p><strong>第 2 步：唯一性（同构）。</strong>设 \(\Omega_1, \Omega_2\) 都是 \(F\) 的代数闭包。把所有"\(F\)-嵌入" \(\sigma : K \hookrightarrow \Omega_2\)（\(F \subset K \subset \Omega_1\)）按"扩张为更大的 \(K\)" 偏序，再用 Zorn 给极大嵌入；论证它必定是 \(\Omega_1 \to \Omega_2\) 整体嵌入；由 \(\Omega_1\) 代数闭、\(\Omega_2\) 代数闭，象 \(= \Omega_2\)（否则 \(\Omega_2\) 上有未被覆盖的代数元素，可继续扩张矛盾极大性）。所以同构。</p>
+
+<p>具体例子里 \(\overline F\) 通常已知：\(\overline{\mathbb{R}} = \mathbb{C}\)（代数基本定理）；\(\overline{\mathbb{Q}} \subset \mathbb{C}\) 是所有满足某 \(\mathbb{Q}\)-多项式的复数；\(\overline{\mathbb{F}_p} = \bigcup_n \mathbb{F}_{p^n}\)（<a href="ch23.html">第 23 章</a>构造）。</p>
+
+<p>这一章把"代数扩张"这条主线钉死了：每个代数元素由最小多项式完全决定；单代数扩张是 \(F[x]/(m_\alpha)\)；扩张次数是最小多项式次数；代数性传递。这五件事是 Galois 理论的"基本物理"。</p>
+
+<p>下一章我们引入<strong>分裂域</strong>——给一个多项式 \(f \in F[x]\)，把它在某个扩域里完全因子化（"分裂"），能这样做的最小扩张就是 \(f\) 的分裂域。这给出 ch21 Galois 群一个具体的"舞台"——Galois 群就是分裂域的自同构群，它的子群与中间域形成著名的 Galois 对应。再后面 ch22 会用 Galois 群把"用尺规作图三等分角"和"五次方程根式不可解" 同时解决。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 域的扩张</a><a href="ch20.html">下一章 · 第 20 章 分裂域与正规扩张 →</a></nav>
+</main>
+</body>
+</html>

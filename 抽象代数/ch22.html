@@ -32,275 +32,275 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 Galois 理论基本定理</a><a href="ch23.html">下一章 · 第 23 章 编码理论与有限域 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 Galois 主定理</a><a href="ch23.html">下一章 · 第 23 章 编码理论与有限域 →</a></nav>
 <h1 id="ch22">第 22 章 应用 Galois：尺规作图与五次方程不可解</h1>
 
-<p>这一章是本书的最高潮。Galois 理论让两个 19 世纪经典难题得到完整答案：</p>
+<p>请你拿一只铅笔，再拿一把直尺和一只圆规——别拿量角器，别拿计算器，就尺规两件。我让你做一件古希腊数学家也尝试过的事：把 60° 角<em>用尺规等分成三份</em>。</p>
 
-<ol>
-  <li>用尺规能不能三等分任意角？倍立方？化圆为方？</li>
-  <li>五次以上多项式方程能不能有"求根公式"？</li>
-</ol>
+<p>你画 60° 不难——画等边三角形就有。等分成两份也容易——作角平分线就行。等分成三份呢？你试试看。每次失败都觉得"再小心一点就成了"。这件事让人类纠结了 2000 年。</p>
 
-<p>两个答案都是<em>不</em>。工具都是 Galois。</p>
+<p>1837 年 Wantzel 证明：<em>它根本不可能</em>。证明只用一句关于扩张次数的话——\([\mathbb{Q}(\cos 20°) : \mathbb{Q}] = 3\)，而尺规可作的数都满足维数 \(2^k\)，3 不是 2 的幂。</p>
 
-<p>这两个问题历史上极重要。三等分角与倍立方传说源于公元前 5 世纪希腊神谕，化圆为方追溯到古巴比伦。两千多年里数学家不断尝试，都失败了——但失败本身从未被证明是<em>必然</em>的。直到 19 世纪 Wantzel（1837）用代数工具证明前两个不可能、Lindemann（1882）证明 \(\pi\) 超越解决第三个、Galois（1832）证明五次方程一般不可解，这些"两千年的猜测"才彻底落地。</p>
+<p>本章把这个"<em>用代数证明几何不可能</em>" 的招数和"<em>五次方程没有求根公式</em>" 的招数（Abel-Galois 1820-1830）打包讲完。这是 Galois 理论的<em>第一批大客户</em>，也是它进入数学史教科书的两个关键瞬间。</p>
 
-<p>整个故事的代数化思路出奇地一致：把"几何或代数操作的可能性"翻译成"某个域扩张的次数能否被某种素因子整除"或"某个 Galois 群是否可解"。一旦翻译完成，问题就变成纯粹的群论计算——Galois 理论的结构定理直接给出答案。</p>
+<h2 id="sec22-1">22.1 尺规的代数化</h2>
 
-<ul>
-  <li>尺规作图的代数化：可作图数 = 由 \(\mathbb{Q}\) 出发迭代二次扩张所及的数。</li>
-  <li>三等分角不可能：60° 三等分需要 \(\cos 20°\)，它在 \(\mathbb{Q}\) 上度数 3，不是 2 的幂。</li>
-  <li>倍立方不可能：要构造 \(\sqrt[3] 2\)，它在 \(\mathbb{Q}\) 上度数 3。</li>
-  <li>化圆为方不可能：要构造 \(\sqrt \pi\)，但 \(\pi\) 超越（Lindemann）。</li>
-  <li>正多边形作图：Gauss 完整刻画 = 边数为 2 的幂乘 Fermat 素数。</li>
-  <li>求根公式的代数化：方程可用根式解 \(\Leftrightarrow\) Galois 群可解。</li>
-  <li>可解群的定义；\(S_n\) 在 \(n \ge 5\) 时不可解。</li>
-  <li>具体五次方程 \(x^5 - 6x + 3\) 的 Galois 群是 \(S_5\)，所以不可解。</li>
-  <li>历史与意义。</li>
-</ul>
+<p>"用尺规可作图" 是个几何说法。要用代数判断它，得先把它<em>翻译</em> 成代数。</p>
 
-<h2 id="sec22-1">22.1 尺规作图的代数化</h2>
+<p>规则。给定平面上有限个起始点；用直尺可以"<em>过两个已有点画直线</em>"，用圆规可以"<em>以已有点为圆心、过另一已有点为半径画圆</em>"。新出现的"已有点" 是<em>线与线、线与圆、圆与圆</em> 的交点。可作图点指从起始点出发有限步操作能得到的点。</p>
 
-<p>"用尺规作图"在数学上的精确意思是：从平面上两个给定点 \((0, 0)\) 与 \((1, 0)\) 出发，反复使用以下两条操作：</p>
+<p>把平面坐标化——\((0,0)\) 与 \((1, 0)\) 作为起始两点（它们由"距离" 给出，距离来自尺规自身）。一个数 \(a \in \mathbb{R}\) 称为<strong>可作图数</strong>，若 \((a, 0)\) 是可作图点。</p>
 
-<ul>
-  <li>过两个已作出的点画直线；</li>
-  <li>以一个已作出的点为圆心，以两个已作出点之间距离为半径画圆。</li>
-</ul>
+<p>关键技术性结果：</p>
 
-<p>新点定义为这些直线与圆的交点。"可作图的数"指可作图点的横纵坐标。</p>
-
-<p><strong>关键观察。</strong>每一次"画线"或"画圆"得到的新点坐标，都是已知坐标在<em>有理运算</em> + <em>开平方</em>下表达的。原因：直线方程一次（解线方程组用有理运算）；圆方程二次（求解二次方程涉及开平方）。所以每加一个新点，要么不扩张当前坐标域、要么把它做一次二次扩张。</p>
-
-<p>把"已作图坐标"装在一个域 \(F_k\) 中，每次新作图最多得到 \(F_{k+1} = F_k(\sqrt d)\)，\([F_{k+1} : F_k] \in \{1, 2\}\)。从 \(F_0 = \mathbb{Q}\) 起步：</p>
+<p><strong>定理（可作图数 = 迭代二次扩张）。</strong>\(a \in \mathbb{R}\) 可作图 ⟺ 存在域链</p>
 
 <p>\[
-\boxed{\ \alpha \text{ 可作图}\ \Leftrightarrow\ \exists\ \mathbb{Q} = F_0 \subset F_1 \subset \cdots \subset F_n,\ [F_{i+1} : F_i] = 2,\ \alpha \in F_n.\ }
+\mathbb{Q} = F_0 \subset F_1 \subset F_2 \subset \cdots \subset F_n
 \]</p>
 
-<p>由塔定理 \([F_n : \mathbb{Q}] = 2^n\)。所以可作图数 \(\alpha\) 必然落在某个 \([F : \mathbb{Q}] = 2^k\) 的 \(F\) 内 \(\Rightarrow [\mathbb{Q}(\alpha) : \mathbb{Q}] \mid 2^k\)。</p>
+<p>使每步 \([F_{i+1} : F_i] = 2\) 且 \(a \in F_n\)。</p>
 
-<p><strong>必要条件（核心）。</strong></p>
+<p>证明思路。</p>
 
-<p>\[
-\boxed{\ \alpha \text{ 可作图}\ \Rightarrow\ [\mathbb{Q}(\alpha) : \mathbb{Q}] \text{ 是 2 的幂}.\ }
-\]</p>
+<p>(\(\Rightarrow\)) 假设 \(a\) 由尺规作出。每一步操作产生一个新点；分析"线 ∩ 线、线 ∩ 圆、圆 ∩ 圆" 三种情形的代数表达：</p>
 
-<p>这个必要条件极强——它把"几何的可作图性"翻译成"代数的扩张次数"。三等分角、倍立方、化圆为方的不可能性，全部由这一条直接读出。</p>
+<ul>
+  <li>线由两点决定，方程 \(\alpha x + \beta y + \gamma = 0\)，\(\alpha, \beta, \gamma\) 是已有点坐标的<em>有理函数</em>（在已有点的坐标域中）。</li>
+  <li>圆由"圆心 + 一点" 决定，方程 \((x - x_0)^2 + (y - y_0)^2 = r^2\)，系数同样是已有点坐标的有理函数。</li>
+  <li>"线 ∩ 线" 解线性方程组，新点坐标在已有点坐标域中（不扩域）。</li>
+  <li>"线 ∩ 圆" 把线 \(y = mx + c\) 代入圆，得二次方程 \(\alpha x^2 + \beta x + \gamma = 0\)，新点 \(x\)-坐标 = \((-\beta \pm \sqrt{\beta^2 - 4 \alpha \gamma})/(2\alpha)\)——在已有点坐标域上加一个<em>平方根</em>，扩张 1 维或 2 维（视乎判别式是否已是平方）。</li>
+  <li>"圆 ∩ 圆" 两个圆方程相减消去 \(x^2 + y^2\) 项得一<em>线性</em> 方程；带回单个圆即"线 ∩ 圆" 同上，再加平方根。</li>
+</ul>
 
-<p>反向（充分）远没有这么简单——\([\mathbb{Q}(\alpha) : \mathbb{Q}]\) 是 2 的幂<em>不</em>蕴涵可作图，需要更精细的"\(\alpha\) 在某个 Galois 二次塔中"条件。但本章只用必要条件就够了——三个经典不可能性都靠它。</p>
+<p>所以每一步至多在域上加一个平方根 \(\Rightarrow\) 扩张 \(\le 2\) 维。\(n\) 步之后落在 \(F_n\) 中，每步 \(\le 2\) 维。完成。</p>
 
-<h2 id="sec22-2">22.2 三等分角不可能</h2>
+<p>(\(\Leftarrow\)) 假设有 \(F_0 \subset \cdots \subset F_n\) 链，每步 2 维。要造出 \(F_n\) 中的元素。归纳：\(F_{i+1} = F_i(\sqrt{d_i})\) 对某 \(d_i \in F_i\)（2 维扩张总是单根；最小多项式 2 次 \(x^2 - d_i\)）。所以只需证："已可作 \(F_i\) 元素 \(\Rightarrow\) \(\sqrt{d_i}\) 也可作"。</p>
 
-<p><strong>问题。</strong>给定一个角 \(\theta\)（用尺规作出），能否构造 \(\theta/3\)？</p>
+<p>这是初等几何。给定 \(d \ge 0\) 已可作（即 \((d, 0)\) 已画），要作 \(\sqrt d\)。在水平线上取 \(P_0 = (-1, 0)\)，\(P_1 = (d, 0)\)，作以 \(P_0 P_1\) 为直径的<em>半圆</em>。从原点向上作垂线，交半圆于 \(Q = (0, h)\)。由半圆性质（圆周角定理）\(P_0 Q P_1\) 是直角三角形，于是 \(h^2 = 1 \cdot d = d\)，所以 \(h = \sqrt d\)。\((0, \sqrt d)\) 可作；旋转得 \((\sqrt d, 0)\) 可作。完成。</p>
 
-<p>答案：对一般 \(\theta\) 不能。具体反例取 \(\theta = 60°\)（这角自身可作——等边三角形给出）。要三等分得到 \(20°\)；这相当于构造 \(\cos 20°\)。用三倍角公式：</p>
+<p>"四则运算" 也都是基本可作（古希腊已知道——比例分割、相似三角形）。所以从 \(\mathbb{Q}\) 出发能用尺规作出的<em>恰好</em> 是"由 \(\mathbb{Q}\) 加四则运算 + 平方根" 的全部组合。\(\square\)</p>
+
+<h2 id="sec22-2">22.2 必要条件：可作图 ⟹ \([\mathbb{Q}(a) : \mathbb{Q}] = 2^k\)</h2>
+
+<p>从 22.1 直接读出：</p>
+
+<p><strong>定理。</strong>若 \(a \in \mathbb{R}\) 可作图，则 \([\mathbb{Q}(a) : \mathbb{Q}]\) 是 2 的幂。</p>
+
+<p>证明。\(a \in F_n\) 给的链每步 2 维，所以 \([F_n : \mathbb{Q}] = 2^n\)（塔式法则）。\(\mathbb{Q}(a) \subseteq F_n\)，所以 \([\mathbb{Q}(a) : \mathbb{Q}]\) 整除 \(2^n\)（再次塔式法则），所以是 2 的幂。\(\square\)</p>
+
+<p>这是<em>必要</em> 条件——满足它的数<em>不一定</em> 可作（22.6 节会看到 \(\cos(2\pi/9)\) 维数 3 不是 2 的幂，所以不可作；但维数 4 也<em>不一定</em> 可作，要 Galois 群是 2-群才行）。但<em>不</em>满足它的就<em>一定</em> 不可作。这是判定不可能性的杀手锏。</p>
+
+<h2 id="sec22-3">22.3 不可能 1：三等分 60° 角</h2>
+
+<p>把"三等分 60° 角" 翻译成代数。三等分 60° = 作 20° 角 = 作点 \((\cos 20°, \sin 20°)\) = 作 \(\cos 20°\)（因为 \(\sin 20° = \sqrt{1 - \cos^2 20°}\)，由 \(\cos 20°\) 加平方根作出）。所以问题归约为<em>\(\cos 20°\) 可作图吗</em>。</p>
+
+<p>用三倍角公式：\(\cos 3\theta = 4 \cos^3 \theta - 3 \cos \theta\)。代 \(\theta = 20°\)：</p>
 
 <p>\[
 \cos 60° = 4 \cos^3 20° - 3 \cos 20°.
 \]</p>
 
-<p>\(\cos 60° = 1/2\)，记 \(x = \cos 20°\)：</p>
+<p>\(\cos 60° = 1/2\)，所以 \(8 \cos^3 20° - 6 \cos 20° = 1\)，即 \(\cos 20°\) 是</p>
 
 <p>\[
-4 x^3 - 3 x = \frac{1}{2}\ \ \Leftrightarrow\ \ 8 x^3 - 6 x - 1 = 0.
+8 x^3 - 6 x - 1 = 0
 \]</p>
 
-<p>这个三次多项式 \(p(x) = 8 x^3 - 6 x - 1\) 在 \(\mathbb{Q}\) 上不可约。验证：有理根定理（任何有理根 \(p/q\) 必满足 \(p \mid 1\), \(q \mid 8\)，候选 \(\pm 1, \pm 1/2, \pm 1/4, \pm 1/8\)），逐个代入都不为零（如 \(p(1) = 1, p(-1) = -3, p(1/2) = -3/2, \ldots\)）。三次无有理根 \(\Rightarrow\) 不可约。</p>
+<p>的根。</p>
 
-<p>所以 \(\cos 20°\) 在 \(\mathbb{Q}\) 上的最小多项式次数 = 3，即 \([\mathbb{Q}(\cos 20°) : \mathbb{Q}] = 3\)。</p>
-
-<p>3 不是 2 的幂 \(\Rightarrow \cos 20°\) <strong>不可作图</strong> \(\Rightarrow\) 60° 不能三等分 \(\Rightarrow\) 一般角不能三等分。\(\Box\)</p>
-
-<p>注意论证的精妙：我们没有证明"任何角都不能三等分"——\(180°\) 当然能三等分（\(60°\) 可作）。我们证明的是"<em>存在某个</em>可作角不能用尺规三等分"，这就<em>否定</em>了"通用尺规三等分方法"的存在性。</p>
-
-<h2 id="sec22-3">22.3 倍立方不可能</h2>
-
-<p><strong>问题（所谓 Delos 问题）。</strong>给定单位边长立方体，作出一个体积为它两倍的立方体——即作出 \(\sqrt[3] 2\)。</p>
-
-<p>\(\sqrt[3] 2\) 的最小多项式 \(x^3 - 2 \in \mathbb{Q}[x]\) 由 Eisenstein \(p = 2\) 不可约 \(\Rightarrow\)</p>
-
-<p>\[
-[\mathbb{Q}(\sqrt[3] 2) : \mathbb{Q}] = 3.
-\]</p>
-
-<p>3 不是 2 的幂 \(\Rightarrow \sqrt[3] 2\) <strong>不可作图</strong> \(\Rightarrow\) 倍立方不可能。\(\Box\)</p>
-
-<p>这条证明几乎一行字，但它结束的是一个两千年的传说——传说雅典爆发瘟疫，神谕命令把 Apollo 神坛（立方形）体积加倍才能止瘟，几代希腊数学家——包括 Plato 学派——都试着用尺规做。1837 年 Pierre Wantzel 用上面这一行代数论证关闭了所有努力。</p>
-
-<h2 id="sec22-4">22.4 化圆为方不可能</h2>
-
-<p><strong>问题。</strong>给定单位圆，作出与之等面积的正方形——即作出边长 \(\sqrt \pi\)。</p>
-
-<p>这次的关键不再是"扩张次数 = 3"，而是 \(\pi\) 根本<em>不是代数数</em>。</p>
-
-<p><strong>定理（Lindemann 1882）。</strong>\(\pi\) 在 \(\mathbb{Q}\) 上超越——即不存在非零 \(p \in \mathbb{Q}[x]\) 使 \(p(\pi) = 0\)。</p>
-
-<p>这条定理证明用复分析（\(e^x\) 的解析性 + Hermite–Lindemann 定理），属于<a href="../复分析/index.html">超越数论</a>，不在本书范围内。</p>
-
-<p>有了 Lindemann 之后论证简单：\(\pi\) 超越 \(\Rightarrow \sqrt \pi\) 也超越（如果 \(\sqrt\pi\) 满足 \(p \in \mathbb{Q}[x]\)，则 \(\pi\) 满足 \(p(x^2) p(-x^2)\)（系数有理），矛盾）\(\Rightarrow [\mathbb{Q}(\sqrt \pi) : \mathbb{Q}] = \infty \Rightarrow\) 远不是 2 的幂 \(\Rightarrow \sqrt \pi\) <strong>不可作图</strong>。\(\Box\)</p>
-
-<p>所以三个古希腊难题全部翻译成代数问题，全部用 Galois 时代之后的代数 / 复分析手段一次性解决。</p>
-
-<h2 id="sec22-5">22.5 正多边形作图：Gauss 定理</h2>
-
-<p>"哪些正 \(n\) 边形可以用尺规作图"是 19 岁的 Carl Friedrich Gauss 在 1796 年解决的问题——他在生日前一天构造了正 17 边形，让自己决定走数学道路。</p>
-
-<p>正 \(n\) 边形可作图 \(\Leftrightarrow \cos(2\pi/n)\) 可作图 \(\Leftrightarrow\) \([\mathbb{Q}(\cos(2\pi/n)) : \mathbb{Q}]\) 是 2 的幂。</p>
-
-<p>用<a href="ch21.html">第 21 章</a>分圆扩张：\([\mathbb{Q}(\zeta_n) : \mathbb{Q}] = \varphi(n)\)（Euler 函数），\([\mathbb{Q}(\cos(2\pi/n)) : \mathbb{Q}] = \varphi(n)/2\)（\(\cos = (\zeta + \zeta^{-1})/2\)，多除以 2）。所以 \(\cos(2\pi/n)\) 的最小多项式次数是 \(\varphi(n)/2\)。</p>
-
-<p>需要 \(\varphi(n)/2\) 是 2 的幂 \(\Leftrightarrow \varphi(n)\) 是 2 的幂。</p>
-
-<p>\(n = 2^a p_1^{e_1} \cdots p_r^{e_r}\)（标准分解），\(\varphi(n) = 2^{a-1} \cdot \prod p_i^{e_i - 1}(p_i - 1)\) 是 2 的幂 \(\Leftrightarrow e_i = 1\) 对所有奇素数 \(p_i\) <em>且</em> \(p_i - 1\) 是 2 的幂。</p>
-
-<p>"\(p - 1\) 是 2 的幂"的奇素数 \(p\) 叫做<strong>Fermat 素数</strong>——形如 \(p = 2^{2^m} + 1\)。已知的只有 5 个：\(3, 5, 17, 257, 65537\)。</p>
-
-<p><strong>Gauss 定理。</strong>正 \(n\) 边形可作图 \(\Leftrightarrow\)</p>
-
-<p>\[
-\boxed{\ n = 2^k \cdot p_1 \cdot p_2 \cdots p_r,\ p_i \text{ 是不同的 Fermat 素数}.\ }
-\]</p>
-
-<p>所以可作图正多边形的边数列表头几个是 \(3, 4, 5, 6, 8, 10, 12, 15, 16, 17, 20, 24, 32, 34, 40, \ldots\)。</p>
-
-<p>注意 \(n = 7, 9, 11, 13, 14, 18, 19, 21, 22, 23, \ldots\) 都<em>不</em>可作。正 7 边形不可作（\(\varphi(7) = 6 = 2 \cdot 3\) 不是 2 的幂），正 9 边形不可作（\(\varphi(9) = 6\)），等等。Gauss 自己的构造是正 17 边形（\(\varphi(17) = 16 = 2^4\)）。</p>
-
-<p>这条定理把"什么正多边形可作"完全归结为"\(n\) 的素分解满足什么条件"。正 257 边形理论上可作但具体构造长达上百页；正 65537 边形据说有人尝试过但没人验证完。</p>
-
-<h2 id="sec22-6">22.6 求根公式与可解群</h2>
-
-<p>第二个大问题转向多项式方程。"求根公式"指的是表达根的公式只用<em>四则运算</em>加<em>开 \(n\) 次方根</em>。</p>
+<p>这是 3 次多项式。在 \(\mathbb{Q}\) 上不可约？用<em>有理根判定</em>：可能的有理根是 \(\pm 1, \pm 1/2, \pm 1/4, \pm 1/8\)（分子整除 1，分母整除 8）。逐个代入：</p>
 
 <ul>
-  <li>二次方程 \(ax^2 + bx + c = 0\)：\(x = (-b \pm \sqrt{b^2 - 4ac})/(2a)\)（古巴比伦已知）。</li>
-  <li>三次方程：Cardano 公式（1545），用 \(\sqrt[3]{}\) 嵌套 \(\sqrt{}\)。</li>
-  <li>四次方程：Ferrari 公式（1545），结构更复杂但仍是根式。</li>
-  <li>五次方程：Abel（1824）证明<em>没有通用根式公式</em>。Galois（1832）给出"为什么"的代数解释。</li>
+  <li>\(x = 1\)：\(8 - 6 - 1 = 1 \neq 0\)。</li>
+  <li>\(x = -1\)：\(-8 + 6 - 1 = -3 \neq 0\)。</li>
+  <li>\(x = 1/2\)：\(8 \cdot 1/8 - 6 \cdot 1/2 - 1 = 1 - 3 - 1 = -3 \neq 0\)。</li>
+  <li>\(x = -1/2\)：\(-1 + 3 - 1 = 1 \neq 0\)。</li>
+  <li>\(x = \pm 1/4, \pm 1/8\)：都给非零（你可以快速验证）。</li>
 </ul>
 
-<p>"用根式表达"在代数上的精确意思：</p>
-
-<p><strong>定义。</strong>多项式 \(f \in F[x]\) 称为<strong>用根式可解</strong>，如果存在一个域塔</p>
+<p>3 次多项式无有理根 \(\Rightarrow\) 在 \(\mathbb{Q}\) 上不可约。所以</p>
 
 <p>\[
-F = F_0 \subset F_1 \subset F_2 \subset \cdots \subset F_n
+[\mathbb{Q}(\cos 20°) : \mathbb{Q}] = 3.
 \]</p>
 
-<p>使得 \(F_n\) 包含 \(f\) 的分裂域，且每一步 \(F_{i+1} = F_i(\sqrt[m_i]{a_i})\)（添加某 \(a_i \in F_i\) 的 \(m_i\) 次方根）。</p>
+<p>3 不是 2 的幂。由 22.2 定理，<em>\(\cos 20°\) 不可作图</em>，所以<em>不能用尺规三等分 60°</em>。\(\square\)</p>
 
-<p>这是把"开方"翻译成"添加 \(\sqrt[m]{}\)" 的代数化操作。</p>
+<p>注意这条证明不是说"我没找到方法"——是<em>无论谁、用任何步骤、不可能找到方法</em>。这种"不可能性证明" 是数学最深刻的成就之一。古希腊找了 2000 年没找到的东西，被一行扩张次数算出来证明<em>本来就找不到</em>。</p>
 
-<p><strong>定义（可解群）。</strong>群 \(G\) 称为<strong>可解的</strong>，如果存在一系列子群</p>
+<h2 id="sec22-4">22.4 不可能 2：倍立方</h2>
+
+<p>另一个古希腊难题（Delos 倍立方问题）：给定一个立方体，作一个体积为它<em>两倍</em> 的立方体。即<em>给 1，作 \(\sqrt[3]{2}\)</em>。</p>
+
+<p>\(\sqrt[3]{2}\) 满足 \(x^3 - 2 = 0\)，Eisenstein \(p = 2\) 给不可约，所以 \([\mathbb{Q}(\sqrt[3]{2}) : \mathbb{Q}] = 3\)。3 不是 2 的幂——\(\sqrt[3]{2}\) 不可作。倍立方不可能。\(\square\)</p>
+
+<p>同样一行话证两件事——必要条件 \(2^k\) 的优美在这里现身。</p>
+
+<h2 id="sec22-5">22.5 不可能 3：化圆为方</h2>
+
+<p>第三个古希腊难题：给定半径 1 的圆（面积 \(\pi\)），作一个面积相同的<em>正方形</em>——边长 \(\sqrt \pi\)。</p>
+
+<p>这件事的证明<em>不</em> 用 22.2 直接给出，因为我们要先证 \(\sqrt \pi\) 不可作。Lindemann 1882 证明：<em>\(\pi\) 是超越数</em>——即 \(\pi\) 不是<em>任何</em> \(\mathbb{Q}\)-非零多项式的根。所以 \([\mathbb{Q}(\pi) : \mathbb{Q}] = \infty\)（\(\pi\) 在 \(\mathbb{Q}\) 上不代数）。同样 \([\mathbb{Q}(\sqrt \pi) : \mathbb{Q}] = \infty\)。<em>无穷不是 2 的幂</em>，所以 \(\sqrt \pi\) 不可作，化圆为方不可能。\(\square\)</p>
+
+<p>注意这件事比 22.3、22.4 微妙得多——\(\pi\) 的超越性<em>不是</em> Galois 理论给出的，而是分析结论（用 Hermite-Lindemann 定理：若 \(\alpha\) 代数非零，则 \(e^\alpha\) 超越；用 \(e^{i\pi} = -1\) 反推 \(\pi\) 超越）。所以化圆为方的不可能性<em>跨越</em> 代数与分析两个学科。这是 19 世纪最让数学家自豪的工作之一——三大古希腊难题<em>全部</em> 在 19 世纪被证不可能。</p>
+
+<h2 id="sec22-6">22.6 正多边形作图：Gauss-Wantzel 定理</h2>
+
+<p>另一个 2000 年悬案：哪些正 \(n\) 边形可用尺规作图？古希腊已知 3、4、5、6、8、10、12、15、16 边形可作；不知道 7、9、11、13、14、17。</p>
+
+<p>1796 年 Gauss 19 岁时证明<em>正 17 边形可作</em>——这件事让他决定终生献身数学（他要求墓碑刻 17 边形；后来雕刻师以"<em>看起来太像圆</em>" 为由没刻）。1801 年 Gauss 给出更一般的<em>充分</em> 条件；1837 年 Wantzel 补上<em>必要</em>条件。最终：</p>
+
+<p><strong>定理（Gauss-Wantzel）。</strong>正 \(n\) 边形可用尺规作图 ⟺ \(n = 2^k p_1 p_2 \cdots p_r\) 其中 \(k \ge 0\)，\(p_i\) 是<em>不同</em> Fermat 素数。Fermat 素数指形如 \(F_m = 2^{2^m} + 1\) 的素数。</p>
+
+<p>已知的 Fermat 素数只有 5 个：\(F_0 = 3, F_1 = 5, F_2 = 17, F_3 = 257, F_4 = 65537\)。\(F_5\) 与之后被验证不是素数（\(F_5 = 4294967297 = 641 \cdot 6700417\)，Euler 1732 发现）。是否还有更多 Fermat 素数<em>至今未知</em>。</p>
+
+<p>所以"小" 的可作正多边形有：3, 4, 5, 6, 8, 10, 12, 15, 16, 17, 20, 24, 30, 32, 34, 40, …。不可作的有：7, 9, 11, 13, 14, 18, 19, 21, 22, 23, 25, 26, 27, …。</p>
+
+<p>证明思路。"作正 \(n\) 边形" = "作 \(\zeta_n = e^{2\pi i / n}\) 在复平面" = "作 \(\cos(2\pi/n)\)"。这件事等价于 \(\cos(2\pi/n)\) 可作图。</p>
+
+<p>核心计算：\([\mathbb{Q}(\zeta_n) : \mathbb{Q}] = \varphi(n)\)（Euler totient），\(\text{Gal}(\mathbb{Q}(\zeta_n)/\mathbb{Q}) \cong (\mathbb{Z}/n)^*\)（21.4 例 2 的一般化，对一般 \(n\) 也成立）。\(\mathbb{Q}(\cos(2\pi/n))\) 是 \(\mathbb{Q}(\zeta_n)\) 的子域（事实上是 "\(\zeta_n + \zeta_n^{-1}\)" 生成；维数 \(\varphi(n)/2\) 当 \(n \ge 3\)）。</p>
+
+<p>必要条件：\(\cos(2\pi/n)\) 可作 \(\Rightarrow\) \([\mathbb{Q}(\cos(2\pi/n)):\mathbb{Q}] = \varphi(n)/2\) 是 2 的幂 \(\Rightarrow \varphi(n)\) 是 2 的幂。</p>
+
+<p>充分条件（更难）：\(\varphi(n)\) 是 2 的幂 \(\Rightarrow\) Galois 群 \((\mathbb{Z}/n)^*\) 是阶 2 的幂的<em>阿贝尔</em> 群 \(\Rightarrow\) 可分解成子群链每步指数 2 \(\Rightarrow\) 由 Galois 主定理得中间域链每步 2 维 \(\Rightarrow\) 每步可作（22.1 反向）\(\Rightarrow\) 顶端可作。</p>
+
+<p>余下数论：\(\varphi(n)\) 是 2 的幂 ⟺ \(n = 2^k p_1 \cdots p_r\) 不同 Fermat 素数（用 \(\varphi\) 的乘法性 + \(\varphi(p^a)\) 的公式）。</p>
+
+<p>具体：\(n = 17\)，\(\varphi(17) = 16 = 2^4\)，所以可作（Gauss）。\(n = 7\)，\(\varphi(7) = 6 = 2 \cdot 3\)，不是 2 的幂，所以不可作。\(n = 9\)，\(\varphi(9) = 6\)，不可作（即 22.3 节"<em>三等分 60° 不行</em>" 的换种说法——正 9 边形需要 40° 角，正 18 边形需要 20° 角，二者都需要 \(\cos 20°\)，不可作）。</p>
+
+<p>这条定理是 Galois 理论<em>第一次</em> 给出"<em>哪些 \(n\) 行哪些不行</em>" 的完整答案——而且答案<em>奇异地依赖于素数分布的未解之谜</em>（"是否存在 \(F_5\) 之后的 Fermat 素数")。</p>
+
+<h2 id="sec22-7">22.7 五次方程：可用根式解 ⟺ Galois 群可解</h2>
+
+<p>转到本章后半的另一个经典——根式解。</p>
+
+<p>背景。二次方程 \(ax^2 + bx + c = 0\)：根 \(x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\)，巴比伦人就会。三次：Cardano 1545（用 Tartaglia 思路）的"\(\sqrt[3]{}\) 嵌套" 公式。四次：Ferrari 1545（同书）的更复杂公式。</p>
+
+<p><em>五次</em>？Lagrange 1770 试探性失败，Ruffini 1799 给出<em>不可能</em> 的证明（不严格），Abel 1824 给严格证明，Galois 1830-1832（死前一夜整理手稿）给一般理论。</p>
+
+<p>"用根式解" 是什么？精确：</p>
+
+<p><strong>定义。</strong>多项式 \(f \in F[x]\) 称为<em>用根式可解</em>，若存在域链</p>
 
 <p>\[
-G = G_0 \trianglerighteq G_1 \trianglerighteq G_2 \trianglerighteq \cdots \trianglerighteq G_n = \{e\}
+F = F_0 \subseteq F_1 \subseteq \cdots \subseteq F_m
 \]</p>
 
-<p>每个 \(G_{i+1}\) 在 \(G_i\) 中正规且<em>商群 \(G_i / G_{i+1}\) 是 Abel 群</em>。</p>
+<p>使每步 \(F_{i+1} = F_i(\alpha_{i+1})\) 其中 \(\alpha_{i+1}^{n_i} \in F_i\) 对某 \(n_i \ge 1\)（即 \(\alpha_{i+1}\) 是 \(F_i\) 中元素的<em>\(n_i\) 次根</em>），且 \(f\) 在 \(F_m\) 上分裂。</p>
 
-<p>典型可解群：</p>
+<p>"链每步加一个根号" 把"<em>嵌套根号公式</em>" 形式化。如二次的 \(\sqrt{b^2 - 4ac}\)、Cardano 的 \(\sqrt[3]{(\cdots)}\) 都是这种链的元素。</p>
+
+<p><strong>主定理（Galois 1832）。</strong>设 \(F\) 特征 0，\(f \in F[x]\)，\(L\) 是 \(f\) 的分裂域。则 \(f\) 用根式可解 ⟺ \(\text{Gal}(L/F)\) 是<em>可解群</em>。</p>
+
+<p>"可解群" 是个群论概念。下一节定义。</p>
+
+<h2 id="sec22-8">22.8 可解群与 \(S_n\) 不可解（\(n \ge 5\)）</h2>
+
+<p><strong>定义。</strong>群 \(G\) 称为<strong>可解</strong>（solvable），若存在子群链</p>
+
+<p>\[
+\{e\} = G_0 \trianglelefteq G_1 \trianglelefteq \cdots \trianglelefteq G_k = G,
+\]</p>
+
+<p>使每个商 \(G_{i+1}/G_i\) 是<em>阿贝尔</em> 群。这种链叫<em>正规级数</em>，"<em>商都阿贝尔</em>" 是关键条件。</p>
+
+<p>名字"可解" 来自这个概念正好对应方程<em>用根式可解</em>。这个对应（22.7 主定理）是 Galois 工作的精华。</p>
+
+<p>例：</p>
 
 <ul>
-  <li>所有 Abel 群（直接 \(G \trianglerighteq \{e\}\)，\(G/\{e\} = G\) Abel）。</li>
-  <li>\(S_3\) 可解：\(S_3 \trianglerighteq A_3 \trianglerighteq \{e\}\)，\(S_3/A_3 \cong \mathbb{Z}/2\) Abel，\(A_3 \cong \mathbb{Z}/3\) Abel。</li>
-  <li>\(S_4\) 可解：\(S_4 \trianglerighteq A_4 \trianglerighteq V_4 \trianglerighteq \{e\}\)，三个商都 Abel。</li>
-  <li>\(p\)-群（阶 \(= p^n\)）总可解。</li>
+  <li>阿贝尔群本身可解（链 \(\{e\} \trianglelefteq G\)，唯一商 = \(G\) 阿贝尔）。</li>
+  <li>\(S_3\) 可解：\(\{e\} \trianglelefteq A_3 \trianglelefteq S_3\)，\(A_3/\{e\} = A_3 \cong \mathbb{Z}_3\) 阿贝尔，\(S_3/A_3 \cong \mathbb{Z}_2\) 阿贝尔。</li>
+  <li>\(S_4\) 可解：\(\{e\} \trianglelefteq V_4 \trianglelefteq A_4 \trianglelefteq S_4\)，其中 \(V_4 = \{e, (12)(34), (13)(24), (14)(23)\}\) Klein 四群。商分别 \(\mathbb{Z}_2 \times \mathbb{Z}_2, \mathbb{Z}_3, \mathbb{Z}_2\) 全阿贝尔。</li>
+  <li>\(p\)-群（阶 \(p^k\)）全部可解（用中心非平凡，归纳）。</li>
 </ul>
 
-<p><strong>定理（Galois 1832）。</strong>多项式 \(f \in F[x]\) 用根式可解 \(\Leftrightarrow\) 它的 Galois 群（在分裂域上）<em>可解</em>。</p>
+<p><strong>关键事实。</strong>对 \(n \ge 5\)，\(S_n\) <em>不可解</em>。</p>
 
-<p>\[
-\boxed{\ f \text{ 用根式可解}\ \Leftrightarrow\ \text{Gal}(\text{Splt}(f)/F) \text{ 是可解群}.\ }
-\]</p>
+<p>证明用 ch9 关键定理：\(A_n\) 在 \(n \ge 5\) 时是<em>单群</em>（除 \(\{e\}\) 与自身外无正规子群）且<em>非阿贝尔</em>（\(|A_n| = n!/2 \ge 60\)）。</p>
 
-<p>证明思路：根式塔 \(F_i \subset F_{i+1} = F_i(\sqrt[m_i]{a_i})\) 对应 Galois 群中的<em>循环</em>子商（添加 \(m_i\) 次方根的 Galois 群是 \((\mathbb{Z}/m_i)\) 的子群——循环 Abel）。所以根式塔自动给出可解链；反之可解链可以"几何化"成根式塔（用本原元 + Hilbert 90 定理）。完整证明详见 Lang《Algebra》第 6 章。</p>
+<p>假设 \(S_n\) 可解（\(n \ge 5\)），有正规级数 \(\{e\} = G_0 \trianglelefteq \cdots \trianglelefteq G_k = S_n\) 商全阿贝尔。考虑链中第一个含 \(A_n\) 的 \(G_i\)（最坏 \(G_k = S_n\)，含 \(A_n\)）。\(G_i \cap A_n\) 是 \(A_n\) 的子群，且<em>正规</em> 在 \(A_n\)（因为 \(G_i\) 正规在 \(G_{i+1}\)，限制到 \(A_n\) 推出 \(G_i \cap A_n\) 正规在 \(A_n\)；这点要稍微展开但是可走通）。\(A_n\) 单群，所以 \(G_i \cap A_n \in \{\{e\}, A_n\}\)。</p>
 
-<h2 id="sec22-7">22.7 \(S_n\) 在 \(n \ge 5\) 时不可解</h2>
+<p>把链限制到 \(A_n\)：得 \(\{e\} = G_0 \cap A_n \trianglelefteq G_1 \cap A_n \trianglelefteq \cdots \trianglelefteq G_k \cap A_n = A_n\)，每步商是阿贝尔（嵌入到原链商，原阿贝尔 \(\Rightarrow\) 子群商阿贝尔）。但每个 \(G_i \cap A_n \in \{\{e\}, A_n\}\)，所以链<em>跳跃</em>——某步 \(\{e\}\) 直接跳 \(A_n\)，那一步商 = \(A_n\)。但 \(A_n\) 非阿贝尔——矛盾。所以 \(S_n\) 不可解。\(\square\)</p>
 
-<p>这是<a href="ch9.html">第 9 章</a>已经准备好的结论。回顾：交替群 \(A_n\) 在 \(n \ge 5\) 时<em>单纯</em>（除 \(\{e\}\) 外没有正规子群）<em>且非 Abel</em>。</p>
+<p>这条证明的灵魂是<em>"\(A_n\) 单 \(\Rightarrow\) \(S_n\) 不可解"</em>，串起 ch9 与 ch22。</p>
 
-<p><strong>引理。</strong>设 \(G\) 可解，\(N \trianglelefteq G\) 正规子群。则 \(N\) 也可解。</p>
+<h2 id="sec22-9">22.9 一个具体五次：\(x^5 - 6x + 3\)</h2>
 
-<p>（证明：可解链 \(G = G_0 \supset \cdots \supset \{e\}\) 限制到 \(N\) 上 \(N \cap G_i\) 给可解链，每个商是 \(G_i/G_{i+1}\) 的子群因而 Abel。）</p>
+<p>22.7 + 22.8 给的是<em>一般</em> 不可解性。但"<em>具体某个</em> 五次方程的 Galois 群是 \(S_5\) 吗" 还要单独验证。给一个干净的例子。</p>
 
-<p>设 \(S_n\) 可解，\(n \ge 5\)。则 \(A_n \trianglelefteq S_n\) 也可解。可解链 \(A_n = H_0 \trianglerighteq H_1 \trianglerighteq \cdots \trianglerighteq \{e\}\)，每个商 Abel。\(H_1 \trianglelefteq A_n\)。\(A_n\) 单纯非 Abel \(\Rightarrow H_1 = \{e\}\) 或 \(H_1 = A_n\)。</p>
+<p><strong>断言。</strong>\(f(x) = x^5 - 6x + 3 \in \mathbb{Q}[x]\) 的分裂域 \(L\) 满足 \(\text{Gal}(L/\mathbb{Q}) = S_5\)。所以 \(f\) <em>不</em> 用根式可解。</p>
+
+<p>证明分三步。</p>
+
+<p><strong>步 1：\(f\) 在 \(\mathbb{Q}\) 上不可约。</strong>用 Eisenstein 判别 \(p = 3\)：</p>
 
 <ul>
-  <li>\(H_1 = \{e\}\)：链是 \(A_n \supset \{e\}\)，要求 \(A_n / \{e\} = A_n\) 是 Abel——\(n \ge 5\) 时 \(A_n\) 非 Abel，矛盾。</li>
-  <li>\(H_1 = A_n\)：链停滞，要继续递归 \(H_2 \trianglelefteq H_1 = A_n\)，同样问题。</li>
+  <li>首项系数 1，\(3 \nmid 1\)。\(\checkmark\)</li>
+  <li>非首项系数 \(0, 0, 0, -6, 3\)：\(3 | 0, 3 | 0, 3 | 0, 3 | -6, 3 | 3\)。\(\checkmark\)</li>
+  <li>常数项 \(3\)，\(3^2 = 9 \nmid 3\)。\(\checkmark\)</li>
 </ul>
 
-<p>所以 \(S_n\) 在 \(n \ge 5\) 时<strong>不可解</strong>。\(\Box\)</p>
+<p>Eisenstein 全部条件满足，\(f\) 不可约。</p>
 
-<p>\[
-\boxed{\ n \ge 5\ \Rightarrow\ S_n \text{ 不可解}.\ }
-\]</p>
+<p><strong>步 2：\(f\) <em>恰好</em> 有 3 个实根（即 2 个复根，互共轭）。</strong>用微积分。\(f'(x) = 5 x^4 - 6\)，零点 \(x = \pm (6/5)^{1/4} \approx \pm 1.046\)。\(f''(\pm 1.046) = 20 x^3\) 异号 \(\Rightarrow\) 一极大一极小。</p>
 
-<h2 id="sec22-8">22.8 五次方程不可解：构造一个具体例子</h2>
+<p>计算极值：</p>
 
-<p>22.6 + 22.7 给出"如果 \(\text{Gal}(\text{Splt}(f)/\mathbb{Q}) = S_5\)，那 \(f\) 不可用根式解"。剩下要做的是<em>构造</em>一个具体五次 \(f \in \mathbb{Q}[x]\) 的 Galois 群确实是 \(S_5\)。</p>
+<ul>
+  <li>\(f(-1.046) \approx (-1.046)^5 - 6(-1.046) + 3 \approx -1.25 + 6.28 + 3 = 8.03 > 0\)。</li>
+  <li>\(f(1.046) \approx 1.25 - 6.28 + 3 = -2.03 < 0\)。</li>
+</ul>
 
-<p>取 \(f(x) = x^5 - 6 x + 3 \in \mathbb{Q}[x]\)。我们要证：</p>
+<p>所以 \(f\) 的图象：从 \(-\infty\) 升到极大 \(\approx 8\)（在 \(x \approx -1.046\)），降到极小 \(\approx -2\)（在 \(x \approx 1.046\)），再升到 \(+\infty\)。穿过 \(x\)-轴 3 次——3 个实根。剩 2 个根必复（共轭）。</p>
 
-<ol>
-  <li>\(f\) 在 \(\mathbb{Q}\) 上不可约。</li>
-  <li>\(f\) 在 \(\mathbb{R}\) 中恰有 3 个实根、1 对复共轭根。</li>
-  <li>由 1 + 2 推 \(\text{Gal} = S_5\)。</li>
-</ol>
+<p><strong>步 3：Galois 群 = \(S_5\)。</strong>设 \(G = \text{Gal}(L/\mathbb{Q}) \subseteq S_5\)（看作根的置换）。用两个事实：</p>
 
-<p><strong>第 1 步：不可约。</strong>用 Eisenstein 判别法 \(p = 3\)。系数 \(1, 0, 0, 0, -6, 3\)：\(3 \nmid 1\)（首项），\(3 \mid 0, 0, 0, -6\)（其它项），\(9 \nmid 3\)（常数项）。Eisenstein 给 \(f\) 不可约。</p>
+<p>(a) \(G\) <em>传递</em>：因为 \(f\) 不可约，任两根 \(\alpha_i, \alpha_j\) 共享最小多项式 \(f\)；同 ch20.5 同构延拓引理给某 \(\sigma \in G\) 把 \(\alpha_i\) 送到 \(\alpha_j\)。所以 \(G\) 在根集 \(\{\alpha_1, \ldots, \alpha_5\}\) 上传递。\(\Rightarrow\) \(5 = |\text{root set}|\) 整除 \(|G|\)（轨道-稳定子定理，ch7）。</p>
 
-<p><strong>第 2 步：恰 3 个实根。</strong>分析 \(f(x) = x^5 - 6 x + 3\) 在 \(\mathbb{R}\) 上。求导：\(f'(x) = 5 x^4 - 6\)，零点 \(x = \pm (6/5)^{1/4} \approx \pm 1.046\)。临界点处的函数值：</p>
+<p>(b) \(G\) 含一个 5-环 \(\sigma\)：因 \(5 | |G|\)，由 Cauchy 定理（ch7）\(G\) 有阶 5 元素。阶 5 在 \(S_5\) 中只能是 5-环（5 是素数；5-环阶 5）。</p>
 
-<p>\(f(1.046) \approx 1.046^5 - 6(1.046) + 3 \approx 1.252 - 6.276 + 3 = -2.024 < 0\)；</p>
+<p>(c) \(G\) 含一个<em>对换</em>（2-环）：复共轭 \(\bar{\cdot} : \mathbb{C} \to \mathbb{C}\) 限制到 \(L\) 是 \(L\) 的 \(\mathbb{Q}\)-自同构（因 \(L\) 由 \(f\) 系数有理 + 取根生成，对共轭封闭）。共轭把每个实根送到自己，把两个复根（互共轭）相互交换——这就是 \(S_5\) 中的<em>对换</em>。</p>
 
-<p>\(f(-1.046) \approx -1.252 + 6.276 + 3 = 8.024 > 0\)。</p>
+<p>(d) "5 阶子群含 5-环 + 对换" \(\Rightarrow\) 等于 \(S_5\)：标准引理（用对换与 5-环生成 \(S_5\)，可由"对换的轨道在 5-环作用下扫出全部 \(\binom{5}{2} = 10\) 对换" 论证；具体在 ch9 习题里）。</p>
 
-<p>所以 \(f\) 在 \(-\infty \to -1.046\) 上从 \(-\infty\) 增到 \(+8.024\)（穿过零一次）、在 \(-1.046 \to 1.046\) 上从 \(+8.024\) 减到 \(-2.024\)（穿零一次）、在 \(1.046 \to +\infty\) 上从 \(-2.024\) 增到 \(+\infty\)（穿零一次）。三个实根。</p>
+<p>所以 \(G = S_5\)。由 22.7、22.8，\(f\) 不用根式可解。\(\square\)</p>
 
-<p>剩下两根必为复共轭对（5 = 3 实 + 2 复，复根成对）。</p>
+<p>请你停下来欣赏这个例子的细节：<em>"恰好 3 个实根"</em> 是关键——它给出对换；"<em>不可约</em>" 给传递性、给 5-环；两者合起来 \(\Rightarrow\) \(S_5\) \(\Rightarrow\) 不可解。这种"多个不同来源的事实合作给出 Galois 群" 的论证是整个 Galois 理论应用层最常见的模式。</p>
 
-<p><strong>第 3 步：Galois 群 = \(S_5\)。</strong>关键事实：\(f\) 不可约 \(\Rightarrow G = \text{Gal}(\text{Splt}(f)/\mathbb{Q})\) 在 5 个根上的作用<em>传递</em>（\(G \le S_5\) 传递子群）\(\Rightarrow 5 \mid |G|\) （由<a href="ch6.html">第 6 章</a>群作用 + 轨道-稳定子定理）。</p>
+<h2 id="sec22-10">22.10 历史与现代</h2>
 
-<p>由 Cauchy 定理，\(G\) 含一个 5 阶元素 \(\Rightarrow G\) 含一个 5-cycle（\(S_5\) 中阶 5 元素只有 5-cycle）。</p>
+<p><strong>Abel-Ruffini 定理。</strong>1799 Ruffini 给出"<em>一般</em> 五次方程不可用根式解" 的证明（部分严格），1824 Abel 完成证明。Abel 的证明<em>不用</em> Galois 理论（那时还没出现）——他直接对根的 \(S_5\)-置换性质论证。这个工作让 22 岁的 Abel 一跃成为欧洲数学家关注对象。Abel 1829 年 26 岁因肺结核去世，临终前刚收到 Crelle 寄来的"柏林教授职位" 录用通知。</p>
 
-<p>另外，复共轭 \(z \mapsto \bar z\) 是 \(\mathbb{C}/\mathbb{R}\) 的自同构，限制到 \(\text{Splt}(f)\) 上是 Galois 元素。它把 3 个实根固定，把 1 对复根互换 \(\Rightarrow\) 在 \(S_5\) 中是<em>一个</em>对换（transposition）。</p>
+<p><strong>Galois 1830-1832。</strong>Évariste Galois 17 岁开始写关于方程的笔记，被 Cauchy 与 Fourier 接连"<em>看不懂</em>" 退稿。20 岁因政治激进入狱；出狱后因决斗去世。决斗前一夜（1832 年 5 月 30 日）他<em>整夜</em> 整理数学手稿，给朋友 Auguste Chevalier 写信"<em>请把它寄给 Jacobi 或 Gauss 让他们评判，不是关于真假，而是关于价值</em>"。第二天天亮决斗，被打成重伤，5 月 31 日去世，22 岁。</p>
 
-<p>群论事实：<em>\(S_5\) 由任一 5-cycle + 任一对换生成</em>。</p>
+<p>Galois 手稿在他死后 14 年（1846）由 Liouville 编辑发表，又过 20 多年后才被 Jordan 1870 在《关于置换与代数方程的论》中系统化。"<em>Galois 群</em>" 一词由 Dedekind 1894 命名。20 世纪 Artin、van der Waerden 给出现代教科书形式（这本书 ch20-21 走的就是 Artin 路线）。</p>
 
-<p>（证明：5-cycle \(\sigma = (1, 2, 3, 4, 5)\)、对换 \(\tau = (i, j)\)。\(\sigma^k\) 把 \((i, j)\) 共轭成 \((i + k, j + k)\)（指标 mod 5），可以遍历所有"距离 \(j - i\)" 的对换。再用 \(\sigma\) 的更多次幂 + 对换合成 \((1, 2)\) 这种"相邻对换"，最后再合成所有对换 \(\Rightarrow\) 生成 \(S_5\)。详见<a href="ch9.html">第 9 章</a>。）</p>
+<p><strong>20 世纪与之后。</strong>Galois 理论已经远远超出"<em>方程能不能用根式解</em>" 的原始问题——它发展成<em>类域论</em>（描述 \(\mathbb{Q}\) 全部阿贝尔扩张）、<em>无穷 Galois 理论</em>（用 profinite 群描述 \(\bar{\mathbb{Q}}/\mathbb{Q}\)）、<em>Grothendieck 的 \(\acute{\text{e}}\)tale 同伦</em>（把 Galois 群推到代数几何）。Wiles 1995 证 Fermat 大定理也通过 Galois 表示论实现。</p>
 
-<p>所以 \(G = S_5\)。</p>
+<p>"<em>5 次方程没有公式</em>" 是 Galois 理论<em>最简单</em> 的应用——这条定理过了 200 年仍是抽象代数课的<em>必学之物</em>，因为它清晰地展示了一件事：<em>对一个具体的、看似只关于"算" 的问题，结构性的代数论证可以给出"算与不能算" 的精确边界</em>。</p>
 
-<p>由 22.6 + 22.7：\(S_5\) 不可解 \(\Rightarrow f(x) = x^5 - 6x + 3\) <strong>不能用根式表达根</strong>。\(\Box\)</p>
+<h2 id="sec22-11">22.11 这一章我们做了什么</h2>
 
-<p>\[
-\boxed{\ x^5 - 6x + 3 \text{ 的根不能用四则 + 开方表达}.\ }
-\]</p>
+<p>我们用 Galois 理论解决了两类古典不可能性。</p>
 
-<p>这就是"五次方程一般无求根公式"的具体反例。它的存在意味着：你写下任何用 \(\sqrt{}, \sqrt[3]{}, \sqrt[5]{}\) 等嵌套的"通用五次根公式"，都不可能正确给出 \(x^5 - 6x + 3\) 的根。</p>
+<p>尺规作图：把"作图" 翻译成"迭代二次扩张"，给出必要条件 \([\mathbb{Q}(a):\mathbb{Q}] = 2^k\)。三件事直接落出来：</p>
 
-<p>整个论证的"机器"很清楚——五个步骤：(i) Eisenstein 给不可约 \(\Rightarrow\) 5 整除群阶；(ii) 实数分析给"3 实 2 复"\(\Rightarrow\) 复共轭是对换；(iii) 群论给"5-cycle + 对换 = \(S_5\)"；(iv) Galois 主定理给"可根式解 \(\Leftrightarrow\) Galois 群可解"；(v) <a href="ch9.html">第 9 章</a>给 "\(S_5\) 不可解"。<em>每一步</em>都用前面章节准备好的结论——Galois 理论真正是"<a href="ch1.html">第 1 章</a>到<a href="ch21.html">第 21 章</a>所有积累"在一个具体问题上的归宿。</p>
+<ul>
+  <li>三等分 60° 不可能（\(\cos 20°\) 维数 3）；</li>
+  <li>倍立方不可能（\(\sqrt[3]{2}\) 维数 3）；</li>
+  <li>化圆为方不可能（\(\pi\) 超越，维数 \(\infty\)）；</li>
+  <li>正 \(n\) 边形可作 ⟺ \(n = 2^k \prod p_i\)（不同 Fermat 素数）。</li>
+</ul>
 
-<h2 id="sec22-9">22.9 历史与意义</h2>
+<p>方程根式解：定义"用根式解" 等价于"<em>Galois 群可解</em>"。可解性是群论概念——\(S_n, n \ge 5\) 不可解（用 \(A_n\) 单群）。具体实例 \(x^5 - 6x + 3\) 的 Galois 群 = \(S_5\)，所以这个具体五次方程<em>没有</em> 根式公式。一般五次同理——所以从此再没数学家追求"五次求根公式"。</p>
 
-<p>把整段历史放在这一章末尾，让你看到这件事的人文重量。</p>
+<p>历史一句话：Abel 26 岁病逝、Galois 22 岁决斗死，但他们留下了改变数学的<em>群论</em>。我们今天能"<em>一行算出 60° 不能三等分</em>" 是站在他们的工作之上——而那工作的诞生过程<em>本身</em> 是数学史上最戏剧的一章。</p>
 
-<p>"五次方程是否可解"问题在 1545 年 Cardano 公开三次方程公式后就成了数学的悬案。两百多年里，数学家——Lagrange、Euler、Vandermonde——反复尝试推广 Cardano 方法到五次，都失败了。Lagrange 在 1770 年代意识到失败有"结构原因"——他注意到三、四次解法本质上利用了根之间的<em>对称性</em>，而五次的对称结构似乎"过于复杂"。但他没工具把这种感觉精确化。</p>
+<p>下一章我们换轨道——把代数应用到工程：编码理论与有限域。从 Galois 的<em>抽象</em> 到 Reed-Solomon、CD 纠错码的<em>具体</em>。代数语言的应用半径，会再展现一次它的宽度。</p>
 
-<p><strong>1824 年，Niels Henrik Abel</strong>（22 岁的挪威数学家）证明了五次方程一般<em>不可解</em>。他的证明用"代数方程根之间的关系结构"做了精细的不变量分析，本质上是一种朴素的"可解群"思想。但他用的不是群论语言，论证读起来非常艰深。这篇论文当时出版费 Abel 自费，仅印 6 页发往欧洲数学界，没有得到充分理解。Abel 1829 年因贫病去世，27 岁。</p>
-
-<p><strong>1831–1832 年，Évariste Galois</strong>（19–20 岁的法国数学家）写下一份奠定现代代数的手稿：他把"方程可解性"翻译成"根的对称群是不是可解群"，用 Galois 群的结构给出"为什么 Abel 是对的"的根本解释。Galois 1832 年因决斗去世，21 岁——决斗前夜他仓促把论文写完寄给朋友 Auguste Chevalier。这份手稿 11 年后由 Joseph Liouville 整理出版，开启了现代抽象代数。</p>
-
-<p>"群论"这个学科<em>就是</em>从 Galois 这份遗稿生长出来的。Cayley 1854 年的"抽象群定义"、Klein 1872 年的 Erlangen 纲领、Sylow 1872 年的 Sylow 定理、Frobenius 与 Schur 的表示论、Lie 的连续群，都是从"Galois 用群解决方程问题"出发的扩展。20 世纪 Emmy Noether 把"用结构定理统一描述代数对象"的思想推向高潮，奠定了现代数学的结构主义基调。</p>
-
-<p>所以本书走过的 22 章——从<a href="ch1.html">正六边形对称</a>到<a href="ch7.html">Sylow 定理</a>到<a href="ch15.html">多项式环</a>到<a href="ch20.html">分裂域</a>到 Galois 主定理到这一章的"五次方程不可解"——本质上是<em>重走 Galois 一夜之间走完的路径</em>，只不过 Galois 来不及把全部细节写下来，后世数学家用 200 年才把它完全填上。</p>
-
-<p>下一章我们换换口味，看抽象代数的<em>现代</em>应用：编码理论与有限域。香农 1948 年的信息论 + Reed–Solomon 1960 年的纠错码 + 现在每天保护你硬盘 / 蓝光 / 5G 信号的 BCH 码——背后的数学全部是<em>有限域 \(\mathbb{F}_{2^k}\) 上的代数</em>。把代数从"19 世纪解方程"推到"21 世纪保护通讯"，闭环就完成了。</p>
-
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 Galois 理论基本定理</a><a href="ch23.html">下一章 · 第 23 章 编码理论与有限域 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 Galois 主定理</a><a href="ch23.html">下一章 · 第 23 章 编码理论与有限域 →</a></nav>
 </main>
 </body>
 </html>

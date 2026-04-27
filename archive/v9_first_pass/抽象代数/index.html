@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目录 — 普林斯顿抽象代数读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+<h1>普林斯顿抽象代数读本</h1>
+
+<p style="margin-top:-0.5rem;color:var(--ink-soft);font-style:italic;">群、环、域、模、Galois 理论 · 把"对称"系统化为代数结构</p>
+
+<h1 id="preface">前言</h1>
+
+<p>欢迎你翻开这本书。抽象代数有一个独特的位置——它是大学数学课程里第一门<em>真正抽象</em>的课。在它之前，你研究的对象大多有具体的"原料"——数、向量、函数、矩阵、几何图形。到了抽象代数，原料几乎被剥光：你研究的就是"一组对象 + 一组规则"，规则少到看上去几乎不能干什么。但奇迹在于：仅仅靠这几条规则，整个数学的大半建筑物——数论、几何、密码学、晶体学、量子粒子物理、Galois 解方程——都被组织成同一个语言。</p>
+
+<p>这本书要教的就是这种"把规则变成结构"的眼光。我们从最朴素的对称问题开始（"正六边形有多少种自旋方式不变形"），慢慢推到群、环、域、模这一整套语言，最后用 Galois 理论给一个让人惊叹的应用——证明<em>五次以上多项式方程没有像求根公式那样的代数解</em>。这个故事 19 世纪初让 Évariste Galois 在 20 岁前完成，把"群论"作为一门学科催生出来；它至今仍是数学里最美的大定理之一。</p>
+
+<p>这是"普林斯顿读本系列"的第九本，也是<strong>系列代数主线的真正深入</strong>。前面几本里代数其实一直在场——<a href="../线性代数/index.html"><em>《线性代数读本》</em></a>讲了向量空间和线性变换；<a href="../多元微积分/index.html"><em>《多元微积分读本》</em></a>用过 \(\mathbb{R}^n\) 上的向量空间结构；<a href="../复分析/index.html"><em>《复分析读本》</em></a>处处依靠复数域 \(\mathbb{C}\) 的代数性质；<a href="../泛函分析/index.html"><em>《泛函分析读本》</em></a>把"线性算子代数 \(\mathcal{B}(X)\)"作为核心对象。但所有这些地方的"代数"只是被当工具用——本书第一次<em>系统</em>地研究代数结构本身。</p>
+
+<p>如果你此刻是第一次接触这门课，担心自己一上来就被"群、环、域、模"这种"全新名词"淹没；如果你下周就要考期中，急需一张能告诉你"Sylow 定理到底在干什么、Galois 对应到底怎么用"的地图；又或者你听过密码学 / 晶体学 / 编码理论用了"群"这个字但始终不知道为什么——我希望这本书都能帮到你。</p>
+
+<h2>抽象代数到底在修什么？</h2>
+
+<p>一句话说，抽象代数在修三样东西。</p>
+
+<p>第一，修<strong>"什么是真正的对称"</strong>。日常意义的"对称"指几何对称——一个图形旋转 / 反射后看起来一样。代数把"对称"提升为<em>"保持结构的双射"</em>，于是"复数共轭"是一种对称、"重新标号"是一种对称、"换基"是一种对称。这种推广让数学里所有"等价的不同表述"都能用同一种语言（群论）来分类。</p>
+
+<p>第二，修<strong>"运算结构"</strong>。整数有加法和乘法、矩阵有加法和乘法、多项式有加法和乘法——它们的运算"长得像"。代数把这种相似抽出来定义"环""域"，于是<em>所有有"加法 + 乘法"结构的对象</em>都可以用同一套理论分析。这不仅是术语统一，更让你能回答"\(p\) 进数算术上的某条性质对吗"用同一种思路答"复数算术上的某条性质对吗"。</p>
+
+<p>第三，修<strong>"为什么有些数学问题不可解"</strong>。这是抽象代数最深刻的一面。"用尺规能不能三等分任意角""五次方程能不能有像 \(x = \sqrt[5]{a + \sqrt b}\) 这样的求根公式""为什么 \(\pi\) 不是代数数"——这些问题的答案<em>都是否</em>，而<em>证明它们是否的工具就是抽象代数</em>。这种"用代数证明不可能"的能力是 19 世纪数学最惊艳的成就。</p>
+
+<h2>在读这本书之前我需要知道什么？</h2>
+
+<p>你需要一定的<a href="../线性代数/index.html"><em>《线性代数读本》</em></a>背景，特别是第 6-15 章关于向量空间、线性变换、行列式、特征值的内容。第 16、17 章模论会大量用到线性代数概念。</p>
+
+<p>你最好读过基本的<em>数论</em>——同余、最大公约数、欧几里得算法、素数的基本性质。本书<a href="appA.html">附录 A</a>会简要回顾，但有数论基础会让前 10 章读起来更顺。</p>
+
+<p>你<strong>不</strong>需要先学过实分析或拓扑——本书几乎完全是代数的。第 18 章后偶尔会用到复数和"代数闭包"概念，但都会在用到时说明白。</p>
+
+<p>你需要的更像是一种态度：愿意接受"<em>群</em>"或"<em>环</em>"作为一个抽象对象，<em>不</em>急着把它具体化成某个熟悉的东西；愿意花时间在简单例子上把抽象概念"跑通"再上一般化；愿意接受很多结论的真正威力要等到第 20 章后 Galois 理论登场才完全显现。</p>
+
+<h2>为什么要看这本书？</h2>
+
+<p>因为这是数学里第一次让你看到<strong>"分类的力量"</strong>。线性代数告诉你"所有 \(n\) 维向量空间都同构于 \(\mathbb{R}^n\)"——这是分类的雏形。抽象代数走得更远：它把"所有有限阶 \(p^2\) 群"分成两类、把"所有 PID 上有限生成模"按初等因子分类、把"所有可解 5 次方程"按 Galois 群可解性分类。每次这种分类都意味着你以后看到该类对象，立刻知道它"必须长什么样"——这是数学最高效的认知工具。</p>
+
+<p>这也是为什么这本书和前面几本会咬得特别紧。第 11-15 章的环论会让<a href="../线性代数/index.html">线性代数</a>里"多项式 = 数学对象"这件事真正稳固；第 17 章 PID 上有限生成模结构定理会给<em>《线性代数读本》</em>的 Jordan 标准形一个根本解释；第 18-22 章 Galois 理论会和<a href="../复分析/index.html">复分析</a>里"代数闭包 \(\mathbb{C}\)" 重新挂钩；第 23-24 章应用会接到密码学、编码理论、晶体学等具体场合。</p>
+
+<h2>"我下周就要考试了，从哪里开始？"</h2>
+
+<p>先别从头读到尾。直接跳到下面的<a href="#reverse-index">主题反向索引</a>。绝大多数本科抽象代数考试主要考三块：群论的基本结果（陪集 / Lagrange / 同构定理 / Sylow）、环论的基本结果（理想 / 整环 / PID / UFD）、Galois 理论的基础（如果你的课包括它）。找到你课程权重最大的那几块，沿着对应章节读。</p>
+
+<p>如果完全不知道考什么，按这个优先级突击：</p>
+
+<ul>
+  <li>群、子群、陪集、Lagrange 定理（第 2-3 章）；</li>
+  <li>同态、正规子群、商群、三大同构定理（第 4-5 章）；</li>
+  <li>群作用与 Sylow 定理（第 6-7 章）；</li>
+  <li>环、理想、商环、整环、域（第 11-13 章）；</li>
+  <li>主理想环、唯一分解、多项式环（第 14-15 章）；</li>
+  <li>域的扩张与代数扩张（第 18-19 章）。</li>
+</ul>
+
+<p>把这些抓牢，绝大多数标准课程的 80% 就稳了。考完之后，如果你还想真正学懂，再回来按章节顺序慢慢读，特别是 Galois 理论（第 21-22 章）。</p>
+
+<h2>例题与证明的安排</h2>
+
+<p>例题全埋在正文里——本书不写"例 4.2.1"这种标签。每个例题都先于一般化定理出现，让你看到"为什么会有这条定理"。比如 Sylow 定理不会先摆三条陈述，而会先用"\(|G| = 12\) 这种群有几种"这个具体问题把你带过来；Galois 对应不会从抽象定理开始，而会先在 \(\mathbb{Q}(\sqrt 2)\)、\(\mathbb{Q}(\sqrt 2, \sqrt 3)\) 这种小例子上把"中间域 ↔ 子群" 反复跑通。</p>
+
+<p>证明会做到"你能真的看见为什么对"的程度，但一些技术性强、第一次出现容易让人晕头转向的细节（如 Sylow 定理的完整三段证明、有限生成模 Smith 标准形的完整算法、Galois 主定理的可分性技术）会在需要的章节给完整版本，而非塞到附录。<a href="appA.html">附录 A</a>给等价关系、商集等基础速查；<a href="appB.html">附录 B</a>简要介绍范畴论的几个核心概念，让你能听懂"函子""自然变换"这两个词以后再读高级文献时不会陌生。</p>
+
+<h2 id="reverse-index">主题反向索引：你想做的事 → 你该读的章节</h2>
+
+<ul>
+  <li><strong>把"对称"系统化：</strong>第 1-3 章。从几何对称到群公理。</li>
+  <li><strong>会用 Lagrange 定理证明小阶群结构：</strong>第 3、7 章。</li>
+  <li><strong>第一次接触 Sylow 定理：</strong>第 7 章；先做 \(|G| = 12, 30, 56\) 这几道经典分类。</li>
+  <li><strong>理解"环 vs 域 vs 整环 vs PID vs UFD"的层级：</strong>第 11-14 章。</li>
+  <li><strong>把<em>《线性代数读本》</em>的 Jordan 标准形真正搞懂：</strong>第 16-17 章模论 + 结构定理。</li>
+  <li><strong>第一次接触 Galois 理论：</strong>第 18-21 章。先把代数扩张和分裂域跑熟。</li>
+  <li><strong>看尺规作图为什么三等分角不可能：</strong>第 22 章。</li>
+  <li><strong>看五次方程为什么没有求根公式：</strong>第 22 章后半。</li>
+  <li><strong>密码学 / 编码理论的代数背景：</strong>第 23 章。</li>
+  <li><strong>晶体学 / 量子粒子分类的群论背景：</strong>第 24 章。</li>
+  <li><strong>"我搞 ML / CS，为什么这门课重要？"：</strong>第 6 章（群作用 = 数据增广 / 等变神经网络）+ 第 17 章（结构定理 = 数据降维的理论根）+ 第 23 章（密码学 / 编码 / 哈希函数）。</li>
+</ul>
+
+<h2>致谢</h2>
+
+<p>本书向 Adrian Banner 的<em>《微积分读本》</em>致敬。在内容选材上参考了多本英文经典：Michael Artin <em>Algebra</em>、David Dummit &amp; Richard Foote <em>Abstract Algebra</em>、Joseph Rotman <em>Advanced Modern Algebra</em>、Serge Lang <em>Algebra</em>、Ian Stewart <em>Galois Theory</em>。这五本书各有特长：Artin 的几何品味、Dummit–Foote 的覆盖广度、Rotman 的现代视角、Lang 的简洁、Stewart 的 Galois 理论历史叙述。本书是这几条传统的折中，但写法上始终坚持 Banner 的姿态——动机先于定义、画面先于公式、例子先于一般化。</p>
+
+<h2>目录</h2>
+
+<ol>
+  <li><a href="ch1.html">第 1 章 引论：从对称到代数结构</a> — 为什么要把"对称"提升为代数。</li>
+  <li><a href="ch2.html">第 2 章 群的定义与基本例子</a> — 群公理 + 八个标准例子。</li>
+  <li><a href="ch3.html">第 3 章 子群、陪集、Lagrange 定理</a> — 第一条结构性定理。</li>
+  <li><a href="ch4.html">第 4 章 同态与正规子群</a> — 把"群之间"的关系系统化。</li>
+  <li><a href="ch5.html">第 5 章 商群与三大同构定理</a> — 同态分解的标准模板。</li>
+  <li><a href="ch6.html">第 6 章 群作用、轨道、稳定子</a> — 把群"用起来"的核心工具。</li>
+  <li><a href="ch7.html">第 7 章 Sylow 定理</a> — 有限群分类的入门定理。</li>
+  <li><a href="ch8.html">第 8 章 有限交换群的结构定理</a> — 完全分类。</li>
+  <li><a href="ch9.html">第 9 章 对称群 \(S_n\) 与置换</a> — 循环表示、奇偶、\(A_n\) 单纯。</li>
+  <li><a href="ch10.html">第 10 章 自由群、生成元与关系</a> — 群表示（presentation）。</li>
+  <li><a href="ch11.html">第 11 章 环：定义与基本例子</a> — 环公理 + 八个标准例子。</li>
+  <li><a href="ch12.html">第 12 章 理想与商环</a> — 环上的"正规子群"。</li>
+  <li><a href="ch13.html">第 13 章 整环、域、商域</a> — 环的层级关系。</li>
+  <li><a href="ch14.html">第 14 章 主理想环与唯一分解</a> — PID, UFD, Eisenstein。</li>
+  <li><a href="ch15.html">第 15 章 多项式环</a> — \(k[x]\) 的精细结构。</li>
+  <li><a href="ch16.html">第 16 章 模的入门</a> — 把"线性代数"推广到任意环上。</li>
+  <li><a href="ch17.html">第 17 章 PID 上有限生成模的结构定理</a> — Smith 标准形与初等因子。</li>
+  <li><a href="ch18.html">第 18 章 域的扩张</a> — 扩张次数与塔。</li>
+  <li><a href="ch19.html">第 19 章 代数扩张与最小多项式</a> — 单代数扩张。</li>
+  <li><a href="ch20.html">第 20 章 分裂域与正规扩张</a> — Galois 的舞台。</li>
+  <li><a href="ch21.html">第 21 章 Galois 理论基本定理</a> — 子群 ↔ 中间域。</li>
+  <li><a href="ch22.html">第 22 章 应用 Galois：尺规作图与五次方程不可解</a> — 经典几何与代数不可能。</li>
+  <li><a href="ch23.html">第 23 章 应用：编码理论与有限域</a> — Reed–Solomon 与 \(\mathbb{F}_q\)。</li>
+  <li><a href="ch24.html">第 24 章 应用：晶体学与表示论入门</a> — 14 Bravais 格子与有限群表示。</li>
+</ol>
+
+<ul>
+  <li><a href="appA.html">附录 A 集合、关系、等价类速查</a></li>
+  <li><a href="appB.html">附录 B 范畴论一瞥</a></li>
+  <li><a href="subject-index.html">主题索引</a></li>
+</ul>
+
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+</main>
+</body>
+</html>

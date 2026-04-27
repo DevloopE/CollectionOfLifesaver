@@ -35,192 +35,314 @@
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 子群、陪集、Lagrange 定理</a><a href="ch5.html">下一章 · 第 5 章 商群与三大同构定理 →</a></nav>
 <h1 id="ch4">第 4 章 同态与正规子群</h1>
 
-<p>到这一章为止，我们一直在<em>一个</em>群里活动：研究子群、陪集、阶。但群论的真正力量在<strong>群与群之间的关系</strong>——也就是<em>同态</em>。一个同态 \(\varphi : G \to H\) 是一种"翻译"，它把 \(G\) 的乘法结构搬到 \(H\) 的乘法结构上，并且保留这套结构的全部代数内容。这条简单的"保结构"要求会扯出来一对关键对象——<em>核</em> \(\operatorname{Ker} \varphi\) 与<em>像</em> \(\operatorname{Im} \varphi\)——以及一种特殊的子群：<strong>正规子群</strong>。</p>
+<p>取一个具体的事——你已经见过它无数次但可能没意识到它的代数意义。</p>
 
-<p>"正规子群"听上去像是个普通的形容词，其实它担任了一个非常具体的角色：<em>它是能拿来做商的子群</em>。我们在<a href="ch3.html">第 3 章</a>定义了陪集 \(gN\)，但当时只把陪集当成集合。要在陪集集合 \(\{gN : g \in G\}\) 上定义出一个群结构，子群 \(N\) 必须满足一个额外的对称条件——\(g N g^{-1} = N\)——这就是正规。这一章我们把这条等价关系完整说穿，并且证明：<em>同态的核永远正规</em>。这两件事——"同态"与"正规子群"——其实是同一件事的两面。下一章的三大同构定理就是把这两面拼回去。</p>
+<p>设 \(A, B\) 是 \(n \times n\) 实可逆矩阵。它们有一个最朴素的关系：</p>
+
+<p>\[
+\det(AB) = \det(A) \cdot \det(B).
+\]</p>
+
+<p>这是<a href="../线性代数/index.html">线性代数</a> 里学过的"行列式乘性"。但请你换个角度看它——左边的 \(\cdot\) 是<em>矩阵乘法</em>（\(GL_n(\mathbb{R})\) 里的运算），右边的 \(\cdot\) 是<em>实数乘法</em>（\(\mathbb{R}^*\) 里的运算）。所以这条等式说的是：</p>
+
+<p style="margin-left: 2em;"><em>"映射 \(\det : GL_n(\mathbb{R}) \to \mathbb{R}^*\) 把矩阵乘法<em>翻译</em> 成实数乘法。"</em></p>
+
+<p>它把一个非阿贝尔群（\(GL_n\)）的运算<em>压</em> 到一个阿贝尔群（\(\mathbb{R}^*\)）的运算上，<em>保持</em> 运算结构。这种"保运算的映射" 是群论里最核心的工具，叫<em>同态</em>。</p>
+
+<p>同态有两个让你觉得着迷的事。第一，它把"群之间的关系" 系统化——你以前接触过的"子群嵌入""商映射""自同构" 都是同态的特例。第二，它带来一个副产品——<em>核</em>——这个副产品本身是子群，但又不是普通子群——它是<em>正规子群</em>，整个本章后半部分都在揭开"正规" 这两个字背后的代数 + 几何画面。</p>
+
+<h2 id="sec4-1">4.1 同态的定义——用 det 立刻引出来</h2>
+
+<p><strong>定义（同态）。</strong> 设 \(G, H\) 是两个群。映射 \(\varphi : G \to H\) 称为<strong>同态</strong>（homomorphism），若对所有 \(a, b \in G\)，</p>
+
+<p>\[
+\varphi(a \cdot_G b) = \varphi(a) \cdot_H \varphi(b).
+\]</p>
+
+<p>简记 \(\varphi(ab) = \varphi(a) \varphi(b)\)（运算符隐去，靠上下文）。</p>
+
+<p>"<em>映射保运算</em>" 这一条定义就够了——其它一切跟着出来。</p>
+
+<p>立刻看几条同态自动具备的性质：</p>
+
+<p><strong>命题（同态的基本性质）。</strong> 设 \(\varphi : G \to H\) 是同态。则</p>
+
+<ol>
+  <li>\(\varphi(e_G) = e_H\)。</li>
+  <li>对所有 \(a \in G\)，\(\varphi(a^{-1}) = \varphi(a)^{-1}\)。</li>
+  <li>对所有 \(a \in G\) 和 \(n \in \mathbb{Z}\)，\(\varphi(a^n) = \varphi(a)^n\)。</li>
+</ol>
+
+<p><em>证。</em> </p>
+
+<p>(1)。\(\varphi(e_G) = \varphi(e_G \cdot e_G) = \varphi(e_G) \cdot \varphi(e_G)\)。两边乘 \(\varphi(e_G)^{-1}\)（在 \(H\) 里）得 \(e_H = \varphi(e_G)\)。</p>
+
+<p>(2)。\(\varphi(a) \cdot \varphi(a^{-1}) = \varphi(a \cdot a^{-1}) = \varphi(e_G) = e_H\)（用 (1)）。同理另一边。所以 \(\varphi(a^{-1})\) 是 \(\varphi(a)\) 的逆。</p>
+
+<p>(3)。归纳，外加 (2) 处理负幂。\(\square\)</p>
+
+<p>请你停下来体会：定义只要求"保乘法"，结果"保恒等""保逆""保所有幂" 全自动跟来。这是抽象代数典型的<em>"少假设、多结论"</em> 风格——公理设计得越紧凑，从中导出的事实越多。</p>
+
+<p>验证<em>是不是</em> 同态：直接查 \(\varphi(ab) = \varphi(a)\varphi(b)\) 对所有 \(a, b\) 成立。这一句是同态的<em>所有内容</em>，没多没少。</p>
+
+<p><strong>例 1：行列式 \(\det : GL_n(\mathbb{R}) \to \mathbb{R}^*\)。</strong> 上面已经写过。\(\det(AB) = \det A \cdot \det B\) 是同态条件。把 \(GL_n\)（矩阵乘法群）"压" 到 \(\mathbb{R}^*\)（实数乘法群）。</p>
+
+<p><strong>例 2：取奇偶 \(\mathrm{sgn} : S_n \to \{\pm 1\}\)。</strong> 把每个排列分成"奇" 或"偶"——奇数次对换合成的是奇排列、偶数次对换合成的是偶排列（第 9 章 仔细讲）。\(\mathrm{sgn}(\sigma \tau) = \mathrm{sgn}(\sigma) \mathrm{sgn}(\tau)\) 即"两个排列合成的奇偶性 = 各自奇偶性的积"。这是 \(S_n \to \{\pm 1\}\)（乘法 \(\pm 1\) 群 \(\cong \mathbb{Z}_2\)）的同态。</p>
+
+<p><strong>例 3：模 \(n\) 同态 \(\pi_n : \mathbb{Z} \to \mathbb{Z}_n\)。</strong> \(\pi_n(k) = k \bmod n\)。检查：\(\pi_n(a + b) = (a + b) \bmod n = (a \bmod n) + (b \bmod n)\) 模 \(n\)，即 \(\pi_n(a) + \pi_n(b)\) 在 \(\mathbb{Z}_n\) 里。是同态。这映射把无穷的 \(\mathbb{Z}\) "卷" 成有限的 \(\mathbb{Z}_n\)，把每 \(n\) 个连续整数压到同一个剩余类。</p>
+
+<p><strong>例 4：指数映射 \(\exp : (\mathbb{R}, +) \to (\mathbb{R}^*, \cdot)\)。</strong> \(\exp(x + y) = \exp(x) \exp(y)\) 即 \(e^{x+y} = e^x e^y\)——这是<em>把加法换成乘法</em> 的同态。它的像不是整个 \(\mathbb{R}^*\)，只是<em>正</em> 实数 \(\mathbb{R}_{>0}\)。下一节会看到这是<em>满</em> / <em>非满</em> 的区分。</p>
+
+<p><strong>例 5：平凡同态。</strong> 任意两个群 \(G, H\) 之间，\(\varphi(g) = e_H\)（把所有元素送到恒等）总是同态——\(\varphi(ab) = e_H = e_H \cdot e_H = \varphi(a) \varphi(b)\)。这是最无聊但合法的同态。</p>
+
+<p>5 个例子来自 5 种 context——矩阵 / 排列 / 模算术 / 指数函数 / 平凡。同态把它们用同一种语言串起来。</p>
+
+<h2 id="sec4-2">4.2 核与像——同态的两个副产品</h2>
+
+<p>给定同态 \(\varphi : G \to H\)，立刻有两个相关的子群浮现。</p>
+
+<p><strong>定义（核与像）。</strong> 设 \(\varphi : G \to H\) 是同态。</p>
 
 <ul>
-  <li>4.1 节定义同态 \(\varphi : G \to H\)，并立刻验证两条立等可取的性质：保单位、保逆。</li>
-  <li>4.2 节定义核与像，证明核是 \(G\) 的子群，像是 \(H\) 的子群。</li>
-  <li>4.3 节区分单同态、满同态、同构，并给出标准例子：\(\mathbb{Z} \to \mathbb{Z}_n\) 是满射、\(x \mapsto 2x\) 是单射。</li>
-  <li>4.4 节定义正规子群 \(N \triangleleft G\)，给出"\(g N g^{-1} = N\)" 与 "\(gN = Ng\)" 等几条等价条件。</li>
-  <li>4.5 节是例子展览：\(A_n \triangleleft S_n\)、\(D_n\) 中旋转子群正规、中心 \(Z(G)\) 永远正规。</li>
-  <li>4.6 节引入共轭与共轭类，作为对正规性最朴素的"几何视角"，并预告 \(S_n\) 的共轭类与循环型分拆的关系。</li>
+  <li>\(\varphi\) 的<strong>核</strong>（kernel）：\(\mathrm{Ker}(\varphi) := \{g \in G : \varphi(g) = e_H\} \subseteq G\)。</li>
+  <li>\(\varphi\) 的<strong>像</strong>（image）：\(\mathrm{Im}(\varphi) := \{\varphi(g) : g \in G\} \subseteq H\)。</li>
 </ul>
 
-<h2 id="sec4-1">4.1 同态：定义与立即性质</h2>
+<p>核住在<em>定义域</em> \(G\) 里——是被映到恒等的那部分；像住在<em>值域</em> \(H\) 里——是被映到的那部分。</p>
 
-<p>设 \((G, \cdot)\) 与 \((H, *)\) 是两个群。一个映射 \(\varphi : G \to H\) 叫做<strong>群同态</strong>（group homomorphism），如果对所有 \(a, b \in G\)，</p>
+<p>立刻验证它们都是子群。</p>
 
-<p>\[
-\varphi(a \cdot b) = \varphi(a) * \varphi(b).
-\]</p>
+<p><strong>命题。</strong> \(\mathrm{Ker}(\varphi) \le G\) 且 \(\mathrm{Im}(\varphi) \le H\)。</p>
 
-<p>这条要求看上去几乎是显然的"翻译规则"——把乘法翻译成乘法——但它把 \(G\) 的整个代数结构压缩进了 \(\varphi\) 这一个映射。它的"本能"性质是：</p>
+<p><em>证。</em> </p>
 
-<p><strong>(H1) 保单位。</strong> \(\varphi(e_G) = e_H\)。证明：\(\varphi(e_G) = \varphi(e_G \cdot e_G) = \varphi(e_G) * \varphi(e_G)\)，两边在 \(H\) 中乘以 \(\varphi(e_G)^{-1}\) 得 \(e_H = \varphi(e_G)\)。</p>
+<p>核：用 3 章的一步判别。设 \(a, b \in \mathrm{Ker}\varphi\)，则 \(\varphi(a) = \varphi(b) = e\)。算 \(\varphi(ab^{-1}) = \varphi(a)\varphi(b)^{-1} = e \cdot e^{-1} = e\)，所以 \(ab^{-1} \in \mathrm{Ker}\varphi\)。又核非空（含 \(e_G\) 由 4.1 命题 (1)）。所以核是子群。</p>
 
-<p><strong>(H2) 保逆。</strong> \(\varphi(g^{-1}) = \varphi(g)^{-1}\)。证明：\(\varphi(g) * \varphi(g^{-1}) = \varphi(g \cdot g^{-1}) = \varphi(e_G) = e_H\)，所以 \(\varphi(g^{-1})\) 就是 \(\varphi(g)\) 的逆。</p>
+<p>像：设 \(\varphi(a), \varphi(b) \in \mathrm{Im}\varphi\)。则 \(\varphi(a) \cdot \varphi(b)^{-1} = \varphi(a b^{-1}) \in \mathrm{Im}\varphi\)。非空（含 \(e_H = \varphi(e_G)\)）。所以像是子群。\(\square\)</p>
 
-<p><strong>(H3) 保幂。</strong>由 (H1)+(H2) 立得 \(\varphi(g^n) = \varphi(g)^n\) 对所有整数 \(n\) 成立。</p>
+<p>看上面 5 个同态的核与像：</p>
 
-<p>这套朴素的性质告诉你：<em>"保乘法"自动蕴含"保整个群结构"</em>。你不需要单独要求保单位或保逆——它们是赠品。</p>
+<p><strong>例 1 续：</strong> \(\det : GL_n(\mathbb{R}) \to \mathbb{R}^*\)。</p>
+<ul>
+  <li>核：\(\mathrm{Ker}(\det) = \{A \in GL_n : \det A = 1\} = SL_n(\mathbb{R})\)。这正是<em>特殊线性群</em>——上一章已经引入。</li>
+  <li>像：\(\mathrm{Im}(\det) = \mathbb{R}^*\) 全部（因为对任何非零 \(c\)，对角矩阵 \(\mathrm{diag}(c, 1, \ldots, 1)\) 行列式 \(c\)）。所以 \(\det\) 是<em>满</em> 同态。</li>
+</ul>
 
-<p>来几个例子。指数映射 \(\exp : (\mathbb{R}, +) \to (\mathbb{R}_{>0}, \cdot)\) 满足 \(\exp(a + b) = \exp(a) \cdot \exp(b)\)，是同态——而且是同构（对数为逆）。行列式 \(\det : GL_n(\mathbb{R}) \to (\mathbb{R}^*, \cdot)\) 满足 \(\det(AB) = \det(A) \det(B)\)，是同态。\(\mathbb{Z} \to \mathbb{Z}_n\)，\(k \mapsto k \bmod n\)，是同态。零映射 \(g \mapsto e_H\) 是同态（也叫平凡同态）。恒等映射 \(\operatorname{id}_G\) 当然也是。这些例子覆盖了"绝大多数你以前默认会用的等式"——它们其实都在偷偷地讲"某个映射是同态"。</p>
+<p><strong>例 2 续：</strong> \(\mathrm{sgn} : S_n \to \{\pm 1\}\)。</p>
+<ul>
+  <li>核：\(\mathrm{Ker}(\mathrm{sgn}) = \{\text{偶排列}\} = A_n\)——<em>交错群</em>，第 9 章核心对象，本章后面 4.5 节再用。</li>
+  <li>像：\(\{\pm 1\}\) 全部（\(n \ge 2\) 时）。满同态。</li>
+</ul>
 
-<p>这里值得对照<a href="../线性代数/index.html">《线性代数读本》</a>里的<em>线性映射</em>。线性映射 \(T : V \to W\) 满足 \(T(v_1 + v_2) = T(v_1) + T(v_2)\) 与 \(T(\alpha v) = \alpha T(v)\)，恰好就是 \(V\) 与 \(W\) 作为加法群的同态加上"保数乘"。所以"同态"是"线性"的群论祖先。线性代数里的<em>核</em>与<em>像</em>，本章里一字不差地搬到群里。</p>
+<p><strong>例 3 续：</strong> \(\pi_n : \mathbb{Z} \to \mathbb{Z}_n\)。</p>
+<ul>
+  <li>核：\(\mathrm{Ker}(\pi_n) = \{k \in \mathbb{Z} : k \equiv 0 \pmod n\} = n\mathbb{Z}\)——\(n\) 的倍数子群。</li>
+  <li>像：整个 \(\mathbb{Z}_n\)。满。</li>
+</ul>
 
-<h2 id="sec4-2">4.2 核与像</h2>
+<p><strong>例 4 续：</strong> \(\exp : (\mathbb{R}, +) \to (\mathbb{R}^*, \cdot)\)。</p>
+<ul>
+  <li>核：\(\{x : e^x = 1\} = \{0\}\)——只有 \(0\)。</li>
+  <li>像：正实数 \(\mathbb{R}_{>0}\)，<em>不</em> 是整个 \(\mathbb{R}^*\)（负数到不了）。非满。</li>
+</ul>
 
-<p>设 \(\varphi : G \to H\) 是同态。它的<strong>核</strong>是</p>
+<p>请你停下来观察核的结构性意义：<em>核衡量"同态丢了多少信息"</em>。</p>
 
-<p>\[
-\operatorname{Ker} \varphi = \{g \in G : \varphi(g) = e_H\} = \varphi^{-1}(\{e_H\}).
-\]</p>
+<p>具体地，<em>\(\varphi(a) = \varphi(b)\) 当且仅当 \(a b^{-1} \in \mathrm{Ker}\varphi\)</em>（证：\(\varphi(a) = \varphi(b) \Leftrightarrow \varphi(a)\varphi(b)^{-1} = e \Leftrightarrow \varphi(ab^{-1}) = e \Leftrightarrow ab^{-1} \in \mathrm{Ker}\)）。所以同一陪集 \(b \cdot \mathrm{Ker}\varphi\) 里的所有元素都映到同一个像。<em>核越大，同态压得越狠</em>。</p>
 
-<p>它的<strong>像</strong>是</p>
+<p>极端例子：核 = \(\{e\}\) 时，"\(\varphi(a) = \varphi(b)\)" 只在 \(a = b\) 时发生——<em>同态是单射</em>，没丢任何信息。核 = 整个 \(G\) 时，所有元素都送到 \(e_H\)——平凡同态，丢掉一切信息。中间情形是大多数有趣的同态——<em>丢一些、留一些</em>。</p>
 
-<p>\[
-\operatorname{Im} \varphi = \{\varphi(g) : g \in G\} = \varphi(G).
-\]</p>
+<p>这件事提升一下：</p>
 
-<p>"核"是 \(G\) 的子集，"像"是 \(H\) 的子集。两者都自动是子群。</p>
+<p><strong>命题（同态单射判据）。</strong> 同态 \(\varphi : G \to H\) 是单射当且仅当 \(\mathrm{Ker}\varphi = \{e_G\}\)。</p>
 
-<p><strong>命题。</strong>\(\operatorname{Ker} \varphi \le G\) 且 \(\operatorname{Im} \varphi \le H\)。</p>
+<p><em>证。</em> "\(\Rightarrow\)"：若 \(\varphi\) 单且 \(g \in \mathrm{Ker}\varphi\)，则 \(\varphi(g) = e = \varphi(e)\)，单射给 \(g = e\)。所以核 \(= \{e\}\)。"\(\Leftarrow\)"：设 \(\varphi(a) = \varphi(b)\)。则 \(\varphi(a b^{-1}) = e\)，即 \(ab^{-1} \in \mathrm{Ker}\varphi = \{e\}\)，所以 \(ab^{-1} = e\)，\(a = b\)。\(\square\)</p>
 
-<p>核的子群验证：\(e_G \in \operatorname{Ker} \varphi\)（由保单位）；若 \(a, b \in \operatorname{Ker} \varphi\)，则 \(\varphi(ab) = \varphi(a) \varphi(b) = e_H \cdot e_H = e_H\)，所以 \(ab \in \operatorname{Ker} \varphi\)；若 \(a \in \operatorname{Ker} \varphi\)，则 \(\varphi(a^{-1}) = \varphi(a)^{-1} = e_H^{-1} = e_H\)，所以 \(a^{-1} \in \operatorname{Ker} \varphi\)。</p>
+<p>请记住这条："<em>核 = 平凡 \(\Leftrightarrow\) 同态单射</em>"——查同态是不是单射，<em>不</em> 用走"\(\varphi(a) = \varphi(b) \Rightarrow a = b\)"，只要算核。</p>
 
-<p>像的子群验证：\(e_H = \varphi(e_G) \in \operatorname{Im} \varphi\)；若 \(\varphi(a), \varphi(b) \in \operatorname{Im} \varphi\)，则 \(\varphi(a) \varphi(b) = \varphi(ab) \in \operatorname{Im} \varphi\)；若 \(\varphi(a) \in \operatorname{Im} \varphi\)，则 \(\varphi(a)^{-1} = \varphi(a^{-1}) \in \operatorname{Im} \varphi\)。</p>
+<h2 id="sec4-3">4.3 单 / 满 / 同构</h2>
 
-<p>但核还有更强的一条性质，这条让它和"普通子群"分道扬镳：</p>
-
-<p>\[
-\boxed{\ \operatorname{Ker} \varphi \triangleleft G\quad\text{(核永远是正规子群)}.\ }
-\]</p>
-
-<p>证明留到 4.4 节正规性定义之后立刻补——但你现在就可以记住这个事实：<em>核不仅是子群，它正规</em>。这件事是下一章三大同构定理的根。</p>
-
-<p>一个具体例子。\(\det : GL_2(\mathbb{R}) \to \mathbb{R}^*\) 的核是行列式为 \(1\) 的 \(2 \times 2\) 实矩阵全体，即 \(SL_2(\mathbb{R})\)。这给出"特殊线性群是一般线性群的子群"这条事实的最干净来源。它的像呢？是 \(\mathbb{R}^* = \mathbb{R} \setminus \{0\}\) 全部——因为对任意非零实数 \(t\)，\(\operatorname{diag}(t, 1) \in GL_2\) 的行列式就是 \(t\)。</p>
-
-<p>另一个。指数 \(\exp : (\mathbb{C}, +) \to (\mathbb{C}^*, \cdot)\)。核是 \(2 \pi i \mathbb{Z}\)（满足 \(e^z = 1\) 的全体复数）；像是整个 \(\mathbb{C}^*\)。这条事实在<a href="../复分析/index.html">《复分析读本》</a>里翻译为"指数函数以 \(2 \pi i\) 为周期"。</p>
-
-<h2 id="sec4-3">4.3 单同态、满同态、同构</h2>
-
-<p>同态有三条特殊形式：</p>
+<p>给同态命名按"单 / 满"：</p>
 
 <ul>
-  <li><strong>单同态</strong>（monomorphism）：\(\varphi\) 是单射。等价地：\(\operatorname{Ker} \varphi = \{e_G\}\)。</li>
-  <li><strong>满同态</strong>（epimorphism）：\(\varphi\) 是满射。等价地：\(\operatorname{Im} \varphi = H\)。</li>
-  <li><strong>同构</strong>（isomorphism）：\(\varphi\) 既单又满。等价地：\(\varphi\) 有逆映射，且逆也是同态。</li>
+  <li><strong>单同态</strong>（monomorphism / 单射同态）：\(\varphi\) 单射，等价 \(\mathrm{Ker}\varphi = \{e\}\)。也叫<em>嵌入</em>。</li>
+  <li><strong>满同态</strong>（epimorphism / 满射同态）：\(\varphi\) 满射，等价 \(\mathrm{Im}\varphi = H\)。</li>
+  <li><strong>同构</strong>（isomorphism）：\(\varphi\) 既单又满。两个群之间存在同构时，记 \(G \cong H\)，称两群<em>同构</em>。</li>
+  <li><strong>自同构</strong>（automorphism）：\(G \to G\) 的同构。所有自同构在合成下构成群，记 \(\mathrm{Aut}(G)\)。</li>
 </ul>
 
-<p>"\(\varphi\) 单射 \(\iff \operatorname{Ker} \varphi = \{e_G\}\)" 这一条值得停下来证一下。"\(\Rightarrow\)" 显然。反过来，设 \(\operatorname{Ker} \varphi = \{e_G\}\)，且 \(\varphi(a) = \varphi(b)\)。则 \(\varphi(a b^{-1}) = \varphi(a) \varphi(b)^{-1} = e_H\)，所以 \(a b^{-1} \in \operatorname{Ker} \varphi = \{e_G\}\)，即 \(a = b\)。这条等价让"单射"完全可以用代数条件检验——查核是否平凡。</p>
+<p>同构的意义重大——它<em>就是</em> 抽象代数的"等价"。两个同构的群在所有<em>抽象</em> 性质上一致：阶、子群结构、是否阿贝尔、元素阶分布——一切。区别只在"标签" 和"具体实现"。</p>
 
-<p>同构这件事比单 + 满更深一层：它说"\(G\) 与 \(H\) 在群论意义下完全一样"。我们记 \(G \cong H\)。同构是一个等价关系（自反、对称、传递），它把所有群划分成<strong>同构类</strong>。整个群论的研究目标之一就是<em>分类同构类</em>——比如下一卷的"有限交换群结构定理"、"有限单群分类"。</p>
+<p><strong>例：\(\pi_n\) 的同构版。</strong> \(\pi_n : \mathbb{Z} \to \mathbb{Z}_n\) 满但<em>不</em> 单（核 \(= n\mathbb{Z}\) 非平凡）。<em>不</em> 是同构。但你可以"商掉核" 让它变成同构——这正是<a href="ch5.html">第 5 章 第一同构定理</a> 要做的事。</p>
 
-<p><strong>例子。</strong>\(\varphi : \mathbb{Z} \to \mathbb{Z}_n\)，\(k \mapsto k \bmod n\) 是<em>满同态</em>但不是单同态——核是 \(n \mathbb{Z}\)，非平凡。</p>
+<p><strong>例：\(\exp\) 的同构版。</strong> \(\exp : (\mathbb{R}, +) \to (\mathbb{R}^*, \cdot)\) 单（核 \(= \{0\}\)）但<em>不</em> 满（像 \(= \mathbb{R}_{>0}\)）。把值域限到像上：\(\exp : (\mathbb{R}, +) \to (\mathbb{R}_{>0}, \cdot)\) 既单又满，是<em>同构</em>。所以 \((\mathbb{R}, +) \cong (\mathbb{R}_{>0}, \cdot)\)——加法实数 = 乘法正实数（结构上）。</p>
 
-<p><strong>例子。</strong>\(\psi : \mathbb{Z} \to \mathbb{Z}\)，\(k \mapsto 2k\) 是<em>单同态</em>但不是满同态——像是 \(2 \mathbb{Z}\)，不是整个 \(\mathbb{Z}\)。这条例子小但很有教育意义：在无限群里"\(G\) 嵌进 \(G\) 自身的真子群"是允许的，有限群里则不行（由 Lagrange 定理）。</p>
+<p>这条同构是<em>对数表</em> 的代数本质：用对数把乘法变成加法。这件事 17 世纪 Napier 发明对数时是为天文计算服务，群论 19 世纪才正式定义"同构"——但<em>同构这件事 17 世纪已经在用了</em>，只是没人叫它同构。</p>
 
-<p><strong>例子。</strong>\(\exp : (\mathbb{R}, +) \to (\mathbb{R}_{>0}, \cdot)\) 是<em>同构</em>，逆是 \(\ln\)。这条同构告诉你：加法实数群与正实数乘法群"在群论上是同一个群"。这条事实在 PDE 与概率统计里反复使用——指数与对数把"乘法问题"翻译成"加法问题"。</p>
+<p><strong>例：4 阶群同构。</strong> 上一章看到 \(V_4 \cong \mathbb{Z}_2 \times \mathbb{Z}_2\)，但 \(V_4 \not\cong \mathbb{Z}_4\)。具体的同构 \(V_4 \to \mathbb{Z}_2 \times \mathbb{Z}_2\) 是 \(e \mapsto (0,0), a \mapsto (1, 0), b \mapsto (0, 1), c \mapsto (1, 1)\)——查这是同态再查它双射，就是同构。</p>
 
-<p><strong>例子。</strong>\(\det : GL_n(\mathbb{R}) \to \mathbb{R}^*\) 是<em>满同态</em>但不是单同态。核是 \(SL_n(\mathbb{R})\)。下一章我们会看到 \(GL_n(\mathbb{R}) / SL_n(\mathbb{R}) \cong \mathbb{R}^*\)——这是第一同构定理最干净的应用。</p>
+<p>"<em>同构意义下分类</em>" 是抽象代数核心追求。"4 阶群有几种" 答 2 种——\(\mathbb{Z}_4\) 与 \(V_4\)；"6 阶群有几种" 答 2 种——\(\mathbb{Z}_6\) 与 \(S_3\)（\(\cong D_3\)）；这种"<em>n 阶群有几种</em>" 是群论永恒的小问题，第 8 章会处理有限阿贝尔的版本。</p>
 
-<p>"单同态"在某些教材里也被写作<em>嵌入</em>（embedding），意思是把 \(G\) "嵌进 \(H\)"——\(G\) 同构于 \(H\) 的某个子群 \(\operatorname{Im} \varphi\)。"满同态"则常被叫做<em>投射</em>（projection），意思是把 \(G\) "压"到 \(H\)——\(H\) 同构于商群 \(G / \operatorname{Ker} \varphi\)（这是下一章第一同构定理的精确陈述）。</p>
+<h2 id="sec4-4">4.4 正规子群——为什么"核" 这种子群特殊</h2>
 
-<h2 id="sec4-4">4.4 正规子群</h2>
+<p>到这里我们看到核总是子群，但<em>核不只是普通子群——它特殊</em>。这一节让你看到特殊在哪。</p>
 
-<p>子群 \(N \le G\) 叫做<strong>正规子群</strong>（normal subgroup），记 \(N \triangleleft G\)，如果对所有 \(g \in G\) 都有</p>
-
-<p>\[
-g N g^{-1} = N,
-\]</p>
-
-<p>这里 \(g N g^{-1} = \{g n g^{-1} : n \in N\}\)。</p>
-
-<p>这条定义看似抽象，但有一组等价表述把它的几何/陪集含义说穿：</p>
-
-<p><strong>命题（正规性的等价条件）。</strong>设 \(N \le G\)。下列条件彼此等价：</p>
+<p>取一个具体的事。\(G = D_3\)（正三角形对称，6 个元素）；考虑两个子群：</p>
 
 <ul>
-  <li>(N1) \(g N g^{-1} = N\) 对所有 \(g \in G\)；</li>
-  <li>(N2) \(g N g^{-1} \subseteq N\) 对所有 \(g \in G\)（即 \(g n g^{-1} \in N\) 对所有 \(g, n\)）；</li>
-  <li>(N3) \(g N = N g\) 对所有 \(g \in G\)（左陪集 = 右陪集）；</li>
-  <li>(N4) 每个左陪集都是某个右陪集（不必是 "同一个 \(g\)" 对应的）。</li>
+  <li>\(N = \{e, r, r^2\}\)（旋转，3 阶）——这是 \(\mathrm{sgn}\) 同态<em>限到 \(D_3\)</em> 的核（旋转 = 偶排列）。</li>
+  <li>\(H = \{e, s\}\)（一个反射的 2 阶子群）。</li>
 </ul>
 
-<p>证明纲要。(N1) \(\Rightarrow\) (N2) 显然。(N2) \(\Rightarrow\) (N1)：把 (N2) 用到 \(g^{-1}\) 上得 \(g^{-1} N g \subseteq N\)，即 \(N \subseteq g N g^{-1}\)，结合 (N2) 得相等。(N1) \(\Leftrightarrow\) (N3)：\(gNg^{-1} = N \iff gN = Ng\)（两边右乘 \(g\)）。(N3) \(\Leftrightarrow\) (N4)：\(\Rightarrow\) 显然；反过来，若 \(gN = N g'\) 某个 \(g'\)，由两边都含 \(g\) 得 \(g \in N g'\) 即 \(g' \in N^{-1} g = N g\)（用 \(N\) 子群保逆），所以 \(N g' = N g\)，即 \(gN = Ng\)。</p>
+<p>对 \(N\)，算它的左陪集 vs 右陪集。\(eN = N = Ne\)。\(sN = \{s, sr, sr^2\} = \{s, r^2 s, rs\}\)（用 \(sr = r^{-1}s = r^2 s\)）。\(Ns = \{es, rs, r^2 s\} = \{s, rs, r^2 s\}\)。</p>
 
-<p>(N3) 是最常用的等价表述：<em>"左陪集等于右陪集"</em>。\(N\) 不正规时，左右陪集分割是不同的两套等价类——\(gN\) 和 \(Ng\) 一般不重合。\(N\) 正规时它们完美吻合，所以"陪集"这个名词不再需要分左右。</p>
+<p>\(sN = \{s, r^2 s, rs\} = \{s, rs, r^2 s\} = Ns\)——<em>左陪集 = 右陪集</em>。</p>
 
-<p>现在补上前一节欠的证明：<strong>核永远正规。</strong></p>
+<p>对 \(H\) 试同样的事。\(eH = H = He\)。\(rH = \{r, rs\}\)。\(Hr = \{r, sr\} = \{r, r^2 s\}\)。<em>\(rH \neq Hr\)</em>——\(\{r, rs\}\) 和 \(\{r, r^2 s\}\) 的第二个元素不同。</p>
 
-<p><strong>证明。</strong>设 \(\varphi : G \to H\)，\(N = \operatorname{Ker} \varphi\)。要证 \(g N g^{-1} \subseteq N\)。取 \(g \in G\) 与 \(n \in N\)。\(\varphi(g n g^{-1}) = \varphi(g) \varphi(n) \varphi(g)^{-1} = \varphi(g) \cdot e_H \cdot \varphi(g)^{-1} = e_H\)。所以 \(g n g^{-1} \in N\)，即 \(g N g^{-1} \subseteq N\)。由等价条件 (N2) 得 \(N \triangleleft G\)。\(\blacksquare\)</p>
+<p>请你停下来：两个子群，一个左 = 右，一个左 \(\neq\) 右。差别在哪？我会论证：差别<em>就是</em> "是不是核"。\(N\) 是核，\(H\) 不是。</p>
 
-<p>这条小证明的重要性怎么强调都不过分。它把"同态"与"正规子群"的关系定下来：<em>每个同态的核都是正规子群</em>。下一章我们会证一个反向定理——<em>每个正规子群都是某个同态的核</em>——这两件事合起来给出"正规子群 \(\equiv\) 商群 \(\equiv\) 同态"的完美三位一体。</p>
-
-<p>另外几条立等可取的：</p>
-
-<ul>
-  <li>\(G\) 与 \(\{e\}\) 都是 \(G\) 的正规子群（"平凡的"正规子群）。</li>
-  <li>\(G\) 是<em>交换群</em> \(\Rightarrow\) 所有子群都正规——因为 \(g n g^{-1} = g g^{-1} n = n\)。这把"交换群"和"任意子群可做商"等同起来。</li>
-  <li>指数 \(2\) 的子群一定正规：左陪集只有两个 \(N\) 与 \(gN\)（\(g \notin N\)），右陪集也只有两个 \(N\) 与 \(Ng\)；由两套陪集都等于 \(\{N, G \setminus N\}\)，得 \(gN = Ng\)，即 \(N\) 正规。</li>
-</ul>
-
-<p>这条"指数 2 \(\Rightarrow\) 正规" 在下一节立等可取地给出 \(A_n \triangleleft S_n\) 的免费证明。</p>
-
-<h2 id="sec4-5">4.5 重要例子：\(A_n\)、\(D_n\) 中的旋转子群、中心</h2>
-
-<p><strong>例 1：\(A_n \triangleleft S_n\)。</strong>对称群 \(S_n\) 是 \(\{1, \ldots, n\}\) 的全体置换，\(|S_n| = n!\)。<em>偶置换</em>（即可表为偶数个对换之积的置换）构成<strong>交错群</strong> \(A_n\)，\(|A_n| = n!/2\)。所以 \(A_n\) 是 \(S_n\) 的指数 2 子群——由前一节"指数 2 \(\Rightarrow\) 正规"，立得 \(A_n \triangleleft S_n\)。这条事实是<a href="ch9.html">第 9 章</a>分析 \(S_n\) 结构的起点，也是 Galois 在 19 世纪证"五次方程不可解"的关键——\(A_5\) 是单群（无非平凡正规子群），所以无法用根式破解 \(S_5\)。</p>
-
-<p>同态视角：定义符号同态 \(\operatorname{sgn} : S_n \to \{+1, -1\}\)，\(\sigma \mapsto +1\) 若 \(\sigma\) 偶置换，\(-1\) 若奇置换。这是一个满同态（验证：对换乘积的奇偶性可加），核恰好就是 \(A_n\)。"核正规"立刻给出 \(A_n \triangleleft S_n\)。</p>
-
-<p><strong>例 2：\(D_n\) 中旋转子群正规。</strong>二面体群 \(D_n\) 是正 \(n\) 边形的对称群，\(|D_n| = 2n\)，由 \(n\) 个旋转和 \(n\) 个反射组成。旋转子群 \(R_n = \langle r \rangle\)（\(r\) 是基本旋转 \(2\pi/n\)）是 \(D_n\) 的指数 2 子群，所以正规。或直接验证：旋转的共轭还是旋转——反射 \(s\) 满足 \(s r s^{-1} = r^{-1}\)，仍在 \(R_n\) 中。这条性质在<a href="ch24.html">第 24 章</a>晶体学里反复使用：晶体学群的"旋转部分"永远是正规子群，对应"晶体的取向部分"。</p>
-
-<p><strong>例 3：中心 \(Z(G) \triangleleft G\)。</strong>群 \(G\) 的<strong>中心</strong>定义为</p>
+<p><strong>定义（正规子群）。</strong> 子群 \(N \le G\) 称<strong>正规</strong>（normal），如果对所有 \(g \in G\)，</p>
 
 <p>\[
-\boxed{\ Z(G) = \{z \in G : z g = g z \text{ 对所有 } g \in G\}.\ }
+gN = Ng,
 \]</p>
 
-<p>这是"和所有元素都交换"的元素全体。中心永远是 \(G\) 的子群（验证三条公理），并且永远正规——因为对任意 \(z \in Z(G)\) 与 \(g \in G\)，\(g z g^{-1} = z g g^{-1} = z \in Z(G)\)。所以 (N2) 满足。</p>
+<p>等价地，\(gNg^{-1} \subseteq N\) 对所有 \(g\)（也等价 \(gNg^{-1} = N\)）。记 \(N \trianglelefteq G\) 或 \(N \lhd G\)。</p>
 
-<p>具体例子：\(Z(GL_n(\mathbb{R}))\) 是数量矩阵 \(\{\lambda I : \lambda \neq 0\}\)（一个标准的线性代数计算）；\(Z(S_n) = \{e\}\) 对 \(n \ge 3\)（"在 \(S_n\) 里和所有置换都交换"非常苛刻）；\(Z(D_n)\) 当 \(n\) 偶等于 \(\{e, r^{n/2}\}\)、当 \(n\) 奇等于 \(\{e\}\)。</p>
+<p>"\(gng^{-1}\) 是把 \(n\) <em>共轭</em> 到 \(g\)"，下面 4.6 节我们正式讲共轭。"\(N\) 在共轭下不变" 意思是：用群里任何元素 \(g\) 把 \(N\) 共轭一下，结果还落在 \(N\) 里。</p>
 
-<p>中心这件事在<a href="ch7.html">第 7 章</a>讲 \(p\)-群时关键：<em>有限 \(p\)-群的中心非平凡</em>——这是用类方程立得的，本章 4.6 节的预告。</p>
+<p>三种等价定义并列：</p>
 
-<p><strong>例 4：交换群里所有子群都正规。</strong>这条已经在 4.4 节顺便提了。它的"反例方向"是：<em>非交换群里有不正规的子群</em>。最小的非平凡反例：\(S_3\) 中由一个对换 \(\{(1\,2)\}\) 生成的子群 \(\{e, (1\,2)\}\) 不正规——验证 \((1\,3)(1\,2)(1\,3)^{-1} = (2\,3) \notin \{e, (1\,2)\}\)。</p>
+<ol>
+  <li>对所有 \(g \in G\)：\(gN = Ng\)。</li>
+  <li>对所有 \(g \in G\)：\(gNg^{-1} = N\)。</li>
+  <li>对所有 \(g \in G, n \in N\)：\(gng^{-1} \in N\)。</li>
+</ol>
 
-<p><strong>例 5：交换子子群正规。</strong>定义 \([G, G] = \langle \{a b a^{-1} b^{-1} : a, b \in G\} \rangle\)（由全体交换子生成的子群）。这总是正规的，验证：\(g (a b a^{-1} b^{-1}) g^{-1} = (g a g^{-1})(g b g^{-1})(g a g^{-1})^{-1}(g b g^{-1})^{-1}\) 还是个交换子。商群 \(G / [G, G]\) 叫做<em>交换化</em>（abelianization），它是 \(G\) 最大的交换商。这条结构在<a href="ch10.html">第 10 章</a>自由群与<a href="ch24.html">第 24 章</a>表示论里都会用。</p>
+<p>三者等价的证明是简单计算（练习）。实战里第 3 条最常用——验正规只需查"群里随便挑 \(g\)、子群里随便挑 \(n\)，\(gng^{-1}\) 还在子群里"。</p>
 
-<h2 id="sec4-6">4.6 共轭、共轭类、与"对称的几何视角"</h2>
+<p><strong>关键定理。</strong> <em>同态的核总是正规子群</em>。</p>
 
-<p>正规性还有一个更"几何"的等价说法。两个元素 \(a, b \in G\) 叫做<strong>共轭</strong>（conjugate），如果存在 \(g \in G\) 使</p>
+<p><em>证。</em> 设 \(\varphi : G \to H\) 同态，\(N = \mathrm{Ker}\varphi\)。取 \(g \in G\)、\(n \in N\)。算 \(\varphi(gng^{-1}) = \varphi(g) \varphi(n) \varphi(g)^{-1} = \varphi(g) \cdot e \cdot \varphi(g)^{-1} = e\)。所以 \(gng^{-1} \in N\)。所以 \(N \trianglelefteq G\)。\(\square\)</p>
 
-<p>\[
-b = g a g^{-1}.
-\]</p>
+<p>这条证明短得令人发笑，但内容极重要——它说："<em>核必正规</em>"。反过来下一章会看到："<em>正规子群必为某同态的核</em>"——这给"正规" 一个对偶刻画。</p>
 
-<p>"共轭于"是一个等价关系（自反 \(a = e a e^{-1}\)，对称 \(b = g a g^{-1} \iff a = g^{-1} b g\)，传递）。它的等价类叫做<strong>共轭类</strong>，记 \(\operatorname{cl}(a) = \{g a g^{-1} : g \in G\}\)。</p>
+<p>所以"正规" 把"核能拥有的子群" 和"普通子群" 区分开。两条直觉：</p>
 
-<p>把这套语言套到正规子群上：\(N \triangleleft G\) 等价于 "\(N\) 是若干共轭类的并"——因为 \(g N g^{-1} = N\) 对所有 \(g\) 等价于 "\(N\) 中元素的共轭还在 \(N\) 中"，而后者等价于 "\(N\) 包含其每个元素所在的整个共轭类"。所以你可以把"正规子群"想象成<em>由整片共轭类拼出来的子群</em>——如果只取部分共轭类的并、漏掉某个元素的共轭，这个子集就不可能是正规子群（更可能连子群都不是）。</p>
+<ol>
+  <li><em>代数直觉</em>：正规子群 = "可以做商的子群"——下章我们会看到，\(N\) 正规是"商集 \(G/N\) 是群" 的充要条件。</li>
+  <li><em>几何直觉</em>：正规子群 = "在共轭下不变的子群"——共轭等价于"换个视角看"。普通子群可能"换视角后跑到别处"，正规子群则"无论怎么换视角都还是它自己"。</li>
+</ol>
 
-<p>这套观点在 \(S_n\) 里特别清晰。\(S_n\) 的共轭类有一个完美的描述：<em>两个置换共轭 \(\iff\) 它们的循环型相同</em>。"循环型"是把置换写成不交循环之积时各循环长度的多重集。比如在 \(S_5\) 里，\((1\,2)(3\,4)\) 与 \((1\,5)(2\,3)\) 共轭，因为它们都是 "(2,2,1) 型"（两个长度 2 的循环 + 一个不动点）。\(S_5\) 的所有共轭类对应于 \(5\) 的所有分拆 \(5 = 5, 4+1, 3+2, 3+1+1, 2+2+1, 2+1+1+1, 1+1+1+1+1\)，共 \(7\) 个共轭类。这条<em>共轭类 \(=\) 循环型 \(=\) 整数分拆</em>的对应关系是<a href="ch9.html">第 9 章</a>的核心，也是表示论与组合数学共享的根。</p>
-
-<p>共轭还有一个动作视角。固定 \(g \in G\)，映射 \(c_g : G \to G\)，\(x \mapsto g x g^{-1}\)，是 \(G\) 到自身的一个同构（验证：保乘法 \(c_g(xy) = g x y g^{-1} = (g x g^{-1})(g y g^{-1}) = c_g(x) c_g(y)\)；逆是 \(c_{g^{-1}}\)）。这种"群的自同构"叫做<strong>内自同构</strong>（inner automorphism）。所有内自同构构成一个群 \(\operatorname{Inn}(G) \le \operatorname{Aut}(G)\)（\(\operatorname{Aut}(G)\) 是 \(G\) 的全体自同构）。事实上有一个干净的同构 \(\operatorname{Inn}(G) \cong G / Z(G)\)——这是下一章第一同构定理的又一个经典应用。</p>
-
-<p>把这条放到一起看：</p>
+<p>注意几条立刻看出的事：</p>
 
 <ul>
-  <li>共轭"\(x \mapsto g x g^{-1}\)" 是 \(G\) 在自身上的一个<em>动作</em>（\(G\) 在自己身上"作用"）；</li>
-  <li>这个动作的<em>轨道</em>就是共轭类；</li>
-  <li>每个元素的<em>稳定子</em>是<em>中心化子</em> \(C_G(x) = \{g \in G : g x = x g\}\)；</li>
-  <li>由<a href="ch6.html">第 6 章</a>的轨道-稳定子定理，\(|\operatorname{cl}(x)| = [G : C_G(x)]\)，立得"共轭类大小整除 \(|G|\)"。</li>
+  <li><em>阿贝尔群里所有子群都正规</em>。证：\(gng^{-1} = gg^{-1}n = n \in N\)（用阿贝尔交换 \(g^{-1}\) 与 \(n\)）。所以阿贝尔群<em>不</em> 区分正规与否——这是阿贝尔群比一般群"温和" 的另一面。</li>
+  <li><em>\(\{e\}\) 和 \(G\) 总是正规</em>——平凡正规子群。一个群叫<em>单纯</em>（simple）如果除了这两个之外没有其它正规子群。<a href="ch9.html">第 9 章</a> 会证 \(A_n\)（\(n \ge 5\)）单纯——这是 Galois 五次方程不可解的核心。</li>
+  <li><em>指数 2 的子群总是正规</em>。证：若 \([G:H] = 2\)，则 \(G\) 被 \(H\) 分成 2 个左陪集 \(\{H, gH\}\)（任 \(g \notin H\)）；同样分成 2 个右陪集 \(\{H, Hg\}\)。但两边都覆盖 \(G \setminus H\) 的同一部分，所以 \(gH = G \setminus H = Hg\)。即左 = 右。所以 \(H \trianglelefteq G\)。</li>
 </ul>
 
-<p>这条"共轭 \(=\) 群在自己身上作用"的视角是第 6 章的预演——它告诉你"群作用"不是远在天边的抽象概念，它本身就藏在群的内部结构里。</p>
+<p>这条"指数 2 子群必正规" 是<em>非常</em> 实用的——用 Lagrange 算指数后立刻知道某些子群正规，不用单独验。</p>
 
-<p>下一章我们要把"正规子群 \(N \triangleleft G\)" 这件事兑现成一个真实的群——商群 \(G/N\)——并证明三大同构定理。第一同构定理 \(G / \operatorname{Ker} \varphi \cong \operatorname{Im} \varphi\) 是同态分解的标准模板，本章我们已经把它的所有零件凑齐：核、像、正规性，下一章只剩一步——验证 \(G/N\) 这个商集合上的乘法良定义，并把同态翻译成"投射 + 嵌入"的标准形式。</p>
+<h2 id="sec4-5">4.5 例子：A_n ◁ S_n 与 Z(G) ◁ G</h2>
+
+<p>正规子群两个特别重要的来源。</p>
+
+<p><strong>例 A：交错群 \(A_n \trianglelefteq S_n\)。</strong> </p>
+
+<p>\(A_n = \mathrm{Ker}(\mathrm{sgn}) = \{\sigma \in S_n : \sigma\) 偶排列\(\}\)——\(S_n\) 里的偶排列。它是 \(\mathrm{sgn}\) 同态的核，所以正规。</p>
+
+<p>\(|A_n| = n!/2\)（一半排列偶、一半奇）；所以 \([S_n : A_n] = 2\)——也可以由"指数 2 必正规" 直接得出。</p>
+
+<p>\(A_n\) 第 9 章详谈，这里只立两件事：</p>
+<ol>
+  <li>\(A_3 \cong \mathbb{Z}_3\)（3 阶循环）；\(A_4\) 有 12 元素，它的子群结构特殊（注意它<em>没有</em> 6 阶子群——上一章 3.7 节提过的反例就是这个）；\(A_5\) 60 元素，是<em>第一个非阿贝尔单纯群</em>。</li>
+  <li>\(A_5\) 的单纯性是"五次方程不可解" 的代数核心。第 22 章用它证 Galois 大定理。</li>
+</ol>
+
+<p><strong>例 B：中心 \(Z(G) \trianglelefteq G\)。</strong> </p>
+
+<p>群 \(G\) 的<strong>中心</strong> \(Z(G) := \{z \in G : zg = gz \ \text{对所有} \ g \in G\}\)——和所有元素都交换的元素。</p>
+
+<p>检查它是子群：含 \(e\)（显然 \(eg = ge\)）；封闭（\(z_1 z_2 g = z_1 g z_2 = g z_1 z_2\)）；含逆（若 \(zg = gz\)，则 \(z^{-1}g = z^{-1} g z z^{-1} = z^{-1} z g z^{-1} = g z^{-1}\)）。</p>
+
+<p>检查它正规：对任 \(g \in G, z \in Z(G)\)，\(g z g^{-1} = z g g^{-1} = z\)（用 \(z\) 与 \(g\) 交换）。所以 \(g z g^{-1} = z \in Z(G)\)。<em>每个元素被自己的共轭固定</em>——这正是中心的几何含义。</p>
+
+<p>\(Z(G)\) 度量"群有多 阿贝尔"——\(Z(G) = G\) 当且仅当 \(G\) 阿贝尔；\(Z(G) = \{e\}\) 时叫"中心平凡"——意味着没有任何非恒等元和所有人都交换。</p>
+
+<p>例：\(Z(D_3) = \{e\}\)——\(D_3\) 中心平凡。证：\(r\) 不和 \(s\) 交换（\(rs \neq sr\)），所以 \(r \notin Z\)；类似 \(s \notin Z\)；其它非恒等元都不在中心。</p>
+
+<p>例：\(Z(D_4) = \{e, r^2\}\)——\(r^2\)（180° 旋转）和所有元素交换。这是因为 180° 旋转把每个元素的"几何作用" 直接颠倒，而且它和反射"对称地" 颠倒，所以交换。</p>
+
+<p>例：\(Z(GL_n(\mathbb{R})) = \{cI : c \in \mathbb{R}^*\}\)——纯量矩阵。这条证起来要点工作（用 \(AB = BA\) 对所有 \(B\) 推 \(A\) 必为纯量），是<a href="../线性代数/index.html">线性代数</a> 的标准结果。</p>
+
+<p>\(Z(G)\) 在第 7 章 Sylow 定理证明、第 8 章<em>p\-群</em> 分析中是基础工具。</p>
+
+<h2 id="sec4-6">4.6 共轭与共轭类</h2>
+
+<p>"\(g n g^{-1}\)" 这个表达式——把 \(n\) 用 \(g\) 共轭——在正规子群定义里反复出现。这一节给它一个独立名字和几何画面。</p>
+
+<p><strong>定义（共轭）。</strong> 元素 \(a, b \in G\) 称<strong>共轭</strong>，若存在 \(g \in G\) 使 \(b = g a g^{-1}\)。这定义了一个等价关系：</p>
+
+<ul>
+  <li>反射：\(a = e a e^{-1}\)。</li>
+  <li>对称：若 \(b = gag^{-1}\)，则 \(a = g^{-1} b g = g^{-1} b (g^{-1})^{-1}\)。</li>
+  <li>传递：若 \(b = g_1 a g_1^{-1}\)、\(c = g_2 b g_2^{-1}\)，则 \(c = g_2 g_1 a g_1^{-1} g_2^{-1} = (g_2 g_1) a (g_2 g_1)^{-1}\)。</li>
+</ul>
+
+<p>这关系把 \(G\) 分成<em>共轭类</em> ——每类里元素彼此共轭，跨类不共轭。元素 \(a\) 所在的共轭类记 \(\mathrm{Cl}(a) = \{g a g^{-1} : g \in G\}\)。</p>
+
+<p><em>几何直觉</em>：共轭等价于"换坐标系看"。在 \(GL_n\) 里 \(P A P^{-1}\) 就是<a href="../线性代数/index.html">线性代数</a> 里"用基变换矩阵 \(P\) 把 \(A\) 换基"——所以共轭矩阵代表"同一个线性变换在不同基下的样子"。\(P A P^{-1}\) 和 \(A\) 有相同特征值、相同迹、相同行列式——这些是"基无关" 的不变量。</p>
+
+<p>同样的画面在 \(D_n\) 里：把 \(s\) 沿对称轴 \(L_1\) 共轭到 \(s'\) 沿 \(L_2\)，相当于把"对称轴 \(L_1\)" 转到"对称轴 \(L_2\)"——共轭把"过 \(L_1\) 反射" 变成"过 \(L_2\) 反射"。它们结构上一样，只是<em>哪一条轴</em> 不同。</p>
+
+<p>请你在 \(S_3\) 里算几个共轭：</p>
+
+<p>\(S_3\) 有 6 个元素：恒等 \(e\)；3 个对换 \((12), (13), (23)\)；2 个 3-循环 \((123), (132)\)。（这是循环写法——见<a href="ch9.html">第 9 章</a>。\((12)\) 表示"把 1 和 2 互换、3 不动"。）</p>
+
+<p>算 \(g (12) g^{-1}\) 对各种 \(g\)：</p>
+<ul>
+  <li>\(g = (13)\)：\((13)(12)(13)^{-1} = (13)(12)(13)\)。手算：先 \((13)\) 把 1↔3；再 \((12)\) 把 1↔2；再 \((13)\) 把 1↔3。整体结果：\(1 \to 3 \to 3 \to 1\) 不对。让我重做——按从右到左作用 \((13)\) 先：1 → 3, 2 → 2, 3 → 1。然后 \((12)\)：3 → 3, 2 → 1, 1 → 2。然后 \((13)\)：3 → 1, 1 → 3, 2 → 2。综合：1 → 3 → 3 → 1，2 → 2 → 1 → 3，3 → 1 → 2 → 2。所以 \(1 \to 1, 2 \to 3, 3 \to 2\)——结果是 \((23)\)。</li>
+  <li>所以 \((13)(12)(13) = (23)\)——把对换 \((12)\) 共轭到对换 \((23)\)。</li>
+</ul>
+
+<p>类似你能验证<em>所有 3 个对换共轭等价</em>——它们都在同一共轭类。3-循环 \((123)\) 和 \((132)\) 也共轭等价，构成另一类。所以 \(S_3\) 的共轭类是：</p>
+
+<p>\[
+\{e\}, \quad \{(12), (13), (23)\}, \quad \{(123), (132)\}.
+\]</p>
+
+<p>请你停下来注意：\(1 + 3 + 2 = 6 = |S_3|\)。共轭类大小加起来恰好等于群阶——因为它们是等价类划分。这就是<em>共轭类方程</em>，下一章 Sylow 定理证明里要用。</p>
+
+<p>更深一步：<em>\(S_n\) 的共轭类完全由"循环型" 决定</em>——两个排列共轭当且仅当它们的循环结构相同。\(S_3\) 里"对换" 都共轭、"3-循环" 都共轭，但"对换" 和"3-循环" 不互相共轭——因为循环型不同（\(2+1\) vs \(3\)）。一般地 \(S_n\) 的共轭类数 = \(n\) 的"分拆数" \(p(n)\)：\(p(3) = 3\)（分拆 \(3 = 3 = 2+1 = 1+1+1\)），对应 \(S_3\) 里 3 个共轭类。第 9 章会全证。</p>
+
+<p>本章铺垫到这里，足够你后面用——共轭、共轭类、中心，下面这些概念会在群作用（第 6 章）、Sylow 定理（第 7 章）、对称群分析（第 9 章）反复出现。</p>
+
+<h2 id="sec4-7">4.7 这一章把"群之间" 系统化了</h2>
+
+<p>让我把本章拉成一条线。</p>
+
+<p>开头的钩子——\(\det : GL_n \to \mathbb{R}^*\) 把矩阵乘法翻译成实数乘法——把"群之间的映射" 这件事推到台面。我们正式叫这种"保运算的映射" 为<em>同态</em>，立刻发现：</p>
+
+<ul>
+  <li>同态自动保恒等、保逆、保幂；</li>
+  <li>同态自带<em>核</em>（在 \(G\) 里）和<em>像</em>（在 \(H\) 里）两个子群；</li>
+  <li>核衡量"信息丢失量"——核越大压得越狠；</li>
+  <li>核是<em>正规</em> 子群——正规这个概念由"陪集左 = 陪集右" 描述，等价于"在共轭下不变"；</li>
+  <li>核所代表的"丢的信息" 正是下章<em>商群</em> 要捡回来的东西。</li>
+</ul>
+
+<p>同时本章引入两件后面反复用的事：</p>
+
+<ul>
+  <li><em>共轭</em>——"同一对象在不同坐标系下的样子"。共轭把群分成共轭类（等价类）；</li>
+  <li><em>中心</em> \(Z(G)\)——和所有人都交换的元素。中心总正规、度量"群有多阿贝尔"。</li>
+</ul>
+
+<p>下一章 (ch5) 把核与商连起来。我们会问"<em>给定正规子群 \(N\)，能不能让 \(G\) 模掉 \(N\) 后也是个群</em>"——答案"<em>能且只有正规子群能</em>"——这个商群 \(G/N\) 与原同态有一个干净对应叫<em>第一同构定理</em>：每个同态都能分解成"先模核 → 再嵌入"。这条定理把同态、核、商三件事拧到同一根绳上，是群论里最常用的<em>计算工具</em>。</p>
+
+<p>把本章一句话压缩：<em>"同态把群 \(G\) 压到 \(H\)，压扁到一根'核' 上的部分被 \(N = \mathrm{Ker}\) 记下；剩下的 \(G/N\) 与像 \(\mathrm{Im}\) 一一对应。"</em>——这就是下一章的全部。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 子群、陪集、Lagrange 定理</a><a href="ch5.html">下一章 · 第 5 章 商群与三大同构定理 →</a></nav>
 </main>
