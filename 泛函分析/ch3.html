@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 内积与 Hilbert 空间 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 度量、范数、Banach 空间</a><a href="ch4.html">下一章 · 第 4 章 经典空间例子库 →</a></nav>
+<h1 id="ch3">第 3 章 内积与 Hilbert 空间</h1>
+
+<p>第 2 章的 Banach 空间已经够装载很多分析了，但它缺一样东西：<strong>角度</strong>。范数能告诉你"这个向量有多长"，却没法告诉你"这两个向量正不正交"。在有限维线性代数里，"正交分解""最佳逼近""谱分解"这些核心结论都依赖内积——也就是依赖角度。无穷维分析里也一样：你想要"投影到一个子空间"，你想要"展开成正交基"，你想要"对称矩阵正交对角化"，这些事情没有内积全部做不了。</p>
+
+<p>这一章建立的是<strong>Hilbert 空间</strong>——内积 + 完备的赋范空间。Hilbert 空间是泛函分析里最舒服的一类——它把"几何"全部还给你，同时保留无穷维的所有有意义部分（比如算子、谱、对偶）。本书从第 6 章到第 7 章、第 16 章、第 21 章、第 24 章，每一处用到正交、投影、谱分解的地方，几乎都站在 Hilbert 空间上。</p>
+
+<ul>
+  <li>从内积的三条公理开始，立刻看出它"长什么样"——以及为什么它一旦存在就立刻给你一个范数。</li>
+  <li>用 Cauchy–Schwarz 把"内积控制范数"这件事钉死。</li>
+  <li>把<strong>平行四边形恒等式</strong>讲清楚——它不是几何小情趣，而是<em>判别一个范数能不能来自内积</em>的关键工具。</li>
+  <li>正式定义 Hilbert 空间（内积 + 完备）并立刻看四个标准例子：\(\mathbb{R}^n\)、\(\ell^2\)、\(L^2\)、Sobolev \(H^1\) 雏形。</li>
+  <li>把"正交"在无穷维里的意义说穿——并立即指出它和"线性无关"的区别。</li>
+  <li>预告第 6 章会讲的几何——闭子空间的正交补一定存在，于是"投影"成为最自然的算子。</li>
+</ul>
+
+<h2 id="sec3-1">3.1 内积的定义与第一直觉</h2>
+
+<p>设 \(H\) 是 \(\mathbb{K}\) 域上的向量空间。一个<strong>内积</strong>是函数</p>
+
+<p>\[
+\langle \cdot, \cdot \rangle : H \times H \to \mathbb{K}
+\]</p>
+
+<p>满足：</p>
+
+<ul>
+  <li>(I1) 共轭对称：\(\langle x, y \rangle = \overline{\langle y, x \rangle}\)（实情形即对称）；</li>
+  <li>(I2) 第一变量线性：\(\langle \alpha x_1 + \beta x_2, y \rangle = \alpha \langle x_1, y \rangle + \beta \langle x_2, y \rangle\)；</li>
+  <li>(I3) 正定：\(\langle x, x \rangle \ge 0\)，且 \(\langle x, x \rangle = 0 \iff x = 0\)。</li>
+</ul>
+
+<p>注意 (I1) + (I2) 蕴含<em>第二变量共轭线性</em>：\(\langle x, \alpha y_1 + \beta y_2 \rangle = \bar\alpha \langle x, y_1 \rangle + \bar\beta \langle x, y_2 \rangle\)。这条"共轭"在实数域上当然变成普通线性，所以读实数情形时可以忽略所有"共轭"——但本书很多陈述要照顾复数情形（特别是<a href="ch24.html">第 24 章</a>谈量子力学时），写法上会一直留着 \(\overline{(\cdot)}\)。</p>
+
+<p>每个内积都自动诱导一个范数：</p>
+
+<p>\[
+\boxed{\ \|x\| := \sqrt{\langle x, x \rangle}.\ }
+\]</p>
+
+<p>(N1)、(N2) 直接验证。(N3) 三角不等式需要先证 Cauchy–Schwarz，下面就做。</p>
+
+<p>把内积当成"广义点积"是最朴素的图像。它给你的不止是长度（即范数），还包括<em>两个向量的"投影"</em>——\(\langle x, y \rangle\) 在直觉上就是"\(y\) 在 \(x\) 方向上的投影长度乘以 \(\|x\|\)"。这个投影直觉是后面整本书反复使用的核心。</p>
+
+<h2 id="sec3-2">3.2 Cauchy–Schwarz 不等式</h2>
+
+<p>这条不等式是泛函分析里出现得最频繁的不等式之一：</p>
+
+<p>\[
+\boxed{\ |\langle x, y \rangle| \le \|x\| \cdot \|y\|, \quad \forall x, y \in H.\ }
+\]</p>
+
+<p>等号当且仅当 \(x, y\) 线性相关时成立。</p>
+
+<p>证明非常短。如果 \(y = 0\) 两边都为零，结束。否则考虑实参数 \(t\) 与</p>
+
+<p>\[
+0 \le \langle x - t y, x - t y \rangle = \|x\|^2 - 2 t \operatorname{Re} \langle x, y \rangle + t^2 \|y\|^2.
+\]</p>
+
+<p>这是关于 \(t\) 的一元非负二次式。判别式 \(\le 0\) 给</p>
+
+<p>\[
+4 (\operatorname{Re} \langle x, y \rangle)^2 \le 4 \|x\|^2 \|y\|^2.
+\]</p>
+
+<p>把 \(x\) 替换成 \(e^{-i \theta} x\)（其中 \(\theta = \arg \langle x, y \rangle\)）让左边的 \(\operatorname{Re}\) 变成绝对值，结束。</p>
+
+<p>有了 Cauchy–Schwarz，三角不等式就一行：</p>
+
+<p>\[
+\|x + y\|^2 = \|x\|^2 + 2 \operatorname{Re} \langle x, y \rangle + \|y\|^2 \le \|x\|^2 + 2 \|x\| \|y\| + \|y\|^2 = (\|x\| + \|y\|)^2.
+\]</p>
+
+<p>所以"内积 \(\Rightarrow\) 范数"这一步彻底落地。</p>
+
+<p>Cauchy–Schwarz 还有一个常见的写法：</p>
+
+<p>\[
+\left| \int_\Omega f \bar g \, d\mu \right|^2 \le \int_\Omega |f|^2 \, d\mu \cdot \int_\Omega |g|^2 \, d\mu,
+\]</p>
+
+<p>就是 \(L^2\) 上的 Cauchy–Schwarz。这条在概率统计里就是协方差的不等式 \(|\operatorname{Cov}(X, Y)| \le \sigma_X \sigma_Y\)（详见<a href="../概率统计/index.html">概率统计读本</a>），在信号处理里就是相关函数的上界，在 PDE 里就是能量估计的基本工具。同一行字在三个学科里有三种名字。</p>
+
+<h2 id="sec3-3">3.3 平行四边形恒等式：判别"内积来源"的钥匙</h2>
+
+<p>内积诱导的范数有一个特殊性质，叫<strong>平行四边形恒等式</strong>：</p>
+
+<p>\[
+\boxed{\ \|x + y\|^2 + \|x - y\|^2 = 2 \|x\|^2 + 2 \|y\|^2.\ }
+\]</p>
+
+<p>证明就是把两边按内积展开（用 (I1)、(I2)），配项后立刻成立。这条等式有一个非常意外的逆命题：</p>
+
+<p><strong>定理（Jordan–von Neumann）。</strong> 一个赋范空间 \((X, \|\cdot\|)\) 上的范数能由某个内积诱导 \(\iff\) 范数满足平行四边形恒等式。</p>
+
+<p>"\(\Rightarrow\)" 上面已证；"\(\Leftarrow\)" 通过<em>极化恒等式</em>显式构造内积：</p>
+
+<p>\[
+\langle x, y \rangle = \frac{1}{4} \left( \|x + y\|^2 - \|x - y\|^2 \right) \quad \text{（实情形）}
+\]</p>
+
+<p>或</p>
+
+<p>\[
+\langle x, y \rangle = \frac{1}{4} \sum_{k=0}^{3} i^k \|x + i^k y\|^2 \quad \text{（复情形）},
+\]</p>
+
+<p>然后验证三条内积公理。详细论证留<a href="appA.html">附录 A</a>。</p>
+
+<p>这条逆命题极有用。它给了一个判别"我能不能在某个范数下做投影 / 正交分解"的具体准则——只要看一行不等式 / 等式即可。比如：</p>
+
+<ul>
+  <li><strong>\(\ell^p\) 在 \(p \neq 2\) 时不是 Hilbert 空间。</strong>取 \(\mathbb{R}^2\) 上 \(\|\cdot\|_p\)，\(x = (1, 0)\)、\(y = (0, 1)\)：\(\|x + y\|_p = 2^{1/p}\)、\(\|x - y\|_p = 2^{1/p}\)、\(\|x\|_p = \|y\|_p = 1\)。代入平行四边形：左边 \(= 2 \cdot 2^{2/p}\)、右边 \(= 4\)。等式成立 \(\iff p = 2\)。所以 \(\|\cdot\|_p\) 只在 \(p = 2\) 时才能从内积来。</li>
+  <li><strong>\(C[a,b]\) 配 sup-范数不是 Hilbert 空间。</strong>类似反例（取两个特征函数式的连续逼近，平行四边形不成立）。</li>
+  <li><strong>\(L^p\) 在 \(p \neq 2\) 时不是 Hilbert 空间。</strong>同上，由具体支撑不交的两个函数立即给出。</li>
+</ul>
+
+<p>这就解释了为什么 \(L^2\) 在所有 \(L^p\) 里有特殊地位——只有 \(p = 2\) 才有内积，才有正交，才有投影。<strong>"\(L^2\) 是分析里几何最丰富的空间"</strong>这句话的全部底气都在这条 Jordan–von Neumann 定理里。</p>
+
+<h2 id="sec3-4">3.4 Hilbert 空间：内积 + 完备</h2>
+
+<p>一个<strong>Hilbert 空间</strong> \(H\) 就是一个完备的内积空间——它是 Banach 空间的"特殊子类"（范数恰好满足平行四边形恒等式）。它享有 Banach 空间的所有结论（完备性给的"取极限"自由），同时多享有"几何"。</p>
+
+<p>四个标准 Hilbert 空间例子，本书后面几乎全部场景都在它们上展开：</p>
+
+<p><strong>例 1（\(\mathbb{R}^n\) 与 \(\mathbb{C}^n\)）。</strong>欧氏内积 \(\langle x, y \rangle = \sum x_i \bar y_i\)，这是有限维"原型"。</p>
+
+<p><strong>例 2（\(\ell^2\)）。</strong></p>
+
+<p>\[
+\ell^2 = \left\{ x : \sum |x_n|^2 < \infty \right\}, \qquad \langle x, y \rangle = \sum_{n=1}^{\infty} x_n \bar y_n.
+\]</p>
+
+<p>是 Hilbert 空间。它就是"最朴素的无穷维 Hilbert 空间"，绝大多数定理在这上面已经能讲得完整。事实上由第 7 章会证的"可分 Hilbert 空间唯一性"，所有可分无穷维 Hilbert 空间在等距同构意义下都<em>就是</em> \(\ell^2\)。</p>
+
+<p><strong>例 3（\(L^2(\Omega, \mu)\)）。</strong></p>
+
+<p>\[
+L^2(\Omega) = \left\{ f : \int |f|^2 \, d\mu < \infty \right\}, \qquad \langle f, g \rangle = \int f \bar g \, d\mu.
+\]</p>
+
+<p>是 Hilbert 空间（这是<a href="../实分析/ch24.html">实分析读本第 24 章</a>的 Riesz–Fischer 定理）。它是泛函分析最常用的"函数版" Hilbert 空间。Fourier 分析、概率论、量子力学、PDE 弱解几乎全部在 \(L^2\) 上写。</p>
+
+<p><strong>例 4（Sobolev 空间 \(H^1(\Omega)\) 雏形）。</strong></p>
+
+<p>\[
+H^1(\Omega) = \left\{ f \in L^2 : \nabla f \in L^2 \right\}, \qquad \langle f, g \rangle_{H^1} = \int (f \bar g + \nabla f \cdot \overline{\nabla g}) \, dx.
+\]</p>
+
+<p>这是 Hilbert 空间。它是 PDE 变分理论的基础对象，第 23 章会专门展开。"\(H^1\)" 这个名字看上去高大，本质就是把"\(L^2\) 函数 + 一阶导数也在 \(L^2\)"打包进同一个内积空间。</p>
+
+<p>这四个例子在本书里出现的次数加起来超过其他所有空间的总和。把它们当成肌肉记忆。</p>
+
+<h2 id="sec3-5">3.5 正交：在无穷维里"垂直"还是"垂直"</h2>
+
+<p>两个向量 \(x, y \in H\) 称为<strong>正交</strong>，记作 \(x \perp y\)，如果 \(\langle x, y \rangle = 0\)。一个集合 \(\{e_\alpha\}\) 称为<strong>正交集</strong>，如果两两正交；称为<strong>正交规范集</strong>（orthonormal），如果还每个 \(\|e_\alpha\| = 1\)。</p>
+
+<p>正交在无穷维里的意义和有限维一样朴素：\(x \perp y\) 意味着它们的"方向上完全无关"。但有几条事项要专门留意：</p>
+
+<p><strong>(O1) 正交 \(\Rightarrow\) 线性无关，反之不然。</strong>正交集自动线性无关（取系数线性组合等于零，与每个 \(e_i\) 取内积，由正交立得每个系数为零）。但线性无关集不一定能选出一组正交的——你得做 Gram–Schmidt。</p>
+
+<p><strong>(O2) Pythagoras 定理推广。</strong>对正交集 \(\{x_1, \ldots, x_n\}\) 与任意系数 \(c_1, \ldots, c_n\)：</p>
+
+<p>\[
+\boxed{\ \left\| \sum_{i=1}^n c_i x_i \right\|^2 = \sum_{i=1}^n |c_i|^2 \cdot \|x_i\|^2.\ }
+\]</p>
+
+<p>对正交规范集进一步简化为 \(\sum |c_i|^2\)。这个等式在无穷维里依然成立——但要先确认级数收敛，这是 Bessel 不等式（第 5 章）和 Parseval 等式（第 7 章）的源头。</p>
+
+<p><strong>(O3) 正交补。</strong>对子集 \(M \subset H\) 定义</p>
+
+<p>\[
+M^\perp = \{x \in H : \langle x, m \rangle = 0, \forall m \in M\}.
+\]</p>
+
+<p>无论 \(M\) 是不是子空间、是不是闭，\(M^\perp\) 永远是<em>闭子空间</em>。证明：线性性来自内积线性，闭性来自内积关于第一变量连续（\(x_n \to x \Rightarrow \langle x_n, m \rangle \to \langle x, m \rangle\)，由 Cauchy–Schwarz）。</p>
+
+<p>这一节最关键的结论留到下一章正式陈述：</p>
+
+<p><strong>预告（第 6 章定理 6.x）。</strong>设 \(H\) 是 Hilbert 空间，\(M \subset H\) 是<em>闭</em>子空间。则 \(H = M \oplus M^\perp\)（直和分解）。每个 \(x \in H\) 唯一写成 \(x = m + m^\perp\)，其中 \(m \in M\)、\(m^\perp \in M^\perp\)，且 \(m\) 是 \(x\) 到 \(M\) 的最佳逼近：\(\|x - m\| = \min_{m' \in M} \|x - m'\|\)。</p>
+
+<p>这条定理是 Hilbert 空间几何的根。它告诉你：在 Hilbert 空间里，闭子空间永远有正交补；"投影到子空间"永远有定义；最小二乘永远有解。这三件事在 Banach 空间里<em>不一定</em>成立——这正是为什么 Hilbert 空间被分析家们如此偏爱。</p>
+
+<h2 id="sec3-6">3.6 Hilbert 空间为什么"那么贵"</h2>
+
+<p>到目前为止你已经见到一连串"Hilbert 空间有，Banach 空间没有"的事：</p>
+
+<ul>
+  <li>有内积（角度）；</li>
+  <li>有 Cauchy–Schwarz（内积控制范数）；</li>
+  <li>有平行四边形恒等式（极化构造内积）；</li>
+  <li>正交规范集自动线性无关；</li>
+  <li>正交补一定是闭子空间；</li>
+  <li>闭子空间的正交补给出全空间分解；</li>
+  <li>对偶空间和自身等距同构（Riesz 表示，第 16 章）；</li>
+  <li>自伴算子有完整谱分解（第 21、24 章）。</li>
+</ul>
+
+<p>这八条加起来意味着：<strong>Hilbert 空间是无穷维里几乎所有"几何 + 分析"工具仍然完好的极少数空间之一</strong>。其他 Banach 空间多多少少都缺一些工具——\(L^p\)（\(p \neq 2\)）有对偶但没有正交分解；\(C[a,b]\) 有最大范数但没有自伴算子的好谱定理；\(\ell^\infty\) 连"可分性"都没有。这些"缺陷"不是技术细节，而是真正影响你能不能写下一个干净结果的根本性差异。</p>
+
+<p>这就是为什么本书的结构里 Hilbert 空间会被反复回头使用：第 6 章正交分解、第 7 章 Fourier 展开、第 16 章 Riesz 表示在 \(H^* = H\)、第 17 章弱收敛在 Hilbert 上特别干净、第 20 章紧算子的核心例子在 Hilbert 上、第 21 章谱定理几乎只在 Hilbert 上有"完整版"、第 24 章量子力学整套语言在 Hilbert 上。</p>
+
+<p>下一章我们要把这些 Hilbert 与 Banach 空间的<em>具体例子</em>过一遍——\(\ell^p\)、\(L^p\)、\(C[a,b]\)、\(C^k\)、\(c_0\)。这些是后面所有定理跑得起来的"硬件"，每一个都值得认识到能直接对它做手算的程度。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 度量、范数、Banach 空间</a><a href="ch4.html">下一章 · 第 4 章 经典空间例子库 →</a></nav>
+</main>
+</body>
+</html>

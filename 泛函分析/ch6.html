@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 6 章 Hilbert 几何：投影与最佳逼近 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 经典不等式</a><a href="ch7.html">下一章 · 第 7 章 正交基与 Fourier 展开 →</a></nav>
+<h1 id="ch6">第 6 章 Hilbert 几何：投影与最佳逼近</h1>
+
+<p>这一章是整本书最"看得见"的一章。它讲的是 Hilbert 空间里的核心几何动作——<strong>把一个向量投影到一个闭子空间上</strong>。这个动作在有限维里你可能已经见过：最小二乘把数据点投到一条直线、一个超平面或一个回归子空间上。本章告诉你两件事：第一，这个"投影"在<em>无穷维</em> Hilbert 空间里也存在，并且性质完全一样；第二，"最小二乘"、"条件期望"、"Fourier 部分和"、"线性回归"这些表面上不同的对象其实都是同一件事——投影到闭子空间。</p>
+
+<p>这件事在 Banach 空间里<em>不</em>成立：一般 Banach 空间里"最佳逼近"不一定存在，存在了也不一定唯一，更不一定是线性映射。Hilbert 空间是<em>唯一</em>一类空间，能让最佳逼近存在、唯一、且是线性连续算子。这就是为什么 Hilbert 空间在分析里有特殊地位。</p>
+
+<ul>
+  <li>从最朴素的几何问题开始：在 Hilbert 空间里，给定向量 \(x\) 与闭凸集 \(C\)，到 \(C\) 的最近点存在吗？</li>
+  <li>用<em>平行四边形恒等式</em>证明"最近点存在且唯一"——这是 Hilbert 空间几何的基本定理。</li>
+  <li>把这个一般结果落到 \(C\) = 闭子空间 \(M\) 的特例：得到正交投影。</li>
+  <li>正交分解定理 \(H = M \oplus M^\perp\)：每个 \(x\) 唯一拆成"平行 + 垂直"两部分。</li>
+  <li>正交投影 \(P_M : H \to M\) 的性质——线性、自伴、幂等、范数 \(\le 1\)。</li>
+  <li>三个具体应用：最小二乘 / 线性回归、Fourier 部分和、条件期望——它们都<em>是</em>正交投影。</li>
+</ul>
+
+<h2 id="sec6-1">6.1 最近点：闭凸集情形</h2>
+
+<p>设 \(H\) 是 Hilbert 空间，\(C \subset H\) 是<strong>非空闭凸集</strong>（凸：包含任两点的连线段；闭：拓扑意义下闭）。<strong>最近点定理</strong>说：对每个 \(x \in H\)，存在唯一的 \(c^* \in C\) 使</p>
+
+<p>\[
+\boxed{\ \|x - c^*\| = \inf_{c \in C} \|x - c\|.\ }
+\]</p>
+
+<p>这点 \(c^*\) 叫 \(x\) 在 \(C\) 上的<strong>投影</strong>，记作 \(P_C(x)\)。</p>
+
+<p>证明这是 Hilbert 几何最优雅的论证之一，全部依赖<a href="ch3.html">第 3 章 3.3 节</a>的<em>平行四边形恒等式</em>。</p>
+
+<p><strong>步骤 1（极小化序列 Cauchy）。</strong>令 \(d = \inf_{c \in C} \|x - c\|\)。取序列 \(\{c_n\} \subset C\) 使 \(\|x - c_n\| \to d\)。对任意 \(m, n\)，由平行四边形：</p>
+
+<p>\[
+\|c_m - c_n\|^2 = 2 \|x - c_m\|^2 + 2 \|x - c_n\|^2 - 4 \left\| x - \frac{c_m + c_n}{2} \right\|^2.
+\]</p>
+
+<p>由 \(C\) 凸，\((c_m + c_n)/2 \in C\)，故 \(\|x - (c_m+c_n)/2\|^2 \ge d^2\)。代回：</p>
+
+<p>\[
+\|c_m - c_n\|^2 \le 2 \|x - c_m\|^2 + 2 \|x - c_n\|^2 - 4 d^2 \to 2 d^2 + 2 d^2 - 4 d^2 = 0.
+\]</p>
+
+<p>所以 \(\{c_n\}\) 是 Cauchy 序列。</p>
+
+<p><strong>步骤 2（极限存在 + 在 \(C\) 内）。</strong>由 \(H\) 完备，\(c_n \to c^*\)。由 \(C\) 闭，\(c^* \in C\)。由范数连续，\(\|x - c^*\| = d\)，所以 \(c^*\) 是最近点。</p>
+
+<p><strong>步骤 3（唯一性）。</strong>设 \(c^*\) 与 \(c^{**}\) 都是最近点。再用平行四边形，相同论证给 \(\|c^* - c^{**}\| = 0\)，即 \(c^* = c^{**}\)。</p>
+
+<p>这条定理就是 Hilbert 几何的"基本定理"。它的两个关键前提是<em>凸</em> 与 <em>闭</em>——失去任何一个都会失败。凸是为了让"中点"也在集合里以应用平行四边形；闭是为了让 Cauchy 极限留在集合里。</p>
+
+<p>注意"\(H\) 完备 + \(C\) 闭"是无可绕过的——在不完备空间里上面的论证就会在第 2 步崩掉。这也是为什么 Hilbert 空间的"完备性"不是装饰：缺了它整个几何就坍塌。</p>
+
+<h2 id="sec6-2">6.2 投影到闭子空间：正交特征</h2>
+
+<p>把上面的定理特化到 \(C = M\) 是<em>闭子空间</em>。子空间一定凸（包含原点 + 加法 + 数乘封闭蕴含中点封闭）。所以最近点定理立即给出：每个 \(x \in H\) 在 \(M\) 上有唯一最近点 \(P_M(x)\)。</p>
+
+<p>子空间情形比一般凸集多一个奇迹：<strong>"最近"等价于"残差垂直于 \(M\)"</strong>。</p>
+
+<p><strong>定理（投影的正交特征）。</strong>设 \(M \subset H\) 闭子空间，\(x \in H\)、\(m \in M\)。则</p>
+
+<p>\[
+\|x - m\| = \min_{m' \in M} \|x - m'\| \iff (x - m) \perp M.
+\]</p>
+
+<p>"\(\Leftarrow\)" 很直接。设 \((x - m) \perp M\)。对任意 \(m' \in M\)，</p>
+
+<p>\[
+\|x - m'\|^2 = \|(x - m) + (m - m')\|^2 = \|x - m\|^2 + \|m - m'\|^2 \ge \|x - m\|^2,
+\]</p>
+
+<p>因为 \((x - m) \perp (m - m') \in M\)。所以 \(m\) 是最近的。</p>
+
+<p>"\(\Rightarrow\)" 用变分。设 \(m\) 最近。对任意 \(m_0 \in M\) 与 \(t \in \mathbb{R}\)，\(m + t m_0 \in M\)，所以</p>
+
+<p>\[
+\|x - m - t m_0\|^2 \ge \|x - m\|^2.
+\]</p>
+
+<p>展开得 \(\|x - m\|^2 - 2 t \operatorname{Re} \langle x - m, m_0 \rangle + t^2 \|m_0\|^2 \ge \|x - m\|^2\)，即</p>
+
+<p>\[
+t^2 \|m_0\|^2 \ge 2 t \operatorname{Re} \langle x - m, m_0 \rangle.
+\]</p>
+
+<p>除以 \(t\) 后取 \(t \to 0^+\) 与 \(t \to 0^-\)，得 \(\operatorname{Re} \langle x - m, m_0 \rangle = 0\)。在复情形对 \(m_0\) 同时取 \(i m_0\) 给 \(\operatorname{Im} = 0\)。所以 \(\langle x - m, m_0 \rangle = 0\) 对所有 \(m_0 \in M\)，即 \((x - m) \perp M\)。</p>
+
+<p>这条等价非常有用。"最近"是个分析概念（取无穷下确界），"垂直"是个代数概念（一行内积等于零）。把这两个等同的瞬间，几何就完全可计算了。</p>
+
+<h2 id="sec6-3">6.3 正交分解 \(H = M \oplus M^\perp\)</h2>
+
+<p>把上一节合起来：每个 \(x \in H\) 唯一写成</p>
+
+<p>\[
+\boxed{\ x = P_M(x) + (x - P_M(x)), \qquad P_M(x) \in M, \ (x - P_M(x)) \in M^\perp.\ }
+\]</p>
+
+<p>分解的存在性来自最近点存在；唯一性来自</p>
+
+<p>\[
+M \cap M^\perp = \{0\}
+\]</p>
+
+<p>（如果 \(y \in M \cap M^\perp\)，则 \(\langle y, y \rangle = 0\)，即 \(y = 0\)）。</p>
+
+<p>这就是 <strong>Hilbert 空间正交分解定理</strong>：</p>
+
+<p><strong>定理。</strong>设 \(H\) 是 Hilbert 空间，\(M \subset H\) 闭子空间。则 \(H = M \oplus M^\perp\)。每个 \(x \in H\) 唯一分解 \(x = m + m^\perp\)，其中 \(m = P_M(x)\)、\(m^\perp = P_{M^\perp}(x)\)。</p>
+
+<p>顺便注意到：\(M^\perp\) 一定是闭子空间（第 3 章 3.5 节已证），所以 \(M^{\perp \perp} = M\)（对闭子空间）。换句话说"取两次正交补"回到原来。这条 \((M^\perp)^\perp = M\) 在第 15 章对偶空间里会反复用。</p>
+
+<p>这里有一个很值得停下来欣赏的奇迹。在<em>非</em> Hilbert 的 Banach 空间里，子空间不一定有<em>任何</em>形式的"补"；甚至闭子空间都不一定有连续的补投影。Hilbert 空间是无穷维里"线性代数全部还在"的少数空间——这就是为什么我们偏爱它。</p>
+
+<h2 id="sec6-4">6.4 正交投影算子的性质</h2>
+
+<p>映射 \(P_M : H \to H\)，\(x \mapsto P_M(x)\)，叫做 \(H\) 到 \(M\) 上的<strong>正交投影</strong>。它有四条核心性质：</p>
+
+<p><strong>(P1) 线性。</strong> \(P_M(\alpha x + \beta y) = \alpha P_M(x) + \beta P_M(y)\)。证明：把 \(\alpha P_M(x) + \beta P_M(y)\) 与 \(\alpha (x - P_M(x)) + \beta (y - P_M(y))\) 分别验证落在 \(M\) 与 \(M^\perp\) 中，由唯一性结束。</p>
+
+<p><strong>(P2) 幂等：\(P_M^2 = P_M\)。</strong> \(P_M(x) \in M\)，再投到 \(M\) 还是它自己。</p>
+
+<p><strong>(P3) 自伴：\(\langle P_M(x), y \rangle = \langle x, P_M(y) \rangle\)。</strong>把 \(x = m_x + m_x^\perp\)、\(y = m_y + m_y^\perp\) 展开，左边 \(= \langle m_x, m_y \rangle\)，右边 \(= \langle m_x, m_y \rangle\)，相等。</p>
+
+<p><strong>(P4) 范数 \(\|P_M\| \le 1\)。</strong>\(\|x\|^2 = \|P_M(x)\|^2 + \|x - P_M(x)\|^2 \ge \|P_M(x)\|^2\)。除非 \(M = \{0\}\)，否则 \(\|P_M\| = 1\)。</p>
+
+<p>这四条把正交投影刻画得相当干净。事实上有一个反向定理：</p>
+
+<p><strong>定理（投影的特征）。</strong>设 \(P : H \to H\) 是有界线性算子，幂等且自伴。则 \(P\) 是某个闭子空间 \(M = \operatorname{Range}(P)\) 上的正交投影。</p>
+
+<p>这条等价让"投影"完全可被代数辨认——以后你看到一个算子满足 \(P^2 = P\) 与 \(P^* = P\)，就立刻知道它是某个闭子空间的正交投影。</p>
+
+<h2 id="sec6-5">6.5 应用一：最小二乘 / 线性回归</h2>
+
+<p>这是正交投影最直观的应用。设我们有数据 \((a_1, b_1), \ldots, (a_n, b_n) \in \mathbb{R}^2\)，想找一条直线 \(b = \alpha + \beta a\) 使总平方误差</p>
+
+<p>\[
+\sum_{i=1}^n (b_i - \alpha - \beta a_i)^2
+\]</p>
+
+<p>最小。把这件事写成线性代数：</p>
+
+<p>\[
+\min_{\alpha, \beta} \|\mathbf{b} - A \boldsymbol{\theta}\|^2, \qquad A = \begin{pmatrix} 1 & a_1 \\ \vdots & \vdots \\ 1 & a_n \end{pmatrix}, \quad \boldsymbol{\theta} = \begin{pmatrix} \alpha \\ \beta \end{pmatrix}.
+\]</p>
+
+<p>这里 Hilbert 空间是 \(\mathbb{R}^n\)，\(M = \operatorname{Range}(A) \subset \mathbb{R}^n\)（一个二维闭子空间），目标就是把 \(\mathbf{b}\) 投影到 \(M\) 上。投影的正交特征给</p>
+
+<p>\[
+A^T (\mathbf{b} - A \hat{\boldsymbol{\theta}}) = 0,
+\]</p>
+
+<p>即<strong>正规方程</strong> \(A^T A \hat{\boldsymbol{\theta}} = A^T \mathbf{b}\)。这就是最小二乘的解。</p>
+
+<p>关键直觉：<strong>最小二乘 \(=\) 把目标向量正交投影到列空间上</strong>。这个图像把一个看上去是数值优化的问题变成了纯几何。这也解释了为什么残差 \(\mathbf{b} - A \hat{\boldsymbol{\theta}}\) 一定垂直于每一列 \(a_i\)——这就是正交特征。</p>
+
+<p>同样的图像在无穷维里也成立。把 \(\mathbb{R}^n\) 换成 \(L^2\)、列空间换成"由若干基函数张成的闭子空间"，最小二乘就变成"用这些基函数最佳逼近目标函数"。这是数值分析、机器学习、信号处理共享的几何根。</p>
+
+<h2 id="sec6-6">6.6 应用二与三：Fourier 部分和与条件期望</h2>
+
+<p><strong>Fourier 部分和。</strong>取 \(H = L^2[-\pi, \pi]\)，\(\{e_n = e^{inx}/\sqrt{2\pi}\}_{n \in \mathbb{Z}}\) 是正交规范集。\(M_N = \operatorname{span}\{e_n : |n| \le N\}\) 是有限维（所以闭）子空间。投影 \(P_{M_N}(f)\) 是什么？由前面的正交特征：\(P_{M_N}(f)\) 在 \(\{e_n\}\) 下的系数恰好是</p>
+
+<p>\[
+\hat f(n) = \langle f, e_n \rangle = \frac{1}{\sqrt{2\pi}} \int_{-\pi}^{\pi} f(x) e^{-inx} \, dx.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+P_{M_N}(f) = \sum_{|n| \le N} \hat f(n) \, e_n = \frac{1}{\sqrt{2\pi}} \sum_{|n| \le N} \hat f(n) e^{inx}.
+\]</p>
+
+<p>这<em>就是</em> Fourier 部分和。Fourier 级数的"逼近"含义恰好就是在 \(L^2\) 上正交投影到三角多项式子空间。第 7 章会把 \(N \to \infty\) 时的极限讲清。</p>
+
+<p><strong>条件期望。</strong>取 \(H = L^2(\Omega, \mathcal{F}, \mathbb{P})\)（概率空间上的二阶可积随机变量），\(\mathcal{G} \subset \mathcal{F}\) 是子 \(\sigma\)-代数。\(L^2(\Omega, \mathcal{G}, \mathbb{P})\) 是 \(L^2(\Omega, \mathcal{F}, \mathbb{P})\) 的闭子空间。条件期望算子</p>
+
+<p>\[
+\mathbb{E}[\cdot | \mathcal{G}] : L^2(\mathcal{F}) \to L^2(\mathcal{G})
+\]</p>
+
+<p>恰好就是<em>这个闭子空间上的正交投影</em>。这是条件期望最干净的几何刻画——它就是"对 \(\mathcal{G}\) 可测的最佳 \(L^2\) 逼近"。</p>
+
+<p>这个观点把<a href="../概率统计/index.html">概率统计读本</a>里所有"条件期望的塔性质""条件期望的线性""条件期望取出可测因子"的结论变成正交投影的代数性质——\(P^2 = P\)、\(P\) 自伴、\(P\) 与"乘上可测因子"交换。这是为什么概率统计课在末尾必须把 \(L^2\) 几何讲清。</p>
+
+<p>这两个例子和最小二乘加在一起就是"投影 = 最佳逼近"的三个最常用化身。它们之所以"长得像"，是因为它们<em>就是</em>同一件事：正交投影到闭子空间。</p>
+
+<p>下一章我们要把"投影到有限维子空间"推广到"投影到由可数正交基张成的子空间"，这就是 Fourier 展开的抽象版——它会把第 5 章的 Bessel 不等式变成 Parseval 等式。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 经典不等式</a><a href="ch7.html">下一章 · 第 7 章 正交基与 Fourier 展开 →</a></nav>
+</main>
+</body>
+</html>

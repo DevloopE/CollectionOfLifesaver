@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 2 章 度量、范数、Banach 空间 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论：从有限维到无穷维</a><a href="ch3.html">下一章 · 第 3 章 内积与 Hilbert 空间 →</a></nav>
+<h1 id="ch2">第 2 章 度量、范数、Banach 空间</h1>
+
+<p>第 1 章已经亲手撕掉了几条有限维直觉。这一章我们要做的相反：把无穷维分析的<em>第一块好用的地基</em>立起来。这块地基叫"完备的赋范空间"，也就是 Banach 空间。这门课接下来差不多 90% 的内容都站在它上面。</p>
+
+<p>"赋范空间 + 完备" 这件事听起来像把两个名词拼一起，但每一半都是为了挡一个具体的坏情况。"赋范"管的是<em>距离</em>——你必须能说"两个函数有多近"，否则没法谈极限、收敛、连续；"完备"管的是<em>极限存在</em>——你必须保证一个看起来在收敛的序列<em>真的</em>收敛到这个空间内的某个东西，否则你做了半天分析最后才发现极限漂出去了。这两件事合起来，才使得后面所有"取极限—构造解—证明定理"的论证不会半路掉链子。</p>
+
+<ul>
+  <li>先复习度量空间（你应该在<a href="../实分析/ch4.html">实分析读本第 4 章</a>见过），把"距离"这个概念清晰化。</li>
+  <li>把<strong>范数</strong>当成"在线性结构上加距离"的最自然方式，写出三条公理并立刻看几个标准例子。</li>
+  <li>把"范数诱导的拓扑"（开集、收敛、连续）一次性讲清，从此不再纠缠。</li>
+  <li>引入 Cauchy 序列与<strong>完备性</strong>——给出标志性的<em>不完备</em>反例，让你看出"为什么没有完备性会出事"。</li>
+  <li>正式定义 Banach 空间，列出 \(\ell^p\)、\(C[a,b]\)、\(C^k[a,b]\)、\(L^p\) 是 Banach 空间这一组关键事实。</li>
+  <li>说一说"完备化"这件事——为什么我们总能把不完备的赋范空间塞进一个 Banach 空间，以及这个构造在直觉上是什么。</li>
+</ul>
+
+<h2 id="sec2-1">2.1 度量空间：把"远近"做成可计算的概念</h2>
+
+<p>一个<strong>度量空间</strong> \((X, d)\) 是一个集合 \(X\)，配一个函数</p>
+
+<p>\[
+d : X \times X \to [0, \infty)
+\]</p>
+
+<p>满足三条直觉公理：</p>
+
+<ul>
+  <li>(M1) 正定：\(d(x, y) = 0 \iff x = y\)；</li>
+  <li>(M2) 对称：\(d(x, y) = d(y, x)\)；</li>
+  <li>(M3) 三角不等式：\(d(x, z) \le d(x, y) + d(y, z)\)。</li>
+</ul>
+
+<p>这三条就是把"距离"这个日常概念里最不能让步的部分提炼出来。第一条说"零距离 = 同一个点"，第二条说"距离不区分方向"，第三条说"绕路不会更近"——这是空间几何的"不可让步条款"。</p>
+
+<p>有了 \(d\)，<strong>开球</strong>、<strong>闭球</strong>、<strong>开集</strong>、<strong>收敛</strong>、<strong>连续</strong>、<strong>Cauchy 序列</strong>这些概念就全部可以定义。详细的复习放在<a href="../实分析/ch4.html">实分析读本第 4 章</a>。这里我们只重申两个本书要反复用到的：</p>
+
+<p>序列 \(\{x_n\}\) <strong>收敛</strong>到 \(x \in X\)，记作 \(x_n \to x\)，是指 \(d(x_n, x) \to 0\)；序列 \(\{x_n\}\) 是 <strong>Cauchy 序列</strong>，是指对任意 \(\varepsilon > 0\)，存在 \(N\) 使 \(m, n \ge N\) 时 \(d(x_m, x_n) < \varepsilon\)。在度量空间里，"收敛 \(\Rightarrow\) Cauchy" 永远成立（用三角不等式两步就能证）。但反过来"Cauchy \(\Rightarrow\) 收敛" 不一定——这正是接下来"完备性"要刻画的事。</p>
+
+<p>纯粹的度量空间已经够撑起一层很丰富的拓扑分析。但泛函分析关心的对象比"裸距离"多一层：它们大部分是<em>向量空间</em>，距离应该和加法、数乘相容。这就是为什么我们立刻要从度量进到<strong>范数</strong>。</p>
+
+<h2 id="sec2-2">2.2 范数：把度量装进线性结构里</h2>
+
+<p>设 \(X\) 是 \(\mathbb{K}\) 域上的向量空间（这本书里 \(\mathbb{K}\) 是 \(\mathbb{R}\) 或 \(\mathbb{C}\)）。一个<strong>范数</strong>是函数</p>
+
+<p>\[
+\|\cdot\| : X \to [0, \infty)
+\]</p>
+
+<p>满足：</p>
+
+<ul>
+  <li>(N1) 正定：\(\|x\| = 0 \iff x = 0\)；</li>
+  <li>(N2) 齐次：\(\|\alpha x\| = |\alpha| \cdot \|x\|\)，对任意 \(\alpha \in \mathbb{K}\)；</li>
+  <li>(N3) 三角不等式：\(\|x + y\| \le \|x\| + \|y\|\)。</li>
+</ul>
+
+<p>这三条是度量的"线性化"。比较一下：度量公理只关心距离的对称性和三角性；范数额外要求"距离尊重数乘"（齐次性）和"距离从原点测量就够"（因为定义里 \(\|x\|\) 是 \(x\) 到原点的距离）。任何范数自动给出一个度量</p>
+
+<p>\[
+d(x, y) = \|x - y\|.
+\]</p>
+
+<p>这个度量满足三条度量公理（你可以做一道思考题验证一下），并且额外满足两条线性兼容条件：</p>
+
+<p>\[
+d(x + z, y + z) = d(x, y), \qquad d(\alpha x, \alpha y) = |\alpha| \cdot d(x, y).
+\]</p>
+
+<p>第一条叫"<em>平移不变</em>"，第二条叫"<em>齐次伸缩</em>"。它们说"距离不依赖你坐在哪里看""距离按比例伸缩"——这两条让"度量"和"线性代数"真正互相理解。这就是为什么泛函分析以"赋范空间"为基本对象，而不是抽象的度量空间。</p>
+
+<p>下面立刻给出几个标准例子。</p>
+
+<p><strong>例 1：欧氏空间。</strong>\(\mathbb{R}^n\) 上经典的 \(\ell^2\) 范数</p>
+
+<p>\[
+\|x\|_2 = \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}.
+\]</p>
+
+<p>这是你最熟的范数。它来自欧氏内积。</p>
+
+<p><strong>例 2：\(\ell^p\) 范数（在 \(\mathbb{R}^n\) 上）。</strong>对 \(1 \le p \le \infty\)，定义</p>
+
+<p>\[
+\|x\|_p = \begin{cases} \left( \sum_{i=1}^n |x_i|^p \right)^{1/p}, & 1 \le p < \infty, \\ \max_i |x_i|, & p = \infty. \end{cases}
+\]</p>
+
+<p>对每个 \(p\) 都是一个范数（三角不等式的证明对 \(p = 1, \infty\) 直接，对 \(1 < p < \infty\) 是 Minkowski 不等式，将在<a href="ch5.html">第 5 章</a>给出）。这些范数定义的"单位球"形状各不相同——\(p = 1\) 是菱形，\(p = 2\) 是圆，\(p = \infty\) 是正方形。这就是你在数据分析里说"\(L^1\) 正则化诱导稀疏""\(L^2\) 正则化诱导平滑"的几何直觉源头。</p>
+
+<p><strong>例 3：连续函数空间 \(C[a,b]\)。</strong>取 \(X = C[a,b]\)（闭区间上的连续函数全体），定义</p>
+
+<p>\[
+\|f\|_\infty = \sup_{x \in [a,b]} |f(x)|.
+\]</p>
+
+<p>这是 sup-范数，又叫 uniform norm。这个范数定义的收敛恰好就是"<em>一致收敛</em>"——这件事和<a href="../实分析/ch13.html">实分析读本第 13 章</a>里讨论函数列的语言完全对应。</p>
+
+<p><strong>例 4：可积函数空间上的 \(L^p\) 范数。</strong>对一个测度空间 \((\Omega, \mu)\) 与 \(1 \le p < \infty\)，定义</p>
+
+<p>\[
+\|f\|_p = \left( \int_\Omega |f|^p \, d\mu \right)^{1/p}.
+\]</p>
+
+<p>这是<em>近乎</em>范数——它满足齐次和三角不等式（后者就是 Minkowski 不等式），但 (N1) 严格说不成立：函数 \(f\) 在零测集上非零时仍有 \(\|f\|_p = 0\) 但 \(f \neq 0\)。修法标准：把"几乎处处相等"的函数视为同一类，定义 \(L^p(\Omega) := \{f : \|f\|_p < \infty\} / \sim\)。在这个商空间上 \(\|\cdot\|_p\) 才是真正的范数。本书后面提到 \(L^p\) 都默认是这种商空间。</p>
+
+<p>这四个例子是泛函分析里最常出现的舞台，本书的几乎每一章都会在它们上面跑一遍新结论。</p>
+
+<h2 id="sec2-3">2.3 范数诱导的拓扑：开集、收敛、连续</h2>
+
+<p>有了范数 \(\|\cdot\|\) 就有了度量 \(d(x,y) = \|x - y\|\)，于是所有度量空间的拓扑概念都自动具备：</p>
+
+<p><strong>开球</strong> \(B(x_0, r) = \{x : \|x - x_0\| < r\}\)；<br>
+<strong>开集</strong>：每点附近都有开球完全落在内部；<br>
+<strong>闭集</strong>：开集的补集，等价于"含全部极限点"；<br>
+<strong>收敛</strong>：\(x_n \to x \iff \|x_n - x\| \to 0\)；<br>
+<strong>连续</strong>：\(f : X \to Y \) 连续在 \(x_0\)，是说 \(x_n \to x_0 \Rightarrow f(x_n) \to f(x_0)\)。</p>
+
+<p>范数自带几条好用的连续性结论。最先要记住的是<strong>范数本身是连续函数</strong>——意思是 \(x_n \to x \Rightarrow \|x_n\| \to \|x\|\)。证明只用反三角不等式：</p>
+
+<p>\[
+\boxed{\ \big| \|x\| - \|y\| \big| \le \|x - y\|.\ }
+\]</p>
+
+<p>这条不等式以后用得非常多。从它立刻看出 \(\|\cdot\| : X \to \mathbb{R}\) 是 1-Lipschitz 的，所以连续。同样的办法可以证：加法 \((x, y) \mapsto x + y\) 与数乘 \((\alpha, x) \mapsto \alpha x\) 都连续。这意味着<em>赋范空间是一个拓扑向量空间</em>——加法和数乘都和拓扑兼容。这件事在第 14 章（凸集分离）和第 17 章（弱拓扑）会被直接用到。</p>
+
+<h2 id="sec2-4">2.4 完备性：让 Cauchy 序列真的有极限</h2>
+
+<p>度量空间 \((X, d)\) 称为<strong>完备</strong>的，如果其中每一个 Cauchy 序列都收敛到 \(X\) 的某个元素。"完备"的核心意义是：你做了半天误差控制，最后<em>确实</em>能落到某个点上，而不会漏出去。</p>
+
+<p>完备性是泛函分析里最关键的"地板条件"。它的重要性大致可以这样总结：</p>
+
+<ul>
+  <li>所有 Picard / Banach 不动点定理都要求完备空间（否则迭代序列可能 Cauchy 但不收敛）；</li>
+  <li>所有 Cauchy 准则证明级数收敛的论证（"\(\sum a_n\) 收敛 \(\iff\) 部分和 Cauchy"）都要求完备；</li>
+  <li>三大原理（Banach–Steinhaus、开映射、闭图像）都基于 Baire 范畴定理，而 Baire 要求完备。</li>
+</ul>
+
+<p>具体看几个例子。</p>
+
+<p><strong>正面例子：\(\mathbb{R}^n\) 在欧氏度量下完备。</strong>这是<a href="../实分析/ch2.html">实分析读本第 2 章</a>的核心结论之一，证明用了实数公理里的"上确界存在"。</p>
+
+<p><strong>反面例子：有理数 \(\mathbb{Q}\) 在欧氏度量下不完备。</strong>取 \(x_n = (1 + 1/n)^n\)，每一项都是有理数，但 \(x_n \to e\)，而 \(e \notin \mathbb{Q}\)。这是 Cauchy 序列在 \(\mathbb{Q}\) 内"漏出去"的最直接例子。</p>
+
+<p><strong>关键反面例子：\((C[0,1], \|\cdot\|_1)\) 不完备。</strong>这是必须自己看一遍的例子。考虑函数列</p>
+
+<p>\[
+f_n(x) = \begin{cases} 0, & 0 \le x \le 1/2 - 1/n, \\ \text{线性插值}, & 1/2 - 1/n \le x \le 1/2, \\ 1, & 1/2 \le x \le 1. \end{cases}
+\]</p>
+
+<p>每个 \(f_n\) 都是连续的"软台阶"。在 \(L^1\) 范数下你算一下：</p>
+
+<p>\[
+\|f_n - f_m\|_1 = \int_0^1 |f_n - f_m| \, dx \le \frac{1}{\min(n,m)} \to 0,
+\]</p>
+
+<p>所以 \(\{f_n\}\) 在 \(\|\cdot\|_1\) 下是 Cauchy 序列。但它的逐点极限是不连续的硬台阶函数</p>
+
+<p>\[
+f(x) = \begin{cases} 0, & x < 1/2, \\ 1, & x \ge 1/2, \end{cases}
+\]</p>
+
+<p>这个 \(f\) 不在 \(C[0,1]\) 内。所以 \(\{f_n\}\) Cauchy 但不收敛<em>到 \(C[0,1]\) 内的任何元素</em>。</p>
+
+<p>\[
+\boxed{\ (C[0,1], \|\cdot\|_1) \text{ 不完备。}\ }
+\]</p>
+
+<p>这个例子就是 Lebesgue 之所以发明 \(L^1\) 空间的根本动机：把"\(L^1\) 意义下的 Cauchy 极限"补齐进来，连续函数空间太小装不下。把 \(C[0,1]\) 在 \(\|\cdot\|_1\) 下完备化得到的空间，恰好就是 \(L^1[0,1]\)（这是 2.6 节会讲的"完备化定理"的具体应用）。</p>
+
+<p>同一个 \(C[0,1]\)，配 sup-范数 \(\|\cdot\|_\infty\) 却<em>是</em>完备的——这又一次说明"完备"和"范数"是耦合在一起的，不能脱离范数谈完备。</p>
+
+<h2 id="sec2-5">2.5 Banach 空间：赋范 + 完备</h2>
+
+<p>一个<strong>Banach 空间</strong>就是一个完备的赋范向量空间。换句话说，Banach 空间 = 范数 + Cauchy 完备。</p>
+
+<p>下面把这本书里反复出现的 Banach 空间一次性列出来。</p>
+
+<p><strong>(B1) 有限维空间。</strong>\((\mathbb{R}^n, \|\cdot\|_p)\) 与 \((\mathbb{C}^n, \|\cdot\|_p)\) 对任意 \(1 \le p \le \infty\) 都是 Banach 空间。事实上有限维赋范空间在<em>任意</em>范数下都完备——而且任意两个范数都等价（这正是第 1 章 1.4 节提到的有限维"任性"事实）。这件事在<a href="appA.html">附录 A</a>里给出完整证明。</p>
+
+<p><strong>(B2) 序列空间 \(\ell^p\)。</strong>对 \(1 \le p \le \infty\)，</p>
+
+<p>\[
+\ell^p = \left\{ x = (x_1, x_2, \ldots) : \|x\|_p < \infty \right\}
+\]</p>
+
+<p>是 Banach 空间。\(p < \infty\) 时完备性来自 \(\mathbb{R}\) 的完备性 + 分量收敛 + Fatou 类型论证；\(p = \infty\) 即 \(\ell^\infty =\) 有界序列空间，配 \(\|x\|_\infty = \sup_n |x_n|\) 也完备（直接从 \(\mathbb{R}\) 的完备性推出）。</p>
+
+<p><strong>(B3) 连续函数空间 \(C[a,b]\)。</strong>配 sup-范数 \(\|f\|_\infty = \sup |f|\) 是 Banach 空间。完备性的本质就是"<em>一致收敛极限连续</em>"——这是<a href="../实分析/ch13.html">实分析读本第 13 章</a>的核心定理。</p>
+
+<p><strong>(B4) \(C^k[a,b]\)。</strong>配 \(C^k\)-范数 \(\|f\|_{C^k} = \sum_{j=0}^{k} \|f^{(j)}\|_\infty\) 是 Banach 空间。完备性的关键还是"一致收敛极限连续"加上"导数列一致收敛 \(\Rightarrow\) 极限可微，导数为极限"。这个空间在 PDE 里反复出现。</p>
+
+<p><strong>(B5) Lebesgue 空间 \(L^p(\Omega)\)。</strong>对 \(1 \le p \le \infty\)，\(L^p\) 在 \(\|\cdot\|_p\) 下是 Banach 空间。这是测度论里最重要的定理之一，常被叫做 Riesz–Fischer 定理。详细完备性证明你在<a href="../实分析/ch24.html">实分析读本第 24 章</a>见过。</p>
+
+<p>这五类空间会在本书出现得比其他一切例子加起来还多。</p>
+
+<p>顺便强调一点："Banach 空间"这个名号听起来很高冷，但它<em>就是</em> "完备的赋范空间"——别被名字吓住。它之所以专门有名字，是因为完备 + 范数这件事在分析里太常用了，每讲一次就要写"完备的赋范向量空间"九个字太累。</p>
+
+<p>下面给出一个非常常用的<em>判别完备性的工具</em>：</p>
+
+<p><strong>定理（绝对收敛 \(\Rightarrow\) 收敛 当且仅当 完备）。</strong> 设 \(X\) 是赋范空间。则 \(X\) 完备 \(\iff\) 每个绝对收敛级数 \(\sum_{n=1}^\infty x_n\)（即 \(\sum \|x_n\| < \infty\)）都收敛于 \(X\) 中。</p>
+
+<p>这是个非常方便的判据，因为它把"Cauchy"换成"绝对级数"，证 \(L^p\) 完备性和算子代数完备性时常用。证明的两个方向都是漂亮的小练习——本章末尾的思考题里我会再点一次。</p>
+
+<h2 id="sec2-6">2.6 完备化：把不完备的"补成"完备的</h2>
+
+<p>第 2.4 节我们看到 \((C[0,1], \|\cdot\|_1)\) 不完备，但它的"完备化"恰好就是 \(L^1[0,1]\)。这种"把不完备的赋范空间补成 Banach 空间"的操作叫做<strong>完备化</strong>，它是分析里非常通用的一招。</p>
+
+<p>完备化定理可以用一句话说清：<em>任何度量空间 \((X, d)\) 都存在一个完备度量空间 \((\widehat X, \widehat d)\)，使 \(X\) 等距嵌入 \(\widehat X\) 且像在 \(\widehat X\) 中稠密；这个 \(\widehat X\) 在等距同构意义下唯一</em>。当 \(X\) 是赋范空间时，\(\widehat X\) 自动是 Banach 空间。</p>
+
+<p>完备化的标准构造（详见<a href="appA.html">附录 A</a>）有两种典型路径：</p>
+
+<ul>
+  <li><strong>路径 1（Cantor 风格）。</strong>把 \(X\) 中所有 Cauchy 序列取出来，对"两个 Cauchy 序列差的范数趋于零"取等价类。等价类构成的集合就是 \(\widehat X\)。这是教科书最常用的构造法。</li>
+  <li><strong>路径 2（嵌入到对偶的对偶里）。</strong>赋范空间 \(X\) 总能等距嵌入它的二次对偶 \(X^{**}\)（详见<a href="ch15.html">第 15 章</a>），而 \(X^{**}\) 自动完备（它是某个 Banach 空间的对偶）。所以 \(X\) 在 \(X^{**}\) 中的闭包就是它的完备化。</li>
+</ul>
+
+<p>路径 1 是显式构造，路径 2 是"白用别人的完备性"。两者各有用途。第一种让你看见完备化"是怎么做出来"的；第二种让你不需要做就能用。</p>
+
+<p>这件事的实用价值是：每当你需要在某个空间上做"取极限"的操作，但发现这个空间不完备，你<strong>都可以</strong>把它换成它的完备化。比如要在<em>多项式空间</em>上谈"\(L^2\) 极限"，结果就是 \(L^2[0,1]\)（因为多项式在 \(L^2\) 中稠密，由 Stone–Weierstrass）；要在 <em>光滑函数空间</em> 上谈"\(H^1\) 极限"，结果就是 Sobolev 空间 \(H^1\)（这是<a href="ch23.html">第 23 章</a>的核心建构）。一旦你接受了"完备化总能做"，分析里很多突然冒出来的空间名字就不再神秘——它们大多是某个朴素空间的完备化。</p>
+
+<p>下一章我们要做一件升级版的事：在范数之上再加一层结构——<strong>内积</strong>。有了内积才有"角度"和"正交"，整个 Hilbert 几何才能展开。下一步开始，"投影到子空间"将取代"差商"成为我们最常用的几何动作。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论：从有限维到无穷维</a><a href="ch3.html">下一章 · 第 3 章 内积与 Hilbert 空间 →</a></nav>
+</main>
+</body>
+</html>
