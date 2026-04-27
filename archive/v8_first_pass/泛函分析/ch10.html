@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 Baire 范畴定理 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 算子范数与算子代数</a><a href="ch11.html">下一章 · 第 11 章 一致有界原理（Banach–Steinhaus）→</a></nav>
+<h1 id="ch10">第 10 章 Baire 范畴定理</h1>
+
+<p>这一章短而关键。Baire 范畴定理本身是个完备度量空间的纯<em>拓扑</em>结论——它不带任何线性结构。可是它一旦套到 Banach 空间上，就立刻孵化出三大原理：一致有界（Banach–Steinhaus）、开映射、闭图像。这三条结论是泛函分析"硬定理"的脊柱，几乎所有"代数等式自动升级为拓扑等式"的论证都要靠 Baire 当杠杆。</p>
+
+<p>Baire 这条结论第一眼看上去甚至不像数学：它说"一个完备度量空间不是可数个'瘦'集合的并"。"瘦"指的是无内点的闭集（叫做<em>无处稠密</em>）。这句话像哲学，但它其实是"完备性 + 度量"两个公理的纯组合后果。看完证明你就明白了。</p>
+
+<ul>
+  <li>定义"无处稠密"和"第一范畴 / 第二范畴"。这两个名词来自 Baire 1899 年的原文，名字别被吓到。</li>
+  <li>Baire 范畴定理的两条等价陈述：可数个开稠集的交还是稠的；完备空间不是可数个无处稠密集的并。</li>
+  <li>完整证明（用嵌套闭球 + 完备性）。</li>
+  <li>三个非泛函分析的小应用（无理数集、连续函数处处不可微、Liouville 数）。</li>
+  <li>预告：在 Banach 空间上，"算子序列逐点有界 \(\Rightarrow\) 一致有界"等三大原理都是 Baire 的化身。</li>
+  <li>陷阱：Baire 不是只对完备的——某些非完备空间也满足 Baire 条件，但本课只用完备这一充分条件。</li>
+</ul>
+
+<h2 id="sec10-1">10.1 无处稠密与"瘦集"</h2>
+
+<p>设 \((X, d)\) 是度量空间。子集 \(A \subset X\) 叫<strong>无处稠密</strong>（nowhere dense），如果 \(\overline A\) 没有内点，等价于 \((\overline A)^c\) 是开稠集。</p>
+
+<p>例子：</p>
+
+<ul>
+  <li>有限集是无处稠密（在任何无离散点的空间中）；</li>
+  <li>\(\mathbb{Z} \subset \mathbb{R}\) 无处稠密；</li>
+  <li>Cantor 三分集是无处稠密的（虽然它不可数）；</li>
+  <li>任意一条直线在 \(\mathbb{R}^2\) 中无处稠密；</li>
+  <li>有限维子空间在无穷维赋范空间中无处稠密——这条很重要！</li>
+</ul>
+
+<p>第一直觉："无处稠密 = 这个集合在空间里太瘦，瘦到挑不出任何一个 \(B(x, r)\) 完全装在它的闭包里"。</p>
+
+<p>子集 \(A\) 叫<strong>第一范畴</strong>（first category, meager），如果 \(A\) 是<em>可数个</em>无处稠密集的并。否则叫<strong>第二范畴</strong>。直觉："第一范畴 = 由可数瘦组件拼出来"。</p>
+
+<p>例子：</p>
+
+<ul>
+  <li>\(\mathbb{Q} = \bigcup_{q \in \mathbb{Q}} \{q\}\) 是第一范畴（每个单点是无处稠密 \(\Rightarrow\) 可数并第一范畴）；</li>
+  <li>有理坐标点集 \(\mathbb{Q}^n \subset \mathbb{R}^n\) 第一范畴；</li>
+  <li>\(C^1[0,1]\) 在 \(C[0,1]\) 内是第一范畴（这是 Baire 给出"几乎所有连续函数都不可微"的关键事实，下面 10.4 节展开）。</li>
+</ul>
+
+<h2 id="sec10-2">10.2 Baire 范畴定理</h2>
+
+<p><strong>定理（Baire）。</strong>设 \((X, d)\) 是完备度量空间。则下列等价陈述都成立：</p>
+
+<p>(B1) 任意可数个开稠集 \(\{U_n\}\) 的交 \(\bigcap_n U_n\) 仍然在 \(X\) 中稠；</p>
+
+<p>(B2) \(X\) 不能写成可数个无处稠密闭集的并（即 \(X\) 是<strong>第二范畴</strong>的）。</p>
+
+<p>等价性：(B2) \(\Leftrightarrow\) \(X = \bigcup F_n\)（\(F_n\) 闭无处稠密）不可能 \(\Leftrightarrow\) \(\bigcap (F_n^c)\) 非空 \(\Leftrightarrow\) (B1)（\(F_n^c\) 是开稠集，且我们要它们交集"在每个开球中都非空"——这个非空性正好对应"稠密"）。</p>
+
+<p>下面证 (B1)。</p>
+
+<h2 id="sec10-3">10.3 证明：嵌套闭球 + 完备性</h2>
+
+<p>设 \(\{U_n\}\) 是可数个开稠集。要证 \(\bigcap U_n\) 在 \(X\) 中稠：对任意 \(x_0 \in X\) 与 \(r_0 > 0\)，要证 \(B(x_0, r_0) \cap \bigcap U_n \neq \emptyset\)。</p>
+
+<p>构造嵌套闭球序列。</p>
+
+<p><strong>第 1 步。</strong>\(U_1\) 在 \(X\) 中稠 \(\Rightarrow\) \(B(x_0, r_0) \cap U_1 \neq \emptyset\)，是开集。取 \(x_1\) 在内，\(r_1 < \min(r_0/2, 1)\) 使</p>
+
+<p>\[
+\overline{B(x_1, r_1)} \subset B(x_0, r_0) \cap U_1.
+\]</p>
+
+<p><strong>第 \(n+1\) 步。</strong>\(U_{n+1}\) 稠 \(\Rightarrow\) \(B(x_n, r_n) \cap U_{n+1} \neq \emptyset\)，是开集。取 \(x_{n+1}\) 在内，\(r_{n+1} < \min(r_n/2, 1/(n+1))\) 使</p>
+
+<p>\[
+\overline{B(x_{n+1}, r_{n+1})} \subset B(x_n, r_n) \cap U_{n+1}.
+\]</p>
+
+<p>这给出嵌套闭球 \(\overline{B(x_1, r_1)} \supset \overline{B(x_2, r_2)} \supset \cdots\)，半径 \(r_n \to 0\)。</p>
+
+<p><strong>取交点。</strong>对 \(m, n \ge N\)，\(x_m, x_n \in \overline{B(x_N, r_N)}\)，所以 \(d(x_m, x_n) \le 2 r_N \to 0\)。\(\{x_n\}\) 是 Cauchy 序列。</p>
+
+<p>\(X\) 完备 \(\Rightarrow\) \(x_n \to x_*\) 某个 \(x_* \in X\)。每个 \(\overline{B(x_n, r_n)}\) 闭，且 \(x_m \in \overline{B(x_n, r_n)}\) 对 \(m \ge n\)；取极限得 \(x_* \in \overline{B(x_n, r_n)}\)，故 \(x_* \in U_n\) 对每个 \(n\)。同时 \(x_* \in B(x_0, r_0)\)。</p>
+
+<p>结束。\(B(x_0, r_0) \cap \bigcap U_n \neq \emptyset\)。</p>
+
+<p>\[
+\boxed{\ \text{完备度量空间} \Rightarrow \text{可数个开稠集之交仍稠} \Rightarrow \text{空间不是第一范畴}.\ }
+\]</p>
+
+<p>这条证明的"齿轮"非常少：嵌套闭球 + 完备性给极限。但每个齿轮都不能丢——少了完备性，序列 Cauchy 但漏出去；少了嵌套缩小半径，极限可能落到某个 \(U_n\) 之外。</p>
+
+<h2 id="sec10-4">10.4 三个非泛函分析的应用</h2>
+
+<p>下面用 Baire 解决三个看上去和函数空间没关系的问题，让你先感到这条定理的"杠杆力"。</p>
+
+<p><strong>应用 1：\(\mathbb{R}\) 不可数。</strong>把 \(\mathbb{R}\) 写成 \(\bigcup_{q \in \mathbb{Q}} \{q\}\) 是第一范畴。Baire 说 \(\mathbb{R}\) 不是第一范畴。所以 \(\mathbb{R} \neq \mathbb{Q}\)，事实上 \(\mathbb{R} \setminus \mathbb{Q}\) 在 \(\mathbb{R}\) 中稠且不可数。</p>
+
+<p>这是一个不用对角化的"\(\mathbb{R}\) 不可数"证明。漂亮、不需要 Cantor 论证。</p>
+
+<p><strong>应用 2：连续但处处不可微的函数大量存在。</strong>在完备空间 \(C[0,1]\)（sup-范数）中，可微的函数集合是第一范畴。具体说，对每个 \(n\)，集合</p>
+
+<p>\[
+A_n = \{f \in C[0,1] : \exists x_0 \in [0, 1 - 1/n], \ |f(x_0 + h) - f(x_0)| \le n |h|, \forall 0 < h < 1/n\}
+\]</p>
+
+<p>是闭无处稠密的。"在某点可微"\(\Rightarrow\) "属于某个 \(A_n\)"。所以可微函数集 \(\subset \bigcup A_n\) 是第一范畴。</p>
+
+<p>由 Baire，\(C[0,1]\) 不是第一范畴，所以处处不可微的连续函数存在——而且在某种意义上"占绝大多数"。这是一个极美的存在性结论：你不需要构造 Weierstrass 函数，Baire 就免费送你"大量这种函数"。</p>
+
+<p><strong>应用 3：Liouville 数稠密。</strong>\(\mathbb{R}\) 中 Liouville 数（被有理数极速逼近的实数）的集合是稠的 \(G_\delta\) 集（可数个开稠集之交）。证明把"代数数被有理逼近的速度"写成可数个无处稠密集的形式，再用 Baire 反向。</p>
+
+<p>这三个应用都不是泛函分析问题，但它们都靠 Baire——这就说明 Baire 是一条<em>极广谱</em>的工具，远不止用在算子论里。</p>
+
+<h2 id="sec10-5">10.5 在 Banach 空间上的 Baire</h2>
+
+<p>Banach 空间是完备度量空间，所以 Baire 自动适用。下一章和第 12 章会反复套用 Baire 来推三大原理。这里先把"模板"写出来：</p>
+
+<p><strong>模板：要证某性质 \(P\) 对 Banach 空间所有元素成立。</strong></p>
+
+<ol>
+  <li>定义集合 \(F_n = \{x \in X : x \text{ 满足 "性质 P 的负向" 程度 } \ge n\}\)；</li>
+  <li>验证每个 \(F_n\) 是<em>闭</em>且<em>无处稠密</em>（这一步常常需要某种"自动的"控制条件）；</li>
+  <li>由 Baire，\(X \neq \bigcup F_n\)，所以存在 \(x \notin \bigcup F_n\)，即 \(x\) 满足性质 \(P\) 的"任意水平"；</li>
+  <li>由线性性 + 平移不变性，把"存在一点"升级为"全空间"。</li>
+</ol>
+
+<p>这个模板的具体化在第 11、12 章会以一致有界、开映射、闭图像三种面目出现。每次本质都是 Baire。</p>
+
+<p>有时反过来用：要证 \(\bigcup F_n\) 是<em>真子集</em>（即不充满 \(X\)），就证每个 \(F_n\) 闭无处稠密，由 Baire 并集第一范畴 \(\Rightarrow\) 不充满。这是 Baire 的"否定形式"。</p>
+
+<h2 id="sec10-6">10.6 Baire 之外：完备的"必要性"与"充分性"</h2>
+
+<p>Baire 范畴定理对 Banach 空间无缝适用，但它<em>需要完备性</em>。看几个例子澄清：</p>
+
+<p><strong>(N1) 不完备的赋范空间不一定满足 Baire。</strong>典型反例：取 \(c_{00} = \{(x_n) : x_n = 0\) 当 \(n\) 足够大\(\}\)（"有限非零序列"），配 \(\ell^2\) 范数。\(c_{00}\) 不完备（其完备化是 \(\ell^2\)）。考虑 \(F_n = \{x \in c_{00} : x_k = 0\) 对 \(k > n\}\)。每个 \(F_n\) 是有限维 \(\Rightarrow\) 闭无处稠密。但 \(c_{00} = \bigcup F_n\)。所以 \(c_{00}\) 是第一范畴的——Baire 在它身上失败。</p>
+
+<p><strong>(N2) 不完备的空间也可能满足 Baire。</strong>事实上"是否满足 Baire"是个比"完备"更弱的条件。某些<em>非完备</em>但<em>开映射友好</em>的空间也满足 Baire（比如局部紧 Hausdorff 空间总满足 Baire，由不同证法）。本书不深入这种推广，知道它存在即可。</p>
+
+<p><strong>(N3) Baire 可以从完备性推到拓扑等价的空间。</strong>如果 \(X\) 完备 + \(Y\) 与 \(X\) 是拓扑同胚，那 \(Y\) 也满足 Baire（虽然 \(Y\) 自己未必有"完备度量"——这与"是否有完备度量结构"是另一个问题）。</p>
+
+<p>本课对 Baire 的全部使用都在 "<strong>Banach 空间 \(\Rightarrow\) 完备度量空间 \(\Rightarrow\) Baire</strong>" 这条简单的链条上。下一章我们就立刻用它，把"逐点有界"升级为"一致有界"。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 算子范数与算子代数</a><a href="ch11.html">下一章 · 第 11 章 一致有界原理（Banach–Steinhaus）→</a></nav>
+</main>
+</body>
+</html>

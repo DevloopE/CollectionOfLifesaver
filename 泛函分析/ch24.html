@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 24 章 应用：量子力学的算子语言 — 普林斯顿泛函分析读本</title>
+<title>第 24 章 量子力学的算子语言 — 普林斯顿泛函分析读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -32,202 +32,353 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：Sobolev 空间与变分入门</a><span class="nav-disabled">下一章 →</span></nav>
-<h1 id="ch24">第 24 章 应用：量子力学的算子语言</h1>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 Sobolev 空间 + 变分入门</a><a href="appA.html">附录 A →</a></nav>
+<h1 id="ch24">第 24 章 量子力学的算子语言</h1>
 
-<p>这是本书最后一章——也是泛函分析最受人喜欢的物理化身。Heisenberg、Schrödinger、Born、von Neumann 在 1925-1932 年间把量子力学公式化的过程中，泛函分析的几乎所有核心对象（Hilbert 空间、自伴算子、谱定理、不确定性、张量积）都被赋予<em>物理</em>含义。这一章把这层翻译关系讲清，让你看见为什么"\(L^2(\mathbb{R}^3)\)" 与 "波函数" 几乎是同义词，为什么"自伴算子的谱" 几乎就是"测量结果的可能值"。</p>
+<p>请你回忆一下经典力学。一个粒子在三维空间里运动，状态由"<em>位置 \((x, y, z)\)</em>" 加"<em>动量 \((p_x, p_y, p_z)\)</em>" 完全确定——共 6 个实数。物理量（能量、角动量等）是这 6 个数的函数。给出初始 6 个数 + 力，Newton 方程<em>逐时刻</em>给出未来轨道。一切是<em>确定</em> 的——你只需要测量初值，未来就被锁定。</p>
 
-<p>这一章不是物理课——我们不会推导 Schrödinger 方程或证明任何物理结论。我们做的是<em>把数学结构和物理直觉对齐</em>，让你以后看到 Reed–Simon、Hall《Quantum Theory for Mathematicians》、Takhtajan 时不再有"语言隔阂"。</p>
+<p>到了 19 世纪末 20 世纪初实验越做越细，发现一系列经典框架<em>无法</em>解释的现象——黑体辐射光谱、光电效应、原子谱线、电子衍射。每一个都说明"<em>原子尺度的物理拒绝被 6 个实数描述</em>"。</p>
 
-<ul>
-  <li>量子力学的"四个公设"——把它们翻译成泛函分析对象。</li>
-  <li>态空间 \(=\) 复 Hilbert 空间，态 \(=\) 单位向量（更精确：单位球面模相位）。</li>
-  <li>可观测量 \(=\) 自伴算子，谱 \(=\) 测量值集合。</li>
-  <li>测量 \(=\) 谱投影 + Born 概率诠释。</li>
-  <li>典型例子：位置 \(\hat x\)、动量 \(\hat p = -i \hbar \partial_x\)、哈密顿 \(\hat H = -\frac{\hbar^2}{2m} \Delta + V\) 及其谱（连续谱与束缚态）。</li>
-  <li>不确定性原理：自伴算子对易关系 \([\hat x, \hat p] = i \hbar I\) 与 Heisenberg 不等式。</li>
-  <li>时间演化 = 单位算子半群 \(e^{-i t H / \hbar}\)（Stone 定理）。</li>
-</ul>
+<p>1925-1932 年间，Heisenberg、Born、Jordan（"矩阵力学"）、Schrödinger（"波动力学"）、Dirac（变换理论）、von Neumann（数学严格化）合作把这套<em>新</em>力学公式化。最后定型的是<em>von Neumann 1932 年的 Hilbert 空间公式</em>——一个完全用泛函分析对象（Hilbert 空间、自伴算子、谱、投影）描述的物理理论。</p>
 
-<h2 id="sec24-1">24.1 量子力学的四个公设</h2>
-
-<p>量子力学有几种等价的公设化版本。最适合泛函分析的是 Dirac–von Neumann 版（1932）：</p>
-
-<p><strong>(QM1) 态空间。</strong>每个量子系统对应一个复<em>可分</em>Hilbert 空间 \(H\)。系统在某瞬刻的<strong>状态</strong>是 \(H\) 中的一个单位向量 \(\psi \in H\)，\(\|\psi\| = 1\)。两个 \(\psi\) 与 \(e^{i \theta} \psi\) 表示同一个物理状态（"相位等价")。</p>
-
-<p><strong>(QM2) 可观测量。</strong>每个物理"可观测量"（位置、动量、能量、自旋等）对应一个 \(H\) 上的<em>自伴</em>算子 \(A\)（可能是无界的）。</p>
-
-<p><strong>(QM3) 测量。</strong>对状态 \(\psi\) 测量可观测量 \(A\)，得到的可能值是 \(\sigma(A)\)（\(A\) 的谱）中的元素。具体得到值 \(\lambda\) 的概率由<em>谱投影</em>给出（详见 24.4 节）。</p>
-
-<p><strong>(QM4) 时间演化。</strong>系统的状态 \(\psi(t)\) 随时间按 Schrödinger 方程演化：</p>
-
-<p>\[
-i \hbar \frac{d\psi}{dt} = H \psi(t),
-\]</p>
-
-<p>其中 \(H\) 是系统的哈密顿算子（自伴）。形式解为 \(\psi(t) = e^{-i t H / \hbar} \psi(0)\)。</p>
-
-<p>四条公设把"量子物理"完全表达为<em>泛函分析对象的代数</em>。从 (QM1) 看 Hilbert 空间不再是抽象工具——它是物理实在的<em>表示空间</em>。这是为什么物理学家说 "Hilbert 空间是量子力学的<em>状态空间</em>"。</p>
-
-<h2 id="sec24-2">24.2 态空间的具体例子</h2>
-
-<p><strong>(E1) 一维粒子：\(H = L^2(\mathbb{R})\)。</strong>波函数 \(\psi(x) \in L^2(\mathbb{R})\)，\(\int |\psi(x)|^2 dx = 1\)。\(|\psi(x)|^2\) 解释为粒子在位置 \(x\) 的<em>概率密度</em>（Born 1926）。</p>
-
-<p><strong>(E2) 三维粒子：\(H = L^2(\mathbb{R}^3)\)。</strong>波函数 \(\psi(x, y, z)\)，\(\int |\psi|^2 dV = 1\)。</p>
-
-<p><strong>(E3) 自旋 \(1/2\)（电子内部自由度）：\(H = \mathbb{C}^2\)。</strong>"上"与"下"两个基态 \(|\uparrow\rangle, |\downarrow\rangle\)，一般态 \(\psi = \alpha |\uparrow\rangle + \beta |\downarrow\rangle\)，\(|\alpha|^2 + |\beta|^2 = 1\)。</p>
-
-<p><strong>(E4) 一维粒子 + 自旋：\(H = L^2(\mathbb{R}) \otimes \mathbb{C}^2\)。</strong>张量积空间——两个独立自由度的"乘积"。</p>
-
-<p><strong>(E5) \(N\) 个全同 fermion：\(H = \bigwedge^N L^2(\mathbb{R}^3)\)。</strong>反对称化的张量积——Pauli 不相容原理的几何根源。</p>
-
-<p>这些都是可分 Hilbert 空间的具体例子。可分性是 (QM1) 的标准要求——所有"实际"系统的态空间都可分。</p>
-
-<h2 id="sec24-3">24.3 可观测量：位置、动量、哈密顿</h2>
-
-<p><strong>位置算子 \(\hat x\)：</strong>在 \(L^2(\mathbb{R})\) 上定义</p>
-
-<p>\[
-(\hat x \psi)(x) = x \cdot \psi(x).
-\]</p>
-
-<p>它是<em>无界</em>自伴算子（定义域 \(\{\psi : x \psi \in L^2\}\)）。谱 \(\sigma(\hat x) = \mathbb{R}\)（每个实数都是谱点，但<em>没有</em>特征值——它是纯连续谱）。</p>
-
-<p><strong>动量算子 \(\hat p\)：</strong>在 \(L^2(\mathbb{R})\) 上定义</p>
-
-<p>\[
-(\hat p \psi)(x) = -i \hbar \frac{\partial \psi}{\partial x}.
-\]</p>
-
-<p>无界自伴算子，定义域是 \(H^1(\mathbb{R})\)。谱 \(\sigma(\hat p) = \mathbb{R}\) 也是连续谱。注意 \(\hat p\) 通过 Fourier 变换<em>对角化</em>——它在动量表象 \(\tilde \psi(p) = \mathcal{F}\psi(p)\) 下就是<em>乘子</em> \(\tilde\psi(p) \mapsto p \tilde\psi(p)\)。这种"位置和动量在 Fourier 变换下互为对角"是量子力学最深的对称性。</p>
-
-<p><strong>哈密顿算子 \(\hat H\)：</strong>对单粒子在势能 \(V(x)\) 中</p>
-
-<p>\[
-\hat H = -\frac{\hbar^2}{2m} \Delta + V(x).
-\]</p>
-
-<p>无界自伴算子，定义域取决于 \(V\)。它的谱通常分两部分：</p>
+<p>泛函分析<em>的几乎每一个核心对象都在这里得到物理身份</em>：</p>
 
 <ul>
-  <li><strong>离散谱（束缚态）：</strong>对应负能量值 \(\lambda < 0\)（"被束缚"），是离散点谱。每个 \(\lambda_n\) 给一个 \(L^2\) 特征函数 \(\psi_n\)（"束缚态波函数"），\(\hat H \psi_n = \lambda_n \psi_n\)。</li>
-  <li><strong>连续谱（散射态）：</strong>对应非负能量 \(\lambda \ge 0\)，不是真正特征值（特征"函数"不在 \(L^2\) 中），但仍构成 \(\hat H\) 的谱。</li>
+  <li>复 Hilbert 空间 = 量子<em>态空间</em>。</li>
+  <li>自伴算子 = <em>可观测物理量</em>。</li>
+  <li>算子的<em>谱</em> = 测量的<em>可能取值</em>。</li>
+  <li><em>投影</em>算子 = 测量后系统状态。</li>
+  <li><em>不确定性原理</em> = 不对易算子的代数关系。</li>
+  <li><em>Stone 定理</em>（强连续单参数群 \(\iff\) 自伴生成元）= 量子<em>时间演化</em>。</li>
 </ul>
 
-<p>典型例子：</p>
+<p>这是泛函分析"<em>意外有用</em>" 的最戏剧化体现——一套为数学家自己开发的抽象工具，<em>恰好</em> 是描述量子物理的<em>正确</em> 语言。物理学家（Wigner 1960 著名文章 "<em>The Unreasonable Effectiveness of Mathematics</em>"）也对此惊叹不已。</p>
+
+<p>本章把量子力学的数学结构按 4 个公设展开（24.1）、给 5 个具体态空间（24.2）、定义三个最基本算子（24.3）、解释测量与 Born 概率（24.4）、严格证 Heisenberg 不确定性（24.5）、提 Stone 定理（24.6）。重点是<em>看泛函分析对象一个个被赋予物理含义</em>——不是物理课，是<em>应用泛函分析</em>。</p>
+
+<h2 id="sec24-1">24.1 量子力学的 4 个公设</h2>
+
+<p>von Neumann 1932 形式：</p>
+
+<p><strong>公设 1（态空间）。</strong>每个量子系统对应一个<em>复 Hilbert 空间</em> \(\mathcal{H}\)。系统的纯态由 \(\mathcal{H}\) 中<em>单位向量</em> \(\psi\) 描述（具体的，全局相位 \(e^{i\theta} \psi\) 与 \(\psi\) 同一态——所以态空间是<em>射影</em> \(\mathcal{P}(\mathcal{H}) := \mathcal{H} / \sim\)，但通常工作在 \(\mathcal{H}\) 上）。</p>
+
+<p><strong>公设 2（可观测量）。</strong>每个可测物理量（位置、动量、能量、角动量等）对应一个<em>自伴算子</em> \(A : \mathcal{H} \to \mathcal{H}\)（一般无界）。</p>
+
+<p><strong>公设 3（测量）。</strong>对态 \(\psi\) 测量可观测量 \(A\)，<em>可能</em> 测得的值是 \(A\) 谱中的某个 \(\lambda \in \sigma(A)\)。具体的：</p>
 
 <ul>
-  <li><strong>谐振子 \(V = \frac{1}{2} m \omega^2 x^2\)：</strong>谱全是离散 \(\lambda_n = \hbar \omega (n + 1/2)\)，特征函数是 Hermite 函数（<a href="ch7.html">第 7 章 7.4 节</a>）。</li>
-  <li><strong>氢原子 \(V = -e^2/r\)：</strong>有无穷多束缚态 \(\lambda_n = -13.6/n^2\) eV + 连续谱 \([0, \infty)\)。</li>
-  <li><strong>自由粒子 \(V = 0\)：</strong>谱完全连续 \([0, \infty)\)，没有束缚态。</li>
+  <li>得到值在 Borel 集 \(B \subset \mathbb{R}\) 中的<em>概率</em> = \(\langle \psi, E_A(B) \psi \rangle\)，其中 \(E_A\) 是 \(A\) 的谱投影测度（<a href="ch21.html#sec21-6">第 21 章 21.6</a>）。</li>
+  <li>测得后系统状态<em>坍缩</em> 到 \(\psi' = E_A(B) \psi / \|E_A(B) \psi\|\)（投影后归一化）。</li>
 </ul>
 
-<h2 id="sec24-4">24.4 测量与 Born 概率诠释</h2>
+<p>这条叫 <em>Born 规则</em>（Born 1926，1954 年获诺贝尔奖）。</p>
 
-<p>(QM3) 把"测量"形式化为谱投影 + 概率。具体说，对自伴算子 \(A\) 和状态 \(\psi\)：</p>
+<p><strong>公设 4（演化）。</strong>系统状态随时间满足 <em>Schrödinger 方程</em>：</p>
 
-<p><strong>(M1) 离散谱情形（紧自伴）。</strong>设 \(A = \sum_n \lambda_n P_n\)（谱分解，第 21 章）。测量 \(A\) 在状态 \(\psi\) 下：</p>
+<p>\[
+i \hbar \frac{d \psi}{dt} = \hat H \psi,
+\]</p>
+
+<p>其中 \(\hat H\) 是<em>哈密顿算子</em>（自伴）= 系统能量的可观测量。等价的：</p>
+
+<p>\[
+\psi(t) = U(t) \psi(0), \qquad U(t) = e^{-i t \hat H / \hbar}.
+\]</p>
+
+<p>\(U(t)\) 是<em>幺正</em>（unitary）算子的强连续单参数群——这件事的存在性由<em>Stone 定理</em>（24.6 节）保证。</p>
+
+<p>这 4 条公设把整个量子力学浓缩。每条都对应一个泛函分析的核心定理：公设 1 = 复 Hilbert 空间论；公设 2 = 自伴算子；公设 3 = 谱定理（投影值测度形式）；公设 4 = Stone 定理。<em>整个量子力学就是一套泛函分析在物理学中的应用</em>。</p>
+
+<p>下面 24.2-24.6 节把每条公设展开到具体的算子和例子。</p>
+
+<h2 id="sec24-2">24.2 五个具体态空间</h2>
+
+<p>\(\mathcal{H}\) 是抽象的——具体物理系统对应具体的 Hilbert 空间。下面五个例子覆盖了这门课大部分例子。</p>
+
+<h3>例 1：一维粒子，\(\mathcal{H} = L^2(\mathbb{R})\)</h3>
+
+<p>实直线上一个无自旋粒子的态。\(\psi \in L^2(\mathbb{R})\) 单位（\(\int |\psi|^2 = 1\)），物理解释：\(|\psi(x)|^2 dx\) = 在位置 \(x\) 处 \(dx\) 区间发现粒子的概率。</p>
+
+<p>所以"<em>波函数</em>" \(\psi(x)\) 是<em>概率幅</em>，模平方给概率密度。这条解释是 Born 规则在位置算子上的具体形态——下节会看到。</p>
+
+<h3>例 2：三维粒子，\(\mathcal{H} = L^2(\mathbb{R}^3)\)</h3>
+
+<p>同例 1 推到三维。\(\psi(x, y, z) \in L^2(\mathbb{R}^3)\) 单位。\(|\psi(\mathbf r)|^2 dV\) = 在 \(\mathbf r\) 附近找到粒子的概率。</p>
+
+<h3>例 3：自旋 1/2，\(\mathcal{H} = \mathbb{C}^2\)</h3>
+
+<p>电子<em>自旋</em> 自由度的态空间是<em>有限维</em>——\(\mathbb{C}^2\)。这是个二维复 Hilbert 空间，配标准内积 \(\langle \mathbf z, \mathbf w \rangle = \overline{z_1} w_1 + \overline{z_2} w_2\)。</p>
+
+<p>标准基 \(|\uparrow\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix}\)、\(|\downarrow\rangle = \begin{pmatrix} 0 \\ 1 \end{pmatrix}\) 表示"<em>自旋向上</em>"、"<em>自旋向下</em>"。一般态 \(\psi = \alpha |\uparrow\rangle + \beta |\downarrow\rangle\)，\(|\alpha|^2 + |\beta|^2 = 1\)。</p>
+
+<p>有限维量子系统不需要任何无穷维分析——可以用纯线性代数（包括<a href="ch20.html">本书第 20 章</a>有限维特征值理论）描述。这是<em>量子计算</em> 数学基础——qubit 就是 \(\mathbb{C}^2\) 上的态。</p>
+
+<h3>例 4：复合系统，张量积 \(\mathcal{H}_1 \otimes \mathcal{H}_2\)</h3>
+
+<p>两个独立量子系统组合。设系统 1 在 \(\mathcal{H}_1\)，系统 2 在 \(\mathcal{H}_2\)。组合系统的态空间是<em>张量积</em> \(\mathcal{H}_1 \otimes \mathcal{H}_2\)。</p>
+
+<p>具体的：如果 \(\{e_n\}\) 是 \(\mathcal{H}_1\) 基，\(\{f_m\}\) 是 \(\mathcal{H}_2\) 基，则 \(\{e_n \otimes f_m\}\) 是 \(\mathcal{H}_1 \otimes \mathcal{H}_2\) 基。一般态 \(\psi = \sum c_{nm} e_n \otimes f_m\)。</p>
+
+<p>"<em>纠缠</em>" 现象的源头在这里：一些 \(\psi\) 不能写成 \(\psi_1 \otimes \psi_2\) 形态——它们是<em>纠缠态</em>。例 \(|00\rangle + |11\rangle \in \mathbb{C}^2 \otimes \mathbb{C}^2\) 不可分。这是经典物理<em>没有</em> 的现象，是量子非局域性的源头（Bell 不等式、EPR 悖论的数学背景）。</p>
+
+<h3>例 5：多电子系统，反对称化的 \(L^2(\mathbb{R}^{3N})\)</h3>
+
+<p>\(N\) 个全同<em>费米子</em>（如电子）的态<em>必</em>是反对称的——交换两个粒子位置导致波函数变号：</p>
+
+<p>\[
+\psi(\mathbf r_1, \ldots, \mathbf r_i, \ldots, \mathbf r_j, \ldots, \mathbf r_N) = -\psi(\mathbf r_1, \ldots, \mathbf r_j, \ldots, \mathbf r_i, \ldots, \mathbf r_N).
+\]</p>
+
+<p>记为 \(\mathcal{H} = \Lambda^N L^2(\mathbb{R}^3)\) (外代数 \(N\) 次幂)。这条反对称<em>不是</em> 公设 1 的内容——它是公设 1 加额外"<em>全同粒子统计</em>" 公设的结果。</p>
+
+<p>反对称的结构后果：<em>Pauli 不相容原理</em>——两个电子不能处于同一单粒子态。这条原理决定了元素周期表的结构、化学键的形态、白矮星和中子星的存在——是宇宙的基本架构事实之一。它的全部数学内容就是<em>波函数反对称</em>。</p>
+
+<h2 id="sec24-3">24.3 三个核心算子</h2>
+
+<h3>位置算子 \(\hat x\)</h3>
+
+<p>在 \(\mathcal{H} = L^2(\mathbb{R})\) 上：</p>
+
+<p>\[
+(\hat x \psi)(x) := x \cdot \psi(x).
+\]</p>
+
+<p>问题：\(\hat x\) 是有界吗？计算 \(\|\hat x \psi\|^2 = \int x^2 |\psi(x)|^2 dx\)。如果 \(\psi(x) = c / (1 + x^2)\)，\(\|\psi\|^2 < \infty\) 但 \(\int x^2 |\psi|^2 = \infty\)——所以 \(\hat x\) 在<em>整个</em> \(L^2\) 上没定义。</p>
+
+<p>所以 \(\hat x\) 是<em>无界</em> 算子，定义域</p>
+
+<p>\[
+D(\hat x) = \{\psi \in L^2 : \int x^2 |\psi(x)|^2 dx < \infty\}
+\]</p>
+
+<p>是 \(L^2\) 的稠密子集，但不是全部。</p>
+
+<p>\(\hat x\) 的<em>谱</em> = 整个实轴 \(\sigma(\hat x) = \mathbb{R}\)（连续谱——没有特征值，因为 \(\hat x \psi = \lambda \psi \Rightarrow (x - \lambda) \psi(x) = 0\)，所以 \(\psi = 0\) 几乎处处）。</p>
+
+<p>物理解释：测量"<em>位置</em>" 可以得到<em>任何</em> 实数 \(\lambda \in \mathbb{R}\)。Born 规则在连续谱上的具体形态：得到位置在 \([a, b]\) 的概率是</p>
+
+<p>\[
+P(x \in [a, b]) = \int_a^b |\psi(x)|^2 dx.
+\]</p>
+
+<p>这正符合"<em>\(|\psi|^2\) 是位置概率密度</em>" 的初始解释。</p>
+
+<h3>动量算子 \(\hat p\)</h3>
+
+<p>在 \(L^2(\mathbb{R})\) 上：</p>
+
+<p>\[
+(\hat p \psi)(x) := -i \hbar \frac{d \psi}{dx}.
+\]</p>
+
+<p>同样无界（在 \(L^2\) 中只对足够光滑的子集定义——具体是 \(H^1(\mathbb{R})\) 域）。\(\sigma(\hat p) = \mathbb{R}\)（也是连续谱）。</p>
+
+<p>"<em>因子 \(-i\hbar\)</em>" 让 \(\hat p\) 自伴（验证：\(\langle \hat p \psi, \varphi \rangle = -i\hbar \int \psi' \overline \varphi = i \hbar \int \psi \overline{\varphi'} = \langle \psi, \hat p \varphi \rangle\)，分部积分 + \(\overline{-i} = i\)）。如果你写 \(\hat p = d/dx\)（没 \(-i\hbar\)），它<em>不</em>自伴——它是<em>反自伴</em>（\(D^* = -D\)），不能作可观测量。</p>
+
+<p>动量算子在<em>傅里叶变换</em> 下变成乘法算子——记 \(\hat \psi(p) = (2\pi \hbar)^{-1/2} \int \psi(x) e^{-ipx/\hbar} dx\)，则 \(\widehat{\hat p \psi}(p) = p \hat \psi(p)\)。所以"<em>动量空间</em>" 视角下 \(\hat p\) 就是<em>位置算子的对偶版</em>——傅里叶把位置和动量互换。这是 Heisenberg/Born-Jordan 与 Schrödinger 两套描述等价的源头。</p>
+
+<h3>哈密顿算子 \(\hat H\)</h3>
+
+<p>系统能量的可观测量。对一维粒子在势 \(V(x)\) 中：</p>
+
+<p>\[
+\hat H = \frac{\hat p^2}{2 m} + V(\hat x) = -\frac{\hbar^2}{2m} \frac{d^2}{dx^2} + V(x).
+\]</p>
+
+<p>这是<em>Schrödinger 算子</em>。在 \(L^2(\mathbb{R})\) 上无界、自伴（在合适域上）。</p>
+
+<p><em>谱的性质</em>：</p>
 
 <ul>
-  <li>得到值 \(\lambda_n\) 的概率 \(\mathbb{P}(\lambda_n) = \|P_n \psi\|^2 = |\langle \psi, e_n \rangle|^2\)；</li>
-  <li>测量后状态"塌缩"为 \(P_n \psi / \|P_n \psi\|\)（归一化）。</li>
+  <li>对<em>束缚势</em>（\(V(x) \to \infty\) 当 \(|x| \to \infty\)，比如谐振子 \(V = \frac{1}{2} m \omega^2 x^2\)）：\(\sigma(\hat H)\) 是<em>离散</em> 的——只有特征值 \(E_0 < E_1 < E_2 \to \infty\)，每个对应一个特征函数 \(\psi_n\)。这是 \(\hat H\) "<em>类紧</em>" 的形态——它的逆\((\hat H + c)^{-1}\) 紧，所以谱定理给离散特征值（<a href="ch21.html">第 21 章</a>）。</li>
+  <li>对<em>散射势</em>（\(V(x) \to 0\) 当 \(|x| \to \infty\)）：\(\sigma(\hat H)\) 由两部分组成——离散部分（束缚态特征值，<em>负</em> 能量）+ 连续部分 \([0, \infty)\)（散射态）。</li>
 </ul>
 
-<p>"<strong>Born 概率诠释</strong>"：\(|\langle \psi, e_n \rangle|^2\) 是"状态 \(\psi\) 中含 \(e_n\) 分量的'权重'平方"——这就是<a href="ch7.html">第 7 章 7.3 节</a>Parseval 等式的物理意义。\(\sum_n \mathbb{P}(\lambda_n) = \sum_n |\langle \psi, e_n \rangle|^2 = \|\psi\|^2 = 1\)，所以这是个真概率分布。</p>
-
-<p><strong>(M2) 一般谱情形。</strong>对一般自伴 \(A\)（含连续谱），用<em>投影值测度</em> \(E\)：</p>
-
-<p>\[
-A = \int_{\sigma(A)} \lambda \, dE(\lambda).
-\]</p>
-
-<p>测量得到值<em>落在 Borel 集 \(\Delta\) 中</em>的概率为</p>
-
-<p>\[
-\mathbb{P}(\lambda \in \Delta) = \langle \psi, E(\Delta) \psi \rangle = \|E(\Delta) \psi\|^2.
-\]</p>
-
-<p>对位置算子 \(\hat x\)：\(E(\Delta) \psi = \chi_\Delta \cdot \psi\)（按集合截断），所以</p>
-
-<p>\[
-\mathbb{P}(x \in \Delta) = \int_\Delta |\psi(x)|^2 dx.
-\]</p>
-
-<p>这正是 Born 给波函数 \(|\psi|^2\) 的概率密度诠释。</p>
-
-<p><strong>(M3) 期望值。</strong>测量 \(A\) 在状态 \(\psi\) 下的<em>期望</em>是</p>
-
-<p>\[
-\boxed{\ \langle A \rangle_\psi = \langle \psi, A \psi \rangle.\ }
-\]</p>
-
-<p>对位置：\(\langle \hat x \rangle_\psi = \int x |\psi(x)|^2 dx\)（位置分布的均值）。这条简洁公式就是泛函分析与统计物理的桥梁。</p>
-
-<h2 id="sec24-5">24.5 不确定性原理</h2>
-
-<p>"不确定性原理"是量子力学最有名的结论。它的数学形式直接来自自伴算子的<em>对易关系</em>。</p>
-
-<p><strong>位置-动量对易关系：</strong>\([\hat x, \hat p] := \hat x \hat p - \hat p \hat x = i \hbar I\)。</p>
-
-<p>验证（在适当定义域上）：\((\hat x \hat p - \hat p \hat x) \psi = x \cdot (-i\hbar \partial_x \psi) - (-i\hbar \partial_x)(x \psi) = -i\hbar x \partial_x \psi + i\hbar (\psi + x \partial_x \psi) = i\hbar \psi\)。</p>
-
-<p><strong>定理（Heisenberg 不确定性）。</strong>设 \(A, B\) 是 Hilbert 空间上的（无界）自伴算子，\(\psi\) 状态向量在两者定义域内。则</p>
-
-<p>\[
-\boxed{\ \Delta_\psi A \cdot \Delta_\psi B \ge \frac{1}{2} |\langle [A, B] \rangle_\psi|,\ }
-\]</p>
-
-<p>其中 \(\Delta_\psi A = \sqrt{\langle A^2 \rangle_\psi - \langle A \rangle_\psi^2}\) 是<em>标准差</em>。</p>
-
-<p>对 \(A = \hat x, B = \hat p\)，\([A, B] = i \hbar I\)，\(\langle [A, B] \rangle_\psi = i \hbar\)，所以</p>
-
-<p>\[
-\Delta_\psi \hat x \cdot \Delta_\psi \hat p \ge \frac{\hbar}{2}.
-\]</p>
-
-<p>这就是<strong>Heisenberg 位置-动量不确定性</strong>。它说"位置和动量不能同时被精确确定"——是<em>对易关系 \(\neq 0\)</em>的直接代数结论，<em>不</em>是测量精度的限制。</p>
-
-<p>证明：对任意 \(t \in \mathbb{R}\)，</p>
-
-<p>\[
-0 \le \|(A - \langle A \rangle - i t (B - \langle B \rangle)) \psi\|^2 = (\Delta A)^2 + t^2 (\Delta B)^2 + t \langle i [A, B] \rangle.
-\]</p>
-
-<p>把它当二次式 in \(t\)，判别式 \(\le 0\)：\(\langle i [A, B] \rangle^2 \le 4 (\Delta A)^2 (\Delta B)^2\)。结束。</p>
-
-<p>(整个论证只用 Cauchy–Schwarz + 对易展开，是泛函分析最优雅的物理结论之一。)</p>
-
-<h2 id="sec24-6">24.6 时间演化与 Stone 定理</h2>
-
-<p>(QM4) 说时间演化由 \(\psi(t) = e^{-i t H / \hbar} \psi(0)\) 给出。这里 \(e^{-i t H / \hbar}\) 是个<em>单位算子</em>（保范数）。它的存在性需要<strong>Stone 定理</strong>：</p>
-
-<p><strong>定理（Stone）。</strong>设 \(H\) 是 Hilbert 空间上的自伴算子（可能无界）。则存在唯一的强连续单位算子单参数群 \(\{U(t)\}_{t \in \mathbb{R}}\) 使</p>
-
-<p>\[
-U(t) = e^{-i t H}.
-\]</p>
-
-<p>反之，每个强连续单位算子单参数群都来自某个唯一自伴 \(H\)（"\(H\) 是 \(U\) 的<em>无穷小生成元</em>"）。</p>
-
-<p>这条定理把"自伴算子" 与"时间演化" 完全配对——每个量子系统的时间演化背后都有一个自伴生成元（"哈密顿"），反之每个自伴算子都能生成一个合法的时间演化。这是 Schrödinger 方程"自动有解"的根本理由。</p>
-
-<p>关键事实：</p>
+<p>这条"<em>谱 = 离散 + 连续</em>" 结构的物理含义：</p>
 
 <ul>
-  <li>\(U(t)\) 单位 \(\Rightarrow\) \(\|\psi(t)\| = \|\psi(0)\|\)，即"概率守恒"——总概率 1 在所有时间保持；</li>
-  <li>\(U(t_1 + t_2) = U(t_1) U(t_2)\)，即时间演化构成"群"——可逆 + 复合可加；</li>
-  <li>谱 \(\sigma(U(t)) \subset \{e^{-i t \lambda} : \lambda \in \sigma(H)\}\)——单位圆上。</li>
+  <li>离散谱 = 束缚态（粒子被势阱困住，定域在原子里）。</li>
+  <li>连续谱 = 散射态（粒子可以跑到无穷远）。</li>
 </ul>
 
-<p>Stone 定理本身的证明涉及谱定理 + 投影值测度的解析函数演算，超出本书入门范围。详见 Reed–Simon Vol. I 第 8 章。</p>
+<p>原子的谱线（氢光谱、Balmer 系列）就是 \(\hat H\) 离散特征值之间的差 \(E_n - E_m\)——这条事实是 Bohr 1913 模型的<em>预测</em>，被 Schrödinger 1926 严格证明（解 \(\hat H \psi = E \psi\) 给 \(E_n = -13.6 / n^2\) eV）。从经验拟合的 Rydberg 公式到从泛函分析<em>原始原理</em> 推导的过程，是 20 世纪初最壮丽的科学成就之一。</p>
 
-<p>这一章把整个泛函分析的工具<em>编织</em>到量子力学的物理画面里。从你看到这里你应该有这种感觉：泛函分析里学的每一个抽象对象——Hilbert 空间、自伴算子、谱、投影值测度、对易关系、单位算子半群——都不是凭空发明的，它们恰好是物理学家在描述"小尺度世界"时<em>不得不引入</em>的语言。</p>
+<h2 id="sec24-4">24.4 测量、Born 概率与期望</h2>
 
-<p>这本书到这里结束。从第 1 章"无穷维直觉的崩塌"，到第 24 章"量子力学的算子语言"，我们走了一条很长的路。希望你建立起的不是若干公式的清单，而是一种<em>看待无穷维的方式</em>——把"函数当向量""算子当线性变换""谱当特征值集"，并意识到每一种这样的"翻译" 都需要泛函分析里特定的几条定理来兜底。这种意识，比任何具体定理都更值钱。</p>
+<p>把公设 3 翻译成具体公式。</p>
 
-<p>祝你以后在 PDE、概率、物理、机器学习、最优化里看到泛函分析对象时，能脑子里立刻浮起这本书里的画面。这就是它存在的意义。</p>
+<p><em>离散谱情形（最简单）。</em>设 \(A\) 自伴 + 紧（或其逆紧），\(A = \sum_n a_n P_n\)（谱分解，\(P_n\) 是到第 \(n\) 个特征空间的投影）。对态 \(\psi\) 测 \(A\)：</p>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 应用：Sobolev 空间与变分入门</a><span class="nav-disabled">下一章 →</span></nav>
+<ul>
+  <li>得到 \(a_n\) 的概率 = \(\|P_n \psi\|^2 = \langle \psi, P_n \psi \rangle\)。</li>
+  <li>测后状态 = \(P_n \psi / \|P_n \psi\|\)（坍缩到第 \(n\) 个特征空间，归一化）。</li>
+</ul>
+
+<p>\(A\) 的"<em>期望值</em>"（多次测量平均）：</p>
+
+<p>\[
+\boxed{\ \langle A \rangle_\psi := \langle \psi, A \psi \rangle = \sum_n a_n \langle \psi, P_n \psi \rangle = \sum_n a_n \cdot P(a_n).\ }
+\]</p>
+
+<p>这正是经典概率"\(E[X] = \sum x P(X = x)\)" 的量子对应物。</p>
+
+<p><em>连续谱情形</em>（如位置 \(\hat x\)）：</p>
+
+<ul>
+  <li>\(P(x \in [a, b]) = \int_a^b |\psi(x)|^2 dx\)（前面提过）。</li>
+  <li>\(\langle \hat x \rangle_\psi = \int x |\psi(x)|^2 dx\)（位置的期望就是 \(x\) 在概率密度 \(|\psi|^2\) 下的均值）。</li>
+</ul>
+
+<p>这条期望公式 \(\langle A \rangle_\psi = \langle \psi, A \psi \rangle\) 有一个重要后果——它对所有自伴 \(A\) 成立，不依赖于特征值或谱。所以即便 \(A\) 没特征值（连续谱），<em>期望仍可计算</em>，结果仍是实数（自伴 \(\implies \langle \psi, A \psi \rangle\) 实，<a href="ch21.html#sec21-2">第 21 章 21.2 (P1)</a>）。</p>
+
+<p>类似的"<em>方差</em>"（不确定度的平方）：</p>
+
+<p>\[
+(\Delta A)_\psi^2 := \langle (A - \langle A \rangle)^2 \rangle_\psi = \langle A^2 \rangle - \langle A \rangle^2.
+\]</p>
+
+<p>下一节用这个量证 Heisenberg 不确定性原理。</p>
+
+<h2 id="sec24-5">24.5 Heisenberg 不确定性原理</h2>
+
+<p>位置和动量算子满足<em>对易关系</em>：</p>
+
+<p>\[
+[\hat x, \hat p] := \hat x \hat p - \hat p \hat x = i \hbar \cdot I.
+\]</p>
+
+<p><em>验证。</em>对 \(\psi \in C_c^\infty(\mathbb{R})\)（足够光滑）：</p>
+
+<p>\[
+(\hat x \hat p \psi)(x) = x \cdot (-i\hbar \psi'(x)) = -i \hbar x \psi'(x),
+\]</p>
+
+<p>\[
+(\hat p \hat x \psi)(x) = -i\hbar (x \psi(x))' = -i\hbar (\psi(x) + x \psi'(x)).
+\]</p>
+
+<p>两者相减：\((\hat x \hat p - \hat p \hat x) \psi = i \hbar \psi\)。即 \([\hat x, \hat p] = i \hbar I\)。\(\square\)</p>
+
+<p>这条关系叫<em>正则对易关系</em>（canonical commutation relation, CCR）——它是量子力学最深的代数关系，把"<em>位置</em>" 和"<em>动量</em>" 永久绑定。</p>
+
+<p><strong>Heisenberg 不确定性。</strong>对任意单位态 \(\psi\)（在合适域内）：</p>
+
+<p>\[
+\boxed{\ (\Delta x)_\psi \cdot (\Delta p)_\psi \ge \frac{\hbar}{2}.\ }
+\]</p>
+
+<p>"位置不确定度" 与"动量不确定度" 的乘积有<em>下界</em> \(\hbar / 2\)——这条下界由 \(\hbar\) 决定（自然常数 \(\hbar \approx 10^{-34} \text{ J} \cdot \text{s}\)）。<em>同时</em>把位置和动量都测准是<em>不可能</em>。</p>
+
+<p><em>证明。</em>下面这条更一般。</p>
+
+<p><strong>定理（Robertson-Schrödinger 不等式）。</strong>对任意自伴 \(A, B\) 和单位态 \(\psi\)（\(\psi \in D(AB) \cap D(BA)\)）：</p>
+
+<p>\[
+(\Delta A)_\psi \cdot (\Delta B)_\psi \ge \frac{1}{2} |\langle \psi, [A, B] \psi \rangle|.
+\]</p>
+
+<p><em>证明。</em>记 \(\tilde A := A - \langle A \rangle I\)（"中心化"），\(\tilde B := B - \langle B \rangle I\)。\([\tilde A, \tilde B] = [A, B]\)（中心项不影响对易）。\((\Delta A)^2 = \langle \tilde A^2 \rangle = \|\tilde A \psi\|^2\)。</p>
+
+<p>Cauchy-Schwarz：</p>
+
+<p>\[
+\|\tilde A \psi\| \cdot \|\tilde B \psi\| \ge |\langle \tilde A \psi, \tilde B \psi \rangle| = |\langle \psi, \tilde A \tilde B \psi \rangle|.
+\]</p>
+
+<p>分解 \(\tilde A \tilde B = \frac{1}{2}(\tilde A \tilde B + \tilde B \tilde A) + \frac{1}{2}[\tilde A, \tilde B]\)（对称 + 反对称部分）。前者是<em>自伴</em>，所以 \(\langle \psi, (\tilde A \tilde B + \tilde B \tilde A) \psi \rangle\) 实；后者 \([A, B]\) 是<em>反自伴</em>（验证：\(([A,B])^* = B^* A^* - A^* B^* = BA - AB = -[A,B]\)），所以 \([A, B] = i C\) 某自伴 \(C\)，\(\langle \psi, i C \psi \rangle = i \langle \psi, C \psi \rangle\) 纯虚。</p>
+
+<p>所以 \(\langle \psi, \tilde A \tilde B \psi \rangle\) 实部 + 虚部分别独立——</p>
+
+<p>\[
+|\langle \psi, \tilde A \tilde B \psi \rangle|^2 \ge |\mathrm{Im} \langle \psi, \tilde A \tilde B \psi \rangle|^2 = \frac{1}{4} |\langle \psi, [A, B] \psi \rangle|^2.
+\]</p>
+
+<p>取根：</p>
+
+<p>\[
+(\Delta A)(\Delta B) \ge \frac{1}{2} |\langle \psi, [A, B] \psi \rangle|.
+\]</p>
+
+<p>\(\square\)</p>
+
+<p>把 \(A = \hat x, B = \hat p, [A, B] = i\hbar I\)：</p>
+
+<p>\[
+(\Delta x)(\Delta p) \ge \frac{1}{2} |\langle \psi, i\hbar \psi \rangle| = \frac{\hbar}{2} \cdot |\langle \psi, \psi \rangle| = \frac{\hbar}{2}.
+\]</p>
+
+<p>这就是 Heisenberg 不确定性。</p>
+
+<p>请你停下来欣赏这件事——<em>不确定性原理是 Cauchy-Schwarz + 对易关系的代数结论</em>。它<em>不</em>是物理假设（不是公设之一），而是公设 2（自伴算子）+ 公设 3（Born）+ 一条简单的算子代数恒等式 \([\hat x, \hat p] = i\hbar I\) 的<em>纯数学推论</em>。</p>
+
+<p>这条推导把"<em>测量精度有下限</em>" 这个看似神秘的物理事实，归约到一条 4 行的代数证明。这是泛函分析在物理学中"<em>把哲学命题转译为数学定理</em>" 最干净的例子。</p>
+
+<h2 id="sec24-6">24.6 Stone 定理 + 时间演化</h2>
+
+<p>公设 4 说量子态满足 Schrödinger 方程 \(i\hbar \dot \psi = \hat H \psi\)，解 \(\psi(t) = e^{-it\hat H/\hbar} \psi(0)\)。</p>
+
+<p>但"\(e^{-it\hat H/\hbar}\)" 在 \(\hat H\) 无界时怎么定义？这是 Stone 定理的内容。</p>
+
+<p><strong>Stone 定理（1932）。</strong>设 \(\mathcal{H}\) 是 Hilbert 空间。下面两类对象之间有<em>双射</em>：</p>
+
+<ol>
+  <li><em>强连续幺正单参数群</em> \(\{U(t)\}_{t \in \mathbb{R}}\)：每个 \(U(t)\) 是 \(\mathcal{H}\) 上的幺正算子；\(U(s + t) = U(s) U(t)\)；\(t \mapsto U(t) \psi\) 强连续对每个 \(\psi\)。</li>
+  <li><em>自伴算子</em> \(\hat H\)（一般无界）。</li>
+</ol>
+
+<p>对应关系：</p>
+
+<p>\[
+U(t) = e^{-i t \hat H / \hbar}, \qquad \hat H \psi = i \hbar \lim_{t \to 0} \frac{U(t) \psi - \psi}{t}.
+\]</p>
+
+<p>定义域 \(D(\hat H) = \{\psi : \lim \text{ 存在}\}\)。</p>
+
+<p>这条定理是<a href="ch21.html#sec21-6">第 21 章 21.6 节</a>"<em>无界自伴谱定理</em>" 的应用——用谱投影测度 \(E_{\hat H}\) 定义</p>
+
+<p>\[
+e^{-it\hat H / \hbar} := \int_{\mathbb{R}} e^{-it\lambda/\hbar} dE_{\hat H}(\lambda).
+\]</p>
+
+<p>即"<em>对每个谱点 \(\lambda\) 把 \(e^{-it\lambda/\hbar}\) 当系数</em>"——这是无界算子的"<em>函数演算</em>"（functional calculus）。</p>
+
+<p>具体后果：</p>
+
+<ul>
+  <li>\(\|U(t) \psi\| = \|\psi\|\)（幺正 \(\implies\) 概率守恒）。</li>
+  <li>\(t \mapsto U(t) \psi\) 在 \(\psi \in D(\hat H)\) 上可微，\(\frac{d}{dt} U(t) \psi = -i \hat H U(t) \psi / \hbar\)（Schrödinger）。</li>
+  <li>\(\hat H\) 不依时（"封闭系统"）\(\implies\) 演化是确定的。</li>
+</ul>
+
+<p>所以"<em>量子态的演化</em>" 完全由<em>哈密顿算子</em> 决定——给 \(\hat H\)，自动有 \(U(t) = e^{-it\hat H/\hbar}\)，自动有 \(\psi(t) = U(t) \psi(0)\)。这条对应关系的双射性（Stone）让"<em>给系统一个能量算子</em>" 等价于"<em>给系统一条演化方程</em>"——所以物理学家说"<em>哈密顿决定一切</em>"。</p>
+
+<h2 id="sec24-7">收束：你应该带走什么</h2>
+
+<p>读到这里，你看完了这本书的 24 章。我希望你建立的不是<em>公式清单</em>——具体的范数、不等式、定理名号你都可以查参考书。我希望你建立的是<em>看待无穷维的方式</em>。</p>
+
+<p>三条核心视角，让你以后<em>第一次</em>看到任何无穷维数学对象时能自动套用：</p>
+
+<ul>
+  <li><em>把"函数当向量"</em>。\(L^2[0, 1]\) 不是"<em>一堆函数</em>"，它是个 Hilbert <em>空间</em>——里面每个元素是一个<em>向量</em>，可以被加、被数乘、被取范数、被取内积。Fourier 级数 \(\sum c_n e_n\) 不是"<em>一种逼近技术</em>"，它是<em>把向量按正交基展开</em>——和 \(\mathbb{R}^n\) 里把向量按 \(e_1, \ldots, e_n\) 展开一回事。这条视角让你不再害怕"<em>一个函数</em>"——它就是个向量。</li>
+  <li><em>把"算子当线性变换"</em>。导数 \(\partial : H^1 \to L^2\) 不是"<em>一种数学操作</em>"，它是个<em>有界线性变换</em>——和 \(\mathbb{R}^n \to \mathbb{R}^m\) 矩阵一回事。它有"<em>核</em>"（常函数）、"<em>像</em>"（\(L^2\) 一些子集）、"<em>范数</em>"（最大放大倍数）——所有线性代数的概念照搬。这条视角让你不再害怕"<em>一个算子</em>"——它就是个线性变换。</li>
+  <li><em>把"谱当特征值集"</em>。哈密顿算子 \(\hat H\) 的谱不是"<em>某种神秘物理量</em>"，它是<em>特征值集</em>——和有限维矩阵的特征值集一回事，只不过维度上升带来"<em>连续谱</em>" 这个额外的可能。Schrödinger 方程"<em>解</em>" 等于"<em>对角化 \(\hat H\)</em>"，类比有限维"<em>找矩阵特征向量</em>"。这条视角让你不再害怕"<em>谱</em>"——它就是特征值集。</li>
+</ul>
+
+<p>这三条视角加上"<em>无穷维要付税</em>" 这条警觉（<a href="ch1.html">第 1 章</a>那五件崩塌），构成你看泛函分析后<em>剩下的</em> 直觉。具体的定理（Hahn-Banach、Banach-Alaoglu、谱定理、Lax-Milgram、Sobolev 嵌入、Stone）都是这套视角的<em>具体结论</em>——它们告诉你在不同的具体设置里"<em>有限维直觉怎么修复</em>"。</p>
+
+<p>这本书结束了。从这里出发，你可以走三条路线：</p>
+
+<ul>
+  <li><em>偏微分方程方向</em>：Brezis 的 <em>Functional Analysis, Sobolev Spaces and PDEs</em> 是接续的标准；Evans 的 <em>Partial Differential Equations</em> 给具体 PDE 工程；Gilbarg-Trudinger 给经典椭圆理论严格化。</li>
+  <li><em>量子力学 / 算子代数方向</em>：Reed-Simon 四卷 <em>Methods of Modern Mathematical Physics</em> 是这条路的标准——把本书 24 章扩到 2000 页技术；Hall 的 <em>Quantum Theory for Mathematicians</em> 是更短的入门。</li>
+  <li><em>抽象算子论 / 算子代数方向</em>：Conway 的 <em>A Course in Functional Analysis</em> 把本书内容扩到 \(C^*\)-代数和 von Neumann 代数；Murphy 的 <em>C*-Algebras and Operator Theory</em> 是这条线的标准入门。</li>
+</ul>
+
+<p>三条路殊途同归——都从"<em>把无穷维当作无穷维线性代数</em>" 这一基础视角发展出去。你这本书里学到的 24 章核心工具，是后面任何方向的<em>共同基础</em>。希望它对你后面几年的数学旅程有用。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 Sobolev 空间 + 变分入门</a><a href="appA.html">附录 A →</a></nav>
 </main>
 </body>
 </html>
+</content>
+</invoke>

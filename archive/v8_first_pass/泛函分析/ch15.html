@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 15 章 对偶空间 X* — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 Hahn–Banach 几何形式与凸集分离</a><a href="ch16.html">下一章 · 第 16 章 Riesz 表示定理 →</a></nav>
+<h1 id="ch15">第 15 章 对偶空间 \(X^*\)</h1>
+
+<p>这一章我们正式研究<strong>对偶空间</strong>。从某种意义上，对偶空间是泛函分析的"另一只手"：你研究 \(X\) 时只能从内部看；研究 \(X^*\) 时则是从"所有线性观察方式的集合"看 \(X\)。这两种视角完全不同，又紧密相关——通过 Hahn–Banach（前两章）保证了它们之间有充分的字典。</p>
+
+<ul>
+  <li>正式定义 \(X^* = \mathcal{B}(X, \mathbb{K})\)，并立即看出它<em>总是 Banach 空间</em>（无论 \(X\) 是否完备）。</li>
+  <li>把 \(X\) 中的点视为 \(X^*\) 上的"取值算子"——这就是<strong>典范嵌入</strong> \(J : X \to X^{**}\)。</li>
+  <li>典范嵌入由 Hahn–Banach 推论 1 是<em>等距</em>——\(\|J(x)\| = \|x\|\)。这条等距让"二次对偶" \(X^{**}\) 成为研究 \(X\) 的可靠舞台。</li>
+  <li>具体计算几个标准对偶空间：\((\ell^p)^*, (L^p)^*, (c_0)^*\)，并说明 \(p = 1, \infty\) 端点的不对称。</li>
+  <li><strong>零化子 / 预零化子</strong>：把"子空间"和"在子空间上零化的泛函集"互相对应。</li>
+  <li>对偶算子 \(T^* : Y^* \to X^*\)：每个 \(T : X \to Y\) 自带一个"逆向"算子。</li>
+</ul>
+
+<h2 id="sec15-1">15.1 对偶空间的定义与基本结构</h2>
+
+<p>设 \(X\) 是赋范空间。它的<strong>对偶空间</strong>是</p>
+
+<p>\[
+X^* := \mathcal{B}(X, \mathbb{K}) = \{f : X \to \mathbb{K} \text{ 线性 + 有界}\}.
+\]</p>
+
+<p>由<a href="ch9.html">第 9 章 9.2 节</a>结论，\(\mathcal{B}(X, \mathbb{K})\) 是 Banach 空间——无论 \(X\) 完备与否（注意：这条只要求<em>目标</em> \(\mathbb{K}\) 完备，自动有）。所以</p>
+
+<p>\[
+\boxed{\ X^* \text{ 永远是 Banach 空间}.\ }
+\]</p>
+
+<p>这条事实非常有用。它意味着"取对偶"是一个把任何赋范空间送到 Banach 空间的运算。即使 \(X\) 不完备，\(X^*\) 自动完备——我们可以放心地在 \(X^*\) 上做"取极限"。</p>
+
+<p>\(X^*\) 上的范数就是算子范数：</p>
+
+<p>\[
+\|f\|_{X^*} = \sup_{\|x\| \le 1} |f(x)| = \sup_{x \neq 0} \frac{|f(x)|}{\|x\|}.
+\]</p>
+
+<h2 id="sec15-2">15.2 二次对偶 \(X^{**}\) 与典范嵌入</h2>
+
+<p>\(X^*\) 是 Banach 空间，所以可以再取它的对偶 \(X^{**} := (X^*)^*\)。这叫<strong>二次对偶</strong>（bidual）。它也是 Banach 空间。</p>
+
+<p>每个 \(x \in X\) 自动给出一个 \(X^{**}\) 中的元素：</p>
+
+<p>\[
+J(x) : X^* \to \mathbb{K}, \qquad J(x)(f) = f(x).
+\]</p>
+
+<p>"\(J(x)\) 就是把 \(x\) 当成一个'取值算子'——给一个泛函，返回它在 \(x\) 上取的值"。线性 + 有界（\(|J(x)(f)| = |f(x)| \le \|f\| \|x\|\)）所以 \(\|J(x)\|_{X^{**}} \le \|x\|\)。</p>
+
+<p>这给出<strong>典范嵌入</strong>（canonical embedding）</p>
+
+<p>\[
+J : X \to X^{**}, \qquad x \mapsto J(x).
+\]</p>
+
+<p>核心性质：</p>
+
+<p><strong>定理（典范嵌入是等距）。</strong>\(\|J(x)\|_{X^{**}} = \|x\|_X\) 对所有 \(x\)。</p>
+
+<p>证明：上界已证。下界来自<a href="ch13.html">第 13 章 13.6 节</a>推论 1——存在 \(f \in X^*\)，\(\|f\| = 1\)，\(f(x) = \|x\|\)。则 \(|J(x)(f)| = |f(x)| = \|x\|\)，所以 \(\|J(x)\|_{X^{**}} \ge \|x\|\)。结束。</p>
+
+<p>\[
+\boxed{\ J : X \hookrightarrow X^{**} \text{ 是等距嵌入}。\ }
+\]</p>
+
+<p>这条等距嵌入让我们可以把 \(X\) 当成 \(X^{**}\) 的一个闭子空间（它的像 \(J(X)\) 在 \(X^{**}\) 中闭，因为等距 \(\Rightarrow\) 像与原空间同构 \(\Rightarrow\) 完备 \(\Rightarrow\) 闭）。</p>
+
+<p>是否 \(J\) <strong>满</strong>射（即 \(J(X) = X^{**}\)）是另一回事。<em>满</em> 时 \(X\) 叫<strong>自反</strong>（reflexive）——这是第 19 章的核心话题。Hilbert 空间永远自反；\(L^p\)（\(1 < p < \infty\)）自反；但 \(L^1, L^\infty, c_0, C(K)\) 不自反。这些差异在第 19 章详谈。</p>
+
+<h2 id="sec15-3">15.3 标准对偶计算</h2>
+
+<p>下面把<a href="ch4.html">第 4 章</a>列过的"对偶速查表"逐条展开。</p>
+
+<p><strong>(D1) \((\ell^p)^* \cong \ell^q\)，\(1 \le p < \infty\)，\(1/p + 1/q = 1\)。</strong></p>
+
+<p>同构由</p>
+
+<p>\[
+y = (y_n) \in \ell^q \mapsto f_y \in (\ell^p)^*, \qquad f_y(x) = \sum_n x_n y_n
+\]</p>
+
+<p>给出。验证 \(\|f_y\|_{(\ell^p)^*} = \|y\|_{\ell^q}\)（上界由 Hölder 不等式；下界取 \(x_n = |y_n|^{q-1} \operatorname{sgn}(y_n) / \|y\|_{\ell^q}^{q/p}\)）。是双射（每个 \(f \in (\ell^p)^*\) 由它在标准基 \(e_n\) 上的值 \(f(e_n) =: y_n\) 决定，\(y \in \ell^q\)）。</p>
+
+<p><strong>(D2) \((\ell^1)^* \cong \ell^\infty\)。</strong>同构 \(y \in \ell^\infty \mapsto f_y(x) = \sum x_n y_n\)。验证 \(\|f_y\| = \|y\|_\infty\)。</p>
+
+<p><strong>(D3) \((\ell^\infty)^* \neq \ell^1\)！</strong>这是个重要的反对称。\((\ell^\infty)^*\) 严格大于 \(\ell^1\)——它包含 \(\ell^1\)（通过 \(y \mapsto f_y\)）作为闭真子空间，但还有"非求和"线性泛函（用 Hahn–Banach 在 \(c \subset \ell^\infty\) 上的"取极限"延拓得到）。完整刻画 \((\ell^\infty)^*\) 涉及"有限可加测度空间"，相当复杂。</p>
+
+<p><strong>(D4) \((c_0)^* \cong \ell^1\)。</strong>同构 \(y \in \ell^1 \mapsto f_y(x) = \sum x_n y_n\) 对 \(x \in c_0\)。这条让 \(c_0\) 在自反性话题里有特殊地位——\(c_0^{**} = (\ell^1)^* = \ell^\infty \neq c_0\)，所以 \(c_0\) 不自反。</p>
+
+<p><strong>(D5) \((L^p(\Omega))^* \cong L^q(\Omega)\)，\(1 \le p < \infty\)，\(1/p + 1/q = 1\)。</strong>同构 \(g \in L^q \mapsto f_g(f) = \int f g\)。这是<a href="ch16.html">第 16 章</a> Riesz 表示在 \(L^p\) 形式的核心结论，证明用某种符号分解 + 单调收敛。</p>
+
+<p><strong>(D6) \((L^1)^* \cong L^\infty\)。</strong>注意反方向 \((L^\infty)^* \neq L^1\)（同 \(\ell^\infty\) 一样）。</p>
+
+<p><strong>(D7) \((C(K))^* \cong M(K)\)，\(K\) 紧致 Hausdorff。</strong>这是 Riesz–Markov–Kakutani 定理（第 16 章），同构由 \(\mu \in M(K) \mapsto f_\mu(g) = \int g \, d\mu\) 给出。"<em>线性泛函就是测度</em>"，这是个让人惊艳的统一。</p>
+
+<p><strong>(D8) \(H^* \cong H\) 对 Hilbert 空间。</strong>这是 Riesz 表示在 Hilbert 上的版本（第 16 章），同构由 \(y \mapsto \langle \cdot, y \rangle\) 给出。这条让 Hilbert 空间<em>自反</em>且<em>对偶等于自身</em>——它和别的 Banach 空间最大的好处之一。</p>
+
+<p>这些对偶等距同构是泛函分析里最常用的"字典"。把它们记住到能瞬时调用的程度。</p>
+
+<h2 id="sec15-4">15.4 零化子与预零化子</h2>
+
+<p>对子集 \(M \subset X\)，定义<strong>零化子</strong></p>
+
+<p>\[
+M^\circ := \{f \in X^* : f(x) = 0, \forall x \in M\} \subset X^*.
+\]</p>
+
+<p>对子集 \(N \subset X^*\)，定义<strong>预零化子</strong></p>
+
+<p>\[
+{}^\circ N := \{x \in X : f(x) = 0, \forall f \in N\} \subset X.
+\]</p>
+
+<p>(注意符号：上标圆圈在右边表示 \(X \to X^*\)，左边表示 \(X^* \to X\)。)</p>
+
+<p>核心性质：</p>
+
+<ul>
+  <li>\(M^\circ\) 永远是 \(X^*\) 中的闭子空间；</li>
+  <li>\({}^\circ N\) 永远是 \(X\) 中的闭子空间；</li>
+  <li>对闭子空间 \(M \subset X\)：\({}^\circ(M^\circ) = M\)（这就是<a href="ch13.html">第 13 章</a>推论 3 的"零化子识别闭子空间"）；</li>
+  <li>对一般子空间 \(N \subset X^*\)：\((^\circ N)^\circ = \overline{N}^{w^*}\)（弱*闭包，下章会用）。</li>
+</ul>
+
+<p>第三条 \({}^\circ(M^\circ) = M\) 把"闭子空间"和"\(X^*\) 的某个闭子空间"互相对应。这是有限维线性代数里"\((W^\perp)^\perp = W\)"的无穷维推广。它也是后面 Fredholm 选择性的关键工具。</p>
+
+<h2 id="sec15-5">15.5 对偶算子（伴随）</h2>
+
+<p>每个 \(T \in \mathcal{B}(X, Y)\) 自带一个<strong>对偶算子</strong>（adjoint，又叫"伴随算子"）：</p>
+
+<p>\[
+T^* : Y^* \to X^*, \qquad T^*(g)(x) := g(T x).
+\]</p>
+
+<p>验证 \(T^*(g)\) 线性 + 有界（\(|T^*(g)(x)| = |g(T x)| \le \|g\| \|T\| \|x\|\)），\(T^*\) 自身线性 + 有界，且</p>
+
+<p>\[
+\boxed{\ \|T^*\| = \|T\|.\ }
+\]</p>
+
+<p>证明上界由前面估计；下界用 Hahn–Banach（取 \(x\) 使 \(\|T x\| \approx \|T\| \|x\|\)，取 \(g\) 使 \(g(T x) = \|T x\|\)）。</p>
+
+<p>对偶算子的几条性质：</p>
+
+<ul>
+  <li>\((S + T)^* = S^* + T^*\)；</li>
+  <li>\((\alpha T)^* = \alpha T^*\)（实情形）或 \(\bar\alpha T^*\)（复情形，因为 \(g \mapsto \alpha g\) 在 \(Y^*\) 上是 \(\alpha\) 数乘）；</li>
+  <li>\((ST)^* = T^* S^*\)（注意顺序反转！）；</li>
+  <li>\(I_X^* = I_{X^*}\)；</li>
+  <li>若 \(T\) 双射 + 有界，则 \(T^*\) 双射 + 有界，\((T^*)^{-1} = (T^{-1})^*\)。</li>
+</ul>
+
+<p>第三条"顺序反转"是对偶算子最经常被记错的事——\((ST)^* = T^* S^*\)，不是 \(S^* T^*\)。这种"反转"在范畴论里是"contravariant" 函子的标准行为。</p>
+
+<p>对偶算子在 Hilbert 空间上特别有内涵。\(H^* \cong H\) 让 \(T^*\) 可以被看作 \(H \to H\) 的算子，而不是 \(H^* \to H^*\)。在这条同构下，\(T^*\) 的定义变成</p>
+
+<p>\[
+\langle T x, y \rangle = \langle x, T^* y \rangle, \quad \forall x, y.
+\]</p>
+
+<p>这就是你在线性代数里熟知的"对称矩阵 \(\Leftrightarrow\) \(A = A^T\)"的无穷维版。算子叫<strong>自伴</strong>，如果 \(T^* = T\)。第 21、24 章谱定理几乎全部是关于自伴算子的。</p>
+
+<h2 id="sec15-6">15.6 \(\ker, \operatorname{Range}\) 与对偶</h2>
+
+<p>对偶算子和原算子的核 / 像有一个非常优美的关系：</p>
+
+<p><strong>定理（对偶的核 / 像识别）。</strong>设 \(T \in \mathcal{B}(X, Y)\)。则</p>
+
+<ul>
+  <li>\(\ker(T^*) = (\operatorname{Range}(T))^\circ\)；</li>
+  <li>\(\overline{\operatorname{Range}(T)} = {}^\circ(\ker(T^*))\)；</li>
+  <li>对应的对偶版本：\(\ker(T) = {}^\circ(\operatorname{Range}(T^*))\)，\(\overline{\operatorname{Range}(T^*)}^{w^*} = (\ker T)^\circ\)。</li>
+</ul>
+
+<p>证明：第一条 \(g \in \ker(T^*) \iff T^* g = 0 \iff g(T x) = 0, \forall x \iff g \in (\operatorname{Range}(T))^\circ\)。第二条用 \({}^\circ(M^\circ) = \overline M\)（对一般集合 \(M \subset X\)）。</p>
+
+<p>这条结构定理是 Fredholm 选择性的最直接基础（第 22 章）：它说"\(T^*\) 的核 = \(T\) 的像的零化子"，这条等价让"\(Tx = y\) 可解 \(\iff\) 所有 \(g \in \ker T^*\) 满足 \(g(y) = 0\)"成为可计算的。</p>
+
+<p>本章把对偶空间的"机械"备齐：定义、典范嵌入、等距、标准对偶、零化子、对偶算子。下一章我们要把"<em>哪些 Banach 空间的对偶能写出具体公式</em>"这件事讲清——这就是 Riesz 表示定理。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 Hahn–Banach 几何形式与凸集分离</a><a href="ch16.html">下一章 · 第 16 章 Riesz 表示定理 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 开映射定理与闭图像定理 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 一致有界原理（Banach–Steinhaus）</a><a href="ch13.html">下一章 · 第 13 章 Hahn–Banach 延拓定理 →</a></nav>
+<h1 id="ch12">第 12 章 开映射定理与闭图像定理</h1>
+
+<p>这一章给三大原理的剩下两条。它们的核心精神可以用一句话说穿：<strong>"代数等式何时自动升级为拓扑等式"</strong>。在有限维这件事是免费的——一个 \(n \times n\) 矩阵满射 \(\iff\) 双射 \(\iff\) 可逆 \(\iff\) 逆矩阵存在；逆矩阵自动连续。在无穷维这每一步都需要论证，而开映射 / 闭图像告诉你：在 Banach 空间之间，<em>只要你写得下"算子是连续的双射"或"算子的图像是闭的"，那它的逆 / 它本身就自动有界</em>。这种"自动有界"是一切现代分析"用代数性质推出连续性"的根。</p>
+
+<ul>
+  <li>陈述<strong>开映射定理</strong>：有界满射 Banach 算子是开映射。</li>
+  <li>从开映射立即推出<strong>有界逆定理</strong>：有界双射的逆自动有界。</li>
+  <li>开映射的完整证明（用 Baire 锁定一个内部含原点的像球）。</li>
+  <li>陈述<strong>闭图像定理</strong>：图像在乘积空间中闭的线性算子自动有界。</li>
+  <li>三大原理的"亲缘关系"：开映射 \(\Leftrightarrow\) 有界逆 \(\Leftrightarrow\) 闭图像；都根植于 Baire。</li>
+  <li>三个典型应用：算子的逆有控制；两种范数等价；闭子空间的"间接验证"。</li>
+</ul>
+
+<h2 id="sec12-1">12.1 开映射定理</h2>
+
+<p><strong>定理（开映射 / Banach–Schauder）。</strong>设 \(X, Y\) 都是 Banach 空间，\(T : X \to Y\) 是<strong>有界 + 满射</strong>的线性算子。则 \(T\) 是<em>开映射</em>，即把 \(X\) 中的开集映成 \(Y\) 中的开集。等价地：</p>
+
+<p>\[
+\boxed{\ \exists r > 0, \quad T(B_X(0, 1)) \supset B_Y(0, r).\ }
+\]</p>
+
+<p>"开映射 \(\iff\) 单位球的像盖住一个原点的开球"——这是开映射最常用的等价表述。证明全部围绕这条等价展开。</p>
+
+<h2 id="sec12-2">12.2 开映射的证明</h2>
+
+<p>分两步。<strong>第一步</strong>用 Baire 给出"\(\overline{T(B_X(0, 1))}\) 含原点的开球"。<strong>第二步</strong>把"闭包含开球"升级为"自身含开球"。</p>
+
+<p><strong>第一步。</strong>因为 \(T\) 满射，\(Y = T(X) = \bigcup_{n=1}^\infty T(B_X(0, n)) = \bigcup_{n=1}^\infty n \cdot T(B_X(0, 1))\)。Baire 给出某个 \(n_0 \cdot \overline{T(B_X(0, 1))}\) 含开球；因为 "倍数 \(\Rightarrow\) 开球"，可以把这个开球缩到原点版本：存在 \(r_0 > 0\) 使</p>
+
+<p>\[
+\overline{T(B_X(0, 1))} \supset B_Y(y_0, r_0) \text{ 某个 } y_0.
+\]</p>
+
+<p>由对称（\(B_X(0, 1) = -B_X(0, 1)\)，所以 \(\overline{T(B_X(0, 1))}\) 也对称）和凸性（\(T\) 与闭包都保凸），</p>
+
+<p>\[
+B_Y(0, r_0) \subset \overline{T(B_X(0, 1))}.
+\]</p>
+
+<p><strong>第二步（关键技巧）。</strong>证明 \(B_Y(0, r_0/2) \subset T(B_X(0, 1))\)。</p>
+
+<p>取 \(y \in B_Y(0, r_0/2)\)。由第一步 \(\overline{T(B_X(0, 1/2))} \supset B_Y(0, r_0/2)\) 知存在 \(x_1 \in B_X(0, 1/2)\) 使 \(\|y - T x_1\| < r_0/4\)。即 \(y - T x_1 \in B_Y(0, r_0/4) \subset \overline{T(B_X(0, 1/4))}\)。</p>
+
+<p>归纳：取 \(x_n \in B_X(0, 1/2^n)\) 使 \(\|y - T(x_1 + \cdots + x_n)\| < r_0/2^{n+1}\)。</p>
+
+<p>令 \(x = \sum_{n=1}^\infty x_n\)（绝对收敛，\(\sum \|x_n\| < \sum 1/2^n = 1\)）。\(X\) 完备 \(\Rightarrow\) \(x\) 存在，\(\|x\| < 1\)。\(T\) 连续 \(\Rightarrow\) \(T x = \sum T x_n = y\)。</p>
+
+<p>所以 \(y = T x\) 且 \(x \in B_X(0, 1)\)，即 \(y \in T(B_X(0, 1))\)。结束。</p>
+
+<p>这条第二步是开映射证明的"灵魂"——它把"闭包覆盖小球"用一个迭代过程<em>无损地</em>升级为"自身覆盖小球"。这种"几何级数 + 完备性"的论证在很多分析定理里反复出现（开映射、Banach 不动点、Picard 迭代、Newton 法收敛性）。</p>
+
+<h2 id="sec12-3">12.3 有界逆定理：开映射的"双射版本"</h2>
+
+<p><strong>推论（有界逆 / Banach 同构定理）。</strong>设 \(X, Y\) 都是 Banach 空间，\(T : X \to Y\) 是<strong>有界 + 双射</strong>线性算子。则 \(T^{-1} : Y \to X\) 也是有界的。</p>
+
+<p>证明：由开映射，\(T\) 把开集映成开集，所以 \(T^{-1}\) 把开集映成开集（注意：\(T^{-1}\) 是真正的逆映射，定义于 \(Y\) 上）。这恰好就是 \(T^{-1}\) 连续 = 有界。</p>
+
+<p>这条推论的实际意义无比重要。它的"日常翻译"是：</p>
+
+<p>\[
+\boxed{\ \text{Banach 空间之间的有界双射}的逆\text{自动有界}。\ }
+\]</p>
+
+<p>有限维这件事白送（矩阵双射 \(\iff\) 行列式非零 \(\iff\) 逆矩阵存在 \(\Rightarrow\) 自动连续）。无穷维它是定理，需要 Baire。</p>
+
+<h2 id="sec12-4">12.4 两种范数等价的判别</h2>
+
+<p>有界逆定理的最常用应用之一是<em>判别两个范数等价</em>。</p>
+
+<p><strong>推论（两种范数等价）。</strong>设 \(X\) 是向量空间，\(\|\cdot\|_1\) 与 \(\|\cdot\|_2\) 是两个范数。如果 \((X, \|\cdot\|_1)\) 与 \((X, \|\cdot\|_2)\) 都是 Banach 空间，且存在 \(C > 0\) 使</p>
+
+<p>\[
+\|x\|_2 \le C \|x\|_1, \quad \forall x,
+\]</p>
+
+<p>那么两个范数等价（即同时存在反向不等式 \(\|x\|_1 \le C' \|x\|_2\)）。</p>
+
+<p>证明：把恒等映射 \(\operatorname{id} : (X, \|\cdot\|_1) \to (X, \|\cdot\|_2)\) 看作算子。条件给它有界（\(\|\operatorname{id}(x)\|_2 = \|x\|_2 \le C \|x\|_1\)）。它显然是双射（同一个集合，恒等映射）。两边都是 Banach \(\Rightarrow\) 由有界逆定理 \(\operatorname{id}^{-1} : (X, \|\cdot\|_2) \to (X, \|\cdot\|_1)\) 也有界 \(\Rightarrow\) \(\|x\|_1 \le C' \|x\|_2\)。</p>
+
+<p>这条推论的实际威力很大。比如证明 Sobolev 范数 \(\|f\|_{H^1}\) 与"等价范数" \(\|f\|_{L^2} + \|\nabla f\|_{L^2}\) 在 \(H^1\) 上等价——只要把两边都验证完备，再写一个方向的不等式即可，无须做反方向估计。</p>
+
+<h2 id="sec12-5">12.5 闭图像定理</h2>
+
+<p>设 \(X, Y\) 是赋范空间。线性算子 \(T : X \to Y\) 的<strong>图像</strong>是</p>
+
+<p>\[
+\Gamma(T) = \{(x, Tx) : x \in X\} \subset X \times Y.
+\]</p>
+
+<p>\(X \times Y\) 是赋范空间（配范数 \(\|(x, y)\| = \|x\|_X + \|y\|_Y\)，或等价的 max 范数）。\(T\) 叫<strong>闭算子</strong>，如果 \(\Gamma(T)\) 是 \(X \times Y\) 的闭子集——等价地：若 \(x_n \to x\) 且 \(T x_n \to y\)，则 \(y = T x\)。</p>
+
+<p><strong>定理（闭图像）。</strong>设 \(X, Y\) 都是 Banach 空间，\(T : X \to Y\) 是<em>处处有定义</em>的<em>线性</em>算子。如果 \(\Gamma(T)\) 在 \(X \times Y\) 中闭，则 \(T\) 有界。</p>
+
+<p>证明：考虑投影</p>
+
+<p>\[
+\pi_1 : \Gamma(T) \to X, \quad (x, Tx) \mapsto x; \qquad \pi_2 : \Gamma(T) \to Y, \quad (x, Tx) \mapsto T x.
+\]</p>
+
+<p>\(\Gamma(T)\) 是 \(X \times Y\) 的闭子集，\(X \times Y\) 是 Banach（积 Banach 空间），所以 \(\Gamma(T)\) 自身是 Banach 空间（闭子集 + 完备 \(=\) 完备）。\(\pi_1\) 是有界双射（双射来自 \(T\) 处处有定义；有界来自 \(\|\pi_1(x, Tx)\| = \|x\| \le \|(x, Tx)\|\)）。由有界逆定理，\(\pi_1^{-1}: X \to \Gamma(T)\)，\(x \mapsto (x, T x)\) 也有界。所以</p>
+
+<p>\[
+\|T x\| \le \|(x, T x)\| = \|\pi_1^{-1}(x)\| \le \|\pi_1^{-1}\| \cdot \|x\|,
+\]</p>
+
+<p>即 \(T\) 有界。</p>
+
+<p>闭图像定理的实际威力：<em>"闭"是个比"连续"弱得多的条件——你只要验证"\(x_n \to x\) 且 \(T x_n \to y\) \(\Rightarrow\) \(y = T x\)"</em>。"连续"则要求"\(x_n \to x \Rightarrow T x_n \to T x\)"。区别：连续要求<em>所有</em> Cauchy 输入序列的输出都有极限；闭只要求<em>当输出已经有极限时</em>极限对得上。</p>
+
+<p>\[
+\boxed{\ \text{在 Banach 空间之间，"闭" + "线性" + "处处有定义"}\ \Rightarrow\ \text{"有界"}。\ }
+\]</p>
+
+<p>这条让"证算子有界"在很多场合变得简单——你只要验证"图像闭"，往往容易很多。</p>
+
+<h2 id="sec12-6">12.6 三大原理的关系与一个常用应用</h2>
+
+<p>把第 11 章和这一章合在一起看：三大原理彼此<em>都从 Baire 出发</em>，但在分析里担任不同角色：</p>
+
+<ul>
+  <li><strong>Banach–Steinhaus</strong>：从"逐点有界"推"一致有界"——对算子族；</li>
+  <li><strong>开映射 / 有界逆</strong>：从"代数双射 + 有界"推"逆有界"——对单个算子；</li>
+  <li><strong>闭图像</strong>：从"代数线性 + 图像闭"推"有界"——对单个算子。</li>
+</ul>
+
+<p>它们彼此<em>等价</em>（事实上在不少教材里把开映射或闭图像当作核心，再相互推）。本书采取了"开映射 \(\Rightarrow\) 闭图像"的方向，因为开映射的几何最朴素。</p>
+
+<p><strong>典型应用：算子的逆控制。</strong>设 \(A : H_1 \to H_2\) 是 Banach 空间之间的有界双射。由有界逆定理，\(A^{-1}\) 有界，\(\|A^{-1}\| < \infty\)。这就给出</p>
+
+<p>\[
+\boxed{\ \|x\| \le \|A^{-1}\| \cdot \|A x\|, \quad \forall x \in H_1.\ }
+\]</p>
+
+<p>这种"反向估计"在<em>方程稳定性</em>里反复用——它说"输出小 \(\Rightarrow\) 输入小"，即解关于数据连续依赖。在 PDE 与数值分析里，这条常被叫做<em>算子的下估计</em>或<em>条件数</em>。</p>
+
+<p><strong>典型应用：闭子空间的"间接验证"。</strong>有时直接证某个子空间闭很难，但容易写出"它是某个有界算子的核"。如果 \(A\) 有界，则 \(\ker A = A^{-1}(\{0\})\) 是闭子空间（连续函数的逆像闭）。这种"核 \(=\) 闭"的论证在第 22 章 Fredholm 选择性里反复使用。</p>
+
+<p><strong>反向典型应用：闭算子但不连续——无界算子的常见情形。</strong>注意闭图像定理要求"<em>处处</em>有定义"。如果算子只在<em>稠</em>子空间上有定义，"图像闭" 不再蕴含"有界"。典型例子：求导算子 \(D\) 在 \(L^2\) 上是闭的（图像闭于 \(L^2 \times L^2\)）但不有界，因为它的定义域只是稠子集 \(C_c^\infty\) 或 \(H^1\)。这是第 21 章末尾"无界自伴算子"故事的入口——闭算子是无界算子论的基本对象，因为它把"虽然不连续但还算良好"这件事捕获到。</p>
+
+<p>本章 + 上一章 + 上上一章构成"三大原理三部曲"。它们之所以重要，是因为它们让你能用<em>代数</em>条件（满射、双射、图像闭、逐点有界）推<em>分析</em>结论（连续、有界、范数控制）。从此泛函分析进入"代数与分析互相翻译"的成熟阶段。</p>
+
+<p>下一章我们要讲第三类原理性结论：Hahn–Banach 延拓定理。它的精神和本章截然不同——它不靠 Baire，而靠 Zorn 引理（选择公理的等价物）。它要解决的问题是"线性泛函足够多吗？"，结论是"够"，方式是延拓。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 一致有界原理（Banach–Steinhaus）</a><a href="ch13.html">下一章 · 第 13 章 Hahn–Banach 延拓定理 →</a></nav>
+</main>
+</body>
+</html>

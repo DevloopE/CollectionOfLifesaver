@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 16 章 Riesz 表示定理 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 对偶空间 X*</a><a href="ch17.html">下一章 · 第 17 章 弱收敛与弱*收敛 →</a></nav>
+<h1 id="ch16">第 16 章 Riesz 表示定理</h1>
+
+<p>"Riesz 表示" 是泛函分析的几个名头中含义最不固定的——它指代一组结构相似但具体形式不同的定理。它们的共同精神是：<strong>给一个特定 Banach 空间上的有界线性泛函 \(f\)，能不能找到一个具体的"实物"\(\phi\)，让 \(f\) 写成 \(f(x) = \langle x, \phi \rangle\) 这种"具体配对"形式</strong>？</p>
+
+<p>对 Hilbert 空间，"实物" \(\phi\) 是同一个空间里的一个向量；对 \(L^p\) 空间，"实物"是 \(L^q\) 中的函数；对 \(C(K)\) 空间，"实物"是 \(K\) 上的有限有符号 Borel 测度。三种情形各有自己的"Riesz 表示"。本章把它们逐个讲清，并把背后的统一精神挑出来。</p>
+
+<ul>
+  <li>Hilbert 空间上的 Riesz 表示：\(H^* \cong H\) 的等距同构。</li>
+  <li>完整证明（用第 6 章的正交分解定理 + 一行小计算）。</li>
+  <li>\(L^p\) 上的 Riesz 表示：\((L^p)^* \cong L^q\) 通过 \(\int f g\) 配对。</li>
+  <li>\(C(K)\) 上的 Riesz–Markov–Kakutani：\((C(K))^* \cong M(K)\) 通过 \(\int g \, d\mu\)。</li>
+  <li>三种 Riesz 表示的"同根性"——它们都说"对偶配对在某个意义下'就是积分'"。</li>
+  <li>四个直接应用：弱解的存在性、条件期望的几何刻画、广义函数（分布）入门、Lax–Milgram 定理预告。</li>
+</ul>
+
+<h2 id="sec16-1">16.1 Hilbert 空间上的 Riesz 表示</h2>
+
+<p><strong>定理（Riesz 表示，Hilbert 版）。</strong>设 \(H\) 是 Hilbert 空间。对每个 \(f \in H^*\)，存在唯一的 \(\phi_f \in H\) 使</p>
+
+<p>\[
+\boxed{\ f(x) = \langle x, \phi_f \rangle, \quad \forall x \in H.\ }
+\]</p>
+
+<p>且映射 \(f \mapsto \phi_f\) 是 \(H^* \to H\) 的<em>共轭线性</em>等距双射。在<em>实</em> Hilbert 空间上它就是<em>线性</em>等距同构 \(H^* \cong H\)。</p>
+
+<p>"共轭线性"在复情形：\(\overline{\alpha f + \beta g} \mapsto \bar\alpha \phi_f + \bar\beta \phi_g\)。</p>
+
+<h2 id="sec16-2">16.2 证明：第 6 章的正交分解直接给出</h2>
+
+<p>取 \(f \in H^*\)。要构造 \(\phi_f\)。</p>
+
+<p>若 \(f = 0\)，取 \(\phi_f = 0\)。下设 \(f \neq 0\)。</p>
+
+<p>令 \(M = \ker f = \{x : f(x) = 0\}\)。\(f\) 连续 \(\Rightarrow\) \(M\) 是闭子空间。\(f \neq 0 \Rightarrow\) \(M \neq H\) \(\Rightarrow\) \(M^\perp \neq \{0\}\) （由<a href="ch6.html">第 6 章</a>正交分解 \(H = M \oplus M^\perp\)）。</p>
+
+<p>取 \(0 \neq z \in M^\perp\)。我们将令 \(\phi_f = c z\) 适当 \(c\)。</p>
+
+<p>对任意 \(x \in H\)，分解 \(x = (x - \alpha z) + \alpha z\)，其中 \(\alpha = f(x)/f(z)\) 让 \(x - \alpha z \in M\)（验证：\(f(x - \alpha z) = f(x) - \alpha f(z) = 0\)）。</p>
+
+<p>所以 \(\langle x, z \rangle = \langle x - \alpha z, z \rangle + \alpha \langle z, z \rangle = 0 + \alpha \|z\|^2 = (f(x)/f(z)) \|z\|^2\)，即</p>
+
+<p>\[
+f(x) = \frac{f(z)}{\|z\|^2} \langle x, z \rangle = \langle x, \overline{f(z)/\|z\|^2} \cdot z \rangle.
+\]</p>
+
+<p>取 \(\phi_f = \overline{f(z)} \cdot z / \|z\|^2\)（实情形 \(\overline{f(z)} = f(z)\)）。结束。</p>
+
+<p>唯一性：如果 \(\langle x, \phi_1 \rangle = \langle x, \phi_2 \rangle\) 对所有 \(x\)，取 \(x = \phi_1 - \phi_2\) 给 \(\|\phi_1 - \phi_2\|^2 = 0\)。</p>
+
+<p>等距：\(\|f\|_{H^*} = \sup_{\|x\| \le 1} |\langle x, \phi_f \rangle| = \|\phi_f\|\)（Cauchy–Schwarz 上界 + 取 \(x = \phi_f / \|\phi_f\|\) 下界）。</p>
+
+<p>这个证明出奇地短——核心就是"取 \(M^\perp\) 的一个非零向量"，剩下的全是代数。这正是 Hilbert 空间几何的奇迹。</p>
+
+<p><em>对比 Banach 情形</em>：在一般 Banach 空间上没有正交分解，所以不能这样"找一个垂直方向"。\(L^p\)（\(p \neq 2\)）和 \(C(K)\) 的对偶都需要更技术的论证（下面两节简述）。</p>
+
+<h2 id="sec16-3">16.3 \(L^p\) 上的 Riesz 表示</h2>
+
+<p><strong>定理（Riesz–\(L^p\) 版本）。</strong>设 \((\Omega, \mu)\) 是 \(\sigma\)-有限测度空间，\(1 \le p < \infty\)，\(1/p + 1/q = 1\)。对每个 \(f \in (L^p(\Omega))^*\)，存在唯一 \(g \in L^q(\Omega)\) 使</p>
+
+<p>\[
+\boxed{\ f(h) = \int_\Omega h g \, d\mu, \quad \forall h \in L^p(\Omega),\ }
+\]</p>
+
+<p>且 \(\|f\|_{(L^p)^*} = \|g\|_{L^q}\)。等距同构 \((L^p)^* \cong L^q\)。</p>
+
+<p>证明思路（不细写，详细见 Folland《Real Analysis》或 Rudin《Real and Complex Analysis》）：</p>
+
+<ol>
+  <li>\(p = 2\)：直接 Hilbert 版 Riesz；</li>
+  <li>\(1 < p < \infty\) 一般情形：用 Hahn–Banach + 单调收敛 + Radon–Nikodym 定理（这是测度论里最深的结论之一）。具体说，对 \(f \in (L^p)^*\) 构造测度 \(\nu(E) = f(\chi_E)\)（适当符号化），证明 \(\nu \ll \mu\)，由 Radon–Nikodym 给 \(g = d\nu/d\mu\)。</li>
+  <li>\(p = 1, q = \infty\)：同样用 Radon–Nikodym 与 \(\sigma\)-有限。</li>
+</ol>
+
+<p>这条定理之所以重要，是因为它把"\(L^p\) 上的对偶配对"完全<em>显式化</em>——你看到一个 \(L^p\) 上的有界线性泛函，立即知道它"就是" \(L^q\) 中某个具体函数的"积分配对"。这让<em>抽象</em>泛函分析在 \(L^p\) 上变得<em>可手算</em>。</p>
+
+<p><em>注意</em>：定理在 \(p = \infty\) 时失败——\((L^\infty)^*\) 严格大于 \(L^1\)，包含"非积分形式"的奇异线性泛函。这又是 \(L^\infty\) 不自反的根源（第 19 章）。</p>
+
+<h2 id="sec16-4">16.4 \(C(K)\) 上的 Riesz–Markov–Kakutani 表示</h2>
+
+<p>这是三个 Riesz 表示里最让人惊艳的一个：<em>线性泛函 = 测度</em>。</p>
+
+<p><strong>定理（Riesz–Markov–Kakutani）。</strong>设 \(K\) 是紧致 Hausdorff 空间。对每个<em>正</em>线性泛函 \(\Lambda \in C(K)^*_+\)（\(\Lambda(g) \ge 0\) 对 \(g \ge 0\)），存在唯一的 Borel 正则测度 \(\mu\) 在 \(K\) 上使</p>
+
+<p>\[
+\boxed{\ \Lambda(g) = \int_K g \, d\mu, \quad \forall g \in C(K).\ }
+\]</p>
+
+<p>对一般有界线性泛函 \(\Lambda \in C(K)^*\)，存在唯一的有限有符号正则测度 \(\mu \in M(K)\) 使</p>
+
+<p>\[
+\Lambda(g) = \int g \, d\mu,
+\]</p>
+
+<p>且 \(\|\Lambda\| = \|\mu\|_{TV}\)（总变差范数）。所以 \(C(K)^* \cong M(K)\) 等距同构。</p>
+
+<p>证明的核心思想：从 \(\Lambda\) 构造测度——对每个开集 \(U\)，定义</p>
+
+<p>\[
+\mu(U) = \sup\{\Lambda(g) : 0 \le g \le 1, \operatorname{supp}(g) \subset U\}.
+\]</p>
+
+<p>验证 \(\mu\) 是 Borel 外测度，扩展到 Borel \(\sigma\)-代数上的 Radon 测度。详细论证大概十几页，是测度论里最技术的几个证明之一。详见 Rudin《Real and Complex Analysis》第 2 章或<a href="appA.html">附录 A</a>速查。</p>
+
+<p>这条定理把"<em>分析对象</em>（线性泛函）"与"<em>测度对象</em>（积分）"等同起来，是测度论与泛函分析最优雅的桥梁。它的两个直接后果：</p>
+
+<ul>
+  <li><strong>每个连续函数空间上的"平均"操作（线性泛函）背后都有一个测度。</strong>这就是为什么概率论可以从"期望"作为基本概念出发——期望 = 概率测度积分 = 线性泛函。</li>
+  <li><strong>测度可以由它定义的"对函数的积分作用"完全识别。</strong>这是为什么"用测试函数来探测对象"在分布理论、PDE 弱解里有效——测试函数集合的对偶就是测度 / 分布。</li>
+</ul>
+
+<h2 id="sec16-5">16.5 三种 Riesz 表示的统一精神</h2>
+
+<p>把三种 Riesz 表示放在一起，可以看出统一精神：</p>
+
+<table>
+<tr><th>空间</th><th>对偶配对的"实物"</th><th>配对形式</th></tr>
+<tr><td>Hilbert \(H\)</td><td>同空间向量 \(\phi \in H\)</td><td>\(f(x) = \langle x, \phi \rangle\)</td></tr>
+<tr><td>\(L^p\)（\(1 \le p < \infty\)）</td><td>\(L^q\) 函数 \(g\)</td><td>\(f(h) = \int h g \, d\mu\)</td></tr>
+<tr><td>\(C(K)\)</td><td>有限有符号测度 \(\mu\)</td><td>\(\Lambda(g) = \int g \, d\mu\)</td></tr>
+</table>
+
+<p>三种情形都说："对偶 \(=\) 一种'积分配对'"。差别只在配对的"另一边"具体是什么：向量、\(L^q\) 函数、还是测度。这种统一性反映了一条更深的原理：<em>合理的 Banach 空间几乎都有"积分形式"对偶</em>。这条原理在 Sobolev 空间（第 23 章）、分布空间、概率测度空间里反复出现。</p>
+
+<h2 id="sec16-6">16.6 四个应用</h2>
+
+<p><strong>应用 1：Lax–Milgram 定理（变分弱解的存在性）。</strong></p>
+
+<p>设 \(H\) 是 Hilbert 空间，\(a : H \times H \to \mathbb{R}\) 双线性、有界、强制（\(a(u, u) \ge \alpha \|u\|^2\) 某 \(\alpha > 0\)）。对每个 \(L \in H^*\)，存在唯一 \(u \in H\) 使</p>
+
+<p>\[
+a(u, v) = L(v), \quad \forall v \in H.
+\]</p>
+
+<p>证明思路：固定 \(u\)，\(v \mapsto a(u, v)\) 是 \(H^*\) 中的元素，由 Riesz 表示对应 \(H\) 中向量 \(A u\)。\(A\) 是有界算子 + 强制 \(\Rightarrow\) 双射 \(\Rightarrow\) 由 Riesz \(L = A u\) 解。</p>
+
+<p>这条定理是 PDE 椭圆变分形式存在唯一性的标准工具。第 23 章会用它处理 \(-\Delta u = f\) 的弱解。</p>
+
+<p><strong>应用 2：条件期望的几何刻画。</strong>由<a href="ch6.html">第 6 章 6.6 节</a>，条件期望 \(\mathbb{E}[\cdot | \mathcal{G}]\) 是 \(L^2(\mathcal{F}) \to L^2(\mathcal{G})\) 的正交投影。结合 Riesz：条件期望 \(\mathbb{E}[X | \mathcal{G}]\) 是 \(L^2(\mathcal{G})\) 中唯一的 \(Y\) 使 \(\mathbb{E}[X Z] = \mathbb{E}[Y Z]\) 对所有 \(Z \in L^2(\mathcal{G})\)。这就是把"条件期望"用 Riesz 配对刻画的标准方式。</p>
+
+<p><strong>应用 3：分布（广义函数）入门。</strong>取空间 \(\mathcal{D}(\mathbb{R}^n) = C_c^\infty(\mathbb{R}^n)\)（紧支撑光滑函数）。它的对偶 \(\mathcal{D}^*(\mathbb{R}^n)\) 叫<strong>分布空间</strong>。每个分布 \(T \in \mathcal{D}^*\) 通过"和测试函数配对" \(\langle T, \varphi \rangle\) 工作。常见分布：Dirac \(\delta_x\)（\(\langle \delta_x, \varphi \rangle = \varphi(x)\)）、求导后的分布（如 \(\delta'\)）。这些"广义函数"不是 \(L^p\) 中的函数，但通过"对偶配对"它们仍然有意义——这就是分布理论的来源。Schwartz 1945 年的工作把整个 PDE 弱解理论建立在这个基础上。</p>
+
+<p><strong>应用 4：弱*紧致性的兑现。</strong>第 18 章 Banach–Alaoglu 定理说 \(X^*\) 的单位球在弱*拓扑下紧。把它具体化到 \(C([0,1])^* = M([0,1])\)（有限测度），就得到"\(M([0,1])\) 中范数有界的测度列在弱*意义下有收敛子序列"——这是 Helly 选择原理，也是概率论里"分布列紧致性"的基础。</p>
+
+<p>本章把"对偶 = 配对"这件事在三种主要 Banach 空间上落地。下一章我们要进入新主题：弱收敛。这是为了在无穷维里"收回紧致性"——记得第 1 章 1.1 节闭单位球不紧的崩塌？弱收敛会给出某种"代偿"——它在弱意义下让紧致性回来。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 对偶空间 X*</a><a href="ch17.html">下一章 · 第 17 章 弱收敛与弱*收敛 →</a></nav>
+</main>
+</body>
+</html>

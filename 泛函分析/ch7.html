@@ -35,137 +35,297 @@
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 Hilbert 几何：投影与最佳逼近</a><a href="ch8.html">下一章 · 第 8 章 有界线性算子 →</a></nav>
 <h1 id="ch7">第 7 章 正交基与 Fourier 展开</h1>
 
-<p>第 6 章我们解决了"投影到一个闭子空间"的问题。这一章把它推到极端：投影到由<strong>整个正交规范集</strong>张成的（闭）子空间。如果这个集合"够大到张满整个空间"，每个 \(x \in H\) 就能写成一个绝对收敛的级数</p>
+<p>请你回到上一章我们做完的那件事——给 Hilbert 空间一个闭子空间 \(M\)、一个外面的点 \(x\)，最佳逼近 \(P_M(x)\) 是<em>唯一</em> 的，残差 \(x - P_M(x)\) 与 \(M\) 垂直。</p>
+
+<p>现在请你<em>把 \(M\) 推到极端</em>。固定一组正交规范的元素 \(\{e_n\}_{n=1}^\infty \subseteq H\)（\(\langle e_i, e_j \rangle = \delta_{ij}\)）。把 \(M_N := \mathrm{span}\{e_1, \ldots, e_N\}\) 看成"<em>越来越大</em>" 的闭子空间，\(M_1 \subseteq M_2 \subseteq \cdots\)。每个 \(M_N\) 上有最佳逼近</p>
 
 <p>\[
-x = \sum_{n=1}^\infty \langle x, e_n \rangle e_n.
+P_{M_N}(x) = \sum_{n=1}^N \langle x, e_n \rangle \, e_n.
 \]</p>
 
-<p>这就是<strong>抽象 Fourier 展开</strong>。它把你在<a href="../微分方程/index.html">微分方程</a>和<a href="../偏微分方程/ch5.html">偏微分方程</a>里反复用过的 Fourier 级数（\(\sin nx, \cos nx\) 展开）从"具体公式"上升为"任意 Hilbert 空间里都对的几何陈述"。</p>
+<p>让 \(N \to \infty\)。问：</p>
+
+<p>\[
+P_{M_N}(x) \to \ ?
+\]</p>
+
+<p>朴素直觉说"应该收敛到 \(x\) 吧——子空间越来越大、最近点越来越好"。可是这个朴素直觉<em>有个漏洞</em>：\(P_{M_N}(x) \to x\) 当且仅当 \(\bigcup M_N\) 的闭包<em>就是整个</em> \(H\)。如果 \(\{e_n\}\) 张成的子空间<em>不</em>稠密在 \(H\) 里，\(P_{M_N}(x)\) 只会收敛到 \(x\) 在那个子空间闭包里的投影——剩下的"<em>正交补部分</em>" 永远丢掉。</p>
+
+<p>所以<em>"\(\{e_n\}\) 张成稠密"</em> 是把"<em>子空间投影</em>" 推成"<em>恢复全部 \(x\)</em>" 的关键条件。这种"<em>足够大</em>" 的正交规范集叫<em>正交规范基</em>。它把整个 \(H\) 完全分解：每个 \(x\) 都能写成绝对收敛级数 \(x = \sum \langle x, e_n \rangle e_n\)——抽象 Fourier 展开。</p>
+
+<p>这一章把"<em>正交规范基</em>" 这个概念建立成定理，给四条等价刻画，然后看四个标准例子（\(\ell^2\)、三角函数、Legendre、Hermite）。最后两节告诉你两件事：(1) <em>所有可分无穷维 Hilbert 空间"本质上" 都是 \(\ell^2\)</em>（没有第二种长相）；(2) <em>\(L^2\) 收敛是无穷维上"天然" 的收敛——逐点和一致都是更苛刻的概念</em>。</p>
+
+<h2 id="sec7-1">7.1 正交规范基：定义与四条等价</h2>
+
+<p>设 \(H\) 是 Hilbert 空间。一组元素 \(\{e_n\}_{n \in I} \subseteq H\) 叫<em>正交规范集</em>（ONS）若 \(\langle e_i, e_j \rangle = \delta_{ij}\)（即两两垂直，每个范数 1）。</p>
+
+<p>定义：正交规范集 \(\{e_n\}\) 叫<em>正交规范基</em>（ONB，orthonormal basis）若它满足以下任一<em>等价</em> 条件。</p>
+
+<p><strong>定理（正交规范基的四条等价刻画）。</strong>设 \(\{e_n\}_{n=1}^\infty \subseteq H\) 是正交规范集。以下四条等价：</p>
+
+<p>(a) <em>"<em>张成稠密</em>"</em>：\(\overline{\mathrm{span}\{e_n\}} = H\)。</p>
+
+<p>(b) <em>"<em>唯一垂直 0</em>"</em>：若 \(x \in H\) 满足 \(\langle x, e_n \rangle = 0\) 对所有 \(n\)，则 \(x = 0\)。</p>
+
+<p>(c) <em>"<em>Parseval 等式</em>"</em>：\(\|x\|^2 = \sum_{n=1}^\infty |\langle x, e_n \rangle|^2\) 对所有 \(x \in H\)。</p>
+
+<p>(d) <em>"<em>展开收敛</em>"</em>：\(x = \sum_{n=1}^\infty \langle x, e_n \rangle e_n\)（在 \(H\) 范数收敛）对所有 \(x \in H\)。</p>
+
+<p>请你停下来端详这四条。它们说的是<em>同一件事</em> 的四个角度：</p>
 
 <ul>
-  <li>把"正交规范集" \(\to\) "正交规范基"这个跨越讲清楚——核心是<strong>完备性</strong>（基够大）。</li>
-  <li>Bessel 不等式（第 5 章）升级为 Parseval 等式：当基完备时，能量 = 系数平方和。</li>
-  <li>给出三个判别"完备正交基"的等价条件——以后你就有三种工具去验。</li>
-  <li>具体例子：\(\ell^2\) 的标准基；\(L^2[-\pi, \pi]\) 上的三角基；\(L^2[-1, 1]\) 上的 Legendre 多项式；\(L^2(\mathbb{R})\) 上的 Hermite 函数。</li>
-  <li>"可分 Hilbert 空间"和 \(\ell^2\) 的等距同构定理：所有可分无穷维 Hilbert 空间在抽象意义上<em>都是 \(\ell^2\)</em>。</li>
-  <li>Fourier 级数收敛的"\(L^2\)"图像——为什么 \(L^2\) 收敛比逐点收敛"舒服得多"。</li>
+  <li>(a) <em>拓扑视角</em>："<em>这组 \(e_n\) 张得够大，闭包覆盖整个 \(H\)</em>"。</li>
+  <li>(b) <em>几何视角</em>："<em>没有非零向量同时垂直所有 \(e_n\)</em>"——\(\{e_n\}^\perp = \{0\}\)。</li>
+  <li>(c) <em>能量视角</em>："<em>\(x\) 的范数平方 = 系数平方和</em>"——Bessel 不等式（<a href="ch5.html">第 5 章</a> 5.5）的等号情形。</li>
+  <li>(d) <em>展开视角</em>："<em>每个 \(x\) 都能写成 \(\{e_n\}\) 的绝对收敛级数</em>"——抽象 Fourier 展开。</li>
 </ul>
 
-<h2 id="sec7-1">7.1 正交规范基的定义</h2>
+<p>四条里你以前接触过的可能是 (d)（Fourier 级数收敛）；最常用的是 (b)（"<em>验证一组 \(\{e_n\}\) 是基</em>" 的最方便办法是查"<em>谁同时垂直所有 \(e_n\)？只有 0</em>"）。</p>
 
-<p>设 \(H\) 是 Hilbert 空间。一个<strong>正交规范集</strong> \(\{e_\alpha\}_{\alpha \in I}\) 满足 \(\langle e_\alpha, e_\beta \rangle = \delta_{\alpha \beta}\)。</p>
+<h2 id="sec7-2">7.2 等价证明：四条互推</h2>
 
-<p>它叫<strong>完备</strong>（或<strong>正交规范基</strong>），如果它满足下面任一等价条件：</p>
+<p>证明等价的"<em>三角链</em>" 走法：(a) ⟺ (b)，(a) ⟹ (d) ⟹ (c) ⟹ (a)。</p>
 
-<p><strong>定理（完备正交基的等价刻画）。</strong>对正交规范集 \(\{e_\alpha\}\)，下列条件等价：</p>
+<p><strong>(a) ⟺ (b)：</strong>把 \(M = \overline{\mathrm{span}\{e_n\}}\) 当作闭子空间。<a href="ch6.html">第 6 章</a> 6.3 节"<em>双重正交补</em>" 给 \((M^\perp)^\perp = M\)。</p>
 
 <ul>
-  <li>(B1) 张成稠密：\(\overline{\operatorname{span}\{e_\alpha\}} = H\)；</li>
-  <li>(B2) 唯一垂直元素：若 \(\langle x, e_\alpha \rangle = 0\) 对所有 \(\alpha\) 都成立，则 \(x = 0\)；</li>
-  <li>(B3) Parseval 等式：\(\|x\|^2 = \sum_\alpha |\langle x, e_\alpha \rangle|^2\) 对所有 \(x \in H\)；</li>
-  <li>(B4) 展开收敛：\(x = \sum_\alpha \langle x, e_\alpha \rangle e_\alpha\) 在 \(H\) 中收敛，对所有 \(x \in H\)。</li>
+  <li>(a) ⟹ (b)：\(M = H\)，所以 \(M^\perp = \{0\}\)。"<em>同时垂直所有 \(e_n\) ⟺ 在 \(M^\perp\) 里 ⟺ 是 0</em>"。</li>
+  <li>(b) ⟹ (a)：(b) 说 \(M^\perp = \{0\}\)，所以 \(M = (M^\perp)^\perp = \{0\}^\perp = H\)。</li>
 </ul>
 
-<p>这四条等价是 Hilbert 空间几何里最值钱的"四面镜子"。每一条单独看都是关于"基够不够大"的不同陈述。下一节我们证它们等价。</p>
+<p><strong>(a) ⟹ (d)：</strong>设 \(M_N = \mathrm{span}\{e_1, \ldots, e_N\}\)。<a href="ch6.html">第 6 章</a> 6.2 给 \(P_{M_N}(x) = \sum_{n=1}^N \langle x, e_n \rangle e_n\)。要证 \(\sum_{n=1}^N \langle x, e_n \rangle e_n \to x\)。</p>
 
-<p>注意每个 \(x\) 的"展开"自动只有可数多个非零项——这是 Bessel 不等式带来的奇迹（第 5 章 5.5 节末尾提过）。所以即使 \(I\) 是不可数指标集，\(x\) 的展开本质上是可数级数。</p>
+<p>设 \(s_N := P_{M_N}(x)\)。第一步：\(\{s_N\}\) 是 Cauchy 列。算 \(\|s_M - s_N\|^2\)（\(M > N\)）：\(s_M - s_N = \sum_{n=N+1}^M \langle x, e_n \rangle e_n\)，正交规范元素的线性组合，所以</p>
 
-<h2 id="sec7-2">7.2 等价性的证明（核心）</h2>
+<p>\[
+\|s_M - s_N\|^2 = \sum_{n=N+1}^M |\langle x, e_n \rangle|^2.
+\]</p>
 
-<p>(B1) \(\Rightarrow\) (B2)：若 \(\langle x, e_\alpha \rangle = 0\) 对所有 \(\alpha\)，则 \(x \perp \operatorname{span}\{e_\alpha\}\)，由内积连续性 \(x \perp \overline{\operatorname{span}\{e_\alpha\}} = H\)。所以 \(\langle x, x \rangle = 0\)，即 \(x = 0\)。</p>
+<p>Bessel 不等式（5.5）给 \(\sum_n |\langle x, e_n \rangle|^2 \le \|x\|^2 < \infty\)，所以这个尾巴 \(\to 0\)。\(\{s_N\}\) Cauchy。\(H\) 完备，所以 \(s_N \to s\) 对某个 \(s \in H\)。</p>
 
-<p>(B2) \(\Rightarrow\) (B4)：用第 6 章正交分解。令 \(M = \overline{\operatorname{span}\{e_\alpha\}}\)（闭子空间）。由分解，\(x = P_M(x) + (x - P_M(x))\)，且 \(x - P_M(x) \in M^\perp\)。由 (B2)，\(M^\perp = \{0\}\)，所以 \(x = P_M(x)\)。再用第 6 章正交特征 + Bessel 控制，\(P_M(x) = \sum_\alpha \langle x, e_\alpha \rangle e_\alpha\)（这一步细节：先在有限部分和 \(P_{M_N}(x) = \sum_{|n| \le N} \langle x, e_n \rangle e_n\) 上证明 \(P_{M_N}(x) \to P_M(x)\)；Bessel 给级数收敛）。</p>
+<p>第二步：要证 \(s = x\)。看 \(x - s\)：对每个 \(j\)，</p>
 
-<p>(B4) \(\Rightarrow\) (B3)：用 Pythagoras + 范数连续。\(\|x\|^2 = \lim_N \|P_{M_N}(x)\|^2 = \lim_N \sum_{n \le N} |\langle x, e_n \rangle|^2 = \sum |\langle x, e_n \rangle|^2\)。</p>
+<p>\[
+\langle x - s, e_j \rangle = \langle x, e_j \rangle - \lim_N \langle s_N, e_j \rangle = \langle x, e_j \rangle - \langle x, e_j \rangle = 0
+\]</p>
 
-<p>(B3) \(\Rightarrow\) (B1)：若张成不稠，存在 \(0 \neq y \in M^\perp\)。则 \(\langle y, e_\alpha \rangle = 0\) 对所有 \(\alpha\)，由 (B3) \(\|y\|^2 = 0\)，矛盾。</p>
+<p>（最后一步：当 \(N \ge j\) 时 \(\langle s_N, e_j \rangle = \langle x, e_j \rangle\)，因为 \(e_j\) 与其它 \(e_n\) 垂直。）</p>
 
-<p>这条等价证明短而漂亮。它是 Hilbert 空间几何的"主结构定理"——它把"基"这件事的所有几何刻画统一在一起。</p>
+<p>所以 \(x - s\) 同时垂直所有 \(e_n\)。由 (b)（已知 (a) ⟺ (b)，(a) 假设之），\(x - s = 0\)。即 \(s = x\)。</p>
 
-<h2 id="sec7-3">7.3 Parseval 等式：能量守恒</h2>
+<p><strong>(d) ⟹ (c)：</strong>由展开收敛，\(\|x\|^2 = \lim_N \|s_N\|^2\)（范数连续）。\(\|s_N\|^2 = \sum_{n=1}^N |\langle x, e_n \rangle|^2\)（正交规范），所以 \(\|x\|^2 = \sum_{n=1}^\infty |\langle x, e_n \rangle|^2\)。</p>
 
-<p>把 (B3) 单独抽出来强调：</p>
+<p><strong>(c) ⟹ (a)：</strong>反证。设 \(M = \overline{\mathrm{span}\{e_n\}} \neq H\)，则 \(M^\perp \neq \{0\}\)。取 \(0 \neq x \in M^\perp\)，那么 \(\langle x, e_n \rangle = 0\) 对所有 \(n\)，所以 (c) 给 \(\|x\|^2 = \sum 0 = 0\)，矛盾。</p>
+
+<p>四条等价证毕。</p>
+
+<p>请你看清这条证明里<em>谁起的什么作用</em>：</p>
+
+<ul>
+  <li>(a) ⟺ (b)：纯几何（双重正交补）。</li>
+  <li>(a) ⟹ (d)：Bessel 给 Cauchy 性 + \(H\) 完备升级到收敛 + 取极限识别极限。</li>
+  <li>(d) ⟹ (c)：范数连续。</li>
+  <li>(c) ⟹ (a)：反证 + Bessel 不等式的"<em>等号 ⟺ 张成稠密</em>" 几何意义。</li>
+</ul>
+
+<p>这个证明示范了 Hilbert 几何最经典的"<em>四样工具一齐发力</em>"：内积、正交、Bessel、完备性。少一个都不行。</p>
+
+<h2 id="sec7-3">7.3 Parseval 等式：能量守恒的物理意义</h2>
+
+<p>把 7.1 (c) 单独提出来。</p>
 
 <p>\[
 \boxed{\ \|x\|^2 = \sum_{n=1}^\infty |\langle x, e_n \rangle|^2.\ }
 \]</p>
 
-<p>这就是 <strong>Parseval 等式</strong>。它说"总能量等于所有方向上分量平方和"。在 \(\mathbb{R}^n\) 上你早已习惯这条（就是欧氏范数公式），现在它在无穷维 Hilbert 空间里照样成立——前提是基<em>完备</em>。</p>
+<p>左边是 \(x\) 的"<em>能量</em>"（范数平方），右边是 \(x\) 在每个"<em>方向</em>" \(e_n\) 上的<em>分量平方和</em>。Parseval 等式说：<em>"总能量 = 分量能量之和"</em>。</p>
 
-<p>这条等式在物理与工程里以非常多的名字出现：</p>
+<p>这个等式在物理 / 信号处理里叫<em>能量守恒</em>。具体场景：</p>
 
 <ul>
-  <li>Fourier 级数情形：\(\|f\|_{L^2}^2 = \sum_n |\hat f(n)|^2\)（信号能量等于频域系数能量）；</li>
-  <li>Fourier 变换情形：\(\|f\|_{L^2}^2 = \|\hat f\|_{L^2}^2\)（这是 Plancherel 定理，第 23 章会再用）；</li>
-  <li>量子力学情形：态向量的范数 = 各本征态上振幅平方和（这是 Born 概率诠释的几何源头，第 24 章）。</li>
+  <li>声音信号 \(f(t)\)：把它做 Fourier 展开，\(f(t) = \sum c_n e^{i 2\pi n t / T}\)。Parseval 给 \(\int |f(t)|^2 dt = \sum |c_n|^2\)：<em>波形的总能量 = 各频率分量能量之和</em>。这是为什么"<em>把信号在频域里分析等价于在时域里分析</em>"——它们的总能量一样多。</li>
+  <li>量子力学：波函数 \(\psi\) 在能量本征态 \(\{e_n\}\) 上展开，\(\psi = \sum c_n e_n\)。\(|c_n|^2\) 是测得能量为 \(E_n\) 的概率。Parseval 说概率之和 = 1（如果 \(\|\psi\| = 1\)）——<em>概率守恒</em>。这是<a href="ch24.html">第 24 章</a> 量子力学应用的核心。</li>
+  <li>统计：\(L^2\) 函数的方差能被分解到正交基上的"<em>方差贡献</em>" 之和。这是 ANOVA、PCA、谱估计的几何根。</li>
 </ul>
 
-<p>三个名字，三种语境，同一个等式。</p>
+<p>请你停下来感受一件事：Parseval 等式<em>看起来像</em> 个深刻的数学事实。但从这一章的视角看，它<em>就是</em> Pythagoras 的无穷维版——\(s_N = \sum_{n=1}^N c_n e_n\) 是<em>正交</em> 元素的有限和，所以 \(\|s_N\|^2 = \sum |c_n|^2\)（标准 Pythagoras）；让 \(N \to \infty\)，左右各取极限就是 Parseval。<em>整套"无穷维波动力学" 的能量守恒，本质就是直角三角形勾股定理</em>。</p>
 
-<h2 id="sec7-4">7.4 标准例子四件套</h2>
+<p>另一个视角：Parseval 让"<em>正交规范基展开</em>" 成为一种<em>同构</em>——稍后 7.5 节我们会看到，它把 \(H\) 等同于 \(\ell^2\)，把 \(x\) 等同于其系数列 \((c_n)\)，且这个等同<em>保范数 + 保内积</em>。</p>
 
-<p><strong>例 1（\(\ell^2\) 的标准基）。</strong>\(e_n = (0, \ldots, 0, 1, 0, \ldots)\)（第 \(n\) 位为 1）。这是<em>最</em>朴素的正交规范基。\(x \in \ell^2\) 的展开就是 \(x = \sum x_n e_n\)。Parseval 退化为 \(\|x\|_2^2 = \sum |x_n|^2\)，这正是 \(\ell^2\) 范数的定义。</p>
+<h2 id="sec7-4">7.4 四个标准例子</h2>
 
-<p><strong>例 2（\(L^2[-\pi, \pi]\) 的三角基）。</strong></p>
+<p>抽象定理需要看具体例子才有血肉。这一节给四组正交规范基。</p>
 
-<p>\[
-e_n(x) = \frac{e^{inx}}{\sqrt{2\pi}}, \quad n \in \mathbb{Z}.
-\]</p>
+<h3 id="sec7-4-1">例 1：\(\ell^2\) 的标准基</h3>
 
-<p>这是经典 Fourier 级数的几何化版本。完备性来自 Stone–Weierstrass（三角多项式在 \(C(\mathbb{T})\) 中稠 \(\Rightarrow\) 在 \(L^2(\mathbb{T})\) 中稠）。</p>
-
-<p>展开</p>
+<p>在 \(\ell^2 = \{(x_n) : \sum |x_n|^2 < \infty\}\) 里取</p>
 
 <p>\[
-f = \sum_{n \in \mathbb{Z}} \hat f(n) \, e_n, \qquad \hat f(n) = \frac{1}{\sqrt{2\pi}} \int_{-\pi}^{\pi} f(x) e^{-inx} \, dx,
+e_k = (0, \ldots, 0, \underbrace{1}_{\text{第 } k \text{ 位}}, 0, 0, \ldots).
 \]</p>
 
-<p>就是 Fourier 级数。它在 \(L^2\) 中收敛 ——这是 (B4) 给的保证。</p>
+<p>\(\langle e_i, e_j \rangle = \delta_{ij}\) 显然。验证 7.1 (b)："<em>同时垂直所有 \(e_n\)</em>" ⟺ "<em>每一位都是 0</em>" ⟺ \(x = 0\)。所以 \(\{e_n\}\) 是 \(\ell^2\) 的正交规范基。</p>
 
-<p><em>注意</em>：\(L^2\) 收敛 \(\neq\) 逐点收敛。Fourier 级数在 \(L^2\) 里永远收敛到 \(f\)；逐点收敛要苛刻得多（Carleson 1966 证 \(L^2\) 函数 a.e. 收敛是历史名作）。这正是 Hilbert 空间几何"舒服"的地方——\(L^2\) 收敛是天然的，逐点收敛得另作论证。</p>
+<p>展开 \(x = (x_1, x_2, \ldots) = \sum x_n e_n\)（这就是"<em>列向量是分量之和</em>" 的无穷版）。Parseval：\(\|x\|^2 = \sum |x_n|^2\)（这<em>就是</em> \(\ell^2\) 范数的定义）。</p>
 
-<p><strong>例 3（\(L^2[-1, 1]\) 的 Legendre 多项式）。</strong>对 \(\{1, x, x^2, \ldots\}\) 在 \(L^2[-1, 1]\) 内积下做 Gram–Schmidt 得到 Legendre 多项式 \(P_n(x)\)。归一化后 \(\{\sqrt{(2n+1)/2} \, P_n\}_{n \ge 0}\) 是正交规范基。完备性来自多项式在 \(C[-1,1]\) 中稠（Weierstrass）。</p>
+<p>这是<em>最朴素</em> 的 ONB 例子——它把 7.1 的所有概念在最简单的空间上具体化。</p>
 
-<p>这套基是 PDE 球面调和分析的开端：在 \(L^2\) 球面上做球函数展开就是分离变量法的几何版本。</p>
+<h3 id="sec7-4-2">例 2：\(L^2[-\pi, \pi]\) 的三角基</h3>
 
-<p><strong>例 4（\(L^2(\mathbb{R})\) 的 Hermite 函数）。</strong>对 \(\{x^n e^{-x^2/2}\}\) 做 Gram–Schmidt 得 Hermite 函数 \(h_n(x) = c_n H_n(x) e^{-x^2/2}\)，其中 \(H_n\) 是 Hermite 多项式。这是 \(L^2(\mathbb{R})\) 上的正交规范基。它们也是<em>量子谐振子哈密顿量的本征函数</em>——这是为什么量子力学第一道严格解析的题目（一维谐振子）总是用 Hermite 写出来。</p>
-
-<h2 id="sec7-5">7.5 可分 Hilbert 空间 \(\cong \ell^2\)</h2>
-
-<p>一个空间叫<strong>可分</strong>，如果它有可数稠子集。\(\ell^2\)、\(L^2(\mathbb{R}^n)\)、\(L^2(\Omega)\)（\(\Omega\) 紧致或 \(\sigma\)-有限）都可分。</p>
-
-<p>对可分 Hilbert 空间有一条非常深的"无穷维线性代数定理"：</p>
-
-<p><strong>定理（可分 Hilbert 空间唯一性）。</strong>每个可分无穷维 Hilbert 空间都<em>等距同构</em>于 \(\ell^2\)。同构由"取完备正交基的展开"具体给出。</p>
-
-<p>证明思路：可分 \(\Rightarrow\) 存在<em>可数</em>稠子集 \(\Rightarrow\) 由 Gram–Schmidt 抽出可数正交规范集 \(\Rightarrow\) 这个集合完备（因为它的张成包含原稠子集，所以仍稠）\(\Rightarrow\) 同构 \(x \mapsto (\langle x, e_n \rangle)_n\) 是从 \(H\) 到 \(\ell^2\) 的等距双射。</p>
+<p>在 \(L^2[-\pi, \pi]\) 里取</p>
 
 <p>\[
-\boxed{\ \text{所有可分无穷维 Hilbert 空间在等距同构意义下都是 } \ell^2.\ }
+e_n(x) = \frac{1}{\sqrt{2\pi}} e^{i n x}, \quad n \in \mathbb{Z}.
 \]</p>
 
-<p>这是个让人有点震惊的结论：\(L^2(\mathbb{R})\)、\(L^2(\Omega)\)、量子力学的一个粒子态空间——"在抽象意义下"全部是同一个空间 \(\ell^2\)。它们的"差异"完全藏在你选了哪个具体的正交基里——三角基给 Fourier 级数，Hermite 给量子谐振子，球面调和给球面 PDE。</p>
+<p>正交规范：\(\int_{-\pi}^\pi e^{inx} \overline{e^{imx}} \, dx = \int e^{i(n-m)x} dx = 2\pi \delta_{nm}\)。所以这组（除以 \(\sqrt{2\pi}\)）是正交规范集。</p>
 
-<p>这条定理从一面解放了你：抽象 Hilbert 几何只需要做一遍。从另一面收紧了你：所有 \(L^2\) 故事的"真正不同"都不在空间结构上，而在你选的算子和基上。</p>
+<p>"<em>是基</em>" 的证明走 7.1 (a)——这组的张成在 \(L^2[-\pi, \pi]\) 中稠密。这是<em>Stone–Weierstrass 定理</em> 的一个推论：三角多项式在 \(C[-\pi, \pi]\)（连续函数空间）上一致稠密；连续函数在 \(L^2\) 中稠密；所以三角多项式在 \(L^2\) 中稠密。</p>
 
-<h2 id="sec7-6">7.6 \(L^2\) 收敛 vs 逐点收敛 vs 一致收敛</h2>
+<p>展开：\(f \in L^2[-\pi, \pi]\) 有</p>
 
-<p>Fourier 级数的收敛性历来是个尴尬话题。我们这里把"\(L^2\) 视角下的 Fourier 收敛"说清，让你看到为什么 Hilbert 空间的发明<em>就是为了</em>解决这个尴尬。</p>
+<p>\[
+f = \sum_{n \in \mathbb{Z}} \hat f(n) \, \frac{e^{i n x}}{\sqrt{2\pi}}, \quad \hat f(n) = \frac{1}{\sqrt{2\pi}} \int_{-\pi}^\pi f(x) e^{-i n x} \, dx.
+\]</p>
 
-<p>设 \(f \in L^2[-\pi, \pi]\)，\(S_N f\) 是它的 \(N\) 阶 Fourier 部分和。三种收敛：</p>
+<p>这就是<em>Fourier 级数</em>。Parseval：\(\int |f|^2 = \sum |\hat f(n)|^2\)（"<em>波形能量 = 频谱能量</em>"）。</p>
 
-<p><strong>(A) \(L^2\) 收敛：</strong>\(\|S_N f - f\|_2 \to 0\)。<em>由 (B4) 永远成立</em>，对所有 \(f \in L^2\)。这是最舒服的版本。</p>
+<p>实数版：用 \(\{1/\sqrt{2\pi}, \cos(nx)/\sqrt{\pi}, \sin(nx)/\sqrt{\pi}\}_{n \ge 1}\)，正交规范。展开就是你以前学过的 \(f(x) = a_0/2 + \sum (a_n \cos nx + b_n \sin nx)\)（系数差一个标量调整）。</p>
 
-<p><strong>(B) 逐点收敛：</strong>\(S_N f(x) \to f(x)\) 对每个 \(x\)。<em>不一定成立</em>。Du Bois-Reymond 1873 给过连续函数 Fourier 级数在某点发散的反例。Carleson 1966 证 \(L^2\) 函数 a.e. 逐点收敛——这是 20 世纪最难的分析定理之一。</p>
+<p>请你回头想：你在<a href="../微分方程/index.html">微分方程</a>课和<a href="../偏微分方程/index.html">偏微分方程</a>课里反复用 Fourier 级数解 PDE——分离变量、热方程、波动方程——背后的"<em>为什么这样的展开收敛</em>" 你以前可能没问过。现在的回答：因为三角函数是 \(L^2[-\pi, \pi]\) 的<em>正交规范基</em>，由 7.1 (d) 展开<em>必然在 \(L^2\) 中收敛</em>。</p>
 
-<p><strong>(C) 一致收敛：</strong>\(\|S_N f - f\|_\infty \to 0\)。<em>更不一定</em>。要求 \(f\) 至少 \(C^1\) 才能保证。</p>
+<h3 id="sec7-4-3">例 3：\(L^2[-1, 1]\) 的 Legendre 多项式</h3>
 
-<p>"\(L^2\) 收敛永远成立，逐点和一致收敛要苛刻得多"——这个反差是 Hilbert 空间在 Fourier 分析里地位的根源。每当一个分析问题需要"展开 + 收敛"，把它放进 \(L^2\) 几乎总是最干净的选择。</p>
+<p>在 \(L^2[-1, 1]\) 上做<em>Gram–Schmidt</em>：从单项式列 \(\{1, x, x^2, x^3, \ldots\}\) 出发正交化。前几个：</p>
 
-<p>这个原则在第 23 章 Sobolev 与变分法里会反复出现：弱解的存在性几乎总是先在 \(L^2\) 或 \(H^k\) 框架下证，然后再用嵌入或正则性论证升到逐点或一致。<em>"先 \(L^2\)，后正则性"</em>是现代 PDE 的黄金路径。</p>
+<p>\[
+P_0(x) = 1, \quad P_1(x) = x, \quad P_2(x) = \frac{1}{2}(3x^2 - 1), \quad P_3(x) = \frac{1}{2}(5x^3 - 3x), \ldots
+\]</p>
 
-<p>下一章我们要离开 Hilbert 几何，进入<em>算子</em>的世界——把"线性映射"在赋范空间之间的连续性、有界性、范数全部讲清。从那里开始，泛函分析进入第二层："不只研究空间，还研究空间上的算子"。</p>
+<p>这组叫<em>Legendre 多项式</em>。归一化后（\(P_n\) 范数是 \(\sqrt{2/(2n+1)}\)）就成正交规范集。</p>
+
+<p>"<em>是基</em>" 的证明：Weierstrass 逼近定理（连续函数在 \([-1, 1]\) 上能被多项式一致逼近）+ 连续函数在 \(L^2\) 中稠密——所以多项式在 \(L^2[-1, 1]\) 中稠密，Legendre 多项式张成稠密。</p>
+
+<p>展开：\(f \in L^2[-1, 1]\) 有 \(f = \sum c_n P_n / \|P_n\|\)。这种展开在数值积分（Gauss–Legendre 求积公式）和 PDE（球面调和函数的径向部分）里反复出现。</p>
+
+<h3 id="sec7-4-4">例 4：\(L^2(\mathbb{R}, e^{-x^2} dx)\) 的 Hermite 多项式</h3>
+
+<p>在加权 \(L^2(\mathbb{R}, e^{-x^2} dx)\)（内积 \(\langle f, g \rangle = \int f \bar g \, e^{-x^2} dx\)）上对 \(\{1, x, x^2, \ldots\}\) Gram–Schmidt。前几个：</p>
+
+<p>\[
+H_0(x) = 1, \quad H_1(x) = 2x, \quad H_2(x) = 4x^2 - 2, \quad H_3(x) = 8x^3 - 12 x, \ldots
+\]</p>
+
+<p>这是<em>Hermite 多项式</em>。归一化后（\(\|H_n\|^2 = \sqrt{\pi} \cdot 2^n n!\)）成正交规范集。</p>
+
+<p>"<em>是基</em>" 涉及"<em>多项式 \(\cdot\) Gauss 衰减</em>" 在加权 \(L^2\) 中稠密——这条证明用 Stone–Weierstrass 的一种变种。</p>
+
+<p>把权 \(e^{-x^2}\) "<em>吸到</em>" 函数里去：定义 \(\tilde H_n(x) = H_n(x) e^{-x^2/2}\)。这组 \(\{\tilde H_n\}\) 是<em>普通</em> \(L^2(\mathbb{R})\)（Lebesgue 测度）的正交规范基——<em>Hermite 函数</em>。它们是<em>量子谐振子</em> 的能量本征态（<a href="ch24.html">第 24 章</a> 应用）。</p>
+
+<p>这四个例子的统一性：<em>每个 ONB 都来自某个"自然" 的正交化过程</em>。\(\ell^2\) 的标准基天然正交。三角函数是平移 / 周期对称性的本征函数。Legendre 是单项式在 \([-1, 1]\) 上的 Gram–Schmidt 结果，并且是 Sturm–Liouville 算子的本征函数。Hermite 同样是某 Sturm–Liouville 算子（量子谐振子）的本征函数。"<em>本征函数 = ONB</em>" 这条线索在<a href="ch21.html">第 21 章</a> 紧自伴算子谱定理里被推到极限——<em>每个</em> 紧自伴算子都给出一组 ONB（它的本征函数）。</p>
+
+<h2 id="sec7-5">7.5 可分 Hilbert 空间 ≅ \(\ell^2\)</h2>
+
+<p>到现在我们看了几个具体的 Hilbert 空间——\(\ell^2\)、\(L^2[-\pi, \pi]\)、\(L^2[-1, 1]\)、\(L^2(\mathbb{R})\)——它们看起来很不一样：一个是数列空间，三个是函数空间，函数空间又有不同的定义域和测度。可这一节告诉你：它们<em>本质上都是同一个空间</em>——都和 \(\ell^2\) 同构。</p>
+
+<p>先回顾：度量空间叫<em>可分</em> 的若它含<em>可数稠密子集</em>。所有 7.4 的例子都可分（多项式 / 三角多项式 / 等等是它们各自的可数稠密集）。事实上在<em>实际遇到</em> 的 Hilbert 空间几乎全是可分的——非可分 Hilbert 空间是相当特殊的对象。</p>
+
+<p><strong>定理（可分 Hilbert 空间结构定理）。</strong>设 \(H\) 是可分无穷维 Hilbert 空间。则 \(H\) 与 \(\ell^2\) 等距同构，即<em>存在</em> 双射 \(U : H \to \ell^2\) 满足</p>
+
+<p>\[
+\langle U x, U y \rangle_{\ell^2} = \langle x, y \rangle_H \quad \text{对所有 } x, y \in H.
+\]</p>
+
+<p>等距同构意味着 \(U\) 不只是双射，还<em>保内积</em>（特别保范数 + 保正交）——\(H\) 与 \(\ell^2\) 在 Hilbert 几何意义下<em>不可区分</em>。</p>
+
+<p>证明草图。两步。</p>
+
+<p>第一步：可分 \(H\) 有可数 ONB。</p>
+
+<p>取 \(\{x_n\}_{n=1}^\infty\) 是 \(H\) 的可数稠密集。对它做<em>Gram–Schmidt 正交化</em>——按顺序取每个 \(x_n\)，减掉它在前面已构造好的 ONS 上的投影分量，再归一化。如果减后是 0（即 \(x_n\) 落在前面的张成里），跳过它。这给一组正交规范集 \(\{e_n\}\)（数量可能少于 \(x_n\)，但因为 \(H\) 无穷维所以仍是无穷的）。</p>
+
+<p>检查 7.1 (a)：\(\{e_n\}\) 张成稠密。理由：\(\mathrm{span}\{e_1, \ldots, e_N\} = \mathrm{span}\{x_1, \ldots, x_M\}\)（某个 \(M \ge N\)），所以 \(\overline{\mathrm{span}\{e_n\}} \supseteq \overline{\{x_n\}} = H\)。所以 \(\{e_n\}\) 是 ONB。</p>
+
+<p>第二步：构造同构 \(U\)。</p>
+
+<p>对 \(x \in H\)，\(U x := (\langle x, e_n \rangle)_{n=1}^\infty\)。Bessel 给 \(\sum |\langle x, e_n \rangle|^2 \le \|x\|^2 < \infty\)，所以 \(U x \in \ell^2\)。</p>
+
+<p>线性是显然的（内积线性）。保范数 / 保内积：Parseval 给 \(\|U x\|_{\ell^2}^2 = \sum |\langle x, e_n \rangle|^2 = \|x\|^2\)；类似地（极化恒等式）保内积。</p>
+
+<p>满射：给任意 \((c_n) \in \ell^2\)，\(\sum c_n e_n\) 在 \(H\) 中收敛（部分和是 Cauchy 列：\(\|s_M - s_N\|^2 = \sum_{n=N+1}^M |c_n|^2 \to 0\)），极限 \(x \in H\)，且 \(\langle x, e_k \rangle = c_k\)（对每个 \(k\) 验证）。</p>
+
+<p>单射：\(U x = 0\) ⟹ \(\langle x, e_n \rangle = 0\) 所有 \(n\) ⟹ \(x = 0\)（7.1 (b)，因为 \(\{e_n\}\) 是 ONB）。</p>
+
+<p>证毕。</p>
+
+<p>\[\boxed{\ \text{所有可分无穷维 Hilbert 空间} \cong \ell^2.\ }\]</p>
+
+<p>请你停下来感受这条结论的<em>结构性</em>。它说的是——<em>抽象的可分 Hilbert 空间只有一种长相</em>。\(L^2[-\pi, \pi]\)、\(L^2[-1, 1]\)、\(L^2(\mathbb{R})\)、抽象的<em>任何</em> 可分无穷维 Hilbert 空间，只要选好一组 ONB 就能"<em>翻译</em>" 成 \(\ell^2\)，每条 Hilbert 几何性质都<em>原样保留</em>。</p>
+
+<p>有限维有平行的事实：所有 \(n\) 维实内积空间都<em>等距同构</em> 于 \(\mathbb{R}^n\)（标准内积）。无穷维的 \(\ell^2\) 在可分 Hilbert 空间这个范畴里扮演的角色<em>就是</em> \(\mathbb{R}^n\) 在有限维内积空间范畴里的角色——<em>"标准模型"</em>。</p>
+
+<p>这件事的意义。当你在抽象 \(L^2(\Omega)\) 里证明一个 Hilbert 空间结论时——比如"<em>紧自伴算子的本征函数能张成 \(L^2(\Omega)\)</em>"——你<em>本质</em> 在证 \(\ell^2\) 上的对应结论。所有"<em>可分 Hilbert 空间</em>" 故事都能化简到 \(\ell^2\)。这是泛函分析<em>巨大的简化</em>——一个无穷维空间能完全用列向量描述。</p>
+
+<p>注意"<em>可分</em>" 的限制。非可分 Hilbert 空间存在（如 \(\ell^2(I)\)，\(I\) 不可数）；它们的 ONB 也存在（用 Zorn 引理），但<em>大小</em>等于 \(I\)。所有"<em>同维数</em>" 的 Hilbert 空间是同构的（"<em>维数</em>" 在这里是 ONB 的基数）；可分对应可数维。</p>
+
+<h2 id="sec7-6">7.6 \(L^2\) 收敛 vs 逐点 vs 一致</h2>
+
+<p>正交规范基展开的"<em>收敛</em>" 是<em>\(L^2\) 范数收敛</em>——\(\|s_N - x\|_{L^2} \to 0\)。请你停下来反省一件事：以前你在<a href="../微分方程/index.html">微分方程</a>里看到 Fourier 级数 \(\sum (a_n \cos nx + b_n \sin nx)\) 时，可能默默以为它<em>逐点</em> 收敛到 \(f\)，或者更强的<em>一致</em> 收敛。这两种期望<em>都不对</em>。Fourier 级数的收敛在<em>\(L^2\) 意义</em> 下<em>总是</em> 成立（如果 \(f \in L^2\)），<em>逐点</em> 和<em>一致</em> 都<em>不</em> 自动给。</p>
+
+<p>具体看：</p>
+
+<ul>
+  <li><em>\(L^2\) 收敛</em>：\(\int |s_N - f|^2 \to 0\)。由 7.1 (d) "<em>展开收敛</em>"，对<em>每个</em> \(L^2\) 函数<em>自动</em> 给。</li>
+  <li><em>逐点收敛</em>：\(s_N(x) \to f(x)\) 对几乎每个 \(x\)。这是 Carleson 1966 的著名定理——成立但<em>极</em>难证（不是这本书的内容）。</li>
+  <li><em>一致收敛</em>：\(\sup_x |s_N(x) - f(x)| \to 0\)。需要 \(f\) 满足相当强的光滑条件（如 \(f\) 连续 + \(f' \in L^2\)）。</li>
+</ul>
+
+<p>更不安的——du Bois-Reymond 1873 构造了<em>连续函数 \(f\) 使其 Fourier 级数在某个点不收敛</em>。所以"<em>连续 + Fourier 级数 ⟹ 逐点收敛</em>" 也错。要保证逐点收敛，需要更强的条件（Dirichlet 判别法、Lipschitz 条件、或 Carleson 那种深刻分析）。</p>
+
+<p>请你看清楚这件事的<em>颠覆性</em>。"<em>逐点</em>" 和"<em>一致</em>" 是你以前在<a href="../实分析/index.html">实分析</a>里的核心收敛模式——你做了几百页极限交换 / 函数列收敛的练习，全都用这两种。<em>到了 \(L^2\) 里，这两种收敛都"<em>太苛刻</em>"</em>。</p>
+
+<p>反过来，"<em>\(L^2\) 收敛</em>" 是<em>更松</em> 的概念——它只看"<em>积分意义下的差</em>"，不要求每个点都对得上。这种放松<em>正好</em> 配合 Hilbert 几何——它对应"<em>距离 = 范数</em>"。</p>
+
+<p>从泛函分析视角，"<em>\(L^2\) 收敛是无穷维上天然的收敛</em>" 是因为：</p>
+
+<ol>
+  <li>它由<em>内积导出范数</em>，所以你能用平行四边形 / Pythagoras / Bessel / Parseval 等几何工具。</li>
+  <li>它<em>等价于"投影 / 展开有限项 \(\to\) 无限项"</em>——这<em>就是</em> 7.1 (d)。</li>
+  <li>它让 \(L^2\) 是<em>完备</em> 的，所以 Cauchy 列 \(\to\) 极限——这是 Hilbert 空间结构的<em>基础</em>。</li>
+</ol>
+
+<p>"<em>逐点</em>" 和"<em>一致</em>" 在这套几何里不自然——它们不来自任何范数 / 内积，是<em>另一种</em>（<em>非线性</em>）收敛。一致收敛可以由 \(\|\cdot\|_\infty\) 范数刻画，但 \(L^\infty\) 不是 Hilbert 空间（无内积），所以投影几何完全失效。这是<a href="ch5.html">第 5 章</a>结尾我说"<em>\(L^2\) 是唯一有内积的 \(L^p\)</em>" 的延续——只有 \(L^2\) 有"<em>内积带来的几何</em>"，所以只有 \(L^2\) 收敛能配 Hilbert 投影定理。</p>
+
+<p>这条认识在以后的应用里反复重要：</p>
+
+<ul>
+  <li><em>PDE 弱解</em>（<a href="ch23.html">第 23 章</a>）：用 \(H^1\)（Sobolev 版的 \(L^2\)）收敛 / 范数。逐点意义下"<em>解方程</em>" 太苛刻，\(L^2 / H^1\) 意义下足够。</li>
+  <li><em>统计 / ML</em>：均方误差 \(\mathbb{E}[(\hat f - f)^2]\) <em>就是</em> \(L^2\) 误差。"<em>逐点最优</em>" 通常做不出来，"<em>\(L^2\) 平均最优</em>" 做得出来——这是为什么回归 / 投影 / 条件期望全用 \(L^2\)。</li>
+  <li><em>信号处理</em>：能量度量自然是 \(L^2\)。逐点理想滤波很难（吉布斯现象就是逐点失败的例子），但 \(L^2\) 意义下任何滤波都能"<em>能量近似</em>"。</li>
+</ul>
+
+<h2 id="sec7-7">7.7 一张全景图</h2>
+
+<p>这一章把 Hilbert 几何推到了最干净的形式。三件主要事：</p>
+
+<ul>
+  <li><em>正交规范基</em>（7.1 + 7.2）：四条等价刻画——稠密 / 唯一垂直 0 / Parseval / 展开收敛。它把"<em>有内积 + 完备</em>" 加上"<em>足够多的方向</em>" 升级为"<em>每个向量都有展开</em>"。</li>
+  <li><em>结构定理</em>（7.5）：所有可分无穷维 Hilbert 空间都同构于 \(\ell^2\)。一种长相，无第二种。</li>
+  <li><em>收敛模式</em>（7.6）：\(L^2\) 收敛是 Hilbert 几何<em>原生</em> 的；逐点和一致是<em>更苛刻</em> 的、和这套几何不直接配套的概念。</li>
+</ul>
+
+<p>四个标准例子（7.4）让抽象具体化——\(\ell^2\) 标准基、三角函数、Legendre、Hermite，每一组都来自一个"<em>自然</em>" 的正交化或本征展开。</p>
+
+<p>请你回头看一下这一章和上一章合起来做的事：</p>
+
+<ul>
+  <li><a href="ch6.html">第 6 章</a>：投影到<em>一个</em> 闭子空间——给唯一最佳逼近。</li>
+  <li>本章：投影到<em>所有</em> ONB 张成的子空间——每个 \(x\) 都被完全展开。</li>
+</ul>
+
+<p>从一个子空间到"<em>所有方向</em>"——这是<em>有限维线性代数</em>"基<em>展开</em>" 思想的<em>无穷维实现</em>。在线性代数里，\(\mathbb{R}^n\) 的标准基让任意 \(x\) 写成 \(x = \sum x_i e_i\)；在 Hilbert 空间里，ONB 让任意 \(x\) 写成 \(x = \sum \langle x, e_n \rangle e_n\)（绝对收敛，用 Bessel + 完备）。<em>同一种代数 / 几何，搬到了无穷维</em>。要付的税：基要<em>正交规范</em>，空间要<em>完备</em>，基要<em>张成稠密</em>——这些"税" 是有限维白送的事实，无穷维必须明示。</p>
+
+<p>下一章我们离开 Hilbert 空间的"<em>静态</em>" 几何，进入<em>算子</em> 的世界——把"<em>线性映射 \(T : X \to Y\)</em>" 当成研究对象，研究"<em>什么时候连续</em>"、"<em>什么时候有界</em>"、"<em>怎么定义算子范数</em>"。这是另一个层级的抽象，也是泛函分析后半本（算子论 + 谱论）的开端。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 Hilbert 几何：投影与最佳逼近</a><a href="ch8.html">下一章 · 第 8 章 有界线性算子 →</a></nav>
 </main>

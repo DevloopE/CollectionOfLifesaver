@@ -32,148 +32,267 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 紧自伴算子的谱定理</a><a href="ch23.html">下一章 · 第 23 章 应用：Sobolev 空间与变分入门 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 紧自伴算子谱定理</a><a href="ch23.html">下一章 · 第 23 章 Sobolev 空间 + 变分入门 →</a></nav>
 <h1 id="ch22">第 22 章 Fredholm 选择性</h1>
 
-<p>这一章把<a href="ch20.html">第 20 章</a>紧算子论"代数侧"的中心事实——<strong>Fredholm 选择性</strong>——讲完整。它要解决的问题非常具体：</p>
+<p>请你回想<a href="../线性代数/index.html">线性代数</a>里"<em>方阵的选择性</em>" 这条铁律。给 \(n \times n\) 方阵 \(A\)，要解 \(A x = y\)。结论很干脆：</p>
 
-<p>"<strong>给一个紧算子 \(T\) 与一个非零数 \(\lambda\)，方程 \(T x - \lambda x = y\) 在什么时候可解？解唯一吗？\</strong>"</p>
+<p><em>下面三条等价</em>：</p>
 
-<p>有限维线性代数的回答是众所周知的——"齐次方程唯一 \(\iff\) 非齐次有解"。这条等价用矩阵秩论证三行写完。Fredholm 1903 发现：在<em>积分方程</em>的语境（即对紧算子）下，<em>同样的等价</em> 在无穷维仍成立。这是个让人惊艳的结论——它把"无穷维 \(I - T\) 的可解性"完全降到"有限维线性方程"水平。</p>
+<ol>
+  <li>\(A x = 0\) 只有平凡解（即 \(\ker A = 0\)）。</li>
+  <li>\(A x = y\) 对每个 \(y\) 都有<em>唯一</em>解。</li>
+  <li>\(A\) 满秩 / 可逆。</li>
+</ol>
+
+<p>这是有限维线性代数的<em>选择性</em>——要么齐次方程只零解 + 非齐次方程总可解 + 解唯一，要么齐次有非零解 + 非齐次只对某些 \(y\) 可解 + 非齐次解空间是仿射子空间。两种情形<em>二选一</em>。</p>
+
+<p>有限维这条来自维数论："\(\dim \ker A + \dim \mathrm{range}\, A = n\)"——所以核大 \(\iff\) 像小，反之亦然。在<em>无穷维</em>，维数论失效（一边无穷一边无穷不能减），所以这条选择性<em>一般不成立</em>。比如<a href="ch1.html#sec1-5">第 1 章 1.5</a> 的右移算子：单射但不满射——既不属于"齐次唯一" 也不属于"非齐次总有解"，根本破了选择性。</p>
+
+<p>但 1903 年 Fredholm 在研究积分方程时观察到一件惊人的事：<em>对方程 \(T x - \lambda x = y\)，其中 \(T\) 是紧算子且 \(\lambda \ne 0\)，有限维选择性<em>原样</em>恢复</em>。这条恢复让 PDE 弱解理论 + 积分方程 + 边值问题都被同一套抽象工具统一处理——所以 Fredholm 选择性常被称为"<em>20 世纪上半叶分析最优雅定理</em>"。</p>
+
+<p>本章把这条选择性正式陈述、给完整证明（六步：Riesz 引理 → 核有限维 → 像闭 → 像有限余维 → 指数 0 → 选择性）、再给三个标准应用。中心结果：</p>
+
+<p>\[
+\boxed{\ T \in \mathcal{K}(X), \lambda \ne 0 \implies \ker(T - \lambda I) \cong \mathrm{coker}(T - \lambda I) \text{ 维数有限且相等。}\ }
+\]</p>
+
+<h2 id="sec22-1">22.1 Fredholm 选择性陈述</h2>
+
+<p>设 \(X\) 是 Banach，\(T \in \mathcal{K}(X)\) 紧，\(\lambda \in \mathbb{C} \setminus \{0\}\)。记 \(A := T - \lambda I\)（注意符号——是 \(T\) 减 \(\lambda I\)，不是 \(\lambda I - T\)；两者只差一个符号，不影响结论但要一致）。</p>
+
+<p>用<em>有限维语言</em> 描述选择性，下面六条等价：</p>
+
+<ol>
+  <li><em>齐次唯一</em>：\(A x = 0 \implies x = 0\)，即 \(\ker A = 0\)。</li>
+  <li><em>非齐次有解</em>：\(A x = y\) 对<em>每个</em> \(y \in X\) 有解。</li>
+  <li><em>双射</em>：\(A\) 是双射。</li>
+  <li><em>可逆</em>：\(A^{-1}\) 存在且有界。</li>
+  <li><em>\(\lambda \notin \sigma(T)\)</em>。</li>
+  <li><em>\(\dim \ker A = \dim \mathrm{coker}\, A\)</em> 等于 0（\(\mathrm{coker}\, A := X / \mathrm{range}\, A\)）。</li>
+</ol>
+
+<p>注：(1) ⟺ (2) ⟺ ... ⟺ (5) 是<em>典型</em> Fredholm 形态——"<em>齐次唯一</em>" 这件本来不一定蕴含"<em>非齐次有解</em>" 的事，在紧扰动下被迫等价。</p>
+
+<p>更强的陈述（"<em>定量</em> 形式"）：</p>
+
+<p><strong>定理（Fredholm 选择性 + 指数 0）。</strong>设 \(T \in \mathcal{K}(X), \lambda \ne 0\)，\(A = T - \lambda I\)。则：</p>
+
+<ol>
+  <li>\(\dim \ker A < \infty\)。</li>
+  <li>\(\mathrm{range}\, A\) 在 \(X\) 中<em>闭</em>。</li>
+  <li>\(\dim \mathrm{coker}\, A < \infty\)。</li>
+  <li>\(\dim \ker A = \dim \mathrm{coker}\, A\)（即 \(A\) 是<em>指数 0</em> 的 Fredholm 算子）。</li>
+</ol>
+
+<p>从 (4) 立即得"<em>(1) ⟺ (2)</em>"——核为 0 \(\iff\) cokernel 为 0 \(\iff\) range 满。</p>
+
+<p>这条定理的<em>定性意义</em>：紧扰动 \(T\) 把恒等 \(I\) 变成 \(I + (T - I) \cdot \) 系数，但<em>不改变</em> 它的"<em>指数</em>"。指数是个拓扑不变量——衡量"算子离可逆有多远"——紧扰动是它的"<em>不动操作</em>"。</p>
+
+<p>本章余下五节就是上面四步的证明 + 应用。</p>
+
+<h2 id="sec22-2">22.2 Riesz 引理与"无穷维单位球不紧"</h2>
+
+<p>证明 Fredholm 需要一个细节工具：在赋范空间里，如果有一个真闭子空间，可以找到"<em>差不多远</em>" 单位向量与它隔开。这就是<em>Riesz 引理</em>。</p>
+
+<p><strong>Riesz 引理。</strong>设 \(X\) 赋范，\(Y \subsetneq X\) 是<em>闭真</em> 子空间。则对任意 \(0 < \delta < 1\)，存在 \(z \in X\) 满足 \(\|z\| = 1\) 且 \(\mathrm{dist}(z, Y) := \inf_{y \in Y} \|z - y\| \ge 1 - \delta\)。</p>
+
+<p>"<em>差不多远</em>"——你想从 \(Y\) 隔开 \(1 - \delta\)，可以；隔开<em>满 \(1\)</em> 一般做不到（除非 \(X\) 是 Hilbert，<a href="ch6.html">第 6 章</a>正交分解给）。Banach 上只能差一点点。</p>
+
+<p><em>证明。</em>取 \(x \in X \setminus Y\)（存在因 \(Y \neq X\)）。设 \(d := \mathrm{dist}(x, Y) > 0\)（\(Y\) 闭 + \(x \notin Y\) \(\implies\) \(d > 0\)）。</p>
+
+<p>由下确界定义，存在 \(y_0 \in Y\) 使 \(d \le \|x - y_0\| \le d / (1 - \delta)\)。设</p>
+
+<p>\[
+z := \frac{x - y_0}{\|x - y_0\|}.
+\]</p>
+
+<p>\(\|z\| = 1\)。对任意 \(y \in Y\)：</p>
+
+<p>\[
+\|z - y\| = \frac{\|x - y_0 - \|x - y_0\| y\|}{\|x - y_0\|} = \frac{\|x - (y_0 + \|x - y_0\| y)\|}{\|x - y_0\|}.
+\]</p>
+
+<p>\(y_0 + \|x - y_0\| y \in Y\)（\(Y\) 是子空间）\(\implies\) 分子 \(\ge d\)。所以</p>
+
+<p>\[
+\|z - y\| \ge \frac{d}{\|x - y_0\|} \ge \frac{d}{d / (1 - \delta)} = 1 - \delta.
+\]</p>
+
+<p>对所有 \(y\) 取下确界：\(\mathrm{dist}(z, Y) \ge 1 - \delta\)。\(\square\)</p>
+
+<p><strong>推论（无穷维单位球不紧）。</strong>设 \(X\) 是无穷维赋范。则 \(\overline{B}_X(0, 1)\) 不紧。等价地：<em>赋范空间单位球紧 \(\iff\) 空间有限维</em>。</p>
+
+<p><em>证明。</em>"\(\Leftarrow\)" 是 Heine-Borel。"\(\Rightarrow\)" 用 Riesz 反证。设 \(X\) 无穷维。任取 \(x_1\) 单位向量，\(Y_1 := \mathrm{span}\{x_1\}\)（一维 \(\implies\) 闭真子空间——任何有限维子空间在 Banach 上自动闭）。Riesz 给 \(x_2\) 单位、\(\mathrm{dist}(x_2, Y_1) \ge 1/2\)。</p>
+
+<p>设 \(Y_2 := \mathrm{span}\{x_1, x_2\}\)（二维闭真）。Riesz 给 \(x_3\) 单位、\(\mathrm{dist}(x_3, Y_2) \ge 1/2\)。</p>
+
+<p>...递归。得无穷序列 \(\{x_n\}\) 单位向量、两两距离 \(\|x_n - x_m\| \ge 1/2\)（\(n < m\) 时 \(x_m\) 距 \(Y_{m-1} \supset \{x_n\}\) 远 \(1/2\)）。无 Cauchy 子列 \(\implies\) 单位球不紧。\(\square\)</p>
+
+<p>这条推论<a href="ch1.html#sec1-1">第 1 章 1.1 节</a>用过——\(\ell^2\) 标准基直接验证。Riesz 引理把这条推广到<em>任何</em> 无穷维赋范空间，包括 Banach 不带内积的情况。</p>
+
+<h2 id="sec22-3">22.3 \(\ker(T - \lambda I)\) 有限维</h2>
+
+<p>第一步证明。\(N := \ker A = \ker(T - \lambda I) = \{x : T x = \lambda x\}\)。即 \(\lambda\) 的特征空间。</p>
+
+<p><em>断言：\(N\) 有限维。</em></p>
+
+<p><em>证明。</em>看 \(T\) 限制到 \(N\) 上。对 \(x \in N\)，\(T x = \lambda x \implies T|_N = \lambda I_N\)。即 \(T\) 在 \(N\) 上是<em>纯量乘子</em>。</p>
+
+<p>\(T\) 紧 \(\implies T|_N\) 紧（紧算子的限制紧——序列论证立得）。但 \(T|_N = \lambda I_N\) 是 \(N\) 上的恒等算子的 \(\lambda\) 倍——它紧 \(\iff\) 恒等算子 \(I_N\) 紧 \(\iff N\) 单位球紧 \(\iff N\) 有限维（22.2 节推论）。</p>
+
+<p>\(\lambda \ne 0\) \(\implies\) \(\lambda I_N\) 紧 \(\implies I_N\) 紧 \(\implies N\) 有限维。\(\square\)</p>
+
+<p>这条推理的核心：<em>"紧算子的特征空间必有限维"</em>。证明走了"<em>限制紧 + 限制是非零纯量乘 + 单位球紧 \(\iff\) 有限维</em>" 的链。每一步都用上了我们之前 22 章里建好的工具，串起来非常优雅。</p>
+
+<p>\[\boxed{\ T \text{ 紧}, \lambda \ne 0 \implies \dim \ker(T - \lambda I) < \infty.\ }\]</p>
+
+<h2 id="sec22-4">22.4 \(\mathrm{range}(T - \lambda I)\) 闭</h2>
+
+<p>第二步——比第一步深得多。设 \(R := \mathrm{range}\, A = (T - \lambda I) X\)。</p>
+
+<p><em>断言：\(R\) 闭。</em></p>
+
+<p>这件事不显然——一般来说有界算子的像不必闭（举反例：在 \(\ell^2\) 上 \(T(x_n) = (x_n / n)\) 是有界、像是 \(\ell^2\) 的稠密真子空间，不闭）。但 \(T - \lambda I\)（\(T\) 紧 \(\lambda \ne 0\)）<em>例外</em>。</p>
+
+<p><em>证明。</em>设 \(y_n \in R, y_n \to y\)。要证 \(y \in R\)。</p>
+
+<p>每个 \(y_n = (T - \lambda I) x_n\) 某 \(x_n\)。技巧：可以选 \(x_n\) 使 \(\|x_n\|\) 受控——具体的，</p>
+
+<p>\[
+\|x_n\| \le 2 \cdot \mathrm{dist}(x_n, \ker A).
+\]</p>
+
+<p>这需要对每个 \(x_n\) 做<em>商空间替换</em>：替换 \(x_n\) 为 \(x_n - z\) 某 \(z \in \ker A\)（不改 \(A x_n\)），使 \(\|x_n - z\| \le 2 \mathrm{dist}(x_n, \ker A)\)（取近似最近点）。重命名替换后的仍叫 \(x_n\)。</p>
+
+<p><em>断言：\(\{x_n\}\) 有界。</em></p>
+
+<p>反证。假设 \(\|x_n\| \to \infty\)（取子列）。设 \(u_n := x_n / \|x_n\|\)（单位向量）。\(A u_n = y_n / \|x_n\| \to 0 / \infty = 0\)。即 \((T - \lambda I) u_n \to 0\)，等价 \(T u_n - \lambda u_n \to 0\)。</p>
+
+<p>\(T\) 紧 + \(\{u_n\}\) 有界 \(\implies\) 抽子列 \(T u_{n_k} \to z\) 强（某 \(z\)）。结合：\(\lambda u_{n_k} = T u_{n_k} - (T u_{n_k} - \lambda u_{n_k}) \to z - 0 = z\)，所以 \(u_{n_k} \to z / \lambda\)。</p>
+
+<p>\(\|u_{n_k}\| = 1 \implies \|z / \lambda\| = 1 \implies z \ne 0\)。</p>
+
+<p>对 \(u_{n_k} \to z / \lambda\) 用 \(T\) 连续传递：\(T u_{n_k} \to T(z / \lambda)\)。又 \(T u_{n_k} \to z \implies z = T(z / \lambda) \implies T z = \lambda z \implies z \in \ker A\)。</p>
+
+<p>但 \(u_{n_k} \to z / \lambda\) 又要求 \(\mathrm{dist}(u_{n_k}, \ker A) \to 0\)（因为 \(z / \lambda \in \ker A\)）。这与 \(\|x_n\| \le 2 \mathrm{dist}(x_n, \ker A)\) 即 \(\mathrm{dist}(u_n, \ker A) \ge 1/2\) 矛盾。</p>
+
+<p>所以 \(\{x_n\}\) 有界。</p>
+
+<p><em>断言完成。</em>\(\{x_n\}\) 有界 + \(T\) 紧 \(\implies\) 抽子列 \(T x_{n_k} \to w\) 强。\(\lambda x_{n_k} = T x_{n_k} - y_{n_k} \to w - y\)。所以 \(x_{n_k} \to (w - y) / \lambda =: x\)。\(T\) 连续 \(\implies T x_{n_k} \to T x = w\)。所以 \(A x = T x - \lambda x = w - \lambda \cdot (w - y) / \lambda = w - w + y = y\)。即 \(y \in R\)。\(\square\)</p>
+
+<p>请你停下来欣赏这条证明的<em>结构</em>。它两次用紧性抽子列：</p>
+
+<ol>
+  <li>第一次（反证里）：证 \(\{x_n\}\) 有界。技巧是把 \(\|x_n\| \to \infty\) 假设转为 \(\|u_n\| = 1\) 的归一化，然后让"\(A u_n \to 0\) + \(u_n \to z/\lambda\) + \(z \in \ker A\)" 撞上 "\(\mathrm{dist}(u_n, \ker A) \ge 1/2\)" 矛盾。</li>
+  <li>第二次（正面）：从 \(\{x_n\}\) 有界抽子列得 \(T x_{n_k}\) 收敛，从而 \(x_{n_k}\) 收敛，从而 \(y \in R\)。</li>
+</ol>
+
+<p>商空间技巧（"<em>替换 \(x_n\) 让 \(\mathrm{dist}(x_n, \ker A)\) 占主导</em>"）非常典型。它让 \(\ker A\) 不阻碍我们的论证——把 \(x_n\) 投影到 \(X / \ker A\) 后再回到 \(X\)。</p>
+
+<h2 id="sec22-5">22.5 完成 Fredholm + 指数 = 0</h2>
+
+<p>22.3 + 22.4 给了 (1)、(2) 两条。剩下 (3) \(\dim \mathrm{coker}\, A < \infty\) 与 (4) \(\dim \ker A = \dim \mathrm{coker}\, A\)。</p>
+
+<p>这两条用<em>对偶</em> 论证。要点：\(A^* = T^* - \lambda I\)（在 \(X^*\) 上），\(T^*\) 也紧（紧算子的对偶紧——Schauder 定理，<a href="ch20.html">第 20 章</a>不证但用）。所以对 \(A^*\) 同样可应用 (1) 和 (2)。</p>
+
+<p><em>证明 (3)。</em>由 Hahn-Banach 一致刻画：</p>
+
+<p>\[
+\mathrm{coker}\, A = X / \mathrm{range}\, A \cong (\ker A^*)^* \quad (\text{对偶身份})
+\]</p>
+
+<p>更具体的：商空间 \(X / R\) 的对偶是 \(R^\perp = \{\varphi \in X^* : \varphi|_R = 0\}\)，而 \(R^\perp = \ker A^*\)（因为 \(\varphi \in R^\perp \iff \varphi(A x) = 0 \forall x \iff (A^* \varphi)(x) = 0 \forall x \iff A^* \varphi = 0\)）。所以</p>
+
+<p>\[
+\dim X / R = \dim (X / R)^* = \dim R^\perp = \dim \ker A^*.
+\]</p>
+
+<p>由 22.3 应用到 \(A^* = T^* - \lambda I\)（\(T^*\) 紧、\(\lambda \ne 0\)）：\(\dim \ker A^* < \infty\)。所以 \(\dim \mathrm{coker}\, A < \infty\)。</p>
+
+<p><em>证明 (4)。</em>设 \(n := \dim \ker A, m := \dim \mathrm{coker}\, A = \dim \ker A^*\)。要证 \(n = m\)。</p>
+
+<p>这步需要更精细的论证（标准证明走<em>升序核</em> 链 \(\ker A \subset \ker A^2 \subset \ldots\) 必有限稳定，给"<em>广义核</em>" 维数与 cokernel 维数相等）。完整证明 2-3 页技术，思路是：</p>
 
 <ul>
-  <li>Fredholm 选择性的正式陈述（"零或非零"二选一）。</li>
-  <li>关键预备：紧扰动 + 单位 = "几乎单射 + 几乎满射"——\(\ker(I - T)\) 有限维，\(\operatorname{Range}(I - T)\) 闭且有限余维。</li>
-  <li>Riesz 引理 + 紧 \(\Rightarrow\) 像闭：\(\operatorname{Range}(I - T)\) 闭。</li>
-  <li>用 15.6 节"\(\overline{\operatorname{Range}(T)} = {}^\circ \ker(T^*)\)"得到第二条选择性。</li>
-  <li>"<strong>指数</strong>" \(\operatorname{ind}(I - T) = \dim \ker - \dim \operatorname{coker} = 0\)——这是 Fredholm 选择性的"一行总结"。</li>
-  <li>三个具体应用：积分方程、PDE 椭圆问题、Toeplitz 算子简介。</li>
+  <li>构造从 \(\ker A\) 到 \(\mathrm{coker}\, A\) 的<em>线性映射</em>，并证它是<em>同构</em>。这个映射不是平凡的——典型的是用 \(A\) 的 Riesz-Schauder 分解：\(X = N \oplus M\)，其中 \(N\) 是广义核（<em>有限维</em>），\(M = R\) 是 range（<em>闭</em>）。\(A|_M : M \to M\) 是双射，\(A|_N : N \to N\) 是<em>幂零</em>。</li>
+  <li>从这个分解直接读出 \(\dim N = \dim X / R\)（在<em>广义</em> 意义）+ 进一步精化到原始核 vs. cokernel 维数。</li>
 </ul>
 
-<h2 id="sec22-1">22.1 Fredholm 选择性的陈述</h2>
+<p>详细技术请见 Brezis "Functional Analysis"（2011）第 6 章 Theorem 6.6 或 Conway "A Course in Functional Analysis" Chap. XI Sec. 4。本章默认这条结论。</p>
 
-<p><strong>定理（Fredholm 选择性）。</strong>设 \(X\) 是 Banach 空间，\(T \in \mathcal{K}(X)\)。则 \(I - T\) 满足以下"二选一" 选择性：</p>
+<p>组合 22.3 + 22.4 + (3) + (4)：</p>
 
-<p><strong>(A) 唯一性 + 存在性版：</strong>恰好出现下面两种情形之一：</p>
+<p>\[\boxed{\ T \text{ 紧}, \lambda \ne 0 \implies T - \lambda I \text{ 是指数 } 0 \text{ Fredholm 算子。}\ }\]</p>
+
+<p>"<em>指数 \(0\)</em>" 自动给"<em>选择性</em>"——核为 0 \(\iff\) cokernel 为 0 \(\iff\) range 满 \(\iff\) 双射 \(\iff \lambda \notin \sigma(T)\)。</p>
+
+<p>注意 (4) 在<em>有限维</em> 是显然的（来自维数论 \(\dim \ker A + \dim R = \dim X\)）。无穷维不能用维数论但仍然成立——这条事实就是 Fredholm 的"<em>奇迹</em>"。它告诉你<em>紧扰动 \(T\) 不改变恒等的"指数 0" 性质</em>。这是更普遍的"<em>指数定理</em>"（Atiyah-Singer）的最基础例子，下面 22.6 节末端会再提。</p>
+
+<h2 id="sec22-6">22.6 三个标准应用</h2>
+
+<h3>应用 1：Fredholm 积分方程</h3>
+
+<p>这是 Fredholm 1903 原始动机。设 \(K \in C([a, b]^2)\)，方程</p>
+
+<p>\[
+\varphi(x) - \int_a^b K(x, y) \varphi(y) dy = f(x)
+\]</p>
+
+<p>是著名的<em>第二类 Fredholm 积分方程</em>。改写：\((I - T_K) \varphi = f\)，\(T_K\) 是 Fredholm 积分算子（<a href="ch20.html#sec20-4">第 20 章 20.4</a> 例 2 紧）。</p>
+
+<p>选择性立即给：</p>
 
 <ul>
-  <li><strong>(A1) "零情形"。</strong>齐次方程 \(x - T x = 0\) 只有零解（即 \(\ker(I - T) = \{0\}\)）。则 \(I - T\) 是双射，对每个 \(y \in X\)，方程 \(x - T x = y\) 有唯一解。</li>
-  <li><strong>(A2) "非零情形"。</strong>齐次方程 \(x - T x = 0\) 有非零解（即 \(\ker(I - T) \neq \{0\}\)）。则 \(\dim \ker(I - T) = \dim \ker(I - T^*) < \infty\)，且非齐次方程 \(x - T x = y\) 可解 \(\iff\) \(y \perp \ker(I - T^*)\)。</li>
+  <li>"<em>齐次唯一</em>"：\(\varphi - T_K \varphi = 0\) 只零解。</li>
+  <li>"<em>非齐次有解</em>"：每个 \(f \in C[a, b]\) 给唯一 \(\varphi\)。</li>
 </ul>
 
-<p>更具体地：</p>
+<p>等价。所以你<em>只需检查齐次方程</em>——若它只零解，立即得每个非齐次方程有唯一解。这是 Fredholm 选择性最直接的实用价值——把"<em>存在性</em>" 转化为"<em>唯一性</em>"，唯一性常常容易得多（用能量估计、最大原理等）。</p>
 
-<p><strong>(B) 有限维 + 闭像版：</strong></p>
+<h3>应用 2：椭圆 PDE 选择性</h3>
 
-<ul>
-  <li>\(\dim \ker(I - T) < \infty\)；</li>
-  <li>\(\operatorname{Range}(I - T)\) 是闭子空间；</li>
-  <li>\(\operatorname{Range}(I - T) = {}^\circ \ker(I - T^*)\)；</li>
-  <li>\(\dim \ker(I - T) = \dim \ker(I - T^*) < \infty\)；</li>
-  <li><strong>(指数零)</strong> \(\operatorname{ind}(I - T) := \dim \ker(I - T) - \operatorname{codim} \operatorname{Range}(I - T) = 0\)。</li>
-</ul>
-
-<p>这就是 Fredholm 1903 在积分方程语境下发现的事实，后来被 Riesz、Schauder、Atkinson 等推广到一般紧算子。</p>
-
-<p>"<strong>选择性</strong>"这个名字来自情形 (A) 的"二选一" ——要么齐次唯一就推出非齐次永远有唯一解，要么齐次有非平凡核就给非齐次施加可解性条件 \(y \perp \ker(I - T^*)\)。这两种情形<em>互斥</em>，<em>必有其一</em>。</p>
-
-<h2 id="sec22-2">22.2 关键预备：Riesz 引理</h2>
-
-<p>证明 Fredholm 选择性需要一个关于"几乎正交"的工具：</p>
-
-<p><strong>Riesz 引理。</strong>设 \(X\) 是赋范空间，\(M \subsetneq X\) 是<em>真闭</em>子空间。对任意 \(0 < \theta < 1\)，存在 \(x \in X\)，\(\|x\| = 1\)，使</p>
+<p>设 \(\Omega \subset \mathbb{R}^d\) 有界，研究椭圆方程</p>
 
 <p>\[
-\operatorname{dist}(x, M) \ge \theta.
+-\Delta u + c(x) u = f \text{ in } \Omega, \quad u = 0 \text{ on } \partial \Omega.
 \]</p>
 
-<p>证明：取 \(z \in X \setminus M\)，\(d = \operatorname{dist}(z, M) > 0\)（\(M\) 闭）。取 \(m \in M\) 使 \(\|z - m\| \le d/\theta\)（这种 \(m\) 由下确界定义存在，注意比 \(d\) 大不超过 \(1/\theta\) 倍）。令 \(x = (z - m)/\|z - m\|\)，\(\|x\| = 1\)。</p>
+<p>其中 \(c \in L^\infty(\Omega)\)。改写：\((I + c \cdot (-\Delta)^{-1}) v = (-\Delta)^{-1} f\)（设 \(v = (-\Delta)^{-1/2}\) 之类——实际重写技术省略，思路是把 PDE 转为 \((I - K) v = g\) 形式）。</p>
 
-<p>对任意 \(m' \in M\)：\(\|x - m'\| = \|z - m - \|z - m\| m'\|/\|z - m\| = \|z - (m + \|z - m\| m')\|/\|z - m\| \ge d / (d/\theta) = \theta\)（因为 \(m + \|z - m\| m' \in M\)）。结束。</p>
+<p>\(c \cdot (-\Delta)^{-1}\) 是紧算子（\(L^\infty\) 乘是有界，\((-\Delta)^{-1}\) 紧——<a href="ch21.html">第 21 章</a> 21.5 例 2）。所以 \(I + c (-\Delta)^{-1} = I - (-c (-\Delta)^{-1})\) 适用 Fredholm 选择性。</p>
 
-<p>这条引理是<em>无穷维"取一个几乎正交方向"的工具</em>。它推出：</p>
+<p>结论：<em>椭圆方程要么齐次解空间是有限维（共振情形），要么非齐次方程对每个 \(f\) 有唯一解（非共振情形）</em>。这是椭圆 PDE 标准存在唯一性定理的源泉，所有 Lax-Milgram 和共振分析都从这里长出。</p>
 
-<p><strong>推论。</strong>无穷维赋范空间的闭单位球不紧。</p>
+<h3>应用 3：Toeplitz 算子 + 指标定理预告</h3>
 
-<p>证明：取 \(M_n = \operatorname{span}\{x_1, \ldots, x_n\}\)（有限维 \(\Rightarrow\) 闭）。无穷维 \(\Rightarrow M_n \neq X\)。Riesz 引理给 \(x_{n+1}\) 范数 1，\(\operatorname{dist}(x_{n+1}, M_n) \ge 1/2\)。所以 \(\{x_n\}\) 在闭单位球内任意两点距离 \(\ge 1/2\)，没收敛子序列。结束。</p>
+<p>"<em>指数 0</em>" 是个非常特殊的事——一般 Fredholm 算子可以有<em>非零</em> 指数。最经典的例子是 <em>Toeplitz 算子</em>。</p>
 
-<p>这条 Riesz 引理 + 推论是<a href="ch1.html">第 1 章 1.1 节</a>"无穷维单位球不紧"的<em>正式证明</em>。</p>
+<p>设 \(\mathbb{T}\) 是单位圆，\(L^2(\mathbb{T})\) 是它上的平方可积函数。\(H^2(\mathbb{T})\) 是 Hardy 空间——傅里叶系数 \(\hat f(n) = 0\) 对 \(n < 0\) 的子空间。设 \(P : L^2 \to H^2\) 是正交投影。</p>
 
-<h2 id="sec22-3">22.3 \(\ker(I - T)\) 有限维</h2>
-
-<p>设 \(T\) 紧。要证 \(\ker(I - T)\) 有限维。</p>
-
-<p>令 \(N = \ker(I - T) = \{x : T x = x\}\)。\(N\) 是 \(T\) 的"特征值 1 的特征空间"，闭。</p>
-
-<p>关键：\(T|_N = \operatorname{id}|_N\) 是 \(N\) 上的恒等算子。但 \(T\) 紧 \(\Rightarrow\) \(T|_N\) 紧 \(\Rightarrow\) \(\operatorname{id}|_N\) 紧。\(\operatorname{id}\) 紧 \(\iff\) \(N\) 单位球紧 \(\iff\) \(N\) 有限维（由 22.2 节推论）。结束。</p>
-
-<p>这条论证非常优雅——把"\(T\) 在自己核上是恒等"翻译为"恒等紧"，紧性立即给"有限维"。</p>
-
-<h2 id="sec22-4">22.4 \(\operatorname{Range}(I - T)\) 闭</h2>
-
-<p>这是 Fredholm 选择性论证里技术最复杂的一步。下面给出标准证明的草图。</p>
-
-<p>令 \(R = \operatorname{Range}(I - T)\)。要证 \(R\) 闭。取 \(y_n = (I - T) x_n \to y\)。要证 \(y \in R\)。</p>
-
-<p>由 22.3，\(N = \ker(I - T)\) 有限维 \(\Rightarrow\) \(X = N \oplus M\)（\(M\) 是 \(N\) 的某个闭补，存在因为 \(N\) 有限维）。</p>
-
-<p>分解 \(x_n = n_n + m_n\)，\(n_n \in N, m_n \in M\)。\((I - T) x_n = (I - T) n_n + (I - T) m_n = 0 + (I - T) m_n = (I - T) m_n\)（因为 \(n_n \in \ker(I - T)\)）。</p>
-
-<p>所以可以假设 \(x_n \in M\)。要证：\(\{x_n\}\) 范数有界。</p>
-
-<p>若不然，\(\|x_n\| \to \infty\)，令 \(z_n = x_n / \|x_n\|\)。\(\|z_n\| = 1\)，\((I - T) z_n = y_n / \|x_n\| \to 0\)。\(T\) 紧 \(\Rightarrow\) \(\{T z_n\}\) 有强收敛子序列 \(T z_{n_k} \to w\)。由 \((I - T) z_{n_k} \to 0\)：\(z_{n_k} = T z_{n_k} + (I - T) z_{n_k} \to w + 0 = w\)。强收敛 + \(z_n \in M\) 闭 \(\Rightarrow\) \(w \in M\)。\(T\) 连续 \(\Rightarrow\) \(T w = \lim T z_{n_k} = w\)，即 \(w \in N\)。所以 \(w \in N \cap M = \{0\}\)，即 \(w = 0\)。但 \(\|w\| = \lim \|z_{n_k}\| = 1\)，矛盾。</p>
-
-<p>所以 \(\{x_n\}\) 范数有界。\(T\) 紧 \(\Rightarrow\) \(\{T x_n\}\) 有强收敛子序列 \(T x_{n_k} \to v\)。\(x_{n_k} = T x_{n_k} + y_{n_k} \to v + y\)。\(T\) 连续 \(\Rightarrow\) \(T(v + y) = v\)，即 \((I - T)(v + y) = y\)。所以 \(y \in R\)。结束。</p>
-
-<p>这条"\(\operatorname{Range}(I - T)\) 闭" 是 Fredholm 选择性最技术的部分。其它部分都从它流出来。</p>
-
-<h2 id="sec22-5">22.5 完成 Fredholm 选择性</h2>
-
-<p>有了 22.3 + 22.4，再加<a href="ch15.html">第 15 章 15.6 节</a>"\(\overline{\operatorname{Range}(I - T)} = {}^\circ \ker(I - T^*)\)"，立即给</p>
+<p>给 \(\varphi \in L^\infty(\mathbb{T})\)（连续就行）。<em>Toeplitz 算子</em> \(T_\varphi : H^2 \to H^2\) 定义为</p>
 
 <p>\[
-\operatorname{Range}(I - T) = {}^\circ \ker(I - T^*).
+T_\varphi f := P (\varphi \cdot f).
 \]</p>
 
-<p>这就是 (A2) 的"可解条件"——\(y \in \operatorname{Range}(I - T) \iff y \perp \ker(I - T^*)\)。</p>
+<p>\(T_\varphi\) 一般<em>不</em>紧——但 Atkinson 定理告诉你 \(T_\varphi\) 是<em>Fredholm</em>（即 \(\dim \ker, \dim \mathrm{coker}\) 都有限），<em>当且仅当</em> \(\varphi\) 在圆上不为 0。</p>
 
-<p>"\(\dim \ker(I - T) = \dim \ker(I - T^*)\)" 是更深一些的事实，叫<strong>对偶等式</strong>。证明用 Schauder 定理（\(T\) 紧 \(\iff\) \(T^*\) 紧），把 22.3 节论证用在 \((I - T^*)\) 上得 \(\dim \ker(I - T^*) < \infty\)。两边相等的论证用一种"范畴对偶"的论证，详细在 Brezis《Functional Analysis》第 6 章。</p>
-
-<p>"<strong>指数 = 0</strong>" 是这条对偶等式的几何重写：</p>
+<p>更深的结论（<em>Gohberg-Krein 1957，Atiyah-Singer 1963 的最简例</em>）：</p>
 
 <p>\[
-\boxed{\ \operatorname{ind}(I - T) = \dim \ker(I - T) - \dim \ker(I - T^*) = 0, \quad T \in \mathcal{K}(X).\ }
+\boxed{\ \mathrm{ind}(T_\varphi) := \dim \ker T_\varphi - \dim \mathrm{coker}\, T_\varphi = -\mathrm{wind}(\varphi).\ }
 \]</p>
 
-<p>它说"<strong>紧扰动不改变恒等的指数</strong>"——\(\operatorname{ind}(I) = 0\)，紧加上去不变。这条是 Atkinson 把"Fredholm 算子" 从这条具体陈述抽象出来的根据。</p>
+<p>"\(\mathrm{wind}(\varphi)\)" 是 \(\varphi : \mathbb{T} \to \mathbb{C}^*\) 的<em>缠绕数</em>（绕原点几圈）。</p>
 
-<h2 id="sec22-6">22.6 三个应用</h2>
+<p>这条公式是<em>指标定理</em>（Atiyah-Singer 1963 的一维版本）的最简单形态——它把<em>分析量</em>（核与 cokernel 维数差）与<em>拓扑量</em>（缠绕数）等同。这种"<em>分析 = 拓扑</em>" 的桥梁是 20 世纪后半叶数学最深的故事之一——延伸到流形上的椭圆算子（Atiyah-Singer 完整版）、到代数几何的 Riemann-Roch、到弦论的 anomaly 计算。Fredholm 选择性是这条故事链的<em>第一环</em>——它给"<em>指数</em>" 这个概念在最简单设置（紧扰动）下的取值（恒等的指数 0）。</p>
 
-<p><strong>应用 1：Fredholm 积分方程。</strong>这是 Fredholm 1903 的原始动机。考虑积分方程</p>
+<p>下一章把上面这些抽象工具组合起来，给经典椭圆 PDE \(-\Delta u + u = f\) 一个干净的弱解理论——会把 Sobolev 空间、Lax-Milgram、Sobolev 嵌入、Rellich 紧嵌入这一整套机器拼装起来。"<em>紧致论证</em>" 三步法（弱抽 + 紧升 + 强传）将在那里得到最完整的应用。</p>
 
-<p>\[
-f(x) - \lambda \int_0^1 K(x, y) f(y) \, dy = g(x), \quad K \text{ 连续}.
-\]</p>
-
-<p>记 \(T_K f = \int K f\)（紧算子）。方程为 \((I - \lambda T_K) f = g\)。</p>
-
-<p>Fredholm 选择性给：要么<em>对每 \(g\) 唯一解</em>（齐次只零解），要么<em>有限维核 + 可解条件</em>（齐次有非零解 \(\Rightarrow\) \(g \perp \ker(I - \lambda T_K^*)\)）。</p>
-
-<p>这条结论让积分方程可解性<em>完全代数化</em>——和有限维线性方程组的可解性<em>相同</em>。这是泛函分析能给"应用数学"最直接的结构性贡献。</p>
-
-<p><strong>应用 2：椭圆 PDE 的 Fredholm 选择性。</strong>考虑 \(-\Delta u + V u = f\) 在有界域 \(\Omega\) 上配 Dirichlet 边条件。把它写成 \((I - \lambda K) u = f'\) 的形式（\(K = (-\Delta)^{-1}\) 紧自伴 + \(V\) 项的紧扰动）。Fredholm 选择性给：要么对每 \(f\) 有唯一弱解（即 \(\lambda\) 不是 \(K\) 的特征值），要么齐次有非零解 + 可解条件。</p>
-
-<p>这就是 PDE 文献里反复出现的"Fredholm 选择性 \(\Rightarrow\) 唯一性 \(\iff\) 存在性"模板。它把 PDE 的存在性和唯一性问题用泛函分析联系起来。</p>
-
-<p><strong>应用 3：Toeplitz 算子（简介）。</strong>在 Hardy 空间 \(H^2\) 上的 Toeplitz 算子 \(T_\varphi\) 满足 \(T_\varphi T_\psi - T_{\varphi \psi}\) 是紧算子。这给了 Toeplitz 代数的"紧模" Calkin 代数结构，从而 Toeplitz 算子的 Fredholm 性可以用其符号 \(\varphi\) 直接判断。这是<strong>Atiyah–Singer 指标定理</strong>（"算子指标 = 拓扑不变量"）的经典先声。</p>
-
-<p>Toeplitz 算子涉及很多具体的复分析与算子代数细节，超出本书入门定位。值得知道的是：紧算子谱论 + Fredholm 选择性 + 指标 是现代泛函分析最具几何意味的方向之一。</p>
-
-<p>本章把"紧算子"故事彻底闭环——谱定理（21 章给"对角化"）+ Fredholm 选择性（本章给"可解性"）。这两条是紧算子分析的<em>结构性</em>双柱。</p>
-
-<p>下一章我们离开抽象，进入<em>应用</em>——Sobolev 空间与变分法入门。我们要把前面 22 章的工具组合起来，证明经典椭圆 PDE 在合适的 Sobolev 空间里有<em>弱解</em>。这个故事会用到 Hilbert 几何（第 6 章）、Riesz 表示（第 16 章）、Lax–Milgram、紧嵌入（本章背景里出现的 Rellich 嵌入）。</p>
-
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 紧自伴算子的谱定理</a><a href="ch23.html">下一章 · 第 23 章 应用：Sobolev 空间与变分入门 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 紧自伴算子谱定理</a><a href="ch23.html">下一章 · 第 23 章 Sobolev 空间 + 变分入门 →</a></nav>
 </main>
 </body>
 </html>
+</content>
+</invoke>

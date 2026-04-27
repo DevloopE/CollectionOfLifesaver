@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 经典空间例子库 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 内积与 Hilbert 空间</a><a href="ch5.html">下一章 · 第 5 章 经典不等式 →</a></nav>
+<h1 id="ch4">第 4 章 经典空间例子库</h1>
+
+<p>前三章我们把 Banach 空间和 Hilbert 空间的"框架"立起来了：完备的赋范空间、完备的内积空间。但泛函分析不是抽象自娱自乐——这些框架要被实际使用。"实际使用"靠的就是几个标准空间，所有定理你都得能把它们具体落到这些空间上。本章把这一组"硬件"过一遍，让你以后看到 \(\ell^p\)、\(L^p\)、\(C[a,b]\)、\(C^k[a,b]\)、\(c_0\) 时，不需要任何再回忆——它们就该像你脑子里的 \(\mathbb{R}^n\) 一样自然。</p>
+
+<p>这一章不堆证明，把每个空间讲到三件事的程度：<em>它装的是什么、范数是什么、它的几个最关键性质是什么</em>。证明工具（特别是 Hölder、Minkowski、嵌入关系）放进下一章和附录。本章的目的是让你建立"看见名字就立刻有图像"的反射。</p>
+
+<ul>
+  <li>序列空间 \(\ell^p\)（\(1 \le p \le \infty\)）+ 子空间 \(c_0\)、\(c\)、\(\ell_0\)。</li>
+  <li>函数空间 \(L^p(\Omega, \mu)\) 的定义、几个关键事实、与 \(\ell^p\) 的对应。</li>
+  <li>连续函数空间 \(C[a,b]\)、\(C(K)\)（\(K\) 紧致 Hausdorff）、\(C_0(\mathbb{R}^n)\)、\(C_c(\mathbb{R}^n)\)。</li>
+  <li>光滑函数空间 \(C^k[a,b]\)、\(C^\infty[a,b]\) 的范数与完备性。</li>
+  <li>Hilbert 与 Banach 之间的"光谱"：哪些是 Hilbert、哪些只是 Banach、哪些既不可分又不自反。</li>
+  <li>嵌入与对偶速览（细节延到第 5、15、19 章）。</li>
+</ul>
+
+<h2 id="sec4-1">4.1 序列空间 \(\ell^p\)</h2>
+
+<p>对 \(1 \le p < \infty\)，</p>
+
+<p>\[
+\ell^p = \left\{ x = (x_1, x_2, \ldots) \in \mathbb{K}^{\mathbb{N}} : \|x\|_p := \left( \sum_{n=1}^{\infty} |x_n|^p \right)^{1/p} < \infty \right\}.
+\]</p>
+
+<p>对 \(p = \infty\)，</p>
+
+<p>\[
+\ell^\infty = \left\{ x : \|x\|_\infty := \sup_n |x_n| < \infty \right\}.
+\]</p>
+
+<p>每个 \(\ell^p\)（\(1 \le p \le \infty\)）都是 Banach 空间。\(\ell^2\) 是 Hilbert 空间，配内积 \(\langle x, y \rangle = \sum x_n \bar y_n\)。其它 \(\ell^p\)（\(p \neq 2\)）<em>不是</em> Hilbert（由第 3 章 3.3 节平行四边形反例）。</p>
+
+<p>关于 \(\ell^p\) 的几条要随手记住的事实：</p>
+
+<p><strong>(L1) 嵌入。</strong>对 \(1 \le p < q \le \infty\)，</p>
+
+<p>\[
+\ell^p \subset \ell^q, \qquad \|x\|_q \le \|x\|_p.
+\]</p>
+
+<p>这条嵌入和 \(L^p\) 上的"\(p\) 越大空间越大"<em>方向相反</em>——这是序列空间和函数空间最常被弄反的一处。原因是序列长度无界但每位独立，逐位 \(|x_n| \le \|x\|_p\) 给出 \(\sup\) 控制。</p>
+
+<p><strong>(L2) 可分性。</strong>对 \(1 \le p < \infty\)，\(\ell^p\) 是<strong>可分</strong>的（有可数稠子集，比如有理坐标的有限非零序列）；但 \(\ell^\infty\) <strong>不可分</strong>（取所有 0/1 序列就有不可数互相距离 \(= 1\) 的元素，可数稠子集放不下）。</p>
+
+<p><strong>(L3) 对偶。</strong>对 \(1 \le p < \infty\) 与 \(1/p + 1/q = 1\)，</p>
+
+<p>\[
+(\ell^p)^* \cong \ell^q.
+\]</p>
+
+<p>具体的对偶配对是 \(\langle x, y \rangle = \sum x_n y_n\)。这是第 15 章会反复用的标准结论。注意 \(p = 1, q = \infty\) 两个端点的<em>不</em>对称：\((\ell^1)^* = \ell^\infty\) 但 \((\ell^\infty)^* \neq \ell^1\)（\(\ell^\infty\) 的对偶比 \(\ell^1\) 大很多）。这是 \(\ell^1\) 不自反的根源。</p>
+
+<p><strong>(L4) 子空间 \(c_0\)。</strong></p>
+
+<p>\[
+c_0 = \{x \in \ell^\infty : x_n \to 0\}
+\]</p>
+
+<p>是 \(\ell^\infty\) 的闭子空间（"趋于 0" 在 sup 范数下闭合）。它本身配 sup-范数也是 Banach 空间，并且<em>可分</em>。它的对偶是 \((c_0)^* = \ell^1\)——这是为什么 \(c_0\) 在自反性话题里非常重要的对照例。</p>
+
+<p>另一个常用子空间是 \(c = \{x : \lim_n x_n \text{ 存在}\}\)，包含 \(c_0\) 作为其闭子空间，差一个一维"常值序列"方向。</p>
+
+<h2 id="sec4-2">4.2 Lebesgue 空间 \(L^p(\Omega, \mu)\)</h2>
+
+<p>设 \((\Omega, \mathcal{F}, \mu)\) 是测度空间。对 \(1 \le p < \infty\)，</p>
+
+<p>\[
+L^p(\Omega, \mu) = \left\{ f : \Omega \to \mathbb{K} \text{ 可测}, \int |f|^p \, d\mu < \infty \right\} / \sim,
+\]</p>
+
+<p>其中 \(\sim\) 是"几乎处处相等"的等价关系。范数</p>
+
+<p>\[
+\|f\|_p = \left( \int |f|^p \, d\mu \right)^{1/p}.
+\]</p>
+
+<p>对 \(p = \infty\)，\(L^\infty\) 是"几乎处处有界函数"的等价类空间，配范数 \(\|f\|_\infty = \operatorname{ess\,sup} |f|\)。</p>
+
+<p>关键事实（详见<a href="../实分析/ch24.html">实分析读本第 24 章</a>）：</p>
+
+<p><strong>(LP1) 完备（Riesz–Fischer）。</strong>每个 \(L^p\)（\(1 \le p \le \infty\)）都是 Banach 空间。\(L^2\) 还是 Hilbert 空间，配内积 \(\langle f, g \rangle = \int f \bar g \, d\mu\)。</p>
+
+<p><strong>(LP2) 嵌入（注意方向！）。</strong>当 \(\mu\) 是<em>有限</em>测度（\(\mu(\Omega) < \infty\)，比如 \(\Omega\) 是有界区域配 Lebesgue 测度），对 \(1 \le p \le q \le \infty\)，</p>
+
+<p>\[
+L^q(\Omega) \subset L^p(\Omega), \qquad \|f\|_p \le \mu(\Omega)^{1/p - 1/q} \|f\|_q.
+\]</p>
+
+<p>这是 \(L^p\) 嵌入的"有限测度"版本。\(p\) 越大空间越小——<em>和 \(\ell^p\) 完全相反</em>。当 \(\mu\) 不是有限测度（比如 \(\Omega = \mathbb{R}^n\) 配 Lebesgue 测度），<em>没有</em>嵌入关系——\(L^1(\mathbb{R})\) 与 \(L^\infty(\mathbb{R})\) 互不包含。</p>
+
+<p><strong>(LP3) 对偶。</strong>对 \(1 \le p < \infty\) 与 \(1/p + 1/q = 1\)，</p>
+
+<p>\[
+(L^p)^* \cong L^q, \qquad \langle f, g \rangle = \int f g \, d\mu.
+\]</p>
+
+<p>这是第 16 章里 Riesz 表示在 \(L^p\) 形式的结论。\(p = 1, q = \infty\) 端点同样不对称——\((L^1)^* = L^\infty\) 但 \((L^\infty)^* \neq L^1\)。</p>
+
+<p><strong>(LP4) 可分性。</strong>对 \(\sigma\)-有限测度空间与 \(1 \le p < \infty\)，\(L^p\) 可分。但 \(L^\infty\) 不可分。</p>
+
+<p>\(L^p\) 是泛函分析里出现最频繁的"函数版"例子。本书后面要反复用到的具体场景包括：第 7 章 Fourier 在 \(L^2\)；第 16 章 Riesz 在 \(L^p\)；第 17 章弱收敛在 \(L^p\)；第 23 章 Sobolev 嵌入到 \(L^p\)。</p>
+
+<h2 id="sec4-3">4.3 连续函数空间 \(C[a,b]\) 与 \(C(K)\)</h2>
+
+<p>设 \(K\) 是紧致 Hausdorff 空间。</p>
+
+<p>\[
+C(K) = \{f : K \to \mathbb{K} \text{ 连续}\}, \qquad \|f\|_\infty = \sup_{x \in K} |f(x)|.
+\]</p>
+
+<p>这是 Banach 空间。最常见的特例是 \(K = [a,b]\)，得到 \(C[a,b]\)。</p>
+
+<p>关键事实：</p>
+
+<p><strong>(C1) 完备。</strong>由 \(K\) 紧 + 连续函数 \(\Rightarrow\) 有界，再由"一致收敛极限连续"得完备。</p>
+
+<p><strong>(C2) Stone–Weierstrass。</strong>如果 \(\mathcal{A} \subset C(K)\) 是含常数、点分离、闭对乘法与加法的代数，那么 \(\mathcal{A}\) 在 \(C(K)\) 中稠。它的两个最常用推论是：多项式在 \(C[a,b]\) 中稠（Weierstrass）、三角多项式在 \(C(\mathbb{T})\) 中稠（Fourier 部分基础）。</p>
+
+<p><strong>(C3) 对偶。</strong>\(C(K)^*\) 是 \(K\) 上的<em>正则有限有符号 Borel 测度空间</em>，配总变差范数。这是 Riesz–Markov–Kakutani 表示定理（第 16 章）。这条让你看到"线性泛函"和"测度"在 \(C(K)\) 上是<em>同一回事</em>——这是测度论里最美的一座桥。</p>
+
+<p>另外两个常用变体：</p>
+
+<p><strong>\(C_0(\mathbb{R}^n)\)：</strong>"无穷远处趋零的连续函数"，配 sup-范数。是 Banach 空间。它的对偶是 \(\mathbb{R}^n\) 上的有限有符号 Borel 测度。</p>
+
+<p><strong>\(C_c(\mathbb{R}^n)\)：</strong>"紧支撑的连续函数"。<em>不</em>是 Banach 空间——它在 sup-范数下不完备，闭包就是 \(C_0(\mathbb{R}^n)\)。在分布理论和测度论里它常作为"测试函数"使用。</p>
+
+<p>注意 \(C[a,b]\)、\(C(K)\) 都是<em>不可分</em>是错的——\(K\) 是紧致<em>度量</em>空间时它们可分（用多项式或 Lipschitz 函数稠子集）。但 \(K\) 是更一般的紧致 Hausdorff 时不一定。本书绝大部分例子取 \(K\) 是闭区间或紧致欧氏域，所以可分性默认成立。</p>
+
+<h2 id="sec4-4">4.4 光滑函数空间 \(C^k[a,b]\) 与 \(C^\infty\)</h2>
+
+<p>对正整数 \(k\)，</p>
+
+<p>\[
+C^k[a,b] = \{f : [a,b] \to \mathbb{K}, f \text{ 是 } k \text{ 次连续可微}\},
+\]</p>
+
+<p>配范数</p>
+
+<p>\[
+\|f\|_{C^k} = \sum_{j=0}^{k} \|f^{(j)}\|_\infty.
+\]</p>
+
+<p>这是 Banach 空间。完备性用归纳：\(C^0\) 完备 + 导数列一致收敛 \(\Rightarrow\) 极限可微且导数为极限，逐阶上推。</p>
+
+<p>注意 sup-范数 \(\|f\|_\infty\) 单独不能让 \(C^k\) 完备——一致收敛极限的导数不一定是导数列的极限（典型反例 \(f_n(x) = \sin(n^2 x)/n\)）。这就是为什么 \(C^k\)-范数把所有阶导数打包在一起。</p>
+
+<p>\(C^\infty[a,b] = \bigcap_k C^k[a,b]\) 不是 Banach 空间——它没有自然的<em>单一</em>范数让它完备。它是 Fréchet 空间（由可数族半范数定义的完备拓扑向量空间）。这是本书不深入讨论的"广义对象"，提一下作为方向标。</p>
+
+<h2 id="sec4-5">4.5 谁是 Hilbert，谁只是 Banach</h2>
+
+<p>把上面的空间按"是否 Hilbert"分类，对你以后看待这些空间会非常有用。</p>
+
+<p><strong>Hilbert 空间。</strong>\(\mathbb{R}^n\)（欧氏）、\(\mathbb{C}^n\)（标准内积）、\(\ell^2\)、\(L^2(\Omega, \mu)\)、\(H^1(\Omega)\)、Sobolev \(H^k\)。这是几何最干净的一类。</p>
+
+<p><strong>非 Hilbert 但自反的 Banach。</strong>\(\ell^p\)（\(1 < p < \infty\), \(p \neq 2\)）、\(L^p(\Omega, \mu)\)（\(1 < p < \infty\), \(p \neq 2\)）。它们不是 Hilbert，但还有"对偶的对偶等于自身"这个好性质，详见第 19 章。</p>
+
+<p><strong>Banach，不自反。</strong>\(\ell^1\)、\(L^1\)、\(c_0\)、\(C(K)\)、\(\ell^\infty\)、\(L^\infty\)。这些空间没有"投影到任意闭子空间"，对偶比自身大或者干脆很奇怪。它们仍然是非常重要的工具，但你做分析时要小心——很多在 \(L^2\) 下白送的论证在 \(L^1\) 或 \(L^\infty\) 上要换工具。</p>
+
+<p>这个分类不是为了背名字，而是为了让你形成"防卫意识"。每次有人给你一个新结论，你应该自动反问：它要的是 Hilbert、还是自反、还是只要 Banach？这就是泛函分析的"假设审计"。</p>
+
+<h2 id="sec4-6">4.6 嵌入与对偶速览</h2>
+
+<p>把上面散落的嵌入和对偶关系整理成一张速查表，本书后面会反复回看。</p>
+
+<p><strong>嵌入：</strong></p>
+
+<ul>
+  <li>\(\ell^p \subset \ell^q\)（\(p < q\)）；</li>
+  <li>\(L^q \subset L^p\)（\(p < q\)，<em>有限</em>测度时）；</li>
+  <li>\(C^{k+1} \subset C^k\)；</li>
+  <li>\(H^{k+1} \subset H^k\)；</li>
+  <li>\(C_c \subset C_0 \subset C_b\)（紧支撑 \(\subset\) 趋零 \(\subset\) 有界连续）；</li>
+  <li>Sobolev 嵌入 \(H^1(\Omega) \hookrightarrow L^p(\Omega)\)（视维数与边界条件而定，第 23 章）。</li>
+</ul>
+
+<p><strong>对偶：</strong></p>
+
+<ul>
+  <li>\((\ell^p)^* = \ell^q\)（\(1 < p < \infty\), \(1/p + 1/q = 1\)）；</li>
+  <li>\((\ell^1)^* = \ell^\infty\)；</li>
+  <li>\((c_0)^* = \ell^1\)；</li>
+  <li>\((L^p)^* = L^q\)（\(1 \le p < \infty\), \(1/p + 1/q = 1\)）；</li>
+  <li>\((C(K))^* = M(K)\)（\(K\) 上 Radon 测度）；</li>
+  <li>\(H^* = H\)（Hilbert 空间，第 16 章 Riesz 表示）。</li>
+</ul>
+
+<p>这张表你不必背，但应该知道在哪查。等做完第 13、15、16、19 章你就会自然记住。</p>
+
+<p>下一章我们要把这些范数之间的不等式（Hölder、Minkowski、Cauchy–Schwarz、Bessel、Jensen）一次性证清。这些不等式不是技术装饰——上面这一长串"嵌入""对偶""完备" 几乎全部最终都归约到这几条不等式上。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 内积与 Hilbert 空间</a><a href="ch5.html">下一章 · 第 5 章 经典不等式 →</a></nav>
+</main>
+</body>
+</html>

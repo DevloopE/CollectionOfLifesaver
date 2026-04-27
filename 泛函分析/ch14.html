@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 14 章 Hahn–Banach 几何形式与凸集分离 — 普林斯顿泛函分析读本</title>
+<title>第 14 章 Hahn-Banach 几何形式与凸集分离 — 普林斯顿泛函分析读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -32,145 +32,322 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 Hahn–Banach 延拓定理（解析形式）</a><a href="ch15.html">下一章 · 第 15 章 对偶空间 X* →</a></nav>
-<h1 id="ch14">第 14 章 Hahn–Banach 几何形式与凸集分离</h1>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 Hahn-Banach 延拓定理</a><a href="ch15.html">下一章 · 第 15 章 对偶空间 →</a></nav>
+<h1 id="ch14">第 14 章 Hahn-Banach 几何形式与凸集分离</h1>
 
-<p>第 13 章把 Hahn–Banach 当成一条延拓定理。这一章把同一条定理翻成<strong>几何</strong>语言：两个不相交的凸集之间总能找到一个"超平面"把它们分开。这个画面是凸分析、凸优化、博弈论、经济学最优化、PDE 变分法的共同根——所有"对偶""支撑""拉格朗日"故事的几何源头都在这里。</p>
+<p>上一章我们证完了 Hahn-Banach 延拓定理：子空间上的有界线性泛函可以延拓到全空间，且范数不变。那一章里 HB 是个"<em>代数</em>" 工具——给一个泛函加几个变量。这一章我把同一个定理翻译成<em>几何</em> 语言。翻译完之后你会发现：HB 真正的故事不是延拓，是<strong>"两个不相交的凸集中间总有一面墙"</strong>。</p>
 
-<p>核心直觉：超平面 \(= \{x : f(x) = c\}\)（某个线性泛函的水平集）。"分离两个集" \(=\) "存在 \(f\) 与 \(c\) 使一个集里所有点 \(f \le c\)，另一个集里所有点 \(f \ge c\)"。"分离" \(\iff\) "找到 \(f\)"，所以 Hahn–Banach 提供的"线性泛函丰富性"立即翻译成"分离丰富性"。</p>
+<p>让我从一个具体场景开始。</p>
+
+<p>设 \(C \subset \mathbb{R}^2\) 是个凸的开圆盘——比方说 \(\{(x, y) : x^2 + y^2 < 1\}\)。再取一个不在 \(C\) 里的点 \(p = (2, 0)\)。<em>请你画一下</em>。你直观就知道：可以画一条直线，让 \(C\) 完全在直线左边、\(p\) 在直线右边。比如 \(x = 1.5\) 这条竖线就行。</p>
+
+<p>现在把这件事抽象一下。</p>
 
 <ul>
-  <li>把"超平面""半空间""支撑超平面"几何化。</li>
-  <li>Minkowski 泛函 \(p_C\)：把任意凸吸收集变成次线性控制函数，连接 13 章的解析形式与本章的几何形式。</li>
-  <li>第一分离定理：凸开集与凸集分离。</li>
-  <li>第二分离定理（强分离）：凸闭集与凸紧集严格分离。</li>
-  <li>支撑超平面定理：凸集的边界点都有支撑超平面。</li>
-  <li>三个直接应用：Lagrange 对偶（凸优化）、Hahn–Banach 间接证存在性（变分法）、Krein–Milman 定理（凸紧集是其极点的闭凸包）的预告。</li>
+  <li>"\(C\) 在直线左边" 翻译成：存在线性泛函 \(f(x, y) = x\) 和实数 \(\alpha = 1.5\)，使 \(f \le \alpha\) 在 \(C\) 上。</li>
+  <li>"\(p\) 在直线右边" 翻译成：\(f(p) > \alpha\)。</li>
+  <li>那条直线本身就是 \(\{(x, y) : f(x, y) = \alpha\}\)——一个<em>超平面</em>。</li>
 </ul>
+
+<p>这就是分离定理的几何雏形：<em>不相交凸集 → 中间夹一个超平面，使一边的所有点 \(f \le \alpha\)、另一边 \(f \ge \alpha\)</em>。</p>
+
+<p>这个画面在 \(\mathbb{R}^2\) 完全显然。本章要做的事是把它推到<em>无穷维 Banach 空间</em>。在无穷维"画一条线" 不再可视，但<em>线性泛函 + 实数</em> 这套代数描述照搬。证明的关键是 HB——延拓定理在这里以"<em>把一个一维上构造好的线性形扩到全空间</em>" 的姿态出场。整套故事自然衔接到下一系列：凸优化的 Lagrange 对偶、变分法的能量极小化、博弈论的极小极大、经济学里的均衡价格。<em>它们的共同根都在这章</em>。</p>
 
 <h2 id="sec14-1">14.1 超平面、半空间、支撑超平面</h2>
 
-<p>设 \(X\) 实赋范空间，\(f \in X^*\) 非零，\(c \in \mathbb{R}\)。集合</p>
+<p>先把语言备齐。设 \(X\) 是实赋范空间，\(f \in X^*\) 是非零有界线性泛函，\(\alpha \in \mathbb{R}\)。</p>
+
+<p><strong>超平面</strong>：</p>
 
 <p>\[
-H = \{x : f(x) = c\}
+H = H_{f, \alpha} := \{x \in X : f(x) = \alpha\}.
 \]</p>
 
-<p>是 \(X\) 的<strong>超平面</strong>（"维数比 \(X\) 少 1" 的仿射子空间）。它把 \(X\) 分成两个<strong>开半空间</strong></p>
+<p>一个非零线性泛函的"水平集"。在 \(\mathbb{R}^n\) 里这就是一张 \((n-1)\) 维子流形（直线、平面、…）；在 Banach 空间里它仍是个余维 1 的<em>仿射</em> 子集——是 \(\ker f\) 平移 \(\alpha\) 的一份。</p>
+
+<p><strong>引理（HB 推论一遍）</strong>：\(H_{f, \alpha}\) 是闭的当且仅当 \(f\) 连续。证明短得几乎透明：\(H = f^{-1}(\{\alpha\})\)，连续函数的闭集原像是闭。反过来如果 \(H\) 闭，可以证 \(\ker f\) 闭，进而 \(f\) 连续（因为线性泛函只有"连续 / 处处不连续" 两种命运——这条结论就是 13.4 节的内容，源于<em>不连续线性泛函的核稠密</em>）。</p>
+
+<p>我们以后<em>只</em>关心 \(f \in X^*\) 给的超平面——它们是<em>闭</em> 超平面。</p>
+
+<p><strong>开半空间 / 闭半空间</strong>：</p>
 
 <p>\[
-H^+ = \{x : f(x) > c\}, \qquad H^- = \{x : f(x) < c\},
+H_{f, \alpha}^{<} := \{x : f(x) < \alpha\}, \qquad H_{f, \alpha}^{\le} := \{x : f(x) \le \alpha\}.
 \]</p>
 
-<p>以及它们的闭包（\(\ge\) 与 \(\le\)）。</p>
+<p>类似地有 \(H^>, H^\ge\)。开半空间是凸的、开的；闭半空间是凸的、闭的。</p>
 
-<p>在欧氏 \(\mathbb{R}^n\) 中超平面就是普通"直线 / 平面"的一般化。在 Hilbert 空间里 Riesz 表示让每个 \(f\) 对应一个向量 \(v\)，超平面就是 \(\{x : \langle x, v \rangle = c\}\)，几何上它是垂直于 \(v\) 的"切片"。</p>
-
-<p>一个集合 \(C\) 在超平面 \(H = \{f = c\}\) 的<strong>一侧</strong>，是指 \(C \subset H^+ \cup H = \{f \ge c\}\) 或 \(C \subset H^- \cup H\)。</p>
-
-<p>两个集合 \(A, B\)被超平面 \(H\) <strong>分离</strong>，是指它们在 \(H\) 的不同侧。当不等号严格时（\(A \subset H^+\)、\(B \subset H^-\)），叫<strong>严格分离</strong>。</p>
-
-<h2 id="sec14-2">14.2 Minkowski 泛函：把凸集变次线性</h2>
-
-<p>怎样把"凸"翻译成"次线性"——这是连接几何与解析 Hahn–Banach 的关键。答案是 Minkowski 泛函。</p>
-
-<p>设 \(C \subset X\) 是<strong>吸收</strong>（每个 \(x\) 都存在 \(\lambda > 0\) 使 \(\lambda x \in C\)）的凸集，包含原点。<strong>Minkowski 泛函</strong>：</p>
-
-<p>\[
-\boxed{\ p_C(x) := \inf \{t > 0 : x \in t C\}.\ }
-\]</p>
-
-<p>几何意义：\(p_C(x) = 1/\) "把 \(x\) 缩到落入 \(C\) 边界所需的最小倍数"。对吸收集这个 \(\inf\) 总是有限。</p>
-
-<p>关键性质：</p>
+<p><strong>"超平面分离" 的两个变体</strong>。设 \(A, B \subset X\) 不相交。</p>
 
 <ul>
-  <li><strong>(MK1) 次线性：</strong>\(p_C(\alpha x) = \alpha p_C(x)\) 对 \(\alpha > 0\)，\(p_C(x + y) \le p_C(x) + p_C(y)\)；</li>
-  <li><strong>(MK2) 内点刻画：</strong>若 \(C\) 还是开集，则 \(C = \{x : p_C(x) < 1\}\)；</li>
-  <li><strong>(MK3) 范数情形：</strong>若 \(C = B(0, 1)\) 是单位球，则 \(p_C(x) = \|x\|\)；范数本身就是单位球的 Minkowski 泛函。</li>
+  <li><em>分离</em>：存在 \(f \in X^*, f \neq 0\) 与 \(\alpha\) 使 \(f \le \alpha\) 在 \(A\) 上、\(f \ge \alpha\) 在 \(B\) 上。</li>
+  <li><em>严格分离</em>：存在 \(f, \alpha, \varepsilon > 0\) 使 \(f \le \alpha - \varepsilon\) 在 \(A\) 上、\(f \ge \alpha + \varepsilon\) 在 \(B\) 上。</li>
 </ul>
 
-<p>这条 Minkowski 泛函的次线性 \((MK1)\) 让我们能用 13 章解析 Hahn–Banach。它就是从凸到次线性的"翻译器"。</p>
+<p>严格分离强一档——它要求超平面<em>不</em> 触碰 \(A \cup B\)。第一分离（14.3）只给"分离"；第二分离（14.4）给"严格分离"，代价是更强假设。</p>
 
-<h2 id="sec14-3">14.3 第一分离定理</h2>
+<p><strong>支撑超平面</strong>。设 \(C \subset X\) 凸、\(x_0 \in \partial C\)（边界点）。一个超平面 \(H_{f, \alpha}\) <em>支撑 \(C\) 于 \(x_0\)</em> 当且仅当：</p>
 
-<p><strong>定理（第一分离 / Hahn–Banach 几何形式 I）。</strong>设 \(X\) 是实赋范空间，\(A, B \subset X\) 是<em>非空、凸、不相交</em>的子集，且 \(A\) <em>开</em>。则存在 \(f \in X^*\) 与 \(c \in \mathbb{R}\) 使</p>
+<ol>
+  <li>\(x_0 \in H\)（即 \(f(x_0) = \alpha\)），</li>
+  <li>\(C \subset H^{\le}\)（整个 \(C\) 在 \(H\) 一侧）。</li>
+</ol>
 
-<p>\[
-\boxed{\ f(a) < c \le f(b), \quad \forall a \in A, b \in B.\ }
-\]</p>
+<p>几何上：超平面"<em>恰好顶住</em>" 凸集 \(C\) 在 \(x_0\) 这点。支撑超平面是凸分析里到处出现的对象——次微分（subdifferential）、Lagrange 乘子、约束方向、KKT 条件——全是它的代数化。</p>
 
-<p>注意：分离是<em>严格的左侧</em>但不要求严格右侧（\(B\) 可能在超平面上）。要求 \(A\) 开，是为了 Minkowski 泛函可用。</p>
+<h2 id="sec14-2">14.2 Minkowski 泛函：从凸集到次线性</h2>
 
-<p>证明思路：考虑 \(C = A - B = \{a - b : a \in A, b \in B\}\)。\(C\) 是凸开集（凸开 \(\pm\) 凸开 = 凸开），且 \(0 \notin C\)（因为 \(A \cap B = \emptyset\)）。要分离 \(A\) 与 \(B\) \(\Leftrightarrow\) 找 \(f\) 使 \(f|_C < 0\) \(\Leftrightarrow\) \(f|_C \le 0\) 且 \(f \neq 0\)。</p>
+<p>分离定理的证明要把"<em>凸吸收集</em>" 和"<em>次线性泛函</em>" 这两件事连起来。这一节做这个连接。这件事 Minkowski 1911 年就在用——他想给凸体一个"<em>规范度量</em>"，从这个度量自动复活 HB 的延拓机器。</p>
 
-<p>取 \(x_0 \in C\)。令 \(C' = C - x_0\)（凸开，含原点）。Minkowski 泛函 \(p_{C'}\) 次线性，\(C' = \{p_{C'} < 1\}\)。\(0 \notin C \Rightarrow -x_0 \notin C' \Rightarrow p_{C'}(-x_0) \ge 1\)。</p>
+<p>设 \(C \subset X\) 凸、且<em>吸收</em>（absorbing）——即 \(0 \in \operatorname{int} C\)，等价地 \(\forall x \in X, \exists t > 0\) 使 \(t x \in C\)。</p>
 
-<p>在一维子空间 \(M = \mathbb{R} x_0\) 上定义 \(f_0(t x_0) = -t \cdot p_{C'}(-x_0)\)。验证 \(f_0 \le p_{C'}\)：对 \(t > 0\)，\(f_0(t x_0) = -t p_{C'}(-x_0) < 0 \le p_{C'}(t x_0)\)；对 \(t < 0\)，\(f_0(t x_0) = -t p_{C'}(-x_0) = |t| p_{C'}(-x_0) = p_{C'}(-t \cdot (-x_0))\)，由次线性 \(\le p_{C'}((-t)(-x_0)) = p_{C'}(t x_0)\)。</p>
-
-<p>解析 Hahn–Banach 给延拓 \(f \in X^*\)，\(f \le p_{C'}\) 在全空间。所以 \(f|_{C'} \le p_{C'}|_{C'} < 1\)，且 \(f(-x_0) \ge p_{C'}(-x_0) \ge 1\)，即 \(f(x_0) \le -1\)。</p>
-
-<p>把 \(C' = C - x_0\) 还回去：\(f|_C = f|_{C'} + f(x_0) < 1 + (-1) = 0\)。即 \(f(a) - f(b) < 0\) 对 \(a \in A, b \in B\)，得分离。结束。</p>
-
-<p>(这条证明的细节很多——重点不是逐步背下，而是看见 Minkowski 泛函如何把"凸不相交"翻译成"次线性 + 解析 Hahn–Banach 适用"。)</p>
-
-<h2 id="sec14-4">14.4 第二分离定理（强分离）</h2>
-
-<p>第一分离允许 \(B\) 在超平面上。下面这个版本要求<em>严格分离</em>：</p>
-
-<p><strong>定理（第二分离 / 强分离）。</strong>设 \(X\) 实 Banach 空间，\(A, B\) 非空凸不相交子集，\(A\) <em>闭</em>，\(B\) <em>紧</em>。则存在 \(f \in X^*\)、\(c_1 < c_2\) 使</p>
+<p><strong>Minkowski 泛函 / 度量函数</strong>定义为</p>
 
 <p>\[
-\boxed{\ f(a) \le c_1 < c_2 \le f(b), \quad \forall a \in A, b \in B.\ }
+\boxed{\ p_C(x) := \inf \{ t > 0 : x / t \in C \}.\ }
 \]</p>
 
-<p>证明思路：\(A - B\) 闭（紧 + 闭 = 闭，由有限维或 Banach 空间论证）；\(0 \notin A - B\) \(\Rightarrow\) 存在 \(\varepsilon > 0\) 使 \(B(0, \varepsilon) \cap (A - B) = \emptyset\)。把第一分离定理用在 \(A' = (A - B) + B(0, \varepsilon/2)\) 与 \(\{0\}\) 上。结束。</p>
+<p>朴素直觉：\(p_C(x)\) 是<em>把 \(x\) 缩到 \(C\) 里需要的最小缩放比</em>。如果 \(C\) 是单位球，\(p_C(x) = \|x\|\)；如果 \(C\) 比单位球大，\(p_C(x) < \|x\|\)；如果 \(C\) 是个椭球或多面体，\(p_C\) 给一个"非各向同性的范数"。</p>
 
-<p>这条强分离常被叫做<strong>"Mazur 分离定理"</strong>。它的几何画面非常清楚：闭凸集 \(A\) 和它外面的紧凸集 \(B\) 之间一定有一道严格的"墙"——左边一切 \(\le c_1\)，右边一切 \(\ge c_2\)。</p>
+<p><strong>关键性质</strong>。设 \(C\) 凸吸收。则</p>
+
+<ol>
+  <li>\(p_C(x) \ge 0\) 总成立（定义里 \(t > 0\)）。</li>
+  <li><em>正齐次</em>：\(p_C(\lambda x) = \lambda p_C(x)\) 对所有 \(\lambda \ge 0\)。</li>
+  <li><em>次可加</em>：\(p_C(x + y) \le p_C(x) + p_C(y)\)。</li>
+  <li>\(\{p_C < 1\} \subset C \subset \{p_C \le 1\}\)。如果 \(C\) 还是开的，\(C = \{p_C < 1\}\)。</li>
+</ol>
+
+<p>第 (2)(3) 条把 \(p_C\) 钉成一个<em>次线性</em> 泛函——正是 HB 延拓定理（13.2 节）需要的那种"control"。这是为什么我们花一节写 Minkowski 泛函：<em>它把"凸集" 翻译成了 HB 能吃的"次线性泛函"</em>。</p>
+
+<p>(1)(2) 直接验。(4) 来自吸收性 + 凸性的组合算（如果 \(p_C(x) < 1\) 则存在 \(t < 1\) 使 \(x/t \in C\)，再用凸组合 \(x = t \cdot (x/t) + (1-t) \cdot 0\) 得 \(x \in C\)）。我们重点证 (3)：</p>
+
+<p>设 \(p_C(x) = a\)、\(p_C(y) = b\)。给任意 \(\varepsilon > 0\)，存在 \(s < a + \varepsilon, t < b + \varepsilon\) 使 \(x/s, y/t \in C\)。考虑 \((x + y)/(s + t)\)：</p>
+
+<p>\[
+\frac{x + y}{s + t} = \frac{s}{s + t} \cdot \frac{x}{s} + \frac{t}{s + t} \cdot \frac{y}{t}.
+\]</p>
+
+<p>这是 \(x/s\) 和 \(y/t\)（都属于 \(C\)）的<em>凸组合</em>——\(C\) 凸所以仍在 \(C\) 里。于是 \(p_C(x + y) \le s + t < a + b + 2\varepsilon\)。\(\varepsilon\) 任意，结束。</p>
+
+<p>请你停下来欣赏这步：<em>"\(C\) 凸" 这条假设在哪儿用了</em>？正是上面那个凸组合。如果 \(C\) 不凸，这一步就崩——\(p_C\) 也不再次可加，HB 就用不上。<em>分离定理只对凸集成立，凸性的代数化身就是这步凸组合</em>。</p>
+
+<p>顺便：(1)~(3) 没用 \(C\) 是开的或闭的，只要凸吸收。但 (4) 在 \(C\) 开和闭的版本里有微妙差别。后面证第一分离我们会用"\(C\) 开 ⟹ \(C = \{p_C < 1\}\)" 这一面，让"\(p_C(x) < 1 \Leftrightarrow x \in C\)" 成为干净的等价。</p>
+
+<h2 id="sec14-3">14.3 第一分离定理：凸开 + 凸不相交</h2>
+
+<p>现在证本章第一个主定理。</p>
+
+<p><strong>定理（第一分离定理 / Hahn-Banach 几何形式 I）</strong>。设 \(X\) 实赋范空间，\(A, B \subset X\) 非空、凸、不相交，且 \(A\) <em>开</em>。则存在 \(f \in X^*, f \neq 0\) 与 \(\alpha \in \mathbb{R}\) 使</p>
+
+<p>\[
+f(a) < \alpha \le f(b), \quad \forall a \in A, b \in B.
+\]</p>
+
+<p>等价地说：超平面 \(H_{f, \alpha}\) 把 \(A, B\) 分到两边，\(A\) 整个在开半空间 \(\{f < \alpha\}\) 里、\(B\) 整个在闭半空间 \(\{f \ge \alpha\}\) 里。</p>
+
+<p><strong>证明</strong>。分四步。</p>
+
+<p><em>步骤 1：归约到"原点不在 \(C\) 里" 的情形</em>。考虑 \(C := A - B = \{a - b : a \in A, b \in B\}\)。性质：</p>
+
+<ul>
+  <li>\(C\) 凸（两个凸集的 Minkowski 差仍凸——直接验），</li>
+  <li>\(C\) <em>开</em>（\(C = \bigcup_{b \in B} (A - b)\)，开集的并仍开），</li>
+  <li>\(0 \notin C\)（因为 \(A \cap B = \emptyset\)）。</li>
+</ul>
+
+<p>如果我们能找到 \(f \neq 0\) 使 \(f(c) < 0\) 对所有 \(c \in C\)（即 \(f\) 在 \(C\) 上严格负），那么 \(f(a) < f(b)\) 对所有 \(a \in A, b \in B\)。设 \(\alpha = \inf_{b \in B} f(b)\)，得到 \(f(a) < \alpha \le f(b)\) 的格式。所以问题归约为：<em>给一个凸开集 \(C\)、\(0 \notin C\)，找 \(f \in X^*\) 使 \(f \le 0\) 在 \(C\) 上、\(f \neq 0\)</em>。</p>
+
+<p>（在这一归约里我们还需要 \(\alpha < \infty\)，即 \(f\) 在 \(B\) 上有下界。这条最后会自动给出来。）</p>
+
+<p><em>步骤 2：把 \(C\) 平移成"<em>含原点的吸收开凸</em>"</em>。\(C\) 是开凸但不含 0。任取一点 \(x_0 \in C\)。令 \(D := C - x_0\)。\(D\) 仍开凸，且<em>含 0</em>（因为 \(x_0 - x_0 = 0\)）。又 \(0 \in \operatorname{int} D\) 因 \(D\) 开，所以 \(D\) <em>吸收</em>。</p>
+
+<p>注意原 \(C\) 不含 0 翻译成：<em>\(-x_0 \notin D\)</em>。</p>
+
+<p><em>步骤 3：在一维子空间上构造一个线性形</em>。对 \(D\) 取 Minkowski 泛函 \(p := p_D\)。由 14.2，\(p\) 次线性。又 \(D\) 开 ⟹ \(D = \{p < 1\}\)。因 \(-x_0 \notin D\)，\(p(-x_0) \ge 1\)。</p>
+
+<p>设 \(L = \mathbb{R} \cdot (-x_0)\)，定义 \(g : L \to \mathbb{R}\) 为</p>
+
+<p>\[
+g(t \cdot (-x_0)) := t \cdot p(-x_0).
+\]</p>
+
+<p>\(g\) 在 \(L\) 上线性，且：</p>
+
+<ul>
+  <li>\(t \ge 0\) 时 \(g(t \cdot (-x_0)) = t p(-x_0) = p(t \cdot (-x_0))\) <em>正齐次</em>使等号。</li>
+  <li>\(t < 0\) 时 \(g(t \cdot (-x_0)) = t p(-x_0) \le 0 \le p(t \cdot (-x_0))\)。</li>
+</ul>
+
+<p>所以 \(g \le p\) 在 \(L\) 上。</p>
+
+<p><em>步骤 4：用解析 HB 把 \(g\) 延拓到全空间</em>。HB 延拓定理（13.2）说：在次线性 \(p\) 控制下的子空间线性形可延拓到全空间，仍受 \(p\) 控制。设延拓为 \(f : X \to \mathbb{R}\) 线性、\(f \le p\)、\(f|_L = g\)。</p>
+
+<p>检验 \(f\) 满足要求：</p>
+
+<ul>
+  <li>\(f(-x_0) = g(-x_0) = p(-x_0) \ge 1 > 0\)，所以 \(f \neq 0\)。</li>
+  <li>对 \(d \in D\)：\(p(d) < 1\)（因 \(D = \{p < 1\}\)），所以 \(f(d) \le p(d) < 1\)。即 \(f < 1\) 在 \(D\) 上。</li>
+  <li>翻译回 \(C = D + x_0\)：\(f(c) = f(d) + f(x_0) < 1 + f(x_0)\) 对所有 \(c \in C\)。设 \(\beta = 1 + f(x_0)\)，则 \(f < \beta\) 在 \(C\) 上。</li>
+  <li>而我们要的是 \(f \le 0\) 在 \(C\) 上。这步还得再调一下——其实更干脆是直接代回 \(C = A - B\)。</li>
+</ul>
+
+<p>清算一下。\(C = A - B\)，\(f < \beta\) 在 \(C\) 上 ⟺ \(f(a) - f(b) < \beta\) 对 \(a \in A, b \in B\) ⟺ \(f(a) < f(b) + \beta\)。又我们前面平移用了 \(D = C - x_0\)，等价于把 \(\beta\) 选成 \(\sup_C f\)（取 \(\beta = \sup_C f\)，则 \(f \le \beta\) 在 \(C\) 上，事实上 \(f < \beta\) 因 \(C\) 开）。这样 \(\sup_{a \in A} f(a) - \inf_{b \in B} f(b) \le \beta < \infty\)，于是 \(\sup_{a \in A} f(a) \le \inf_{b \in B} f(b)\) 处可以取一个 \(\alpha\) 夹在中间，再用 \(A\) 开 + \(f\) 连续推出 \(f(a) < \alpha\)（开集上线性泛函上确界不达到），得到</p>
+
+<p>\[
+f(a) < \alpha \le f(b), \quad \forall a \in A, b \in B.
+\]</p>
+
+<p><em>剩一件事：\(f\) 是否连续？</em>HB 延拓出来的 \(f\) 一开始只是线性的——但 \(f \le p\) 加 \(p\) 在 0 邻域有界（因 \(0 \in \operatorname{int} D\)）合起来给 \(f\) 在 0 邻域有界，所以 \(f\) 连续——\(f \in X^*\)。这步是次线性 control 自动给"连续" 的标准论证（详细推 13.3 节里有）。</p>
+
+<p>证毕。<strong>请你停下来回看证明的脉络</strong>：凸开不相交（几何条件） → \(A - B\) 凸开不含 0 → 平移到含 0 → Minkowski 泛函（凸 → 次线性）→ 解析 HB 延拓 → 得分离泛函。<em>整个证明就是把"几何分离" 翻译成"代数延拓" 的链子</em>。Minkowski 泛函是这条链子里的关键齿轮——<em>没</em>有它，HB 不知道该控制谁。</p>
+
+<h2 id="sec14-4">14.4 第二分离定理：凸闭 + 凸紧 → 严格分离</h2>
+
+<p>第一分离给的是 \(<\) 和 \(\le\) 的不对称分隔。如果两个集都<em>闭</em>，能不能得到<em>严格</em> 分离 \(f(a) < \alpha < \beta < f(b)\)？答案是：要付一点代价——其中一个集必须<em>紧</em>。</p>
+
+<p><strong>定理（第二分离定理 / 强分离）</strong>。设 \(X\) 实 Banach 空间，\(A, B \subset X\) 非空凸不相交，\(A\) <em>闭</em>、\(B\) <em>紧</em>。则存在 \(f \in X^*, f \neq 0\) 与 \(\alpha < \beta\) 使</p>
+
+<p>\[
+f(a) \le \alpha < \beta \le f(b), \quad \forall a \in A, b \in B.
+\]</p>
+
+<p>等价地说：超平面 \(H_{f, (\alpha + \beta)/2}\) <em>严格</em> 把两集分到两边——超平面本身不与任何一集相交。</p>
+
+<p><strong>证明</strong>。考虑 \(C = A - B\)。两条性质：</p>
+
+<ol>
+  <li>\(C\) 凸。</li>
+  <li>\(C\) <em>闭</em>。这步用到 \(B\) 紧——任取 \(c_n = a_n - b_n \to c\)，因 \(B\) 紧，\(b_n\) 有收敛子列 \(b_{n_k} \to b \in B\)，于是 \(a_{n_k} = c_{n_k} + b_{n_k} \to c + b \in A\)（因 \(A\) 闭），故 \(c = (c + b) - b \in A - B = C\)。如果 \(B\) 只是闭不紧，这步会失败——闭 - 闭未必闭，需要紧来保证子列收敛。</li>
+  <li>\(0 \notin C\)（\(A \cap B = \emptyset\)）。</li>
+</ol>
+
+<p>所以 \(C\) 是闭凸不含 0 的集合。"\(0 \notin C\) + \(C\) 闭" 给一个具体距离 \(\delta := d(0, C) > 0\)（因 \(C\) 闭，\(\inf_{c \in C} \|c\|\) 在闭集上严格正——这是闭集到点距离不为零的标准事实）。</p>
+
+<p>令 \(U := \{x \in X : \|x\| < \delta\}\)，开球。\(U\) 凸开，且 \(U \cap C = \emptyset\)（任何 \(c \in C\) 满足 \(\|c\| \ge \delta\)）。</p>
+
+<p>对 \(U, C\) 用<em>第一分离定理</em>（\(U\) 开、\(C\) 凸、二者凸不相交）：存在 \(f \in X^*, f \neq 0\) 与 \(\gamma\) 使</p>
+
+<p>\[
+f(u) < \gamma \le f(c), \quad \forall u \in U, c \in C.
+\]</p>
+
+<p>关键：\(U\) 是关于 0 对称的开球（含 0），所以 \(f(U) = (-\|f\| \delta, \|f\| \delta)\)（线性泛函在球上是个对称区间）。\(f < \gamma\) 在 \(U\) 上 ⟹ \(\|f\| \delta \le \gamma\)，即 \(\gamma \ge \|f\| \delta > 0\)。所以</p>
+
+<p>\[
+f(c) \ge \|f\| \delta > 0, \quad \forall c \in C = A - B.
+\]</p>
+
+<p>翻译：\(f(a) - f(b) \ge \|f\| \delta > 0\) 对所有 \(a \in A, b \in B\)。即</p>
+
+<p>\[
+\inf_{a \in A} f(a) \ge \sup_{b \in B} f(b) + \|f\| \delta.
+\]</p>
+
+<p>取 \(\alpha = \sup_{b \in B} f(b) + \|f\| \delta / 3\)、\(\beta = \alpha + \|f\| \delta / 3\)。等等——做反了，应该交换：注意我们记号让 \(f(a) > f(b)\)，所以严格说 \(f\) 在 \(B\) 上小、在 \(A\) 上大。换成</p>
+
+<p>\[
+f(b) \le \sup_B f =: s, \qquad f(a) \ge s + \|f\| \delta.
+\]</p>
+
+<p>取 \(\alpha = s + \|f\| \delta / 3, \beta = s + 2 \|f\| \delta / 3\)，则</p>
+
+<p>\[
+f(b) \le s < \alpha < \beta < s + \|f\| \delta \le f(a).
+\]</p>
+
+<p>这是严格分离。证毕。</p>
+
+<p>请你停下来对比第一分离和第二分离的<em>假设</em> 与<em>结论</em>：</p>
+
+<ul>
+  <li>第一分离：\(A\) 开 + 凸不相交 → \(f(a) < \alpha \le f(b)\)（不等号是非对称的 \(<\) 与 \(\le\)）。</li>
+  <li>第二分离：\(A\) 闭 + \(B\) 紧 + 凸不相交 → \(f(a) \le \alpha < \beta \le f(b)\)（严格分离，超平面不碰任何一集）。</li>
+</ul>
+
+<p>"<em>开 vs 闭+紧</em>" 的取舍贯穿凸分析：开集让 Minkowski 泛函好用，闭+紧让差集闭、距离严格正。两个版本各有用场——第一个适合原子的存在性论证（例如证支撑超平面必存在），第二个适合数值意义下的 separation（例如证最小范数解存在唯一）。</p>
+
+<p>顺带：如果两集都只是<em>闭</em>（不要求紧），严格分离<em>可能失败</em>。经典反例：在 \(\mathbb{R}^2\) 里 \(A = \{(x, y) : y \ge e^x\}\)（指数曲线上方）、\(B = \{(x, y) : y \le 0\}\)（下半平面）。两集都闭、凸、不相交，但<em>没有任何超平面严格分离它们</em>——它们沿 \(x \to -\infty\) 越来越接近。这是为什么"\(B\) 紧" 这条假设不能去掉。</p>
 
 <h2 id="sec14-5">14.5 支撑超平面定理</h2>
 
-<p>这是凸集"边界几何"的基本定理：</p>
+<p>第二分离的一个直接推论是<strong>支撑超平面的存在性</strong>。</p>
 
-<p><strong>定理（支撑超平面）。</strong>设 \(C \subset X\) 凸开非空，\(x_0 \in \partial C\)（边界点）。则存在 \(f \in X^*\)、\(c \in \mathbb{R}\) 使 \(f(x_0) = c\) 且 \(f(x) < c\) 对 \(x \in C\)。"\(\{f = c\}\)" 叫 \(C\) 在 \(x_0\) 的<strong>支撑超平面</strong>。</p>
+<p><strong>定理（支撑超平面）</strong>。设 \(X\) 实 Banach 空间，\(C \subset X\) 凸闭，\(x_0 \in \partial C\)（\(C\) 的边界）。则存在 \(f \in X^*, f \neq 0\) 使</p>
 
-<p>证明：把第一分离用到 \(A = C\) 与 \(B = \{x_0\}\)。\(B\) 是单点 \(\Rightarrow\) 凸；\(A\) 开凸；\(x_0 \in \partial C \Rightarrow x_0 \notin C \Rightarrow A \cap B = \emptyset\)。第一分离给 \(f, c\) 使 \(f(a) < c \le f(x_0)\)。把 \(c = f(x_0)\) 取到边界即可。</p>
+<p>\[
+f(x_0) = \sup_{c \in C} f(c).
+\]</p>
 
-<p>支撑超平面在凸优化、PDE 变分法里反复出现。它是 \(C\) 在每个边界点处"切向 + 法向"的几何替代物——在不要求光滑的凸集上仍然给"支撑方向"。</p>
+<p>即超平面 \(H_{f, f(x_0)}\) 在 \(x_0\) 处<em>支撑</em> \(C\)。</p>
+
+<p><strong>证明</strong>。\(x_0 \in \partial C\) 意味着 \(x_0 \notin \operatorname{int} C\)。设 \(U := \operatorname{int} C\)。两件事：\(U\) 凸开（凸集内部凸），\(\{x_0\}\) 凸紧，\(U \cap \{x_0\} = \emptyset\)。用第一分离（更适合开集这边的版本）得 \(f \in X^*, f \neq 0\) 与 \(\alpha\) 使 \(f(u) < \alpha \le f(x_0)\) 对所有 \(u \in U\)。</p>
+
+<p>把不等号紧化到 \(C\) 整体：\(\overline{U} = \overline{C}\)（凸集内部的闭包等于其闭包，对内部非空的凸集成立）= \(C\)（\(C\) 闭）。所以 \(f \le \alpha\) 在 \(C\) 上（连续性）；又 \(f(x_0) \ge \alpha\)；这两条合起来 \(f(x_0) = \alpha = \sup_C f\)。证毕。</p>
+
+<p><strong>支撑超平面定理</strong> 是凸分析的<em>主轴定理</em> 之一。它给凸集"<em>每个边界点都有一面支撑墙</em>"——这是凸集"光滑性" 的代数表达。它直接给两个分支：</p>
+
+<ul>
+  <li><em>次微分（subdifferential）</em>：凸函数 \(f\) 在某点 \(x_0\) 的次微分 \(\partial f(x_0)\) 是"支撑 epigraph 的所有线性形" 的集合。支撑超平面定理保证这集合<em>非空</em>——这是凸优化里 Lagrange 乘子存在性的原始形式。</li>
+  <li><em>对偶锥与极锥</em>：凸锥 \(K\) 的极锥 \(K^\circ = \{f : f \le 0 \text{ 在 } K\}\)。支撑定理保证它<em>足够丰富</em>，足以表达 \(K\) 的所有"约束方向"。</li>
+</ul>
 
 <h2 id="sec14-6">14.6 三个应用</h2>
 
-<p><strong>应用 1：凸优化中的 Lagrange 对偶。</strong>考虑约束最小化</p>
+<p>这一节给三条本章工具的"应用样例"，让你看到分离定理在数学的哪些角落落地。</p>
+
+<p><strong>应用 1：Lagrange 对偶 = 凸集分离的代数化</strong>。考虑约束极小化问题</p>
 
 <p>\[
-\min_x f(x) \quad \text{s.t.} \quad g(x) \le 0,
+\min_{x} f(x), \qquad \text{s.t. } g_i(x) \le 0, \ i = 1, \ldots, m,
 \]</p>
 
-<p>其中 \(f, g\) 凸。可行集 \(\{x : g(x) \le 0\}\) 凸。在 \((f, g)\)-平面上看"可达像"</p>
+<p>其中 \(f, g_i\) 凸。Lagrange 函数</p>
 
 <p>\[
-A = \{(t, s) : \exists x, f(x) \le t, g(x) \le s\}
+L(x, \lambda) = f(x) + \sum_i \lambda_i g_i(x), \qquad \lambda \ge 0.
 \]</p>
 
-<p>是凸集；目标是看 \(A\) 在 \(s = 0\) 截面的最小 \(t\)——这就是 \(\min f\) 对约束 \(g \le 0\) 的值。如果 \(A\) 与 \(\{(t^*, 0) : t < p^*\}\) 不相交（\(p^*\) 是真值），第一分离给一个超平面 \(\alpha t + \beta s = c\)。这条超平面就是 Lagrange 函数 \(L(x, \beta) = f(x) + \beta g(x)\) 的对偶变量解释。<strong>整个 Lagrange 对偶理论 = 凸集分离的代数包装</strong>。</p>
+<p>对偶问题 \(\max_{\lambda \ge 0} \inf_x L(x, \lambda)\)。著名的<em>强对偶性</em>（在 Slater 条件下）说原问题最优值等于对偶问题最优值。</p>
 
-<p>这就是凸优化课里"为什么 Lagrange 乘数是真定理而不是巧合"的根本原因。Hahn–Banach 几何形式提供了它的存在性。</p>
+<p>这条强对偶<em>本质</em> 是分离定理。考虑可达集</p>
 
-<p><strong>应用 2：变分法中的存在性。</strong>设 \(X\) 是 Banach 空间，\(F : X \to \mathbb{R}\) 凸下半连续，要证某个变分问题有解。常用策略：把"最小化序列" \(\{x_n\}\) 看成 \(X^*\) 上某种 Hahn–Banach 几何的"试探函数集"，用第二分离定理在某个紧致环境里找到极小元素。详见<a href="ch23.html">第 23 章</a>变分法入门。</p>
+<p>\[
+A := \{(g_1(x), \ldots, g_m(x), f(x)) + (\mathbb{R}^m_{\ge 0} \times \mathbb{R}_{\ge 0}) : x \in X\} \subset \mathbb{R}^{m+1}.
+\]</p>
 
-<p><strong>应用 3：Krein–Milman 定理（预告）。</strong>这是凸分析的高峰之一：</p>
+<p>\(A\) 凸（\(f, g_i\) 凸；加非负锥仍凸）。设原问题最优值 \(p^*\)。"原问题最优值大于 \(p^*\)" 翻译成 \(\{(0, \ldots, 0, p^* - \varepsilon)\} \cap A = \emptyset\) 对小 \(\varepsilon > 0\)。用第二分离得一个 \((m+1)\)-维线性形 \(\lambda \cdot u + \mu \cdot v\) 把这两个凸集分开。该线性形的系数<em>就是</em> Lagrange 乘子。强对偶性 = 分离超平面的代数化。</p>
 
-<p><strong>定理（Krein–Milman）。</strong>Banach 空间中的凸紧集 \(K\) 等于其<strong>极点</strong>（不能写成 \(K\) 中两点的非平凡凸组合的点）的闭凸包。</p>
+<p>这条对应让你以后看任何"约束优化 + 对偶" 的故事时，都能在脑子里把它翻译成"<em>哪两个凸集，被哪面墙分开</em>"。从 SVM（支持向量机里 Lagrange 乘子是支撑超平面的法向量）到经济学一般均衡（价格向量是支撑超平面的法向）到 PDE 变分约束（接触问题里 Lagrange 乘子是接触力），全是同一条几何直觉。</p>
 
-<p>证明完全靠 Hahn–Banach 几何形式 + Zorn 引理。直观上：每个支撑超平面会切下一片"凸面"，这片凸面的极点也是 \(K\) 的极点；逐次切下去得到所有极点。详细在<a href="appA.html">附录 A</a>。</p>
+<p><strong>应用 2：变分法的存在性</strong>。设 \(I : X \to \mathbb{R} \cup \{+\infty\}\) 是个凸下半连续泛函（典型例子：弹性能量、Dirichlet 能量），\(K \subset X\) 凸闭。问 \(\inf_K I\) 是否达到。</p>
 
-<p>Krein–Milman 是为什么"线性规划的最优解一定在顶点上"在无穷维变体里依然真——这是博弈论 von Neumann minimax 定理的几何根。</p>
+<p>朴素方法：取一极小化序列 \(x_n \in K, I(x_n) \to \inf_K I\)。希望 \(x_n\) 有收敛子列、子列极限取到 inf。无穷维里 \(x_n\) 不一定有强收敛子列（ch1.1 节"单位球不紧"），但<em>弱收敛子列</em>有（ch18 Banach-Alaoglu）。问题剩下：弱极限是否仍在 \(K\) 里、\(I\) 在弱极限处是否达到 \(\inf\)。</p>
 
-<p>本章把 Hahn–Banach 的几何面挑明。第 13、14 两章合起来给了泛函分析最深刻的对偶性原则：<em>一个空间 \(X\) 和它的对偶 \(X^*\) 通过 Hahn–Banach 互相照镜子</em>。任何 \(X\) 上的几何问题（点、子空间、凸集、距离、紧致）都对应一个 \(X^*\) 上的代数问题（线性泛函、零化、分离、保范延拓）。</p>
+<p>"\(K\) 弱闭" 这条是分离定理的直接推论：<em>凸闭集自动弱闭</em>。证明就是支撑超平面：\(K\) 凸闭，则任何 \(x_0 \notin K\) 可被超平面与 \(K\) 严格分离（第二分离）；这条性质自动给"\(K\) 在弱拓扑下也是闭的"。详见 ch17 关于强弱拓扑的讨论。</p>
 
-<p>下一章我们正式开始 \(X^*\) 这个"镜中世界"——研究<strong>对偶空间</strong>的结构、它和 \(X\) 的关系、以及它在分析里反复出现的若干代数等距同构。</p>
+<p>这一观察让<em>整个变分方法</em> 落脚：凸 + 闭 自动给弱闭，弱闭 + 弱紧（Banach-Alaoglu 在自反空间 + 强制性）自动给最小元存在。这是 Sobolev 空间上 PDE 变分理论的基础结构。</p>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 Hahn–Banach 延拓定理（解析形式）</a><a href="ch15.html">下一章 · 第 15 章 对偶空间 X* →</a></nav>
+<p><strong>应用 3：Krein-Milman 预告</strong>。\(\mathbb{R}^n\) 里凸紧多面体是其顶点的凸包。Krein-Milman 把这件事推广到无穷维：<em>Banach 空间里凸紧集是其极点（extreme points）的闭凸包</em>。证明的核心步骤就是支撑超平面——每个边界点处取支撑超平面，超平面与凸紧集的交是更低维的凸紧面，归纳下去得到极点。</p>
+
+<p>这是泛函分析里的另一条主线（ch19 / ch24 会有更详细的版本）。它让你能在抽象空间里"找出顶点"——这是在概率论（极点分解 \(\Leftrightarrow\) 测度的分解）、量子力学（纯态 = 密度算子的极点）、优化（线性规划最优在顶点取得）等地方都基础的工具。</p>
+
+<h2 id="sec14-7">14.7 一句临别话</h2>
+
+<p>HB 延拓定理（ch13）说"<em>线性泛函足够多</em>"。本章把这件事翻成几何："<em>不相交凸集中间总有一面墙</em>"。请你把<a href="ch13.html">ch13</a> 的 HB 和这一章并起来看：同一个定理，两副面孔。</p>
+
+<ul>
+  <li>ch13 的 HB：<em>把一根定义在子空间上的线段往全空间方向接长，长度不变</em>。</li>
+  <li>ch14 的 HB：<em>把两块不相交的凸集分开，中间夹一面超平面</em>。</li>
+</ul>
+
+<p>它们等价。从延拓证分离我们刚做完；反过来从分离证延拓也只需要把"延拓 \(g\) 到 \(f\)" 翻译成"分离 \(g\) 的图像与某个 epigraph"。所以"延拓 = 分离" 是同一件事的两种讲法。</p>
+
+<p>这条观察是泛函分析的<em>美</em>——一个定理同时是代数的也是几何的，应用到一个领域就成代数构造（ch15 对偶空间），应用到另一个领域就成几何工具（凸优化、变分法）。</p>
+
+<p>下一章我们把 HB 推向另一个方向：<em>研究 \(X^*\) 这个对偶空间本身的结构</em>。HB 保证了 \(X^*\) 大；现在我们正式研究它。8 条标准对偶字典 + 二次对偶 + 对偶算子，为 Banach 空间理论 + 谱论铺路。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 Hahn-Banach 延拓定理</a><a href="ch15.html">下一章 · 第 15 章 对偶空间 →</a></nav>
 </main>
 </body>
 </html>

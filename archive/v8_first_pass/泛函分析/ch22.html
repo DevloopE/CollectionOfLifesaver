@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 22 章 Fredholm 选择性 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 紧自伴算子的谱定理</a><a href="ch23.html">下一章 · 第 23 章 应用：Sobolev 空间与变分入门 →</a></nav>
+<h1 id="ch22">第 22 章 Fredholm 选择性</h1>
+
+<p>这一章把<a href="ch20.html">第 20 章</a>紧算子论"代数侧"的中心事实——<strong>Fredholm 选择性</strong>——讲完整。它要解决的问题非常具体：</p>
+
+<p>"<strong>给一个紧算子 \(T\) 与一个非零数 \(\lambda\)，方程 \(T x - \lambda x = y\) 在什么时候可解？解唯一吗？\</strong>"</p>
+
+<p>有限维线性代数的回答是众所周知的——"齐次方程唯一 \(\iff\) 非齐次有解"。这条等价用矩阵秩论证三行写完。Fredholm 1903 发现：在<em>积分方程</em>的语境（即对紧算子）下，<em>同样的等价</em> 在无穷维仍成立。这是个让人惊艳的结论——它把"无穷维 \(I - T\) 的可解性"完全降到"有限维线性方程"水平。</p>
+
+<ul>
+  <li>Fredholm 选择性的正式陈述（"零或非零"二选一）。</li>
+  <li>关键预备：紧扰动 + 单位 = "几乎单射 + 几乎满射"——\(\ker(I - T)\) 有限维，\(\operatorname{Range}(I - T)\) 闭且有限余维。</li>
+  <li>Riesz 引理 + 紧 \(\Rightarrow\) 像闭：\(\operatorname{Range}(I - T)\) 闭。</li>
+  <li>用 15.6 节"\(\overline{\operatorname{Range}(T)} = {}^\circ \ker(T^*)\)"得到第二条选择性。</li>
+  <li>"<strong>指数</strong>" \(\operatorname{ind}(I - T) = \dim \ker - \dim \operatorname{coker} = 0\)——这是 Fredholm 选择性的"一行总结"。</li>
+  <li>三个具体应用：积分方程、PDE 椭圆问题、Toeplitz 算子简介。</li>
+</ul>
+
+<h2 id="sec22-1">22.1 Fredholm 选择性的陈述</h2>
+
+<p><strong>定理（Fredholm 选择性）。</strong>设 \(X\) 是 Banach 空间，\(T \in \mathcal{K}(X)\)。则 \(I - T\) 满足以下"二选一" 选择性：</p>
+
+<p><strong>(A) 唯一性 + 存在性版：</strong>恰好出现下面两种情形之一：</p>
+
+<ul>
+  <li><strong>(A1) "零情形"。</strong>齐次方程 \(x - T x = 0\) 只有零解（即 \(\ker(I - T) = \{0\}\)）。则 \(I - T\) 是双射，对每个 \(y \in X\)，方程 \(x - T x = y\) 有唯一解。</li>
+  <li><strong>(A2) "非零情形"。</strong>齐次方程 \(x - T x = 0\) 有非零解（即 \(\ker(I - T) \neq \{0\}\)）。则 \(\dim \ker(I - T) = \dim \ker(I - T^*) < \infty\)，且非齐次方程 \(x - T x = y\) 可解 \(\iff\) \(y \perp \ker(I - T^*)\)。</li>
+</ul>
+
+<p>更具体地：</p>
+
+<p><strong>(B) 有限维 + 闭像版：</strong></p>
+
+<ul>
+  <li>\(\dim \ker(I - T) < \infty\)；</li>
+  <li>\(\operatorname{Range}(I - T)\) 是闭子空间；</li>
+  <li>\(\operatorname{Range}(I - T) = {}^\circ \ker(I - T^*)\)；</li>
+  <li>\(\dim \ker(I - T) = \dim \ker(I - T^*) < \infty\)；</li>
+  <li><strong>(指数零)</strong> \(\operatorname{ind}(I - T) := \dim \ker(I - T) - \operatorname{codim} \operatorname{Range}(I - T) = 0\)。</li>
+</ul>
+
+<p>这就是 Fredholm 1903 在积分方程语境下发现的事实，后来被 Riesz、Schauder、Atkinson 等推广到一般紧算子。</p>
+
+<p>"<strong>选择性</strong>"这个名字来自情形 (A) 的"二选一" ——要么齐次唯一就推出非齐次永远有唯一解，要么齐次有非平凡核就给非齐次施加可解性条件 \(y \perp \ker(I - T^*)\)。这两种情形<em>互斥</em>，<em>必有其一</em>。</p>
+
+<h2 id="sec22-2">22.2 关键预备：Riesz 引理</h2>
+
+<p>证明 Fredholm 选择性需要一个关于"几乎正交"的工具：</p>
+
+<p><strong>Riesz 引理。</strong>设 \(X\) 是赋范空间，\(M \subsetneq X\) 是<em>真闭</em>子空间。对任意 \(0 < \theta < 1\)，存在 \(x \in X\)，\(\|x\| = 1\)，使</p>
+
+<p>\[
+\operatorname{dist}(x, M) \ge \theta.
+\]</p>
+
+<p>证明：取 \(z \in X \setminus M\)，\(d = \operatorname{dist}(z, M) > 0\)（\(M\) 闭）。取 \(m \in M\) 使 \(\|z - m\| \le d/\theta\)（这种 \(m\) 由下确界定义存在，注意比 \(d\) 大不超过 \(1/\theta\) 倍）。令 \(x = (z - m)/\|z - m\|\)，\(\|x\| = 1\)。</p>
+
+<p>对任意 \(m' \in M\)：\(\|x - m'\| = \|z - m - \|z - m\| m'\|/\|z - m\| = \|z - (m + \|z - m\| m')\|/\|z - m\| \ge d / (d/\theta) = \theta\)（因为 \(m + \|z - m\| m' \in M\)）。结束。</p>
+
+<p>这条引理是<em>无穷维"取一个几乎正交方向"的工具</em>。它推出：</p>
+
+<p><strong>推论。</strong>无穷维赋范空间的闭单位球不紧。</p>
+
+<p>证明：取 \(M_n = \operatorname{span}\{x_1, \ldots, x_n\}\)（有限维 \(\Rightarrow\) 闭）。无穷维 \(\Rightarrow M_n \neq X\)。Riesz 引理给 \(x_{n+1}\) 范数 1，\(\operatorname{dist}(x_{n+1}, M_n) \ge 1/2\)。所以 \(\{x_n\}\) 在闭单位球内任意两点距离 \(\ge 1/2\)，没收敛子序列。结束。</p>
+
+<p>这条 Riesz 引理 + 推论是<a href="ch1.html">第 1 章 1.1 节</a>"无穷维单位球不紧"的<em>正式证明</em>。</p>
+
+<h2 id="sec22-3">22.3 \(\ker(I - T)\) 有限维</h2>
+
+<p>设 \(T\) 紧。要证 \(\ker(I - T)\) 有限维。</p>
+
+<p>令 \(N = \ker(I - T) = \{x : T x = x\}\)。\(N\) 是 \(T\) 的"特征值 1 的特征空间"，闭。</p>
+
+<p>关键：\(T|_N = \operatorname{id}|_N\) 是 \(N\) 上的恒等算子。但 \(T\) 紧 \(\Rightarrow\) \(T|_N\) 紧 \(\Rightarrow\) \(\operatorname{id}|_N\) 紧。\(\operatorname{id}\) 紧 \(\iff\) \(N\) 单位球紧 \(\iff\) \(N\) 有限维（由 22.2 节推论）。结束。</p>
+
+<p>这条论证非常优雅——把"\(T\) 在自己核上是恒等"翻译为"恒等紧"，紧性立即给"有限维"。</p>
+
+<h2 id="sec22-4">22.4 \(\operatorname{Range}(I - T)\) 闭</h2>
+
+<p>这是 Fredholm 选择性论证里技术最复杂的一步。下面给出标准证明的草图。</p>
+
+<p>令 \(R = \operatorname{Range}(I - T)\)。要证 \(R\) 闭。取 \(y_n = (I - T) x_n \to y\)。要证 \(y \in R\)。</p>
+
+<p>由 22.3，\(N = \ker(I - T)\) 有限维 \(\Rightarrow\) \(X = N \oplus M\)（\(M\) 是 \(N\) 的某个闭补，存在因为 \(N\) 有限维）。</p>
+
+<p>分解 \(x_n = n_n + m_n\)，\(n_n \in N, m_n \in M\)。\((I - T) x_n = (I - T) n_n + (I - T) m_n = 0 + (I - T) m_n = (I - T) m_n\)（因为 \(n_n \in \ker(I - T)\)）。</p>
+
+<p>所以可以假设 \(x_n \in M\)。要证：\(\{x_n\}\) 范数有界。</p>
+
+<p>若不然，\(\|x_n\| \to \infty\)，令 \(z_n = x_n / \|x_n\|\)。\(\|z_n\| = 1\)，\((I - T) z_n = y_n / \|x_n\| \to 0\)。\(T\) 紧 \(\Rightarrow\) \(\{T z_n\}\) 有强收敛子序列 \(T z_{n_k} \to w\)。由 \((I - T) z_{n_k} \to 0\)：\(z_{n_k} = T z_{n_k} + (I - T) z_{n_k} \to w + 0 = w\)。强收敛 + \(z_n \in M\) 闭 \(\Rightarrow\) \(w \in M\)。\(T\) 连续 \(\Rightarrow\) \(T w = \lim T z_{n_k} = w\)，即 \(w \in N\)。所以 \(w \in N \cap M = \{0\}\)，即 \(w = 0\)。但 \(\|w\| = \lim \|z_{n_k}\| = 1\)，矛盾。</p>
+
+<p>所以 \(\{x_n\}\) 范数有界。\(T\) 紧 \(\Rightarrow\) \(\{T x_n\}\) 有强收敛子序列 \(T x_{n_k} \to v\)。\(x_{n_k} = T x_{n_k} + y_{n_k} \to v + y\)。\(T\) 连续 \(\Rightarrow\) \(T(v + y) = v\)，即 \((I - T)(v + y) = y\)。所以 \(y \in R\)。结束。</p>
+
+<p>这条"\(\operatorname{Range}(I - T)\) 闭" 是 Fredholm 选择性最技术的部分。其它部分都从它流出来。</p>
+
+<h2 id="sec22-5">22.5 完成 Fredholm 选择性</h2>
+
+<p>有了 22.3 + 22.4，再加<a href="ch15.html">第 15 章 15.6 节</a>"\(\overline{\operatorname{Range}(I - T)} = {}^\circ \ker(I - T^*)\)"，立即给</p>
+
+<p>\[
+\operatorname{Range}(I - T) = {}^\circ \ker(I - T^*).
+\]</p>
+
+<p>这就是 (A2) 的"可解条件"——\(y \in \operatorname{Range}(I - T) \iff y \perp \ker(I - T^*)\)。</p>
+
+<p>"\(\dim \ker(I - T) = \dim \ker(I - T^*)\)" 是更深一些的事实，叫<strong>对偶等式</strong>。证明用 Schauder 定理（\(T\) 紧 \(\iff\) \(T^*\) 紧），把 22.3 节论证用在 \((I - T^*)\) 上得 \(\dim \ker(I - T^*) < \infty\)。两边相等的论证用一种"范畴对偶"的论证，详细在 Brezis《Functional Analysis》第 6 章。</p>
+
+<p>"<strong>指数 = 0</strong>" 是这条对偶等式的几何重写：</p>
+
+<p>\[
+\boxed{\ \operatorname{ind}(I - T) = \dim \ker(I - T) - \dim \ker(I - T^*) = 0, \quad T \in \mathcal{K}(X).\ }
+\]</p>
+
+<p>它说"<strong>紧扰动不改变恒等的指数</strong>"——\(\operatorname{ind}(I) = 0\)，紧加上去不变。这条是 Atkinson 把"Fredholm 算子" 从这条具体陈述抽象出来的根据。</p>
+
+<h2 id="sec22-6">22.6 三个应用</h2>
+
+<p><strong>应用 1：Fredholm 积分方程。</strong>这是 Fredholm 1903 的原始动机。考虑积分方程</p>
+
+<p>\[
+f(x) - \lambda \int_0^1 K(x, y) f(y) \, dy = g(x), \quad K \text{ 连续}.
+\]</p>
+
+<p>记 \(T_K f = \int K f\)（紧算子）。方程为 \((I - \lambda T_K) f = g\)。</p>
+
+<p>Fredholm 选择性给：要么<em>对每 \(g\) 唯一解</em>（齐次只零解），要么<em>有限维核 + 可解条件</em>（齐次有非零解 \(\Rightarrow\) \(g \perp \ker(I - \lambda T_K^*)\)）。</p>
+
+<p>这条结论让积分方程可解性<em>完全代数化</em>——和有限维线性方程组的可解性<em>相同</em>。这是泛函分析能给"应用数学"最直接的结构性贡献。</p>
+
+<p><strong>应用 2：椭圆 PDE 的 Fredholm 选择性。</strong>考虑 \(-\Delta u + V u = f\) 在有界域 \(\Omega\) 上配 Dirichlet 边条件。把它写成 \((I - \lambda K) u = f'\) 的形式（\(K = (-\Delta)^{-1}\) 紧自伴 + \(V\) 项的紧扰动）。Fredholm 选择性给：要么对每 \(f\) 有唯一弱解（即 \(\lambda\) 不是 \(K\) 的特征值），要么齐次有非零解 + 可解条件。</p>
+
+<p>这就是 PDE 文献里反复出现的"Fredholm 选择性 \(\Rightarrow\) 唯一性 \(\iff\) 存在性"模板。它把 PDE 的存在性和唯一性问题用泛函分析联系起来。</p>
+
+<p><strong>应用 3：Toeplitz 算子（简介）。</strong>在 Hardy 空间 \(H^2\) 上的 Toeplitz 算子 \(T_\varphi\) 满足 \(T_\varphi T_\psi - T_{\varphi \psi}\) 是紧算子。这给了 Toeplitz 代数的"紧模" Calkin 代数结构，从而 Toeplitz 算子的 Fredholm 性可以用其符号 \(\varphi\) 直接判断。这是<strong>Atiyah–Singer 指标定理</strong>（"算子指标 = 拓扑不变量"）的经典先声。</p>
+
+<p>Toeplitz 算子涉及很多具体的复分析与算子代数细节，超出本书入门定位。值得知道的是：紧算子谱论 + Fredholm 选择性 + 指标 是现代泛函分析最具几何意味的方向之一。</p>
+
+<p>本章把"紧算子"故事彻底闭环——谱定理（21 章给"对角化"）+ Fredholm 选择性（本章给"可解性"）。这两条是紧算子分析的<em>结构性</em>双柱。</p>
+
+<p>下一章我们离开抽象，进入<em>应用</em>——Sobolev 空间与变分法入门。我们要把前面 22 章的工具组合起来，证明经典椭圆 PDE 在合适的 Sobolev 空间里有<em>弱解</em>。这个故事会用到 Hilbert 几何（第 6 章）、Riesz 表示（第 16 章）、Lax–Milgram、紧嵌入（本章背景里出现的 Rellich 嵌入）。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 紧自伴算子的谱定理</a><a href="ch23.html">下一章 · 第 23 章 应用：Sobolev 空间与变分入门 →</a></nav>
+</main>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 21 章 紧自伴算子的谱定理 — 普林斯顿泛函分析读本</title>
+<title>第 21 章 紧自伴算子谱定理 — 普林斯顿泛函分析读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -33,165 +33,347 @@
 <body>
 <main>
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 紧算子</a><a href="ch22.html">下一章 · 第 22 章 Fredholm 选择性 →</a></nav>
-<h1 id="ch21">第 21 章 紧自伴算子的谱定理</h1>
+<h1 id="ch21">第 21 章 紧自伴算子谱定理</h1>
 
-<p>这一章是泛函分析最美的几个定理之一：<strong>紧自伴算子的谱定理</strong>。它把"对称矩阵能正交对角化"这个有限维线性代数的核心结论<em>原样</em>推到无穷维 Hilbert 空间——只要算子既<em>紧</em>又<em>自伴</em>。结论的形态非常干净："特征值构成可数实序列趋于 0；对应特征向量构成 Hilbert 空间的正交规范基；每个 \(x\) 可以按特征向量展开，\(T\) 在这组基下是对角的"。整个故事就是<em>有限维谱定理在无穷维 Hilbert 空间上的复制</em>。</p>
+<p>请你回想<a href="../线性代数/index.html">线性代数</a>里学到的最干净一条定理：<em>实对称矩阵可正交对角化</em>。设 \(A\) 是 \(n \times n\) 实对称（\(A = A^T\)），则存在正交矩阵 \(Q\) 使</p>
+
+<p>\[
+A = Q \Lambda Q^T, \qquad \Lambda = \mathrm{diag}(\lambda_1, \ldots, \lambda_n).
+\]</p>
+
+<p>所有特征值都是<em>实</em> 的；不同特征值对应的特征向量<em>正交</em>；特征向量的归一化集合 \(\{q_1, \ldots, q_n\}\) 构成 \(\mathbb{R}^n\) 的正交基。</p>
+
+<p>这是有限维线性代数的一颗钻石。下面这条本章要证的定理，是它的无穷维版本——前提条件加两个税：算子要既<em>紧</em>（<a href="ch20.html">上一章</a>定义的）又<em>自伴</em>（即 \(\langle T x, y \rangle = \langle x, T y \rangle\)）。</p>
+
+<p>这条定理叫<em>紧自伴算子谱定理</em>。我把它写在这里供你看完整结论：</p>
+
+<p>\[
+\boxed{\ T = \sum_{n=1}^\infty \lambda_n \langle \cdot, e_n \rangle e_n,\ }
+\]</p>
+
+<p>其中 \(\{e_n\}\) 是 \((\ker T)^\perp\) 的正交基（\(T e_n = \lambda_n e_n\)），\(\{\lambda_n\} \subset \mathbb{R}\) 满足 \(\lambda_n \to 0\) 且 \(|\lambda_1| \ge |\lambda_2| \ge \ldots\)。</p>
+
+<p>这是有限维 \(A = Q \Lambda Q^T\) 公式的<em>原样</em> 推广——只不过对角矩阵 \(\Lambda\) 现在是个无穷对角，对角元 \(\lambda_n \to 0\)。结论的形态完全一致，证明却要费 5 页（这就是这一章）。</p>
+
+<p>我们走六步：先把"谱" 概念在无穷维设置正确（21.1）、列自伴算子的基本性质（21.2）、证关键引理"\(\|T\|\) 是特征值"（21.3）、用引理递归构造特征基（21.4）、跑两个具体例子（21.5）、最后扼要提一般有界自伴算子的谱定理（21.6——投影值测度形式，技术更深）。</p>
+
+<h2 id="sec21-1">21.1 谱、解集、点谱 / 连续谱 / 残留谱</h2>
+
+<p>要谈"特征值在无穷维的推广"，先把语言准好。设 \(X\) 是复 Banach（本章默认<em>复</em>，因为要算特征值；实数版本最后转回去）。\(T \in \mathcal{B}(X)\)。</p>
+
+<p><strong>定义。</strong>\(\lambda \in \mathbb{C}\) 在 \(T\) 的<em>解集</em> \(\rho(T)\) 中，如果 \(T - \lambda I : X \to X\) 是<em>双射</em>（即可逆，且逆有界——由开映射定理<a href="ch10.html">第 10 章</a>自动得到）。否则 \(\lambda \in \sigma(T) := \mathbb{C} \setminus \rho(T)\)，称为<em>谱点</em>。</p>
+
+<p>有限维：\(T - \lambda I\) 双射 \(\iff\) 单射 \(\iff \lambda\) 不是特征值。所以谱 = 特征值集合。</p>
+
+<p>无穷维：单射、满射、可逆<em>不再等价</em>（<a href="ch1.html#sec1-5">第 1 章 1.5</a> 见过——右移算子单射不满射）。所以"\(T - \lambda I\) 不可逆" 可以分三种细节：</p>
 
 <ul>
-  <li>谱、解集、谱半径的<em>正式</em>定义（前面 9.6 节预告过的"地图"现在落实）。</li>
-  <li>自伴算子在 Hilbert 空间上的基本事实：谱实、特征向量正交。</li>
-  <li>紧自伴算子的关键引理：算子范数 \(\|T\| = \max\{|\lambda| : \lambda \in \sigma(T)\}\) 总能达到，作为特征值。</li>
-  <li>归纳论证给出谱定理：把"特征向量构成基"逐个剥下来。</li>
-  <li>谱分解形式 \(T = \sum_n \lambda_n \langle \cdot, e_n \rangle e_n\)。</li>
-  <li>最后预告：一般有界自伴算子的谱定理需要"投影值测度"，这是无界算子谱论的入口。</li>
+  <li><em>点谱</em> \(\sigma_p(T)\)：\(T - \lambda I\) <em>不</em>单射——存在 \(x \ne 0\) 使 \(T x = \lambda x\)。这就是经典的<em>特征值</em>。</li>
+  <li><em>连续谱</em> \(\sigma_c(T)\)：\(T - \lambda I\) 单射，像 \((T - \lambda I) X\) 在 \(X\) 中<em>稠密</em>，但不<em>满</em>。逆 \((T - \lambda I)^{-1}\) 在像上有定义但<em>无界</em>。</li>
+  <li><em>残留谱</em> \(\sigma_r(T)\)：\(T - \lambda I\) 单射，但像<em>不稠密</em>。</li>
 </ul>
 
-<h2 id="sec21-1">21.1 谱的定义与基本概念</h2>
+<p>三者不交，并 = \(\sigma(T)\)。残留谱在<a href="ch1.html#sec1-5">第 1 章 1.5</a> 已伏笔——右移 \(S\) 的 \(0\) 是它的残留谱（\(S\) 单射，但像 \(\subset \{x : x_1 = 0\}\) 不稠密）。</p>
 
-<p>设 \(T \in \mathcal{B}(H)\) 是 Hilbert 空间上的有界算子。<strong>谱</strong></p>
+<p><strong>谱半径公式。</strong>对 \(T \in \mathcal{B}(X)\)，</p>
 
 <p>\[
-\sigma(T) := \{\lambda \in \mathbb{C} : T - \lambda I \text{ 不可逆于 } \mathcal{B}(H)\}.
+r(T) := \sup_{\lambda \in \sigma(T)} |\lambda| = \lim_{n \to \infty} \|T^n\|^{1/n}.
 \]</p>
 
-<p>"不可逆"在 Banach 代数里是有定义的——\(T - \lambda I\) 在 \(\mathcal{B}(H)\) 中没有有界逆。</p>
+<p>极限存在且 \(\le \|T\|\)。这个公式（Gelfand 1941）是<a href="ch10.html">第 10 章</a>的内容，不在这里证。我们用一条它的简单推论：</p>
 
-<p><strong>解集</strong>（resolvent set）\(\rho(T) = \mathbb{C} \setminus \sigma(T)\)。</p>
+<p>\[
+\boxed{\ \sigma(T) \text{ 是非空紧集，} \subset \overline{B}(0, \|T\|) \subset \mathbb{C}.\ }
+\]</p>
 
-<p>谱可以进一步细分：</p>
+<p>"非空" 这件事在 \(X\) 是复 Banach 上由 Liouville（解析函数版本）证；在<em>实</em> Banach 上谱可以为空（比如 \(\mathbb{R}^2\) 上的旋转矩阵\(\begin{pmatrix}0 & -1 \\ 1 & 0\end{pmatrix}\) 实谱空，复谱 \(\{\pm i\}\)），所以本章默认复。</p>
+
+<h2 id="sec21-2">21.2 自伴算子的基本性质</h2>
+
+<p>自伴是 Hilbert 空间上"对称矩阵" 的对应物。\(H\) 是 Hilbert（本节默认复）。</p>
+
+<p><strong>定义。</strong>\(T \in \mathcal{B}(H)\) <em>自伴</em>（self-adjoint），如果 \(\langle T x, y \rangle = \langle x, T y \rangle\) 对所有 \(x, y \in H\)。等价地，\(T = T^*\)（伴随，<a href="ch15.html">第 15 章</a>定义）。</p>
+
+<p>有限维：\(T\) 自伴 \(\iff\) 矩阵 \(T = T^*\)（共轭转置 = 自身）。复对称叫"Hermitian"。</p>
+
+<p>下面三条是自伴算子的核心性质，每条对应有限维对称矩阵的同一条事实。</p>
+
+<p><strong>(P1) 自伴 \(\implies \langle T x, x \rangle \in \mathbb{R}\)，所有特征值 \(\in \mathbb{R}\)。</strong></p>
+
+<p><em>证明。</em>\(\overline{\langle T x, x \rangle} = \langle x, T x \rangle = \langle T x, x \rangle\)（自伴）。所以 \(\langle T x, x \rangle\) 实。如果 \(T x = \lambda x, x \ne 0\)，则 \(\langle T x, x \rangle = \lambda \|x\|^2\)，而左边实 + \(\|x\|^2\) 实正 \(\implies \lambda\) 实。\(\square\)</p>
+
+<p><strong>(P2) 不同特征值的特征向量正交。</strong></p>
+
+<p><em>证明。</em>\(T x = \lambda x, T y = \mu y, \lambda \ne \mu\)（实）。则 \(\lambda \langle x, y \rangle = \langle T x, y \rangle = \langle x, T y \rangle = \overline{\mu} \langle x, y \rangle = \mu \langle x, y \rangle\)。所以 \((\lambda - \mu) \langle x, y \rangle = 0 \implies \langle x, y \rangle = 0\)。\(\square\)</p>
+
+<p><strong>(P3) 自伴 \(\implies \|T\| = \sup_{\|x\| = 1} |\langle T x, x \rangle|\)。</strong></p>
+
+<p>这条比上两条<em>更深</em>，因为一般有界算子只有 \(\|T\| = \sup_{\|x\| = \|y\| = 1} |\langle T x, y \rangle|\)（取 \(y\) 自由）。自伴让我们能"<em>把 \(y\) 锁在 \(x\) 上</em>"——这是下一节 21.3 关键引理的根基。</p>
+
+<p><em>证明。</em>记 \(M := \sup_{\|x\| = 1} |\langle T x, x \rangle|\)。\(\le\) 方向：\(|\langle T x, x \rangle| \le \|T x\| \cdot \|x\| \le \|T\|\)。\(\ge\) 方向（这是有意思的部分）。</p>
+
+<p>对任意 \(x, y\) 单位向量，恒等式：</p>
+
+<p>\[
+4 \mathrm{Re} \langle T x, y \rangle = \langle T(x + y), x + y \rangle - \langle T(x - y), x - y \rangle
+\]</p>
+
+<p>（直接展开 + 自伴性质）。所以</p>
+
+<p>\[
+4 |\mathrm{Re} \langle T x, y \rangle| \le M \|x + y\|^2 + M \|x - y\|^2 = 2 M (\|x\|^2 + \|y\|^2) = 4 M.
+\]</p>
+
+<p>（用了平行四边形等式）。即 \(|\mathrm{Re} \langle T x, y \rangle| \le M\)。对任意单位 \(x, y\)，选 \(\theta\) 使 \(\langle T x, e^{i\theta} y \rangle = e^{-i\theta} \langle T x, y \rangle = |\langle T x, y \rangle|\)（实正），所以可改成 \(|\langle T x, y \rangle| \le M\)。取 \(\sup\) 得 \(\|T\| \le M\)。\(\square\)</p>
+
+<p>\[\boxed{\ T \text{ 自伴} \implies \|T\| = \sup_{\|x\| = 1} |\langle T x, x \rangle|.\ }\]</p>
+
+<p>这条公式让"<em>找最大特征值</em>" 变成"<em>最大化二次型</em> \(\langle T x, x \rangle\) 在单位球上"——这是下一节关键引理的几何起点。</p>
+
+<h2 id="sec21-3">21.3 关键引理：\(\|T\|\) 总能"达到" 为特征值</h2>
+
+<p>下面这条引理是整个谱定理的<em>核心</em>。它说：紧自伴算子的"最大算子范数" 实际是<em>被某个单位向量达到</em>，且达到的方向就是<em>特征向量</em>。</p>
+
+<p><strong>关键引理。</strong>设 \(T \in \mathcal{B}(H)\) 紧 + 自伴，\(T \ne 0\)。则存在单位向量 \(e_1 \in H\) 和实数 \(\lambda_1\) 满足 \(|\lambda_1| = \|T\|\)，使</p>
+
+<p>\[
+T e_1 = \lambda_1 e_1.
+\]</p>
+
+<p>注意"\(|\lambda_1| = \|T\|\)" 这一句的力度——<em>最大算子范数自动是特征值的绝对值</em>。在有限维这条由 \(\|T\| = \max_n |\lambda_n|\) 直接给（对称矩阵）；这里我们要用紧 + 自伴<em>无穷维原生</em> 地证。</p>
+
+<p><em>证明。</em>分两步。</p>
+
+<p><em>步 1：找出 \(|\lambda_1| = \|T\|\) 的弱极限候选。</em></p>
+
+<p>由 21.2 节 (P3)，\(\|T\| = \sup_{\|x\| = 1} |\langle T x, x \rangle|\)。所以存在单位序列 \(\{x_n\}\) 使 \(|\langle T x_n, x_n \rangle| \to \|T\|\)。\(\langle T x_n, x_n \rangle\) 是<em>实</em> 数列（自伴），所以可挑子序列使 \(\langle T x_n, x_n \rangle \to \lambda_1\)，其中 \(\lambda_1 \in \{+\|T\|, -\|T\|\}\)。重命名子列仍叫 \(\{x_n\}\)，所以 \(\langle T x_n, x_n \rangle \to \lambda_1, |\lambda_1| = \|T\|\)。</p>
+
+<p><em>步 2：证 \(T x_n - \lambda_1 x_n \to 0\)。</em></p>
+
+<p>算（用 \(T\) 自伴 + \(\lambda_1\) 实）：</p>
+
+<p>\[
+\|T x_n - \lambda_1 x_n\|^2 = \|T x_n\|^2 - 2 \lambda_1 \langle T x_n, x_n \rangle + \lambda_1^2.
+\]</p>
+
+<p>每项分开。\(\|T x_n\|^2 \le \|T\|^2 = \lambda_1^2\)。\(\langle T x_n, x_n \rangle \to \lambda_1\)。所以</p>
+
+<p>\[
+\limsup \|T x_n - \lambda_1 x_n\|^2 \le \lambda_1^2 - 2 \lambda_1 \cdot \lambda_1 + \lambda_1^2 = 0.
+\]</p>
+
+<p>所以 \(\|T x_n - \lambda_1 x_n\| \to 0\)。</p>
+
+<p><em>步 3：用紧性抽收敛子列。</em></p>
+
+<p>\(\{x_n\}\) 单位球上有界 + \(T\) 紧 \(\implies\) 抽子列 \(T x_{n_k} \to z\) 强（\(z\) 某向量）。结合步 2：\(\lambda_1 x_{n_k} \to z\)。\(\lambda_1 \ne 0\) \(\implies x_{n_k} \to z / \lambda_1 =: e_1\)。</p>
+
+<p>\(\|e_1\| = \lim \|x_{n_k}\| = 1\)。在 \(x_{n_k} \to e_1\) 上对 \(T\) 连续传递（紧 \(\implies\) 连续）：\(T e_1 = \lim T x_{n_k} = \lambda_1 e_1\)。</p>
+
+<p>\(\square\)</p>
+
+<p>请你停下来欣赏这条证明的<em>结构</em>。它用了所有三类工具：</p>
 
 <ul>
-  <li><strong>点谱</strong> \(\sigma_p(T) = \{\lambda : \ker(T - \lambda I) \neq \{0\}\}\)：特征值，存在非零特征向量；</li>
-  <li><strong>连续谱</strong> \(\sigma_c(T) = \{\lambda : \ker(T - \lambda I) = \{0\}, \overline{\operatorname{Range}(T - \lambda I)} = H, \text{但 } T - \lambda I \text{ 不满射}\}\)；</li>
-  <li><strong>残留谱</strong> \(\sigma_r(T) = \{\lambda : \ker(T - \lambda I) = \{0\}, \overline{\operatorname{Range}(T - \lambda I)} \neq H\}\)。</li>
+  <li><em>(P3) 自伴公式</em>：让"找 \(\|T\|\) 的最大化向量" 变成<em>实</em> 优化问题。</li>
+  <li><em>极小化 \(\|T x - \lambda x\|^2\)</em>：自伴让交叉项 \(\langle T x, x \rangle\) 是实，可以让二次型展开闭合到一个完美平方。</li>
+  <li><em>紧性</em>：从有界序列抽子列收敛——把"<em>极大化序列收敛吗</em>" 这件事变成"<em>是的，紧算子保证</em>"。</li>
 </ul>
 
-<p>三者两两不交，并 \(= \sigma(T)\)。</p>
+<p>少任何一个，证明都垮。如果只紧不自伴，步 2 的等式不成立（因为 \(\lambda_1\) 可能复，得到的不是平方而是模方加交叉项）。如果只自伴不紧，步 3 没法抽子列收敛——可能极大化序列在弱意义下有极限，但<em>强收敛</em> 失败。</p>
 
-<p>对<em>有限维</em>对称矩阵，谱 = 点谱 = 一组实特征值。无穷维三类都可能出现。</p>
-
-<p>核心事实：</p>
-
-<p><strong>(S1) \(\sigma(T)\) 非空、闭、有界于 \(\mathbb{C}\)。</strong>非空用 Liouville 定理（解集函数 \(\lambda \mapsto (T - \lambda I)^{-1}\) 是解集上的解析函数；如果谱空，全 \(\mathbb{C}\) 上有界解析 \(\Rightarrow\) 常数 \(\Rightarrow\) 矛盾）。</p>
-
-<p><strong>(S2) Gelfand 谱半径公式：</strong></p>
-
-<p>\[
-\rho(T) := \max\{|\lambda| : \lambda \in \sigma(T)\} = \lim_{n \to \infty} \|T^n\|^{1/n}.
-\]</p>
-
-<h2 id="sec21-2">21.2 自伴算子的基本事实</h2>
-
-<p>设 \(T \in \mathcal{B}(H)\) 是 Hilbert 空间上的有界算子。\(T\) 称为<strong>自伴</strong>，如果 \(T = T^*\)（即 \(\langle T x, y \rangle = \langle x, T y \rangle\) 对所有 \(x, y\)）。</p>
-
-<p><strong>(SA1) 谱实。</strong>\(\sigma(T) \subset \mathbb{R}\)。</p>
-
-<p>证明：取 \(\lambda = a + ib\)（\(b \neq 0\)）。要证 \(T - \lambda I\) 可逆。计算：</p>
-
-<p>\[
-\|(T - \lambda I) x\|^2 = \langle (T - \lambda I) x, (T - \lambda I) x \rangle = \|(T - aI) x\|^2 + b^2 \|x\|^2 \ge b^2 \|x\|^2.
-\]</p>
-
-<p>所以 \(T - \lambda I\) 单射且范围闭。再用 \((T - \lambda I)^* = T - \bar\lambda I\) 给类似估计 \(\Rightarrow\) \(\overline{\operatorname{Range}(T - \lambda I)} = H\) \(\Rightarrow\) 满射 \(\Rightarrow\) 双射 \(\Rightarrow\) 由有界逆定理 \(T - \lambda I\) 可逆。</p>
-
-<p><strong>(SA2) 不同特征值的特征向量正交。</strong>设 \(T x_1 = \lambda_1 x_1\)，\(T x_2 = \lambda_2 x_2\)，\(\lambda_1 \neq \lambda_2\)（实）。则</p>
-
-<p>\[
-\lambda_1 \langle x_1, x_2 \rangle = \langle T x_1, x_2 \rangle = \langle x_1, T x_2 \rangle = \lambda_2 \langle x_1, x_2 \rangle,
-\]</p>
-
-<p>所以 \(\langle x_1, x_2 \rangle = 0\)。</p>
-
-<p><strong>(SA3) 算子范数 = 谱半径 = \(\sup\{|\langle T x, x \rangle| : \|x\| = 1\}\)。</strong>有限维你可能见过：对称矩阵的范数等于最大绝对特征值。这条结论在无穷维同样成立。</p>
-
-<p>"\(\|T\| = \sup\{|\langle T x, x \rangle| : \|x\| = 1\}\)" 的证明：上界 \(\le\) 由 Cauchy–Schwarz。下界 \(\ge\) 用极化：\(4 \operatorname{Re}\langle T x, y \rangle = \langle T(x + y), x + y \rangle - \langle T(x - y), x - y \rangle\)（自伴让交叉项消掉）。</p>
-
-<h2 id="sec21-3">21.3 紧自伴关键引理</h2>
-
-<p>这一节准备主定理。</p>
-
-<p><strong>引理。</strong>设 \(T\) 是 Hilbert 空间 \(H\) 上的紧自伴算子，\(T \neq 0\)。则 \(\|T\|\) 或 \(-\|T\|\) 是 \(T\) 的特征值，对应特征向量是某个 \(x\) 满足 \(\|T x\| = \|T\| \cdot \|x\|\)（"达到"算子范数的 \(x\)）。</p>
-
-<p>证明：由 (SA3)，存在序列 \(\{x_n\}\)，\(\|x_n\| = 1\)，\(|\langle T x_n, x_n \rangle| \to \|T\|\)。抽子序列让 \(\langle T x_n, x_n \rangle \to \mu\) 实数，\(|\mu| = \|T\|\)。</p>
-
-<p>计算：</p>
-
-<p>\[
-\|T x_n - \mu x_n\|^2 = \|T x_n\|^2 - 2 \mu \langle T x_n, x_n \rangle + \mu^2 \|x_n\|^2 \le \|T\|^2 - 2\mu \langle T x_n, x_n \rangle + \mu^2 \to \|T\|^2 - 2 \mu^2 + \mu^2 = 0.
-\]</p>
-
-<p>所以 \(T x_n - \mu x_n \to 0\)。</p>
-
-<p>由 \(T\) 紧，\(\{T x_n\}\) 有强收敛子序列 \(T x_{n_k} \to y\)。结合 \(T x_n - \mu x_n \to 0\) 给 \(\mu x_{n_k} \to y\)，即 \(x_{n_k} \to y/\mu\)（\(\mu \neq 0\)）。\(T\) 连续 \(\Rightarrow\) \(T(y/\mu) = \lim T x_{n_k} = y\)，即 \(y\) 是特征向量对应特征值 \(\mu\)。\(\|y\| = |\mu| \cdot \|y/\mu\| = |\mu| \cdot 1 = |\mu| = \|T\| > 0\)。结束。</p>
-
-<p>这条引理是<strong>整个谱定理的"种子"</strong>。它说"紧自伴算子总能找到一个范数最大的特征值"。下一节用它递归地把所有特征值"剥"出来。</p>
+<p>这条引理是<em>谱定理的种子</em>——它给我们第一个特征值和第一个特征向量。下一节用它递归构造剩下所有的。</p>
 
 <h2 id="sec21-4">21.4 谱定理：递归构造正交基</h2>
 
-<p><strong>定理（紧自伴谱定理 / Hilbert–Schmidt）。</strong>设 \(T \in \mathcal{K}(H)\) 紧自伴。则存在：</p>
+<p><strong>定理（紧自伴算子谱定理）。</strong>设 \(H\) 是可分 Hilbert 空间，\(T \in \mathcal{B}(H)\) 紧 + 自伴。则：</p>
+
+<ol>
+  <li>存在 \(H\) 的标准正交集 \(\{e_n\}_{n=1}^N\)（\(N \in \mathbb{N} \cup \{\infty\}\)）和实数 \(\{\lambda_n\}\) 满足 \(T e_n = \lambda_n e_n\)。</li>
+  <li>\(|\lambda_1| \ge |\lambda_2| \ge \ldots\)，且当 \(N = \infty\) 时 \(\lambda_n \to 0\)。</li>
+  <li>\(\{e_n\}\) 张成 \((\ker T)^\perp\)。\(H = \ker T \oplus \overline{\mathrm{span}\{e_n\}}\)。</li>
+  <li>\(T x = \sum_n \lambda_n \langle x, e_n \rangle e_n\) 对所有 \(x \in H\)。</li>
+</ol>
+
+<p><em>证明（递归构造）。</em></p>
+
+<p>设 \(H_1 = H\)。21.3 节关键引理给 \(e_1\) 单位向量、\(\lambda_1 = \pm \|T\|\)，使 \(T e_1 = \lambda_1 e_1\)。</p>
+
+<p>设 \(H_2 = e_1^\perp = \{x \in H : \langle x, e_1 \rangle = 0\}\)（闭子空间，<a href="ch6.html">第 6 章</a>）。<em>断言：\(T(H_2) \subset H_2\)</em>。验证：\(x \in H_2 \implies \langle T x, e_1 \rangle = \langle x, T e_1 \rangle = \lambda_1 \langle x, e_1 \rangle = 0 \implies T x \in H_2\)。</p>
+
+<p>所以可考虑限制 \(T_2 := T|_{H_2} : H_2 \to H_2\)。它仍紧（紧算子的限制紧——序列论证）+ 自伴（限制保持 \(\langle, \rangle\) 关系）。</p>
+
+<p><em>如果 \(T_2 = 0\)</em>：构造止于 \(N = 1\)。剩下所有 \(H_2\) 都在 \(\ker T\)。</p>
+
+<p><em>如果 \(T_2 \ne 0\)</em>：再次应用关键引理给 \(e_2 \in H_2\) 单位、\(\lambda_2 = \pm \|T_2\|\)，\(T e_2 = \lambda_2 e_2\)。注意 \(|\lambda_2| = \|T_2\| \le \|T\| = |\lambda_1|\)（限制 \(\implies\) 范数 \(\le\)）。</p>
+
+<p>设 \(H_3 = \{e_1, e_2\}^\perp\)，\(T_3 := T|_{H_3}\)。再问 \(T_3 = 0\)？是 \(\implies\) 终止于 \(N = 2\)；否 \(\implies\) 找 \(e_3, \lambda_3\)，\(|\lambda_3| \le |\lambda_2|\)。</p>
+
+<p>...递归。</p>
+
+<p>这个过程<em>有限</em>：终止于某个 \(N\) 时 \(T|_{H_{N+1}} = 0\)，所有 \(H_{N+1} \subset \ker T\)。</p>
+
+<p>这个过程<em>无穷</em>：得到无限正交集 \(\{e_n\}_{n=1}^\infty\) 与实数列 \(\{\lambda_n\}\)，\(|\lambda_n|\) 递减。</p>
+
+<p><em>断言：无穷情形下 \(\lambda_n \to 0\)。</em></p>
+
+<p>反证。假设 \(|\lambda_n| \ge \varepsilon > 0\) 对所有 \(n\)。则 \(\{e_n\}\) 弱收敛到 \(0\)（标准正交集弱收敛到 0：每个 \(\varphi = \langle \cdot, y \rangle\) 给 \(\langle e_n, y \rangle \to 0\) 由 Bessel）。\(T\) 紧 \(\implies T e_n \to 0\) 强（<a href="ch20.html#sec20-5">20.5 节</a>关键工具）。但 \(\|T e_n\| = |\lambda_n| \ge \varepsilon\) 矛盾。\(\square\)</p>
+
+<p><em>断言：\(\{e_n\}\) 张成 \((\ker T)^\perp\)。</em></p>
+
+<p>设 \(M := \overline{\mathrm{span}\{e_n\}}\)（闭线性张）。要证 \(M = (\ker T)^\perp\)。</p>
+
+<p>\(M \subset (\ker T)^\perp\) 显然——每个 \(e_n\) 都不在 \(\ker T\)（特征值 \(\lambda_n \ne 0\)），且不同特征值正交（21.2 (P2)）。</p>
+
+<p>反过来，设 \(z \in (\ker T)^\perp\)。考虑 \(z' := z - P_M z\)（\(P_M\) 是到 \(M\) 的正交投影）。则 \(z' \in M^\perp\) 且 \(z' \in (\ker T)^\perp\)。要证 \(z' = 0\)。</p>
+
+<p>看 \(T|_{M^\perp}\)：由前面 \(T(H_n) \subset H_n\) 的论证 + 极限稳定性，\(M^\perp = \bigcap_n H_n\) 满足 \(T(M^\perp) \subset M^\perp\)。又 \(T|_{M^\perp}\) 是紧自伴；它的范数 \(\le |\lambda_n|\) 对所有 \(n\)（因为 \(M^\perp \subset H_{n+1}\)），所以 \(\|T|_{M^\perp}\| \le \lim |\lambda_n| = 0\)。所以 \(T|_{M^\perp} = 0\)，即 \(M^\perp \subset \ker T\)。</p>
+
+<p>所以 \(z' \in M^\perp \subset \ker T\)。又 \(z' \in (\ker T)^\perp\)。所以 \(z' \in \ker T \cap (\ker T)^\perp = \{0\}\)。\(z' = 0\)，即 \(z = P_M z \in M\)。</p>
+
+<p>结合：\(M = (\ker T)^\perp\)，\(H = \ker T \oplus M\)。</p>
+
+<p><em>断言：分解公式。</em></p>
+
+<p>对任意 \(x \in H\)，分解 \(x = x_0 + x_1\)，\(x_0 \in \ker T, x_1 \in M\)。则</p>
+
+<p>\[
+T x = T x_0 + T x_1 = 0 + T \Big(\sum_n \langle x_1, e_n \rangle e_n\Big) = \sum_n \langle x_1, e_n \rangle T e_n = \sum_n \lambda_n \langle x_1, e_n \rangle e_n.
+\]</p>
+
+<p>\(\langle x_1, e_n \rangle = \langle x, e_n \rangle\)（因为 \(x_0 \perp e_n\)）。所以</p>
+
+<p>\[
+T x = \sum_n \lambda_n \langle x, e_n \rangle e_n.
+\]</p>
+
+<p>\(\square\)</p>
+
+<p>这条公式叫<em>谱分解</em>（spectral decomposition）。它把 \(T\) 完整地分成<em>一维投影的实加权和</em>。每一项 \(\lambda_n \langle \cdot, e_n \rangle e_n\) 是"先把 \(x\) 投影到 \(e_n\)，乘 \(\lambda_n\)"——一个秩 1 的算子。无穷多个秩 1 算子加起来给整个 \(T\)。</p>
+
+<p>\[\boxed{\ T \text{ 紧自伴} \implies T = \sum_n \lambda_n \langle \cdot, e_n \rangle e_n,\ \lambda_n \to 0,\ \{e_n\} \text{ 标准正交.}\ }\]</p>
+
+<p>请你停下来对照有限维 \(A = Q \Lambda Q^T = \sum_k \lambda_k q_k q_k^T\)——结构完全一样。无穷维多了"\(\lambda_n \to 0\)" 这条尾巴控制（紧算子的代价）+ "需要 \((\ker T)^\perp\) 才张成" 这一个分情况（紧算子可逆不可能，必有零空间）。</p>
+
+<h2 id="sec21-5">21.5 两个具体例子</h2>
+
+<h3>例 1：积分算子 \(K(x, y) = \min(x, y)\)</h3>
+
+<p>在 \(L^2[0, 1]\) 上定义</p>
+
+<p>\[
+(T f)(x) = \int_0^1 \min(x, y) f(y) \, dy = \int_0^x y f(y) dy + x \int_x^1 f(y) dy.
+\]</p>
+
+<p>核 \(K(x, y) = \min(x, y)\) 在 \([0, 1]^2\) 上连续 \(\implies\) Hilbert-Schmidt（<a href="ch20.html#sec20-4">20.4 节</a>例 3）\(\implies\) 紧。又 \(K(x, y) = K(y, x)\)（对称）\(\implies T\) 自伴。所以谱定理适用。</p>
+
+<p>找特征值。设 \(T f = \lambda f\)。两次微分（用 Leibniz 求积分上限的导数）：</p>
 
 <ul>
-  <li>实特征值序列 \(\lambda_1, \lambda_2, \ldots\)（按绝对值递减），\(|\lambda_n| \to 0\)；</li>
-  <li>对应特征向量序列 \(\{e_n\}\)，正交规范，\(T e_n = \lambda_n e_n\)；</li>
-  <li>\(\{e_n\} \cup \{\ker T \text{ 的正交基}\}\) 构成 \(H\) 的完备正交基；</li>
-  <li>对每 \(x \in H\)，\(T x = \sum_n \lambda_n \langle x, e_n \rangle e_n\)（\(L^2\) 收敛）。</li>
+  <li>\((T f)(0) = 0\)（\(x = 0\) 时积分为 0）。</li>
+  <li>\((T f)(x) = \int_0^x y f(y) dy + x \int_x^1 f(y) dy\)。</li>
+  <li>\((T f)'(x) = x f(x) + \int_x^1 f(y) dy - x f(x) = \int_x^1 f(y) dy\)。</li>
+  <li>\((T f)'(1) = 0\)。</li>
+  <li>\((T f)''(x) = -f(x)\)。</li>
 </ul>
 
-<p>\[
-\boxed{\ T = \sum_{n=1}^\infty \lambda_n \langle \cdot, e_n \rangle e_n.\ }
-\]</p>
+<p>所以 \(T f = \lambda f\) \(\iff\) \(\lambda f''(x) = -f(x)\)，加边界条件 \(f(0) = 0, f'(1) = 0\)。</p>
 
-<p>这就是<strong>谱分解</strong>。它说 \(T\) 在某组正交规范基下"对角化"为 \(\operatorname{diag}(\lambda_1, \lambda_2, \ldots, 0, 0, \ldots)\)——除了 \(\ker T\) 上是零，每个非零特征值对应一组特征向量。</p>
+<p>这是经典的 Sturm-Liouville 问题。设 \(\lambda > 0\)，写 \(f(x) = A \sin(\omega x) + B \cos(\omega x)\)，\(\omega = 1/\sqrt{\lambda}\)。\(f(0) = 0 \implies B = 0\)。\(f'(1) = A \omega \cos(\omega) = 0 \implies \cos(\omega) = 0\)，即 \(\omega = (n - 1/2) \pi, n = 1, 2, \ldots\)。</p>
 
-<p>证明（递归构造）：</p>
-
-<p><strong>第 1 步。</strong>对 \(T\) 用 21.3 节引理，得 \(\lambda_1\) 满足 \(|\lambda_1| = \|T\|\) 与对应 \(\|e_1\| = 1\) 特征向量。</p>
-
-<p><strong>第 \(n+1\) 步（归纳）。</strong>假设已得 \(\{(\lambda_k, e_k)\}_{k=1}^n\)，正交规范。令 \(H_n = \operatorname{span}\{e_1, \ldots, e_n\}^\perp\)（闭子空间）。\(T\) 在 \(H_n\) 上的限制 \(T|_{H_n} : H_n \to H_n\) 是良定义的紧自伴算子（\(T\) 把 \(H_n\) 映到自身：\(\langle T y, e_k \rangle = \langle y, T e_k \rangle = \lambda_k \langle y, e_k \rangle = 0\) 对 \(y \in H_n\)）。如果 \(T|_{H_n} = 0\) 停止；否则用引理对 \(T|_{H_n}\) 得 \(\lambda_{n+1}\) 与 \(e_{n+1} \in H_n\)，\(|\lambda_{n+1}| = \|T|_{H_n}\| \le \|T|_{H_{n-1}}\| = |\lambda_n|\)（递减）。</p>
-
-<p><strong>极限。</strong>所得序列 \(\{e_n\}\) 正交规范，\(\{|\lambda_n|\}\) 递减。要证 \(\lambda_n \to 0\)：反设 \(|\lambda_n| \ge c > 0\) 全部 \(n\)。则 \(\{T e_n / \lambda_n\} = \{e_n\}\) 在 \(H\) 中。但 \(\{e_n\}\) 是正交规范集 \(\Rightarrow\) 任意两点距离 \(\sqrt{2}\)，没有强收敛子序列。同时 \(\{e_n\}\) 范数有界 \(\Rightarrow\) \(T\) 紧 \(\Rightarrow\) \(\{T e_n\} = \{\lambda_n e_n\}\) 应有强收敛子序列。从 \(\lambda_n\) 实有界（\(|\lambda_n| \le \|T\|\)）抽子序列 \(\lambda_{n_k} \to \mu\)，\(T e_{n_k} = \lambda_{n_k} e_{n_k}\) 强收敛 \(\Rightarrow\) \(e_{n_k}\) 强收敛（因为 \(\lambda_{n_k} \to \mu \neq 0\)）。矛盾。所以 \(|\lambda_n| \to 0\)。</p>
-
-<p><strong>完备性。</strong>令 \(M = \overline{\operatorname{span}\{e_n\}}\)。要证 \(M^\perp = \ker T\)。若 \(y \in M^\perp\)，则 \(y \in H_n\) 对每个 \(n\) \(\Rightarrow\) \(\|T y\| \le \|T|_{H_n}\| \cdot \|y\| = |\lambda_{n+1}| \|y\| \to 0\)，所以 \(T y = 0\)，\(y \in \ker T\)。反之 \(y \in \ker T\) 显然 \(y \perp e_n\)（\(\langle y, e_n \rangle \cdot \lambda_n = \langle y, T e_n \rangle = \langle T y, e_n \rangle = 0\)）。结束。</p>
-
-<p>取 \(\ker T\) 的任意完备正交基 \(\{e_\alpha\}\)，并入 \(\{e_n\}\) 得整个 \(H\) 的完备正交基。</p>
-
-<p>对每 \(x \in H\)，由完备性 \(x = \sum_n \langle x, e_n \rangle e_n + \sum_\alpha \langle x, e_\alpha \rangle e_\alpha\)。\(T\) 作用：\(T x = \sum_n \lambda_n \langle x, e_n \rangle e_n + 0\)（\(\ker T\) 部分被 \(T\) 杀死）。这就是谱分解。结束。</p>
-
-<h2 id="sec21-5">21.5 几个具体计算</h2>
-
-<p><strong>例 1：积分算子的特征值。</strong>取 \(K(x, y) = \min(x, y)\)（"绿函数核"）。算子</p>
+<p>所以特征值</p>
 
 <p>\[
-T f(x) = \int_0^1 K(x, y) f(y) \, dy
+\lambda_n = \frac{1}{\omega_n^2} = \frac{1}{(n - 1/2)^2 \pi^2}, \qquad n = 1, 2, \ldots
 \]</p>
 
-<p>是 \(L^2[0,1]\) 上的紧自伴算子。它的特征值是 \(\lambda_n = (n - 1/2)^{-2} \pi^{-2}\)，对应特征函数 \(e_n(x) = \sqrt{2} \sin((n - 1/2) \pi x)\)。这就是 PDE 里 \(-u'' = \lambda u\)（带边界条件 \(u(0) = u'(1) = 0\)）的本征问题——通过求"逆算子"（Green 函数）转换为紧自伴算子谱问题。</p>
-
-<p><strong>例 2：拉普拉斯逆算子。</strong>在有界域 \(\Omega \subset \mathbb{R}^n\) 上考虑 \(-\Delta\) 配 Dirichlet 边条件。它的"逆算子" \((-\Delta)^{-1} : L^2(\Omega) \to L^2(\Omega)\) 是<em>紧自伴</em>的（紧由 Sobolev 嵌入 + Rellich，第 23 章）。它的特征值就是 \(-\Delta\) 的特征值的倒数 \(\lambda_n^{-1}\)；其谱定理就是说 \(L^2(\Omega)\) 有<em>由 \(-\Delta\) 的特征函数</em>构成的正交基——这是 Fourier 级数在一般域上的推广。</p>
-
-<p>这就是为什么<a href="../偏微分方程/index.html">偏微分方程</a>的"分离变量法"在有界域上总能产生特征展开——背后的存在性就是紧自伴谱定理。</p>
-
-<h2 id="sec21-6">21.6 推广预告：一般有界自伴 + 无界自伴</h2>
-
-<p>本章给的谱定理只对<em>紧</em>自伴算子。对一般有界自伴算子，谱定理形式不一样——特征值列表可能"连续化"成谱。</p>
-
-<p><strong>定理（一般有界自伴谱定理 / 投影值测度形式）。</strong>设 \(T \in \mathcal{B}(H)\) 自伴。则存在<strong>投影值测度</strong> \(E\)（一族正交投影 \(E(\Delta)\)，\(\Delta \subset \mathbb{R}\) Borel 集）使</p>
+<p>对应特征函数</p>
 
 <p>\[
-T = \int_{\sigma(T)} \lambda \, dE(\lambda).
+e_n(x) = \sqrt{2} \sin\big((n - 1/2) \pi x\big).
 \]</p>
 
-<p>对紧情形，\(E\) "退化"为离散测度，每个 \(\lambda_n\) 给一个投影 \(P_n = \langle \cdot, e_n \rangle e_n\)（一维投影）；积分变成求和 \(\sum \lambda_n P_n\)，这就是 21.4 节的形式。</p>
+<p>（归一化系数 \(\sqrt 2\) 来自 \(\int_0^1 \sin^2 = 1/2\)。）</p>
 
-<p>对一般有界自伴，\(E\) 可能"连续"——比如位置算子 \(M_x\)（\(L^2(\mathbb{R})\) 上 \(f \mapsto x f\)）的谱是整个 \(\mathbb{R}\)，每个点不是特征值，\(E(\Delta) f = \chi_\Delta f\) 是"按集合截断"的投影。</p>
+<p>验证：\(\lambda_1 = 4 / \pi^2 \approx 0.405\)，\(\lambda_2 = 4 / (9 \pi^2) \approx 0.045\)，\(\lambda_n \sim 1/n^2 \to 0\)（紧算子要求）。</p>
 
-<p>对<strong>无界自伴算子</strong>（如量子力学里的位置 \(x\)、动量 \(-i \partial_x\)、哈密顿 \(-\Delta + V\)），谱定理需要更专门的"自伴扩张"理论：选好定义域、验证算子是自伴的（不只是对称）、再用投影值测度。这是<a href="ch24.html">第 24 章</a>量子力学语言的舞台。</p>
+<p>所以谱定理给</p>
 
-<p>这条"从紧到一般再到无界"的推广轨迹是泛函分析谱论的全部主线。本书在第 22 章会用紧自伴谱定理解决积分方程；第 24 章会把无界版本提一下；详细的无界自伴理论（如 von Neumann 自伴扩张定理）超出本书入门定位，可参考 Reed–Simon《Methods of Modern Mathematical Physics, Vol. I》。</p>
+<p>\[
+T f = \sum_{n = 1}^\infty \frac{1}{(n - 1/2)^2 \pi^2} \langle f, e_n \rangle e_n.
+\]</p>
 
-<p>下一章我们把紧算子谱论的"代数侧"推到极致：Fredholm 选择性。它讲的是"\(T - \lambda I\) 在 \(\lambda\) 是非零特征值附近的可解性"——把它的"齐次解唯一 \(\Leftrightarrow\) 非齐次解存在"性质类比到无穷维矩阵代数。</p>
+<p>\(\{e_n\}\) 是 \(L^2[0,1]\) 的<em>正交基</em>（这个具体三角系是 \(L^2[0,1]\) 的一组完整基；实际上 \(\ker T = 0\) 所以基是整个空间）。</p>
+
+<h3>例 2：\((-\Delta)^{-1}\) on 有界域</h3>
+
+<p>这个例子是 PDE 里"<em>椭圆算子</em>" 谱定理的入门版。设 \(\Omega \subset \mathbb{R}^d\) 有界开域。考虑 Dirichlet 问题：</p>
+
+<p>\[
+\begin{cases} -\Delta u = f & \text{in } \Omega, \\ u = 0 & \text{on } \partial \Omega. \end{cases}
+\]</p>
+
+<p>定义 \(T := (-\Delta)^{-1} : L^2(\Omega) \to L^2(\Omega)\)——给 \(f\)，返回上述方程的弱解 \(u\)。</p>
+
+<p>由 PDE 标准理论（<a href="ch23.html">第 23 章</a>会建立）：</p>
+
+<ul>
+  <li>\(T\) 把 \(L^2(\Omega)\) 映入 \(H_0^1(\Omega)\)。</li>
+  <li>\(H_0^1(\Omega) \hookrightarrow L^2(\Omega)\) 是<em>紧</em> 嵌入（Rellich 定理，<a href="ch23.html">第 23 章</a>）。</li>
+  <li>所以 \(T : L^2 \to L^2\) 是 紧算子（=有界算子 \(L^2 \to H_0^1\) 复合紧嵌入 \(H_0^1 \to L^2\)，\(\mathcal{K} \cdot \mathcal{B} = \mathcal{K}\)）。</li>
+  <li>\(T\) 自伴：\(\langle T f, g \rangle_{L^2} = \int u v \, dx\)（\(v = T g\)）+ Green 恒等式 \(\int (-\Delta u) v = \int \nabla u \cdot \nabla v = \int u (-\Delta v)\) \(\implies\) 对称。</li>
+</ul>
+
+<p>谱定理应用：存在 \(L^2(\Omega)\) 的标准正交基 \(\{e_n\}\) 与实数 \(\mu_n \to 0\) 使 \(T e_n = \mu_n e_n\)。</p>
+
+<p>翻译回 \(-\Delta\)：\(T e_n = \mu_n e_n \iff e_n = -\mu_n \Delta e_n \iff -\Delta e_n = (1/\mu_n) e_n\)。设 \(\lambda_n := 1 / \mu_n\)（\(\mu_n > 0\) 由椭圆性 \(\implies \lambda_n > 0\)）。</p>
+
+<p>\[
+\boxed{\ -\Delta e_n = \lambda_n e_n \text{ 在 } \Omega,\ e_n = 0 \text{ 在 } \partial \Omega,\ \lambda_n \nearrow \infty.\ }
+\]</p>
+
+<p>这就是<em>椭圆算子的特征值问题</em>。具体例：</p>
+
+<ul>
+  <li>\(\Omega = [0, \pi]\)（一维）：\(e_n(x) = \sqrt{2/\pi} \sin(n x)\)，\(\lambda_n = n^2\)（高中物理"驻波频率"）。</li>
+  <li>\(\Omega = [0, \pi]^2\)（方形二维）：\(e_{n, m}(x, y) = (2/\pi) \sin(n x) \sin(m y)\)，\(\lambda_{n, m} = n^2 + m^2\)。</li>
+  <li>\(\Omega = \) 圆盘：特征函数是 Bessel 函数 \(J_n(\lambda r) e^{i n \theta}\)（高级了一点，但思路一样）。</li>
+</ul>
+
+<p>这条结论极重要——<em>有界域上的拉普拉斯算子有离散无穷的特征值，特征函数构成 \(L^2\) 的正交基</em>。所有"<em>傅里叶级数 / 模式展开</em>" 在 PDE 里的合法性都依赖这条。Mark Kac 1966 经典文章 "Can one hear the shape of a drum?" 问的就是 \(\{\lambda_n\}\) 能否决定 \(\Omega\) 的形状——一个深刻的逆问题。</p>
+
+<h2 id="sec21-6">21.6 一般有界自伴算子谱定理（提及）</h2>
+
+<p>"<em>紧 + 自伴</em>" 给了我们最干净的谱定理。但很多重要算子是<em>自伴但不紧</em>——比如 \(L^2(\mathbb{R})\) 上的乘子算子 \(M_x f(x) = x f(x)\)（位置算子，<a href="ch24.html">第 24 章</a>会用），或导数算子 \(-i d/dx\)（动量算子）。它们的谱通常是<em>连续</em> 的（实直线段），不再是离散点集。</p>
+
+<p>对这类算子，特征值不再够用——你不能写 \(T = \sum \lambda_n P_n\)（因为<em>没有</em>足够多的特征值）。要把"求和" 替换为"<em>积分</em>"。</p>
+
+<p><strong>谱定理（一般有界自伴）。</strong>设 \(T \in \mathcal{B}(H)\) 自伴。则存在<em>投影值测度</em> \(E\)（projection-valued measure）在 \(\mathbb{R}\) 上，使</p>
+
+<p>\[
+T = \int_{\mathbb{R}} \lambda \, dE(\lambda).
+\]</p>
+
+<p>其中 \(E(B)\) 对每个 Borel 集 \(B \subset \mathbb{R}\) 给一个正交投影 \(P_B \in \mathcal{B}(H)\)，满足：</p>
+
+<ul>
+  <li>\(E(\emptyset) = 0\)，\(E(\mathbb{R}) = I\)。</li>
+  <li>\(E(B_1 \cap B_2) = E(B_1) E(B_2)\)。</li>
+  <li>\(E\) "可数加性"（强收敛意义下）。</li>
+</ul>
+
+<p>"投影值测度" 是把"<em>谱测度对每个 Borel 集分配一个投影</em>" 形式化。直观：紧算子的离散和 \(T = \sum \lambda_n P_{\{e_n\}}\) 把 \(\{e_n\}\) 上的投影按权 \(\lambda_n\) 加起；一般自伴的连续谱版本把"<em>把每段 \(d\lambda\) 上的投影按权 \(\lambda\) 积分</em>"。</p>
+
+<p>这条定理由 von Neumann 1929 证（更早 Hilbert 1906 给积分算子做过特殊版本），技术深度大——证明 6-10 页，依赖 Cauchy 积分公式 + Riesz 表示<a href="ch16.html">第 16 章</a> + 复测度论。本书把它列为"<em>知道存在</em>" 而不展开证。</p>
+
+<p>这条定理还能<em>进一步</em>推广到"<em>无界自伴算子</em>"——比如位置算子 \(\hat x : f \mapsto x f\) 在 \(L^2(\mathbb{R})\) 上不是定义在<em>所有</em> \(L^2\) 函数上（因为 \(x f(x)\) 可能不在 \(L^2\) 里）。无界自伴算子谱定理是<a href="ch24.html">第 24 章</a>量子力学的核心数学背景——可观测量被建模为无界自伴算子，这条定理给"<em>测量结果服从某概率分布</em>" 的数学基础。</p>
+
+<p>下一章我们跳到紧算子<em>代数侧</em>的中心事实——Fredholm 选择性。它说"<em>对紧算子 \(T\) 与非零 \(\lambda\)，方程 \(T x - \lambda x = y\) 的可解性遵循有限维线性代数的'齐次唯一 ⟺ 非齐次有解' 的<em>原样</em>规律</em>"。这条结论让<em>椭圆 PDE 的存在唯一性</em> 和<em>积分方程</em> 都被同一套抽象工具统一处理。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 紧算子</a><a href="ch22.html">下一章 · 第 22 章 Fredholm 选择性 →</a></nav>
 </main>
 </body>
 </html>
+</content>
+</invoke>

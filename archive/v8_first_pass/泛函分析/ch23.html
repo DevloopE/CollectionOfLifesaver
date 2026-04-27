@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 23 章 应用：Sobolev 空间与变分入门 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 Fredholm 选择性</a><a href="ch24.html">下一章 · 第 24 章 应用：量子力学的算子语言 →</a></nav>
+<h1 id="ch23">第 23 章 应用：Sobolev 空间与变分入门</h1>
+
+<p>这一章把前面 22 章的工具组合在一起，给经典椭圆偏微分方程一个干净的"<strong>弱解</strong>"理论。具体说，我们要解</p>
+
+<p>\[
+-\Delta u + u = f \text{ 在 } \Omega, \quad u|_{\partial \Omega} = 0,
+\]</p>
+
+<p>其中 \(\Omega \subset \mathbb{R}^n\) 是有界域，\(f\) 给定。</p>
+
+<p>这是<a href="../偏微分方程/index.html">偏微分方程</a>课的标准经典问题。古典方法（分离变量、Green 函数）对几何形状有限制。<strong>变分 / 弱解</strong>方法靠的是泛函分析：</p>
+
+<ol>
+  <li>定义合适的"<em>解所在空间</em>"——Sobolev 空间 \(H_0^1(\Omega)\)；</li>
+  <li>把 PDE 写成"<em>双线性形式 + 线性泛函</em>"形式；</li>
+  <li>用 Lax–Milgram 定理（第 16 章应用）+ Riesz 表示得到唯一弱解；</li>
+  <li>由 Sobolev 嵌入 + Rellich 紧嵌入研究弱解的正则性。</li>
+</ol>
+
+<ul>
+  <li>Sobolev 空间 \(W^{k,p}(\Omega)\) 与 \(H^k(\Omega) = W^{k,2}(\Omega)\) 的定义。</li>
+  <li>\(H^1\) 上的内积、范数、完备性。</li>
+  <li>"零边值"子空间 \(H_0^1(\Omega)\) 的定义。</li>
+  <li>Poincaré 不等式与 \(H_0^1\) 上的等价范数。</li>
+  <li>Lax–Milgram 在 \(-\Delta + 1\) 上的应用：弱解存在唯一。</li>
+  <li>Sobolev 嵌入与 Rellich 紧嵌入（陈述 + 应用到正则性）。</li>
+  <li>变分法的标准模板：极小化能量泛函 \(\Rightarrow\) 弱解。</li>
+</ul>
+
+<h2 id="sec23-1">23.1 Sobolev 空间的定义</h2>
+
+<p>设 \(\Omega \subset \mathbb{R}^n\) 是开集，\(k \in \mathbb{N}\)，\(1 \le p \le \infty\)。<strong>Sobolev 空间</strong></p>
+
+<p>\[
+W^{k,p}(\Omega) = \{u \in L^p(\Omega) : D^\alpha u \in L^p(\Omega) \text{ 对 } |\alpha| \le k \text{（弱意义）}\}.
+\]</p>
+
+<p>"弱导数" \(D^\alpha u\) 的定义：\(v = D^\alpha u\) 弱意义是说</p>
+
+<p>\[
+\int_\Omega u D^\alpha \varphi \, dx = (-1)^{|\alpha|} \int_\Omega v \varphi \, dx, \quad \forall \varphi \in C_c^\infty(\Omega).
+\]</p>
+
+<p>这是把<em>分部积分</em>反向定义"导数"——经典 \(C^k\) 的导数自动满足这条等式（正向分部积分），所以弱导数在 \(C^k\) 上和经典导数一致。</p>
+
+<p>\(W^{k,p}\) 配范数</p>
+
+<p>\[
+\|u\|_{W^{k,p}} = \left( \sum_{|\alpha| \le k} \|D^\alpha u\|_{L^p}^p \right)^{1/p}
+\]</p>
+
+<p>是 Banach 空间。当 \(p = 2\) 时记 \(H^k(\Omega) = W^{k,2}(\Omega)\)，是 Hilbert 空间，配内积</p>
+
+<p>\[
+\langle u, v \rangle_{H^k} = \sum_{|\alpha| \le k} \int_\Omega D^\alpha u \cdot D^\alpha v \, dx.
+\]</p>
+
+<p>本章主要用 \(H^1(\Omega)\)。它的内积是</p>
+
+<p>\[
+\boxed{\ \langle u, v \rangle_{H^1} = \int_\Omega (u v + \nabla u \cdot \nabla v) \, dx.\ }
+\]</p>
+
+<p>对应范数 \(\|u\|_{H^1}^2 = \|u\|_{L^2}^2 + \|\nabla u\|_{L^2}^2\)。</p>
+
+<h2 id="sec23-2">23.2 \(H_0^1(\Omega)\)：零边值子空间</h2>
+
+<p>"\(u|_{\partial \Omega} = 0\)" 这个边界条件在 \(H^1\) 上不直接有意义——\(H^1\) 函数只有"几乎处处"定义，没有"边界值"。要让边界条件可表达，定义</p>
+
+<p>\[
+H_0^1(\Omega) := \overline{C_c^\infty(\Omega)}^{H^1}.
+\]</p>
+
+<p>即 "紧支撑光滑函数"在 \(H^1\) 范数下的闭包。\(H_0^1\) 是 \(H^1\) 的闭子空间，因此自身是 Hilbert 空间。</p>
+
+<p>"\(u \in H_0^1\)"是把"零边值"几何化的方式——你不能直接谈"边界值"，但可以谈"是否能被零延拓的紧支撑光滑函数 \(H^1\) 逼近"。</p>
+
+<p>对足够"光滑"的边界（比如 Lipschitz 边界），有<strong>迹算子</strong> \(T : H^1(\Omega) \to L^2(\partial \Omega)\) 让"边界值"有意义；这时 \(H_0^1 = \ker T\)。详细在 Adams《Sobolev Spaces》。</p>
+
+<h2 id="sec23-3">23.3 Poincaré 不等式</h2>
+
+<p><strong>定理（Poincaré 不等式）。</strong>设 \(\Omega \subset \mathbb{R}^n\) 是<em>有界</em>域。则存在常数 \(C = C(\Omega) > 0\) 使</p>
+
+<p>\[
+\boxed{\ \|u\|_{L^2} \le C \|\nabla u\|_{L^2}, \quad \forall u \in H_0^1(\Omega).\ }
+\]</p>
+
+<p>"零边值"+"有界域"是必须的——在 \(H^1(\mathbb{R}^n)\) 或非零边值下不成立（取 \(u \equiv 1\) 给反例：\(\nabla u = 0\) 但 \(\|u\|_{L^2}\) 大）。</p>
+
+<p>证明思路（一维情形）：\(u(x) = u(0) + \int_0^x u'(t) dt\)。\(u(0) = 0\)（零边值），所以 \(|u(x)| \le |\Omega|^{1/2} \|u'\|_{L^2}\)（Cauchy–Schwarz）。两边平方积分得 \(\|u\|_{L^2}^2 \le C \|u'\|_{L^2}^2\)。一般维度论证类似但需要 Friedrichs 引理或 Faber–Krahn。</p>
+
+<p>Poincaré 不等式给一个非常有用的<strong>等价范数</strong>：在 \(H_0^1(\Omega)\) 上，</p>
+
+<p>\[
+\|u\|_* := \|\nabla u\|_{L^2}
+\]</p>
+
+<p>是范数（正定来自 Poincaré：\(\|u\|_* = 0 \Rightarrow \|u\|_{L^2} = 0 \Rightarrow u = 0\)），且与 \(H^1\) 范数等价：</p>
+
+<p>\[
+\|u\|_{H^1}^2 = \|u\|_{L^2}^2 + \|\nabla u\|_{L^2}^2 \le (C^2 + 1) \|\nabla u\|_{L^2}^2,
+\]</p>
+
+<p>反向 \(\|\nabla u\|_{L^2} \le \|u\|_{H^1}\)。所以 \(H_0^1\) 配 \(\|\cdot\|_*\) 也是 Hilbert 空间。这个范数在变分法里更自然。</p>
+
+<h2 id="sec23-4">23.4 弱解的定义与 Lax–Milgram 应用</h2>
+
+<p>问题：解 \(-\Delta u + u = f\) 在 \(\Omega\)，\(u \in H_0^1(\Omega)\)，\(f \in L^2(\Omega)\) 给定。</p>
+
+<p>"弱解"的来源：用<em>测试函数</em> \(\varphi \in H_0^1\) 乘 PDE 两边并积分：</p>
+
+<p>\[
+\int_\Omega (-\Delta u) \varphi \, dx + \int_\Omega u \varphi \, dx = \int_\Omega f \varphi \, dx.
+\]</p>
+
+<p>第一项用分部积分（"零边值"让边界项消失）：\(\int_\Omega (-\Delta u) \varphi = \int_\Omega \nabla u \cdot \nabla \varphi\)。所以</p>
+
+<p>\[
+\int_\Omega \nabla u \cdot \nabla \varphi \, dx + \int_\Omega u \varphi \, dx = \int_\Omega f \varphi \, dx.
+\]</p>
+
+<p>左边的第一项 + 第二项就是 \(H^1\) 内积 \(\langle u, \varphi \rangle_{H^1}\)。</p>
+
+<p><strong>定义。</strong>\(u \in H_0^1(\Omega)\) 是 PDE \(-\Delta u + u = f\)（带零边值）的<em>弱解</em>，是说</p>
+
+<p>\[
+\boxed{\ \langle u, \varphi \rangle_{H^1} = \int_\Omega f \varphi \, dx, \quad \forall \varphi \in H_0^1(\Omega).\ }
+\]</p>
+
+<p>右边定义了 \(H_0^1\) 上的线性泛函 \(L_f(\varphi) = \int f \varphi\)。验证它有界：</p>
+
+<p>\[
+|L_f(\varphi)| = \left| \int f \varphi \right| \le \|f\|_{L^2} \|\varphi\|_{L^2} \le \|f\|_{L^2} \|\varphi\|_{H^1}.
+\]</p>
+
+<p>所以 \(L_f \in (H_0^1)^*\)，\(\|L_f\| \le \|f\|_{L^2}\)。</p>
+
+<p>由 Riesz 表示定理（<a href="ch16.html">第 16 章</a>），存在唯一 \(u \in H_0^1\) 使</p>
+
+<p>\[
+\langle u, \varphi \rangle_{H^1} = L_f(\varphi), \quad \forall \varphi.
+\]</p>
+
+<p>这个 \(u\) 就是弱解。<em>存在唯一</em> 由 Riesz 一行字给。</p>
+
+<p>\[
+\boxed{\ \text{对每 } f \in L^2(\Omega), \text{ PDE } -\Delta u + u = f \text{（零边值）有唯一弱解 } u \in H_0^1.\ }
+\]</p>
+
+<h2 id="sec23-5">23.5 Lax–Milgram：更一般的椭圆方程</h2>
+
+<p>上一节的方法直接用 Riesz 表示是因为左边恰好就是 \(H^1\) 内积。对更一般的椭圆 PDE 比如 \(-\nabla \cdot (A \nabla u) + b \cdot \nabla u + c u = f\)，左边变成<em>非对称</em>双线性形式，不直接是内积。这时用<strong>Lax–Milgram 定理</strong>。</p>
+
+<p><strong>定理（Lax–Milgram）。</strong>设 \(H\) Hilbert 空间，\(a : H \times H \to \mathbb{R}\) 双线性满足：</p>
+
+<ul>
+  <li><strong>有界：</strong>\(|a(u, v)| \le M \|u\|_H \|v\|_H\)；</li>
+  <li><strong>强制（coercive）：</strong>\(a(u, u) \ge \alpha \|u\|_H^2\) 某 \(\alpha > 0\)。</li>
+</ul>
+
+<p>对每个 \(L \in H^*\)，存在唯一 \(u \in H\) 使 \(a(u, v) = L(v), \forall v\)。</p>
+
+<p>证明思路：固定 \(u\)，\(v \mapsto a(u, v)\) 是 \(H^*\) 元素，由 Riesz 对应 \(A u \in H\)。即 \(a(u, v) = \langle A u, v \rangle\)。\(A : H \to H\) 有界 + 强制 \(\Rightarrow\) 双射（强制给单射 + 像闭，再用对偶论证给满射）。再用 Riesz 表示 \(L(v) = \langle \ell, v \rangle\) 某 \(\ell \in H\)。由 \(A\) 双射 \(\Rightarrow\) \(u = A^{-1} \ell\) 是 \(a(u, v) = L(v)\) 的唯一解。</p>
+
+<p>这条定理把上一节的"内积形式"推广到"强制双线性形式"。它是<a href="../偏微分方程/index.html">偏微分方程</a>椭圆问题的核心存在性工具。具体应用：</p>
+
+<ul>
+  <li><strong>变系数椭圆：</strong>\(-\nabla \cdot (A(x) \nabla u) = f\)，\(A(x)\) 一致椭圆 \(\Rightarrow\) 强制 \(\Rightarrow\) Lax–Milgram 给唯一解。</li>
+  <li><strong>带漂移项：</strong>\(-\Delta u + b \cdot \nabla u + c u = f\)，\(c \ge 0\) + 适当 \(b\) 控制 \(\Rightarrow\) 强制（用 Poincaré 控漂移）。</li>
+</ul>
+
+<h2 id="sec23-6">23.6 Sobolev 嵌入与 Rellich 紧嵌入</h2>
+
+<p>有了"弱解存在"，下一个问题是：弱解<em>多正则</em>？它是否在某个 \(L^p\) 中、是否连续、是否光滑？</p>
+
+<p><strong>定理（Sobolev 嵌入）。</strong>设 \(\Omega \subset \mathbb{R}^n\) 有界 + Lipschitz 边界。对 \(k \in \mathbb{N}\) 与 \(1 \le p \le \infty\)：</p>
+
+<ul>
+  <li>若 \(k p < n\)：\(W^{k,p}(\Omega) \hookrightarrow L^q(\Omega)\)，其中 \(\frac{1}{q} = \frac{1}{p} - \frac{k}{n}\)；</li>
+  <li>若 \(k p = n\)：\(W^{k,p}(\Omega) \hookrightarrow L^q(\Omega)\) 对 \(p \le q < \infty\)；</li>
+  <li>若 \(k p > n\)：\(W^{k,p}(\Omega) \hookrightarrow C^{k - \lceil n/p \rceil, \alpha}(\overline\Omega)\) 某 \(\alpha\)。</li>
+</ul>
+
+<p>第三条最有用——它说"<em>导数阶数 \(k\) 比 \(n/p\) 大时，函数自动连续</em>"。例如 \(H^1(\Omega)\) 在 \(n = 1\) 时（\(k = 1, p = 2, k p = 2 > 1 = n\)）嵌入 \(C^{0, 1/2}\)；在 \(n = 2\) 时不嵌入到连续函数（\(k p = n\) 临界）；在 \(n = 3\) 时嵌入到 \(L^6\)（\(\frac{1}{q} = \frac{1}{2} - \frac{1}{3} = \frac{1}{6}\)）。</p>
+
+<p><strong>定理（Rellich–Kondrachov 紧嵌入）。</strong>在 Sobolev 嵌入的"严格"情形下（即 \(q\) 严格小于嵌入定理给的临界 \(q^*\)），嵌入还是<em>紧</em>的。最常用版本：</p>
+
+<p>\[
+\boxed{\ H^1(\Omega) \hookrightarrow\hookrightarrow L^2(\Omega), \quad \Omega \text{ 有界 + Lipschitz 边界}.\ }
+\]</p>
+
+<p>"\(\hookrightarrow\hookrightarrow\)" 表示<em>紧嵌入</em>——\(H^1\) 中的有界集在 \(L^2\) 中相对紧。</p>
+
+<p>这条紧嵌入是 PDE 弱解理论里最重要的一条事实。它的实际意义：你拿到 \(H^1\) 弱收敛序列 \(u_n \rightharpoonup u\)，<em>自动</em>得到 \(L^2\) 强收敛 \(u_n \to u\)。这就是<a href="ch20.html">第 20 章 20.5 节</a>"紧算子把弱收敛变强收敛"的具体化——嵌入 \(H^1 \hookrightarrow L^2\) 紧 \(\Rightarrow\) 嵌入算子是紧算子。</p>
+
+<p>用紧嵌入证明非线性 PDE 弱解存在性的"<strong>极小化方法</strong>"模板：</p>
+
+<ol>
+  <li>定义能量 \(F(u) = \int (\frac{1}{2} |\nabla u|^2 + G(u))\)；</li>
+  <li>取极小化序列 \(u_n\) in \(H_0^1\)；</li>
+  <li>能量有界 \(\Rightarrow \|\nabla u_n\|_{L^2}\) 有界 \(\Rightarrow \{u_n\}\) 在 \(H_0^1\) 中有界；</li>
+  <li>\(H_0^1\) 自反 \(\Rightarrow u_{n_k} \rightharpoonup u^*\) 弱收敛；</li>
+  <li>Rellich \(\Rightarrow u_{n_k} \to u^*\) 在 \(L^2\) 中强收敛；</li>
+  <li>\(F\) 弱下半连续 \(\Rightarrow F(u^*) \le \liminf F(u_{n_k}) = \inf F\)；</li>
+  <li>\(u^*\) 是极小元 \(\Rightarrow\) Euler–Lagrange 给 \(u^*\) 是 PDE 弱解。</li>
+</ol>
+
+<p>这条模板是 Calderón、De Giorgi、Stampacchia 等在 1950-60 年代标准化的。它把 PDE 弱解存在性问题<em>完全代数化</em>——只要验证 7 步里每一步的假设，存在性自动有。</p>
+
+<p>本章把"泛函分析 \(\to\) PDE"这条桥梁的入口处展示完整。深入下去就是 Brezis、Evans、Gilbarg–Trudinger 这种 PDE 教材的内容。本书止步于此——下一章我们去看另一个"应用"：量子力学，这是泛函分析最受人欢迎的物理化身。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 Fredholm 选择性</a><a href="ch24.html">下一章 · 第 24 章 应用：量子力学的算子语言 →</a></nav>
+</main>
+</body>
+</html>

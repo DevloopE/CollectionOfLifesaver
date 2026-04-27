@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 23 章 应用：Sobolev 空间与变分入门 — 普林斯顿泛函分析读本</title>
+<title>第 23 章 Sobolev 空间 + 变分入门 — 普林斯顿泛函分析读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -32,219 +32,347 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 Fredholm 选择性</a><a href="ch24.html">下一章 · 第 24 章 应用：量子力学的算子语言 →</a></nav>
-<h1 id="ch23">第 23 章 应用：Sobolev 空间与变分入门</h1>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 Fredholm 选择性</a><a href="ch24.html">下一章 · 第 24 章 量子力学的算子语言 →</a></nav>
+<h1 id="ch23">第 23 章 Sobolev 空间 + 变分入门</h1>
 
-<p>这一章把前面 22 章的工具组合在一起，给经典椭圆偏微分方程一个干净的"<strong>弱解</strong>"理论。具体说，我们要解</p>
+<p>请你做一道朴素的事——求下面这道椭圆 PDE 的解：</p>
 
 <p>\[
--\Delta u + u = f \text{ 在 } \Omega, \quad u|_{\partial \Omega} = 0,
+-\Delta u + u = f \text{ in } \Omega, \qquad u = 0 \text{ on } \partial \Omega.
 \]</p>
 
-<p>其中 \(\Omega \subset \mathbb{R}^n\) 是有界域，\(f\) 给定。</p>
+<p>其中 \(\Omega \subset \mathbb{R}^d\) 是有界开域、\(f\) 给定。这道题在物理上无处不在——稳态扩散、Helmholtz 方程减阻尼极限、量子粒子势阱的低能态、统计物理中的高斯采样——大概是数学物理里最常见的边值问题。</p>
 
-<p>这是<a href="../偏微分方程/index.html">偏微分方程</a>课的标准经典问题。古典方法（分离变量、Green 函数）对几何形状有限制。<strong>变分 / 弱解</strong>方法靠的是泛函分析：</p>
+<p>朴素的解法是<em>找经典解</em>——找一个 \(u \in C^2(\Omega)\) 在 \(\overline\Omega\) 上连续，满足上面方程<em>逐点</em>。这条路在 \(\Omega\) 形状好（光滑边界）、\(f\) 光滑时可走（<em>Schauder 估计</em>给）。但实际工作里 \(\Omega\) 经常有<em>角</em>（多边形 mesh）、\(f\) 经常只在 \(L^2\) 里（不连续）——经典解根本<em>不存在</em>。</p>
+
+<p>20 世纪上半叶大半的努力是开发<em>弱解</em> 理论——一种可以接受 "u 不二阶可微"、"f 不连续"、"\(\partial \Omega\) 不光滑" 的存在性框架。结果是个干净的两步骤：</p>
 
 <ol>
-  <li>定义合适的"<em>解所在空间</em>"——Sobolev 空间 \(H_0^1(\Omega)\)；</li>
-  <li>把 PDE 写成"<em>双线性形式 + 线性泛函</em>"形式；</li>
-  <li>用 Lax–Milgram 定理（第 16 章应用）+ Riesz 表示得到唯一弱解；</li>
-  <li>由 Sobolev 嵌入 + Rellich 紧嵌入研究弱解的正则性。</li>
+  <li><em>把 PDE 改写为变分等式 / 变分极值</em>——它<em>等价于</em> 原 PDE 在弱意义下解。</li>
+  <li><em>在合适的 Hilbert 空间上用 Lax-Milgram 或直接 Riesz 表示给变分等式存在唯一解</em>。</li>
 </ol>
 
-<ul>
-  <li>Sobolev 空间 \(W^{k,p}(\Omega)\) 与 \(H^k(\Omega) = W^{k,2}(\Omega)\) 的定义。</li>
-  <li>\(H^1\) 上的内积、范数、完备性。</li>
-  <li>"零边值"子空间 \(H_0^1(\Omega)\) 的定义。</li>
-  <li>Poincaré 不等式与 \(H_0^1\) 上的等价范数。</li>
-  <li>Lax–Milgram 在 \(-\Delta + 1\) 上的应用：弱解存在唯一。</li>
-  <li>Sobolev 嵌入与 Rellich 紧嵌入（陈述 + 应用到正则性）。</li>
-  <li>变分法的标准模板：极小化能量泛函 \(\Rightarrow\) 弱解。</li>
-</ul>
+<p>这条程序需要的"<em>合适的 Hilbert 空间</em>" 就是<em>Sobolev 空间</em> \(H^1(\Omega)\)、\(H_0^1(\Omega)\)。本章把它们构造、给关键性质（Poincaré、嵌入、Rellich 紧嵌入），最后展示这套机器在椭圆 PDE 上跑一遍。</p>
 
-<h2 id="sec23-1">23.1 Sobolev 空间的定义</h2>
+<p>核心结果：<em>椭圆 PDE 的弱解存在唯一性是泛函分析（Hilbert + 紧 + 对偶）的<em>纯</em>定理</em>——一旦把 PDE 翻译到 Sobolev 空间上，剩下的全部由前面 22 章的工具自动给出。</p>
 
-<p>设 \(\Omega \subset \mathbb{R}^n\) 是开集，\(k \in \mathbb{N}\)，\(1 \le p \le \infty\)。<strong>Sobolev 空间</strong></p>
+<h2 id="sec23-1">23.1 Sobolev 空间 \(W^{k, p}\) 与 \(H^k\)</h2>
+
+<p>"<em>弱导数</em>" 的关键想法：放弃"<em>导数逐点定义</em>"——改用"<em>分部积分</em> 在所有测试函数上验证"。</p>
+
+<p>设 \(\Omega \subset \mathbb{R}^d\) 开。\(C_c^\infty(\Omega)\) 是 \(\Omega\) 上具紧支撑的光滑函数空间。</p>
+
+<p><strong>定义（弱导数）。</strong>设 \(u \in L^1_{\mathrm{loc}}(\Omega)\)（局部可积）。\(v \in L^1_{\mathrm{loc}}\) 是 \(u\) 的<em>弱偏导数</em> \(\partial^\alpha u\)（多重指标 \(\alpha = (\alpha_1, \ldots, \alpha_d)\)），如果对每个 \(\varphi \in C_c^\infty(\Omega)\)：</p>
 
 <p>\[
-W^{k,p}(\Omega) = \{u \in L^p(\Omega) : D^\alpha u \in L^p(\Omega) \text{ 对 } |\alpha| \le k \text{（弱意义）}\}.
+\int_\Omega u \cdot \partial^\alpha \varphi \, dx = (-1)^{|\alpha|} \int_\Omega v \cdot \varphi \, dx.
 \]</p>
 
-<p>"弱导数" \(D^\alpha u\) 的定义：\(v = D^\alpha u\) 弱意义是说</p>
+<p>右边是经典导数被推到 \(\varphi\) 上的"<em>分部积分</em>" 形态。如果 \(u \in C^{|\alpha|}\)，经典导数 \(\partial^\alpha u\) 自动满足这条等式（用 \(d\) 次分部积分）。所以弱导数<em>包含</em> 经典导数；它<em>扩张</em> 到不可微但仍能被分部积分定义的函数。</p>
+
+<p><strong>定义（Sobolev 空间）。</strong>给 \(k \in \mathbb{N}, 1 \le p \le \infty\)：</p>
 
 <p>\[
-\int_\Omega u D^\alpha \varphi \, dx = (-1)^{|\alpha|} \int_\Omega v \varphi \, dx, \quad \forall \varphi \in C_c^\infty(\Omega).
+W^{k, p}(\Omega) := \{u \in L^p(\Omega) : \partial^\alpha u \in L^p(\Omega) \text{ 对所有 } |\alpha| \le k\}.
 \]</p>
 
-<p>这是把<em>分部积分</em>反向定义"导数"——经典 \(C^k\) 的导数自动满足这条等式（正向分部积分），所以弱导数在 \(C^k\) 上和经典导数一致。</p>
-
-<p>\(W^{k,p}\) 配范数</p>
+<p>配范数</p>
 
 <p>\[
-\|u\|_{W^{k,p}} = \left( \sum_{|\alpha| \le k} \|D^\alpha u\|_{L^p}^p \right)^{1/p}
+\|u\|_{W^{k, p}} := \Big(\sum_{|\alpha| \le k} \|\partial^\alpha u\|_{L^p}^p\Big)^{1/p}.
 \]</p>
 
-<p>是 Banach 空间。当 \(p = 2\) 时记 \(H^k(\Omega) = W^{k,2}(\Omega)\)，是 Hilbert 空间，配内积</p>
+<p>这是 Banach 空间。</p>
+
+<p><em>Hilbert 情形 \(p = 2\)</em>：记 \(H^k(\Omega) := W^{k, 2}(\Omega)\)。配内积</p>
 
 <p>\[
-\langle u, v \rangle_{H^k} = \sum_{|\alpha| \le k} \int_\Omega D^\alpha u \cdot D^\alpha v \, dx.
+\langle u, v \rangle_{H^k} := \sum_{|\alpha| \le k} \int_\Omega \partial^\alpha u \cdot \partial^\alpha v \, dx.
 \]</p>
 
-<p>本章主要用 \(H^1(\Omega)\)。它的内积是</p>
+<p>这是 Hilbert 空间——可分性 + 自反性都跟着 \(L^2\) 一起来。</p>
+
+<p>具体到 \(k = 1, p = 2\)：</p>
 
 <p>\[
-\boxed{\ \langle u, v \rangle_{H^1} = \int_\Omega (u v + \nabla u \cdot \nabla v) \, dx.\ }
+H^1(\Omega) = \{u \in L^2(\Omega) : \nabla u \in L^2(\Omega; \mathbb{R}^d)\}, \qquad \|u\|_{H^1}^2 = \|u\|_{L^2}^2 + \|\nabla u\|_{L^2}^2.
 \]</p>
 
-<p>对应范数 \(\|u\|_{H^1}^2 = \|u\|_{L^2}^2 + \|\nabla u\|_{L^2}^2\)。</p>
+<p>请你停下来想一想这个范数。它把"<em>函数本身的大小</em>" 与"<em>梯度的大小</em>" <em>同时</em>纳入度量。对比<a href="ch1.html#sec1-2">第 1 章 1.2 节</a>那个失败例子——求导算子 \(D : (C^1, \|\cdot\|_\infty) \to (C, \|\cdot\|_\infty)\) 不连续——根本原因就是输入空间的范数<em>没把导数纳入</em>。Sobolev 范数<em>纳入了</em>，所以求导算子 \(\partial : H^1 \to L^2\) <em>自动</em> 有界，\(\|\partial u\|_{L^2} \le \|u\|_{H^1}\)。</p>
 
-<h2 id="sec23-2">23.2 \(H_0^1(\Omega)\)：零边值子空间</h2>
+<p><em>"Sobolev 空间" 这个范畴存在的全部目的就是把朴素的"求导" 强行变成<em>有界算子</em></em>。这是泛函分析对 PDE 最贡献的一步——以 Sobolev 1936 论文为标志。</p>
 
-<p>"\(u|_{\partial \Omega} = 0\)" 这个边界条件在 \(H^1\) 上不直接有意义——\(H^1\) 函数只有"几乎处处"定义，没有"边界值"。要让边界条件可表达，定义</p>
+<h2 id="sec23-2">23.2 \(H_0^1(\Omega)\) 零边值闭子空间</h2>
+
+<p>椭圆 Dirichlet 问题要求"\(u = 0\) 在 \(\partial \Omega\) 上"。但 \(u \in H^1\) 一般不连续——"<em>边值</em>" 怎么定义？答案是用<em>稠密扩张</em>。</p>
+
+<p><strong>定义。</strong></p>
 
 <p>\[
-H_0^1(\Omega) := \overline{C_c^\infty(\Omega)}^{H^1}.
+H_0^1(\Omega) := \overline{C_c^\infty(\Omega)}^{\|\cdot\|_{H^1}}.
 \]</p>
 
-<p>即 "紧支撑光滑函数"在 \(H^1\) 范数下的闭包。\(H_0^1\) 是 \(H^1\) 的闭子空间，因此自身是 Hilbert 空间。</p>
+<p>即：紧支撑光滑函数在 \(H^1\) 范数下的闭包。</p>
 
-<p>"\(u \in H_0^1\)"是把"零边值"几何化的方式——你不能直接谈"边界值"，但可以谈"是否能被零延拓的紧支撑光滑函数 \(H^1\) 逼近"。</p>
+<p>"<em>紧支撑</em>" 在 \(\Omega\) 内意味着支撑离 \(\partial \Omega\) 一个正距离——所以朴素地"\(u\) 在边界上为 0"。\(H_0^1\) 是这种朴素零边值函数在 \(H^1\) 中的闭包——它正是<em>抽象意义</em> 上"\(u|_{\partial \Omega} = 0\)" 的函数。</p>
 
-<p>对足够"光滑"的边界（比如 Lipschitz 边界），有<strong>迹算子</strong> \(T : H^1(\Omega) \to L^2(\partial \Omega)\) 让"边界值"有意义；这时 \(H_0^1 = \ker T\)。详细在 Adams《Sobolev Spaces》。</p>
+<p>\(H_0^1(\Omega)\) 是 \(H^1(\Omega)\) 的<em>闭线性子空间</em>，所以自身是 Hilbert 空间。一般 \(H_0^1 \subsetneq H^1\)（比如 \(u \equiv 1\) 在 \(H^1\) 但不在 \(H_0^1\)，因为它"边界值是 1 不是 0"）。</p>
 
-<h2 id="sec23-3">23.3 Poincaré 不等式</h2>
-
-<p><strong>定理（Poincaré 不等式）。</strong>设 \(\Omega \subset \mathbb{R}^n\) 是<em>有界</em>域。则存在常数 \(C = C(\Omega) > 0\) 使</p>
-
-<p>\[
-\boxed{\ \|u\|_{L^2} \le C \|\nabla u\|_{L^2}, \quad \forall u \in H_0^1(\Omega).\ }
-\]</p>
-
-<p>"零边值"+"有界域"是必须的——在 \(H^1(\mathbb{R}^n)\) 或非零边值下不成立（取 \(u \equiv 1\) 给反例：\(\nabla u = 0\) 但 \(\|u\|_{L^2}\) 大）。</p>
-
-<p>证明思路（一维情形）：\(u(x) = u(0) + \int_0^x u'(t) dt\)。\(u(0) = 0\)（零边值），所以 \(|u(x)| \le |\Omega|^{1/2} \|u'\|_{L^2}\)（Cauchy–Schwarz）。两边平方积分得 \(\|u\|_{L^2}^2 \le C \|u'\|_{L^2}^2\)。一般维度论证类似但需要 Friedrichs 引理或 Faber–Krahn。</p>
-
-<p>Poincaré 不等式给一个非常有用的<strong>等价范数</strong>：在 \(H_0^1(\Omega)\) 上，</p>
-
-<p>\[
-\|u\|_* := \|\nabla u\|_{L^2}
-\]</p>
-
-<p>是范数（正定来自 Poincaré：\(\|u\|_* = 0 \Rightarrow \|u\|_{L^2} = 0 \Rightarrow u = 0\)），且与 \(H^1\) 范数等价：</p>
-
-<p>\[
-\|u\|_{H^1}^2 = \|u\|_{L^2}^2 + \|\nabla u\|_{L^2}^2 \le (C^2 + 1) \|\nabla u\|_{L^2}^2,
-\]</p>
-
-<p>反向 \(\|\nabla u\|_{L^2} \le \|u\|_{H^1}\)。所以 \(H_0^1\) 配 \(\|\cdot\|_*\) 也是 Hilbert 空间。这个范数在变分法里更自然。</p>
-
-<h2 id="sec23-4">23.4 弱解的定义与 Lax–Milgram 应用</h2>
-
-<p>问题：解 \(-\Delta u + u = f\) 在 \(\Omega\)，\(u \in H_0^1(\Omega)\)，\(f \in L^2(\Omega)\) 给定。</p>
-
-<p>"弱解"的来源：用<em>测试函数</em> \(\varphi \in H_0^1\) 乘 PDE 两边并积分：</p>
-
-<p>\[
-\int_\Omega (-\Delta u) \varphi \, dx + \int_\Omega u \varphi \, dx = \int_\Omega f \varphi \, dx.
-\]</p>
-
-<p>第一项用分部积分（"零边值"让边界项消失）：\(\int_\Omega (-\Delta u) \varphi = \int_\Omega \nabla u \cdot \nabla \varphi\)。所以</p>
-
-<p>\[
-\int_\Omega \nabla u \cdot \nabla \varphi \, dx + \int_\Omega u \varphi \, dx = \int_\Omega f \varphi \, dx.
-\]</p>
-
-<p>左边的第一项 + 第二项就是 \(H^1\) 内积 \(\langle u, \varphi \rangle_{H^1}\)。</p>
-
-<p><strong>定义。</strong>\(u \in H_0^1(\Omega)\) 是 PDE \(-\Delta u + u = f\)（带零边值）的<em>弱解</em>，是说</p>
-
-<p>\[
-\boxed{\ \langle u, \varphi \rangle_{H^1} = \int_\Omega f \varphi \, dx, \quad \forall \varphi \in H_0^1(\Omega).\ }
-\]</p>
-
-<p>右边定义了 \(H_0^1\) 上的线性泛函 \(L_f(\varphi) = \int f \varphi\)。验证它有界：</p>
-
-<p>\[
-|L_f(\varphi)| = \left| \int f \varphi \right| \le \|f\|_{L^2} \|\varphi\|_{L^2} \le \|f\|_{L^2} \|\varphi\|_{H^1}.
-\]</p>
-
-<p>所以 \(L_f \in (H_0^1)^*\)，\(\|L_f\| \le \|f\|_{L^2}\)。</p>
-
-<p>由 Riesz 表示定理（<a href="ch16.html">第 16 章</a>），存在唯一 \(u \in H_0^1\) 使</p>
-
-<p>\[
-\langle u, \varphi \rangle_{H^1} = L_f(\varphi), \quad \forall \varphi.
-\]</p>
-
-<p>这个 \(u\) 就是弱解。<em>存在唯一</em> 由 Riesz 一行字给。</p>
-
-<p>\[
-\boxed{\ \text{对每 } f \in L^2(\Omega), \text{ PDE } -\Delta u + u = f \text{（零边值）有唯一弱解 } u \in H_0^1.\ }
-\]</p>
-
-<h2 id="sec23-5">23.5 Lax–Milgram：更一般的椭圆方程</h2>
-
-<p>上一节的方法直接用 Riesz 表示是因为左边恰好就是 \(H^1\) 内积。对更一般的椭圆 PDE 比如 \(-\nabla \cdot (A \nabla u) + b \cdot \nabla u + c u = f\)，左边变成<em>非对称</em>双线性形式，不直接是内积。这时用<strong>Lax–Milgram 定理</strong>。</p>
-
-<p><strong>定理（Lax–Milgram）。</strong>设 \(H\) Hilbert 空间，\(a : H \times H \to \mathbb{R}\) 双线性满足：</p>
+<p><em>对应技术：迹算子。</em>更精确地，对 \(\partial \Omega\) 是 Lipschitz 边界的情形，存在<em>迹算子</em> \(\gamma : H^1(\Omega) \to L^2(\partial \Omega)\)（有界），使</p>
 
 <ul>
-  <li><strong>有界：</strong>\(|a(u, v)| \le M \|u\|_H \|v\|_H\)；</li>
-  <li><strong>强制（coercive）：</strong>\(a(u, u) \ge \alpha \|u\|_H^2\) 某 \(\alpha > 0\)。</li>
+  <li>\(u \in C^1(\overline \Omega) \implies \gamma u = u|_{\partial \Omega}\)（与经典边值一致）。</li>
+  <li>\(\ker \gamma = H_0^1(\Omega)\)。</li>
 </ul>
 
-<p>对每个 \(L \in H^*\)，存在唯一 \(u \in H\) 使 \(a(u, v) = L(v), \forall v\)。</p>
+<p>证明用 Sobolev 嵌入定理 + 局部坐标化 + 紧支撑光滑函数稠密。本章不展开技术，但请你接受这条结论：<em>\(H_0^1\) 内部"=0" 的边值是抽象但合理的</em>，且对 Lipschitz 域边界值通过迹算子取值在 \(L^2(\partial \Omega)\)。</p>
 
-<p>证明思路：固定 \(u\)，\(v \mapsto a(u, v)\) 是 \(H^*\) 元素，由 Riesz 对应 \(A u \in H\)。即 \(a(u, v) = \langle A u, v \rangle\)。\(A : H \to H\) 有界 + 强制 \(\Rightarrow\) 双射（强制给单射 + 像闭，再用对偶论证给满射）。再用 Riesz 表示 \(L(v) = \langle \ell, v \rangle\) 某 \(\ell \in H\)。由 \(A\) 双射 \(\Rightarrow\) \(u = A^{-1} \ell\) 是 \(a(u, v) = L(v)\) 的唯一解。</p>
+<h2 id="sec23-3">23.3 Poincaré 不等式 + 等价范数</h2>
 
-<p>这条定理把上一节的"内积形式"推广到"强制双线性形式"。它是<a href="../偏微分方程/index.html">偏微分方程</a>椭圆问题的核心存在性工具。具体应用：</p>
+<p>下面这条不等式是 \(H_0^1\) 上一切优雅论证的根。</p>
 
-<ul>
-  <li><strong>变系数椭圆：</strong>\(-\nabla \cdot (A(x) \nabla u) = f\)，\(A(x)\) 一致椭圆 \(\Rightarrow\) 强制 \(\Rightarrow\) Lax–Milgram 给唯一解。</li>
-  <li><strong>带漂移项：</strong>\(-\Delta u + b \cdot \nabla u + c u = f\)，\(c \ge 0\) + 适当 \(b\) 控制 \(\Rightarrow\) 强制（用 Poincaré 控漂移）。</li>
-</ul>
-
-<h2 id="sec23-6">23.6 Sobolev 嵌入与 Rellich 紧嵌入</h2>
-
-<p>有了"弱解存在"，下一个问题是：弱解<em>多正则</em>？它是否在某个 \(L^p\) 中、是否连续、是否光滑？</p>
-
-<p><strong>定理（Sobolev 嵌入）。</strong>设 \(\Omega \subset \mathbb{R}^n\) 有界 + Lipschitz 边界。对 \(k \in \mathbb{N}\) 与 \(1 \le p \le \infty\)：</p>
-
-<ul>
-  <li>若 \(k p < n\)：\(W^{k,p}(\Omega) \hookrightarrow L^q(\Omega)\)，其中 \(\frac{1}{q} = \frac{1}{p} - \frac{k}{n}\)；</li>
-  <li>若 \(k p = n\)：\(W^{k,p}(\Omega) \hookrightarrow L^q(\Omega)\) 对 \(p \le q < \infty\)；</li>
-  <li>若 \(k p > n\)：\(W^{k,p}(\Omega) \hookrightarrow C^{k - \lceil n/p \rceil, \alpha}(\overline\Omega)\) 某 \(\alpha\)。</li>
-</ul>
-
-<p>第三条最有用——它说"<em>导数阶数 \(k\) 比 \(n/p\) 大时，函数自动连续</em>"。例如 \(H^1(\Omega)\) 在 \(n = 1\) 时（\(k = 1, p = 2, k p = 2 > 1 = n\)）嵌入 \(C^{0, 1/2}\)；在 \(n = 2\) 时不嵌入到连续函数（\(k p = n\) 临界）；在 \(n = 3\) 时嵌入到 \(L^6\)（\(\frac{1}{q} = \frac{1}{2} - \frac{1}{3} = \frac{1}{6}\)）。</p>
-
-<p><strong>定理（Rellich–Kondrachov 紧嵌入）。</strong>在 Sobolev 嵌入的"严格"情形下（即 \(q\) 严格小于嵌入定理给的临界 \(q^*\)），嵌入还是<em>紧</em>的。最常用版本：</p>
+<p><strong>Poincaré 不等式。</strong>设 \(\Omega \subset \mathbb{R}^d\) <em>有界</em>。则存在常数 \(C(\Omega) > 0\) 使</p>
 
 <p>\[
-\boxed{\ H^1(\Omega) \hookrightarrow\hookrightarrow L^2(\Omega), \quad \Omega \text{ 有界 + Lipschitz 边界}.\ }
+\|u\|_{L^2(\Omega)} \le C(\Omega) \cdot \|\nabla u\|_{L^2(\Omega)} \quad \forall u \in H_0^1(\Omega).
 \]</p>
 
-<p>"\(\hookrightarrow\hookrightarrow\)" 表示<em>紧嵌入</em>——\(H^1\) 中的有界集在 \(L^2\) 中相对紧。</p>
+<p>"<em>函数大小被梯度大小控制</em>"。直观：\(u \in H_0^1\) 在边界为 0，所以"\(u\) 的取值由从边界到内部的积分决定"——\(u(x) = \int_{\partial \Omega \to x} \partial u\)——所以 \(L^2\) 范数被梯度的 \(L^2\) 范数控制（积分把"<em>梯度</em>" 升级成"<em>函数</em>"）。</p>
 
-<p>这条紧嵌入是 PDE 弱解理论里最重要的一条事实。它的实际意义：你拿到 \(H^1\) 弱收敛序列 \(u_n \rightharpoonup u\)，<em>自动</em>得到 \(L^2\) 强收敛 \(u_n \to u\)。这就是<a href="ch20.html">第 20 章 20.5 节</a>"紧算子把弱收敛变强收敛"的具体化——嵌入 \(H^1 \hookrightarrow L^2\) 紧 \(\Rightarrow\) 嵌入算子是紧算子。</p>
+<p>\(C(\Omega)\) 与 \(\Omega\) 形状有关——具体的 \(C(\Omega) \le \mathrm{diam}(\Omega) / \pi\)（一维情形，最优常数）。</p>
 
-<p>用紧嵌入证明非线性 PDE 弱解存在性的"<strong>极小化方法</strong>"模板：</p>
+<p><em>证明草图（一维版本，思路足够说明意图）。</em>设 \(\Omega = (a, b)\)，\(u \in H_0^1\) 即 \(u(a) = u(b) = 0\)。对 \(x \in (a, b)\)：</p>
+
+<p>\[
+u(x) = u(a) + \int_a^x u'(t) dt = \int_a^x u'(t) dt.
+\]</p>
+
+<p>Cauchy-Schwarz：</p>
+
+<p>\[
+|u(x)|^2 \le (x - a) \int_a^x |u'(t)|^2 dt \le (b - a) \|u'\|_{L^2}^2.
+\]</p>
+
+<p>积分：</p>
+
+<p>\[
+\|u\|_{L^2}^2 = \int_a^b |u(x)|^2 dx \le (b - a)^2 \|u'\|_{L^2}^2.
+\]</p>
+
+<p>所以 \(C \le b - a\)（一个不错但非最优的估计）。</p>
+
+<p>多维情形思路相同——把 \(u\) 在每条平行于某一坐标轴的"<em>纤维</em>" 上沿弦方向积分。详细技术请见 Brezis 第 9 章。\(\square\)</p>
+
+<p><strong>推论（\(H_0^1\) 上等价范数）。</strong>在 \(H_0^1(\Omega)\)（\(\Omega\) 有界）上，</p>
+
+<p>\[
+\|u\|_{H^1}^2 = \|u\|_{L^2}^2 + \|\nabla u\|_{L^2}^2
+\]</p>
+
+<p>与</p>
+
+<p>\[
+\|u\|_*^2 := \|\nabla u\|_{L^2}^2
+\]</p>
+
+<p>是<em>等价范数</em>。因为</p>
+
+<p>\[
+\|u\|_*^2 \le \|u\|_{H^1}^2 \le (1 + C^2) \|u\|_*^2 \quad (\text{用 Poincaré})
+\]</p>
+
+<p>所以 \(\|\cdot\|_*\) 是 \(H_0^1\) 上一个等价范数——可以<em>只用梯度</em> 当 Hilbert 范数。这给 \(H_0^1\) 一个更干净的内积</p>
+
+<p>\[
+\langle u, v \rangle_* := \int_\Omega \nabla u \cdot \nabla v \, dx.
+\]</p>
+
+<p>下一节用这个内积做弱解理论。\(\square\)</p>
+
+<p>请你欣赏这一句"<em>有界域 + Dirichlet 边界 = 梯度可单独度量函数</em>"——它把椭圆 PDE 的能量泛函\(\int |\nabla u|^2\) 直接作为<em>范数平方</em>，给整个变分理论一个干净的几何根基。</p>
+
+<h2 id="sec23-4">23.4 弱解定义 + Riesz 给存在唯一</h2>
+
+<p>回到本章开头那道题：</p>
+
+<p>\[
+-\Delta u + u = f \text{ in } \Omega, \quad u = 0 \text{ on } \partial \Omega.
+\]</p>
+
+<p>"<em>弱解</em>" 这样定义：把方程<em>乘以测试函数 \(v \in H_0^1\)，再积分 + 分部</em>：</p>
+
+<p>\[
+\int_\Omega (- \Delta u + u) v \, dx = \int_\Omega f v \, dx.
+\]</p>
+
+<p>分部积分（\(v\) 在边界为 0，没有边界项）：</p>
+
+<p>\[
+\int_\Omega (\nabla u \cdot \nabla v + u v) dx = \int_\Omega f v \, dx.
+\]</p>
+
+<p>这条等式<em>不含 \(u\) 的二阶导数</em>——只要求 \(u \in H^1\)（一阶弱可微）就有意义。</p>
+
+<p><strong>定义。</strong>\(u \in H_0^1(\Omega)\) 是 \(-\Delta u + u = f\) (Dirichlet) 的<em>弱解</em>，如果对所有 \(v \in H_0^1(\Omega)\)：</p>
+
+<p>\[
+\int_\Omega (\nabla u \cdot \nabla v + u v) dx = \int_\Omega f v \, dx.
+\]</p>
+
+<p>左边正是一个对称双线性形式 \(a(u, v) := \int (\nabla u \cdot \nabla v + uv)\)。右边是线性泛函 \(L(v) := \int f v\)。</p>
+
+<p>注意 \(a\) 与 \(H^1\) 标准内积<em>完全相同</em>！所以问题变成：</p>
+
+<p>\[
+\text{找 } u \in H_0^1, \langle u, v \rangle_{H^1} = L(v) \quad \forall v \in H_0^1.
+\]</p>
+
+<p>这是<em>Riesz 表示定理</em>（<a href="ch16.html">第 16 章</a>）的直接应用！\(L : H_0^1 \to \mathbb{R}\) 有界（验证：\(|L(v)| = |\int f v| \le \|f\|_{L^2} \|v\|_{L^2} \le \|f\|_{L^2} \|v\|_{H^1}\)）。Riesz 给唯一 \(u \in H_0^1\) 使 \(\langle u, v \rangle_{H^1} = L(v)\) 对所有 \(v\)。</p>
+
+<p>\[\boxed{\ -\Delta u + u = f \text{ (Dirichlet) 的弱解存在唯一，对每个 } f \in L^2(\Omega).\ }\]</p>
+
+<p>请你停下来想想这件事的<em>速度</em>。一道偏微分方程的存在唯一性，被泛函分析<em>三行字</em> 解决——只要把它正确翻译成 \(H_0^1\) 上的"<em>找一个使内积等于某泛函的元素</em>" 形态，Riesz 表示自动给答案。</p>
+
+<p>这里的"<em>三行字</em>" 实际是把"<em>弱解理论</em>" 50 年技术全部封装进 Sobolev 空间和 Riesz 表示——你需要预先建构 \(H_0^1\)（Banach 空间论），证它是 Hilbert（内积存在），证 Poincaré（不等式技术），证 \(L\) 有界（trace 理论 / 嵌入）。这些都准备好之后，弱解的<em>存在唯一</em> 是个 4 行的注解。</p>
+
+<p>这条事实的<em>哲学价值</em>：<em>泛函分析把"PDE 何时有解" 这件本质上是分析的问题</em><em>转译成一个抽象算子代数问题</em>——是"\(L \in H^*\)" 还是 "\(a(\cdot, v) = L(v)\) 在 \(v\) 上的可解性"——一旦正确转译，它的解决就是机械的。这是<em>抽象</em> 数学最有用的体现。</p>
+
+<h2 id="sec23-5">23.5 Lax-Milgram 推到一般椭圆</h2>
+
+<p>23.4 节用了 \(a(u, v) = \langle u, v \rangle_{H^1}\) 这条<em>对称</em> 性质——所以可以直接调 Riesz 表示。但更一般的椭圆方程会破对称——例如对流-扩散方程</p>
+
+<p>\[
+- \Delta u + b \cdot \nabla u + c u = f.
+\]</p>
+
+<p>对应的双线性形式 \(a(u, v) = \int(\nabla u \cdot \nabla v + (b \cdot \nabla u) v + c u v)\) 在 \(b \ne 0\) 时<em>非对称</em>。</p>
+
+<p>这种情形下 Riesz 不适用——需要更一般的工具。这就是<em>Lax-Milgram 引理</em>。</p>
+
+<p><strong>Lax-Milgram 引理。</strong>设 \(H\) 是 Hilbert，\(a : H \times H \to \mathbb{R}\) 是<em>双线性形式</em>（不必对称）满足：</p>
+
+<ul>
+  <li><em>有界</em>：\(\exists M > 0\) 使 \(|a(u, v)| \le M \|u\| \|v\|\) 所有 \(u, v\)。</li>
+  <li><em>强制（coercive）</em>：\(\exists \alpha > 0\) 使 \(a(u, u) \ge \alpha \|u\|^2\) 所有 \(u\)。</li>
+</ul>
+
+<p>则对任意 \(L \in H^*\)，存在<em>唯一</em> \(u \in H\) 满足</p>
+
+<p>\[
+a(u, v) = L(v) \quad \forall v \in H.
+\]</p>
+
+<p>且 \(\|u\| \le \|L\|_{H^*} / \alpha\)。</p>
+
+<p><em>证明草图。</em>对每个固定 \(u \in H\)，\(v \mapsto a(u, v)\) 是 \(H\) 上的有界线性泛函 \(\implies\) Riesz 给唯一 \(A u \in H\) 使 \(\langle A u, v \rangle = a(u, v)\)。映射 \(A : H \to H\) 是<em>有界线性</em>（\(\|A u\| \le M \|u\|\)）。</p>
+
+<p>同样 Riesz 给唯一 \(\ell \in H\) 使 \(L(v) = \langle \ell, v \rangle\)。</p>
+
+<p>问题变成：找 \(u\) 使 \(A u = \ell\)。需 \(A\) 是双射 \(\iff\) \(A\) 单射 + 像稠密 + 像闭。</p>
+
+<ul>
+  <li><em>单射</em>：强制性 \(\implies a(u, u) \ge \alpha \|u\|^2 \implies \langle A u, u \rangle \ge \alpha \|u\|^2 \implies \|A u\| \ge \alpha \|u\|\)（Cauchy-Schwarz）\(\implies A\) 单 + range 闭。</li>
+  <li><em>像稠密</em>：用<a href="ch14.html">第 14 章</a> Hahn-Banach 推论"<em>像稠密 \(\iff\) 对偶单</em>"——验证 \(A^* z = 0 \implies z = 0\)。\(A^* z = 0 \iff \langle z, A v \rangle = 0 \forall v \iff a(v, z) = 0 \forall v \iff a(z, z) = 0 \implies z = 0\)（强制性）。</li>
+</ul>
+
+<p>所以 \(A\) 双射，\(u = A^{-1} \ell\) 给唯一解。\(\|u\| \le \alpha^{-1} \|A u\| = \alpha^{-1} \|\ell\| = \alpha^{-1} \|L\|_{H^*}\)。\(\square\)</p>
+
+<p>Lax-Milgram 是 Riesz 表示的"<em>非对称版</em>"——付的代价是要验证强制性 \(a(u, u) \ge \alpha \|u\|^2\)。对椭圆方程 \(-\Delta u + b \cdot \nabla u + c u = f\) 这件事在 \(c\) 大或 \(b\) 小时容易验证。在某些情况下强制性可以失败——这时不能用 Lax-Milgram，要用 Fredholm 选择性（<a href="ch22.html">上一章</a>）找弱解。</p>
+
+<p>"<em>对称 → Riesz</em>"、"<em>非对称强制 → Lax-Milgram</em>"、"<em>非强制 → Fredholm</em>" 是椭圆 PDE 弱解理论的<em>三层工具栈</em>，按问题对称性 + 强制性逐层应用。</p>
+
+<h2 id="sec23-6">23.6 Sobolev 嵌入 + Rellich 紧嵌入</h2>
+
+<p>到目前为止 Sobolev 空间是个工具。现在我们看它<em>之间</em> 的两条关键关系。</p>
+
+<p><strong>Sobolev 嵌入定理（粗略版）。</strong>设 \(\Omega \subset \mathbb{R}^d\) 有界 Lipschitz，\(k p < d\)。则</p>
+
+<p>\[
+W^{k, p}(\Omega) \hookrightarrow L^q(\Omega), \quad q = \frac{d p}{d - k p}.
+\]</p>
+
+<p>嵌入是连续的——存在常数 \(C\) 使 \(\|u\|_{L^q} \le C \|u\|_{W^{k, p}}\)。</p>
+
+<p>边界情形：</p>
+
+<ul>
+  <li>\(k p = d\)：嵌入到所有 \(L^q\)，\(q < \infty\)（不达到 \(L^\infty\)）。</li>
+  <li>\(k p > d\)：嵌入到 \(C^{0, \gamma}\)（Hölder 连续函数空间）。</li>
+</ul>
+
+<p>对 \(d = 3, k = 1, p = 2\)：\(H^1(\Omega) \hookrightarrow L^6(\Omega)\)。对 \(d = 2\)：\(H^1 \hookrightarrow L^q\) 任何 \(q < \infty\)。对 \(d = 1\)：\(H^1 \hookrightarrow C^{0, 1/2}\)（Hölder 1/2）——所以一维 Sobolev 函数<em>自动连续</em>。</p>
+
+<p>这是 Sobolev 1936 的最深结论。证明用 Hardy-Littlewood-Sobolev 不等式 + 截断 + 卷积。Brezis 第 9 章给完整 5 页证明。</p>
+
+<p>嵌入定理告诉你：<em>"弱可微" 这个看似很弱的概念，自动蕴含一些"经典" 的可积性</em>。比如 \(u \in H^1(\mathbb{R}^3) \implies u \in L^6(\mathbb{R}^3)\)——你白送了一个高 \(p\) 的可积性。这件事在 PDE 估计里反复用——常常是把"\(\|\nabla u\|_{L^2}\) 控制" 升级成"\(\|u\|_{L^6}\) 控制"。</p>
+
+<p>下面这条<em>更</em>关键。它是 PDE 紧致论证的<em>引擎</em>。</p>
+
+<p><strong>Rellich-Kondrachov 紧嵌入定理。</strong>设 \(\Omega \subset \mathbb{R}^d\) <em>有界 Lipschitz</em>。则嵌入</p>
+
+<p>\[
+H^1(\Omega) \hookrightarrow L^2(\Omega)
+\]</p>
+
+<p>是<em>紧</em>的。也即：\(H^1\) 的有界集在 \(L^2\) 中是相对紧。</p>
+
+<p>更一般的：</p>
+
+<p>\[
+W^{k, p}(\Omega) \hookrightarrow L^q(\Omega) \text{ 紧}, \quad q < \frac{dp}{d - kp}.
+\]</p>
+
+<p>"<em>嵌入到比临界 \(q\) 更小的 \(q\) 都是紧</em>"。临界 \(q\) 本身只是连续嵌入。</p>
+
+<p>这条<em>紧</em>嵌入是变分法的核心工具：</p>
 
 <ol>
-  <li>定义能量 \(F(u) = \int (\frac{1}{2} |\nabla u|^2 + G(u))\)；</li>
-  <li>取极小化序列 \(u_n\) in \(H_0^1\)；</li>
-  <li>能量有界 \(\Rightarrow \|\nabla u_n\|_{L^2}\) 有界 \(\Rightarrow \{u_n\}\) 在 \(H_0^1\) 中有界；</li>
-  <li>\(H_0^1\) 自反 \(\Rightarrow u_{n_k} \rightharpoonup u^*\) 弱收敛；</li>
-  <li>Rellich \(\Rightarrow u_{n_k} \to u^*\) 在 \(L^2\) 中强收敛；</li>
-  <li>\(F\) 弱下半连续 \(\Rightarrow F(u^*) \le \liminf F(u_{n_k}) = \inf F\)；</li>
-  <li>\(u^*\) 是极小元 \(\Rightarrow\) Euler–Lagrange 给 \(u^*\) 是 PDE 弱解。</li>
+  <li>从 \(H^1\) 中有界序列 \(\{u_n\}\)，由<a href="ch18.html">Banach-Alaoglu</a>抽弱收敛子列 \(u_n \rightharpoonup u\) 在 \(H^1\)（\(H^1\) 自反，<a href="ch11.html">第 11 章</a>）。</li>
+  <li>由 Rellich：\(u_n \to u\) <em>强</em> 在 \(L^2\)。</li>
+  <li>用强收敛传连续泛函（如 \(L^2\) 范数）。</li>
 </ol>
 
-<p>这条模板是 Calderón、De Giorgi、Stampacchia 等在 1950-60 年代标准化的。它把 PDE 弱解存在性问题<em>完全代数化</em>——只要验证 7 步里每一步的假设，存在性自动有。</p>
+<p>这正是<a href="ch20.html#sec20-5">第 20 章 20.5 节</a>"<em>抽 + 升级 + 传递</em>" 三步法在 Sobolev 设置的具体形态。</p>
 
-<p>本章把"泛函分析 \(\to\) PDE"这条桥梁的入口处展示完整。深入下去就是 Brezis、Evans、Gilbarg–Trudinger 这种 PDE 教材的内容。本书止步于此——下一章我们去看另一个"应用"：量子力学，这是泛函分析最受人欢迎的物理化身。</p>
+<p>\[\boxed{\ H^1(\Omega) \hookrightarrow L^2(\Omega) \text{ 紧嵌入（Rellich）= PDE 紧致论证的引擎.}\ }\]</p>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 Fredholm 选择性</a><a href="ch24.html">下一章 · 第 24 章 应用：量子力学的算子语言 →</a></nav>
+<p>证明思路：用<em>截断 + 卷积近似</em> 把 \(H^1\) 函数光滑化，证光滑化后等度连续 + 一致有界，Arzelà-Ascoli 给紧。详细 4-5 页技术请见 Brezis 第 9 章。</p>
+
+<p>没有 Rellich 紧嵌入，<em>每一</em>条非线性椭圆方程的存在性证明都会失败——所以这条定理的力度很难夸大。</p>
+
+<h2 id="sec23-7">23.7 极小化方法 7 步标准模板</h2>
+
+<p>很多 PDE 的弱解可以表示为某个<em>能量泛函</em> 的极小元。比如</p>
+
+<p>\[
+J(u) := \frac{1}{2} \int_\Omega |\nabla u|^2 dx - \int_\Omega f u \, dx
+\]</p>
+
+<p>在 \(H_0^1(\Omega)\) 上的极小元就是 \(-\Delta u = f\) (Dirichlet) 的弱解（直接验证：\(J\) 的临界点 \(\iff\) \(\nabla J(u) = 0 \iff \int (\nabla u \cdot \nabla v - f v) = 0\) 即弱解）。</p>
+
+<p>极小化方法的<em>七步标准模板</em>——你以后看几乎所有变分 PDE 论文都按这个套路：</p>
+
+<ol>
+  <li><em>选合适 Hilbert 空间</em>：本题 \(H = H_0^1(\Omega)\)。</li>
+  <li><em>验证 \(J\) 在 \(H\) 上下有界</em>：用 Poincaré + Cauchy-Schwarz：\(J(u) \ge \frac{1}{2} \|\nabla u\|^2 - \|f\| \|u\|_{L^2} \ge \frac{1}{2} \|\nabla u\|^2 - C \|f\| \|\nabla u\| \ge -C^2 \|f\|^2 / 2\)（用二次完美平方）。</li>
+  <li><em>取极小化序列</em>：\(\{u_n\} \subset H\) 满足 \(J(u_n) \to \inf J\)。</li>
+  <li><em>证 \(\{u_n\}\) 有界</em>：从 \(J(u_n) \le \inf J + 1\) 加上 (2) 的下界估计反推 \(\|\nabla u_n\| \le M\)。</li>
+  <li><em>抽弱收敛子列</em>：\(H\) 自反 + Banach-Alaoglu \(\implies\) \(u_{n_k} \rightharpoonup u^*\) 弱。</li>
+  <li><em>用 Rellich 升级到强收敛</em>（或对必要的项弱下半连续）：\(u_{n_k} \to u^*\) 在 \(L^2\)。\(L^2\) 项 \(\int f u_n \to \int f u^*\) 强连续；\(H^1\) 项 \(\int |\nabla u_n|^2\) 弱<em>下半</em> 连续 \(\implies \liminf \ge \int |\nabla u^*|^2\)。</li>
+  <li><em>结合：\(J(u^*) \le \liminf J(u_{n_k}) = \inf J \implies u^*\) 是极小元</em>。变分法给 Euler-Lagrange 方程 = 弱解。</li>
+</ol>
+
+<p>这个模板叫<em>直接方法</em>（the direct method of the calculus of variations）——Hilbert 1900 提出，Tonelli 1915 完整化。它把"<em>找一个 PDE 的解</em>" 变成"<em>找一个泛函的极小元</em>"，再用泛函分析的紧致 + 自反 + 弱下半连续机器解决后者。</p>
+
+<p>这种思路推到非线性问题（\(p\)-Laplace、Yamabe 方程、Ginzburg-Landau）需要更精细的工具——下半连续的 \(L^p\) 版本、Lions 集中-紧致性原理、Mountain Pass 引理——但<em>骨架</em> 不变，仍然是上面 7 步。</p>
+
+<p>到这里你应该看出：<em>泛函分析在 PDE / 变分上的全部应用，本质是把一道连续问题"<em>在合适的无穷维空间上</em> 转译成一个抽象算子问题，然后用紧 + 自反 + Hilbert 内积自动解决"</em>。Sobolev 空间是这条转译的<em>唯一选择</em>——它精确地补偿了"求导算子无界" 这件无穷维白送的灾难（<a href="ch1.html#sec1-2">第 1 章 1.2</a> 那个 \(D : C^1 \to C\) 不连续的故事）。</p>
+
+<p>下一章我们离开 PDE，看泛函分析另一个最重要应用——量子力学。Heisenberg / Schrödinger / von Neumann 1925-1932 把量子力学公式化时<em>每一个</em> 数学对象（Hilbert / 自伴 / 谱 / 不确定性）都被赋予物理含义，是泛函分析理论"<em>意外有用</em>" 的最戏剧性体现。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 Fredholm 选择性</a><a href="ch24.html">下一章 · 第 24 章 量子力学的算子语言 →</a></nav>
 </main>
 </body>
 </html>
+</content>
+</invoke>

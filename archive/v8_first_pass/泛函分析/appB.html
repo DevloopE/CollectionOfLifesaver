@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B Lebesgue 积分与 L^p 速查 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+<h1 id="appB">附录 B Lebesgue 积分与 \(L^p\) 速查</h1>
+
+<p>本书在第 4、5、16、23 章反复用到 \(L^p\) 空间和 Lebesgue 积分的几条基本事实。这个附录把它们集中列出，让你能快速回查而不必每次跳到<a href="../实分析/index.html"><em>《实分析读本》</em></a>第 20-24 章。如果你完全没接触过 Lebesgue，建议先翻那一卷的相关章节再回来。</p>
+
+<ul>
+  <li>测度空间 \((\Omega, \mathcal{F}, \mu)\) 的定义与术语。</li>
+  <li>Lebesgue 积分与 Riemann 积分的关键差别。</li>
+  <li>三大收敛定理：单调收敛、Fatou、控制收敛。</li>
+  <li>\(L^p\) 空间的定义、范数、完备性（Riesz–Fischer）。</li>
+  <li>稠密性结果：\(C_c\) 在 \(L^p\) 中稠（\(p < \infty\)）。</li>
+  <li>Fubini–Tonelli 定理（陈述）。</li>
+  <li>Radon–Nikodym 定理（陈述与"\(d\nu/d\mu\)" 直觉）。</li>
+</ul>
+
+<h2 id="appB-1">B.1 测度空间</h2>
+
+<p>三元组 \((\Omega, \mathcal{F}, \mu)\)：</p>
+
+<ul>
+  <li>\(\Omega\) 是集合；</li>
+  <li>\(\mathcal{F} \subset 2^\Omega\) 是 \(\sigma\)-代数（含 \(\Omega\)、对补封闭、对可数并封闭）；</li>
+  <li>\(\mu : \mathcal{F} \to [0, \infty]\) 是测度（\(\mu(\emptyset) = 0\)、可数可加 \(\mu(\bigcup E_n) = \sum \mu(E_n)\) 对不交 \(\{E_n\}\)）。</li>
+</ul>
+
+<p>常用术语：</p>
+
+<ul>
+  <li><strong>有限测度：</strong>\(\mu(\Omega) < \infty\)；</li>
+  <li><strong>\(\sigma\)-有限：</strong>\(\Omega = \bigcup E_n\)，\(\mu(E_n) < \infty\)；</li>
+  <li><strong>概率测度：</strong>\(\mu(\Omega) = 1\)；</li>
+  <li><strong>Lebesgue 测度：</strong>\(\mathbb{R}^n\) 上推广区间（区域）的"长度（体积）"；</li>
+  <li><strong>计数测度：</strong>\(\mu(E) = |E|\)；序列空间 \(\ell^p\) 是 \(L^p\) 在计数测度下的特例。</li>
+</ul>
+
+<p>"几乎处处" (a.e.) 性质：在零测集（\(\mu(N) = 0\)）外成立。在 \(L^p\) 里的"等价类"就是按"几乎处处相等"分类。</p>
+
+<h2 id="appB-2">B.2 Lebesgue 积分 vs Riemann 积分</h2>
+
+<p>Lebesgue 积分对<em>可测函数</em> \(f : \Omega \to [-\infty, \infty]\) 定义。构造分四步：</p>
+
+<ol>
+  <li>非负<em>简单函数</em> \(\sum c_i \chi_{E_i}\) 的积分 \(= \sum c_i \mu(E_i)\)；</li>
+  <li>非负可测函数 \(f \ge 0\) 的积分 \(\int f := \sup\{\int s : s \text{ 简单函数}, 0 \le s \le f\}\)；</li>
+  <li>一般可测 \(f = f^+ - f^-\)，\(\int f := \int f^+ - \int f^-\)（要求至少一个有限）；</li>
+  <li>复值 \(f = u + iv\)，\(\int f := \int u + i \int v\)。</li>
+</ol>
+
+<p>"<strong>可积</strong>" \(f \in L^1\) 是说 \(\int |f| < \infty\)。</p>
+
+<p>Riemann vs Lebesgue 关键差别：</p>
+
+<ul>
+  <li><strong>定义起点不同：</strong>Riemann 把<em>定义域</em>分割再求和；Lebesgue 把<em>值域</em>分割再求和。</li>
+  <li><strong>可积函数集合不同：</strong>Lebesgue 积分包含 Riemann 积分（前者定义域更广）。Dirichlet 函数 \(\chi_\mathbb{Q}\) Riemann 不可积，Lebesgue 可积（\(= 0\)）。</li>
+  <li><strong>极限交换：</strong>Lebesgue 有单调 / 控制收敛三大定理，Riemann 没有这种方便工具。</li>
+</ul>
+
+<h2 id="appB-3">B.3 三大收敛定理</h2>
+
+<p><strong>单调收敛定理（MCT, Beppo Levi）。</strong>设 \(\{f_n\}\) 是非负可测函数序列，\(f_n \nearrow f\)（逐点单调上升趋于 \(f\)）。则</p>
+
+<p>\[
+\boxed{\ \int f_n \, d\mu \nearrow \int f \, d\mu.\ }
+\]</p>
+
+<p>(右边可能 \(= \infty\)。)</p>
+
+<p><strong>Fatou 引理。</strong>对非负可测函数序列 \(\{f_n\}\)，</p>
+
+<p>\[
+\int (\liminf f_n) \, d\mu \le \liminf \int f_n \, d\mu.
+\]</p>
+
+<p><strong>控制收敛定理（DCT, Lebesgue）。</strong>设 \(\{f_n\}\) 可测，\(f_n \to f\) a.e.。如果存在<em>可积</em> \(g \ge 0\) 使 \(|f_n| \le g\) a.e. 对所有 \(n\)，则 \(f \in L^1\) 且</p>
+
+<p>\[
+\boxed{\ \int f_n \, d\mu \to \int f \, d\mu.\ }
+\]</p>
+
+<p>这三条定理是 Lebesgue 积分的"<em>核心机器</em>"。它们是 \(L^p\) 完备性、Riesz–Fischer、对偶定理（\((L^p)^* = L^q\)）的所有证明的关键步骤。</p>
+
+<h2 id="appB-4">B.4 \(L^p\) 空间</h2>
+
+<p>对 \(1 \le p < \infty\) 和测度空间 \((\Omega, \mu)\)：</p>
+
+<p>\[
+L^p(\Omega, \mu) = \{f : \Omega \to \mathbb{K} \text{ 可测}, \int |f|^p \, d\mu < \infty\} / \sim,
+\]</p>
+
+<p>商关系 \(\sim\) 是 a.e. 相等。范数 \(\|f\|_p = (\int |f|^p)^{1/p}\)。</p>
+
+<p>\(L^\infty\)：a.e. 有界可测函数 mod a.e. 相等，配范数 \(\|f\|_\infty = \operatorname{ess\,sup} |f|\)。</p>
+
+<p>关键事实：</p>
+
+<p><strong>(L1) 完备（Riesz–Fischer 定理）。</strong>每个 \(L^p\)（\(1 \le p \le \infty\)）是 Banach 空间。</p>
+
+<p><strong>(L2) Hölder 不等式。</strong>对 \(1/p + 1/q = 1\)：\(\|fg\|_1 \le \|f\|_p \|g\|_q\)。</p>
+
+<p><strong>(L3) Minkowski 不等式。</strong>\(\|f + g\|_p \le \|f\|_p + \|g\|_p\)。</p>
+
+<p><strong>(L4) 对偶 (Riesz)。</strong>\((L^p)^* \cong L^q\) 对 \(1 \le p < \infty, 1/p + 1/q = 1\)，等距同构由 \(g \mapsto (f \mapsto \int f g)\) 给。</p>
+
+<p><strong>(L5) 嵌入（有限测度时）。</strong>\(\mu(\Omega) < \infty\) 时 \(L^q \subset L^p\) 对 \(p \le q\)，\(\|f\|_p \le \mu(\Omega)^{1/p - 1/q} \|f\|_q\)。</p>
+
+<p><strong>(L6) Fatou 在 \(L^p\)。</strong>"<em>\(L^p\) 范数关于 a.e. 收敛下半连续</em>"：若 \(f_n \to f\) a.e.，\(\|f\|_p \le \liminf \|f_n\|_p\)。</p>
+
+<h2 id="appB-5">B.5 稠密性结果</h2>
+
+<p>这一节列出几条<em>非常常用</em>的"\(X\) 在 \(L^p\) 中稠"事实。</p>
+
+<p><strong>(D1) 简单函数稠。</strong>简单函数（有限值可测）在 \(L^p\) 中稠对 \(1 \le p < \infty\)。</p>
+
+<p><strong>(D2) 紧支撑连续函数稠。</strong>\(C_c(\mathbb{R}^n)\) 在 \(L^p(\mathbb{R}^n)\) 中稠对 \(1 \le p < \infty\)。</p>
+
+<p><strong>(D3) 紧支撑光滑函数稠。</strong>\(C_c^\infty(\mathbb{R}^n)\) 在 \(L^p(\mathbb{R}^n)\) 中稠对 \(1 \le p < \infty\)。证明用卷积平滑（mollification）。</p>
+
+<p><strong>(D4) 多项式稠（紧域上）。</strong>多项式在 \(L^p[a,b]\) 中稠对 \(1 \le p < \infty\)。由 \(C[a,b]\) 在 \(L^p\) 中稠 + Weierstrass 多项式逼近。</p>
+
+<p><strong>(D5) 三角多项式稠。</strong>三角多项式 \(\sum_{|n| \le N} c_n e^{inx}\) 在 \(L^p[-\pi, \pi]\)（\(1 \le p < \infty\)）中稠。</p>
+
+<p>注意 (D2)–(D5) 在 \(p = \infty\) 时<em>不</em>成立——\(L^\infty\) 不可分，连续函数无法稠。这又是 \(L^\infty\) 不自反、不可分等"病态" 的源头之一。</p>
+
+<h2 id="appB-6">B.6 Fubini–Tonelli 定理</h2>
+
+<p>对乘积测度空间 \((\Omega_1 \times \Omega_2, \mathcal{F}_1 \otimes \mathcal{F}_2, \mu_1 \otimes \mu_2)\)：</p>
+
+<p><strong>Tonelli 定理（非负函数版）。</strong>设 \(f : \Omega_1 \times \Omega_2 \to [0, \infty]\) 可测。则</p>
+
+<p>\[
+\int_{\Omega_1 \times \Omega_2} f \, d(\mu_1 \otimes \mu_2) = \int_{\Omega_1} \left( \int_{\Omega_2} f \, d\mu_2 \right) d\mu_1 = \int_{\Omega_2} \left( \int_{\Omega_1} f \, d\mu_1 \right) d\mu_2.
+\]</p>
+
+<p>三个值相等（可能 \(= \infty\)）。</p>
+
+<p><strong>Fubini 定理（一般可积函数版）。</strong>设 \(f \in L^1(\Omega_1 \times \Omega_2)\)。则上式三个值都有限且相等。</p>
+
+<p>"<em>积分顺序可交换</em>"在 Tonelli（非负）下永远成立；在 Fubini（一般 \(L^1\)）下要先验证可积性。</p>
+
+<p>这条定理在第 16 章 Riesz 表示、第 23 章 Sobolev 嵌入、第 11 章 Banach–Steinhaus 应用里反复用。</p>
+
+<h2 id="appB-7">B.7 Radon–Nikodym 定理</h2>
+
+<p><strong>定理（Radon–Nikodym）。</strong>设 \((\Omega, \mathcal{F}, \mu)\) \(\sigma\)-有限测度空间，\(\nu\) 是 \(\mathcal{F}\) 上的有限有符号测度，且 \(\nu \ll \mu\)（\(\nu\) 关于 \(\mu\) 绝对连续，即 \(\mu(E) = 0 \Rightarrow \nu(E) = 0\)）。则存在唯一（a.e.）可积函数 \(g : \Omega \to \mathbb{R}\) 使</p>
+
+<p>\[
+\boxed{\ \nu(E) = \int_E g \, d\mu, \quad \forall E \in \mathcal{F}.\ }
+\]</p>
+
+<p>函数 \(g\) 叫<strong>Radon–Nikodym 导数</strong>，记 \(g = d\nu/d\mu\)。</p>
+
+<p>直觉：\(d\nu/d\mu\) 是"<em>密度函数</em>"——\(\nu\) 是"\(\mu\) 的连续变形"，变形比例就是 \(g\)。在概率论里这条定理给"<em>条件期望</em>" 与"<em>概率密度</em>" 一个统一定义。</p>
+
+<p>这条定理是<a href="ch16.html">第 16 章</a> Riesz 表示在 \((L^p)^*\) 上的关键工具：从 \(f \in (L^p)^*\) 构造对应的 \(L^q\) 函数 \(g\)，本质就是用 Radon–Nikodym 找到 "\(f\) 对应的密度"。</p>
+
+<p>本附录到此。它涵盖了本书使用 Lebesgue / \(L^p\) 的全部最小工具集。详细证明、更多技术细节、各种"几乎处处" 处理建议查阅<a href="../实分析/index.html"><em>《实分析读本》</em></a>第 20-24 章或 Folland《Real Analysis》、Rudin《Real and Complex Analysis》。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+</main>
+</body>
+</html>

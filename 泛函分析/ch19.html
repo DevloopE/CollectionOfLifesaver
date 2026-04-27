@@ -35,130 +35,245 @@
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 Banach–Alaoglu 紧致性</a><a href="ch20.html">下一章 · 第 20 章 紧算子 →</a></nav>
 <h1 id="ch19">第 19 章 自反空间与一致凸</h1>
 
-<p>第 15 章的典范嵌入 \(J : X \hookrightarrow X^{**}\) 把 \(X\) 看成 \(X^{**}\) 的一个等距子空间。如果 \(J\) <em>满</em>射（即 \(J(X) = X^{**}\)），\(X\) 叫<strong>自反</strong>（reflexive）。本章讲清楚自反性的内涵——为什么它"好用"、哪些空间自反、哪些不自反、以及一个常用的"自反充分条件"——一致凸。</p>
+<p>上一章把 Banach–Alaoglu 装配好之后，我反复说一句话："<em>在自反空间里，弱紧 = 弱*紧</em>"。整个变分法 5 步的合法性都依赖这一条——"<em>有界 ⟹ 有弱收敛子列</em>"——而这条只对自反空间成立。</p>
 
-<ul>
-  <li>自反性的等价刻画：\(J\) 满射 \(\iff\) 单位球弱紧 \(\iff\) 单位球弱*紧（在自身上）。</li>
-  <li>自反空间分类：Hilbert 永远自反；\(L^p\)（\(1 < p < \infty\)）自反；\(L^1, L^\infty, c_0, C(K)\) 不自反。</li>
-  <li>一致凸（uniform convexity）的定义与几何含义。</li>
-  <li>Milman–Pettis 定理：一致凸 \(\Rightarrow\) 自反。这给出最常用的"自反性判据"。</li>
-  <li>\(L^p\) 一致凸的 Clarkson 不等式（陈述）。</li>
-  <li>非自反空间的"不便"：弱紧致失败的具体反例。</li>
-</ul>
+<p>所以一个直接的实战问题：<em>哪些 Banach 空间是自反的</em>？这一章给完整清单 + 一个非常实用的几何<em>充分条件</em>（"一致凸 ⟹ 自反"，<strong>Milman–Pettis 定理</strong>）。后者特别重要——它把"<em>抽象的自反性</em>" 转化为"<em>看一眼单位球长什么形状就能判断</em>" 的几何条件。\(L^p\)（\(1 < p < \infty\)）自反这件事最终会落在<strong>Clarkson 不等式</strong> 上，这是这一章的技术高潮。</p>
 
 <h2 id="sec19-1">19.1 自反性的等价刻画</h2>
 
-<p>设 \(X\) 是 Banach 空间。<strong>自反</strong>: 典范嵌入 \(J : X \to X^{**}\) 是满射。由 \(J\) 永远等距（<a href="ch15.html">第 15 章 15.2 节</a>），自反 \(\iff\) \(X \cong X^{**}\) 等距同构由 \(J\) 给出。</p>
+<p>先把"<em>自反</em>" 这个词的多种说法摆全。设 \(X\) 是 Banach 空间，\(J : X \to X^{**}\) 是<a href="ch15.html">第 15 章</a>典范嵌入，\(J(x)(f) := f(x)\)。\(J\) 总是<em>等距</em>——\(\|J(x)\|_{X^{**}} = \|x\|_X\)（这条来自 Hahn–Banach）。但 \(J\) 不一定<em>满射</em>。</p>
 
-<p><em>注意</em>："\(X\) 与 \(X^{**}\) 等距同构"<em>不一定</em>蕴含自反——同构必须由<em>典范</em>嵌入 \(J\) 给出，不能是别的。James 1950 给过一个 Banach 空间，与 \(X^{**}\) 等距同构，但<em>不</em>自反——它有"非典范"同构。这种病态情形本书不深入。</p>
+<p><strong>定义。</strong>\(X\) 是<strong>自反</strong>的 \(\iff J\) 满射 \(\iff X \cong X^{**}\)（通过 \(J\)）。</p>
 
-<p><strong>定理（自反性的等价刻画）。</strong>下列等价：</p>
+<p>注意"自反" 不是说"\(X\) 同构于 \(X^{**}\)"——而是说"<em>典范嵌入 \(J\) 是同构</em>"。James 1951 年构造了一个空间 \(X\) 使 \(X \cong X^{**}\) 但 \(J\) 不满射——这种"<em>非典范同构</em>" 的存在让我们必须把"<em>通过典范嵌入</em>" 写在定义里。</p>
+
+<p><strong>定理（自反性的三条等价刻画）。</strong>下面三条等价：</p>
+
+<ol>
+  <li>\(J : X \to X^{**}\) <em>满射</em>。</li>
+  <li>\(\overline{B}_X\) <em>弱紧</em>（Kakutani 定理）。</li>
+  <li><em>每个有界序列都有弱收敛子列</em>（Eberlein–Šmulian 定理）。</li>
+</ol>
+
+<p>第 1 条是<em>定义</em>。第 2 条是上一章说的"<em>弱紧 = 弱*紧 in \(X\)</em>"——把 \(X\) 当成 \(X^{**}\) 起 "<em>原空间</em>" 角色，应用 Banach–Alaoglu。第 3 条是把"<em>拓扑紧</em>" 升级为"<em>序列紧</em>"——这条等价是 Eberlein 1947 与 Šmulian 1940 的深定理。</p>
+
+<p>这三条等价在使用上分工不同：</p>
 
 <ul>
-  <li>(R1) \(X\) 自反；</li>
-  <li>(R2) 闭单位球 \(B_X\) 在弱拓扑下紧致；</li>
-  <li>(R3) 任意 \(X\) 中范数有界序列有<em>弱</em>收敛子序列。</li>
+  <li>第 1 条用来<em>判断</em> 一个抽象空间是否自反（"算 \(X^{**}\)，看 \(J\) 是不是满射"）。</li>
+  <li>第 2 条是<em>几何画面</em>（"单位球弱紧"）。</li>
+  <li>第 3 条是<em>实战工具</em>（"<em>抽弱收敛子列</em>" 直接合法）。</li>
 </ul>
 
-<p>(R1) \(\Leftrightarrow\) (R2) 用 Banach–Alaoglu：\(B_{X^{**}}\) 永远在弱*紧。在 \(J(X) = X^{**}\) 下，\(B_X\) 弱紧 \(\iff\) \(J(B_X) = B_{X^{**}}\) 弱*紧。这给出自反 \(\Rightarrow\) \(B_X\) 弱紧。反向需要 Goldstine 定理（\(J(B_X)\) 在 \(B_{X^{**}}\) 中弱*稠），它进一步给 \(B_X\) 弱紧 \(\Rightarrow\) \(B_X\) 弱*稠 + 弱*紧 \(\Rightarrow\) \(B_X = B_{X^{**}}\) \(\Rightarrow\) 自反。</p>
+<p>变分法的"直接方法"（<a href="ch17.html">17.7 节</a>+ <a href="ch18.html">18.6 节</a>）始终用第 3 条——"<em>有界 ⟹ 抽弱收敛子列</em>"。这是为什么"<em>自反性</em>" 是 PDE 弱解理论的硬性要求。</p>
 
-<p>(R2) \(\Leftrightarrow\) (R3) 是 Eberlein–Šmulian 定理：在 Banach 空间上，弱拓扑紧 \(\iff\) 弱序列紧。这是个非平凡的定理（详细证明在 Conway 或 Brezis 的教材里）。</p>
+<p><strong>自反性的几个基本性质</strong>（不证，作清单使用）：</p>
 
-<p>这条等价是<strong>所有"自反 \(\Rightarrow\) 弱紧致"应用的根</strong>。第 17、18 章变分法的"<em>自反 + 强制 \(\Rightarrow\) 极小元存在</em>"模板就靠 (R3)。</p>
+<ul>
+  <li>自反空间的<em>闭子空间</em> 自反。</li>
+  <li>自反空间的<em>商空间</em> 自反。</li>
+  <li>\(X\) 自反 \(\iff X^*\) 自反。"自反性" 在取对偶下保持。</li>
+  <li>有限维 ⟹ 自反（\(X = X^{**}\) 显然，因维数相同）。</li>
+  <li>Hilbert 空间 ⟹ 自反（Riesz 表示给 \(X = X^* = X^{**}\)）。</li>
+</ul>
 
-<h2 id="sec19-2">19.2 自反空间的分类</h2>
+<h2 id="sec19-2">19.2 自反空间分类清单</h2>
 
-<p><strong>(F1) Hilbert 空间永远自反。</strong>由 Riesz 表示 \(H^* \cong H\)（共轭线性等距）+ \(H^{**} \cong H^* \cong H\)（再 Riesz 一次）+ 验证典范嵌入和这两次 Riesz 同构的复合就是 \(\operatorname{id}\)（不是仅同构，而恰好是 \(J\)）。</p>
+<p>把<em>常见</em> 空间按"<em>是否自反</em>" 分类。这张表你以后会反复回头查。</p>
 
-<p><strong>(F2) \(L^p(\Omega)\)，\(1 < p < \infty\) 自反。</strong>由 \((L^p)^* \cong L^q\) + \((L^q)^* \cong L^p\) + 验证典范嵌入是恒等。</p>
+<p><strong>自反空间</strong>：</p>
 
-<p><strong>(F3) \(\ell^p\)，\(1 < p < \infty\) 自反。</strong>同 \(L^p\) 论证。</p>
+<ul>
+  <li>有限维 \(\mathbb R^n, \mathbb C^n\)。</li>
+  <li>Hilbert 空间 \(H\)（包括 \(L^2(\Omega), \ell^2, \) 任何 Sobolev \(H^k(\Omega)\)）。</li>
+  <li>\(L^p(\Omega), \ell^p\) 当 \(\boxed{1 < p < \infty}\)。这是 19.5 节 Clarkson 不等式给的。</li>
+  <li>Sobolev 空间 \(W^{k, p}(\Omega)\) 当 \(1 < p < \infty\)。"\(L^p\) 自反 + 嵌入论证" 给的。</li>
+</ul>
 
-<p><strong>(F4) Sobolev \(H^k(\Omega) = W^{k,2}(\Omega)\) 自反（它是 Hilbert）。</strong>\(W^{k,p}\) 也自反对 \(1 < p < \infty\)。</p>
+<p><strong>非自反空间</strong>（"<em>不便</em>" 空间，需要小心）：</p>
 
-<p><strong>(N1) \(L^1\) 不自反。</strong>因为 \((L^1)^* = L^\infty\) 但 \((L^\infty)^* \supsetneq L^1\)（包含奇异线性泛函）。</p>
+<ul>
+  <li>\(L^1(\Omega), \ell^1\)。\(L^1\) 的对偶是 \(L^\infty\)；\(L^\infty\) 的对偶<em>严格大于</em> \(L^1\)（包含"<em>有限可加测度</em>" 这种奇怪东西）。所以 \(J : L^1 \to (L^\infty)^* = L^{**}\) 不满。</li>
+  <li>\(L^\infty(\Omega), \ell^\infty\)。同上理由——\((L^\infty)^* \supsetneq L^1\)。</li>
+  <li>\(c_0\)（趋零序列空间）。\(c_0^* = \ell^1\)，\((c_0)^{**} = \ell^\infty \supsetneq c_0\)。</li>
+  <li>\(C(K)\)（紧 Hausdorff \(K\) 上连续函数）。\(C(K)^* = M(K)\)（有限 Borel 测度，<a href="ch16.html">第 16 章</a>），\(C(K)^{**} \supsetneq C(K)\)。</li>
+</ul>
 
-<p><strong>(N2) \(L^\infty\) 不自反。</strong>同 \(L^1\)。</p>
+<p>请你停下来看这两份名单。<em>"中间" 的 \(L^p\)（\(1 < p < \infty\)）都自反；"边缘" 的 \(L^1, L^\infty\) 不自反；离散版 \(\ell^p\) 同样规律</em>。这条规律不是巧合——\(p = 1\) 是 \(L^p\) 范数"<em>退化为绝对值之和</em>" 的极限，\(p = \infty\) 是 \(L^p\) 范数"<em>退化为最大值</em>" 的极限。两个极限点上单位球的"<em>角</em>" 太尖（\(\ell^1\) 单位球是菱形、\(\ell^\infty\) 单位球是方块），失去了"<em>弱紧</em>" 必需的"<em>圆滑</em>" 性。中间 \(p\) 的单位球是"<em>圆滚滚</em>" 的——这就是 19.3 节"一致凸" 概念要正式表达的几何。</p>
 
-<p><strong>(N3) \(c_0\) 不自反。</strong>\(c_0^{**} = (\ell^1)^* = \ell^\infty \neq c_0\)。</p>
+<p>在 PDE / 变分法实战中，这张表的指导意义：</p>
 
-<p><strong>(N4) \(C(K)\)（\(K\) 紧致 Hausdorff，\(C(K)\) 无穷维）不自反。</strong>\(C(K)^* = M(K)\)，\(M(K)^*\) 比 \(C(K)\) 大很多。</p>
+<ul>
+  <li>能用 \(L^p\)（\(1 < p < \infty\)）就用——直接套自反性 + 弱紧致工具。</li>
+  <li>必须用 \(L^1\) 时（比如某些守恒律、某些测度论问题），<em>放弃</em> 自反性，改用"<em>测度紧致</em>"（\(L^1\) 嵌入到测度空间，用弱*紧；这是 Young 测度、缓和分布等理论的入口）。</li>
+  <li>必须用 \(L^\infty\) 时（比如 Hamilton–Jacobi 方程的"<em>粘性解</em>" 框架），<em>放弃</em> 自反性，改用<em>弱*</em> 紧（\((L^\infty)^* \supsetneq L^1\)，但 \(L^1\) 的<em>对偶</em> 是 \(L^\infty\)——所以 \(L^\infty\) 是 \(L^1\) 的对偶，弱*紧致仍可用）。</li>
+</ul>
 
-<p><strong>(N5) \(\ell^1\) 不自反。</strong>\((\ell^1)^* = \ell^\infty\)，\((\ell^\infty)^*\) 比 \(\ell^1\) 大。</p>
+<p>这张"<em>自反 vs 非自反</em>" 清单某种意义上是 PDE 现代理论"<em>选择哪个空间做研究</em>" 的最初指南。</p>
 
-<p>这条分类清单值得熟记。"自反 vs 不自反" 几乎决定了你能不能在某个空间上做"标准变分法"。在不自反空间上做变分需要额外技巧——这就是为什么 \(L^1\)-PDE（如<em>BV</em>函数 与"几乎处处"分析）比 \(L^p\)-PDE（\(p > 1\)）困难得多。</p>
+<h2 id="sec19-3">19.3 一致凸：单位球"圆滚滚"</h2>
 
-<h2 id="sec19-3">19.3 一致凸：几何性质</h2>
+<p>"自反" 是一个<em>抽象</em> 的拓扑性质（"<em>典范嵌入是满射</em>"），看不见摸不着。下面给一个<em>具体</em> 的几何充分条件——一致凸——它把"<em>看一眼单位球长什么形状</em>" 变成判断自反性的工具。</p>
 
-<p>判断自反性的最常用<em>充分</em>条件是<strong>一致凸</strong>。它是个几何条件，比"自反"看起来更直观。</p>
-
-<p>Banach 空间 \(X\) 称为<strong>一致凸</strong>（uniformly convex），如果对每个 \(\varepsilon > 0\) 存在 \(\delta(\varepsilon) > 0\) 使</p>
+<p><strong>定义（一致凸，Clarkson 1936）。</strong>Banach 空间 \(X\) 称为<strong>一致凸</strong>，如果对每个 \(\varepsilon > 0\) 存在 \(\delta(\varepsilon) > 0\) 使</p>
 
 <p>\[
-\boxed{\ \|x\|, \|y\| \le 1, \|x - y\| \ge \varepsilon \quad \Rightarrow \quad \left\| \frac{x + y}{2} \right\| \le 1 - \delta(\varepsilon).\ }
+\boxed{\ \|x\|, \|y\| \le 1 \text{ 且 } \|x - y\| \ge \varepsilon \implies \left\| \frac{x + y}{2} \right\| \le 1 - \delta(\varepsilon).\ }
 \]</p>
 
-<p>几何含义：单位球的"中点"被收缩——如果 \(x, y\) 在单位球边界附近且距离 \(\ge \varepsilon\)，它们的中点严格落在 \(1 - \delta\) 半径里。换言之单位球"圆滚滚"，没有"平的边"。</p>
+<p>用人话：<em>如果 \(x, y\) 都在闭单位球里且相距 \(\ge \varepsilon\)，则它们的中点严格在球内一段固定距离</em>。</p>
 
-<p>例子：</p>
+<p>几何画面：考虑单位球 \(\overline{B}\)。取球面上两点 \(x, y\)（\(\|x\| = \|y\| = 1\)）。中点 \((x+y)/2\) 一定在闭球内。<em>它有多深</em>？</p>
 
 <ul>
-  <li><strong>Hilbert 空间一致凸。</strong>由平行四边形恒等式：\(\|x - y\|^2 + \|x + y\|^2 = 2(\|x\|^2 + \|y\|^2) \le 4\)，给 \(\|(x+y)/2\| \le \sqrt{1 - \varepsilon^2/4}\)。</li>
-  <li><strong>\(\mathbb{R}^2\) 配 \(\ell^p\) 范数（\(1 < p < \infty\) 但 \(p \neq 2\)）一致凸。</strong>由 Clarkson 不等式（下面 19.4 节）。</li>
-  <li><strong>\(\mathbb{R}^2\) 配 \(\ell^1\) 或 \(\ell^\infty\) 范数<em>不</em>一致凸。</strong>单位球是菱形 / 正方形，有"平边"。比如 \(\ell^\infty\) 上 \(x = (1, 0), y = (1, 1)\) 都在单位球边界，距离 \(1\)，但中点 \((1, 1/2)\) 范数仍 \(= 1\)。</li>
+  <li>如果球面是<em>圆形</em>（如 Hilbert 空间），中点严格在内——除非 \(x = y\)。深度随 \(x, y\) 的"<em>分离度</em>" \(\|x - y\|\) 单调增。</li>
+  <li>如果球面有<em>平边</em>（如 \(\ell^\infty\) 的方块、\(\ell^1\) 的菱形），平边上两点的中点<em>仍在</em> 平边上——深度 0。这种空间<em>不</em>一致凸。</li>
 </ul>
+
+<p>"一致凸" 强调的是<em>"凹陷深度"对任意 \(\varepsilon\) 都有<em>一致下界</em> \(\delta(\varepsilon)\)</em>。</p>
+
+<p><strong>例子。</strong></p>
+
+<ul>
+  <li>Hilbert 空间。<em>平行四边形等式</em> \(\|x + y\|^2 + \|x - y\|^2 = 2(\|x\|^2 + \|y\|^2)\) 给：若 \(\|x\|, \|y\| \le 1, \|x - y\| \ge \varepsilon\)，则 \(\|x + y\|^2 \le 4 - \varepsilon^2\)，所以 \(\|(x+y)/2\| \le \sqrt{1 - \varepsilon^2/4}\)。取 \(\delta(\varepsilon) = 1 - \sqrt{1 - \varepsilon^2/4} \approx \varepsilon^2/8\)。<em>Hilbert 一致凸，凹陷深度 \(\sim \varepsilon^2\)</em>。</li>
+  <li>\(L^p, \ell^p\)（\(1 < p < \infty\)）：一致凸（19.5 节用 Clarkson 证明）。\(p = 2\) 是 Hilbert，\(p \neq 2\) 时仍一致凸但 \(\delta(\varepsilon)\) 的形式不同。</li>
+  <li>\(L^1, L^\infty\)：<em>不</em> 一致凸（19.6 节会展示具体反例）。</li>
+  <li>\(c_0, C(K)\)：<em>不</em> 一致凸。</li>
+</ul>
+
+<p>请你看这个分类——和 19.2 节自反清单<em>完全一致</em>。这不是巧合：<strong>Milman–Pettis 定理</strong>说<em>一致凸 ⟹ 自反</em>。下一节证。</p>
 
 <h2 id="sec19-4">19.4 Milman–Pettis 定理</h2>
 
-<p><strong>定理（Milman 1938 / Pettis 1939）。</strong>一致凸 Banach 空间自反。</p>
+<p><strong>定理（Milman 1938，Pettis 1939）。</strong>一致凸的 Banach 空间是自反的。</p>
 
-<p>这是判别自反性的最常用工具。证明思路：用 (R3)，要证有界序列有弱收敛子序列。取 \(x_n\) 范数有界 \(\le M\)。考虑 \(J(x_n) \in X^{**}\)，由 Banach–Alaoglu 有弱*收敛子序列 \(J(x_{n_k}) \overset{*}{\rightharpoonup} \Phi \in X^{**}\)。要证 \(\Phi = J(x^*)\) 某个 \(x^* \in X\)（这就是 \(J\) 的"满射性"在这个特殊弱*极限处的验证）。</p>
+<p>证明。要证 \(J : X \to X^{**}\) 满射。等价地，对每个 \(\Phi \in X^{**}\)（不妨 \(\|\Phi\| = 1\)），找 \(x \in X\) 使 \(J(x) = \Phi\)（即 \(x \in X\) 满足 \(\|x\| = 1\) 且 \(\Phi(f) = f(x)\) 对所有 \(f \in X^*\)）。</p>
 
-<p>关键步骤是：一致凸让 \(\{x_n\}\) 自身成为弱 Cauchy（在某个子序列上），因为否则中点会"收缩"产生矛盾。这条技术细节涉及 Day 对偶引理或 Šmulian 引理，详细在 Megginson《An Introduction to Banach Space Theory》。</p>
+<p><em>第 1 步：找逼近。</em>由 \(\|\Phi\| = 1\) 和上确界定义，对每个 \(\varepsilon > 0\) 存在 \(f_\varepsilon \in X^*\) 使 \(\|f_\varepsilon\| = 1\) 且 \(|\Phi(f_\varepsilon)| > 1 - \varepsilon/2\)。</p>
 
-<p>实用价值：如果你能验证某个空间一致凸（例如用 Clarkson 不等式），自反性自动有。这就是<em>\(L^p\)（\(1 < p < \infty\)）自反</em>的最常用证法——证它一致凸，然后 Milman–Pettis 给自反。</p>
+<p>反过来，由 \(f_\varepsilon\) 的范数定义和 \(\|f_\varepsilon\| = 1\)，存在 \(x_\varepsilon \in X\) 使 \(\|x_\varepsilon\| \le 1\) 且 \(|f_\varepsilon(x_\varepsilon)| > 1 - \varepsilon/2\)。</p>
 
-<h2 id="sec19-5">19.5 Clarkson 不等式与 \(L^p\) 一致凸</h2>
+<p>这些 \(x_\varepsilon\) 是 "<em>逼近 \(\Phi\) 的具体向量</em>"。</p>
 
-<p><strong>Clarkson 第一不等式。</strong>对 \(2 \le p < \infty\)，\(f, g \in L^p\)：</p>
+<p><em>第 2 步：证 \(\{x_{1/n}\}\) 是 Cauchy。</em>取 \(\varepsilon, \varepsilon' > 0\) 小。考虑两个对应的向量 \(x_\varepsilon, x_{\varepsilon'}\)。中点 \(z := (x_\varepsilon + x_{\varepsilon'})/2\)。</p>
 
-<p>\[
-\left\| \frac{f + g}{2} \right\|_p^p + \left\| \frac{f - g}{2} \right\|_p^p \le \frac{1}{2} \left( \|f\|_p^p + \|g\|_p^p \right).
-\]</p>
+<p>选 \(g \in X^*\) 使 \(\|g\| = 1\) 且 \(\Phi(g) > 1 - \min(\varepsilon, \varepsilon')/4\)（同样的逼近论证）。</p>
 
-<p><strong>Clarkson 第二不等式。</strong>对 \(1 < p \le 2\)，\(1/p + 1/q = 1\)：</p>
+<p>关键算式。把 \(g\) 应用到 \(z\)：</p>
 
 <p>\[
-\left\| \frac{f + g}{2} \right\|_p^q + \left\| \frac{f - g}{2} \right\|_p^q \le \left( \frac{1}{2} \|f\|_p^p + \frac{1}{2} \|g\|_p^p \right)^{q/p}.
+g(z) = \frac{g(x_\varepsilon) + g(x_{\varepsilon'})}{2}.
 \]</p>
 
-<p>证明用<em>逐点</em> Clarkson 不等式 \(|a + b|^p + |a - b|^p \le 2^{p-1}(|a|^p + |b|^p)\)（\(p \ge 2\)）然后积分。完整论证可见 Adams《Sobolev Spaces》或 Folland《Real Analysis》。</p>
-
-<p>核心后果：</p>
+<p>但更巧妙的：考虑 \(\Phi(g)\) 与 \(g(z)\) 的差。我用<em>另一种</em> 关系——设 \(h \in X^*\) 是 \(z\) 范数的"<em>对偶</em>" 元素（Hahn–Banach 给一个 \(h \in X^*\) 使 \(\|h\| = 1\) 且 \(h(z) = \|z\|\)）。则 \(|\Phi(h)| \le \|\Phi\| \|h\| = 1\)，且</p>
 
 <p>\[
-\boxed{\ L^p \text{ 一致凸，对 } 1 < p < \infty.\ }
+\|z\| = h(z) = \frac{h(x_\varepsilon) + h(x_{\varepsilon'})}{2}.
 \]</p>
 
-<p>结合 Milman–Pettis 给 \(L^p\) 自反。</p>
+<p>但每个 \(|h(x_i)| \le \|h\| \|x_i\| \le 1\)，所以 \(\|z\| \le 1\)。问题是 \(\|z\|\) 有<em>多</em> 接近 1。</p>
 
-<p>注意 \(p = 1\) 与 \(p = \infty\) 不一致凸，所以 Clarkson 不适用——它们也<em>不</em>自反，前面已说。</p>
+<p>(标准证明做的是另一条路——这里给一种偏轻的版本。)考虑 \(\Phi\) 应用到 \(f_\varepsilon, f_{\varepsilon'}\) 的<em>平均</em>：</p>
+
+<p>\[
+\Phi\left(\frac{f_\varepsilon + f_{\varepsilon'}}{2}\right) = \frac{\Phi(f_\varepsilon) + \Phi(f_{\varepsilon'})}{2} > 1 - \frac{\max(\varepsilon, \varepsilon')}{2}.
+\]</p>
+
+<p>所以 \(\|(f_\varepsilon + f_{\varepsilon'})/2\| \ge 1 - \max(\varepsilon, \varepsilon')/2\)（因为 \(\Phi\) 对偶范数 \(\le 1\)）。</p>
+
+<p>对偶到 \(X^*\) 的<em>一致凸</em>（这一步用到"<em>X 一致凸 ⟹ X* 一致凸</em>" 的对偶引理，详细见 Brezis 第 3 章；本质是把 \(X\) 上凹陷反映到 \(X^*\) 上的"<em>光滑性</em>"，再再对偶回 \(X^{**}\)）：</p>
+
+<p>\[
+\|f_\varepsilon - f_{\varepsilon'}\| \le \tilde\delta^{-1}(\max(\varepsilon, \varepsilon')) \to 0.
+\]</p>
+
+<p>这一步配合 \(X\) 自身的一致凸，给 \(\|x_\varepsilon - x_{\varepsilon'}\| \to 0\)。</p>
+
+<p>(完整严格证明涉及"对偶空间一致凸性 = 原空间光滑性"等较深引理，标准教科书如 Brezis "Functional Analysis" 第 3.7 节、Conway "A Course in Functional Analysis" 第 V.10 节给完整版。这里给的是几何骨架——证明的<em>动力</em> 来自一致凸的"<em>中点必落进去</em>" 性质。)</p>
+
+<p><em>第 3 步：取极限。</em>\(\{x_{1/n}\}\) Cauchy + \(X\) 完备 ⟹ \(x_{1/n} \to x^*\) 强收敛。验证 \(J(x^*) = \Phi\)：对任意 \(f \in X^*\)，\(f(x^*) = \lim f(x_{1/n})\)；可证 \(\lim f(x_{1/n}) = \Phi(f)\)（用 \(x_{1/n}\) 是 \(\Phi\) 的"<em>逼近向量</em>" 的性质）。结束。</p>
+
+<p>关键想法的<em>一句话</em> 总结：<em>一致凸把"对偶上的逼近向量序列" 强迫成 Cauchy；完备性让它收敛；极限就是 \(\Phi\) 的代表元</em>。</p>
+
+<p><strong>反向不真。</strong>James 1951 构造了一个自反但不一致凸的 Banach 空间（"James 空间"，比较著名）。所以"一致凸 ⟹ 自反" 是单向的——一致凸是自反的<em>充分</em> 但<em>不必要</em> 条件。</p>
+
+<p>实战上 Milman–Pettis 极有用。它把"<em>自反性</em>" 这种抽象拓扑性质归结为"<em>看单位球长什么样</em>" 的具体几何。下一节用它证 \(L^p\)（\(1 < p < \infty\)）自反。</p>
+
+<h2 id="sec19-5">19.5 Clarkson 不等式</h2>
+
+<p>怎么证 \(L^p\)（\(1 < p < \infty\)）一致凸？需要一个<em>具体</em> 的"<em>中点深度</em>" 估计。这就是 Clarkson 1936 给的不等式。</p>
+
+<p><strong>Clarkson 不等式（\(2 \le p < \infty\)）。</strong>对任意 \(f, g \in L^p\)：</p>
+
+<p>\[
+\boxed{\ \left\| \frac{f + g}{2} \right\|_p^p + \left\| \frac{f - g}{2} \right\|_p^p \le \frac{1}{2}\left( \|f\|_p^p + \|g\|_p^p \right).\ }
+\]</p>
+
+<p><strong>Clarkson 不等式（\(1 < p \le 2\)）。</strong>对任意 \(f, g \in L^p\)：</p>
+
+<p>\[
+\left\| \frac{f + g}{2} \right\|_p^q + \left\| \frac{f - g}{2} \right\|_p^q \le \left( \frac{1}{2} (\|f\|_p^p + \|g\|_p^p) \right)^{q/p},
+\]</p>
+
+<p>其中 \(q = p/(p-1)\) 是共轭指数。</p>
+
+<p>这两条都把"<em>中点 + 半差</em>" 用"<em>原始两点的范数</em>" 控制——本质是 Hilbert 平行四边形 \(\|f+g\|^2 + \|f-g\|^2 = 2(\|f\|^2 + \|g\|^2)\) 在 \(p \neq 2\) 上的一种"<em>不等式版本</em>"。</p>
+
+<p>证明（\(p \ge 2\) 版本，草图）。靠两条逐点不等式：对任意 \(a, b \in \mathbb R\) 和 \(p \ge 2\)，</p>
+
+<p>\[
+\left| \frac{a+b}{2} \right|^p + \left| \frac{a-b}{2} \right|^p \le \frac{1}{2}\left(|a|^p + |b|^p\right).
+\]</p>
+
+<p>这条逐点不等式可由凸性 + 单变量分析证明。把它对 \(a = f(x), b = g(x)\) 取 + 在 \(\Omega\) 上积分，得 Clarkson。</p>
+
+<p>(\(1 < p < 2\) 的版本更微妙，用对偶 + Hölder。)</p>
+
+<p>从 Clarkson 推一致凸（\(p \ge 2\) 情形）：设 \(\|f\|_p, \|g\|_p \le 1\) 且 \(\|f - g\|_p \ge \varepsilon\)。则</p>
+
+<p>\[
+\left\| \frac{f+g}{2} \right\|_p^p \le \frac{1}{2}(\|f\|_p^p + \|g\|_p^p) - \left\| \frac{f-g}{2} \right\|_p^p \le 1 - (\varepsilon/2)^p.
+\]</p>
+
+<p>所以 \(\|(f+g)/2\|_p \le (1 - (\varepsilon/2)^p)^{1/p}\)。取 \(\delta(\varepsilon) = 1 - (1 - (\varepsilon/2)^p)^{1/p}\)——一致凸条件满足。结束。</p>
+
+<p>所以 \(L^p\)（\(p \ge 2\)）一致凸 ⟹ 自反（Milman–Pettis）。\(1 < p < 2\) 的版本类似（用第二组 Clarkson 不等式）。</p>
+
+<p>对偶视角：对偶范数 \((L^p)^* = L^q\)（\(1/p + 1/q = 1\)，\(p, q \in (1, \infty)\)，<a href="ch15.html">第 15 章</a>），自反给 \((L^p)^{**} = (L^q)^* = L^p\)——典范嵌入<em>就是</em> 同构。所以 "\(L^p\) 自反" 这条不只是抽象事实——它告诉你 \(L^p\) 与 \(L^q\) 之间的对偶配对是<em>对称</em> 的（每边互为对方的对偶）。</p>
+
+<p>整个 \(L^p\)（\(1 < p < \infty\)）几何就这样：单位球"<em>圆滚滚</em>"（一致凸）⟹ 自反 ⟹ 弱拓扑下闭单位球紧 ⟹ 变分法畅通。</p>
 
 <h2 id="sec19-6">19.6 非自反空间的"不便"</h2>
 
-<p>不自反空间在分析里常出现各种"反直觉"现象。下面列三条最重要的，提醒你<em>什么时候不能套自反空间的标准模板</em>。</p>
+<p>把上面的好故事翻过来。在<em>非</em> 自反空间里，弱紧致<em>失败</em>——以下三个具体不便会反复出现。</p>
 
-<p><strong>(P1) \(L^1\) 中有界序列<em>不一定</em>有弱收敛子序列。</strong>典型例子：\(f_n = n \chi_{[0, 1/n]}\) 在 \(L^1[0,1]\) 中。\(\|f_n\|_1 = 1\) 有界。但 \(f_n\) 在弱意义下"质量集中到原点"\(\Rightarrow\) 弱极限应该是 Dirac \(\delta_0\)，但 \(\delta_0 \notin L^1\)（它是测度，不是函数）。所以没有弱极限<em>在 \(L^1\) 内</em>。</p>
+<p><strong>不便 1：\(L^1\) 弱紧致失败。</strong>取 \(\Omega = (0, 1)\)。考虑序列 \(f_n(x) = n \mathbf 1_{(0, 1/n)}(x)\)。每个 \(f_n \in L^1\)，\(\|f_n\|_1 = 1\)——序列<em>一致有界</em>。</p>
 
-<p>这是 \(L^1\) 不自反的具体表现：弱紧致失败。补救工具是<strong>等可积性</strong>（Dunford–Pettis 定理）：在 \(L^1\) 中"等可积 + 紧支撑"才能保证有弱收敛子序列。</p>
+<p>问：\(f_n\) 有弱收敛子列吗？</p>
 
-<p><strong>(P2) \(C[0,1]\) 中"逐点收敛 + 范数有界"序列不一定有强收敛子序列。</strong>典型例子：\(f_n(x) = \sin(n x)\) 在 \(C[0,1]\) 中。\(\|f_n\|_\infty = 1\) 有界，逐点收敛在某些点不存在（\(\sin(n x)\) 在大多数 \(x\) 处发散）。Arzelà–Ascoli 定理（紧致连续函数族需要等度连续 + 逐点紧）告诉你"等度连续"是缺少的关键。</p>
+<p>假设 \(f_{n_k} \rightharpoonup f\) 在 \(L^1(0, 1)\) 弱意义下。则对每个 \(g \in L^\infty(0, 1)\)：\(\int f_{n_k} g \to \int f g\)。取 \(g = \mathbf 1_{(0, 1)}\)（恒 1）：\(\int f_{n_k} = 1 \to \int f = 1\)。但同时取 \(g_\delta = \mathbf 1_{(\delta, 1)}\) 对小 \(\delta\)：\(\int_{n_k > 1/\delta} f_{n_k} g_\delta = 0\)（因 \(f_{n_k}\) 集中在 \((0, 1/n_k) \subset (0, \delta)\)）。所以 \(\int f \cdot g_\delta = 0\)，对所有 \(\delta > 0\)——意味着 \(f = 0\) 几乎处处。</p>
 
-<p><strong>(P3) \(C[0,1]^*\) 上的弱收敛<em>严格弱</em>于弱*收敛。</strong>因为 \(C[0,1]^{**}\) 比 \(M[0,1] = C[0,1]^*\) 的对偶 \(M[0,1]^*\) 大很多。这种"弱 \(\neq\) 弱*"在不自反空间上是常态。</p>
+<p>但 \(\int f = 1\) 与 \(f = 0\) a.e. 矛盾。所以<em>没有</em> 弱收敛子列。\(L^1\) 不弱紧。</p>
 
-<p>这三条提醒你：<em>"在自反空间上的标准变分法 / 紧致论证不能盲目搬到非自反空间"</em>。每次到 \(L^1, L^\infty, c_0, C(K)\) 上，你需要专门的"修补"工具。</p>
+<p>背后的物理图像：质量"<em>集中到一点</em>"（\(f_n\) 接近 Dirac \(\delta_0\)）。极限不在 \(L^1\) 里——\(\delta_0\) 是<em>测度</em>，不是<em>函数</em>。\(L^1\) "<em>逃逸</em>" 到了它的对偶 \((L^\infty)^*\) 里去了。</p>
 
-<p>本章把"自反 vs 不自反"这个泛函分析的"基本分水岭" 讲清。下一章我们要切到一个新主题——<strong>紧算子</strong>。它是最接近"无穷维矩阵"的算子类——其谱论几乎是有限维谱定理的直接推广。</p>
+<p>修法（不修 \(L^1\) 自反，因不可能）：把问题搬到测度空间 \(M(\Omega)\)（有限 Borel 测度）。\(M(\Omega) = C_0(\Omega)^*\)，所以闭球弱*紧（Banach–Alaoglu）。<em>测度的弱*紧致</em> 是流体力学、调和分析、概率论里常用的工具——正是 \(L^1\) 弱紧致失败的"<em>修补</em>"。</p>
+
+<p><strong>不便 2：\(L^\infty\) 不可分 + 弱*拓扑不可度量。</strong>\(L^\infty\) 是 \(L^1\) 的对偶——所以 \(L^\infty\) 闭单位球弱*紧（Banach–Alaoglu）。但 \(L^1\) <em>可分</em>（多项式 / 阶梯函数稠密），所以 \(L^\infty\) 闭单位球弱*<em>序列紧 + 度量化</em>（<a href="ch18.html">18.3-4 节</a>）。</p>
+
+<p>但 \(L^\infty\) 自身的<em>弱</em> 拓扑就麻烦——\(L^\infty\) 不可分，它的弱*拓扑不可度量。所以"\(L^\infty\) 上的有界序列有弱收敛子列" 这种话在<em>弱</em> 意义下<em>不</em>对——必须用<em>弱*</em>。</p>
+
+<p>实战意义：处理 \(L^\infty\) 数据时（如 Hamilton–Jacobi 方程的"<em>粘性解</em>"、调和分析里的 BMO 空间），<em>始终</em> 用弱*——把 \(L^\infty\) 当成 \(L^1\) 的对偶。</p>
+
+<p><strong>不便 3：\(L^1\) 单位球缺少强极值点。</strong>"<em>极值点</em>" 是一个集合的"<em>角</em>"——闭凸集里不能写为内部两点中点的点。Hilbert 单位球的极值点是<em>整个球面</em>。\(L^p\)（\(1 < p < \infty\)）类似。</p>
+
+<p>但 \(L^1\) 单位球的极值点很少——对 \(L^1(0, 1)\)，极值点是<em>正</em> 函数 \(f \ge 0\) with \(\|f\|_1 = 1\) 而<em>没</em> 任何"分裂" 余地的。具体的极值点几乎不存在（"<em>每个 \(L^1\) 函数都可以拆成两个不等的 \(L^1\) 单位球元素的中点</em>"——除非函数<em>已经</em>是 Dirac 测度）。</p>
+
+<p>这条"<em>极值点稀少</em>" 让 Krein–Milman 定理（"<em>紧凸集 = 其极值点闭凸包</em>"）在 \(L^1\) 上给不出有用的结构。要在 \(L^1\) 上做"<em>极值点分析</em>"，必须扩张到测度空间或用"<em>分解定理</em>"（如 Choquet 表示）——这些都是高度技术性的工具。</p>
+
+<p>这一章三件不便共同说一句话：<em>非自反空间是泛函分析的"<em>边缘</em>" 案例</em>。它们存在、它们重要（\(L^1, L^\infty\) 是日常空间），但<em>变分法、PDE 弱解、紧致论证</em> 在它们上要么失败要么需要更复杂的工具。如果你能选择空间——选自反的；如果不能——准备多写几页论证。</p>
+
+<p>这一章和上两章合起来构成"<em>无穷维紧致</em>" 这个主题的完整故事：<em>有限维 Heine–Borel 在无穷维崩塌（ch1）→ 弱收敛把 \(\ell^2\) 单位球的紧致用新形式找回（ch17）→ Banach–Alaoglu 把"对偶单位球弱*紧" 升为定理（ch18）→ 自反空间让"原空间弱紧" 也成立 + 一致凸给可操作的几何判据（本章）</em>。这条主线是泛函分析"<em>无穷维代数 + 几何 + 分析</em>" 三位一体的脊骨——下面 5 章谈紧算子、谱定理、Sobolev 空间、量子力学时反复回头用它。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 Banach–Alaoglu 紧致性</a><a href="ch20.html">下一章 · 第 20 章 紧算子 →</a></nav>
 </main>

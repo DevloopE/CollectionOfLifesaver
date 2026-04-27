@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 13 章 Hahn–Banach 延拓定理（解析形式）— 普林斯顿泛函分析读本</title>
+<title>第 13 章 Hahn-Banach 解析形式 — 普林斯顿泛函分析读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -32,152 +32,304 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 开映射定理与闭图像定理</a><a href="ch14.html">下一章 · 第 14 章 Hahn–Banach 几何形式与凸集分离 →</a></nav>
-<h1 id="ch13">第 13 章 Hahn–Banach 延拓定理（解析形式）</h1>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 开映射 + 闭图像定理</a><a href="ch14.html">下一章 · 第 14 章 Hahn-Banach 几何形式 →</a></nav>
+<h1 id="ch13">第 13 章 Hahn-Banach 解析形式</h1>
 
-<p>这一章讲三大原理里的最后一条——也是历史上最重要的一条：<strong>Hahn–Banach 延拓定理</strong>。前两条原理（一致有界、开映射）依赖 Baire，本质是"完备性 + 拓扑"的合作。Hahn–Banach 完全不一样——它不需要任何完备性，但需要<em>选择公理</em>（Zorn 引理）。它要解决的问题非常直白：</p>
+<p>请你先做一道朴素的问。一个非零向量 \(x \in X\) 摆在你面前 (\(X\) 是赋范空间)。你想"看见" 它——也就是, 找一个连续线性泛函 \(\varphi \in X^*\) 使 \(\varphi(x) \neq 0\)。</p>
 
-<p>"<strong>给一个赋范空间 \(X\) 上的子空间 \(M\)，已经在 \(M\) 上定义了一个有界线性泛函 \(f\)。我能不能把 \(f\) 延拓成<em>整个</em> \(X\) 上的有界线性泛函，而且保持范数？</strong>"</p>
+<p>有限维你瞬间能做: 在 \(\mathbb{R}^n\) 里, \(x = (x_1, \ldots, x_n) \neq 0\), 取 \(x_k \neq 0\), 让 \(\varphi(y) = y_k\) 是第 \(k\) 个坐标投影, \(\varphi(x) = x_k \neq 0\)。这个泛函显然连续 (有限维线性映射都连续)。</p>
 
-<p>有限维里这件事是平凡的——给 \(M\) 找一个补，定义在补上为 0，合起来。无穷维里这件事一点都不平凡，因为你不一定有"补"。Hahn–Banach 用 Zorn 引理告诉你：<em>无论维数多大、空间多奇怪，这种延拓总是存在</em>。</p>
+<p>无穷维呢? 设 \(x \neq 0\) 是 \(\ell^\infty\) 中某个序列, 你想找连续线性泛函看见它。最自然的尝试是"取第 \(k\) 位坐标"——可这是有限维直觉的迁移, 在无穷维它<em>有时不够</em> (比如 \(x = (1, 1, 1, \ldots)\) 在 \(\ell^\infty\)/\(c_0\) 商空间里非零, 你需要更精细的"<em>极限型</em>" 泛函如 Banach 极限才能看见它)。</p>
 
-<ul>
-  <li>正式陈述并理解"为什么需要这条定理"——它保证了 \(X^*\) 足够大。</li>
-  <li>实数情形的完整证明（一维延拓 + Zorn 链式归纳）。</li>
-  <li>复数情形的处理（实部 / 虚部技巧）。</li>
-  <li>推论 1：每个非零 \(x \in X\) 都能用某个 \(f \in X^*\) "看见"，且 \(\|f\| = 1, f(x) = \|x\|\)。</li>
-  <li>推论 2：\(X^*\) 在 \(X\) 上"分点"——任意两个不同点都能被某个泛函区分。</li>
-  <li>推论 3：闭子空间 \(M \subset X\) 的"可达性"——\(x \in M\) 当且仅当所有 \(f|_M = 0\) 的 \(f\) 都满足 \(f(x) = 0\)。</li>
-</ul>
-
-<h2 id="sec13-1">13.1 为什么需要 Hahn–Banach</h2>
-
-<p>第 8、9 章我们建立了"算子"的世界。但有一类特殊的"算子"出现得最频繁：值域为 \(\mathbb{K}\) 的<strong>线性泛函</strong>。它们集合就是<strong>对偶空间</strong> \(X^*\)（详见<a href="ch15.html">第 15 章</a>）。</p>
-
-<p>对偶空间的"实用性"完全依赖于一个前提：<em>它够大</em>。具体来说：</p>
+<p>这一章我要让你看清: <em>"无穷维空间总能找到泛函看见每一个非零向量"</em> 这件事, <em>在一般 Banach 空间里既不显然也并不自动</em>。它需要一条强大的延拓定理来保证。这条定理就是<strong>Hahn-Banach 定理</strong>——三大原理的最后一条。它的风味跟 UBP/OMT/CGT <em>完全不同</em>:</p>
 
 <ul>
-  <li>给一个非零向量 \(x\)，至少要有一个 \(f \in X^*\) 使 \(f(x) \neq 0\)（不然 \(X^*\) 看不见 \(x\)，那它没用）；</li>
-  <li>给两个不同向量，至少要能找一个 \(f\) 区分它们；</li>
-  <li>给一个点和一个闭子空间（点不在子空间内），要能找一个 \(f\) "把点和子空间分开"。</li>
+  <li>UBP/OMT/CGT 用 <strong>Baire 纲</strong>, 需要 Banach (完备), 把"软" 假设升级为"硬" 结论。</li>
+  <li>Hahn-Banach 用 <strong>Zorn 引理</strong> (即<em>选择公理</em>), 不需要完备, 解决的是"<em>子空间上的泛函能否延拓到全空间, 同时保范数</em>"。</li>
 </ul>
 
-<p>这三件事都不是显然的——它们的内容都是"线性泛函丰富到能解决这些识别问题"。Hahn–Banach 就是<em>给出这种丰富性的唯一一般工具</em>。</p>
+<p>这一章我们做<em>解析形式</em>——直接给"延拓 + 保范数"。下一章 (<a href="ch14.html">第 14 章</a>) 我们做<em>几何形式</em>——把"延拓" 翻译成"超平面分离"。两形式等价, 角度不同。</p>
 
-<p>一句话：Hahn–Banach 让对偶空间真正成为有意义的对象。没有它，\(X^*\) 可能空得连一个非零元素都没有（在最病态的拓扑空间里这真会发生；在赋范空间里 Hahn–Banach 排除了这种情况）。</p>
+<h2 id="sec13-1">13.1 为什么需要 Hahn-Banach: 让 \(X^*\) 足够大</h2>
 
-<h2 id="sec13-2">13.2 实数情形的陈述</h2>
+<p>我们先把<em>动机</em> 讲清楚。下面三件事都需要"<em>对偶空间 \(X^* = \mathcal{B}(X, \mathbb{C})\) 有足够多的元素</em>", 而 Hahn-Banach 是这件事的根源。</p>
 
-<p><strong>定理（Hahn–Banach 实数版本）。</strong>设 \(X\) 是实向量空间，\(p : X \to \mathbb{R}\) 是<em>次线性</em>泛函（即 \(p(\alpha x) = \alpha p(x)\) 对 \(\alpha \ge 0\)，\(p(x + y) \le p(x) + p(y)\)）。设 \(M \subset X\) 是子空间，\(f : M \to \mathbb{R}\) 是线性的，并被 \(p\) 控制（\(f(m) \le p(m), \forall m \in M\)）。则存在线性延拓 \(\tilde f : X \to \mathbb{R}\) 使</p>
+<p><em>事件 1 (识别一个向量)</em>。两个向量 \(x, y \in X\), 我们想知道 \(x = y\) 是否成立。<em>等价</em> 写法: 是否对每个 \(\varphi \in X^*\) 有 \(\varphi(x) = \varphi(y)\)? 等价的"<em>是</em>" 需要对偶空间足够大: 如果 \(x \neq y\) 但<em>所有</em> 泛函都给同样的值, 那就是说 \(X^*\) "看不见" \(x - y\), \(X^*\) <em>太小</em> 了。Hahn-Banach 排除这种情况: 对每个非零 \(z \in X\), 总有 \(\varphi \in X^*\) 使 \(\varphi(z) \neq 0\)。</p>
 
-<p>\[
-\tilde f|_M = f, \qquad \tilde f(x) \le p(x), \forall x \in X.
-\]</p>
+<p><em>事件 2 (计算范数)</em>。给一个 \(x\), 我们想用泛函算它的范数。一个 trivial 估计: \(\|x\| \ge |\varphi(x)| / \|\varphi\|\) 对每个非零 \(\varphi\) (因为 \(|\varphi(x)| \le \|\varphi\| \|x\|\))。理想情形: 这条估计是<em>紧</em> 的, 即 \(\|x\| = \sup_{\|\varphi\| \le 1} |\varphi(x)|\)。这条等式叫"<em>对偶式范数公式</em>", 它要求"<em>有 \(\varphi\) 真把 \(x\) 看到极致</em>"——具体是 \(\|\varphi\| = 1\) 且 \(\varphi(x) = \|x\|\)。Hahn-Banach 给你这个 \(\varphi\) 的存在。</p>
 
-<p>这是最一般的解析陈述。它<em>没有</em>要求 \(X\) 有范数——它只要求一个"控制函数" \(p\)。范数只是 \(p\) 的一个特例。</p>
+<p><em>事件 3 (闭子空间识别)</em>。给一个子空间 \(M \subset X\), 我们想知道某个 \(x \notin \overline{M}\) 是否真的不在闭包里。等价的形式 (后面证): \(x \notin \overline{M}\) \(\Leftrightarrow\) 存在 \(\varphi \in X^*\) 使 \(\varphi|_M = 0\) 而 \(\varphi(x) \neq 0\)——即一个<em>"湮没 \(M\) 但看见 \(x\)" 的泛函</em>。Hahn-Banach 给这个 \(\varphi\) 的存在。它把"<em>不在闭包里</em>" 这种几何条件翻译成"<em>有泛函分离</em>", 这正是 ch14 几何形式的内容。</p>
 
-<p>当 \(p(x) = C \|x\|\) 是范数的常数倍时，结论变成"<em>保范数</em>延拓"——延拓的算子范数 \(\le C\)。这是最常用的情形：</p>
+<p>三件事的共同需求: <em>"对偶空间足够大"</em>。在有限维这件事白送 (\(X^* \cong X\) 维数相等, 自然有"足够多" 泛函)。在无穷维, "足够大" 不是 trivial——需要 Hahn-Banach 才能做到。</p>
 
-<p><strong>定理（Hahn–Banach 范数延拓版本）。</strong>设 \((X, \|\cdot\|)\) 是实赋范空间，\(M \subset X\) 子空间，\(f : M \to \mathbb{R}\) 有界线性泛函，\(\|f\|_{M^*} = C\)。则存在延拓 \(\tilde f : X \to \mathbb{R}\) 满足 \(\tilde f|_M = f\) 且 \(\|\tilde f\|_{X^*} = C\)。</p>
+<p>Hahn-Banach 定理把"足够大" 翻译成一种<em>具体的延拓技术</em>: 给我子空间上一个泛函, 我能延拓到全空间不增范数。这是一切上面"事件" 的根源。</p>
 
-<h2 id="sec13-3">13.3 证明：一维延拓步</h2>
+<h2 id="sec13-2">13.2 实数情形定理陈述</h2>
 
-<p>核心是一道<em>一维延拓</em>引理。把它做完，再用 Zorn 引理一气推到整个空间。</p>
+<p>我们先在<em>实</em> 数域 \(\mathbb{R}\) 上写陈述, 之后再处理复数。</p>
 
-<p><strong>一维延拓引理。</strong>设 \(X\) 实向量空间、\(p\) 次线性、\(M\) 子空间、\(f : M \to \mathbb{R}\) 被 \(p\) 控制。取 \(z \in X \setminus M\)，令 \(M' = M \oplus \mathbb{R} z\)。则存在 \(f'\) 是 \(f\) 在 \(M'\) 上被 \(p\) 控制的线性延拓。</p>
-
-<p>证明：\(M'\) 上的延拓由其在 \(z\) 上的值唯一决定。设 \(f'(z) = c\)。则 \(f'(m + tz) = f(m) + tc\)。控制条件 \(f'(m + tz) \le p(m + tz)\)：</p>
+<p><strong>定理 13.1 (Hahn-Banach 解析形式, 实)</strong>. 设 \(X\) 是<em>实</em> 向量空间 (不必赋范! 不必完备!), \(p : X \to \mathbb{R}\) 是<em>次线性</em> 的——即满足:</p>
 
 <ul>
-  <li>对 \(t > 0\)：\(c \le \frac{p(m + tz) - f(m)}{t}\)；</li>
-  <li>对 \(t < 0\)：\(c \ge \frac{p(m + tz) - f(m)}{t}\)（除以负数翻号）。</li>
+  <li>(i) 正齐: \(p(\lambda x) = \lambda p(x)\) 对所有 \(\lambda \ge 0\) 与 \(x \in X\);</li>
+  <li>(ii) 次加: \(p(x + y) \le p(x) + p(y)\) 对所有 \(x, y \in X\)。</li>
 </ul>
 
-<p>所以延拓存在 \(\iff\) 存在 \(c\) 使</p>
+<p>设 \(M \subset X\) 是线性子空间, \(f : M \to \mathbb{R}\) 是<em>线性</em> 泛函, 满足</p>
 
 <p>\[
-\sup_{m \in M, t < 0} \frac{p(m + tz) - f(m)}{t} \le c \le \inf_{m \in M, t > 0} \frac{p(m + tz) - f(m)}{t}.
+f(x) \le p(x) \text{ 对所有 } x \in M
 \]</p>
 
-<p>关键：左边 \(\le\) 右边。设 \(m_1 + t_1 z\) 给左边，\(m_2 + t_2 z\) 给右边（\(t_1 < 0, t_2 > 0\)）。我们要证</p>
+<p>(称 \(f\) 被 \(p\) <em>支配</em>)。则存在<em>线性</em> 泛函 \(F : X \to \mathbb{R}\) 使</p>
+
+<ul>
+  <li>(a) \(F|_M = f\) (延拓);</li>
+  <li>(b) \(F(x) \le p(x)\) 对所有 \(x \in X\) (保支配)。</li>
+</ul>
+
+<p>请你停下来体会一下这条陈述的<em>普适性</em>: 它<em>不</em>假设 \(X\) 是赋范、不假设完备; 它只用一个次线性 \(p\) 当"<em>控制函数</em>"。当 \(p(x) = \|x\|\) (这显然是次线性: 范数自动正齐 + 三角不等式), 同时 \(f\) 是 \(M\) 上的有界线性泛函, "支配" 即 \(|f(x)| \le \|x\|\) 即 \(\|f\| \le 1\)。这种特殊化给出最常用的"<em>赋范情形</em>", 见 13.6 节。</p>
+
+<p>核心是<em>一维延拓引理</em>——把 \(f\) 从 \(M\) 延拓到 \(M \oplus \mathbb{R} v\) (一个一维扩张), 同时保支配。这是整个 Hahn-Banach 的"<em>核心 lemma</em>"; 一旦做到, 用 Zorn 把它一直推到全空间。下面我们一步一步做。</p>
+
+<h2 id="sec13-3">13.3 一维延拓引理 (核心 lemma)</h2>
+
+<p><strong>引理 13.2 (一维延拓)</strong>. 设 \(X\) 实向量空间, \(p : X \to \mathbb{R}\) 次线性, \(M \subset X\) 线性子空间, \(f : M \to \mathbb{R}\) 线性且 \(f(x) \le p(x)\) 对所有 \(x \in M\)。设 \(v \in X \setminus M\) 是任一不在 \(M\) 中的向量。则存在 \(F : M \oplus \mathbb{R} v \to \mathbb{R}\) 线性, \(F|_M = f\), 且 \(F(z) \le p(z)\) 对所有 \(z \in M \oplus \mathbb{R} v\)。</p>
+
+<p><strong>证明</strong>。\(M \oplus \mathbb{R} v\) 中元素都唯一写成 \(z = x + t v\), \(x \in M\), \(t \in \mathbb{R}\)。要定义 \(F\) 线性, 只需选一个数 \(\alpha = F(v)\), 然后令</p>
 
 <p>\[
-\frac{p(m_1 + t_1 z) - f(m_1)}{t_1} \le \frac{p(m_2 + t_2 z) - f(m_2)}{t_2}.
+F(x + t v) = f(x) + t \alpha.
 \]</p>
 
-<p>整理为 \(t_2 (p(m_1 + t_1 z) - f(m_1)) \ge t_1 (p(m_2 + t_2 z) - f(m_2))\)（注意 \(t_1 < 0\) 翻号），即</p>
+<p>这显然延拓 \(f\) (\(t = 0\) 时 \(F = f\)) 且线性。问题: 是否存在 \(\alpha\) 使保支配 \(F(x + t v) \le p(x + t v)\)?</p>
+
+<p>把这条条件按 \(t\) 的符号拆。\(t > 0\) 时 \(F(x + t v) = f(x) + t \alpha \le p(x + t v)\) 即</p>
 
 <p>\[
-t_2 p(m_1 + t_1 z) + (-t_1) p(m_2 + t_2 z) \ge t_2 f(m_1) + (-t_1) f(m_2).
+\alpha \le \frac{p(x + t v) - f(x)}{t} = p(x/t + v) - f(x/t)
 \]</p>
 
-<p>右边 \(= f(t_2 m_1 - t_1 m_2)\)，由 \(f\) 被 \(p\) 控制 \(\le p(t_2 m_1 - t_1 m_2)\)。注意 \(t_2 m_1 - t_1 m_2 = t_2(m_1 + t_1 z) + (-t_1)(m_2 + t_2 z)\) 因为 \(z\) 系数 \(t_2 t_1 + (-t_1) t_2 = 0\)。由 \(p\) 次线性 \(\le t_2 p(m_1 + t_1 z) + (-t_1) p(m_2 + t_2 z)\)。结束。</p>
-
-<p>所以一维延拓引理成立。这条引理是 Hahn–Banach 的"原子步"。</p>
-
-<h2 id="sec13-4">13.4 用 Zorn 引理推到全空间</h2>
-
-<p>有了一维延拓引理，剩下就是逐个一维地往外加，直到覆盖整个 \(X\)。这个"逐个一维"过程在<em>无穷维不可数维数</em>的空间里需要 Zorn 引理。</p>
-
-<p>设 \(\mathcal{F}\) 是所有"\(f\) 在某个含 \(M\) 的子空间上被 \(p\) 控制的延拓"的集合。在 \(\mathcal{F}\) 上定义偏序：\(g \le h\) 如果 \(\operatorname{dom}(g) \subset \operatorname{dom}(h)\) 且 \(h|_{\operatorname{dom}(g)} = g\)。</p>
-
-<p><strong>验证 Zorn 假设</strong>：每个全序链 \(\{g_\alpha\}\) 有上界。取 \(g = \bigcup g_\alpha\)（图像并集；定义域是 \(\bigcup \operatorname{dom}(g_\alpha)\)）——它是子空间（因为链全序，任意两点都有共同 \(g_\alpha\)），\(g\) 良定义且线性，被 \(p\) 控制。这是上界。</p>
-
-<p>由 Zorn，\(\mathcal{F}\) 有极大元素 \(\tilde f\)。要证 \(\operatorname{dom}(\tilde f) = X\)。反设否，存在 \(z \in X \setminus \operatorname{dom}(\tilde f)\)。一维延拓引理给一个真延拓——矛盾极大性。所以 \(\operatorname{dom}(\tilde f) = X\)。</p>
-
-<p>结束。这就是 Hahn–Banach 的完整证明。</p>
-
-<p><em>对选择公理的依赖</em>：实际上 Hahn–Banach 严格弱于选择公理，比 ZF 强但比 AC 弱。在标准 ZFC 数学里 Hahn–Banach 永远可用。</p>
-
-<h2 id="sec13-5">13.5 复数情形</h2>
-
-<p>复数情形通过实数情形得来。设 \(X\) 是复向量空间、\(M\) 复子空间、\(f : M \to \mathbb{C}\) 复线性、\(|f(m)| \le p(m)\)（\(p\) 半范数，即对称次线性 \(p(\alpha x) = |\alpha| p(x)\)）。</p>
-
-<p>把 \(X\) 看作<em>实</em>向量空间。复线性 \(f = u + i v\)，其中 \(u = \operatorname{Re} f\) 是实线性。复线性条件：\(f(i x) = i f(x)\) 给 \(u(i x) + i v(i x) = i(u(x) + i v(x)) = -v(x) + i u(x)\)，即 \(u(i x) = -v(x)\)，所以 \(v(x) = -u(i x)\)。<em>整个 \(f\) 由它的实部 \(u\) 决定</em>。</p>
-
-<p>实情形 Hahn–Banach 把 \(u\) 延拓到 \(X\) 上的实线性 \(\tilde u\) 被 \(p\) 控制。定义 \(\tilde f(x) = \tilde u(x) - i \tilde u(i x)\)。验证 \(\tilde f\) 复线性、\(\tilde f|_M = f\)、\(|\tilde f(x)| \le p(x)\)（最后一条用 \(|\tilde f(x)| = e^{i \theta} \tilde f(x) = \tilde f(e^{-i \theta} x) = \tilde u(e^{-i \theta} x) \le p(e^{-i \theta} x) = p(x)\)）。结束。</p>
-
-<p>所以 Hahn–Banach 在复 Banach 空间上同样成立。</p>
-
-<h2 id="sec13-6">13.6 三条核心推论</h2>
-
-<p>定理本身有点抽象。它的真正威力在三条推论上。这三条推论是后面所有"对偶空间"故事的根基。</p>
-
-<p><strong>推论 1（"看见每个点"）。</strong>设 \(X\) 是赋范空间，\(0 \neq x \in X\)。则存在 \(f \in X^*\) 使 \(\|f\| = 1\) 且 \(f(x) = \|x\|\)。</p>
-
-<p>证明：在 \(M = \mathbb{K} x\) 上定义 \(f_0(\alpha x) = \alpha \|x\|\)，则 \(\|f_0\|_{M^*} = 1\)。由 Hahn–Banach 范数延拓版，存在 \(f \in X^*\) 满足 \(f|_M = f_0\) 且 \(\|f\| = 1\)。则 \(f(x) = f_0(x) = \|x\|\)。</p>
+<p>(用次线性: 把 \(t\) 提出来; 用 \(f\) 线性: 把 \(t\) 提出来)。改写 \(y = x/t \in M\): 即</p>
 
 <p>\[
-\boxed{\ \forall x \neq 0, \ \exists f \in X^*: \|f\| = 1 \ \text{且} \ f(x) = \|x\|.\ }
+\alpha \le p(y + v) - f(y) \text{ 对所有 } y \in M.
 \]</p>
 
-<p>这条让 \(X^*\) 真正"看见"每个非零向量。下一条推论由它得：</p>
-
-<p><strong>推论 2（"分离两个点"）。</strong>对 \(x \neq y\)，存在 \(f \in X^*\) 使 \(f(x) \neq f(y)\)。</p>
-
-<p>证明：用推论 1 取 \(f\) 看到 \(x - y\)，则 \(f(x - y) = \|x - y\| > 0\) 即 \(f(x) \neq f(y)\)。</p>
-
-<p>这条结论叫"<strong>\(X^*\) 在 \(X\) 上分点</strong>"。它让"对偶空间识别原空间"成为可能——任何"在所有 \(f \in X^*\) 看来都一样"的两个点必须相同。这是后面"双重对偶嵌入" \(X \hookrightarrow X^{**}\)（第 19 章）的根基。</p>
-
-<p><strong>推论 3（"识别闭子空间"）。</strong>设 \(M \subset X\) 是闭子空间，\(x \in X\)。则 \(x \in M \iff \forall f \in M^\circ, f(x) = 0\)，其中 \(M^\circ = \{f \in X^* : f|_M = 0\}\) 叫 \(M\) 的<strong>零化子</strong>。</p>
-
-<p>证明：</p>
-
-<p>"\(\Rightarrow\)" 平凡（\(x \in M\) 自动 \(f(x) = 0\) 对 \(f \in M^\circ\)）。</p>
-
-<p>"\(\Leftarrow\)" 反证。设 \(x \notin M\)。\(M\) 闭 \(\Rightarrow\) \(d := \operatorname{dist}(x, M) > 0\)。在 \(M' := M \oplus \mathbb{K} x\) 上定义 \(f_0(m + \alpha x) = \alpha\)。验证 \(\|f_0\|_{(M')^*} \le 1/d\)：</p>
+<p>\(t < 0\) 时 \(F(x + t v) = f(x) + t \alpha \le p(x + t v)\), 写 \(t = -s\), \(s > 0\):</p>
 
 <p>\[
-|\alpha| = \frac{1}{d} \cdot d \cdot |\alpha| \le \frac{1}{d} \|m + \alpha x\|, \quad \forall m \in M
+f(x) - s \alpha \le p(x - s v), \quad \alpha \ge \frac{f(x) - p(x - s v)}{s} = f(x/s) - p(x/s - v).
 \]</p>
 
-<p>（因为 \(\|m + \alpha x\| = |\alpha| \|x + m/\alpha\| \ge |\alpha| d\)）。Hahn–Banach 延拓为 \(f \in X^*\) 范数 \(\le 1/d\)、\(f|_M = 0\)（即 \(f \in M^\circ\)）、\(f(x) = 1 \neq 0\)。矛盾。</p>
+<p>改写 \(y' = x/s \in M\): 即</p>
 
-<p>这条推论是<strong>对偶 \(\Leftrightarrow\) 几何</strong>桥梁。它说"闭子空间的成员资格 = 被所有零化它的泛函杀死"。第 22 章 Fredholm 选择性、第 23 章 Sobolev 弱解理论几乎全部以此为基础。</p>
+<p>\[
+\alpha \ge f(y') - p(y' - v) \text{ 对所有 } y' \in M.
+\]</p>
 
-<p>有了这三条推论，对偶空间 \(X^*\) 不再是抽象工具，而成为真正能"看见 \(X\) 内在结构"的几何镜子。下一章我们要把 Hahn–Banach 翻译成<em>几何</em>形式——凸集分离定理。从那一面看，Hahn–Banach 说的是"两个不相交凸集之间总有一面墙"。这个几何画面是凸优化、博弈论、变分法的共同语言根。</p>
+<p>\(t = 0\) 时条件 \(f(x) \le p(x)\) 已假设。</p>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 开映射定理与闭图像定理</a><a href="ch14.html">下一章 · 第 14 章 Hahn–Banach 几何形式与凸集分离 →</a></nav>
+<p>所以"<em>存在 \(\alpha\) 使保支配</em>" 等价于</p>
+
+<p>\[
+\sup_{y' \in M} [f(y') - p(y' - v)] \le \inf_{y \in M} [p(y + v) - f(y)].
+\]</p>
+
+<p>这就是要证的核心不等式。如何证? 任取 \(y, y' \in M\), 我们要</p>
+
+<p>\[
+f(y') - p(y' - v) \le p(y + v) - f(y), \quad \text{即} \quad f(y) + f(y') \le p(y + v) + p(y' - v).
+\]</p>
+
+<p>左边 \(f(y) + f(y') = f(y + y')\) (线性) \(\le p(y + y')\) (假设)。又 \(p(y + y') = p((y + v) + (y' - v)) \le p(y + v) + p(y' - v)\) (次加)。串起来:</p>
+
+<p>\[
+f(y) + f(y') = f(y + y') \le p(y + y') \le p(y + v) + p(y' - v).
+\]</p>
+
+<p>正是要证的。所以 \(\sup \le \inf\), 故存在 \(\alpha\) (例如 \(\alpha = \sup_{y'} [f(y') - p(y' - v)]\)) 满足两边夹的条件。\(\square\)</p>
+
+<p>请你停下来感受这条<em>一维延拓</em> 的核心思路。我们要选一个数 \(\alpha\), 使得新泛函在<em>所有</em> 方向 (\(t > 0\) 和 \(t < 0\)) 都被 \(p\) 支配。这给 \(\alpha\) 的"<em>下界</em>" 和"<em>上界</em>"。证存在 \(\alpha\) 满足两边即证"<em>下界 \(\le\) 上界</em>", 而这条不等式来自 \(p\) 的<em>次加性</em> 和 \(f \le p\) 的<em>支配</em>。<em>整个 Hahn-Banach 的全部"魔术" 都在这一步</em>: 一行不等式 \(f(y + y') \le p(y + y') \le p(y + v) + p(y' - v)\)。</p>
+
+<p>下面把这条一维延拓"<em>叠</em>" 起来——用 Zorn 引理推到全空间。</p>
+
+<h2 id="sec13-4">13.4 用 Zorn 推到全空间</h2>
+
+<p>这一步需要 Zorn 引理 (即选择公理)。Zorn 引理说: <em>偏序集中, 如果每条链都有上界, 则存在极大元</em>。我们在"<em>所有保支配延拓</em>" 的集合上用它。</p>
+
+<p>定义</p>
+
+<p>\[
+\mathcal{P} = \{(N, g) : N \supset M \text{ 是线性子空间}, g : N \to \mathbb{R} \text{ 线性}, g|_M = f, g \le p \text{ 在 } N \text{ 上}\}.
+\]</p>
+
+<p>这是"<em>从 \(f\) 出发的所有保支配延拓</em>" 的集合。它非空 (\((M, f) \in \mathcal{P}\) 显然)。</p>
+
+<p>偏序: \((N_1, g_1) \le (N_2, g_2)\) 当且仅当 \(N_1 \subset N_2\) 且 \(g_2|_{N_1} = g_1\)。</p>
+
+<p>要用 Zorn, 验证每条链都有上界。设 \(\{(N_\alpha, g_\alpha)\}_{\alpha \in A}\) 是 \(\mathcal{P}\) 中的链 (即任两元素可比)。令 \(N = \bigcup_\alpha N_\alpha\)。由链性质 \(N\) 是线性子空间 (任两 \(x, y \in N\) 在某个 \(N_\alpha\) 里都在, 那里就是子空间)。定义 \(g : N \to \mathbb{R}\) 为 \(g(x) = g_\alpha(x)\) 当 \(x \in N_\alpha\)——由链性质这定义良好 (\(x \in N_\alpha \cap N_\beta\) 时 \(g_\alpha(x) = g_\beta(x)\))。\(g\) 显然线性, 延拓 \(f\), 被 \(p\) 支配。所以 \((N, g) \in \mathcal{P}\) 且是这条链的上界。</p>
+
+<p>由 Zorn, 存在<em>极大元</em> \((N^*, F) \in \mathcal{P}\)。我们要证 \(N^* = X\)。如果不, 取 \(v \in X \setminus N^*\), 由一维延拓引理 (13.2), \(F\) 可延拓到 \(N^* \oplus \mathbb{R} v\) 保支配, 这给出严格更大的元素, 与极大性矛盾。所以 \(N^* = X\), \(F\) 是要找的延拓。\(\square\)</p>
+
+<p>请你停一下意识到 Zorn 的角色。它把"<em>一维一维延拓</em>" 整合成"<em>一次性延拓到全空间</em>"。<em>不可数</em> 维的空间也通用——这是 Zorn 的力量。代价: Zorn 等价于选择公理, 有"非构造" 的味道——你证明了 \(F\) 存在, 但没有给出 \(F\) 的<em>显式</em>构造。这是 Hahn-Banach 跟 UBP/OMT/CGT 不同的地方: 那三条原理给的"<em>存在性</em>" 都是 Baire 给的, Baire 本身在 ZF 里也是"半构造" 的, 但 Hahn-Banach 用 Zorn 更"<em>非构造</em>"。</p>
+
+<p>历史上 Hahn (1927) 和 Banach (1929) 独立证了这条定理, 都用了某种形式的 Zorn (当时叫"<em>超穷归纳</em>")。他们在意的是<em>对偶空间足够大</em> 这件事——这是他们要让 \(X^*\) 真正成为有用对象的根源。</p>
+
+<h2 id="sec13-5">13.5 复数情形 (实部 / 虚部技巧)</h2>
+
+<p>很多应用 (Fourier 分析、量子力学、复 Banach 代数) 用复数域。Hahn-Banach 在复数情形怎么写? 答案是同样的, 但要做一点"<em>实部 / 虚部</em>" 的技巧。</p>
+
+<p><strong>定理 13.3 (Hahn-Banach, 复)</strong>. 设 \(X\) 是<em>复</em> 向量空间, \(p : X \to \mathbb{R}\) 是<em>半范</em>——即满足:</p>
+
+<ul>
+  <li>(i) \(p(\lambda x) = |\lambda| p(x)\) 对所有 \(\lambda \in \mathbb{C}\) 与 \(x\) (注意是 \(|\lambda|\), 不是 \(\lambda\));</li>
+  <li>(ii) \(p(x + y) \le p(x) + p(y)\)。</li>
+</ul>
+
+<p>(半范比次线性强一点——它要求<em>任何</em> 复标量都用 \(|\cdot|\) 提出, 包括负数和复数。范数是半范的特例。) 设 \(M\) 复线性子空间, \(f : M \to \mathbb{C}\) 复线性, \(|f(x)| \le p(x)\) 对所有 \(x \in M\)。则存在复线性 \(F : X \to \mathbb{C}\), \(F|_M = f\), \(|F(x)| \le p(x)\) 对所有 \(x\)。</p>
+
+<p><strong>证明 (Bohnenblust-Sobczyk 1938)</strong>。把复数情形<em>归约</em> 为实数情形, 用"实部 / 虚部技巧":</p>
+
+<p><em>步骤 1</em>: 把 \(f\) 拆成实部 + 虚部。\(f(x) = u(x) + i \cdot u'(x)\), 其中 \(u, u' : M \to \mathbb{R}\) 都是实线性 (复线性 \(\Rightarrow\) 实部、虚部各自实线性)。</p>
+
+<p>关键观察: \(f\) 复线性 \(\Rightarrow\) \(f(i x) = i f(x) = i (u(x) + i u'(x)) = -u'(x) + i u(x)\)。同时 \(f(i x) = u(i x) + i u'(i x)\), 取实部得 \(u(i x) = -u'(x)\), 即 \(u'(x) = -u(i x)\)。所以</p>
+
+<p>\[
+f(x) = u(x) - i u(i x).
+\]</p>
+
+<p>\(f\) <em>完全</em> 由它的实部 \(u\) 决定。这是复 \(\to\) 实归约的关键。</p>
+
+<p><em>步骤 2</em>: 把 \(X\) 视为<em>实</em> 向量空间 (忘记复结构, 只保留实标量)。\(M\) 也是实子空间。\(u : M \to \mathbb{R}\) 是实线性, 而 \(|u(x)| \le |f(x)| \le p(x)\) (实部不超过模, \(p\) 是半范故实)。所以 \(u \le p\)。由<em>实</em> Hahn-Banach (13.1, 这里 \(p\) 半范 \(\Rightarrow\) 次线性), 存在实线性 \(U : X \to \mathbb{R}\) 延拓 \(u\), 且 \(U \le p\) 在全 \(X\) 上。</p>
+
+<p><em>步骤 3</em>: 反向构造复线性延拓。令 \(F(x) = U(x) - i U(i x)\)。验证 \(F\) 复线性:</p>
+
+<ul>
+  <li>实加性: \(F(x + y) = U(x + y) - i U(i x + i y) = U(x) + U(y) - i (U(i x) + U(i y)) = F(x) + F(y)\)。</li>
+  <li>实数乘: 显然。</li>
+  <li>乘 \(i\): \(F(i x) = U(i x) - i U(-x) = U(i x) + i U(x) = i \cdot (U(x) - i U(i x)) = i F(x)\) (用 \(U\) 实线性, \(U(-x) = -U(x)\))。复线性 \(\Leftrightarrow\) 实线性 + \(F(i x) = i F(x)\), 验证完。</li>
+</ul>
+
+<p>\(F\) 延拓 \(f\): \(F|_M(x) = U(x) - i U(i x) = u(x) - i u(i x) = f(x)\) (因为 \(U\) 在 \(M\) 上等于 \(u\), \(M\) 复子空间故 \(i x \in M\))。</p>
+
+<p>最后<em>保支配</em> \(|F(x)| \le p(x)\)。这是最 tricky 的一步——\(U \le p\) 给的是<em>实部</em> 的支配, 怎么推<em>模</em> 的支配?</p>
+
+<p>设 \(F(x) = r e^{i \theta}\), \(r = |F(x)| \ge 0\)。则 \(e^{-i \theta} F(x) = r\) 是实数。复线性给 \(F(e^{-i \theta} x) = e^{-i \theta} F(x) = r\)。所以 \(F(e^{-i \theta} x) = r\) 是实数, 即 \(U(e^{-i \theta} x) = r\) (因为 \(F\) 实部 = \(U\), \(F\) 虚部 = \(-U(i \cdot)\), 但 \(F(e^{-i\theta} x)\) 是实数所以虚部 \(= 0\), 即 \(F\) 实部 \(= U(e^{-i\theta} x) = r\))。</p>
+
+<p>由 \(U \le p\) 与 \(p\) 半范:</p>
+
+<p>\[
+|F(x)| = r = U(e^{-i \theta} x) \le p(e^{-i \theta} x) = |e^{-i \theta}| p(x) = p(x).
+\]</p>
+
+<p>\(\square\)</p>
+
+<p>请你停下来体会"<em>实部 / 虚部</em>" 这个把戏: 复 Hahn-Banach 不是单独证, 而是把"<em>看成实空间</em>" 用实 Hahn-Banach 给个实部延拓, 再"<em>反推</em>" 复线性。整个论证用到复结构的地方只有一处: 步骤 3 里 \(F(i x) = i F(x)\) 的验证, 还有最后那个 \(e^{-i \theta}\) 旋转技巧。<em>"乘 \(i\) 旋转出实数, 用 \(U\) 估出实数, 旋回去得模"</em>——这个手法叫"<em>极坐标技巧</em>", 是复线性泛函估计的标准动作。</p>
+
+<h2 id="sec13-6">13.6 三条核心推论 (在赋范空间里)</h2>
+
+<p>把 Hahn-Banach 应用到赋范空间, 取 \(p(x) = \|x\|\), 立刻给三条具体推论, 它们是日常使用 Hahn-Banach 的 90% 场景。</p>
+
+<p><strong>推论 13.4 (赋范延拓)</strong>。设 \(X\) 赋范空间, \(M \subset X\) 线性子空间, \(f \in M^* = \mathcal{B}(M, \mathbb{C})\) (\(M\) 上有界线性泛函)。则存在 \(F \in X^*\), \(F|_M = f\), 且 \(\|F\|_{X^*} = \|f\|_{M^*}\)。</p>
+
+<p><strong>证明</strong>。取 \(p(x) = \|f\|_{M^*} \cdot \|x\|\), 这是半范 (复) / 次线性 (实)。在 \(M\) 上 \(|f(x)| \le \|f\|_{M^*} \cdot \|x\| = p(x)\)。由 Hahn-Banach (实/复对应版本) 延拓 \(F\), \(|F(x)| \le p(x) = \|f\|_{M^*} \|x\|\) 即 \(\|F\|_{X^*} \le \|f\|_{M^*}\)。反向 \(\|F\|_{X^*} \ge \|f\|_{M^*}\) 显然 (\(F\) 延拓 \(f\) 不能使范数变小, 因为 \(M\) 上的上确界 \(\le\) \(X\) 上的上确界)。所以 \(\|F\| = \|f\|\)。\(\square\)</p>
+
+<p>这条推论是 Hahn-Banach 在赋范情形<em>最常用</em> 的形式: <em>子空间上的有界泛函可以保范数延拓到全空间</em>。下面两条都是它的特殊化。</p>
+
+<p><strong>推论 13.5 (看见每个 \(x\), 即"识别")</strong>。设 \(X\) 赋范空间, \(x_0 \in X\), \(x_0 \neq 0\)。则存在 \(\varphi \in X^*\) 使 \(\|\varphi\| = 1\) 且 \(\varphi(x_0) = \|x_0\|\)。</p>
+
+<p><strong>证明</strong>。在一维子空间 \(M = \mathbb{C} x_0\) 上 (复情形, 实情形类似) 定义 \(f(\lambda x_0) = \lambda \|x_0\|\)。这是线性, 且</p>
+
+<p>\[
+|f(\lambda x_0)| = |\lambda| \|x_0\| = \|\lambda x_0\|,
+\]</p>
+
+<p>所以 \(\|f\|_{M^*} = 1\), 同时 \(f(x_0) = \|x_0\|\)。由 13.4, 延拓到 \(\varphi \in X^*\), \(\|\varphi\| = 1\), \(\varphi(x_0) = \|x_0\|\)。\(\square\)</p>
+
+<p>这条推论给出"<em>对偶式范数公式</em>":</p>
+
+<p>\[
+\|x\| = \sup_{\|\varphi\| \le 1} |\varphi(x)| = \max_{\|\varphi\| \le 1} |\varphi(x)|.
+\]</p>
+
+<p>(\(\sup\) 由 \(|\varphi(x)| \le \|\varphi\| \|x\| \le \|x\|\); \(\sup\) 达到由 13.5 给的特定 \(\varphi\), 故 \(\sup = \max\)。) 这个公式让我们能把"<em>计算 \(x\) 的范数</em>" 转化为"<em>对所有 \(\varphi\) 取上确界</em>"——这种转化在估计、对偶、弱收敛 (<a href="ch17.html">第 17 章</a>) 里反复用到。</p>
+
+<p>另外, 13.5 也给出"<em>分点</em>" 的能力: 两个不同向量 \(x, y\), 取 \(z = x - y \neq 0\), 由 13.5 存在 \(\varphi\) 使 \(\varphi(z) = \|z\| > 0\), 即 \(\varphi(x) - \varphi(y) > 0\), 特别 \(\varphi(x) \neq \varphi(y)\)。<em>"对偶空间足够大, 能区分任意两个不同向量"</em>。</p>
+
+<p><strong>推论 13.6 (闭子空间识别)</strong>. 设 \(X\) 赋范, \(M \subset X\) 线性子空间, \(x_0 \in X\) 满足</p>
+
+<p>\[
+d := \mathrm{dist}(x_0, M) = \inf_{m \in M} \|x_0 - m\| > 0
+\]</p>
+
+<p>(即 \(x_0 \notin \overline{M}\))。则存在 \(\varphi \in X^*\) 使</p>
+
+<ul>
+  <li>(a) \(\varphi|_M = 0\) (湮没 \(M\));</li>
+  <li>(b) \(\varphi(x_0) = d\);</li>
+  <li>(c) \(\|\varphi\| = 1\)。</li>
+</ul>
+
+<p><strong>证明</strong>。在子空间 \(M' = M \oplus \mathbb{C} x_0\) 上 (注意 \(x_0 \notin M\) 由 \(d > 0\) 保证, 所以这是真"加" 一维) 定义</p>
+
+<p>\[
+f(m + \lambda x_0) = \lambda d, \quad m \in M, \lambda \in \mathbb{C}.
+\]</p>
+
+<p>这条定义良好 (因为分解 \(m + \lambda x_0\) 是唯一的, 由 \(M' = M \oplus \mathbb{C} x_0\) 的直和性) 且线性。\(f|_M = 0\) (取 \(\lambda = 0\)), \(f(x_0) = d\) (取 \(m = 0, \lambda = 1\))。</p>
+
+<p>估范数: 对 \(\lambda \neq 0\),</p>
+
+<p>\[
+\frac{|f(m + \lambda x_0)|}{\|m + \lambda x_0\|} = \frac{|\lambda| d}{\|m + \lambda x_0\|} = \frac{d}{\|m/\lambda + x_0\|} \le \frac{d}{d} = 1
+\]</p>
+
+<p>(用 \(\|m/\lambda + x_0\| = \|x_0 - (-m/\lambda)\| \ge \mathrm{dist}(x_0, M) = d\), 因为 \(-m/\lambda \in M\))。所以 \(\|f\|_{M'^*} \le 1\)。</p>
+
+<p>反向: 取 \(m_n \in M\) 使 \(\|x_0 - m_n\| \to d\), 则</p>
+
+<p>\[
+\frac{|f(-m_n + x_0)|}{\|-m_n + x_0\|} = \frac{d}{\|x_0 - m_n\|} \to 1.
+\]</p>
+
+<p>所以 \(\|f\|_{M'^*} = 1\)。</p>
+
+<p>由 13.4 延拓 \(f\) 到 \(\varphi \in X^*\), \(\|\varphi\| = 1\), 且 \(\varphi|_M = 0, \varphi(x_0) = d\)。\(\square\)</p>
+
+<p>这条推论是"<em>闭子空间识别</em>" 的核心: <em>\(x_0 \notin \overline{M}\) 等价于存在湮没 \(M\) 但不湮没 \(x_0\) 的连续泛函</em>。它的逆否更直观: <em>\(x_0 \in \overline{M}\) 等价于"任何湮没 \(M\) 的泛函都湮没 \(x_0\)"</em>——这是经典的"<em>湮没条件</em>"。</p>
+
+<p>这条推论在多个场合用到:</p>
+
+<ul>
+  <li><em>稠密性测试</em>: \(M\) 在 \(X\) 中稠密 \(\Leftrightarrow\) \(\overline{M} = X\) \(\Leftrightarrow\) 唯一湮没 \(M\) 的连续泛函是 \(0\)。Weierstrass 逼近 (\(\mathcal{P}\) 在 \(C[0,1]\) 稠密) 的<em>另一个证</em> 是: 假设 \(\varphi \in C[0,1]^*\) 湮没所有多项式, 表示 \(\varphi\) 为 Riesz-Markov 测度 \(\mu\), 由<em>矩问题</em> 论证 \(\mu = 0\)。</li>
+  <li><em>核 / 像的对偶</em>: 算子 \(T : X \to Y\) 的<em>像</em> \(T(X)\) 在 \(Y\) 中稠密 \(\Leftrightarrow\) 对偶算子 \(T^* : Y^* \to X^*\) 是单射 (\(T^* \varphi = 0 \Leftrightarrow \varphi \circ T = 0 \Leftrightarrow \varphi\) 湮没 \(T(X)\) \(\Leftrightarrow\) \(\varphi = 0\) 由 13.6)。这是<a href="ch15.html">第 15 章</a>对偶论的基础。</li>
+  <li><em>商空间嵌入</em>: \(X / M\) 的元素 \([x_0]\) 非零 \(\Leftrightarrow\) \(x_0 \notin M\), 在 \(M\) 闭时 \(\Leftrightarrow\) 存在湮没 \(M\) 的连续泛函在 \(x_0\) 上非零。这是商空间对偶 \((X/M)^* \cong M^\perp\) (湮没 \(M\) 的泛函集合) 的根源。</li>
+</ul>
+
+<h2 id="sec13-7">13.7 总结：Hahn-Banach 的"形状" + 三大原理总览</h2>
+
+<p>这一章你看到了 Hahn-Banach 解析形式的<em>形状</em>:</p>
+
+<p><em>核心机制</em>: <strong>一维延拓 + Zorn 升级</strong>。一维引理是真正"难" 的步骤 (用 \(p\) 的次加性闭合一条不等式), Zorn 把它"<em>叠</em>" 到全空间。</p>
+
+<p><em>风味跟前两章不同</em>: 不用 Baire, 不需要完备 (赋范空间够, 不必 Banach)。它用<em>选择公理</em>。</p>
+
+<p><em>核心后果</em>: <strong>对偶空间 \(X^*\) 足够大</strong>——能"看见" 每一个非零向量、能"识别" 每一对不同向量、能"分离" 闭子空间外的点。这三件事是<em>对偶论</em> 的全部根基。</p>
+
+<p>到这里, 我们已经看完了三大原理的全部:</p>
+
+<ul>
+  <li><strong>第 11 章 UBP</strong>: 逐点有界 \(\Rightarrow\) 一致有界 (Baire 给"含开球", 线性升级)。</li>
+  <li><strong>第 12 章 OMT/CGT</strong>: 满射 \(\Rightarrow\) 开映射; 图像闭 \(\Rightarrow\) 算子有界 (Baire + 几何级数)。</li>
+  <li><strong>第 13 章 Hahn-Banach (解析)</strong>: 子空间泛函 \(\Rightarrow\) 全空间延拓 (Zorn + 一维核心引理)。</li>
+</ul>
+
+<p>它们一起构成 Banach 空间论的"<em>三块基石</em>"。前两条让"<em>代数等式自动升级为拓扑等式</em>"; 第三条让"<em>对偶论可用</em>"。这本书后面所有的"高定理"——Riesz 表示 (ch16)、Banach-Alaoglu (ch18)、谱定理 (ch21)、Sobolev 嵌入 (ch23)——都<em>不可避免地</em> 用到这三大原理之一。</p>
+
+<p>下一章 (<a href="ch14.html">第 14 章</a>) 我们做 Hahn-Banach 的<em>几何形式</em>: 把"延拓泛函" 翻译成"分离凸集 / 分离超平面"。这是同一条定理的几何视角, 它是凸分析、最优化、变分方法的语言基础。准备好。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 开映射 + 闭图像定理</a><a href="ch14.html">下一章 · 第 14 章 Hahn-Banach 几何形式 →</a></nav>
 </main>
 </body>
 </html>

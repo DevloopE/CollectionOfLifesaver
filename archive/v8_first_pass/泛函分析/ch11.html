@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 一致有界原理（Banach–Steinhaus）— 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 Baire 范畴定理</a><a href="ch12.html">下一章 · 第 12 章 开映射定理与闭图像定理 →</a></nav>
+<h1 id="ch11">第 11 章 一致有界原理（Banach–Steinhaus）</h1>
+
+<p>这是泛函分析"三大原理"的第一条。它的核心陈述非常出乎意料：<strong>给一族算子 \(\{T_\alpha\}\)，如果对每个 \(x\) 它们的值 \(\{T_\alpha x\}\) 在 \(Y\) 中有界（"逐点有界"），那么这一族算子的<em>算子范数</em>本身也有界（"一致有界"）</strong>。</p>
+
+<p>这件事的不平凡之处在于：你给的<em>条件</em>是逐点的——对每一个 \(x\) 单独地说"\(\sup_\alpha \|T_\alpha x\| < \infty\)"，<em>不</em>要求这个上界对 \(x\) 一致。但<em>结论</em>是一致的——\(\sup_\alpha \|T_\alpha\| < \infty\)。从"逐点"自动升级到"一致"，这就是 Banach–Steinhaus 的魔术，也是 Baire 在算子论里的第一次大显身手。</p>
+
+<ul>
+  <li>正式陈述定理 + 完整证明（用 Baire 锁定一个有界吸收点）。</li>
+  <li>把"逐点有界 \(\Rightarrow\) 一致有界"翻译成几个等价的常用表述。</li>
+  <li>"反向版本" Banach–Steinhaus：如果一族算子<em>不</em>一致有界，那存在某个 \(x\) 使 \(\sup \|T_\alpha x\| = \infty\)——这种 \(x\) 在 \(X\) 中"很多"。</li>
+  <li>典型应用：Fourier 级数在某点发散的连续函数存在（du Bois-Reymond 反例的 Banach–Steinhaus 证法）。</li>
+  <li>典型应用：算子序列强收敛 \(\Rightarrow\) 算子范数一致有界（这是定义"算子序列收敛极限"时反复用的"自动有界"）。</li>
+  <li>陷阱与边界：Banach–Steinhaus 要求<em>定义域</em>是 Banach 空间，目标空间只需赋范。失去定义域完备就崩。</li>
+</ul>
+
+<h2 id="sec11-1">11.1 陈述</h2>
+
+<p><strong>定理（Banach–Steinhaus / 一致有界原理）。</strong>设 \(X\) 是 Banach 空间，\(Y\) 是赋范空间。设 \(\{T_\alpha\}_{\alpha \in I}\) 是 \(\mathcal{B}(X, Y)\) 中一族（不必可数）有界算子。如果对每个 \(x \in X\)，</p>
+
+<p>\[
+\sup_\alpha \|T_\alpha x\|_Y < \infty,
+\]</p>
+
+<p>那么</p>
+
+<p>\[
+\boxed{\ \sup_\alpha \|T_\alpha\| < \infty.\ }
+\]</p>
+
+<p>"逐点有界 \(\Rightarrow\) 一致有界"——这是这条定理最常用的速记。</p>
+
+<h2 id="sec11-2">11.2 证明</h2>
+
+<p>对每个 \(n \in \mathbb{N}\)，定义</p>
+
+<p>\[
+F_n = \{x \in X : \sup_\alpha \|T_\alpha x\|_Y \le n\} = \bigcap_\alpha \{x : \|T_\alpha x\|_Y \le n\}.
+\]</p>
+
+<p>每个 \(\{x : \|T_\alpha x\|_Y \le n\}\) 是闭集（连续函数 \(x \mapsto \|T_\alpha x\|_Y\) 的逆像 \([0, n]\)）。任意交闭集是闭，所以 \(F_n\) 是闭集。</p>
+
+<p>由前提"对每个 \(x\) \(\sup_\alpha \|T_\alpha x\| < \infty\)"，每个 \(x\) 都属于某个 \(F_n\)。所以 \(X = \bigcup_{n=1}^\infty F_n\)。</p>
+
+<p>\(X\) 完备 \(\Rightarrow\) Baire \(\Rightarrow\) \(X\) 不是第一范畴 \(\Rightarrow\) 至少有一个 \(F_{n_0}\) <em>不</em>无处稠密 \(\Rightarrow\) \(F_{n_0}\) 内部非空 \(\Rightarrow\) 存在球 \(B(x_0, r) \subset F_{n_0}\)。</p>
+
+<p>这个结论是关键。它说：在 \(F_{n_0}\) 里能找到一个开球。换言之，对所有 \(\|y - x_0\| < r\)，</p>
+
+<p>\[
+\sup_\alpha \|T_\alpha y\|_Y \le n_0.
+\]</p>
+
+<p>现在用线性 + 平移把"一个球上的有界"升级到"全空间一致有界"。对任意 \(z \in X\) 与 \(\|z\| < r\)，把 \(z = (z + x_0) - x_0\)，每个 \(T_\alpha z = T_\alpha(z + x_0) - T_\alpha(x_0)\)。\(\|z + x_0 - x_0\| = \|z\| < r \Rightarrow z + x_0 \in B(x_0, r) \subset F_{n_0}\)，所以 \(\|T_\alpha(z + x_0)\| \le n_0\)。同时 \(\|T_\alpha x_0\| \le n_0\)。所以</p>
+
+<p>\[
+\|T_\alpha z\| \le \|T_\alpha (z + x_0)\| + \|T_\alpha x_0\| \le 2 n_0, \quad \forall \|z\| < r.
+\]</p>
+
+<p>对一般 \(x \neq 0\)，令 \(z = (r/2) x / \|x\|\)（\(\|z\| = r/2 < r\)）：</p>
+
+<p>\[
+\|T_\alpha x\| = \frac{2 \|x\|}{r} \|T_\alpha z\| \le \frac{2 \|x\|}{r} \cdot 2 n_0 = \frac{4 n_0}{r} \|x\|.
+\]</p>
+
+<p>所以 \(\|T_\alpha\| \le 4 n_0 / r\) 对所有 \(\alpha\)。一致有界。结束。</p>
+
+<p>这条证明把 Baire 用得很彻底。请注意：定理对<em>任意指标集</em> \(I\) 都成立——可数无穷、不可数都可以。这是因为 \(F_n\) 的定义里 "\(\sup_\alpha\)" 不需要可数性。</p>
+
+<h2 id="sec11-3">11.3 等价表述与三种用法</h2>
+
+<p><strong>表述 (UB1)：经典版。</strong>已陈述。</p>
+
+<p><strong>表述 (UB2)：序列版。</strong>设 \(X\) Banach、\(Y\) 赋范、\(\{T_n\} \subset \mathcal{B}(X, Y)\)。如果对每个 \(x\) 序列 \(\{T_n x\}\) 在 \(Y\) 中有界，则 \(\sup_n \|T_n\| < \infty\)。</p>
+
+<p><strong>表述 (UB3)：强收敛版（最常用！）。</strong>设 \(X\) Banach、\(Y\) 赋范、\(\{T_n\} \subset \mathcal{B}(X, Y)\)。如果 \(T_n \to T\) 强收敛（即对每个 \(x\)，\(T_n x \to T x\)），那么：</p>
+
+<ul>
+  <li>\(T\) 是有界线性算子；</li>
+  <li>\(\sup_n \|T_n\| < \infty\)；</li>
+  <li>\(\|T\| \le \liminf_n \|T_n\|\)。</li>
+</ul>
+
+<p>这条 (UB3) 几乎在每一次"算子序列强收敛"的论证里出现——它告诉你强极限不仅<em>存在</em>而且<em>有界</em>，并且范数被序列范数控制。这是为什么"强收敛"在分析里这么好用的根本原因。</p>
+
+<p>(UB3) 的证明很短：强收敛 \(\Rightarrow\) 每个 \(\{T_n x\}\) 收敛 \(\Rightarrow\) 有界 \(\Rightarrow\) 由 (UB2) \(\sup \|T_n\| < \infty\)。然后线性性 + 范数下半连续给 \(\|T\| \le \liminf \|T_n\|\)。</p>
+
+<h2 id="sec11-4">11.4 反向版本：发散点的存在性</h2>
+
+<p>Banach–Steinhaus 也常以"反向"形式出现：</p>
+
+<p><strong>定理（共鸣定理 / Banach–Steinhaus 反向）。</strong>设 \(X\) Banach、\(Y\) 赋范、\(\{T_\alpha\}\) 一族算子。如果 \(\sup_\alpha \|T_\alpha\| = \infty\)，那么存在 \(x \in X\) 使 \(\sup_\alpha \|T_\alpha x\| = \infty\)。事实上这种 \(x\) 在 \(X\) 中是一个稠密的 \(G_\delta\) 子集（即 "几乎所有 \(x\)" 都是发散点）。</p>
+
+<p>证明：定义 \(F_n = \{x : \sup_\alpha \|T_\alpha x\| \le n\}\) 闭。如果<em>不</em>存在发散 \(x\)，则 \(X = \bigcup F_n\)。Baire 给某个 \(F_{n_0}\) 含开球，沿前一节论证得 \(\sup \|T_\alpha\| < \infty\)，矛盾。所以发散 \(x\) 存在。"稠密 \(G_\delta\)"是因为"发散 \(x\)"\(= X \setminus \bigcup F_n =\) 可数个开稠集 \((F_n^c)\) 的交。</p>
+
+<p>这个反向版本的实际意思：<strong>如果你能算出一族算子的范数序列发散，那么"对绝大多数初始条件，结果会爆炸"</strong>。这种"几乎所有点都坏"的存在性结论非常强大。</p>
+
+<h2 id="sec11-5">11.5 应用：Fourier 级数在某点发散的连续函数</h2>
+
+<p>这是一个历史名作，1873 年 du Bois-Reymond 用复杂构造给出。50 年后 Banach 与 Steinhaus 用一致有界原理三行证完。这里给完整的现代版。</p>
+
+<p><strong>定理。</strong>存在 \(f \in C(\mathbb{T})\)（\(\mathbb{T} = [-\pi, \pi]\) 周期连续函数），使其 Fourier 级数在 \(x = 0\) 发散。事实上这种 \(f\) 在 \(C(\mathbb{T})\) 中构成稠密 \(G_\delta\)。</p>
+
+<p>证明：在 Banach 空间 \(C(\mathbb{T})\)（sup-范数）上定义线性泛函</p>
+
+<p>\[
+T_n(f) = S_n f(0) = \int_{-\pi}^\pi f(t) D_n(t) \, dt,
+\]</p>
+
+<p>其中 \(D_n(t) = \frac{\sin((n + 1/2) t)}{2\pi \sin(t/2)}\) 是<strong>Dirichlet 核</strong>。</p>
+
+<p>每个 \(T_n\) 是 \(C(\mathbb{T})^* \to \mathbb{R}\) 的有界线性泛函（积分对 \(L^\infty\) 函数 \(D_n\) 配 sup-范数 \(f\)）。</p>
+
+<p>核心估计：算子范数</p>
+
+<p>\[
+\|T_n\| = \int_{-\pi}^\pi |D_n(t)| \, dt =: L_n,
+\]</p>
+
+<p>其中 \(L_n\) 是<strong>Lebesgue 常数</strong>。已知 \(L_n \sim (4/\pi^2) \log n \to \infty\)（详细在<a href="../偏微分方程/ch5.html">偏微分方程读本第 5 章</a>调和分析速查里有）。</p>
+
+<p>所以 \(\sup_n \|T_n\| = \infty\)。由 Banach–Steinhaus 反向版，存在 \(f \in C(\mathbb{T})\) 使 \(\sup_n |T_n(f)| = \sup_n |S_n f(0)| = \infty\)，即 \(S_n f(0)\) 发散。事实上这种 \(f\) 在 \(C(\mathbb{T})\) 中稠密 \(G_\delta\)。</p>
+
+<p>\[
+\boxed{\ \text{大多数连续周期函数的 Fourier 级数在每个固定点发散。}\ }
+\]</p>
+
+<p>这就是为什么 Fourier 级数的"<em>逐点</em>收敛"是个非常微妙的话题——它不是常态而是例外。<a href="../偏微分方程/index.html">偏微分方程读本</a>里反复绕开"逐点收敛"用 Cesàro 平均、Abel 求和、\(L^2\) 收敛，根本理由就在这里。</p>
+
+<h2 id="sec11-6">11.6 应用：双线性对称形式与算子的等价</h2>
+
+<p>另一组常见应用：把"双线性形式有界"翻译成"对应算子有界"。</p>
+
+<p>设 \(B : X \times Y \to \mathbb{K}\) 是双线性的。如果对每个 \(x\)，\(y \mapsto B(x, y)\) 是 \(Y\) 上的有界线性泛函；同时对每个 \(y\)，\(x \mapsto B(x, y)\) 是 \(X\) 上的有界线性泛函。那么这种"分别有界"<em>是否</em>足以保证联合有界 \(|B(x, y)| \le C \|x\| \|y\|\)？</p>
+
+<p><strong>定理。</strong>若 \(X\) 与 \(Y\) 都是 Banach 空间，则答案<em>是</em>：分别有界 \(\Rightarrow\) 联合有界。</p>
+
+<p>证明：对每个 \(x\)，\(B(x, \cdot) \in Y^*\)。把它当成 \(X\) 中算子族 \(\{B(\cdot, y) : \|y\| \le 1\}\)（每个 \(y\) 给一个 \(X\) 上的有界线性泛函）。由"对每个 \(x\)" \(\sup_{\|y\| \le 1} |B(x, y)| = \|B(x, \cdot)\|_{Y^*} < \infty\)（每个 \(B(x, \cdot)\) 是有界泛函的事实）。Banach–Steinhaus \(\Rightarrow\) \(\sup_{\|y\| \le 1} \sup_{\|x\| \le 1} |B(x, y)| < \infty\) 即 \(|B(x, y)| \le C \|x\| \|y\|\)。</p>
+
+<p>这条推论在变分法、PDE 的弱形式里非常常用——Lax–Milgram 定理（第 23 章）的前提"双线性形式有界"在很多场合就是用这种"分别有界 \(\Rightarrow\) 联合有界"先验证的。</p>
+
+<p>本章把"逐点 \(\to\) 一致"这个升级机制讲完。下一章我们要讲第二条原理：开映射定理。它要回答的问题正好对偶——给一个有界<em>满射</em>线性算子，它的逆<em>是否</em>也有界？这件事在有限维一定成立（满射 \(\Leftrightarrow\) 双射 \(\Leftrightarrow\) 矩阵可逆 \(\Rightarrow\) 逆矩阵有界），在无穷维则是个真定理。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 Baire 范畴定理</a><a href="ch12.html">下一章 · 第 12 章 开映射定理与闭图像定理 →</a></nav>
+</main>
+</body>
+</html>

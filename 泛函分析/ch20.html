@@ -32,150 +32,283 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 自反空间与一致凸</a><a href="ch21.html">下一章 · 第 21 章 紧自伴算子的谱定理 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 弱*紧致与可分性</a><a href="ch21.html">下一章 · 第 21 章 紧自伴算子谱定理 →</a></nav>
 <h1 id="ch20">第 20 章 紧算子</h1>
 
-<p>有限维世界里"线性代数"工作得那么顺，是因为<em>有限维线性算子的"输出维数有限"</em>。换到无穷维，一般有界算子可以"维持无穷自由度"，所以谱可能连续、可逆性微妙、对角化失败。但有一类特殊的算子在无穷维里仍然非常"接近有限维"——它们把有界集映成<em>相对紧</em>集，等价于它们的"有效自由度"是有限的。这就是<strong>紧算子</strong>。</p>
+<p>请你回想一道有限维线性代数的考试题。给一个 \(n \times n\) 实方阵 \(A\)，问"\(A\) 的特征值有几个"。答案干脆——<em>最多 \(n\) 个</em>。每个还是个具体的数（\(\det(A - \lambda I) = 0\) 的根）。"特征向量构成一组正交基" 在对称情况自动成立。"算 \(A^{-1}\) 把单位向量拉成什么形状" 给一个椭球——奇异值就是椭球半轴长。</p>
 
-<p>紧算子的重要性怎么强调都不过分。它们是分析里"几乎所有谱可计算"的算子类，是 Fredholm 选择性（第 22 章）的主角，是积分方程理论的核心，也是量子力学里"逆-有限维"算子（如 \((H + 1)^{-1}\)）的标准形态。本章把紧算子的定义、基本性质、经典例子、谱结构整理清楚，为下一章紧自伴谱定理做准备。</p>
+<p>这一切的<em>共同源头</em>是一句话：\(A\) 把整个 \(\mathbb{R}^n\) <em>映到一个 \(n\) 维空间</em>。输出维数有限。所以输出空间里"有界 + 闭 ⟹ 紧" 自动可用，所以从输出抽收敛子序列总是可以的，所以"有限维线性代数那一整套" 都顺。</p>
 
-<ul>
-  <li>紧算子定义：把单位球（更一般地，有界集）映成<em>相对紧</em>集。</li>
-  <li>等价定义：把任意有界序列的像有强收敛子序列。</li>
-  <li>紧算子的代数性质：紧算子集 \(\mathcal{K}(X)\) 是 \(\mathcal{B}(X)\) 的<em>闭双侧理想</em>。</li>
-  <li>有限秩算子是紧算子的"原型"——紧算子在 Hilbert 空间上是有限秩算子的范数极限。</li>
-  <li>四类经典紧算子：积分算子、Hilbert–Schmidt、有限秩、对角算子（在 \(\ell^2\) 上）。</li>
-  <li>紧算子的谱：最多可数特征值，唯一聚点是 0。</li>
-</ul>
+<p>到了无穷维，<em>一般</em> 有界算子 \(T : H \to H\)（\(H\) 是 Hilbert）<em>不</em>满足这条。它的像 \(T(B(0, 1))\) 仍然是无穷维空间的子集——里面的有界序列<em>不</em>必有收敛子序列（<a href="ch1.html#sec1-1">第 1 章 1.1 节</a>已演过这场崩塌）。所以恒等算子 \(I : \ell^2 \to \ell^2\) 把单位球<em>原样</em> 送出去——单位球本身就不紧。</p>
 
-<h2 id="sec20-1">20.1 紧算子的定义与等价</h2>
+<p>但有一类算子<em>反常温和</em>。它们虽然作用在无穷维空间上，<em>把有界集映成相对紧集</em>——仿佛把无穷维"压回了" 有限维。这种"把无穷维压回有限维" 的特性使整套有限维直觉<em>大部分</em> 复活——可逆性的微妙、谱的离散化、Fredholm 选择性，全部因这类算子才成立。</p>
 
-<p>设 \(X, Y\) 是 Banach 空间。\(T \in \mathcal{B}(X, Y)\) 称为<strong>紧</strong>算子，如果 \(T\) 把 \(X\) 中的有界集映成 \(Y\) 中的<em>相对紧</em>（precompact / relatively compact）集——即闭包紧。</p>
+<p>这类算子叫<em>紧算子</em>。它们是后面三章（谱论、Fredholm 选择性、PDE 弱解）的中心人物。这一章把它们正式定义、给出操作性的等价刻画、证它们构成 \(\mathcal{B}(X)\) 的闭双侧理想、给四类标准例子，最后展示一条核心工具：紧算子把<em>弱</em> 收敛升级成<em>强</em> 收敛。这条工具是后面所有应用的心脏。</p>
 
-<p>等价地：</p>
+<h2 id="sec20-1">20.1 紧算子的定义与等价刻画</h2>
 
-<p><strong>(K1) 球版：</strong>\(\overline{T(B_X(0, 1))}\) 在 \(Y\) 中紧。</p>
+<p>设 \(X, Y\) 是 Banach 空间，\(T : X \to Y\) 线性。回忆一下"<em>相对紧</em>"——子集 \(K \subset Y\) 相对紧是说 \(\overline{K}\) 紧。</p>
 
-<p><strong>(K2) 序列版：</strong>对任意 \(X\) 中有界序列 \(\{x_n\}\)，序列 \(\{T x_n\}\) 在 \(Y\) 中有强收敛子序列。</p>
+<p><strong>定义。</strong>线性算子 \(T : X \to Y\) <em>紧</em>，如果它把 \(X\) 的每个有界集映成 \(Y\) 的<em>相对紧</em> 集——等价地，\(T(\overline{B}(0, 1))\) 在 \(Y\) 中相对紧。</p>
 
-<p>(K1) \(\Leftrightarrow\) (K2) 用 Banach 空间上"紧 \(\iff\) 序列紧"（这是因为 Banach 空间是度量空间）。</p>
+<p>记 \(\mathcal{K}(X, Y) = \{T : X \to Y : T \text{ 紧 + 线性}\}\)，简写 \(\mathcal{K}(X) := \mathcal{K}(X, X)\)。</p>
 
-<p>紧算子集合记为 \(\mathcal{K}(X, Y)\)。当 \(X = Y\) 时简记 \(\mathcal{K}(X)\)。</p>
+<p>请你停下来想一想这个定义的<em>分量</em>。它说"输出是相对紧的"——意味着任何在像里的有界序列<em>必有收敛子序列</em>。这正是有限维线性代数自动有的特性。<em>紧算子是为了把这条特性强行装回无穷维而发明的范畴</em>。</p>
 
-<h2 id="sec20-2">20.2 代数性质：闭双侧理想</h2>
+<p>紧算子<em>自动</em> 有界——\(T(\overline{B}(0,1))\) 紧 ⟹ 有界 ⟹ \(T\) 把单位球映到有界集 ⟹ \(T\) 有界。但反过来不一定（恒等算子 \(I_{\ell^2}\) 有界但不紧——\(I(\overline{B}(0,1)) = \overline{B}(0,1)\) 在 \(\ell^2\) 里不紧）。</p>
 
-<p>\(\mathcal{K}(X, Y)\) 是 \(\mathcal{B}(X, Y)\) 的<em>闭子空间</em>。</p>
+<p>下面给一个<em>序列形式</em> 的等价刻画，实战中比定义还好用。</p>
 
-<p><strong>(A1) 加法 + 数乘：</strong>紧算子的有限和与数乘仍是紧的。证明：用序列定义 (K2) + 对角化抽子序列。</p>
-
-<p><strong>(A2) 复合保紧：</strong>若 \(T \in \mathcal{K}(X, Y)\) 而 \(S \in \mathcal{B}(Y, Z)\) 或 \(S \in \mathcal{B}(W, X)\)，则 \(S T\)、\(T S\) 都是紧的。证明：取有界序列后追踪即可。</p>
-
-<p><strong>(A3) 算子范数闭：</strong>若 \(T_n \in \mathcal{K}(X, Y)\) 且 \(T_n \to T\) 在算子范数下，则 \(T \in \mathcal{K}(X, Y)\)。证明：用对角化论证 + 完备性。这条是紧算子最重要的拓扑性质之一。</p>
-
-<p>把 (A1)、(A2) 合在 \(X = Y\) 时给出</p>
-
-<p>\[
-\boxed{\ \mathcal{K}(X) \text{ 是 } \mathcal{B}(X) \text{ 的闭双侧理想}.\ }
-\]</p>
-
-<p>这条结构性陈述非常深远。它意味着：商代数 \(\mathcal{B}(X) / \mathcal{K}(X)\)（叫做 <strong>Calkin 代数</strong>）是 Banach 代数，是 Fredholm 算子分类的天然舞台（第 22 章）。</p>
-
-<h2 id="sec20-3">20.3 有限秩算子 + Hilbert 空间上紧 \(=\) 有限秩极限</h2>
-
-<p>线性算子 \(T\) 称为<strong>有限秩</strong>，如果 \(\operatorname{Range}(T)\) 是有限维。有限秩算子是最简单的紧算子（有限维子空间的有界集自动相对紧，由 Heine–Borel）。</p>
-
-<p>反之：</p>
-
-<p><strong>定理（紧算子在 Hilbert 空间上是有限秩算子的范数极限）。</strong>设 \(H\) 是 Hilbert 空间，\(T \in \mathcal{K}(H)\)。则存在有限秩算子序列 \(T_n\) 使 \(T_n \to T\) 在算子范数下。</p>
-
-<p>证明思路：取 \(H\) 的可数完备正交基 \(\{e_n\}\)（可分的话）。令 \(P_N\) 是到 \(\operatorname{span}\{e_1, \ldots, e_N\}\) 的正交投影。则 \(T_N = P_N T\) 是有限秩。要证 \(T_N \to T\)：对单位球上 \(x\)，</p>
-
-<p>\[
-\|T x - T_N x\| = \|(I - P_N) T x\| \le \|(I - P_N)\| \cdot \|T x\| \le 2 \|T\|.
-\]</p>
-
-<p>这条估计单独不够紧；用紧性把单位球的像 \(T(B)\) 取相对紧 \(\Rightarrow\) 在 \(\overline{T(B)}\) 上 \(\|(I - P_N) y\| \to 0\) 一致。结束。</p>
-
-<p>这条定理只在 Hilbert 空间上成立。对一般 Banach 空间，"紧 = 有限秩范数极限"是 Per Enflo 1973 才解决的开放问题——他给了一个反例 Banach 空间上紧算子<em>不能</em>用有限秩逼近。这个例子的发现是 20 世纪泛函分析的标志性事件。</p>
-
-<p>在本书的"日常使用"上你只需要记住：<em>Hilbert 空间上紧 = 有限秩范数极限</em>。这条让 Hilbert 空间紧算子分析变得很可控。</p>
-
-<h2 id="sec20-4">20.4 四类经典紧算子</h2>
-
-<p><strong>(C1) 有限秩算子。</strong>已经讲过。</p>
-
-<p><strong>(C2) 积分算子（Fredholm 型）。</strong>设 \(K \in C([0,1]^2)\)。算子</p>
-
-<p>\[
-T_K f(x) = \int_0^1 K(x, y) f(y) \, dy
-\]</p>
-
-<p>把 \(C[0,1]\) 映成 \(C[0,1]\) 是<em>紧</em>的。证明：取 \(C[0,1]\) 单位球内 \(\{f_n\}\)（\(\|f_n\|_\infty \le 1\)）。\(T_K f_n(x)\) 满足：</p>
-
-<ul>
-  <li>一致有界：\(\|T_K f_n\|_\infty \le \int |K(x,y)| dy \cdot 1 \le \|K\|_{\infty, \infty}\)；</li>
-  <li>等度连续：\(K\) 在紧集 \([0,1]^2\) 上一致连续 \(\Rightarrow\) \(|K(x_1, y) - K(x_2, y)| \to 0\) 当 \(|x_1 - x_2| \to 0\) 一致 \(\Rightarrow\) \(|T_K f_n(x_1) - T_K f_n(x_2)| \to 0\) 一致。</li>
-</ul>
-
-<p>由 Arzelà–Ascoli，\(\{T_K f_n\}\) 在 \(C[0,1]\) 中相对紧。结束。</p>
-
-<p>这是 Fredholm 1903 引入"紧算子"概念的原始动机——他研究积分方程 \(f(x) - \lambda \int K(x,y) f(y) dy = g(x)\) 的可解性，发现 \(T_K\) 紧让"可解性"具有有限维线性方程组那种"代数交替性"（Fredholm 选择性，第 22 章）。</p>
-
-<p><strong>(C3) Hilbert–Schmidt 算子。</strong>设 \(K \in L^2([0,1]^2)\)（不要求连续，只要求平方可积）。算子</p>
-
-<p>\[
-T_K f(x) = \int_0^1 K(x, y) f(y) \, dy
-\]</p>
-
-<p>把 \(L^2[0,1]\) 映成 \(L^2[0,1]\) 是<em>紧</em>的。事实上属于一个特殊的紧算子子类——<strong>Hilbert–Schmidt 算子</strong>，定义为：算子的"核函数"在 \(L^2\) 中。</p>
-
-<p>Hilbert–Schmidt 算子有<em>Hilbert–Schmidt 范数</em></p>
-
-<p>\[
-\|T\|_{HS} := \left( \sum_n \|T e_n\|^2 \right)^{1/2} = \|K\|_{L^2([0,1]^2)},
-\]</p>
-
-<p>对任意正交基 \(\{e_n\}\)（这条独立于基的事实是 Parseval）。注意 \(\|T\|_{HS} \ge \|T\|\) 算子范数；HS 算子集合在 HS 范数下又是 Hilbert 空间。</p>
-
-<p>HS 算子是量子力学密度矩阵的标准形态，也是统计学协方差算子的形态。</p>
-
-<p><strong>(C4) 对角算子（\(\ell^2\) 上）。</strong>取序列 \(\{\lambda_n\} \subset \mathbb{C}\)，定义 \(D_\lambda x = (\lambda_n x_n)\)。它有界 \(\iff \sup |\lambda_n| < \infty\)，紧 \(\iff \lambda_n \to 0\)。</p>
-
-<p>这是最简单的"非有限秩紧算子"例子。它的谱就是 \(\{\lambda_n\} \cup \{0\}\)——下面 20.6 节会推广这条直觉到一般紧算子谱。</p>
-
-<h2 id="sec20-5">20.5 紧算子与弱收敛的"翻译机"作用</h2>
-
-<p>紧算子有一个特别有用的性质：</p>
-
-<p><strong>定理（紧算子把弱收敛变强收敛）。</strong>设 \(T \in \mathcal{K}(X, Y)\)，\(x_n \rightharpoonup x\) 在 \(X\) 中弱收敛。则 \(T x_n \to T x\) 在 \(Y\) 中<em>强</em>收敛。</p>
-
-<p>证明思路：首先 \(T x_n \rightharpoonup T x\)（线性 + 弱收敛 + \(T^*\) 有界 \(\Rightarrow\) \(g(T x_n) = T^* g(x_n) \to T^* g(x) = g(T x)\) 对每个 \(g\)）。其次 \(\{x_n\}\) 弱收敛 \(\Rightarrow\) 范数有界（<a href="ch17.html">第 17 章</a> (W3)）。\(T\) 紧 \(\Rightarrow\) \(\{T x_n\}\) 有强收敛子序列，记极限为 \(y\)。由弱极限唯一 \(y = T x\)。再用"每个子序列都有进一步子序列收敛到 \(T x\)"的标准论证给整个序列收敛。结束。</p>
-
-<p>这条性质让紧算子成为"<strong>把弱信息转换成强信息的机器</strong>"。在变分法和 PDE 里它是关键工具——你拿到弱收敛的近似解，对它作用一个紧算子（如 Sobolev 嵌入 \(H^1 \hookrightarrow\hookrightarrow L^2\)，第 23 章），就立即得到强收敛。这是<em>"弱 + 紧嵌入 \(\Rightarrow\) 强"</em>的标准模式，PDE 里反复用。</p>
-
-<h2 id="sec20-6">20.6 紧算子的谱：经典事实预告</h2>
-
-<p>下一章会正式陈述紧自伴算子的谱定理。这里先把一般紧算子（不必自伴）的谱事实总结一下，作为"地图"：</p>
-
-<p><strong>定理（紧算子的谱）。</strong>设 \(T \in \mathcal{K}(X)\)，\(\dim X = \infty\)。则：</p>
+<p><strong>定理（紧算子的序列等价）。</strong>对线性 \(T : X \to Y\)，下面三条等价：</p>
 
 <ol>
-  <li><strong>\(0 \in \sigma(T)\)。</strong>因为如果 \(T\) 可逆，\(I = T \cdot T^{-1}\) 是紧 + 有界的复合 = 紧。但 \(I\) 在无穷维不紧（单位球不紧），矛盾。</li>
-  <li><strong>\(\sigma(T) \setminus \{0\}\) 由<em>特征值</em>组成。</strong>每个非零 \(\lambda \in \sigma(T)\) 都是 \(T\) 的特征值，对应特征空间 \(\ker(T - \lambda I)\) 是有限维。</li>
-  <li><strong>\(\sigma(T)\) 至多可数。</strong>且唯一可能的聚点是 \(0\)。即对每 \(r > 0\)，\(\{\lambda \in \sigma(T) : |\lambda| \ge r\}\) 是有限集。</li>
+  <li>\(T\) 紧。</li>
+  <li>\(T(\overline{B}(0, 1))\) 在 \(Y\) 中相对紧。</li>
+  <li>对每个 \(X\) 中有界序列 \(\{x_n\}\)，\(\{T x_n\}\) 在 \(Y\) 中有<em>收敛</em> 子序列。</li>
 </ol>
 
-<p>这三条是<strong>Riesz–Schauder 定理</strong>。它把紧算子谱完全"离散化"——除了可能在 0 处聚集，谱里的非零部分就是有限多个特征值（在每个圆环里）。</p>
+<p><em>证明。</em>(1) ⟺ (2) 是定义直接给的（紧算子定义里"有界集" 用单位球放缩即得）。(2) ⟹ (3)：\(\{x_n\}\) 有界 ⟹ \(\{T x_n\} \subset T(M \cdot \overline{B}(0,1))\) 在 \(Y\) 中相对紧 ⟹ 抽子列收敛。(3) ⟹ (2)：\(T(\overline{B}(0,1))\) 中任取序列 \(y_n = T x_n\)（\(\|x_n\| \le 1\)），由 (3) 有子列 \(T x_{n_k}\) 收敛 ⟹ 该集合是<em>序列紧</em> 的 ⟹ 在度量空间里等价于紧（有限维同等价，但 \(Y\) 这里是度量空间，所以序列紧 ⟺ 紧自动）。\(\square\)</p>
+
+<p>条件 (3) 是<em>实战形态</em>。每次想证某个 \(T\) 紧，你的开场白就是"取 \(\{x_n\}\) 有界，要从 \(\{T x_n\}\) 抽收敛子列"。这是你后面几章会做几十次的动作。</p>
+
+<h2 id="sec20-2">20.2 \(\mathcal{K}(X)\) 是 \(\mathcal{B}(X)\) 的闭双侧理想</h2>
+
+<p>"<em>闭双侧理想</em>" 是<a href="../线性代数/index.html">线性代数</a>里你见过的代数概念，搬到算子代数 \(\mathcal{B}(X)\) 上：</p>
+
+<ul>
+  <li><em>子空间</em>：紧算子的线性组合还是紧的。</li>
+  <li><em>双侧理想</em>：紧算子<em>左乘 / 右乘</em> 任意有界算子还是紧的。</li>
+  <li><em>闭</em>：紧算子序列在<em>算子范数</em> 下的极限还是紧的。</li>
+</ul>
+
+<p>这条结构定理把紧算子作为一个"<em>稳定族</em>" 钉死——你不会因为做加减乘除就跑出这个族。</p>
+
+<p><strong>定理。</strong>设 \(X\) 是 Banach 空间。\(\mathcal{K}(X)\) 是 \(\mathcal{B}(X)\) 的闭双侧理想：</p>
+
+<ol>
+  <li>\(T_1, T_2 \in \mathcal{K}(X), \alpha \in \mathbb{C} \implies \alpha T_1 + T_2 \in \mathcal{K}(X)\)。</li>
+  <li>\(T \in \mathcal{K}(X), S \in \mathcal{B}(X) \implies S T \in \mathcal{K}(X)\) 且 \(T S \in \mathcal{K}(X)\)。</li>
+  <li>\(T_n \in \mathcal{K}(X), T_n \to T\)（算子范数）\(\implies T \in \mathcal{K}(X)\)。</li>
+</ol>
+
+<p><em>证明。</em></p>
+
+<p><em>(1)</em> 用序列刻画。取有界序列 \(\{x_n\}\)。\(T_1\) 紧 \(\implies\) 抽 \(x_{n_k}^{(1)}\) 使 \(T_1 x_{n_k}^{(1)}\) 收敛。在这子列上 \(T_2\) 紧 \(\implies\) 抽再细子列 \(x_{n_{k_j}}^{(2)}\) 使 \(T_2 x_{n_{k_j}}^{(2)}\) 收敛。两次收敛子列 \(\implies (\alpha T_1 + T_2) x_{n_{k_j}}^{(2)}\) 收敛。</p>
+
+<p><em>(2)</em> \(S T\) 部分：\(\{x_n\}\) 有界 \(\implies T x_{n_k}\) 收敛（\(T\) 紧）\(\implies S T x_{n_k}\) 收敛（\(S\) 连续）。所以 \(S T\) 紧。\(T S\) 部分：\(\{x_n\}\) 有界 \(\implies\{S x_n\}\) 有界（\(S\) 有界）\(\implies T S x_{n_k}\) 收敛（\(T\) 紧）。</p>
+
+<p><em>(3)</em>（这是关键的、不那么显然的）。设 \(T_n \to T\) 算子范数收敛，每个 \(T_n\) 紧。要证 \(T\) 紧。取有界 \(\{x_k\} \subset X\)（\(\|x_k\| \le M\)）。<em>对角线法</em>：</p>
+
+<ul>
+  <li>\(T_1\) 紧 \(\implies\) 抽子列 \(\{x_k^{(1)}\}\) 使 \(T_1 x_k^{(1)}\) 收敛。</li>
+  <li>\(T_2\) 在该子列紧 \(\implies\) 抽再细子列 \(\{x_k^{(2)}\}\) 使 \(T_2 x_k^{(2)}\) 也收敛（且 \(T_1\) 在其上仍收敛）。</li>
+  <li>...</li>
+  <li>对角化 \(y_k := x_k^{(k)}\)：对每个 \(n\)，从某项后 \(T_n y_k\) 收敛。</li>
+</ul>
+
+<p>要证 \(\{T y_k\}\) 是 Cauchy。给 \(\varepsilon > 0\)，选 \(N\) 使 \(\|T - T_N\| < \varepsilon / (3 M)\)。在该子列上 \(\{T_N y_k\}\) Cauchy，选 \(K\) 使 \(j, k \ge K\) 时 \(\|T_N y_j - T_N y_k\| < \varepsilon / 3\)。则</p>
 
 <p>\[
-\boxed{\ \text{紧算子谱} = \{0\} \cup \{\text{至多可数个非零特征值}\}, \text{ 唯一聚点 } 0.\ }
+\|T y_j - T y_k\| \le \|T y_j - T_N y_j\| + \|T_N y_j - T_N y_k\| + \|T_N y_k - T y_k\| < 2 \cdot \frac{\varepsilon}{3M} \cdot M + \frac{\varepsilon}{3} = \varepsilon.
 \]</p>
 
-<p>这件事让紧算子像"有限维矩阵"一样有"特征值的清单"。这是为什么紧算子被叫做"无穷维线性代数的最佳近似类"——它们保留了有限维谱论的几乎所有结构。</p>
+<p>所以 \(\{T y_k\}\) Cauchy，\(Y\) 完备 \(\implies\) 收敛。\(T\) 紧。\(\square\)</p>
 
-<p>下一章要把这条谱定理在<em>自伴</em>紧算子上做完整论证：除了 Riesz–Schauder 给的清单，自伴性还给出"特征向量构成正交基"。这就把矩阵的对角化干干净净地推到了无穷维，是泛函分析最美的结构定理之一。</p>
+<p>请你停下来欣赏这条 <em>(3)</em>——它说"<em>紧算子在算子范数下闭</em>"。这看起来不显然——紧是关于像的拓扑性质，怎么会被算子范数<em>恰好</em> 保住？答案是上面这个 \(\varepsilon / 3\) 论证：<em>用 \(T_N\) 替代 \(T\) 的代价是 \(\|T - T_N\|\)，可以任意小</em>。这是泛函分析里反复出现的"<em>用紧密近似来传递性质</em>" 的典型套路。</p>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 自反空间与一致凸</a><a href="ch21.html">下一章 · 第 21 章 紧自伴算子的谱定理 →</a></nav>
+<p>这条的实际后果：<em>有限秩算子的算子范数极限是紧算子</em>（下一节会用）。这给了构造紧算子的一个标准方法——找一列简单的有限秩算子收敛到目标。</p>
+
+<h2 id="sec20-3">20.3 有限秩 + Hilbert 上紧 = 有限秩范数极限</h2>
+
+<p>"<em>有限秩</em>" 是个很具体的子族：算子的<em>像</em> 是有限维子空间。</p>
+
+<p><strong>定义。</strong>\(T : X \to Y\) <em>有限秩</em>，如果 \(\dim T(X) < \infty\)。记 \(\mathcal{F}(X, Y)\)。</p>
+
+<p>有限秩 \(\implies\) 紧——因为像在有限维空间里"有界 + 闭 ⟹ 紧"（Heine-Borel 在有限维仍然成立）。具体的：\(T \overline{B}(0,1) \subset T(X) \cap (\|T\| \cdot \overline{B})\)，是有限维空间的有界闭集，紧。</p>
+
+<p>反过来呢？<em>每个紧算子都是有限秩的极限吗</em>？这是个微妙问题。</p>
+
+<p><strong>定理（Hilbert 上紧 = 有限秩极限）。</strong>设 \(H\) 是 Hilbert 空间。\(T \in \mathcal{K}(H) \iff T\) 是 \(\mathcal{F}(H)\) 中算子的算子范数极限。</p>
+
+<p><em>证明 ⟸。</em>20.2 节 (3) 给。</p>
+
+<p><em>证明 ⟹。</em>设 \(T\) 紧。要构造一列 \(T_n \in \mathcal{F}(H)\) 使 \(\|T - T_n\| \to 0\)。</p>
+
+<p>\(T \overline{B}(0, 1)\) 相对紧 \(\implies\) <em>完全有界</em>——给任何 \(\varepsilon > 0\) 可被有限多个 \(\varepsilon\)-球覆盖：存在有限点集 \(\{y_1, \ldots, y_N\}\) 使 \(T \overline{B}(0,1) \subset \bigcup_k B(y_k, \varepsilon)\)。</p>
+
+<p>设 \(F_\varepsilon = \mathrm{span}\{y_1, \ldots, y_N\}\)（有限维），\(P_\varepsilon\) 是到 \(F_\varepsilon\) 的<em>正交投影</em>（Hilbert 空间用<a href="ch6.html">第 6 章</a>正交分解定理给）。定义 \(T_\varepsilon := P_\varepsilon T\)——这是有限秩（像 \(\subset F_\varepsilon\)）。</p>
+
+<p>估计 \(\|T - T_\varepsilon\|\)。对 \(\|x\| \le 1\)，存在 \(y_{k(x)}\) 使 \(\|T x - y_{k(x)}\| < \varepsilon\)。又 \(P_\varepsilon\) 是正交投影 \(\implies\) \(\|T x - P_\varepsilon T x\| \le \|T x - y_{k(x)}\| < \varepsilon\)（投影到含 \(y_{k(x)}\) 的子空间，使距离 \(\le\) 到 \(y_{k(x)}\) 的距离）。所以 \(\|T - T_\varepsilon\| \le \varepsilon\)。\(\square\)</p>
+
+<p>\[\boxed{\ \text{Hilbert 上：} T \text{ 紧 } \iff T \text{ 是有限秩的算子范数极限。}\ }\]</p>
+
+<p>这条等价性极方便——证某个 \(T\) 紧时，可以选择"找有限秩列逼近"。</p>
+
+<p><em>Banach 空间不一定如此</em>。1973 年 Enflo 构造出反例：存在 Banach 空间 \(X\) 和紧算子 \(T \in \mathcal{K}(X)\) 不是任何有限秩列的算子范数极限。这个空间不带"<em>逼近性质</em>"（approximation property，简称 AP）——一个深刻的结构性不变量。所有自然空间（\(L^p\)、\(C[a,b]\)、\(\ell^p\) 等）都有 AP，所以实际工作中你几乎不会撞上 Enflo 的反例；但理论上要清楚 Hilbert 上的"紧 = 有限秩极限" 是 Hilbert 内积结构白送的礼物。</p>
+
+<h2 id="sec20-4">20.4 四个标准例子</h2>
+
+<p>抽象定义和等价刻画给完，要看真东西。下面四类紧算子覆盖了这门课大部分应用。</p>
+
+<h3>例 1：有限秩算子（最朴素）</h3>
+
+<p>设 \(\varphi_1, \ldots, \varphi_n \in X^*\)，\(y_1, \ldots, y_n \in Y\)。定义</p>
+
+<p>\[
+T x = \sum_{k=1}^n \varphi_k(x) \cdot y_k.
+\]</p>
+
+<p>像是 \(\mathrm{span}\{y_1, \ldots, y_n\}\)，有限维。\(T\) 紧。</p>
+
+<p>这种"行 = 泛函，列 = 向量" 的形式是有限秩算子的<em>典范形态</em>——任何有限秩算子（在 reflexive 空间上）都能这么写。</p>
+
+<h3>例 2：Fredholm 积分算子</h3>
+
+<p>设 \(K \in C([a, b] \times [a, b])\)（核函数连续）。定义 \(T_K : C[a, b] \to C[a, b]\) 为</p>
+
+<p>\[
+(T_K f)(x) = \int_a^b K(x, y) f(y) \, dy.
+\]</p>
+
+<p>这种算子是 Fredholm 1903 研究积分方程时的中心对象——他证<a href="ch22.html">第 22 章</a>选择性时用的就是这个例子。</p>
+
+<p><em>断言：\(T_K\) 紧。</em></p>
+
+<p><em>证明。</em>设 \(\{f_n\} \subset C[a, b]\) 有界（\(\|f_n\|_\infty \le M\)）。要证 \(\{T_K f_n\}\) 在 sup 范数下有收敛子列。</p>
+
+<p>由 Arzelà-Ascoli 定理（详<a href="ch3.html">第 3 章</a>），只需证 \(\{T_K f_n\}\) <em>一致有界</em> 加<em>等度连续</em>。</p>
+
+<p><em>一致有界。</em>\(|(T_K f_n)(x)| \le \int |K(x, y)| |f_n(y)| dy \le \|K\|_\infty \cdot M \cdot (b - a)\)，与 \(n, x\) 无关。</p>
+
+<p><em>等度连续。</em>\(K\) 在紧集 \([a,b]^2\) 上连续 \(\implies\) 一致连续。给 \(\varepsilon > 0\)，存在 \(\delta > 0\) 使 \(|x - x'| < \delta \implies |K(x, y) - K(x', y)| < \varepsilon / (M(b-a))\)。所以</p>
+
+<p>\[
+|(T_K f_n)(x) - (T_K f_n)(x')| \le \int |K(x,y) - K(x', y)| |f_n(y)| dy < \varepsilon.
+\]</p>
+
+<p>与 \(n\) 无关——等度连续。Arzelà-Ascoli \(\implies\) 抽收敛子列。\(T_K\) 紧。\(\square\)</p>
+
+<p>这个例子告诉你：<em>积分是个"光滑化" 操作</em>——它把 \(C[a,b]\) 的有界集（可以非常颠簸）映成等度连续集（不那么颠簸了）——在等度连续 + 有界 = 紧的逻辑下塑成紧。这是泛函分析里"<em>积分把一切变得更乖</em>" 的最干净体现。</p>
+
+<h3>例 3：Hilbert-Schmidt 算子</h3>
+
+<p>例 2 的 Hilbert 版。设 \((X, \mu)\) 测度空间，\(K \in L^2(X \times X, \mu \otimes \mu)\)。定义 \(T_K : L^2(X) \to L^2(X)\) 为</p>
+
+<p>\[
+(T_K f)(x) = \int_X K(x, y) f(y) \, d\mu(y).
+\]</p>
+
+<p>这是<em>Hilbert-Schmidt 算子</em>。它的关键参数是<em>Hilbert-Schmidt 范数</em></p>
+
+<p>\[
+\|T_K\|_{\mathrm{HS}} := \|K\|_{L^2(X \times X)} = \Big(\iint |K(x, y)|^2 d\mu(x) d\mu(y)\Big)^{1/2}.
+\]</p>
+
+<p>定理：\(\|T_K\| \le \|T_K\|_{\mathrm{HS}}\)（用 Cauchy-Schwarz + Tonelli），所以 \(T_K\) 自动有界；进一步 \(T_K\) <em>紧</em>。</p>
+
+<p><em>证明紧性。</em>分解 \(K\)。设 \(\{e_n\}\) 是 \(L^2(X)\) 的标准正交基。则 \(\{e_n(x) e_m(y)\}_{n, m}\) 是 \(L^2(X \times X)\) 的标准正交基（张量积）。展开</p>
+
+<p>\[
+K(x, y) = \sum_{n, m} c_{nm} e_n(x) e_m(y), \qquad \sum |c_{nm}|^2 = \|K\|_{\mathrm{HS}}^2.
+\]</p>
+
+<p>截断到 \(N \times N\)：</p>
+
+<p>\[
+K_N(x, y) = \sum_{n, m \le N} c_{nm} e_n(x) e_m(y).
+\]</p>
+
+<p>\(T_{K_N}\) 是有限秩（像 \(\subset \mathrm{span}\{e_1, \ldots, e_N\}\)）。\(\|K - K_N\|_{L^2}^2 = \sum_{n > N \text{ or } m > N} |c_{nm}|^2 \to 0\)。所以 \(\|T_K - T_{K_N}\| \le \|K - K_N\|_{L^2} \to 0\)——20.3 节定理给出 \(T_K\) 紧。\(\square\)</p>
+
+<p>Hilbert-Schmidt 算子在 PDE 里出现频率超高——\(-\Delta\) 在有界域上的逆 \((-\Delta)^{-1}\)（带 Dirichlet 边界）就是个 Hilbert-Schmidt 算子，核是 Green 函数（<a href="ch23.html">第 23 章</a>会再展开）。</p>
+
+<h3>例 4：对角算子</h3>
+
+<p>设 \(\{\lambda_n\} \subset \mathbb{C}\) 是有界数列。在 \(\ell^2\) 上定义</p>
+
+<p>\[
+T (x_1, x_2, \ldots) = (\lambda_1 x_1, \lambda_2 x_2, \ldots).
+\]</p>
+
+<p>显然 \(T\) 有界，\(\|T\| = \sup |\lambda_n|\)。</p>
+
+<p><strong>断言：\(T\) 紧 \(\iff \lambda_n \to 0\)。</strong></p>
+
+<p><em>证明 ⟸。</em>设 \(\lambda_n \to 0\)。截断 \(T_N (x_1, \ldots) = (\lambda_1 x_1, \ldots, \lambda_N x_N, 0, 0, \ldots)\) 是有限秩。</p>
+
+<p>\[
+\|T - T_N\| = \sup_{n > N} |\lambda_n| \to 0.
+\]</p>
+
+<p>所以 \(T\) 是有限秩极限——紧。</p>
+
+<p><em>证明 ⟹。</em>反证。设 \(\lambda_n \not\to 0\)，存在 \(\varepsilon > 0\) 与子列 \(\lambda_{n_k}\) 满足 \(|\lambda_{n_k}| \ge \varepsilon\)。看 \(T e_{n_k} = \lambda_{n_k} e_{n_k}\)。\(\{e_{n_k}\}\) 有界（\(\|e_{n_k}\| = 1\)），\(\{T e_{n_k}\}\) 中两个不同元素</p>
+
+<p>\[
+\|T e_{n_k} - T e_{n_j}\|^2 = |\lambda_{n_k}|^2 + |\lambda_{n_j}|^2 \ge 2 \varepsilon^2.
+\]</p>
+
+<p>无 Cauchy 子列 \(\implies\) 不紧。\(\square\)</p>
+
+<p>这个例子是<em>谱论的入门工程</em>——对角算子的特征值就是 \(\{\lambda_n\}\) 本身（\(T e_n = \lambda_n e_n\)）。下一章紧自伴谱定理本质上说"<em>每个紧自伴算子在某组基下都是对角算子，且对角元 \(\to 0\)</em>"。例 4 是那个结论的<em>已经对角化</em> 的版本。</p>
+
+<h2 id="sec20-5">20.5 紧算子把弱收敛变强收敛（关键工具）</h2>
+
+<p>到目前为止，我们看到了紧算子的定义、代数结构、四类例子。下面这条性质是它们在<em>实战</em> 中最常被调用的能力。</p>
+
+<p><strong>定理（紧算子升级弱收敛）。</strong>设 \(X\) 是 Banach，\(T \in \mathcal{K}(X)\)。若 \(x_n \rightharpoonup x\)（弱收敛），则 \(T x_n \to T x\)（强收敛）。</p>
+
+<p>"弱" 收敛回忆：\(x_n \rightharpoonup x \iff \varphi(x_n) \to \varphi(x)\) 对每个 \(\varphi \in X^*\)（详<a href="ch17.html">第 17 章</a>）。它比强收敛<em>弱得多</em>——\(\ell^2\) 标准基 \(e_n \rightharpoonup 0\)（容易验证：每个 \(\varphi \in (\ell^2)^* = \ell^2\) 给 \(\varphi(e_n) = \varphi_n \to 0\)），但 \(e_n\) 不强收敛（范数恒为 1）。</p>
+
+<p>定理说：<em>紧算子把这种"弱但不强" 的尴尬抹平</em>——把 \(e_n \rightharpoonup 0\) 升级成 \(T e_n \to 0\)（强）。</p>
+
+<p><em>证明。</em>反证。假设 \(T x_n \not\to T x\)。存在 \(\varepsilon > 0\) 与子列 \(\{x_{n_k}\}\) 使 \(\|T x_{n_k} - T x\| \ge \varepsilon\)。</p>
+
+<p>弱收敛 \(\implies \{x_n\}\) 有界（一致有界原理推论，<a href="ch12.html">第 12 章</a>）。所以 \(\{x_{n_k}\}\) 有界 \(\implies\) \(T\) 紧 \(\implies\) 抽<em>再细子列</em> \(\{x_{n_{k_j}}\}\) 使 \(T x_{n_{k_j}} \to z\)（强）某 \(z\)。</p>
+
+<p>另一方面 \(x_{n_{k_j}} \rightharpoonup x\) \(\implies T\) 弱连续（有界算子自动弱连续：\(\varphi(T x_n) = (T^* \varphi)(x_n) \to (T^* \varphi)(x) = \varphi(T x)\)）\(\implies T x_{n_{k_j}} \rightharpoonup T x\)。</p>
+
+<p>但<em>同时</em> \(T x_{n_{k_j}} \to z\)（强）\(\implies T x_{n_{k_j}} \rightharpoonup z\)（强 ⟹ 弱）。弱极限唯一 \(\implies z = T x\)。这与 \(\|T x_{n_{k_j}} - T x\| \ge \varepsilon\) 矛盾。\(\square\)</p>
+
+<p>请你停下来感受这条工具的<em>分量</em>。在无穷维里，"<em>从有界序列抽强收敛子列</em>" 一般做不到（<a href="ch1.html#sec1-1">第 1 章 1.1</a>）。<em>能</em>做到的是抽弱收敛子列（用 Banach-Alaoglu，<a href="ch18.html">第 18 章</a>）。但弱收敛常常不够——比如想用 \(x_n \to x\) 作连续传递，弱收敛不行。</p>
+
+<p>紧算子是<em>把弱升级为强</em> 的桥梁。所以下面的两步组合在<a href="ch23.html">第 23 章</a> PDE 弱解理论里反复出现：</p>
+
+<ol>
+  <li>从某个无穷维有界集抽弱收敛子列（Alaoglu / 自反性）；</li>
+  <li>用某个紧算子把弱收敛升级为强收敛；</li>
+  <li>在强收敛上做连续传递（极限存在、收敛到弱解）。</li>
+</ol>
+
+<p>这套"<em>抽 + 升级 + 传递</em>" 三步法——叫"<em>紧致论证</em>"——是泛函分析在 PDE / 变分 / 极值问题里的工作马。Sobolev 嵌入定理 \(H_0^1 \hookrightarrow L^2\) 就是为了让这条桥梁在那个具体设置成立而设计的。</p>
+
+<h2 id="sec20-6">20.6 紧算子谱（预告）</h2>
+
+<p>有限维方阵的特征值集合是<em>有限</em> 的——这件事有限维白送。无穷维有界算子的"谱" 一般可以是<em>整个</em> 圆盘——比如左移算子的谱是闭单位圆盘。这种"连续谱" 让有限维直觉很难直接搬过来。</p>
+
+<p>紧算子在这件事上保持了有限维的<em>大部分</em> 特征。下面是<a href="ch21.html">第 21 章</a> Riesz-Schauder 理论的概览，本节先给出陈述供后面引用。</p>
+
+<p><strong>Riesz-Schauder 谱定理（紧算子）。</strong>设 \(T \in \mathcal{K}(X)\)，\(X\) 是无穷维 Banach。则：</p>
+
+<ol>
+  <li>\(T\) 的谱 \(\sigma(T) \subset \mathbb{C}\) 至多<em>可数</em>，唯一可能聚点是 \(0\)。</li>
+  <li>除 \(0\) 外的每个谱点都是<em>特征值</em>（点谱），且对应特征空间是<em>有限维</em>。</li>
+  <li>\(0\) 必在 \(\sigma(T)\) 中（无穷维上），可能是特征值也可能不是。</li>
+</ol>
+
+<p>翻译成视觉：紧算子谱看起来像有限维方阵谱<em>加一个</em>极限点 \(0\)——在复平面上是一系列离散的点，挤向 \(0\)。比有限维多了一个"无穷尾巴" 的修饰。</p>
+
+<p>\[\boxed{\ \text{紧算子谱} = \text{至多可数个特征值，唯一聚点 } 0.\ }\]</p>
+
+<p>有限维：\(0\) 可能不在谱里（\(A\) 可逆时）。无穷维紧：\(0\) <em>必</em>在谱里——这是因为如果 \(T - 0 \cdot I = T\) 可逆，则 \(I = T \cdot T^{-1}\) 是紧算子和有界算子的乘积 \(\implies\) 紧。但 \(I\) 在无穷维不紧（单位球的像是单位球，不紧）。矛盾。</p>
+
+<p>所以：<em>紧算子永不可逆</em>（在无穷维 Banach 上）。这条命运是它<em>定义</em> 的代价——把无穷维压回有限维必须付出"<em>有自由度跑掉</em>" 这个税，跑掉的方向就是核。这条事实让"\(I - T\)" 而不是"\(T\)" 自身成为下一章的研究对象——\(I - T\) 才是"<em>恒等扰动了一个紧算子</em>"，可逆性是<a href="ch22.html">第 22 章</a> Fredholm 选择性的核心问题。</p>
+
+<p>下一章我们把上面"谱定理" 在<em>自伴</em> 设置下完整证明——把"对称矩阵正交对角化" 这条有限维奇迹整套搬到无穷维。结果将是泛函分析里最干净、最优美、应用最广的一条定理。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 弱*紧致与可分性</a><a href="ch21.html">下一章 · 第 21 章 紧自伴算子谱定理 →</a></nav>
 </main>
 </body>
 </html>
+</content>
+</invoke>

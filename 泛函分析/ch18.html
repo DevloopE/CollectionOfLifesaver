@@ -35,141 +35,240 @@
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 弱收敛与弱*收敛</a><a href="ch19.html">下一章 · 第 19 章 自反空间与一致凸 →</a></nav>
 <h1 id="ch18">第 18 章 Banach–Alaoglu 紧致性</h1>
 
-<p>这一章给出无穷维分析里"找回紧致性"最重要的一条定理：</p>
+<p>上一章末尾我把"变分法直接方法 5 步" 的第 3 步交代了一句"<em>有界序列有弱收敛子列</em>"——并且说"<em>这本质来自下一章</em>"。这一章兑现这句话。</p>
 
-<p><strong>定理（Banach–Alaoglu）。</strong>设 \(X\) 是赋范空间。则 \(X^*\) 的闭单位球</p>
+<p>具体的一句陈述：</p>
 
 <p>\[
-B_{X^*} = \{f \in X^* : \|f\| \le 1\}
+\boxed{\ \text{任何赋范空间 } X \text{ 的对偶 } X^* \text{ 的<em>闭单位球</em> 在<em>弱*</em> 拓扑下<em>紧</em>。}\ }
 \]</p>
 
-<p>在<em>弱*拓扑</em>下是紧致的。</p>
+<p>这是<strong>Banach–Alaoglu 定理</strong>。它是无穷维分析里"紧致" 这个词最深的一次复活——<a href="ch1.html">第 1 章 1.1 节</a>那个"\(\ell^2\) 单位球不紧" 的崩塌，到这里以一种新形式被修回来。<em>新</em> 的紧致是"<em>弱*</em>"，不是"<em>范数</em>"——但这种弱形式的紧致，已经够变分法、够 PDE、够调和分析、够概率论用整一辈子。</p>
 
-<p>记得第 1 章 1.1 节：在无穷维赋范空间上，闭单位球在<em>范数拓扑</em>下不紧。Banach–Alaoglu 没有反驳这条事实——它在<em>更弱</em>的拓扑（弱*）下找回了紧致。这就是分析里"弱拓扑代偿"的最高峰。这条定理把 17 章的弱收敛理论和"紧致性方法"重新接通，是后面变分法、PDE、概率论、最优控制等领域中"存在性"论证的核心引擎。</p>
+<h2 id="sec18-1">18.1 弱*拓扑：让"取值映射" 都连续的最粗拓扑</h2>
+
+<p>先把"<em>弱*拓扑</em>" 这个词说清楚。</p>
+
+<p>设 \(X\) 是赋范空间，\(X^*\) 是它的对偶。对每个 \(x \in X\) 定义"<em>取值映射</em>"</p>
+
+<p>\[
+\hat x : X^* \to \mathbb{R}, \quad \hat x(f) := f(x).
+\]</p>
+
+<p>这是一个把"泛函" 映成"它在 \(x\) 上的取值" 的函数。\(\hat x\) 是 \(X^*\) 上的线性泛函（对 \(f\) 线性）；它就是<a href="ch15.html">第 15 章</a>典范嵌入 \(J(x) \in X^{**}\) 的具体形式。</p>
+
+<p>在 \(X^*\) 上有<em>多种</em> 拓扑可选：</p>
 
 <ul>
-  <li>正式陈述并理解"弱*拓扑"——这是 \(X^*\) 上由 \(X\) 诱导的最粗拓扑。</li>
-  <li>证明思路：把 \(B_{X^*}\) 嵌入到 \(\prod_{x \in X} [-\|x\|, \|x\|]\) 里，用 Tychonoff 定理。</li>
-  <li>可分版本（顺序版）：若 \(X\) 可分，则 \(B_{X^*}\) 弱*序列紧——任意有界序列有弱*收敛子序列。</li>
-  <li>自反空间版本：自反空间的有界序列有弱收敛子序列。</li>
-  <li>三个直接应用：变分法存在性、Helly 选择原理、PDE 弱解的紧致论证。</li>
-  <li>注意点：弱*紧致<em>不</em>蕴含弱紧致（除非自反）；弱紧致比强紧致弱得多。</li>
+  <li><em>范数拓扑</em>：由 \(\|f\|_{X^*}\) 给的，自然但<em>太细</em>——闭单位球在这下不紧（<a href="ch1.html">ch1</a>那个反例适用于任何无穷维空间）。</li>
+  <li><em>弱拓扑</em>：让所有 \(\Phi \in X^{**}\) 连续的最粗拓扑。</li>
+  <li><strong>弱*拓扑</strong>：让所有 \(\hat x\)（\(x \in X\)）连续的最粗拓扑。</li>
 </ul>
 
-<h2 id="sec18-1">18.1 弱*拓扑：在 \(X^*\) 上由 \(X\) 诱导</h2>
+<p>"<em>最粗</em>" 的意思是开集尽可能少，恰好够保证 \(\hat x\) 连续。具体的一组开集基：弱*开集是形如</p>
 
-<p>弱*拓扑是 \(X^*\) 上让<em>所有"取值映射" \(J_x : X^* \to \mathbb{K}\), \(f \mapsto f(x)\)（\(x \in X\)）都连续</em>的最粗拓扑。</p>
+<p>\[
+U(f_0; x_1, \ldots, x_n; \varepsilon) := \{f \in X^* : |f(x_i) - f_0(x_i)| < \varepsilon, \, i = 1, \ldots, n\}
+\]</p>
 
-<p>这种拓扑有以下关键性质：</p>
+<p>的有限相交（其中 \(f_0 \in X^*\)，\(x_1, \ldots, x_n \in X\)，\(\varepsilon > 0\)）的有限并。换句话说，<em>弱*邻域</em>是用<em>有限多个 \(x \in X\)</em> 的取值近似来定义的。</p>
+
+<p>弱*收敛在这一拓扑下的具体形式：\(f_\alpha \xrightharpoonup{*} f \iff f_\alpha(x) \to f(x)\) 对所有 \(x \in X\)——和<a href="ch17.html">第 17 章 17.4 节</a>定义一致。这是因为弱*拓扑就是"逐点收敛"（在 \(X\) 上的逐点）的拓扑——只不过用净 / 滤子的语言来表达。</p>
+
+<p>三种拓扑的强弱关系：<em>弱*拓扑 \(\subseteq\) 弱拓扑 \(\subseteq\) 范数拓扑</em>（左侧拓扑的开集少，更粗）。所以紧集越粗的拓扑里越多——弱*拓扑下"紧" 是最容易的。这就是 Banach–Alaoglu 能成立的几何前提。</p>
+
+<p>请你停下来想一想：把拓扑变粗，相当于把"<em>区分两个不同泛函的能力</em>" 调弱。在范数拓扑下，两个泛函只要范数差远，就被认为"远"。在弱*拓扑下，两个泛函要"远"，必须存在某个 \(x\) 使它们在 \(x\) 上取值差远。<em>区分能力降下来，紧致性升上来</em>——这就是 Banach–Alaoglu 的几何精神。</p>
+
+<h2 id="sec18-2">18.2 Banach–Alaoglu 定理 + 完整证明</h2>
+
+<p><strong>定理（Banach–Alaoglu，1932）。</strong>设 \(X\) 是赋范空间。则</p>
+
+<p>\[
+\overline{B}_{X^*}(0, 1) := \{f \in X^* : \|f\|_{X^*} \le 1\}
+\]</p>
+
+<p>在<em>弱*拓扑下紧</em>。</p>
+
+<p>证明。这是一个非常美的论证，本质上把"<em>无穷维球</em>" 嵌入到一个"<em>巨大乘积空间</em>"，然后用 Tychonoff 定理。</p>
+
+<p><em>第 1 步：嵌入到乘积空间。</em>对每个 \(x \in X\)，定义</p>
+
+<p>\[
+K_x := [-\|x\|, \|x\|] \subset \mathbb{R}.
+\]</p>
+
+<p>这是一个紧区间（因为是 \(\mathbb R\) 的有界闭集）。考虑乘积空间</p>
+
+<p>\[
+K := \prod_{x \in X} K_x.
+\]</p>
+
+<p>这是一个非常大的（一般是不可数维的）乘积空间，元素是"给每个 \(x \in X\) 指定一个数 \(\xi_x \in K_x\)" 的函数。配以<em>乘积拓扑</em>。</p>
+
+<p>由<strong>Tychonoff 定理</strong>（任意多个紧空间的乘积在乘积拓扑下紧——见<a href="appA.html">附录 A</a>），\(K\) 是紧的。</p>
+
+<p><em>第 2 步：把闭单位球嵌入 \(K\)。</em>定义</p>
+
+<p>\[
+\Phi : \overline{B}_{X^*}(0, 1) \to K, \quad \Phi(f) := (f(x))_{x \in X}.
+\]</p>
+
+<p>对每个 \(f \in \overline{B}_{X^*}(0, 1)\)，\(|f(x)| \le \|f\| \cdot \|x\| \le \|x\|\)，所以 \(f(x) \in K_x\)——\(\Phi(f)\) 真在 \(K\) 里。</p>
+
+<p>关键观察：\(\Phi\) 是<em>同胚</em>（onto its image）。它把 \(\overline{B}_{X^*}\) 上的<em>弱*拓扑</em> 等同于 \(K\) 上的<em>乘积拓扑</em>限制——因为两个拓扑都是"<em>逐点收敛</em>" 的拓扑。</p>
+
+<p>具体的：弱*拓扑的子基开集 \(U(f_0; x; \varepsilon) = \{f : |f(x) - f_0(x)| < \varepsilon\}\)，在 \(\Phi\) 下对应乘积拓扑的子基开集 \(\{\xi \in K : |\xi_x - f_0(x)| < \varepsilon\}\)。两边一致。</p>
+
+<p><em>第 3 步：\(\Phi(\overline{B}_{X^*})\) 在 \(K\) 中闭。</em>这是关键的"<em>选择</em>" 步：\(K\) 里所有"取值序列" 都允许，但只有满足<em>线性</em> + <em>有界</em> 的才对应一个泛函 \(f\)。这两条性质是闭条件。</p>
+
+<p>具体的：定义</p>
+
+<p>\[
+L := \{\xi \in K : \xi \text{ 满足下列两条}\}
+\]</p>
 
 <ul>
-  <li><strong>序列收敛 \(=\) 弱*收敛：</strong>\(f_n \overset{*}{\rightharpoonup} f \iff f_n(x) \to f(x), \forall x\)（这就是<a href="ch17.html">第 17 章</a> 17.3 节的定义）。</li>
-  <li><strong>弱*连续函数：</strong>每个 "取值映射" \(J_x\) 弱*连续；线性组合也是。但<em>范数 \(f \mapsto \|f\|\) 不是弱*连续</em>——它只是弱*下半连续。</li>
-  <li><strong>比强（范数）拓扑粗：</strong>每个范数收敛序列都弱*收敛，反之不然。</li>
-  <li><strong>不一定可度量化：</strong>当 \(X\) 不可分时，弱*拓扑可能不是来自度量。但当 \(X\) 可分时，\(B_{X^*}\) 上弱*拓扑可度量化（下面 18.4 节）。</li>
+  <li>线性性："对任意 \(x, y \in X\) 和 \(\alpha, \beta \in \mathbb R\)，\(\xi_{\alpha x + \beta y} = \alpha \xi_x + \beta \xi_y\)"。</li>
+  <li>有界性：已经隐含——"\(\xi_x \in K_x = [-\|x\|, \|x\|]\)"。</li>
 </ul>
 
-<h2 id="sec18-2">18.2 Banach–Alaoglu 的证明（Tychonoff 路径）</h2>
+<p>第二条已经被 \(K\) 的定义保证。第一条：对每对 \((x, y, \alpha, \beta)\)，集合 \(\{\xi : \xi_{\alpha x + \beta y} - \alpha \xi_x - \beta \xi_y = 0\}\) 是一个<em>闭</em> 集（"取三个坐标，做一个连续的代数表达式 = 0"——闭）。所以 \(L\) 是这些闭集对所有 \((x, y, \alpha, \beta)\) 的<em>交集</em>，仍闭。</p>
 
-<p>证明用 Tychonoff 定理（任意紧空间族的乘积仍紧），它本身依赖选择公理。</p>
+<p>而 \(L = \Phi(\overline{B}_{X^*})\)：每个 \(\xi \in L\) 给一个线性算子 \(f : X \to \mathbb R, \, f(x) := \xi_x\)，由有界性 \(\|f\| \le 1\)，所以 \(f \in \overline{B}_{X^*}\)，且 \(\Phi(f) = \xi\)。</p>
 
-<p><strong>嵌入步。</strong>对每个 \(x \in X\)，区间 \(K_x := \{z \in \mathbb{K} : |z| \le \|x\|\}\) 紧。乘积空间</p>
+<p>所以 \(\Phi(\overline{B}_{X^*})\) 是紧空间 \(K\) 的<em>闭子集</em>——也紧。</p>
 
-<p>\[
-\Pi := \prod_{x \in X} K_x
-\]</p>
+<p><em>第 4 步：原球紧。</em>\(\Phi\) 是同胚 onto its image，把紧像 \(\Phi(\overline{B}_{X^*})\) 映回 \(\overline{B}_{X^*}\)，仍紧。结束。</p>
 
-<p>由 Tychonoff 定理在乘积拓扑下紧。</p>
+<p>这个证明的灵魂：<em>把无穷维球的紧致归结到无穷多紧区间的乘积——靠 Tychonoff 定理</em>。Tychonoff 是拓扑学里"<em>选择公理 + 紧致</em>" 的最深定理之一（它逻辑上等价于选择公理）。所以 Banach–Alaoglu 在背后<em>真的依赖选择公理</em>——这是无穷维分析里少数明显需要 ZF + AC 的定理之一。</p>
 
-<p>把 \(B_{X^*}\) 嵌入 \(\Pi\)：每个 \(f \in B_{X^*}\) 对应 \(\Pi\) 中的"族" \((f(x))_{x \in X} \in \Pi\)（因为 \(|f(x)| \le \|f\| \|x\| \le \|x\|\)）。</p>
+<p>请你停下来感受这个证明的<em>结构</em>。它没"<em>构造</em>" 任何收敛子列；它把"<em>紧</em>" 从乘积空间"<em>偷过来</em>" 给单位球。这种"嵌入到大空间 + 用大空间的紧致" 的论证模式，在泛函分析里反复出现——比如<a href="ch20.html">第 20 章紧算子</a>的 Arzelà–Ascoli 定理证明也用类似套路。</p>
 
-<p>这是<em>到</em> \(\Pi\) 的<em>单射</em>（不同 \(f\) 给不同族），并且<em>把弱*拓扑变成乘积拓扑诱导的子空间拓扑</em>（弱*与乘积拓扑都由"按坐标 \(x\) 收敛"定义）。</p>
+<h2 id="sec18-3">18.3 序列版：可分时的对角法</h2>
 
-<p><strong>验证 \(B_{X^*}\) 在 \(\Pi\) 中闭。</strong>取 \(\Pi\) 中网 \((g_\alpha) \to g\)，且每个 \(g_\alpha\) 来自某 \(f_\alpha \in B_{X^*}\)。要证 \(g\) 也来自某 \(B_{X^*}\) 中元素。</p>
+<p>Banach–Alaoglu 给的是<em>拓扑</em> 紧致——任何<em>网</em>有收敛<em>子网</em>。但实战中我们更喜欢<em>序列</em> 紧致——任何<em>序列</em>有收敛<em>子序列</em>。在一般无穷维空间里这两个不一样（拓扑紧 ≠ 序列紧）。但<em>当 \(X\) 可分时</em>，弱*拓扑下闭单位球<em>序列紧</em>。</p>
 
-<p>定义 \(f(x) := g(x)\)（\(g\) 是函数 \(x \mapsto g(x)\)）。验证 \(f\) 线性：</p>
+<p><strong>定理（序列版 Banach–Alaoglu）。</strong>设 \(X\) <em>可分</em> 赋范空间。则 \(X^*\) 的闭单位球在弱*拓扑下<em>序列紧</em>——任意 \(\{f_n\} \subset \overline{B}_{X^*}\) 都有弱*收敛子列。</p>
 
-<p>\[
-g_\alpha(\lambda x + \mu y) = f_\alpha(\lambda x + \mu y) = \lambda f_\alpha(x) + \mu f_\alpha(y) = \lambda g_\alpha(x) + \mu g_\alpha(y),
-\]</p>
+<p>证明（Cantor 对角法）。设 \(\{x_k\}_{k=1}^\infty\) 是 \(X\) 的<em>稠密</em> 可数子集（"可分" 给的）。</p>
 
-<p>取 \(\alpha\) 极限：\(g(\lambda x + \mu y) = \lambda g(x) + \mu g(y)\)，即 \(f\) 线性。再验证 \(|f(x)| = |g(x)| \le \|x\|\)，即 \(\|f\| \le 1\)。所以 \(g\) 来自 \(f \in B_{X^*}\)。所以 \(B_{X^*}\) 在 \(\Pi\) 中闭。</p>
+<p><em>第 1 步：抽对角子列。</em>序列 \(\{f_n(x_1)\}_n\) 有界（\(|f_n(x_1)| \le \|x_1\|\)）。由 Bolzano–Weierstrass，抽子列 \(\{f_{1, n}\}\) 使 \(f_{1, n}(x_1) \to a_1\) 收敛。</p>
 
-<p>\(\Pi\) 紧 + \(B_{X^*}\) 闭 \(\Rightarrow\) \(B_{X^*}\) 紧。结束。</p>
+<p>从 \(\{f_{1, n}\}\) 抽子列 \(\{f_{2, n}\}\) 使 \(f_{2, n}(x_2) \to a_2\)。</p>
 
-<p>这条证明的优雅之处：用 Tychonoff 把"无穷维"问题归约为"逐坐标"问题。每个坐标都是有限区间，所以紧。然后线性结构保证嵌入像闭。</p>
+<p>继续：从 \(\{f_{k-1, n}\}\) 抽子列 \(\{f_{k, n}\}\) 使 \(f_{k, n}(x_k) \to a_k\)。</p>
 
-<h2 id="sec18-3">18.3 一个常用的具体形式：序列版</h2>
+<p>取<em>对角</em> 子列 \(g_n := f_{n, n}\)。则对每个 \(k\)：\(g_n\) 从第 \(n = k\) 起是 \(\{f_{k, m}\}\) 的子列，所以 \(g_n(x_k) \to a_k\) 当 \(n \to \infty\)。</p>
 
-<p>抽象 Banach–Alaoglu 用的是"网" 与"拓扑紧致"。在分析里我们最常用的是"序列紧致"——任意有界序列有收敛子序列。这两件事在不可度量化拓扑下不一定等价，所以需要附加条件。</p>
-
-<p><strong>定理（Banach–Alaoglu 序列版本）。</strong>设 \(X\) 是<em>可分</em> Banach 空间。则 \(B_{X^*}\) 在弱*拓扑下序列紧——即任意 \(\{f_n\} \subset B_{X^*}\) 有弱*收敛子序列。</p>
-
-<p>证明思路：可分性给可数稠子集 \(\{x_k\}\)。对每个 \(k\)，\(\{f_n(x_k)\}\) 是 \(\mathbb{K}\) 中有界序列 \(\Rightarrow\) 有收敛子序列。用 Cantor 对角法逐个 \(k\) 抽子序列，得到 \(\{f_{n_j}\}\) 使 \(f_{n_j}(x_k) \to L_k\) 对每 \(k\)。由稠密性 + 一致控制 \(\|f_n\| \le 1\)，\(f_{n_j}(x) \to L(x)\) 对每 \(x \in X\)，且 \(L\) 是有界线性。结束。</p>
-
-<p>这是日常使用的"<strong>有界序列 \(\Rightarrow\) 弱*收敛子序列</strong>"定理。它在变分法、PDE、概率论里几乎是基础工具。</p>
-
-<h2 id="sec18-4">18.4 弱*拓扑可度量化条件</h2>
-
-<p>更精细地：</p>
-
-<p><strong>定理（弱*拓扑可度量化）。</strong>若 \(X\) 是可分 Banach 空间，则 \(B_{X^*}\) 上的弱*拓扑可度量化。</p>
-
-<p>显式度量：取 \(X\) 的可数稠子集 \(\{x_k\}\)（不失一般性 \(\|x_k\| \le 1\)），定义</p>
+<p><em>第 2 步：扩展到所有 \(x \in X\)。</em>对任意 \(x \in X\)，由稠密性取 \(x_k \to x\)（强）。</p>
 
 <p>\[
-d^*(f, g) = \sum_{k=1}^\infty 2^{-k} |f(x_k) - g(x_k)|.
+|g_n(x) - g_m(x)| \le |g_n(x) - g_n(x_k)| + |g_n(x_k) - g_m(x_k)| + |g_m(x_k) - g_m(x)|.
 \]</p>
 
-<p>这条度量给 \(B_{X^*}\) 上的弱*拓扑——可分性确保它"够细"。</p>
+<p>第一项与第三项 \(\le \|g_n\| \cdot \|x - x_k\| \le \|x - x_k\|\)（因 \(\|g_n\| \le 1\)）——可任意小。第二项 \(\to 0\)（因 \(g_n(x_k) \to a_k\)）。所以 \(\{g_n(x)\}\) 是 Cauchy，收敛到某 \(b(x)\)。</p>
 
-<p>这条结果让"\(B_{X^*}\) 弱*紧"在可分情形下变得非常具体——它是一个紧度量空间，所以序列紧、可分、有完备性等等。在 PDE 和泛函分析的具体应用里，几乎所有相关空间（\(L^p\)、Sobolev 等）都可分，所以这条度量化几乎总是适用。</p>
+<p>\(b : X \to \mathbb R\) 是线性（每个 \(g_n\) 线性，逐点极限保持线性）；\(|b(x)| \le \|x\|\)（因每个 \(g_n\) 满足）。所以 \(b \in X^*\) 且 \(\|b\| \le 1\)。</p>
 
-<h2 id="sec18-5">18.5 自反空间版本：弱紧致</h2>
+<p>由构造，\(g_n \xrightharpoonup{*} b\)。结束。</p>
 
-<p>对自反空间，弱与弱*合一（因为 \(X^{**} = X\)），所以 Banach–Alaoglu 给出：</p>
+<p>这个证明几乎是一个"<em>对角法</em>" 的标准模板——和你在<a href="../实分析/ch16.html">实分析 Arzelà–Ascoli 证明</a>里见过的对角法一模一样。<em>"可分性 + 对角法 ⟹ 序列紧"</em> 是这种论证的通用结构。</p>
 
-<p><strong>定理（弱紧致 / Eberlein–Šmulian 系列）。</strong>设 \(X\) 是<em>自反</em> Banach 空间。则 \(B_X\) 在弱拓扑下紧。等价地：\(X\) 中任意范数有界序列有弱收敛子序列。</p>
+<p>实战意义：你以后碰到"<em>有界序列 \(\{f_n\} \subset L^p\)（\(1 < p < \infty\)）</em>"，可以立刻写"<em>抽弱收敛子列 \(f_{n_k} \rightharpoonup f\)</em>"。背后的合法性就是这条序列版 Banach–Alaoglu——\(L^p\) 自反 + 可分（<a href="ch4.html">第 4 章</a>），有界序列在弱拓扑下序列紧。这是 PDE 弱解理论里最常用的"<em>抽子列动作</em>"。</p>
 
-<p>"自反 \(\Rightarrow\) 弱有界 \(=\) 弱紧"，这条等价是后面所有"自反空间存在性"论证的核心。</p>
+<h2 id="sec18-4">18.4 弱*拓扑可度量化</h2>
 
-<p>具体来说，所有 Hilbert 空间自反，所有 \(L^p\)（\(1 < p < \infty\)）自反、所有 Sobolev \(H^k\) 自反。这意味着这些空间中"<strong>有界序列总有弱收敛子序列</strong>"——这就是变分法在它们上面有完整存在性论证的根本原因。</p>
+<p>"<em>序列紧</em>" 听起来已经很好用，但严格说弱*拓扑本身不是<em>度量</em>——序列收敛和拓扑收敛在它上不必一致。可下面这条事实让我们能在很多场合直接用度量直觉：</p>
 
-<p>反过来 \(L^1\)、\(L^\infty\)、\(c_0\)、\(C(K)\) 不自反——它们的"弱紧致"现象更微妙。<em>\(L^1\) 中有界序列<em>不一定</em>有弱收敛子序列</em>，需要额外的"等可积性"条件（Dunford–Pettis 定理）。这就是为什么"在 \(L^1\) 上做变分"比"在 \(L^p\)（\(p > 1\)）上做"难得多——也是为什么 PDE 文献里 \(p > 1\) 是默认假设。</p>
+<p><strong>定理。</strong>设 \(X\) <em>可分</em>。则<em>弱*拓扑限制到 \(\overline{B}_{X^*}\) 上</em> 是<em>可度量化</em> 的。</p>
+
+<p>具体度量：取 \(X\) 稠密可数子集 \(\{x_k\}\)，定义</p>
+
+<p>\[
+d(f, g) := \sum_{k=1}^\infty \frac{1}{2^k} \cdot \frac{|f(x_k) - g(x_k)|}{1 + |f(x_k) - g(x_k)|}.
+\]</p>
+
+<p>验证（草图）：每项 \(\le 1/2^k\) 所以级数收敛；\(d\) 是度量；\(d(f_n, f) \to 0\) ⟺ 对每个 \(k\)，\(f_n(x_k) \to f(x_k)\)（由级数控制）；又因 \(\|f_n\| \le \|f\| + \|f_n - f\| \le M\) 一致有界 + \(\{x_k\}\) 在 \(X\) 稠密，\(f_n(x) \to f(x)\) 对所有 \(x \in X\)（同 18.3 节论证）。所以 \(d\) 度量化弱*拓扑。</p>
+
+<p>这条度量化定理把"<em>弱*紧</em>" 升级成"<em>弱*紧 + 度量</em>"——也就是<em>弱*紧 = 弱*序列紧 + 完备</em>。所以你以后在可分空间的对偶上做弱*分析，<em>完全可以</em>用度量直觉：考虑 Cauchy 序列、用 BW 抽子列、用对角法，全部合法。</p>
+
+<p>反过来：如果 \(X\) 不可分，弱*拓扑不可度量化。这种情况罕见但存在——比如 \(X = L^\infty(\mathbb R)\) 不可分（<a href="ch4.html">第 4 章</a>）；它的对偶 \(X^*\) 上的弱*拓扑就不可度量。</p>
+
+<h2 id="sec18-5">18.5 自反空间版：弱紧 = 弱*紧 in \(X\)</h2>
+
+<p>Banach–Alaoglu 给的是<em>对偶</em> \(X^*\) 上的<em>弱*</em> 紧。我们真正想要的，往往是<em>原</em> 空间 \(X\) 上的<em>弱</em> 紧——比如变分法第 3 步要的"<em>原始函数空间里有界序列有弱收敛子列</em>"。这两者什么时候等价？</p>
+
+<p><em>当 \(X\) <strong>自反</strong> 时</em>。</p>
+
+<p>"自反" 的具体定义：典范嵌入 \(J : X \to X^{**}\) 是<em>满射</em>（即 \(X\) 与 \(X^{**}\) 通过 \(J\) 等同）。详细定义和分类放<a href="ch19.html">下一章</a>。</p>
+
+<p>这里只用一条逻辑：把 \(X\) 通过 \(J\) 等同为 \((X^*)^*\)。则 \(X\) 上的"<em>弱</em>" 拓扑（由 \(X^*\) 测）<em>就是</em> \((X^*)^*\) 上的"<em>弱*</em>" 拓扑（由 \(X^*\) 测，这里 \(X = X^{**}\) 起"原空间" 的作用）。所以 Banach–Alaoglu 应用到 \(X^*\) 上，给的是 "\(X\)（= \(X^{**}\)）的闭单位球弱紧"。</p>
+
+<p><strong>推论（Kakutani 定理）。</strong>\(X\) 自反 \(\iff\) \(\overline{B}_X\) 弱紧。</p>
+
+<p>结合<a href="ch17.html">17.2 节事实 3</a>（弱收敛 ⟹ 范数有界）：</p>
+
+<p><strong>推论（Eberlein–Šmulian 定理）。</strong>\(X\) 自反 \(\iff\) <em>每个有界序列都有弱收敛子列</em>。</p>
+
+<p>这两条等价是变分法的"<em>合法令</em>"。每次你看到"<em>抽弱收敛子列</em>" 的论证背后，就是 Eberlein–Šmulian + 自反性这件事。</p>
+
+<p>常用自反空间：</p>
+
+<ul>
+  <li>所有 Hilbert 空间（包括 \(L^2, \ell^2, H^k\)）。</li>
+  <li>\(L^p(\Omega), \ell^p\) 当 \(1 < p < \infty\)。</li>
+  <li>有限维空间。</li>
+</ul>
+
+<p>常见<em>非</em>自反空间（陷阱）：</p>
+
+<ul>
+  <li>\(L^1, L^\infty\)。</li>
+  <li>\(c_0, \ell^1, \ell^\infty\)。</li>
+  <li>\(C(K)\)（连续函数空间）。</li>
+</ul>
+
+<p>所以你做变分法，<em>避开</em> \(L^1\) 和 \(L^\infty\)（除非用更复杂的工具，比如测度的弱*紧）；<em>偏向</em> \(L^p\)（\(1 < p < \infty\)）和 Hilbert 空间。这条偏好深植于 Sobolev 空间理论里——\(W^{1, p}\)（\(1 < p < \infty\)）自反，PDE 弱解理论几乎全在 \(p\) 范围内做。</p>
 
 <h2 id="sec18-6">18.6 三个应用</h2>
 
-<p><strong>应用 1：变分法存在性的标准模板。</strong>结合 17 章 17.6 节的"直接方法"+ 18.5 节的弱紧致：</p>
+<p><strong>应用 1：变分法存在性 5 步模板。</strong>这就是<a href="ch17.html">17.7 节</a>那 5 步，把它正式重写一遍——这次每一步都标出依据。</p>
 
-<p>设 \(X\) 自反 Banach 空间，\(F : X \to \mathbb{R}\) 强制（\(\|u\| \to \infty \Rightarrow F(u) \to \infty\)）+ 弱下半连续。则 \(F\) 在 \(X\) 上达到极小。</p>
+<p>设 \(X\) 自反 Banach 空间，\(E : X \to \mathbb R \cup \{+\infty\}\) <em>胁迫</em>（\(E[u] \to +\infty\) 当 \(\|u\| \to \infty\)）+ <em>弱下半连续</em>（\(u_n \rightharpoonup u \implies E[u] \le \liminf E[u_n]\)）+ <em>有下界</em>。则 \(\inf E\) <em>达到</em>。</p>
 
-<p>证明：取极小化序列 \(u_n\)：\(F(u_n) \to \inf F\)。强制 \(\Rightarrow \{u_n\}\) 范数有界。自反 + Banach–Alaoglu \(\Rightarrow\) 抽弱收敛子序列 \(u_{n_k} \rightharpoonup u^*\)。弱下半连续 \(\Rightarrow F(u^*) \le \liminf F(u_{n_k}) = \inf F\)。所以 \(u^*\) 是极小元。结束。</p>
+<ol>
+  <li>取极小化序列 \(u_n\) 使 \(E[u_n] \to m = \inf E\)。<em>合法</em> 因 \(m\) 有限。</li>
+  <li>胁迫 ⟹ \(\|u_n\| \le M\)。<em>合法</em>：\(E[u_n] \le m + 1\)（大 \(n\)）+ 胁迫的逆推。</li>
+  <li>抽弱收敛子列 \(u_{n_k} \rightharpoonup u^*\)。<em>合法</em>：Eberlein–Šmulian（自反 + 有界 ⟹ 有弱收敛子列）。</li>
+  <li>\(E[u^*] \le \liminf E[u_{n_k}] = m\)。<em>合法</em>：弱下半连续 + 子列保收敛。</li>
+  <li>结合 \(E[u^*] \ge \inf E = m\)，得 \(E[u^*] = m\)。<em>极小达到</em>。</li>
+</ol>
 
-<p>\[
-\boxed{\ \text{自反 + 强制 + 弱下半连续}\ \Rightarrow\ \text{极小元存在}.\ }
-\]</p>
+<p>这个模板是 PDE 弱解理论的<em>主轴</em>。Dirichlet 问题、p-Laplace 方程、Navier–Stokes 弱解、调和映射、最小曲面——所有这些经典 PDE 的<em>存在性</em> 论证都是这 5 步的某个变体。</p>
 
-<p>这条模板是无穷维优化、PDE 椭圆问题、最优控制存在性的统一陈述。它的每一项都<em>需要</em>——失去任何一项都可能导致不存在。</p>
+<p><strong>应用 2：Helly 选择原理。</strong>概率论里有个经典定理：</p>
 
-<p><strong>应用 2：Helly 选择原理（概率论）。</strong>设 \(\{F_n\}\) 是 \(\mathbb{R}\) 上一族分布函数（即非降、右连续、值域 \([0,1]\)）。则存在子序列 \(F_{n_k}\) 与某个分布函数 \(F^*\) 使 \(F_{n_k}(x) \to F^*(x)\) 对每个 \(x\) 是 \(F^*\) 的连续点。</p>
+<p><strong>Helly 选择定理。</strong>任何<em>分布函数</em> 序列 \(\{F_n\}\)（\(F_n : \mathbb R \to [0, 1]\) 单调不减、右连续、\(F(-\infty) = 0\)、\(F(+\infty) = 1\)）<em>都有逐点收敛子列</em>——极限可能不是分布函数（"质量逃逸到无穷"），但<em>一定</em> 是单调不减的右连续函数。</p>
 
-<p>证明：把 \(F_n\) 看作 \(\mathbb{R}\) 上的概率测度 \(\mu_n\)。\(\mu_n\) 是 \(C_c(\mathbb{R})^*\) 的元素（"配对" \(g \mapsto \int g \, d\mu_n\)），范数 \(\le 1\)。由 Banach–Alaoglu 弱*紧 + \(C_c(\mathbb{R})\) 可分 \(\Rightarrow\) 抽弱*收敛子序列 \(\mu_{n_k} \overset{*}{\rightharpoonup} \mu^*\)，\(\mu^*\) 是某个有限测度。\(\mu^*(\mathbb{R}) \le 1\)（可能丢质量到无穷远）；当不丢质量时 \(\mu^*\) 是概率测度。逐点收敛由对应分布函数论证。</p>
+<p>这条定理本质就是 Banach–Alaoglu 在 \(C_0(\mathbb R)^*\)（\(\mathbb R\) 上有限测度空间）上的应用。<em>分布函数 ↔ 概率测度</em>；<em>逐点收敛 ↔ 弱*收敛</em>；<em>抽收敛子列 ↔ 弱*紧</em>。</p>
 
-<p>这是为什么"分布列总有弱极限子序列（如果 tight）"在概率极限定理（中心极限定理、大数律）里如此基础——它让"先抽子序列存在弱极限再识别"的标准论证成为可能。</p>
+<p>具体的：把 \(F_n\) 当成 \(\mathbb R\) 上 Borel 概率测度 \(\mu_n\)（通过 \(\mu_n((-\infty, x]) = F_n(x)\)）。\(\mu_n \in C_0(\mathbb R)^*\)（连续紧支函数空间的对偶 = 有限 Borel 测度，<a href="ch16.html">第 16 章 Riesz 表示</a>）。\(\|\mu_n\| = \mu_n(\mathbb R) = 1\) 一致有界。所以 \(\{\mu_n\}\) 在 \(C_0(\mathbb R)^*\) 闭单位球里——弱*紧（Banach–Alaoglu）+ 序列紧（\(C_0(\mathbb R)\) 可分）。所以有弱*收敛子列 \(\mu_{n_k} \xrightharpoonup{*} \mu\)。</p>
 
-<p><strong>应用 3：PDE 弱解的紧致性论证。</strong>椭圆 / 抛物 PDE 的弱解理论（详见<a href="ch23.html">第 23 章</a>）几乎都基于这种紧致性逻辑。例如：</p>
+<p>这条原理是概率论里"<em>分布弱收敛</em>"（\(F_n \xrightarrow{D} F\)）紧致性的源头。中心极限定理、大数定律、各种"分布收敛" 论证背后都站着这条 Helly + Banach–Alaoglu。</p>
 
-<ul>
-  <li>给一族近似解 \(\{u_\varepsilon\}\)（用某种正则化），</li>
-  <li>用能量估计证明它们在 \(H^1\) 中有界，</li>
-  <li>由 \(H^1\) 自反 + Banach–Alaoglu 抽弱收敛子序列 \(u_{\varepsilon_k} \rightharpoonup u^*\) 在 \(H^1\)，</li>
-  <li>用 Sobolev 紧嵌入 \(H^1 \hookrightarrow\hookrightarrow L^2\) 把弱收敛升级为强收敛 (Rellich)，</li>
-  <li>取极限传到 PDE，得 \(u^*\) 是极限方程的弱解。</li>
-</ul>
+<p><strong>应用 3：PDE 弱解的紧致论证 5 步。</strong>典型场景：构造非线性椭圆 PDE \(-\Delta u + g(u) = f\) 的弱解，其中 \(g\) 有"足够好" 的增长条件。</p>
 
-<p>这五步是 PDE 弱解理论的"标准协议"。每一步都依赖泛函分析里某条结构性结论：弱紧致（Banach–Alaoglu）、自反性、紧嵌入（Sobolev）、对偶配对（Riesz）。</p>
+<ol>
+  <li><strong>逼近问题。</strong>取截断 \(g_n\)（\(g_n = g\) 在 \(|s| \le n\) 上，\(g_n\) 有界外延），构造截断 PDE \(-\Delta u_n + g_n(u_n) = f\)。</li>
+  <li><strong>先验估计。</strong>用能量法 / 最大值原理推 \(\|u_n\|_{H^1} \le C\) 一致。</li>
+  <li><strong>抽弱收敛子列。</strong>\(H^1\) 自反 + 有界 ⟹ \(u_{n_k} \rightharpoonup u\) in \(H^1\)（Eberlein–Šmulian）。</li>
+  <li><strong>抽强收敛子列（"<em>紧致提升</em>"）。</strong>用 Rellich–Kondrachov 紧嵌入 \(H^1 \hookrightarrow\hookrightarrow L^p\)（\(p < 2^*\)）：\(H^1\) 弱收敛 ⟹ \(L^p\) 强收敛。这一步把"<em>弱收敛</em>" 升级成"<em>几乎处处收敛</em>"——足以对非线性项 \(g_n(u_n)\) 取极限。</li>
+  <li><strong>对极限取弱形式。</strong>对每个测试函数 \(\varphi \in H^1_0\)，验证 \(u\) 满足弱形式 \(\int \nabla u \cdot \nabla \varphi + g(u) \varphi = \int f \varphi\)。<em>弱解构造完成</em>。</li>
+</ol>
 
-<p>本章把"找回紧致感"做完。下一章我们讨论<strong>自反空间</strong>——哪些 Banach 空间自带 \(X^{**} = X\) 的好性质，为什么自反那么好用，以及非自反的"不舒适"有多严重。</p>
+<p>这 5 步是 1950–60 年代 Stampacchia、Lions、Brezis 等人发展非线性椭圆 PDE 理论的<em>主流程</em>。每一步都用到这一章和上一章的技术：弱收敛定义、范数下半连续、Banach–Alaoglu、Eberlein–Šmulian、紧嵌入。<em>没有 Banach–Alaoglu，整套现代 PDE 弱解理论几乎不存在</em>。</p>
+
+<p>这一章结尾请你记住：<em>Banach–Alaoglu 是无穷维分析"紧致" 这个词最重要的一次复活</em>。\(\ell^2\) 单位球范数下不紧——但<em>对偶</em> 的单位球弱*下紧。这个"<em>对偶 + 弱*</em>" 的组合是为什么所有现代变分法、PDE 存在性、调和分析、概率论都能在无穷维里启动的根本原因。下一章我们专门看一类"<em>特别舒服</em>" 的空间——自反空间——并给一个判断它的几何充分条件（一致凸 + Milman–Pettis）。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 弱收敛与弱*收敛</a><a href="ch19.html">下一章 · 第 19 章 自反空间与一致凸 →</a></nav>
 </main>

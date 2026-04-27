@@ -35,162 +35,279 @@
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 有界线性算子</a><a href="ch10.html">下一章 · 第 10 章 Baire 范畴定理 →</a></nav>
 <h1 id="ch9">第 9 章 算子范数与算子代数</h1>
 
-<p>第 8 章我们把"什么算子值得研究"挑出来：有界线性算子。这一章把"所有有界算子"作为一个<em>整体</em>研究——它本身是一个赋范空间，事实上是一个 Banach 空间，并且当 \(X = Y\) 时还是一个<strong>Banach 代数</strong>。这件事的实际意义是：算子也是分析对象，也可以"取极限""做级数展开""谈乘法"——这些操作组成了后面谱论、解析函数演算、紧算子的全部技术基础。</p>
+<p>上一章把"<em>哪些</em> 算子值得研究" 这件事筛选清楚——有界线性算子。我们也学会了用 \(\|T\|\) 度量它们的"<em>放大率</em>"。</p>
+
+<p>朴素的下一问：<em>所有有界线性算子</em> 加起来构成的对象长什么样？</p>
+
+<p>具体的：固定两个赋范空间 \(X, Y\)，把所有有界线性算子 \(T : X \to Y\) 收集起来——记作</p>
+
+<p>\[
+\mathcal{B}(X, Y) := \{T : X \to Y \mid T \text{ 是有界线性算子}\}.
+\]</p>
+
+<p>这个集合<em>本身</em> 是个空间。"算子的加法 / 数乘" 是显然的（按值定义），算子范数 \(\|T\|\) 是个范数，于是 \(\mathcal{B}(X, Y)\) 自动成为一个<em>赋范空间</em>。</p>
+
+<p>这一章就是研究这个新空间。三个关键结论：</p>
+
+<ol>
+  <li>当 \(Y\) 完备时，\(\mathcal{B}(X, Y)\) <em>自动</em> 完备——是 Banach 空间。</li>
+  <li>当 \(X = Y\) 时，<em>复合</em> 给 \(\mathcal{B}(X)\) 一个乘法，与算子范数相容（\(\|ST\| \le \|S\| \|T\|\)）——这是个 Banach <em>代数</em>。</li>
+  <li>这个代数里，\(I - T\)（\(\|T\| < 1\)）总可逆，逆是<em>Neumann 级数</em> \(\sum T^n\)——这条几何级数论证是后面谱论的整个工程基础。</li>
+</ol>
+
+<p>这层"算子也是空间 / 也是代数" 的视角换一次<em>本体论</em>：算子不再是"作用在向量上的东西"，它<em>自己就是个分析对象</em>，有范数、有收敛、有乘法、有可逆性。后面紧算子（ch20）、谱（ch21）、Riesz 表示（ch16）全部以这层视角为前提。</p>
+
+<h2 id="sec9-1">9.1 \(\mathcal{B}(X, Y)\) 是赋范空间</h2>
+
+<p>先把"<em>算子的加法 / 数乘</em>" 写清楚。两个有界算子 \(S, T : X \to Y\)，定义</p>
+
+<p>\[
+(S + T)(x) := S(x) + T(x), \quad (\alpha T)(x) := \alpha \cdot T(x).
+\]</p>
+
+<p>线性显然。有界性：</p>
+
+<p>\[
+\|(S + T) x\| = \|Sx + Tx\| \le \|Sx\| + \|Tx\| \le (\|S\| + \|T\|) \|x\|.
+\]</p>
+
+<p>所以 \(S + T\) 有界，且</p>
+
+<p>\[\boxed{\ \|S + T\| \le \|S\| + \|T\|.\ }\]</p>
+
+<p>同样 \(\alpha T\) 有界，\(\|\alpha T\| = |\alpha| \|T\|\)。</p>
+
+<p>验证 \(\|\cdot\|\) 是范数：</p>
 
 <ul>
-  <li>把 \(\mathcal{B}(X, Y) = \{T : X \to Y \text{ 有界线性}\}\) 作为赋范空间组织起来。</li>
-  <li>证 \(\mathcal{B}(X, Y)\) 是 Banach 空间——只要 \(Y\) 是。这条结论看似温和，却是后面所有"算子序列收敛"的根基。</li>
-  <li>三种算子序列收敛：算子范数收敛、强收敛、弱收敛。三者在无穷维彼此<em>不</em>等价。</li>
-  <li>\(\mathcal{B}(X)\) 作为 Banach 代数：有结合乘法、有单位元 \(I\)、范数与乘法相容 \(\|ST\| \le \|S\| \|T\|\)。</li>
-  <li>Neumann 级数：当 \(\|T\| < 1\) 时 \(I - T\) 可逆，且 \((I - T)^{-1} = \sum T^n\)。这是分析里"几何级数"的算子版。</li>
-  <li>谱半径公式预告 \(\rho(T) = \lim \|T^n\|^{1/n}\)——第 21 章会真正用到，这里先把它写在视野里。</li>
+  <li><em>正定</em>：\(\|T\| = \sup \|Tx\| / \|x\| \ge 0\)；\(\|T\| = 0 \Leftrightarrow Tx = 0\) 对所有 \(x\) \(\Leftrightarrow T = 0\)。</li>
+  <li><em>齐次</em>：\(\|\alpha T\| = |\alpha| \|T\|\)。</li>
+  <li><em>三角</em>：上面刚证。</li>
 </ul>
 
-<h2 id="sec9-1">9.1 \(\mathcal{B}(X, Y)\) 作为赋范空间</h2>
+<p>三条全过——\(\mathcal{B}(X, Y)\) 在算子范数下是<em>赋范空间</em>。</p>
 
-<p>设 \(X, Y\) 是赋范空间。集合</p>
+<p>这件事其实有点神奇。\(\mathcal{B}(X, Y)\) 的元素是<em>函数</em>（从 \(X\) 到 \(Y\) 的映射），可它们用算子范数<em>聚成一个赋范空间</em>，和你之前看到的"<em>点的空间</em>"（\(\ell^2\), \(C[0, 1]\) 等）地位完全平行。<em>算子也是几何对象</em>。</p>
+
+<h2 id="sec9-2">9.2 \(Y\) 完备 ⟹ \(\mathcal{B}(X, Y)\) 完备</h2>
+
+<p>这是这一章<em>第一</em> 个真正定理。它的<em>结论</em> 强（Banach 空间），它的<em>条件</em> 简单（只需 \(Y\) 完备，不要求 \(X\) 完备）。</p>
+
+<p><strong>定理（\(\mathcal{B}(X, Y)\) 是 Banach 空间）。</strong>设 \(X\) 是赋范空间，\(Y\) 是 Banach 空间。则 \(\mathcal{B}(X, Y)\) 在算子范数下是 Banach 空间。</p>
+
+<p>证明分四步：取一列 Cauchy 算子 \(\{T_n\}\)；逐点构造极限算子 \(T\)；验证 \(T\) 线性 + 有界；验证 \(T_n \to T\) 在算子范数下。</p>
+
+<p><strong>第一步：构造 \(T\)。</strong>设 \(\{T_n\} \subset \mathcal{B}(X, Y)\) 是 Cauchy 列：</p>
 
 <p>\[
-\mathcal{B}(X, Y) = \{T : X \to Y \text{ 线性 + 有界}\}
+\forall \varepsilon > 0,\ \exists N,\ \forall n, m \ge N: \|T_n - T_m\| < \varepsilon.
 \]</p>
 
-<p>在加法 \((S + T)(x) = Sx + Tx\) 与数乘 \((\alpha T)(x) = \alpha (Tx)\) 下是向量空间。算子范数 \(\|T\|\)（第 8 章定义）让它成为赋范空间。这一步几乎是字面验证，但不能跳过——你需要确认：</p>
+<p>对固定 \(x \in X\)，看 \(\{T_n x\}\) 在 \(Y\) 中。用算子范数控制：</p>
+
+<p>\[
+\|T_n x - T_m x\| = \|(T_n - T_m) x\| \le \|T_n - T_m\| \cdot \|x\| < \varepsilon \|x\|.
+\]</p>
+
+<p>所以 \(\{T_n x\}\) 是 \(Y\) 中 Cauchy 列。<em>用 \(Y\) 完备</em>（这是这条定理唯一一处真正用到的"<em>分析资源</em>"）：\(T_n x\) 收敛到某 \(y \in Y\)。定义 \(T x := y\)。</p>
+
+<p><strong>第二步：\(T\) 线性。</strong>由极限保线性运算：</p>
+
+<p>\[
+T(\alpha x + \beta x') = \lim T_n(\alpha x + \beta x') = \lim (\alpha T_n x + \beta T_n x') = \alpha Tx + \beta Tx'.
+\]</p>
+
+<p><strong>第三步：\(T\) 有界。</strong>Cauchy 列必有界，所以存在 \(M\) 使所有 \(\|T_n\| \le M\)。对每个 \(x\)：</p>
+
+<p>\[
+\|Tx\| = \lim \|T_n x\| \le \limsup \|T_n\| \|x\| \le M \|x\|.
+\]</p>
+
+<p>所以 \(\|T\| \le M < \infty\)。</p>
+
+<p><strong>第四步：\(T_n \to T\) 在算子范数下。</strong>这一步最微妙，要求"<em>对所有 \(x\) 同时控制</em>"。固定 \(\varepsilon > 0\)，取 \(N\) 使 \(n, m \ge N\) 时 \(\|T_n - T_m\| < \varepsilon\)。对任意 \(x\) 和这样的 \(n, m\)：</p>
+
+<p>\[
+\|T_n x - T_m x\| < \varepsilon \|x\|.
+\]</p>
+
+<p>固定 \(n \ge N\)，让 \(m \to \infty\)。由 \(T_m x \to Tx\)，</p>
+
+<p>\[
+\|T_n x - T x\| = \lim_{m \to \infty} \|T_n x - T_m x\| \le \varepsilon \|x\|.
+\]</p>
+
+<p>这条对<em>所有 \(x\)</em> 同时成立，所以</p>
+
+<p>\[
+\|T_n - T\| = \sup_{\|x\| = 1} \|T_n x - T x\| \le \varepsilon.
+\]</p>
+
+<p>对所有 \(n \ge N\) 成立——\(T_n \to T\) 在算子范数下。\(\mathcal{B}(X, Y)\) 完备。</p>
+
+<p>请你停下来欣赏第四步的<em>顺序</em>。我们先固定 \(n\) 让 \(m \to \infty\)（用 \(Y\) 完备得到逐点极限），然后在<em>对所有 \(x\) 同时</em> 取 sup 之前，先把<em>对 \(\varepsilon\) 的一致控制</em> 已经攒好。这种"逐点极限 + 一致控制 = 算子范数收敛" 的论证<em>会反复出现</em> 在这本书每一处证 \(\mathcal{B}(X, Y)\) 元素列收敛的地方。</p>
+
+<p>这条定理一个<em>意外的</em> 推论：<em>对偶空间</em> \(X^* := \mathcal{B}(X, \mathbb{R})\) <em>总是</em> Banach 空间——因为 \(\mathbb{R}\)（或 \(\mathbb{C}\)）完备。<em>无论 \(X\) 自己完不完备</em>，它的对偶都完备。这是<a href="ch15.html">第 15 章</a>对偶论的开门事实。</p>
+
+<h2 id="sec9-3">9.3 算子序列三种收敛</h2>
+
+<p>\(\mathcal{B}(X, Y)\) 既然是赋范空间，"<em>收敛</em>" 已经有意义——按算子范数 \(\|T_n - T\| \to 0\)。但这不是唯一一种自然的"算子收敛"。下面三种都自然，强弱依次：</p>
+
+<p>\[\boxed{\quad
+\begin{aligned}
+&\textbf{一致收敛 (uniform):}\quad && \|T_n - T\| \to 0.\\
+&\textbf{强收敛 (strong):}\quad && T_n x \to T x \text{ 对每个 } x \in X.\\
+&\textbf{弱收敛 (weak):}\quad && \langle T_n x, y^* \rangle \to \langle T x, y^* \rangle \text{ 对每个 } x, y^*.
+\end{aligned}
+\quad}\]</p>
+
+<p>(<em>弱收敛</em> 用到对偶空间 \(Y^*\)，里面的 \(y^* \in Y^*\)。如果 \(Y\) 是 Hilbert 空间，可以把 \(\langle \cdot, y^*\rangle\) 想成与某 \(y \in Y\) 的内积。)</p>
+
+<p>"一致" 比"强" 强；"强" 比"弱" 强——这点你可以一行验：算子范数收敛 ⟹ 算子在每个固定 \(x\) 上收敛（取 \(x\) 后 \(\|T_n x - Tx\| \le \|T_n - T\| \|x\| \to 0\)）；强收敛 ⟹ 弱收敛（按对偶配对的连续性）。</p>
+
+<p>但<em>反向</em> 怎样？让我们看一个让你不舒服的反例：<em>有强收敛但不一致收敛的算子列</em>。</p>
+
+<p><strong>反例（移位算子）。</strong>设 \(X = \ell^2\)，\(R\) 是右移算子（上一章例 5）。看其幂 \(R^n\)：</p>
+
+<p>\[
+R^n (x_1, x_2, x_3, \ldots) = (\underbrace{0, \ldots, 0}_{n \text{ 个}}, x_1, x_2, \ldots).
+\]</p>
+
+<p>问 \(R^n\) 收敛吗？算 \(\|R^n e_1\|_2 = 1\)（\(R^n e_1 = e_{n+1}\) 仍是单位长度），所以 \(R^n e_1\) 不趋零。<em>强收敛</em>不到 0。</p>
+
+<p>但算 <em>弱收敛</em>。对每个 \(y \in \ell^2\)：</p>
+
+<p>\[
+\langle R^n x, y \rangle = \sum_k (R^n x)_k y_k = \sum_{k > n} x_{k - n} y_k.
+\]</p>
+
+<p>由 Cauchy-Schwarz \(|\langle R^n x, y \rangle| \le \|x\|_2 \cdot \left(\sum_{k > n} y_k^2\right)^{1/2}\)。后面那个尾项 \(\sum_{k > n} y_k^2 \to 0\)（因为 \(\sum y_k^2 < \infty\)）。所以 \(\langle R^n x, y \rangle \to 0\) 对每个 \(x, y\)——\(R^n\) <em>弱</em> 收敛到 0。</p>
+
+<p>合起来：</p>
+
+<p>\[\boxed{\ R^n \xrightarrow{\text{弱}} 0, \quad R^n \not\xrightarrow{\text{强}} 0, \quad \text{自然 } R^n \not\xrightarrow{\text{一致}} 0.\ }\]</p>
+
+<p>这是一个标准反例——它告诉你"<em>三种收敛</em>" 在无穷维真的<em>不同</em>。</p>
+
+<p>请你停下来想：右移 \(R^n\) 把每个 \(\ell^2\) 向量"<em>越推越远</em>"——非零分量被推到第 \(n+1, n+2, \ldots\) 位。在<em>每个固定的</em> 投影下（"<em>看第 \(k\) 位</em>"）总会被推到那个位置之外，所以投影变成 0。但<em>整体的 \(\ell^2\) 长度</em> 一直是 1——不可能消失。这是<em>"质量逃到无穷"</em> 的现象，弱收敛到 0 但不强收敛——它将在<a href="ch17.html">第 17 章</a>弱收敛和<a href="ch18.html">第 18 章</a> Banach-Alaoglu 里被反复回访。</p>
+
+<p>有限维不会有这种事。\(\mathbb{R}^n\) 上有限维算子的三种收敛<em>等价</em>——这又是有限维的"<em>白送奇迹</em>"。无穷维一裂为三。</p>
+
+<h2 id="sec9-4">9.4 \(\mathcal{B}(X)\) 是 Banach 代数</h2>
+
+<p>把<em>定义域 = 值域</em> 限制到一种特殊情况——\(X = Y\)。记 \(\mathcal{B}(X) := \mathcal{B}(X, X)\)。这是<em>X 上的有界算子的全体</em>。</p>
+
+<p>新结构：<em>复合给一个乘法</em>。两个算子 \(S, T \in \mathcal{B}(X)\)，定义 \((S T)(x) := S(T(x))\)。</p>
+
+<p>线性：\(ST(\alpha x + \beta x') = S(\alpha T x + \beta T x') = \alpha STx + \beta STx'\)。</p>
+
+<p>有界：</p>
+
+<p>\[
+\|(ST) x\| = \|S(Tx)\| \le \|S\| \|Tx\| \le \|S\| \|T\| \|x\|.
+\]</p>
+
+<p>所以 \(ST \in \mathcal{B}(X)\)，且</p>
+
+<p>\[\boxed{\quad \|ST\| \le \|S\| \cdot \|T\|. \quad}\]</p>
+
+<p>这条不等式叫<em>子乘法性</em>（submultiplicativity）。它和"<em>恒等元 \(I\) 范数 1</em>" 一起，让 \(\mathcal{B}(X)\) 成为<em>赋范代数</em>。当 \(X\) 完备（即 \(\mathcal{B}(X)\) 完备），它就是<em>Banach 代数</em>——一个完备的赋范代数。</p>
+
+<p>验证三个代数公理（结合性 / 分配性 / 单位元）：</p>
 
 <ul>
-  <li>\(\|T\| \ge 0\)；\(\|T\| = 0 \iff T = 0\)；</li>
-  <li>\(\|\alpha T\| = |\alpha| \|T\|\)；</li>
-  <li>\(\|S + T\| \le \|S\| + \|T\|\)。</li>
+  <li><em>结合性</em>：\((RS)T = R(ST)\)（因为函数复合本就结合）。</li>
+  <li><em>分配性</em>：\(R(S + T) = RS + RT\)（每点验证）。</li>
+  <li><em>单位元</em>：\(I T = T I = T\)，且 \(\|I\| = 1\)。</li>
 </ul>
 
-<p>这三条已经在第 8 章 8.2 节验过。所以 \(\mathcal{B}(X, Y)\) 配算子范数是赋范空间。</p>
+<p>但请注意——<em>不交换</em>。\(ST\) 一般不等于 \(TS\)。最简单的反例：在 \(\mathbb{R}^2\) 上取两个旋转矩阵，绕不同轴或不同角度——它们一般不交换。在 \(\ell^2\) 上取右移 \(R\) 和左移 \(L\)：\(L R = I\)（"向右移再向左移" 还原），但 \(R L \neq I\)（"向左移把 \(x_1\) 丢了，再向右移补 0\)\(\)\(\)，结果是 \((0, x_2, x_3, \ldots) \neq (x_1, x_2, \ldots)\)）。所以 \(L R \neq R L\)。这正是<a href="ch1.html#sec1-5">第 1 章 1.5 节</a>"算子 ≠ 矩阵" 故事的精确表达——\(R\) 单不满，所以它有左逆但无右逆。</p>
 
-<h2 id="sec9-2">9.2 \(\mathcal{B}(X, Y)\) 是 Banach 空间</h2>
+<p>这层"<em>算子是非交换 Banach 代数</em>" 的视角是<em>谱论</em>（<a href="ch21.html">第 21 章</a>）的<em>整个工作语言</em>。在那一章你会问：什么样的 \(T \in \mathcal{B}(X)\) 在这个代数里"<em>可逆</em>"？答案不是"<em>单射 + 满射</em>"（无穷维这两个不再等价于可逆），而是更精细的"<em>谱不含 0</em>"。</p>
 
-<p>这是本章的<em>第一条结构定理</em>：</p>
+<h2 id="sec9-5">9.5 Neumann 级数：\(\|T\| < 1 \Rightarrow I - T\) 可逆</h2>
 
-<p><strong>定理。</strong>若 \(Y\) 是 Banach 空间（\(X\) 只需赋范），则 \(\mathcal{B}(X, Y)\) 在算子范数下是 Banach 空间。</p>
+<p>谱论的<em>第一</em> 个关键工具——也是在 \(\mathcal{B}(X)\) 里"<em>用代数解决可逆问题</em>" 的最朴素例子。</p>
 
-<p>证明：取 Cauchy 序列 \(\{T_n\} \subset \mathcal{B}(X, Y)\)。对每个固定 \(x \in X\)：</p>
+<p>朴素直觉。在<em>实数</em> 上，\(|t| < 1\) 时几何级数 \(\sum t^n = 1/(1 - t)\)。也就是 \(1 - t\) 可逆，逆等于级数和。能不能直接<em>抄</em> 到 \(\mathcal{B}(X)\)？</p>
 
-<p>\[
-\|T_n x - T_m x\|_Y \le \|T_n - T_m\| \cdot \|x\|_X \to 0,
-\]</p>
+<p>答案：可以，<em>只要</em> \(X\) 完备。</p>
 
-<p>所以 \(\{T_n x\}\) 是 \(Y\) 中的 Cauchy 序列。\(Y\) 完备 \(\Rightarrow\) 存在 \(T x := \lim T_n x \in Y\)。</p>
+<p><strong>定理（Neumann 级数）。</strong>设 \(X\) 是 Banach 空间，\(T \in \mathcal{B}(X)\)，\(\|T\| < 1\)。则 \(I - T\) 在 \(\mathcal{B}(X)\) 中可逆，并且</p>
 
-<p>线性：由极限算子保线性性。</p>
+<p>\[\boxed{\quad
+(I - T)^{-1} = \sum_{n = 0}^\infty T^n.
+\quad}\]</p>
 
-<p>有界：由 \(\{T_n\}\) Cauchy \(\Rightarrow\) \(\|T_n\|\) 有界（设 \(\le M\)）；取极限 \(\|T x\|_Y \le M \|x\|_X\)。所以 \(T \in \mathcal{B}(X, Y)\)。</p>
+<p>该级数在算子范数下绝对收敛，并 \(\|(I - T)^{-1}\| \le 1 / (1 - \|T\|)\)。</p>
 
-<p>范数收敛：对任意 \(\varepsilon > 0\)，取 \(N\) 使 \(\|T_n - T_m\| < \varepsilon\) 对 \(n, m \ge N\)。固定 \(x\) 与 \(n \ge N\)，让 \(m \to \infty\)：</p>
-
-<p>\[
-\|T_n x - T x\|_Y \le \varepsilon \|x\|_X.
-\]</p>
-
-<p>除以 \(\|x\|_X\) 取上确界：\(\|T_n - T\| \le \varepsilon\) 对 \(n \ge N\)。即 \(T_n \to T\) 在算子范数下。结束。</p>
-
-<p>这条定理至关重要：它让"算子的极限是算子"成为可靠操作。后面所有用 Neumann 级数、谱投影、半群指数函数 \(e^{tA}\) 的论证都要靠它。</p>
-
-<h2 id="sec9-3">9.3 算子序列的三种收敛</h2>
-
-<p>无穷维里"算子序列收敛"有三种自然定义，彼此<em>不等价</em>：</p>
-
-<p><strong>(U) 算子范数收敛 / 一致收敛：</strong>\(T_n \to T\) 在 \(\mathcal{B}(X, Y)\) 中，即 \(\|T_n - T\| \to 0\)。</p>
-
-<p><strong>(S) 强收敛 / 逐点收敛：</strong>对每个 \(x \in X\)，\(T_n x \to T x\) 在 \(Y\) 中。</p>
-
-<p><strong>(W) 弱收敛：</strong>对每个 \(x \in X\) 与每个 \(y^* \in Y^*\)，\(\langle y^*, T_n x \rangle \to \langle y^*, T x \rangle\)。</p>
-
-<p>三种收敛之间的强弱关系是 \(\text{(U)} \Rightarrow \text{(S)} \Rightarrow \text{(W)}\)。反向蕴含<em>都不</em>成立——本节给反例。</p>
-
-<p><strong>反例 (S) 不蕴含 (U)：投影到前 \(n\) 个坐标。</strong>在 \(\ell^2\) 上定义 \(P_n x = (x_1, x_2, \ldots, x_n, 0, 0, \ldots)\)。每个 \(x \in \ell^2\) 满足 \(P_n x \to x\)（\(L^2\) 收敛 = 余尾趋零），所以 \(P_n \to I\) 强收敛。但 \(\|I - P_n\| = 1\)（取 \(x = e_{n+1}\)），所以<em>不</em>是算子范数收敛。</p>
-
-<p><strong>反例 (W) 不蕴含 (S)：移位算子。</strong>在 \(\ell^2\) 上 \(R\) 是右移。考虑 \(R^n e_1 = e_{n+1}\)。这个序列<em>不</em>强收敛（\(\|R^n e_1\| = 1\) 不趋零；事实上不存在 \(\ell^2\) 中的极限）。但弱收敛：对任意 \(y \in \ell^2\)，\(\langle y, R^n e_1 \rangle = \overline{y_{n+1}} \to 0\)（因为 \(\sum |y_k|^2 < \infty\) 蕴含 \(y_k \to 0\)）。所以 \(R^n e_1 \to 0\) 弱收敛但不强收敛。</p>
-
-<p>这三种收敛各有用处：</p>
-
-<ul>
-  <li>算子范数收敛是最强的，分析里非常稀有，常用在 Neumann 级数、解析函数演算；</li>
-  <li>强收敛是默认收敛模式，定义"算子序列趋近极限算子"的最自然方式；</li>
-  <li>弱收敛常出现在变分法、紧算子、Banach–Alaoglu 等话题（第 17 章会专门展开）。</li>
-</ul>
-
-<h2 id="sec9-4">9.4 \(\mathcal{B}(X)\) 作为 Banach 代数</h2>
-
-<p>当 \(X = Y\) 时，\(\mathcal{B}(X) := \mathcal{B}(X, X)\) 上多了一个自然的乘法——算子复合：</p>
+<p>证明。先证级数收敛。由子乘法性 \(\|T^n\| \le \|T\|^n\)（按归纳：\(\|T^{n+1}\| = \|T \cdot T^n\| \le \|T\| \|T^n\| \le \|T\|^{n+1}\)）。所以</p>
 
 <p>\[
-(ST)(x) = S(T x).
+\sum_{n = 0}^\infty \|T^n\| \le \sum \|T\|^n = \frac{1}{1 - \|T\|} < \infty.
 \]</p>
 
-<p>这个乘法满足：</p>
+<p>这是个<em>绝对收敛</em> 的级数。<em>用 \(\mathcal{B}(X)\) 完备</em>（=用 \(X\) 完备 + 上一节定理）：绝对收敛级数收敛。设和为 \(S := \sum T^n\)。由三角不等式 \(\|S\| \le \sum \|T^n\| \le 1 / (1 - \|T\|)\)。</p>
 
-<ul>
-  <li>结合：\((ST)U = S(TU)\)；</li>
-  <li>左/右分配：\(S(T_1 + T_2) = S T_1 + S T_2\)、\((S_1 + S_2) T = S_1 T + S_2 T\)；</li>
-  <li>数乘相容：\(\alpha (ST) = (\alpha S) T = S(\alpha T)\)；</li>
-  <li>单位元 \(I\)：\(IT = TI = T\)；</li>
-  <li><strong>子乘法范数性：\(\|ST\| \le \|S\| \cdot \|T\|\)</strong>。</li>
-</ul>
-
-<p>最后一条值得专门看一眼。它的证明就一行：\(\|(ST)x\| = \|S(Tx)\| \le \|S\| \|Tx\| \le \|S\| \|T\| \|x\|\)。但这条不等式有非常深的后果——它就是"Banach 代数"这个概念的<em>唯一</em>定义性条件之外的内容。</p>
-
-<p><strong>定义。</strong>一个<strong>Banach 代数</strong> \(A\) 是一个 Banach 空间 + 一个结合乘法，满足子乘法范数性 \(\|ab\| \le \|a\| \|b\|\)。如果还有单位元 \(1\) 满足 \(\|1\| = 1\)，叫<strong>带单位 Banach 代数</strong>。</p>
+<p>验证 \(S\) 是 \(I - T\) 的逆。先算</p>
 
 <p>\[
-\boxed{\ \mathcal{B}(X) \text{（} X \text{ Banach）是带单位 Banach 代数。}\ }
+(I - T) S = (I - T) \sum_{n = 0}^\infty T^n = \sum_{n = 0}^\infty (T^n - T^{n+1}) = I - \lim_{N \to \infty} T^{N+1}.
 \]</p>
 
-<p>这条结构性结论就是<em>谱论的舞台</em>。算子的"代数运算"和"分析运算"被打包在一起，使得我们能给一个算子写下它的"幂级数函数"\(f(T)\)、"指数" \(e^T\)、"逆" \(T^{-1}\)、"谱" \(\sigma(T)\) 等等。这些工具都需要 Banach 代数结构。</p>
+<p>由 \(\|T^N\| \le \|T\|^N \to 0\)，最后那项是 0。所以 \((I - T) S = I\)。同样 \(S (I - T) = I\)（"<em>左乘 / 右乘</em>" 都用一遍同样的伸缩级数）。所以 \(S\) 就是 \(I - T\) 的逆。</p>
 
-<h2 id="sec9-5">9.5 Neumann 级数：算子版的几何级数</h2>
+<p>请你停下来感受这条定理的<em>分量</em>。它把"<em>逆算子的存在性</em>" 这件听起来抽象的事，<em>具体</em> 写成一个级数。这不是"<em>存在某个逆</em>"，是"<em>逆 = 这个级数和</em>"。在数值线性代数里这条定理直接给一个迭代算法：要算 \((I - T)^{-1} b\)，就累加 \(b + Tb + T^2 b + T^3 b + \ldots\) 直到误差够小——这正是<a href="../数值方法/index.html">数值方法</a>里"<em>Jacobi 迭代</em>" "<em>Gauss-Seidel 迭代</em>" 的精神祖先。</p>
 
-<p>这是本章最实用的一条结论：</p>
+<p>条件 \(\|T\| < 1\) 意味着 \(T\) 是<em>"</em> 弱"</em> 的扰动——\(I - T\) 是"<em>恒等加小扰动</em>"。Neumann 定理说：<em>"</em> 恒等加小扰动"</em> 总<em>可逆</em>，逆有具体级数。</p>
 
-<p><strong>定理（Neumann 级数）。</strong>设 \(X\) 是 Banach 空间，\(T \in \mathcal{B}(X)\)，\(\|T\| < 1\)。则 \(I - T\) 可逆，且</p>
-
-<p>\[
-\boxed{\ (I - T)^{-1} = \sum_{n=0}^\infty T^n, \qquad \|(I - T)^{-1}\| \le \frac{1}{1 - \|T\|}.\ }
-\]</p>
-
-<p>证明几乎是字面把"\(1/(1 - r) = \sum r^n\)"搬到算子上。子乘法范数性给 \(\|T^n\| \le \|T\|^n\)，所以 \(\sum \|T^n\| \le \sum \|T\|^n = 1/(1 - \|T\|) < \infty\)（因为 \(\|T\| < 1\)）。\(\mathcal{B}(X)\) 完备 \(\Rightarrow\) 绝对收敛级数收敛（第 2 章 2.5 节判据），所以 \(S := \sum_{n=0}^\infty T^n \in \mathcal{B}(X)\)。再核算 \(S(I - T) = (I - T) S = I\)。范数估计直接由级数。</p>
-
-<p>Neumann 级数的几个典型应用：</p>
-
-<ul>
-  <li><strong>积分方程的逐次逼近 / Picard 迭代。</strong>方程 \(f - K f = g\)（\(K\) 是 \(\|K\| < 1\) 的积分算子）有唯一解 \(f = (I - K)^{-1} g = \sum K^n g\)。这是<a href="../微分方程/index.html">微分方程读本</a>里 Picard 存在唯一性的几何重写——它的核心就是 Banach 代数 + Neumann 级数。</li>
-  <li><strong>"小扰动"理论。</strong>若 \(A\) 可逆且 \(B\) 是<em>小扰动</em>（\(\|A^{-1} B\| < 1\)），则 \(A + B = A(I + A^{-1} B)\) 仍可逆，因为 \(I + A^{-1} B = I - (-A^{-1} B)\) 可逆。这给出"可逆算子集是开集"的关键事实——在第 21 章谱论里这条会反复用。</li>
-  <li><strong>谱半径估计。</strong>Neumann 级数对 \(\|T\| < 1\) 起作用，但实际真正起作用的常数是<em>谱半径</em>：\(I - T\) 可逆当且仅当 \(1 \notin \sigma(T)\)，等价于 \(\rho(T) < 1\)。下一节先把谱半径的"具体公式"指出来。</li>
-</ul>
+<p>这件事还有一条直接推论：<em>可逆算子的集合在 \(\mathcal{B}(X)\) 中是开集</em>。设 \(A\) 可逆，\(\|A^{-1}\|^{-1}\) 是开球的半径。当 \(B\) 满足 \(\|A - B\| < \|A^{-1}\|^{-1}\)，写 \(B = A - (A - B) = A (I - A^{-1}(A - B))\)。设 \(T = A^{-1}(A - B)\)，则 \(\|T\| \le \|A^{-1}\| \|A - B\| < 1\)，所以 \(I - T\) 由 Neumann 可逆，从而 \(B = A(I - T)\) 也可逆。<em>可逆性是开条件</em>——这条事实在谱论里就成了"<em>谱是闭集</em>" 的来源。</p>
 
 <h2 id="sec9-6">9.6 谱半径公式预告</h2>
 
-<p>对 \(T \in \mathcal{B}(X)\)，定义<strong>谱半径</strong></p>
+<p>Neumann 定理给一个<em>充分条件</em> "\(\|T\| < 1 \Rightarrow I - T\) 可逆"。这个条件能不能<em>放宽</em>？</p>
+
+<p>具体的：考虑 \(I - \lambda T\)，其中 \(\lambda \in \mathbb{C}\) 是数。Neumann 给"\(|\lambda| \|T\| < 1\)" 时可逆。但有时即便 \(|\lambda| \|T\| > 1\)，\(I - \lambda T\) 也可逆——比如 \(T\) 的"<em>真实</em> 大小" 比它的范数小（在某些方向算子被 \(T\) 拉伸，但在大部分方向不会）。</p>
+
+<p>正确的"<em>真实大小</em>" 不是 \(\|T\|\)——是<em>谱半径</em>：</p>
 
 <p>\[
-\rho(T) := \inf_{n \ge 1} \|T^n\|^{1/n} = \lim_{n \to \infty} \|T^n\|^{1/n}.
+\rho(T) := \sup \{|\lambda| : \lambda \in \sigma(T)\},
 \]</p>
 
-<p>下确界与极限相等是个不平凡的事实（用次乘法序列的"Fekete 引理"，详细在<a href="appA.html">附录 A</a>）。</p>
+<p>其中 \(\sigma(T)\) 是 \(T\) 的<em>谱</em>（让 \(\lambda I - T\) 不可逆的所有 \(\lambda\)）。</p>
 
-<p>\[
-\boxed{\ \rho(T) = \lim_{n \to \infty} \|T^n\|^{1/n} \le \|T\|.\ }
-\]</p>
+<p>关键是<em>谱半径公式</em>（Gelfand）：</p>
 
-<p>不等号 \(\rho(T) \le \|T\|\) 来自次乘法（\(\|T^n\|^{1/n} \le \|T\|^{n/n} = \|T\|\)）。值得知道的是 \(\rho(T)\) 可以严格小于 \(\|T\|\)：比如<em>幂零矩阵</em>的谱半径为 0 但范数可能很大。这种情形在无穷维同样出现。</p>
+<p>\[\boxed{\quad
+\rho(T) = \lim_{n \to \infty} \|T^n\|^{1/n}.
+\quad}\]</p>
 
-<p>谱半径的几何含义在第 21 章会被正式给出：它就是"复平面上 \(\sigma(T)\) 的最大模"——也就是说</p>
+<p>(<em>这条极限永远存在</em>，详见<a href="appA.html">附录 A</a>。)</p>
 
-<p>\[
-\rho(T) = \max\{|\lambda| : \lambda \in \sigma(T)\}.
-\]</p>
+<p>这条公式<em>意义重大</em>：</p>
 
-<p>这条等式叫<strong>Gelfand 谱半径公式</strong>，它的证明本质上是给 \((\lambda I - T)^{-1}\) 当成 \(\lambda\) 的解析函数处理（用复分析里 Liouville 定理 \(\Rightarrow\) 谱非空）。这是泛函分析与复分析最优雅的交叉点之一。</p>
+<ul>
+  <li>右边是<em>纯算子范数</em> 量，可算可估；左边是<em>谱</em> 量，在复平面上的几何信息。<em>两者相等</em>——这是个"<em>分析-代数</em>" 之间的桥梁。</li>
+  <li>由不等式 \(\|T^n\|^{1/n} \le \|T\|\)，谱半径 \(\rho(T) \le \|T\|\)。<em>谱半径不超过算子范数</em>——所以 Neumann 的"\(\|T\| < 1\)" 是个偏保守的条件，真正的临界是"\(\rho(T) < 1\)"。</li>
+  <li>当 \(T\) 自伴或正规（在 Hilbert 空间上），\(\rho(T) = \|T\|\)——两者重合。一般情况严格不等。例：在 \(\ell^2\) 上的 Volterra 算子 \((Vf)(x) = \int_0^x f\)，\(\|V\| = 1\) 但 \(\rho(V) = 0\)（它的所有迭代 \(V^n\) 范数 \(\to 0\)）。</li>
+</ul>
 
-<p>本章到此把"算子代数"的语言备齐：算子范数、三种收敛、子乘法范数性、Neumann 级数、谱半径。这些工具会在第 20 章紧算子、第 21 章谱定理、第 22 章 Fredholm、第 24 章量子力学算子里反复使用。</p>
+<p>在数值方法里这条公式直接是<em>"</em> 迭代法收敛性"</em> 的判据。要用迭代 \(x_{n+1} = T x_n + b\) 解方程组 \((I - T) x = b\)，迭代收敛 \(\Leftrightarrow \rho(T) < 1\)——参见<a href="../数值方法/ch18.html">数值方法读本第 18 章</a>关于 Jacobi / Gauss-Seidel 收敛性的判据。</p>
 
-<p>下一章我们要切到<em>三大原理</em>的入口：Baire 范畴定理。它本身是一个完备度量空间的拓扑事实，但它会在接下来的三章（一致有界、开映射、闭图像）里作为"杠杆"被反复利用——这些定理的所有"非平凡性"几乎都靠 Baire 这一条。</p>
+<p>完整的谱论<em>留到</em> <a href="ch21.html">第 21 章</a>，那里会用 Banach 代数 + Neumann + 谱半径公式 + Cauchy 积分（解析函数演算）一起搭<em>复变函数版的算子理论</em>。这一章先把工具备齐：</p>
+
+<p>\[\boxed{\quad
+\begin{aligned}
+&\textbf{1. 空间结构:}\quad && \mathcal{B}(X, Y) \text{ 是赋范空间}; Y \text{ 完备} \Rightarrow \text{ Banach 空间}.\\
+&\textbf{2. 三种收敛:}\quad && \text{一致 } \Rightarrow \text{ 强 } \Rightarrow \text{ 弱};\ \text{反向不成立}(R^n \text{ 反例}).\\
+&\textbf{3. 代数结构:}\quad && \mathcal{B}(X) \text{ 是 Banach 代数};\ \|ST\| \le \|S\|\|T\|;\ \text{ 不交换}.\\
+&\textbf{4. Neumann:}\quad && \|T\| < 1 \Rightarrow (I - T)^{-1} = \sum T^n;\ \text{ 可逆性是开条件}.\\
+&\textbf{5. 谱半径:}\quad && \rho(T) = \lim \|T^n\|^{1/n} \le \|T\|;\ \text{ 完整理论见 ch21}.
+\end{aligned}
+\quad}\]</p>
+
+<p>下一章我们离开"<em>算子代数</em>" 的纯线性代数面，回到完备空间的<em>纯拓扑</em>——证一个看起来朴素到无聊的定理：<em>完备度量空间不能写成可数个"瘦" 闭集的并</em>（Baire 范畴定理）。这个定理本身的<em>形式</em> 不漂亮——但它一旦套到 Banach 空间上就<em>孵化</em> 出三大原理（一致有界 / 开映射 / 闭图像）。这是泛函分析<em>整本书的脊柱</em>，让所有"<em>逐点信息升级到一致信息</em>" "<em>代数等式自动成为拓扑等式</em>" 的论证有了底层引擎。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 有界线性算子</a><a href="ch10.html">下一章 · 第 10 章 Baire 范畴定理 →</a></nav>
 </main>

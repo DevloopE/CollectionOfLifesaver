@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第 12 章 开映射定理与闭图像定理 — 普林斯顿泛函分析读本</title>
+<title>第 12 章 开映射定理 + 闭图像定理 — 普林斯顿泛函分析读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -32,151 +32,267 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 一致有界原理（Banach–Steinhaus）</a><a href="ch13.html">下一章 · 第 13 章 Hahn–Banach 延拓定理 →</a></nav>
-<h1 id="ch12">第 12 章 开映射定理与闭图像定理</h1>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 一致有界原理</a><a href="ch13.html">下一章 · 第 13 章 Hahn-Banach 解析形式 →</a></nav>
+<h1 id="ch12">第 12 章 开映射定理 + 闭图像定理</h1>
 
-<p>这一章给三大原理的剩下两条。它们的核心精神可以用一句话说穿：<strong>"代数等式何时自动升级为拓扑等式"</strong>。在有限维这件事是免费的——一个 \(n \times n\) 矩阵满射 \(\iff\) 双射 \(\iff\) 可逆 \(\iff\) 逆矩阵存在；逆矩阵自动连续。在无穷维这每一步都需要论证，而开映射 / 闭图像告诉你：在 Banach 空间之间，<em>只要你写得下"算子是连续的双射"或"算子的图像是闭的"，那它的逆 / 它本身就自动有界</em>。这种"自动有界"是一切现代分析"用代数性质推出连续性"的根。</p>
+<p>请你先回答两个非常具体的问题。</p>
 
+<p><em>问题 A</em>。设 \(T : X \to Y\) 是 Banach 空间之间的<em>有界双射</em>——线性、连续、一一对应。它的代数逆 \(T^{-1} : Y \to X\) 总是存在 (双射的逆), 而且<em>线性</em> (代数事实)。问: \(T^{-1}\) 是不是<em>自动连续</em>?</p>
+
+<p>有限维你早就知道答案是<em>是</em>。Cramer 法则给你逆矩阵的显式公式, 显然连续。可在无穷维, "矩阵" 不再是有限张表, 你不能写显式逆。要不要<em>额外验证</em> \(T^{-1}\) 连续性, 还是它<em>白送</em>?</p>
+
+<p><em>问题 B</em>。设 \(T : X \to Y\) 是 Banach 之间的线性算子, 但你<em>不知</em> \(T\) 连续。你只知道它的<em>图像</em></p>
+
+<p>\[
+\Gamma(T) = \{(x, T x) : x \in X\} \subset X \times Y
+\]</p>
+
+<p>是 \(X \times Y\) 中的<em>闭子集</em>。问: \(T\) 是不是<em>自动连续</em>?</p>
+
+<p>朴素直觉: "图像闭" 是个比"\(T\) 连续" 弱得多的条件。\(T\) 连续意味着"\(x_n \to x \Rightarrow T x_n \to T x\)", 而图像闭只意味着"\(x_n \to x\) <em>且</em> \(T x_n \to y \Rightarrow y = T x\)"——多了一个前提"\(T x_n\) 已经收敛到了某个 \(y\)"。听起来弱很多。可问: 这个弱条件够吗?</p>
+
+<p>这一章我要让你看两个出乎意料的"<em>是</em>"。<em>问题 A 答是</em>——这条结论叫<strong>有界逆定理</strong> (bounded inverse theorem)。<em>问题 B 答是</em>——这条结论叫<strong>闭图像定理</strong> (closed graph theorem)。两条都是 Baire 纲的化身。它们和上一章的 UBP 一起, 构成<em>三大原理</em> 中的后两条。</p>
+
+<p>上一章 UBP 的形状是"<em>逐点 \(\Rightarrow\) 一致</em>"。这一章的形状是"<em>代数事实 \(\Rightarrow\) 拓扑事实</em>"——双射 (代数) 自动给逆连续 (拓扑); 图像闭 (代数 + 拓扑混合) 自动给算子连续 (拓扑)。在每一处, Baire 都把"<em>软</em>" 的条件升级为"<em>硬</em>" 的结论。</p>
+
+<p>顺序: 我们先证<em>开映射定理</em> (它是核心), 推出有界逆定理 (问题 A 的答案), 再用它推闭图像定理 (问题 B 的答案)。</p>
+
+<h2 id="sec12-1">12.1 开映射定理: 陈述</h2>
+
+<p>"开映射" 是说: 把每个开集映成开集。一般连续映射不一定是开映射 (例: \(f(x) = x^2 : \mathbb{R} \to \mathbb{R}\) 把开集 \((-1, 1)\) 映到 \([0, 1)\), 不开)。但下面这条定理说: <em>Banach 空间之间的有界线性满射, 自动是开映射</em>。</p>
+
+<p><strong>定理 12.1 (开映射定理, OMT)</strong>. 设 \(X, Y\) 都是 Banach 空间, \(T : X \to Y\) 是<em>满射</em> 的有界线性算子。则 \(T\) 是<em>开映射</em>: 对 \(X\) 中每个开集 \(U\), \(T(U)\) 是 \(Y\) 中的开集。</p>
+
+<p>等价的局部表述 (用得更顺手): 存在 \(r > 0\) 使</p>
+
+<p>\[
+T(B_X(0, 1)) \supset B_Y(0, r),
+\]</p>
+
+<p>即 \(T\) 把单位开球的像<em>包含</em> \(Y\) 中某个原点开球。</p>
+
+<p>请你停下来理解这个等价。"\(T\) 是开映射" 是关于<em>所有</em> 开集的; "\(T(B(0,1)) \supset B(0,r)\)" 只是关于<em>一个</em> 开球。它们等价, 因为线性 + 平移给"局部 \(\Rightarrow\) 全局"。具体: 任给开集 \(U \subset X\) 与 \(T x_0 \in T(U)\), 取 \(\rho > 0\) 使 \(B(x_0, \rho) \subset U\), 则</p>
+
+<p>\[
+T(U) \supset T(B(x_0, \rho)) = T x_0 + T(B(0, \rho)) = T x_0 + \rho \cdot T(B(0, 1)) \supset T x_0 + \rho \cdot B_Y(0, r) = B_Y(T x_0, \rho r),
+\]</p>
+
+<p>所以 \(T x_0\) 在 \(T(U)\) 内有开球, \(T(U)\) 开。所以下面我们只需证 \(T(B_X(0,1)) \supset B_Y(0, r)\) 这一个局部断言。</p>
+
+<h2 id="sec12-2">12.2 开映射定理: 完整证明 (两步)</h2>
+
+<p>证明分两步, 形状跟上一章 UBP 几乎一字不差: 第一步用 Baire 锁定<em>闭包</em> 含开球, 第二步用<em>几何级数</em> 升级到<em>自身</em> 含开球。</p>
+
+<p><strong>第一步 (Baire 锁定): \(\overline{T(B(0, 1))}\) 含 \(Y\) 的某个原点开球。</strong></p>
+
+<p>因为 \(T\) 满, \(Y = \bigcup_{n=1}^\infty T(B(0, n))\)——任意 \(y \in Y\) 写成 \(y = T x\), 取 \(n > \|x\|\) 即可。但开球的像未必闭, 我们要闭集做 Baire, 所以取闭包:</p>
+
+<p>\[
+Y = \bigcup_{n=1}^\infty \overline{T(B(0, n))}.
+\]</p>
+
+<p>每个 \(\overline{T(B(0, n))}\) 是闭集 (定义就是闭包), \(Y\) 是 Banach 即完备, 由 Baire 至少有一个 \(\overline{T(B(0, N))}\) 有内点——存在 \(y_0 \in Y, s > 0\) 使</p>
+
+<p>\[
+B_Y(y_0, s) \subset \overline{T(B(0, N))}.
+\]</p>
+
+<p>由线性 \(T(B(0, N)) = N \cdot T(B(0, 1))\), 故</p>
+
+<p>\[
+B_Y(y_0, s) \subset N \cdot \overline{T(B(0, 1))}, \quad \text{即} \quad B_Y(y_0/N, s/N) \subset \overline{T(B(0, 1))}.
+\]</p>
+
+<p>把 \(y_0/N\) 改写为 \(y_1\), \(s/N\) 改写为 \(s_1\): \(B_Y(y_1, s_1) \subset \overline{T(B(0, 1))}\)。</p>
+
+<p>下一步要把"\(y_1\) 附近的球" 平移到"原点附近的球"——这里就是一个 reframe, 跟 UBP 第二步一样, 用<em>对称性</em>。\(\overline{T(B(0, 1))}\) 是<em>对称</em> 的 (\(T(-x) = -T(x)\), 所以 \(T(B(0,1))\) 关于原点对称, 闭包也对称), 同时是<em>凸</em> 的 (开球凸 \(\Rightarrow\) 像凸 \(\Rightarrow\) 闭包凸)。</p>
+
+<p>取任何 \(y \in B_Y(0, s_1)\), 写 \(y = \frac{1}{2}((y_1 + y) + (-y_1 + y))\)。这里 \(y_1 + y \in B(y_1, s_1) \subset \overline{T(B(0, 1))}\), 而 \(-y_1 + y = -(y_1 - y) \in -B(y_1, s_1) \subset \overline{T(B(0, 1))}\) (用对称性)。由凸性 \(y \in \overline{T(B(0, 1))}\)。所以</p>
+
+<p>\[
+B_Y(0, s_1) \subset \overline{T(B(0, 1))}.
+\]</p>
+
+<p>\(\overline{T(B(0, 1))}\) 含原点开球。第一步完。</p>
+
+<p>(注: 严格说凸要 \(\frac{1}{2}\) 系数; 我们用了 \(\frac{1}{2} + \frac{1}{2} = 1\), 是凸组合。)</p>
+
+<p><strong>第二步 (几何级数升级): \(T(B(0, 1))\) 自己含开球。</strong></p>
+
+<p>这一步要把"闭包含开球" 提升为"自身含开球" ——这是 OMT 真正的难点, 和 UBP 不同, 用一个<em>迭代逼近</em> 的论证。</p>
+
+<p>把第一步缩放: \(\overline{T(B(0, 2^{-k}))} \supset B_Y(0, s_1 / 2^k)\) 对所有 \(k \ge 0\)。</p>
+
+<p>取任意 \(y \in B_Y(0, s_1 / 2)\)。我们要找 \(x \in B_X(0, 1)\) 使 \(T x = y\)。</p>
+
+<p>由 \(\overline{T(B(0, 1/2))} \supset B_Y(0, s_1 / 2)\), 存在 \(x_0 \in B_X(0, 1/2)\) 使 \(T x_0\) 离 \(y\) 任意近——具体, 取 \(\|y - T x_0\| < s_1 / 4\), 即 \(y - T x_0 \in B_Y(0, s_1 / 4)\)。</p>
+
+<p>再由 \(\overline{T(B(0, 1/4))} \supset B_Y(0, s_1 / 4)\), 存在 \(x_1 \in B_X(0, 1/4)\) 使 \(\|(y - T x_0) - T x_1\| < s_1 / 8\), 即 \(y - T(x_0 + x_1) \in B_Y(0, s_1 / 8)\)。</p>
+
+<p>继续: 第 \(k\) 步取 \(x_k \in B_X(0, 2^{-(k+1)})\) 使 \(\|y - T(x_0 + x_1 + \cdots + x_k)\| < s_1 / 2^{k+2}\)。</p>
+
+<p>令 \(S_k = x_0 + x_1 + \cdots + x_k\)。由 \(\|x_k\| < 2^{-(k+1)}\), \(S_k\) 是 \(X\) 中的<em>绝对收敛</em> 序列 (\(\sum_k \|x_k\| < \sum_k 2^{-(k+1)} = 1\)), 所以是 Cauchy。\(X\) <em>Banach</em>, 故 \(S_k \to x\) (这是用 \(X\) 完备的关键!) 且 \(\|x\| \le \sum_k \|x_k\| < 1\), 即 \(x \in B_X(0, 1)\)。</p>
+
+<p>同时, \(\|y - T S_k\| \to 0\), \(T\) 连续给 \(T S_k \to T x\), 所以 \(T x = y\)。</p>
+
+<p>这表明 \(B_Y(0, s_1/2) \subset T(B_X(0, 1))\), 即 \(T(B(0, 1)) \supset B_Y(0, s_1/2)\), 取 \(r = s_1 / 2\) 即可。\(\square\)</p>
+
+<p>请你回头看完整的证明形状。第一步是 UBP 同款"Baire + 平移", 给"<em>闭包</em> 含开球"。第二步是 OMT 独有的"<em>几何级数迭代</em>", 用 \(X\) 的完备性把"逼近" 转化成"<em>真</em>命中"——这一步用 \(X\) Banach (而第一步用 \(Y\) Banach)。<em>OMT 同时需要 \(X\) 和 \(Y\) 完备</em>, 跟 UBP 只需要 \(X\) 完备不同。两个完备性各起一个作用。</p>
+
+<p>请你也记一下"<em>几何级数</em>" 这个数值技巧——把"逼近误差减半" 写成 \(\sum_k 2^{-(k+1)}\) 收敛级数, 然后用完备性把级数收敛 \(\Rightarrow\) 部分和 Cauchy \(\Rightarrow\) 部分和收敛到极限——这个手法在泛函分析里反复出现, Picard 迭代 (<a href="ch3.html">第 3 章</a>解 ODE 那里) 是同款, 后面 Neumann 级数 (\((I - T)^{-1} = \sum T^k\), 用在谱论 <a href="ch21.html">第 21 章</a>) 也是同款。</p>
+
+<h2 id="sec12-3">12.3 推论: 有界逆定理</h2>
+
+<p>这是 OMT 的<em>第一</em> 重要推论, 也回答了开头的问题 A。</p>
+
+<p><strong>定理 12.2 (有界逆定理, BIT)</strong>. 设 \(X, Y\) Banach, \(T : X \to Y\) 是<em>有界线性双射</em>。则 \(T^{-1} : Y \to X\) 也<em>有界</em> (即连续)。</p>
+
+<p><strong>证明</strong>。\(T\) 双射 \(\Rightarrow\) 满射, 由 OMT, \(T\) 是开映射, 即对每个开集 \(U \subset X\), \(T(U)\) 开。换句话说, \((T^{-1})^{-1}(U) = T(U)\) 开——这正是 \(T^{-1}\) 连续的定义。\(\square\)</p>
+
+<p>就这两行。OMT 是真正的工作, BIT 只是把"开映射" 翻成"逆连续"。</p>
+
+<p>请你停下来想想这条定理的<em>实战意义</em>。在数学日常里, 我们经常遇到这种情形: 我有两个 Banach 空间 \(X, Y\), 我用某种方式把 \(X\) 嵌入 \(Y\)——比如 \(X \subset Y\) 是一个稠密子空间, \(T = \text{id}\) 显然连续 (单射, 范数相等)。问: 逆映射 (从 \(Y\) 投回 \(X\)) 是不是连续?</p>
+
+<p>答案<em>取决于 \(T\) 是不是双射</em>——如果它是双射, BIT 给你连续。最常见的应用形态是<strong>等价范数判别</strong>, 我们下一节说。</p>
+
+<p>另一个应用形态: 如果 \(T : X \to Y\) 是有界单射, 你想说 \(T^{-1} : T(X) \to X\) 连续。这条结论<em>等价于</em> \(T\) 满足"<em>下估计</em>": \(\|T x\| \ge c \|x\|\) 对所有 \(x\)。证明: \(T^{-1}\) 连续 \(\Leftrightarrow\) \(\|T^{-1} y\| \le C \|y\|\) 对所有 \(y \in T(X)\) \(\Leftrightarrow\) \(\|x\| \le C \|T x\|\) 对所有 \(x \in X\)——令 \(c = 1/C\) 即下估计。这在算子论里非常常用: <em>"\(T\) 有连续逆 \(\Leftrightarrow\) \(T\) 有下估计"</em>。</p>
+
+<h2 id="sec12-4">12.4 推论: 等价范数判别</h2>
+
+<p>这是 BIT 在<em>同一</em>个空间上两种范数比较时的应用。</p>
+
+<p><strong>定理 12.3 (等价范数判别)</strong>. 设 \(X\) 是一个向量空间, 上面有两个范数 \(\|\cdot\|_1\) 和 \(\|\cdot\|_2\), 在<em>各自</em> 范数下都完备 (即 \((X, \|\cdot\|_1)\) 和 \((X, \|\cdot\|_2)\) 都是 Banach)。如果存在常数 \(C\) 使</p>
+
+<p>\[
+\|x\|_2 \le C \|x\|_1 \text{ 对所有 } x \in X,
+\]</p>
+
+<p>则<em>反方向</em> 也<em>自动</em> 成立——即存在 \(c > 0\) 使</p>
+
+<p>\[
+\|x\|_1 \le c \|x\|_2 \text{ 对所有 } x \in X.
+\]</p>
+
+<p>换言之, 两个范数<em>等价</em>。</p>
+
+<p><strong>证明</strong>。考虑恒等映射 \(\text{id} : (X, \|\cdot\|_1) \to (X, \|\cdot\|_2)\)。它显然双射 (它就是恒等)。由假设 \(\|\text{id}(x)\|_2 = \|x\|_2 \le C \|x\|_1\), 即 \(\text{id}\) 有界。两边都 Banach, 由 BIT, \(\text{id}^{-1} : (X, \|\cdot\|_2) \to (X, \|\cdot\|_1)\) 也有界, 即 \(\|x\|_1 = \|\text{id}^{-1}(x)\|_1 \le c \|x\|_2\)。\(\square\)</p>
+
+<p>请你停下来意识到这条定理多<em>无情</em>。它说: <em>同一空间上两个完备范数</em>, 只要一边能控制另一边, 反方向<em>白送</em>。在<a href="ch1.html">第 1 章</a> 1.4 节我们看到无穷维空间上不同范数<em>不等价</em>——\(\|f\|_1\) 和 \(\|f\|_\infty\) 在 \(C[0, 1]\) 上不等价。BIT 给出一个解释: 因为 \((C[0, 1], \|\cdot\|_1)\) <em>不完备</em>! 它的完备化是 \(L^1[0, 1]\), 是更大的空间。完备性<em>缺一不可</em>。</p>
+
+<p>反过来, 如果两个范数都让 \(X\) 完备, 而且一边支配另一边, 它们<em>必</em>等价——这是无穷维空间"<em>完备 Banach 范数的唯一性</em>" 的核心。如果你在 \(X\) 上找到两种 Banach 范数都看起来"自然", 它们不可能"不等价但都 Banach"——必有一边不完备, 或者它们等价。</p>
+
+<p>这条结论在 PDE / 谱论里反复用到。例: Sobolev 空间 \(H^1\) 上有几种"自然" 范数 \(\|u\|_{H^1}^2 = \|u\|_{L^2}^2 + \|\nabla u\|_{L^2}^2\), 或 (在带 Dirichlet 边界条件时) 单独 \(\|\nabla u\|_{L^2}^2\) (Poincaré 不等式给等价)。BIT 给了你"等价" 的快速检查: 一边支配 + 都完备 = 等价。</p>
+
+<h2 id="sec12-5">12.5 闭图像定理: 陈述与证明</h2>
+
+<p>现在我们处理开头的问题 B。先把"图像闭" 这件事写干净。</p>
+
+<p><strong>定义</strong>。\(T : X \to Y\) 是线性映射 (不假设连续)。它的<em>图像</em> 是</p>
+
+<p>\[
+\Gamma(T) = \{(x, T x) : x \in X\} \subset X \times Y.
+\]</p>
+
+<p>这里 \(X \times Y\) 配图积范数 \(\|(x, y)\| = \|x\| + \|y\|\) (或等价地 \(\max(\|x\|, \|y\|)\), 都给同一拓扑)。</p>
+
+<p>"图像闭" 即 \(\Gamma(T)\) 是 \(X \times Y\) 中的闭子集——等价地: 如果 \(x_n \to x\) 且 \(T x_n \to y\), 则 \(y = T x\)。</p>
+
+<p>请你比较"图像闭" 与"\(T\) 连续":</p>
 <ul>
-  <li>陈述<strong>开映射定理</strong>：有界满射 Banach 算子是开映射。</li>
-  <li>从开映射立即推出<strong>有界逆定理</strong>：有界双射的逆自动有界。</li>
-  <li>开映射的完整证明（用 Baire 锁定一个内部含原点的像球）。</li>
-  <li>陈述<strong>闭图像定理</strong>：图像在乘积空间中闭的线性算子自动有界。</li>
-  <li>三大原理的"亲缘关系"：开映射 \(\Leftrightarrow\) 有界逆 \(\Leftrightarrow\) 闭图像；都根植于 Baire。</li>
-  <li>三个典型应用：算子的逆有控制；两种范数等价；闭子空间的"间接验证"。</li>
+  <li>\(T\) 连续: \(x_n \to x\) \(\Rightarrow\) \(T x_n \to T x\)。<em>条件少一个</em>: 不需要假设 \(T x_n\) 已经收敛。</li>
+  <li>图像闭: \(x_n \to x\) <em>且</em> \(T x_n \to y\) \(\Rightarrow\) \(y = T x\)。<em>多一个前提</em>: 假设 \(T x_n\) 已经收敛, 然后断言极限是 \(T x\)。</li>
 </ul>
 
-<h2 id="sec12-1">12.1 开映射定理</h2>
+<p>显然连续 \(\Rightarrow\) 图像闭 (连续直接给 \(T x_n \to T x\), 极限唯一性给 \(y = T x\))。但反过来呢? 在一般拓扑里反过来<em>不</em>成立 (你能构造图像闭但不连续的映射)。下面的定理说: 如果 \(X, Y\) 都 Banach, 反过来<em>成立</em>。</p>
 
-<p><strong>定理（开映射 / Banach–Schauder）。</strong>设 \(X, Y\) 都是 Banach 空间，\(T : X \to Y\) 是<strong>有界 + 满射</strong>的线性算子。则 \(T\) 是<em>开映射</em>，即把 \(X\) 中的开集映成 \(Y\) 中的开集。等价地：</p>
+<p><strong>定理 12.4 (闭图像定理, CGT)</strong>. 设 \(X, Y\) 都是 Banach 空间, \(T : X \to Y\) 是<em>线性</em> 映射 (不假设连续), 且 \(\Gamma(T)\) 是 \(X \times Y\) 中的闭子集。则 \(T\) 是<em>有界</em> (即连续) 的。</p>
 
-<p>\[
-\boxed{\ \exists r > 0, \quad T(B_X(0, 1)) \supset B_Y(0, r).\ }
-\]</p>
-
-<p>"开映射 \(\iff\) 单位球的像盖住一个原点的开球"——这是开映射最常用的等价表述。证明全部围绕这条等价展开。</p>
-
-<h2 id="sec12-2">12.2 开映射的证明</h2>
-
-<p>分两步。<strong>第一步</strong>用 Baire 给出"\(\overline{T(B_X(0, 1))}\) 含原点的开球"。<strong>第二步</strong>把"闭包含开球"升级为"自身含开球"。</p>
-
-<p><strong>第一步。</strong>因为 \(T\) 满射，\(Y = T(X) = \bigcup_{n=1}^\infty T(B_X(0, n)) = \bigcup_{n=1}^\infty n \cdot T(B_X(0, 1))\)。Baire 给出某个 \(n_0 \cdot \overline{T(B_X(0, 1))}\) 含开球；因为 "倍数 \(\Rightarrow\) 开球"，可以把这个开球缩到原点版本：存在 \(r_0 > 0\) 使</p>
+<p><strong>证明</strong>。考虑两个范数都装在 \(\Gamma(T)\) 上 (它是 \(X \times Y\) 的闭子空间, 故 Banach):</p>
 
 <p>\[
-\overline{T(B_X(0, 1))} \supset B_Y(y_0, r_0) \text{ 某个 } y_0.
+\Gamma(T) \subset X \times Y \quad \text{Banach (因为它是 Banach 空间的闭子空间)}.
 \]</p>
 
-<p>由对称（\(B_X(0, 1) = -B_X(0, 1)\)，所以 \(\overline{T(B_X(0, 1))}\) 也对称）和凸性（\(T\) 与闭包都保凸），</p>
+<p>定义两个投影:</p>
 
 <p>\[
-B_Y(0, r_0) \subset \overline{T(B_X(0, 1))}.
+\pi_X : \Gamma(T) \to X, \quad \pi_X(x, T x) = x;
 \]</p>
-
-<p><strong>第二步（关键技巧）。</strong>证明 \(B_Y(0, r_0/2) \subset T(B_X(0, 1))\)。</p>
-
-<p>取 \(y \in B_Y(0, r_0/2)\)。由第一步 \(\overline{T(B_X(0, 1/2))} \supset B_Y(0, r_0/2)\) 知存在 \(x_1 \in B_X(0, 1/2)\) 使 \(\|y - T x_1\| < r_0/4\)。即 \(y - T x_1 \in B_Y(0, r_0/4) \subset \overline{T(B_X(0, 1/4))}\)。</p>
-
-<p>归纳：取 \(x_n \in B_X(0, 1/2^n)\) 使 \(\|y - T(x_1 + \cdots + x_n)\| < r_0/2^{n+1}\)。</p>
-
-<p>令 \(x = \sum_{n=1}^\infty x_n\)（绝对收敛，\(\sum \|x_n\| < \sum 1/2^n = 1\)）。\(X\) 完备 \(\Rightarrow\) \(x\) 存在，\(\|x\| < 1\)。\(T\) 连续 \(\Rightarrow\) \(T x = \sum T x_n = y\)。</p>
-
-<p>所以 \(y = T x\) 且 \(x \in B_X(0, 1)\)，即 \(y \in T(B_X(0, 1))\)。结束。</p>
-
-<p>这条第二步是开映射证明的"灵魂"——它把"闭包覆盖小球"用一个迭代过程<em>无损地</em>升级为"自身覆盖小球"。这种"几何级数 + 完备性"的论证在很多分析定理里反复出现（开映射、Banach 不动点、Picard 迭代、Newton 法收敛性）。</p>
-
-<h2 id="sec12-3">12.3 有界逆定理：开映射的"双射版本"</h2>
-
-<p><strong>推论（有界逆 / Banach 同构定理）。</strong>设 \(X, Y\) 都是 Banach 空间，\(T : X \to Y\) 是<strong>有界 + 双射</strong>线性算子。则 \(T^{-1} : Y \to X\) 也是有界的。</p>
-
-<p>证明：由开映射，\(T\) 把开集映成开集，所以 \(T^{-1}\) 把开集映成开集（注意：\(T^{-1}\) 是真正的逆映射，定义于 \(Y\) 上）。这恰好就是 \(T^{-1}\) 连续 = 有界。</p>
-
-<p>这条推论的实际意义无比重要。它的"日常翻译"是：</p>
 
 <p>\[
-\boxed{\ \text{Banach 空间之间的有界双射}的逆\text{自动有界}。\ }
+\pi_Y : \Gamma(T) \to Y, \quad \pi_Y(x, T x) = T x.
 \]</p>
 
-<p>有限维这件事白送（矩阵双射 \(\iff\) 行列式非零 \(\iff\) 逆矩阵存在 \(\Rightarrow\) 自动连续）。无穷维它是定理，需要 Baire。</p>
+<p>两个都<em>线性</em> 显然。两个都<em>有界</em>: \(\|\pi_X(x, T x)\| = \|x\| \le \|x\| + \|T x\| = \|(x, T x)\|\), 类似地 \(\pi_Y\) 也有界。</p>
 
-<h2 id="sec12-4">12.4 两种范数等价的判别</h2>
+<p>\(\pi_X\) 还是<em>双射</em>: 对每个 \(x \in X\), 唯一的 \((x, T x) \in \Gamma(T)\) 是它的原像; 满射 + 单射都直接。</p>
 
-<p>有界逆定理的最常用应用之一是<em>判别两个范数等价</em>。</p>
+<p>由 BIT (定理 12.2), \(\pi_X^{-1} : X \to \Gamma(T)\), \(x \mapsto (x, T x)\) 也<em>有界</em>。</p>
 
-<p><strong>推论（两种范数等价）。</strong>设 \(X\) 是向量空间，\(\|\cdot\|_1\) 与 \(\|\cdot\|_2\) 是两个范数。如果 \((X, \|\cdot\|_1)\) 与 \((X, \|\cdot\|_2)\) 都是 Banach 空间，且存在 \(C > 0\) 使</p>
+<p>所以 \(T = \pi_Y \circ \pi_X^{-1}\) 是两个有界算子的复合, 自身有界。\(\square\)</p>
 
-<p>\[
-\|x\|_2 \le C \|x\|_1, \quad \forall x,
-\]</p>
+<p>请你停下来意识到这条证明的<em>构造</em>: 把 \(T\) 拆成 \(\pi_Y \circ \pi_X^{-1}\), 每一段都用 OMT/BIT 处理。这种"<em>把算子分解为双射 + 投影</em>" 的形状, 你在<a href="ch22.html">第 22 章</a>商空间 / 准 Fredholm 算子里会再次用到。CGT 不是 OMT 的"重复版", 它是 OMT 的<em>最优雅应用</em>——把"图像闭" 这个很弱的条件升级为"算子有界"。</p>
 
-<p>那么两个范数等价（即同时存在反向不等式 \(\|x\|_1 \le C' \|x\|_2\)）。</p>
+<p>请你也比较 CGT 和我们日常验证连续性的方法。直接证 \(T\) 连续, 你要做"<em>给定 \(x_n \to x\), 证 \(T x_n \to T x\)</em>" ——这要验证的极限关系。CGT 让你证一个<em>更轻</em> 的事: "<em>给定 \(x_n \to x\) 且 \(T x_n \to y\), 证 \(y = T x\)</em>" ——这里你已经免费拿到了 \(T x_n\) 的收敛, 只要识别极限。这就是 CGT 在实战里"<em>白送</em>" 给你 \(T\) 连续的方式: 你根本不用证 \(T x_n\) 收敛, 只要能证"<em>如果它收敛, 那极限是对的</em>"。</p>
 
-<p>证明：把恒等映射 \(\operatorname{id} : (X, \|\cdot\|_1) \to (X, \|\cdot\|_2)\) 看作算子。条件给它有界（\(\|\operatorname{id}(x)\|_2 = \|x\|_2 \le C \|x\|_1\)）。它显然是双射（同一个集合，恒等映射）。两边都是 Banach \(\Rightarrow\) 由有界逆定理 \(\operatorname{id}^{-1} : (X, \|\cdot\|_2) \to (X, \|\cdot\|_1)\) 也有界 \(\Rightarrow\) \(\|x\|_1 \le C' \|x\|_2\)。</p>
+<h2 id="sec12-6">12.6 三大原理的关系 + 几个具体应用</h2>
 
-<p>这条推论的实际威力很大。比如证明 Sobolev 范数 \(\|f\|_{H^1}\) 与"等价范数" \(\|f\|_{L^2} + \|\nabla f\|_{L^2}\) 在 \(H^1\) 上等价——只要把两边都验证完备，再写一个方向的不等式即可，无须做反方向估计。</p>
-
-<h2 id="sec12-5">12.5 闭图像定理</h2>
-
-<p>设 \(X, Y\) 是赋范空间。线性算子 \(T : X \to Y\) 的<strong>图像</strong>是</p>
-
-<p>\[
-\Gamma(T) = \{(x, Tx) : x \in X\} \subset X \times Y.
-\]</p>
-
-<p>\(X \times Y\) 是赋范空间（配范数 \(\|(x, y)\| = \|x\|_X + \|y\|_Y\)，或等价的 max 范数）。\(T\) 叫<strong>闭算子</strong>，如果 \(\Gamma(T)\) 是 \(X \times Y\) 的闭子集——等价地：若 \(x_n \to x\) 且 \(T x_n \to y\)，则 \(y = T x\)。</p>
-
-<p><strong>定理（闭图像）。</strong>设 \(X, Y\) 都是 Banach 空间，\(T : X \to Y\) 是<em>处处有定义</em>的<em>线性</em>算子。如果 \(\Gamma(T)\) 在 \(X \times Y\) 中闭，则 \(T\) 有界。</p>
-
-<p>证明：考虑投影</p>
-
-<p>\[
-\pi_1 : \Gamma(T) \to X, \quad (x, Tx) \mapsto x; \qquad \pi_2 : \Gamma(T) \to Y, \quad (x, Tx) \mapsto T x.
-\]</p>
-
-<p>\(\Gamma(T)\) 是 \(X \times Y\) 的闭子集，\(X \times Y\) 是 Banach（积 Banach 空间），所以 \(\Gamma(T)\) 自身是 Banach 空间（闭子集 + 完备 \(=\) 完备）。\(\pi_1\) 是有界双射（双射来自 \(T\) 处处有定义；有界来自 \(\|\pi_1(x, Tx)\| = \|x\| \le \|(x, Tx)\|\)）。由有界逆定理，\(\pi_1^{-1}: X \to \Gamma(T)\)，\(x \mapsto (x, T x)\) 也有界。所以</p>
-
-<p>\[
-\|T x\| \le \|(x, T x)\| = \|\pi_1^{-1}(x)\| \le \|\pi_1^{-1}\| \cdot \|x\|,
-\]</p>
-
-<p>即 \(T\) 有界。</p>
-
-<p>闭图像定理的实际威力：<em>"闭"是个比"连续"弱得多的条件——你只要验证"\(x_n \to x\) 且 \(T x_n \to y\) \(\Rightarrow\) \(y = T x\)"</em>。"连续"则要求"\(x_n \to x \Rightarrow T x_n \to T x\)"。区别：连续要求<em>所有</em> Cauchy 输入序列的输出都有极限；闭只要求<em>当输出已经有极限时</em>极限对得上。</p>
-
-<p>\[
-\boxed{\ \text{在 Banach 空间之间，"闭" + "线性" + "处处有定义"}\ \Rightarrow\ \text{"有界"}。\ }
-\]</p>
-
-<p>这条让"证算子有界"在很多场合变得简单——你只要验证"图像闭"，往往容易很多。</p>
-
-<h2 id="sec12-6">12.6 三大原理的关系与一个常用应用</h2>
-
-<p>把第 11 章和这一章合在一起看：三大原理彼此<em>都从 Baire 出发</em>，但在分析里担任不同角色：</p>
-
+<p>我们到这里已经看到了三大原理:</p>
 <ul>
-  <li><strong>Banach–Steinhaus</strong>：从"逐点有界"推"一致有界"——对算子族；</li>
-  <li><strong>开映射 / 有界逆</strong>：从"代数双射 + 有界"推"逆有界"——对单个算子；</li>
-  <li><strong>闭图像</strong>：从"代数线性 + 图像闭"推"有界"——对单个算子。</li>
+  <li><em>UBP (上一章 11.1)</em>: 逐点有界 \(\Rightarrow\) 一致有界 (\(X\) Banach)。</li>
+  <li><em>OMT / BIT (12.1, 12.2)</em>: 满射有界 \(\Rightarrow\) 开映射; 双射有界 \(\Rightarrow\) 逆有界 (\(X, Y\) Banach)。</li>
+  <li><em>CGT (12.4)</em>: 图像闭 \(\Rightarrow\) 算子有界 (\(X, Y\) Banach)。</li>
 </ul>
 
-<p>它们彼此<em>等价</em>（事实上在不少教材里把开映射或闭图像当作核心，再相互推）。本书采取了"开映射 \(\Rightarrow\) 闭图像"的方向，因为开映射的几何最朴素。</p>
+<p>它们的<em>共同形状</em>: 用 Baire 把<em>软</em> 假设升级为<em>硬</em> 结论。每一条都需要 Banach (完备), 这是 Baire 的代价。每一条都<em>不</em>提关于解析的精细结构 (没有用内积, 没有用紧致, 没有用对偶)——它们是<em>纯 Banach 空间的几何 + 拓扑</em> 结论。</p>
 
-<p><strong>典型应用：算子的逆控制。</strong>设 \(A : H_1 \to H_2\) 是 Banach 空间之间的有界双射。由有界逆定理，\(A^{-1}\) 有界，\(\|A^{-1}\| < \infty\)。这就给出</p>
+<p>它们之间的<em>逻辑关系</em>: OMT \(\Rightarrow\) BIT \(\Rightarrow\) CGT。反过来 CGT 也能推 BIT (用 \(T^{-1}\) 的图像 = \(T\) 的图像翻转, 翻转是连续的同胚, 所以 \(T\) 图像闭 \(\Leftrightarrow\) \(T^{-1}\) 图像闭)。所以 OMT, BIT, CGT 三者两两等价 (在 Banach 设定下)——它们是<em>同一回事</em> 的三种语言, 看你哪种语言用着方便。UBP 跟它们独立, 但形状同源 (都是 Baire 的化身)。</p>
+
+<p>下面给三个用 CGT/OMT 的快速应用样本, 让你看到这些原理"<em>实用</em>" 的样子。</p>
+
+<p><strong>应用 12.5.1 (核 = 闭子空间)</strong>。设 \(T : X \to Y\) 是 Banach 之间的有界线性算子。则 \(\ker T = \{x : T x = 0\}\) 是 \(X\) 的<em>闭</em> 子空间。</p>
+
+<p><em>证明</em>: \(\ker T = T^{-1}(\{0\})\), \(\{0\}\) 闭, \(T\) 连续, 故 \(\ker T\) 闭。</p>
+
+<p>这条结论本身不用 OMT/CGT, 但它是后面应用的前提。注意"<em>核闭</em>" 在<a href="ch1.html">第 1 章</a> 1.3 节我们说"<em>代数自然 ≠ 拓扑闭</em>"——核是代数自然的子空间, 但它<em>因为 \(T\) 连续才闭</em>。如果 \(T\) 不连续, 核可以不闭——这就是 CGT 的反面: 一个<em>不连续</em> 的线性算子可以有<em>不闭</em> 的核。</p>
+
+<p><strong>应用 12.5.2 (算子的下估计)</strong>。设 \(T : X \to Y\) Banach 之间有界线性单射 (即 \(\ker T = \{0\}\))。如果 \(T\) 还<em>满射</em>, 则它有"下估计":</p>
 
 <p>\[
-\boxed{\ \|x\| \le \|A^{-1}\| \cdot \|A x\|, \quad \forall x \in H_1.\ }
+\|x\| \le \|T^{-1}\| \cdot \|T x\| \text{ 对所有 } x \in X.
 \]</p>
 
-<p>这种"反向估计"在<em>方程稳定性</em>里反复用——它说"输出小 \(\Rightarrow\) 输入小"，即解关于数据连续依赖。在 PDE 与数值分析里，这条常被叫做<em>算子的下估计</em>或<em>条件数</em>。</p>
+<p><em>证明</em>: 由 BIT, \(T^{-1}\) 有界, \(\|T^{-1} y\| \le \|T^{-1}\| \cdot \|y\|\)。代 \(y = T x\): \(\|x\| \le \|T^{-1}\| \|T x\|\)。 \(\square\)</p>
 
-<p><strong>典型应用：闭子空间的"间接验证"。</strong>有时直接证某个子空间闭很难，但容易写出"它是某个有界算子的核"。如果 \(A\) 有界，则 \(\ker A = A^{-1}(\{0\})\) 是闭子空间（连续函数的逆像闭）。这种"核 \(=\) 闭"的论证在第 22 章 Fredholm 选择性里反复使用。</p>
+<p>这条估计有非常具体的含义。在数值线性代数里, 这条 \(\|T^{-1}\|\) 叫做"<em>条件数</em>" (condition number), 它度量"<em>解的相对误差 / 数据相对误差</em>" 的放大率。BIT 保证它有限, 而它的具体大小是数值稳定性的核心 (详见<a href="../数值方法/ch4.html">数值方法读本第 4 章</a>条件数)。</p>
 
-<p><strong>反向典型应用：闭算子但不连续——无界算子的常见情形。</strong>注意闭图像定理要求"<em>处处</em>有定义"。如果算子只在<em>稠</em>子空间上有定义，"图像闭" 不再蕴含"有界"。典型例子：求导算子 \(D\) 在 \(L^2\) 上是闭的（图像闭于 \(L^2 \times L^2\)）但不有界，因为它的定义域只是稠子集 \(C_c^\infty\) 或 \(H^1\)。这是第 21 章末尾"无界自伴算子"故事的入口——闭算子是无界算子论的基本对象，因为它把"虽然不连续但还算良好"这件事捕获到。</p>
+<p><strong>应用 12.5.3 (CGT 用法的样本: 自伴算子是闭算子)</strong>。在 Hilbert 空间上, 一个对称算子 \(A\) (在某个稠密定义域上) 自伴 \(\Rightarrow\) \(A\) 是闭算子 (即 \(\Gamma(A)\) 闭)。这是后面谱论 (<a href="ch21.html">第 21 章</a>) 的前置——闭算子有合理的谱定义。CGT 给"<em>闭算子 + 全空间定义 \(\Rightarrow\) 有界</em>", 反向用即"<em>无界自伴算子的定义域必不是全空间</em>" (这是为什么微分算子要谨慎处理的根源)。</p>
 
-<p>本章 + 上一章 + 上上一章构成"三大原理三部曲"。它们之所以重要，是因为它们让你能用<em>代数</em>条件（满射、双射、图像闭、逐点有界）推<em>分析</em>结论（连续、有界、范数控制）。从此泛函分析进入"代数与分析互相翻译"的成熟阶段。</p>
+<p><strong>应用 12.5.4 (Hellinger-Toeplitz 定理)</strong>。Hilbert 空间 \(H\) 上一个对称算子 \(T : H \to H\) (定义域是<em>整个</em> \(H\), \(\langle T x, y \rangle = \langle x, T y \rangle\) 对所有 \(x, y\)), 必<em>有界</em>。</p>
 
-<p>下一章我们要讲第三类原理性结论：Hahn–Banach 延拓定理。它的精神和本章截然不同——它不靠 Baire，而靠 Zorn 引理（选择公理的等价物）。它要解决的问题是"线性泛函足够多吗？"，结论是"够"，方式是延拓。</p>
+<p><em>证明 (经典 CGT 应用)</em>。要证 \(T\) 图像闭。设 \(x_n \to x\), \(T x_n \to y\)。任取 \(z \in H\):</p>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 一致有界原理（Banach–Steinhaus）</a><a href="ch13.html">下一章 · 第 13 章 Hahn–Banach 延拓定理 →</a></nav>
+<p>\[
+\langle y, z \rangle = \lim_n \langle T x_n, z \rangle = \lim_n \langle x_n, T z \rangle = \langle x, T z \rangle = \langle T x, z \rangle.
+\]</p>
+
+<p>第一步用极限连续 + 内积连续, 第二步用对称性, 第三步用极限, 最后一步又用对称性。所以 \(\langle y - T x, z \rangle = 0\) 对所有 \(z\), 故 \(y = T x\)。\(\Gamma(T)\) 闭。由 CGT, \(T\) 有界。\(\square\)</p>
+
+<p>这条定理的<em>含义</em> 非常深刻。它说: <em>定义在整个 Hilbert 空间上的对称算子, 自动有界</em>。在量子力学里, "可观测量" 是自伴算子, 而<em>许多重要的可观测量 (位置 \(x\), 动量 \(-i \hbar \partial_x\), 能量 \(-\Delta + V\)) 都是无界算子</em>——它们要 \(L^2\) 上有意义, 必须接受"<em>定义域不是全 \(L^2\)</em>" 这件事。CGT 告诉你这不可避免: 你不可能写出一个"无界但全空间定义" 的对称算子, 那是矛盾的。所以量子力学里的算子必须细致地定义"<em>定义域</em>"——这是 von Neumann 在 1930s 把量子力学严格化时反复处理的事, CGT 是它的数学根源。</p>
+
+<h2 id="sec12-7">12.7 总结：三大原理的"形状"</h2>
+
+<p>把这两章 (UBP + OMT/CGT) 放在一起看, 你应该看到三大原理的<em>统一形状</em>:</p>
+
+<p><em>共同骨架</em>: <strong>Baire 给"含开球", 线性把"局部" 升级到"全局"</strong>。UBP 的形状是"<em>逐点 \(\Rightarrow\) 一致</em>"; OMT 的形状是"<em>满 \(\Rightarrow\) 开</em>"; CGT 的形状是"<em>图像闭 \(\Rightarrow\) 连续</em>"。三者都不<em>显式</em> 用到内积、紧致、对偶——纯 Banach 几何。</p>
+
+<p><em>共同代价</em>: <strong>Banach (完备)</strong>。Baire 必须有完备性才能用; 三大原理的所有版本都假设 Banach。这就是为什么这本书第一段花了几章 (<a href="ch2.html">ch2</a>-<a href="ch10.html">ch10</a>) 把 Banach 空间 + Baire 备齐——它们是三大原理的"<em>底层资源</em>"。</p>
+
+<p><em>共同后果</em>: <strong>"代数事实自动升级为拓扑事实"</strong>。<em>双射</em> (代数) 自动给<em>逆连续</em> (拓扑); <em>逐点</em> (一种弱代数控制) 自动给<em>一致</em> (强拓扑控制); <em>图像闭</em> (混合) 自动给<em>算子连续</em>。这种"<em>升级</em>" 的正当性, 正是 Banach + Baire 的礼物。</p>
+
+<p>下一章我们看三大原理的最后一条: <strong>Hahn-Banach 解析形式</strong>。它的风味<em>完全不同</em>——它<em>不</em>用 Baire, 用 Zorn 引理。它解决的问题也不一样: 它保证对偶空间 \(X^*\) "<em>足够大</em>", 让我们能用线性泛函"看见" 每一个非零向量。Hahn-Banach 的影响范围比 UBP/OMT/CGT 还要广——几乎所有"<em>对偶论证</em>" 都依赖它。准备好。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 一致有界原理</a><a href="ch13.html">下一章 · 第 13 章 Hahn-Banach 解析形式 →</a></nav>
 </main>
 </body>
 </html>

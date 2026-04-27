@@ -35,186 +35,327 @@
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 经典不等式</a><a href="ch7.html">下一章 · 第 7 章 正交基与 Fourier 展开 →</a></nav>
 <h1 id="ch6">第 6 章 Hilbert 几何：投影与最佳逼近</h1>
 
-<p>这一章是整本书最"看得见"的一章。它讲的是 Hilbert 空间里的核心几何动作——<strong>把一个向量投影到一个闭子空间上</strong>。这个动作在有限维里你可能已经见过：最小二乘把数据点投到一条直线、一个超平面或一个回归子空间上。本章告诉你两件事：第一，这个"投影"在<em>无穷维</em> Hilbert 空间里也存在，并且性质完全一样；第二，"最小二乘"、"条件期望"、"Fourier 部分和"、"线性回归"这些表面上不同的对象其实都是同一件事——投影到闭子空间。</p>
+<p>请你做一道你<em>看得见</em> 的事。在 \(\mathbb{R}^3\) 里给一个平面 \(M\)（过原点）和一个不在平面上的点 \(x\)。问：\(M\) 里<em>离 \(x\) 最近</em> 的点是哪一个？</p>
 
-<p>这件事在 Banach 空间里<em>不</em>成立：一般 Banach 空间里"最佳逼近"不一定存在，存在了也不一定唯一，更不一定是线性映射。Hilbert 空间是<em>唯一</em>一类空间，能让最佳逼近存在、唯一、且是线性连续算子。这就是为什么 Hilbert 空间在分析里有特殊地位。</p>
+<p>你拿铅笔画一下：从 \(x\) 出发<em>垂直</em> 落到 \(M\) 上，落脚那个点就是。这是中学几何——"最近 = 垂直投影"。</p>
+
+<p>一行数学描述：那个最近的点 \(p\) 是<em>唯一</em> 满足"<em>残差 \(x - p\) 与平面 \(M\) 垂直</em>" 的点。"残差垂直" 是"<em>最近</em>" 的几何代号。</p>
+
+<p>现在请你停下来想一件事。这个图——"<em>从外面一个点垂直落到子空间得到最近点</em>"——你能<em>原封不动</em> 地搬到 \(L^2\) 里去吗？比方说在 \(L^2[-\pi, \pi]\) 里给一个函数 \(f\)，给一个闭子空间 \(M\)（譬如"次数 \(\le 5\) 的三角多项式")，问 \(M\) 里离 \(f\) 最近的那个函数是哪一个？答：<em>能搬</em>。\(L^2\) 是 Hilbert 空间，几何"<em>一字不差</em>"——存在唯一的"垂直投影 \(p \in M\)"，残差 \(f - p\) 与 \(M\) 垂直。</p>
+
+<p>这件事的<em>分量</em> 让人不安。在 \(\mathbb{R}^3\) 里"最近点存在 + 唯一 + 是垂直投影" 是中学事实——你画图就看见了。在 \(L^2\) 里——一个无穷维空间——这件事居然<em>原样照搬</em>。<em>这是为什么 Hilbert 空间被发明出来</em>：它们恰好是"<em>有限维欧氏几何能搬过去</em>" 的那一类无穷维空间。</p>
+
+<p>这一章把这件事建立成定理。它将以"<em>最佳逼近</em>" 为主题——给闭凸集 + 外面一点，里面有<em>唯一</em> 的最近点；给闭子空间，最近点 = 垂直投影；空间分裂成 \(H = M \oplus M^\perp\)；投影算子 \(P_M\) 有四条结构性质；统计 / 概率 / Fourier 三个应用一齐落地。</p>
+
+<h2 id="sec6-1">6.1 最近点定理：闭凸集情形</h2>
+
+<p>从最一般也最朴素的版本开始。</p>
+
+<p><strong>定理（Hilbert 空间最近点定理）。</strong>设 \(H\) 是 Hilbert 空间，\(C \subseteq H\) 是<em>非空闭凸</em> 子集，\(x \in H\)。则<em>存在唯一</em> 的 \(p \in C\) 使</p>
+
+<p>\[
+\|x - p\| = \inf_{y \in C} \|x - y\|.
+\]</p>
+
+<p>这个 \(p\) 叫 \(x\) 在 \(C\) 上的<em>最佳逼近</em>。</p>
+
+<p>请你先停下来想：这个结论一点都不显然。<em>"infimum 一定被取到"</em> 是标准的"<em>极小化序列</em>" 问题——在一般度量空间里这件事完全不成立。一般做法：取一列 \(y_n \in C\) 使 \(\|x - y_n\| \to d := \inf\)；想抽出收敛子列 \(y_{n_k} \to p\)；取极限。这条路在<em>有限维</em> 因为 Heine–Borel 走得通，<em>无穷维</em> 立刻撞墙——闭集不一定紧（<a href="ch1.html">第 1 章</a> 1.1 节那条"单位球不紧" 的崩塌）。</p>
+
+<p>所以朴素套路<em>不行</em>。我们需要一个不依赖紧致性的论证——<em>直接证明那列 \(y_n\) 是 Cauchy 的</em>，再用 \(H\) 的<em>完备性</em> 抽极限。这就要用到 Hilbert 空间一条<em>独家</em> 的恒等式。</p>
+
+<p>关键工具：<em>平行四边形恒等式</em>。在 Hilbert 空间里，</p>
+
+<p>\[
+\|u + v\|^2 + \|u - v\|^2 = 2\|u\|^2 + 2\|v\|^2.
+\]</p>
+
+<p>这是把内积式 \(\|u \pm v\|^2 = \|u\|^2 \pm 2 \mathrm{Re}\langle u, v \rangle + \|v\|^2\) 两条相加得到的代数恒等式——只有内积空间才有这条。</p>
+
+<p>证明（最近点定理）。设 \(d = \inf_{y \in C} \|x - y\|\)。取极小化序列 \(y_n \in C\) 使 \(\|x - y_n\| \to d\)。要证 \(\{y_n\}\) 是 Cauchy 列。</p>
+
+<p>对平行四边形恒等式中令 \(u = x - y_n\), \(v = x - y_m\)：</p>
+
+<p>\[
+\|2x - y_n - y_m\|^2 + \|y_m - y_n\|^2 = 2\|x - y_n\|^2 + 2\|x - y_m\|^2.
+\]</p>
+
+<p>左边第一项写成 \(4 \|x - \frac{y_n + y_m}{2}\|^2\)。重排：</p>
+
+<p>\[
+\|y_n - y_m\|^2 = 2\|x - y_n\|^2 + 2\|x - y_m\|^2 - 4\left\|x - \frac{y_n + y_m}{2}\right\|^2.
+\]</p>
+
+<p>关键一步：\(C\) 凸，所以 \((y_n + y_m)/2 \in C\)，于是</p>
+
+<p>\[
+\left\|x - \frac{y_n + y_m}{2}\right\| \ge d \quad \Rightarrow \quad -4\left\|x - \frac{y_n + y_m}{2}\right\|^2 \le -4 d^2.
+\]</p>
+
+<p>代入：</p>
+
+<p>\[
+\|y_n - y_m\|^2 \le 2\|x - y_n\|^2 + 2\|x - y_m\|^2 - 4 d^2.
+\]</p>
+
+<p>当 \(n, m \to \infty\)，右边的 \(2\|x - y_n\|^2 \to 2 d^2\) 与 \(2\|x - y_m\|^2 \to 2 d^2\)。所以 \(\|y_n - y_m\|^2 \to 0\)。\(\{y_n\}\) 是 Cauchy 的。</p>
+
+<p>\(H\) 完备，所以 \(y_n \to p\) 对某个 \(p \in H\)。\(C\) 闭，所以 \(p \in C\)。范数连续，所以 \(\|x - p\| = \lim \|x - y_n\| = d\)。<em>存在性</em> 证毕。</p>
+
+<p>唯一性。设另有 \(p' \in C\) 也是最近点。把 \(p, p'\) 当作"两元极小化序列" 套到上面那条公式（\(y_n = p, y_m = p'\)）：</p>
+
+<p>\[
+\|p - p'\|^2 \le 2 d^2 + 2 d^2 - 4 d^2 = 0.
+\]</p>
+
+<p>所以 \(p = p'\)。<em>唯一性</em> 证毕。</p>
+
+<p>请你回头看这条证明的<em>力学</em>。三件事一齐发力：</p>
+
+<ol>
+  <li>"<em>凸性</em>" 让中点 \((y_n + y_m)/2\) 还在 \(C\) 里——给我"\(\ge d\)" 这条下界。</li>
+  <li>"<em>平行四边形恒等式</em>" 把 \(\|y_n - y_m\|^2\) 表示成"<em>两个 \(\|x - y\|^2\) 的和减去四倍中点的</em>"——这是 Hilbert 几何独家的代数。</li>
+  <li>"<em>完备性</em>" 把 Cauchy 列升级为收敛列。</li>
+</ol>
+
+<p>这三件事缺一不可。把"凸" 拿掉中点可能跑出去，"<em>平行四边形</em>" 在一般 Banach 空间不成立（<a href="ch3.html">第 3 章</a>讨论过 \(L^p\) 不等价 Hilbert）。"<em>完备性</em>" 从 Cauchy 升到收敛——这是<a href="ch2.html">第 2 章</a>的 Banach 空间结构。</p>
+
+<p>\[\boxed{\ \text{Hilbert + 闭凸集} \Rightarrow \text{最近点存在唯一。}\ }\]</p>
+
+<p>这条定理的版本在<em>一般 Banach 空间</em> 是<em>错</em> 的——\(L^1\) 里你能构造闭凸集没有最近点，或者最近点不唯一。Hilbert 空间是<em>能让这件事工作</em> 的最大类。</p>
+
+<h2 id="sec6-2">6.2 子空间情形：最近 ⟺ 残差垂直</h2>
+
+<p>把 6.1 的 \(C\) 换成<em>闭线性子空间</em> \(M \subseteq H\)（一般闭凸集的特例：线性子空间一定凸）。最近点 \(p \in M\) 仍存在唯一。这一节加上一条<em>新</em> 的几何刻画：<em>"最近" 等价于"残差与子空间垂直"</em>。</p>
+
+<p><strong>定理（投影刻画）。</strong>设 \(M \subseteq H\) 是闭线性子空间，\(x \in H\)，\(p \in M\)。以下两条等价：</p>
+
+<ol>
+  <li>\(\|x - p\| = \min_{y \in M} \|x - y\|\)；</li>
+  <li>\(x - p \perp M\)，即 \(\langle x - p, y \rangle = 0\) 对所有 \(y \in M\)。</li>
+</ol>
+
+<p>证明（朴素方向 (2) ⟹ (1)）。设 \(x - p \perp M\)。对任意 \(y \in M\)，\(p - y \in M\) 也在 \(M\) 里，所以 \(x - p \perp p - y\)。Pythagoras：</p>
+
+<p>\[
+\|x - y\|^2 = \|(x - p) + (p - y)\|^2 = \|x - p\|^2 + \|p - y\|^2 \ge \|x - p\|^2.
+\]</p>
+
+<p>所以 \(p\) 是最近点。</p>
+
+<p>反方向 (1) ⟹ (2)。设 \(p\) 是最近点，要证 \(\langle x - p, z \rangle = 0\) 对所有 \(z \in M\)。固定 \(z\)（不妨 \(\|z\| = 1\)）。对任意 \(t \in \mathbb{R}\)，\(p + t z \in M\)（线性子空间！），所以</p>
+
+<p>\[
+\|x - p\|^2 \le \|x - (p + t z)\|^2 = \|x - p\|^2 - 2 t \langle x - p, z \rangle + t^2.
+\]</p>
+
+<p>消掉 \(\|x - p\|^2\) 得 \(2 t \langle x - p, z \rangle \le t^2\) 对<em>所有</em> \(t \in \mathbb{R}\)。这条想成立，必须 \(\langle x - p, z \rangle = 0\)（否则取 \(t = \langle x - p, z \rangle\) 矛盾）。</p>
+
+<p>请你看清这条证明的两面：</p>
 
 <ul>
-  <li>从最朴素的几何问题开始：在 Hilbert 空间里，给定向量 \(x\) 与闭凸集 \(C\)，到 \(C\) 的最近点存在吗？</li>
-  <li>用<em>平行四边形恒等式</em>证明"最近点存在且唯一"——这是 Hilbert 空间几何的基本定理。</li>
-  <li>把这个一般结果落到 \(C\) = 闭子空间 \(M\) 的特例：得到正交投影。</li>
-  <li>正交分解定理 \(H = M \oplus M^\perp\)：每个 \(x\) 唯一拆成"平行 + 垂直"两部分。</li>
-  <li>正交投影 \(P_M : H \to M\) 的性质——线性、自伴、幂等、范数 \(\le 1\)。</li>
-  <li>三个具体应用：最小二乘 / 线性回归、Fourier 部分和、条件期望——它们都<em>是</em>正交投影。</li>
+  <li>"<em>残差垂直 ⟹ 最近</em>" 用 Pythagoras——一行。</li>
+  <li>"<em>最近 ⟹ 残差垂直</em>" 用"<em>变分</em>"——\(p + tz\) 沿任意方向<em>动</em> 一步，最近点在 \(t = 0\) 取极小，导数为零。</li>
 </ul>
 
-<h2 id="sec6-1">6.1 最近点：闭凸集情形</h2>
+<p>第二条的"沿方向动一步" 几乎就是<em>变分法</em> 的雏形。这是为什么<a href="ch23.html">第 23 章</a> Sobolev 空间 + 变分入门里能反复看到"<em>欧拉–拉格朗日方程</em>"——它们都是同一种"<em>极小化 ⟹ 一阶导为零 ⟹ 残差与所有方向垂直</em>" 的几何。</p>
 
-<p>设 \(H\) 是 Hilbert 空间，\(C \subset H\) 是<strong>非空闭凸集</strong>（凸：包含任两点的连线段；闭：拓扑意义下闭）。<strong>最近点定理</strong>说：对每个 \(x \in H\)，存在唯一的 \(c^* \in C\) 使</p>
+<p>\[\boxed{\ \text{投影刻画：} p = \text{最近点} \iff x - p \perp M.\ }\]</p>
 
-<p>\[
-\boxed{\ \|x - c^*\| = \inf_{c \in C} \|x - c\|.\ }
-\]</p>
+<p>这条等价让最佳逼近<em>从优化问题变成代数问题</em>——"<em>找 \(p \in M\) 使 \(x - p \perp M\)</em>" 是个线性方程组（在有限维就是<em>正规方程</em> \(A^T A p = A^T x\)，6.5 节看）。优化变线性是 Hilbert 几何<em>最有用</em> 的应用力。</p>
 
-<p>这点 \(c^*\) 叫 \(x\) 在 \(C\) 上的<strong>投影</strong>，记作 \(P_C(x)\)。</p>
+<h2 id="sec6-3">6.3 正交分解：\(H = M \oplus M^\perp\)</h2>
 
-<p>证明这是 Hilbert 几何最优雅的论证之一，全部依赖<a href="ch3.html">第 3 章 3.3 节</a>的<em>平行四边形恒等式</em>。</p>
+<p>有了投影定理，立刻可以把整个 Hilbert 空间<em>分裂</em> 成两块。</p>
 
-<p><strong>步骤 1（极小化序列 Cauchy）。</strong>令 \(d = \inf_{c \in C} \|x - c\|\)。取序列 \(\{c_n\} \subset C\) 使 \(\|x - c_n\| \to d\)。对任意 \(m, n\)，由平行四边形：</p>
+<p>定义：\(M^\perp := \{x \in H : \langle x, y \rangle = 0 \text{ 对所有 } y \in M\}\)，叫 \(M\) 的<em>正交补</em>。容易看出 \(M^\perp\) 是<em>闭线性子空间</em>（线性是因为内积线性，闭是因为内积连续——\(x_n \to x\) 与 \(\langle x_n, y \rangle = 0\) ⟹ \(\langle x, y \rangle = 0\)）。</p>
 
-<p>\[
-\|c_m - c_n\|^2 = 2 \|x - c_m\|^2 + 2 \|x - c_n\|^2 - 4 \left\| x - \frac{c_m + c_n}{2} \right\|^2.
-\]</p>
-
-<p>由 \(C\) 凸，\((c_m + c_n)/2 \in C\)，故 \(\|x - (c_m+c_n)/2\|^2 \ge d^2\)。代回：</p>
+<p><strong>定理（正交分解）。</strong>设 \(M \subseteq H\) 是闭线性子空间。则<em>每个</em> \(x \in H\) 有<em>唯一</em> 的分解</p>
 
 <p>\[
-\|c_m - c_n\|^2 \le 2 \|x - c_m\|^2 + 2 \|x - c_n\|^2 - 4 d^2 \to 2 d^2 + 2 d^2 - 4 d^2 = 0.
+\boxed{\ x = p + r, \quad p \in M, \ r \in M^\perp.\ }
 \]</p>
 
-<p>所以 \(\{c_n\}\) 是 Cauchy 序列。</p>
+<p>简记 \(H = M \oplus M^\perp\)（直和分解）。</p>
 
-<p><strong>步骤 2（极限存在 + 在 \(C\) 内）。</strong>由 \(H\) 完备，\(c_n \to c^*\)。由 \(C\) 闭，\(c^* \in C\)。由范数连续，\(\|x - c^*\| = d\)，所以 \(c^*\) 是最近点。</p>
+<p>证明：取 \(p\) 为 \(x\) 在 \(M\) 上的最近点（6.1），\(r = x - p\)。投影刻画（6.2）说 \(r \perp M\)，即 \(r \in M^\perp\)。<em>存在性</em> 证毕。</p>
 
-<p><strong>步骤 3（唯一性）。</strong>设 \(c^*\) 与 \(c^{**}\) 都是最近点。再用平行四边形，相同论证给 \(\|c^* - c^{**}\| = 0\)，即 \(c^* = c^{**}\)。</p>
+<p>唯一性：设 \(x = p_1 + r_1 = p_2 + r_2\)（\(p_i \in M, r_i \in M^\perp\)）。则 \(p_1 - p_2 = r_2 - r_1\)，左边在 \(M\) 里，右边在 \(M^\perp\) 里。\(M \cap M^\perp = \{0\}\)（在 \(M\) 又垂直 \(M\)，特别垂直自己 ⟹ 范数为零）。所以 \(p_1 = p_2, r_1 = r_2\)。</p>
 
-<p>这条定理就是 Hilbert 几何的"基本定理"。它的两个关键前提是<em>凸</em> 与 <em>闭</em>——失去任何一个都会失败。凸是为了让"中点"也在集合里以应用平行四边形；闭是为了让 Cauchy 极限留在集合里。</p>
+<p>请你停下来感受这条结论的<em>结构性</em>。它把 Hilbert 空间的<em>每一个闭子空间</em> 都升级成<em>直和分量</em>——你可以自由地把任意向量"<em>沿 \(M\) 方向</em>" 与"<em>沿 \(M^\perp\) 方向</em>" 拆开。</p>
 
-<p>注意"\(H\) 完备 + \(C\) 闭"是无可绕过的——在不完备空间里上面的论证就会在第 2 步崩掉。这也是为什么 Hilbert 空间的"完备性"不是装饰：缺了它整个几何就坍塌。</p>
+<p>对比一般 Banach 空间：那里"闭子空间一定有补空间" <em>是错的</em>（这条事实涉及"补类型空间" 与 Lindenstrauss–Tzafriri 定理，超出本书范围）。Hilbert 空间是<em>每个</em> 闭子空间都自动有正交补的<em>独家</em> 一类——因为它有内积，能定义"垂直"。</p>
 
-<h2 id="sec6-2">6.2 投影到闭子空间：正交特征</h2>
+<p>立刻的推论：<em>双重正交补</em>。\((M^\perp)^\perp = M\) 对闭子空间 \(M\) 成立。证明：\(x \in M\) ⟹ \(x \perp M^\perp\) ⟹ \(x \in (M^\perp)^\perp\)（这给 \(\subseteq\)）。反过来，设 \(x \in (M^\perp)^\perp\)，分解 \(x = p + r\)（\(p \in M, r \in M^\perp\)）。\(x \perp M^\perp\) 与 \(p \in M \subseteq (M^\perp)^\perp\) 给 \(p \perp M^\perp\)，所以 \(r = x - p \perp M^\perp\)。但 \(r \in M^\perp\)，自身垂直 ⟹ \(r = 0\)，所以 \(x = p \in M\)。</p>
 
-<p>把上面的定理特化到 \(C = M\) 是<em>闭子空间</em>。子空间一定凸（包含原点 + 加法 + 数乘封闭蕴含中点封闭）。所以最近点定理立即给出：每个 \(x \in H\) 在 \(M\) 上有唯一最近点 \(P_M(x)\)。</p>
+<p>"<em>双重正交补 = 自身</em>" 这条事实只对<em>闭</em> 子空间成立——一般 \(M\) 不闭时，\((M^\perp)^\perp\) 给的是 \(M\) 的<em>闭包</em>。这是为什么<a href="ch7.html">下一章</a> "正交规范基" 那里要反复说"<em>张成稠密 ⟺ 唯一垂直 0</em>"——背后正是这条双重正交补。</p>
 
-<p>子空间情形比一般凸集多一个奇迹：<strong>"最近"等价于"残差垂直于 \(M\)"</strong>。</p>
+<h2 id="sec6-4">6.4 正交投影算子 \(P_M\) 的四条性质</h2>
 
-<p><strong>定理（投影的正交特征）。</strong>设 \(M \subset H\) 闭子空间，\(x \in H\)、\(m \in M\)。则</p>
+<p>正交分解 \(x = p + r\) 让我们能定义一个<em>算子</em>：</p>
 
 <p>\[
-\|x - m\| = \min_{m' \in M} \|x - m'\| \iff (x - m) \perp M.
+P_M : H \to H, \quad P_M(x) = p \quad (\text{即 } x \text{ 在 } M \text{ 上的最近点 / 投影分量}).
 \]</p>
 
-<p>"\(\Leftarrow\)" 很直接。设 \((x - m) \perp M\)。对任意 \(m' \in M\)，</p>
+<p>\(P_M\) 叫 \(H\) 到 \(M\) 上的<em>正交投影算子</em>。它有四条结构性质——这四条几乎<em>定义</em> 了"投影算子" 这件事。</p>
+
+<p><strong>性质 1（线性）。</strong>\(P_M(\alpha x + \beta y) = \alpha P_M(x) + \beta P_M(y)\)。</p>
+
+<p>证明：把 \(x = p_x + r_x, y = p_y + r_y\)（正交分解）。则 \(\alpha x + \beta y = (\alpha p_x + \beta p_y) + (\alpha r_x + \beta r_y)\)。第一项在 \(M\) 里（\(M\) 线性），第二项在 \(M^\perp\) 里（\(M^\perp\) 线性）。<em>分解唯一</em>，所以 \(P_M(\alpha x + \beta y) = \alpha p_x + \beta p_y = \alpha P_M(x) + \beta P_M(y)\)。</p>
+
+<p><strong>性质 2（幂等）。</strong>\(P_M^2 = P_M\)，即 \(P_M(P_M(x)) = P_M(x)\)。</p>
+
+<p>证明：\(P_M(x) = p \in M\)；\(p\) 在 \(M\) 上的"最近点" 是它自己。</p>
+
+<p><strong>性质 3（自伴）。</strong>\(\langle P_M x, y \rangle = \langle x, P_M y \rangle\) 对所有 \(x, y \in H\)。</p>
+
+<p>证明：把 \(x = p_x + r_x, y = p_y + r_y\)。算</p>
 
 <p>\[
-\|x - m'\|^2 = \|(x - m) + (m - m')\|^2 = \|x - m\|^2 + \|m - m'\|^2 \ge \|x - m\|^2,
+\langle P_M x, y \rangle = \langle p_x, p_y + r_y \rangle = \langle p_x, p_y \rangle + \langle p_x, r_y \rangle.
 \]</p>
 
-<p>因为 \((x - m) \perp (m - m') \in M\)。所以 \(m\) 是最近的。</p>
+<p>第二项 \(\langle p_x, r_y \rangle = 0\)（\(p_x \in M, r_y \in M^\perp\)）。所以 \(\langle P_M x, y \rangle = \langle p_x, p_y \rangle\)。对称的论证给 \(\langle x, P_M y \rangle = \langle p_x, p_y \rangle\)。两者相等。</p>
 
-<p>"\(\Rightarrow\)" 用变分。设 \(m\) 最近。对任意 \(m_0 \in M\) 与 \(t \in \mathbb{R}\)，\(m + t m_0 \in M\)，所以</p>
+<p><strong>性质 4（范数 \(\le 1\)）。</strong>\(\|P_M x\| \le \|x\|\) 对所有 \(x\)。</p>
+
+<p>证明：Pythagoras——\(\|x\|^2 = \|p_x\|^2 + \|r_x\|^2 \ge \|p_x\|^2 = \|P_M x\|^2\)。</p>
+
+<p>当 \(M \neq \{0\}\) 时取 \(x \in M, x \neq 0\) 给 \(\|P_M x\| = \|x\|\)，所以 \(\|P_M\| = 1\)。</p>
+
+<p>\[\boxed{\ P_M \text{ 是} H \text{ 上} \textbf{有界线性} \text{算子, } \|P_M\| = 1, \ P_M^2 = P_M, \ P_M^* = P_M.\ }\]</p>
+
+<p>请你记下这四条——以后任何时候你看到一个算子 \(P\) 满足"\(P^2 = P\)" 与"\(P^* = P\)"，你应该立刻反应"<em>这是某个闭子空间上的正交投影</em>"。事实上这条<em>反过来</em> 也成立（在<a href="ch9.html">第 9 章</a> + <a href="ch21.html">第 21 章</a>会证）：<em>"幂等 + 自伴" 就是正交投影的代数刻画</em>。</p>
+
+<p>这条刻画在<a href="ch21.html">第 21 章</a>谱定理里至关重要——紧自伴算子的<em>谱分解</em> 把任意紧自伴算子写成"<em>不同特征空间上的投影的加权和</em>"，每个分量正是这一节定义的 \(P_M\)。</p>
+
+<h2 id="sec6-5">6.5 应用 1：最小二乘 / 线性回归</h2>
+
+<p>第一个具体应用——最小二乘。这是<a href="../线性代数/index.html">线性代数</a>里你做过的事，这里给它一个<em>几何身份</em>。</p>
+
+<p>问题。给数据 \((x_i, y_i)_{i=1}^n\)，找系数 \(\beta_0, \beta_1\) 使</p>
 
 <p>\[
-\|x - m - t m_0\|^2 \ge \|x - m\|^2.
+\sum_{i=1}^n (y_i - \beta_0 - \beta_1 x_i)^2 \quad \text{最小}.
 \]</p>
 
-<p>展开得 \(\|x - m\|^2 - 2 t \operatorname{Re} \langle x - m, m_0 \rangle + t^2 \|m_0\|^2 \ge \|x - m\|^2\)，即</p>
+<p>翻译成几何。把 \(y = (y_1, \ldots, y_n) \in \mathbb{R}^n\) 看成<em>目标向量</em>。把"<em>所有可能的回归值</em>" 装进一个集合 \(\widehat{Y} = \{(\beta_0 + \beta_1 x_i)_{i=1}^n : \beta_0, \beta_1 \in \mathbb{R}\}\)。</p>
+
+<p>关键观察：\(\widehat{Y}\) 是 \(\mathbb{R}^n\) 里的一个<em>二维线性子空间</em>——它由两个向量 \(\mathbf{1} = (1, \ldots, 1)\) 与 \(x = (x_1, \ldots, x_n)\) 张成。\(\widehat{Y} = \mathrm{span}\{\mathbf{1}, x\}\)，闭子空间（有限维总闭）。</p>
+
+<p>"<em>最小二乘</em>" = "\(\sum (y_i - \hat y_i)^2\) 最小" = "\(\|y - \hat y\|_2^2\) 最小" = "<em>找 \(\widehat Y\) 里离 \(y\) 最近的点</em>"。</p>
+
+<p>由 6.2 投影定理：</p>
 
 <p>\[
-t^2 \|m_0\|^2 \ge 2 t \operatorname{Re} \langle x - m, m_0 \rangle.
+\hat y = P_{\widehat{Y}}(y), \quad y - \hat y \perp \widehat{Y}.
 \]</p>
 
-<p>除以 \(t\) 后取 \(t \to 0^+\) 与 \(t \to 0^-\)，得 \(\operatorname{Re} \langle x - m, m_0 \rangle = 0\)。在复情形对 \(m_0\) 同时取 \(i m_0\) 给 \(\operatorname{Im} = 0\)。所以 \(\langle x - m, m_0 \rangle = 0\) 对所有 \(m_0 \in M\)，即 \((x - m) \perp M\)。</p>
+<p>"<em>残差垂直回归子空间</em>"。把"垂直 \(\mathbf{1}\)" 与"垂直 \(x\)" 写出来：</p>
 
-<p>这条等价非常有用。"最近"是个分析概念（取无穷下确界），"垂直"是个代数概念（一行内积等于零）。把这两个等同的瞬间，几何就完全可计算了。</p>
+<ul>
+  <li>\(\langle y - \hat y, \mathbf{1} \rangle = 0 \Rightarrow \sum (y_i - \hat y_i) = 0\)：残差和为零。</li>
+  <li>\(\langle y - \hat y, x \rangle = 0 \Rightarrow \sum x_i (y_i - \hat y_i) = 0\)：残差与 \(x_i\) 不相关。</li>
+</ul>
 
-<h2 id="sec6-3">6.3 正交分解 \(H = M \oplus M^\perp\)</h2>
+<p>这两条就是统计课里的<em>正规方程</em>（normal equations）——它们以前对你来说可能像是机械算出来的；现在你看到，它们就是"<em>残差垂直每个回归方向</em>" 的展开。</p>
 
-<p>把上一节合起来：每个 \(x \in H\) 唯一写成</p>
+<p>用矩阵记号：设 \(X = [\mathbf{1} | x] \in \mathbb{R}^{n \times 2}\)，\(\hat y = X \beta\)，\(\beta = (\beta_0, \beta_1)^T\)。残差垂直 \(X\) 的列空间 \(\Leftrightarrow X^T (y - X\beta) = 0\) \(\Leftrightarrow\)</p>
 
 <p>\[
-\boxed{\ x = P_M(x) + (x - P_M(x)), \qquad P_M(x) \in M, \ (x - P_M(x)) \in M^\perp.\ }
+\boxed{\ X^T X \beta = X^T y.\ }
 \]</p>
 
-<p>分解的存在性来自最近点存在；唯一性来自</p>
+<p>这就是<em>正规方程</em>。它是"<em>最佳逼近 = 投影</em>" 的代数表达。</p>
+
+<p>这条几何视角把统计里看似神秘的事重新解释。比如"<em>残差与解释变量不相关</em>" 不再是巧合——它就是"<em>残差垂直 \(x\)</em>"。再比如<em>多元回归</em> 也一字不差——把 \(\widehat{Y} = \mathrm{span}\{\mathbf{1}, x_1, x_2, \ldots, x_p\}\)，"残差垂直每个回归方向" 给 \(p+1\) 个正规方程。</p>
+
+<p>更深的：这条投影视角让"<em>异方差 / 加权回归</em>" 也变成几何——只是改 \(\mathbb{R}^n\) 上的内积。"广义最小二乘" \(\beta = (X^T \Sigma^{-1} X)^{-1} X^T \Sigma^{-1} y\) 就是在内积 \(\langle u, v \rangle_\Sigma = u^T \Sigma^{-1} v\) 下做投影。<em>同一种几何，换一个内积，换一个回归</em>。</p>
+
+<h2 id="sec6-6">6.6 应用 2：Fourier 部分和——你已经做过了</h2>
+
+<p>第二个应用，把"<em>截断 Fourier 级数</em>" 重新解释。</p>
+
+<p>在 \(L^2[-\pi, \pi]\) 里你以前学过：函数 \(f\) 可以展开成 Fourier 级数</p>
 
 <p>\[
-M \cap M^\perp = \{0\}
+f(x) \sim \frac{a_0}{2} + \sum_{n=1}^\infty (a_n \cos nx + b_n \sin nx).
 \]</p>
 
-<p>（如果 \(y \in M \cap M^\perp\)，则 \(\langle y, y \rangle = 0\)，即 \(y = 0\)）。</p>
+<p>截断 \(N\) 项得部分和 \(s_N(x) = \frac{a_0}{2} + \sum_{n=1}^N (a_n \cos nx + b_n \sin nx)\)。</p>
 
-<p>这就是 <strong>Hilbert 空间正交分解定理</strong>：</p>
+<p>现在的问题：\(s_N\) 是<em>所有</em> \(N\) 阶三角多项式中"<em>最好</em>" 的近似吗？</p>
 
-<p><strong>定理。</strong>设 \(H\) 是 Hilbert 空间，\(M \subset H\) 闭子空间。则 \(H = M \oplus M^\perp\)。每个 \(x \in H\) 唯一分解 \(x = m + m^\perp\)，其中 \(m = P_M(x)\)、\(m^\perp = P_{M^\perp}(x)\)。</p>
-
-<p>顺便注意到：\(M^\perp\) 一定是闭子空间（第 3 章 3.5 节已证），所以 \(M^{\perp \perp} = M\)（对闭子空间）。换句话说"取两次正交补"回到原来。这条 \((M^\perp)^\perp = M\) 在第 15 章对偶空间里会反复用。</p>
-
-<p>这里有一个很值得停下来欣赏的奇迹。在<em>非</em> Hilbert 的 Banach 空间里，子空间不一定有<em>任何</em>形式的"补"；甚至闭子空间都不一定有连续的补投影。Hilbert 空间是无穷维里"线性代数全部还在"的少数空间——这就是为什么我们偏爱它。</p>
-
-<h2 id="sec6-4">6.4 正交投影算子的性质</h2>
-
-<p>映射 \(P_M : H \to H\)，\(x \mapsto P_M(x)\)，叫做 \(H\) 到 \(M\) 上的<strong>正交投影</strong>。它有四条核心性质：</p>
-
-<p><strong>(P1) 线性。</strong> \(P_M(\alpha x + \beta y) = \alpha P_M(x) + \beta P_M(y)\)。证明：把 \(\alpha P_M(x) + \beta P_M(y)\) 与 \(\alpha (x - P_M(x)) + \beta (y - P_M(y))\) 分别验证落在 \(M\) 与 \(M^\perp\) 中，由唯一性结束。</p>
-
-<p><strong>(P2) 幂等：\(P_M^2 = P_M\)。</strong> \(P_M(x) \in M\)，再投到 \(M\) 还是它自己。</p>
-
-<p><strong>(P3) 自伴：\(\langle P_M(x), y \rangle = \langle x, P_M(y) \rangle\)。</strong>把 \(x = m_x + m_x^\perp\)、\(y = m_y + m_y^\perp\) 展开，左边 \(= \langle m_x, m_y \rangle\)，右边 \(= \langle m_x, m_y \rangle\)，相等。</p>
-
-<p><strong>(P4) 范数 \(\|P_M\| \le 1\)。</strong>\(\|x\|^2 = \|P_M(x)\|^2 + \|x - P_M(x)\|^2 \ge \|P_M(x)\|^2\)。除非 \(M = \{0\}\)，否则 \(\|P_M\| = 1\)。</p>
-
-<p>这四条把正交投影刻画得相当干净。事实上有一个反向定理：</p>
-
-<p><strong>定理（投影的特征）。</strong>设 \(P : H \to H\) 是有界线性算子，幂等且自伴。则 \(P\) 是某个闭子空间 \(M = \operatorname{Range}(P)\) 上的正交投影。</p>
-
-<p>这条等价让"投影"完全可被代数辨认——以后你看到一个算子满足 \(P^2 = P\) 与 \(P^* = P\)，就立刻知道它是某个闭子空间的正交投影。</p>
-
-<h2 id="sec6-5">6.5 应用一：最小二乘 / 线性回归</h2>
-
-<p>这是正交投影最直观的应用。设我们有数据 \((a_1, b_1), \ldots, (a_n, b_n) \in \mathbb{R}^2\)，想找一条直线 \(b = \alpha + \beta a\) 使总平方误差</p>
+<p>答：是——在 \(L^2\) 距离下。理由：把 \(M_N := \mathrm{span}\{1, \cos x, \sin x, \cos 2x, \sin 2x, \ldots, \cos Nx, \sin Nx\}\)，闭子空间（有限维）。Fourier 系数 \(a_n = \frac{1}{\pi} \int f \cos nx \, dx\), \(b_n = \frac{1}{\pi} \int f \sin nx \, dx\) <em>就是</em> \(f\) 在 \(\{\cos nx, \sin nx\}\) 这组（按合适标量调整后）正交规范元素上的内积投影系数。所以</p>
 
 <p>\[
-\sum_{i=1}^n (b_i - \alpha - \beta a_i)^2
+s_N = P_{M_N}(f) = \arg\min_{g \in M_N} \|f - g\|_{L^2}.
 \]</p>
 
-<p>最小。把这件事写成线性代数：</p>
+<p>截断 Fourier 级数<em>就是</em> \(L^2\) 投影到 \(M_N\) 上的最佳逼近——这是 6.1–6.4 整套定理的<em>最干净</em> 的应用之一。</p>
+
+<p>\[\boxed{\ \text{Fourier 部分和} = L^2 \text{ 投影到三角多项式子空间。}\ }\]</p>
+
+<p>请你停下来感受这件事的<em>颠覆性</em>。"<em>Fourier 系数为什么是 \(\frac{1}{\pi}\int f \cos nx\)？</em>" 你以前可能背过这条公式但不知道<em>为什么</em>。现在的回答：因为这<em>就是</em> \(f\) 在正交规范元素 \(\frac{\cos nx}{\sqrt{\pi}}\) 上的投影系数——投影定理"<em>残差垂直</em>" 解出来正是这个值。</p>
+
+<p>这条解释的力量在<a href="ch7.html">下一章</a>更进一步——把 \(N \to \infty\)，\(s_N \to f\) 在 \(L^2\) 中（前提是 \(\{\cos nx, \sin nx\}\) 张成 \(L^2\) 中稠密集——这是"正交规范基" 的内容）。<em>Fourier 级数收敛</em> 不是分析奇迹，是 Hilbert 几何<em>必然</em>。</p>
+
+<h2 id="sec6-7">6.7 应用 3：条件期望 = \(L^2\) 投影</h2>
+
+<p>第三个应用——把概率统计里的<em>条件期望</em> 重新解释为 Hilbert 投影。</p>
+
+<p>设 \((\Omega, \mathcal{F}, \mathbb{P})\) 是概率空间，\(\mathcal{G} \subseteq \mathcal{F}\) 是子 \(\sigma\)-代数。<em>条件期望</em> \(\mathbb{E}[X | \mathcal{G}]\) 在概率课上的定义比较抽象——"<em>\(\mathcal{G}\) 可测的随机变量, 满足 \(\int_A \mathbb{E}[X | \mathcal{G}] \, d\mathbb{P} = \int_A X \, d\mathbb{P}\) 对所有 \(A \in \mathcal{G}\)</em>"——这条定义你以前可能背下来但没真正理解为什么。</p>
+
+<p>现在的回答：当 \(X \in L^2(\Omega, \mathcal{F}, \mathbb{P})\) 时，</p>
 
 <p>\[
-\min_{\alpha, \beta} \|\mathbf{b} - A \boldsymbol{\theta}\|^2, \qquad A = \begin{pmatrix} 1 & a_1 \\ \vdots & \vdots \\ 1 & a_n \end{pmatrix}, \quad \boldsymbol{\theta} = \begin{pmatrix} \alpha \\ \beta \end{pmatrix}.
+\boxed{\ \mathbb{E}[X | \mathcal{G}] = P_{L^2(\Omega, \mathcal{G}, \mathbb{P})}(X), \ }
 \]</p>
 
-<p>这里 Hilbert 空间是 \(\mathbb{R}^n\)，\(M = \operatorname{Range}(A) \subset \mathbb{R}^n\)（一个二维闭子空间），目标就是把 \(\mathbf{b}\) 投影到 \(M\) 上。投影的正交特征给</p>
+<p>即条件期望<em>就是</em> \(X\) 在<em>"\(\mathcal{G}\) 可测的 \(L^2\) 函数" 这个闭子空间</em> 上的正交投影。</p>
+
+<p>核对：把 \(M = L^2(\Omega, \mathcal{G}, \mathbb{P}) \subseteq L^2(\Omega, \mathcal{F}, \mathbb{P})\)（闭子空间——\(\mathcal{G}\) 可测且 \(L^2\) 的函数全体）。投影定理给 \(P_M(X)\) 是 \(M\) 里离 \(X\) 最近的元素，且</p>
 
 <p>\[
-A^T (\mathbf{b} - A \hat{\boldsymbol{\theta}}) = 0,
+\langle X - P_M(X), Z \rangle = 0 \quad \text{对所有 } Z \in M.
 \]</p>
 
-<p>即<strong>正规方程</strong> \(A^T A \hat{\boldsymbol{\theta}} = A^T \mathbf{b}\)。这就是最小二乘的解。</p>
-
-<p>关键直觉：<strong>最小二乘 \(=\) 把目标向量正交投影到列空间上</strong>。这个图像把一个看上去是数值优化的问题变成了纯几何。这也解释了为什么残差 \(\mathbf{b} - A \hat{\boldsymbol{\theta}}\) 一定垂直于每一列 \(a_i\)——这就是正交特征。</p>
-
-<p>同样的图像在无穷维里也成立。把 \(\mathbb{R}^n\) 换成 \(L^2\)、列空间换成"由若干基函数张成的闭子空间"，最小二乘就变成"用这些基函数最佳逼近目标函数"。这是数值分析、机器学习、信号处理共享的几何根。</p>
-
-<h2 id="sec6-6">6.6 应用二与三：Fourier 部分和与条件期望</h2>
-
-<p><strong>Fourier 部分和。</strong>取 \(H = L^2[-\pi, \pi]\)，\(\{e_n = e^{inx}/\sqrt{2\pi}\}_{n \in \mathbb{Z}}\) 是正交规范集。\(M_N = \operatorname{span}\{e_n : |n| \le N\}\) 是有限维（所以闭）子空间。投影 \(P_{M_N}(f)\) 是什么？由前面的正交特征：\(P_{M_N}(f)\) 在 \(\{e_n\}\) 下的系数恰好是</p>
+<p>用内积是 \(\langle U, V \rangle = \mathbb{E}[UV]\) 写出来：\(\mathbb{E}[(X - P_M(X)) Z] = 0\) 对所有 \(\mathcal{G}\) 可测 \(Z \in L^2\)。取 \(Z = \mathbf{1}_A\)（\(A \in \mathcal{G}\)，\(\mathbf{1}_A \in M\)）得</p>
 
 <p>\[
-\hat f(n) = \langle f, e_n \rangle = \frac{1}{\sqrt{2\pi}} \int_{-\pi}^{\pi} f(x) e^{-inx} \, dx.
+\int_A (X - P_M(X)) \, d\mathbb{P} = 0 \Rightarrow \int_A P_M(X) \, d\mathbb{P} = \int_A X \, d\mathbb{P}.
 \]</p>
 
-<p>所以</p>
+<p>这<em>正是</em> 条件期望定义的核心条件！加上 \(P_M(X) \in M\) 是 \(\mathcal{G}\) 可测的——所以 \(P_M(X) = \mathbb{E}[X | \mathcal{G}]\)。</p>
 
-<p>\[
-P_{M_N}(f) = \sum_{|n| \le N} \hat f(n) \, e_n = \frac{1}{\sqrt{2\pi}} \sum_{|n| \le N} \hat f(n) e^{inx}.
-\]</p>
+<p>这个解释的<em>颠覆性</em>。"<em>条件期望最佳逼近</em>"（"<em>给定 \(\mathcal{G}\)，对 \(X\) 的最佳预测是什么？</em>" 用 \(L^2\) 误差度量，答案是条件期望）<em>不再是统计奇迹</em>——它就是 Hilbert 投影定理<em>必然</em>。</p>
 
-<p>这<em>就是</em> Fourier 部分和。Fourier 级数的"逼近"含义恰好就是在 \(L^2\) 上正交投影到三角多项式子空间。第 7 章会把 \(N \to \infty\) 时的极限讲清。</p>
+<p>条件期望的所有性质都对应投影性质：</p>
 
-<p><strong>条件期望。</strong>取 \(H = L^2(\Omega, \mathcal{F}, \mathbb{P})\)（概率空间上的二阶可积随机变量），\(\mathcal{G} \subset \mathcal{F}\) 是子 \(\sigma\)-代数。\(L^2(\Omega, \mathcal{G}, \mathbb{P})\) 是 \(L^2(\Omega, \mathcal{F}, \mathbb{P})\) 的闭子空间。条件期望算子</p>
+<ul>
+  <li>"<em>线性</em>" \(\mathbb{E}[\alpha X + \beta Y | \mathcal{G}] = \alpha \mathbb{E}[X|\mathcal{G}] + \beta \mathbb{E}[Y|\mathcal{G}]\) ↔ \(P_M\) 线性。</li>
+  <li>"<em>幂等</em>" \(\mathbb{E}[\mathbb{E}[X|\mathcal{G}] | \mathcal{G}] = \mathbb{E}[X | \mathcal{G}]\) ↔ \(P_M^2 = P_M\)。</li>
+  <li>"<em>嵌套</em>" \(\mathbb{E}[\mathbb{E}[X | \mathcal{G}_1] | \mathcal{G}_2] = \mathbb{E}[X | \mathcal{G}_2]\)（\(\mathcal{G}_2 \subseteq \mathcal{G}_1\)）↔ 子空间嵌套时投影也嵌套。</li>
+  <li>"<em>方差分解</em>" \(\mathrm{Var}(X) = \mathrm{Var}(\mathbb{E}[X|\mathcal{G}]) + \mathbb{E}[\mathrm{Var}(X|\mathcal{G})]\) ↔ Pythagoras（\(\|X - \mathbb{E}X\|^2 = \|P_M(X - \mathbb{E}X)\|^2 + \|(I - P_M)(X - \mathbb{E}X)\|^2\)）。</li>
+</ul>
 
-<p>\[
-\mathbb{E}[\cdot | \mathcal{G}] : L^2(\mathcal{F}) \to L^2(\mathcal{G})
-\]</p>
+<p>看吧——"<em>方差分解定律</em>" 就是 Hilbert 几何里的<em>勾股定理</em>。这件事在<a href="ch16.html">第 16 章</a> Riesz 表示定理里会回头说一次："<em>条件期望就是 \(L^2\) 投影</em>" 的更精确版本。</p>
 
-<p>恰好就是<em>这个闭子空间上的正交投影</em>。这是条件期望最干净的几何刻画——它就是"对 \(\mathcal{G}\) 可测的最佳 \(L^2\) 逼近"。</p>
+<h2 id="sec6-8">6.8 一张全景图</h2>
 
-<p>这个观点把<a href="../概率统计/index.html">概率统计读本</a>里所有"条件期望的塔性质""条件期望的线性""条件期望取出可测因子"的结论变成正交投影的代数性质——\(P^2 = P\)、\(P\) 自伴、\(P\) 与"乘上可测因子"交换。这是为什么概率统计课在末尾必须把 \(L^2\) 几何讲清。</p>
+<p>这一章做了一件事——把"<em>欧氏几何里的垂直投影</em>" 系统地<em>搬</em> 到 Hilbert 空间。三件配套都到位：</p>
 
-<p>这两个例子和最小二乘加在一起就是"投影 = 最佳逼近"的三个最常用化身。它们之所以"长得像"，是因为它们<em>就是</em>同一件事：正交投影到闭子空间。</p>
+<ul>
+  <li><em>存在 + 唯一</em>：闭凸集情形（6.1）+ 闭子空间情形（6.2）。</li>
+  <li><em>分裂</em>：\(H = M \oplus M^\perp\)（6.3）。</li>
+  <li><em>算子化</em>：\(P_M\) 的四条性质（6.4）。</li>
+</ul>
 
-<p>下一章我们要把"投影到有限维子空间"推广到"投影到由可数正交基张成的子空间"，这就是 Fourier 展开的抽象版——它会把第 5 章的 Bessel 不等式变成 Parseval 等式。</p>
+<p>三个应用——最小二乘（6.5）、Fourier 部分和（6.6）、条件期望（6.7）——把"<em>投影几何</em>" 放到了三个完全不同的具体场景里，让你感受这件事的<em>普适</em>。这三处看起来毫不相关，背后是<em>同一种几何</em>。</p>
+
+<p>请你回头想一件事：本章开头我说"<em>这是本书最看得见的一章</em>"。理由是<em>它的所有定理都能用一张图理解</em>——从外面一个点垂直落到一个子空间。这张图你在 \(\mathbb{R}^3\) 里就有了。整章只是反复证明：这张图<em>能搬过去</em>。"能搬" 的代价是 Hilbert 空间结构（内积 + 完备）+ 子空间闭。</p>
+
+<p>下一章把"<em>投影到子空间</em>" 推到极端——投影到由<em>整个</em>正交规范集张成的子空间。如果这个集合"<em>够大</em>"，每个 \(x \in H\) 就能展开成绝对收敛级数 \(x = \sum \langle x, e_n \rangle e_n\)。这就是<em>抽象 Fourier 展开</em>，泛函分析里最干净的"<em>无穷维线性代数</em>"。</p>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 经典不等式</a><a href="ch7.html">下一章 · 第 7 章 正交基与 Fourier 展开 →</a></nav>
 </main>

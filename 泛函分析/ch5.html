@@ -32,187 +32,336 @@
 </head>
 <body>
 <main>
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 经典空间例子库</a><a href="ch6.html">下一章 · 第 6 章 Hilbert 几何：投影与最佳逼近 →</a></nav>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 \(L^p\) 空间</a><a href="ch6.html">下一章 · 第 6 章 Hilbert 几何：投影与最佳逼近 →</a></nav>
 <h1 id="ch5">第 5 章 经典不等式</h1>
 
-<p>这一章把分析里几条最常见的不等式集中讲明白。它们看起来是"工具章"，但每一条不等式背后都有一个强的几何或概率含义。Cauchy–Schwarz 来自内积；Hölder 是 Cauchy–Schwarz 在 \(L^p\) 里的推广，本质是凸性；Minkowski 是 \(L^p\) 范数三角不等式的全部内容；Bessel 控制 Fourier 系数；Jensen 把所有"凸函数 + 平均"的关系统一成一行。把这五条都看清，你后面读 PDE、概率、调和分析时就再也不会被"为什么这一行不等式成立"卡住。</p>
+<p>请你先做一道你高中就会的事。给两个非负实数 \(a, b\)。比较</p>
 
-<ul>
-  <li>从 Young 不等式（\(ab \le a^p/p + b^q/q\)）这条最朴素的凸性开始。</li>
-  <li>用 Young 推出 Hölder 不等式，这是 \(L^p\) 配对的基本工具。</li>
-  <li>用 Hölder 推出 Minkowski 不等式，这是 \(L^p\) 范数本身的三角不等式。</li>
-  <li>把 Cauchy–Schwarz 重新放回这条链条，看它是 Hölder 的 \(p = q = 2\) 特例。</li>
-  <li>Bessel 不等式：把"投影到正交规范集"的几何写成一行控制。</li>
-  <li>Jensen 不等式：把所有凸函数 + 平均的关系一并打包，是 Hölder 的"概率版"。</li>
-</ul>
+<p>\[
+ab \quad \text{和} \quad \frac{a^2 + b^2}{2}.
+\]</p>
 
-<h2 id="sec5-1">5.1 Young 不等式：凸性的最朴素形式</h2>
+<p>左边是几何均值平方那一类，右边是算术均值平方那一类。两边相减</p>
 
-<p>Young 不等式说：对 \(1 < p, q < \infty\) 满足 \(1/p + 1/q = 1\)，以及任意 \(a, b \ge 0\)，</p>
+<p>\[
+\frac{a^2 + b^2}{2} - ab = \frac{(a - b)^2}{2} \ge 0.
+\]</p>
+
+<p>所以 \(ab \le \frac{a^2 + b^2}{2}\)。等号在 \(a = b\) 时成立。这是<em>最朴素</em> 的"两个数的乘积被两个数的平方平均控制" 的不等式。</p>
+
+<p>请你停下来想：这条小结果跟<em>分析</em>有什么关系？答：跟 Cauchy–Schwarz 不等式有关系。把它写在向量上：对 \(\mathbb{R}^n\) 里两个向量 \(x = (x_1, \ldots, x_n)\), \(y = (y_1, \ldots, y_n)\)，把上面对每个分量做一遍：</p>
+
+<p>\[
+|x_i y_i| \le \frac{x_i^2 + y_i^2}{2}.
+\]</p>
+
+<p>求和：\(\sum |x_i y_i| \le \frac{\|x\|_2^2 + \|y\|_2^2}{2}\)。这条本身已经是个有用的估计。要把它"打磨" 成 Cauchy–Schwarz \(|\sum x_i y_i| \le \|x\|_2 \cdot \|y\|_2\)，只差一步——把 \(x, y\) 各自换成"<em>归一化</em>" 版本（除以自己的范数），让 \(\|x\|_2 = \|y\|_2 = 1\)，再倒推。</p>
+
+<p>整本泛函分析里几乎所有"用范数估计内积 / 用一类积分估计另一类积分" 的不等式，背后都是<em>同一种思路</em>：先证一个<em>两个数</em> 的不等式 \(ab \le \cdots\)（分项不等式），再"归一化 + 求和" 把它升级到向量 / 函数。这一章我把这条思路<em>串成一条链</em>：</p>
+
+<p>\[
+\boxed{\ \text{Young} \xrightarrow{\text{归一化求和}} \text{Hölder} \xrightarrow{\text{重新分组}} \text{Minkowski}.\ }
+\]</p>
+
+<p>三步走完，\(L^p\) 空间是 Banach 空间这件事就被钉牢了——这是<a href="ch4.html">第 4 章</a>承诺要还的债。链子之外再加两件常用工具：Bessel（投影几何里出来的）+ Jensen（凸函数版本的"分项不等式")。</p>
+
+<h2 id="sec5-1">5.1 Young 不等式：链子的种子</h2>
+
+<p>从前面那条 \(ab \le (a^2 + b^2)/2\) 出发，你能把指数<em>非对称地</em> 推广。Young 不等式说：</p>
+
+<p><strong>定理（Young 不等式）。</strong>设 \(a, b \ge 0\)，\(p, q \in (1, \infty)\) 满足<em>共轭关系</em></p>
+
+<p>\[
+\frac{1}{p} + \frac{1}{q} = 1.
+\]</p>
+
+<p>则</p>
 
 <p>\[
 \boxed{\ ab \le \frac{a^p}{p} + \frac{b^q}{q}.\ }
 \]</p>
 
-<p>等号成立 \(\iff a^p = b^q\)。</p>
+<p>等号在 \(a^p = b^q\) 时成立。</p>
 
-<p>证明用 \(\log\) 凹性。\(\log\) 是凹函数，于是对 \(1/p + 1/q = 1\)：</p>
-
-<p>\[
-\log\left( \frac{a^p}{p} + \frac{b^q}{q} \right) \ge \frac{1}{p} \log a^p + \frac{1}{q} \log b^q = \log a + \log b = \log(ab).
-\]</p>
-
-<p>取指数即得 Young。</p>
-
-<p>这条小不等式是后面所有 \(L^p\) 不等式的<em>原子</em>。它的对称版（任何凸函数 + 共轭凸函数都有类似估计，叫做 Fenchel–Young 不等式）是凸优化、对偶分析整个分支的源头。本书暂时只用最简单的 \(a^p/p + b^q/q\) 这一条。</p>
-
-<h2 id="sec5-2">5.2 Hölder 不等式</h2>
-
-<p>对 \(1 \le p, q \le \infty\) 满足 \(1/p + 1/q = 1\)（约定 \(1/\infty = 0\)），与任意 \(f \in L^p\)、\(g \in L^q\)：</p>
+<p>证明只用一行——\(\log\) 的凹性。设 \(a, b > 0\)（\(a = 0\) 或 \(b = 0\) 时不等式平凡）。\(\log\) 在 \((0, \infty)\) 上凹，所以对凸组合系数 \(1/p, 1/q\)（这两个数加起来是 1）有</p>
 
 <p>\[
-\boxed{\ \|fg\|_1 = \int |fg| \, d\mu \le \|f\|_p \cdot \|g\|_q.\ }
+\log\left(\frac{1}{p} \cdot a^p + \frac{1}{q} \cdot b^q\right) \ge \frac{1}{p} \log(a^p) + \frac{1}{q} \log(b^q) = \log a + \log b = \log(ab).
 \]</p>
 
-<p>序列版本：\(\sum_n |x_n y_n| \le \|x\|_p \|y\|_q\)。</p>
+<p>对两边取指数（指数函数单增）：\(\frac{a^p}{p} + \frac{b^q}{q} \ge ab\)。证毕。</p>
 
-<p>证明（\(1 < p < \infty\) 情形）：先齐次化，假设 \(\|f\|_p = \|g\|_q = 1\)。对每个 \(x\) 应用 Young：</p>
+<p>这个证明的精神：<em>"两个数的乘积 \(\le\) 它们的某种'幂平均'"</em>。\(p = q = 2\) 时退化到本章开头那条 \(ab \le (a^2 + b^2)/2\)（共轭关系 \(1/2 + 1/2 = 1\) 成立）。</p>
+
+<p>请你停下来感受 \(p\) 与 \(q\) 的<em>共轭</em> 关系。\(1/p + 1/q = 1\) 意味着 \(q = p/(p-1)\)。当 \(p = 1.1\) 时 \(q = 11\)；\(p = 2\) 时 \(q = 2\)；\(p = 3\) 时 \(q = 3/2\)；\(p \to \infty\) 时 \(q \to 1\)。这条关系不是装饰——它<em>就是</em> \(L^p\) 与 \(L^q\) 配对的几何根，下一节立刻看到。</p>
+
+<h2 id="sec5-2">5.2 Hölder 不等式：把 Young 升级到向量</h2>
+
+<p>现在把 5.1 的"分项不等式" 套到向量上去。设 \(x = (x_1, \ldots, x_n) \in \mathbb{R}^n\), \(y = (y_1, \ldots, y_n) \in \mathbb{R}^n\)，\(p, q \in (1, \infty)\) 共轭。</p>
+
+<p>朴素试法：把 Young 直接对每个 \((|x_i|, |y_i|)\) 用一遍：</p>
 
 <p>\[
-|f(x) g(x)| \le \frac{|f(x)|^p}{p} + \frac{|g(x)|^q}{q}.
+|x_i y_i| \le \frac{|x_i|^p}{p} + \frac{|y_i|^q}{q}.
 \]</p>
 
-<p>两边对 \(x\) 积分：</p>
+<p>对 \(i\) 求和：</p>
 
 <p>\[
-\int |fg| \, d\mu \le \frac{1}{p} \int |f|^p + \frac{1}{q} \int |g|^q = \frac{1}{p} + \frac{1}{q} = 1 = \|f\|_p \|g\|_q.
+\sum_i |x_i y_i| \le \frac{1}{p} \sum_i |x_i|^p + \frac{1}{q} \sum_i |y_i|^q = \frac{\|x\|_p^p}{p} + \frac{\|y\|_q^q}{q}.
 \]</p>
 
-<p>结束。\(p = 1, q = \infty\) 端点情形直接 \(|fg| \le \|g\|_\infty |f|\) 后积分。</p>
+<p>这条<em>已经</em> 是个估计，但形式不漂亮——左边一个内积式量，右边是范数的<em>幂</em> 之和。理想的形状应该是<em>"内积 \(\le\) 范数 × 范数"</em>。</p>
 
-<p>Hölder 不等式可以理解成"\(L^p\) 和它的对偶 \(L^q\) 之间的配对受范数控制"。这是为什么对偶配对 \(\langle f, g \rangle = \int fg\) 在 \(L^p \times L^q\) 上良定义，并且</p>
+<p>撞墙了。怎么办？<em>重新归一化</em>。</p>
+
+<p>关键技巧：把 \(x, y\) 各自<em>除以自己的范数</em>。设 \(\|x\|_p > 0, \|y\|_q > 0\)（否则平凡），令</p>
 
 <p>\[
-|\langle f, g \rangle| \le \|f\|_p \|g\|_q.
+\tilde x_i = \frac{x_i}{\|x\|_p}, \quad \tilde y_i = \frac{y_i}{\|y\|_q}.
 \]</p>
 
-<p>这是第 15 章对偶空间 \((L^p)^* = L^q\) 等距同构的核心估计。</p>
+<p>则 \(\|\tilde x\|_p = 1, \|\tilde y\|_q = 1\)。把上面那条不等式套到归一化版本：</p>
 
-<p><strong>Hölder 的几个常用变体：</strong></p>
+<p>\[
+\sum_i |\tilde x_i \tilde y_i| \le \frac{\|\tilde x\|_p^p}{p} + \frac{\|\tilde y\|_q^q}{q} = \frac{1}{p} + \frac{1}{q} = 1.
+\]</p>
+
+<p>左边代回原变量：\(\sum |x_i y_i| / (\|x\|_p \|y\|_q) \le 1\)。两边乘 \(\|x\|_p \|y\|_q\)：</p>
+
+<p>\[
+\boxed{\ \sum_{i=1}^n |x_i y_i| \le \|x\|_p \cdot \|y\|_q. \ }
+\]</p>
+
+<p>这就是<em>Hölder 不等式</em>（离散版本）。漂亮形状达成。</p>
+
+<p>请你看清这条证明的<em>力学</em>：朴素套 Young 给的是"<em>幂相加</em>" 形状；这个形状不是要的；解决办法不是改算法，是<em>改输入</em>——把 \(x, y\) 归一化让 \(\|x\|_p = \|y\|_q = 1\)，于是右边的 \(\frac{\|x\|_p^p}{p} + \frac{\|y\|_q^q}{q}\) 自动塌缩成 \(\frac{1}{p} + \frac{1}{q} = 1\)。共轭关系<em>就是</em> 让这步塌缩发生的条件。</p>
+
+<p>积分版本完全平行：对可测函数 \(f, g\)，</p>
+
+<p>\[
+\int |f g| \, d\mu \le \left(\int |f|^p \, d\mu\right)^{1/p} \cdot \left(\int |g|^q \, d\mu\right)^{1/q} = \|f\|_p \cdot \|g\|_q.
+\]</p>
+
+<p>证明<em>一字不差</em>——把求和换成积分。这就是<a href="ch4.html">第 4 章</a>定义的 \(L^p\) 范数与 \(L^q\) 范数的<em>对偶配对</em>。</p>
+
+<p>\[\boxed{\ \text{Hölder：} L^p \text{ 与 } L^q \text{ 是天生的'对偶配对'，配对形状是积分。}\ }\]</p>
+
+<p>这件事的分量。\(L^p\) 与 \(L^q\)（\(1/p + 1/q = 1\)）不是两个互不相干的空间——它们通过 Hölder 不等式<em>互为对方的对偶</em>。这是<a href="ch15.html">第 15 章</a>"\(L^p\) 的对偶就是 \(L^q\)" 的几何根。Hölder 是这个对偶关系<em>能存在</em> 的不等式条件——没有 Hölder，"\(L^q\) 函数定义 \(L^p\) 上的连续线性泛函" 这件事根本说不出口。</p>
+
+<p>三个特例你必须记住：</p>
 
 <ul>
-  <li><strong>三因子 Hölder：</strong>\(1/p + 1/q + 1/r = 1\) 时 \(\int |fgh| \le \|f\|_p \|g\|_q \|h\|_r\)；</li>
-  <li><strong>插值 Hölder：</strong>对 \(1/p = \theta/p_0 + (1-\theta)/p_1\)（\(0 < \theta < 1\)），\(\|f\|_p \le \|f\|_{p_0}^\theta \|f\|_{p_1}^{1-\theta}\)；</li>
-  <li><strong>反向 Hölder（在某些场景下成立）：</strong>需要额外控制条件，本书不深入。</li>
+  <li>\(p = q = 2\)：Hölder 退化为<em>Cauchy–Schwarz</em>（5.4 节）。</li>
+  <li>\(p = 1, q = \infty\)：\(\int |fg| \le \|f\|_1 \|g\|_\infty\)（积分被一个一致界 × 总质量控制）。</li>
+  <li>\(p = \infty, q = 1\)：对称的另一版。</li>
 </ul>
 
-<h2 id="sec5-3">5.3 Minkowski 不等式</h2>
+<h2 id="sec5-3">5.3 Minkowski 不等式：\(L^p\) 三角不等式</h2>
 
-<p>Minkowski 不等式就是 \(L^p\) 范数的三角不等式：</p>
+<p>现在到第 4 章遗留的那笔账：\(L^p\) 范数<em>是</em> 范数吗？范数三条要求是：(i) 正定；(ii) 齐次；(iii) 三角不等式。前两条 \(L^p\) 显然满足。第三条——三角不等式 \(\|f + g\|_p \le \|f\|_p + \|g\|_p\)——<em>不显然</em>，因为求和发生在<em>幂</em> 里面。</p>
 
-<p>\[
-\boxed{\ \|f + g\|_p \le \|f\|_p + \|g\|_p, \quad 1 \le p \le \infty.\ }
-\]</p>
+<p>这就是 Minkowski 不等式的内容。</p>
 
-<p>证明（\(1 < p < \infty\)）：令 \(h = f + g\)。</p>
+<p><strong>定理（Minkowski 不等式）。</strong>设 \(p \in [1, \infty]\)，\(f, g \in L^p(\mu)\)。则</p>
 
 <p>\[
-|h|^p = |h| \cdot |h|^{p-1} \le (|f| + |g|) |h|^{p-1}.
+\boxed{\ \|f + g\|_p \le \|f\|_p + \|g\|_p.\ }
 \]</p>
 
-<p>对两边积分，对每一项用 Hölder（\(p\) 与 \(q = p/(p-1)\)）：</p>
+<p>证明思路：把 \(\|f + g\|_p^p = \int |f+g|^p\) 拆成两块，每块用 Hölder。</p>
+
+<p>\(p = 1\) 与 \(p = \infty\) 平凡（\(p = 1\) 是积分 + 三角不等式；\(p = \infty\) 是 sup 加性）。看 \(1 < p < \infty\)，设 \(q\) 是 \(p\) 的共轭。计算：</p>
 
 <p>\[
-\int |f| |h|^{p-1} \le \|f\|_p \cdot \||h|^{p-1}\|_q = \|f\|_p \cdot \|h\|_p^{p-1}.
+|f + g|^p = |f + g| \cdot |f + g|^{p-1} \le |f| \cdot |f + g|^{p-1} + |g| \cdot |f + g|^{p-1}.
 \]</p>
 
-<p>同样估计 \(\int |g| |h|^{p-1}\)。合起来</p>
+<p>积分两边：</p>
 
 <p>\[
-\|h\|_p^p \le (\|f\|_p + \|g\|_p) \|h\|_p^{p-1}.
+\int |f + g|^p \le \int |f| \cdot |f + g|^{p-1} + \int |g| \cdot |f + g|^{p-1}.
 \]</p>
 
-<p>两边除以 \(\|h\|_p^{p-1}\)（若为 0 则 \(h = 0\) 已立）即得 Minkowski。</p>
-
-<p>有了 Minkowski，\(L^p\) 真的是<em>赋范空间</em>这件事才落实。换句话说，\(\ell^p\) 与 \(L^p\) 是 Banach 空间的全部根基都在这条 Minkowski。</p>
-
-<p>序列版本同理：\(\|x + y\|_p \le \|x\|_p + \|y\|_p\)。</p>
-
-<h2 id="sec5-4">5.4 Cauchy–Schwarz 在这条链条里的位置</h2>
-
-<p>第 3 章证过 Cauchy–Schwarz：\(|\langle x, y \rangle| \le \|x\| \|y\|\)。它其实就是 Hölder 在 \(p = q = 2\) 的特例（在 \(L^2\) 上）：</p>
+<p>对每一项用 Hölder（\(p\) 与 \(q\) 共轭）：\(\int |f| \cdot |f + g|^{p-1} \le \|f\|_p \cdot \||f+g|^{p-1}\|_q\)。算后一个范数：</p>
 
 <p>\[
-\left| \int f \bar g \right| \le \int |f \bar g| \le \|f\|_2 \|g\|_2.
+\||f + g|^{p-1}\|_q = \left(\int |f+g|^{(p-1) q}\right)^{1/q} = \left(\int |f+g|^p\right)^{1/q} = \|f+g\|_p^{p/q}.
 \]</p>
 
-<p>所以这条不等式有<em>两个</em>来源：从内积公理（第 3 章用判别式法）或从 Hölder（本章）。两种证法各有意义——第一种说"Cauchy–Schwarz 是 Hilbert 空间的内禀性质"，第二种说"它是 Hölder 链条的一环"。两种眼光都要会。</p>
+<p>（用了共轭关系 \((p-1)q = p\)：从 \(1/p + 1/q = 1\) 推 \(q(p-1) = p\)。）</p>
 
-<h2 id="sec5-5">5.5 Bessel 不等式：把"部分和投影"控制住</h2>
-
-<p>设 \(H\) 是 Hilbert 空间，\(\{e_n\}_{n=1}^N\) 是<em>有限</em>正交规范集。对任意 \(x \in H\)，令</p>
+<p>合起来：</p>
 
 <p>\[
-\hat x_n = \langle x, e_n \rangle, \qquad y_N = \sum_{n=1}^N \hat x_n e_n.
+\|f+g\|_p^p \le (\|f\|_p + \|g\|_p) \cdot \|f+g\|_p^{p/q}.
 \]</p>
 
-<p>这个 \(y_N\) 是"\(x\) 在 \(\operatorname{span}\{e_1, \ldots, e_N\}\) 上的投影"（具体证明在第 6 章）。Pythagoras：</p>
+<p>两边除以 \(\|f+g\|_p^{p/q}\)（设 \(\|f+g\|_p > 0\)，否则平凡）。剩下的指数 \(p - p/q = p(1 - 1/q) = p \cdot 1/p = 1\)。所以</p>
 
 <p>\[
-\|x\|^2 = \|x - y_N\|^2 + \|y_N\|^2 = \|x - y_N\|^2 + \sum_{n=1}^N |\hat x_n|^2.
+\|f+g\|_p^1 \le \|f\|_p + \|g\|_p.
 \]</p>
 
-<p>从中立刻得</p>
+<p>证毕。</p>
 
-<p>\[
-\boxed{\ \sum_{n=1}^N |\langle x, e_n \rangle|^2 \le \|x\|^2.\ }
-\]</p>
+<p>这条证明的<em>味道</em>：朴素的 \(|f + g|^p \le 2^{p-1}(|f|^p + |g|^p)\)（这条由凸性给）<em>给</em> 不出三角不等式——它的常数 \(2^{p-1}\) 太大。Minkowski 的关键技巧：把 \(|f + g|^p\) 拆成 \(|f + g| \cdot |f+g|^{p-1}\)，把那个 \(|f+g|^{p-1}\) 当成 \(L^q\) 函数，用 Hölder 把它 "<em>消化</em>" 到右边——共轭关系让指数算账正好平衡。</p>
 
-<p>这就是 <strong>Bessel 不等式</strong>。它对任何（可数甚至不可数）正交规范集都成立——只取那些 \(\langle x, e_\alpha \rangle \neq 0\) 的项即可，自动只剩可数个非零（这是 Bessel 自带的"可数支撑"奇迹）。</p>
-
-<p>Bessel 不等式的应用：</p>
+<p>请你回头看链子：Young → Hölder → Minkowski。</p>
 
 <ul>
-  <li><strong>Fourier 系数列在 \(\ell^2\) 中。</strong>把 \(\{e^{inx}/\sqrt{2\pi}\}\) 当成 \(L^2[-\pi, \pi]\) 上的正交规范集（不一定是基），Bessel 立即给 \(\sum |\hat f(n)|^2 \le \|f\|_2^2 / (2\pi)\)。</li>
-  <li><strong>正交规范集的"投影列"控制。</strong>第 7 章会用 Bessel 推出 Parseval：当 \(\{e_n\}\) 是<em>完备</em>正交基时，Bessel 退化成等式。</li>
+  <li>Young：两个<em>数</em> 的不等式，1 行 \(\log\) 凹性。</li>
+  <li>Hölder：归一化求和，把 Young 升级成<em>向量 / 函数</em> 的不等式。</li>
+  <li>Minkowski：拆 \(|f+g|^p\)，对两块各用一次 Hölder——升级成<em>三角</em> 不等式。</li>
 </ul>
 
-<p>Bessel 是<em>不等式</em>，Parseval 是<em>等式</em>。两者的差距 \(\|x\|^2 - \sum |\langle x, e_n \rangle|^2\) 就是"投影外的剩余"，等于 0 当且仅当 \(\{e_n\}\) 真的够用——也就是它是完备正交基。这正是第 7 章要说穿的事。</p>
+<p>三步全都<em>不靠运气</em>，每步靠的是上一步的成果。这种"<em>从一个具体不等式逐步搭出整套</em>" 的写法，是泛函分析估计技术的<em>标准模板</em>——你后面看 Sobolev 嵌入定理（<a href="ch23.html">第 23 章</a>）和插值定理时会一再撞见。</p>
 
-<h2 id="sec5-6">5.6 Jensen 不等式：凸函数 + 平均</h2>
+<h2 id="sec5-4">5.4 Cauchy–Schwarz：Hölder 在 \(p = q = 2\) 的特例</h2>
 
-<p>设 \(\varphi : \mathbb{R} \to \mathbb{R}\) 是凸函数，\(X\) 是概率空间上的随机变量（或测度空间上的可积函数），\(\mathbb{E}\) 是期望（积分）。<strong>Jensen 不等式</strong>说：</p>
-
-<p>\[
-\boxed{\ \varphi(\mathbb{E} X) \le \mathbb{E}[\varphi(X)].\ }
-\]</p>
-
-<p>等号当 \(\varphi\) 严格凸时成立 \(\iff X\) 几乎必然为常数。</p>
-
-<p>证明用支撑线（subgradient）。在 \(\mathbb{E} X\) 处取 \(\varphi\) 的支撑线 \(L(t) = \varphi(\mathbb{E} X) + c (t - \mathbb{E} X)\)，由凸性 \(\varphi(t) \ge L(t)\) 对所有 \(t\)。代入 \(t = X\) 取期望：</p>
+<p>Hölder 取 \(p = q = 2\)（共轭关系 \(1/2 + 1/2 = 1\) 成立），得</p>
 
 <p>\[
-\mathbb{E}[\varphi(X)] \ge \mathbb{E}[L(X)] = \varphi(\mathbb{E} X) + c (\mathbb{E} X - \mathbb{E} X) = \varphi(\mathbb{E} X).
+\boxed{\ \left|\int f g \, d\mu\right| \le \int |fg| \, d\mu \le \|f\|_2 \cdot \|g\|_2.\ }
 \]</p>
 
-<p>结束。</p>
+<p>这就是<em>Cauchy–Schwarz 不等式</em>（积分版）。离散版：\(|\sum x_i y_i| \le \|x\|_2 \|y\|_2\)（你在<a href="../线性代数/index.html">线性代数</a>里见过的形式）。</p>
 
-<p>Jensen 不等式有非常多的应用：</p>
+<p>请你停下来反省。Cauchy–Schwarz 是<em>整套分析里你用过最多的不等式之一</em>——它在<a href="../实分析/index.html">实分析</a>、<a href="../线性代数/index.html">线性代数</a>、<a href="../概率统计/index.html">概率</a>、<a href="../微分方程/index.html">微分方程</a>里反复出现。可它原来只是 Hölder 的<em>一个特例</em>。</p>
+
+<p>这个视角的<em>颠覆性</em>。Cauchy–Schwarz 在以前的课里看起来像个<em>独立</em> 的事实，需要单独证（要么用判别式法 \(\|x - t y\|^2 \ge 0\)，要么用平行四边形）。但放到 Hölder 链子里它<em>不是孤立</em> 的——它是 \(p = 2\) 的对称特例，恰好是因为 \(2\) 是<em>它自己的共轭</em>。</p>
+
+<p>更深的视角。\(L^2\) 是<em>唯一</em> 的"自共轭"（\(p = q\)）的 \(L^p\) 空间。这件事直接对应着：<em>\(L^2\) 是唯一</em> 的有<em>内积</em> 的 \(L^p\) 空间——Cauchy–Schwarz 在 \(L^2\) 上不只是不等式，它<em>定义</em> 了内积。其他 \(L^p\)（\(p \neq 2\)）只是赋范空间，没有内积，所以你在 \(L^p\)（\(p \neq 2\)）里没有"垂直"、"投影到子空间" 这些几何概念。</p>
+
+<p>这是为什么<a href="ch6.html">下一章</a>——Hilbert 几何——会专门挑出 \(L^2\) 这一类 Hilbert 空间。整本书"<em>有内积的</em>" 和"<em>只有范数的</em>" 故事在这里分家。</p>
+
+<h2 id="sec5-5">5.5 Bessel 不等式：投影几何里出来的</h2>
+
+<p>换一个角度。前面四节的不等式都是从 Young 链生出来——本质是<em>凸性</em>。Bessel 不等式从<em>另一处</em> 长出来——本质是<em>Pythagoras</em>。</p>
+
+<p>设 \(H\) 是 Hilbert 空间，\(\{e_1, e_2, \ldots\}\) 是 \(H\) 里一组<em>正交规范</em> 元素（\(\langle e_i, e_j \rangle = \delta_{ij}\)）。给一个 \(x \in H\)。试着把 \(x\) "<em>投影</em>" 到这组元素张成的子空间上。前 \(N\) 项的投影系数：</p>
+
+<p>\[
+c_n = \langle x, e_n \rangle, \quad n = 1, 2, \ldots, N.
+\]</p>
+
+<p>设 \(s_N = \sum_{n=1}^N c_n e_n\)。从几何上看，\(s_N\) 是 \(x\) 在 \(\{e_1, \ldots, e_N\}\) 张成子空间上的投影；\(x - s_N\) 应该和 \(\{e_n\}\) 都垂直。检查：对 \(j \le N\)，</p>
+
+<p>\[
+\langle x - s_N, e_j \rangle = \langle x, e_j \rangle - \sum_{n=1}^N c_n \langle e_n, e_j \rangle = c_j - c_j = 0. \ \checkmark
+\]</p>
+
+<p>所以 \(x - s_N \perp s_N\)。Pythagoras 给</p>
+
+<p>\[
+\|x\|^2 = \|x - s_N\|^2 + \|s_N\|^2.
+\]</p>
+
+<p>算 \(\|s_N\|^2\)：因为 \(\{e_n\}\) 正交规范，\(\|s_N\|^2 = \sum_{n=1}^N |c_n|^2\)。</p>
+
+<p>所以</p>
+
+<p>\[
+\sum_{n=1}^N |c_n|^2 = \|s_N\|^2 = \|x\|^2 - \|x - s_N\|^2 \le \|x\|^2.
+\]</p>
+
+<p>对 \(N\) 取极限：</p>
+
+<p>\[
+\boxed{\ \sum_{n=1}^\infty |\langle x, e_n \rangle|^2 \le \|x\|^2. \ }
+\]</p>
+
+<p>这就是<em>Bessel 不等式</em>。</p>
+
+<p>请你看清这条证明里发生了什么。<em>Pythagoras</em> 一行就给出来了——其余都是"<em>正交规范</em>" 的代数自动展开。这是为什么"凸性 vs 正交" 是泛函分析里两套<em>独立</em> 的几何工具：Young 链来自凸性，Bessel 来自正交。它们各管各的。</p>
+
+<p>Bessel 不等式的<em>分量</em>：它说 \(x\) 在<em>任意</em> 一组正交规范元素上的"展开系数" 平方和被 \(\|x\|^2\) 控制——所以这些系数<em>可以平方求和</em>。这件事有两个直接后果：</p>
+
+<ol>
+  <li>抽象 Fourier 级数 \(\sum c_n e_n\) 在 \(H\) 中<em>总是收敛</em> 的（部分和是 Cauchy 列，<a href="ch7.html">第 7 章</a>会用）。</li>
+  <li>"<em>等号</em>" 何时成立？答：当 \(\{e_n\}\) 不只是正交规范，还<em>张成稠密集</em>——也就是<em>正交规范基</em>。这条等号叫<em>Parseval 等式</em>，<a href="ch7.html">第 7 章</a>专门讲。</li>
+</ol>
+
+<p>Bessel 是"<em>不等式</em>"，Parseval 是"<em>等式</em>"——它们之间的差距 \(\|x\|^2 - \sum|c_n|^2\) <em>就是</em> \(x\) 落在 \(\{e_n\}\) 张成子空间正交补里那部分的范数平方。这条几何故事是下两章的全部内容。</p>
+
+<h2 id="sec5-6">5.6 Jensen 不等式：凸性的最后一击</h2>
+
+<p>把 Young 那条"\(\log\) 凹" 的论证再推一步——直接对<em>任意</em> 凸函数说话。</p>
+
+<p><strong>定理（Jensen 不等式，离散版）。</strong>设 \(\varphi : \mathbb{R} \to \mathbb{R}\) 凸，\(\lambda_1, \ldots, \lambda_n \ge 0\) 满足 \(\sum \lambda_i = 1\)，\(x_1, \ldots, x_n \in \mathbb{R}\)。则</p>
+
+<p>\[
+\boxed{\ \varphi\left(\sum_{i=1}^n \lambda_i x_i\right) \le \sum_{i=1}^n \lambda_i \varphi(x_i).\ }
+\]</p>
+
+<p>证明：对 \(n\) 归纳；\(n = 2\) 是凸函数定义；一般 \(n\) 把前 \(n-1\) 项的凸组合归到一个数，再用 \(n = 2\) 一次。</p>
+
+<p>积分版（更常用）：设 \(\mu\) 是概率测度（\(\mu(\Omega) = 1\)），\(f \in L^1(\mu)\)，\(\varphi : \mathbb{R} \to \mathbb{R}\) 凸。则</p>
+
+<p>\[
+\varphi\left(\int f \, d\mu\right) \le \int \varphi(f) \, d\mu.
+\]</p>
+
+<p>用人话：<em>"先平均再凸函数 \(\le\) 先凸函数再平均"</em>。这是对前面"两个数" 不等式的<em>无穷个数</em> 推广。</p>
+
+<p>三个标志性应用：</p>
+
+<p><strong>应用 1（AM–GM 不等式）。</strong>取 \(\varphi(x) = -\log x\)（\(\log\) 凹 ⟺ \(-\log\) 凸）。设 \(x_i > 0\)，\(\lambda_i = 1/n\)。Jensen 给</p>
+
+<p>\[
+-\log\left(\frac{1}{n} \sum x_i\right) \le \frac{1}{n} \sum (-\log x_i) = -\log\left(\prod x_i\right)^{1/n}.
+\]</p>
+
+<p>翻过来：</p>
+
+<p>\[
+\frac{x_1 + \cdots + x_n}{n} \ge \sqrt[n]{x_1 \cdots x_n}.
+\]</p>
+
+<p>算术均值 \(\ge\) 几何均值（AM–GM）。这条结果你可能在中学就背过——它的<em>根</em> 是 \(\log\) 函数的凹性 + Jensen。</p>
+
+<p><strong>应用 2（矩生成函数的凸性）。</strong>设 \(X\) 是随机变量，\(M_X(t) = \mathbb{E}[e^{tX}]\) 是它的矩生成函数。\(\varphi(x) = e^x\) 凸。Jensen 给</p>
+
+<p>\[
+e^{t \cdot \mathbb{E}[X]} = e^{\mathbb{E}[tX]} \le \mathbb{E}[e^{tX}] = M_X(t).
+\]</p>
+
+<p>翻成：\(M_X(t) \ge e^{t \mu}\)（\(\mu = \mathbb{E}[X]\)）——矩生成函数总在它的"中心指数" 之上。这条不等式是 Chernoff 界（<a href="../概率统计/index.html">概率统计</a>里讲的"<em>大偏差</em>" 不等式）的起点。</p>
+
+<p><strong>应用 3（条件期望的 Jensen）。</strong>对凸 \(\varphi\) 与子 \(\sigma\)-代数 \(\mathcal{G}\)，</p>
+
+<p>\[
+\varphi(\mathbb{E}[X | \mathcal{G}]) \le \mathbb{E}[\varphi(X) | \mathcal{G}] \quad \text{a.s.}
+\]</p>
+
+<p>这条是鞅论里<em>子鞅 / 上鞅</em> 概念的支柱——它说"<em>凸函数把鞅变成子鞅</em>"。这条事实在<a href="../概率统计/index.html">概率统计</a>里有详细讨论；这里只想让你看到 Jensen 多么<em>无所不在</em>。</p>
+
+<h2 id="sec5-7">5.7 一张全景图</h2>
+
+<p>把这一章五条不等式按"长在哪里" 摆一张图：</p>
 
 <ul>
-  <li><strong>取 \(\varphi(t) = t^2\)：</strong>\((\mathbb{E} X)^2 \le \mathbb{E} X^2\)，即 \(\operatorname{Var}(X) \ge 0\)。</li>
-  <li><strong>取 \(\varphi(t) = -\log t\)（在 \(t > 0\) 上凹反向应用）：</strong>得到 AM–GM 不等式 \(\sqrt[n]{x_1 \cdots x_n} \le (x_1 + \cdots + x_n)/n\)。</li>
-  <li><strong>取 \(\varphi(t) = e^t\)：</strong>得到 \(e^{\mathbb{E} X} \le \mathbb{E} e^X\)，是矩生成函数控制 cumulant 的根源。</li>
-  <li><strong>Hölder 的概率证明：</strong>对 \(\varphi(t) = t^p\)（\(p \ge 1\)）应用 Jensen 即得 \(L^p\) 范数的几条插值不等式。</li>
+  <li><em>凸性家族</em>：Young → Hölder → Minkowski → Cauchy–Schwarz（最后一条是 Hölder 的 \(p=2\) 特例）。这一支控制 \(L^p\) 空间的范数与对偶配对。</li>
+  <li><em>正交家族</em>：Bessel（来自 Pythagoras + 正交规范）。这一支控制 Hilbert 空间的<em>展开</em> 与<em>投影</em>。</li>
+  <li><em>凸函数家族</em>：Jensen（凸函数与积分平均的交换不等式）。这一支控制概率不等式与对数 / 指数估计。</li>
 </ul>
 
-<p>Jensen 不等式说穿了就是"凸函数图像在弦下方"这件事的<em>积分版</em>。这一句话在概率、信息论、统计、优化、PDE 里反复出现。</p>
+<p>它们之间的关系并不是一层平行，是一张<em>层次图</em>：Jensen \(\Rightarrow\) Young（\(\varphi = \exp\) 与 \(\lambda_1 = 1/p, \lambda_2 = 1/q\)）\(\Rightarrow\) Hölder \(\Rightarrow\) Minkowski；Cauchy–Schwarz 是 Hölder 的特例；Bessel 是<em>另外</em> 一棵树（来自正交几何，与凸性无关）。</p>
 
-<p>到这里你已经握住分析里最常用的几条不等式。它们之间的关系：Young 是凸性的微观形式 → Hölder 是它的"配对"形式 → Minkowski 是 Hölder 的三角推论。Cauchy–Schwarz 和 Bessel 在 Hilbert 上独立讲，但其实就是 \(p = q = 2\) 时的 Hölder 与 \(\ell^2\) 中的 Pythagoras。Jensen 把所有"凸函数和平均"的关系打包。</p>
+<p>这张图你以后会一再回头查。每次写一个估计——</p>
 
-<p>这五条工具备齐之后，下一章我们就可以把 Hilbert 空间的"几何"<em>正式</em>展开——投影到闭子空间、正交分解、最佳逼近。这些是泛函分析里最干净也最容易"看见"的几何，也是后面所有谱论、Fourier 展开、变分法的根。</p>
+<ul>
+  <li>"<em>积分 \(\int |f|^p\) 大不大</em>" → 用 Hölder / Minkowski。</li>
+  <li>"<em>内积 \(\langle x, y \rangle\) 大不大</em>" → 用 Cauchy–Schwarz。</li>
+  <li>"<em>系数 \(\sum |c_n|^2\) 收不收敛</em>" → 用 Bessel。</li>
+  <li>"<em>期望 / 平均通过凸函数后变多大</em>" → 用 Jensen。</li>
+</ul>
 
-<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 经典空间例子库</a><a href="ch6.html">下一章 · 第 6 章 Hilbert 几何：投影与最佳逼近 →</a></nav>
+<p>泛函分析的全部"硬估计" 工程，<em>差不多</em> 就是把这五条不等式以不同顺序、不同代换、不同维度组合起来。它们是这门学科的<em>四则运算</em>。</p>
+
+<p>下一章我们换一个完全不同的方向——把 \(L^2\) 那条"自共轭" 特性独立出来研究。整套<em>Hilbert 空间几何</em> 从那里出发。第一件事：给一个闭凸集和一个外面的点，里面<em>哪个点离它最近</em>。回答这个具体问题，整章就长出来了。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 \(L^p\) 空间</a><a href="ch6.html">下一章 · 第 6 章 Hilbert 几何：投影与最佳逼近 →</a></nav>
 </main>
 </body>
 </html>

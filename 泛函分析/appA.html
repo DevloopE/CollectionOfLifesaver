@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>附录 A 完备度量空间与 Baire 范畴定理速查 — 普林斯顿泛函分析读本</title>
+<title>附录 A 完备度量空间 + Baire 速查 — 普林斯顿泛函分析读本</title>
 <link rel="stylesheet" href="styles.css">
 <script>
   MathJax = {
@@ -33,130 +33,245 @@
 <body>
 <main>
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
-<h1 id="appA">附录 A 完备度量空间与 Baire 范畴定理速查</h1>
+<h1 id="appA">附录 A 完备度量空间 + Baire 速查</h1>
 
-<p>这个附录把正文里多次提到、但出于"不抢主线注意力"的考虑而没完整给出的几条结构性事实集中处理。所有内容都<em>基础</em>但<em>必备</em>——没有它们，正文里的一些关键步骤会显得"无法独立验证"。</p>
+<p>本书第 2 章把"完备" 当成度量 / 范数空间的<em>基础属性</em>引入；第 8 章 BLT 用了一次完备性"<em>稠密扩张</em>"；第 10-12 章三大基础定理（开映射、闭图像、一致有界）以 Baire 范畴为<em>无名背景</em>；第 13-14 章 Hahn-Banach 用 Zorn 引理顺过——但"<em>这些事在哪里完备性变成关键</em>" 的全景图，正文里没有集中处理。这个附录把它们集中处理。</p>
 
 <ul>
-  <li>有限维赋范空间任意两个范数等价（含完整证明）。</li>
-  <li>有限维赋范空间自动完备 + 闭单位球紧致。</li>
-  <li>完备化定理：每个度量空间嵌等距入唯一的完备度量空间。</li>
-  <li>Baire 范畴定理对完备度量空间的完整证明（重述 ch10）。</li>
-  <li>Banach 不动点定理（Picard 迭代收敛）。</li>
-  <li>谱半径公式 \(\rho(T) = \lim \|T^n\|^{1/n}\) 中"极限存在"的 Fekete 引理证明。</li>
-  <li>Krein–Milman 定理证明草图。</li>
-  <li>Eberlein–Šmulian 与 Goldstine 定理陈述。</li>
+  <li>有限维赋范空间任意范数等价（含完整证）。</li>
+  <li>完备化定理（Cauchy 序列等价类）。</li>
+  <li>Banach 不动点定理 + 完整证。</li>
+  <li>Fekete 子可加引理。</li>
+  <li>Krein-Milman（紧凸 = 端点凸闭包）。</li>
+  <li>Eberlein-Šmulian 与 Goldstine 陈述。</li>
 </ul>
 
-<h2 id="appA-1">A.1 有限维赋范空间：任意两个范数等价</h2>
+<h2 id="appA-1">A.1 有限维赋范空间任意范数等价</h2>
 
-<p><strong>定理。</strong>设 \(X\) 是<em>有限维</em>实（或复）向量空间，\(\|\cdot\|_a, \|\cdot\|_b\) 是两个范数。则它们等价：存在 \(c, C > 0\) 使</p>
+<p>这条是<a href="ch1.html#sec1-4">第 1 章 1.4 节</a>的对照——"<em>有限维上所有范数等价，无穷维上不</em>" 区别的<em>有限维半</em>。</p>
+
+<p><strong>定理。</strong>设 \(V\) 是有限维赋范空间，\(\dim V = n < \infty\)。则 \(V\) 上任意两个范数 \(\|\cdot\|_a, \|\cdot\|_b\) 等价——存在 \(c, C > 0\) 使</p>
 
 <p>\[
-c \|x\|_a \le \|x\|_b \le C \|x\|_a, \quad \forall x.
+c \|x\|_a \le \|x\|_b \le C \|x\|_a \quad \forall x \in V.
 \]</p>
 
-<p>证明：取 \(X\) 的一组基 \(\{u_1, \ldots, u_n\}\)。在坐标下，\(\|x\|_b\) 对应 \(\mathbb{R}^n\) 上的连续函数 \(F : (c_1, \ldots, c_n) \mapsto \|\sum c_i u_i\|_b\)（连续在 \(\mathbb{R}^n\) 标准拓扑下，由三角不等式）。</p>
+<p><em>证明。</em>选 \(V\) 的基 \(\{e_1, \ldots, e_n\}\)。给定向量 \(x = \sum x_k e_k\)。定义比较范数</p>
 
-<p>限制到单位球面 \(S = \{c \in \mathbb{R}^n : \|c\|_2 = 1\}\)（紧致 by Heine–Borel）。\(F\) 在 \(S\) 上连续 + 紧 \(\Rightarrow\) 取最小值 \(c > 0\)（最小不为 0 因为 \(F\) 正定）和最大值 \(C\)。所以对单位球面上的 \(c\)，\(c \le F(c) \le C\)。由齐次性推到一般 \(c\)，结合 \(\|c\|_a \le K \|c\|_2\)（同理），得范数等价。结束。</p>
+<p>\[
+\|x\|_0 := \max_k |x_k|.
+\]</p>
 
-<p><strong>推论 1。</strong>有限维赋范空间在任何范数下都完备。证明：用上述等价归约到欧氏 \(\mathbb{R}^n\) 完备。</p>
+<p>这是个范数（直接验证）。我们证<em>每个</em> 范数 \(\|\cdot\|_a\) 与 \(\|\cdot\|_0\) 等价——再用传递性给两条等价。</p>
 
-<p><strong>推论 2。</strong>有限维赋范空间的闭单位球紧致。证明：归约到欧氏 + Heine–Borel。</p>
+<p><em>步 1：上界 \(\|x\|_a \le M \|x\|_0\)。</em></p>
 
-<p><strong>推论 3。</strong>有限维子空间永远闭。证明：完备子集 \(\Rightarrow\) 闭。</p>
+<p>\[
+\|x\|_a = \|\sum x_k e_k\|_a \le \sum |x_k| \|e_k\|_a \le \big(\sum \|e_k\|_a\big) \cdot \|x\|_0 = M \|x\|_0.
+\]</p>
 
-<p>这三条推论是<em>正文里反复用到却看似"白送"的事实</em>——所有"自动连续""自动完备"的根源都在这里。</p>
+<p>所以 \(\|\cdot\|_a\) 是 \((V, \|\cdot\|_0)\) 上的连续函数。</p>
+
+<p><em>步 2：下界 \(\|x\|_a \ge c \|x\|_0\)。</em></p>
+
+<p>看单位 \(\|\cdot\|_0\)-球面 \(S = \{x : \|x\|_0 = 1\}\)。把 \(V\) 视为 \(\mathbb{R}^n\)（用基），\(\|\cdot\|_0\) 是 \(\ell^\infty\) 范数，\(S\) 是有界闭集（\(\ell^\infty\) 球面），由 Heine-Borel <em>紧</em>。</p>
+
+<p>\(\|\cdot\|_a\) 在 \(S\) 上连续（步 1），所以达到正最小值 \(c := \min_{x \in S} \|x\|_a > 0\)（\(c > 0\) 因为 \(0 \notin S\)，且 \(\|\cdot\|_a > 0\) 在非零向量上）。</p>
+
+<p>对任意 \(x \ne 0\)：\(x / \|x\|_0 \in S \implies \|x / \|x\|_0\|_a \ge c \implies \|x\|_a \ge c \|x\|_0\)。</p>
+
+<p>结合：\(c \|x\|_0 \le \|x\|_a \le M \|x\|_0\)。所以 \(\|\cdot\|_a \sim \|\cdot\|_0\)。\(\square\)</p>
+
+<p>请你停下来欣赏这条证明的<em>关键</em>——<em>它在第 2 步用了 Heine-Borel</em>（有限维"<em>有界 + 闭 ⟹ 紧</em>"）。在无穷维这条不成立，所以"任意范数等价" 这件事在无穷维就<em>不能这样证</em>，事实上反例存在（<a href="ch1.html#sec1-4">第 1 章</a> \(C[0,1]\) 上 \(L^1, L^\infty\) 不等价）。</p>
+
+<p><strong>三个推论。</strong></p>
+
+<p><em>推论 1.</em> 有限维赋范空间<em>自动完备</em>。证明：由等价 + \(\mathbb{R}^n\) 完备性。</p>
+
+<p><em>推论 2.</em> 有限维子空间在 Banach 空间中<em>自动闭</em>。证明：用推论 1 + 完备 \(\implies\) 闭于嵌入空间。</p>
+
+<p><em>推论 3.</em> 有限维之间的<em>每个</em> 线性映射自动连续。证明：取基写矩阵 + 矩阵给 \(\ell^\infty\) 上 Lipschitz。</p>
+
+<p>这三条让"<em>有限维</em>" 在泛函分析里是 trivial 部分——所有崩塌都在无穷维出现。</p>
 
 <h2 id="appA-2">A.2 完备化定理</h2>
 
-<p><strong>定理。</strong>设 \((X, d)\) 是任意度量空间。存在完备度量空间 \((\widehat X, \widehat d)\) 与等距嵌入 \(\iota : X \to \widehat X\) 使 \(\iota(X)\) 在 \(\widehat X\) 中稠。这个 \((\widehat X, \widehat d)\) 在等距同构意义下唯一。</p>
+<p>不完备的度量空间可以"<em>填满</em>" 成完备的——通过 Cauchy 序列的等价类。这是泛函分析里对"<em>引入新对象</em>" 最常用的策略，比如从有理数 \(\mathbb{Q}\) 完备化得到实数 \(\mathbb{R}\)、从 Riemann 可积函数完备化得到 \(L^2\)。</p>
 
-<p>构造（Cantor 风格）：</p>
+<p><strong>定义。</strong>设 \((X, d)\) 度量空间。<em>完备化</em> 是指一对 \((\widehat X, j)\)，其中 \(\widehat X\) 是完备度量空间，\(j : X \to \widehat X\) 是<em>等距嵌入</em>（\(d_{\widehat X}(j x, j y) = d(x, y)\)），且 \(j(X)\) 在 \(\widehat X\) 中稠密。</p>
 
-<p>令 \(\mathcal{C}\) 是 \(X\) 中所有 Cauchy 序列的集合。在 \(\mathcal{C}\) 上定义等价关系</p>
+<p><strong>定理。</strong>每个度量空间 \((X, d)\) 都有完备化，且<em>本质唯一</em>（差一个等距同构）。</p>
 
-<p>\[
-\{x_n\} \sim \{y_n\} \iff d(x_n, y_n) \to 0.
-\]</p>
+<p><em>构造。</em>定义 \(C(X) := \{X \text{ 上的 Cauchy 序列}\}\)。在 \(C(X)\) 上等价关系：\(\{x_n\} \sim \{y_n\} \iff d(x_n, y_n) \to 0\)。设 \(\widehat X := C(X) / \sim\)。</p>
 
-<p>令 \(\widehat X = \mathcal{C} / \sim\)。在 \(\widehat X\) 上定义</p>
+<p>距离：\(\widehat d([\{x_n\}], [\{y_n\}]) := \lim_n d(x_n, y_n)\)（极限存在因 Cauchy + 三角不等式）。</p>
 
-<p>\[
-\widehat d([\{x_n\}], [\{y_n\}]) = \lim_n d(x_n, y_n).
-\]</p>
+<p>嵌入 \(j(x) := [\{x, x, x, \ldots\}]\)（常序列等价类）。直接验证 \(j\) 等距，\(j(X)\) 稠密（每个 Cauchy 序列由其前 \(n\) 项常序列逼近）。</p>
 
-<p>(这条极限存在因为 \(d(x_n, y_n) - d(x_m, y_m)\) 由 Cauchy 性 + 三角不等式趋零。)</p>
+<p><em>完备性的证。</em>设 \(\{[\{x_n^{(k)}\}]\}_{k}\) 是 \(\widehat X\) 中 Cauchy 序列。对角线选 \(y_k := x_k^{(k)}\)（足够后的项），则 \(\{y_k\}\) 是 \(X\) 中 Cauchy（用三角不等式 + Cauchy 性两次），其等价类 \([\{y_k\}]\) 是序列极限。\(\square\)</p>
 
-<p>嵌入 \(\iota(x) = [\{x, x, x, \ldots\}]\)（常值序列）等距。\(\iota(X)\) 在 \(\widehat X\) 中稠（Cauchy 序列由前 \(n\) 项常数序列逼近）。</p>
+<p><em>赋范情形</em>：如果 \(X\) 是不完备赋范空间，完备化 \(\widehat X\) 自动是 Banach 空间——加法 + 数乘 + 范数都按等价类的代表逐项极限定义。</p>
 
-<p>完备性：取 \(\widehat X\) 中 Cauchy 序列 \(\{[\{x_n^{(k)}\}]\}_k\)。用对角法构造 \(z_n = x_n^{(n)}\) 给一个新 Cauchy 序列；\([\{z_n\}]\) 是该序列的极限。</p>
+<p>典型例：</p>
 
-<p>唯一性（等距同构意义下）：两个完备化间用稠密性 + Cauchy 序列 \(\Rightarrow\) 等距同构。</p>
+<ul>
+  <li>有理数 \(\mathbb{Q}\)（\(d(x, y) = |x - y|\)）的完备化 = \(\mathbb{R}\)。</li>
+  <li>\(C[a, b]\) 配 \(L^p\) 范数 \(\|f\|_p = (\int |f|^p)^{1/p}\) 不完备（例：\(f_n = \) sgn 函数的连续逼近，Cauchy 但极限是不连续 sgn）。完备化 = \(L^p[a, b]\)。</li>
+</ul>
 
-<p>当 \(X\) 是赋范空间时，上述完备化天然继承线性结构，\(\widehat X\) 是 Banach 空间。</p>
-
-<p>典型实际应用：\(C[0,1]\) 在 \(L^p\) 范数下的完备化 \(=\) \(L^p[0,1]\)。多项式 \(\mathcal{P}[0,1]\) 在 \(L^2\) 范数下的完备化 \(=\) \(L^2[0,1]\)（Weierstrass + 完备化唯一性）。</p>
+<p>实际工作中你<em>很少</em> 直接构造完备化——而是预先在<em>已经完备</em> 的空间（\(L^p\)、\(C[a,b]\) 配 sup 范数、Hilbert）里工作。但完备化定理保证了"<em>需要时总能完备化</em>"。</p>
 
 <h2 id="appA-3">A.3 Banach 不动点定理</h2>
 
-<p><strong>定理（Banach 不动点 / 压缩映射原理）。</strong>设 \((X, d)\) 是<em>非空完备</em>度量空间，\(T : X \to X\) 是<em>压缩映射</em>：存在 \(L < 1\) 使</p>
+<p>这条是分析里"<em>用迭代构造解</em>" 的工作马。</p>
+
+<p><strong>定理（Banach 不动点）。</strong>设 \((X, d)\) 完备度量空间，\(T : X \to X\) <em>压缩</em>（contraction）——存在 \(0 \le k < 1\) 使</p>
 
 <p>\[
-d(T x, T y) \le L \cdot d(x, y), \quad \forall x, y.
+d(T x, T y) \le k \cdot d(x, y) \quad \forall x, y \in X.
 \]</p>
 
-<p>则 \(T\) 有<em>唯一</em>不动点 \(x^* \in X\)（即 \(T x^* = x^*\)）。任意初始 \(x_0\) 的迭代 \(x_{n+1} = T x_n\) 满足 \(x_n \to x^*\)，且</p>
+<p>则 \(T\) 有<em>唯一</em> 不动点 \(x^* \in X\)（即 \(T x^* = x^*\)），且对任意 \(x_0 \in X\) 迭代序列 \(x_{n+1} := T x_n\) 收敛到 \(x^*\)，速度</p>
 
 <p>\[
-d(x_n, x^*) \le \frac{L^n}{1 - L} d(x_0, x_1).
+d(x_n, x^*) \le \frac{k^n}{1 - k} d(x_0, x_1).
 \]</p>
 
-<p>证明：迭代序列是 Cauchy（由 \(d(x_{n+1}, x_n) \le L^n d(x_1, x_0)\) + 几何级数）。完备 \(\Rightarrow\) 收敛到 \(x^*\)。\(T\) 连续（Lipschitz）\(\Rightarrow\) \(T x^* = T(\lim x_n) = \lim T x_n = \lim x_{n+1} = x^*\)。唯一性：两个不动点 \(x^*, y^*\) \(\Rightarrow\) \(d(x^*, y^*) = d(T x^*, T y^*) \le L d(x^*, y^*)\) \(\Rightarrow\) \(d = 0\)。结束。</p>
+<p><em>证明。</em></p>
 
-<p>这条定理在<a href="ch9.html">第 9 章</a> Neumann 级数（变形）、<a href="../微分方程/index.html">微分方程读本</a> Picard 存在唯一性、隐函数定理等场合都是核心。</p>
+<p><em>(1) 唯一性。</em>设 \(x^*, y^*\) 都是不动点。则 \(d(x^*, y^*) = d(T x^*, T y^*) \le k \cdot d(x^*, y^*) \implies (1 - k) d(x^*, y^*) \le 0 \implies d = 0 \implies x^* = y^*\)。</p>
 
-<h2 id="appA-4">A.4 Fekete 引理 + 谱半径公式极限存在</h2>
-
-<p><strong>Fekete 引理。</strong>设 \(\{a_n\}_{n \ge 1}\) 是非负实数序列满足<em>次可加性</em> \(a_{m+n} \le a_m + a_n\)。则 \(\lim_n a_n / n\) 存在（可能 \(= -\infty\) 在更一般情形，但取非负这里 \(= \inf a_n/n\)）。</p>
-
-<p>证明：固定 \(N\)。对 \(n\)，写 \(n = qN + r\)（\(0 \le r < N\)）。由次可加 \(a_n \le q a_N + a_r\)。所以 \(a_n / n \le q a_N / n + a_r / n \le a_N / N + a_r / n\)。取 \(n \to \infty\)：\(\limsup a_n/n \le a_N / N\)。\(N\) 任意，\(\limsup a_n / n \le \inf_N a_N / N \le \liminf a_n / n\)。所以 \(\lim\) 存在 \(= \inf\)。</p>
-
-<p>应用到谱半径：\(a_n = \log \|T^n\|\) 由 \(\|T^{m+n}\| \le \|T^m\| \|T^n\|\) 给次可加。所以 \(\lim \log \|T^n\| / n\) 存在 \(\Rightarrow \lim \|T^n\|^{1/n} = e^{\lim \log \|T^n\|/n}\) 存在。这就是<a href="ch9.html">第 9 章 9.6 节</a>预告的"极限存在 + 等于下确界"的理由。</p>
-
-<h2 id="appA-5">A.5 Krein–Milman 定理</h2>
-
-<p><strong>定理（Krein–Milman 1940）。</strong>设 \(X\) 是 Banach 空间（或更一般的局部凸 Hausdorff 空间），\(K \subset X\) 非空凸紧。则 \(K\) 等于其<strong>极点</strong>集 \(\operatorname{ext}(K)\) 的闭凸包：</p>
+<p><em>(2) 存在性。</em>取任意 \(x_0\)，定义 \(x_{n+1} = T x_n\)。计算</p>
 
 <p>\[
-K = \overline{\operatorname{conv}}(\operatorname{ext}(K)).
+d(x_{n+1}, x_n) = d(T x_n, T x_{n-1}) \le k d(x_n, x_{n-1}) \le k^n d(x_1, x_0).
 \]</p>
 
-<p>"极点" \(x \in K\) 是指 \(x\) 不能写成 \(K\) 中两个<em>不同</em>点的非平凡凸组合 \(\lambda y + (1-\lambda) z\)（\(0 < \lambda < 1\)）。</p>
+<p>所以对 \(m > n\)：</p>
 
-<p>证明草图：</p>
+<p>\[
+d(x_m, x_n) \le \sum_{j = n}^{m - 1} d(x_{j+1}, x_j) \le \sum_{j=n}^{m-1} k^j d(x_1, x_0) \le \frac{k^n}{1 - k} d(x_1, x_0).
+\]</p>
 
-<ol>
-  <li>定义"<em>支撑面</em>"：\(F \subset K\) 是支撑面，如果 \(F\) 是 \(K\) 与某个仿射超平面的交，且 \(F\) 凸非空。</li>
-  <li>用 Hahn–Banach 几何形式 + Zorn 引理：\(K\) 的极小（在包含意义下）支撑面恰好是<em>极点</em>。</li>
-  <li>反证：如果 \(\overline{\operatorname{conv}}(\operatorname{ext}(K)) \subsetneq K\)，由 Hahn–Banach 几何形式给一个分离超平面，与 \(K\) 的紧性矛盾。</li>
-</ol>
+<p>\(k < 1 \implies\) 右边 \(\to 0\) 当 \(n \to \infty\) \(\implies \{x_n\}\) Cauchy。\(X\) 完备 \(\implies\) 有极限 \(x^*\)。\(T\) 压缩 \(\implies T\) 连续 \(\implies T x_n \to T x^*\)。但 \(T x_n = x_{n+1} \to x^*\)。所以 \(T x^* = x^*\)。</p>
 
-<p>这是泛函分析里最优雅的存在性定理之一。它在变分法、最优化、博弈论里有大量应用。</p>
+<p><em>(3) 收敛速率。</em>令上面 \(m \to \infty\)：\(d(x^*, x_n) \le k^n / (1 - k) \cdot d(x_1, x_0)\)。\(\square\)</p>
 
-<h2 id="appA-6">A.6 Eberlein–Šmulian 与 Goldstine 定理（陈述）</h2>
+<p>这条定理的应用范围超广：</p>
 
-<p><strong>Eberlein–Šmulian 定理。</strong>在 Banach 空间 \(X\) 上，集合 \(A \subset X\) 是<em>弱</em>相对紧 \(\iff\) <em>弱序列</em>相对紧 \(\iff\) 弱聚点存在性。</p>
+<ul>
+  <li><em>常微分方程局部存在唯一性</em>（Picard 定理）：把 ODE \(\dot u = f(t, u)\) 转为积分方程 \(u(t) = u_0 + \int_0^t f(s, u(s)) ds\)，右边是 \(C[0, T]\) 上的算子。在 \(T\) 小时它是压缩 \(\implies\) 唯一解。</li>
+  <li><em>隐函数定理</em>：把"<em>解 \(F(x, y) = 0\) 关于 \(y\) 隐式表为 \(y = g(x)\)</em>" 转为 Banach 空间上的不动点。</li>
+  <li><em>Newton 法收敛性</em>：在 \(f'(x^*) \ne 0\) 附近 Newton 迭代是压缩，二次收敛是压缩常数 \(\to 0\) 的体现。</li>
+  <li><em>Markov 链平稳分布存在唯一性</em>（在合适度量下转移算子是压缩）。</li>
+</ul>
 
-<p>这条定理把"弱拓扑"的紧致与"弱序列"紧致等价化——在抽象拓扑里这条等价不显然（弱拓扑可能不可度量化）。它的证明用 Goldstine + James 选择性 + 双线性论证。详见 Megginson《An Introduction to Banach Space Theory》。</p>
+<p>"<em>把存在性问题转为不动点问题，再用 Banach</em>" 是分析的标准战术。需要的两件事是 (a) 选完备空间，(b) 把"<em>解的方程</em>" 写成 \(T x = x\) 形态，再验证 \(T\) 是压缩。</p>
 
-<p><strong>Goldstine 定理。</strong>设 \(X\) Banach 空间，\(B_X\) 闭单位球。则 \(J(B_X)\) 在 \(B_{X^{**}}\) 中弱*稠。</p>
+<h2 id="appA-4">A.4 Fekete 子可加引理</h2>
 
-<p>这条定理是<a href="ch19.html">第 19 章 19.1 节</a>"自反 (R1) \(\Leftrightarrow\) (R2)" 的关键工具。它说"\(X\) 的单位球通过典范嵌入在 \(X^{**}\) 单位球中弱*稠"——即 \(J(X)\) 在 \(X^{**}\) 中"足够大"。</p>
+<p>在动力系统、组合学、数论里反复出现的"<em>子可加序列除以 \(n\) 收敛</em>" 引理。</p>
 
-<p>本附录到此。这些工具构成本书"<em>能跳过技术细节专心讲主线</em>" 的底层支架。当你以后做更深入研究时，这些定理的完整证明应该在 Brezis、Conway、Megginson 等专题书里查阅。</p>
+<p><strong>Fekete 引理（1923）。</strong>设 \(\{a_n\}_{n \ge 1}\) 是<em>子可加</em>实数列：\(a_{m + n} \le a_m + a_n\) 对所有 \(m, n \ge 1\)。则</p>
+
+<p>\[
+\lim_{n \to \infty} \frac{a_n}{n} = \inf_{n \ge 1} \frac{a_n}{n} \in [-\infty, +\infty).
+\]</p>
+
+<p>极限<em>必存在</em>（可能 \(-\infty\)），且等于下确界。</p>
+
+<p><em>证明。</em>记 \(L := \inf_n a_n / n\)。要证 \(\limsup a_n/n \le L\)。</p>
+
+<p>给 \(\varepsilon > 0\)，选 \(m\) 使 \(a_m/m < L + \varepsilon\)。对任意 \(n\)，写 \(n = q m + r, 0 \le r < m\)。子可加：</p>
+
+<p>\[
+a_n \le q \cdot a_m + a_r.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\frac{a_n}{n} \le \frac{q a_m + a_r}{n} = \frac{q m}{n} \cdot \frac{a_m}{m} + \frac{a_r}{n} \to \frac{a_m}{m} \quad (n \to \infty)
+\]</p>
+
+<p>（\(qm/n \to 1\), \(a_r/n \to 0\) 因为 \(r\) 有限多个值）。所以 \(\limsup a_n/n \le a_m/m < L + \varepsilon\)。\(\varepsilon\) 任意 \(\implies \limsup \le L\)。结合 \(\liminf \ge L\)（下确界）：极限 = \(L\)。\(\square\)</p>
+
+<p>典型应用：</p>
+
+<ul>
+  <li><em>谱半径公式</em> \(r(T) = \lim \|T^n\|^{1/n}\)（用 \(a_n = \log \|T^n\|\) 子可加由 \(\|T^{m+n}\| \le \|T^m\| \|T^n\|\)）。</li>
+  <li><em>动力系统拓扑熵</em>（Bowen-Walters 定义里覆盖数 \(N(n, \varepsilon)\) 子可加）。</li>
+  <li><em>组合学：自避走道路数</em> \(c_n\) 满足 \(c_{m+n} \le c_m c_n\)（取 log 子可加）\(\implies\) 增长率 \(\mu := \lim c_n^{1/n}\) 存在。</li>
+</ul>
+
+<p>这条引理"<em>子可加 \(\implies\) 比率收敛</em>" 是个非常有力但易被忽视的工具。</p>
+
+<h2 id="appA-5">A.5 Krein-Milman 定理</h2>
+
+<p>"<em>紧凸集 = 端点的凸闭包</em>"——在无穷维拓扑向量空间里仍然成立。</p>
+
+<p><strong>定义。</strong>设 \(K\) 凸集，\(x \in K\) 是<em>端点</em>（extreme point），如果不存在 \(y, z \in K, y \ne z, t \in (0, 1)\) 使 \(x = t y + (1 - t) z\)。即 \(x\) 不能写成 \(K\) 中两点的<em>真</em>凸组合。</p>
+
+<p>记 \(\mathrm{ext}(K) :=\) \(K\) 的端点集。</p>
+
+<p><strong>Krein-Milman 定理（1940）。</strong>设 \(X\) 是局部凸 Hausdorff 拓扑向量空间（如赋范 / 弱拓扑），\(K \subset X\) <em>非空 紧凸</em>。则</p>
+
+<p>\[
+K = \overline{\mathrm{conv}(\mathrm{ext}(K))}.
+\]</p>
+
+<p>即 \(K\) 是其端点凸组合的闭包。</p>
+
+<p>具体的：</p>
+
+<ul>
+  <li><em>有限维</em>：\(K \subset \mathbb{R}^n\) 紧凸，\(\mathrm{ext}(K)\) 是 \(K\) 的<em>顶点</em>集。Krein-Milman 给"<em>多面体 = 顶点凸包</em>"——朴素事实。</li>
+  <li><em>\(\mathbb{R}^n\) 单位球面</em>：每个边界点都是端点（球面无"<em>平直部分</em>"），\(\mathrm{ext}(\overline{B}) = S^{n-1}\)。</li>
+  <li><em>\(\ell^p\) 单位球，\(1 < p < \infty\)</em>：每个 \(\|x\|_p = 1\) 的 \(x\) 都是端点（严格凸性）。</li>
+  <li><em>\(\ell^1\) 单位球</em>：端点 = 标准基 \(\pm e_n\)（"<em>角点</em>"）。\(\ell^1\) 不严格凸，所以非角点不是端点。</li>
+  <li><em>\(\ell^\infty\) 单位球</em>：端点 = 极端序列 \(\{x : x_n = \pm 1\}\)（每位都达到 ±1）——超大集合。</li>
+</ul>
+
+<p>证明思路（一页粗略）：用 Hahn-Banach 找<em>支撑超平面</em>，沿该平面切下"<em>面</em>"（face），递归到一维，最后得端点。完整证明 2-3 页技术，请见 Conway 第 4 章。</p>
+
+<p>这条定理在概率 / 统计 / 优化里超有用——说"<em>找紧凸集上某线性泛函的极值</em>" 等价于"<em>在端点上找</em>"，因为端点凸包的线性泛函最值<em>就是</em>端点上最值。这是<em>线性规划</em> 单纯形法的<em>无穷维</em>版背景。</p>
+
+<h2 id="appA-6">A.6 Eberlein-Šmulian 与 Goldstine</h2>
+
+<p>这两条是<em>弱拓扑</em> 的精细工具，本书第 17-19 章用过若干次。</p>
+
+<p><strong>Eberlein-Šmulian 定理。</strong>设 \(X\) Banach。一个集 \(K \subset X\) 在<em>弱拓扑</em> 下相对紧 \(\iff\) 它<em>序列</em> 弱相对紧（即每个序列有弱收敛子列）。</p>
+
+<p>这条不显然，因为弱拓扑一般<em>不</em>第一可数（无穷维 + 不可分时）——而紧 \(\iff\) 序列紧" 在非第一可数空间一般失败。Eberlein-Šmulian 说在 Banach 弱拓扑下二者<em>恰好</em> 等价。证明用 Banach-Alaoglu + 双对偶嵌入 + 局部凸性，6-8 页技术。</p>
+
+<p>实际后果：弱紧致论证可以"<em>抽序列子列</em>" 而不需要"<em>抽网</em>"。这是<a href="ch20.html#sec20-5">第 20 章</a>"<em>弱抽 + 紧升 + 强传</em>" 三步法用<em>序列</em> 形式正确的根基。</p>
+
+<p><strong>Goldstine 定理。</strong>设 \(X\) Banach，\(B_X = \{x : \|x\| \le 1\}\) 单位球，\(B_{X^{**}} = \{\xi \in X^{**} : \|\xi\| \le 1\}\) 双对偶单位球。在典范嵌入 \(X \hookrightarrow X^{**}\) 下，</p>
+
+<p>\[
+B_X \text{ 在 } X^{**} \text{ 弱*拓扑下稠密于 } B_{X^{**}}.
+\]</p>
+
+<p>即：每个 \(\xi \in X^{**}\) 单位向量都是 \(X\) 中单位向量的弱*极限。</p>
+
+<p>这条定理"<em>双对偶不大于单对偶的弱*闭包</em>"。它是\(X\) 自反 (\(X = X^{**}\)) 的等价刻画的工具——\(X\) 自反 \(\iff B_X\) 弱紧 \(\iff\) Goldstine 给的弱*稠密性<em>实际是</em> \(B_X = B_{X^{**}}\)。</p>
+
+<p>证明用 Hahn-Banach 分离 + 凸闭包等于弱闭包（对凸集）+ 双对偶范数关系，2 页技术。</p>
+
+<h2 id="appA-7">A.7 实战准则</h2>
+
+<ul>
+  <li>"<em>完备</em>" 是 Banach / Hilbert 定义的核心——它是反复有用的"<em>底层资源</em>"，让 BLT、Banach-Steinhaus、开映射、闭图像都成立。每次见到"<em>完备空间</em>" 这条假设，知道它是<em>不能省的</em>——本书第 12-14 章三大基础定理全部依赖它。</li>
+  <li>有限维的"<em>任意范数等价</em>" + "<em>子空间自动闭</em>" + "<em>线性映射自动连续</em>" 三条让有限维成为泛函分析中的 trivial 部分——所有努力都在无穷维。</li>
+  <li>Banach 不动点是<em>构造</em> 工具——只要能把问题写成 \(T x = x\) 且 \(T\) 压缩，存在唯一解就是<em>免费</em> 的。配套的 Picard 定理是 ODE 标准存在唯一性。</li>
+  <li>Krein-Milman 在凸优化、概率（极端测度）、控制论里反复用。它的"<em>对偶</em>" 用法（找端点 → 推出整个集合的性质）值得记住。</li>
+  <li>Eberlein-Šmulian 让你在弱紧致论证里<em>放心地用序列</em>——这条在<a href="ch23.html">第 23 章</a> PDE 直接方法里默默用了无数次。</li>
+  <li>Goldstine 是"<em>自反性</em>" 内部刻画的核心工具，在<a href="ch16.html">第 16 章</a>对偶论中反复出现。</li>
+</ul>
 
 <nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch24.html">← 第 24 章</a><a href="appB.html">附录 B →</a></nav>
 </main>
 </body>
 </html>
+</content>
+</invoke>

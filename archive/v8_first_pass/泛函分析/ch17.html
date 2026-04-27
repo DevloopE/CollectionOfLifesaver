@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 弱收敛与弱*收敛 — 普林斯顿泛函分析读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 Riesz 表示定理</a><a href="ch18.html">下一章 · 第 18 章 Banach–Alaoglu 紧致性 →</a></nav>
+<h1 id="ch17">第 17 章 弱收敛与弱*收敛</h1>
+
+<p>第 1 章 1.1 节我们看到：在无穷维赋范空间里"闭单位球不紧"。这条事实把传统的"紧致性方法"切了一刀。<strong>弱收敛</strong>是分析家们为了把紧致感"找回来"发明的工具——它把"序列收敛"的判据从"范数"放宽到"对偶配对"，于是单位球在<em>弱</em>意义下重新变得紧（Banach–Alaoglu，下章正式陈述）。</p>
+
+<p>本章先把"弱收敛"和它的姊妹概念"弱*收敛"讲清。它们的差别极小但极重要——前者把序列放在 \(X\) 里看，后者把序列放在 \(X^*\) 里看；它们在自反空间上一致，在非自反空间上有别。</p>
+
+<ul>
+  <li>弱收敛 \(x_n \rightharpoonup x\) 的定义：对每个 \(f \in X^*\)，\(f(x_n) \to f(x)\)。</li>
+  <li>弱*收敛 \(f_n \overset{*}{\rightharpoonup} f\) 的定义：对每个 \(x \in X\)，\(f_n(x) \to f(x)\)。</li>
+  <li>两条最重要事实：弱极限唯一；范数关于弱收敛<em>下半连续</em> \(\|x\| \le \liminf \|x_n\|\)。</li>
+  <li>"强 \(\Rightarrow\) 弱"，反向不成立——经典反例 \(e_n \rightharpoonup 0\) 在 \(\ell^2\) 中。</li>
+  <li>Mazur 定理：弱闭凸集 = 强闭凸集。这是把"弱"翻译回"强"的桥梁。</li>
+  <li>典型应用：极小化序列在弱意义下收敛 \(\Rightarrow\) 极小化问题有解（这是变分法存在性的标准路径）。</li>
+</ul>
+
+<h2 id="sec17-1">17.1 弱收敛：定义与基本事实</h2>
+
+<p>设 \(X\) 是赋范空间，\(\{x_n\} \subset X\) 序列，\(x \in X\)。<strong>弱收敛</strong>记作 \(x_n \rightharpoonup x\)，定义为：</p>
+
+<p>\[
+\boxed{\ \forall f \in X^*, \quad f(x_n) \to f(x).\ }
+\]</p>
+
+<p>对应"强收敛" \(x_n \to x\)（即 \(\|x_n - x\| \to 0\)）。</p>
+
+<p>核心事实：</p>
+
+<p><strong>(W1) 弱极限唯一。</strong>若 \(x_n \rightharpoonup x\) 且 \(x_n \rightharpoonup y\)，则 \(x = y\)。证明：对每 \(f \in X^*\)，\(f(x) = f(y)\)。由<a href="ch13.html">第 13 章</a>推论 2（"\(X^*\) 分点"），\(x = y\)。</p>
+
+<p><strong>(W2) 强 \(\Rightarrow\) 弱。</strong>\(x_n \to x \Rightarrow f(x_n) \to f(x)\) 由 \(f\) 连续。</p>
+
+<p><strong>(W3) 弱收敛序列范数有界。</strong>若 \(x_n \rightharpoonup x\)，则 \(\sup \|x_n\| < \infty\)。这条是 Banach–Steinhaus 的应用——把 \(\{x_n\}\) 看成 \(X^{**}\) 中元素的序列（通过 \(J(x_n)\)），它对每个 \(f \in X^*\) 有界 \(\Rightarrow\) 一致有界 \(\Rightarrow\) \(\sup \|J(x_n)\|_{X^{**}} = \sup \|x_n\| < \infty\)。</p>
+
+<p><strong>(W4) 范数下半连续。</strong>若 \(x_n \rightharpoonup x\)，则 \(\|x\| \le \liminf \|x_n\|\)。证明：对每 \(\varepsilon > 0\)，由 Hahn–Banach 取 \(f \in X^*\) 范数 1 使 \(f(x) \ge \|x\| - \varepsilon\)。由弱收敛 \(f(x_n) \to f(x)\)，所以 \(\liminf \|x_n\| \ge \liminf |f(x_n)| = |f(x)| \ge \|x\| - \varepsilon\)。\(\varepsilon\) 任意得 \(\liminf \|x_n\| \ge \|x\|\)。</p>
+
+<p><strong>(W4) 是个非常实用的工具——"弱极限的范数 \(\le\) 序列范数的极限"</strong>。它在变分法极小化里反复出现：极小化序列范数有上界 + 弱收敛 \(\Rightarrow\) 弱极限范数也被同一上界控制。</p>
+
+<h2 id="sec17-2">17.2 经典反例：\(e_n \rightharpoonup 0\) 在 \(\ell^2\)</h2>
+
+<p>这是弱收敛最常用的具体例子，值得自己核算。在 \(\ell^2\) 中考虑标准基 \(\{e_n\}\)。第 1 章 1.1 节我们已经知道 \(e_n\) <em>不</em>强收敛——任意两点距离 \(\sqrt{2}\)。</p>
+
+<p>但 \(e_n \rightharpoonup 0\)。证明：取任意 \(f \in (\ell^2)^* \cong \ell^2\)（用 Riesz）。\(f\) 对应某个 \(y \in \ell^2\)，\(f(x) = \langle x, y \rangle = \sum x_n \bar y_n\)。则 \(f(e_n) = \bar y_n\)。由 \(\sum |y_n|^2 < \infty\) \(\Rightarrow\) \(y_n \to 0\) \(\Rightarrow\) \(f(e_n) \to 0\)。结束。</p>
+
+<p>这个反例非常有教育意义。它说明：</p>
+
+<ul>
+  <li>弱收敛真的<em>严格弱</em>于强收敛——\(e_n \rightharpoonup 0\) 但 \(e_n\) 不强收敛于 \(0\)；</li>
+  <li>弱极限可以"漏出"原序列的某些性质——\(\|e_n\| = 1\) 但弱极限 \(\|0\| = 0\)，所以范数<em>不连续</em>关于弱收敛（虽然下半连续）；</li>
+  <li>"弱"提供的紧致感是真实的——这条序列在强意义下没有收敛子序列，但它本身就<em>是</em>弱 Cauchy 收敛序列，弱极限存在。</li>
+</ul>
+
+<p>下一章 Banach–Alaoglu 会把这条"\(\ell^2\) 中弱收敛子序列"的现象升级为定理：自反空间的有界序列总有弱收敛子序列。</p>
+
+<h2 id="sec17-3">17.3 弱*收敛：在 \(X^*\) 上看</h2>
+
+<p>设 \(X\) 是赋范空间，\(\{f_n\} \subset X^*\) 序列，\(f \in X^*\)。<strong>弱*收敛</strong>记作 \(f_n \overset{*}{\rightharpoonup} f\)，定义为：</p>
+
+<p>\[
+\boxed{\ \forall x \in X, \quad f_n(x) \to f(x).\ }
+\]</p>
+
+<p>注意它和"\(X^*\) 上的弱收敛"的区别：</p>
+
+<ul>
+  <li><strong>弱收敛在 \(X^*\) 上：</strong>对每个 \(\Phi \in X^{**}\)，\(\Phi(f_n) \to \Phi(f)\)；</li>
+  <li><strong>弱*收敛在 \(X^*\) 上：</strong>对每个 \(x \in X\)（即 \(J(x) \in X^{**}\) 的"特殊"元素），\(f_n(x) \to f(x)\)。</li>
+</ul>
+
+<p>差别在"<em>所有 \(\Phi \in X^{**}\)</em>" vs "<em>只考虑 \(J(X) \subset X^{**}\)</em>"。</p>
+
+<p>因为 \(J(X) \subset X^{**}\)，弱收敛 \(\Rightarrow\) 弱*收敛。但反向不成立——除非 \(X\) <strong>自反</strong>（即 \(J(X) = X^{**}\)），这两种收敛<em>不等价</em>。</p>
+
+<p>对自反空间，弱与弱*合一。对非自反空间，弱*收敛是"更宽松"的收敛（因为只用了 \(X^*\) 的"小子集" \(J(X)\) 来做检验）。</p>
+
+<h2 id="sec17-4">17.4 三种收敛的清单：算子序列</h2>
+
+<p>在<a href="ch9.html">第 9 章 9.3 节</a>我们已经看过算子序列的三种收敛：算子范数、强、弱。这条清单的"对偶版"在 \(X^*\) 上：</p>
+
+<table>
+<tr><th>记号</th><th>定义</th><th>对应原算子语言</th></tr>
+<tr><td>\(f_n \to f\)（在 \(X^*\) 中）</td><td>\(\|f_n - f\|_{X^*} \to 0\)</td><td>"算子范数收敛"</td></tr>
+<tr><td>\(f_n \rightharpoonup f\)（弱）</td><td>\(\Phi(f_n) \to \Phi(f), \forall \Phi \in X^{**}\)</td><td>"弱算子收敛"</td></tr>
+<tr><td>\(f_n \overset{*}{\rightharpoonup} f\)（弱*）</td><td>\(f_n(x) \to f(x), \forall x \in X\)</td><td>"强算子收敛"</td></tr>
+</table>
+
+<p>注意第三行：弱*收敛实际上是对偶空间上的<em>逐点</em>收敛——每个 \(x\) 处的<em>值</em>收敛。这正好对应"算子序列强收敛"的语言（每个输入处的输出收敛）。这种语言对应在第 18 章 Banach–Alaoglu 的运用上特别重要。</p>
+
+<h2 id="sec17-5">17.5 Mazur 定理：弱闭凸 = 强闭凸</h2>
+
+<p>"弱"和"强"在凸集上有一个非常关键的"等同"事实：</p>
+
+<p><strong>定理（Mazur）。</strong>设 \(C \subset X\) 是<em>凸</em>集。则 \(C\) 弱闭 \(\iff\) \(C\) 强闭。</p>
+
+<p>"\(\Rightarrow\)" 是平凡（弱闭 \(\Rightarrow\) 强闭，因为弱拓扑比强拓扑粗）。"\(\Leftarrow\)" 用 Hahn–Banach 几何形式（<a href="ch14.html">第 14 章</a>第二分离）：若 \(x \notin C\)（\(C\) 强闭凸），存在 \(f \in X^*\) 与 \(c\) 使 \(f(x) > c \ge f(y)\) 对 \(y \in C\)。这给一个"弱开" 邻域 \(\{z : f(z) > c\}\) 含 \(x\) 不交 \(C\)，即 \(C\) 弱闭。</p>
+
+<p>这条定理把"弱"和"强"在凸集上完全打通——你以后可以放心地"用强闭凸集来理解弱闭凸集"。具体应用：</p>
+
+<ul>
+  <li><strong>凸集合的强闭包 = 弱闭包：</strong>对凸 \(C\)，\(\overline{C}^{\text{strong}} = \overline{C}^{\text{weak}}\)。</li>
+  <li><strong>弱收敛序列的"凸组合可以强收敛"：</strong>若 \(x_n \rightharpoonup x\)，则存在 \(\{x_n\}\) 的凸组合序列 \(\{y_m\}\) 使 \(y_m \to x\) 强收敛。这条"Mazur 凸组合定理"是"<em>弱极限是序列凸组合的强极限</em>"的精确版。</li>
+</ul>
+
+<h2 id="sec17-6">17.6 应用：变分法的极小化方法</h2>
+
+<p>这是弱收敛工具的"主战场"。考虑变分问题</p>
+
+<p>\[
+\min_{u \in X} F(u),
+\]</p>
+
+<p>其中 \(F : X \to \mathbb{R}\) 是 Banach 空间上的某个能量。</p>
+
+<p>"<strong>直接方法</strong>" (direct method) 由 Tonelli 1915 年标准化：</p>
+
+<ol>
+  <li>取极小化序列 \(\{u_n\}\)：\(F(u_n) \to \inf F\)。</li>
+  <li>验证 \(\{u_n\}\) 在 \(X\) 中范数有界（强制条件 / coercivity）。</li>
+  <li>由 Banach–Alaoglu / 自反性，存在弱收敛子序列 \(u_{n_k} \rightharpoonup u^*\)。</li>
+  <li>验证 \(F\) 在弱意义下下半连续：\(F(u^*) \le \liminf F(u_{n_k}) = \inf F\)。</li>
+  <li>所以 \(F(u^*) = \inf F\)，\(u^*\) 是极小元。</li>
+</ol>
+
+<p>整套思路完全建立在弱收敛上。第 1 步靠 \(\inf\) 定义；第 2 步靠 \(F\) 的"强制性"（\(F(u) \to \infty\) 当 \(\|u\| \to \infty\)）；<em>第 3 步靠 Banach–Alaoglu / 自反性（这是把"紧致感找回来"的核心）</em>；第 4 步靠 \(F\) 的弱下半连续（由 Mazur，凸 \(F\) 的强下半连续 = 弱下半连续）。</p>
+
+<p>这是泛函分析在 PDE 与最优化里"无穷维存在性"标准模板。第 23 章 Lax–Milgram + Sobolev 嵌入正是这条模板在椭圆方程弱解上的具体化。</p>
+
+<p>这条方法之所以非常强大：<em>所有不等式都"自动单边"</em>——\(\liminf\) 与 \(\le\)。你不需要构造极小元，只要证它"必须存在因为序列不能漏出去"——这种存在性靠紧致感而不是构造。这就是为什么"弱紧致" 在分析里值得花一整章学。</p>
+
+<p>下一章我们要把"弱紧致"形式化：Banach–Alaoglu 定理。它说在<em>任何</em> Banach 空间的对偶 \(X^*\) 上，单位球在弱*拓扑下都紧。这是把第 1 章 1.1 节崩塌的"单位球紧"用一种新方式找了回来——只是这个紧致是<em>弱*</em>意义的而非范数意义的。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch16.html">← 上一章 · 第 16 章 Riesz 表示定理</a><a href="ch18.html">下一章 · 第 18 章 Banach–Alaoglu 紧致性 →</a></nav>
+</main>
+</body>
+</html>
