@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 1 章 引论：从最速降线到变分原理 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><span class="nav-disabled">← 上一章</span><a href="ch2.html">下一章 · 第 2 章 Newton 力学复习 →</a></nav>
+<h1 id="ch1">第 1 章 引论：从最速降线到变分原理</h1>
+
+<p>1696 年 6 月, Johann Bernoulli 在莱比锡《Acta Eruditorum》上发布一道公开挑战题, 给"<em>欧洲所有最杰出的数学家</em>"。题目是这样的:</p>
+
+<blockquote style="border-left:3px solid var(--ink-soft);padding-left:1em;margin:1em 0;color:var(--ink-soft);font-style:italic;">
+"<em>给空间中两点 A 和 B（A 高 B 低, 但<em>不</em> 在同一垂线上）。求一条曲线连接 A 到 B, 使得一颗只受重力作用的小球从 A 出发沿这条曲线滑到 B 所用时间<em>最短</em>。</em>"
+</blockquote>
+
+<p>请你停下来想一秒——你<em>第一反应</em> 是什么曲线？</p>
+
+<p>大多数人答<em>直线</em>——AB 之间最短路径。这是空间最短, 但<em>时间</em> 不一定最短。第二反应可能是"<em>先垂直下降, 然后水平到 B</em>"——这样开始时获得最大速度。也错。</p>
+
+<p>真答案——一条<em>cycloid</em>（摆线）。具体: 一个圆沿水平直线滚动时, 圆周上一点划出的轨迹。把这条曲线放置成"<em>从 A 出发向下滚, 到 B 结束</em>", 球沿这条线滑下时<em>时间最短</em>。Bernoulli 1696 给挑战, Newton 看到题目<em>当晚</em> 就解出来寄回答案（Newton 当时已 53 岁, 是<em>英国造币厂厂长</em>, 不再做学术）。Newton 匿名投稿, Bernoulli 看到答案直接说: "<em>I recognize the lion by his claw.</em>"（"我从爪印认出狮子"）。</p>
+
+<p>这条问题——<em>最速降线问题</em>（brachistochrone）——是历史上第一道严肃的<em>变分问题</em>。它的解法是经典力学一次根本视角变化的开端: 从"<em>瞬间动力学</em>"（Newton 的 F = ma）到"<em>整体路径优化</em>"（Lagrange 的 \(\delta S = 0\)）。这一章用这道历史题作钩子, 把整本书的<em>主线</em> 立起来。</p>
+
+<h2 id="sec1-1">1.1 这道题的两种解法</h2>
+
+<p><strong>朴素 Newton 风格解法</strong>: 设小球沿曲线 \(y(x)\) 下降。在 \((x, y)\) 处, 由能量守恒 \(\frac{1}{2} m v^2 = m g y\), 得速度 \(v = \sqrt{2gy}\)。线元 \(ds = \sqrt{dx^2 + dy^2}\)。时间</p>
+
+<p>\[
+T = \int_A^B \frac{ds}{v} = \int_0^X \frac{\sqrt{1 + y'(x)^2}}{\sqrt{2 g y(x)}} \, dx.
+\]</p>
+
+<p>问题——找让 \(T\) 取最小的曲线 \(y(x)\)。这<em>不是</em> 一道普通的"<em>找最值</em>" 题——你不是找一个<em>数</em>, 是找一个<em>函数</em>。函数最小化的工具叫<em>变分法</em>。</p>
+
+<p><strong>变分法解法</strong>（Euler-Lagrange 方程, 1744）: 设泛函 \(T[y] = \int_0^X F(y, y') dx\) where \(F(y, y') = \sqrt{(1 + y'^2)/(2gy)}\)。极小条件是<em>Euler-Lagrange 方程</em></p>
+
+<p>\[
+\frac{d}{dx} \frac{\partial F}{\partial y'} - \frac{\partial F}{\partial y} = 0.
+\]</p>
+
+<p>对我们这个 \(F\) 算偏导（一些代数), 得</p>
+
+<p>\[
+y(1 + y'^2) = C \quad (\text{C 是常数}).
+\]</p>
+
+<p>这条 ODE 的解就是 cycloid 的参数化方程</p>
+
+<p>\[
+x(\theta) = \frac{C}{2}(\theta - \sin \theta), \quad y(\theta) = \frac{C}{2}(1 - \cos \theta).
+\]</p>
+
+<p>看到了吗——同一道题两种解法。Newton 的: 写出 \(T\) 表达式直接试各种 \(y\), 难。Lagrange 的（用变分法）: 写出 \(T\) 后套 EL 方程, 一行 ODE 解完。<em>变分法</em> 是工具, <em>变分原理</em>（"<em>真实路径让某个泛函取极值</em>"）是<em>哲学</em>。</p>
+
+<p>1744 年 Euler 把变分法系统化。1788 年 Lagrange 在《<em>Mécanique analytique</em>》中把<em>整个</em> 经典力学重写成变分形式。这就是 Lagrange 力学的诞生。</p>
+
+<h2 id="sec1-2">1.2 把变分法搬到力学</h2>
+
+<p>Bernoulli 的"<em>最短时间</em>" 是<em>几何 / 光学</em> 问题。Lagrange 的洞察——<em>整个力学</em> 都能写成"<em>极小化某个积分</em>"。</p>
+
+<p>具体说: 给一个力学系统（粒子在势 \(V(x)\) 中, 或多粒子, 或刚体, 或带约束）。定义</p>
+
+<p>\[
+\boxed{\ L = T - V \quad (\text{动能减势能}),\ }
+\]</p>
+
+<p>叫<em>Lagrangian</em>。给一条从 \(t_1\) 到 \(t_2\) 的路径 \(q(t)\), 定义</p>
+
+<p>\[
+\boxed{\ S[q] = \int_{t_1}^{t_2} L\big(q(t), \dot q(t), t\big) \, dt,\ }
+\]</p>
+
+<p>叫<em>作用量</em>。</p>
+
+<p><strong>Hamilton 原理</strong>（最小作用量原理）: <em>真实物理路径让 \(S\) 取极值</em>。</p>
+
+<p>这条原则替代 Newton 的 F = ma。给定 Lagrangian, 求 EL 方程</p>
+
+<p>\[
+\frac{d}{dt} \frac{\partial L}{\partial \dot q} - \frac{\partial L}{\partial q} = 0
+\]</p>
+
+<p>就给出运动方程。对单粒子在 \(V(x)\) 中, \(L = \frac{1}{2} m \dot x^2 - V(x)\), EL 方程算完正好是 \(m \ddot x = -V'(x)\) — 即 F = ma。<em>同样物理结果</em>, 不同语言。</p>
+
+<p>请你停下来感受这件事的<em>分量</em>。Lagrange 不是给一个新理论——他给同样的牛顿物理一个<em>不同</em> 的写法。这种"<em>换写法</em>" 看似无聊（既然结果一样, 何必）。但它的<em>价值</em> 在四个方面: 简化、对称、推广、桥梁。</p>
+
+<h2 id="sec1-3">1.3 为什么换语言: 简化</h2>
+
+<p>第一个理由: <em>处理约束系统</em>。</p>
+
+<p>具体: 单摆。一根绳长 \(\ell\) 一端固定一端挂质量 \(m\)。绳张力 \(T\) 是<em>未知</em> 的（取决于运动状态）。Newton 风格: 写 \(\boldsymbol F = m \boldsymbol a\), 把 \(\boldsymbol F\) 分解成重力 + 张力, 张力分量需要靠约束方程 \(|\boldsymbol r| = \ell\) 求解。两条独立方程 + 一条约束 = 三未知（两个位置 + 张力）。复杂。</p>
+
+<p>Lagrange 风格: 选<em>广义坐标</em> \(\theta\)（摆角）。约束<em>自动</em> 满足——\(\theta\) 是 1 维的, 摆球总在圆上。Lagrangian:</p>
+
+<p>\[
+L = \frac{1}{2} m \ell^2 \dot \theta^2 - m g \ell (1 - \cos \theta).
+\]</p>
+
+<p>EL 方程: \(\frac{d}{dt}(m \ell^2 \dot \theta) + m g \ell \sin \theta = 0\), 即 \(\ddot \theta + (g/\ell) \sin \theta = 0\)。<em>单摆方程</em>, 一行字, <em>不</em> 出现张力。</p>
+
+<p>张力<em>哪去了</em>？Lagrangian 里没出现, 因为它是<em>约束力</em>—— 不做功（垂直于运动）。Lagrange 公式自动消去所有约束力, 只留下"<em>真物理</em>" 的力。这种"<em>选广义坐标 + 约束自动消失</em>" 的便利在多体复杂系统（机械臂、行星系统、分子振动）里是<em>必须</em>。Newton F = ma 在这些系统下做不动。</p>
+
+<h2 id="sec1-4">1.4 为什么换语言: 对称 ↔ 守恒律</h2>
+
+<p>第二个理由: <em>Noether 定理</em>。</p>
+
+<p>1918 年 Emmy Noether 证: <em>Lagrangian 的每一个连续对称性, 都对应一条守恒律</em>。具体:</p>
+
+<ul>
+  <li><em>时间平移对称</em>（\(L\) 不显含 \(t\)）⟹ <em>能量守恒</em></li>
+  <li><em>空间平移对称</em>（\(L\) 在 \(\boldsymbol r \to \boldsymbol r + \boldsymbol c\) 下不变）⟹ <em>动量守恒</em></li>
+  <li><em>旋转对称</em>（\(L\) 在旋转下不变）⟹ <em>角动量守恒</em></li>
+  <li><em>规范对称</em>（电磁场 \(A \to A + d\chi\) 下不变）⟹ <em>电荷守恒</em></li>
+  <li>……</li>
+</ul>
+
+<p>这条定理把"<em>守恒律</em>" 从"<em>幸运观察</em>" 升级成"<em>对称性的代数推论</em>"。Newton 风格里这些守恒律靠特定例子各自证, 没有统一原因。Lagrange 风格里它们是<em>同一定理</em> 的具体化。</p>
+
+<p>这条 Noether 定理在 20 世纪物理变成<em>圣经</em>——粒子物理把"<em>新粒子 / 新相互作用</em>" 等价为"<em>新对称性</em>", 用 Noether 定理推守恒律（重子数 / 轻子数 / 电荷 / 色…）。<a href="ch7.html">第 7 章</a>给完整证明 + 多个例子。</p>
+
+<h2 id="sec1-5">1.5 为什么换语言: 推广性 + 量子桥</h2>
+
+<p>第三个理由: <em>Lagrangian 推到任何"几何空间"</em>。</p>
+
+<p>Newton F = ma 写在<em>欧氏空间</em> 里——\(F\) 与 \(a\) 都是向量, 加减需要欧氏结构。怎么把这套搬到<em>弯曲</em> 空间（GR 时空）？硬搬不通。</p>
+
+<p>Lagrangian 写法: \(L = T - V\), \(T = \frac{1}{2} g_{ij}(q) \dot q^i \dot q^j\)（\(g_{ij}\) 是度量张量）。这种写法<em>自动</em> 适应任何流形, 任何度量。所以 Einstein 写广义相对论<em>就用</em> Lagrangian 公式: 时空作用量 \(S = \int R \sqrt{|g|} \, d^4 x\)（Einstein-Hilbert 作用量）, 极值条件给 Einstein 方程（链<a href="../微分几何/ch23.html">微分几何 ch23</a>）。Newton F = ma 完全做不到这一步。</p>
+
+<p>第四个理由: <em>量子桥</em>。Feynman 1948 路径积分把量子力学写成"<em>所有路径加权 \(e^{i S/\hbar}\)</em>"。经典极限 \(\hbar \to 0\) 时<em>主导贡献</em> 来自 \(S\) 极值的路径——也就是 Lagrange 力学的真路径。所以经典力学是量子力学的<em>稳态相位</em> 极限。Newton F=ma 与量子力学不直接连; Lagrange 力学是量子力学的<em>经典极限</em>。本书<a href="ch21.html">ch21</a> 讨论"经典 → 量子" 的桥梁。</p>
+
+<p>请你回头看这四个理由——简化、对称、推广、桥梁。任何一个都足够让 Lagrange 力学值得学。<em>合在一起</em>, Lagrange / Hamilton 力学是物理学不可避免的<em>第二语言</em>。这本书就是教这门语言。</p>
+
+<h2 id="sec1-6">1.6 这本书的路线</h2>
+
+<p>24 章五段式：</p>
+
+<ul>
+  <li><strong>Newton 复习 (ch2-3)</strong>: 速度回顾, 不重写。中心力 + 开普勒作为"<em>最朴素的两体问题</em>"。</li>
+  <li><strong>Lagrange 力学 (ch4-9)</strong>: 广义坐标 + 约束 → 变分原理 → EL 方程 → Noether → 小振动 → 刚体。读完这一段你能<em>用 Lagrange 解题</em>。</li>
+  <li><strong>Hamilton 力学 (ch10-15)</strong>: Legendre 变换 → 相空间 → Poisson 括号 → 正则变换 → Hamilton-Jacobi → 作用-角变量 + 积分系统。这一段是经典力学的<em>几何</em> 化身。</li>
+  <li><strong>高级 (ch16-21)</strong>: 微扰 + KAM + 混沌 + 弹性 / 流体 / 经典场论 + 量子前夜。</li>
+  <li><strong>应用 (ch22-24)</strong>: 相对论力学 + 航天 + 几何力学（symplectic）。</li>
+</ul>
+
+<h2 id="sec1-7">1.7 临别话</h2>
+
+<p>经典力学在物理学课程里常被排在第一年（中学/大一）, 听起来"<em>简单 + 古老</em>"。这是个误导。<em>初等</em> 经典力学（高中级别）确实简单——抛物运动、单摆、碰撞。<em>分析</em> 力学（Lagrange / Hamilton）<em>不</em> 简单——它涉及变分法 / 流形 / symplectic 几何 / 变换群, 数学深度足以让一个数学博士专研多年。本书走的是<em>分析力学</em> 路线。</p>
+
+<p>Arnold 在他的经典教材里写: "<em>经典力学不仅是物理课, 还是一门<em>数学学科</em>; 它的语言是 symplectic 几何 + Lie 群</em>"。这本书的目标就是带你看见这一面——<em>经典力学是几何, 不是公式堆砌</em>。</p>
+
+<p>下一章我们快速复习 Newton 力学的核心结果（动量、能量、角动量守恒）作为 ch3 中心力问题的预备。然后 ch4 起正式跳到 Lagrange。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><span class="nav-disabled">← 上一章</span><a href="ch2.html">下一章 · 第 2 章 Newton 力学复习 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 经典 → 量子的桥 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 经典场论</a><a href="ch22.html">下一章 · 第 22 章 相对论力学 →</a></nav>
+<h1 id="ch21">第 21 章 经典 → 量子的桥</h1>
+
+<p>1925 年夏天, 23 岁的 Werner Heisenberg 患花粉症避到北海 Helgoland 小岛上养病。他随身带着一个困扰他几个月的问题——氢原子谱线为什么<em>这样</em> 排（具体那些频率 + 强度）, 经典电动力学怎么算都对不上。一天夜里凌晨三点, 他突然意识到——把"<em>电子位置 \(x\)</em>" 这种<em>不可观察</em> 量从理论里删掉, 只保留<em>可观察</em> 量（频率 + 强度）。这些可观察量天然组织成<em>方阵</em>, 而方阵的乘法<em>不</em> 对易: \(AB \neq BA\)。Heisenberg 当时<em>不</em> 知道这玩意叫"<em>矩阵</em>"——他凭物理直觉硬推出来的。回 Göttingen 给老师 Max Born 看, Born 第一眼: "<em>这是矩阵代数</em>"。</p>
+
+<p>1925-1926 一年内, Heisenberg + Born + Jordan 三人把"<em>矩阵力学</em>" 系统化; 同时 Schrödinger 1926 年从波动方程出发独立给"<em>波动力学</em>"; Dirac 1926 年统一两者, 给抽象算子 + 态向量的<em>正则形式</em>。1928 年——也就是从 Heisenberg 那个夜晚 3 年后——量子力学的数学骨架就完整了。</p>
+
+<p>这次"<em>从经典到量子</em>" 跳跃<em>看起来</em> 是物理革命, 但<em>从数学结构看</em> 是一次<em>极其温和</em> 的修改。具体: Hamilton + Poisson 给了经典力学一个"<em>代数</em>" 结构——可观察量是相空间上的函数, Poisson 括号 \(\{,\}\) 给它们结构。量子力学保留几乎全部结构, 只把 \(\{,\}\) 替换成 \([,]/(i \hbar)\)（对易子除以 \(i \hbar\)）。这就是<em>正则量子化</em>。</p>
+
+<p>这一章把这条桥讲清——不是教你怎么解氢原子（那是<a href="../量子力学/index.html">V14 量子力学</a>的事）, 而是让你看见: 经典力学 + 量子力学不是两件事, 而是<em>同一套代数结构</em> 的两个具体化（\(\hbar = 0\) 给经典, \(\hbar > 0\) 给量子）。把这件事看清, 你会明白为什么本书前 20 章<em>必然</em> 通向 V14 量子力学——Hamilton + Poisson 不是经典力学的可选包装, 而是它通向量子力学的<em>预备</em> 形式。</p>
+
+<h2 id="sec21-1">21.1 经典 → 量子的"正则量子化" 表</h2>
+
+<p>把 Heisenberg-Born-Jordan-Dirac 1925-1928 给的"<em>怎么从经典写出量子</em>" 规则, 整理成一张<em>对应表</em>:</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">经典力学</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">量子力学</th></tr>
+<tr><td style="padding: 0.3em 1em;">相空间函数 \(f(q, p)\)</td><td style="padding: 0.3em 1em;">Hilbert 空间算子 \(\hat f\)</td></tr>
+<tr><td style="padding: 0.3em 1em;">点 \((q_0, p_0) \in M\)</td><td style="padding: 0.3em 1em;">态向量 \(|\psi\rangle \in \mathcal H\)</td></tr>
+<tr><td style="padding: 0.3em 1em;">观测值 \(f(q_0, p_0)\)</td><td style="padding: 0.3em 1em;">期望值 \(\langle \psi | \hat f | \psi \rangle\)</td></tr>
+<tr><td style="padding: 0.3em 1em;">Poisson 括号 \(\{f, g\}\)</td><td style="padding: 0.3em 1em;">\(\frac{1}{i \hbar}[\hat f, \hat g]\)</td></tr>
+<tr><td style="padding: 0.3em 1em;">\(\dot f = \{f, H\}\)（Hamilton）</td><td style="padding: 0.3em 1em;">\(\dot{\hat f} = \frac{1}{i \hbar}[\hat f, \hat H]\)（Heisenberg）</td></tr>
+<tr><td style="padding: 0.3em 1em;">\(q^i, p_j\) 满足 \(\{q^i, p_j\} = \delta^i_j\)</td><td style="padding: 0.3em 1em;">\(\hat q^i, \hat p_j\) 满足 \([\hat q^i, \hat p_j] = i \hbar \delta^i_j\)</td></tr>
+</table>
+
+<p>看这张表的<em>形状</em>: 左右两列<em>结构完全一致</em>, 只把 \(\{,\}\) 替成 \([,]/(i\hbar)\)。<em>规则</em>:</p>
+
+<p>\[
+\boxed{\ \text{正则量子化}: \quad \{f, g\} \;\longmapsto\; \frac{1}{i\hbar}[\hat f, \hat g].\ }
+\]</p>
+
+<p>这一行就是<em>整个</em> 量子化方案。Dirac 1930 年《<em>Principles of Quantum Mechanics</em>》第一版正是这样组织的——他把<em>抽象量子力学</em> 写成"<em>把 Hamilton-Poisson 经典力学的 \(\{,\}\) 替成 \([,]/(i\hbar)\)</em>"。</p>
+
+<p>请你停下来想一秒: <em>为什么</em> 这样替换合理？两个理由:</p>
+
+<ul>
+  <li><em>代数结构保留</em>。Poisson 括号有几条性质——双线性、反对称、Leibniz、Jacobi（链<a href="ch12.html">第 12 章</a> 12.4 节）。对易子 \([A, B] = AB - BA\) 有<em>同样</em> 几条性质。所以替换"代数上无缝"。</li>
+  <li><em>经典极限</em> \(\hbar \to 0\)。当 \(\hbar\) 数值小（普朗克常数 \(\approx 10^{-34}\) J·s, 在宏观物理里"<em>天文级</em>" 小）, 量子修正可忽略, 量子力学回到经典力学。本章 21.7 节给定量陈述。</li>
+</ul>
+
+<p>第二条是物理理由——经典力学是量子力学的<em>极限</em>, 不是相反。我们日常宏观经验是<em>经典的</em>, 因为 \(\hbar / S \ll 1\)（其中 \(S\) 是典型作用量）。</p>
+
+<h2 id="sec21-2">21.2 正则对易关系</h2>
+
+<p>正则量子化最具体的内容: 经典正则对 \((q^i, p_j)\) 满足 \(\{q^i, p_j\} = \delta^i_j\)（链<a href="ch12.html">第 12 章</a>）。量子化后</p>
+
+<p>\[
+\boxed{\ [\hat q^i, \hat p_j] = i \hbar \, \delta^i_j.\ }
+\]</p>
+
+<p>这就是<em>正则对易关系</em>（CCR, canonical commutation relations）, 量子力学最核心的方程之一。</p>
+
+<p>具体到 1 维: \([\hat x, \hat p] = i \hbar\)。位置算子 \(\hat x\) 与动量算子 \(\hat p\) <em>不</em> 对易。它们的"<em>不对易程度</em>" 由 \(\hbar\) 量化。</p>
+
+<p>从 CCR 直接推出 Heisenberg 不确定关系。任两个 self-adjoint 算子 \(\hat A, \hat B\) 满足</p>
+
+<p>\[
+\Delta A \cdot \Delta B \ge \frac{1}{2} |\langle [\hat A, \hat B] \rangle|.
+\]</p>
+
+<p>取 \(\hat A = \hat x, \hat B = \hat p\):</p>
+
+<p>\[
+\Delta x \cdot \Delta p \ge \hbar / 2.
+\]</p>
+
+<p>这就是著名的<em>Heisenberg 不确定原理</em>。它<em>不</em> 是测量误差——是<em>原理上</em> 不能同时给位置 + 动量任意精确值。原因纯<em>代数</em>: \([\hat x, \hat p] = i \hbar \neq 0\)。</p>
+
+<p>请你看这件事的逻辑: <em>经典 Poisson 括号 \(\{x, p\} = 1\) 通过正则量子化变成 \([\hat x, \hat p] = i\hbar\), 然后从这条对易关系推出不确定原理</em>。整个不确定原理的"<em>种子</em>" 已经在经典 Hamilton-Poisson 力学里——\(x\) 与 \(p\) 是<em>共轭对</em>, Poisson 括号 1。这件事在经典里看不出物理意义（一切都对易, Poisson 1 只是个数）, 但量子化后 \(\hbar\) 接管, 共轭性的物理含义浮出水面。</p>
+
+<p>用<em>具体表示</em> 实现 CCR。最常见的"<em>位置表象</em>": 态 \(|\psi\rangle\) 由波函数 \(\psi(x)\) 表示, 算子作用</p>
+
+<p>\[
+\hat x \psi(x) = x \psi(x), \quad \hat p \psi(x) = -i \hbar \frac{d \psi}{dx}.
+\]</p>
+
+<p>验证 CCR: \([\hat x, \hat p] \psi = \hat x (-i\hbar \psi') - (-i\hbar)(x \psi)' = -i\hbar x \psi' - (-i\hbar)(\psi + x \psi') = i \hbar \psi\)。一致。</p>
+
+<p>"<em>动量表象</em>" 对偶: 用 Fourier 变换换基, \(\hat p\) 变乘法, \(\hat x\) 变 \(i \hbar d/dp\)。两个表象由 Fourier 联系——这也是经典 \(p \leftrightarrow x\) 对偶性（链<a href="ch10.html">第 10 章</a>Legendre 变换）的<em>延伸</em>。</p>
+
+<h2 id="sec21-3">21.3 谐振子: 升降算子的来源</h2>
+
+<p>试一个具体例子, 看正则量子化怎么操作。<em>谐振子</em>——经典 Hamiltonian \(H = p^2 / (2m) + m \omega^2 q^2 / 2\)。</p>
+
+<p>定义两个复合量（经典）:</p>
+
+<p>\[
+a = \sqrt{\frac{m \omega}{2 \hbar}} \left( q + \frac{i p}{m \omega} \right), \quad \bar a = \sqrt{\frac{m \omega}{2 \hbar}} \left( q - \frac{i p}{m \omega} \right).
+\]</p>
+
+<p>算它们的 Poisson 括号（用 \(\{q, p\} = 1\) + 双线性）:</p>
+
+<p>\[
+\{a, \bar a\} = \frac{m \omega}{2 \hbar} \cdot 2 \cdot \frac{i \cdot (-1)}{m \omega} \{q, p\} \cdot (\text{...}) = -i / \hbar.
+\]</p>
+
+<p>（具体常数: \(\{a, \bar a\} = -i/\hbar\); 标准化 \(\tilde a = \sqrt \hbar \, a\) 让 \(\{\tilde a, \bar{\tilde a}\} = -i\)。）</p>
+
+<p>用 \(a, \bar a\) 重写 Hamiltonian: \(H = \hbar \omega \, \bar a \, a\)（自验: 把 \(a, \bar a\) 展开代入, 算几何代数即可）。</p>
+
+<p>正则量子化: \(\{a, \bar a\} = -i/\hbar \mapsto [\hat a, \hat a^\dagger] = (-i/\hbar) \cdot i \hbar = 1\)。所以</p>
+
+<p>\[
+\boxed{\ [\hat a, \hat a^\dagger] = 1.\ }
+\]</p>
+
+<p>这就是<em>升降算子代数</em>, 量子谐振子的核心。\(\hat a^\dagger\) 是"<em>升算子</em>" (创生一个量子), \(\hat a\) 是"<em>降算子</em>" (湮灭一个量子)。能量本征值 \(E_n = \hbar \omega (n + 1/2)\)（\(n = 0, 1, 2, \ldots\)）<em>整步</em>——这就是"<em>能量量子化</em>"。</p>
+
+<p>请你看到这件事的<em>必然性</em>: 升降算子代数<em>不是</em> 量子力学的发明, 是<em>经典</em> Poisson 括号的直接量子化。\([\hat a, \hat a^\dagger] = 1\) 来自 \(\{a, \bar a\} = -i\)。<em>整个</em> 量子谐振子的代数结构在经典里已存在; 量子化只把代数<em>实现</em> 在 Hilbert 空间。</p>
+
+<p>这种"<em>升降算子</em>" 模式后来推广到<em>所有</em> 二次量子化（量子场论里的<em>粒子产生 + 湮灭</em>, 链 V14 ch20-22）。<em>每个谐振子模式 = 一个粒子种类</em> 是量子场论的根本想法; 它的代数骨架就是这一节的 \([\hat a, \hat a^\dagger] = 1\)。</p>
+
+<h2 id="sec21-4">21.4 Heisenberg 运动方程 = 量子的 \(\dot f = \{f, H\}\)</h2>
+
+<p>经典力学里 Hamilton 给</p>
+
+<p>\[
+\frac{df}{dt} = \{f, H\}
+\]</p>
+
+<p>(链<a href="ch12.html">第 12 章</a> 12.3 节)。这是说"<em>任何观测量沿 Hamilton 流的演化, 由它和 \(H\) 的 Poisson 括号决定</em>"。</p>
+
+<p>正则量子化: \(\{f, H\} \mapsto [\hat f, \hat H]/(i \hbar)\)。所以</p>
+
+<p>\[
+\boxed{\ \frac{d \hat f}{dt} = \frac{1}{i \hbar}[\hat f, \hat H].\ }
+\]</p>
+
+<p>这就是<em>Heisenberg 运动方程</em>。它说: 在<em>Heisenberg 表象</em>（算子时间演化, 态不变）里, 算子 \(\hat f(t)\) 的演化由它和 \(\hat H\) 的对易子驱动。</p>
+
+<p>Heisenberg 表象 vs Schrödinger 表象（态时间演化, 算子不变）vs Dirac 表象（混合）——三种<em>等价</em> 描述, 由幺正变换连接。这种"<em>多表象</em>" 多样性<em>来自</em> 经典 Hamilton 力学的"<em>多正则坐标</em>" 多样性（链<a href="ch13.html">第 13 章</a>正则变换）——经典里 \((q, p)\) 可以正则变换到 \((Q, P)\), 量子里类似地态 + 算子可以幺正变换。</p>
+
+<p>例: 谐振子 \(\hat H = \hbar \omega (\hat a^\dagger \hat a + 1/2)\)。算 \(\dot{\hat a}\):</p>
+
+<p>\[
+\frac{d \hat a}{dt} = \frac{1}{i \hbar} [\hat a, \hat H] = \frac{1}{i \hbar} [\hat a, \hbar \omega \hat a^\dagger \hat a] = \frac{\omega}{i} [\hat a, \hat a^\dagger \hat a].
+\]</p>
+
+<p>用 \([\hat a, \hat a^\dagger \hat a] = [\hat a, \hat a^\dagger] \hat a = \hat a\):</p>
+
+<p>\[
+\dot{\hat a} = -i \omega \hat a, \quad \hat a(t) = \hat a(0) e^{-i \omega t}.
+\]</p>
+
+<p>对比经典谐振子里 \(\dot a = -i \omega a\)（同样 ODE!）。<em>同样的运动方程, 同样的解</em>; 量子和经典在这里几乎一样。差别只在 \(\hat a\) 是<em>算子</em> 而 \(a\) 是<em>数</em>; 但代数 + 演化结构一致。</p>
+
+<p>请你停下感受这件事: <em>Hamilton 力学的 \(\dot f = \{f, H\}\) 是一条<em>普适</em> 的"<em>动力学法则</em>"——不分经典 / 量子</em>。在经典里它是相空间函数的演化; 在量子里它是 Hilbert 空间算子的演化。"<em>把 \(\{,\}\) 换成 \([,]/(i\hbar)\)</em>" 是结构层的字面替换, 物理含义不变。</p>
+
+<h2 id="sec21-5">21.5 量子化的歧义: ordering 问题</h2>
+
+<p>正则量子化看似<em>自动</em>, 但有一个隐藏问题——<em>排序歧义</em>。</p>
+
+<p>具体: 经典上 \(qp = pq\)（数 commute）, 同一<em>函数</em> 可以多种写法 \(qp\), \(pq\), \((qp + pq)/2\) 都相等。量子化后 \(\hat q \hat p \neq \hat p \hat q\)（差 \(i \hbar\)）。所以经典函数 \(f(q, p) = qp\) 量子化时<em>不</em> 唯一——\(\hat q \hat p\)？\(\hat p \hat q\)？\((\hat q \hat p + \hat p \hat q)/2\)？三个不同算子都"<em>对应</em>" 经典 \(qp\)。</p>
+
+<p>这就是<em>operator ordering</em> 问题。正则量子化方案<em>本身</em> 不解决——给经典 \(f(q, p)\), 量子化结果 \(\hat f\) 可以有多个候选。</p>
+
+<p>常用约定:</p>
+
+<ul>
+  <li><em>Weyl 排序</em>: \(\widehat{qp}_{\text{Weyl}} = (\hat q \hat p + \hat p \hat q)/2\)（对称化）。它让 self-adjoint 性自动。</li>
+  <li><em>正规排序</em>（normal ordering, 量子场论用）: 所有 \(\hat a^\dagger\) 在左, 所有 \(\hat a\) 在右。</li>
+  <li><em>反正规排序</em>: 反过来。</li>
+</ul>
+
+<p>不同 ordering 给的算子<em>差 \(O(\hbar)\)</em>。经典极限 \(\hbar \to 0\) 时它们同一, 但量子修正不同。<em>实际物理</em> 选哪个 ordering 通常由"<em>self-adjoint 性 + 对称性</em>" 唯一定; 但<em>原则上</em> 量子化是"<em>多对一</em>" 的——许多量子理论对应同一经典极限。</p>
+
+<p>这件事的物理含义: <em>经典力学不<em>完全</em> 决定量子力学</em>。经典 \(\hbar \to 0\) 极限丢了信息。从经典 \(H\) 到量子 \(\hat H\) 不唯一; 反之, 量子 \(\hat H\) 到经典 \(H\) 唯一。这种"<em>不可逆</em>" 是物理学常态——更细的理论（量子）<em>含有</em> 粗理论（经典）的全部, 但反过来需要额外信息。</p>
+
+<p>为什么 ordering 问题不<em>毁掉</em> 量子化？因为<em>简单</em> 系统（谐振子、自由粒子、势 \(V(q)\)）的 Hamilton 函数在 \(q\) 与 \(p\) 中<em>分离</em>: \(H = T(p) + V(q)\)。这种 \(T(p) + V(q)\) 形式没有 \(qp\) 项, 所以 ordering 不出现。物理学绝大部分实际系统就是这种形式。<em>真</em> 出现 ordering 是带"<em>速度依赖</em>" 项（如电磁场里 \(p \cdot A(q)\)）, 那时需要选 Weyl 或对称化。</p>
+
+<h2 id="sec21-6">21.6 Feynman 路径积分</h2>
+
+<p>Heisenberg-Schrödinger-Dirac 1925-1928 的"<em>正则量子化</em>" 是<em>从经典代数走向量子算子</em>。1948 年 Feynman 给量子力学一个完全不同的形式——<em>路径积分</em>, <em>从经典作用量直接走向量子振幅</em>。这条路与 Hamilton 路对偶, 与 Lagrange 路同源。</p>
+
+<p>核心公式: 粒子从位置 \(x_i\) 在时间 \(t_i\) 到位置 \(x_f\) 在时间 \(t_f\) 的<em>量子振幅</em></p>
+
+<p>\[
+\boxed{\ \langle x_f | e^{-i \hat H (t_f - t_i)/\hbar} | x_i \rangle = \int \mathcal D x(t) \, e^{i S[x] / \hbar},\ }
+\]</p>
+
+<p>其中 \(\int \mathcal D x(t)\) 是"<em>对所有从 \((x_i, t_i)\) 到 \((x_f, t_f)\) 的路径求和</em>", \(S[x] = \int_{t_i}^{t_f} L(x, \dot x) \, dt\) 是这条路径的<em>经典作用量</em>。</p>
+
+<p>用人话: <em>量子粒子从 A 到 B 的振幅 = 所有可能路径的相位 \(e^{i S/\hbar}\) 的相干叠加</em>。每条路径都"<em>参与</em>", 不只是经典最小作用路径。</p>
+
+<p>这给了量子力学一个截然不同的画面:</p>
+
+<ul>
+  <li>经典: 唯一路径——使 \(S\) 取极值的那条（Hamilton 原理, 链<a href="ch5.html">第 5 章</a>）。</li>
+  <li>量子: <em>所有</em> 路径——每条加权 \(e^{i S/\hbar}\) 求和。</li>
+</ul>
+
+<p><em>这个加权 \(e^{iS/\hbar}\) 是"<em>振幅</em>"——一个复数, 不是概率</em>。最终概率是 \(|\sum_{\text{路径}} e^{iS/\hbar}|^2\)。这就是双缝实验里"<em>两条路径相位差</em> 决定干涉条纹" 背后的数学。</p>
+
+<p>路径积分的<em>实际</em> 计算: 把时间 \([t_i, t_f]\) 切成 \(N\) 段, \(\Delta t = (t_f - t_i)/N\), 路径变成离散点 \(x_0 = x_i, x_1, \ldots, x_N = x_f\), \(\mathcal D x = \prod_{k=1}^{N-1} dx_k\)（差归一化常数）, \(S \approx \sum_k L(x_k, (x_{k+1} - x_k)/\Delta t) \Delta t\)。然后 \(N \to \infty\)。</p>
+
+<p>这种"<em>全路径求和</em>" 视角的力量:</p>
+
+<ul>
+  <li>对量子场论<em>本质</em> 重要——QFT 里粒子有<em>无穷</em> 自由度, 算子代数难处理, 路径积分给最自然的形式。</li>
+  <li>对统计力学连接量子: <em>Wick 旋转</em> \(t \to -i \tau\) 让 \(e^{iS/\hbar} \to e^{-S_E/\hbar}\)（欧氏作用量）, 量子振幅变成<em>Boltzmann 权重</em>。这就是为什么 4 维量子场论 \(\equiv\) 4 维 statistical mechanics。</li>
+  <li>对计算: Monte Carlo 路径积分（链 V12 数值）让<em>非</em> 微扰量子计算成为可能。</li>
+</ul>
+
+<p>请你停下来比较 Feynman 路径积分 + 经典 Hamilton 原理:</p>
+
+<ul>
+  <li>Hamilton 原理（经典）: \(\delta S = 0\)——<em>极值</em> 路径选出。</li>
+  <li>Feynman 路径积分（量子）: 所有路径加权 \(e^{iS/\hbar}\)——所有路径都有, 但相位干涉抵消大部分。</li>
+</ul>
+
+<p>这两个表述<em>共享同一个 \(S\)</em>。"<em>经典 = 量子的极限</em>" 用稳态相位法可以从路径积分读出——见下节。</p>
+
+<h2 id="sec21-7">21.7 经典极限 \(\hbar \to 0\): 稳态相位</h2>
+
+<p>路径积分 \(\int \mathcal D x \, e^{i S[x] / \hbar}\) 当 \(\hbar \to 0\) 时怎么样？</p>
+
+<p>这是一个<em>振荡积分</em>——\(e^{iS/\hbar}\) 的相位 \(S/\hbar\) 当 \(\hbar\) 小时<em>剧烈</em> 振荡。绝大部分路径上, \(S\) 稍变, 相位 \(S/\hbar\) 巨变, 相邻路径贡献<em>互相抵消</em>。<em>不</em> 抵消的只有"<em>相位稳态</em>" 的路径——即 \(S\) 在 \(x(t)\) 下不变的路径, 数学条件 \(\delta S / \delta x = 0\)——<em>正是 Euler-Lagrange 方程</em>!</p>
+
+<p>所以 \(\hbar \to 0\) 时主导贡献来自<em>经典路径</em>。</p>
+
+<p>具体: 用<em>稳态相位法</em>（method of stationary phase）。设 \(S\) 在 \(x_{cl}(t)\) 处极值（即 \(x_{cl}\) 是经典解 EL 方程）。在 \(x_{cl}\) 附近 \(x = x_{cl} + \eta\):</p>
+
+<p>\[
+S[x] = S[x_{cl}] + \frac{1}{2} \int \int \eta(t) \frac{\delta^2 S}{\delta x(t) \delta x(t')} \eta(t') \, dt dt' + O(\eta^3).
+\]</p>
+
+<p>一阶项消失（\(x_{cl}\) 是极值）。代入路径积分, 用 Gauss 积分（链 V11 复分析的 saddle point 法）算 \(\eta\) 积分:</p>
+
+<p>\[
+\int \mathcal D x \, e^{i S/\hbar} \approx C \cdot e^{i S[x_{cl}]/\hbar} \cdot \frac{1}{\sqrt{\det(\delta^2 S)}}.
+\]</p>
+
+<p>主导<em>相位</em> 是 \(e^{i S_{cl}/\hbar}\), 即经典作用量。这就是著名的<em>半经典近似</em>。</p>
+
+<p>请你看这件事的力量: <em>从 Feynman 路径积分自动推出经典力学</em>。我们不必<em>另外假设</em> "经典极限是 EL 方程"; 它从振荡积分的稳态相位法<em>自然</em> 浮出。这是路径积分相比正则量子化最优雅的一面——经典力学<em>不</em> 是公理, 是<em>结论</em>。</p>
+
+<p>更广: 半经典展开 \(\sum_k \hbar^k$ 的高阶项给"<em>量子修正</em>"——经典轨道周围的高斯涨落 + 高阶非线性。<em>每一阶 \(\hbar\) 是越细的量子精度</em>。这套展开是<a href="../量子力学/index.html">V14 量子力学</a> ch15 的 WKB 展开 + ch16 Feynman 图论的根。</p>
+
+<h2 id="sec21-8">21.8 半经典近似 (WKB)</h2>
+
+<p>"<em>稳态相位</em>" 给路径积分版的经典极限。还有一个等价但更早的方案——<em>WKB 近似</em>（Wentzel-Kramers-Brillouin, 1926）, 直接从 Schrödinger 方程出发。</p>
+
+<p>对 1 维 Schrödinger 方程 \(-\hbar^2 \psi''/(2m) + V(x) \psi = E \psi\), 假设解形式</p>
+
+<p>\[
+\psi(x) = e^{i \sigma(x)/\hbar},
+\]</p>
+
+<p>代入并按 \(\hbar\) 展开 \(\sigma = \sigma_0 + \hbar \sigma_1 + \hbar^2 \sigma_2 + \ldots\)。最低阶 (\(\hbar^0\)) 给</p>
+
+<p>\[
+(\sigma_0')^2 = 2m(E - V(x)),
+\]</p>
+
+<p>这<em>正是经典 Hamilton-Jacobi 方程</em>（链<a href="ch14.html">第 14 章</a>）! 解 \(\sigma_0(x) = \int \sqrt{2m(E - V)} \, dx = \int p(x) \, dx\)——经典作用量沿能量为 \(E\) 的轨道的累积。</p>
+
+<p>下一阶 (\(\hbar^1\)) 给"<em>幅度</em>" 修正: \(\sigma_1\) 包含 \(\ln \sqrt{p(x)}\), 给出</p>
+
+<p>\[
+\psi_{\text{WKB}}(x) \approx \frac{1}{\sqrt{p(x)}} \exp\left( \frac{i}{\hbar} \int p(x') \, dx' \right).
+\]</p>
+
+<p>这是<em>WKB 近似波函数</em>。它在"<em>经典允许区</em>" \(E > V(x)\)（\(p\) 实）有效, 在<em>经典禁区</em> \(E < V(x)\)（\(p\) 虚）变成指数衰减——这给量子隧穿的振幅估算。</p>
+
+<p>WKB 视角的关键洞察: <em>量子波函数的相位 = 经典作用量 / \(\hbar\)</em>。这就是为什么 Hamilton-Jacobi 方程 \(\partial S/\partial t + H = 0\) 是"<em>经典波动方程</em>"（链 ch14 末段）——它已经包含了量子里的相位演化, 经典极限只看相位的 leading 项。</p>
+
+<p>Schrödinger 1926 年得出他的方程, <em>正是从 Hamilton-Jacobi 方程出发</em>: 把 \(\psi = e^{iS/\hbar}\) 代入, 反推 \(\psi\) 该满足什么方程。这条历史路径——<em>从经典 Hamilton-Jacobi 到量子 Schrödinger</em>——是经典 → 量子桥的最短路。</p>
+
+<p>请你欣赏这条逻辑链: 经典力学的<em>四种语言</em> 各通向量子力学的不同形式。</p>
+
+<ul>
+  <li>Lagrange（变分原理）→ Feynman 路径积分（21.6）。</li>
+  <li>Hamilton（相空间）→ Heisenberg 矩阵力学（21.4）。</li>
+  <li>Poisson（代数）→ Dirac 算子代数（21.1-21.5）。</li>
+  <li>Hamilton-Jacobi（PDE）→ Schrödinger 波动力学（21.8 + WKB）。</li>
+</ul>
+
+<p>四条路<em>等价</em>（Dirac 1930 + von Neumann 1932 + Feynman 1948 给同构证明）。本书前 20 章的<em>每一种</em> 经典语言, 都直接对应一种量子力学形式。这绝非巧合——它说明经典 Hamilton-Lagrange 框架<em>本身</em> 已携带量子化的种子。</p>
+
+<h2 id="sec21-9">21.9 现代视角: 几何量子化</h2>
+
+<p>正则量子化是"<em>菜谱式</em>" 的——给经典系统, 套规则, 写量子。但严格做起来有几个深问题:</p>
+
+<ul>
+  <li>ordering 歧义（21.5）。</li>
+  <li>"<em>怎么从相空间 \(M\) 构造 Hilbert 空间 \(\mathcal H\)</em>" 不显然。\(M\) 是个流形, \(\mathcal H\) 是个无穷维向量空间, 之间的"<em>构造</em>" 关系？</li>
+  <li>正则量子化偏好 \((q, p)\) 坐标, 但经典力学的<em>本</em> 是"<em>辛流形</em>"（链<a href="ch24.html">第 24 章</a>）, 不依赖坐标。</li>
+</ul>
+
+<p>1970-1980 年代, Kostant + Souriau + Kirillov 等人发展<em>几何量子化</em> 解决这些问题。基本想法:</p>
+
+<ol>
+  <li>从辛流形 \((M, \omega)\) 出发——纯几何对象, 无坐标。</li>
+  <li><em>预量子化</em>: 在 \(M\) 上构造一个<em>线丛</em> \(L\), 使 \(\omega\) 是 \(L\) 的曲率 / \(\hbar\)。这要求 Bohr-Sommerfeld 量子化条件——\(\int \omega / \hbar \in 2\pi \mathbb Z\)（Dirac 1931 早早提过）。</li>
+  <li><em>极化</em>: 选一个"<em>方向</em>"——\(M\) 上的 \(n\) 维子分布, Hilbert 空间是<em>沿这个分布常数</em> 的 \(L\) 截面。<em>极化的选择对应 \((q, p)\) 表象 vs \((p)\) 表象 vs Bargmann 表象 \(\ldots\)</em>。</li>
+</ol>
+
+<p>这套理论让<em>量子化变成几何运算</em>——不依赖坐标, 不依赖 ordering 选择（极化已经给唯一答案）。它给经典 → 量子桥一个干净数学框架, 应用于:</p>
+
+<ul>
+  <li><em>表示论</em>（Kirillov orbit method, 链 V13 微分几何 ch24）: Lie 群的酉表示 \(\leftrightarrow\) 共轭轨道（即一种特殊辛流形）的几何量子化。</li>
+  <li><em>规范理论 / 拓扑场论</em>: 几何量子化 Atiyah-Bott 1982 给 Chern-Simons 3 维场论的精确量子化。</li>
+  <li><em>BRST + 约束系统</em>: 几何量子化处理"<em>带规范对称的经典系统</em>" 的量子化。</li>
+</ul>
+
+<p>这些都超出本书范围。但你应该知道: <em>经典 → 量子的桥不止"正则量子化菜谱" 一种</em>。几何量子化是更深的桥梁, 适合数学严格场合。物理实用上还是用菜谱; 但<em>理解</em> 量子化的几何根基, 让你看见经典力学和量子力学共享的<em>底层</em>: 辛几何。</p>
+
+<h2 id="sec21-10">21.10 临别话: 经典 / 量子是同一种力学</h2>
+
+<p>这一章贯穿一条主线: <em>经典力学和量子力学不是两套独立的物理, 是同一套代数 / 几何结构的两个具体化</em>。具体见证:</p>
+
+<ul>
+  <li>Poisson 括号 \(\to\) 对易子（21.1-21.2）。</li>
+  <li>Hamilton 流 \(\to\) Heisenberg 演化（21.4）。</li>
+  <li>Lagrange 作用量 \(\to\) 路径积分振幅（21.6）。</li>
+  <li>Hamilton-Jacobi PDE \(\to\) Schrödinger 方程（21.8）。</li>
+  <li>辛流形 \(\to\) 几何量子化（21.9）。</li>
+</ul>
+
+<p>经典 \(\hbar \to 0\) + 量子 \(\hbar > 0\) 是连续家族; 它们的代数 / 几何形状是一样的。<em>本书前 20 章建立的所有 Lagrange-Hamilton-Poisson 形式, 是直接通往量子力学的预备语言</em>。</p>
+
+<p>请你回头看这件事的<em>历史</em> 巧合。1788 年 Lagrange 写《<em>Mécanique analytique</em>》时, 量子力学还没影; 1833 年 Hamilton 写正则方程时, 也没人想到这套会用到原子。可<em>结果</em>——这两位 18-19 世纪天才发明的"<em>变分 / 相空间</em>" 形式, <em>恰好</em> 是 1925 Heisenberg + 1926 Schrödinger 量子力学需要的形式。<em>不是巧合</em>: Lagrange-Hamilton 框架<em>抓住了力学的代数 / 几何本质</em>, 这个本质既适合经典又适合量子。</p>
+
+<p>这种"<em>古典数学预言现代物理</em>" 例子在物理学 history 重复出现——Riemann 1854 的弯曲几何被 Einstein 1915 拿去做广义相对论; Hilbert 1900 的算子代数被 Heisenberg 1925 拿去做量子力学; 群论被粒子物理拿去做基本相互作用。<em>数学家在物理学家用它之前几十年就准备好了工具</em>。这是数学与物理互相滋养的最美的一面。</p>
+
+<p>下一章我们换方向: 把经典力学推到<em>另一个</em> 极端——高速运动 (\(v \sim c\))。狭义相对论强迫 Lagrangian 必须 Lorentz 不变, 这是变分原理在四维 Minkowski 时空里的体现。然后 ch23-24 给两个具体应用——航天 + 几何力学。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch20.html">← 上一章 · 第 20 章 经典场论</a><a href="ch22.html">下一章 · 第 22 章 相对论力学 →</a></nav>
+</main>
+</body>
+</html>

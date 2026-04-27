@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 刚体动力学 + 欧拉角 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 小振动 + 简正模式</a><a href="ch10.html">下一章 · 第 10 章 Legendre 变换 + Hamiltonian →</a></nav>
+<h1 id="ch9">第 9 章 刚体动力学 + 欧拉角</h1>
+
+<p>请你想象一个普通陀螺。圆盘形的, 中间一根竖直的轴, 用绳子绕一下用力一拉, 它转起来, 然后<em>不稳定地</em> 站在桌子上。如果它没在转, 你松手它<em>立刻</em> 倒下——不平衡的物体在重力下倒, 这是常识。</p>
+
+<p>但<em>转着</em> 的陀螺<em>不</em> 倒。它的轴不会沿着重力方向坠落, 反而<em>横着</em> 慢慢绕一个竖直方向画圆——这种运动叫<em>进动</em>（precession）。如果你仔细看, 在进动的同时陀螺轴还<em>上下点头</em>——这叫<em>章动</em>（nutation）。整个画面: 陀螺自转 + 进动 + 章动, 三个旋转叠在一起, 看起来既魔幻又违反直觉。</p>
+
+<p>请你停下来<em>认真</em> 想这个现象。陀螺不倒, 难道重力消失了? 不, 重力还在, 它给陀螺一个<em>转矩</em>（绕底部支点）。可这个转矩没让陀螺<em>倒</em>, 反而让它<em>横着旋转</em>。这件事在 Newton F=ma 直觉里完全说不通——你推一个东西, 它应该往推的方向加速。怎么"<em>推</em>" 一个陀螺让它往<em>横向</em> 走?</p>
+
+<p>答案藏在<em>角动量与转矩的关系</em>里。Newton 第二定律的旋转版本是 \(\boldsymbol \tau = d\boldsymbol L / dt\): 转矩等于角动量的变化率。重力转矩是<em>水平</em> 的（垂直于陀螺轴 + 垂直于重力方向）, 所以它让<em>角动量\(\boldsymbol L\)</em> 沿水平方向变化——这意味着 \(\boldsymbol L\) 这个向量<em>方向</em> 旋转, 大小不变。陀螺轴<em>跟着</em> \(\boldsymbol L\) 一起旋转, 就成了进动。一句话: <em>"\(\boldsymbol \tau = d \boldsymbol L / dt\)" 不是 "推 → 加速", 是 "推 → 角动量旋转"</em>。</p>
+
+<p>这条故事告诉我们: 刚体动力学需要<em>新的</em> 概念——不是质点力学的简单类比, 而是一整套基于<em>角动量、惯性张量、欧拉方程</em> 的体系。本章把刚体动力学完整建立: 6 自由度 → 角速度 → 角动量 → 惯性张量（链<a href="../线性代数/index.html">线性代数</a>对称矩阵的特征值分解）→ 主轴 → Euler 方程 → 欧拉角参数化 → 重力下对称陀螺的完整解。证明从问题里自然长出。</p>
+
+<h2 id="sec9-1">9.1 刚体的定义 + 6 自由度</h2>
+
+<p><em>刚体</em>（rigid body）是任意两点间距离<em>不变</em> 的物体。理想化——真实物体多少有变形, 但变形相比"<em>整体运动</em>" 小很多时, 把它看成刚体是个好近似（陀螺、行星、汽车车身、骰子）。</p>
+
+<p>一个由 \(N\) 个质点构成的自由系统有 \(3N\) 自由度。但刚体的"<em>距离不变</em>" 给了多少约束? \(N\) 个点之间有 \(N(N-1)/2\) 个距离, 但只<em>独立</em> 一部分。总数计算的简洁方式是: <em>三个不共线的点已经把刚体的位置 / 取向锁死</em>——其他点都被它们决定。三个点有 9 个坐标, 减 3 个"<em>距离不变</em>" 约束（点 1-2、1-3、2-3 距离）= 6 自由度。所以</p>
+
+<p>\[
+\boxed{\ \text{刚体在 3D 空间里有 6 个自由度.}\ }
+\]</p>
+
+<p>这 6 个怎么参数化? 最自然: <em>3 个</em> 用于<em>质心位置</em>（\(x_{\text{cm}}, y_{\text{cm}}, z_{\text{cm}}\)）, <em>3 个</em> 用于<em>取向</em>（绕质心的旋转）。前 3 个就是普通质点平动力学。本章重点在<em>后</em> 3 个——刚体绕<em>质心</em>（或者绕一个固定点）的转动。</p>
+
+<p>取向的 3 个自由度怎么参数化? 一个朴素方式: 选 3 个角度（"<em>欧拉角</em>"）。我们 9.7 节专门讲。在做参数化之前, 先讲<em>不依赖坐标</em> 的概念: 角速度、角动量、惯性张量、转动动能。</p>
+
+<h2 id="sec9-2">9.2 角速度 + 角动量 + 转动动能</h2>
+
+<p><strong>角速度</strong> \(\boldsymbol \omega\)。设刚体绕固定点（或质心）旋转, 取向用一个 \(3 \times 3\) 旋转矩阵 \(R(t) \in SO(3)\) 描述（"<em>把初始取向旋转到 \(t\) 时刻取向</em>" 的矩阵）。<em>角速度</em> \(\boldsymbol \omega\) 是这样一个 3 维向量: 任意刚体上一点 \(\boldsymbol r\)（相对旋转中心）的速度是</p>
+
+<p>\[
+\boldsymbol v = \boldsymbol \omega \times \boldsymbol r.
+\]</p>
+
+<p>具体推导: 一点 \(\boldsymbol r(t) = R(t) \boldsymbol r_0\)（\(\boldsymbol r_0\) 是初始位置）。求导 \(\dot{\boldsymbol r} = \dot R \boldsymbol r_0 = \dot R R^{-1} \boldsymbol r\)。设 \(\Omega := \dot R R^{-1}\) 是 \(3 \times 3\) 矩阵, 由 \(R^T R = I\) 求导得 \(\dot R^T R + R^T \dot R = 0\), 即 \(\dot R R^{-1} = -(R^{-1})^T \dot R^T = -\Omega^T\)。所以 \(\Omega = -\Omega^T\)——\(\Omega\) 是<em>反对称</em>。任何 \(3 \times 3\) 反对称矩阵可以写成</p>
+
+<p>\[
+\Omega = \begin{pmatrix} 0 & -\omega_3 & \omega_2 \\ \omega_3 & 0 & -\omega_1 \\ -\omega_2 & \omega_1 & 0 \end{pmatrix},
+\]</p>
+
+<p>把 \(\Omega \boldsymbol r\) 算出来正好是 \(\boldsymbol \omega \times \boldsymbol r\), 其中 \(\boldsymbol \omega = (\omega_1, \omega_2, \omega_3)\)。这就是<em>角速度向量</em>。它的<em>方向</em> 是瞬时旋转轴, 大小 \(|\boldsymbol \omega|\) 是旋转速率（rad/s）。</p>
+
+<p><strong>角动量</strong> \(\boldsymbol L\)。对单点 \(\boldsymbol L = \boldsymbol r \times \boldsymbol p = m \boldsymbol r \times \boldsymbol v\)。对刚体, 把所有质点的角动量加起来:</p>
+
+<p>\[
+\boldsymbol L = \sum_\alpha m_\alpha \boldsymbol r_\alpha \times \boldsymbol v_\alpha = \sum_\alpha m_\alpha \boldsymbol r_\alpha \times (\boldsymbol \omega \times \boldsymbol r_\alpha).
+\]</p>
+
+<p>这里 \(\boldsymbol r_\alpha\) 是第 \(\alpha\) 个质点相对旋转中心的位置。用<em>三重叉乘公式</em> \(\boldsymbol a \times (\boldsymbol b \times \boldsymbol c) = \boldsymbol b (\boldsymbol a \cdot \boldsymbol c) - \boldsymbol c (\boldsymbol a \cdot \boldsymbol b)\):</p>
+
+<p>\[
+\boldsymbol r \times (\boldsymbol \omega \times \boldsymbol r) = \boldsymbol \omega (r^2) - \boldsymbol r (\boldsymbol r \cdot \boldsymbol \omega).
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\boldsymbol L = \sum_\alpha m_\alpha [r_\alpha^2 \boldsymbol \omega - \boldsymbol r_\alpha (\boldsymbol r_\alpha \cdot \boldsymbol \omega)].
+\]</p>
+
+<p>用矩阵形式 \(\boldsymbol L = I \boldsymbol \omega\), 其中</p>
+
+<p>\[
+\boxed{\ I_{ij} = \sum_\alpha m_\alpha (r_\alpha^2 \delta_{ij} - r_{\alpha, i} r_{\alpha, j}).\ }
+\]</p>
+
+<p>\(I\) 是个 \(3 \times 3\) 对称矩阵, 叫<em>惯性张量</em>（inertia tensor）。它把<em>角速度向量</em> 映到<em>角动量向量</em>——刚体的"<em>转动质量</em>"。</p>
+
+<p>对连续刚体（密度 \(\rho(\boldsymbol r)\)）:</p>
+
+<p>\[
+I_{ij} = \int \rho(\boldsymbol r) (r^2 \delta_{ij} - r_i r_j) \, dV.
+\]</p>
+
+<p>具体写出三对角项:</p>
+
+<p>\[
+I_{xx} = \int \rho (y^2 + z^2) dV, \quad I_{yy} = \int \rho (x^2 + z^2) dV, \quad I_{zz} = \int \rho (x^2 + y^2) dV.
+\]</p>
+
+<p>对角项叫<em>主惯性矩</em>（关于 \(x, y, z\) 轴的）。非对角项 \(I_{xy} = -\int \rho \, x y \, dV\) 等叫<em>惯性积</em>。</p>
+
+<p><strong>转动动能</strong>。每个质点 \(\frac{1}{2} m_\alpha v_\alpha^2 = \frac{1}{2} m_\alpha (\boldsymbol \omega \times \boldsymbol r_\alpha)^2\)。求和（用 \(|\boldsymbol \omega \times \boldsymbol r|^2 = \omega^2 r^2 - (\boldsymbol \omega \cdot \boldsymbol r)^2\)）:</p>
+
+<p>\[
+T_{\text{rot}} = \frac{1}{2} \sum_\alpha m_\alpha [\omega^2 r_\alpha^2 - (\boldsymbol \omega \cdot \boldsymbol r_\alpha)^2] = \frac{1}{2} \sum_{i,j} \omega_i I_{ij} \omega_j = \frac{1}{2} \boldsymbol \omega^T I \boldsymbol \omega.
+\]</p>
+
+<p>合起来 \(T_{\text{rot}} = \frac{1}{2} \boldsymbol \omega \cdot \boldsymbol L\)（直接由 \(\boldsymbol L = I \boldsymbol \omega\) 看出）。和质点的 \(T = \frac{1}{2} \boldsymbol p \cdot \boldsymbol v\) 形式类似——只是 \(\boldsymbol p, \boldsymbol v\) 换成 \(\boldsymbol L, \boldsymbol \omega\)。</p>
+
+<p>请你停下来注意一件关键的事: <em>对刚体, \(\boldsymbol L\) 一般不平行于 \(\boldsymbol \omega\)</em>。\(\boldsymbol L = I \boldsymbol \omega\) 是矩阵 × 向量, 矩阵把方向"<em>扭一下</em>"。只有特殊方向（\(I\) 的特征向量）上, \(\boldsymbol L\) 平行 \(\boldsymbol \omega\)。这条事实是刚体动力学一切奇怪现象的根源——下一节展开。</p>
+
+<h2 id="sec9-3">9.3 惯性张量的对称性 + 主轴</h2>
+
+<p>\(I\) 是 \(3 \times 3\)<em>实对称</em> 矩阵。线性代数告诉我们（链<a href="../线性代数/index.html">线性代数 ch8</a>: 实对称矩阵的谱定理）:</p>
+
+<ul>
+  <li>\(I\) 有 3 个<em>实</em> 特征值 \(I_1, I_2, I_3\)（计数重数）。</li>
+  <li>不同特征值对应的特征向量<em>正交</em>。</li>
+  <li>存在<em>正交</em> 特征向量基 \(\hat{\boldsymbol e}_1, \hat{\boldsymbol e}_2, \hat{\boldsymbol e}_3\) 使 \(I \hat{\boldsymbol e}_k = I_k \hat{\boldsymbol e}_k\)。</li>
+</ul>
+
+<p>这三个正交方向叫<em>主轴</em>（principal axes）, 三个特征值叫<em>主转动惯量</em>（principal moments）。在主轴坐标系下:</p>
+
+<p>\[
+I = \text{diag}(I_1, I_2, I_3) = \begin{pmatrix} I_1 & 0 & 0 \\ 0 & I_2 & 0 \\ 0 & 0 & I_3 \end{pmatrix}.
+\]</p>
+
+<p>而且<em>所有 \(I_k > 0\)</em>（\(I\) 正定: \(\boldsymbol \omega^T I \boldsymbol \omega = 2 T_{\text{rot}} \ge 0\), 等于 0 只有 \(\boldsymbol \omega = 0\)）。</p>
+
+<p>主轴的物理意义: <em>当 \(\boldsymbol \omega\) 沿一个主轴时, \(\boldsymbol L = I \boldsymbol \omega\) 也沿同一主轴, 即 \(\boldsymbol L \parallel \boldsymbol \omega\)</em>。这是<em>唯一</em> 让 \(\boldsymbol L\) 平行于 \(\boldsymbol \omega\) 的方向。其他方向都"<em>歪</em>"。</p>
+
+<p>怎么找主轴? 大多数刚体的对称性<em>白送</em> 给你主轴。比如:</p>
+
+<ul>
+  <li>立方体（关于质心对称）: 任何过质心的轴都是主轴, 三个 \(I_k\) 相等。</li>
+  <li>圆柱（关于对称轴）: 对称轴是一个主轴, 任何垂直它的方向都是另一个主轴, 两个 \(I_k\) 相等（"<em>对称陀螺</em>"）。</li>
+  <li>长方体（边长 \(a > b > c\)）: 三条边方向是三个主轴, 三个 \(I_k\) 不等（"<em>不对称陀螺</em>"）。</li>
+</ul>
+
+<p>对一般不对称物体（无明显对称性）, 你算 \(I_{ij}\) 然后做特征值分解（数值上 \(O(1)\) 步——\(3 \times 3\) 矩阵）。这步就是<em>对角化</em> \(I\), 找它的特征值和特征向量。</p>
+
+<p>例 (具体计算)。<em>均质长方体</em>, 边长 \(2a, 2b, 2c\), 质量 \(M\), 中心在原点。算 \(I_{xx}\):</p>
+
+<p>\[
+I_{xx} = \int \rho (y^2 + z^2) dV = \frac{M}{8 abc} \int_{-a}^a dx \int_{-b}^b dy \int_{-c}^c dz \, (y^2 + z^2) = \frac{M}{3} (b^2 + c^2).
+\]</p>
+
+<p>同理 \(I_{yy} = M(a^2 + c^2)/3\), \(I_{zz} = M(a^2 + b^2)/3\)。\(I_{xy} = -\frac{M}{8abc} \int xy \, dV = 0\)（被积函数<em>反对称</em>, 积分区间对称）。同理其他非对角项均为 0。所以</p>
+
+<p>\[
+I = \frac{M}{3} \text{diag}(b^2 + c^2, a^2 + c^2, a^2 + b^2),
+\]</p>
+
+<p>已经对角——三条棱方向已是主轴。这正是你期望的: 长方体的对称性"<em>白送</em>" 主轴。</p>
+
+<h2 id="sec9-4">9.4 主轴坐标的方便</h2>
+
+<p>选主轴坐标系（设固在<em>刚体上</em>, 跟着旋转）后, 转动动能与角动量都简化:</p>
+
+<p>\[
+T_{\text{rot}} = \frac{1}{2} (I_1 \omega_1^2 + I_2 \omega_2^2 + I_3 \omega_3^2),
+\]</p>
+
+<p>\[
+\boldsymbol L = (I_1 \omega_1, I_2 \omega_2, I_3 \omega_3)^T \quad (\text{在主轴坐标系下}).
+\]</p>
+
+<p>即 \(L_k = I_k \omega_k\)。每个分量分开。这是主轴坐标的实际方便——把 \(\boldsymbol L = I \boldsymbol \omega\) 这个矩阵-向量乘法对角化。</p>
+
+<p>注意一个子细节: 主轴是<em>固定在刚体上</em> 的, 即它跟着刚体一起转。所以"<em>主轴坐标系</em>" 是<em>非</em> 惯性的——惯性系（实验室系）下牛顿力学的 \(\boldsymbol \tau = d\boldsymbol L / dt\) 在<em>转动</em> 系下要修正。下一节做这个修正, 给出<em>Euler 方程</em>。</p>
+
+<h2 id="sec9-5">9.5 Euler 方程</h2>
+
+<p>Newton 第二定律的旋转版本（<em>实验室系</em>）:</p>
+
+<p>\[
+\frac{d \boldsymbol L}{dt}\bigg|_{\text{lab}} = \boldsymbol \tau,
+\]</p>
+
+<p>转矩 \(\boldsymbol \tau\) 是外力关于旋转中心的力矩。但我们想在<em>主轴系</em>（跟刚体转）里写 \(\boldsymbol L\), 因为那里 \(I\) 对角。两个坐标系之间, 任意向量的时间导数转换公式是</p>
+
+<p>\[
+\frac{d \boldsymbol L}{dt}\bigg|_{\text{lab}} = \frac{d \boldsymbol L}{dt}\bigg|_{\text{body}} + \boldsymbol \omega \times \boldsymbol L,
+\]</p>
+
+<p>这是任何"<em>从惯性系到旋转系</em>" 的标准变换（你在多元微积分里见过它）。所以</p>
+
+<p>\[
+\frac{d \boldsymbol L}{dt}\bigg|_{\text{body}} + \boldsymbol \omega \times \boldsymbol L = \boldsymbol \tau.
+\]</p>
+
+<p>在主轴坐标下 \(L_k = I_k \omega_k\)（\(I_k\) 常数, 因为是物体属性, 不随时间变）, 所以 \(dL_k/dt|_{\text{body}} = I_k \dot \omega_k\)。叉乘 \(\boldsymbol \omega \times \boldsymbol L\) 的分量算:</p>
+
+<p>\[
+(\boldsymbol \omega \times \boldsymbol L)_1 = \omega_2 L_3 - \omega_3 L_2 = (I_3 - I_2) \omega_2 \omega_3, \text{ etc.}
+\]</p>
+
+<p>合起来三条:</p>
+
+<p>\[
+\boxed{\ \begin{aligned}
+I_1 \dot \omega_1 &= (I_2 - I_3) \omega_2 \omega_3 + \tau_1, \\
+I_2 \dot \omega_2 &= (I_3 - I_1) \omega_3 \omega_1 + \tau_2, \\
+I_3 \dot \omega_3 &= (I_1 - I_2) \omega_1 \omega_2 + \tau_3.
+\end{aligned}\ }
+\]</p>
+
+<p>这是<em>Euler 方程</em>（1758）, 刚体动力学的核心方程。</p>
+
+<p>读法: 每条方程左边是<em>角动量分量</em> 的变化率, 右边是<em>转矩</em> 加一个"<em>陀螺项</em>" \((I_j - I_k) \omega_j \omega_k\)。陀螺项<em>非线性</em>, 是刚体力学一切复杂性的根源——它让"<em>没外力的</em>" 自由刚体也能有奇怪运动。</p>
+
+<p>请你停下来感受这件事的特别: 没外力（\(\tau = 0\)）的<em>质点</em> 做匀速直线运动——简单。没外力的<em>刚体</em> 还有<em>非平凡</em> 角速度演化——\(\boldsymbol \omega(t)\) 一般不是常数, 而是 Euler 方程给出的复杂时间函数。下一节看自由刚体的几个具体例子。</p>
+
+<h2 id="sec9-6">9.6 自由刚体: 网球拍定理 + Poinsot 几何</h2>
+
+<p>"<em>自由</em>" = 无外转矩 = \(\boldsymbol \tau = 0\)。Euler 方程化为</p>
+
+<p>\[
+I_1 \dot \omega_1 = (I_2 - I_3) \omega_2 \omega_3, \quad \text{etc.}
+\]</p>
+
+<p>有两个守恒量: <em>动能</em> \(T = \frac{1}{2}(I_1 \omega_1^2 + I_2 \omega_2^2 + I_3 \omega_3^2)\) 与<em>角动量大小平方</em> \(L^2 = I_1^2 \omega_1^2 + I_2^2 \omega_2^2 + I_3^2 \omega_3^2\)。所以 \(\boldsymbol \omega(t)\) 的轨迹被两个二次曲面（椭球）的<em>交线</em> 限制——在 \(\omega\) 空间画出复杂闭合曲线。</p>
+
+<p><strong>稳态解</strong>: 沿任一<em>主轴</em> 旋转。设 \(\boldsymbol \omega = \omega \hat{\boldsymbol e}_1\), 即 \(\omega_2 = \omega_3 = 0\)。Euler 方程: \(I_1 \dot \omega_1 = 0, \dot \omega_2 = \dot \omega_3 = 0\)。所有 \(\dot \omega_k = 0\)——<em>稳态</em>。同样沿 \(\hat{\boldsymbol e}_2, \hat{\boldsymbol e}_3\) 也是稳态。三个主轴都给出"<em>稳态自转</em>"。</p>
+
+<p>但这三个稳态不是同样<em>稳定</em> 的! 设 \(I_1 < I_2 < I_3\)（不对称陀螺）, 在每个主轴稳态附近做<em>线性扰动分析</em>:</p>
+
+<ul>
+  <li>沿 <em>\(\hat{\boldsymbol e}_1\)</em>（最小转动惯量）: 扰动衰减, <em>稳定</em>。</li>
+  <li>沿 <em>\(\hat{\boldsymbol e}_3\)</em>（最大转动惯量）: 扰动衰减, <em>稳定</em>。</li>
+  <li>沿 <em>\(\hat{\boldsymbol e}_2\)</em>（<em>中间</em> 转动惯量）: 扰动<em>指数增长</em>, <em>不稳定</em>!</li>
+</ul>
+
+<p>这就是著名的<em>网球拍定理</em>（intermediate axis theorem, or Dzhanibekov effect）。具体证明: 设 \(\boldsymbol \omega = \omega_2 \hat{\boldsymbol e}_2 + \delta \omega_1 \hat{\boldsymbol e}_1 + \delta \omega_3 \hat{\boldsymbol e}_3\), \(\delta\) 小。线性化 Euler 方程:</p>
+
+<p>\[
+I_1 \dot{\delta \omega_1} = (I_2 - I_3) \omega_2 \delta \omega_3, \quad I_3 \dot{\delta \omega_3} = (I_1 - I_2) \omega_2 \delta \omega_1.
+\]</p>
+
+<p>合并成 \(\ddot{\delta \omega_1} = \frac{(I_2 - I_3)(I_1 - I_2)}{I_1 I_3} \omega_2^2 \, \delta \omega_1\)。</p>
+
+<p>系数符号: \(I_1 < I_2 < I_3\) 给 \((I_2 - I_3) < 0\), \((I_1 - I_2) < 0\), 乘积 \(> 0\), 所以系数<em>正</em>。\(\ddot {\delta \omega_1} = +c^2 \delta \omega_1\), 解 \(e^{ct}\)——指数发散! 中间主轴稳态不稳定。</p>
+
+<p>反过来对最小或最大主轴, 系数<em>负</em>, 解振荡, 稳定。</p>
+
+<p>这条结论有个超有趣的实验展示: <em>Dzhanibekov</em>（俄国宇航员 1985）在国际空间站把一个 T 形螺母（一个不对称物体）甩在零重力舱里, 视频显示它绕中间轴自转一段后<em>突然翻转</em>——并且周期性<em>反复</em> 翻转。这就是中间轴不稳定。"<em>网球拍定理</em>" 这个名字来自把网球拍向上抛（绕中间轴自转 = 拍面绕拍把方向旋转）, 接住时拍面方向<em>翻了 180°</em>——任何打过球的人都干过这件事, 不知道它的物理学解释就在 Euler 方程里。</p>
+
+<p><strong>Poinsot 几何描述</strong>。1834 年 Poinsot 给自由刚体一个漂亮的几何画面: 在物体坐标系里画"<em>能量椭球</em>" \(I_1 \omega_1^2 + I_2 \omega_2^2 + I_3 \omega_3^2 = 2T\)（\(\boldsymbol \omega\) 端点的轨迹必在它上）。在实验室坐标系里有一个<em>不变平面</em>（垂直于 \(\boldsymbol L\) 方向, 距原点 \(2T/L\) 处）。Poinsot 定理: <em>能量椭球在不变平面上无滑动地滚动</em>, 而 \(\boldsymbol \omega\) 是它们的接触点（轴方向）。这个画面把自由刚体的复杂运动可视化成"<em>椭球在墙上滚</em>", 是经典力学最美的几何之一。</p>
+
+<h2 id="sec9-7">9.7 欧拉角参数化</h2>
+
+<p>到现在我们用过角速度向量 \(\boldsymbol \omega\), 但没正面参数化"<em>取向</em>"——三个角度具体怎么选。最常见的<em>欧拉角</em> 选法是 \(z\)-\(x\)-\(z\) 序列:</p>
+
+<ol>
+  <li>从实验室系出发, 绕 \(z\) 轴转一个角 \(\phi\) (precession angle, 进动角)。</li>
+  <li>再绕<em>新</em> 的 \(x\) 轴转一个角 \(\theta\) (nutation angle, 章动角)。</li>
+  <li>再绕<em>新</em> 的 \(z\) 轴转一个角 \(\psi\) (spin angle, 自旋角)。</li>
+</ol>
+
+<p>三个角 \((\phi, \theta, \psi)\) 把刚体取向参数化。\(\phi \in [0, 2\pi)\), \(\theta \in [0, \pi]\), \(\psi \in [0, 2\pi)\)。这三个角的几何含义:</p>
+
+<ul>
+  <li>\(\theta\): 物体 \(z\) 轴（"<em>对称轴</em>"）和实验室 \(z\) 轴的夹角。</li>
+  <li>\(\phi\): 物体 \(z\) 轴在实验室 \(xy\) 平面投影的方位角。</li>
+  <li>\(\psi\): 物体绕自己 \(z\) 轴自转的角度。</li>
+</ul>
+
+<p>(注意: 不同教材有不同欧拉角约定, 这里用<em>物理</em> 标准的 \(z\)-\(x\)-\(z\)。航空里更常用 \(z\)-\(y\)-\(x\) 即 yaw-pitch-roll, 不同。)</p>
+
+<p>用欧拉角写角速度。每个角的导数 \(\dot \phi, \dot \theta, \dot \psi\) 对应一个<em>瞬时</em> 旋转。三个旋转向量是不同方向（\(\dot \phi\) 沿实验室 \(z\), \(\dot \theta\) 沿"<em>线节</em>"——两个 \(z\) 轴的公共垂线方向, \(\dot \psi\) 沿物体 \(z\)）。把它们投影到物体主轴坐标系（标 1, 2, 3 主轴, 设 3 是对称轴）, 得</p>
+
+<p>\[
+\begin{aligned}
+\omega_1 &= \dot \phi \sin \theta \sin \psi + \dot \theta \cos \psi, \\
+\omega_2 &= \dot \phi \sin \theta \cos \psi - \dot \theta \sin \psi, \\
+\omega_3 &= \dot \phi \cos \theta + \dot \psi.
+\end{aligned}
+\]</p>
+
+<p>(具体推导用三个旋转矩阵相乘 + 取反对称部分。这步是个标准但繁琐的代数。)</p>
+
+<p>有了 \(\omega_k\) 的欧拉角表达, 转动动能</p>
+
+<p>\[
+T_{\text{rot}} = \frac{1}{2}(I_1 \omega_1^2 + I_2 \omega_2^2 + I_3 \omega_3^2)
+\]</p>
+
+<p>就成 \((\phi, \theta, \psi, \dot \phi, \dot \theta, \dot \psi)\) 的函数。Lagrangian \(L = T_{\text{rot}} - V\) 用欧拉角写好, EL 方程套上, 给三个二阶 ODE for \((\phi, \theta, \psi)\)。这是<em>Lagrange 方法处理刚体</em> 的标准程序——不用单独处理 Euler 方程, 直接用通用 EL。</p>
+
+<p>对<em>对称陀螺</em>（\(I_1 = I_2 = I_\perp\), \(I_3 = I_\parallel\)）, 转动动能简化为</p>
+
+<p>\[
+T_{\text{rot}} = \frac{1}{2} I_\perp (\dot \theta^2 + \dot \phi^2 \sin^2 \theta) + \frac{1}{2} I_\parallel (\dot \psi + \dot \phi \cos \theta)^2.
+\]</p>
+
+<p>看这个表达式: \(\phi, \psi\) 不显式出现, <em>只有它们的导数</em>。所以 \(\phi, \psi\) 是<em>循环坐标</em>, 对应共轭动量守恒——这给两条守恒量, 大大简化运动方程。下一节用这一点解决最经典的"<em>重力下对称陀螺</em>"。</p>
+
+<h2 id="sec9-8">9.8 重力下对称陀螺</h2>
+
+<p>设一个对称陀螺（轴对称）在重力下转, 一端固定（陀螺尖)。设质心到固定端距离 \(\ell\), 质量 \(M\), 重力加速度 \(g\)。重力势能 \(V = M g \ell \cos \theta\)（\(\theta\) 是陀螺轴与竖直方向夹角, \(\theta = 0\) 是直立）。</p>
+
+<p>Lagrangian:</p>
+
+<p>\[
+L = \frac{1}{2} I_\perp (\dot \theta^2 + \dot \phi^2 \sin^2 \theta) + \frac{1}{2} I_\parallel (\dot \psi + \dot \phi \cos \theta)^2 - M g \ell \cos \theta.
+\]</p>
+
+<p>循环坐标 \(\phi, \psi\) 给守恒量:</p>
+
+<p>\[
+p_\phi = \frac{\partial L}{\partial \dot \phi} = I_\perp \dot \phi \sin^2 \theta + I_\parallel (\dot \psi + \dot \phi \cos \theta) \cos \theta = \text{const},
+\]</p>
+
+<p>\[
+p_\psi = \frac{\partial L}{\partial \dot \psi} = I_\parallel (\dot \psi + \dot \phi \cos \theta) = \text{const}.
+\]</p>
+
+<p>物理上 \(p_\psi\) 是<em>沿物体 3 轴的角动量分量</em> \(L_3 = I_\parallel \omega_3\), \(p_\phi\) 是<em>沿实验室 \(z\) 轴的角动量分量</em> \(L_z\)（重力转矩沿水平, 不能改变 \(L_z\), 自然守恒）。</p>
+
+<p>另外能量守恒</p>
+
+<p>\[
+E = \frac{1}{2} I_\perp (\dot \theta^2 + \dot \phi^2 \sin^2 \theta) + \frac{1}{2} I_\parallel \omega_3^2 + M g \ell \cos \theta = \text{const}.
+\]</p>
+
+<p>三个守恒量降至一个 \(\theta(t)\) 的方程: 用 \(p_\phi, p_\psi\) 表 \(\dot \phi, \dot \psi\), 代入能量得 \(\dot \theta^2\) 的方程</p>
+
+<p>\[
+\dot \theta^2 = \frac{2(E - M g \ell \cos \theta) - I_\parallel \omega_3^2}{I_\perp} - \frac{(p_\phi - p_\psi \cos \theta)^2}{I_\perp^2 \sin^2 \theta}.
+\]</p>
+
+<p>这是个 1D"<em>有效势</em>" 问题——\(\theta\) 在某个区间 \([\theta_1, \theta_2]\) 振荡, 这就是<em>章动</em>（\(\theta\) 周期性变化, 陀螺轴上下点头）。同时 \(\dot \phi\) 由 \(p_\phi, p_\psi, \theta\) 决定, 让 \(\phi\) 持续旋转——这就是<em>进动</em>。整体: 陀螺自转（\(\dot \psi\)） + 进动（\(\dot \phi\)） + 章动（\(\theta\) 振荡）, 三种运动叠加。</p>
+
+<p><strong>定常进动</strong>。一种特殊解是 \(\theta = \theta_0\) 常数（不章动）, \(\dot \phi = \omega_p\) 常数（匀速进动）, \(\dot \psi\) 也常数。代入 EL 方程对 \(\theta\) 的解:</p>
+
+<p>\[
+0 = -I_\perp \dot \phi^2 \sin \theta_0 \cos \theta_0 + I_\parallel \omega_3 \dot \phi \sin \theta_0 - M g \ell \sin \theta_0.
+\]</p>
+
+<p>消 \(\sin \theta_0\) (假设 \(\theta_0 \neq 0, \pi\))</p>
+
+<p>\[
+I_\perp \omega_p^2 \cos \theta_0 - I_\parallel \omega_3 \omega_p + M g \ell = 0.
+\]</p>
+
+<p>这是关于 \(\omega_p\) 的二次方程。解</p>
+
+<p>\[
+\omega_p = \frac{I_\parallel \omega_3 \pm \sqrt{I_\parallel^2 \omega_3^2 - 4 I_\perp M g \ell \cos \theta_0}}{2 I_\perp \cos \theta_0}.
+\]</p>
+
+<p>对<em>快速</em> 自转（\(\omega_3\) 大）有两支根, 分别近似</p>
+
+<p>\[
+\omega_p^{\text{slow}} \approx \frac{M g \ell}{I_\parallel \omega_3}, \quad \omega_p^{\text{fast}} \approx \frac{I_\parallel \omega_3}{I_\perp \cos \theta_0}.
+\]</p>
+
+<p>第一支是"<em>慢进动</em>", 我们日常看到的陀螺进动。其频率 \(\sim M g \ell / (I_\parallel \omega_3)\): 自转越快, 进动越慢——这是直觉外的关系。第二支"<em>快进动</em>" 频率与自转同量级, 罕见。</p>
+
+<p>"<em>慢进动公式</em>" \(\omega_p \approx M g \ell / L\)（\(L = I_\parallel \omega_3\) 是自转角动量大小）来自更朴素的论证: 重力转矩 \(\tau = M g \ell \sin \theta\), 它让<em>水平方向</em> 的 \(\boldsymbol L\) 分量 \(L \sin \theta\) 旋转, 旋转速率 \(\omega_p = \tau / (L \sin \theta) = Mg\ell / L\)。这个简短论证给出<em>同一个公式</em>。但完整 Lagrange 程序告诉你它是某个二次方程的<em>近似根</em>, 还有"<em>快支</em>" 与<em>章动</em> 等额外的物理。</p>
+
+<p><strong>章动振幅</strong>。一般初始条件下 \(\theta\) 不是常数, 而是在 \(\theta_1, \theta_2\) 间振荡。章动振幅 \(\theta_2 - \theta_1\) 由初始扰动决定; 章动频率约等于 \(\omega_3 (I_\parallel / I_\perp)\) 量级。日常陀螺章动振幅小, 看起来像"<em>定常进动 + 微小颠簸</em>"; 但仔细看仍能察觉。这就是开头那个"<em>陀螺不倒, 反而绕一圈</em>" 的全部物理——自转角动量的稳定性 + 重力转矩驱动的进动 + 小幅章动颠簸。</p>
+
+<h2 id="sec9-9">9.9 应用: 地球岁差</h2>
+
+<p>把对称陀螺的结果搬到地球。地球不是完美球体——它<em>赤道凸起</em>（自转使然）, 所以 \(I_3\)（绕自转轴）略大于 \(I_1 = I_2\)（赤道直径方向）。月球 / 太阳的引力作用在<em>地球的赤道凸起</em> 上, 给一个想"<em>把地球转正</em>" 的微弱转矩（地轴目前对黄道倾斜 23.5°）。</p>
+
+<p>这个转矩让地球轴<em>进动</em>。算出的进动周期约 26000 年。这条事实是天文上观测到的<em>春分点岁差</em>（北极星位置每两万多年变一次, 古希腊已经知道）。整个推导只是 9.8 节的"<em>重力陀螺</em>" 套到地球, 把 \(M g \ell\) 换成月日引力转矩。</p>
+
+<p>章动也存在: 地球的章动周期约 18.6 年（与月球轨道节点回归周期一致）, 振幅只有 9 角秒——天文学高精度仪器才察觉得到。</p>
+
+<p>所以你头顶的星空"<em>缓慢绕一圈再绕一圈</em>" 的现象, 物理上和你桌上转的陀螺<em>是同一个方程</em>。这就是<em>普遍性</em> 的力量——刚体动力学的同一组方程, 描述桌上玩具陀螺到地球, 跨 25 个数量级。</p>
+
+<h2 id="sec9-10">9.10 临别话</h2>
+
+<p>这一章把刚体力学的结构铺完。回头看, 它的核心信息是:</p>
+
+<ul>
+  <li>刚体有 6 自由度（3 平动 + 3 转动）。转动部分是关键。</li>
+  <li>转动用<em>角速度</em> \(\boldsymbol \omega\)、<em>角动量</em> \(\boldsymbol L = I \boldsymbol \omega\)、<em>转动动能</em> \(\frac{1}{2} \boldsymbol \omega^T I \boldsymbol \omega\) 描述。\(I\) 是惯性张量。</li>
+  <li>\(I\) 实对称 → 有<em>主轴</em> + 主转动惯量。在主轴坐标 \(I\) 对角化。</li>
+  <li><em>Euler 方程</em>（在物体坐标系）+ <em>欧拉角</em>（参数化取向）+ <em>Lagrange 公式</em>（统一处理）三套工具结合, 解决任何刚体动力学问题。</li>
+  <li>奇异现象——网球拍定理（中间主轴不稳定）、对称陀螺的进动 + 章动、Poinsot 几何——都是 Euler 方程<em>非线性</em> 的直接后果。</li>
+</ul>
+
+<p>这一章的<em>主结构</em> 是<em>线性代数</em>——惯性张量是个对称矩阵, 它的对角化是核心计算。这条主线在 ch8 也出现过（小振动: 同时对角化 \(T, V\)）, 而且会在 ch10 起的 Hamilton 力学反复重现（正则变换 = symplectic 矩阵的对角化）。请你把这条<em>"对角化是经典力学的灵魂"</em> 哲学记在心里——表面五花八门的物理, 内核都在做一件事: <em>找让矩阵对角的坐标</em>。</p>
+
+<p>下一章我们换主题, 进入<em>Hamilton 力学</em>。Lagrange 力学用 \((q, \dot q)\) 描述系统, Hamilton 力学引入"<em>共轭动量</em>" \(p = \partial L / \partial \dot q\), 用 \((q, p)\) 描述——从"<em>位形空间</em>" 到"<em>相空间</em>"。两种描述等价（连接它们的工具是 Legendre 变换）, 但相空间几何上更对称, 是 Hamilton / 统计 / 量子力学的主舞台。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch8.html">← 上一章 · 第 8 章 小振动 + 简正模式</a><a href="ch10.html">下一章 · 第 10 章 Legendre 变换 + Hamiltonian →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 小振动 + 简正模式 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 对称性 + Noether 定理</a><a href="ch9.html">下一章 · 第 9 章 刚体动力学 + 欧拉角 →</a></nav>
+<h1 id="ch8">第 8 章 小振动 + 简正模式</h1>
+
+<p>请你先想象一个非常简单的实验装置。两根<em>相同</em> 的弹簧（劲度系数 \(k\)）水平放在桌面, 中间夹一个质量 \(m\)。两端固定在墙上。把质量从平衡位置稍微推一下, 它怎么动？</p>
+
+<p>停下来回答, 不要往下看。</p>
+
+<p>它做<em>简谐振动</em>——左右来回, 频率 \(\omega = \sqrt{2k/m}\)。这是高中物理。<em>一个</em> 频率, <em>一个</em> 模式, 动起来像个钟摆。这没什么意思。</p>
+
+<p>现在把场景升级一下。把<em>三个</em> 相同的质量串在<em>四根</em> 相同的弹簧上, 两端依然钉在墙上。三个质量、四根弹簧。把<em>第二个</em> 质量推一下——其他两个起初不动——它会怎么演化？</p>
+
+<p>请你停下来认真想这个问题。</p>
+
+<p>第二个质量开始振——但很快, 它<em>带动</em> 第一个和第三个一起振（因为它们之间通过弹簧耦合）。一段时间后, 三个质量同时在振, 但不是同步, 也不是简单地"<em>整体来回</em>"。它们的位置-时间曲线看起来<em>毫无规律</em>——既不是正弦, 也不是周期, 像三个独立钟摆但又互相影响。</p>
+
+<p>这种"<em>看起来无规律</em>" 的运动是耦合系统的典型表现。如果你试图用 Newton 风格直接写 \(\boldsymbol F = m \boldsymbol a\), 你得到三条<em>耦合</em> 的二阶 ODE: 第一个质量的方程里出现第二个的位置, 第二个的方程里出现第一和第三, 第三个的方程里出现第二。三个未知函数 \(x_1(t), x_2(t), x_3(t)\) 缠在一起, 解不出来。</p>
+
+<p>但 Lagrange + 线性代数告诉我们一件让人惊讶的事: <em>这个看起来无规律的运动其实是<em>三个</em> 独立简谐振动的叠加</em>。每个独立振动有自己的频率 \(\omega_k\) 与"<em>形状</em>" \(\boldsymbol A_k\), 叫<em>简正模式</em>。三个模式各自频率不同, 各自独立演化, 不互相干扰。任何初始条件都可以被分解成"<em>三种模式各占多少</em>" 的叠加, 每个模式按自己的频率正弦振动, 不会相互交换能量。整体看起来无规律, 拆开看每个模式都规整漂亮。</p>
+
+<p>这条洞察的一般化是: <em>任何 \(n\) 自由度系统在平衡点附近的小振动, 都可分解为 \(n\) 个独立的简正模式</em>。这不是巧合, 不是特例——是 Lagrange 力学加上线性代数（特征值问题）的<em>必然结论</em>。证明从问题里自然长出来。这一章带你看完整的推导, 然后拿三耦合摆做完整例子, 最后看应用——分子振动光谱、晶格声子、弦的傅里叶级数, 全是同一套数学的不同物理实例。</p>
+
+<h2 id="sec8-1">8.1 单弹簧振子复习</h2>
+
+<p>先把"<em>一个</em> 自由度" 的最简情形过一遍, 把符号约定好。一根劲度系数 \(k\) 的弹簧, 一端固定一端挂质量 \(m\)。位置坐标 \(x\), 平衡点 \(x = 0\)。势能 \(V(x) = \frac{1}{2} k x^2\), 动能 \(T = \frac{1}{2} m \dot x^2\)。Lagrangian:</p>
+
+<p>\[
+L = T - V = \frac{1}{2} m \dot x^2 - \frac{1}{2} k x^2.
+\]</p>
+
+<p>EL 方程 \(\frac{d}{dt} \frac{\partial L}{\partial \dot x} - \frac{\partial L}{\partial x} = 0\) 给</p>
+
+<p>\[
+m \ddot x + k x = 0 \implies \ddot x = -\frac{k}{m} x.
+\]</p>
+
+<p>这是<em>简谐振动方程</em>。解 \(x(t) = A \cos(\omega t + \phi)\), 其中</p>
+
+<p>\[
+\boxed{\ \omega = \sqrt{k/m}\ }
+\]</p>
+
+<p>是<em>固有频率</em>（angular frequency）。\(A, \phi\) 由初始条件定。每隔 \(T = 2\pi / \omega\) 重复一次。</p>
+
+<p>这里有<em>一个</em> 自由度, 给<em>一个</em> 频率, 解是<em>一个</em> 简谐运动。简单到几乎平凡——但它是后面所有结构的种子。下一节我们看在更一般的势 \(V(x)\) 中, 平衡点附近<em>仍然</em> 是简谐振动, 只是 \(k\) 换成了 \(V''(x_0)\)。</p>
+
+<h2 id="sec8-2">8.2 平衡点附近的 Taylor 展开</h2>
+
+<p>给一个一般的（可能非常复杂的）势能 \(V(q)\), 假设 \(q = q_0\) 是<em>稳定平衡点</em>——即 \(V'(q_0) = 0\)（驻点）且 \(V''(q_0) > 0\)（极小值）。把 \(V\) 在 \(q_0\) 附近 Taylor 展开:</p>
+
+<p>\[
+V(q) = V(q_0) + V'(q_0)(q - q_0) + \frac{1}{2} V''(q_0)(q - q_0)^2 + O((q - q_0)^3).
+\]</p>
+
+<p>\(V(q_0)\) 是常数, 在 Lagrangian 里贡献 0（EL 方程只看导数）。\(V'(q_0) = 0\) 由平衡条件。所以前两项消掉, 留下</p>
+
+<p>\[
+V(q) \approx \frac{1}{2} V''(q_0) (q - q_0)^2.
+\]</p>
+
+<p>设 \(\xi = q - q_0\) 为<em>偏离平衡位置的小量</em>, 重写</p>
+
+<p>\[
+V(\xi) \approx \frac{1}{2} k_{\text{eff}} \xi^2, \quad k_{\text{eff}} := V''(q_0).
+\]</p>
+
+<p>这就是<em>有效弹簧</em>! 任何稳定平衡点附近的势, 在小偏离极限下都长得像弹簧——抛物线最小值附近的形状。</p>
+
+<p>动能也类似处理。一般地 \(T = \frac{1}{2} \mu(q) \dot q^2\)（\(\mu(q)\) 是"<em>有效质量</em>", 取决于坐标选择）。在 \(q_0\) 处展开 \(\mu(q) \approx \mu(q_0)\), 高阶项乘以 \(\dot \xi^2\) 是更高阶小量, 忽略。所以</p>
+
+<p>\[
+T \approx \frac{1}{2} \mu(q_0) \dot \xi^2 = \frac{1}{2} m_{\text{eff}} \dot \xi^2.
+\]</p>
+
+<p>合起来 Lagrangian:</p>
+
+<p>\[
+L \approx \frac{1}{2} m_{\text{eff}} \dot \xi^2 - \frac{1}{2} k_{\text{eff}} \xi^2.
+\]</p>
+
+<p>EL 方程: \(\ddot \xi + (k_{\text{eff}}/m_{\text{eff}}) \xi = 0\), 频率 \(\omega = \sqrt{k_{\text{eff}}/m_{\text{eff}}} = \sqrt{V''(q_0)/\mu(q_0)}\)。</p>
+
+<p>这告诉你<em>普适</em> 的结论: <em>任何稳定平衡点附近的小振动都是简谐的</em>。频率由势的二阶导数（曲率）和"<em>有效惯性</em>" 决定。这是物理学中最普遍的近似之一——分子谐振、原子振动、桥梁微振、电路 LC 振荡, 全部在某个层次上是这个公式。</p>
+
+<p>例子。<em>单摆小角振动</em>。 \(L = \frac{1}{2} m \ell^2 \dot \theta^2 - mg\ell(1 - \cos \theta)\)。势在 \(\theta = 0\) 平衡。\(V(\theta) = mg\ell(1 - \cos \theta) \approx \frac{1}{2} mg\ell \theta^2\)（用 \(\cos \theta \approx 1 - \theta^2/2\)）。所以 \(k_{\text{eff}} = mg\ell\), \(m_{\text{eff}} = m\ell^2\), 频率 \(\omega = \sqrt{g/\ell}\)。这就是经典的单摆小角公式, 从 Taylor 展开自然落地。</p>
+
+<p>请你停下来想这件事的意义: 单摆<em>原本</em> 不是线性系统——\(\sin \theta\) 不是线性函数, 大角运动是<em>非线性</em> 振子。但<em>小</em> 角下 \(\sin \theta \approx \theta\), 系统线性化, 简谐解出。"<em>线性化</em>" 是物理学一切振动 / 波动 / 共振分析的起点。下一节把这一过程推到 \(n\) 自由度。</p>
+
+<h2 id="sec8-3">8.3 n 自由度: Lagrangian 的二次型</h2>
+
+<p>把上面的故事推到 \(n\) 自由度。设广义坐标 \(\boldsymbol q = (q^1, q^2, \ldots, q^n)\), 平衡点 \(\boldsymbol q_0\)。设 \(\boldsymbol \xi = \boldsymbol q - \boldsymbol q_0\) 为偏离量。</p>
+
+<p>势能 \(V(\boldsymbol q)\) 在 \(\boldsymbol q_0\) 处 Taylor 展开:</p>
+
+<p>\[
+V(\boldsymbol q) = V(\boldsymbol q_0) + \sum_i \frac{\partial V}{\partial q^i}\Big|_0 \xi^i + \frac{1}{2} \sum_{i,j} \frac{\partial^2 V}{\partial q^i \partial q^j}\Big|_0 \xi^i \xi^j + O(\xi^3).
+\]</p>
+
+<p>常数 \(V(\boldsymbol q_0)\) 丢掉。一阶项 \(\partial V / \partial q^i|_0 = 0\)（平衡条件）。剩下</p>
+
+<p>\[
+V(\boldsymbol \xi) \approx \frac{1}{2} \sum_{i,j} V_{ij} \xi^i \xi^j, \quad V_{ij} := \frac{\partial^2 V}{\partial q^i \partial q^j}\Big|_0.
+\]</p>
+
+<p>\(V_{ij}\) 是<em>对称</em> 的 \(n \times n\) 矩阵（偏导可交换）。叫<em>势能 Hessian</em>。\(\boldsymbol q_0\) 是<em>稳定</em> 平衡 ⟺ \(V_{ij}\) 是<em>正定</em> 矩阵（所有特征值 > 0）, 这是高维"<em>极小值</em>" 的判定。</p>
+
+<p>动能。一般 \(T = \frac{1}{2} \sum_{i,j} \mu_{ij}(\boldsymbol q) \dot q^i \dot q^j\), \(\mu_{ij}\) 是"<em>度量张量</em>"（坐标依赖的有效质量矩阵）。在 \(\boldsymbol q_0\) 处取值 \(T_{ij} := \mu_{ij}(\boldsymbol q_0)\), 高阶修正再乘 \(\dot \xi^2\) 是更小的量, 略去。</p>
+
+<p>\[
+T \approx \frac{1}{2} \sum_{i,j} T_{ij} \dot \xi^i \dot \xi^j.
+\]</p>
+
+<p>\(T_{ij}\) 也是对称的 \(n \times n\) 矩阵, 叫<em>动能矩阵</em>。它<em>必</em> 正定（动能必非负, 等于零仅当 \(\dot{\boldsymbol \xi} = 0\)）。</p>
+
+<p>合起来:</p>
+
+<p>\[
+\boxed{\ L \approx \frac{1}{2} \sum_{i,j} T_{ij} \dot \xi^i \dot \xi^j - \frac{1}{2} \sum_{i,j} V_{ij} \xi^i \xi^j.\ }
+\]</p>
+
+<p>用矩阵记号 \(\boldsymbol \xi = (\xi^1, \ldots, \xi^n)^T\):</p>
+
+<p>\[
+L = \frac{1}{2} \dot{\boldsymbol \xi}^T T \dot{\boldsymbol \xi} - \frac{1}{2} \boldsymbol \xi^T V \boldsymbol \xi.
+\]</p>
+
+<p>这是个<em>二次型</em> 的 Lagrangian——动能与势能都是 \(\boldsymbol \xi\) (or \(\dot{\boldsymbol \xi}\)) 的二次齐次函数, 不含一次或常数项。<em>所有小振动问题都有这种形式</em>。\(T, V\) 这两个矩阵把全部物理信息编码完毕。</p>
+
+<p>EL 方程。对 \(\xi^k\) 套 EL: \(\frac{d}{dt} \partial L / \partial \dot \xi^k - \partial L / \partial \xi^k = 0\)。算偏导（\(T_{ij}, V_{ij}\) 是常数）:</p>
+
+<p>\[
+\frac{\partial L}{\partial \dot \xi^k} = \sum_j T_{kj} \dot \xi^j, \quad \frac{\partial L}{\partial \xi^k} = -\sum_j V_{kj} \xi^j.
+\]</p>
+
+<p>带入 EL:</p>
+
+<p>\[
+\sum_j T_{kj} \ddot \xi^j + \sum_j V_{kj} \xi^j = 0, \quad k = 1, \ldots, n.
+\]</p>
+
+<p>用矩阵:</p>
+
+<p>\[
+\boxed{\ T \ddot{\boldsymbol \xi} + V \boldsymbol \xi = \boldsymbol 0.\ }
+\]</p>
+
+<p>这是 \(n\) 个耦合的二阶线性 ODE 的紧凑写法。比起 Newton 风格——你要画 \(n\) 个自由体图、写 \(n\) 个 \(F = ma\)、把内力对消、追踪谁连接谁——这里只有<em>两个矩阵</em> + <em>一条方程</em>。系统的全部信息都在 \(T, V\) 里。下一节解这个方程。</p>
+
+<h2 id="sec8-4">8.4 试解 \(\boldsymbol \xi = \boldsymbol A e^{i \omega t}\): 广义特征值问题</h2>
+
+<p>线性 ODE 的标准技巧——猜<em>指数</em> 解。试</p>
+
+<p>\[
+\boldsymbol \xi(t) = \boldsymbol A e^{i \omega t},
+\]</p>
+
+<p>\(\boldsymbol A\) 是常向量（"<em>振动形状</em>"）, \(\omega\) 是常数（"<em>振动频率</em>"）。代入 \(T \ddot{\boldsymbol \xi} + V \boldsymbol \xi = 0\):</p>
+
+<p>\[
+T \cdot (-\omega^2) \boldsymbol A e^{i \omega t} + V \boldsymbol A e^{i \omega t} = 0.
+\]</p>
+
+<p>消去 \(e^{i \omega t}\)（永远非零）:</p>
+
+<p>\[
+\boxed{\ (V - \omega^2 T) \boldsymbol A = \boldsymbol 0.\ }
+\]</p>
+
+<p>这是<em>广义特征值问题</em>! 寻找 \(\omega^2\) 与非零向量 \(\boldsymbol A\), 满足 \(V \boldsymbol A = \omega^2 T \boldsymbol A\)。</p>
+
+<p>读法: \(\omega^2\) 是"<em>广义特征值</em>", \(\boldsymbol A\) 是"<em>广义特征向量</em>"。对比标准特征值问题 \(M \boldsymbol A = \lambda \boldsymbol A\)（即 \(T = I\) 的特例）。这里 \(T\) 不必是单位矩阵, 但因为它是<em>正定</em> 的, 这个广义特征值问题等价于一个标准的: 把 \(T = L L^T\)（Cholesky 分解）, 设 \(\boldsymbol B = L^T \boldsymbol A\), 则方程化为</p>
+
+<p>\[
+L^{-1} V L^{-T} \boldsymbol B = \omega^2 \boldsymbol B.
+\]</p>
+
+<p>矩阵 \(\tilde V := L^{-1} V L^{-T}\) 是对称的（因为 \(V\) 对称）, 所以这是一个<em>对称</em> 标准特征值问题。线性代数告诉我们:</p>
+
+<ul>
+  <li>对称矩阵有 \(n\) 个<em>实</em> 特征值（计数重数）。</li>
+  <li>不同特征值对应的特征向量<em>正交</em>。</li>
+  <li>重特征值的本征空间也存在正交基。</li>
+</ul>
+
+<p>所以广义特征值问题 \((V - \omega^2 T) \boldsymbol A = 0\) 给出 \(n\) 个实特征值 \(\omega_1^2, \omega_2^2, \ldots, \omega_n^2\) 与对应的 \(n\) 个特征向量 \(\boldsymbol A_1, \boldsymbol A_2, \ldots, \boldsymbol A_n\)。它们叫<em>简正频率</em> 与<em>简正模式</em>。</p>
+
+<p>更进一步——\(V\) 正定意味着<em>所有 \(\omega_k^2 > 0\)</em>, 即所有 \(\omega_k\) 是实数, 对应真实振动（不发散）。如果某个 \(\omega^2 \le 0\), 那个模式不振动而是<em>指数发散</em> 或<em>线性漂移</em>——意味着平衡点不是稳定的。所以"<em>稳定平衡 ⟺ 所有 \(\omega_k^2 > 0\) ⟺ \(V\) 正定</em>" 是同一回事。</p>
+
+<p>怎么实际求 \(\omega_k^2, \boldsymbol A_k\)？广义特征值方程 \((V - \omega^2 T) \boldsymbol A = 0\) 有非零解 ⟺ \(\det(V - \omega^2 T) = 0\)。这是关于 \(\omega^2\) 的<em>n 次多项式</em>方程, 叫<em>特征方程</em>。解出 \(n\) 个根 \(\omega_k^2\), 然后对每个 \(\omega_k^2\) 把它代回 \((V - \omega_k^2 T) \boldsymbol A_k = 0\) 解出 \(\boldsymbol A_k\)。</p>
+
+<p>实践上你<em>从不</em> 手动算特征多项式（除非 \(n = 2, 3\)）——\(n\) 大时多项式根问题<em>条件极差</em>（链<a href="../数值方法/ch4.html">数值方法 ch4</a>: Wilkinson 多项式条件数天文级）, 直接用 LAPACK 的对称特征值算法（基于 QR 算法的对称版本）开销 \(O(n^3)\) 且<em>稳定</em>。NumPy 里就是 <code>scipy.linalg.eigh(V, T)</code>。</p>
+
+<h2 id="sec8-5">8.5 简正模式的物理含义</h2>
+
+<p>每对 \((\omega_k, \boldsymbol A_k)\) 给出一个特殊的解</p>
+
+<p>\[
+\boldsymbol \xi^{(k)}(t) = \boldsymbol A_k \cdot \cos(\omega_k t + \phi_k).
+\]</p>
+
+<p>这意味着: 如果你<em>恰好</em> 把系统推到形状 \(\boldsymbol A_k\)（即所有自由度按 \(\boldsymbol A_k\) 的比例同时偏离）然后释放, 系统会<em>整体同步</em> 振动——所有自由度以<em>同一频率</em> \(\omega_k\)<em>同相位</em> 周期性回到平衡再过去。这就是一个<em>简正模式</em>。</p>
+
+<p>请你停下来感受这件事: 在简正模式下, 整个 \(n\) 自由度系统<em>表现得像一个</em> 自由度的简谐振子。\(n\) 个不同坐标按固定比例同步, 整个系统只剩"<em>振幅 + 相位</em>" 这两个时间未知, 它们按 \(\omega_k\) 谐变。所有的耦合, 所有的"<em>谁影响谁</em>", 在这种特殊运动方式下消失了。系统<em>看起来</em> 是一个简谐振子。</p>
+
+<p>一般初始条件下, 系统<em>不</em> 是单一模式, 而是 \(n\) 个模式的<em>线性组合</em>:</p>
+
+<p>\[
+\boldsymbol \xi(t) = \sum_{k=1}^n c_k \boldsymbol A_k \cos(\omega_k t + \phi_k),
+\]</p>
+
+<p>\(c_k, \phi_k\) 由 \(2n\) 个初始条件（\(\boldsymbol \xi(0), \dot{\boldsymbol \xi}(0)\)）决定。<em>n 个模式各自独立振动, 不交换能量, 互不干扰</em>。如果第 \(k\) 个模式有能量 \(E_k\), 它<em>永远</em> 保持能量 \(E_k\)——其他模式碰它它也不变。这是耦合系统的"<em>解耦后</em>" 视角: 表面上 \(n\) 个坐标缠在一起, 内里是 \(n\) 个独立振子并排放着。</p>
+
+<p>这条洞察改变了我们看耦合系统的方式。"<em>耦合</em>" 不是一种<em>真</em> 的相互作用——它是"<em>选错坐标</em>" 的副产品。换到简正模式坐标下, 耦合彻底消失。下一节正式定义这种坐标变换。</p>
+
+<h2 id="sec8-6">8.6 简正坐标</h2>
+
+<p>把 \(n\) 个简正模式 \(\boldsymbol A_1, \ldots, \boldsymbol A_n\) 排成矩阵 \(P = [\boldsymbol A_1 | \boldsymbol A_2 | \cdots | \boldsymbol A_n]\)（\(P\) 是 \(n \times n\) 方阵, 列是模式向量）。</p>
+
+<p>定义<em>简正坐标</em></p>
+
+<p>\[
+\boldsymbol Q = P^{-1} \boldsymbol \xi, \quad \text{i.e.}, \quad \boldsymbol \xi = P \boldsymbol Q.
+\]</p>
+
+<p>即 \(Q^k\) 是 \(\boldsymbol \xi\) 在模式 \(\boldsymbol A_k\) "<em>方向</em>" 上的分量。\(\xi^i = \sum_k P_{ik} Q^k = \sum_k (A_k)_i Q^k\)。</p>
+
+<p>把这个变换代入 Lagrangian。先做<em>正交化</em> 约定: 简正模式向量满足</p>
+
+<p>\[
+\boldsymbol A_j^T T \boldsymbol A_k = \delta_{jk}, \quad \boldsymbol A_j^T V \boldsymbol A_k = \omega_k^2 \delta_{jk}.
+\]</p>
+
+<p>第一条是"<em>关于 \(T\) 的</em>" 正交归一化（可以做到, 因为 \(T\) 正定且模式向量线性独立——Gram-Schmidt 程序适配 \(T\)-内积）。第二条由广义特征值方程自动得到: 把 \(V \boldsymbol A_k = \omega_k^2 T \boldsymbol A_k\) 左乘 \(\boldsymbol A_j^T\) 得 \(\boldsymbol A_j^T V \boldsymbol A_k = \omega_k^2 \boldsymbol A_j^T T \boldsymbol A_k = \omega_k^2 \delta_{jk}\)。</p>
+
+<p>这两条用矩阵语言说: \(P^T T P = I\), \(P^T V P = \text{diag}(\omega_1^2, \ldots, \omega_n^2)\)——\(P\) 同时把 \(T\) 对角化成单位阵, 把 \(V\) 对角化成 \(\omega_k^2\)。这叫"<em>同时对角化</em>" 一对实对称矩阵, 是线性代数里的经典定理（前提是 \(T\) 正定）。</p>
+
+<p>现在把变换代入 Lagrangian:</p>
+
+<p>\[
+T = \frac{1}{2} \dot{\boldsymbol \xi}^T T \dot{\boldsymbol \xi} = \frac{1}{2} (P \dot{\boldsymbol Q})^T T (P \dot{\boldsymbol Q}) = \frac{1}{2} \dot{\boldsymbol Q}^T (P^T T P) \dot{\boldsymbol Q} = \frac{1}{2} \dot{\boldsymbol Q}^T \dot{\boldsymbol Q} = \frac{1}{2} \sum_k \dot Q_k^2.
+\]</p>
+
+<p>\[
+V = \frac{1}{2} \boldsymbol \xi^T V \boldsymbol \xi = \frac{1}{2} \boldsymbol Q^T (P^T V P) \boldsymbol Q = \frac{1}{2} \sum_k \omega_k^2 Q_k^2.
+\]</p>
+
+<p>合起来:</p>
+
+<p>\[
+\boxed{\ L = \sum_{k=1}^n \left[ \frac{1}{2} \dot Q_k^2 - \frac{1}{2} \omega_k^2 Q_k^2 \right].\ }
+\]</p>
+
+<p>这是奇迹——Lagrangian 解耦成 \(n\) 个<em>独立</em> 的单弹簧振子, 每个有自己的频率 \(\omega_k\)。EL 方程对每个 \(Q_k\) 给</p>
+
+<p>\[
+\ddot Q_k + \omega_k^2 Q_k = 0,
+\]</p>
+
+<p>独立简谐方程, 解 \(Q_k(t) = c_k \cos(\omega_k t + \phi_k)\)。然后回到原坐标 \(\boldsymbol \xi(t) = P \boldsymbol Q(t)\) 给一般解。</p>
+
+<p>所以"<em>解耦合 \(n\) 自由度小振动</em>" 的整套程序是:</p>
+
+<ol>
+  <li>找平衡点 \(\boldsymbol q_0\)。</li>
+  <li>算 \(T_{ij} = \mu_{ij}(\boldsymbol q_0)\), \(V_{ij} = \partial^2 V / \partial q^i \partial q^j |_0\)。</li>
+  <li>解广义特征值问题 \((V - \omega^2 T) \boldsymbol A = 0\) 得 \(\omega_k^2, \boldsymbol A_k\)。</li>
+  <li>正交归一化模式: \(\boldsymbol A_k^T T \boldsymbol A_k = 1\)。</li>
+  <li>简正坐标 \(Q_k = \boldsymbol A_k^T T \boldsymbol \xi\), 每个独立简谐, \(Q_k(t) = c_k \cos(\omega_k t + \phi_k)\)。</li>
+  <li>回到原坐标 \(\boldsymbol \xi(t) = \sum_k Q_k(t) \boldsymbol A_k\)。</li>
+</ol>
+
+<p>这是一个完整的"<em>菜谱</em>"——任何小振动问题, 不管多少个自由度, 走完这六步就解完。下一节用一个具体例子（三耦合摆）跑完整流程。</p>
+
+<h2 id="sec8-7">8.7 完整例子: 三耦合摆</h2>
+
+<p>把开头的"<em>三个质量四个弹簧</em>" 直接做。设三个相同质量 \(m\), 四根相同弹簧 \(k\), 排成一线: 墙—弹簧—\(m_1\)—弹簧—\(m_2\)—弹簧—\(m_3\)—弹簧—墙。设每个质量偏离平衡的位移 \(x_1, x_2, x_3\)。</p>
+
+<p>动能: \(T = \frac{1}{2} m (\dot x_1^2 + \dot x_2^2 + \dot x_3^2)\), 即 \(T = m I_{3 \times 3}\)（动能矩阵就是 \(m\) 倍单位阵）。</p>
+
+<p>势能。每根弹簧的能量是 \(\frac{1}{2} k \times (\text{伸长})^2\):</p>
+
+<ul>
+  <li>第一根（墙到 \(m_1\)）: 伸长 \(x_1\), 能量 \(\frac{1}{2} k x_1^2\)。</li>
+  <li>第二根（\(m_1\) 到 \(m_2\)）: 伸长 \(x_2 - x_1\), 能量 \(\frac{1}{2} k (x_2 - x_1)^2\)。</li>
+  <li>第三根（\(m_2\) 到 \(m_3\)）: 伸长 \(x_3 - x_2\), 能量 \(\frac{1}{2} k (x_3 - x_2)^2\)。</li>
+  <li>第四根（\(m_3\) 到墙）: 伸长 \(-x_3\), 能量 \(\frac{1}{2} k x_3^2\)。</li>
+</ul>
+
+<p>展开总和:</p>
+
+<p>\[
+V = \frac{1}{2} k \big[ x_1^2 + (x_2 - x_1)^2 + (x_3 - x_2)^2 + x_3^2 \big]
+= \frac{1}{2} k \big[ 2 x_1^2 + 2 x_2^2 + 2 x_3^2 - 2 x_1 x_2 - 2 x_2 x_3 \big].
+\]</p>
+
+<p>所以势能矩阵</p>
+
+<p>\[
+V = k \begin{pmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{pmatrix}.
+\]</p>
+
+<p>动能矩阵 \(T = m I\)。广义特征值问题</p>
+
+<p>\[
+\det(V - \omega^2 T) = \det\left[ k \begin{pmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{pmatrix} - m \omega^2 I \right] = 0.
+\]</p>
+
+<p>设 \(\lambda = m \omega^2 / k\), 求</p>
+
+<p>\[
+\det \begin{pmatrix} 2 - \lambda & -1 & 0 \\ -1 & 2 - \lambda & -1 \\ 0 & -1 & 2 - \lambda \end{pmatrix} = 0.
+\]</p>
+
+<p>沿第一行展开:</p>
+
+<p>\[
+(2 - \lambda) \big[ (2 - \lambda)^2 - 1 \big] - (-1) \big[ -(2 - \lambda) \big] = 0.
+\]</p>
+
+<p>整理</p>
+
+<p>\[
+(2 - \lambda)\big[(2 - \lambda)^2 - 2\big] = 0.
+\]</p>
+
+<p>解 \(\lambda = 2\) 或 \((2 - \lambda)^2 = 2\), 即 \(\lambda = 2 \pm \sqrt 2\)。三个根</p>
+
+<p>\[
+\lambda_1 = 2 - \sqrt 2 \approx 0.586, \quad \lambda_2 = 2, \quad \lambda_3 = 2 + \sqrt 2 \approx 3.414.
+\]</p>
+
+<p>对应频率</p>
+
+<p>\[
+\omega_k = \sqrt{k \lambda_k / m}, \quad \omega_1 \approx 0.765 \sqrt{k/m}, \quad \omega_2 = \sqrt{2 k/m}, \quad \omega_3 \approx 1.848 \sqrt{k/m}.
+\]</p>
+
+<p>三个不同的振动频率! 每个对应一个简正模式。下面找它们的形状。</p>
+
+<p><strong>模式 1, \(\lambda_1 = 2 - \sqrt 2\)。</strong>代回 \((V - \omega^2 T) \boldsymbol A = 0\) 即</p>
+
+<p>\[
+\begin{pmatrix} \sqrt 2 & -1 & 0 \\ -1 & \sqrt 2 & -1 \\ 0 & -1 & \sqrt 2 \end{pmatrix} \begin{pmatrix} a_1 \\ a_2 \\ a_3 \end{pmatrix} = 0.
+\]</p>
+
+<p>第一行: \(\sqrt 2 a_1 = a_2\), 即 \(a_2 = \sqrt 2 a_1\)。第三行同样: \(a_2 = \sqrt 2 a_3\), 即 \(a_3 = a_1\)。第二行验证 \(-a_1 + \sqrt 2 a_2 - a_3 = -a_1 + 2 a_1 - a_1 = 0\) ✓。所以 \(\boldsymbol A_1 \propto (1, \sqrt 2, 1)\)。归一化让 \(\boldsymbol A^T T \boldsymbol A = m \|\boldsymbol A\|^2 = 1\), 即 \(\|\boldsymbol A\|^2 = 1/m\), \(\boldsymbol A_1 = (1, \sqrt 2, 1) / \sqrt{4 m} = (1, \sqrt 2, 1) / (2 \sqrt m)\)。</p>
+
+<p>物理上: 三个质量同方向移动, 中间那个移得最远（\(\sqrt 2\) 倍）。这是<em>最低</em> 频率模式——三个质量基本同步, 中间被边上的"<em>带</em>" 着移动, 整体类似于一个大的等效振子。</p>
+
+<p><strong>模式 2, \(\lambda_2 = 2\)。</strong>代回</p>
+
+<p>\[
+\begin{pmatrix} 0 & -1 & 0 \\ -1 & 0 & -1 \\ 0 & -1 & 0 \end{pmatrix} \boldsymbol A = 0.
+\]</p>
+
+<p>第一、三行: \(a_2 = 0\)。第二行: \(a_1 + a_3 = 0\), 即 \(a_3 = -a_1\)。所以 \(\boldsymbol A_2 \propto (1, 0, -1)\)。归一化 \(\boldsymbol A_2 = (1, 0, -1)/\sqrt{2 m}\)。</p>
+
+<p>物理上: 中间质量<em>不动</em>, 两边对称反向移动。这是中间频率的"<em>反对称</em>" 模式——左右对称, 中间是节点。</p>
+
+<p><strong>模式 3, \(\lambda_3 = 2 + \sqrt 2\)。</strong>代回</p>
+
+<p>\[
+\begin{pmatrix} -\sqrt 2 & -1 & 0 \\ -1 & -\sqrt 2 & -1 \\ 0 & -1 & -\sqrt 2 \end{pmatrix} \boldsymbol A = 0.
+\]</p>
+
+<p>第一行: \(a_2 = -\sqrt 2 a_1\)。第三行: \(a_2 = -\sqrt 2 a_3\), 即 \(a_3 = a_1\)。所以 \(\boldsymbol A_3 \propto (1, -\sqrt 2, 1)\)。归一化 \(\boldsymbol A_3 = (1, -\sqrt 2, 1)/(2\sqrt m)\)。</p>
+
+<p>物理上: 边上两个同方向, 中间反方向, 振幅<em>大</em>（\(\sqrt 2\) 倍）。这是<em>最高</em> 频率——中间反方向地高频颠簸, 类似"<em>蹦极</em>" 把中间反复抛上抛下。</p>
+
+<p>三个模式总结:</p>
+
+<table style="margin: 1em 0; border-collapse: collapse; border:1px solid #ccc;">
+<tr><th style="padding: 0.3em 1em; border:1px solid #ccc;">模式</th><th style="padding: 0.3em 1em; border:1px solid #ccc;">频率 \(\omega_k\)</th><th style="padding: 0.3em 1em; border:1px solid #ccc;">形状 \(\boldsymbol A_k\)</th><th style="padding: 0.3em 1em; border:1px solid #ccc;">物理图像</th></tr>
+<tr><td style="padding: 0.3em 1em; border:1px solid #ccc;">1（低）</td><td style="padding: 0.3em 1em; border:1px solid #ccc;">\(0.765\sqrt{k/m}\)</td><td style="padding: 0.3em 1em; border:1px solid #ccc;">\((1, \sqrt 2, 1)\)</td><td style="padding: 0.3em 1em; border:1px solid #ccc;">三块同步同方向</td></tr>
+<tr><td style="padding: 0.3em 1em; border:1px solid #ccc;">2（中）</td><td style="padding: 0.3em 1em; border:1px solid #ccc;">\(\sqrt{2k/m}\)</td><td style="padding: 0.3em 1em; border:1px solid #ccc;">\((1, 0, -1)\)</td><td style="padding: 0.3em 1em; border:1px solid #ccc;">中间静止, 两边反相</td></tr>
+<tr><td style="padding: 0.3em 1em; border:1px solid #ccc;">3（高）</td><td style="padding: 0.3em 1em; border:1px solid #ccc;">\(1.848\sqrt{k/m}\)</td><td style="padding: 0.3em 1em; border:1px solid #ccc;">\((1, -\sqrt 2, 1)\)</td><td style="padding: 0.3em 1em; border:1px solid #ccc;">中间相反, 振幅最大</td></tr>
+</table>
+
+<p>验证<em>正交</em>: \(\boldsymbol A_1 \cdot \boldsymbol A_2 = 1 \cdot 1 + \sqrt 2 \cdot 0 + 1 \cdot (-1) = 0\) ✓; \(\boldsymbol A_1 \cdot \boldsymbol A_3 = 1 - 2 + 1 = 0\) ✓; \(\boldsymbol A_2 \cdot \boldsymbol A_3 = 1 + 0 - 1 = 0\) ✓。三个模式相互正交（这里 \(T = m I\), 所以 \(T\)-正交退化为普通正交）。</p>
+
+<p>一般初始条件下 \(x_i(t) = \sum_{k=1}^3 c_k (A_k)_i \cos(\omega_k t + \phi_k)\), 例如 \(x_1(0) = 1, x_2(0) = 0, x_3(0) = 0, \dot x_i(0) = 0\) 给</p>
+
+<p>\[
+c_k = \frac{\boldsymbol A_k \cdot \boldsymbol x(0)}{\boldsymbol A_k \cdot \boldsymbol A_k}, \quad \phi_k = 0.
+\]</p>
+
+<p>具体算 \(c_1 = 1/4\), \(c_2 = 1/2\), \(c_3 = 1/4\)。所以</p>
+
+<p>\[
+x_1(t) = \tfrac 1 4 \cos \omega_1 t + \tfrac 1 2 \cos \omega_2 t + \tfrac 1 4 \cos \omega_3 t.
+\]</p>
+
+<p>三个不同频率的余弦的线性叠加——表面上看起来像"<em>无规律的拍子</em>"（因为 \(\omega_1, \omega_2, \omega_3\) 互不可通约）, 实际上每个余弦各自周期。</p>
+
+<p>这就是开头那个"<em>三个质量缠在一起看起来无规律</em>" 的解释——表面无规律, 内里是三个独立简谐运动叠加的产物。<em>简正模式分析</em> 把无规律分解成 3 段规律——这是一切耦合振动分析的基本工具。</p>
+
+<h2 id="sec8-8">8.8 应用一: 分子振动</h2>
+
+<p>把刚才的"<em>线性弹簧网络</em>" 升级到<em>分子</em>。一个分子由 \(N\) 个原子构成, 用<em>化学键</em>（可以建模为有效弹簧）连接。一个 \(N\) 原子分子在三维空间有 \(3N\) 个位置自由度。其中 6 个用于<em>整体</em>运动: 3 个平移（质心位置）+ 3 个旋转（取向）, 这些不是振动。剩下 \(3N - 6\) 个是<em>内部振动</em>自由度（线性分子是 \(3N - 5\), 因为只有 2 个独立旋转方向）。</p>
+
+<p>所以:</p>
+<ul>
+  <li>水分子（\(\text H_2 \text O\)）: 3 原子, \(3 \cdot 3 - 6 = 3\) 个振动模式。</li>
+  <li>二氧化碳（\(\text C \text O_2\)）: 3 原子, 但<em>线性</em>, \(3 \cdot 3 - 5 = 4\) 个模式。</li>
+  <li>苯（\(\text C_6 \text H_6\)）: 12 原子, 30 个振动模式。</li>
+</ul>
+
+<p>对每个分子, 实验测<em>红外</em> 或<em>拉曼</em> 光谱给出这些频率（光的吸收 / 散射在 \(\omega = \omega_k\) 处共振）。理论上算: 选合适内坐标（键长、键角）→ 写势能（用化学键力常数）→ 写动能 → 解广义特征值。算出的 \(\omega_k\) 与实验对比, 是化学家鉴定分子结构 + 计算热容的标准工具。</p>
+
+<p>水分子的 3 个模式（标准编号）:</p>
+<ul>
+  <li>\(\nu_1\) 对称伸缩（两根 O–H 键同步伸缩）, 频率 ~3650 cm\(^{-1}\)。</li>
+  <li>\(\nu_2\) 弯曲（H–O–H 角变化）, 频率 ~1595 cm\(^{-1}\)。</li>
+  <li>\(\nu_3\) 反对称伸缩（一根伸长, 另一根缩短）, 频率 ~3760 cm\(^{-1}\)。</li>
+</ul>
+
+<p>这三个就是水的"<em>简正模式</em>"。任何水分子振动状态都是它们的叠加。这就是<em>振动光谱学</em> 的物理基础。</p>
+
+<h2 id="sec8-9">8.9 应用二: 晶格声子</h2>
+
+<p>把分子继续放大到<em>晶体</em>。一块晶体是 Avogadro 量级（\(N \sim 10^{23}\)）个原子的有序排列, 每对相邻原子之间有键。\(3N\) 个自由度——所以有 \(3N\) 个简正模式。</p>
+
+<p>这里直接套上面的程序就要算 \(3N \times 3N\) 矩阵的特征值——\(N \sim 10^{23}\) 不可能。<em>但</em> 晶体有一个救命的对称性: <em>平移不变</em> 性。如果你把整个晶体平移一个晶格向量, 它和原来一模一样。这种对称性意味着简正模式可以选成<em>平面波</em> 形式</p>
+
+<p>\[
+\xi_n^{(k)} \propto e^{i \boldsymbol k \cdot \boldsymbol R_n - i \omega t},
+\]</p>
+
+<p>\(\boldsymbol R_n\) 是第 \(n\) 个原子的位置, \(\boldsymbol k\) 是<em>波矢</em>。每个 \(\boldsymbol k\) 给一个模式（或几个, 如果晶胞里多于一个原子）。这种"<em>波矢标记的模式</em>" 叫<em>声子</em>（phonon）——以波矢 \(\boldsymbol k\) 和频率 \(\omega(\boldsymbol k)\) 为标识的格点振动量子。</p>
+
+<p>声子是<em>固体物理</em> 的核心概念。它解释:</p>
+<ul>
+  <li>固体的<em>比热</em>: 低温的 \(T^3\) 律（Debye 模型）从声子态密度推。</li>
+  <li>固体的<em>热传导</em>: 声子碰撞 + 散射决定热导率。</li>
+  <li>电阻随温度变化: 电子被声子散射。</li>
+  <li><em>超导</em>: BCS 理论里声子提供电子配对的"<em>胶水</em>"。</li>
+</ul>
+
+<p>整个固体物理的振动 / 输运 / 热性质几乎都建立在"<em>把晶格的耦合振动简正化为声子</em>" 这一步上。这步本质就是 8.4-8.6 节的程序, 只不过利用了晶格平移对称使得问题<em>每个 \(\boldsymbol k\) 都可解析</em>, 不需要数值对角化 \(10^{23} \times 10^{23}\) 矩阵。</p>
+
+<h2 id="sec8-10">8.10 应用三: 弦振动 → 傅里叶级数</h2>
+
+<p>最后一个例子, 把"<em>离散质量</em>" 推到"<em>连续弦</em>"。一根长度 \(L\) 的弦, 两端固定, 横向小振动 \(u(x, t)\)。对应的 Lagrangian 是连续版的:</p>
+
+<p>\[
+L = \int_0^L \left[ \frac{1}{2} \rho \, u_t^2 - \frac{1}{2} \tau u_x^2 \right] dx,
+\]</p>
+
+<p>\(\rho\) 是线密度, \(\tau\) 是张力。EL 方程给<em>波动方程</em> \(\rho u_{tt} = \tau u_{xx}\), 即 \(u_{tt} = c^2 u_{xx}\), \(c = \sqrt{\tau/\rho}\)。</p>
+
+<p>试解 \(u(x, t) = X(x) T(t)\) 分离变量, 加上边界 \(u(0, t) = u(L, t) = 0\), 得到</p>
+
+<p>\[
+u_n(x, t) = \sin\left(\frac{n \pi x}{L}\right) \cos(\omega_n t + \phi_n), \quad \omega_n = \frac{n \pi c}{L}, \quad n = 1, 2, 3, \ldots
+\]</p>
+
+<p>每个 \(u_n\) 是一个<em>简正模式</em>: 形状 \(\sin(n \pi x/L)\)（n 个半波）, 频率 \(n \pi c / L\)（基音的整数倍）。一般初始条件解</p>
+
+<p>\[
+u(x, t) = \sum_{n=1}^\infty c_n \sin\left(\frac{n \pi x}{L}\right) \cos(\omega_n t + \phi_n),
+\]</p>
+
+<p>这就是<em>傅里叶级数</em>! 任何 (满足边界条件的) 弦的振动状态可以分解为<em>无穷</em> 个正弦模式的叠加。</p>
+
+<p>请你把这件事和前面的串起来:</p>
+
+<ul>
+  <li>1 自由度 → 1 频率（单弹簧）。</li>
+  <li>3 自由度 → 3 频率（三耦合摆）。</li>
+  <li>\(N\) 自由度 → \(N\) 频率（一般离散系统）。</li>
+  <li>\(\infty\) 自由度（连续介质）→ \(\infty\) 频率（傅里叶级数）。</li>
+</ul>
+
+<p>傅里叶级数<em>就是</em> 连续介质的简正模式分析! 历史上 Fourier 1822 引入这个工具是为了解热传导方程, 但本质数学和我们这一章一模一样: 把一个二阶线性 PDE / ODE 分解为<em>独立振动模式</em> 的叠加。在<a href="../泛函分析/index.html">泛函分析</a>里这叫"<em>对自伴算子的谱分解</em>"——简正模式 = 算子的本征函数, 频率 = 本征值。这是同一个数学对象 (Hermitian 算子的谱定理) 在不同物理场景的现身。</p>
+
+<p>而 \(n \to \infty\) 让"<em>简正模式</em>" 升级成"<em>本征函数</em>", 这条路通向<em>量子力学</em>: 一个 1D 量子粒子在势井 \(V(x)\) 中的波函数也<em>分解成定态的叠加</em>, 每个定态有自己的能量 \(E_n\) 与"<em>形状</em>" \(\psi_n(x)\)。本质数学一致——Schrödinger 方程的定态正是经典小振动的量子对应物。这条桥在 ch21 里讨论。</p>
+
+<h2 id="sec8-11">8.11 临别话</h2>
+
+<p>这一章的核心信息只有一句: <em>任何稳定平衡点附近的小振动都解耦为 \(n\) 个独立简谐模式</em>。这条结论以三种身份出现:</p>
+
+<ul>
+  <li><em>线性代数</em>: 同时对角化两个对称矩阵 \((T, V)\) 的程序。</li>
+  <li><em>物理学</em>: 任何耦合振动系统的"<em>表面缠绕、内里解耦</em>" 现象。</li>
+  <li><em>谱理论</em>: 自伴算子的本征展开（连续极限下变成傅里叶 / 球谐 / Hermite 等正交基）。</li>
+</ul>
+
+<p>"<em>简正模式</em>" 是物理学的<em>第一种</em> 解耦工具——它把表面复杂的耦合分解为独立元件。这种"<em>找正确坐标使问题分离</em>" 的哲学贯穿后面整本书和你后续学的物理:</p>
+
+<ul>
+  <li><em>正则变换</em>（ch13）: 找让 Hamiltonian 简化的相空间坐标变换。</li>
+  <li><em>作用-角变量</em>（ch15）: 找让 Hamilton 方程<em>线性</em>化的坐标。</li>
+  <li><em>量子力学</em>: 找让 Hamiltonian 算子对角的本征基。</li>
+  <li><em>场论</em>: 找让自由场 Lagrangian 解耦的傅里叶模式（粒子）。</li>
+</ul>
+
+<p>所有这些都在做同一件事——<em>分解</em>。一个完整的 \(n\) 自由度问题, 找<em>正确</em> 的坐标系后, 拆成 \(n\) 个独立 1 自由度问题。<em>正确</em> 的坐标系由<em>问题的对称性</em> 决定, 对小振动来说就是 \((T, V)\) 矩阵的同时对角化, 对一般 Hamilton 系统来说就是<em>积分变量</em>。这条主线在 ch10 起的 Hamilton 力学里我们将不断看到。</p>
+
+<p>下一章我们换主题——刚体动力学。陀螺仪、网球拍、地球岁差, 这些"<em>转动的扩展物体</em>" 有自己的奇怪现象, 需要新的工具: 惯性张量 + Euler 方程 + 欧拉角参数化。表面上和小振动毫不相关, 但深层都是 Lagrange 力学 + 线性代数（特征值分解）的组合。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 对称性 + Noether 定理</a><a href="ch9.html">下一章 · 第 9 章 刚体动力学 + 欧拉角 →</a></nav>
+</main>
+</body>
+</html>

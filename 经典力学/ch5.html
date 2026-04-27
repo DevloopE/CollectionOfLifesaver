@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 变分原理：从一道老题到一门通用方法 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 广义坐标与约束</a><a href="ch6.html">下一章 · 第 6 章 Hamilton 原理与 Lagrange 方程 →</a></nav>
+<h1 id="ch5">第 5 章 变分原理：从一道老题到一门通用方法</h1>
+
+<p>请你回忆<a href="ch1.html">第 1 章</a>开头那道题——Bernoulli 1696 年挂出的最速降线。我们当时用<em>变分法</em> 解出: 写下时间泛函 \(T[y] = \int \sqrt{(1+y'^2)/(2gy)} \, dx\), 套<em>Euler-Lagrange 方程</em>, 解得摆线。整段过程像一段魔术——你看见了它有用, 但没看懂"<em>泛函取极值</em>" 究竟是什么数学动作, 也没看懂 EL 方程从哪里来。</p>
+
+<p>这一章把这套魔术拆开。我们从同一道最速降线问题再起步, 但这一次把每一步都<em>显式</em> 化: 什么是泛函, 什么叫"<em>对函数取微分</em>", 为什么\(\delta J = 0\) 能化简到一条 ODE, 为什么这条 ODE 长成 \((d/dx)(\partial F/\partial y') - \partial F/\partial y = 0\) 那个特定形状。读完之后你不仅会用变分法, 还知道<em>它为什么成立</em>。</p>
+
+<p>这一章<em>还不</em> 进入力学的 Hamilton 原理。Hamilton 原理是<a href="ch6.html">下一章</a>的事——这一章只搭<em>数学</em> 工具。但你会在 5.5–5.7 看到三个例子: 最短路径（几何）、最速降线（力学）、Fermat 光路（光学）。同一条 EL 方程在三个领域各自给出"<em>真实路径</em>"。这种<em>跨领域同形</em> 是变分法最让人着迷的地方, 也是 Lagrange 后来敢把<em>整个</em> 力学搬到这个框架的底气。</p>
+
+<h2 id="sec5-1">5.1 复述最速降线: 我们要解决什么样的问题</h2>
+
+<p>把<a href="ch1.html">ch1.1</a> 那一节的设置搬过来。两点 A 在原点, B 在 \((X, Y)\)（\(Y > 0\), 取 \(y\) 轴向下为正）。一条曲线 \(y(x)\) 连接 A 到 B, 满足边界条件 \(y(0) = 0\), \(y(X) = Y\)。沿这条曲线, 受重力的小球从 A 静止释放, 经过线元 \(ds\) 用时</p>
+
+<p>\[
+dt = \frac{ds}{v} = \frac{\sqrt{1 + y'^2} \, dx}{\sqrt{2 g y}}.
+\]</p>
+
+<p>总用时</p>
+
+<p>\[
+T[y] = \int_0^X \frac{\sqrt{1 + y'(x)^2}}{\sqrt{2 g y(x)}} \, dx.
+\]</p>
+
+<p>问题: 在所有满足边界条件的可微函数 \(y(\cdot)\) 中, 找让 \(T[y]\) 最小的那一条。</p>
+
+<p>请你停下来对比这道题和<em>普通</em> 最值题的区别。普通最值: 给函数 \(f(x)\), 找让 \(f\) 最小的<em>数</em> \(x^*\)。变分最值: 给"<em>把函数变成数</em>" 的规则 \(T[\cdot]\), 找让 \(T\) 最小的<em>函数</em> \(y^*\)。前者输入是个数, 后者输入是<em>整个函数</em>——<em>无穷多自由度</em>。</p>
+
+<p>这种"<em>无穷多自由度的最值</em>" 第一次看会迷惑——你<em>怎么</em> 在所有函数里搜? 更糟糕的是: 函数空间没有标准的"<em>距离</em>" 概念（两个函数<em>近</em> 是什么意思? 同一点处值近? 还是图像近? 还是导数近?）, 取极值的"<em>极</em>" 字也不容易精确化。</p>
+
+<p>但有一个朴素的应对: 把"<em>找最优函数</em>" 套进"<em>找最优数</em>" 的框架。<em>怎么套</em>? 选一族单参数函数 \(y_\epsilon = y + \epsilon \eta\), 让 \(\epsilon\) 是<em>数</em>; 这把无穷自由度收缩到一个自由度。然后对这一族, 把 \(T[y_\epsilon]\) 看成 \(\epsilon\) 的<em>函数</em>, 求它对 \(\epsilon\) 的导数等于零。这就是变分法。</p>
+
+<h2 id="sec5-2">5.2 泛函: 把函数映成数</h2>
+
+<p>正式给个名字。</p>
+
+<p><strong>定义（泛函）</strong>: 设 \(\mathcal{F}\) 是一族函数（比如 \([a,b]\) 上满足 \(y(a)=A\), \(y(b)=B\) 的可微函数）。一个<em>泛函</em> \(J: \mathcal F \to \mathbb R\) 是把每条 \(y \in \mathcal F\) 映成一个实数。</p>
+
+<p>本章关心的最常见的一类泛函是</p>
+
+<p>\[
+\boxed{\ J[y] = \int_a^b F\big(x,\, y(x),\, y'(x)\big) \, dx,\ }
+\]</p>
+
+<p>其中 \(F: \mathbb R^3 \to \mathbb R\) 是一个给定的、足够光滑的函数（叫<em>被积函数</em>; 在力学里它会扮演 Lagrangian 的角色）。我们一律假设 \(F\) 对它的三个变量都有连续偏导。</p>
+
+<p>请你看清符号的语意。\(F\) 是<em>三元函数</em>: \(F(x, u, p)\)。当代入 \(y(x)\) 时, 我们把第二个槽放 \(y(x)\), 第三个槽放 \(y'(x)\)。你需要分清"<em>对 \(F\) 第二个槽求导</em>"（写成 \(F_y\) 或 \(\partial F/\partial y\), 此时 \(y'\) 当独立变量保持不动）与"<em>对 \(y(x)\) 沿曲线求导</em>"（即 \(dy/dx\)）。这两件事符号上像, 物理上完全不同。下面凡 \(\partial F/\partial y\) 都是前者。</p>
+
+<p>对最速降线, \(F(x, y, y') = \sqrt{(1 + y'^2)/(2 g y)}\)（不显含 \(x\)）。对最短路径（5.5）, \(F = \sqrt{1 + y'^2}\)（不显含 \(x\) 也不显含 \(y\)）。对 Fermat（5.7）, \(F = n(y) \sqrt{1 + y'^2}\)（不显含 \(x\)）。这些都是同一形式 \(\int F \, dx\) 的具体化。</p>
+
+<h2 id="sec5-3">5.3 变分: 函数空间里的"<em>方向导数</em>"</h2>
+
+<p>现在做 5.1 末尾说的那件事。设 \(y\) 是<em>候选极值</em>（即我们猜它就是最优的那条函数）。我们要检验它是不是真极值。怎么做? 让它沿任意方向"<em>晃一晃</em>", 看 \(J\) 怎么变。</p>
+
+<p>具体: 取任意一个<em>试验函数</em> \(\eta(x)\), 满足边界 \(\eta(a) = \eta(b) = 0\)（这样 \(y_\epsilon = y + \epsilon \eta\) 仍满足边界条件 \(y_\epsilon(a) = A, y_\epsilon(b) = B\)）。考虑单参数族 \(y_\epsilon(x) = y(x) + \epsilon \eta(x)\), 把</p>
+
+<p>\[
+\Phi(\epsilon) := J[y_\epsilon] = \int_a^b F\big(x, y(x) + \epsilon \eta(x), y'(x) + \epsilon \eta'(x)\big) \, dx
+\]</p>
+
+<p>看成 \(\epsilon\) 的普通函数。如果 \(y\) 是真极值, 那么 \(\Phi(\epsilon)\) 在 \(\epsilon = 0\) 处取极值, 即 \(\Phi'(0) = 0\), 而且这对<em>每一个</em> 满足边界条件的 \(\eta\) 都成立。</p>
+
+<p>定义</p>
+
+<p>\[
+\boxed{\ \delta J[y; \eta] \, := \, \frac{d}{d\epsilon} J[y + \epsilon \eta] \,\Big|_{\epsilon = 0},\ }
+\]</p>
+
+<p>叫<em>\(J\) 在 \(y\) 处沿 \(\eta\) 的第一变分</em>（first variation）。这就是函数空间版的<em>方向导数</em>——\(\eta\) 是"<em>方向</em>", \(\delta J\) 是 \(J\) 在 \(y\) 沿 \(\eta\) 的"<em>瞬时变化率</em>"。</p>
+
+<p>极值条件: 对所有满足 \(\eta(a) = \eta(b) = 0\) 的 \(\eta\), \(\delta J[y; \eta] = 0\)。简写成</p>
+
+<p>\[
+\boxed{\ \delta J = 0 \quad (\text{对所有合法变分}).\ }
+\]</p>
+
+<p>这是<em>变分原理</em> 的标准写法。请你停下来想——这条等式说的不是"<em>\(J\) 取一个固定值</em>", 是"<em>\(J\) 在 \(y\) 处对所有微小晃动的<em>响应</em> 都是零</em>"。和单变量微积分里 \(f'(x^*) = 0\) 完全同构, 只是"<em>所有方向</em>" 换成"<em>所有 \(\eta\)</em>"。</p>
+
+<p><strong>类比</strong>: 一个<em>函数</em> 在点上取极值 ⟺ 所有方向上一阶导都为零（梯度为零向量）。一个<em>泛函</em> 在曲线 \(y\) 上取极值 ⟺ 所有方向 \(\eta\) 上一阶变分都为零。"<em>方向</em>" 在前者是 \(\mathbb R^n\) 中的向量, 在后者是 \(C^1[a,b]\) 中的函数; 维度从有限升到无限, 思路不变。</p>
+
+<h2 id="sec5-4">5.4 计算第一变分: Euler-Lagrange 方程的诞生</h2>
+
+<p>现在把 \(\delta J\) <em>具体算出来</em>, 看"\(\delta J = 0\) 对一切 \(\eta\)" 能给出什么。</p>
+
+<p>从定义出发:</p>
+
+<p>\[
+\delta J = \frac{d}{d\epsilon} \int_a^b F(x, y + \epsilon \eta, y' + \epsilon \eta') \, dx \,\Big|_{\epsilon=0}.
+\]</p>
+
+<p>把 \(d/d\epsilon\) 拉进积分号（\(F\) 光滑, 积分区域固定, 合法）, 用链式法则:</p>
+
+<p>\[
+\delta J = \int_a^b \Big[ F_y(x, y, y') \, \eta(x) + F_{y'}(x, y, y') \, \eta'(x) \Big] \, dx.
+\]</p>
+
+<p>这里 \(F_y := \partial F/\partial y\) 是把 \(F\) 当三元函数对第二个槽求偏导, \(F_{y'} := \partial F/\partial y'\) 是对第三个槽求偏导。两者都在点 \((x, y(x), y'(x))\) 上取值。</p>
+
+<p>表达式里出现 \(\eta'\)——它和 \(\eta\) 不独立, 让接下来"<em>对所有 \(\eta\) 都为零</em>" 不容易直接读出条件。<em>策略</em>: 用<em>分部积分</em> 把 \(\eta'\) 转回 \(\eta\):</p>
+
+<p>\[
+\int_a^b F_{y'} \, \eta'(x) \, dx = \big[F_{y'} \, \eta(x)\big]_a^b - \int_a^b \frac{d}{dx}\big(F_{y'}\big) \, \eta(x) \, dx.
+\]</p>
+
+<p>边界项 \([F_{y'} \, \eta]_a^b\) 在 \(\eta(a)=\eta(b)=0\) 下<em>消失</em>。代回:</p>
+
+<p>\[
+\delta J = \int_a^b \Big[ F_y - \frac{d}{dx}\big(F_{y'}\big) \Big] \, \eta(x) \, dx.
+\]</p>
+
+<p>这就是<em>第一变分的标准型</em>。括号里的东西<em>不依赖 \(\eta\)</em>; 它只依赖 \(y\)（候选极值本身）。</p>
+
+<p>极值条件 \(\delta J = 0\) 现在是: 对一切满足边界为零的 \(\eta\),</p>
+
+<p>\[
+\int_a^b \underbrace{\Big[ F_y - \frac{d}{dx}\big(F_{y'}\big) \Big]}_{=: \, G(x)} \eta(x) \, dx = 0.
+\]</p>
+
+<p>关键的最后一步是<em>变分法基本引理</em>。</p>
+
+<p><strong>引理（变分法基本引理）</strong>: 设 \(G\) 在 \([a,b]\) 上连续。如果对一切在 \([a,b]\) 上光滑、且 \(\eta(a)=\eta(b)=0\) 的 \(\eta\), 都有 \(\int_a^b G(x) \eta(x) \, dx = 0\), 则 \(G(x) \equiv 0\) 在 \([a,b]\) 上。</p>
+
+<p><em>证明思路</em>（不细抠）: 反证。假设某点 \(x_0\) 处 \(G(x_0) > 0\)。由连续性, 在 \(x_0\) 邻域 \([x_0-\delta, x_0+\delta] \subset (a,b)\) 上 \(G > 0\)。取 \(\eta\) 是个"<em>凸起</em>"（bump）: 在这个邻域内是正光滑函数（如 \((\delta^2 - (x-x_0)^2)^2\) 截断）, 在外面恒为零。则 \(\int G \eta \, dx > 0\), 矛盾。\(G(x_0) < 0\) 同理。</p>
+
+<p>把引理应用到我们的情形: \(G(x) = F_y - (d/dx) F_{y'}\) 必须恒为零。即</p>
+
+<p>\[
+\boxed{\ \frac{d}{dx} \frac{\partial F}{\partial y'} - \frac{\partial F}{\partial y} = 0.\ }
+\]</p>
+
+<p>这就是<em>Euler-Lagrange 方程</em>。是泛函 \(J[y] = \int F \, dx\) 取极值的<em>必要条件</em>。请你停下来感受这条方程的来源——它<em>不是</em> 我们硬猜出来的; 它是"<em>对一切方向第一变分为零</em>" + "<em>分部积分把 \(\eta'\) 处理掉</em>" 这两件事的<em>逻辑后果</em>。</p>
+
+<p><strong>关于必要 vs 充分</strong>: EL 方程是<em>极值的必要条件</em>, 不是充分。满足 EL 的 \(y\) 可能是极小、极大、或<em>鞍点</em>（局部既不是极小也不是极大）。变分法把它们统称为<em>极值点</em>（extremal）或<em>稳定点</em>（stationary point）。物理学常说"<em>最小作用量原理</em>", 措辞误导——更准的说法是<em>稳定作用量原理</em>: 真实路径让 \(\delta S = 0\), 但 \(S\) 不一定是<em>最小</em>。判断是不是真极小要看二阶变分（Jacobi 条件、Legendre 条件）, 这是更高级的内容, 本书不展开。对实际物理这个细节通常不关键。</p>
+
+<h2 id="sec5-5">5.5 例 1: 两点之间最短路径（直线）</h2>
+
+<p>第一个练手例。在欧氏平面上, 两点 \(A = (a, A)\), \(B = (b, B)\) 之间, 找一条让弧长最短的曲线 \(y(x)\)。</p>
+
+<p>弧长泛函</p>
+
+<p>\[
+L[y] = \int_a^b \sqrt{1 + y'(x)^2} \, dx.
+\]</p>
+
+<p>这里 \(F(x, y, y') = \sqrt{1 + y'^2}\)。它<em>不显含 \(x\) 也不显含 \(y\)</em>, 只依赖 \(y'\)。算偏导:</p>
+
+<p>\[
+F_y = 0, \qquad F_{y'} = \frac{y'}{\sqrt{1 + y'^2}}.
+\]</p>
+
+<p>EL 方程: \((d/dx)(F_{y'}) - F_y = (d/dx)\big(y'/\sqrt{1+y'^2}\big) = 0\)。这告诉我们 \(y'/\sqrt{1+y'^2} = \text{const}\)。把这条方程解出来: 设常数为 \(c\), 平方:</p>
+
+<p>\[
+\frac{y'^2}{1 + y'^2} = c^2 \implies y'^2 = \frac{c^2}{1 - c^2} \implies y' = \text{const}.
+\]</p>
+
+<p>导数为常数⟹ 曲线是<em>直线</em>。代入边界条件得 \(y = A + (B-A)/(b-a) \cdot (x - a)\)。</p>
+
+<p>请你回头看这一题——结论是直线, 是大家从小知道的事。<em>变分法</em> 没有给出新东西, 它给出的是"<em>为什么是直线</em>" 的<em>推导</em>: 因为 EL 方程对这个 \(F\) 化简为 \(y'\) 是常数。这在欧氏平面是直觉; 但同一公式搬到<em>球面</em> 或<em>双曲平面</em> 时, "<em>测地线</em>" 不再是欧氏直线, 它的具体形状（球面上是<em>大圆</em>; 双曲上是<em>双曲直线</em>）要由对应度量下的 EL 方程算出来。变分法的力量在<em>同一框架</em> 应付所有情形。</p>
+
+<p>我们这一段的<em>方法论收获</em>: 当 \(F\) <em>不依赖 \(y\)</em>（只依赖 \(x, y'\)）, EL 方程退化为 \((d/dx) F_{y'} = 0\), 即 \(F_{y'} = \text{const}\)。这是一条<em>第一积分</em>（first integral）, 比原 EL 方程低一阶, 通常容易解。"<em>不依赖 \(y\)</em>" 在物理里对应"<em>\(y\) 是<em>循环坐标</em>（cyclic coordinate）</em>", 给出守恒律。这个想法 ch7 详细展开。</p>
+
+<h2 id="sec5-6">5.6 例 2: 最速降线（摆线）</h2>
+
+<p>回到 ch1 那道题, 这次用我们建立的工具完整跑一遍。</p>
+
+<p>泛函</p>
+
+<p>\[
+T[y] = \int_0^X \frac{\sqrt{1 + y'^2}}{\sqrt{2 g y}} \, dx, \qquad F = \frac{\sqrt{1 + y'^2}}{\sqrt{2 g y}}.
+\]</p>
+
+<p>这里 \(F\) <em>不显含 \(x\)</em>（它只通过 \(y, y'\) 出现）。这个特性给我们一个<em>简便武器</em>: <em>Beltrami 恒等式</em>。</p>
+
+<p><strong>Beltrami 恒等式</strong>: 当 \(F\) 不显含 \(x\) 时, EL 方程<em>等价于</em></p>
+
+<p>\[
+\boxed{\ F - y' \frac{\partial F}{\partial y'} = \text{const}.\ }
+\]</p>
+
+<p><em>简短证明</em>: 算 \(d/dx [F - y' F_{y'}]\) = \(F_y \cdot y' + F_{y'} \cdot y'' - y'' F_{y'} - y' (d/dx) F_{y'}\) = \(y' [F_y - (d/dx) F_{y'}]\)。EL 方程让方括号为零, 所以 \(F - y' F_{y'} = \text{const}\)。<em>逆向</em>: 已知 \(F - y' F_{y'} = \text{const}\) 且 \(y' \neq 0\), 同样的代数能反推 EL 方程成立（只在 \(y' \equiv 0\) 的退化点失效, 我们不关心）。</p>
+
+<p>套到最速降线: 算 \(F - y' F_{y'}\)。</p>
+
+<p>\[
+F_{y'} = \frac{1}{\sqrt{2gy}} \cdot \frac{y'}{\sqrt{1 + y'^2}}, \quad y' F_{y'} = \frac{y'^2}{\sqrt{2gy}\sqrt{1+y'^2}}.
+\]</p>
+
+<p>\[
+F - y' F_{y'} = \frac{1}{\sqrt{2gy}} \cdot \left[ \sqrt{1 + y'^2} - \frac{y'^2}{\sqrt{1 + y'^2}} \right] = \frac{1}{\sqrt{2gy}} \cdot \frac{1}{\sqrt{1+y'^2}} = \frac{1}{\sqrt{2gy(1+y'^2)}}.
+\]</p>
+
+<p>令它等于常数 \(1/\sqrt{2gC}\)（把 \(\sqrt{2g}\) 吸进常数, 写法清爽）:</p>
+
+<p>\[
+\frac{1}{\sqrt{y(1 + y'^2)}} = \frac{1}{\sqrt{C}} \implies y(1 + y'^2) = C.
+\]</p>
+
+<p>这条 ODE 就是 ch1.1 末尾出现的那条。它的解可以用<em>参数化</em> 找到。设</p>
+
+<p>\[
+y = \frac{C}{2}(1 - \cos\theta), \quad \text{则} \quad y' = \frac{dy/d\theta}{dx/d\theta}.
+\]</p>
+
+<p>代入 \(y(1+y'^2) = C\) 反解 \(dx/d\theta\), 一些代数后得到 \(dx/d\theta = (C/2)(1 - \cos \theta)\), 积分:</p>
+
+<p>\[
+\boxed{\ x(\theta) = \frac{C}{2}(\theta - \sin\theta), \quad y(\theta) = \frac{C}{2}(1 - \cos\theta).\ }
+\]</p>
+
+<p>这就是<em>摆线</em>（cycloid）——半径 \(C/2\) 的圆沿水平线滚动时, 圆周上一点画出的轨迹。常数 \(C\) 由边界条件 \((X, Y)\) 隐式确定。</p>
+
+<p>请你停下来对比这一节和 5.5。同一条 EL 方程, 同一条变分原理, 在不同的 \(F\) 下给出截然不同的<em>真实曲线</em>: 直线 vs 摆线。\(F\) 编码了"<em>问题特性</em>"（欧氏几何 vs 重力时间）, EL 方程把这个特性翻译成 ODE, 解 ODE 给出真实曲线。变分法是个<em>翻译机</em>。</p>
+
+<h2 id="sec5-7">5.7 例 3: Fermat 光路</h2>
+
+<p>第三个例子换领域: <em>光学</em>。</p>
+
+<p>1657 年 Fermat 提出的<em>最短时间原理</em>: 光在介质中行进时, 总走<em>用时最短</em> 的路径。在折射率 \(n(y)\) 不均匀的介质里, 局部光速 \(v = c/n(y)\)。光从 \(A\) 到 \(B\) 沿 \(y(x)\) 的总时</p>
+
+<p>\[
+T[y] = \int_A^B \frac{ds}{v} = \int_a^b \frac{n(y)}{c} \sqrt{1 + y'^2} \, dx.
+\]</p>
+
+<p>分子常数 \(1/c\) 不影响极值点, 我们去掉。被积函数</p>
+
+<p>\[
+F(y, y') = n(y) \sqrt{1 + y'^2}.
+\]</p>
+
+<p>\(F\) 不显含 \(x\), 用 Beltrami:</p>
+
+<p>\[
+F - y' F_{y'} = n(y) \sqrt{1 + y'^2} - y' \cdot \frac{n(y) y'}{\sqrt{1+y'^2}} = \frac{n(y)}{\sqrt{1 + y'^2}} = \text{const}.
+\]</p>
+
+<p>翻译: \(n(y)/\sqrt{1+y'^2} = \text{const}\)。如果用<em>角度</em> 写——设光线与 \(y\) 轴（这里是<em>法线</em>方向）夹角为 \(\theta\), 则 \(\sin\theta = (\text{水平分量})/(\text{弧长})  = 1/\sqrt{1+y'^2}\)（小心: 这取决于 \(y\) 是水平还是竖直, 我们这里设 \(y\) 是<em>横向</em> 坐标, 光主要沿 \(x\) 方向传播, 那么 \(y'\) 小, \(1/\sqrt{1+y'^2}\) 接近 1。具体几何细节可以细看, 关键关系是下一行）。</p>
+
+<p>\[
+n(y) \sin\theta(y) = \text{const}.
+\]</p>
+
+<p>这是<em>Snell 定律</em>! 在两介质界面（\(n\) 突变）, Snell 定律 \(n_1 \sin\theta_1 = n_2 \sin\theta_2\); 在折射率连续变化的介质（如大气、海水分层）里, 这条守恒律告诉你光线沿曲线传播时, \(n \sin\theta\) 处处相等。<em>Snell 定律是 Fermat 原理的 EL 方程</em>。</p>
+
+<p>请你感受这一刻的统一性。我们用的方法<em>完全一样</em>: 写下泛函, 套 EL（或 Beltrami）, 解。在重力题里得到摆线, 在光学题里得到 Snell 定律。变分法把"<em>力学</em>" 与"<em>光学</em>" 在<em>数学骨架</em> 上等同——这正是 Hamilton 1830 年代意识到的事, 启发他后来把<em>整个力学</em> 写成"<em>力学的 Fermat 原理</em>": 真路径让作用量取极值。<em>力学 ↔ 几何光学</em> 的类比是 Hamilton 力学 + 几何光学 + 量子力学三者一脉相承的根源。<a href="ch14.html">ch14 Hamilton-Jacobi 方程</a> 会再回到这个类比, 看到它如何引向 de Broglie 的物质波。</p>
+
+<p>另一个有趣推论: 沙漠中的<em>蜃景</em>（mirage）就是这条 EL 方程的解。地表附近空气热, \(n\) 小; 高空冷, \(n\) 大。\(n\) 是 \(y\)（高度）的递减函数。光线从远处天空斜射地面附近, 因为 \(n \sin\theta = \text{const}\), 在 \(n\) 小的地方 \(\sin\theta\) 必须大——光线被"<em>弯</em>" 起来, 你看到一团明亮的天空贴在地面上, 像一汪水。这是 Fermat 原理给的预测, 不是巧合。</p>
+
+<h2 id="sec5-8">5.8 推广: 多变量 + 多函数</h2>
+
+<p>到此我们的泛函都是 \(\int_a^b F(x, y, y') \, dx\) 形式——<em>一个</em> 自变量 \(x\), <em>一条</em> 函数 \(y(x)\)。物理里很快就需要更复杂的形式: 力学的位形空间通常是<em>多个</em> 函数（每条粒子三个坐标, 多粒子更多）, 场论里的拉格朗日密度是<em>多变量</em>（时空四维）。这一节快速把推广讲掉。</p>
+
+<p><strong>推广 1: 多个未知函数 \(y_1(x), \ldots, y_n(x)\)</strong>。泛函</p>
+
+<p>\[
+J[y_1, \ldots, y_n] = \int_a^b F(x, y_1, \ldots, y_n, y_1', \ldots, y_n') \, dx.
+\]</p>
+
+<p>对每个 \(y_i\) 独立做变分（取 \(y_i \to y_i + \epsilon \eta_i\), 各自零边界）, 极值条件给出<em>一组</em> EL 方程:</p>
+
+<p>\[
+\boxed{\ \frac{d}{dx} \frac{\partial F}{\partial y_i'} - \frac{\partial F}{\partial y_i} = 0, \qquad i = 1, \ldots, n.\ }
+\]</p>
+
+<p><em>n 条 ODE, n 个未知函数</em>。这正是力学多自由度系统会出现的形式（\(x \to t\) 时间, \(y_i \to q^i\) 广义坐标, \(F \to L\) Lagrangian）。<a href="ch6.html">下一章</a>我们就用这一组方程。</p>
+
+<p><strong>推广 2: 多个自变量</strong>。设 \(\phi(x, t)\) 是定义在二维区域 \(\Omega \subset \mathbb R^2\) 上的函数（\(t\) 是时间, \(x\) 是空间; 或两个空间维度）。泛函</p>
+
+<p>\[
+J[\phi] = \iint_\Omega F(x, t, \phi, \phi_x, \phi_t) \, dx \, dt.
+\]</p>
+
+<p>同样让 \(\phi \to \phi + \epsilon \eta\)（\(\eta\) 在 \(\partial \Omega\) 上为零）, 算第一变分, 用<em>二维分部积分</em>（即 Green 定理的特例）化掉 \(\eta_x, \eta_t\), 极值条件给:</p>
+
+<p>\[
+\frac{\partial F}{\partial \phi} - \frac{\partial}{\partial x} \frac{\partial F}{\partial \phi_x} - \frac{\partial}{\partial t} \frac{\partial F}{\partial \phi_t} = 0.
+\]</p>
+
+<p>这是<em>场论</em> 的 EL 方程。比如取 \(F = (1/2)(\phi_t^2 - c^2 \phi_x^2)\)（自由波场的 Lagrangian 密度）, 这条方程退化为<em>波动方程</em> \(\phi_{tt} = c^2 \phi_{xx}\)。本书 ch20 经典场论讨论这一段, 这里只展示<em>同样的变分推理在更高维同样适用</em>。</p>
+
+<p><strong>推广 3: 高阶导</strong>。被积函数若依赖到 \(y''\), 推广的 EL 方程是 \(F_y - (d/dx) F_{y'} + (d^2/dx^2) F_{y''} = 0\), 同样由分部积分两次得到。物理上比较少见, 但弹性梁理论用到（梁的应变能依赖<em>曲率</em>, 即 \(y''\)）。</p>
+
+<p><strong>推广 4: 含约束的变分</strong>（Lagrange 乘子法）。如果你要在<em>额外约束</em> \(G[y] = \int g(x, y, y') \, dx = \text{const}\) 下极值化 \(J[y]\), 可以引入乘子 \(\lambda\), 改极值化 \(J[y] - \lambda G[y]\)。这给出 EL 方程的"<em>约束版</em>"。一个经典应用: <em>等周问题</em>（在固定周长下找围出最大面积的曲线; 答案是圆）。</p>
+
+<p>这些推广都<em>不</em> 改变变分推理的基本步骤——只是分部积分要做更多次或在更高维做。骨架是同一根: <em>第一变分为零 + 基本引理 ⟹ EL 方程</em>。</p>
+
+<h2 id="sec5-9">5.9 通向 Hamilton 原理（下一章预告）</h2>
+
+<p>这一章把变分法当<em>纯数学工具</em> 建立。下一章它升级成<em>物理原理</em>。</p>
+
+<p>具体: 给一个力学系统, 选一组广义坐标 \(q^1, \ldots, q^n\)。定义 Lagrangian \(L(q, \dot q, t) = T - V\)（动能减势能, 必要时含其他项）。在两时刻 \(t_1, t_2\) 间, 系统从位形 \(q(t_1) = q_1\) 走到 \(q(t_2) = q_2\), 真实路径让<em>作用量</em></p>
+
+<p>\[
+S[q] = \int_{t_1}^{t_2} L(q(t), \dot q(t), t) \, dt
+\]</p>
+
+<p>取极值——<em>Hamilton 原理</em>, \(\delta S = 0\)。</p>
+
+<p>这正是本章 5.8 推广 1 的特例, 把 \(x \to t\), \(y_i \to q^i\), \(F \to L\)。EL 方程</p>
+
+<p>\[
+\frac{d}{dt} \frac{\partial L}{\partial \dot q^i} - \frac{\partial L}{\partial q^i} = 0
+\]</p>
+
+<p>变成<em>力学的运动方程</em>。它对单粒子在势场里化简为 \(m\ddot{\boldsymbol r} = -\nabla V\)（即 Newton F=ma）。<em>对约束系统、广义坐标系统</em>, 它直接给出广义坐标下的运动方程, 不必显式处理约束力。这是 ch1 末尾说的"<em>简化</em>" 优势的具体兑现。</p>
+
+<p>但请注意——把"<em>变分原理</em>" 当成<em>物理公设</em>（即"<em>自然界为什么让 \(\delta S = 0\)</em>"）是<em>新</em> 假设, 不能从 Newton 力学严格推出（虽然两者等价）。它<em>是</em> 一条独立的物理陈述, 形式上比 F=ma 更<em>整体</em>——F=ma 描述<em>每一瞬间</em> 局部力平衡, \(\delta S = 0\) 描述<em>整条路径</em> 的全局选择。这种"<em>从瞬时到整体</em>" 的视角变换是 Hamilton 力学的灵魂, 也是它能桥到<em>量子力学</em>（Feynman 路径积分: 所有路径加权求和, 主导贡献来自 \(\delta S = 0\)）的根源。</p>
+
+<p>下一章详细做这件事: 把 Hamilton 原理立为公设, 推 EL 方程在力学里的具体化, 跑四个完整例题（单摆 / 双摆 / 弹簧滑块 / 球面摆）, 引入广义动量 + 广义力, 最后回应 ch1.4 的"<em>四理由</em>"。</p>
+
+<h2 id="sec5-10">5.10 临别话</h2>
+
+<p>变分法在数学史上的地位不亚于微积分。Newton-Leibniz 给"<em>怎么对函数求导 / 求积分</em>", 这是 17 世纪。Euler-Lagrange 给"<em>怎么对泛函求导 / 求极值</em>", 这是 18 世纪。两者<em>同根</em>: 都把"<em>极值</em>" 翻译成"<em>导数为零</em>", 只是后者的"<em>导数</em>" 是函数空间版（变分）。</p>
+
+<p>变分原理在 19-20 世纪占领整个理论物理:</p>
+
+<ul>
+  <li><em>经典力学</em>: Hamilton 原理 \(\delta S = 0\)（下一章）</li>
+  <li><em>电磁学</em>: Maxwell 方程从电磁场作用量 \(S = \int (-1/4) F_{\mu\nu} F^{\mu\nu} \, d^4 x\) 的 EL 方程导出</li>
+  <li><em>广义相对论</em>: Einstein 方程从 \(S = \int R \sqrt{|g|} \, d^4 x\) 的 EL 方程导出（Einstein-Hilbert 作用量, 1915, 链<a href="../微分几何/ch23.html">微分几何 ch23</a>）</li>
+  <li><em>量子场论</em>: 标准模型整套 Lagrangian 写出来, EL 方程给所有粒子运动 + 相互作用规则</li>
+  <li><em>规范理论</em>: Yang-Mills 拉格朗日, EL 给 Yang-Mills 方程</li>
+  <li><em>弦论</em>: Polyakov 作用量 \(S = -(T/2) \int \sqrt{-h} h^{ab} \partial_a X^\mu \partial_b X_\mu \, d^2 \sigma\) 是世界面作用量</li>
+</ul>
+
+<p>请你停下来感受这件事的<em>普遍性</em>。20 世纪所有重要物理理论<em>都</em> 是先写下一个作用量, 再用 EL 方程推运动方程。物理学家发明新理论的标准操作是"<em>构造一个具有正确对称性的作用量</em>"——不是直接写运动方程。这是因为作用量比方程<em>更紧凑</em>, 对称性<em>更显眼</em>（参 ch7 Noether）, 量子化<em>更自然</em>（路径积分直接用作用量）。</p>
+
+<p>所以这一章看似"<em>就是几个例子加 EL 方程</em>", 其实是一门通向整个现代物理的入口。变分法不是一个具体技巧, 是一种<em>看物理的方式</em>。从下一章起这种视角全面接管经典力学。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 广义坐标与约束</a><a href="ch6.html">下一章 · 第 6 章 Hamilton 原理与 Lagrange 方程 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 11 章 Hamilton 方程 + 相空间 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 Legendre 变换 + Hamiltonian</a><a href="ch12.html">下一章 · 第 12 章 Poisson 括号 + 守恒律 →</a></nav>
+<h1 id="ch11">第 11 章 Hamilton 方程 + 相空间</h1>
+
+<p>上一章结尾我们做了一件代数手脚——把 Lagrangian \(L(q, \dot q, t)\) 通过 Legendre 变换换成了 Hamiltonian \(H(q, p, t)\)。换算关系是 \(p_i = \partial L/\partial \dot q^i\)（共轭动量）, \(H = \sum p_i \dot q^i - L\)（Legendre 变换）。代价是<em>把</em> \(\dot q\) <em>这个变量从舞台撤掉</em>, 换上 \(p\) 当主演。</p>
+
+<p>这件事如果只是换记号, 就<em>没意思</em>——你可以用 \(L(q, \dot q)\) 写 EL 方程, 也可以用 \(H(q, p)\) 写另一组方程, 物理一样。但请你停下来问一个非常具体的问题: <em>给定 Hamiltonian \(H(q, p, t)\), 怎么得到运动方程？</em></p>
+
+<p>这一章就是回答这个问题。答案——<em>Hamilton 方程</em>——表面上只是 EL 方程的"<em>对偶版本</em>", 一组 \(2n\) 条一阶 ODE。但它带来的<em>视角</em> 转换比记号变化大得多: 从"<em>位形空间 \(q\) 加速度</em>" 走到"<em>相空间 \((q, p)\) 流</em>", 经典力学第一次<em>纯几何</em> 化。本章末尾我们会看到一个惊人的事实——相空间体积在 Hamilton 流下保持不变（Liouville 定理）, 这是统计力学整门学科的<em>逻辑起点</em>。</p>
+
+<h2 id="sec11-1">11.1 从 \(H\) 推 Hamilton 方程</h2>
+
+<p><strong>朴素</strong>。我们手上有 \(H(q, p, t) = \sum p_i \dot q^i - L(q, \dot q, t)\), 其中 \(\dot q\) 应该被理解成 "<em>由 \(p_i = \partial L/\partial \dot q^i\) 反解出来的 \(\dot q(q, p, t)\)</em>"。我们的目标——找两组 ODE, 决定 \(q(t)\) 和 \(p(t)\)。</p>
+
+<p>从哪里下手？最直接的——<em>对 \(H\) 求微分</em>。把 \(H\) 当 \(q, p, t\) 的函数求全微分:</p>
+
+<p>\[
+dH = \sum_i \frac{\partial H}{\partial q^i} dq^i + \sum_i \frac{\partial H}{\partial p_i} dp_i + \frac{\partial H}{\partial t} dt.
+\]</p>
+
+<p>另一边——直接对定义式 \(H = \sum p_i \dot q^i - L\) 求微分（视 \(\dot q^i\) 与 \(q^i, p_i, t\) 都为独立变量, 这一步是 Legendre 变换的关键）:</p>
+
+<p>\[
+dH = \sum_i \big(dp_i \cdot \dot q^i + p_i \cdot d\dot q^i\big) - \sum_i \frac{\partial L}{\partial q^i} dq^i - \sum_i \frac{\partial L}{\partial \dot q^i} d\dot q^i - \frac{\partial L}{\partial t} dt.
+\]</p>
+
+<p>用 \(p_i = \partial L/\partial \dot q^i\), 中间含 \(d\dot q^i\) 的两项<em>正好抵消</em>:</p>
+
+<p>\[
+\sum_i p_i \cdot d\dot q^i - \sum_i \frac{\partial L}{\partial \dot q^i} d\dot q^i = \sum_i \big(p_i - \tfrac{\partial L}{\partial \dot q^i}\big) d\dot q^i = 0.
+\]</p>
+
+<p>这就是 Legendre 变换<em>巧</em> 的地方——它让 \(\dot q\) 从微分结构里消失。剩下:</p>
+
+<p>\[
+dH = \sum_i \dot q^i \, dp_i - \sum_i \frac{\partial L}{\partial q^i} dq^i - \frac{\partial L}{\partial t} dt.
+\]</p>
+
+<p>对照两式（\(dq^i, dp_i, dt\) 都是独立微分, 两边系数相等）:</p>
+
+<p>\[
+\frac{\partial H}{\partial p_i} = \dot q^i, \qquad \frac{\partial H}{\partial q^i} = -\frac{\partial L}{\partial q^i}, \qquad \frac{\partial H}{\partial t} = -\frac{\partial L}{\partial t}.
+\]</p>
+
+<p><strong>撞墙</strong>。第一条已经是好东西——\(\dot q^i = \partial H/\partial p_i\)。但第二条只是<em>偏导转换</em>, 不是 ODE。需要把 EL 方程引进来。</p>
+
+<p><strong>reframe</strong>。EL 方程: \(\frac{d}{dt} \frac{\partial L}{\partial \dot q^i} - \frac{\partial L}{\partial q^i} = 0\), 即 \(\dot p_i = \partial L/\partial q^i\)。代入第二条等式 \(\partial H/\partial q^i = -\partial L/\partial q^i\), 得 \(\dot p_i = -\partial H/\partial q^i\)。</p>
+
+<p><strong>命名</strong>。两条合在一起叫<em>Hamilton 方程</em>:</p>
+
+<p>\[\boxed{\ \dot q^i = \frac{\partial H}{\partial p_i}, \qquad \dot p_i = -\frac{\partial H}{\partial q^i}.\ }\]</p>
+
+<p>请你停下来欣赏这一对方程的<em>对称</em>。\(q\) 和 \(p\) 在形式上几乎平等——\(q\) 的变化率由 \(H\) 对 \(p\) 的偏导给, \(p\) 的变化率由 \(H\) 对 \(q\) 的偏导（带个负号）给。这种 "<em>互相决定</em>" 的对称在 Lagrangian 框架里看不到——\(L(q, \dot q)\) 把 \(q\) 和 \(\dot q\) 当成<em>不同种</em> 的东西。Hamilton 框架第一次让两者地位平等。这种对称是后面 Poisson 括号 + 正则变换 + symplectic 几何的<em>种子</em>。</p>
+
+<h2 id="sec11-2">11.2 完整方程组与初值问题</h2>
+
+<p>对一个 \(n\) 自由度系统, Hamilton 方程组是 \(2n\) 条<em>一阶</em> ODE:</p>
+
+<p>\[
+\begin{cases}
+\dot q^1 = \partial H/\partial p_1, & \dot p_1 = -\partial H/\partial q^1, \\
+\dot q^2 = \partial H/\partial p_2, & \dot p_2 = -\partial H/\partial q^2, \\
+\quad \vdots & \quad \vdots \\
+\dot q^n = \partial H/\partial p_n, & \dot p_n = -\partial H/\partial q^n.
+\end{cases}
+\]</p>
+
+<p>对照 Lagrange 方程: \(n\) 条<em>二阶</em> ODE。两边总微分维数都是 \(2n\)（\(n\) 条二阶 = \(2n\) 个初值条件）。差别在<em>形式</em>: Lagrangian 是<em>二阶 in</em> \(q\), Hamilton 是<em>一阶 in</em> \((q, p)\)。一阶系统有几何上的好处——它定义了 \((q, p)\) 空间上一个<em>向量场</em>:</p>
+
+<p>\[
+\boldsymbol X_H(q, p) = \Big(\partial H/\partial p_1, \ldots, \partial H/\partial p_n;\ -\partial H/\partial q^1, \ldots, -\partial H/\partial q^n\Big).
+\]</p>
+
+<p>初值问题——给一个起点 \((q_0, p_0)\), 沿这个向量场流动, 得到一条曲线 \(t \mapsto (q(t), p(t))\)。每个起点定一条流线, 整个相空间被这些流线<em>层叠</em> 满。这是相空间的<em>动力学</em> 几何。</p>
+
+<p>初值条件维数也变好——Lagrange 框架下你需要 \((q_0, \dot q_0)\), 即 \(n\) 个位置 + \(n\) 个速度, 但<em>速度</em> 是个时间变化率, 概念上比"<em>位置</em>" 抽象。Hamilton 框架下你需要 \((q_0, p_0)\), 都是<em>状态变量</em>（位置 + 动量），地位对等。这种"<em>状态</em>" 概念后来被量子力学全盘继承——量子态用 \((q, p)\) 的<em>波函数</em> 描述, 不是用 \((q, \dot q)\)。</p>
+
+<h2 id="sec11-3">11.3 三个例子</h2>
+
+<p>让我们把 Hamilton 方程<em>真正写出来</em> 看一遍, 用本书反复出现的三个标本——谐振子、单摆、Kepler 问题。</p>
+
+<p><strong>例 1: 一维谐振子</strong>。\(L = \frac{1}{2} m \dot q^2 - \frac{1}{2} k q^2\)。共轭动量 \(p = m \dot q\)（即 \(\dot q = p/m\)）。Hamiltonian:</p>
+
+<p>\[
+H(q, p) = p \dot q - L = p \cdot \frac{p}{m} - \Big(\frac{1}{2 m} p^2 - \frac{1}{2} k q^2\Big) = \frac{p^2}{2 m} + \frac{1}{2} k q^2.
+\]</p>
+
+<p>这正是<em>能量</em>（动能 + 势能）。Hamilton 方程:</p>
+
+<p>\[
+\dot q = \frac{\partial H}{\partial p} = \frac{p}{m}, \qquad \dot p = -\frac{\partial H}{\partial q} = -k q.
+\]</p>
+
+<p>第一条只是动量定义; 第二条就是 Newton \(F = -k q = m \ddot q\)。两条联立解出 \(q(t) = A \cos(\omega t + \phi), \omega = \sqrt{k/m}\), 标准谐振子。</p>
+
+<p><em>相轨迹</em>。把 \(q(t), p(t)\) 在 \((q, p)\) 平面上画出来。能量守恒 \(H(q, p) = E\) 是一条等高线:</p>
+
+<p>\[
+\frac{p^2}{2 m} + \frac{1}{2} k q^2 = E.
+\]</p>
+
+<p>这是<em>椭圆</em>——半轴 \(\sqrt{2 m E}\)（沿 \(p\) 方向）和 \(\sqrt{2 E/k}\)（沿 \(q\) 方向）。每个 \(E\) 对应一条椭圆, 椭圆套椭圆铺满整个 \((q, p)\) 平面。这就是谐振子的<em>相肖像</em>: 每条流线都是闭合椭圆, 周期 \(T = 2\pi/\omega\) <em>不依赖振幅</em>（线性振子的 isochronism）。</p>
+
+<p><strong>例 2: 单摆</strong>。\(L = \frac{1}{2} m \ell^2 \dot \theta^2 - m g \ell (1 - \cos \theta)\), 共轭动量 \(p_\theta = m \ell^2 \dot \theta\) (角动量), \(\dot \theta = p_\theta/(m \ell^2)\)。Hamiltonian:</p>
+
+<p>\[
+H(\theta, p_\theta) = \frac{p_\theta^2}{2 m \ell^2} + m g \ell (1 - \cos \theta).
+\]</p>
+
+<p>Hamilton 方程: \(\dot \theta = p_\theta/(m \ell^2), \dot p_\theta = -m g \ell \sin \theta\), 联立得 \(\ddot \theta + (g/\ell) \sin \theta = 0\)——单摆方程, ch1 + ch6 出现过。</p>
+
+<p><em>相肖像</em>。能量等高线 \(H(\theta, p_\theta) = E\) 在 \((\theta, p_\theta)\) 平面长什么样？</p>
+
+<ul>
+  <li><em>低能</em>（\(E \ll 2 m g \ell\)）: \(\sin \theta \approx \theta\), 椭圆闭合轨迹, 类似谐振子——小振幅摆动。</li>
+  <li><em>临界能</em>（\(E = 2 m g \ell\)）: 这条等高线<em>恰好</em> 经过 \((\theta, p_\theta) = (\pm \pi, 0)\)——倒立位置。这条<em>分界轨道</em>（separatrix）是闭合 / 不闭合轨道的界限。</li>
+  <li><em>高能</em>（\(E > 2 m g \ell\)）: 摆球不停旋转, 角动量 \(p_\theta\) 永不变号。\(\theta\) 单调推进 \(2 \pi\)（一圈）, 然后再 \(2 \pi\), …。如果把 \(\theta\) 看成 mod \(2\pi\) 的圆变量, 这种轨道在 \((\theta, p_\theta)\) 圆柱上是<em>水平</em> 闭合曲线（绕圆柱周长一圈）。</li>
+</ul>
+
+<p>低能椭圆 + 高能水平线 + 之间的 separatrix——这就是单摆相肖像的标准图。它在<em>每本</em> 经典力学教材里都画一次, 因为它示范了相空间几何如何<em>区分</em> 定性不同的运动模式。Newton 框架（\(\ddot \theta\) ODE）很难一眼看出"<em>有两类轨道</em>"; Hamilton 相空间一目了然。</p>
+
+<p><strong>例 3: Kepler 问题（中心力 \(V = -\alpha/r\)）</strong>。用极坐标 \((r, \phi)\), Lagrangian \(L = \frac{1}{2} m (\dot r^2 + r^2 \dot \phi^2) + \alpha/r\)。共轭动量:</p>
+
+<p>\[
+p_r = m \dot r, \qquad p_\phi = m r^2 \dot \phi \quad (\text{角动量}).
+\]</p>
+
+<p>Hamiltonian:</p>
+
+<p>\[
+H = \frac{p_r^2}{2 m} + \frac{p_\phi^2}{2 m r^2} - \frac{\alpha}{r}.
+\]</p>
+
+<p>因为 \(\phi\) 不出现在 \(H\) 里（叫<em>循环坐标</em>）, 所以 \(\dot p_\phi = -\partial H/\partial \phi = 0\)——\(p_\phi\) 守恒, 这是<em>角动量守恒</em>。Hamilton 框架下守恒律变得<em>显然</em>: <em>循环坐标的共轭动量自动守恒</em>。这是 Hamilton 框架最大的便利之一。</p>
+
+<p>剩下两条 ODE \(\dot r = p_r/m, \dot p_r = -\partial H/\partial r = p_\phi^2/(m r^3) - \alpha/r^2\) 描述径向运动。\((r, p_r)\) 平面上的相轨迹（固定 \(p_\phi\) = 常数）就是 ch3 见过的<em>有效势</em> \(V_{\text{eff}}(r) = p_\phi^2/(2 m r^2) - \alpha/r\) 的能级图——椭圆轨道对应低能（束缚态 \(E < 0\)）, 抛物线 + 双曲线对应 \(E \geq 0\)（散射态）。</p>
+
+<h2 id="sec11-4">11.4 \(H\) 的守恒——能量守恒重生</h2>
+
+<p>\(H(q, p, t)\) 沿 Hamilton 流的演化:</p>
+
+<p>\[
+\frac{dH}{dt} = \sum_i \frac{\partial H}{\partial q^i} \dot q^i + \sum_i \frac{\partial H}{\partial p_i} \dot p_i + \frac{\partial H}{\partial t}.
+\]</p>
+
+<p>代入 Hamilton 方程 \(\dot q^i = \partial H/\partial p_i, \dot p_i = -\partial H/\partial q^i\):</p>
+
+<p>\[
+\frac{dH}{dt} = \sum_i \frac{\partial H}{\partial q^i} \cdot \frac{\partial H}{\partial p_i} + \sum_i \frac{\partial H}{\partial p_i} \cdot \Big(-\frac{\partial H}{\partial q^i}\Big) + \frac{\partial H}{\partial t} = \frac{\partial H}{\partial t}.
+\]</p>
+
+<p>那两个和号<em>恰好抵消</em>——这是 Hamilton 方程内置的对称性。结论:</p>
+
+<p>\[\boxed{\ \frac{dH}{dt} = \frac{\partial H}{\partial t}.\ }\]</p>
+
+<p>如果 \(H\) <em>不显含</em> \(t\)（\(\partial H/\partial t = 0\)）, 则 \(H\) 沿轨道<em>守恒</em>。</p>
+
+<p>对常见系统（\(L = T - V\), \(V = V(q)\), 不显含时间）, \(H\) 等于<em>能量</em> \(E = T + V\)（ch10 给的标准结果）。所以 \(H\) 守恒就是<em>能量守恒</em>。Newton + Lagrange 框架下能量守恒是从 EL 方程 + 时间平移对称<em>推</em> 出来的（Noether 定理, ch7）; Hamilton 框架下它是<em>结构性</em> 的, 直接从方程对称性看出来。</p>
+
+<p>更妙的是——这条公式同时说明<em>当 \(H\) 显含 \(t\) 时能量不守恒</em>, 而且不守恒的速率<em>就是</em> \(\partial H/\partial t\)。例如带时间相关外力的振子 \(H(q, p, t) = p^2/(2 m) + (1/2) k q^2 - F(t) q\), 能量变化率 \(\partial H/\partial t = -\dot F(t) q\), 也就是<em>外力做的功</em> 改变能量。物理图像清晰。</p>
+
+<h2 id="sec11-5">11.5 相空间几何与辛形式</h2>
+
+<p><strong>朴素</strong>。相空间是 \(\mathbb R^{2n}\)（笛卡尔积 \(q\)-空间 \(\times\) \(p\)-空间）。Hamilton 方程是这个空间上的向量场。这<em>看起来</em> 没什么神秘的——就是 \(2n\) 维欧氏空间上的 ODE 系统。</p>
+
+<p><strong>撞墙</strong>。但仔细想——<em>q 和 p 是不同种的物理量</em>。\(q\) 单位长度（米）, \(p\) 单位动量（千克·米/秒）。两者不能直接相加, 不能取"<em>距离</em>"。"\(\sqrt{(q_2 - q_1)^2 + (p_2 - p_1)^2}\)" 在物理上没意义——这两个差是不同单位。</p>
+
+<p>那么相空间上"<em>什么样的几何结构</em>" 是<em>有意义</em> 的？答案——<em>不</em> 是欧氏度量, 而是一个<em>反对称双线性形式</em>:</p>
+
+<p>\[\boxed{\ \omega = \sum_{i=1}^n dp_i \wedge dq^i.\ }\]</p>
+
+<p>这叫<em>辛形式</em>（symplectic form）。\(\wedge\) 是<em>外积</em>（链<a href="../微分几何/ch12.html">微分几何 ch12</a>）, 反对称: \(dp_i \wedge dq^i = -dq^i \wedge dp_i\)。</p>
+
+<p><strong>reframe</strong>。这个反对称形式取代了欧氏度量, 给相空间提供它自己的"<em>面积</em>" 概念:</p>
+
+<p>\[
+\omega(\boldsymbol u, \boldsymbol v) = \sum_i \big(u_{p_i} v_{q^i} - u_{q^i} v_{p_i}\big), \quad \boldsymbol u, \boldsymbol v \in \mathbb R^{2n}.
+\]</p>
+
+<p>对 \(n = 1\) 这正好是<em>定向面积</em>: \(\omega(\boldsymbol u, \boldsymbol v) = u_p v_q - u_q v_p\) = \((q, p)\) 平面上 \(\boldsymbol u, \boldsymbol v\) 张成的平行四边形<em>有向面积</em>。一般 \(n\) 时, \(\omega\) 测量"<em>各 (q^i, p_i) 平面上的面积之和</em>"。</p>
+
+<p><strong>命名</strong>。\((\mathbb R^{2n}, \omega)\) 是一个<em>辛流形</em>（symplectic manifold）。Hamilton 方程可以重写为<em>纯几何</em> 形式:</p>
+
+<p>\[
+\iota_{\boldsymbol X_H} \omega = -dH \quad \text{或} \quad \omega(\boldsymbol X_H, \cdot) = -dH(\cdot).
+\]</p>
+
+<p>意思——<em>Hamilton 向量场</em> \(\boldsymbol X_H\) 是<em>由 \(H\) 通过 \(\omega\) 唯一决定的</em>。Hamilton 方程不是任意写出来的——它是辛结构 + 一个函数 \(H\) 唯一推出来的。换句话——<em>辛形式 \(\omega\) 才是相空间真正的几何, Hamilton 方程是它的自然伴随</em>。</p>
+
+<p>这一段如果你觉得抽象, 暂时记住一个画面: 相空间不像距离空间, 它像<em>有向面积空间</em>。任何"<em>距离</em>" 的直觉对相空间不适用; 任何"<em>面积</em>" 的直觉适用。下一节 Liouville 定理就是这个直觉的具体兑现。</p>
+
+<h2 id="sec11-6">11.6 Liouville 定理: 相空间体积守恒</h2>
+
+<p>请你停下来想象一个具体场景: 你有大量初始状态略不同的粒子, 各自从相空间 \((q, p)\) 中相邻的点出发。把这些初始点想成一团"<em>云</em>"（一个体积为 \(V_0\) 的小区域）。每个点沿自己的 Hamilton 流走, 走到时刻 \(t\) 时云<em>变形</em>——可能拉长、扭曲、甚至缠成奇形怪状。</p>
+
+<p>问: 这团云的<em>体积</em> 怎么变化？</p>
+
+<p>直觉答案大概是"<em>看 Hamilton 系统多复杂</em>"——耗散系统体积应该缩小（吸子）, 振荡系统说不定不变, 不知道。</p>
+
+<p><strong>Liouville 定理</strong>: 在 Hamilton 流下, 相空间任何区域的<em>体积</em> 严格保持不变。无例外。</p>
+
+<p>\[\boxed{\ \frac{d V(t)}{dt} = 0 \quad (\text{Hamilton 流下}).\ }\]</p>
+
+<p>请你停一下, 让这件事的份量沉淀。无论 Hamiltonian 多复杂, 无论流动多扭曲, <em>2n 维体积是不变的</em>。这是相空间最深的几何性质。</p>
+
+<p>两种理解。<em>形式上</em>——Hamilton 向量场 \(\boldsymbol X_H = (\partial H/\partial p, -\partial H/\partial q)\) 的散度</p>
+
+<p>\[
+\nabla \cdot \boldsymbol X_H = \sum_i \Big(\frac{\partial}{\partial q^i} \frac{\partial H}{\partial p_i} + \frac{\partial}{\partial p_i} \big(-\frac{\partial H}{\partial q^i}\big)\Big) = \sum_i \Big(\frac{\partial^2 H}{\partial q^i \partial p_i} - \frac{\partial^2 H}{\partial p_i \partial q^i}\Big) = 0.
+\]</p>
+
+<p>由 \(\partial^2/\partial q \partial p = \partial^2/\partial p \partial q\)（混合偏导对称, Clairaut 定理）。Hamilton 流的向量场散度<em>恒等于零</em>——这是相空间体积守恒的解析底。</p>
+
+<p><em>几何上</em>——Hamilton 流保持辛形式 \(\omega\), 而相空间体积元 \(\omega^n/n! = dq^1 \wedge dp_1 \wedge \cdots \wedge dq^n \wedge dp_n\) 是 \(\omega\) 的幂, 自动也保持。</p>
+
+<p>这条定理有<em>巨大</em> 后果。耗散系统（带摩擦的振子, 带阻力的小球）<em>不能</em> 写成 Hamilton 形式——因为耗散吸子让相空间体积缩小, 违反 Liouville。任何"<em>真实</em>" Hamilton 系统不能有"<em>稳定吸引点</em>"; 平衡只能是中性平衡（如谐振子的椭圆轨道围绕原点）或鞍点。</p>
+
+<p>统计力学整门课的逻辑起点也在这里——见 11.8。</p>
+
+<h2 id="sec11-7">11.7 完整证明</h2>
+
+<p>设 \(D_0\) 是相空间一个区域, 体积 \(V(0) = \int_{D_0} d^n q \, d^n p\)。Hamilton 流 \(\Phi_t: (q, p) \mapsto (q(t), p(t))\)。\(D_t = \Phi_t(D_0)\), 体积 \(V(t) = \int_{D_t} d^n q \, d^n p\)。</p>
+
+<p>用变量代换</p>
+
+<p>\[
+V(t) = \int_{D_0} \big|\det J_t\big| \, d^n q_0 \, d^n p_0,
+\]</p>
+
+<p>其中 \(J_t\) 是 \(\Phi_t\) 的 Jacobian 矩阵（\(2n \times 2n\)）。证明 \(V(t) = V(0)\) 等价于证 \(\det J_t = 1\)（取号正, 因 \(t = 0\) 时 \(J_0\) = 单位矩阵, 行列式由连续性保号）。</p>
+
+<p>对时间求导:</p>
+
+<p>\[
+\frac{d}{dt} \det J_t = \det J_t \cdot \text{tr}\Big(\dot J_t \cdot J_t^{-1}\Big).
+\]</p>
+
+<p>这是 Liouville 公式（线性代数的恒等式: \(\frac{d}{dt} \det A = \det A \cdot \text{tr}(\dot A A^{-1})\)）。</p>
+
+<p>注意 \(J_t\) 的元素是 \(\partial(q^i(t), p_i(t))/\partial(q^j_0, p_{j,0})\), 所以 \(\dot J_t = \partial(\dot q^i, \dot p_i)/\partial(q^j_0, p_{j,0})\)。在 \(t = 0\) 处:</p>
+
+<p>\[
+\dot J_0 = \frac{\partial(\dot q^i, \dot p_i)}{\partial(q^j, p_j)}\Big|_{t=0}.
+\]</p>
+
+<p>这是 \(2n \times 2n\) 矩阵, 块结构:</p>
+
+<p>\[
+\dot J_0 = \begin{pmatrix} \partial \dot q^i/\partial q^j & \partial \dot q^i/\partial p_j \\ \partial \dot p_i/\partial q^j & \partial \dot p_i/\partial p_j \end{pmatrix} = \begin{pmatrix} \partial^2 H/(\partial p_i \partial q^j) & \partial^2 H/(\partial p_i \partial p_j) \\ -\partial^2 H/(\partial q^i \partial q^j) & -\partial^2 H/(\partial q^i \partial p_j) \end{pmatrix}.
+\]</p>
+
+<p>对角块 \(\partial^2 H/(\partial p_i \partial q^j)\) 和 \(-\partial^2 H/(\partial q^i \partial p_j)\) 在 \(i = j\) 时互为相反数（由 \(\partial^2 H/\partial p \partial q = \partial^2 H/\partial q \partial p\) 的对称性）, 所以 \(\text{tr}(\dot J_0)\) = 对角元之和 = \(\sum_i (\partial^2 H/\partial p_i \partial q^i - \partial^2 H/\partial q^i \partial p_i) = 0\)。</p>
+
+<p>结合 \(J_0 = I\) (单位矩阵), \(\det J_0 = 1\), 所以</p>
+
+<p>\[
+\frac{d}{dt} \det J_t \Big|_{t = 0} = \det J_0 \cdot \text{tr}(\dot J_0 J_0^{-1}) = 1 \cdot 0 = 0.
+\]</p>
+
+<p>更一般 \(t\) 的情形——把 \(\Phi_t\) 看成"<em>从 \(t\) 走到 \(t + dt\)</em>" 的连续序列, 每一步 Jacobian 行列式变化率为零, 所以 \(\det J_t = 1\) 对所有 \(t\) 成立。完整论证可以用流的<em>群</em> 性质 \(\Phi_{s + t} = \Phi_s \circ \Phi_t\) 把 \(t\) 处的导数化简到 \(0\) 处的导数。</p>
+
+<p>结论: \(\det J_t = 1\) 对所有 \(t\), 即相空间体积守恒。Q.E.D.</p>
+
+<h2 id="sec11-8">11.8 应用: 统计力学的逻辑起点</h2>
+
+<p>请你想象一个气体——\(N\) 个分子, 在三维空间中运动。完整描述需要 \(6 N\) 个数: 每个分子的位置 \((x, y, z)\) + 动量 \((p_x, p_y, p_z)\)。这构成一个 \(6 N\) 维相空间, 通常 \(N \sim 10^{23}\), 维数天文级。</p>
+
+<p>显然——你<em>不</em> 可能跟踪每个分子的轨迹。统计力学的基本想法——<em>不跟踪个体, 跟踪一个</em>"<em>分布</em>"。设 \(\rho(q, p, t)\) 是一个相空间上的<em>密度函数</em>: \(\rho \, dq \, dp\) = 在 \((q, p)\) 周围相空间体积 \(dq \, dp\) 内系统出现的概率（对一个<em>系综</em>——很多相同系统的统计分布）。</p>
+
+<p>问: 这个 \(\rho\) 怎么演化？</p>
+
+<p>用 Liouville 定理。考虑一团相空间体积内"<em>系统数</em>"。Hamilton 流让这些系统沿轨道走, <em>但不创造也不消灭</em>系统。所以"<em>这团体积内系统数</em>" 守恒。又因为 Liouville 定理"<em>体积本身</em>" 也守恒, 所以"<em>密度</em>" \(\rho\) 沿流动也守恒:</p>
+
+<p>\[
+\frac{d \rho}{dt} = 0 \quad \text{(沿 Hamilton 流)}.
+\]</p>
+
+<p>这叫<em>Liouville 方程</em>。展开:</p>
+
+<p>\[
+\frac{\partial \rho}{\partial t} + \sum_i \big(\dot q^i \frac{\partial \rho}{\partial q^i} + \dot p_i \frac{\partial \rho}{\partial p_i}\big) = 0,
+\]</p>
+
+<p>即</p>
+
+<p>\[
+\frac{\partial \rho}{\partial t} + \sum_i \Big(\frac{\partial H}{\partial p_i} \frac{\partial \rho}{\partial q^i} - \frac{\partial H}{\partial q^i} \frac{\partial \rho}{\partial p_i}\Big) = 0.
+\]</p>
+
+<p>下一章我们会看到, 中间那个和正是<em>Poisson 括号</em> \(\{\rho, H\}\), 所以 Liouville 方程简写为</p>
+
+<p>\[
+\frac{\partial \rho}{\partial t} = -\{\rho, H\} = \{H, \rho\}.
+\]</p>
+
+<p><em>平衡分布</em>。如果 \(\rho\) 不显含 \(t\)（系统已达平衡）, 上面方程给 \(\{H, \rho\} = 0\), 即 \(\rho\) 与 \(H\) "<em>相容</em>", 通常就意味着 \(\rho = \rho(H)\)（密度只依赖能量）。最常见选择 \(\rho \propto e^{-H/(k_B T)}\)——<em>玻尔兹曼分布</em>, 经典统计力学的基石。这条分布的<em>合法性</em> 直接来自 Liouville 定理: 它告诉你"<em>等能面上各微观态等概率</em>" 这个假设与 Hamilton 演化<em>不矛盾</em>。</p>
+
+<p>这一段链条值得停下来回顾:</p>
+
+<p style="margin-left: 1em;">
+\(\downarrow\) Lagrangian \(L\)<br>
+\(\downarrow\) Legendre 变换 \(\to\) Hamiltonian \(H\)<br>
+\(\downarrow\) Hamilton 方程 \(\dot q = \partial H/\partial p, \dot p = -\partial H/\partial q\)<br>
+\(\downarrow\) 散度为零 \(\to\) Liouville 定理（相空间体积守恒）<br>
+\(\downarrow\) 平衡分布 \(\rho \propto e^{-H/k_B T}\)<br>
+\(\downarrow\) 统计力学
+</p>
+
+<p>整本统计力学都建立在 Hamilton 力学的相空间几何上。链<a href="../概率统计/index.html">V5 概率统计</a>（概率分布的处理）+ 即将上线的 V16 统计力学（用 \(\rho\) 推导热力学）。Hamilton 框架不只是力学的"<em>另一种写法</em>", 是统计力学和量子力学共同的底座。</p>
+
+<h2 id="sec11-9">11.9 临别话</h2>
+
+<p>这一章开始于一个朴素问题——<em>怎么从 \(H(q, p)\) 得运动方程？</em>——结束于一条惊人的几何结果——<em>相空间体积守恒</em>。中间走过的路径包含三层升级:</p>
+
+<ul>
+  <li><em>记号升级</em>: \(L(q, \dot q) \to H(q, p)\), \(n\) 条二阶 ODE \(\to\) \(2n\) 条一阶 ODE。</li>
+  <li><em>视角升级</em>: 位形空间 \(\to\) 相空间。\((q, p)\) 平等共存, 不再是"<em>位置 + 速度</em>"。</li>
+  <li><em>几何升级</em>: 欧氏度量 \(\to\) 辛形式 \(\omega\)。"<em>距离</em>" 让位给"<em>面积</em>"。Hamilton 方程是辛结构 + Hamiltonian 自然推论。</li>
+</ul>
+
+<p>下一章我们引入<em>Poisson 括号</em> \(\{f, g\}\)——它把 Hamilton 方程的对称结构提炼成一个代数对象。任何函数 \(f(q, p)\) 沿 Hamilton 流的演化都是 \(\dot f = \{f, H\}\), 守恒律变成 \(\{f, H\} = 0\)。这种代数化使经典力学和量子力学第一次<em>语法</em> 相容——量子化的本质是把 \(\{,\}\) 替换成 \(\frac{1}{i\hbar}[,]\)（Dirac 1925）。</p>
+
+<p>Hamilton 写下这套方程在 1833 年, 当时是为了优化光学和力学的统一; 他绝想不到这套方程一百年后变成<em>整个量子力学</em> 的母版。这正是数学物理的一种典型——<em>结构</em> 的力量比"<em>解</em>" 的力量大。一组方程的几何对称, 注定它会在意想不到的领域复活。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch10.html">← 上一章 · 第 10 章 Legendre 变换 + Hamiltonian</a><a href="ch12.html">下一章 · 第 12 章 Poisson 括号 + 守恒律 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 中心力问题与开普勒 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 Newton 力学复习</a><a href="ch4.html">下一章 · 第 4 章 广义坐标与约束 →</a></nav>
+<h1 id="ch3">第 3 章 中心力问题与开普勒</h1>
+
+<p>1609 年 Kepler 在《<em>Astronomia Nova</em>》发表他研究 Tycho Brahe 火星观测多年得到的两条规律：行星绕太阳沿<em>椭圆</em> 轨道（太阳在一焦点）, 行星-太阳连线在等时间内扫过<em>等面积</em>。1619 年又补第三条: 公转周期平方与轨道长半轴立方成正比。这三条<em>开普勒定律</em> 是观测总结, 但 Kepler 自己<em>不知道</em> 为什么——他只看到模式, 没有动力学解释。</p>
+
+<p>1687 年 Newton 在《<em>Principia</em>》给答案: 假设太阳对行星施加沿连线方向、大小与距离平方成反比的引力 \(F = G M m / r^2\), 则开普勒三定律<em>同时</em> 从 \(\boldsymbol F = m \boldsymbol a\) 推出。这是经典力学历史上<em>第一次</em>"<em>预测</em>" 验证天文——不是事后解释观测, 而是<em>从基本规律推出可观测后果, 并对得上数字</em>。这个胜利让 Newton 力学在欧洲学术界几乎是<em>一夜征服</em>。</p>
+
+<p>这一章我们沿 Newton 思路完整推一遍: 两体问题 → 约化质量 → 中心力 ⟹ 角动量守恒 ⟹ 平面运动 → 极坐标 EOM → 有效势 → \(V = -k/r\) 解得圆锥曲线 → 开普勒三定律 → Laplace-Runge-Lenz 隐藏对称性 → 应用。读完这一章你能理解<em>为什么</em> 行星轨道是椭圆, 也会看到中心力问题<em>异乎寻常</em> 的可解性背后藏着的隐藏对称性——这条线一直延伸到<a href="ch11.html">ch11 Poisson 括号</a> 和<a href="ch15.html">ch15 作用-角变量</a>。</p>
+
+<h2 id="sec3-1">3.1 两体问题与约化质量</h2>
+
+<p>两个粒子 1, 2, 质量 \(m_1, m_2\), 位置 \(\boldsymbol r_1, \boldsymbol r_2\), 它们之间通过<em>仅依赖距离 \(r = |\boldsymbol r_1 - \boldsymbol r_2|\)</em> 的中心力相互作用。运动方程</p>
+
+<p>\[
+m_1 \ddot{\boldsymbol r}_1 = \boldsymbol F_{21}, \quad m_2 \ddot{\boldsymbol r}_2 = \boldsymbol F_{12} = -\boldsymbol F_{21}.
+\]</p>
+
+<p>第三定律保 \(\boldsymbol F_{12} + \boldsymbol F_{21} = \boldsymbol 0\)。两条耦合 ODE, 总共 6 个标量自由度（每条 3 个分量）。看起来复杂, 但<em>恰当变量替换</em> 后会拆成两个独立问题。</p>
+
+<p><strong>变量替换</strong>: 引入<em>质心</em> \(\boldsymbol R\) 和<em>相对位置</em> \(\boldsymbol r\):</p>
+
+<p>\[
+\boldsymbol R = \frac{m_1 \boldsymbol r_1 + m_2 \boldsymbol r_2}{m_1 + m_2}, \quad \boldsymbol r = \boldsymbol r_1 - \boldsymbol r_2.
+\]</p>
+
+<p>逆向: \(\boldsymbol r_1 = \boldsymbol R + \frac{m_2}{M} \boldsymbol r, \boldsymbol r_2 = \boldsymbol R - \frac{m_1}{M} \boldsymbol r\)（\(M = m_1 + m_2\)）。</p>
+
+<p>把两条 EOM 组合: 两式相加</p>
+
+<p>\[
+m_1 \ddot{\boldsymbol r}_1 + m_2 \ddot{\boldsymbol r}_2 = M \ddot{\boldsymbol R} = \boldsymbol 0 \quad \Rightarrow \quad \ddot{\boldsymbol R} = \boldsymbol 0.
+\]</p>
+
+<p><em>质心匀速直线运动</em>。这是 §2.5 质心定理的两体特例。\(\boldsymbol R\) 自由度被解决——3 个标量分量给出 \(\boldsymbol R(t) = \boldsymbol R(0) + \boldsymbol V_{\text{cm}} t\)。剩下 3 个自由度在 \(\boldsymbol r\) 中。</p>
+
+<p>第一式除以 \(m_1\) 减去第二式除以 \(m_2\):</p>
+
+<p>\[
+\ddot{\boldsymbol r} = \ddot{\boldsymbol r}_1 - \ddot{\boldsymbol r}_2 = \frac{\boldsymbol F_{21}}{m_1} - \frac{\boldsymbol F_{12}}{m_2} = \boldsymbol F_{21} \left( \frac{1}{m_1} + \frac{1}{m_2} \right) = \frac{\boldsymbol F_{21}}{\mu}
+\]</p>
+
+<p>其中</p>
+
+<p>\[
+\boxed{\ \mu = \frac{m_1 m_2}{m_1 + m_2} \quad (\text{约化质量}).\ }
+\]</p>
+
+<p>所以相对运动满足</p>
+
+<p>\[
+\mu \ddot{\boldsymbol r} = \boldsymbol F(\boldsymbol r),
+\]</p>
+
+<p>其中 \(\boldsymbol F(\boldsymbol r) = \boldsymbol F_{21}(\boldsymbol r)\) 是粒子 2 对粒子 1 施的力, 写成 \(\boldsymbol r = \boldsymbol r_1 - \boldsymbol r_2\) 的函数。<em>两体问题</em>等价于<em>一个</em>有效粒子（质量 \(\mu\)、位置 \(\boldsymbol r\)）在外力场 \(\boldsymbol F(\boldsymbol r)\) 中运动。</p>
+
+<p>极限: \(m_2 \to \infty\)（如太阳对地球）时 \(\mu \to m_1\), 约化质量 \(\approx\) 较小那个的质量, 较大那个近似不动。地球-太阳系统 \(\mu \approx m_{\text{地}}\), 误差是 \(m_{\text{地}}/m_{\text{日}} \approx 3 \times 10^{-6}\), 可以忽略。但若两质量可比（双星系统）, 必须用真正的 \(\mu\)。</p>
+
+<h2 id="sec3-2">3.2 中心力 ⟹ 角动量守恒 ⟹ 平面运动</h2>
+
+<p>设粒子 2 取在原点, 力</p>
+
+<p>\[
+\boldsymbol F = -f(r) \hat{\boldsymbol r}, \quad \hat{\boldsymbol r} = \boldsymbol r / r, \quad r = |\boldsymbol r|.
+\]</p>
+
+<p>这是<em>中心力</em> 的标准形式: 沿径向, 大小只依赖 \(r\)。引力 \(f(r) = G M \mu / r^2\), Coulomb 力 \(f(r) = k q_1 q_2 / r^2\)（同号斥力, 异号则前面带负号——我们用 \(f > 0\) 表示吸引）。</p>
+
+<p>角动量 \(\boldsymbol L = \mu \boldsymbol r \times \dot{\boldsymbol r}\), 力矩</p>
+
+<p>\[
+\boldsymbol N = \boldsymbol r \times \boldsymbol F = \boldsymbol r \times (-f(r) \hat{\boldsymbol r}) = -f(r) (\boldsymbol r \times \hat{\boldsymbol r}) = \boldsymbol 0.
+\]</p>
+
+<p>因 \(\boldsymbol r \parallel \hat{\boldsymbol r}\)。所以 \(d \boldsymbol L / dt = \boldsymbol 0\), <em>\(\boldsymbol L\) 守恒</em>。</p>
+
+<p>这条结果立刻给两个推论。<strong>(1) 运动平面化</strong>: \(\boldsymbol L = \mu \boldsymbol r \times \dot{\boldsymbol r}\) 是常向量, 它与 \(\boldsymbol r\) 总是垂直 (\(\boldsymbol L \cdot \boldsymbol r = 0\))。所以 \(\boldsymbol r\) 永远在<em>垂直 \(\boldsymbol L\) 的固定平面</em> 内。3 维问题降为 2 维平面问题。<strong>(2) 等面积律</strong>: 在平面极坐标 \((r, \varphi)\) 下 \(L = \mu r^2 \dot \varphi\)。面积元 \(dA = \frac{1}{2} r^2 d \varphi\), 面积速率</p>
+
+<p>\[
+\frac{dA}{dt} = \frac{1}{2} r^2 \dot \varphi = \frac{L}{2 \mu}
+\]</p>
+
+<p>是常数。这就是<em>开普勒第二定律</em>: 行星-太阳连线在等时间扫等面积。Kepler 1609 从观测发现; Newton 1687 证它<em>等价于</em>"<em>力沿径向</em>" 这一条假设。等面积律本身<em>不</em> 依赖力的具体形式 \(f(r)\)——任何中心力都满足。</p>
+
+<h2 id="sec3-3">3.3 极坐标 EOM</h2>
+
+<p>选 \(\boldsymbol L\) 方向为 \(\hat{\boldsymbol z}\), 运动平面为 \(xy\)。在平面极坐标 \((r, \varphi)\) 下, 位置 \(\boldsymbol r = r \hat{\boldsymbol r}\)。基矢满足 \(\dot{\hat{\boldsymbol r}} = \dot \varphi \hat{\boldsymbol \varphi}, \dot{\hat{\boldsymbol \varphi}} = -\dot \varphi \hat{\boldsymbol r}\)。所以速度</p>
+
+<p>\[
+\dot{\boldsymbol r} = \dot r \hat{\boldsymbol r} + r \dot \varphi \hat{\boldsymbol \varphi}
+\]</p>
+
+<p>加速度</p>
+
+<p>\[
+\ddot{\boldsymbol r} = (\ddot r - r \dot \varphi^2) \hat{\boldsymbol r} + (r \ddot \varphi + 2 \dot r \dot \varphi) \hat{\boldsymbol \varphi}.
+\]</p>
+
+<p>把 \(\mu \ddot{\boldsymbol r} = -f(r) \hat{\boldsymbol r}\) 投影到两个方向</p>
+
+<p>\[
+\mu (\ddot r - r \dot \varphi^2) = -f(r), \quad \mu (r \ddot \varphi + 2 \dot r \dot \varphi) = 0.
+\]</p>
+
+<p>第二式可写 \(\frac{1}{r} \frac{d}{dt}(r^2 \dot \varphi) \cdot \mu = 0\), 即 \(L = \mu r^2 \dot \varphi\) 守恒——再次确认角动量守恒。第一式给径向运动</p>
+
+<p>\[
+\mu \ddot r = \mu r \dot \varphi^2 - f(r) = \frac{L^2}{\mu r^3} - f(r)
+\]</p>
+
+<p>（用 \(\dot \varphi = L / (\mu r^2)\) 消去 \(\dot \varphi\)）。这条 ODE <em>只</em> 涉及 \(r\) 和 \(\dot r\)——\(\varphi\) 已经被代数地解出。径向问题降为 1 维。</p>
+
+<h2 id="sec3-4">3.4 有效势</h2>
+
+<p>径向方程 \(\mu \ddot r = -f(r) + L^2/(\mu r^3)\) 看上去像"<em>力 = 真力 + 离心力</em>"。把它写成势的梯度形式: 设</p>
+
+<p>\[
+\boxed{\ V_{\text{eff}}(r) = V(r) + \frac{L^2}{2 \mu r^2},\ }
+\]</p>
+
+<p>其中 \(V(r)\) 是<em>真</em> 势（满足 \(f(r) = -V'(r)\), 引力 \(V = -k/r\)），第二项是<em>离心势</em>。则 \(V_{\text{eff}}'(r) = V'(r) - L^2/(\mu r^3) = -f(r) - L^2/(\mu r^3)\)（注意符号）, 不对——重算: \(V'(r) = f(r)\)（因 \(f = -V'\) 给吸引力）……</p>
+
+<p>让我重新约定符号。用<em>引力</em> 例子: \(V(r) = -k/r\) (\(k > 0\)) 是<em>吸引</em> 势, 力 \(\boldsymbol F = -\nabla V = -(k/r^2) \hat{\boldsymbol r}\) 指向原点, 大小 \(k/r^2\)。所以前面 §3.2 的 "\(f(r)\)" 在引力下取 \(f(r) = k/r^2\), \(\boldsymbol F = -f(r) \hat{\boldsymbol r}\) 即 \(\boldsymbol F = -(k/r^2)\hat{\boldsymbol r}\) 与梯度公式一致, \(f(r) = -V'(r) = k/r^2\)（因 \(V' = k/r^2\)——稍等, \(V = -k/r\) 给 \(V' = +k/r^2\)）。所以 \(f = -V' = -k/r^2 < 0\)？这跟吸引矛盾。问题在我两处约定: \(\boldsymbol F = -f(r)\hat{\boldsymbol r}\) 中的 \(-\) 已经表明吸引为 \(f > 0\), 所以 \(f = +k/r^2\), 与 \(V' = +k/r^2\) 配合需要 \(f = V'\)（不是 \(-V'\)）。这就对了——再验: \(\boldsymbol F = -\nabla V = -V'(r) \hat{\boldsymbol r} = -(k/r^2) \hat{\boldsymbol r}\) 指向原点, 与 \(\boldsymbol F = -f(r) \hat{\boldsymbol r}\) 比较得 \(f(r) = V'(r) = k/r^2\)。OK 一致。</p>
+
+<p>所以径向 EOM 变成</p>
+
+<p>\[
+\mu \ddot r = -V'(r) + \frac{L^2}{\mu r^3} = -\left[V(r) + \frac{L^2}{2 \mu r^2}\right]' = -V_{\text{eff}}'(r).
+\]</p>
+
+<p>径向运动等价于<em>1 维粒子（质量 \(\mu\)）在势 \(V_{\text{eff}}(r)\) 中</em>。这是中心力问题简化的终点——3D 问题降到了 1D。1D 问题有能量守恒</p>
+
+<p>\[
+E = \tfrac{1}{2} \mu \dot r^2 + V_{\text{eff}}(r) = \text{常数}.
+\]</p>
+
+<p>径向速度</p>
+
+<p>\[
+\dot r = \pm \sqrt{\tfrac{2}{\mu}[E - V_{\text{eff}}(r)]}.
+\]</p>
+
+<p>积分得 \(t(r)\), 反过来给 \(r(t)\), 再用 \(\dot \varphi = L/(\mu r^2)\) 得 \(\varphi(t)\)。原则上完整解析。</p>
+
+<p>\(V_{\text{eff}}\) 的形状决定运动模式。引力 \(V = -k/r\)：</p>
+
+<ul>
+  <li>\(L = 0\) 时 \(V_{\text{eff}} = -k/r\), 单调递增到 0。粒子径向自由落进原点（碰撞）。</li>
+  <li>\(L \neq 0\) 时 \(V_{\text{eff}}\) 有最小值（在某 \(r_0\) 处, 由 \(V_{\text{eff}}'(r_0) = 0\) 给）。</li>
+</ul>
+
+<p>解 \(V_{\text{eff}}'(r) = k/r^2 - L^2/(\mu r^3) = 0\) 给 \(r_0 = L^2/(\mu k)\), 此处 \(V_{\text{eff}}(r_0) = -\mu k^2/(2 L^2)\)。</p>
+
+<p>能量决定<em>类型</em>: \(E < 0\) 时 \(\dot r = 0\) 在两个 \(r_{\min}, r_{\max}\) 处, 粒子在二者间径向震荡——<em>束缚</em> 轨道。\(E = 0\) 时 \(\dot r = 0\) 仅 \(r_{\min}\) 处, 粒子从无穷远来逐渐离开——<em>临界</em>（抛物）。\(E > 0\) 时类似但能量过大永远拒绝——<em>非束缚</em>（双曲）。具体形状 §3.5 算。</p>
+
+<h2 id="sec3-5">3.5 解 \(V = -k/r\): 圆锥曲线</h2>
+
+<p>径向问题给 \(r(t)\), 但更便利的是直接求<em>轨道形状</em> \(r(\varphi)\)——把时间消去。</p>
+
+<p><strong>变量替换</strong>: 令 \(u = 1/r\)。计算 \(dr/d\varphi\):</p>
+
+<p>\[
+\dot r = \frac{dr}{d\varphi} \dot \varphi = \frac{dr}{d\varphi} \frac{L}{\mu r^2} = -\frac{L}{\mu} \frac{du}{d\varphi}.
+\]</p>
+
+<p>再求二阶</p>
+
+<p>\[
+\ddot r = -\frac{L}{\mu} \frac{d^2 u}{d \varphi^2} \dot \varphi = -\frac{L^2 u^2}{\mu^2} \frac{d^2 u}{d \varphi^2}.
+\]</p>
+
+<p>把 \(\mu \ddot r = L^2/(\mu r^3) - V'(r) = L^2 u^3/\mu - V'(1/u)\) 写出</p>
+
+<p>\[
+-\frac{L^2 u^2}{\mu} \frac{d^2 u}{d \varphi^2} = \frac{L^2 u^3}{\mu} - V'(1/u).
+\]</p>
+
+<p>整理</p>
+
+<p>\[
+\frac{d^2 u}{d \varphi^2} + u = \frac{\mu}{L^2 u^2} V'(1/u) \cdot (-1) \cdot \ldots
+\]</p>
+
+<p>嗯, 直接代具体势更清楚。引力 \(V = -k/r = -k u\), \(V'(r) = k/r^2 = k u^2\)（关于 \(r\) 求导）, 所以 \(V'(1/u) = k u^2\)。代入：</p>
+
+<p>\[
+-\frac{L^2 u^2}{\mu} \frac{d^2 u}{d \varphi^2} = \frac{L^2 u^3}{\mu} - k u^2.
+\]</p>
+
+<p>两边除以 \(-L^2 u^2 / \mu\)（假设 \(u \neq 0\)）</p>
+
+<p>\[
+\frac{d^2 u}{d \varphi^2} = -u + \frac{\mu k}{L^2}.
+\]</p>
+
+<p>即</p>
+
+<p>\[
+\boxed{\ \frac{d^2 u}{d \varphi^2} + u = \frac{\mu k}{L^2}.\ }
+\]</p>
+
+<p>这是<em>线性</em> 二阶 ODE, 形式上是"<em>简谐振子 + 常数驱动</em>"。通解</p>
+
+<p>\[
+u(\varphi) = \frac{\mu k}{L^2} + A \cos(\varphi - \varphi_0).
+\]</p>
+
+<p>取 \(\varphi_0 = 0\)（旋转坐标系约定）, 写成</p>
+
+<p>\[
+\boxed{\ \frac{1}{r} = \frac{\mu k}{L^2} (1 + e \cos \varphi), \quad e = A L^2 / (\mu k).\ }
+\]</p>
+
+<p>整理</p>
+
+<p>\[
+r(\varphi) = \frac{p}{1 + e \cos \varphi}, \quad p = \frac{L^2}{\mu k}.
+\]</p>
+
+<p>这是<em>圆锥曲线</em> 极坐标方程！\(p\) 是<em>半正焦弦</em>, \(e\) 是<em>偏心率</em>:</p>
+
+<ul>
+  <li>\(e = 0\): <em>圆</em>, \(r = p\) 常数。</li>
+  <li>\(0 < e < 1\): <em>椭圆</em>, \(r\) 在 \(p/(1+e)\)（近日点 \(\varphi = 0\)）和 \(p/(1-e)\)（远日点 \(\varphi = \pi\)）间。</li>
+  <li>\(e = 1\): <em>抛物线</em>。</li>
+  <li>\(e > 1\): <em>双曲线</em>。</li>
+</ul>
+
+<p><em>开普勒第一定律</em>: 行星轨道是椭圆, 太阳在一焦点。Newton 在这里推出来。从极坐标方程看, 原点（即太阳位置, 因为我们把约化粒子放在原点意味着它围绕中心力源）正是椭圆的一个焦点。这是非平凡几何事实——一般 \(V(r)\) 给出的轨道不是圆锥曲线（如 \(V = -k/r^3\) 的轨道是螺旋, \(V = +\frac{1}{2} k r^2\) 的轨道是椭圆但太阳在<em>中心</em> 不是焦点）。<em>只有</em> 平方反比力 \(F \propto 1/r^2\) 给出"<em>焦点为引力源的圆锥曲线</em>"。</p>
+
+<p><strong>偏心率与能量的关系</strong>: 用能量守恒</p>
+
+<p>\[
+E = \tfrac{1}{2} \mu \dot r^2 + \frac{L^2}{2 \mu r^2} - \frac{k}{r}.
+\]</p>
+
+<p>取近日点 \(r = r_{\min} = p/(1+e), \dot r = 0\), 代入解 \(e\):</p>
+
+<p>\[
+e = \sqrt{1 + \frac{2 E L^2}{\mu k^2}}.
+\]</p>
+
+<p>所以</p>
+
+<ul>
+  <li>\(E = -\mu k^2/(2 L^2)\): \(e = 0\), 圆。这是<em>最低</em> 能量, 此时 \(r = p\) 不变。</li>
+  <li>\(E < 0\): \(e < 1\), 椭圆（束缚）。</li>
+  <li>\(E = 0\): \(e = 1\), 抛物线（恰逃逸）。</li>
+  <li>\(E > 0\): \(e > 1\), 双曲线（散射）。</li>
+</ul>
+
+<p>这与 §3.4 有效势的能量分类<em>对得上</em>。漂亮。</p>
+
+<h2 id="sec3-6">3.6 开普勒三定律推导</h2>
+
+<p>把上述结果整理成<em>三定律</em> 形式：</p>
+
+<p><strong>第一定律</strong>: 行星沿椭圆轨道, 太阳在一焦点。<em>已证</em>（§3.5）。</p>
+
+<p><strong>第二定律</strong>: 行星-太阳连线在等时间扫等面积。<em>已证</em>（§3.2, 等面积律来自角动量守恒）。它<em>不</em> 依赖力的具体形式, 任何中心力都满足。</p>
+
+<p><strong>第三定律</strong>: \(T^2 / a^3\) 对所有行星相同。这是新的, 我们推导。</p>
+
+<p>椭圆面积 \(A = \pi a b\)（\(a, b\) 是长短半轴）, 半正焦弦 \(p = b^2/a\), \(b = \sqrt{p a} = \sqrt{a L^2/(\mu k)}\)。等面积律给 \(dA/dt = L/(2 \mu)\), 是常数。所以一周期</p>
+
+<p>\[
+T = \frac{A}{dA/dt} = \frac{\pi a b}{L/(2 \mu)} = \frac{2 \pi \mu a b}{L} = \frac{2 \pi \mu a}{L} \sqrt{\frac{a L^2}{\mu k}} = 2 \pi a^{3/2} \sqrt{\frac{\mu}{k}}.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\boxed{\ T^2 = \frac{4 \pi^2 \mu}{k} a^3.\ }
+\]</p>
+
+<p>对引力 \(k = G M m\)（其中 \(M\) 是太阳, \(m\) 是行星, \(\mu \approx m\) 当 \(M \gg m\)）, \(\mu/k = 1/(G M)\), 与 \(m\) 无关。所以 \(T^2/a^3 = 4 \pi^2 / (G M)\) <em>对所有行星都同</em>——这就是 Kepler 第三定律。常数仅依赖中心质量 \(M\)。</p>
+
+<p>实测: 地球轨道 \(a = 1\) AU, \(T = 1\) yr。把 \(T^2/a^3 = 1\)（用这个单位）。其他行星按观测数据验证, Kepler 时代精度已能确认到几分之一。Newton 推出的常数 \(4 \pi^2/(GM)\) 给出 \(GM_{\odot}\) 的值, 与从地表 \(g\) 推出的太阳引力一致——这是 Newton 1687 给出的<em>定量预测验证</em>, 让 \(F = G M m/r^2\) 从假设变成定律。</p>
+
+<h2 id="sec3-7">3.7 守恒量与隐藏对称性: Laplace-Runge-Lenz 向量</h2>
+
+<p>开普勒问题中已知守恒量: 能量 \(E\)（1 个标量）、角动量 \(\boldsymbol L\)（3 个分量, 但因平面运动只 1 个独立——\(\boldsymbol L\) 方向 + 大小）。3D 中心力一般问题有这些守恒量。但<em>开普勒问题</em>（特别是 \(V = -k/r\)）有<em>额外</em> 一个守恒量, 叫</p>
+
+<p><strong>Laplace-Runge-Lenz 向量</strong>:</p>
+
+<p>\[
+\boxed{\ \boldsymbol A = \boldsymbol p \times \boldsymbol L - \mu k \hat{\boldsymbol r}.\ }
+\]</p>
+
+<p>验证 \(\boldsymbol A\) 守恒（这里给思路, 完整代数读者自验）: \(d \boldsymbol L / dt = \boldsymbol 0\), 所以 \(d \boldsymbol A / dt = \dot{\boldsymbol p} \times \boldsymbol L - \mu k d \hat{\boldsymbol r}/dt\)。\(\dot{\boldsymbol p} = \boldsymbol F = -k \hat{\boldsymbol r}/r^2\), \(\boldsymbol L = \mu \boldsymbol r \times \dot{\boldsymbol r}\)。展开两项,</em>恰好相消</em>——完全靠 \(V = -k/r\) 这一个特定形式。其他幂次 \(V \propto 1/r^n\) (\(n \neq 1\)) 不守恒。</p>
+
+<p>\(\boldsymbol A\) 在轨道平面内（垂直 \(\boldsymbol L\)）, 指向<em>近日点</em> 方向, 大小 \(|\boldsymbol A| = \mu k e\)。所以它<em>同时</em> 编码偏心率 \(e\) 和近日点方位。</p>
+
+<p>守恒的<em>意义</em>: 一般中心力问题的轨道<em>不闭合</em>——粒子绕原点一圈后近点方位改变, 整体轨迹是"<em>玫瑰</em>" 形（如 \(V = -k/r^2\) 的轨道是 Cotes 螺旋）。但开普勒问题轨道<em>闭合</em>（椭圆每圈回到同一近点）, 因为 \(\boldsymbol A\) 守恒, 近点方位钉死。这是 Bertrand 定理（1873）的内容: <em>只有</em> \(V = -k/r\) 和 \(V = \tfrac{1}{2} k r^2\)（3D 等向谐振子）这两种势使所有束缚轨道闭合, 其他都不闭合。</p>
+
+<p><em>隐藏对称性</em>: \(\boldsymbol L\) 守恒来自<em>旋转对称</em>（SO(3)）。\(\boldsymbol A\) 额外守恒来自<em>什么</em>？答案: 4 维旋转对称 SO(4)。原来 \(V = -k/r\) Kepler 问题在能量层 \(E < 0\) 上等价于 4 维球面上的自由粒子运动——一个隐藏的<em>更大</em> 对称群。这条事实由 Pauli 1926 首次用代数证, 重新发现氢原子能级公式 \(E_n = -\frac{1}{2} \mu k^2/(L^2)\) 用 \(L^2 = n^2 \hbar^2\) 给 \(E_n \propto -1/n^2\)——他用 \(\boldsymbol L\) 和 \(\boldsymbol A\) 的代数关系, <em>不解 Schrödinger 方程</em> 直接得能级。这是量子力学早期最优雅的代数计算之一。在经典力学中 LRL 向量是<a href="ch11.html">ch11 Poisson 括号</a> 和<a href="ch15.html">ch15 作用-角变量</a> 的入口。</p>
+
+<h2 id="sec3-8">3.8 应用</h2>
+
+<p><strong>(a) 行星轨道</strong>: 直接套公式。地球: \(a = 1\) AU \(= 1.496 \times 10^{11}\) m, \(e \approx 0.017\)（近圆）, \(T = 365.25\) 日。火星 \(a \approx 1.524\) AU, \(e \approx 0.094\), \(T \approx 687\) 日, \(T^2/a^3\) 与地球一致到几位精度——Kepler 第三定律的实测确认。</p>
+
+<p><strong>(b) 卫星轨道</strong>: 围绕地球的卫星, 中心力源是地球（\(M = M_{\oplus}\)）。同样圆锥曲线轨道。<em>地球同步轨道</em>: 卫星周期 = 地球自转周期 \(T = 24\) hr, 用 \(T^2 = 4 \pi^2 a^3 / (G M_{\oplus})\) 解出 \(a \approx 4.22 \times 10^7\) m, 海拔约 \(35\,786\) km。所有同步通讯卫星都在这个高度的圆轨道上。</p>
+
+<p><strong>(c) Hohmann 转移</strong>: 从地球轨道（\(a_1 = 1\) AU）到火星轨道（\(a_2 = 1.524\) AU）, 最省燃料的双脉冲转移轨道是椭圆, 近日 \(a_1\), 远日 \(a_2\), 长半轴 \(a = (a_1 + a_2)/2\)。转移时间 \(T/2 = \pi a^{3/2} \sqrt{1/(GM_{\odot})}\)。算出来 \(\approx 259\) 日。NASA 1965 Mariner 4 火星探测器走的就是这条轨道。</p>
+
+<p><strong>(d) 散射</strong>: \(E > 0\) 时双曲轨迹, 粒子从无穷远来从无穷远去, 经过近点时被偏转。偏转角 \(\theta\) 与"<em>瞄准距离</em>" \(b\)（即从原点到入射方向的垂直距离）的关系</p>
+
+<p>\[
+\tan(\theta/2) = \frac{k}{2 E b}.
+\]</p>
+
+<p>这是<em>Rutherford 散射公式</em> 的经典基础。Rutherford 1911 用 \(\alpha\) 粒子轰击金箔, 测出散射角分布与上式（电荷间 Coulomb 力, \(k = Z_1 Z_2 e^2 / (4 \pi \epsilon_0)\)）符合, 推出原子有<em>致密原子核</em>——这是 20 世纪最重要的力学应用之一, 直接催生了原子模型。</p>
+
+<p>开普勒问题的解析可解性是经典力学的<em>例外</em>——大多数力学问题<em>没有</em> 闭式解。三体（如太阳 + 木星 + 土星）已经不可解析（Poincaré 1890 证）, 走向<em>混沌</em>（<a href="ch17.html">ch17</a>）。所以中心力问题的可解性依赖<em>对称性</em>: SO(3) 的旋转对称给角动量守恒, SO(4) 的隐藏对称给 LRL 向量, 自由度被守恒量"<em>反向消解</em>" 到 1。这种"<em>对称 ⟹ 守恒 ⟹ 可解</em>" 链条在 Lagrange 框架下变成<a href="ch15.html">ch15 完全可积系统</a>——开普勒只是这个理论的最早例子。</p>
+
+<p>到这里 Newton 部分结束。我们用了三章: ch1 引子（从最速降线到变分原理）, ch2 Newton 复习与守恒律, ch3 开普勒问题作为 Newton 框架的最高成就。下一章我们正式跳到<em>Lagrange 框架</em> 的入口——<em>广义坐标</em>。这个概念是 Lagrange 力学的<em>语言</em>; 没有它后面 EL 方程、变分原理、Noether 定理都无从谈起。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch2.html">← 上一章 · 第 2 章 Newton 力学复习</a><a href="ch4.html">下一章 · 第 4 章 广义坐标与约束 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目录 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+<h1>普林斯顿经典力学读本</h1>
+
+<p style="margin-top:-0.5rem;color:var(--ink-soft);font-style:italic;">从最速降线到 Hamilton 流 · Lagrangian + Hamiltonian + Poisson + 几何力学</p>
+
+<h1 id="preface">前言</h1>
+
+<p>欢迎你翻开这本书。经典力学是物理学最古老的分支——从 Newton 1687 年《自然哲学的数学原理》算起 339 年。可它有一个奇怪的事实——<em>大部分</em> 高级物理（电磁、相对论、量子力学、量子场论、统计力学）都<em>不</em> 直接用 Newton F=ma, 而是用 1788 Lagrange + 1833 Hamilton 重写过的语言。这本书就是教你<em>从 Newton 到 Lagrange 到 Hamilton</em> 这次语言升级——以及为什么它如此重要。</p>
+
+<p>核心命题: Newton 的力学告诉你"<em>物体在每一瞬怎么动</em>"。Lagrange-Hamilton 的力学告诉你"<em>物体的<em>整条路径</em> 由什么决定</em>"。从瞬间动力学到全局变分，是物理学最深的视角转换之一。它让<em>对称性 = 守恒律</em>（Noether 定理）成为定理而不是巧合，让相对论 / 量子力学 / 场论的写法<em>必然如此</em>，让混沌 / 积分系统 / 几何力学有共同语言。</p>
+
+<h2>这本书的角色</h2>
+
+<p>系列<em>第 15 卷</em>。前置：<a href="../多元微积分/index.html">多元微积分</a>（梯度 / 散度 / 偏导）+ <a href="../微分方程/index.html">微分方程</a>（ODE 求解）。<a href="../线性代数/index.html">线性代数</a>（矩阵 / 特征值）在 ch8 振动 + ch12 Poisson 用到。<a href="../微分几何/index.html">微分几何</a>（流形 / 切丛）让 ch10-15 Hamiltonian 力学的几何视角更深, 但不必要。</p>
+
+<p>下一步：<a href="../量子力学/index.html">量子力学</a>（V14, 已上线）—— 量子力学的"<em>正则量子化</em>" 直接把经典 Hamilton 翻译成量子算子。也通向<em>场论</em>（连续 Lagrangian）+ <em>统计力学</em>（相空间几何）。</p>
+
+<h2>这本书<em>不</em>是什么</h2>
+
+<p>它<em>不</em>是高中物理——不重讲牛顿三定律 + 抛物运动。本书 ch2 简短复习, 然后 ch3 起切到 Lagrange。</p>
+
+<p>它<em>不</em>是连续介质力学专书——本书 ch18-19 简介弹性 + 流体, 但不深入。专书参考 Landau-Lifshitz <em>Theory of Elasticity</em> + <em>Fluid Mechanics</em>。</p>
+
+<p>它<em>不</em>是经典场论专书——本书 ch20 给入口（Lagrangian 密度 + Klein-Gordon）, 但完整 QFT 不在范围。</p>
+
+<h2>读这本书之前你需要什么</h2>
+
+<p>你需要<a href="../多元微积分/index.html">多元微积分</a>（链式法则 + 偏导 + 多重积分）。本书几乎每章都用。</p>
+
+<p>你需要<a href="../微分方程/index.html">微分方程</a>到二阶 ODE（齐次 + 非齐次, 线性系统）。Lagrange / Hamilton 方程都是 ODE 系统。</p>
+
+<p>你最好懂高中物理——动量、动能、势能。本书<em>会</em> 复习这些, 但用过会更顺。</p>
+
+<p>你<em>不</em> 需要相对论 + 量子力学——本书 ch22 讲狭义相对论（自包含）, ch24 简介量子前夜。</p>
+
+<h2>"我下周就要考期中, 从哪里开始?"</h2>
+
+<p>本科<em>分析力学</em> 标准考试看：</p>
+
+<ul>
+  <li>Lagrange 方程 + 例子（ch5-7）</li>
+  <li>Noether 定理 + 守恒律（ch7）</li>
+  <li>小振动 + 简正模式（ch8）</li>
+  <li>刚体 + 欧拉角（ch9）</li>
+  <li>Hamilton 方程（ch10-11）</li>
+  <li>Poisson 括号 + 正则变换（ch12-13）</li>
+</ul>
+
+<p>研究生<em>高级</em> 加上：</p>
+
+<ul>
+  <li>Hamilton-Jacobi（ch14）</li>
+  <li>作用-角变量 + 积分系统（ch15）</li>
+  <li>KAM + 混沌（ch16-17）</li>
+  <li>经典场论（ch20）</li>
+</ul>
+
+<h2>致谢</h2>
+
+<p>本书向 Adrian Banner 的<em>《微积分读本》</em> 致敬。内容主要参考 Goldstein <em>Classical Mechanics</em>（首选, 物理标准）+ Landau-Lifshitz <em>Mechanics</em>（极简精炼）+ Arnold <em>Mathematical Methods of Classical Mechanics</em>（几何视角）+ José + Saletan <em>Classical Dynamics: A Contemporary Approach</em>（中级现代）+ Marsden-Ratiu <em>Introduction to Mechanics and Symmetry</em>（symplectic 几何）。</p>
+
+<h2>目录</h2>
+
+<ol>
+  <li><a href="ch1.html">第 1 章 引论：从最速降线到变分原理</a> — Bernoulli 1696 + Newton + Lagrange 接力。</li>
+  <li><a href="ch2.html">第 2 章 Newton 力学复习 + 守恒律</a> — F=ma 的核心结果。</li>
+  <li><a href="ch3.html">第 3 章 中心力问题：开普勒</a> — 行星运动 + 1/r² 引力。</li>
+  <li><a href="ch4.html">第 4 章 广义坐标 + 约束</a> — 把约束几何化。</li>
+  <li><a href="ch5.html">第 5 章 变分原理：最小作用量</a> — \(\delta S = 0\)。</li>
+  <li><a href="ch6.html">第 6 章 Euler-Lagrange 方程</a> — 经典力学的统一方程。</li>
+  <li><a href="ch7.html">第 7 章 对称性 + Noether 定理</a> — 对称 ↔ 守恒律。</li>
+  <li><a href="ch8.html">第 8 章 小振动 + 简正模式</a> — 多自由度耦合振动。</li>
+  <li><a href="ch9.html">第 9 章 刚体动力学 + 欧拉角</a> — 角动量 + 惯性张量。</li>
+  <li><a href="ch10.html">第 10 章 Legendre 变换 + Hamiltonian</a> — 从 \(L\) 到 \(H\)。</li>
+  <li><a href="ch11.html">第 11 章 Hamilton 方程 + 相空间</a> — \((q, p)\) 几何。</li>
+  <li><a href="ch12.html">第 12 章 Poisson 括号 + 守恒律</a> — 经典对易。</li>
+  <li><a href="ch13.html">第 13 章 正则变换</a> — 相空间的"<em>等距</em>"。</li>
+  <li><a href="ch14.html">第 14 章 Hamilton-Jacobi 方程</a> — 经典 PDE 视角。</li>
+  <li><a href="ch15.html">第 15 章 作用-角变量 + 积分系统</a> — Liouville 完全可积。</li>
+  <li><a href="ch16.html">第 16 章 经典微扰论 + KAM 定理</a> — "几乎可积" 的命运。</li>
+  <li><a href="ch17.html">第 17 章 经典混沌 + Lyapunov 指数</a> — 蝴蝶效应。</li>
+  <li><a href="ch18.html">第 18 章 弹性力学入门</a> — 连续介质 + 应力应变。</li>
+  <li><a href="ch19.html">第 19 章 流体力学入门</a> — Euler + Navier-Stokes。</li>
+  <li><a href="ch20.html">第 20 章 经典场论 + Lagrangian 密度</a> — 标量场 + 电磁场。</li>
+  <li><a href="ch21.html">第 21 章 经典 → 量子的桥</a> — 正则量子化 + 路径积分。</li>
+  <li><a href="ch22.html">第 22 章 相对论力学</a> — 时空中的 Lagrangian。</li>
+  <li><a href="ch23.html">第 23 章 应用：航天器轨道 + 多体问题</a> — Lagrange 点 + 三体。</li>
+  <li><a href="ch24.html">第 24 章 应用：几何力学（symplectic + moment map）</a> — 现代几何视角。</li>
+</ol>
+
+<ul>
+  <li><a href="appA.html">附录 A 多元微积分 + 微分方程速查</a></li>
+  <li><a href="appB.html">附录 B 群与对称性速查</a></li>
+  <li><a href="subject-index.html">主题索引</a></li>
+</ul>
+
+<nav class="page-nav"><a href="ch1.html">从第一章开始 →</a></nav>
+
+</main>
+</body>
+</html>

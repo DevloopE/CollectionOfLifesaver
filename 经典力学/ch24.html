@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 24 章 几何力学（symplectic + moment map）— 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 航天器轨道</a><a href="appA.html">附录 A →</a></nav>
+<h1 id="ch24">第 24 章 几何力学（symplectic + moment map）</h1>
+
+<p>本书最后一章。我们走了 23 章, 从 1696 Bernoulli 最速降线开始, 经过 Newton + Lagrange + Hamilton + Poisson 四种力学语言, 经过 KAM + 混沌 + 弹性 + 流体 + 经典场论 + 量子前夜 + 相对论 + 航天, 走到最后一站——<em>几何力学</em>。</p>
+
+<p>这是 1970-1980 年代由 Vladimir Arnold（莫斯科）+ Jerrold Marsden（Berkeley/Caltech）+ Alan Weinstein（Berkeley）+ Tudor Ratiu（EPFL Lausanne）等人系统化的<em>现代</em> 经典力学。它的核心命题是: <em>把经典力学完全几何化</em>——相空间是<em>辛流形</em>（symplectic manifold）, Hamilton 流是辛同胚, 守恒量是<em>moment map</em>, 对称约化是<em>商映射</em>。所有 \((q, p)\) 坐标本质消失, 留下纯几何对象。</p>
+
+<p>为什么这种"<em>纯几何</em>" 的视角值得最后一章？三个理由:</p>
+
+<ul>
+  <li><em>普适</em>: 几何力学的语言适用任何<em>偶数</em> 维流形 + 闭非退化 2-形式, 不仅仅是 \(T^* Q\)。这覆盖<em>所有</em> 经典力学系统——刚体（旋转群上）、Toda 链、Calogero-Moser 系统、流体（无穷维 Lie 群）、规范理论。</li>
+  <li><em>对称约化</em>: Marsden-Weinstein 定理 (1974) 给"<em>有对称的力学系统怎么"商掉"对称性</em>" 一个干净几何答案。这是 ch7 Noether 定理的<em>几何完成</em>。</li>
+  <li><em>通向现代物理</em>: 几何力学的语言渗透量子化（几何量子化, 链 ch21.9）+ 数学物理（可积系统, 链 ch15）+ 表示论（Kirillov 轨道）+ 量子计算的几何相位。</li>
+</ul>
+
+<p>本章是<em>导论</em>——给概念 + 主要定理, 不深证明。深入 see Marsden-Ratiu《<em>Introduction to Mechanics and Symmetry</em>》（标准教材）+ Arnold《<em>Mathematical Methods of Classical Mechanics</em>》（更老但更优雅）。</p>
+
+<h2 id="sec24-1">24.1 复习相空间 + 辛形式</h2>
+
+<p>从<a href="ch11.html">第 11 章</a>到<a href="ch15.html">第 15 章</a>, 我们用<em>相空间</em> \((q, p)\) 描述 Hamilton 力学。Poisson 括号</p>
+
+<p>\[
+\{f, g\} = \sum_i \left( \frac{\partial f}{\partial q^i} \frac{\partial g}{\partial p_i} - \frac{\partial f}{\partial p_i} \frac{\partial g}{\partial q^i} \right)
+\]</p>
+
+<p>给观测量代数。Hamilton 流 \(\dot q^i = \partial H/\partial p_i, \dot p_i = -\partial H/\partial q^i\) 由<em>辛 2-形式</em></p>
+
+<p>\[
+\omega = \sum_i dp_i \wedge dq^i
+\]</p>
+
+<p>统一描述 (链<a href="ch13.html">第 13 章</a> 13.7 节正则变换 = 保 \(\omega\) 的变换)。</p>
+
+<p>这种"<em>用 \(\omega\) 来组织一切</em>" 的视角让<em>坐标变得不重要</em>。任何保 \(\omega\) 的坐标变换都给同样的物理。<em>真正的对象是 \(\omega\) 与流形, 不是坐标</em>。这就是几何力学的<em>哲学</em>。</p>
+
+<p>本节正式定义<em>辛流形</em>——抽象到<em>不依赖坐标</em> 的层面。</p>
+
+<h2 id="sec24-2">24.2 辛流形定义</h2>
+
+<p>设 \(M\) 是 \(2n\) 维光滑流形。<em>辛 2-形式</em> \(\omega\) 是 \(M\) 上的<em>2-阶微分形式</em>（链 V13 微分几何 ch12-15）, 满足:</p>
+
+<ol>
+  <li><em>闭</em>: \(d \omega = 0\)。</li>
+  <li><em>非退化</em>: 对每点 \(x \in M\) 与每非零切向量 \(v \in T_x M\), 存在 \(w \in T_x M\) 使 \(\omega(v, w) \neq 0\)。等价说, 矩阵 \(\omega_{ij}\)（\(\omega\) 在某基下分量）非奇异——这要求 \(\dim M\) 为<em>偶数</em>。</li>
+</ol>
+
+<p>满足两条的 \((M, \omega)\) 叫<em>辛流形</em>。</p>
+
+<p>例 1: \(M = \mathbb R^{2n}\), \(\omega = \sum_i dp_i \wedge dq^i\)。这是"<em>标准辛空间</em>", 经典 \((q, p)\) 相空间。</p>
+
+<p>例 2: 球面 \(S^2\) (二维) 带<em>面积形式</em> \(\omega = \sin \theta \, d\theta \wedge d\varphi\) (球面坐标)。\(d\omega = 0\), 非退化。\((S^2, \omega)\) 是辛流形——这给一个不是"<em>位置 + 动量</em>" 的辛例子。</p>
+
+<p>例 3: 复射影空间 \(\mathbb C P^n\) 带 Fubini-Study 形式。\(2n\) 实维。这是量子态空间的辛结构（量子力学的纯态构成 \(\mathbb C P^{n-1}\)）。</p>
+
+<p>关键定理（<em>Darboux 定理</em>, 1882）: <em>所有辛流形局部上等价于标准 \(\mathbb R^{2n}\)</em>——存在局部坐标 \((q^1, \ldots, q^n, p_1, \ldots, p_n)\) 使 \(\omega = \sum dp_i \wedge dq^i\)。</p>
+
+<p>这说: <em>辛几何没有"<em>局部不变量</em>"</em>——所有辛流形<em>局部都长一样</em> (与 Riemann 几何<em>不</em> 同, 后者有曲率作局部不变量)。整体上辛流形可以非常不同 (球面 vs 平面 vs 环面), 但局部完全相同。</p>
+
+<h2 id="sec24-3">24.3 例: \(T^* Q\) 自然辛</h2>
+
+<p>给任意流形 \(Q\)（"<em>配置空间</em>", 比如 N 粒子系统的 \(\mathbb R^{3N}\), 或单摆的圆 \(S^1\), 或刚体的 \(SO(3)\)）, 它的<em>余切丛</em> \(T^* Q\) 自然带辛结构。</p>
+
+<p>构造: \(T^* Q\) 上点是 \((q, p)\), 其中 \(q \in Q\), \(p \in T_q^* Q\)（\(q\) 处余切向量）。定义"<em>同调 1-形式</em>" \(\theta\) 在 \((q, p)\) 处:</p>
+
+<p>\[
+\theta_{(q, p)}(v) = p(\pi_*(v)),
+\]</p>
+
+<p>其中 \(\pi: T^* Q \to Q\) 是投影, \(\pi_*\) 是它在切丛的微分。然后</p>
+
+<p>\[
+\boxed{\ \omega = -d \theta.\ }
+\]</p>
+
+<p>证明 \(\omega\) 是辛: \(d \omega = -d d \theta = 0\)（外微分平方零, 链 V13 ch14）; 非退化由 \(Q\) 上局部坐标 \(q^i\) + 自然对偶 \(dq^i\) 给的 \(p = p_i \, dq^i\) 验证, 得 \(\omega = dp_i \wedge dq^i\) 标准形式。</p>
+
+<p>所以<em>任意配置空间 \(Q\) 的余切丛 \(T^* Q\) 自然带辛结构</em>——这就是"<em>位置-动量相空间</em>" 在几何上的本质。</p>
+
+<p>例: \(Q = \mathbb R^n\)（自由粒子）, \(T^* Q = \mathbb R^{2n}\), 标准辛。</p>
+
+<p>例: \(Q = S^1\)（单摆配置）, \(T^* S^1 = S^1 \times \mathbb R\)（圆柱）。辛形式 \(\omega = dp \wedge d\theta\)。Hamilton 流的整体几何非常具体——能量小给小圆轨道, 能量大给翻越的轨道, 临界能量分隔两区。这就是 ch15 作用-角变量在单摆上的几何。</p>
+
+<p>例: \(Q = SO(3)\)（刚体配置 = 旋转矩阵）, \(T^* SO(3) = SO(3) \times \mathfrak{so}(3)^*\)。这是刚体力学的相空间。</p>
+
+<p>但<em>不是所有辛流形都是 \(T^* Q\) 形式</em>——比如球面 \(S^2\) 上的面积形式不能写成 \(T^* Q\)。一般辛流形比余切丛多。这种"<em>辛但不是余切丛</em>" 的例子在几何力学中重要——它们对应"<em>没有自然位置 / 动量分离</em>" 的力学系统。</p>
+
+<h2 id="sec24-4">24.4 Hamilton 向量场 \(X_H\)</h2>
+
+<p>给辛流形 \((M, \omega)\) + 光滑函数 \(H: M \to \mathbb R\)（"<em>Hamiltonian</em>"）, 怎么得 Hamilton 流？答案: <em>Hamilton 向量场</em> \(X_H\) 由</p>
+
+<p>\[
+\boxed{\ \iota_{X_H} \omega = dH\ }
+\]</p>
+
+<p>唯一定（用 \(\omega\) 非退化）。\(\iota\) 是<em>内积</em>（contraction）——\(\iota_X \omega\) 是 1-形式 \(v \mapsto \omega(X, v)\)。</p>
+
+<p>方程 \(\iota_{X_H} \omega = dH\) 说: <em>\(X_H\) 是 \(\omega\) 把 \(dH\) "<em>翻译</em>" 成的向量场</em>。它给"<em>沿 \(H\) 的等位面切向量</em>"——确实, \(X_H \cdot H = \omega(X_H, X_H) = 0\)（\(\omega\) 反对称）, 即 \(H\) 沿 \(X_H\) 不变, 能量守恒。</p>
+
+<p>在标准坐标 \((q, p)\), \(\omega = dp \wedge dq\), 解 \(\iota_X \omega = dH\) 直接给</p>
+
+<p>\[
+X_H = \frac{\partial H}{\partial p} \frac{\partial}{\partial q} - \frac{\partial H}{\partial q} \frac{\partial}{\partial p}.
+\]</p>
+
+<p>这正是 Hamilton 流——\(\dot q = \partial H/\partial p, \dot p = -\partial H/\partial q\)。所以"<em>抽象 \(\iota_X \omega = dH\)</em>" 在标准坐标下退化成熟悉的 Hamilton 方程。但抽象形式在<em>任意辛流形</em> 上工作, 不需要全局 \((q, p)\) 坐标。</p>
+
+<p>Poisson 括号也几何重写:</p>
+
+<p>\[
+\{f, g\} = \omega(X_f, X_g) = X_g \cdot f = -X_f \cdot g.
+\]</p>
+
+<p>(各种等价表达; 用 \(\iota_{X_g} \omega = dg\) 推导。)</p>
+
+<p>所以<em>Poisson 括号 = 用 \(\omega\) 把 \(df\) 与 \(dg\) 配成的标量</em>。整套 Poisson 代数就是辛形式的内禀产物。</p>
+
+<p>请你停下感受这件事: <em>在几何力学语言里, "<em>Hamilton 力学</em>" 是 "<em>选个辛流形 \((M, \omega)\) + 选个 \(H</em>", 然后 \(X_H\) 由 \(\omega\) 自动构造</em>。\((q, p)\) 不是对象——它们只是局部坐标. 真对象是 \((M, \omega, H)\)。</p>
+
+<h2 id="sec24-5">24.5 辛同胚 = 保 \(\omega\) 微分同胚</h2>
+
+<p>辛流形之间"<em>力学等价</em>" 的映射是<em>辛同胚</em>: 微分同胚 \(\phi: (M_1, \omega_1) \to (M_2, \omega_2)\) 满足</p>
+
+<p>\[
+\phi^* \omega_2 = \omega_1.
+\]</p>
+
+<p>即 \(\phi\) "<em>把 \(\omega_2\) 拉回 \(M_1\) 等于 \(\omega_1\)</em>"。</p>
+
+<p>关键性质:</p>
+
+<ul>
+  <li>辛同胚保 Hamilton 流——\(\phi(\)\(M_1\) 中 Hamilton 流的轨道\() = M_2\) 中的对应 Hamilton 流轨道。</li>
+  <li>辛同胚保 Poisson 括号——\(\phi^* \{f, g\}_2 = \{\phi^* f, \phi^* g\}_1\)。</li>
+  <li>辛同胚保<em>体积</em>——\(\omega^n / n!\) 是 \(2n\) 维"<em>Liouville 体积</em>", 辛同胚保它（链<a href="ch11.html">第 11 章</a> 11.7 Liouville 定理）。</li>
+</ul>
+
+<p>对自映射 \(\phi: M \to M\) (即 \(M_1 = M_2 = M\)), 辛同胚就是<em>正则变换</em>（链<a href="ch13.html">第 13 章</a>）的现代版。所以本书 ch13 的"<em>正则变换</em>" = "<em>辛同胚</em>", 只是名字不同。</p>
+
+<p>例: <em>Hamilton 流本身是辛同胚族</em>。给 \(H\), 时间 \(t\) 的演化 \(\phi_t: M \to M\) 是辛同胚（每个 \(t\)）, 且 \(\phi_0 = \text{id}, \phi_{t+s} = \phi_t \circ \phi_s\)（一参数群）。这是"<em>Hamilton 流</em>" 的几何描述: 每个 Hamiltonian 给一族<em>辛同胚</em>。</p>
+
+<p>例: 量子力学里的<em>幺正算子</em> \(\hat U(t) = e^{-i \hat H t/\hbar}\)。它<em>保 Hilbert 内积</em>, 是经典辛同胚的"<em>量子升级</em>"。这也是 ch21 的"<em>经典 → 量子桥</em>" 的几何提示——辛同胚 \(\to\) 幺正算子。</p>
+
+<h2 id="sec24-6">24.6 Lie 群作用 + moment map</h2>
+
+<p>现在到几何力学最深的概念——<em>moment map</em>。</p>
+
+<p>给辛流形 \((M, \omega)\) + Lie 群 \(G\) 在 \(M\) 上的<em>辛作用</em> (即 \(G\) 的每个元素 \(g \in G\) 给辛同胚 \(\phi_g: M \to M\), 且 \(\phi_{gh} = \phi_g \circ \phi_h\))。</p>
+
+<p>这种"<em>对称作用</em>" 给一族无穷小变换。每个 \(\xi \in \mathfrak g\)（\(G\) 的 Lie 代数, 即"<em>无穷小生成元</em>"）给 \(M\) 上的"<em>基本向量场</em>" \(\xi_M\)——它是 \(\phi_{\exp(t \xi)}\) 在 \(t = 0\) 的导数。</p>
+
+<p>Hamilton 化: 对每个 \(\xi \in \mathfrak g\), 是否存在函数 \(H_\xi: M \to \mathbb R\) 使 \(\xi_M = X_{H_\xi}\)（即 \(\xi_M\) 的"<em>Hamilton 函数</em>"）？答案——若 \(H^1(M, \mathbb R) = 0\)（\(M\) 一维上同调消失, 大多数物理空间满足), 则<em>是</em>。</p>
+
+<p>把所有 \(H_\xi\) 集成<em>moment map</em>:</p>
+
+<p>\[
+\boxed{\ \mu: M \to \mathfrak g^*, \quad \langle \mu(x), \xi \rangle = H_\xi(x).\ }
+\]</p>
+
+<p>(\(\mathfrak g^*\) 是 \(\mathfrak g\) 的对偶空间。)</p>
+
+<p>\(\mu\) 把<em>相空间点</em> 映到<em>对偶 Lie 代数</em>, 每个 \(\xi \in \mathfrak g\) 配上一个 Hamilton 函数。直观: \(\mu(x)\) 是"<em>对称群作用 \(G\) 在 \(x\) 处的"<em>守恒量</em>"</em>"。具体例子:</p>
+
+<p><strong>例 1: 平移对称</strong>。\(M = T^* \mathbb R^3\), \(G = \mathbb R^3\) 平移群作用 \((q, p) \mapsto (q + a, p)\)。\(\mathfrak g = \mathbb R^3\), 基 \(e_i\) 对应 \(i\) 方向平移。基本向量场 \(\xi_M = \partial/\partial q\) (沿 \(q\) 方向)。Hamilton 函数 \(H_{e_i} = p_i\) (因为 \(\iota_{\partial/\partial q^i} \omega = -dp_i\), 所以 \(X_{p_i} = -\partial/\partial q^i\)... 符号 cross-check 略)。所以 \(\mu(q, p) = p\)——<em>moment map = 动量</em>!</p>
+
+<p><strong>例 2: 旋转对称</strong>。\(M = T^* \mathbb R^3\), \(G = SO(3)\) 旋转群。\(\mathfrak{so}(3) = \mathbb R^3\) (反对称矩阵 \(\leftrightarrow\) 向量, 链 ch9 刚体)。Moment map \(\mu(q, p) = q \times p = \boldsymbol L\)——<em>角动量</em>!</p>
+
+<p><strong>例 3: 时间平移</strong>。\(G = \mathbb R\), 作用是 Hamilton 流。Moment map \(\mu = H\)——<em>能量</em>。</p>
+
+<p>请你看到这件事的<em>普适</em>: <em>所有</em> Noether 守恒量都是 moment map。Noether 定理（链<a href="ch7.html">第 7 章</a>）的几何完成: <em>守恒量 \(=\) 对称作用的 moment map 分量</em>。这给"<em>对称 ↔ 守恒</em>" 一个<em>结构性</em> 表达——不再是"<em>每例分别证</em>", 而是"<em>由 moment map 普适给</em>"。</p>
+
+<p>关键性质 (\(G\) 作用 + \(\mu\)):</p>
+
+<ul>
+  <li>若 \(H\) <em>G 不变</em>（即对所有 \(g \in G\), \(H \circ \phi_g = H\)）, 则 \(\mu\) 沿 Hamilton 流守恒——\(d\mu/dt = 0\)。这是 Noether 的几何陈述。</li>
+  <li>\(\mu\) 是<em>等变</em> 的: \(\mu(\phi_g(x)) = \text{Ad}^*_g \mu(x)\), 其中 \(\text{Ad}^*\) 是 \(G\) 在 \(\mathfrak g^*\) 上的余伴随作用。这条等变性使得 \(\mu\) 行为良好。</li>
+</ul>
+
+<h2 id="sec24-7">24.7 Marsden-Weinstein 辛约化</h2>
+
+<p>有了 moment map, 怎么"<em>商掉</em>" 对称性？1974 年 Jerry Marsden + Alan Weinstein 给出干净答案——<em>辛约化</em>（symplectic reduction）。</p>
+
+<p>setup: \((M, \omega)\) 辛流形, \(G\) Lie 群辛作用, \(\mu: M \to \mathfrak g^*\) moment map。固定 moment 值 \(\eta \in \mathfrak g^*\)（"<em>固定守恒量</em>"）。考虑 level set \(\mu^{-1}(\eta) \subset M\)——所有 \(x\) 满足 \(\mu(x) = \eta\)。</p>
+
+<p>这个 level set 上 \(G_\eta = \{g \in G : \text{Ad}^*_g \eta = \eta\}\)（\(\eta\) 的<em>稳定子</em>）作用。商空间</p>
+
+<p>\[
+\boxed{\ M_\eta = \mu^{-1}(\eta) / G_\eta.\ }
+\]</p>
+
+<p>是<em>约化相空间</em>。</p>
+
+<p><strong>Marsden-Weinstein 定理</strong>: 若 \(G_\eta\) 在 \(\mu^{-1}(\eta)\) 上的作用<em>自由 + 真</em> (常成立), 则 \(M_\eta\) 是<em>辛流形</em>, 维数 \(\dim M_\eta = \dim M - 2 \dim G\)。</p>
+
+<p>具体: 把对称<em>商掉</em> 减 \(\dim G\) 维（每个对称 1 个自由度）, 又减 \(\dim G\) 维（固定 moment 值用掉守恒量）, 总共减 \(2 \dim G\)。</p>
+
+<p>这是"<em>对称约化</em>" 的几何形式——<em>用对称把相空间维数缩小</em>, 留下的空间仍是辛流形, 仍可做 Hamilton 力学。</p>
+
+<p>例 1: 中心力问题。\(M = T^* \mathbb R^3\)（6 维）, \(G = SO(3)\)（3 维）, \(\mu(q, p) = q \times p = \boldsymbol L\)。固定 \(\boldsymbol L = \boldsymbol L_0\)（角动量），\(G_{\boldsymbol L_0} = SO(2)\)（绕 \(\boldsymbol L_0\) 轴旋转, 1 维）。约化空间 \(M_{\boldsymbol L_0}\) 维数 \(6 - 2 \cdot 3 + 2 \cdot 1 = 2\)（因为 \(G_\eta = SO(2)\) 不是全 \(G\), 标准定理给 \(\dim M - \dim G - \dim G_\eta = 6 - 3 - 1 = 2\)）。<em>2 维相空间</em>——这正是<a href="ch3.html">第 3 章</a>把中心力 reduced 到一维径向问题（一维位置 + 一维径向动量）。约化让"<em>3D 矢量问题</em>" 变成"<em>1D 径向问题</em>", Marsden-Weinstein 给几何理由。</p>
+
+<p>例 2: 刚体动力学。\(M = T^* SO(3)\)（6 维）, \(G = SO(3)\)（左作用, 3 维）。约化 \(M_\eta\) 是 2 维。具体: 这 2 维是 \(\mathbb R^3\) 上的 sphere \(|\boldsymbol L| = \text{const}\)（角动量大小不变）。Hamilton 流在 \(S^2\) 上是 Euler 方程的轨迹（链<a href="ch9.html">第 9 章</a>）。<em>Euler 方程的几何来源 = 刚体相空间 \(T^* SO(3)\) 的 Marsden-Weinstein 约化</em>。这种"<em>从全相空间 → 约化空间</em>" 视角让 Euler 方程的"<em>椭圆轨道 / 双曲鞍点</em>" 几何有干净来源。</p>
+
+<p>例 3: \(N\) 体引力。\(M\) 是 \(N\) 粒子的 \(6 N\) 维相空间, \(G = E(3)\)（欧氏运动群, 6 维）。约化掉平移对称（3 维）+ 旋转对称（3 维）= 6 维, 给\(6N - 12\) 维约化空间。这是天体力学的"<em>Jacobi 坐标</em>" 后台机制。</p>
+
+<p>请你欣赏 Marsden-Weinstein 的<em>普适</em>: <em>任何带 Lie 群对称的力学系统都可几何约化</em>。这给"<em>用对称简化问题</em>" 一个统一框架, 不再是"<em>每例独立设计技巧</em>"。</p>
+
+<h2 id="sec24-8">24.8 应用: 刚体, Toda 链, Calogero-Moser</h2>
+
+<p>本节给几何力学的<em>3 个经典例子</em>, 让你看到这套语言怎么用。</p>
+
+<p><strong>1. 刚体 (\(SO(3)\) 作用)</strong>。前节提过。完整刚体力学的相空间 \(T^* SO(3)\) (6 维), Hamiltonian \(H = \frac{1}{2} I^{-1}_{ij} L^i L^j\) (惯性张量倒 + 角动量平方)。约化到 \(\boldsymbol L\) 不变球面 \(S^2\), Hamilton 流给 Euler 方程</p>
+
+<p>\[
+\dot {\boldsymbol L} = \boldsymbol L \times (I^{-1} \boldsymbol L).
+\]</p>
+
+<p>解析积分（用守恒量 \(|\boldsymbol L|^2\) + 能量 \(H\)）, Jacobi 1839 用椭圆函数给精确解。这是经典力学最优雅的<em>解析可积</em> 例子之一。</p>
+
+<p><strong>2. Toda 链</strong>。Morikazu Toda 1967 提出: \(N\) 个粒子在线上, 相邻粒子用<em>指数</em> 势耦合 \(V(q_i - q_{i+1}) = e^{-(q_{i+1} - q_i)}\)。Hamiltonian \(H = \sum p_i^2/2 + \sum e^{-(q_{i+1} - q_i)}\)。</p>
+
+<p>看似无对称, 但 Flaschka 1974 + Manakov 1974 发现: <em>Toda 链有 \(N\) 个独立守恒量</em>, 完全可积！具体: 用 Lax 对 \((L, A)\) 形式 \(\dot L = [A, L]\), \(L\) 的特征多项式系数全是守恒量。</p>
+
+<p>几何力学解释: Toda 链是某个 Lie 代数 \(sl(N, \mathbb R)\) 的<em>余伴随轨道</em> 上的 Hamilton 系统。Marsden-Weinstein 约化 + Lie-Poisson 结构给完全积分性的<em>结构性</em> 来源。这是"<em>几何力学解释可积性</em>" 的范例。</p>
+
+<p>Toda 链应用: 数值离散化 KdV 方程 + 量子可积链 + 随机矩阵理论（Toda 链的连续极限是 KdV; KdV 是 \(N \to \infty\) Toda）。</p>
+
+<p><strong>3. Calogero-Moser 系统</strong>。Calogero 1971 + Moser 1975 提: \(N\) 个粒子在线上, 相互作用 \(V(q_i - q_j) = 1/(q_i - q_j)^2\)（反平方）。Hamiltonian \(H = \sum p_i^2/2 + \sum_{i < j} 1/(q_i - q_j)^2\)。</p>
+
+<p>同样有 \(N\) 个独立守恒量, 完全可积。Lax 表示 + 散射理论给精确解。</p>
+
+<p>几何力学解释: Calogero-Moser 是 \(T^* GL(N) \times T^* \mathbb C^N\) 经过 \(GL(N)\) 对称约化的结果。这种"<em>更大空间的辛约化给可积链</em>" 模式叫<em>Hamiltonian 约化构造可积系统</em>, 是 Marsden-Weinstein-Atiyah-Hitchin 1980 年代的重大发现。</p>
+
+<p>Calogero-Moser 应用: 扩展到量子（量子 Calogero-Moser）, 与 random matrix theory 紧密相连; 连续极限给 Benjamin-Ono 方程; 复化版本（"<em>elliptic Calogero-Moser</em>"）与超对称 Yang-Mills 理论有深联系（Donagi-Witten 1995）。</p>
+
+<p>这三个例子让你看到几何力学的<em>丰收</em>——它不是抽象游戏, 而是产生<em>具体新结果</em> 的工具。可积系统的整个 1980-2000 黄金时代靠这套语言驱动。</p>
+
+<h2 id="sec24-9">24.9 收尾段: 1696-2026 力学进化</h2>
+
+<p>这是本书最后一节。让我们回顾整个旅程, 看这 330 年力学经过了什么。</p>
+
+<p><strong>1696 Bernoulli 最速降线</strong>。一道挑战题——"<em>滑下时间最短的曲线是什么</em>"。Newton 当晚解出, 揭开<em>变分法</em> 历史。这是本书 ch1 的钩子, 也是经典力学的"<em>第一次革命</em>"——从"<em>物体每瞬怎么动</em>" 转向"<em>整条路径如何决定</em>"。</p>
+
+<p><strong>1788 Lagrange 《Mécanique analytique》</strong>。把整个力学重写成变分形式。\(L = T - V\), \(\delta S = 0\), EL 方程。这是<em>第一次系统化的"<em>力学 = 变分</em>"</em>——经典力学第二次革命。</p>
+
+<p><strong>1833 Hamilton 正则方程</strong>。Legendre 变换把 \(L\) 变 \(H\), 二阶 ODE 变一阶 ODE 系统, 引入相空间。这给经典力学一个<em>对称, 几何</em> 的形式——为后续 Poisson 括号、量子力学、辛几何打底。</p>
+
+<p><strong>1858-1872 Liouville + Sophus Lie</strong>。Liouville 完全可积性 (\(N\) 个互对合守恒量给 \(N\) 自由度系统的解析可解); Lie 创立 Lie 群理论 (连续对称 \(\to\) Lie 代数), 1893 出版《<em>Theorie der Transformationsgruppen</em>》。这两套理论给后续几何力学的群论基础。</p>
+
+<p><strong>1887 Poincaré + 三体不可解</strong>。证明三体一般不可积; 引入<em>Poincaré 截面</em> + <em>稳定 / 不稳定流形</em> + <em>同宿轨道</em>。混沌理论的种子。</p>
+
+<p><strong>1905-1916 Einstein 相对论</strong>。狭义 + 广义。把 Newton 引力换成时空几何, Lagrangian 公式自然推广。本书 ch22 + V13 ch23-24。</p>
+
+<p><strong>1918 Noether 定理</strong>。<em>对称 ↔ 守恒</em>。这条定理后来被一切现代物理 (粒子物理、规范理论、量子场论) 当成圣经。</p>
+
+<p><strong>1925-1928 Heisenberg-Schrödinger-Dirac 量子力学</strong>。从经典 Hamilton-Poisson 框架"<em>正则量子化</em>" 出量子力学。本书 ch21。</p>
+
+<p><strong>1948 Feynman 路径积分</strong>。经典 Lagrangian 直接通向量子振幅。给量子力学第二种描述形式。</p>
+
+<p><strong>1954-1963 KAM 定理</strong>（Kolmogorov + Arnold + Moser）。"<em>几乎可积</em>" 系统的 invariant tori 在小扰动下保留——澄清了"<em>太阳系稳定吗</em>" 的 200 年问题。本书 ch16。</p>
+
+<p><strong>1960-1980 混沌</strong>（Lorenz + Smale + Feigenbaum + Mandelbrot）。蝴蝶效应 + 分形 + 周期倍增。打破"<em>确定性 = 可预测</em>" 神话。本书 ch17。</p>
+
+<p><strong>1970-1980 几何力学</strong>（Arnold + Marsden + Weinstein + Ratiu）。本章。把经典力学几何化——辛流形 + moment map + 对称约化。</p>
+
+<p><strong>1968-1990 可积系统</strong>。KdV + Toda + Calogero-Moser + 反散射变换 + Lax 对。让"<em>可积</em>" 从孤立例子变成结构性现象。</p>
+
+<p><strong>1985-2000 量子可积 + 量子群</strong>（Drinfeld + Faddeev）。把可积系统量子化, 引入量子群。与统计力学、共形场论紧密相连。</p>
+
+<p><strong>2000-2026 现代延伸</strong>:</p>
+
+<ul>
+  <li><em>非交换辛几何 + 量子化</em>（Kontsevich 形式量子化定理 1997）。</li>
+  <li><em>Floer 同调 + 辛拓扑</em>: 辛流形的拓扑不变量, Gromov 1985 + Floer 1988+。</li>
+  <li><em>镜对称 + Calabi-Yau</em>（弦论 + 几何力学的交汇）。</li>
+  <li><em>积分系统 + Geometric Langlands</em>（Beilinson-Drinfeld + Frenkel）。</li>
+  <li><em>量子计算的几何相位</em>（Berry 1984 + 拓扑量子计算 Kitaev 2003）——经典几何相空间 \(\to\) 量子 Berry 相 \(\to\) 拓扑量子门。</li>
+  <li><em>航天工程</em>: JWST 在 \(L_2\), Voyager 出太阳系, SpaceX 计划火星, Lucy 任务到 Trojan 小行星。本书 ch23。</li>
+</ul>
+
+<p>从 1696 Bernoulli 一道挑战题, 到 2026 几何力学 + 量子计算 + 星际探测——330 年的力学进化让人类:</p>
+
+<ul>
+  <li>知道天体怎么运动（Kepler + Newton + Lagrange）。</li>
+  <li>知道为什么能量 / 动量守恒 (Noether)。</li>
+  <li>知道经典如何通向量子 (Dirac + Feynman)。</li>
+  <li>知道力学如何成为几何（Arnold + Marsden + Weinstein）。</li>
+  <li>能把卫星送到 Lagrange 点 (Voyager + JWST)。</li>
+  <li>能用经典几何相位做量子计算（Berry + Kitaev）。</li>
+</ul>
+
+<p>这就是经典力学——<em>不是</em> 高中物理的"<em>抛物运动 + 单摆</em>" 旧课, 而是物理学最古老 / 最现代的双面: 1687 Newton 原理 + 2026 几何量子计算并存的活生生学科。</p>
+
+<h2 id="sec24-10">24.10 临别话: 看待力学的方式</h2>
+
+<p>本书结束。我希望你建立的<em>不是</em> 一堆方程, 而是<em>看待力学的方式</em>。</p>
+
+<p>具体三层:</p>
+
+<ol>
+  <li><strong>瞬间动力学</strong>（Newton, ch2-3）: 物体在每一瞬怎么动。\(F = ma\)。直接简单, 但处理约束 + 多坐标系不方便。</li>
+  <li><strong>全局变分</strong>（Lagrange, ch4-9）: 整条路径如何决定。\(\delta S = 0\)。处理约束自动, 给 Noether 守恒律, 推广到任何流形 + 弯曲时空。</li>
+  <li><strong>几何</strong>（Hamilton-Poisson + symplectic, ch10-15 + ch24）: 相空间是辛流形, Hamilton 流是辛同胚, 守恒量是 moment map。最抽象, 最对称, 通向量子化 + 可积系统 + 现代物理。</li>
+</ol>
+
+<p><em>这三个层次不是"<em>谁取代谁</em>", 是同样物理的三种语言</em>。看一道题, 学会问"<em>用哪种语言最方便</em>": Atwood 机用 Newton; 多自由度耦合用 Lagrange; 找守恒律 + 对称性用 Hamilton-Poisson; 处理一般辛流形 / 约化用几何力学。</p>
+
+<p>第二个收获——<em>对称性是物理学的灵魂</em>。Noether 定理（ch7）+ moment map（本章）+ 量子化（ch21）三处反复出现: 物理学的<em>守恒律 / 量子数 / 选择规则</em> 都是对称的几何后果。20 世纪粒子物理把这条想法发挥到极致——夸克色 + 弱同位旋 + 超对称 + 弦理论的轮廓全是对称群论。本书前 23 章为这个视角搭舞台。</p>
+
+<p>第三个收获——<em>数学预言物理</em>。Lagrange 1788 + Hamilton 1833 没想过量子力学; 但他们给的形式正好是 1925 量子力学需要的。Riemann 1854 没想过广义相对论; 但他给的弯曲几何正好是 1915 Einstein 需要的。Lie 1880-1893 没想过粒子物理; 但他给的 Lie 群正好是 20 世纪规范理论需要的。<em>纯数学家在物理学家用它之前几十年甚至上百年就已经准备好工具</em>。这是数学和物理彼此滋养的最美一面。</p>
+
+<p>你读完本书, 看见了 1696-2026 的<em>力学进化</em>, 看见了 Newton-Lagrange-Hamilton-Poisson-Symplectic 五种语言, 看见了对称性怎么变守恒律, 看见了经典怎么通向量子, 看见了航天工程怎么用 18 世纪 Lagrange 点. 现在你有<em>语言</em> 谈论力学的<em>本质</em>, 不再被困在"<em>F = ma</em>" 的初等表述。这就是分析力学的真正价值。</p>
+
+<p>下一步: 想深入<em>几何力学</em>, 读 Marsden-Ratiu。想<em>可积系统</em>, 读 Babelon-Bernard-Talon。想<em>量子化</em>, 读 V14 量子力学 + Woodhouse《<em>Geometric Quantization</em>》。想<em>规范理论</em>, 读 Peskin-Schroeder QFT。所有这些进阶都从本书的 ch10-15 + ch24 出发——你已具备入门资格。</p>
+
+<p>感谢你读到最后。祝你的力学之旅长久 + 美丽。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch23.html">← 上一章 · 第 23 章 航天器轨道</a><a href="appA.html">附录 A →</a></nav>
+</main>
+</body>
+</html>

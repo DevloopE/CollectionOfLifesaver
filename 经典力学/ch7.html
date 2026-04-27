@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 对称性与 Noether 定理 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 Hamilton 原理与 Lagrange 方程</a><a href="ch8.html">下一章 · 第 8 章 小振动 →</a></nav>
+<h1 id="ch7">第 7 章 对称性与 Noether 定理</h1>
+
+<p>请你回想中学物理。三大守恒律: 能量守恒、动量守恒、角动量守恒。它们各自从不同地方"<em>冒</em>" 出来:</p>
+
+<ul>
+  <li><em>能量守恒</em>: 从功能定理 \(\Delta T = W\) 推, 在保守力 \(\boldsymbol F = -\nabla V\) 下 \(W = -\Delta V\), 所以 \(T + V\) 守恒。</li>
+  <li><em>动量守恒</em>: Newton 第三定律——内力两两抵消, 所以孤立系统总动量守恒。</li>
+  <li><em>角动量守恒</em>: 对中心力（\(\boldsymbol F\) 沿径向）, 力矩 \(\boldsymbol \tau = \boldsymbol r \times \boldsymbol F = 0\), 所以 \(\boldsymbol L = \boldsymbol r \times m\boldsymbol v\) 守恒。</li>
+</ul>
+
+<p>三条守恒律, 三条互不相干的推理。每条都基于<em>不同的特殊条件</em>——保守力 / 牛顿三定律 / 中心力。这三条<em>同时</em> 守恒在哪里? <em>为什么</em> 偏偏是这三个量守恒, 不是另外什么? 这三件事有没有<em>共同的根</em>?</p>
+
+<p>1918 年, Emmy Noether 给出回答——<em>有</em>。三大守恒律是<em>同一定理</em> 的化身, 那条定理说:</p>
+
+<blockquote style="border-left:3px solid var(--ink-soft);padding-left:1em;margin:1em 0;color:var(--ink-soft);font-style:italic;">
+"<em>每一个连续对称性, 都给一条守恒律。</em>"
+</blockquote>
+
+<p>能量守恒来自<em>时间平移对称</em>; 动量守恒来自<em>空间平移对称</em>; 角动量守恒来自<em>旋转对称</em>。这条定理把"<em>守恒律的存在</em>" 直接挂在"<em>系统对称性</em>" 上——一旦你知道系统 Lagrangian 在某种连续变换下不变, 立即可以<em>读出</em> 一个守恒量, 不必再做特殊推理。</p>
+
+<p>这一章的目标:</p>
+
+<ul>
+  <li>把"<em>对称性</em>" 这个直觉概念精确化（Lagrangian 在某连续变换族下不变）；</li>
+  <li>陈述 Noether 定理；</li>
+  <li>给出完整证明（用变分原理 + 边界项控制）；</li>
+  <li>用四个具体应用复盘三大守恒律 + 一个标度对称的例外；</li>
+  <li>看 Kepler 问题的<em>隐藏对称</em> 给出 Laplace-Runge-Lenz 矢量；</li>
+  <li>展望 Noether 在量子 / 粒子物理里如何成为发现新粒子的指南针。</li>
+</ul>
+
+<h2 id="sec7-1">7.1 三个守恒律的统一谜题</h2>
+
+<p>请你停下来想这件事。中学物理里能量、动量、角动量这三个量, <em>每一个</em> 都是大量物理过程的核心。能量守恒让你估算抛体运动的最大高度、电荷震荡的能量分配、热机效率上限; 动量守恒让你处理碰撞、反推、火箭推进; 角动量守恒解释陀螺岁差、行星轨道平面不变、原子电子的轨道选择规则。三个量, 三套应用, 各撑半边天。</p>
+
+<p>但<em>为什么是三个</em>? 为什么不是两个或四个? 为什么这三个量恰巧守恒, 而其它候选量（比如 \(m\dot x^3\) 或 \(\boldsymbol r \cdot \boldsymbol p\)）不守恒?</p>
+
+<p>Newton 力学没办法回答这种"<em>为什么</em>"。它只能<em>验证</em>: 你提一个量 \(Q(\boldsymbol r, \boldsymbol p, t)\), 看 \(dQ/dt\) 在运动方程下是不是零。是, 它守恒; 不是, 不守恒。Newton 力学没有<em>预测哪个量会守恒</em> 的方法。</p>
+
+<p>Lagrange 力学第一次给出回答——但这个回答需要<em>等到</em> 1918 才被完全表达出来。先看一个<em>提示</em>。<a href="ch6.html">ch6.5</a> 里我们看到: <em>循环坐标</em>（\(L\) 不显含 \(q^i\)）⟹ 共轭动量 \(p_i\) 守恒。具体例: 球面摆里 \(L\) 不显含 \(\varphi\) ⟹ \(p_\varphi = m\ell^2 \sin^2\theta \, \dot\varphi\) 守恒。这是"<em>对绕垂直轴旋转对称</em> ⟹ <em>角动量守恒</em>" 的特例。</p>
+
+<p>但<em>循环坐标</em> 只覆盖一类对称——某个特定 \(q^i\) 不出现。更一般的对称（比如<em>总系统</em> 在<em>同时</em> 对所有粒子做平移）就<em>不对应</em> 单个 \(q^i\) 不出现; 你需要把"<em>对称性</em>" 描述成对整组坐标的<em>变换</em>。Noether 定理就是把"<em>循环坐标 ⟹ 守恒动量</em>" 这条朴素观察推广到任意连续对称变换的<em>普适版本</em>。</p>
+
+<h2 id="sec7-2">7.2 对称性: 把概念精确化</h2>
+
+<p><strong>定义（连续对称, 朴素版）</strong>: 设 \(L(q, \dot q, t)\) 是一个力学系统的 Lagrangian。考虑一族单参数变换</p>
+
+<p>\[
+q^i \to \tilde q^i = q^i + \epsilon X^i(q, t),
+\]</p>
+
+<p>其中 \(\epsilon\) 是小参数, \(X^i(q, t)\) 是给定的"<em>方向场</em>"（变换的<em>无穷小生成元</em>）。如果<em>对每条物理路径 \(q(t)\)</em>, 在变换下 Lagrangian 满足</p>
+
+<p>\[
+\boxed{\ L(\tilde q, \dot{\tilde q}, t) = L(q, \dot q, t) + \mathcal O(\epsilon^2),\ }
+\]</p>
+
+<p>即 \(L\) 在<em>一阶</em> 上不变（\(dL/d\epsilon|_{\epsilon=0} = 0\)）, 我们说 \(L\) 具有<em>关于 \(X\) 的连续对称性</em>。</p>
+
+<p>请你看清这个定义。"<em>对称</em>" 不是说 Lagrangian 长得"<em>好看</em>" 或"<em>有镜像</em>"; 它是一条具体的代数等式: 把 \(q\) 和 \(\dot q\) 都按变换平移一点, 算出新 \(L\), 与旧 \(L\) 相等到一阶。\(\epsilon\) 是连续参数（不是离散的反射）, 对应"<em>连续</em>" 对称, 这个限制后面 7.3 解释。</p>
+
+<p>具体例:</p>
+
+<ul>
+  <li><em>空间平移</em>: \(\boldsymbol r \to \boldsymbol r + \epsilon \hat e\) 对所有粒子, \(\hat e\) 是某固定方向单位向量。生成元 \(X = \hat e\)。"<em>\(L\) 不依赖<em>整体</em> 位置</em>"（只依赖粒子之间的相对位置）等价于 \(L\) 对此变换不变。</li>
+  <li><em>时间平移</em>: \(t \to t + \epsilon\)。这不是位形变换, 但等价于"<em>把 Lagrangian 在新时间值取的值与旧时间一样</em>", 即 \(L\) 不显含 \(t\)。</li>
+  <li><em>旋转</em>: \(\boldsymbol r \to R(\epsilon) \boldsymbol r\), \(R(\epsilon)\) 是绕固定轴 \(\hat n\) 转 \(\epsilon\) 角的矩阵。生成元 \(X^i = (\hat n \times \boldsymbol r)^i\)。</li>
+  <li><em>规范变换</em>（电磁系统）: \(\phi \to \phi - \partial \chi/\partial t\), \(\boldsymbol A \to \boldsymbol A + \nabla \chi\); 配上波函数相位 \(\psi \to e^{i q \chi/\hbar} \psi\)（量子情形）。</li>
+</ul>
+
+<p>这些都是<em>变换族</em>, 由参数 \(\epsilon\) 连续生成。"<em>连续</em>" 这个词对 Noether 定理是<em>核心</em>——离散对称（如镜像反射 \(x \to -x\)）<em>没有</em> 对应守恒律, 只对应<em>选择规则</em>（量子里的 parity）。Noether 定理覆盖<em>连续</em> 的版本。</p>
+
+<p><strong>稍精化的定义</strong>（允许 \(L\) 加全微分）: 实际上 Noether 定理还容许更宽的对称——不是 \(L\) 严格不变, 而是 \(L \to L + \epsilon \, dF/dt\)（在变换下变化一个全微分）。因为 \(\int (dF/dt) \, dt = F|_{t_1}^{t_2}\) 在边界给定的变分里是常数, 不影响 EL 方程。这个细节让对称变得<em>更宽松</em>, 但本节主线先按"<em>严格不变</em>" 讲, 7.5 应用到时间平移时再细化。</p>
+
+<h2 id="sec7-3">7.3 Noether 定理陈述</h2>
+
+<p><strong>定理（Noether, 1918）</strong>: 设 \(L(q, \dot q, t)\) 在变换 \(q^i \to q^i + \epsilon X^i(q, t)\) 下连续对称（\(L\) 不变到一阶）。那么沿着<em>任何</em> EL 方程的解 \(q(t)\),</p>
+
+<p>\[
+\boxed{\ Q := \sum_i \frac{\partial L}{\partial \dot q^i} X^i(q, t) = \sum_i p_i X^i\ }
+\]</p>
+
+<p>是<em>守恒量</em>: \(dQ/dt = 0\)。\(Q\) 叫<em>对称 \(X\) 对应的 Noether 荷</em>。</p>
+
+<p>请你停下来读这条定理三遍。它的结构: 输入是<em>变换 \(X\)</em>（一个对称的具体描述）; 输出是<em>显式公式 \(Q = \sum p_i X^i\)</em>（一个守恒量的具体表达式）。<em>给一个对称, 立刻读出守恒律</em>——这就是统一三大守恒律的钥匙。</p>
+
+<p>这个公式很简洁: \(Q\) 是<em>共轭动量 \(p_i\) 沿对称方向 \(X^i\) 投影的求和</em>。如果对称是空间平移（\(X^i\) 是常向量）, \(Q\) 是<em>总动量沿该方向分量</em>。如果对称是绕轴旋转（\(X^i = (\hat n \times \boldsymbol r)^i\)）, \(Q\) 是<em>沿该轴的角动量</em>。Noether 定理把这些守恒量编码成<em>对称变换的对偶量</em>。</p>
+
+<p>下面 7.4 给完整证明, 7.5–7.8 给四个例子。在那之前请先把上面这条公式 \(Q = \sum p_i X^i\) 记牢——它是这一章的<em>主结论</em>。</p>
+
+<h2 id="sec7-4">7.4 证明</h2>
+
+<p>这一节做完整推导。请你跟着每一步, 这是 Lagrange 力学最美的一段证明之一。</p>
+
+<p><strong>设置</strong>: \(L\) 在 \(q^i \to q^i + \epsilon X^i(q, t)\) 下不变到一阶。即考虑变换族 \(\tilde q^i(t, \epsilon) = q^i(t) + \epsilon X^i(q(t), t)\), 算 \(d\tilde q^i/dt\) = \(\dot q^i + \epsilon (\dot X^i)\)（这里 \(\dot X^i = \sum_j (\partial X^i/\partial q^j) \dot q^j + \partial X^i/\partial t\), 是 \(X\) 沿路径的<em>全</em> 时间导数, 不是偏导）。变换后 Lagrangian</p>
+
+<p>\[
+\tilde L := L(\tilde q, \dot{\tilde q}, t) = L(q, \dot q, t) + \epsilon \frac{dL}{d\epsilon}\bigg|_{\epsilon=0} + \mathcal O(\epsilon^2).
+\]</p>
+
+<p>对称条件 \(dL/d\epsilon|_{\epsilon=0} = 0\) 即</p>
+
+<p>\[
+\sum_i \left[ \frac{\partial L}{\partial q^i} X^i + \frac{\partial L}{\partial \dot q^i} \dot X^i \right] = 0. \tag{$\ast$}
+\]</p>
+
+<p>请记住这条等式 \((\ast)\)——这就是"<em>对称</em>" 的代数表达。</p>
+
+<p><strong>主要论证</strong>: 现在<em>沿一条 EL 方程的解 \(q(t)\)</em> 算 \(dQ/dt\), 其中 \(Q = \sum_i (\partial L/\partial \dot q^i) X^i\)。</p>
+
+<p>\[
+\frac{dQ}{dt} = \sum_i \frac{d}{dt}\left( \frac{\partial L}{\partial \dot q^i} \right) X^i + \sum_i \frac{\partial L}{\partial \dot q^i} \dot X^i.
+\]</p>
+
+<p>第一项<em>用 EL 方程</em>替换 \((d/dt)(\partial L/\partial \dot q^i) = \partial L/\partial q^i\):</p>
+
+<p>\[
+\frac{dQ}{dt} = \sum_i \frac{\partial L}{\partial q^i} X^i + \sum_i \frac{\partial L}{\partial \dot q^i} \dot X^i.
+\]</p>
+
+<p>右边正是 \((\ast)\) 的左边! 由对称条件 \((\ast) = 0\), 得 \(dQ/dt = 0\)。</p>
+
+<p><strong>证毕</strong>。</p>
+
+<p>请你回头看这个证明。它<em>极其简短</em>——一行 EL 方程的代换, 加一行对称条件的应用, 完。这种简洁是 Lagrange 力学的招牌——同样的事用 Newton 风格做需要分别处理动量、能量、角动量, 各自一章; Lagrange 用一个推理统一所有。</p>
+
+<p><strong>稍宽的版本</strong>（容许 \(L \to L + \epsilon \, dF/dt\) 对称）: 如果对称条件改成</p>
+
+<p>\[
+\frac{dL}{d\epsilon}\bigg|_{\epsilon=0} = \frac{dF}{dt}
+\]</p>
+
+<p>（\(L\) 在变换下变了一个全微分, 而非严格不变）, 那么守恒量改为</p>
+
+<p>\[
+Q = \sum_i \frac{\partial L}{\partial \dot q^i} X^i - F.
+\]</p>
+
+<p>同样的证明流程, 多减一项。这一情形 7.5 时间平移会用到。</p>
+
+<h2 id="sec7-5">7.5 应用 1: 时间平移 ⟹ 能量守恒</h2>
+
+<p><strong>对称</strong>: \(L\) 不显含 \(t\)（即 \(\partial L/\partial t = 0\)）。这描述"<em>系统的物理规则不随时间变</em>"——你今天做实验和明天做实验, 结果一样。这是物理学最普遍的对称之一。</p>
+
+<p>注意"<em>时间平移</em>" 不是一个 \(q\) 变换, 是一个<em>时间</em> 重标。Noether 定理稍要扩展才能涵盖时间变换。一个常用变体: 设 \(t \to t + \epsilon\), \(q\) 不变（不是 \(q(t)\) 不变, 是函数 \(q\) 沿时间轴平移）。这等价于"<em>\(L\) 不显含 \(t\)</em>" + "<em>\(L\) 在变换下变了个全微分</em>"。具体推导稍麻烦, 我们换个直接路径。</p>
+
+<p><strong>直接证明能量守恒</strong>: 算<em>Hamiltonian</em></p>
+
+<p>\[
+\boxed{\ H := \sum_i p_i \dot q^i - L = \sum_i \frac{\partial L}{\partial \dot q^i} \dot q^i - L\ }
+\]</p>
+
+<p>对时间的全导数（沿一条 EL 解）:</p>
+
+<p>\[
+\frac{dH}{dt} = \sum_i \left[ \frac{d p_i}{dt} \dot q^i + p_i \ddot q^i \right] - \frac{dL}{dt}.
+\]</p>
+
+<p>注意 \(dL/dt = \sum_i (\partial L/\partial q^i) \dot q^i + \sum_i (\partial L/\partial \dot q^i) \ddot q^i + \partial L/\partial t\), 用 EL \(\partial L/\partial q^i = dp_i/dt\) 替换:</p>
+
+<p>\[
+\frac{dL}{dt} = \sum_i \dot p_i \dot q^i + \sum_i p_i \ddot q^i + \frac{\partial L}{\partial t}.
+\]</p>
+
+<p>代入:</p>
+
+<p>\[
+\frac{dH}{dt} = \sum_i \dot p_i \dot q^i + \sum_i p_i \ddot q^i - \sum_i \dot p_i \dot q^i - \sum_i p_i \ddot q^i - \frac{\partial L}{\partial t} = -\frac{\partial L}{\partial t}.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\boxed{\ \frac{dH}{dt} = -\frac{\partial L}{\partial t}.\ }
+\]</p>
+
+<p>"<em>\(L\) 不显含 \(t\) ⟹ \(H\) 守恒</em>"。</p>
+
+<p><em>那么 \(H\) 是不是能量？</em> 在常见情形<em>是</em>。设 \(L = T(q, \dot q) - V(q)\), 其中 \(T\) 是<em>速度的二次型</em>: \(T = (1/2) \sum_{ij} g_{ij}(q) \dot q^i \dot q^j\)。算 \(p_i = \partial T/\partial \dot q^i = \sum_j g_{ij} \dot q^j\), \(\sum_i p_i \dot q^i = \sum_{ij} g_{ij} \dot q^i \dot q^j = 2T\)（用<em>Euler 定理</em>: 二次齐次函数 \(T\) 满足 \(\sum_i \dot q^i \partial T/\partial \dot q^i = 2T\)）。所以</p>
+
+<p>\[
+H = 2T - L = 2T - (T - V) = T + V \quad (\text{即<em>力学能</em>}).
+\]</p>
+
+<p>请你回头读这一段——我们导出了"<em>\(L\) 不显含 \(t\) ⟹ 能量 \(T+V\) 守恒</em>"。<em>时间平移对称 ⟺ 能量守恒</em>, Noether 定理的第一个具体兑现。</p>
+
+<p><em>反例提醒</em>: 如果 \(L\) <em>显含 \(t\)</em>（比如系统受外加随时间变化的驱动力, \(V = V(q, t)\)）, \(H\) 不守恒, \(dH/dt = -\partial L/\partial t \neq 0\)。物理上这是因为驱动力<em>从外部</em> 注入或抽取能量, 系统不再孤立。<em>能量守恒就是"<em>系统孤立 + 物理规则恒定</em>"</em> 的反映。</p>
+
+<p>另一<em>反例提醒</em>: 如果动能 \(T\) 不是 \(\dot q\) 的纯二次型（出现一阶项, 如电磁中带电粒子的 \(q \boldsymbol A \cdot \dot{\boldsymbol r}\)）, \(H\) 仍守恒（在 \(L\) 不显含 \(t\) 下）, 但 \(H\) 不再等于 \(T + V\); 它要做更细致的修正。这是 ch10 Hamilton 化身的内容。</p>
+
+<h2 id="sec7-6">7.6 应用 2: 空间平移 ⟹ 动量守恒</h2>
+
+<p><strong>对称</strong>: 设系统由 \(N\) 个粒子组成, 用每粒子位置 \(\boldsymbol r_a\) 描述。考虑变换 \(\boldsymbol r_a \to \boldsymbol r_a + \epsilon \hat e\) 对所有 \(a\)（一个固定方向 \(\hat e\) 的常平移）。即整个系统刚性平移。</p>
+
+<p>"<em>\(L\) 在此变换下不变</em>" 意味着 \(L\) 不依赖<em>各粒子位置的<em>整体</em>偏移</em>, 只依赖<em>粒子间相对位置</em>。比如 \(V = V(|\boldsymbol r_1 - \boldsymbol r_2|, |\boldsymbol r_2 - \boldsymbol r_3|, \ldots)\) 这种"<em>两两距离势</em>" 满足这个对称。重力 / 静电 / 弹簧 等任何"<em>对的相互作用</em>" 都属此类。</p>
+
+<p><strong>套 Noether</strong>: 生成元 \(X_a^i = \hat e^i\)（每个粒子向同方向偏移, 与粒子标签 \(a\) 无关）。守恒量</p>
+
+<p>\[
+Q = \sum_a \sum_i p_a^i \cdot \hat e^i = \hat e \cdot \sum_a \boldsymbol p_a = \hat e \cdot \boldsymbol P,
+\]</p>
+
+<p>其中 \(\boldsymbol P = \sum_a \boldsymbol p_a\) 是<em>系统总动量</em>。所以总动量沿 \(\hat e\) 方向的分量守恒。</p>
+
+<p>对每个独立的 \(\hat e\)（三个独立方向）, 我们都能选作平移生成元, 所以三个分量各自守恒——<em>整个</em> 总动量 \(\boldsymbol P\) 守恒。</p>
+
+<p>请你停下来想这一段的物理含义。"<em>整个系统的物理规则不依赖你把它放在空间哪个位置</em>" ⟺ "<em>系统总动量守恒</em>"。这条对应不再是<em>巧合</em>——是<em>逻辑</em>。空间是<em>均匀的</em>（你把实验室搬到火星, 实验结果不变）, 这条空间均匀性<em>就是</em> 动量守恒的根据。</p>
+
+<p>反过来, 如果<em>系统不是孤立的</em>（比如外加重力场——\(V = m g z\) 显含 \(z\), 在 \(z\) 方向<em>不</em> 平移不变）, \(z\) 方向动量<em>不</em> 守恒（每秒减少 \(mg\)）, 但 \(x, y\) 方向<em>仍</em> 平移不变, \(P_x, P_y\) 守恒。"<em>哪些方向有平移对称, 哪些方向就有动量守恒</em>" 这种细致对应是 Noether 给的, Newton 风格分别处理每方向才能得出相同结论。</p>
+
+<h2 id="sec7-7">7.7 应用 3: 旋转对称 ⟹ 角动量守恒</h2>
+
+<p><strong>对称</strong>: 同样设 \(N\) 粒子系统。考虑绕固定轴 \(\hat n\) 转 \(\epsilon\) 角的变换 \(\boldsymbol r_a \to \boldsymbol r_a + \epsilon (\hat n \times \boldsymbol r_a)\)（无穷小旋转的一阶展开）。生成元 \(X_a^i = (\hat n \times \boldsymbol r_a)^i\)。</p>
+
+<p>"<em>\(L\) 在此变换下不变</em>" 意味着 \(L\) 不依赖<em>整体方向</em>, 只依赖<em>粒子间相对距离 + 相对角度</em>——即<em>各向同性</em>。中心力势 \(V(|\boldsymbol r|)\) 满足, 任何<em>两体距离势</em>满足。</p>
+
+<p><strong>套 Noether</strong>: 共轭动量 \(\boldsymbol p_a = m_a \dot{\boldsymbol r}_a\)（笛卡尔坐标下）。守恒量</p>
+
+<p>\[
+Q = \sum_a \boldsymbol p_a \cdot (\hat n \times \boldsymbol r_a) = \sum_a \hat n \cdot (\boldsymbol r_a \times \boldsymbol p_a) = \hat n \cdot \boldsymbol L,
+\]</p>
+
+<p>其中 \(\boldsymbol L = \sum_a \boldsymbol r_a \times \boldsymbol p_a\) 是<em>系统总角动量</em>。第一步用混合积循环 \(\boldsymbol a \cdot (\boldsymbol b \times \boldsymbol c) = \boldsymbol c \cdot (\boldsymbol a \times \boldsymbol b)\)。</p>
+
+<p>结论: 对每个独立的轴 \(\hat n\)（三个独立轴）, 总角动量沿该轴守恒——整个总角动量 \(\boldsymbol L\) 守恒。</p>
+
+<p><em>对应原则</em>: 空间是<em>各向同性</em> 的（哪个方向都没有特别), 这条各向同性<em>就是</em> 角动量守恒的根据。</p>
+
+<p>如果旋转对称<em>不完整</em>（比如外加 \(z\) 方向均匀磁场 \(\boldsymbol B = B \hat z\), 该系统在绕 \(z\) 轴旋转下对称, 但绕 \(x, y\) 轴不对称）, 那么<em>只有 \(L_z\)</em> 守恒, \(L_x, L_y\) 不守恒。这种"<em>哪个方向有对称, 哪个方向有角动量守恒</em>" 的细致对应又是 Noether 给的。</p>
+
+<p>请你回头总结 7.5–7.7。三个对称, 三个守恒律:</p>
+
+<ul>
+  <li>时间均匀 ⟺ 能量守恒</li>
+  <li>空间均匀 ⟺ 动量守恒</li>
+  <li>空间各向同性 ⟺ 角动量守恒</li>
+</ul>
+
+<p>这是经典力学最深刻的事实之一。中学物理里这三条互不相干的"<em>守恒律事实</em>", 在 Lagrange 力学里是<em>同一定理</em>对<em>时空对称性</em> 不同方面的具体兑现。</p>
+
+<h2 id="sec7-8">7.8 应用 4: 标度对称（不一定有, 但有时有）</h2>
+
+<p>除了时空对称, 有时系统具有<em>标度对称</em>: \(L\) 在变换 \(q \to \lambda q\), \(t \to \lambda^a t\) 下不变（\(\lambda\) 是标度因子, \(a\) 是某指数）。这<em>不是普遍</em> 对称——只有特殊势场满足。</p>
+
+<p>例: 设 \(V(\boldsymbol r) = c |\boldsymbol r|^k\)（齐次势, 比如 \(k=2\) 简谐振子, \(k=-1\) 牛顿引力）。看变换 \(\boldsymbol r \to \lambda \boldsymbol r\), \(t \to \lambda^\beta t\)。</p>
+
+<p>动能 \(T = (1/2) m |d\boldsymbol r/dt|^2\) 在变换下变为 \(T \to (1/2) m |\lambda d\boldsymbol r/(\lambda^\beta dt)|^2 = \lambda^{2-2\beta} T\)。</p>
+
+<p>势能 \(V = c |\boldsymbol r|^k\) 在变换下变为 \(\lambda^k V\)。</p>
+
+<p>要让 \(L = T - V\) 标度不变（最起码同次幂, 这样 \(\delta S = 0\) 同步缩放——细节是 \(S = \int L \, dt\) 与 \(L \, dt\) 的标度行为）, 我们要 \(T\) 与 \(V\) 缩放指数相等 + \(L \, dt\) 缩放为 \(\lambda^?\) 不变。算: \(L \, dt\) 在最优情况下要不变, 即 \(\lambda^{2-2\beta} \cdot \lambda^\beta = \lambda^k \cdot \lambda^\beta\), 即 \(2 - \beta = k + \beta\), 即 \(\beta = (2-k)/2\)。</p>
+
+<p>具体:</p>
+
+<ul>
+  <li><em>\(k = 2\)</em>（简谐振子）: \(\beta = 0\)。即 \(\boldsymbol r \to \lambda \boldsymbol r\), \(t\) 不变。物理含义: 简谐振子的<em>周期不依赖振幅</em>（"<em>等时性</em>"）。</li>
+  <li><em>\(k = -1\)</em>（Newton 引力 / Coulomb）: \(\beta = 3/2\)。即 \(\boldsymbol r \to \lambda \boldsymbol r\), \(t \to \lambda^{3/2} t\)。物理含义: <em>Kepler 第三定律</em> \(T^2 \propto a^3\)——周期平方与半长轴立方成正比。这条 17 世纪 Kepler 由观测发现的定律, 在 Noether 框架下是<em>标度对称</em> 的直接结果。</li>
+  <li><em>\(k = -2\)</em>（如二维平方反比, 不是物理力但出现在某些数学问题）: \(\beta = 2\)。</li>
+</ul>
+
+<p>请你看这一段——Kepler 第三定律来自 Newton 引力的标度对称性, 这件事很多教科书没说穿。Noether 框架让"<em>定律</em>" 直接<em>变成</em> "<em>对称的代数后果</em>"。</p>
+
+<p>标度对称严格说不一定给"<em>守恒律</em>"（它是离散参数族在某种意义上, 上面给的是定律的 scaling, 不是单参数无穷小生成元的标准 Noether 流程）。但<em>近</em> 标度对称（系统几乎不变在缩放下）给"<em>近守恒</em>" 的有用估计——这是天体物理 / 分形 / 临界现象大量用的工具。</p>
+
+<h3 id="sec7-8-1">Kepler 隐藏对称: Laplace-Runge-Lenz 矢量</h3>
+
+<p>这是经典力学的<em>压轴</em> 例。考虑 Newton 引力下两体问题 \(L = (1/2) m |\dot{\boldsymbol r}|^2 + GMm/|\boldsymbol r|\)。这个系统的<em>显然</em> 对称: 时间平移（能量 \(E\) 守恒）+ 空间各向同性（角动量 \(\boldsymbol L\) 守恒）。这给出 4 个守恒量（\(E\) + \(\boldsymbol L\) 三分量）。</p>
+
+<p>但 Kepler 轨道还有第五条<em>不显然</em> 的守恒律——<em>Laplace-Runge-Lenz 矢量</em>:</p>
+
+<p>\[
+\boldsymbol A := \boldsymbol p \times \boldsymbol L - GMm^2 \frac{\boldsymbol r}{|\boldsymbol r|}.
+\]</p>
+
+<p>直接代运动方程能验证 \(d\boldsymbol A/dt = 0\)（<a href="ch3.html">ch3</a> 已展示过）。\(\boldsymbol A\) 指向<em>近日点方向</em>, 它的守恒解释为什么 Kepler 轨道<em>不进动</em>——椭圆永远闭合, 长轴方向恒定。</p>
+
+<p>这条额外守恒律看起来像"<em>奇迹</em>"。Noether 视角揭穿: 它对应一个<em>不那么显然</em> 的对称——Kepler 系统在 \(\mathrm{SO}(4)\)（4 维旋转群）作用下不变, 比表面上的 \(\mathrm{SO}(3)\)（3 维旋转群）更大。这个<em>隐藏对称</em> 的发现历史上让<em>氢原子</em> 量子能级简并比"<em>显然</em>" 的预测多。Pauli 1926 用 LRL 矢量代数化解氢原子能级（不用解 Schrödinger 方程, 纯代数推 \(E_n = -13.6/n^2\)）。今天看, 这是<em>动力学对称</em>（dynamical symmetry）的标准例。</p>
+
+<p><em>结论</em>: Noether 定理的力量不只覆盖<em>显然</em> 的时空对称——它给出一个普适框架, 让你识别<em>任何</em> 守恒律背后<em>必然有</em> 一条对称, 即使那条对称隐藏在动力学中。</p>
+
+<h2 id="sec7-9">7.9 量子版 + 现代物理</h2>
+
+<p>Noether 定理在量子力学里有<em>等价的对应</em>。请你回想<a href="ch1.html">ch1</a> 末尾说的"<em>路径积分</em> + Lagrangian 在量子力学起根本作用"。Noether 在那个框架里以下列形式出现:</p>
+
+<p><strong>量子版 Noether</strong>: 在量子场论里, 经典作用量 \(S\) 在变换 \(X\) 下不变 ⟹ 量子场论的<em>路径积分测度</em> 在该变换下不变 ⟹ 对应<em>量子算符 \(\hat Q\) 与 Hamiltonian \(\hat H\) 对易</em>: \([\hat Q, \hat H] = 0\) ⟹ \(\hat Q\) 守恒（对易守恒律的量子版）。</p>
+
+<p>具体例:</p>
+
+<ul>
+  <li><em>时间平移对称</em>: 量子版给 \([\hat H, \hat H] = 0\)（自动）, 即<em>能量守恒</em>。但量子里能量量子化, 守恒律说"<em>测得能量后, 后续测量结果不变（如果 \(\hat H\) 不显含 \(t\)）</em>"。</li>
+  <li><em>空间平移对称</em>: \([\hat{\boldsymbol P}, \hat H] = 0\), 动量守恒。Bloch 定理（晶格周期势对应离散平移群, 动量被替换为<em>晶动量</em>）就是这条对称的固体物理具体化。</li>
+  <li><em>旋转对称</em>: \([\hat{\boldsymbol L}, \hat H] = 0\), 角动量守恒。本征态可以同时按角动量分类, 给出原子的<em>轨道量子数</em>。</li>
+</ul>
+
+<p>更深的: <em>规范对称</em>。带电粒子 Lagrangian \(L = (1/2) m |\dot{\boldsymbol r}|^2 - q \phi + q \boldsymbol A \cdot \dot{\boldsymbol r}\) 在<em>规范变换</em> \(\phi \to \phi - \partial_t \chi\), \(\boldsymbol A \to \boldsymbol A + \nabla\chi\), 加波函数相位变 \(\psi \to e^{iq\chi/\hbar} \psi\) 下不变。Noether 定理给的守恒荷是<em>电荷</em> \(q\)。这是<em>电荷守恒</em> 与<em>规范对称</em> 的对应——20 世纪量子电动力学的根基。</p>
+
+<p><em>非阿贝尔规范理论</em>: 把 \(\mathrm{U}(1)\)（电磁规范）推广到 \(\mathrm{SU}(2) \times \mathrm{U}(1)\)（电弱）或 \(\mathrm{SU}(3)\)（强相互作用）, Noether 给出对应守恒荷——弱同位旋, 色荷。<em>整个标准模型</em> 是"<em>挑一个规范对称群, 写下兼容的 Lagrangian, 用 Noether 读出守恒荷</em>" 的过程。</p>
+
+<p><em>新粒子 = 新对称</em>. 1960 年代, 用 \(\mathrm{SU}(3)\) 旗号味对称分类强子, Gell-Mann 预言 \(\Omega^-\) 重子作为对称多重态的"<em>缺失成员</em>", 1964 年发现。这是"<em>对称指引发现</em>" 的标志事件——你信对称, 对称告诉你存在哪个粒子。同样的逻辑后来给希格斯玻色子的预言（电弱对称破缺产生质量, 一个标量场必然存在）, 2012 年 LHC 确认。</p>
+
+<p>请你停下来感受这一节的<em>距离</em>——我们从中学物理"<em>三大守恒律</em>" 出发, 在 Lagrange 力学里把它们统一为<em>一条 Noether 定理</em>; 这条定理 1918 年发现时只是经典力学的优雅观察, 100 年后已经统治整个理论物理, 成为标准模型 + 引力 + 凝聚态的<em>组织原则</em>。<em>"<em>对称性思维</em>" 是 20 世纪物理学最深的成就之一, 而它的根就是这一章你刚学的 Noether 定理</em>。</p>
+
+<p>有一个反向的发展也值得提——<em>对称破缺</em>。如果系统的 Lagrangian 有对称, 但<em>真空态</em> 不享有这条对称（自发对称破缺）, 你会得到<em>无质量 Goldstone 玻色子</em>（Goldstone 定理, Noether 定理的对偶）。把这个机制扭一下（局部规范对称 + 自发破缺）, Goldstone 模式被"<em>吃掉</em>" 给规范玻色子赋质量, 这就是 Higgs 机制。本书 ch20 经典场论介绍 Goldstone 定理的经典版本。</p>
+
+<h2 id="sec7-10">7.10 临别话</h2>
+
+<p>Emmy Noether 1918 年发表这条定理时, 她正在 Göttingen 大学申请<em>无薪</em>讲师资格——德国大学不允许女性正式任教。她用形式数学（变分法的代数视角）证了这条结果, 紧接着 Hilbert 拿这条定理证<em>广义相对论中的能量守恒为什么"<em>看起来</em>" 怪</em>（Noether 第二定理处理规范对称, 给出 Bianchi 恒等式, 这是 Hilbert 当时困惑的来源）。Hilbert 公开说: "<em>我不明白为什么哲学系反对她任教——我们这里是大学, 不是浴场。</em>"</p>
+
+<p>从 1918 到今天, Noether 定理是物理学最常被引用的定理之一。它的<em>结构</em> 简洁——\(Q = \sum p_i X^i\)——但<em>意义</em> 巨大: 把"<em>守恒律</em>" 这种<em>具体观察</em> 升级到"<em>对称性的代数推论</em>"。这种"<em>由对称推物理</em>" 的方法, 1950 年代后成为粒子物理的<em>主导思维</em>。</p>
+
+<p>本书剩余章节里, 你会反复看到 Noether 视角:</p>
+
+<ul>
+  <li><a href="ch11.html">ch11 中心力问题</a>: 用角动量守恒降维（Noether 给的"<em>降维武器</em>"）</li>
+  <li><a href="ch13.html">ch13 Poisson 括号</a>: \(\{Q, H\} = 0 \Leftrightarrow Q\) 守恒（Hamilton 风格的 Noether）</li>
+  <li><a href="ch15.html">ch15 作用-角变量</a>: 完全可积系统的"<em>所有守恒量</em>"</li>
+  <li><a href="ch20.html">ch20 经典场论</a>: 场论的 Noether 流 \(j^\mu\)</li>
+  <li><a href="ch24.html">ch24 几何力学</a>: 矩映射 (moment map) 是 Noether 在 symplectic 几何里的化身</li>
+</ul>
+
+<p>下一章我们换主题——<em>小振动</em>。当系统在平衡点附近做小幅运动时, EL 方程线性化为<em>耦合简谐振子</em> 系统; 用模态分析（本征值问题）解开。这一段把 Lagrange 力学应用到分子振动 / 晶格声子 / 电路 LC 振荡 / 工程结构动力学等大量具体场景。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 Hamilton 原理与 Lagrange 方程</a><a href="ch8.html">下一章 · 第 8 章 小振动 →</a></nav>
+</main>
+</body>
+</html>

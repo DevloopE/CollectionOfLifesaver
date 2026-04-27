@@ -22,6 +22,7 @@ A growing series of Chinese-language math textbooks in the **Adrian Banner / *Ca
 | 第十二卷 | 普林斯顿拓扑学读本 | 24 章 + 2 附录 |
 | 第十三卷 | 普林斯顿微分几何读本 | 24 章 + 2 附录 |
 | 第十四卷 | 普林斯顿量子力学读本 | 24 章 + 2 附录 |
+| 第十五卷 | 普林斯顿经典力学读本 | 24 章 + 2 附录 |
 
 每章一个独立 HTML 文件（13–50 KB），数学符号用 MathJax 渲染（自动从 CDN 加载）。每本书都有共享的 `styles.css` 和上下章导航。
 

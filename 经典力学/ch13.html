@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 13 章 正则变换 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 Poisson 括号 + 守恒律</a><a href="ch14.html">下一章 · 第 14 章 Hamilton-Jacobi 方程 →</a></nav>
+<h1 id="ch13">第 13 章 正则变换</h1>
+
+<p>请你回想 Lagrange 力学里换坐标。给一个变量替换 \(q^i \to Q^i(q, t)\), Lagrangian 自动变成 \(L(Q, \dot Q, t)\)（用链式法则把 \(\dot q\) 变成 \(\dot Q\)）, EL 方程在新坐标下<em>形式不变</em>。这件事很<em>方便</em>——你可以为不同问题选不同的广义坐标, EL 方程的形式不变。</p>
+
+<p>请你停下来想 Hamilton 力学里能不能也这样。Hamilton 方程涉及<em>两组变量</em> \((q, p)\), 而且 \(p\) 是<em>共轭动量</em>, 不是独立的——它是 \(p = \partial L/\partial \dot q\) 由 \(L\) 决定。所以"<em>换坐标</em>" 在相空间是个更微妙的事。</p>
+
+<p>具体地——能不能做一个变换</p>
+
+<p>\[
+(q, p) \to (Q(q, p, t), P(q, p, t))
+\]</p>
+
+<p>使得 Hamilton 方程在新坐标下还是 Hamilton 方程的形式？也就是说存在一个新 \(K(Q, P, t)\) 使</p>
+
+<p>\[
+\dot Q^i = \frac{\partial K}{\partial P_i}, \qquad \dot P_i = -\frac{\partial K}{\partial Q^i}.
+\]</p>
+
+<p>这种"<em>保 Hamilton 方程</em>" 的变换称为<em>正则变换</em>（canonical transformation）。它们形成一个<em>无穷维群</em>, 是相空间的<em>结构保持</em> 变换——经典力学几何里"<em>等距</em>" 变换的对应物。</p>
+
+<p>这一章我们做四件事——给正则变换三种等价定义、用<em>生成函数</em> 描述它们、做两个具体例子（谐振子简化、相空间旋转）、揭示<em>时间演化本身</em> 是正则变换。最后一点深刻得离谱——它把"<em>动力学</em>" 解构成"<em>对称变换</em>", 是 ch14 Hamilton-Jacobi 方程的种子, 也是 V14 量子力学"<em>幺正演化</em>" 的经典对应。</p>
+
+<h2 id="sec13-1">13.1 正则变换的三种等价定义</h2>
+
+<p><strong>朴素定义</strong>。变换 \((q, p) \to (Q, P)\) 是<em>正则的</em>, 如果存在 \(K(Q, P, t)\) 使 Hamilton 方程在新坐标下成立。</p>
+
+<p>这定义对——但<em>不可操作</em>: 给一个变换, 你怎么验证它"<em>正则</em>"？暴力验证 Hamilton 方程在新坐标下成立太麻烦。需要更<em>结构化</em> 的等价刻画。</p>
+
+<p><strong>定义 1: 保 Hamilton 方程</strong>。如刚才说的——存在 \(K\) 使新坐标下 Hamilton 方程仍成立。</p>
+
+<p><strong>定义 2: 保辛形式</strong>。变换保<em>辛形式</em> \(\omega = \sum dp_i \wedge dq^i\) 不变:</p>
+
+<p>\[
+\sum_i dP_i \wedge dQ^i = \sum_i dp_i \wedge dq^i.
+\]</p>
+
+<p>(等号在外微分代数里; 即新坐标下计算的 \(\omega\) 等于旧坐标下的 \(\omega\)).</p>
+
+<p><strong>定义 3: 保 Poisson 括号</strong>。新坐标下计算的 Poisson 括号和旧坐标下相同:</p>
+
+<p>\[
+\{f, g\}_{Q, P} = \{f, g\}_{q, p} \quad \forall f, g.
+\]</p>
+
+<p>等价地——基本 Poisson 关系在新坐标下保持:</p>
+
+<p>\[
+\{Q^i, Q^j\}_{q, p} = 0, \qquad \{P_i, P_j\}_{q, p} = 0, \qquad \{Q^i, P_j\}_{q, p} = \delta^i_j.
+\]</p>
+
+<p>三种定义<em>等价</em>。这一节剩下证一段, 把三者串起来。</p>
+
+<h2 id="sec13-2">13.2 三种定义的等价性证明</h2>
+
+<p><strong>定义 2 ⟺ 定义 3</strong>。先看这一对。Poisson 括号几何上 \(\{f, g\} = \omega(\boldsymbol X_f, \boldsymbol X_g)\)（上一章 12.7）。所以变换保 \(\omega\) 等价于保 Poisson 括号。具体——若变换保 \(\omega\), 任两个函数微分 \(df, dg\) 在新旧坐标下"<em>同样的</em>" \(\omega\) 配对; 反之同样。</p>
+
+<p>更代数地: 把 \(2n\) 维相空间坐标排成 \(\xi = (q^1, \ldots, q^n, p_1, \ldots, p_n)\)。辛形式矩阵</p>
+
+<p>\[
+J = \begin{pmatrix} 0 & I_n \\ -I_n & 0 \end{pmatrix}.
+\]</p>
+
+<p>(\(I_n\) 是 \(n\) 阶单位矩阵)。Poisson 括号</p>
+
+<p>\[
+\{f, g\} = \sum_{a, b} \frac{\partial f}{\partial \xi^a} J^{ab} \frac{\partial g}{\partial \xi^b}.
+\]</p>
+
+<p>变换 \(\xi \to \eta(\xi)\), Jacobian \(M^a_b = \partial \eta^a/\partial \xi^b\)。新 Poisson 括号 \(\{f, g\}_\eta = \sum_{a, b} (\partial f/\partial \eta^a) J^{ab} (\partial g/\partial \eta^b)\)。变量代换让旧括号变形:</p>
+
+<p>\[
+\{f, g\}_\xi = \sum_{a, b, c, d} \frac{\partial f}{\partial \eta^c} M^c_a J^{ab} M^d_b \frac{\partial g}{\partial \eta^d} = \sum_{c, d} \frac{\partial f}{\partial \eta^c} (M J M^T)^{cd} \frac{\partial g}{\partial \eta^d}.
+\]</p>
+
+<p>所以 \(\{f, g\}_\xi = \{f, g\}_\eta\) 对所有 \(f, g\) ⟺ \(M J M^T = J\)。这条<em>矩阵</em> 方程就是 \(M\) 是<em>辛矩阵</em>的定义。它等价于变换保辛形式。</p>
+
+<p><strong>定义 1 ⟺ 定义 3</strong>。这一对稍复杂。一边——保 Hamilton 方程的变换必保 Poisson 括号。设 \(K(Q, P, t)\) 是新 Hamiltonian, 取 \(f = Q^i, g = Q^j\), 由主方程 \(\dot Q^i = \{Q^i, K\}_{Q, P} + \partial Q^i/\partial t\)。但同时 \(\dot Q^i = \{Q^i, H\}_{q, p} + \partial Q^i/\partial t\)（在原坐标下用主方程）。两个比较 + 任意 \(H\), 推出 \(\{Q^i, Q^j\}_{q, p} = \{Q^i, Q^j\}_{Q, P} = 0\) 等基本关系——具体推导用变换的<em>每个</em> 函数都遵守主方程。</p>
+
+<p>反方向——保 Poisson 括号 ⟹ 保 Hamilton 方程。设 \(\{Q^i, P_j\}_{q, p} = \delta^i_j\) 等。算 \(\dot Q^i\):</p>
+
+<p>\[
+\dot Q^i = \frac{\partial Q^i}{\partial q^j} \dot q^j + \frac{\partial Q^i}{\partial p_j} \dot p_j + \frac{\partial Q^i}{\partial t}.
+\]</p>
+
+<p>用 \(\dot q^j = \partial H/\partial p_j, \dot p_j = -\partial H/\partial q^j\):</p>
+
+<p>\[
+\dot Q^i = \sum_j \Big(\frac{\partial Q^i}{\partial q^j} \frac{\partial H}{\partial p_j} - \frac{\partial Q^i}{\partial p_j} \frac{\partial H}{\partial q^j}\Big) + \frac{\partial Q^i}{\partial t} = \{Q^i, H\}_{q, p} + \frac{\partial Q^i}{\partial t}.
+\]</p>
+
+<p>把 \(H\) 看成 \((Q, P)\) 的函数 \(K(Q, P, t) = H(q(Q, P, t), p(Q, P, t), t)\)（如果变换不显含时间, \(K = H\); 否则需要修正项, 见 13.3 末尾）。算 \(\{Q^i, K\}_{q, p}\):</p>
+
+<p>\[
+\{Q^i, K\}_{q, p} = \sum_j \Big(\frac{\partial Q^i}{\partial q^j} \frac{\partial K}{\partial p_j} - \frac{\partial Q^i}{\partial p_j} \frac{\partial K}{\partial q^j}\Big).
+\]</p>
+
+<p>但 \(\partial K/\partial p_j = \sum_k (\partial K/\partial Q^k) (\partial Q^k/\partial p_j) + (\partial K/\partial P_k)(\partial P_k/\partial p_j)\), 类似 \(\partial K/\partial q^j\)。代回去, 用 \(\{Q^i, Q^k\}_{q, p} = 0, \{Q^i, P_k\}_{q, p} = \delta^i_k\), 化简得</p>
+
+<p>\[
+\{Q^i, K\}_{q, p} = \sum_k \delta^i_k \frac{\partial K}{\partial P_k} = \frac{\partial K}{\partial Q^i}\,\text{的对应}\;\text{即}\;\frac{\partial K}{\partial P_i}.
+\]</p>
+
+<p>(具体是 \(\partial K/\partial P_i\), 用基本 Poisson 关系筛出)。所以 \(\dot Q^i = \partial K/\partial P_i\)——新坐标下 Hamilton 方程<em>形式正确</em>。同理 \(\dot P_i = -\partial K/\partial Q^i\)。完成。</p>
+
+<p>结论——三种定义等价。任意一条都可以用作"<em>正则变换</em>" 的判据。在实战中:</p>
+
+<ul>
+  <li>验证一个具体变换是否正则 → 用<em>定义 3</em>（计算基本 Poisson 括号）。</li>
+  <li>构造正则变换 → 用<em>生成函数</em>（下节）。</li>
+  <li>理解几何 → 用<em>定义 2</em>（保辛形式）。</li>
+</ul>
+
+<h2 id="sec13-3">13.3 生成函数 \(F(q, Q, t)\)</h2>
+
+<p>正则变换<em>系统化</em> 的方式——用<em>生成函数</em>。</p>
+
+<p>核心想法: 在 \((q, p)\) 变换到 \((Q, P)\) 时, 作用量原理 \(\delta \int (\sum p \dot q - H) dt = 0\) 在新坐标下应该也成立 \(\delta \int (\sum P \dot Q - K) dt = 0\)。两者都给同样的物理, 所以 Lagrangian 形式 \(\sum p \dot q - H\) 与 \(\sum P \dot Q - K\) 之差应该是<em>全微分</em>:</p>
+
+<p>\[
+\sum_i p_i \dot q^i - H = \sum_i P_i \dot Q^i - K + \frac{dF}{dt},
+\]</p>
+
+<p>其中 \(F\) 是某个函数（叫<em>生成函数</em>）。整理:</p>
+
+<p>\[
+\sum_i p_i dq^i - \sum_i P_i dQ^i + (K - H) dt = dF.
+\]</p>
+
+<p>(把 \(\dot q dt = dq\) 等式代换)</p>
+
+<p>所以 \(F\) 应该看成 \((q, Q, t)\) 的函数:</p>
+
+<p>\[
+F = F_1(q, Q, t), \quad dF_1 = \sum_i \frac{\partial F_1}{\partial q^i} dq^i + \sum_i \frac{\partial F_1}{\partial Q^i} dQ^i + \frac{\partial F_1}{\partial t} dt.
+\]</p>
+
+<p>对照系数:</p>
+
+<p>\[\boxed{\ p_i = \frac{\partial F_1}{\partial q^i}, \qquad P_i = -\frac{\partial F_1}{\partial Q^i}, \qquad K = H + \frac{\partial F_1}{\partial t}.\ }\]</p>
+
+<p>这就是<em>第一类生成函数</em>。它给一种<em>构造</em> 正则变换的办法——选任何 \(F_1(q, Q, t)\), 上面三条公式定义一个正则变换。</p>
+
+<p>但 \(F_1(q, Q)\) 假设 \(q\) 和 \(Q\) 都是独立变量——有时候一个变换里 \(q\) 与 \(Q\) <em>不</em> 独立（例如恒等变换 \(Q = q, P = p\), \(q\) 与 \(Q\) 完全相同）。这种情况下用<em>其它</em> 三类生成函数:</p>
+
+<p><em>第二类</em>: \(F_2(q, P, t)\)（用 \(q, P\) 当独立变量）。Legendre 变换 \(F_2 = F_1 + \sum P_i Q^i\), 给</p>
+
+<p>\[
+p_i = \frac{\partial F_2}{\partial q^i}, \qquad Q^i = \frac{\partial F_2}{\partial P_i}, \qquad K = H + \frac{\partial F_2}{\partial t}.
+\]</p>
+
+<p><em>第三类</em>: \(F_3(p, Q, t)\)。\(F_3 = F_1 - \sum p_i q^i\), 给</p>
+
+<p>\[
+q^i = -\frac{\partial F_3}{\partial p_i}, \qquad P_i = -\frac{\partial F_3}{\partial Q^i}, \qquad K = H + \frac{\partial F_3}{\partial t}.
+\]</p>
+
+<p><em>第四类</em>: \(F_4(p, P, t)\)。\(F_4 = F_1 - \sum p_i q^i + \sum P_i Q^i\), 给</p>
+
+<p>\[
+q^i = -\frac{\partial F_4}{\partial p_i}, \qquad Q^i = \frac{\partial F_4}{\partial P_i}, \qquad K = H + \frac{\partial F_4}{\partial t}.
+\]</p>
+
+<p>四类对应"<em>独立变量选择</em>" 的四种组合。每个具体变换问题选哪类视情况而定——选让计算最简单的那类。</p>
+
+<p>例: 恒等变换 \(Q = q, P = p\)。\(F_1\) 不行（\(q, Q\) 不独立）。\(F_2(q, P) = \sum_i q^i P_i\) 给 \(\partial F_2/\partial q^i = P_i = p_i\)（正确, 因 \(P = p\)）, \(\partial F_2/\partial P_i = q^i = Q^i\)（正确）。所以 \(F_2 = q \cdot P\) 是恒等变换的生成函数。这把 \(F_2\) 标榜为"<em>最常用</em>" 的一类——它包含恒等变换附近的所有正则变换。</p>
+
+<h2 id="sec13-4">13.4 例 1: 谐振子的"超级坐标"</h2>
+
+<p>考虑一维谐振子 \(H = p^2/(2m) + (1/2) m \omega^2 q^2\)。请你停下来想——能不能找一个正则变换 \((q, p) \to (Q, P)\), 让新 \(K(Q, P)\) 看起来<em>极简</em>, 比如 \(K = \omega P\)？</p>
+
+<p>这个目标的吸引力——若 \(K = \omega P\), Hamilton 方程给</p>
+
+<p>\[
+\dot Q = \frac{\partial K}{\partial P} = \omega, \qquad \dot P = -\frac{\partial K}{\partial Q} = 0.
+\]</p>
+
+<p>解出来 \(Q(t) = \omega t + Q_0, P(t) = P_0\)——<em>最</em> 简单的解, 一条直线 + 一个常数。原振子的复杂运动在这个新坐标下<em>退化</em> 成"<em>匀速直线</em>"。</p>
+
+<p><strong>怎么找这个变换</strong>。直觉——谐振子相轨迹是椭圆 \(p^2/(2m) + (1/2) m \omega^2 q^2 = E\)。把它<em>参数化</em>:</p>
+
+<p>\[
+q = \sqrt{\frac{2 E}{m \omega^2}} \sin Q, \qquad p = \sqrt{2 m E} \cos Q.
+\]</p>
+
+<p>(\(Q\) 是椭圆上的"<em>角度</em>"). 想让 \(K = \omega P\) 等于 \(E\), 即 \(P = E/\omega\)。所以猜:</p>
+
+<p>\[
+q = \sqrt{\frac{2 P}{m \omega}} \sin Q, \qquad p = \sqrt{2 m \omega P} \cos Q.
+\]</p>
+
+<p>验证这是正则变换——计算 \(\{Q, P\}_{q, p}\) 应该等于 1。逆变换:</p>
+
+<p>\[
+P = \frac{1}{2 \omega} (p^2/m + m \omega^2 q^2) = \frac{H}{\omega}, \qquad Q = \arctan\Big(\frac{m \omega q}{p}\Big).
+\]</p>
+
+<p>计算 \(\{Q, P\}_{q, p}\):</p>
+
+<p>\[
+\{Q, P\} = \frac{\partial Q}{\partial q} \frac{\partial P}{\partial p} - \frac{\partial Q}{\partial p} \frac{\partial P}{\partial q}.
+\]</p>
+
+<p>\(\partial P/\partial p = p/(m \omega), \partial P/\partial q = m \omega q/\omega \cdot \omega = m \omega q\), 嗯让我重做——\(P = H/\omega = p^2/(2 m \omega) + (1/2) m \omega q^2\), 所以 \(\partial P/\partial p = p/(m \omega), \partial P/\partial q = m \omega q\).</p>
+
+<p>\(Q = \arctan(m \omega q/p)\), \(\partial Q/\partial q = (m \omega/p) \cdot 1/(1 + (m \omega q/p)^2) = m \omega p/(p^2 + m^2 \omega^2 q^2) = m \omega p/(2 m \omega P) = p/(2 P)\)。</p>
+
+<p>类似 \(\partial Q/\partial p = -m \omega q/p^2 \cdot 1/(1 + (m\omega q/p)^2) = -m \omega q/(p^2 + m^2 \omega^2 q^2) = -m \omega q/(2 m \omega P) = -q/(2 P)\)。</p>
+
+<p>合:</p>
+
+<p>\[
+\{Q, P\} = \frac{p}{2 P} \cdot \frac{p}{m \omega} - \Big(-\frac{q}{2 P}\Big) \cdot m \omega q = \frac{p^2}{2 m \omega P} + \frac{m \omega q^2}{2 P} = \frac{1}{P} \cdot \frac{p^2/(2 m \omega) + (1/2) m \omega q^2}{1} = \frac{P}{P} = 1.
+\]</p>
+
+<p>(用 \(P = p^2/(2 m \omega) + (1/2) m \omega q^2\))</p>
+
+<p>验证: \(\{Q, P\}_{q, p} = 1\). 所以这是正则变换。新 Hamiltonian \(K = H = \omega P\)。Hamilton 方程: \(\dot Q = \omega, \dot P = 0\). 解 \(Q(t) = \omega t + Q_0, P(t) = E/\omega\)。回到原坐标:</p>
+
+<p>\[
+q(t) = \sqrt{\frac{2 E}{m \omega^2}} \sin(\omega t + Q_0), \qquad p(t) = \sqrt{2 m E} \cos(\omega t + Q_0).
+\]</p>
+
+<p>这就是谐振子的标准解——但<em>不</em> 通过解 ODE 得到, 而是通过<em>选好坐标</em>。在新坐标里运动是平凡的, 难度全部转移到"<em>找变换</em>" 这一步。</p>
+
+<p>这种 \((Q, P)\) 叫<em>作用-角变量</em> (action-angle variables): \(Q\) 是<em>相角</em>（每周期增 \(2\pi\)）, \(P\) 是<em>作用量</em>（积分 \(\oint p \, dq/(2\pi)\)）。\(P = E/\omega\) 在量子力学里直接对应能量量子化 \(E_n = \hbar \omega (n + 1/2)\)（旧量子论 Bohr-Sommerfeld 量子化 \(\oint p \, dq = n h\)）, 所以这里 \(P\) 量子化 \(P = n \hbar\) 给 \(E = n \hbar \omega\)（差 \((1/2) \hbar \omega\) 是零点能, 旧量子论看不到）。这种"<em>作用-角变量</em>" 在 ch15 系统讨论。</p>
+
+<h2 id="sec13-5">13.5 例 2: 简单变换 \(q \to p, p \to -q\)</h2>
+
+<p>请你考虑一个非常具体、非常奇怪的变换:</p>
+
+<p>\[
+Q = p, \qquad P = -q.
+\]</p>
+
+<p>"<em>把动量当新坐标, 把负坐标当新动量</em>"。这是不是正则变换？</p>
+
+<p>验证: \(\{Q, P\}_{q, p} = \{p, -q\} = -\{p, q\} = -(-1) = 1\)。是。</p>
+
+<p>新 Hamiltonian: 把原 \(H(q, p)\) 中 \(q \to -P, p \to Q\) 替换:</p>
+
+<p>\[
+K(Q, P) = H(-P, Q).
+\]</p>
+
+<p>例如自由粒子 \(H = p^2/(2m)\) 变成 \(K = Q^2/(2 m)\)。Hamilton 方程: \(\dot Q = \partial K/\partial P = 0, \dot P = -\partial K/\partial Q = -Q/m\). 解出 \(Q = \) 常数, \(P = -Q t/m + P_0\). 在原变量: \(p = \) 常数（动量守恒）, \(-q = -p t/m + P_0\), 即 \(q = (p/m) t - P_0\)（自由粒子做匀速直线）。和原解一致。</p>
+
+<p>请你停下来欣赏这一变换的几何意义。\((q, p) \to (p, -q)\) 是相空间上的<em>旋转</em> \(\pi/2\)（顺时针）。在 \((q, p)\) 平面把 \(q\) 轴转到 \(p\) 轴位置, \(p\) 轴转到 \(-q\) 轴位置。这种"<em>互换</em> \(q\) 与 \(p\)" 的变换在 Lagrange 框架是<em>不可思议</em> 的——\(q\) 是位置, \(p\) 是动量, 物理意义不同。但 Hamilton 框架下 \(q\) 与 \(p\) 在方程中<em>地位平等</em>, 这种互换是正则变换的<em>合法</em> 操作。</p>
+
+<p>这就是 Hamilton 框架的几何<em>解放</em>——相空间的对称性比位形空间大, 包含了"<em>位置和动量互换</em>" 这种 Lagrange 想都不敢想的变换。这种对称在量子力学里以"<em>Fourier 变换互换</em> \(\hat q\) 与 \(\hat p\) 表象" 复活——位置表象和动量表象是<em>同一</em> 量子态的两种描述, 通过 Fourier 变换互换。Hamilton 力学的<em>正则变换</em> 群是这一切的经典基础。</p>
+
+<h2 id="sec13-6">13.6 无穷小正则变换 + 生成元</h2>
+
+<p>请你考虑一个<em>非常接近恒等</em> 的正则变换</p>
+
+<p>\[
+Q^i = q^i + \epsilon \, \xi^i(q, p), \qquad P_i = p_i + \epsilon \, \eta_i(q, p),
+\]</p>
+
+<p>其中 \(\epsilon\) 是无穷小参数, \(\xi^i, \eta_i\) 是某个向量场。问: 什么条件下这是正则变换？</p>
+
+<p>计算 \(\{Q^i, P_j\}_{q, p}\) 到 \(\epsilon\) 的一阶:</p>
+
+<p>\[
+\{Q^i, P_j\} = \{q^i + \epsilon \xi^i, p_j + \epsilon \eta_j\} = \delta^i_j + \epsilon(\{q^i, \eta_j\} + \{\xi^i, p_j\}) + O(\epsilon^2).
+\]</p>
+
+<p>正则条件 \(\{Q^i, P_j\} = \delta^i_j\), 所以 \(\epsilon\) 一阶项</p>
+
+<p>\[
+\{q^i, \eta_j\} + \{\xi^i, p_j\} = \frac{\partial \eta_j}{\partial p_i} - \frac{\partial \xi^i}{\partial q^j} = 0.
+\]</p>
+
+<p>类似 \(\{Q^i, Q^j\} = 0\) 给 \(\partial \xi^j/\partial p_i - \partial \xi^i/\partial p_j = 0\), 即 \(\xi\) 在 \(p\) 上的<em>对称</em>。\(\{P_i, P_j\} = 0\) 给 \(\partial \eta_j/\partial q^i - \partial \eta_i/\partial q^j = 0\), \(\eta\) 在 \(q\) 上对称。这些条件等价于存在一个函数 \(G(q, p)\), 使</p>
+
+<p>\[
+\xi^i = \frac{\partial G}{\partial p_i}, \qquad \eta_i = -\frac{\partial G}{\partial q^i}.
+\]</p>
+
+<p>(标准向量场积分性条件——\(\xi, \eta\) 是某个标量函数 \(G\) 通过 Hamilton 向量场公式生成)</p>
+
+<p>所以无穷小正则变换</p>
+
+<p>\[\boxed{\ Q^i = q^i + \epsilon \frac{\partial G}{\partial p_i}, \qquad P_i = p_i - \epsilon \frac{\partial G}{\partial q^i}.\ }\]</p>
+
+<p>函数 \(G\) 叫<em>生成元</em>（infinitesimal generator）。任何标量函数 \(G(q, p)\) 都生成一个无穷小正则变换。</p>
+
+<p>用 Poisson 括号写得更紧凑:</p>
+
+<p>\[
+\delta f := f(Q, P) - f(q, p) = \epsilon \{f, G\} + O(\epsilon^2),
+\]</p>
+
+<p>对任何函数 \(f\)。换言之——无穷小正则变换 = "<em>用 \(G\) 通过 Poisson 括号作用</em>"。这就是 Hamilton 框架的<em>对称性</em> 的代数表达。</p>
+
+<h2 id="sec13-7">13.7 时间演化是正则变换</h2>
+
+<p>请你看一个特殊选择的生成元: 取 \(G = H\), \(\epsilon = dt\). 无穷小变换</p>
+
+<p>\[
+\delta q^i = dt \cdot \frac{\partial H}{\partial p_i} = \dot q^i \, dt, \qquad \delta p_i = -dt \cdot \frac{\partial H}{\partial q^i} = \dot p_i \, dt.
+\]</p>
+
+<p>这就是 Hamilton 流动一步的位移——<em>时间演化本身</em> 是无穷小正则变换, 生成元就是 \(H\) 自己。</p>
+
+<p>或者积分起来——从时刻 \(t_0\) 到时刻 \(t_0 + t\) 的时间演化映射 \(\Phi_t: (q_0, p_0) \mapsto (q(t), p(t))\) <em>是正则变换</em>。</p>
+
+<p>请你停下来感受这件事的份量——<em>动力学不是某种"运动", 它是相空间上一族正则变换</em>。Hamilton 流是相空间的"<em>对称变形</em>", 时刻 \(t\) 不同则正则变换不同, 形成一族单参数子群（\(\Phi_{s + t} = \Phi_s \circ \Phi_t\)）。</p>
+
+<p>这条洞察的<em>三重后果</em>:</p>
+
+<ul>
+  <li>Liouville 定理是"<em>正则变换保相空间体积</em>" 的必然——上一章 11.6 可以由此立刻看出。</li>
+  <li>Hamilton 是时间演化的<em>生成元</em>——这条事实在量子力学翻译为"\(\hat H\) 是幺正演化的生成元", \(U(t) = e^{-i \hat H t/\hbar}\)。经典 Hamilton 流 ↔ 量子幺正演化, 都由 \(H\) 生成。</li>
+  <li>动力学和"<em>对称变换</em>" 在 Hamilton 框架下<em>语法上不可区分</em>——一切都是"<em>某个函数 \(G\) 通过 Poisson 括号生成的变换</em>"; 时间演化 (\(G = H\))、空间平移 (\(G = p\))、旋转 (\(G = L\)) 都是这族变换的例子。"<em>动力学</em>" 退化成一种特殊的对称变换。</li>
+</ul>
+
+<h2 id="sec13-8">13.8 守恒量是正则变换的生成元（相空间 Noether）</h2>
+
+<p>Noether 定理（ch7）说"<em>对称 ↔ 守恒律</em>"。在 Lagrange 框架它说"<em>位形空间对称（\(L\) 不变变换）↔ 共轭动量守恒</em>"。在 Hamilton 框架可以更清晰地表述。</p>
+
+<p><strong>命题</strong>: 设 \(G(q, p)\) 不显含时间。则 \(G\) 是 Hamilton 流的<em>守恒量</em> (\(\dot G = 0\)) 当且仅当 \(G\) 生成的正则变换<em>保 Hamiltonian \(H\)</em>。</p>
+
+<p><strong>证明</strong>。\(G\) 生成的无穷小变换让任何函数 \(f\) 变为 \(f + \epsilon \{f, G\}\)。\(H\) 在变换下的变化:</p>
+
+<p>\[
+\delta H = \epsilon \{H, G\} = -\epsilon \{G, H\}.
+\]</p>
+
+<p>"<em>变换保 \(H\)</em>" 即 \(\delta H = 0\), 即 \(\{G, H\} = 0\)。但 \(\{G, H\} = 0\) 也是 "<em>\(G\) 守恒</em>" 的条件（ch12 主方程给 \(\dot G = \{G, H\}\)）。两条等价。Q.E.D.</p>
+
+<p>这就是 Noether 定理在 Hamilton 框架的<em>极简</em> 版本——一行 Poisson 括号验证。具体例子:</p>
+
+<ul>
+  <li><em>\(G = p_x\) 生成沿 \(x\) 平移</em>: \(\delta q^x = \{q^x, p_x\} = 1, \delta q^y = 0, \delta q^z = 0, \delta p = 0\)。即 \(q^x \to q^x + \epsilon\), 是 \(x\) 方向的平移。\(G\) 守恒 ⟺ \(\{p_x, H\} = -\partial H/\partial x = 0\) ⟺ \(H\) 在 \(x\) 平移下不变。<em>动量守恒 ↔ 平移对称</em>。</li>
+  <li><em>\(G = L_z\) 生成绕 \(z\) 轴旋转</em>: \(\delta q^x = \{q^x, L_z\} = -q^y\) 等, 给绕 \(z\) 轴的无穷小旋转。\(L_z\) 守恒 ⟺ \(\{L_z, H\} = 0\) ⟺ \(H\) 在绕 \(z\) 转下不变。<em>角动量守恒 ↔ 旋转对称</em>。</li>
+  <li><em>\(G = H\) 生成时间演化</em>。\(H\) 守恒 ⟺ \(\{H, H\} = 0\)（恒成立）⟺ \(H\) 在时间演化下不变。即<em>\(H\) 不显含时间</em>（注意自动满足）⟺ <em>能量守恒 ↔ 时间平移对称</em>。</li>
+</ul>
+
+<p>Hamilton 框架下 Noether 定理变成<em>一句话</em>: <em>守恒量 \(G\) 与它生成的正则变换的对称性是同一件事</em>。这是对称性物理的<em>统一</em> 视角——粒子物理里的"<em>规范对称 ↔ 守恒荷</em>" 是这一原则在场论里的扩展。</p>
+
+<h2 id="sec13-9">13.9 临别话</h2>
+
+<p>这一章的中心命题——<em>正则变换是相空间的"等距"</em>。它们形成无穷维群, 由生成函数 \(F\) 或生成元 \(G\) 参数化, 保持辛形式 / Poisson 括号 / Hamilton 方程形式。它们让"<em>找好坐标</em>" 这件事在 Hamilton 框架下有一个<em>系统</em> 的工具。</p>
+
+<p>本章的三个深刻结论:</p>
+
+<ul>
+  <li><em>谐振子可以通过正则变换"<em>退化</em>" 成 \(K = \omega P\)</em>。这是<em>作用-角变量</em> 的雏形——任何"<em>可积系统</em>" 都能通过正则变换化简成 \(K = K(P)\)（不依赖 \(Q\)）的形式, 解出来全是直线运动。ch15 系统化。</li>
+  <li><em>时间演化本身是正则变换, 生成元是 \(H\)</em>。这把"<em>动力学</em>" 解构成"<em>对称变换</em>"。Hamilton 流不是某种"<em>运动</em>", 是相空间的<em>结构变形</em>。这条洞察直接通往 ch14 Hamilton-Jacobi 方程: 找一个特殊正则变换, 让 \(K \equiv 0\) (新 Hamiltonian 全消)。</li>
+  <li><em>守恒量是正则变换的生成元</em>。Noether 定理在 Hamilton 框架退化成 \(\{G, H\} = 0\)。这是粒子物理"<em>对称 ↔ 守恒</em>" 范式的<em>原型</em>。</li>
+</ul>
+
+<p>下一章 Hamilton-Jacobi 方程把这套技术推到极限——找一个使 \(K \equiv 0\) 的正则变换, 当代入 Hamilton 方程时新坐标完全静止 (\(\dot Q = 0, \dot P = 0\)), 即 \(Q, P\) 都是常数。这听起来不可能——但只要解一个 PDE \(\partial S/\partial t + H(q, \partial S/\partial q, t) = 0\), 就能找到这种变换。这条 PDE 是经典力学的<em>压轴成就</em>, 也是量子力学波函数 \(\psi = e^{i S/\hbar}\) 的种子（短波极限下）。从 Bernoulli 1696 一直走到 Hamilton-Jacobi PDE, 经典力学的<em>从粒子轨道到波动方程</em> 这一弧线在 ch14 闭合。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch12.html">← 上一章 · 第 12 章 Poisson 括号 + 守恒律</a><a href="ch14.html">下一章 · 第 14 章 Hamilton-Jacobi 方程 →</a></nav>
+</main>
+</body>
+</html>

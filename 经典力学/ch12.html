@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 12 章 Poisson 括号 + 守恒律 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 Hamilton 方程 + 相空间</a><a href="ch13.html">下一章 · 第 13 章 正则变换 →</a></nav>
+<h1 id="ch12">第 12 章 Poisson 括号 + 守恒律</h1>
+
+<p>上一章我们建立了 Hamilton 框架的<em>几何</em>: 相空间 \((q, p)\)、辛形式 \(\omega\)、Liouville 体积守恒。这一章我们引入它的<em>代数</em>。</p>
+
+<p>具体的引子——请你停下来盯着上一章末尾 Liouville 方程那个表达式:</p>
+
+<p>\[
+\frac{\partial \rho}{\partial t} + \sum_i \Big(\frac{\partial H}{\partial p_i} \frac{\partial \rho}{\partial q^i} - \frac{\partial H}{\partial q^i} \frac{\partial \rho}{\partial p_i}\Big) = 0.
+\]</p>
+
+<p>那个奇怪的"<em>对 \(p\) 微分乘对 \(q\) 微分减对 \(q\) 微分乘对 \(p\) 微分</em>" 的双线性结构出现在哪里？答案——它出现在<em>每一个</em> 与 Hamilton 流有关的计算里。任何函数 \(f(q, p)\) 沿 Hamilton 流的演化, 任何守恒条件, 任何正则变换的不变量, 全都用这个结构。</p>
+
+<p>这就是写一个<em>代数</em> 对象的契机——给它一个名字, 研究它的代数性质, 让"<em>沿 Hamilton 流的演化</em>" 变成一行代数。这就是<em>Poisson 括号</em>。</p>
+
+<h2 id="sec12-1">12.1 Poisson 括号: 定义与性质</h2>
+
+<p><strong>朴素</strong>。给两个相空间上的光滑函数 \(f(q, p), g(q, p)\)。模仿 Liouville 方程那个表达式, 定义</p>
+
+<p>\[\boxed{\ \{f, g\} := \sum_{i=1}^n \Big(\frac{\partial f}{\partial q^i} \frac{\partial g}{\partial p_i} - \frac{\partial f}{\partial p_i} \frac{\partial g}{\partial q^i}\Big).\ }\]</p>
+
+<p>这就是 Poisson 括号。它把"<em>两个函数</em>" 映射到"<em>另一个函数</em>"——双线性运算 \(\{,\}: C^\infty(\mathbb R^{2n}) \times C^\infty(\mathbb R^{2n}) \to C^\infty(\mathbb R^{2n})\)。</p>
+
+<p>定义看起来像凭空降下来的——为什么是这个特定的组合？两个原因。第一——它就是 Liouville 方程里出现的那个组合; 第二——它是辛形式 \(\omega = \sum dp_i \wedge dq^i\) 在两个函数的微分上的<em>自然</em> 配对（见 12.7）。我们先验证它的代数性质, 再揭示它的几何意义。</p>
+
+<p><strong>性质 1: 双线性</strong>。\(\{a f + b g, h\} = a \{f, h\} + b \{g, h\}\), 同理对第二个槽双线性。直接从定义代入验证（每个偏导都是线性算子）。</p>
+
+<p><strong>性质 2: 反对称</strong>。\(\{f, g\} = -\{g, f\}\)。从定义</p>
+
+<p>\[
+\{f, g\} = \sum_i \big(\partial_{q^i} f \cdot \partial_{p_i} g - \partial_{p_i} f \cdot \partial_{q^i} g\big),
+\]</p>
+
+<p>交换 \(f \leftrightarrow g\) 得</p>
+
+<p>\[
+\{g, f\} = \sum_i \big(\partial_{q^i} g \cdot \partial_{p_i} f - \partial_{p_i} g \cdot \partial_{q^i} f\big) = -\{f, g\}.
+\]</p>
+
+<p>反对称的<em>立即</em> 推论: \(\{f, f\} = 0\)。</p>
+
+<p><strong>性质 3: Leibniz 法则</strong>。\(\{f g, h\} = f \{g, h\} + g \{f, h\}\)。直接验证（链式法则）。这条性质说 \(\{,\}\) 在第一个槽上像"<em>导数</em>" 一样表现。</p>
+
+<p><strong>性质 4: Jacobi 恒等式</strong>。这是最深的一条:</p>
+
+<p>\[\boxed{\ \{f, \{g, h\}\} + \{g, \{h, f\}\} + \{h, \{f, g\}\} = 0.\ }\]</p>
+
+<p>三个嵌套括号循环置换 \(f \to g \to h \to f\) 求和等于零。</p>
+
+<p>验证 Jacobi 恒等式是一段标准的代数练习——展开三组嵌套括号, 每个嵌套是<em>四阶</em> 偏导（外层对内层求两次微分）。最终所有四阶偏导项<em>两两抵消</em>。这是因为四阶混合偏导 \(\partial^4/(\partial q^a \partial p_b \partial q^c \partial p_d)\) 等都是对称的（Clairaut）, 而 Poisson 括号的反对称结构让奇置换贡献为零, 偶置换三个的和正好抵消。</p>
+
+<p>简短论证（不展开所有指标）: 注意 \(\{f, \cdot\}\) 是一个一阶微分算子（对每个 \(\cdot\) 取一次偏导）, 所以 \(\{f, \{g, h\}\}\) 包含 \(g, h\) 各最多一次偏导加一次组合, 总共二阶偏导 in \((g, h)\), 一阶 in \(f\)。把三项 cyclic 加起来, 含两次微分作用同一函数的项（如 \(\partial^2 g/\partial q \partial p\) 出现于 \(\{f, \{g, h\}\}\) 又出现于其它项）<em>抵消</em>, 最终结果恒为零。完整代数推导见 Goldstein 第 9 章。</p>
+
+<p>这四条——双线性 + 反对称 + Leibniz + Jacobi——把 \(C^\infty(\mathbb R^{2n})\) 变成一个<em>Poisson 代数</em>。或者说, 函数空间在 Poisson 括号下是一个<em>Lie 代数</em>（双线性 + 反对称 + Jacobi）, 同时配上 Leibniz 法则让它和函数乘法相容。这种"<em>Lie 代数 + 兼容乘法</em>" 的双重结构让 Poisson 括号是经典力学的<em>真正代数</em>。</p>
+
+<h2 id="sec12-2">12.2 Hamilton 方程的代数化</h2>
+
+<p>请你看这一行:</p>
+
+<p>\[
+\dot q^i = \frac{\partial H}{\partial p_i}, \qquad \dot p_i = -\frac{\partial H}{\partial q^i}.
+\]</p>
+
+<p>用 Poisson 括号包装。算 \(\{q^i, H\}\):</p>
+
+<p>\[
+\{q^i, H\} = \sum_j \Big(\frac{\partial q^i}{\partial q^j} \frac{\partial H}{\partial p_j} - \frac{\partial q^i}{\partial p_j} \frac{\partial H}{\partial q^j}\Big) = \sum_j \delta^i_j \frac{\partial H}{\partial p_j} - 0 = \frac{\partial H}{\partial p_i}.
+\]</p>
+
+<p>(用 \(\partial q^i/\partial q^j = \delta^i_j\), \(\partial q^i/\partial p_j = 0\)). 同理</p>
+
+<p>\[
+\{p_i, H\} = -\frac{\partial H}{\partial q^i}.
+\]</p>
+
+<p>所以 Hamilton 方程<em>等价</em> 于</p>
+
+<p>\[\boxed{\ \dot q^i = \{q^i, H\}, \qquad \dot p_i = \{p_i, H\}.\ }\]</p>
+
+<p>更一般——任何<em>函数</em> \(f(q, p, t)\) 沿 Hamilton 流的演化:</p>
+
+<p>\[
+\frac{df}{dt} = \sum_i \Big(\frac{\partial f}{\partial q^i} \dot q^i + \frac{\partial f}{\partial p_i} \dot p_i\Big) + \frac{\partial f}{\partial t} = \sum_i \Big(\frac{\partial f}{\partial q^i} \frac{\partial H}{\partial p_i} - \frac{\partial f}{\partial p_i} \frac{\partial H}{\partial q^i}\Big) + \frac{\partial f}{\partial t},
+\]</p>
+
+<p>即</p>
+
+<p>\[\boxed{\ \frac{df}{dt} = \{f, H\} + \frac{\partial f}{\partial t}.\ }\]</p>
+
+<p>这一公式是 Hamilton 力学的<em>主方程</em>。它包含了:</p>
+
+<ul>
+  <li><em>Hamilton 方程</em>（取 \(f = q^i\) 或 \(p_i\), 这两个不显含 \(t\), \(\partial f/\partial t = 0\)）。</li>
+  <li><em>能量守恒</em>（取 \(f = H\), 不显含 \(t\): \(\dot H = \{H, H\} + 0 = 0\)）, 因 \(\{H, H\} = 0\)（反对称）。</li>
+  <li><em>守恒律刻画</em>（下节）。</li>
+</ul>
+
+<h2 id="sec12-3">12.3 基本对易关系 \(\{q^i, p_j\} = \delta^i_j\)</h2>
+
+<p>把 Poisson 括号施于<em>坐标</em> 自身:</p>
+
+<p>\[
+\{q^i, q^j\} = \sum_k \big(\partial_{q^k} q^i \cdot \partial_{p_k} q^j - \partial_{p_k} q^i \cdot \partial_{q^k} q^j\big) = \sum_k \big(\delta^i_k \cdot 0 - 0 \cdot \delta^j_k\big) = 0,
+\]</p>
+
+<p>同理 \(\{p_i, p_j\} = 0\)。但</p>
+
+<p>\[
+\{q^i, p_j\} = \sum_k \big(\delta^i_k \cdot \delta^k_j - 0 \cdot 0\big) = \delta^i_j.
+\]</p>
+
+<p>整理:</p>
+
+<p>\[\boxed{\ \{q^i, q^j\} = 0, \qquad \{p_i, p_j\} = 0, \qquad \{q^i, p_j\} = \delta^i_j.\ }\]</p>
+
+<p>这是<em>基本 Poisson 关系</em>（fundamental Poisson brackets）。它们刻画了相空间坐标 \((q, p)\) 之间最基础的代数结构。</p>
+
+<p>请你停下来对照量子力学(链<a href="../量子力学/index.html">V14 量子力学</a>):</p>
+
+<p>\[
+[\hat q^i, \hat q^j] = 0, \qquad [\hat p_i, \hat p_j] = 0, \qquad [\hat q^i, \hat p_j] = i \hbar \delta^i_j.
+\]</p>
+
+<p>对应关系明显—— Poisson 括号 \(\{,\}\) ↔ 量子对易子 \([,]/(i \hbar)\)。这条对应不是巧合, 而是<em>正则量子化</em> 的本质（Dirac 1925）。我们在 12.8 详谈。</p>
+
+<h2 id="sec12-4">12.4 守恒律 ⟺ 与 \(H\) 的 Poisson 括号为零</h2>
+
+<p>用主方程 \(\dot f = \{f, H\} + \partial f/\partial t\)。如果 \(f\) 不显含 \(t\):</p>
+
+<p>\[
+\dot f = 0 \iff \{f, H\} = 0.
+\]</p>
+
+<p>所以——<em>函数 \(f\) 沿 Hamilton 流守恒, 当且仅当 \(\{f, H\} = 0\)</em>。</p>
+
+<p>这把"<em>守恒</em>" 这个动力学概念变成了一个<em>纯代数</em> 条件。Newton 框架下检验"<em>这量是否守恒</em>" 需要解 ODE; Lagrange 框架下需要 Noether 定理 + 找对称; Hamilton 框架下你只需要算一个 Poisson 括号。</p>
+
+<p>例 1: \(\{H, H\} = 0\) 由反对称, 所以 \(H\) 永远是它自己的守恒量（前提不显含时间）, 即<em>能量守恒</em>。</p>
+
+<p>例 2: 一维中心力, \(H = p_r^2/(2m) + p_\phi^2/(2 m r^2) + V(r)\) (用极坐标), \(\phi\) 不出现, 所以 \(\{p_\phi, H\} = -\partial H/\partial \phi = 0\)——<em>角动量</em> \(p_\phi\) 守恒。</p>
+
+<p>例 3: 自由粒子 \(H = p^2/(2 m)\), \(\{p, H\} = -\partial H/\partial q = 0\)——<em>动量</em> 守恒。</p>
+
+<p>这些例子在 Lagrangian / Newton 框架下也容易, 但 Hamilton + Poisson 框架的优势在<em>系统化</em>: <em>守恒律检测</em> 变成一个机械计算。</p>
+
+<h2 id="sec12-5">12.5 Poisson 定理: 守恒量的 Poisson 括号仍然是守恒量</h2>
+
+<p>请你想象——已经知道两个守恒量 \(f, g\)（\(\{f, H\} = 0, \{g, H\} = 0\)）, 它们的 Poisson 括号 \(\{f, g\}\) 是个新函数。这个新函数是不是也守恒？</p>
+
+<p>用 Jacobi 恒等式:</p>
+
+<p>\[
+\{f, \{g, H\}\} + \{g, \{H, f\}\} + \{H, \{f, g\}\} = 0.
+\]</p>
+
+<p>用 \(\{g, H\} = 0\) (前提) 和 \(\{H, f\} = -\{f, H\} = 0\), 前两项都是 0, 剩下 \(\{H, \{f, g\}\} = 0\), 即 \(\{\{f, g\}, H\} = 0\)。即:</p>
+
+<p>\[\boxed{\ f, g \text{ 守恒} \implies \{f, g\} \text{ 守恒}.\ }\]</p>
+
+<p>这叫<em>Poisson 定理</em>（Poisson 1809）。它告诉你——<em>守恒量构成 Lie 代数</em>: Poisson 括号在守恒量的集合里封闭。</p>
+
+<p>这条定理的实用价值——已知两条守恒律, 算它们的括号有时候给<em>新的</em> 守恒律, 而且新守恒律对应的对称可能<em>不</em> 是显然的。例如三维中心力问题中, 角动量分量 \(L_x, L_y, L_z\) 都守恒, 它们的 Poisson 括号给 \(\{L_x, L_y\} = L_z\) 等（见下节）, 这<em>不</em> 给新独立守恒量, 但说明 \(\{L_i\}\) 在 Poisson 括号下闭合, 形成 \(\mathfrak{so}(3)\) Lie 代数。这是经典力学和 Lie 理论之间的<em>第一个深桥</em>。</p>
+
+<p>实战中很多时候 \(\{f, g\}\) 退化为 0 或<em>已知</em> 守恒量的函数（不给新东西）, 但这本身也是信息——它告诉你你已经掌握的守恒量"<em>已经够多</em>" 了, 系统是<em>可积的</em>（链 ch15）。</p>
+
+<h2 id="sec12-6">12.6 角动量的 Poisson 括号</h2>
+
+<p>三维粒子, 角动量分量 \(L_i = \epsilon_{ijk} q^j p_k\)（用 Einstein 求和约定 + Levi-Civita 符号 \(\epsilon_{ijk}\)）。</p>
+
+<p>计算 \(\{L_i, L_j\}\):</p>
+
+<p>\[
+\{L_i, L_j\} = \{\epsilon_{iab} q^a p_b, \epsilon_{jcd} q^c p_d\}.
+\]</p>
+
+<p>用双线性 + Leibniz + 基本关系:</p>
+
+<p>\[
+\{q^a p_b, q^c p_d\} = q^a \{p_b, q^c p_d\} + \{q^a, q^c p_d\} p_b
+\]</p>
+
+<p>展开:</p>
+
+<p>\[
+\{p_b, q^c p_d\} = \{p_b, q^c\} p_d + q^c \{p_b, p_d\} = -\delta^c_b p_d,
+\]</p>
+
+<p>\[
+\{q^a, q^c p_d\} = \{q^a, q^c\} p_d + q^c \{q^a, p_d\} = q^c \delta^a_d.
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\{q^a p_b, q^c p_d\} = -q^a \delta^c_b p_d + q^c \delta^a_d p_b.
+\]</p>
+
+<p>带回去:</p>
+
+<p>\[
+\{L_i, L_j\} = \epsilon_{iab} \epsilon_{jcd} \big(-q^a \delta^c_b p_d + q^c \delta^a_d p_b\big).
+\]</p>
+
+<p>第一项: \(-\epsilon_{iab} \epsilon_{jbd} q^a p_d\)（用 \(\delta^c_b\)）。用 \(\epsilon\)-恒等式 \(\epsilon_{iab} \epsilon_{jbd} = \delta_{id} \delta_{aj} - \delta_{ij} \delta_{ad}\)（经典恒等式: 两 \(\epsilon\) 缩并一个指标）, 得 \(-(\delta_{id} \delta_{aj} - \delta_{ij} \delta_{ad}) q^a p_d = -q^j p_i + \delta_{ij} (q \cdot p)\)。</p>
+
+<p>第二项: \(\epsilon_{iab} \epsilon_{jcb} q^c p_b\)。同样 \(\epsilon\) 恒等式给 \(\delta_{ij} \delta_{ac} - \delta_{ic} \delta_{aj}\), 得 \(\delta_{ij} (q \cdot p) - q^i p_j\)。</p>
+
+<p>两项相加:</p>
+
+<p>\[
+\{L_i, L_j\} = -q^j p_i + \delta_{ij}(q \cdot p) + \delta_{ij}(q \cdot p) - q^i p_j = -q^j p_i + 2 \delta_{ij}(q \cdot p) - q^i p_j.
+\]</p>
+
+<p>嗯——这看起来不太对。让我换一个更干净的算法——直接用<em>分量</em> 写。</p>
+
+<p>具体: \(L_x = q^y p_z - q^z p_y, L_y = q^z p_x - q^x p_z, L_z = q^x p_y - q^y p_x\). 算 \(\{L_x, L_y\}\):</p>
+
+<p>\[
+\{L_x, L_y\} = \{q^y p_z - q^z p_y, q^z p_x - q^x p_z\}.
+\]</p>
+
+<p>四项分开:</p>
+
+<p>\[
+\{q^y p_z, q^z p_x\} = q^y \{p_z, q^z\} p_x + q^z \{q^y, p_x\} p_z + (\ldots) = -q^y p_x + 0 = -q^y p_x,
+\]</p>
+
+<p>(用 \(\{p_z, q^z\} = -1, \{q^y, p_x\} = 0, \{q^y, q^z\} = 0, \{p_z, p_x\} = 0\)). </p>
+
+<p>\[
+\{q^y p_z, -q^x p_z\} = -q^y q^x \{p_z, p_z\} - \{q^y, q^x\} p_z p_z + \ldots = 0,
+\]</p>
+
+<p>\[
+\{-q^z p_y, q^z p_x\} = -q^z \{p_y, q^z p_x\} - \{q^z, q^z p_x\} p_y = 0 - 0 = 0,
+\]</p>
+
+<p>\[
+\{-q^z p_y, -q^x p_z\} = q^z \{p_y, q^x p_z\} + \{q^z, q^x p_z\} p_y = q^z \cdot q^x \{p_y, p_z\} + q^z \{p_y, q^x\} p_z + \{q^z, q^x\} p_z p_y + q^x \{q^z, p_z\} p_y = 0 + 0 + 0 + q^x p_y.
+\]</p>
+
+<p>(因为 \(\{q^z, p_z\} = 1, \{p_y, q^x\} = 0\) 等)</p>
+
+<p>合: \(\{L_x, L_y\} = -q^y p_x + 0 + 0 + q^x p_y = q^x p_y - q^y p_x = L_z\). </p>
+
+<p>同理可得 \(\{L_y, L_z\} = L_x, \{L_z, L_x\} = L_y\), 即</p>
+
+<p>\[\boxed{\ \{L_i, L_j\} = \epsilon_{ijk} L_k.\ }\]</p>
+
+<p>这就是经典<em>角动量代数</em>。它和量子角动量代数</p>
+
+<p>\[
+[\hat L_i, \hat L_j] = i \hbar \epsilon_{ijk} \hat L_k
+\]</p>
+
+<p>(链 V14 ch14) 完全对应——把 \(\{,\}\) 换成 \([,]/(i\hbar)\) 就得到。</p>
+
+<p>这个对应不是表面相似——它揭示<em>转动群 \(SO(3)\) 的 Lie 代数 \(\mathfrak{so}(3)\)</em> 同时支配经典和量子的角动量。两边都说"<em>三个分量在自身括号下封闭, 结构常数是 \(\epsilon_{ijk}\)</em>"。Lie 代数是数学对象, 经典和量子是它在不同语境的表现。</p>
+
+<p>这条平行也实战有用——量子角动量本征值 \(L^2 = \hbar^2 \ell(\ell + 1), L_z = \hbar m\) 的推导<em>纯代数</em>（用 \([L_+, L_-] = 2 \hbar L_z\) 等）, 它的经典翻版是 Casimir 不变量 \(L^2 = L_x^2 + L_y^2 + L_z^2\) 在 Poisson 括号下与所有 \(L_i\) 交换 (\(\{L^2, L_i\} = 0\), 直接用 Jacobi + 自身括号验证)。</p>
+
+<h2 id="sec12-7">12.7 Poisson 括号的几何意义</h2>
+
+<p>现在回头解释 Poisson 括号<em>几何上</em> 是什么。</p>
+
+<p>设 \(f, g \in C^\infty(\mathbb R^{2n})\), \(df, dg\) 是它们的微分（1-形式）。辛形式 \(\omega = \sum dp_i \wedge dq^i\) 给一个从 1-形式到向量场的映射（"<em>反度量提升</em>"）: 给 \(df\), 定义 Hamilton 向量场 \(\boldsymbol X_f\) 满足</p>
+
+<p>\[
+\iota_{\boldsymbol X_f} \omega = -df, \quad \text{即} \quad \omega(\boldsymbol X_f, \cdot) = -df.
+\]</p>
+
+<p>这条方程在 \(\omega\) 非退化时唯一确定 \(\boldsymbol X_f\)。具体计算给</p>
+
+<p>\[
+\boldsymbol X_f = \sum_i \big(\partial_{p_i} f \cdot \partial_{q^i} - \partial_{q^i} f \cdot \partial_{p_i}\big).
+\]</p>
+
+<p>请验证: \(\omega(\boldsymbol X_f, \boldsymbol X_g) = \sum_i (\partial_{p_i} f \cdot \partial_{q^i} g - \partial_{q^i} f \cdot \partial_{p_i} g) = \{g, f\} = -\{f, g\}\)。或者:</p>
+
+<p>\[\boxed{\ \{f, g\} = \omega(\boldsymbol X_f, \boldsymbol X_g).\ }\]</p>
+
+<p>(部分文献符号约定不同, 可能差一个负号; 这里取 \(\{f, g\} = \boldsymbol X_g(f) = -\boldsymbol X_f(g)\) 的约定)</p>
+
+<p>这就是 Poisson 括号的<em>几何</em> 意义——它是辛形式 \(\omega\) 作用在两个函数对应的 Hamilton 向量场上的<em>值</em>。所以"<em>Poisson 括号</em>" = "<em>辛形式诱导的双线性</em>"。</p>
+
+<p>这种几何观点使 Poisson 括号<em>独立</em> 于坐标——任何坐标系下计算给同样答案。事实上这是<em>正则变换</em>（ch13）的本质——保持 Poisson 括号的变换 = 保持辛形式的变换 = 保 Hamilton 方程的变换。三种刻画等价。</p>
+
+<p>这段几何也<em>说明</em> 为什么 Poisson 括号有那四条性质——它们是辛结构的代数后果。Lie 代数 \(\mathfrak{X}(M)\) 的向量场括号 \([\boldsymbol X_f, \boldsymbol X_g] = \boldsymbol X_{\{f, g\}}\) 把"<em>函数空间 Poisson 括号</em>" 翻译成 "<em>向量场李括号</em>"——两边的 Jacobi 恒等式互相推导。</p>
+
+<h2 id="sec12-8">12.8 量子化原则: \(\{,\} \to \frac{1}{i \hbar}[,]\)</h2>
+
+<p>Dirac 1925 发现的对应原则——<em>经典 Poisson 括号</em> 在量子化下变成<em>量子对易子除以</em> \(i \hbar\):</p>
+
+<p>\[\boxed{\ \{f, g\}_{\text{经典}} \quad \longleftrightarrow \quad \frac{1}{i \hbar} [\hat f, \hat g]_{\text{量子}}.\ }\]</p>
+
+<p>具体:</p>
+
+<ul>
+  <li>基本关系 \(\{q, p\} = 1\) ↔ \([\hat q, \hat p] = i \hbar\)（Heisenberg 关系）。</li>
+  <li>Hamilton 方程 \(\dot f = \{f, H\}\) ↔ Heisenberg 方程 \(\dot{\hat f} = \frac{1}{i\hbar} [\hat f, \hat H]\)（量子时间演化）。</li>
+  <li>角动量代数 \(\{L_i, L_j\} = \epsilon_{ijk} L_k\) ↔ \([\hat L_i, \hat L_j] = i \hbar \epsilon_{ijk} \hat L_k\)。</li>
+  <li>守恒律 \(\{f, H\} = 0\) ↔ \([\hat f, \hat H] = 0\)（量子守恒律）。</li>
+</ul>
+
+<p>这条对应是 1925-1926 年量子力学诞生的<em>导航星</em>。Heisenberg 在 1925 给出"<em>矩阵力学</em>" 时, Dirac 看到 Heisenberg 的对易子有"<em>非交换乘法</em>" 的代数结构, 立刻想起 Poisson 括号——两者都是<em>反对称双线性 + Jacobi 恒等式</em>。Dirac 在 1925 年 Cambridge 做了<em>正确的猜想</em>: 量子代数是把经典 Poisson 括号用 \([\cdot, \cdot]/(i\hbar)\) 替换得到的。</p>
+
+<p>这条对应不是<em>定理</em>（数学上"<em>量子化</em>" 这个映射并非唯一, 有<em>排序歧义</em>等技术问题, 数学家 Groenewold-van Hove 1946 给出的<em>不可能定理</em> 说严格"<em>整体</em>" 量子化不存在）, 但它在物理上<em>足够好</em>——大多数实际系统的量子化用 Dirac 法则就行, 偶尔有排序问题用对称化或 Weyl 量子化处理。</p>
+
+<p>这条对应揭示了一个深刻事实——<em>量子力学不是经典力学的彻底替代, 而是经典力学的</em>"<em>变形</em>"<em>: 把 Poisson 括号变形成对易子, \(\hbar\) 是变形参数</em>。\(\hbar \to 0\) 极限下两者应该收敛, 这是<em>对应原理</em>（Bohr 1913）。详细见 V14 量子力学 + 即将的 V21 量子场论。</p>
+
+<p>从 ch13 开始我们用这个代数视角研究<em>正则变换</em>——保 Poisson 括号的坐标变换, 量子对应是<em>幺正变换</em>。两边的对应在那一章会展现得更深。</p>
+
+<h2 id="sec12-9">12.9 临别话</h2>
+
+<p>这一章把 Hamilton 力学的<em>动力学</em> 提炼成<em>代数</em>。一个简单运算 \(\{f, g\}\) 包含了:</p>
+
+<ul>
+  <li>Hamilton 方程: \(\dot q^i = \{q^i, H\}, \dot p_i = \{p_i, H\}\)。</li>
+  <li>沿流演化: \(\dot f = \{f, H\} + \partial_t f\)。</li>
+  <li>守恒律刻画: \(\{f, H\} = 0\)。</li>
+  <li>Poisson 定理: 守恒量空间在括号下闭合。</li>
+  <li>角动量 Lie 代数 \(\mathfrak{so}(3)\): \(\{L_i, L_j\} = \epsilon_{ijk} L_k\)。</li>
+  <li>正则变换刻画: 保 \(\{,\}\) ⟺ 保 Hamilton 方程（下章）。</li>
+  <li>量子化: \(\{,\} \to \frac{1}{i \hbar} [,]\)。</li>
+</ul>
+
+<p>这是物理学典型的"<em>代数化收益</em>" 案例——把动力学问题化成代数问题, 大量原本需要"<em>解 ODE</em>" 的事变成"<em>算括号</em>"。</p>
+
+<p>下一章我们用 Poisson 括号刻画<em>正则变换</em>——相空间上保 Hamilton 方程形式的坐标变换。这是相空间的"<em>等距</em>"（保辛形式）变换, 形成无穷维群。生成函数 \(F(q, Q)\) 把变换参数化, 让"<em>找好坐标</em>" 这件事系统化。再下一章 ch14 我们用 Hamilton-Jacobi 方程把"<em>找最好坐标</em>" 变成解一个 PDE。再下一章 ch15 给出<em>作用-角变量</em>——可积系统的最优坐标。这一段共五章是经典力学的<em>核心几何代数</em>。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch11.html">← 上一章 · 第 11 章 Hamilton 方程 + 相空间</a><a href="ch13.html">下一章 · 第 13 章 正则变换 →</a></nav>
+</main>
+</body>
+</html>

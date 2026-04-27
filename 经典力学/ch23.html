@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 23 章 应用：航天器轨道 + 多体问题 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 相对论力学</a><a href="ch24.html">下一章 · 第 24 章 几何力学 →</a></nav>
+<h1 id="ch23">第 23 章 应用：航天器轨道 + 多体问题</h1>
+
+<p>2021 年 12 月 25 日, NASA 詹姆斯韦布太空望远镜（JWST）从法属圭亚那 Kourou 发射场升空, 6 个月后在距离地球 150 万公里的<em>第二 Lagrange 点 \(L_2\)</em> 进入轨道。\(L_2\) 不是地球围绕太阳的"<em>简单</em>" 轨道——它是太阳-地球两体引力场中一个特殊的<em>平衡点</em>, 让卫星<em>同步</em> 跟随地球绕太阳旋转, 同时背向太阳保持冷低温（红外观测必须）。要把 JWST 送到 \(L_2\) 并稳定停在那里, 需要 30 年的轨道力学研究 + 0.5 m/s 精度的轨道修正。</p>
+
+<p>这一章把"<em>多体引力问题</em>" 的经典力学讲清。具体: <em>三体问题</em>（限制版）+ <em>Lagrange 点</em> + <em>Hohmann 转移</em> + <em>引力借助</em>。这些不是抽象数学游戏——它们是 SpaceX 火星任务、JWST 部署、Voyager 星际探测器的核心算法。</p>
+
+<p>钩子问题: <em>怎么把一艘飞船从地球送到木星, 用最少燃料？</em>朴素答案: "<em>沿直线飞</em>"。这违反所有引力——飞船在太阳引力场里, 直线得不到。第二朴素: "<em>沿椭圆轨道, 像 Newton 行星运动那样</em>"。对——但椭圆怎么选？1925 Hohmann 给一个<em>燃料最少</em> 的椭圆。1962 Minovich + 1965 Voyager 设计师给<em>引力借助</em> 让飞船借木星的轨道速度免费加速——一艘探测器多次借助 (Voyager 2: 木星 → 土星 → 天王星 → 海王星) 可以用一次发射跑遍外太阳系。</p>
+
+<h2 id="sec23-1">23.1 二体问题复习 + 三体问题不可解</h2>
+
+<p>先回到熟地。<em>二体问题</em>——两个互相引力的天体（太阳 + 地球）。链<a href="ch3.html">第 3 章</a>给完整解: 化简为约化质量 \(\mu = m_1 m_2 / (m_1 + m_2)\) 在中心力 \(F = -G M \mu/r^2\) 下的单粒子运动 (\(M = m_1 + m_2\))。结果是<em>圆锥曲线</em>: 椭圆 / 抛物 / 双曲, 取决于能量。Kepler 三定律自动浮出。</p>
+
+<p>解析可解。所有守恒量（能量 + 角动量 + LRL 向量）齐全, <em>完全可积</em>（链<a href="ch15.html">第 15 章</a>）。</p>
+
+<p>加第三体——<em>三体问题</em>。1887 King Oscar 数学比赛 (Sweden 国王悬赏) 题目就是"<em>解三体问题</em>"。Henri Poincaré 拿了 1888 年奖, 但他<em>没</em> 解出——他证明了"<em>不可解</em>": 三体一般没有第 3 类型守恒量, 解析积分不存在; 系统<em>混沌</em>（链<a href="ch17.html">第 17 章</a>）。</p>
+
+<p>具体: 三体 \(m_1, m_2, m_3\) 的 6 个位置坐标, 6 个动量。能量 (1) + 总动量 (3) + 总角动量 (3) + 质心运动 (3) = 10 个守恒量。剩下 18 - 10 = 8 维相空间。要"<em>完全可积</em>" 需要 4 个独立守恒量在 8 维空间, Poincaré 证不存在。</p>
+
+<p>但<em>特殊三体</em> 可解 / 半解。最重要的是<em>限制三体问题</em>:</p>
+
+<ul>
+  <li>3 个天体, 但 \(m_3\) 比 \(m_1, m_2\) 小得多——\(m_3\) 不影响 \(m_1, m_2\) 运动 (但反过来 \(m_3\) 受两者引力)。</li>
+  <li>\(m_1, m_2\) 互相做<em>圆轨道</em>（具体的"<em>圆 restricted 三体</em>" CR3BP）。</li>
+</ul>
+
+<p>这种限制三体里 \(m_3\) 是个"<em>测试粒子</em>"——它的运动是 6 维 ODE 系统, 不可解析积分但<em>有用守恒量</em>（Jacobi 积分, 23.4 节）+ <em>5 个特殊点</em>（Lagrange 点, 23.5 节）。这是航天器力学的<em>基本场景</em>。</p>
+
+<p>具体: 太阳 + 地球 + 飞船。太阳与地球做圆轨道（实际是椭圆但近似圆), 飞船在它们引力场中。</p>
+
+<h2 id="sec23-2">23.2 限制三体问题: 飞船 + 太阳 + 地球</h2>
+
+<p>建立 setup。两个主体 \(M_1\)（太阳）和 \(M_2\)（地球）, 质量 \(m_1, m_2\), \(\mu = m_2 / (m_1 + m_2)\)（地球的"<em>质量分数</em>"）。它们在<em>共同质心</em> 周围做角速度 \(\Omega = \sqrt{G(m_1 + m_2)/a^3}\) 圆运动 (\(a\) 是它们的距离 = 1 AU 对太阳-地球)。</p>
+
+<p>测试粒子 \(m_3\) (飞船) 受两个引力</p>
+
+<p>\[
+\boldsymbol F = - G m_1 m_3 \frac{\boldsymbol r - \boldsymbol r_1}{|\boldsymbol r - \boldsymbol r_1|^3} - G m_2 m_3 \frac{\boldsymbol r - \boldsymbol r_2}{|\boldsymbol r - \boldsymbol r_2|^3}.
+\]</p>
+
+<p>但 \(\boldsymbol r_1(t), \boldsymbol r_2(t)\) 都<em>时间依赖</em>（绕质心转）, 让 ODE 不显式守恒能量。</p>
+
+<p>关键技巧: <em>切到旋转坐标系</em>。让坐标系跟随 \(M_1, M_2\) 一起转, 它们在新坐标系里<em>静止</em>。这就把"<em>显式时间依赖</em>" 转换成"<em>固定势 + 离心 + Coriolis 力</em>"。下节给。</p>
+
+<h2 id="sec23-3">23.3 旋转坐标系 + Coriolis 力</h2>
+
+<p>让旋转坐标系角速度 \(\boldsymbol \Omega = \Omega \hat z\)（绕 \(z\) 轴）。旋转系下的位置 \(\boldsymbol r'\) 与惯性系 \(\boldsymbol r\): \(\boldsymbol r = R(t) \boldsymbol r'\), 其中 \(R(t)\) 是绕 \(z\) 轴的转动矩阵, 角度 \(\Omega t\)。</p>
+
+<p>速度 + 加速度变换（推导见任何力学教材, 链 ch9 刚体 + 转动坐标）:</p>
+
+<p>\[
+\boldsymbol a = \boldsymbol a' + \underbrace{2 \boldsymbol \Omega \times \boldsymbol v'}_{\text{Coriolis}} + \underbrace{\boldsymbol \Omega \times (\boldsymbol \Omega \times \boldsymbol r')}_{\text{离心}} + \dot{\boldsymbol \Omega} \times \boldsymbol r'.
+\]</p>
+
+<p>(\(\dot{\boldsymbol \Omega} = 0\) 因为 \(\Omega\) 常数。)</p>
+
+<p>把 Newton 第二定律写在旋转系中, 把 \(\boldsymbol a\) 替换:</p>
+
+<p>\[
+m \boldsymbol a' = \boldsymbol F - 2 m \boldsymbol \Omega \times \boldsymbol v' - m \boldsymbol \Omega \times (\boldsymbol \Omega \times \boldsymbol r').
+\]</p>
+
+<p>右侧后两项是<em>惯性力</em>（"<em>虚拟力</em>"）, 因切换到非惯性系而生:</p>
+
+<ul>
+  <li><em>Coriolis 力</em> \(\boldsymbol F_{\text{Cor}} = -2 m \boldsymbol \Omega \times \boldsymbol v'\): 与速度方向垂直, 不做功。地球大气环流的"<em>右偏</em>" 效应 (北半球) 是 Coriolis。</li>
+  <li><em>离心力</em> \(\boldsymbol F_{\text{cf}} = -m \boldsymbol \Omega \times (\boldsymbol \Omega \times \boldsymbol r') = m \Omega^2 \boldsymbol \rho\)（指向远离 \(z\) 轴, \(\boldsymbol \rho\) 是 \(\boldsymbol r'\) 在 \(xy\) 平面的投影）: 离心势 \(V_{\text{cf}} = -m \Omega^2 \rho^2/2\)。</li>
+</ul>
+
+<p>在旋转系中, \(M_1, M_2\) 静止, 引力势 + 离心势是<em>时间无关</em> 的"<em>有效势</em>":</p>
+
+<p>\[
+V_{\text{eff}}(\boldsymbol r') = -\frac{G m_1 m_3}{|\boldsymbol r' - \boldsymbol r_1'|} - \frac{G m_2 m_3}{|\boldsymbol r' - \boldsymbol r_2'|} - \frac{m_3 \Omega^2 \rho^2}{2}.
+\]</p>
+
+<p>飞船运动方程</p>
+
+<p>\[
+m_3 \ddot{\boldsymbol r}' = -\nabla V_{\text{eff}} - 2 m_3 \boldsymbol \Omega \times \dot{\boldsymbol r}'.
+\]</p>
+
+<p>(Coriolis 力<em>不</em> 进入势——它依赖速度。)</p>
+
+<p>请你停下感受这件事: <em>旋转坐标系把"显式时间依赖" 转换成"位置依赖的有效势 + 速度依赖的 Coriolis"</em>。前者是好处理的（标准势), 后者是<em>不做功</em> 的（速度垂直）。所以能量守恒在旋转系中是<em>"有效能量"</em> 守恒——下节的 Jacobi 积分。</p>
+
+<h2 id="sec23-4">23.4 Jacobi 积分 + Hill 球</h2>
+
+<p>定义飞船的<em>Jacobi 积分</em>:</p>
+
+<p>\[
+\boxed{\ C = -\frac{1}{2} m_3 |\dot{\boldsymbol r}'|^2 - V_{\text{eff}}(\boldsymbol r').\ }
+\]</p>
+
+<p>(传统差一个负号; 取这版让 \(C\) 是"<em>有效能量</em>" 的负数。)</p>
+
+<p>验证 \(\dot C = 0\): 计算 \(\dot C = -\boldsymbol v' \cdot \dot{\boldsymbol v'} - \nabla V \cdot \boldsymbol v'\)。代入运动方程 \(\dot{\boldsymbol v'} = -\nabla V/m_3 - 2 \boldsymbol \Omega \times \boldsymbol v'\):</p>
+
+<p>\[
+\dot C = -\boldsymbol v' \cdot (-\nabla V/m_3 - 2 \boldsymbol \Omega \times \boldsymbol v') \cdot m_3 - \nabla V \cdot \boldsymbol v' = 0.
+\]</p>
+
+<p>(用 \(\boldsymbol v' \cdot (\boldsymbol \Omega \times \boldsymbol v') = 0\), Coriolis 不做功。) 所以 \(C\) 守恒。</p>
+
+<p>Jacobi 积分是限制三体的<em>唯一</em>（除质量 + 距离）守恒量, 给运动一个重要约束: <em>能量层 \(C = \text{常数}\) 把 6 维相空间限到 5 维</em>。</p>
+
+<p><em>Hill 区域</em>: 给定 \(C\), 飞船 KE 必须 \(\ge 0\), 所以</p>
+
+<p>\[
+V_{\text{eff}}(\boldsymbol r') \le -C / m_3.
+\]</p>
+
+<p>这定义了"<em>飞船能去的区域</em>"——\(V_{\text{eff}}\) 的等位面是<em>边界</em>。具体形状随 \(C\) 变化:</p>
+
+<ul>
+  <li><em>低能量</em>（\(C\) 大）: 飞船只能在 \(M_1\) 周围或 \(M_2\) 周围一个小区域内运动, 不能跨越——"<em>禁戒区</em>" 把两区域隔开。</li>
+  <li><em>能量增加</em>: 禁戒区缩小, 在某临界值打开"<em>颈口</em>" \(L_1\)（位于 \(M_1, M_2\) 之间）, 飞船可经此通过。</li>
+  <li><em>更高能量</em>: \(L_2\)（地外侧）+ \(L_3\)（太阳后方）相继打开。</li>
+  <li><em>极高能量</em>: 整个空间允许。</li>
+</ul>
+
+<p><em>Hill 球</em>: \(M_2\) 周围的"<em>引力主导区域</em>", 大致以 \(L_1, L_2\) 之间的距离为半径。地球的 Hill 球半径约 150 万公里——月球 (38 万 km) 在内, 所以月球绕地球; 火星 (远离地球时几亿 km) 在外, 不绕地球。<em>JWST 在 \(L_2\), 正好在地球 Hill 球边缘</em>。</p>
+
+<p>实际计算: Hill 半径 \(r_H \approx a (m_2/(3 m_1))^{1/3}\), 其中 \(a\) 是 \(M_1, M_2\) 距离。地球: \(r_H \approx 1.5 \times 10^9\) m = 150 万 km, 一致。</p>
+
+<h2 id="sec23-5">23.5 5 个 Lagrange 点</h2>
+
+<p>\(V_{\text{eff}}\) 的<em>临界点</em>（\(\nabla V_{\text{eff}} = 0\)）是飞船的"<em>平衡点</em>"——放在那里以零速度, 飞船保持原位（在旋转系中）。Lagrange 1772 找出共 5 个, 命名 \(L_1\)-\(L_5\):</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">点</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">位置</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">稳定性</th></tr>
+<tr><td>\(L_1\)</td><td>\(M_1\)-\(M_2\) 之间, 偏向 \(M_2\)</td><td>不稳定（鞍点）</td></tr>
+<tr><td>\(L_2\)</td><td>\(M_2\) 远侧</td><td>不稳定</td></tr>
+<tr><td>\(L_3\)</td><td>\(M_1\) 远侧（轨道相反）</td><td>不稳定</td></tr>
+<tr><td>\(L_4\)</td><td>等边三角形, \(M_1 M_2\) 前方 60°</td><td>稳定（如果 \(\mu < 0.0385\)）</td></tr>
+<tr><td>\(L_5\)</td><td>等边三角形, 后方 60°</td><td>稳定（同条件）</td></tr>
+</table>
+
+<p>计算 \(L_1\) 位置（沿 \(M_1\)-\(M_2\) 连线）。设 \(M_1\) 在原点, \(M_2\) 在 \((a, 0, 0)\), \(L_1\) 在 \((a - \delta, 0, 0)\)。\(\nabla V_{\text{eff}}\) 沿 \(x\) 等于零给</p>
+
+<p>\[
+-\frac{G m_1}{(a - \delta)^2} + \frac{G m_2}{\delta^2} + \Omega^2 (a - \delta) = 0.
+\]</p>
+
+<p>用 \(\Omega^2 a^3 = G(m_1 + m_2)\), 取 \(\delta \ll a\), 展开得 \(\delta \approx a (\mu/3)^{1/3}\)（\(\mu = m_2/(m_1 + m_2)\)）。地球的 \(\mu \approx 3 \times 10^{-6}\), 给 \(\delta \approx 1.5 \times 10^9\) m = 150 万 km。<em>这就是 \(L_1, L_2\) 距离地球的距离</em>——和 Hill 球半径一致 (它们其实在 Hill 边缘)。</p>
+
+<p>\(L_4, L_5\) 在等边三角形顶点。这是 Euler-Lagrange 1767-1772 的几何漂亮结果——证明用<em>所有方向</em> 的引力 + 离心力均衡 (3 个方程, 3 个未知数即位置, 解出几何)。</p>
+
+<p>稳定性: \(L_1, L_2, L_3\) 是 \(V_{\text{eff}}\) 的<em>鞍点</em>——某些方向极小, 另一些方向极大; 飞船在那里不稳定, 会被推开。<em>但</em> Coriolis 力让"<em>不稳定</em>" 的具体动力学比直接 saddle 复杂——某些方向上 Coriolis 把飞船推回, 让它做"<em>halo 轨道</em>"（围绕 \(L_1\) 等做小圆运动, 但需要持续修正才能稳定）。</p>
+
+<p>\(L_4, L_5\): 严格分析（Lyapunov 1907）证明若 \(\mu < 0.0385\)（约 1/25）, 这两个点<em>稳定</em>——飞船被 Coriolis "<em>圈住</em>", 做围绕 \(L_4\) 的振荡。太阳-地球的 \(\mu \approx 3 \times 10^{-6}\) 远小于 1/25, 所以稳定。木星-太阳的 \(\mu \approx 10^{-3}\), 也稳定; 这就是<em>Trojan 小行星</em> 的栖息地（下节）。</p>
+
+<h2 id="sec23-6">23.6 实际应用: JWST 在 \(L_2\) + Trojan 小行星</h2>
+
+<p><strong>太阳-地球 \(L_2\)</strong>。距离地球 150 万 km, 远离太阳一侧。优势:</p>
+
+<ul>
+  <li><em>同步绕太阳</em>: \(L_2\) 上的飞船角速度 = 地球角速度（一年一圈）, 所以 JWST 与地球共同绕太阳, 距离地球总在 150 万 km。地面通信简单。</li>
+  <li><em>背向太阳</em>: JWST 太阳挡板挡住太阳 + 地球 + 月亮（三者都在同一方向）, 让望远镜冷到 40 K——红外观测必须。</li>
+  <li><em>稳定阴影</em>: 地球永远在阳光方向, 不会"<em>切换</em>" 让望远镜暴晒。</li>
+</ul>
+
+<p>缺点: 不稳定 (鞍点), 需要每 21 天小推力修正——\(\Delta v \sim 1\) m/s/年, 燃料预算 10 年。</p>
+
+<p>JWST 之前: WMAP（2001-2010）+ Planck（2009-2013）+ Herschel（2009-2013）也在 \(L_2\)。这是宇宙学卫星的<em>黄金</em> 位置。</p>
+
+<p><strong>太阳-地球 \(L_1\)</strong>。距离地球 150 万 km, 朝向太阳。优势: 太阳 - 地球之间, 看到太阳"<em>预警</em>" 太阳风暴（影响地球电网 / 卫星）。SOHO（1995-）+ DSCOVR（2015-）在那里。</p>
+
+<p><strong>太阳-木星 \(L_4, L_5\): Trojan 小行星</strong>。\(\mu \approx 10^{-3}\), 稳定。1906 起天文学家发现一群小行星<em>正好</em> 停在太阳-木星 \(L_4\) (前 60°) + \(L_5\) (后 60°)——它们以特洛伊战争中的英雄命名（"<em>Trojan</em>"）。共发现近 1 万颗。这些是太阳系最古老的天体之一, 反映原始太阳星云的分布。</p>
+
+<p>2021 NASA Lucy 任务正发往木星 Trojan 小行星——一次飞掠 7 颗。它的轨道设计涉及多次<em>引力借助</em>（23.8 节）。</p>
+
+<p><strong>地-月 \(L_4, L_5\): 太空殖民候选</strong>。Gerard O'Neill 1970 年代提议: 在地-月 \(L_4\) 或 \(L_5\) 建大型空间居住区——稳定 + 离地球月球都接近。2020 年代仍是航天爱好者讨论的"<em>未来基地</em>"。</p>
+
+<h2 id="sec23-7">23.7 Hohmann 转移轨道</h2>
+
+<p>问题: 把飞船从地球轨道转到火星轨道, <em>用最少燃料</em>。这是 1925 Walter Hohmann 给的解。</p>
+
+<p>关键洞察: 飞船在<em>椭圆</em> 转移轨道上, 椭圆的<em>近日点</em> 在地球轨道, <em>远日点</em> 在火星轨道。整个过程涉及 2 次推动:</p>
+
+<ol>
+  <li>飞船在地球轨道（圆速 \(v_E\)）上, 加速到椭圆的近日点速度 \(v_p\)（指向运动方向）。\(\Delta v_1 = v_p - v_E\)。</li>
+  <li>飞船到达远日点（速度 \(v_a\)）, 此时火星正好在那里。再加速到火星轨道圆速 \(v_M\)。\(\Delta v_2 = v_M - v_a\)。</li>
+</ol>
+
+<p>为什么"<em>椭圆</em>" 是最少燃料？因为</p>
+
+<ul>
+  <li>圆轨道在两个不同半径之间不能"<em>瞬间</em>" 切换 (会要求无穷加速度)。</li>
+  <li>椭圆是连接两圆轨道的"<em>桥</em>" 中, <em>切线连接</em> 两圆的(在近 / 远日点 \(\boldsymbol v_{\text{transfer}} \parallel \boldsymbol v_{\text{circle}}\)) 节省燃料——速度<em>方向不变</em>, 只调大小。</li>
+  <li>对小推动, 直接增加速度大小是<em>能量效率最高</em> 的方式（动能 \(\propto v^2\), 改方向需"<em>取消旧速度 + 加新速度</em>"）。</li>
+</ul>
+
+<p>定量。设地球轨道半径 \(r_1\), 火星轨道半径 \(r_2\), 椭圆轨道半长轴 \(a = (r_1 + r_2)/2\)。Vis-viva 方程（链<a href="ch3.html">第 3 章</a>）</p>
+
+<p>\[
+v^2 = G M \left( \frac{2}{r} - \frac{1}{a} \right).
+\]</p>
+
+<p>近日点速度 \(v_p^2 = G M (2/r_1 - 1/a)\), 远日点 \(v_a^2 = G M (2/r_2 - 1/a)\)。圆速 \(v_E = \sqrt{G M / r_1}\), \(v_M = \sqrt{G M / r_2}\)。</p>
+
+<p>\[
+\Delta v_1 = v_p - v_E = \sqrt{G M / r_1} \left( \sqrt{2 r_2 / (r_1 + r_2)} - 1 \right).
+\]</p>
+
+<p>类似 \(\Delta v_2\)。</p>
+
+<p>地球到火星: \(r_1 = 1\) AU, \(r_2 = 1.524\) AU, 给 \(\Delta v_{\text{tot}} = \Delta v_1 + \Delta v_2 \approx 5.6\) km/s（相对于太阳引力中心系; 加上脱离地球引力的额外 11.2 km/s）。所以从地面火箭, 总 \(\Delta v \approx 17\) km/s。</p>
+
+<p>转移时间 = 椭圆半周期 \(T/2 = \pi \sqrt{a^3/(G M)}\)。地-火: 约 8.5 个月。</p>
+
+<p>窗口: 飞船到远日点时火星<em>必须</em> 正好在那里。地-火转移每 26 个月一次窗口（地球与火星合期）。SpaceX 火星任务 + NASA 火星任务都按这个节奏。</p>
+
+<p>缺点: Hohmann 是<em>最少燃料</em>, 不是<em>最快</em>。需要更快可以用"<em>双切线椭圆</em>" 或<em>低推力螺旋</em>（电推进）, 但燃料代价更高。</p>
+
+<h2 id="sec23-8">23.8 引力借助 + 行星弹弓</h2>
+
+<p>1962 年 UCLA 数学博士生 Michael Minovich 在 NASA JPL 暑期实习, 计算"<em>行星借助</em>" 飞船加速。他发现: <em>飞船经过行星近距离飞掠, 可以"借走" 行星部分轨道速度, 自己加速</em>。后来 Voyager 团队 (1965-1977) 把这个想法系统化, 设计 Voyager 1 + 2 多次借助轨道。</p>
+
+<p>物理: 在<em>行星参考系</em> 中, 飞船弹性散射——速度大小不变, 方向改。但在<em>太阳参考系</em> 中, 行星<em>本身</em> 在运动 (\(v_p\), 比如木星 13 km/s 绕太阳)。飞船速度的<em>太阳系</em> 测量值 = 飞船在行星系速度 + 行星速度。如果飞船以正确方向飞掠, "<em>方向改</em>" 的同时<em>加上</em> 行星速度的分量, 太阳系下飞船速度<em>大小增加</em>。</p>
+
+<p>具体: 飞船以速度 \(\boldsymbol u_\infty\)（行星系下进入）飞向行星, 远离时速度 \(\boldsymbol u_\infty'\)（同样大小, 方向不同, 偏角 \(\theta\) 由飞掠距离决定）。</p>
+
+<p>太阳系下: \(\boldsymbol v = \boldsymbol u + \boldsymbol v_p\)（\(\boldsymbol v_p\) 是行星相对太阳的速度）。</p>
+
+<p>飞船增速: \(|\boldsymbol v'|^2 - |\boldsymbol v|^2 = 2 \boldsymbol u_\infty' \cdot \boldsymbol v_p - 2 \boldsymbol u_\infty \cdot \boldsymbol v_p\)。</p>
+
+<p>最大化: 飞船<em>顺</em> 行星运动方向飞掠, \(\boldsymbol u_\infty \cdot \boldsymbol v_p = -|u_\infty| |v_p|\)（飞向行星迎面）, \(\boldsymbol u_\infty' \cdot \boldsymbol v_p = +|u_\infty'| |v_p| = +|u_\infty| |v_p|\)（飞离行星顺向）。增速 \(\Delta v^2 = 4 |u_\infty| |v_p|\), 最大可加速 \(2 |u_\infty|\) 量级。</p>
+
+<p>Voyager 2 (1977 发射) 使用了 4 次行星借助: 木星（1979）→ 土星（1981）→ 天王星（1986）→ 海王星（1989）。每次借助加速 ~10 km/s, 让 Voyager 2 用一次发射飞遍外太阳系——直接飞需要的燃料是不可能的。</p>
+
+<p>2003 NASA Cassini 探测器到土星: 借助 金星 → 金星 → 地球 → 木星 → 土星, 7 年到达。</p>
+
+<p>2024 ESA Juice 探测器到木星: 借助 地球月亮 → 金星 → 地球 → 火星 → 地球 → 木星, 11 年到达。</p>
+
+<p>请你看到这件事的力量: <em>引力借助是"零成本" 加速</em>——它不消耗燃料, 只用行星的角动量。"<em>能量从哪里来</em>"？从<em>行星减速</em>——飞船加 \(\Delta v\), 行星减 \(M_{\text{ship}}/M_{\text{planet}} \cdot \Delta v\)（动量守恒）。质量比 \(10^{-22}\) 量级, 行星减速完全可忽略（每次借助让木星轨道减速 \(\sim 10^{-25}\) km/s, 比所有测量精度小无数量级）。<em>飞船一面赚, 行星一面输, 但行星太大输不出感觉</em>。</p>
+
+<p>这是经典力学最美的工程应用——<em>三体动力学</em> 的实际运用让人类探测器到达星际空间。Voyager 1 现在在<em>太阳系外</em>（distance > 150 AU, 2026 年）, 仍向地球传回数据 (微弱)。这一切的轨道力学基础是 Newton 1687 的引力定律 + Lagrange-Hamilton 重写。</p>
+
+<h2 id="sec23-9">23.9 现代航天</h2>
+
+<p>现代航天力学发展:</p>
+
+<p><strong>低推力轨道</strong>。化学火箭给"<em>瞬间</em> 大 \(\Delta v\)", 但效率低。<em>电推进</em>（离子推进, 霍尔推进器）给"<em>持续小 \(\Delta v\)</em>", 总效率高 10 倍。但 ODE 不再是 Hohmann 的"<em>2 次脉冲</em>", 而是连续低推力——<em>螺旋上升</em>。优化轨道是<em>变分</em> 问题——选 \(\boldsymbol u(t)\) 让总燃料最少。Pontryagin 最大原理（控制论）给极小化条件。Dawn 探测器（NASA 2007-2018, 探测 Vesta + Ceres 小行星）用低推力螺旋。</p>
+
+<p><strong>低能量转移 / 弹性边界</strong>。1990 年代发现: <em>沿 \(L_1, L_2\) 周围的不稳定流形</em>, 飞船<em>不需要燃料</em> 就能从地-月 \(L_1\) 漫游到太阳-地 \(L_2\) 之类。这是<em>weak stability boundary</em> (WSB) 转移。日本 Hiten（1991, 月球任务）首次实战 WSB——节省 50% 燃料。</p>
+
+<p><strong>SpaceX Starship</strong>。完全可重用火箭, 长期火星 + 月球任务。Hohmann 转移仍是基本框架, 加引力借助 + 火星轨道捕获。每次火星窗口（26 月）SpaceX 要发射 100+ 艘 Starship 把人类与物资送到火星——长期目标百万人移民火星 (Elon Musk 2050 设想)。</p>
+
+<p><strong>JWST 部署</strong>（2021）。前文提到。L₂ Halo 轨道——半径 80 万 km 的"<em>椭圆</em>" 围绕 \(L_2\)（实际是<em>不稳定</em> 鞍点的"<em>3 维 Lissajous</em>" 拟周期轨道, 由 Coriolis 力维持）。需要每月小修正。</p>
+
+<p><strong>计划: Roman Telescope (2027) + LISA (2030s)</strong>。前者另一台 \(L_2\) 太空望远镜; 后者<em>3 颗卫星组成 250 万 km 三角形, 检测引力波</em>——史无前例的精密轨道控制。LISA 卫星<em>沿地球轨道滞后</em> 20°, 缓慢绕"<em>共同质心</em>" 旋转, 三角形保持稳定。这是经典力学 + 广义相对论的极限工程。</p>
+
+<h2 id="sec23-10">23.10 临别话</h2>
+
+<p>这一章给了你<em>多体力学的实际应用</em>。从 Lagrange 1772 的纯理论计算, 到 Voyager 1977 的星际探测, 到 JWST 2021 的 \(L_2\) 部署——250 年的力学进化让人类探测器走遍太阳系。</p>
+
+<p>核心提取:</p>
+
+<ul>
+  <li>三体一般不可解 (Poincaré), 但<em>限制三体</em>（CR3BP）给可控的 ODE 系统 + 守恒量（Jacobi 积分）。</li>
+  <li>5 个 Lagrange 点是 \(V_{\text{eff}}\) 的临界点。\(L_1, L_2, L_3\) 不稳定（航天器需修正）, \(L_4, L_5\) 稳定（Trojan 小行星天然栖息）。</li>
+  <li>JWST 在太阳-地 \(L_2\): 同步 + 背太阳 + 通信简单。</li>
+  <li>Hohmann 转移椭圆是地-火等行星间最少燃料路径。</li>
+  <li>引力借助让 Voyager 2 用一次发射游遍外太阳系——零燃料加速。</li>
+  <li>现代低推力 + 低能量边界转移让燃料效率进一步提升。</li>
+</ul>
+
+<p>请你欣赏这件事: <em>本书前 22 章建立的所有抽象数学工具, 在这一章变成<em>具体</em> 的航天工程</em>。Lagrange 方程 (CR3BP 的 ODE)、Hamilton 守恒量 (Jacobi 积分)、相空间几何（Hill 球 + Lagrange 点）、变分原理（最少燃料）、混沌（三体不可解）——所有都在 NASA / SpaceX 任务中实际<em>用到</em>。经典力学不是博物馆里的旧家具——它是<em>当下</em> 最前沿航天的基础工具。</p>
+
+<p>下一章是本书最后一章——把经典力学推到<em>最现代</em> 的几何形式（symplectic 几何 + moment map）。Marsden-Weinstein-Arnold 1970-1980 年代发展的语言, 让经典力学变成纯几何。这是 ch1 引论里 Arnold 那句话的兑现——"<em>经典力学的语言是 symplectic 几何 + Lie 群</em>"。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch22.html">← 上一章 · 第 22 章 相对论力学</a><a href="ch24.html">下一章 · 第 24 章 几何力学 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 经典场论与 Lagrangian 密度 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 流体力学</a><a href="ch21.html">下一章 · 第 21 章 通向量子力学 →</a></nav>
+<h1 id="ch20">第 20 章 经典场论与 Lagrangian 密度</h1>
+
+<p>请你回想前面 19 章我们一直在讨论什么样的系统。粒子（一个 / 几个 / 许多）, 刚体（连续物体但只有 6 自由度）, 弹性体 + 流体（连续介质, 出现了无穷自由度的影子）。除了最后两章之外, 我们的系统都是<em>有限自由度</em> 的——\(N\) 个粒子总共 \(3N\) 个广义坐标, 一个数。</p>
+
+<p>现在请你把视野再拉一档。看你周围的世界, 真正的"<em>物理对象</em>" 不止粒子。<em>电磁场</em>——空间每点有一个电场矢量 \(\boldsymbol E(\boldsymbol x, t)\) + 一个磁场矢量 \(\boldsymbol B(\boldsymbol x, t)\)。<em>引力场</em>——空间每点有一个时空度规 \(g_{\mu\nu}(\boldsymbol x, t)\)。<em>Higgs 场</em>——空间每点有一个标量 \(\phi(\boldsymbol x, t)\)。这些不是粒子, 是<em>场</em>。</p>
+
+<p>场和粒子的根本差别: 自由度数。\(N\) 个粒子有 \(3N\) 个自由度——大但有限。一个场——空间无穷多点, 每点上有一个或几个分量, 总共"<em>每点 \(\times\) 无穷多点</em>" = 不可数无穷个自由度。这是<em>真正</em> 的无穷自由度系统。</p>
+
+<p>Lagrange / Hamilton 力学能不能推广到这种无穷自由度？答案: 干净地推广。架构是<strong>Lagrangian 密度</strong> + <strong>作用量积分</strong>。这一章把这套架构搭起来, 看两个标志性例子（Klein-Gordon 标量场 + Maxwell 电磁场）, 谈对称 + Noether 在场论里的样子, 最后指向<em>QFT</em>: 把场<em>量子化</em>, 你得到现代基本物理（粒子物理标准模型, 凝聚态量子场论）。这一章是经典力学课的<em>极限</em> 与 QFT 的<em>入口</em>。</p>
+
+<h2 id="sec20-1">20.1 从粒子到场: \(N \to \infty\) 极限</h2>
+
+<p>要把粒子力学搬到场, 最直接的桥——<em>1D 弹簧链</em>。</p>
+
+<p>设 \(N\) 个相同质量 \(m\) 沿 \(x\) 轴等间距排列, 间距 \(a\), 相邻两质量用劲度 \(K\) 弹簧连接（链 ch8 小振动）。第 \(n\) 个质量的位移是 \(q_n(t)\)。Lagrangian:</p>
+
+<p>\[
+L = \sum_n \frac{1}{2} m \dot q_n^2 - \sum_n \frac{1}{2} K (q_{n+1} - q_n)^2.
+\]</p>
+
+<p>EL 方程: \(m \ddot q_n = K(q_{n+1} - 2 q_n + q_{n-1})\)。这是离散波动方程; 解是<em>声子</em> 模式 \(q_n \sim e^{i k n a - i \omega t}\), 色散 \(\omega = 2\sqrt{K/m} |\sin(ka/2)|\)。\(N \to \infty\) + \(a \to 0\) 极限怎么变？</p>
+
+<p>把 \(q_n(t)\) 看成<em>光滑场</em> \(\phi(x, t)\) 在离散点 \(x = n a\) 的值: \(q_n(t) = \phi(n a, t)\)。差分变导数:</p>
+
+<p>\[
+q_{n+1} - q_n \approx a \, \partial_x \phi.
+\]</p>
+
+<p>求和变积分: \(\sum_n \to \int dx/a\)。Lagrangian 化为</p>
+
+<p>\[
+L = \int dx \left[ \frac{m}{2 a} (\partial_t \phi)^2 - \frac{K a}{2} (\partial_x \phi)^2 \right] = \int dx \, \mathcal L,
+\]</p>
+
+<p>其中</p>
+
+<p>\[
+\mathcal L = \frac{1}{2} \mu (\partial_t \phi)^2 - \frac{1}{2} \tau (\partial_x \phi)^2, \quad \mu = m/a, \tau = K a.
+\]</p>
+
+<p>这就叫<em>Lagrangian 密度</em>——单位长度的 Lagrangian。\(\mu\) 是单位长度质量, \(\tau\) 是单位长度的"<em>张力</em>"（弹簧链替代量）。运动方程: 1D 波动方程</p>
+
+<p>\[
+\mu \partial_t^2 \phi - \tau \partial_x^2 \phi = 0, \quad c = \sqrt{\tau/\mu}.
+\]</p>
+
+<p>请你停下来欣赏这一推广: 离散弹簧链的 Lagrangian 是个<em>求和</em>; 连续场的 Lagrangian 是个<em>积分</em>; <em>结构完全平行</em>。求和号变积分号, 差分变偏导, 离散变量变场, 离散指标变连续坐标。这是 19 世纪从离散介质（弹性体声波）到连续介质（声学）极限的标准操作。20 世纪 Maxwell + Einstein 把它推到<em>真正的场</em>（电磁场, 引力场), 这些场的"<em>底层离散</em>" 不知道是什么, 但 Lagrangian 密度形式同样适用。</p>
+
+<h2 id="sec20-2">20.2 Lagrangian 密度 + 作用量</h2>
+
+<p>一般场论的设置:</p>
+
+<ul>
+  <li>时空: 4D Minkowski 空间, 坐标 \(x^\mu = (t, \boldsymbol x)\), \(\mu = 0, 1, 2, 3\)。</li>
+  <li>场: 一个或多个函数 \(\phi^a(x^\mu)\), \(a\) 是场的指标（标量场 \(a\) 单一; 矢量场 \(a = 0, 1, 2, 3\); 张量场更高）。</li>
+  <li><em>Lagrangian 密度</em> \(\mathcal L\): 一个函数, 依赖场及其一阶时空导数</li>
+</ul>
+
+<p>\[
+\mathcal L = \mathcal L(\phi^a, \partial_\mu \phi^a, x^\mu).
+\]</p>
+
+<p>注意只到一阶导——因为我们要 EL 是二阶 PDE（高阶动力学有奥斯特罗格拉茨基不稳定性）。</p>
+
+<ul>
+  <li><em>作用量</em>:</li>
+</ul>
+
+<p>\[
+\boxed{\ S[\phi] = \int d^4 x \, \mathcal L(\phi, \partial \phi).\ }
+\]</p>
+
+<p>积分是<em>4D 时空积分</em>——区别于粒子 \(S = \int dt \, L\) 是<em>1D 时间积分</em>。</p>
+
+<ul>
+  <li><em>Hamilton 原理</em>: 真实场满足 \(\delta S = 0\), 其中变分对场 \(\phi\) 求, 在时空区域边界上固定 \(\phi\)。</li>
+</ul>
+
+<p>变分演算给<em>场版 EL 方程</em>。具体: 变分 \(\phi \to \phi + \delta \phi\)（\(\delta \phi\) 在边界上为零）, \(\delta(\partial_\mu \phi) = \partial_\mu(\delta \phi)\)。\(\delta \mathcal L = (\partial \mathcal L/\partial \phi) \delta \phi + (\partial \mathcal L/\partial(\partial_\mu \phi)) \partial_\mu(\delta \phi)\)。第二项分部积分（边界为零）:</p>
+
+<p>\[
+\delta S = \int d^4 x \left[\frac{\partial \mathcal L}{\partial \phi} - \partial_\mu \frac{\partial \mathcal L}{\partial(\partial_\mu \phi)}\right] \delta \phi.
+\]</p>
+
+<p>对任意 \(\delta \phi\) 都为零, 给</p>
+
+<p>\[
+\boxed{\ \partial_\mu \frac{\partial \mathcal L}{\partial(\partial_\mu \phi)} - \frac{\partial \mathcal L}{\partial \phi} = 0 \quad (\text{场版 EL}).\ }
+\]</p>
+
+<p>这是粒子版 \(\frac{d}{dt} (\partial L/\partial \dot q) - \partial L/\partial q = 0\) 的<em>直接</em> 推广: 把 \(d/dt\) 换成 \(\partial_\mu\)（4 个时空导数都参加）。多个场时每个 \(\phi^a\) 各一条 EL。</p>
+
+<p>请你停下来确认: <em>从粒子到场的整个 Lagrange 架构平行得让人吃惊</em>。Hamilton 原理换坐标系不变, EL 方程形式不变, 只是积分维数 1D → 4D。这种"<em>拓朴学般稳健</em>" 是 Lagrange 力学的最大优点之一——它推广到几乎任何系统。</p>
+
+<h2 id="sec20-3">20.3 例 1: Klein-Gordon 标量场</h2>
+
+<p>最简单非平凡场: <em>实标量场</em> \(\phi(x^\mu)\)（一个分量, Lorentz 标量）。最简单的相对论性 Lagrangian 密度:</p>
+
+<p>\[
+\boxed{\ \mathcal L_{\mathrm{KG}} = \frac{1}{2} \partial_\mu \phi \, \partial^\mu \phi - \frac{1}{2} m^2 \phi^2.\ }
+\]</p>
+
+<p>(用 metric \(\eta_{\mu\nu} = \mathrm{diag}(+, -, -, -)\); \(\partial_\mu \phi \partial^\mu \phi = (\partial_t \phi)^2 - (\nabla \phi)^2\)。) 这个 Lagrangian 长得像<em>"动能 - 势能"</em>: \(\frac{1}{2}(\partial_t \phi)^2\) 是动能密度, \(\frac{1}{2}(\nabla \phi)^2 + \frac{1}{2} m^2 \phi^2\) 是势能密度（弹性 + 自势）。</p>
+
+<p>EL 方程:</p>
+
+<p>\[
+\partial_\mu \frac{\partial \mathcal L}{\partial(\partial_\mu \phi)} - \frac{\partial \mathcal L}{\partial \phi} = \partial_\mu \partial^\mu \phi + m^2 \phi = 0.
+\]</p>
+
+<p>记 \(\Box = \partial_\mu \partial^\mu = \partial_t^2 - \nabla^2\)（达朗贝尔算符）, 得</p>
+
+<p>\[
+\boxed{\ (\Box + m^2) \phi = 0 \quad (\text{Klein-Gordon 方程}).\ }
+\]</p>
+
+<p>这是<em>相对论性</em> 标量波方程。\(m = 0\) 时退化为<em>波动方程</em> \(\Box \phi = 0\)（光速传播的标量波）。\(m \ne 0\) 时, 平面波解 \(\phi = e^{-i E t + i \boldsymbol p \cdot \boldsymbol x}\) 给色散关系</p>
+
+<p>\[
+E^2 = p^2 + m^2 \quad (\text{相对论能量-动量关系}).
+\]</p>
+
+<p>这正是质量 \(m\) 的相对论粒子! Klein-Gordon 1926 年最初<em>就是</em> 想用它做相对论 Schrödinger 方程的——但发现它有"<em>负能量</em>" + "<em>负概率</em>" 问题, 不适合做单粒子量子力学。直到 Dirac 1928（电子的旋量场）+ Pauli-Weisskopf 1934（场量子化解释 KG）, 大家才理解: <em>KG 是<em>场</em> 方程, 不是粒子方程; 它的"<em>负能量</em>" 解对应反粒子, 它的量子化给标量介子（如 \(\pi\) 介子）</em>。这是 QFT 的开端。</p>
+
+<p>从经典力学角度, Klein-Gordon 是<em>最简单</em> 的相对论场。它的 Lagrangian 是所有场论 Lagrangian 的"<em>HelloWorld</em>"——之后所有更复杂场（Dirac 旋量, Maxwell, Yang-Mills, ...）的 Lagrangian 都借用这种"<em>动能 + 质量项</em>" 结构。</p>
+
+<h2 id="sec20-4">20.4 例 2: Maxwell 电磁场</h2>
+
+<p>第二个标志性例子: 电磁场。这次场是个<em>4-向量</em> \(A^\mu(x) = (\phi, \boldsymbol A)\)（电势 + 矢势）。电场 + 磁场用 \(A^\mu\) 写:</p>
+
+<p>\[
+\boldsymbol E = -\nabla \phi - \partial_t \boldsymbol A, \quad \boldsymbol B = \nabla \times \boldsymbol A.
+\]</p>
+
+<p>更优美的形式: 引入<em>场强张量</em></p>
+
+<p>\[
+F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu.
+\]</p>
+
+<p>这是个反对称 4×4 张量, 6 个独立分量, 对应 \(\boldsymbol E\) 的 3 个 + \(\boldsymbol B\) 的 3 个。具体 \(F_{0i} = E_i\), \(F_{ij} = -\epsilon_{ijk} B_k\)。</p>
+
+<p>Maxwell Lagrangian 密度:</p>
+
+<p>\[
+\boxed{\ \mathcal L_{\mathrm{Maxwell}} = -\frac{1}{4} F_{\mu\nu} F^{\mu\nu} - J^\mu A_\mu,\ }
+\]</p>
+
+<p>其中 \(J^\mu = (\rho, \boldsymbol j)\) 是 4-电流密度（外源）。展开 \(F_{\mu\nu} F^{\mu\nu} = -2 (\boldsymbol E^2 - \boldsymbol B^2)\), 所以 \(-\frac{1}{4} F_{\mu\nu} F^{\mu\nu} = \frac{1}{2}(\boldsymbol E^2 - \boldsymbol B^2)\)。这就是<em>电场 - 磁场</em> 的能量差形式 Lagrangian。</p>
+
+<p>EL 方程对 \(A_\mu\):</p>
+
+<p>\[
+\partial_\mu \frac{\partial \mathcal L}{\partial(\partial_\mu A_\nu)} - \frac{\partial \mathcal L}{\partial A_\nu} = 0.
+\]</p>
+
+<p>算偏导（\(\partial \mathcal L/\partial(\partial_\mu A_\nu) = -F^{\mu\nu}\), \(\partial \mathcal L/\partial A_\nu = -J^\nu\)）, 得</p>
+
+<p>\[
+\boxed{\ \partial_\mu F^{\mu\nu} = J^\nu \quad (\text{Maxwell 方程, 含源}).\ }
+\]</p>
+
+<p>展开成 \(\boldsymbol E, \boldsymbol B\) 给</p>
+
+<ul>
+  <li>\(\nabla \cdot \boldsymbol E = \rho\)（Gauss 电）</li>
+  <li>\(\nabla \times \boldsymbol B - \partial_t \boldsymbol E = \boldsymbol j\)（Ampère-Maxwell）</li>
+</ul>
+
+<p>另两条 Maxwell（Faraday + Gauss 磁）<em>自动</em> 满足——它们是 \(F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu\) 这条恒等式的<em>Bianchi 恒等式</em> \(\partial_{[\rho} F_{\mu\nu]} = 0\)。所以从 \(A^\mu\) + Maxwell Lagrangian 出发, <em>四条</em> Maxwell 方程都得到了——两条来自 EL, 两条来自定义。</p>
+
+<p>请你停下来再次惊叹: 一行 Lagrangian \(-\frac{1}{4} F^2 - J A\) 包含了整个经典电动力学。这是 Lagrangian 力学最美的胜利之一——19 世纪 Maxwell 用 20 条方程描述电磁, 20 世纪 Lagrange / Lorentz / Einstein 把它压成一行。</p>
+
+<p>这个 Lagrangian 还有个<em>对称性</em>: <strong>规范对称</strong>（gauge symmetry）。变换 \(A_\mu \to A_\mu + \partial_\mu \chi\)（\(\chi\) 任意函数）不改变 \(F_{\mu\nu}\), 也不改变 \(\mathcal L\) 中的 \(F^2\) 项。这条对称是电磁场的<em>核心特征</em>; 它在 QFT 里推广到<em>规范理论</em> 框架, 给标准模型的 SU(3) × SU(2) × U(1)。</p>
+
+<h2 id="sec20-5">20.5 Noether 在场论: 能量-动量张量</h2>
+
+<p>ch7 我们看了粒子版 Noether: <em>每个连续对称对应一条守恒量</em>。场论里 Noether 升级——<em>每个对称对应一条<em>守恒流</em></em>:</p>
+
+<p>\[
+\partial_\mu j^\mu = 0, \quad \text{即 } \partial_t \rho + \nabla \cdot \boldsymbol j = 0.
+\]</p>
+
+<p>这是连续性方程形式（ch19 里见过）, 它的总积分 \(Q = \int d^3 x \, j^0\) 是<em>守恒荷</em>。</p>
+
+<p>具体: <em>时空平移对称</em>（Lagrangian 不显含 \(x^\mu\)）⟹ <em>能量-动量张量</em> \(T^{\mu\nu}\) 守恒, \(\partial_\mu T^{\mu\nu} = 0\)。\(T^{\mu\nu}\) 的具体形式（Noether 给）</p>
+
+<p>\[
+T^{\mu\nu} = \frac{\partial \mathcal L}{\partial(\partial_\mu \phi^a)} \partial^\nu \phi^a - \eta^{\mu\nu} \mathcal L.
+\]</p>
+
+<p>分量解释:</p>
+<ul>
+  <li>\(T^{00}\)——能量密度。</li>
+  <li>\(T^{0i}\)——能量流密度（即 \(c\) 倍动量密度）。</li>
+  <li>\(T^{ij}\)——应力张量（动量 \(i\) 在 \(j\) 方向流速）。</li>
+</ul>
+
+<p>守恒律 \(\partial_\mu T^{\mu 0} = 0\) 是能量守恒, \(\partial_\mu T^{\mu i} = 0\) 是动量守恒。两条粒子时是<em>独立</em> 的守恒律（ch2）, 场论里被打包成一个张量方程。</p>
+
+<p>对 KG 标量场, 算出</p>
+
+<p>\[
+T^{\mu\nu} = \partial^\mu \phi \partial^\nu \phi - \eta^{\mu\nu} \mathcal L,
+\]</p>
+
+<p>能量密度 \(T^{00} = \frac{1}{2}(\partial_t \phi)^2 + \frac{1}{2}|\nabla \phi|^2 + \frac{1}{2} m^2 \phi^2\)——<em>正定</em>, 像粒子动能 + 势能。这是 KG 的良性: 它的能量是有界下方的（不像 Dirac 的负能问题）。</p>
+
+<p>对 Maxwell, \(T^{\mu\nu}\) 算出</p>
+
+<p>\[
+T^{\mu\nu}_{\mathrm{EM}} = F^{\mu\rho} F^\nu{}_\rho - \frac{1}{4} \eta^{\mu\nu} F^{\rho\sigma} F_{\rho\sigma}.
+\]</p>
+
+<p>能量密度 \(T^{00}_{\mathrm{EM}} = \frac{1}{2}(\boldsymbol E^2 + \boldsymbol B^2)\)——这正是大学电磁课本里的"<em>电磁能量密度</em>"。这条结果以前是凭直觉 / 实验得到的; Noether + 场版 Lagrangian 让它<em>从原理推出</em>。</p>
+
+<h2 id="sec20-6">20.6 局部规范对称: 场论里最深的洞见</h2>
+
+<p>电磁场的对称变换 \(A_\mu \to A_\mu + \partial_\mu \chi(x)\) 中的 \(\chi\) 是<em>时空函数</em>——每点可以独立选不同的 \(\chi\)。这种"<em>局部</em>" 对称（每点独立）和"<em>全局</em>" 对称（所有点同样变换）是不同物种。</p>
+
+<p>请你想清楚: 全局对称（如全空间平移 \(\boldsymbol x \to \boldsymbol x + \boldsymbol c\)）是<em>有限维</em> 的对称变换。局部对称是<em>无穷维</em> 的——每点选一个变换参数, 总共 \(\infty\) 个自由度。这种自由度的"<em>无穷</em>" 是规范理论的核心。</p>
+
+<p>规范对称的意义: <em>它是物理冗余, 不是真物理变化</em>。\(A_\mu\) 不是直接观测量; 真观测量是 \(F_{\mu\nu}\), 它在规范变换下不变。\(A_\mu\) 像"<em>方位坐标</em>"——你可以选不同的, 但物理同样。这种"<em>多个数学描述对应一个物理</em>" 的冗余在 GR（坐标自由度）+ Yang-Mills（非阿贝尔规范）+ 弦论里反复出现, 成为现代物理的<em>组织原则</em>。</p>
+
+<p>1954 年 Yang + Mills 把 U(1) 局部对称推广到 SU(N) 局部对称——给<em>非阿贝尔规范理论</em>。20 世纪后半叶: SU(2) × U(1) 给电弱（Glashow-Weinberg-Salam, 1961-67）; SU(3) 给强相互作用（QCD, 1973）。<em>标准模型</em> = SU(3) × SU(2) × U(1) 局部规范。这条线索完全长在场论 Lagrangian + 局部对称的土壤上, 是 20 世纪粒子物理的全部架构。</p>
+
+<h2 id="sec20-7">20.7 Hamilton 形式 + 量子化预备</h2>
+
+<p>Lagrangian 场论可以转 Hamilton 形式。Legendre 变换</p>
+
+<ul>
+  <li>共轭场 \(\pi^a(x) = \partial \mathcal L/\partial(\partial_t \phi^a)\)</li>
+  <li>Hamiltonian 密度 \(\mathcal H = \pi^a \partial_t \phi^a - \mathcal L\)</li>
+  <li>Hamilton 方程 \(\partial_t \phi^a = \delta H/\delta \pi^a\), \(\partial_t \pi^a = -\delta H/\delta \phi^a\)（变分导数）</li>
+</ul>
+
+<p>对 Klein-Gordon: \(\pi = \partial_t \phi\), \(\mathcal H = \frac{1}{2} \pi^2 + \frac{1}{2}(\nabla \phi)^2 + \frac{1}{2} m^2 \phi^2\)。</p>
+
+<p>Poisson 括号在场论:</p>
+
+<p>\[
+\{\phi(\boldsymbol x, t), \pi(\boldsymbol y, t)\} = \delta^3(\boldsymbol x - \boldsymbol y).
+\]</p>
+
+<p>注意是<em>等时</em> 括号, 给的是 \(\delta\) 函数（不是 Kronecker \(\delta\)）。这是连续指标版本。</p>
+
+<p>量子化: 把 Poisson 括号升成对易子:</p>
+
+<p>\[
+[\hat \phi(\boldsymbol x, t), \hat \pi(\boldsymbol y, t)] = i \hbar \delta^3(\boldsymbol x - \boldsymbol y).
+\]</p>
+
+<p>这就是<em>正则量子化</em>。\(\hat \phi(\boldsymbol x)\) 现在是<em>算符</em>（每点一个, 对易关系给定）, 作用在 Hilbert 空间的态上。Fock 空间分解: \(\hat \phi\) 用产生 / 湮灭算符 \(a_k^\dagger, a_k\) 展开, 真空 \(|0\rangle\) 满足 \(a_k |0\rangle = 0\), \(a_k^\dagger |0\rangle\) 是单粒子态。这就是 QFT。</p>
+
+<p>请你停下来意识到: 经典场论 + 正则量子化 = 量子场论（QFT）。从 Lagrangian 密度出发, 通过 Hamilton 形式, 通过对易关系, 直接到量子。这条路径 Heisenberg + Pauli + Dirac 1929 年就走通了——它是经典力学到量子力学的<em>第二条桥</em>（第一条是 ch21 即将讨论的 Schrödinger / 粒子量子化）。两条桥是同一山顶（量子力学）的两条上山路。</p>
+
+<h2 id="sec20-8">20.8 通向 QFT: 场量子化是物理学的基础</h2>
+
+<p>场量子化是<em>不</em> 是哲学游戏——它是物理学描述基本粒子的<em>唯一方式</em>。具体:</p>
+
+<ul>
+  <li>粒子物理标准模型：六种夸克, 六种轻子, 四种规范玻色子（\(\gamma, W^\pm, Z, \) 胶子\(\times 8\)）, 一个 Higgs——所有这些是<em>场</em>, 量子激发就是粒子。\(\pi\) 介子是 KG 标量场（pseudoscalar 实际上）的量子激发; 光子是 Maxwell 场的量子激发; 电子是 Dirac 旋量场的量子激发。</li>
+  <li>凝聚态: 声子（晶格振动场的量子）、磁子（自旋波场的量子）、超导库珀对（电子场的"<em>双激发</em>"）、超流相位场（Goldstone 模）等等——都是场量子化的产物。</li>
+  <li>宇宙学早期: 暴涨场（一个标量场）的量子涨落给宇宙微波背景的"<em>原始扰动</em>"——这套用 KG-类场 Lagrangian 写下, 量子化, 算扰动谱, 与观测对照。Planck 卫星 2013-2018 测出这条谱, 完美符合暴涨预言。</li>
+</ul>
+
+<p>这一章我们在<em>经典</em> 场论结束。量子化是<a href="../量子力学/index.html">量子力学</a>（特别 ch24 量子场论入门）+ 量子场论专门课程的内容。但请你记住: <em>经典场论的 Lagrangian / Hamilton 框架是 QFT 的"<em>骨架</em>"</em>; 量子化只是把骨架"<em>充电</em>"——把场变成算符。骨架本身——\(\mathcal L, S = \int \mathcal L d^4 x, \delta S = 0\)——是经典物理给的礼物。</p>
+
+<h2 id="sec20-9">20.9 临别话: 这本书的尽头与起点</h2>
+
+<p>这一章是经典力学课的<em>极限</em>。请你回头看从 ch1 到 ch20 走过的路:</p>
+
+<ul>
+  <li>ch1-3: Newton 复习 + 中心力。中学物理的成熟版。</li>
+  <li>ch4-9: Lagrange 力学。变分原理 + EL + Noether + 小振动 + 刚体。这是经典力学的<em>第二语言</em>。</li>
+  <li>ch10-15: Hamilton 力学。相空间 + Poisson 括号 + 正则变换 + Hamilton-Jacobi + 作用-角变量。这是经典力学的<em>几何化</em>。</li>
+  <li>ch16-17: 微扰 + KAM + 混沌。经典力学的"<em>近现代</em>" 章节, 用动力系统语言研究稳定 / 不稳。</li>
+  <li>ch18-19: 弹性 + 流体。连续介质——经典力学到无穷自由度的<em>过渡</em>。</li>
+  <li>ch20: 经典场论。无穷自由度的<em>正式</em> 框架。Lagrangian 密度 + 时空作用量 + 场版 EL + Noether 张量 + 局部规范——QFT 的入口。</li>
+</ul>
+
+<p>这条线把"<em>苹果落地</em>" 和"<em>夸克 + 胶子</em>" 用同一架构——Lagrangian / Hamilton——连起来。这是 18 世纪 Lagrange / Hamilton 给我们的礼物: 一种能从单粒子推到量子场的<em>统一语言</em>。</p>
+
+<p>下一章 ch21 我们走另一条桥: <em>从经典走向量子</em>。Hamilton-Jacobi 方程的"<em>波振面</em>" 解释——光学短波极限 → 几何光学, 量子力学短波极限 → 经典力学。这是量子诞生时 Schrödinger / Dirac / Feynman 的视角, 也是本书结尾的高潮。</p>
+
+<p>本书剩下: ch22 相对论力学 + ch23 航天力学应用 + ch24 几何力学（symplectic 流形）。这是经典力学的"<em>专题</em>" 部分, 不是必修序列。</p>
+
+<p>请你在合本之前停下来想清楚一件事。<em>经典力学</em> 是 17-18 世纪的物理, 已经 350 年; 但它的<em>语言</em>（Lagrange, Hamilton, Lagrangian 密度, 作用量, 对称, 守恒）<em>仍然</em> 是 21 世纪基本物理的工作语言。Newton 公式 \(F = ma\) 在大学物理课结束就基本不再写了, 但 Lagrangian / 作用量出现在每一篇粒子物理 / 凝聚态 / 弦论 paper 的开头。这不是历史巧合, 是因为<em>变分原理</em> 是物理本身的语言——大自然似乎"<em>真的</em>" 在最小化什么东西, 而我们把它写成 \(S = \int \mathcal L \, dt\) 或 \(S = \int \mathcal L \, d^4 x\)。这条信仰是经典力学留给现代物理的最大遗产。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch19.html">← 上一章 · 第 19 章 流体力学</a><a href="ch21.html">下一章 · 第 21 章 通向量子力学 →</a></nav>
+</main>
+</body>
+</html>

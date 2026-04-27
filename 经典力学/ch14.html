@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 14 章 Hamilton-Jacobi 方程：把 ODE 系统压成一条 PDE — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 正则变换</a><a href="ch15.html">下一章 · 第 15 章 作用-角变量 + 积分系统 →</a></nav>
+<h1 id="ch14">第 14 章 Hamilton-Jacobi 方程：把 ODE 系统压成一条 PDE</h1>
+
+<p>到目前为止你看的"Hamilton 力学"长这样：相空间 \((q, p) \in \mathbb{R}^{2n}\)、Hamilton 函数 \(H(q, p, t)\)、运动方程一组<em>常微分方程</em>（ODE）：</p>
+
+<p>\[
+\dot q^i = \frac{\partial H}{\partial p_i}, \qquad \dot p_i = -\frac{\partial H}{\partial q^i}.
+\]</p>
+
+<p>这是 \(2n\) 个一阶 ODE。给定初值 \((q_0, p_0)\)、向时间正方向积分，得到唯一一条相空间轨迹。</p>
+
+<p>1834 年 Hamilton、1837 年 Jacobi 给出<em>另一种视角</em>。他们说：与其追这 \(2n\) 条 ODE，<em>把整个力学问题装进一条偏微分方程</em>（PDE）。这条 PDE 长这样：</p>
+
+<p>\[
+\boxed{\ \frac{\partial S}{\partial t} + H\!\left(q,\ \frac{\partial S}{\partial q},\ t\right) = 0.\ }
+\]</p>
+
+<p>叫 <em>Hamilton-Jacobi 方程</em>（HJ 方程）。它的未知函数 \(S(q, t)\) 是<em>作用量</em>看作终点位置和时间的函数。一个 \(2n\) ODE 系统，被压缩成一条 \((n+1)\) 自变量的<em>单条</em> PDE。</p>
+
+<p>请你停一秒——这件事乍看像换了一种麻烦：本来就在解 ODE，干嘛把它转成更难的 PDE？这一章的任务就是回答这件事，并且让你看到：HJ 方程不是工具，是一种<em>视角</em>。它把"轨道"换成"波前"——预示量子力学的 Schrödinger 方程；它把"运动"换成"静止"——化所有动力学为找一个恰当的坐标变换。这两条洞察都需要你先看到 HJ 方程<em>怎么自然长出来</em>。</p>
+
+<h2 id="sec14-1">14.1 一道具体题让 \(S\) 变成 \((q, t)\) 的函数</h2>
+
+<p>从最朴素的问题入手：自由粒子，一维。\(L = \frac{1}{2} m \dot x^2\)，\(H = p^2 / (2m)\)。从原点 \(x = 0\) 在 \(t = 0\) 出发，到达 \(x\) 的时间是 \(t\)。这种简单问题你高一就会算。</p>
+
+<p>真路径是匀速直线 \(x(\tau) = (x/t)\tau\)，\(\tau \in [0, t]\)。沿这条路径的<em>作用量</em>：</p>
+
+<p>\[
+S = \int_0^t L\, d\tau = \int_0^t \frac{1}{2} m \left(\frac{x}{t}\right)^2 d\tau = \frac{m x^2}{2 t}.
+\]</p>
+
+<p>注意我把作用量算出来后，写成<em>终点位置 \(x\) 和终点时间 \(t\)</em> 的函数：\(S(x, t) = m x^2 / (2t)\)。这看起来没什么——就一个具体公式。但它是一个<em>关键的视角转换</em>：</p>
+
+<ul>
+  <li><em>普通的作用量</em> \(S[q]\)：作为<em>路径</em> \(q(\tau)\) 的<em>泛函</em>。给一条路径返回一个数。</li>
+  <li>HJ 视角的作用量 \(S(q, t)\)：作为<em>终点</em> \((q, t)\) 的<em>函数</em>。给一个终点（隐含选了"<em>从某个固定起点出发的真路径</em>"）返回一个数。</li>
+</ul>
+
+<p>这两种 \(S\) 的关系：固定起点 \((q_0, t_0)\)、终点 \((q, t)\)，让粒子在<em>真物理路径</em>上跑，对沿路径的 \(L\) 积分得到的就是 \(S(q, t)\)。Hamilton 1834 年就把这个量叫"<em>主函数</em>"（principal function）。</p>
+
+<p>你要做的事——分析这个 \(S(x, t) = m x^2 / (2t)\) 的<em>偏导数</em>。</p>
+
+<p>对位置求偏导：</p>
+
+<p>\[
+\frac{\partial S}{\partial x} = \frac{m x}{t}.
+\]</p>
+
+<p>看这一项——\(m x / t\) 正是粒子的动量 \(p\)（自由粒子 \(p = m \dot x = m \cdot x/t\)）！所以</p>
+
+<p>\[
+\frac{\partial S}{\partial x} = p.
+\]</p>
+
+<p>对时间求偏导：</p>
+
+<p>\[
+\frac{\partial S}{\partial t} = -\frac{m x^2}{2 t^2} = -\frac{1}{2} m \left(\frac{x}{t}\right)^2 = -\frac{1}{2} m \dot x^2 = -E,
+\]</p>
+
+<p>这里 \(E = p^2/(2m)\) 是粒子的能量。所以</p>
+
+<p>\[
+\frac{\partial S}{\partial t} = -E = -H.
+\]</p>
+
+<p>把两条合起来：</p>
+
+<p>\[
+\frac{\partial S}{\partial t} + H = 0,
+\]</p>
+
+<p>而 \(H\) 写成 \(p\) 函数后 \(p = \partial S / \partial x\)，所以</p>
+
+<p>\[
+\frac{\partial S}{\partial t} + H\!\left(x,\ \frac{\partial S}{\partial x}\right) = 0.
+\]</p>
+
+<p>HJ 方程！我们仅仅算了一道具体题——自由粒子，初值 \((0, 0)\)、终点 \((x, t)\)——并把 \(S\) 写成 \((x, t)\) 的函数，求偏导，<em>就推出了 HJ 方程</em>。</p>
+
+<p>请你停下来感受这件事的份量。HJ 方程不是凭空写下的——它是"<em>把作用量当 \((q, t)\) 函数，求偏导</em>"的<em>必然</em>结果。下一节把它对一般 Hamilton 系统证明出来。</p>
+
+<h2 id="sec14-2">14.2 HJ 方程的一般推导</h2>
+
+<p>设固定起点 \((q_0, t_0)\)，可变终点 \((q, t)\)。设真物理路径 \(\gamma_{q, t}\) 是从 \((q_0, t_0)\) 出发、终点 \((q, t)\) 的 EL 方程解。定义</p>
+
+<p>\[
+S(q, t) := \int_{\gamma_{q, t}} L\, d\tau.
+\]</p>
+
+<p>这是 Hamilton 主函数。我们要证它满足 HJ 方程。</p>
+
+<p>第一步——对 \(q^i\) 求偏导。把终点 \(q\) 沿坐标 \(q^i\) 方向小动 \(\delta q^i\)，路径变成 \(\gamma_{q + \delta q, t}\)。沿新路径的作用量与旧路径作用量相差多少？这是<a href="ch4.html">第 4 章</a>变分计算的标准结果——把作用量的变分写成"<em>EL 项 + 边界项</em>"。EL 项在真路径上为零（这就是 EL 方程），剩下的边界项</p>
+
+<p>\[
+\delta S = \left[\frac{\partial L}{\partial \dot q^i} \delta q^i\right]_{t_0}^{t} = p_i(t)\, \delta q^i - p_i(t_0)\, \delta q^i_0.
+\]</p>
+
+<p>起点不动 \(\delta q^i_0 = 0\)，所以 \(\delta S = p_i(t) \delta q^i\)。这就给出</p>
+
+<p>\[
+\boxed{\ \frac{\partial S}{\partial q^i} = p_i.\ }
+\]</p>
+
+<p>"<em>作用量对终点位置的偏导 = 终点动量</em>"。这是一条<em>美妙的恒等式</em>——把"位置和动量"的关系换成"势函数 \(S\) 和它的梯度"。这条恒等式是 HJ 视角的<em>基石</em>。</p>
+
+<p>第二步——对 \(t\) 求偏导。把终点时间 \(t\) 微动 \(\delta t\)，固定 \(q\)。新路径的作用量增加多少？两块贡献：</p>
+
+<ul>
+  <li>积分上限延伸 \(\delta t\)，新增 \(L(q, \dot q, t)\, \delta t\) 一段。</li>
+  <li>但你又要求终点固定在 \(q\)，所以路径需要"重新调整"——即起点同样固定 \((q_0, t_0)\)，终点同样 \(q\) 但时间从 \(t\) 变到 \(t + \delta t\)，意味着原路径"<em>慢一点</em>" 走到 \(q\)。这个调整产生<em>另一个</em>边界项 \(-p_i \dot q^i \delta t\)（你可以从 EL 方程的端点变分推出来）。</li>
+</ul>
+
+<p>合起来：</p>
+
+<p>\[
+\delta S = L\, \delta t - p_i \dot q^i\, \delta t = (L - p_i \dot q^i)\, \delta t = -H\, \delta t.
+\]</p>
+
+<p>第二步用到了 Hamilton 函数的定义 \(H = p_i \dot q^i - L\)。所以</p>
+
+<p>\[
+\boxed{\ \frac{\partial S}{\partial t} = -H.\ }
+\]</p>
+
+<p>"<em>作用量对终点时间的偏导 = 负的能量</em>"。把这条和上面的 \(p_i = \partial S / \partial q^i\) 合起来，把 \(p_i\) 在 \(H\) 里都换掉：</p>
+
+<p>\[
+\frac{\partial S}{\partial t} + H\!\left(q,\ \frac{\partial S}{\partial q},\ t\right) = 0.
+\]</p>
+
+<p>HJ 方程，证毕。整个推导的真心血在<em>那两条边界项恒等式</em>——\(\partial S / \partial q = p\)、\(\partial S / \partial t = -H\)——其它都是代换。</p>
+
+<p>请你回头看这条 PDE。它以<em>三条信息</em>同时编码了整个力学：</p>
+
+<ul>
+  <li>路径——"<em>真</em>"路径是从某起点把 \(\nabla S\) 当动量演化出来的曲线。</li>
+  <li>动量——\(p = \nabla_q S\)。</li>
+  <li>能量——\(-\partial S / \partial t = H\)。</li>
+</ul>
+
+<p>一个标量函数 \(S(q, t)\) 蕴含<em>所有</em>。这就是 HJ 方程的"<em>压缩感</em>"——\(2n\) 条 ODE 变成 1 条 PDE，但代价是要找<em>整个 \(S\)</em>，不只是一条轨道。</p>
+
+<h2 id="sec14-3">14.3 时间不显含时：分离变量</h2>
+
+<p>HJ 方程一般是非线性 PDE，难解。但当 \(H\) 不显含 \(t\)（保守系统）时，有一个朴素的分离变量招——把</p>
+
+<p>\[
+S(q, t) = W(q) - E\, t
+\]</p>
+
+<p>代入 HJ。\(\partial S / \partial t = -E\)。HJ 方程变成</p>
+
+<p>\[
+-E + H\!\left(q,\ \frac{\partial W}{\partial q}\right) = 0,
+\]</p>
+
+<p>即</p>
+
+<p>\[
+\boxed{\ H\!\left(q,\ \nabla W\right) = E.\ }
+\]</p>
+
+<p>这条叫 <em>Hamilton 简化方程</em>（Hamilton characteristic equation）。它对 \(W(q)\) 是<em>纯空间</em>的 PDE——没有时间。\(E\) 是分离常数（就是能量）。</p>
+
+<p>解了 \(W\) 之后，原 \(S = W - E t\) 是 HJ 方程的解。这种 \(S\) 叫<em>Hamilton 简化主函数</em>（characteristic function）。</p>
+
+<p>请你停一秒看这个分离。"<em>时间不显含 ⟹ 能量守恒 ⟹ \(S\) 中时间项简单</em>"——这条逻辑链每一步都很自然，但合起来威力大：把 PDE 的 \(n+1\) 自变量降到 \(n\) 自变量。后面看具体例子时这种降维带来本质便利。</p>
+
+<h2 id="sec14-4">14.4 三个例子</h2>
+
+<h3 id="sec14-4-1">14.4.1 自由粒子</h3>
+
+<p>\(H = p^2/(2m)\)。\(W\) 满足 \((W')^2 / (2m) = E\)，即 \(W' = \sqrt{2 m E}\)，得 \(W = \sqrt{2 m E}\, x + C\)。\(S = \sqrt{2 m E} \cdot x - E t\)。这条 \(S\)（线性形）和 14.1 节的 \(S = m x^2 / (2t)\)（抛物形）是<em>两个不同的</em>解——HJ 方程是非线性的，没有"叠加" 原理；不同解对应不同初值约束。"<em>线性</em> 解" 描述"以确定动量 \(\sqrt{2mE}\) 出发的平面波束"；"抛物 解" 描述"<em>从某点出发的发散球面波</em>"。</p>
+
+<p>这个区别在量子力学里也存在——平面波 vs. 球面波——本节末尾会再回来。</p>
+
+<h3 id="sec14-4-2">14.4.2 一维谐振子</h3>
+
+<p>\(H = p^2/(2m) + \frac{1}{2} m \omega^2 q^2\)。Hamilton 简化方程</p>
+
+<p>\[
+\frac{1}{2m} (W')^2 + \frac{1}{2} m \omega^2 q^2 = E,
+\]</p>
+
+<p>解出 \(W' = \sqrt{2 m E - m^2 \omega^2 q^2}\)。积分</p>
+
+<p>\[
+W(q) = \int_0^q \sqrt{2 m E - m^2 \omega^2 q'^2}\, dq' = \frac{m \omega q}{2} \sqrt{q_{\max}^2 - q^2} + \frac{E}{\omega} \arcsin(q/q_{\max}),
+\]</p>
+
+<p>其中 \(q_{\max} = \sqrt{2E / (m \omega^2)}\) 是振幅。\(S = W - E t\)。</p>
+
+<p>这个 \(W\) 不漂亮，但它<em>是</em>HJ 方程的解。注意 \(W\) 在 \(q = q_{\max}\) 时有<em>奇点</em>（导数发散）——对应转向点（粒子瞬时静止处）。HJ 主函数在转向点上有这种"<em>caustic</em>" 奇点是普遍现象，对应几何光学里的"<em>焦散面</em>"。</p>
+
+<h3 id="sec14-4-3">14.4.3 Kepler 问题</h3>
+
+<p>\(H = (p_r^2 + p_\theta^2 / r^2 + p_\phi^2 / (r^2 \sin^2\theta))/(2m) - k/r\)。这条 \(H\) 在 \((r, \theta, \phi)\) 三个变量上都<em>可分离</em>——HJ 方程允许"<em>完全分离</em>"：</p>
+
+<p>\[
+W(r, \theta, \phi) = W_r(r) + W_\theta(\theta) + W_\phi(\phi).
+\]</p>
+
+<p>\(W_\phi\) 因 \(H\) 不显含 \(\phi\) 而 \(W_\phi = \alpha_\phi \phi\)（\(\alpha_\phi\) 是 \(z\) 方向角动量）。\(W_\theta\) 同理可分离出 \(\alpha_\theta\)（总角动量平方）。\(W_r\) 满足一条 ODE 含 \(\alpha_\theta, \alpha_\phi, E\) 三常数。整道 Kepler 问题的解被装进 3 个分离常数 \((E, L, L_z)\)——正好是 Kepler 问题的<em>三个守恒量</em>。</p>
+
+<p>HJ 方程的"<em>完全分离</em>" 和系统的"<em>守恒量丰富度</em>" 是<em>同一件事</em>——这是<a href="ch15.html">下一章</a>的主线。</p>
+
+<h2 id="sec14-5">14.5 HJ 方程的 \(\hbar\) 极限：Schrödinger 方程</h2>
+
+<p>这一节是 HJ 方程的"<em>大事件</em>"。1925 年 Schrödinger 写出他的著名方程</p>
+
+<p>\[
+i \hbar \frac{\partial \psi}{\partial t} = -\frac{\hbar^2}{2 m} \nabla^2 \psi + V(q) \psi.
+\]</p>
+
+<p>看起来和 HJ 方程没关系。但代入 <em>WKB</em> ansatz</p>
+
+<p>\[
+\psi(q, t) = A(q, t) \exp\!\left(\frac{i}{\hbar} S(q, t)\right),
+\]</p>
+
+<p>把 \(\psi\) 写成"<em>振幅 \(A\) 乘相位 \(S/\hbar\)</em>" 形式（\(S\) 是某个待定的实函数）。代进 Schrödinger 方程，把 \(\hbar\) 按幂展开</p>
+
+<p>\[
+\hbar^0\ \text{项}: \quad \frac{\partial S}{\partial t} + \frac{1}{2 m} (\nabla S)^2 + V(q) = 0,
+\]</p>
+
+<p>这正是 HJ 方程。</p>
+
+<p>更高 \(\hbar\) 项给出振幅 \(A\) 的演化——"<em>守恒律</em>"</p>
+
+<p>\[
+\frac{\partial A^2}{\partial t} + \nabla \cdot (A^2 \nabla S / m) = 0,
+\]</p>
+
+<p>说"<em>概率密度 \(|\psi|^2 = A^2\) 沿 \(\nabla S / m\) 流动</em>"——这就是<em>概率流</em>守恒。</p>
+
+<p>请你停下来感受这条对应。<em>HJ 方程是 Schrödinger 方程在 \(\hbar \to 0\) 极限的最低阶</em>。\(S\) 是相位、\(\nabla S\) 是动量、\(-\partial S / \partial t\) 是能量——经典 HJ 视角和量子 WKB 视角说的<em>是同一件事</em>，只是在量子里加上了振幅 \(A\) 和 \(\hbar\) 修正。</p>
+
+<p>这就是历史上 Schrödinger 找他方程时<em>用</em> 的灵感。Hamilton 在 1834 年写："<em>力学是几何光学的极限——光线对应轨道，波对应粒子</em>"——一条比量子力学早 90 年的预言。Schrödinger 把这条预言<em>反过来</em>用：粒子轨道（HJ）→ 粒子的"<em>波</em>" 描述（\(\psi\)）。整个量子力学的奠基从 HJ 方程的 \(\hbar\) 修正长出来。</p>
+
+<p>本书<a href="ch21.html">ch21</a> 给经典 → 量子的全路径积分。这里你要带走的是：<em>HJ 方程不是力学的边角料——它是连接经典与量子的桥梁</em>。</p>
+
+<h2 id="sec14-6">14.6 Jacobi 的 reformulation：让 \(H = 0\)</h2>
+
+<p>1837 年 Jacobi 给 HJ 方程一个不同的诠释，比 Hamilton 原版还深。</p>
+
+<p>设你找到 HJ 方程的一个"<em>完全解</em>"——\(S(q, \alpha, t)\) 含<em>n 个独立常数</em> \(\alpha = (\alpha_1, \ldots, \alpha_n)\)。把 \(\alpha\) 当成新坐标 \(Q\)，并定义新动量</p>
+
+<p>\[
+\beta_i = -\frac{\partial S}{\partial \alpha_i}.
+\]</p>
+
+<p>则 \((\alpha, \beta)\) 是<em>新的</em>正则坐标——\(S\) 是<a href="ch13.html">第 13 章</a> Type-2 生成函数 \(F_2(q, P)\) 的范例（\(p_i = \partial S / \partial q^i\)、\(Q^i = \partial S / \partial P_i\)，等价地 \(\beta_i = \partial S/\partial \alpha_i\) 用了 \(P = -\beta\) 约定）。</p>
+
+<p>关键一步：在新坐标下 Hamilton 函数</p>
+
+<p>\[
+K(\alpha, \beta, t) = H + \frac{\partial S}{\partial t} = 0
+\]</p>
+
+<p>因为 HJ 方程！整个 \(K = 0\)。新 Hamilton 方程</p>
+
+<p>\[
+\dot \alpha_i = \frac{\partial K}{\partial \beta_i} = 0, \qquad \dot \beta_i = -\frac{\partial K}{\partial \alpha_i} = 0.
+\]</p>
+
+<p>所有 \(\alpha\)、\(\beta\) 都是<em>常数</em>！系统在新坐标下"<em>静止</em>"。</p>
+
+<p>请你停下来体会这件事。原本系统在 \((q, p)\) 中复杂运动；找到 HJ 方程的完全解后，做一个正则变换到 \((\alpha, \beta)\)，<em>所有运动消失</em>——粒子在新坐标下不动。整个动力学的复杂性<em>全部</em>装进了那个变换 \((q, p) \leftrightarrow (\alpha, \beta)\)。</p>
+
+<p>这是<em>解析力学的最终统一观</em>。Hamilton 力学说"运动 = 沿相空间流"；HJ 力学说"<em>运动 = 找一个合适的坐标，让流停下来</em>"。</p>
+
+<p>原坐标下的解从 \((\alpha, \beta)\) 反推出来：\(p_i = \partial S(q, \alpha, t) / \partial q^i\)、\(\beta_i = -\partial S(q, \alpha, t) / \partial \alpha_i\)。第二条隐式确定 \(q(t, \alpha, \beta)\)（解出来），第一条给 \(p(t, \alpha, \beta)\)。完整解。</p>
+
+<p>这条思路在<em>实践上</em>有用吗？非常有用——\(\alpha\) 和 \(\beta\) 各自是<em>守恒量</em>，提供了系统的<em>第一积分</em>。Kepler 问题的 \((\alpha, \beta)\) 就是六个 Kepler 元素（半长轴、偏心率、倾角、升交点经度、近日点幅角、过近日点时刻）——天文学家 200 年来用的"<em>椭圆轨道参数</em>" 正是 HJ 视角下的"<em>静止坐标</em>"。</p>
+
+<h2 id="sec14-7">14.7 几何光学：Eikonal 方程</h2>
+
+<p>HJ 方程在光学里有<em>同样形状</em> 的<em>独立</em> 来源。1690 年 Huygens 写 wave optics、1858 年 Hamilton 写"<em>characteristic function</em>" of optical systems。这一节快速过对应。</p>
+
+<p>光学的<em>Eikonal 方程</em>：</p>
+
+<p>\[
+|\nabla \Phi|^2 = n(\boldsymbol r)^2,
+\]</p>
+
+<p>\(\Phi\) 是光程（optical path length），\(n(\boldsymbol r)\) 是介质折射率。光线 = "<em>\(\Phi = \text{const}\) 等值面的法线</em>"，沿光线 \(\Phi\) 的增长率 = 折射率。</p>
+
+<p>HJ 方程的非时间形 \(H(q, \nabla W) = E\) 形状一模一样——"<em>\(\nabla W\) 的某种二次形式 = 常数</em>"。两者结构上同构</p>
+
+<p>\[
+\text{光线} \leftrightarrow \text{粒子轨道}, \quad \text{波前} \leftrightarrow \text{HJ 等值面}, \quad \text{光程} \leftrightarrow \text{作用量}.
+\]</p>
+
+<p>1834 年 Hamilton 自觉地观察到这条对应——他把<em>同一套 HJ 数学</em> 写成"<em>力学版本</em>" 和"<em>光学版本</em>"，他认为是同一种深层结构。</p>
+
+<p>近百年后 1925 年 de Broglie + Schrödinger 把这条对应<em>反推</em>：既然几何光学是 wave 光学的极限，而经典力学和几何光学结构同构，那经典力学应该也是<em>某种 wave 力学</em> 的极限——量子力学的诞生。</p>
+
+<p>这条历史让你体会<em>结构同构的力量</em>——"<em>形状一样的方程在不同物理领域里</em>" 不是巧合，是<em>背后有深层共通结构</em>。HJ 方程的影响力远不止经典力学——它是最优控制、几何光学、量子力学、广义相对论（Eikonal 化的 Klein-Gordon 方程）共同的语言。</p>
+
+<h2 id="sec14-8">14.8 现代延展：Hamilton-Jacobi-Bellman 方程</h2>
+
+<p>1957 年 Richard Bellman 把 HJ 思路推广到<em>最优控制</em>。问题：</p>
+
+<blockquote style="border-left:3px solid var(--ink-soft);padding-left:1em;margin:1em 0;color:var(--ink-soft);font-style:italic;">
+"<em>给一个动力学系统 \(\dot x = f(x, u, t)\)，控制量 \(u(t)\) 由你选。最小化某个累积代价 \(J = \int_0^T c(x, u, t)\, dt + g(x(T))\)。问最优控制 \(u^*(t)\) 是什么？</em>"
+</blockquote>
+
+<p>Bellman 1957 给"<em>动态规划原理</em>"——值函数 \(V(x, t) := \min_u \int_t^T c\, d\tau + g(x(T))\) 满足</p>
+
+<p>\[
+\boxed{\ \frac{\partial V}{\partial t} + \min_u \left\{c(x, u, t) + \nabla_x V \cdot f(x, u, t)\right\} = 0.\ }
+\]</p>
+
+<p>看这条结构——和 HJ 方程<em>完全一样</em>：时间偏导 + 一个"<em>含 \(\nabla V\) 的代数表达式</em>" = 0。把</p>
+
+<p>\[
+H(x, p, t) := \min_u \{c(x, u, t) + p \cdot f(x, u, t)\}
+\]</p>
+
+<p>当成"<em>有效 Hamilton 函数</em>"，HJB = HJ。</p>
+
+<p>这条对应让经典力学的整套 HJ 工具迁移到现代控制论。航天器最优导引、机器人路径规划、强化学习里的<em>最优值函数</em>（Bellman 方程的离散版）、金融工程的最优投资策略——全是 HJB 的具体化。</p>
+
+<p>对 RL（强化学习）：连续时间贝尔曼方程 = HJB；离散时间贝尔曼方程 = HJB 的差分形式。深度强化学习训神经网络去近似 \(V(x)\)——本质是数值解一条 HJB-PDE。</p>
+
+<p>请你回头看 Hamilton 1834 + Jacobi 1837 写下 HJ 方程时——他们是为了重新表达经典力学。190 年后，同一条方程结构<em>支配着</em>:</p>
+
+<ul>
+  <li>经典力学（Hamilton-Jacobi）</li>
+  <li>量子力学（Schrödinger 的 \(\hbar\) 修正）</li>
+  <li>几何光学（Eikonal）</li>
+  <li>广义相对论（曲面时空 HJ）</li>
+  <li>最优控制（HJB）</li>
+  <li>金融工程（Black-Scholes 是退化 HJB）</li>
+  <li>强化学习（贝尔曼方程的连续极限）</li>
+</ul>
+
+<p>这就是基础物理结构的<em>多面性</em>。学 HJ 方程不是为了解一道力学题——是为了拿到这条贯穿七个领域的钥匙。</p>
+
+<h2 id="sec14-9">14.9 临别话</h2>
+
+<p>这一章你看到了 HJ 方程的<em>三种诠释</em>：</p>
+
+<ul>
+  <li>计算工具——把 ODE 系统替换成单条 PDE，特别是<em>分离变量</em> 时给完全可解。</li>
+  <li>正则变换的极限——找让 \(H = 0\) 的变换，所有运动停止。</li>
+  <li>量子 / 光学桥梁——是 Schrödinger 方程的 \(\hbar \to 0\) 极限，是 Eikonal 方程的力学化身。</li>
+</ul>
+
+<p>三种诠释指向<em>同一条方程</em>——但每一条诠释打开一个不同的门。计算诠释让你具体解 Kepler / 谐振子；变换诠释让你看到天体力学家 200 年来用的 Kepler 元素是"<em>静止坐标</em>"；桥梁诠释让你听见量子力学的胚胎心跳。</p>
+
+<p>下一章我们沿着"<em>分离变量 + 守恒量</em>" 这条线走深——给周期系统一套<em>作用-角变量</em>。在这套变量下 \(H\) 只依赖<em>作用</em>，<em>角</em> 线性变化——Hamilton 方程的"<em>最简单可能形式</em>"。这一类系统叫<em>积分系统</em>——所有人都希望真实物理系统是积分的。<em>不是</em>。下下章 KAM 定理告诉你"<em>积分系统在多体微扰下还能多大程度保留</em>"——一条 1954-1962 年才解决的、200 年悬而未决的问题：太阳系是稳定的吗？</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch13.html">← 上一章 · 第 13 章 正则变换</a><a href="ch15.html">下一章 · 第 15 章 作用-角变量 + 积分系统 →</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

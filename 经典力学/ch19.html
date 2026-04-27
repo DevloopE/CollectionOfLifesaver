@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 流体力学入门 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 弹性力学</a><a href="ch20.html">下一章 · 第 20 章 经典场论 →</a></nav>
+<h1 id="ch19">第 19 章 流体力学入门</h1>
+
+<p>请你做这个实验。打开水龙头, 让水流进玻璃杯。慢慢拧——水流细而<em>笔直</em>, 像一根光滑的玻璃柱。再拧大——水流变粗, 但仍光滑。再拧到一定程度——水流突然<em>翻腾</em>, 表面起波纹, 内部出现旋涡, 颜色变白（因为夹了空气泡）。这两种状态有<em>名字</em>: 第一种叫<em>层流</em>（laminar）, 第二种叫<em>湍流</em>（turbulent）。它们之间的过渡<em>不是</em> 渐变, 是<em>突变</em>——给定水龙头, 一拧到某个阈值, 流态<em>跳变</em>。</p>
+
+<p>这条小实验是<em>流体力学</em> 的窗口。流体——水、空气、油、血液、熔岩——在物理上比固体<em>更软</em>: 没有形状, 静止时不能撑剪应力（弹性力学 ch18 说过, 流体的剪切模量 \(\mu = 0\)）。但流体<em>动起来</em> 比固体复杂得多——它有惯性、有黏性、有压力, 三者耦合起来给一个非线性 PDE: <em>Navier-Stokes 方程</em>。</p>
+
+<p>Navier-Stokes 是科学史上著名的<em>未解</em> 方程之一。Clay Mathematics Institute 2000 年公布的<em>千禧年七大问题</em>（每解一道悬赏 100 万美元）, 其中一道就是: "<em>给定 \(\mathbb R^3\) 中光滑初值, Navier-Stokes 方程是否存在所有时间的光滑解？或者是否会在有限时间产生奇点？</em>" 至今没有定论。我们能<em>数值</em> 解它（CFD, 计算流体动力学）模拟飞机绕流、台风、心脏血液、原子弹蘑菇云——但<em>解析</em> 上, 我们不知道它的解是不是良定。</p>
+
+<p>这一章给入门: 怎么描述流体（位置 vs 速度场）、连续性方程、Euler 方程（无黏）、Navier-Stokes（黏）、Bernoulli、涡度、Reynolds 数、Clay 问题。读完这一章你会知道为什么流体力学既<em>实用极广</em>, 又<em>理论极难</em>。</p>
+
+<h2 id="sec19-1">19.1 描述流体: Eulerian vs Lagrangian</h2>
+
+<p>固体每点有<em>固定</em> 的标识——你拍那块不变。流体不一样——一片"<em>水分子</em>" 此刻在杯里, 一秒后流到下游, 失去身份。怎么描述？两种语言:</p>
+
+<p><strong>Lagrangian 描述</strong>: 跟着流体粒子。给每个粒子一个标签 \(\boldsymbol X_0\)（初始位置）, 它的轨迹是 \(\boldsymbol x(\boldsymbol X_0, t)\)。变量是<em>粒子位置</em>。这是固体力学（弹性 ch18）用的语言。优点: 守恒律（动量、能量）按粒子写。缺点: 流体里粒子轨迹复杂, 不容易跟。</p>
+
+<p><strong>Eulerian 描述</strong>: 站在固定空间点 \(\boldsymbol x\) 观察"<em>此时此地的流体</em>"。变量是<em>速度场</em> \(\boldsymbol v(\boldsymbol x, t)\)、密度场 \(\rho(\boldsymbol x, t)\)、压力场 \(p(\boldsymbol x, t)\)。这是流体力学的<em>主流</em> 语言, 因为它把"<em>跟踪粒子</em>" 替换成"<em>看场</em>"——场是空间函数, 容易写 PDE。</p>
+
+<p>两者关系: 粒子在 \(\boldsymbol x = \boldsymbol x(\boldsymbol X_0, t)\) 处的速度等于场在那一点的值, \(d\boldsymbol x/dt|_{\boldsymbol X_0} = \boldsymbol v(\boldsymbol x(\boldsymbol X_0, t), t)\)。Eulerian 是把 Lagrangian 的"<em>个人轨迹</em>" 投影到"<em>瞬时速度分布</em>" 上。</p>
+
+<p>一个常用工具: <em>物质导数</em>（material derivative, 也叫 Lagrangian 导数）。给一个量 \(f(\boldsymbol x, t)\)（密度、温度、什么都行）, 跟着粒子看它怎么变:</p>
+
+<p>\[
+\frac{D f}{D t} := \frac{\partial f}{\partial t} + \boldsymbol v \cdot \nabla f.
+\]</p>
+
+<p>第一项是"<em>定点变化</em>"（站着不动看 \(f\) 怎么变）, 第二项是"<em>对流变化</em>"（跟着流走, 看 \(f\) 在新位置的值与旧位置差）。这个组合是流体力学最频繁的算符。</p>
+
+<h2 id="sec19-2">19.2 连续性方程: 质量守恒</h2>
+
+<p>取流体中一个固定空间区域 \(V\)。区域内总质量 \(\int_V \rho \, dV\)。流体可以从边界流进流出, 速率 \(\int_{\partial V} \rho \boldsymbol v \cdot \hat n \, dA\)（出去为正）。质量守恒说</p>
+
+<p>\[
+\frac{d}{dt} \int_V \rho \, dV = -\int_{\partial V} \rho \boldsymbol v \cdot \hat n \, dA.
+\]</p>
+
+<p>用散度定理转右边到体积分:</p>
+
+<p>\[
+\int_V \frac{\partial \rho}{\partial t} \, dV = -\int_V \nabla \cdot (\rho \boldsymbol v) \, dV.
+\]</p>
+
+<p>因 \(V\) 任意, 被积项相等:</p>
+
+<p>\[
+\boxed{\ \frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \boldsymbol v) = 0 \quad (\text{连续性方程}).\ }
+\]</p>
+
+<p>这是<em>质量守恒</em> 的 PDE 写法。请你停下来注意它的<em>结构</em>: 它是一条<em>守恒律</em>, 形式 \(\partial_t (\text{密度}) + \nabla \cdot (\text{流密度}) = 0\)——这种结构在物理学里反复出现（电荷守恒、能量守恒、熵流……）。</p>
+
+<p>对<em>不可压缩</em> 流体（密度 \(\rho\) 是常数, 一阶近似下水、空气低速）, 连续性方程退化成</p>
+
+<p>\[
+\nabla \cdot \boldsymbol v = 0.
+\]</p>
+
+<p>速度场<em>无散</em>。这条简单约束在水流、低速空气流的求解里经常作为基本假设。</p>
+
+<h2 id="sec19-3">19.3 Euler 方程: 无黏流体</h2>
+
+<p>动力学——Newton 第二定律对流体怎么写。考虑流体中一个小体积 \(dV\), 跟着流走。它的动量 \(\rho \boldsymbol v \, dV\)。受力两类: <em>压力</em>（来自周围流体推它）+ <em>体力</em>（重力等）。</p>
+
+<p>跟随这个小元的动量随时间变化等于受力。用物质导数</p>
+
+<p>\[
+\rho \frac{D \boldsymbol v}{D t} = -\nabla p + \rho \boldsymbol g.
+\]</p>
+
+<p>展开 \(D/Dt\):</p>
+
+<p>\[
+\boxed{\ \frac{\partial \boldsymbol v}{\partial t} + (\boldsymbol v \cdot \nabla) \boldsymbol v = -\frac{1}{\rho} \nabla p + \boldsymbol g \quad (\text{Euler 方程, 无黏}).\ }
+\]</p>
+
+<p>这是 Euler 1755 年写下的方程, 描述<em>理想</em>（无黏）流体。请你停下来看它的<em>非线性</em>: 项 \((\boldsymbol v \cdot \nabla) \boldsymbol v\) 是速度自我作用, 这是流体力学一切复杂性的根源。</p>
+
+<p>具体: 把 Euler 写在分量里, 设 \(\boldsymbol v = (u, v, w)\),</p>
+
+<p>\[
+\frac{\partial u}{\partial t} + u \frac{\partial u}{\partial x} + v \frac{\partial u}{\partial y} + w \frac{\partial u}{\partial z} = -\frac{1}{\rho} \frac{\partial p}{\partial x} + g_x.
+\]</p>
+
+<p>那 \(u (\partial u/\partial x)\) 项是<em>双线性</em> 的——速度乘速度梯度。在线性方程里, 解的叠加给解; 这里, <em>叠加性破坏</em>——两条流的叠加<em>不是</em> 解。这种"<em>非线性自相互作用</em>" 让流体方程<em>极难</em>。</p>
+
+<p>Euler 方程 + 连续性方程 + 状态方程（如不可压条件 \(\nabla \cdot \boldsymbol v = 0\) 或理想气体 \(p = p(\rho)\)）合起来给完整动力学。维数: \(\boldsymbol v\) 三分量 + \(p\) 一标量 = 4 个未知场, 4 条方程刚好闭合。</p>
+
+<h2 id="sec19-4">19.4 Navier-Stokes 方程: 加入黏性</h2>
+
+<p>真实流体有<em>黏性</em>。蜂蜜流得慢, 水流得快, 空气流得更快——黏性是流体内部"<em>摩擦</em>" 的衡量。它来自分子碰撞: 高速分子层与低速分子层接触时交换动量, 把高速拉慢、低速拉快——产生剪切阻力。这种内部应力是<em>剪应力</em>, 对应弹性体的剪切模量, 但流体里它是<em>速度梯度</em> 的函数（Newtonian 流体）:</p>
+
+<p>\[
+\sigma_{ij}^{\text{visc}} = \mu (\partial_i v_j + \partial_j v_i) - \frac{2}{3} \mu \delta_{ij} \nabla \cdot \boldsymbol v + \zeta \delta_{ij} \nabla \cdot \boldsymbol v,
+\]</p>
+
+<p>\(\mu\) 是<em>动力黏度</em>, \(\zeta\) 是<em>第二黏度</em>。注意类比弹性 ch18: 那里 \(\sigma = \lambda \mathrm{tr}(\epsilon) I + 2\mu \epsilon\), 这里 \(\sigma^{\text{visc}}\) 是 \(\dot \epsilon\)（应变率）的同样形式。<em>弹性体应力依赖应变, 流体应力依赖应变率</em>——这是固液本质区别。</p>
+
+<p>把这个黏性应力加入 Cauchy 平衡方程, 不可压情况下 \(\nabla \cdot \boldsymbol v = 0\), 多出一项 \(\mu \nabla^2 \boldsymbol v\)（从 \(\partial_j \sigma^{\text{visc}}_{ij}\) 算来）。结果:</p>
+
+<p>\[
+\boxed{\ \rho\left(\frac{\partial \boldsymbol v}{\partial t} + (\boldsymbol v \cdot \nabla) \boldsymbol v\right) = -\nabla p + \mu \nabla^2 \boldsymbol v + \rho \boldsymbol g \quad (\text{Navier-Stokes}).\ }
+\]</p>
+
+<p>这就是著名的<em>Navier-Stokes 方程</em>（Navier 1822, Stokes 1845）。Euler 是它在 \(\mu = 0\) 极限。Navier-Stokes 加上 \(\nabla \cdot \boldsymbol v = 0\) 与初值 + 边值, 是大部分实用流体问题的<em>标准模型</em>。</p>
+
+<p>典型 \(\mu\) 值: 水 \(10^{-3}\) Pa·s; 空气 \(2 \times 10^{-5}\) Pa·s; 蜂蜜 \(10\) Pa·s; 沥青 \(10^8\) Pa·s。"<em>运动黏度</em>" \(\nu = \mu/\rho\), 单位 m²/s, 描述黏性扩散动量的速率: 水 \(\nu \approx 10^{-6}\) m²/s, 空气 \(\nu \approx 1.5 \times 10^{-5}\) m²/s。</p>
+
+<h2 id="sec19-5">19.5 Bernoulli 方程: 沿流线的能量守恒</h2>
+
+<p>一个常用结果——沿一条流线, "<em>动能 + 压能 + 重势能</em>" 守恒。具体: 设无黏 + 不可压 + 稳态（\(\partial_t = 0\)）+ 无旋（\(\nabla \times \boldsymbol v = 0\)）。Euler 方程化为</p>
+
+<p>\[
+(\boldsymbol v \cdot \nabla) \boldsymbol v = -\frac{1}{\rho} \nabla p - \nabla \Phi \quad (\Phi = -\boldsymbol g \cdot \boldsymbol r \text{ 重势}).
+\]</p>
+
+<p>用恒等式 \((\boldsymbol v \cdot \nabla) \boldsymbol v = \nabla(v^2/2) - \boldsymbol v \times (\nabla \times \boldsymbol v) = \nabla(v^2/2)\)（因为无旋）:</p>
+
+<p>\[
+\nabla\left(\frac{v^2}{2} + \frac{p}{\rho} + \Phi\right) = 0.
+\]</p>
+
+<p>所以括号内是常数:</p>
+
+<p>\[
+\boxed{\ \frac{1}{2} \rho v^2 + p + \rho g h = \mathrm{const} \quad (\text{Bernoulli 方程, 沿流线}).\ }
+\]</p>
+
+<p>这就是 Daniel Bernoulli 1738 年发现的<em>Bernoulli 原理</em>。物理意义: <em>速度大处压力小</em>。应用极广:</p>
+
+<ul>
+  <li><em>飞机翼</em>: 翼上方曲面长, 空气流过得快, \(p\) 低; 下方平直, 流得慢, \(p\) 高。压差托起飞机。（这是常见简化解释; 真实升力更复杂涉及环量。）</li>
+  <li><em>Venturi 管</em>: 管缩窄处流速高, 压力低——可用差压测流量。</li>
+  <li><em>Pitot 管</em>: 飞机机鼻测速。把动压 \(\frac{1}{2} \rho v^2\) 与静压差 \(p\) 转换。</li>
+  <li><em>香蕉球</em>（足球, 棒球）: 旋转球体一侧空气快、一侧慢, 压差给侧向力——曲线轨迹。</li>
+</ul>
+
+<p>请你停下来欣赏 Bernoulli 的<em>简单</em>。三个量加起来是常数——一行字解释一大堆现象。这是流体力学罕见的"<em>解析洞见</em>"——大多数实际问题需要数值积分 Navier-Stokes; Bernoulli 是少数能心算的。</p>
+
+<h2 id="sec19-6">19.6 涡度: 流体的"角速度"</h2>
+
+<p>定义</p>
+
+<p>\[
+\boldsymbol \omega = \nabla \times \boldsymbol v.
+\]</p>
+
+<p>这叫<em>涡度</em>（vorticity）。物理意义: 流体某点附近的<em>局部转速</em>——把一片小流体看成转动的"<em>风车</em>", \(\boldsymbol \omega/2\) 就是它的角速度。</p>
+
+<p>无旋流（\(\boldsymbol \omega = 0\)）举例: 均匀直流、势流（来自势函数 \(\boldsymbol v = \nabla \phi\) 的流）。这种流容易解析。但<em>真实流</em> 几乎总有旋——边界附近会产生"<em>边界层</em>" 涡度, 黏性把它扩散到流场中。</p>
+
+<p>从 Euler 方程对 \(\nabla \times\) 一下, 得<em>涡度方程</em></p>
+
+<p>\[
+\frac{D \boldsymbol \omega}{Dt} = (\boldsymbol \omega \cdot \nabla) \boldsymbol v + \nu \nabla^2 \boldsymbol \omega.
+\]</p>
+
+<p>第一项 \((\boldsymbol \omega \cdot \nabla) \boldsymbol v\) 叫<em>涡管拉伸</em>（vortex stretching）——流体沿涡轴拉长会让涡度<em>增强</em>（角动量守恒, 转速加快）。这是花样滑冰运动员收手加速的同样原理。第二项 \(\nu \nabla^2 \boldsymbol \omega\) 是涡度的<em>黏性扩散</em>。</p>
+
+<p><strong>Kelvin 环量定理</strong>（1869）: 设无黏（Euler）+ 流体里画一闭合曲线 \(C\), 算环量 \(\Gamma = \oint_C \boldsymbol v \cdot d\boldsymbol l\)。Kelvin 证: <em>跟着流走的曲线 \(C\) 上, \(\Gamma\) 守恒</em>。这是涡度的"<em>动量守恒</em>" 版本——涡度不能从无到有, 只能拉伸 / 扩散。</p>
+
+<p>这条定理强加一个有趣后果: <em>无黏流不能产生涡度</em>。但你拿一杯水搅一下立刻有涡——因为水有黏性, 容器壁的摩擦 + 你勺子的剪切产生了涡度。<em>所有真实涡的源头都是黏性 + 边界</em>。</p>
+
+<h2 id="sec19-7">19.7 Reynolds 数: 层流 vs 湍流</h2>
+
+<p>把 Navier-Stokes 无量纲化。设特征速度 \(U\), 特征长度 \(L\), 特征时间 \(L/U\)。无量纲变量 \(\boldsymbol v' = \boldsymbol v/U, \boldsymbol x' = \boldsymbol x/L, t' = tU/L\)。代入 Navier-Stokes:</p>
+
+<p>\[
+\frac{\partial \boldsymbol v'}{\partial t'} + (\boldsymbol v' \cdot \nabla') \boldsymbol v' = -\nabla' p' + \frac{1}{\mathrm{Re}} \nabla'^2 \boldsymbol v',
+\]</p>
+
+<p>其中</p>
+
+<p>\[
+\boxed{\ \mathrm{Re} := \frac{U L}{\nu} \quad (\text{Reynolds 数}).\ }
+\]</p>
+
+<p>这是<em>所有流体力学最重要的无量纲数</em>。它衡量"<em>惯性项 \((\boldsymbol v \cdot \nabla) \boldsymbol v\) 与黏性项 \(\nu \nabla^2 \boldsymbol v\) 的比</em>":</p>
+
+<ul>
+  <li>\(\mathrm{Re} \ll 1\): 黏性主导。流体像蜂蜜, 流动光滑, <em>低 Re 流</em>（细菌游泳, 微流控芯片, 地幔对流）。</li>
+  <li>\(\mathrm{Re} \sim 10\) 到 \(\sim 10^3\): 中等。多种流态, 出现尾迹涡。</li>
+  <li>\(\mathrm{Re} \gtrsim 10^4\): 惯性主导。<em>湍流</em>。流场<em>多尺度涡</em>, 能量从大尺度<em>级联</em> 到小尺度（Kolmogorov 1941）, 直到黏性把它耗散为热。</li>
+</ul>
+
+<p>临界 Reynolds 数（湍流出现的阈值）依赖几何: 直管 \(\mathrm{Re}_c \approx 2300\); 平板边界层 \(\sim 5 \times 10^5\); 球后流 \(\sim 200\)。</p>
+
+<p>典型例子:</p>
+<ul>
+  <li>水龙头水流（直径 1 cm, 速度 1 m/s）: \(\mathrm{Re} = 0.01 \cdot 1 / 10^{-6} = 10^4\)——湍流边缘, 拧大就湍流。</li>
+  <li>飞机机翼（弦长 3 m, 速度 250 m/s, 空气）: \(\mathrm{Re} = 5 \times 10^7\)——深度湍流。</li>
+  <li>大肠杆菌游泳（长 2 μm, 速 30 μm/s, 水）: \(\mathrm{Re} = 6 \times 10^{-5}\)——黏性世界, 对它来说水像沥青。</li>
+  <li>海洋大尺度流（\(L \sim 100\) km, \(U \sim 0.1\) m/s）: \(\mathrm{Re} = 10^{10}\)——极度湍流。</li>
+</ul>
+
+<p>请你停下来感受 Reynolds 数的<em>覆盖范围</em>: 14 个数量级。同一组方程（Navier-Stokes）描述细菌世界 + 飞机机翼 + 海洋——这是物理学很少有的"<em>普适性</em>"。</p>
+
+<p>湍流是个<em>巨大的未解领域</em>。Kolmogorov 1941 给一个统计图像（"<em>K41</em>" 理论）: 能量从大涡级联到小涡, 给出 \(-5/3\) 谱密度（\(E(k) \sim k^{-5/3}\)）。这条 K41 标度律是 20 世纪流体最美的预言之一, 被实验广泛证实。但<em>解析</em> 上, 我们仍然无法从 Navier-Stokes 推 K41——湍流的<em>第一原理推导</em> 是流体力学的圣杯。</p>
+
+<h2 id="sec19-8">19.8 Clay 千禧年问题</h2>
+
+<p>2000 年 Clay Mathematics Institute 公布七大千禧年问题, 每解一道悬赏 100 万美元。其中一道是<em>Navier-Stokes 存在性 + 光滑性</em>:</p>
+
+<blockquote style="border-left:3px solid var(--ink-soft);padding-left:1em;margin:1em 0;color:var(--ink-soft);font-style:italic;">
+"<em>给定 \(\mathbb R^3\) 中光滑、紧支撑的初值 \(\boldsymbol v_0(\boldsymbol x)\) 满足 \(\nabla \cdot \boldsymbol v_0 = 0\), 不可压 Navier-Stokes 方程是否存在所有时间 \(t > 0\) 的光滑解 \(\boldsymbol v(\boldsymbol x, t)\)？或者是否会在有限时间产生奇点（"<em>blow-up</em>"）？</em>"
+</blockquote>
+
+<p>具体:</p>
+<ul>
+  <li><em>2D 情况</em>（流场在平面上）: 解决了——Leray 1934 年证 2D 全局光滑存在唯一。2D 干净。</li>
+  <li><em>3D 情况</em>（真实物理）: 未解。Leray 1934 证<em>弱解</em> 全局存在（"<em>Leray-Hopf 弱解</em>"）, 但弱解的<em>唯一性 + 光滑性</em> 都没证。也<em>没</em> 证一定有奇点——可能光滑, 可能不光滑, 谁也不知道。</li>
+</ul>
+
+<p>这道题<em>难</em> 在哪？数学上, 关键障碍是 \(L^p\) 估计的<em>临界标度</em>: Navier-Stokes 在 3D 是<em>能量临界</em> 的——能量估计给的紧致性<em>恰好不够</em> 控制非线性项。任何已知方法都<em>差一点点</em>——这就是著名的"<em>临界 \(L^3\)</em>" 障碍。</p>
+
+<p>物理学家普遍相信 \(\mathbb R^3\) 中 Navier-Stokes 不会爆破——湍流虽然剧烈, 但黏性扩散应足够阻止奇点形成。Tao 2014 给一些<em>假想 Navier-Stokes</em>（average 化的版本）的<em>显式爆破</em>, 显示数学障碍真实存在; 真 Navier-Stokes 是不是这样还不知道。</p>
+
+<p>悬赏 100 万还在桌面。如果你解决, 物理 + 数学双重永流。</p>
+
+<p>除了存在唯一性, 流体里其他经典问题:</p>
+<ul>
+  <li><em>湍流统计</em>: K41 的严格推导? 中间间歇性修正?</li>
+  <li><em>边界层分离</em>: 雷诺数大到一定时, 流体怎么从平板剥离, 出现湍流唤醒?</li>
+  <li><em>Reynolds 平均 N-S（RANS）的闭合</em>: 平均流方程包含未知的 Reynolds 应力, 工程模拟靠经验闭合（k-ε, k-ω）, 第一原理闭合是悬题。</li>
+  <li><em>湍流的相变性质</em>: 有没有"<em>湍流相变</em>"？能不能用统计力学语言写湍流分布函数？</li>
+</ul>
+
+<h2 id="sec19-9">19.9 临别话: 流体的双重身份</h2>
+
+<p>请你回头看流体力学的<em>位置</em>。它在物理学有<em>双重身份</em>:</p>
+
+<p><em>身份 1: 应用之王</em>。航空（飞机, 火箭）、海洋（船舶, 潮流）、气象（天气, 气候）、能源（油田, 风电）、生物（血流, 心脏, 鸟飞）、工业（化工反应器, 流水线）——几乎所有工程领域都靠流体力学。计算流体动力学（CFD）是<em>大产业</em>: 美军 + 波音 + 特斯拉的研发预算里 CFD 占很大份。</p>
+
+<p><em>身份 2: 数学难题之源</em>。Navier-Stokes 是 Clay 千禧年问题; 湍流是非线性物理的圣杯; 涡的拓扑学（结的概念）启发现代量子拓扑; 自由表面流（水面, 海浪, 飞沫）连接微分几何。Arnold 还把不可压无黏流体写成 Lie 群 \(\mathrm{SDiff}\)（保体积微分同胚群）上的 geodesic 流——这是<em>无穷维 Hamilton 系统</em> 的优美几何（Arnold 1966）。</p>
+
+<p>这种"<em>实用极广 + 理论极难</em>" 的组合让流体力学成为物理学最特别的学科。物理学家通常追求"<em>简单方程</em>"——Maxwell 4 条, Einstein 1 条。Navier-Stokes 也是 1 条+辅助条件, 但<em>解</em> 它的复杂度<em>开放</em>: 同一方程能描述静止的池水（解析解）和台风（湍流, 数值不可达全分辨率）。这条方程是<em>简单 ↔ 复杂</em> 在物理学的最强例子。</p>
+
+<p>本章只是入门——我们做了概念骨架（Eulerian 描述, 连续性, Euler, Navier-Stokes, Bernoulli, 涡度, Reynolds, Clay 问题）, 没碰可压缩气体动力学（激波, 跨音速, 超音速）、磁流体（MHD, 等离子体）、非牛顿流体（聚合物, 血液）、自由表面（海浪）等大块。Landau-Lifshitz <em>Fluid Mechanics</em>（第 6 卷）是经典参考; Acheson <em>Elementary Fluid Dynamics</em> 是良好教材。</p>
+
+<p>下一章我们做这本书最后的<em>跳跃</em>: 把 Lagrange / Hamilton 力学从<em>有限自由度</em>（粒子, 刚体）推广到<em>无穷自由度</em>（场）。这就是<em>经典场论</em>。前面 ch18 弹性体的位移场 \(\boldsymbol u(\boldsymbol x, t)\) + ch19 流体的速度场 \(\boldsymbol v(\boldsymbol x, t)\) 都是连续介质场的例子, 但场论不止于此——电磁场、引力场、Higgs 场, 都是无穷自由度系统, 都有同一架构: <em>Lagrangian 密度</em>。这是 QFT 的入口。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch18.html">← 上一章 · 第 18 章 弹性力学</a><a href="ch20.html">下一章 · 第 20 章 经典场论 →</a></nav>
+</main>
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 广义坐标与约束 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 中心力问题</a><a href="ch5.html">下一章 · 第 5 章 变分原理与 Euler-Lagrange →</a></nav>
+<h1 id="ch4">第 4 章 广义坐标与约束</h1>
+
+<p>请你具体看下面这道题。一根长 \(\ell\) 的轻绳, 一端固定在原点 \(O\), 一端挂质量为 \(m\) 的小球。小球在重力下摆动。求运动方程。</p>
+
+<p>这是中学题——单摆。可<em>怎么</em> 用 Newton \(\boldsymbol F = m \boldsymbol a\) 写出方程？我们试一下, 看看 Newton 风格在这道<em>简单</em> 问题上要做多少额外工作。</p>
+
+<h2 id="sec4-1">4.1 单摆 Newton 解法的复杂</h2>
+
+<p>选笛卡尔坐标 \((x, z)\), 摆球位置 \((x, z)\), 摆角 \(\theta\)（从竖直向下逆时针测量）。摆球受两个力: <em>重力</em> \(\boldsymbol F_g = (0, -mg)\), <em>绳张力</em> \(\boldsymbol T = T(-\sin \theta, \cos \theta)\)（沿绳向上, \(T \geq 0\) 是张力大小）。注意 \(T\) 是<em>未知</em>——它取决于运动状态, 不能事先给出。</p>
+
+<p>Newton 第二定律</p>
+
+<p>\[
+m \ddot x = -T \sin \theta, \quad m \ddot z = T \cos \theta - m g.
+\]</p>
+
+<p>两条方程, 三个未知量 \(x, z, T\)。需要补一个方程: <em>约束方程</em></p>
+
+<p>\[
+x^2 + z^2 = \ell^2.
+\]</p>
+
+<p>三个未知三条方程——可以解, 但代数痛苦。具体: 把 \(x = \ell \sin \theta, z = -\ell \cos \theta\)（消去 \(x, z\), 用 \(\theta\) 描述）, 求二阶导:</p>
+
+<p>\[
+\ddot x = \ell (\cos \theta \cdot \ddot \theta - \sin \theta \cdot \dot \theta^2), \quad \ddot z = \ell (\sin \theta \cdot \ddot \theta + \cos \theta \cdot \dot \theta^2).
+\]</p>
+
+<p>代回 \(m \ddot x = -T \sin \theta\):</p>
+
+<p>\[
+m \ell (\cos \theta \ddot \theta - \sin \theta \dot \theta^2) = -T \sin \theta.
+\]</p>
+
+<p>代回 \(m \ddot z = T \cos \theta - m g\):</p>
+
+<p>\[
+m \ell (\sin \theta \ddot \theta + \cos \theta \dot \theta^2) = T \cos \theta - m g.
+\]</p>
+
+<p>把第一式 \(\times \cos \theta\), 第二式 \(\times \sin \theta\), 相加</p>
+
+<p>\[
+m \ell \ddot \theta (\cos^2 \theta + \sin^2 \theta) = -T \sin \theta \cos \theta + T \sin \theta \cos \theta - m g \sin \theta = -m g \sin \theta.
+\]</p>
+
+<p>得 \(\ddot \theta = -(g/\ell) \sin \theta\)——单摆方程。</p>
+
+<p><em>张力哪去了</em>？两式相加时 \(T\) 项相消。所以 \(T\) 在最后方程里<em>消失</em>。如果你想<em>额外</em> 知道 \(T\), 把第一式 \(\times \sin \theta\)、第二式 \(\times \cos \theta\) 相减得 \(T = m g \cos \theta + m \ell \dot \theta^2\)（重力沿绳分量 + 圆周向心力）。</p>
+
+<p>请你停下来感受这套流程的<em>累赘</em>。我们想求<em>一</em> 个 ODE（关于 \(\theta(t)\)）, 走过了:</p>
+
+<ol>
+  <li>设笛卡尔坐标 \((x, z)\) 写两条 \(\boldsymbol F = m \boldsymbol a\)。</li>
+  <li>引入未知张力 \(T\)。</li>
+  <li>补约束方程 \(x^2 + z^2 = \ell^2\)。</li>
+  <li>用 \(\theta\) 参数化 \((x, z)\), 计算二阶导（链式法则两次）。</li>
+  <li>线性组合两条方程消去 \(T\)。</li>
+</ol>
+
+<p>5 步, 出来一行 \(\ddot \theta + (g/\ell) \sin \theta = 0\)。<em>张力</em> 这个量——我们根本不关心——占了大半精力。它是<em>约束力</em>: 维持绳长不变所需的力, 不在 \(\theta\) 方向做功, 但在笛卡尔分解里"<em>污染</em>" 了方程。</p>
+
+<p>这个例子是<em>最简单</em> 的约束系统。复杂例: 双摆——两根绳两个摆球, Newton 风格要算两个张力 + 两条约束 + 4 维 \((x_1, z_1, x_2, z_2)\), 总共 6 个未知 6 条方程。代数是噩梦。三摆? 球面摆? 滑块上的摆? <em>越复杂越绝望</em>。</p>
+
+<p>Lagrange 1788 的洞察: <em>从一开始就用 \(\theta\) 写方程, 不要走笛卡尔弯路</em>。\(\theta\) 是描述系统位形所需的<em>最少</em> 变量, 约束<em>自动</em> 满足（因 \(\theta\) 一旦给定, 摆球位置就在圆上, 不可能违约束）, 张力<em>不</em> 出现（因 \(\theta\) 方向是摆球能动的方向, 张力在这个方向无分量）。这就是 Lagrange 力学的<em>第一</em> 灵感——选对变量, 让<em>形式</em> 简化背后是<em>物理</em> 的洁净。</p>
+
+<p>这一章我们就把"<em>选对变量</em>" 这件事讲清。它的术语是 <strong>广义坐标</strong>。后面 ch5 在广义坐标基础上写出 Lagrangian 与 EL 方程, 力学正式跨进 Lagrange 时代。</p>
+
+<h2 id="sec4-2">4.2 广义坐标定义</h2>
+
+<p><strong>定义</strong>: 给定一个力学系统。它的 <em>位形</em>（configuration）由系统中所有粒子的位置决定。<em>广义坐标</em> 是<em>描述位形所需的最少独立变量</em>:</p>
+
+<p>\[
+(q_1, q_2, \ldots, q_n).
+\]</p>
+
+<p>这里 \(n\) 叫系统的 <em>自由度</em>（degrees of freedom, dof）。\(n\) 等于:</p>
+
+<p>\[
+n = (\text{所有粒子的笛卡尔分量数}) - (\text{约束方程数}).
+\]</p>
+
+<p>例:</p>
+
+<ul>
+  <li>3D 自由粒子: 1 粒子 × 3 分量 = 3, 无约束, \(n = 3\), 广义坐标 \((x, y, z)\) 或 \((r, \theta, \varphi)\)。</li>
+  <li>单摆: 1 粒子 × 2 分量（平面）= 2, 1 条约束 \(x^2 + z^2 = \ell^2\), \(n = 1\), 广义坐标 \(\theta\)。</li>
+  <li>双摆: 2 粒子 × 2 分量 = 4, 2 条约束 (\(\ell_1 = \) 常, \(\ell_2 = \) 常), \(n = 2\), 广义坐标 \((\theta_1, \theta_2)\)。</li>
+  <li>3D 刚体: 6 自由度（质心 3 + 朝向 3）, 广义坐标可选 \((\boldsymbol R, \alpha, \beta, \gamma)\)（位置 + 三个 Euler 角）。</li>
+</ul>
+
+<p>广义坐标的<em>关键性质</em>:</p>
+
+<ol>
+  <li><em>独立</em>: \(q_1, \ldots, q_n\) 之间没有约束方程。每个 \(q_i\) 可以独立地变（在它的允许范围内）。</li>
+  <li><em>完整</em>: 给定 \((q_1, \ldots, q_n)\), 系统的<em>每个</em> 粒子位置 \(\boldsymbol r_i\) 都被唯一确定: \(\boldsymbol r_i = \boldsymbol r_i(q_1, \ldots, q_n, t)\)（可能显含时间, 如果约束随时间变）。</li>
+  <li><em>自动满足约束</em>: 因为 \(\boldsymbol r_i\) 是用 \(\boldsymbol q\) 表达的, 所有"<em>距离</em>"" <em>角度</em>" 等约束在这个参数化下<em>恒成立</em>。</li>
+</ol>
+
+<p>第三条是<em>关键</em>。它把 Newton 框架里"<em>额外补一条约束方程, 引入未知张力</em>" 的复杂步骤<em>整个绕开</em>——你从一开始就在<em>位形空间</em>（configuration space, 维数 \(n\)）里走, 笛卡尔空间的多余维度从来没被引入。</p>
+
+<p><strong>位形空间</strong>: 所有可能位形的集合 \(\mathcal Q = \{(q_1, \ldots, q_n)\}\), 是个 \(n\) 维流形。单摆: \(\mathcal Q = S^1\)（圆）。双摆: \(\mathcal Q = S^1 \times S^1 = T^2\)（环面）。球面摆: \(\mathcal Q = S^2\)。3D 自由粒子: \(\mathcal Q = \mathbb R^3\)。刚体: \(\mathcal Q = \mathbb R^3 \times SO(3)\)。位形空间是力学的舞台, 系统的运动是 \(\mathcal Q\) 上的一条曲线 \(\boldsymbol q(t)\)。这种<em>几何</em> 视角是分析力学的精髓——<a href="ch24.html">ch24</a> 几何力学完整展开。</p>
+
+<h2 id="sec4-3">4.3 例子集</h2>
+
+<p><strong>(a) 单摆</strong>: 已讨论。\(n = 1\), \(q = \theta\)。\(\boldsymbol r = (\ell \sin \theta, -\ell \cos \theta)\)。</p>
+
+<p><strong>(b) 双摆</strong>: 第一根绳长 \(\ell_1\), 一端固定原点, 另一端挂质量 \(m_1\) 摆角 \(\theta_1\)。第二根绳长 \(\ell_2\), 一端挂在 \(m_1\), 另一端挂 \(m_2\), 摆角 \(\theta_2\)（独立于第一根, 从竖直方向测）。\(n = 2\), \(\boldsymbol q = (\theta_1, \theta_2)\)。</p>
+
+<p>\[
+\boldsymbol r_1 = (\ell_1 \sin \theta_1, -\ell_1 \cos \theta_1),
+\]
+\[
+\boldsymbol r_2 = (\ell_1 \sin \theta_1 + \ell_2 \sin \theta_2, -\ell_1 \cos \theta_1 - \ell_2 \cos \theta_2).
+\]</p>
+
+<p>给定 \((\theta_1, \theta_2)\), \(\boldsymbol r_1, \boldsymbol r_2\) 完全确定, 两条约束（绳长不变）<em>自动</em> 成立。</p>
+
+<p><strong>(c) 滑块上的摆</strong>: 质量 \(M\) 滑块沿水平轨道无摩擦滑行, 滑块上挂一根长 \(\ell\) 摆质量 \(m\)。\(n = 2\): 滑块位置 \(X\) + 摆角 \(\theta\)。</p>
+
+<p>\[
+\boldsymbol r_M = (X, 0), \quad \boldsymbol r_m = (X + \ell \sin \theta, -\ell \cos \theta).
+\]</p>
+
+<p>这是经典耦合振动例题。Newton 风格要算 3 个未知（\(X, \theta\) + 摆杆张力）, Lagrange 风格<em>2</em> 个广义坐标即可。</p>
+
+<p><strong>(d) 球面摆</strong>: 一根长 \(\ell\) 的绳, 一端固定一端挂质量 \(m\), 摆球可在以原点为中心、半径 \(\ell\) 的<em>球面</em> 上自由运动。\(n = 2\), 广义坐标可选球坐标 \((\theta, \varphi)\)（\(\theta\) 极角, \(\varphi\) 方位角）。</p>
+
+<p>\[
+\boldsymbol r = \ell (\sin \theta \cos \varphi, \sin \theta \sin \varphi, -\cos \theta).
+\]</p>
+
+<p>位形空间 \(\mathcal Q = S^2\)。这是 Lagrange 框架处理"<em>非平凡几何</em>" 的优势: 在 \(S^2\) 上选好坐标 \((\theta, \varphi)\), 直接写 Lagrangian, 完全不需要在三维笛卡尔空间里用约束 \(|\boldsymbol r| = \ell\) 兜圈子。</p>
+
+<p><strong>(e) 刚体</strong>: 由 \(N\) 粒子组成, 任意两粒子间距离固定。原始坐标 \(3 N\) 个, 距离约束 \(\binom{N}{2}\) 条, 但其中只有 \(3 N - 6\) 条独立（很容易过约束——\(N = 3\) 个点确定一个三角形, 3 条边长完全描述, 与 \(\binom{3}{2} = 3\) 一致; \(N = 4\) 个点, 6 条距离描述空间四面体, 与 \(\binom{4}{2} = 6\) 一致; 但 \(N = 5\) 个点, 6 个独立参数（4 面体 + 第 5 点的 3 维位置 - 3 个对其他点的距离 = 6）, 而 \(\binom{5}{2} = 10\) 条距离, 多出 4 条<em>非独立</em>）。</p>
+
+<p>结果: <em>3D 刚体有 6 个自由度</em>。\(n = 6\)。广义坐标可选: 质心位置 \((X, Y, Z)\) + 朝向 (3 个 Euler 角 \((\alpha, \beta, \gamma)\) 或四元数等其他表示)。<a href="ch9.html">ch9</a> 完整展开。</p>
+
+<h2 id="sec4-4">4.4 约束分类</h2>
+
+<p>约束按形式分两大类。</p>
+
+<p><strong>全约束</strong>（holonomic, integrable）: 约束方程可写成位置和时间的<em>代数</em> 关系</p>
+
+<p>\[
+f(\boldsymbol r_1, \ldots, \boldsymbol r_N, t) = 0.
+\]</p>
+
+<p>例: 绳长不变 \(|\boldsymbol r| = \ell\)（即 \(|\boldsymbol r|^2 - \ell^2 = 0\)）, 球面 \(|\boldsymbol r|^2 = R^2\), 表面方程 \(z = h(x, y)\)。全约束是<em>位置层面</em> 的限制——它在<em>任何时刻</em> 都给位置一条等式。\(k\) 条全约束把 \(3 N\) 个笛卡尔分量减到 \(3 N - k\) 个广义坐标, <em>不</em> 影响速度的独立性（\(\dot{\boldsymbol q}\) 是 \(n\) 维空间的任意切向量）。</p>
+
+<p><strong>非全约束</strong>（non-holonomic）: 约束含速度且<em>不可积</em>。典型例: 圆盘在地面无滑滚动。圆盘绕中心轴转动时, 无滑要求接触点速度为零</p>
+
+<p>\[
+\dot{\boldsymbol r}_{\text{触}} = \boldsymbol 0.
+\]</p>
+
+<p>这是一条<em>速度</em> 约束, 不是位置约束。它把瞬时速度限制在某子空间, 但<em>不</em> 限制位形——圆盘可以滚到地面任何点, 朝任何方向。位形空间维度<em>不变</em>, 但速度可达方向<em>受限</em>。</p>
+
+<p>判定: 一条约束 \(\sum_i \boldsymbol a_i \cdot d \boldsymbol r_i + a_0 dt = 0\) 是<em>全</em> 约束当且仅当存在某 \(f\) 使 \(\boldsymbol a_i = \partial f/\partial \boldsymbol r_i\) 且 \(a_0 = \partial f/\partial t\), 即上面的 1-形式是某 \(f\) 的全微分。\(\nabla \times\) 这一条件等价于 \(\boldsymbol a_i\) 的某些偏导对称（链<a href="../多元微积分/ch15.html">多元微积分 ch15</a>）。汽车前轮转向方程通常是非全约束: 转向限制车体瞬时速度方向, 但车可以平移到任何位置（停车 + 倒车的复杂操作就是为了"<em>积出</em>" 看似不能直接到达的位形）。</p>
+
+<p>这本书<em>主要处理全约束</em>——这是 Lagrange 1788 设计的范围。非全约束有专门理论（D'Alembert-Lagrange 方程的扩展形式 + Lagrange 乘子法）, <a href="ch6.html">ch6</a> 简要提及。绝大多数物理问题（粒子在面上 / 链条 / 摆 / 中心力 / 振动 / 行星）是全约束。</p>
+
+<p>另一个二分: <em>定常</em>（scleronomic）vs <em>非定常</em>（rheonomic）。定常约束<em>不</em> 显含时间 \(f(\boldsymbol r) = 0\); 非定常显含 \(f(\boldsymbol r, t) = 0\), 例如把单摆悬挂点设成<em>水平摆动</em>, 摆杆固定点 \(\boldsymbol R(t) = (a \cos \omega t, 0)\), 摆球位置 \(\boldsymbol r = \boldsymbol R(t) + \ell (\sin \theta, -\cos \theta)\), 约束 \(|\boldsymbol r - \boldsymbol R(t)| = \ell\) 显含 \(t\)。这种系统能量<em>不</em> 守恒（外界通过移动悬挂点对系统做功）, 但 EL 方程仍可正常写——Lagrange 框架处理非定常约束依然顺。</p>
+
+<h2 id="sec4-5">4.5 全约束自动消去</h2>
+
+<p>这一节我们正式说明: <em>选用广义坐标后, 全约束完全消失, 不再出现在方程里</em>。</p>
+
+<p>设有 \(N\) 粒子, \(k\) 条全约束。系统自由度 \(n = 3N - k\)。选 \(n\) 个广义坐标 \(q_1, \ldots, q_n\), 把每个 \(\boldsymbol r_i\) 表达为</p>
+
+<p>\[
+\boldsymbol r_i = \boldsymbol r_i(q_1, \ldots, q_n, t).
+\]</p>
+
+<p>这个映射 \((\boldsymbol q, t) \mapsto (\boldsymbol r_1, \ldots, \boldsymbol r_N)\) 把 \(n + 1\) 维 \((\boldsymbol q, t)\) 空间嵌入 \(3 N + 1\) 维 \((\boldsymbol r, t)\) 空间, 像是 \(n + 1\) 维子流形——这正是约束流形。</p>
+
+<p>由链式法则</p>
+
+<p>\[
+\dot{\boldsymbol r}_i = \sum_{\alpha=1}^n \frac{\partial \boldsymbol r_i}{\partial q_\alpha} \dot q_\alpha + \frac{\partial \boldsymbol r_i}{\partial t}.
+\]</p>
+
+<p>所以一旦给定 \(\boldsymbol q(t)\), 速度 \(\dot{\boldsymbol r}_i\) 也确定。系统的<em>整个</em> 动力学（位置 + 速度 + 加速度）都用 \(\boldsymbol q, \dot{\boldsymbol q}, \ddot{\boldsymbol q}\) 表达。</p>
+
+<p>动能</p>
+
+<p>\[
+T = \tfrac{1}{2} \sum_i m_i |\dot{\boldsymbol r}_i|^2 = \tfrac{1}{2} \sum_{\alpha, \beta} M_{\alpha \beta}(\boldsymbol q, t) \dot q_\alpha \dot q_\beta + \cdots
+\]</p>
+
+<p>是 \(\dot{\boldsymbol q}\) 的二次型, 系数 \(M_{\alpha \beta}\) 是<em>质量度量</em>（mass metric）, 一般依赖位置 \(\boldsymbol q\)（如球面摆 \(T = \tfrac{1}{2} m \ell^2 (\dot \theta^2 + \sin^2 \theta \dot \varphi^2)\), 系数随 \(\theta\) 变）。这条二次型给出位形空间的<em>Riemann 度量</em>——力学的"<em>距离</em>" 不是欧氏的, 而是质量加权的。这条线索一直到<a href="ch24.html">ch24</a> 几何力学。</p>
+
+<p>势能</p>
+
+<p>\[
+V = V(\boldsymbol r_1, \ldots, \boldsymbol r_N, t) = V(\boldsymbol r_1(\boldsymbol q, t), \ldots, t) = V(\boldsymbol q, t).
+\]</p>
+
+<p>把所有 \(\boldsymbol r_i\) 替换成 \(\boldsymbol q\) 的函数, \(V\) 也变成 \(\boldsymbol q\) 的函数。</p>
+
+<p>Lagrangian \(L(\boldsymbol q, \dot{\boldsymbol q}, t) = T - V\) 完全用广义坐标写出, 不出现笛卡尔位置, 不出现约束力。这就是"<em>全约束自动消去</em>"——它从来没出现在 Lagrangian 里, 自然在 EL 方程里也不出现。</p>
+
+<p>下一章我们正式给 EL 方程 + 用单摆 / 双摆 / 滑块上摆等 §4.3 例子练手, 让你看到广义坐标的<em>实操威力</em>。</p>
+
+<h2 id="sec4-6">4.6 虚位移与 d'Alembert 原理</h2>
+
+<p>这一节是 Lagrange 力学的<em>历史</em> 入口——从 Newton 的"<em>力</em>" 视角推到变分视角。读者可以选择跳过（§4.7 是后续章节的<em>选广义坐标</em> 实操向导, 与本节内容平行）, 但若想理解<em>为什么</em> EL 方程长那个样子, 这是最朴素的推导。</p>
+
+<p><strong>虚位移</strong>: 想象在<em>固定时刻</em> \(t\), 系统从位形 \(\boldsymbol q\) 微小移动到 \(\boldsymbol q + \delta \boldsymbol q\), 其中 \(\delta \boldsymbol q\) 是<em>瞬时</em> 的小位移, <em>不</em> 涉及时间流动 (\(\delta t = 0\))。在笛卡尔空间</p>
+
+<p>\[
+\delta \boldsymbol r_i = \sum_\alpha \frac{\partial \boldsymbol r_i}{\partial q_\alpha} \delta q_\alpha
+\]</p>
+
+<p>注意没有 \(\partial \boldsymbol r_i/\partial t\) 项（虚位移 \(\delta t = 0\)）。这种"<em>瞬时假想位移</em>" 跟<em>真</em> 位移 \(d \boldsymbol r_i = \dot{\boldsymbol r}_i dt\) 的区别在: 真位移含时间流动, 虚位移不含。</p>
+
+<p>虚位移的关键性质——它<em>遵循约束</em>: 因 \(\boldsymbol r_i\) 是 \(\boldsymbol q\) 的函数, 任何 \(\delta \boldsymbol q\) 给出的 \(\delta \boldsymbol r_i\) 都自动满足全约束（"<em>沿约束流形切方向变</em>"）。</p>
+
+<p><strong>约束力做的虚功</strong>: 设第 \(i\) 粒子受合力 \(\boldsymbol F_i = \boldsymbol F_i^{\text{appl}} + \boldsymbol F_i^{\text{constr}}\)（外加力 + 约束力）。对于<em>理想</em> 约束（光滑表面、刚性绳、刚体内力），约束力 \(\boldsymbol F_i^{\text{constr}}\) 在虚位移上做的<em>虚功</em></p>
+
+<p>\[
+\sum_i \boldsymbol F_i^{\text{constr}} \cdot \delta \boldsymbol r_i = 0.
+\]</p>
+
+<p>这是<em>理想约束</em> 的定义——约束力垂直于允许的运动方向（如绳张力垂直于摆球切向, 光滑面法向力垂直于面切向）。这一条假设把摩擦排除——摩擦做负功, 不算理想。</p>
+
+<p><strong>d'Alembert 原理</strong>（1743）: 真实运动满足</p>
+
+<p>\[
+\sum_i (\boldsymbol F_i^{\text{appl}} - m_i \ddot{\boldsymbol r}_i) \cdot \delta \boldsymbol r_i = 0
+\]</p>
+
+<p>对所有合容许虚位移 \(\delta \boldsymbol r_i\) 成立。推导: \(\boldsymbol F_i^{\text{tot}} = m_i \ddot{\boldsymbol r}_i\)（Newton 第二）, 代入 \(\boldsymbol F_i^{\text{tot}} = \boldsymbol F_i^{\text{appl}} + \boldsymbol F_i^{\text{constr}}\), 得 \((\boldsymbol F_i^{\text{appl}} - m_i \ddot{\boldsymbol r}_i) = -\boldsymbol F_i^{\text{constr}}\), 与 \(\delta \boldsymbol r_i\) 点乘求和等于 \(-\sum \boldsymbol F_i^{\text{constr}} \cdot \delta \boldsymbol r_i = 0\)（理想约束）。</p>
+
+<p>d'Alembert 原理是<em>约束力消去</em> 的根。把虚位移用广义坐标展开 \(\delta \boldsymbol r_i = \sum \partial \boldsymbol r_i/\partial q_\alpha \cdot \delta q_\alpha\):</p>
+
+<p>\[
+\sum_\alpha \left[\sum_i (\boldsymbol F_i^{\text{appl}} - m_i \ddot{\boldsymbol r}_i) \cdot \frac{\partial \boldsymbol r_i}{\partial q_\alpha} \right] \delta q_\alpha = 0.
+\]</p>
+
+<p>因 \(\delta q_\alpha\) 独立, 每个系数为零</p>
+
+<p>\[
+\sum_i (\boldsymbol F_i^{\text{appl}} - m_i \ddot{\boldsymbol r}_i) \cdot \frac{\partial \boldsymbol r_i}{\partial q_\alpha} = 0, \quad \alpha = 1, \ldots, n.
+\]</p>
+
+<p>这就是 \(n\) 条<em>广义运动方程</em>。可证（一些代数, 用链式法则）它等价于 EL 方程</p>
+
+<p>\[
+\frac{d}{dt} \frac{\partial T}{\partial \dot q_\alpha} - \frac{\partial T}{\partial q_\alpha} = Q_\alpha
+\]</p>
+
+<p>其中 \(Q_\alpha = \sum_i \boldsymbol F_i^{\text{appl}} \cdot \partial \boldsymbol r_i/\partial q_\alpha\) 是<em>广义力</em>。若外加力守恒 \(\boldsymbol F_i^{\text{appl}} = -\partial V/\partial \boldsymbol r_i\), 则 \(Q_\alpha = -\partial V/\partial q_\alpha\), 上式变成</p>
+
+<p>\[
+\frac{d}{dt} \frac{\partial L}{\partial \dot q_\alpha} - \frac{\partial L}{\partial q_\alpha} = 0, \quad L = T - V.
+\]</p>
+
+<p>这就是<em>Euler-Lagrange 方程</em>! 它从 d'Alembert 原理（即 \(\boldsymbol F = m \boldsymbol a\) + 理想约束）<em>推</em> 出来——所以与 Newton 力学完全等价, 只是表达更经济。</p>
+
+<p>请你停下来感受这条历史: Newton 1687 给 \(F = m a\), Lagrange 1788 把它在广义坐标下重写成 EL 方程。<em>底层物理一样</em>, 但<em>语言</em> 不同——后者去掉了约束力 + 笛卡尔分量, 直接在位形空间写。这就是从"<em>力</em>" 视角到"<em>能量 / 作用量</em>" 视角的转变, 是经典力学的成熟期。</p>
+
+<p>下一章我们用<em>变分原理</em>（Hamilton 原理: \(\delta S = 0\)）<em>独立</em> 推 EL 方程, 让你看到 Lagrange 力学的<em>另一</em> 推导路径——它不依赖 d'Alembert / Newton, 而把 \(\delta S = 0\) 作为<em>原始</em> 假设。两种推导给同样结果, 但变分原理在<em>推广</em>（场论, 相对论, 量子）中更强。</p>
+
+<h2 id="sec4-7">4.7 力学问题第一步: 选广义坐标 + 写出 \(T, V\)</h2>
+
+<p>从 ch5 起所有 Lagrange 解题都从<em>这一步</em> 开始。我们在这里立一个清单, 后面所有题都会用到。</p>
+
+<p><strong>步骤 1</strong>: 数自由度。\(n = 3 N - (\text{全约束数})\)。</p>
+
+<p><strong>步骤 2</strong>: 选 \(n\) 个广义坐标 \((q_1, \ldots, q_n)\)。挑原则: (a) 让<em>对称性</em> 显形（如有旋转对称, 用极角; 有平移对称, 用笛卡尔）; (b) 让<em>约束自动满足</em>（如限制在球面上, 用球坐标）; (c) 让<em>表达式简洁</em>（一般情况下试几种, 比比简洁性）。</p>
+
+<p><strong>步骤 3</strong>: 写每个粒子的位置 \(\boldsymbol r_i = \boldsymbol r_i(\boldsymbol q, t)\), 求速度 \(\dot{\boldsymbol r}_i\)（链式法则）。</p>
+
+<p><strong>步骤 4</strong>: 写动能 \(T = \tfrac{1}{2} \sum m_i |\dot{\boldsymbol r}_i|^2\) 用 \((\boldsymbol q, \dot{\boldsymbol q})\) 展开。</p>
+
+<p><strong>步骤 5</strong>: 写势能 \(V = V(\boldsymbol q)\), 把所有 \(\boldsymbol r_i\) 替换成 \(\boldsymbol q\)。</p>
+
+<p><strong>步骤 6</strong>: \(L = T - V\)。这是 Lagrangian。</p>
+
+<p>到这里已经做完<em>建模</em>。后面 ch5 会告诉你如何从 \(L\) 得 EL 方程, 即 \(n\) 条 ODE 控制 \(\boldsymbol q(t)\)。</p>
+
+<p>我们用单摆把这个流程跑一遍, 让你感受它有多快。</p>
+
+<p>1. 自由度 \(n = 1\), 选 \(q = \theta\)。</p>
+<p>2. 位置 \(\boldsymbol r = (\ell \sin \theta, -\ell \cos \theta)\)。</p>
+<p>3. 速度 \(\dot{\boldsymbol r} = \ell \dot \theta (\cos \theta, \sin \theta)\), \(|\dot{\boldsymbol r}|^2 = \ell^2 \dot \theta^2\)。</p>
+<p>4. \(T = \tfrac{1}{2} m \ell^2 \dot \theta^2\)。</p>
+<p>5. \(V = m g \cdot z = -m g \ell \cos \theta\)（取最低点 \(\theta = 0\) 为零势能, 加 \(m g \ell\) 常数后 \(V = m g \ell (1 - \cos \theta)\)——常数不影响 EOM, 任意取）。</p>
+<p>6. \(L = \tfrac{1}{2} m \ell^2 \dot \theta^2 + m g \ell \cos \theta\)。</p>
+
+<p>建模到此结束, <em>5 行</em>。比较 §4.1 的 Newton 风格 5 步 + 复杂代数, 你能直观看到 Lagrange 风格的<em>简洁</em>。</p>
+
+<p>请你心理上记住这条对比——单摆是<em>最简单</em> 的约束系统, Lagrange 风格已经显出优势; 双摆 / 滑块 + 摆 / 球面摆这类复杂系统, Lagrange 风格的优势会指数增长（Newton 风格根本写不动, Lagrange 风格仍是 5 步流程）。这就是为什么所有现代力学课程都在中级以上转向 Lagrange / Hamilton——Newton 风格能解的题它都能解, 反过来不行。</p>
+
+<p>下一章我们正式介绍<em>Hamilton 变分原理</em>——\(\delta S = 0\), \(S = \int L \, dt\)——并从中推出 EL 方程。然后用 EL 方程解 §4.3 所有例子。从那里起 Lagrange 力学正式启动。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch3.html">← 上一章 · 第 3 章 中心力问题</a><a href="ch5.html">下一章 · 第 5 章 变分原理与 Euler-Lagrange →</a></nav>
+</main>
+</body>
+</html>

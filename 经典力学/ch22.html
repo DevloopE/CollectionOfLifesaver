@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 22 章 相对论力学 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 经典 → 量子的桥</a><a href="ch23.html">下一章 · 第 23 章 航天器轨道 + 多体问题 →</a></nav>
+<h1 id="ch22">第 22 章 相对论力学</h1>
+
+<p>1905 年, 26 岁的 Albert Einstein 在瑞士伯尔尼专利局做 III 级技术员。这一年他发表了 4 篇论文, 后世称为<em>Annus Mirabilis</em>（奇迹年）——光电效应（量子）、布朗运动（统计）、狭义相对论、\(E = mc^2\)。其中第 3 篇《<em>论运动物体的电动力学</em>》给狭义相对论一个干净简洁的推导, 出发点只两条公设:</p>
+
+<ol>
+  <li><em>相对性原理</em>: 物理定律在所有惯性参考系中等价。</li>
+  <li><em>光速恒定</em>: 真空光速 \(c\) 在所有惯性系中相同, 与光源运动无关。</li>
+</ol>
+
+<p>看起来温和的两条, 数学后果是<em>颠覆性</em> 的。Newton 的"<em>绝对时间 + 绝对空间</em>" 死了——不同惯性系的<em>时间</em> 不一样, "<em>同时性</em>" 不再绝对; 长度收缩、时间延缓、\(E = mc^2\) 都从这两条公设直接长出。</p>
+
+<p>这一章把狭义相对论的<em>力学部分</em> 讲清——具体是: <em>相对论 Lagrangian 是什么形状？相对论动量 + 能量怎么定义？经典 Newton F = ma 怎么变？</em>这些问题让你看见前 21 章建立的 Lagrange-Hamilton 框架在<em>高速</em> 下怎么修——不是"<em>修小补丁</em>", 是"<em>本质重写</em>"。然后 ch23 用这套（加上 ch1-21 的工具）做航天器问题。</p>
+
+<p>本章<em>不</em> 涉及广义相对论（弯曲时空 + 引力 = 几何）——那是 V13 微分几何 ch23 的事。本章自包含狭义相对论。</p>
+
+<h2 id="sec22-1">22.1 狭义相对论复习</h2>
+
+<p>把核心结果列一下, 不证。完整推导见 V11 复分析 + V13 微分几何 ch20-22 或任何相对论教材。</p>
+
+<p><strong>Lorentz 变换</strong>。两个惯性系 \(S\) 与 \(S'\)（\(S'\) 相对 \(S\) 沿 \(x\) 轴匀速运动 \(v\)）, 时空坐标变换:</p>
+
+<p>\[
+\boxed{\ x' = \gamma (x - v t), \quad t' = \gamma \left( t - \frac{v x}{c^2} \right), \quad y' = y, \quad z' = z.\ }
+\]</p>
+
+<p>其中 \(\gamma = 1/\sqrt{1 - v^2/c^2}\)（Lorentz 因子）。\(v \ll c\) 时 \(\gamma \to 1\), 退化到 Galileo 变换 \(x' = x - v t, t' = t\)。</p>
+
+<p><strong>时间延缓</strong>。\(S'\) 系中的钟（静止）测得 1 秒, 在 \(S\) 系（钟运动）看是 \(\gamma\) 秒。<em>运动钟变慢</em>。</p>
+
+<p>例: GPS 卫星轨道速度 \(v \approx 4 \, \text{km/s}\), \(\gamma - 1 \approx v^2/(2c^2) \approx 9 \times 10^{-11}\), 即每秒钟慢约 0.1 微秒。GPS 系统<em>必须</em> 修正这个延缓 (再加上引力时间延缓 V13 ch23), 否则 24 小时后定位偏差累积到 10 公里——GPS 不可用。狭义相对论是<em>实用工程</em>。</p>
+
+<p><strong>长度收缩</strong>。\(S'\) 系中静止的杆长 \(L_0\), 在 \(S\) 系（杆运动）测得 \(L = L_0 / \gamma\)。<em>运动物体在运动方向收缩</em>。</p>
+
+<p><strong>同时性相对</strong>。\(S\) 系中两事件"<em>同时</em>"（\(t_1 = t_2\) 但 \(x_1 \neq x_2\)), 在 \(S'\) 系中<em>不</em> 同时: \(t_1' - t_2' = -\gamma v (x_1 - x_2)/c^2 \neq 0\)。<em>"现在" 不是普适概念</em>——不同惯性系的"<em>当前时刻</em>" 是不同的"<em>时空切片</em>"。</p>
+
+<p>这三个结果（时间延缓 + 长度收缩 + 同时性相对）<em>不</em> 独立——它们是 Lorentz 变换的三个面。物理上: 时间 + 空间不再分开, 它们合成<em>4 维 Minkowski 时空</em>, Lorentz 变换是"<em>时空旋转</em>"（含双曲角度 \(\tanh \phi = v/c\)）。下节正式定义。</p>
+
+<h2 id="sec22-2">22.2 4-向量 + Minkowski 时空</h2>
+
+<p>把时间 + 空间统一成 4 维实向量空间 \(\mathbb R^4\), 坐标 \(x^\mu = (x^0, x^1, x^2, x^3) = (ct, x, y, z)\)（希腊指标 \(\mu = 0, 1, 2, 3\)）。时间分量 \(x^0 = ct\) 乘上 \(c\) 让所有分量同量纲（长度）。</p>
+
+<p>定义<em>Minkowski 度量</em>:</p>
+
+<p>\[
+\eta_{\mu \nu} = \operatorname{diag}(-1, +1, +1, +1)
+\]</p>
+
+<p>(粒子物理常用 \((-, +, +, +)\) 或 \((+, -, -, -)\); 选哪种是惯例, 物理一致。本书用 \((-, +, +, +)\)。)</p>
+
+<p>4-向量内积: \(A \cdot B = \eta_{\mu \nu} A^\mu B^\nu = -A^0 B^0 + \boldsymbol A \cdot \boldsymbol B\)。<em>不是</em> 正定——<em>有正负</em>。</p>
+
+<p>对位置 4-向量 \(x^\mu\):</p>
+
+<p>\[
+x \cdot x = -c^2 t^2 + r^2.
+\]</p>
+
+<p>事件 \((t, \boldsymbol r)\) 与原点的"<em>时空间隔</em>"。三种情况:</p>
+
+<ul>
+  <li>\(x \cdot x < 0\): <em>类时</em> 间隔——\(c^2 t^2 > r^2\), 信号能从原点到达此事件。</li>
+  <li>\(x \cdot x > 0\): <em>类空</em>——\(c^2 t^2 < r^2\), 不能因果连接。</li>
+  <li>\(x \cdot x = 0\): <em>类光</em>——光信号沿光锥。</li>
+</ul>
+
+<p><em>Lorentz 变换是保 \(\eta\) 的线性变换</em>: \(x'^\mu = \Lambda^\mu_\nu x^\nu\), 其中 \(\Lambda^T \eta \Lambda = \eta\)。\(x \cdot x\) 在 Lorentz 变换下不变——所有惯性系一致。</p>
+
+<p>定义粒子的<em>固有时</em> \(\tau\):</p>
+
+<p>\[
+d \tau = \sqrt{- (dx/c)^2} = \sqrt{dt^2 - d \boldsymbol r^2/c^2} = dt / \gamma.
+\]</p>
+
+<p>这是粒子<em>自己钟</em> 测得的时间。它<em>是 Lorentz 不变量</em>——不依赖参考系。</p>
+
+<p><em>4-速度</em>:</p>
+
+<p>\[
+u^\mu = \frac{dx^\mu}{d\tau} = \gamma (c, \boldsymbol v).
+\]</p>
+
+<p>这是 Lorentz 变换下的 4-向量（因为 \(dx^\mu\) 是 4-向量, \(d\tau\) 是不变量）。</p>
+
+<p>\(u \cdot u = -\gamma^2 c^2 + \gamma^2 v^2 = -\gamma^2 (c^2 - v^2) = -c^2\) (常数)。<em>所有粒子的 4-速度模都是 \(c\)（\(\sqrt{|u \cdot u|} = c\)）</em>——不管运动多快。</p>
+
+<p><em>4-动量</em>:</p>
+
+<p>\[
+\boxed{\ p^\mu = m u^\mu = (\gamma m c, \gamma m \boldsymbol v).\ }
+\]</p>
+
+<p>\(m\) 是粒子<em>静质量</em>（不变量）。\(p^\mu\) 是 4-向量。</p>
+
+<h2 id="sec22-3">22.3 \(E = m c^2 \gamma\) + 质壳条件</h2>
+
+<p>分别看 4-动量两部分:</p>
+
+<ul>
+  <li>空间部分: \(\boldsymbol p = \gamma m \boldsymbol v\)。<em>相对论动量</em>, 与 Newton 经典动量 \(m \boldsymbol v\) 差 \(\gamma\) 因子。\(v \ll c\) 时 \(\gamma \to 1\), 退化经典。</li>
+  <li>时间部分: \(p^0 = \gamma m c\)。给它一个解释——<em>能量除以 \(c\)</em>: \(E = p^0 c = \gamma m c^2\)。</li>
+</ul>
+
+<p>所以</p>
+
+<p>\[
+\boxed{\ E = \gamma m c^2 = \frac{m c^2}{\sqrt{1 - v^2/c^2}}.\ }
+\]</p>
+
+<p>当 \(v = 0\): \(\gamma = 1\), \(E = m c^2\)。<em>静止能量</em>——著名的 \(E = mc^2\)。粒子即使静止, 也有内禀能量 \(mc^2\)（来自质量自身）。</p>
+
+<p>当 \(v \ll c\): 展开 \(\gamma = 1 + v^2/(2 c^2) + O(v^4/c^4)\)。所以</p>
+
+<p>\[
+E = m c^2 + \frac{1}{2} m v^2 + O(v^4/c^2).
+\]</p>
+
+<p>第一项是静止能, 第二项是<em>经典动能</em> \(T = m v^2/2\)。<em>相对论能量在低速极限退化为经典动能 + 静止能</em>。Newton 力学里"<em>能量</em>" 的零点选择不重要; 相对论里能量的零点是<em>静止能</em>, 物理意义具体——可以转换为光子, 进入核反应, etc。</p>
+
+<p>4-动量内积:</p>
+
+<p>\[
+p \cdot p = -E^2/c^2 + \boldsymbol p^2.
+\]</p>
+
+<p>计算: \(p \cdot p = m^2 (u \cdot u) = -m^2 c^2\)。所以</p>
+
+<p>\[
+\boxed{\ E^2 = (\boldsymbol p c)^2 + (m c^2)^2.\ }
+\]</p>
+
+<p>这是<em>相对论能量-动量关系</em>, 也叫<em>质壳条件</em>（mass shell condition）——粒子的 \((E, \boldsymbol p)\) 必须满足。</p>
+
+<p>三种特殊情况:</p>
+
+<ul>
+  <li>\(\boldsymbol p = 0\): \(E = m c^2\)。静止粒子。</li>
+  <li>\(m = 0\)（光子, 胶子）: \(E = |\boldsymbol p| c\)。光子动量与能量直接成比例。</li>
+  <li>\(|\boldsymbol p| \ll m c\): \(E \approx m c^2 + \boldsymbol p^2 / (2 m)\)。低速极限——经典动能。</li>
+</ul>
+
+<p>这条公式让"<em>无质量粒子</em>" 在相对论里有清晰意义: \(m = 0\) 给 \(E = |\boldsymbol p| c\), <em>必须</em> \(v = c\) 移动（否则 \(\gamma = \infty \cdot 0\) 不定; 用 \(v = pc^2/E = c\) 直接验证）。光子 + 胶子 + 引力子<em>必</em> 以光速运动, 因为它们无质量。</p>
+
+<h2 id="sec22-4">22.4 相对论 Lagrangian</h2>
+
+<p>怎么写一个<em>Lorentz 不变</em> 的 Lagrangian？回到 Lagrange 力学的<em>哲学</em>: 给一条路径 \(x^\mu(\sigma)\)（参数 \(\sigma\) 任选）, 作用量是某个 Lorentz 标量沿路径的积分。最简单的"<em>沿路径的不变量</em>" 是<em>固有时</em> \(\tau\)。</p>
+
+<p>试: <em>自由相对论粒子的作用量正比于固有时</em>。</p>
+
+<p>\[
+S = -\alpha \int d \tau = -\alpha \int \sqrt{1 - v^2/c^2} \, dt.
+\]</p>
+
+<p>(负号 + 系数 \(\alpha\) 待定。) 这就给了 Lagrangian</p>
+
+<p>\[
+L = -\alpha \sqrt{1 - v^2/c^2}.
+\]</p>
+
+<p>定 \(\alpha\): 低速展开 \(L = -\alpha (1 - v^2/(2c^2)) = -\alpha + \alpha v^2/(2 c^2)\)。要求与经典 \(L = m v^2/2\) 在低速一致, 取 \(\alpha = m c^2\)。所以</p>
+
+<p>\[
+\boxed{\ L = -m c^2 \sqrt{1 - v^2/c^2}.\ }
+\]</p>
+
+<p>(常数项 \(-m c^2\) 是 <em>负</em> 静止能, 对运动方程没贡献; 物理上经常忽略。但保留它让 \(L\) 是 Lorentz 标量乘 \(d t/d \tau = \gamma\) 的负数。)</p>
+
+<p>检验 4-动量:</p>
+
+<p>\[
+\boldsymbol p = \frac{\partial L}{\partial \boldsymbol v} = -m c^2 \cdot \frac{- \boldsymbol v / c^2}{\sqrt{1 - v^2/c^2}} = \gamma m \boldsymbol v.
+\]</p>
+
+<p>正是相对论动量 (22.2 节的定义)。</p>
+
+<p>能量（用 Hamilton 公式 \(H = \boldsymbol p \cdot \boldsymbol v - L\)）:</p>
+
+<p>\[
+H = \gamma m \boldsymbol v \cdot \boldsymbol v + m c^2 \sqrt{1 - v^2/c^2} = \gamma m v^2 + m c^2 / \gamma.
+\]</p>
+
+<p>用 \(\gamma^2 (1 - v^2/c^2) = 1\) 化简: \(\gamma m v^2 + m c^2/\gamma = m c^2 (\gamma^2 v^2/c^2 + 1/\gamma)/\gamma \cdot \gamma = \gamma m c^2\)。所以 \(H = \gamma m c^2 = E\), 一致。</p>
+
+<p>请你停下感受这件事: <em>一行最简单的 Lorentz 不变量（固有时）作为作用量, 自动给出相对论动量 + 能量 + EL 方程</em>。这就是变分原理在相对论里的力量——它给"<em>怎么把经典力学与相对论一致</em>" 一个机械的答案。Newton 风格"<em>修动量公式</em>" 看起来是补丁, 但 Lagrangian 风格<em>原则上</em> 自然。</p>
+
+<h2 id="sec22-5">22.5 EL 方程 + 相对论 \(\boldsymbol F = d\boldsymbol p/dt\)</h2>
+
+<p>对自由相对论粒子, EL 方程</p>
+
+<p>\[
+\frac{d}{dt} \frac{\partial L}{\partial \dot {\boldsymbol r}} - \frac{\partial L}{\partial \boldsymbol r} = 0
+\]</p>
+
+<p>给 \(d \boldsymbol p / dt = 0\)（因为 \(L\) 不依赖 \(\boldsymbol r\)）。即 \(\boldsymbol p\) 守恒——自由粒子动量守恒, 与经典一致。</p>
+
+<p>加外势 \(V(\boldsymbol r)\): \(L = -m c^2 \sqrt{1 - v^2/c^2} - V(\boldsymbol r)\)。EL 方程</p>
+
+<p>\[
+\boxed{\ \frac{d \boldsymbol p}{dt} = -\nabla V \equiv \boldsymbol F.\ }
+\]</p>
+
+<p>看起来和 Newton 一样——但 \(\boldsymbol p = \gamma m \boldsymbol v\) 不是 \(m \boldsymbol v\)。所以"<em>力 = 动量变化率</em>" 这条<em>更基本</em> 的形式在相对论中保持; 而"<em>力 = 质量乘加速度</em>" \(\boldsymbol F = m \boldsymbol a\) 不再成立。</p>
+
+<p>具体: 设 \(\boldsymbol v\) 方向为 \(\boldsymbol v\)。\(\boldsymbol F = d (\gamma m \boldsymbol v)/dt\)。展开:</p>
+
+<p>\[
+\boldsymbol F = m \dot \gamma \boldsymbol v + \gamma m \dot{\boldsymbol v}.
+\]</p>
+
+<p>\(\dot \gamma = \gamma^3 (\boldsymbol v \cdot \boldsymbol a)/c^2\), 所以</p>
+
+<p>\[
+\boldsymbol F = \gamma^3 m (\boldsymbol v \cdot \boldsymbol a) \boldsymbol v / c^2 + \gamma m \boldsymbol a.
+\]</p>
+
+<p>分两种情况:</p>
+
+<ul>
+  <li><em>\(\boldsymbol F \parallel \boldsymbol v\)</em>（纵向力）: \(\boldsymbol a \parallel \boldsymbol v\), \(\boldsymbol F = m \gamma^3 \boldsymbol a\)。"<em>纵向质量</em>" \(\gamma^3 m\)。</li>
+  <li><em>\(\boldsymbol F \perp \boldsymbol v\)</em>（横向力）: \(\boldsymbol a \perp \boldsymbol v\), \(\boldsymbol F = \gamma m \boldsymbol a\)。"<em>横向质量</em>" \(\gamma m\)。</li>
+</ul>
+
+<p>所以"<em>有效惯性</em>" 在相对论里依赖力的方向。这就是为什么"<em>相对论质量</em>" 这个旧概念被现代物理废弃——它依赖参考系 + 力方向, 没有干净意义。<em>静质量 \(m\)</em>（Lorentz 不变）才是有意义的。</p>
+
+<p>实际计算用 \(\boldsymbol F = d\boldsymbol p/dt\) 简单——把动量当作基本量, 不引入"<em>相对论质量</em>"。</p>
+
+<p>例: 直线加速器。常 \(F\) 沿 \(x\) 方向, 粒子从静止加速。\(d p/dt = F\), \(p(t) = F t\), 即 \(\gamma m v(t) = F t\), 解 \(v(t) = F t / \sqrt{m^2 + (F t/c)^2}\)。当 \(t \to \infty\), \(v \to c\)（不达到, 渐近）。<em>无论加速多久, 粒子永远不达光速</em>——这是相对论的"<em>光速壁障</em>", 是 Newton F = ma 完全做不到的（Newton 给 \(v = F t/m \to \infty\)）。</p>
+
+<h2 id="sec22-6">22.6 Minkowski 时空中的"测地线"</h2>
+
+<p>把"<em>自由相对论粒子作用量 \(\propto -\int d \tau\)</em>" 换个角度: 自由粒子<em>极小化固有时积分</em>。但在 Minkowski 度量 \((-, +, +, +)\) 下, "<em>极小</em>" 实际是"<em>极大固有时</em>"——因为度量符号差。</p>
+
+<p>这是<em>测地线原理</em> 在平直时空里的版本: <em>自由相对论粒子的世界线是 Minkowski 时空的"测地线"——4 维直线</em>。</p>
+
+<p>用变分法: \(S = -m c^2 \int d \tau = -m c \int \sqrt{-\eta_{\mu \nu} dx^\mu dx^\nu}\)。把路径参数化 \(x^\mu(\sigma)\), 作用量</p>
+
+<p>\[
+S = -m c \int \sqrt{-\eta_{\mu \nu} \dot x^\mu \dot x^\nu} \, d\sigma,
+\]</p>
+
+<p>(\(\dot{} = d/d\sigma\))。EL 方程</p>
+
+<p>\[
+\frac{d}{d\sigma} \frac{\eta_{\mu \nu} \dot x^\nu}{\sqrt{-\eta_{\rho \sigma} \dot x^\rho \dot x^\sigma}} = 0.
+\]</p>
+
+<p>选 \(\sigma = \tau\)（固有时参数化）, 分母 \(c\), 简化为</p>
+
+<p>\[
+\frac{d^2 x^\mu}{d\tau^2} = 0.
+\]</p>
+
+<p>\(x^\mu(\tau) = a^\mu \tau + b^\mu\)——4 维直线。这就是<em>Minkowski 测地线</em>。</p>
+
+<p>这条变分原理形式为<em>广义相对论</em>（弯曲时空）做了铺垫。GR 里时空度量 \(g_{\mu \nu}(x)\) 不是常数 \(\eta\), 而是依赖位置的张量场。但作用量形式不变: 自由粒子作用量 \(\propto -m c \int \sqrt{-g_{\mu \nu} \dot x^\mu \dot x^\nu} \, d\sigma\), EL 方程给<em>弯曲时空测地线方程</em>:</p>
+
+<p>\[
+\frac{d^2 x^\mu}{d\tau^2} + \Gamma^\mu_{\nu \rho} \frac{dx^\nu}{d\tau} \frac{dx^\rho}{d\tau} = 0.
+\]</p>
+
+<p>(\(\Gamma\) 是 Christoffel 符号, 依赖度量。) 这是<em>引力</em> 的相对论描述——引力<em>不是</em> 一种力, 是<em>时空弯曲</em>; 自由粒子在弯曲时空"<em>沿测地线</em>" 运动, 这"<em>测地线</em>" 在远处看就是被引力源弯曲的轨道。</p>
+
+<p>详细 GR 见 V13 微分几何 ch23 + ch24。本章只指出: <em>相对论 Lagrange 形式自然推广到弯曲时空 = 引力</em>。Newton F = ma 完全做不到这一步——它写在欧氏空间, 没法直接搬到弯曲流形。这就是 Lagrangian 力学的<em>推广性</em>（链<a href="ch1.html">第 1 章</a> 1.5 节"<em>第三个理由</em>"）的最深例子。</p>
+
+<h2 id="sec22-7">22.7 经典 \(\to\) 相对论的连续过渡</h2>
+
+<p>相对论力学不是"<em>替代</em>" 经典力学的一种新理论——它<em>包含</em> 经典力学作为低速极限。具体过渡:</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">经典 (\(v \ll c\))</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">相对论</th></tr>
+<tr><td style="padding: 0.3em 1em;">动量 \(\boldsymbol p = m \boldsymbol v\)</td><td style="padding: 0.3em 1em;">\(\boldsymbol p = \gamma m \boldsymbol v\)</td></tr>
+<tr><td style="padding: 0.3em 1em;">动能 \(T = m v^2/2\)</td><td style="padding: 0.3em 1em;">\(T = (\gamma - 1) m c^2\)</td></tr>
+<tr><td style="padding: 0.3em 1em;">能量 \(E = T + V\)</td><td style="padding: 0.3em 1em;">\(E = \gamma m c^2 + V\)（含静止能）</td></tr>
+<tr><td style="padding: 0.3em 1em;">F = ma</td><td style="padding: 0.3em 1em;">\(\boldsymbol F = d \boldsymbol p/dt\), 不等于 \(m \boldsymbol a\)</td></tr>
+<tr><td style="padding: 0.3em 1em;">Lagrangian \(L = T - V\)</td><td style="padding: 0.3em 1em;">\(L = -m c^2/\gamma - V\)</td></tr>
+<tr><td style="padding: 0.3em 1em;">质量守恒</td><td style="padding: 0.3em 1em;">\(E = mc^2\), 质能可换</td></tr>
+<tr><td style="padding: 0.3em 1em;">Galileo 变换</td><td style="padding: 0.3em 1em;">Lorentz 变换</td></tr>
+<tr><td style="padding: 0.3em 1em;">绝对时间</td><td style="padding: 0.3em 1em;">同时性相对</td></tr>
+</table>
+
+<p>每条相对论结果在 \(v \ll c\)（即 \(\gamma \to 1\)）时<em>连续</em> 退化为经典。这种"<em>限于光速壁垒, 加上同时性相对</em>" 的修改是<em>必需的</em>——因为 Newton 力学与 Maxwell 电动力学（其中光速 \(c\) 是普适常数）<em>不</em> 相容。19 世纪末的 Michelson-Morley 实验直接证实光速恒定; 1900 年前后整个物理界感受到危机, 1905 Einstein 给一个干净答案。</p>
+
+<p>请你欣赏这种"<em>新理论包含旧理论作极限</em>" 模式: 它在物理学反复出现——量子力学包含经典力学作 \(\hbar \to 0\) 极限; 广义相对论包含狭义相对论作弱场 + 平直时空极限; 量子场论包含量子力学作 1 粒子部分。<em>新理论不打破旧的, 而是把旧的作为它的某种极限</em>。这种结构上的连续性是物理学进步的特征。</p>
+
+<h2 id="sec22-8">22.8 通向广义相对论</h2>
+
+<p>狭义相对论假设惯性参考系 + 平直 Minkowski 时空。但<em>引力</em> 在狭义相对论里很别扭——Newton 引力 \(F = G m_1 m_2 / r^2\) 是<em>瞬时</em> 作用 (\(r\) 一变, \(F\) 立即变), 这违反"<em>没有信号超光速</em>"。所以 Newton 引力<em>必须</em> 修。</p>
+
+<p>1907 年 Einstein 想到"<em>引力 = 加速度</em>" 等效原理: <em>自由下落的人感受不到引力</em>——他的参考系局部等价于无引力的惯性系。这给了他一个想法——也许"<em>引力</em>" 是因为我们选了"<em>错</em>" 的参考系（非惯性的）。</p>
+
+<p>1915 年（8 年艰苦数学奋斗后）Einstein 给广义相对论:</p>
+
+<ul>
+  <li><em>时空是 4 维伪 Riemann 流形</em>（弯曲, 度量符号 \((-,+,+,+)\)）。</li>
+  <li><em>物质 / 能量分布弯曲时空</em>: Einstein 场方程 \(R_{\mu \nu} - g_{\mu \nu} R/2 = 8 \pi G T_{\mu \nu}/c^4\)。</li>
+  <li><em>自由粒子沿测地线</em>（22.6 节）。<em>引力</em> 不是力, 是时空弯曲的几何效应。</li>
+</ul>
+
+<p>详见 V13 微分几何 ch23-24（Einstein-Hilbert 作用量 + 弯曲测地线 + 黑洞 + 宇宙学）。</p>
+
+<p>本节只把通往 GR 的<em>力学连接</em> 讲清。狭义相对论的<em>4-向量 + 测地线 + Lagrangian \(\propto \int d\tau\)</em> 是 GR 的核心组件——只把 \(\eta\) 换成弯曲度量 \(g(x)\), 框架不变。这就是为什么 Lagrangian 力学是<em>广义相对论的天然语言</em>: 它本来就处理任意"<em>几何</em>" 上的力学。</p>
+
+<p>请你看这条逻辑: 我们走过四步——</p>
+
+<ol>
+  <li>Newton 力学（欧氏 3 维空间, 绝对时间）。</li>
+  <li>Lagrange 力学（任意广义坐标流形 + 时间）。</li>
+  <li>狭义相对论（Minkowski 4 维平直时空）。</li>
+  <li>广义相对论（Riemann 4 维弯曲时空）。</li>
+</ol>
+
+<p>每步都<em>包含</em> 上一步作为极限。Lagrange 力学是<em>跨越</em> 1 → 3 的数学工具——它的"<em>不依赖坐标系 + 度量友好</em>" 性质让 Newton → Einstein 路径可走。这就是 ch1 提的"<em>Lagrange 的推广性</em>" 的最戏剧体现。</p>
+
+<h2 id="sec22-9">22.9 临别话</h2>
+
+<p>这一章给了你<em>狭义相对论的力学骨架</em>: 4-向量 + Minkowski 度量 + 相对论 Lagrangian + \(E = mc^2\) + \(\boldsymbol F = d\boldsymbol p/dt\)。完整推导（电磁场 + 4-势 + 张量 / 旋量场）超出本书, 见 Jackson 电动力学 + Wald 一般相对论 + Carroll 时空与几何。</p>
+
+<p>本章关键提取:</p>
+
+<ul>
+  <li>狭义相对论从 2 条公设（相对性 + 光速恒定）+ 4 维 Minkowski 时空建出。</li>
+  <li>4-动量 \(p^\mu\) 是相对论的基本动力学量, 满足质壳条件 \(E^2 = (pc)^2 + (mc^2)^2\)。</li>
+  <li>相对论 Lagrangian \(L = -m c^2/\gamma\) 是<em>固有时积分</em> 的负数, Lorentz 不变。</li>
+  <li>EL 方程给 \(\boldsymbol F = d \boldsymbol p/dt\)（不是 \(m \boldsymbol a\)）。</li>
+  <li>自由粒子是 Minkowski 测地线; 推广到弯曲时空 = 广义相对论。</li>
+  <li>Lagrangian 力学的几何兼容性<em>必然</em> 通向 Einstein——这是 ch1 末尾推广性的最深应用。</li>
+</ul>
+
+<p>下一章我们把所有工具（Newton + Lagrange + Hamilton, ch1-22）应用到一个具体宏伟问题——<em>航天器轨道 + 多体力学</em>。Lagrange 点、引力借助、Hohmann 转移——21 世纪航天工程的力学基础。这是经典力学的<em>实用主义</em> 体现, 让你看到这套抽象数学如何让 Voyager 探测器到达星际 + JWST 部署到 \(L_2\) 点。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch21.html">← 上一章 · 第 21 章 经典 → 量子的桥</a><a href="ch23.html">下一章 · 第 23 章 航天器轨道 + 多体问题 →</a></nav>
+</main>
+</body>
+</html>

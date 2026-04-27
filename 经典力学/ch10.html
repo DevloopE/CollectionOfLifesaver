@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 10 章 Legendre 变换 + Hamiltonian — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 刚体动力学 + 欧拉角</a><a href="ch11.html">下一章 · 第 11 章 Hamilton 方程 + 相空间 →</a></nav>
+<h1 id="ch10">第 10 章 Legendre 变换 + Hamiltonian</h1>
+
+<p>到这里, Lagrange 力学的画面已经站住——你写下 \(L(q, \dot q, t)\), 套 EL 方程 \(\frac{d}{dt} \partial L / \partial \dot q = \partial L / \partial q\), 得到运动方程。这套语言简洁、强大, 处理约束、对称、推广到弯曲空间都游刃有余。看起来一切完美。</p>
+
+<p>但 1833 年 William Rowan Hamilton 发现 Lagrange 风格的<em>一个</em>瑕疵: 描述系统状态用的<em>两个变量</em>—— \(q\) 与 \(\dot q\)——<em>地位不对称</em>。\(q\) 是<em>位置</em>, 是基本量; \(\dot q\) 是<em>位置的时间导数</em>, 是<em>派生量</em>。如果只给你 \(q(t_0)\), 你不知道系统未来; 只给你 \(\dot q(t_0)\), 你也不知道。但<em>同时给</em> \(q(t_0)\) 与 \(\dot q(t_0)\) 你才知道。所以 \(q, \dot q\) 这一对是"<em>位置 + 它的导数</em>", 一个主, 一个从。</p>
+
+<p>这种"<em>主从</em>" 关系在数学上让人不舒服: 它不"<em>对称</em>"。<em>2n</em> 维的状态空间分成<em>n</em> 维位置 + <em>n</em> 维"<em>位置的导数</em>", 后者是前者的衍生品, 整个空间不平等。Hamilton 想——能不能找一对<em>地位平等</em> 的变量, 也是 \(2n\) 维, 但每个都<em>独立</em>, 没有谁是谁的导数?</p>
+
+<p>请你停下来认真想这个动机。一开始它<em>听起来像审美洁癖</em>——管它对称不对称, 反正物理结果一样。但 Hamilton 押对了: 这种"<em>找一对平等变量</em>" 的洁癖背后藏着一个深刻的几何结构, 叫<em>相空间</em>（phase space）, 它会成为 Hamilton 力学 / 统计力学 / 量子力学的<em>共同舞台</em>。所有现代物理（除了广义相对论）都搭建在相空间上。所以这一章的"<em>变换</em>" 不是为了简化计算, 是为了暴露<em>更深的几何</em>。</p>
+
+<p>具体怎么做? 引入<em>共轭动量</em> \(p = \partial L / \partial \dot q\) 替换 \(\dot q\)。这步把"<em>位置 + 速度</em>" 变成"<em>位置 + 动量</em>"。然后用一个叫<em>Legendre 变换</em> 的数学工具, 把 Lagrangian \(L(q, \dot q)\) 替换成<em>Hamiltonian</em> \(H(q, p)\)。整个语言换了, 但物理一样——这就是 Hamilton 力学。本章铺设这次"<em>语言换装</em>" 的全部细节。</p>
+
+<h2 id="sec10-1">10.1 \((q, \dot q)\) 的不对称</h2>
+
+<p>具体看一个例子, 说明 \(q, \dot q\) 的不对称。设单粒子在势 \(V(x)\) 中, \(L = \frac{1}{2} m \dot x^2 - V(x)\)。状态空间是 \((x, \dot x)\), 二维。EL 方程 \(m \ddot x = -V'(x)\), 即 \(\ddot x\) 由 \((x, \dot x)\) 决定。</p>
+
+<p>问题: 如果只给我 \(x = 0\), 我能算 \(\ddot x\) 吗? 不能——还要 \(\dot x\)。如果只给我 \(\dot x = 1\), 能不能算 \(\ddot x\)? 不能——还要 \(x\) 决定 \(V'(x)\)。所以两个变量<em>都</em> 必要。这个意义上 \(x\) 和 \(\dot x\) 平等。</p>
+
+<p>但<em>另一个</em> 意义上不平等。\(\dot x\) 是 \(x\) 的<em>时间导数</em>: 一旦 \(x(t)\) 给了, \(\dot x(t)\) 就由它决定。所以"\(x\) 的曲线" 已经包含了"\(\dot x\) 的曲线"——它们不是独立的。一条 1D 路径 \(x(t)\) 自动决定了 2D 的 \((x(t), \dot x(t))\) 轨迹。</p>
+
+<p>这种"<em>表面 2D 实际 1D</em>" 让 \((x, \dot x)\) 空间显得"<em>多余</em>"——你只需要 \(x\) 就够了, \(\dot x\) 是它的衍生品。这条事实在数学上表现为: \((x, \dot x)\) 空间没有"<em>典则</em>" 的几何结构。它是切丛 \(TQ\)（位形空间 \(Q\) 的切丛）, 是个流形, 但缺乏让所有 \(2n\) 个方向<em>对称</em> 的结构。</p>
+
+<p>对比一下, 如果换成 \((x, p)\), 其中 \(p = m \dot x\) 是<em>动量</em>（一个独立物理量, 不是 \(x\) 的衍生）。\(x\) 与 \(p\) 都有"<em>独立</em>" 的物理意义——\(x\) 是位置, \(p\) 是动量。两者能<em>同时测量</em>, 各自是基本量。在 Newton 力学里 \(x\) 与 \(p\) 都是基础变量, 通过 \(\boldsymbol F = d\boldsymbol p / dt\) 联系。</p>
+
+<p>"<em>状态由 \((x, p)\) 而非 \((x, \dot x)\) 描述</em>" 不是新发现——Newton 一直这么用。Lagrange 把<em>派生量</em> \(\dot q\) 抬上来与 \(q\) 平起平坐, 是有他的理由（变分原理需要在轨迹上变分, \(\dot q\) 自然出现）。但回到 \(p\) 后, 我们能恢复"<em>真两个独立变量</em>" 的对称结构。这条恢复就是 Hamilton 力学的工程。</p>
+
+<h2 id="sec10-2">10.2 共轭动量</h2>
+
+<p>定义。对 Lagrangian \(L(q^1, \ldots, q^n, \dot q^1, \ldots, \dot q^n, t)\), 第 \(i\) 个<em>共轭动量</em>（conjugate momentum）是</p>
+
+<p>\[
+\boxed{\ p_i := \frac{\partial L}{\partial \dot q^i}.\ }
+\]</p>
+
+<p>注意: \(p_i\) 与<em>坐标 \(q^i\) 配对</em>——所以叫"<em>共轭于 \(q^i\)</em>"。换不同坐标, 共轭动量不一样。</p>
+
+<p>具体例子。</p>
+
+<ul>
+  <li><em>笛卡尔坐标</em>: \(L = \frac{1}{2} m (\dot x^2 + \dot y^2 + \dot z^2) - V\)。\(p_x = m \dot x, p_y = m \dot y, p_z = m \dot z\)——和 Newton 力学的"<em>线动量</em>" 一致。</li>
+  <li><em>极坐标</em>: \(L = \frac{1}{2} m (\dot r^2 + r^2 \dot \theta^2) - V(r)\)。\(p_r = m \dot r\) (径向线动量), \(p_\theta = m r^2 \dot \theta\)<em>角动量</em>。"<em>共轭于 \(\theta\) 的</em>" 动量正是<em>角动量</em>! 不是普通线动量。</li>
+  <li><em>带电粒子在电磁场</em>: \(L = \frac{1}{2} m \dot{\boldsymbol r}^2 - q \Phi + q \dot{\boldsymbol r} \cdot \boldsymbol A\)。\(p_x = m \dot x + q A_x\)——共轭动量是<em>机械动量 \(m \dot x\) 加上场动量 \(q A_x\)</em>。这是非平凡的: 在电磁场里粒子的"<em>动量</em>" 不光是 \(m v\), 还包括场的部分。</li>
+</ul>
+
+<p>请你看清这件事的<em>力量</em>: 共轭动量自动地把每个广义坐标"<em>配上</em>" 它合适的"<em>动量</em>"——线坐标配线动量, 角坐标配角动量, 电磁场里的粒子配"<em>正则动量</em>"。<em>无需事先猜</em>。EL 方程的 \(\partial L / \partial \dot q\) 自动给出"<em>对的</em>" 那个量。这种自动性让 Lagrange 公式比 Newton 更通用——"<em>动量</em>" 这个概念被推广到任何坐标系。</p>
+
+<p>Lagrange 公式下守恒律也得简洁: <em>如果 Lagrangian 不显含 \(q^i\)（即 \(q^i\) 是<em>循环坐标</em>）, 则 \(p_i\) 守恒</em>。证明直接: EL 方程 \(\dot p_i = \partial L / \partial q^i = 0\), 所以 \(p_i\) 常数。这是 Noether 定理的最简单情形（<a href="ch7.html">第 7 章</a>）。</p>
+
+<h2 id="sec10-3">10.3 Legendre 变换</h2>
+
+<p>现在的目标: 把 \(L(q, \dot q)\) 换成一个新函数 \(H(q, p)\), 用 \(p\) 替换 \(\dot q\)。"<em>替换</em>" 意思: \(H\) 不显含 \(\dot q\), 全部用 \(p\) 表达。</p>
+
+<p>朴素做法: 解 \(p = \partial L / \partial \dot q\) 得 \(\dot q = \dot q(q, p)\), 直接代入 \(L\) 得 \(L(q, \dot q(q, p))\)。但这样不<em>对称</em>: \(L\) 关于 \(p\) 怎么变化? 不清楚。</p>
+
+<p>更聪明的做法是<em>Legendre 变换</em>。定义</p>
+
+<p>\[
+\boxed{\ H(q, p, t) := \sum_i p_i \dot q^i - L(q, \dot q, t),\ }
+\]</p>
+
+<p>其中右边的 \(\dot q^i\) 必须用 \(p\) 表达——即先解 \(p_i = \partial L / \partial \dot q^i\) 得 \(\dot q^i = \dot q^i(q, p)\), 代入。</p>
+
+<p>关键性质: 这样定义的 \(H\) 关于 \(p_i\) 偏导是</p>
+
+<p>\[
+\frac{\partial H}{\partial p_i} = \dot q^i + \sum_j p_j \frac{\partial \dot q^j}{\partial p_i} - \sum_j \frac{\partial L}{\partial \dot q^j} \frac{\partial \dot q^j}{\partial p_i} = \dot q^i + \sum_j (p_j - p_j) \frac{\partial \dot q^j}{\partial p_i} = \dot q^i.
+\]</p>
+
+<p>(用 \(p_j = \partial L / \partial \dot q^j\) 抵消。)</p>
+
+<p>所以 \(\dot q^i = \partial H / \partial p_i\)。同样地 \(\partial H / \partial q^i = -\partial L / \partial q^i = -\dot p_i\) (用 EL 方程 \(\dot p_i = \partial L / \partial q^i\))。</p>
+
+<p>所以 EL 方程在新变量下化为<em>Hamilton 方程</em>:</p>
+
+<p>\[
+\boxed{\ \dot q^i = \frac{\partial H}{\partial p_i}, \quad \dot p_i = -\frac{\partial H}{\partial q^i}.\ }
+\]</p>
+
+<p>(常被合称为<em>正则方程</em> canonical equations。下一章详细讨论。)</p>
+
+<p>关键观察——\(2n\) 个一阶 ODE 替换原来 \(n\) 个二阶 EL 方程。每个 \(q^i, p_i\) 演化由对方的偏导决定, <em>对称</em>: \(\dot q^i\) 来自 \(\partial H / \partial p_i\), \(\dot p_i\) 来自 \(-\partial H / \partial q^i\)。仅一个负号区分两类变量, 但这个负号有深的几何意义（symplectic 结构, ch11 + ch24）。</p>
+
+<p>用 Legendre 变换的<em>逆</em>: 如果你给我 \(H(q, p)\), 我能恢复 \(L(q, \dot q)\) 吗? 算 \(\dot q^i = \partial H / \partial p_i\), 解 \(p_i = p_i(q, \dot q)\), 然后</p>
+
+<p>\[
+L = \sum_i p_i \dot q^i - H.
+\]</p>
+
+<p>看出来了——\(L\) 与 \(H\) 是 Legendre 变换<em>互反</em> 的两个对象。<em>(L, q, \dot q) \leftrightarrow (H, q, p)\)</em> 完全等价, 不丢信息。</p>
+
+<h2 id="sec10-4">10.4 几何意义: 凸函数与对偶</h2>
+
+<p>Legendre 变换看起来像个机械的代数操作, 但它有漂亮的<em>几何含义</em>。Legendre 变换是<em>凸函数与其对偶</em> 的互换。</p>
+
+<p>具体看 1D。设 \(f(v)\) 是个严格凸函数（\(f''(v) > 0\) 处处）。它的<em>Legendre 变换</em></p>
+
+<p>\[
+f^*(p) = \sup_v [p v - f(v)],
+\]</p>
+
+<p>即对每个 \(p\) 找让 \(p v - f(v)\) 最大的 \(v\), 然后取那个最大值。极值条件: 偏导对 \(v\) 等于 0, 即 \(p = f'(v)\)。所以"<em>给 \(p\) 对应 \(v\)</em>" 通过 \(p = f'(v)\) 这个映射。代入</p>
+
+<p>\[
+f^*(p) = p \cdot v(p) - f(v(p)).
+\]</p>
+
+<p>这就是 Legendre 变换。注意 \(f^*(p)\) 是<em>另一个凸函数</em>——它的二阶导是 \(d^2 f^* / dp^2 = 1 / f''(v) > 0\)。而且 \(f^{**} = f\)（变换<em>对合</em>, 对称的）。</p>
+
+<p>几何画面: \(f(v)\) 的图是 \(v\)-\(f\) 平面上一条凸曲线。对每个 \(p\), 画一族斜率为 \(p\) 的直线 \(y = pv - c\)（\(c\) 是 \(y\) 截距的负值, 即 \(c = pv - y\)）。把这族直线<em>下移</em>（\(c\) 增大）, 直到它<em>触</em> 上 \(f\) 曲线为止——此时 \(c = f^*(p)\)。也就是: <em>\(f^*\) 描述 \(f\) 的"切线包络</em>"。给斜率 \(p\), 算切线的截距, 这个截距函数就是 \(f^*\)。</p>
+
+<p>这个画面让"<em>函数 ↔ 切线族</em>" 成为对偶关系。<em>函数</em> 由其图（点的轨迹）描述, 也可以由<em>所有切线的集合</em>（线的轨迹）描述。两种描述等价, 互为 Legendre 变换。这种"<em>点对偶线</em>" 思想在投影几何 / 优化理论里反复出现。</p>
+
+<p>把这条搬到力学。\(L(q, \dot q)\)（固定 \(q\)）作为 \(\dot q\) 的函数是凸的（动能项 \(\frac{1}{2} m \dot q^2\)）。\(p = \partial L / \partial \dot q\) 给出"<em>切线斜率</em>" 与"<em>速度</em>" 的对应。\(H = p \dot q - L\) 是 Legendre 共轭。所以<em>Hamiltonian = Lagrangian 关于 \(\dot q\) 的 Legendre 共轭</em>。两个函数, 一对凸, 互相决定。</p>
+
+<p>这种对偶的另一个例子: 热力学。<em>内能</em> \(U(S, V)\) 与<em>自由能</em> \(F(T, V)\) 也是 Legendre 互换——\(F = U - TS\), \(T = \partial U / \partial S\)。换一对独立变量（\(S \to T\)）就是这一步。Lagrange ↔ Hamilton 的语言转换和<em>内能 ↔ 自由能</em> 的转换是<em>同一</em> 数学操作。Legendre 变换在物理学有多个化身, 都是同一件事: <em>换一对独立变量</em>。</p>
+
+<h2 id="sec10-5">10.5 Hamiltonian 是能量</h2>
+
+<p>定义 \(H = \sum p_i \dot q^i - L\) 看起来像个<em>定义</em>, 没有直接的物理含义。但有个漂亮的事实: <em>对绝大多数物理系统, \(H\) 等于<em>能量</em> \(E = T + V\)</em>。</p>
+
+<p>具体证明。设动能是 \(\dot q\) 的<em>二次齐次</em>函数（一般情况, 包括所有非时变约束系统）: \(T = \frac{1}{2} \sum \mu_{ij}(q) \dot q^i \dot q^j\)。设势能 \(V = V(q)\) 不显含 \(\dot q\)。那么 \(L = T - V\), 共轭动量</p>
+
+<p>\[
+p_i = \frac{\partial L}{\partial \dot q^i} = \sum_j \mu_{ij} \dot q^j.
+\]</p>
+
+<p>所以 \(\sum_i p_i \dot q^i = \sum_{i,j} \mu_{ij} \dot q^i \dot q^j = 2 T\)。Hamiltonian:</p>
+
+<p>\[
+H = \sum_i p_i \dot q^i - L = 2T - (T - V) = T + V = E.
+\]</p>
+
+<p>所以<em>Hamiltonian = 总能量</em>, 在这种"<em>动能二次 + 势能不依赖速度</em>" 的标准情形下成立。</p>
+
+<p>(欧拉<em>齐次函数</em> 定理: \(f(\lambda v) = \lambda^k f(v)\) ⟹ \(\sum_i v_i \partial f / \partial v_i = k f\)。\(T\) 是 \(\dot q\) 的 2 次齐次, 所以 \(\sum \dot q^i \partial T / \partial \dot q^i = 2T\)。这就是上面那一步。)</p>
+
+<p>例外情况:</p>
+
+<ul>
+  <li><em>带速度依赖的势</em>（如电磁场 \(L = \frac{1}{2} m \dot r^2 - q\Phi + q \dot r \cdot A\)）: 这时 \(H \neq T + V\), 但 \(H = T + q \Phi\)（机械动能 + 静电势能）, 不等于 \(L\) 形式上的 \(T - V\) 简单切换。</li>
+  <li><em>动能含 \(\dot q\) 的奇次项</em>（罕见）: 可能 \(H \ne E\)。</li>
+  <li><em>L 显含时间</em>: \(H\) 也显含时间, 但 \(H\) 仍可能 = 能量, 取决于具体形式。</li>
+</ul>
+
+<p>所以"<em>Hamiltonian = 能量</em>" 不是<em>定义</em>, 是<em>大多数</em> 系统下的一个事实。对带电粒子之类的特殊情形, \(H\) 只是<em>形式上的</em> 能量, 物理能量另算。但 \(H\) 守恒（如果 \(H\) 不显含时间）这条性质对所有 Hamilton 系统都成立, 后面 ch11 证明。</p>
+
+<h2 id="sec10-6">10.6 三个例子</h2>
+
+<p>现在跑三个具体例子, 把"<em>从 \(L\) 算 \(H\)</em>" 的程序固化。</p>
+
+<p><strong>例 1. 单粒子在势 \(V(x)\) 中</strong>。Lagrangian \(L = \frac{1}{2} m \dot x^2 - V(x)\)。共轭动量 \(p = \partial L / \partial \dot x = m \dot x\), 反解 \(\dot x = p/m\)。Hamiltonian:</p>
+
+<p>\[
+H = p \dot x - L = p \cdot \frac{p}{m} - \frac{1}{2} m \cdot \left(\frac{p}{m}\right)^2 + V(x) = \frac{p^2}{m} - \frac{p^2}{2m} + V(x) = \frac{p^2}{2m} + V(x).
+\]</p>
+
+<p>所以</p>
+
+<p>\[
+\boxed{\ H(x, p) = \frac{p^2}{2m} + V(x).\ }
+\]</p>
+
+<p>这就是粒子的"<em>动能 + 势能</em>" 总能量, 写成 \((x, p)\) 函数形式。Hamilton 方程</p>
+
+<p>\[
+\dot x = \frac{\partial H}{\partial p} = \frac{p}{m}, \quad \dot p = -\frac{\partial H}{\partial x} = -V'(x).
+\]</p>
+
+<p>第一条 \(\dot x = p/m\) 是"<em>动量定义反过来</em>"——速度与动量成正比。第二条 \(\dot p = -V'(x)\) 是 Newton 第二定律 (\(F = -V'\), \(\dot p = F\)) 的写法。所以 Hamilton 方程在 1D 单粒子情形下就是熟悉的 Newton 力学, 只是把它写成<em>两个一阶 ODE</em> 而不是<em>一个二阶 ODE</em>。</p>
+
+<p><strong>例 2. 单摆</strong>。Lagrangian \(L = \frac{1}{2} m \ell^2 \dot \theta^2 - m g \ell (1 - \cos \theta)\)。共轭动量 \(p_\theta = \partial L / \partial \dot \theta = m \ell^2 \dot \theta\), 反解 \(\dot \theta = p_\theta / (m \ell^2)\)。Hamiltonian:</p>
+
+<p>\[
+H = p_\theta \dot \theta - L = \frac{p_\theta^2}{m \ell^2} - \frac{p_\theta^2}{2 m \ell^2} + m g \ell (1 - \cos \theta) = \frac{p_\theta^2}{2 m \ell^2} + m g \ell (1 - \cos \theta).
+\]</p>
+
+<p>\[
+\boxed{\ H(\theta, p_\theta) = \frac{p_\theta^2}{2 m \ell^2} + m g \ell (1 - \cos \theta).\ }
+\]</p>
+
+<p>"<em>角动量平方 / 转动惯量 + 重力势能</em>"——能量的角度版。Hamilton 方程</p>
+
+<p>\[
+\dot \theta = \frac{p_\theta}{m \ell^2}, \quad \dot{p_\theta} = -m g \ell \sin \theta.
+\]</p>
+
+<p>第二条乘以 \(m \ell^2\) 并对 \(t\) 用 \(\dot p_\theta = m \ell^2 \ddot \theta\): \(m \ell^2 \ddot \theta = -m g \ell \sin \theta\), 即 \(\ddot \theta + (g/\ell) \sin \theta = 0\)——熟悉的单摆方程。</p>
+
+<p><strong>例 3. 谐振子</strong>。Lagrangian \(L = \frac{1}{2} m \dot x^2 - \frac{1}{2} k x^2\)。共轭动量 \(p = m \dot x\)。Hamiltonian</p>
+
+<p>\[
+\boxed{\ H = \frac{p^2}{2m} + \frac{1}{2} k x^2.\ }
+\]</p>
+
+<p>设 \(\omega = \sqrt{k/m}\), 改写</p>
+
+<p>\[
+H = \frac{p^2}{2m} + \frac{1}{2} m \omega^2 x^2.
+\]</p>
+
+<p>这是经典<em>谐振子 Hamiltonian</em>——物理学最重要的形式之一, 量子谐振子直接基于它（链 ch21）。Hamilton 方程</p>
+
+<p>\[
+\dot x = \frac{p}{m}, \quad \dot p = -m \omega^2 x.
+\]</p>
+
+<p>合并 \(\ddot x = -\omega^2 x\), 简谐振动方程, 解 \(x(t) = A \cos(\omega t + \phi)\)。</p>
+
+<p>看相空间画面: \((x, p)\) 平面上, 谐振子轨迹</p>
+
+<p>\[
+\frac{p^2}{2m} + \frac{1}{2} m \omega^2 x^2 = E
+\]</p>
+
+<p>是<em>椭圆</em>（半轴 \(\sqrt{2E/(m\omega^2)}\) 与 \(\sqrt{2mE}\)）。每个能量 \(E\) 对应一条椭圆, 轨迹在椭圆上顺时针绕（\(x > 0\) 时 \(\dot p < 0\), \(p\) 减小; \(p > 0\) 时 \(\dot x > 0\), \(x\) 增大——对照 Hamilton 方程）。每周期 \(T = 2\pi/\omega\) 走一圈。</p>
+
+<p>这是<em>相图</em> 的最简单实例——把状态画在 \((q, p)\) 平面上, 演化是平面上的曲线。下一章详细展开相空间几何。</p>
+
+<h2 id="sec10-7">10.7 相空间</h2>
+
+<p>把 \((q^1, \ldots, q^n, p_1, \ldots, p_n)\) 视为<em>2n</em> 维空间——叫<em>相空间</em>（phase space）。Hamilton 力学的<em>主舞台</em>。</p>
+
+<p>每个时刻系统的状态由相空间的<em>一个点</em> 表示。系统演化是相空间里的<em>一条曲线</em>。这条曲线由 Hamilton 方程</p>
+
+<p>\[
+\dot q^i = \frac{\partial H}{\partial p_i}, \quad \dot p_i = -\frac{\partial H}{\partial q^i}
+\]</p>
+
+<p>定义。把 \((q, p) = (q^1, \ldots, q^n, p_1, \ldots, p_n)\) 整体视为相空间向量, Hamilton 方程定义一个<em>向量场</em></p>
+
+<p>\[
+\boldsymbol X_H = \left(\frac{\partial H}{\partial p_1}, \ldots, \frac{\partial H}{\partial p_n}, -\frac{\partial H}{\partial q^1}, \ldots, -\frac{\partial H}{\partial q^n}\right),
+\]</p>
+
+<p>叫<em>Hamilton 向量场</em>。系统演化沿 \(\boldsymbol X_H\) 流动——相空间是一片"<em>水</em>", \(\boldsymbol X_H\) 是流速场, 每个粒子（初始条件）随水漂流。这种"<em>流动</em>" 视角让 Hamilton 力学可以用<em>动力系统</em> + <em>遍历论</em> 的工具研究——KAM 定理、混沌、Lyapunov 指数等都建立在这个视角上（ch16-17）。</p>
+
+<p>相空间的几何结构:</p>
+
+<ul>
+  <li><em>2n 维, 偶数维</em>。位置和动量配成对, "<em>一对一对</em>" 出现。</li>
+  <li><em>每条 Hamilton 流线长度永远不变</em>——能量 \(H\) 在流线上守恒（\(\dot H = \sum (\partial H / \partial q^i) \dot q^i + \sum (\partial H / \partial p_i) \dot p_i = -\sum \dot p_i \cdot \dot q^i + \sum \dot q^i \dot p_i = 0\), 假设 \(H\) 不显含 \(t\)）。所以流线在等能面（\(2n - 1\) 维）上。</li>
+  <li><em>相空间体积</em> 由流保持（Liouville 定理, ch11）——这条性质让<em>统计力学</em> 可以建立。</li>
+  <li><em>辛结构</em>（symplectic structure）: 相空间不光是流形, 还有一个特殊的 2-形式 \(\omega = \sum dp_i \wedge dq^i\) 由 Hamilton 流保持。这是相空间最深的几何, 在 ch24 完整发展。</li>
+</ul>
+
+<p>请你停下来感受这件事的重要性。Lagrange 力学是<em>位形空间</em>（n 维 \(q\) 空间）上做变分的工程, 优雅但缺乏额外结构。Hamilton 力学是<em>相空间</em>（2n 维 \((q, p)\) 空间）上的<em>流</em>, 自带 symplectic 几何, 让无数定理（守恒律、对称性、相变量、积分系统）有自然语言。Lagrange ↔ Hamilton 的"<em>变量换装</em>" 不只是审美, 是从<em>n 维</em> 升级到<em>2n 维</em>, 暴露隐藏的几何。</p>
+
+<p>统计力学直接住在相空间——一个气体的"<em>状态</em>" 是 \(N\) 个分子的 \((q, p)\), 总共 \(6N\) 维相空间一个点。系统演化是这个点在相空间漂。统计力学不算具体路径, 而是算"<em>能量某区间内的相空间体积</em>"——熵 \(S = k_B \ln \Omega\), \(\Omega\) 就是能量曲面在相空间的<em>面积</em>。整个统计物理的语言来自相空间几何。</p>
+
+<p>量子力学也直接住在相空间, 但是<em>量子化</em> 版的。Heisenberg 不确定关系 \(\Delta x \Delta p \ge \hbar/2\) 把相空间"<em>分块</em>" 到面积为 \(h\) 的格子, 每个格子代表一个量子态。这个"<em>相空间分块</em>" 来自经典相空间的几何, Planck 常数 \(h\) 是格子大小。</p>
+
+<p>所以这一章我们做的事——从 \(L\) 到 \(H\)、从 \((q, \dot q)\) 到 \((q, p)\)、从位形空间到相空间——是经典物理通向统计 / 量子物理的<em>必经一步</em>。Lagrange 力学到这里告一段落, Hamilton 力学正式上场。</p>
+
+<h2 id="sec10-8">10.8 临别话</h2>
+
+<p>这一章的核心信息只有一句: <em>用 Legendre 变换从 Lagrangian 切换到 Hamiltonian, 不丢信息, 但暴露相空间</em>。</p>
+
+<p>为什么这一步如此关键? 几个理由总结:</p>
+
+<ul>
+  <li><em>变量对称</em>。\((q, p)\) 中两个变量地位平等, 都是<em>独立</em> 的状态变量, 都通过偏导和 \(H\) 关联。这种对称是 symplectic 几何的起点。</li>
+  <li><em>2n 个一阶 ODE 替换 n 个二阶 ODE</em>。一阶 ODE 是动力系统理论的标准对象, 让<em>相图、不动点、稳定性</em> 概念直接搬过来。混沌 / 积分系统理论建立在一阶 ODE 上。</li>
+  <li><em>相空间几何</em>。Hamilton 方程定义流, 流保持 symplectic 形式 + 相空间体积。这两条性质让 Hamilton 力学不仅是物理学的语言, 还是<em>几何对象</em>: 一个 Hamilton 系统就是一个<em>symplectic 流形</em> + 一个<em>函数 H</em>, 全部物理由这个几何决定。</li>
+  <li><em>统计力学 + 量子力学的桥</em>。统计力学以相空间为舞台。量子力学 Heisenberg 描述以相空间函数对易为基础（链 ch12 Poisson 括号 → 量子对易子）。没有 Hamilton 公式, 这两座大厦缺地基。</li>
+</ul>
+
+<p>下一章我们正式探索 Hamilton 方程 + 相空间。我们会:</p>
+
+<ul>
+  <li>用 Hamilton 方程算几个例子的相轨迹（自由粒子、谐振子、单摆相图）。</li>
+  <li>证明<em>Liouville 定理</em>: Hamilton 流保持相空间体积。</li>
+  <li>讨论守恒律: \(H\) 不显含 \(t\) ⟹ 能量守恒; 循环坐标 ⟹ 共轭动量守恒。</li>
+  <li>引入<em>Poisson 括号</em>（ch12）作为相空间上的"<em>代数结构</em>", 让任意函数的演化都有简洁公式 \(\dot f = \{f, H\}\)。</li>
+</ul>
+
+<p>Hamilton 力学是经典力学最优雅的版本, 也是通向现代物理（统计、量子、场论、几何力学）的桥梁。从这里开始, 我们离开"<em>具体计算运动</em>" 的工程层面, 进入"<em>研究运动的几何结构</em>" 的高观点。</p>
+
+<p>Hamilton 1833 写道: "<em>The science of dynamics may be regarded as a single mathematical subject, distinguished only in its applications.</em>" (动力学是一个数学学科, 只在应用上变化。) 这句话用一个半世纪还成立——Hamilton 力学的语言已经是全部物理的标准底层。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch9.html">← 上一章 · 第 9 章 刚体动力学 + 欧拉角</a><a href="ch11.html">下一章 · 第 11 章 Hamilton 方程 + 相空间 →</a></nav>
+</main>
+</body>
+</html>

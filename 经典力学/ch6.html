@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 6 章 Hamilton 原理与 Lagrange 方程 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 变分原理</a><a href="ch7.html">下一章 · 第 7 章 对称性与 Noether 定理 →</a></nav>
+<h1 id="ch6">第 6 章 Hamilton 原理与 Lagrange 方程</h1>
+
+<p>上一章我们把变分法当<em>纯数学</em> 建好——给一个泛函 \(\int F \, dx\), 写下 EL 方程, 解出极值曲线。这是数学。这一章把它<em>升级</em> 成物理: 命名一个特殊泛函（作用量 \(S\)）, 立一条原理（\(\delta S = 0\)）, 让它成为<em>力学的统一运动方程</em>。</p>
+
+<p>读完之后你将会:</p>
+
+<ul>
+  <li>把 Hamilton 原理当作<em>独立物理公设</em>（不是从 Newton 推出, 是与之等价的另一条根基）；</li>
+  <li>看见 EL 方程对四个有代表性的力学系统直接吐出运动方程, 而 Newton F=ma 在其中两个（双摆、球面摆）几乎不可写；</li>
+  <li>认识广义动量 \(p_i = \partial L / \partial \dot q^i\), 它在第 10 章变成 Hamilton 形式的核心；</li>
+  <li>知道非保守力（摩擦、外驱动）怎么塞回这个框架；</li>
+  <li>回到 ch1.4 那"<em>四个理由</em>" 把它们对照实例验证一遍。</li>
+</ul>
+
+<h2 id="sec6-1">6.1 立公设: Hamilton 原理</h2>
+
+<p>请你回到这本书最初设定的力学问题: 一个系统在两时刻 \(t_1, t_2\) 间从某位形 \(q(t_1) = q_1\) 演化到另一位形 \(q(t_2) = q_2\); 真实运动是<em>哪一条路径</em>? Newton 的回答是 F=ma——告诉你<em>每一瞬间</em> 加速度等于受力除质量, 一阶一阶累计积出真路径。Hamilton 给一种<em>完全不同</em> 形态的回答: 在所有满足两端边界 \(q(t_1) = q_1, q(t_2) = q_2\) 的"<em>候选路径</em>" 里, 真实路径是让某个泛函取极值的那一条。</p>
+
+<p><strong>Hamilton 原理（1834）</strong>: 给定一个力学系统, 选一组广义坐标 \(q = (q^1, \ldots, q^n)\)（参<a href="ch4.html">ch4</a>）。存在一个函数 \(L(q, \dot q, t)\)（系统的<em>Lagrangian</em>）, 使得在所有满足边界条件 \(q(t_1) = q_1, q(t_2) = q_2\) 的可微路径中, 真实物理路径让<em>作用量</em></p>
+
+<p>\[
+\boxed{\ S[q] = \int_{t_1}^{t_2} L(q(t), \dot q(t), t) \, dt\ }
+\]</p>
+
+<p>取极值, 即对所有满足边界为零的变分 \(\delta q\), 一阶变分</p>
+
+<p>\[
+\boxed{\ \delta S = 0.\ }
+\]</p>
+
+<p>请你停下来读这条公设三遍。它<em>不是</em> 我们从更基本的东西推出来的——它是一条<em>独立的物理假设</em>。它的合理性来自<em>结果</em>: 套到具体系统它给出与 Newton 完全一致的运动方程, 而且在 Newton 写不动（约束、广义坐标、相对论、场论）的地方它依然成立。</p>
+
+<p>"<em>极值</em>" 的精确含义在 ch5 已澄清: 是<em>稳定点</em>（stationary point）, 不一定是最小值。物理上 \(S\) 通常是极小（短时间内）或鞍点（长时间或在共轭点之后）。"<em>最小作用量原理</em>" 这个传统名字略带误导, 严格说应叫"<em>稳定作用量原理</em>"。后面我们都按习惯叫"<em>Hamilton 原理</em>" 或"<em>变分原理</em>"。</p>
+
+<h2 id="sec6-2">6.2 Lagrangian: 简单情形 \(L = T - V\)</h2>
+
+<p>Hamilton 原理还没说<em>怎么</em> 写下 \(L\)。这是<em>另一条</em> 物理输入。对一大类力学系统（保守力, 无约束力做功, 无显式时间依赖外力）, Lagrangian 取最简单的形式</p>
+
+<p>\[
+\boxed{\ L = T - V,\ }
+\]</p>
+
+<p>其中 \(T\) 是动能（写成广义坐标 \(\dot q\) 的函数）, \(V\) 是势能（写成 \(q\) 的函数）。对单粒子在三维欧氏势 \(V(\boldsymbol r)\) 中:</p>
+
+<p>\[
+T = \tfrac{1}{2} m (\dot x^2 + \dot y^2 + \dot z^2), \qquad V = V(x, y, z).
+\]</p>
+
+<p>对多粒子系统, \(T = \sum_a (1/2) m_a |\dot{\boldsymbol r}_a|^2\), \(V\) 是粒子位置的势函数。</p>
+
+<p>这条规则<em>背后</em> 没有更深定理——它是一条经验, 19 世纪由 Lagrange 提出, 实践上对绝大多数力学系统给出与 Newton 一致的运动方程。我们暂时把它当公理, ch6.7 我们用 Newton ↔ Lagrange 等价性来<em>反向论证</em>这个 \(L = T - V\) 的形式不是凭空挑的。</p>
+
+<p>当力学涉及<em>非保守力</em>（摩擦, 外驱动）或<em>电磁力</em>（带电粒子在 \(\boldsymbol E, \boldsymbol B\) 中）时, \(L\) 不再是简单 \(T-V\):</p>
+
+<ul>
+  <li><em>电磁场中带电粒子</em>: \(L = (1/2) m |\dot{\boldsymbol r}|^2 - q \phi(\boldsymbol r, t) + q \boldsymbol A(\boldsymbol r, t) \cdot \dot{\boldsymbol r}\)（\(\phi, \boldsymbol A\) 是标势 + 矢势）。\(\boldsymbol A \cdot \dot{\boldsymbol r}\) 这一项依赖<em>速度</em>, 不能写成 \(T-V\) 形式。</li>
+  <li><em>含摩擦</em>: 通常把摩擦分出来当"<em>广义力</em>" 加在 EL 方程右边, 不并入 \(L\)（6.6 详述）。</li>
+  <li><em>相对论粒子</em>: \(L = -m c^2 \sqrt{1 - v^2/c^2} - q \phi + q \boldsymbol A \cdot \boldsymbol v\)。这是 ch22 的内容。</li>
+</ul>
+
+<p>本章 6.4 的四个例题都属于<em>简单情形</em>, 用 \(L = T - V\) 即可。复杂情形 6.6 + 后续章节再处理。</p>
+
+<h2 id="sec6-3">6.3 EL 方程从 Hamilton 原理推出</h2>
+
+<p>这一节把<a href="ch5.html">ch5</a> 的纯数学结果具体应用到力学。</p>
+
+<p>把 \(S[q] = \int_{t_1}^{t_2} L(q, \dot q, t) \, dt\) 当成 ch5.8 推广 1 的特例: 自变量 \(x = t\), 多个未知函数 \(q^1(t), \ldots, q^n(t)\), 被积函数 \(F = L\)。让 \(q^i \to q^i + \epsilon \eta^i\), \(\eta^i(t_1) = \eta^i(t_2) = 0\)。第一变分</p>
+
+<p>\[
+\delta S = \int_{t_1}^{t_2} \sum_i \left[ \frac{\partial L}{\partial q^i} \eta^i + \frac{\partial L}{\partial \dot q^i} \dot\eta^i \right] dt.
+\]</p>
+
+<p>对第二项分部积分:</p>
+
+<p>\[
+\int_{t_1}^{t_2} \frac{\partial L}{\partial \dot q^i} \dot\eta^i \, dt = \left[ \frac{\partial L}{\partial \dot q^i} \eta^i \right]_{t_1}^{t_2} - \int_{t_1}^{t_2} \frac{d}{dt}\left( \frac{\partial L}{\partial \dot q^i} \right) \eta^i \, dt.
+\]</p>
+
+<p>\(\eta^i\) 在两端为零, 所以括号项消失。代回:</p>
+
+<p>\[
+\delta S = \int_{t_1}^{t_2} \sum_i \left[ \frac{\partial L}{\partial q^i} - \frac{d}{dt} \frac{\partial L}{\partial \dot q^i} \right] \eta^i \, dt.
+\]</p>
+
+<p>对一切 \(\eta^i\)（每个独立, 任意选）, \(\delta S = 0\)——把每个 \(\eta^i\) 单独激活时其余取零, 套变分基本引理, 中括号<em>每一个</em> 必须恒为零:</p>
+
+<p>\[
+\boxed{\ \frac{d}{dt} \frac{\partial L}{\partial \dot q^i} - \frac{\partial L}{\partial q^i} = 0, \qquad i = 1, \ldots, n.\ }
+\]</p>
+
+<p>这是<em>力学的 Lagrange 方程</em>（也叫力学的 Euler-Lagrange 方程, 简称 EL 方程）。\(n\) 个广义坐标对应 \(n\) 条二阶 ODE, 加 \(2n\) 个初始条件（位置 + 速度）唯一确定运动。</p>
+
+<p>请你停下来对比 EL 方程和 Newton 第二定律。Newton: \(m \ddot{\boldsymbol r}_a = \boldsymbol F_a\)（每个粒子三条标量方程, 共 \(3N\) 条对 \(N\) 粒子）。Lagrange: \(n\) 条 EL 方程（\(n\) 是<em>真自由度数</em>, 已减去约束）。如果系统约束多, \(n \ll 3N\), Lagrange 方程数量<em>少很多</em>。这不只是省事——还<em>不出现</em> 任何约束力, 物理变量更<em>纯</em>。</p>
+
+<h2 id="sec6-4">6.4 四个例题完整跑</h2>
+
+<p>下面四个例题是 Lagrange 方法的"<em>体操</em>"。请你<em>跟着推</em>, 不只读结果——这些例题手感是 ch7-15 一切高级讨论的基础。</p>
+
+<h3 id="sec6-4-1">6.4.1 例 A: 平面单摆</h3>
+
+<p>设置: 长 \(\ell\) 不可伸刚性轻杆, 一端在原点固定, 另一端挂质量 \(m\)。重力 \(g\) 沿 \(-y\) 方向。让 \(\theta\) 为杆与垂直方向的夹角。这是 1 自由度系统。</p>
+
+<p><em>动能</em>: 摆球速度 \(v = \ell \dot\theta\), 所以 \(T = (1/2) m \ell^2 \dot\theta^2\)。</p>
+
+<p><em>势能</em>: 取最低点为零势能。摆球高度 \(y = -\ell \cos\theta\)（向下为负）, 所以 \(V = m g \ell (1 - \cos\theta)\)（取最低点为零）。</p>
+
+<p><em>Lagrangian</em>:</p>
+
+<p>\[
+L = \tfrac{1}{2} m \ell^2 \dot\theta^2 - m g \ell (1 - \cos\theta).
+\]</p>
+
+<p><em>EL 方程</em>: 算偏导。</p>
+
+<p>\[
+\frac{\partial L}{\partial \dot\theta} = m \ell^2 \dot\theta, \qquad \frac{\partial L}{\partial \theta} = - m g \ell \sin\theta.
+\]</p>
+
+<p>\[
+\frac{d}{dt}(m \ell^2 \dot\theta) - (-m g \ell \sin\theta) = 0 \implies m\ell^2 \ddot\theta + m g \ell \sin\theta = 0,
+\]</p>
+
+<p>整理</p>
+
+<p>\[
+\boxed{\ \ddot\theta + \frac{g}{\ell} \sin\theta = 0.\ }
+\]</p>
+
+<p>这就是熟悉的<em>单摆方程</em>。请注意——整段过程<em>不出现</em> 杆的张力 \(T\)（约束力）, 只有重力。这正是 ch1.3 说的"<em>约束自动消失</em>" 的实例。如果用 Newton 风格做这道题: 写 \(\boldsymbol F = m \boldsymbol a\), 把<em>张力</em>沿杆方向当未知量, 加约束 \(|\boldsymbol r| = \ell\), 解出张力为时间的函数, 再代回去——能做但绕。Lagrange 直接吐运动方程。</p>
+
+<h3 id="sec6-4-2">6.4.2 例 B: 双摆</h3>
+
+<p>设置: 在原点有第一个固定点, 长 \(\ell_1\) 杆挂质量 \(m_1\); 第一个质量底下又用长 \(\ell_2\) 杆挂质量 \(m_2\)。两杆都在重力 \(g\) 下自由摆动。两个角度 \(\theta_1, \theta_2\) 描述位形, 是 2 自由度系统。</p>
+
+<p>这道题用 Newton 几乎写不动——你要分别对两质量写 F=ma, 处理两条杆的张力（两个未知量, 各自变化）, 加约束。结果是 6 条方程含张力, 极其凌乱。Lagrange 风格<em>简单</em>。</p>
+
+<p>位置: \(m_1\) 在 \((\ell_1 \sin\theta_1, -\ell_1 \cos\theta_1)\); \(m_2\) 在 \((\ell_1 \sin\theta_1 + \ell_2 \sin\theta_2, -\ell_1 \cos\theta_1 - \ell_2 \cos\theta_2)\)。求速度（对 \(t\) 求导）:</p>
+
+<p>\[
+\dot x_1 = \ell_1 \dot\theta_1 \cos\theta_1, \quad \dot y_1 = \ell_1 \dot\theta_1 \sin\theta_1.
+\]</p>
+
+<p>\[
+\dot x_2 = \ell_1 \dot\theta_1 \cos\theta_1 + \ell_2 \dot\theta_2 \cos\theta_2, \quad \dot y_2 = \ell_1 \dot\theta_1 \sin\theta_1 + \ell_2 \dot\theta_2 \sin\theta_2.
+\]</p>
+
+<p><em>动能</em>:</p>
+
+<p>\[
+T_1 = \tfrac{1}{2} m_1 \ell_1^2 \dot\theta_1^2.
+\]</p>
+
+<p>\[
+T_2 = \tfrac{1}{2} m_2 (\dot x_2^2 + \dot y_2^2) = \tfrac{1}{2} m_2 \big[\ell_1^2 \dot\theta_1^2 + \ell_2^2 \dot\theta_2^2 + 2 \ell_1 \ell_2 \dot\theta_1 \dot\theta_2 \cos(\theta_1 - \theta_2)\big].
+\]</p>
+
+<p>（最后一步用 \(\cos\theta_1 \cos\theta_2 + \sin\theta_1 \sin\theta_2 = \cos(\theta_1 - \theta_2)\)。）</p>
+
+<p><em>势能</em>: \(V = m_1 g (-\ell_1 \cos\theta_1) + m_2 g (-\ell_1 \cos\theta_1 - \ell_2 \cos\theta_2) = -(m_1 + m_2) g \ell_1 \cos\theta_1 - m_2 g \ell_2 \cos\theta_2\)（加无关常数让 \(V\) 在 \(\theta_1 = \theta_2 = 0\) 时为零, 不影响 EL 方程）。</p>
+
+<p><em>Lagrangian</em>:</p>
+
+<p>\[
+L = \tfrac{1}{2} (m_1 + m_2) \ell_1^2 \dot\theta_1^2 + \tfrac{1}{2} m_2 \ell_2^2 \dot\theta_2^2 + m_2 \ell_1 \ell_2 \dot\theta_1 \dot\theta_2 \cos(\theta_1 - \theta_2) + (m_1+m_2) g \ell_1 \cos\theta_1 + m_2 g \ell_2 \cos\theta_2.
+\]</p>
+
+<p>EL 方程: 对 \(\theta_1\),</p>
+
+<p>\[
+\frac{\partial L}{\partial \dot\theta_1} = (m_1+m_2)\ell_1^2 \dot\theta_1 + m_2 \ell_1 \ell_2 \dot\theta_2 \cos(\theta_1-\theta_2).
+\]</p>
+
+<p>\[
+\frac{d}{dt} \frac{\partial L}{\partial\dot\theta_1} = (m_1+m_2)\ell_1^2 \ddot\theta_1 + m_2\ell_1\ell_2 \ddot\theta_2 \cos(\theta_1-\theta_2) - m_2\ell_1\ell_2 \dot\theta_2 (\dot\theta_1-\dot\theta_2) \sin(\theta_1-\theta_2).
+\]</p>
+
+<p>\[
+\frac{\partial L}{\partial \theta_1} = -m_2 \ell_1 \ell_2 \dot\theta_1 \dot\theta_2 \sin(\theta_1-\theta_2) - (m_1+m_2) g \ell_1 \sin\theta_1.
+\]</p>
+
+<p>EL 方程 \((d/dt)(\partial L/\partial \dot\theta_1) - \partial L/\partial \theta_1 = 0\):</p>
+
+<p>\[
+(m_1+m_2)\ell_1 \ddot\theta_1 + m_2\ell_2 \ddot\theta_2 \cos(\theta_1-\theta_2) + m_2 \ell_2 \dot\theta_2^2 \sin(\theta_1-\theta_2) + (m_1+m_2) g \sin\theta_1 = 0.
+\]</p>
+
+<p>同样推 \(\theta_2\) 给</p>
+
+<p>\[
+\ell_2 \ddot\theta_2 + \ell_1 \ddot\theta_1 \cos(\theta_1-\theta_2) - \ell_1 \dot\theta_1^2 \sin(\theta_1-\theta_2) + g \sin\theta_2 = 0.
+\]</p>
+
+<p>这是一对耦合非线性 ODE, 数值上著名: 双摆是<em>经典混沌</em> 的标准例（链<a href="ch18.html">ch18 混沌</a>）。这里的重点不是解它, 是<em>看见我们能简洁写出它</em>。整段推理只用了 Lagrangian, 没用张力, 没用 F=ma。Newton 风格做这一题至少要花十倍的纸。</p>
+
+<h3 id="sec6-4-3">6.4.3 例 C: 弹簧上的滑块（含约束）</h3>
+
+<p>设置: 一根水平直杆, 上面套个质量 \(m\) 的滑块, 滑块与杆之间无摩擦。滑块连一根劲度 \(k\) 弹簧, 弹簧另一端固定在原点。简单的<em>简谐振子</em>——这里的目的是看 Lagrange 给出我们已知的答案。</p>
+
+<p>1 自由度, 取滑块沿杆的位移 \(x\)（弹簧自然长度位置为 \(x = 0\)）。</p>
+
+<p>\(T = (1/2) m \dot x^2\), \(V = (1/2) k x^2\)。</p>
+
+<p>\[
+L = \tfrac{1}{2} m \dot x^2 - \tfrac{1}{2} k x^2.
+\]</p>
+
+<p>EL: \(\partial L/\partial \dot x = m \dot x\), \(\partial L/\partial x = -k x\)。\((d/dt)(m\dot x) - (-kx) = 0 \implies m \ddot x + k x = 0 \implies \ddot x = -(k/m) x\), 简谐振子方程。\(\omega = \sqrt{k/m}\)。一切如常。</p>
+
+<p>这道题朴素到无聊——但它显示了一件事: <em>Lagrange 在简单情形也能用, 不会错</em>。我们这本书后续大量用 Lagrange 处理的复杂场景, 在简单情形必须退化到熟知的答案; 这一节就是核对这件事。</p>
+
+<p>变种: 让杆<em>倾斜</em> 角 \(\alpha\)。重力沿杆有分量 \(g \sin\alpha\)。\(V\) 多一项 \(-mg\sin\alpha \cdot x\)（位移 \(x\) 沿杆向下时势能下降）。Lagrangian \(L = (1/2) m \dot x^2 - (1/2) k x^2 + m g \sin\alpha \cdot x\)。EL: \(m \ddot x + k x - m g \sin\alpha = 0\), 即简谐振子绕<em>新平衡点</em> \(x_0 = m g \sin\alpha / k\) 振动。"<em>含恒力的简谐振子等价于无外力的简谐振子</em>" 这件事在 Lagrange 公式里一行字就出来。</p>
+
+<h3 id="sec6-4-4">6.4.4 例 D: 球面摆</h3>
+
+<p>设置: 长 \(\ell\) 杆一端在原点, 另一端挂质量 \(m\); 摆球可在<em>整个</em> 球面 \(|\boldsymbol r| = \ell\) 上自由运动（不限于一个平面）。这是 2 自由度系统, 标准坐标用<em>球坐标</em> 的极角 \(\theta\)（与 \(-y\) 轴, 即向下方向的夹角）+ 方位角 \(\varphi\)。</p>
+
+<p>位置: \(\boldsymbol r = \ell (\sin\theta \cos\varphi, \sin\theta \sin\varphi, -\cos\theta)\)（\(z\) 轴向下）。</p>
+
+<p>速度平方:</p>
+
+<p>\[
+|\dot{\boldsymbol r}|^2 = \ell^2 (\dot\theta^2 + \sin^2\theta \, \dot\varphi^2).
+\]</p>
+
+<p>（球面度量, \(\theta\) 方向"<em>径向</em>" 弧长, \(\varphi\) 方向<em>纬度圈</em> 弧长有 \(\sin\theta\) 因子。）</p>
+
+<p>\(T = (1/2) m \ell^2 (\dot\theta^2 + \sin^2\theta \, \dot\varphi^2)\)。</p>
+
+<p>\(V = -m g \ell \cos\theta\)（向下取 \(z\) 为负, 但势能 \(V = m g z\), 而 \(z = -\ell \cos\theta\), 所以 \(V = -m g \ell \cos\theta\)）。</p>
+
+<p>\[
+L = \tfrac{1}{2} m \ell^2 (\dot\theta^2 + \sin^2\theta \, \dot\varphi^2) + m g \ell \cos\theta.
+\]</p>
+
+<p>请你注意 \(L\) <em>不显含 \(\varphi\)</em>! 也就是 \(\partial L / \partial \varphi = 0\), 而 \(\partial L / \partial \dot\varphi = m \ell^2 \sin^2\theta \, \dot\varphi\)。EL 对 \(\varphi\): \((d/dt)(m\ell^2 \sin^2\theta \, \dot\varphi) - 0 = 0\), 即</p>
+
+<p>\[
+\boxed{\ p_\varphi := m \ell^2 \sin^2\theta \, \dot\varphi = \text{const}.\ }
+\]</p>
+
+<p>这是 \(\varphi\) 方向的<em>广义动量</em> 守恒——物理上是绕垂直轴的<em>角动量</em> 守恒（重力对垂直轴无力矩）。<em>不显含 \(\varphi\) ⟹ \(p_\varphi\) 守恒</em> 是<a href="ch7.html">ch7</a> Noether 定理的具体例。</p>
+
+<p>EL 对 \(\theta\):</p>
+
+<p>\[
+\frac{\partial L}{\partial \dot\theta} = m\ell^2 \dot\theta, \quad \frac{\partial L}{\partial \theta} = m\ell^2 \sin\theta\cos\theta\, \dot\varphi^2 - mg\ell \sin\theta.
+\]</p>
+
+<p>\[
+m\ell^2 \ddot\theta - m\ell^2 \sin\theta\cos\theta\, \dot\varphi^2 + mg\ell \sin\theta = 0.
+\]</p>
+
+<p>用守恒律 \(\dot\varphi = p_\varphi / (m \ell^2 \sin^2\theta)\) 把 \(\dot\varphi\) 消掉, 得</p>
+
+<p>\[
+\ddot\theta = \frac{p_\varphi^2 \cos\theta}{m^2 \ell^4 \sin^3\theta} - \frac{g}{\ell} \sin\theta.
+\]</p>
+
+<p>这是<em>1 维有效</em> 的方程（在 \(\theta\) 上）, 转动那一维已被守恒律吸收。这种"<em>用守恒律降维</em>" 的技术是 Lagrange 力学解题的标准流程, 常见到在<a href="ch11.html">ch11 中心力问题</a> 重复出现（Kepler 用同样办法把开普勒问题降到一维有效势）。</p>
+
+<p>请你停下来感受这一例。如果不用 Lagrange, 用 Newton 风格做球面摆——你要写 \(m\ddot{\boldsymbol r}\) 等于重力 + 杆的张力, 张力沿径向、大小未知, 加约束 \(|\boldsymbol r| = \ell\)。三条标量方程 + 一条约束 + 一个未知张力, 强行解。Lagrange 完全跳过这一切, 直接给运动方程, 还顺手给一个守恒律。<em>这就是换语言的力量</em>。</p>
+
+<h2 id="sec6-5">6.5 广义动量</h2>
+
+<p>上一节的球面摆里我们看到一个<em>守恒量</em> \(p_\varphi = \partial L / \partial \dot\varphi\)。这种<em>"<em>对速度求偏导</em>"</em> 的对象在 Lagrange 力学有专门的名字。</p>
+
+<p><strong>定义（广义动量, 共轭动量, conjugate / canonical momentum）</strong>:</p>
+
+<p>\[
+\boxed{\ p_i := \frac{\partial L}{\partial \dot q^i}.\ }
+\]</p>
+
+<p>EL 方程用这个记号写得更紧凑:</p>
+
+<p>\[
+\boxed{\ \frac{d p_i}{dt} = \frac{\partial L}{\partial q^i}.\ }
+\]</p>
+
+<p>"<em>动量随时间变化等于 \(L\) 对位置的偏导</em>"。这个语句和 Newton "<em>动量随时间变化等于力</em>" 同形, 提示 \(\partial L / \partial q^i\) 扮演<em>广义力</em> 的角色（6.6 详）。</p>
+
+<p>具体例:</p>
+
+<ul>
+  <li><em>笛卡尔坐标自由粒子</em> \(L = (1/2) m |\dot{\boldsymbol r}|^2\): \(p_i = m \dot x^i\)——就是熟悉的线性动量。</li>
+  <li><em>极坐标平面粒子</em> \(L = (1/2) m (\dot r^2 + r^2 \dot\theta^2) - V(r)\): \(p_r = m\dot r\)（径向线性动量）, \(p_\theta = m r^2 \dot\theta\)（绕原点角动量）！<em>同一个数学定义对不同坐标给不同物理量</em>: 极角的共轭动量自动就是角动量。这正是 Lagrange 公式优雅的地方——你<em>不必</em> 单独引入"<em>角动量</em>" 这个新概念, 它从公式自然冒出来。</li>
+  <li><em>电磁场中带电粒子</em> \(L = (1/2) m |\dot{\boldsymbol r}|^2 - q\phi + q\boldsymbol A \cdot \dot{\boldsymbol r}\): \(p_i = m\dot x^i + q A_i\)。共轭动量<em>不是</em> 机械动量 \(m\dot{\boldsymbol r}\), 还多一项 \(q\boldsymbol A\)。这条事实在量子力学起关键作用——\(\hat p = -i\hbar \nabla\) 量子算符替换的是 <em>共轭动量</em>, 不是机械动量, 所以 Schrödinger 方程在电磁场里要做<em>极小耦合</em> 替换 \(\hat p \to \hat p - q\boldsymbol A\)。</li>
+</ul>
+
+<p><em>重要事实</em>: \(p_i\) 的物理含义依赖<em>选什么 \(q\)</em>。同一个力学系统, 选 \(q = x\) 时 \(p\) 是线动量, 选 \(q = \theta\) 时 \(p\) 是角动量。Lagrange 公式不偏爱某一种坐标——这种<em>坐标无关性</em> 后面 ch10 Hamilton 形式更彻底（symplectic 形式不依赖具体坐标）。</p>
+
+<p><strong>定义（循环坐标, cyclic coordinate）</strong>: 若 \(L\) <em>不显含</em> 某个 \(q^i\)（即 \(\partial L / \partial q^i = 0\)）, 称该坐标为<em>循环</em> 坐标。EL 方程立即给</p>
+
+<p>\[
+\dot p_i = \frac{\partial L}{\partial q^i} = 0 \implies p_i = \text{const}.
+\]</p>
+
+<p>每一个循环坐标对应一个守恒动量。这是<em>Noether 定理对位置平移对称的直接特例</em>, ch7 详细展开。</p>
+
+<h2 id="sec6-6">6.6 广义力 + 非保守力</h2>
+
+<p>如果系统含<em>不保守力</em>（摩擦、外加随时间变的驱动力）, 或者某些力<em>不能写成 \(-\nabla V\)</em>, 简单的 \(L = T - V\) 不再覆盖。处理方法是<em>把额外的力当广义力塞回 EL 方程的右边</em>。</p>
+
+<p><strong>EL 方程的广义力扩展</strong>: 设有 \(L = T - V_{\text{保}}\) 用于<em>所有保守力</em>; 剩下不能写成势的力 \(\boldsymbol F^{\text{非}}\) 通过<em>广义力</em></p>
+
+<p>\[
+Q_i := \sum_a \boldsymbol F^{\text{非}}_a \cdot \frac{\partial \boldsymbol r_a}{\partial q^i}
+\]</p>
+
+<p>引入。EL 方程改写</p>
+
+<p>\[
+\boxed{\ \frac{d}{dt} \frac{\partial L}{\partial \dot q^i} - \frac{\partial L}{\partial q^i} = Q_i.\ }
+\]</p>
+
+<p>\(Q_i\) 是<em>非保守力</em> 投影到广义坐标 \(q^i\) "<em>方向</em>" 的<em>力</em>。</p>
+
+<p>具体: <em>带摩擦的简谐振子</em>。设阻尼力 \(\boldsymbol F^{\text{阻}} = -b \dot{\boldsymbol r}\)（黏性摩擦, 比例于速度）。在一维 \(x\) 坐标下, \(\boldsymbol F^{\text{阻}} = -b \dot x \hat x\), \(\partial \boldsymbol r/\partial x = \hat x\), 所以 \(Q = -b \dot x\)。EL:</p>
+
+<p>\[
+m \ddot x + k x = -b \dot x \implies m \ddot x + b \dot x + k x = 0.
+\]</p>
+
+<p>这正是<em>阻尼简谐振子</em> 标准方程。</p>
+
+<p>另一种<em>更优雅</em> 处理（适合速度比例阻尼）是引入<em>Rayleigh 耗散函数</em></p>
+
+<p>\[
+\mathcal F = \tfrac{1}{2} \sum_a b_a |\dot{\boldsymbol r}_a|^2,
+\]</p>
+
+<p>它不是 Lagrangian, 是另一个标量, EL 方程改成</p>
+
+<p>\[
+\frac{d}{dt} \frac{\partial L}{\partial \dot q^i} - \frac{\partial L}{\partial q^i} + \frac{\partial \mathcal F}{\partial \dot q^i} = 0.
+\]</p>
+
+<p>这种"<em>双标量</em>"（Lagrangian + 耗散函数）公式在工程力学（机械振动、车辆动力学）常用。</p>
+
+<p>真<em>不保守</em> 的力（即<em>不能写成任何标量函数的导数形式</em>）总有不便处。Lagrange 公式的力量<em>主要</em> 在保守 + 约束系统; 完全非保守力学（如塑性变形）通常不用 Lagrange 处理。一般物理课程关心的<em>所有基本相互作用</em>（重力、电磁、弱、强）都可以写成<em>带势的 Lagrangian</em>, 所以这个限制在基础物理里很少遇到。</p>
+
+<h2 id="sec6-7">6.7 Hamilton 原理是新公设, 但与 Newton 等价</h2>
+
+<p>请你回到 6.1 我们立的公设: \(\delta S = 0\)。这一节回答两个问题——(1) 它<em>不能</em> 从 Newton 推出来吗? (2) 那么它和 Newton 力学到底什么关系?</p>
+
+<p><strong>等价性证明（保守力简单情形）</strong>: 设单粒子在 \(V(\boldsymbol r)\) 中, \(L = (1/2) m |\dot{\boldsymbol r}|^2 - V(\boldsymbol r)\)。算 EL 方程:</p>
+
+<p>\[
+\frac{\partial L}{\partial \dot{\boldsymbol r}} = m \dot{\boldsymbol r}, \quad \frac{\partial L}{\partial \boldsymbol r} = -\nabla V.
+\]</p>
+
+<p>EL: \(m \ddot{\boldsymbol r} - (-\nabla V) = 0 \implies m\ddot{\boldsymbol r} = -\nabla V = \boldsymbol F\)。<em>正是 Newton F=ma</em>。</p>
+
+<p>多粒子保守系统 \(L = \sum_a (1/2) m_a |\dot{\boldsymbol r}_a|^2 - V(\boldsymbol r_1, \ldots, \boldsymbol r_N)\), 对每条 \(\boldsymbol r_a\) 写 EL 给 \(m_a \ddot{\boldsymbol r}_a = -\nabla_a V = \boldsymbol F_a\)。同样退化到 Newton。</p>
+
+<p>所以: 在 \(L = T - V\) 形式下, EL 方程<em>等价</em> 于 Newton 第二定律。Hamilton 原理在这种情形<em>不</em> 给新物理。</p>
+
+<p><strong>关键反过来一问</strong>: 能不能从 Newton 推出 Hamilton 原理? 答案——可以, 但需要"<em>D'Alembert 原理</em>"（一个把 F=ma 改写成"<em>虚功为零</em>" 的等价陈述）作为桥梁。Lagrange 1788 的《Mécanique analytique》正是这条路: D'Alembert 原理 + 配上"<em>虚功在约束方向恒为零</em>" 即可推出 EL 方程。这条路很扎实, 但<em>抽象</em>, 也<em>不显眼</em>——它需要先承认"<em>虚位移</em>" 这个概念。本书 ch9 简要介绍 D'Alembert 路径, 这里我们走更直接的"<em>立 Hamilton 原理为公设</em>" 路线, 因为它对量子化、相对论化、场论化更方便。</p>
+
+<p><strong>所以 Hamilton 原理是不是"<em>新</em>" 物理</strong>? 在保守 \(L=T-V\) 范围内, 它和 Newton 等价, 不<em>给</em> 新物理, 但<em>给</em> 新视角 / 新数学结构。在保守 + 简单约束之外（比如电磁带电粒子、相对论粒子、规范场、广义相对论时空、量子力学路径积分）, 它<em>是</em> 新物理——因为我们可以<em>直接写下</em> 一个具有正确对称性的作用量, 让 EL 方程吐运动方程, 而<em>不必</em> 通过 F=ma（在很多场合 F=ma 根本写不出来; 比如你怎么"<em>写下</em>" 时空的 F=ma?）。</p>
+
+<p>这种"<em>等价但有时给新物理</em>" 的状况在物理史上反复出现——电磁的 \(\nabla \cdot \boldsymbol E = \rho/\varepsilon_0\) 与 \(\boldsymbol E = -\nabla \phi - \partial \boldsymbol A/\partial t\) 等价, 但势 \(\phi, \boldsymbol A\) 在量子电动力学是<em>更基本的对象</em>（Aharonov-Bohm 效应里只有势直接进入相位, 场不进入）。变分原理的优越性是<em>类似</em> 的现象: 形式上等价, 物理上更深。</p>
+
+<h2 id="sec6-8">6.8 回到 ch1.4 的"<em>四理由</em>"</h2>
+
+<p><a href="ch1.html">ch1.4</a> 我们承诺了为什么换 Lagrange 语言的<em>四理由</em>: 简化、对称、推广、桥梁。这一章已经实例兑现前两个, 后两个交给后续:</p>
+
+<ul>
+  <li><em>简化</em>: 6.4 的四个例题里, 单摆张力消失（A）, 双摆变成两条耦合 ODE 而非六条带张力的方程（B）, 球面摆出守恒律自动（D）。<em>每一例</em> 都看见 \(L = T - V\) 公式比 F=ma 更省力。</li>
+  <li><em>对称 ↔ 守恒</em>: 6.4 D 里 \(\varphi\) 是循环坐标 ⟹ \(p_\varphi\) 守恒。这正是<em>Noether 定理对旋转对称的具体例</em>。<a href="ch7.html">下一章</a>把这条事系统化, 让它成为<em>每个连续对称都给一条守恒律</em> 的统一定理。</li>
+  <li><em>推广</em>: \(L = T - V\) 在弯曲流形（广义相对论、机械臂在多关节构型空间）一字不差成立, 只要用对应度量算 \(T\)。Newton F=ma 在弯曲空间没法直接写。本书 <a href="ch24.html">ch24 几何力学</a> 把这条几何化收尾。</li>
+  <li><em>量子桥</em>: Feynman 路径积分 \(K = \int \mathcal D q \, e^{i S[q]/\hbar}\)。经典极限 \(\hbar \to 0\) 由稳相法主导, 主导路径正是 \(\delta S = 0\) 那条——也就是 EL 方程的解。所以<em>经典力学 = 量子力学的稳相极限</em>。这是 ch21 量子前夜的内容。</li>
+</ul>
+
+<p>请你停下来回头看这一章的距离: 我们从一条公设 \(\delta S = 0\) 出发, 用<a href="ch5.html">ch5</a> 提供的变分工具, 推出了 EL 方程, 套到四个例题, 引入了广义动量 + 广义力, 处理了非保守情形, 与 Newton 力学对接。这一整套<em>就是</em> Lagrange 力学的<em>骨架</em>。本书后续每一章都是在这个骨架上挂血肉:</p>
+
+<ul>
+  <li>ch7 把对称性 + 守恒律的关系讲清</li>
+  <li>ch8 小振动（线性化的 Lagrange 力学）</li>
+  <li>ch9 刚体动力学（典型多自由度系统）</li>
+  <li>ch10-15 Hamilton 化身（用 \(p\) 替换 \(\dot q\), 进入相空间的几何）</li>
+  <li>ch16-21 微扰、混沌、流体、场论、量子前夜</li>
+</ul>
+
+<p>下一章我们做这一章末尾埋下的最重要伏笔——<em>对称性如何对应守恒律</em>。这是 Lagrange / Hamilton 力学最深刻、最美的结果, 1918 由 Emmy Noether 一举证明, 至今支配整个理论物理。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 变分原理</a><a href="ch7.html">下一章 · 第 7 章 对称性与 Noether 定理 →</a></nav>
+</main>
+</body>
+</html>

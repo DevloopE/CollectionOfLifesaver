@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 15 章 作用-角变量 + 积分系统 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 Hamilton-Jacobi 方程</a><a href="ch16.html">下一章 · 第 16 章 经典微扰论 + KAM →</a></nav>
+<h1 id="ch15">第 15 章 作用-角变量 + 积分系统</h1>
+
+<p>上一章末尾 Jacobi 给了一个深刻的诠释——找正则变换让 \(H = 0\)，所有运动停止。这是<em>极限情形</em>。这一章问一个相邻问题——能不能找到正则变换让 Hamilton 方程<em>最简单可能</em>，但不要求 \(H = 0\)？</p>
+
+<p>具体——能不能找一对新坐标 \((I, \theta)\)，让</p>
+
+<p>\[
+H = H(I), \quad \text{即 } H \text{ 不依赖 } \theta?
+\]</p>
+
+<p>如果可以，Hamilton 方程<em>平凡</em>解：\(\dot I = -\partial H / \partial \theta = 0\)（\(I\) 守恒）；\(\dot \theta = \partial H / \partial I = \omega(I)\)（\(\theta\) 线性增长）。一切运动变成"<em>常速绕一个圈</em>"。</p>
+
+<p>这种 \((I, \theta)\) 在<em>周期系统</em>（谐振子、单摆、Kepler 椭圆轨道）中存在并称为<em>作用-角变量</em>（action-angle variables）。能这么做的系统叫<em>积分系统</em>（integrable systems）。</p>
+
+<h2 id="sec15-1">15.1 周期运动的"作用"</h2>
+
+<p>从最朴素的开始：一维周期系统。\(H(q, p)\) 是给定能量 \(E\) 时\((q, p)\) 平面上的一条<em>闭曲线</em>（能量等高线 \(H = E\)）。每个周期粒子绕这条曲线跑一圈。具体例：</p>
+
+<p>谐振子 \(H = p^2 / (2m) + \frac{1}{2} m \omega^2 q^2\)——能量等高线是<em>椭圆</em>。粒子在 \((q, p)\) 平面绕椭圆跑，周期 \(T = 2\pi / \omega\)。</p>
+
+<p>单摆 \(H = p^2 / (2m\ell^2) + m g \ell (1 - \cos q)\)——小振幅时近似椭圆，大振幅时变形（甚至完全打开成"<em>翻滚</em>" 状态）。</p>
+
+<p>Kepler 椭圆——粒子在 \((r, p_r)\) 截面上的运动是"<em>近日点 \(r_{\min}\) 到远日点 \(r_{\max}\) 来回</em>"，闭曲线。</p>
+
+<p>给定一个周期闭曲线，定义</p>
+
+<p>\[
+\boxed{\ I := \frac{1}{2 \pi} \oint p\, dq.\ }
+\]</p>
+
+<p>这个量叫<em>作用变量</em>（action variable）——在 \((q, p)\) 平面上沿闭曲线一圈对 \(p\, dq\) 积分，再除以 \(2\pi\)。注意它<em>不</em>是作用量 \(S = \int L\, dt\)——它是别的东西。两个量都叫"<em>action</em>" 是术语撞车（Hamilton 主函数 + 作用变量），上下文区分。</p>
+
+<p>请你停下来想 \(I\) 的几何含义。\(\oint p\, dq\) 是<em>闭曲线包围的相空间面积</em>（Stokes 定理：\(\oint p\, dq = \iint dp \wedge dq\)）。除以 \(2\pi\) 是为了让 \(\theta\) 在标准 \([0, 2\pi)\) 取值。所以</p>
+
+<p>\[
+I = \frac{1}{2 \pi} \cdot \text{周期闭曲线包围的面积}.
+\]</p>
+
+<p>这是一个<em>纯几何量</em>——和参数化方式无关。同一条闭曲线无论你怎么走（顺时针、逆时针、从哪个点起步），\(I\) 是同一个数。</p>
+
+<h2 id="sec15-2">15.2 谐振子的作用-角</h2>
+
+<p>跑一个具体例子。一维谐振子 \(H = p^2 / (2m) + \frac{1}{2} m \omega^2 q^2 = E\)。能量等高线</p>
+
+<p>\[
+\frac{p^2}{2 m E} + \frac{q^2}{2 E / (m \omega^2)} = 1,
+\]</p>
+
+<p>这是一个椭圆，半轴 \(\sqrt{2 m E}\)（沿 \(p\) 方向）和 \(\sqrt{2 E / (m \omega^2)}\)（沿 \(q\) 方向）。面积 \(= \pi \cdot \sqrt{2 m E} \cdot \sqrt{2 E / (m \omega^2)} = 2\pi E / \omega\)。所以</p>
+
+<p>\[
+I = \frac{1}{2\pi} \cdot \frac{2 \pi E}{\omega} = \frac{E}{\omega}.
+\]</p>
+
+<p>\(I = E / \omega\)。把它倒过来：\(E = \omega I\)，即</p>
+
+<p>\[
+\boxed{\ H(I) = \omega I.\ }
+\]</p>
+
+<p>纯洁。\(H\) 是 \(I\) 的<em>线性</em> 函数。\(\theta\) 满足 \(\dot \theta = \partial H / \partial I = \omega\)，所以 \(\theta = \omega t + \theta_0\)——线性增长。</p>
+
+<p>反推 \((q, p)\)：标准定义里 \(\theta\) 是椭圆上的<em>相位角</em>。把 \(q = \sqrt{2 I / (m \omega)} \sin \theta\)、\(p = \sqrt{2 m \omega I} \cos \theta\) 代回去验证：\(H = (2 m \omega I / 2 m) \cos^2 \theta + \frac{1}{2} m \omega^2 \cdot 2 I / (m \omega) \sin^2 \theta = \omega I (\cos^2 \theta + \sin^2 \theta) = \omega I\)。✓</p>
+
+<p>这条 \(q = A \sin(\omega t + \theta_0)\)（\(A = \sqrt{2I / (m \omega)}\)）是谐振子的标准解，但你<em>第一次</em>从"<em>找正则变换让 \(H = H(I)\)</em>" 的角度推出来。这条视角的好处——它<em>不</em>依赖谐振子是线性。任何周期系统都有作用-角变量，结构同样。</p>
+
+<p>请你看 \(I = E / \omega\) 这条关系。Bohr 1913 的量子化条件 \(E = n \hbar \omega\)（谐振子）就等价于 \(I = n \hbar\)。"<em>作用变量在量子论里被量子化为 \(\hbar\) 的整数倍</em>"——15.7 节回到这件事。</p>
+
+<h2 id="sec15-3">15.3 单摆与 Kepler</h2>
+
+<h3 id="sec15-3-1">15.3.1 单摆</h3>
+
+<p>\(H = p^2 / (2 m \ell^2) + m g \ell (1 - \cos q)\)。小振幅 \(q \ll 1\) 时 \(1 - \cos q \approx q^2 / 2\)，回到谐振子 \(I = E / \omega\)，\(\omega = \sqrt{g/\ell}\)。</p>
+
+<p>大振幅时，\(I = (1/2\pi) \oint p\, dq\) 是个椭圆积分，没有初等表达。频率 \(\omega(I) = dH/dI\) 不再常数——<em>振幅依赖</em>。这就是单摆的"<em>非线性</em>"：大振幅周期变长，小振幅周期 \(2\pi \sqrt{\ell/g}\)。这个非线性反映在 \(H(I)\) 不是线性函数。</p>
+
+<p>临界能量 \(E = 2 m g \ell\) 时单摆"<em>勉强翻顶</em>"——这是<em>分界轨道</em>（separatrix），\(I\) 在这里有跳变（从"<em>振荡</em>" 区到"<em>翻滚</em>" 区）。分界轨道是<em>非积分系统</em> 的种子——下一章混沌从这里长出来。</p>
+
+<h3 id="sec15-3-2">15.3.2 Kepler</h3>
+
+<p>三维 Kepler 是<em>3 自由度</em>系统——需要<em>三个</em> 作用变量 \((I_r, I_\theta, I_\phi)\)。HJ 方程的完全分离（<a href="ch14.html#sec14-4-3">14.4.3 节</a>）给出</p>
+
+<ul>
+  <li>\(I_\phi = L_z\)（z 角动量）</li>
+  <li>\(I_\theta + I_\phi = L\)（总角动量）</li>
+  <li>\(I_r + I_\theta + I_\phi = k \sqrt{m / (-2 E)}\)（"主作用"，由 Kepler 第三定律编码）</li>
+</ul>
+
+<p>合起来 \(H = -m k^2 / (2 (I_r + I_\theta + I_\phi)^2)\)——\(H\) 只依赖<em>三个作用之和</em>。这是 Kepler 的<em>退化性</em>（degeneracy）——三个频率 \(\omega_r, \omega_\theta, \omega_\phi\) 全部<em>相等</em>，所以椭圆轨道<em>闭合</em>（不退转）。Kepler 是<em>maximally degenerate 系统</em>——这种特别现象的来源是 Kepler 问题有<em>额外</em> 守恒量（Laplace-Runge-Lenz 矢量），让相空间的对称群比一般中心力还大。</p>
+
+<p>太阳系不是严格 Kepler——其它行星扰动让退化打破，地球轨道近日点<em>缓慢转动</em>（牛顿验证过这条）。这种"<em>perihelion precession</em>" 是<em>非退化扰动</em> 的标志，<a href="ch16.html">下一章</a>主题。</p>
+
+<h2 id="sec15-4">15.4 Liouville-Arnold 定理：积分系统的精确刻画</h2>
+
+<p>把上面"<em>找作用-角</em>" 的故事推到一般 \(n\) 自由度系统。问题：什么时候存在作用-角？答案是<em>Liouville-Arnold 定理</em>——经典力学最美的结构定理之一。</p>
+
+<p><strong>定理（Liouville-Arnold，约 1840 / 1963）.</strong> 设 \(H\) 是一个 \(n\) 自由度 Hamilton 系统。如果存在 \(n\) 个独立的守恒量 \(F_1, F_2, \ldots, F_n\)（其中 \(F_1 = H\)）满足:</p>
+
+<ol>
+  <li>它们<em>独立</em>：\(dF_1, \ldots, dF_n\) 在 phase space 上几乎处处线性独立；</li>
+  <li>它们两两<em>Poisson 对易</em>：\(\{F_i, F_j\} = 0\)（"in involution"）；</li>
+  <li>能量等值面 \(M_c := \{F = c\}\) 是<em>紧致连通</em> 的；</li>
+</ol>
+
+<p>则:</p>
+
+<ol>
+  <li>\(M_c\) 微分同胚于 <em>n 维环面</em> \(T^n = S^1 \times S^1 \times \cdots \times S^1\)；</li>
+  <li>存在<em>作用-角变量</em> \((I_1, \ldots, I_n, \theta_1, \ldots, \theta_n)\) 使 \(H = H(I)\) 不依赖 \(\theta\)；</li>
+  <li>解为 \(\theta_i(t) = \omega_i(I) t + \theta_i^0\)，频率 \(\omega_i = \partial H / \partial I_i\)，\(I_i\) 守恒。</li>
+</ol>
+
+<p>系统称<em>完全可积</em>（completely integrable）。</p>
+
+<p>请你停下来想这条定理的力量。它说"<em>n 个对易守恒量 ⟹ 相空间叶层化为 n 维 torus，每个 torus 上动力学是常频准周期</em>"。</p>
+
+<p>三个条件每一条都关键：</p>
+
+<ul>
+  <li><em>独立</em>——少一个守恒量你只压缩到 \(2n - k + 1\) 维子流形（\(k\) 是独立守恒量数），不到 \(n\) 维。</li>
+  <li><em>对易</em>——非对易的守恒量给"<em>非交换</em>" 的 Lie 群结构（如 SU(2) 角动量），结果是<em>球面</em> 不是 torus。</li>
+  <li><em>紧</em>——能量面无界时（如自由粒子）拓扑不是 torus 而是 \(\mathbb R^n\)。</li>
+</ul>
+
+<p>定理的<em>构造性</em> 部分——给三条件就构造出 \((I, \theta)\)——通过 HJ 方程的完全分离实现。\(I_i\) 是各分离方向的"<em>每周期 \(\oint p\, dq\) 除以 \(2\pi\)</em>"。\(\theta_i\) 由生成函数 \(W(q, I)\) 通过 \(\theta_i = \partial W / \partial I_i\) 给出。</p>
+
+<h2 id="sec15-5">15.5 完全可积系统是稀有</h2>
+
+<p>读完上一节你可能想"<em>n 个对易守恒量？听起来不难，每个 1 自由度系统都有 \(H\) 守恒，多自由度系统应该也总能找到</em>"。</p>
+
+<p>不。<em>完全可积系统是相空间里的<em>零测集</em></em>。Poincaré 1890 年证明三体问题<em>不</em>可积——除了能量、动量、角动量这"<em>朴素</em>" 守恒量（共 7 条，3 自由度三体系统需要 9 条），<em>不存在</em>其它解析守恒量。</p>
+
+<p>这条结果引发<em>20 世纪动力系统革命</em>。Birkhoff 1927、Kolmogorov 1954、Arnold 1963、Moser 1962 把"<em>不可积系统的行为</em>" 系统研究——发现混沌、奇异吸引子、KAM tori——这些<a href="ch16.html">下一章</a>主题。</p>
+
+<p>"<em>大多数 Hamilton 系统不可积</em>" 这条直觉的几何画面——相空间里 \(n\) 个对易守恒量定义一个<em>n 维拉格朗日子流形</em>（symplectic 几何术语）。在 \(2n\) 维相空间里这是<em>测度零</em> 子集。<em>典型</em> 系统的轨道不躺在 torus 上，而是在更大维数的子集上"<em>填满</em>"——这就是<em>遍历性</em>（ergodic）。</p>
+
+<p>请你停下来体会"<em>积分系统是稀有</em>" 这件事的份量。我们物理课本上能解的几乎所有"<em>经典力学题</em>"——谐振子、Kepler、对称陀螺、Toda 链、KdV 方程——都是<em>积分系统</em>。这给你一种错觉，"<em>力学问题原则上能解析解</em>"。<em>错</em>。能解的是<em>很少数</em>系统，刚好因为它们具有特殊对称性 / 守恒量丰富。<em>大部分</em> 真实物理系统（多体、湍流、行星动力学的精确版本）<em>不</em>积分，<em>必须</em> 数值或微扰处理。</p>
+
+<h2 id="sec15-6">15.6 已知积分系统的类目</h2>
+
+<p>把"<em>少数能解的</em>" 系统列一遍，让你看它们的覆盖面：</p>
+
+<p><strong>有限自由度积分系统</strong>:</p>
+<ul>
+  <li><em>谐振子</em>（任意维数）——\(H = \sum \omega_i I_i\)，trivially 积分。</li>
+  <li><em>Kepler</em>（中心力 \(V = -k/r\)）——三作用 + 退化。</li>
+  <li><em>各向同性谐振子 + Coulomb</em>（同时 SO(4) 对称）——这两个例外的对称性来自动量空间几何，第 3 章中心力问题里讨论过。</li>
+  <li><em>对称陀螺</em>（Lagrange 陀螺、Euler 陀螺、Kovalevskaya 陀螺）——19 世纪三个被发现的可积刚体，第四个不存在（Husson 1906 证明）。</li>
+  <li><em>Toda 链</em>（\(N\) 个粒子在指数相互作用势下）——1967 年 Toda 发现可积。</li>
+  <li><em>Calogero-Moser 系统</em>（\(N\) 粒子 \(1/(q_i - q_j)^2\) 相互作用）——量子和经典都可积。</li>
+  <li><em>磁单极散射</em>——SU(2) 对称给可积。</li>
+</ul>
+
+<p><strong>无限自由度积分 PDE</strong>（也叫"<em>孤立子方程</em>"）:</p>
+<ul>
+  <li><em>KdV 方程</em> \(u_t + 6 u u_x + u_{xxx} = 0\)——浅水波。1967 年通过逆散射变换证可积，<em>无穷多</em> 守恒量。</li>
+  <li><em>非线性 Schrödinger 方程</em> \(i \psi_t + \psi_{xx} + |\psi|^2 \psi = 0\)——光纤通信中 soliton。</li>
+  <li><em>Sine-Gordon</em> \(\phi_{tt} - \phi_{xx} + \sin \phi = 0\)——Josephson 结、相对论场论玩具。</li>
+  <li><em>Camassa-Holm</em>——浅水波改进版。</li>
+</ul>
+
+<p>这些可积 PDE 的发现 1967 年起开启了<em>逆散射变换</em>（inverse scattering transform）整个学科。每个可积 PDE 都对应一种"<em>无限维 Hamilton 系统</em>"，相空间是函数空间，作用-角变量是<em>谱数据</em>。这是 20 世纪应用数学的一大主线。</p>
+
+<p>请你看这个列表的<em>共同特征</em>——它们都有<em>特殊代数结构</em>（Lie 群、量子群、Lax 对、双 Hamilton 结构）。<em>可积性的根本原因总是代数对称性</em>。这条洞察让"<em>找新可积系统</em>" 变成"<em>找带新对称性的代数结构</em>"——这是数学物理的一支显学。</p>
+
+<h2 id="sec15-7">15.7 量子积分性 + Bohr-Sommerfeld 量子化</h2>
+
+<p>这一节看作用-角在量子力学的化身。量子力学初期 Bohr 1913、Sommerfeld 1916 给"<em>old quantum theory</em>"——粒子绕周期轨道的作用变量被<em>量子化</em>:</p>
+
+<p>\[
+\boxed{\ I_i = n_i \hbar, \quad n_i \in \mathbb Z_{\ge 0}.\ }
+\]</p>
+
+<p>叫 <em>Bohr-Sommerfeld 量子化条件</em>。来源是"<em>电子绕原子核的轨道周长是 de Broglie 波长的整数倍</em>"——驻波条件。</p>
+
+<p>对谐振子 \(I = E / \omega\)，BS 量子化给 \(E_n = n \hbar \omega\)——精确得到谐振子能级（最低 \(n = 0\) 给 \(E = 0\)；正确量子答案是 \(E_n = (n + 1/2) \hbar \omega\)，差一个零点能 \(\hbar \omega / 2\)，是 BS 的一阶修正）。</p>
+
+<p>对氢原子 Kepler \(H = -m k^2 / (2 (I_r + I_\theta + I_\phi)^2)\)，BS 量子化给 \(E_n = -m k^2 / (2 \hbar^2 n^2)\) where \(n = n_r + n_\theta + n_\phi\)——精确给出 Bohr 能级 \(E_n = -13.6 \text{eV}/n^2\)！</p>
+
+<p>这就是 1913-1925 旧量子论的方法：<em>每个积分系统的作用-角变量量子化为 \(\hbar\) 整数倍，给出能级</em>。这套方法对积分系统精确，但对<em>不可积</em>系统（如氦原子两电子）不知道怎么用——这正是促使 Heisenberg 1925 发明矩阵力学、Schrödinger 1926 发明波动力学的<em>历史动机</em>。</p>
+
+<p>1972 Maslov 完善 BS 公式，加入"<em>Maslov 指标</em>" 修正零点能：</p>
+
+<p>\[
+I_i = \left(n_i + \frac{\mu_i}{4}\right) \hbar,
+\]</p>
+
+<p>\(\mu_i\) 是<em>Maslov 指标</em>（每个 caustic 加 1）。这条修正让谐振子的 \(\mu = 2\) 给出 \(E = (n + 1/2) \hbar \omega\) 正确量子答案。</p>
+
+<p>请你在这里看到<em>经典 → 量子</em> 的桥梁——作用变量是经典物理的"<em>面积</em>"，量子化为 \(\hbar\) 整数倍。\(\hbar\) 是相空间的"<em>最小面积单位</em>"。这条几何诠释让"<em>量子化</em>" 不再是神秘的"<em>从经典到量子的跳跃</em>"——它变成"<em>经典相空间被划成 \(\hbar\) 大小的格子</em>"。</p>
+
+<h2 id="sec15-8">15.8 通往 KAM</h2>
+
+<p>这一章我们证明了"<em>积分系统</em>" 的存在——\(n\) 守恒量、torus 叶层化、作用-角变量、平凡 Hamilton 方程。但 15.5 节说积分系统稀有，<em>典型</em> Hamilton 系统不可积。</p>
+
+<p>1954 Kolmogorov 提出一个介于两极之间的问题：取一个积分系统 \(H_0(I)\)，加一个小扰动 \(\epsilon V(I, \theta)\)：</p>
+
+<p>\[
+H = H_0(I) + \epsilon V(I, \theta).
+\]</p>
+
+<p>新系统不再积分（\(V\) 让 \(\theta\) 在 \(H\) 里出现，破坏 \(I\) 的守恒性）。但<em>整体行为</em>有多远离原积分系统？\(I\) 还近似守恒？torus 还存在吗？</p>
+
+<p>朴素回答："<em>用经典微扰论展开</em>"——但展开<em>发散</em>，因为分母上出现"<em>共振</em>" \(\boldsymbol n \cdot \boldsymbol \omega(I) = 0\) 让分母变零（"<em>small denominators</em>" 问题）。这条困难 Poincaré 1890 年就识别，但没有解决方法。</p>
+
+<p>1954 Kolmogorov、1962 Arnold、1963 Moser 给出 <em>KAM 定理</em>——对"<em>非退化</em>" 积分系统加"<em>小</em>" 解析扰动，<em>大多数</em> torus（满足 diophantine 条件）<em>仍然存在</em>，只是有点变形。这条定理用<em>Newton 迭代</em> 巧妙绕过 small denominators 问题，是 20 世纪数学物理一座丰碑。</p>
+
+<p>它的<em>物理意义</em>就是回答"<em>太阳系稳定吗</em>" 这条 200 年问题。"<em>太阳系</em>" = "<em>Kepler 主导 + 行星互扰小</em>" = "<em>积分系统加小扰动</em>"，KAM 定理保证"<em>大多数初值的轨道在长时间内仍像 Kepler 椭圆</em>"——一种<em>受限</em> 的稳定性。下一章我们把这条定理铺开来讲。</p>
+
+<p>你这一章带走的东西:</p>
+
+<ul>
+  <li>作用-角变量——周期系统的"<em>最简单可能形式</em>"。</li>
+  <li>积分系统——存在 \(n\) 个对易守恒量、torus 叶层化、作用-角；这是经典力学的<em>美</em> 的极限。</li>
+  <li>Liouville-Arnold 定理——积分系统的精确刻画。</li>
+  <li>但积分系统<em>稀有</em>——绝大多数 Hamilton 系统不可积。这就给"<em>近积分</em> 系统怎么办" 留下了下一章 KAM 的舞台。</li>
+</ul>
+
+<p>下一章正式进入近积分摄动论 + KAM 定理 + 太阳系稳定性。准备好——这是经典力学最难也最美的一章。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch14.html">← 上一章 · 第 14 章 Hamilton-Jacobi 方程</a><a href="ch16.html">下一章 · 第 16 章 经典微扰论 + KAM →</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

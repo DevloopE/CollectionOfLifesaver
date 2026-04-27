@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>主题索引 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+<h1 id="subject-index">主题索引</h1>
+
+<p>按拼音 A-Z 排列。每条给"概念 / 名词 → 主要登场章节"。末尾有一节"按行为查找"——按"<em>我现在要做什么</em>" 索引。</p>
+
+<h2>A</h2>
+<ul>
+  <li><strong>Arnold（V. Arnold）</strong> — KAM 定理 <a href="ch16.html">第 16 章</a>; 几何力学 <a href="ch24.html">第 24 章</a>; 引论引语 <a href="ch1.html#sec1-7">1.7</a>。</li>
+  <li><strong>Atwood 机</strong> — Newton vs Lagrange 对比 <a href="ch4.html">第 4 章</a>。</li>
+  <li><strong>A-Lagrange 点</strong>（航天） — 见 L 节"Lagrange 点"。</li>
+</ul>
+
+<h2>B</h2>
+<ul>
+  <li><strong>Bernoulli（J. Bernoulli）</strong> — 1696 最速降线挑战题 <a href="ch1.html">第 1 章</a>。</li>
+  <li><strong>变分原理 / 最小作用量</strong> — Hamilton 原理 <a href="ch1.html#sec1-2">1.2</a>; 完整推导 <a href="ch5.html">第 5 章</a>; 相对论版 <a href="ch22.html#sec22-4">22.4</a>; 路径积分版 <a href="ch21.html#sec21-6">21.6</a>。</li>
+  <li><strong>不变量（invariant）</strong> — 见"守恒量" + "Casimir 不变量"。</li>
+  <li><strong>BFGS / 准 Newton</strong> — 不在本书; 见数值方法读本第 8 章。</li>
+  <li><strong>Brachistochrone（最速降线）</strong> — 见"最速降线"。</li>
+</ul>
+
+<h2>C</h2>
+<ul>
+  <li><strong>Calogero-Moser 系统（可积）</strong> — <a href="ch24.html#sec24-8">24.8</a>。</li>
+  <li><strong>CCR（正则对易关系）</strong> — \([\hat q, \hat p] = i\hbar\) <a href="ch21.html#sec21-2">21.2</a>。</li>
+  <li><strong>Casimir 不变量</strong> — Lie-Poisson 流的中心元 <a href="ch12.html">第 12 章</a>; 刚体角动量大小 <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>Chaos（混沌）</strong> — 见"混沌"。</li>
+  <li><strong>Coriolis 力</strong> — 旋转坐标系惯性力 <a href="ch23.html#sec23-3">23.3</a>。</li>
+  <li><strong>Cycloid（摆线）</strong> — 见"摆线"。</li>
+</ul>
+
+<h2>D</h2>
+<ul>
+  <li><strong>d'Alembert 原理</strong> — 虚功原理 + 约束力 <a href="ch4.html">第 4 章</a>。</li>
+  <li><strong>Darboux 定理</strong> — 辛流形局部标准 <a href="ch24.html#sec24-2">24.2</a>。</li>
+  <li><strong>对称性 → 守恒律</strong> — 见 N 节"Noether"。</li>
+  <li><strong>对易子 \([\hat A, \hat B]\)</strong> — 经典 Poisson 括号的量子版 <a href="ch21.html#sec21-1">21.1</a>。</li>
+  <li><strong>Dirac（P. Dirac）</strong> — 1930 Principles 整理 + 正则量子化 <a href="ch21.html#sec21-1">21.1</a>。</li>
+  <li><strong>多体问题（N-body）</strong> — 三体不可解 <a href="ch23.html#sec23-1">23.1</a>; 限制三体 <a href="ch23.html#sec23-2">23.2</a>; KAM <a href="ch16.html">第 16 章</a>。</li>
+</ul>
+
+<h2>E</h2>
+<ul>
+  <li><strong>Einstein</strong> — 狭义相对论 1905 <a href="ch22.html">第 22 章</a>; 广义相对论 1915 通向 V13 ch23。</li>
+  <li><strong>Euler 方程（刚体）</strong> — 角动量 ODE <a href="ch9.html">第 9 章</a>; Marsden-Weinstein 起源 <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>Euler 角</strong> — 刚体姿态参数化 <a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>Euler-Lagrange 方程</strong> — 推导 <a href="ch6.html">第 6 章</a>; 最早出现 <a href="ch1.html">第 1 章</a>。</li>
+  <li><strong>欧拉</strong> — 见"Euler"。</li>
+</ul>
+
+<h2>F</h2>
+<ul>
+  <li><strong>Feynman 路径积分</strong> — \(\int Dx \, e^{iS/\hbar}\) <a href="ch21.html#sec21-6">21.6</a>; 经典极限 <a href="ch21.html#sec21-7">21.7</a>。</li>
+  <li><strong>Fermi-Pasta-Ulam 实验</strong> — 1953 数值发现非线性振动反弹 <a href="ch16.html">第 16 章</a>。</li>
+</ul>
+
+<h2>G</h2>
+<ul>
+  <li><strong>Galileo</strong> — Galilei 变换 (经典) vs Lorentz 变换 (相对论) <a href="ch22.html#sec22-1">22.1</a>。</li>
+  <li><strong>固有时（proper time）</strong> — \(d\tau = dt/\gamma\) <a href="ch22.html#sec22-2">22.2</a>。</li>
+  <li><strong>共轭动量</strong> — \(p_i = \partial L/\partial \dot q^i\) <a href="ch10.html">第 10 章</a>; Poisson \(\{q, p\} = 1\) <a href="ch12.html">第 12 章</a>; 量子 CCR <a href="ch21.html#sec21-2">21.2</a>。</li>
+  <li><strong>广义相对论</strong> — 通向 V13 ch23-24; 本书铺垫 <a href="ch22.html#sec22-8">22.8</a>。</li>
+  <li><strong>广义坐标</strong> — 解约束的工具 <a href="ch4.html">第 4 章</a>。</li>
+</ul>
+
+<h2>H</h2>
+<ul>
+  <li><strong>Hamilton（W. R. Hamilton）</strong> — 1833 正则方程 <a href="ch10.html">第 10 章</a>。</li>
+  <li><strong>Hamilton 原理</strong> — \(\delta S = 0\) <a href="ch1.html#sec1-2">1.2</a>; 推 EL 方程 <a href="ch5.html">第 5 章</a>。</li>
+  <li><strong>Hamilton 方程</strong> — \(\dot q = \partial H/\partial p, \dot p = -\partial H/\partial q\) <a href="ch11.html">第 11 章</a>。</li>
+  <li><strong>Hamiltonian \(H\)</strong> — Legendre 变换 \(L \to H\) <a href="ch10.html">第 10 章</a>; 几何 \(H: M \to \mathbb R\) on 辛流形 <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>Hamilton-Jacobi 方程</strong> — \(\partial S/\partial t + H = 0\) <a href="ch14.html">第 14 章</a>; 通向 Schrödinger <a href="ch21.html#sec21-8">21.8</a>。</li>
+  <li><strong>Hamilton 流</strong> — 相空间向量场 <a href="ch11.html">第 11 章</a>; 辛同胚族 <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>Hamilton 向量场 \(X_H\)</strong> — \(\iota_{X_H} \omega = dH\) <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>海森堡（Heisenberg）</strong> — 矩阵力学 1925 <a href="ch21.html">第 21 章</a>; 不确定原理 <a href="ch21.html#sec21-2">21.2</a>; Heisenberg 运动方程 <a href="ch21.html#sec21-4">21.4</a>。</li>
+  <li><strong>Hill 球</strong> — 引力主导区域 <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>Hohmann 转移轨道</strong> — 最少燃料星际转移 <a href="ch23.html#sec23-7">23.7</a>。</li>
+  <li><strong>Hooke 定律</strong> — 弹簧 \(F = -k x\); 谐振子 <a href="ch2.html">第 2 章</a>; 弹性力学 <a href="ch18.html">第 18 章</a>。</li>
+  <li><strong>混沌</strong> — Lyapunov 指数 + 同宿轨道 + Smale 马蹄 <a href="ch17.html">第 17 章</a>。</li>
+</ul>
+
+<h2>J</h2>
+<ul>
+  <li><strong>Jacobi（C. G. J. Jacobi）</strong> — 椭圆函数解刚体 <a href="ch24.html#sec24-8">24.8</a>; Jacobi 恒等式 <a href="ch12.html">第 12 章</a>。</li>
+  <li><strong>Jacobi 积分</strong> — 限制三体守恒量 <a href="ch23.html#sec23-4">23.4</a>。</li>
+  <li><strong>简正模式</strong> — 多自由度耦合振动分解 <a href="ch8.html">第 8 章</a>; 速查 <a href="appA.html#appA-8">附录 A.8</a>。</li>
+  <li><strong>角动量</strong> — 经典 \(\boldsymbol L = \boldsymbol r \times \boldsymbol p\) <a href="ch2.html">第 2 章</a>; 中心力守恒 <a href="ch3.html">第 3 章</a>; Noether 来源 <a href="ch7.html">第 7 章</a>; 刚体 \(I \boldsymbol \omega\) <a href="ch9.html">第 9 章</a>; moment map 例 <a href="ch24.html#sec24-6">24.6</a>; 量子代数 <a href="appB.html#appB-7">附录 B.7</a>。</li>
+  <li><strong>经典场论</strong> — Lagrangian 密度 + Klein-Gordon + 电磁 <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>JWST（James Webb 太空望远镜）</strong> — 在太阳-地 \(L_2\) <a href="ch23.html#sec23-6">23.6</a>。</li>
+</ul>
+
+<h2>K</h2>
+<ul>
+  <li><strong>KAM 定理（Kolmogorov-Arnold-Moser）</strong> — <a href="ch16.html">第 16 章</a>。</li>
+  <li><strong>Kepler</strong> — 三定律 + 椭圆轨道 <a href="ch3.html">第 3 章</a>; LRL 向量 <a href="ch3.html">第 3 章</a>。</li>
+  <li><strong>刚体</strong> — 转动惯量 + 欧拉方程 <a href="ch9.html">第 9 章</a>; 几何力学约化 <a href="ch24.html#sec24-7">24.7</a>。</li>
+</ul>
+
+<h2>L</h2>
+<ul>
+  <li><strong>Lagrange（J. L. Lagrange）</strong> — 1788 Mécanique analytique <a href="ch1.html">第 1 章</a>; 1772 Lagrange 点 <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>Lagrange 点 \(L_1\)-\(L_5\)</strong> — 限制三体平衡点 <a href="ch23.html#sec23-5">23.5</a>; JWST + Trojan 应用 <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>Lagrange 方程</strong> — 见"Euler-Lagrange 方程"。</li>
+  <li><strong>Lagrangian \(L = T - V\)</strong> — <a href="ch1.html#sec1-2">1.2</a>; 相对论版 \(-mc^2/\gamma\) <a href="ch22.html#sec22-4">22.4</a>; 经典场论 \(\mathcal L\) 密度 <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>拉格朗日</strong> — 见"Lagrange"。</li>
+  <li><strong>Laplace-Runge-Lenz（LRL）向量</strong> — Kepler 守恒额外不变量 <a href="ch3.html">第 3 章</a>。</li>
+  <li><strong>Legendre 变换</strong> — \(L \to H\) <a href="ch10.html">第 10 章</a>。</li>
+  <li><strong>Lie 代数 / Lie 群</strong> — 速查 <a href="appB.html#appB-2">附录 B.2</a>; 几何力学 <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Liouville 定理（相空间体积）</strong> — Hamilton 流保体积 <a href="ch11.html">第 11 章</a>; 几何形式 <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>Liouville 完全可积</strong> — \(N\) 个对合守恒量 <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>Lorentz</strong> — 变换 <a href="ch22.html#sec22-1">22.1</a>; 群 \(SO(1,3)\) <a href="appB.html#appB-5">附录 B.5</a>; 不变量 <a href="ch22.html#sec22-2">22.2</a>。</li>
+  <li><strong>Lyapunov 指数</strong> — 局部敏感度量混沌 <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>流体力学</strong> — Euler + Navier-Stokes <a href="ch19.html">第 19 章</a>。</li>
+  <li><strong>路径积分</strong> — 见"Feynman"。</li>
+</ul>
+
+<h2>M</h2>
+<ul>
+  <li><strong>Marsden-Weinstein 约化</strong> — 辛对称商空间 <a href="ch24.html#sec24-7">24.7</a>。</li>
+  <li><strong>Maxwell 方程</strong> — 经典场论例 <a href="ch20.html">第 20 章</a>。</li>
+  <li><strong>Minkowski 时空</strong> — 4 维平直 <a href="ch22.html#sec22-2">22.2</a>; 测地线 <a href="ch22.html#sec22-6">22.6</a>。</li>
+  <li><strong>Moment map \(\mu: M \to \mathfrak g^*\)</strong> — <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>Moser（J. Moser）</strong> — KAM <a href="ch16.html">第 16 章</a>; Calogero-Moser <a href="ch24.html#sec24-8">24.8</a>。</li>
+  <li><strong>摆线（cycloid）</strong> — 最速降线解 <a href="ch1.html">第 1 章</a>。</li>
+</ul>
+
+<h2>N</h2>
+<ul>
+  <li><strong>Navier-Stokes 方程</strong> — 粘性流体 <a href="ch19.html">第 19 章</a>。</li>
+  <li><strong>Newton</strong> — F=ma 复习 <a href="ch2.html">第 2 章</a>; 1696 解最速降线 <a href="ch1.html">第 1 章</a>; 引力定律 <a href="ch3.html">第 3 章</a>。</li>
+  <li><strong>Noether 定理</strong> — 对称 ↔ 守恒律 <a href="ch7.html">第 7 章</a>; 几何完成 (moment map) <a href="ch24.html#sec24-6">24.6</a>。</li>
+</ul>
+
+<h2>O</h2>
+<ul>
+  <li><strong>Operator ordering（量子化排序）</strong> — Weyl + 正规序 <a href="ch21.html#sec21-5">21.5</a>。</li>
+</ul>
+
+<h2>P</h2>
+<ul>
+  <li><strong>Pauli 矩阵</strong> — \(SU(2)\) 生成元 <a href="appB.html#appB-4">附录 B.4</a>。</li>
+  <li><strong>Poincaré（H. Poincaré）</strong> — 三体不可积 <a href="ch23.html#sec23-1">23.1</a>; 截面 + 同宿 <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>Poincaré 群</strong> — 相对论时空对称 <a href="appB.html#appB-5">附录 B.5</a>。</li>
+  <li><strong>Poisson（S. D. Poisson）</strong> — Poisson 括号 <a href="ch12.html">第 12 章</a>。</li>
+  <li><strong>Poisson 括号 \(\{f, g\}\)</strong> — 定义 + 性质 <a href="ch12.html">第 12 章</a>; 量子化 \(\to\) 对易子 <a href="ch21.html#sec21-1">21.1</a>; 几何形式 <a href="ch24.html#sec24-4">24.4</a>。</li>
+  <li><strong>偏微分方程（PDE）</strong> — Hamilton-Jacobi <a href="ch14.html">第 14 章</a>; 经典场论 <a href="ch20.html">第 20 章</a>; 速查 <a href="appA.html#appA-9">附录 A.9</a>。</li>
+</ul>
+
+<h2>Q</h2>
+<ul>
+  <li><strong>正则变换</strong> — 保 Hamilton 形式的坐标变换 <a href="ch13.html">第 13 章</a>; 现代 = 辛同胚 <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>正则量子化</strong> — \(\{,\} \to [,]/(i\hbar)\) <a href="ch21.html#sec21-1">21.1</a>。</li>
+  <li><strong>群（group）</strong> — 速查 <a href="appB.html#appB-1">附录 B.1</a>。</li>
+</ul>
+
+<h2>R</h2>
+<ul>
+  <li><strong>Reynolds 数</strong> — 流体粘性 vs 惯性 <a href="ch19.html">第 19 章</a>。</li>
+  <li><strong>Routhian（部分 Legendre 变换）</strong> — <a href="ch10.html">第 10 章</a>。</li>
+</ul>
+
+<h2>S</h2>
+<ul>
+  <li><strong>Schrödinger 方程</strong> — 通过 Hamilton-Jacobi 推导 <a href="ch21.html#sec21-8">21.8</a>。</li>
+  <li><strong>受迫振动 + 共振</strong> — <a href="ch8.html">第 8 章</a>; 二阶 ODE 速查 <a href="appA.html#appA-6">附录 A.6</a>。</li>
+  <li><strong>守恒律</strong> — 能量 + 动量 + 角动量 <a href="ch2.html">第 2 章</a>; Noether 总框架 <a href="ch7.html">第 7 章</a>; moment map <a href="ch24.html#sec24-6">24.6</a>。</li>
+  <li><strong>守恒量（沿 Hamilton 流）</strong> — Poisson 括号 \(\{f, H\} = 0\) <a href="ch12.html">第 12 章</a>。</li>
+  <li><strong>速度</strong> — 4-速度（相对论）<a href="ch22.html#sec22-2">22.2</a>; 角速度（刚体）<a href="ch9.html">第 9 章</a>。</li>
+  <li><strong>双摆</strong> — 简正模式例 <a href="ch8.html">第 8 章</a>; 混沌例 <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>SO(3) / SU(2)</strong> — 旋转群 <a href="appB.html#appB-3">附录 B.3</a>; 量子自旋 <a href="appB.html#appB-4">附录 B.4</a>。</li>
+  <li><strong>symplectic（辛）</strong> — 形式 \(\omega\) <a href="ch11.html">第 11 章</a>; 流形 <a href="ch24.html#sec24-2">24.2</a>; 同胚 <a href="ch24.html#sec24-5">24.5</a>。</li>
+  <li><strong>三体问题</strong> — 不可积（Poincaré）<a href="ch23.html#sec23-1">23.1</a>; 限制版 + Lagrange 点 <a href="ch23.html#sec23-2">23.2</a>。</li>
+</ul>
+
+<h2>T</h2>
+<ul>
+  <li><strong>太阳系</strong> — Kepler 行星 <a href="ch3.html">第 3 章</a>; 稳定性问 + KAM <a href="ch16.html">第 16 章</a>; 航天器 <a href="ch23.html">第 23 章</a>。</li>
+  <li><strong>弹性力学</strong> — 应力 + 应变 + 杨氏模量 <a href="ch18.html">第 18 章</a>。</li>
+  <li><strong>Toda 链</strong> — 可积例 <a href="ch24.html#sec24-8">24.8</a>。</li>
+  <li><strong>Trojan 小行星</strong> — 太阳-木星 \(L_4, L_5\) <a href="ch23.html#sec23-6">23.6</a>。</li>
+  <li><strong>同时性相对</strong> — Lorentz 变换后果 <a href="ch22.html#sec22-1">22.1</a>。</li>
+</ul>
+
+<h2>V</h2>
+<ul>
+  <li><strong>Voyager 探测器</strong> — 引力借助多次飞掠 <a href="ch23.html#sec23-8">23.8</a>。</li>
+</ul>
+
+<h2>W</h2>
+<ul>
+  <li><strong>WKB 近似（半经典）</strong> — Schrödinger 经典极限 <a href="ch21.html#sec21-8">21.8</a>。</li>
+  <li><strong>Wigner</strong> — Poincaré 群表示 + 粒子分类 <a href="appB.html#appB-5">附录 B.5</a>。</li>
+</ul>
+
+<h2>X</h2>
+<ul>
+  <li><strong>相对论</strong> — 见"Lorentz" + <a href="ch22.html">第 22 章</a>。</li>
+  <li><strong>相空间</strong> — \((q, p)\) 几何 <a href="ch11.html">第 11 章</a>; 辛流形 <a href="ch24.html">第 24 章</a>。</li>
+  <li><strong>限制三体问题（CR3BP）</strong> — <a href="ch23.html#sec23-2">23.2</a>。</li>
+</ul>
+
+<h2>Y</h2>
+<ul>
+  <li><strong>引力借助（gravitational slingshot）</strong> — Voyager 多次借助 <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>有效势 \(V_{\text{eff}}\)</strong> — 中心力径向 <a href="ch3.html">第 3 章</a>; 限制三体 <a href="ch23.html#sec23-3">23.3</a>。</li>
+</ul>
+
+<h2>Z</h2>
+<ul>
+  <li><strong>振动</strong> — 单摆小振动 <a href="ch1.html">第 1 章</a>; 多自由度 + 简正模 <a href="ch8.html">第 8 章</a>; 二阶 ODE <a href="appA.html#appA-6">附录 A.6</a>。</li>
+  <li><strong>正则变换 / 正则坐标</strong> — 见 Q 节。</li>
+  <li><strong>中心力</strong> — 角动量守恒 + 径向方程 <a href="ch3.html">第 3 章</a>。</li>
+  <li><strong>周期运动</strong> — Kepler 椭圆 <a href="ch3.html">第 3 章</a>; 作用-角变量 <a href="ch15.html">第 15 章</a>; 极限环（混沌前体）<a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>最速降线（brachistochrone）</strong> — Bernoulli 1696 + Newton 解答 <a href="ch1.html">第 1 章</a>。</li>
+  <li><strong>最小作用量</strong> — Hamilton 原理 <a href="ch1.html#sec1-2">1.2</a>; 完整 <a href="ch5.html">第 5 章</a>。</li>
+  <li><strong>作用量 \(S\)</strong> — \(\int L \, dt\) 定义 <a href="ch1.html#sec1-2">1.2</a>; Hamilton-Jacobi 主函数 <a href="ch14.html">第 14 章</a>; 路径积分相位 <a href="ch21.html#sec21-6">21.6</a>。</li>
+  <li><strong>作用-角变量</strong> — 完全可积系统 <a href="ch15.html">第 15 章</a>。</li>
+</ul>
+
+<h2>查找：按"我现在想做什么"</h2>
+
+<ol>
+  <li><strong>解一道单粒子力学题（无约束）</strong>: 直接 Newton F = ma <a href="ch2.html">第 2 章</a>; 若有势 \(V(\boldsymbol r)\) 用能量守恒。</li>
+  <li><strong>解一道带约束 + 多自由度题</strong>: 选广义坐标 \(q^i\) <a href="ch4.html">第 4 章</a>; 写 \(L = T - V\), EL 方程 <a href="ch6.html">第 6 章</a>; 多自由度小振动 → 简正模式 <a href="ch8.html">第 8 章</a>。</li>
+  <li><strong>找系统的守恒量</strong>: 看 Lagrangian 对称性, 用 Noether 定理 <a href="ch7.html">第 7 章</a>; 经典: 时间不显含 → 能量, 平移对称 → 动量, 旋转 → 角动量。</li>
+  <li><strong>分析相空间结构 / 找正则变换</strong>: Legendre \(L \to H\) <a href="ch10.html">第 10 章</a>; Hamilton 方程 <a href="ch11.html">第 11 章</a>; 用 Poisson 括号验证 <a href="ch12.html">第 12 章</a>。</li>
+  <li><strong>解可分变量系统 / 找作用-角</strong>: Hamilton-Jacobi 分离 <a href="ch14.html">第 14 章</a>; 作用-角变量 <a href="ch15.html">第 15 章</a>。</li>
+  <li><strong>研究太阳系或多体引力稳定性</strong>: KAM 定理 <a href="ch16.html">第 16 章</a>; 三体不可积 <a href="ch23.html#sec23-1">23.1</a>; Lagrange 点 <a href="ch23.html#sec23-5">23.5</a>。</li>
+  <li><strong>诊断混沌行为</strong>: Lyapunov 指数 <a href="ch17.html">第 17 章</a>; Poincaré 截面 <a href="ch17.html">第 17 章</a>; 倍周期分岔 + Smale 马蹄 <a href="ch17.html">第 17 章</a>。</li>
+  <li><strong>分析高速运动 / 相对论</strong>: 4-向量 + Lorentz 变换 <a href="ch22.html#sec22-2">22.2</a>; 相对论 Lagrangian <a href="ch22.html#sec22-4">22.4</a>; \(\boldsymbol F = d\boldsymbol p/dt\) <a href="ch22.html#sec22-5">22.5</a>。</li>
+  <li><strong>设计航天器轨道</strong>: Hohmann 转移 <a href="ch23.html#sec23-7">23.7</a>; Lagrange 点驻留 <a href="ch23.html#sec23-5">23.5</a>; 引力借助 <a href="ch23.html#sec23-8">23.8</a>。</li>
+  <li><strong>从经典推量子（量子化）</strong>: 正则量子化 \(\{,\} \to [,]/(i\hbar)\) <a href="ch21.html#sec21-1">21.1</a>; Heisenberg 运动方程 <a href="ch21.html#sec21-4">21.4</a>; 路径积分 \(\int Dx \, e^{iS/\hbar}\) <a href="ch21.html#sec21-6">21.6</a>。</li>
+  <li><strong>用对称性约化系统维数</strong>: Marsden-Weinstein 辛约化 <a href="ch24.html#sec24-7">24.7</a>; 例: 中心力 6→2 维, 刚体 6→2 维。</li>
+  <li><strong>识别系统是否可积</strong>: 找 \(N\) 个互对合守恒量 <a href="ch15.html">第 15 章</a>; Lax 对结构 <a href="ch24.html#sec24-8">24.8</a>; 若否, KAM 检查"<em>几乎可积</em>" <a href="ch16.html">第 16 章</a>。</li>
+</ol>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appB.html">← 附录 B</a></nav>
+</main>
+</body>
+</html>

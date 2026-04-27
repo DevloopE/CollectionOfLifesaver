@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>附录 B 群与对称性速查 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+<h1 id="appB">附录 B 群与对称性速查</h1>
+
+<p>本书<a href="ch7.html">第 7 章</a> Noether 定理需要"<em>连续对称性</em>" + "<em>无穷小变换</em>"; <a href="ch9.html">第 9 章</a>刚体角动量用 \(SO(3)\) 旋转群; <a href="ch12.html">第 12 章</a> Poisson 括号是一种 Lie 代数; <a href="ch24.html">第 24 章</a>几何力学完全建立在 Lie 群作用 + moment map 上。所有这些都用<em>群论</em>——抽象代数里"<em>对称性</em>" 的数学语言（链<a href="../抽象代数/index.html">《抽象代数读本》</a>）。这个附录把本书需要的群论事实集中速查——没有新概念, 都在抽象代数读本里有完整推导。</p>
+
+<ul>
+  <li>群定义 + 例子。</li>
+  <li>Lie 群 + Lie 代数 (连续对称).</li>
+  <li>\(SO(3)\) (3 维旋转) + \(\mathfrak{so}(3)\) Lie 代数.</li>
+  <li>\(SU(2)\) + \(\mathfrak{su}(2)\) (量子力学角动量).</li>
+  <li>Lorentz 群 + Poincaré 群 (相对论).</li>
+  <li>表示论入门.</li>
+  <li>量子角动量代数（链 ch21）.</li>
+  <li>力学中常见群的总结表。</li>
+</ul>
+
+<h2 id="appB-1">B.1 群定义</h2>
+
+<p>集合 \(G\) + 二元运算 \(\cdot: G \times G \to G\) 是<em>群</em>, 若满足:</p>
+
+<ol>
+  <li><em>结合律</em>: \((a \cdot b) \cdot c = a \cdot (b \cdot c)\)。</li>
+  <li><em>单位元</em>: 存在 \(e \in G\) 使 \(e \cdot a = a \cdot e = a\)。</li>
+  <li><em>逆元</em>: 每个 \(a \in G\) 有 \(a^{-1}\) 使 \(a \cdot a^{-1} = a^{-1} \cdot a = e\)。</li>
+</ol>
+
+<p>若额外 \(a \cdot b = b \cdot a\)（交换律）, 群<em>交换</em>（Abelian）。</p>
+
+<p>例:</p>
+
+<ul>
+  <li>\((\mathbb Z, +)\): 整数加法, 单位 0, 逆 \(-a\)。Abelian, 无穷。</li>
+  <li>\((\mathbb R^n, +)\): 向量加法。Abelian, 无穷连续。<em>平移群</em>。</li>
+  <li>\(\mathbb Z/n \mathbb Z\): 模 \(n\) 整数加法。Abelian, \(n\) 元有限。</li>
+  <li>\(S_n\): \(n\) 个对象的置换群, \(n!\) 元。\(n \ge 3\) 时<em>非</em> Abelian。</li>
+  <li>\(GL(n, \mathbb R)\): \(n \times n\) 可逆实矩阵 + 矩阵乘法。无穷连续, \(n \ge 2\) 时非 Abelian。</li>
+</ul>
+
+<p>力学相关的群基本上是<em>连续</em>（"<em>Lie 群</em>"）+ <em>无穷</em>。本书直接用 \(\mathbb R^n\)（平移）+ \(SO(3)\)（旋转）+ \(SU(2)\)（自旋）+ Lorentz / Poincaré（相对论）+ 几个 Hamilton 流的一参数群。</p>
+
+<h2 id="appB-2">B.2 Lie 群 + Lie 代数</h2>
+
+<p><em>Lie 群</em>: 同时是<em>群</em> 又是<em>光滑流形</em>, 群运算（乘法 + 求逆）是光滑映射。</p>
+
+<p>例: \(SO(3)\) (3×3 行列式 1 正交矩阵) 是 3 维光滑流形, 群运算光滑——是 Lie 群。</p>
+
+<p>Lie 群在物理里描述<em>连续对称性</em>——比如旋转, 平移, 时空 Lorentz 变换, 量子幺正变换等。</p>
+
+<p><em>Lie 代数</em>: Lie 群 \(G\) 在单位元 \(e\) 处的<em>切空间</em>, 记 \(\mathfrak g = T_e G\)。维度 = Lie 群维度。</p>
+
+<p>Lie 代数有<em>括号运算</em> \([\cdot, \cdot]: \mathfrak g \times \mathfrak g \to \mathfrak g\), 满足:</p>
+
+<ol>
+  <li>双线性。</li>
+  <li>反对称: \([X, Y] = -[Y, X]\)。</li>
+  <li>Jacobi 恒等式: \([X, [Y, Z]] + [Y, [Z, X]] + [Z, [X, Y]] = 0\)。</li>
+</ol>
+
+<p>对矩阵 Lie 群（如 \(SO(3), GL(n)\)）, Lie 代数也是矩阵, 括号是<em>对易子</em> \([X, Y] = XY - YX\)。</p>
+
+<p>关键关系: <em>指数映射</em> \(\exp: \mathfrak g \to G\), \(X \mapsto e^X = \sum_k X^k/k!\)。</p>
+
+<p>这条映射连接代数和群: 每个 \(X \in \mathfrak g\) 给一条<em>一参数子群</em> \(\{e^{tX}: t \in \mathbb R\} \subset G\)。<em>无穷小变换 \(X\)</em> 通过 \(\exp\) "<em>积分</em>" 出有限变换。</p>
+
+<p>例 \(SO(3)\): \(\mathfrak{so}(3)\) 是反对称 3×3 矩阵集 (3 维)。基</p>
+
+<p>\[
+J_x = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{pmatrix}, \quad J_y = \begin{pmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ -1 & 0 & 0 \end{pmatrix}, \quad J_z = \begin{pmatrix} 0 & -1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.
+\]</p>
+
+<p>对易关系</p>
+
+<p>\[
+[J_x, J_y] = J_z, \quad [J_y, J_z] = J_x, \quad [J_z, J_x] = J_y.
+\]</p>
+
+<p>简记 \([J_i, J_j] = \varepsilon_{ijk} J_k\)（\(\varepsilon\) 是反对称符号）。</p>
+
+<p>指数 \(\exp(\theta J_z)\) 给绕 \(z\) 轴 \(\theta\) 角度的旋转矩阵。所以"<em>无穷小绕 \(z\) 旋转</em>" \(J_z\) "<em>积分</em>" 出"<em>有限角度旋转</em>"。</p>
+
+<p>请你看这件事的力量: <em>Lie 群上无穷连续的几何被"<em>压缩</em>" 到 Lie 代数的有限维线性结构</em>。研究 \(SO(3)\)（3 维流形）变成研究 \(\mathfrak{so}(3)\)（3 维向量空间）+ 一个对易子。这是<em>Lie 1880 年代</em> 的核心洞察, 后来被 Killing + Cartan 1890-1900 系统化为 Lie 代数分类。</p>
+
+<h2 id="appB-3">B.3 \(SO(3)\) 与 \(\mathfrak{so}(3)\): 3 维旋转</h2>
+
+<p>\(SO(3) = \{R \in \mathbb R^{3 \times 3}: R^T R = I, \det R = 1\}\)——3 维欧氏空间保<em>距离 + 取向</em> 的线性变换. <em>旋转群</em>。</p>
+
+<p>结构: 3 维 Lie 群, 紧 (compact)。可参数化为<em>欧拉角</em> (链<a href="ch9.html">第 9 章</a>) 或<em>转轴 + 转角</em> (Rodrigues 公式)。</p>
+
+<p>Lie 代数 \(\mathfrak{so}(3) \cong \mathbb R^3\)（同构, 反对称矩阵 \(\leftrightarrow\) 向量）, 括号是<em>叉乘</em>:</p>
+
+<p>\[
+[\boldsymbol \omega_1, \boldsymbol \omega_2] = \boldsymbol \omega_1 \times \boldsymbol \omega_2.
+\]</p>
+
+<p>这就是为什么角速度 + 角动量是<em>叉乘</em>: 它们生活在 \(\mathfrak{so}(3) \cong \mathbb R^3\) 中, Lie 括号是叉乘。</p>
+
+<p>物理用: <a href="ch9.html">第 9 章</a>刚体动力学全建在 \(SO(3)\) + \(\mathfrak{so}(3)\) 上。Euler 方程 \(\dot{\boldsymbol L} = \boldsymbol L \times (I^{-1} \boldsymbol L)\) 是 \(\mathfrak{so}(3)^*\) 上的 Lie-Poisson 流（链<a href="ch24.html">第 24 章</a>）。</p>
+
+<p>\(SO(3)\) <em>不</em> 单连通——基本群 \(\pi_1(SO(3)) = \mathbb Z/2\)。"<em>转 360° 不回到自己</em>"（量子自旋的"<em>2π 不等于</em> 1</em>"）是这件事的物理后果. 详 B.4 节。</p>
+
+<h2 id="appB-4">B.4 \(SU(2)\) 与 \(\mathfrak{su}(2)\): 量子力学角动量</h2>
+
+<p>\(SU(2) = \{U \in \mathbb C^{2 \times 2}: U^\dagger U = I, \det U = 1\}\)——2×2 复幺正行列式 1 矩阵。3 维 Lie 群, 紧, 单连通。</p>
+
+<p>关键: <em>\(SU(2)\) 是 \(SO(3)\) 的双覆盖</em>。具体, 存在 2-1 同态 \(\rho: SU(2) \to SO(3)\), \(\ker \rho = \{\pm I\}\)。所以 \(SO(3) = SU(2)/\{\pm I\}\)。"<em>每个 \(SO(3)\) 旋转对应 \(SU(2)\) 中的 ±2 个元素</em>"。</p>
+
+<p>Lie 代数 \(\mathfrak{su}(2) \cong \mathfrak{so}(3) \cong \mathbb R^3\)（局部同构）。基用<em>Pauli 矩阵</em> 的一半:</p>
+
+<p>\[
+S_i = \frac{1}{2} \sigma_i, \quad \sigma_x = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \quad \sigma_y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \quad \sigma_z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.
+\]</p>
+
+<p>对易关系:</p>
+
+<p>\[
+[S_i, S_j] = i \varepsilon_{ijk} S_k.
+\]</p>
+
+<p>跟 \(\mathfrak{so}(3)\) 的 \([J_i, J_j] = \varepsilon_{ijk} J_k\) 几乎一样, 差因子 \(i\)（来自反厄米 vs 反对称矩阵 / 物理常用厄米 \(\hat S\) 而不是反厄米）。</p>
+
+<p>物理: <em>电子自旋 \(s = 1/2\)</em> 的态空间是 \(\mathbb C^2\), \(SU(2)\) 是它的"<em>旋转群</em>"。\(SO(3)\) 不能直接作用于 \(\mathbb C^2\)（自旋是 \(SO(3)\) 的"<em>射影表示</em>", 严格说是 \(SU(2)\) 的表示）。</p>
+
+<p>"<em>电子转 360° 不回到自己, 转 720° 才回到</em>"——这是 \(SU(2) \to SO(3)\) 是<em>2-1</em> 的物理后果。一个 \(SO(3)\) 360° 旋转对应 \(SU(2)\) 中 \(-I\)（不是 \(+I\)）, 给波函数 \(\psi \to -\psi\)。两次 360° 才回 \(+I\)。这件事在量子干涉实验里直接看到（中子干涉仪 1975 年实验）。</p>
+
+<p>请你欣赏这件事——<em>抽象代数（双覆盖）的具体物理</em>。\(SU(2) \to SO(3)\) 不是数学游戏, 是实测物理事实。</p>
+
+<h2 id="appB-5">B.5 Lorentz 群 + Poincaré 群</h2>
+
+<p>狭义相对论的对称群（链<a href="ch22.html">第 22 章</a>）。</p>
+
+<p><em>Lorentz 群</em> \(O(1, 3)\): 4 维实矩阵 \(\Lambda\) 满足 \(\Lambda^T \eta \Lambda = \eta\) (\(\eta = \operatorname{diag}(-1, +1, +1, +1)\))。包括 4 个连通分量（保 / 反时间方向 \(\times\) 保 / 反空间取向）。</p>
+
+<p>"<em>正常</em>" Lorentz 群 \(SO^+(1, 3)\): 保时间 + 取向, 包含单位元的连通分量。6 维 Lie 群: 3 个空间旋转 + 3 个 Lorentz boost (沿 3 个空间轴)。</p>
+
+<p>Lie 代数 \(\mathfrak{so}(1, 3)\): 6 维, 有 3 个 \(J_i\)（旋转生成元）+ 3 个 \(K_i\)（boost 生成元）。对易关系</p>
+
+<p>\[
+[J_i, J_j] = \varepsilon_{ijk} J_k, \quad [J_i, K_j] = \varepsilon_{ijk} K_k, \quad [K_i, K_j] = -\varepsilon_{ijk} J_k.
+\]</p>
+
+<p>(最后一条<em>负号</em> 来自 Minkowski 度量负时间分量。这是相对论的"<em>双曲</em>" 几何与 \(SO(4)\) 的"<em>椭圆</em>" 几何的代数差别。)</p>
+
+<p>关键: 把 \(J + K\) 和 \(J - K\) 重组, 得</p>
+
+<p>\[
+[A_i, A_j] = i \varepsilon_{ijk} A_k, \quad [B_i, B_j] = i \varepsilon_{ijk} B_k, \quad [A_i, B_j] = 0,
+\]</p>
+
+<p>其中 \(A = (J + i K)/2, B = (J - i K)/2\) (\(\mathbb C\) 化系数). 所以复化的 \(\mathfrak{so}(1, 3)_{\mathbb C} \cong \mathfrak{su}(2) \oplus \mathfrak{su}(2)\)。Lorentz 表示由 \((j_1, j_2)\) 标记 (两组自旋)。</p>
+
+<ul>
+  <li>\((0, 0)\): 标量。</li>
+  <li>\((1/2, 0)\) + \((0, 1/2)\): Weyl 旋量 (左 / 右手电子)。</li>
+  <li>\((1/2, 1/2)\): 4-向量 (位置, 4-动量)。</li>
+  <li>\((1, 0)\) + \((0, 1)\): 自对偶 / 反自对偶张量 (电磁场 \(F_{\mu \nu}\) 的两半)。</li>
+</ul>
+
+<p>这是粒子物理 Standard Model 的"<em>场谱</em>" 分类工具。详见任何 QFT 教材 (Peskin-Schroeder, Weinberg)。</p>
+
+<p><em>Poincaré 群</em>: Lorentz 群加上时空平移. 半直积 \(P = \mathbb R^{1, 3} \rtimes SO^+(1, 3)\), 10 维 (4 平移 + 6 Lorentz)。这是相对论<em>完整</em> 时空对称群。</p>
+
+<p>Wigner 1939 分类 Poincaré 群的<em>幺正不可约表示</em>——给出"<em>所有可能粒子类型</em>": 由 (mass, spin) 二元组标记。每种基本粒子（电子、光子、夸克、…）对应一个特定 Wigner 表示。这是相对论量子场论的<em>结构性</em> 起点。</p>
+
+<h2 id="appB-6">B.6 表示论入门</h2>
+
+<p><em>表示</em>: 群 \(G\) 的<em>表示</em> 是同态 \(\rho: G \to GL(V)\)（\(V\) 是向量空间）, 即把 \(G\) 元素表示为 \(V\) 上线性变换, 保群运算。</p>
+
+<p><em>不可约</em>: 表示 \(\rho\) <em>不可约</em> ⟺ \(V\) 没有 \(\rho\)-不变真子空间 (除 0 + \(V\))。"<em>不能再分解</em>" 的最小表示。</p>
+
+<p>核心定理: <em>紧 Lie 群所有有限维表示完全分解为不可约表示之和</em> (Peter-Weyl 定理)。所以<em>不可约表示</em> 是"<em>构造块</em>"。</p>
+
+<p>\(SO(3)\) 不可约表示: 由非负整数 \(\ell = 0, 1, 2, \ldots\) 标记, 维度 \(2\ell + 1\)。具体:</p>
+
+<ul>
+  <li>\(\ell = 0\): 标量, 1 维。</li>
+  <li>\(\ell = 1\): 向量, 3 维。</li>
+  <li>\(\ell = 2\): 对称无迹张量, 5 维。</li>
+  <li>...</li>
+</ul>
+
+<p>\(SU(2)\) 不可约: 由半整数 \(s = 0, 1/2, 1, 3/2, \ldots\) 标记, 维度 \(2 s + 1\)。<em>多了半整数 \(s = 1/2, 3/2, \ldots\)</em>——它们对应"<em>SO(3) 的射影表示</em>", 物理是费米子（电子 \(s = 1/2\) + 夸克 \(s = 1/2\)）.</p>
+
+<p>物理用: <em>角动量</em> 在量子力学里由<em>\(SO(3)\) 或 \(SU(2)\) 不可约表示</em> 标记。整数 \(\ell\) 给轨道角动量 (玻色-像), 半整数 \(s\) 给自旋 (费米子)。这就是为什么"<em>电子自旋 1/2</em>" 是<em>群论必然</em> 而不是物理偶然——它是 \(SU(2)\) 比 \(SO(3)\) "<em>更大</em>" 的代数后果。</p>
+
+<p><em>Clebsch-Gordan 系数</em>: 把两个不可约表示的张量积分解成不可约表示之和:</p>
+
+<p>\[
+V_{j_1} \otimes V_{j_2} = \bigoplus_{j = |j_1 - j_2|}^{j_1 + j_2} V_j.
+\]</p>
+
+<p>物理: "<em>两个角动量 \(j_1, j_2\) 的耦合</em>" 给出"<em>总角动量</em>" 取值 \(|j_1 - j_2|, |j_1 - j_2| + 1, \ldots, j_1 + j_2\)。具体系数（耦合幅度）是 Clebsch-Gordan 系数, 量子化学 / 原子物理标准查表。</p>
+
+<h2 id="appB-7">B.7 量子角动量代数</h2>
+
+<p>本节具体把<a href="ch21.html">第 21 章</a>正则量子化 + Lie 代数结合, 给量子角动量代数。</p>
+
+<p>从经典 \(\boldsymbol L = \boldsymbol q \times \boldsymbol p\)（\(\{L_i, L_j\} = \varepsilon_{ijk} L_k\), 链<a href="ch12.html">第 12 章</a> 12.5 节）正则量子化:</p>
+
+<p>\[
+[\hat L_i, \hat L_j] = i \hbar \, \varepsilon_{ijk} \hat L_k.
+\]</p>
+
+<p>这与 \(\mathfrak{so}(3)\) 对易关系一样, 差 \(i \hbar\)。所以<em>量子角动量算子代数 = \(\mathfrak{so}(3)\) Lie 代数</em>（带 \(\hbar\) 单位）。</p>
+
+<p>定义升降算子 \(\hat L_\pm = \hat L_x \pm i \hat L_y\)。算 \([\hat L_+, \hat L_-] = 2 \hbar \hat L_z\), \([\hat L_z, \hat L_\pm] = \pm \hbar \hat L_\pm\)。</p>
+
+<p>这给"<em>角动量阶梯</em>": 设 \(\hat L_z |m\rangle = m \hbar |m\rangle\), \(\hat L_+ |m\rangle\) 是 \(\hat L_z\) 的 \(m + 1\) 本征态; \(\hat L_-\) 降一格。代数有限制: 必须 \(\hat L_+\) 在某 \(m_{\max}\) 处给 0（否则 \(L_z\) 无界）, \(\hat L_-\) 在 \(m_{\min}\) 给 0。\(m_{\max} = -m_{\min} = \ell\), \(\ell\) 取非负半整数。</p>
+
+<p>所以<em>角动量量子化</em>: \(\boldsymbol L^2 = \hbar^2 \ell(\ell+1)\), \(L_z = \hbar m\), \(m = -\ell, -\ell + 1, \ldots, \ell\)。</p>
+
+<p>\(\ell\) 整数: 玻色子角动量（光子 \(s = 1\)）。\(\ell\) 半整数: 费米子（电子 \(s = 1/2\)）。<em>"自旋为半整数" 的物理来自 \(SU(2)\) 表示论</em>——<a href="ch21.html">第 21 章</a> 21.2 节正则量子化的具体延伸。</p>
+
+<h2 id="appB-8">B.8 力学中常见 Lie 群速查</h2>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">群</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">维数</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">物理含义</th><th style="padding: 0.3em 1em; border-bottom: 1px solid #888;">本书章节</th></tr>
+<tr><td>\(\mathbb R^n\)（平移）</td><td>\(n\)</td><td>空间 / 时间平移</td><td>ch7</td></tr>
+<tr><td>\(SO(2)\)</td><td>1</td><td>平面旋转 / 单参数对称</td><td>ch3, ch7</td></tr>
+<tr><td>\(SO(3)\)</td><td>3</td><td>3 维旋转 / 角动量</td><td>ch9, ch24</td></tr>
+<tr><td>\(SO(3) \times \mathbb R^3\)</td><td>6</td><td>欧氏运动群 \(E(3)\)</td><td>ch24</td></tr>
+<tr><td>\(SU(2)\)</td><td>3</td><td>自旋 1/2 / 双覆盖 \(SO(3)\)</td><td>appB</td></tr>
+<tr><td>\(SU(3)\)</td><td>8</td><td>夸克色 / 强相互作用</td><td>QFT 范围外</td></tr>
+<tr><td>\(SO(1, 3)\)</td><td>6</td><td>Lorentz 群</td><td>ch22</td></tr>
+<tr><td>Poincaré 群</td><td>10</td><td>相对论时空对称</td><td>ch22</td></tr>
+<tr><td>\(Sp(2n, \mathbb R)\)</td><td>\(n(2n+1)\)</td><td>辛同胚（线性）</td><td>ch24</td></tr>
+<tr><td>Diff(M)</td><td>\(\infty\)</td><td>流体 / 一般相对论</td><td>ch19, V13 ch23</td></tr>
+</table>
+
+<p>注:</p>
+
+<ul>
+  <li>"<em>维数</em>" 指 Lie 群的实维数 (= Lie 代数的维数)。</li>
+  <li>\(SU(N)\) 维数 \(N^2 - 1\)。\(SO(N)\) 维数 \(N(N-1)/2\)。\(Sp(2n)\) 维数 \(n(2n+1)\)。</li>
+  <li>Diff(M)（流形 \(M\) 上微分同胚群）是<em>无穷维</em> Lie 群——流体力学里"<em>速度场</em>" 的 Lie 代数; 一般相对论里时空微分同胚的代数。这些超出有限维群论, 需特别处理。</li>
+</ul>
+
+<h2 id="appB-9">B.9 实战准则</h2>
+
+<ul>
+  <li>看到"<em>对称性</em>" → 先找它的 Lie 群; 再找 Lie 代数; 最后找无穷小生成元 + 对易关系。Noether 守恒量在生成元上算清楚。</li>
+  <li>常见模板: \([X, Y] = c X + d Y + \ldots\) 给 Lie 代数结构常数; \(SO(3), SU(2), SO(1,3)\) 都熟。</li>
+  <li>区分"<em>群</em>" (有限变换) vs "<em>代数</em>" (无穷小变换). Lie 代数代数运算（双线性 + 反对称 + Jacobi）容易; 群运算（指数映射 + 嵌入）几何复杂。研究<em>无穷小</em> 行为先看代数。</li>
+  <li>"<em>射影表示</em>"（如 \(SU(2)\) 之于 \(SO(3)\)）—— 经典对称在量子里可能<em>放大</em> 成更大的群。这是双值波函数 / 自旋半整数等"<em>纯量子</em>" 现象的源头。</li>
+  <li>角动量代数 \(\mathfrak{so}(3) \cong \mathfrak{su}(2)\) 是物理学最常用 Lie 代数。<em>务必</em> 熟练对易关系 + 升降算子 + 有限维不可约。</li>
+  <li>Lorentz / Poincaré 群是相对论 + QFT 的对称基础. \(\mathfrak{so}(1, 3) \cong \mathfrak{sl}(2, \mathbb C)\) 给"<em>左右手 Weyl 旋量</em>" 自动分解.</li>
+  <li>详细群论 + 表示论见<a href="../抽象代数/index.html">《抽象代数读本》</a>第二部分（连续群）+ Hall 《<em>Lie Groups, Lie Algebras, and Representations</em>》。</li>
+</ul>
+
+<p>群论是物理学的"<em>公共语言</em>"——一旦熟练, 所有后续物理 (QFT + 凝聚态 + 弦论) 都顺畅。这一附录只给入口; 真正掌握需要系统学习抽象代数 + Lie 群表示论。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="appA.html">← 附录 A</a><a href="subject-index.html">主题索引 →</a></nav>
+</main>
+</body>
+</html>

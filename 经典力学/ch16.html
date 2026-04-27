@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 16 章 经典微扰论 + KAM 定理：太阳系稳定吗 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 作用-角变量</a><a href="ch17.html">下一章 · 第 17 章 混沌的诞生 →</a></nav>
+<h1 id="ch16">第 16 章 经典微扰论 + KAM 定理：太阳系稳定吗</h1>
+
+<p>1687 Newton 在《<em>Principia</em>》第三卷里写"<em>每两个粒子之间引力 \(F = G m_1 m_2 / r^2\)</em>"。这条定律的力量在<em>两体</em>问题——Kepler 椭圆轨道——精确解。</p>
+
+<p>但太阳系不是两体——是<em>九体以上</em>系统：太阳、八行星、卫星、小行星、彗星、人造卫星。每一对天体之间都有引力。地球的轨道<em>不是</em> 严格 Kepler 椭圆——木星把地球向外拽、金星把地球向内拽、月亮把地球绕来绕去。</p>
+
+<p>实际怎么处理？经典回答——<em>每个行星的运动近似是 Kepler（被太阳主导）+ 小扰动（其它行星）</em>。\(M_{\odot} / M_{\text{Jupiter}} \approx 1000\)，最大行星的引力扰动是太阳引力的 \(\sim 10^{-3}\) 量级。所以太阳系是"<em>近积分系统</em>"——基础是 Kepler（积分），加小扰动。</p>
+
+<p>问题——这种小扰动会不会<em>累积</em> 起来让行星轨道在长时间内"<em>逃逸</em>"？牛顿、Lagrange、Laplace、Poincaré 200 年都在和这条问题搏斗。1954-1962 年 Kolmogorov + Arnold + Moser 给出 <em>KAM 定理</em>——一条给"<em>近积分系统大致仍像积分系统</em>" 提供精确数学保证的定理。</p>
+
+<p>这一章把这条故事完整讲一遍——为什么朴素微扰失败、KAM 怎么修、太阳系到底稳不稳定。</p>
+
+<h2 id="sec16-1">16.1 多体不可积：Poincaré 1890</h2>
+
+<p>先把上一章 15.5 节"<em>多体问题不可积</em>" 的论断兑现。具体——三体问题（太阳 + 木星 + 太阳系小天体）。三个粒子各自三维位置 + 三维动量 = 18 维相空间。</p>
+
+<p>朴素守恒量：能量（1）、总动量（3）、总角动量（3），合 7 条。3 自由度系统需要 9 个独立守恒量（每自由度 3，再加 \(H\)？不，n 自由度需要 \(n\) 个对易守恒量，三体 3D 是 9 自由度但 18 相空间，需要 9 守恒量）。还差 2 条。</p>
+
+<p>1887 年瑞典国王 Oscar II 设奖问"<em>三体问题能否解析解？</em>"。Poincaré 投稿，1890 年获奖论文给出震撼答案：</p>
+
+<blockquote style="border-left:3px solid var(--ink-soft);padding-left:1em;margin:1em 0;color:var(--ink-soft);font-style:italic;">
+"<em>三体问题不存在解析守恒量超出已知 7 条之外。系统不可积</em>。"
+</blockquote>
+
+<p>Poincaré 的证明思路：假设存在第八条解析守恒量 \(F\)。当 Jupiter 质量 \(\epsilon \to 0\) 时系统退化为两个 Kepler（太阳-Jupiter + 太阳-小天体），\(F\) 必须在 \(\epsilon = 0\) 时和已知守恒量相容。把 \(F\) 按 \(\epsilon\) 展开 \(F = F_0 + \epsilon F_1 + \ldots\)，对一阶项 \(F_1\) 求约束方程，发现"<em>共振</em>" 项让 \(F_1\) 不能是周期函数——所以 \(F\) 不存在。</p>
+
+<p>Poincaré 自己评价这条结果："<em>这道题的混乱让我恐惧</em>。"——他第一个看见<em>混沌</em> 的影子（"<em>同宿轨道</em>" 的纠缠图，分形结构）。这是 70 年后被叫"<em>chaos</em>" 的现象的最早记录。</p>
+
+<p>请你停下来感受这条定理的份量。"<em>三体问题不可积</em>"——意味着<em>没有公式</em> 能写出来"<em>水星 100 万年后在哪里</em>"。任何想求精确解析答案的努力<em>注定失败</em>。这条 1890 年震撼至今——它告诉我们物理学的局限，并打开了"<em>定性 + 数值</em>" 力学的整个领域。</p>
+
+<h2 id="sec16-2">16.2 经典微扰论的设置</h2>
+
+<p>既然没有精确解，<em>近似</em> 解就是必需。具体设置：</p>
+
+<p>\[
+H(I, \theta, \epsilon) = H_0(I) + \epsilon V(I, \theta),
+\]</p>
+
+<p>\(H_0\) 是积分系统（Kepler 椭圆），\(\epsilon V\) 是扰动（其它行星引力），\(\epsilon \ll 1\)（\(\sim 10^{-3}\) 太阳系）。在新作用-角 \((I, \theta)\) 下 \(H_0\) 不依赖 \(\theta\)，扰动 \(V\) 依赖 \(\theta\)。</p>
+
+<p>目标——找一个<em>近恒等</em> 正则变换</p>
+
+<p>\[
+(I, \theta) \to (J, \phi),
+\]</p>
+
+<p>使在新坐标下扰动消失到更高阶</p>
+
+<p>\[
+H(J, \phi) = \bar H_0(J) + \epsilon^2 V_2(J, \phi).
+\]</p>
+
+<p>这样新系统在<em>一阶 \(\epsilon\)</em> 仍是积分（\(\bar H_0(J)\) 不依赖 \(\phi\)），\(\theta\) 的运动还是常频。重复这条手法，理论上能消去更高阶——这是<em>Lindstedt 系列</em>（19 世纪天体力学家用了 100 年的工具）。</p>
+
+<p>具体怎么找这个变换？用<a href="ch13.html">第 13 章</a>正则变换的生成函数 \(F = \boldsymbol J \cdot \boldsymbol \theta + \epsilon S(J, \theta)\)（"<em>近恒等</em>" Type-2）。新坐标</p>
+
+<p>\[
+\phi = \theta + \epsilon \partial S / \partial J, \quad I = J + \epsilon \partial S / \partial \theta.
+\]</p>
+
+<p>把这条代回 \(H\) 并要"一阶 \(\epsilon\) 项不依赖 \(\phi\)" 给出</p>
+
+<p>\[
+\boldsymbol \omega(J) \cdot \frac{\partial S}{\partial \theta} + V(J, \theta) = \langle V \rangle_\theta(J),
+\]</p>
+
+<p>\(\langle V \rangle_\theta\) 是 \(V\) 对 \(\theta\) 的角度平均。这条方程叫<em>同调方程</em>（cohomological equation）。</p>
+
+<p>把 \(V\) 和 \(S\) 展成 Fourier 级数 \(V = \sum_{\boldsymbol n} V_{\boldsymbol n}(J) e^{i \boldsymbol n \cdot \boldsymbol \theta}\)、\(S = \sum_{\boldsymbol n} S_{\boldsymbol n}(J) e^{i \boldsymbol n \cdot \boldsymbol \theta}\)。同调方程对每个 Fourier mode 给出</p>
+
+<p>\[
+\boxed{\ S_{\boldsymbol n}(J) = \frac{V_{\boldsymbol n}(J)}{i \boldsymbol n \cdot \boldsymbol \omega(J)}, \quad \boldsymbol n \neq 0.\ }
+\]</p>
+
+<p>\(\boldsymbol n = 0\) 项给 \(\langle V \rangle = V_0(J)\)，这就是平均扰动 \(\bar H_0 = H_0 + \epsilon \langle V \rangle\)。</p>
+
+<h2 id="sec16-3">16.3 一阶平均：朴素的好处</h2>
+
+<p>把一阶平均 \(\bar H_0(J) = H_0(J) + \epsilon \langle V \rangle_\theta(J)\) 当成"<em>有效</em>" Hamilton 函数，得新频率 \(\bar \omega = \partial \bar H_0 / \partial J\)。这条修正反映"<em>扰动的角度平均改变频率</em>"。</p>
+
+<p>具体例：水星近日点进动。水星受太阳引力，但其它行星的扰动让水星轨道<em>不</em> 闭合——近日点每年缓慢转。\(V\) = 其它行星势能。\(\langle V \rangle\) 是这条势能在水星周期内的平均。计算给出近日点进动率 \(\sim 532\text{″/世纪}\)（Le Verrier 1859 年计算）。</p>
+
+<p>实际观测——水星近日点进动 \(\sim 575\text{″/世纪}\)。差额 43″/世纪 由 Newton 万有引力<em>无法解释</em>——这条差额最终在 1915 年由 Einstein 广义相对论解释（时空弯曲修正给恰好 43″/世纪）。这是 GR 的<em>第一个</em> 实验验证！</p>
+
+<p>这条故事告诉你两件事：(1) 经典微扰论一阶平均能算 99% 的天体动力学，精度<em>极高</em>（532″ 中只差 43″）；(2) 那 43″ 的差额逼出了广义相对论。</p>
+
+<h2 id="sec16-4">16.4 共振 + 小分母：朴素崩塌</h2>
+
+<p>16.2 节那个"<em>把扰动按 \(\epsilon\) 展开消去</em>" 的招法<em>看起来</em> 完美。但它有个致命问题——分母 \(\boldsymbol n \cdot \boldsymbol \omega(J)\) 可能<em>为零或接近零</em>。</p>
+
+<p>具体：取 \(n = 2\) 自由度系统，\(\boldsymbol \omega = (\omega_1, \omega_2)\)。如果 \(\omega_1 / \omega_2 = p / q\)（有理数），那存在整数向量 \(\boldsymbol n = (q, -p)\) 使</p>
+
+<p>\[
+\boldsymbol n \cdot \boldsymbol \omega = q \omega_1 - p \omega_2 = 0.
+\]</p>
+
+<p>此时 \(S_{\boldsymbol n} = V_{\boldsymbol n} / (i \cdot 0) = \infty\)——同调方程<em>无解</em>。这种情况叫<em>共振</em>（resonance）。</p>
+
+<p>共振不是数学瑕疵——是<em>真物理现象</em>。具体的太阳系共振:</p>
+
+<ul>
+  <li><em>木星 - 火星 1:3 共振</em>——在 2.5 AU 处的小行星轨道周期是木星 1/3。Kirkwood 1866 年发现，这条共振位置上<em>没有小行星</em>（"<em>Kirkwood 缺口</em>"），因为共振放大让小行星被踢飞。</li>
+  <li><em>木星 - 木卫一-木卫二 1:2:4 Laplace 共振</em>——木卫一、木卫二、木卫三轨道周期比 1:2:4，被木星稳定锁定。</li>
+  <li><em>水星 3:2 自旋-轨道共振</em>——水星自转周期是公转的 3/2。</li>
+</ul>
+
+<p>共振位置上小分母 = 0，朴素微扰<em>不收敛</em>。这条困难叫<em>"小分母" 问题</em>。1880-1890 年代天体力学家发现 Lindstedt 级数<em>发散</em>——任何阶都会撞到某个共振。Poincaré 1890 自己评价 Lindstedt 系列"<em>形式上有用，但收敛性<em>令人怀疑</em></em>"。</p>
+
+<p>更根本的——<em>有理数在实数中稠密</em>。任何<em>非共振</em> 频率 \(\boldsymbol \omega\) 附近都有<em>共振</em> 频率。所以<em>无论</em> \(\boldsymbol \omega\) 选择什么值，朴素微扰展开<em>总会撞</em> 共振。这看起来"<em>近积分系统应该总崩塌</em>"——这就是<em>朴素</em> 微扰的悲观结论。</p>
+
+<h2 id="sec16-5">16.5 KAM 定理：救赎</h2>
+
+<p>1954 年 Kolmogorov 在国际数学家大会做了一个 30 分钟的 talk，宣布定理："<em>近积分系统中大多数 invariant tori 在小扰动下保留</em>"。1962 Moser、1963 Arnold 给出完整证明（不同版本）。这条定理叫 <em>KAM 定理</em>。</p>
+
+<p><strong>KAM 定理（1954-1963 简化版）</strong>。设 \(H_0(I)\) 是<em>非退化</em>积分 Hamilton 系统：</p>
+
+<p>\[
+\det\!\left(\frac{\partial^2 H_0}{\partial I_i \partial I_j}\right) \neq 0.
+\]</p>
+
+<p>（<em>非退化</em> 意味着 \(\boldsymbol \omega(I) = \nabla H_0(I)\) 是 \(I\) 的<em>正则</em> 函数，频率随 \(I\) 真改变。Kepler 因为退化不直接满足，要先调整。）</p>
+
+<p>设扰动 \(V(I, \theta)\) 解析、\(\epsilon\) 充分小。对每一频率 \(\boldsymbol \omega^*\) 满足 <em>diophantine 条件</em></p>
+
+<p>\[
+\boxed{\ |\boldsymbol n \cdot \boldsymbol \omega^*| \ge \frac{\gamma}{|\boldsymbol n|^\tau}, \quad \forall \boldsymbol n \in \mathbb Z^n \setminus 0,\ }
+\]</p>
+
+<p>（\(\gamma > 0, \tau > n - 1\) 是常数）则:</p>
+
+<ul>
+  <li>原积分系统中频率为 \(\boldsymbol \omega^*\) 的 invariant torus 在扰动后仍存在，只是稍有变形;</li>
+  <li>新 torus 上动力学仍是 \(\theta = \boldsymbol \omega^* t + \theta_0\) 准周期;</li>
+  <li>满足 diophantine 条件的频率<em>组成测度</em> \(\ge 1 - O(\sqrt \epsilon)\) <em>的子集</em>（即"<em>大多数</em>"）.</li>
+</ul>
+
+<p>请你停下来感受这条定理。它说"<em>多数 invariant tori 在小扰动下保留</em>"——具体多数：扰动 \(\epsilon\) 越小，保留的 tori 越多，比例 \(\to 1\) when \(\epsilon \to 0\)。</p>
+
+<p>关键在 diophantine 条件。它要求 \(\boldsymbol \omega^*\) 不仅"<em>非有理</em>"（避免共振），还要"<em>充分远离</em> 有理数"——即 \(\boldsymbol n \cdot \boldsymbol \omega^*\) 衰减不能太快。<em>大多数</em> 实数满足 diophantine（只有"<em>过分接近有理</em>" 的 Liouville 数不满足，这些是测度零）。所以<em>大多数初频率</em> 的 torus 保留。</p>
+
+<p>但<em>共振</em>频率处的 torus 被破坏——其上的轨道变成混沌或被推到"<em>共振岛</em>" 结构。共振 torus 是测度零集，但<em>每一个</em> 共振附近<em>有限</em> 测度的 torus 被破坏（叫<em>共振区</em>）。最终图景：相空间是"<em>留下的 KAM tori</em>"（大多数）+ "<em>共振岛 + 混沌海</em>"（在共振附近）的复杂分形结构。</p>
+
+<h2 id="sec16-6">16.6 KAM 证明思路：Newton 迭代</h2>
+
+<p>KAM 证明的<em>关键技术</em> 让人 surprised——它<em>不是</em> 朴素微扰展开（那个发散）。它是<em>Newton 迭代</em>。</p>
+
+<p>具体——朴素 Lindstedt 展开是"<em>幂级数</em>" \(H = H_0 + \epsilon H_1 + \epsilon^2 H_2 + \ldots\)。每阶要求"<em>消掉这一阶的 \(\theta\)-依赖</em>"，这条迭代收敛速度<em>线性</em>——每步 \(\epsilon^n \to \epsilon^{n+1}\)，但 \(n!\) 类小分母让级数发散。</p>
+
+<p>Kolmogorov 的<em>洞察</em>——把它换成<em>二次</em> 收敛迭代（Newton 法）。每步消掉的不是"<em>这一阶</em>"，而是"<em>\(\epsilon \to \epsilon^2 \to \epsilon^4 \to \epsilon^8 \to \ldots\)</em>" 一次性吃掉前面所有阶。这样小分母只出现"<em>有限次</em>"——具体：第 \(k\) 步迭代余项是 \(\epsilon^{2^k}\)，比阶乘小分母快得多。</p>
+
+<p>这条二次迭代有<a href="../数值方法/ch7.html">数值方法 ch7</a>牛顿法的味道——<em>每步精度翻倍</em>。Kolmogorov 把数值分析思路移植到数学物理——用 Newton 法证明形式级数收敛。</p>
+
+<p>请你看到这条数学策略的优雅。原本"<em>线性</em> 迭代发散" 的级数，换成"<em>二次</em> 迭代" <em>收敛</em>——纯粹靠迭代速度增加来打败小分母带来的<em>发散因子</em>。这就是 KAM 证明的核心创新。</p>
+
+<p>Moser 1962 把 KAM 思路应用到<em>低正则性</em>（\(C^k\) 而不仅解析）扰动；Arnold 1963 把它推到具体应用（"<em>Arnold 扩散</em>"——多自由度系统中混沌可能"<em>沿共振网络爬行</em>"）。三人合起来构成现代 KAM 理论。</p>
+
+<h2 id="sec16-7">16.7 太阳系稳定吗</h2>
+
+<p>把 KAM 应用到太阳系。Kepler 主导（积分），其它行星扰动 \(\epsilon \sim M_{\text{Jupiter}}/M_{\odot} \sim 10^{-3}\)。</p>
+
+<p>朴素直接应用<em>不能</em>——KAM 要求扰动"<em>充分小</em>"，临界 \(\epsilon\) 是个具体数。详细分析（Laskar 1989-2009）显示<em>太阳系不严格满足</em> KAM 直接应用。但用<em>更精细</em>的工具（"Nekhoroshev 估计" + 数值积分）能给出</p>
+
+<p>\[
+\boxed{\ \text{太阳系在 } \sim 10^9 \text{ 年时间尺度上稳定（多数 KAM tori 保留）}.\ }
+\]</p>
+
+<p>太阳系当前年龄 \(4.6 \times 10^9\) 年，剩 \(\sim 10^{10}\) 年（直到太阳变成红巨星吞掉地球）。在这段时间内 KAM 给"<em>大多数初值的轨道行为可预测</em>" 的保证。</p>
+
+<p>但<em>不</em> 在无穷时间尺度。Laskar 1989 的数值实验显示水星轨道在 \(10^9\)-\(10^{10}\) 年时间尺度上有<em>非可忽略概率（\(\sim 1\%\)）</em>变得偏心率 \(> 0.6\)，可能与金星 / 地球碰撞或被弹出太阳系。这种"<em>缓慢混沌</em>" 是 KAM 边界附近的 Arnold 扩散现象。</p>
+
+<p>小行星带某些区域（如 Kirkwood 缺口）<em>更不</em>稳定——共振直接撕碎 invariant torus，小行星<em>很快</em>（\(10^6\) 年）被踢出。这是 KAM 失败的具体地方。</p>
+
+<p>请你看到这种"<em>受限稳定性</em>" 的图景。太阳系不是"<em>永恒稳定</em>" 的钟表（Laplace 1799 的设想），但也不是"<em>立即混沌</em>" 的暴风雨（Poincaré 1890 担心的）。它是<em>两者之间</em>——在有限但巨大的时间尺度上稳定，过这个尺度后<em>有概率</em> 出问题。这条结论<em>本身</em> 是 20 世纪后半叶动力系统理论的一项胜利。</p>
+
+<h2 id="sec16-8">16.8 数值实验：标准映射 + Hénon-Heiles</h2>
+
+<p>KAM 定理在数学上美，但<em>看起来</em> 抽象。这一节给两个具体数值系统让你<em>看见</em> KAM 的图景。</p>
+
+<h3 id="sec16-8-1">16.8.1 标准映射（Chirikov 标准映射）</h3>
+
+<p>1979 Chirikov 引入<em>标准映射</em>:</p>
+
+<p>\[
+\begin{cases} I_{n+1} = I_n + K \sin \theta_n,\\ \theta_{n+1} = \theta_n + I_{n+1}, \end{cases}
+\]</p>
+
+<p>定义在二维相空间 \((I, \theta) \in \mathbb R \times [0, 2\pi)\)。\(K\) 是扰动强度。</p>
+
+<p>\(K = 0\) 时：\(I_{n+1} = I_n\)（积分），\(\theta_{n+1} = \theta_n + I_n\)（线性增长）。轨道是常 \(I\) 直线——典型<em>积分系统</em>。</p>
+
+<p>\(K\) 渐增：</p>
+
+<ul>
+  <li>\(K = 0.5\)：大多数轨道仍在 KAM tori 上（\(I \approx \text{const}\) 的曲线带）。一些 separatrix 周围出现"<em>共振岛</em>" + "<em>混沌薄带</em>"。</li>
+  <li>\(K = 1\)：KAM tori 大量保留，但混沌区扩大，覆盖共振附近。</li>
+  <li>\(K \approx 0.9716\)：<em>临界值</em>。最后一条全局 KAM torus（连接 \(I = -\infty\) 到 \(+\infty\) 的）破裂。\(I\) 不再受限。</li>
+  <li>\(K = 5\)：几乎全混沌，\(I\) 大幅扩散。</li>
+</ul>
+
+<p>这条系统让你<em>看见</em> KAM 定理预测的"<em>多数 tori 保留 + 共振附近混沌</em>" 图景在数值上的具体相图。Chirikov 1979 的<em>共振重叠准则</em>（resonance overlap）给出 \(K_c \approx 0.97\) 这条临界值的<em>解析估计</em>。</p>
+
+<h3 id="sec16-8-2">16.8.2 Hénon-Heiles 系统</h3>
+
+<p>1964 Hénon + Heiles 引入<em>2 自由度</em> Hamilton 系统（最少自由度让 KAM 非平凡）:</p>
+
+<p>\[
+H = \frac{1}{2}(p_x^2 + p_y^2) + \frac{1}{2}(x^2 + y^2) + x^2 y - \frac{y^3}{3}.
+\]</p>
+
+<p>\(H_0 = \frac{1}{2}(p_x^2 + p_y^2 + x^2 + y^2)\) 是 2D 各向同性谐振子（积分），扰动 \(V = x^2 y - y^3/3\) 是三阶项。</p>
+
+<p>系统在能量 \(E\) 充分大时不可积。Poincaré 截面（取 \(x = 0\) 时 \((y, p_y)\) 切片）显示:</p>
+
+<ul>
+  <li>\(E = 1/12\)（小）：截面充满 KAM tori 的"<em>洋葱皮</em>" 结构。</li>
+  <li>\(E = 1/8\)：tori 之间出现"<em>混沌带</em>"。</li>
+  <li>\(E = 1/6\)（临界）：大块混沌区出现，KAM tori 退到核心区。</li>
+</ul>
+
+<p>这是<em>第一个</em>明确显示"<em>有序-混沌混合相空间</em>" 的物理系统。Hénon 1964 的 截面图是动力系统教科书的经典。</p>
+
+<p>请你想象这两个系统的相图——<em>KAM tori（光滑曲线 / 闭曲线）+ 共振岛（小椭圆链）+ 混沌海（散点云）</em> 三者的交错。这就是<em>典型</em> 近积分系统的相空间结构。和"<em>纯积分</em>"（全曲线）或"<em>纯混沌</em>"（全散点）都不一样——<em>混合</em>。</p>
+
+<h2 id="sec16-9">16.9 临别话</h2>
+
+<p>这一章你看到了<em>近积分系统</em> 的完整理论:</p>
+
+<ul>
+  <li>多体不可积——Poincaré 1890 证明，"<em>没有解析公式</em>" 是<em>定理</em>，不是缺陷。</li>
+  <li>朴素微扰——一阶平均能算 99%（水星 532″/575″），但级数发散因小分母。</li>
+  <li>共振——有理频率比上小分母为零，是真物理现象（Kirkwood 缺口、Laplace 共振）。</li>
+  <li>KAM 定理——多数 invariant tori 在小扰动下保留（\(\epsilon \to 0\) 时比例 \(\to 1\)）。</li>
+  <li>证明用 Newton 迭代（二次收敛）打败小分母（线性发散）。</li>
+  <li>太阳系——\(10^9\) 年稳定但<em>不</em> 严格永恒稳定。水星有 \(\sim 1\%\) 概率长期被弹出。</li>
+  <li>数值——标准映射 + Hénon-Heiles 显示"<em>KAM tori + 共振岛 + 混沌海</em>" 的混合相空间。</li>
+</ul>
+
+<p>请你回头看这一章的<em>哲学</em>份量。19 世纪经典力学家们相信"<em>世界是 deterministic 钟表</em>"——给初值，未来完全可预测。Poincaré 1890 给第一击——三体不可积，意味着公式不存在。Kolmogorov 1954 + Arnold 1963 + Moser 1962 给修正——虽然没公式，但<em>多数初值的多数轨道仍可预测</em>。</p>
+
+<p>这条 KAM 图景比"<em>钟表</em>" 或"<em>暴风雨</em>" 都更接近真相——经典力学是"<em>有序 + 混沌混合</em>" 的复杂结构。下一章我们正式进入<em>混沌</em> 这一边——研究 Lyapunov 指数、奇异吸引子、shadow 定理、Smale 马蹄。20 世纪后半叶 chaos theory 整个学科都从 KAM 失败处长出来。</p>
+
+<p>下一章：混沌的诞生。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch15.html">← 上一章 · 第 15 章 作用-角变量</a><a href="ch17.html">下一章 · 第 17 章 混沌的诞生 →</a></nav>
+</main>
+</body>
+</html>
+</content>
+</invoke>

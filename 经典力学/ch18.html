@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 18 章 弹性力学入门 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 经典混沌</a><a href="ch19.html">下一章 · 第 19 章 流体力学入门 →</a></nav>
+<h1 id="ch18">第 18 章 弹性力学入门</h1>
+
+<p>请你抓一根橡皮筋, 用两根手指捏住两端, 拉一下。它<em>伸长</em> 了。多伸多少？取决于两件事: 你拉得多重; 橡皮筋本身有多<em>软</em> 或多<em>硬</em>。这条直觉所有人都有。它对应的物理写法叫<strong>Hooke 定律</strong>:</p>
+
+<p>\[
+F = -k x \quad (\text{F 是恢复力, x 是伸长}).
+\]</p>
+
+<p>这是中学物理。但请你停下来想——Hooke 定律里的<em>橡皮筋</em> 被理想化为<em>一维</em>: 只有"<em>长度</em>" 一个变量, 拉一下伸长, 松开缩回。<em>真实物体</em> 远不止这个。一座<em>钢桥</em>, 你站在中间, 它会<em>下凹</em>; 一架<em>飞机翼</em>, 在飞行中受空气压力, 会<em>扭转 + 弯曲 + 拉伸</em>; 你身边的<em>木头桌子</em>, 受敲击后会传出<em>声波</em>。这些不是"<em>一维拉伸</em>" 能描述的——物体是<em>三维</em> 的, 形变是<em>多方向</em> 的, 内部应力是<em>张量</em> 的。</p>
+
+<p>3D 弹性力学就是把 Hooke 定律推广到<em>三维连续体</em>。它的关键对象是三个张量: <em>应变张量 \(\epsilon_{ij}\)</em>（描述形变）、<em>应力张量 \(\sigma_{ij}\)</em>（描述内部力）、<em>弹性模量张量 \(C_{ijkl}\)</em>（连接两者）。这一章作<em>入门</em>: 讲清楚三个张量是什么、Hooke 定律怎么变成"<em>\(\sigma = C \epsilon\)</em>"、平衡方程、几个简单求解（梁的弯曲 + 弹性波）。完整理论参考 Landau-Lifshitz <em>Theory of Elasticity</em>（第 7 卷）, 那是经典文本。</p>
+
+<h2 id="sec18-1">18.1 1D Hooke 定律: 起点</h2>
+
+<p>先固定语言。一根杆<em>长度 \(L\)</em>, <em>横截面积 \(A\)</em>, 沿轴受拉力 \(F\)。它<em>伸长</em> \(\Delta L\)。实验告诉你（小变形条件下）:</p>
+
+<p>\[
+\Delta L = \frac{F L}{E A}, \quad \text{即} \quad \frac{F}{A} = E \cdot \frac{\Delta L}{L}.
+\]</p>
+
+<p>定义</p>
+
+<ul>
+  <li><em>应力</em>（stress）\(\sigma = F/A\)——单位面积承受的力。SI 单位 \(\mathrm{Pa} = \mathrm{N/m^2}\)。</li>
+  <li><em>应变</em>（strain）\(\epsilon = \Delta L/L\)——相对伸长。无量纲。</li>
+  <li><em>Young 模量</em> \(E\)——材料硬度。SI 单位也是 Pa。</li>
+</ul>
+
+<p>所以 1D Hooke 定律是</p>
+
+<p>\[
+\boxed{\ \sigma = E \epsilon.\ }
+\]</p>
+
+<p>典型 \(E\) 值: 钢 \(\sim 2 \times 10^{11}\) Pa; 铝 \(\sim 7 \times 10^{10}\) Pa; 木头 \(\sim 10^{10}\) Pa; 橡胶 \(\sim 10^7\) Pa。<em>橡胶比钢软 4 个数量级</em>——这就是 Young 模量的具体意义。</p>
+
+<p>这条 1D 关系是<em>所有</em> 弹性力学的种子。问题——3D 怎么写？应力 \(\sigma\) 还是数？应变 \(\epsilon\) 还是数？答案是<em>都不是数</em>——它们升级为<em>张量</em>。</p>
+
+<h2 id="sec18-2">18.2 应变张量: 形变的三维描述</h2>
+
+<p>设固体在未变形时占据区域 \(\Omega \subset \mathbb R^3\), 每点位置标记 \(\boldsymbol X\)。变形后, 这个点移到新位置 \(\boldsymbol x = \boldsymbol X + \boldsymbol u(\boldsymbol X)\), 其中 \(\boldsymbol u(\boldsymbol X)\) 是<em>位移场</em>。如果 \(\boldsymbol u\) 全空间是常向量——整体平移, <em>没有形变</em>。如果 \(\boldsymbol u\) 是旋转——也<em>没有形变</em>。形变指的是<em>相对位移</em>——不同点之间距离的改变。</p>
+
+<p>看两个邻近点 \(\boldsymbol X\) 与 \(\boldsymbol X + d\boldsymbol X\)。变形前距离平方 \(|d\boldsymbol X|^2 = d X^i d X^i\)（求和约定）。变形后, 它们移到 \(\boldsymbol x\) 与 \(\boldsymbol x + d\boldsymbol x\), \(d\boldsymbol x = d\boldsymbol X + d\boldsymbol u = d\boldsymbol X + (\partial \boldsymbol u/\partial \boldsymbol X) d\boldsymbol X\)。所以新距离平方</p>
+
+<p>\[
+|d\boldsymbol x|^2 = (d X^i + \partial_i u^k \cdot d X^i)(d X^k + \partial_j u^k \cdot d X^j) \approx d X^i d X^i + 2 \cdot \frac{1}{2}(\partial_i u^j + \partial_j u^i) d X^i d X^j,
+\]</p>
+
+<p>（小变形——丢掉二次项）。距离平方变化 \(|d\boldsymbol x|^2 - |d\boldsymbol X|^2 = 2 \epsilon_{ij} d X^i d X^j\), 其中</p>
+
+<p>\[
+\boxed{\ \epsilon_{ij} = \frac{1}{2}(\partial_i u_j + \partial_j u_i) \quad (\text{应变张量}).\ }
+\]</p>
+
+<p>请你停下来观察这条定义的<em>结构</em>。它就是位移场梯度的<em>对称化</em>。为什么对称化？因为<em>反对称部分</em>（\(\frac{1}{2}(\partial_i u_j - \partial_j u_i)\)）描述<em>局部旋转</em>——不引起距离变化, 不是真形变。只有<em>对称部分</em> 引起距离变化——这才是"<em>形变</em>"。</p>
+
+<p>\(\epsilon_{ij}\) 是 \(3 \times 3\) 对称张量, 6 个独立分量:</p>
+
+<ul>
+  <li><em>对角</em> \(\epsilon_{xx}, \epsilon_{yy}, \epsilon_{zz}\)——沿 \(x, y, z\) 方向的拉伸 / 压缩。1D Hooke 里的 \(\epsilon\) 就是 \(\epsilon_{xx}\)。</li>
+  <li><em>非对角</em> \(\epsilon_{xy}, \epsilon_{yz}, \epsilon_{zx}\)——剪切（shear）。比如 \(\epsilon_{xy} = \frac{1}{2}(\partial_x u_y + \partial_y u_x)\)。</li>
+</ul>
+
+<p>痕迹 \(\mathrm{tr}(\epsilon) = \epsilon_{ii} = \nabla \cdot \boldsymbol u\)——体积相对变化（\(dV'/dV = 1 + \nabla \cdot \boldsymbol u\)）。无痕迹部分 \(\epsilon_{ij} - \frac{1}{3} \mathrm{tr}(\epsilon) \delta_{ij}\)——纯<em>畸变</em>（不改体积, 只改形状）。这种"<em>体积部分 + 畸变部分</em>" 分解在弹性力学是基本动作。</p>
+
+<h2 id="sec18-3">18.3 应力张量: 内部力的描述</h2>
+
+<p>外力作用在固体表面（推, 拉）或体内（重力）。固体内部, 每个想象切面两侧的物质<em>互相施力</em>。如何描述？答案是<em>应力张量</em>。</p>
+
+<p>设固体内一个想象的小面元, 法向 \(\hat n\), 面积 \(dA\)。这面元一侧（\(\hat n\) 指向那一侧）的物质对另一侧施力 \(d\boldsymbol F\)。比例</p>
+
+<p>\[
+\frac{d\boldsymbol F}{dA} = \boldsymbol t(\hat n)
+\]</p>
+
+<p>是<em>面力密度</em>（traction）, 依赖法向 \(\hat n\)。Cauchy 1822 证明（Cauchy 应力定理）: \(\boldsymbol t\) 对 \(\hat n\) 是<em>线性</em> 的。所以存在张量 \(\sigma_{ij}\)（叫<em>应力张量</em>）使得</p>
+
+<p>\[
+\boxed{\ t_i(\hat n) = \sigma_{ij} \hat n_j.\ }
+\]</p>
+
+<p>张量 \(\sigma_{ij}\) 物理含义: <em>\(\sigma_{ij}\) 是法向 \(\hat e_j\) 的面元, 在 \(i\) 方向受到的力 / 单位面积</em>。比如 \(\sigma_{xx}\) 是法向 \(\hat x\) 面元上 \(x\) 方向力——拉伸 / 压缩 \(x\) 方向。\(\sigma_{xy}\) 是法向 \(\hat y\) 面元上 \(x\) 方向力——剪应力。</p>
+
+<p>Cauchy 还证: <em>角动量守恒蕴含 \(\sigma\) 对称</em>: \(\sigma_{ij} = \sigma_{ji}\)。所以 \(\sigma\) 也只 6 个独立分量。</p>
+
+<p>1D Hooke 里的 \(\sigma\) 就是 \(\sigma_{xx}\)（拉伸方向是 \(x\)）。3D 应力一般有 6 个分量同时存在——你的桌脚承受拉伸 + 压缩 + 剪切, 都同时。</p>
+
+<h2 id="sec18-4">18.4 各向同性弹性: \(\sigma_{ij}\) 与 \(\epsilon_{ij}\) 的连接</h2>
+
+<p>1D Hooke 是线性关系 \(\sigma = E \epsilon\)。3D 推广: 假设 \(\sigma_{ij}\) 是 \(\epsilon_{kl}\) 的线性函数</p>
+
+<p>\[
+\sigma_{ij} = C_{ijkl} \epsilon_{kl},
+\]</p>
+
+<p>其中 \(C_{ijkl}\) 是<em>四阶弹性模量张量</em>。原始上 \(C\) 有 \(3^4 = 81\) 个分量, 但对称性把它压缩——\(\sigma, \epsilon\) 都对称迫使 \(C_{ijkl} = C_{jikl} = C_{ijlk}\), 还有热力学约束 \(C_{ijkl} = C_{klij}\)。结果: 一般弹性体有 21 个独立 \(C\) 分量（这叫<em>三斜晶体</em>对称性）。这太多, 实用上太复杂。</p>
+
+<p>大多数实用材料（钢、混凝土、水泥、铸铝、玻璃……）<em>各向同性</em>——所有方向等价。这把 \(C\) 压到只剩 2 个独立常数, 叫<em>Lamé 参数</em> \(\lambda, \mu\):</p>
+
+<p>\[
+\boxed{\ \sigma_{ij} = \lambda \delta_{ij} \, \mathrm{tr}(\epsilon) + 2 \mu \epsilon_{ij}.\ }
+\]</p>
+
+<p>展开成两部分:</p>
+
+<ul>
+  <li>\(\lambda \delta_{ij} \mathrm{tr}(\epsilon)\)——<em>体积部分</em>（"压力"）, \(\lambda\) 与体积变化的能量代价相关。</li>
+  <li>\(2 \mu \epsilon_{ij}\)——<em>剪切部分</em>, \(\mu\) 是<em>剪切模量</em>, 描述形状变化的能量代价。</li>
+</ul>
+
+<p>\(\mu\) 又叫<em>第二 Lamé 参数</em> 或 <em>shear modulus</em>。它描述"<em>固体能抵抗剪切</em>" 的强度——这是固体区别于流体的关键: <em>流体 \(\mu = 0\), 静止时不能维持剪应力</em>; 固体 \(\mu > 0\)。</p>
+
+<p>各向同性假设是个<em>大</em> 简化: 钢、铝、玻璃、水泥, 都<em>近似</em> 各向同性。但<em>木头</em> 有纤维, <em>晶体</em> 有晶格方向, <em>纤维复合材料</em>（碳纤维 + 树脂）极度<em>各向异性</em>——它们需要更多 \(C\) 分量。本章只讲各向同性。</p>
+
+<h2 id="sec18-5">18.5 Young 模量与 Poisson 比</h2>
+
+<p>实验里直接测 \(\lambda, \mu\) 不方便。两个更直观的等价参数:</p>
+
+<ul>
+  <li><em>Young 模量 \(E\)</em>——单轴拉伸时应力 / 应变比。</li>
+  <li><em>Poisson 比 \(\nu\)</em>——单轴拉伸时, 横向收缩 / 纵向伸长比。</li>
+</ul>
+
+<p>具体: 设杆沿 \(z\) 拉, \(\sigma_{zz} = \sigma_0\), 其他 \(\sigma_{ij} = 0\)（杆侧面自由, 无侧向力）。代各向同性 Hooke 算应变, 得</p>
+
+<p>\[
+\epsilon_{zz} = \frac{\sigma_0}{E}, \quad \epsilon_{xx} = \epsilon_{yy} = -\nu \frac{\sigma_0}{E}, \quad \nu = \frac{\lambda}{2(\lambda + \mu)}.
+\]</p>
+
+<p>关系式</p>
+
+<p>\[
+E = \frac{\mu(3\lambda + 2\mu)}{\lambda + \mu}, \quad \nu = \frac{\lambda}{2(\lambda + \mu)}.
+\]</p>
+
+<p>反转</p>
+
+<p>\[
+\lambda = \frac{E \nu}{(1+\nu)(1-2\nu)}, \quad \mu = \frac{E}{2(1+\nu)}.
+\]</p>
+
+<p>请你停下来理解 Poisson 比。把橡皮筋拉一下你<em>不仅</em> 看到它伸长, 还看到它<em>变细</em>——这就是 Poisson 比。\(\nu\) 描述这两件事的比例。典型值:</p>
+
+<ul>
+  <li>钢 \(\nu \approx 0.30\)。</li>
+  <li>铝 \(\nu \approx 0.33\)。</li>
+  <li>橡胶 \(\nu \approx 0.49\)（几乎不可压缩）。</li>
+  <li>软木塞 \(\nu \approx 0.0\)（拉伸不变细——所以软木塞容易塞瓶子）。</li>
+  <li><em>auxetic 材料</em>（\(\nu < 0\), 拉伸反而<em>变粗</em>）——20 世纪末发现的特殊材料 + 曾受关注。</li>
+</ul>
+
+<p>热力学约束 \(-1 < \nu < 1/2\)。\(\nu \to 1/2\) 是<em>不可压缩</em> 极限——\(\mathrm{tr}(\epsilon) \to 0\), 体积不变。橡胶 / 液体接近这个极限。</p>
+
+<h2 id="sec18-6">18.6 平衡方程: 内力平衡 + 边界条件</h2>
+
+<p>有了应变（描述形变）+ 应力（描述内力）+ Hooke（连接两者）, 还差<em>动力学</em>: 应力如何与外力平衡。这就是<em>Cauchy 平衡方程</em>。</p>
+
+<p>取固体内一个小体积 \(V\), 边界 \(\partial V\)。受力: 边界面力 \(\boldsymbol t = \sigma \cdot \hat n\)（来自周围物质）+ 体积力 \(\boldsymbol f\)（重力等, 单位是 N/m³）。Newton 第二定律</p>
+
+<p>\[
+\int_V \rho \ddot u_i \, dV = \int_{\partial V} \sigma_{ij} \hat n_j \, dA + \int_V f_i \, dV.
+\]</p>
+
+<p>用散度定理, 表面积分变体积积分:</p>
+
+<p>\[
+\int_V (\rho \ddot u_i - \partial_j \sigma_{ij} - f_i) \, dV = 0.
+\]</p>
+
+<p>因 \(V\) 任意, 被积项必为零:</p>
+
+<p>\[
+\boxed{\ \rho \ddot u_i = \partial_j \sigma_{ij} + f_i \quad (\text{Cauchy 运动方程}).\ }
+\]</p>
+
+<p>静态情况（\(\ddot u = 0\)）退化为<em>平衡方程</em></p>
+
+<p>\[
+\partial_j \sigma_{ij} + f_i = 0.
+\]</p>
+
+<p>把 Hooke 定律 \(\sigma = \lambda \mathrm{tr}(\epsilon) I + 2 \mu \epsilon\) 代入, \(\epsilon\) 用 \(\boldsymbol u\) 写出, 得到一个对 \(\boldsymbol u\) 的二阶 PDE:</p>
+
+<p>\[
+\rho \ddot {\boldsymbol u} = (\lambda + \mu) \nabla(\nabla \cdot \boldsymbol u) + \mu \nabla^2 \boldsymbol u + \boldsymbol f.
+\]</p>
+
+<p>这叫<strong>Navier-Cauchy 方程</strong>（或叫弹性 PDE）。它是弹性力学的<em>核心方程</em>。任何静态弹性问题（钢梁承重、桥墩压力）+ 动力学问题（声波、地震波）都从这条方程出发。</p>
+
+<p>边界条件: 在边界上要么给<em>位移</em>（\(\boldsymbol u\) 已知, 比如墙固定）, 要么给<em>面力</em>（\(\sigma \cdot \hat n\) 已知, 比如表面压力）。混合边值常见。</p>
+
+<h2 id="sec18-7">18.7 简单例子: 梁的弯曲</h2>
+
+<p>给一根细长梁, 两端支撑（"<em>简支梁</em>"）, 中间承重。它会下凹。问下凹多少。这是<em>欧拉-伯努利梁理论</em>（Euler-Bernoulli beam theory, 18 世纪）。</p>
+
+<p>梁沿 \(x\) 方向, 长 \(L\), 横截面积 \(A\), 截面惯性矩 \(I = \int_A y^2 \, dA\)（\(y\) 是横向距中性轴的距离）。设垂直位移 \(w(x)\)（"<em>挠度</em>"）。在小挠度近似下, 梁理论给</p>
+
+<p>\[
+\boxed{\ E I \frac{d^4 w}{dx^4} = q(x), \quad q(x) = \text{单位长度横向力}.\ }
+\]</p>
+
+<p>这是<em>梁的弯曲方程</em>。右边 \(q\) 是分布载荷（每米多少 N）。\(E I\) 叫<em>弯曲刚度</em>——\(E\) 是材料硬度, \(I\) 是截面形状。同样材料, \(I\) 大的截面（H 型钢, 工字钢）比 \(I\) 小的（圆杆）抵抗弯曲<em>多得多</em>——这是建筑工程师为什么用工字钢的原因。</p>
+
+<p>简支梁中点受集中力 \(P\) 的解: 中点挠度</p>
+
+<p>\[
+w_{\max} = \frac{P L^3}{48 E I}.
+\]</p>
+
+<p>注意 \(L^3\) 比例——梁加倍长, 中点下凹增加 \(2^3 = 8\) 倍。这就是<em>长跨度桥</em> 难造的原因。\(L^3\) scaling 决定了为什么古代石桥跨度有限——必须用拱（把弯矩转成压缩, 石头抗压不抗拉）。现代钢桥用拉索（悬索 / 斜拉）也是为同样原因——把弯矩转成拉伸 + 压缩, 避开 \(L^3\) 灾难。</p>
+
+<p>梁理论是<em>3D 弹性的简化</em>——它假设截面"<em>不变形</em>", 只是绕中性轴转。这个简化对细长梁很好（\(L/h \gg 10\)）, 短粗梁要更复杂的 Timoshenko 梁理论。</p>
+
+<h2 id="sec18-8">18.8 弹性波: 声音在固体里</h2>
+
+<p>Navier-Cauchy 方程的<em>动力学</em> 部分支持<em>波动</em> 解。给无外力 \(\boldsymbol f = 0\) + 假设平面波 \(\boldsymbol u = \boldsymbol u_0 \exp(i \boldsymbol k \cdot \boldsymbol r - i \omega t)\), 代入</p>
+
+<p>\[
+-\rho \omega^2 \boldsymbol u = -(\lambda + \mu)(\boldsymbol k \cdot \boldsymbol u) \boldsymbol k - \mu k^2 \boldsymbol u.
+\]</p>
+
+<p>分两种情况:</p>
+
+<p><strong>纵波</strong>（\(\boldsymbol u \parallel \boldsymbol k\)）: \(\boldsymbol u = u \hat k\), 代入得</p>
+
+<p>\[
+\omega^2 = \frac{\lambda + 2\mu}{\rho} k^2 \quad \Rightarrow \quad c_L = \sqrt{\frac{\lambda + 2\mu}{\rho}}.
+\]</p>
+
+<p>纵波（也叫 P 波——primary, 因为它在地震里最先到）速度 \(c_L\)。它是<em>密度波</em>——介质沿波传方向被压缩 / 膨胀。空气中的声波也是纵波（但空气 \(\mu = 0\), 退化为 \(c = \sqrt{B/\rho}\), \(B\) 是体积模量）。</p>
+
+<p><strong>横波</strong>（\(\boldsymbol u \perp \boldsymbol k\)）: 代入得</p>
+
+<p>\[
+\omega^2 = \frac{\mu}{\rho} k^2 \quad \Rightarrow \quad c_T = \sqrt{\frac{\mu}{\rho}}.
+\]</p>
+
+<p>横波（S 波——secondary）速度 \(c_T\)。它是<em>剪切波</em>——介质沿垂直波传方向移动。<em>流体不传横波</em>（\(\mu = 0\)）——这就是为什么地震 S 波<em>不通过</em> 地核外核（液态铁）, 历史上这是地震学家发现地核液态层的方法（Oldham 1906, Lehmann 1936）。</p>
+
+<p>典型数据（钢）: \(c_L \approx 5800\) m/s, \(c_T \approx 3200\) m/s, 比值 \(c_L/c_T \approx 1.8\)。地震波通过地壳: \(c_L \sim 6\) km/s, \(c_T \sim 3.5\) km/s。震中 100 km 远的城市: P 波约 17 秒到, S 波 28 秒到——这 11 秒差就是<em>地震预警系统</em> 的窗口（早一秒检测 P 波, 早一秒报警 S 波）。</p>
+
+<p>请你停下来欣赏这件事的<em>结构对应</em>。一个<em>各向同性</em> 弹性体只有<em>两种</em> 体波（纵 P + 横 S）, 因为弹性体对各向同性方向只有两个模量（\(\lambda + 2\mu\) 与 \(\mu\)）。各向异性体（晶体）会有更多波模——慢横、快横、纵, 一共三种。这种"<em>对称性 ↔ 波模数</em>" 的对应在更高级的固体物理（声子）里关键。</p>
+
+<h2 id="sec18-9">18.9 临别话: 弹性是连续介质的入门</h2>
+
+<p>这一章只是入门——我们做了三件事: (1) 给应变 + 应力 + 弹性模量三个张量的定义; (2) 写下 Navier-Cauchy 方程; (3) 看了梁与弹性波两个简单解。完整弹性力学还有一大堆: 板与壳理论、塑性变形（超过弹性极限）、断裂力学（裂缝传播）、复合材料、地震学。Landau-Lifshitz <em>Theory of Elasticity</em> 是经典参考; 工程界常用 Timoshenko 的<em>Theory of Elasticity</em>。</p>
+
+<p>从经典力学课程角度, 弹性力学的<em>意义</em> 是: 它是<em>连续介质</em> 力学的第一个例子。位移场 \(\boldsymbol u(\boldsymbol x, t)\) 是一个<em>无穷自由度</em> 系统——每点的位移是独立坐标。但它仍然遵从 Newton 第二定律（每个微元 \(\rho dV\) 受力等于加速度乘质量）, 仍然遵从 Hamilton 原理——只是<em>Lagrangian</em> 现在是<em>Lagrangian 密度</em>, 作用量是个<em>积分</em></p>
+
+<p>\[
+S = \int dt \int dV \, \mathcal L(u, \partial u),
+\]</p>
+
+<p>这就引向第 20 章的<em>经典场论</em>: 把 Lagrangian / Hamilton 力学推广到无穷自由度连续系统。弹性体是这种推广的<em>原型</em>; 之后的电磁场、引力场、Klein-Gordon 标量场都遵从同一架构。</p>
+
+<p>下一章我们看连续介质的另一面: <em>流体</em>。固体有剪切模量（\(\mu > 0\)）, 静止时能撑住剪应力; 流体 \(\mu = 0\), 静止时不能撑剪应力, 所以一推就流。流体的位移场不能简单描述（粒子可以远离原位置）, 我们要换语言: 看<em>速度场</em> \(\boldsymbol v(\boldsymbol x, t)\)。这就是 Euler 方程 + Navier-Stokes 的世界——一个仍未完全征服的世界（Navier-Stokes 解析存在唯一性是 Clay 千禧年问题）。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch17.html">← 上一章 · 第 17 章 经典混沌</a><a href="ch19.html">下一章 · 第 19 章 流体力学入门 →</a></nav>
+</main>
+</body>
+</html>

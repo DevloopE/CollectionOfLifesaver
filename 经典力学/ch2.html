@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 2 章 Newton 力学复习与守恒律 — 普林斯顿经典力学读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论</a><a href="ch3.html">下一章 · 第 3 章 中心力问题 →</a></nav>
+<h1 id="ch2">第 2 章 Newton 力学复习与守恒律</h1>
+
+<p>这本书<em>不是</em> Newton 力学教程——你在中学和大一已经学过 \(\boldsymbol F = m \boldsymbol a\)、抛物运动、能量守恒。但本书后面用 Lagrange / Hamilton 解题时, 偶尔需要"<em>落回 Newton 验证答案对不对</em>"——比如算出 EL 方程后想确认它是不是 \(m \ddot x = -V'(x)\), 或者解出多体运动后想验证总动量真的守恒。所以这一章我们用最快的速度<em>系统</em> 扫一遍 Newton: 三大定律 + 三大守恒律 + 多粒子 / 质心 + 几个标准例子。读起来应该顺——大部分内容你都见过。</p>
+
+<p>请你<em>不要</em> 把这一章当背诵——而是当一次"<em>统一视角</em>"。三大守恒律（动量 / 能量 / 角动量）在 Newton 框架里是<em>三条独立结果</em>, 各自从 \(\boldsymbol F = m \boldsymbol a\) 导出。后面 Lagrange 框架（<a href="ch7.html">ch7 Noether 定理</a>）会把它们统一成"<em>对称性 ⟹ 守恒律</em>" 的<em>一条</em> 结果。但那个统一的前提是你先知道<em>分别</em> 它们长什么样。这一章就在做这件事。</p>
+
+<h2 id="sec2-1">2.1 F = ma 与三大定律</h2>
+
+<p>Newton 1687 年《<em>Principia</em>》三大定律, 我们用现代记号简洁列一遍：</p>
+
+<p><strong>第一定律</strong>（惯性定律）: 若粒子受合力 \(\boldsymbol F = \boldsymbol 0\), 它保持速度 \(\boldsymbol v = \) 常向量。这条话<em>看似</em> 是第二定律的特例（设 \(\boldsymbol F = 0\) 则 \(\boldsymbol a = 0\) 则 \(\boldsymbol v\) 不变）, 但 Newton 把它独立列出, 是因为它<em>定义了惯性参考系</em>: "<em>在哪些坐标系中第一定律成立</em>" 就是 "<em>哪些坐标系是惯性系</em>"。第二定律只在惯性系中以 \(\boldsymbol F = m \boldsymbol a\) 形式成立; 在加速 / 旋转坐标系中要加上"<em>惯性力</em>"（离心力, Coriolis 力, ……）, 那是<a href="ch9.html">ch9</a> 的内容。</p>
+
+<p><strong>第二定律</strong>（运动方程）: \(\boldsymbol F = \dfrac{d \boldsymbol p}{dt}\), 其中 \(\boldsymbol p = m \boldsymbol v\) 是<em>动量</em>。质量恒定时退化为</p>
+
+<p>\[
+\boxed{\ \boldsymbol F = m \boldsymbol a = m \frac{d^2 \boldsymbol r}{d t^2}.\ }
+\]</p>
+
+<p>这是一个二阶 ODE: 给定初始位置 \(\boldsymbol r(0)\) 和初始速度 \(\boldsymbol v(0)\), 加上力 \(\boldsymbol F\) 作为时间 / 位置 / 速度的函数, 微分方程<em>唯一确定</em> 整段轨迹 \(\boldsymbol r(t)\)。这是经典力学<em>决定论</em> 的根: 知道现在 \((\boldsymbol r, \boldsymbol v)\), 就知道全部过去和未来。</p>
+
+<p><strong>第三定律</strong>（作用反作用）: 若粒子 1 对粒子 2 施力 \(\boldsymbol F_{12}\), 则粒子 2 对粒子 1 施力 \(\boldsymbol F_{21} = -\boldsymbol F_{12}\)。<em>等大、反向、共线</em>。这条定律在<a href="#sec2-2">动量守恒</a> 和<a href="#sec2-4">角动量守恒</a> 的推导里是<em>关键</em>——没有它两个守恒律都垮。</p>
+
+<p>第三定律对"<em>接触力</em>"（推、拉、碰撞）成立没异议; 对"<em>瞬时远距力</em>"（Newton 引力, Coulomb 力）成立但<em>需要假设力沿连线方向</em>; 对"<em>磁力</em>" 严格说<em>不</em> 成立——磁力 \(q \boldsymbol v \times \boldsymbol B\) 不是中心力, 两电荷间的 Lorentz 力不严格反向, 缺失的动量被电磁场带走。这种"<em>第三定律失效</em>" 的情况在 Lagrange 框架里被自然修补——动量守恒不再依赖第三定律, 而依赖 Lagrangian 的<em>平移对称性</em>（<a href="ch7.html">ch7</a>）。</p>
+
+<h2 id="sec2-2">2.2 动量守恒</h2>
+
+<p><strong>单粒子</strong>: \(\boldsymbol F = d \boldsymbol p / dt\)。若 \(\boldsymbol F = \boldsymbol 0\), 则 \(\boldsymbol p = m \boldsymbol v\) 守恒。这是第一定律的现代写法。</p>
+
+<p><strong>两粒子</strong>: 设粒子 1, 2 间内力 \(\boldsymbol F_{12}, \boldsymbol F_{21}\), 还可能各受外力 \(\boldsymbol F_1^{\text{ext}}, \boldsymbol F_2^{\text{ext}}\)。系统总动量 \(\boldsymbol P = \boldsymbol p_1 + \boldsymbol p_2\)。</p>
+
+<p>\[
+\frac{d \boldsymbol P}{dt} = \frac{d \boldsymbol p_1}{dt} + \frac{d \boldsymbol p_2}{dt} = (\boldsymbol F_1^{\text{ext}} + \boldsymbol F_{21}) + (\boldsymbol F_2^{\text{ext}} + \boldsymbol F_{12}) = \boldsymbol F_1^{\text{ext}} + \boldsymbol F_2^{\text{ext}}
+\]</p>
+
+<p>因第三定律 \(\boldsymbol F_{12} + \boldsymbol F_{21} = \boldsymbol 0\), 内力相消。所以</p>
+
+<p>\[
+\boxed{\ \frac{d \boldsymbol P}{dt} = \boldsymbol F^{\text{ext, total}}.\ }
+\]</p>
+
+<p>系统总动量变化率 = 外力总和。<em>内力</em> 不能改变系统总动量。若无外力, \(\boldsymbol P\) 守恒。这条结论推到任意 \(N\) 粒子系统同样成立——内力两两相消, 外力作总和。</p>
+
+<p><strong>例</strong>（一维弹性碰撞）: 两质量 \(m_1, m_2\), 初速度 \(v_1, v_2\), 碰后速度 \(v_1', v_2'\)。动量守恒</p>
+
+<p>\[
+m_1 v_1 + m_2 v_2 = m_1 v_1' + m_2 v_2'.
+\]</p>
+
+<p>能量守恒（弹性碰撞）</p>
+
+<p>\[
+\tfrac{1}{2} m_1 v_1^2 + \tfrac{1}{2} m_2 v_2^2 = \tfrac{1}{2} m_1 v_1'^2 + \tfrac{1}{2} m_2 v_2'^2.
+\]</p>
+
+<p>两条方程两个未知, 解得</p>
+
+<p>\[
+v_1' = \frac{m_1 - m_2}{m_1 + m_2} v_1 + \frac{2 m_2}{m_1 + m_2} v_2, \quad v_2' = \frac{2 m_1}{m_1 + m_2} v_1 + \frac{m_2 - m_1}{m_1 + m_2} v_2.
+\]</p>
+
+<p>有趣的极限——\(m_1 = m_2\): \(v_1' = v_2, v_2' = v_1\), <em>两球交换速度</em>（Newton 摆）。\(m_2 \to \infty\)（撞墙）: \(v_1' = -v_1\), <em>球反弹</em>。</p>
+
+<h2 id="sec2-3">2.3 动能定理与能量守恒</h2>
+
+<p>从 \(\boldsymbol F = m \dot{\boldsymbol v}\) 两边点乘 \(\boldsymbol v\):</p>
+
+<p>\[
+\boldsymbol F \cdot \boldsymbol v = m \dot{\boldsymbol v} \cdot \boldsymbol v = \frac{d}{dt} \left( \tfrac{1}{2} m |\boldsymbol v|^2 \right) = \frac{d T}{dt}
+\]</p>
+
+<p>这里 \(T = \tfrac{1}{2} m |\boldsymbol v|^2\) 是<em>动能</em>。沿轨迹积分</p>
+
+<p>\[
+\int_{t_1}^{t_2} \boldsymbol F \cdot \boldsymbol v \, dt = \int_{\boldsymbol r_1}^{\boldsymbol r_2} \boldsymbol F \cdot d \boldsymbol r = T_2 - T_1.
+\]</p>
+
+<p>左边是力沿路径做的<em>功</em> \(W\)。所以 <strong>动能定理</strong>:</p>
+
+<p>\[
+\boxed{\ W = \Delta T = T_2 - T_1.\ }
+\]</p>
+
+<p>这条话总成立, 不论力是否守恒、有无约束。是 \(\boldsymbol F = m \boldsymbol a\) 的纯粹运动学推论。</p>
+
+<p><strong>守恒力</strong>: 若 \(\boldsymbol F\) 可写成 \(\boldsymbol F = -\nabla V(\boldsymbol r)\), 其中 \(V\) 是位置的<em>标量</em> 函数（势能）, 则 \(\boldsymbol F\) 沿任意路径的功只依赖端点：</p>
+
+<p>\[
+W = \int_{\boldsymbol r_1}^{\boldsymbol r_2} \boldsymbol F \cdot d \boldsymbol r = -\int_{\boldsymbol r_1}^{\boldsymbol r_2} \nabla V \cdot d \boldsymbol r = -[V(\boldsymbol r_2) - V(\boldsymbol r_1)] = V_1 - V_2.
+\]</p>
+
+<p>结合动能定理: \(T_2 - T_1 = V_1 - V_2\), 即</p>
+
+<p>\[
+\boxed{\ T + V = E = \text{常数}.\ }
+\]</p>
+
+<p>这就是<em>能量守恒</em>。它的前提是力守恒, 即 \(\boldsymbol F\) 是某势的负梯度。等价条件: \(\nabla \times \boldsymbol F = \boldsymbol 0\) 在单连通域中（链<a href="../多元微积分/ch15.html">多元微积分 ch15</a> Stokes 定理）。</p>
+
+<p><em>不</em> 守恒力的典型: 摩擦力 \(\boldsymbol f = -\mu |\boldsymbol N| \hat{\boldsymbol v}\) 与速度反向, 沿任意闭合路径做<em>负</em> 功, 不是任何势的梯度。所以摩擦系统能量<em>不</em> 守恒, 机械能逐渐变成热能。Newton 框架下我们直接说"<em>能量被摩擦耗散了</em>"; Lagrange 框架下需要引入"<em>耗散函数</em>" 或扩展 Lagrangian, 处理起来比 Newton 更累——这是 Lagrange 力学的<em>少数</em> 短处。</p>
+
+<h2 id="sec2-4">2.4 角动量守恒</h2>
+
+<p>定义粒子相对原点 \(O\) 的<em>角动量</em></p>
+
+<p>\[
+\boldsymbol L = \boldsymbol r \times \boldsymbol p = m (\boldsymbol r \times \boldsymbol v).
+\]</p>
+
+<p>取时间导数（用乘积法则）</p>
+
+<p>\[
+\frac{d \boldsymbol L}{dt} = \dot{\boldsymbol r} \times \boldsymbol p + \boldsymbol r \times \dot{\boldsymbol p} = \boldsymbol v \times m \boldsymbol v + \boldsymbol r \times \boldsymbol F = \boldsymbol r \times \boldsymbol F = \boldsymbol N.
+\]</p>
+
+<p>第一项零（自身叉乘）。\(\boldsymbol N = \boldsymbol r \times \boldsymbol F\) 叫<em>力矩</em>。所以</p>
+
+<p>\[
+\boxed{\ \frac{d \boldsymbol L}{dt} = \boldsymbol N.\ }
+\]</p>
+
+<p>力矩是角动量的"<em>角动量版 F = ma</em>"。若 \(\boldsymbol N = \boldsymbol 0\), 则 \(\boldsymbol L\) 守恒。</p>
+
+<p><strong>什么时候 \(\boldsymbol N = \boldsymbol 0\)</strong>: (a) \(\boldsymbol F = \boldsymbol 0\)（没受力, 平凡）; (b) \(\boldsymbol F\) 沿径向方向 \(\boldsymbol r \parallel \boldsymbol F\), 即<em>中心力</em>。开普勒问题（行星受太阳引力）满足 (b), 行星角动量守恒——这是<a href="ch3.html">下一章</a> 的核心。</p>
+
+<p><strong>多粒子</strong>: 系统总角动量 \(\boldsymbol L = \sum_i \boldsymbol r_i \times \boldsymbol p_i\), 总力矩 \(\boldsymbol N = \sum_i \boldsymbol r_i \times \boldsymbol F_i\)。仿照 \(\boldsymbol P\) 推导, 内力在第三定律 + "<em>沿连线</em>" 假设下两两相消（这两条比单纯第三定律强一点）, 得</p>
+
+<p>\[
+\frac{d \boldsymbol L}{dt} = \boldsymbol N^{\text{ext, total}}.
+\]</p>
+
+<p><strong>例</strong>（单摆角动量）: 一根绳长 \(\ell\) 一端固定原点 \(O\), 一端挂质量 \(m\)。\(O\) 取在悬挂点。重力 \(\boldsymbol F = m \boldsymbol g\) 沿竖直向下, 摆球位置 \(\boldsymbol r\), 摆角 \(\theta\)。力矩</p>
+
+<p>\[
+\boldsymbol N = \boldsymbol r \times m \boldsymbol g, \quad |\boldsymbol N| = m g \ell \sin \theta.
+\]</p>
+
+<p>角动量 \(L = m \ell^2 \dot \theta\)（垂直摆动平面）。\(d L/dt = N\) 给</p>
+
+<p>\[
+m \ell^2 \ddot \theta = -m g \ell \sin \theta \quad \Rightarrow \quad \ddot \theta + (g/\ell) \sin \theta = 0.
+\]</p>
+
+<p>这就是单摆方程。角动量框架下推单摆比 Newton 直接写 \(F = ma\) + 投影更简洁——你只需要算 \(L\) 和 \(N\), 不需要分解坐标轴。这种"<em>用角动量代替坐标分解</em>" 的便利在 Lagrange 框架下被推到极致——你直接用 \(\theta\) 写 Lagrangian, 张力<em>消失</em>（<a href="ch1.html#sec1-3">ch1 §1.3</a>）。</p>
+
+<h2 id="sec2-5">2.5 多粒子系统与质心</h2>
+
+<p>\(N\) 粒子系统, 第 \(i\) 粒子质量 \(m_i\), 位置 \(\boldsymbol r_i\)。<strong>质心</strong>（center of mass）位置定义为</p>
+
+<p>\[
+\boxed{\ \boldsymbol R = \frac{\sum_i m_i \boldsymbol r_i}{\sum_i m_i} = \frac{1}{M} \sum_i m_i \boldsymbol r_i, \quad M = \sum_i m_i.\ }
+\]</p>
+
+<p>它是<em>质量加权</em> 的位置平均。系统总动量</p>
+
+<p>\[
+\boldsymbol P = \sum_i m_i \dot{\boldsymbol r}_i = M \dot{\boldsymbol R}.
+\]</p>
+
+<p>所以 \(\boldsymbol P = M \boldsymbol V_{\text{cm}}\)——系统总动量等于"<em>把全部质量集中在质心</em>" 的等效粒子的动量。</p>
+
+<p>结合 §2.2 的 \(d \boldsymbol P / dt = \boldsymbol F^{\text{ext}}\)：</p>
+
+<p>\[
+M \ddot{\boldsymbol R} = \boldsymbol F^{\text{ext}}.
+\]</p>
+
+<p><em>质心的运动等价于一个总质量为 \(M\) 的单粒子受总外力 \(\boldsymbol F^{\text{ext}}\) 的运动</em>。这条话叫<strong>质心定理</strong>, 是简化复杂系统的<em>钥匙</em>。它的实用版本：</p>
+
+<ul>
+  <li>太阳系 8 大行星 + 太阳, 质心运动靠近太阳中心, 外部银河引力近乎均匀, 整个系统作匀速直线（在银河系参考系内）运动。算太阳系内行星运动可以<em>把太阳系看成孤立系</em>。</li>
+  <li>炮弹爆炸: 炮弹空中爆炸成多块碎片, 受重力之外内力（爆炸冲击）。质心继续按抛物线飞行——爆炸只是把碎片绕质心散开, <em>没有改变质心轨迹</em>。</li>
+  <li>两体问题（<a href="ch3.html">ch3</a>）: 质心匀速直线运动, 相对运动化为约化质量单粒子。这是 ch3 的核心简化。</li>
+</ul>
+
+<p><strong>动能分解</strong>: 设 \(\boldsymbol r_i = \boldsymbol R + \boldsymbol r_i'\)（\(\boldsymbol r_i'\) 是相对质心位置）, \(\boldsymbol v_i = \boldsymbol V + \boldsymbol v_i'\)。总动能</p>
+
+<p>\[
+T = \tfrac{1}{2} \sum_i m_i |\boldsymbol v_i|^2 = \tfrac{1}{2} \sum_i m_i |\boldsymbol V + \boldsymbol v_i'|^2 = \tfrac{1}{2} M |\boldsymbol V|^2 + \tfrac{1}{2} \sum_i m_i |\boldsymbol v_i'|^2.
+\]</p>
+
+<p>交叉项 \(\sum m_i \boldsymbol v_i' = d/dt (\sum m_i \boldsymbol r_i') = \boldsymbol 0\)（相对质心位置加权和为零, 由 \(\boldsymbol R\) 定义）。所以</p>
+
+<p>\[
+\boxed{\ T = \tfrac{1}{2} M |\boldsymbol V|^2 + T_{\text{rel}}.\ }
+\]</p>
+
+<p>动能 = 质心平动动能 + 相对运动动能。这条分解叫 <em>König 定理</em>, 在两体 / 多体 / 刚体力学中反复出现。</p>
+
+<h2 id="sec2-6">2.6 几个标准例</h2>
+
+<p><strong>(a) 自由落体</strong>: 质量 \(m\) 受重力 \(\boldsymbol F = -m g \hat{\boldsymbol z}\)（\(\hat{\boldsymbol z}\) 向上）。\(\boldsymbol F = m \boldsymbol a\) 给 \(\ddot z = -g\)。积分两次, 初值 \(z(0) = z_0, \dot z(0) = v_0\):</p>
+
+<p>\[
+z(t) = z_0 + v_0 t - \tfrac{1}{2} g t^2.
+\]</p>
+
+<p>能量守恒: \(\tfrac{1}{2} m v^2 + m g z = E\)。验证两种方式给同样的轨迹。</p>
+
+<p><strong>(b) 抛物运动</strong>: 同样重力, 初速度 \(\boldsymbol v_0 = v_0 (\cos \alpha, \sin \alpha)\), 初位置原点。\(x\) 方向无力, \(z\) 方向有 \(-g\)：</p>
+
+<p>\[
+x(t) = v_0 \cos \alpha \cdot t, \quad z(t) = v_0 \sin \alpha \cdot t - \tfrac{1}{2} g t^2.
+\]</p>
+
+<p>消去 \(t\): \(z = x \tan \alpha - \frac{g x^2}{2 v_0^2 \cos^2 \alpha}\), 抛物线。射程 \(R\)（落地 \(z = 0\)）</p>
+
+<p>\[
+R = \frac{2 v_0^2 \sin \alpha \cos \alpha}{g} = \frac{v_0^2 \sin 2 \alpha}{g}.
+\]</p>
+
+<p>\(\alpha = 45°\) 时 \(\sin 2 \alpha = 1\) 取最大射程。这是<em>变分</em> 思想的微缩版——给定初速度, 选发射角让射程最大。后面 Lagrange 框架的"<em>选路径让作用量取极值</em>" 就是这个思想的延伸。</p>
+
+<p><strong>(c) 单摆</strong>: <a href="#sec2-4">§2.4</a> 已推 \(\ddot \theta + (g/\ell) \sin \theta = 0\)。小角近似 \(\sin \theta \approx \theta\) 给</p>
+
+<p>\[
+\ddot \theta + \omega^2 \theta = 0, \quad \omega = \sqrt{g/\ell}.
+\]</p>
+
+<p>这是<em>简谐振子</em>方程, 周期 \(T = 2 \pi / \omega = 2 \pi \sqrt{\ell / g}\), <em>不依赖振幅</em>（小角下）。Galileo 在比萨教堂里看摆动吊灯发现这条规律, 后来用它设计摆钟。<em>大</em> 角下周期与振幅有关, 完整解需椭圆函数（<a href="ch15.html">ch15</a>）。</p>
+
+<p><strong>(d) 弹簧振子</strong>: 弹簧劲度 \(k\), 平衡位置 \(x = 0\), 弹簧力 \(F = -k x\)。\(\boldsymbol F = m \boldsymbol a\) 给</p>
+
+<p>\[
+m \ddot x = -k x \quad \Rightarrow \quad \ddot x + \omega^2 x = 0, \quad \omega = \sqrt{k/m}.
+\]</p>
+
+<p>解 \(x(t) = A \cos(\omega t + \varphi)\)。能量 \(E = \tfrac{1}{2} m \dot x^2 + \tfrac{1}{2} k x^2 = \tfrac{1}{2} k A^2\) 是常数。简谐振子是经典力学最重要的模型——任何系统在平衡点附近线性化都<em>退化为</em> 简谐振子（<a href="ch8.html">ch8 小振动</a>）。所以记住它是物理学的"<em>氢原子</em>"。</p>
+
+<p><strong>(e) 圆周运动</strong>: 粒子绕原点作半径 \(r\)、角速度 \(\omega\) 的匀速圆周运动。位置 \(\boldsymbol r(t) = r (\cos \omega t, \sin \omega t)\), 速度 \(\boldsymbol v = r \omega (-\sin \omega t, \cos \omega t)\), 加速度</p>
+
+<p>\[
+\boldsymbol a = -r \omega^2 (\cos \omega t, \sin \omega t) = -\omega^2 \boldsymbol r.
+\]</p>
+
+<p>\(\boldsymbol a\) 指向原点, 大小 \(r \omega^2 = v^2 / r\), 这是<em>向心加速度</em>。所以维持圆周运动需要中心力 \(\boldsymbol F = -m \omega^2 \boldsymbol r\), 大小 \(m v^2 / r\)。</p>
+
+<p>例: 月球绕地球公转。半径 \(r \approx 3.84 \times 10^8\) m, 周期 \(T \approx 27.3\) 日, \(\omega = 2 \pi / T\)。所需向心力 \(F = m_{\text{月}} \omega^2 r\)。Newton 比较这个 \(F\) 与"<em>苹果落地</em>" 时的引力（\(\boldsymbol F = m g\)）, 用 \(g \to g (R_{\text{地}} / r)^2\) 的"<em>距离平方反比</em>" 修正, 数字上对得上——这是 Newton 推出引力规律 \(F = G M m / r^2\) 的经典论证。</p>
+
+<p>这五个例子展示了 Newton 力学的工作模式: <em>识别力, 写 \(\boldsymbol F = m \boldsymbol a\), 解 ODE, 验证守恒量</em>。简单系统下这套流程很顺; 复杂系统（带约束的多体, 非惯性系, 弯曲空间）下它越来越累。从<a href="ch4.html">下下章</a> 起我们正式跳到 Lagrange 框架, 让"<em>识别力</em>" 这一步消失。</p>
+
+<p>下一章我们用 Newton 工具做最后一道<em>巨题</em>: <em>开普勒问题</em>（行星绕太阳）。这是中心力问题的解析解, 也是 Newton 1687 立威之作——历史上经典力学第一次<em>预测</em> 验证天文学。读完<a href="ch3.html">下一章</a>, Newton 部分就告一段落, 我们正式跨进 Lagrange。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch1.html">← 上一章 · 第 1 章 引论</a><a href="ch3.html">下一章 · 第 3 章 中心力问题 →</a></nav>
+</main>
+</body>
+</html>
