@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 算法稳定性：实现的"后天好坏" — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 条件数</a><a href="ch6.html">下一章 · 第 6 章 一维方程求根 →</a></nav>
+<h1 id="ch5">第 5 章 算法稳定性：实现的"后天好坏"</h1>
+
+<p>上一章给了"<em>问题</em>先天难度" 一个名字（条件数）。这一章给"<em>算法</em>后天质量" 一个名字（稳定性）。两者独立——同一道良态问题可以有稳定也有不稳定的算法；同一道病态问题用最稳定的算法依然只能得到 \(\kappa \cdot \varepsilon_{\text{mach}}\) 的精度。</p>
+
+<p>把这两件事拆开是 Wilkinson 给数值分析最大的礼物。在他之前，"算法不准" 是一个混在一起的抱怨；在他之后，你能精确地说："这道题条件数是 \(10^6\)，所以最多 10 位准；我用的算法向后误差是 \(10^{-15}\)，所以前向误差应该是 \(10^{-9}\)。我看到 \(10^{-3}\) 的误差——说明<em>算法</em>有问题，不是问题。"</p>
+
+<h2 id="sec5-1">5.1 同一道题，两个算法，天差地别</h2>
+
+<p>来一道很常见的任务：算一组数据的方差。给定 \(x_1, \ldots, x_n\)，方差是</p>
+
+<p>\[
+\sigma^2 = \frac{1}{n} \sum_{i=1}^n (x_i - \bar x)^2, \quad \bar x = \frac{1}{n} \sum x_i.
+\]</p>
+
+<p>这个公式叫"<em>两遍算法</em>"——一遍算均值、一遍算偏差平方和。代码直观，没什么花样。</p>
+
+<p>大学概率统计课经常给一个"等价" 的"<em>一遍算法</em>"，因为它只扫一遍数据：</p>
+
+<p>\[
+\sigma^2 = \frac{1}{n} \sum x_i^2 - \bar x^2 = \frac{1}{n} \left( \sum x_i^2 - \frac{(\sum x_i)^2}{n} \right).
+\]</p>
+
+<p>两个公式在<em>纸上</em>恒等。但在浮点下，让我们试一组很特别的数据：</p>
+
+<p>\[
+x = (10^9, \quad 10^9 + 0.1, \quad 10^9 + 0.2, \quad 10^9 + 0.3, \quad 10^9 + 0.4).
+\]</p>
+
+<p>真方差是 0.02（差量是 0, 0.1, 0.2, 0.3, 0.4，方差就是这些数的方差）。</p>
+
+<p>用<em>两遍算法</em>：先算均值 \(\bar x = 10^9 + 0.2\)，然后算 \((x_i - \bar x)^2\) 得 \((-0.2)^2, (-0.1)^2, 0, (0.1)^2, (0.2)^2 = 0.04, 0.01, 0, 0.01, 0.04\)，平均 0.02。准。</p>
+
+<p>用<em>一遍算法</em>（在 double 下）：</p>
+
+<ul>
+  <li>\(\sum x_i = 5 \times 10^9 + 1.0\)。但 \(5 \times 10^9 + 1.0\) 在 double 下精确——\(5 \times 10^9\) 还在 16 位精度内的整数范围。</li>
+  <li>\(\sum x_i^2\)：每个 \(x_i^2 \approx 10^{18}\)，五个加起来 \(\approx 5 \times 10^{18}\)。这个数的相对精度是 \(\varepsilon_{\text{mach}} \approx 10^{-16}\)，绝对精度<em>只有 \(\sim 500\)</em>。所以 \(\sum x_i^2\) 在 double 下的绝对误差大约 \(500\)。</li>
+  <li>\((\sum x_i)^2 / n = (5 \times 10^9 + 1.0)^2 / 5 \approx 5 \times 10^{18}\)。同样的精度问题。</li>
+  <li>两个 \(\sim 5 \times 10^{18}\) 的数相减，本应得到 \(0.1\)（真值），但<em>双方各自有 \(\sim 500\) 的绝对误差</em>——差出来的"0.1" 完全淹没在误差里。</li>
+</ul>
+
+<p>实测：在 Python 里用一遍算法对上面的 \(x\) 算方差，得到的不是 0.02——可能是 0、可能是负数、可能是几百。<em>同一个数学公式，"等价" 的两种实现，给出截然不同的精度</em>。</p>
+
+<p>请你停下来想：上一章我们说"<em>问题</em>条件数大才会出问题"。这道方差问题<em>本身</em>条件数<em>不</em>大——给定数据扰动小，方差变化也小。问题良态。是<em>算法</em>把它变得不准。</p>
+
+<p>这就是<em>算法稳定性</em>要说的事——同样良态的问题，不同算法的输出精度可以相差 16 个数量级。</p>
+
+<h2 id="sec5-2">5.2 稳定 = "给一道附近问题的精确解"</h2>
+
+<p>把<a href="ch3.html">第 3 章 3.3 节</a>的"向后误差" 概念正式化为算法的属性。</p>
+
+<p>设算法实现了 \(\hat f\)（计算上的 \(f\)）。给输入 \(x\)，输出 \(\hat y = \hat f(x)\)。算法叫</p>
+
+<p>\[
+\boxed{\ \text{向后稳定（backward stable）}: \exists \Delta x, \ \|\Delta x\| / \|x\| \le C \cdot \varepsilon_{\text{mach}}, \ \hat y = f(x + \Delta x).\ }
+\]</p>
+
+<p>用人话：<em>"我算出的答案 \(\hat y\)，等于 \(f\) 作用在'被扰动了 \(\varepsilon_{\text{mach}}\) 量级' 的输入上的精确值"</em>。</p>
+
+<p>常数 \(C\) 通常是问题维数的多项式（\(O(n^2)\) 或 \(O(n^3)\)），不重要——重要的是它<em>不</em>含 \(\kappa\)。即"向后误差和问题难度无关，只受机器精度限制"。</p>
+
+<p>有了这条定义，<a href="ch4.html">上一章 4.4 节</a>的核心不等式立即给出</p>
+
+<p>\[
+\frac{\|\hat y - y\|}{\|y\|} \le \kappa(f, x) \cdot \frac{\|\Delta x\|}{\|x\|} \le C \cdot \kappa \cdot \varepsilon_{\text{mach}}.
+\]</p>
+
+<p><em>向后稳定算法的向前误差受 \(\kappa \cdot \varepsilon_{\text{mach}}\) 控制</em>。这是你能要求一个算法做到的最好。</p>
+
+<p>"<em>向后稳定</em>" 一开始听上去比"向前稳定" 弱（"我没保证答案准、只保证我解了某道附近的题"），但它<em>更</em>强——因为附近问题的解<em>就是</em>原问题最好的可能解，前提是问题本身良态。这种把"算法的责任" 与"问题的难度" 解耦的视角是 Wilkinson 的最深贡献。</p>
+
+<h2 id="sec5-3">5.3 几个重要算法的稳定性清单</h2>
+
+<p>本书后面会反复用的几个数值线性代数算法，按稳定性分一类：</p>
+
+<ul>
+  <li><strong>LU 分解 + 部分主元消元</strong>：向后稳定。这是为什么<a href="ch16.html">第 16 章</a>把它当解线性方程组的默认。</li>
+  <li><strong>Householder QR 分解</strong>：向后稳定。<a href="ch17.html">第 17 章</a>会用它做最小二乘的稳定算法。</li>
+  <li><strong>修正 Gram–Schmidt（MGS）</strong>：稳定但不严格向后稳定。在大多数情况下可用，特别是组合 Krylov 方法时。</li>
+  <li><strong>经典 Gram–Schmidt（CGS）</strong>：<em>不稳定</em>。算出来的"正交向量" 实际可能差 \(\kappa \cdot \varepsilon_{\text{mach}}\) 远不正交。永远用 MGS 或 Householder 替代。</li>
+  <li><strong>QR 算法（求特征值）</strong>：向后稳定。这是<a href="ch20.html">第 20 章</a>的内容。</li>
+  <li><strong>SVD 算法（多种实现）</strong>：向后稳定。<a href="ch21.html">第 21 章</a>。</li>
+  <li><strong>幂法（求最大特征值）</strong>：稳定但收敛速度依赖谱间隙。</li>
+  <li><strong>Cramer 法则解线性方程组</strong>：<em>非常不稳定</em>。永远不要用。即使在 \(\kappa = 1\) 时也可能给出 \(10^{-3}\) 的误差。理论上它是闭式解；实践中是数值灾难。</li>
+</ul>
+
+<p>这条清单告诉你一件重要事：<em>"看上去最直接的算法" 不一定稳定</em>。Cramer 法则、经典 Gram–Schmidt、上一节那个"一遍方差" 都直观、教材里出现频繁——但都不稳定。稳定算法常常需要看起来稍多一步（部分主元、Householder 反射、两遍方差），那一步就是把它从灾难里救出来的关键。</p>
+
+<h2 id="sec5-4">5.4 不稳定算法的三个征兆</h2>
+
+<p>你怎么看一个算法稳不稳？严格证向后稳定要做形式化误差分析，繁琐。但<em>大多数</em>不稳定算法身上有几个一眼可见的征兆：</p>
+
+<p><strong>征兆 1：中间结果远大于最终答案。</strong>"一遍方差" 算法里 \(\sum x_i^2 \approx 10^{18}\)，最终答案 0.02。比例 \(10^{20}\)。中间值越比答案大，最后那一步减法吃掉的有效位越多。同样的现象在求行列式（一些算法的中间值是大小相反的巨大数）和求逆矩阵（某些列爆炸性增长）里出现。</p>
+
+<p>诊断动作：算一遍中间最大绝对值与最终答案绝对值的比。比例超过 \(\sqrt{1/\varepsilon_{\text{mach}}} \approx 10^8\)，警惕。</p>
+
+<p><strong>征兆 2：几乎相等的数相减。</strong>这就是<a href="ch1.html">第 1 章</a>的灾难性抵消。任何算法里出现 \(a - b\) 形式且 \(a \approx b\)，<em>都</em>是不稳定信号。<a href="ch1.html">第 1 章 1.2 节</a>那个求根公式与<a href="ch1.html">1.3 节</a>那个 \(1 - \cos(x)\) 都是这个征兆的具体化。</p>
+
+<p>诊断动作：扫一遍算法的每一步，凡是减号都问"两边大小级别相同吗？"如果是，找代数等价的形式重排（用 Vieta、用三角恒等式、用 \(a - b = (a^2 - b^2)/(a + b)\) 这种"分子有理化" 技巧）。</p>
+
+<p><strong>征兆 3：迭代步骤的"残差膨胀"。</strong>很多迭代算法（如某些 ODE 数值解、某些迭代线性求解器）在每步都引入一点误差。如果每一步把误差放大（不只是积累），整个算法就是<em>指数</em>放大误差。这是<a href="ch23.html">第 23 章</a>"刚性方程的 explicit Euler 不稳定" 的根。</p>
+
+<p>诊断动作：看算法的"误差传递矩阵" 的谱半径。\(\rho > 1\) 是放大、\(\rho < 1\) 是衰减、\(\rho = 1\) 是中性。这套语言在 PDE 数值分析里成熟为 von Neumann 稳定性分析。</p>
+
+<h2 id="sec5-5">5.5 检测与修复</h2>
+
+<p>在实战中你怎么知道一个算法对你的具体问题稳不稳？三个工具：</p>
+
+<p><strong>工具 1：换公式重算。</strong>把<em>同一</em>数学问题用<em>两个</em>不同算法各算一次。如果两个结果差不多，问题可能良态、两个算法都稳；如果两个结果天差地别，<em>至少有一个算法不稳定</em>。哪个？通常是中间值更大、或者公式更"clever" 的那个（"clever" 在数值里常常是不稳的同义词）。</p>
+
+<p><strong>工具 2：残差检查。</strong>对线性方程组 \(A x = b\)，算完 \(\hat x\) 后立即看 \(\|b - A \hat x\| / \|b\|\)。这是向后误差的下界。它<em>大</em>意味着算法肯定有问题；它<em>小</em><em>不</em>意味着算法对（仍可能 \(\kappa\) 大），但可以排除"算法的锅"。</p>
+
+<p><strong>工具 3：高精度对照。</strong>如果你担心，用任意精度库（Python 的 mpmath、Julia 的 BigFloat）把同一道题在 50 位精度下重算，得到的"准答案" 用来诊断 double 算法的精度。这是<em>事后</em>诊断的金标准。代价是慢——但用在小规模诊断里完全可承受。</p>
+
+<p>如果发现算法不稳，<strong>修复</strong> 的办法不一而足：</p>
+
+<ul>
+  <li><em>换算法</em>。一遍方差 → 两遍方差。Cramer → LU。CGS → MGS。</li>
+  <li><em>重排表达式</em>。\(1 - \cos(x) \to 2 \sin^2(x/2)\)。\(a - b \to (a^2 - b^2)/(a + b)\)。求根公式用 Vieta 救小根。</li>
+  <li><em>迭代精化</em>。解 \(A x = b\) 得 \(\hat x\)；算残差 \(r = b - A \hat x\)；解 \(A y = r\) 得 \(\hat y\)；更新 \(x \leftarrow \hat x + \hat y\)。重复几次。可以把向后稳定算法的精度推到接近 \(\varepsilon_{\text{mach}}\)。</li>
+  <li><em>提高精度</em>。用 long double（80 位）或 quad（128 位）。代价：慢 5-10 倍。仅在<em>小规模</em>关键计算里值得。</li>
+  <li><em>修问题</em>。如果不只是算法不稳、问题本身也病——重新参数化、加正则化、收集更多数据让矩阵更"圆"。这是机器学习里大量的"为什么 L2 正则化" 的数值动机之一。</li>
+</ul>
+
+<h2 id="sec5-6">5.6 一个完整的诊断流</h2>
+
+<p>把这一章和上一章合在一起，对任何"算出来不准" 的报错，你应该跑这个流程：</p>
+
+<ul>
+  <li><strong>问 1：</strong>问题的条件数 \(\kappa\) 多大？（用 SVD、condest 估或几何直觉判）</li>
+  <li><strong>问 2：</strong>预测的可达精度 \(\sim \kappa \cdot \varepsilon_{\text{mach}}\) 等于多少？</li>
+  <li><strong>问 3：</strong>实际看到的精度比预测好还是差？</li>
+</ul>
+
+<p>分情况：</p>
+
+<ul>
+  <li><strong>实际精度 ≈ 预测：</strong>算法稳定、问题良态——一切都好。如果你想要更准，必须换问题（重新参数化或提高精度）。</li>
+  <li><strong>实际精度 ≪ 预测（差很多）：</strong>算法不稳定。看 5.4 节三个征兆找哪一步在丢精度，按 5.5 节修法救。</li>
+  <li><strong>实际精度 ≫ 预测：</strong>幸运。可能问题在你这道实例上比一般情况更好处理——或者你估的 \(\kappa\) 太悲观。</li>
+</ul>
+
+<p>这个流程让"我的代码算出来不准" 这种发问从模糊变具体。你不再是大喊"为什么不准"，你能精确说"我的问题 \(\kappa = 10^4\)，预测精度 \(10^{-12}\)，但我看到 \(10^{-4}\)，差 8 个数量级——所以是算法的问题，让我看看哪一步在做减法或迭代放大"。</p>
+
+<p>下一章我们离开"误差与稳定性" 这个抽象层，进入第一个具体的数值任务——<em>解一个方程</em>。这是数值方法最朴素也最常见的工作。我们从最稳但也最慢的二分法开始，逐步上升到收敛飞快的牛顿法。一路上你会看到这一章的"稳定性 vs 速度" 张力反复出现——稳的算法常常慢，快的算法常常脆弱。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch4.html">← 上一章 · 第 4 章 条件数</a><a href="ch6.html">下一章 · 第 6 章 一维方程求根 →</a></nav>
+</main>
+</body>
+</html>

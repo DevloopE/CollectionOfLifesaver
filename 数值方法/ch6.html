@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 6 章 一维方程求根：二分与不动点 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 算法稳定性</a><a href="ch7.html">下一章 · 第 7 章 牛顿法与割线法 →</a></nav>
+<h1 id="ch6">第 6 章 一维方程求根：二分与不动点</h1>
+
+<p>前五章是地基——浮点、误差、条件数、稳定性。从这一章开始我们做<em>具体</em>事。第一件具体事：解一个方程</p>
+
+<p>\[
+f(x) = 0.
+\]</p>
+
+<p>这是数值方法最朴素也最常见的任务。物理里求平衡点、化学里算化学势、金融里反算隐含波动率、机器学习里求最大似然估计的零导数点——本质上都是解 \(f(x) = 0\)。\(f\) 通常没有闭式根（除了线性、二次、少数三次和一些三角方程），剩下的全得用数值方法。</p>
+
+<p>这一章给最朴素的两个算法：<em>二分法</em>（永远收敛但慢）和<em>不动点迭代</em>（可能很快也可能发散）。下一章给把这两条优点合一的牛顿法。</p>
+
+<h2 id="sec6-1">6.1 为什么需要数值求根</h2>
+
+<p>你心想"二次方程不是有公式吗？"对，二次有。三次也有（Cardano 公式），但已经丑得没人记。四次也有（Ferrari），更丑。五次以上<em>没有</em>用根式表达的一般公式（这是 Galois 与 Abel 的著名结论，详见<a href="../抽象代数/ch22.html">《抽象代数读本》第 22 章</a>）。</p>
+
+<p>但这只是冰山一角。物理与工程里大部分方程根本不是多项式：</p>
+
+<ul>
+  <li>普朗克黑体辐射峰值：\(5(1 - e^{-x}) = x\)，没有闭式解。</li>
+  <li>Kepler 方程（行星运动）：\(M = E - e \sin E\)，求 \(E\)。</li>
+  <li>反算 Black–Scholes 隐含波动率：\(\sigma\) 在 erfc 复合里。</li>
+</ul>
+
+<p>这些都是"<em>有解</em>，但解写不出来" 的问题。数值方法不是 plan B——它是<em>唯一</em>的解法。</p>
+
+<p>整章我们用同一个简单例子练手：</p>
+
+<p>\[
+f(x) = x^3 - 2 = 0,
+\]</p>
+
+<p>真根 \(\sqrt[3]{2} \approx 1.2599210\). 这道题<em>能</em>闭式解（\(x = 2^{1/3}\)），但我们假装不能——这样可以把数值算出的每一步和真值对照。</p>
+
+<h2 id="sec6-2">6.2 二分法</h2>
+
+<p>二分法的全部逻辑就一句话：<em>如果一个连续函数在区间两端取异号值，那它在中间某处必为零</em>。这是中值定理（IVT）。给定 \(a < b\) 满足 \(f(a) \cdot f(b) < 0\)，根一定在 \([a, b]\) 内。</p>
+
+<p>算法：取中点 \(m = (a + b) / 2\)，算 \(f(m)\)。三种情况：</p>
+
+<ul>
+  <li>\(f(m) = 0\)：找到根，停。</li>
+  <li>\(f(m) \cdot f(a) < 0\)：根在 \([a, m]\)，把 \(b\) 缩到 \(m\)。</li>
+  <li>否则根在 \([m, b]\)，把 \(a\) 缩到 \(m\)。</li>
+</ul>
+
+<p>循环。每步把区间长度<em>减半</em>。</p>
+
+<p>对 \(f(x) = x^3 - 2\) 起点 \([1, 2]\)，\(f(1) = -1, f(2) = 6\)：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">step</th><th style="padding: 0.3em 1em;">\(a\)</th><th style="padding: 0.3em 1em;">\(b\)</th><th style="padding: 0.3em 1em;">\(m\)</th><th style="padding: 0.3em 1em;">\(f(m)\)</th></tr>
+<tr><td>1</td><td>1.0000</td><td>2.0000</td><td>1.5000</td><td>+1.375</td></tr>
+<tr><td>2</td><td>1.0000</td><td>1.5000</td><td>1.2500</td><td>−0.047</td></tr>
+<tr><td>3</td><td>1.2500</td><td>1.5000</td><td>1.3750</td><td>+0.6%</td></tr>
+<tr><td>4</td><td>1.2500</td><td>1.3750</td><td>1.3125</td><td>+0.260</td></tr>
+<tr><td>5</td><td>1.2500</td><td>1.3125</td><td>1.2812</td><td>+0.103</td></tr>
+<tr><td>10</td><td colspan="3" style="text-align:center;">区间长度 \(\sim 10^{-3}\)</td><td>1.2607</td></tr>
+<tr><td>20</td><td colspan="3" style="text-align:center;">区间长度 \(\sim 10^{-6}\)</td><td>1.25992</td></tr>
+<tr><td>53</td><td colspan="3" style="text-align:center;">区间长度 \(\sim \varepsilon_{\text{mach}}\)</td><td>1.2599210...</td></tr>
+</table>
+
+<p>每步区间减半。从 \([1, 2]\) 长度 1 出发，要到 \(\varepsilon_{\text{mach}} = 2^{-52}\)，<em>恰好需要 52 步</em>。这是二分法的"<em>线性收敛</em>"——每步把误差减半，等价于"每步多一位二进制精度"。</p>
+
+<p>\[
+\boxed{\ \text{二分法误差} \le \frac{b - a}{2^n}, \quad \text{每步精度增加 1 位.}\ }
+\]</p>
+
+<p>53 步算 16 位精度——比起牛顿法的"<em>每步精度翻倍</em>"（下一章），<em>慢得多</em>。但它的承诺也强得多：<em>给定有效起始括号 \([a, b]\)，二分法 100% 收敛</em>。这种"绝不失败" 的稳定性在工程上极有价值。</p>
+
+<h2 id="sec6-3">6.3 二分法的细节陷阱</h2>
+
+<p>看似简单的二分法在实现上有几个让你以后受用的细节。</p>
+
+<p><strong>陷阱 1：中点的算法。</strong>朴素 \(m = (a + b) / 2\) 在 \(a, b\) 数量级很大时可能<em>上溢</em>。比如 \(a = 10^{300}\)，\(b = 1.5 \times 10^{300}\)，加起来 \(2.5 \times 10^{300}\)<em>没</em>溢出，但如果 \(b = 10^{308}\) 之类就接近 double 上限了。更稳的写法：</p>
+
+<p>\[
+m = a + (b - a) / 2.
+\]</p>
+
+<p>\(b - a\) 是个相对小的数，加 \(a\) 不会溢出。这个小重排是无代价的好习惯。</p>
+
+<p><strong>陷阱 2：停止判据。</strong>什么时候认定"找到根了"？不是"<em>区间长度小</em>" 单一标准——病态问题里 \(f(m)\) 仍可能很大。也不是"\(|f(m)|\) 小" 单一标准——\(f\) 可能本来就接近 0（比如 \(f(x) = (x - 1)^{10}\) 在 \(x = 1\) 附近的所有点 \(f\) 都很小，但根的位置仍要精确）。</p>
+
+<p>实战的双判据：</p>
+
+<p>\[
+|b - a| < \tau_x \quad \textbf{且} \quad |f(m)| < \tau_f.
+\]</p>
+
+<p>\(\tau_x\) 通常取 \(\varepsilon_{\text{mach}} \cdot |x|\)（相对位置精度），\(\tau_f\) 取问题特定的小数。两个都满足才停。</p>
+
+<p><strong>陷阱 3：起始括号的获取。</strong>二分法<em>需要</em>一个 \(f(a) \cdot f(b) < 0\) 的括号——但<em>怎么找</em>这个括号本身是另一个问题。常见方法：</p>
+
+<ul>
+  <li>从问题的物理 / 几何意义猜（一个温度问题，温度大概在 \([0, 100]\) 摄氏度内）。</li>
+  <li>采样：\(f\) 在 \([x_{\min}, x_{\max}]\) 上每隔 \(\Delta x\) 取一点，找连续两个符号异的点。</li>
+  <li>"扩张" 算法：从 \(x_0\) 出发，每次把区间扩大一倍 \([x_0 - 2^k, x_0 + 2^k]\)，直到符号异。</li>
+</ul>
+
+<p>没找到括号？说明 \([a, b]\) 内可能<em>无</em>实根、或<em>偶数</em>个根。二分法不适用。</p>
+
+<p><strong>陷阱 4：多根。</strong>二分法找到的是<em>某一个</em>根，不是所有根。如果 \(f\) 在你的范围内有多个根，二分法找哪个取决于初始括号怎么选。要找全部根，你得做"扫描 + 局部二分"。</p>
+
+<h2 id="sec6-4">6.4 不动点迭代：另一种视角</h2>
+
+<p>从另一个角度看求根。把 \(f(x) = 0\) 重写成</p>
+
+<p>\[
+x = g(x)
+\]</p>
+
+<p>对某个函数 \(g\)。\(g\) 不止一种选——比如 \(x^3 - 2 = 0\) 可写成 \(x = x - (x^3 - 2)\) 或 \(x = (x + 2/x^2)/2\) 或 \(x = (2/x)^{1/2}\) 等许多形式，每个都对。</p>
+
+<p>解 \(x = g(x)\) 的方程叫求 \(g\) 的<em>不动点</em>（fixed point）。算法：从某个 \(x_0\) 出发，迭代</p>
+
+<p>\[
+x_{n+1} = g(x_n), \quad n = 0, 1, 2, \ldots
+\]</p>
+
+<p>如果序列收敛到 \(x^*\)，则 \(x^* = g(x^*)\)，找到根。</p>
+
+<p>例：解 \(x = \cos(x)\)。从 \(x_0 = 1\) 出发：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(n\)</th><th style="padding: 0.3em 1em;">\(x_n\)</th></tr>
+<tr><td>0</td><td>1.0000</td></tr>
+<tr><td>1</td><td>0.5403</td></tr>
+<tr><td>2</td><td>0.8576</td></tr>
+<tr><td>3</td><td>0.6543</td></tr>
+<tr><td>4</td><td>0.7935</td></tr>
+<tr><td>10</td><td>0.7388</td></tr>
+<tr><td>30</td><td>0.7390851</td></tr>
+<tr><td>50</td><td>0.7390851332</td></tr>
+</table>
+
+<p>慢慢震荡收敛到 \(\approx 0.73908513\)。这是 \(x = \cos(x)\) 的根。</p>
+
+<p><em>但</em>——同样的"重写为 \(x = g(x)\)" 不是总收敛。试解 \(x^2 = 2\) 用 \(x = 2/x\)：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(n\)</th><th style="padding: 0.3em 1em;">\(x_n\)</th></tr>
+<tr><td>0</td><td>1.5000</td></tr>
+<tr><td>1</td><td>1.3333</td></tr>
+<tr><td>2</td><td>1.5000</td></tr>
+<tr><td>3</td><td>1.3333</td></tr>
+<tr><td>...</td><td>永远在两值间震荡</td></tr>
+</table>
+
+<p>不收敛。同样的方程换不同的 \(g\) 表达，结果完全不同。</p>
+
+<h2 id="sec6-5">6.5 不动点迭代什么时候收敛？</h2>
+
+<p>核心定理（压缩映射 / Banach 不动点定理的实数版）：</p>
+
+<p><strong>定理。</strong>设 \(g\) 在 \(x^*\) 附近连续可微，\(x^* = g(x^*)\) 是不动点。如果 \(|g'(x^*)| < 1\)，则存在邻域 \(U(x^*)\) 使任何 \(x_0 \in U\) 出发的迭代收敛到 \(x^*\)。收敛速率：</p>
+
+<p>\[
+\boxed{\ |x_{n+1} - x^*| \approx |g'(x^*)| \cdot |x_n - x^*|.\ }
+\]</p>
+
+<p>每步误差被 \(|g'(x^*)|\) 倍缩。叫<em>线性收敛</em>，速率 \(|g'(x^*)|\)。</p>
+
+<p>反过来，如果 \(|g'(x^*)| > 1\)，迭代<em>发散</em>——任何起点最终都跑离 \(x^*\)。\(|g'(x^*)| = 1\) 是临界，可能收敛也可能不，看高阶项。</p>
+
+<p>验证两个例子：</p>
+
+<p><strong>\(g(x) = \cos(x)\)</strong>，\(x^* \approx 0.739\)。\(g'(x^*) = -\sin(0.739) \approx -0.673\)。\(|g'(x^*)| \approx 0.673 < 1\) → 收敛，每步误差缩 0.67 倍。这就是上一节我们看到的"慢慢震荡收敛"。</p>
+
+<p><strong>\(g(x) = 2/x\)</strong>，\(x^* = \sqrt{2}\)。\(g'(x) = -2/x^2\)。\(g'(\sqrt{2}) = -2/2 = -1\)。\(|g'(x^*)| = 1\) → 临界，本例中实际<em>不</em>收敛（永远震荡）。</p>
+
+<p>\(g'(x^*)\) 越接近 0，收敛越快。理想是 \(g'(x^*) = 0\)——这时收敛是<em>二次的</em>（每步精度翻倍），比线性快得多。<em>怎么构造让 \(g'(x^*) = 0\) 的 \(g\)</em>？这就是<a href="ch7.html">下一章</a>牛顿法的精髓——它本质就是个"自动选最优 \(g\)" 的算法。</p>
+
+<p>请你停下来想一件事：上面这条<em>导数大小决定收敛与否</em> 的事实，把"求根" 和"几何" 联系起来。\(g'(x^*) < 0\) 让迭代震荡（每步换边）；\(g'(x^*) > 0\) 让迭代单调；\(|g'(x^*)|\) 大让收敛慢甚至发散。整个不动点理论<em>是 \(g\) 在不动点附近的局部线性近似</em>的几何。这种"用线性近似理解非线性算法" 的视角在数值方法里反复出现。</p>
+
+<h2 id="sec6-6">6.6 二分 vs 不动点：怎么选</h2>
+
+<p>这两种方法在工程上的取舍：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse; font-size: 0.95em;">
+<tr><th style="padding: 0.4em 1em; text-align: left;"></th><th style="padding: 0.4em 1em; text-align: left;">二分法</th><th style="padding: 0.4em 1em; text-align: left;">不动点迭代</th></tr>
+<tr><td style="padding: 0.4em 1em;">需要</td><td style="padding: 0.4em 1em;">异号括号 \(f(a) f(b) < 0\)</td><td style="padding: 0.4em 1em;">良好初值 + 合适 \(g\)</td></tr>
+<tr><td style="padding: 0.4em 1em;">收敛保证</td><td style="padding: 0.4em 1em;">100%（连续 + 异号）</td><td style="padding: 0.4em 1em;">仅 \(|g'| < 1\) 时</td></tr>
+<tr><td style="padding: 0.4em 1em;">收敛速度</td><td style="padding: 0.4em 1em;">每步 1 位（线性）</td><td style="padding: 0.4em 1em;">线性，速率 \(|g'(x^*)|\)</td></tr>
+<tr><td style="padding: 0.4em 1em;">每步开销</td><td style="padding: 0.4em 1em;">1 次 \(f\) 求值</td><td style="padding: 0.4em 1em;">1 次 \(g\) 求值</td></tr>
+<tr><td style="padding: 0.4em 1em;">易实现</td><td style="padding: 0.4em 1em;">极易</td><td style="padding: 0.4em 1em;">易但需想 \(g\)</td></tr>
+<tr><td style="padding: 0.4em 1em;">病例</td><td style="padding: 0.4em 1em;">无括号、多根</td><td style="padding: 0.4em 1em;">\(g\) 选错则发散</td></tr>
+</table>
+
+<p>实战做法：用<em>组合算法</em>。Brent's method 是工业标准——它<em>开始用二分</em>保证收敛进入根附近，<em>切换到二次插值或反向二次插值</em>加速到接近 Newton 速度，但每步监控收敛性，不行就退回二分。这种"多算法组合" 的思路在数值方法里反复出现：每个单算法各有优劣，组合起来取长补短。</p>
+
+<p>SciPy 的 <code>scipy.optimize.brentq</code> 就是 Brent 算法的实现。99% 的"找一维方程根" 任务直接用它就行。理解二分和不动点是为了让你知道它<em>底层</em>在做什么、什么时候会失败。</p>
+
+<p>下一章我们引入<em>牛顿法</em>。它本质是"用 \(f\) 在 \(x_n\) 处的切线代替 \(f\) 找新猜值" 的不动点迭代——但选 \(g\) 选得极好，使得 \(g'(x^*) = 0\)，得到<em>二次收敛</em>（每步精度翻倍）。代价是每步要算 \(f\) 和 \(f'\)，且不像二分那样保证收敛。下一章我们看清楚这个交易。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch5.html">← 上一章 · 第 5 章 算法稳定性</a><a href="ch7.html">下一章 · 第 7 章 牛顿法与割线法 →</a></nav>
+</main>
+</body>
+</html>

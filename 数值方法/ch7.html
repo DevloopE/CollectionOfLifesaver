@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 牛顿法与割线法 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 一维方程求根</a><a href="ch8.html">下一章 · 第 8 章 多变量牛顿与拟牛顿 →</a></nav>
+<h1 id="ch7">第 7 章 牛顿法与割线法</h1>
+
+<p>上一章末尾我说："牛顿法本质是'<em>自动构造满足 \(g'(x^*) = 0\) 的 \(g\)</em>'。" 这一章把这句话兑现，并看它带来的好处（二次收敛）和代价（要算导数 + 不保证收敛）。</p>
+
+<p>牛顿法是数值分析最重要的算法之一——它出现在求根、求极值、解 ODE 的隐式格式、求矩阵开方、训练神经网络（二阶优化）等等几乎所有"局部线性近似" 的场合。理解它的几何 + 收敛性 + 失效模式，是数值人的基本功。</p>
+
+<h2 id="sec7-1">7.1 牛顿法的几何</h2>
+
+<p>设 \(f\) 在当前猜值 \(x_n\) 附近可导。最朴素的近似——把 \(f\) 用它在 \(x_n\) 处的<em>切线</em>代替：</p>
+
+<p>\[
+f(x) \approx f(x_n) + f'(x_n)(x - x_n).
+\]</p>
+
+<p>切线是个直线方程，求根容易：解 \(f(x_n) + f'(x_n)(x - x_n) = 0\) 得</p>
+
+<p>\[
+\boxed{\ x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}.\ }
+\]</p>
+
+<p>这就是<em>牛顿迭代</em>。算法上：从 \(x_0\) 出发，反复套这个公式，直到相邻两步差小于容忍度。</p>
+
+<p>几何画面非常具体：在 \(x_n\) 处画 \(f\) 的切线；找切线和 \(x\)-轴的交点；那就是 \(x_{n+1}\)。如果 \(f\) 在根附近"几乎是直线"，新猜值会非常接近真根。</p>
+
+<p>请你在脑子里画一遍：\(f\) 是个曲线，在 \(x_n\) 处用一根直线"近似" 它，那根直线和 \(x\)-轴的交点就跳到了 \(x_{n+1}\)。再在 \(x_{n+1}\) 重新画切线，跳一次，到 \(x_{n+2}\)。这个"画切线 → 跳" 的循环就是牛顿法的灵魂。</p>
+
+<h2 id="sec7-2">7.2 跑一遍：解 \(x^3 - 2 = 0\)</h2>
+
+<p>同样用上一章的例子，求 \(\sqrt[3]{2}\)。\(f(x) = x^3 - 2\)，\(f'(x) = 3 x^2\)。牛顿迭代</p>
+
+<p>\[
+x_{n+1} = x_n - \frac{x_n^3 - 2}{3 x_n^2} = \frac{2 x_n}{3} + \frac{2}{3 x_n^2}.
+\]</p>
+
+<p>从 \(x_0 = 1.5\) 出发：</p>
+
+<table style="margin: 1em 0; border-collapse: collapse;">
+<tr><th style="padding: 0.3em 1em;">\(n\)</th><th style="padding: 0.3em 1em;">\(x_n\)</th><th style="padding: 0.3em 1em;">误差 \(|x_n - \sqrt[3]{2}|\)</th></tr>
+<tr><td>0</td><td>1.500000000000</td><td>\(2.4 \times 10^{-1}\)</td></tr>
+<tr><td>1</td><td>1.296296296296</td><td>\(3.6 \times 10^{-2}\)</td></tr>
+<tr><td>2</td><td>1.260932224741</td><td>\(1.0 \times 10^{-3}\)</td></tr>
+<tr><td>3</td><td>1.259921860565</td><td>\(8.1 \times 10^{-7}\)</td></tr>
+<tr><td>4</td><td>1.259921049894</td><td>\(5.2 \times 10^{-13}\)</td></tr>
+<tr><td>5</td><td>1.259921049895</td><td>\(<\varepsilon_{\text{mach}}\)</td></tr>
+</table>
+
+<p>5 步就到机器精度。对比上一章二分法的 53 步——快了一个数量级。</p>
+
+<p>看误差栏：\(0.24 \to 0.036 \to 0.001 \to 8 \times 10^{-7} \to 5 \times 10^{-13}\)。每步误差<em>大约平方</em>：\(0.036 \approx 0.24^{1.5}\)、\(0.001 \approx 0.036^2\)、\(8 \times 10^{-7} \approx 0.001^2\)、\(5 \times 10^{-13} \approx (8 \times 10^{-7})^{1.7}\)。</p>
+
+<p>"误差每步平方" 翻译成精度语言：<em>正确数字位数每步翻倍</em>。第 2 步 3 位准、第 3 步 6 位准、第 4 步 13 位准——典型的<em>二次收敛</em>。</p>
+
+<h2 id="sec7-3">7.3 二次收敛：定理与证明草图</h2>
+
+<p>正式陈述：</p>
+
+<p><strong>定理（牛顿法局部二次收敛）。</strong>设 \(f \in C^2\)，\(x^*\) 是 \(f(x) = 0\) 的简单根（即 \(f(x^*) = 0, f'(x^*) \neq 0\)）。则存在 \(x^*\) 的某邻域 \(U\) 与常数 \(C\) 使任何 \(x_0 \in U\) 出发的牛顿迭代收敛到 \(x^*\)，且</p>
+
+<p>\[
+\boxed{\ |x_{n+1} - x^*| \le C \cdot |x_n - x^*|^2.\ }
+\]</p>
+
+<p>常数 \(C \approx |f''(x^*)| / (2 |f'(x^*)|)\)。</p>
+
+<p>证明草图。把 \(f\) 在 \(x^*\) 处 Taylor 展到二阶：</p>
+
+<p>\[
+0 = f(x^*) = f(x_n) + f'(x_n)(x^* - x_n) + \frac{f''(\xi)}{2} (x^* - x_n)^2,
+\]</p>
+
+<p>其中 \(\xi\) 在 \(x_n\) 与 \(x^*\) 之间。整理：</p>
+
+<p>\[
+x^* - x_n = -\frac{f(x_n)}{f'(x_n)} - \frac{f''(\xi)}{2 f'(x_n)}(x^* - x_n)^2.
+\]</p>
+
+<p>第一项就是 \(x_{n+1} - x_n\)，所以</p>
+
+<p>\[
+x^* - x_{n+1} = -\frac{f''(\xi)}{2 f'(x_n)}(x^* - x_n)^2.
+\]</p>
+
+<p>取绝对值，\(C = \sup |f''| / (2 \inf |f'|)\)，结束。</p>
+
+<p>这条证明的几何含义：牛顿法用切线代替 \(f\)，切线 = 一阶 Taylor。误差来自被丢掉的二阶项 \(\frac{1}{2} f''(\xi)(x - x_n)^2\)——所以新误差<em>正比于旧误差平方</em>。这是为什么<em>每步精度翻倍</em>：每丢一阶展开项，下一步误差就少一阶。</p>
+
+<p>请你把这条放在心里：<em>"用 \(k\) 阶展开近似"自动给"\(k+1\) 阶收敛"</em>。一阶展开（切线）→ 二阶收敛。这不是巧合，是<em>每个</em>"用低阶逼近高阶量" 算法的通用规律。后面 ODE 数值方法里 RK4 用四阶展开 → 五阶局部精度，同样的逻辑。</p>
+
+<h2 id="sec7-4">7.4 牛顿法可以怎么坏</h2>
+
+<p>二次收敛听起来天上掉馅饼。但定理里有<em>"局部"</em> 这个限定——\(x_0\) 必须"<em>足够接近</em>" \(x^*\)。"足够接近" 是多近？没有一般答案。下面三个真实失效场景：</p>
+
+<p><strong>失效 1：\(f'(x_n) \approx 0\)。</strong>切线几乎水平。它和 \(x\)-轴的交点跳到很远——\(x_{n+1}\) 离根十万八千里。对 \(f(x) = x^2 - 1\)，从 \(x_0 = 0.001\) 出发，\(f'(0.001) = 0.002\)，\(x_1 = 0.001 - (0.001^2 - 1)/0.002 = 0.001 + 500 = 500.001\)。一步跳到 500。整个收敛性丢失。</p>
+
+<p><strong>失效 2：循环。</strong>有些 \(f\) 让牛顿迭代陷入有限循环，不收敛也不发散。教科书例子 \(f(x) = x^3 - 2x + 2\)，从 \(x_0 = 0\) 出发：\(x_1 = 1\)，\(x_2 = 0\)，\(x_3 = 1\)，... 永远在 0 和 1 间震荡。这种循环不靠收敛分析的局部线性化预测。</p>
+
+<p><strong>失效 3：发散到错误根。</strong>\(f\) 有多个根时，牛顿法不<em>选择</em>找哪个——切线交 \(x\)-轴在哪，就跳到哪个根的吸引域。"<em>吸引域</em>" 在复平面上画出来是著名的牛顿分形——分形边界意味着初值的<em>无穷小</em>变化可以导致跳到完全不同的根。这种敏感性在工程上麻烦。</p>
+
+<p><strong>失效 4：重根（multiple root）。</strong>如果 \(x^*\) 是 \(f\) 的<em>重根</em>（即 \(f(x^*) = f'(x^*) = 0\)），牛顿法<em>仍然</em>收敛，但只<em>线性</em>收敛——每步误差减半，不再翻倍精度。原因是定理前提 \(f'(x^*) \neq 0\) 失效。比如 \(f(x) = (x - 1)^2\) 的根 1 是重根；牛顿法收敛但慢。修法：用<em>修正</em>牛顿 \(x_{n+1} = x_n - m \cdot f(x_n) / f'(x_n)\)，其中 \(m\) 是根的重数，恢复二次收敛。但你通常事先不知道重数——所以重根问题<em>本质</em>难处理。</p>
+
+<p>这四个失效点告诉你：<em>牛顿法是高效但脆弱的工具</em>。在生产代码里你<em>从不</em>裸用牛顿——总要套一层"保护壳"，监控收敛、失效时退回二分。下面 7.6 节给具体做法。</p>
+
+<h2 id="sec7-5">7.5 割线法：没有 \(f'\) 怎么办？</h2>
+
+<p>牛顿法每步要算 \(f(x_n)\) 和 \(f'(x_n)\)。但很多实际情况里 \(f'\) 你不知道——\(f\) 可能是个黑盒函数（一段第三方代码、一个仿真模拟器、一个昂贵的物理实验测量）。或者 \(f'\) 你<em>能</em>算但代价巨大（每次 \(f'\) 调用要几秒）。这时怎么办？</p>
+
+<p>用<em>差商</em>近似切线斜率——拿之前两步的 \(f\) 值连一根<em>割线</em>代替切线：</p>
+
+<p>\[
+\boxed{\ x_{n+1} = x_n - f(x_n) \cdot \frac{x_n - x_{n-1}}{f(x_n) - f(x_{n-1})}.\ }
+\]</p>
+
+<p>需要两个起点 \(x_0, x_1\)。每步只算<em>一</em>次 \(f\)（重用上一步的）。<em>不</em>需要 \(f'\)。</p>
+
+<p>收敛性：割线法的收敛阶是<em>黄金比 \(\varphi = (1 + \sqrt{5})/2 \approx 1.618\)</em>，不是 2。即 \(|x_{n+1} - x^*| \approx C \cdot |x_n - x^*|^\varphi\)。比牛顿慢一点（每步精度乘 1.618 倍而不是 2 倍），但比线性快得多。</p>
+
+<p>实际工作中割线法常见两个用场：</p>
+
+<ul>
+  <li><em>\(f\) 是黑盒</em>，没法符号求导。</li>
+  <li><em>\(f'\) 可算但昂贵</em>。割线每步省一次 \(f'\) 调用，长远上比牛顿少 30-50% 总开销。</li>
+</ul>
+
+<p>下一章我们把这套思路推到多维（\(f : \mathbb{R}^n \to \mathbb{R}^n\)），那里"省 Jacobian 计算" 的优势更明显——多维 Jacobian 矩阵 \(O(n^2)\) 个偏导数，每个都得算。<em>拟牛顿法</em>（quasi-Newton）就是多维割线法的 souped-up 版本，是机器学习训练里最常用的二阶优化算法。</p>
+
+<h2 id="sec7-6">7.6 实战：保护过的牛顿 + 二分混合</h2>
+
+<p>把牛顿的<em>速度</em>和二分的<em>稳定</em>结合，得到工程级算法。最经典的是 <strong>Brent 方法</strong>（1973）：</p>
+
+<ul>
+  <li>维护一个有效括号 \([a, b]\)（\(f(a) f(b) < 0\)）。</li>
+  <li>每步尝试用<em>反二次插值</em>（牛顿的一种变体）算下一步。</li>
+  <li>如果新点跳出括号、或太接近端点、或步长不缩小一半——<em>退回二分</em>，把括号严格折半。</li>
+  <li>如果新点合理，更新括号，继续。</li>
+</ul>
+
+<p>Brent 方法保证：</p>
+
+<ul>
+  <li>最多 \(O(\log_2 (\text{初始括号长度} / \varepsilon))\) 步收敛——和二分一样的最坏情况保证。</li>
+  <li>大多数实际情况下接近超线性 / 二次收敛——和牛顿一样的好情况速度。</li>
+</ul>
+
+<p>SciPy 的 <code>scipy.optimize.brentq(f, a, b)</code> 就是 Brent 方法。99% 的"找一维根" 任务直接用它：你只给函数和初始括号，剩下的它处理。理解牛顿和二分是为了让你知道<em>它底层在做什么</em>、<em>什么时候会慢</em>、<em>失败时该怎么诊断</em>。</p>
+
+<p>更朴素的"<em>保护过的牛顿</em>" 实现：</p>
+
+<pre style="background:#f7f7f0;padding:0.6em 1em;border-radius:6px;">
+def safeguarded_newton(f, fp, x0, a, b, tol=1e-12, max_iter=50):
+    x = x0
+    for i in range(max_iter):
+        fx = f(x)
+        if abs(fx) < tol: return x
+        # 试牛顿步
+        if fp(x) != 0:
+            x_newton = x - fx / fp(x)
+            if a <= x_newton <= b:
+                # 牛顿步合法，用之
+                x = x_newton
+                continue
+        # 牛顿失败，退回二分
+        m = (a + b) / 2
+        if f(a) * f(m) < 0:
+            b = m
+        else:
+            a = m
+        x = m
+    return x
+</pre>
+
+<p>这段代码体现了"<em>能快就快，不能快就稳</em>" 的工程哲学。这种"快算法 + 慢回退" 的模式在数值方法的几乎每个领域都重现——你后面会看到迭代线性求解器（GMRES + restart）、ODE 数值方法（Adams + 自适应步长）、PDE 数值解（自适应网格）都是同一种思路。</p>
+
+<p>下一章我们把求根从一维推广到多维。多维牛顿法把"切线" 换成"<em>切平面</em>"——本质是多元 Taylor 一阶展开。除了维数变高带来的几何复杂性，整个故事和一维一样。但因为高维 Jacobian 计算贵，会发展出"<em>拟牛顿</em>" 系列算法（BFGS、L-BFGS、SR1），那是机器学习训练的核心工具之一。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch6.html">← 上一章 · 第 6 章 一维方程求根</a><a href="ch8.html">下一章 · 第 8 章 多变量牛顿与拟牛顿 →</a></nav>
+</main>
+</body>
+</html>

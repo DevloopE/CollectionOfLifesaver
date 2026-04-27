@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 多变量牛顿与拟牛顿 — 普林斯顿数值方法读本</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true,
+      tags: 'none',
+      packages: {'[+]': ['boldsymbol', 'cases', 'ams']},
+      macros: {
+        oiint:  ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x222F}}\\nolimits', 0],
+        oiiint: ['\\mathop{\\vphantom{\\int}\\unicode[Times]{x2230}}\\nolimits', 0]
+      }
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="mathjax"></script>
+<script>
+  document.getElementById('mathjax').onerror = function() {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js';
+    document.head.appendChild(s);
+  };
+</script>
+</head>
+<body>
+<main>
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 牛顿法与割线法</a><a href="ch9.html">下一章 · 第 9 章 多项式插值 →</a></nav>
+<h1 id="ch8">第 8 章 多变量牛顿与拟牛顿</h1>
+
+<p>一维牛顿法用切线代替函数。多维牛顿法把"切线" 换成"<em>切超平面</em>"——本质是多元 Taylor 一阶展开。整个故事的逻辑和一维一样，但<em>规模</em>带来新问题：Jacobian 是 \(n \times n\) 矩阵，每步要解一次线性方程组（开销 \(O(n^3)\)），\(n\) 大时这两条都要命。</p>
+
+<p>这一章先正面给多维牛顿法。然后引入<em>拟牛顿</em>系列——通过<em>近似</em>Jacobian 把每步从 \(O(n^3)\) 降到 \(O(n^2)\) 甚至 \(O(n)\)。后者是机器学习里 BFGS / L-BFGS 等优化算法的源头。</p>
+
+<h2 id="sec8-1">8.1 多维求根问题的形状</h2>
+
+<p>设 \(F : \mathbb{R}^n \to \mathbb{R}^n\)，要解 \(F(x) = 0\)——即 \(n\) 个方程 \(n\) 个未知数。展开来看：</p>
+
+<p>\[
+\begin{cases} f_1(x_1, \ldots, x_n) = 0 \\ f_2(x_1, \ldots, x_n) = 0 \\ \vdots \\ f_n(x_1, \ldots, x_n) = 0 \end{cases}
+\]</p>
+
+<p>具体例子：</p>
+
+<ul>
+  <li><em>电路分析</em>：基尔霍夫电流定律 + 欧姆定律给一组非线性方程，未知数是各节点电压。</li>
+  <li><em>力学平衡</em>：合力 \(\sum F_i = 0\) 是矢量方程，每个分量给一个标量方程。</li>
+  <li><em>化学平衡</em>：质量作用律给一组多项式方程，未知数是各物种浓度。</li>
+  <li><em>反算 ODE 隐式格式</em>：\(x_{n+1} = x_n + h \cdot f(x_{n+1})\) 在每个时间步都是一道非线性方程组（<a href="ch23.html">第 23 章</a>）。</li>
+</ul>
+
+<p>多维问题比一维难有几个原因。</p>
+
+<p>第一，<em>解的几何</em>更复杂。一维 \(f(x) = 0\) 的解集通常是孤立点。多维 \(F(x) = 0\) 的解集可以是点、线、面、流形——取决于 \(F\) 雅可比的秩。如果 Jacobian 的秩满（\(n\)），解是孤立的；如果不满，解是更高维的子流形（系统欠定）。</p>
+
+<p>第二，<em>没有"括号"概念</em>。一维有 IVT 让你可靠"夹住" 一个根；多维没有自然推广。所以二分法在多维不适用，必须靠迭代法。</p>
+
+<p>第三，<em>多个根</em>难处理。一维你可以扫描区间找全部异号点；多维空间没法"扫描" \(\mathbb{R}^n\)。一般你只能用<em>多个不同初值</em>各跑一次牛顿，希望覆盖到不同根。这是一种"<em>蒙特卡洛式</em>" 求全部根。</p>
+
+<h2 id="sec8-2">8.2 多维牛顿法</h2>
+
+<p>把 \(F\) 在当前 \(x_n\) 处<em>线性化</em>：</p>
+
+<p>\[
+F(x) \approx F(x_n) + J(x_n)(x - x_n),
+\]</p>
+
+<p>其中 \(J(x_n)\) 是 \(n \times n\) 的 <strong>Jacobian 矩阵</strong>，\(J_{ij} = \partial f_i / \partial x_j\)。</p>
+
+<p>令右边等于 0 解 \(x\)：</p>
+
+<p>\[
+J(x_n)(x - x_n) = -F(x_n) \quad \implies \quad x = x_n - J(x_n)^{-1} F(x_n).
+\]</p>
+
+<p>所以多维牛顿迭代：</p>
+
+<p>\[
+\boxed{\ x_{n+1} = x_n + \Delta x_n, \quad J(x_n) \Delta x_n = -F(x_n).\ }
+\]</p>
+
+<p>注意这里写成 \(J \Delta x = -F\) 而<em>不</em>是 \(\Delta x = -J^{-1} F\)。原因是：你<em>从不</em>显式求逆矩阵——求逆<em>慢且不稳</em>（<a href="ch16.html">第 16 章</a>会专门讨论）。你<em>解线性方程组</em>，开销 \(O(n^3)\) 用 LU 分解，比求逆便宜也更稳。这条小语义差别在数值线性代数里很重要：<em>"\(J^{-1} F\)" 是数学符号，"解 \(J \Delta x = -F\)" 是算法</em>。</p>
+
+<h2 id="sec8-3">8.3 跑一遍 2D 例子</h2>
+
+<p>解</p>
+
+<p>\[
+\begin{cases} f_1 = x^2 + y^2 - 4 = 0 & \text{(圆 } r = 2\text{)}\\ f_2 = x y - 1 = 0 & \text{(双曲线 } x y = 1\text{)} \end{cases}
+\]</p>
+
+<p>几何上：两条曲线相交。圆与 \(xy = 1\) 双曲线相交于第一象限两点，第三象限两点。第一象限两点近似 \((1.93, 0.52)\) 和 \((0.52, 1.93)\)。</p>
+
+<p>Jacobian：</p>
+
+<p>\[
+J = \begin{pmatrix} \partial f_1 / \partial x & \partial f_1 / \partial y \\ \partial f_2 / \partial x & \partial f_2 / \partial y \end{pmatrix} = \begin{pmatrix} 2x & 2y \\ y & x \end{pmatrix}.
+\]</p>
+
+<p>从 \((2, 0.5)\) 出发：</p>
+
+<p>步 1：\(F = (4 + 0.25 - 4, 1 - 1) = (0.25, 0)\)。\(J = \begin{pmatrix} 4 & 1 \\ 0.5 & 2 \end{pmatrix}\)。解 \(J \Delta = -(0.25, 0)\) 给 \(\Delta = (-0.0667, 0.0167)\)。新 \(x = (1.933, 0.517)\)。</p>
+
+<p>步 2：\(F \approx (0.0011, 0.0001)\)，已经几乎为零。再做一步把误差压到 \(\sim 10^{-8}\)。再一步到 \(\sim 10^{-15}\)。</p>
+
+<p>三四步收敛到机器精度——和一维牛顿同等的速度。这就是"<em>每步精度翻倍</em>" 在多维的体现。</p>
+
+<h2 id="sec8-4">8.4 局部二次收敛（多维版）</h2>
+
+<p><strong>定理。</strong>设 \(F \in C^2\)，\(F(x^*) = 0\)，\(J(x^*)\) 非奇异。则存在 \(x^*\) 邻域内任意起点的牛顿迭代收敛到 \(x^*\)，且</p>
+
+<p>\[
+\|x_{n+1} - x^*\| \le C \|x_n - x^*\|^2.
+\]</p>
+
+<p>证明思路同一维（多元 Taylor 加 \(J(x^*)^{-1}\) 范数估计）。详见 Nocedal–Wright《Numerical Optimization》第 11 章。</p>
+
+<p>关键前提换成"\(J(x^*)\) 非奇异"——即 Jacobian 行列式非零。这个条件在<em>解的几何</em>是孤立点时通常满足。如果 \(J(x^*)\) 奇异，意味着<em>解附近 \(F\) 的线性化退化</em>——通常对应解的"高重数" 或"沿某方向连续解"。这种退化情形需要专门处理（如修正牛顿、半光滑方法等），本书不深入。</p>
+
+<p>失效模式和一维类似但更微妙：</p>
+
+<ul>
+  <li>\(J(x_n)\) 几乎奇异 → \(\Delta x\) 很大 → 跳得太远 → 发散。修法：步长 \(\alpha < 1\)（line search，下面 8.7 节）。</li>
+  <li>初值远 → 不在收敛域 → 跳到错误根或发散。修法：好的初值、全局策略（trust region、homotopy 等）。</li>
+  <li>解集是连续流形 → \(J\) 在整个流形上奇异 → 牛顿法无法收敛到孤立点。修法：用 SVD-based 伪逆，或者重新参数化。</li>
+</ul>
+
+<h2 id="sec8-5">8.5 Jacobian 太贵：拟牛顿法</h2>
+
+<p>多维牛顿法的实际瓶颈是<em>计算 Jacobian</em>。\(n \times n\) 矩阵有 \(n^2\) 个偏导。每个偏导可能要：</p>
+
+<ul>
+  <li>符号求导（复杂表达式时不实际）；</li>
+  <li>自动微分（现代框架如 JAX / PyTorch 支持，但每步开销仍大）；</li>
+  <li>有限差分 \(\partial f_i / \partial x_j \approx (f_i(x + h e_j) - f_i(x))/h\)，需要 \(n+1\) 次 \(F\) 求值。</li>
+</ul>
+
+<p>对 \(n = 1000\)，每步 \(\sim 10^6\) 次<em>标量</em>函数求值（如果 \(F\) 本身复杂），完全不可接受。</p>
+
+<p><em>拟牛顿法</em>（quasi-Newton）的核心思想：<em>不算精确 Jacobian，用上一步的（\(\Delta x, \Delta F\)）信息更新一个 Jacobian 近似 \(B_n \approx J(x_n)\)</em>。每步开销从 \(O(n^2 \cdot \text{cost of } f) + O(n^3)\) 降到 \(O(n^2)\) 或 \(O(n)\)（带稀疏结构）。</p>
+
+<p>最简单的<em>Broyden 法</em>（"多维割线法"）：用 rank-1 更新维护 \(B_n\)：</p>
+
+<p>\[
+B_{n+1} = B_n + \frac{(\Delta F - B_n \Delta x) \Delta x^T}{\Delta x^T \Delta x}, \quad \Delta x = x_{n+1} - x_n, \quad \Delta F = F(x_{n+1}) - F(x_n).
+\]</p>
+
+<p>这个更新让 \(B_{n+1} \Delta x = \Delta F\)（"<em>割线条件</em>"——多维割线类比）。其它方向上 \(B_{n+1}\) 和 \(B_n\) 一致。</p>
+
+<p>Broyden 法收敛<em>超线性</em>（介于线性和二次之间），但比真牛顿便宜得多。在求解非线性方程组时是个常用工具。</p>
+
+<h2 id="sec8-6">8.6 优化里的拟牛顿：BFGS 与 L-BFGS</h2>
+
+<p>多维牛顿最常见的应用<em>不</em>是解 \(F(x) = 0\)，是<em>最小化</em> 一个标量函数 \(g(x)\)：</p>
+
+<p>\[
+\min_{x \in \mathbb{R}^n} \ g(x).
+\]</p>
+
+<p>极小点处 \(\nabla g(x^*) = 0\)，所以问题归约为求根 \(F(x) = \nabla g(x) = 0\)。Jacobian \(J = \nabla^2 g = H\)（Hessian 矩阵，对称的）。</p>
+
+<p>牛顿法的迭代：</p>
+
+<p>\[
+x_{n+1} = x_n - H(x_n)^{-1} \nabla g(x_n).
+\]</p>
+
+<p>问题同前——Hessian 贵。<em>BFGS</em>（Broyden–Fletcher–Goldfarb–Shanno，四个发明人，1970）是优化里最有名的拟牛顿，rank-2 更新近似 Hessian 的<em>逆</em>：</p>
+
+<p>\[
+B_{n+1}^{-1} = (I - \rho s y^T) B_n^{-1} (I - \rho y s^T) + \rho s s^T,
+\]</p>
+
+<p>其中 \(s = \Delta x\), \(y = \Delta(\nabla g)\), \(\rho = 1/(y^T s)\)。这套更新保证：(1) 满足割线条件；(2) 保持对称性；(3) 保持正定（收敛邻域内）。</p>
+
+<p>BFGS 的好处：每步 \(O(n^2)\)，超线性收敛，常常实战表现接近真牛顿。<em>但</em>需要存 \(n \times n\) 的 \(B^{-1}\)——\(n = 10^6\) 时存不下。</p>
+
+<p><em>L-BFGS</em>（Limited-memory BFGS）解决这个：只存最近 \(m\) 个 \((s_k, y_k)\) 对（典型 \(m = 5\) 到 20），每步用它们隐式应用 BFGS 更新。每步开销 \(O(m n)\)，存储 \(O(m n)\)。这就是<em>大规模优化</em>的工业标准——SciPy 的 <code>L-BFGS-B</code>、TensorFlow 的二阶优化器、几乎所有 logistic regression / 线性 SVM 训练的底层求解器，都是 L-BFGS。</p>
+
+<p>对比一阶方法（梯度下降 \(x_{n+1} = x_n - \alpha \nabla g\)）：梯度下降<em>线性</em>收敛，速率取决于 \(g\) 的条件数；BFGS / L-BFGS <em>超线性</em>收敛。在中等规模光滑优化（10K–100M 维）上 L-BFGS 通常胜出。机器学习里训练神经网络则常用一阶方法（SGD + momentum、Adam），原因是数据集太大、随机近似梯度更适合，而不是 L-BFGS 不好。</p>
+
+<h2 id="sec8-7">8.7 全局收敛策略：line search 与 trust region</h2>
+
+<p>纯牛顿法<em>局部</em>收敛——初值要够近。要把它做成<em>全局</em>收敛（任何起点都收敛到某个局部解），常用两套策略：</p>
+
+<p><strong>Line search（线搜索）。</strong>牛顿法每步给一个方向 \(d_n = -J^{-1} F\) 或 \(-H^{-1} \nabla g\)。这是<em>方向</em>，不一定是<em>合适步长</em>。Line search 在这个方向上找最优步长 \(\alpha\)：</p>
+
+<p>\[
+x_{n+1} = x_n + \alpha_n d_n, \quad \alpha_n = \arg\min_\alpha g(x_n + \alpha d_n).
+\]</p>
+
+<p>实战中不真的求精确最小，用<em>Wolfe 条件</em>做"足够下降" 检查。这套方法保证 \(g(x_{n+1}) < g(x_n)\)——单调下降——所以全局收敛到某个驻点。</p>
+
+<p><strong>Trust region（置信域）。</strong>不沿固定方向走，而是在 \(x_n\) 附近某个球 \(\|x - x_n\| \le r_n\) 内最小化局部二次模型 \(m_n(x) = g(x_n) + \nabla g^T (x - x_n) + \frac{1}{2}(x - x_n)^T H_n (x - x_n)\)。如果新点真的让 \(g\) 下降足够多，扩大 \(r_n\)；否则缩小。</p>
+
+<p>两种思路各有优劣。Line search 实现简单，trust region 在 \(H\) 不正定（出现负曲率方向）时更稳健。SciPy 的 <code>trust-ncg</code>、<code>trust-krylov</code> 是 trust region 实现；<code>BFGS</code>、<code>L-BFGS-B</code> 是 line search 实现。</p>
+
+<p>这两套策略让"<em>局部好快</em>" 的牛顿法变成"<em>全局可靠 + 局部好快</em>" 的工程级算法。所有现代非凸优化器都是这种"<em>方向 by quasi-Newton + 步长 by line search/trust region</em>" 的混合架构。</p>
+
+<p>下一章我们离开求根 / 优化，进入<em>插值与逼近</em>——给一些数据点求一个函数。这是数值方法另一大支柱，应用从信号重建到曲线拟合到求积分都靠它。Banner 风格的故事会从最朴素的"<em>多项式过 \(n+1\) 个点</em>" 开始，然后看为什么这个朴素想法在 \(n\) 大时灾难性失败（Runge 现象）。</p>
+
+<nav class="page-nav"><a href="index.html">⌂ 目录</a><a href="ch7.html">← 上一章 · 第 7 章 牛顿法与割线法</a><a href="ch9.html">下一章 · 第 9 章 多项式插值 →</a></nav>
+</main>
+</body>
+</html>
